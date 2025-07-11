@@ -37,12 +37,18 @@
 
     <div class="section-header">
         <h1>Dashboard</h1>
+
     </div>
+    <!-- <b>
+        Dashboard Akan Dibuat Setelah Semua Modul Siap
+    </b> -->
     <div class="card">
-        <div class="card-header card-dashboard-text">
+        <!-- <div class="card-header card-dashboard-text">
             <b>MENU CEPAT</b>
         </div>
         <div class="card-body">
+        </div> -->
+        <!-- <div class="card-body">
             <div class="row justify-content-center" style="margin-top: -20px;">
 
                 <div class="col-sm-1 mr-4 ml-4 mt-3">
@@ -414,14 +420,14 @@
 
                 </div>
             </div>
-        </div>
+        </div> -->
 
     </div>
 
 
 
 </section>
-<script>
+<!-- <script>
     document.addEventListener("DOMContentLoaded", function() {
         document.body.style.zoom = "70%";
     });
@@ -603,7 +609,7 @@
         let kodeProduksi = $(".kodeProduksi").val();
         window.open(url + `?month=${month}&kodeProduksi=${kodeProduksi}&sort=${sort}&sortType=${sortType}`, "_blank");
     }
-</script>
+</script> -->
 
 
 <?= $this->endSection(); ?>
