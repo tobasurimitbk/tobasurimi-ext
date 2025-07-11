@@ -538,7 +538,8 @@ class RMPurchaseOrderModel extends Model
         rm_purchase_order_details.monthly_price AS dppBulanan,
         rm_purchase_order_details.general_price AS dppUmum,
         rm_purchase_orders.pph AS poPPH,
-        supplier_harga.spesifikasi AS spekName
+        supplier_harga.spesifikasi AS spekName,
+        divisis.divisi AS divisiName,
         ";
 
         $poBBLokalData = $this->asObject()
@@ -553,6 +554,7 @@ class RMPurchaseOrderModel extends Model
             ->join('penerimaan_barang', 'penerimaan_barang_detail.penerimaan_barang_id = penerimaan_barang.id', 'left')
             ->join('warehouses', 'penerimaan_barang.warehouse_id = warehouses.id', 'left')
             ->join('supplier_harga', 'supplier_harga.id = rm_purchase_order_details.supplier_harga_id', 'left')
+            ->join('divisis', 'divisis.id = rm_purchase_orders.divisi_id', 'left')
             ->where($condition)
             ->orderBy($sort, $sortType);
 
