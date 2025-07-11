@@ -160,18 +160,22 @@ class RMPurchaseOrderModel extends Model
         if ($addCondition['search'] || $addCondition['dateStart'] || $addCondition['dateEnd']) {
             $bbLokalDataQry->groupStart();
         }
-        if ($addCondition['search']) {
-            $bbLokalDataQry
-                ->like('po_no', $addCondition['search']);
-            $bbLokalDataQry->orLike('suppliers.name', $addCondition['search']);
-            $bbLokalDataQry->orLike('divisis.divisi', $addCondition['search']);
-        }
+
 
         if ($addCondition['dateStart']) {
             $bbLokalDataQry->where('rm_purchase_orders.po_date >=',  $addCondition['dateStart']);
         }
         if ($addCondition['dateEnd']) {
             $bbLokalDataQry->where('rm_purchase_orders.po_date <=', $addCondition['dateEnd']);
+        }
+
+        if ($addCondition['search']) {
+            $bbLokalDataQry
+                ->groupStart()
+                ->like('po_no', $addCondition['search']);
+            $bbLokalDataQry->orLike('suppliers.name', $addCondition['search']);
+            $bbLokalDataQry->orLike('divisis.divisi', $addCondition['search'])
+                ->groupEnd();
         }
         if ($addCondition['search'] || $addCondition['dateStart'] || $addCondition['dateEnd']) {
             $bbLokalDataQry->groupEnd();
