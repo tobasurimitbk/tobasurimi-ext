@@ -9,7 +9,7 @@
             Export
         </button>
         <ul class="dropdown-menu list-dropdown-company" aria-labelledby="dropdownMenuButtonExport">
-            <li><button class="dropdown-item pdf" onclick="exportData('<?= base_url("/laporan-supplier-lokal-bb/rekap-all-barang/print"); ?>')">PDF</button></li>
+            <!-- <li><button class="dropdown-item pdf" onclick="exportData('<?= base_url("/laporan-supplier-lokal-bb/rekap-all-barang/print"); ?>')">PDF</button></li> -->
             <li><button class="dropdown-item excel" onclick="exportData('<?= base_url("/laporan-supplier-lokal-bb/rekap-all-barang/export-excel"); ?>')">Excel</button></li>
         </ul>
         <div class="col-button-tambah-spp">
@@ -118,6 +118,26 @@
                         </thead>
                         <tbody class="body-table" id="body-table">
                         </tbody>
+                        <tfoot>
+                            <tr>
+                                <th colspan="4" class="text-center">Total</th>
+                                <th class="text-center total-qty"></th>
+                                <th></th>
+                                <th class="text-center total-dpp-umum"></th>
+                                <th class="text-center total-pph-umum"></th>
+                                <th class="text-center total-total-umum"></th>
+                                <th class="text-center total-dpp-harian"></th>
+                                <th class="text-center total-pph-harian"></th>
+                                <th class="text-center total-total-harian"></th>
+                                <th class="text-center total-dpp-bulanan"></th>
+                                <th class="text-center total-pph-bulanan"></th>
+                                <th class="text-center total-total-bulanan"></th>
+                                <th class="text-center total-dpp-subsidi"></th>
+                                <th class="text-center total-pph-subsidi"></th>
+                                <th class="text-center total-total-subsidi"></th>
+                                <th class="text-center total-total-row"></th>
+                            </tr>
+                        </tfoot>
                     </table>
                 </div>
             </div>
@@ -184,7 +204,7 @@
             },
 
             {
-                data: "bagianName",
+                data: "divisiName",
                 className: "text-center",
             },
 
@@ -263,7 +283,94 @@
                 previous: '<i class="fa fa-angle-left"></i>',
                 next: '<i class="fa fa-angle-right"></i>'
             }
-        }
+        },
+        footerCallback: function(row, data, start, end, display) {
+            var api = this.api();
+
+            function parseNumber(value) {
+                return typeof value === 'string' ?
+                    parseFloat(value.replace(/,/g, '')) || 0 :
+                    typeof value === 'number' ?
+                    value :
+                    0;
+            }
+
+            function totalCol(index) {
+                return api
+                    .column(index, {
+                        page: 'current'
+                    })
+                    .data()
+                    .reduce(function(a, b) {
+                        return parseNumber(a) + parseNumber(b);
+                    }, 0);
+            }
+
+            // urutan index kolom (sesuai columns array):
+            const indexes = {
+                qty: 4,
+                dppUmum: 6,
+                pphUmum: 7,
+                totalUmum: 8,
+                dppHarian: 9,
+                pphHarian: 10,
+                totalHarian: 11,
+                dppBulanan: 12,
+                pphBulanan: 13,
+                totalBulanan: 14,
+                dppSubsidi: 15,
+                pphSubsidi: 16,
+                totalSubsidi: 17,
+                totalRow: 18,
+            };
+
+            $('.total-qty').html(totalCol(indexes.qty).toLocaleString('en-US', {
+                minimumFractionDigits: 2
+            }));
+            $('.total-dpp-umum').html(totalCol(indexes.dppUmum).toLocaleString('en-US', {
+                minimumFractionDigits: 2
+            }));
+            $('.total-pph-umum').html(totalCol(indexes.pphUmum).toLocaleString('en-US', {
+                minimumFractionDigits: 2
+            }));
+            $('.total-total-umum').html(totalCol(indexes.totalUmum).toLocaleString('en-US', {
+                minimumFractionDigits: 2
+            }));
+
+            $('.total-dpp-harian').html(totalCol(indexes.dppHarian).toLocaleString('en-US', {
+                minimumFractionDigits: 2
+            }));
+            $('.total-pph-harian').html(totalCol(indexes.pphHarian).toLocaleString('en-US', {
+                minimumFractionDigits: 2
+            }));
+            $('.total-total-harian').html(totalCol(indexes.totalHarian).toLocaleString('en-US', {
+                minimumFractionDigits: 2
+            }));
+
+            $('.total-dpp-bulanan').html(totalCol(indexes.dppBulanan).toLocaleString('en-US', {
+                minimumFractionDigits: 2
+            }));
+            $('.total-pph-bulanan').html(totalCol(indexes.pphBulanan).toLocaleString('en-US', {
+                minimumFractionDigits: 2
+            }));
+            $('.total-total-bulanan').html(totalCol(indexes.totalBulanan).toLocaleString('en-US', {
+                minimumFractionDigits: 2
+            }));
+
+            $('.total-dpp-subsidi').html(totalCol(indexes.dppSubsidi).toLocaleString('en-US', {
+                minimumFractionDigits: 2
+            }));
+            $('.total-pph-subsidi').html(totalCol(indexes.pphSubsidi).toLocaleString('en-US', {
+                minimumFractionDigits: 2
+            }));
+            $('.total-total-subsidi').html(totalCol(indexes.totalSubsidi).toLocaleString('en-US', {
+                minimumFractionDigits: 2
+            }));
+
+            $('.total-total-row').html(totalCol(indexes.totalRow).toLocaleString('en-US', {
+                minimumFractionDigits: 2
+            }));
+        },
     })
 
     const changeSort = function(val) {
