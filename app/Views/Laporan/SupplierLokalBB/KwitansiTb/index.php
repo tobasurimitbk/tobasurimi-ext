@@ -9,6 +9,16 @@
             <a class="btn btn-hide-form btn-discard float-right" href="<?= base_url("laporan-supplier-lokal-bb"); ?>">
                 Kembali
             </a>
+            <form id="form-export-pdf" method="GET" action="<?= base_url('laporan-supplier-lokal-bb/print-all-kwitansi-tb'); ?>" target="_blank">
+                <input type="hidden" name="month" id="export_month">
+                <input type="hidden" name="year" id="export_year">
+                <input type="hidden" name="tb_search" id="export_tb_search">
+                <input type="hidden" name="supplier_search" id="export_supplier_search">
+
+                <button type="submit" class="btn btn-warning btn-print" id="btn-print-all">
+                    Export
+                </button>
+            </form>
         </div>
     </div>
     <div class="card">
@@ -235,6 +245,15 @@
 
         window.open("<?= base_url('/') ?>" + res, "_blank");
     }
+
+    $('#btn-print-all').on('click', function(e) {
+        e.preventDefault();
+        $('#export_month').val($('#month').val());
+        $('#export_year').val($('#year').val());
+        $('#export_tb_search').val($('#tb_search').val());
+        $('#export_supplier_search').val($('.supplier_search').val());
+        $('#form-export-pdf').submit();
+    });
 </script>
 
 <?= $this->endSection(); ?>

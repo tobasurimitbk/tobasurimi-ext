@@ -7,6 +7,7 @@ use App\Models\CompaniesModel;
 use App\Models\ProvincesModel;
 use App\Models\SupplierModel;
 use Dompdf\Dompdf;
+use Dompdf\Options;
 
 class KwitansiTb extends BaseController
 {
@@ -200,5 +201,103 @@ class KwitansiTb extends BaseController
         $dompdf->stream("Cetak Kwitansi TB ", array("Attachment" => false));
 
         exit(0);
+    }
+
+    public function printAllKwitansiTB()
+    {
+        $month = $this->request->getGet('month');
+        $year = $this->request->getGet('year');
+        $tbSearch = $this->request->getGet('tb_search');
+        $supplierSearch = $this->request->getGet('supplier_search');
+
+        $allSuppliers = $this->supplierModel->getSupplierByType("BAHAN BAKU");
+        $noKwitansi = '';
+        $pages = [];
+
+        foreach ($allSuppliers as $data) {
+            if ($supplierSearch && stripos($data['name'], $supplierSearch) === false) continue;
+
+            $kwitansiTB = $this->supplierModel->getKwitansiTBBySupplier(
+                $data['id'],
+                $year,
+                $month
+            );
+
+            $totalTB = $kwitansiTB['total'];
+            $masuk = false;
+
+            if ($tbSearch === "1" && $totalTB != 0) $masuk = true;
+            elseif ($tbSearch === "0" && $totalTB == 0) $masuk = true;
+            elseif ($tbSearch === null || $tbSearch === '') $masuk = true;
+
+            if ($masuk && $totalTB != 0) {
+                $noKwitansi = ($noKwitansi == '') ? "001/KTB/$month/$year" : generateNoKwitansiTB($noKwitansi, $month, $year);
+                $company = (new CompaniesModel())->where('id', $this->this_company_id)->where('deletedAt', null)->first();
+                $provinsi = (new ProvincesModel())->where('id', $company['province_id'])->first();
+
+                $tanggal = "$year-$month-" . date("t", strtotime("$year-$month-01"));
+
+                $kwitansiTBMerged = [];
+                $namaBarang = "";
+                $kodeSatuan = "";
+                $qtyTotal = 0;
+                $hargaBulananTotal = 0;
+                $pphTotal = 0;
+                $hargaBulananPphTotal = 0;
+
+                foreach ($kwitansiTB['all'] as $k) {
+                    $namaBarang = $k['nama_barang'];
+                    $kodeSatuan = $k['kode_satuan'];
+                    $qtyTotal += $k['qty'];
+                    $hargaBulananTotal += $k['harga_bulanan'];
+                    $pphTotal += $k['pph'];
+                    $hargaBulananPphTotal += $k['harga_bulanan_pph'];
+                }
+
+                $kwitansiTBFinal = [
+                    'all' => [[
+                        'nama_barang' => $namaBarang,
+                        'kode_satuan' => $kodeSatuan,
+                        'qty' => $qtyTotal,
+                        'harga_bulanan' => $hargaBulananTotal,
+                        'pph' => $pphTotal,
+                        'harga_bulanan_pph' => $hargaBulananPphTotal
+                    ]],
+                    'supplier' => $kwitansiTB['supplier'],
+                    'total' => $kwitansiTB['total']
+                ];
+
+                $data = [
+                    'year' => $year,
+                    'month' => $month,
+                    'tanggal' => $tanggal,
+                    'noKwitansi' => $noKwitansi,
+                    'company' => $company,
+                    'kwitansis' => $kwitansiTBFinal,
+                    'provinsi' => $provinsi
+                ];
+
+                // Render view ke string
+                $pages[] = view('Laporan/SupplierLokalBB/KwitansiTb/print', $data);
+            }
+        }
+
+        if (empty($pages)) {
+            return redirect()->back()->with('error', 'Tidak ada data untuk dicetak.');
+        }
+
+        // Gabungkan semua halaman dengan page break
+        $html = implode('', $pages);
+
+        $options = new Options();
+        $options->set('isHtml5ParserEnabled', true);
+        $options->set('isRemoteEnabled', true);
+
+        $dompdf = new Dompdf($options);
+        $dompdf->loadHtml($html);
+        $dompdf->setPaper('A4', 'portrait');
+        $dompdf->render();
+        $dompdf->stream("Kwitansi_TB_Bulanan_$month-$year.pdf", ["Attachment" => false]);
+        exit;
     }
 }
