@@ -135,7 +135,7 @@
                         </tbody>
                         <tfoot>
                             <tr>
-                                <th colspan="6" class="text-right">Total</th>
+                                <th colspan="7" class="text-right">Total</th>
                                 <th id="ft-qtyall" class="text-center">0</th>
                                 <th colspan="2" class="text-right"></th>
                                 <th id="ft-dppUmum" class="text-center">0</th>
