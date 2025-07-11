@@ -277,6 +277,7 @@ class RMPurchaseOrderModel extends Model
                             companies.holding_company,
                             companies.company AS companyName,
                             companies.address AS companyAddress,
+                            companies.holding_company AS holdingCompany,
                             suppliers.name AS supplierName,
                             suppliers.address AS supplierAddress,
                             suppliers.phone AS supplierPhone,

@@ -14,8 +14,10 @@
 
         @page {
             size: 8.27in 5.50in landscape;
-            margin: 29px;
-            padding: 29px;
+            margin: 25px;
+            /* Margin diperkecil */
+            padding: 25px;
+            /* Padding diperkecil */
         }
 
         .pagebreak {
@@ -168,7 +170,7 @@
             </div>
             <div class="w-50 d-flex content-between" style="margin-top: -40px;">
                 <div style="border: 3px solid;border-style: double;width: 60%;padding: 0.5rem;">
-                    <b> PT TOBASURIMI INDUSTRIES (<?= $company['company'] ?>)</b> <br>
+                    <b><?= $company['holding_company'] ?> (<?= $company['company'] ?>)</b> <br>
                 </div>
 
             </div>
@@ -177,7 +179,7 @@
                 <tr>
                     <td style="vertical-align: top; width: 40%;">SUDAH TERIMA DARI <br> (RECEIVED FROM)</td>
                     <td style="vertical-align: top;">: </td>
-                    <td style="vertical-align: top; width: 55%;"><?= strtoupper($company['company']) ?></td>
+                    <td style="vertical-align: top; width: 55%;"><?= $company['holding_company'] ?> (<?= strtoupper($company['company']) ?>)</td>
                 </tr>
                 <tr>
                     <td style="vertical-align: top;">BANYAKNYA UANG <br> (AMOUNT)</td>
@@ -229,7 +231,7 @@
                 </div>
                 <div class="w-50 d-flex content-between" style="margin-top: -40px;">
                     <div style="border: 3px solid;border-style: double;width: 60%;padding: 0.5rem;">
-                        <b> PT TOBASURIMI INDUSTRIES (<?= $company['company'] ?>)</b> <br>
+                        <b> <?= $company['holding_company'] ?> (<?= $company['company'] ?>)</b> <br>
                     </div>
                 </div>
 
@@ -237,7 +239,7 @@
                     <tr>
                         <td style="vertical-align: top; width: 40%;">SUDAH TERIMA DARI <br> (RECEIVED FROM)</td>
                         <td style="vertical-align: top;">: </td>
-                        <td style="vertical-align: top; width: 55%;"><?= strtoupper($company['company']) ?></td>
+                        <td style="vertical-align: top; width: 55%;"><?= $company['holding_company'] ?> (<?= strtoupper($company['company']) ?>)</td>
                     </tr>
                     <tr>
                         <td style="vertical-align: top;">BANYAKNYA UANG <br> (AMOUNT)</td>
