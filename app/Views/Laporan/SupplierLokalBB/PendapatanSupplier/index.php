@@ -104,7 +104,6 @@
                                 <option value="<?= $row['id']; ?>" data-code=""><?= strtoupper($row["divisi"]); ?></option>
                             <?php endforeach; ?>
 
-
                         </select>
                         <label for="floatingInput">Filter Department</label>
                     </div>

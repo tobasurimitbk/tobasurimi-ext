@@ -1174,6 +1174,7 @@ class LaporanSupplierLokalBB extends BaseController
         $data = [
             'getSupplier' => $this->supplierModel->where('deletedAt', NULL)->where('type', 'BAHAN BAKU')->findAll(),
             'getBarang' => $this->barangMasterModel->getBarangByType("bahan_baku"),
+            'getDivisi' => $this->divisiModel->getDivisiAccess(),
         ];
 
         return view('Laporan/SupplierLokalBB/RekapAllSupplier/index', $data);
@@ -1294,6 +1295,7 @@ class LaporanSupplierLokalBB extends BaseController
             if (!isset($groupedData[$groupKey])) {
                 $groupedData[$groupKey] = [
                     'supplierName'   => $row->supplierName,
+                    'divisiName'     => $row->divisiName,
                     'barangName'     => $row->barangName,
                     'spekName'       => $row->spekName,
                     'satuanName'     => $row->satuanName,
@@ -1389,7 +1391,6 @@ class LaporanSupplierLokalBB extends BaseController
 
     public function exportPDFLaporanRekapAllSupplier()
     {
-
         $totalDppUmum = 0;
         $totalPphUmum = 0;
         $totalTotalUmum = 0;
@@ -1421,6 +1422,7 @@ class LaporanSupplierLokalBB extends BaseController
             "barangId"     => $this->request->getGet("filter_barang"),
             "warehouseId"  => $this->request->getGet("filter_warehouse"),
             "poNo"         => $this->request->getGet("filter_po_no"),
+            "divisiId"     => $this->request->getGet("filter_divisi"),
         ];
 
         $availableSort = [
@@ -1645,6 +1647,7 @@ class LaporanSupplierLokalBB extends BaseController
             "barangId"     => $this->request->getGet("filter_barang"),
             "warehouseId"  => $this->request->getGet("filter_warehouse"),
             "poNo"         => $this->request->getGet("filter_po_no"),
+            "divisiId"     => $this->request->getGet("filter_divisi"),
         ];
 
         $availableSort = [
@@ -1850,121 +1853,190 @@ class LaporanSupplierLokalBB extends BaseController
             $totalTotalRow += $item['totalRow'];
         }
 
-        // Setup spreadsheet
         $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
 
-        // Header & Tanggal
-        $sheet->setCellValue('A1', $header);
-        $sheet->mergeCells('A1:P1');
+        // Header utama (Judul hanya 1 kali di baris 1)
+        $sheet->setCellValue('A1', "LAPORAN PENDAPATAN DETAIL SUPPLIER");
+        $sheet->mergeCells('A1:U1');
         $sheet->getStyle('A1')->getFont()->setBold(true)->setSize(14);
         $sheet->getStyle('A1')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
 
+        // Tanggal (baris 2)
         $sheet->setCellValue('A2', 'Tanggal');
         $sheet->setCellValue('B2', ':');
-        if ($tanggalAwal && $tanggalAkhir) {
-            $sheet->setCellValue('C2', $tanggalAwal);
+        if ($addCondition['dateStart'] && $addCondition['dateEnd']) {
+            $sheet->setCellValue('C2', $addCondition['dateStart']);
             $sheet->setCellValue('D2', 's/d');
-            $sheet->setCellValue('E2', $tanggalAkhir);
+            $sheet->setCellValue('E2', $addCondition['dateEnd']);
         } else {
             $sheet->setCellValue('C2', 'ALL');
         }
 
-        // Header tabel
-        $sheet->fromArray([
-            [
-                'No.',
-                'Supplier',
-                'Bahan Baku',
-                'Nama Satuan',
-                'QTY',
-                'DPP Umum',
-                'PPh Umum',
-                'Total Umum',
-                'DPP Harian',
-                'PPh Harian',
-                'Total Harian',
-                'DPP Bulanan',
-                'PPh Bulanan',
-                'Total Bulanan',
-                'DPP Subsidi',
-                'PPh Subsidi',
-                'Total Subsidi',
-                'Total'
-            ]
-        ], NULL, 'A4');
+        // Mulai isi data dari baris 5
+        $currentRow = 5;
+        $cols = range('E', 'U'); // Format kolom angka (dari E sampai U, karena kolom 'C' dihapus)
 
-        $sheet->getStyle('A4:P4')->getFont()->setBold(true);
-        $sheet->getStyle('A4:P4')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
-        $sheet->getStyle('A4:P4')->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_THIN);
-
-        // Isi data
-        $startRow = 5;
-        $no = 1;
-        foreach ($dataOrder as $item) {
-            $sheet->fromArray([
-                $no++,
-                $item['supplierName'] ?? '',
-                $item['barangName'] ?? '',
-                $item['satuanName'] ?? '',
-                $item['qtyPO'] ?? '',
-                $item['dppUmum'] ?? 0,
-                $item['pphUmum'] ?? 0,
-                $item['totalUmum'] ?? 0,
-                $item['dppHarian'] ?? 0,
-                $item['pphHarian'] ?? 0,
-                $item['totalHarian'] ?? 0,
-                $item['dppBulanan'] ?? 0,
-                $item['pphBulanan'] ?? 0,
-                $item['totalBulanan'] ?? 0,
-                $item['subsidi'] ?? 0,
-                $item['pphSubsidi'] ?? 0,
-                $item['totalSubsidi'] ?? 0,
-                $item['totalRow'] ?? 0
-            ], null, 'A' . $startRow);
-            $startRow++;
-        }
-
-
-        // Baris total
-        $sheet->fromArray([
-            '',
-            '',
-            '',
-            'Total',
-            $totalQty,
-            $totalDppUmum,
-            $totalPphUmum,
-            $totalTotalUmum,
-            $totalDppHarian,
-            $totalPphHarian,
-            $totalTotalHarian,
-            $totalDppBulanan,
-            $totalPphBulanan,
-            $totalTotalBulanan,
-            $totalDppSubsidi,
-            $totalPphSubsidi,
-            $totalTotalSubsidi,
-            $totalTotalRow
-        ], NULL, 'A' . $startRow);
-        $sheet->getStyle("A{$startRow}:P{$startRow}")->getFont()->setBold(true);
-
-        // Format angka
-        $cols = range('D', 'P');
-        for ($r = 5; $r <= $startRow; $r++) {
-            foreach ($cols as $col) {
-                $sheet->getStyle("{$col}{$r}")
-                    ->getNumberFormat()
-                    ->setFormatCode(NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1);
+        // Kelompokkan berdasarkan barangName
+        $groupedByBarang = [];
+        foreach ($groupedData as $key => $item) {
+            $barangName = $item['barangName'];
+            if (!isset($groupedByBarang[$barangName])) {
+                $groupedByBarang[$barangName] = [];
             }
+            $groupedByBarang[$barangName][] = $item;
         }
 
-        // Autosize kolom
-        foreach (range('A', 'P') as $col) {
+        foreach ($groupedByBarang as $barangName => $items) {
+            // Judul barang
+            $sheet->setCellValue('A' . $currentRow, 'Bahan Baku: ' . $barangName);
+            $sheet->mergeCells('A' . $currentRow . ':U' . $currentRow);
+            $sheet->getStyle('A' . $currentRow)->getFont()->setBold(true);
+            $currentRow += 1;
+
+            // Header 2 baris
+            $sheet->setCellValue('A' . $currentRow, 'No.');
+            $sheet->mergeCells('A' . $currentRow . ':A' . ($currentRow + 1));
+            $sheet->setCellValue('B' . $currentRow, 'Supplier');
+            $sheet->mergeCells('B' . $currentRow . ':B' . ($currentRow + 1));
+            $sheet->setCellValue('C' . $currentRow, 'Nama Satuan');
+            $sheet->mergeCells('C' . $currentRow . ':C' . ($currentRow + 1));
+            $sheet->setCellValue('D' . $currentRow, 'QTY');
+            $sheet->mergeCells('D' . $currentRow . ':D' . ($currentRow + 1));
+
+            $sheet->setCellValue('E' . $currentRow, 'UMUM');
+            $sheet->mergeCells('E' . $currentRow . ':G' . $currentRow);
+            $sheet->setCellValue('H' . $currentRow, 'HARIAN');
+            $sheet->mergeCells('H' . $currentRow . ':J' . $currentRow);
+            $sheet->setCellValue('K' . $currentRow, 'TAMBAHAN HARIAN');
+            $sheet->mergeCells('K' . $currentRow . ':M' . $currentRow);
+            $sheet->setCellValue('N' . $currentRow, 'TAMBAHAN BULANAN');
+            $sheet->mergeCells('N' . $currentRow . ':P' . $currentRow);
+            $sheet->setCellValue('Q' . $currentRow, 'SUBSIDI');
+            $sheet->mergeCells('Q' . $currentRow . ':S' . $currentRow);
+            $sheet->setCellValue('T' . $currentRow, 'TOTAL');
+            $sheet->mergeCells('T' . $currentRow . ':T' . ($currentRow + 1));
+            $sheet->setCellValue('U' . $currentRow, 'TOTAL');
+            $sheet->mergeCells('U' . $currentRow . ':U' . ($currentRow + 1));
+
+            $subHeaders = [
+                'E' => 'DPP',
+                'F' => 'PPH',
+                'G' => 'Total',
+                'H' => 'DPP',
+                'I' => 'PPH',
+                'J' => 'Total',
+                'K' => 'DPP',
+                'L' => 'PPH',
+                'M' => 'Total',
+                'N' => 'DPP',
+                'O' => 'PPH',
+                'P' => 'Total',
+                'Q' => 'DPP',
+                'R' => 'PPH',
+                'S' => 'Total',
+            ];
+
+            foreach ($subHeaders as $col => $label) {
+                $sheet->setCellValue($col . ($currentRow + 1), $label);
+            }
+
+            $sheet->getStyle('A' . $currentRow . ':U' . ($currentRow + 1))->getFont()->setBold(true);
+            $sheet->getStyle('A' . $currentRow . ':U' . ($currentRow + 1))->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+            $sheet->getStyle('A' . $currentRow . ':U' . ($currentRow + 1))->getAlignment()->setVertical(Alignment::VERTICAL_CENTER);
+            $sheet->getStyle('A' . $currentRow . ':U' . ($currentRow + 1))->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_THIN);
+
+            $currentRow += 2;
+            $no = 1;
+
+            $totals = array_fill_keys([
+                'qtyPO',
+                'dppUmum',
+                'pphUmum',
+                'totalUmum',
+                'dppHarian',
+                'pphHarian',
+                'totalHarian',
+                'dppBulanan',
+                'pphBulanan',
+                'totalBulanan',
+                'subsidi',
+                'pphSubsidi',
+                'totalSubsidi',
+                'totalRow'
+            ], 0);
+
+            foreach ($items as $item) {
+                $sheet->setCellValue('A' . $currentRow, $no++);
+                $sheet->setCellValue('B' . $currentRow, $item['supplierName']);
+                $sheet->setCellValue('C' . $currentRow, $item['satuanName']);
+                $sheet->setCellValue('D' . $currentRow, $item['qtyPO']);
+
+                $sheet->setCellValue('E' . $currentRow, $item['dppUmum']);
+                $sheet->setCellValue('F' . $currentRow, $item['pphUmum']);
+                $sheet->setCellValue('G' . $currentRow, $item['totalUmum']);
+
+                $sheet->setCellValue('H' . $currentRow, $item['dppHarian']);
+                $sheet->setCellValue('I' . $currentRow, $item['pphHarian']);
+                $sheet->setCellValue('J' . $currentRow, $item['totalHarian']);
+
+                $sheet->setCellValue('K' . $currentRow, $item['dppHarian']);
+                $sheet->setCellValue('L' . $currentRow, $item['pphHarian']);
+                $sheet->setCellValue('M' . $currentRow, $item['totalHarian']);
+
+                $sheet->setCellValue('N' . $currentRow, $item['dppBulanan']);
+                $sheet->setCellValue('O' . $currentRow, $item['pphBulanan']);
+                $sheet->setCellValue('P' . $currentRow, $item['totalBulanan']);
+
+                $sheet->setCellValue('Q' . $currentRow, $item['subsidi']);
+                $sheet->setCellValue('R' . $currentRow, $item['pphSubsidi']);
+                $sheet->setCellValue('S' . $currentRow, $item['totalSubsidi']);
+
+                $sheet->setCellValue('T' . $currentRow, $item['totalRow']);
+                $sheet->setCellValue('U' . $currentRow, $item['totalRow']);
+
+                foreach (range('E', 'U') as $col) {
+                    $sheet->getStyle($col . $currentRow)->getNumberFormat()->setFormatCode(NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1);
+                }
+
+                foreach ($totals as $key => &$val) $val += $item[$key];
+                $currentRow++;
+            }
+
+            // Row TOTAL per bahan
+            $sheet->setCellValue('A' . $currentRow, 'TOTAL');
+            $sheet->mergeCells('A' . $currentRow . ':C' . $currentRow);
+            $sheet->setCellValue('D' . $currentRow, $totals['qtyPO']);
+            $sheet->setCellValue('E' . $currentRow, $totals['dppUmum']);
+            $sheet->setCellValue('F' . $currentRow, $totals['pphUmum']);
+            $sheet->setCellValue('G' . $currentRow, $totals['totalUmum']);
+            $sheet->setCellValue('H' . $currentRow, $totals['dppHarian']);
+            $sheet->setCellValue('I' . $currentRow, $totals['pphHarian']);
+            $sheet->setCellValue('J' . $currentRow, $totals['totalHarian']);
+            $sheet->setCellValue('K' . $currentRow, $totals['dppHarian']);
+            $sheet->setCellValue('L' . $currentRow, $totals['pphHarian']);
+            $sheet->setCellValue('M' . $currentRow, $totals['totalHarian']);
+            $sheet->setCellValue('N' . $currentRow, $totals['dppBulanan']);
+            $sheet->setCellValue('O' . $currentRow, $totals['pphBulanan']);
+            $sheet->setCellValue('P' . $currentRow, $totals['totalBulanan']);
+            $sheet->setCellValue('Q' . $currentRow, $totals['subsidi']);
+            $sheet->setCellValue('R' . $currentRow, $totals['pphSubsidi']);
+            $sheet->setCellValue('S' . $currentRow, $totals['totalSubsidi']);
+            $sheet->setCellValue('T' . $currentRow, $totals['totalRow']);
+            $sheet->setCellValue('U' . $currentRow, $totals['totalRow']);
+
+            $sheet->getStyle('A' . $currentRow . ':U' . $currentRow)->getFont()->setBold(true);
+            foreach (range('E', 'U') as $col) {
+                $sheet->getStyle($col . $currentRow)->getNumberFormat()->setFormatCode(NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1);
+            }
+
+            $currentRow += 3;
+        }
+
+        foreach (range('A', 'U') as $col) {
             $sheet->getColumnDimension($col)->setAutoSize(true);
         }
 
-        // Download response
         $filename = 'Laporan_Rekap_' . date('Ymd_His') . '.xlsx';
         header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
         header("Content-Disposition: attachment;filename=\"{$filename}\"");

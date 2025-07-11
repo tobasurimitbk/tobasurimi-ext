@@ -9,7 +9,7 @@
             Export
         </button>
         <ul class="dropdown-menu list-dropdown-company" aria-labelledby="dropdownMenuButtonExport">
-            <li><button class="dropdown-item pdf" onclick="pdf('<?= base_url("/laporan-supplier-lokal-bb/rekap-all-supplier/print"); ?>')">PDF</button></li>
+            <!-- <li><button class="dropdown-item pdf" onclick="pdf('<?= base_url("/laporan-supplier-lokal-bb/rekap-all-supplier/print"); ?>')">PDF</button></li> -->
             <li><button class="dropdown-item pdf" onclick="pdf('<?= base_url("/laporan-supplier-lokal-bb/rekap-all-supplier/print-excel"); ?>')">Excel</button></li>
         </ul>
         <div class="col-button-tambah-spp">
@@ -77,6 +77,20 @@
                         <label for="floatingInput">Filter Barang</label>
                     </div>
                 </div>
+
+                <!-- <div class="col-md-3">
+                    <div class="form-floating mb-3">
+                        <select class="form-select filter_divisi" name="filter_divisi" id="filter_divisi">
+                            <option value="" data-code=""></option>
+
+                            <?php foreach ($getDivisi as $row) : ?>
+                                <option value="<?= $row['id']; ?>" data-code=""><?= strtoupper($row["divisi"]); ?></option>
+                            <?php endforeach; ?>
+
+                        </select>
+                        <label for="floatingInput">Filter Department</label>
+                    </div>
+                </div> -->
             </div>
             <div class="row">
                 <div class="table-responsive">
@@ -167,6 +181,7 @@
                 data.sortType = sortType;
                 data.filter_supplier = $(".filter_supplier").val();
                 data.filter_barang = $(".filter_barang").val();
+                data.filter_divisi = $(".filter_divisi").val();
             },
         },
         // scrollX: true,
@@ -324,12 +339,18 @@
         table.ajax.reload();
     })
 
-    $(".dateStart, .dateEnd, .filter_supplier, .filter_barang").change(function() {
+    $(".dateStart, .dateEnd, .filter_supplier, .filter_barang, .filter_divisi").change(function() {
         table.ajax.reload();
     });
 
     $('.filter_supplier').select2({
         placeholder: "Pilih Supplier",
+        theme: "bootstrap-5",
+        allowClear: true,
+    })
+
+    $('.filter_divisi').select2({
+        placeholder: "Pilih Department",
         theme: "bootstrap-5",
         allowClear: true,
     })
@@ -341,14 +362,14 @@
     })
 
 
-    $('.filter_supplier, .filter_barang')
+    $('.filter_supplier, .filter_barang, .filter_divisi')
         .parent('div')
         .children('span')
         .children('span')
         .children('span')
         .css('height', ' calc(3.5rem + 2px)');
 
-    $('.filter_supplier, .filter_barang')
+    $('.filter_supplier, .filter_barang, .filter_divisi')
         .parent('div')
         .children('span')
         .children('span')
@@ -356,7 +377,7 @@
         .children('span')
         .css('margin-top', '22px').css('margin-left', '-7px');
 
-    $('.filter_supplier, .filter_barang')
+    $('.filter_supplier, .filter_barang, .filter_divisi')
         .parent('div')
         .find('label')
         .css('z-index', '1');
