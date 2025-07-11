@@ -63,6 +63,7 @@ class LaporanSupplierLokalBB extends BaseController
             'getSupplier' => $this->supplierModel->where('deletedAt', NULL)->where('type', 'BAHAN BAKU')->findAll(),
             'getWarehouse' => $this->warehousesModel->get_by_company_id($this->this_company_id),
             'getBarang' => $this->barangMasterModel->getBarangByType("bahan_baku"),
+            'getDivisi' => $this->divisiModel->getDivisiAccess(),
         ];
 
 
@@ -93,6 +94,7 @@ class LaporanSupplierLokalBB extends BaseController
             "barangId"     => $this->request->getGet("filter_barang"),
             "warehouseId"  => $this->request->getGet("filter_warehouse"),
             "poNo"         => $this->request->getGet("filter_po_no"),
+            "divisiId"         => $this->request->getGet("filter_divisi"),
         ];
 
         $availableSort = [
@@ -319,6 +321,7 @@ class LaporanSupplierLokalBB extends BaseController
             "barangId"     => $this->request->getGet("filter_barang"),
             "warehouseId"  => $this->request->getGet("filter_warehouse"),
             "poNo"         => $this->request->getGet("filter_po_no"),
+            "divisiId"         => $this->request->getGet("filter_divisi"),
         ];
 
         $availableSort = [

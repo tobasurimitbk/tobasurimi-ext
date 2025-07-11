@@ -21,8 +21,8 @@
 
     <div class="card">
         <div class="card-body">
-            <div class="row justify-content-end row-col-spp">
-                <div class="col-md-2">
+            <div class="row row-col-spp">
+                <div class="col-md-3">
                     <div class="form-floating mb-3">
                         <select class="form-select filter_po_no" name="filter_po_no" id="filter_po_no">
                             <option value="" data-code=""></option>
@@ -36,7 +36,7 @@
                         <label for="floatingInput">Filter No PO</label>
                     </div>
                 </div>
-                <div class="col-md-2">
+                <div class="col-md-3">
                     <div class="input-group input-group-password">
                         <input autocomplete="one-time-code" class="form-control input-picker dateStart" id="dateStart" name="dateStart" placeholder="Tanggal">
                         <div class="input-group-prepend group-prepend-password align-items-center">
@@ -44,7 +44,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-md-2">
+                <div class="col-md-3">
                     <div class="input-group input-group-password">
                         <input autocomplete="one-time-code" class="form-control input-picker dateEnd" id="dateEnd" name="dateEnd" placeholder="Tanggal">
                         <div class="input-group-prepend group-prepend-password align-items-center">
@@ -52,7 +52,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-md-2">
+                <div class="col-md-3">
                     <div class="form-floating mb-3">
                         <select class="form-select filter_supplier" name="filter_supplier" id="filter_supplier">
                             <option value="" data-code=""></option>
@@ -66,7 +66,7 @@
                         <label for="floatingInput">Filter Supplier</label>
                     </div>
                 </div>
-                <div class="col-md-2">
+                <div class="col-md-3">
                     <div class="form-floating mb-3">
                         <select class="form-select filter_warehouse" name="filter_warehouse" id="filter_warehouse">
                             <option value="" data-code=""></option>
@@ -80,7 +80,7 @@
                         <label for="floatingInput">Filter Warehouse</label>
                     </div>
                 </div>
-                <div class="col-md-2">
+                <div class="col-md-3">
                     <div class="form-floating mb-3">
                         <select class="form-select filter_barang" name="filter_barang" id="filter_barang">
                             <option value="" data-code=""></option>
@@ -92,6 +92,21 @@
 
                         </select>
                         <label for="floatingInput">Filter Barang</label>
+                    </div>
+                </div>
+
+                <div class="col-md-3">
+                    <div class="form-floating mb-3">
+                        <select class="form-select filter_divisi" name="filter_divisi" id="filter_divisi">
+                            <option value="" data-code=""></option>
+
+                            <?php foreach ($getDivisi as $row) : ?>
+                                <option value="<?= $row['id']; ?>" data-code=""><?= strtoupper($row["divisi"]); ?></option>
+                            <?php endforeach; ?>
+
+
+                        </select>
+                        <label for="floatingInput">Filter Department</label>
                     </div>
                 </div>
             </div>
@@ -192,6 +207,7 @@
                 data.filter_warehouse = $(".filter_warehouse").val();
                 data.filter_barang = $(".filter_barang").val();
                 data.filter_po_no = $(".filter_po_no").val();
+                data.filter_divisi = $(".filter_divisi").val();
             },
         },
         // scrollX: true,
@@ -371,12 +387,18 @@
         table.ajax.reload();
     })
 
-    $(".dateStart, .dateEnd, .filter_supplier, .filter_warehouse, .filter_barang, .filter_po_no").change(function() {
+    $(".dateStart, .dateEnd, .filter_supplier, .filter_warehouse, .filter_barang, .filter_po_no, .filter_divisi").change(function() {
         table.ajax.reload();
     });
 
     $('.filter_supplier').select2({
         placeholder: "Pilih Supplier",
+        theme: "bootstrap-5",
+        allowClear: true,
+    })
+
+    $('.filter_divisi').select2({
+        placeholder: "Pilih Department",
         theme: "bootstrap-5",
         allowClear: true,
     })
@@ -400,14 +422,14 @@
     })
 
 
-    $('.filter_supplier, .filter_warehouse, .filter_barang, .filter_po_no')
+    $('.filter_supplier, .filter_warehouse, .filter_barang, .filter_po_no, .filter_divisi')
         .parent('div')
         .children('span')
         .children('span')
         .children('span')
         .css('height', ' calc(3.5rem + 2px)');
 
-    $('.filter_supplier, .filter_warehouse, .filter_barang, .filter_po_no')
+    $('.filter_supplier, .filter_warehouse, .filter_barang, .filter_po_no, .filter_divisi')
         .parent('div')
         .children('span')
         .children('span')
@@ -415,7 +437,7 @@
         .children('span')
         .css('margin-top', '22px').css('margin-left', '-7px');
 
-    $('.filter_supplier, .filter_warehouse, .filter_barang, .filter_po_no')
+    $('.filter_supplier, .filter_warehouse, .filter_barang, .filter_po_no, .filter_divisi')
         .parent('div')
         .find('label')
         .css('z-index', '1');
@@ -440,8 +462,9 @@
         let filter_warehouse = $(".filter_warehouse").val();
         let filter_barang = $(".filter_barang").val();
         let filter_po_no = $(".filter_po_no").val();
+        let filter_divisi = $(".filter_divisi").val();
 
-        window.open(url + `?filter_supplier=${filter_supplier}&filter_warehouse=${filter_warehouse}&filter_barang=${filter_barang}&filter_po_no=${filter_po_no}&dateStart=${dateStart}&dateEnd=${dateEnd}&sort=${sort}&sortType=${sortType}`, "_blank");
+        window.open(url + `?filter_supplier=${filter_supplier}&filter_warehouse=${filter_warehouse}&filter_barang=${filter_barang}&filter_po_no=${filter_po_no}&filter_divisi=${filter_divisi}&dateStart=${dateStart}&dateEnd=${dateEnd}&sort=${sort}&sortType=${sortType}`, "_blank");
     }
 </script>
 

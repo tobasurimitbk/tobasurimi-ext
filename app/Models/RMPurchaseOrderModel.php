@@ -561,7 +561,7 @@ class RMPurchaseOrderModel extends Model
 
         $totalData = $poBBLokalData->countAllResults(false);
 
-        if ($addCondition['dateStart'] || $addCondition['dateEnd'] || $addCondition['supplierId'] || $addCondition['barangId'] || $addCondition['warehouseId'] || $addCondition['poNo']) {
+        if ($addCondition['dateStart'] || $addCondition['dateEnd'] || $addCondition['supplierId'] || $addCondition['barangId'] || $addCondition['warehouseId'] || $addCondition['poNo'] || $addCondition['divisiId']) {
             $poBBLokalData->groupStart();
         }
 
@@ -577,6 +577,10 @@ class RMPurchaseOrderModel extends Model
             $poBBLokalData->where('penerimaan_barang.warehouse_id', $addCondition['warehouseId']);
         }
 
+        if ($addCondition['divisiId']) {
+            $poBBLokalData->where('penerimaan_barang.divisi_id', $addCondition['divisiId']);
+        }
+
         if ($addCondition['poNo']) {
 
             $poBBLokalData->where('rm_purchase_orders.po_no', $addCondition['poNo']);
@@ -590,7 +594,7 @@ class RMPurchaseOrderModel extends Model
         }
 
 
-        if ($addCondition['dateStart'] || $addCondition['dateEnd'] || $addCondition['supplierId'] || $addCondition['barangId'] || $addCondition['warehouseId'] || $addCondition['poNo']) {
+        if ($addCondition['dateStart'] || $addCondition['dateEnd'] || $addCondition['supplierId'] || $addCondition['barangId'] || $addCondition['warehouseId'] || $addCondition['poNo'] || $addCondition['divisiId']) {
             $poBBLokalData->groupEnd();
         }
 
