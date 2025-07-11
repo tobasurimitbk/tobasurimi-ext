@@ -41,7 +41,7 @@
 
         .item-table {
             width: 100%;
-            border: 1px solid;
+            /* border: 1px solid; */
             border-collapse: collapse;
             border-spacing: 10px;
         }
@@ -287,6 +287,10 @@
             justify-content: center;
             background-color: red;
         }
+
+        tr.no-border td {
+            border: none !important;
+        }
     </style>
 </head>
 
@@ -338,7 +342,7 @@
                 // exit;
                 foreach ($dataPODetail as $detail) {
                 ?>
-                    <tr>
+                    <tr style="border: 1px solid black;">
                         <td><?= $detail->peti ?></td>
                         <td><?= $dataPO->divisi ?></td>
                         <td><?= $detail->note ?></td>
@@ -367,13 +371,13 @@
                     </tr>
                 <?php } ?>
                 <tr>
-                    <td class="skip" colspan="3">JUMLAH</td>
-                    <td class="skip txt-right" style="border: none;"><?= $dataPO->totalQty ?></td>
-                    <td class="skip" style="border: none;"></td>
+                    <td colspan="3" style="border-top: 1px solid black;border-left: none!important;text-align: right;">Total Qty</td>
+                    <td class="txt-right" style="border-top: 1px solid black; border-left: 1px solid black; border-bottom: 1px solid black;"><?= $dataPO->totalQty ?></td>
+                    <td class="txt-right" style="border-top: 1px solid black; border-left: 1px solid black;">JUMLAH</td>
                     <td class="txt-right" style="border: 1px solid black;"><?= number_format(formatter($nilai_total, "STR_TO_FLOAT"), 2, '.', ',') ?></td>
                 </tr>
                 <tr>
-                    <td class="skip" colspan="5" style="border: none;">PPH</td>
+                    <td class="skip" colspan="5" style="border: none;text-align: right;">PPH</td>
                     <td class="txt-right" style="border: 1px solid black;">
                         <?php if ($dataPO->pph === "Company" || $dataPO->pph === "Supplier") { ?>
                             <?= number_format(($nilai_total * $dataPO->nilai_pph2), 2, '.', ',') ?>
@@ -383,7 +387,7 @@
                     </td>
                 </tr>
                 <tr>
-                    <td class="skip" colspan="5" style="border: none;">DIBAYARKAN</td>
+                    <td class="skip" colspan="5" style="border: none!important;text-align: right;">DIBAYARKAN</td>
                     <td class="txt-right" style="border: 1px solid black;">
                         <?php
                         if ($dataPO->pph === "Company" || $dataPO->pph === "Supplier") {
