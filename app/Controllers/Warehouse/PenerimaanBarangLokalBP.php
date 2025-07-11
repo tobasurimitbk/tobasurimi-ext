@@ -480,25 +480,32 @@ class PenerimaanBarangLokalBP extends BaseController
         }
 
         $dataPenerimaanBarang =  $this->penerimaanBarangModel->where('id', $id)->first();
-        $dataAJU = $this->metadataModel->getBCUsed("po_lokal_bp");
-        $dataSupplier = $this->supplierModel->getSupplierByType('BAHAN PENOLONG');
-        $dataWarehouse = $this->warehousesModel->where('divisi_id', $dataPenerimaanBarang['divisi_id'])->where('deletedAt', null)->findAll();
-        $dataSatuan = $this->satuanModel->asObject()->find();
-        $dataDivisi = $this->divisiModel->getDivisiAccess();
-        $dataKemasan = $this->kemasanModel->where('deletedAt', null)->where('company_id', $this->this_company_id)->orderBy('name', 'asc')->findAll();
+        // $dataAJU = $this->metadataModel->getBCUsed("po_lokal_bp");
+        // $dataSupplier = $this->supplierModel->getSupplierByType('BAHAN PENOLONG');
+        // $dataWarehouse = $this->warehousesModel->where('divisi_id', $dataPenerimaanBarang['divisi_id'])->where('deletedAt', null)->findAll();
+        // $dataSatuan = $this->satuanModel->asObject()->find();
+        // $dataDivisi = $this->divisiModel->getDivisiAccess();
+        // $dataKemasan = $this->kemasanModel->where('deletedAt', null)->where('company_id', $this->this_company_id)->orderBy('name', 'asc')->findAll();
 
         $data = [
-            "dataSatuan" => $dataSatuan,
-            "dataWarehouse" => $dataWarehouse,
-            "dataSupplier" => $dataSupplier,
-            "dataAJU" => $dataAJU,
+            // "dataSatuan" => $dataSatuan,
+            // "dataWarehouse" => $dataWarehouse,
+            // "dataSupplier" => $dataSupplier,
+            // "dataAJU" => $dataAJU,
             "dataPenerimaanBarang" => $dataPenerimaanBarang,
-            "dataKemasan"   => $dataKemasan,
-            "dataDivisi" => $dataDivisi,
-            "dataSPP" => []
+            // "dataKemasan"   => $dataKemasan,
+            // "dataDivisi" => $dataDivisi,
+            // "dataSPP" => [],
+            // 'dataSPPSelected' => []
         ];
 
-        $data['dataSPP'] = $this->amPurchaseOrderModel->getSPP(json_decode($data['dataPenerimaanBarang']['multiple_po_id']));
+        // $dataSPPSelected = $this->amPurchaseOrderModel->getSPP(json_decode($data['dataPenerimaanBarang']['multiple_po_id']));
+        // $dataSppAll = $this->sppModel->getListSPPLPBByDivisi($this->this_company_id, $dataPenerimaanBarang['divisi_id'], $dataPenerimaanBarang['supplier_id']);
+
+
+        // $data['dataSPPSelected'] = $dataSPPSelected;
+        // $data['dataSPP'] = $dataSppAll;
+
 
         return view('Warehouse/penerimaanBarangLokal/bahanPenolong/form', $data);
     }
@@ -1141,15 +1148,21 @@ class PenerimaanBarangLokalBP extends BaseController
             "dataSPP" => [],
             "dataDivisi" => [],
             "dataPenerimaanBarang" => null,
-            "dataSPP" => []
+            "dataSPP" => [],
+            'dataSPPSelected' => []
         ];
 
         if (!empty($id)) {
             $data['dataPenerimaanBarang'] =  $this->penerimaanBarangModel->where('id', $id)->first();
-            $data['dataSPP'] = $this->amPurchaseOrderModel->getSPP(json_decode($data['dataPenerimaanBarang']['multiple_po_id']));
             $dataSupplier = $this->supplierModel->where('id', $data['dataPenerimaanBarang']['supplier_id'])->findAll();
             $data['dataSupplier'] = $dataSupplier;
             $data['dataWarehouse'] =  $this->warehousesModel->where('divisi_id', $data['dataPenerimaanBarang']['divisi_id'])->where('deletedAt', null)->findAll();
+
+            $dataSPPSelected = $this->amPurchaseOrderModel->getSPP(json_decode($data['dataPenerimaanBarang']['multiple_po_id']));
+            $dataSppAll = $this->sppModel->getListSPPLPBByDivisi($this->this_company_id,  $data['dataPenerimaanBarang']['divisi_id'], $data['dataPenerimaanBarang']['supplier_id']);
+
+            $data['dataSPPSelected'] = $dataSPPSelected;
+            $data['dataSPP'] = $dataSppAll;
         }
 
         if ($form == 'single') {

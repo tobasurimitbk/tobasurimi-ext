@@ -105,6 +105,7 @@ class RMImportPODetailModel extends Model
 
         $selectQry = "
             rm_import_pos.po_no,
+            rm_import_pos.status_penerimaan,  
             rm_import_po_details.*,
             barang_master.barang_name AS nama_barang,
             barang_master.kode_barang,
@@ -222,7 +223,8 @@ class RMImportPODetailModel extends Model
                         'satuan_konversi_id' => $satuanKonversiId,
                         'satuan_konversi' => $kodeSatuanKonversi,
                         'nilai_konversi' => $nilaiKonversi,
-                        'jml_diterima_lpb_konversi' => ($inLPB * $nilaiKonversi)
+                        'jml_diterima_lpb_konversi' => ($inLPB * $nilaiKonversi),
+                        'status_penerimaan' => $b['status_penerimaan']
                     ];
 
                     $jmlOrderTotal += $b['qty'];
@@ -264,7 +266,8 @@ class RMImportPODetailModel extends Model
                         'satuan_konversi_id' => $satuanKonversiId,
                         'satuan_konversi' => $kodeSatuanKonversi,
                         'nilai_konversi' => $nilaiKonversi,
-                        'jml_diterima_lpb_konversi' => ($inLPB * $nilaiKonversi)
+                        'jml_diterima_lpb_konversi' => ($inLPB * $nilaiKonversi),
+                        'status_penerimaan' => $b['status_penerimaan'],
                     ];
 
                     $jmlOrderTotal += $b['qty'];

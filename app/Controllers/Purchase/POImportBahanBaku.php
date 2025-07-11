@@ -275,7 +275,7 @@ class POImportBahanBaku extends BaseController
                 'note' => $b->note,
                 'total' => $b->total,
             ]);
-            $this->accountBarangModel->insertAccountBarang($this->this_company_id, $this->request->getVar('divisionID'), $b->barang_id, $b->spesifikasi_id, $b->note);
+            $this->accountBarangModel->insertAccountBarang($this->this_company_id, $this->request->getVar('divisionID'), $b->barang_id, $b->spesifikasi_id, trim($b->note));
         }
 
         $this->sppModel->update($this->request->getVar('spp_id'), [
@@ -382,7 +382,7 @@ class POImportBahanBaku extends BaseController
                     'total' => $b->total,
                 ]);
                 array_push($id_detail_all, $check['id']);
-                $this->accountBarangModel->insertAccountBarang($this->this_company_id, $this->request->getVar('divisionID'), $b->barang_id, $b->spesifikasi_id, $b->note);
+                $this->accountBarangModel->insertAccountBarang($this->this_company_id, $this->request->getVar('divisionID'), $b->barang_id, $b->spesifikasi_id, trim($b->note));
             } else {
                 // NEW BARANG
                 // DELETE
@@ -407,7 +407,7 @@ class POImportBahanBaku extends BaseController
                     'total' => $b->total,
                 ]);
                 array_push($id_detail_all, $id_detail_new);
-                $this->accountBarangModel->insertAccountBarang($this->this_company_id, $this->request->getVar('divisionID'), $b->barang_id, $b->spesifikasi_id, $b->note);
+                $this->accountBarangModel->insertAccountBarang($this->this_company_id, $this->request->getVar('divisionID'), $b->barang_id, $b->spesifikasi_id, trim($b->note));
             }
         }
 
