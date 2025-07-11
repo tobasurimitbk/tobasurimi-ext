@@ -4,7 +4,7 @@
 <!-- Begin Page Content -->
 <section class="section">
     <div class="section-header">
-        <h1>Pendapatan Supplier</h1>
+        <h1>Pendapatan Supplier Per PO</h1>
         <button class="btn btn-discard btn-dropdown-export dropdown-toggle float-right" type="button" id="dropdownMenuButtonExport" data-bs-toggle="dropdown" aria-expanded="false">
             Export
         </button>
@@ -21,8 +21,8 @@
 
     <div class="card">
         <div class="card-body">
-            <div class="row justify-content-end row-col-spp">
-                <div class="col-md-2">
+            <div class="row row-col-spp">
+                <div class="col-md-3">
                     <div class="form-floating mb-3">
                         <select class="form-select filter_po_no" name="filter_po_no" id="filter_po_no">
                             <option value="" data-code=""></option>
@@ -36,7 +36,7 @@
                         <label for="floatingInput">Filter No PO</label>
                     </div>
                 </div>
-                <div class="col-md-2">
+                <div class="col-md-3">
                     <div class="input-group input-group-password">
                         <input autocomplete="one-time-code" class="form-control input-picker dateStart" id="dateStart" name="dateStart" placeholder="Tanggal">
                         <div class="input-group-prepend group-prepend-password align-items-center">
@@ -44,7 +44,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-md-2">
+                <div class="col-md-3">
                     <div class="input-group input-group-password">
                         <input autocomplete="one-time-code" class="form-control input-picker dateEnd" id="dateEnd" name="dateEnd" placeholder="Tanggal">
                         <div class="input-group-prepend group-prepend-password align-items-center">
@@ -52,7 +52,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-md-2">
+                <div class="col-md-3">
                     <div class="form-floating mb-3">
                         <select class="form-select filter_supplier" name="filter_supplier" id="filter_supplier">
                             <option value="" data-code=""></option>
@@ -66,7 +66,7 @@
                         <label for="floatingInput">Filter Supplier</label>
                     </div>
                 </div>
-                <div class="col-md-2">
+                <div class="col-md-3">
                     <div class="form-floating mb-3">
                         <select class="form-select filter_warehouse" name="filter_warehouse" id="filter_warehouse">
                             <option value="" data-code=""></option>
@@ -80,7 +80,7 @@
                         <label for="floatingInput">Filter Warehouse</label>
                     </div>
                 </div>
-                <div class="col-md-2">
+                <div class="col-md-3">
                     <div class="form-floating mb-3">
                         <select class="form-select filter_barang" name="filter_barang" id="filter_barang">
                             <option value="" data-code=""></option>
@@ -94,6 +94,21 @@
                         <label for="floatingInput">Filter Barang</label>
                     </div>
                 </div>
+
+                <div class="col-md-3">
+                    <div class="form-floating mb-3">
+                        <select class="form-select filter_divisi" name="filter_divisi" id="filter_divisi">
+                            <option value="" data-code=""></option>
+
+                            <?php foreach ($getDivisi as $row) : ?>
+                                <option value="<?= $row['id']; ?>" data-code=""><?= strtoupper($row["divisi"]); ?></option>
+                            <?php endforeach; ?>
+
+
+                        </select>
+                        <label for="floatingInput">Filter Department</label>
+                    </div>
+                </div>
             </div>
             <div class="row">
                 <div class="table-responsive">
@@ -105,6 +120,7 @@
                                 <th onclick="changeSort('poNum')" class="sort" rowspan="2">No PO</th>
                                 <th onclick="changeSort('poDate')" class="sort" rowspan="2">Tgl PO</th>
                                 <th onclick="changeSort('barangName')" class="sort" rowspan="2">Bahan Baku</th>
+                                <th onclick="changeSort('divisiName')" class="sort" rowspan="2">Department</th>
                                 <th onclick="changeSort('warehouseName')" class="sort" rowspan="2">Gudang</th>
                                 <th rowspan="2">Qty</th>
                                 <th rowspan="2">Satuan</th>
@@ -132,6 +148,26 @@
                         </thead>
                         <tbody class="body-table" id="body-table">
                         </tbody>
+                        <tfoot>
+                            <tr>
+                                <th colspan="7" class="text-right">Total</th>
+                                <th id="ft-qtyall" class="text-center">0</th>
+                                <th colspan="2" class="text-right"></th>
+                                <th id="ft-dppUmum" class="text-center">0</th>
+                                <th id="ft-pphUmum" class="text-center">0</th>
+                                <th id="ft-totalUmum" class="text-center">0</th>
+                                <th id="ft-dppHarian" class="text-center">0</th>
+                                <th id="ft-pphHarian" class="text-center">0</th>
+                                <th id="ft-totalHarian" class="text-center">0</th>
+                                <th id="ft-dppBulanan" class="text-center">0</th>
+                                <th id="ft-pphBulanan" class="text-center">0</th>
+                                <th id="ft-totalBulanan" class="text-center">0</th>
+                                <th id="ft-subsidi" class="text-center">0</th>
+                                <th id="ft-pphSubsidi" class="text-center">0</th>
+                                <th id="ft-totalSubsidi" class="text-center">0</th>
+                                <th id="ft-totalRow" class="text-center">0</th>
+                            </tr>
+                        </tfoot>
                     </table>
                 </div>
             </div>
@@ -171,6 +207,7 @@
                 data.filter_warehouse = $(".filter_warehouse").val();
                 data.filter_barang = $(".filter_barang").val();
                 data.filter_po_no = $(".filter_po_no").val();
+                data.filter_divisi = $(".filter_divisi").val();
             },
         },
         // scrollX: true,
@@ -202,6 +239,10 @@
             },
             {
                 data: "barangName",
+                className: "text-center",
+            },
+            {
+                data: "divisiName",
                 className: "text-center",
             },
             {
@@ -285,6 +326,29 @@
                 previous: '<i class="fa fa-angle-left"></i>',
                 next: '<i class="fa fa-angle-right"></i>'
             }
+        },
+        drawCallback: function(settings) {
+            const json = settings.json;
+            if (json && json.footerTotals) {
+                $('#ft-qtyall').html(json.footerTotals.qtyAll);
+                $('#ft-dppUmum').html(json.footerTotals.dppUmum);
+                $('#ft-pphUmum').html(json.footerTotals.pphUmum);
+                $('#ft-totalUmum').html(json.footerTotals.totalUmum);
+
+                $('#ft-dppHarian').html(json.footerTotals.dppHarian);
+                $('#ft-pphHarian').html(json.footerTotals.pphHarian);
+                $('#ft-totalHarian').html(json.footerTotals.totalHarian);
+
+                $('#ft-dppBulanan').html(json.footerTotals.dppBulanan);
+                $('#ft-pphBulanan').html(json.footerTotals.pphBulanan);
+                $('#ft-totalBulanan').html(json.footerTotals.totalBulanan);
+
+                $('#ft-subsidi').html(json.footerTotals.subsidi);
+                $('#ft-pphSubsidi').html(json.footerTotals.pphSubsidi);
+                $('#ft-totalSubsidi').html(json.footerTotals.totalSubsidi);
+
+                $('#ft-totalRow').html(json.footerTotals.totalRow);
+            }
         }
     })
 
@@ -323,12 +387,18 @@
         table.ajax.reload();
     })
 
-    $(".dateStart, .dateEnd, .filter_supplier, .filter_warehouse, .filter_barang, .filter_po_no").change(function() {
+    $(".dateStart, .dateEnd, .filter_supplier, .filter_warehouse, .filter_barang, .filter_po_no, .filter_divisi").change(function() {
         table.ajax.reload();
     });
 
     $('.filter_supplier').select2({
         placeholder: "Pilih Supplier",
+        theme: "bootstrap-5",
+        allowClear: true,
+    })
+
+    $('.filter_divisi').select2({
+        placeholder: "Pilih Department",
         theme: "bootstrap-5",
         allowClear: true,
     })
@@ -352,14 +422,14 @@
     })
 
 
-    $('.filter_supplier, .filter_warehouse, .filter_barang, .filter_po_no')
+    $('.filter_supplier, .filter_warehouse, .filter_barang, .filter_po_no, .filter_divisi')
         .parent('div')
         .children('span')
         .children('span')
         .children('span')
         .css('height', ' calc(3.5rem + 2px)');
 
-    $('.filter_supplier, .filter_warehouse, .filter_barang, .filter_po_no')
+    $('.filter_supplier, .filter_warehouse, .filter_barang, .filter_po_no, .filter_divisi')
         .parent('div')
         .children('span')
         .children('span')
@@ -367,7 +437,7 @@
         .children('span')
         .css('margin-top', '22px').css('margin-left', '-7px');
 
-    $('.filter_supplier, .filter_warehouse, .filter_barang, .filter_po_no')
+    $('.filter_supplier, .filter_warehouse, .filter_barang, .filter_po_no, .filter_divisi')
         .parent('div')
         .find('label')
         .css('z-index', '1');
@@ -392,8 +462,9 @@
         let filter_warehouse = $(".filter_warehouse").val();
         let filter_barang = $(".filter_barang").val();
         let filter_po_no = $(".filter_po_no").val();
+        let filter_divisi = $(".filter_divisi").val();
 
-        window.open(url + `?filter_supplier=${filter_supplier}&filter_warehouse=${filter_warehouse}&filter_barang=${filter_barang}&filter_po_no=${filter_po_no}&dateStart=${dateStart}&dateEnd=${dateEnd}&sort=${sort}&sortType=${sortType}`, "_blank");
+        window.open(url + `?filter_supplier=${filter_supplier}&filter_warehouse=${filter_warehouse}&filter_barang=${filter_barang}&filter_po_no=${filter_po_no}&filter_divisi=${filter_divisi}&dateStart=${dateStart}&dateEnd=${dateEnd}&sort=${sort}&sortType=${sortType}`, "_blank");
     }
 </script>
 

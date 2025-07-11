@@ -58,14 +58,11 @@
                 <?= csrf_field() ?>
                 <div class="row">
                     <div class="col-md-4">
-                        <div class="form-floating mb-3" style="height: 50px;">
+                       <div class="form-floating mb-3" style="height: 50px;">
                             <div class="input-group input-group-password">
                                 <div class="form-floating mb-3" style="height: 50px;">
                                     <input autocomplete="one-time-code" type="text" class="form-control no_bukti_pembayaran" id="no_bukti_pembayaran" name="no_bukti_pembayaran" placeholder="No. Pembayaran" required <?= !empty($detail) ? ($detail['pembayaranDetail']['status_posting'] == 1 ? 'readonly' : '') : '' ?> <?= !empty($detail) ? ' value="' . $detail['pembayaranDetail']['payment_no'] . '"' : '' ?>>
                                     <label for="floatingInput">No. Pembayaran</label>
-                                </div>
-                                <div class="input-generate input-group-prepend group-prepend-password align-items-center">
-                                    <input autocomplete="one-time-code" style="z-index: 99; margin-bottom: 10px; margin-left: -30px; <?= !empty($detail) ? 'display:none;' : '' ?>" class="auto_generate" id="auto_generate" name="auto_generate" type="checkbox" onchange="changeStatus()">
                                 </div>
                             </div>
                         </div>
@@ -261,6 +258,10 @@
 
 
     $(document).ready(function() {
+
+         <?php if(empty($detail)): ?>
+            generatePaymentNumber();
+        <?php endif; ?>
 
         var validator = $(".create-form").validate({
             rules: {
@@ -910,42 +911,42 @@
 
     }
 
-    function changeStatus() {
-        let value = document.getElementById('auto_generate').checked ? true : false;
-        const csrfToken = '<?= csrf_token() ?>';
-        const csrf = $(`[name="${csrfToken}"]`);
-        var formData = new FormData();
-        formData.append("type", "Bahan Penolong");
-        formData.append("payment_date", $("#payment_date").val());
-        if (value) {
-            $(".no_bukti_pembayaran").attr("readonly", true);
-            $.ajax({
-                url: "<?= base_url("pembayaran-po-lokal-bp/generate-no-pembayaran"); ?>",
-                method: "POST",
-                data: formData,
-                dataType: "json",
-                beforeSend: function(xhr) {
-                    xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                },
-                processData: false,
-                contentType: false,
-                success: function(response) {
-                    csrf.val(response.token);
-                    $(".no_bukti_pembayaran").val(response.paymentNo);
-                },
-                onError: function(response) {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Terjadi kesalahan pada sistem',
-                        confirmButtonColor: '#4e73df',
-                    });
-                }
-            });
-        } else {
-            $(".no_bukti_pembayaran").attr("readonly", false);
-            $(".no_bukti_pembayaran").val("");
-        }
-    }
+    // function changeStatus() {
+    //     let value = document.getElementById('auto_generate').checked ? true : false;
+    //     const csrfToken = '<?= csrf_token() ?>';
+    //     const csrf = $(`[name="${csrfToken}"]`);
+    //     var formData = new FormData();
+    //     formData.append("type", "Bahan Penolong");
+    //     formData.append("payment_date", $("#payment_date").val());
+    //     if (value) {
+    //         $(".no_bukti_pembayaran").attr("readonly", true);
+    //         $.ajax({
+    //             url: "<?= base_url("pembayaran-po-lokal-bp/generate-no-pembayaran"); ?>",
+    //             method: "POST",
+    //             data: formData,
+    //             dataType: "json",
+    //             beforeSend: function(xhr) {
+    //                 xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+    //             },
+    //             processData: false,
+    //             contentType: false,
+    //             success: function(response) {
+    //                 csrf.val(response.token);
+    //                 $(".no_bukti_pembayaran").val(response.paymentNo);
+    //             },
+    //             onError: function(response) {
+    //                 Swal.fire({
+    //                     icon: 'error',
+    //                     title: 'Terjadi kesalahan pada sistem',
+    //                     confirmButtonColor: '#4e73df',
+    //                 });
+    //             }
+    //         });
+    //     } else {
+    //         $(".no_bukti_pembayaran").attr("readonly", false);
+    //         $(".no_bukti_pembayaran").val("");
+    //     }
+    // }
 
     function convertRupiahToNumber(rupiah) {
         if (rupiah == "") {
@@ -1016,6 +1017,41 @@
 
         keterangan = "Pembayaran " + supplierName + "; No TTS : " + noTandaTerima + "; " + poNoText;
         $('#keterangan').val(keterangan);
+    }
+
+    function generatePaymentNumber() {
+        const csrfToken = '<?= csrf_token() ?>';
+        const csrf = $(`[name="${csrfToken}"]`);
+        var formData = new FormData();
+        formData.append("type", "Bahan Penolong");
+        formData.append("payment_date", $("#payment_date").val());
+        
+        $(".no_bukti_pembayaran").attr("readonly", true);
+        
+        $.ajax({
+            url: "<?= base_url("pembayaran-po-lokal-bp/generate-no-pembayaran"); ?>",
+            method: "POST",
+            data: formData,
+            dataType: "json",
+            beforeSend: function(xhr) {
+                xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+            },
+            processData: false,
+            contentType: false,
+            success: function(response) {
+                csrf.val(response.token);
+                $(".no_bukti_pembayaran").val(response.paymentNo);
+            },
+            error: function(xhr, status, error) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Terjadi kesalahan pada sistem',
+                    text: 'Gagal menghasilkan nomor pembayaran otomatis',
+                    confirmButtonColor: '#4e73df',
+                });
+                $(".no_bukti_pembayaran").attr("readonly", false);
+            }
+        });
     }
 </script>
 

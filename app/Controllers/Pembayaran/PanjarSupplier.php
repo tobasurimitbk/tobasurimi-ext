@@ -621,7 +621,7 @@ class PanjarSupplier extends BaseController
                 "is_posted"          => $data->is_posted,
                 "supplier"      => $data->supplier_name,
                 "nominal" => $data->total_pinjaman + $data->total_panjar,
-                "createdAt"    => date('d/m/Y H:i', strtotime($data->createdAt)),
+                "createdAt"    => date('d/m/Y', strtotime($data->createdAt)),
             ];
         }
 

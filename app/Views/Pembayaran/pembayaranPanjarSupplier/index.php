@@ -226,6 +226,7 @@
                                 <th onclick="changeSort('jenis_panjar')">Jenis</th>
                                 <th onclick="changeSort('supplier_id')">Supplier</th>
                                 <th>Nominal</th>
+                                <th>Tanggal Di Buat</th>
                                 <th>Action</th>
                             </tr>
                         </thead>
@@ -365,6 +366,10 @@
                 render: function(data) {
                     return greatFormatRupiah(data);
                 }
+            },
+            {
+                data: "createdAt",
+                className: "text-center"
             },
             {
                 data: "id",
