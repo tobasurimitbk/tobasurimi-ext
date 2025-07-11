@@ -167,11 +167,22 @@
             width: 100%;
         }
 
-        .item-table tr th {
+        .item-table-lpb {
+            border-collapse: collapse;
+            text-align: left;
+            width: 100%;
+        }
+
+
+        .item-table-lpb tr th {
             border: 1px solid grey;
         }
 
-        .item-table tr td {
+        /* .item-table tr td {
+            border: 1px solid grey;
+        } */
+
+        .item-table-lpb tr td {
             border: 1px solid grey;
         }
 
@@ -793,7 +804,7 @@
                     </td>
                 </tr>
             </table>
-            <table class="item-table mt-050">
+            <table class="item-table-lpb mt-050">
                 <tr>
                     <th class="txt-left" style="text-align:center; width: 30px;">No</th>
                     <th class="txt-left" style=" text-align:center; width: 150px;">No PO</th>
