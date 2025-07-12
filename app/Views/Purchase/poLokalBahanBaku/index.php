@@ -129,7 +129,7 @@
 </div>
 <script>
     const csrfToken = '<?= csrf_token() ?>';
-    let sort = "id";
+    let sort = "rm_purchase_orders.id";
     let sortType = "desc";
     var previousRequest;
 
