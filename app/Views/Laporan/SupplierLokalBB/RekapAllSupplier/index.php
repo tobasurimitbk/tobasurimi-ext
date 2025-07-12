@@ -21,7 +21,7 @@
 
     <div class="card">
         <div class="card-body">
-            <div class="row justify-content-end">
+            <div class="row">
                 <div class="col-md-3">
                     <div class="input-group">
                         <div class="form-floating" style="height: 50px;">
@@ -78,7 +78,7 @@
                     </div>
                 </div>
 
-                <!-- <div class="col-md-3">
+                <div class="col-md-3">
                     <div class="form-floating mb-3">
                         <select class="form-select filter_divisi" name="filter_divisi" id="filter_divisi">
                             <option value="" data-code=""></option>
@@ -90,7 +90,7 @@
                         </select>
                         <label for="floatingInput">Filter Department</label>
                     </div>
-                </div> -->
+                </div>
             </div>
             <div class="row">
                 <div class="table-responsive">
@@ -99,6 +99,7 @@
                             <tr>
                                 <th rowspan="2">No</th>
                                 <th onclick="changeSort('supplierName')" class="sort" rowspan="2">Supplier</th>
+                                <th onclick="changeSort('divisiName')" class="sort" rowspan="2">Department</th>
                                 <th onclick="changeSort('barangName')" class="sort" rowspan="2">Bahan Baku</th>
                                 <th onclick="changeSort('barangName')" class="sort" rowspan="2">Satuan</th>
                                 <th onclick="changeSort('barangName')" class="sort" rowspan="2">Qty</th>
@@ -127,7 +128,7 @@
                         </tbody>
                         <tfoot>
                             <tr>
-                                <th colspan="4">TOTAL</th>
+                                <th colspan="5">TOTAL</th>
                                 <th class="text-center">-</th> <!-- Satuan -->
                                 <th class="text-center">0</th> <!-- DPP Harian -->
                                 <th class="text-center">0</th> <!-- PPh Harian -->
@@ -203,7 +204,11 @@
                 className: "text-center",
 
             },
+            {
+                data: "divisiName",
+                className: "text-center",
 
+            },
             {
                 data: "barangName",
                 className: "text-center",
@@ -278,7 +283,7 @@
             var api = this.api();
 
             // Kolom-kolom yang ingin di-total (indeks dimulai dari 0)
-            var columnsToSum = [4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17];
+            var columnsToSum = [5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18];
 
             columnsToSum.forEach(function(col) {
                 var total = api
