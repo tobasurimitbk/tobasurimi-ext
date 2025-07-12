@@ -9,15 +9,15 @@
                 Kembali
             </a>
             <?php if (!empty($dataPenerimaanBarang)) : ?>
-                <?php if (can('Warehouse', 'P. Barang Lokal BP', 'p')) : ?>
+                <!-- <?php if (can('Warehouse', 'P. Barang Lokal BP', 'p')) : ?>
                     <button class="btn btn-warning btn-print float-right" onclick="print('<?= base_url("penerimaan-barang-lokal-bp/print/"); ?><?= encrypt($dataPenerimaanBarang['id']); ?>')">
                         Print
                     </button>
-                <?php endif; ?>
+                <?php endif; ?> -->
             <?php endif; ?>
             <?php if (!empty($dataPenerimaanBarang)) : ?>
                 <?php if ($dataPenerimaanBarang['status_post'] === "WAITING") : ?>
-                    <?php if (can('Warehouse', 'P. Barang Lokal BP', 'd')) : ?>
+                    <!-- <?php if (can('Warehouse', 'P. Barang Lokal BP', 'd')) : ?>
                         <button class="btn btn-hapus delete-parent float-right">
                             Hapus
                         </button>
@@ -26,7 +26,7 @@
                         <button class="btn btn-success posting-spp float-right posting-lpb">
                             Posting
                         </button>
-                    <?php endif; ?>
+                    <?php endif; ?> -->
                     <?php if (can('Warehouse', 'P. Barang Lokal BP', 'u')) : ?>
                         <button class="btn btn-show-form btn-save float-right btn-submit-parent">
                             Simpan
