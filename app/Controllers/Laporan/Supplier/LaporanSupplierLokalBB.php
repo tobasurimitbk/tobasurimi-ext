@@ -420,6 +420,8 @@ class LaporanSupplierLokalBB extends BaseController
             }
 
             $sheet->getStyle("A{$rowNo}:V" . ($rowNo + 1))->getFont()->setBold(true);
+            $sheet->getStyle('A' . $rowNo . ':V' . ($rowNo + 1))->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+            $sheet->getStyle('A' . $rowNo . ':V' . ($rowNo + 1))->getAlignment()->setVertical(Alignment::VERTICAL_CENTER);
             $rowNo++;
 
             // Baris Header 2
@@ -1679,8 +1681,8 @@ class LaporanSupplierLokalBB extends BaseController
         // Header utama
         $sheet->setCellValue('A1', "LAPORAN PENDAPATAN DETAIL SUPPLIER");
         $sheet->mergeCells('A1:U1');
-        $sheet->getStyle('A1')->getFont()->setBold(true)->setSize(14);
-        $sheet->getStyle('A1')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+        $sheet->getStyle("A1")->getFont()->setBold(true)->setSize(14);
+        $sheet->getRowDimension(1)->setRowHeight(22);
 
         // Tanggal
         $sheet->setCellValue('A2', 'Tanggal');
@@ -2433,8 +2435,8 @@ class LaporanSupplierLokalBB extends BaseController
         // Judul utama
         $sheet->setCellValue('A1', 'LAPORAN REKAP ALL BARANG (SUMMARY)');
         $sheet->mergeCells('A1:S1');
-        $sheet->getStyle('A1')->getFont()->setBold(true)->setSize(14);
-        $sheet->getStyle('A1')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+        $sheet->getStyle("A1")->getFont()->setBold(true)->setSize(14);
+        $sheet->getRowDimension(1)->setRowHeight(22);
 
         $headers = [
             ['NO.', 'BARANG', 'SPESIFIKASI', 'DEPARTEMEN', 'QTY', 'SATUAN', 'Umum', '', '', 'Tambahan Harian', '', '', 'Tambahan Bulanan', '', '', 'Tambahan Langsung', '', '', 'Total'],
