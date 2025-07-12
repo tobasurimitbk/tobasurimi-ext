@@ -129,25 +129,28 @@
             width: 100%;
         }
 
-        .sign-row>div {
+        .sign-row>div,
+        .sign-name>div {
             width: 200px;
-            border-top: 1px solid;
+            /* border-top: 1px solid; */
             margin-top: 2rem
         }
 
         .sign-row-second {
-            display: flex;
-            justify-content: space-around;
-            margin-top: 1rem;
-            width: 100%;
+            text-align: center;
+            font-weight: bold;
+            padding-bottom: 10px;
         }
 
-        .sign-row-second>div {
-            width: 150px;
-            border-top: 1px solid;
-            margin-top: 2rem
+        .sign-space {
+            height: 25px;
+            /* Jarak antar baris kosong */
         }
 
+        .sign-name {
+            text-align: center;
+            font-style: bold;
+        }
 
         /* 
         @page {
@@ -336,6 +339,14 @@
                 <?php
                 $nilai_total = 0;
                 $nilai_total_harian = 0;
+                $jumlahData = count($dataPODetail);
+                if ($jumlahData >= 5) {
+                    $marginTop = '1rem';
+                } elseif ($jumlahData >= 3) {
+                    $marginTop = '2rem';
+                } else {
+                    $marginTop = '3rem';
+                }
                 foreach ($dataPODetail as $detail) {
                 ?>
                     <tr>
@@ -395,7 +406,7 @@
                 </tr>
 
             </table>
-            <table class="w-100 sign-table border-collapse signed-info footer mt-3">
+            <table class="w-100 sign-table border-collapse signed-info footer" style="margin-top: <?= $marginTop ?>;">
 
                 <tr>
                     <th>
@@ -413,6 +424,22 @@
                             <div>Yang Menerima</div>
                         </div>
                     </th>
+                </tr>
+                <tr style="border: none!important;">
+                    <td class="sign-space" style="border: none!important;"></td>
+                    <td class="sign-space" style="border: none!important;"></td>
+                    <td class="sign-space" style="border: none!important;"></td>
+                </tr>
+                <tr>
+                    <td class="sign-name" style="border: none!important;">
+                        <div>( &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; )</div>
+                    </td>
+                    <td class="sign-name" style="border: none!important;">
+                        <div>( &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; )</div>
+                    </td>
+                    <td class="sign-name" style="border: none!important;">
+                        <div>( &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; )</div>
+                    </td>
                 </tr>
             </table>
         </div>
@@ -612,7 +639,7 @@
             </table>
 
             <?php if ($dataPO->pph === "Company") { ?>
-                <table class="cong-table item-table txt-right">
+                <table class="cong-table item-table txt-right" style="border: 1px solid black;">
                     <tr>
                         <th>QTY</th>
                         <th>CONG SEBENARNYA</th>
@@ -648,7 +675,7 @@
                     </tr>
                 </table>
             <?php } elseif ($dataPO->pph === "Supplier") { ?>
-                <table class="cong-table item-table txt-right">
+                <table class="cong-table item-table txt-right" style="border: 1px solid black;">
                     <tr>
                         <th>QTY</th>
                         <th>CONG SEBENARNYA</th>
@@ -685,7 +712,7 @@
                     </tr>
                 </table>
             <?php } else { ?>
-                <table class="cong-table item-table txt-right">
+                <table class="cong-table item-table txt-right" style="border: 1px solid black;">
                     <tr>
                         <th>QTY</th>
                         <th>CONG SEBENARNYA</th>
@@ -738,28 +765,44 @@
             <?php } ?>
 
 
-            <table class="w-100 sign-table border-collapse signed-info footer mt-3">
+            <table class="w-100 sign-table border-collapse signed-info footer mt-3" style="border: none!important;">
+                <tr style="border: none!important;">
+                    <th>
+                        <div class="sign-row-second">Dibuat Oleh</div>
+                    </th>
+                    <th>
+                        <div class="sign-row-second">Diketahui</div>
+                    </th>
+                    <th>
+                        <div class="sign-row-second">Disetujui</div>
+                    </th>
+                    <th>
+                        <div class="sign-row-second">Yang Menerima</div>
+                    </th>
+                </tr>
+                <tr style="border: none!important;">
+                    <td class="sign-space" style="border: none!important;"></td>
+                    <td class="sign-space" style="border: none!important;"></td>
+                    <td class="sign-space" style="border: none!important;"></td>
+                    <td class="sign-space" style="border: none!important;"></td>
+                </tr>
+                <tr style="border: none!important;">
+                    <td class="sign-space" style="border: none!important;"></td>
+                    <td class="sign-space" style="border: none!important;"></td>
+                    <td class="sign-space" style="border: none!important;"></td>
+                    <td class="sign-space" style="border: none!important;"></td>
+                </tr>
+                <tr style="border: none!important;">
+                    <td class="sign-space" style="border: none!important;"></td>
+                    <td class="sign-space" style="border: none!important;"></td>
+                    <td class="sign-space" style="border: none!important;"></td>
+                    <td class="sign-space" style="border: none!important;"></td>
+                </tr>
                 <tr>
-                    <th>
-                        <div class="sign-row-second">
-                            <div>Dibuat Oleh</div>
-                        </div>
-                    </th>
-                    <th>
-                        <div class="sign-row-second">
-                            <div>Diketahui</div>
-                        </div>
-                    </th>
-                    <th>
-                        <div class="sign-row-second">
-                            <div>Disetujui</div>
-                        </div>
-                    </th>
-                    <th>
-                        <div class="sign-row-second">
-                            <div>Yang Menerima</div>
-                        </div>
-                    </th>
+                    <td class="sign-name" style="border: none!important;">( &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; )</td>
+                    <td class="sign-name" style="border: none!important;">( &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; )</td>
+                    <td class="sign-name" style="border: none!important;">( &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; )</td>
+                    <td class="sign-name" style="border: none!important;">( &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; )</td>
                 </tr>
             </table>
         </div>
