@@ -114,7 +114,7 @@
                 <td>
                     <div><span class="txt-bold">No. LPB : <?= $dataPenerimaanBarang->no_penerimaan_barang; ?></span></div>
                 </td>
-                <td class="txt-right">
+                <td>
                     <div><span class="txt-bold">Supplier : <?= $dataPenerimaanBarang->supplier_name; ?></span></div>
                 </td>
                 <!-- <td class="txt-right">
@@ -125,7 +125,7 @@
                 <td>
                     <div><span class="txt-bold">Tanggal : <?= $dataPenerimaanBarang->tanggal ? date("d/m/Y", strtotime($dataPenerimaanBarang->tanggal)) : ""; ?></span></div>
                 </td>
-                <td class="txt-right">
+                <td>
                     <div><span class="txt-bold">Departemen : <?= $dataPenerimaanBarang->divisi ?></span></div>
                 </td>
 
