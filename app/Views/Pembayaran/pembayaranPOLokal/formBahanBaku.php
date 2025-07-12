@@ -1323,7 +1323,7 @@
         var newRow = $('<tr>');
         newRow.append($('<td style="text-align:right;" colspan="7"><b>TOTAL PEMBAYARAN  </b></td>'));
         newRow.append($('<td style="text-align:right;" ><b>' +
-            '<input autocomplete="one-time-code" data-id=""  class="form-control total-pembayaran trigger-input" type="text" value="' + greatFormatRupiahPayment(data.total_pembayaran) + '" name = "total_pembayaran"  readonly>' +
+            '<input autocomplete="one-time-code" data-id="" onkeyup="validateTotalPayment()" onblur="validateTotalPayment()"  class="form-control total-pembayaran trigger-input" onchange="this.value = greatFormatRupiahPayment(this.value)" onkeyup="preventNegativeInput(this)" type="text" value="' + greatFormatRupiahPayment(data.total_pembayaran) + '" name = "total_pembayaran" readonly>' +
             '</b></td>'));
         table.find('tbody').append(newRow);
 
@@ -1420,13 +1420,13 @@
             newRow.append($('<td style="text-align:center;">').text(greatFormatRupiahPayment(v.total_paid)));
             newRow.append($('<td class="hidden" style="display:none;">').html(
                 `
-                        <input <?= !empty($detail) ? ($detail['pembayaranDetail']['status_posting'] == 1 ? 'disabled' : '') : ""  ?>  onchange="this.value = greatFormatRupiahPayment(this.value)"  oninput="limitInputBayar(this, ${v.sisa_pembayaran})" autocomplete="one-time-code" data-id="${v.penerimaan_barang_detail_id}"  class="form-control pembayaran" type="text" value="${v.total_tagihan}" name = "pembayaran" style="height:40px">
+                        <input <?= !empty($detail) ? ($detail['pembayaranDetail']['status_posting'] == 1 ? 'disabled' : '') : ""  ?>  onchange="this.value = greatFormatRupiahPayment(this.value)"  oninput="limitInputBayar(this, ${v.sisa_pembayaran})" autocomplete="one-time-code" data-id="${v.penerimaan_barang_detail_id}"  class="form-control pembayaran" type="text" value="${greatFormatRupiahPayment(v.total_tagihan)}" name = "pembayaran" style="height:40px">
                                 `
             ));
 
             newRow.append($('<td style="text-align:center;">').html(
                 `
-                        <input <?= !empty($detail) ? ($detail['pembayaranDetail']['status_posting'] == 1 ? 'disabled' : '') : ""  ?>  onchange="this.value = greatFormatRupiahPayment(this.value)"  oninput="limitInputBayar(this, ${v.total_tagihan})" autocomplete="one-time-code" data-id="${v.rm_purchase_order_id}"  class="form-control total_po_dibayar" type="text" value="${v.sisa_tagihan}" name = "total_po_dibayar" style="height:40px">
+                        <input <?= !empty($detail) ? ($detail['pembayaranDetail']['status_posting'] == 1 ? 'disabled' : '') : ""  ?>  onchange="this.value = greatFormatRupiahPayment(this.value)"  oninput="limitInputBayar(this, ${v.total_tagihan})" autocomplete="one-time-code" data-id="${v.rm_purchase_order_id}"  class="form-control total_po_dibayar" type="text" value="${greatFormatRupiahPayment(v.sisa_tagihan)}" name = "total_po_dibayar" style="height:40px">
                                 `
             ));
 
@@ -1434,14 +1434,15 @@
 
             TotalOrder += parseFloat(v.total_order);
             TotalDiterima += parseFloat(v.total_diterima);
-            TotalHarga += parseFloat(v.total_tagihan_number);
+            TotalTagihan += parseFloat(v.total_tagihan);
+            TotalHarga += parseFloat(v.sisa_tagihan);
 
         });
 
         var newRow = $('<tr>');
         newRow.append($('<td style="text-align:right;" colspan="7"><b>TOTAL PEMBAYARAN  </b></td>'));
         newRow.append($('<td style="text-align:right;" ><b>' +
-            '<input autocomplete="one-time-code" data-id=""  class="form-control total-pembayaran trigger-input" type="text" value="' + greatFormatRupiahPayment(TotalHarga) + '" name = "total_pembayaran"  readonly>' +
+            '<input autocomplete="one-time-code" data-id="" onkeyup="validateTotalPayment()" onblur="validateTotalPayment()"  class="form-control total-pembayaran trigger-input" onchange="this.value = greatFormatRupiahPayment(this.value)" onkeyup="preventNegativeInput(this)" type="text" value="' + greatFormatRupiahPayment(TotalHarga) + '" name = "total_pembayaran" readonly>' +
             '</b></td>'));
         table.find('tbody').append(newRow);
 
@@ -1979,6 +1980,26 @@
         <?php endif; ?>
     }
 
+
+    function validateTotalPayment() {
+        // Get the input values
+        const totalPembayaran = parseFloat(document.getElementById('total_pembayaran').value) || 0;
+        const grandTotal = parseFloat(document.getElementById('grand_total').value) || 0;
+        
+        // Check if payment exceeds grand total
+        if (totalPembayaran > grandTotal) {
+            // Show error message
+            Swal.fire({
+                icon: 'error',
+                title: 'Jumlah pembayaran melebihi total',
+                text: 'Total pembayaran tidak boleh melebihi ' + grandTotal.toLocaleString(),
+                confirmButtonColor: '#4e73df',
+            });
+            
+            // Reset the value to grand total
+            document.getElementById('total_pembayaran').value = grandTotal;
+        }
+    }
 
 </script>
 
