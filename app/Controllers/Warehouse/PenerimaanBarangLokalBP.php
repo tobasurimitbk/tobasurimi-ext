@@ -1052,12 +1052,13 @@ class PenerimaanBarangLokalBP extends BaseController
     {
         $penerimaanBarangID = empty($this->request->getVar('penerimaan_barang_id')) ? null : decrypt($this->request->getVar('penerimaan_barang_id'));
         $amPurchaseOrderID = json_decode($this->request->getVar('am_purchase_order_id'));
+        $isInitEdit = $this->request->getVar('is_init_edit');
         if (count($amPurchaseOrderID) == 0) {
             return response()->setJSON([
                 'result' => []
             ]);
         }
-        return response()->setJSON($this->amPurchaseOrderDetailModel->getListLPBBahanPenolong($amPurchaseOrderID, "LOKAL", "PENOLONG", $penerimaanBarangID));
+        return response()->setJSON($this->amPurchaseOrderDetailModel->getListLPBBahanPenolong($amPurchaseOrderID, "LOKAL", "PENOLONG", $isInitEdit, $penerimaanBarangID));
     }
 
     public function generatePONo()
@@ -1159,10 +1160,26 @@ class PenerimaanBarangLokalBP extends BaseController
             $data['dataWarehouse'] =  $this->warehousesModel->where('divisi_id', $data['dataPenerimaanBarang']['divisi_id'])->where('deletedAt', null)->findAll();
 
             $dataSPPSelected = $this->amPurchaseOrderModel->getSPP(json_decode($data['dataPenerimaanBarang']['multiple_po_id']));
-            $dataSppAll = $this->sppModel->getListSPPLPBByDivisi($this->this_company_id,  $data['dataPenerimaanBarang']['divisi_id'], $data['dataPenerimaanBarang']['supplier_id']);
+            $dataSppAll = $this->sppModel->getListSPPLPBByDivisi(
+                $this->this_company_id,
+                $data['dataPenerimaanBarang']['divisi_id'],
+                $data['dataPenerimaanBarang']['supplier_id']
+            );
+
+            // Buat array berisi ID dari yang sudah selected
+            $selectedIds = array_column($dataSPPSelected, 'id');
+
+            // Filter hanya yang belum dipilih
+            $dataSppAllUnique = [];
+
+            foreach ($dataSppAll as $spp) {
+                if (!in_array($spp['id'], $selectedIds)) {
+                    $dataSppAllUnique[] = $spp;
+                }
+            }
 
             $data['dataSPPSelected'] = $dataSPPSelected;
-            $data['dataSPP'] = $dataSppAll;
+            $data['dataSPP'] = $dataSppAllUnique;
         }
 
         if ($form == 'single') {

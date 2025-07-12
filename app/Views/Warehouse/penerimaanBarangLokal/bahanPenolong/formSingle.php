@@ -21,8 +21,11 @@
                 <select <?= !empty($dataPenerimaanBarang) ? ($dataPenerimaanBarang['status_post'] === "FINISH" ? 'disabled=true' : '') : ''; ?> class="form-select multiple_spp_id" id="multiple_spp_id" name="multiple_spp_id" aria-label="Floating label select example">
                     <option value=""></option>
                     <?php if (!empty($dataPenerimaanBarang)) : ?>
-                        <?php foreach ($dataSPP as $d) : ?>
+                        <?php foreach ($dataSPPSelected as $d) : ?>
                             <option selected value="<?= $d["id"]; ?>"><?= strtoupper($d["spp_no"]); ?></option>
+                        <?php endforeach; ?>
+                        <?php foreach ($dataSPP as $d) : ?>
+                            <option value="<?= $d["id"]; ?>"><?= strtoupper($d["spp_no"]); ?></option>
                         <?php endforeach; ?>
                     <?php else: ?>
                         <option value="">Pilih Nomor SPP</option>
@@ -347,10 +350,9 @@
     $(".multiple_spp_id").select2({
         placeholder: "Pilih Nomor SPP",
         theme: "bootstrap-5",
-        allowClear: false
+        allowClear: true
     }).change(function() {
         let arr = $('.multiple_spp_id').val();
-        getPoBySpp();
         // GET SIPPLIER
         $.ajax({
             url: `<?= base_url('penerimaan-barang-lokal-bp/get-supplier-by-spp'); ?>`,
@@ -403,6 +405,7 @@
                     $(".multiple_po_id").append(`<option selected value="${item.id}">${item.po_no}</option>`)
                 })
                 $(".multiple_po_id").change();
+
                 // Set Divisi Id
                 var divisi_id = $(".multiple_spp_id option:selected").data('divisi_id');
                 $('.divisi_id').val(divisi_id);
@@ -410,6 +413,7 @@
             }
         });
     }
+
 
     $(document).on('select2:open', function(e) {
         // Pastikan ini adalah elemen yang kita inginkan (form-select)
@@ -951,7 +955,27 @@
 
 <?php if (!empty($dataPenerimaanBarang)) : ?>
     <script>
-        $('.multiple_po_id').change();
+        // $('.multiple_po_id').change();
+        let arr = $('.multiple_po_id').val();
+        $.ajax({
+            url: `<?= base_url("penerimaan-barang-lokal-bp/list-barang"); ?>`,
+            method: "GET",
+            data: {
+                am_purchase_order_id: JSON.stringify(arr),
+                penerimaan_barang_id: $('.id').val(),
+                is_init_edit: 1
+            },
+            dataType: "json",
+            success: function(res) {
+                // INIT KOSONG
+                listData = [];
+                listDataServer = [];
+                // ISI DATA
+                listData = res;
+                listDataServer = res;
+                drawTable(listData);
+            }
+        });
 
         function print(url) {
             window.open(url, "_blank");

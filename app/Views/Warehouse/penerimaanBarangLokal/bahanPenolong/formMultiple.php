@@ -246,7 +246,8 @@
             method: "GET",
             data: {
                 am_purchase_order_id: JSON.stringify(arr),
-                penerimaan_barang_id: $('.id').val()
+                penerimaan_barang_id: $('.id').val(),
+                is_init_edit: 0
             },
             dataType: "json",
             success: function(res) {
@@ -970,7 +971,28 @@
 
 <?php if (!empty($dataPenerimaanBarang)) : ?>
     <script>
-        $('.multiple_po_id').change();
+        // $('.multiple_po_id').change();
+        // Load Barang Pertama Kali Pas Edit
+        let arr = $('.multiple_po_id').val();
+        $.ajax({
+            url: `<?= base_url("penerimaan-barang-lokal-bp/list-barang"); ?>`,
+            method: "GET",
+            data: {
+                am_purchase_order_id: JSON.stringify(arr),
+                penerimaan_barang_id: $('.id').val(),
+                is_init_edit: 1
+            },
+            dataType: "json",
+            success: function(res) {
+                // INIT KOSONG
+                listData = [];
+                listDataServer = [];
+                // ISI DATA
+                listData = res;
+                listDataServer = res;
+                drawTable(listData);
+            }
+        });
 
         function print(url) {
             window.open(url, "_blank");
