@@ -1686,7 +1686,7 @@ class LaporanSupplierLokalBB extends BaseController
 
         // Header utama
         $sheet->setCellValue('A1', "LAPORAN PENDAPATAN DETAIL SUPPLIER");
-        $sheet->mergeCells('A1:U1');
+        $sheet->mergeCells('A1:Q1');
         $sheet->getStyle("A1")->getFont()->setBold(true)->setSize(14);
         $sheet->getRowDimension(1)->setRowHeight(22);
 
@@ -1714,20 +1714,16 @@ class LaporanSupplierLokalBB extends BaseController
         $sheet->setCellValue('D' . $currentRow, 'QTY');
         $sheet->mergeCells('D' . $currentRow . ':D' . ($currentRow + 1));
 
-        $sheet->setCellValue('E' . $currentRow, 'UMUM');
+        $sheet->setCellValue('E' . $currentRow, 'HARIAN');
         $sheet->mergeCells('E' . $currentRow . ':G' . $currentRow);
-        $sheet->setCellValue('H' . $currentRow, 'HARIAN');
+        $sheet->setCellValue('H' . $currentRow, 'TAMBAHAN HARIAN');
         $sheet->mergeCells('H' . $currentRow . ':J' . $currentRow);
-        $sheet->setCellValue('K' . $currentRow, 'TAMBAHAN HARIAN');
+        $sheet->setCellValue('K' . $currentRow, 'TAMBAHAN BULANAN');
         $sheet->mergeCells('K' . $currentRow . ':M' . $currentRow);
-        $sheet->setCellValue('N' . $currentRow, 'TAMBAHAN BULANAN');
+        $sheet->setCellValue('N' . $currentRow, 'TAMBAHAN LANGSUNG');
         $sheet->mergeCells('N' . $currentRow . ':P' . $currentRow);
-        $sheet->setCellValue('Q' . $currentRow, 'SUBSIDI');
-        $sheet->mergeCells('Q' . $currentRow . ':S' . $currentRow);
-        $sheet->setCellValue('T' . $currentRow, 'TOTAL');
-        $sheet->mergeCells('T' . $currentRow . ':T' . ($currentRow + 1));
-        $sheet->setCellValue('U' . $currentRow, 'TOTAL');
-        $sheet->mergeCells('U' . $currentRow . ':U' . ($currentRow + 1));
+        $sheet->setCellValue('Q' . $currentRow, 'TOTAL');
+        $sheet->mergeCells('Q' . $currentRow . ':Q' . ($currentRow + 1));
 
         $subHeaders = [
             'E' => 'DPP',
@@ -1742,18 +1738,15 @@ class LaporanSupplierLokalBB extends BaseController
             'N' => 'DPP',
             'O' => 'PPH',
             'P' => 'Total',
-            'Q' => 'DPP',
-            'R' => 'PPH',
-            'S' => 'Total',
         ];
         foreach ($subHeaders as $col => $label) {
             $sheet->setCellValue($col . ($currentRow + 1), $label);
         }
 
-        $sheet->getStyle('A' . $currentRow . ':U' . ($currentRow + 1))->getFont()->setBold(true);
-        $sheet->getStyle('A' . $currentRow . ':U' . ($currentRow + 1))->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
-        $sheet->getStyle('A' . $currentRow . ':U' . ($currentRow + 1))->getAlignment()->setVertical(Alignment::VERTICAL_CENTER);
-        $sheet->getStyle('A' . $currentRow . ':U' . ($currentRow + 1))->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_THIN);
+        $sheet->getStyle('A' . $currentRow . ':Q' . ($currentRow + 1))->getFont()->setBold(true);
+        $sheet->getStyle('A' . $currentRow . ':Q' . ($currentRow + 1))->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+        $sheet->getStyle('A' . $currentRow . ':Q' . ($currentRow + 1))->getAlignment()->setVertical(Alignment::VERTICAL_CENTER);
+        $sheet->getStyle('A' . $currentRow . ':Q' . ($currentRow + 1))->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_THIN);
 
         $currentRow += 2;
 
@@ -1767,7 +1760,7 @@ class LaporanSupplierLokalBB extends BaseController
         foreach ($groupedByBarang as $barangName => $items) {
             // Judul bahan
             $sheet->setCellValue('A' . $currentRow, 'Bahan Baku: ' . $barangName);
-            $sheet->mergeCells('A' . $currentRow . ':U' . $currentRow);
+            $sheet->mergeCells('A' . $currentRow . ':Q' . $currentRow);
             $sheet->getStyle('A' . $currentRow)->getFont()->setBold(true);
             $currentRow++;
 
@@ -1799,19 +1792,15 @@ class LaporanSupplierLokalBB extends BaseController
                 $sheet->setCellValue('H' . $currentRow, $item['dppHarian']);
                 $sheet->setCellValue('I' . $currentRow, $item['pphHarian']);
                 $sheet->setCellValue('J' . $currentRow, $item['totalHarian']);
-                $sheet->setCellValue('K' . $currentRow, $item['dppHarian']);
-                $sheet->setCellValue('L' . $currentRow, $item['pphHarian']);
-                $sheet->setCellValue('M' . $currentRow, $item['totalHarian']);
-                $sheet->setCellValue('N' . $currentRow, $item['dppBulanan']);
-                $sheet->setCellValue('O' . $currentRow, $item['pphBulanan']);
-                $sheet->setCellValue('P' . $currentRow, $item['totalBulanan']);
-                $sheet->setCellValue('Q' . $currentRow, $item['subsidi']);
-                $sheet->setCellValue('R' . $currentRow, $item['pphSubsidi']);
-                $sheet->setCellValue('S' . $currentRow, $item['totalSubsidi']);
-                $sheet->setCellValue('T' . $currentRow, $item['totalRow']);
-                $sheet->setCellValue('U' . $currentRow, $item['totalRow']);
+                $sheet->setCellValue('K' . $currentRow, $item['dppBulanan']);
+                $sheet->setCellValue('L' . $currentRow, $item['pphBulanan']);
+                $sheet->setCellValue('M' . $currentRow, $item['totalBulanan']);
+                $sheet->setCellValue('N' . $currentRow, $item['subsidi']);
+                $sheet->setCellValue('O' . $currentRow, $item['pphSubsidi']);
+                $sheet->setCellValue('P' . $currentRow, $item['totalSubsidi']);
+                $sheet->setCellValue('Q' . $currentRow, $item['totalRow']);
 
-                foreach (range('E', 'U') as $col) {
+                foreach (range('E', 'Q') as $col) {
                     $sheet->getStyle($col . $currentRow)->getNumberFormat()->setFormatCode(NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1);
                 }
 
@@ -1832,27 +1821,23 @@ class LaporanSupplierLokalBB extends BaseController
             $sheet->setCellValue('H' . $currentRow, $totals['dppHarian']);
             $sheet->setCellValue('I' . $currentRow, $totals['pphHarian']);
             $sheet->setCellValue('J' . $currentRow, $totals['totalHarian']);
-            $sheet->setCellValue('K' . $currentRow, $totals['dppHarian']);
-            $sheet->setCellValue('L' . $currentRow, $totals['pphHarian']);
-            $sheet->setCellValue('M' . $currentRow, $totals['totalHarian']);
-            $sheet->setCellValue('N' . $currentRow, $totals['dppBulanan']);
-            $sheet->setCellValue('O' . $currentRow, $totals['pphBulanan']);
-            $sheet->setCellValue('P' . $currentRow, $totals['totalBulanan']);
-            $sheet->setCellValue('Q' . $currentRow, $totals['subsidi']);
-            $sheet->setCellValue('R' . $currentRow, $totals['pphSubsidi']);
-            $sheet->setCellValue('S' . $currentRow, $totals['totalSubsidi']);
-            $sheet->setCellValue('T' . $currentRow, $totals['totalRow']);
-            $sheet->setCellValue('U' . $currentRow, $totals['totalRow']);
+            $sheet->setCellValue('K' . $currentRow, $totals['dppBulanan']);
+            $sheet->setCellValue('L' . $currentRow, $totals['pphBulanan']);
+            $sheet->setCellValue('M' . $currentRow, $totals['totalBulanan']);
+            $sheet->setCellValue('N' . $currentRow, $totals['subsidi']);
+            $sheet->setCellValue('O' . $currentRow, $totals['pphSubsidi']);
+            $sheet->setCellValue('P' . $currentRow, $totals['totalSubsidi']);
+            $sheet->setCellValue('Q' . $currentRow, $totals['totalRow']);
 
-            $sheet->getStyle('A' . $currentRow . ':U' . $currentRow)->getFont()->setBold(true);
-            foreach (range('E', 'U') as $col) {
+            $sheet->getStyle('A' . $currentRow . ':Q' . $currentRow)->getFont()->setBold(true);
+            foreach (range('E', 'Q') as $col) {
                 $sheet->getStyle($col . $currentRow)->getNumberFormat()->setFormatCode(NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1);
             }
 
             $currentRow += 2;
         }
 
-        foreach (range('A', 'U') as $col) {
+        foreach (range('A', 'Q') as $col) {
             $sheet->getColumnDimension($col)->setAutoSize(true);
         }
 
