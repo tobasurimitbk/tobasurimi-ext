@@ -340,7 +340,9 @@
                 $nilai_total = 0;
                 $nilai_total_harian = 0;
                 $jumlahData = count($dataPODetail);
-                if ($jumlahData >= 5) {
+                if ($jumlahData >= 7) {
+                    $marginTop = '';
+                } elseif ($jumlahData >= 5 && $jumlahData <= 6) {
                     $marginTop = '1rem';
                 } elseif ($jumlahData >= 3) {
                     $marginTop = '2rem';
