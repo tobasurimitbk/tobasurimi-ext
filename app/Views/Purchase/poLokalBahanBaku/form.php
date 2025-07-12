@@ -610,6 +610,13 @@
         });
     }
 
+    $('.cong_sebenarnya,.cong_batasan').change(function() {
+        var congSebenarnya = destroyFormatRupiah($('.cong_sebenarnya').val() || 0);
+        var congBatasan = destroyFormatRupiah($('.cong_batasan').val() || 0);
+
+        $('.subsidi_langsung').val(greatFormatRupiah(congBatasan - congSebenarnya));
+    });
+
     $(document).ready(function() {
         //
         $(".po_date").datepicker({
