@@ -242,6 +242,7 @@ class SppModel extends Model
             ->join('am_purchase_order_details', 'am_purchase_orders.id = am_purchase_order_details.am_purchase_order_id', 'left')
             ->where('purchase_requests.company_id', $company_id)
             ->where('am_purchase_orders.is_posted', 1)
+            ->where('am_purchase_orders.status_penerimaan', 0)
             ->where('purchase_requests.deletedAt', null)
             ->groupBy('purchase_requests.id')
             ->having('SUM(am_purchase_order_details.remaining_qty) > 0') // Langsung filter yang masih ada sisa qty
@@ -259,6 +260,7 @@ class SppModel extends Model
             ->where('purchase_requests.company_id', $company_id)
             ->where('purchase_requests.divisi_id', $divisi_id)
             ->where('am_purchase_orders.supplier_id', $supplier_id)
+            ->where('am_purchase_orders.status_penerimaan', 0)
             ->where('am_purchase_orders.is_posted', 1)
             ->where('purchase_requests.deletedAt', null)
             ->groupBy('purchase_requests.id')

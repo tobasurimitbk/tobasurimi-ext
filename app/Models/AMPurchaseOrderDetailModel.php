@@ -134,7 +134,7 @@ class AMPurchaseOrderDetailModel extends Model
         return $query->getRow();
     }
 
-    public function getListLPBBahanPenolong($amPurchaseOrderID, $statusPenerimaan, $tipeBahan, $penerimaanBarangID = null)
+    public function getListLPBBahanPenolong($amPurchaseOrderID, $statusPenerimaan, $tipeBahan, $isInitEdit, $penerimaanBarangID = null)
     {
         // dd($amPurchaseOrderID);
 
@@ -323,7 +323,8 @@ class AMPurchaseOrderDetailModel extends Model
                     $sisaDiterimaTotal += $sisaDiterima;
                     $hargaPerBarangTotal += $harga;
                     $subTotal += ($inLPB * $harga);
-                } else {
+                } else if ($isInitEdit == 0) {
+                    // TAMPILKAN JIKA DI CHANGE ULANG SPP NYA
                     // TAMPILKAN YANG MASIH ADA SISA AJA
                     $res[] = [
                         'penerimaan_barang_detail_id' => isset($firstLPB['penerimaan_barang_detail_id']) ? $firstLPB['penerimaan_barang_detail_id'] : "",
