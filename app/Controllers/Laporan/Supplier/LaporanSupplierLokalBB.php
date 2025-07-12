@@ -321,7 +321,7 @@ class LaporanSupplierLokalBB extends BaseController
             "barangId"     => $this->request->getGet("filter_barang"),
             "warehouseId"  => $this->request->getGet("filter_warehouse"),
             "poNo"         => $this->request->getGet("filter_po_no"),
-            "divisiId"         => $this->request->getGet("filter_divisi"),
+            "divisiId"     => $this->request->getGet("filter_divisi"),
         ];
 
         $availableSort = [
@@ -345,12 +345,84 @@ class LaporanSupplierLokalBB extends BaseController
         $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
         $sheet->setTitle('Laporan Pendapatan Supplier');
+
+        // Header utama hanya sekali
         $sheet->setCellValue("A1", 'Pendapatan Supplier Per PO');
         $sheet->mergeCells("A1:V1");
         $sheet->getStyle("A1")->getFont()->setBold(true)->setSize(14);
         $sheet->getRowDimension(1)->setRowHeight(22);
 
+        // Header tabel hanya sekali (baris 3 dan 4)
         $rowNo = 3;
+
+        // Baris Header 1
+        $headers1 = [
+            'No',
+            'Supplier',
+            'No PO',
+            'Tgl PO',
+            'Department',
+            'Gudang',
+            'Qty',
+            'Satuan',
+            'Unit',
+            'Harian',
+            '',
+            '',
+            'Tambahan Harian',
+            '',
+            '',
+            'Tambahan Bulanan',
+            '',
+            '',
+            'Tambahan Langsung',
+            '',
+            '',
+            'Total'
+        ];
+        $sheet->fromArray($headers1, null, "A{$rowNo}");
+
+        // Merge A–I (kolom identitas) - rowspan 2
+        foreach (range('A', 'I') as $col) {
+            $sheet->mergeCells("{$col}{$rowNo}:{$col}" . ($rowNo + 1));
+        }
+
+        // Merge J–L = Harian, M–O = Tambahan Harian, P–R = Tambahan Bulanan
+        $sheet->mergeCells("J{$rowNo}:L{$rowNo}");
+        $sheet->mergeCells("M{$rowNo}:O{$rowNo}");
+        $sheet->mergeCells("P{$rowNo}:R{$rowNo}");
+        $sheet->mergeCells("S{$rowNo}:U{$rowNo}");
+
+        // Merge Total
+        $sheet->mergeCells("V{$rowNo}:V" . ($rowNo + 1));
+
+        $sheet->getStyle("A{$rowNo}:V" . ($rowNo + 1))->getFont()->setBold(true);
+        $sheet->getStyle('A' . $rowNo . ':V' . ($rowNo + 1))->getAlignment()
+            ->setHorizontal(Alignment::HORIZONTAL_CENTER)
+            ->setVertical(Alignment::VERTICAL_CENTER);
+
+        $rowNo++;
+
+        // Baris Header 2
+        $headers2 = array_fill(0, 9, ''); // A–I kosong
+        $headers2 = array_merge($headers2, [
+            'DPP',
+            'PPh',
+            'Total', // J–L (Harian)
+            'DPP',
+            'PPh',
+            'Total', // M–O (Tambahan Harian)
+            'DPP',
+            'PPh',
+            'Total', // P–R (Tambahan Bulanan)
+            'DPP',
+            'PPh',
+            'Total', // S–U (Tambahan Langsung)
+            ''         // V (Total)
+        ]);
+        $sheet->fromArray($headers2, null, "A{$rowNo}");
+
+        $rowNo++; // Sekarang rowNo = 5 untuk data pertama
         $globalNo = 1;
 
         foreach ($barangGrouped as $barangName => $items) {
@@ -372,76 +444,10 @@ class LaporanSupplierLokalBB extends BaseController
                 'totalRow' => 0,
             ];
 
+            // Tampilkan nama barang
             $sheet->setCellValue("A{$rowNo}", 'Bahan Baku: ' . $barangName);
             $sheet->mergeCells("A{$rowNo}:V{$rowNo}");
             $sheet->getStyle("A{$rowNo}")->getFont()->setBold(true);
-            $rowNo++;
-
-            // Baris Header 1
-            $headers1 = [
-                'No',
-                'Supplier',
-                'No PO',
-                'Tgl PO',
-                'Department',
-                'Gudang',
-                'Qty',
-                'Satuan',
-                'Unit',
-                'Umum',
-                '',
-                '',
-                'Harian',
-                '',
-                '',
-                'Bulanan',
-                '',
-                '',
-                'DPP Subsidi',
-                'PPh Subsidi',
-                'Total Subsidi',
-                'Total'
-            ];
-            $sheet->fromArray($headers1, null, "A{$rowNo}");
-
-            // Merge A–I (kolom identitas) - rowspan 2
-            foreach (range('A', 'I') as $col) {
-                $sheet->mergeCells("{$col}{$rowNo}:{$col}" . ($rowNo + 1));
-            }
-
-            // Merge J–L = Umum, M–O = Harian, P–R = Bulanan
-            $sheet->mergeCells("J{$rowNo}:L{$rowNo}");
-            $sheet->mergeCells("M{$rowNo}:O{$rowNo}");
-            $sheet->mergeCells("P{$rowNo}:R{$rowNo}");
-
-            // Merge Subsidi dan Total
-            foreach (['S', 'T', 'U', 'V'] as $col) {
-                $sheet->mergeCells("{$col}{$rowNo}:{$col}" . ($rowNo + 1));
-            }
-
-            $sheet->getStyle("A{$rowNo}:V" . ($rowNo + 1))->getFont()->setBold(true);
-            $sheet->getStyle('A' . $rowNo . ':V' . ($rowNo + 1))->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
-            $sheet->getStyle('A' . $rowNo . ':V' . ($rowNo + 1))->getAlignment()->setVertical(Alignment::VERTICAL_CENTER);
-            $rowNo++;
-
-            // Baris Header 2
-            $headers2 = array_fill(0, 9, ''); // A–I kosong
-            $headers2 = array_merge($headers2, [
-                'DPP',
-                'PPh',
-                'Total', // J–L (Umum)
-                'DPP',
-                'PPh',
-                'Total', // M–O (Harian)
-                'DPP',
-                'PPh',
-                'Total', // P–R (Bulanan)
-                '',
-                '',
-                '',
-                ''         // S–V
-            ]);
-            $sheet->fromArray($headers2, null, "A{$rowNo}");
             $rowNo++;
 
             // Data
@@ -522,7 +528,7 @@ class LaporanSupplierLokalBB extends BaseController
             ], null, "A{$rowNo}");
 
             $sheet->getStyle("A{$rowNo}:V{$rowNo}")->getFont()->setBold(true);
-            $rowNo += 3;
+            $rowNo += 3; // Beri jarak 3 baris sebelum kelompok berikutnya
         }
 
         // Auto-width
