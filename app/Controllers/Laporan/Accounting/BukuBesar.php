@@ -121,6 +121,7 @@ class BukuBesar extends BaseController
             $dataJurnalUmum = $this->jurnalUmumModel
                 ->select('
                     jurnal_umum.*, 
+                    companies.company,
                     transaksi_jurnal.no_transaksi, 
                     suppliers.name as supplier_name, 
                     transaksi_jurnal.id AS transaksi_jurnal_id, 
@@ -131,6 +132,7 @@ class BukuBesar extends BaseController
                 ->join('suppliers', 'suppliers.id = jurnal_umum.supplier_id', 'left')
                 ->join('metadata AS m_valas', 'm_valas.id = jurnal_umum.valas', 'left')
                 ->join('metadata AS m_jenis_transaksi', 'm_jenis_transaksi.id = transaksi_jurnal.type_transaksi', 'left')
+                ->join('companies', 'companies.id = jurnal_umum.company_id', 'left')
                 ->where('transaksi_jurnal.deleted_at', null)
                 ->where('jurnal_umum.deletedAt', null)
                 ->where($condition)

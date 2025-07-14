@@ -152,6 +152,7 @@
                                 <thead>
                                     <tr>
                                         <th>Tanggal</th>
+                                        <th>Company</th>
                                         <th>Jenis Transaksi</th>
                                         <th>Supplier</th>
                                         <th>No Transaksi</th>
@@ -183,6 +184,7 @@
                                         ?>
                                         <tr>
                                             <td><?= date('d/m/Y', strtotime($r['tanggal_jurnal'])) ?></td>
+                                            <td><?= $r['company'] ?></td>
                                             <td><?= $r['jenis_transaksi'] ?></td>
                                             <td><?= $r['supplier_name'] ?></td>
                                             <td><?= $r['no_transaksi'] ?></td>
@@ -195,7 +197,7 @@
                                         </tr>
                                     <?php endforeach; ?>
                                     <tr>
-                                        <td colspan="6" style="text-align: center;font-weight:bold;">
+                                        <td colspan="8" style="text-align: center;font-weight:bold;">
                                             <b>Sub Total</b>
                                         </td>
                                         <td>
@@ -211,7 +213,7 @@
                                         <td></td>
                                     </tr>
                                     <tr>
-                                        <td colspan="6" style="text-align: center;">
+                                        <td colspan="8" style="text-align: center;">
                                             <b>Total</b>
                                         </td>
                                         <td></td>

@@ -577,7 +577,7 @@ class PenerimaanBarangImportBP extends BaseController
 
             $data = [
                 'dataPenerimaanBarang' => $this->penerimaanBarangModel->getById($id),
-                'dataPenerimaanBarangDetail' => $this->penerimaanBarangDetailModel->getPenerimaanBarangPenolongDetail($id)
+                'dataPenerimaanBarangDetail' => $this->penerimaanBarangDetailModel->getPenerimaanBarangPenolongDetail2($id)
             ];
             $this->dompdf->loadHtml(view('Warehouse/penerimaanBarangImport/bahanPenolong/print', $data));
             $this->dompdf->setPaper('A4', 'portrait');
@@ -911,6 +911,7 @@ class PenerimaanBarangImportBP extends BaseController
     {
         $penerimaanBarangID = empty($this->request->getVar('penerimaan_barang_id')) ? null : decrypt($this->request->getVar('penerimaan_barang_id'));
         $amPurchaseOrderID = json_decode($this->request->getVar('am_purchase_order_id'));
+        $isInitEdit = $this->request->getVar('is_init_edit');
 
         if (count($amPurchaseOrderID) == 0) {
             return response()->setJSON([
@@ -918,7 +919,7 @@ class PenerimaanBarangImportBP extends BaseController
             ]);
         }
 
-        return response()->setJSON($this->amPurchaseOrderDetailModel->getListLPBBahanPenolong($amPurchaseOrderID, "IMPORT", "PENOLONG", $penerimaanBarangID));
+        return response()->setJSON($this->amPurchaseOrderDetailModel->getListLPBBahanPenolong($amPurchaseOrderID, "IMPORT", "PENOLONG", $isInitEdit, $penerimaanBarangID));
     }
 
     public function dropdownDivisiPOImportBP()
