@@ -206,7 +206,6 @@ class LaporanSupplierLokalBB extends BaseController
             $totals['totalRow'] += $totalRow;
 
             if (!isset($groupedData[$poId])) {
-                $tambahan = $row->subsidi;
                 $subsidi = $row->subsidi == 0 ? ($row->cong_batasan - $row->cong_sebenarnya) : $row->subsidi;
 
                 if ($pphMode === "Company") {
@@ -739,16 +738,18 @@ class LaporanSupplierLokalBB extends BaseController
                 $pphSubsidi = 0;
                 $totalSubsidi = 0;
 
+                $subsidi = ($row->subsidi == 0) ? ($row->cong_batasan - $row->cong_sebenarnya) : $row->subsidi;
+
                 if ($pphMode === "Company") {
-                    $dppSubsidi = $row->subsidi / $nilai_pph;
+                    $dppSubsidi = $subsidi / $nilai_pph;
                     $pphSubsidi = $dppSubsidi * $nilai_pph2;
                     $totalSubsidi = $dppSubsidi - $pphSubsidi;
                 } elseif ($pphMode === "Supplier") {
-                    $dppSubsidi = $row->subsidi;
-                    $pphSubsidi = $row->subsidi * $nilai_pph2;
+                    $dppSubsidi = $subsidi;
+                    $pphSubsidi = $subsidi * $nilai_pph2;
                     $totalSubsidi = $dppSubsidi - $pphSubsidi;
                 } else {
-                    $dppSubsidi = $row->subsidi;
+                    $dppSubsidi = $subsidi;
                     $pphSubsidi = 0;
                     $totalSubsidi = $dppSubsidi;
                 }
@@ -773,6 +774,7 @@ class LaporanSupplierLokalBB extends BaseController
                     'pphBulanan' => 0,
                     'totalBulanan' => 0,
                     'subsidi' => $dppSubsidi,
+                    'tambahan' => $row->subsidi,
                     'pphSubsidi' => $pphSubsidi,
                     'totalSubsidi' => $totalSubsidi,
                     'totalRow' => $totalRow + $totalSubsidi,
@@ -1249,9 +1251,12 @@ class LaporanSupplierLokalBB extends BaseController
                     'dppBulanan'   => 0,
                     'pphBulanan'   => 0,
                     'totalBulanan' => 0,
-                    'subsidi'      => 0,
-                    'pphSubsidi'   => 0,
+                    'tambahan' => $row->subsidi,
+                    'subsidi' => 0,
+                    'pphSubsidi' => 0,
                     'totalSubsidi' => 0,
+                    'nilai_pph' => $nilai_pph,
+                    'nilai_pph2' => $nilai_pph2,
                     'totalRow'     => 0,
                 ];
             }
@@ -1272,16 +1277,27 @@ class LaporanSupplierLokalBB extends BaseController
 
             if (!in_array($poId, $usedSubsidiPo)) {
                 $usedSubsidiPo[] = $poId;
+                $subsidi = $row->subsidi == 0 ? ($row->cong_batasan - $row->cong_sebenarnya) : $row->subsidi;
 
-                $dppSubsidi = $pphMode === "Company" ? $row->subsidi / $nilai_pph : $row->subsidi;
-                $pphSubsidi = $pphMode === "Company" || $pphMode === "Supplier" ? $dppSubsidi * $nilai_pph2 : 0;
-                $totalSubsidi = $pphMode === "Company" || $pphMode === "Supplier" ? $dppSubsidi - $pphSubsidi : $dppSubsidi + $pphSubsidi;
+                if ($pphMode === "Company") {
+                    $dppSubsidi = $subsidi / $nilai_pph;
+                    $pphSubsidi = $subsidi * $nilai_pph2;
+                    $totalSubsidi = $dppSubsidi - $pphSubsidi;
+                } elseif ($pphMode === "Supplier") {
+                    $dppSubsidi = $subsidi;
+                    $pphSubsidi = ($subsidi * $nilai_pph2);
+                    $totalSubsidi = $dppSubsidi - $pphSubsidi;
+                } else {
+                    $dppSubsidi = $subsidi;
+                    $pphSubsidi = ($pphMode === "Supplier") ? ($subsidi * $nilai_pph2) : 0;
+                    $totalSubsidi = $dppSubsidi + $pphSubsidi;
+                }
 
                 $g['subsidi'] += $dppSubsidi;
                 $g['pphSubsidi'] += $pphSubsidi;
                 $g['totalSubsidi'] += $totalSubsidi;
-                $g['totalRow'] += $totalSubsidi;
-                $totalTotalRow += $totalSubsidi;
+                // $g['totalRow'] += $totalSubsidi;
+                // $totalTotalRow += $totalSubsidi;
             }
         }
 
@@ -1291,6 +1307,13 @@ class LaporanSupplierLokalBB extends BaseController
 
         foreach ($paginatedData as $i => &$row) {
             $row['no'] = ($currentPage - 1) * $pageSize + $i + 1;
+            $subsidi = $row['tambahan'] == "0" ? $row['subsidi'] * $row['qtyPO'] : $row['subsidi'];
+            $pphSubsidi = $subsidi * $row['nilai_pph2'];
+            $totalSubsidi = $subsidi - $pphSubsidi;
+            $row['subsidi'] = $subsidi;
+            $row['pphSubsidi'] = $pphSubsidi;
+            $row['totalSubsidi'] = $totalSubsidi;
+            $row['totalRow'] = $row['totalRow'] + $totalSubsidi;
             foreach ($row as $key => $val) {
                 if (is_numeric($val) && $key !== 'no') {
                     $row[$key] = number_format($val, 2, '.', ',');

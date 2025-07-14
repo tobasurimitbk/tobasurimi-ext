@@ -308,7 +308,7 @@ $routes->get('/po-lokal-bahan-baku/histori-lpb', 'Purchase\POLokalBahanBaku::dro
 $routes->get('/po-lokal-bahan-baku/dropdown/get-spp', 'Purchase\POLokalBahanBaku::dropdownGetSpp', ['filter' => 'Auth']);
 $routes->get('/po-lokal-bahan-baku/dropdown/get-detail-barang-spp', 'Purchase\POLokalBahanBaku::dropdownGetSppDetail', ['filter' => 'Auth']);
 $routes->get('/po-lokal-bahan-baku/get-spesifikasi-barang-supplier', 'Purchase\POLokalBahanBaku::getBarangAndSupplier', ['filter' => 'Auth']);
-$routes->get('/po-lokal-bahan-baku/print/(:segment)', 'Purchase\POLokalBahanBaku::printPengeluaran/$1', ['filter' => 'Auth']);
+$routes->get('/po-lokal-bahan-baku/print-pengeluaran/(:segment)', 'Purchase\POLokalBahanBaku::printPengeluaran/$1', ['filter' => 'Auth']);
 
 // BAHAN BAKU PO PENOLONG
 $routes->get('/po-lokal-bahan-penolong', 'Purchase\POLokalBahanPenolong::poLokalBahanPenolong', ['filter' => 'Auth']);

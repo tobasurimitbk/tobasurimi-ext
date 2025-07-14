@@ -816,95 +816,25 @@ class POLokalBahanBaku extends BaseController
     public function printPengeluaran($id)
     {
         $id = decrypt($id);
-        $purchaseLokalBB = $this->RMPurchaseOrderModel->find($id);
-
-        dd($purchaseLokalBB);
-
-        $filename = "Bukti Pengeluaran Bahan Baku";
-
-        $data = [];
-        $noList = [];
-        $itemsList = [];
-        $taxList = [];
-        $taxReturnList = [];
-        $itemTotal = 0;
-        $taxTotal = 0;
-        $taxReturnTotal = 0;
-        $taxPph23 = 0;
-
-        $dataInv = $tandaTerimaFakturModel->asObject()
-            ->select("tanda_terima_faktur.*, DATE_FORMAT(tanda_terima_faktur.invoice_date, '%d/%m/%Y') AS invoice_date, suppliers.name AS supplier_name")
-            ->join('suppliers', 'suppliers.id = tanda_terima_faktur.supplier_id', 'left')
+        $data = $this->RMPurchaseOrderModel
+            ->select('
+                rm_purchase_orders.po_no, 
+                rm_purchase_orders.po_date, 
+                rm_purchase_orders.total_after_pph, 
+                suppliers.name, 
+                suppliers.address,
+                barang_master.barang_name,
+                sum(rm_purchase_order_details.qty) as qty_po,
+                satuans.kode_satuan')
+            ->join('suppliers', 'suppliers.id = rm_purchase_orders.supplier_id', 'left')
+            ->join('barang_master', 'barang_master.id = rm_purchase_orders.id', 'left')
+            ->join('rm_purchase_order_details', 'rm_purchase_order_details.rm_purchase_order_id = rm_purchase_orders.id', 'left')
+            ->join('satuans', 'satuans.id = rm_purchase_order_details.satuan_id', 'left')
             ->find($id);
 
-        $dataDet = $tandaTerimaFakturDetModel->asObject()
-            ->where('tanda_terima_faktur_id', $id)
-            ->where('deletedAt', null)
-            ->findAll();
+        // dd($data);
 
-        // Pajak Bukti Pengeluaran (Bon Putih)
-        $taxData = $pajakTandaTerimaFakturModel->asObject()
-            ->where('tanda_terima_faktur_id', $id)
-            ->whereIn('tax_type', ['PPN Masukan', 'PPN Masukan 11%'])
-            ->where('deletedAt', null)
-            ->findAll();
-
-        // Pajak Bukti Pemasukkan (Bon Merah)
-        $taxReturnData = $pajakTandaTerimaFakturModel->asObject()
-            ->where('tanda_terima_faktur_id', $id)
-            ->whereIn('tax_type', ['PPN Masukan', 'PPh Pasal 21', 'PPh Pasal 23', 'PPh Pasal 4 (2)'])
-            ->where('deletedAt', null)
-            ->findAll();
-
-        foreach ($dataDet as $det) {
-            $noList[] = "$det->lpb_no";
-            $itemsList[] = "$det->qty $det->unit $det->item_name";
-            $itemTotal += $det->qty * $det->price_single;
-        }
-
-        // foreach ($taxData as $tax) {
-        //     $taxList[] = "{$tax->tax_type}: {$tax->tax_inv_no}";
-        //     if ($tax->tax_type == "PPh Pasal 23") {
-        //         $taxPph23 += $tax->tax_amt;
-        //     } else {
-        //         $taxTotal += $tax->tax_amt;
-        //     }
-        // }
-
-        foreach ($taxData as $tax) {
-            $taxList[] = "{$tax->tax_type}: {$tax->tax_inv_no}";
-            $taxTotal += $tax->tax_amt;
-        }
-
-        foreach ($taxReturnData as $tax) {
-            $taxReturnList[] = "{$tax->tax_type}: {$tax->tax_inv_no}";
-            $taxReturnTotal += $tax->tax_amt;
-        }
-
-        // \var_dump($itemTotal, $dataInv->tambahan, $taxTotal, $taxReturnTotal);
-        // die;
-
-        // $total = ($itemTotal + $dataInv->tambahan + $taxTotal - $dataInv->potongan) - $taxPph23;
-        $total = ($itemTotal + $dataInv->tambahan + $taxReturnTotal) - $taxPph23;
-        $taxTotal += $dataInv->potongan;
-
-        $data["data"] = $dataInv;
-        $data['invNo'] = $dataInv->faktur_no;
-        $data['invKeluarNo'] = $dataInv->faktur_keluar_no;
-        $data["lpbNo"] = implode(', ', $noList);
-        $data["itemName"] = implode(', ', $itemsList);
-        $data['taxList'] = implode(', ', $taxList);
-        $data['taxReturnList'] = implode(', ', $taxReturnList);
-        $data["itemTotal"] = $itemTotal;
-        $data["potongan"] = $dataInv->potongan;
-        $data["tambahan"] = $dataInv->tambahan;
-        $data['total'] = $total;
-        $data['taxTotal'] = $taxTotal;
-        $data['taxReturnTotal'] = $taxReturnTotal;
-        $data['terbilang'] = penyebut($total < 0 ? $total * -1 : $total);
-        $data['taxReturnTerbilang'] = $taxReturnTotal > 0 ? penyebut($taxReturnTotal) : 'nol';
-        $data['taxReturnData'] = $taxReturnData;
-        $data['taxData'] = $taxData;
+        $filename = "Bukti Pengeluaran Bahan Baku";
 
         $this->dompdf->loadHtml(view('Purchase/poLokalBahanBaku/print-pengeluaran', $data));
         $this->dompdf->setPaper('A5', 'landscape');
