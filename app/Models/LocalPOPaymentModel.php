@@ -35,10 +35,13 @@ class LocalPOPaymentModel extends Model
         'pembayaran_oleh',
         'potongan_harga',
         'amount',
+        'amount_pph',
         'status_posting',
         'keterangan',
         'akun_kas',
         'akun_selisih',
+        'akun_kas_pph',
+        'akun_selisih_pph',
         'deletedAt'
     ];
 
@@ -1100,6 +1103,8 @@ class LocalPOPaymentModel extends Model
         $purchaseOrders = $purchaseOrderModel
             ->select("rm_purchase_orders.po_date AS tanggal_PO,
                     rm_purchase_orders.po_no AS no_po,
+                    rm_purchase_orders.total_after_pph,
+                    rm_purchase_orders.total_before_pph,
                     rm_purchase_orders.id AS rm_purchase_order_id,
                     rm_purchase_orders.total AS total_tagihan_number,
                     barang_master.barang_name AS barang,
@@ -1116,7 +1121,14 @@ class LocalPOPaymentModel extends Model
 
         // Ambil semua pembayaran yang terkait dengan PO yang dipilih
         $payments = $localPOPaymentDetailModel
-            ->select('local_po_payment_details.id, local_po_payment_details.local_po_payment_id as po_payment_id, local_po_payment_details.rm_purchase_order_id, local_po_payment_details.total as total_paid, local_po_payment_panjar.bayar_panjar as total_panjar,  local_po_payment_pinjaman.bayar_pinjaman as total_pinjaman, local_po_payment_panjar.id as panjar_payment_id')
+            ->select('local_po_payment_details.id, 
+                    local_po_payment_details.local_po_payment_id as po_payment_id, 
+                    local_po_payment_details.rm_purchase_order_id, 
+                    local_po_payment_details.total as total_paid, 
+                    local_po_payment_details.total_pay_pph as total_paid_pph, 
+                    local_po_payment_panjar.bayar_panjar as total_panjar,  
+                    local_po_payment_pinjaman.bayar_pinjaman as total_pinjaman, 
+                    local_po_payment_panjar.id as panjar_payment_id')
             ->whereIn('rm_purchase_order_id', $poIdArr)
             ->groupBy('rm_purchase_order_id')
             ->join("local_po_payment_panjar", 'local_po_payment_panjar.local_po_payment_id = local_po_payment_details.local_po_payment_id', 'left')
@@ -1128,16 +1140,16 @@ class LocalPOPaymentModel extends Model
         foreach ($payments as $pay) {
             $paymentsMap[$pay['rm_purchase_order_id']] = [
                 'total_paid'    => (float) ($pay['total_paid'] ?? 0),
+                'total_paid_pph'    => (float) ($pay['total_paid_pph'] ?? 0),
                 'total_panjar'  => (float) ($pay['total_panjar'] ?? 0),
                 'total_pinjaman' => (float) ($pay['total_pinjaman'] ?? 0)
             ];
         }
 
         foreach ($purchaseOrders as &$p) {
-            $totalWithPPH = $purchaseOrderModel->getTotalwithPPH($p['rm_purchase_order_id']);
-
             // Ambil data pembayaran, panjar, dan pinjaman dengan casting ke float
             $totalPaid    = floatval($paymentsMap[$p['rm_purchase_order_id']]['total_paid'] ?? 0);
+            $totalPaidPPH    = floatval($paymentsMap[$p['rm_purchase_order_id']]['total_paid_pph'] ?? 0);
             $totalPanjar  = floatval($paymentsMap[$p['rm_purchase_order_id']]['total_panjar'] ?? 0);
             $totalPinjaman = floatval($paymentsMap[$p['rm_purchase_order_id']]['total_pinjaman'] ?? 0);
 
@@ -1146,10 +1158,13 @@ class LocalPOPaymentModel extends Model
 
             // Format tanggal & update data PO
             $p['tanggal_PO'] = date('d/m/Y', strtotime($p['tanggal_PO']));
-            $p['total_tagihan'] = number_format($totalWithPPH['total_after_pph'], 2, '.', '');
-            $p['total_tagihan_number'] = number_format($totalWithPPH['total_after_pph'], 2, '.', '');
+            $p['total_tagihan'] = number_format($p['total_before_pph'], 2, '.', '');
+            $p['total_tagihan_number'] = number_format($p['total_before_pph'], 2, '.', '');
+            $p['total_tagihan_pph'] = number_format($p['total_before_pph'] - $p['total_after_pph'], 2, '.', '');
             $p['total_paid'] = number_format($totalPaid, 2, '.', '');
-            $p['sisa_tagihan'] = number_format($totalWithPPH['total_after_pph'] - $totalPaid, 2, '.', '');
+            $p['total_paid_pph'] = number_format($totalPaidPPH, 2, '.', '');
+            $p['sisa_tagihan'] = number_format($p['total_before_pph'] - $totalPaid, 2, '.', '');
+            $p['sisa_tagihan_pph'] = number_format($p['total_tagihan_pph'] - $totalPaidPPH, 2, '.', '');
             $p['total_qty_diterima'] = number_format($p['total_qty_diterima'], 2, '.', '');
         }
 

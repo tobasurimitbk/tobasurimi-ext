@@ -21,6 +21,7 @@ class LocalPOPaymentDetailModel extends Model
         'rm_purchase_order_id',
         'rm_purchase_order_details_id',
         'total',
+        'total_pay_pph',
         'tipe'
     ];
 

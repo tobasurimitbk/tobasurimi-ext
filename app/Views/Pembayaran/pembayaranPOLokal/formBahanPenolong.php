@@ -183,6 +183,17 @@
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating form-pembayaran-po mb-3" style="height: 50px;">
+                            <select class="form-select" <?= !empty($detail) ? ($detail['pembayaranDetail']['status_posting'] == 1 ? 'disabled' : '') : ""  ?> name="akun_pajak" id="akun_pajak">
+                                <option disabled selected value=""></option>
+                                <?php foreach ($subsAkuns as $subs) : ?>
+                                    <option <?= !empty($detail) ? ($detail['pembayaranDetail']['akun_pajak'] == $subs->id ? 'selected' : '') : '' ?> value="<?= $subs->id ?>"><?= strtoupper($subs->no_sub . " " . $subs->nama_sub) ?></option>
+                                <?php endforeach ?>
+                            </select>
+                            <label for="floatingInput" style="z-index: 1;">Akun Pajak</label>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-floating form-pembayaran-po mb-3" style="height: 50px;">
                             <textarea class="form-control" name="supplier" id="supplier" <?= !empty($detail) ? ($detail['pembayaranDetail']['status_posting'] == 1 ? 'readonly' : '') : '' ?> placeholder="supplier"><?= !empty($detail) ? $detail['pembayaranDetail']['supplier'] : ''  ?></textarea>
                             <label for="floatingInput" style="z-index: 1;">Pembayaran Ke</label>
                         </div>
@@ -390,6 +401,11 @@
             theme: "bootstrap-5"
         });
 
+        $('#akun_pajak').select2({
+            placeholder: "Akun Pajak",
+            theme: "bootstrap-5"
+        });
+
         $('#payment_method').select2({
             placeholder: "Metode Pembayaran",
             theme: "bootstrap-5"
@@ -450,6 +466,7 @@
                         if (result.isConfirmed) {
                             let formData = new FormData(document.querySelector(".create-form"));
                             let nominalPembayaran = destroyFormatRupiah($('.nominal_pembayaran').val());
+                            let nominalPembayaranPajak = destroyFormatRupiah($('.nominal_pembayaran_pajak').val());
 
                             const formatList = (list) => {
                                 if (!Array.isArray(list)) return []; // Pastikan `list` adalah array
@@ -464,6 +481,7 @@
                             };
 
                             formData.set('nominal_pembayaran', nominalPembayaran);
+                            formData.set('nominal_pembayaran_pajak', nominalPembayaranPajak);
                             formData.append("pembayaranList", JSON.stringify(listPembayaran));
                             $.ajax({
 
@@ -530,7 +548,8 @@
 
                             let formData = new FormData(document.querySelector(".create-form"));
                             let nominalPembayaran = destroyFormatRupiah($('.nominal_pembayaran').val());
-
+                            let nominalPembayaranPajak = destroyFormatRupiah($('.nominal_pembayaran_pajak').val());
+                            
                             const formatList = (list) => {
                                 if (!Array.isArray(list)) return []; // Pastikan `list` adalah array
                                 return list.map(item => {
@@ -545,6 +564,7 @@
 
 
                             formData.set('nominal_pembayaran', nominalPembayaran);
+                            formData.set('nominal_pembayaran_pajak', nominalPembayaranPajak);
                             formData.append("pembayaranList", JSON.stringify(listPembayaran));
                             $.ajax({
                                 url: "<?= base_url("pembayaran-po-lokal-bp/create"); ?>",
@@ -621,9 +641,8 @@
                 var detail = res.detail;
                 // var dateSplit = detail.jatuh_tempo.split('-');
                 var subTotal = Number(detail.nominal_faktur) + Number(res.tax_dipungut_negara.taxAmt) + Number(res.tax_dikembalikan_lagi.taxAmt) + Number(res.pph) - Number(detail.total_amount);
-
+                var totalPajak = Number(res.tax_dipungut_negara.taxAmt) + Number(res.tax_dikembalikan_lagi.taxAmt) + Number(res.pph);
                 $('.nominal_pembayaran').val(greatFormatRupiah(subTotal));
-                // $('.jatuh_tempo').val(dateSplit[2] + '/' + dateSplit[1] + '/' + dateSplit[0]);
                 $('.tanda_terima_faktur_id').val(detail.id);
 
 
@@ -642,30 +661,37 @@
                     newRow.append($('<td>').text(greatFormatRupiah(v.price)));
                     table.find('tbody').append(newRow);
                 });
+
+                
                 var newRow1 = $('<tr>');
                 newRow1.append($('<td style="text-align:right;" colspan="6">').text('Tambahan'));
                 newRow1.append($('<td>').text(greatFormatRupiah(detail.tambahan)));
                 table.find('tbody').append(newRow1);
+
 
                 var newRow2 = $('<tr>');
                 newRow2.append($('<td style="text-align:right;" colspan="6">').text('Potongan'));
                 newRow2.append($('<td>').text(greatFormatRupiah(detail.potongan)));
                 table.find('tbody').append(newRow2);
 
+
                 var newRow3 = $('<tr>');
                 newRow3.append($('<td style="text-align:right;" colspan="6">').text('Setelah Tambahan dan Potongan'));
                 newRow3.append($('<td>').text(greatFormatRupiah(detail.nominal_faktur)));
                 table.find('tbody').append(newRow3);
+
 
                 var newRow4 = $('<tr>');
                 newRow4.append($('<td style="text-align:right;" colspan="6">').text('Pajak Dipungut Negara (' + res.tax_dipungut_negara.taxType + ')'));
                 newRow4.append($('<td>').text(greatFormatRupiah(res.tax_dipungut_negara.taxAmt)));
                 table.find('tbody').append(newRow4);
 
+
                 var newRow5 = $('<tr>');
                 newRow5.append($('<td style="text-align:right;" colspan="6">').text('Pajak Dikembalikan Lagi (' + res.tax_dikembalikan_lagi.taxType + ')'));
                 newRow5.append($('<td>').text(greatFormatRupiah(res.tax_dikembalikan_lagi.taxAmt)));
                 table.find('tbody').append(newRow5);
+
 
                 var newRow6 = $('<tr>');
                 newRow6.append($('<td style="text-align:right;" colspan="6">').text('Pajak Penghasilan (2.5 %) (+)'));
@@ -673,18 +699,26 @@
                 table.find('tbody').append(newRow6);
 
 
-                var newRow7 = $('<tr>');
-                newRow7.append($('<td style="text-align:right;" colspan="6">').text('Sub Total'));
-                newRow7.append($('<td class="subtotal">').text(greatFormatRupiah(subTotal)));
-                newRow7.append($('<td class="subtotalNominal hidden" style="display: none;">').text(greatFormatRupiah(subTotal)));
-                table.find('tbody').append(newRow7);
+                // var newRow7 = $('<tr>');
+                // newRow7.append($('<td style="text-align:right;" colspan="6">').text('Sub Total'));
+                // newRow7.append($('<td class="subtotal">').text(greatFormatRupiah(detail.nominal_faktur)));
+                // newRow7.append($('<td class="subtotalNominal hidden" style="display: none;">').text(greatFormatRupiah(detail.nominal_faktur)));
+                // table.find('tbody').append(newRow7);
 
+                var newRow9 = $('<tr>');
+                newRow9.append($('<td style="text-align:right;" colspan="6"><b>Nominal Pajak</b></td>'));
+                newRow9.append($('<td>').html(
+                    `
+                        <input onkeyup="this.value = greatFormatRupiah(this.value)" oninput="limitInputBayar(this,${totalPajak})" value="${greatFormatRupiah(totalPajak)}" autocomplete="one-time-code" data-id=""  class="form-control nominal_pembayaran_pajak" type="text" value="" name = "nominal_pembayaran_pajak" style="height:40px" readonly>
+                    `
+                ));
+                table.find('tbody').append(newRow9);
 
                 var newRow9 = $('<tr>');
                 newRow9.append($('<td style="text-align:right;" colspan="6"><b>Input Pembayaran</b></td>'));
                 newRow9.append($('<td>').html(
                     `
-                        <input onkeyup="this.value = greatFormatRupiah(this.value)" oninput="limitInputBayar(this,${subTotal})" autocomplete="one-time-code" data-id=""  class="form-control nominal_pembayaran" type="text" value="" name = "nominal_pembayaran" style="height:40px">
+                        <input onkeyup="this.value = greatFormatRupiah(this.value)" oninput="limitInputBayar(this,${detail.nominal_faktur})" value="${greatFormatRupiah(detail.nominal_faktur)}" autocomplete="one-time-code" data-id=""  class="form-control nominal_pembayaran" type="text" value="" name = "nominal_pembayaran" style="height:40px" readonly>
                     `
                 ));
                 table.find('tbody').append(newRow9);
@@ -699,7 +733,7 @@
         var detail = res.detail;
         var paymentDetail = res.paymentDetail;
         var dateSplit = detail.jatuh_tempo.split('-');
-
+        var totalPrice = 0;
         var subTotal = Number(detail.nominal_faktur) + Number(res.tax_dipungut_negara.taxAmt) + Number(res.tax_dikembalikan_lagi.taxAmt) + Number(res.pph);
 
 
@@ -710,6 +744,7 @@
         table.find('tbody').empty();
         var no = 1;
         $.each(res.list, function(i, v) {
+            totalPrice += v.price;
             var dateSplit = v.lpb_date.split('-');
             var newRow = $('<tr>');
             newRow.append($('<td>').text(no++));
@@ -753,33 +788,23 @@
 
         var newRow7 = $('<tr>');
         newRow7.append($('<td style="text-align:right;" colspan="6">').text('Sub Total'));
-        newRow7.append($('<td class="subtotal">').text(greatFormatRupiah(subTotal)));
-        newRow7.append($('<td class="subtotalNominal hidden" style="display: none;">').text(greatFormatRupiah(subTotal)));
+        newRow7.append($('<td class="subtotal">').text(greatFormatRupiah(totalPrice)));
+        newRow7.append($('<td class="subtotalNominal hidden" style="display: none;">').text(greatFormatRupiah(totalPrice)));
         table.find('tbody').append(newRow7);
 
-        let sisaPembayaran = subTotal - paymentDetail.amount;
-        var newRow9 = $('<tr>');
-        newRow9.append($('<td style="text-align:right;" colspan="6"><b>Sisa Pembayaran</b></td>'));
-        newRow9.append($(`<td style="text-align:center;"><b>${greatFormatRupiah(sisaPembayaran)} </b></td>`));
+        // let sisaPembayaran = subTotal - paymentDetail.amount;
+        // var newRow9 = $('<tr>');
+        // newRow9.append($('<td style="text-align:right;" colspan="6"><b>Sisa Pembayaran</b></td>'));
+        // newRow9.append($(`<td style="text-align:center;"><b>${greatFormatRupiah(sisaPembayaran)} </b></td>`));
 
-        table.find('tbody').append(newRow9);
-
-
-        var newRow10 = $('<tr>');
-        newRow10.append($('<td style="text-align:right;" colspan="6"><b>Total Di Bayar</b></td>'));
-        newRow10.append($(`<td style="text-align:center;"><b>${greatFormatRupiah(paymentDetail.amount)} </b></td>`));
-
-        table.find('tbody').append(newRow10);
+        // table.find('tbody').append(newRow9);
 
 
-        var newRow11 = $('<tr>');
-        newRow11.append($('<td style="text-align:right;" colspan="6"><b>Input Pembayaran</b></td>'));
-        newRow11.append($('<td>').html(
-            `
-                        <input  <?= !empty($detail) ? ($detail['pembayaranDetail']['status_posting'] == 1 ? 'disabled' : '') : ""  ?> oninput="this.value = greatFormatRupiah(this.value)" oninput="limitInputBayar(this,${Number(subTotal)})" autocomplete="one-time-code" data-id=""  class="form-control nominal_pembayaran" type="text" value="" name = "nominal_pembayaran" style="height:40px">
-                    `
-        ));
-        table.find('tbody').append(newRow11);
+        // var newRow10 = $('<tr>');
+        // newRow10.append($('<td style="text-align:right;" colspan="6"><b>Total Di Bayar</b></td>'));
+        // newRow10.append($(`<td style="text-align:center;"><b>${greatFormatRupiah(paymentDetail.amount)} </b></td>`));
+
+        // table.find('tbody').append(newRow10);
     }
 
     function remove(id) {

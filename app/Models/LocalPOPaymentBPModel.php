@@ -29,9 +29,11 @@ class LocalPOPaymentBPModel extends Model
         'supplier',
         'keterangan',
         'amount',
+        'amount_pajak',
         'status_posting',
         'akun_kas',
         'akun_selisih',
+        'akun_pajak',
         'deletedAt'
     ];
 
@@ -244,5 +246,20 @@ class LocalPOPaymentBPModel extends Model
             ->first();
 
         return $res;
+    }
+
+    public function getPembayaranDetailByidTTS($tandaTerimaFakturID)
+    {
+        $condition = [
+            'local_po_payment_bp.tanda_terima_faktur_id' => $tandaTerimaFakturID,
+            'local_po_payment_bp.deletedAt' => null,
+        ];
+        
+        $payments = $this
+            ->select('amount')
+            ->where($condition)
+            ->findAll();
+
+        return $payments;
     }
 }

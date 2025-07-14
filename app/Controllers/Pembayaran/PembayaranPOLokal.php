@@ -112,7 +112,8 @@ class PembayaranPOLokal extends BaseController
 
         return response()->setJSON([
             'detail' => $tandaTerimaFakturModel->getByID($tandaTerimaFakturID),
-            'paymentDetail' => $localPOPaymentBPModel->getPembayaranDetailByid($pembayaranId),
+            // 'paymentDetail' => $localPOPaymentBPModel->getPembayaranDetailByid($pembayaranId),
+            'paymentDetail' => $localPOPaymentBPModel->getPembayaranDetailByidTTS($tandaTerimaFakturID),
             'list' => $tandaTerimaFakturDetailModel->getListTandaTerimaItemFaktur($tandaTerimaFakturID),
             'tax_dipungut_negara' => $pajakTandaTerimaFakturModel->getTaxDetail("Pajak dipungut oleh negara", $tandaTerimaFakturID),
             'tax_dikembalikan_lagi' => $pajakTandaTerimaFakturModel->getTaxDetail("Pajak dikembalikan lagi", $tandaTerimaFakturID),
@@ -147,12 +148,14 @@ class PembayaranPOLokal extends BaseController
                 'supplier_id' => $this->request->getVar('supplier_id'),
                 'tanda_terima_faktur_id' => $this->request->getVar('tanda_terima_faktur_id'),
                 'amount' => $this->request->getVar('nominal_pembayaran'),
+                'amount_pajak' => $this->request->getVar('nominal_pembayaran_pajak'),
                 'payment_method' => $this->request->getVar('payment_method'),
                 'keterangan' => $this->request->getVar('keterangan'),
                 'supplier' => $this->request->getVar('supplier'),
                 'status_pph' => $this->request->getVar('status_pph'),
                 'akun_kas' => $this->request->getVar('akun_kas'),
                 'akun_selisih' => $this->request->getVar('akun_selisih'),
+                'akun_pajak' => $this->request->getVar('akun_pajak'),
                 'status_posting' => '0',
                 'pembayaran_oleh'   => $this->request->getVar('pembayaran_oleh'),
                 'payment_date'      => date('Y-m-d', strtotime(str_replace('/', '-', $this->request->getVar('payment_date')))),
@@ -239,6 +242,9 @@ class PembayaranPOLokal extends BaseController
                 'status_pph' => $this->request->getVar('status_pph'),
                 'akun_kas' => $this->request->getVar('akun_kas'),
                 'akun_selisih' => $this->request->getVar('akun_selisih'),
+                'akun_pajak' => $this->request->getVar('akun_pajak'),
+                'amount' => $this->request->getVar('nominal_pembayaran'),
+                'amount_pajak' => $this->request->getVar('nominal_pembayaran_pajak'),
                 'supplier' => $this->request->getVar('supplier'),
                 'status_posting' => '0',
                 'pembayaran_oleh'   => $this->request->getVar('pembayaran_oleh'),
@@ -406,10 +412,13 @@ class PembayaranPOLokal extends BaseController
                 'pembayaran_oleh'   => $this->request->getVar('pembayaran_oleh'),
                 'potongan_harga'    => $this->request->getVar('potongan'),
                 'amount'            => $this->request->getVar('total_pembayaran'),
+                'amount_pph'            => $this->request->getVar('total_pembayaran_pph'),
                 'status_posting'    => '0',
                 'keterangan'        => $this->request->getVar('keterangan'),
                 'akun_kas'          => $this->request->getVar('akun_kas'),
-                'akun_selisih'      => $this->request->getVar('akun_selisih')
+                'akun_selisih'      => $this->request->getVar('akun_selisih'),
+                'akun_kas_pph'      => $this->request->getVar('akun_kas_pph'),
+                'akun_selisih_pph'  => $this->request->getVar('akun_selisih_pph')
 
             ]);
 
@@ -474,7 +483,8 @@ class PembayaranPOLokal extends BaseController
                     'tipe' => "BB",
                     "local_po_payment_id"          => $id,
                     "rm_purchase_order_id"         => $l['rm_purchase_order_id'],
-                    "total"                        => $l['total_paid']
+                    "total"                        => $l['total_paid'],
+                    "total_pay_pph"                => $l['total_paid_pph']
                 ]);
             }
 
@@ -556,6 +566,7 @@ class PembayaranPOLokal extends BaseController
                 'pembayaran_oleh'   => $this->request->getVar('pembayaran_oleh'),
                 'potongan_harga'    => $this->request->getVar('potongan'),
                 'amount'            => $total_pembayaran,
+                'amount_pph'        => $this->request->getVar('total_pembayaran_pph'),
                 'keterangan'        => $this->request->getVar('keterangan'),
                 'akun_kas'          => $this->request->getVar('akun_kas'),
                 'akun_selisih'      => $this->request->getVar('akun_selisih')
@@ -580,6 +591,7 @@ class PembayaranPOLokal extends BaseController
                         "local_po_payment_id" => $id,
                         "rm_purchase_order_id" => $l["rm_purchase_order_id"],
                         "total" => $totalToPay,  // Gunakan nilai yang sudah ditentukan
+                        "total_pay_pph" => $l["total_paid_pph"],  // Gunakan nilai yang sudah ditentukan
                     ]);
                 }
             }
