@@ -345,10 +345,12 @@ class LaporanSupplierLokalBB extends BaseController
         ];
 
         $dataBBLokal = $this->RMPurchaseOrderModel->getPoBBLokalForSupplier($availableSort, $condition, $addCondition, null, null);
+
+        // Gunakan function yang sama seperti di allLaporanPendapatanSupplier()
         $processed = $this->processLaporanPendapatanSupplier($dataBBLokal['data']);
         $groupedData = $processed;
 
-        // Kelompokkan data berdasarkan nama barang
+        // Kelompokkan data berdasarkan barangName
         $barangGrouped = [];
         foreach ($groupedData as $row) {
             $barangGrouped[$row['barangName']][] = $row;
@@ -358,16 +360,13 @@ class LaporanSupplierLokalBB extends BaseController
         $sheet = $spreadsheet->getActiveSheet();
         $sheet->setTitle('Laporan Pendapatan Supplier');
 
-        // Header utama hanya sekali
         $sheet->setCellValue("A1", 'Pendapatan Supplier Per PO');
         $sheet->mergeCells("A1:V1");
         $sheet->getStyle("A1")->getFont()->setBold(true)->setSize(14);
         $sheet->getRowDimension(1)->setRowHeight(22);
 
-        // Header tabel hanya sekali (baris 3 dan 4)
         $rowNo = 3;
 
-        // Baris Header 1
         $headers1 = [
             'No',
             'Supplier',
@@ -394,18 +393,14 @@ class LaporanSupplierLokalBB extends BaseController
         ];
         $sheet->fromArray($headers1, null, "A{$rowNo}");
 
-        // Merge A–I (kolom identitas) - rowspan 2
         foreach (range('A', 'I') as $col) {
             $sheet->mergeCells("{$col}{$rowNo}:{$col}" . ($rowNo + 1));
         }
 
-        // Merge J–L = Harian, M–O = Tambahan Harian, P–R = Tambahan Bulanan
         $sheet->mergeCells("J{$rowNo}:L{$rowNo}");
         $sheet->mergeCells("M{$rowNo}:O{$rowNo}");
         $sheet->mergeCells("P{$rowNo}:R{$rowNo}");
         $sheet->mergeCells("S{$rowNo}:U{$rowNo}");
-
-        // Merge Total
         $sheet->mergeCells("V{$rowNo}:V" . ($rowNo + 1));
 
         $sheet->getStyle("A{$rowNo}:V" . ($rowNo + 1))->getFont()->setBold(true);
@@ -415,36 +410,31 @@ class LaporanSupplierLokalBB extends BaseController
 
         $rowNo++;
 
-        // Baris Header 2
-        $headers2 = array_fill(0, 9, ''); // A–I kosong
-        $headers2 = array_merge($headers2, [
+        $headers2 = array_merge(array_fill(0, 9, ''), [
             'DPP',
             'PPh',
-            'Total', // J–L (Harian)
+            'Total',
             'DPP',
             'PPh',
-            'Total', // M–O (Tambahan Harian)
+            'Total',
             'DPP',
             'PPh',
-            'Total', // P–R (Tambahan Bulanan)
+            'Total',
             'DPP',
             'PPh',
-            'Total', // S–U (Tambahan Langsung)
-            ''         // V (Total)
+            'Total',
+            '',
         ]);
         $sheet->fromArray($headers2, null, "A{$rowNo}");
 
-        $rowNo++; // Sekarang rowNo = 5 untuk data pertama
+        $rowNo++; // Data mulai baris ini
         $globalNo = 1;
 
-        // Daftar kolom
-        $columns = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V'];
-        // Kolom numerik (G, J, K, L, M, N, O, P, Q, R, S, T, U, V)
+        $columns = range('A', 'V');
         $numericColumns = [6, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21];
 
         foreach ($barangGrouped as $barangName => $items) {
-            // Inisialisasi total per kelompok barang
-            $totalsPerBarang = [
+            $totals = [
                 'qtyAll' => 0,
                 'dppUmum' => 0,
                 'pphUmum' => 0,
@@ -461,48 +451,36 @@ class LaporanSupplierLokalBB extends BaseController
                 'totalRow' => 0,
             ];
 
-            // Tampilkan nama barang
             $sheet->setCellValue("A{$rowNo}", 'Bahan Baku: ' . $barangName);
             $sheet->mergeCells("A{$rowNo}:V{$rowNo}");
             $sheet->getStyle("A{$rowNo}")->getFont()->setBold(true);
             $rowNo++;
 
-            // Data
             foreach ($items as $item) {
-                // Pastikan semua nilai numerik diisi dengan 0 jika kosong
-                $numericFields = [
-                    'qtyPO',
-                    'dppUmum',
-                    'pphUmum',
-                    'totalUmum',
-                    'dppHarian',
-                    'pphHarian',
-                    'totalHarian',
-                    'dppBulanan',
-                    'pphBulanan',
-                    'totalBulanan',
-                    'subsidi',
-                    'pphSubsidi',
-                    'totalSubsidi',
-                    'totalRow'
-                ];
-
-                foreach ($numericFields as $field) {
-                    $item[$field] = isset($item[$field]) && is_numeric($item[$field])
-                        ? (float)$item[$field]
-                        : 0;
+                // Pastikan nilai numerik di-cast ke float
+                foreach ($totals as $key => $_) {
+                    $item[$key] = isset($item[$key]) && is_numeric($item[$key]) ? (float)$item[$key] : 0;
                 }
+
+                $item['subsidi'] = $item['tambahan'] == "0" ? $item['subsidi'] * $item['qtyPO'] : $item['subsidi'];
+                $item['pphSubsidi'] = $item['subsidi'] * $item['nilai_pph2'];
+                $item['totalSubsidi'] = $item['subsidi'] - $item['pphSubsidi'];
+                $item['totalRow'] =
+                    $item['totalUmum'] +
+                    $item['totalHarian'] +
+                    $item['totalBulanan'] +
+                    $item['totalSubsidi'];
 
                 $rowValues = [
                     $globalNo++,
-                    $item['supplierName'] ?? '',
-                    $item['poNum'] ?? '',
-                    $item['poDate'] ?? '',
-                    $item['divisiName'] ?? '',
-                    $item['warehouseName'] ?? '',
+                    $item['supplierName'],
+                    $item['poNum'],
+                    $item['poDate'],
+                    $item['divisiName'],
+                    $item['warehouseName'],
                     $item['qtyPO'],
-                    $item['satuanName'] ?? '',
-                    $item['companyName'] ?? '',
+                    $item['satuanName'],
+                    $item['companyName'],
                     $item['dppUmum'],
                     $item['pphUmum'],
                     $item['totalUmum'],
@@ -518,119 +496,81 @@ class LaporanSupplierLokalBB extends BaseController
                     $item['totalRow']
                 ];
 
-                // Tulis data per kolom dengan setCellValueExplicit untuk kolom numerik
-                foreach ($columns as $colIndex => $col) {
-                    $value = $rowValues[$colIndex] ?? '';
-
-                    // Jika kolom numerik, gunakan setCellValueExplicit dengan tipe NUMERIC
-                    if (in_array($colIndex, $numericColumns)) {
-                        // Pastikan nilai numerik
+                foreach ($columns as $idx => $col) {
+                    $value = $rowValues[$idx] ?? '';
+                    if (in_array($idx, $numericColumns)) {
                         if (!is_numeric($value)) {
                             $value = 0;
                         }
-                        $sheet->setCellValueExplicit(
-                            $col . $rowNo,
-                            $value,
-                            \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_NUMERIC
-                        );
+                        $sheet->setCellValueExplicit($col . $rowNo, $value, \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_NUMERIC);
                     } else {
                         $sheet->setCellValue($col . $rowNo, $value);
                     }
                 }
 
-                // Akumulasi total per kelompok barang
-                $totalsPerBarang['qtyAll'] += $item['qtyPO'];
-                $totalsPerBarang['dppUmum'] += $item['dppUmum'];
-                $totalsPerBarang['pphUmum'] += $item['pphUmum'];
-                $totalsPerBarang['totalUmum'] += $item['totalUmum'];
-                $totalsPerBarang['dppHarian'] += $item['dppHarian'];
-                $totalsPerBarang['pphHarian'] += $item['pphHarian'];
-                $totalsPerBarang['totalHarian'] += $item['totalHarian'];
-                $totalsPerBarang['dppBulanan'] += $item['dppBulanan'];
-                $totalsPerBarang['pphBulanan'] += $item['pphBulanan'];
-                $totalsPerBarang['totalBulanan'] += $item['totalBulanan'];
-                $totalsPerBarang['subsidi'] += $item['subsidi'];
-                $totalsPerBarang['pphSubsidi'] += $item['pphSubsidi'];
-                $totalsPerBarang['totalSubsidi'] += $item['totalSubsidi'];
-                $totalsPerBarang['totalRow'] += $item['totalRow'];
+                // Akumulasi total
+                foreach ($totals as $key => $_) {
+                    $totals[$key] += $item[$key];
+                }
 
                 $rowNo++;
             }
 
-            // Row Total per kelompok barang
-            $totalRowValues = [
+            // Baris total per barang
+            $totalRow = [
                 '',
                 '',
                 '',
                 '',
                 '',
                 'TOTAL',
-                $totalsPerBarang['qtyAll'],
+                $totals['qtyAll'],
                 '',
                 '',
-                $totalsPerBarang['dppUmum'],
-                $totalsPerBarang['pphUmum'],
-                $totalsPerBarang['totalUmum'],
-                $totalsPerBarang['dppHarian'],
-                $totalsPerBarang['pphHarian'],
-                $totalsPerBarang['totalHarian'],
-                $totalsPerBarang['dppBulanan'],
-                $totalsPerBarang['pphBulanan'],
-                $totalsPerBarang['totalBulanan'],
-                $totalsPerBarang['subsidi'],
-                $totalsPerBarang['pphSubsidi'],
-                $totalsPerBarang['totalSubsidi'],
-                $totalsPerBarang['totalRow'],
+                $totals['dppUmum'],
+                $totals['pphUmum'],
+                $totals['totalUmum'],
+                $totals['dppHarian'],
+                $totals['pphHarian'],
+                $totals['totalHarian'],
+                $totals['dppBulanan'],
+                $totals['pphBulanan'],
+                $totals['totalBulanan'],
+                $totals['subsidi'],
+                $totals['pphSubsidi'],
+                $totals['totalSubsidi'],
+                $totals['totalRow']
             ];
 
-            // Tulis baris total dengan setCellValueExplicit untuk kolom numerik
-            foreach ($columns as $colIndex => $col) {
-                $value = $totalRowValues[$colIndex] ?? '';
-
-                if (in_array($colIndex, $numericColumns)) {
-                    // Pastikan nilai numerik
+            foreach ($columns as $idx => $col) {
+                $value = $totalRow[$idx] ?? '';
+                if (in_array($idx, $numericColumns)) {
                     if (!is_numeric($value)) {
                         $value = 0;
                     }
-                    $sheet->setCellValueExplicit(
-                        $col . $rowNo,
-                        $value,
-                        \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_NUMERIC
-                    );
+                    $sheet->setCellValueExplicit($col . $rowNo, $value, \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_NUMERIC);
                 } else {
                     $sheet->setCellValue($col . $rowNo, $value);
                 }
             }
 
             $sheet->getStyle("A{$rowNo}:V{$rowNo}")->getFont()->setBold(true);
-            $rowNo += 3; // Beri jarak 3 baris sebelum kelompok berikutnya
+            $rowNo += 3;
         }
 
-        // Auto-width
-        foreach (range('A', 'V') as $col) {
+        // Auto width
+        foreach ($columns as $col) {
             $sheet->getColumnDimension($col)->setAutoSize(true);
         }
 
-        // Format angka untuk menampilkan 0.00
+        // Format angka (0.00)
         $lastRow = $sheet->getHighestRow();
-        $numberCols = ['G', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V'];
         $numberFormat = '#,##0.00;-#,##0.00;"0.00"';
-
-        foreach ($numberCols as $col) {
+        foreach (['G', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V'] as $col) {
             $sheet->getStyle("{$col}4:{$col}{$lastRow}")
                 ->getNumberFormat()
                 ->setFormatCode($numberFormat);
         }
-
-        // Tambahkan border untuk seluruh data
-        // $sheet->getStyle("A3:V" . $lastRow)->applyFromArray([
-        //     'borders' => [
-        //         'allBorders' => [
-        //             'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
-        //             'color' => ['argb' => 'FF000000'],
-        //         ],
-        //     ],
-        // ]);
 
         // Output
         $filename = 'Laporan_Pendapatan_Supplier_BB_Lokal_' . date('Ymd_His') . '.xlsx';
@@ -778,6 +718,9 @@ class LaporanSupplierLokalBB extends BaseController
                     'pphSubsidi' => $pphSubsidi,
                     'totalSubsidi' => $totalSubsidi,
                     'totalRow' => $totalRow + $totalSubsidi,
+                    'poPPH' => $pphMode,
+                    'nilai_pph' => $nilai_pph,
+                    'nilai_pph2' => $nilai_pph2,
                 ];
             } else {
                 $groupedData[$poId]['totalRow'] += $totalRow;
