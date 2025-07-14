@@ -119,9 +119,9 @@
 <body>
     <?php if (!empty($dataPenerimaanBarang)) { ?>
         <div class="w-100 d-flex content-between" style="margin-top: -20px;">
-            <div>
+            <b>
                 <?= $dataPenerimaanBarang->holding_company ?> (<?= $dataPenerimaanBarang->companyName ?>)<br>
-            </div>
+            </b>
         </div><br>
         <div class="txt-center"><span class="title">LAPORAN PENERIMAAN BARANG</span></div>
         <table class="w-100 mt-050">
@@ -209,7 +209,7 @@
                 </th> -->
                 <th>
                     <div class="sign-row">
-                        <div>Dibuat, </div>
+                        <div>Dibuat Oleh,</div>
                     </div>
                 </th>
                 <th>
@@ -223,11 +223,13 @@
                 <td class="sign-space" style="border: none!important;"></td>
             </tr>
             <tr>
-                <td class="sign-name" style="border: none!important;">
-                    <div>( &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; )</div>
+                <td class="sign-name" style="border: none!important; margin-top:30px;">
+                    <br><br>
+                    <div> <?= $dataUser != null ? $dataUser['name'] : "" ?> </div>
                 </td>
-                <td class="sign-name" style="border: none!important;">
-                    <div>( &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; )</div>
+                <td class="sign-name" style="border: none!important;margin-top:30px;">
+                    <br><br>
+                    <div> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </div>
                 </td>
                 <!-- <td class="sign-name" style="border: none!important;">
                     <div>( &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; )</div>
