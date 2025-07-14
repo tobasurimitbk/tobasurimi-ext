@@ -53,6 +53,7 @@ class POLokalBahanBaku extends BaseController
 
     protected $this_user_id;
     protected $is_admin;
+    protected $this_role_name;
 
     public function __construct()
     {
@@ -60,6 +61,7 @@ class POLokalBahanBaku extends BaseController
         $this->this_company_id = session()->get("login")->this_company_id;
         $this->this_user_id = session()->get("login")->user_id;
         $this->is_admin = session()->get("login")->is_admin;
+        $this->this_role_name = session()->get("login")->this_role_name;
         $this->RMPurchaseOrderModel = new RMPurchaseOrderModel();
         $this->RMPurchaseOrderDetailModel = new RMPurchaseOrderDetailModel();
         $this->SupplierModel = new SupplierModel();
@@ -85,7 +87,10 @@ class POLokalBahanBaku extends BaseController
 
     public function poLokalBahanBaku()
     {
-        return view('Purchase/poLokalBahanBaku/index');
+        $data = [
+            'this_role_name' => $this->this_role_name
+        ];
+        return view('Purchase/poLokalBahanBaku/index', $data);
     }
 
     public function createPOLokalBahanBaku()
