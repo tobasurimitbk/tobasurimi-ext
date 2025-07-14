@@ -103,11 +103,26 @@
             font-size: 25px;
             text-decoration: underline;
         }
+
+        .sign-space {
+            height: 25px;
+            /* Jarak antar baris kosong */
+        }
+
+        .sign-name {
+            text-align: center;
+            font-style: bold;
+        }
     </style>
 </head>
 
 <body>
     <?php if (!empty($dataPenerimaanBarang)) { ?>
+        <div class="w-100 d-flex content-between" style="margin-top: -20px;">
+            <div style="border: 1px solid;border-style: single;width: 30%;padding: 0.5rem;">
+                <?= $dataPenerimaanBarang->holding_company ?> (<?= $dataPenerimaanBarang->companyName ?>)<br>
+            </div>
+        </div><br>
         <div class="txt-center"><span class="title">LAPORAN PENERIMAAN BARANG</span></div>
         <table class="w-100 mt-050">
             <tr>
@@ -138,12 +153,12 @@
         <table class="item-table mt-050">
             <tr>
                 <th class="txt-left" style="text-align:center; width: 30px;">No</th>
-                <th class="txt-left" style="text-align:center; width: 100px;">Nama Barang</th>
+                <th class="txt-left" style="text-align:center; width: 150px;">Nama Barang</th>
                 <th class="txt-left" style="text-align:center; width: 40px;">Qty</th>
                 <th class="txt-left" style="text-align:center; width: 30px;">Satuan</th>
-                <th class="txt-left" style="text-align:center; width: 60px;">@ Rp</th>
-                <th class="txt-left" style="text-align:center; width: 60px;">Jumlah</th>
-                <th class="txt-left" style=" text-align:center; width: 150px;">No SPP</th>
+                <th class="txt-left" style="text-align:center; width: 60px;">Rp</th>
+                <th class="txt-left" style="text-align:center; width: 60px;">Total Harga</th>
+                <th class="txt-left" style=" text-align:center; width: 100px;">No SPP</th>
                 <th class="txt-left" style="text-align:center; width: 60px;">Keterangan</th>
             </tr>
 
@@ -167,11 +182,11 @@
                     <td class="txt-left" style="text-align:center;"><?= $detail["keterangan"]; ?></td>
                 </tr>
             <?php endforeach; ?>
-            <tr>
+            <!-- <tr>
                 <td class="txt-left" style="padding-left: 5px" colspan="5"><b></b></td>
                 <td class="txt-right" style="text-align:center;"><?= number_format(round($jml_sub_total), 2, '.', ','); ?></td>
                 <td colspan="2"></td>
-            </tr>
+            </tr> -->
             <tr>
                 <td class="txt-left" style="padding-left: 5px" colspan="5"><b>ONGKOS KIRIM</b></td>
                 <td class="txt-right" style="text-align:center;"><?= number_format($dataPenerimaanBarang->ongkos_kirim, 2, '.', ','); ?></td>
@@ -184,25 +199,42 @@
                 <td colspan="2"></td>
             </tr>
         </table>
-        <div class="header mt-050">
-            <table class="w-50 sign-table footer" style="padding-top: 0px; margin-top: 0px">
-                <tr>
-                    <td>Diperiksa & Dibukukan</td>
-                    <td class="txt-center" style="width:100px;">Tgl</td>
-                    <td class="txt-center" style="width:100px;">Paraf</td>
-                </tr>
-                <tr>
-                    <td style="height: 40px;">Pembelian</td>
-                    <td></td>
-                    <td></td>
-                </tr>
-                <tr>
-                    <td style="height: 40px;">Accounting</td>
-                    <td></td>
-                    <td></td>
-                </tr>
-            </table>
-        <?php } ?>
+        <table class="w-100 sign-table border-collapse signed-info footer" style="margin-top: 3rem;">
+
+            <tr>
+                <!-- <th>
+                    <div class="sign-row">
+                        <div>TTD Penerima Bahan Baku</div>
+                    </div>
+                </th> -->
+                <th>
+                    <div class="sign-row">
+                        <div>Dibuat, </div>
+                    </div>
+                </th>
+                <th>
+                    <div class="sign-row">
+                        <div>Diperiksa</div>
+                    </div>
+                </th>
+            </tr>
+            <tr style="border: none!important;">
+                <td class="sign-space" style="border: none!important;"></td>
+                <td class="sign-space" style="border: none!important;"></td>
+            </tr>
+            <tr>
+                <td class="sign-name" style="border: none!important;">
+                    <div>( &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; )</div>
+                </td>
+                <td class="sign-name" style="border: none!important;">
+                    <div>( &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; )</div>
+                </td>
+                <!-- <td class="sign-name" style="border: none!important;">
+                    <div>( &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; )</div>
+                </td> -->
+            </tr>
+        </table>
+    <?php } ?>
 </body>
 
 </html>
