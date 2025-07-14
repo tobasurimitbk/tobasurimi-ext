@@ -26,6 +26,7 @@ use App\Models\JurnalUmumModel;
 use App\Models\PengembalianBarangModel;
 use App\Models\SppModel;
 use App\Models\TransaksiJurnalModel;
+use App\Models\UserModel;
 use Config\Database;
 use Dompdf\Dompdf;
 use Exception;
@@ -61,6 +62,7 @@ class PenerimaanBarangLokalBP extends BaseController
     protected $sppModel;
     protected $transaksiJurnalModel;
     protected $jurnalUmumModel;
+    protected $usersModel;
 
     public function __construct()
     {
@@ -91,6 +93,7 @@ class PenerimaanBarangLokalBP extends BaseController
         $this->sppModel = new SppModel();
         $this->transaksiJurnalModel = new TransaksiJurnalModel();
         $this->jurnalUmumModel = new JurnalUmumModel();
+        $this->usersModel = new UserModel();
     }
 
     public function index()
@@ -702,7 +705,8 @@ class PenerimaanBarangLokalBP extends BaseController
 
             $data = [
                 'dataPenerimaanBarang' => $this->penerimaanBarangModel->getById($id),
-                'dataPenerimaanBarangDetail' => $this->penerimaanBarangDetailModel->getPenerimaanBarangPenolongDetail2($id)
+                'dataPenerimaanBarangDetail' => $this->penerimaanBarangDetailModel->getPenerimaanBarangPenolongDetail2($id),
+                'dataUser' => $this->usersModel->where('id', $this->this_user_id)->first()
             ];
             $this->dompdf->loadHtml(view('Warehouse/penerimaanBarangLokal/bahanPenolong/print', $data));
             $this->dompdf->setPaper('A4', 'portrait');

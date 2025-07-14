@@ -363,6 +363,9 @@ class PenerimaanBarangModel extends Model
         warehouses.warehouse_name,
         metadata.value as bc_type,divisis.divisi as divisi,
         barang_master.barang_name as barang_name,
+        companies.holding_company,
+        companies.company as companyName,
+        companies.address as companyAddress
         ";
 
         $sppData = $this->asObject()
@@ -373,6 +376,7 @@ class PenerimaanBarangModel extends Model
             ->join('metadata', 'metadata.id = penerimaan_barang.bc_type', 'left')
             ->join('penerimaan_barang_detail', 'penerimaan_barang_detail.penerimaan_barang_id = penerimaan_barang.id', 'left')
             ->join('barang_master', 'barang_master.id = penerimaan_barang_detail.barang_id', 'left')
+            ->join('companies', 'companies.id = penerimaan_barang.company_id', 'left')
             ->find($id);
 
         return $sppData;
