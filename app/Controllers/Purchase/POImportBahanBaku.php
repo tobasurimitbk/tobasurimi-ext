@@ -336,6 +336,7 @@ class POImportBahanBaku extends BaseController
             'company_id' => $this->this_company_id,
             'division_id' => $this->request->getVar('divisionID'),
             'po_no' => $noPoNew,
+            'po_date' => $this->request->getPost("poDate") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getVar("poDate")))) : "",
             'currency' => formatter($this->request->getVar("currency"), "STR_TO_INT"),
             'supplier_id' => $this->request->getVar('supplierID'),
             'total' => $this->request->getVar('total') - $this->request->getVar('potongan_harga'),
