@@ -992,7 +992,24 @@
 
 <?php if (!empty($dataPenerimaanBarang)) : ?>
     <script>
-        $('.multiple_po_id').change();
+        let arr = $('.multiple_po_id').val();
+        $.ajax({
+            url: `<?= base_url("penerimaan-barang-import-bp/list-barang"); ?>`,
+            method: "GET",
+            data: {
+                am_purchase_order_id: JSON.stringify(arr),
+                penerimaan_barang_id: $('.id').val(),
+                is_init_edit: 1
+            },
+            dataType: "json",
+            success: function(res) {
+                listData = [];
+                listFromDatabase = [];
+                listData = res;
+                listFromDatabase = res.result;
+                drawTable(listData);
+            }
+        })
 
         function print(url) {
             window.open(url, "_blank");
