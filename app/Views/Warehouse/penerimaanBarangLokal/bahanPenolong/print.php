@@ -119,7 +119,7 @@
 <body>
     <?php if (!empty($dataPenerimaanBarang)) { ?>
         <div class="w-100 d-flex content-between" style="margin-top: -20px;">
-            <div style="border: 1px solid;border-style: single;width: 30%;padding: 0.5rem;">
+            <div>
                 <?= $dataPenerimaanBarang->holding_company ?> (<?= $dataPenerimaanBarang->companyName ?>)<br>
             </div>
         </div><br>
