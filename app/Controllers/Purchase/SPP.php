@@ -207,6 +207,7 @@ class SPP extends BaseController
     {
         $sppNoFirst = $this->SppModel->where('company_id', $this->this_company_id)
             ->where('spp_no', $this->request->getVar('spp_no'))
+            ->where('deletedAt', null)
             ->first();
 
         // Validasi Nomor SPP
@@ -258,6 +259,7 @@ class SPP extends BaseController
         $sppNoFirst = $this->SppModel->where('company_id', $this->this_company_id)
             ->where('spp_no', $this->request->getVar('spp_no'))
             ->where('id <>', $id)
+            ->where('deletedAt', null)
             ->first();
 
         // Validasi Nomor SPP
