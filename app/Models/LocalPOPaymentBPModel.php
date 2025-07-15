@@ -20,6 +20,7 @@ class LocalPOPaymentBPModel extends Model
         'divisi_id',
         'supplier_id',
         'tanda_terima_faktur_id',
+        'jenis_pembayaran',
         'payment_no',
         'payment_date',
         'payment_panjar_date',
@@ -29,9 +30,11 @@ class LocalPOPaymentBPModel extends Model
         'supplier',
         'keterangan',
         'amount',
+        'amount_pajak',
         'status_posting',
         'akun_kas',
         'akun_selisih',
+        'akun_pajak',
         'deletedAt'
     ];
 
@@ -82,6 +85,7 @@ class LocalPOPaymentBPModel extends Model
             local_po_payment_bp.payment_no, 
             DATE_FORMAT(local_po_payment_bp.payment_date, '%d/%m/%Y') AS payment_date, 
             local_po_payment_bp.amount,
+            local_po_payment_bp.amount_pajak,
             local_po_payment_bp.payment_method,
             suppliers.name AS supplierName,
             tanda_terima_faktur.faktur_no,
@@ -244,5 +248,100 @@ class LocalPOPaymentBPModel extends Model
             ->first();
 
         return $res;
+    }
+
+    public function getPembayaranDetailByidTTS($tandaTerimaFakturID)
+    {
+        $condition = [
+            'local_po_payment_bp.tanda_terima_faktur_id' => $tandaTerimaFakturID,
+            'local_po_payment_bp.deletedAt' => null,
+        ];
+        
+        $payments = $this
+            ->select('amount')
+            ->where($condition)
+            ->findAll();
+
+        return $payments;
+    }
+
+    public function get_new_no_po($jenis, $divisi, $bank_id, $bln, $thn, $last_day, $companyID)
+    {
+        $banksModel = new BanksModel();
+        
+        // Step 1: Dapatkan kode bank dari database
+        $kodeBank = '';
+        if (!empty($bank_id)) {
+            $bankData = $banksModel->select('name')
+                                ->where('id', $bank_id)
+                                ->first();
+            if ($bankData) {
+                $name = strtoupper($bankData['name']);
+                if (strpos($name, 'BRI') !== false) {
+                    $kodeBank = 'BRI';
+                } elseif (strpos($name, 'MANDIRI') !== false) {
+                    $kodeBank = 'MND';
+                } elseif (strpos($name, 'BNI') !== false) {
+                    $kodeBank = 'KBA';
+                } elseif (strpos($name, 'BCA') !== false) {
+                    $kodeBank = 'BCI';
+                }
+            }
+        }
+
+        // Step 2: Tentukan kode divisi
+        $kodeDivisi = '';
+        if (!empty($divisi)) {
+            $divisiUpper = strtoupper($divisi);
+            if (strpos($divisiUpper, 'PTS') !== false) {
+                $kodeDivisi = ($jenis == 'MERAH') ? 'MKN' : 'KKN';
+            } elseif (strpos($divisiUpper, 'CANNING') !== false) {
+                $kodeDivisi = ($jenis == 'MERAH') ? 'CNM' : 'CNK';
+            } elseif (strpos($divisiUpper, 'FROZEN I') !== false) {
+                $kodeDivisi = ($jenis == 'MERAH') ? 'FRM' : 'FRK';
+            } elseif (strpos($divisiUpper, 'FROZEN II') !== false) {
+                $kodeDivisi = ($jenis == 'MERAH') ? 'FSM' : 'FSK';
+            } elseif (strpos($divisiUpper, 'GLOBAL') !== false) {
+                $kodeDivisi = ($jenis == 'MERAH') ? 'GBM' : 'GBK';
+            } elseif (strpos($divisiUpper, 'OCS') !== false) {
+                $kodeDivisi = ($jenis == 'MERAH') ? 'OCM' : 'OCK';
+            }
+        }
+
+        // Step 3: Gabungkan kode divisi dan kode bank
+        $prefix = '';
+        if (!empty($kodeDivisi)) {
+            $prefix .= $kodeDivisi . '/';
+        }
+        if (!empty($kodeBank)) {
+            $prefix .= $kodeBank . '/';
+        }
+
+        // Step 4: Tambahkan tahun, bulan, dan nomor urut
+        $prefix .= $thn . '/' . $bln . '/';
+
+        // Step 5: Query nomor terakhir dan generate nomor baru
+        $lastPO = $this->select('payment_no')
+                    ->like('payment_no', $prefix)
+                    ->where('createdAt >=', "{$thn}-{$bln}-01 00:00:00")
+                    ->where('createdAt <=', "{$last_day} 23:59:59")
+                    ->where('company_id', $companyID)
+                    ->where('deletedAt', null)
+                    ->orderBy('payment_no', 'DESC')
+                    ->first();
+
+        $counterFirst = '0001';
+        if ($lastPO == null) {
+            return $prefix . $counterFirst;
+        } else {
+            try {
+                $lastParts = explode('/', $lastPO['payment_no']);
+                $lastNumber = isset($lastParts[4]) ? (int) $lastParts[4] : 0; // Perhatikan index [4] untuk nomor urut
+                $counterNext = str_pad($lastNumber + 1, 4, '0', STR_PAD_LEFT);
+                return $prefix . $counterNext;
+            } catch (Exception $e) {
+                return 'ERROR GENERATE NUMBER ' . date('Y-m-d');
+            }
+        }
     }
 }

@@ -61,7 +61,7 @@
                                 <th>PO Number</th>
                                 <th>Tanggal Pembayaran</th>
                                 <th>Metode Pembayaran</th>
-                                <th>Jumlah</th>
+                                <th>Total Bayar</th>
                                 <th>Action</th>
                             </tr>
                         </thead>

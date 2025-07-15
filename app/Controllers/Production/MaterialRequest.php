@@ -355,18 +355,18 @@ class MaterialRequest extends BaseController
                 $no = $reqNo;
             }
 
-            $checkDuplicate = $this->materialRequestModel->where('company_id', $this->this_company_id)
-                ->where('req_no', $no)
-                ->where('deletedAt', null)
-                ->first();
+            // $checkDuplicate = $this->materialRequestModel->where('company_id', $this->this_company_id)
+            //     ->where('req_no', $no)
+            //     ->where('deletedAt', null)
+            //     ->first();
 
-            if ($checkDuplicate != null) {
-                return \response()->setJSON([
-                    "status"            => false,
-                    "message"    => "No Material Requests sudah ada",
-                    'token' => csrf_hash()
-                ]);
-            }
+            // if ($checkDuplicate != null) {
+            //     return \response()->setJSON([
+            //         "status"            => false,
+            //         "message"    => "No Material Requests sudah ada",
+            //         'token' => csrf_hash()
+            //     ]);
+            // }
 
             $dataMaterial = [
                 // "work_order_id" => $this->request->getPost("kode_produksi"),

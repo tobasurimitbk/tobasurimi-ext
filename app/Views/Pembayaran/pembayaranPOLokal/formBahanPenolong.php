@@ -81,6 +81,29 @@
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating form-pembayaran-po mb-3" style="height: 50px;">
+                            <select class="form-select" <?= !empty($detail) ? ($detail['pembayaranDetail']['status_posting'] == 1 ? 'disabled' : '') : "" ?> name="jenis_pembayaran" id="jenis_pembayaran">
+                                <option selected value="<?= !empty($detail['pembayaranDetail']['jenis_bayar']) ? $detail['pembayaranDetail']['jenis_bayar'] : '';  ?>"></option>
+                                <option value="MERAH">MERAH</option>
+                                <option value="PUTIH">PUTIH</option>
+                            </select>
+                            <label for="floatingInput" style="z-index: 1;">Jenis Pembayaran</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-floating form-pembayaran-po mb-3" style="height: 50px;">
+                            <select class="form-select" <?= !empty($detail) ? ($detail['pembayaranDetail']['status_posting'] == 1 ? 'disabled' : '') : ""; ?> name="bank_id" id="bank_id">
+                                <option disabled selected value=""></option>
+                                <?php foreach ($bankList as $b) : ?>
+                                    <option <?= !empty($detail) ? ($detail['pembayaranDetail']['bank_id'] == $b->id ? 'selected' : '') : '' ?> value="<?= $b->id ?>"><?= strtoupper($b->kode_bank) ?></option>
+                                <?php endforeach ?>
+                            </select>
+                            <label for="floatingInput" style="z-index: 1;">Kode Bank (Opsional)</label>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-floating form-pembayaran-po mb-3" style="height: 50px;">
                             <select class="form-select" <?= !empty($detail) ? ($detail['pembayaranDetail']['status_posting'] == 1 ? 'disabled' : '') : ""  ?> name="supplier_id" id="supplier_id">
                                 <option disabled selected value=""></option>
                                 <?php foreach ($suppliers as $supplier) : ?>
@@ -90,8 +113,6 @@
                             <label for="floatingInput" style="z-index: 1;">Supplier</label>
                         </div>
                     </div>
-                </div>
-                <div class="row">
                     <div class="col-md-4">
                         <div class="form-floating form-pembayaran-po mb-3" style="height: 50px;">
                             <select <?= !empty($detail) ? ($detail['pembayaranDetail']['status_posting'] == 1 ? 'disabled' : '') : ""  ?> class="form-select divisi_id" id="divisi_id" name="divisi_id" aria-label="Floating label select example">
@@ -105,6 +126,8 @@
                             <label for="floatingInput" style="z-index: 1;">Departemen</label>
                         </div>
                     </div>
+                </div>
+                <div class="row">
                     <div class="col-md-4">
                         <div class="form-floating form-pembayaran-po mb-3" style="height: 50px;">
                             <select class="form-select" <?= !empty($detail) ? ($detail['pembayaranDetail']['status_posting'] == 1 ? 'disabled' : '') : ""  ?> name="tanda_terima_supplier" id="tanda_terima_supplier">
@@ -128,22 +151,6 @@
                             <label for="floatingInput" style="z-index: 1;">Metode Pembayaran</label>
                         </div>
                     </div>
-                </div>
-                <!-- <div class="row">
-                    <div class="col-md-4">
-                        <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" onkeyup="this.value = greatFormatRupiah(this.value);" type="text" class="form-control nominal_pembayaran" name="nominal_pembayaran" id="nominal_pembayaran" readonly <?= !empty($detail) ? 'disabled value="' . " " . number_format($detail['pembayaranDetail']['amount'], 2, ',', '.')  . '"' : '' ?>>
-                            <label for="floatingInput">Nominal Pembayaran</label>
-                        </div>
-                    </div>
-                </div> -->
-                <div class="row">
-                    <!-- <div class="col-md-4" style="display: none;">
-                        <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" class="form-control input-picker jatuh_tempo" id="jatuh_tempo" name="jatuh_tempo" placeholder="Tanggal Jatuh Tempo" readonly >
-                            <label for="floatingInput">Tanggal Jatuh Tempo</label>
-                        </div>
-                    </div> -->
                     <div class="col-md-4">
                         <div class="form-floating form-pembayaran-po mb-3" style="height: 50px;">
                             <select <?= !empty($detail) ? ($detail['pembayaranDetail']['status_posting'] == 1 ? 'disabled' : '') : ""  ?> class="form-select status_pph" name="status_pph" id="status_pph">
@@ -179,6 +186,17 @@
                                 <?php endforeach ?>
                             </select>
                             <label for="floatingInput" style="z-index: 1;">Kredit</label>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-floating form-pembayaran-po mb-3" style="height: 50px;">
+                            <select class="form-select" <?= !empty($detail) ? ($detail['pembayaranDetail']['status_posting'] == 1 ? 'disabled' : '') : ""  ?> name="akun_pajak" id="akun_pajak">
+                                <option disabled selected value=""></option>
+                                <?php foreach ($subsAkuns as $subs) : ?>
+                                    <option <?= !empty($detail) ? ($detail['pembayaranDetail']['akun_pajak'] == $subs->id ? 'selected' : '') : '' ?> value="<?= $subs->id ?>"><?= strtoupper($subs->no_sub . " " . $subs->nama_sub) ?></option>
+                                <?php endforeach ?>
+                            </select>
+                            <label for="floatingInput" style="z-index: 1;">Akun Pajak</label>
                         </div>
                     </div>
                     <div class="col-md-4">
@@ -301,6 +319,12 @@
                 akun_selisih: {
                     required: true
                 },
+                akun_pajak: {
+                    required: true
+                },
+                jenis_pembayaran: {
+                    required: true
+                },
                 divisi_id: {
                     required: true
                 },
@@ -342,6 +366,12 @@
                 },
                 akun_selisih: {
                     required: "Akun selisih wajib diisi"
+                },
+                akun_pajak: {
+                    required: "Akun Pajak wajib diisi"
+                },
+                jenis_pembayaran: {
+                    required: "Jenis Pembayaran wajib diisi"
                 },
                 divisi_id: {
                     required: "Departemen wajib diisi"
@@ -390,6 +420,11 @@
             theme: "bootstrap-5"
         });
 
+        $('#akun_pajak').select2({
+            placeholder: "Akun Pajak",
+            theme: "bootstrap-5"
+        });
+
         $('#payment_method').select2({
             placeholder: "Metode Pembayaran",
             theme: "bootstrap-5"
@@ -412,6 +447,7 @@
             theme: "bootstrap-5"
         }).change(function() {
             getListTandaTerimaSupplier();
+            generatePaymentNumber();
         });
 
         $('#tanda_terima_supplier').select2({
@@ -419,6 +455,20 @@
             theme: "bootstrap-5"
         }).change(function() {
             listBarangDetail();
+        });
+
+        $('#bank_id').select2({
+            placeholder: "Pilih kode bank",
+            theme: "bootstrap-5"
+        }).change(function() {
+            generatePaymentNumber();
+        });
+
+        $('#jenis_pembayaran').select2({
+            placeholder: "Pilih kode bank",
+            theme: "bootstrap-5"
+        }).change(function() {
+            generatePaymentNumber();
         });
 
         $('#supplier_id').select2({
@@ -450,6 +500,7 @@
                         if (result.isConfirmed) {
                             let formData = new FormData(document.querySelector(".create-form"));
                             let nominalPembayaran = destroyFormatRupiah($('.nominal_pembayaran').val());
+                            let nominalPembayaranPajak = destroyFormatRupiah($('.nominal_pembayaran_pajak').val());
 
                             const formatList = (list) => {
                                 if (!Array.isArray(list)) return []; // Pastikan `list` adalah array
@@ -464,6 +515,7 @@
                             };
 
                             formData.set('nominal_pembayaran', nominalPembayaran);
+                            formData.set('nominal_pembayaran_pajak', nominalPembayaranPajak);
                             formData.append("pembayaranList", JSON.stringify(listPembayaran));
                             $.ajax({
 
@@ -530,7 +582,8 @@
 
                             let formData = new FormData(document.querySelector(".create-form"));
                             let nominalPembayaran = destroyFormatRupiah($('.nominal_pembayaran').val());
-
+                            let nominalPembayaranPajak = destroyFormatRupiah($('.nominal_pembayaran_pajak').val());
+                            
                             const formatList = (list) => {
                                 if (!Array.isArray(list)) return []; // Pastikan `list` adalah array
                                 return list.map(item => {
@@ -545,6 +598,7 @@
 
 
                             formData.set('nominal_pembayaran', nominalPembayaran);
+                            formData.set('nominal_pembayaran_pajak', nominalPembayaranPajak);
                             formData.append("pembayaranList", JSON.stringify(listPembayaran));
                             $.ajax({
                                 url: "<?= base_url("pembayaran-po-lokal-bp/create"); ?>",
@@ -621,9 +675,8 @@
                 var detail = res.detail;
                 // var dateSplit = detail.jatuh_tempo.split('-');
                 var subTotal = Number(detail.nominal_faktur) + Number(res.tax_dipungut_negara.taxAmt) + Number(res.tax_dikembalikan_lagi.taxAmt) + Number(res.pph) - Number(detail.total_amount);
-
+                var totalPajak = Number(res.tax_dipungut_negara.taxAmt) + Number(res.tax_dikembalikan_lagi.taxAmt) + Number(res.pph);
                 $('.nominal_pembayaran').val(greatFormatRupiah(subTotal));
-                // $('.jatuh_tempo').val(dateSplit[2] + '/' + dateSplit[1] + '/' + dateSplit[0]);
                 $('.tanda_terima_faktur_id').val(detail.id);
 
 
@@ -642,30 +695,37 @@
                     newRow.append($('<td>').text(greatFormatRupiah(v.price)));
                     table.find('tbody').append(newRow);
                 });
+
+                
                 var newRow1 = $('<tr>');
                 newRow1.append($('<td style="text-align:right;" colspan="6">').text('Tambahan'));
                 newRow1.append($('<td>').text(greatFormatRupiah(detail.tambahan)));
                 table.find('tbody').append(newRow1);
+
 
                 var newRow2 = $('<tr>');
                 newRow2.append($('<td style="text-align:right;" colspan="6">').text('Potongan'));
                 newRow2.append($('<td>').text(greatFormatRupiah(detail.potongan)));
                 table.find('tbody').append(newRow2);
 
+
                 var newRow3 = $('<tr>');
                 newRow3.append($('<td style="text-align:right;" colspan="6">').text('Setelah Tambahan dan Potongan'));
                 newRow3.append($('<td>').text(greatFormatRupiah(detail.nominal_faktur)));
                 table.find('tbody').append(newRow3);
+
 
                 var newRow4 = $('<tr>');
                 newRow4.append($('<td style="text-align:right;" colspan="6">').text('Pajak Dipungut Negara (' + res.tax_dipungut_negara.taxType + ')'));
                 newRow4.append($('<td>').text(greatFormatRupiah(res.tax_dipungut_negara.taxAmt)));
                 table.find('tbody').append(newRow4);
 
+
                 var newRow5 = $('<tr>');
                 newRow5.append($('<td style="text-align:right;" colspan="6">').text('Pajak Dikembalikan Lagi (' + res.tax_dikembalikan_lagi.taxType + ')'));
                 newRow5.append($('<td>').text(greatFormatRupiah(res.tax_dikembalikan_lagi.taxAmt)));
                 table.find('tbody').append(newRow5);
+
 
                 var newRow6 = $('<tr>');
                 newRow6.append($('<td style="text-align:right;" colspan="6">').text('Pajak Penghasilan (2.5 %) (+)'));
@@ -673,18 +733,26 @@
                 table.find('tbody').append(newRow6);
 
 
-                var newRow7 = $('<tr>');
-                newRow7.append($('<td style="text-align:right;" colspan="6">').text('Sub Total'));
-                newRow7.append($('<td class="subtotal">').text(greatFormatRupiah(subTotal)));
-                newRow7.append($('<td class="subtotalNominal hidden" style="display: none;">').text(greatFormatRupiah(subTotal)));
-                table.find('tbody').append(newRow7);
+                // var newRow7 = $('<tr>');
+                // newRow7.append($('<td style="text-align:right;" colspan="6">').text('Sub Total'));
+                // newRow7.append($('<td class="subtotal">').text(greatFormatRupiah(detail.nominal_faktur)));
+                // newRow7.append($('<td class="subtotalNominal hidden" style="display: none;">').text(greatFormatRupiah(detail.nominal_faktur)));
+                // table.find('tbody').append(newRow7);
 
+                var newRow9 = $('<tr>');
+                newRow9.append($('<td style="text-align:right;" colspan="6"><b>Nominal Pajak</b></td>'));
+                newRow9.append($('<td>').html(
+                    `
+                        <input onkeyup="this.value = greatFormatRupiah(this.value)" oninput="limitInputBayar(this,${totalPajak})" value="${greatFormatRupiah(totalPajak)}" autocomplete="one-time-code" data-id=""  class="form-control nominal_pembayaran_pajak" type="text" value="" name = "nominal_pembayaran_pajak" style="height:40px" readonly>
+                    `
+                ));
+                table.find('tbody').append(newRow9);
 
                 var newRow9 = $('<tr>');
                 newRow9.append($('<td style="text-align:right;" colspan="6"><b>Input Pembayaran</b></td>'));
                 newRow9.append($('<td>').html(
                     `
-                        <input onkeyup="this.value = greatFormatRupiah(this.value)" oninput="limitInputBayar(this,${subTotal})" autocomplete="one-time-code" data-id=""  class="form-control nominal_pembayaran" type="text" value="" name = "nominal_pembayaran" style="height:40px">
+                        <input onkeyup="this.value = greatFormatRupiah(this.value)" oninput="limitInputBayar(this,${detail.nominal_faktur})" value="${greatFormatRupiah(detail.nominal_faktur)}" autocomplete="one-time-code" data-id=""  class="form-control nominal_pembayaran" type="text" value="" name = "nominal_pembayaran" style="height:40px" readonly>
                     `
                 ));
                 table.find('tbody').append(newRow9);
@@ -699,7 +767,7 @@
         var detail = res.detail;
         var paymentDetail = res.paymentDetail;
         var dateSplit = detail.jatuh_tempo.split('-');
-
+        var totalPrice = 0;
         var subTotal = Number(detail.nominal_faktur) + Number(res.tax_dipungut_negara.taxAmt) + Number(res.tax_dikembalikan_lagi.taxAmt) + Number(res.pph);
 
 
@@ -710,6 +778,7 @@
         table.find('tbody').empty();
         var no = 1;
         $.each(res.list, function(i, v) {
+            totalPrice += v.price;
             var dateSplit = v.lpb_date.split('-');
             var newRow = $('<tr>');
             newRow.append($('<td>').text(no++));
@@ -753,33 +822,23 @@
 
         var newRow7 = $('<tr>');
         newRow7.append($('<td style="text-align:right;" colspan="6">').text('Sub Total'));
-        newRow7.append($('<td class="subtotal">').text(greatFormatRupiah(subTotal)));
-        newRow7.append($('<td class="subtotalNominal hidden" style="display: none;">').text(greatFormatRupiah(subTotal)));
+        newRow7.append($('<td class="subtotal">').text(greatFormatRupiah(totalPrice)));
+        newRow7.append($('<td class="subtotalNominal hidden" style="display: none;">').text(greatFormatRupiah(totalPrice)));
         table.find('tbody').append(newRow7);
 
-        let sisaPembayaran = subTotal - paymentDetail.amount;
-        var newRow9 = $('<tr>');
-        newRow9.append($('<td style="text-align:right;" colspan="6"><b>Sisa Pembayaran</b></td>'));
-        newRow9.append($(`<td style="text-align:center;"><b>${greatFormatRupiah(sisaPembayaran)} </b></td>`));
+        // let sisaPembayaran = subTotal - paymentDetail.amount;
+        // var newRow9 = $('<tr>');
+        // newRow9.append($('<td style="text-align:right;" colspan="6"><b>Sisa Pembayaran</b></td>'));
+        // newRow9.append($(`<td style="text-align:center;"><b>${greatFormatRupiah(sisaPembayaran)} </b></td>`));
 
-        table.find('tbody').append(newRow9);
-
-
-        var newRow10 = $('<tr>');
-        newRow10.append($('<td style="text-align:right;" colspan="6"><b>Total Di Bayar</b></td>'));
-        newRow10.append($(`<td style="text-align:center;"><b>${greatFormatRupiah(paymentDetail.amount)} </b></td>`));
-
-        table.find('tbody').append(newRow10);
+        // table.find('tbody').append(newRow9);
 
 
-        var newRow11 = $('<tr>');
-        newRow11.append($('<td style="text-align:right;" colspan="6"><b>Input Pembayaran</b></td>'));
-        newRow11.append($('<td>').html(
-            `
-                        <input  <?= !empty($detail) ? ($detail['pembayaranDetail']['status_posting'] == 1 ? 'disabled' : '') : ""  ?> oninput="this.value = greatFormatRupiah(this.value)" oninput="limitInputBayar(this,${Number(subTotal)})" autocomplete="one-time-code" data-id=""  class="form-control nominal_pembayaran" type="text" value="" name = "nominal_pembayaran" style="height:40px">
-                    `
-        ));
-        table.find('tbody').append(newRow11);
+        // var newRow10 = $('<tr>');
+        // newRow10.append($('<td style="text-align:right;" colspan="6"><b>Total Di Bayar</b></td>'));
+        // newRow10.append($(`<td style="text-align:center;"><b>${greatFormatRupiah(paymentDetail.amount)} </b></td>`));
+
+        // table.find('tbody').append(newRow10);
     }
 
     function remove(id) {
@@ -1025,6 +1084,9 @@
         var formData = new FormData();
         formData.append("type", "Bahan Penolong");
         formData.append("payment_date", $("#payment_date").val());
+        formData.append("bankId", $("#bank_id option:selected").val());
+        formData.append("divisiId", $("#divisi_id option:selected").text());
+        formData.append("jenisPembayaran", $("#jenis_pembayaran option:selected").text());
         
         $(".no_bukti_pembayaran").attr("readonly", true);
         
