@@ -209,17 +209,6 @@
                         </div>
                     </div>
                     <div class="col-md-4">
-                        <div class="form-floating form-pembayaran-po mb-3" style="height: 50px;">
-                            <select class="form-select" <?= !empty($detail) ? ($detail['pembayaranDetail']['status_posting'] == 1 ? 'disabled' : '') : "" ?> name="akun_pajak" id="akun_pajak">
-                                <option disabled selected value=""></option>
-                                <?php foreach ($subsAkuns as $subs) : ?>
-                                    <option <?= !empty($detail) ? ($detail['pembayaranDetail']['akun_pajak'] == $subs->id ? 'selected' : '') : '' ?> value="<?= $subs->id ?>"><?= strtoupper($subs->no_sub . " " . $subs->nama_sub) ?></option>
-                                <?php endforeach ?>
-                            </select>
-                            <label for="floatingInput" style="z-index: 1;">Akun Pajak</label>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
                         <div class="input-group input-group-password">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <input autocomplete="one-time-code"
@@ -600,9 +589,6 @@
             akun_selisih: {
                 required: true
             },
-            akun_pajak: {
-                required: true
-            },
             jenis_pembayaran: {
                 required: true
             },
@@ -643,9 +629,6 @@
             },
             akun_selisih: {
                 required: "Akun kredit wajib diisi"
-            },
-            akun_pajak: {
-                required: "Akun Pajak wajib diisi"
             },
             jenis_pembayaran: {
                 required: "Jenis Pembayaran wajib diisi"
@@ -757,11 +740,6 @@
 
     $('#akun_selisih').select2({
         placeholder: "Pilih akun Kredit",
-        theme: "bootstrap-5"
-    });
-
-    $('#akun_pajak').select2({
-        placeholder: "Pilih akun pajak",
         theme: "bootstrap-5"
     });
 

@@ -34,6 +34,28 @@
                                 <label for="floatingInput">Nilai Tax(%)</label>
                             </div>
                         </div>
+                        <div class="col-md-4">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                               <select class="form-select akun_kredit" name="akun_kredit" id="akun_kredit">
+                                        <option value="" data-id="">Pilih Akun Kredit</option>
+                                    <?php foreach ($akun_coa as $a) : ?>
+                                        <option value="<?= $a->id ?>"><?= $a->nama_sub ?> || <?= $a->no_sub ?></option>
+                                    <?php endforeach ?>
+                                </select>
+                                <label for="floatingInput">Akun debit</label>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                               <select class="form-select akun_debit" name="akun_debit" id="akun_debit">
+                                       <option value="" data-id="">Pilih Akun Debit</option>
+                                    <?php foreach ($akun_coa as $a) : ?>
+                                        <option value="<?= $a->id ?>"><?= $a->nama_sub ?> || <?= $a->no_sub ?></option>
+                                    <?php endforeach ?>
+                                </select>
+                                <label for="floatingInput">Akun Debit</label>
+                            </div>
+                        </div>
                     </div>
                 </form>
             </div>
@@ -65,6 +87,8 @@
                                 <th class="sort">Nama Tax</th>
                                 <th class="sort">Type Tax</th>
                                 <th class="sort">Nilai Tax</th>
+                                <th class="sort">Akun Kredit</th>
+                                <th class="sort">Akun Debit</th>
                             </tr>
                         </thead>
                         <tbody class="body-table" id="body-table" style="cursor: pointer;">
@@ -82,6 +106,17 @@
     const csrfToken = '<?= csrf_token() ?>';
     let sort = "valas";
     let sortType = "desc";
+
+
+    $('#akun_kredit').select2({
+        placeholder: "Pilih akun Kredit",
+        theme: "bootstrap-5"
+    });
+
+    $('#akun_debit').select2({
+        placeholder: "Pilih akun Debit",
+        theme: "bootstrap-5"
+    });
 
     const table = $('.dataTable').DataTable({
 
@@ -132,6 +167,16 @@
                 data: "tax_value",
                 className: "text-center",
                 orderable: false,
+            },
+            {
+                data: "akun_kredit",
+                className: "text-center",
+                orderable: false,
+            },
+            {
+                data: "akun_debit",
+                className: "text-center",
+                orderable: false,
             }
         ],
         columnDefs: [{
@@ -166,6 +211,12 @@
                 },
                 tax_value: {
                     required: true
+                },
+                akun_kredit: {
+                    required: true
+                },
+                akun_debit: {
+                    required: true
                 }
             },
             messages: {
@@ -177,6 +228,12 @@
                 },
                 tax_value: {
                     required: "Nilai tax tidak boleh kosong"
+                },
+                akun_kredit: {
+                    required: "Nilai Akun Kredit tidak boleh kosong"
+                },
+                akun_debit: {
+                    required: "Nilai Akun Kredit tidak boleh kosong"
                 }
             },
             errorElement: 'span',
@@ -234,6 +291,8 @@
                         $(".tax_name").val(res.data.name);
                         $(".tax_type").val(res.data.type).change();
                         $(".tax_value").val(Number(res.data.tax_value).toLocaleString());
+                        $(".akun_kredit").val(res.data.akun_kredit).change();
+                        $(".akun_debit").val(res.data.akun_debit).change();
 
                         validator.resetForm();
                         validator.reset();
