@@ -319,6 +319,12 @@
                 akun_selisih: {
                     required: true
                 },
+                akun_pajak: {
+                    required: true
+                },
+                jenis_pembayaran: {
+                    required: true
+                },
                 divisi_id: {
                     required: true
                 },
@@ -360,6 +366,12 @@
                 },
                 akun_selisih: {
                     required: "Akun selisih wajib diisi"
+                },
+                akun_pajak: {
+                    required: "Akun Pajak wajib diisi"
+                },
+                jenis_pembayaran: {
+                    required: "Jenis Pembayaran wajib diisi"
                 },
                 divisi_id: {
                     required: "Departemen wajib diisi"

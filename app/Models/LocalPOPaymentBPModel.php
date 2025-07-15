@@ -85,6 +85,7 @@ class LocalPOPaymentBPModel extends Model
             local_po_payment_bp.payment_no, 
             DATE_FORMAT(local_po_payment_bp.payment_date, '%d/%m/%Y') AS payment_date, 
             local_po_payment_bp.amount,
+            local_po_payment_bp.amount_pajak,
             local_po_payment_bp.payment_method,
             suppliers.name AS supplierName,
             tanda_terima_faktur.faktur_no,

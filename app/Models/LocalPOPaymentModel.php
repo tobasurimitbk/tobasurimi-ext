@@ -41,8 +41,7 @@ class LocalPOPaymentModel extends Model
         'keterangan',
         'akun_kas',
         'akun_selisih',
-        'akun_kas_pph',
-        'akun_selisih_pph',
+        'akun_pajak',
         'deletedAt'
     ];
 
@@ -95,6 +94,7 @@ class LocalPOPaymentModel extends Model
                 local_po_payments.type_bayar,
                 DATE_FORMAT(local_po_payments.payment_date, '%d/%m/%Y') AS payment_date, 
                 local_po_payments.amount AS amount,
+                local_po_payments.amount_pajak AS amount_pajak,
                 local_po_payments.payment_method AS payment_method,
                 suppliers.name AS supplierName,
                 COALESCE(SUM(local_po_payment_pinjaman.bayar_pinjaman), 0) AS total_pinjaman,

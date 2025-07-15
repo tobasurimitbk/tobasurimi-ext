@@ -315,6 +315,7 @@ class PembayaranPOLokal extends BaseController
 
     public function createPembayaranPOLokalBBAction()
     {
+        
         try {
             $penerimaanBarangModel = new PenerimaanBarangModel();
             $localPOPaymentPinjamanModel = new LocalPOPaymentPinjamanModel();
@@ -426,8 +427,7 @@ class PembayaranPOLokal extends BaseController
                 'keterangan'        => $this->request->getVar('keterangan'),
                 'akun_kas'          => $this->request->getVar('akun_kas'),
                 'akun_selisih'      => $this->request->getVar('akun_selisih'),
-                'akun_kas_pph'      => $this->request->getVar('akun_kas_pph'),
-                'akun_selisih_pph'  => $this->request->getVar('akun_selisih_pph')
+                'akun_pajak'      => $this->request->getVar('akun_pajak')
 
             ]);
 
@@ -578,8 +578,7 @@ class PembayaranPOLokal extends BaseController
                 'amount'            => $total_pembayaran,
                 'amount_pph'        => $this->request->getVar('total_pembayaran_pph'),
                 'keterangan'        => $this->request->getVar('keterangan'),
-                'akun_kas'          => $this->request->getVar('akun_kas'),
-                'akun_selisih'      => $this->request->getVar('akun_selisih')
+                'akun_pajak'          => $this->request->getVar('akun_pajak')
             ]);
 
             // Hapus detail pembayaran lama sebelum insert baru
@@ -730,7 +729,7 @@ class PembayaranPOLokal extends BaseController
                 "po_number"         => $resultlpb,
                 "payment_date"      => $data->payment_date,
                 "payment_method"    => strtoupper($data->payment_method),
-                "amount"            => number_format($data->amount ?? 0, 0, ',', '.'),
+                "amount"            => number_format($data->amount ?? 0, 0, ',', '.') - number_format($data->amount_pajak ?? 0, 0, ',', '.'),
                 "total_sum_amount"            => number_format($data->total_sum_amount ?? 0, 0, ',', '.'),
                 "tipe_bayar"        => strtoupper($data->type_bayar),
                 'status_posting'    => $data->status_posting
@@ -802,7 +801,7 @@ class PembayaranPOLokal extends BaseController
                 "supplier"          => $p->supplierName,
                 "payment_date"      => $p->payment_date,
                 "payment_method"    => strtoupper($p->payment_method),
-                "amount"            => $p->amount,
+                "amount"            => $p->amount + $p->amount_pajak,
                 'status_posting'    => $p->status_posting
             ]);
         }

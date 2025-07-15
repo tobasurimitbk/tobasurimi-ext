@@ -210,24 +210,13 @@
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating form-pembayaran-po mb-3" style="height: 50px;">
-                            <select class="form-select" <?= !empty($detail) ? ($detail['pembayaranDetail']['status_posting'] == 1 ? 'disabled' : '') : "" ?> name="akun_kas_pph" id="akun_kas_pph">
+                            <select class="form-select" <?= !empty($detail) ? ($detail['pembayaranDetail']['status_posting'] == 1 ? 'disabled' : '') : "" ?> name="akun_pajak" id="akun_pajak">
                                 <option disabled selected value=""></option>
                                 <?php foreach ($subsAkuns as $subs) : ?>
-                                    <option <?= !empty($detail) ? ($detail['pembayaranDetail']['akun_kas_pph'] == $subs->id ? 'selected' : '') : '' ?> value="<?= $subs->id ?>"><?= strtoupper($subs->no_sub . " " . $subs->nama_sub) ?></option>
+                                    <option <?= !empty($detail) ? ($detail['pembayaranDetail']['akun_pajak'] == $subs->id ? 'selected' : '') : '' ?> value="<?= $subs->id ?>"><?= strtoupper($subs->no_sub . " " . $subs->nama_sub) ?></option>
                                 <?php endforeach ?>
                             </select>
-                            <label for="floatingInput" style="z-index: 1;">Debit PPH</label>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="form-floating form-pembayaran-po mb-3" style="height: 50px;">
-                            <select class="form-select" <?= !empty($detail) ? ($detail['pembayaranDetail']['status_posting'] == 1 ? 'disabled' : '') : "" ?> name="akun_selisih_pph" id="akun_selisih_pph">
-                                <option disabled selected value=""></option>
-                                <?php foreach ($subsAkuns as $subs) : ?>
-                                    <option <?= !empty($detail) ? ($detail['pembayaranDetail']['akun_selisih_pph'] == $subs->id ? 'selected' : '') : '' ?> value="<?= $subs->id ?>"><?= strtoupper($subs->no_sub . " " . $subs->nama_sub) ?></option>
-                                <?php endforeach ?>
-                            </select>
-                            <label for="floatingInput" style="z-index: 1;">Kredit PPH</label>
+                            <label for="floatingInput" style="z-index: 1;">Akun Pajak</label>
                         </div>
                     </div>
                     <div class="col-md-4">
@@ -611,6 +600,12 @@
             akun_selisih: {
                 required: true
             },
+            akun_pajak: {
+                required: true
+            },
+            jenis_pembayaran: {
+                required: true
+            },
             // bayar_panjar: {
             //     digits: true
             // },
@@ -648,6 +643,12 @@
             },
             akun_selisih: {
                 required: "Akun kredit wajib diisi"
+            },
+            akun_pajak: {
+                required: "Akun Pajak wajib diisi"
+            },
+            jenis_pembayaran: {
+                required: "Jenis Pembayaran wajib diisi"
             },
             // bayar_panjar: {
             //     digits: "harus berupa angka"
@@ -755,17 +756,12 @@
     });
 
     $('#akun_selisih').select2({
-        placeholder: "Pilih akun kredit",
+        placeholder: "Pilih akun Kredit",
         theme: "bootstrap-5"
     });
 
-    $('#akun_kas_pph').select2({
-        placeholder: "Pilih akun debit pph",
-        theme: "bootstrap-5"
-    });
-
-    $('#akun_selisih_pph').select2({
-        placeholder: "Pilih akun kredit pph",
+    $('#akun_pajak').select2({
+        placeholder: "Pilih akun pajak",
         theme: "bootstrap-5"
     });
 
@@ -945,6 +941,7 @@
                         let totalPembayaranPinjaman = destroyFormatRupiahPayment($('[name="total_pembayaran_pinjaman"]').val());
                         formData.set('nominal_pembayaran', nominalPembayaran);
                         formData.set('total_pembayaran', totalPembayaran);
+                        formData.set('total_pembayaran_pph', totalPembayaranPPH);
                         formData.set('total_pembayaran_panjar', totalPembayaranPanjar);
                         formData.set('total_pembayaran_panjar_tb', totalPembayaranPanjarTB);
                         formData.set('total_pembayaran_pinjaman', totalPembayaranPinjaman);
@@ -1058,6 +1055,7 @@
                             let totalPembayaranPinjaman = destroyFormatRupiahPayment($('[name="total_pembayaran_pinjaman"]').val());
                             formData.set('nominal_pembayaran', nominalPembayaran);
                             formData.set('total_pembayaran', totalPembayaran);
+                            formData.set('total_pembayaran_pph', totalPembayaranPPH);
                             formData.set('total_pembayaran_panjar', totalPembayaranPanjar);
                             formData.set('total_pembayaran_panjar_tb', totalPembayaranPanjarTB);
                             formData.set('total_pembayaran_pinjaman', totalPembayaranPinjaman);
