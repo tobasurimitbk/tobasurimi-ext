@@ -268,9 +268,11 @@
 
             validator.resetForm();
             validator.reset();
-            $(".add-modal").modal("show")
+            $(".add-modal").modal("show");
 
-            $(".create-form")[0].reset()
+            $(".create-form")[0].reset();
+            $("#akun_debit").val("").trigger("change");
+            $("#akun_kredit").val("").trigger("change");
             $(".delete-btn").css('display', 'none');
         })
 
