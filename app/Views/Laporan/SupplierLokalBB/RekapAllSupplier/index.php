@@ -159,18 +159,12 @@
     var row = 0;
 
     var table = $('.dataTable').DataTable({
-
         processing: true,
         serverSide: true,
         ordering: true,
-        order: [
-            [1, 'asc']
-        ],
+        order: [[1, 'asc']],
         fixedHeader: true,
-        lengthMenu: [
-            [25],
-            [25],
-        ],
+        lengthMenu: [[25], [25]],
         pageLength: 25,
         ajax: {
             url: "<?= base_url("/laporan-supplier-lokal-bb/rekap-all-supplier/all-rekap-all-supplier"); ?>",
@@ -185,119 +179,53 @@
                 data.filter_divisi = $(".filter_divisi").val();
             },
         },
-        // scrollX: true,
-        "initComplete": function(settings, json) {
+        initComplete: function(settings, json) {
             $('.dataTables_length').empty();
             $('.dataTables_length').html("<div><label class='text-center ml-2 mt-2'>Show <b class='entries-label'>25</b> Entries</label></div>");
             $('.dataTable').wrap("<div style='overflow:auto; width:100%;position:relative;'></div>");
         },
-        //responsive: true,
         display: "stripe",
         searching: false,
-        columns: [{
-                data: "no",
-                className: "text-center",
-                sortable: false
-            },
-            {
-                data: "supplierName",
-                className: "text-center",
-
-            },
-            {
-                data: "divisiName",
-                className: "text-center",
-
-            },
-            {
-                data: "barangName",
-                className: "text-center",
-            },
-            {
-                data: "satuanName",
-                className: "text-center",
-            },
-            {
-                data: "qtyPO",
-                className: "text-center",
-            },
-            {
-                data: "dppUmum",
-                className: "text-center",
-            },
-            {
-                data: "pphUmum",
-                className: "text-center",
-            },
-            {
-                data: "totalUmum",
-                className: "text-center",
-            },
-            {
-                data: "dppHarian",
-                className: "text-center",
-            },
-            {
-                data: "pphHarian",
-                className: "text-center",
-            },
-            {
-                data: "totalHarian",
-                className: "text-center",
-            },
-            {
-                data: "dppBulanan",
-                className: "text-center",
-            },
-            {
-                data: "pphBulanan",
-                className: "text-center",
-            },
-            {
-                data: "totalBulanan",
-                className: "text-center",
-            },
-            {
-                data: "subsidi",
-                className: "text-center",
-            },
-            {
-                data: "pphSubsidi",
-                className: "text-center",
-
-            },
-            {
-                data: "totalSubsidi",
-                className: "text-center",
-            },
-            {
-                data: "totalRow",
-                className: "text-center",
-            },
+        columns: [
+            { data: "no", className: "text-center", sortable: false },
+            { data: "supplierName", className: "text-center" },
+            { data: "divisiName", className: "text-center" },
+            { data: "barangName", className: "text-center" },
+            { data: "satuanName", className: "text-center" },
+            { data: "qtyPO", className: "text-center" },
+            { data: "dppUmum", className: "text-center" },
+            { data: "pphUmum", className: "text-center" },
+            { data: "totalUmum", className: "text-center" },
+            { data: "dppHarian", className: "text-center" },
+            { data: "pphHarian", className: "text-center" },
+            { data: "totalHarian", className: "text-center" },
+            { data: "dppBulanan", className: "text-center" },
+            { data: "pphBulanan", className: "text-center" },
+            { data: "totalBulanan", className: "text-center" },
+            { data: "subsidi", className: "text-center" },
+            { data: "pphSubsidi", className: "text-center" },
+            { data: "totalSubsidi", className: "text-center" },
+            { data: "totalRow", className: "text-center" },
         ],
-        columnDefs: [{
-            defaultContent: "-",
-            targets: "_all"
-        }],
+        columnDefs: [
+            { defaultContent: "-", targets: "_all" }
+        ],
         footerCallback: function(row, data, start, end, display) {
             var api = this.api();
+            var json = api.ajax.json(); // Ambil semua total dari server
 
-            // Kolom-kolom yang ingin di-total (indeks dimulai dari 0)
-            var columnsToSum = [5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18];
+            const colMap = {
+                15: 'subsidi',
+                16: 'pphSubsidi',
+                17: 'totalSubsidi',
+                18: 'totalRow'
+            };
 
-            columnsToSum.forEach(function(col) {
-                var total = api
-                    .column(col, {
-                        page: 'current'
-                    })
-                    .data()
-                    .reduce(function(a, b) {
-                        return destroyFormatRupiah(a) + destroyFormatRupiah(b);
-                    }, 0);
-
-                // Update footer
-                $(api.column(col).footer()).html(greatFormatRupiah(total.toFixed(2)));
-            });
+            for (const [colIndex, key] of Object.entries(colMap)) {
+                if (json.totalFooter && json.totalFooter[key]) {
+                    $(api.column(colIndex).footer()).html(greatFormatRupiah(json.totalFooter[key]));
+                }
+            }
         },
         language: {
             emptyTable: "Tidak Ada Data",
@@ -307,7 +235,7 @@
                 next: '<i class="fa fa-angle-right"></i>'
             }
         }
-    })
+    });
 
     const changeSort = function(val) {
         if (sort !== val) {
