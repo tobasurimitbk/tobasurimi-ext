@@ -422,7 +422,7 @@ class PembayaranPOLokal extends BaseController
                 'pembayaran_oleh'   => $this->request->getVar('pembayaran_oleh'),
                 'potongan_harga'    => $this->request->getVar('potongan'),
                 'amount'            => $this->request->getVar('total_pembayaran'),
-                'amount_pph'            => $this->request->getVar('total_pembayaran_pph'),
+                'amount_pajak'            => $this->request->getVar('total_pembayaran_pph'),
                 'status_posting'    => '0',
                 'keterangan'        => $this->request->getVar('keterangan'),
                 'akun_kas'          => $this->request->getVar('akun_kas'),
@@ -576,7 +576,7 @@ class PembayaranPOLokal extends BaseController
                 'pembayaran_oleh'   => $this->request->getVar('pembayaran_oleh'),
                 'potongan_harga'    => $this->request->getVar('potongan'),
                 'amount'            => $total_pembayaran,
-                'amount_pph'        => $this->request->getVar('total_pembayaran_pph'),
+                'amount_pajak'        => $this->request->getVar('total_pembayaran_pph'),
                 'keterangan'        => $this->request->getVar('keterangan'),
                 'akun_pajak'          => $this->request->getVar('akun_pajak')
             ]);

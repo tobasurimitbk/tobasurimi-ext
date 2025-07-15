@@ -36,7 +36,7 @@ class LocalPOPaymentModel extends Model
         'pembayaran_oleh',
         'potongan_harga',
         'amount',
-        'amount_pph',
+        'amount_pajak',
         'status_posting',
         'keterangan',
         'akun_kas',
