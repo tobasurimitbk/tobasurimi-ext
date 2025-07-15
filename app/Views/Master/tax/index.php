@@ -277,7 +277,9 @@
         })
 
         $(".btn-hide-form").click(function() {
-            $(".add-modal").modal("hide")
+            $(".add-modal").modal("hide");
+            $("#akun_debit").val("").trigger("change");
+            $("#akun_kredit").val("").trigger("change");
         })
 
         $('#dataTable tbody').on('click', 'tr td:not(.actions):not(.dataTables_empty)', function() {
