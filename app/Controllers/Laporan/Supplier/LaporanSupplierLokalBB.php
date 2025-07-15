@@ -188,7 +188,26 @@ class LaporanSupplierLokalBB extends BaseController
                 $totalBulanan = $dppBulanan + $pphBulanan;
             }
 
-            $totalRow = $totalUmum + $totalHarian + $totalBulanan;
+            if ($row->subsidi == 0) {
+                $subsidi = $row->cong_batasan - $row->cong_sebenarnya;
+                if ($pphMode === "Company") {
+                    $dppSubsidi = ($subsidi / $nilai_pph) * $qty;
+                    $pphSubsidi = ($subsidi / $nilai_pph * $nilai_pph2) * $qty;
+                    $totalSubsidi = $dppSubsidi - $pphSubsidi;
+                } elseif ($pphMode === "Supplier") {
+                    $dppSubsidi = $subsidi * $qty;
+                    $pphSubsidi = ($subsidi * $nilai_pph2) * $qty;
+                    $totalSubsidi = $dppSubsidi - $pphSubsidi;
+                } else {
+                    $dppSubsidi = $subsidi * $qty;
+                    $pphSubsidi = ($pphMode === "Supplier") ? ($subsidi * $nilai_pph2) * $qty : 0;
+                    $totalSubsidi = $dppSubsidi + $pphSubsidi;
+                }
+                $totalRow = $totalUmum + $totalHarian + $totalBulanan + $totalSubsidi;
+            }else{
+                $totalRow = $totalUmum + $totalHarian + $totalBulanan;
+            }
+
 
             $totals['qtyAll'] += $qty;
             $totals['dppUmum'] += $dppUmum;
@@ -206,20 +225,21 @@ class LaporanSupplierLokalBB extends BaseController
             $totals['totalRow'] += $totalRow;
 
             if (!isset($groupedData[$poId])) {
-                $subsidi = $row->subsidi == 0 ? ($row->cong_batasan - $row->cong_sebenarnya) : $row->subsidi;
-
-                if ($pphMode === "Company") {
-                    $dppSubsidi = $subsidi / $nilai_pph;
-                    $pphSubsidi = $subsidi * $nilai_pph2;
-                    $totalSubsidi = $dppSubsidi - $pphSubsidi;
-                } elseif ($pphMode === "Supplier") {
-                    $dppSubsidi = $subsidi;
-                    $pphSubsidi = ($subsidi * $nilai_pph2);
-                    $totalSubsidi = $dppSubsidi - $pphSubsidi;
-                } else {
-                    $dppSubsidi = $subsidi;
-                    $pphSubsidi = ($pphMode === "Supplier") ? ($subsidi * $nilai_pph2) : 0;
-                    $totalSubsidi = $dppSubsidi + $pphSubsidi;
+                if ($row->subsidi != 0) {
+                    $subsidi = $row->subsidi;
+                    if ($pphMode === "Company") {
+                        $dppSubsidi = $subsidi / $nilai_pph;
+                        $pphSubsidi = $dppSubsidi * $nilai_pph2;
+                        $totalSubsidi = $dppSubsidi - $pphSubsidi;
+                    } elseif ($pphMode === "Supplier") {
+                        $dppSubsidi = $subsidi;
+                        $pphSubsidi = ($dppSubsidi * $nilai_pph2);
+                        $totalSubsidi = $dppSubsidi - $pphSubsidi;
+                    } else {
+                        $dppSubsidi = $subsidi;
+                        $pphSubsidi = ($pphMode === "Supplier") ? ($dppSubsidi * $nilai_pph2) : 0;
+                        $totalSubsidi = $dppSubsidi + $pphSubsidi;
+                    }
                 }
 
                 $groupedData[$poId] = [
@@ -250,8 +270,7 @@ class LaporanSupplierLokalBB extends BaseController
                     'nilai_pph2' => $nilai_pph2,
                     'totalRow' => $totalRow,
                 ];
-
-                $totalTotalRow += $totalRow + $totalSubsidi;
+                $totalTotalRow += $totalRow;
             } else {
                 $groupedData[$poId]['totalRow'] += $totalRow;
                 $totalTotalRow += $totalRow;
@@ -275,16 +294,28 @@ class LaporanSupplierLokalBB extends BaseController
         // Pagination manual
         $paginatedData = array_slice($groupedData, ($currentPage - 1) * $pageSize, $pageSize);
 
+        $finalDppSubsidi = 0;
+        $finalPphSubsidi = 0;
+        $finalTotalSubsidi = 0;
+        $finalTotalRow = 0;
         // Format angka dan nomor urut
         foreach ($paginatedData as $i => &$row) {
             $row['no'] = ($currentPage - 1) * $pageSize + $i + 1;
-            $subsidi = $row['tambahan'] == "0" ? $row['subsidi'] * $row['qtyPO'] : $row['subsidi'];
-            $pphSubsidi = $subsidi * $row['nilai_pph2'];
-            $totalSubsidi = $subsidi - $pphSubsidi;
-            $row['subsidi'] = $subsidi;
-            $row['pphSubsidi'] = $pphSubsidi;
-            $row['totalSubsidi'] = $totalSubsidi;
-            $row['totalRow'] = $row['totalRow'] + $totalSubsidi;
+            if($row['tambahan'] != "0"){
+                $subsidi = $row['subsidi'];
+                $pphSubsidi = $subsidi * $row['nilai_pph2'];
+                $totalSubsidi = $subsidi - $pphSubsidi;
+                $row['subsidi'] = $subsidi;
+                $row['pphSubsidi'] = $pphSubsidi;
+                $row['totalSubsidi'] = $totalSubsidi;
+            // } else {
+            //     $row['totalRow'] = $row['totalUmum'] + $row['totalHarian'] + $row['totalBulanan'];
+                $row['totalRow'] = $row['totalUmum'] + $row['totalHarian'] + $row['totalBulanan'] + $row['totalSubsidi'];
+            }
+            $finalDppSubsidi += $row['subsidi'];
+            $finalPphSubsidi += $row['pphSubsidi'];
+            $finalTotalSubsidi += $row['totalSubsidi'];
+            $finalTotalRow += $row['totalRow'];
 
             foreach ($row as $key => $val) {
                 if (is_numeric($val) && $key !== 'no') {
@@ -292,6 +323,10 @@ class LaporanSupplierLokalBB extends BaseController
                 }
             }
         }
+        $totals['subsidi'] = $finalDppSubsidi;
+        $totals['pphSubsidi'] = $finalPphSubsidi;
+        $totals['totalSubsidi'] = $finalTotalSubsidi;
+        $totals['totalRow'] = $finalTotalRow;
 
         foreach ($totals as $key => $val) {
             $totals[$key] = number_format($val, 2, '.', ',');
@@ -744,113 +779,114 @@ class LaporanSupplierLokalBB extends BaseController
 
     public function exportPDFPendapatanSupplier()
     {
+        $condition = [
+            'rm_purchase_orders.is_posted' => '1',
+            'penerimaan_barang.status_post' => 'FINISH',
+            'penerimaan_barang.status_penerimaan' => 'LOKAL',
+            'penerimaan_barang.tipe_bahan' => 'BAKU',
+            'rm_purchase_orders.company_id' => $this->this_company_id,
+            'penerimaan_barang.deletedAt' => null,
+            'penerimaan_barang_detail.deletedAt' => null,
+        ];
 
-        $totalDppUmum = 0;
-        $totalPphUmum = 0;
-        $totalTotalUmum = 0;
-        $totalDppHarian = 0;
-        $totalPphHarian = 0;
-        $totalTotalHarian = 0;
-        $totalDppBulanan = 0;
-        $totalPphBulanan = 0;
-        $totalTotalBulanan = 0;
-        $totalDppSubsidi = 0;
-        $totalPphSubsidi = 0;
-        $totalTotalSubsidi = 0;
-        $totalTotalRow = 0;
+        $addCondition = [
+            "dateStart"    => $this->request->getGet("dateStart") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getGet("dateStart")))) : "",
+            "dateEnd"      => $this->request->getGet("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getGet("dateEnd")))) : "",
+            "supplierId"   => $this->request->getGet("filter_supplier"),
+            "barangId"     => $this->request->getGet("filter_barang"),
+            "warehouseId"  => $this->request->getGet("filter_warehouse"),
+            "poNo"         => $this->request->getGet("filter_po_no"),
+            "divisiId"     => $this->request->getGet("filter_divisi"),
+        ];
 
-        $dateStart = $this->request->getVar('dateStart');
-        $newDateStart = $this->request->getGet("dateStart") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getGet("dateStart")))) : "";
-        $dateEnd = $this->request->getVar('dateEnd');
-        $newDateEnd = $this->request->getGet("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getGet("dateEnd")))) : "";
-        $supplierId = $this->request->getVar('filter_supplier');
-        $barangId = $this->request->getVar('filter_barang');
-        $warehouseId = $this->request->getVar('filter_warehouse');
-        $poNo = $this->request->getVar('filter_po_no');
-        $companyId  = $this->this_company_id;
+        $availableSort = [
+            'supplierName'  => 'suppliers.name',
+            'poNum'         => 'rm_purchase_orders.po_no',
+            'poDate'        => 'rm_purchase_orders.po_date',
+            'barangName'    => 'barang_master.barang_name',
+            'warehouseName' => 'warehouses.warehouse_name',
+        ];
 
-        $dataBBLokal = $this->RMPurchaseOrderModel->getPoBBLokalForSupplierReportPdf($newDateStart, $newDateEnd, $supplierId, $barangId, $warehouseId, $companyId, $poNo);
-        $dataBahanBaku = $this->barangMasterModel->asObject()->where('id', $barangId)->where('type_barang', 'bahan_baku')->first();
-        $dataWarehouse = $this->warehousesModel->asObject()->where('id', $warehouseId)->first();
-        $dataSupplier = $this->supplierModel->asObject()->where('id', $supplierId)->first();
-        $dataTotalBBLokal = [];
-        if (!empty($dataBBLokal)) {
-            foreach ($dataBBLokal as $row) {
-                $row->pphUmum       = ($row->poPPH != 'None') ? (!empty($row->supplierNpwp) ? ($row->dppUmum * 0.0025) : ($row->dppUmum * 0.005)) : 0;
-                $row->totalUmum     = ($row->dppUmum + $row->pphUmum) * $row->qtyPO;
-                $row->pphUmum       = $row->pphUmum * $row->qtyPO;
-
-                $row->pphHarian     = ($row->poPPH != 'None') ? (!empty($row->supplierNpwp) ? ($row->dppHarian * 0.0025) : ($row->dppHarian * 0.005)) : 0;
-                $row->totalHarian   = ($row->dppHarian + $row->pphHarian) * $row->qtyPO;
-                $row->pphHarian       = $row->pphHarian * $row->qtyPO;
-
-                $row->pphBulanan    = ($row->poPPH != 'None') ? (!empty($row->supplierNpwp) ? ($row->dppBulanan * 0.0025) : ($row->dppBulanan * 0.005)) : 0;
-                $row->totalBulanan  = ($row->dppBulanan + $row->pphBulanan) * $row->qtyPO;
-                $row->pphBulanan = $row->pphBulanan * $row->qtyPO;
-
-                $row->pphSubsidi = ($row->poPPH != 'None') ? (!empty($row->supplierNpwp) ? ($row->subsidi * 0.0025) : ($row->subsidi * 0.005)) : 0;
-                $row->totalSubsidi = $row->subsidi - $row->pphSubsidi;
-                $row->totalRow = $row->totalUmum + $row->totalHarian + $row->totalBulanan + $row->totalSubsidi;
-                $totalDppUmum += $row->dppUmum;
-                $totalPphUmum += $row->pphUmum;
-                $totalTotalUmum += $row->totalUmum;
-                $totalDppHarian += $row->dppHarian;
-                $totalPphHarian += $row->pphHarian;
-                $totalTotalHarian += $row->totalHarian;
-                $totalDppBulanan += $row->dppBulanan;
-                $totalPphBulanan += $row->pphBulanan;
-                $totalTotalBulanan += $row->totalBulanan;
-                $totalDppSubsidi += $row->subsidi;
-                $totalPphSubsidi += $row->pphSubsidi;
-                $totalTotalSubsidi += $row->totalSubsidi;
-            }
-            $totalTotalRow = $totalTotalUmum + $totalTotalHarian + $totalTotalBulanan + $totalTotalSubsidi;
+        $dataBBLokal = $this->RMPurchaseOrderModel->getPoBBLokalForSupplier($availableSort, $condition, $addCondition, null, null);
+        $processedData = $this->processLaporanPendapatanSupplier($dataBBLokal['data']);
+        // dd($processedData, $dataBBLokal);
+        // Group by barangName
+        $groupedData = [];
+        foreach ($processedData as $item) {
+            $barangName = $item['barangName'] ?? 'Lainnya';
+            $groupedData[$barangName][] = $item;
         }
-        $no = 1;
+
+        $summaryPerBarang = [];
+        foreach ($groupedData as $barang => $items) {
+            foreach ($items as &$item) {
+                $subsidi = $item['subsidi'] * $item['qtyPO'];
+
+                $pphSubsidi = $subsidi * floatval($item['nilai_pph2']);
+                $totalSubsidi = $subsidi - $pphSubsidi;
+
+                $item['subsidi'] = $subsidi;
+                $item['pphSubsidi'] = $pphSubsidi;
+                $item['totalSubsidi'] = $totalSubsidi;
+                $item['totalRow'] = $item['totalUmum'] + $item['totalHarian'] + $item['totalBulanan'] + $totalSubsidi;
+            }
+
+            $totals = [
+                'totalDppUmum' => 0,
+                'totalPphUmum' => 0,
+                'totalTotalUmum' => 0,
+                'totalDppHarian' => 0,
+                'totalPphHarian' => 0,
+                'totalTotalHarian' => 0,
+                'totalDppBulanan' => 0,
+                'totalPphBulanan' => 0,
+                'totalTotalBulanan' => 0,
+                'totalDppSubsidi' => 0,
+                'totalPphSubsidi' => 0,
+                'totalTotalSubsidi' => 0,
+                'totalTotalRow' => 0,
+            ];
+
+            foreach ($items as $row) {
+                $totals['totalDppUmum'] += $row['dppUmum'];
+                $totals['totalPphUmum'] += $row['pphUmum'];
+                $totals['totalTotalUmum'] += $row['totalUmum'];
+
+                $totals['totalDppHarian'] += $row['dppHarian'];
+                $totals['totalPphHarian'] += $row['pphHarian'];
+                $totals['totalTotalHarian'] += $row['totalHarian'];
+
+                $totals['totalDppBulanan'] += $row['dppBulanan'];
+                $totals['totalPphBulanan'] += $row['pphBulanan'];
+                $totals['totalTotalBulanan'] += $row['totalBulanan'];
+
+                $totals['totalDppSubsidi'] += $row['subsidi'];
+                $totals['totalPphSubsidi'] += $row['pphSubsidi'];
+                $totals['totalTotalSubsidi'] += $row['totalSubsidi'];
+
+                $totals['totalTotalRow'] += $row['totalRow'];
+            }
+
+            $summaryPerBarang[$barang] = [
+                'data' => $items,
+                'summary' => $totals,
+            ];
+        }
 
         $data = [
-            'no' => $no,
             'header' => "Laporan Pendapatan Supplier",
-            'tanggalAwal' => $dateStart,
-            'tanggalAkhir' => $dateEnd,
-            'bahanBaku' => !empty($dataBahanBaku) ? $dataBahanBaku->barang_name : "All",
-            'warehouse' => !empty($dataWarehouse) ? $dataWarehouse->warehouse_name : "All",
-            'supplier' => !empty($dataSupplier) ? $dataSupplier->name : "ALL",
-            'poNo' => !empty($poNo) ? $poNo : "ALL",
-            'dataOrder' => $dataBBLokal,
-            'totalDppUmum' => $totalDppUmum,
-            'totalPphUmum' => $totalPphUmum,
-            'totalTotalUmum' => $totalTotalUmum,
-            'totalDppHarian' => $totalDppHarian,
-            'totalPphHarian' => $totalPphHarian,
-            'totalTotalHarian' => $totalTotalHarian,
-            'totalDppBulanan' => $totalDppBulanan,
-            'totalPphBulanan' => $totalPphBulanan,
-            'totalTotalBulanan' => $totalTotalBulanan,
-            'totalDppSubsidi' => $totalDppSubsidi,
-            'totalPphSubsidi' => $totalPphSubsidi,
-            'totalTotalSubsidi' => $totalTotalSubsidi,
-            'totalTotalRow' => $totalTotalRow
+            'tanggalAwal' => $this->request->getVar('dateStart'),
+            'tanggalAkhir' => $this->request->getVar('dateEnd'),
+            'poNo' => $addCondition['poNo'] ?? 'ALL',
+            'groupedData' => $summaryPerBarang,
         ];
 
         $domPdf = new Dompdf();
-
-        $fileName = 'Pendapatan Supplier';
-
-        // load HTML content
         $domPdf->loadHtml(view('Laporan/SupplierLokalBB/PendapatanSupplier/print', $data));
-
-        // (optional) setup the paper size and orientation
-        $domPdf->setPaper('legal', 'landscape');
-
-        // render html as PDF
+        $domPdf->setPaper('a4', 'landscape');
         $domPdf->render();
-
-        // output the generated pdf
-        $domPdf->stream($fileName, array("Attachment" => false));
-
+        $domPdf->stream('Pendapatan Supplier', array("Attachment" => false));
         exit();
-        // return view('Supplier/supplierBahanBaku/print');
     }
 
     public function laporanRincianPerbarang()
@@ -1218,8 +1254,8 @@ class LaporanSupplierLokalBB extends BaseController
             $g['totalRow']     += $totalRow;
             $totalTotalRow     += $totalRow;
 
-            if (!in_array($poId, $usedSubsidiPo)) {
-                $usedSubsidiPo[] = $poId;
+            if (!in_array($groupKey, $usedSubsidiPo)) {
+                $usedSubsidiPo[] = $groupKey;
                 $subsidi = $row->subsidi == 0 ? ($row->cong_batasan - $row->cong_sebenarnya) : $row->subsidi;
 
                 if ($pphMode === "Company") {
@@ -1247,7 +1283,6 @@ class LaporanSupplierLokalBB extends BaseController
         $groupedData = array_values($groupedData);
         $totalGrouped = count($groupedData);
         $paginatedData = array_slice($groupedData, ($currentPage - 1) * $pageSize, $pageSize);
-
         foreach ($paginatedData as $i => &$row) {
             $row['no'] = ($currentPage - 1) * $pageSize + $i + 1;
             $subsidi = $row['tambahan'] == "0" ? $row['subsidi'] * $row['qtyPO'] : $row['subsidi'];

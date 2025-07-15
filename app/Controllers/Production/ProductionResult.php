@@ -344,7 +344,7 @@ class ProductionResult extends BaseController
             ->join('work_order_details', 'work_order_details.work_order_id = work_orders.id', 'left')
             ->where('work_orders.company_id', $this->this_company_id)
             ->where('work_orders.deletedAt', null)
-            ->where('work_orders.is_posted', "1")
+            // ->where('work_orders.is_posted', "1")
             ->where('work_orders.request_status', "waiting")
             ->where('work_order_details.deletedAt', null)
             ->groupBy('work_order_details.work_order_id')
@@ -720,30 +720,30 @@ class ProductionResult extends BaseController
 
     public function getListMaterialRequestByWOID()
     {
-            $dataMaterialRequest = $this->materialRequestModel->asObject()
-                ->select('material_requests.*, GROUP_CONCAT(material_request_details.nama_barang SEPARATOR \', \') AS nama_barang, users.name AS user_name')
-                ->join('material_request_details', 'material_request_details.material_request_id = material_requests.id', 'left')
-                ->join('users', 'users.id = material_requests.createdBy', 'left')
-                ->where('company_id', $this->this_company_id)
-                ->where('material_requests.is_posted', 1)
-                ->where('material_requests.deletedAt', null)
-                ->where('material_request_details.deletedAt', null)
-                ->where('material_request_details.qty_now >', 0)
-                // ->where('material_requests.work_order_id', $this->request->getVar('kode_produksi'))
-                ->groupBy('material_request_details.material_request_id')
-                ->find();
-            if ($dataMaterialRequest) {
-                return response()->setJSON([
-                    'data' => $dataMaterialRequest,
-                    'token' => csrf_hash(),
-                    'status' => true
-                ]);
-            } else {
-                return response()->setJSON([
-                    'token' => csrf_hash(),
-                    'status' => false
-                ]);
-            }
+        $dataMaterialRequest = $this->materialRequestModel->asObject()
+            ->select('material_requests.*, GROUP_CONCAT(material_request_details.nama_barang SEPARATOR \', \') AS nama_barang, users.name AS user_name')
+            ->join('material_request_details', 'material_request_details.material_request_id = material_requests.id', 'left')
+            ->join('users', 'users.id = material_requests.createdBy', 'left')
+            ->where('company_id', $this->this_company_id)
+            ->where('material_requests.is_posted', 1)
+            ->where('material_requests.deletedAt', null)
+            ->where('material_request_details.deletedAt', null)
+            ->where('material_request_details.qty_now >', 0)
+            // ->where('material_requests.work_order_id', $this->request->getVar('kode_produksi'))
+            ->groupBy('material_request_details.material_request_id')
+            ->find();
+        if ($dataMaterialRequest) {
+            return response()->setJSON([
+                'data' => $dataMaterialRequest,
+                'token' => csrf_hash(),
+                'status' => true
+            ]);
+        } else {
+            return response()->setJSON([
+                'token' => csrf_hash(),
+                'status' => false
+            ]);
+        }
     }
 
     public function updateStatusPostedProductionResult()
