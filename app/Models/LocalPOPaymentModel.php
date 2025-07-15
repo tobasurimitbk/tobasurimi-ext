@@ -83,7 +83,7 @@ class LocalPOPaymentModel extends Model
         ];
         $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
 
-        $sort = $availableSort[$addCondition['sort'] ?? 'createdAt'] ?? 'suppliers.createdAt';
+        $sort = $availableSort[$addCondition['sort'] ?? 'createdAt'] ?? 'local_po_payments.createdAt';
         $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'DESC';
 
         $selectQry = "local_po_payments.id AS id,
