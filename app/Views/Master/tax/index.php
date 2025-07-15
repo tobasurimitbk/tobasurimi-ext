@@ -42,7 +42,7 @@
                                         <option value="<?= $a->id ?>"><?= $a->nama_sub ?> || <?= $a->no_sub ?></option>
                                     <?php endforeach ?>
                                 </select>
-                                <label for="floatingInput">Akun debit</label>
+                                <label style="z-index: 1;" for="floatingInput">Akun debit</label>
                             </div>
                         </div>
                         <div class="col-md-4">
@@ -53,7 +53,7 @@
                                         <option value="<?= $a->id ?>"><?= $a->nama_sub ?> || <?= $a->no_sub ?></option>
                                     <?php endforeach ?>
                                 </select>
-                                <label for="floatingInput">Akun Debit</label>
+                                <label style="z-index: 1;" for="floatingInput">Akun Debit</label>
                             </div>
                         </div>
                     </div>
@@ -110,12 +110,16 @@
 
     $('#akun_kredit').select2({
         placeholder: "Pilih akun Kredit",
-        theme: "bootstrap-5"
+        theme: "bootstrap-5",
+        allowClear: true,
+        dropdownParent: $('.add-modal')
     });
 
     $('#akun_debit').select2({
         placeholder: "Pilih akun Debit",
-        theme: "bootstrap-5"
+        theme: "bootstrap-5",
+        allowClear: true,
+        dropdownParent: $('.add-modal')
     });
 
     const table = $('.dataTable').DataTable({
