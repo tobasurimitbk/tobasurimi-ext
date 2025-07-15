@@ -81,6 +81,29 @@
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating form-pembayaran-po mb-3" style="height: 50px;">
+                            <select class="form-select" <?= !empty($detail) ? ($detail['pembayaranDetail']['status_posting'] == 1 ? 'disabled' : '') : "" ?> name="jenis_pembayaran" id="jenis_pembayaran">
+                                <option selected value="<?= !empty($detail['pembayaranDetail']['jenis_bayar']) ? $detail['pembayaranDetail']['jenis_bayar'] : '';  ?>"></option>
+                                <option value="MERAH">MERAH</option>
+                                <option value="PUTIH">PUTIH</option>
+                            </select>
+                            <label for="floatingInput" style="z-index: 1;">Jenis Pembayaran</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-floating form-pembayaran-po mb-3" style="height: 50px;">
+                            <select class="form-select" <?= !empty($detail) ? ($detail['pembayaranDetail']['status_posting'] == 1 ? 'disabled' : '') : ""; ?> name="bank_id" id="bank_id">
+                                <option disabled selected value=""></option>
+                                <?php foreach ($bankList as $b) : ?>
+                                    <option <?= !empty($detail) ? ($detail['pembayaranDetail']['bank_id'] == $b->id ? 'selected' : '') : '' ?> value="<?= $b->id ?>"><?= strtoupper($b->kode_bank) ?></option>
+                                <?php endforeach ?>
+                            </select>
+                            <label for="floatingInput" style="z-index: 1;">Kode Bank (Opsional)</label>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-floating form-pembayaran-po mb-3" style="height: 50px;">
                             <select class="form-select" <?= !empty($detail) ? ($detail['pembayaranDetail']['status_posting'] == 1 ? 'disabled' : '') : ""  ?> name="supplier_id" id="supplier_id">
                                 <option disabled selected value=""></option>
                                 <?php foreach ($suppliers as $supplier) : ?>
@@ -90,8 +113,6 @@
                             <label for="floatingInput" style="z-index: 1;">Supplier</label>
                         </div>
                     </div>
-                </div>
-                <div class="row">
                     <div class="col-md-4">
                         <div class="form-floating form-pembayaran-po mb-3" style="height: 50px;">
                             <select <?= !empty($detail) ? ($detail['pembayaranDetail']['status_posting'] == 1 ? 'disabled' : '') : ""  ?> class="form-select divisi_id" id="divisi_id" name="divisi_id" aria-label="Floating label select example">
@@ -105,6 +126,8 @@
                             <label for="floatingInput" style="z-index: 1;">Departemen</label>
                         </div>
                     </div>
+                </div>
+                <div class="row">
                     <div class="col-md-4">
                         <div class="form-floating form-pembayaran-po mb-3" style="height: 50px;">
                             <select class="form-select" <?= !empty($detail) ? ($detail['pembayaranDetail']['status_posting'] == 1 ? 'disabled' : '') : ""  ?> name="tanda_terima_supplier" id="tanda_terima_supplier">
@@ -128,22 +151,6 @@
                             <label for="floatingInput" style="z-index: 1;">Metode Pembayaran</label>
                         </div>
                     </div>
-                </div>
-                <!-- <div class="row">
-                    <div class="col-md-4">
-                        <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" onkeyup="this.value = greatFormatRupiah(this.value);" type="text" class="form-control nominal_pembayaran" name="nominal_pembayaran" id="nominal_pembayaran" readonly <?= !empty($detail) ? 'disabled value="' . " " . number_format($detail['pembayaranDetail']['amount'], 2, ',', '.')  . '"' : '' ?>>
-                            <label for="floatingInput">Nominal Pembayaran</label>
-                        </div>
-                    </div>
-                </div> -->
-                <div class="row">
-                    <!-- <div class="col-md-4" style="display: none;">
-                        <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" class="form-control input-picker jatuh_tempo" id="jatuh_tempo" name="jatuh_tempo" placeholder="Tanggal Jatuh Tempo" readonly >
-                            <label for="floatingInput">Tanggal Jatuh Tempo</label>
-                        </div>
-                    </div> -->
                     <div class="col-md-4">
                         <div class="form-floating form-pembayaran-po mb-3" style="height: 50px;">
                             <select <?= !empty($detail) ? ($detail['pembayaranDetail']['status_posting'] == 1 ? 'disabled' : '') : ""  ?> class="form-select status_pph" name="status_pph" id="status_pph">
@@ -428,6 +435,7 @@
             theme: "bootstrap-5"
         }).change(function() {
             getListTandaTerimaSupplier();
+            generatePaymentNumber();
         });
 
         $('#tanda_terima_supplier').select2({
@@ -435,6 +443,20 @@
             theme: "bootstrap-5"
         }).change(function() {
             listBarangDetail();
+        });
+
+        $('#bank_id').select2({
+            placeholder: "Pilih kode bank",
+            theme: "bootstrap-5"
+        }).change(function() {
+            generatePaymentNumber();
+        });
+
+        $('#jenis_pembayaran').select2({
+            placeholder: "Pilih kode bank",
+            theme: "bootstrap-5"
+        }).change(function() {
+            generatePaymentNumber();
         });
 
         $('#supplier_id').select2({
@@ -1050,6 +1072,9 @@
         var formData = new FormData();
         formData.append("type", "Bahan Penolong");
         formData.append("payment_date", $("#payment_date").val());
+        formData.append("bankId", $("#bank_id option:selected").val());
+        formData.append("divisiId", $("#divisi_id option:selected").text());
+        formData.append("jenisPembayaran", $("#jenis_pembayaran option:selected").text());
         
         $(".no_bukti_pembayaran").attr("readonly", true);
         

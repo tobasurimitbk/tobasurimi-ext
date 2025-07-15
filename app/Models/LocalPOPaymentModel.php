@@ -27,6 +27,7 @@ class LocalPOPaymentModel extends Model
         'payment_date',
         'payment_method',
         'type_bayar',
+        'jenis_bayar',
         'bulan',
         'multiple_lpb_no',
         'multiple_lpb_id',
@@ -1344,35 +1345,80 @@ class LocalPOPaymentModel extends Model
     public function getlistLPBmonth() {}
 
 
-    public function get_new_no_po($divisi, $bank, $bln, $thn, $last_day, $companyID)
+    public function get_new_no_po($jenis, $divisi, $bank_id, $bln, $thn, $last_day, $companyID)
     {
-        // Format header dari parameter yang diterima
-        $headParts = array_filter([$divisi, $bank]); // Hapus elemen kosong
-        $head = !empty($headParts) ? implode('/', $headParts) . '/' : ''; // Gabungkan dengan "/" jika ada data
+        $banksModel = new BanksModel();
+        
+        // Step 1: Dapatkan kode bank dari database
+        $kodeBank = '';
+        if (!empty($bank_id)) {
+            $bankData = $banksModel->select('name')
+                                ->where('id', $bank_id)
+                                ->first();
+            if ($bankData) {
+                $name = strtoupper($bankData['name']);
+                if (strpos($name, 'BRI') !== false) {
+                    $kodeBank = 'BRI';
+                } elseif (strpos($name, 'MANDIRI') !== false) {
+                    $kodeBank = 'MND';
+                } elseif (strpos($name, 'BNI') !== false) {
+                    $kodeBank = 'KBA';
+                } elseif (strpos($name, 'BCA') !== false) {
+                    $kodeBank = 'BCI';
+                }
+            }
+        }
 
-        // Tambahkan bulan dan tahun
-        $head .= $bln . $thn . '/';
+        // Step 2: Tentukan kode divisi
+        $kodeDivisi = '';
+        if (!empty($divisi)) {
+            $divisiUpper = strtoupper($divisi);
+            if (strpos($divisiUpper, 'PTS') !== false) {
+                $kodeDivisi = ($jenis == 'MERAH') ? 'MKN' : 'KKN';
+            } elseif (strpos($divisiUpper, 'CANNING') !== false) {
+                $kodeDivisi = ($jenis == 'MERAH') ? 'CNM' : 'CNK';
+            } elseif (strpos($divisiUpper, 'FROZEN I') !== false) {
+                $kodeDivisi = ($jenis == 'MERAH') ? 'FRM' : 'FRK';
+            } elseif (strpos($divisiUpper, 'FROZEN II') !== false) {
+                $kodeDivisi = ($jenis == 'MERAH') ? 'FSM' : 'FSK';
+            } elseif (strpos($divisiUpper, 'GLOBAL') !== false) {
+                $kodeDivisi = ($jenis == 'MERAH') ? 'GBM' : 'GBK';
+            } elseif (strpos($divisiUpper, 'OCS') !== false) {
+                $kodeDivisi = ($jenis == 'MERAH') ? 'OCM' : 'OCK';
+            }
+        }
 
-        // Ambil nomor terakhir berdasarkan format yang sesuai
+        // Step 3: Gabungkan kode divisi dan kode bank
+        $prefix = '';
+        if (!empty($kodeDivisi)) {
+            $prefix .= $kodeDivisi . '/';
+        }
+        if (!empty($kodeBank)) {
+            $prefix .= $kodeBank . '/';
+        }
+
+        // Step 4: Tambahkan tahun, bulan, dan nomor urut
+        $prefix .= $thn . '/' . $bln . '/';
+
+        // Step 5: Query nomor terakhir dan generate nomor baru
         $lastPO = $this->select('payment_no')
-            ->like('payment_no', $head) // Cari dengan prefix yang sudah terbentuk
-            ->where('local_po_payments.createdAt >=', "{$thn}-{$bln}-01 00:00:00")
-            ->where('local_po_payments.createdAt <=', "{$last_day} 23:59:59")
-            ->where('local_po_payments.company_id', $companyID)
-            ->orderBy('payment_no', "DESC")
-            ->first();
+                    ->like('payment_no', $prefix)
+                    ->where('createdAt >=', "{$thn}-{$bln}-01 00:00:00")
+                    ->where('createdAt <=', "{$last_day} 23:59:59")
+                    ->where('company_id', $companyID)
+                    ->where('deletedAt', null)
+                    ->orderBy('payment_no', 'DESC')
+                    ->first();
 
-        // Nomor urut awal
-        $counterFirst = '000001';
-
+        $counterFirst = '0001';
         if ($lastPO == null) {
-            return $head . $counterFirst;
+            return $prefix . $counterFirst;
         } else {
             try {
-                $last = explode('/', $lastPO['payment_no']);
-                $poLastDigit = isset($last[count($last) - 1]) ? (int) $last[count($last) - 1] : 0;
-                $counterNext = str_pad($poLastDigit + 1, strlen($counterFirst), '0', STR_PAD_LEFT);
-                return $head . $counterNext;
+                $lastParts = explode('/', $lastPO['payment_no']);
+                $lastNumber = isset($lastParts[4]) ? (int) $lastParts[4] : 0; // Perhatikan index [4] untuk nomor urut
+                $counterNext = str_pad($lastNumber + 1, 4, '0', STR_PAD_LEFT);
+                return $prefix . $counterNext;
             } catch (Exception $e) {
                 return 'ERROR GENERATE NUMBER ' . date('Y-m-d');
             }

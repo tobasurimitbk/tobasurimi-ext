@@ -2094,36 +2094,38 @@ class JurnalUmum extends BaseController
                 ]);
 
 
-                array_push($result, [
-                    'id_transaksi'      => $id_transaksi_jurnal,
-                    'id_coa'            => $POlocal['akun_pajak'],
-                    'company_id'        => $POlocal['company_id'],
-                    'divisi_id'         => $divisi,
-                    'supplier_id'       => $POlocal['supplier_id'],
-                    'tanggal_jurnal'    =>  $POlocal['payment_date'],
-                    'debit'             => $POlocal['amount_pajak'],
-                    'kredit'            => 0,
-                    'valas'             => '30',
-                    'kurs'              => 1,
-                    'keterangan'        => $POlocal['keterangan'],
-                    'id_inputer'        => session()->get("login")->user_id
-                ]);
+                if ($POlocal['amount_pajak']) {
+                    array_push($result, [
+                        'id_transaksi'      => $id_transaksi_jurnal,
+                        'id_coa'            => $POlocal['akun_pajak'],
+                        'company_id'        => $POlocal['company_id'],
+                        'divisi_id'         => $divisi,
+                        'supplier_id'       => $POlocal['supplier_id'],
+                        'tanggal_jurnal'    =>  $POlocal['payment_date'],
+                        'debit'             => $POlocal['amount_pajak'],
+                        'kredit'            => 0,
+                        'valas'             => '30',
+                        'kurs'              => 1,
+                        'keterangan'        => $POlocal['keterangan'],
+                        'id_inputer'        => session()->get("login")->user_id
+                    ]);
 
-                // Kredit
-                array_push($result, [
-                    'id_transaksi'      => $id_transaksi_jurnal,
-                    'id_coa'            => $POlocal['akun_pajak'],
-                    'company_id'        => $POlocal['company_id'],
-                    'divisi_id'         => $divisi,
-                    'supplier_id'       => $POlocal['supplier_id'],
-                    'tanggal_jurnal'    => $POlocal['payment_date'],
-                    'debit'             => 0,
-                    'kredit'            => $POlocal['amount_pajak'],
-                    'valas'             => '30',
-                    'kurs'              => 1,
-                    'keterangan'        => $POlocal['keterangan'],
-                    'id_inputer'        => session()->get("login")->user_id
-                ]);
+                    // Kredit
+                    array_push($result, [
+                        'id_transaksi'      => $id_transaksi_jurnal,
+                        'id_coa'            => $POlocal['akun_pajak'],
+                        'company_id'        => $POlocal['company_id'],
+                        'divisi_id'         => $divisi,
+                        'supplier_id'       => $POlocal['supplier_id'],
+                        'tanggal_jurnal'    => $POlocal['payment_date'],
+                        'debit'             => 0,
+                        'kredit'            => $POlocal['amount_pajak'],
+                        'valas'             => '30',
+                        'kurs'              => 1,
+                        'keterangan'        => $POlocal['keterangan'],
+                        'id_inputer'        => session()->get("login")->user_id
+                    ]);
+                }
 
                 // Input Ke Jurnal Umum
                 $this->jurnalUmumModel->insertJurnalBatch($result);

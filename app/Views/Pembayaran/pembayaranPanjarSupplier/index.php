@@ -26,9 +26,6 @@
                                             <input autocomplete="one-time-code" type="text" class="form-control name" id="no_transaksi" name="no_transaksi" placeholder="No Transaksi">
                                             <label for="no_transaksi">No Transaksi</label>
                                         </div>
-                                        <div style="" class="input-generate input-group-prepend group-prepend-password align-items-center">
-                                            <input autocomplete="one-time-code" style="z-index: 5; margin-bottom: -8px; margin-left: -30px;" class="auto_generate" id="auto_generate" name="auto_generate" type="checkbox" onchange="changeStatus()">
-                                        </div>
                                     </div>
                                 </div>
 
@@ -980,7 +977,7 @@
             $(".title-name").text("Tambah Data Panjar & Pinjaman");
             $(".delete-btn").css('display', 'none');
             $(".add-modal").modal("show");
-
+            changeStatus();
             $(".btn-submit-form").show();
             $(".create-form input, .create-form select, .btn-add-detail").prop("disabled", false);
         });
@@ -1114,11 +1111,8 @@
 
     function changeStatus() {
         const isPinjaman = $("#form-type").val() === "pinjaman";
-        const checkbox = document.getElementById('auto_generate');
         const noTransaksiField = $("#no_transaksi");
 
-        if (checkbox.checked) {
-            // Tentukan endpoint berdasarkan jenis form
             const endpoint = isPinjaman ?
                 "<?= base_url('/pinjaman-supplier/generate-no-pinjaman'); ?>" :
                 "<?= base_url('/panjar-supplier/generate-no-panjar'); ?>";
@@ -1154,10 +1148,6 @@
 
                 }
             });
-        } else {
-            noTransaksiField.val("");
-            $("#no_transaksi").attr('readonly', false);
-        }
     }
 
 

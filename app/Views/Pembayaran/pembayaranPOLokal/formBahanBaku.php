@@ -78,6 +78,16 @@
                         </div>
                     </div>
                     <div class="col-md-4">
+                        <div class="form-floating form-pembayaran-po mb-3" style="height: 50px;">
+                            <select class="form-select" <?= !empty($detail) ? ($detail['pembayaranDetail']['status_posting'] == 1 ? 'disabled' : '') : "" ?> name="jenis_pembayaran" id="jenis_pembayaran">
+                                <option selected value="<?= !empty($detail['pembayaranDetail']['jenis_bayar']) ? $detail['pembayaranDetail']['jenis_bayar'] : '';  ?>"></option>
+                                <option value="MERAH">MERAH</option>
+                                <option value="PUTIH">PUTIH</option>
+                            </select>
+                            <label for="floatingInput" style="z-index: 1;">Jenis Pembayaran</label>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <div class="input-group input-group-password">
                                 <div class="form-floating mb-3" style="height: 50px;">
@@ -114,6 +124,8 @@
                             <label for="floatingInput" style="z-index: 1;">Supplier</label>
                         </div>
                     </div>
+                </div>
+                <div class="row">
                     <div class="col-md-4">
                         <div class="form-floating form-pembayaran-po mb-3" style="height: 50px;">
                             <select class="form-select" <?= !empty($detail) ? ($detail['pembayaranDetail']['status_posting'] == 1 ? 'disabled' : '') : "" ?> name="tipe_pembayaran" id="tipe_pembayaran">
@@ -124,15 +136,6 @@
                             <label for="floatingInput" style="z-index: 1;">Tipe Bayar</label>
                         </div>
                     </div>
-                </div>
-                <div class="row">
-                    <div class="col-md-4">
-                        <div class="form-floating form-pembayaran-po mb-3" style="height: 50px;">
-                            <input type="text" name="jenis_dokumen" class="form-control" id="jenis_dokumen" readonly>
-                            <label for="floatingInput" style="z-index: 1;">Jenis Dokumen</label>
-                        </div>
-                    </div>
-
                     <div class="col-md-4">
                         <div class="bulanan-form">
                             <?php if (!empty($detail)) : ?>
@@ -158,6 +161,14 @@
                         </div>
                     </div>
                     <div class="col-md-4">
+                        <div class="form-floating form-pembayaran-po mb-3" style="height: 50px;">
+                            <input type="text" name="jenis_dokumen" class="form-control" id="jenis_dokumen" readonly>
+                            <label for="floatingInput" style="z-index: 1;">Jenis Dokumen</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <select <?= !empty($detail) ? ($detail['pembayaranDetail']['status_posting'] == 1 ? 'disabled' : '') : "" ?> class="form-select " name="payment_method" id="payment_method">
                                 <option disabled selected value="">Pilih Metode Pembayaran</option>
@@ -167,8 +178,6 @@
                             <label for="floatingInput" style="z-index: 1;">Metode Pembayaran</label>
                         </div>
                     </div>
-                </div>
-                <div class="row">
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <input <?= !empty($detail) ? ($detail['pembayaranDetail']['status_posting'] == 1 ? 'disabled' : '') : "" ?> name="pembayaran_oleh" id="pembayaran_oleh" autocomplete="one-time-code" value="<?= !empty($detail) ? $detail['pembayaranDetail']['pembayaran_oleh'] : session()->get("login")->name; ?>" type="text" class="form-control" placeholder="Pembayaran Oleh">
@@ -186,6 +195,8 @@
                             <label for="floatingInput" style="z-index: 1;">Debit (Opsional)</label>
                         </div>
                     </div>
+                </div>
+                <div class="row">
                     <div class="col-md-4">
                         <div class="form-floating form-pembayaran-po mb-3" style="height: 50px;">
                             <select class="form-select" <?= !empty($detail) ? ($detail['pembayaranDetail']['status_posting'] == 1 ? 'disabled' : '') : "" ?> name="akun_selisih" id="akun_selisih">
@@ -197,8 +208,6 @@
                             <label for="floatingInput" style="z-index: 1;">Kredit</label>
                         </div>
                     </div>
-                </div>
-                <div class="row">
                     <div class="col-md-4">
                         <div class="form-floating form-pembayaran-po mb-3" style="height: 50px;">
                             <select class="form-select" <?= !empty($detail) ? ($detail['pembayaranDetail']['status_posting'] == 1 ? 'disabled' : '') : "" ?> name="akun_kas_pph" id="akun_kas_pph">
@@ -727,6 +736,13 @@
         generatePaymentNumber();
     });
 
+    $('#jenis_pembayaran').select2({
+        placeholder: "Pilih kode bank",
+        theme: "bootstrap-5"
+    }).change(function() {
+        generatePaymentNumber();
+    });
+
     $('#po').select2({
         placeholder: "Pilih No Penerimaan Barang",
         theme: "bootstrap-5",
@@ -750,6 +766,11 @@
 
     $('#akun_selisih_pph').select2({
         placeholder: "Pilih akun kredit pph",
+        theme: "bootstrap-5"
+    });
+
+    $('#jenis_pembayaran').select2({
+        placeholder: "Pilih Jenis Pembayaran",
         theme: "bootstrap-5"
     });
 
@@ -2028,8 +2049,9 @@
 
     function generatePaymentNumber() {
         // Get selected divisi and bank values
+        let jenisPembayaran = $("#jenis_pembayaran option:selected").text();
         let divisiId = $("#divisi_id option:selected").text();
-        let bankId = $("#bank_id option:selected").text();
+        let bankId = $("#bank_id option:selected").val();
         
         // Only generate if this is a new record (empty detail)
         <?php if(empty($detail)): ?>
@@ -2038,7 +2060,7 @@
             
             // Build URL with query parameters
             let url = "<?= base_url('pembayaran-po-lokal-bb/generate-no-pembayaran'); ?>";
-            url += `?divisiId=${encodeURIComponent(divisiId)}&bankId=${encodeURIComponent(bankId)}`;
+            url += `?jenisPembayaran=${encodeURIComponent(jenisPembayaran)}&divisiId=${encodeURIComponent(divisiId)}&bankId=${encodeURIComponent(bankId)}`;
             
             // Additional data if needed
             var formData = new FormData();
