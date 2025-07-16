@@ -314,6 +314,9 @@
                 divisi_id: {
                     required: true
                 },
+                bank_id: {
+                    required: true
+                },
                 status_pph: {
                     required: true
                 },
@@ -358,6 +361,9 @@
                 },
                 divisi_id: {
                     required: "Departemen wajib diisi"
+                },
+                bank_id: {
+                    required: "Bank wajib diisi"
                 },
                 status_pph: {
                     required: "Pilih status pph"

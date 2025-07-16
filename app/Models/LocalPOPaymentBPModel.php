@@ -18,6 +18,7 @@ class LocalPOPaymentBPModel extends Model
     protected $allowedFields    = [
         'company_id',
         'divisi_id',
+        'bank_id',
         'supplier_id',
         'tanda_terima_faktur_id',
         'jenis_pembayaran',
