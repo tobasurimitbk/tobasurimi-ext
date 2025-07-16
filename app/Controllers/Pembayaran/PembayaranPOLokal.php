@@ -151,6 +151,7 @@ class PembayaranPOLokal extends BaseController
             $id = $localPOPaymentBPModel->insert([
                 'company_id' => $this->this_company_id,
                 'divisi_id' => $this->request->getVar('divisi_id'),
+                'bank_id' => $this->request->getVar('bank_id'),
                 'payment_no' => $this->request->getVar('no_bukti_pembayaran'),
                 'supplier_id' => $this->request->getVar('supplier_id'),
                 'tanda_terima_faktur_id' => $this->request->getVar('tanda_terima_faktur_id'),
@@ -241,6 +242,7 @@ class PembayaranPOLokal extends BaseController
                 'payment_no' => $this->request->getVar('no_bukti_pembayaran'),
                 'company_id' => $this->this_company_id,
                 'divisi_id' => $this->request->getVar('divisi_id'),
+                'bank_id' => $this->request->getVar('bank_id'),
                 'supplier_id' => $this->request->getVar('supplier_id'),
                 'tanda_terima_faktur_id' => $this->request->getVar('tanda_terima_faktur_id'),
                 'jenis_pembayaran' => $this->request->getVar('jenis_pembayaran'),
