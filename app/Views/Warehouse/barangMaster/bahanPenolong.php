@@ -282,12 +282,12 @@
                                         <th scope="col" onclick="changeShortPoLokal('am_purchase_orders.po_date')" class="sort">Tanggal</th>
                                         <th scope="col" onclick="changeShortPoLokal('suppliers.name')" class="sort">Supplier</th>
                                         <th scope="col" onclick="changeShortPoLokal('barang_master_spesifikasi.spesifikasi')" class="sort">Barang</th>
-                                        <th scope="col" onclick="changeShortPoLokal('am_purchase_orders.note')" class="sort">Keterangan</th>
-                                        <th scope="col" onclick="changeShortPoLokal('am_purchase_orders.division_id')" class="sort">Departemen</th>
                                         <th scope="col" onclick="changeShortPoLokal('am_purchase_order_details.qty')" class="sort">Qty</th>
                                         <th scope="col" onclick="changeShortPoLokal('am_purchase_order_details.unit')" class="sort">Satuan</th>
                                         <th scope="col" onclick="changeShortPoLokal('am_purchase_order_details.price')" class="sort">Harga</th>
                                         <th scope="col" onclick="changeShortPoLokal('am_purchase_order_details.price')" class="sort">Sub Total Harga</th>
+                                        <th scope="col" onclick="changeShortPoLokal('am_purchase_orders.division_id')" class="sort">Departemen</th>
+                                        <th scope="col" onclick="changeShortPoLokal('am_purchase_orders.note')" class="sort">Keterangan</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -829,48 +829,46 @@
             display: "stripe",
             searching: false,
             columns: [{
-                    data: "no",
-                    className: "text-center",
-                    sortable: false
-                }, {
-                    data: "spp_no",
-                    className: "text-center"
-                }, {
-                    data: "po_no",
-                    className: "text-center"
-                }, {
-                    data: "no_lpb",
-                    className: "text-center"
-                }, {
-                    data: "po_date",
-                    className: "text-center"
-                }, {
-                    data: "nama_supplier",
-                    className: "text-center"
-                }, {
-                    data: "nama_barang",
-                    className: "text-center"
-                }, {
-                    data: "note",
-                    className: "text-center"
-                }, {
-                    data: "divisi",
-                    className: "text-center"
-                }, {
-                    data: "qty",
-                    className: "text-center"
-                }, {
-                    data: "kode_satuan",
-                    className: "text-center"
-                }, {
-                    data: "price",
-                    className: "text-center"
-                },
-                {
-                    data: "sub_total",
-                    className: "text-center"
-                }
-            ],
+                data: "no",
+                className: "text-center",
+                sortable: false
+            }, {
+                data: "spp_no",
+                className: "text-center"
+            }, {
+                data: "po_no",
+                className: "text-center"
+            }, {
+                data: "no_lpb",
+                className: "text-center"
+            }, {
+                data: "po_date",
+                className: "text-center"
+            }, {
+                data: "nama_supplier",
+                className: "text-center"
+            }, {
+                data: "nama_barang",
+                className: "text-center"
+            }, {
+                data: "qty",
+                className: "text-center"
+            }, {
+                data: "kode_satuan",
+                className: "text-center"
+            }, {
+                data: "price",
+                className: "text-center"
+            }, {
+                data: "sub_total",
+                className: "text-center"
+            }, {
+                data: "divisi",
+                className: "text-center"
+            }, {
+                data: "note",
+                className: "text-center"
+            }, ],
             columnDefs: [{
                 defaultContent: "-",
                 targets: "_all"

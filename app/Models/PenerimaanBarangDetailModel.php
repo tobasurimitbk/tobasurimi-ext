@@ -342,4 +342,91 @@ class PenerimaanBarangDetailModel extends Model
             ->groupBy('penerimaan_barang_id')
             ->findAll();
     }
+
+    public function historiHargaPOBahanPenolongByLpb($condition, $addCondition, $limit = 10, $offset = 0)
+    {
+        $availableSort = [
+            'am_purchase_orders.po_no' => 'am_purchase_orders.po_no',
+            'penerimaan_barang.tanggal' => 'penerimaan_barang.tanggal',
+            'suppliers.name'  => 'suppliers.name',
+            'barang_master_spesifikasi.spesifikasi' => 'barang_master_spesifikasi.spesifikasi',
+            'penerimaan_barang_detail.sub_total'    => 'penerimaan_barang_detail.sub_total',
+            'penerimaan_barang.divisi_id' => 'penerimaan_barang.divisi_id',
+            'am_purchase_orders.note' => 'am_purchase_orders.note',
+        ];
+        $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
+
+        $sort = $availableSort[$addCondition['sort'] ?? 'createdAt'] ?? 'penerimaan_barang.createdAt';
+        $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'DESC';
+
+        $selectQry = "
+            CONCAT(barang_master.barang_name, ' - ', barang_master_spesifikasi.spesifikasi) as nama_barang, 
+            am_purchase_orders.po_no,
+            penerimaan_barang.tanggal,
+            am_purchase_order_details.note,
+            suppliers.name as nama_supplier,
+            penerimaan_barang_detail.harga, 
+            penerimaan_barang_detail.qty,
+            penerimaan_barang_detail.sub_total, 
+            divisis.divisi,
+            satuans.kode_satuan,
+            purchase_requests.spp_no,
+            penerimaan_barang.no_penerimaan_barang
+        ";
+
+        $dataLPB = $this->asArray()
+            ->select($selectQry)
+            ->where($condition)
+            ->join('penerimaan_barang', 'penerimaan_barang.id = penerimaan_barang_detail.penerimaan_barang_id', 'left')
+            ->join('am_purchase_orders', 'am_purchase_orders.id  = penerimaan_barang_detail.purchase_order_id')
+            ->join('am_purchase_order_details', 'am_purchase_order_details.id  = penerimaan_barang_detail.purchase_order_details_id')
+            ->join('purchase_requests', 'purchase_requests.id = am_purchase_orders.purchase_request_id', 'left')
+            ->join('barang_master', 'barang_master.id = penerimaan_barang_detail.barang_id', 'left')
+            ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = penerimaan_barang_detail.spesifikasi_id', 'left')
+            ->join('suppliers', 'suppliers.id = am_purchase_orders.supplier_id', 'left')
+            ->join('divisis', 'divisis.id = penerimaan_barang.divisi_id', 'left')
+            ->join('satuans', 'satuans.id = penerimaan_barang_detail.unit', 'left')
+            ->groupBy('penerimaan_barang.id, nama_barang, po_no, tanggal, note, nama_supplier, divisi, kode_satuan, spp_no, no_penerimaan_barang')
+            ->orderBy($sort, $sortType);
+
+        $totalData = $dataLPB->countAllResults(false);
+
+        if ($addCondition['search']) {
+            $dataLPB->groupStart();
+        }
+
+        if ($addCondition['start_date'] && $addCondition['end_date']) {
+            $startDate = date('Y-m-d', strtotime($addCondition['start_date']));
+            $endDate = date('Y-m-d', strtotime($addCondition['end_date']));
+
+            $dataLPB->where('am_purchase_orders.tanggal >=', $startDate)
+                ->where('am_purchase_orders.tanggal <=', $endDate);
+        }
+
+        if ($addCondition['search']) {
+            $dataLPB->like('purchase_requests.spp_no', $addCondition['search'])
+                ->orLike('suppliers.name', $addCondition['search'])
+                ->orLike("CONCAT(barang_master.barang_name, ' ', barang_master_spesifikasi.spesifikasi)", $addCondition['search'])
+                ->orLike('am_purchase_orders.note', $addCondition['search'])
+                ->orLike('divisis.divisi', $addCondition['search'])
+                ->orLike('penerimaan_barang_detail.qty', $addCondition['search'])
+                ->orLike('satuans.kode_satuan', $addCondition['search'])
+                ->orLike('penerimaan_barang_detail.harga', $addCondition['search']);
+        }
+
+        if ($addCondition['search']) {
+            $dataLPB->groupEnd();
+        }
+
+        $totalFilteredData = $dataLPB->countAllResults(false);
+        $data = $dataLPB->findAll($limit, $offset);
+
+        return [
+            'data'              => $data,
+            'totalData'         => $totalData,
+            'totalFilteredData' => $totalFilteredData,
+            'sort'  => $sort,
+            'sortType'  => $sortType
+        ];
+    }
 }

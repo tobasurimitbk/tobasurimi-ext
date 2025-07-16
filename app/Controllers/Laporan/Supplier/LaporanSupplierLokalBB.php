@@ -1658,53 +1658,41 @@ class LaporanSupplierLokalBB extends BaseController
             $sheet->getStyle("A{$rowExcel}")->getFont()->setBold(true);
             $rowExcel++;
 
-            $headers = [
-                'No.',
-                'Supplier',
-                'Divisi',
-                'Barang',
-                'Spek',
-                'Satuan',
-                'QTY',
-                'DPP Umum',
-                'PPH Umum',
-                'Total Umum',
-                'DPP Harian',
-                'PPH Harian',
-                'Total Harian',
-                'DPP Bulanan',
-                'PPH Bulanan',
-                'Total Bulanan',
-                'DPP Subsidi',
-                'PPH Subsidi',
-                'Total Subsidi',
-                'TOTAL'
-            ];
+            // Header baris 1 (rowExcel)
+            $sheet->setCellValue("A{$rowExcel}", "No");
+            $sheet->mergeCells("A{$rowExcel}:A" . ($rowExcel + 1));
+            $sheet->setCellValue("B{$rowExcel}", "Supplier");
+            $sheet->mergeCells("B{$rowExcel}:B" . ($rowExcel + 1));
+            $sheet->setCellValue("C{$rowExcel}", "Divisi");
+            $sheet->mergeCells("C{$rowExcel}:C" . ($rowExcel + 1));
+            $sheet->setCellValue("D{$rowExcel}", "Barang");
+            $sheet->mergeCells("D{$rowExcel}:D" . ($rowExcel + 1));
+            $sheet->setCellValue("E{$rowExcel}", "Spek");
+            $sheet->mergeCells("E{$rowExcel}:E" . ($rowExcel + 1));
+            $sheet->setCellValue("F{$rowExcel}", "Satuan");
+            $sheet->mergeCells("F{$rowExcel}:F" . ($rowExcel + 1));
+            $sheet->setCellValue("G{$rowExcel}", "QTY");
+            $sheet->mergeCells("G{$rowExcel}:G" . ($rowExcel + 1));
 
-            foreach ($headers as $i => $title) {
-                $col = chr(65 + $i);
-                $sheet->setCellValue("{$col}{$rowExcel}", $title);
-                $sheet->getStyle("{$col}{$rowExcel}")->getFont()->setBold(true);
+            $grup = ['Harian', 'Tambahan Harian', 'Tambahan Bulanan', 'Subsidi'];
+            $startCol = 'H';
+            foreach ($grup as $grupName) {
+                $col1 = $startCol;
+                $col2 = chr(ord($startCol) + 2);
+                $sheet->setCellValue("{$col1}{$rowExcel}", $grupName);
+                $sheet->mergeCells("{$col1}{$rowExcel}:{$col2}{$rowExcel}");
+                $sheet->setCellValue("{$col1}" . ($rowExcel + 1), 'DPP');
+                $sheet->setCellValue(chr(ord($col1) + 1) . ($rowExcel + 1), 'PPH');
+                $sheet->setCellValue($col2 . ($rowExcel + 1), 'Dibayar');
+                $startCol = chr(ord($col2) + 1);
             }
 
-            $rowExcel++;
+            $sheet->setCellValue("T{$rowExcel}", "TOTAL");
+            $sheet->mergeCells("T{$rowExcel}:T" . ($rowExcel + 1));
+            $sheet->getStyle("A{$rowExcel}:T" . ($rowExcel + 1))->getFont()->setBold(true);
+            $sheet->getStyle("A{$rowExcel}:T" . ($rowExcel + 1))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER)->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER);
 
-            $subTotal = array_fill_keys([
-                'qtyPO',
-                'dppUmum',
-                'pphUmum',
-                'totalUmum',
-                'dppHarian',
-                'pphHarian',
-                'totalHarian',
-                'dppBulanan',
-                'pphBulanan',
-                'totalBulanan',
-                'subsidi',
-                'pphSubsidi',
-                'totalSubsidi',
-                'totalRow'
-            ], 0);
+            $rowExcel += 2;
 
             foreach ($rows as &$row) {
                 $subsidi = $pph = $total = 0;
@@ -1713,40 +1701,17 @@ class LaporanSupplierLokalBB extends BaseController
                 foreach ($row['poDetails'] as $po) {
                     $qty = $po['qty'];
                     $s = $po['subsidi'];
-
                     if ($po['isSubsidiFixed']) {
                         if ($hasFixed) continue;
                         $hasFixed = true;
-
-                        if ($po['pphMode'] === 'Company') {
-                            $d = $s / $po['nilai_pph'];
-                            $p = $d * $po['nilai_pph2'];
-                            $t = $d - $p;
-                        } elseif ($po['pphMode'] === 'Supplier') {
-                            $d = $s;
-                            $p = $d * $po['nilai_pph2'];
-                            $t = $d - $p;
-                        } else {
-                            $d = $s;
-                            $p = 0;
-                            $t = $d;
-                        }
+                        $d = $po['pphMode'] === 'Company' ? $s / $po['nilai_pph'] : $s;
+                        $p = $po['pphMode'] !== 'None' ? $d * $po['nilai_pph2'] : 0;
+                        $t = $d - $p;
                     } else {
-                        if ($po['pphMode'] === 'Company') {
-                            $d = ($s / $po['nilai_pph']) * $qty;
-                            $p = $d * $po['nilai_pph2'];
-                            $t = $d - $p;
-                        } elseif ($po['pphMode'] === 'Supplier') {
-                            $d = $s * $qty;
-                            $p = $d * $po['nilai_pph2'];
-                            $t = $d - $p;
-                        } else {
-                            $d = $s * $qty;
-                            $p = 0;
-                            $t = $d;
-                        }
+                        $d = $po['pphMode'] === 'Company' ? ($s / $po['nilai_pph']) * $qty : $s * $qty;
+                        $p = $po['pphMode'] !== 'None' ? $d * $po['nilai_pph2'] : 0;
+                        $t = $d - $p;
                     }
-
                     $subsidi += $d;
                     $pph += $p;
                     $total += $t;
@@ -1783,39 +1748,17 @@ class LaporanSupplierLokalBB extends BaseController
                 foreach ($data as $i => $val) {
                     $col = chr(65 + $i);
                     $cell = "{$col}{$rowExcel}";
-                    if ($i === 0) {
-                        $sheet->setCellValueExplicit($cell, $val, DataType::TYPE_STRING);
-                    } elseif ($i >= 6) {
-                        $sheet->setCellValue($cell, $val);
+                    $sheet->setCellValue($cell, $val);
+                    if ($i >= 6) {
                         $format = $i === 6 ? '#,##0' : '#,##0.00';
                         $sheet->getStyle($cell)->getNumberFormat()->setFormatCode($format);
-                    } else {
-                        $sheet->setCellValue($cell, $val);
                     }
-                }
-
-                foreach ($subTotal as $k => $_) {
-                    $subTotal[$k] += $row[$k];
                 }
 
                 $rowExcel++;
             }
 
-            // Total per barangName
-            $sheet->setCellValue("A{$rowExcel}", "TOTAL {$barangName}");
-            $sheet->mergeCells("A{$rowExcel}:F{$rowExcel}");
-
-            $data = array_values($subTotal);
-            foreach ($data as $i => $val) {
-                $col = chr(71 + $i);
-                $cell = "{$col}{$rowExcel}";
-                $sheet->setCellValue($cell, $val);
-                $format = $i === 0 ? '#,##0' : '#,##0.00';
-                $sheet->getStyle($cell)->getNumberFormat()->setFormatCode($format);
-            }
-
-            $sheet->getStyle("A{$rowExcel}:T{$rowExcel}")->getFont()->setBold(true);
-            $rowExcel += 2;
+            $rowExcel++;
         }
 
         foreach (range('A', 'T') as $col) {
@@ -1826,12 +1769,10 @@ class LaporanSupplierLokalBB extends BaseController
         header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
         header("Content-Disposition: attachment;filename=\"{$filename}\"");
         header('Cache-Control: max-age=0');
-
         $writer = new Xlsx($spreadsheet);
         $writer->save('php://output');
         exit;
     }
-
 
     public function laporanRekapPerSupplier()
     {

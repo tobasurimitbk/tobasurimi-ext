@@ -12,6 +12,7 @@ use App\Models\BarangMasterSpesifikasiModel;
 use App\Models\ParentBarangModel;
 use App\Models\SatuansModel;
 use App\Models\DivisisModel;
+use App\Models\PenerimaanBarangDetailModel;
 use Exception;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
@@ -523,6 +524,7 @@ class Barang extends BaseController
     public function historiHargaPOBahanPenolong()
     {
         $amPurchaseOrderModel = new AMPurchaseOrderModel();
+        $penerimaanBarangDetailModel = new PenerimaanBarangDetailModel();
 
         $payload = [
             "pageSize" => $this->request->getGet("length"),
@@ -533,11 +535,11 @@ class Barang extends BaseController
         ];
 
         $condition = [
-            "am_purchase_orders.company_id"  => $this->this_company_id,
-            "am_purchase_order_details.spesifikasi_id" => $this->request->getVar('id'),
-            "am_purchase_orders.deletedAt" => NULL,
-            "am_purchase_order_details.deletedAt" => NULL,
-            "am_purchase_orders.po_type" => $this->request->getVar('po_type')
+            "penerimaan_barang.company_id"  => $this->this_company_id,
+            "penerimaan_barang_detail.spesifikasi_id" => $this->request->getVar('id'),
+            "penerimaan_barang.deletedAt" => NULL,
+            "penerimaan_barang_detail.deletedAt" => NULL,
+            "penerimaan_barang.status_penerimaan" => strtoupper($this->request->getVar('po_type'))
         ];
 
         $addCondition = [
@@ -551,7 +553,7 @@ class Barang extends BaseController
         $limit = $this->request->getGet("length");
         $offset = $this->request->getGet("start");
 
-        $res = $amPurchaseOrderModel->historiHargaPOBahanPenolongByLpb($condition, $addCondition, $limit, $offset);
+        $res = $penerimaanBarangDetailModel->historiHargaPOBahanPenolongByLpb($condition, $addCondition, $limit, $offset);
 
         $rdata = [];
         $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
@@ -561,15 +563,15 @@ class Barang extends BaseController
                 "po_no"                 => $data['po_no'],
                 "no_lpb"                => $data['no_penerimaan_barang'],
                 "spp_no"                => $data['spp_no'],
-                "po_date"               => date('d/m/Y', strtotime($data['po_date'])),
+                "po_date"               => date('d/m/Y', strtotime($data['tanggal'])),
                 "nama_supplier"         => $data['nama_supplier'],
                 "nama_barang"           => $data['nama_barang'],
                 'divisi'                => $data['divisi'],
                 'note'                  => $data['note'],
-                'qty'                   => floatval($data['total_qty']),
+                'qty'                   => floatval($data['qty']),
                 'kode_satuan'           => $data['kode_satuan'],
-                "price"                 => number_format($data['total_harga'], 2, ',', '.'),
-                "sub_total"             => number_format($data['total_sub_total'], 2, ',', '.'),
+                "price"                 => number_format($data['harga'], 2, ',', '.'),
+                "sub_total"             => number_format($data['sub_total'], 2, ',', '.'),
             ]);
         }
 
