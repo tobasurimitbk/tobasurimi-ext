@@ -190,17 +190,6 @@
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating form-pembayaran-po mb-3" style="height: 50px;">
-                            <select class="form-select" <?= !empty($detail) ? ($detail['pembayaranDetail']['status_posting'] == 1 ? 'disabled' : '') : ""  ?> name="akun_pajak" id="akun_pajak">
-                                <option disabled selected value=""></option>
-                                <?php foreach ($subsAkuns as $subs) : ?>
-                                    <option <?= !empty($detail) ? ($detail['pembayaranDetail']['akun_pajak'] == $subs->id ? 'selected' : '') : '' ?> value="<?= $subs->id ?>"><?= strtoupper($subs->no_sub . " " . $subs->nama_sub) ?></option>
-                                <?php endforeach ?>
-                            </select>
-                            <label for="floatingInput" style="z-index: 1;">Akun Pajak</label>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="form-floating form-pembayaran-po mb-3" style="height: 50px;">
                             <textarea class="form-control" name="supplier" id="supplier" <?= !empty($detail) ? ($detail['pembayaranDetail']['status_posting'] == 1 ? 'readonly' : '') : '' ?> placeholder="supplier"><?= !empty($detail) ? $detail['pembayaranDetail']['supplier'] : ''  ?></textarea>
                             <label for="floatingInput" style="z-index: 1;">Pembayaran Ke</label>
                         </div>
@@ -319,9 +308,6 @@
                 akun_selisih: {
                     required: true
                 },
-                akun_pajak: {
-                    required: true
-                },
                 jenis_pembayaran: {
                     required: true
                 },
@@ -366,9 +352,6 @@
                 },
                 akun_selisih: {
                     required: "Akun selisih wajib diisi"
-                },
-                akun_pajak: {
-                    required: "Akun Pajak wajib diisi"
                 },
                 jenis_pembayaran: {
                     required: "Jenis Pembayaran wajib diisi"
@@ -420,11 +403,6 @@
             theme: "bootstrap-5"
         });
 
-        $('#akun_pajak').select2({
-            placeholder: "Akun Pajak",
-            theme: "bootstrap-5"
-        });
-
         $('#payment_method').select2({
             placeholder: "Metode Pembayaran",
             theme: "bootstrap-5"
@@ -465,7 +443,7 @@
         });
 
         $('#jenis_pembayaran').select2({
-            placeholder: "Pilih kode bank",
+            placeholder: "Pilih Jenis Pembayaran",
             theme: "bootstrap-5"
         }).change(function() {
             generatePaymentNumber();

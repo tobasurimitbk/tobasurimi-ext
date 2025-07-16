@@ -422,6 +422,7 @@ $routes->post('/ambil-gaji/check-ambil-gaji', 'Pembayaran\AmbilGaji::checkIsAmbi
 $routes->get('/ambil-pinjaman-karyawan', 'Pembayaran\AmbilPinjamanKaryawan::index', ['filter' => 'Auth']);
 $routes->get('/ambil-pinjaman-karyawan/all', 'Pembayaran\AmbilPinjamanKaryawan::getAllAmbilPinjamanKaryawan', ['filter' => 'Auth']);
 $routes->post('/ambil-pinjaman-karyawan/check-ambil-pinjaman', 'Pembayaran\AmbilPinjamanKaryawan::checkIsAmbil', ['filter' => 'Auth']);
+
 // PEMBAYARAN PO LOKAL BP
 $routes->get('/pembayaran-po-lokal-bp', 'Pembayaran\PembayaranPOLokal::pembayaranPOLokalBP', ['filter' => 'Auth']);
 $routes->get('/pembayaran-po-lokal-bp/create', 'Pembayaran\PembayaranPOLokal::createPembayaranPOLokalBP', ['filter' => 'Auth']);
@@ -491,6 +492,7 @@ $routes->post('/pembayaran-lain/delete', 'Pembayaran\OtherPayment::delete', ['fi
 $routes->get('/pembayaran-lain/all', 'Pembayaran\OtherPayment::all', ['filter' => 'Auth']);
 $routes->post('/pembayaran-lain/posting', 'Pembayaran\OtherPayment::posting', ['filter' => 'Auth']);
 $routes->post('/pembayaran-lain/update', 'Pembayaran\OtherPayment::updateAction', ['filter' => 'Auth']);
+
 // penerimaan pembayaran SO
 $routes->get('/penerimaan-penjualan-lokal', 'Penerimaan\SalesOrderPayment::index', ['filter' => 'Auth']);
 $routes->get('/penerimaan-penjualan-lokal/create', 'Penerimaan\SalesOrderPayment::create', ['filter' => 'Auth']);

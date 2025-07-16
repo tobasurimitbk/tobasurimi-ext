@@ -28,6 +28,7 @@ use App\Models\KursModel;
 use App\Models\OtherPaymentModel;
 use App\Models\OtherPaymentDetailModel;
 use App\Models\PembayaranInvoiceDetailModel;
+use App\Models\PajakTandaTerimaFakturModel;
 use App\Models\PembayaranInvoiceModel;
 use App\Models\PenerimaanBarangModel;
 use App\Models\SalesOrderLainDetailModel;
@@ -49,6 +50,7 @@ use App\Models\PinjamanSupplierModel;
 use App\Models\EmployeesModel;
 use App\Models\LocalPOPaymentBPModel;
 use App\Models\PenerimaanBarangDetailModel;
+use App\Models\TaxModel;
 use Carbon\Carbon;
 
 class JurnalUmum extends BaseController
@@ -2016,7 +2018,7 @@ class JurnalUmum extends BaseController
                                     'kredit'            => 0,
                                     'valas'             => '30',
                                     'kurs'              => 1,
-                                    'keterangan'        => "PAJAK". $POlocal->keterangan,
+                                    'keterangan'        => "PAJAK ". $POlocal->keterangan,
                                     'id_inputer'        => session()->get("login")->user_id
                                 );
                                 $result[] = array(
@@ -2030,7 +2032,7 @@ class JurnalUmum extends BaseController
                                     'kredit'            => ($sumValue),
                                     'valas'             => '30',
                                     'kurs'              => 1,
-                                    'keterangan'        => "PAJAK". $POlocal->keterangan,
+                                    'keterangan'        => "PAJAK ". $POlocal->keterangan,
                                     'id_inputer'        => session()->get("login")->user_id
                                 );
                         }
@@ -2042,6 +2044,12 @@ class JurnalUmum extends BaseController
         } elseif ($module == "LOKAL BP") {
             $result = array();
             $POlocal = $this->localPoPaymentBpModel->where('id', $payID)->first();
+            $pajakTandaTerimaFakturModel = new PajakTandaTerimaFakturModel();
+
+            $pajakTandaTerima = $pajakTandaTerimaFakturModel->where("tanda_terima_faktur_id", $POlocal['tanda_terima_faktur_id'])
+                                                        ->where("deletedAt", null)
+                                                        ->findAll();
+
             if ($POlocal) {
                 $dataMetadataTipeTransaksi = $this->MetadataModel->asObject()->where('name', 'tipe_transaksi')->where('value', 'PEMBAYARAN')->findAll();
                 foreach ($dataMetadataTipeTransaksi as $val) {
@@ -2095,37 +2103,41 @@ class JurnalUmum extends BaseController
                 ]);
 
 
-                if ($POlocal['amount_pajak']) {
-                    array_push($result, [
-                        'id_transaksi'      => $id_transaksi_jurnal,
-                        'id_coa'            => $POlocal['akun_pajak'],
-                        'company_id'        => $POlocal['company_id'],
-                        'divisi_id'         => $divisi,
-                        'supplier_id'       => $POlocal['supplier_id'],
-                        'tanggal_jurnal'    =>  $POlocal['payment_date'],
-                        'debit'             => $POlocal['amount_pajak'],
-                        'kredit'            => 0,
-                        'valas'             => '30',
-                        'kurs'              => 1,
-                        'keterangan'        => "Pajak". $POlocal['keterangan'],
-                        'id_inputer'        => session()->get("login")->user_id
-                    ]);
+                if ($pajakTandaTerima) {
+                    foreach ($pajakTandaTerima as $ptt) {
+                        $taxesModel = new TaxModel();
+                        $tax = $taxesModel->where('name', $ptt['tax_type'])->first();
+                        array_push($result, [
+                            'id_transaksi'      => $id_transaksi_jurnal,
+                            'id_coa'            => $tax['akun_debit'],
+                            'company_id'        => $POlocal['company_id'],
+                            'divisi_id'         => $divisi,
+                            'supplier_id'       => $POlocal['supplier_id'],
+                            'tanggal_jurnal'    =>  $POlocal['payment_date'],
+                            'debit'             => $ptt['tax_amt'],
+                            'kredit'            => 0,
+                            'valas'             => '30',
+                            'kurs'              => 1,
+                            'keterangan'        => "Pajak ". $POlocal['keterangan'],
+                            'id_inputer'        => session()->get("login")->user_id
+                        ]);
 
-                    // Kredit
-                    array_push($result, [
-                        'id_transaksi'      => $id_transaksi_jurnal,
-                        'id_coa'            => $POlocal['akun_pajak'],
-                        'company_id'        => $POlocal['company_id'],
-                        'divisi_id'         => $divisi,
-                        'supplier_id'       => $POlocal['supplier_id'],
-                        'tanggal_jurnal'    => $POlocal['payment_date'],
-                        'debit'             => 0,
-                        'kredit'            => $POlocal['amount_pajak'],
-                        'valas'             => '30',
-                        'kurs'              => 1,
-                        'keterangan'        => "Pajak". $POlocal['keterangan'],
-                        'id_inputer'        => session()->get("login")->user_id
-                    ]);
+                        // Kredit
+                        array_push($result, [
+                            'id_transaksi'      => $id_transaksi_jurnal,
+                            'id_coa'            => $tax['akun_kredit'],
+                            'company_id'        => $POlocal['company_id'],
+                            'divisi_id'         => $divisi,
+                            'supplier_id'       => $POlocal['supplier_id'],
+                            'tanggal_jurnal'    => $POlocal['payment_date'],
+                            'debit'             => 0,
+                            'kredit'            => $ptt['tax_amt'],
+                            'valas'             => '30',
+                            'kurs'              => 1,
+                            'keterangan'        => "Pajak ". $POlocal['keterangan'],
+                            'id_inputer'        => session()->get("login")->user_id
+                        ]);
+                    }
                 }
 
                 // Input Ke Jurnal Umum

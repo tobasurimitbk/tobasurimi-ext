@@ -9,7 +9,7 @@
             Export
         </button>
         <ul class="dropdown-menu list-dropdown-company" aria-labelledby="dropdownMenuButtonExport">
-            <!-- <li><button class="dropdown-item pdf" onclick="pdf('<?= base_url("/laporan-supplier-lokal-bb/rekap-all-supplier/print"); ?>')">PDF</button></li> -->
+            <li><button class="dropdown-item pdf" onclick="pdf('<?= base_url("/laporan-supplier-lokal-bb/rekap-all-supplier/print"); ?>')">PDF</button></li>
             <li><button class="dropdown-item pdf" onclick="pdf('<?= base_url("/laporan-supplier-lokal-bb/rekap-all-supplier/print-excel"); ?>')">Excel</button></li>
         </ul>
         <div class="col-button-tambah-spp">
@@ -159,7 +159,6 @@
     var row = 0;
 
     var table = $('.dataTable').DataTable({
-
         processing: true,
         serverSide: true,
         ordering: true,
@@ -169,7 +168,7 @@
         fixedHeader: true,
         lengthMenu: [
             [25],
-            [25],
+            [25]
         ],
         pageLength: 25,
         ajax: {
@@ -185,13 +184,11 @@
                 data.filter_divisi = $(".filter_divisi").val();
             },
         },
-        // scrollX: true,
-        "initComplete": function(settings, json) {
+        initComplete: function(settings, json) {
             $('.dataTables_length').empty();
             $('.dataTables_length').html("<div><label class='text-center ml-2 mt-2'>Show <b class='entries-label'>25</b> Entries</label></div>");
             $('.dataTable').wrap("<div style='overflow:auto; width:100%;position:relative;'></div>");
         },
-        //responsive: true,
         display: "stripe",
         searching: false,
         columns: [{
@@ -201,78 +198,75 @@
             },
             {
                 data: "supplierName",
-                className: "text-center",
-
+                className: "text-center"
             },
             {
                 data: "divisiName",
-                className: "text-center",
-
+                className: "text-center"
             },
             {
                 data: "barangName",
-                className: "text-center",
+                className: "text-center"
             },
             {
                 data: "satuanName",
-                className: "text-center",
+                className: "text-center"
             },
             {
                 data: "qtyPO",
-                className: "text-center",
+                className: "text-center"
             },
             {
                 data: "dppUmum",
-                className: "text-center",
+                className: "text-center"
             },
             {
                 data: "pphUmum",
-                className: "text-center",
+                className: "text-center"
             },
             {
                 data: "totalUmum",
-                className: "text-center",
+                className: "text-center"
             },
             {
                 data: "dppHarian",
-                className: "text-center",
+                className: "text-center"
             },
             {
                 data: "pphHarian",
-                className: "text-center",
+                className: "text-center"
             },
             {
                 data: "totalHarian",
-                className: "text-center",
+                className: "text-center"
             },
             {
                 data: "dppBulanan",
-                className: "text-center",
+                className: "text-center"
             },
             {
                 data: "pphBulanan",
-                className: "text-center",
+                className: "text-center"
             },
             {
                 data: "totalBulanan",
-                className: "text-center",
+                className: "text-center"
             },
             {
                 data: "subsidi",
-                className: "text-center",
+                className: "text-center"
             },
             {
                 data: "pphSubsidi",
-                className: "text-center",
-
+                className: "text-center"
             },
             {
                 data: "totalSubsidi",
-                className: "text-center",
+                className: "text-center"
             },
             {
                 data: "totalRow",
-                className: "text-center",
+                className: "text-center"
             },
         ],
         columnDefs: [{
@@ -281,23 +275,32 @@
         }],
         footerCallback: function(row, data, start, end, display) {
             var api = this.api();
+            var json = api.ajax.json();
 
-            // Kolom-kolom yang ingin di-total (indeks dimulai dari 0)
-            var columnsToSum = [5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18];
+            const colMap = {
+                5: 'qtyAll',
+                6: 'dppUmum',
+                7: 'pphUmum',
+                8: 'totalUmum',
+                9: 'dppHarian',
+                10: 'pphHarian',
+                11: 'totalHarian',
+                12: 'dppBulanan',
+                13: 'pphBulanan',
+                14: 'totalBulanan',
+                15: 'subsidi',
+                16: 'pphSubsidi',
+                17: 'totalSubsidi',
+                18: 'totalRow'
+            };
 
-            columnsToSum.forEach(function(col) {
-                var total = api
-                    .column(col, {
-                        page: 'current'
-                    })
-                    .data()
-                    .reduce(function(a, b) {
-                        return destroyFormatRupiah(a) + destroyFormatRupiah(b);
-                    }, 0);
-
-                // Update footer
-                $(api.column(col).footer()).html(greatFormatRupiah(total.toFixed(2)));
-            });
+            for (const [colIndex, key] of Object.entries(colMap)) {
+                if (json.totalFooter && json.totalFooter[key]) {
+                    $(api.column(colIndex).footer()).html(greatFormatRupiah(json.totalFooter[key]));
+                } else {
+                    $(api.column(colIndex).footer()).html('-');
+                }
+            }
         },
         language: {
             emptyTable: "Tidak Ada Data",
@@ -307,7 +310,7 @@
                 next: '<i class="fa fa-angle-right"></i>'
             }
         }
-    })
+    });
 
     const changeSort = function(val) {
         if (sort !== val) {

@@ -21,6 +21,7 @@ use App\Models\TandaTerimaFakturDetailModel;
 use App\Models\TandaTerimaFakturModel;
 use App\Models\Sub_AkunsModel;
 use Dompdf\Dompdf;
+use App\Models\TaxModel;
 use Exception;
 use PhpOffice\PhpSpreadsheet\Reader\Xml\Style\NumberFormat;
 use PhpParser\Node\Stmt\TryCatch;
@@ -404,6 +405,8 @@ class PembayaranPOLokal extends BaseController
             }
 
 
+            $taxModel = new TaxModel();
+            $akunPajakId = $taxModel->where('name', 'PPH PASAL 22')->first();
 
             $id = $localPOPaymentModel->insert([
                 'company_id'        => $this->this_company_id,
@@ -427,7 +430,7 @@ class PembayaranPOLokal extends BaseController
                 'keterangan'        => $this->request->getVar('keterangan'),
                 'akun_kas'          => $this->request->getVar('akun_kas'),
                 'akun_selisih'      => $this->request->getVar('akun_selisih'),
-                'akun_pajak'      => $this->request->getVar('akun_pajak')
+                'akun_pajak'      =>  $akunPajakId['akun_kredit'],
 
             ]);
 
@@ -560,6 +563,9 @@ class PembayaranPOLokal extends BaseController
             }
 
             // Update data pembayaran utama
+            $taxModel = new TaxModel();
+            $akunPajakId = $taxModel->where('name', 'PPH PASAL 22')->first();
+
             $localPOPaymentModel->update($id, [
                 'divisi_id'         => $this->request->getVar('divisi_id'),
                 'supplier_id'       => $this->request->getVar('supplier_id'),
@@ -578,10 +584,9 @@ class PembayaranPOLokal extends BaseController
                 'amount'            => $total_pembayaran,
                 'amount_pajak'        => $this->request->getVar('total_pembayaran_pph'),
                 'keterangan'        => $this->request->getVar('keterangan'),
-                'akun_pajak'          => $this->request->getVar('akun_pajak')
+                'akun_pajak'      =>  $akunPajakId['akun_kredit'],
             ]);
 
-            // Hapus detail pembayaran lama sebelum insert baru
             // Hapus detail pembayaran lama sebelum insert baru
             $localPOPaymentDetailModel->where('local_po_payment_id', $id)->delete();
             $validPembayaranList = array_filter($pembayaranList, function ($item) {

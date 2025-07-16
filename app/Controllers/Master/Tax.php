@@ -5,6 +5,7 @@ namespace App\Controllers\Master;
 use App\Controllers\BaseController;
 
 use App\Models\TaxModel;
+use App\Models\Sub_AkunsModel;
 
 class Tax extends BaseController
 {
@@ -21,7 +22,17 @@ class Tax extends BaseController
 
     public function index()
     {
-        return view('Master/tax/index');
+        $Sub_AkunsModel = new Sub_AkunsModel();
+
+        $subAkunsModel = $Sub_AkunsModel->asObject()
+            ->where('company_id', $this->this_company_id)
+            ->where('deletedAt', null)
+            ->findAll();
+
+        $data = [
+            "akun_coa" => $subAkunsModel,
+        ];
+        return view('Master/tax/index', $data);
     }
 
     public function all()
@@ -35,7 +46,7 @@ class Tax extends BaseController
         ];
 
         $condition = [
-            'company_id' => session()->get("login")->this_company_id,
+            'taxes.company_id' => session()->get("login")->this_company_id,
         ];
 
         $addCondition = [
@@ -59,6 +70,8 @@ class Tax extends BaseController
                 "tax_name"      => $data->name,
                 "tax_type"      => strtoupper($data->type),
                 "tax_value"     => $data->tax_value,
+                "akun_kredit"     => $data->akun_kredit_nama ."|". $data->akun_kredit_no,
+                "akun_debit"     => $data->akun_debit_nama ."|". $data->akun_debit_no,
             ]);
         }
 
@@ -95,6 +108,18 @@ class Tax extends BaseController
                     'errors' => [
                         'required' => 'Nilai tax tidak boleh kosong'
                     ]
+                    ],
+                "akun_kredit" => [
+                    "rules" => "required",
+                    'errors' => [
+                        'required' => 'Akun Kredit tidak boleh kosong'
+                    ]
+                ],
+                "akun_debit" => [
+                    "rules" => "required",
+                    'errors' => [
+                        'required' => 'Akun Debit tidak boleh kosong'
+                    ]
                 ]
             ];
 
@@ -102,12 +127,16 @@ class Tax extends BaseController
                 $tax_name =  $this->request->getPost("tax_name");
                 $tax_type =  $this->request->getPost("tax_type");
                 $tax_value =  $this->request->getPost("tax_value");
+                $akun_kredit =  $this->request->getPost("akun_kredit");
+                $akun_debit =  $this->request->getPost("akun_debit");
 
                 $values = [
                     "company_id" => $this->this_company_id,
                     "name" => $tax_name,
                     "type" => $tax_type,
                     "tax_value" => $tax_value,
+                    "akun_kredit" => $akun_kredit,
+                    "akun_debit" => $akun_debit,
                 ];
                 if ($this->taxModel->insert($values)) {
                     $data = [
@@ -160,6 +189,18 @@ class Tax extends BaseController
                     'errors' => [
                         'required' => 'Nilai tax tidak boleh kosong'
                     ]
+                ],
+                "akun_kredit" => [
+                    "rules" => "required",
+                    'errors' => [
+                        'required' => 'Akun Kredit tidak boleh kosong'
+                    ]
+                ],
+                "akun_debit" => [
+                    "rules" => "required",
+                    'errors' => [
+                        'required' => 'Akun Debit tidak boleh kosong'
+                    ]
                 ]
             ];
 
@@ -168,12 +209,16 @@ class Tax extends BaseController
                 $tax_name =  $this->request->getPost("tax_name");
                 $tax_type =  $this->request->getPost("tax_type");
                 $tax_value =  $this->request->getPost("tax_value");
+                $akun_kredit =  $this->request->getPost("akun_kredit");
+                $akun_debit =  $this->request->getPost("akun_debit");
 
                 $values = [
                     "company_id" => $this->this_company_id,
                     "name" => $tax_name,
                     "type" => $tax_type,
                     "tax_value" => $tax_value,
+                    "akun_kredit" => $akun_kredit,
+                    "akun_debit" => $akun_debit,
                 ];
 
                 if ($this->taxModel->where(['id' => $id])->set($values)->update()) {

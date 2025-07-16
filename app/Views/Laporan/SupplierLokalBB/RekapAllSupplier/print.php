@@ -4,172 +4,309 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Laporan Rekap All Supplier</title>
     <style>
-        .company-name {
-            font-weight: 700;
-            border: 1px solid;
+        body {
+            font-family: Arial, sans-serif;
+            font-size: 8pt;
+            margin: 0;
             padding: 5px;
-            border-radius: 7px;
-            margin-bottom: 10px;
-            display: inline-block;
-            min-width: 70px
         }
 
-        .description-container {
-            border: 1px solid;
-            border-radius: 7px;
-            height: 65px;
-            margin-top: 20px;
-            width: 60%;
-            position: relative;
-            padding-top: 7px;
-            padding-left: 17px;
-        }
-
-        .description-label {
-            position: absolute;
-            top: -10px;
-            background: white;
-            left: 15px;
-            padding-left: 3px;
-            padding-right: 5px;
-        }
-
-        .item-table {
-            border: 1px solid;
-            width: 100%;
-            height: 230px;
-            margin-top: 10px;
-            border-collapse: collapse;
-        }
-
-        .item-table th {
-            border-right: 1px solid;
-            border-bottom: 1px solid;
-            font-size: 13px;
-            font-weight: normal;
-            padding: 2px
-        }
-
-        .item-table td {
-            border: 1px solid;
-            font-size: 10px;
-            padding: 2px
-        }
-
-        .signature-table {
-            border-spacing: 30px 0;
-            margin-top: 10px;
-        }
-
-        .txt-bold {
-            font-weight: 700;
-        }
-
-        .txt-center {
+        .header {
             text-align: center;
+            margin-bottom: 5px;
         }
 
-        .txt-right {
+        .header h2 {
+            margin: 0;
+            font-size: 12pt;
+        }
+
+        .info {
+            margin-bottom: 5px;
+        }
+
+        .info table {
+            width: 100%;
+            font-size: 8pt;
+        }
+
+        .table-container {
+            width: 100%;
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            table-layout: fixed;
+            page-break-inside: avoid;
+        }
+
+        th,
+        td {
+            border: 1px solid #000;
+            padding: 3px;
+            text-align: center;
+            word-wrap: break-word;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        th {
+            background-color: #f2f2f2;
+            font-weight: bold;
+            font-size: 8pt;
+            padding: 4px;
+        }
+
+        .sub-header {
+            background-color: #e0e0e0;
+            font-weight: bold;
+        }
+
+        .total-row {
+            font-weight: bold;
+            background-color: #f2f2f2;
+        }
+
+        .text-left {
+            text-align: left;
+        }
+
+        .text-right {
             text-align: right;
         }
 
-        .w-100 {
-            width: 100%;
+        .page-break {
+            page-break-before: always;
+        }
+
+        .section-title {
+            font-weight: bold;
+            margin: 5px 0;
+            background-color: #e0e0e0;
+            padding: 3px;
+            font-size: 9pt;
+        }
+
+        /* Optimized column widths */
+        .col-no {
+            width: 3%;
+        }
+
+        .col-supplier {
+            width: 12%;
+        }
+
+        .col-divisi {
+            width: 8%;
+        }
+
+        .col-barang {
+            width: 10%;
+        }
+
+        .col-spek {
+            width: 8%;
+        }
+
+        .col-satuan {
+            width: 5%;
+        }
+
+        .col-qty {
+            width: 4%;
+        }
+
+        .col-amount {
+            width: 5%;
+        }
+
+        .col-total {
+            width: 6%;
         }
     </style>
 </head>
 
 <body>
-    <h2><?= $header; ?></h2>
-    <table class="w-100">
-        <tbody>
-            <tr>
-                <td style="width:100px">Tanggal</td>
-                <td style="width:10px">:</td>
-                <?php if (!empty($tanggalAwal) && !empty($tanggalAkhir)) : ?>
-                    <td style="width:80px"><?= $tanggalAwal; ?></td>
-                    <td style="width:10px"> S/D </td>
-                    <td><?= $tanggalAkhir; ?></td>
-                <?php else : ?>
-                    <td colspan="3" style="width:80px">ALL</td>
+    <div class="header">
+        <h2><?= $header; ?></h2>
+    </div>
 
-                <?php endif; ?>
-            </tr>
-        </tbody>
-    </table>
+    <div class="info">
+        Tanggal:
 
-    <table class="w-100 item-table">
-        <tr>
-            <th rowspan="2">No.</th>
-            <th rowspan="2">Supplier</th>
-            <th rowspan="2">Bahan Baku</th>
-            <th colspan="3">Harian</th>
-            <th colspan="3">Tambahan Harian</th>
-            <th colspan="3">Tambahan Bulanan</th>
-            <th colspan="3">Subsidi</th>
-            <th rowspan="2">Total</th>
-        </tr>
-        <tr>
-            <th>DPP</th>
-            <th>PPh</th>
-            <th>Dibayarkan</th>
-            <th>DPP</th>
-            <th>PPh</th>
-            <th>Dibayarkan</th>
-            <th>DPP</th>
-            <th>PPh</th>
-            <th>Dibayarkan</th>
-            <th>DPP</th>
-            <th>PPh</th>
-            <th>Dibayarkan</th>
-        </tr>
-        <?php if (!empty($dataOrder)) : ?>
-            <?php foreach ($dataOrder as $do) : ?>
-                <tr>
-                    <td><?= $no++; ?></td>
-                    <td><?= $do['supplierName']; ?></td>
-                    <td><?= $do['barangName']; ?></td>
-                    <td><?= number_format($do['dppUmum'], 2); ?></td>
-                    <td><?= number_format($do['pphUmum'], 2); ?></td>
-                    <td><?= number_format($do['totalUmum'], 2); ?></td>
-                    <td><?= number_format($do['dppHarian'], 2); ?></td>
-                    <td><?= number_format($do['pphHarian'], 2); ?></td>
-                    <td><?= number_format($do['totalHarian'], 2); ?></td>
-                    <td><?= number_format($do['dppBulanan'], 2); ?></td>
-                    <td><?= number_format($do['pphBulanan'], 2); ?></td>
-                    <td><?= number_format($do['totalBulanan'], 2); ?></td>
-                    <td><?= number_format($do['subsidi'], 2); ?></td>
-                    <td><?= number_format($do['pphSubsidi'], 2); ?></td>
-                    <td><?= number_format($do['totalSubsidi'], 2); ?></td>
-                    <td><?= number_format($do['totalRow'], 2); ?></td>
-                </tr>
-            <?php endforeach; ?>
-            <tr>
-                <td colspan="3">Total</td>
-                <td id="totalDppUmum"><?= number_format($totalDppUmum, 2); ?></td>
-                <td id="totalPphUmum"><?= number_format($totalPphUmum, 2); ?></td>
-                <td id="totalTotalUmum"><?= number_format($totalTotalUmum, 2); ?></td>
-                <td id="totalDppHarian"><?= number_format($totalDppHarian, 2); ?></td>
-                <td id="totalPphHarian"><?= number_format($totalPphHarian, 2); ?></td>
-                <td id="totalTotalHarian"><?= number_format($totalTotalHarian, 2); ?></td>
-                <td id="totalDppBulanan"><?= number_format($totalDppBulanan, 2); ?></td>
-                <td id="totalPphBulanan"><?= number_format($totalPphBulanan, 2); ?></td>
-                <td id="totalTotalBulanan"><?= number_format($totalTotalBulanan, 2); ?></td>
-                <td id="totalDppSubsidi"><?= number_format($totalDppSubsidi, 2); ?></td>
-                <td id="totalPphSubsidi"><?= number_format($totalPphSubsidi, 2); ?></td>
-                <td id="totalTotalSubsidi"><?= number_format($totalTotalSubsidi, 2); ?></td>
-                <td id="totalTotalRow"><?= number_format($totalTotalRow, 2); ?></td>
-
-            </tr>
+        <?php if (!empty($tanggalAwal) && !empty($tanggalAkhir)) : ?>
+            <?= $tanggalAwal; ?> s/d <?= $tanggalAkhir; ?>
         <?php else : ?>
-            <tr>
-                <td colspan="23">Tidak ada data yang tersedia.</td>
-            </tr>
+            ALL
         <?php endif; ?>
-    </table>
+    </div>
 
+    <div class="table-container">
+        <?php foreach ($groupedData as $barangName => $groups) : ?>
+            <div class="section-title">Bahan Baku: <?= $barangName; ?></div>
+            <table>
+                <thead>
+                    <tr>
+                        <th class="col-no">No</th>
+                        <th class="col-supplier">Supplier</th>
+                        <th class="col-divisi">Divisi</th>
+                        <th class="col-barang">Barang</th>
+                        <th class="col-spek">Spek</th>
+                        <th class="col-satuan">Satuan</th>
+                        <th class="col-qty">QTY</th>
+
+                        <!-- Harian -->
+                        <th class="col-amount">DPP</th>
+                        <th class="col-amount">PPh</th>
+                        <th class="col-amount">Dibayar</th>
+
+                        <!-- Tambahan Harian -->
+                        <th class="col-amount">DPP</th>
+                        <th class="col-amount">PPh</th>
+                        <th class="col-amount">Dibayar</th>
+
+                        <!-- Tambahan Bulanan -->
+                        <th class="col-amount">DPP</th>
+                        <th class="col-amount">PPh</th>
+                        <th class="col-amount">Dibayar</th>
+
+                        <!-- Subsidi -->
+                        <th class="col-amount">DPP</th>
+                        <th class="col-amount">PPh</th>
+                        <th class="col-amount">Dibayar</th>
+
+                        <th class="col-total">TOTAL</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php
+                    $subTotal = [
+                        'qtyPO' => 0,
+                        'dppUmum' => 0,
+                        'pphUmum' => 0,
+                        'totalUmum' => 0,
+                        'dppHarian' => 0,
+                        'pphHarian' => 0,
+                        'totalHarian' => 0,
+                        'dppBulanan' => 0,
+                        'pphBulanan' => 0,
+                        'totalBulanan' => 0,
+                        'subsidi' => 0,
+                        'pphSubsidi' => 0,
+                        'totalSubsidi' => 0,
+                        'totalRow' => 0,
+                    ];
+                    ?>
+
+                    <?php foreach ($groups as $group) : ?>
+                        <tr>
+                            <td class="col-no"><?= $group['no']; ?></td>
+                            <td class="col-supplier text-left"><?= $group['supplierName']; ?></td>
+                            <td class="col-divisi text-left"><?= $group['divisiName']; ?></td>
+                            <td class="col-barang text-left"><?= $group['barangName']; ?></td>
+                            <td class="col-spek text-left"><?= $group['spekName']; ?></td>
+                            <td class="col-satuan"><?= $group['satuanName']; ?></td>
+                            <td class="col-qty"><?= number_format($group['qtyPO'], 0); ?></td>
+
+                            <!-- Harian -->
+                            <td class="col-amount text-right"><?= number_format($group['dppUmum'], 2); ?></td>
+                            <td class="col-amount text-right"><?= number_format($group['pphUmum'], 2); ?></td>
+                            <td class="col-amount text-right"><?= number_format($group['totalUmum'], 2); ?></td>
+
+                            <!-- Tambahan Harian -->
+                            <td class="col-amount text-right"><?= number_format($group['dppHarian'], 2); ?></td>
+                            <td class="col-amount text-right"><?= number_format($group['pphHarian'], 2); ?></td>
+                            <td class="col-amount text-right"><?= number_format($group['totalHarian'], 2); ?></td>
+
+                            <!-- Tambahan Bulanan -->
+                            <td class="col-amount text-right"><?= number_format($group['dppBulanan'], 2); ?></td>
+                            <td class="col-amount text-right"><?= number_format($group['pphBulanan'], 2); ?></td>
+                            <td class="col-amount text-right"><?= number_format($group['totalBulanan'], 2); ?></td>
+
+                            <!-- Subsidi -->
+                            <td class="col-amount text-right"><?= number_format($group['subsidi'], 2); ?></td>
+                            <td class="col-amount text-right"><?= number_format($group['pphSubsidi'], 2); ?></td>
+                            <td class="col-amount text-right"><?= number_format($group['totalSubsidi'], 2); ?></td>
+
+                            <td class="col-total text-right"><?= number_format($group['totalRow'], 2); ?></td>
+                        </tr>
+
+                        <?php
+                        // Akumulasi subtotal
+                        $subTotal['qtyPO'] += $group['qtyPO'];
+                        $subTotal['dppUmum'] += $group['dppUmum'];
+                        $subTotal['pphUmum'] += $group['pphUmum'];
+                        $subTotal['totalUmum'] += $group['totalUmum'];
+                        $subTotal['dppHarian'] += $group['dppHarian'];
+                        $subTotal['pphHarian'] += $group['pphHarian'];
+                        $subTotal['totalHarian'] += $group['totalHarian'];
+                        $subTotal['dppBulanan'] += $group['dppBulanan'];
+                        $subTotal['pphBulanan'] += $group['pphBulanan'];
+                        $subTotal['totalBulanan'] += $group['totalBulanan'];
+                        $subTotal['subsidi'] += $group['subsidi'];
+                        $subTotal['pphSubsidi'] += $group['pphSubsidi'];
+                        $subTotal['totalSubsidi'] += $group['totalSubsidi'];
+                        $subTotal['totalRow'] += $group['totalRow'];
+                        ?>
+                    <?php endforeach; ?>
+
+                    <!-- Sub Total per Bahan Baku -->
+                    <tr class="total-row">
+                        <td class="text-right" colspan="6">TOTAL <?= $barangName; ?></td>
+                        <td class="col-qty"><?= number_format($subTotal['qtyPO'], 0); ?></td>
+
+                        <td class="col-amount text-right"><?= number_format($subTotal['dppUmum'], 2); ?></td>
+                        <td class="col-amount text-right"><?= number_format($subTotal['pphUmum'], 2); ?></td>
+                        <td class="col-amount text-right"><?= number_format($subTotal['totalUmum'], 2); ?></td>
+
+                        <td class="col-amount text-right"><?= number_format($subTotal['dppHarian'], 2); ?></td>
+                        <td class="col-amount text-right"><?= number_format($subTotal['pphHarian'], 2); ?></td>
+                        <td class="col-amount text-right"><?= number_format($subTotal['totalHarian'], 2); ?></td>
+
+                        <td class="col-amount text-right"><?= number_format($subTotal['dppBulanan'], 2); ?></td>
+                        <td class="col-amount text-right"><?= number_format($subTotal['pphBulanan'], 2); ?></td>
+                        <td class="col-amount text-right"><?= number_format($subTotal['totalBulanan'], 2); ?></td>
+
+                        <td class="col-amount text-right"><?= number_format($subTotal['subsidi'], 2); ?></td>
+                        <td class="col-amount text-right"><?= number_format($subTotal['pphSubsidi'], 2); ?></td>
+                        <td class="col-amount text-right"><?= number_format($subTotal['totalSubsidi'], 2); ?></td>
+
+                        <td class="col-total text-right"><?= number_format($subTotal['totalRow'], 2); ?></td>
+                    </tr>
+                </tbody>
+            </table>
+        <?php endforeach; ?>
+
+        <!-- Grand Total -->
+        <table>
+            <tr class="total-row">
+                <td class="text-right" colspan="6">GRAND TOTAL</td>
+                <td class="col-qty"><?= number_format($totalGlobal['qtyPO'], 0); ?></td>
+
+                <td class="col-amount text-right"><?= number_format($totalGlobal['dppUmum'], 2); ?></td>
+                <td class="col-amount text-right"><?= number_format($totalGlobal['pphUmum'], 2); ?></td>
+                <td class="col-amount text-right"><?= number_format($totalGlobal['totalUmum'], 2); ?></td>
+
+                <td class="col-amount text-right"><?= number_format($totalGlobal['dppHarian'], 2); ?></td>
+                <td class="col-amount text-right"><?= number_format($totalGlobal['pphHarian'], 2); ?></td>
+                <td class="col-amount text-right"><?= number_format($totalGlobal['totalHarian'], 2); ?></td>
+
+                <td class="col-amount text-right"><?= number_format($totalGlobal['dppBulanan'], 2); ?></td>
+                <td class="col-amount text-right"><?= number_format($totalGlobal['pphBulanan'], 2); ?></td>
+                <td class="col-amount text-right"><?= number_format($totalGlobal['totalBulanan'], 2); ?></td>
+
+                <td class="col-amount text-right"><?= number_format($totalGlobal['subsidi'], 2); ?></td>
+                <td class="col-amount text-right"><?= number_format($totalGlobal['pphSubsidi'], 2); ?></td>
+                <td class="col-amount text-right"><?= number_format($totalGlobal['totalSubsidi'], 2); ?></td>
+
+                <td class="col-total text-right"><?= number_format($totalGlobal['totalRow'], 2); ?></td>
+            </tr>
+        </table>
+    </div>
 </body>
 
 </html>

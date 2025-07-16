@@ -69,7 +69,7 @@
                     <div class="col-md-4">
                         <div class="form-floating form-pembayaran-po mb-3" style="height: 50px;">
                             <select class="form-select" <?= !empty($detail) ? ($detail['pembayaranDetail']['status_posting'] == 1 ? 'disabled' : '') : ""; ?> name="bank_id" id="bank_id">
-                                <option disabled selected value=""></option>
+                                    <option disabled selected value=""></option>
                                 <?php foreach ($bankList as $b) : ?>
                                     <option <?= !empty($detail) ? ($detail['pembayaranDetail']['bank_id'] == $b->id ? 'selected' : '') : '' ?> value="<?= $b->id ?>"><?= strtoupper($b->kode_bank) ?></option>
                                 <?php endforeach ?>
@@ -209,17 +209,6 @@
                         </div>
                     </div>
                     <div class="col-md-4">
-                        <div class="form-floating form-pembayaran-po mb-3" style="height: 50px;">
-                            <select class="form-select" <?= !empty($detail) ? ($detail['pembayaranDetail']['status_posting'] == 1 ? 'disabled' : '') : "" ?> name="akun_pajak" id="akun_pajak">
-                                <option disabled selected value=""></option>
-                                <?php foreach ($subsAkuns as $subs) : ?>
-                                    <option <?= !empty($detail) ? ($detail['pembayaranDetail']['akun_pajak'] == $subs->id ? 'selected' : '') : '' ?> value="<?= $subs->id ?>"><?= strtoupper($subs->no_sub . " " . $subs->nama_sub) ?></option>
-                                <?php endforeach ?>
-                            </select>
-                            <label for="floatingInput" style="z-index: 1;">Akun Pajak</label>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
                         <div class="input-group input-group-password">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <input autocomplete="one-time-code"
@@ -230,7 +219,7 @@
                                     <?= !empty($detail) ? ($detail['pembayaranDetail']['status_posting'] == 1 ? 'disabled' : '') : "" ?>
                                     value="<?= !empty($detail['pembayaranDetail']['payment_panjar_date']) && $detail['pembayaranDetail']['payment_panjar_date'] != '1970-01-01' ?
                                                 date('d/m/Y', strtotime($detail['pembayaranDetail']['payment_panjar_date'])) : '' ?>">
-                                <label for="payment_panjar_date">Tanggal Pembayaran Panjar</label>
+                                <label for="payment_panjar_date">Tanggal Pembayaran Panjar (Opsional)</label>
                             </div>
                             <div class="input-group-prepend group-prepend-password align-items-center">
                                 <i style="cursor: pointer; z-index: 99; margin-bottom: 8px; margin-left: -30px; border: 0px"
@@ -600,9 +589,6 @@
             akun_selisih: {
                 required: true
             },
-            akun_pajak: {
-                required: true
-            },
             jenis_pembayaran: {
                 required: true
             },
@@ -643,9 +629,6 @@
             },
             akun_selisih: {
                 required: "Akun kredit wajib diisi"
-            },
-            akun_pajak: {
-                required: "Akun Pajak wajib diisi"
             },
             jenis_pembayaran: {
                 required: "Jenis Pembayaran wajib diisi"
@@ -738,7 +721,7 @@
     });
 
     $('#jenis_pembayaran').select2({
-        placeholder: "Pilih kode bank",
+        placeholder: "Pilih Jenis Pembayaran",
         theme: "bootstrap-5"
     }).change(function() {
         generatePaymentNumber();
@@ -757,11 +740,6 @@
 
     $('#akun_selisih').select2({
         placeholder: "Pilih akun Kredit",
-        theme: "bootstrap-5"
-    });
-
-    $('#akun_pajak').select2({
-        placeholder: "Pilih akun pajak",
         theme: "bootstrap-5"
     });
 
