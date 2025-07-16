@@ -154,7 +154,10 @@
                 <th style="padding: 3px; text-align: left; font-weight: bold; border: 1px solid #ddd; width: 40%;">PARTICULAR</th>
                 <th style="padding: 3px; text-align: left; font-weight: bold; border: 1px solid #ddd; width: 10%;">PACKING</th>
                 <th style="padding: 3px; text-align: right; font-weight: bold; border: 1px solid #ddd; width: 12%;">UNIT PRICE (<?= $salesKontrak['mata_uang'] ?>)</th>
-                <th style="padding: 3px; text-align: right; font-weight: bold; border: 1px solid #ddd; width: 12%;">TOTAL (<?= $salesKontrak['mata_uang'] ?>)</th>
+                <th style="padding: 3px; text-align: right; font-weight: bold; border: 1px solid #ddd; width: 12%;">
+                    TOTAL (<?= $salesKontrak['mata_uang'] ?>) <br>
+                    <?= $salesKontrak['tipe_harga'] . " " . $salesKontrak['dicharge_port'] ?>
+                </th>
             </tr>
         </thead>
         <tbody>
