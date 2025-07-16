@@ -69,7 +69,7 @@
                     <div class="col-md-4">
                         <div class="form-floating form-pembayaran-po mb-3" style="height: 50px;">
                             <select class="form-select" <?= !empty($detail) ? ($detail['pembayaranDetail']['status_posting'] == 1 ? 'disabled' : '') : ""; ?> name="bank_id" id="bank_id">
-                                <option disabled selected value=""></option>
+                                    <option disabled selected value=""></option>
                                 <?php foreach ($bankList as $b) : ?>
                                     <option <?= !empty($detail) ? ($detail['pembayaranDetail']['bank_id'] == $b->id ? 'selected' : '') : '' ?> value="<?= $b->id ?>"><?= strtoupper($b->kode_bank) ?></option>
                                 <?php endforeach ?>
@@ -219,7 +219,7 @@
                                     <?= !empty($detail) ? ($detail['pembayaranDetail']['status_posting'] == 1 ? 'disabled' : '') : "" ?>
                                     value="<?= !empty($detail['pembayaranDetail']['payment_panjar_date']) && $detail['pembayaranDetail']['payment_panjar_date'] != '1970-01-01' ?
                                                 date('d/m/Y', strtotime($detail['pembayaranDetail']['payment_panjar_date'])) : '' ?>">
-                                <label for="payment_panjar_date">Tanggal Pembayaran Panjar</label>
+                                <label for="payment_panjar_date">Tanggal Pembayaran Panjar (Opsional)</label>
                             </div>
                             <div class="input-group-prepend group-prepend-password align-items-center">
                                 <i style="cursor: pointer; z-index: 99; margin-bottom: 8px; margin-left: -30px; border: 0px"
