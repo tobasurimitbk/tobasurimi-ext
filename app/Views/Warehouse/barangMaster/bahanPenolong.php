@@ -262,10 +262,10 @@
                                     </ul>
                                 </div>
                                 <div class="col-md-3">
-                                    <input autocomplete="one-time-code" style="height: 40px;" value="" type="text" placeholder="Tanggal PO" class="form-control form-control-lg po-start-date-lokal">
+                                    <input autocomplete="one-time-code" style="height: 40px;" value="" type="text" placeholder="Tanggal LPB" class="form-control form-control-lg po-start-date-lokal">
                                 </div>
                                 <div class="col-md-3">
-                                    <input autocomplete="one-time-code" style="height: 40px;" value="" type="text" placeholder="Tanggal PO" class="form-control form-control-lg po-end-date-lokal" disabled>
+                                    <input autocomplete="one-time-code" style="height: 40px;" value="" type="text" placeholder="Tanggal LPB" class="form-control form-control-lg po-end-date-lokal" disabled>
                                 </div>
                                 <div class="col-md-3">
                                     <input autocomplete="one-time-code" style="height: 40px;" placeholder="Cari Data" value="" type="text" class="form-control form-control-lg search-po-lokal">
