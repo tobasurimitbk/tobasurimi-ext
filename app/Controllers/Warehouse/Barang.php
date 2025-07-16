@@ -535,6 +535,8 @@ class Barang extends BaseController
         ];
 
         $condition = [
+            "penerimaan_barang.status_post" => "FINISH",
+            "penerimaan_barang.tipe_bahan" => "PENOLONG",
             "penerimaan_barang.company_id"  => $this->this_company_id,
             "penerimaan_barang_detail.spesifikasi_id" => $this->request->getVar('id'),
             "penerimaan_barang.deletedAt" => NULL,

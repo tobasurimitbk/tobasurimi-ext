@@ -277,15 +277,15 @@
                                     <tr>
                                         <th scope="col">No</th>
                                         <th scope="col" onclick="changeShortPoLokal('am_purchase_orders.purchase_request_id')" class="sort">No SPP</th>
-                                        <th scope="col" onclick="changeShortPoLokal('am_purchase_orders.purchase_request_id')" class="sort">No Po</th>
-                                        <th scope="col" onclick="changeShortPoLokal('am_purchase_orders.purchase_request_id')" class="sort">No LPB</th>
-                                        <th scope="col" onclick="changeShortPoLokal('am_purchase_orders.po_date')" class="sort">Tanggal</th>
+                                        <th scope="col" onclick="changeShortPoLokal('am_purchase_orders.po_no')" class="sort">No Po</th>
+                                        <th scope="col" onclick="changeShortPoLokal('penerimaan_barang.no_penerimaan_barang')" class="sort">No LPB</th>
+                                        <th scope="col" onclick="changeShortPoLokal('penerimaan_barang.tanggal')" class="sort">Tgl LPB </th>
                                         <th scope="col" onclick="changeShortPoLokal('suppliers.name')" class="sort">Supplier</th>
                                         <th scope="col" onclick="changeShortPoLokal('barang_master_spesifikasi.spesifikasi')" class="sort">Barang</th>
-                                        <th scope="col" onclick="changeShortPoLokal('am_purchase_order_details.qty')" class="sort">Qty</th>
-                                        <th scope="col" onclick="changeShortPoLokal('am_purchase_order_details.unit')" class="sort">Satuan</th>
-                                        <th scope="col" onclick="changeShortPoLokal('am_purchase_order_details.price')" class="sort">Harga</th>
-                                        <th scope="col" onclick="changeShortPoLokal('am_purchase_order_details.price')" class="sort">Sub Total Harga</th>
+                                        <th scope="col" onclick="changeShortPoLokal('penerimaan_barang_detail.qty')" class="sort">Qty</th>
+                                        <th scope="col" onclick="changeShortPoLokal('penerimaan_barang_detail.unit')" class="sort">Satuan</th>
+                                        <th scope="col" onclick="changeShortPoLokal('penerimaan_barang_detail.harga')" class="sort">Harga</th>
+                                        <th scope="col" onclick="changeShortPoLokal('penerimaan_barang_detail.sub_total')" class="sort">Sub Total Harga</th>
                                         <th scope="col" onclick="changeShortPoLokal('am_purchase_orders.division_id')" class="sort">Departemen</th>
                                         <th scope="col" onclick="changeShortPoLokal('am_purchase_orders.note')" class="sort">Keterangan</th>
                                     </tr>
