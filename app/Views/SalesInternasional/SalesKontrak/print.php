@@ -308,6 +308,7 @@
                     <div style="border-top: 1px solid !important; width: 80%;"></div>
                 </td>
                 <td>
+                    <?= $salesKontrak['signature_by'] ?>
                     <div style="border-top: 1px solid !important; width: 80%;"></div>
                 </td>
             </tr>
