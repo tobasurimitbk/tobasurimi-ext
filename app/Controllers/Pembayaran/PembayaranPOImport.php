@@ -816,7 +816,7 @@ class PembayaranPOImport extends BaseController
     {
         $id = decrypt($this->request->getVar('id'));
         $this->importPOPaymentModel->update($id, ['status_posting' => '1']);
-        $result = $this->jurnalController->insertDataPembayaran($id, "IMPORT");
+        $result = $this->jurnalController->insertDataPembayaran($id, "IMPORT", '');
         return response()->setJSON([
             'status' => true,
             'token' => csrf_hash(),

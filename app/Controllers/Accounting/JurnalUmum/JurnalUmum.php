@@ -2215,6 +2215,7 @@ class JurnalUmum extends BaseController
                     'kurs' => $POimport->current_exchange_rate,
                     'company_id' => $POimport->company_id,
                     'divisi_id' => $POimport->divisi_id,
+                    'supplier_id' => $POimport->supplier_id,
                     'keterangan' => "Pembayaran PO " . $dataPO,
                     'id_inputer' => session()->get("login")->user_id
                 );
@@ -2228,6 +2229,7 @@ class JurnalUmum extends BaseController
                     'kurs' => $POimport->current_exchange_rate,
                     'company_id' => $POimport->company_id,
                     'divisi_id' => $POimport->divisi_id,
+                    'supplier_id' => $POimport->supplier_id,
                     'keterangan' => "Pembayaran PO " . $dataPO,
                     'id_inputer' => session()->get("login")->user_id
                 );
