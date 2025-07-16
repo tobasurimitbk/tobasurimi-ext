@@ -69,11 +69,18 @@ class TaxModel extends Model
         $sort = $availableSort[$addCondition['sort'] ?? 'createdAt'] ?? 'taxes.createdAt';
         $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'DESC';
 
-        $selectQry = "taxes.*";
-        $dataQry = $this->asObject()
-            ->select($selectQry)
-            ->where($condition)
-            ->orderBy($sort, $sortType);
+      $selectQry = "taxes.*, 
+                akun_kredit.nama_sub as akun_kredit_nama,
+                akun_debit.nama_sub as akun_debit_nama,
+                akun_kredit.no_sub as akun_kredit_no,
+                akun_debit.no_sub as akun_debit_no";
+                
+    $dataQry = $this->asObject()
+        ->select($selectQry)
+        ->where($condition)
+        ->join('sub_akuns as akun_kredit', 'akun_kredit.id = taxes.akun_kredit', 'left')
+        ->join('sub_akuns as akun_debit', 'akun_debit.id = taxes.akun_debit', 'left')
+        ->orderBy($sort, $sortType);
 
         $totalData = $dataQry->countAllResults(false);
         $totalFilteredData = $dataQry->countAllResults(false);
