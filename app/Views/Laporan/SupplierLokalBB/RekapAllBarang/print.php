@@ -6,184 +6,222 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Laporan Rekap All Barang (Summary)</title>
     <style>
-        .company-name {
-            font-weight: 700;
-            border: 1px solid;
-            padding: 5px;
-            border-radius: 7px;
+        body {
+            font-family: Arial, sans-serif;
+            font-size: 10px;
+        }
+
+        .header {
+            text-align: center;
             margin-bottom: 10px;
-            display: inline-block;
-            min-width: 70px
         }
 
-        .description-container {
-            border: 1px solid;
-            border-radius: 7px;
-            height: 65px;
-            margin-top: 20px;
-            width: 60%;
-            position: relative;
-            padding-top: 7px;
-            padding-left: 17px;
+        .header h2 {
+            font-size: 14px;
+            font-weight: bold;
+            margin: 0;
         }
 
-        .description-label {
-            position: absolute;
-            top: -10px;
-            background: white;
-            left: 15px;
-            padding-left: 3px;
-            padding-right: 5px;
+        .date-info {
+            margin-bottom: 10px;
         }
 
-        .item-table {
-            border: 1px solid;
+        table {
             width: 100%;
-            height: 230px;
-            margin-top: 10px;
             border-collapse: collapse;
         }
 
-        .item-table th {
-            border-right: 1px solid;
-            border-bottom: 1px solid;
-            font-size: 13px;
-            font-weight: normal;
-            padding: 2px
-        }
-
-        .item-table td {
-            border: 1px solid;
-            font-size: 10px;
-            padding: 2px
-        }
-
-        .signature-table {
-            border-spacing: 30px 0;
-            margin-top: 10px;
-        }
-
-        .txt-bold {
-            font-weight: 700;
-        }
-
-        .txt-center {
+        th {
+            border: 1px solid #000;
+            padding: 3px;
             text-align: center;
         }
 
-        .txt-right {
+        th {
+            background-color: #f2f2f2;
+            font-weight: bold;
+            vertical-align: middle;
+        }
+
+        .group-header {
+            font-weight: bold;
+            background-color: #e0e0e0;
+            text-align: left;
+        }
+
+        .total-row {
+            font-weight: bold;
+            background-color: #f2f2f2;
+        }
+
+        .grand-total-row {
+            font-weight: bold;
+            background-color: #d0d0d0;
+        }
+
+        .text-left {
+            text-align: left;
+        }
+
+        .text-right {
             text-align: right;
         }
 
-        .w-100 {
-            width: 100%;
+        .no-border {
+            border: none !important;
         }
     </style>
 </head>
 
 <body>
-    <h2><?= $header; ?></h2>
-    <table class="w-100">
-        <tbody>
+    <div class="header">
+        <h2><?= $header; ?></h2>
+    </div>
+
+    <div class="date-info">
+        Tanggal :
+        <?php if ($tanggalAwal && $tanggalAkhir) : ?>
+            <?= date('d/m/Y', strtotime($tanggalAwal)) ?> s/d <?= date('d/m/Y', strtotime($tanggalAkhir)) ?>
+        <?php else : ?>
+            ALL
+        <?php endif; ?>
+    </div>
+
+    <table>
+        <thead>
             <tr>
-                <td style="width:100px">Tanggal</td>
-                <td style="width:10px">:</td>
-                <?php if (!empty($tanggalAwal) || !empty($tanggalAkhir)) : ?>
-                    <td style="width:80px"><?= $tanggalAwal; ?></td>
-                    <td style="width:10px"> S/D </td>
-                    <td><?= $tanggalAkhir; ?></td>
-                <?php else : ?>
-                    <td colspan="3" style="width:80px">ALL</td>
-
-                <?php endif; ?>
+                <th rowspan="2">NO.</th>
+                <th rowspan="2">BARANG</th>
+                <th rowspan="2">SPESIFIKASI</th>
+                <th rowspan="2">DEPARTEMEN</th>
+                <th rowspan="2">QTY</th>
+                <th rowspan="2">SATUAN</th>
+                <th colspan="3">HARIAN</th>
+                <th colspan="3">TAMBAHAN HARIAN</th>
+                <th colspan="3">TAMBAHAN BULANAN</th>
+                <th colspan="3">TAMBAHAN LANGSUNG</th>
+                <th rowspan="2">TOTAL</th>
             </tr>
-        </tbody>
-    </table>
+            <tr>
+                <th>DPP</th>
+                <th>PPh</th>
+                <th>Dibayarkan</th>
+                <th>DPP</th>
+                <th>PPh</th>
+                <th>Dibayarkan</th>
+                <th>DPP</th>
+                <th>PPh</th>
+                <th>Dibayarkan</th>
+                <th>DPP</th>
+                <th>PPh</th>
+                <th>Dibayarkan</th>
+            </tr>
+        </thead>
+        <tbody>
+            <?php $no = 1; ?>
+            <?php foreach ($groupedData as $barangName => $records) : ?>
+                <tr class="group-header">
+                    <td colspan="19" class="text-left">Bahan Baku: <?= $barangName ?></td>
+                </tr>
 
-    <table class="w-100 item-table">
-        <tr>
-            <th rowspan="2">No.</th>
-            <th rowspan="2">Barang</th>
-            <th rowspan="2">Spesifikasi</th>
+                <?php
+                $groupTotals = [
+                    'qtyPO' => 0,
+                    'dppUmum' => 0,
+                    'pphUmum' => 0,
+                    'totalUmum' => 0,
+                    'dppHarian' => 0,
+                    'pphHarian' => 0,
+                    'totalHarian' => 0,
+                    'dppBulanan' => 0,
+                    'pphBulanan' => 0,
+                    'totalBulanan' => 0,
+                    'subsidi' => 0,
+                    'pphSubsidi' => 0,
+                    'totalSubsidi' => 0,
+                    'totalRow' => 0,
+                ];
+                ?>
 
-            <th rowspan="2">Departemen</th>
-            <th rowspan="2">Qty</th>
-            <th rowspan="2">Satuan</th>
-            <th colspan="3">Umum</th>
-            <th colspan="3">Tambahan Harian</th>
-            <th colspan="3">Tambahan Bulanan</th>
-            <th colspan="3">Tambahan Langsung</th>
-            <th colspan="1" rowspan="2">Total</th>
-        </tr>
-        <tr>
-            <th>DPP</th>
-            <th>PPh</th>
-            <th>Dibayarkan</th>
+                <?php foreach ($records as $record) : ?>
+                    <tr>
+                        <td><?= $no++ ?></td>
+                        <td class="text-left"><?= $record['barangName'] ?></td>
+                        <td class="text-left"><?= $record['spekName'] ?></td>
+                        <td class="text-left"><?= $record['divisiName'] ?></td>
+                        <td><?= number_format($record['qtyPO'], 2) ?></td>
+                        <td><?= $record['satuanName'] ?></td>
+                        <td class="text-right"><?= number_format($record['dppUmum'], 2) ?></td>
+                        <td class="text-right"><?= number_format($record['pphUmum'], 2) ?></td>
+                        <td class="text-right"><?= number_format($record['totalUmum'], 2) ?></td>
+                        <td class="text-right"><?= number_format($record['dppHarian'], 2) ?></td>
+                        <td class="text-right"><?= number_format($record['pphHarian'], 2) ?></td>
+                        <td class="text-right"><?= number_format($record['totalHarian'], 2) ?></td>
+                        <td class="text-right"><?= number_format($record['dppBulanan'], 2) ?></td>
+                        <td class="text-right"><?= number_format($record['pphBulanan'], 2) ?></td>
+                        <td class="text-right"><?= number_format($record['totalBulanan'], 2) ?></td>
+                        <td class="text-right"><?= number_format($record['subsidi'], 2) ?></td>
+                        <td class="text-right"><?= number_format($record['pphSubsidi'], 2) ?></td>
+                        <td class="text-right"><?= number_format($record['totalSubsidi'], 2) ?></td>
+                        <td class="text-right"><?= number_format($record['totalRow'], 2) ?></td>
+                    </tr>
 
-            <th>DPP</th>
-            <th>PPh</th>
-            <th>Dibayarkan</th>
+                    <?php
+                    // Akumulasi group totals
+                    foreach ($groupTotals as $key => $val) {
+                        $groupTotals[$key] += $record[$key];
+                    }
+                    ?>
+                <?php endforeach; ?>
 
-            <th>DPP</th>
-            <th>PPh</th>
-            <th>Dibayarkan</th>
-
-            <th>DPP</th>
-            <th>PPh</th>
-            <th>Dibayarkan</th>
-
-        </tr>
-        <?php if (!empty($dataOrder)) : ?>
-            <?php foreach ($dataOrder as $do) : ?>
-                <tr>
-                    <td><?= $no++; ?></td>
-                    <td><?= $do->barangName; ?></td>
-                    <td><?= $do->spekName; ?></td>
-                    <td><?= $do->bagianName; ?></td>
-                    <td><?= $do->qtyPO; ?></td>
-                    <td><?= $do->satuanName; ?></td>
-                    <td><?= number_format($do->dppUmum, 2); ?></td>
-                    <td><?= number_format($do->pphUmum, 2); ?></td>
-                    <td><?= number_format($do->totalUmum, 2); ?></td>
-
-                    <td><?= number_format($do->dppHarian, 2); ?></td>
-                    <td><?= number_format($do->pphHarian, 2); ?></td>
-                    <td><?= number_format($do->totalHarian, 2); ?></td>
-
-                    <td><?= number_format($do->dppBulanan, 2); ?></td>
-                    <td><?= number_format($do->pphBulanan, 2); ?></td>
-                    <td><?= number_format($do->totalBulanan, 2); ?></td>
-
-                    <td><?= number_format($do->subsidi, 2); ?></td>
-                    <td><?= number_format($do->pphSubsidi, 2); ?></td>
-                    <td><?= number_format($do->totalSubsidi, 2); ?></td>
-
-                    <td><?= number_format($do->totalRow, 2); ?></td>
+                <tr class="total-row">
+                    <td colspan="4" class="text-left">TOTAL</td>
+                    <td class="text-right"><?= number_format($groupTotals['qtyPO'], 2) ?></td>
+                    <td></td>
+                    <td class="text-right"><?= number_format($groupTotals['dppUmum'], 2) ?></td>
+                    <td class="text-right"><?= number_format($groupTotals['pphUmum'], 2) ?></td>
+                    <td class="text-right"><?= number_format($groupTotals['totalUmum'], 2) ?></td>
+                    <td class="text-right"><?= number_format($groupTotals['dppHarian'], 2) ?></td>
+                    <td class="text-right"><?= number_format($groupTotals['pphHarian'], 2) ?></td>
+                    <td class="text-right"><?= number_format($groupTotals['totalHarian'], 2) ?></td>
+                    <td class="text-right"><?= number_format($groupTotals['dppBulanan'], 2) ?></td>
+                    <td class="text-right"><?= number_format($groupTotals['pphBulanan'], 2) ?></td>
+                    <td class="text-right"><?= number_format($groupTotals['totalBulanan'], 2) ?></td>
+                    <td class="text-right"><?= number_format($groupTotals['subsidi'], 2) ?></td>
+                    <td class="text-right"><?= number_format($groupTotals['pphSubsidi'], 2) ?></td>
+                    <td class="text-right"><?= number_format($groupTotals['totalSubsidi'], 2) ?></td>
+                    <td class="text-right"><?= number_format($groupTotals['totalRow'], 2) ?></td>
                 </tr>
             <?php endforeach; ?>
-            <tr style="font-weight: bold;">
-                <td colspan="6">Total</td>
-                <td id="totalDppUmum"><?= number_format($totalDppUmum, 2); ?></td>
-                <td id="totalPphUmum"><?= number_format($totalPphUmum, 2); ?></td>
-                <td id="totalTotalUmum"><?= number_format($totalTotalUmum, 2); ?></td>
-                <td id="totalDppHarian"><?= number_format($totalDppHarian, 2); ?></td>
-                <td id="totalPphHarian"><?= number_format($totalPphHarian, 2); ?></td>
-                <td id="totalTotalHarian"><?= number_format($totalTotalHarian, 2); ?></td>
-                <td id="totalDppBulanan"><?= number_format($totalDppBulanan, 2); ?></td>
-                <td id="totalPphBulanan"><?= number_format($totalPphBulanan, 2); ?></td>
-                <td id="totalTotalBulanan"><?= number_format($totalTotalBulanan, 2); ?></td>
-                <td id="totalDppSubsidi"><?= number_format($totalDppSubsidi, 2); ?></td>
-                <td id="totalPphSubsidi"><?= number_format($totalPphSubsidi, 2); ?></td>
-                <td id="totalTotalSubsidi"><?= number_format($totalTotalSubsidi, 2); ?></td>
-                <td id="totalTotalRow"><?= number_format($totalTotalRow, 2); ?></td>
-            </tr>
-        <?php else : ?>
-            <tr>
-                <td colspan="26">Tidak ada data yang tersedia.</td>
-            </tr>
-        <?php endif; ?>
-    </table>
 
+            <?php if (!empty($grandTotals)) : ?>
+                <tr class="grand-total-row">
+                    <td colspan="4" class="text-left">GRAND TOTAL</td>
+                    <td class="text-right"><?= number_format($grandTotals['qtyPO'], 2) ?></td>
+                    <td></td>
+                    <td class="text-right"><?= number_format($grandTotals['dppUmum'], 2) ?></td>
+                    <td class="text-right"><?= number_format($grandTotals['pphUmum'], 2) ?></td>
+                    <td class="text-right"><?= number_format($grandTotals['totalUmum'], 2) ?></td>
+                    <td class="text-right"><?= number_format($grandTotals['dppHarian'], 2) ?></td>
+                    <td class="text-right"><?= number_format($grandTotals['pphHarian'], 2) ?></td>
+                    <td class="text-right"><?= number_format($grandTotals['totalHarian'], 2) ?></td>
+                    <td class="text-right"><?= number_format($grandTotals['dppBulanan'], 2) ?></td>
+                    <td class="text-right"><?= number_format($grandTotals['pphBulanan'], 2) ?></td>
+                    <td class="text-right"><?= number_format($grandTotals['totalBulanan'], 2) ?></td>
+                    <td class="text-right"><?= number_format($grandTotals['subsidi'], 2) ?></td>
+                    <td class="text-right"><?= number_format($grandTotals['pphSubsidi'], 2) ?></td>
+                    <td class="text-right"><?= number_format($grandTotals['totalSubsidi'], 2) ?></td>
+                    <td class="text-right"><?= number_format($grandTotals['totalRow'], 2) ?></td>
+                </tr>
+            <?php endif; ?>
+
+            <?php if (empty($groupedData)) : ?>
+                <tr>
+                    <td colspan="19" class="text-center">Tidak ada data yang tersedia</td>
+                </tr>
+            <?php endif; ?>
+        </tbody>
+    </table>
 </body>
 
 </html>

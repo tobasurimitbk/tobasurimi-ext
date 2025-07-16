@@ -9,7 +9,7 @@
             Export
         </button>
         <ul class="dropdown-menu list-dropdown-company" aria-labelledby="dropdownMenuButtonExport">
-            <!-- <li><button class="dropdown-item pdf" onclick="exportData('<?= base_url("/laporan-supplier-lokal-bb/rekap-all-barang/print"); ?>')">PDF</button></li> -->
+            <li><button class="dropdown-item pdf" onclick="exportData('<?= base_url("/laporan-supplier-lokal-bb/rekap-all-barang/print"); ?>')">PDF</button></li>
             <li><button class="dropdown-item excel" onclick="exportData('<?= base_url("/laporan-supplier-lokal-bb/rekap-all-barang/export-excel"); ?>')">Excel</button></li>
         </ul>
         <div class="col-button-tambah-spp">
