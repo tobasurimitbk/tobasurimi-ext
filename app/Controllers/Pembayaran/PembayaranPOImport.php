@@ -64,6 +64,7 @@ class PembayaranPOImport extends BaseController
 
         $subAkunsModel = $Sub_AkunsModel->asObject()
             ->where('deletedAt', null)
+            ->where('company_id', $this->this_company_id)
             ->findAll();
         $divisi = $this->divisiModel->getDivisiAccess();
         $data = [
