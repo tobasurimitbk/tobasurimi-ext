@@ -218,10 +218,10 @@ class MaterialRequestPenolong extends BaseController
                 "no"                    => $no++,
                 "id"                    => encrypt($data->id),
                 "req_no"                 => $data->req_no,
-                "nama_barang"           => $data->nama_barang,
-                "wo_no"           => $data->wo_no,
+                "nama_barang"           => "",
+                "wo_no"           => "",
                 "is_posted"           => $data->is_posted,
-                "request_status"           => $data->request_status,
+                "request_status"           => "",
             ]);
         }
 
