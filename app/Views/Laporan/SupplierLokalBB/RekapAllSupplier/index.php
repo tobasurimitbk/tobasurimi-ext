@@ -162,9 +162,14 @@
         processing: true,
         serverSide: true,
         ordering: true,
-        order: [[1, 'asc']],
+        order: [
+            [1, 'asc']
+        ],
         fixedHeader: true,
-        lengthMenu: [[25], [25]],
+        lengthMenu: [
+            [25],
+            [25]
+        ],
         pageLength: 25,
         ajax: {
             url: "<?= base_url("/laporan-supplier-lokal-bb/rekap-all-supplier/all-rekap-all-supplier"); ?>",
@@ -186,35 +191,103 @@
         },
         display: "stripe",
         searching: false,
-        columns: [
-            { data: "no", className: "text-center", sortable: false },
-            { data: "supplierName", className: "text-center" },
-            { data: "divisiName", className: "text-center" },
-            { data: "barangName", className: "text-center" },
-            { data: "satuanName", className: "text-center" },
-            { data: "qtyPO", className: "text-center" },
-            { data: "dppUmum", className: "text-center" },
-            { data: "pphUmum", className: "text-center" },
-            { data: "totalUmum", className: "text-center" },
-            { data: "dppHarian", className: "text-center" },
-            { data: "pphHarian", className: "text-center" },
-            { data: "totalHarian", className: "text-center" },
-            { data: "dppBulanan", className: "text-center" },
-            { data: "pphBulanan", className: "text-center" },
-            { data: "totalBulanan", className: "text-center" },
-            { data: "subsidi", className: "text-center" },
-            { data: "pphSubsidi", className: "text-center" },
-            { data: "totalSubsidi", className: "text-center" },
-            { data: "totalRow", className: "text-center" },
+        columns: [{
+                data: "no",
+                className: "text-center",
+                sortable: false
+            },
+            {
+                data: "supplierName",
+                className: "text-center"
+            },
+            {
+                data: "divisiName",
+                className: "text-center"
+            },
+            {
+                data: "barangName",
+                className: "text-center"
+            },
+            {
+                data: "satuanName",
+                className: "text-center"
+            },
+            {
+                data: "qtyPO",
+                className: "text-center"
+            },
+            {
+                data: "dppUmum",
+                className: "text-center"
+            },
+            {
+                data: "pphUmum",
+                className: "text-center"
+            },
+            {
+                data: "totalUmum",
+                className: "text-center"
+            },
+            {
+                data: "dppHarian",
+                className: "text-center"
+            },
+            {
+                data: "pphHarian",
+                className: "text-center"
+            },
+            {
+                data: "totalHarian",
+                className: "text-center"
+            },
+            {
+                data: "dppBulanan",
+                className: "text-center"
+            },
+            {
+                data: "pphBulanan",
+                className: "text-center"
+            },
+            {
+                data: "totalBulanan",
+                className: "text-center"
+            },
+            {
+                data: "subsidi",
+                className: "text-center"
+            },
+            {
+                data: "pphSubsidi",
+                className: "text-center"
+            },
+            {
+                data: "totalSubsidi",
+                className: "text-center"
+            },
+            {
+                data: "totalRow",
+                className: "text-center"
+            },
         ],
-        columnDefs: [
-            { defaultContent: "-", targets: "_all" }
-        ],
+        columnDefs: [{
+            defaultContent: "-",
+            targets: "_all"
+        }],
         footerCallback: function(row, data, start, end, display) {
             var api = this.api();
-            var json = api.ajax.json(); // Ambil semua total dari server
+            var json = api.ajax.json();
 
             const colMap = {
+                5: 'qtyAll',
+                6: 'dppUmum',
+                7: 'pphUmum',
+                8: 'totalUmum',
+                9: 'dppHarian',
+                10: 'pphHarian',
+                11: 'totalHarian',
+                12: 'dppBulanan',
+                13: 'pphBulanan',
+                14: 'totalBulanan',
                 15: 'subsidi',
                 16: 'pphSubsidi',
                 17: 'totalSubsidi',
@@ -224,6 +297,8 @@
             for (const [colIndex, key] of Object.entries(colMap)) {
                 if (json.totalFooter && json.totalFooter[key]) {
                     $(api.column(colIndex).footer()).html(greatFormatRupiah(json.totalFooter[key]));
+                } else {
+                    $(api.column(colIndex).footer()).html('-');
                 }
             }
         },
