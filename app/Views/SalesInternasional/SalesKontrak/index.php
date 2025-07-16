@@ -182,7 +182,9 @@
                     let status_closed = row.status_closed;
 
                     let res = '';
-
+                    //   <button data-toggle="tooltip" title="Duplikasi" onclick="duplicate('${id}')" class="btn duplicate-btn text-white" style="background-color:#B8522A">
+                    //                                         <i class="fa fa-copy fa-sm" aria-hidden="true"></i>
+                    //                                     </button>
                     if (status_posting === "0") {
                         res += `
                         <div class="mt-0">
@@ -202,9 +204,7 @@
                                 </button>
                             <?php endif; ?>
                                 <?php if (can('Penjualan Ekspor', 'Sales Kontrak', 'c')) : ?>
-                                    <button data-toggle="tooltip" title="Duplikasi" onclick="duplicate('${id}')" class="btn duplicate-btn text-white" style="background-color:#B8522A">
-                                        <i class="fa fa-copy fa-sm" aria-hidden="true"></i>
-                                    </button>
+                                  
                                 <?php endif; ?>
                             </div>
                         `;
@@ -229,9 +229,7 @@
                             `;
                         }
                         <?php if (can('Penjualan Ekspor', 'Sales Kontrak', 'c')) : ?>
-                            res += `  <button data-toggle="tooltip" title="Duplikasi" onclick="duplicate('${id}')" class="btn text-white duplicate-btn" style="background-color:#B8522A">
-                                        <i class="fa fa-copy fa-sm" aria-hidden="true"></i>
-                                    </button>`;
+
                         <?php endif; ?>
                     }
 

@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title><?= $salesKontrak['sales_contract_no'] ?></title>
     <style>
         .header {
             display: flex !important;
@@ -134,34 +134,27 @@
                 <label class="label-header">Revision: <?= $salesKontrak['jumlah_unpost']; ?></label>
             </div> -->
         </div>
+        <div class="mt-1 justify-content-center">
+            <label class="label-header">
+                <?= $salesKontrak['banking_information'] ?>
+            </label>
+        </div>
+
         <div class="mt-1 justify-content-center"><label class="label-header">THIS SALES CONTRACT
                 IS MADE BY AND BETWEEN THE BUYER AND SELLER, WHEREBY THE BUYER AGREES TO PURCHASE AND THE SELLER
                 AGREES TO SELL THE UNDER MENTIONED COMMODITIES AS PER THE TERMS AND CONDITIONS STIPULATED BELOW:</label></div>
     </div>
-    <table class="mt-1 item-table border-collapse">
+    <div class="header">
+        <div class="mt-1 txt-left"><label class="label-header"> I. DESCRIPTION OF GOODS, MARKS </label></div>
+    </div>
+    <table style="width: 100%; border-collapse: collapse; margin-top: 4px; font-family: Arial, sans-serif; font-size: 9px;">
         <thead>
-            <tr>
-                <th>
-                    <label class="label-header">No</label>
-                </th>
-                <th>
-                    <label class="label-header">DESCRIPTION OF GOODS</label>
-                </th>
-                <th>
-                    <label class="label-header">PACKING</label>
-                </th>
-                <th>
-                    <label class="label-header">SIZE</label>
-                </th>
-                <th>
-                    <label class="label-header">QTY</label>
-                </th>
-                <th>
-                    <label class="label-header">UNIT PRICE (<?= $salesKontrak['mata_uang'] ?>)</label>
-                </th>
-                <th>
-                    <label class="label-header">TOTAL AMOUNT (<?= $salesKontrak['mata_uang'] ?>)</label>
-                </th>
+            <tr style="background-color: #f8f9fa; border-bottom: 1px solid #dee2e6;">
+                <th style="padding: 3px; text-align: left; font-weight: bold; border: 1px solid #ddd; width: 3%;">NO</th>
+                <th style="padding: 3px; text-align: left; font-weight: bold; border: 1px solid #ddd; width: 40%;">PARTICULAR</th>
+                <th style="padding: 3px; text-align: left; font-weight: bold; border: 1px solid #ddd; width: 10%;">PACKING</th>
+                <th style="padding: 3px; text-align: right; font-weight: bold; border: 1px solid #ddd; width: 12%;">UNIT PRICE (<?= $salesKontrak['mata_uang'] ?>)</th>
+                <th style="padding: 3px; text-align: right; font-weight: bold; border: 1px solid #ddd; width: 12%;">TOTAL (<?= $salesKontrak['mata_uang'] ?>)</th>
             </tr>
         </thead>
         <tbody>
@@ -173,66 +166,116 @@
                 $total_qty = $total_qty + formatter($detail["qty"], "STR_TO_INT");
                 $total_amount = $total_amount + formatter($detail["total_harga"], "STR_TO_INT");
             ?>
-                <?php if ($detail['remark'] != null): ?>
-                    <tr>
-                        <td><label class="label-child"> <small><?= $detail["remark"]; ?></small></label></td>
-                        <td colspan="6"></td>
-                    </tr>
-                <?php endif; ?>
-                <tr>
-                    <td>
-                        <?= $no++ ?>
-                    </td>
-                    <td>
-                        <label class="label-header"> <?= $detail["nama_barang"]; ?> <br> SPECIFICATION : <?= $salesKontrak['spesifikasi'] ?></label>
-                    </td>
-                    <td><label class="label-header"> <?= $detail["kemasan"]; ?></td>
-                    <td><label class="label-header"> <?= $detail["size"]; ?></td>
-                    <td><label class="label-header"><?= number_format($detail["qty"], 2) . " " . $detail['satuan_order_name'] ?></label></td>
-                    <td><label class="label-header"><?= number_format($detail["harga"], 2); ?></label></td>
-                    <td><label class="label-header"><?= number_format($detail["total_harga"], 2); ?></label></td>
-                </tr>
+                <tr style="border-bottom: 1px solid #eee;">
+                    <td style="padding: 3px; border: 1px solid #ddd; vertical-align: top;"><?= $no++ ?></td>
+                    <td style="padding: 3px; border: 1px solid #ddd; vertical-align: top;">
+                        <div style="font-weight: bold; font-size: 8.5px;"><?= $detail["nama_barang"]; ?></div>
+                        <div style="font-size: 7.5px; margin-top: 2px; line-height: 1.2;">
+                            <span style="display: inline-block; width: 50px;">SPECIES:</span> <?= $detail['species'] ?> <br>
+                            <span style="display: inline-block; width: 40px;">SPECS:</span> <?= $detail['specs'] ?> <br>
+                            <span style="display: inline-block; width: 50px;">PACKING:</span> <?= $detail['kemasan'] ?> <br>
+                        </div>
 
+                        <?php if (!empty($detail['size_breakdown'])): ?>
+                            <?php
+                            // Cari kolom mana saja yang memiliki data
+                            $columns_to_show = [];
+                            $all_columns = [
+                                'size' => ['label' => 'Size', 'width' => '6%'],
+                                'grade' => ['label' => 'Grade', 'width' => '6%'],
+                                'packing' => ['label' => 'Pack', 'width' => '6%'],
+                                'can' => ['label' => 'Can', 'width' => '5%'],
+                                'cased' => ['label' => 'Case', 'width' => '5%'],
+                                'kg' => ['label' => 'Kg', 'width' => '5%'],
+                                'lb' => ['label' => 'LB', 'width' => '5%'],
+                                'inner_box' => ['label' => 'Inner', 'width' => '6%'],
+                                'pc' => ['label' => 'PC', 'width' => '5%'],
+                                'bag' => ['label' => 'Bag', 'width' => '5%'],
+                                'persen' => ['label' => '%', 'width' => '4%'],
+                                'remark' => ['label' => 'Remarks', 'width' => '8%']
+                            ];
+
+                            foreach ($all_columns as $col => $col_data) {
+                                foreach ($detail['size_breakdown'] as $breakdown) {
+                                    if (!empty($breakdown[$col])) {
+                                        $columns_to_show[$col] = $col_data;
+                                        break;
+                                    }
+                                }
+                            }
+                            ?>
+
+                            <div style="margin-top: 4px;">
+                                <div style="font-size: 7.5px; font-weight: bold;">SIZE BREAKDOWN:</div>
+                                <table style="width: 100%; border-collapse: collapse; margin-top: 2px; font-size: 7px;">
+                                    <thead>
+                                        <tr style="background-color: #f3f4f6;">
+                                            <?php foreach ($columns_to_show as $col => $col_data): ?>
+                                                <th style="padding: 1px; border: 1px solid #ddd; width: <?= $col_data['width'] ?>"><?= $col_data['label'] ?></th>
+                                            <?php endforeach; ?>
+                                            <th style="padding: 1px; border: 1px solid #ddd; width: 7%; text-align: right;">Qty</th>
+                                            <th style="padding: 1px; border: 1px solid #ddd; width: 8%; text-align: right;">Price</th>
+                                            <th style="padding: 1px; border: 1px solid #ddd; width: 8%; text-align: right;">Amount</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <?php
+                                        $breakdown_qty = 0;
+                                        $breakdown_total = 0;
+                                        foreach ($detail['size_breakdown'] as $breakdown):
+                                            $breakdown_qty += $breakdown['qty'];
+                                            $breakdown_total += $breakdown['total'];
+                                        ?>
+                                            <tr>
+                                                <?php foreach ($columns_to_show as $col => $col_data): ?>
+                                                    <td style="padding: 1px; border: 1px solid #ddd;"><?= $breakdown[$col] ?></td>
+                                                <?php endforeach; ?>
+                                                <td style="padding: 1px; border: 1px solid #ddd; text-align: right;"><?= number_format($breakdown['qty'], 2) ?></td>
+                                                <td style="padding: 1px; border: 1px solid #ddd; text-align: right;"><?= number_format($breakdown['harga'], 2) ?></td>
+                                                <td style="padding: 1px; border: 1px solid #ddd; text-align: right;"><?= number_format($breakdown['total'], 2) ?></td>
+                                            </tr>
+                                        <?php endforeach; ?>
+                                    </tbody>
+                                    <tfoot>
+                                        <tr style="background-color: #e9ecef;">
+                                            <td colspan="<?= count($columns_to_show) ?>" style="padding: 1px; border: 1px solid #ddd; text-align: right; font-weight: bold;">TOTAL</td>
+                                            <td style="padding: 1px; border: 1px solid #ddd; text-align: right; font-weight: bold;"><?= number_format($breakdown_qty, 2) ?></td>
+                                            <td style="padding: 1px; border: 1px solid #ddd; text-align: right; font-weight: bold;">-</td>
+                                            <td style="padding: 1px; border: 1px solid #ddd; text-align: right; font-weight: bold;"><?= number_format($breakdown_total, 2) ?></td>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                            </div>
+                        <?php endif; ?>
+                    </td>
+                    <td style="padding: 3px; border: 1px solid #ddd; vertical-align: top; text-align: right;"><?= number_format($detail["qty"], 2) . " " . $detail['satuan_order_name'] ?></td>
+                    <td style="padding: 3px; border: 1px solid #ddd; vertical-align: top; text-align: right;"><?= number_format($detail["harga"], 2); ?></td>
+                    <td style="padding: 3px; border: 1px solid #ddd; vertical-align: top; text-align: right;"><?= number_format($detail["total_harga"], 2); ?></td>
+                </tr>
             <?php } ?>
-            <!-- <tr>
-                <td><label class="label-header">DISCOUNT</label></td>
-                <td><label class="label-header"></label></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td><label class="label-header"><?= number_format($salesKontrak['potongan_harga'], 2); ?></label></td>
-            </tr> -->
-            <tr>
-                <td><label class="label-header">TOTAL</label></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td><label class="label-header"><?= number_format($total_qty, 2); ?></label></td>
-                <td></td>
-                <td><label class="label-header"><?= number_format($total_amount - $salesKontrak['potongan_harga'], 2); ?></label></td>
+            <tr style="font-weight: bold; background-color: #e9ecef;">
+                <td style="padding: 3px; border: 1px solid #ddd;">TOTAL</td>
+                <td style="padding: 3px; border: 1px solid #ddd;"></td>
+                <td style="padding: 3px; border: 1px solid #ddd; text-align: right;"><?= number_format($total_qty, 2); ?></td>
+                <td style="padding: 3px; border: 1px solid #ddd; text-align: right;"><?= number_format($total_amount - $salesKontrak['potongan_harga'], 2); ?></td>
+                <td style="padding: 3px; border: 1px solid #ddd; text-align: right;"><?= number_format($total_amount, 2); ?></td>
             </tr>
         </tbody>
     </table>
     <div class="header">
-        <div class="mt-1 txt-left"><label class="label-header">TOTAL AMOUNT: <?= $salesKontrak['total_amount'] ? number_format($salesKontrak['total_amount'], 2) : 0; ?></label></div>
-        <div class="mt-1 txt-left"><label class="label-header">TOLERANCE: <?= $salesKontrak['tolerance']; ?></label></div>
+        <div class="mt-1 txt-left"><label class="label-header">II. TOTAL AMOUNT: <?= $salesKontrak['total_amount'] ? number_format($salesKontrak['total_amount'], 2) : 0; ?></label></div>
+        <div class="mt-1 txt-left"><label class="label-header">III. TOLERANCE: <?= $salesKontrak['tolerance']; ?></label></div>
         <!-- <div class="mt-1 txt-left"><label class="label-header">DUE DATE: <?= date('d M Y', strtotime($salesKontrak['due_date'])); ?></label></div> -->
-        <div class="mt-1 txt-left"><label class="label-header">ESTIMATED SHIPMENT DATE: </label></div>
-        <div class="mt-1 txt-left"><label class="label-header">PORT LOADING: <?= $salesKontrak['loading_port']; ?></label></div>
-        <div class="mt-1 txt-left"><label class="label-header">PORT OF DISCHARGE: <?= $salesKontrak['dicharge_port']; ?></label></div>
-        <div class="mt-1 txt-left"><label class="label-header">PAYMENT TERM: <?= $salesKontrak['payment_term']; ?></label></div>
-        <div class="mt-1 txt-left"><label class="label-header">DOCUMENT REQUIRED:</label></div>
+        <div class="mt-1 txt-left"><label class="label-header">IV. ESTIMATED SHIPMENT DATE: </label></div>
+        <div class="mt-1 txt-left"><label class="label-header">V. PORT LOADING: <?= $salesKontrak['loading_port']; ?></label></div>
+        <div class="mt-1 txt-left"><label class="label-header">VI. PORT OF DISCHARGE: <?= $salesKontrak['dicharge_port']; ?></label></div>
+        <div class="mt-1 txt-left"><label class="label-header">VII. PAYMENT TERM: <?= $salesKontrak['payment_term']; ?></label></div>
+        <div class="mt-1 txt-left"><label class="label-header">VIII. DOCUMENT REQUIRED:</label></div>
         <div class="txt-left"><label class="label-header"><?= nl2br($salesKontrak['documents_required']); ?></label></div>
-        <?php if ($salesKontrak['print_out_broker']) : ?>
-            <div class="mt-1 txt-left"><label class="label-header">BROKER:</label></div>
-            <div class="txt-left"><label class="label-header"><?= ($salesKontrak['broker']); ?></label></div>
-            <div class="mt-1 txt-left"><label class="label-header">COMMISSION :</label></div>
-            <div class="txt-left"><label class="label-header"><?= number_format($salesKontrak['komisi']); ?></label></div>
-        <?php endif; ?>
-
-        <div class="mt-1 txt-left"><label class="label-header">SPECIAL INSTRUCTIONS:</label></div>
+        <div class="mt-1 txt-left"><label class="label-header">IX. ADDITIONAL CLAUSES:</label></div>
         <div class="txt-left"><label class="label-header"><?= nl2br($salesKontrak['special_instructions']); ?></label></div>
+        <div class="mt-1 txt-left"><label class="label-header">X. INSURANCE: <?= $salesKontrak['shipment_insurance']; ?></label></div>
+
         <div class="mt-1 txt-left"><label class="label-header">FOR THOSE ITEMS WHICH ARE NOT COVERED IN
                 THIS CONTRACT, BOTH PARTIES WILL NEGOTIATE AND COME TO COMPROMISE.</label></div>
     </div>
