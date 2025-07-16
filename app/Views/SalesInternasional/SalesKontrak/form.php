@@ -1893,7 +1893,7 @@
         if (listBarang.length === 0) {
             const row = `
             <tr>
-                <td colspan="8" style="text-align:right;"><b>TOTAL</b></td>
+                <td colspan="7" style="text-align:right;"><b>TOTAL</b></td>
                 <td><b>0.00</b></td>
                 <td><b>0.00</b></td>
                 <td><b>0.00</b></td>
