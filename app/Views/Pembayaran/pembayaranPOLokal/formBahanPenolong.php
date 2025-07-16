@@ -443,7 +443,7 @@
         });
 
         $('#jenis_pembayaran').select2({
-            placeholder: "Pilih kode bank",
+            placeholder: "Pilih Jenis Pembayaran",
             theme: "bootstrap-5"
         }).change(function() {
             generatePaymentNumber();
