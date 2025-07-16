@@ -151,14 +151,20 @@
             <table>
                 <thead>
                     <tr>
-                        <th class="col-no">No</th>
-                        <th class="col-supplier">Supplier</th>
-                        <th class="col-divisi">Divisi</th>
-                        <th class="col-barang">Barang</th>
-                        <th class="col-spek">Spek</th>
-                        <th class="col-satuan">Satuan</th>
-                        <th class="col-qty">QTY</th>
-
+                        <th class="col-no" rowspan="2">No</th>
+                        <th class="col-supplier" rowspan="2">Supplier</th>
+                        <th class="col-divisi" rowspan="2">Divisi</th>
+                        <th class="col-barang" rowspan="2">Barang</th>
+                        <th class="col-spek" rowspan="2">Spek</th>
+                        <th class="col-satuan" rowspan="2">Satuan</th>
+                        <th class="col-qty" rowspan="2">QTY</th>
+                        <th class="col-amount" colspan="3">Harian</th>
+                        <th class="col-amount" colspan="3">Tambahan Harian</th>
+                        <th class="col-amount" colspan="3">Tambahan Bulanan</th>
+                        <th class="col-amount" colspan="3">Subsidi</th>
+                        <th class="col-total" rowspan="2">TOTAL</th>
+                    </tr>
+                    <tr>
                         <!-- Harian -->
                         <th class="col-amount">DPP</th>
                         <th class="col-amount">PPh</th>
@@ -178,8 +184,6 @@
                         <th class="col-amount">DPP</th>
                         <th class="col-amount">PPh</th>
                         <th class="col-amount">Dibayar</th>
-
-                        <th class="col-total">TOTAL</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -280,32 +284,6 @@
                 </tbody>
             </table>
         <?php endforeach; ?>
-
-        <!-- Grand Total -->
-        <table>
-            <tr class="total-row">
-                <td class="text-right" colspan="6">GRAND TOTAL</td>
-                <td class="col-qty"><?= number_format($totalGlobal['qtyPO'], 0); ?></td>
-
-                <td class="col-amount text-right"><?= number_format($totalGlobal['dppUmum'], 2); ?></td>
-                <td class="col-amount text-right"><?= number_format($totalGlobal['pphUmum'], 2); ?></td>
-                <td class="col-amount text-right"><?= number_format($totalGlobal['totalUmum'], 2); ?></td>
-
-                <td class="col-amount text-right"><?= number_format($totalGlobal['dppHarian'], 2); ?></td>
-                <td class="col-amount text-right"><?= number_format($totalGlobal['pphHarian'], 2); ?></td>
-                <td class="col-amount text-right"><?= number_format($totalGlobal['totalHarian'], 2); ?></td>
-
-                <td class="col-amount text-right"><?= number_format($totalGlobal['dppBulanan'], 2); ?></td>
-                <td class="col-amount text-right"><?= number_format($totalGlobal['pphBulanan'], 2); ?></td>
-                <td class="col-amount text-right"><?= number_format($totalGlobal['totalBulanan'], 2); ?></td>
-
-                <td class="col-amount text-right"><?= number_format($totalGlobal['subsidi'], 2); ?></td>
-                <td class="col-amount text-right"><?= number_format($totalGlobal['pphSubsidi'], 2); ?></td>
-                <td class="col-amount text-right"><?= number_format($totalGlobal['totalSubsidi'], 2); ?></td>
-
-                <td class="col-total text-right"><?= number_format($totalGlobal['totalRow'], 2); ?></td>
-            </tr>
-        </table>
     </div>
 </body>
 
