@@ -10,6 +10,7 @@ use App\Models\CountryModel;
 use App\Models\EmployeesModel;
 use App\Models\DivisisModel;
 use App\Models\MetadataModel;
+use App\Models\SalesContractSizeBreakdownModel;
 use App\Models\SalesKontrakModel;
 use App\Models\SalesKontrakDetailModel;
 use App\Models\SalesOrderExportModel;
@@ -37,6 +38,7 @@ class SalesKontrak extends BaseController
     protected $employessModel;
     protected $divisiModel;
     protected $bankModel;
+    protected $salesContractSizeBreakdownModel;
 
     public function __construct()
     {
@@ -57,6 +59,7 @@ class SalesKontrak extends BaseController
         $this->dompdf = new Dompdf();
         $this->divisiModel = new DivisisModel();
         $this->bankModel = new BanksModel();
+        $this->salesContractSizeBreakdownModel = new SalesContractSizeBreakdownModel();
     }
 
     public function index()
@@ -233,8 +236,8 @@ class SalesKontrak extends BaseController
                 "sales_contract_no"     => $data->sales_contract_no,
                 "customer_po_no"        => $data->customer_po_no,
                 "customer_name"         => $data->customer_name,
-                "dicharge_port"         => strtoupper($data->dicharge_port),
-                "shipment_date"         => date('d/m/Y', strtotime($data->shipment_date)),
+                "dicharge_port"         => $data->dicharge_port,
+                "shipment_date"         => $data->shipment_date,
                 "createdAt"             => date('d/m/Y', strtotime($data->createdAt)),
                 "status_posting"        => $data->status_posting,
                 "status_closed"         => count($isClosed) > 0 ? '1' : '0',
@@ -284,48 +287,70 @@ class SalesKontrak extends BaseController
 
         $id = $this->salesKontrakModel->insert([
             'company_id' => $this->this_company_id,
-            'customer_id' => $this->request->getVar('customer_id'),
-            'divisi_id' => $this->request->getVar('divisi_id'),
-            'sales_contract_no' => $this->request->getVar('sales_contract_no'),
+            'bank_id' => $this->request->getVar('bank_id'),
+            'banking_information' => $this->request->getVar('banking_information'),
             'currency' => $this->request->getVar('currency'),
+            'customer_id' => $this->request->getVar('customer_id'),
             'customer_po_no' => $this->request->getVar('customer_po_no'),
-            'loading_port' => $this->request->getVar('loading_port'),
             'dicharge_port' => $this->request->getVar('dicharge_port'),
-            'due_date' => $this->request->getVar("due_date") ? date_format(date_create_from_format("d/m/Y", $this->request->getVar("due_date")), "Y-m-d") : "",
-            'total_amount' => $this->request->getVar('total_amount'),
-            'tolerance' => $this->request->getVar('tolerance'),
-            'due_date' => $this->request->getVar("due_date") ? date_format(date_create_from_format("d/m/Y", $this->request->getVar("due_date")), "Y-m-d") : "",
-            'total_amount' => $this->request->getVar('total_amount'),
-            'tolerance' => $this->request->getVar('tolerance'),
-            'shipment_date' => $this->request->getVar("shipment_date") ? date_format(date_create_from_format("d/m/Y", $this->request->getVar("shipment_date")), "Y-m-d") : "",
+            'divisi_id' => $this->request->getVar('divisi_id'),
+            'documents_required' => $this->request->getVar('documents_required'),
+            'keterangan' => $this->request->getVar('keterangan'),
+            'komisi' => $this->request->getVar('komisi'),
+            'loading_port' => $this->request->getVar('loading_port'),
+            'no_container' => $this->request->getVar('no_container'),
             'payment_term' => $this->request->getVar('payment_term'),
             'potongan_harga' => $this->request->getVar('potongan_harga'),
-            'documents_required' => $this->request->getVar('documents_required'),
+            'sales_contract_no' => $this->request->getVar('sales_contract_no'),
+            'shipment_date' => $this->request->getVar("shipment_date"),
+            'shipment_insurance' => $this->request->getVar('shipment_insurance'),
+            'signature_by' => $this->request->getVar('signature_by'),
             'special_instructions' => $this->request->getVar('special_instructions'),
             'tipe_harga' => $this->request->getVar('tipe_harga'),
-            'broker' => $this->request->getVar('broker'),
-            'komisi' => $this->request->getVar('komisi'),
-            'print_out_broker' => $this->request->getVar('print_out_broker'),
+            'tolerance' => $this->request->getVar('tolerance'),
+            'total_amount' => $this->request->getVar('total_amount'),
+            'total_container' => $this->request->getVar('total_container'),
+            'royalty' => $this->request->getVar('royalty'),
+            'rebate' => $this->request->getVar('rebate'),
+            'can_deduction' => $this->request->getVar('can_deduction'),
+            'estimated_freight' => $this->request->getVar('estimated_freight'),
             'createdBy' => $this->this_user_id,
-            'keterangan' => $this->request->getVar('keterangan'),
             'status_posting' => '0',
-            'bank_id' => $this->request->getVar('bank_id'),
-            'spesifikasi' => $this->request->getVar('spesifikasi'),
-            'no_container' => $this->request->getVar('no_container')
         ]);
 
         foreach ($barangs as $b) {
-            $this->salesKontrakDetailModel->insert([
+            $salesKontrakDetailId = $this->salesKontrakDetailModel->insert([
                 'sales_contract_id' => $id,
                 'barang_master_sales_id' => $b->barang_master_sales_id,
-                'satuan_order_id' => $b->satuan_order_id,
-                'kemasan' => $b->kemasan,
-                'remark' => $b->remark,
-                'qty' => $b->qty,
+                'brand' => $b->brand,
                 'harga' => $b->harga,
+                'kemasan' => $b->packing,
+                'qty' => $b->qty,
+                'species' => $b->species,
+                'specs' => $b->specs,
                 'total_harga' => $b->total,
-                'size' => $b->size
             ]);
+
+            foreach ($b->size_breakdown as $sb) {
+                $this->salesContractSizeBreakdownModel->insert([
+                    'sales_contract_detail_id' => $salesKontrakDetailId,
+                    'bag' => $sb->bag,
+                    'can' => $sb->can,
+                    'cased' => $sb->cased,
+                    'grade' => $sb->grade,
+                    'inner_box' => $sb->inner_box,
+                    'kg' => $sb->kg,
+                    'lb' => $sb->lb,
+                    'packing' => $sb->packing,
+                    'pc' => $sb->pc,
+                    'persen' => $sb->persen,
+                    'remark' => $sb->remark,
+                    'size' => $sb->size,
+                    'qty' => $sb->qty,
+                    'harga' => $sb->harga,
+                    'total' => $sb->total
+                ]);
+            }
         }
 
         return response()->setJSON([
@@ -360,40 +385,42 @@ class SalesKontrak extends BaseController
 
         if ($salesContract != null) {
             return response()->setJSON([
-                'message' => "Nomor sales kontrak sudah digunakan oleh anda atau sales lain",
+                'message' => "Nomor sales kontrak sudah digunakan oleh anda atau sales lain, silahkan checklist lalu unchecklist no sales kontrak",
                 'status' => false,
                 'token' => csrf_token()
             ]);
         }
 
         $this->salesKontrakModel->update($id, [
-            'sales_contract_no' => $this->request->getVar('sales_contract_no'),
-            'customer_id' => $this->request->getVar('customer_id'),
-            'divisi_id' => $this->request->getVar('divisi_id'),
-            'customer_po_no' => $this->request->getVar('customer_po_no'),
+            'company_id' => $this->this_company_id,
+            'bank_id' => $this->request->getVar('bank_id'),
+            'banking_information' => $this->request->getVar('banking_information'),
             'currency' => $this->request->getVar('currency'),
-            'loading_port' => $this->request->getVar('loading_port'),
+            'customer_id' => $this->request->getVar('customer_id'),
+            'customer_po_no' => $this->request->getVar('customer_po_no'),
             'dicharge_port' => $this->request->getVar('dicharge_port'),
-            'due_date' => $this->request->getVar("due_date") ? date_format(date_create_from_format("d/m/Y", $this->request->getVar("due_date")), "Y-m-d") : "",
-            'total_amount' => $this->request->getVar('total_amount'),
-            'tolerance' => $this->request->getVar('tolerance'),
-            'due_date' => $this->request->getVar("due_date") ? date_format(date_create_from_format("d/m/Y", $this->request->getVar("due_date")), "Y-m-d") : "",
-            'total_amount' => $this->request->getVar('total_amount'),
-            'tolerance' => $this->request->getVar('tolerance'),
-            'shipment_date' => $this->request->getVar("shipment_date") ? date_format(date_create_from_format("d/m/Y", $this->request->getVar("shipment_date")), "Y-m-d") : "",
+            'divisi_id' => $this->request->getVar('divisi_id'),
+            'documents_required' => $this->request->getVar('documents_required'),
+            'keterangan' => $this->request->getVar('keterangan'),
+            'komisi' => $this->request->getVar('komisi'),
+            'loading_port' => $this->request->getVar('loading_port'),
+            'no_container' => $this->request->getVar('no_container'),
             'payment_term' => $this->request->getVar('payment_term'),
             'potongan_harga' => $this->request->getVar('potongan_harga'),
-            'documents_required' => $this->request->getVar('documents_required'),
+            'sales_contract_no' => $this->request->getVar('sales_contract_no'),
+            'shipment_date' => $this->request->getVar("shipment_date"),
+            'shipment_insurance' => $this->request->getVar('shipment_insurance'),
+            'signature_by' => $this->request->getVar('signature_by'),
             'special_instructions' => $this->request->getVar('special_instructions'),
             'tipe_harga' => $this->request->getVar('tipe_harga'),
-            'broker' => $this->request->getVar('broker'),
-            'komisi' => $this->request->getVar('komisi'),
-            'print_out_broker' => $this->request->getVar('print_out_broker'),
+            'tolerance' => $this->request->getVar('tolerance'),
+            'total_amount' => $this->request->getVar('total_amount'),
+            'total_container' => $this->request->getVar('total_container'),
+            'royalty' => $this->request->getVar('royalty'),
+            'rebate' => $this->request->getVar('rebate'),
+            'can_deduction' => $this->request->getVar('can_deduction'),
+            'estimated_freight' => $this->request->getVar('estimated_freight'),
             'createdBy' => $this->this_user_id,
-            'keterangan' => $this->request->getVar('keterangan'),
-            'bank_id' => $this->request->getVar('bank_id'),
-            'spesifikasi' => $this->request->getVar('spesifikasi'),
-            'no_container' => $this->request->getVar('no_container')
         ]);
 
         // get all id detail
@@ -409,14 +436,41 @@ class SalesKontrak extends BaseController
             if ($check != null) {
                 $this->salesKontrakDetailModel->update($check['id'], [
                     'barang_master_sales_id' => $b->barang_master_sales_id,
-                    'satuan_order_id' => $b->satuan_order_id,
-                    'kemasan' => $b->kemasan,
-                    'remark' => $b->remark,
-                    'qty' => $b->qty,
+                    'brand' => $b->brand,
                     'harga' => $b->harga,
+                    'kemasan' => $b->packing,
+                    'qty' => $b->qty,
+                    'species' => $b->species,
+                    'specs' => $b->specs,
                     'total_harga' => $b->total,
-                    'size' => $b->size
                 ]);
+
+                // Hapus Dulu
+                $this->salesContractSizeBreakdownModel
+                    ->where('sales_contract_detail_id', $check['id'])
+                    ->delete();
+
+                foreach ($b->size_breakdown as $sb) {
+                    $this->salesContractSizeBreakdownModel->insert([
+                        'sales_contract_detail_id' => $check['id'],
+                        'bag' => $sb->bag,
+                        'can' => $sb->can,
+                        'cased' => $sb->cased,
+                        'grade' => $sb->grade,
+                        'inner_box' => $sb->inner_box,
+                        'kg' => $sb->kg,
+                        'lb' => $sb->lb,
+                        'packing' => $sb->packing,
+                        'pc' => $sb->pc,
+                        'persen' => $sb->persen,
+                        'remark' => $sb->remark,
+                        'size' => $sb->size,
+                        'qty' => $sb->qty,
+                        'harga' => $sb->harga,
+                        'total' => $sb->total
+                    ]);
+                }
+
                 array_push($id_detail_all, $check['id']);
             } else {
                 $this->salesKontrakDetailModel
@@ -428,14 +482,36 @@ class SalesKontrak extends BaseController
                 $id_detail_new = $this->salesKontrakDetailModel->insert([
                     'sales_contract_id' => $id,
                     'barang_master_sales_id' => $b->barang_master_sales_id,
-                    'satuan_order_id' => $b->satuan_order_id,
-                    'kemasan' => $b->kemasan,
-                    'remark' => $b->remark,
-                    'qty' => $b->qty,
+                    'brand' => $b->brand,
                     'harga' => $b->harga,
+                    'kemasan' => $b->packing,
+                    'qty' => $b->qty,
+                    'species' => $b->species,
+                    'specs' => $b->specs,
                     'total_harga' => $b->total,
-                    'size' => $b->size
                 ]);
+
+                foreach ($b->size_breakdown as $sb) {
+                    $this->salesContractSizeBreakdownModel->insert([
+                        'sales_contract_detail_id' => $id_detail_new,
+                        'bag' => $sb->bag,
+                        'can' => $sb->can,
+                        'cased' => $sb->cased,
+                        'grade' => $sb->grade,
+                        'inner_box' => $sb->inner_box,
+                        'kg' => $sb->kg,
+                        'lb' => $sb->lb,
+                        'packing' => $sb->packing,
+                        'pc' => $sb->pc,
+                        'persen' => $sb->persen,
+                        'remark' => $sb->remark,
+                        'size' => $sb->size,
+                        'qty' => $sb->qty,
+                        'harga' => $sb->harga,
+                        'total' => $sb->total
+                    ]);
+                }
+
 
                 array_push($id_detail_all,  $id_detail_new);
             }
@@ -477,6 +553,10 @@ class SalesKontrak extends BaseController
         $id = decrypt($this->request->getVar('id'));
 
         $this->salesKontrakModel->delete($id);
+        $salesContractDetail =  $this->salesKontrakDetailModel->where('sales_contract_id', $id)->findAll();
+        foreach ($salesContractDetail as $s) {
+            $this->salesContractSizeBreakdownModel->where('sales_contract_detail_id', $s['id'])->delete();
+        }
         $this->salesKontrakDetailModel->where('sales_contract_id', $id)->delete();
 
         return response()->setJSON([
@@ -519,7 +599,7 @@ class SalesKontrak extends BaseController
         ];
 
         $this->dompdf->loadHtml(view('SalesInternasional/SalesKontrak/print', $data));
-        $this->dompdf->setPaper('A4', 'portrait');
+        $this->dompdf->setPaper('Legal', 'portrait');
         $this->dompdf->render();
         $this->dompdf->stream($filename, array("Attachment" => false));
 

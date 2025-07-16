@@ -59,6 +59,9 @@ class SalesKontrakDetailModel extends Model
 
     public function detail($salesContractID)
     {
+
+        $salesContractSizeBreakdownModel = new SalesContractSizeBreakdownModel();
+
         $qryResult = $this->asArray()
             ->select('barang_master_sales.kode_barang,barang_master_sales.barang_name,sales_contract_detail.*,satuans.kode_satuan')
             ->join('barang_master_sales', 'barang_master_sales.id = sales_contract_detail.barang_master_sales_id', 'left')
@@ -68,6 +71,33 @@ class SalesKontrakDetailModel extends Model
         $dataResult = [];
 
         foreach ($qryResult as $q) {
+            $sizeBreakdown = [];
+
+            $salesContractSize = $salesContractSizeBreakdownModel
+                ->where('sales_contract_detail_id', $q['id'])
+                ->findAll();
+
+            foreach ($salesContractSize as $s) {
+                array_push($sizeBreakdown, [
+                    'id_detail_breakdown' => $s['id'],
+                    'size' => $s['size'],
+                    'grade' => $s['grade'],
+                    'packing' => $s['packing'],
+                    'can' => $s['can'],
+                    'cased' => $s['cased'],
+                    'kg' => $s['kg'],
+                    'lb' => $s['lb'],
+                    'inner_box' => $s['inner_box'],
+                    'pc' => $s['pc'],
+                    'bag' => $s['bag'],
+                    'persen' => $s['persen'],
+                    'qty' => $s['qty'],
+                    'harga' => $s['harga'],
+                    'total' => $s['total'],
+                    'remark' => $s['remark'],
+                ]);
+            }
+
             $dataResult[] = [
                 'id_detail' => $q['id'],
                 'barang_master_sales_id' => $q['barang_master_sales_id'],
@@ -83,7 +113,11 @@ class SalesKontrakDetailModel extends Model
                 // print
                 'total_harga' => $q['total_harga'],
                 'nama_barang' => $q['barang_name'],
-                'size' => $q['size']
+                'size' => $q['size'],
+                'brand' => $q['brand'],
+                'species' => $q['species'],
+                'specs' => $q['specs'],
+                'size_breakdown' => $sizeBreakdown
             ];
         }
 

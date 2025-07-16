@@ -172,19 +172,6 @@
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <div class="input-group input-group-password">
-                                <div class="form-floating mb-3" style="height: 50px;">
-                                    <input <?= !empty($paymentData) ? ($paymentData['status_posting'] == "1" ?  "readonly" : '')  : "" ?> autocomplete="one-time-code" type="text" class="form-control" name="termin" id="termin" value="<?= !empty($paymentData) ? $paymentData['termin'] : '-' ?>" placeholder="Termin">
-                                    <label for="floatingInput">Termin Pembayaran</label>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                </div>
-                <div class="row">
-                    <div class="col-md-4">
-                        <div class="form-floating mb-3" style="height: 50px;">
                             <select <?= !empty($paymentData) ? ($paymentData['status_posting'] == "1" ?  "disabled" : '')  : "" ?> class="form-select " name="payment_method" id="payment_method">
                                 <option selected value="">Pilih Payment Method</option>
                                 <option value="CASH" <?= (!empty($paymentData) && $paymentData['payment_method'] == 'CASH') ? 'selected' : '' ?>>CASH</option>
@@ -193,16 +180,8 @@
                             <label for="floatingInput" style="z-index: 1;">Metode Pembayaran</label>
                         </div>
                     </div>
-                    <div class="col-md-4">
-                        <div class="form-floating mb-3" style="height: 50px;">
-                            <div class="input-group input-group-password">
-                                <div class="form-floating mb-3" style="height: 50px;">
-                                    <input <?= !empty($paymentData) ? ($paymentData['status_posting'] == "1" ?  "readonly" : '')  : "" ?> autocomplete="one-time-code" type="text" class="form-control" id="voucher_no" name="voucher_no" value="<?= !empty($paymentData) ? $paymentData['voucher_no'] : '-' ?>" placeholder="No. Voucher">
-                                    <label for="floatingInput">No. Voucher</label>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                </div>
+                <div class="row">
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <select <?= !empty($paymentData) ? ($paymentData['status_posting'] == "1" ?  "disabled" : '')  : "" ?> class="form-select status_pph" name="status_pph" id="status_pph">
@@ -240,41 +219,6 @@
                             <label for="floatingInput" style="z-index: 1;">Kredit (Opsional)</label>
                         </div>
                     </div>
-
-                </div>
-                <div class="row">
-                    <div class="col-md-4">
-                        <div class="form-floating mb-3" style="height: 50px;">
-                            <div class="input-group input-group-password">
-                                <div class="form-floating mb-3" style="height: 50px;">
-                                    <input <?= !empty($paymentData) ? ($paymentData['status_posting'] == "1" ?  "readonly" : '') : "" ?> autocomplete="one-time-code" type="text" name="no_invoice" class="form-control no_invoice" id="no_invoice" value="<?= $paymentData['no_invoice'] ?? '' ?>" placeholder="No Invoice">
-                                    <label for="floatingInput">No Invoice (Opsional)</label>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="form-floating mb-3" style="height: 50px;">
-                            <div class="input-group input-group-password">
-                                <div class="form-floating mb-3" style="height: 50px;">
-                                    <input <?= !empty($paymentData) ? ($paymentData['status_posting'] == "1" ?  "readonly" : '')  : "" ?> autocomplete="one-time-code" type="text" name="invoice_emkl" class="form-control" id="invoice_emkl" value="<?= $paymentData['invoice_emkl'] ?? '' ?>" placeholder="Invoice EMKL">
-                                    <label for="floatingInput">No Invoice EMKL (Opsional)</label>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="form-floating mb-3" style="height: 50px;">
-                            <div class="input-group input-group-password">
-                                <div class="form-floating mb-3" style="height: 50px;">
-                                    <input <?= !empty($paymentData) ? ($paymentData['status_posting'] == "1" ?  "readonly" : '')  : "" ?> autocomplete="one-time-code" type="text" name="no_aju" class="form-control" id="no_aju" value="<?= $paymentData['no_aju'] ?? '' ?>" placeholder="No Aju">
-                                    <label for="floatingInput">No Aju (Opsional)</label>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="row">
                     <div class="col-md-4">
                         <div class="form-floating mb-3">
                             <textarea <?= !empty($paymentData) ? ($paymentData['status_posting'] == "1" ?  "readonly" : '')  : "" ?> autocomplete="one-time-code" name="note" class="form-control information text-area-all"><?= !empty($paymentData) ? $paymentData['note'] : '-' ?></textarea>
@@ -282,7 +226,6 @@
                         </div>
                     </div>
                 </div>
-
                 <div class="row">
                     <ul class="nav nav-tabs" id="myTab" role="tablist">
                         <li class="nav-item" role="presentation">
@@ -633,9 +576,6 @@
             payment_date: {
                 required: true
             },
-            termin: {
-                required: true
-            },
             payment_method: {
                 required: true
             },
@@ -685,9 +625,6 @@
             },
             payment_date: {
                 required: "Tanggal pembayaran wajib diisi"
-            },
-            termin: {
-                required: "Termin wajib diisi"
             },
             payment_method: {
                 required: "Pilih metode pembayaran"

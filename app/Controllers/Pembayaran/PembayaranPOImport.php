@@ -314,7 +314,7 @@ class PembayaranPOImport extends BaseController
             'po_id' => decrypt($this->request->getVar('import_po')),
             'voucher_no' => $this->request->getVar('voucher_no'),
             'currency' => $this->request->getVar('currency'),
-            'payment_amt' => repairDouble($this->request->getVar('grand_total')),
+            'payment_amt' => $this->request->getVar('grand_total'),
             'current_exchange_rate' => formatter($this->request->getVar('current_exchange_rate'), "CURR_TO_INT"),
             'payment_date' =>  $this->request->getPost("payment_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getVar("payment_date")))) : "",
             'termin' => $this->request->getVar('termin'),
@@ -816,7 +816,7 @@ class PembayaranPOImport extends BaseController
     {
         $id = decrypt($this->request->getVar('id'));
         $this->importPOPaymentModel->update($id, ['status_posting' => '1']);
-        $result = $this->jurnalController->insertDataPembayaran($id, "IMPORT");
+        $result = $this->jurnalController->insertDataPembayaran($id, "IMPORT", '');
         return response()->setJSON([
             'status' => true,
             'token' => csrf_hash(),
