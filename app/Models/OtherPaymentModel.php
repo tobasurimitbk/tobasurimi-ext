@@ -117,13 +117,13 @@ class OtherPaymentModel extends Model
     }
 
        public function get_new_no(
-        string $jenis,
-        string $divisi,
-        int $bank_id,
-        string $bln,
-        string $thn,
-        string $last_day,
-        int $companyID
+        $jenis,
+        $divisi,
+        $bank_id,
+        $bln,
+        $thn,
+        $last_day,
+        $companyID
     ) {
         $banksModel = new BanksModel();
         
