@@ -279,9 +279,17 @@ class CustomerModel extends Model
         return $query->getResultArray();
     }
 
-    public function getCustomerEkspor($user_id, $companyID)
+    public function getCustomerEkspor($user_id, $companyID, $is_admin)
     {
-        return $this->asArray()->where('company_id', $companyID)->where('tipe_customer', "INTERNASIONAL")->where('deletedAt', null)->where('user_id', $user_id)->orderBy('createdAt', "DESC")->findAll();
+        $query = $this->asArray()->where('company_id', $companyID)
+            ->where('tipe_customer', "INTERNASIONAL")
+            ->where('deletedAt', null);
+
+        if (!$is_admin) {
+            $query->where('user_id', $user_id);
+        }
+
+        return $query->orderBy('createdAt', "DESC")->findAll();
     }
 
     public function getCustomerLokal($user_id, $is_admin)
