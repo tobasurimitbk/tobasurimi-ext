@@ -38,7 +38,7 @@
                                 <label for="floatingInput">NIK (Opsional)</label>
                             </div>
                         </div>
-                    
+
                     </div>
                     <div class="row">
                         <div class="col-md-6">
@@ -215,8 +215,8 @@
                                 <th onclick="changeSort('phone')" class="sort">Kontak</th>
                                 <th onclick="changeSort('address')" class="sort">Alamat</th>
                                 <th onclick="changeSort('nameSales')" class="sort">Nama Sales</th>
-                                <th onclick="changeSort('nameSales')" class="sort">Termin</th>
-                                <th onclick="changeSort('nameSales')" class="sort">Limit</th>
+                                <th onclick="changeSort('termin')" class="sort">Termin</th>
+                                <th onclick="changeSort('piutang')" class="sort">Limit</th>
                             </tr>
                         </thead>
                         <tbody class="body-table" id="body-table" style="cursor: pointer;">
@@ -274,19 +274,19 @@
             width: "5%"
         }, {
             data: "kode",
-            className: "text-center"
+            className: "text-left"
         }, {
             data: "name",
-            className: "text-center"
+            className: "text-left"
         }, {
             data: "phone",
-            className: "text-center"
+            className: "text-left"
         }, {
             data: "address",
-            className: "text-center",
+            className: "text-left"
         }, {
             data: "namaSales",
-            className: "text-center"
+            className: "text-left"
         }, {
             data: "termin",
             className: "text-center"
@@ -710,7 +710,7 @@
                             $("#auto_generate").off("change");
                             $("#auto_generate").prop("checked", true);
                             $(".kode").attr("readonly", true);
-                            $("#auto_generate").on("change", function () {
+                            $("#auto_generate").on("change", function() {
                                 changeStatus();
                             });
                         }

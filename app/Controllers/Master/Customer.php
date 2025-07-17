@@ -78,15 +78,14 @@ class Customer extends BaseController
     public function generateNo()
     {
         $bln = date('m');
-        $thn = date('Y'); // Tahun awal, full (contoh: 2025)
+        // $thn = date('Y'); // Tahun awal, full (contoh: 2025)
         $thn2 = date('y'); // Untuk disisipkan dalam kode, biasanya tahun full
-        $last_year = $thn . "-12-31"; // Batas akhir tahun ini
+        // $last_year = $thn . "-12-31"; // Batas akhir tahun ini
 
         $no = $this->CustomerModel->get_kode(
             $bln,
-            $thn,
             $thn2,
-            $last_year
+            "LOKAL"
         );
 
         return response()->setJSON([
@@ -114,15 +113,15 @@ class Customer extends BaseController
             "search"        => $this->request->getGet("search"),
             "sort"          => $this->request->getGet("sort"),
             "sortType"      => $this->request->getGet("sortType"),
-            "company_id"    => $this->request->getGet("company_id"),
+            "customers.company_id"    => $this->request->getGet("company_id"),
         ];
 
 
         $limit = $this->request->getGet("length");
         $offset = $this->request->getGet("start");
-        $dataCompanyUserLogin = $this->CompanyModel->getCompaniesUserLogin();
+        // $dataCompanyUserLogin = $this->CompanyModel->getCompaniesUserLogin();
 
-        $customerData = $this->CustomerModel->getList($condition, $dataCompanyUserLogin, $addCondition, $limit, $offset);
+        $customerData = $this->CustomerModel->getList($condition, $addCondition, $limit, $offset);
 
         $dataCustomer = [];
 
@@ -205,16 +204,24 @@ class Customer extends BaseController
                 $kode = $this->request->getPost("kode");
                 if (empty($kode)) {
                     $bln = date('m');
-                    $thn = date('Y'); // Tahun awal, full (contoh: 2025)
-                    $thn2 = date('y'); // Untuk disisipkan dalam kode, biasanya tahun full
-                    $last_year = $thn . "-12-31"; // Batas akhir tahun ini
+                    $thn2 = date('y');
+                    $tipeCustomer = $this->request->getPost("tipe_customer");
 
-                    $kode = $this->CustomerModel->get_kode(
-                        $bln,
-                        $thn,
-                        $thn2,
-                        $last_year
-                    );
+                    if ($tipeCustomer == "LOKAL") {
+                        // KODE CUSTOMER LOKAL
+                        $kode = $this->CustomerModel->get_kode(
+                            $bln,
+                            $thn2,
+                            "LOKAL"
+                        );
+                    } else {
+                        // KODE CUSTOMER IMPORT
+                        $kode = $this->CustomerModel->get_kode(
+                            $bln,
+                            $thn2,
+                            "INTERNASIONAL"
+                        );
+                    }
                 }
                 $values = [
                     "company_id" => $this->this_company_id,
@@ -325,7 +332,7 @@ class Customer extends BaseController
                 $values = [
                     "company_id" => $this->this_company_id,
                     // "user_id" => $this->this_user_id,
-                    "kode" => $this->request->getPost("kode"),
+                    // "kode" => $this->request->getPost("kode"),
                     "name" => strtoupper($this->request->getVar("name")),
                     "address" => strtoupper($this->request->getVar("address")),
                     "nik" => $this->request->getPost("nik"),
@@ -346,6 +353,13 @@ class Customer extends BaseController
                     "jenis_penjualan" => $this->request->getPost("jenis_penjualan"),
                     "sales_id" => $this->request->getPost("sales_id") ?? null,
                 ];
+
+                if ($values['tipe_customer'] == "LOKAL") {
+                    $this->CustomerModel->update($id, [
+                        "kode" => $this->request->getPost("kode"),
+                    ]);
+                }
+
                 if ($this->CustomerModel->update($id, $values)) {
                     $data = [
                         "status"            => true,

@@ -492,6 +492,7 @@ $routes->post('/pembayaran-lain/delete', 'Pembayaran\OtherPayment::delete', ['fi
 $routes->get('/pembayaran-lain/all', 'Pembayaran\OtherPayment::all', ['filter' => 'Auth']);
 $routes->post('/pembayaran-lain/posting', 'Pembayaran\OtherPayment::posting', ['filter' => 'Auth']);
 $routes->post('/pembayaran-lain/update', 'Pembayaran\OtherPayment::updateAction', ['filter' => 'Auth']);
+$routes->get('/pembayaran-lain/generate-no-pembayaran', 'Pembayaran\OtherPayment::generatePayment', ['filter' => 'Auth']);
 
 // penerimaan pembayaran SO
 $routes->get('/penerimaan-penjualan-lokal', 'Penerimaan\SalesOrderPayment::index', ['filter' => 'Auth']);

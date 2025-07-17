@@ -194,16 +194,16 @@
             width: "5%"
         }, {
             data: "kode",
-            className: "text-center"
+            className: "text-left"
         }, {
             data: "name",
-            className: "text-center"
+            className: "text-left"
         }, {
             data: "countryName",
-            className: "text-center"
+            className: "text-left"
         }, {
             data: "address",
-            className: "text-center",
+            className: "text-left"
         }, ],
         columnDefs: [{
             defaultContent: "-",

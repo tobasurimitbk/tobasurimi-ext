@@ -9,6 +9,7 @@ use App\Models\OtherPaymentModel;
 use App\Models\OtherPaymentDetailModel;
 use App\Models\Sub_AkunsModel;
 use App\Controllers\Accounting\JurnalUmum\JurnalUmum;
+use App\Models\BanksModel;
 
 class OtherPayment extends BaseController
 {
@@ -29,14 +30,17 @@ class OtherPayment extends BaseController
         $this->jurnalController = new JurnalUmum();
         $this->metaDataModel = new MetadataModel();
         $this->subAkunsModel = new Sub_AkunsModel();
+        $this->banksModel = new BanksModel();
     }
 
     public function index()
     {
-
         $data = [
+            'bankList' => $this->banksModel->where('company_id', $this->this_company_id)
+                            ->orderBy('name', "ASC")
+                            ->findAll(),
             'divisi' => $this->divisiModel->getDivisiAccess(),
-            "dataValuta" => $this->metaDataModel->get_by_name('Valuta'),
+            'dataValuta' => $this->metaDataModel->get_by_name('Valuta'),
             'subsAkuns' =>  $this->subAkunsModel->asObject()
                 ->where('deletedAt', null)
                 ->where('company_id', $this->this_company_id)
@@ -120,6 +124,7 @@ class OtherPayment extends BaseController
         $parentData = [
             'company_id'     => $this->this_company_id,
             'divisi_id'      => $payload['divisi_id'],
+            'bank_id'      => $payload['bank_id'],
             'no_pembayaran'  => $payload['no_pembayaran'],
             'bayar_ke'       => $payload['bayar_ke'],
             'jenis_pembayaran'          => $payload['jenis_pembayaran'],
@@ -191,6 +196,7 @@ class OtherPayment extends BaseController
         $parentData = [
             'company_id'     => $this->this_company_id,
             'divisi_id'      => $payload['divisi_id'],
+            'bank_id'      => $payload['bank_id'],
             'no_pembayaran'  => $payload['no_pembayaran'],
             'bayar_ke'       => $payload['bayar_ke'],
             'jenis_pembayaran'          => $payload['jenis_pembayaran'],
@@ -344,6 +350,31 @@ class OtherPayment extends BaseController
         ];
 
         return $this->response->setJSON($response);
+    }
+
+
+    public function generatePayment()
+    {
+        $otherPaymentModel = new otherPaymentModel();
+        $jenis = $this->request->getGet('jenisPembayaran');
+        $divisi = str_replace(' ', '', trim($this->request->getGet('divisiId')));
+        $bank = str_replace(' ', '', trim($this->request->getGet('bankId')));
+
+        $paymentNo = $otherPaymentModel->get_new_no(
+            $jenis,
+            $divisi,
+            $bank,
+            date('m'),
+            date('Y'),
+            getLastDay(),
+            $this->this_company_id
+        );
+
+        return response()->setJSON([
+            'paymentNo' => $paymentNo,
+            'token' => csrf_hash(),
+            'success' => true,
+        ]);
     }
 
     public function posting()

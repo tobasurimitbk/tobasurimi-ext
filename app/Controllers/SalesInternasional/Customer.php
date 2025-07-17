@@ -33,7 +33,7 @@ class Customer extends BaseController
     {
         $dataCountry = $this->countryModel->findAll();
         $condition = [
-            'jabatan_name' => "SALES"
+            'jabatan_name' => "SALES INTERNASIONAL"
         ];
         $sales = $this->employessModel->getEmployeesComplete($this->this_company_id, $condition);
 
@@ -79,9 +79,7 @@ class Customer extends BaseController
         $limit = $this->request->getGet("length");
         $offset = $this->request->getGet("start");
 
-        $dataCompanyUserLogin = [$this->this_company_id];
-
-        $customerData = $this->CustomerModel->getList($condition, $dataCompanyUserLogin, $addCondition, $limit, $offset);
+        $customerData = $this->CustomerModel->getListCustomerDetail($condition, $addCondition, $limit, $offset);
 
         $dataCustomer = [];
 
