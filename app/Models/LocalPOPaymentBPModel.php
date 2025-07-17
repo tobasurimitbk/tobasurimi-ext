@@ -266,7 +266,7 @@ class LocalPOPaymentBPModel extends Model
         return $payments;
     }
 
-    public function get_new_no(
+      public function get_new_no(
         $jenis,
         $divisi,
         $bank_id,
@@ -276,8 +276,7 @@ class LocalPOPaymentBPModel extends Model
         $companyID
     ) {
         $banksModel = new BanksModel();
-        $db = \Config\Database::connect();
-
+        
         // Step 1: Get bank code
         $kodeBank = '';
         if (!empty($bank_id)) {
@@ -298,7 +297,6 @@ class LocalPOPaymentBPModel extends Model
             }
         }
 
-        // Step 2: Divisi Code
         $kodeDivisi = '';
         if (!empty($divisi)) {
             $divisiUpper = strtoupper($divisi);
@@ -317,49 +315,59 @@ class LocalPOPaymentBPModel extends Model
             }
         }
 
-        // Step 3: Build prefix
-        $prefix = '';
-        if (!empty($kodeDivisi)) {
-            $prefix .= $kodeDivisi . '/';
-        }
+        // Step 3: Build search pattern based on whether bank code exists
+        $searchPattern = $kodeDivisi . '/';
         if (!empty($kodeBank)) {
-            $prefix .= $kodeBank . '/';
+            $searchPattern .= $kodeBank . '/';
         }
-        $prefix .= $thn . '/' . $bln . '/';
+        $searchPattern .= $thn . '/' . $bln . '/';
 
-        // Step 4: Check all tables
+        // Step 4: Check all relevant tables for the highest number
+        $db = \Config\Database::connect();
+        
         $tablesToCheck = [
             'other_payment' => 'no_pembayaran',
             'local_po_payments' => 'payment_no',
             'local_po_payment_bp' => 'payment_no',
             'panjar_pinjaman_transaction' => 'no_transaction',
         ];
-
+        
         $maxNumber = 0;
-
+        
         foreach ($tablesToCheck as $table => $column) {
             $builder = $db->table($table);
+            
             $lastRecord = $builder->select($column)
-                ->like($column, $prefix, 'after') // match prefix awal
-                ->where('company_id', $companyID)
-                ->where("DATE(createdAt) >=", "{$thn}-{$bln}-01")
-                ->where("DATE(createdAt) <=", "{$last_day}")
-                ->where('deletedAt', null)
-                ->orderBy($column, 'DESC')
-                ->get(1)
-                ->getRowArray();
+                                ->like($column, $searchPattern, 'after')
+                                ->where('createdAt >=', "{$thn}-{$bln}-01 00:00:00")
+                                ->where('createdAt <=', "{$last_day} 23:59:59")
+                                ->where('company_id', $companyID)
+                                ->where('deletedAt', null)
+                                ->orderBy($column, 'DESC')
+                                ->get(1)
+                                ->getRowArray();
 
-            if ($lastRecord && isset($lastRecord[$column])) {
-                $parts = explode('/', $lastRecord[$column]);
-                $currentNumber = isset($parts[4]) ? (int)$parts[4] : 0;
-                $maxNumber = max($maxNumber, $currentNumber);
+            if ($lastRecord) {
+                try {
+                    $lastParts = explode('/', $lastRecord[$column]);
+                    $currentNumber = (int)end($lastParts);
+                    $maxNumber = max($maxNumber, $currentNumber);
+                } catch (Exception $e) {
+                    log_message('error', "Failed to parse number from {$table}.{$column}: " . $e->getMessage());
+                }
             }
         }
 
-        // Step 5: Create new number
+        // Step 5: Generate new number
         $counterNext = str_pad($maxNumber + 1, 4, '0', STR_PAD_LEFT);
-        $newNo = $prefix . $counterNext;
-
-        return $newNo;
+        
+        // Build final number
+        $prefix = $kodeDivisi . '/';
+        if (!empty($kodeBank)) {
+            $prefix .= $kodeBank . '/';
+        }
+        $prefix .= $thn . '/' . $bln . '/';
+        
+        return $prefix . $counterNext;
     }
 }
