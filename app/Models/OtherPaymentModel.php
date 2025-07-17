@@ -116,11 +116,18 @@ class OtherPaymentModel extends Model
         ];
     }
 
-    public function get_new_no($jenis, $divisi, $bank_id, $bln, $thn, $last_day, $companyID)
-    {
+       public function get_new_no(
+        string $jenis,
+        string $divisi,
+        int $bank_id,
+        string $bln,
+        string $thn,
+        string $last_day,
+        int $companyID
+    ) {
         $banksModel = new BanksModel();
         
-        // Step 1: Dapatkan kode bank dari database
+        // Step 1: Get bank code
         $kodeBank = '';
         if (!empty($bank_id)) {
             $bankData = $banksModel->select('name')
@@ -140,7 +147,6 @@ class OtherPaymentModel extends Model
             }
         }
 
-        // Step 2: Tentukan kode divisi
         $kodeDivisi = '';
         if (!empty($divisi)) {
             $divisiUpper = strtoupper($divisi);
@@ -159,7 +165,7 @@ class OtherPaymentModel extends Model
             }
         }
 
-        // Step 3: Gabungkan kode divisi dan kode bank
+        // Step 3: Build prefix
         $prefix = '';
         if (!empty($kodeDivisi)) {
             $prefix .= $kodeDivisi . '/';
@@ -167,32 +173,47 @@ class OtherPaymentModel extends Model
         if (!empty($kodeBank)) {
             $prefix .= $kodeBank . '/';
         }
-
-        // Step 4: Tambahkan tahun, bulan, dan nomor urut
         $prefix .= $thn . '/' . $bln . '/';
 
-        // Step 5: Query nomor terakhir dan generate nomor baru
-        $lastPO = $this->select('no_pembayaran')
-                    ->like('no_pembayaran', $prefix)
-                    ->where('createdAt >=', "{$thn}-{$bln}-01 00:00:00")
-                    ->where('createdAt <=', "{$last_day} 23:59:59")
-                    ->where('company_id', $companyID)
-                    ->where('deletedAt', null)
-                    ->orderBy('no_pembayaran', 'DESC')
-                    ->first();
+        // Step 4: Check all relevant tables for the highest number
+        $db = \Config\Database::connect();
+        
+        // Define all tables and columns to check
+        $tablesToCheck = [
+            'other_payment' => 'no_pembayaran',
+            'local_po_payments' => 'payment_no',
+            'local_po_payment_bp' => 'payment_no',
+            'panjar_pinjaman_transaction' => 'no_transaction',
+        ];
+        
+        $maxNumber = 0;
+        
+        foreach ($tablesToCheck as $table => $column) {
+            $builder = $db->table($table);
+            
+            $lastRecord = $builder->select($column)
+                                ->like($column, $prefix)
+                                ->where('createdAt >=', "{$thn}-{$bln}-01 00:00:00")
+                                ->where('createdAt <=', "{$last_day} 23:59:59")
+                                ->where('company_id', $companyID)
+                                ->where('deletedAt', null)
+                                ->orderBy($column, 'DESC')
+                                ->get(1)
+                                ->getRowArray();
 
-        $counterFirst = '0001';
-        if ($lastPO == null) {
-            return $prefix . $counterFirst;
-        } else {
-            try {
-                $lastParts = explode('/', $lastPO['no_pembayaran']);
-                $lastNumber = isset($lastParts[4]) ? (int) $lastParts[4] : 0; // Perhatikan index [4] untuk nomor urut
-                $counterNext = str_pad($lastNumber + 1, 4, '0', STR_PAD_LEFT);
-                return $prefix . $counterNext;
-            } catch (Exception $e) {
-                return 'ERROR GENERATE NUMBER ' . date('Y-m-d');
+            if ($lastRecord) {
+                try {
+                    $lastParts = explode('/', $lastRecord[$column]);
+                    $currentNumber = isset($lastParts[4]) ? (int)$lastParts[4] : 0;
+                    $maxNumber = max($maxNumber, $currentNumber);
+                } catch (Exception $e) {
+                    log_message('error', "Failed to parse number from {$table}.{$column}: " . $e->getMessage());
+                }
             }
         }
+
+        // Step 5: Generate new number
+        $counterNext = str_pad($maxNumber + 1, 4, '0', STR_PAD_LEFT);
+        return $prefix . $counterNext;
     }
 }

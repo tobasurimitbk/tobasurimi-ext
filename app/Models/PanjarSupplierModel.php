@@ -266,7 +266,7 @@ class PanjarSupplierModel extends Model
         return $historyPembayaranPanjarData;
     }
 
-        public function get_new_no($jenis, $divisi, $bank_id, $bln, $thn, $last_day, $companyID)
+    public function get_new_no($jenis, $divisi, $bank_id, $bln, $thn, $last_day, $companyID)
     {
         $banksModel = new BanksModel();
         

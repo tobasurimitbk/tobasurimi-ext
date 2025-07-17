@@ -1438,7 +1438,7 @@ class PembayaranPOLokal extends BaseController
         $divisi = str_replace(' ', '', trim($this->request->getGet('divisiId')));
         $bank = str_replace(' ', '', trim($this->request->getGet('bankId')));
 
-        $paymentNo = $localPOPaymentModel->get_new_no_po(
+        $paymentNo = $localPOPaymentModel->get_new_no(
             $jenis,
             $divisi,
             $bank,
@@ -1494,7 +1494,7 @@ class PembayaranPOLokal extends BaseController
         $divisi = str_replace(' ', '', trim($this->request->getvar('divisiId')));
         $bank = str_replace(' ', '', trim($this->request->getvar('bankId')));
 
-        $paymentNo = $localPOPaymentBPModel->get_new_no_po(
+        $paymentNo = $localPOPaymentBPModel->get_new_no(
             $jenis,
             $divisi,
             $bank,
