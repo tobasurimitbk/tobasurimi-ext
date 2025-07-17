@@ -818,11 +818,10 @@ class POLokalBahanBaku extends BaseController
 
     public function printPengeluaran($id)
     {
-        if (is_numeric($id)) {
-            $id = $id;
-        } else {
+        if (!is_numeric($id)) {
             $id = decrypt($id);
         }
+
         $data = [];
         if ($id) {
             $dataPO = $this->RMPurchaseOrderModel->getPoBBLokalById($id);
@@ -833,17 +832,15 @@ class POLokalBahanBaku extends BaseController
             if ($dataPO) {
                 $dataPODetail = $this->RMPurchaseOrderDetailModel->getPoBBLokalDetailById($id);
 
-                // dd($dataPODetail);
+                $totalPrice = 0.0;
+                $totalDailyPrice = 0.0;
+                $totalQty = 0.0;
 
-                $totalPrice = 0;
-                $totalDailyPrice = 0;
-                $totalQty = 0;
-                $pph = 0.00;
-
-                if ($dataPO->po_date <=  '2025-06-30') {
+                // Hitung tarif PPh
+                if ($dataPO->po_date <= '2025-06-30') {
                     $pphTax = !empty($dataPO->supplierNPWP) ? 0.0025 : 0.005;
                 } else {
-                    $pphTax = !empty($dataPO->supplierNPWP) ? 0.0025 : 0.0025;
+                    $pphTax = 0.0025;
                 }
 
                 $objPph = [
@@ -854,56 +851,65 @@ class POLokalBahanBaku extends BaseController
 
                 $pphTax *= $objPph[$dataPO->pph];
 
-                if ($dataPO->po_date <=  '2025-06-30') {
-                    $dataPO->nilai_pph2 = !empty($dataPO->supplierNPWP) ? 0.0025 : 0.005;
-                } else {
-                    $dataPO->nilai_pph2 =  0.0025;
-                }
-
+                // Simpan nilai asli PPh
+                $dataPO->nilai_pph2 = ($dataPO->po_date <= '2025-06-30') ? (!empty($dataPO->supplierNPWP) ? 0.0025 : 0.005) : 0.0025;
                 $dataPO->nilai_pph = 1 - $dataPO->nilai_pph2;
 
-                // $dataPO->nilai_pph = !empty($dataPO->supplierNPWP) ? (1.00 - 0.0025) : (1.00 - 0.005);
-                // $dataPO->nilai_pph2 = !empty($dataPO->supplierNPWP) ? 0.0025 : 0.005;
-
                 foreach ($dataPODetail as $value) {
-                    $totalPrice += formatter($value->general_price, "CURR_TO_FLOAT") * formatter($value->qty, "CURR_TO_FLOAT");
-                    $totalDailyPrice += formatter($value->daily_price, "CURR_TO_FLOAT") * formatter($value->qty, "CURR_TO_FLOAT");
-                    $totalQty += formatter($value->qty, "STR_TO_FLOAT");
-                }
-                $dataPO->kode_satuan = $dataPODetail[0]->kode_satuan;
-                $dataPO->totalPrice = number_format($totalPrice, 2, '.', ',');
-                $dataPO->totalDailyPrice = number_format($totalDailyPrice, 2, '.', ',');
-                $dataPO->totalQty = number_format($totalQty, 2, '.', ',');
-                $dataPO->totalPph = number_format($totalPrice * $pphTax, 2, '.', ',');
-                $dataPO->totalDailyPph = number_format($totalDailyPrice * $pphTax, 2, '.', ',');
-                $dataPO->totalPaid = number_format($totalPrice - ($totalPrice * $pphTax), 2, '.', ',');
-                $dataPO->totalDailyPaid = number_format(($totalDailyPrice - $totalDailyPrice * $pphTax), 2, '.', ',');
-                $dataPO->totalPaidTerbilang = terbilang($totalPrice - ($totalPrice * $pphTax));
-                $dataPO->totalDailyPaidTerbilang = terbilang(($totalDailyPrice - $totalDailyPrice * $pphTax));
-                $dataPO->amount = terbilang($totalPrice);
-                $dataPO->amountDaily = terbilang($totalDailyPrice);
-                if ($dataPO->pph == "Company") {
-                    // Pakai nilai_pph
-                    $dataPO->selisih = (($dataPO->cong_batasan ? $dataPO->cong_batasan : 0) - ($dataPO->cong_sebenarnya ? $dataPO->cong_sebenarnya : 0) + $dataPO->subsidi_langsung) / $dataPO->nilai_pph;
-                    $dataPO->totalTambahan = number_format($dataPO->selisih, 2, '.', ',');
-                    $dataPO->totalTambahanPph = number_format($dataPO->selisih * $pphTax, 2, '.', ',');
-                    $dataPO->totalTambahanPaid = number_format(($dataPO->selisih * $pphTax) - $dataPO->totalTambahanPph, 2, '.', ',');
-                } else {
-                    // Pakai nilai_pph2
-                    $dataPO->selisih = (($dataPO->cong_batasan ? $dataPO->cong_batasan : 0) - ($dataPO->cong_sebenarnya ? $dataPO->cong_sebenarnya : 0) + $dataPO->subsidi_langsung);
-                    $dataPO->totalTambahan = number_format(($dataPO->selisih * $totalQty), 2, '.', ',');
-                    $dataPO->totalTambahanPph = number_format(($dataPO->selisih * $totalQty) * $pphTax, 2, '.', ',');
-                    $dataPO->totalTambahanPaid = number_format(($dataPO->selisih * $totalQty) - (($dataPO->selisih * $totalQty) * $pphTax), 2, '.', ',');
-                }
-                $dataPO->totalTambahanPaidTerbilang = terbilang($dataPO->totalTambahanPaid);
+                    $price = formatter($value->general_price, "CURR_TO_FLOAT");
+                    $daily = formatter($value->daily_price, "CURR_TO_FLOAT");
+                    $qty = formatter($value->qty, "CURR_TO_FLOAT");
 
+                    $totalPrice += $price * $qty;
+                    $totalDailyPrice += $daily * $qty;
+                    $totalQty += $qty;
+                }
+
+                // Format yang akan dikirim ke view
+                $dataPO->kode_satuan = $dataPODetail[0]->kode_satuan ?? '';
+                $dataPO->totalPriceRaw = round($totalPrice, 2);
+                $dataPO->totalDailyPriceRaw = round($totalDailyPrice, 2);
+                $dataPO->totalQtyRaw = round($totalQty, 2);
+                $dataPO->totalPphRaw = round($totalPrice * $pphTax, 2);
+                $dataPO->totalDailyPphRaw = round($totalDailyPrice * $pphTax, 2);
+                $dataPO->totalPaidRaw = round($totalPrice - $dataPO->totalPphRaw, 2);
+                $dataPO->totalDailyPaidRaw = round($totalDailyPrice - $dataPO->totalDailyPphRaw, 2);
+
+                $dataPO->totalPrice = number_format($dataPO->totalPriceRaw, 2, '.', ',');
+                $dataPO->totalDailyPrice = number_format($dataPO->totalDailyPriceRaw, 2, '.', ',');
+                $dataPO->totalQty = number_format($dataPO->totalQtyRaw, 2, '.', ',');
+                $dataPO->totalPph = number_format($dataPO->totalPphRaw, 2, '.', ',');
+                $dataPO->totalDailyPph = number_format($dataPO->totalDailyPphRaw, 2, '.', ',');
+                $dataPO->totalPaid = number_format($dataPO->totalPaidRaw, 2, '.', ',');
+                $dataPO->totalDailyPaid = number_format($dataPO->totalDailyPaidRaw, 2, '.', ',');
+
+                // Konsistensi dengan nilai asli
+                $dataPO->totalPaidTerbilang = terbilang($dataPO->totalPaidRaw);
+                $dataPO->totalDailyPaidTerbilang = terbilang($dataPO->totalDailyPaidRaw);
+                $dataPO->amount = terbilang($dataPO->totalPriceRaw);
+                $dataPO->amountDaily = terbilang($dataPO->totalDailyPriceRaw);
+
+                if ($dataPO->pph == "Company") {
+                    $selisih = (($dataPO->cong_batasan ?? 0) - ($dataPO->cong_sebenarnya ?? 0) + $dataPO->subsidi_langsung) / $dataPO->nilai_pph;
+                } else {
+                    $selisih = (($dataPO->cong_batasan ?? 0) - ($dataPO->cong_sebenarnya ?? 0) + $dataPO->subsidi_langsung) * $totalQty;
+                }
+
+                $selisih = round($selisih, 2);
+                $selisihPph = round($selisih * $pphTax, 2);
+                $selisihPaid = round($selisih - $selisihPph, 2);
+
+                $dataPO->selisih = $selisih;
+                $dataPO->totalTambahan = number_format($selisih, 2, '.', ',');
+                $dataPO->totalTambahanPph = number_format($selisihPph, 2, '.', ',');
+                $dataPO->totalTambahanPaid = number_format($selisihPaid, 2, '.', ',');
+                $dataPO->totalTambahanPaidTerbilang = terbilang($selisihPaid);
+
+                // Siapkan data sebagai array untuk view
                 $data = (array) $dataPO;
             }
 
-            // dd($data);
-
             $filename = "Bukti Pengeluaran Bahan Baku";
-
             $this->dompdf->loadHtml(view('Purchase/poLokalBahanBaku/print-pengeluaran', $data));
             $this->dompdf->setPaper('A5', 'landscape');
             $this->dompdf->render();
