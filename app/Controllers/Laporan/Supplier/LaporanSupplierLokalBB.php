@@ -89,7 +89,7 @@ class LaporanSupplierLokalBB extends BaseController
         $addCondition = [
             "dateStart"    => $this->request->getGet("dateStart") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getGet("dateStart")))) : "",
             "dateEnd"      => $this->request->getGet("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getGet("dateEnd")))) : "",
-            "sort"         => $this->request->getGet("sort"),
+            "sort"         => $this->request->getGet("sort") ?? 'rm_purchase_orders.po_no',
             "sortType"     => $this->request->getGet("sortType"),
             "supplierId"   => $this->request->getGet("filter_supplier"),
             "barangId"     => $this->request->getGet("filter_barang"),

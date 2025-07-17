@@ -523,8 +523,15 @@ class RMPurchaseOrderModel extends Model
 
         $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
 
-        $sort = $availableSort[$addCondition['sort'] ?? 'updatedAt'] ?? 'rm_purchase_orders.updatedAt';
-        $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'DESC';
+        if (!empty($addCondition['sort'])) {
+            if ($addCondition['sort'] == "rm_purchase_orders.po_no" || $addCondition['sort'] == "poNum") {
+                $sort = 'rm_purchase_orders.po_no';
+                $sortType = 'ASC';
+            }
+        } else {
+            $sort = $availableSort[$addCondition['sort'] ?? 'updatedAt'] ?? 'rm_purchase_orders.updatedAt';
+            $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'DESC';
+        }
 
         $selectQry = "
         suppliers.no_npwp AS supplierNpwp,
