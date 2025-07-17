@@ -485,24 +485,24 @@
                 width: "5%"
             }, {
                 data: "kode",
-                className: "text-center"
+                className: "text-left"
             },
             {
                 data: "companyName",
-                className: "text-center"
+                className: "text-left"
             },
             {
                 data: "name",
-                className: "text-center"
+                className: "text-left"
             }, {
                 data: "namaSales",
-                className: "text-center"
+                className: "text-left"
             }, {
                 data: "phone",
-                className: "text-center"
+                className: "text-left"
             }, {
                 data: "address",
-                className: "text-center",
+                className: "text-left"
             },
 
         ],
@@ -561,22 +561,22 @@
             width: "5%"
         }, {
             data: "kode",
-            className: "text-center"
+            className: "text-left"
         }, {
             data: "companyName",
-            className: "text-center"
+            className: "text-left"
         }, {
             data: "name",
-            className: "text-center"
+            className: "text-left"
         }, {
             data: "namaSales",
-            className: "text-center"
+            className: "text-left"
         }, {
             data: "countryName",
-            className: "text-center"
+            className: "text-left"
         }, {
             data: "address",
-            className: "text-center",
+            className: "text-left"
         }, ],
         columnDefs: [{
             defaultContent: "-",
@@ -602,6 +602,10 @@
                     pattern: /[0-9]/,
                 }
             }
+        })
+
+        $('.company_lokal_search').change(function() {
+            dataTableLokal.ajax.reload();
         })
 
         $(".parent_postal_code").mask("AAAAA", {

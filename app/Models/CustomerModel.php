@@ -76,7 +76,7 @@ class CustomerModel extends Model
         return $query->getResultArray();
     }
 
-    public function getList($condition, $companyAccessArr, $dataIsAdmin, $addCondition, $limit = 10, $offset = 0)
+    public function getList($condition, $addCondition, $limit = 10, $offset = 0)
     {
         $availableSort = [
             'namaSales'         => 'users.name',
@@ -103,12 +103,87 @@ class CustomerModel extends Model
 
         $customerDataQry = $this->asObject()
             ->select($selectQry)
-            // ->where('customers.address !=', '')
+            ->where($condition)
+            ->join('metadata', 'customers.currency = metadata.id', 'left')
+            ->join('country', 'country.id = customers.country_id', 'left')
+            ->join('employees', 'employees.id = customers.sales_id', 'left')
+            ->join('companies', 'companies.id = customers.company_id', 'left');
+
+        if ($condition['tipe_customer'] == "LOKAL") {
+            $customerDataQry->where('customers.address !=', '')
+                ->where('customers.address IS NOT NULL');
+        }
+
+        if (isset($addCondition['customers.company_id'])) {
+            if (!empty($addCondition['customers.company_id'])) {
+                $customerDataQry->where('customers.company_id', $addCondition['customers.company_id']);
+            }
+        }
+
+        if (isset($addCondition['search']) && !empty($addCondition['search'])) {
+            $customerDataQry->groupStart()
+                ->like('customers.name', $addCondition['search'])
+                ->orLike('customers.kode', $addCondition['search'])
+                ->groupEnd();
+        }
+
+        $totalData = $customerDataQry->countAllResults(false);
+        $totalFilteredData = $customerDataQry->countAllResults(false);
+        $data = $customerDataQry->orderBy($sort, $sortType)
+            ->findAll($limit, $offset);
+
+        return [
+            'data'              => $data,
+            'totalData'         => $totalData,
+            'totalFilteredData' => $totalFilteredData,
+            'sort'              => $sort,
+            'sortType'          => $sortType
+        ];
+    }
+
+    public function getListCustomerDetail($condition, $addCondition, $limit = 10, $offset = 0)
+    {
+        $availableSort = [
+            'namaSales'         => 'users.name',
+            'kode'              => 'customers.kode',
+            'name'              => 'customers.name',
+            'address'           => 'customers.address',
+            'contact_person'    => 'customers.contact_person',
+            'phone'             => 'customers.phone',
+            'saldo'             => 'customers.saldo',
+            'currencyName'      => 'metadata.value',
+            'createdAt'         => 'customers.createdAt',
+            'updatedAt'         => 'customers.updatedAt',
+            'termin'            => 'customers.termin',
+            'piutang'           => 'customers.piutang',
+        ];
+
+        $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
+
+        $sort = $availableSort[$addCondition['sort'] ?? 'createdAt'] ?? 'customers.kode';
+        $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'DESC';
+
+        $selectQry = "customers.*, 
+                    employees.name as namaSales,
+                    metadata.value AS currencyName,
+                    country.country_name AS countryName,
+                    companies.company as companyName";
+
+        $customerDataQry = $this->asObject()
+            ->select($selectQry)
             ->where($condition)
             ->join('metadata', 'customers.currency = metadata.id', 'left')
             ->join('country', 'country.id = customers.country_id', 'left')
             ->join('employees', 'employees.id = customers.sales_id', 'LEFT')
             ->join('companies', 'companies.id = customers.company_id', 'left');
+
+        if (session()->get("login")->this_company_id == 16) {
+            // OCS PUNYA COUNTER NOMOR SENDIRI
+            $customerDataQry->where('customers.company_id', 16);
+        } else {
+            // KIM 1, KIM 2, GLOBAL COUNTER NYA DIGABUNG
+            $customerDataQry->whereIn('customers.company_id', [1, 2, 15]);
+        }
 
         if ($condition['tipe_customer'] == "LOKAL") {
             $customerDataQry->where('customers.address !=', '')
@@ -329,22 +404,41 @@ class CustomerModel extends Model
         return $customerMeta;
     }
 
-    public function get_kode($bln, $thn, $thn2, $last_year)
+    public function get_kode($bln, $thn2, $tipe_customer)
     {
         $lastStr = $thn2;
-        $first_day = "$thn-01-01 00:00:00";
-        $last_day = "$last_year 23:59:59";
 
         $builder = $this->db->table('customers');
         $builder->select('kode');
         $builder->orderBy('kode', 'asc');
-        $builder->where('createdAt >=', $first_day);
-        $builder->where('createdAt <=', $last_day);
+        $builder->where('tipe_customer', $tipe_customer);
         $builder->where('deletedAt', null);
-        $builder->like('kode', $lastStr);
+
+        if ($tipe_customer == "LOKAL") {
+            // LOKAL
+            if (session()->get("login")->this_company_id == 16) {
+                // OCS PUNYA COUNTER NOMOR SENDIRI
+                $builder->where('company_id', 16);
+            } else {
+                // KIM 1, KIM 2, GLOBAL COUNTER NYA DIGABUNG
+                $builder->whereIn('company_id', [1, 2, 15]);
+            }
+        } else {
+            // INTERNASIONAL
+            $builder->where('company_id', session()->get("login")->this_company_id);
+        }
+
+        $builder->groupStart()->like('kode', $lastStr)->groupEnd();
+
         $query = $builder->get();
 
-        $kodePrefix = 'CS/' . $bln . '/' . $thn2;
+        if ($tipe_customer == "LOKAL") {
+            // TIPE CUSTOMER LOKAL
+            $kodePrefix = 'CS/' . $bln . '/' . $thn2;
+        } else {
+            // TIPE CUSTOMER EKSPOR
+            $kodePrefix = 'IN/' . $bln . '/' . $thn2;
+        }
 
         $existingNumbers = [];
 

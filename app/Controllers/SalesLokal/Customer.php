@@ -70,13 +70,11 @@ class Customer extends BaseController
         if ($this->is_admin == '1') {
             $condition = [
                 'tipe_customer' => $this->request->getGet('customerType'),
-                // 'customers.company_id' => $this->this_company_id,
                 'customers.deletedAt' => null,
             ];
         } elseif ($this->is_admin == '0') {
             $condition = [
                 'tipe_customer' => $this->request->getGet('customerType'),
-                // 'customers.company_id' => $this->this_company_id,
                 'customers.deletedAt' => null,
                 'customers.user_id' => session()->get('login')->user_id
             ];
@@ -88,12 +86,9 @@ class Customer extends BaseController
             "sortType"      => $this->request->getGet("sortType"),
         ];
 
-        $dataCompanyUserLogin = [$this->this_company_id];
-        $dataIsAdmin = $this->is_admin;
-
         $limit = $this->request->getGet("length");
         $offset = $this->request->getGet("start");
-        $customerData = $this->CustomerModel->getList($condition, $dataCompanyUserLogin, $dataIsAdmin, $addCondition, $limit, $offset);
+        $customerData = $this->CustomerModel->getListCustomerDetail($condition, $addCondition, $limit, $offset);
 
         $dataCustomer = [];
 
@@ -118,12 +113,12 @@ class Customer extends BaseController
                 "name"          => $data->name,
                 "phone"         => $data->phone,
                 "contact_person" => $data->contact_person,
-                "saldo"         => number_format($data->saldo),
+                "saldo"         => number_format(floatval($data->saldo)),
                 "currencyName"  => $data->currencyName,
                 "countryName"   => $data->countryName,
                 "address"       => $data->address,
                 "termin"        => $termin,
-                "limit"       => number_format($data->piutang),
+                "piutang"         => number_format(floatval($data->piutang)),
             ]);
         }
 
