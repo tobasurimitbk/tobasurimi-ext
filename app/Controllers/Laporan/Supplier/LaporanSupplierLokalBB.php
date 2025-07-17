@@ -238,20 +238,64 @@ class LaporanSupplierLokalBB extends BaseController
         }
 
         $groupedData = array_values($groupedData);
-        $totalGrouped = count($groupedData);
-        $paginatedData = array_slice($groupedData, ($currentPage - 1) * $pageSize, $pageSize);
 
-        foreach ($paginatedData as $i => &$row) {
-            $row['no'] = ($currentPage - 1) * $pageSize + $i + 1;
-
-            if ($row['tambahan'] != "0") {
+        // Hitung ulang nilai subsidi dan total per baris SEBELUM paginasi
+        foreach ($groupedData as &$row) {
+            if ($row['tambahan'] == 0) {
                 $row['pphSubsidi'] = $row['subsidi'] * $row['nilai_pph2'];
                 $row['totalSubsidi'] = $row['subsidi'] - $row['pphSubsidi'];
                 $row['totalRow'] = $row['totalUmum'] + $row['totalHarian'] + $row['totalBulanan'] + $row['totalSubsidi'];
             } else {
+                $dppSubsidi = $row['tambahan'] / (1 - $row['nilai_pph2']);
+                $row['subsidi'] = $dppSubsidi;
+                $row['pphSubsidi'] = $dppSubsidi * $row['nilai_pph2'];
+                $row['totalSubsidi'] = $dppSubsidi - $row['pphSubsidi'];
                 $row['totalRow'] = $row['totalUmum'] + $row['totalHarian'] + $row['totalBulanan'] + $row['totalSubsidi'];
             }
+        }
+        unset($row); // Hapus reference
 
+        // HITUNG ULANG TOTALS DARI DATA YANG SUDAH DISESUAIKAN
+        $totals = [
+            'qtyAll' => 0,
+            'dppUmum' => 0,
+            'pphUmum' => 0,
+            'totalUmum' => 0,
+            'dppHarian' => 0,
+            'pphHarian' => 0,
+            'totalHarian' => 0,
+            'dppBulanan' => 0,
+            'pphBulanan' => 0,
+            'totalBulanan' => 0,
+            'subsidi' => 0,
+            'pphSubsidi' => 0,
+            'totalSubsidi' => 0,
+            'totalRow' => 0,
+        ];
+
+        foreach ($groupedData as $row) {
+            $totals['qtyAll'] += $row['qtyPO'];
+            $totals['dppUmum'] += $row['dppUmum'];
+            $totals['pphUmum'] += $row['pphUmum'];
+            $totals['totalUmum'] += $row['totalUmum'];
+            $totals['dppHarian'] += $row['dppHarian'];
+            $totals['pphHarian'] += $row['pphHarian'];
+            $totals['totalHarian'] += $row['totalHarian'];
+            $totals['dppBulanan'] += $row['dppBulanan'];
+            $totals['pphBulanan'] += $row['pphBulanan'];
+            $totals['totalBulanan'] += $row['totalBulanan'];
+            $totals['subsidi'] += $row['subsidi'];
+            $totals['pphSubsidi'] += $row['pphSubsidi'];
+            $totals['totalSubsidi'] += $row['totalSubsidi'];
+            $totals['totalRow'] += $row['totalRow'];
+        }
+
+        $totalGrouped = count($groupedData);
+        $paginatedData = array_slice($groupedData, ($currentPage - 1) * $pageSize, $pageSize);
+
+        // Format angka untuk tampilan (TANPA mengubah nilai asli)
+        foreach ($paginatedData as $i => &$row) {
+            $row['no'] = ($currentPage - 1) * $pageSize + $i + 1;
             foreach ($row as $key => $val) {
                 if (is_numeric($val) && $key !== 'no') {
                     $row[$key] = number_format($val, 2, '.', ',');
@@ -259,8 +303,10 @@ class LaporanSupplierLokalBB extends BaseController
             }
         }
 
+        // Format totals untuk footer
+        $formattedTotals = [];
         foreach ($totals as $key => $val) {
-            $totals[$key] = number_format($val, 2, '.', ',');
+            $formattedTotals[$key] = number_format($val, 2, '.', ',');
         }
 
         echo json_encode([
@@ -272,8 +318,8 @@ class LaporanSupplierLokalBB extends BaseController
                 "pageSize" => $pageSize,
                 "currentPage" => $currentPage
             ],
-            'totalTotalRow' => number_format($totalTotalRow, 2, '.', ','),
-            'footerTotals' => $totals
+            'totalTotalRow' => number_format($totals['totalRow'], 2, '.', ','),
+            'footerTotals' => $formattedTotals
         ]);
     }
 
