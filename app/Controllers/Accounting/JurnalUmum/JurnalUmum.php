@@ -1941,7 +1941,8 @@ class JurnalUmum extends BaseController
                     'metode_input' => 'system',
                     'type_transaksi' => $idTransaksi,
                     'no_bukti' => $POlocal->payment_no,
-                    'valas' => '30',
+                    'valas' => 'IDR',
+                    'valas_id' => '30',
                     'exchange_rate' => 1,
                 );
 
@@ -1951,7 +1952,7 @@ class JurnalUmum extends BaseController
                 //untuk insert ke jurnal umum
                 $multiplePoIds = str_replace(['[', ']'], '', $POlocal->multiple_po_id); // Remove brackets
                 $PoIdsArray = explode(',', $multiplePoIds); // Split the string into an array by comma
-                
+
                 foreach ($PoIdsArray as $poId) {
 
                     $sumValue = 0;
@@ -2003,41 +2004,40 @@ class JurnalUmum extends BaseController
 
                         if ($value->total_pay_pph) {
 
-                                $cleanedPO = str_replace(['[', ']', '"', "\\"], '', $value->multiple_po_no);
-                                $dataPO = $value->supplier_name . ' - ' . $cleanedPO;
+                            $cleanedPO = str_replace(['[', ']', '"', "\\"], '', $value->multiple_po_no);
+                            $dataPO = $value->supplier_name . ' - ' . $cleanedPO;
 
-                                $sumValue = $value->total_pay_pph;
-                                $result[] = array(
-                                    'id_transaksi'      => $id_transaksi_jurnal,
-                                    'id_coa'            => $POlocal->akun_pajak,
-                                    'company_id'        => $POlocal->company_id,
-                                    'divisi_id'         => $divisi,
-                                    'supplier_id'       => $POlocal->supplier_id,
-                                    'tanggal_jurnal'    => date('Y-m-d', strtotime(str_replace('/', '-', $POlocal->payment_date))),
-                                    'debit'             => ($sumValue),
-                                    'kredit'            => 0,
-                                    'valas'             => '30',
-                                    'kurs'              => 1,
-                                    'keterangan'        => "PAJAK ". $POlocal->keterangan,
-                                    'id_inputer'        => session()->get("login")->user_id
-                                );
-                                $result[] = array(
-                                    'id_transaksi'      => $id_transaksi_jurnal,
-                                    'id_coa'            => $POlocal->akun_pajak,
-                                    'company_id'        => $POlocal->company_id,
-                                    'divisi_id'         => $divisi,
-                                    'supplier_id'       => $POlocal->supplier_id,
-                                    'tanggal_jurnal'    => date('Y-m-d', strtotime(str_replace('/', '-', $POlocal->payment_date))),
-                                    'debit'             => 0,
-                                    'kredit'            => ($sumValue),
-                                    'valas'             => '30',
-                                    'kurs'              => 1,
-                                    'keterangan'        => "PAJAK ". $POlocal->keterangan,
-                                    'id_inputer'        => session()->get("login")->user_id
-                                );
+                            $sumValue = $value->total_pay_pph;
+                            $result[] = array(
+                                'id_transaksi'      => $id_transaksi_jurnal,
+                                'id_coa'            => $POlocal->akun_pajak,
+                                'company_id'        => $POlocal->company_id,
+                                'divisi_id'         => $divisi,
+                                'supplier_id'       => $POlocal->supplier_id,
+                                'tanggal_jurnal'    => date('Y-m-d', strtotime(str_replace('/', '-', $POlocal->payment_date))),
+                                'debit'             => ($sumValue),
+                                'kredit'            => 0,
+                                'valas'             => '30',
+                                'kurs'              => 1,
+                                'keterangan'        => "PAJAK " . $POlocal->keterangan,
+                                'id_inputer'        => session()->get("login")->user_id
+                            );
+                            $result[] = array(
+                                'id_transaksi'      => $id_transaksi_jurnal,
+                                'id_coa'            => $POlocal->akun_pajak,
+                                'company_id'        => $POlocal->company_id,
+                                'divisi_id'         => $divisi,
+                                'supplier_id'       => $POlocal->supplier_id,
+                                'tanggal_jurnal'    => date('Y-m-d', strtotime(str_replace('/', '-', $POlocal->payment_date))),
+                                'debit'             => 0,
+                                'kredit'            => ($sumValue),
+                                'valas'             => '30',
+                                'kurs'              => 1,
+                                'keterangan'        => "PAJAK " . $POlocal->keterangan,
+                                'id_inputer'        => session()->get("login")->user_id
+                            );
                         }
                     }
-
                 }
                 $this->jurnalUmumModel->insertJurnalBatch($result);
             }
@@ -2047,8 +2047,8 @@ class JurnalUmum extends BaseController
             $pajakTandaTerimaFakturModel = new PajakTandaTerimaFakturModel();
 
             $pajakTandaTerima = $pajakTandaTerimaFakturModel->where("tanda_terima_faktur_id", $POlocal['tanda_terima_faktur_id'])
-                                                        ->where("deletedAt", null)
-                                                        ->findAll();
+                ->where("deletedAt", null)
+                ->findAll();
 
             if ($POlocal) {
                 $dataMetadataTipeTransaksi = $this->MetadataModel->asObject()->where('name', 'tipe_transaksi')->where('value', 'PEMBAYARAN')->findAll();
@@ -2064,7 +2064,8 @@ class JurnalUmum extends BaseController
                     'metode_input' => 'system',
                     'type_transaksi' => $idTransaksi,
                     'no_bukti' => $POlocal['payment_no'],
-                    'valas' => '30',
+                    'valas' => 'IDR',
+                    'valas_id' => '30',
                     'exchange_rate' => 1,
                     'uraian_transaksi' => $POlocal['supplier']
                 );
@@ -2118,7 +2119,7 @@ class JurnalUmum extends BaseController
                             'kredit'            => 0,
                             'valas'             => '30',
                             'kurs'              => 1,
-                            'keterangan'        => "Pajak ". $POlocal['keterangan'],
+                            'keterangan'        => "Pajak " . $POlocal['keterangan'],
                             'id_inputer'        => session()->get("login")->user_id
                         ]);
 
@@ -2134,7 +2135,7 @@ class JurnalUmum extends BaseController
                             'kredit'            => $ptt['tax_amt'],
                             'valas'             => '30',
                             'kurs'              => 1,
-                            'keterangan'        => "Pajak ". $POlocal['keterangan'],
+                            'keterangan'        => "Pajak " . $POlocal['keterangan'],
                             'id_inputer'        => session()->get("login")->user_id
                         ]);
                     }
@@ -2194,6 +2195,7 @@ class JurnalUmum extends BaseController
                     'type_transaksi' => $idTransaksi,
                     'no_bukti' => $no_transaksi_jurnal,
                     'valas' => $POimport->currency,
+                    'valas_id' => $POimport->valas_id,
                     'exchange_rate' => $POimport->current_exchange_rate,
                 );
 
@@ -2211,7 +2213,7 @@ class JurnalUmum extends BaseController
                     'tanggal_jurnal' => date('Y-m-d', strtotime(str_replace('/', '-', $POimport->payment_date))),
                     'debit' => 0,
                     'kredit' => ($POimport->payment_amt),
-                    'valas' => $POimport->currency,
+                    'valas' => $POimport->valas_id,
                     'kurs' => $POimport->current_exchange_rate,
                     'company_id' => $POimport->company_id,
                     'divisi_id' => $POimport->divisi_id,
@@ -2225,7 +2227,7 @@ class JurnalUmum extends BaseController
                     'tanggal_jurnal' => date('Y-m-d', strtotime(str_replace('/', '-', $POimport->payment_date))),
                     'debit' => ($POimport->payment_amt),
                     'kredit' => 0,
-                    'valas' => $POimport->currency,
+                    'valas' => $POimport->valas_id,
                     'kurs' => $POimport->current_exchange_rate,
                     'company_id' => $POimport->company_id,
                     'divisi_id' => $POimport->divisi_id,
