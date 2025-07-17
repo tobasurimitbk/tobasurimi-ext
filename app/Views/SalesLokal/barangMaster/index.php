@@ -47,9 +47,10 @@
                                 <th onclick="changeSort('harga_pokok')" class="sort">Harga Pokok</th>
                                 <th onclick="changeSort('harga_jual')" class="sort">Harga Jual</th>
                                 <th onclick="changeSort('status_ppn')" class="sort">Status PPn</th>
+                                <th>Action</th>
                             </tr>
                         </thead>
-                        <tbody class="body-table" id="body-table" style="cursor: pointer;">
+                        <tbody class="body-table" id="body-table">
                         </tbody>
                     </table>
                 </div>
@@ -161,7 +162,6 @@
 
 
     const table = $('.dataTable').DataTable({
-
         processing: true,
         serverSide: true,
         ordering: true,
@@ -229,6 +229,29 @@
                     } else { // Otherwise, display a dash "-"
                         return "<i class='fa fa-minus' aria-hidden='true' style='color:red;'></i>";
                     }
+                }
+            },
+            {
+                data: "id",
+                className: "text-center actions",
+                searchable: false,
+                sortable: false,
+                render: function(data, type, row) {
+                    var id = row.id;
+                    return `
+                        <div class="mt-0">
+                            <?php if (can('Penjualan Lokal', 'Customer', 'u')) : ?>
+                                <a href="javascript:void(0)" onclick="edit('${id}')" data-toggle="tooltip" title="Detail" class="btn btn-primary">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                            <?php endif; ?>
+                            <?php if (can('Penjualan Lokal', 'Customer', 'd')) : ?>
+                                <button data-toggle="tooltip" title="Hapus" onclick="destroy('${id}')" class="btn btn-danger delete-parent">
+                                    <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
+                                </button>
+                            <?php endif; ?>
+                        </div>
+                    `
                 }
             },
         ],
@@ -440,99 +463,6 @@
         }
     });
 
-    $('#dataTable tbody').on('click', 'tr td:not(.actions):not(.dataTables_empty)', function() {
-        resetForm();
-        const data = table.row(this).data();
-        let id = data.id;
-        let formData = new FormData();
-        formData.append("id", id);
-
-        $.ajax({
-            url: "<?= base_url("master-barang-lokal/get"); ?>",
-            data: formData,
-            beforeSend: function(xhr) {
-                xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                setLoading();
-            },
-            complete: function() {
-                stopLoading();
-            },
-            method: "POST",
-            dataType: "json",
-            processData: false,
-            contentType: false,
-            success: function(res) {
-                csrf.val();
-                $('.id').val(res.data.id);
-                $('.kode_barang').val(res.data.kode_barang);
-                $('.barang_name').val(res.data.barang_name);
-                $('.type_barang').val(res.data.type_barang).change();
-                $('.satuan_id').val(res.data.satuan_id).change();
-                $('.harga_pokok').val(greatFormatRupiah(res.data.harga_pokok));
-                $('.harga_jual').val(greatFormatRupiah(res.data.harga_jual));
-                if (res.data.status_ppn != 0) {
-                    $("#status_ppn").prop('checked', true);
-                } else {
-                    $("#status_ppn").prop('checked', false);
-                }
-
-                $('.input-generate').hide();
-                $('.kode_barang').attr('readonly', true);
-                // $('.type_barang').attr('disabled', true);
-                $('#add_modal').modal('show');
-                $('.delete-btn').show();
-                $('.title-name').text('Update Barang')
-            }
-        })
-    });
-
-    $(".delete-btn").click(function() {
-        Swal.fire({
-            icon: 'question',
-            title: 'Hapus Barang ?',
-            confirmButtonColor: '#4e73df',
-            cancelButtonColor: '#d33',
-            showCancelButton: true,
-            reverseButtons: true,
-            confirmButtonText: 'Hapus',
-            cancelButtonText: 'Kembali',
-        }).then((result) => {
-            if (result.isConfirmed) {
-                let csrf = $(`[name="${csrfToken}"]`);
-                let id = $('input[name="id"]').val();
-                $.ajax({
-                    url: "<?= base_url("master-barang-lokal/delete"); ?>",
-                    data: {
-                        id: id
-                    },
-                    beforeSend: function(xhr) {
-                        xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                        setLoading();
-                    },
-                    complete: function() {
-                        stopLoading();
-                    },
-                    method: "POST",
-                    dataType: "json",
-                    success: function(response) {
-                        csrf.val(response.token);
-                        Swal.fire({
-                            icon: 'success',
-                            title: response.message,
-                            confirmButtonColor: '#4e73df',
-                            reverseButtons: true,
-                            confirmButtonText: 'Oke',
-                        }).then((result) => {
-                            table.ajax.reload();
-                            $('#add_modal').modal('hide');
-                            resetForm();
-                        })
-
-                    },
-                });
-            }
-        })
-    });
 
     $('.btn-add').click(function() {
         resetForm();
@@ -653,6 +583,97 @@
         } else {
             inputElement.value = numericValue;
         }
+    }
+
+    function edit(id) {
+        resetForm();
+        let formData = new FormData();
+        formData.append("id", id);
+
+        $.ajax({
+            url: "<?= base_url("master-barang-lokal/get"); ?>",
+            data: formData,
+            beforeSend: function(xhr) {
+                xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                setLoading();
+            },
+            complete: function() {
+                stopLoading();
+            },
+            method: "POST",
+            dataType: "json",
+            processData: false,
+            contentType: false,
+            success: function(res) {
+                $('.id').val(res.data.id);
+                $('.kode_barang').val(res.data.kode_barang);
+                $('.barang_name').val(res.data.barang_name);
+                $('.type_barang').val(res.data.type_barang).change();
+                $('.satuan_id').val(res.data.satuan_id).change();
+                $('.harga_pokok').val(greatFormatRupiah(res.data.harga_pokok));
+                $('.harga_jual').val(greatFormatRupiah(res.data.harga_jual));
+                if (res.data.status_ppn != 0) {
+                    $("#status_ppn").prop('checked', true);
+                } else {
+                    $("#status_ppn").prop('checked', false);
+                }
+
+                $('.input-generate').hide();
+                $('.kode_barang').attr('readonly', true);
+                // $('.type_barang').attr('disabled', true);
+                $('#add_modal').modal('show');
+                $('.delete-btn').show();
+                $('.title-name').text('Update Barang')
+            }
+        })
+    }
+
+    function destroy(id) {
+        Swal.fire({
+            icon: 'question',
+            title: 'Hapus Barang ?',
+            confirmButtonColor: '#4e73df',
+            cancelButtonColor: '#d33',
+            showCancelButton: true,
+            reverseButtons: true,
+            confirmButtonText: 'Hapus',
+            cancelButtonText: 'Kembali',
+        }).then((result) => {
+            if (result.isConfirmed) {
+                let csrf = $(`[name="${csrfToken}"]`);
+                $.ajax({
+                    url: "<?= base_url("master-barang-lokal/delete"); ?>",
+                    data: {
+                        id: id
+                    },
+                    beforeSend: function(xhr) {
+                        xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                        setLoading();
+                    },
+                    complete: function() {
+                        stopLoading();
+                    },
+                    method: "POST",
+                    dataType: "json",
+                    success: function(response) {
+                        csrf.val(response.token);
+                        Swal.fire({
+                            icon: 'success',
+                            title: response.message,
+                            confirmButtonColor: '#4e73df',
+                            reverseButtons: true,
+                            confirmButtonText: 'Oke',
+                        }).then((result) => {
+                            table.ajax.reload();
+                            $('#add_modal').modal('hide');
+                            resetForm();
+                        })
+
+                    },
+                });
+            }
+        })
+
     }
 </script>
 
