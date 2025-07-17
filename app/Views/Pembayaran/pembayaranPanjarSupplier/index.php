@@ -31,6 +31,32 @@
 
                                 <div class="col-md-6">
                                     <div class="form-floating mb-3" style="height: 50px;">
+                                        <select class="form-select divisi_id" id="divisi_id" name="divisi_id" aria-label="Floating label select example">
+                                            <option value=""></option>
+                                            <?php foreach ($divisi as $d) : ?>
+                                                <option value="<?= $d['id'] ?>">
+                                                    <?= $d['divisi']; ?>
+                                                </option>
+                                            <?php endforeach; ?>
+                                        </select>
+                                        <label for="floatingInput" style="z-index: 1;">Departemen</label>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <div class="form-floating form-pembayaran-po mb-3" style="height: 50px;">
+                                        <select class="form-select" name="bank_id" id="bank_id">
+                                                <option disabled selected value=""></option>
+                                            <?php foreach ($bankList as $b) : ?>
+                                                <option value="<?= $b['id'] ?>"><?= strtoupper($b['kode_bank']) ?></option>
+                                            <?php endforeach ?>
+                                        </select>
+                                        <label for="floatingInput" style="z-index: 1;">Kode Bank (Opsional)</label>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <div class="form-floating mb-3" style="height: 50px;">
                                         <select class="form-select" name="jenis" id="jenis">
                                             <option value="PUTIH">PUTIH</option>
                                             <option value="MERAH">MERAH</option>
@@ -660,6 +686,22 @@
     });
 
 
+    $('#divisi_id').select2({
+            placeholder: "Pilih Departemen",
+            theme: "bootstrap-5",
+            dropdownParent: $('#add_modal .modal-content') // Updated to match modal structure
+    }).change(function() {
+            generatePaymentNumber();    
+    });
+        
+    $('#bank_id').select2({
+            placeholder: "Pilih Bank",
+            theme: "bootstrap-5",
+            dropdownParent: $('#add_modal .modal-content') // Updated to match modal structure
+    }).change(function() {
+            generatePaymentNumber();    
+    });
+
     $("#tipe_supplier, #supplier_id, #tipe, #jenis_transaksi, #jenis")
         .parent('div')
         .find('label')
@@ -977,7 +1019,6 @@
             $(".title-name").text("Tambah Data Panjar & Pinjaman");
             $(".delete-btn").css('display', 'none');
             $(".add-modal").modal("show");
-            changeStatus();
             $(".btn-submit-form").show();
             $(".create-form input, .create-form select, .btn-add-detail").prop("disabled", false);
         });
@@ -1107,47 +1148,6 @@
         data.forEach(function(item) {
             $(".supplier_id").append(`<option value="${item.id}">${item.name}</option>`)
         })
-    }
-
-    function changeStatus() {
-        const isPinjaman = $("#form-type").val() === "pinjaman";
-        const noTransaksiField = $("#no_transaksi");
-
-            const endpoint = isPinjaman ?
-                "<?= base_url('/pinjaman-supplier/generate-no-pinjaman'); ?>" :
-                "<?= base_url('/panjar-supplier/generate-no-panjar'); ?>";
-
-            $.ajax({
-                url: endpoint,
-                method: "GET",
-                dataType: "json",
-                success: function(res) {
-                    if (res) {
-                        noTransaksiField.val(res);
-                        $("#no_transaksi").attr('readonly', true);
-                    } else {
-                        Swal.fire({
-                            icon: 'error',
-                            title: res.message || 'Gagal generate nomor transaksi',
-                            confirmButtonColor: '#4e73df',
-                        });
-                        checkbox.checked = false;
-                        noTransaksiField.val("");
-                        $("#no_transaksi").attr('readonly', false);
-                    }
-                },
-                error: function() {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Terjadi kesalahan saat generate nomor',
-                        confirmButtonColor: '#4e73df',
-                    });
-                    checkbox.checked = false;
-                    noTransaksiField.val("");
-                    $("#no_transaksi").attr('readonly', false);
-
-                }
-            });
     }
 
 
@@ -1319,6 +1319,54 @@
             var numberWithDot = withoutDot.replace(',', '.');
             return parseFloat(numberWithDot);
         }
+    }
+
+    function generatePaymentNumber() {
+        // Get selected divisi and bank values
+        let jenisPembayaran = $("#jenis option:selected").text();
+        let divisiId = $("#divisi_id option:selected").text();
+        let bankId = $("#bank_id option:selected").val();
+        
+        // Only generate if this is a new record (empty detail)
+        <?php if(empty($detail)): ?>
+            const csrfToken = '<?= csrf_token() ?>';
+            const csrf = $(`[name="${csrfToken}"]`);
+            
+            // Build URL with query parameters
+            let url = "<?= base_url('panjar-supplier/generate-no-panjar'); ?>";
+            url += `?jenisPembayaran=${encodeURIComponent(jenisPembayaran)}&divisiId=${encodeURIComponent(divisiId)}&bankId=${encodeURIComponent(bankId)}`;
+            
+            // Additional data if needed
+            var formData = new FormData();
+            formData.append("payment_date", $("#payment_date").val());
+            
+            $("#no_transaksi").attr("readonly", true);
+            
+            $.ajax({
+                url: url,
+                method: "GET",
+                data: formData,
+                dataType: "json",
+                beforeSend: function(xhr) {
+                    xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                },
+                processData: false,
+                contentType: false,
+                success: function(response) {
+                    csrf.val(response.token);
+                    $("#no_transaksi").val(response.paymentNo);
+                },
+                error: function(xhr, status, error) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Terjadi kesalahan pada sistem',
+                        text: 'Gagal menghasilkan nomor pembayaran otomatis',
+                        confirmButtonColor: '#4e73df',
+                    });
+                    $("#no_transaksi").attr("readonly", false);
+                }
+            });
+        <?php endif; ?>
     }
 </script>
 

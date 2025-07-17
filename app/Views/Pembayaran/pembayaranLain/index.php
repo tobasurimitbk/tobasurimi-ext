@@ -42,6 +42,17 @@
                             </div>
                             <div class="row">
                                 <div class="col-md-6">
+                                    <div class="form-floating form-pembayaran-po mb-3" style="height: 50px;">
+                                        <select class="form-select" name="bank_id" id="bank_id">
+                                                <option disabled selected value=""></option>
+                                            <?php foreach ($bankList as $b) : ?>
+                                                <option value="<?= $b['id'] ?>"><?= strtoupper($b['kode_bank']) ?></option>
+                                            <?php endforeach ?>
+                                        </select>
+                                        <label for="floatingInput" style="z-index: 1;">Kode Bank (Opsional)</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
                                     <div class="form-floating mb-3" style="height: 50px;">
                                         <select class="form-select" name="jenis_pembayaran" id="jenis_pembayaran" required>
                                             <option value="PUTIH">PUTIH</option>
@@ -50,6 +61,8 @@
                                         <label for="floatingInput" style="z-index: 1;">Jenis Pembayaran</label>
                                     </div>
                                 </div>
+                            </div>
+                            <div class="row">
                                 <div class="col-md-6">
                                     <div class="form-floating mb-3" style="height: 50px;">
                                         <select class="form-select" name="akun_selisih" id="akun_selisih" required>
@@ -61,22 +74,20 @@
                                         <label for="floatingInput" style="z-index: 1;">Kredit</label>
                                     </div>
                                 </div>
-                            </div>
-                            <div class="row">
                                 <div class="col-md-6">
                                     <div class="form-floating mb-3" style="height: 50px;">
                                         <input autocomplete="one-time-code" type="text" class="form-control bayar_ke" name="bayar_ke" id="bayar_ke" placeholder="Pembayaran Ke">
                                         <label for="floatingInput">Pembayaran Kepada</label>
                                     </div>
                                 </div>
+                            </div>
+                            <div class="row">
                                 <div class="col-md-6">
                                     <div class="form-floating mb-3" style="height: 50px;">
                                         <input autocomplete="one-time-code" type="text" class="form-control total_all_amount" name="total_all_amount" id="total_all_amount" placeholder="Total Keseluruhan" readonly>
                                         <label for="floatingInput">Total Keseluruhan</label>
                                     </div>
                                 </div>
-                            </div>
-                            <div class="row">
                                 <div class="col-md-6">
                                     <div class="form-floating mb-3" style="height: 50px;">
                                         <textarea autocomplete="one-time-code" style="height: 88px;" type="text" class="form-control keterangan_parent" name="keterangan_parent" id="keterangan_parent" placeholder="Keterangan"></textarea>
@@ -551,6 +562,16 @@
             placeholder: "Pilih Departemen",
             theme: "bootstrap-5",
             dropdownParent: $('#add_modal .modal-content') // Updated to match modal structure
+        }).change(function() {
+            generatePaymentNumber();    
+        });
+        
+        $('#bank_id').select2({
+            placeholder: "Pilih Bank",
+            theme: "bootstrap-5",
+            dropdownParent: $('#add_modal .modal-content') // Updated to match modal structure
+        }).change(function() {
+            generatePaymentNumber();    
         });
 
         $('#valas').select2({
@@ -770,6 +791,7 @@
             const formData = {
                 no_pembayaran: $('#no_pembayaran').val(),
                 divisi_id: $('#divisi_id').val(),
+                bank_id: $('#bank_id').val(),
                 valas: $('#valas').val(),
                 bayar_ke: $('#bayar_ke').val(),
                 details: details
@@ -983,6 +1005,7 @@
             const formData = {
                 no_pembayaran: $('#no_pembayaran').val(),
                 divisi_id: $('#divisi_id').val(),
+                bank_id: $('#bank_id').val(),
                 valas: $('#valas').val(),
                 bayar_ke: $('#bayar_ke').val(),
                 details: details
@@ -1055,6 +1078,7 @@
                         $('#id').val(parent.id);
                         $("#no_pembayaran").val(parent.no_pembayaran);
                         $('#divisi_id').val(parent.divisi_id).change();
+                        $('#bank_id').val(parent.bank_id).change();
                         $('#bayar_ke').val(parent.bayar_ke);
                         $('#akun_selisih').val(parent.akun_selisih).change();
                         $('#keterangan_parent').val(parent.keterangan_parent);
@@ -1140,6 +1164,7 @@
                         const requestData = {
                             id: id,
                             divisi_id: $('#divisi_id').val(),
+                            bank_id: $('#bank_id').val(),
                             no_pembayaran: $('#no_pembayaran').val(),
                             bayar_ke: $('#bayar_ke').val(),
                             akun_selisih: $('#akun_selisih').val(),
@@ -1275,6 +1300,7 @@
         $("#no_pembayaran").attr('disabled', true);
         $('#tanggal').attr('disabled', true);
         $('#divisi_id').attr('disabled', true);
+        $('#bank_id').attr('disabled', true);
         $('#bayar_ke').attr('disabled', true);
         $('#valas').attr('disabled', true);
         $('#metode_pembayaran').attr('disabled', true);
@@ -1295,6 +1321,7 @@
         $("#no_pembayaran").attr('disabled', false);
         $('#tanggal').attr('disabled', false);
         $('#divisi_id').attr('disabled', false);
+        $('#bank_id').attr('disabled', false);
         $('#bayar_ke').attr('disabled', false);
         $('#valas').attr('disabled', false);
         $('#metode_pembayaran').attr('disabled', false);
@@ -1312,6 +1339,7 @@
         $("#no_pembayaran").val(null).change();
         $('#tanggal').val(null).change();
         $('#divisi_id').val(null).change();
+        $('#bank_id').val(null).change();
         $('#bayar_ke').val(null).change();
         $('#valas').val(null).change();
         $('#metode_pembayaran').val(null).change();
@@ -1388,5 +1416,55 @@
             inputElement.value = numericValue;
         }
     }
+
+
+    function generatePaymentNumber() {
+        // Get selected divisi and bank values
+        let jenisPembayaran = $("#jenis option:selected").text();
+        let divisiId = $("#divisi_id option:selected").text();
+        let bankId = $("#bank_id option:selected").val();
+        
+        // Only generate if this is a new record (empty detail)
+        <?php if(empty($detail)): ?>
+            const csrfToken = '<?= csrf_token() ?>';
+            const csrf = $(`[name="${csrfToken}"]`);
+            
+            // Build URL with query parameters
+            let url = "<?= base_url('pembayaran-lain/generate-no-pembayaran'); ?>";
+            url += `?jenisPembayaran=${encodeURIComponent(jenisPembayaran)}&divisiId=${encodeURIComponent(divisiId)}&bankId=${encodeURIComponent(bankId)}`;
+            
+            // Additional data if needed
+            var formData = new FormData();
+            formData.append("payment_date", $("#payment_date").val());
+            
+            $(".no_pembayaran").attr("readonly", true);
+            
+            $.ajax({
+                url: url,
+                method: "GET",
+                data: formData,
+                dataType: "json",
+                beforeSend: function(xhr) {
+                    xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                },
+                processData: false,
+                contentType: false,
+                success: function(response) {
+                    csrf.val(response.token);
+                    $(".no_pembayaran").val(response.paymentNo);
+                },
+                error: function(xhr, status, error) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Terjadi kesalahan pada sistem',
+                        text: 'Gagal menghasilkan nomor pembayaran otomatis',
+                        confirmButtonColor: '#4e73df',
+                    });
+                    $(".no_pembayaran").attr("readonly", false);
+                }
+            });
+        <?php endif; ?>
+    }
+    
 </script>
 <?= $this->endSection(); ?>

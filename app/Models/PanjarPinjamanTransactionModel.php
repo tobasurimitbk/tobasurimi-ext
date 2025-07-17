@@ -19,6 +19,8 @@ class PanjarPinjamanTransactionModel extends Model
         'type',
         'supplier_id',
         'company_id',
+        'bank_id',
+        'divisi_id',
         'no_transaction',
         'is_posted',
         'keterangan'
@@ -172,5 +174,85 @@ class PanjarPinjamanTransactionModel extends Model
         $generatedNo = $kode . '/' . $lastStr . '/' . $formattedlastNumber; // Gabungkan semua bagian
 
         return $generatedNo;
+    }
+
+    public function get_new_no($jenis, $divisi, $bank_id, $bln, $thn, $last_day, $companyID)
+    {
+        $banksModel = new BanksModel();
+        
+        // Step 1: Dapatkan kode bank dari database
+        $kodeBank = '';
+        if (!empty($bank_id)) {
+            $bankData = $banksModel->select('name')
+                                ->where('id', $bank_id)
+                                ->first();
+            if ($bankData) {
+                $name = strtoupper($bankData['name']);
+                if (strpos($name, 'BRI') !== false) {
+                    $kodeBank = 'BRI';
+                } elseif (strpos($name, 'MANDIRI') !== false) {
+                    $kodeBank = 'MND';
+                } elseif (strpos($name, 'BNI') !== false) {
+                    $kodeBank = 'KBA';
+                } elseif (strpos($name, 'BCA') !== false) {
+                    $kodeBank = 'BCI';
+                }
+            }
+        }
+
+        // Step 2: Tentukan kode divisi
+        $kodeDivisi = '';
+        if (!empty($divisi)) {
+            $divisiUpper = strtoupper($divisi);
+            if (strpos($divisiUpper, 'PTS') !== false) {
+                $kodeDivisi = ($jenis == 'MERAH') ? 'MKN' : 'KKN';
+            } elseif (strpos($divisiUpper, 'CANNING') !== false) {
+                $kodeDivisi = ($jenis == 'MERAH') ? 'CNM' : 'CNK';
+            } elseif (strpos($divisiUpper, 'FROZEN I') !== false) {
+                $kodeDivisi = ($jenis == 'MERAH') ? 'FRM' : 'FRK';
+            } elseif (strpos($divisiUpper, 'FROZEN II') !== false) {
+                $kodeDivisi = ($jenis == 'MERAH') ? 'FSM' : 'FSK';
+            } elseif (strpos($divisiUpper, 'GLOBAL') !== false) {
+                $kodeDivisi = ($jenis == 'MERAH') ? 'GBM' : 'GBK';
+            } elseif (strpos($divisiUpper, 'OCS') !== false) {
+                $kodeDivisi = ($jenis == 'MERAH') ? 'OCM' : 'OCK';
+            }
+        }
+
+        // Step 3: Gabungkan kode divisi dan kode bank
+        $prefix = '';
+        if (!empty($kodeDivisi)) {
+            $prefix .= $kodeDivisi . '/';
+        }
+        if (!empty($kodeBank)) {
+            $prefix .= $kodeBank . '/';
+        }
+
+        // Step 4: Tambahkan tahun, bulan, dan nomor urut
+        $prefix .= $thn . '/' . $bln . '/';
+
+        // Step 5: Query nomor terakhir dan generate nomor baru
+        $lastPO = $this->select('no_transaction')
+                    ->like('no_transaction', $prefix)
+                    ->where('createdAt >=', "{$thn}-{$bln}-01 00:00:00")
+                    ->where('createdAt <=', "{$last_day} 23:59:59")
+                    ->where('company_id', $companyID)
+                    ->where('deletedAt', null)
+                    ->orderBy('no_transaction', 'DESC')
+                    ->first();
+
+        $counterFirst = '0001';
+        if ($lastPO == null) {
+            return $prefix . $counterFirst;
+        } else {
+            try {
+                $lastParts = explode('/', $lastPO['no_transaction']);
+                $lastNumber = isset($lastParts[4]) ? (int) $lastParts[4] : 0; // Perhatikan index [4] untuk nomor urut
+                $counterNext = str_pad($lastNumber + 1, 4, '0', STR_PAD_LEFT);
+                return $prefix . $counterNext;
+            } catch (Exception $e) {
+                return 'ERROR GENERATE NUMBER ' . date('Y-m-d');
+            }
+        }
     }
 }

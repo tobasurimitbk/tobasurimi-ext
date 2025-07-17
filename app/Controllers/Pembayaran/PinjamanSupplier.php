@@ -170,6 +170,8 @@ class PinjamanSupplier extends BaseController
 
                 "company_id"    => $this->this_company_id,
                 "supplier_id"   => $this->request->getVar('supplier_id'),
+                "bank_id" => $this->request->getVar('bank_id'),
+                "divisi_id" => $this->request->getVar('divisi_id'),
                 "no_pinjaman"     => $this->request->getPost("no_pinjaman"),
                 "payment_date"  => $this->request->getVar("payment_date"),
                 "type_pinjaman"  => $this->request->getVar("tipe"),
@@ -261,7 +263,8 @@ class PinjamanSupplier extends BaseController
 
                     "company_id" => $this->this_company_id,
                     "supplier_id"   => $this->request->getVar('supplier_id'),
-                    // "no_pinjaman"     => $this->request->getPost("no_pinjaman"),
+                    "bank_id" => $this->request->getVar('bank_id'),
+                    "divisi_id" => $this->request->getVar('divisi_id'),
                     "akun_kas"  => $this->request->getVar("akun_kas"),
                     "akun_selisih"  => $this->request->getVar("akun_selisih"),
                     "payment_date"  => $this->request->getVar("payment_date"),

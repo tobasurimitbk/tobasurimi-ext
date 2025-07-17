@@ -10,6 +10,8 @@ use App\Models\PanjarPinjamanTransactionModel;
 use App\Models\LocalPOPaymentPanjarModel;
 use App\Models\Sub_AkunsModel;
 use App\Controllers\Accounting\JurnalUmum\JurnalUmum;
+use App\Models\BanksModel;
+use App\Models\DivisisModel;
 
 class PanjarSupplier extends BaseController
 {
@@ -36,13 +38,18 @@ class PanjarSupplier extends BaseController
         $this->jurnalController = new JurnalUmum();
         $this->sub_AkunsModel = new Sub_AkunsModel();
         $this->localPOPaymentPanjarModel = new LocalPOPaymentPanjarModel();
+        $this->banksModel = new BanksModel();
+        $this->divisiModel = new DivisisModel();
     }
 
     public function index()
     {
 
         $data = [
-            // 'noPanjar' => $this->panjarSupplierModel->getNumber($this->this_company_id)
+            'bankList' => $this->banksModel->where('company_id', $this->this_company_id)
+                            ->orderBy('name', "ASC")
+                            ->findAll(),
+            'divisi' => $this->divisiModel->getDivisiAccess()
         ];
 
         return view('Pembayaran/pembayaranPanjarSupplier/index', $data);
@@ -109,6 +116,8 @@ class PanjarSupplier extends BaseController
             $parentData = [
                 "company_id" => $this->this_company_id,
                 "supplier_id" => $this->request->getVar('supplier_id'),
+                "bank_id" => $this->request->getVar('bank_id'),
+                "divisi_id" => $this->request->getVar('divisi_id'),
                 "type" => $this->request->getVar('jenis'),
                 "no_transaction" => $this->request->getPost("no_transaksi"),
                 "keterangan" => $this->request->getPost("keterangan"),
@@ -282,6 +291,8 @@ class PanjarSupplier extends BaseController
             // Prepare parent transaction data
             $parentData = [
                 "supplier_id" => $this->request->getVar('supplier_id'),
+                "bank_id" => $this->request->getVar('bank_id'),
+                "divisi_id" => $this->request->getVar('divisi_id'),
                 "type" => $this->request->getVar('jenis'),
                 "no_transaction" => $this->request->getPost("no_transaksi"),
                 "updated_at" => date('Y-m-d H:i:s'),
@@ -829,25 +840,49 @@ class PanjarSupplier extends BaseController
     }
     public function generateNoPanjar()
     {
-        $noPanjar = $this->panjarPinjamanTransactionModel->getNumber($this->this_company_id);
-        return json_encode($noPanjar);
+        $panjarPinjamanSupplierModel = new PanjarPinjamanTransactionModel();
+        $jenis = $this->request->getGet('jenisPembayaran');
+        $divisi = str_replace(' ', '', trim($this->request->getGet('divisiId')));
+        $bank = str_replace(' ', '', trim($this->request->getGet('bankId')));
+
+        $paymentNo = $panjarPinjamanSupplierModel->get_new_no(
+            $jenis,
+            $divisi,
+            $bank,
+            date('m'),
+            date('Y'),
+            getLastDay(),
+            $this->this_company_id
+        );
+
+        return response()->setJSON([
+            'paymentNo' => $paymentNo,
+            'token' => csrf_hash(),
+            'success' => true,
+        ]);
     }
 
     public function getSubAkun()
     {
         $Sub_AkunsModel = new Sub_AkunsModel();
-        $search = trim($this->request->getGet('search')); // Ambil & bersihkan input pencarian
-
-        $subAkun = $Sub_AkunsModel
-            ->select('id, no_sub, nama_sub')
-            ->where('company_id', $this->this_company_id)
-            ->where('deletedAt', null)
-            ->groupStart()
-            ->like('nama_sub', $search)
-            ->orLike('no_sub', $search)
-            ->groupEnd()
-            ->findAll(10); // Batasi hasil max 10 biar efisien
-
+        $search = trim($this->request->getGet('search'));
+        
+        $builder = $Sub_AkunsModel->builder(); // Pakai query builder biar lebih fleksibel
+        
+        $builder->select('id, no_sub, nama_sub')
+                ->where('company_id', $this->this_company_id)
+                ->where('deletedAt', null);
+        
+        // Ini trik pentingnya!
+        if(!empty($search)) {
+            $builder->groupStart()
+                    ->like('nama_sub', $search)
+                    ->orLike('no_sub', $search)
+                    ->groupEnd();
+        }
+        
+        $subAkun = $builder->get(10)->getResult(); // Get 10 results
+        
         return $this->response->setJSON($subAkun);
     }
 }
