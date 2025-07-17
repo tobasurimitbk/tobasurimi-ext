@@ -276,10 +276,8 @@ class PembayaranPOImport extends BaseController
 
     public function savePembayaranPOImport()
     {
-
-
+        $firstPo = $this->rmImportPOModel->where('id', decrypt($this->request->getVar('import_po')))->first();
         $first = $this->importPOPaymentModel->where('payment_no', $this->request->getVar('no_pembayaran'))->where('company_id', $this->this_company_id)->first();
-
         if ($first != null) {
             return response()->setJSON([
                 'status' => false,
@@ -315,7 +313,8 @@ class PembayaranPOImport extends BaseController
             'po_id' => decrypt($this->request->getVar('import_po')),
             'voucher_no' => $this->request->getVar('voucher_no'),
             'currency' => $this->request->getVar('currency'),
-            'payment_amt' => $this->request->getVar('grand_total'),
+            'valas_id' => $firstPo['currency'],
+            'payment_amt' => intval(str_replace(',', '', $this->request->getVar('grand_total'))),
             'current_exchange_rate' => formatter($this->request->getVar('current_exchange_rate'), "CURR_TO_INT"),
             'payment_date' =>  $this->request->getPost("payment_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getVar("payment_date")))) : "",
             'termin' => $this->request->getVar('termin'),
@@ -753,7 +752,8 @@ class PembayaranPOImport extends BaseController
 
         foreach ($responseData as $r => $i) {
             $condition = [
-                'purchase_detail_id'   => decrypt($i['detail_id'])
+                'purchase_detail_id'   => decrypt($i['detail_id']),
+                'deletedAt' => null
             ];
             $selectQry = "sum(amount) as totalPaid";
             $totalPaidAmount = $this->importPOPaymentDetailModel

@@ -28,6 +28,7 @@ class ImportPOPaymentModel extends Model
         'pembayaran_oleh',
         'voucher_no',
         'currency',
+        'valas_id',
         'payment_amt',
         'current_exchange_rate',
         'payment_date',
