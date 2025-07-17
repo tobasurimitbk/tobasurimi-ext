@@ -395,10 +395,10 @@
         let dateStart = $(".dateStart").val();
         let dateEnd = $(".dateEnd").val();
         let filter_supplier = $(".filter_supplier").val();
-
         let filter_barang = $(".filter_barang").val();
+        let filter_divisi = $(".filter_divisi").val();
 
-        window.open(url + `?filter_supplier=${filter_supplier}&filter_barang=${filter_barang}&dateStart=${dateStart}&dateEnd=${dateEnd}&sort=${sort}&sortType=${sortType}`, "_blank");
+        window.open(url + `?filter_supplier=${filter_supplier}&filter_barang=${filter_barang}&filter_divisi=${filter_divisi}&dateStart=${dateStart}&dateEnd=${dateEnd}&sort=${sort}&sortType=${sortType}`, "_blank");
     }
 </script>
 

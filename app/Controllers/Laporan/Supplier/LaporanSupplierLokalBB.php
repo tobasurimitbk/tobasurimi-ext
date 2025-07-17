@@ -1720,7 +1720,7 @@ class LaporanSupplierLokalBB extends BaseController
             $sheet->setCellValue("G{$rowExcel}", "QTY");
             $sheet->mergeCells("G{$rowExcel}:G" . ($rowExcel + 1));
 
-            $grup = ['Harian', 'Tambahan Harian', 'Tambahan Bulanan', 'Subsidi'];
+            $grup = ['Harian', 'Tambahan Harian', 'Tambahan Bulanan', 'Tambahan Langsung'];
             $startCol = 'H';
             foreach ($grup as $grupName) {
                 $col1 = $startCol;
@@ -1739,6 +1739,24 @@ class LaporanSupplierLokalBB extends BaseController
             $sheet->getStyle("A{$rowExcel}:T" . ($rowExcel + 1))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER)->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER);
 
             $rowExcel += 2;
+
+            // Inisialisasi total per barang
+            $totalBarang = [
+                'qtyPO' => 0,
+                'dppUmum' => 0,
+                'pphUmum' => 0,
+                'totalUmum' => 0,
+                'dppHarian' => 0,
+                'pphHarian' => 0,
+                'totalHarian' => 0,
+                'dppBulanan' => 0,
+                'pphBulanan' => 0,
+                'totalBulanan' => 0,
+                'subsidi' => 0,
+                'pphSubsidi' => 0,
+                'totalSubsidi' => 0,
+                'totalRow' => 0
+            ];
 
             foreach ($rows as &$row) {
                 $subsidi = $pph = $total = 0;
@@ -1767,6 +1785,22 @@ class LaporanSupplierLokalBB extends BaseController
                 $row['pphSubsidi'] = $pph;
                 $row['totalSubsidi'] = $total;
                 $row['totalRow'] = $row['totalUmum'] + $row['totalHarian'] + $row['totalBulanan'] + $total;
+
+                // Akumulasi untuk total per barang
+                $totalBarang['qtyPO'] += $row['qtyPO'];
+                $totalBarang['dppUmum'] += $row['dppUmum'];
+                $totalBarang['pphUmum'] += $row['pphUmum'];
+                $totalBarang['totalUmum'] += $row['totalUmum'];
+                $totalBarang['dppHarian'] += $row['dppHarian'];
+                $totalBarang['pphHarian'] += $row['pphHarian'];
+                $totalBarang['totalHarian'] += $row['totalHarian'];
+                $totalBarang['dppBulanan'] += $row['dppBulanan'];
+                $totalBarang['pphBulanan'] += $row['pphBulanan'];
+                $totalBarang['totalBulanan'] += $row['totalBulanan'];
+                $totalBarang['subsidi'] += $subsidi;
+                $totalBarang['pphSubsidi'] += $pph;
+                $totalBarang['totalSubsidi'] += $total;
+                $totalBarang['totalRow'] += $row['totalRow'];
 
                 $data = [
                     $no++,
@@ -1804,7 +1838,33 @@ class LaporanSupplierLokalBB extends BaseController
                 $rowExcel++;
             }
 
-            $rowExcel++;
+            // TAMPILKAN TOTAL PER BARANG - TEPAT DI BAWAH DATA TERAKHIR
+            $sheet->setCellValue("A{$rowExcel}", "TOTAL {$barangName}");
+            $sheet->mergeCells("A{$rowExcel}:G{$rowExcel}"); // Gabung kolom A-G
+            $sheet->getStyle("A{$rowExcel}:T{$rowExcel}")->getFont()->setBold(true);
+
+            // Isi nilai total per kolom
+            $sheet->setCellValue("H{$rowExcel}", $totalBarang['dppUmum']);
+            $sheet->setCellValue("I{$rowExcel}", $totalBarang['pphUmum']);
+            $sheet->setCellValue("J{$rowExcel}", $totalBarang['totalUmum']);
+            $sheet->setCellValue("K{$rowExcel}", $totalBarang['dppHarian']);
+            $sheet->setCellValue("L{$rowExcel}", $totalBarang['pphHarian']);
+            $sheet->setCellValue("M{$rowExcel}", $totalBarang['totalHarian']);
+            $sheet->setCellValue("N{$rowExcel}", $totalBarang['dppBulanan']);
+            $sheet->setCellValue("O{$rowExcel}", $totalBarang['pphBulanan']);
+            $sheet->setCellValue("P{$rowExcel}", $totalBarang['totalBulanan']);
+            $sheet->setCellValue("Q{$rowExcel}", $totalBarang['subsidi']);
+            $sheet->setCellValue("R{$rowExcel}", $totalBarang['pphSubsidi']);
+            $sheet->setCellValue("S{$rowExcel}", $totalBarang['totalSubsidi']);
+            $sheet->setCellValue("T{$rowExcel}", $totalBarang['totalRow']);
+
+            // Format angka untuk total
+            $numberCols = ['H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T'];
+            foreach ($numberCols as $col) {
+                $sheet->getStyle("{$col}{$rowExcel}")->getNumberFormat()->setFormatCode('#,##0.00');
+            }
+
+            $rowExcel += 2; // Jeda 2 baris untuk kelompok berikutnya
         }
 
         foreach (range('A', 'T') as $col) {
