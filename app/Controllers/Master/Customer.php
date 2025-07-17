@@ -174,12 +174,12 @@ class Customer extends BaseController
                         'valid_email' => 'Email harus valid'
                     ]
                 ],
-                "no_npwp" => [
-                    'rules' => 'permit_empty|min_length[15]',
-                    'errors' => [
-                        'min_length' => 'Nomor NPWP harus diisi minimal 15 digit'
-                    ]
-                ],
+                // "no_npwp" => [
+                //     'rules' => 'permit_empty|min_length[15]',
+                //     'errors' => [
+                //         'min_length' => 'Nomor NPWP harus diisi minimal 15 digit'
+                //     ]
+                // ],
                 // "phone" => [
                 //     'rules' => 'permit_empty|min_length[12]',
                 //     'errors' => [
@@ -299,12 +299,12 @@ class Customer extends BaseController
                         'valid_email' => 'Email harus valid'
                     ]
                 ],
-                "no_npwp" => [
-                    'rules' => 'permit_empty|min_length[15]',
-                    'errors' => [
-                        'min_length' => 'Nomor NPWP harus diisi minimal 15 digit'
-                    ]
-                ],
+                // "no_npwp" => [
+                //     'rules' => 'permit_empty|min_length[15]',
+                //     'errors' => [
+                //         'min_length' => 'Nomor NPWP harus diisi minimal 15 digit'
+                //     ]
+                // ],
                 // "phone" => [
                 //     'rules' => 'permit_empty|min_length[12]',
                 //     'errors' => [

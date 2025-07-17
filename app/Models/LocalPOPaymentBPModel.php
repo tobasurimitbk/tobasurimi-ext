@@ -67,8 +67,8 @@ class LocalPOPaymentBPModel extends Model
     {
         $availableSort = [
             'payment_no'        => 'local_po_payment_bp.payment_no',
-            'suppliers.name'    => 'suppliers.name',
-            'tanda_terima_faktur.faktur_no' => 'tanda_terima_faktur.faktur_no',
+            // 'suppliers.name'    => 'suppliers.name',
+            // 'tanda_terima_faktur.faktur_no' => 'tanda_terima_faktur.faktur_no',
             'payment_date'      => 'local_po_payment_bp.payment_date',
             'payment_method'    => 'local_po_payment_bp.payment_method',
             'amount'            => 'local_po_payment_bp.amount',
@@ -76,7 +76,7 @@ class LocalPOPaymentBPModel extends Model
         ];
 
         $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
-        $sort = $availableSort[$addCondition['sort'] ?? 'createdAt'] ?? 'local_po_payment_bp.id';
+        $sort = $availableSort[$addCondition['sort'] ?? 'createdAt'] ?? 'local_po_payment_bp.createdAt';
         $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'DESC';
 
         $selectQry = "
@@ -107,12 +107,12 @@ class LocalPOPaymentBPModel extends Model
         if ($hasFilter) {
             $supplierDataQry->groupStart();
 
-            if (!empty($addCondition['dueDate'])) {
-                $supplierDataQry->where('tanda_terima_faktur.jatuh_tempo', $addCondition['dueDate']);
-            }
-
-            if (!empty($addCondition['paymentDate'])) {
-                $supplierDataQry->where('local_po_payment_bp.payment_date', $addCondition['paymentDate']);
+            if (!empty($addCondition['dueDate']) && !empty($addCondition['paymentDate'])) {
+                $supplierDataQry->where("DATE(local_po_payment_bp.createdAt) BETWEEN '{$addCondition['dueDate']}' AND '{$addCondition['paymentDate']}'");
+            } elseif (!empty($addCondition['dueDate'])) {
+                $supplierDataQry->where('DATE(local_po_payment_bp.createdAt)', $addCondition['dueDate']);
+            } elseif (!empty($addCondition['paymentDate'])) {
+                $supplierDataQry->where('DATE(local_po_payment_bp.createdAt)', $addCondition['paymentDate']);
             }
 
             if (!empty($addCondition['search'])) {
@@ -266,11 +266,18 @@ class LocalPOPaymentBPModel extends Model
         return $payments;
     }
 
-    public function get_new_no_po($jenis, $divisi, $bank_id, $bln, $thn, $last_day, $companyID)
-    {
+    public function get_new_no(
+        string $jenis,
+        string $divisi,
+        int $bank_id,
+        string $bln,
+        string $thn,
+        string $last_day,
+        int $companyID
+    ) {
         $banksModel = new BanksModel();
         
-        // Step 1: Dapatkan kode bank dari database
+        // Step 1: Get bank code
         $kodeBank = '';
         if (!empty($bank_id)) {
             $bankData = $banksModel->select('name')
@@ -290,7 +297,6 @@ class LocalPOPaymentBPModel extends Model
             }
         }
 
-        // Step 2: Tentukan kode divisi
         $kodeDivisi = '';
         if (!empty($divisi)) {
             $divisiUpper = strtoupper($divisi);
@@ -309,7 +315,7 @@ class LocalPOPaymentBPModel extends Model
             }
         }
 
-        // Step 3: Gabungkan kode divisi dan kode bank
+        // Step 3: Build prefix
         $prefix = '';
         if (!empty($kodeDivisi)) {
             $prefix .= $kodeDivisi . '/';
@@ -317,32 +323,47 @@ class LocalPOPaymentBPModel extends Model
         if (!empty($kodeBank)) {
             $prefix .= $kodeBank . '/';
         }
-
-        // Step 4: Tambahkan tahun, bulan, dan nomor urut
         $prefix .= $thn . '/' . $bln . '/';
 
-        // Step 5: Query nomor terakhir dan generate nomor baru
-        $lastPO = $this->select('payment_no')
-                    ->like('payment_no', $prefix)
-                    ->where('createdAt >=', "{$thn}-{$bln}-01 00:00:00")
-                    ->where('createdAt <=', "{$last_day} 23:59:59")
-                    ->where('company_id', $companyID)
-                    ->where('deletedAt', null)
-                    ->orderBy('payment_no', 'DESC')
-                    ->first();
+        // Step 4: Check all relevant tables for the highest number
+        $db = \Config\Database::connect();
+        
+        // Define all tables and columns to check
+        $tablesToCheck = [
+            'other_payment' => 'no_pembayaran',
+            'local_po_payments' => 'payment_no',
+            'local_po_payment_bp' => 'payment_no',
+            'panjar_pinjaman_transaction' => 'no_transaction',
+        ];
+        
+        $maxNumber = 0;
+        
+        foreach ($tablesToCheck as $table => $column) {
+            $builder = $db->table($table);
+            
+            $lastRecord = $builder->select($column)
+                                ->like($column, $prefix)
+                                ->where('createdAt >=', "{$thn}-{$bln}-01 00:00:00")
+                                ->where('createdAt <=', "{$last_day} 23:59:59")
+                                ->where('company_id', $companyID)
+                                ->where('deletedAt', null)
+                                ->orderBy($column, 'DESC')
+                                ->get(1)
+                                ->getRowArray();
 
-        $counterFirst = '0001';
-        if ($lastPO == null) {
-            return $prefix . $counterFirst;
-        } else {
-            try {
-                $lastParts = explode('/', $lastPO['payment_no']);
-                $lastNumber = isset($lastParts[4]) ? (int) $lastParts[4] : 0; // Perhatikan index [4] untuk nomor urut
-                $counterNext = str_pad($lastNumber + 1, 4, '0', STR_PAD_LEFT);
-                return $prefix . $counterNext;
-            } catch (Exception $e) {
-                return 'ERROR GENERATE NUMBER ' . date('Y-m-d');
+            if ($lastRecord) {
+                try {
+                    $lastParts = explode('/', $lastRecord[$column]);
+                    $currentNumber = isset($lastParts[4]) ? (int)$lastParts[4] : 0;
+                    $maxNumber = max($maxNumber, $currentNumber);
+                } catch (Exception $e) {
+                    log_message('error', "Failed to parse number from {$table}.{$column}: " . $e->getMessage());
+                }
             }
         }
+
+        // Step 5: Generate new number
+        $counterNext = str_pad($maxNumber + 1, 4, '0', STR_PAD_LEFT);
+        return $prefix . $counterNext;
     }
 }

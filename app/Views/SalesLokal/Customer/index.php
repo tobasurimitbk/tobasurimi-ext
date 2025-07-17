@@ -217,9 +217,10 @@
                                 <th onclick="changeSort('nameSales')" class="sort">Nama Sales</th>
                                 <th onclick="changeSort('termin')" class="sort">Termin</th>
                                 <th onclick="changeSort('piutang')" class="sort">Limit</th>
+                                <th>Action</th>
                             </tr>
                         </thead>
-                        <tbody class="body-table" id="body-table" style="cursor: pointer;">
+                        <tbody class="body-table" id="body-table">
 
                         </tbody>
                     </table>
@@ -293,6 +294,28 @@
         }, {
             data: "piutang",
             className: "text-center"
+        }, {
+            data: "id",
+            className: "text-center actions",
+            searchable: false,
+            sortable: false,
+            render: function(data, type, row) {
+                var id = row.id;
+                return `
+                    <div class="mt-0">
+                        <?php if (can('Penjualan Lokal', 'Customer', 'u')) : ?>
+                            <a href="javascript:void(0)" onclick="edit('${id}')" data-toggle="tooltip" title="Edit" class="btn btn-primary">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                        <?php endif; ?>
+                        <?php if (can('Penjualan Lokal', 'Customer', 'd')) : ?>
+                            <button data-toggle="tooltip" title="Hapus" onclick="destroy('${id}')" class="btn btn-danger delete-parent">
+                                <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
+                            </button>
+                        <?php endif; ?>
+                    </div>
+                `
+            }
         }, ],
         columnDefs: [{
             defaultContent: "-",
@@ -307,6 +330,212 @@
             }
         }
     });
+
+    function edit(id) {
+        $(".create-form-lokal")[0].reset()
+        $(".delete-form").css('display', '');
+        $(".title-name").text("Update")
+
+        $.ajax({
+            url: "<?= base_url("customer-lokal/id"); ?>" + "/" + id,
+            method: "GET",
+            dataType: "json",
+            beforeSend: function() {
+                setLoading();
+            },
+            complete: function() {
+                stopLoading();
+            },
+            success: function(res) {
+                if (res.data) {
+                    $(".id").val(id);
+                    $(".kode").val(res.data.kode);
+                    if (res.data.kode) {
+                        $("#auto_generate").off("change");
+                        $("#auto_generate").prop("checked", true);
+                        $(".kode").attr("readonly", true);
+                        $("#auto_generate").on("change", function() {
+                            changeStatus();
+                        });
+                    }
+                    $(".name").val(res.data.name);
+                    $(".address").val(res.data.address);
+                    $(".no_npwp").val(res.data.no_npwp);
+                    $(".phone").val(res.data.phone);
+
+                    $(".contact_person").val(res.data.contact_person);
+                    $(".email").val(res.data.email);
+                    $(".parent_postal_code").val(res.data.postal_code);
+                    $(".province_parent_id").val(res.data.province_id).change();
+                    $(".piutang").val(greatFormatRupiah(res.data.piutang)).change();
+
+                    $(".jenis_penjualan").val(res.data.jenis_penjualan).change();
+
+                    $(".nik").val(res.data.nik);
+                    $(".sales_id").val(res.data.sales_id).change();
+
+                    $.ajax({
+                        url: `<?= base_url("metadata/dropdown"); ?>`,
+                        method: "GET",
+                        data: {
+                            name: 'termin'
+                        },
+                        beforeSend: function() {
+                            setLoading();
+                        },
+                        complete: function() {
+                            stopLoading();
+                        },
+                        dataType: "json",
+                        success: function(result) {
+                            $(".termin").empty()
+                            $(".termin").append(`<option value=""></option>`)
+                            result.data.forEach(function(item) {
+                                $(".termin").append(`<option value="${item.id}">${item.value}</option>`)
+                            })
+
+                            $(".termin").val(res.data.termin).change();
+                        }
+                    })
+
+                    $.ajax({
+                        url: `<?= base_url("metadata/dropdown"); ?>`,
+                        method: "GET",
+                        data: {
+                            name: 'Valuta'
+                        },
+                        beforeSend: function() {
+                            setLoading();
+                        },
+                        complete: function() {
+                            stopLoading();
+                        },
+                        dataType: "json",
+                        success: function(result) {
+                            $(".currency").empty()
+                            $(".currency").append(`<option value=""></option>`)
+                            result.data.forEach(function(item) {
+                                $(".currency").append(`<option value="${item.id}">${item.value}</option>`)
+                            })
+
+                            $(".currency").attr('disabled', true).val(res.data.currency).change();
+                        }
+                    })
+
+                    // AJAX GET CITY
+                    $.ajax({
+                        url: `<?= base_url("city"); ?>/${res.data.province_id}`,
+                        method: "GET",
+                        beforeSend: function() {
+                            setLoading();
+                        },
+                        complete: function() {
+                            stopLoading();
+                        },
+                        dataType: "json",
+                        success: function(result) {
+                            $(".city_parent_id").empty()
+                            $(".city_parent_id").val("").change()
+                            $(".city_parent_id").append(`<option value=""></option>`)
+                            result.data.forEach(function(item) {
+                                $(".city_parent_id").append(`<option value="${item.id}" data-code="${item.postal_code}">${item.city_name.toUpperCase()}</option>`)
+                            })
+
+                            $(".city_parent_id").val(res.data.city_id).change();
+                        }
+                    })
+
+                    $.ajax({
+                        url: `<?= base_url("metadata/dropdown"); ?>`,
+                        method: "GET",
+                        beforeSend: function() {
+                            setLoading();
+                        },
+                        complete: function() {
+                            stopLoading();
+                        },
+                        data: {
+                            name: 'tipe_pelanggan'
+                        },
+                        dataType: "json",
+                        success: function(result) {
+                            $(".tipe_pelanggan").empty()
+                            $(".tipe_pelanggan").append(`<option value=""></option>`)
+                            result.data.forEach(function(item) {
+                                $(".tipe_pelanggan").append(`<option value="${item.id}">${item.value.toUpperCase()}</option>`)
+                            })
+
+                            $(".tipe_pelanggan").val(res.data.tipe_pelanggan).change();
+                            $(".add-modal").modal("show");
+                        }
+                    })
+
+
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: res.message,
+                        confirmButtonColor: '#4e73df',
+                    })
+                }
+            }
+        })
+    }
+
+    function destroy(id) {
+        Swal.fire({
+            icon: 'question',
+            title: 'Hapus Data?',
+            confirmButtonColor: '#4e73df',
+            cancelButtonColor: '#d33',
+            showCancelButton: true,
+            reverseButtons: true,
+            confirmButtonText: 'Hapus',
+            cancelButtonText: 'Kembali',
+        }).then((result) => {
+            if (result.isConfirmed) {
+                const csrf = $(`[name="${csrfToken}"]`);
+                let id = $(".id").val();
+                setLoading()
+                $.ajax({
+                    url: "<?= base_url("customer-lokal/delete"); ?>",
+                    data: {
+                        id: id
+                    },
+                    beforeSend: function(xhr) {
+                        setLoading();
+                        xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                    },
+                    complete: function() {
+                        stopLoading();
+                    },
+                    method: "POST",
+                    dataType: "json",
+                    success: function(response) {
+                        csrf.val(response.token);
+                        if (response.status) {
+                            stopLoading()
+                            Swal.fire({
+                                    icon: 'success',
+                                    title: response.message,
+                                    confirmButtonColor: '#4e73df',
+                                })
+                                .then(() => {
+                                    dataTableLokal.ajax.reload()
+                                    $(".add-modal").modal("hide")
+                                })
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: response.message,
+                                confirmButtonColor: '#4e73df',
+                            })
+                        }
+                    },
+                });
+            }
+        })
+    }
 
     $(document).ready(function() {
 
@@ -583,7 +812,7 @@
 
         $(".postal_code").mask("00000")
 
-        $(".no_npwp").mask("000000000000000")
+        // $(".no_npwp").mask("000000000000000")
 
         $(".form-search-lokal").keyup(function() {
             dataTableLokal.ajax.reload();
@@ -685,217 +914,10 @@
             $(".add-modal").modal("hide")
         })
 
-        $('#dataTableLokal tbody').on('click', 'tr td:not(.actions):not(.dataTables_empty)', function() {
-            const data = dataTableLokal.row(this).data();
-            $(".create-form-lokal")[0].reset()
-            $(".delete-form").css('display', '');
-            let id = data.id;
-            $(".title-name").text("Update")
-
-            $.ajax({
-                url: "<?= base_url("customer-lokal/id"); ?>" + "/" + id,
-                method: "GET",
-                dataType: "json",
-                beforeSend: function() {
-                    setLoading();
-                },
-                complete: function() {
-                    stopLoading();
-                },
-                success: function(res) {
-                    if (res.data) {
-                        $(".id").val(id);
-                        $(".kode").val(res.data.kode);
-                        if (res.data.kode) {
-                            $("#auto_generate").off("change");
-                            $("#auto_generate").prop("checked", true);
-                            $(".kode").attr("readonly", true);
-                            $("#auto_generate").on("change", function() {
-                                changeStatus();
-                            });
-                        }
-                        $(".name").val(res.data.name);
-                        $(".address").val(res.data.address);
-                        $(".no_npwp").val(res.data.no_npwp);
-                        $(".phone").val(res.data.phone);
-
-                        $(".contact_person").val(res.data.contact_person);
-                        $(".email").val(res.data.email);
-                        $(".parent_postal_code").val(res.data.postal_code);
-                        $(".province_parent_id").val(res.data.province_id).change();
-                        $(".piutang").val(greatFormatRupiah(res.data.piutang)).change();
-
-                        $(".jenis_penjualan").val(res.data.jenis_penjualan).change();
-
-                        $(".nik").val(res.data.nik);
-                        $(".sales_id").val(res.data.sales_id).change();
-
-
-                        validator.resetForm();
-                        validator.reset();
-
-                        $.ajax({
-                            url: `<?= base_url("metadata/dropdown"); ?>`,
-                            method: "GET",
-                            data: {
-                                name: 'termin'
-                            },
-                            beforeSend: function() {
-                                setLoading();
-                            },
-                            complete: function() {
-                                stopLoading();
-                            },
-                            dataType: "json",
-                            success: function(result) {
-                                $(".termin").empty()
-                                $(".termin").append(`<option value=""></option>`)
-                                result.data.forEach(function(item) {
-                                    $(".termin").append(`<option value="${item.id}">${item.value}</option>`)
-                                })
-
-                                $(".termin").val(res.data.termin).change();
-                            }
-                        })
-
-                        $.ajax({
-                            url: `<?= base_url("metadata/dropdown"); ?>`,
-                            method: "GET",
-                            data: {
-                                name: 'Valuta'
-                            },
-                            beforeSend: function() {
-                                setLoading();
-                            },
-                            complete: function() {
-                                stopLoading();
-                            },
-                            dataType: "json",
-                            success: function(result) {
-                                $(".currency").empty()
-                                $(".currency").append(`<option value=""></option>`)
-                                result.data.forEach(function(item) {
-                                    $(".currency").append(`<option value="${item.id}">${item.value}</option>`)
-                                })
-
-                                $(".currency").attr('disabled', true).val(res.data.currency).change();
-                            }
-                        })
-
-                        // AJAX GET CITY
-                        $.ajax({
-                            url: `<?= base_url("city"); ?>/${res.data.province_id}`,
-                            method: "GET",
-                            beforeSend: function() {
-                                setLoading();
-                            },
-                            complete: function() {
-                                stopLoading();
-                            },
-                            dataType: "json",
-                            success: function(result) {
-                                $(".city_parent_id").empty()
-                                $(".city_parent_id").val("").change()
-                                $(".city_parent_id").append(`<option value=""></option>`)
-                                result.data.forEach(function(item) {
-                                    $(".city_parent_id").append(`<option value="${item.id}" data-code="${item.postal_code}">${item.city_name.toUpperCase()}</option>`)
-                                })
-
-                                $(".city_parent_id").val(res.data.city_id).change();
-                            }
-                        })
-
-                        $.ajax({
-                            url: `<?= base_url("metadata/dropdown"); ?>`,
-                            method: "GET",
-                            beforeSend: function() {
-                                setLoading();
-                            },
-                            complete: function() {
-                                stopLoading();
-                            },
-                            data: {
-                                name: 'tipe_pelanggan'
-                            },
-                            dataType: "json",
-                            success: function(result) {
-                                $(".tipe_pelanggan").empty()
-                                $(".tipe_pelanggan").append(`<option value=""></option>`)
-                                result.data.forEach(function(item) {
-                                    $(".tipe_pelanggan").append(`<option value="${item.id}">${item.value.toUpperCase()}</option>`)
-                                })
-
-                                $(".tipe_pelanggan").val(res.data.tipe_pelanggan).change();
-                                $(".add-modal").modal("show");
-                            }
-                        })
-
-
-                    } else {
-                        Swal.fire({
-                            icon: 'error',
-                            title: res.message,
-                            confirmButtonColor: '#4e73df',
-                        })
-                    }
-                }
-            })
-        })
-
         // delete lokal
         $(".delete-form").click(function() {
-            Swal.fire({
-                icon: 'question',
-                title: 'Hapus Data?',
-                confirmButtonColor: '#4e73df',
-                cancelButtonColor: '#d33',
-                showCancelButton: true,
-                reverseButtons: true,
-                confirmButtonText: 'Hapus',
-                cancelButtonText: 'Kembali',
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    const csrf = $(`[name="${csrfToken}"]`);
-                    let id = $(".id").val();
-                    setLoading()
-                    $.ajax({
-                        url: "<?= base_url("customer-lokal/delete"); ?>",
-                        data: {
-                            id: id
-                        },
-                        beforeSend: function(xhr) {
-                            setLoading();
-                            xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                        },
-                        complete: function() {
-                            stopLoading();
-                        },
-                        method: "POST",
-                        dataType: "json",
-                        success: function(response) {
-                            csrf.val(response.token);
-                            if (response.status) {
-                                stopLoading()
-                                Swal.fire({
-                                        icon: 'success',
-                                        title: response.message,
-                                        confirmButtonColor: '#4e73df',
-                                    })
-                                    .then(() => {
-                                        dataTableLokal.ajax.reload()
-                                        $(".add-modal").modal("hide")
-                                    })
-                            } else {
-                                Swal.fire({
-                                    icon: 'error',
-                                    title: response.message,
-                                    confirmButtonColor: '#4e73df',
-                                })
-                            }
-                        },
-                    });
-                }
-            })
+            let id = $(".id").val();
+            destroy(id);
         });
 
         $(".btn-submit-parent-lokal").click(function() {

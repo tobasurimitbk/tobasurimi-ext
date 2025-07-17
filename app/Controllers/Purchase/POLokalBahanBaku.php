@@ -50,6 +50,7 @@ class POLokalBahanBaku extends BaseController
     protected $divisiModel;
     protected $kemasanModel;
     protected $accountBarangModel;
+    protected $supplierHargaModel;
 
     protected $this_user_id;
     protected $is_admin;
@@ -83,6 +84,7 @@ class POLokalBahanBaku extends BaseController
         $this->sppModel = new SppModel();
         $this->kemasanModel = new KemasanModel();
         $this->accountBarangModel = new AccountBarangModel();
+        $this->supplierHargaModel = new SupplierHargaModel();
     }
 
     public function poLokalBahanBaku()
@@ -540,6 +542,30 @@ class POLokalBahanBaku extends BaseController
             'token' => csrf_hash(),
             'id' => encrypt($id),
             'status' => true
+        ]);
+    }
+
+    public function getSupplierHargaById()
+    {
+        $supplierHargaId = $this->request->getVar('supplier_harga_id');
+        $supplierHarga = $this->supplierHargaModel->where('id', $supplierHargaId)->first();
+        if ($supplierHarga == null) {
+            $data = [
+                'harga' => 0,
+                'monthly_price' => 0,
+                'daily_price' => 0,
+            ];
+        } else {
+            $data = [
+                'harga' => $supplierHarga['harga_umum'],
+                'monthly_price' => $supplierHarga['harga_bulanan'],
+                'daily_price' => $supplierHarga['harga_harian'],
+            ];
+        }
+
+        return response()->setJSON([
+            'status' => true,
+            'data' => $data
         ]);
     }
 
