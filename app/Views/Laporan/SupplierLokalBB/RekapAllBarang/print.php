@@ -31,7 +31,8 @@
             border-collapse: collapse;
         }
 
-        th {
+        th,
+        td {
             border: 1px solid #000;
             padding: 3px;
             text-align: center;
@@ -119,7 +120,7 @@
         </thead>
         <tbody>
             <?php $no = 1; ?>
-            <?php foreach ($groupedData as $barangName => $records) : ?>
+            <?php foreach ($groupedData as $barangName => $subGroups) : ?>
                 <tr class="group-header">
                     <td colspan="19" class="text-left">Bahan Baku: <?= $barangName ?></td>
                 </tr>
@@ -143,7 +144,7 @@
                 ];
                 ?>
 
-                <?php foreach ($records as $record) : ?>
+                <?php foreach ($subGroups as $subKey => $record) : ?>
                     <tr>
                         <td><?= $no++ ?></td>
                         <td class="text-left"><?= $record['barangName'] ?></td>
@@ -168,9 +169,20 @@
 
                     <?php
                     // Akumulasi group totals
-                    foreach ($groupTotals as $key => $val) {
-                        $groupTotals[$key] += $record[$key];
-                    }
+                    $groupTotals['qtyPO'] += $record['qtyPO'];
+                    $groupTotals['dppUmum'] += $record['dppUmum'];
+                    $groupTotals['pphUmum'] += $record['pphUmum'];
+                    $groupTotals['totalUmum'] += $record['totalUmum'];
+                    $groupTotals['dppHarian'] += $record['dppHarian'];
+                    $groupTotals['pphHarian'] += $record['pphHarian'];
+                    $groupTotals['totalHarian'] += $record['totalHarian'];
+                    $groupTotals['dppBulanan'] += $record['dppBulanan'];
+                    $groupTotals['pphBulanan'] += $record['pphBulanan'];
+                    $groupTotals['totalBulanan'] += $record['totalBulanan'];
+                    $groupTotals['subsidi'] += $record['subsidi'];
+                    $groupTotals['pphSubsidi'] += $record['pphSubsidi'];
+                    $groupTotals['totalSubsidi'] += $record['totalSubsidi'];
+                    $groupTotals['totalRow'] += $record['totalRow'];
                     ?>
                 <?php endforeach; ?>
 
