@@ -69,7 +69,7 @@
                     <div class="col-md-4">
                         <div class="form-floating form-pembayaran-po mb-3" style="height: 50px;">
                             <select class="form-select" <?= !empty($detail) ? ($detail['pembayaranDetail']['status_posting'] == 1 ? 'disabled' : '') : ""; ?> name="bank_id" id="bank_id">
-                                    <option disabled selected value=""></option>
+                                <option disabled selected value=""></option>
                                 <?php foreach ($bankList as $b) : ?>
                                     <option <?= !empty($detail) ? ($detail['pembayaranDetail']['bank_id'] == $b->id ? 'selected' : '') : '' ?> value="<?= $b->id ?>"><?= strtoupper($b->kode_bank) ?></option>
                                 <?php endforeach ?>
@@ -168,7 +168,7 @@
                     </div>
                 </div>
                 <div class="row">
-                     <div class="col-md-4">
+                    <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <select <?= !empty($detail) ? ($detail['pembayaranDetail']['status_posting'] == 1 ? 'disabled' : '') : "" ?> class="form-select " name="payment_method" id="payment_method">
                                 <option disabled selected value="">Pilih Metode Pembayaran</option>
@@ -668,7 +668,7 @@
 
     $(document).ready(function() {
 
-        <?php if(empty($detail)): ?>
+        <?php if (empty($detail)): ?>
             generatePaymentNumber();
         <?php endif; ?>
 
@@ -884,14 +884,14 @@
             var element = $('input[data-id="' + v.rm_purchase_order_id + '"].total_po_dibayar');
             var input_user = destroyFormatRupiahPayment(element.val());
 
-            listPembayaran[i].total_paid = parseInt(input_user) || 0;
+            listPembayaran[i].total_paid = parseFloat(input_user) || 0;
         });
 
         $.each(listPembayaran, function(i, v) {
             var element = $('input[data-id="' + v.rm_purchase_order_id + '"].total_pph_po_dibayar');
             var input_user = destroyFormatRupiahPayment(element.val());
 
-            listPembayaran[i].total_paid_pph = parseInt(input_user) || 0;
+            listPembayaran[i].total_paid_pph = parseFloat(input_user) || 0;
         });
 
 
@@ -2005,7 +2005,7 @@
         $(".grand-total").val(greatFormatRupiahPayment(total));
     }
 
-     function updateGrandTotalPPH() {
+    function updateGrandTotalPPH() {
         var totalPembayaran = destroyFormatRupiahPayment($(".total-pembayaran-pph").val()) || 0;
         $(".grand-total-pph").val(greatFormatRupiahPayment(totalPembayaran));
     }
@@ -2028,23 +2028,23 @@
         let jenisPembayaran = $("#jenis_pembayaran option:selected").text();
         let divisiId = $("#divisi_id option:selected").text();
         let bankId = $("#bank_id option:selected").val();
-        
+
         // Only generate if this is a new record (empty detail)
-        <?php if(empty($detail)): ?>
+        <?php if (empty($detail)): ?>
             const csrfToken = '<?= csrf_token() ?>';
             const csrf = $(`[name="${csrfToken}"]`);
-            
+
             // Build URL with query parameters
             let url = "<?= base_url('pembayaran-po-lokal-bb/generate-no-pembayaran'); ?>";
             url += `?jenisPembayaran=${encodeURIComponent(jenisPembayaran)}&divisiId=${encodeURIComponent(divisiId)}&bankId=${encodeURIComponent(bankId)}`;
-            
+
             // Additional data if needed
             var formData = new FormData();
             formData.append("type", "Bahan Penolong");
             formData.append("payment_date", $("#payment_date").val());
-            
+
             $(".no_bukti_pembayaran").attr("readonly", true);
-            
+
             $.ajax({
                 url: url,
                 method: "GET",
@@ -2077,7 +2077,7 @@
         // Get the input values
         const totalPembayaran = parseFloat(document.getElementById('total_pembayaran').value) || 0;
         const grandTotal = parseFloat(document.getElementById('grand_total').value) || 0;
-        
+
         // Check if payment exceeds grand total
         if (totalPembayaran > grandTotal) {
             // Show error message
@@ -2087,7 +2087,7 @@
                 text: 'Total pembayaran tidak boleh melebihi ' + grandTotal.toLocaleString(),
                 confirmButtonColor: '#4e73df',
             });
-            
+
             // Reset the value to grand total
             document.getElementById('total_pembayaran').value = grandTotal;
         }
@@ -2098,7 +2098,7 @@
         // Get the input values
         const totalPembayaran = parseFloat(document.getElementById('total_pembayaran_pph').value) || 0;
         const grandTotal = parseFloat(document.getElementById('grand_total_pph').value) || 0;
-        
+
         // Check if payment exceeds grand total
         if (totalPembayaran > grandTotal) {
             // Show error message
@@ -2108,12 +2108,11 @@
                 text: 'Total pembayaran tidak boleh melebihi ' + grandTotal.toLocaleString(),
                 confirmButtonColor: '#4e73df',
             });
-            
+
             // Reset the value to grand total
             document.getElementById('total_pembayaran_pph').value = grandTotal;
         }
     }
-
 </script>
 
 <?= $this->endSection(); ?>

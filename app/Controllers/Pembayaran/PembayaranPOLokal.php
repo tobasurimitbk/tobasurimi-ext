@@ -318,7 +318,7 @@ class PembayaranPOLokal extends BaseController
 
     public function createPembayaranPOLokalBBAction()
     {
-        
+
         try {
             $penerimaanBarangModel = new PenerimaanBarangModel();
             $localPOPaymentPinjamanModel = new LocalPOPaymentPinjamanModel();
@@ -409,6 +409,8 @@ class PembayaranPOLokal extends BaseController
 
             $taxModel = new TaxModel();
             $akunPajakId = $taxModel->where('name', 'PPH PASAL 22')->first();
+            // var_dump($pembayaranList);
+            // exit;
 
             $id = $localPOPaymentModel->insert([
                 'company_id'        => $this->this_company_id,
@@ -433,7 +435,6 @@ class PembayaranPOLokal extends BaseController
                 'akun_kas'          => $this->request->getVar('akun_kas'),
                 'akun_selisih'      => $this->request->getVar('akun_selisih'),
                 'akun_pajak'      =>  $akunPajakId['akun_kredit'],
-
             ]);
 
             foreach ($panjarList as $p) {
@@ -497,8 +498,8 @@ class PembayaranPOLokal extends BaseController
                     'tipe' => "BB",
                     "local_po_payment_id"          => $id,
                     "rm_purchase_order_id"         => $l['rm_purchase_order_id'],
-                    "total"                        => $l['total_paid'],
-                    "total_pay_pph"                => $l['total_paid_pph']
+                    "total"                        => number_format($l['total_paid'], 2, '.', ''),
+                    "total_pay_pph"                => number_format($l['total_paid_pph'], 2, '.', '')
                 ]);
             }
 
@@ -577,16 +578,16 @@ class PembayaranPOLokal extends BaseController
                 'payment_date'      => date('Y-m-d', strtotime(str_replace('/', '-', $this->request->getVar('payment_date')))),
                 'payment_method'    => $this->request->getVar('payment_method'),
                 'type_bayar'        => ucfirst($this->request->getVar('tipe_pembayaran')),
-                'jenis_bayar'        => ucfirst($this->request->getVar('jenis_pembayaran')),
+                'jenis_bayar'       => ucfirst($this->request->getVar('jenis_pembayaran')),
                 'bulan'             => $bulan,
                 'multiple_po_no'    => $resPoNo,
                 'multiple_po_id'    => $resPoID,
                 'pembayaran_oleh'   => $this->request->getVar('pembayaran_oleh'),
                 'potongan_harga'    => $this->request->getVar('potongan'),
                 'amount'            => $total_pembayaran,
-                'amount_pajak'        => $this->request->getVar('total_pembayaran_pph'),
+                'amount_pajak'      => $this->request->getVar('total_pembayaran_pph'),
                 'keterangan'        => $this->request->getVar('keterangan'),
-                'akun_pajak'      =>  $akunPajakId['akun_kredit'],
+                'akun_pajak'        =>  $akunPajakId['akun_kredit'],
             ]);
 
             // Hapus detail pembayaran lama sebelum insert baru
@@ -1486,7 +1487,7 @@ class PembayaranPOLokal extends BaseController
     //     ]);
     // }
 
-    public function generatePaymentNoBPNew() 
+    public function generatePaymentNoBPNew()
     {
         $localPOPaymentBPModel = new LocalPOPaymentBPModel();
         $jenis = $this->request->getvar('jenisPembayaran');
