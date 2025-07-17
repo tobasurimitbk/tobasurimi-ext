@@ -67,8 +67,8 @@ class LocalPOPaymentBPModel extends Model
     {
         $availableSort = [
             'payment_no'        => 'local_po_payment_bp.payment_no',
-            'suppliers.name'    => 'suppliers.name',
-            'tanda_terima_faktur.faktur_no' => 'tanda_terima_faktur.faktur_no',
+            // 'suppliers.name'    => 'suppliers.name',
+            // 'tanda_terima_faktur.faktur_no' => 'tanda_terima_faktur.faktur_no',
             'payment_date'      => 'local_po_payment_bp.payment_date',
             'payment_method'    => 'local_po_payment_bp.payment_method',
             'amount'            => 'local_po_payment_bp.amount',
@@ -107,12 +107,12 @@ class LocalPOPaymentBPModel extends Model
         if ($hasFilter) {
             $supplierDataQry->groupStart();
 
-            if (!empty($addCondition['dueDate'])) {
-                $supplierDataQry->where('tanda_terima_faktur.jatuh_tempo', $addCondition['dueDate']);
-            }
-
-            if (!empty($addCondition['paymentDate'])) {
-                $supplierDataQry->where('local_po_payment_bp.payment_date', $addCondition['paymentDate']);
+            if (!empty($addCondition['dueDate']) && !empty($addCondition['paymentDate'])) {
+                $supplierDataQry->where("DATE(local_po_payment_bp.createdAt) BETWEEN '{$addCondition['dueDate']}' AND '{$addCondition['paymentDate']}'");
+            } elseif (!empty($addCondition['dueDate'])) {
+                $supplierDataQry->where('DATE(local_po_payment_bp.createdAt)', $addCondition['dueDate']);
+            } elseif (!empty($addCondition['paymentDate'])) {
+                $supplierDataQry->where('DATE(local_po_payment_bp.createdAt)', $addCondition['paymentDate']);
             }
 
             if (!empty($addCondition['search'])) {
