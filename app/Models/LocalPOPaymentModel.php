@@ -1355,7 +1355,8 @@ class LocalPOPaymentModel extends Model
         $companyID
     ) {
         $banksModel = new BanksModel();
-        
+        $db = \Config\Database::connect();
+
         // Step 1: Get bank code
         $kodeBank = '';
         if (!empty($bank_id)) {
@@ -1376,6 +1377,7 @@ class LocalPOPaymentModel extends Model
             }
         }
 
+        // Step 2: Divisi Code
         $kodeDivisi = '';
         if (!empty($divisi)) {
             $divisiUpper = strtoupper($divisi);
@@ -1404,45 +1406,39 @@ class LocalPOPaymentModel extends Model
         }
         $prefix .= $thn . '/' . $bln . '/';
 
-        // Step 4: Check all relevant tables for the highest number
-        $db = \Config\Database::connect();
-        
-        // Define all tables and columns to check
+        // Step 4: Check all tables
         $tablesToCheck = [
             'other_payment' => 'no_pembayaran',
             'local_po_payments' => 'payment_no',
             'local_po_payment_bp' => 'payment_no',
             'panjar_pinjaman_transaction' => 'no_transaction',
         ];
-        
+
         $maxNumber = 0;
-        
+
         foreach ($tablesToCheck as $table => $column) {
             $builder = $db->table($table);
-            
             $lastRecord = $builder->select($column)
-                                ->like($column, $prefix)
-                                ->where('createdAt >=', "{$thn}-{$bln}-01 00:00:00")
-                                ->where('createdAt <=', "{$last_day} 23:59:59")
-                                ->where('company_id', $companyID)
-                                ->where('deletedAt', null)
-                                ->orderBy($column, 'DESC')
-                                ->get(1)
-                                ->getRowArray();
+                ->like($column, $prefix, 'after') // match prefix awal
+                ->where('company_id', $companyID)
+                ->where("DATE(createdAt) >=", "{$thn}-{$bln}-01")
+                ->where("DATE(createdAt) <=", "{$last_day}")
+                ->where('deletedAt', null)
+                ->orderBy($column, 'DESC')
+                ->get(1)
+                ->getRowArray();
 
-            if ($lastRecord) {
-                try {
-                    $lastParts = explode('/', $lastRecord[$column]);
-                    $currentNumber = isset($lastParts[4]) ? (int)$lastParts[4] : 0;
-                    $maxNumber = max($maxNumber, $currentNumber);
-                } catch (Exception $e) {
-                    log_message('error', "Failed to parse number from {$table}.{$column}: " . $e->getMessage());
-                }
+            if ($lastRecord && isset($lastRecord[$column])) {
+                $parts = explode('/', $lastRecord[$column]);
+                $currentNumber = isset($parts[4]) ? (int)$parts[4] : 0;
+                $maxNumber = max($maxNumber, $currentNumber);
             }
         }
 
-        // Step 5: Generate new number
+        // Step 5: Create new number
         $counterNext = str_pad($maxNumber + 1, 4, '0', STR_PAD_LEFT);
-        return $prefix . $counterNext;
+        $newNo = $prefix . $counterNext;
+
+        return $newNo;
     }
 }
