@@ -1,6 +1,22 @@
 <?= $this->extend('layouts/template'); ?>
 <?= $this->Section('content'); ?>
 
+<style>
+    .table-sm th,
+    .table-sm td {
+        padding: 0.35rem !important;
+        vertical-align: middle;
+    }
+
+    .bg-light {
+        background-color: #f9f9f9 !important;
+    }
+
+    .bg-warning {
+        background-color: #fff3cd !important;
+    }
+</style>
+
 <!-- Begin Page Content -->
 <section class="section">
     <div class="section-header">
@@ -9,19 +25,21 @@
             <a class="btn btn-hide-form btn-discard float-right" href="<?= base_url("sales-kontrak"); ?>">
                 Kembali
             </a>
-            <button class="btn btn-show-form btn-primary btn-save float-right btn-submit-parent">
+
+            <button class="btn btn-show-form btn-save float-right btn-submit-parent">
                 Duplikasi
             </button>
         </div>
     </div>
     <div class="card">
-        <div class="card-body">
-            <div class="row">
-                <div class="col mb-3">
-                    <label class="form-label font-weight-bold lable-title">Data Header</label>
+        <form class="create-form form-add-spp" role="form" method="POST" enctype="multipart/form-data">
+
+            <div class="card-body">
+                <div class="row">
+                    <div class="col mb-3">
+                        <label class="form-label font-weight-bold lable-title">Data Header</label>
+                    </div>
                 </div>
-            </div>
-            <form class="create-form form-add-spp" role="form" method="POST" enctype="multipart/form-data">
                 <input autocomplete="one-time-code" type="hidden" class="id" name="id" id="id" value="<?= !empty($dataSalesKontrak) ? encrypt($dataSalesKontrak['id']) : ""; ?>" />
                 <?= csrf_field() ?>
                 <div class="row">
@@ -29,18 +47,18 @@
                         <div class="form-floating mb-3" style="height: 50px;">
                             <div class="input-group input-group-password">
                                 <div class="form-floating mb-3" style="height: 50px;">
-                                    <input autocomplete="one-time-code" value="<?= !empty($dataSalesKontrak) ? $dataSalesKontrak['sales_contract_no'] : ""; ?>" type="text" class="form-control sales_contract_no" id="sales_contract_no" name="sales_contract_no" placeholder="No. Sales Contract">
+                                    <input autocomplete="one-time-code" type="text" class="form-control sales_contract_no" id="sales_contract_no" name="sales_contract_no" placeholder="No. Sales Contract">
                                     <label for="floatingInput">No Sales Kontrak</label>
                                 </div>
-                                <div style="<?= !empty($dataSalesKontrak)  ? "display: none" : ""; ?>" class="input-generate input-group-prepend group-prepend-password align-items-center">
-                                    <input checked autocomplete="one-time-code" style="z-index: 99; margin-bottom: 10px; margin-left: -30px;" class="auto_generate" id="auto_generate" name="auto_generate" type="checkbox" onchange="changeStatus()">
+                                <div class="input-generate input-group-prepend group-prepend-password align-items-center">
+                                    <input checked autocomplete="one-time-code" style="z-index: 99; margin-bottom: 25px; margin-left: -30px;" class="auto_generate" id="auto_generate" name="auto_generate" type="checkbox" onchange="changeStatus()">
                                 </div>
                             </div>
                         </div>
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <select <?= !empty($dataSalesKontrak) ? ($dataSalesKontrak['status_posting'] ? 'disabled=true' : '') : ''; ?>
+                            <select
                                 class="form-select divisi_id"
                                 aria-label="Floating label select example"
                                 name="divisi_id"
@@ -59,7 +77,7 @@
                     <div class="col-md-4">
                         <div class="input-group">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <select <?= !empty($dataSalesKontrak) ? ($dataSalesKontrak['status_posting'] ? 'disabled=true' : '') : ''; ?> class="form-select customer_id" id="customer_id" name="customer_id" aria-label="Floating label select example">
+                                <select class="form-select customer_id" id="customer_id" name="customer_id" aria-label="Floating label select example">
                                     <option value=""></option>
                                     <?php
                                     if (!empty($dataCustomer)) {
@@ -95,39 +113,14 @@
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" value="<?= !empty($dataSalesKontrak) ? $dataSalesKontrak['customer_po_no'] : ""; ?>" type="text" class="form-control customer_po_no" id="customer_po_no" name="customer_po_no" placeholder="No. PO">
-                            <label for="floatingInput">No. PO (Opsional)</label>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="form-floating mb-3" style="height: 50px;">
                             <input autocomplete="one-time-code" value="<?= !empty($dataSalesKontrak) ? $dataSalesKontrak['loading_port'] : ""; ?>" type="text" class="form-control loading_port" id="loading_port" name="loading_port" placeholder="Loading Port">
                             <label for="floatingInput">Loading Port</label>
                         </div>
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" value="<?= !empty($dataSalesKontrak) ? $dataSalesKontrak['dicharge_port'] : ""; ?>" type="text" class="form-control dicharge_port" id="dicharge_port" name="dicharge_port" placeholder="Dicharge Port">
-                            <label for="floatingInput">Dicharge Port</label>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="form-floating mb-3" style="height: 50px;">
-                            <div class="input-group input-group-password">
-                                <div class="form-floating mb-3" style="height: 50px;">
-                                    <input autocomplete="one-time-code" <?= !empty($dataSalesKontrak) ? ($dataSalesKontrak['status_posting']  ? 'disabled=true' : '') : ''; ?> value="<?= !empty($dataSalesKontrak) ? ($dataSalesKontrak['due_date'] ? date("d/m/Y", strtotime($dataSalesKontrak['due_date'])) : "") : ""; ?>" class="form-control input-picker due_date" id="due_date" name="due_date" placeholder="Due Date">
-                                    <label for="floatingInput">Due Date</label>
-                                </div>
-                                <div class="input-group-prepend group-prepend-password align-items-center">
-                                    <i style="cursor: pointer; z-index: 99; margin-bottom: 10px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-due-date"></i>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" value="<?= !empty($dataSalesKontrak) ? $dataSalesKontrak['payment_term'] : ""; ?>" type="text" class="form-control payment_term" id="payment_term" name="payment_term" placeholder="Payment Term (Opsional)">
-                            <label for="floatingInput">Payment Term (Opsional)</label>
+                            <input autocomplete="one-time-code" value="<?= !empty($dataSalesKontrak) ? $dataSalesKontrak['dicharge_port'] : ""; ?>" type="text" class="form-control dicharge_port" id="dicharge_port" name="dicharge_port" placeholder="Discharge Port">
+                            <label for="floatingInput">Discharge Port</label>
                         </div>
                     </div>
                     <div class="col-md-4">
@@ -136,22 +129,22 @@
                             <label for="floatingInput">Tolerance</label>
                         </div>
                     </div>
+
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <div class="input-group input-group-password">
-                                <div class="form-floating mb-3" style="height: 50px;">
-                                    <input autocomplete="one-time-code" <?= !empty($dataSalesKontrak) ? ($dataSalesKontrak['status_posting']  ? 'disabled=true' : '') : ''; ?> value="<?= !empty($dataSalesKontrak) ? ($dataSalesKontrak['shipment_date'] ? date("d/m/Y", strtotime($dataSalesKontrak['shipment_date'])) : "") : ""; ?>" class="form-control input-picker shipment_date" id="shipment_date" name="shipment_date" placeholder="Shipment Date">
-                                    <label for="floatingInput">Shipment Date</label>
-                                </div>
-                                <div class="input-group-prepend group-prepend-password align-items-center">
-                                    <i style="cursor: pointer; z-index: 99; margin-bottom: 10px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-shipment-date"></i>
-                                </div>
-                            </div>
+                            <input autocomplete="one-time-code" value="<?= !empty($dataSalesKontrak) ? ($dataSalesKontrak['shipment_date'] ? $dataSalesKontrak['shipment_date'] : "") : ""; ?>" class="form-control input-picker shipment_date" id="shipment_date" name="shipment_date" placeholder="Shipment Date">
+                            <label for="floatingInput">Shipment Date</label>
                         </div>
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <select <?= !empty($dataSalesKontrak) ? ($dataSalesKontrak['status_posting']  ? 'disabled=true' : '') : ''; ?> class="form-select currency" id="currency" name="currency" aria-label="Floating label select example">
+                            <input autocomplete="one-time-code" value="<?= !empty($dataSalesKontrak) ? $dataSalesKontrak['payment_term'] : ""; ?>" type="text" class="form-control payment_term" id="payment_term" name="payment_term" placeholder="Payment Term">
+                            <label for="floatingInput">Payment Term</label>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <select class="form-select currency" id="currency" name="currency" aria-label="Floating label select example">
                                 <option value=""></option>
                                 <?php foreach ($dataValuta as $valuta) : ?>
                                     <option <?= !empty($dataSalesKontrak) ? ($dataSalesKontrak['currency'] == $valuta['id'] ? 'selected' : '') : '' ?> value="<?= $valuta["id"]; ?>"><?= $valuta["value"]; ?> - <?= strtoupper($valuta["description"]); ?></option>
@@ -162,7 +155,7 @@
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <select <?= !empty($dataSalesKontrak) ? ($dataSalesKontrak['status_posting']  ? 'disabled=true' : '') : ''; ?> class="form-select tipe_harga" id="tipe_harga" name="tipe_harga" aria-label="Floating label select example">
+                            <select class="form-select tipe_harga" id="tipe_harga" name="tipe_harga" aria-label="Floating label select example">
                                 <option value=""></option>
                                 <?php foreach ($dataTipeHarga as $v) : ?>
                                     <option <?= !empty($dataSalesKontrak) ? ($dataSalesKontrak['tipe_harga'] == $v['value'] ? 'selected' : '') : '' ?> value="<?= $v["value"]; ?>"><?= $v["value"]; ?></option>
@@ -173,67 +166,64 @@
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
+                            <select class="form-select bank_id" id="bank_id" name="bank_id" aria-label="Floating label select example">
+                                <option value=""></option>
+                                <?php foreach ($dataBank as $d) : ?>
+                                    <option <?= !empty($dataSalesKontrak) ? ($dataSalesKontrak['bank_id'] == $d['id'] ? 'selected' : '') : '' ?> value="<?= $d["id"]; ?>"><?= $d["name"] . " - " . $d['atas_nama'] . " - " . $d['no_rekening']; ?></option>
+                                <?php endforeach ?>
+                            </select>
+                            <label for="floatingInput">Pilih Bank</label>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <input autocomplete="one-time-code" value="<?= !empty($dataSalesKontrak) ? $dataSalesKontrak['shipment_insurance'] : ""; ?>" type="text" class="form-control shipment_insurance" id="shipment_insurance" name="shipment_insurance" placeholder="Shipment Insurance">
+                            <label for="floatingInput">Shipment Insurance</label>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-floating">
+                            <textarea autocomplete="one-time-code" class="full-textarea form-control banking_information" id="banking_information" name="banking_information" placeholder="Banking Information"><?= !empty($dataSalesKontrak) ? $dataSalesKontrak['banking_information'] : ""; ?></textarea>
+                            <label for="floatingInput">Banking Information</label>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <input autocomplete="one-time-code" value="<?= !empty($dataSalesKontrak) ? $dataSalesKontrak['signature_by'] : ""; ?>" type="text" class="form-control signature_by" id="signature_by" name="signature_by" placeholder="Penanda Tangan">
+                            <label for="floatingInput">Penanda Tangan</label>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <input autocomplete="one-time-code" value="<?= !empty($dataSalesKontrak) ? $dataSalesKontrak['customer_po_no'] : ""; ?>" type="text" class="form-control customer_po_no" id="customer_po_no" name="customer_po_no" placeholder="No. PO">
+                            <label for="floatingInput">No. PO (Opsional)</label>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-floating mb-3 mt-3" style="height: 50px;">
                             <input onkeyup="this.value = greatFormatRupiah(this.value)" oninput="preventNegativeInput(this)" autocomplete="one-time-code" value="<?= !empty($dataSalesKontrak) ? $dataSalesKontrak['potongan_harga'] : ""; ?>" type="text" class="form-control potongan_harga" id="potongan_harga" name="potongan_harga" placeholder="Potongan Harga (Opsional)">
                             <label for="floatingInput">Potongan Harga (Opsional)</label>
                         </div>
                     </div>
                     <div class="col-md-4">
-                        <div class="form-floating mb-3" style="height: 50px;">
+                        <div class="form-floating mb-3 mt-3" style="height: 50px;">
                             <input autocomplete="one-time-code" value="<?= !empty($dataSalesKontrak) ? $dataSalesKontrak['keterangan'] : ""; ?>" type="text" class="form-control keterangan" id="keterangan" name="keterangan" placeholder="Keterangan (Opsional)">
                             <label for="floatingInput">Keterangan (Opsional)</label>
                         </div>
                     </div>
+
                     <div class="col-md-4">
-                        <div class="form-floating mb-3" style="height: 50px;">
-                            <select <?= !empty($dataSalesKontrak) ? ($dataSalesKontrak['status_posting']  ? 'disabled=true' : '') : ''; ?> class="form-select bank_id" id="bank_id" name="bank_id" aria-label="Floating label select example">
-                                <option value=""></option>
-                                <?php foreach ($dataBank as $d) : ?>
-                                    <option <?= !empty($dataSalesKontrak) ? ($dataSalesKontrak['bank_id'] == $d['id'] ? 'selected' : '') : '' ?> value="<?= $d["id"]; ?>"><?= $d["name"] . " - " . $d['atas_nama'] . " " . $d['no_rekening']; ?></option>
-                                <?php endforeach ?>
-                            </select>
-                            <label for="floatingInput">Pilih Bank (Opsional)</label>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" <?= !empty($dataSalesKontrak) ? ($dataSalesKontrak['status_posting']  ? 'readonly=true' : '') : ''; ?> value="<?= !empty($dataSalesKontrak) ? $dataSalesKontrak['no_container'] : ""; ?>" type="text" class="form-control no_container" id="no_container" name="no_container" placeholder="Nomor Container (Opsional)">
+                        <div class="form-floating mb-3 mt-3" style="height: 50px;">
+                            <input autocomplete="one-time-code" value="<?= !empty($dataSalesKontrak) ? $dataSalesKontrak['no_container'] : ""; ?>" type="text" class="form-control no_container" id="no_container" name="no_container" placeholder="Nomor Container (Opsional)">
                             <label for="floatingInput">No Container (Opsional)</label>
                         </div>
                     </div>
-                </div>
-                <!-- <div class="row">
-                    <div class="col mb-3">
-                        <label class="form-label font-weight-bold lable-title">Broker</label>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-md-4">
-                        <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" value="<?= !empty($dataSalesKontrak) ? $dataSalesKontrak['broker'] : ""; ?>" type="text" class="form-control broker" id="broker" name="broker" placeholder="Agency / Broker (Opsional)">
-                            <label for="floatingInput">Agency / Broker (Opsional)</label>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="form-floating mb-3" style="height: 50px;">
-                            <input onkeyup="this.value = greatFormatRupiah(this.value)" autocomplete="one-time-code" value="<?= !empty($dataSalesKontrak) ? $dataSalesKontrak['komisi'] : ""; ?>" type="text" class="form-control komisi" id="komisi" name="komisi" placeholder="Komisi Broker (Opsional)">
-                            <label for="floatingInput">Komisi Broker (Opsional)</label>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="form-floating mb-3" style="height: 50px;">
-                            <select <?= !empty($dataSalesKontrak) ? ($dataSalesKontrak['status_posting']  ? 'disabled=true' : '') : ''; ?> class="form-select print_out_broker" id="print_out_broker" name="print_out_broker" aria-label="Floating label select example">
-                                <option value=""></option>
-                                <option <?= !empty($dataSalesKontrak) ? ($dataSalesKontrak['print_out_broker'] ? 'selected' : '') : '' ?> value="1">TAMPILKAN BROKER DI PRINT OUT</option>
-                                <option <?= !empty($dataSalesKontrak) ? (!$dataSalesKontrak['print_out_broker'] ? 'selected' : '') : '' ?> value="0">JANGAN TAMPILKAN BROKER DI PRINT OUT</option>
-                            </select>
-                            <label for="floatingInput">Print Out Sales Kontak</label>
-                        </div>
-                    </div>
 
-                </div> -->
+                </div>
+
                 <div class="row">
                     <div class="col mb-3">
-                        <label class="form-label font-weight-bold lable-title">Dokumen & Special Instructions</label>
+                        <label class="form-label font-weight-bold lable-title">Dokumen & Additional Clauses</label>
                     </div>
                 </div>
                 <div class="row">
@@ -245,101 +235,127 @@
                     </div>
                     <div class="col-md-6">
                         <div class="form-floating">
-                            <textarea autocomplete="one-time-code" class="full-textarea form-control special_instructions" id="special_instructions" name="special_instructions" placeholder="Special Instructions"><?= !empty($dataSalesKontrak) ? $dataSalesKontrak['special_instructions'] : ""; ?></textarea>
-                            <label for="floatingInput">Special Instructions (Opsional)</label>
+                            <textarea autocomplete="one-time-code" class="full-textarea form-control special_instructions" id="special_instructions" name="special_instructions" placeholder="Additional Clauses"><?= !empty($dataSalesKontrak) ? $dataSalesKontrak['special_instructions'] : ""; ?></textarea>
+                            <label for="floatingInput">Additional Clauses (Opsional)</label>
                         </div>
                     </div>
                 </div>
-                <div class="row mt-3">
-                    <div class="col mb-3">
-                        <label class="form-label font-weight-bold lable-title">Spesifikasi Detail</label>
+                <div class="col-subtitle-modal mt-5">
+                    <div class="row mt-3">
+                        <div class="col-md-6">
+                            <label class="form-label font-weight-bold modal-sub-title">List Barang</label>
+                        </div>
+                        <div class="col-md-6">
+                            <?php if (!empty($dataSalesKontrak)) { ?>
+                                <?php if (!$dataSalesKontrak['status_posting']) { ?>
+                                    <button class="btn btn-show-detail btn-add btn-block float-right" type="button" data-btn="detail-modal">
+                                        <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
+                                    </button>
+                                <?php } ?>
+                            <?php } else { ?>
+                                <button class="btn btn-show-detail btn-add btn-block float-right" type="button" data-btn="detail-modal">
+                                    <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
+                                </button>
+                            <?php } ?>
+                        </div>
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-md-6">
-                        <div class="form-floating">
-                            <textarea autocomplete="one-time-code" <?= !empty($dataSalesKontrak) ? ($dataSalesKontrak['status_posting']  ? 'readonly=true' : '') : ''; ?> class="full-textarea form-control spesifikasi" id="spesifikasi" name="spesifikasi" placeholder="Document Required"><?= !empty($dataSalesKontrak) ? $dataSalesKontrak['spesifikasi'] : ""; ?></textarea>
-                            <label for="floatingInput">Spesifikasi Detail (Opsional)</label>
+                    <div class="table-responsive">
+                        <table class="table table-bordered nowrap table-hover-tobasurimi dataTable" id="dataTable" width="100%" cellspacing="0">
+                            <thead class="thead-dark">
+                                <tr>
+                                    <th>No</th>
+                                    <th>Kode Barang</th>
+                                    <th>Barang</th>
+                                    <th>Species</th>
+                                    <th>Brand</th>
+                                    <th>Packing</th>
+                                    <th>Specs</th>
+                                    <th>Qty</th>
+                                    <th>Unit Price</th>
+                                    <th>Total Amount</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody class="body-detail-table" id="body-detail-table">
+
+                            </tbody>
+                            <tfoot class="foot-detail-table" id="foot-detail-table">
+                                <tr>
+                                    <td colspan="6"></td>
+                                    <td><b>TOTAL</b></td>
+                                    <td><b>0,00</b></td>
+                                    <td><b>0,00</b></td>
+                                    <td><b>0,00</b></td>
+                                    <td></td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="row mt-3">
+
+                    <div class="col-md-4">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <input autocomplete="one-time-code" value="<?= !empty($dataSalesKontrak) ? $dataSalesKontrak['total_container'] : ""; ?>" type="text" class="form-control total_container" id="total_container" name="total_container" placeholder="Total Container (Opsional)">
+                            <label for="floatingInput">Total Container (Opsional)</label>
                         </div>
                     </div>
-
-                </div>
-            </form>
-            <div class="col-subtitle-modal mt-5">
-                <div class="row mt-3">
-                    <div class="col-md-6">
-                        <label class="form-label font-weight-bold modal-sub-title">List Barang</label>
+                    <div class="col-md-4">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <input autocomplete="one-time-code" value="<?= !empty($dataSalesKontrak) ? $dataSalesKontrak['royalty'] : ""; ?>" type="text" class="form-control royalty" id="royalty" name="royalty" placeholder="Royalty (Opsional)">
+                            <label for="floatingInput">Royalty (Opsional)</label>
+                        </div>
                     </div>
-                    <div class="col-md-6">
-                        <button class="btn btn-show-detail btn-add btn-block float-right" data-btn="detail-modal">
-                            <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
-                        </button>
+                    <div class="col-md-4">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <input autocomplete="one-time-code" value="<?= !empty($dataSalesKontrak) ? $dataSalesKontrak['rebate'] : ""; ?>" type="text" class="form-control rebate" id="rebate" name="rebate" placeholder="Rebate (Opsional)">
+                            <label for="floatingInput">Rebate (Opsional)</label>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <input autocomplete="one-time-code" value="<?= !empty($dataSalesKontrak) ? $dataSalesKontrak['can_deduction'] : ""; ?>" type="text" class="form-control can_deduction" id="can_deduction" name="can_deduction" placeholder="Can Deduction (Opsional)">
+                            <label for="floatingInput">Can Deduction (Opsional)</label>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <input autocomplete="one-time-code" value="<?= !empty($dataSalesKontrak) ? $dataSalesKontrak['estimated_freight'] : ""; ?>" type="text" class="form-control estimated_freight" id="estimated_freight" name="estimated_freight" placeholder="Estimated Freight (Opsional)">
+                            <label for="floatingInput">Estimated Freight (Opsional)</label>
+                        </div>
                     </div>
                 </div>
             </div>
-            <div class="row">
-                <div class="table-responsive">
-                    <table class="table table-bordered nowrap table-hover-tobasurimi dataTable" id="dataTable" width="100%" cellspacing="0">
-                        <thead class="thead-dark">
-                            <tr>
-                                <th>No</th>
-                                <th>Kode Barang</th>
-                                <th>Barang</th>
-                                <th>Size</th>
-                                <th>Satuan Order</th>
-                                <th>Kemasan</th>
-                                <th>Remark</th>
-                                <th>Qty</th>
-                                <th>Harga</th>
-                                <th>Total Harga</th>
-                                <th>Action</th>
-                            </tr>
-                        </thead>
-                        <tbody class="body-detail-table" id="body-detail-table" style="cursor: pointer;">
+        </form>
 
-                        </tbody>
-                        <tfoot class="foot-detail-table" id="foot-detail-table">
-                            <tr>
-                                <td colspan="6"></td>
-                                <td><b>TOTAL</b></td>
-                                <td><b>0,00</b></td>
-                                <td><b>0,00</b></td>
-                                <td><b>0,00</b></td>
-                                <td></td>
-                            </tr>
-                        </tfoot>
-                    </table>
-                </div>
-            </div>
-        </div>
+    </div>
     </div>
 </section>
 
 <div class="modal detail-modal" tabindex="1">
-    <div class="modal-dialog" style="min-width: 900px;">
+    <div class="modal-dialog modal-xl">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title title-secondary"><label class="title-detail-name"></label> Barang</h5>
+                <h5 class="modal-title title-secondary"><label class="title-detail-name"></label> Product Description</h5>
             </div>
-            <div class="modal-body">
-                <form class="detail-form" role="form" method="POST" enctype="multipart/form-data">
+            <form class="detail-form">
+
+                <div class="modal-body">
                     <input type="hidden" name="id_detail" class="id_detail" id="id_detail">
-                    <div class="row">
+                    <!-- <div class="row">
                         <div class="col mb-3">
-                            <h5 class="title-tambah-barang">Data Barang</h5>
+                            <h5 class="title-tambah-barang">Product Name</h5>
                         </div>
-                    </div>
+                    </div> -->
                     <div class="row">
                         <div class="col-md-6">
                             <div class="input-group">
                                 <div class="form-floating mb-3" style="height: 50px;">
                                     <select class="form-select barang_master_sales_id" name="barang_master_sales_id" id="barang_master_sales_id" aria-label="Floating label select example">
                                         <option value=""></option>
-                                        <?php foreach ($dataBarang as $d) : ?>
-                                            <option value="<?= $d['id'] ?>" data-kode_barang="<?= $d['kode_barang'] ?>" data-barang_name="<?= $d['barang_name'] ?>" data-harga_jual="<?= ($d['harga_jual']) ?>" data-satuan_id="<?= $d['satuan_id'] ?>">
-                                                <?= "(" . $d['kode_barang'] . ") " . $d['barang_name'] ?>
-                                            </option>
-                                        <?php endforeach; ?>
                                     </select>
                                     <label for="floatingInput">Barang</label>
                                 </div>
@@ -352,33 +368,187 @@
                                 <?php endif; ?>
                             </div>
                         </div>
+
                         <div class="col-md-6">
-                            <div class="form-floating mb-3">
-                                <input autocomplete="one-time-code" type="text" class="form-control size" id="size" name="size" placeholder="Size">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input autocomplete="one-time-code" value="" type="text" class="form-control species" id="species" name="species" placeholder="Species">
+                                <label for="floatingInput">Species</label>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input autocomplete="one-time-code" value="" type="text" class="form-control brand" id="brand" name="brand" placeholder="Brand">
+                                <label for="floatingInput">Brand</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input autocomplete="one-time-code" value="" type="text" class="form-control packing" id="packing" name="packing" placeholder="Packing">
+                                <label for="floatingInput">Packing</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input autocomplete="one-time-code" value="" type="text" class="form-control specs" id="specs" name="specs" placeholder="Specs">
+                                <label for="floatingInput">Specs</label>
+                            </div>
+                        </div>
+
+                        <div class="col-subtitle-modal">
+                            <div class="row mt-3 justify-content-end">
+                                <div class="col-md-6">
+                                    <label class="form-label font-weight-bold modal-sub-title"></label>
+                                </div>
+                                <div class="col-md-3">
+                                    <button class="btn btn-success btn-block float-right" type="button" id="btnAddSizeBreakdownModal">
+                                        <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah Size & Breakdown
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div style="max-height: 400px; overflow-y: auto;">
+                            <div class="table-responsive">
+                                <table class="table table-bordered nowrap table-hover-tobasurimi dataTable" id="productSizeBreakdown" width="100%" cellspacing="0">
+                                    <thead class="thead-dark">
+                                        <tr>
+                                            <th>No</th>
+                                            <th>Size</th>
+                                            <th>Grade</th>
+                                            <th>Packing</th>
+                                            <th>Can</th>
+                                            <th>Case</th>
+                                            <th>Kg</th>
+                                            <th>LB</th>
+                                            <th>Inner Box</th>
+                                            <th>PC</th>
+                                            <th>Bag</th>
+                                            <th>Cup</th>
+                                            <th>%</th>
+                                            <th>Remarks</th>
+                                            <th>Qty</th>
+                                            <th>Unit Price</th>
+                                            <th>Total Amount</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="body-detail-table-size-breakdown">
+                                        <!-- isi data -->
+                                    </tbody>
+                                    <tfoot class="tfoot-detail-table-size-breakdown">
+                                        <tr>
+                                            <td colspan="13"></td>
+                                            <td><b>TOTAL</b></td>
+                                            <td><b>0.00</b></td>
+                                            <td><b>0.00</b></td>
+                                            <td><b>0.00</b></td>
+                                            <td></td>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-hide-detail btn-discard mr-3">Kembali</button>
+                    <button type="button" class="btn btn-submit-form" id="btn-submit-detail">Simpan</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="modal add-modal" id="addSizeBreakdownModal" tabindex="-1">
+    <div class="modal-dialog" style="min-width: 900px">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title "><label class="title-size-breakdown"></label> Size & BreakDown</h5>
+            </div>
+            <form class="create-form-size-breakdown" role="form" method="POST">
+                <div class="modal-body">
+                    <input type="hidden" name="id_detail_breakdown" id="id_detail_breakdown">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input autocomplete="one-time-code" type="text" class="form-control size" name="size" id="size" placeholder="Size (Opsional)">
                                 <label for="floatingInput">Size (Opsional)</label>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <select class="form-select satuan_order_id" name="satuan_order_id" id="satuan_order_id" aria-label="Floating label select example">
-                                    <option value=""></option>
-                                    <?php foreach ($dataSatuan as $d) : ?>
-                                        <option value="<?= $d['id'] ?>"><?= $d['kode_satuan'] ?></option>
-                                    <?php endforeach; ?>
-                                </select>
-                                <label for="floatingInput">Satuan Order</label>
+                                <input autocomplete="one-time-code" type="text" class="form-control grade" name="grade" id="grade" placeholder="Grade (Opsional)">
+                                <label for="floatingInput">Grade (Opsional)</label>
                             </div>
                         </div>
                         <div class="col-md-6">
-                            <div class="form-floating mb-3">
-                                <input autocomplete="one-time-code" type="text" class="form-control kemasan" id="kemasan" name="kemasan" placeholder="Kemasan" oninput="capitalize()">
-                                <label for="floatingInput">Kemasan (Opsional)</label>
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input autocomplete="one-time-code" type="text" class="form-control packing_size" name="packing_size" id="packing_size" placeholder="Packing (Opsional)">
+                                <label for="floatingInput">Packing (Opsional)</label>
                             </div>
                         </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input autocomplete="one-time-code" type="text" class="form-control can" name="can" id="can" placeholder="Can (Opsional)">
+                                <label for="floatingInput">Can (Opsional)</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input autocomplete="one-time-code" type="text" class="form-control case" name="case" id="case" placeholder="Case (Opsional)">
+                                <label for="floatingInput">Case (Opsional)</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input autocomplete="one-time-code" type="text" class="form-control kg" name="kg" id="kg" placeholder="Kg (Opsional)">
+                                <label for="floatingInput">Kg (Opsional)</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input autocomplete="one-time-code" type="text" class="form-control lb" name="lb" id="lb" placeholder="Lb (Opsional)">
+                                <label for="floatingInput">Lb (Opsional)</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input autocomplete="one-time-code" type="text" class="form-control inner_box" name="inner_box" id="inner_box" placeholder="Inner Box (Opsional)">
+                                <label for="floatingInput">Inner Box (Opsional)</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input autocomplete="one-time-code" type="text" class="form-control pc" name="pc" id="pc" placeholder="Pc (Opsional)">
+                                <label for="floatingInput">PC (Opsional)</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input autocomplete="one-time-code" type="text" class="form-control bag" name="bag" id="bag" placeholder="Bag (Opsional)">
+                                <label for="floatingInput">Bag (Opsional)</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input autocomplete="one-time-code" type="text" class="form-control persen" name="persen" id="persen" placeholder="Persen (Opsional)">
+                                <label for="floatingInput">Persen % (Opsional)</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input autocomplete="one-time-code" type="text" class="form-control cup" name="cup" id="cup" placeholder="Cup (Opsional)">
+                                <label for="floatingInput">Cup (Opsional)</label>
+                            </div>
+                        </div>
+
                     </div>
-                    <div class="row mt-2">
+                    <div class="row mt-3">
                         <div class="col mb-3">
-                            <h5 class="title-tambah-barang">Data Harga</h5>
+                            <h6 class="text-dark">Data Harga</h6>
                         </div>
                     </div>
                     <div class="row">
@@ -391,14 +561,12 @@
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <input onkeyup="this.value = greatFormatRupiah(this.value)" autocomplete="one-time-code" type="text" class="form-control harga" name="harga" id="harga" placeholder="Harga Satuan">
-                                <label for="floatingInput">Harga</label>
+                                <label for="floatingInput">Harga Satuan</label>
                             </div>
                         </div>
-                    </div>
-                    <div class="row">
                         <div class="col-md-6">
                             <div class="form-floating mb-3">
-                                <input autocomplete="one-time-code" type="text" class="form-control remark" id="remark" name="remark" placeholder="Remark" oninput="capitalize()">
+                                <input autocomplete="one-time-code" type="text" class="form-control remark" id="remark" name="remark" placeholder="Remark">
                                 <label for="floatingInput">Remark (Opsional)</label>
                             </div>
                         </div>
@@ -409,12 +577,12 @@
                             </div>
                         </div>
                     </div>
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-hide-detail btn-discard mr-3">Kembali</button>
-                <button type="submit" class="btn btn-submit-form btn-submit-detail">Simpan</button>
-            </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-discard mr-2" id="btnHideSizeBreakdownModal">Kembali</button>
+                    <button type="submit" class="btn btn-submit-form" id="btnSubmitSizeBreakDown">Simpan</button>
+                </div>
+            </form>
         </div>
     </div>
 </div>
@@ -566,11 +734,10 @@
     </div>
 </div>
 
-
-
 <script>
     const csrfToken = '<?= csrf_token() ?>';
     var listBarang = [];
+    var listSizeBreakdown = [];
     var totalAmount = 0;
 
     <?php if (!empty($dataSalesKontrakDetail)) : ?>
@@ -582,17 +749,21 @@
                 barang_master_sales_id: "<?= $s['barang_master_sales_id'] ?>",
                 kode_barang: "<?= $s['kode_barang'] ?>",
                 barang_name: "<?= $s['barang_name'] ?>",
-                satuan_order_id: "<?= $s['satuan_order_id'] ?>",
-                satuan_order_name: "<?= $s['satuan_order_name'] ?>",
-                kemasan: "<?= $s['kemasan'] ?>",
-                qty: "<?= $s['qty'] ?>",
-                harga: "<?= $s['harga'] ?>",
-                remark: "<?= $s['remark'] ?>",
-                total: "<?= $s['total'] ?>",
-                size: "<?= $s['size'] ?>"
+                brand: "<?= $s['brand'] ?>",
+                harga: "<?= floatval($s['harga']) ?>",
+                packing: "<?= $s['kemasan'] ?>",
+                qty: "<?= floatval($s['qty']) ?>",
+                species: "<?= $s['species'] ?>",
+                specs: "<?= $s['specs'] ?>",
+                total: <?= floatval($s['total']) ?>,
+                size_breakdown: <?= json_encode($s['size_breakdown']) ?> // Hapus JSON.parse()
             });
         <?php endforeach; ?>
         drawTable();
+        changeStatus();
+
+    <?php else: ?>
+        changeStatus();
     <?php endif; ?>
 
     $(".due_date").datepicker({
@@ -602,20 +773,108 @@
         autoclose: true
     })
 
-    $(".shipment_date").datepicker({
-        todayHighlight: true,
-        format: "dd/mm/yyyy",
-        orientation: "bottom auto",
-        autoclose: true
+    $('#btnAddSizeBreakdownModal').click(function() {
+        clearFormSizeBreakdown();
+        $('.title-size-breakdown').text("Tambah ");
+        $('#addSizeBreakdownModal').modal('show');
+    });
+
+    $('#btnHideSizeBreakdownModal').click(function() {
+        $('#addSizeBreakdownModal').modal('hide');
+
+    });
+
+    $('#btnSubmitSizeBreakDown').click(function(e) {
+        e.preventDefault();
+        if ($('.create-form-size-breakdown').valid()) {
+            var id_detail_breakdown = $('#id_detail_breakdown').val();
+            var size = $('#size').val();
+            var grade = $('#grade').val();
+            var packing_size = $('#packing_size').val();
+            var can = $('#can').val();
+            var cased = $('#case').val();
+            var kg = $('#kg').val();
+            var lb = $('#lb').val();
+            var inner_box = $('#inner_box').val();
+            var pc = $('#pc').val();
+            var bag = $('#bag').val();
+            var persen = $('#persen').val();
+            var qty = $('#qty').val();
+            var harga = destroyFormatRupiah($('#harga').val());
+            var total = destroyFormatRupiah($('#total').val());
+            var remark = $('#remark').val();
+
+            var result = {
+                id_detail_breakdown: id_detail_breakdown,
+                size: size,
+                grade: grade,
+                packing: packing_size,
+                can: can,
+                cased: cased,
+                kg: kg,
+                lb: lb,
+                inner_box: inner_box,
+                pc: pc,
+                bag: bag,
+                persen: persen,
+                qty: qty,
+                harga: harga,
+                total: harga * qty,
+                remark: remark
+            }
+
+            if (id_detail_breakdown == '') {
+                // Create
+                result.id_detail_breakdown = getID();
+                listSizeBreakdown.push(result);
+            } else {
+                // Update
+                var index = null;
+                for (var i = 0; i < listSizeBreakdown.length; i++) {
+                    if (listSizeBreakdown[i].id_detail_breakdown == id_detail_breakdown) {
+                        index = i;
+                        break;
+                    }
+                }
+
+                listSizeBreakdown[index].size = result.size;
+                listSizeBreakdown[index].grade = result.grade;
+                listSizeBreakdown[index].packing = result.packing;
+                listSizeBreakdown[index].can = result.can;
+                listSizeBreakdown[index].cased = result.cased;
+                listSizeBreakdown[index].kg = result.kg;
+                listSizeBreakdown[index].lb = result.lb;
+                listSizeBreakdown[index].inner_box = result.inner_box;
+                listSizeBreakdown[index].pc = result.pc;
+                listSizeBreakdown[index].bag = result.bag;
+                listSizeBreakdown[index].persen = result.persen;
+                listSizeBreakdown[index].qty = result.qty;
+                listSizeBreakdown[index].harga = result.harga;
+                listSizeBreakdown[index].total = result.total;
+                listSizeBreakdown[index].remark = result.remark;
+            }
+
+            drawTableListSizeBreakDown(listSizeBreakdown);
+            $('#addSizeBreakdownModal').modal('hide');
+
+        }
+
     })
+
+    // $(".shipment_date").datepicker({
+    //     todayHighlight: true,
+    //     format: "dd/mm/yyyy",
+    //     orientation: "bottom auto",
+    //     autoclose: true
+    // })
 
     $('.icon-due-date').click(function() {
         $(".due_date").focus();
     });
 
-    $('.icon-shipment-date').click(function() {
-        $(".shipment_date").focus();
-    });
+    // $('.icon-shipment-date').click(function() {
+    //     $(".shipment_date").focus();
+    // });
 
     // CUSTOMER
     $('.customer_id').select2({
@@ -633,7 +892,7 @@
     $('.barang_master_sales_id').select2({
         placeholder: "Pilih Barang",
         theme: "bootstrap-5",
-        dropdownParent: $(".detail-modal .modal-content"),
+        dropdownParent: $("#addMasterBarangModal"),
         allowClear: true
     });
 
@@ -642,7 +901,7 @@
         theme: "bootstrap-5",
         placeholder: 'Pilih Tipe Barang',
         allowClear: true,
-        dropdownParent: $(".add-modal .modal-content")
+        dropdownParent: $("#addMasterBarangModal")
     }).change(function() {
         let value = document.getElementById('generate_new_code').checked ? true : false;
         if (value) {
@@ -684,7 +943,7 @@
     });
 
     $('.bank_id').select2({
-        placeholder: "Pilih Bank (Opsional)",
+        placeholder: "Pilih Bank",
         theme: "bootstrap-5",
     });
 
@@ -693,6 +952,7 @@
     $('.barang_master_sales_id').select2({
         placeholder: "Pilih Barang",
         theme: "bootstrap-5",
+        dropdownParent: $('.detail-modal')
     }).change(function() {
         var selected = $('.barang_master_sales_id option:selected');
         if (selected.val() != "") {
@@ -717,7 +977,7 @@
         theme: "bootstrap-5",
         placeholder: 'Pilih Dari Master Barang',
         allowClear: true,
-        dropdownParent: $(".add-modal .modal-content"),
+        dropdownParent: $("#addMasterBarangModal"),
     }).change(function() {
         var id = $('#spesifikasi_id option:selected').val();
         var selectedText = $('#spesifikasi_id option:selected').text();
@@ -760,13 +1020,12 @@
         .find('label')
         .css('z-index', '1');
 
-
     // QTY KEYUP
     $('.qty,.harga').keyup(function() {
         var qty = parseFloat($('.qty').val()) || 0;
         var harga = destroyFormatRupiah($('.harga').val()) || 0;
         var total = qty * harga;
-        $('.total').val(greatFormatRupiah(total));
+        $('.total').val(greatFormatRupiah(total.toFixed(2)));
     });
 
     // CUSTOMER 
@@ -780,6 +1039,7 @@
     $('.btn-discard-customer').click(function() {
         $('#addCustomerModal').modal('hide');
     });
+
 
     // VALIDATOR SALES KONTRAK FORM
     var validator = $(".create-form").validate({
@@ -796,9 +1056,6 @@
             dicharge_port: {
                 required: true
             },
-            due_date: {
-                required: true
-            },
             tolerance: {
                 required: true
             },
@@ -814,12 +1071,24 @@
             print_out_broker: {
                 required: true
             },
-            // documents_required: {
-            //     required: true
-            // },
-            // special_instructions: {
-            //     required: true
-            // },
+            divisi_id: {
+                required: true
+            },
+            shipment_insurance: {
+                required: true
+            },
+            banking_information: {
+                required: true
+            },
+            signature_by: {
+                required: true
+            },
+            payment_term: {
+                required: true
+            },
+            bank_id: {
+                required: true
+            }
         },
         messages: {
             sales_contract_no: {
@@ -832,10 +1101,7 @@
                 required: "Loading port wajib diisi"
             },
             dicharge_port: {
-                required: "Dicharge port wajib diisi"
-            },
-            due_date: {
-                required: "Due date wajib diisi"
+                required: "Discharge port wajib diisi"
             },
             tolerance: {
                 required: "Tolerance wajib diisi"
@@ -852,12 +1118,24 @@
             print_out_broker: {
                 required: "Print out boker wajib diisi"
             },
-            // documents_required: {
-            //     required: "Dokumen wajib diisi"
-            // },
-            // special_instructions: {
-            //     required: "Special instructions wajib diisi"
-            // },
+            divisi_id: {
+                required: "Pilih Departemen"
+            },
+            shipment_insurance: {
+                required: "Shipment Insurance wajib diisi"
+            },
+            banking_information: {
+                required: "Banking Information wajib diisi"
+            },
+            signature_by: {
+                required: "Nama Penanda Tangan Wajib Diisi"
+            },
+            payment_term: {
+                required: "Payment Term Wajib Diisi"
+            },
+            bank_id: {
+                required: "Bank Wajib Diisi"
+            }
         },
         errorElement: 'span',
         errorClass: 'text-danger',
@@ -887,19 +1165,16 @@
             barang_master_sales_id: {
                 required: true
             },
-            satuan_order_id: {
+            species: {
                 required: true
             },
-            qty: {
+            brand: {
                 required: true
             },
-            harga: {
+            packing: {
                 required: true
             },
-            // remark: {
-            //     required: true
-            // },
-            total: {
+            specs: {
                 required: true
             }
         },
@@ -907,20 +1182,17 @@
             barang_master_sales_id: {
                 required: "Pilih barang"
             },
-            satuan_order_id: {
-                required: "Pilih satuan order"
+            species: {
+                required: "Species Wajib Diisi"
             },
-            qty: {
-                required: "Qty wajib diisi"
+            brand: {
+                required: "Brand Wajib Diisi"
             },
-            harga: {
-                required: "Harga wajib diisi"
+            packing: {
+                required: "Packing Wajib Diisi"
             },
-            // remark: {
-            //     required: "Remark wajib diisi"
-            // },
-            total: {
-                required: "Total wajib diisi"
+            specs: {
+                required: "Species Wajib Diisi"
             }
         },
         errorElement: 'span',
@@ -1049,6 +1321,46 @@
         },
     });
 
+    // VALIDATOR SIZE & BREAKDOWN
+    var validatorSizeBreakdown = $('.create-form-size-breakdown').validate({
+        rules: {
+            qty: {
+                required: true
+            },
+            harga: {
+                required: true
+            },
+        },
+        messages: {
+            qty: {
+                required: "Qty wajib diisi"
+            },
+            harga: {
+                required: "Harga wajib diisi"
+            },
+        },
+        errorElement: 'span',
+        errorClass: 'text-danger',
+        errorPlacement: function(error, element) {
+            var elem = $(element);
+            if (elem.hasClass("select2-hidden-accessible")) {
+                element = $("#select2-" + elem.attr("id") + "-container").parent();
+                error.insertAfter(element);
+            } else {
+                error.insertAfter(element);
+            }
+        },
+        highlight: function(element) {
+            $(element).closest('.form-group').addClass('has-error');
+            $(element).addClass('select-class');
+
+        },
+        unhighlight: function(element) {
+            $(element).closest('.form-group').removeClass('has-error');
+            $(element).removeClass('select-class');
+        },
+    })
+
     $('.btn-submit-customer').click(function() {
         if ($('.create-form-customer').valid()) {
             const csrf = $(`[name="${csrfToken}"]`);
@@ -1121,8 +1433,10 @@
             let data = new FormData(document.querySelector(".create-form-master-barang"));
             let hargaPokok = destroyFormatRupiah($('#harga_pokok').val());
             let hargaJual = destroyFormatRupiah($('#harga_jual').val());
+            let divisiId = $("#divisi_id").val();
             data.set('harga_jual', hargaJual);
             data.set('harga_pokok', hargaPokok);
+            data.set('divisi_id', divisiId);
 
             Swal.fire({
                 icon: 'question',
@@ -1182,80 +1496,98 @@
         }
     });
 
-    $('.btn-submit-detail').click(function() {
+    $('#btn-submit-detail').click(function() {
         if ($('.detail-form').valid()) {
             var id_detail = $('.id_detail').val();
             var barang_master_sales_id = $('.barang_master_sales_id option:selected').val();
             var kode_barang = $('.barang_master_sales_id option:selected').data('kode_barang');
             var barang_name = $('.barang_master_sales_id option:selected').data('barang_name');
-            var satuan_order_id = $('.satuan_order_id option:selected').val();
-            var satuan_order_name = $('.satuan_order_id option:selected').text();
-            var kemasan = $('.kemasan').val();
-            var qty = $('.qty').val();
-            var harga = destroyFormatRupiah($('.harga').val());
-            var remark = $('.remark').val();
-            var total = (qty * harga);
-            var size = $('.size').val();
+            var species = $('.species').val();
+            var brand = $('.brand').val();
+            var packing = $('.packing').val();
+            var specs = $('.specs').val();
+            var qty = 0;
+            var harga = 0;
+            var total = 0;
 
-            if (id_detail) {
-                // UPDATE
-                $.each(listBarang, function(i, v) {
-                    if (v.id_detail === id_detail) {
-                        listBarang[i].barang_master_sales_id = barang_master_sales_id;
-                        listBarang[i].kode_barang = kode_barang;
-                        listBarang[i].barang_name = barang_name;
-                        listBarang[i].satuan_order_id = satuan_order_id;
-                        listBarang[i].satuan_order_name = satuan_order_name;
-                        listBarang[i].kemasan = kemasan;
-                        listBarang[i].qty = qty;
-                        listBarang[i].harga = harga;
-                        listBarang[i].remark = remark;
-                        listBarang[i].total = total;
-                        listBarang[i].size = size;
-                    }
+            if (listSizeBreakdown.length === 0) {
+                Swal.fire({
+                    icon: 'error',
+                    title: "Size & Breakdown Wajib Diisi",
+                    confirmButtonColor: '#4e73df',
                 });
             } else {
-                // CREATE
-                // CEK DUPLIKASI
-                var isAdd = false;
-                for (var i = 0; i < listBarang.length; i++) {
-                    if (listBarang[i].barang_master_sales_id == barang_master_sales_id) {
-                        indexToRemove = i;
-                        isAdd = true;
-                        break;
+
+                $.each(listSizeBreakdown, function(i, v) {
+                    qty += parseFloat(v.qty);
+                    harga += parseFloat(v.harga);
+                    total += parseFloat(v.total);
+                });
+
+                if (id_detail) {
+                    // UPDATE
+                    $.each(listBarang, function(i, v) {
+                        if (v.id_detail === id_detail) {
+                            listBarang[i].barang_master_sales_id = barang_master_sales_id;
+                            listBarang[i].kode_barang = kode_barang;
+                            listBarang[i].barang_name = barang_name;
+                            listBarang[i].species = species;
+                            listBarang[i].brand = brand;
+                            listBarang[i].packing = packing;
+                            listBarang[i].specs = specs;
+                            listBarang[i].qty = qty;
+                            listBarang[i].harga = harga;
+                            listBarang[i].total = total;
+                            listBarang[i].size_breakdown = listSizeBreakdown
+                        }
+                    });
+                } else {
+                    // CREATE
+                    // CEK DUPLIKASI
+                    var isAdd = false;
+                    for (var i = 0; i < listBarang.length; i++) {
+                        if (listBarang[i].barang_master_sales_id == barang_master_sales_id) {
+                            indexToRemove = i;
+                            isAdd = true;
+                            break;
+                        }
+                    }
+
+                    if (isAdd) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Barang Sudah Ada',
+                            confirmButtonColor: '#4e73df',
+                            cancelButtonColor: '#d33',
+                            reverseButtons: true,
+                            confirmButtonText: 'Oke',
+                        })
+                    } else {
+                        var id_detail = getID();
+                        listBarang.push({
+                            id_detail: id_detail,
+                            barang_master_sales_id: barang_master_sales_id,
+                            kode_barang: kode_barang,
+                            barang_name: barang_name,
+                            species: species,
+                            brand: brand,
+                            packing: packing,
+                            specs: specs,
+                            qty: qty,
+                            harga: harga,
+                            total: total,
+                            size_breakdown: listSizeBreakdown
+                        });
                     }
                 }
 
-                if (isAdd) {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Barang Sudah Ada',
-                        confirmButtonColor: '#4e73df',
-                        cancelButtonColor: '#d33',
-                        reverseButtons: true,
-                        confirmButtonText: 'Oke',
-                    })
-                } else {
-                    var id_detail = getID();
-                    listBarang.push({
-                        id_detail: id_detail,
-                        barang_master_sales_id: barang_master_sales_id,
-                        kode_barang: kode_barang,
-                        barang_name: barang_name,
-                        satuan_order_id: satuan_order_id,
-                        satuan_order_name: satuan_order_name,
-                        kemasan: kemasan,
-                        qty: qty,
-                        harga: harga,
-                        remark: remark,
-                        total: total,
-                        size: size
-                    });
-                }
+                resetFormDetail();
+                drawTable();
+                $('.detail-modal').modal('hide');
+
             }
-            resetFormDetail();
-            drawTable();
-            $('.detail-modal').modal('hide');
+
+
         }
     });
 
@@ -1285,12 +1617,12 @@
                 // CREATE
                 Swal.fire({
                     icon: 'question',
-                    title: 'Duplikasi Data?',
+                    title: 'Simpan Data?',
                     confirmButtonColor: '#4e73df',
                     cancelButtonColor: '#d33',
                     showCancelButton: true,
                     reverseButtons: true,
-                    confirmButtonText: 'Duplikasi',
+                    confirmButtonText: 'Simpan',
                     cancelButtonText: 'Kembali',
                 }).then((result) => {
                     if (result.isConfirmed) {
@@ -1309,16 +1641,25 @@
                             processData: false,
                             contentType: false,
                             success: function(response) {
-                                Swal.fire({
-                                    icon: 'success',
-                                    title: response.message,
-                                    confirmButtonColor: '#4e73df',
-                                    confirmButtonText: 'Ok'
-                                }).then((result) => {
-                                    if (result.isConfirmed) {
-                                        window.location.href = "<?= base_url('sales-kontrak') ?>"
-                                    }
-                                });
+                                if (response.status) {
+                                    Swal.fire({
+                                        icon: 'success',
+                                        title: response.message,
+                                        confirmButtonColor: '#4e73df',
+                                        confirmButtonText: 'Ok'
+                                    }).then((result) => {
+                                        if (result.isConfirmed) {
+                                            window.location.href = "<?= base_url('sales-kontrak') ?>"
+                                        }
+                                    });
+                                } else {
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: response.message,
+                                        confirmButtonColor: '#4e73df',
+                                        confirmButtonText: 'Ok'
+                                    });
+                                }
                             },
                         });
                     }
@@ -1329,6 +1670,7 @@
 
     // MASTER BARANG
     $('.btn-barang-add').click(function() {
+
         $('#addMasterBarangModal').modal('show');
         $('.detail-modal').modal('hide');
         // reset form master barang
@@ -1356,6 +1698,10 @@
         validatorDetail.resetForm();
         validatorDetail.reset();
         resetFormDetail();
+        getListMasterBarang()
+        // Reset List Size BreakDown
+        listSizeBreakdown = [];
+        drawTableListSizeBreakDown(listSizeBreakdown);
     });
 
     $(".btn-hide-detail").click(function() {
@@ -1363,8 +1709,8 @@
     })
 
 
-    changeStatus();
     generateCodeMasterBarang();
+    getListMasterBarang();
 
     function print(url) {
         window.open(url, "_blank");
@@ -1380,14 +1726,57 @@
         }
         $('.id_detail').val(item.id_detail);
         $('.barang_master_sales_id').val(item.barang_master_sales_id).change();
-        $('.satuan_order_id').val(item.satuan_order_id).change();
-        $('.kemasan').val(item.kemasan);
-        $('.qty').val(item.qty);
-        $('.harga').val(greatFormatRupiah(item.harga));
-        $('.remark').val(item.remark);
-        $('.total').val(greatFormatRupiah(item.total));
-        $('.size').val(item.size);
+        $('.species').val(item.species);
+        $('.brand').val(item.brand);
+        $('.packing').val(item.packing);
+        $('.specs').val(item.specs);
+        listSizeBreakdown = item.size_breakdown;
+        drawTableListSizeBreakDown(listSizeBreakdown);
         $(".detail-modal").modal("show")
+    }
+
+    function detailRowSizeBreakdown(id) {
+        var item = null;
+        for (var i = 0; i < listSizeBreakdown.length; i++) {
+            if (listSizeBreakdown[i].id_detail_breakdown == id) {
+                item = listSizeBreakdown[i];
+                break;
+            }
+        }
+
+        $('#id_detail_breakdown').val(item.id_detail_breakdown);
+        $('#size').val(item.size);
+        $('#grade').val(item.grade);
+        $('#packing_size').val(item.packing_size);
+        $('#can').val(item.can);
+        $('#case').val(item.cased);
+        $('#kg').val(item.kg);
+        $('#lb').val(item.lb);
+        $('#inner_box').val(item.inner_box);
+        $('#pc').val(item.pc);
+        $('#bag').val(item.bag);
+        $('#persen').val(item.persen);
+        $('#qty').val(item.qty);
+        $('#harga').val(greatFormatRupiah(item.harga));
+        $('#total').val(greatFormatRupiah(item.total));
+        $('#remark').val(item.remark);
+
+        $('.title-size-breakdown').text("Update ");
+        $('#addSizeBreakdownModal').modal('show');
+    }
+
+    function deleteRowSizeBreakdown(id) {
+        var indexToRemove = -1;
+        for (var i = 0; i < listSizeBreakdown.length; i++) {
+            if (listSizeBreakdown[i].id_detail_breakdown == id) {
+                indexToRemove = i;
+                break;
+            }
+        }
+        if (indexToRemove !== -1) {
+            listSizeBreakdown.splice(indexToRemove, 1);
+        }
+        drawTableListSizeBreakDown(listSizeBreakdown);
     }
 
     function deleteRow(id) {
@@ -1405,15 +1794,165 @@
     }
 
     function drawTable() {
-        $('.body-detail-table').empty();
-        $('.tfoot').empty();
+        const table = $('.dataTable');
+        const tbody = table.find('.body-detail-table'); // tbody utama
+        const tfoot = table.find('tfoot');
+
+        tbody.empty();
+        tfoot.empty();
+
+        let no = 1;
+        let totalQty = 0;
+        let totalHarga = 0;
+        let totalTotalHarga = 0;
+
+        if (listBarang.length === 0) {
+            const row = `
+            <tr>
+                <td colspan="7" style="text-align:right;"><b>TOTAL</b></td>
+                <td><b>0.00</b></td>
+                <td><b>0.00</b></td>
+                <td><b>0.00</b></td>
+                <td></td>
+            </tr>`;
+            tfoot.append(row);
+            return;
+        }
+
+        listBarang.forEach(item => {
+            // === Row Utama Barang ===
+            const newRow = $('<tr style="color:whitesmoke;">');
+            newRow.append(`<td style="text-align:center;">${no++}</td>`);
+            newRow.append(`<td>${item.kode_barang}</td>`);
+            newRow.append(`<td>${item.barang_name}</td>`);
+            newRow.append(`<td>${item.species}</td>`);
+            newRow.append(`<td>${item.brand}</td>`);
+            newRow.append(`<td>${item.packing}</td>`);
+            newRow.append(`<td>${item.specs}</td>`);
+            newRow.append(`<td>${greatFormatRupiah(item.qty)}</td>`);
+            newRow.append(`<td>${greatFormatRupiah(item.harga)}</td>`);
+            newRow.append(`<td>${greatFormatRupiah(item.total)}</td>`);
+
+            const actionButton = `
+                <button type="button" class="btn btn-warning posting-spp mr-1" onclick="detailRow('${item.id_detail}')">
+                    <i class="fa fa-pencil fa-sm" aria-hidden="true"></i>
+                </button>
+                <button type="button" class="btn btn-danger" onclick="deleteRow('${item.id_detail}')">
+                    <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
+                </button>
+            `;
+
+            newRow.append(`<td>${actionButton}</td>`);
+            tbody.append(newRow);
+
+            // === Row Kedua: Breakdown Table ===
+            const detailRow = $('<tr class="bg-light">');
+            const innerTable = $(`
+            <table class="table table-sm table-bordered mb-2 w-100">
+                <thead class="bg-warning text-dark">
+                    <tr>
+                        <th>Size</th>
+                        <th>Grade</th>
+                        <th>Packing</th>
+                        <th>Can</th>
+                        <th>Case</th>
+                        <th>Kg</th>
+                        <th>LB</th>
+                        <th>Inner Box</th>
+                        <th>PC</th>
+                        <th>Bag</th>
+                        <th>%</th>
+                        <th>Remarks</th>
+                        <th>Qty</th>
+                        <th>Unit Price</th>
+                        <th>Total Amount</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+                <tfoot>
+                    <tr class="bg-light">
+                        <td colspan="12" class="text-end"><b>TOTAL</b></td>
+                        <td class="total-qty"><b>0.00</b></td>
+                        <td class="total-price"><b>0.00</b></td>
+                        <td class="total-amount"><b>0.00</b></td>
+                    </tr>
+                </tfoot>
+            </table>
+        `);
+
+            const breakdownBody = innerTable.find('tbody');
+            let totalQtySize = 0;
+            let totalHargaSize = 0;
+            let totalAmountSize = 0;
+
+            item.size_breakdown.forEach(size => {
+                let qty = parseFloat(size.qty) || 0;
+                let harga = parseFloat(size.harga) || 0;
+                let total = parseFloat(size.total) || 0;
+
+                totalQtySize += qty;
+                totalHargaSize += harga;
+                totalAmountSize += total;
+
+                const row = `
+                <tr>
+                    <td>${size.size || ''}</td>
+                    <td>${size.grade || ''}</td>
+                    <td>${size.packing || ''}</td>
+                    <td>${size.can || ''}</td>
+                    <td>${size.cased || ''}</td>
+                    <td>${size.kg || ''}</td>
+                    <td>${size.lb || ''}</td>
+                    <td>${size.inner_box || ''}</td>
+                    <td>${size.pc || ''}</td>
+                    <td>${size.bag || ''}</td>
+                    <td>${size.persen || ''}</td>
+                    <td>${size.remark || ''}</td>
+                    <td>${greatFormatRupiah(qty.toFixed(2))}</td>
+                    <td>${greatFormatRupiah(harga.toFixed(2))}</td>
+                    <td>${greatFormatRupiah(total.toFixed(2))}</td>
+                </tr>
+            `;
+                breakdownBody.append(row);
+            });
+
+            innerTable.find('.total-qty').html(`<b>${greatFormatRupiah(totalQtySize.toFixed(2))}</b>`);
+            innerTable.find('.total-price').html(`<b>${greatFormatRupiah(totalHargaSize.toFixed(2))}</b>`);
+            innerTable.find('.total-amount').html(`<b>${greatFormatRupiah(totalAmountSize.toFixed(2))}</b>`);
+
+            detailRow.append(`<td colspan="12"><b>SIZE & BREAKDOWN</b><br>${innerTable.prop('outerHTML')}</td>`);
+            tbody.append(detailRow);
+
+            totalQty += parseFloat(item.qty);
+            totalHarga += destroyFormatRupiah(item.harga);
+            totalTotalHarga += destroyFormatRupiah(item.total);
+        });
+
+        // === Footer Total ===
+        const totalRow = $(`
+        <tr class="bg-light">
+            <td colspan="7" class="text-end"><b>TOTAL</b></td>
+            <td><b>${greatFormatRupiah(totalQty)}</b></td>
+            <td><b>${greatFormatRupiah(totalHarga.toFixed(2))}</b></td>
+            <td><b>${greatFormatRupiah(totalTotalHarga.toFixed(2))}</b></td>
+            <td></td>
+        </tr>
+    `);
+        tfoot.append(totalRow);
+
+        totalAmount = totalTotalHarga;
+    }
+
+    function drawTableListSizeBreakDown(listSizeBreakdown) {
+        $('.body-detail-table-size-breakdown').empty();
+        $('.tfoot-detail-table-size-breakdown').empty();
         var row = '';
         var no = 1;
-        const table = $('.dataTable');
-        if (listBarang.length === 0) {
+        const table = $('#productSizeBreakdown');
+        if (listSizeBreakdown.length === 0) {
             row += `
                     <tr>
-                        <td colspan="5"></td>
+                        <td colspan="13"></td>
                         <td><b>TOTAL</b></td>
                         <td><b>0.00</b></td>
                         <td><b>0.00</b></td>
@@ -1421,39 +1960,46 @@
                         <td></td>
                     </tr>
                 `;
-            $('.tfoot').append(row);
+            $('.tfoot-detail-table-size-breakdown').append(row);
         } else {
             var totalQty = 0;
             var totalHarga = 0;
             var totalTotalHarga = 0;
 
-            listBarang.map(item => {
+            listSizeBreakdown.map(item => {
                 var newRow = $('<tr style="color:whitesmoke;">');
                 newRow.append($('<td style="text-align:center;">').text(no++));
-                newRow.append($('<td>').text(item.kode_barang));
-                newRow.append($('<td>').text(item.barang_name));
                 newRow.append($('<td>').text(item.size));
-                newRow.append($('<td>').text(item.satuan_order_name));
-                newRow.append($('<td>').text(item.kemasan));
+                newRow.append($('<td>').text(item.grade));
+                newRow.append($('<td>').text(item.packing));
+                newRow.append($('<td>').text(item.can));
+                newRow.append($('<td>').text(item.case));
+                newRow.append($('<td>').text(item.kg));
+                newRow.append($('<td>').text(item.lb));
+                newRow.append($('<td>').text(item.inner_box));
+                newRow.append($('<td>').text(item.pc));
+                newRow.append($('<td>').text(item.bag));
+                newRow.append($('<td>').text(item.cup));
+                newRow.append($('<td>').text(item.persen));
                 newRow.append($('<td>').text(item.remark));
-                newRow.append($('<td>').text(item.qty));
+                newRow.append($('<td>').text(greatFormatRupiah(item.qty)));
                 newRow.append($('<td>').text(greatFormatRupiah(item.harga)));
                 newRow.append($('<td>').text(greatFormatRupiah(item.total)));
                 newRow.append($('<td>').html(
                     <?php if (!empty($dataSalesKontrak)) : ?> <?php if ($dataSalesKontrak['status_posting']) : ?> `-`
                         <?php else : ?> `
-                        <button class="btn btn-warning posting-spp mr-1" onclick="detailRow('${item.id_detail}')">
+                        <button type="button" class="btn btn-warning posting-spp mr-1" onclick="detailRowSizeBreakdown('${item.id_detail_breakdown}')">
                                 <i class="fa fa-pencil fa-sm" aria-hidden="true"></i>
-                            </button><button class="btn btn-danger" onclick="deleteRow('${item.id_detail}')">
+                            </button><button type="button" class="btn btn-danger" onclick="deleteRowSizeBreakdown('${item.id_detail_breakdown}')">
                                 <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
                             </button>
                     `
                         <?php endif; ?>
 
                     <?php else : ?> `
-                        <button class="btn btn-warning posting-spp mr-1" onclick="detailRow('${item.id_detail}')">
+                        <button type="button" class="btn btn-warning posting-spp mr-1" onclick="detailRowSizeBreakdown('${item.id_detail_breakdown}')">
                                 <i class="fa fa-pencil fa-sm" aria-hidden="true"></i>
-                            </button><button class="btn btn-danger" onclick="deleteRow('${item.id_detail}')">
+                            </button><button type="button" class="btn btn-danger" onclick="deleteRowSizeBreakdown('${item.id_detail_breakdown}')">
                                 <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
                             </button>
                     `
@@ -1466,18 +2012,16 @@
 
                 table.find('tbody').append(newRow);
             });
-            $('.body-detail-table').append(row);
+            $('.body-detail-table-size-breakdown').append(row);
             table.find('tfoot').empty();
             var newRow = $('<tr>');
-            newRow.append($('<td colspan="6"></td>'));
+            newRow.append($('<td colspan="13"></td>'));
             newRow.append($('<td><b>TOTAL</b></td>'));
-            newRow.append($('<td><b>' + totalQty + '</b></td>'));
-            newRow.append($('<td><b>' + greatFormatRupiah(totalHarga) + '</b></td>'));
-            newRow.append($('<td><b>' + greatFormatRupiah(totalTotalHarga) + '</b></td>'));
+            newRow.append($('<td><b>' + greatFormatRupiah(totalQty) + '</b></td>'));
+            newRow.append($('<td><b>' + greatFormatRupiah(totalHarga.toFixed(2)) + '</b></td>'));
+            newRow.append($('<td><b>' + greatFormatRupiah(totalTotalHarga.toFixed(2)) + '</b></td>'));
             newRow.append($('<td></td>'));
             table.find('tfoot').append(newRow);
-
-            totalAmount = totalTotalHarga;
         }
     }
 
@@ -1536,25 +2080,49 @@
     }
 
     function getListMasterBarang() {
+        // Get the selected divisi_id value
+        const csrf = $(`[name="${csrfToken}"]`);
+        const divisiId = $("#divisi_id").val();
+
         $.ajax({
             url: `<?= base_url('sales-kontrak/master-barang'); ?>`,
-            method: "GET",
-            beforeSend: function() {
-                setLoading();
+            method: "POST",
+            beforeSend: function(xhr) {
+                xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                // setLoading();
             },
             complete: function() {
-                stopLoading();
+                // stopLoading();
             },
-            data: {},
             dataType: "json",
             success: function(res) {
-                $(".barang_master_sales_id").empty()
-                $(".barang_master_sales_id").append(`<option value=""></option>`)
-                res.data.forEach(function(item) {
-                    $(".barang_master_sales_id").append(`<option value="${item.id}" data-harga_jual="${item.harga_jual}" data-satuan_id="${item.satuan_id}" data-kode_barang="${item.kode_barang}" data-barang_name="${item.barang_name}">(${item.kode_barang}) ${item.barang_name}</option>`)
-                })
-                $(".barang_master_sales_id").val();
+                if (res.data && res.data.length > 0) {
+                    $(".barang_master_sales_id").empty();
+                    $(".barang_master_sales_id").append(`<option value=""></option>`);
 
+                    res.data.forEach(function(item) {
+                        $(".barang_master_sales_id").append(
+                            `<option value="${item.id}" 
+                                data-harga_jual="${item.harga_jual}" 
+                                data-satuan_id="${item.satuan_id}" 
+                                data-kode_barang="${item.kode_barang}" 
+                                data-barang_name="${item.barang_name}">
+                                (${item.kode_barang}) ${item.barang_name}
+                            </option>`
+                        );
+                    });
+
+                    $(".barang_master_sales_id").val('').trigger('change');
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error("Error fetching master barang:", error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Gagal memuat data barang. Silakan coba lagi.',
+                    confirmButtonText: 'OK'
+                });
             }
         });
     }
@@ -1591,18 +2159,12 @@
 
 
     function resetFormDetail() {
-        $('.id_detail').val(null);
-        $('.barang_master_sales_id').val(null).change();
-        $('.kemasan').val(null);
-        $('.qty').val(null);
-        $('.remark').val(null);
-        $('.total').val(null);
-        $('#satuan_order_id').val(null).change();
-    }
-
-    function capitalize() {
-        var input = document.getElementById("kemasan");
-        input.value = input.value.toUpperCase();
+        $('#id_detail').val(null);
+        $('#barang_master_sales_id').val(null).change();
+        $('#species').val(null);
+        $('#brand').val(null);
+        $('#packing').val(null);
+        $('#specs').val(null);
     }
 
     function preventNegativeInput(inputElement) {
@@ -1728,6 +2290,7 @@
         window.open(url, "_blank");
     }
 
+    // // Function to fetch barang data
     function fetchBarangData() {
         let csrfToken = '<?= csrf_token() ?>';
         let csrf = $(`[name="${csrfToken}"]`);
@@ -1773,51 +2336,23 @@
         });
     }
 
-    function getListMasterBarang() {
-        // Get the selected divisi_id value
-        const csrf = $(`[name="${csrfToken}"]`);
-
-        $.ajax({
-            url: `<?= base_url('sales-kontrak/master-barang'); ?>`,
-            method: "POST",
-            beforeSend: function(xhr) {
-                xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                setLoading();
-            },
-            complete: function() {
-                stopLoading();
-            },
-            dataType: "json",
-            success: function(res) {
-                if (res.data && res.data.length > 0) {
-                    $(".barang_master_sales_id").empty();
-                    $(".barang_master_sales_id").append(`<option value=""></option>`);
-
-                    res.data.forEach(function(item) {
-                        $(".barang_master_sales_id").append(
-                            `<option value="${item.id}" 
-                                data-harga_jual="${item.harga_jual}" 
-                                data-satuan_id="${item.satuan_id}" 
-                                data-kode_barang="${item.kode_barang}" 
-                                data-barang_name="${item.barang_name}">
-                                (${item.kode_barang}) ${item.barang_name}
-                            </option>`
-                        );
-                    });
-
-                    $(".barang_master_sales_id").val('').trigger('change');
-                }
-            },
-            error: function(xhr, status, error) {
-                console.error("Error fetching master barang:", error);
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Error',
-                    text: 'Gagal memuat data barang. Silakan coba lagi.',
-                    confirmButtonText: 'OK'
-                });
-            }
-        });
+    function clearFormSizeBreakdown() {
+        $('#id_detail_breakdown').val(null);
+        $('#size').val(null);
+        $('#grade').val(null);
+        $('#packing_size').val(null);
+        $('#can').val(null);
+        $('#case').val(null);
+        $('#kg').val(null);
+        $('#lb').val(null);
+        $('#inner_box').val(null);
+        $('#pc').val(null);
+        $('#bag').val(null);
+        $('#persen').val(null);
+        $('#qty').val(null);
+        $('#harga').val(null);
+        $('#remark').val(null);
+        $('#total').val(null);
     }
 </script>
 <?= $this->endSection(); ?>

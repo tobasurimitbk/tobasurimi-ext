@@ -134,7 +134,11 @@ class OrderForm extends BaseController
 
     public function createView()
     {
-        $dataCustomer = $this->customerModel->getCustomerEkspor($this->this_user_id, $this->this_company_id);
+        $dataCustomer = $this->customerModel->getCustomerEkspor(
+            $this->this_user_id,
+            $this->this_company_id,
+            $this->is_admin
+        );
         $dataCountry = $this->countryModel->findAll();
         $dataValuta = $this->metaDataModel->get_by_name('Valuta');
         $dataTipeHarga = $this->metaDataModel->get_by_name('Tipe Harga Sales Ekspor');
@@ -434,7 +438,11 @@ class OrderForm extends BaseController
     public function getById($id = null)
     {
         $id = decrypt($id);
-        $dataCustomer = $this->customerModel->getCustomerEkspor($this->this_user_id, $this->this_company_id);
+        $dataCustomer = $this->customerModel->getCustomerEkspor(
+            $this->this_user_id,
+            $this->this_company_id,
+            $this->is_admin
+        );
         $dataCountry = $this->countryModel->findAll();
         $dataValuta = $this->metaDataModel->get_by_name('Valuta');
         $dataTipeHarga = $this->metaDataModel->get_by_name('Tipe Harga Sales Ekspor');

@@ -346,13 +346,19 @@ class PenerimaanBarangDetailModel extends Model
     public function historiHargaPOBahanPenolongByLpb($condition, $addCondition, $limit = 10, $offset = 0)
     {
         $availableSort = [
+            'am_purchase_orders.purchase_request_id' => 'am_purchase_orders.purchase_request_id',
             'am_purchase_orders.po_no' => 'am_purchase_orders.po_no',
             'penerimaan_barang.tanggal' => 'penerimaan_barang.tanggal',
             'suppliers.name'  => 'suppliers.name',
             'barang_master_spesifikasi.spesifikasi' => 'barang_master_spesifikasi.spesifikasi',
             'penerimaan_barang_detail.sub_total'    => 'penerimaan_barang_detail.sub_total',
+            'penerimaan_barang_detail.qty'    => 'penerimaan_barang_detail.qty',
+            'penerimaan_barang_detail.harga'    => 'penerimaan_barang_detail.harga',
+            'penerimaan_barang_detail.unit' => 'penerimaan_barang_detail.unit',
             'penerimaan_barang.divisi_id' => 'penerimaan_barang.divisi_id',
+            'penerimaan_barang.no_penerimaan_barang' => 'penerimaan_barang.no_penerimaan_barang',
             'am_purchase_orders.note' => 'am_purchase_orders.note',
+
         ];
         $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
 
@@ -399,19 +405,22 @@ class PenerimaanBarangDetailModel extends Model
             $startDate = date('Y-m-d', strtotime($addCondition['start_date']));
             $endDate = date('Y-m-d', strtotime($addCondition['end_date']));
 
-            $dataLPB->where('am_purchase_orders.tanggal >=', $startDate)
-                ->where('am_purchase_orders.tanggal <=', $endDate);
+            $dataLPB->where('penerimaan_barang.tanggal >=', $startDate)
+                ->where('penerimaan_barang.tanggal <=', $endDate);
         }
 
         if ($addCondition['search']) {
+            $dataLPB->groupStart();
             $dataLPB->like('purchase_requests.spp_no', $addCondition['search'])
                 ->orLike('suppliers.name', $addCondition['search'])
                 ->orLike("CONCAT(barang_master.barang_name, ' ', barang_master_spesifikasi.spesifikasi)", $addCondition['search'])
                 ->orLike('am_purchase_orders.note', $addCondition['search'])
                 ->orLike('divisis.divisi', $addCondition['search'])
                 ->orLike('penerimaan_barang_detail.qty', $addCondition['search'])
+                ->orLike('penerimaan_barang.no_penerimaan_barang', $addCondition['search'])
                 ->orLike('satuans.kode_satuan', $addCondition['search'])
                 ->orLike('penerimaan_barang_detail.harga', $addCondition['search']);
+            $dataLPB->groupEnd();
         }
 
         if ($addCondition['search']) {

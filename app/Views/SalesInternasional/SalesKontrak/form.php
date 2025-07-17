@@ -444,44 +444,46 @@
                         </div>
                     </div>
                     <div class="row">
-                        <div class="table-responsive">
-                            <table class="table table-bordered nowrap table-hover-tobasurimi dataTable" id="productSizeBreakdown" width="100%" cellspacing="0">
-                                <thead class="thead-dark">
-                                    <tr>
-                                        <th>No</th>
-                                        <th>Size</th>
-                                        <th>Grade</th>
-                                        <th>Packing</th>
-                                        <th>Can</th>
-                                        <th>Case</th>
-                                        <th>Kg</th>
-                                        <th>LB</th>
-                                        <th>Inner Box</th>
-                                        <th>PC</th>
-                                        <th>Bag</th>
-                                        <th>Cup</th>
-                                        <th>%</th>
-                                        <th>Remarks</th>
-                                        <th>Qty</th>
-                                        <th>Unit Price</th>
-                                        <th>Total Amount</th>
-                                        <th>Action</th>
-                                    </tr>
-                                </thead>
-                                <tbody class="body-detail-table-size-breakdown">
-
-                                </tbody>
-                                <tfoot class="tfoot-detail-table-size-breakdown">
-                                    <tr>
-                                        <td colspan="13"></td>
-                                        <td><b>TOTAL</b></td>
-                                        <td><b>0.00</b></td>
-                                        <td><b>0.00</b></td>
-                                        <td><b>0.00</b></td>
-                                        <td></td>
-                                    </tr>
-                                </tfoot>
-                            </table>
+                        <div style="max-height: 400px; overflow-y: auto;">
+                            <div class="table-responsive">
+                                <table class="table table-bordered nowrap table-hover-tobasurimi dataTable" id="productSizeBreakdown" width="100%" cellspacing="0">
+                                    <thead class="thead-dark">
+                                        <tr>
+                                            <th>No</th>
+                                            <th>Size</th>
+                                            <th>Grade</th>
+                                            <th>Packing</th>
+                                            <th>Can</th>
+                                            <th>Case</th>
+                                            <th>Kg</th>
+                                            <th>LB</th>
+                                            <th>Inner Box</th>
+                                            <th>PC</th>
+                                            <th>Bag</th>
+                                            <th>Cup</th>
+                                            <th>%</th>
+                                            <th>Remarks</th>
+                                            <th>Qty</th>
+                                            <th>Unit Price</th>
+                                            <th>Total Amount</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="body-detail-table-size-breakdown">
+                                        <!-- isi data -->
+                                    </tbody>
+                                    <tfoot class="tfoot-detail-table-size-breakdown">
+                                        <tr>
+                                            <td colspan="13"></td>
+                                            <td><b>TOTAL</b></td>
+                                            <td><b>0.00</b></td>
+                                            <td><b>0.00</b></td>
+                                            <td><b>0.00</b></td>
+                                            <td></td>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                            </div>
                         </div>
                     </div>
                 </div>
