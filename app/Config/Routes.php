@@ -43,7 +43,7 @@ $routes->get('/403', function () {
     return view('errors/html/error_403');
 });
 
-$routes->get('/jurnal-update-lpb', 'Warehouse\Penomoran_::repairJurnalUmumLpbBp');
+// $routes->get('/jurnal-update-lpb', 'Warehouse\Penomoran_::repairJurnalUmumLpbBp');
 // $routes->get('/delete-transaksi-jurnal', 'Accounting\TutupBuku\TutupBukuController::deleteTransaksiJurnalLama');
 // $routes->get('/update-transaksi-jurnal', 'Accounting\TutupBuku\TutupBukuController::updateTransaksiJurnalBahanBaku');
 
@@ -309,6 +309,7 @@ $routes->get('/po-lokal-bahan-baku/dropdown/get-spp', 'Purchase\POLokalBahanBaku
 $routes->get('/po-lokal-bahan-baku/dropdown/get-detail-barang-spp', 'Purchase\POLokalBahanBaku::dropdownGetSppDetail', ['filter' => 'Auth']);
 $routes->get('/po-lokal-bahan-baku/get-spesifikasi-barang-supplier', 'Purchase\POLokalBahanBaku::getBarangAndSupplier', ['filter' => 'Auth']);
 $routes->get('/po-lokal-bahan-baku/print-pengeluaran/(:segment)', 'Purchase\POLokalBahanBaku::printPengeluaran/$1', ['filter' => 'Auth']);
+$routes->get('/po-lokal-bahan-baku/get-supplier-harga-detail', 'Purchase\POLokalBahanBaku::getSupplierHargaById', ['filter' => 'Auth']);
 
 // BAHAN BAKU PO PENOLONG
 $routes->get('/po-lokal-bahan-penolong', 'Purchase\POLokalBahanPenolong::poLokalBahanPenolong', ['filter' => 'Auth']);
