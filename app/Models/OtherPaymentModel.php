@@ -116,7 +116,7 @@ class OtherPaymentModel extends Model
         ];
     }
 
-       public function get_new_no(
+    public function get_new_no(
         $jenis,
         $divisi,
         $bank_id,
@@ -165,20 +165,16 @@ class OtherPaymentModel extends Model
             }
         }
 
-        // Step 3: Build prefix
-        $prefix = '';
-        if (!empty($kodeDivisi)) {
-            $prefix .= $kodeDivisi . '/';
-        }
+        // Step 3: Build search pattern based on whether bank code exists
+        $searchPattern = $kodeDivisi . '/';
         if (!empty($kodeBank)) {
-            $prefix .= $kodeBank . '/';
+            $searchPattern .= $kodeBank . '/';
         }
-        $prefix .= $thn . '/' . $bln . '/';
+        $searchPattern .= $thn . '/' . $bln . '/';
 
         // Step 4: Check all relevant tables for the highest number
         $db = \Config\Database::connect();
         
-        // Define all tables and columns to check
         $tablesToCheck = [
             'other_payment' => 'no_pembayaran',
             'local_po_payments' => 'payment_no',
@@ -192,7 +188,7 @@ class OtherPaymentModel extends Model
             $builder = $db->table($table);
             
             $lastRecord = $builder->select($column)
-                                ->like($column, $prefix)
+                                ->like($column, $searchPattern, 'after')
                                 ->where('createdAt >=', "{$thn}-{$bln}-01 00:00:00")
                                 ->where('createdAt <=', "{$last_day} 23:59:59")
                                 ->where('company_id', $companyID)
@@ -204,7 +200,7 @@ class OtherPaymentModel extends Model
             if ($lastRecord) {
                 try {
                     $lastParts = explode('/', $lastRecord[$column]);
-                    $currentNumber = isset($lastParts[4]) ? (int)$lastParts[4] : 0;
+                    $currentNumber = (int)end($lastParts);
                     $maxNumber = max($maxNumber, $currentNumber);
                 } catch (Exception $e) {
                     log_message('error', "Failed to parse number from {$table}.{$column}: " . $e->getMessage());
@@ -214,6 +210,15 @@ class OtherPaymentModel extends Model
 
         // Step 5: Generate new number
         $counterNext = str_pad($maxNumber + 1, 4, '0', STR_PAD_LEFT);
+        
+        // Build final number
+        $prefix = $kodeDivisi . '/';
+        if (!empty($kodeBank)) {
+            $prefix .= $kodeBank . '/';
+        }
+        $prefix .= $thn . '/' . $bln . '/';
+        
         return $prefix . $counterNext;
     }
+
 }
