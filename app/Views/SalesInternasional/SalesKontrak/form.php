@@ -1090,13 +1090,13 @@
 
     // BROKER
     $('.print_out_broker').select2({
-        placeholder: "Pilih Print Out Broker",
+        placeholder: "Select Print Out Broker",
         theme: "bootstrap-5",
     })
 
     // DEPARTMENT
     $('.divisi_id').select2({
-        placeholder: "Pilih Department",
+        placeholder: "Select Department",
         theme: "bootstrap-5",
     })
 
@@ -2517,7 +2517,7 @@
 
                 var emptyOption = $("<option></option>")
                     .attr("value", "")
-                    .text("Pilih Dari Master Barang");
+                    .text("Select From Master Items");
                 // Replace with select element
                 if (typeBarang == 'kemasan') {
                     spesifikasiIdSelect.append(emptyOption);
