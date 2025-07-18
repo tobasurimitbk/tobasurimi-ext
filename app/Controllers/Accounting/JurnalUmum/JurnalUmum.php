@@ -2462,7 +2462,7 @@ class JurnalUmum extends BaseController
                 throw new \Exception("Transaction not found");
             }
 
-            // Get all transaction details (both panjar and pinjaman)
+            // Get all transaction details
             $panjarDetails = $this->PanjarSupplierModel
                 ->where('transaction_id', $payID)
                 ->findAll();
@@ -2470,6 +2470,11 @@ class JurnalUmum extends BaseController
             $pinjamanDetails = $this->PinjamanSupplierModel
                 ->where('transaction_id', $payID)
                 ->findAll();
+
+            // Validate at least one detail exists
+            if (empty($panjarDetails) && empty($pinjamanDetails)) {
+                throw new \Exception("No panjar or pinjaman details found for this transaction");
+            }
 
             // Combine all details
             $allDetails = array_merge($panjarDetails, $pinjamanDetails);
@@ -2489,18 +2494,51 @@ class JurnalUmum extends BaseController
                 ];
             }
 
+            // Calculate totals with validation
             $tanggal = "";
             $totalPanjar = 0;
             $totalPinjaman = 0;
+            
             foreach ($allDetails as $detail) {
+                if (!isset($detail['payment_date'])) {
+                    throw new \Exception("Payment date is missing in one of the details");
+                }
+                
                 $tanggal = $detail['payment_date'];
-                $totalPanjar += isset($detail['total_panjar']) ? $detail['total_panjar'] : 0;
-                $totalPinjaman += isset($detail['total_pinjaman']) ? $detail['total_pinjaman'] : 0;
+                
+                if (isset($detail['total_panjar'])) {
+                    if (!is_numeric($detail['total_panjar'])) {
+                        throw new \Exception("Invalid panjar amount");
+                    }
+                    $totalPanjar += $detail['total_panjar'];
+                }
+                
+                if (isset($detail['total_pinjaman'])) {
+                    if (!is_numeric($detail['total_pinjaman'])) {
+                        throw new \Exception("Invalid pinjaman amount");
+                    }
+                    $totalPinjaman += $detail['total_pinjaman'];
+                }
             }
 
-            // Generate journal number
+            // Validate totals
+            if ($totalPanjar <= 0 && $totalPinjaman <= 0) {
+                throw new \Exception("Total amounts must be greater than 0");
+            }
+
+            // Generate journal number and determine transaction type
             $no_transaksi_jurnal = $transaction->no_transaction;
-            $jenisTransaksi = $totalPanjar != 0 && $totalPinjaman != 0 ? 'PANJAR & PINJAMAN' : ($totalPanjar != 0 ? 'PANJAR' : 'PINJAMAN');
+            $jenisTransaksi = '';
+            
+            if ($totalPanjar > 0 && $totalPinjaman > 0) {
+                $jenisTransaksi = 'PANJAR & PINJAMAN';
+            } elseif ($totalPanjar > 0) {
+                $jenisTransaksi = 'PANJAR';
+            } elseif ($totalPinjaman > 0) {
+                $jenisTransaksi = 'PINJAMAN';
+            } else {
+                throw new \Exception("Cannot determine transaction type");
+            }
 
             // Create journal header
             $jurnalHeader = [
@@ -2522,14 +2560,26 @@ class JurnalUmum extends BaseController
             // Insert journal header and get ID
             $id_transaksi_jurnal = $this->transaksiJurnalModel
                 ->insertTransaksiJurnal($jurnalHeader);
+                
             $jurnalEntries = [];
-            // Process each detail
+            
+            // Process each detail with validation
             foreach ($allDetails as $detail) {
-                $nominal =  isset($detail['total_pinjaman']) ? $detail['total_pinjaman'] : $detail['total_panjar'];
+                if (!isset($detail['akun_kas']) || empty($detail['akun_kas'])) {
+                    throw new \Exception("Cash account is missing in one of the details");
+                }
+                
+                if (!isset($detail['akun_selisih']) || empty($detail['akun_selisih'])) {
+                    throw new \Exception("Difference account is missing in one of the details");
+                }
+                
+                $nominal = isset($detail['total_pinjaman']) ? $detail['total_pinjaman'] : $detail['total_panjar'];
+                
+                if (!is_numeric($nominal) || $nominal <= 0) {
+                    throw new \Exception("Invalid amount in one of the details");
+                }
 
                 // Prepare journal entries
-
-                // Debit entry (akun_kas)
                 $jurnalEntries[] = [
                     'id_transaksi' => $id_transaksi_jurnal,
                     'id_coa' => $detail['akun_kas'],
@@ -2540,13 +2590,12 @@ class JurnalUmum extends BaseController
                     'kredit' => 0,
                     'valas' => '30',
                     'kurs' => 1,
-                    'keterangan' => $detail['keterangan'],
-                    'supplier_id' => $detail['supplier_id'],
+                    'keterangan' => $detail['keterangan'] ?? '',
+                    'supplier_id' => $detail['supplier_id'] ?? null,
                     'id_inputer' => session()->get("login")->user_id,
                     'createdAt' => date('Y-m-d H:i:s')
                 ];
 
-                // Credit entry (akun_selisih)
                 $jurnalEntries[] = [
                     'id_transaksi' => $id_transaksi_jurnal,
                     'id_coa' => $detail['akun_selisih'],
@@ -2557,18 +2606,30 @@ class JurnalUmum extends BaseController
                     'kredit' => $nominal,
                     'valas' => '30',
                     'kurs' => 1,
-                    'keterangan' => $detail['keterangan'],
-                    'supplier_id' => $detail['supplier_id'],
+                    'keterangan' => $detail['keterangan'] ?? '',
+                    'supplier_id' => $detail['supplier_id'] ?? null,
                     'id_inputer' => session()->get("login")->user_id,
                     'createdAt' => date('Y-m-d H:i:s')
                 ];
-
-                // Insert journal entries
             }
-            $this->jurnalUmumModel->insertJurnalBatch($jurnalEntries);
+
+            // Insert journal entries if any
+            if (!empty($jurnalEntries)) {
+                $this->jurnalUmumModel->insertJurnalBatch($jurnalEntries);
+            } else {
+                throw new \Exception("No valid journal entries to process");
+            }
+
+            return [
+                'status' => true,
+                'message' => 'Journal entries created successfully'
+            ];
+
         } catch (Exception $e) {
-            var_dump("Terjadi Keslahan Saat Input Jurnal : ", $e->getMessage());
-            die;
+            return [
+                'status' => false,
+                'message' => $e->getMessage()
+            ];
         }
     }
 
@@ -2590,18 +2651,26 @@ class JurnalUmum extends BaseController
                 ->first();
 
             if (!$transaksiJurnal) {
-                throw new \Exception("Journal transaction not found");
+                // If journal doesn't exist, consider it already unposted
+                return [
+                    'status' => true,
+                    'message' => 'No journal entries found to unpost'
+                ];
             }
 
             // 2. Delete all related journal entries
-            $this->jurnalUmumModel
+            $deletedEntries = $this->jurnalUmumModel
                 ->where('id_transaksi', $transaksiJurnal['id'])
                 ->delete();
 
             // 3. Delete journal header
-            $this->transaksiJurnalModel
+            $deletedHeader = $this->transaksiJurnalModel
                 ->where('id', $transaksiJurnal['id'])
                 ->delete();
+
+            if ($deletedHeader === false || $deletedEntries === false) {
+                throw new \Exception("Failed to delete journal entries");
+            }
 
             return [
                 'status' => true,

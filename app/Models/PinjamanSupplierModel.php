@@ -163,20 +163,38 @@ class PinjamanSupplierModel extends Model
 
     public function getPinjamanSupplierbySupplierId($id, $companyId)
     {
+        // First get transactions from panjar_pinjaman_transaction
+        $transactions = $this->db->table('panjar_pinjaman_transaction')
+            ->select('panjar_pinjaman_transaction.*')
+            ->where([
+                'supplier_id' => $id,
+                'company_id' => $companyId,
+                'deletedAt' => null,
+                'is_posted' => '1'
+            ])
+            ->get()
+            ->getResult();
 
-        $condition = [
-            'pinjaman_supplier.supplier_id ' => $id,
-            'pinjaman_supplier.deletedAt' => null,
-            'is_posted' => '1',
-            'pinjaman_supplier.company_id' => $companyId
-        ];
+        if (empty($transactions)) {
+            return [];
+        }
 
-        $selectQry = "pinjaman_supplier.*";
-        $pinjamanSupplierData = $this->asObject()
-            ->select($selectQry)
-            // ->join('local_po_payment_pinjaman', 'pinjaman_supplier.id = local_po_payment_pinjaman.pinjaman_id', 'left')
-            ->where($condition)
-            ->findAll();
+        // Get all transaction IDs
+        $transactionIds = array_column($transactions, 'id');
+
+        // Then get pinjaman data related to these transactions
+        $pinjamanSupplierData = $this->db->table('pinjaman_supplier')
+            ->select('pinjaman_supplier.*')
+            ->join('panjar_pinjaman_transaction', 'pinjaman_supplier.transaction_id = panjar_pinjaman_transaction.id')
+            ->where([
+                'pinjaman_supplier.supplier_id' => $id,
+                'pinjaman_supplier.deletedAt' => null,
+                'pinjaman_supplier.is_posted' => '1',
+                'pinjaman_supplier.company_id' => $companyId,
+                'panjar_pinjaman_transaction.id' => $transactionIds
+            ])
+            ->get()
+            ->getResult();
 
         return $pinjamanSupplierData;
     }
