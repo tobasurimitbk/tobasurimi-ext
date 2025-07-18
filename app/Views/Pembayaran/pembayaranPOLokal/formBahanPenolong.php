@@ -152,15 +152,6 @@
                         </div>
                     </div>
                     <div class="col-md-4">
-                        <div class="form-floating form-pembayaran-po mb-3" style="height: 50px;">
-                            <select <?= !empty($detail) ? ($detail['pembayaranDetail']['status_posting'] == 1 ? 'disabled' : '') : ""  ?> class="form-select status_pph" name="status_pph" id="status_pph">
-                                <option <?= !empty($detail) ? ($detail['pembayaranDetail']['status_pph'] == "1" ? 'selected' : '') : '' ?> value="1">PPH 2.5 %</option>
-                                <option <?= !empty($detail) ? ($detail['pembayaranDetail']['status_pph'] == "0" ? 'selected' : '') : 'selected' ?> value="0">TIDAK ADA</option>
-                            </select>
-                            <label for="floatingInput" style="z-index: 1;">Status PPH</label>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <input <?= !empty($detail) ? ($detail['pembayaranDetail']['status_posting'] == 1 ? 'disabled' : '') : ""  ?> name="pembayaran_oleh" autocomplete="one-time-code" value="<?= !empty($detail) ? $detail['pembayaranDetail']['pembayaran_oleh'] : session()->get("login")->name; ?>" type="text" class="form-control" placeholder="Pembayaran Oleh">
                             <label for="floatingInput">Pembayaran Oleh</label>
@@ -365,9 +356,6 @@
                 bank_id: {
                     required: "Bank wajib diisi"
                 },
-                status_pph: {
-                    required: "Pilih status pph"
-                },
 
             },
             errorElement: 'span',
@@ -414,12 +402,12 @@
             theme: "bootstrap-5"
         });
 
-        $('#status_pph').select2({
-            placeholder: "Status PPH",
-            theme: "bootstrap-5"
-        }).change(function() {
-            listBarangDetail();
-        });
+        // $('#status_pph').select2({
+        //     placeholder: "Status PPH",
+        //     theme: "bootstrap-5"
+        // }).change(function() {
+        //     listBarangDetail();
+        // });
 
         $('#akun_selisih').select2({
             placeholder: "Akun Selisih (Opsional)",
