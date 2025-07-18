@@ -53,11 +53,6 @@
         $(".search").keyup(function() {
             table.ajax.reload();
         })
-
-        $('#dataTable tbody').on('click', 'tr td:not(.actions):not(.dataTables_empty)', function() {
-            const data = table.row(this).data();
-            location.replace(`<?= base_url("return-barang-sales/details/"); ?>${data.id}`);
-        })
     })
 
     const table = $('.dataTable').DataTable({
@@ -129,12 +124,18 @@
                                     <button type="button" class="btn btn-primary" onclick="approve('${id}', 1)">
                                         <i class="fa fa-paper-plane"></i> Approve
                                     </button>
+                                    <a href="javascript:void(0)" onclick="edit('${id}')" data-toggle="tooltip" title="Edit" class="btn btn-primary">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
                                 `;
                 } else {
                     buttonHtml = `
                                     <button type="button" class="btn btn-success" disabled>
                                         <i class="fa fa-check"></i> Approved
                                     </button>
+                                    <a href="javascript:void(0)" onclick="edit('${id}')" data-toggle="tooltip" title="Edit" class="btn btn-primary">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
                                 `;
                 }
 
@@ -225,6 +226,10 @@
                 });
             }
         })
+    }
+
+    function edit(id){
+        location.replace(`<?= base_url("return-barang-sales/details/"); ?>/${id}`);
     }
 </script>
 <?= $this->endSection(); ?>

@@ -182,11 +182,6 @@
             table.ajax.reload();
         })
 
-        $('#dataTable tbody').on('click', 'tr td:not(.actions):not(.dataTables_empty)', function() {
-            const data = table.row(this).data();
-            location.replace(`<?= base_url("invoice-penjualan-lokal/id"); ?>/${data.id}`);
-        })
-
         $(".dateStart, .dateEnd, .filter_customer, .filter_jenis_dokumen").change(function() {
             table.ajax.reload();
         });
@@ -309,11 +304,18 @@
                         `;
                     <?php endif; ?>
 
+                    <?php if (can('Penjualan Lokal', 'Invoice', 'u')) : ?>
+                        btn_edit = `
+                        <a href="javascript:void(0)" onclick="edit('${id}')" data-toggle="tooltip" title="Edit" class="btn btn-primary">
+                            <i class="fas fa-edit"></i>
+                        </a>`;
+                    <?php endif; ?>
+
 
                     if (status == "WAITING") {
-                        return `${btn_print}${btn_delete}`;
+                        return `${btn_edit}${btn_print}${btn_delete}`;
                     } else {
-                        return `${btn_print}`;
+                        return `${btn_edit}${btn_print}`;
 
                     }
 
@@ -459,6 +461,10 @@
 
     const print = function(url) {
         window.open(url, "_blank");
+    }
+
+    function edit(id){
+        location.replace(`<?= base_url("invoice-penjualan-lokal/id"); ?>/${id}`);
     }
 </script>
 <?= $this->endSection(); ?>
