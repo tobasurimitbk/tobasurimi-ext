@@ -3,7 +3,7 @@
 <meta name="csrf-token" content="<?= csrf_hash() ?>">
 
 <div class="modal add-modal" id="add_modal" tabindex="-1">
-    <div class="modal-dialog" style="min-width: 1800px">
+    <div class="modal-dialog" style="min-width: 1200px">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title"><label class="title-name"></label></h5>
@@ -195,6 +195,7 @@
 
                             <div class="row">
                                 <div class="col-md-12 text-end">
+                                    <button type="button" class="btn btn-success btn-update-detail" style="display:none;">Update</button>
                                     <button type="button" class="btn btn-primary btn-add-detail">Tambah Detail</button>
                                 </div>
                             </div>
@@ -299,6 +300,7 @@
 </section>
 
 <script>
+    let editingIndex = -1;
     let details = [];
     let sort = "id";
     let sortType = "desc";
@@ -720,13 +722,66 @@
                         <td>${detail.pembayaran_oleh}</td>
                         <td>${detail.keterangan}</td>
                         <td>
-                            <button class="btn btn-danger btn-sm btn-remove-detail" data-index="${index}">Hapus</button>
+                            <button type="button" class="btn btn-warning btn-sm btn-edit-detail" data-index="${index}">Edit</button>
+                            <button type="button" class="btn btn-danger btn-sm btn-remove-detail" data-index="${index}">Hapus</button>
                         </td>
                     </tr>
                 `);
             });
         }
 
+        function updateDetail(index) {
+            if (!validateDetails()) {
+                refreshValidation();
+                return;
+            }
+
+            const jenisPembayaran = $('#jenis_pembayaran').val();
+            const detail = {
+                tanggal: $('#tanggal').val(),
+                metode_pembayaran: $('#metode_pembayaran').val(),
+                pembayaran_oleh: $('#pembayaran_oleh').val(),
+                akun_kas: $('#akun_kas').val(),
+                akun_kas_name: $('#akun_kas option:selected').text(),
+                akun_selisih_name: $('#akun_selisih option:selected').text(),
+                keterangan: $('#keterangan').val(),
+                valas: $('#valas option:selected').text(),
+                valas_id: $('#valas option:selected').val(),
+                jumlah: $('#jumlah').val(),
+                kurs: $('#kurs').val(),
+                jumlah_idr: $('#jumlah_idr').val(),
+                jenis_pembayaran: jenisPembayaran
+            };
+
+            details[index] = detail;
+            refreshDetailsTable();
+            clearDetailForm();
+            refreshValidation();
+            
+            // Reset editing state
+            editingIndex = -1;
+            $('.btn-update-detail').hide();
+            $('.btn-add-detail').show();
+        }
+
+        
+        $('.btn-update-detail').hide();
+
+        // Event handler untuk tombol edit
+        $(document).on('click', '.btn-edit-detail', function(e) {
+            e.preventDefault(); // Ini yang paling penting
+            e.stopPropagation();
+            const index = $(this).data('index');
+            editDetail(index);
+        });
+
+        // Event handler untuk tombol update
+        $(document).on('click', '.btn-update-detail', function(e) {
+            e.preventDefault(); // Ini yang paling penting
+            e.stopPropagation();
+            const index = $(this).data('index');
+            updateDetail(index);
+        });
         // Remove detail
         $(document).on('click', '.btn-remove-detail', function() {
             const index = $(this).data('index');
@@ -773,14 +828,7 @@
                 });
             }
         }
-
-
-        // Clear detail form
-        function clearDetailForm() {
-            $('#tanggal, #keterangan, #kurs, #jumlah, #jumlah_idr').val('');
-            $('#metode_pembayaran, #akun_kas, #valas').val('').trigger('change');
-        }
-
+        
         // Handle final submission
         $('.btn-submit-form').click(function() {
             if (details.length === 0) {
@@ -965,7 +1013,8 @@
                         <td>${detail.pembayaran_oleh}</td>
                         <td>${detail.keterangan}</td>
                         <td>
-                            <button class="btn btn-danger btn-sm btn-remove-detail" data-index="${index}">Hapus</button>
+                            <button type="button" class="btn btn-warning btn-sm btn-edit-detail" data-index="${index}">Edit</button>
+                            <button type="button" class="btn btn-danger btn-sm btn-remove-detail" data-index="${index}">Hapus</button>
                         </td>
                     </tr>
                 `);
@@ -1415,8 +1464,43 @@
         } else {
             inputElement.value = numericValue;
         }
+    }   
+
+    function editDetail(index) {
+        const detail = details[index];
+        
+        // Populate all form fields
+        $('#tanggal').val(detail.tanggal);
+        $('#metode_pembayaran').val(detail.metode_pembayaran).trigger('change');
+        $('#pembayaran_oleh').val(detail.pembayaran_oleh);
+        $('#akun_kas').val(detail.akun_kas).trigger('change');
+        $('#keterangan').val(detail.keterangan);
+        $('#valas').val(detail.valas_id).trigger('change');
+        $('#jumlah').val(detail.jumlah);
+        $('#kurs').val(detail.kurs);
+        $('#jumlah_idr').val(detail.jumlah_idr);
+        
+        // Set akun selisih based on payment type
+        if (detail.jenis_pembayaran === 'PUTIH') {
+            $('#akun_selisih').val(detail.akun_selisih).trigger('change');
+        } else {
+            // For MERAH, the roles are reversed
+            $('#akun_selisih').val(detail.akun_kas).trigger('change');
+        }
+        
+        // Update editing index
+        editingIndex = index;
+        
+        // Change button state
+        $('.btn-add-detail').hide();
+        $('.btn-update-detail').show().data('index', index);
     }
 
+    // Clear detail form
+    function clearDetailForm() {
+        $('#tanggal, #keterangan, #kurs, #jumlah, #jumlah_idr').val('');
+        $('#metode_pembayaran, #akun_kas, #valas').val('').trigger('change');
+    }
 
     function generatePaymentNumber() {
         // Get selected divisi and bank values
