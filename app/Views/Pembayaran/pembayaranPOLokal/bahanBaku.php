@@ -159,36 +159,55 @@
                 render: function(data, type, row) {
                     let id = row.id;
                     let divisi_id = row.divisi_id;
-                    let form = '';
                     let status_posting = row.status_posting;
-                    form += ` <div class="mt-0">`;
+                    let buttons = '';
+                    
+                    buttons += `<div class="btn-group" role="group">`;
+                    
+                    // Print button (always visible if has permission)
+                    <?php if (can('Pembayaran', 'Lokal BB', 'p')) : ?>
+                        buttons += `
+                            <button class="btn btn-warning btn-print" 
+                                    onclick="print('<?= base_url("pembayaran-po-lokal-bb/print/"); ?>${id}')"
+                                    data-toggle="tooltip" title="Print">
+                                <i class="fa fa-print fa-sm"></i>
+                            </button>`;
+                    <?php endif; ?>
+                    
+                    // Conditional buttons based on posting status
                     if (status_posting == '0') {
-                        form += `
-                            <?php if (can('Pembayaran', 'Lokal BB', 'd')) : ?>
-                                <button onclick="remove('${id}')" class="btn btn-danger delete-parent">
-                                    <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
-                                </button>
-                            <?php endif; ?>
-
-                            <?php if (can('Pembayaran', 'Lokal BB', 'p')) : ?>
-                                <button class="btn btn-warning btn-print" onclick="print('<?= base_url("pembayaran-po-lokal-bb/print/"); ?>${id}')" style="box-shadow: none !important;">
-                                    <i class="fa fa-print fa-sm" aria-hidden="true"></i>
-                                </button>
-                            <?php endif; ?>
-
-                            <?php if (can('Pembayaran', 'Lokal BB', 'a')) : ?>
-                                <button data-toggle="tooltip" title="Posting" onclick="posting('${id}', '${divisi_id}')" class="btn btn-success posting-spp">
-                                    <i class="fa fa-paper-plane fa-sm" aria-hidden="true"></i>
-                                </button>
-                            <?php endif; ?>
-                        `;
+                        // Unposted state - show delete and post buttons
+                        <?php if (can('Pembayaran', 'Lokal BB', 'd')) : ?>
+                            buttons += `
+                                <button onclick="remove('${id}')" 
+                                        class="btn btn-danger"
+                                        data-toggle="tooltip" title="Hapus">
+                                    <i class="fa fa-trash fa-sm"></i>
+                                </button>`;
+                        <?php endif; ?>
+                        
+                        <?php if (can('Pembayaran', 'Lokal BB', 'a')) : ?>
+                            buttons += `
+                                <button onclick="posting('${id}', '${divisi_id}')" 
+                                        class="btn btn-success"
+                                        data-toggle="tooltip" title="Posting">
+                                    <i class="fa fa-paper-plane fa-sm"></i>
+                                </button>`;
+                        <?php endif; ?>
                     } else {
-                        form += '';
+                        // Posted state - show unpost button
+                        <?php if (can('Pembayaran', 'Lokal BB', 'a')) : ?>
+                            buttons += `
+                                <button onclick="posting('${id}', '${divisi_id}')" 
+                                        class="btn btn-danger"
+                                        data-toggle="tooltip" title="Unpost">
+                                    <i class="fa fa-undo fa-sm"></i>
+                                </button>`;
+                        <?php endif; ?>
                     }
-
-                    form += ` </div>`;
-
-                    return form;
+                    
+                    buttons += `</div>`;
+                    return buttons;
                 }
             }
         ],

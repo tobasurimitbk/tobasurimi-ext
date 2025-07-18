@@ -58,10 +58,12 @@ class WorkOrdersModel extends Model
     public function getWorkOrderList($condition, $addCondition, $limit = 10, $offset = 0)
     {
         $availableSort = [
-            'request_date'      => 'request_date',
-            'wo_no'             => 'work_orders.wo_no',
-            'department'       => 'divisis.divisi',
-            'nama_barang'       => 'work_order_details.nama_barang',
+            'request_date'           => 'request_date',
+            'wo_no'                  => 'work_orders.wo_no',
+            'department'             => 'divisis.divisi',
+            'barang1_id'             => 'barang1_id',
+            'warehouse_id'           => 'work_orders.warehouse_id',
+            'work_order_details.qty' => 'work_order_details.qty',
         ];
         $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
 
@@ -69,15 +71,19 @@ class WorkOrdersModel extends Model
         $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'DESC';
 
         $selectQry = "work_orders.*,
-            work_order_details.nama_barang,
-            divisis.divisi
+            work_order_details.qty,
+            divisis.divisi,
+            warehouses.warehouse_name,
+            barang_master.barang_name
         ";
 
         $workOrdersDataQry = $this->asObject()
             ->select($selectQry)
             ->where($condition)
-            ->join('divisis', 'divisis.id = work_orders.divisi_id')
-            ->join('work_order_details', 'work_order_details.work_order_id = work_orders.id')
+            ->join('divisis', 'divisis.id = work_orders.divisi_id', 'left')
+            ->join('warehouses', 'warehouses.id = work_orders.warehouse_id', 'left')
+            ->join('work_order_details', 'work_order_details.work_order_id = work_orders.id', 'left')
+            ->join('barang_master', 'barang_master.id = work_order_details.barang1_id', 'left')
             ->groupBy('work_orders.id')
             ->orderBy($sort, $sortType);
 

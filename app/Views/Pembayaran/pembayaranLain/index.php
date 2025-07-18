@@ -373,30 +373,44 @@
                 sortable: false,
                 render: function(data, type, row) {
                     let id = row.id;
-                    let form = '';
                     let status_posting = row.status_posting;
-
-                    form += ` <div class="mt-0">`;
+                    let buttons = '';
+                    
+                    buttons += `<div class="btn-group" role="group">`;
+                    
                     if (status_posting == '0') {
+                        // Unposted state - show delete and post buttons
                         <?php if (can('Pembayaran', 'Lain - Lain', 'd')) : ?>
-                            form += `
-                            <button onclick="remove('${id}')" class="btn btn-danger delete-parent">
-                                <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
-                            </button>                    
-                        `;
+                            buttons += `
+                                <button onclick="confirmDelete('${id}')" 
+                                        class="btn btn-danger"
+                                        data-toggle="tooltip" title="Hapus">
+                                    <i class="fa fa-trash fa-sm"></i>
+                                </button>`;
                         <?php endif; ?>
-                        form += `
+                        
                         <?php if (can('Pembayaran', 'Lain - Lain', 'a')) : ?>
-                            <button data-toggle="tooltip" title="Posting" onclick="posting('${id}')" class="btn btn-success posting-spp">
-                                <i class="fa fa-paper-plane fa-sm" aria-hidden="true"></i>
-                            </button>
+                            buttons += `
+                                <button onclick="confirmPosting('${id}')" 
+                                        class="btn btn-success"
+                                        data-toggle="tooltip" title="Posting">
+                                    <i class="fa fa-paper-plane fa-sm"></i>
+                                </button>`;
                         <?php endif; ?>
-                    `;
                     } else {
-                        form += '-';
+                        // Posted state - show unpost button
+                        <?php if (can('Pembayaran', 'Lain - Lain', 'a')) : ?>
+                            buttons += `
+                                <button onclick="confirmUnpost('${id}')" 
+                                        class="btn btn-warning"
+                                        data-toggle="tooltip" title="Unpost">
+                                    <i class="fa fa-undo fa-sm"></i>
+                                </button>`;
+                        <?php endif; ?>
                     }
-                    form += ` </div>`;
-                    return form;
+                    
+                    buttons += `</div>`;
+                    return buttons || '-'; // Return '-' if no buttons are shown
                 }
             }
         ],
@@ -1296,6 +1310,53 @@
         });
 
     });
+
+
+    function confirmPosting(id) {
+        Swal.fire({
+            title: 'Post Pembayaran?',
+            text: "Anda akan memposting transaksi ini",
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: '#28a745',
+            confirmButtonText: 'Ya, Posting!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                posting(id);
+            }
+        });
+    }
+
+    function confirmUnpost(id) {
+        Swal.fire({
+            title: 'Unpost Pembayaran?',
+            text: "Anda akan membatalkan posting transaksi ini",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#ffc107',
+            confirmButtonText: 'Ya, Unpost!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                unpost(id);
+            }
+        });
+    }
+
+    function confirmDelete(id) {
+        Swal.fire({
+            title: 'Hapus Pembayaran?',
+            text: "Data yang dihapus tidak dapat dikembalikan!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#dc3545',
+            confirmButtonText: 'Ya, Hapus!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                remove(id);
+            }
+        });
+    }
+
 
     const remove = function(id) {
         const csrfToken = '<?= csrf_token() ?>';

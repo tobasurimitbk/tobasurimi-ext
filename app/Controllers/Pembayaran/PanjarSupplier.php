@@ -399,27 +399,51 @@ class PanjarSupplier extends BaseController
 
     public function updateStatusPanjarSupplier()
     {
-        $id = decrypt($this->request->getVar('id'));
-        $status = $this->request->getVar('status');
+        try {
+            $id = decrypt($this->request->getVar('id'));
+            $currentStatus = $this->request->getVar('status'); // 0 atau 1
 
-        $this->panjarPinjamanTransactionModel->update($id, [
-            'is_posted' => $status
-        ]);
+            // Update status di semua tabel terkait
+            $this->panjarPinjamanTransactionModel->update($id, ['is_posted' => $currentStatus]);
+            $this->pinjamanSupplierModel->where('transaction_id', $id)->set('is_posted', $currentStatus)->update();
+            $this->panjarSupplierModel->where('transaction_id', $id)->set('is_posted', $currentStatus)->update();
 
-        // Update di Pinjaman Supplier
-        $this->pinjamanSupplierModel->where('transaction_id', $id)->set('is_posted', $status)->update();
-        // Update di Panjar Supplier
-        $this->panjarSupplierModel->where('transaction_id', $id)->set('is_posted', $status)->update();
+            // Tentukan aksi berdasarkan status
+            if ($currentStatus == 1) {
+                // Jika status 1 (posting), jalankan insert jurnal
+                $result = $this->jurnalController->insertDataPanjarPinjamanTransaction($id);
+                $message = "Posting berhasil dilakukan";
+            } else {
+                // Jika status 0 (unpost), jalankan unpost jurnal
+                $result = $this->jurnalController->unpostDataPanjarPinjamanTransaction($id);
+                $message = "Unpost berhasil dilakukan";
+            }
 
-        $this->jurnalController->insertDataPanjarPinjamanTransaction($id);
+            if (!$result['status']) {
+                throw new \Exception($result['message']);
+            }
 
-        return response()->setJSON([
-            "status" => true,
-            "message" => "Status Posting Berhasil Diudpdate",
-            "token" => csrf_hash()
-        ]);
+            return $this->response->setJSON([
+                "status" => true,
+                "message" => $message,
+                "new_status" => $currentStatus, // Kirim balik status baru
+                "token" => csrf_hash()
+            ]);
+
+        } catch (\Exception $e) {
+            // Rollback status jika gagal
+            $rollbackStatus = $this->request->getVar('status') == 1 ? 0 : 1;
+            $this->panjarPinjamanTransactionModel->update($id, ['is_posted' => $rollbackStatus]);
+            $this->pinjamanSupplierModel->where('transaction_id', $id)->set('is_posted', $rollbackStatus)->update();
+            $this->panjarSupplierModel->where('transaction_id', $id)->set('is_posted', $rollbackStatus)->update();
+
+            return $this->response->setJSON([
+                "status" => false,
+                "message" => "Gagal memproses: " . $e->getMessage(),
+                "token" => csrf_hash()
+            ]);
+        }
     }
-
 
     public function deletePanjarSupplier()
     {

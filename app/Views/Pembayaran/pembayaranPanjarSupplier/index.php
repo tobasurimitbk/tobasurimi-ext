@@ -407,33 +407,46 @@
                     let is_posted = row.is_posted;
 
                     if (is_posted === '0') {
-
                         return `
-                        <div class="mt-0">
-        
-                            <button data-toggle="tooltip" title="Posting" onclick="updateStatus('${id}', 1)" class="btn btn-success posting-panjar-supplier">
-                                <i class="fa fa-paper-plane fa-sm" aria-hidden="true"></i>
-                            </button>
+                        <div class="btn-group" role="group">
+                            <?php if (can('PanjarSupplier', 'Posting', 'a')) : ?>
+                                <button data-toggle="tooltip" 
+                                        title="Posting" 
+                                        onclick="postPanjar('${id}')" 
+                                        class="btn btn-success posting-panjar-supplier">
+                                    <i class="fa fa-paper-plane fa-sm"></i>
+                                </button>
+                            <?php endif; ?>
 
-                            <button data-toggle="tooltip" title="Hapus" onclick="remove('${id}')" class="btn btn-danger delete-parent">
-                                <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
-                            </button>
-
-                        <div>
-                        `
+                            <?php if (can('PanjarSupplier', 'Delete', 'd')) : ?>
+                                <button data-toggle="tooltip" 
+                                        title="Hapus" 
+                                        onclick="confirmDelete('${id}')" 
+                                        class="btn btn-danger">
+                                    <i class="fa fa-trash fa-sm"></i>
+                                </button>
+                            <?php endif; ?>
+                        </div>
+                        `;
+                    } else {
+                        return `
+                        <div class="btn-group" role="group">
+                            <?php if (can('PanjarSupplier', 'Unpost', 'a')) : ?>
+                                <button data-toggle="tooltip" 
+                                        title="Unpost" 
+                                        onclick="unpostPanjar('${id}')" 
+                                        class="btn btn-warning">
+                                    <i class="fa fa-undo fa-sm"></i>
+                                </button>
+                            <?php endif; ?>
+                        </div>
+                        `;
                     }
                     // <div class="mt-0">
                     //             <button  data-toggle="tooltip" title="Histori LPB" onclick="displayHistory('${id}')" class="btn btn-success posting-spp">
                     //                 <i class="fa-solid fa-clock-rotate-left"></i>
                     //             </button>
                     //         <div>
-                    if (is_posted === '1') {
-                        return `
-                            -
-                            
-                        `
-
-                    }
 
 
                 }
@@ -1275,6 +1288,56 @@
             sortType = sortType === "asc" ? "desc" : "asc";
         }
     }
+
+
+    // Post function
+    function postPanjar(id) {
+        Swal.fire({
+            title: 'Post Panjar?',
+            text: "Anda akan memposting transaksi ini",
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: '#28a745',
+            confirmButtonText: 'Ya, Posting!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                updateStatus(id, 1);
+            }
+        });
+    }
+
+    // Unpost function
+    function unpostPanjar(id) {
+        Swal.fire({
+            title: 'Unpost Panjar?',
+            text: "Anda akan membatalkan posting transaksi ini",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#ffc107',
+            confirmButtonText: 'Ya, Unpost!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                updateStatus(id, 0);
+            }
+        });
+    }
+
+    // Delete function
+    function confirmDelete(id) {
+        Swal.fire({
+            title: 'Hapus Data?',
+            text: "Data yang dihapus tidak dapat dikembalikan!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#dc3545',
+            confirmButtonText: 'Ya, Hapus!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                remove(id);
+            }
+        });
+    }
+
 
     const updateStatus = function(id, status) {
         Swal.fire({

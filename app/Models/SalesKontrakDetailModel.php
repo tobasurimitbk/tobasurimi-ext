@@ -74,6 +74,8 @@ class SalesKontrakDetailModel extends Model
             $sizeBreakdown = [];
 
             $salesContractSize = $salesContractSizeBreakdownModel
+                ->select('sales_contract_size_breakdown.*,satuans.kode_satuan')
+                ->join('satuans', 'satuans.id = sales_contract_size_breakdown.satuan_size_id', 'left')
                 ->where('sales_contract_detail_id', $q['id'])
                 ->findAll();
 
@@ -95,6 +97,8 @@ class SalesKontrakDetailModel extends Model
                     'harga' => $s['harga'],
                     'total' => $s['total'],
                     'remark' => $s['remark'],
+                    'satuan_size_id' => $s['satuan_size_id'],
+                    'satuan_size_code' => $s['kode_satuan']
                 ]);
             }
 
@@ -110,6 +114,7 @@ class SalesKontrakDetailModel extends Model
                 'harga' => $q['harga'],
                 'remark' => $q['remark'],
                 'total' => $q['total_harga'],
+                'persen' => $q['persen'],
                 // print
                 'total_harga' => $q['total_harga'],
                 'nama_barang' => $q['barang_name'],

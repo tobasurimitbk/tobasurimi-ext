@@ -327,6 +327,7 @@ class SalesKontrak extends BaseController
             'rebate' => $this->request->getVar('rebate'),
             'can_deduction' => $this->request->getVar('can_deduction'),
             'estimated_freight' => $this->request->getVar('estimated_freight'),
+            'royalty_price' => $this->request->getVar('royalty_price'),
             'createdBy' => $this->this_user_id,
             'status_posting' => '0',
         ]);
@@ -361,7 +362,8 @@ class SalesKontrak extends BaseController
                     'size' => $sb->size,
                     'qty' => $sb->qty,
                     'harga' => $sb->harga,
-                    'total' => $sb->total
+                    'total' => $sb->total,
+                    'satuan_size_id' => $sb->satuan_size_id
                 ]);
             }
         }
@@ -433,6 +435,7 @@ class SalesKontrak extends BaseController
             'rebate' => $this->request->getVar('rebate'),
             'can_deduction' => $this->request->getVar('can_deduction'),
             'estimated_freight' => $this->request->getVar('estimated_freight'),
+            'royalty_price' => $this->request->getVar('royalty_price'),
             'createdBy' => $this->this_user_id,
         ]);
 
@@ -442,8 +445,7 @@ class SalesKontrak extends BaseController
         foreach ($barangs as $b) {
             // CHECK
             $check = $this->salesKontrakDetailModel
-                ->where('sales_contract_id', $id)
-                ->where('barang_master_sales_id', $b->barang_master_sales_id)
+                ->where('id', $b->id_detail)
                 ->first();
 
             if ($check != null) {
@@ -480,16 +482,17 @@ class SalesKontrak extends BaseController
                         'size' => $sb->size,
                         'qty' => $sb->qty,
                         'harga' => $sb->harga,
-                        'total' => $sb->total
+                        'total' => $sb->total,
+                        'satuan_size_id' => $sb->satuan_size_id
                     ]);
                 }
 
                 array_push($id_detail_all, $check['id']);
             } else {
-                $this->salesKontrakDetailModel
-                    ->where('sales_contract_id', $id)
-                    ->where('barang_master_sales_id', $b->barang_master_sales_id)
-                    ->delete();
+                // $this->salesKontrakDetailModel
+                //     ->where('sales_contract_id', $id)
+                //     ->where('barang_master_sales_id', $b->barang_master_sales_id)
+                //     ->delete();
 
                 // INSERT
                 $id_detail_new = $this->salesKontrakDetailModel->insert([
@@ -521,7 +524,8 @@ class SalesKontrak extends BaseController
                         'size' => $sb->size,
                         'qty' => $sb->qty,
                         'harga' => $sb->harga,
-                        'total' => $sb->total
+                        'total' => $sb->total,
+                        'satuan_size_id' => $sb->satuan_size_id
                     ]);
                 }
 

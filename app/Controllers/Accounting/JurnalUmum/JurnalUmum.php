@@ -2370,6 +2370,79 @@ class JurnalUmum extends BaseController
         }
     }
 
+    public function unpostDataPembayaran($payID, $module, $divisi)
+    {
+        try {
+            // Cari transaksi berdasarkan module dan payID
+            $transaction = null;
+            $paymentNo = '';
+            
+            switch ($module) {
+                case "LOKAL BB":
+                    $payment = $this->localPOPaymentModel->asObject()->find($payID);
+                    if ($payment) {
+                        $paymentNo = $payment->payment_no;
+                    }
+                    break;
+                    
+                case "LOKAL BP":
+                    $payment = $this->localPoPaymentBpModel->where('id', $payID)->first();
+                    if ($payment) {
+                        $paymentNo = $payment['payment_no'];
+                    }
+                    break;
+                    
+                case "IMPORT":
+                    $payment = $this->importPOPaymentModel->asObject()->where('deletedAt', null)->where('id', $payID)->first();
+                    if ($payment) {
+                        $paymentNo = $payment->payment_no;
+                    }
+                    break;
+                    
+                case "LAIN-LAIN":
+                    $payment = $this->otherPaymentModel->asObject()->where('deletedAt', null)->where('id', $payID)->first();
+                    if ($payment) {
+                        $paymentNo = $payment->no_pembayaran;
+                    }
+                    break;
+            }
+            
+            if (empty($paymentNo)) {
+                throw new Exception("Data pembayaran tidak ditemukan");
+            }
+            
+            // 1. Cari transaksi jurnal berdasarkan no_transaksi
+            $transaksiJurnal = $this->transaksiJurnalModel
+                ->where('no_transaksi', $paymentNo)
+                ->first();
+            
+            if (!$transaksiJurnal) {
+                throw new Exception("Transaksi jurnal tidak ditemukan");
+            }
+            
+            // 2. Hapus jurnal umum terkait
+            $this->jurnalUmumModel
+                ->where('id_transaksi', $transaksiJurnal['id'])
+                ->delete();
+            
+            // 3. Hapus transaksi jurnal
+            $this->transaksiJurnalModel
+                ->where('id', $transaksiJurnal['id'])
+                ->delete();
+            
+            return [
+                'status' => true,
+                'message' => 'Data jurnal berhasil diunpost'
+            ];
+            
+        } catch (Exception $e) {
+            return [
+                'status' => false,
+                'message' => $e->getMessage()
+            ];
+        }
+    }
+
 
     public function insertDataPanjarPinjamanTransaction($payID)
     {
@@ -2496,6 +2569,50 @@ class JurnalUmum extends BaseController
         } catch (Exception $e) {
             var_dump("Terjadi Keslahan Saat Input Jurnal : ", $e->getMessage());
             die;
+        }
+    }
+
+    public function unpostDataPanjarPinjamanTransaction($payID)
+    {
+        try {
+            // Get transaction data
+            $transaction = $this->panjarPinjamanTransactionModel
+                ->asObject()
+                ->find($payID);
+
+            if (!$transaction) {
+                throw new \Exception("Transaction not found");
+            }
+
+            // 1. Find journal transaction by transaction number
+            $transaksiJurnal = $this->transaksiJurnalModel
+                ->where('no_bukti', $transaction->no_transaction)
+                ->first();
+
+            if (!$transaksiJurnal) {
+                throw new \Exception("Journal transaction not found");
+            }
+
+            // 2. Delete all related journal entries
+            $this->jurnalUmumModel
+                ->where('id_transaksi', $transaksiJurnal['id'])
+                ->delete();
+
+            // 3. Delete journal header
+            $this->transaksiJurnalModel
+                ->where('id', $transaksiJurnal['id'])
+                ->delete();
+
+            return [
+                'status' => true,
+                'message' => 'Journal transaction successfully unposted'
+            ];
+
+        } catch (\Exception $e) {
+            return [
+                'status' => false,
+                'message' => $e->getMessage()
+            ];
         }
     }
 
@@ -2743,6 +2860,58 @@ class JurnalUmum extends BaseController
     }
 
 
+    public function unpostDataPembayaranPanjar($payID, $module, $divisi)
+    {
+        try {
+            // Validasi module harus PANJAR
+            if ($module != "PANJAR") {
+                throw new Exception("Module harus PANJAR");
+            }
+
+            // Cari data panjar berdasarkan ID
+            $dataPanjar = $this->localPOPaymentPanjarModel
+                ->where('local_po_payment_panjar.id', $payID)
+                ->join('panjar_supplier', 'panjar_supplier.id = local_po_payment_panjar.panjar_id', 'left')
+                ->asObject()
+                ->select('local_po_payment_panjar.*, panjar_supplier.no_panjar')
+                ->first();
+
+            if (!$dataPanjar) {
+                throw new Exception("Data panjar tidak ditemukan");
+            }
+
+            // 1. Cari transaksi jurnal berdasarkan keterangan yang unik
+            $transaksiJurnal = $this->transaksiJurnalModel
+                ->where('no_bukti', $dataPanjar->no_panjar)
+                ->orWhere('keterangan', 'LIKE', '%Pembayaran Panjar ' . $dataPanjar->no_panjar . '%')
+                ->first();
+
+            if (!$transaksiJurnal) {
+                throw new Exception("Transaksi jurnal untuk panjar ini tidak ditemukan");
+            }
+
+            // 2. Hapus semua jurnal umum terkait
+            $this->jurnalUmumModel
+                ->where('id_transaksi', $transaksiJurnal['id'])
+                ->delete();
+
+            // 3. Hapus transaksi jurnal
+            $this->transaksiJurnalModel
+                ->where('id', $transaksiJurnal['id'])
+                ->delete();
+
+            return [
+                'status' => true,
+                'message' => 'Data jurnal panjar berhasil diunpost'
+            ];
+
+        } catch (Exception $e) {
+            return [
+                'status' => false,
+                'message' => $e->getMessage()
+            ];
+        }
+    }
 
     public function inserDataPembayaranPinjaman($payID, $module, $divisi)
     {
@@ -2824,6 +2993,59 @@ class JurnalUmum extends BaseController
 
                 $this->jurnalUmumModel->insertJurnalBatch($result);
             }
+        }
+    }
+
+    public function unpostDataPembayaranPinjaman($payID, $module, $divisi)
+    {
+        try {
+            // Validasi module harus PINJAMAN
+            if ($module != "PINJAMAN") {
+                throw new Exception("Module harus PINJAMAN");
+            }
+
+            // Cari data pinjaman berdasarkan ID
+            $dataPinjaman = $this->localPOPaymentPinjamanModel
+                ->where('local_po_payment_pinjaman.id', $payID)
+                ->join('pinjaman_supplier', 'pinjaman_supplier.id = local_po_payment_pinjaman.pinjaman_id', 'left')
+                ->asObject()
+                ->select('local_po_payment_pinjaman.*, pinjaman_supplier.no_pinjaman')
+                ->first();
+
+            if (!$dataPinjaman) {
+                throw new Exception("Data pinjaman tidak ditemukan");
+            }
+
+            // 1. Cari transaksi jurnal berdasarkan no_pinjaman atau keterangan
+            $transaksiJurnal = $this->transaksiJurnalModel
+                ->where('no_bukti', $dataPinjaman->no_pinjaman)
+                ->orWhere('keterangan', 'LIKE', '%Pembayaran Pinjaman' . $dataPinjaman->no_pinjaman . '%')
+                ->first();
+
+            if (!$transaksiJurnal) {
+                throw new Exception("Transaksi jurnal untuk pinjaman ini tidak ditemukan");
+            }
+
+            // 2. Hapus semua jurnal umum terkait
+            $this->jurnalUmumModel
+                ->where('id_transaksi', $transaksiJurnal['id'])
+                ->delete();
+
+            // 3. Hapus transaksi jurnal
+            $this->transaksiJurnalModel
+                ->where('id', $transaksiJurnal['id'])
+                ->delete();
+
+            return [
+                'status' => true,
+                'message' => 'Data jurnal pinjaman berhasil diunpost'
+            ];
+
+        } catch (Exception $e) {
+            return [
+                'status' => false,
+                'message' => $e->getMessage()
+            ];
         }
     }
 

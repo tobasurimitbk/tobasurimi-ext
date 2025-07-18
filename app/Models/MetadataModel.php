@@ -54,7 +54,7 @@ class MetadataModel extends Model
 
     public function get_by_name($name)
     {
-        $requete = "SELECT * FROM metadata WHERE name='" . $name . "' ORDER BY value ASC";
+        $requete = "SELECT * FROM metadata WHERE name='" . $name . "' AND deletedAt IS NULL ORDER BY value ASC";
         //echo $requete;
         $query = $this->db->query($requete);
         return $query->getResultArray();
@@ -135,8 +135,10 @@ class MetadataModel extends Model
     public function getKodeSatuanBarang($search)
     {
         $data = [];
-        foreach ($this->asArray()->where('name', "Kode Satuan BC")->like('value', '%' . $search . '%')->orderBy('value', "ASC")->limit(10)->get()
-            ->getResultArray() as $d) {
+        foreach (
+            $this->asArray()->where('name', "Kode Satuan BC")->like('value', '%' . $search . '%')->orderBy('value', "ASC")->limit(10)->get()
+                ->getResultArray() as $d
+        ) {
             $data[] = [
                 'id' => encrypt($d['value']),
                 'text' => '' . $d['value'] . ' - ' . strtoupper($d['description'])
