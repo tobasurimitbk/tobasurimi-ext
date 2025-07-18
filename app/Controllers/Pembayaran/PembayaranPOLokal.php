@@ -884,8 +884,6 @@ class PembayaranPOLokal extends BaseController
         $pinjamanResult = $this->pinjamanSupplierModel->getPinjamanSupplierbySupplierId($supplierId, $this->this_company_id);
         $panjarResult = $this->panjarSupplierModel->getPanjarSupplierbySupplierId($supplierId, $this->this_company_id);
 
-        // var_dump($panjarResult);
-        // die;
         // Inisialisasi array untuk menyimpan data panjar
         $panjarList = [];
         foreach ($panjarResult as $p) {
@@ -1555,7 +1553,7 @@ class PembayaranPOLokal extends BaseController
         try {
             $id = decrypt($this->request->getVar('id'));
             $divisiId = decrypt($this->request->getVar('divisi_id'));
-            $currentStatus = $this->request->getVar('status') ?? 1; // Default to posting if not specified
+            $currentStatus = $this->request->getVar('status');
 
             $localPOPaymentModel = new LocalPOPaymentModel();
             $localPOPaymentPanjarModel = new LocalPOPaymentPanjarModel();
@@ -1565,33 +1563,48 @@ class PembayaranPOLokal extends BaseController
             $localPOPaymentModel->update($id, ['status_posting' => $currentStatus]);
 
             // Get related panjar/pinjaman
-            $dataPayPanjar = $localPOPaymentPanjarModel->where('local_po_payment_id', $id)->select('id')->findAll();
-            $dataPayPinjaman = $localPOPaymentPinjamanModel->where('local_po_payment_id', $id)->select('id')->findAll();
+            $dataPayPanjar = $localPOPaymentPanjarModel->where('local_po_payment_id', $id)
+                                ->select('id')
+                                ->findAll() ?: [];
+            
+            $dataPayPinjaman = $localPOPaymentPinjamanModel->where('local_po_payment_id', $id)
+                                ->select('id')
+                                ->findAll() ?: [];
 
             if ($currentStatus == 1) {
                 // POSTING LOGIC
                 foreach ($dataPayPanjar as $payPanjar) {
-                    $this->jurnalController->inserDataPembayaranPanjar($payPanjar['id'], "PANJAR", $divisiId);
+                    if (!empty($payPanjar['id'])) {
+                        $result = $this->jurnalController->inserDataPembayaranPanjar($payPanjar['id'], "PANJAR", $divisiId);
+                    }
                 }
+                
                 foreach ($dataPayPinjaman as $payPinjaman) {
-                    $this->jurnalController->inserDataPembayaranPinjaman($payPinjaman['id'], "PINJAMAN", $divisiId);
+                    if (!empty($payPinjaman['id'])) {
+                        $result = $this->jurnalController->inserDataPembayaranPinjaman($payPinjaman['id'], "PINJAMAN", $divisiId);
+                    }
                 }
+                
                 $result = $this->jurnalController->insertDataPembayaran($id, "LOKAL BB", $divisiId);
+                $finalResult = $result;
                 $message = "Pembayaran berhasil diposting";
             } else {
                 // UNPOSTING LOGIC
                 foreach ($dataPayPanjar as $payPanjar) {
-                    $this->jurnalController->unpostDataPembayaranPanjar($payPanjar['id'], "PANJAR", $divisiId);
+                    if (!empty($payPanjar['id'])) {
+                        $result = $this->jurnalController->unpostDataPembayaranPanjar($payPanjar['id'], "PANJAR", $divisiId);
+                    }
                 }
+                
                 foreach ($dataPayPinjaman as $payPinjaman) {
-                    $this->jurnalController->unpostDataPembayaranPinjaman($payPinjaman['id'], "PINJAMAN", $divisiId);
+                    if (!empty($payPinjaman['id'])) {
+                        $result = $this->jurnalController->unpostDataPembayaranPinjaman($payPinjaman['id'], "PINJAMAN", $divisiId);
+                    }
                 }
+                
                 $result = $this->jurnalController->unpostDataPembayaran($id, "LOKAL BB", $divisiId);
+                $finalResult = $result;
                 $message = "Pembayaran berhasil diunpost";
-            }
-
-            if (!$result['status']) {
-                throw new \Exception($result['message']);
             }
 
             return response()->setJSON([
@@ -1602,6 +1615,9 @@ class PembayaranPOLokal extends BaseController
             ]);
 
         } catch (\Exception $e) {
+            
+            log_message('error', 'Error in postingPoLokalBB: ' . $e->getMessage());
+            
             return response()->setJSON([
                 'token' => csrf_hash(),
                 'status' => false,
@@ -1615,7 +1631,7 @@ class PembayaranPOLokal extends BaseController
         try {
             $id = decrypt($this->request->getVar('id'));
             $divisiId = decrypt($this->request->getVar('divisi_id'));
-            $currentStatus = $this->request->getVar('status') ?? 1; // Default to posting if not specified
+            $currentStatus = $this->request->getVar('status');
 
             $localPoPaymentBpModel = new LocalPOPaymentBPModel();
             
@@ -1624,17 +1640,14 @@ class PembayaranPOLokal extends BaseController
 
             if ($currentStatus == 1) {
                 // POSTING LOGIC
-                $result = $this->jurnalController->insertDataPembayaran($id, "LOKAL BP", $divisiId);
+                $this->jurnalController->insertDataPembayaran($id, "LOKAL BP", $divisiId);
                 $message = "Pembayaran berhasil diposting";
             } else {
                 // UNPOSTING LOGIC
-                $result = $this->jurnalController->unpostDataPembayaran($id, "LOKAL BP", $divisiId);
+                $this->jurnalController->unpostDataPembayaran($id, "LOKAL BP", $divisiId);
                 $message = "Pembayaran berhasil diunpost";
             }
 
-            if (!$result['status']) {
-                throw new \Exception($result['message']);
-            }
 
             return response()->setJSON([
                 'token' => csrf_hash(),
@@ -1644,6 +1657,11 @@ class PembayaranPOLokal extends BaseController
             ]);
 
         } catch (\Exception $e) {
+            // Rollback status on error
+            if (isset($localPoPaymentBpModel)) {
+                $localPoPaymentBpModel->update($id, ['status_posting' => ($currentStatus == 1) ? 0 : 1]);
+            }
+            
             return response()->setJSON([
                 'token' => csrf_hash(),
                 'status' => false,
@@ -1651,4 +1669,5 @@ class PembayaranPOLokal extends BaseController
             ]);
         }
     }
+    
 }

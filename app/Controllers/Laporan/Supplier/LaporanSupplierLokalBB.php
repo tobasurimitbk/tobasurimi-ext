@@ -177,7 +177,7 @@ class LaporanSupplierLokalBB extends BaseController
                 $groupedData[$poId] = [
                     'supplierName' => $row->supplierName,
                     'poNum' => $row->poNum,
-                    'poDate' => $row->poDate,
+                    'poDate' => date('d-m-Y', strtotime($row->poDate)),
                     'satuanName' => $row->satuanName,
                     'companyName' => $row->companyName,
                     'divisiName' => $row->divisiName,
