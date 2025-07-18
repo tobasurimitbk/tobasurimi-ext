@@ -2039,7 +2039,7 @@ class JurnalUmum extends BaseController
                         }
                     }
                 }
-                $this->jurnalUmumModel->insertJurnalBatch($result);
+                return $this->jurnalUmumModel->insertJurnalBatch($result);
             }
         } elseif ($module == "LOKAL BP") {
             $result = array();
@@ -2142,7 +2142,7 @@ class JurnalUmum extends BaseController
                 }
 
                 // Input Ke Jurnal Umum
-                $this->jurnalUmumModel->insertJurnalBatch($result);
+                return $this->jurnalUmumModel->insertJurnalBatch($result);
             } else {
                 throw new Exception("Tidak ada data pembayaran Lokal Bp");
             }
@@ -2235,7 +2235,7 @@ class JurnalUmum extends BaseController
                     'keterangan' => "Pembayaran PO " . $dataPO,
                     'id_inputer' => session()->get("login")->user_id
                 );
-                $this->jurnalUmumModel->insertJurnalBatch($result);
+                return $this->jurnalUmumModel->insertJurnalBatch($result);
             }
         } else if ($module == "LAIN-LAIN") {
             $otherPayment = $this->otherPaymentModel
