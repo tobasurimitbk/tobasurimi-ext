@@ -324,10 +324,16 @@ class SalesKontrak extends BaseController
             'total_amount' => $this->request->getVar('total_amount'),
             'total_container' => $this->request->getVar('total_container'),
             'royalty' => $this->request->getVar('royalty'),
-            'rebate' => $this->request->getVar('rebate'),
-            'can_deduction' => $this->request->getVar('can_deduction'),
-            'estimated_freight' => $this->request->getVar('estimated_freight'),
             'royalty_price' => $this->request->getVar('royalty_price'),
+            'rebate' => $this->request->getVar('rebate'),
+            'rebate_price' => $this->request->getVar('rebate_price'),
+            'can_deduction' => $this->request->getVar('can_deduction'),
+            'can_deduction_price' => $this->request->getVar('can_deduction_price'),
+            'estimated_freight' => $this->request->getVar('estimated_freight'),
+            'estimated_freight_price' => $this->request->getVar('estimated_freight_price'),
+            'others' => $this->request->getVar('others'),
+            'others_price' => $this->request->getVar('others_price'),
+            'others_type' => $this->request->getVar('others_type'),
             'createdBy' => $this->this_user_id,
             'status_posting' => '0',
         ]);
@@ -363,6 +369,7 @@ class SalesKontrak extends BaseController
                     'qty' => $sb->qty,
                     'harga' => $sb->harga,
                     'total' => $sb->total,
+                    'palet' => $sb->palet,
                     'satuan_size_id' => $sb->satuan_size_id
                 ]);
             }
@@ -430,12 +437,17 @@ class SalesKontrak extends BaseController
             'tipe_harga' => $this->request->getVar('tipe_harga'),
             'tolerance' => $this->request->getVar('tolerance'),
             'total_amount' => $this->request->getVar('total_amount'),
-            'total_container' => $this->request->getVar('total_container'),
             'royalty' => $this->request->getVar('royalty'),
-            'rebate' => $this->request->getVar('rebate'),
-            'can_deduction' => $this->request->getVar('can_deduction'),
-            'estimated_freight' => $this->request->getVar('estimated_freight'),
             'royalty_price' => $this->request->getVar('royalty_price'),
+            'rebate' => $this->request->getVar('rebate'),
+            'rebate_price' => $this->request->getVar('rebate_price'),
+            'can_deduction' => $this->request->getVar('can_deduction'),
+            'can_deduction_price' => $this->request->getVar('can_deduction_price'),
+            'estimated_freight' => $this->request->getVar('estimated_freight'),
+            'estimated_freight_price' => $this->request->getVar('estimated_freight_price'),
+            'others' => $this->request->getVar('others'),
+            'others_price' => $this->request->getVar('others_price'),
+            'others_type' => $this->request->getVar('others_type'),
             'createdBy' => $this->this_user_id,
         ]);
 
@@ -483,6 +495,7 @@ class SalesKontrak extends BaseController
                         'qty' => $sb->qty,
                         'harga' => $sb->harga,
                         'total' => $sb->total,
+                        'palet' => $sb->palet,
                         'satuan_size_id' => $sb->satuan_size_id
                     ]);
                 }

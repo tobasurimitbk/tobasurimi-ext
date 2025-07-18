@@ -358,8 +358,20 @@
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
+                            <input autocomplete="one-time-code" <?= !empty($dataSalesKontrak) ? ($dataSalesKontrak['status_posting']  ? 'readonly=true' : '') : ''; ?> value="<?= !empty($dataSalesKontrak) ? number_format($dataSalesKontrak['rebate_price'], 2) : ""; ?>" type="text" oninput="this.value = greatFormatRupiah(this.value)" class="form-control rebate_price" id="rebate_price" name="rebate_price" placeholder="Rebate Price (Opsional)">
+                            <label for="floatingInput">Rebate Price (Opsional)</label>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-floating mb-3" style="height: 50px;">
                             <input autocomplete="one-time-code" <?= !empty($dataSalesKontrak) ? ($dataSalesKontrak['status_posting']  ? 'readonly=true' : '') : ''; ?> value="<?= !empty($dataSalesKontrak) ? $dataSalesKontrak['can_deduction'] : ""; ?>" type="text" class="form-control can_deduction" id="can_deduction" name="can_deduction" placeholder="Can Deduction (Opsional)">
                             <label for="floatingInput">Can Deduction (Opsional)</label>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <input autocomplete="one-time-code" <?= !empty($dataSalesKontrak) ? ($dataSalesKontrak['status_posting']  ? 'readonly=true' : '') : ''; ?> value="<?= !empty($dataSalesKontrak) ? number_format($dataSalesKontrak['can_deduction_price'], 2) : ""; ?>" type="text" oninput="this.value = greatFormatRupiah(this.value)" class="form-control can_deduction_price" id="can_deduction_price" name="can_deduction_price" placeholder="Can Deduction Price (Opsional)">
+                            <label for="floatingInput">Can Deduction Price (Opsional)</label>
                         </div>
                     </div>
                     <div class="col-md-4">
@@ -368,9 +380,38 @@
                             <label for="floatingInput">Estimated Freight (Opsional)</label>
                         </div>
                     </div>
+                    <div class="col-md-4">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <input autocomplete="one-time-code" <?= !empty($dataSalesKontrak) ? ($dataSalesKontrak['status_posting']  ? 'readonly=true' : '') : ''; ?> value="<?= !empty($dataSalesKontrak) ? number_format($dataSalesKontrak['estimated_freight_price'], 2) : ""; ?>" type="text" oninput="this.value = greatFormatRupiah(this.value)" class="form-control estimated_freight_price" id="estimated_freight_price" name="estimated_freight_price" placeholder="Estimated Freight Price (Opsional)">
+                            <label for="floatingInput">Estimated Freight Price (Opsional)</label>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <input autocomplete="one-time-code" <?= !empty($dataSalesKontrak) ? ($dataSalesKontrak['status_posting']  ? 'readonly=true' : '') : ''; ?> value="<?= !empty($dataSalesKontrak) ? $dataSalesKontrak['others'] : ""; ?>" type="text" class="form-control others" id="others" name="others" placeholder="Others (Opsional)">
+                            <label for="floatingInput">Others (Opsional)</label>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <select name="others_type" id="others_type" class="form-control others_type">
+                                    <option <?= !empty($dataSalesKontrak) ? ($dataSalesKontrak['others_type'] == "PLUS" ? 'selected' : '') : '' ?> value="PLUS">PLUS (+)</option>
+                                    <option <?= !empty($dataSalesKontrak) ? ($dataSalesKontrak['others_type'] == "MINUS" ? 'selected' : '')  : '' ?> value="MINUS">MINUS (-)</option>
+                                </select>
+                            </div>
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input autocomplete="one-time-code" <?= !empty($dataSalesKontrak) ? ($dataSalesKontrak['status_posting']  ? 'readonly=true' : '') : ''; ?> value="<?= !empty($dataSalesKontrak) ? number_format($dataSalesKontrak['others_price'], 2) : ""; ?>" type="text" oninput="this.value = greatFormatRupiah(this.value)" class="form-control others_price" id="others_price" name="others_price" placeholder="Others Price (Opsional)">
+                                <label for="floatingInput">Others Price (Opsional)</label>
+                            </div>
+                        </div>
+
+                    </div>
                 </div>
+
             </div>
-        </form>
+    </div>
+    </form>
 
     </div>
     </div>
@@ -465,6 +506,7 @@
                                             <th>PC</th>
                                             <th>Bag</th>
                                             <th>Cup</th>
+                                            <th>Palet</th>
                                             <th>%</th>
                                             <th>Remarks</th>
                                             <th>Unit</th>
@@ -479,7 +521,7 @@
                                     </tbody>
                                     <tfoot class="tfoot-detail-table-size-breakdown">
                                         <tr>
-                                            <td colspan="14"></td>
+                                            <td colspan="15"></td>
                                             <td><b>TOTAL</b></td>
                                             <td><b>0.00</b></td>
                                             <td><b>0.00</b></td>
@@ -583,7 +625,12 @@
                                 <label for="floatingInput">Cup (Opsional)</label>
                             </div>
                         </div>
-
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input autocomplete="one-time-code" type="text" class="form-control palet" name="palet" id="palet" placeholder="Cup (Opsional)">
+                                <label for="floatingInput">Palet (Opsional)</label>
+                            </div>
+                        </div>
                     </div>
                     <div class="row mt-3">
                         <div class="col mb-3">
@@ -848,6 +895,7 @@
             var inner_box = $('#inner_box').val();
             var pc = $('#pc').val();
             var bag = $('#bag').val();
+            var palet = $('#palet').val();
             var persen = destroyFormatRupiah($('#persen').val() || 0);
             var qty = $('#qty').val();
             var harga = destroyFormatRupiah($('#harga').val());
@@ -868,6 +916,7 @@
                 inner_box: inner_box,
                 pc: pc,
                 bag: bag,
+                palet: palet,
                 persen: persen,
                 qty: qty,
                 harga: harga,
@@ -891,6 +940,7 @@
                     }
                 }
 
+                listSizeBreakdown[index].palet = palet;
                 listSizeBreakdown[index].size = result.size;
                 listSizeBreakdown[index].grade = result.grade;
                 listSizeBreakdown[index].packing = result.packing;
@@ -1660,9 +1710,18 @@
                 let potonganHarga = destroyFormatRupiah($('#potongan_harga').val());
                 let komisi = destroyFormatRupiah($('#komisi').val());
                 let royaltyPrice = destroyFormatRupiah($('#royalty_price').val());
+                let rebatePrice = destroyFormatRupiah($('#rebate_price').val());
+                let canDeductionPrice = destroyFormatRupiah($('#can_deduction_price').val());
+                let estimatedFreightPrice = destroyFormatRupiah($('#estimated_freight_price').val());
+                let othersPrice = destroyFormatRupiah($('#others_price').val());
+
                 data.set('potongan_harga', potonganHarga);
                 data.set('komisi', komisi);
                 data.set("royalty_price", royaltyPrice);
+                data.set("rebate_price", rebatePrice);
+                data.set("can_deduction_price", canDeductionPrice);
+                data.set("estimated_freight_price", estimatedFreightPrice);
+                data.set("others_price", othersPrice);
 
                 data.append("total_amount", totalAmount);
                 data.append("listBarang", listDataBarang);
@@ -2079,7 +2138,7 @@
         if (listSizeBreakdown.length === 0) {
             row += `
                     <tr>
-                        <td colspan="14"></td>
+                        <td colspan="15"></td>
                         <td><b>TOTAL</b></td>
                         <td><b>0.00</b></td>
                         <td><b>0.00</b></td>
@@ -2107,6 +2166,7 @@
                 newRow.append($('<td>').text(item.pc));
                 newRow.append($('<td>').text(item.bag));
                 newRow.append($('<td>').text(item.cup));
+                newRow.append($('<td>').text(item.palet));
                 newRow.append($('<td>').text(item.persen));
                 newRow.append($('<td>').text(item.remark));
                 newRow.append($('<td>').text(item.satuan_size_code));
@@ -2143,7 +2203,7 @@
             $('.body-detail-table-size-breakdown').append(row);
             table.find('tfoot').empty();
             var newRow = $('<tr>');
-            newRow.append($('<td colspan="14"></td>'));
+            newRow.append($('<td colspan="15"></td>'));
             newRow.append($('<td><b>TOTAL</b></td>'));
             newRow.append($('<td><b>' + greatFormatRupiah(totalQty) + '</b></td>'));
             newRow.append($('<td><b>' + greatFormatRupiah(totalHarga.toFixed(2)) + '</b></td>'));

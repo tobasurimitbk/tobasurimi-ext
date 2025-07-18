@@ -438,9 +438,13 @@ class SupplierModel extends Model
             $pphMode = $r->pph;
 
             // Hitung DPP, PPh, dan setelah PPh hanya untuk monthly_price
-            if ($pphMode === "Company" || $pphMode === "Supplier") {
+            if ($pphMode === "Company") {
                 $dpp = ($hargaSatuan / $nilai_pph) * $qty;
                 $pph = ($hargaSatuan / $nilai_pph * $nilai_pph2) * $qty;
+                $dibayarkan = $dpp - $pph;
+            } elseif ($pphMode === "Supplier") {
+                $dpp = $hargaSatuan * $qty;
+                $pph = ($pphMode === "Supplier") ? ($hargaSatuan * $nilai_pph2) * $qty : 0;
                 $dibayarkan = $dpp - $pph;
             } else {
                 $dpp = $hargaSatuan * $qty;
