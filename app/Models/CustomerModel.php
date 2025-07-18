@@ -144,7 +144,7 @@ class CustomerModel extends Model
     public function getListCustomerDetail($condition, $addCondition, $limit = 10, $offset = 0)
     {
         $availableSort = [
-            'namaSales'         => 'users.name',
+            'namaSales'         => 'employees.name',
             'kode'              => 'customers.kode',
             'name'              => 'customers.name',
             'address'           => 'customers.address',
