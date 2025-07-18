@@ -1640,17 +1640,14 @@ class PembayaranPOLokal extends BaseController
 
             if ($currentStatus == 1) {
                 // POSTING LOGIC
-                $result = $this->jurnalController->insertDataPembayaran($id, "LOKAL BP", $divisiId);
+                $this->jurnalController->insertDataPembayaran($id, "LOKAL BP", $divisiId);
                 $message = "Pembayaran berhasil diposting";
             } else {
                 // UNPOSTING LOGIC
-                $result = $this->jurnalController->unpostDataPembayaran($id, "LOKAL BP", $divisiId);
+                $this->jurnalController->unpostDataPembayaran($id, "LOKAL BP", $divisiId);
                 $message = "Pembayaran berhasil diunpost";
             }
 
-            if (!$result['status']) {
-                throw new \Exception($result['message']);
-            }
 
             return response()->setJSON([
                 'token' => csrf_hash(),

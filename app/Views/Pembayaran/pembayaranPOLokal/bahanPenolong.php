@@ -310,16 +310,22 @@
             }
         });
     }
+
     const posting = function(id, divisi_id, status) {
+        const action = status == 1 ? 'Posting' : 'Unposting';
+        const actionMessage = status == 1 ? 'Anda akan memposting transaksi ini' : 'Anda akan membatalkan posting transaksi ini';
+        const successMessage = status == 1 ? 'Pembayaran berhasil diposting' : 'Pembayaran berhasil diunpost';
+
         Swal.fire({
             icon: 'question',
-            title: 'Posting Pembayaran ?',
+            title: `${action} Pembayaran?`,
+            text: actionMessage,
             confirmButtonColor: '#4e73df',
             cancelButtonColor: '#d33',
             showCancelButton: true,
             reverseButtons: true,
-            confirmButtonText: 'Simpan',
-            cancelButtonText: 'Kembali',
+            confirmButtonText: 'Ya, ' + action,
+            cancelButtonText: 'Batal',
         }).then((result) => {
             if (result.isConfirmed) {
                 const csrf = $(`[name="${csrfToken}"]`);
@@ -343,18 +349,32 @@
                         csrf.val(response.token);
                         if (response.status) {
                             Swal.fire({
-                                    icon: 'success',
-                                    title: response.message,
-                                    confirmButtonColor: '#4e73df',
-                                })
-                                .then(() => {
-                                    table.ajax.reload()
-                                })
+                                icon: 'success',
+                                title: successMessage,
+                                confirmButtonColor: '#4e73df',
+                            }).then(() => {
+                                table.ajax.reload();
+                            });
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Gagal',
+                                text: response.message,
+                                confirmButtonColor: '#4e73df',
+                            });
                         }
                     },
+                    error: function(xhr) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: xhr.responseJSON?.message || 'Terjadi kesalahan saat memproses',
+                            confirmButtonColor: '#4e73df',
+                        });
+                    }
                 });
             }
-        })
+        });
     }
 
     const changeSort = function(val) {

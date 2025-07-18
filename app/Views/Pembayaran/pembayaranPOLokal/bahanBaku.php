@@ -270,15 +270,21 @@
     const print = function(url) {
         window.open(url, "_blank");
     }
+
+
     const posting = function(id, divisi_id, status) {
+        const isPosting = status == 1;
+        const titleText = isPosting ? 'Posting Pembayaran?' : 'Unposting Pembayaran?';
+        const confirmText = isPosting ? 'Posting' : 'Unposting';
+
         Swal.fire({
             icon: 'question',
-            title: 'Posting Pembayaran ?',
+            title: titleText,
             confirmButtonColor: '#4e73df',
             cancelButtonColor: '#d33',
             showCancelButton: true,
             reverseButtons: true,
-            confirmButtonText: 'Simpan',
+            confirmButtonText: confirmText,
             cancelButtonText: 'Kembali',
         }).then((result) => {
             if (result.isConfirmed) {
@@ -303,19 +309,19 @@
                         csrf.val(response.token);
                         if (response.status) {
                             Swal.fire({
-                                    icon: 'success',
-                                    title: response.message,
-                                    confirmButtonColor: '#4e73df',
-                                })
-                                .then(() => {
-                                    table.ajax.reload()
-                                })
+                                icon: 'success',
+                                title: response.message,
+                                confirmButtonColor: '#4e73df',
+                            }).then(() => {
+                                table.ajax.reload();
+                            });
                         }
                     },
                 });
             }
-        })
+        });
     }
+
 
     const remove = function(id) {
         const csrfToken = '<?= csrf_token() ?>';
