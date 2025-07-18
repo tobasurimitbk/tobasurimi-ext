@@ -180,14 +180,15 @@
                         <div style="font-weight: bold; font-size: 9px;"><?= $detail["nama_barang"]; ?></div>
                         <div style="font-size: 9px; margin-top: 4px; line-height: 1.4;">
                             <?php if (!empty($detail['species'])): ?>
-                                <span style="display: inline-block; width: 60px;">SPECIES:</span> <?= $detail['species'] ?> <br>
+                                <span style="display: inline-block; width: 65px; font-weight: bold;">SPECIES:</span> <?= trim($detail['species']) ?> <br>
                             <?php endif; ?>
-                            <?php if (!empty($detail['specs'])): ?>
-                                <span style="display: inline-block; width: 50px;">SPECS:</span> <?= $detail['specs'] ?> <br>
-                            <?php endif; ?>
-                            <span style="display: inline-block; width: 60px;">BRAND:</span> <?= $detail['brand'] ?> <br>
-                            <span style="display: inline-block; width: 60px;">PACKING:</span> <?= $detail['kemasan'] ?> <br>
 
+                            <?php if (!empty($detail['specs'])): ?>
+                                <span style="display: inline-block; width: 65px; font-weight: bold;">SPECS:</span> <?= trim($detail['specs']) ?> <br>
+                            <?php endif; ?>
+
+                            <span style="display: inline-block; width: 65px; font-weight: bold;">BRAND:</span> <?= trim($detail['brand']) ?> <br>
+                            <span style="display: inline-block; width: 65px; font-weight: bold;">PACKING:</span> <?= trim($detail['kemasan']) ?> <br>
                         </div>
 
                         <?php if (!empty($detail['size_breakdown'])): ?>
@@ -298,7 +299,43 @@
                     </td>
                 </tr>
             <?php } ?>
-            <!-- Royalty Row (if exists) -->
+
+            <?php
+            // Calculate total adjustments
+            $total_adjustments = 0;
+
+            // Deductions (always subtracted)
+            if ($salesKontrak['royalty_price'] > 0) {
+                $total_adjustments -= $salesKontrak['royalty_price'];
+            }
+            if ($salesKontrak['rebate_price'] > 0) {
+                $total_adjustments -= $salesKontrak['rebate_price'];
+            }
+            if ($salesKontrak['can_deduction_price'] > 0) {
+                $total_adjustments -= $salesKontrak['can_deduction_price'];
+            }
+
+            // Freight (always added)
+            if ($salesKontrak['estimated_freight_price'] > 0) {
+                $total_adjustments += $salesKontrak['estimated_freight_price'];
+            }
+
+            // Handle others (can be positive or negative)
+            $others_value = 0;
+            if ($salesKontrak['others_price'] > 0) {
+                $others_value = (float) $salesKontrak['others_price'];
+                if ($salesKontrak['others_type'] == "PLUS") {
+                    $total_adjustments += $others_value;
+                } else {
+                    $total_adjustments -= $others_value;
+                }
+            }
+
+            // Calculate final amount
+            $grand_total = $total_amount + $total_adjustments;
+            ?>
+
+            <!-- Royalty -->
             <?php if ($salesKontrak['royalty_price'] > 0): ?>
                 <tr style="font-weight: bold; background-color: #e9ecef; font-size:10px;">
                     <td style="padding: 6px; border: 1px solid #ddd;"></td>
@@ -309,14 +346,58 @@
                 </tr>
             <?php endif; ?>
 
+            <!-- Rebate -->
+            <?php if ($salesKontrak['rebate_price'] > 0): ?>
+                <tr style="font-weight: bold; background-color: #e9ecef; font-size:10px;">
+                    <td style="padding: 6px; border: 1px solid #ddd;"></td>
+                    <td style="padding: 6px; border: 1px solid #ddd; text-align: right;">
+                        <span style="float: left;"><?= $salesKontrak['rebate'] ?></span>
+                        <?= number_format($salesKontrak['rebate_price'], 2) ?>
+                    </td>
+                </tr>
+            <?php endif; ?>
+
+            <!-- Can Deduction -->
+            <?php if ($salesKontrak['can_deduction_price'] > 0): ?>
+                <tr style="font-weight: bold; background-color: #e9ecef; font-size:10px;">
+                    <td style="padding: 6px; border: 1px solid #ddd;"></td>
+                    <td style="padding: 6px; border: 1px solid #ddd; text-align: right;">
+                        <span style="float: left;"><?= $salesKontrak['can_deduction'] ?></span>
+                        <?= number_format($salesKontrak['can_deduction_price'], 2) ?>
+                    </td>
+                </tr>
+            <?php endif; ?>
+
+            <!-- Freight -->
+            <?php if ($salesKontrak['estimated_freight_price'] > 0): ?>
+                <tr style="font-weight: bold; background-color: #e9ecef; font-size:10px;">
+                    <td style="padding: 6px; border: 1px solid #ddd;"></td>
+                    <td style="padding: 6px; border: 1px solid #ddd; text-align: right;">
+                        <span style="float: left;"><?= $salesKontrak['estimated_freight'] ?></span>
+                        <?= number_format($salesKontrak['estimated_freight_price'], 2) ?>
+                    </td>
+                </tr>
+            <?php endif; ?>
+
+            <!-- Others (with +/- sign) -->
+            <?php if ($salesKontrak['others_price'] > 0): ?>
+                <tr style="font-weight: bold; background-color: #e9ecef; font-size:10px;">
+                    <td style="padding: 6px; border: 1px solid #ddd;"></td>
+                    <td style="padding: 6px; border: 1px solid #ddd; text-align: right;">
+                        <span style="float: left;"><?= $salesKontrak['others'] ?></span>
+                        <?= number_format($salesKontrak['others_price'], 2) ?>
+                    </td>
+                </tr>
+            <?php endif; ?>
+
             <!-- Quantity Row -->
-            <!-- <tr style="font-weight: bold; background-color: #e9ecef; font-size:10px;">
+            <tr style="font-weight: bold; background-color: #e9ecef; font-size:10px;">
                 <td style="padding: 6px; border: 1px solid #ddd;"></td>
                 <td style="padding: 6px; border: 1px solid #ddd; text-align: right;">
                     <span style="float: left;">TOTAL QTY</span>
                     <?= number_format($total_qty, 2) ?>
                 </td>
-            </tr> -->
+            </tr>
 
             <!-- Percentage Row (if exists) -->
             <!-- <?php if ($total_persen > 0): ?>
@@ -333,7 +414,7 @@
             <tr style="font-weight: bold; background-color: #e9ecef; font-size:10px;">
                 <td style="padding: 6px; border: 1px solid #ddd;"></td>
                 <td style="padding: 6px; border: 1px solid #ddd; text-align: right;">
-                    <span style="float: left;">GRAND TOTAL </span>
+                    <span style="float: left;">GRAND TOTAL <?= !empty($salesKontrak['total_container']) ? "(" . $salesKontrak['total_container'] . ")" : "" ?> </span>
                     (<?= $salesKontrak['mata_uang'] ?>) <?= number_format($total_amount - ($salesKontrak['royalty_price'] > 0 ? $salesKontrak['royalty_price'] : 0), 2) ?>
                 </td>
             </tr>
