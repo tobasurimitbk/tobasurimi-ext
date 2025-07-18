@@ -884,8 +884,6 @@ class PembayaranPOLokal extends BaseController
         $pinjamanResult = $this->pinjamanSupplierModel->getPinjamanSupplierbySupplierId($supplierId, $this->this_company_id);
         $panjarResult = $this->panjarSupplierModel->getPanjarSupplierbySupplierId($supplierId, $this->this_company_id);
 
-        // var_dump($panjarResult);
-        // die;
         // Inisialisasi array untuk menyimpan data panjar
         $panjarList = [];
         foreach ($panjarResult as $p) {
