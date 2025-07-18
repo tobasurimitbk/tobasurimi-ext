@@ -176,8 +176,8 @@
 
 <script>
     const csrfToken = '<?= csrf_token() ?>';
-    let sort = "poNum";
-    let sortType = "desc";
+    let sort = "poDate";
+    let sortType = "asc";
     var row = 0;
 
     var table = $('.dataTable').DataTable({
