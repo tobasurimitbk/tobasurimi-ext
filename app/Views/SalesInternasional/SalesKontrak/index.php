@@ -7,7 +7,7 @@
         <h1>Sales Kontrak</h1>
         <?php if (can('Penjualan Ekspor', 'Sales Kontrak', 'c')) : ?>
             <a class="btn btn-show-form btn-add float-right" href="<?= base_url("sales-kontrak/create"); ?>">
-                <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
+                <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Create New
             </a>
         <?php endif; ?>
     </div>
@@ -17,7 +17,7 @@
             <div class="row justify-content-end row-col-spp mb-3">
                 <div class="col mb-3">
                     <div class="input-group input-group-password">
-                        <input autocomplete="one-time-code" class="form-control input-picker dateStart" id="dateStart" name="dateStart" placeholder="Tanggal Mulai" value="01<?= date('/m/Y') ?>">
+                        <input autocomplete="one-time-code" class="form-control input-picker dateStart" id="dateStart" name="dateStart" placeholder="Start Date" value="01<?= date('/m/Y') ?>">
                         <div class="input-group-prepend group-prepend-password align-items-center">
                             <i style="cursor: pointer; z-index: 99; margin-bottom: 10px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-dateStart"></i>
                         </div>
@@ -25,7 +25,7 @@
                 </div>
                 <div class="col mb-3">
                     <div class="input-group input-group-password">
-                        <input autocomplete="one-time-code" class="form-control input-picker dateEnd" id="dateEnd" name="dateEnd" placeholder="Tanggal Akhir">
+                        <input autocomplete="one-time-code" class="form-control input-picker dateEnd" id="dateEnd" name="dateEnd" placeholder="End Date">
                         <div class="input-group-prepend group-prepend-password align-items-center">
                             <i style="cursor: pointer; z-index: 99; margin-bottom: 10px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-dateEnd"></i>
                         </div>
@@ -33,12 +33,12 @@
                 </div>
                 <div class="col-md-3">
                     <select class="form-select status_posting" name="status_posting" id="status_posting" aria-label="Floating label select example">
-                        <option value="BELUM POSTING">STATUS : BELUM POSTING</option>
-                        <option value="SUDAH POSTING">STATUS : SUDAH POSTING</option>
+                        <option value="BELUM POSTING">STATUS : NOT POSTED</option>
+                        <option value="SUDAH POSTING">STATUS : POSTED</option>
                     </select>
                 </div>
                 <div class="col-md-3">
-                    <input autocomplete="one-time-code" class="form-control search form-out-search" placeholder="Cari No. SC / No. PO / Buyer" value="" />
+                    <input autocomplete="one-time-code" class="form-control search form-out-search" placeholder="Search Data" value="" />
                 </div>
             </div>
             <div class="row">
@@ -48,13 +48,12 @@
                             <tr>
                                 <th>No</th>
                                 <th onclick="changeSort('sales_contract_no')" class="sort">No. SC</th>
-                                <!-- <th onclick="changeSort('customer_po_no')" class="sort">No. PO</th> -->
                                 <th onclick="changeSort('customer_name')" class="sort">Buyer</th>
-                                <th onclick="changeSort('dicharge_port')" class="sort">Tujuan Pengiriman</th>
+                                <th onclick="changeSort('dicharge_port')" class="sort">Dicharge Port</th>
                                 <th onclick="changeSort('shipment_date')" class="sort">Shipment Date</th>
-                                <th onclick="changeSort('createdAt')" class="sort">Tanggal Pembuatan</th>
-                                <th class="sort">Keterangan Unpost</th>
-                                <th class="sort">Jumlah Unpost</th>
+                                <th onclick="changeSort('createdAt')" class="sort">Creation Date</th>
+                                <th class="sort">Unpost Description</th>
+                                <th class="sort">Number of Unposts</th>
                                 <th>Status</th>
                                 <th>Action</th>
                             </tr>
@@ -81,13 +80,13 @@
                     <div class="col-md-6">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <input autocomplete="one-time-code" type="text" class="form-control keterangan_unpost" name="keterangan_unpost" id="keterangan_unpost" placeholder="Keterangan Unpost">
-                            <label for="floatingInput">Keterangan Unpost</label>
+                            <label for="floatingInput">Note Unpost</label>
                         </div>
                     </div>
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-hide-detail btn-discard mr-3">Kembali</button>
+                <button type="button" class="btn btn-hide-detail btn-discard mr-3">Back</button>
                 <button type="button" onclick="updateStatus('NEW', '0')" class="btn btn-submit-form btn-submit-detail">Un Posting</button>
             </div>
         </div>
@@ -197,12 +196,12 @@
                                 </button>
                             <?php endif; ?>
                             <?php if (can('Penjualan Ekspor', 'Sales Kontrak', 'd')) : ?>
-                                <button data-toggle="tooltip" title="Hapus" onclick="remove('${id}')" class="btn btn-danger delete-parent">
+                                <button data-toggle="tooltip" title="Delete" onclick="remove('${id}')" class="btn btn-danger delete-parent">
                                     <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
                                 </button>
                             <?php endif; ?>
                                 <?php if (can('Penjualan Ekspor', 'Sales Kontrak', 'c')) : ?>
-                                    <button data-toggle="tooltip" title="Duplikasi" onclick="duplicate('${id}')" class="btn duplicate-btn text-white" style="background-color:#B8522A">
+                                    <button data-toggle="tooltip" title="Duplicate" onclick="duplicate('${id}')" class="btn duplicate-btn text-white" style="background-color:#B8522A">
                                         <i class="fa fa-copy fa-sm" aria-hidden="true"></i>
                                     </button>
                                 <?php endif; ?>
@@ -230,7 +229,7 @@
                         }
                         <?php if (can('Penjualan Ekspor', 'Sales Kontrak', 'c')) : ?>
                             res += `
-                                <button data-toggle="tooltip" title="Duplikasi" onclick="duplicate('${id}')" class="btn duplicate-btn text-white" style="background-color:#B8522A">
+                                <button data-toggle="tooltip" title="Duplicate" onclick="duplicate('${id}')" class="btn duplicate-btn text-white" style="background-color:#B8522A">
                                     <i class="fa fa-copy fa-sm" aria-hidden="true"></i>
                                 </button>
                             `;
@@ -256,7 +255,7 @@
             targets: "_all"
         }],
         language: {
-            emptyTable: "Tidak Ada Data",
+            emptyTable: "Data Empty",
             lengthMenu: "Show _MENU_ entries",
             paginate: {
                 previous: '<i class="fa fa-angle-left"></i>',
@@ -301,13 +300,13 @@
             }
             Swal.fire({
                 icon: 'question',
-                title: status == '1' ? 'Yakin akan diposting ?' : 'Batalkan Posting ?',
+                title: status == '1' ? 'Posted ?' : 'Unposted ?',
                 confirmButtonColor: '#4e73df',
                 cancelButtonColor: '#d33',
                 showCancelButton: true,
                 reverseButtons: true,
-                confirmButtonText: 'Simpan',
-                cancelButtonText: 'Kembali',
+                confirmButtonText: 'Save',
+                cancelButtonText: 'Back',
             }).then((result) => {
                 if (result.isConfirmed) {
                     const csrf = $(`[name="${csrfToken}"]`);
@@ -352,13 +351,13 @@
     const remove = function(id, tipe) {
         Swal.fire({
             icon: 'question',
-            title: 'Yakin akan di hapus?',
+            title: 'Delete Sales Kontrak ?',
             confirmButtonColor: '#4e73df',
             cancelButtonColor: '#d33',
             showCancelButton: true,
             reverseButtons: true,
-            confirmButtonText: 'Hapus',
-            cancelButtonText: 'Kembali',
+            confirmButtonText: 'Delete',
+            cancelButtonText: 'Back',
         }).then((result) => {
             if (result.isConfirmed) {
                 const csrf = $(`[name="${csrfToken}"]`);
@@ -396,12 +395,12 @@
 
     function duplicate(id) {
         Swal.fire({
-            title: 'Duplikasi Sales Kontrak ?',
+            title: 'Duplicate Sales Kontrak ?',
             icon: 'warning',
             showCancelButton: true,
             confirmButtonColor: '#3085d6',
             cancelButtonColor: '#d33',
-            confirmButtonText: 'Ya, duplikasi!',
+            confirmButtonText: 'Yes, duplicate!',
             cancelButtonText: 'Batal'
         }).then((result) => {
             if (result.isConfirmed) {

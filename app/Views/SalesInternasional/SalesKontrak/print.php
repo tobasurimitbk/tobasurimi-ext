@@ -170,9 +170,32 @@
             $total_amount = 0;
             $total_persen = 0;
             $no = 1;
+
+            // Buat array untuk mengelompokkan berdasarkan satuan
+            $groupBySatuan = [];
             foreach ($salesKontrakdetail as $detail) {
-                $total_qty = $total_qty + formatter($detail["qty"], "STR_TO_INT");
+                if (!empty($detail['size_breakdown'])) {
+                    foreach ($detail['size_breakdown'] as $breakdown) {
+                        $satuan = $breakdown['satuan_size_code'];
+                        if (!isset($groupBySatuan[$satuan])) {
+                            $groupBySatuan[$satuan] = [
+                                'qty' => 0,
+                                'total' => 0
+                            ];
+                        }
+                        $groupBySatuan[$satuan]['qty'] += $breakdown['qty'];
+                        $groupBySatuan[$satuan]['total'] += $breakdown['total'];
+                    }
+                }
+            }
+
+
+            $totalSalesKontrakdetail = count($salesKontrakdetail);
+            $currentItemSaleskontrakdetail = 0;
+            foreach ($salesKontrakdetail as $key => $detail) {
+                $currentItemSaleskontrakdetail++;
                 $total_amount = $total_amount + formatter($detail["total_harga"], "STR_TO_INT");
+                $total_qty += $detail['qty'];
             ?>
                 <tr style="border-bottom: 1px solid #eee;">
                     <td style="padding: 6px; border: 1px solid #ddd; vertical-align: top;"><?= $no++ ?></td>
@@ -296,8 +319,39 @@
                                 </table>
                             </div>
                         <?php endif; ?>
+
+                        <div style="margin-top:10px;">
+                            <?php if ($currentItemSaleskontrakdetail === $totalSalesKontrakdetail): ?>
+                                <?php if (!empty($groupBySatuan) && count($groupBySatuan) > 1) : ?>
+                                    <b>
+                                        TOTAL QTY
+                                    </b>
+                                    <table style="width: auto; border-collapse: collapse; font-size: 9px; margin-top: 5px;">
+                                        <thead>
+                                            <tr style="background-color: #f3f4f6;">
+                                                <?php foreach ($groupBySatuan as $satuan => $data): ?>
+                                                    <th style="padding: 5px; border: 1px solid #ddd; text-align: center;"><?= $satuan ?></th>
+                                                <?php endforeach; ?>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <?php
+                                                $grand_total_qty = 0;
+                                                foreach ($groupBySatuan as $satuan => $data):
+                                                    $grand_total_qty += $data['qty'];
+                                                ?>
+                                                    <td style="padding: 5px; border: 1px solid #ddd; text-align: right;"><?= number_format($data['qty'], 2) ?></td>
+                                                <?php endforeach; ?>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                <?php endif; ?>
+                            <?php endif; ?>
+                        </div>
                     </td>
                 </tr>
+
             <?php } ?>
 
             <?php
@@ -334,6 +388,17 @@
             // Calculate final amount
             $grand_total = $total_amount + $total_adjustments;
             ?>
+
+            <!-- Quantity Row -->
+            <?php if (count($groupBySatuan) == 1): ?>
+                <tr style="font-weight: bold; background-color: #e9ecef; font-size:10px;">
+                    <td style="padding: 6px; border: 1px solid #ddd;"></td>
+                    <td style="padding: 6px; border: 1px solid #ddd; text-align: right;">
+                        <span style="float: left;">TOTAL QTY</span>
+                        <?= number_format($total_qty, 2) ?>
+                    </td>
+                </tr>
+            <?php endif; ?>
 
             <!-- Royalty -->
             <?php if ($salesKontrak['royalty_price'] > 0): ?>
@@ -389,15 +454,6 @@
                     </td>
                 </tr>
             <?php endif; ?>
-
-            <!-- Quantity Row -->
-            <tr style="font-weight: bold; background-color: #e9ecef; font-size:10px;">
-                <td style="padding: 6px; border: 1px solid #ddd;"></td>
-                <td style="padding: 6px; border: 1px solid #ddd; text-align: right;">
-                    <span style="float: left;">TOTAL QTY</span>
-                    <?= number_format($total_qty, 2) ?>
-                </td>
-            </tr>
 
             <!-- Percentage Row (if exists) -->
             <!-- <?php if ($total_persen > 0): ?>

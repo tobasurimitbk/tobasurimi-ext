@@ -377,7 +377,7 @@ class SalesKontrak extends BaseController
 
         return response()->setJSON([
             'id' => encrypt($id),
-            'message' => "Sales Kontrak Berhasil Disimpan",
+            'message' => "Sales Kontrak Created",
             'token' => csrf_hash(),
             'status' => true
         ]);
@@ -550,7 +550,7 @@ class SalesKontrak extends BaseController
         $this->salesKontrakDetailModel->where('sales_contract_id', $id)->whereNotIn('id', $id_detail_all)->delete();
 
         return response()->setJSON([
-            'message' => "Sales Kontrak Berhasil Diupdate",
+            'message' => "Sales Kontrak Updated",
             'token' => csrf_hash(),
             'status' => true
         ]);
@@ -572,7 +572,7 @@ class SalesKontrak extends BaseController
         ]);
 
         return response()->setJSON([
-            'message' => "Status Posting Sales Kontrak Berhasil Diupdate",
+            'message' => "Status Post Updated",
             'token' => csrf_hash(),
             'status' => true
         ]);
@@ -590,7 +590,7 @@ class SalesKontrak extends BaseController
         $this->salesKontrakDetailModel->where('sales_contract_id', $id)->delete();
 
         return response()->setJSON([
-            'message' => "Status Posting Sales Kontrak Berhasil Dihapus",
+            'message' => "Sales Kontrak Deleted",
             'token' => csrf_hash(),
             'status' => true
         ]);
