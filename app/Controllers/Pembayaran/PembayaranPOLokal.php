@@ -1631,7 +1631,7 @@ class PembayaranPOLokal extends BaseController
         try {
             $id = decrypt($this->request->getVar('id'));
             $divisiId = decrypt($this->request->getVar('divisi_id'));
-            $currentStatus = $this->request->getVar('status') ?? 1;
+            $currentStatus = $this->request->getVar('status');
 
             $localPoPaymentBpModel = new LocalPOPaymentBPModel();
             

@@ -184,7 +184,7 @@
                         
                         <?php if (can('Pembayaran', 'Lokal BP', 'a')) : ?>
                             buttons += `
-                                <button onclick="posting('${id}', '${divisi_id}')" 
+                                <button onclick="posting('${id}', '${divisi_id}', '1')" 
                                         class="btn btn-success posting-spp"
                                         data-toggle="tooltip" title="Posting">
                                     <i class="fa fa-paper-plane fa-sm"></i>
@@ -194,7 +194,7 @@
                         // Posted state - show unpost button
                         <?php if (can('Pembayaran', 'Lokal BP', 'a')) : ?>
                             buttons += `
-                                <button onclick="posting('${id}', '${divisi_id}')" 
+                                <button onclick="posting('${id}', '${divisi_id}', '0')" 
                                         class="btn btn-danger"
                                         data-toggle="tooltip" title="Unpost">
                                     <i class="fa fa-undo fa-sm"></i>
@@ -310,7 +310,7 @@
             }
         });
     }
-    const posting = function(id, divisi_id) {
+    const posting = function(id, divisi_id, status) {
         Swal.fire({
             icon: 'question',
             title: 'Posting Pembayaran ?',
@@ -328,6 +328,7 @@
                     data: {
                         id: id,
                         divisi_id: divisi_id,
+                        status: status,
                     },
                     beforeSend: function(xhr) {
                         xhr.setRequestHeader('X-CSRF-Token', csrf.val());
