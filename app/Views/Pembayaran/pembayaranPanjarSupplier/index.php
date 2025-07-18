@@ -327,6 +327,7 @@
     let trigger = true;
     let details = [];
     let editingIndex = -1;
+    let isEditMode = false;
 
     const table = $('.dataTable').DataTable({
 
@@ -406,47 +407,37 @@
                     let id = row.id;
                     let is_posted = row.is_posted;
 
-                    if (is_posted === '0') {
+                    if (is_posted == '0') {
                         return `
                         <div class="btn-group" role="group">
-                            <?php if (can('PanjarSupplier', 'Posting', 'a')) : ?>
+                           
                                 <button data-toggle="tooltip" 
                                         title="Posting" 
                                         onclick="postPanjar('${id}')" 
                                         class="btn btn-success posting-panjar-supplier">
                                     <i class="fa fa-paper-plane fa-sm"></i>
                                 </button>
-                            <?php endif; ?>
 
-                            <?php if (can('PanjarSupplier', 'Delete', 'd')) : ?>
                                 <button data-toggle="tooltip" 
                                         title="Hapus" 
                                         onclick="confirmDelete('${id}')" 
                                         class="btn btn-danger">
                                     <i class="fa fa-trash fa-sm"></i>
                                 </button>
-                            <?php endif; ?>
                         </div>
                         `;
                     } else {
                         return `
                         <div class="btn-group" role="group">
-                            <?php if (can('PanjarSupplier', 'Unpost', 'a')) : ?>
                                 <button data-toggle="tooltip" 
                                         title="Unpost" 
                                         onclick="unpostPanjar('${id}')" 
                                         class="btn btn-warning">
                                     <i class="fa fa-undo fa-sm"></i>
                                 </button>
-                            <?php endif; ?>
                         </div>
                         `;
                     }
-                    // <div class="mt-0">
-                    //             <button  data-toggle="tooltip" title="Histori LPB" onclick="displayHistory('${id}')" class="btn btn-success posting-spp">
-                    //                 <i class="fa-solid fa-clock-rotate-left"></i>
-                    //             </button>
-                    //         <div>
 
 
                 }
@@ -736,12 +727,6 @@
         dropdownParent: $(".add-modal .modal-content")
     });
 
-    $('#jenis').select2({
-        placeholder: "Pilih Jenis",
-        theme: "bootstrap-5",
-        dropdownParent: $(".add-modal .modal-content")
-    });
-
     $('#supplier_id').select2({
         placeholder: "Pilih Supplier",
         theme: "bootstrap-5",
@@ -749,21 +734,36 @@
     });
 
 
+    $('#jenis').select2({
+        placeholder: "Pilih Jenis",
+        theme: "bootstrap-5",
+        dropdownParent: $(".add-modal .modal-content")
+    }).change(function() {
+        if (!$('#id').val()) { // Only generate if not in edit mode (no ID present)
+            generatePaymentNumber();    
+        }
+    });
+
     $('#divisi_id').select2({
-            placeholder: "Pilih Departemen",
-            theme: "bootstrap-5",
-            dropdownParent: $('#add_modal .modal-content') // Updated to match modal structure
+        placeholder: "Pilih Departemen",
+        theme: "bootstrap-5",
+        dropdownParent: $('#add_modal .modal-content')
     }).change(function() {
+        if (!$('#id').val()) { // Only generate if not in edit mode
             generatePaymentNumber();    
+        }
     });
-        
+
     $('#bank_id').select2({
-            placeholder: "Pilih Bank",
-            theme: "bootstrap-5",
-            dropdownParent: $('#add_modal .modal-content') // Updated to match modal structure
+        placeholder: "Pilih Bank",
+        theme: "bootstrap-5",
+        dropdownParent: $('#add_modal .modal-content')
     }).change(function() {
+        if (!$('#id').val()) { // Only generate if not in edit mode
             generatePaymentNumber();    
+        }
     });
+    
 
     $("#tipe_supplier, #supplier_id, #tipe, #jenis_transaksi, #jenis")
         .parent('div')
@@ -861,6 +861,8 @@
                     // Populate parent form
                     $('#id').val(res.data.transaction.id);
                     $('#no_transaksi').val(res.data.transaction.no_transaction);
+                    $('#divisi_id').val(res.data.transaction.divisi_id).trigger('change');
+                    $('#bank_id').val(res.data.transaction.bank_id).trigger('change');
                     $('#jenis').val(res.data.transaction.type).trigger('change');
                     $('#tipe_supplier').val(res.data.supplier?.type || '');
                     $('#keterangan').val(res.data.transaction.keterangan || '');
@@ -1183,6 +1185,8 @@
                         // Add main form data
                         data.append('no_transaksi', $('#no_transaksi').val());
                         data.append('jenis', $('#jenis').val());
+                        data.append('bank_id', $('#bank_id').val());
+                        data.append('divisi_id', $('#divisi_id').val());
                         data.append('tipe_supplier', $('#tipe_supplier').val());
                         data.append('supplier_id', $('#supplier_id').val());
                         data.append('keterangan', $('#keterangan').val());

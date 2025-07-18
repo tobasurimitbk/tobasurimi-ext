@@ -405,9 +405,6 @@ class PanjarSupplier extends BaseController
 
             // Update status di semua tabel terkait
             $this->panjarPinjamanTransactionModel->update($id, ['is_posted' => $currentStatus]);
-            $this->pinjamanSupplierModel->where('transaction_id', $id)->set('is_posted', $currentStatus)->update();
-            $this->panjarSupplierModel->where('transaction_id', $id)->set('is_posted', $currentStatus)->update();
-
             // Tentukan aksi berdasarkan status
             if ($currentStatus == 1) {
                 // Jika status 1 (posting), jalankan insert jurnal
@@ -431,11 +428,6 @@ class PanjarSupplier extends BaseController
             ]);
 
         } catch (\Exception $e) {
-            // Rollback status jika gagal
-            $rollbackStatus = $this->request->getVar('status') == 1 ? 0 : 1;
-            $this->panjarPinjamanTransactionModel->update($id, ['is_posted' => $rollbackStatus]);
-            $this->pinjamanSupplierModel->where('transaction_id', $id)->set('is_posted', $rollbackStatus)->update();
-            $this->panjarSupplierModel->where('transaction_id', $id)->set('is_posted', $rollbackStatus)->update();
 
             return $this->response->setJSON([
                 "status" => false,
@@ -820,6 +812,8 @@ class PanjarSupplier extends BaseController
                     "type" => $transaction->type,
                     "createdAt" => $transaction->createdAt,
                     "keterangan" => $transaction->keterangan,
+                    "divisi_id" => $transaction->divisi_id,
+                    "bank_id" => $transaction->bank_id,
                     "is_posted" => $transaction->is_posted ?? 0,
                     "total_panjar" => $totalPanjar,
                     "total_pinjaman" => $totalPinjaman,

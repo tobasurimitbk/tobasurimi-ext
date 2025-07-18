@@ -166,45 +166,80 @@ class PanjarSupplierModel extends Model
 
     public function getPanjarSupplierbySupplierId($id, $companyId)
     {
+        // First get transactions from panjar_pinjaman_transaction
+        $transactions = $this->db->table('panjar_pinjaman_transaction')
+            ->select('panjar_pinjaman_transaction.*')
+            ->where([
+                'supplier_id' => $id,
+                'company_id' => $companyId,
+                'deletedAt' => null,
+                'is_posted' => '1'
+            ])
+            ->get()
+            ->getResult();
 
-        $condition = [
-            'panjar_supplier.supplier_id ' => $id,
-            'panjar_supplier.deletedAt' => null,
-            'panjar_supplier.jenis_panjar' => "PANJAR",
-            'is_posted' => '1',
-            'panjar_supplier.company_id' => $companyId
-        ];
+        if (empty($transactions)) {
+            return [];
+        }
 
-        $selectQry = "panjar_supplier.*";
-        $panjarSupplierData = $this->asObject()
-            ->select($selectQry)
-            // ->join('local_po_payment_panjar', 'panjar_supplier.id = local_po_payment_panjar.panjar_id', 'left')
-            ->where($condition)
-            ->findAll();
+        // Get all transaction IDs
+        $transactionIds = array_column($transactions, 'id');
+
+        // Then get panjar data related to these transactions
+        $panjarSupplierData = $this->db->table('panjar_supplier')
+            ->select('panjar_supplier.*')
+            ->join('panjar_pinjaman_transaction', 'panjar_supplier.transaction_id = panjar_pinjaman_transaction.id')
+            ->where([
+                'panjar_supplier.supplier_id' => $id,
+                'panjar_supplier.deletedAt' => null,
+                'panjar_supplier.jenis_panjar' => "PANJAR",
+                'panjar_supplier.company_id' => $companyId,
+                'panjar_pinjaman_transaction.id' => $transactionIds
+            ])
+            ->get()
+            ->getResult();
 
         return $panjarSupplierData;
     }
 
 
-    public function getPanjarTBSupplierbySupplierId($id, $companyId)
+   public function getPanjarTBSupplierbySupplierId($id, $companyId)
     {
+        // First get transactions from panjar_pinjaman_transaction
+        $transactions = $this->db->table('panjar_pinjaman_transaction')
+            ->select('panjar_pinjaman_transaction.*')
+            ->where([
+                'supplier_id' => $id,
+                'company_id' => $companyId,
+                'deletedAt' => null,
+                'is_posted' => '1'
+            ])
+            ->get()
+            ->getResult();
 
-        $condition = [
-            'panjar_supplier.supplier_id ' => $id,
-            'panjar_supplier.deletedAt' => null,
-            'panjar_supplier.jenis_panjar' => "PANJAR_TB",
-            'is_posted' => '1',
-            'panjar_supplier.company_id' => $companyId
-        ];
+        if (empty($transactions)) {
+            return [];
+        }
 
-        $selectQry = "panjar_supplier.*";
-        $panjarSupplierData = $this->asObject()
-            ->select($selectQry)
-            // ->join('local_po_payment_panjar', 'panjar_supplier.id = local_po_payment_panjar.panjar_id', 'left')
-            ->where($condition)
-            ->findAll();
+        // Get all transaction IDs
+        $transactionIds = array_column($transactions, 'id');
 
-        return $panjarSupplierData;
+        // Then get PANJAR_TB data related to these transactions
+        $panjarTBSupplierData = $this->db->table('panjar_supplier')
+            ->select('panjar_supplier.*')
+            ->join('panjar_pinjaman_transaction', 'panjar_supplier.transaction_id = panjar_pinjaman_transaction.id')
+            ->where([
+                'panjar_supplier.supplier_id' => $id,
+                'panjar_supplier.deletedAt' => null,
+                'panjar_supplier.jenis_panjar' => "PANJAR_TB",
+                'panjar_supplier.is_posted' => '1',
+                'panjar_supplier.company_id' => $companyId,
+                'panjar_pinjaman_transaction.id' => $transactionIds
+            ])
+            ->get()
+            ->getResult();
+
+        return $panjarTBSupplierData;
     }
 
 
