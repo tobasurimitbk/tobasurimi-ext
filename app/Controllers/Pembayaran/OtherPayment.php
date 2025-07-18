@@ -379,15 +379,43 @@ class OtherPayment extends BaseController
 
     public function posting()
     {
-        $id = decrypt($this->request->getVar('id'));
-        $this->jurnalController->insertDataPembayaran($id, "LAIN-LAIN", null);
-        // exit;
-        $this->otherPaymentModel->update($id, ['status_posting' => '1']);
+        try {
+            $id = decrypt($this->request->getVar('id'));
+            $currentStatus = $this->request->getVar('status') ?? 1; // Default to posting if not specified
 
-        return response()->setJSON([
-            'status' => true,
-            'token' => csrf_hash(),
-            'message' => "Pembayaran berhasil diposting"
-        ]);
+            // Update posting status
+            $this->otherPaymentModel->update($id, ['status_posting' => $currentStatus]);
+
+            if ($currentStatus == 1) {
+                // POSTING LOGIC
+                $result = $this->jurnalController->insertDataPembayaran($id, "LAIN-LAIN", null);
+                $message = "Pembayaran berhasil diposting";
+            } else {
+                // UNPOSTING LOGIC
+                $result = $this->jurnalController->unpostDataPembayaran($id, "LAIN-LAIN", null);
+                $message = "Pembayaran berhasil diunpost";
+            }
+
+            if (!$result['status']) {
+                throw new \Exception($result['message']);
+            }
+
+            return response()->setJSON([
+                'status' => true,
+                'token' => csrf_hash(),
+                'message' => $message,
+                'new_status' => $currentStatus
+            ]);
+
+        } catch (\Exception $e) {
+            // Rollback status update if error occurs
+            $this->otherPaymentModel->update($id, ['status_posting' => $currentStatus ? 0 : 1]);
+
+            return response()->setJSON([
+                'status' => false,
+                'token' => csrf_hash(),
+                'message' => "Gagal memproses: " . $e->getMessage()
+            ]);
+        }
     }
 }

@@ -1548,62 +1548,103 @@ class PembayaranPOLokal extends BaseController
 
     public function postingPoLokalBB()
     {
-        $localPOPaymentModel = new LocalPOPaymentModel();
-        $localPOPaymentPanjarModel = new LocalPOPaymentPanjarModel();
-        $localPOPaymentPinjamanModel = new LocalPOPaymentPinjamanModel();
+        try {
+            $id = decrypt($this->request->getVar('id'));
+            $divisiId = decrypt($this->request->getVar('divisi_id'));
+            $currentStatus = $this->request->getVar('status') ?? 1; // Default to posting if not specified
 
-        $id = decrypt($this->request->getVar('id'));
-        $localPOPaymentModel->update($id, ['status_posting' => '1']);
+            $localPOPaymentModel = new LocalPOPaymentModel();
+            $localPOPaymentPanjarModel = new LocalPOPaymentPanjarModel();
+            $localPOPaymentPinjamanModel = new LocalPOPaymentPinjamanModel();
 
-        $dataPayPanjar = $localPOPaymentPanjarModel->where('local_po_payment_id', $id)->select('id')->findAll();
-        $dataPayPinjaman = $localPOPaymentPinjamanModel->where('local_po_payment_id', $id)->select('id')->findAll();
+            // Update main status
+            $localPOPaymentModel->update($id, ['status_posting' => $currentStatus]);
 
-        foreach ($dataPayPanjar as $payPanjar) {
-            $this->jurnalController->inserDataPembayaranPanjar($payPanjar['id'], "PANJAR", $this->request->getVar('divisi_id'));
+            // Get related panjar/pinjaman
+            $dataPayPanjar = $localPOPaymentPanjarModel->where('local_po_payment_id', $id)->select('id')->findAll();
+            $dataPayPinjaman = $localPOPaymentPinjamanModel->where('local_po_payment_id', $id)->select('id')->findAll();
+
+            if ($currentStatus == 1) {
+                // POSTING LOGIC
+                foreach ($dataPayPanjar as $payPanjar) {
+                    $this->jurnalController->inserDataPembayaranPanjar($payPanjar['id'], "PANJAR", $divisiId);
+                }
+                foreach ($dataPayPinjaman as $payPinjaman) {
+                    $this->jurnalController->inserDataPembayaranPinjaman($payPinjaman['id'], "PINJAMAN", $divisiId);
+                }
+                $result = $this->jurnalController->insertDataPembayaran($id, "LOKAL BB", $divisiId);
+                $message = "Pembayaran berhasil diposting";
+            } else {
+                // UNPOSTING LOGIC
+                foreach ($dataPayPanjar as $payPanjar) {
+                    $this->jurnalController->unpostDataPembayaranPanjar($payPanjar['id'], "PANJAR", $divisiId);
+                }
+                foreach ($dataPayPinjaman as $payPinjaman) {
+                    $this->jurnalController->unpostDataPembayaranPinjaman($payPinjaman['id'], "PINJAMAN", $divisiId);
+                }
+                $result = $this->jurnalController->unpostDataPembayaran($id, "LOKAL BB", $divisiId);
+                $message = "Pembayaran berhasil diunpost";
+            }
+
+            if (!$result['status']) {
+                throw new \Exception($result['message']);
+            }
+
+            return response()->setJSON([
+                'token' => csrf_hash(),
+                'status' => true,
+                'message' => $message,
+                'new_status' => $currentStatus
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->setJSON([
+                'token' => csrf_hash(),
+                'status' => false,
+                'message' => "Gagal memproses: " . $e->getMessage()
+            ]);
         }
-
-        foreach ($dataPayPinjaman as $payPinjaman) {
-            $this->jurnalController->inserDataPembayaranPinjaman($payPinjaman['id'], "PINJAMAN", $this->request->getVar('divisi_id'));
-        }
-
-        $result = $this->jurnalController->insertDataPembayaran($id, "LOKAL BB", decrypt($this->request->getVar('divisi_id')));
-
-        return response()->setJSON([
-            'token' => csrf_hash(),
-            'status' => true,
-            'message' => "Pembayaran berhasil diposting"
-        ]);
     }
 
     public function postingPoLokalBP()
     {
-        $localPoPaymentBpModel = new LocalPOPaymentBPModel();
+        try {
+            $id = decrypt($this->request->getVar('id'));
+            $divisiId = decrypt($this->request->getVar('divisi_id'));
+            $currentStatus = $this->request->getVar('status') ?? 1; // Default to posting if not specified
 
-        $id = decrypt($this->request->getVar('id'));
-        $localPoPaymentBpModel->update($id, ['status_posting' => '1']);
-        $localPoPaymentBp = $localPoPaymentBpModel->where('id', $id)->first();
+            $localPoPaymentBpModel = new LocalPOPaymentBPModel();
+            
+            // Update main status
+            $localPoPaymentBpModel->update($id, ['status_posting' => $currentStatus]);
 
-        $result = $this->jurnalController->insertDataPembayaran($id, "LOKAL BP", decrypt($this->request->getVar('divisi_id')));
+            if ($currentStatus == 1) {
+                // POSTING LOGIC
+                $result = $this->jurnalController->insertDataPembayaran($id, "LOKAL BP", $divisiId);
+                $message = "Pembayaran berhasil diposting";
+            } else {
+                // UNPOSTING LOGIC
+                $result = $this->jurnalController->unpostDataPembayaran($id, "LOKAL BP", $divisiId);
+                $message = "Pembayaran berhasil diunpost";
+            }
 
-        return response()->setJSON([
-            'token' => csrf_hash(),
-            'status' => true,
-            'message' => "Pembayaran berhasil diposting"
-        ]);
-    }
+            if (!$result['status']) {
+                throw new \Exception($result['message']);
+            }
 
-    public function unposting()
-    {
-        $localPOPaymentModel = new LocalPOPaymentModel();
+            return response()->setJSON([
+                'token' => csrf_hash(),
+                'status' => true,
+                'message' => $message,
+                'new_status' => $currentStatus
+            ]);
 
-        $id = decrypt($this->request->getVar('id'));
-        $localPOPaymentModel->update($id, ['status_posting' => '0']);
-        // $result = $this->jurnalController->insertDataPembayaran($id, "LOKAL");
-
-        return response()->setJSON([
-            'token' => csrf_hash(),
-            'status' => true,
-            'message' => "Pembayaran berhasil diunposting"
-        ]);
+        } catch (\Exception $e) {
+            return response()->setJSON([
+                'token' => csrf_hash(),
+                'status' => false,
+                'message' => "Gagal memproses: " . $e->getMessage()
+            ]);
+        }
     }
 }
