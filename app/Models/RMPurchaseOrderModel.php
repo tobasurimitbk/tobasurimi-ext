@@ -524,8 +524,8 @@ class RMPurchaseOrderModel extends Model
         $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
 
         if (!empty($addCondition['sort'])) {
-            if ($addCondition['sort'] == "rm_purchase_orders.po_no" || $addCondition['sort'] == "poNum") {
-                $sort = 'rm_purchase_orders.po_no';
+            if ($addCondition['sort'] == "rm_purchase_orders.po_date" || $addCondition['sort'] == "poDate") {
+                $sort = 'rm_purchase_orders.po_date, rm_purchase_orders.po_no';
                 $sortType = 'ASC';
             }
         } else {
