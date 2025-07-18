@@ -44,12 +44,14 @@
                                 <th style="width: 10px;">No</th>
                                 <th onclick="changeSort('request_date')" class="sort">Tanggal</th>
                                 <th onclick="changeSort('wo_no')" class="sort">Kode Produksi</th>
-                                <th onclick="changeSort('nama_barang')" class="sort">Barang Jadi</th>
+                                <th onclick="changeSort('barang1_id')" class="sort">Barang Jadi</th>
                                 <th onclick="changeSort('department')" class="sort">Departemen</th>
-                                <th>Action</th>
+                                <th onclick="changeSort('warehouse_id')" class="sort">Warehouse</th>
+                                <th onclick="changeSort('work_order_details.qty')" class="sort">Qty Target</th>
+                                <th style="width: 100px;">Action</th>
                             </tr>
                         </thead>
-                        <tbody class="body-table" id="body-table" style="cursor: pointer;">
+                        <tbody class="body-table" id="body-table">
 
                         </tbody>
                     </table>
@@ -114,19 +116,30 @@
             },
             {
                 data: "request_date",
-                className: "text-center"
+                className: "text-left"
             },
             {
                 data: "wo_no",
-                className: "text-center"
+                className: "text-left"
             },
             {
-                data: "nama_barang",
-                className: "text-center"
+                data: "barang_name",
+                className: "text-left"
             },
             {
-                data: "nama_divisi",
-                className: "text-center"
+                data: "divisi",
+                className: "text-left"
+            },
+            {
+                data: "warehouse_name",
+                className: "text-left"
+            },
+            {
+                data: "qty",
+                className: "text-left",
+                render: function(data) {
+                    return greatFormatRupiah(data);
+                }
             },
             {
                 data: "id",
@@ -135,24 +148,19 @@
                 sortable: false,
                 render: function(data, type, row) {
                     let id = row.id;
-                    // let id_material_request = row.id_material_request;
-                    let id_production_result = row.id_production_result;
 
                     let buttonsHTML = `
                         <div class="mt-0">
                     `;
-                    buttonsHTML += `
-                        <button data-toggle="tooltip" title="Material Request" onclick="toMaterialRequest()" class="btn btn-success text-white">
-                            <i class="fa fa-copy fa-sm" aria-hidden="true"></i>
-                        </button>
-                    `;
-                    // if (id_production_result) {
-                    //     buttonsHTML += `
-                    //         <button class="btn btn-warning to-production-result" onclick="toProductionResult('${id_production_result}')" >
-                    //             <i class="fa fa-folder fa-sm" aria-hidden="true"></i>
-                    //         </button>
-                    //     `;
-                    // }
+
+                    <?php if (can('Produksi', 'Work Order', 'u')): ?>
+                        buttonsHTML += `
+                            <a href="javascript:void(0)" onclick="edit('${id}')" data-toggle="tooltip" title="Edit" class="btn btn-primary">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                        `;
+                    <?php endif; ?>
+
                     // Tombol hapus selalu ditampilkan
                     <?php if (can('Produksi', 'Work Order', 'd')): ?>
                         buttonsHTML += `
@@ -161,6 +169,7 @@
                             </button>
                         `;
                     <?php endif; ?>
+
                     buttonsHTML += `
                         </div>
                     `;
@@ -286,6 +295,11 @@
             }
         })
     }
+
+    const edit = function(id) {
+        location.replace(`<?= base_url("work-order/details"); ?>/${id}`);
+    }
+
     const toMaterialRequest = function(id) {
         // console.log(id);
         // if (id != 0) {

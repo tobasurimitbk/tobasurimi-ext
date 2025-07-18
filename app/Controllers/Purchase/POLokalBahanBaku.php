@@ -331,11 +331,11 @@ class POLokalBahanBaku extends BaseController
         }
 
         if ($first != null) {
-            return response()->setJSON([
-                'token' => csrf_hash(),
-                'message' => "No Purchase Order " . $first['po_no'] . ". Sudah dipakai di Company " . $first['company'],
-                'status' => false
-            ]);
+            // GENERATE YANG BARU
+            $po_no = $this->getNumberPo();
+        } else {
+            // AMBIL YANG LAMA
+            $po_no = $this->request->getVar("po_no");
         }
 
         $id = $this->RMPurchaseOrderModel->insert([
@@ -349,7 +349,7 @@ class POLokalBahanBaku extends BaseController
             "kemasan_id" => $this->request->getVar('kemasan_id'),
             "jumlah_kemasan" => $this->request->getVar('jumlah_kemasan'),
             "kemasan_tambahan" => $this->request->getVar('kemasan_tambahan'),
-            "po_no" =>  $this->request->getVar("po_no"),
+            "po_no" =>  $po_no,
             "po_date" => $this->request->getVar("po_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getVar("po_date")))) : "",
             "pph" => $this->request->getVar("pph"),
             "cong_sebenarnya" => $this->request->getVar("cong_sebenarnya") ? formatter($this->request->getVar("cong_sebenarnya"), "STR_TO_INT") : 0,
@@ -1162,6 +1162,12 @@ class POLokalBahanBaku extends BaseController
 
     public function generateNoPO()
     {
+        $no = $this->getNumberPo();
+        return json_encode($no);
+    }
+
+    private function getNumberPo()
+    {
         // yyyy-mm-dd
         $tanggal = date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("tanggal"))));
         $tanggalExplode = explode('-', $tanggal);
@@ -1173,6 +1179,7 @@ class POLokalBahanBaku extends BaseController
             $year,
             $this->this_company_id
         );
-        return json_encode($no);
+
+        return $no;
     }
 }

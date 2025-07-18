@@ -138,19 +138,17 @@ class WorkOrder extends BaseController
         $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
 
         foreach ($workOrdersData['data'] as $data) {
-            // $materialRequestData = $this->materialRequestModel->asObject()->where('work_order_id', $data->id)->where('deletedAt', null)->where('is_posted', 1)->find();
-            // $materialRequestId = isset($materialRequestData[0]->id) ? $materialRequestData[0]->id : null;
             $productionData = $this->productionResultModel->asObject()->where('work_order_id', $data->id)->where('deletedAt', null)->find();
             $productionResultId = isset($productionData[0]->id) ? $productionData[0]->id : null;
             array_push($dataWorkOrders, [
                 "no"                    => $no++,
                 "id"                    => encrypt($data->id),
-                // "id_material_request"   => $materialRequestId ? encrypt($materialRequestId) : 0,
                 'request_date'          => date('d/m/Y', strtotime($data->request_date)),
-                "id_production_result"  => $productionResultId ? encrypt($productionResultId) : 0,
                 "wo_no"                 => $data->wo_no,
-                "nama_barang"           => $data->nama_barang,
-                "nama_divisi"           => $data->divisi,
+                "barang_name"           => $data->barang_name,
+                "divisi"                => $data->divisi,
+                "warehouse_name"        => $data->warehouse_name,
+                "qty"                   => $data->qty,
             ]);
         }
 
