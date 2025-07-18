@@ -158,6 +158,7 @@
 
                             <div class="row">
                                 <div class="col-md-12 text-end">
+                                    <button type="button" class="btn btn-success btn-update-detail" style="display:none;">Update Detail</button>
                                     <button type="button" class="btn btn-primary btn-add-detail">Tambah Detail</button>
                                 </div>
                             </div>
@@ -325,6 +326,7 @@
     let sortType = "desc";
     let trigger = true;
     let details = [];
+    let editingIndex = -1;
 
     const table = $('.dataTable').DataTable({
 
@@ -655,6 +657,54 @@
         $('.add-modal').modal('hide');
     });
 
+    // Modal close handler - Reset semua state
+    $('#add_modal').on('hidden.bs.modal', function() {
+        // 1. Reset form utama
+        $('.create-form')[0].reset();
+        
+        // 2. Reset select2
+        $('.form-select').val('').trigger('change');
+        
+        // 3. Clear detail table
+        $('#detail-table tbody').empty();
+        
+        // 4. Reset array details
+        details = [];
+        
+        // 5. Reset editing state
+        editingIndex = -1;
+        
+        // 6. Reset tombol
+        $('.btn-add-detail').show();
+        $('.btn-update-detail').hide();
+        
+        // 7. Reset validasi
+        $('.is-invalid').removeClass('is-invalid');
+        $('.has-error').removeClass('has-error');
+        $('.text-danger').remove();
+        
+        // 8. Reset field khusus
+        $('#auto_generate').show();
+        $('#no_transaksi').val('').prop('disabled', false);
+        
+        // 9. Reset title dan tombol delete
+        $(".title-name").text("Tambah Data Panjar & Pinjaman");
+        $(".delete-btn").hide();
+        
+        // 10. Reset ID jika ada
+        $("#id").val('');
+    });
+
+    // Fungsi reset tambahan yang bisa dipanggil manual
+    function resetAllForm() {
+        $('#add_modal').modal('hide'); // Ini akan trigger event hidden.bs.modal
+    }
+
+    // Contoh implementasi tombol cancel/batal
+    $('.btn-cancel-form').click(function() {
+        resetAllForm();
+    });
+
     // $('#tipe_supplier').select2({
     //     placeholder: "Pilih Tipe Supplier",
     //     theme: "bootstrap-5",
@@ -718,6 +768,39 @@
         $(this).valid();
     });
 
+
+    $(document).on('click', '.btn-edit-detail', function(e) {
+        e.preventDefault();
+        const index = $(this).data('index');
+        editDetail(index);
+    });
+
+    function editDetail(index) {
+        const detail = details[index];
+        
+        // Isi field biasa
+        $('#tanggal').val(detail.tanggal);
+        $('#jenis_transaksi').val(detail.jenis_transaksi).trigger('change');
+        $('#nominal_pembayaran').val(detail.nominal_pembayaran);
+        $('#keterangan_detail').val(detail.keterangan);
+        
+        // Inisialisasi Select2 untuk akun_kas
+        const akunKasOption = new Option(detail.akun_kas_name, detail.akun_kas, true, true);
+        $('#akun_kas').append(akunKasOption).trigger('change');
+        
+        // Inisialisasi Select2 untuk akun_selisih
+        const akunSelisihOption = new Option(detail.akun_selisih_name, detail.akun_selisih, true, true);
+        $('#akun_selisih').append(akunSelisihOption).trigger('change');
+        
+        // Set index yang sedang diedit
+        editingIndex = index;
+        
+        // Ubah tampilan tombol
+        $('.btn-add-detail').hide();
+        $('.btn-update-detail').show();
+    }
+
+
     // Refresh details table
     function refreshDetailsTable() {
         const tbody = $('#detail-table tbody');
@@ -731,11 +814,10 @@
                         <td>${detail.nominal_pembayaran}</td>
                         <td>${detail.akun_kas_name || detail.akun_kas}</td>
                         <td>${detail.akun_selisih_name || detail.akun_selisih}</td>
-                         <td>${detail.keterangan}</td>
+                        <td>${detail.keterangan}</td>
                         <td>
-                            <button class="btn btn-danger btn-sm btn-remove-detail" data-index="${index}">
-                                <i class="fas fa-trash"></i>
-                            </button>
+                            <button type="button" class="btn btn-primary btn-sm btn-edit-detail" data-index="${index}">Edit</button>
+                            <button type="button" class="btn btn-danger btn-sm btn-remove-detail" data-index="${index}">Hapus</button>
                         </td>
                     </tr>
                 `);
@@ -876,6 +958,41 @@
             minimumInputLength: 3
         });
 
+         // Fungsi untuk update detail yang sedang diedit
+        function updateDetail() {
+            if (!validateDetails()) {
+                refreshValidation();
+                return;
+            }
+
+            const detail = {
+                tanggal: $('#tanggal').val(),
+                jenis_transaksi: $('#jenis_transaksi').val(),
+                nominal_pembayaran: $('#nominal_pembayaran').val(),
+                akun_kas: $('#akun_kas').val(),
+                akun_selisih: $('#akun_selisih').val(),
+                keterangan: $('#keterangan_detail').val()
+            };
+
+            // Update data di array details
+            details[editingIndex] = detail;
+            
+            // Refresh tabel
+            refreshDetailsTable();
+            
+            // Reset form dan editing state
+            clearDetailForm();
+            editingIndex = -1;
+            $('.btn-update-detail').hide();
+            $('.btn-add-detail').show();
+        }   
+
+
+        // Event handler untuk tombol update
+        $(document).on('click', '.btn-update-detail', function(e) {
+            e.preventDefault();
+            updateDetail();
+        });
 
         $('.btn-add-detail').click(function() {
             if (!validateDetails()) {
@@ -911,11 +1028,11 @@
             refreshValidation();
         });
 
-        // Clear detail form
         function clearDetailForm() {
-            $('#tanggal, #nominal_pembayaran').val('');
-            $('#jenis_transaksi, #akun_kas, #akun_selisih, #keterangan_detail').val('').trigger('change');
+            $('#tanggal, #nominal_pembayaran, #keterangan_detail').val('');
+            $('#jenis_transaksi, #akun_kas, #akun_selisih').val('').trigger('change');
         }
+
 
 
         // Custom validation for details
@@ -1025,7 +1142,6 @@
 
         // Handle submit form
         $(".btn-submit-form").click(function() {
-            console.log($('#jenis').val())
             if ($(".create-form").valid()) {
                 // Validate if there are details
                 if (details.length === 0) {
