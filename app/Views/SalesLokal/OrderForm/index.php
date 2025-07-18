@@ -267,11 +267,6 @@
             table.ajax.reload();
         })
 
-        $('#dataTable tbody').on('click', 'tr td:not(.actions):not(.dataTables_empty)', function() {
-            const data = table.row(this).data();
-            location.replace(`<?= base_url("order-form-lokal/id"); ?>/${data.id}`);
-        })
-
         $(".dateStart, .dateEnd, .filter_customer, .filter_surat_jalan, .filter_invoice").change(function() {
             table.ajax.reload();
         });
@@ -390,6 +385,11 @@
 
                     if (posting == 0) {
                         return `
+                            <?php if (can('Penjualan Lokal', 'Order Form', 'u')) : ?>
+                                <a href="javascript:void(0)" onclick="edit('${id}')" data-toggle="tooltip" title="Edit" class="btn btn-primary">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                            <?php endif; ?>
                             <button data-toggle="tooltip" title="Histori Harga Barang" onclick="displayHistory('${id}')" class="btn btn-success posting-spp">
                                 <i class="fa-solid fa-clock-rotate-left"></i>
                             </button>
@@ -405,6 +405,11 @@
                         `;
                     } else {
                         return `
+                            <?php if (can('Penjualan Lokal', 'Order Form', 'u')) : ?>
+                                <a href="javascript:void(0)" onclick="edit('${id}')" data-toggle="tooltip" title="Edit" class="btn btn-primary">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                            <?php endif; ?>
                             <button data-toggle="tooltip" title="Print" class="btn btn-warning btn-print" onclick="print('<?= base_url("order-form-lokal/print/"); ?>${id}')" style="box-shadow: none !important;">
                                 <i class="fa fa-print fa-sm" aria-hidden="true"></i>
                             </button>
@@ -591,6 +596,10 @@
 
     const print = function(url) {
         window.open(url, "_blank");
+    }
+
+    function edit(id){
+        location.replace(`<?= base_url("order-form-lokal/id"); ?>/${id}`);
     }
 </script>
 <?= $this->endSection(); ?>

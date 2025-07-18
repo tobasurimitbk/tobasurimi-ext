@@ -295,7 +295,7 @@
                                 <button  data-toggle="tooltip" title="Print" class="btn btn-warning btn-print" onclick="print('<?= base_url("po-lokal-bahan-baku/print/"); ?>${id}')" style="box-shadow: none !important;">
                                     <i class="fa fa-print fa-sm" aria-hidden="true"></i>
                                 </button>
-                                <?php if ($this_role_name == "KASIR") : ?>
+                                <?php if ($this_role_name == "KASIR" || can('Pembayaran', 'Lokal BB', 'p')) : ?>
                                     <button  data-toggle="tooltip" title="Print Pengeluaran" class="btn btn-success btn-print" onclick="print('<?= base_url("po-lokal-bahan-baku/print-pengeluaran/"); ?>${id}')" style="box-shadow: none !important;">
                                         <i class="fa fa-print fa-sm" aria-hidden="true"></i>
                                     </button>
@@ -316,7 +316,7 @@
                                 <button  data-toggle="tooltip" title="Print" class="btn btn-warning btn-print" onclick="print('<?= base_url("po-lokal-bahan-baku/print/"); ?>${id}')" style="box-shadow: none !important;">
                                     <i class="fa fa-print fa-sm" aria-hidden="true"></i>
                                 </button>
-                                <?php if ($this_role_name == "KASIR") : ?>
+                                <?php if ($this_role_name == "KASIR" || can('Pembayaran', 'Lokal BB', 'p')) : ?>
                                     <button  data-toggle="tooltip" title="Print Pengeluaran" class="btn btn-success btn-print" onclick="print('<?= base_url("po-lokal-bahan-baku/print-pengeluaran/"); ?>${id}')" style="box-shadow: none !important;">
                                         <i class="fa fa-print fa-sm" aria-hidden="true"></i>
                                     </button>

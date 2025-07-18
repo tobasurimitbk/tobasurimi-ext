@@ -12,9 +12,8 @@
         }
 
         @page {
-            size: 8.27in 5.50in landscape;
-            margin: 0px;
-            padding: 0px;
+            size: A4;
+            margin: 10mm;
         }
 
         .align-items-center {
@@ -100,19 +99,20 @@
 
 <body style="border: 0px solid;font-size: 11px;">
 
-    <div style="margin: 25px; padding: 25px; page-break-after: always;" class="">
+    <div style="margin: 10px; padding: 10px;" class="">
         <table class="w-100">
             <tr>
                 <td>
                     <table>
+                        
                         <tr>
-                            <td>BUKTI PENGELUARAN</td>
+                            <td style="font-size: 14px; font-weight: bold;">BUKTI PENGELUARAN</td>
                             <td>
-                                <div style="margin-bottom: 0.25rem;">
+                                <div style="margin-bottom: 0.25rem;margin-left: 70px">
                                     <div class="box-sm bukti-pengeluaran"></div>
                                     <div class="bukti-pengeluaran">KAS</div>
                                 </div>
-                                <div>
+                                <div style="margin-left: 70px">
                                     <div class="box-sm bukti-pengeluaran"></div>
                                     <div class="bukti-pengeluaran">BANK</div>
                                 </div>
@@ -158,7 +158,7 @@
                 <table>
                     <tr>
                         <td>NO BUKTI:</td>
-                        <td></td>
+                        <td style="border-bottom: 1px solid #000; width: 170px;"></td>
                     </tr>
                 </table>
             </div>
@@ -166,9 +166,9 @@
 
         <table class="w-100 bank-table border-collapse">
             <tr>
-                <th class="txt-left" style="width: 300px;">KETERANGAN</th>
-                <th class="txt-right">JUMLAH</th>
-                <th class="txt-left">NO. PERKIRAAN</th>
+                <th class="txt-center" style="width: 400px;">KETERANGAN</th>
+                <th class="txt-center">JUMLAH</th>
+                <th class="txt-center">NO. PERKIRAAN</th>
             </tr>
             <tr>
                 <td>Pembayaran <?= $supplierName ?> sebanyak <?= $totalQty . " " . $kode_satuan ?> (No: <?= $po_no ?>)</td>
@@ -215,19 +215,21 @@
         </table>
     </div>
 
-    <div style="margin: 25px; padding: 25px; page-break-after: always;" class="">
+    <hr style="margin-top: 25px;margin-bottom: 10px;border: 1px dotted #000;">
+
+    <div style="margin: 10px; padding: 10px;" class="">
         <table class="w-100">
             <tr>
                 <td>
                     <table>
                         <tr>
-                            <td>BUKTI PENGELUARAN</td>
+                            <td style="font-size: 14px; font-weight: bold;">BUKTI PENGELUARAN</td>
                             <td>
-                                <div style="margin-bottom: 0.25rem;">
+                                <div style="margin-bottom: 0.25rem;margin-left: 70px">
                                     <div class="box-sm bukti-pengeluaran"></div>
                                     <div class="bukti-pengeluaran">KAS</div>
                                 </div>
-                                <div>
+                                <div style="margin-left: 70px">
                                     <div class="box-sm bukti-pengeluaran"></div>
                                     <div class="bukti-pengeluaran">BANK</div>
                                 </div>
@@ -273,7 +275,7 @@
                 <table>
                     <tr>
                         <td>NO BUKTI:</td>
-                        <td></td>
+                        <td style="border-bottom: 1px solid #000; width: 170px;"></td>
                     </tr>
                 </table>
             </div>
@@ -281,9 +283,9 @@
 
         <table class="w-100 bank-table border-collapse">
             <tr>
-                <th class="txt-left" style="width: 300px;">KETERANGAN</th>
-                <th class="txt-right">JUMLAH</th>
-                <th class="txt-left">NO. PERKIRAAN</th>
+                <th class="txt-center" style="width: 400px;">KETERANGAN</th>
+                <th class="txt-center">JUMLAH</th>
+                <th class="txt-center">NO. PERKIRAAN</th>
             </tr>
             <tr>
                 <td>Pembayaran <?= $supplierName ?> sebanyak <?= $totalQty . " " . $kode_satuan ?> (No: <?= $po_no ?>)</td>
@@ -330,19 +332,22 @@
         </table>
     </div>
 
-    <div style="margin: 25px; padding: 25px;" class="">
+    <hr style="margin-top: 25px;margin-bottom: 10px;border: 1px dotted #000;">
+
+    <div style="margin: 10px; padding: 10px;" class="">
         <table class="w-100">
             <tr>
                 <td>
                     <table>
+                        
                         <tr>
-                            <td>BUKTI PENGELUARAN</td>
+                            <td style="font-size: 14px; font-weight: bold;">BUKTI PENGELUARAN</td>
                             <td>
-                                <div style="margin-bottom: 0.25rem;">
+                                <div style="margin-bottom: 0.25rem;margin-left: 70px">
                                     <div class="box-sm bukti-pengeluaran"></div>
                                     <div class="bukti-pengeluaran">KAS</div>
                                 </div>
-                                <div>
+                                <div style="margin-left: 70px">
                                     <div class="box-sm bukti-pengeluaran"></div>
                                     <div class="bukti-pengeluaran">BANK</div>
                                 </div>
@@ -388,7 +393,7 @@
                 <table>
                     <tr>
                         <td>NO BUKTI:</td>
-                        <td></td>
+                        <td style="border-bottom: 1px solid #000; width: 170px;"></td>
                     </tr>
                 </table>
             </div>
@@ -396,9 +401,9 @@
 
         <table class="w-100 bank-table border-collapse">
             <tr>
-                <th class="txt-left" style="width: 300px;">KETERANGAN</th>
-                <th class="txt-right">JUMLAH</th>
-                <th class="txt-left">NO. PERKIRAAN</th>
+                <th class="txt-center" style="width: 400px;">KETERANGAN</th>
+                <th class="txt-center">JUMLAH</th>
+                <th class="txt-center">NO. PERKIRAAN</th>
             </tr>
             <tr>
                 <td>Pembayaran <?= $supplierName ?> sebanyak <?= $totalQty . " " . $kode_satuan ?> (No: <?= $po_no ?>)</td>

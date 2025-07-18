@@ -176,11 +176,6 @@
             table.ajax.reload();
         })
 
-        $('#dataTable tbody').on('click', 'tr td:not(.actions):not(.dataTables_empty)', function() {
-            const data = table.row(this).data();
-            location.replace(`<?= base_url("surat-jalan/id"); ?>/${data.id}`);
-        })
-
         $(".dateStart, .dateEnd, .filter_customer, .filter_invoice").change(function() {
             table.ajax.reload();
         });
@@ -307,7 +302,14 @@
                     `;
                 }
 
-                return `${btn_print}${btn_delete}${btn_posting}`;
+                <?php if (can('Penjualan Lokal', 'Surat Jalan', 'u')) : ?>
+                    btn_edit = `
+                    <a href="javascript:void(0)" onclick="edit('${id}')" data-toggle="tooltip" title="Edit" class="btn btn-primary">
+                        <i class="fas fa-edit"></i>
+                    </a>`;
+                <?php endif; ?>
+
+                return `${btn_edit}${btn_print}${btn_delete}${btn_posting}`;
             }
         }],
         columnDefs: [{
@@ -456,6 +458,10 @@
 
     const print = function(url) {
         window.open(url, "_blank");
+    }
+
+    function edit(id){
+        location.replace(`<?= base_url("surat-jalan/id"); ?>/${id}`);
     }
 </script>
 <?= $this->endSection(); ?>
