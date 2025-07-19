@@ -11,6 +11,7 @@
             font-size: 12px;
             font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
             text-transform: uppercase;
+            /* font-weight: normal; */
         }
 
         @page {
@@ -29,6 +30,7 @@
         .cong-table tr td {
             border: 0 !important;
             border-right: 1px solid !important;
+            font-weight: normal;
         }
 
         .content-between {
@@ -44,6 +46,7 @@
             /* border: 1px solid; */
             border-collapse: collapse;
             border-spacing: 10px;
+            font-weight: normal;
         }
 
         .item-table tr td {
@@ -82,8 +85,11 @@
             text-align: center;
         }
 
-        .txt-bold {
+        /* .txt-bold {
             font-weight: 700;
+        } */
+        .column-table-normal {
+            font-weight: normal;
         }
 
         .txt-left {
@@ -127,6 +133,7 @@
             justify-content: space-around;
             margin-top: 1rem;
             width: 100%;
+            font-weight: normal;
         }
 
         .sign-row>div,
@@ -138,7 +145,7 @@
 
         .sign-row-second {
             text-align: center;
-            font-weight: bold;
+            /* font-weight: bold; */
             padding-bottom: 10px;
         }
 
@@ -149,7 +156,7 @@
 
         .sign-name {
             text-align: center;
-            font-style: bold;
+            /* font-style: bold; */
         }
 
         /* 
@@ -235,9 +242,9 @@
             margin-top: 2rem
         } */
 
-        .txt-bold {
+        /* .txt-bold {
             font-weight: 700;
-        }
+        } */
 
         .txt-center {
             text-align: center;
@@ -274,7 +281,7 @@
         }
 
         .title {
-            font-weight: bold;
+            /* font-weight: bold; */
             font-size: 25px;
             text-decoration: underline;
         }
@@ -329,12 +336,12 @@
             </table>
             <table class="item-table">
                 <tr>
-                    <th>PETI / TONG</th>
-                    <th>DEPARTEMEN</th>
-                    <th>KETERANGAN</th>
-                    <th class="txt-right">QTY (KG)</th>
-                    <th class="txt-right">HARGA @</th>
-                    <th class="txt-right">TOTAL</th>
+                    <th class="column-table-normal">PETI / TONG</th>
+                    <th class="column-table-normal">DEPARTEMEN</th>
+                    <th class="column-table-normal">KETERANGAN</th>
+                    <th class="txt-right column-table-normal">QTY (KG)</th>
+                    <th class="txt-right column-table-normal">HARGA @</th>
+                    <th class="txt-right column-table-normal">TOTAL</th>
                 </tr>
                 <?php
                 $nilai_total = 0;
@@ -379,14 +386,14 @@
                     </tr>
                 <?php } ?>
                 <tr>
-                    <td colspan="3" style="border-top: 1px solid black;border-left: none!important;text-align: right; font-weight:bold;height:5%;font-size:13px;">Total Qty</td>
-                    <td class="txt-right" style="border-top: 1px solid black; border-left: 1px solid black; border-bottom: 1px solid black; font-weight:bold;height:5%;font-size:13px;"><?= $dataPO->totalQty ?></td>
-                    <td class="txt-right" style="border-top: 1px solid black; border-left: 1px solid black; font-weight:bold;height:5%;font-size:13px;">JUMLAH</td>
-                    <td class="txt-right" style="border: 1px solid black;font-size:13px;font-weight:bold;"><?= number_format(formatter($nilai_total, "STR_TO_FLOAT"), 2, '.', ',') ?></td>
+                    <td colspan="3" style="border-top: 1px solid black;border-left: none!important;text-align: right; height:5%;font-size:13px;">Total Qty</td>
+                    <td class="txt-right" style="border-top: 1px solid black; border-left: 1px solid black; border-bottom: 1px solid black; height:5%;font-size:13px;"><?= $dataPO->totalQty ?></td>
+                    <td class="txt-right" style="border-top: 1px solid black; border-left: 1px solid black; height:5%;font-size:13px;">JUMLAH</td>
+                    <td class="txt-right" style="border: 1px solid black;font-size:13px;"><?= number_format(formatter($nilai_total, "STR_TO_FLOAT"), 2, '.', ',') ?></td>
                 </tr>
                 <tr>
-                    <td class="skip" colspan="5" style="border: none;text-align: right; font-weight:bold;height:5%;font-size:13px;;">PPH</td>
-                    <td class="txt-right" style="border: 1px solid black; font-weight:bold;height:5%;font-size:13px;">
+                    <td class="skip" colspan="5" style="border: none;text-align: right;height:5%;font-size:13px;;">PPH</td>
+                    <td class="txt-right" style="border: 1px solid black;height:5%;font-size:13px;">
                         <?php if ($dataPO->pph === "Company" || $dataPO->pph === "Supplier") { ?>
                             <?= number_format(($nilai_total * $dataPO->nilai_pph2), 2, '.', ',') ?>
                         <?php } else { ?>
@@ -395,8 +402,8 @@
                     </td>
                 </tr>
                 <tr>
-                    <td class="skip" colspan="5" style="border: none!important;text-align: right; font-weight:bold;height:5%;font-size:13px;">DIBAYARKAN</td>
-                    <td class="txt-right" style="border: 1px solid black; font-weight:bold;height:5%;font-size:13px;">
+                    <td class="skip" colspan="5" style="border: none!important;text-align: right;height:5%;font-size:13px;">DIBAYARKAN</td>
+                    <td class="txt-right" style="border: 1px solid black;height:5%;font-size:13px;">
                         <?php
                         if ($dataPO->pph === "Company" || $dataPO->pph === "Supplier") {
                             echo number_format($nilai_total - ($nilai_total * $dataPO->nilai_pph2), 2, '.', ',');
@@ -483,12 +490,12 @@
             </table>
 
             <table class="mt-1" style="width: 30%;border: 0;border-bottom: 3px solid;border-style: double;">
-                <tr style="font-size:13px;font-weight:bold;">
+                <tr style="font-size:13px;">
                     <td>Bruto</td>
                     <td>Rp.</td>
                     <td class="txt-right"><?= number_format(formatter($nilai_total, "STR_TO_FLOAT"), 2, '.', ',') ?></td>
                 </tr>
-                <tr style="font-size:13px;font-weight:bold;">
+                <tr style="font-size:13px;">
                     <td>PPh</td>
                     <td>Rp.</td>
                     <?php if ($dataPO->pph === "Company" || $dataPO->pph === "Supplier") { ?>
@@ -502,7 +509,7 @@
                     <td>Rp.</td>
                     <td class="txt-right"><?= number_format(formatter($dataPO->subsidi_langsung, "STR_TO_FLOAT"), 2, '.', ',') ?></td>
                 </tr> -->
-                <tr style="font-size:13px;font-weight:bold;">
+                <tr style="font-size:13px;">
                     <td>Dibayarkan</td>
                     <td>Rp.</td>
                     <?php if ($dataPO->pph === "Company") { ?>
@@ -571,12 +578,12 @@
             </table>
 
             <table class="mt-05" style="width: 30%;border: 0;border-bottom: 3px solid;border-style: double;">
-                <tr style="font-size:13px;font-weight:bold;">
+                <tr style="font-size:13px;">
                     <td>Bruto</td>
                     <td>Rp.</td>
                     <td class="txt-right"><?= number_format(formatter($nilai_total_harian, "STR_TO_FLOAT"), 2, '.', ',') ?></td>
                 </tr>
-                <tr class="table-bordered" style="font-size:13px;font-weight:bold;">
+                <tr class="table-bordered" style="font-size:13px;">
                     <td>PPh</td>
                     <td>Rp.</td>
                     <?php if ($dataPO->pph === "Company" || $dataPO->pph === "Supplier") { ?>
@@ -590,7 +597,7 @@
                     <td>Rp.</td>
                     <td class="txt-right"><?= number_format(formatter($dataPO->subsidi_langsung, "STR_TO_FLOAT"), 2, '.', ',') ?></td>
                 </tr> -->
-                <tr style="font-size:13px;font-weight:bold;">
+                <tr style="font-size:13px;">
                     <td>Dibayarkan</td>
                     <td>Rp.</td>
                     <?php if ($dataPO->pph === "Company") { ?>
@@ -643,69 +650,69 @@
             <?php if ($dataPO->pph === "Company") { ?>
                 <table class="cong-table item-table txt-right" style="border: 1px solid black;">
                     <tr>
-                        <th>QTY</th>
-                        <th>CONG SEBENARNYA</th>
-                        <th>CONG BATASAN</th>
-                        <th>SELISIH</th>
-                        <th>TOTAL TAMBAHAN</th>
+                        <th class="column-table-normal" style="height: 5%;">QTY</th>
+                        <th class="column-table-normal">CONG SEBENARNYA</th>
+                        <th class="column-table-normal">CONG BATASAN</th>
+                        <th class="column-table-normal">SELISIH</th>
+                        <th class="column-table-normal">TOTAL TAMBAHAN</th>
                     </tr>
                     <tr>
-                        <td><?= htmlspecialchars($dataPO->totalQty ?? 0) ?></td>
-                        <td><?= number_format($dataPO->cong_sebenarnya ?? 0, 2, '.', ',') ?></td>
-                        <td><?= number_format($dataPO->cong_batasan ?? 0, 2, '.', ',') ?></td>
-                        <td><?= number_format(abs($dataPO->selisih) ?? 0, 2, '.', ',') ?></td>
-                        <td style="border: 1px solid black !important;"><?= number_format(abs($dataPO->totalTambahan) ?? 0, 2, '.', ',') ?></td>
+                        <td style="height: 5%;font-size:13px;"><?= htmlspecialchars($dataPO->totalQty ?? 0) ?></td>
+                        <td style="height: 5%;font-size:13px;"><?= number_format($dataPO->cong_sebenarnya ?? 0, 2, '.', ',') ?></td>
+                        <td style="height: 5%;font-size:13px;"><?= number_format($dataPO->cong_batasan ?? 0, 2, '.', ',') ?></td>
+                        <td style="height: 5%;font-size:13px;"><?= number_format(abs($dataPO->selisih) ?? 0, 2, '.', ',') ?></td>
+                        <td style="border: 1px solid black !important;font-size:13px;"><?= number_format(abs($dataPO->totalTambahan) ?? 0, 2, '.', ',') ?></td>
                     </tr>
                     <tr>
-                        <td></td>
+                        <td style="height: 5%;"></td>
                         <td></td>
                         <td></td>
                         <td>PPH</td>
-                        <td style="border: 1px solid black !important;"><?= number_format(abs(($dataPO->totalTambahan ?? 0) * ($dataPO->nilai_pph2 ?? 0)), 2, '.', ',') ?></td>
+                        <td style="border: 1px solid black !important;font-size:13px;"><?= number_format(abs(($dataPO->totalTambahan ?? 0) * ($dataPO->nilai_pph2 ?? 0)), 2, '.', ',') ?></td>
                     </tr>
                     <tr>
-                        <td></td>
+                        <td style="height: 5%;"></td>
                         <td></td>
                         <td></td>
                         <td>DIBAYARKAN</td>
-                        <td style="border: 1px solid black;"><?= number_format(
-                                                                    abs(($dataPO->totalTambahan ?? 0)  - (($dataPO->totalTambahan ?? 0) * ($dataPO->nilai_pph2 ?? 0))),
-                                                                    2,
-                                                                    '.',
-                                                                    ','
-                                                                ) ?></td>
+                        <td style="border: 1px solid black;font-size:13px;"><?= number_format(
+                                                                                abs(($dataPO->totalTambahan ?? 0)  - (($dataPO->totalTambahan ?? 0) * ($dataPO->nilai_pph2 ?? 0))),
+                                                                                2,
+                                                                                '.',
+                                                                                ','
+                                                                            ) ?></td>
                     </tr>
                 </table>
             <?php } elseif ($dataPO->pph === "Supplier") { ?>
                 <table class="cong-table item-table txt-right" style="border: 1px solid black;">
                     <tr>
-                        <th>QTY</th>
-                        <th>CONG SEBENARNYA</th>
-                        <th>CONG BATASAN</th>
-                        <th>SELISIH</th>
-                        <th>TOTAL TAMBAHAN</th>
+                        <th class="column-table-normal" style="height: 5%;">QTY</th>
+                        <th class="column-table-normal">CONG SEBENARNYA</th>
+                        <th class="column-table-normal">CONG BATASAN</th>
+                        <th class="column-table-normal">SELISIH</th>
+                        <th class="column-table-normal">TOTAL TAMBAHAN</th>
                     </tr>
                     <tr>
-                        <td><?= htmlspecialchars($dataPO->totalQty ?? 0) ?></td>
-                        <td><?= number_format($dataPO->cong_sebenarnya ?? 0, 2, '.', ',') ?></td>
-                        <td><?= number_format($dataPO->cong_batasan ?? 0, 2, '.', ',') ?></td>
-                        <td><?= number_format(abs($dataPO->selisih) ?? 0, 2, '.', ',') ?></td>
-                        <td style="border: 1px solid black !important;"><?= number_format(abs($dataPO->totalTambahan) ?? 0, 2, '.', ',') ?></td>
+                        <td style="height: 5%;font-size:13px;"><?= htmlspecialchars($dataPO->totalQty ?? 0) ?></td>
+                        <td style="height: 5%;font-size:13px;"><?= number_format($dataPO->cong_sebenarnya ?? 0, 2, '.', ',') ?></td>
+                        <td style="height: 5%;font-size:13px;"><?= number_format($dataPO->cong_batasan ?? 0, 2, '.', ',') ?></td>
+                        <td style="height: 5%;font-size:13px;"><?= number_format(abs($dataPO->selisih) ?? 0, 2, '.', ',') ?></td>
+                        <td style="border: 1px solid black !important;font-size:13px;"><?= number_format(abs($dataPO->totalTambahan) ?? 0, 2, '.', ',') ?></td>
                     </tr>
 
                     <tr>
-                        <td></td>
+                        <td style="height: 5%;"></td>
                         <td></td>
                         <td></td>
                         <td>PPH</td>
-                        <td style="border: 1px solid black !important;"><?= number_format(abs(($dataPO->totalTambahan ?? 0) * ($dataPO->nilai_pph2 ?? 0)), 2, '.', ',') ?></td>
+                        <td style="border: 1px solid black !important;font-size:13px;"><?= number_format(abs(($dataPO->totalTambahan ?? 0) * ($dataPO->nilai_pph2 ?? 0)), 2, '.', ',') ?></td>
                     </tr>
                     <tr>
-                        <td></td>
+                        <td style="height: 5%;"></td>
                         <td></td>
                         <td></td>
                         <td>DIBAYARKAN</td>
-                        <td style="border: 1px solid black !important;">
+                        <td style="border: 1px solid black !important;font-size:13px;">
                             <?= number_format(
                                 abs(($dataPO->totalTambahan ?? 0)  - (($dataPO->totalTambahan ?? 0) * ($dataPO->nilai_pph2 ?? 0))),
                                 2,
@@ -717,50 +724,50 @@
             <?php } else { ?>
                 <table class="cong-table item-table txt-right" style="border: 1px solid black;">
                     <tr>
-                        <th>QTY</th>
-                        <th>CONG SEBENARNYA</th>
-                        <th>CONG BATASAN</th>
-                        <th>SELISIH</th>
-                        <th>TOTAL TAMBAHAN</th>
+                        <th class="column-table-normal" style="height: 5%;">QTY</th>
+                        <th class="column-table-normal">CONG SEBENARNYA</th>
+                        <th class="column-table-normal">CONG BATASAN</th>
+                        <th class="column-table-normal">SELISIH</th>
+                        <th class="column-table-normal">TOTAL TAMBAHAN</th>
                     </tr>
                     <tr>
-                        <td><?= htmlspecialchars($dataPO->totalQty ?? 0) ?></td>
-                        <td><?= number_format($dataPO->cong_sebenarnya ?? 0, 2, '.', ',') ?></td>
-                        <td><?= number_format($dataPO->cong_batasan ?? 0, 2, '.', ',') ?></td>
-                        <td><?= number_format(abs($dataPO->selisih) ?? 0, 2, '.', ',') ?></td>
-                        <td style="border: 1px solid black !important;"><?= number_format(abs($dataPO->totalTambahan) ?? 0, 2, '.', ',') ?></td>
+                        <td style="height: 5%;font-size:13px;"><?= htmlspecialchars($dataPO->totalQty ?? 0) ?></td>
+                        <td style="height: 5%;font-size:13px;"><?= number_format($dataPO->cong_sebenarnya ?? 0, 2, '.', ',') ?></td>
+                        <td style="height: 5%;font-size:13px;"><?= number_format($dataPO->cong_batasan ?? 0, 2, '.', ',') ?></td>
+                        <td style="height: 5%;font-size:13px;"><?= number_format(abs($dataPO->selisih) ?? 0, 2, '.', ',') ?></td>
+                        <td style="border: 1px solid black !important;font-size:13px;"><?= number_format(abs($dataPO->totalTambahan) ?? 0, 2, '.', ',') ?></td>
                     </tr>
 
                     <tr>
-                        <td></td>
+                        <td style="height: 5%;"></td>
                         <td></td>
                         <td></td>
                         <td>PPH</td>
                         <?php if ($dataPO->pph === "Company" || $dataPO->pph === "Supplier"): ?>
-                            <td style="border: 1px solid black !important;"><?= number_format(abs(($dataPO->totalTambahan ?? 0) * ($dataPO->nilai_pph2 ?? 0)), 2, '.', ',') ?></td>
+                            <td style="border: 1px solid black !important;font-size:13px;"><?= number_format(abs(($dataPO->totalTambahan ?? 0) * ($dataPO->nilai_pph2 ?? 0)), 2, '.', ',') ?></td>
                         <?php else: ?>
-                            <td style="border: 1px solid black !important;">0.00</td>
+                            <td style="border: 1px solid black !important;font-size:13px;">0.00</td>
                         <?php endif ?>
                     </tr>
                     <tr>
-                        <td></td>
+                        <td style="height: 5%;"></td>
                         <td></td>
                         <td></td>
                         <td>DIBAYARKAN</td>
                         <?php if ($dataPO->pph === "Company" || $dataPO->pph === "Supplier"): ?>
-                            <td style="border: 1px solid black !important;"><?= number_format(
-                                                                                abs(($dataPO->totalTambahan ?? 0)  - (($dataPO->totalTambahan ?? 0) * ($dataPO->nilai_pph2 ?? 0))),
-                                                                                2,
-                                                                                '.',
-                                                                                ','
-                                                                            ) ?></td>
+                            <td style="border: 1px solid black !important;font-size:13px;"><?= number_format(
+                                                                                                abs(($dataPO->totalTambahan ?? 0)  - (($dataPO->totalTambahan ?? 0) * ($dataPO->nilai_pph2 ?? 0))),
+                                                                                                2,
+                                                                                                '.',
+                                                                                                ','
+                                                                                            ) ?></td>
                         <?php else: ?>
-                            <td style="border: 1px solid black !important;"><?= number_format(
-                                                                                abs(($dataPO->totalTambahan ?? 0)),
-                                                                                2,
-                                                                                '.',
-                                                                                ','
-                                                                            ) ?>
+                            <td style="border: 1px solid black !important;font-size:13px;"><?= number_format(
+                                                                                                abs(($dataPO->totalTambahan ?? 0)),
+                                                                                                2,
+                                                                                                '.',
+                                                                                                ','
+                                                                                            ) ?>
                             </td>
                         <?php endif ?>
                     </tr>
@@ -771,16 +778,16 @@
             <table class="w-100 sign-table border-collapse signed-info footer mt-3" style="border: none!important;">
                 <tr style="border: none!important;">
                     <th>
-                        <div class="sign-row-second">Dibuat Oleh</div>
+                        <div class="sign-row-second column-table-normal">Dibuat Oleh</div>
                     </th>
                     <th>
-                        <div class="sign-row-second">Diketahui</div>
+                        <div class="sign-row-second column-table-normal">Diketahui</div>
                     </th>
                     <th>
-                        <div class="sign-row-second">Disetujui</div>
+                        <div class="sign-row-second column-table-normal">Disetujui</div>
                     </th>
                     <th>
-                        <div class="sign-row-second">Yang Menerima</div>
+                        <div class="sign-row-second column-table-normal">Yang Menerima</div>
                     </th>
                 </tr>
                 <tr style="border: none!important;">
@@ -850,12 +857,12 @@
             </table>
             <table class="item-table-lpb mt-050">
                 <tr>
-                    <th class="txt-left" style="text-align:center; width: 30px;">No</th>
-                    <th class="txt-left" style=" text-align:center; width: 150px;">No PO</th>
-                    <th class="txt-left" style="text-align:center; width: 40px;">Qty</th>
-                    <th class="txt-left" style="text-align:center; width: 30px;">Satuan</th>
-                    <th class="txt-left" style="text-align:center; width: 60px;">Jumlah</th>
-                    <th class="txt-left" style="text-align:center; width: 60px;">Keterangan</th>
+                    <th class="txt-left column-table-normal" style="text-align:center; width: 30px;">No</th>
+                    <th class="txt-left column-table-normal" style=" text-align:center; width: 150px;">No PO</th>
+                    <th class="txt-left column-table-normal" style="text-align:center; width: 40px;">Qty</th>
+                    <th class="txt-left column-table-normal" style="text-align:center; width: 30px;">Satuan</th>
+                    <th class="txt-left column-table-normal" style="text-align:center; width: 60px;">Jumlah</th>
+                    <th class="txt-left column-table-normal" style="text-align:center; width: 60px;">Keterangan</th>
                 </tr>
 
                 <?php
@@ -877,17 +884,17 @@
                     </tr>
                 <?php endforeach; ?>
                 <tr>
-                    <td class="txt-left" style="padding-left: 5px" colspan="4"><b>TOTAL</b></td>
+                    <td class="txt-left column-table-normal" style="padding-left: 5px" colspan="4">TOTAL</td>
                     <td class="txt-right" style="text-align:center;"><?= number_format($dataPO->lpb->total_before_pph, 2, '.', ','); ?></td>
                     <td></td>
                 </tr>
                 <tr>
-                    <td class="txt-left" style="padding-left: 5px" colspan="4"><b>PPh</b></td>
+                    <td class="txt-left column-table-normal" style="padding-left: 5px" colspan="4">PPh</td>
                     <td class="txt-right" style="text-align:center;"><?= number_format($dataPO->lpb->total_before_pph - $dataPO->lpb->total_after_pph, 2, '.', ','); ?></td>
                     <td></td>
                 </tr>
                 <tr>
-                    <td class="txt-left" style="padding-left: 5px" colspan="4"><b>TOTAL DIBAYARKAN</b></td>
+                    <td class="txt-left column-table-normal" style="padding-left: 5px" colspan="4">TOTAL DIBAYARKAN</td>
                     <td class="txt-right" style="text-align:center;"><?= number_format($dataPO->lpb->total_after_pph, 2, '.', ','); ?></td>
                     <td></td>
                 </tr>

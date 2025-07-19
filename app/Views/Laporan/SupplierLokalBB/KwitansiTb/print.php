@@ -10,6 +10,7 @@
             font-size: 15px;
             font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
             text-transform: uppercase;
+            font-weight: normal;
         }
 
         @page {
@@ -160,17 +161,17 @@
     <?php foreach ($kwitansis['all'] as $i => $kwitansi) : ?>
         <?php if ($i == 0) : ?>
             <div style="text-align: right;">
-                <b>
-                    <u>
-                        Tanggal: <?= date('d-m-Y', strtotime($tanggal))  ?>
-                    </u>
-                </b><br><br>
-                <b>Kwitansi Bulanan</b> <br>
+
+                <u>
+                    Tanggal: <?= date('d-m-Y', strtotime($tanggal))  ?>
+                </u>
+                <br><br>
+                Kwitansi Bulanan <br>
                 No. Nota : <?= $noKwitansi ?>
             </div>
             <div class="w-50 d-flex content-between" style="margin-top: -40px;">
                 <div style="border: 3px solid;border-style: double;width: 60%;padding: 0.5rem;">
-                    <b><?= $company['holding_company'] ?> (<?= $company['company'] ?>)</b> <br>
+                    <?= $company['holding_company'] ?> (<?= $company['company'] ?>) <br>
                 </div>
 
             </div>

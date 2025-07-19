@@ -7,13 +7,13 @@
     <title>Bukti Pengeluaran Lokal BB</title>
     <style>
         body {
-            font-size: 12px;
+            font-size: 30px;
             font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
         }
 
         @page {
-            size: A4;
-            margin: 10mm;
+            size: LEGAL;
+            margin: 3mm;
         }
 
         .align-items-center {
@@ -41,14 +41,6 @@
             display: inline-block;
             vertical-align: middle;
         }
-
-        /* .d-flex {
-            display: flex;
-        }
-
-        .flex-1 {
-            flex: 1;
-        } */
 
         .flex-column {
             flex-direction: column;
@@ -97,16 +89,19 @@
     </style>
 </head>
 
-<body style="border: 0px solid;font-size: 11px;">
+<body style="border: 0px solid;font-size: 12px;">
 
-    <div style="margin: 10px; padding: 10px;" class="">
+    <br>
+    <br>
+    <br>
+
+    <div style="margin: 10px; padding: 10px; margin-top: 30px" class="">
         <table class="w-100">
             <tr>
                 <td>
                     <table>
-                        
                         <tr>
-                            <td style="font-size: 14px; font-weight: bold;">BUKTI PENGELUARAN</td>
+                            <td style="font-size: 18px; font-weight: bold;"><u>BUKTI PENGELUARAN</u></td>
                             <td>
                                 <div style="margin-bottom: 0.25rem;margin-left: 70px">
                                     <div class="box-sm bukti-pengeluaran"></div>
@@ -146,11 +141,11 @@
                 <table>
                     <tr>
                         <td>TGL</td>
-                        <td>: <?= date('d-m-Y', strtotime($po_date)) ?></td>
+                        <td>. <u><?= date('d-M-Y', strtotime($po_date)) ?></u></td>
                     </tr>
                     <tr>
                         <td>DIBAYAR KEPADA</td>
-                        <td>: <?= $supplierName ?></td>
+                        <td>: <u><?= $supplierName ?></u></td>
                     </tr>
                 </table>
             </div>
@@ -168,23 +163,23 @@
             <tr>
                 <th class="txt-center" style="width: 400px;">KETERANGAN</th>
                 <th class="txt-center">JUMLAH</th>
-                <th class="txt-center">NO. PERKIRAAN</th>
+                <th class="txt-center" style="width: 100px;">NO. PERKIRAAN</th>
             </tr>
             <tr>
-                <td>Pembayaran <?= $supplierName ?> sebanyak <?= $totalQty . " " . $kode_satuan ?> (No: <?= $po_no ?>)</td>
-                <td class="txt-right"><?= $totalPaid ?></td>
+                <td>Pembayaran <?= $barangName ?> sebanyak <?= $totalQty . " " . $kode_satuan ?> (No: <?= $po_no ?>)</td>
+                <td class="txt-right">Rp <?= $totalPaid ?></td>
                 <td></td>
             </tr>
             <tr>
                 <th class="txt-right">TOTAL</th>
-                <th class="txt-right"><?= $totalPaid ?></th>
+                <th class="txt-right">Rp <?= $totalPaid ?></th>
                 <th></th>
             </tr>
         </table>
 
         <div style="margin-top: 0.5rem;margin-bottom: 0.5rem">
             <span>TERBILANG:</span>
-            <span style="text-transform: uppercase;"><?= ($totalPaidTerbilang) . ' RUPIAH' ?></span>
+            <span style="text-transform: uppercase;"><u><?= ($totalPaidTerbilang) . ' RUPIAH' ?></u></span>
         </div>
 
         <table class="w-100 sign-table border-collapse">
@@ -215,15 +210,16 @@
         </table>
     </div>
 
-    <hr style="margin-top: 25px;margin-bottom: 10px;border: 1px dotted #000;">
+    <hr style="margin-top: 50px;margin-bottom: 45px;border: 1px dotted #000;">
+    <br>
 
-    <div style="margin: 10px; padding: 10px;" class="">
+    <div style="margin: 10px; padding: 10px; margin-top: 30px">
         <table class="w-100">
             <tr>
                 <td>
                     <table>
                         <tr>
-                            <td style="font-size: 14px; font-weight: bold;">BUKTI PENGELUARAN</td>
+                            <td style="font-size: 18px; font-weight: bold;"><u>BUKTI PENGELUARAN</u></td>
                             <td>
                                 <div style="margin-bottom: 0.25rem;margin-left: 70px">
                                     <div class="box-sm bukti-pengeluaran"></div>
@@ -263,11 +259,11 @@
                 <table>
                     <tr>
                         <td>TGL</td>
-                        <td>: <?= date('d-m-Y', strtotime($po_date)) ?></td>
+                        <td>. <u><?= date('d-M-Y', strtotime($po_date)) ?></u></td>
                     </tr>
                     <tr>
                         <td>DIBAYAR KEPADA</td>
-                        <td>: <?= $supplierName ?></td>
+                        <td>: <u><?= $supplierName ?></u></td>
                     </tr>
                 </table>
             </div>
@@ -285,23 +281,23 @@
             <tr>
                 <th class="txt-center" style="width: 400px;">KETERANGAN</th>
                 <th class="txt-center">JUMLAH</th>
-                <th class="txt-center">NO. PERKIRAAN</th>
+                <th class="txt-center" style="width: 100px;">NO. PERKIRAAN</th>
             </tr>
             <tr>
-                <td>Pembayaran <?= $supplierName ?> sebanyak <?= $totalQty . " " . $kode_satuan ?> (No: <?= $po_no ?>)</td>
-                <td class="txt-right"><?= $totalDailyPaid ?></td>
+                <td>Pembayaran <?= $barangName ?> sebanyak <?= $totalQty . " " . $kode_satuan ?> (No: <?= $po_no ?>)</td>
+                <td class="txt-right">Rp <?= $totalDailyPaid ?></td>
                 <td></td>
             </tr>
             <tr>
                 <th class="txt-right">TOTAL</th>
-                <th class="txt-right"><?= $totalDailyPaid ?></th>
+                <th class="txt-right">Rp <?= $totalDailyPaid ?></th>
                 <th></th>
             </tr>
         </table>
 
         <div style="margin-top: 0.5rem;margin-bottom: 0.5rem">
             <span>TERBILANG:</span>
-            <span style="text-transform: uppercase;"><?= ($totalDailyPaidTerbilang) . ' RUPIAH' ?></span>
+            <span style="text-transform: uppercase;"><u><?= ($totalDailyPaidTerbilang) . ' RUPIAH' ?></u></span>
         </div>
 
         <table class="w-100 sign-table border-collapse">
@@ -332,16 +328,17 @@
         </table>
     </div>
 
-    <hr style="margin-top: 25px;margin-bottom: 10px;border: 1px dotted #000;">
+    <hr style="margin-top: 50px;margin-bottom: 45px;border: 1px dotted #000;">
+    <br>
 
-    <div style="margin: 10px; padding: 10px;" class="">
+    <div style="margin: 10px; padding: 10px; margin-top: 30px">
         <table class="w-100">
             <tr>
                 <td>
                     <table>
                         
                         <tr>
-                            <td style="font-size: 14px; font-weight: bold;">BUKTI PENGELUARAN</td>
+                            <td style="font-size: 18px; font-weight: bold;"><u>BUKTI PENGELUARAN</u></td>
                             <td>
                                 <div style="margin-bottom: 0.25rem;margin-left: 70px">
                                     <div class="box-sm bukti-pengeluaran"></div>
@@ -376,16 +373,16 @@
             </tr>
         </table>
 
-        <div class="d-flex w-100">
+        <div class="d-flex w-100 mt-5">
             <div style="display: inline-block;">
                 <table>
                     <tr>
                         <td>TGL</td>
-                        <td>: <?= date('d-m-Y', strtotime($po_date)) ?></td>
+                        <td>. <u><?= date('d-M-Y', strtotime($po_date)) ?></u></td>
                     </tr>
                     <tr>
                         <td>DIBAYAR KEPADA</td>
-                        <td>: <?= $supplierName ?></td>
+                        <td>: <u><?= $supplierName ?></u></td>
                     </tr>
                 </table>
             </div>
@@ -403,23 +400,23 @@
             <tr>
                 <th class="txt-center" style="width: 400px;">KETERANGAN</th>
                 <th class="txt-center">JUMLAH</th>
-                <th class="txt-center">NO. PERKIRAAN</th>
+                <th class="txt-center" style="width: 100px;">NO. PERKIRAAN</th>
             </tr>
             <tr>
-                <td>Pembayaran <?= $supplierName ?> sebanyak <?= $totalQty . " " . $kode_satuan ?> (No: <?= $po_no ?>)</td>
-                <td class="txt-right"><?= $totalTambahanPaid ?></td>
+                <td>Pembayaran <?= $barangName ?> sebanyak <?= $totalQty . " " . $kode_satuan ?> (No: <?= $po_no ?>)</td>
+                <td class="txt-right">Rp <?= $totalTambahanPaid ?></td>
                 <td></td>
             </tr>
             <tr>
                 <th class="txt-right">TOTAL</th>
-                <th class="txt-right"><?= $totalTambahanPaid ?></th>
+                <th class="txt-right">Rp <?= $totalTambahanPaid ?></th>
                 <th></th>
             </tr>
         </table>
 
         <div style="margin-top: 0.5rem;margin-bottom: 0.5rem">
             <span>TERBILANG:</span>
-            <span style="text-transform: uppercase;"><?= ($totalTambahanPaidTerbilang) . ' RUPIAH' ?></span>
+            <span style="text-transform: uppercase;"><u><?= $totalTambahanPaid != 0 ? ($totalTambahanPaidTerbilang) . ' RUPIAH' : ''?></u></span>
         </div>
 
         <table class="w-100 sign-table border-collapse">
