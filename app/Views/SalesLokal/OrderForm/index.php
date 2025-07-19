@@ -106,26 +106,18 @@
                                 <th>No.</th>
 
                                 <th onclick="changeSort('no_sales_order')" class="sort">No Order</th>
-                                <th onclick="changeSort('createdAt')" class="sort">Tanggal Dibuat</th>
+                                <!-- <th onclick="changeSort('createdAt')" class="sort">Tanggal Dibuat</th> -->
                                 <th onclick="changeSort('order_date')" class="sort">Tanggal Order</th>
                                 <th onclick="changeSort('shipping_date')" class="sort">Tanggal Dikirim</th>
-
                                 <th onclick="changeSort('nama_customer')" class="sort">Nama Customer</th>
-
                                 <th onclick="changeSort('destination')" class="sort">Destinasi</th>
-
+                                <th onclick="changeSort('salesName')" class="sort">Nama Sales</th>
                                 <th onclick="changeSort('qty_barang')" class="sort">QTY Barang</th>
-
                                 <th onclick="changeSort('total_harga')" class="sort">Total Harga</th>
-
                                 <th onclick="changeSort('keterangan')" class="sort">Keterangan</th>
-
                                 <th onclick="changeSort('surat_jalan_so_id')" class="sort">Surat Jalan</th>
-
                                 <th onclick="changeSort('sales_order_invoice_id')" class="sort">Invoice</th>
-
                                 <th onclick="changeSort('counter_print')" class="sort">Print</th>
-
                                 <th class="sort sticky-col">Action</th>
                             </tr>
                         </thead>
@@ -317,9 +309,6 @@
                 data: "no_sales_order",
                 className: "text-center"
             }, {
-                data: "createdAt",
-                className: "text-center"
-            }, {
                 data: "order_date",
                 className: "text-center"
             }, {
@@ -330,6 +319,9 @@
                 className: "text-center"
             }, {
                 data: "destination",
+                className: "text-center"
+            }, {
+                data: "salesName",
                 className: "text-center"
             }, {
                 data: "qty_barang",
@@ -381,7 +373,7 @@
                 sortable: false,
                 render: function(data, type, row) {
                     let id = row.id;
-                    let posting = row.posting; 
+                    let posting = row.posting;
 
                     if (posting == 0) {
                         return `
@@ -598,7 +590,7 @@
         window.open(url, "_blank");
     }
 
-    function edit(id){
+    function edit(id) {
         location.replace(`<?= base_url("order-form-lokal/id"); ?>/${id}`);
     }
 </script>

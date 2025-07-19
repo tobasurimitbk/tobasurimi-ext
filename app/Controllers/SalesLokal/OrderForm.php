@@ -205,6 +205,7 @@ class OrderForm extends BaseController
                 "sales_order_invoice_id" => $data->sales_order_invoice_id,
                 "counter_print" => $data->counter_print,
                 "posting" => $data->posting,
+                "salesName" => $data->salesName,
             ]);
         }
 
