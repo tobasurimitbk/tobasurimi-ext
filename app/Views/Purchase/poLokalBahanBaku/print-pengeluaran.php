@@ -91,7 +91,11 @@
 
 <body style="border: 0px solid;font-size: 12px;">
 
-    <div style="margin: 10px; padding: 10px;" class="">
+    <br>
+    <br>
+    <br>
+
+    <div style="margin: 10px; padding: 10px; margin-top: 30px" class="">
         <table class="w-100">
             <tr>
                 <td>
@@ -206,7 +210,8 @@
         </table>
     </div>
 
-    <hr style="margin-top: 40px;margin-bottom: 45px;border: 1px dotted #000;">
+    <hr style="margin-top: 50px;margin-bottom: 45px;border: 1px dotted #000;">
+    <br>
 
     <div style="margin: 10px; padding: 10px; margin-top: 30px">
         <table class="w-100">
@@ -323,7 +328,8 @@
         </table>
     </div>
 
-    <hr style="margin-top: 40px;margin-bottom: 45px;border: 1px dotted #000;">
+    <hr style="margin-top: 50px;margin-bottom: 45px;border: 1px dotted #000;">
+    <br>
 
     <div style="margin: 10px; padding: 10px; margin-top: 30px">
         <table class="w-100">
