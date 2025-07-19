@@ -13,7 +13,7 @@
 
         @page {
             size: LEGAL;
-            margin: 10mm;
+            margin: 3mm;
         }
 
         .align-items-center {
