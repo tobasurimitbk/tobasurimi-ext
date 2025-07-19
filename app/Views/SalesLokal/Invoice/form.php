@@ -268,7 +268,7 @@
                                     <th>Qty Invoice</th>
                                     <th>Satuan</th>
                                     <th>Harga Satuan</th>
-                                    <th>Discount (%)</th>
+                                    <th>Discount</th>
                                     <th>Amount</th>
                                 </tr>
                             </thead>
@@ -367,7 +367,7 @@
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <input autocomplete="one-time-code" type="text" class="form-control discount_percentage" name="discount_percentage" id="discount_percentage" placeholder="discount">
-                                <label for="floatingInput">disc%</label>
+                                <label for="floatingInput">Disc</label>
                             </div>
                         </div>
                     </div>
@@ -797,8 +797,6 @@
                     var array1 = [<?= ($data->document_id) ?>];
                     var difference = selectedDocs.filter(item => !array1.includes(Number(item)));
 
-                    // console.log(array1);
-                    // console.log(difference);
                     // Fetch data for newly selected documents
                     if (difference && difference.length > 0) {
                         difference.forEach(docId => getDocumentData(docId));
@@ -859,25 +857,23 @@
         }
 
         <?php if (!empty($documentData)) : ?>
-            
-                var itemList = [];
 
-                <?php foreach ($documentData as $doc) : ?>
-                    var tempItems = [];
-                    <?php if ($data->status_posting == "0") : ?>
-                        tempItems = <?= json_encode($doc->itemList) ?>;
-                    <?php else : ?>
-                        tempItems = <?= json_encode($doc->itemListPosting) ?>;
-                    <?php endif; ?>
+            var itemList = [];
 
-                    itemList = itemList.concat(tempItems); // Gabungkan item dari setiap dokumen
-                <?php endforeach; ?>
+            <?php foreach ($documentData as $doc) : ?>
+                var tempItems = [];
+                <?php if ($data->status_posting == "0") : ?>
+                    tempItems = <?= json_encode($doc->itemList) ?>;
+                <?php else : ?>
+                    tempItems = <?= json_encode($doc->itemListPosting) ?>;
+                <?php endif; ?>
 
-                console.log(<?= json_encode($documentData) ?>);
-                table.rows.add(itemList).draw(false);
-                itemList.forEach(function(item) {
-                    list_items.push(item);
-                });
+                itemList = itemList.concat(tempItems); // Gabungkan item dari setiap dokumen
+            <?php endforeach; ?>
+            table.rows.add(itemList).draw(false);
+            itemList.forEach(function(item) {
+                list_items.push(item);
+            });
         <?php endif; ?>
 
         $('#tax_status').on('input change paste', function() {
@@ -981,7 +977,6 @@
     });
 
     $(".btn-submit").click(function() {
-        // console.log(list_items);
         var noDocument = $('#doc_id option:selected').text()
         isValid = true;
 
@@ -1200,11 +1195,13 @@
         let grandTotal = 0;
 
         list_items.forEach((obj) => {
+
             let itemAmt = parseFloat(obj.amount.replaceAll(',', '')) || 0;
-            let discPercent = Math.min(Math.max(parseFloat(obj.disc) || 0, 0), 100); // Validasi diskon antara 0-100%
+            let discUnit = obj.discUnit;
+            let discPercent = discUnit == 'percent' ? Math.min(Math.max(parseFloat(obj.disc) || 0, 0), 100) : obj.disc; // Validasi diskon antara 0-100%
             let taxAmt = 0;
 
-            discTotal += (discPercent / 100) * itemAmt; // Hitung total diskon
+            discTotal += discUnit == 'percent' ? (discPercent / 100) * itemAmt : discPercent; // Hitung total diskon
 
             if (taxStatus) {
                 taxAmt = itemAmt * (taxes / 100);
@@ -1213,8 +1210,9 @@
             }
 
             if (taxStatus && includeTax) {
-                itemSubTotal += itemAmt / (1 + (taxes / 100));
-                taxTotalHtml += itemAmt - (itemAmt / (1 + (taxes / 100))); // Pajak dihitung dari selisih
+                tax = itemAmt * (taxes / 100);
+                itemSubTotal += itemAmt + tax;
+                taxTotalHtml += tax; // Pajak dihitung dari selisih
             } else {
                 itemSubTotal += itemAmt;
                 taxTotalHtml += taxAmt;
@@ -1224,7 +1222,7 @@
         // Pastikan total tidak negatif
         itemSubTotal = Math.max(0, itemSubTotal);
         taxTotalHtml = Math.max(0, taxTotalHtml);
-        grandTotal = itemSubTotal + (taxStatus ? taxTotalHtml : 0);
+        grandTotal = taxStatus && includeTax ? itemSubTotal - (taxStatus ? taxTotalHtml : 0) : itemSubTotal + (taxStatus ? taxTotalHtml : 0);
 
         // Update tampilan HTML
         $('#itemSubTotal').html(itemSubTotal.toLocaleString());
@@ -1264,7 +1262,6 @@
 
     //posting
     const posting = function(id) {
-        // console.log(list_items);
         var noDocument = $('#doc_id option:selected').text()
         $.each(list_items, function(i, v) {
             var element = $('input[data-id="' + v.id + '"].input-qty');
@@ -1281,7 +1278,6 @@
                 list_items[i].qty_input = input_user;
             }
         });
-        // console.log(list_items);
 
         if ($(".create-form").valid()) {
             Swal.fire({
@@ -1373,7 +1369,6 @@
     }
 
     $(".posting-invoice").click(function() {
-        // console.log(list_items);
         var noDocument = $('#doc_id option:selected').text()
 
         if ($(".create-form").valid()) {

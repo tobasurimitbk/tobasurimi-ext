@@ -1132,4 +1132,36 @@ class OrderForm extends BaseController
         }
         return;
     }
+
+    public function checkPiutang($id)
+    {
+        $dataCustomer = $this->CustomerModel
+            ->find($id);
+
+        $dataSalesOrder = $this->salesOrderInvoiceModel
+            ->where('id_customer', $id)
+            ->findAll();
+
+        $totalNotPay = 0;
+        foreach ($dataSalesOrder as $key => $value) {
+            $totalNotPay += $value['total_invoice'] - $value['pay_amount'];
+        }
+
+        $data = [
+            'id' => $id,
+            'status' => true
+        ];
+
+        if ($dataCustomer['piutang'] == '0' || $dataCustomer['piutang'] == null) {
+            $data['status'] = true;
+        } else {
+            if ($dataCustomer['piutang'] == $totalNotPay) {
+                $data['status'] = false;
+            } else {
+                $data['status'] = true;
+            }
+        }
+        echo json_encode($data);
+        return;
+    }
 }

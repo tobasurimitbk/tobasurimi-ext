@@ -291,9 +291,9 @@ class Invoice extends BaseController
                 "status_tax"        => $this->request->getPost('tax_status') ? 'true' : 'false',
                 "tipe_invoice"      => 'LOKAL',
                 "status_pelunasan"  => 'UNPAID',
-                "id_company"        => ($this->this_company_id != 16) 
-                                        ? $this->request->getPost('company_id') 
-                                        : $this->this_company_id,
+                "id_company"        => ($this->this_company_id != 16)
+                    ? $this->request->getPost('company_id')
+                    : $this->this_company_id,
                 "tax_id"            => $this->request->getPost('taxes'),
                 "tax_value"         => ($tax = $this->taxModel->find($this->request->getPost('taxes'))) ? $tax['tax_value'] : null,
             ];
@@ -428,59 +428,59 @@ class Invoice extends BaseController
         // var_dump($documentData);
         // exit;
 
-       foreach ($documentData as $doc) {
-        foreach ($doc->itemList as $key => &$value) {
-            foreach ($dataSalesInvoiceOrderDetail as $valueDetail) {
-                // var_dump($value);
-                // var_dump($valueDetail);
+        foreach ($documentData as $doc) {
+            foreach ($doc->itemList as $key => &$value) {
+                foreach ($dataSalesInvoiceOrderDetail as $valueDetail) {
+                    // var_dump($value);
+                    // var_dump($valueDetail);
 
-                if ($value->id_sales_order == $valueDetail['id_sales_order'] && $value->id_barang == $valueDetail['id_barang_invoice']) {
+                    if ($value->id_sales_order == $valueDetail['id_sales_order'] && $value->id_barang == $valueDetail['id_barang_invoice']) {
 
-                    // Check if deletedAt is not empty
-                    if (!empty($valueDetail['deletedAt'])) {
-                        unset($documentData->itemList[$key]);
-                        break; // Break out of the inner loop since the item has been removed
+                        // Check if deletedAt is not empty
+                        if (!empty($valueDetail['deletedAt'])) {
+                            unset($documentData->itemList[$key]);
+                            break; // Break out of the inner loop since the item has been removed
+                        }
+
+                        $value->id_detail_invoice = $valueDetail['id'];
+                        $value->qty_input = number_format(floatval($valueDetail['qty_invoice']), 2);
+                        $value->harga_barang = number_format(floatval($valueDetail['harga_barang_invoice']), 0);
+                        $value->amount = number_format(floatval($valueDetail['amount_invoice']), 0);
+                        // } else {
+                        //     unset($documentData->itemList[$key]);
+                        //     break; // Break out of the inner loop since the item has been removed
                     }
-
-                    $value->id_detail_invoice = $valueDetail['id'];
-                    $value->qty_input = number_format(floatval($valueDetail['qty_invoice']), 2);
-                    $value->harga_barang = number_format(floatval($valueDetail['harga_barang_invoice']), 0);
-                    $value->amount = number_format(floatval($valueDetail['amount_invoice']), 0);
-                    // } else {
-                    //     unset($documentData->itemList[$key]);
-                    //     break; // Break out of the inner loop since the item has been removed
                 }
             }
         }
-       }
 
         // exit();
         //untuk yang sudah di posting
 
-       foreach ($documentData as $doc) {
-        foreach ($doc->itemListPosting as $key => &$value) {
-            // var_dump($value);
-            foreach ($dataSalesInvoiceOrderDetail as $valueDetail) {
+        foreach ($documentData as $doc) {
+            foreach ($doc->itemListPosting as $key => &$value) {
+                // var_dump($value);
+                foreach ($dataSalesInvoiceOrderDetail as $valueDetail) {
 
-                if ($value->id_sales_order == $valueDetail['id_sales_order'] && $value->id_barang == $valueDetail['id_barang_invoice']) {
+                    if ($value->id_sales_order == $valueDetail['id_sales_order'] && $value->id_barang == $valueDetail['id_barang_invoice']) {
 
-                    // Check if deletedAt is not empty
-                    if (!empty($valueDetail['deletedAt'])) {
-                        unset($documentData->itemListPosting[$key]);
-                        break; // Break out of the inner loop since the item has been removed
+                        // Check if deletedAt is not empty
+                        if (!empty($valueDetail['deletedAt'])) {
+                            unset($documentData->itemListPosting[$key]);
+                            break; // Break out of the inner loop since the item has been removed
+                        }
+
+                        $value->id_detail_invoice = $valueDetail['id'];
+                        $value->qty_input = number_format(floatval($valueDetail['qty_invoice']), 2);
+                        $value->harga_barang = number_format(floatval($valueDetail['harga_barang_invoice']), 0);
+                        $value->amount = number_format(floatval($valueDetail['amount_invoice']), 0);
+                        // } else {
+                        //     unset($documentData->itemListPosting[$key]);
+                        //     break; // Break out of the inner loop since the item has been removed
                     }
-
-                    $value->id_detail_invoice = $valueDetail['id'];
-                    $value->qty_input = number_format(floatval($valueDetail['qty_invoice']), 2);
-                    $value->harga_barang = number_format(floatval($valueDetail['harga_barang_invoice']), 0);
-                    $value->amount = number_format(floatval($valueDetail['amount_invoice']), 0);
-                    // } else {
-                    //     unset($documentData->itemListPosting[$key]);
-                    //     break; // Break out of the inner loop since the item has been removed
                 }
             }
         }
-       }
 
 
         $noFaktur = $this->SalesOrderInvoiceModel->generateNoFaktur();
@@ -1056,7 +1056,12 @@ class Invoice extends BaseController
         if ($docType == 'pesanan') {
             $soData = $this->SalesOrderModel->asObject()
                 ->select("sales_order.*,
-                sales_order.no_po, sales_order.nama_ecommerce, customers.name AS customerName, customers.address AS customerAddress, CONCAT(employees.nip , ' - ', employees.name) AS salesName, metadata.id AS termin")
+                sales_order.no_po, 
+                sales_order.nama_ecommerce, 
+                customers.name AS customerName, 
+                customers.address AS customerAddress, 
+                CONCAT(employees.nip , ' - ', employees.name) AS salesName, 
+                metadata.id AS termin")
                 ->join('customers', 'customers.id = sales_order.id_customer', 'left')
                 ->join('employees', 'employees.id = sales_order.sales_id', 'left')
                 ->join('metadata', 'metadata.id = sales_order.payment_terms', 'left')
@@ -1137,13 +1142,22 @@ class Invoice extends BaseController
             }
             $hargaBarang = str_replace(',', '', $item->harga_barang);
             $qty = str_replace(',', '', $item->qty);
+            $discUnit = $item->discUnit;
             $getDiscount = str_replace(',', '', $item->disc);
-            $discount = floatval($getDiscount) / 100;
+            $discount = $discUnit == "percent" ? floatval($getDiscount) / 100 : floatval($getDiscount);
 
-            if ($getDiscount == 0) {
-                $itemTotal = $hargaBarang * $qty;
+            if ($discUnit == "percent") {
+                if ($getDiscount == 0) {
+                    $itemTotal = $hargaBarang * $qty;
+                } else {
+                    $itemTotal = ($hargaBarang - ($hargaBarang * $discount)) * $qty;
+                }
             } else {
-                $itemTotal = ($hargaBarang - ($hargaBarang * $discount)) * $qty;
+                if ($getDiscount == 0) {
+                    $itemTotal = $hargaBarang * $qty;
+                } else {
+                    $itemTotal = ($hargaBarang * $qty) - $discount;
+                }
             }
 
             $dpp += $itemTotal;

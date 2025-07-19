@@ -157,7 +157,7 @@
                                     <th>Qty</th>
                                     <th>Satuan</th>
                                     <th>Harga Satuan</th>
-                                    <th>Discount (%)</th>
+                                    <th>Discount</th>
                                     <th>Amount</th>
                                 </tr>
                             </thead>
@@ -345,7 +345,7 @@
                 $(".id_so").val("");
             }
         });
-        
+
         $(".id_so").change(function() {
             // Simpan konteks this ke dalam variabel
             let $this = $(this);
@@ -378,7 +378,8 @@
                         res.map((row) => {
                             const amount = parseFloat(row.amount)
                             const disc = parseFloat(row.disc)
-                            row.amount = (amount * (100 - disc)) / 100
+                            const discUnit = 'row.discUnit'
+                            row.amount = discUnit == 'percent' ? (amount * (100 - disc)) / 100 : amount - disc
                         })
                         table.clear();
 
@@ -504,7 +505,7 @@
                                         denyButtonColor: '#28a745', // Hijau
                                         cancelButtonColor: '#dc3545', // Merah
                                     }).then((result) => {
-                                       if (result.isConfirmed) {
+                                        if (result.isConfirmed) {
                                             // Cetak
                                             window.location.href = `<?= base_url("surat-jalan/print"); ?>/${response.id}`;
                                         } else if (result.isDenied) {

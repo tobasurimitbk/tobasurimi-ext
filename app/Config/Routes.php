@@ -575,6 +575,7 @@ $routes->post('/order-form-lokal/posting', 'SalesLokal\OrderForm::posting', ['fi
 $routes->get('/order-form-lokal/barangAll', 'SalesLokal\OrderForm::getAllBarang', ['filter' => 'Auth']);
 $routes->get('/order-form-lokal/customer', 'SalesLokal\OrderForm::dropdownCustomer', ['filter' => 'Auth']);
 $routes->post('/order-form-lokal/generate-no-order-form', 'SalesLokal\OrderForm::generateNomorSalesOrder', ['filter' => 'Auth']);
+$routes->get('/order-form-lokal/check-piutang/(:segment)', 'SalesLokal\OrderForm::checkPiutang/$1', ['filter' => 'Auth']);
 
 // Invoice Lokal
 $routes->get('/invoice-penjualan-lokal', 'SalesLokal\Invoice::index', ['filter' => 'Auth']);

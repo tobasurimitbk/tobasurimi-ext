@@ -70,6 +70,7 @@ class SalesOrderDetailModel extends Model
                       sales_order_detail.qty_sekarang AS qty_sekarang,
                       satuans.kode_satuan AS satuan,
                       sales_order_detail.discount_percentage AS disc,
+                      sales_order_detail.discount_unit AS discUnit,
                       sales_order_detail.tax AS tax,
                       sales_order_detail.amount AS amount,
                       sales_order_detail.id_sales_order,
@@ -89,7 +90,7 @@ class SalesOrderDetailModel extends Model
         foreach ($datas as &$data) {
             $amount = ($data->amount);
             $totalPrice = (($amount) * (100 - $data->disc)) / 100;
-            $data->total_harga_barang = $totalPrice;
+            $data->total_harga_barang = $amount;
         }
         return $datas;
     }
@@ -108,6 +109,7 @@ class SalesOrderDetailModel extends Model
                       sales_order_detail.qty_sekarang AS qty_sekarang,
                       satuans.kode_satuan AS satuan,
                       sales_order_detail.discount_percentage AS disc,
+                      sales_order_detail.discount_unit AS discUnit,
                       sales_order_detail.tax AS tax,
                       sales_order_detail.amount AS amount,
                       sales_order_detail.id_sales_order,

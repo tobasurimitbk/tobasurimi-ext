@@ -905,23 +905,59 @@
             allowClear: true,
             theme: "bootstrap-5"
         }).change(function() {
-            const customerPhone = $(this).find(':selected').data('customerphone') ? $(this).find(':selected').data('customerphone') : "";
-            const customerAddress = $(this).find(':selected').data('address') ? $(this).find(':selected').data('address') : "";
-            const termin = $(this).find(':selected').data('termin') ? $(this).find(':selected').data('termin') : "";
+            let selected = $(this);
+            let id = selected.find(':selected').val();
 
-            const salesName = $(this).find(':selected').data('salesname') ? $(this).find(':selected').data('salesname') : "";
-            const tipePelanggan = $(this).find(':selected').data('tipepelanggan') ? $(this).find(':selected').data('tipepelanggan') : "";
-            const jenis_penjualan = $(this).find(':selected').data('jenis_penjualan') ? $(this).find(':selected').data('jenis_penjualan') : "";
+            // Jika customer di-reset, kosongkan field
+            if (!id) {
+                $('#customerphone').val('');
+                $('#destination').val('');
+                $('#termin_order_form').val('').change();
+                $('#id_sales').val('').change();
+                $('#hidden_tipe_pelanggan').val('').change();
+                $('#jenis_penjualan').val('').change();
+                return;
+            }
 
-            console.log(termin)
+            // Ambil data customer terlebih dahulu
+            const customerPhone = selected.find(':selected').data('customerphone') || "";
+            const customerAddress = selected.find(':selected').data('address') || "";
+            const termin = selected.find(':selected').data('termin') || "";
+            const salesName = selected.find(':selected').data('salesname') || "";
+            const tipePelanggan = selected.find(':selected').data('tipepelanggan') || "";
+            const jenis_penjualan = selected.find(':selected').data('jenis_penjualan') || "";
 
-            $('#customerphone').val(decodeURIComponent(customerPhone));
-            $('#destination').val(decodeURIComponent(customerAddress));
-            $('#termin_order_form').val(decodeURIComponent(termin)).change();
+            // Cek status piutang
+            checkPiutang(id, function(status) {
+                if (status) {
+                    // Jika piutang MEMENUHI SYARAT, isi field
+                    $('#customerphone').val(decodeURIComponent(customerPhone));
+                    $('#destination').val(decodeURIComponent(customerAddress));
+                    $('#termin_order_form').val(decodeURIComponent(termin)).change();
+                    $('#id_sales').val(decodeURIComponent(salesName)).change();
+                    $('#hidden_tipe_pelanggan').val(decodeURIComponent(tipePelanggan)).change();
+                    $('#jenis_penjualan').val(decodeURIComponent(jenis_penjualan)).change();
+                } else {
+                    // Jika piutang TIDAK MEMENUHI:
+                    // 1. Reset pilihan customer
+                    selected.val('').trigger('change');
 
-            $('#id_sales').val(decodeURIComponent(salesName)).change();
-            $('#hidden_tipe_pelanggan').val(decodeURIComponent(tipePelanggan)).change();
-            $('#jenis_penjualan').val(decodeURIComponent(jenis_penjualan)).change();
+                    // 2. Kosongkan field
+                    $('#customerphone').val('');
+                    $('#destination').val('');
+                    $('#termin_order_form').val('').change();
+                    $('#id_sales').val('').change();
+                    $('#hidden_tipe_pelanggan').val('').change();
+                    $('#jenis_penjualan').val('').change();
+
+                    // 3. Tampilkan alert
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Piutang melebihi batas! Tidak dapat memilih customer ini.',
+                        confirmButtonColor: '#4e73df',
+                    })
+                }
+            });
         });
 
         $("#hidden_tipe_pelanggan").on('input change keyup paste', function() {
@@ -2227,6 +2263,32 @@
         }
     }
 
+    function checkPiutang(id, callback) {
+        if (id) {
+            $.ajax({
+                url: `<?= base_url("order-form-lokal/check-piutang"); ?>/${id}`,
+                method: "GET",
+                beforeSend: function() {
+                    setLoading();
+                },
+                complete: function() {
+                    stopLoading();
+                },
+                dataType: "json",
+                success: function(res) {
+                    console.log(res);
+                    // Panggil callback dengan status dari response
+                    callback(res.status);
+                },
+                error: function() {
+                    // Jika terjadi error, anggap tidak memenuhi syarat
+                    callback(false);
+                }
+            })
+        } else {
+            callback(false);
+        }
+    }
 
     // Company
     $('.company').select2({
