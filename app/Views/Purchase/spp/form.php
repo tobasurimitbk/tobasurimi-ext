@@ -9,7 +9,7 @@
 <!-- Begin Page Content -->
 <section class="section">
     <div class="section-header">
-        <h1 class="title-name">Tambah SPP</h1>
+        <h1 class="title-name"><?= !empty($dataSPP) ? "Update SPP" : "Tambah SPP" ?></h1>
         <div class="col-button-tambah-spp">
             <a class="btn btn-hide-form btn-discard float-right" href="<?= base_url("spp"); ?>">
                 Kembali
