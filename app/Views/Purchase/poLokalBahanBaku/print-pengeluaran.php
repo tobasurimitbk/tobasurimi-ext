@@ -159,16 +159,16 @@
             <tr>
                 <th class="txt-center" style="width: 400px;">KETERANGAN</th>
                 <th class="txt-center">JUMLAH</th>
-                <th class="txt-center">NO. PERKIRAAN</th>
+                <th class="txt-center" style="width: 100px;">NO. PERKIRAAN</th>
             </tr>
             <tr>
                 <td>Pembayaran <?= $barangName ?> sebanyak <?= $totalQty . " " . $kode_satuan ?> (No: <?= $po_no ?>)</td>
-                <td class="txt-right"><?= $totalPaid ?></td>
+                <td class="txt-right">Rp <?= $totalPaid ?></td>
                 <td></td>
             </tr>
             <tr>
                 <th class="txt-right">TOTAL</th>
-                <th class="txt-right"><?= $totalPaid ?></th>
+                <th class="txt-right">Rp <?= $totalPaid ?></th>
                 <th></th>
             </tr>
         </table>
@@ -276,16 +276,16 @@
             <tr>
                 <th class="txt-center" style="width: 400px;">KETERANGAN</th>
                 <th class="txt-center">JUMLAH</th>
-                <th class="txt-center">NO. PERKIRAAN</th>
+                <th class="txt-center" style="width: 100px;">NO. PERKIRAAN</th>
             </tr>
             <tr>
                 <td>Pembayaran <?= $barangName ?> sebanyak <?= $totalQty . " " . $kode_satuan ?> (No: <?= $po_no ?>)</td>
-                <td class="txt-right"><?= $totalDailyPaid ?></td>
+                <td class="txt-right">Rp <?= $totalDailyPaid ?></td>
                 <td></td>
             </tr>
             <tr>
                 <th class="txt-right">TOTAL</th>
-                <th class="txt-right"><?= $totalDailyPaid ?></th>
+                <th class="txt-right">Rp <?= $totalDailyPaid ?></th>
                 <th></th>
             </tr>
         </table>
@@ -394,16 +394,16 @@
             <tr>
                 <th class="txt-center" style="width: 400px;">KETERANGAN</th>
                 <th class="txt-center">JUMLAH</th>
-                <th class="txt-center">NO. PERKIRAAN</th>
+                <th class="txt-center" style="width: 100px;">NO. PERKIRAAN</th>
             </tr>
             <tr>
                 <td>Pembayaran <?= $barangName ?> sebanyak <?= $totalQty . " " . $kode_satuan ?> (No: <?= $po_no ?>)</td>
-                <td class="txt-right"><?= $totalTambahanPaid ?></td>
+                <td class="txt-right">Rp <?= $totalTambahanPaid ?></td>
                 <td></td>
             </tr>
             <tr>
                 <th class="txt-right">TOTAL</th>
-                <th class="txt-right"><?= $totalTambahanPaid ?></th>
+                <th class="txt-right">Rp <?= $totalTambahanPaid ?></th>
                 <th></th>
             </tr>
         </table>
