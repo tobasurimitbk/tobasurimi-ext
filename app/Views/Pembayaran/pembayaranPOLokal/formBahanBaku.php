@@ -60,7 +60,7 @@
                         <div class="form-floating mb-3" style="height: 50px;">
                             <div class="input-group input-group-password">
                                 <div class="form-floating mb-3" style="height: 50px;">
-                                    <input autocomplete="one-time-code" type="text" class="form-control no_bukti_pembayaran" id="no_bukti_pembayaran" name="no_bukti_pembayaran" placeholder="No. Pembayaran" required <?= !empty($detail) ? ($detail['pembayaranDetail']['status_posting'] == 1 ? 'readonly' : '') : '' ?> <?= !empty($detail) ? ' value="' . $detail['pembayaranDetail']['payment_no'] . '"' : '' ?>>
+                                    <input autocomplete="one-time-code" type="text" class="form-control no_bukti_pembayaran" id="no_bukti_pembayaran" name="no_bukti_pembayaran" placeholder="No. Pembayaran" required readonly <?= !empty($detail) ? ' value="' . $detail['pembayaranDetail']['payment_no'] . '"' : '' ?>>
                                     <label for="floatingInput">No. Pembayaran</label>
                                 </div>
                             </div>
@@ -79,12 +79,18 @@
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating form-pembayaran-po mb-3" style="height: 50px;">
-                            <select class="form-select" <?= !empty($detail) ? ($detail['pembayaranDetail']['status_posting'] == 1 ? 'disabled' : '') : "" ?> name="jenis_pembayaran" id="jenis_pembayaran">
-                                <option selected value="<?= !empty($detail['pembayaranDetail']['jenis_bayar']) ? $detail['pembayaranDetail']['jenis_bayar'] : '';  ?>"></option>
-                                <option value="MERAH">MERAH</option>
-                                <option value="PUTIH">PUTIH</option>
+                            <select class="form-select" 
+                                    <?= !empty($detail) && $detail['pembayaranDetail']['status_posting'] == 1 ? 'disabled' : '' ?> 
+                                    name="jenis_pembayaran" 
+                                    id="jenis_pembayaran"
+                                    required>
+                                <?php if (empty($detail['pembayaranDetail']['jenis_bayar'])): ?>
+                                    <option value="" selected disabled>Pilih Jenis Pembayaran</option>
+                                <?php endif; ?>
+                                <option value="MERAH" <?= !empty($detail['pembayaranDetail']['jenis_bayar']) && $detail['pembayaranDetail']['jenis_bayar'] == 'MERAH' ? 'selected' : '' ?>>MERAH</option>
+                                <option value="PUTIH" <?= !empty($detail['pembayaranDetail']['jenis_bayar']) && $detail['pembayaranDetail']['jenis_bayar'] == 'PUTIH' ? 'selected' : '' ?>>PUTIH</option>
                             </select>
-                            <label for="floatingInput" style="z-index: 1;">Jenis Pembayaran</label>
+                            <label  for="floatingInput" style="z-index: 1;">Jenis Pembayaran</label>
                         </div>
                     </div>
                     <div class="col-md-4">
@@ -528,10 +534,6 @@
 <?php else : ?>
     <script>
         $('.bulanan-form,.harian-form').hide();
-        $(document).ready(function() {
-            generatePaymentNumber();
-
-        });
     </script>
 <?php endif; ?>
 <script>
@@ -592,9 +594,6 @@
             jenis_pembayaran: {
                 required: true
             },
-            // bayar_panjar: {
-            //     digits: true
-            // },
             keterangan: {
                 required: true
             }
@@ -667,10 +666,6 @@
 
 
     $(document).ready(function() {
-
-        <?php if (empty($detail)): ?>
-            generatePaymentNumber();
-        <?php endif; ?>
 
         $("#akun_kas_panjar, #akun_selisih_panjar, #akun_kas_panjar_tb, #akun_selisih_panjar_tb, #akun_selisih_pinjaman, #akun_kas_pinjaman").select2({
             theme: "bootstrap-5",
@@ -748,10 +743,12 @@
         theme: "bootstrap-5"
     });
 
-    // $('#payment_method').select2({
-    //     placeholder: "Pilih metode pembayaran",
-    //     theme: "bootstrap-5"
-    // })
+    $('#payment_method').select2({
+        placeholder: "Pilih metode pembayaran",
+        theme: "bootstrap-5"
+    }).change(function() {
+        generatePaymentNumber();
+    });
 
     $('#divisi_id').select2({
         placeholder: "Pilih Departemen",
@@ -2028,15 +2025,15 @@
         let jenisPembayaran = $("#jenis_pembayaran option:selected").text();
         let divisiId = $("#divisi_id option:selected").text();
         let bankId = $("#bank_id option:selected").val();
+        let paymentMethod = $("#payment_method option:selected").val();
 
         // Only generate if this is a new record (empty detail)
-        <?php if (empty($detail)): ?>
             const csrfToken = '<?= csrf_token() ?>';
             const csrf = $(`[name="${csrfToken}"]`);
 
             // Build URL with query parameters
             let url = "<?= base_url('pembayaran-po-lokal-bb/generate-no-pembayaran'); ?>";
-            url += `?jenisPembayaran=${encodeURIComponent(jenisPembayaran)}&divisiId=${encodeURIComponent(divisiId)}&bankId=${encodeURIComponent(bankId)}`;
+            url += `?jenisPembayaran=${encodeURIComponent(jenisPembayaran)}&paymentMethod=${encodeURIComponent(paymentMethod)}&divisiId=${encodeURIComponent(divisiId)}&bankId=${encodeURIComponent(bankId)}`;
 
             // Additional data if needed
             var formData = new FormData();
@@ -2069,7 +2066,6 @@
                     $(".no_bukti_pembayaran").attr("readonly", false);
                 }
             });
-        <?php endif; ?>
     }
 
 
