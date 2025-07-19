@@ -58,7 +58,7 @@
                 <?= csrf_field() ?>
                 <div class="row">
                     <div class="col-md-4">
-                       <div class="form-floating mb-3" style="height: 50px;">
+                        <div class="form-floating mb-3" style="height: 50px;">
                             <div class="input-group input-group-password">
                                 <div class="form-floating mb-3" style="height: 50px;">
                                     <input autocomplete="one-time-code" type="text" class="form-control no_bukti_pembayaran" id="no_bukti_pembayaran" name="no_bukti_pembayaran" placeholder="No. Pembayaran" required <?= !empty($detail) ? ($detail['pembayaranDetail']['status_posting'] == 1 ? 'readonly' : '') : '' ?> <?= !empty($detail) ? ' value="' . $detail['pembayaranDetail']['payment_no'] . '"' : '' ?>>
@@ -257,7 +257,7 @@
 
     $(document).ready(function() {
 
-         <?php if(empty($detail)): ?>
+        <?php if (empty($detail)): ?>
             generatePaymentNumber();
         <?php endif; ?>
 
@@ -305,9 +305,6 @@
                 divisi_id: {
                     required: true
                 },
-                bank_id: {
-                    required: true
-                },
                 status_pph: {
                     required: true
                 },
@@ -352,10 +349,7 @@
                 },
                 divisi_id: {
                     required: "Departemen wajib diisi"
-                },
-                bank_id: {
-                    required: "Bank wajib diisi"
-                },
+                }
 
             },
             errorElement: 'span',
@@ -555,7 +549,7 @@
                             let formData = new FormData(document.querySelector(".create-form"));
                             let nominalPembayaran = destroyFormatRupiah($('.nominal_pembayaran').val());
                             let nominalPembayaranPajak = destroyFormatRupiah($('.nominal_pembayaran_pajak').val());
-                            
+
                             const formatList = (list) => {
                                 if (!Array.isArray(list)) return []; // Pastikan `list` adalah array
                                 return list.map(item => {
@@ -668,7 +662,7 @@
                     table.find('tbody').append(newRow);
                 });
 
-                
+
                 var newRow1 = $('<tr>');
                 newRow1.append($('<td style="text-align:right;" colspan="6">').text('Tambahan'));
                 newRow1.append($('<td>').text(greatFormatRupiah(detail.tambahan)));
@@ -1059,9 +1053,9 @@
         formData.append("bankId", $("#bank_id option:selected").val());
         formData.append("divisiId", $("#divisi_id option:selected").text());
         formData.append("jenisPembayaran", $("#jenis_pembayaran option:selected").text());
-        
+
         $(".no_bukti_pembayaran").attr("readonly", true);
-        
+
         $.ajax({
             url: "<?= base_url("pembayaran-po-lokal-bp/generate-no-pembayaran"); ?>",
             method: "POST",
