@@ -156,7 +156,7 @@
                             </div>
                         </div>
                         <div class="col-md-4">
-                            <div class="form-floating mb-3" style="height: 50px;">
+                            <div class="form-floating mb-3 sales-text-field" style="height: 50px;display:none;">
                                 <!-- <input autocomplete="one-time-code" type="text" disabled value="<?= session()->get('login')->name; ?>" class="form-control sales_id" id="sales_id" name="sales_id" placeholder="Nama Sales"> -->
                                 <select class="form-select sales_id" name="sales_id" id="sales_id" <?= !empty($data) ? 'disabled' : ''; ?>>
                                     <option value=""></option>
@@ -918,6 +918,14 @@
         $(".delete-form").click(function() {
             let id = $(".id").val();
             destroy(id);
+        });
+
+        $('.jenis_penjualan').change(function() {
+            if ($(this).val() == '1') {
+                $('.sales-text-field').show();
+            } else {
+                $('.sales-text-field').hide();
+            }
         });
 
         $(".btn-submit-parent-lokal").click(function() {
