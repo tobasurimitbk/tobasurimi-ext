@@ -228,7 +228,7 @@ class Barang extends BaseController
                 "barang_name"       => $data['barang_name'],
                 "type_barang_sales" => $data['type_barang_sales'],
                 'kode_satuan'       => $data['kode_satuan'] != null ? $data['kode_satuan'] . " (" . $data['nama_satuan'] . ")" : "",
-                "type_barang"       => strtoupper(str_replace('_', ' ', $data['type_barang'] == "bahan_jadi" ? "barang_jadi" : "kemasan")),
+                "type_barang"       => strtoupper(str_replace('_', ' ', $data['type_barang'] == "bahan_jadi" ? "FINISHED GOOD" : "PACKAGING")),
                 "harga_pokok"       => floatval($data['harga_pokok']),
                 "harga_jual"        => $data['harga_jual'] != 0.00 ? floatval($data['harga_jual']) : '',
             ]);

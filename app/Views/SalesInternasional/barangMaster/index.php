@@ -4,7 +4,7 @@
 <!-- Begin Page Content -->
 <section class="section">
     <div class="section-header">
-        <h1>Master Barang Sales Ekspor</h1>
+        <h1>Master Items Sales Ekspor</h1>
         <?php if (can('Penjualan Ekspor', 'Master Barang', 'p')) : ?>
             <button class="btn btn-discard btn-dropdown-export dropdown-toggle float-right" type="button" id="dropdownMenuButtonExport" data-bs-toggle="dropdown" aria-expanded="false" style="margin-right: 20px;">
                 Import / Export
@@ -16,7 +16,7 @@
         <?php endif; ?>
         <?php if (can('Penjualan Ekspor', 'Master Barang', 'c')): ?>
             <button class="btn btn-show-form btn-add float-right">
-                <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
+                <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Create New
             </button>
         <?php endif; ?>
     </div>
@@ -34,12 +34,12 @@
                         <thead class="thead-dark">
                             <tr>
                                 <th>No</th>
-                                <th onclick="changeSort('type_barang')" class="sort">Tipe Barang</th>
-                                <th onclick="changeSort('kode_barang')" class="sort">Kode Barang</th>
-                                <th onclick="changeSort('barang_name')" class="sort">Nama Barang</th>
-                                <th onclick="changeSort('satuan_id')" class="sort">Satuan</th>
+                                <th onclick="changeSort('type_barang')" class="sort">Item Type</th>
+                                <th onclick="changeSort('kode_barang')" class="sort">Item Code</th>
+                                <th onclick="changeSort('barang_name')" class="sort">Item</th>
+                                <th onclick="changeSort('satuan_id')" class="sort">Unit</th>
                                 <!-- <th onclick="changeSort('harga_pokok')" class="sort">Harga Pokok</th> -->
-                                <th onclick="changeSort('harga_jual')" class="sort">Harga Jual</th>
+                                <th onclick="changeSort('harga_jual')" class="sort">Selling Price</th>
                             </tr>
                         </thead>
                         <tbody class="body-table" id="body-table" style="cursor: pointer;">
@@ -66,8 +66,8 @@
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <div class="input-group input-group-password">
                                     <div class="form-floating mb-3" style="height: 50px;">
-                                        <input autocomplete="one-time-code" type="text" id="kode_barang" class="form-control kode_barang" name="kode_barang" placeholder="Kode Barang">
-                                        <label for="floatingInput">Kode Barang</label>
+                                        <input autocomplete="one-time-code" type="text" id="kode_barang" class="form-control kode_barang" name="kode_barang" placeholder="Item Code">
+                                        <label for="floatingInput">Item Code</label>
                                     </div>
                                     <div class="input-generate input-group-prepend group-prepend-password align-items-center">
                                         <input autocomplete="one-time-code" style="z-index: 99; margin-bottom: 5px; margin-left: -30px;" id="generate_new_code" name="generate_new_code" type="checkbox" onchange="generateNewCode()">
@@ -78,12 +78,12 @@
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <select class="form-select type_barang" name="type_barang" id="type_barang">
-                                    <option value="">Pilih Tipe Barang</option>
-                                    <option value="bahan_jadi">BARANG JADI</option>
-                                    <option value="kemasan">KEMASAN</option>
+                                    <option value="">Items Type</option>
+                                    <option value="bahan_jadi">FINISHED GOODS</option>
+                                    <option value="kemasan">PACKING</option>
 
                                 </select>
-                                <label for="floatingInput" style="z-index: 1;">Tipe Barang</label>
+                                <label for="floatingInput" style="z-index: 1;">Items Type</label>
                             </div>
                         </div>
 
@@ -94,13 +94,13 @@
                                 <select class="form-select spesifikasi_id" name="spesifikasi_id" id="spesifikasi_id">
                                     <option value=""></option>
                                 </select>
-                                <label for="floatingInput" style="z-index: 1;">Pilih Dari Master Barang</label>
+                                <label for="floatingInput" style="z-index: 1;">Select From Item Master</label>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <input autocomplete="one-time-code" type="text" class="form-control barang_name" name="barang_name" id="barang_name" placeholder="Nama Barang">
-                                <label for="floatingInput">Nama Barang</label>
+                                <label for="floatingInput">Item Name</label>
                             </div>
                         </div>
                         <div class="col-md-6">
@@ -111,13 +111,13 @@
                                         <option value="<?= ($kb['id']) ?>"><?= $kb['kode_satuan'] ?></option>
                                     <?php endforeach; ?>
                                 </select>
-                                <label for="floatingInput" style="z-index: 1;">Satuan Default (Opsional)</label>
+                                <label for="floatingInput" style="z-index: 1;">Default Units (Opsional)</label>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input oninput="preventNegativeInput(this)" onkeyup="this.value=greatFormatRupiah(this.value)" autocomplete="one-time-code" type="text" class="form-control harga_jual" name="harga_jual" id="harga_jual" placeholder="Harga Jual">
-                                <label for="floatingInput">Harga Jual</label>
+                                <input oninput="preventNegativeInput(this)" onkeyup="this.value=greatFormatRupiah(this.value)" autocomplete="one-time-code" type="text" class="form-control harga_jual" name="harga_jual" id="harga_jual" placeholder="Selling Price (Optional)">
+                                <label for="floatingInput">Selling Price (Optional)</label>
                             </div>
                         </div>
                     </div>
@@ -125,10 +125,10 @@
                 </form>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-hide-form btn-discard mr-2">Kembali</button>
-                <button type="submit" class="btn btn-submit-form" id="btn-submit-form">Simpan</button>
+                <button type="button" class="btn btn-hide-form btn-discard mr-2">Back</button>
+                <button type="submit" class="btn btn-submit-form" id="btn-submit-form">Create</button>
                 <?php if (can('Penjualan Ekspor', 'Master Barang', 'd')) : ?>
-                    <button type="button" class="btn btn-discard delete-btn">Hapus</button>
+                    <button type="button" class="btn btn-discard delete-btn">Delete</button>
                 <?php endif; ?>
             </div>
         </div>
@@ -138,11 +138,11 @@
     <div class="modal-dialog" style="min-width: 900px">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">Import Master Barang</h5>
+                <h5 class="modal-title">Import Master Product</h5>
             </div>
             <div class="modal-body">
                 <div class="alert alert-secondary text-black" role="alert">
-                    UNDUH TEMPLEATE EXCEL <a href="<?= base_url('assets/import/IMPORT_MASTER_BARANG_SALES_EKSPOR.xlsx') ?>" style="text-decoration: none;"><b style="color: black;">DISINI</b></a>
+                    DOWNLOAD TEMPLEATE EXCEL <a href="<?= base_url('assets/import/IMPORT_MASTER_BARANG_SALES_EKSPOR.xlsx') ?>" style="text-decoration: none;"><b style="color: black;">DISINI</b></a>
                 </div>
                 <form class="form-excel-master-barang-ekspor" method="post">
                     <input type="hidden" name="type_barang_sales" value="EKSPOR">
@@ -152,8 +152,8 @@
                 </form>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-hide-form btn-discard mr-2" id="btn-discard-import-excel-master-barang-ekspor">Kembali</button>
-                <button type="submit" class="btn btn-submit-form" id="btn-submit-excel-master-barang-ekspor">Simpan</button>
+                <button type="button" class="btn btn-hide-form btn-discard mr-2" id="btn-discard-import-excel-master-barang-ekspor">Back</button>
+                <button type="submit" class="btn btn-submit-form" id="btn-submit-excel-master-barang-ekspor">Create</button>
             </div>
         </div>
     </div>
@@ -198,25 +198,25 @@
         searching: false,
         columns: [{
                 data: "no",
-                className: "text-center",
+                className: "text-left",
                 sortable: false,
                 width: "5%"
             },
             {
                 data: "type_barang",
-                className: "text-center",
+                className: "text-left",
             },
             {
                 data: "kode_barang",
-                className: "text-center",
+                className: "text-left",
             },
             {
                 data: "barang_name",
-                className: "text-center",
+                className: "text-left",
             },
             {
                 data: "kode_satuan",
-                className: "text-center",
+                className: "text-left",
             },
             // {
             //     data: "harga_pokok",
@@ -227,7 +227,7 @@
             // },
             {
                 data: "harga_jual",
-                className: "text-center",
+                className: "text-left",
                 render: function(data) {
                     return greatFormatRupiah(data);
                 }
@@ -263,8 +263,8 @@
             cancelButtonColor: '#d33',
             showCancelButton: true,
             reverseButtons: true,
-            confirmButtonText: 'Simpan',
-            cancelButtonText: 'Kembali',
+            confirmButtonText: 'Save',
+            cancelButtonText: 'Back',
         }).then((result) => {
             if (result.isConfirmed) {
                 let csrf = $(`[name="${csrfToken}"]`);
@@ -337,13 +337,13 @@
         },
         messages: {
             kode_barang: {
-                required: "Kode barang wajib diisi"
+                required: "Item Code required"
             },
             barang_name: {
-                required: "Nama barang wajib diisi"
+                required: "Item required"
             },
             type_barang: {
-                required: "Tipe barang wajib diisi"
+                required: "Item type required"
             },
             // satuan_id: {
             //     required: "Satuan wajib diisi"
@@ -395,8 +395,8 @@
                         cancelButtonColor: '#d33',
                         showCancelButton: true,
                         reverseButtons: true,
-                        confirmButtonText: 'Simpan',
-                        cancelButtonText: 'Kembali',
+                        confirmButtonText: 'Update',
+                        cancelButtonText: 'Back',
                     }).then((result) => {
                         if (result.isConfirmed) {
                             $.ajax({
@@ -453,13 +453,13 @@
             } else {
                 Swal.fire({
                     icon: 'question',
-                    title: 'Simpan Data ?',
+                    title: 'Create Data ?',
                     confirmButtonColor: '#4e73df',
                     cancelButtonColor: '#d33',
                     showCancelButton: true,
                     reverseButtons: true,
-                    confirmButtonText: 'Simpan',
-                    cancelButtonText: 'Kembali',
+                    confirmButtonText: 'Save',
+                    cancelButtonText: 'Back',
                 }).then((result) => {
                     if (result.isConfirmed) {
                         $.ajax({
@@ -552,7 +552,7 @@
     $(".delete-btn").click(function() {
         Swal.fire({
             icon: 'question',
-            title: 'Hapus Barang ?',
+            title: 'Delete Item ?',
             confirmButtonColor: '#4e73df',
             cancelButtonColor: '#d33',
             showCancelButton: true,
@@ -619,7 +619,7 @@
     // Initialize select2 for type_barang
     $("#type_barang").select2({
         theme: "bootstrap-5",
-        placeholder: 'Pilih Tipe Barang',
+        placeholder: 'Select Item Type',
         allowClear: true,
         dropdownParent: $(".add-modal .modal-content")
     }).change(function() {
@@ -680,14 +680,14 @@
 
     $("#satuan_id").select2({
         theme: "bootstrap-5",
-        placeholder: 'Pilih Satuan Default (Opsional)',
+        placeholder: 'Select Unit Default (Opsional)',
         allowClear: true,
         dropdownParent: $(".add-modal .modal-content")
     });
 
     $("#spesifikasi_id").select2({
         theme: "bootstrap-5",
-        placeholder: 'Pilih Dari Master Barang',
+        placeholder: 'Select Master Item',
         allowClear: true,
         dropdownParent: $(".add-modal .modal-content"),
     }).change(function() {
