@@ -15,10 +15,10 @@
             padding: 0;
         }
 
-        @page {
-            size: 8.27in 13in;
-            margin: 0;
-        }
+    @page {
+    size: 216mm 330mm;
+    margin: 0;
+}
 
         .align-items-center {
             align-items: center;
@@ -116,7 +116,7 @@
         
         .dotted-line {
             border-top: 1px dotted #000;
-            margin: 10px 0;
+            margin: 3px 0;
         }
     </style>
 </head>
