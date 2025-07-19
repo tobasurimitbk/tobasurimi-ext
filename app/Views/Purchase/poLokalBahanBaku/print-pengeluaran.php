@@ -7,13 +7,17 @@
     <title>Bukti Pengeluaran Lokal BB</title>
     <style>
         body {
-            font-size: 30px;
+            font-size: 12px;
             font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+            width: 8.27in;
+            height: 13in;
+            margin: 0;
+            padding: 0;
         }
 
         @page {
-            size: LEGAL;
-            margin: 3mm;
+            size: 8.27in 13in;
+            margin: 0;
         }
 
         .align-items-center {
@@ -86,16 +90,41 @@
         .w-100 {
             width: 100%;
         }
+        
+        /* Fold marks */
+        .fold-mark {
+            position: absolute;
+            width: 100%;
+            /* border-top: 1px dashed #999; */
+        }
+        
+        .fold-mark-1 {
+            top: 4.33in;
+        }
+        
+        .fold-mark-2 {
+            top: 8.67in;
+        }
+        
+        .section {
+            position: relative;
+            height: 3.9in;
+            padding: 10px;
+            margin-left: 15px;
+            box-sizing: border-box;
+        }
+        
+        .dotted-line {
+            border-top: 1px dotted #000;
+            margin: 10px 0;
+        }
     </style>
 </head>
 
-<body style="border: 0px solid;font-size: 12px;">
-
-    <br>
-    <br>
-    <br>
-
-    <div style="margin: 10px; padding: 10px; margin-top: 30px" class="">
+<body>
+    <!-- First section -->
+    <div class="section" style="margin-top: 0.2in;">
+        <div class="fold-mark fold-mark-1"></div>
         <table class="w-100">
             <tr>
                 <td>
@@ -210,10 +239,11 @@
         </table>
     </div>
 
-    <hr style="margin-top: 50px;margin-bottom: 45px;border: 1px dotted #000;">
-    <br>
+    <div class="dotted-line"></div>
 
-    <div style="margin: 10px; padding: 10px; margin-top: 30px">
+    <!-- Second section -->
+    <div class="section">
+        <div class="fold-mark fold-mark-2"></div>
         <table class="w-100">
             <tr>
                 <td>
@@ -328,15 +358,14 @@
         </table>
     </div>
 
-    <hr style="margin-top: 50px;margin-bottom: 45px;border: 1px dotted #000;">
-    <br>
+    <div class="dotted-line"></div>
 
-    <div style="margin: 10px; padding: 10px; margin-top: 30px">
+    <!-- Third section -->
+    <div class="section">
         <table class="w-100">
             <tr>
                 <td>
                     <table>
-                        
                         <tr>
                             <td style="font-size: 18px; font-weight: bold;"><u>BUKTI PENGELUARAN</u></td>
                             <td>
