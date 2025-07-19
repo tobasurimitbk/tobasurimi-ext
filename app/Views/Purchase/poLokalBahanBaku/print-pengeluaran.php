@@ -206,7 +206,7 @@
         </table>
     </div>
 
-    <hr style="margin-top: 80px;margin-bottom: 45px;border: 1px dotted #000;">
+    <hr style="margin-top: 40px;margin-bottom: 45px;border: 1px dotted #000;">
 
     <div style="margin: 10px; padding: 10px; margin-top: 30px">
         <table class="w-100">
@@ -323,7 +323,7 @@
         </table>
     </div>
 
-    <hr style="margin-top: 80px;margin-bottom: 45px;border: 1px dotted #000;">
+    <hr style="margin-top: 40px;margin-bottom: 45px;border: 1px dotted #000;">
 
     <div style="margin: 10px; padding: 10px; margin-top: 30px">
         <table class="w-100">
