@@ -225,6 +225,96 @@ function terbilang($x)
    return "";
 }
 
+function terbilangInggris($x)
+{
+   // Remove commas from number
+   $x = str_replace(',', '', $x);
+
+   $ones = [
+      "",
+      "One",
+      "Two",
+      "Three",
+      "Four",
+      "Five",
+      "Six",
+      "Seven",
+      "Eight",
+      "Nine",
+      "Ten",
+      "Eleven",
+      "Twelve",
+      "Thirteen",
+      "Fourteen",
+      "Fifteen",
+      "Sixteen",
+      "Seventeen",
+      "Eighteen",
+      "Nineteen"
+   ];
+
+   $tens = [
+      "",
+      "",
+      "Twenty",
+      "Thirty",
+      "Forty",
+      "Fifty",
+      "Sixty",
+      "Seventy",
+      "Eighty",
+      "Ninety"
+   ];
+
+   $scales = [
+      "",
+      "Thousand",
+      "Million",
+      "Billion",
+      "Trillion"
+   ];
+
+   // Handle decimals
+   if (strpos($x, '.') !== false) {
+      $parts = explode('.', $x);
+      $words = trim(terbilangInggris($parts[0]));
+
+      if ((int)$parts[1] > 0) {
+         $words .= " Point";
+         $digits = str_split($parts[1]);
+         foreach ($digits as $digit) {
+            $words .= " " . $ones[$digit];
+         }
+      }
+
+      return trim($words);
+   }
+
+   $x = (int)$x;
+
+   if ($x < 20) {
+      return $ones[$x];
+   } elseif ($x < 100) {
+      return $tens[floor($x / 10)] . ($x % 10 > 0 ? " " . $ones[$x % 10] : "");
+   } elseif ($x < 1000) {
+      return $ones[floor($x / 100)] . " Hundred" . ($x % 100 > 0 ? " " . terbilangInggris($x % 100) : "");
+   } else {
+      $result = "";
+      $scaleIndex = 0;
+
+      while ($x > 0) {
+         $chunk = $x % 1000;
+         if ($chunk > 0) {
+            $prefix = terbilangInggris($chunk);
+            $result = $prefix . " " . $scales[$scaleIndex] . ($result ? " " . $result : "");
+         }
+         $x = floor($x / 1000);
+         $scaleIndex++;
+      }
+
+      return trim($result);
+   }
+}
 
 function convertToIndonesianMonth($date)
 {

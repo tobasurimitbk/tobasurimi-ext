@@ -112,6 +112,11 @@
                     <label class="label-header">CONTAINER: <?= $salesKontrak['no_container']; ?></label>
                 <?php endif; ?>
 
+                <?php $no = 1; ?>
+                <?php foreach ($revisionList as $r): ?>
+                    <label class="label-header">REV: <?= $no ?>: <?= date('d/m/Y', strtotime($r['date_revision'])) ?></label> <br>
+                    <?php $no++ ?>
+                <?php endforeach; ?>
             </div>
 
         </div>
@@ -320,35 +325,6 @@
                             </div>
                         <?php endif; ?>
 
-                        <div style="margin-top:10px;">
-                            <?php if ($currentItemSaleskontrakdetail === $totalSalesKontrakdetail): ?>
-                                <?php if (!empty($groupBySatuan) && count($groupBySatuan) > 1) : ?>
-                                    <b>
-                                        TOTAL QTY
-                                    </b>
-                                    <table style="width: auto; border-collapse: collapse; font-size: 9px; margin-top: 5px;">
-                                        <thead>
-                                            <tr style="background-color: #f3f4f6;">
-                                                <?php foreach ($groupBySatuan as $satuan => $data): ?>
-                                                    <th style="padding: 5px; border: 1px solid #ddd; text-align: center;"><?= $satuan ?></th>
-                                                <?php endforeach; ?>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <tr>
-                                                <?php
-                                                $grand_total_qty = 0;
-                                                foreach ($groupBySatuan as $satuan => $data):
-                                                    $grand_total_qty += $data['qty'];
-                                                ?>
-                                                    <td style="padding: 5px; border: 1px solid #ddd; text-align: right;"><?= number_format($data['qty'], 2) ?></td>
-                                                <?php endforeach; ?>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                <?php endif; ?>
-                            <?php endif; ?>
-                        </div>
                     </td>
                 </tr>
 
@@ -390,7 +366,7 @@
             ?>
 
             <!-- Quantity Row -->
-            <?php if (count($groupBySatuan) == 1): ?>
+            <!-- <?php if (count($groupBySatuan) == 1): ?>
                 <tr style="font-weight: bold; background-color: #e9ecef; font-size:10px;">
                     <td style="padding: 6px; border: 1px solid #ddd;"></td>
                     <td style="padding: 6px; border: 1px solid #ddd; text-align: right;">
@@ -398,7 +374,7 @@
                         <?= number_format($total_qty, 2) ?>
                     </td>
                 </tr>
-            <?php endif; ?>
+            <?php endif; ?> -->
 
             <!-- Royalty -->
             <?php if ($salesKontrak['royalty_price'] > 0): ?>
@@ -469,9 +445,48 @@
             <!-- Final Amount Row -->
             <tr style="font-weight: bold; background-color: #e9ecef; font-size:10px;">
                 <td style="padding: 6px; border: 1px solid #ddd;"></td>
-                <td style="padding: 6px; border: 1px solid #ddd; text-align: right;">
-                    <span style="float: left;">GRAND TOTAL <?= !empty($salesKontrak['total_container']) ? "(" . $salesKontrak['total_container'] . ")" : "" ?> </span>
-                    (<?= $salesKontrak['mata_uang'] ?>) <?= number_format($grand_total, 2) ?>
+                <td style="padding: 6px; border: 1px solid #ddd;">
+                    <table style="width: 100%; table-layout: fixed;">
+                        <tr style="vertical-align: middle;">
+                            <!-- Kolom 1: GRAND TOTAL Label -->
+                            <td style="width: 25%; text-align: left; vertical-align: middle; white-space: nowrap;">
+                                GRAND TOTAL <?= !empty($salesKontrak['total_container']) ? "(" . $salesKontrak['total_container'] . ")" : "" ?>
+                            </td>
+
+                            <!-- Kolom 2: Tabel Satuan -->
+                            <td style="width: 50%; text-align: center; vertical-align: middle;">
+                                <?php if ($currentItemSaleskontrakdetail === $totalSalesKontrakdetail): ?>
+                                    <?php if (!empty($groupBySatuan)) : ?>
+                                        <table style="width: auto; margin: 0 auto; border-collapse: collapse; font-size: 9px;">
+                                            <thead>
+                                                <tr style="background-color: #f3f4f6;">
+                                                    <?php foreach ($groupBySatuan as $satuan => $data): ?>
+                                                        <th style="padding: 5px; border: 1px solid #ddd; text-align: center;"><?= $satuan ?></th>
+                                                    <?php endforeach; ?>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <?php
+                                                    $grand_total_qty = 0;
+                                                    foreach ($groupBySatuan as $satuan => $data):
+                                                        $grand_total_qty += $data['qty'];
+                                                    ?>
+                                                        <td style="padding: 5px; border: 1px solid #ddd; text-align: right;"><?= number_format($data['qty'], 2) ?></td>
+                                                    <?php endforeach; ?>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    <?php endif; ?>
+                                <?php endif; ?>
+                            </td>
+
+                            <!-- Kolom 3: Nilai Grand Total -->
+                            <td style="width: 25%; text-align: right; vertical-align: middle; white-space: nowrap;">
+                                (<?= $salesKontrak['mata_uang'] ?>) <?= number_format($grand_total, 2) ?>
+                            </td>
+                        </tr>
+                    </table>
                 </td>
             </tr>
         </tbody>
@@ -489,6 +504,8 @@
                         $grand_total,
                         2
                     ) ?>
+
+                    (<?= strtoupper(terbilangInggris($grand_total)) ?>)
                 </label>
             </div>
         <?php endif;
