@@ -17,7 +17,7 @@
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <input autocomplete="one-time-code" type="text" class="form-control name" id="name" name="name" placeholder="Nama">
-                                <label for="floatingInput">Nama Customer</label>
+                                <label for="floatingInput">Customer Name</label>
                             </div>
                         </div>
                         <div class="col-md-6">
@@ -34,7 +34,7 @@
                                     }
                                     ?>
                                 </select>
-                                <label for="floatingInput">Negara</label>
+                                <label for="floatingInput">Country</label>
                             </div>
                         </div>
                     </div>
@@ -42,7 +42,7 @@
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <textarea autocomplete="one-time-code" class="form-control address" id="address" name="address"></textarea>
-                                <label for="floatingInput">Alamat (Opsional)</label>
+                                <label for="floatingInput">Address (Opsional)</label>
                             </div>
                         </div>
                         <div class="col-md-6">
@@ -59,7 +59,7 @@
                                     }
                                     ?>
                                 </select>
-                                <label for="floatingInput">Nama Sales</label>
+                                <label for="floatingInput">Sales</label>
                             </div>
                         </div>
                     </div>
@@ -67,10 +67,10 @@
                 </form>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-hide-form btn-discard mr-2">Kembali</button>
-                <button type="submit" class="btn btn-submit-form btn-submit-parent-internasional">Simpan</button>
+                <button type="button" class="btn btn-hide-form btn-discard mr-2">Back</button>
+                <button type="submit" class="btn btn-submit-form btn-submit-parent-internasional">Save</button>
                 <?php if (can('Penjualan Ekspor', 'Customer', 'd')) : ?>
-                    <button type="button" class="btn btn-discard delete-btn delete-form-internasional">Hapus</button>
+                    <button type="button" class="btn btn-discard delete-btn delete-form-internasional">Delete</button>
                 <?php endif; ?>
             </div>
         </div>
@@ -84,7 +84,7 @@
         <h1>Customer Ekspor</h1>
         <?php if (can('Penjualan Ekspor', 'Customer', 'c')) : ?>
             <button class="btn btn-show-form btn-add float-right btn-show-form-internasional" data-btn="create-modal">
-                <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
+                <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Create New
             </button>
         <?php endif; ?>
         <?php if (can('Penjualan Ekspor', 'Customer', 'p')) : ?>
@@ -101,7 +101,7 @@
         <div class="card-body">
             <div class="row  justify-content-end ">
                 <div class="col-sm-3 mb-3" style="float: right;">
-                    <input autocomplete="one-time-code" class="form-control search form-out-search mr-3 form-search-internasional" placeholder="Cari Kode / Nama Customer" value="" />
+                    <input autocomplete="one-time-code" class="form-control search form-out-search mr-3 form-search-internasional" placeholder="Search Data" value="" />
                 </div>
             </div>
             <div class="table-responsive">
@@ -110,10 +110,10 @@
                         <thead class="thead-dark">
                             <tr>
                                 <th>No.</th>
-                                <th onclick="changeSort('kode')" class="sort">Kode</th>
-                                <th onclick="changeSort('name')" class="sort">Nama Pelanggan</th>
-                                <th onclick="changeSort('country')" class="sort">Negara</th>
-                                <th onclick="changeSort('address')" class="sort">Alamat</th>
+                                <th onclick="changeSort('kode')" class="sort">Code</th>
+                                <th onclick="changeSort('name')" class="sort">Customer Name</th>
+                                <th onclick="changeSort('country')" class="sort">Country</th>
+                                <th onclick="changeSort('address')" class="sort">Address</th>
                             </tr>
                         </thead>
                         <tbody class="body-table" id="body-table" style="cursor: pointer;">
@@ -133,7 +133,7 @@
             </div>
             <div class="modal-body">
                 <div class="alert alert-secondary text-black" role="alert">
-                    UNDUH TEMPLEATE EXCEL <a href="<?= base_url('assets/import/IMPORT_EXCEL_CUSTOMER.xlsx') ?>" style="text-decoration: none;"><b style="color: black;">DISINI</b></a>
+                    DOWNLOAD TEMPLEATE EXCEL <a href="<?= base_url('assets/import/IMPORT_EXCEL_CUSTOMER.xlsx') ?>" style="text-decoration: none;"><b style="color: black;">DISINI</b></a>
                 </div>
                 <form class="form-excel-master-barang-ekspor" method="post">
                     <input type="hidden" name="tipe_customer" value="INTERNASIONAL">
@@ -143,8 +143,8 @@
                 </form>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-hide-form btn-discard btn-discard-import-excel-customer-global mr-2">Kembali</button>
-                <button type="submit" class="btn btn-submit-form btn-submit-excel-master-barang-ekspor">Simpan</button>
+                <button type="button" class="btn btn-hide-form btn-discard btn-discard-import-excel-customer-global mr-2">Back</button>
+                <button type="submit" class="btn btn-submit-form btn-submit-excel-master-barang-ekspor">Import</button>
             </div>
         </div>
     </div>
@@ -298,14 +298,14 @@
         // COUNTRY
         //CSS SELECT2 FLOATING LABEL
         $('#sales_id').select2({
-            placeholder: "Pilih Sales (Opsional)",
+            placeholder: "Select Sales (Opsional)",
             theme: "bootstrap-5",
             allowClear: true,
             dropdownParent: $("#add_modal_internasional")
         });
 
         $('.country_id').select2({
-            placeholder: "Pilih Negara",
+            placeholder: "Select Country",
             theme: "bootstrap-5",
             dropdownParent: $(".add-modal-internasional .modal-content")
         })
@@ -344,10 +344,10 @@
             },
             messages: {
                 name: {
-                    required: "Nama customer wajib diisi"
+                    required: "Customer name required"
                 },
                 country_id: {
-                    required: "Pilih negara"
+                    required: "Select country"
                 },
             },
             errorElement: 'span',

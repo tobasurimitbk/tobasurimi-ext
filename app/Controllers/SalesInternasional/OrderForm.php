@@ -136,7 +136,6 @@ class OrderForm extends BaseController
     {
         $dataCustomer = $this->customerModel->getCustomerEkspor(
             $this->this_user_id,
-            $this->this_company_id,
             $this->is_admin
         );
         $dataCountry = $this->countryModel->findAll();
@@ -440,7 +439,6 @@ class OrderForm extends BaseController
         $id = decrypt($id);
         $dataCustomer = $this->customerModel->getCustomerEkspor(
             $this->this_user_id,
-            $this->this_company_id,
             $this->is_admin
         );
         $dataCountry = $this->countryModel->findAll();

@@ -1159,6 +1159,7 @@ class PembayaranPOLokal extends BaseController
             "divisi" => $divisiList,
             "panjar" => $dataPembayaranPanjar,
         ];
+
         return view('Pembayaran/pembayaranPOLokal/formBahanBaku', $data);
     }
     // PRINT PEMBAYARAN PO BP
@@ -1435,12 +1436,14 @@ class PembayaranPOLokal extends BaseController
     {
         $localPOPaymentModel = new LocalPOPaymentModel();
         $jenis = $this->request->getGet('jenisPembayaran');
+        $metodePembayaran = $this->request->getGet('paymentMethod');
         $divisi = str_replace(' ', '', trim($this->request->getGet('divisiId')));
         $bank = str_replace(' ', '', trim($this->request->getGet('bankId')));
 
         $paymentNo = $localPOPaymentModel->get_new_no(
             $jenis,
             $divisi,
+            $metodePembayaran,
             $bank,
             date('m'),
             date('Y'),
@@ -1488,15 +1491,17 @@ class PembayaranPOLokal extends BaseController
     // }
 
     public function generatePaymentNoBPNew()
-    {
+    {   
         $localPOPaymentBPModel = new LocalPOPaymentBPModel();
         $jenis = $this->request->getvar('jenisPembayaran');
+        $paymentMethod = $this->request->getvar('paymentMethod');
         $divisi = str_replace(' ', '', trim($this->request->getvar('divisiId')));
         $bank = str_replace(' ', '', trim($this->request->getvar('bankId')));
 
         $paymentNo = $localPOPaymentBPModel->get_new_no(
             $jenis,
             $divisi,
+            $paymentMethod,
             $bank,
             date('m'),
             date('Y'),

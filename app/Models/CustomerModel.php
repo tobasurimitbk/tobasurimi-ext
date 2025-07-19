@@ -177,12 +177,15 @@ class CustomerModel extends Model
             ->join('employees', 'employees.id = customers.sales_id', 'LEFT')
             ->join('companies', 'companies.id = customers.company_id', 'left');
 
-        if (session()->get("login")->this_company_id == 16) {
-            // OCS PUNYA COUNTER NOMOR SENDIRI
-            $customerDataQry->where('customers.company_id', 16);
-        } else {
-            // KIM 1, KIM 2, GLOBAL COUNTER NYA DIGABUNG
-            $customerDataQry->whereIn('customers.company_id', [1, 2, 15]);
+        if ($condition['tipe_customer'] == "LOKAL") {
+            // LOKAL
+            if (session()->get("login")->this_company_id == 16) {
+                // OCS PUNYA COUNTER LOKAL SENDIRI
+                $customerDataQry->where('customers.company_id', 16);
+            } else {
+                // KIM 1, KIM 2, GLOBAL CUSTOMER LOKAL NYA DIGABUNG
+                $customerDataQry->whereIn('customers.company_id', [1, 2, 15]);
+            }
         }
 
         if ($condition['tipe_customer'] == "LOKAL") {
@@ -354,9 +357,10 @@ class CustomerModel extends Model
         return $query->getResultArray();
     }
 
-    public function getCustomerEkspor($user_id, $companyID, $is_admin)
+    public function getCustomerEkspor($user_id, $is_admin)
     {
-        $query = $this->asArray()->where('company_id', $companyID)
+        $query = $this->asArray()
+            // ->where('company_id', $companyID) KIM 1, KIM 2, GLOBAL DAN OCS DIGABUNG
             ->where('tipe_customer', "INTERNASIONAL")
             ->where('deletedAt', null);
 
@@ -364,7 +368,7 @@ class CustomerModel extends Model
             $query->where('user_id', $user_id);
         }
 
-        return $query->orderBy('createdAt', "DESC")->findAll();
+        return $query->orderBy('kode', "DESC")->findAll();
     }
 
     public function getCustomerLokal($user_id, $is_admin)
@@ -424,8 +428,8 @@ class CustomerModel extends Model
                 $builder->whereIn('company_id', [1, 2, 15]);
             }
         } else {
-            // INTERNASIONAL
-            $builder->where('company_id', session()->get("login")->this_company_id);
+            // INTERNASIONAL (JADI SATU)
+            $builder->whereIn('company_id', [1, 2, 15, 16]);
         }
 
         $builder->groupStart()->like('kode', $lastStr)->groupEnd();

@@ -1345,9 +1345,11 @@ class LocalPOPaymentModel extends Model
     public function getlistLPBmonth() {}
 
 
+    
     public function get_new_no(
         $jenis,
         $divisi,
+        $paymentMethod,
         $bank_id,
         $bln,
         $thn,
@@ -1356,9 +1358,9 @@ class LocalPOPaymentModel extends Model
     ) {
         $banksModel = new BanksModel();
         
-        // Step 1: Get bank code
+        // Step 1: Get bank code (only if payment method is BANK)
         $kodeBank = '';
-        if (!empty($bank_id)) {
+        if (!empty($bank_id) && strtoupper($paymentMethod) !== 'CASH') {
             $bankData = $banksModel->select('name')
                                 ->where('id', $bank_id)
                                 ->first();
@@ -1377,7 +1379,8 @@ class LocalPOPaymentModel extends Model
         }
 
         $kodeDivisi = '';
-        if (!empty($divisi)) {
+        // Only get division code if payment method is CASH or if bank code is empty (fallback)
+        if (!empty($divisi) && (strtoupper($paymentMethod) === 'CASH' || empty($kodeBank))) {
             $divisiUpper = strtoupper($divisi);
             if (strpos($divisiUpper, 'PTS') !== false) {
                 $kodeDivisi = ($jenis == 'MERAH') ? 'MKN' : 'KKN';
@@ -1394,11 +1397,20 @@ class LocalPOPaymentModel extends Model
             }
         }
 
-        // Step 3: Build search pattern based on whether bank code exists
-        $searchPattern = $kodeDivisi . '/';
-        if (!empty($kodeBank)) {
-            $searchPattern .= $kodeBank . '/';
+        // Step 3: Build search pattern
+        $searchPattern = '';
+        
+        // Use division code for CASH, bank code for BANK
+        if (strtoupper($paymentMethod) === 'CASH') {
+            $searchPattern = $kodeDivisi . '/';
+        } else {
+            if (!empty($kodeBank)) {
+                $searchPattern = $kodeBank . '/';
+            } elseif (!empty($kodeDivisi)) { // Fallback to division code if no bank code
+                $searchPattern = $kodeDivisi . '/';
+            }
         }
+        
         $searchPattern .= $thn . '/' . $bln . '/';
 
         // Step 4: Check all relevant tables for the highest number
@@ -1440,13 +1452,21 @@ class LocalPOPaymentModel extends Model
         // Step 5: Generate new number
         $counterNext = str_pad($maxNumber + 1, 4, '0', STR_PAD_LEFT);
         
-        // Build final number
-        $prefix = $kodeDivisi . '/';
-        if (!empty($kodeBank)) {
-            $prefix .= $kodeBank . '/';
+        // Build final number based on payment method
+        $prefix = '';
+        if (strtoupper($paymentMethod) === 'CASH') {
+            $prefix = $kodeDivisi . '/';
+        } else {
+            if (!empty($kodeBank)) {
+                $prefix = $kodeBank . '/';
+            } elseif (!empty($kodeDivisi)) { // Fallback to division code if no bank code
+                $prefix = $kodeDivisi . '/';
+            }
         }
         $prefix .= $thn . '/' . $bln . '/';
         
         return $prefix . $counterNext;
     }
+
+    
 }

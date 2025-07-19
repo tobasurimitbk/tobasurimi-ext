@@ -61,7 +61,7 @@
                         <div class="form-floating mb-3" style="height: 50px;">
                             <div class="input-group input-group-password">
                                 <div class="form-floating mb-3" style="height: 50px;">
-                                    <input autocomplete="one-time-code" type="text" class="form-control no_bukti_pembayaran" id="no_bukti_pembayaran" name="no_bukti_pembayaran" placeholder="No. Pembayaran" required <?= !empty($detail) ? ($detail['pembayaranDetail']['status_posting'] == 1 ? 'readonly' : '') : '' ?> <?= !empty($detail) ? ' value="' . $detail['pembayaranDetail']['payment_no'] . '"' : '' ?>>
+                                    <input autocomplete="one-time-code" type="text" class="form-control no_bukti_pembayaran" id="no_bukti_pembayaran" name="no_bukti_pembayaran" placeholder="No. Pembayaran" required readonly <?= !empty($detail) ? ' value="' . $detail['pembayaranDetail']['payment_no'] . '"' : '' ?>>
                                     <label for="floatingInput">No. Pembayaran</label>
                                 </div>
                             </div>
@@ -81,12 +81,18 @@
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating form-pembayaran-po mb-3" style="height: 50px;">
-                            <select class="form-select" <?= !empty($detail) ? ($detail['pembayaranDetail']['status_posting'] == 1 ? 'disabled' : '') : "" ?> name="jenis_pembayaran" id="jenis_pembayaran">
-                                <option selected value="<?= !empty($detail['pembayaranDetail']['jenis_bayar']) ? $detail['pembayaranDetail']['jenis_bayar'] : '';  ?>"></option>
-                                <option value="MERAH">MERAH</option>
-                                <option value="PUTIH">PUTIH</option>
+                            <select class="form-select"
+                                <?= !empty($detail) && $detail['pembayaranDetail']['status_posting'] == 1 ? 'disabled' : '' ?>
+                                name="jenis_pembayaran"
+                                id="jenis_pembayaran"
+                                required>
+                                <?php if (empty($detail['pembayaranDetail']['jenis_pembayaran'])): ?>
+                                    <option value="" selected disabled>Pilih Jenis Pembayaran</option>
+                                <?php endif; ?>
+                                <option value="MERAH" <?= !empty($detail['pembayaranDetail']['jenis_pembayaran']) && $detail['pembayaranDetail']['jenis_pembayaran'] == 'MERAH' ? 'selected' : '' ?>>MERAH</option>
+                                <option value="PUTIH" <?= !empty($detail['pembayaranDetail']['jenis_pembayaran']) && $detail['pembayaranDetail']['jenis_pembayaran'] == 'PUTIH' ? 'selected' : '' ?>>PUTIH</option>
                             </select>
-                            <label for="floatingInput" style="z-index: 1;">Jenis Pembayaran</label>
+                            <label for="jenis_pembayaran">Jenis Pembayaran</label>
                         </div>
                     </div>
                 </div>
@@ -257,10 +263,6 @@
 
     $(document).ready(function() {
 
-        <?php if (empty($detail)): ?>
-            generatePaymentNumber();
-        <?php endif; ?>
-
         var validator = $(".create-form").validate({
             rules: {
                 no_bukti_pembayaran: {
@@ -394,6 +396,8 @@
         $('#payment_method').select2({
             placeholder: "Metode Pembayaran",
             theme: "bootstrap-5"
+        }).change(function() {
+            generatePaymentNumber();
         });
 
         // $('#status_pph').select2({
@@ -1053,6 +1057,7 @@
         formData.append("bankId", $("#bank_id option:selected").val());
         formData.append("divisiId", $("#divisi_id option:selected").text());
         formData.append("jenisPembayaran", $("#jenis_pembayaran option:selected").text());
+        formData.append("paymentMethod", $("#payment_method option:selected").text());
 
         $(".no_bukti_pembayaran").attr("readonly", true);
 

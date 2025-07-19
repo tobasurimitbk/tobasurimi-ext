@@ -57,13 +57,13 @@ class Customer extends BaseController
         if ($this->is_admin == '1') {
             $condition = [
                 'tipe_customer' => $this->request->getGet('customerType'),
-                'customers.company_id' => $this->this_company_id,
+                // 'customers.company_id' => $this->this_company_id,
                 'customers.deletedAt' => null,
             ];
         } else {
             $condition = [
                 'tipe_customer' => $this->request->getGet('customerType'),
-                'customers.company_id' => $this->this_company_id,
+                // 'customers.company_id' => $this->this_company_id,
                 'customers.deletedAt' => null,
                 'customers.user_id' => session()->get('login')->user_id
             ];
@@ -73,7 +73,6 @@ class Customer extends BaseController
             "search"        => $this->request->getGet("search"),
             "sort"          => $this->request->getGet("sort"),
             "sortType"      => $this->request->getGet("sortType"),
-            'company_id' => ''
         ];
 
         $limit = $this->request->getGet("length");
