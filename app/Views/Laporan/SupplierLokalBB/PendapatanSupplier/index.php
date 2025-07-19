@@ -127,7 +127,7 @@
                                 <th colspan="3">Harian</th>
                                 <th colspan="3">Tambahan Harian</th>
                                 <th colspan="3">Tambahan Bulanan</th>
-                                <th colspan="3">Subsidi</th>
+                                <th colspan="3">Tambahan Langsung</th>
                                 <th rowspan="2">Total</th>
                             </tr>
                             <tr>

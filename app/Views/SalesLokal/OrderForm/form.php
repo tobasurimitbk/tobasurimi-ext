@@ -229,7 +229,7 @@
                                 <th>Qty</th>
                                 <th>Satuan</th>
                                 <th>Harga Satuan</th>
-                                <th>Discount (%)</th>
+                                <th>Discount</th>
                                 <th>PPN</th>
                                 <th>Amount</th>
                                 <th></th>
@@ -330,9 +330,21 @@
                             </div>
                         </div>
                         <div class="col-md-6">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" type="text" class="form-control discount_percentage" name="discount_percentage" id="discount_percentage" placeholder="discount">
-                                <label for="floatingInput">disc%</label>
+                            <div class="mb-3">
+                                <!-- <label for="discount_input" class="form-label">disc%</label> -->
+                                <div class="input-group" style="height: 50px;">
+                                    <input
+                                        autocomplete="one-time-code"
+                                        type="text"
+                                        class="form-control discount_percentage"
+                                        name="discount_percentage"
+                                        id="discount_percentage"
+                                        placeholder="Discount">
+                                    <select class="form-select discount_unit" name="discount_unit" id="discount_unit" style="max-width: 100px;">
+                                        <option value="percent" selected>%</option>
+                                        <option value="rupiah">Rp</option>
+                                    </select>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -738,6 +750,8 @@
                     statusppn: "<?= $payload['status_ppn'] ?>",
                     tax: null,
                     discount_percentage: <?= $payload['discount_percentage'] ?? 0 ?>,
+                    discount_unit: "<?= $payload['discount_unit'] ?? "percent" ?>",
+                    discUnit: "<?= $payload['discount_unit'] ?? "percent" ?>",
                     isDeleted: false,
                     kode_barang: '<?= $payload['kode_barang'] ?>',
                     satuan: '<?= $payload['satuan'] ?>',
@@ -745,8 +759,11 @@
                     barangTotal: "<?= $payload['barangTotal'] ?>",
                     disc: "<?= $payload['discount_percentage'] ?? 0 ?>",
                     taxAmt: null,
-                    discAmt: <?= $payload['barangTotal'] ?> * (<?= $payload['discount_percentage'] ?? 0 ?> / 100),
+                    discAmt: "<?= $payload['discount_unit'] ?? "percent" ?>" == 'percent' ? <?= $payload['barangTotal'] ?> * (<?= $payload['discount_percentage'] ?? 0 ?> / 100) : <?= $payload['discount_percentage'] ?? 0 ?>,
                 });
+
+                console.log(list_items);
+
 
                 table.row.add({
                     no: no,
@@ -760,6 +777,8 @@
                     statusppn: "<?= $payload['status_ppn'] ?>",
                     tax: null,
                     discount_percentage: <?= $payload['discount_percentage'] ?? 0 ?>,
+                    discount_unit: "<?= $payload['discount_unit'] ?? "percent" ?>",
+                    discUnit: "<?= $payload['discount_unit'] ?? "percent" ?>",
                     isDeleted: false,
                     kode_barang: '<?= $payload['kode_barang'] ?>',
                     satuan: '<?= $payload['satuan'] ?>',
@@ -767,7 +786,7 @@
                     barangTotal: "<?= $payload['barangTotal'] ?>",
                     disc: "<?= $payload['discount_percentage'] ?? 0 ?>",
                     taxAmt: null,
-                    discAmt: <?= $payload['barangTotal'] ?> * (<?= $payload['discount_percentage'] ?? 0 ?> / 100),
+                    discAmt: "<?= $payload['discount_unit'] ?? "percent" ?>" == 'percent' ? <?= $payload['barangTotal'] ?> * (<?= $payload['discount_percentage'] ?? 0 ?> / 100) : <?= $payload['discount_percentage'] ?? 0 ?>,
                 }).draw(false);
             <?php
             }
@@ -1526,7 +1545,7 @@
                 $(".keterangan").val("").change();
                 $(".statusppn").val("");
                 $(".tax").val("");
-                $(".discount_percentage").val("0");
+                $(".discount_percentage").val();
                 $(".dept").val("");
                 $(".warehouse").val("");
                 $(".id_warehouse").val("");
@@ -1636,6 +1655,7 @@
                                     statusppn: obj.statusppn,
                                     tax: obj.tax ? Number(obj.tax) : 0,
                                     discount_percentage: obj.discount_percentage ? Number(obj.discount_percentage) : 0,
+                                    discount_unit: obj.discUnit,
                                     dept: obj.dept ? Number(obj.dept) : 0,
                                     warehouse_id: obj.warehouse_id ? Number(obj.warehouse_id) : 0,
                                     warhouse_name: obj.warhouse_name,
@@ -1836,7 +1856,7 @@
 
         $(".harga, .qty").keyup(function() {
             let harga = $(".harga").val() ? $(".harga").val().replaceAll(",", "") : 0;
-            let qty = $(".qty").val() ? parseInt($(".qty").val()) : 0;
+            let qty = $(".qty").val() ? parseFloat($(".qty").val()) : 0;
 
             let amount = (harga * qty).toLocaleString();
             $(".amount").val(amount);
@@ -1844,11 +1864,28 @@
 
         $(".discount_percentage").keyup(function() {
             if ($(".discount_percentage").val()) {
-                if ($(".discount_percentage").val() > 100) {
+                if ($(".discount_unit option:selected").val() == 'percent' && $(".discount_percentage").val() > 100) {
                     $(".discount_percentage").val(100)
                 }
-                if ($(".discount_percentage").val() < 0) {
+                if ($(".discount_unit option:selected").val() == 'percent' && $(".discount_percentage").val() < 0) {
                     $(".discount_percentage").val();
+                }
+            } else {
+                $(".discount_percentage").val();
+            }
+        })
+
+        $(".discount_unit").change(function() {
+            let discVal = $(".discount_percentage").val();
+            if (discVal) {
+                if ($(".discount_unit option:selected").val() == 'percent' && discVal > 100) {
+                    $(".discount_percentage").val(100)
+                }
+                if ($(".discount_unit option:selected").val() == 'percent' && discVal < 0) {
+                    $(".discount_percentage").val();
+                }
+                if ($(".discount_unit option:selected").val() == 'rupiah') {
+                    $(".discount_percentage").val(discVal)
                 }
             } else {
                 $(".discount_percentage").val();
@@ -1862,17 +1899,21 @@
             const selectedData = $(".id_barang option:selected").data();
             let harga = $(".harga").val()
             let qty = $(".qty").val()
-            let amount = $(".amount").val().replace(/\,/g, '');
+            let amount = $(".amount").val().replace(/\./g, '').replace(/\,/g, '.');
             let keterangan = $(".keterangan").val()
             let statusppn = $(".statusppn").val()
             const tax = selectedData.tax;
             let discountPercentage = $(".discount_percentage").val() || 0;
+            let discountUnit = $(".discount_unit option:selected").val() || "percent";
             let dept = $(".dept").val()
             let warehouseId = $(".warehouse").val()
             let warhouseName = $(".warehouse").text()
 
-            const discAmt = amount * (discountPercentage / 100);
+            const discAmt = discountUnit == "percent" ? amount * (discountPercentage / 100) : discountPercentage;
             const discountedAmt = amount - discAmt;
+
+            console.log(discAmt, discountedAmt, amount);
+
 
             const currentItemList = table.rows().data().toArray();
             let validate_same = currentItemList.findIndex((obj) => obj.id_barang == id_barang && obj.warehouse_id == warehouseId);
@@ -1913,6 +1954,7 @@
                             satuan: selectedData.satuan,
                             disc: discountPercentage,
                             discAmt: discAmt,
+                            discUnit: discountUnit,
                             isDeleted: false,
 
                             barangTotal: amount,
@@ -1934,6 +1976,7 @@
                             taxAmt: amount * (tax / 100),
                             keterangan: keterangan,
                             discAmt: discAmt,
+                            discUnit: discountUnit,
                             amount: discountedAmt,
                             dept: dept,
                             warehouse_id: warehouseId,

@@ -23,6 +23,7 @@ class SalesOrderDetailModel extends Model
         'qty_sekarang',
         'keterangan',
         'discount_percentage',
+        'discount_unit',
         'tax',
         'harga_barang',
         'amount',

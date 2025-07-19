@@ -25,6 +25,7 @@ use App\Models\SatuansModel;
 use App\Models\SuratJalanModel;
 use Error;
 use ErrorException;
+use Exception;
 
 class OrderForm extends BaseController
 {
@@ -283,7 +284,7 @@ class OrderForm extends BaseController
                 ],
             ],
             "items.*.discount_percentage" => [
-                "rules" => "permit_empty|numeric|greater_than_equal_to[0]",
+                "rules" => "permit_empty",
                 'errors' => [
                     // 'required' => 'barang tidak boleh kosong',
                 ],
@@ -292,6 +293,12 @@ class OrderForm extends BaseController
                 "rules" => "required",
                 'errors' => [
                     'required' => 'Harga Barang tidak boleh kosong',
+                ],
+            ],
+            "items.*.discUnit" => [
+                "rules" => "required",
+                'errors' => [
+                    'required' => 'Discount unit tidak boleh kosong',
                 ],
             ],
         ];
@@ -342,12 +349,13 @@ class OrderForm extends BaseController
         try {
             $this->SalesOrderModel->db->transException(true)->transStart();
             $orderDate = date('Y-m-d', strtotime(str_replace('/', '-', $postData['order_date'])));
+            $shippingDate = date('Y-m-d', strtotime(str_replace('/', '-', $postData['shipping_date'])));
 
             $values = [
                 "no_sales_order"        => strtoupper($postData['no_sales_order']),
                 "id_user"               => $this->userId,
                 "id_customer"           => $postData['id_customer'],
-                "shipping_date"           => $postData['shipping_date'],
+                "shipping_date"           => $shippingDate,
                 "destination"           => $postData['destination'],
                 "jenis_penjualan"           => $postData['jenis_penjualan'],
                 "sales_id"              => isset($postData['id_sales']) ? $postData['id_sales'] : NULL,
@@ -397,6 +405,7 @@ class OrderForm extends BaseController
                     "discount_percentage"   => number_format($row->disc, 2, '.', ''),
                     "tipe_input"            => "order_form",
                     "status_ppn"            => $row->statusppn,
+                    "discount_unit"            => $row->discUnit,
                     // "dept"                  => $row->dept,
                     // "id_warehouse"          => $row->warehouse_id,
                 ];
@@ -781,7 +790,7 @@ class OrderForm extends BaseController
         foreach ($getAllBarangSalesOrderDetail as $row) {
             $totalQty = $totalQty + $row['qty'];
             $amountValue = $row['amount'] ? (float) str_replace(",", "", $row['amount']) : 0;
-            $total_harga +=  $amountValue - ($amountValue * ($row['discount_percentage'] / 100));
+            $total_harga +=  $row['discount_unit'] == "percent" ? ($amountValue - ($amountValue * ($row['discount_percentage'] / 100))) : ($amountValue - $row['discount_percentage']);
         }
         //qty barang ditambah jumlah kemasan
         $this->SalesOrderModel->update($getBarangSalesOrderDetail['id_sales_order'], ['qty_barang' => ($totalQty * 2), 'total_harga' => $total_harga]);

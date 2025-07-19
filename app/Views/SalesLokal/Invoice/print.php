@@ -192,9 +192,9 @@
                     <td><?= $detail->nama_barang ?></td>
                     <td class="txt-center"><?= $detail->qty_invoice ?></td>
                     <td class="txt-center"><?= $detail->satuan ?></td>
-                    <td class="txt-center">Rp. <?= number_format($detail->harga_barang) ?></td>
+                    <td class="txt-center"><?= number_format($detail->harga_barang) ?></td>
                     <td class="txt-center"><?= $detail->disc ?></td>
-                    <td class="txt-right">Rp. <?= number_format($detail->amount) ?></td>
+                    <td class="txt-right"><?= number_format($detail->amount) ?></td>
                 </tr>
             <?php
                 $rowNumber++;
@@ -224,11 +224,11 @@
                 <table class="w-100" style="border-collapse: collapse">
                     <tr>
                         <td class="txt-right" style="border-bottom: 1px solid;">DPP: </td>
-                        <td class="txt-right" style="border-bottom: 1px solid;">Rp. <?= number_format($invData->dpp) ?></td>
+                        <td class="txt-right" style="border-bottom: 1px solid;"><?= number_format($invData->dpp) ?></td>
                     </tr>
                     <tr>
                         <td class="txt-right">PPN: </td>
-                        <td class="txt-right">Rp. <?= (isset($invData->status_tax) && isset($invData->status_tax)) ? number_format($invData->ppn) : number_format($invData->ppn) ?></td>
+                        <td class="txt-right"><?= (isset($invData->status_tax) && isset($invData->status_tax)) ? number_format($invData->ppn) : number_format($invData->ppn) ?></td>
                     </tr>
                 </table>
             </td>
@@ -266,7 +266,7 @@
                 <table class="w-100 rounded-border" style="margin-bottom: 3px;">
                     <tr>
                         <td>Tot Sub Stlh Pjk</td>
-                        <td class="txt-right">Rp. <?= number_format($invData->total_invoice) ?></td>
+                        <td class="txt-right"><?= number_format($invData->total_invoice) ?></td>
                     </tr>
                 </table>
                 <div class="rounded-border" style="margin-bottom: 3px;">&nbsp;</div>
