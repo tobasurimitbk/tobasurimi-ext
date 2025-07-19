@@ -937,7 +937,7 @@ class POLokalBahanBaku extends BaseController
 
             $filename = "Bukti Pengeluaran Bahan Baku";
             $this->dompdf->loadHtml(view('Purchase/poLokalBahanBaku/print-pengeluaran', $data));
-            $this->dompdf->setPaper('A4', 'PORTRAIT');
+            $this->dompdf->setPaper('LEGAL', 'PORTRAIT');
             $this->dompdf->render();
             $this->dompdf->stream($filename, array("Attachment" => false));
             exit(0);

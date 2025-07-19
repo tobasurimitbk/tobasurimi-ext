@@ -7,12 +7,12 @@
     <title>Bukti Pengeluaran Lokal BB</title>
     <style>
         body {
-            font-size: 12px;
+            font-size: 30px;
             font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
         }
 
         @page {
-            size: A4;
+            size: LEGAL;
             margin: 10mm;
         }
 
@@ -41,14 +41,6 @@
             display: inline-block;
             vertical-align: middle;
         }
-
-        /* .d-flex {
-            display: flex;
-        }
-
-        .flex-1 {
-            flex: 1;
-        } */
 
         .flex-column {
             flex-direction: column;
@@ -97,7 +89,7 @@
     </style>
 </head>
 
-<body style="border: 0px solid;font-size: 11px;">
+<body style="border: 0px solid;font-size: 12px;">
 
     <div style="margin: 10px; padding: 10px;" class="">
         <table class="w-100">
@@ -214,7 +206,7 @@
         </table>
     </div>
 
-    <hr style="margin-top: 25px;margin-bottom: 10px;border: 1px dotted #000;">
+    <hr style="margin-top: 80px;margin-bottom: 45px;border: 1px dotted #000;">
 
     <div style="margin: 10px; padding: 10px; margin-top: 30px">
         <table class="w-100">
@@ -300,7 +292,7 @@
 
         <div style="margin-top: 0.5rem;margin-bottom: 0.5rem">
             <span>TERBILANG:</span>
-            <span style="text-transform: uppercase;"><u><?= ($totalDailyPaidTerbilang) . ' RUPIA</u>H' ?></span>
+            <span style="text-transform: uppercase;"><u><?= ($totalDailyPaidTerbilang) . ' RUPIAH' ?></u></span>
         </div>
 
         <table class="w-100 sign-table border-collapse">
@@ -331,7 +323,7 @@
         </table>
     </div>
 
-    <hr style="margin-top: 25px;margin-bottom: 10px;border: 1px dotted #000;">
+    <hr style="margin-top: 80px;margin-bottom: 45px;border: 1px dotted #000;">
 
     <div style="margin: 10px; padding: 10px; margin-top: 30px">
         <table class="w-100">
@@ -418,7 +410,7 @@
 
         <div style="margin-top: 0.5rem;margin-bottom: 0.5rem">
             <span>TERBILANG:</span>
-            <span style="text-transform: uppercase;"><u><?= ($totalTambahanPaidTerbilang) . ' RU</u>PIAH' ?></span>
+            <span style="text-transform: uppercase;"><u><?= $totalTambahanPaid != 0 ? ($totalTambahanPaidTerbilang) . ' RUPIAH' : ''?></u></span>
         </div>
 
         <table class="w-100 sign-table border-collapse">
