@@ -471,7 +471,7 @@
                 <td style="padding: 6px; border: 1px solid #ddd;"></td>
                 <td style="padding: 6px; border: 1px solid #ddd; text-align: right;">
                     <span style="float: left;">GRAND TOTAL <?= !empty($salesKontrak['total_container']) ? "(" . $salesKontrak['total_container'] . ")" : "" ?> </span>
-                    (<?= $salesKontrak['mata_uang'] ?>) <?= number_format($total_amount - ($salesKontrak['royalty_price'] > 0 ? $salesKontrak['royalty_price'] : 0), 2) ?>
+                    (<?= $salesKontrak['mata_uang'] ?>) <?= number_format($grand_total, 2) ?>
                 </td>
             </tr>
         </tbody>
@@ -481,13 +481,14 @@
         $counter = 2; // Start counter for Roman numerals
 
         // II. TOTAL AMOUNT
-        if ($salesKontrak['royalty_price'] > 0 || $salesKontrak['total_amount'] > 0): ?>
+        if ($grand_total > 0): ?>
             <div class="mt-1 txt-left">
                 <label class="label-header">
                     <?= strtoupper(numToRoman($counter++)) ?>. TOTAL AMOUNT (<?= $salesKontrak['mata_uang'] ?>) :
-                    <?= number_format($salesKontrak['royalty_price'] > 0 ?
-                        ($total_amount - $salesKontrak['royalty_price']) :
-                        $salesKontrak['total_amount'], 2) ?>
+                    <?= number_format(
+                        $grand_total,
+                        2
+                    ) ?>
                 </label>
             </div>
         <?php endif;
