@@ -10,6 +10,7 @@ use App\Models\CountryModel;
 use App\Models\EmployeesModel;
 use App\Models\DivisisModel;
 use App\Models\MetadataModel;
+use App\Models\SalesContractRevisionModel;
 use App\Models\SalesContractSizeBreakdownModel;
 use App\Models\SalesKontrakModel;
 use App\Models\SalesKontrakDetailModel;
@@ -39,6 +40,7 @@ class SalesKontrak extends BaseController
     protected $divisiModel;
     protected $bankModel;
     protected $salesContractSizeBreakdownModel;
+    protected $salesContractRevisionModel;
 
     public function __construct()
     {
@@ -60,6 +62,7 @@ class SalesKontrak extends BaseController
         $this->divisiModel = new DivisisModel();
         $this->bankModel = new BanksModel();
         $this->salesContractSizeBreakdownModel = new SalesContractSizeBreakdownModel();
+        $this->salesContractRevisionModel = new SalesContractRevisionModel();
     }
 
     public function index()
@@ -427,6 +430,7 @@ class SalesKontrak extends BaseController
             'payment_term' => $this->request->getVar('payment_term'),
             'potongan_harga' => $this->request->getVar('potongan_harga'),
             'sales_contract_no' => $this->request->getVar('sales_contract_no'),
+            'total_container' => $this->request->getVar('total_container'),
             'shipment_date' => $this->request->getVar("shipment_date"),
             'shipment_insurance' => $this->request->getVar('shipment_insurance'),
             'signature_by' => $this->request->getVar('signature_by'),
@@ -558,15 +562,30 @@ class SalesKontrak extends BaseController
         $id = decrypt($this->request->getVar('id'));
         $statusPosting = $this->request->getVar('status');
         $keterangan = $this->request->getPost("keterangan");
-        $checkUnpost = $this->salesKontrakModel->find($id);
 
-        $jmlh = (float) $checkUnpost['jumlah_unpost'];
+        if ($statusPosting == "0") {
+            // INI UNPOST
+            $this->salesContractRevisionModel->insert([
+                'sales_contract_id' => $id,
+                'date_revision' => $this->request->getVar("date_revision") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getVar("date_revision")))) : "",
+                'note' => $this->request->getVar('keterangan')
+            ]);
 
-        $this->salesKontrakModel->update($id, [
-            'status_posting' => $statusPosting,
-            "keterangan_unpost" => $keterangan,
-            "jumlah_unpost" => $statusPosting == "0" ? $jmlh + 1 : $jmlh,
-        ]);
+            $salesContractRevision = $this->salesContractRevisionModel
+                ->where('sales_contract_id', $id)
+                ->findAll();
+
+            $this->salesKontrakModel->update($id, [
+                'status_posting' => $statusPosting,
+                "keterangan_unpost" => $keterangan,
+                "jumlah_unpost" => count($salesContractRevision),
+            ]);
+        } else {
+            // INI POSTING
+            $this->salesKontrakModel->update($id, [
+                'status_posting' => $statusPosting,
+            ]);
+        }
 
         return response()->setJSON([
             'message' => "Status Post Updated",
@@ -622,7 +641,8 @@ class SalesKontrak extends BaseController
         $data = [
             'salesKontrak' => $salesKontrak,
             'customer' => $this->customerModel->find($salesKontrak['customer_id']),
-            'salesKontrakdetail' => $salesKontrakDetail
+            'salesKontrakdetail' => $salesKontrakDetail,
+            'revisionList' => $this->salesContractRevisionModel->where('sales_contract_id', $id)->findAll()
         ];
 
         $this->dompdf->loadHtml(view('SalesInternasional/SalesKontrak/print', $data));

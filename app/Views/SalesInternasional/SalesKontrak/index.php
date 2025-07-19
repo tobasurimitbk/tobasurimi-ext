@@ -74,21 +74,31 @@
             <div class="modal-header">
                 <h5 class="modal-title title-secondary">Unposting Sales Kontrak</h5>
             </div>
-            <div class="modal-body">
-                <input type="hidden" name="id_sales_order" class="id_sales_order" id="id_sales_order">
-                <div class="row">
-                    <div class="col-md-6">
-                        <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" type="text" class="form-control keterangan_unpost" name="keterangan_unpost" id="keterangan_unpost" placeholder="Keterangan Unpost">
-                            <label for="floatingInput">Note Unpost</label>
+            <form class="form-unposting">
+                <div class="modal-body">
+                    <input type="hidden" name="id_sales_order" class="id_sales_order" id="id_sales_order">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input autocomplete="one-time-code" type="text" class="form-control date_revision" name="date_revision" id="date_revision" placeholder="Date Revision">
+                                <label for="floatingInput">Date Revision</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input autocomplete="one-time-code" type="text" class="form-control keterangan_unpost" name="keterangan_unpost" id="keterangan_unpost" placeholder="Keterangan Unpost (Opsional)">
+                                <label for="floatingInput">Note Unposting (Opsional)</label>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-hide-detail btn-discard mr-3">Back</button>
-                <button type="button" onclick="updateStatus('NEW', '0')" class="btn btn-submit-form btn-submit-detail">Un Posting</button>
-            </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-hide-detail btn-discard mr-3">Back</button>
+                    <button type="button" onclick="updateStatus('NEW', '0')" class="btn btn-submit-form btn-submit-detail">Un Posting</button>
+                </div>
+            </form>
+
+
         </div>
     </div>
 </div>
@@ -278,6 +288,26 @@
         autoclose: true
     })
 
+    $(".date_revision").datepicker({
+        todayHighlight: true,
+        format: "dd/mm/yyyy",
+        orientation: "bottom auto",
+        autoclose: true
+    })
+
+    $(document).on('shown.bs.modal', '.unpost-modal', function() {
+        if (!$(this).data('datepicker-initialized')) {
+            $(this).find(".date_revision").datepicker({
+                todayHighlight: true,
+                format: "dd/mm/yyyy",
+                orientation: "bottom auto",
+                autoclose: true
+            });
+            $(this).data('datepicker-initialized', true);
+        }
+    });
+
+
     $('.icon-dateStart').click(function() {
         $(".dateStart").focus();
     });
@@ -287,6 +317,8 @@
     });
 
     const updateStatus = function(id, status) {
+        document.activeElement.blur(); // cegah auto focus trigger datepicker
+
         if (status == "UNPOST") {
             $(".id_sales_order").val(id);
             $(".unpost-modal").modal("show");
@@ -298,53 +330,71 @@
                 id = id;
                 ket = "-";
             }
-            Swal.fire({
-                icon: 'question',
-                title: status == '1' ? 'Posted ?' : 'Unposted ?',
-                confirmButtonColor: '#4e73df',
-                cancelButtonColor: '#d33',
-                showCancelButton: true,
-                reverseButtons: true,
-                confirmButtonText: 'Save',
-                cancelButtonText: 'Back',
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    const csrf = $(`[name="${csrfToken}"]`);
-                    $(".id_sales_order").val("");
-                    $(".keterangan_unpost").val("");
-                    $(".unpost-modal").modal("hide");
-                    $.ajax({
-                        url: "<?= base_url("sales-kontrak/update-status"); ?>",
-                        data: {
-                            id: id,
-                            status: status,
-                            keterangan: ket,
-                        },
-                        beforeSend: function(xhr) {
-                            xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                            setLoading();
-                        },
-                        complete: function() {
-                            stopLoading();
-                        },
-                        method: "POST",
-                        dataType: "json",
-                        success: function(response) {
-                            csrf.val(response.token);
-                            if (response.status) {
-                                Swal.fire({
-                                        icon: 'success',
-                                        title: response.message,
-                                        confirmButtonColor: '#4e73df',
-                                    })
-                                    .then(() => {
-                                        table.ajax.reload()
-                                    })
-                            }
-                        },
-                    });
+
+            var state = true;
+            var date_revision = $('#date_revision').val();
+            if (status == 0) {
+                // MAU UNPOSTING
+                if (date_revision == "") {
+                    state = false;
+                    Swal.fire({
+                        icon: 'error',
+                        title: "Form Date Revision Required",
+                        confirmButtonColor: '#4e73df',
+                    })
                 }
-            })
+            }
+
+            if (state) {
+                Swal.fire({
+                    icon: 'question',
+                    title: status == '1' ? 'Posted ?' : 'Unposted ?',
+                    confirmButtonColor: '#4e73df',
+                    cancelButtonColor: '#d33',
+                    showCancelButton: true,
+                    reverseButtons: true,
+                    confirmButtonText: 'Save',
+                    cancelButtonText: 'Back',
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        const csrf = $(`[name="${csrfToken}"]`);
+                        $(".id_sales_order").val("");
+                        $(".keterangan_unpost").val("");
+                        $(".unpost-modal").modal("hide");
+                        $.ajax({
+                            url: "<?= base_url("sales-kontrak/update-status"); ?>",
+                            data: {
+                                id: id,
+                                status: status,
+                                keterangan: ket,
+                                date_revision: date_revision
+                            },
+                            beforeSend: function(xhr) {
+                                xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                                setLoading();
+                            },
+                            complete: function() {
+                                stopLoading();
+                            },
+                            method: "POST",
+                            dataType: "json",
+                            success: function(response) {
+                                csrf.val(response.token);
+                                if (response.status) {
+                                    Swal.fire({
+                                            icon: 'success',
+                                            title: response.message,
+                                            confirmButtonColor: '#4e73df',
+                                        })
+                                        .then(() => {
+                                            table.ajax.reload()
+                                        })
+                                }
+                            },
+                        });
+                    }
+                })
+            }
         }
     }
 
