@@ -188,7 +188,7 @@
                         
                         <?php if (can('Pembayaran', 'Lokal BB', 'a')) : ?>
                             buttons += `
-                                <button onclick="posting('${id}', '${divisi_id}')" 
+                                <button onclick="posting('${id}', '${divisi_id}', '1')" 
                                         class="btn btn-success"
                                         data-toggle="tooltip" title="Posting">
                                     <i class="fa fa-paper-plane fa-sm"></i>
@@ -198,7 +198,7 @@
                         // Posted state - show unpost button
                         <?php if (can('Pembayaran', 'Lokal BB', 'a')) : ?>
                             buttons += `
-                                <button onclick="posting('${id}', '${divisi_id}')" 
+                                <button onclick="posting('${id}', '${divisi_id}', '0')" 
                                         class="btn btn-danger"
                                         data-toggle="tooltip" title="Unpost">
                                     <i class="fa fa-undo fa-sm"></i>
@@ -270,15 +270,21 @@
     const print = function(url) {
         window.open(url, "_blank");
     }
-    const posting = function(id, divisi_id) {
+
+
+    const posting = function(id, divisi_id, status) {
+        const isPosting = status == 1;
+        const titleText = isPosting ? 'Posting Pembayaran?' : 'Unposting Pembayaran?';
+        const confirmText = isPosting ? 'Posting' : 'Unposting';
+
         Swal.fire({
             icon: 'question',
-            title: 'Posting Pembayaran ?',
+            title: titleText,
             confirmButtonColor: '#4e73df',
             cancelButtonColor: '#d33',
             showCancelButton: true,
             reverseButtons: true,
-            confirmButtonText: 'Simpan',
+            confirmButtonText: confirmText,
             cancelButtonText: 'Kembali',
         }).then((result) => {
             if (result.isConfirmed) {
@@ -288,6 +294,7 @@
                     data: {
                         id: id,
                         divisi_id: divisi_id,
+                        status: status
                     },
                     beforeSend: function(xhr) {
                         xhr.setRequestHeader('X-CSRF-Token', csrf.val());
@@ -302,19 +309,19 @@
                         csrf.val(response.token);
                         if (response.status) {
                             Swal.fire({
-                                    icon: 'success',
-                                    title: response.message,
-                                    confirmButtonColor: '#4e73df',
-                                })
-                                .then(() => {
-                                    table.ajax.reload()
-                                })
+                                icon: 'success',
+                                title: response.message,
+                                confirmButtonColor: '#4e73df',
+                            }).then(() => {
+                                table.ajax.reload();
+                            });
                         }
                     },
                 });
             }
-        })
+        });
     }
+
 
     const remove = function(id) {
         const csrfToken = '<?= csrf_token() ?>';

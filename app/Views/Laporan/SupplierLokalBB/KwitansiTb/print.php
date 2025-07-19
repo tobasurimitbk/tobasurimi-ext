@@ -184,7 +184,7 @@
                 <tr>
                     <td style="vertical-align: top;">BANYAKNYA UANG <br> (AMOUNT)</td>
                     <td style="vertical-align: top;">: </td>
-                    <td style="vertical-align: top;"><?= strtoupper(terbilang(formatter(($kwitansi['harga_bulanan_pph']), "STR_TO_FLOAT"))) ?></td>
+                    <td style="vertical-align: top;"><?= strtoupper(terbilang(formatter(($kwitansi['harga_bulanan_pph']), "STR_TO_FLOAT"))) ?> RUPIAH</td>
                 </tr>
                 <tr>
                     <td style="vertical-align: top;">UNTUK PEMBAYARAN <br> (FOR PAYMENT)</td>

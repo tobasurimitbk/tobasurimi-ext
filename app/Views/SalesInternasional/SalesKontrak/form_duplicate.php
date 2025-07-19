@@ -7,27 +7,41 @@
         padding: 0.35rem !important;
         vertical-align: middle;
     }
-
-    .bg-light {
-        background-color: #f9f9f9 !important;
-    }
-
-    .bg-warning {
-        background-color: #fff3cd !important;
-    }
 </style>
+
+<?php if (session()->get('theme') == "dark"): ?>
+    <style>
+        .bg-light {
+            background-color: #343A40 !important;
+        }
+
+        .bg-warning {
+            background-color: #343A40 !important;
+        }
+    </style>
+<?php else: ?>
+    <style>
+        .bg-light {
+            background-color: #f9f9f9 !important;
+        }
+
+        .bg-warning {
+            background-color: #fff3cd !important;
+        }
+    </style>
+<?php endif; ?>
 
 <!-- Begin Page Content -->
 <section class="section">
     <div class="section-header">
-        <h1 class="title-name">Duplikasi Sales Kontrak</h1>
+        <h1 class="title-name">Duplicate Sales Kontrak</h1>
         <div class="col-button-tambah-spp">
             <a class="btn btn-hide-form btn-discard float-right" href="<?= base_url("sales-kontrak"); ?>">
-                Kembali
+                Back
             </a>
 
             <button class="btn btn-show-form btn-save float-right btn-submit-parent">
-                Duplikasi
+                Duplicate
             </button>
         </div>
     </div>
@@ -48,7 +62,7 @@
                             <div class="input-group input-group-password">
                                 <div class="form-floating mb-3" style="height: 50px;">
                                     <input autocomplete="one-time-code" <?= !empty($dataSalesKontrak) ? ($dataSalesKontrak['status_posting'] == "1" ? 'readonly' : '') : 'readonly'; ?> value="<?= !empty($dataSalesKontrak) ? $dataSalesKontrak['sales_contract_no'] : ""; ?>" type="text" class="form-control sales_contract_no" id="sales_contract_no" name="sales_contract_no" placeholder="No. Sales Contract">
-                                    <label for="floatingInput">No Sales Kontrak</label>
+                                    <label for="floatingInput">Sales Kontrak No</label>
                                 </div>
                                 <div style="<?= !empty($dataSalesKontrak)  ? "display: none" : ""; ?>" class="input-generate input-group-prepend group-prepend-password align-items-center">
                                     <input checked autocomplete="one-time-code" style="z-index: 99; margin-bottom: 10px; margin-left: -30px;" class="auto_generate" id="auto_generate" name="auto_generate" type="checkbox" onchange="changeStatus()">
@@ -172,7 +186,7 @@
                                     <option <?= !empty($dataSalesKontrak) ? ($dataSalesKontrak['bank_id'] == $d['id'] ? 'selected' : '') : '' ?> value="<?= $d["id"]; ?>"><?= $d["name"] . " - " . $d['atas_nama'] . " - " . $d['no_rekening']; ?></option>
                                 <?php endforeach ?>
                             </select>
-                            <label for="floatingInput">Pilih Bank</label>
+                            <label for="floatingInput">Choose Bank</label>
                         </div>
                     </div>
                     <div class="col-md-4">
@@ -190,32 +204,32 @@
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <input autocomplete="one-time-code" <?= !empty($dataSalesKontrak) ? ($dataSalesKontrak['status_posting']  ? 'readonly=true' : '') : ''; ?> value="<?= !empty($dataSalesKontrak) ? $dataSalesKontrak['signature_by'] : ""; ?>" type="text" class="form-control signature_by" id="signature_by" name="signature_by" placeholder="Penanda Tangan">
-                            <label for="floatingInput">Penanda Tangan</label>
+                            <label for="floatingInput">Signature By</label>
                         </div>
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <input autocomplete="one-time-code" <?= !empty($dataSalesKontrak) ? ($dataSalesKontrak['status_posting']  ? 'readonly=true' : '') : ''; ?> value="<?= !empty($dataSalesKontrak) ? $dataSalesKontrak['customer_po_no'] : ""; ?>" type="text" class="form-control customer_po_no" id="customer_po_no" name="customer_po_no" placeholder="No. PO">
-                            <label for="floatingInput">No. PO (Opsional)</label>
+                            <label for="floatingInput">No. PO (Optional)</label>
                         </div>
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3 mt-3" style="height: 50px;">
-                            <input onkeyup="this.value = greatFormatRupiah(this.value)" oninput="preventNegativeInput(this)" autocomplete="one-time-code" <?= !empty($dataSalesKontrak) ? ($dataSalesKontrak['status_posting']  ? 'readonly=true' : '') : ''; ?> value="<?= !empty($dataSalesKontrak) ? $dataSalesKontrak['potongan_harga'] : ""; ?>" type="text" class="form-control potongan_harga" id="potongan_harga" name="potongan_harga" placeholder="Potongan Harga (Opsional)">
-                            <label for="floatingInput">Potongan Harga (Opsional)</label>
+                            <input onkeyup="this.value = greatFormatRupiah(this.value)" oninput="preventNegativeInput(this)" autocomplete="one-time-code" <?= !empty($dataSalesKontrak) ? ($dataSalesKontrak['status_posting']  ? 'readonly=true' : '') : ''; ?> value="<?= !empty($dataSalesKontrak) ? $dataSalesKontrak['potongan_harga'] : ""; ?>" type="text" class="form-control potongan_harga" id="potongan_harga" name="potongan_harga" placeholder="Potongan Harga (Optional)">
+                            <label for="floatingInput">Discounts Price (Optional)</label>
                         </div>
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3 mt-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" <?= !empty($dataSalesKontrak) ? ($dataSalesKontrak['status_posting']  ? 'readonly=true' : '') : ''; ?> value="<?= !empty($dataSalesKontrak) ? $dataSalesKontrak['keterangan'] : ""; ?>" type="text" class="form-control keterangan" id="keterangan" name="keterangan" placeholder="Keterangan (Opsional)">
-                            <label for="floatingInput">Keterangan (Opsional)</label>
+                            <input autocomplete="one-time-code" <?= !empty($dataSalesKontrak) ? ($dataSalesKontrak['status_posting']  ? 'readonly=true' : '') : ''; ?> value="<?= !empty($dataSalesKontrak) ? $dataSalesKontrak['keterangan'] : ""; ?>" type="text" class="form-control keterangan" id="keterangan" name="keterangan" placeholder="Keterangan (Optional)">
+                            <label for="floatingInput">Note (Optional)</label>
                         </div>
                     </div>
 
                     <div class="col-md-4">
                         <div class="form-floating mb-3 mt-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" <?= !empty($dataSalesKontrak) ? ($dataSalesKontrak['status_posting']  ? 'readonly=true' : '') : ''; ?> value="<?= !empty($dataSalesKontrak) ? $dataSalesKontrak['no_container'] : ""; ?>" type="text" class="form-control no_container" id="no_container" name="no_container" placeholder="Nomor Container (Opsional)">
-                            <label for="floatingInput">No Container (Opsional)</label>
+                            <input autocomplete="one-time-code" <?= !empty($dataSalesKontrak) ? ($dataSalesKontrak['status_posting']  ? 'readonly=true' : '') : ''; ?> value="<?= !empty($dataSalesKontrak) ? $dataSalesKontrak['no_container'] : ""; ?>" type="text" class="form-control no_container" id="no_container" name="no_container" placeholder="Nomor Container (Optional)">
+                            <label for="floatingInput">No Container (Optional)</label>
                         </div>
                     </div>
 
@@ -230,31 +244,31 @@
                     <div class="col-md-6">
                         <div class="form-floating">
                             <textarea autocomplete="one-time-code" <?= !empty($dataSalesKontrak) ? ($dataSalesKontrak['status_posting']  ? 'readonly=true' : '') : ''; ?> class="full-textarea form-control documents_required" id="documents_required" name="documents_required" placeholder="Document Required"><?= !empty($dataSalesKontrak) ? $dataSalesKontrak['documents_required'] : ""; ?></textarea>
-                            <label for="floatingInput">Document Required (Opsional)</label>
+                            <label for="floatingInput">Document Required (Optional)</label>
                         </div>
                     </div>
                     <div class="col-md-6">
                         <div class="form-floating">
                             <textarea autocomplete="one-time-code" <?= !empty($dataSalesKontrak) ? ($dataSalesKontrak['status_posting']  ? 'readonly=true' : '') : ''; ?> class="full-textarea form-control special_instructions" id="special_instructions" name="special_instructions" placeholder="Additional Clauses"><?= !empty($dataSalesKontrak) ? $dataSalesKontrak['special_instructions'] : ""; ?></textarea>
-                            <label for="floatingInput">Additional Clauses (Opsional)</label>
+                            <label for="floatingInput">Additional Clauses (Optional)</label>
                         </div>
                     </div>
                 </div>
                 <div class="col-subtitle-modal mt-5">
                     <div class="row mt-3">
                         <div class="col-md-6">
-                            <label class="form-label font-weight-bold modal-sub-title">List Barang</label>
+                            <label class="form-label font-weight-bold modal-sub-title">Item List</label>
                         </div>
                         <div class="col-md-6">
                             <?php if (!empty($dataSalesKontrak)) { ?>
                                 <?php if (!$dataSalesKontrak['status_posting']) { ?>
                                     <button class="btn btn-show-detail btn-add btn-block float-right" type="button" data-btn="detail-modal">
-                                        <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
+                                        <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Add Product
                                     </button>
                                 <?php } ?>
                             <?php } else { ?>
                                 <button class="btn btn-show-detail btn-add btn-block float-right" type="button" data-btn="detail-modal">
-                                    <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
+                                    <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Add Product
                                 </button>
                             <?php } ?>
                         </div>
@@ -299,45 +313,82 @@
 
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" <?= !empty($dataSalesKontrak) ? ($dataSalesKontrak['status_posting']  ? 'readonly=true' : '') : ''; ?> value="<?= !empty($dataSalesKontrak) ? $dataSalesKontrak['total_container'] : ""; ?>" type="text" class="form-control total_container" id="total_container" name="total_container" placeholder="Total Container (Opsional)">
-                            <label for="floatingInput">Total Container (Opsional)</label>
+                            <input autocomplete="one-time-code" <?= !empty($dataSalesKontrak) ? ($dataSalesKontrak['status_posting']  ? 'readonly=true' : '') : ''; ?> value="<?= !empty($dataSalesKontrak) ? $dataSalesKontrak['total_container'] : ""; ?>" type="text" class="form-control total_container" id="total_container" name="total_container" placeholder="Total Container (Optional)">
+                            <label for="floatingInput">Total Container (Optional)</label>
                         </div>
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" <?= !empty($dataSalesKontrak) ? ($dataSalesKontrak['status_posting']  ? 'readonly=true' : '') : ''; ?> value="<?= !empty($dataSalesKontrak) ? $dataSalesKontrak['royalty'] : ""; ?>" type="text" class="form-control royalty" id="royalty" name="royalty" placeholder="Royalty (Opsional)">
-                            <label for="floatingInput">Royalty (Opsional)</label>
+                            <input autocomplete="one-time-code" <?= !empty($dataSalesKontrak) ? ($dataSalesKontrak['status_posting']  ? 'readonly=true' : '') : ''; ?> value="<?= !empty($dataSalesKontrak) ? $dataSalesKontrak['royalty'] : ""; ?>" type="text" class="form-control royalty" id="royalty" name="royalty" placeholder="Royalty (Optional)">
+                            <label for="floatingInput">Royalty (Optional)</label>
                         </div>
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-2" style="height: 50px;">
-                            <input autocomplete="one-time-code" <?= !empty($dataSalesKontrak) ? ($dataSalesKontrak['status_posting']  ? 'readonly=true' : '') : ''; ?> value="<?= !empty($dataSalesKontrak) ? number_format($dataSalesKontrak['royalty_price'], 2) : ""; ?>" type="text" oninput="this.value = greatFormatRupiah(this.value)" class="form-control royalty_price" id="royalty_price" name="royalty_price" placeholder="Royalty Price (Opsional)">
-                            <label for="floatingInput">Royalty Price (Opsional)</label>
+                            <input autocomplete="one-time-code" <?= !empty($dataSalesKontrak) ? ($dataSalesKontrak['status_posting']  ? 'readonly=true' : '') : ''; ?> value="<?= !empty($dataSalesKontrak) ? number_format($dataSalesKontrak['royalty_price'], 2) : ""; ?>" type="text" oninput="this.value = greatFormatRupiah(this.value)" class="form-control royalty_price" id="royalty_price" name="royalty_price" placeholder="Royalty Price (Optional)">
+                            <label for="floatingInput">Royalty Price (Optional)</label>
                         </div>
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" <?= !empty($dataSalesKontrak) ? ($dataSalesKontrak['status_posting']  ? 'readonly=true' : '') : ''; ?> value="<?= !empty($dataSalesKontrak) ? $dataSalesKontrak['rebate'] : ""; ?>" type="text" class="form-control rebate" id="rebate" name="rebate" placeholder="Rebate (Opsional)">
-                            <label for="floatingInput">Rebate (Opsional)</label>
+                            <input autocomplete="one-time-code" <?= !empty($dataSalesKontrak) ? ($dataSalesKontrak['status_posting']  ? 'readonly=true' : '') : ''; ?> value="<?= !empty($dataSalesKontrak) ? $dataSalesKontrak['rebate'] : ""; ?>" type="text" class="form-control rebate" id="rebate" name="rebate" placeholder="Rebate (Optional)">
+                            <label for="floatingInput">Rebate (Optional)</label>
                         </div>
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" <?= !empty($dataSalesKontrak) ? ($dataSalesKontrak['status_posting']  ? 'readonly=true' : '') : ''; ?> value="<?= !empty($dataSalesKontrak) ? $dataSalesKontrak['can_deduction'] : ""; ?>" type="text" class="form-control can_deduction" id="can_deduction" name="can_deduction" placeholder="Can Deduction (Opsional)">
-                            <label for="floatingInput">Can Deduction (Opsional)</label>
+                            <input autocomplete="one-time-code" <?= !empty($dataSalesKontrak) ? ($dataSalesKontrak['status_posting']  ? 'readonly=true' : '') : ''; ?> value="<?= !empty($dataSalesKontrak) ? number_format($dataSalesKontrak['rebate_price'], 2) : ""; ?>" type="text" oninput="this.value = greatFormatRupiah(this.value)" class="form-control rebate_price" id="rebate_price" name="rebate_price" placeholder="Rebate Price (Optional)">
+                            <label for="floatingInput">Rebate Price (Optional)</label>
                         </div>
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" <?= !empty($dataSalesKontrak) ? ($dataSalesKontrak['status_posting']  ? 'readonly=true' : '') : ''; ?> value="<?= !empty($dataSalesKontrak) ? $dataSalesKontrak['estimated_freight'] : ""; ?>" type="text" class="form-control estimated_freight" id="estimated_freight" name="estimated_freight" placeholder="Estimated Freight (Opsional)">
-                            <label for="floatingInput">Estimated Freight (Opsional)</label>
+                            <input autocomplete="one-time-code" <?= !empty($dataSalesKontrak) ? ($dataSalesKontrak['status_posting']  ? 'readonly=true' : '') : ''; ?> value="<?= !empty($dataSalesKontrak) ? $dataSalesKontrak['can_deduction'] : ""; ?>" type="text" class="form-control can_deduction" id="can_deduction" name="can_deduction" placeholder="Can Deduction (Optional)">
+                            <label for="floatingInput">Can Deduction (Optional)</label>
                         </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <input autocomplete="one-time-code" <?= !empty($dataSalesKontrak) ? ($dataSalesKontrak['status_posting']  ? 'readonly=true' : '') : ''; ?> value="<?= !empty($dataSalesKontrak) ? number_format($dataSalesKontrak['can_deduction_price'], 2) : ""; ?>" type="text" oninput="this.value = greatFormatRupiah(this.value)" class="form-control can_deduction_price" id="can_deduction_price" name="can_deduction_price" placeholder="Can Deduction Price (Optional)">
+                            <label for="floatingInput">Can Deduction Price (Optional)</label>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <input autocomplete="one-time-code" <?= !empty($dataSalesKontrak) ? ($dataSalesKontrak['status_posting']  ? 'readonly=true' : '') : ''; ?> value="<?= !empty($dataSalesKontrak) ? $dataSalesKontrak['estimated_freight'] : ""; ?>" type="text" class="form-control estimated_freight" id="estimated_freight" name="estimated_freight" placeholder="Estimated Freight (Optional)">
+                            <label for="floatingInput">Estimated Freight (Optional)</label>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <input autocomplete="one-time-code" <?= !empty($dataSalesKontrak) ? ($dataSalesKontrak['status_posting']  ? 'readonly=true' : '') : ''; ?> value="<?= !empty($dataSalesKontrak) ? number_format($dataSalesKontrak['estimated_freight_price'], 2) : ""; ?>" type="text" oninput="this.value = greatFormatRupiah(this.value)" class="form-control estimated_freight_price" id="estimated_freight_price" name="estimated_freight_price" placeholder="Estimated Freight Price (Optional)">
+                            <label for="floatingInput">Estimated Freight Price (Optional)</label>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <input autocomplete="one-time-code" <?= !empty($dataSalesKontrak) ? ($dataSalesKontrak['status_posting']  ? 'readonly=true' : '') : ''; ?> value="<?= !empty($dataSalesKontrak) ? $dataSalesKontrak['others'] : ""; ?>" type="text" class="form-control others" id="others" name="others" placeholder="Others (Optional)">
+                            <label for="floatingInput">Others (Optional)</label>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <select name="others_type" id="others_type" class="form-control others_type">
+                                    <option <?= !empty($dataSalesKontrak) ? ($dataSalesKontrak['others_type'] == "PLUS" ? 'selected' : '') : '' ?> value="PLUS">PLUS (+)</option>
+                                    <option <?= !empty($dataSalesKontrak) ? ($dataSalesKontrak['others_type'] == "MINUS" ? 'selected' : '')  : '' ?> value="MINUS">MINUS (-)</option>
+                                </select>
+                            </div>
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input autocomplete="one-time-code" <?= !empty($dataSalesKontrak) ? ($dataSalesKontrak['status_posting']  ? 'readonly=true' : '') : ''; ?> value="<?= !empty($dataSalesKontrak) ? number_format($dataSalesKontrak['others_price'], 2) : ""; ?>" type="text" oninput="this.value = greatFormatRupiah(this.value)" class="form-control others_price" id="others_price" name="others_price" placeholder="Others Price (Optional)">
+                                <label for="floatingInput">Others Price (Optional)</label>
+                            </div>
+                        </div>
+
                     </div>
                 </div>
-            </div>
-        </form>
 
-    </div>
+            </div>
     </div>
 </section>
 
@@ -363,7 +414,7 @@
                                     <select class="form-select barang_master_sales_id" name="barang_master_sales_id" id="barang_master_sales_id" aria-label="Floating label select example">
                                         <option value=""></option>
                                     </select>
-                                    <label for="floatingInput">Barang</label>
+                                    <label for="floatingInput">Items</label>
                                 </div>
                                 <?php if (can('Penjualan Ekspor', 'Master Barang', 'c')) : ?>
                                     <div class="input-group-append" style="height:50px;">
@@ -388,14 +439,14 @@
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" value="" type="text" class="form-control species" id="species" name="species" placeholder="Species (Opsional)">
-                                <label for="floatingInput">Species (Opsional)</label>
+                                <input autocomplete="one-time-code" value="" type="text" class="form-control species" id="species" name="species" placeholder="Species (Optional)">
+                                <label for="floatingInput">Species (Optional)</label>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" value="" type="text" class="form-control specs" id="specs" name="specs" placeholder="Specs (Opsional)">
-                                <label for="floatingInput">Specs (Opsional)</label>
+                                <input autocomplete="one-time-code" value="" type="text" class="form-control specs" id="specs" name="specs" placeholder="Specs (Optional)">
+                                <label for="floatingInput">Specs (Optional)</label>
                             </div>
                         </div>
 
@@ -406,7 +457,7 @@
                                 </div>
                                 <div class="col-md-3">
                                     <button class="btn btn-success btn-block float-right" type="button" id="btnAddSizeBreakdownModal">
-                                        <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah Size & Breakdown
+                                        <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Add Size & Breakdown
                                     </button>
                                 </div>
                             </div>
@@ -430,6 +481,7 @@
                                             <th>PC</th>
                                             <th>Bag</th>
                                             <th>Cup</th>
+                                            <th>Pallet</th>
                                             <th>%</th>
                                             <th>Remarks</th>
                                             <th>Unit</th>
@@ -444,7 +496,7 @@
                                     </tbody>
                                     <tfoot class="tfoot-detail-table-size-breakdown">
                                         <tr>
-                                            <td colspan="14"></td>
+                                            <td colspan="15"></td>
                                             <td><b>TOTAL</b></td>
                                             <td><b>0.00</b></td>
                                             <td><b>0.00</b></td>
@@ -458,8 +510,8 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-hide-detail btn-discard mr-3">Kembali</button>
-                    <button type="button" class="btn btn-submit-form" id="btn-submit-detail">Simpan</button>
+                    <button type="button" class="btn btn-hide-detail btn-discard mr-3">Back</button>
+                    <button type="button" class="btn btn-submit-form" id="btn-submit-detail">Create</button>
                 </div>
             </form>
         </div>
@@ -478,81 +530,86 @@
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" type="text" class="form-control size" name="size" id="size" placeholder="Size (Opsional)">
-                                <label for="floatingInput">Size (Opsional)</label>
+                                <input autocomplete="one-time-code" type="text" class="form-control size" name="size" id="size" placeholder="Size (Optional)">
+                                <label for="floatingInput">Size (Optional)</label>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" type="text" class="form-control grade" name="grade" id="grade" placeholder="Grade (Opsional)">
-                                <label for="floatingInput">Grade (Opsional)</label>
+                                <input autocomplete="one-time-code" type="text" class="form-control grade" name="grade" id="grade" placeholder="Grade (Optional)">
+                                <label for="floatingInput">Grade (Optional)</label>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" type="text" class="form-control packing_size" name="packing_size" id="packing_size" placeholder="Packing (Opsional)">
-                                <label for="floatingInput">Packing (Opsional)</label>
+                                <input autocomplete="one-time-code" type="text" class="form-control packing_size" name="packing_size" id="packing_size" placeholder="Packing (Optional)">
+                                <label for="floatingInput">Packing (Optional)</label>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" type="text" class="form-control can" name="can" id="can" placeholder="Can (Opsional)">
-                                <label for="floatingInput">Can (Opsional)</label>
+                                <input autocomplete="one-time-code" type="text" class="form-control can" name="can" id="can" placeholder="Can (Optional)">
+                                <label for="floatingInput">Can (Optional)</label>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" type="text" class="form-control case" name="case" id="case" placeholder="Case (Opsional)">
-                                <label for="floatingInput">Case (Opsional)</label>
+                                <input autocomplete="one-time-code" type="text" class="form-control case" name="case" id="case" placeholder="Case (Optional)">
+                                <label for="floatingInput">Case (Optional)</label>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" type="text" class="form-control kg" name="kg" id="kg" placeholder="Kg (Opsional)">
-                                <label for="floatingInput">Kg (Opsional)</label>
+                                <input autocomplete="one-time-code" type="text" class="form-control kg" name="kg" id="kg" placeholder="Kg (Optional)">
+                                <label for="floatingInput">Kg (Optional)</label>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" type="text" class="form-control lb" name="lb" id="lb" placeholder="Lb (Opsional)">
-                                <label for="floatingInput">Lb (Opsional)</label>
+                                <input autocomplete="one-time-code" type="text" class="form-control lb" name="lb" id="lb" placeholder="Lb (Optional)">
+                                <label for="floatingInput">Lb (Optional)</label>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" type="text" class="form-control inner_box" name="inner_box" id="inner_box" placeholder="Inner Box (Opsional)">
-                                <label for="floatingInput">Inner Box (Opsional)</label>
+                                <input autocomplete="one-time-code" type="text" class="form-control inner_box" name="inner_box" id="inner_box" placeholder="Inner Box (Optional)">
+                                <label for="floatingInput">Inner Box (Optional)</label>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" type="text" class="form-control pc" name="pc" id="pc" placeholder="Pc (Opsional)">
-                                <label for="floatingInput">PC (Opsional)</label>
+                                <input autocomplete="one-time-code" type="text" class="form-control pc" name="pc" id="pc" placeholder="Pc (Optional)">
+                                <label for="floatingInput">PC (Optional)</label>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" type="text" class="form-control bag" name="bag" id="bag" placeholder="Bag (Opsional)">
-                                <label for="floatingInput">Bag (Opsional)</label>
+                                <input autocomplete="one-time-code" type="text" class="form-control bag" name="bag" id="bag" placeholder="Bag (Optional)">
+                                <label for="floatingInput">Bag (Optional)</label>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" type="text" class="form-control persen" name="persen" id="persen" placeholder="Persen (Opsional)" oninput="this.value = greatFormatRupiah(this.value)">
-                                <label for="floatingInput">Persen % (Opsional)</label>
+                                <input autocomplete="one-time-code" type="text" class="form-control persen" name="persen" id="persen" placeholder="Persen (Optional)" oninput="this.value = greatFormatRupiah(this.value)">
+                                <label for="floatingInput">Percentage % (Optional)</label>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" type="text" class="form-control cup" name="cup" id="cup" placeholder="Cup (Opsional)">
-                                <label for="floatingInput">Cup (Opsional)</label>
+                                <input autocomplete="one-time-code" type="text" class="form-control cup" name="cup" id="cup" placeholder="Cup (Optional)">
+                                <label for="floatingInput">Cup (Optional)</label>
                             </div>
                         </div>
-
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input autocomplete="one-time-code" type="text" class="form-control palet" name="palet" id="palet" placeholder="Cup (Optional)">
+                                <label for="floatingInput">Pallet (Optional)</label>
+                            </div>
+                        </div>
                     </div>
                     <div class="row mt-3">
                         <div class="col mb-3">
-                            <h6 class="text-dark">Data Harga</h6>
+                            <h6 class="<?= session()->get('theme') == "dark" ? "text-white" : "text-dark" ?>">Price Data</h6>
                         </div>
                     </div>
                     <div class="row">
@@ -570,32 +627,32 @@
                                         <option value="<?= $d['id'] ?>"><?= $d['kode_satuan'] ?></option>
                                     <?php endforeach; ?>
                                 </select>
-                                <label for="floatingInput" style="z-index: 1;">Satuan</label>
+                                <label for="floatingInput" style="z-index: 1;">Unit</label>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <input onkeyup="this.value = greatFormatRupiah(this.value)" autocomplete="one-time-code" type="text" class="form-control harga" name="harga" id="harga" placeholder="Harga Satuan">
-                                <label for="floatingInput">Harga Satuan</label>
+                                <label for="floatingInput">Unit Price</label>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating mb-3">
                                 <input autocomplete="one-time-code" type="text" class="form-control remark" id="remark" name="remark" placeholder="Remark">
-                                <label for="floatingInput">Remark (Opsional)</label>
+                                <label for="floatingInput">Remark (Optional)</label>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <input autocomplete="one-time-code" type="text" readonly="true" class="form-control total" name="total" id="total" placeholder="Total">
-                                <label for="floatingInput">Total</label>
+                                <label for="floatingInput">Total Price</label>
                             </div>
                         </div>
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-discard mr-2" id="btnHideSizeBreakdownModal">Kembali</button>
-                    <button type="submit" class="btn btn-submit-form" id="btnSubmitSizeBreakDown">Simpan</button>
+                    <button type="button" class="btn btn-discard mr-2" id="btnHideSizeBreakdownModal">Back</button>
+                    <button type="submit" class="btn btn-submit-form" id="btnSubmitSizeBreakDown">Create</button>
                 </div>
             </form>
         </div>
@@ -606,7 +663,7 @@
     <div class="modal-dialog" style="min-width: 900px;">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">Tambah Customer</h5>
+                <h5 class="modal-title">Create Customer</h5>
             </div>
             <div class="modal-body">
                 <form class="create-form-customer" role="form" method="POST" enctype="multipart/form-data">
@@ -616,7 +673,7 @@
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <input autocomplete="one-time-code" type="text" class="form-control name" id="name" name="name" placeholder="Nama">
-                                <label for="floatingInput">Nama Customer</label>
+                                <label for="floatingInput">Customer Name</label>
                             </div>
                         </div>
                         <div class="col-md-6">
@@ -633,7 +690,7 @@
                                     }
                                     ?>
                                 </select>
-                                <label for="floatingInput">Negara</label>
+                                <label for="floatingInput">Country</label>
                             </div>
                         </div>
                     </div>
@@ -641,7 +698,7 @@
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <textarea autocomplete="one-time-code" class="form-control address" id="address" name="address"></textarea>
-                                <label for="floatingInput">Alamat (Opsional)</label>
+                                <label for="floatingInput">Address (Optional)</label>
                             </div>
                         </div>
                         <div class="col-md-6">
@@ -658,7 +715,7 @@
                                     }
                                     ?>
                                 </select>
-                                <label for="floatingInput">Nama Sales</label>
+                                <label for="floatingInput">Select Sales</label>
                             </div>
                         </div>
                     </div>
@@ -666,8 +723,8 @@
                 </form>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-hide-form btn-discard mr-2 btn-discard-customer" id="btn-discard-customer">Kembali</button>
-                <button type="submit" class="btn btn-submit-form btn-submit-customer">Simpan</button>
+                <button type="button" class="btn btn-hide-form btn-discard mr-2 btn-discard-customer" id="btn-discard-customer">Back</button>
+                <button type="submit" class="btn btn-submit-form btn-submit-customer">Create</button>
             </div>
         </div>
     </div>
@@ -677,7 +734,7 @@
     <div class="modal-dialog" style="min-width: 900px">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">Tambah Master Barang</h5>
+                <h5 class="modal-title">Create Master Product</h5>
             </div>
             <div class="modal-body">
                 <?= csrf_field() ?>
@@ -687,8 +744,8 @@
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <div class="input-group input-group-password">
                                     <div class="form-floating mb-3" style="height: 50px;">
-                                        <input autocomplete="one-time-code" type="text" id="kode_barang" class="form-control kode_barang" name="kode_barang" placeholder="Kode Barang">
-                                        <label for="floatingInput">Kode Barang</label>
+                                        <input autocomplete="one-time-code" type="text" id="kode_barang" class="form-control kode_barang" name="kode_barang" placeholder="Item Code">
+                                        <label for="floatingInput">Item Code</label>
                                     </div>
                                     <div class="input-generate input-group-prepend group-prepend-password align-items-center">
                                         <input checked autocomplete="one-time-code" style="z-index: 99; margin-bottom: 5px; margin-left: -30px;" id="generate_new_code" name="generate_new_code" type="checkbox" onchange="generateCodeMasterBarang()">
@@ -699,12 +756,12 @@
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <select class="form-select type_barang" name="type_barang" id="type_barang">
-                                    <option value="">Pilih Tipe Barang</option>
-                                    <option value="bahan_jadi">BARANG JADI</option>
-                                    <option value="kemasan">KEMASAN</option>
+                                    <option value="">Select Items Type</option>
+                                    <option value="bahan_jadi">FINISHED GOODS</option>
+                                    <option value="kemasan">PACKAGING</option>
 
                                 </select>
-                                <label for="floatingInput" style="z-index: 1;">Tipe Barang</label>
+                                <label for="floatingInput" style="z-index: 1;">Items Type</label>
                             </div>
                         </div>
                         <div class="col-md-6">
@@ -712,13 +769,13 @@
                                 <select class="form-select spesifikasi_id" name="spesifikasi_id" id="spesifikasi_id">
                                     <option value=""></option>
                                 </select>
-                                <label for="floatingInput" style="z-index: 1;">Pilih Dari Master Barang</label>
+                                <label for="floatingInput" style="z-index: 1;">Select From Item Master</label>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <input autocomplete="one-time-code" type="text" class="form-control barang_name" name="barang_name" id="barang_name" placeholder="Nama Kemasan">
-                                <label for="floatingInput">Nama Barang</label>
+                                <label for="floatingInput">Item Name</label>
                             </div>
                         </div>
                         <div class="col-md-6">
@@ -729,21 +786,21 @@
                                         <option value="<?= $d['id'] ?>"><?= $d['kode_satuan'] ?></option>
                                     <?php endforeach; ?>
                                 </select>
-                                <label for="floatingInput" style="z-index: 1;">Satuan Default (Opsional)</label>
+                                <label for="floatingInput" style="z-index: 1;">Default Units (Optional)</label>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <input onkeyup="this.value=greatFormatRupiah(this.value)" autocomplete="one-time-code" type="text" class="form-control harga_jual" name="harga_jual" id="harga_jual" placeholder="Harga Jual">
-                                <label for="floatingInput">Harga Jual</label>
+                                <label for="floatingInput">Selling price (Optional)</label>
                             </div>
                         </div>
                     </div>
                 </form>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-hide-form btn-discard btn-discard-master-barang mr-2">Kembali</button>
-                <button type="submit" class="btn btn-submit-form btn-submit-form-master-barang">Simpan</button>
+                <button type="button" class="btn btn-hide-form btn-discard btn-discard-master-barang mr-2">Back</button>
+                <button type="submit" class="btn btn-submit-form btn-submit-form-master-barang">Create</button>
             </div>
         </div>
     </div>
@@ -792,7 +849,7 @@
 
     $('#btnAddSizeBreakdownModal').click(function() {
         clearFormSizeBreakdown();
-        $('.title-size-breakdown').text("Tambah ");
+        $('.title-size-breakdown').text("Create ");
         $('#addSizeBreakdownModal').modal('show');
     });
 
@@ -815,6 +872,7 @@
             var inner_box = $('#inner_box').val();
             var pc = $('#pc').val();
             var bag = $('#bag').val();
+            var palet = $('#palet').val();
             var persen = destroyFormatRupiah($('#persen').val() || 0);
             var qty = $('#qty').val();
             var harga = destroyFormatRupiah($('#harga').val());
@@ -835,6 +893,7 @@
                 inner_box: inner_box,
                 pc: pc,
                 bag: bag,
+                palet: palet,
                 persen: persen,
                 qty: qty,
                 harga: harga,
@@ -858,6 +917,7 @@
                     }
                 }
 
+                listSizeBreakdown[index].palet = palet;
                 listSizeBreakdown[index].size = result.size;
                 listSizeBreakdown[index].grade = result.grade;
                 listSizeBreakdown[index].packing = result.packing;
@@ -901,18 +961,18 @@
 
     // CUSTOMER
     $('.customer_id').select2({
-        placeholder: "Pilih Customer",
+        placeholder: "Select Customer",
         theme: "bootstrap-5"
     })
 
     $('#sales_id').select2({
-        placeholder: "Pilih Sales (Optional)",
+        placeholder: "Select Sales (Optional)",
         theme: "bootstrap-5",
         dropdownParent: $('#addCustomerModal')
     })
 
     $('#satuan_size_id').select2({
-        placeholder: "Pilih Satuan",
+        placeholder: "Select Units",
         theme: "bootstrap-5",
         dropdownParent: $('#addSizeBreakdownModal')
     })
@@ -920,7 +980,7 @@
 
     // BARANG 
     $('.barang_master_sales_id').select2({
-        placeholder: "Pilih Barang",
+        placeholder: "Select Item",
         theme: "bootstrap-5",
         dropdownParent: $("#addMasterBarangModal"),
         allowClear: true
@@ -929,7 +989,7 @@
     // TYPE BARANG
     $("#type_barang").select2({
         theme: "bootstrap-5",
-        placeholder: 'Pilih Tipe Barang',
+        placeholder: 'Select Item Type',
         allowClear: true,
         dropdownParent: $("#addMasterBarangModal")
     }).change(function() {
@@ -942,14 +1002,14 @@
 
     // COUNTRY
     $('.country_id').select2({
-        placeholder: "Pilih Negara",
+        placeholder: "Select Country",
         theme: "bootstrap-5",
         dropdownParent: $("#addCustomerModal")
     });
 
     // CURRENCY
     $('.currency').select2({
-        placeholder: "Pilih Mata Uang",
+        placeholder: "Select Currency",
         theme: "bootstrap-5",
     });
 
@@ -961,26 +1021,26 @@
 
     // SATUAN ORDER
     $('.satuan_order_id').select2({
-        placeholder: "Pilih Satuan Order",
+        placeholder: "Select Order Unit",
         theme: "bootstrap-5",
         dropdownParent: $('.detail-modal')
     });
 
     // SATUAN
     $('.satuan_id').select2({
-        placeholder: "Pilih Satuan",
+        placeholder: "Select Units",
         theme: "bootstrap-5",
     });
 
     $('.bank_id').select2({
-        placeholder: "Pilih Bank",
+        placeholder: "Select Bank",
         theme: "bootstrap-5",
     });
 
 
     // BARANG MASTER
     $('.barang_master_sales_id').select2({
-        placeholder: "Pilih Barang",
+        placeholder: "Select Item",
         theme: "bootstrap-5",
         dropdownParent: $('.detail-modal')
     }).change(function() {
@@ -999,13 +1059,13 @@
 
     // DEPARTMENT
     $('.divisi_id').select2({
-        placeholder: "Pilih Department",
+        placeholder: "Select Department",
         theme: "bootstrap-5",
     })
 
     $("#spesifikasi_id").select2({
         theme: "bootstrap-5",
-        placeholder: 'Pilih Dari Master Barang',
+        placeholder: 'Select From Item Master',
         allowClear: true,
         dropdownParent: $("#addMasterBarangModal"),
     }).change(function() {
@@ -1122,49 +1182,49 @@
         },
         messages: {
             sales_contract_no: {
-                required: "No sales kontrak wajib diisi"
+                required: "Sales contract number is required"
             },
             customer_id: {
-                required: "Customer wajib diisi"
+                required: "Customer is required"
             },
             loading_port: {
-                required: "Loading port wajib diisi"
+                required: "Loading port is required"
             },
             dicharge_port: {
-                required: "Discharge port wajib diisi"
+                required: "Discharge port is required"
             },
             tolerance: {
-                required: "Tolerance wajib diisi"
+                required: "Tolerance is required"
             },
             shipment_date: {
-                required: "Shipment date wajib diisi"
+                required: "Shipment date is required"
             },
             currency: {
-                required: "Currency wajib diisi"
+                required: "Currency is required"
             },
             tipe_harga: {
-                required: "Price type wajib diisi"
+                required: "Price type is required"
             },
             print_out_broker: {
-                required: "Print out boker wajib diisi"
+                required: "Broker printout is required"
             },
             divisi_id: {
-                required: "Pilih Departemen"
+                required: "Department selection is required"
             },
             shipment_insurance: {
-                required: "Shipment Insurance wajib diisi"
+                required: "Shipment insurance is required"
             },
             banking_information: {
-                required: "Banking Information wajib diisi"
+                required: "Banking information is required"
             },
             signature_by: {
-                required: "Nama Penanda Tangan Wajib Diisi"
+                required: "Signatory name is required"
             },
             payment_term: {
-                required: "Payment Term Wajib Diisi"
+                required: "Payment term is required"
             },
             bank_id: {
-                required: "Bank Wajib Diisi"
+                required: "Bank is required"
             }
         },
         errorElement: 'span',
@@ -1210,16 +1270,16 @@
         },
         messages: {
             barang_master_sales_id: {
-                required: "Pilih barang"
+                required: "Product is required"
             },
             // species: {
             //     required: "Species Wajib Diisi"
             // },
             brand: {
-                required: "Brand Wajib Diisi"
+                required: "Brand is required"
             },
             packing: {
-                required: "Packing Wajib Diisi"
+                required: "Packing is required"
             },
             // specs: {
             //     required: "Species Wajib Diisi"
@@ -1271,13 +1331,13 @@
         },
         messages: {
             kode_barang: {
-                required: "Kode barang wajib diisi"
+                required: "Item code required"
             },
             barang_name: {
-                required: "Nama barang wajib diisi"
+                required: "Item required"
             },
             type_barang: {
-                required: "Tipe barang wajib diisi"
+                required: "Item type required"
             },
             // satuan_id: {
             //     required: "Satuan wajib diisi"
@@ -1323,10 +1383,10 @@
         },
         messages: {
             name: {
-                required: "Nama customer wajib diisi"
+                required: "Customer name required"
             },
             country_id: {
-                required: "Pilih negara"
+                required: "Country required"
             },
         },
         errorElement: 'span',
@@ -1366,13 +1426,13 @@
         },
         messages: {
             qty: {
-                required: "Qty wajib diisi"
+                required: "Qty required"
             },
             harga: {
-                required: "Harga wajib diisi"
+                required: "Price required"
             },
             satuan_size_id: {
-                required: "Pilih wajib diisi"
+                required: "Unit required"
             },
         },
         errorElement: 'span',
@@ -1403,13 +1463,13 @@
             const data = new FormData(document.querySelector(".create-form-customer"));
             Swal.fire({
                 icon: 'question',
-                title: 'Simpan Customer?',
+                title: 'Create Customer?',
                 confirmButtonColor: '#4e73df',
                 cancelButtonColor: '#d33',
                 showCancelButton: true,
                 reverseButtons: true,
-                confirmButtonText: 'Simpan',
-                cancelButtonText: 'Kembali',
+                confirmButtonText: 'Create',
+                cancelButtonText: 'Back',
             }).then((result) => {
                 if (result.isConfirmed) {
                     $.ajax({
@@ -1476,13 +1536,13 @@
 
             Swal.fire({
                 icon: 'question',
-                title: 'Simpan Master Barang ?',
+                title: 'Create Item ?',
                 confirmButtonColor: '#4e73df',
                 cancelButtonColor: '#d33',
                 showCancelButton: true,
                 reverseButtons: true,
-                confirmButtonText: 'Simpan',
-                cancelButtonText: 'Kembali',
+                confirmButtonText: 'Create',
+                cancelButtonText: 'Back',
             }).then((result) => {
                 if (result.isConfirmed) {
                     $.ajax({
@@ -1550,7 +1610,7 @@
             if (listSizeBreakdown.length === 0) {
                 Swal.fire({
                     icon: 'error',
-                    title: "Size & Breakdown Wajib Diisi",
+                    title: "Size & Breakdown Required",
                     confirmButtonColor: '#4e73df',
                 });
             } else {
@@ -1612,7 +1672,7 @@
         if (listBarang.length == 0) {
             Swal.fire({
                 icon: 'error',
-                title: 'List Barang Belum Ada',
+                title: 'List of items not yet available',
                 confirmButtonColor: '#4e73df',
                 cancelButtonColor: '#d33',
                 reverseButtons: true,
@@ -1627,22 +1687,32 @@
                 let potonganHarga = destroyFormatRupiah($('#potongan_harga').val());
                 let komisi = destroyFormatRupiah($('#komisi').val());
                 let royaltyPrice = destroyFormatRupiah($('#royalty_price').val());
+                let rebatePrice = destroyFormatRupiah($('#rebate_price').val());
+                let canDeductionPrice = destroyFormatRupiah($('#can_deduction_price').val());
+                let estimatedFreightPrice = destroyFormatRupiah($('#estimated_freight_price').val());
+                let othersPrice = destroyFormatRupiah($('#others_price').val());
+
                 data.set('potongan_harga', potonganHarga);
                 data.set('komisi', komisi);
                 data.set("royalty_price", royaltyPrice);
+                data.set("rebate_price", rebatePrice);
+                data.set("can_deduction_price", canDeductionPrice);
+                data.set("estimated_freight_price", estimatedFreightPrice);
+                data.set("others_price", othersPrice);
 
                 data.append("total_amount", totalAmount);
                 data.append("listBarang", listDataBarang);
+
                 // CREATE
                 Swal.fire({
                     icon: 'question',
-                    title: 'Duplikasi Data?',
+                    title: 'Duplicate Data?',
                     confirmButtonColor: '#4e73df',
                     cancelButtonColor: '#d33',
                     showCancelButton: true,
                     reverseButtons: true,
-                    confirmButtonText: 'Simpan',
-                    cancelButtonText: 'Kembali',
+                    confirmButtonText: 'Save',
+                    cancelButtonText: 'Back',
                 }).then((result) => {
                     if (result.isConfirmed) {
                         $.ajax({
@@ -1713,7 +1783,7 @@
     // MODAL DETAIL
     $('.btn-show-detail').click(function() {
         $('.detail-modal').modal('show');
-        $('.title-detail-name').text('Tambah');
+        $('.title-detail-name').text('Create');
         validatorDetail.resetForm();
         validatorDetail.reset();
         resetFormDetail();
@@ -1897,6 +1967,7 @@
                         <th>Bag</th>
                         <th>Unit</th>
                         <th>Remarks</th>
+                        <th>Pallet</th>
                         <th>%</th>
                         <th>Qty</th>
                         <th>Unit Price</th>
@@ -1905,8 +1976,8 @@
                 </thead>
                 <tbody></tbody>
                 <tfoot>
-                    <tr class="bg-light">
-                        <td colspan="12" class="text-end"><b>TOTAL</b></td>
+                    <tr>
+                        <td colspan="13" class="text-end"><b>TOTAL</b></td>
                         <td class="total-persen"><b>0.00</b></td>
                         <td class="total-qty"><b>0.00</b></td>
                         <td class="total-price"><b>0.00</b></td>
@@ -1947,6 +2018,7 @@
                     <td>${size.bag || ''}</td>
                     <td>${size.satuan_size_code || ''}</td>
                     <td>${size.remark || ''}</td>
+                    <td>${size.palet || ''}</td>
                     <td>${size.persen || ''}</td>
                     <td>${greatFormatRupiah(qty.toFixed(2))}</td>
                     <td>${greatFormatRupiah(harga.toFixed(2))}</td>
@@ -1961,7 +2033,7 @@
             innerTable.find('.total-price').html(`<b>${greatFormatRupiah(totalHargaSize.toFixed(2))}</b>`);
             innerTable.find('.total-amount').html(`<b>${greatFormatRupiah(totalAmountSize.toFixed(2))}</b>`);
 
-            detailRow.append(`<td colspan="12"><b>SIZE & BREAKDOWN</b><br>${innerTable.prop('outerHTML')}</td>`);
+            detailRow.append(`<td colspan="13"><b>SIZE & BREAKDOWN</b><br>${innerTable.prop('outerHTML')}</td>`);
             tbody.append(detailRow);
 
             totalQty += parseFloat(item.qty);
@@ -1972,10 +2044,11 @@
         // === Footer Total ===
         const totalRow = $(`
         <tr class="bg-light">
-            <td colspan="8" class="text-end"><b>TOTAL</b></td>
+            <td colspan="7" class="text-end"><b>TOTAL</b></td>
             <td><b>${greatFormatRupiah(totalQty)}</b></td>
             <td><b>${greatFormatRupiah(totalHarga.toFixed(2))}</b></td>
             <td><b>${greatFormatRupiah(totalTotalHarga.toFixed(2))}</b></td>
+            <td></td>
         </tr>
     `);
         tfoot.append(totalRow);
@@ -1992,7 +2065,7 @@
         if (listSizeBreakdown.length === 0) {
             row += `
                     <tr>
-                        <td colspan="14"></td>
+                        <td colspan="15"></td>
                         <td><b>TOTAL</b></td>
                         <td><b>0.00</b></td>
                         <td><b>0.00</b></td>
@@ -2020,6 +2093,7 @@
                 newRow.append($('<td>').text(item.pc));
                 newRow.append($('<td>').text(item.bag));
                 newRow.append($('<td>').text(item.cup));
+                newRow.append($('<td>').text(item.palet));
                 newRow.append($('<td>').text(item.persen));
                 newRow.append($('<td>').text(item.remark));
                 newRow.append($('<td>').text(item.satuan_size_code));
@@ -2056,7 +2130,7 @@
             $('.body-detail-table-size-breakdown').append(row);
             table.find('tfoot').empty();
             var newRow = $('<tr>');
-            newRow.append($('<td colspan="14"></td>'));
+            newRow.append($('<td colspan="15"></td>'));
             newRow.append($('<td><b>TOTAL</b></td>'));
             newRow.append($('<td><b>' + greatFormatRupiah(totalQty) + '</b></td>'));
             newRow.append($('<td><b>' + greatFormatRupiah(totalHarga.toFixed(2)) + '</b></td>'));
@@ -2240,7 +2314,7 @@
             showCancelButton: true,
             reverseButtons: true,
             confirmButtonText: status == '0' ? 'Unposting' : 'Posting',
-            cancelButtonText: 'Kembali',
+            cancelButtonText: 'Back',
         }).then((result) => {
             if (result.isConfirmed) {
                 const csrf = $(`[name="${csrfToken}"]`);
@@ -2281,13 +2355,13 @@
     $(".delete-parent").click(function() {
         Swal.fire({
             icon: 'question',
-            title: 'Hapus Data?',
+            title: 'Delete Data?',
             confirmButtonColor: '#4e73df',
             cancelButtonColor: '#d33',
             showCancelButton: true,
             reverseButtons: true,
-            confirmButtonText: 'Hapus',
-            cancelButtonText: 'Kembali',
+            confirmButtonText: 'Delete',
+            cancelButtonText: 'Back',
         }).then((result) => {
             if (result.isConfirmed) {
                 const csrf = $(`[name="${csrfToken}"]`);
@@ -2353,7 +2427,7 @@
 
                 var emptyOption = $("<option></option>")
                     .attr("value", "")
-                    .text("Pilih Dari Master Barang");
+                    .text("Select From Master Items");
                 // Replace with select element
                 if (typeBarang == 'kemasan') {
                     spesifikasiIdSelect.append(emptyOption);

@@ -162,41 +162,34 @@ class PinjamanSupplierModel extends Model
     // }
 
     public function getPinjamanSupplierbySupplierId($id, $companyId)
-    {
-        // First get transactions from panjar_pinjaman_transaction
-        $transactions = $this->db->table('panjar_pinjaman_transaction')
-            ->select('panjar_pinjaman_transaction.*')
-            ->where([
-                'supplier_id' => $id,
-                'company_id' => $companyId,
-                'deletedAt' => null,
-                'is_posted' => '1'
-            ])
+     {
+        // First get transaction IDs from panjar_pinjaman_transaction
+        $transactionIds = $this->db->table('panjar_pinjaman_transaction')
+            ->select('id')
+            ->where('supplier_id', $id)
+            ->where('company_id', $companyId)
+            ->where('deletedAt', null)
+            ->where('is_posted', '1')
             ->get()
-            ->getResult();
+            ->getResultArray(); // Changed to getResultArray()
 
-        if (empty($transactions)) {
+        if (empty($transactionIds)) {
             return [];
         }
 
-        // Get all transaction IDs
-        $transactionIds = array_column($transactions, 'id');
+        // Extract just the ID values
+        $transactionIds = array_column($transactionIds, 'id');
 
-        // Then get pinjaman data related to these transactions
-        $pinjamanSupplierData = $this->db->table('pinjaman_supplier')
+        // Then get PANJAR_TB data related to these transactions
+        return $this->db->table('pinjaman_supplier')
             ->select('pinjaman_supplier.*')
             ->join('panjar_pinjaman_transaction', 'pinjaman_supplier.transaction_id = panjar_pinjaman_transaction.id')
-            ->where([
-                'pinjaman_supplier.supplier_id' => $id,
-                'pinjaman_supplier.deletedAt' => null,
-                'pinjaman_supplier.is_posted' => '1',
-                'pinjaman_supplier.company_id' => $companyId,
-                'panjar_pinjaman_transaction.id' => $transactionIds
-            ])
+            ->where('pinjaman_supplier.supplier_id', $id)
+            ->where('pinjaman_supplier.deletedAt', null)
+            ->where('pinjaman_supplier.company_id', $companyId)
+            ->whereIn('panjar_pinjaman_transaction.id', $transactionIds) // Changed to whereIn
             ->get()
             ->getResult();
-
-        return $pinjamanSupplierData;
     }
 
 
