@@ -382,7 +382,7 @@
                         // Unposted state - show delete and post buttons
                         <?php if (can('Pembayaran', 'Lain - Lain', 'd')) : ?>
                             buttons += `
-                                <button onclick="confirmDelete('${id}')" 
+                                <button onclick="remove('${id}')" 
                                         class="btn btn-danger"
                                         data-toggle="tooltip" title="Hapus">
                                     <i class="fa fa-trash fa-sm"></i>
@@ -391,7 +391,7 @@
                         
                         <?php if (can('Pembayaran', 'Lain - Lain', 'a')) : ?>
                             buttons += `
-                                <button onclick="confirmPosting('${id}')" 
+                                <button onclick="posting('${id}', '1')" 
                                         class="btn btn-success"
                                         data-toggle="tooltip" title="Posting">
                                     <i class="fa fa-paper-plane fa-sm"></i>
@@ -401,7 +401,7 @@
                         // Posted state - show unpost button
                         <?php if (can('Pembayaran', 'Lain - Lain', 'a')) : ?>
                             buttons += `
-                                <button onclick="confirmUnpost('${id}')" 
+                                <button onclick="posting('${id}', '0')" 
                                         class="btn btn-warning"
                                         data-toggle="tooltip" title="Unpost">
                                     <i class="fa fa-undo fa-sm"></i>
@@ -1312,52 +1312,6 @@
     });
 
 
-    function confirmPosting(id) {
-        Swal.fire({
-            title: 'Post Pembayaran?',
-            text: "Anda akan memposting transaksi ini",
-            icon: 'question',
-            showCancelButton: true,
-            confirmButtonColor: '#28a745',
-            confirmButtonText: 'Ya, Posting!'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                posting(id);
-            }
-        });
-    }
-
-    function confirmUnpost(id) {
-        Swal.fire({
-            title: 'Unpost Pembayaran?',
-            text: "Anda akan membatalkan posting transaksi ini",
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#ffc107',
-            confirmButtonText: 'Ya, Unpost!'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                unpost(id);
-            }
-        });
-    }
-
-    function confirmDelete(id) {
-        Swal.fire({
-            title: 'Hapus Pembayaran?',
-            text: "Data yang dihapus tidak dapat dikembalikan!",
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#dc3545',
-            confirmButtonText: 'Ya, Hapus!'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                remove(id);
-            }
-        });
-    }
-
-
     const remove = function(id) {
         const csrfToken = '<?= csrf_token() ?>';
         const csrf = $(`[name="${csrfToken}"]`);
@@ -1461,10 +1415,13 @@
         $('.btn-submit-form').show();
     }
 
-    const posting = function(id) {
+
+    const posting = function(id, status) {
+        const actionText = status == 1 ? 'Posting' : 'Unposting';
+
         Swal.fire({
             icon: 'question',
-            title: 'Posting Pembayaran ?',
+            title: `${actionText} Pembayaran ?`,
             confirmButtonColor: '#4e73df',
             cancelButtonColor: '#d33',
             showCancelButton: true,
@@ -1478,6 +1435,7 @@
                     url: "<?= base_url("pembayaran-lain/posting"); ?>",
                     data: {
                         id: id,
+                        status: status, // kirim juga status ke server jika perlu
                     },
                     beforeSend: function(xhr) {
                         xhr.setRequestHeader('X-CSRF-Token', csrf.val());
@@ -1492,18 +1450,18 @@
                         csrf.val(response.token);
                         if (response.status) {
                             Swal.fire({
-                                    icon: 'success',
-                                    title: response.message,
-                                    confirmButtonColor: '#4e73df',
-                                })
-                                .then(() => {
-                                    table.ajax.reload()
-                                })
+                                icon: 'success',
+                                title: `${actionText} berhasil!`,
+                                text: response.message,
+                                confirmButtonColor: '#4e73df',
+                            }).then(() => {
+                                table.ajax.reload();
+                            });
                         }
                     },
                 });
             }
-        })
+        });
     }
 
     const changeSort = function(val) {

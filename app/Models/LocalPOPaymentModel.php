@@ -1467,6 +1467,5 @@ class LocalPOPaymentModel extends Model
         
         return $prefix . $counterNext;
     }
-
     
 }

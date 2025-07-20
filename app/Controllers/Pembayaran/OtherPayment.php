@@ -396,10 +396,6 @@ class OtherPayment extends BaseController
                 $message = "Pembayaran berhasil diunpost";
             }
 
-            if (!$result['status']) {
-                throw new \Exception($result['message']);
-            }
-
             return response()->setJSON([
                 'status' => true,
                 'token' => csrf_hash(),
