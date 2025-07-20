@@ -167,7 +167,7 @@
 
                                 <tbody>
                                     <tr>
-                                        <td colspan="8">Saldo Awal : </td>
+                                        <td colspan="10">Saldo Awal : </td>
                                         <td><?= toRupiah($j['saldo_lama']) ?></td>
                                     </tr>
                                     <?php
@@ -178,7 +178,7 @@
                                     ?>
                                     <?php foreach ($j['result'] as $r): ?>
                                         <?php
-                                        $sisaSaldo += ($r['debit']) - ($r['kredit']);
+                                        $sisaSaldo += ($r['debit'] * $r['kurs']) - ($r['kredit'] * $r['kurs']);
                                         $totalDebit += $r['debit'] * $r['kurs'];
                                         $totalKredit += $r['kredit'] * $r['kurs'];
                                         ?>
@@ -189,13 +189,17 @@
                                             <td><?= $r['supplier_name'] ?></td>
                                             <td><?= $r['no_transaksi'] ?></td>
                                             <td><?= $r['keterangan'] ?></td>
-                                            <td><?= toRupiah($r['kredit'] / $r['kurs']) . " " . "<b>" . $r['valas'] . "</b>" ?></td>
+                                            <td><?= toRupiah((float)$r['kredit'] != 0 ? $r['kredit'] : $r['debit']) . " <b>{$r['valas']}</b>" ?></td>
                                             <td><?= $r['kurs'] == "1" ? "" : toRupiah($r['kurs']) ?></td>
                                             <td><?= toRupiah($r['debit'] * $r['kurs']) ?></td>
                                             <td><?= toRupiah($r['kredit']) ?></td>
                                             <td><?= toRupiah($sisaSaldo) ?></td>
                                         </tr>
                                     <?php endforeach; ?>
+                                    <?php
+                                    // var_dump(toRupiah($sisaSaldo), toRupiah($totalDebit), toRupiah($totalKredit));
+                                    // die;
+                                    ?>
                                     <tr>
                                         <td colspan="8" style="text-align: center;font-weight:bold;">
                                             <b>Sub Total</b>

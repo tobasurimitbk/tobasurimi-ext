@@ -10,43 +10,39 @@
       font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
       font-size: 11px;
       margin: 0;
-      /* Hilangkan margin body agar konsisten */
     }
 
     @page {
       size: auto;
-      margin: 0 10px;
-      /* 0 atas-bawah, 10px kiri-kanan */
+      margin: 0 5px; /* Reduced margins to maximize space */
     }
 
     h5 {
       font-weight: bold;
       font-size: 18px;
-      margin-bottom: 10px;
-      margin-top: 8px;
+      margin-bottom: 5px;
+      margin-top: 5px;
       text-align: center;
     }
 
     h6 {
       font-weight: bold;
       font-size: 13px;
-      margin: 10px 0;
+      margin: 5px 0;
       text-align: center;
     }
 
     table {
       border-collapse: collapse !important;
       width: 100%;
+      table-layout: fixed; /* Ensures column width consistency */
     }
 
-    #table1,
-    th,
-    td {
+    #table1, th, td {
       border: 1px solid #999;
+      word-wrap: break-word; /* Allows text to wrap within cells */
     }
   </style>
-
-
 </head>
 
 <body>
@@ -56,23 +52,21 @@
 
   <?php if (count($jurnalUmum) > 0): ?>
     <?php foreach ($jurnalUmum as $j): ?>
-      <div style="margin-top: 10px; margin-bottom:10px;">
+      <div style="margin-top: 8px; margin-bottom:8px;">
         <b><?= $j['number'] ?> - <?= $j['name'] ?></b>
       </div>
-      <table id="table1
-      style=" margin-top: -20px;">
+      <table id="table1">
         <thead>
           <tr>
-            <th style="width: 10%;">Tanggal</th>
-            <th style="width: 10%;">No Trx</th>
+            <th style="width: 7%;">Tanggal</th>
+            <th style="width: 8%;">No Trx</th>
             <th style="width: 10%;">Supplier</th>
-            <th style="width: 77%;">Desc</th>
-            <th style="width: 5%;">Currency</th>
-            <th style="width: 5%;">Exchange</th>
-            <th style="width: 5%;">Debit</th>
-            <th style="width: 5%;">Kredit</th>
-            <th style="width: 5%;">Balance</th>
-
+            <th style="width: 35%;">Desc</th> <!-- Significantly wider description column -->
+            <th style="width: 8%;">Currency</th>
+            <th style="width: 7%;">Exch</th>
+            <th style="width: 8%;">Debit</th>
+            <th style="width: 8%;">Kredit</th>
+            <th style="width: 9%;">Balance</th>
           </tr>
         </thead>
 
@@ -85,7 +79,6 @@
           $sisaSaldo = $j['saldo_lama'];
           $totalKredit = 0;
           $totalDebit = 0;
-
           ?>
           <?php foreach ($j['result'] as $r): ?>
             <?php
@@ -95,30 +88,25 @@
             ?>
             <tr>
               <td><?= date('d/m/Y', strtotime($r['tanggal_jurnal'])) ?></td>
-              <!-- <td><?= $r['jenis_transaksi'] ?></td> -->
               <td><?= $r['no_transaksi'] ?></td>
               <td><?= $r['supplier_name'] ?></td>
-              <td><?= $r['keterangan'] ?></td>
+              <td style="text-align: left;"><?= $r['keterangan'] ?></td> <!-- Left aligned for better readability -->
               <td><?= toRupiah($r['kredit'] / $r['kurs']) . " " . "<b>" . $r['valas'] . "</b>" ?></td>
               <td><?= $r['kurs'] == "1" ? "" : toRupiah($r['kurs']) ?></td>
-              <td><?= toRupiah($r['debit'] * $r['kurs']) ?></td>
-              <td><?= toRupiah($r['kredit']) ?></td>
-              <td><?= toRupiah($sisaSaldo) ?></td>
+              <td style="text-align: right;"><?= toRupiah($r['debit'] * $r['kurs']) ?></td>
+              <td style="text-align: right;"><?= toRupiah($r['kredit']) ?></td>
+              <td style="text-align: right;"><?= toRupiah($sisaSaldo) ?></td>
             </tr>
           <?php endforeach; ?>
           <tr>
             <td colspan="6" style="text-align: center;font-weight:bold;">
               <b>Sub Total</b>
             </td>
-            <td>
-              <b>
-                <?= toRupiah($totalDebit) ?>
-              </b>
+            <td style="text-align: right;">
+              <b><?= toRupiah($totalDebit) ?></b>
             </td>
-            <td>
-              <b>
-                <?= toRupiah($totalKredit) ?>
-              </b>
+            <td style="text-align: right;">
+              <b><?= toRupiah($totalKredit) ?></b>
             </td>
             <td></td>
           </tr>
@@ -128,22 +116,17 @@
             </td>
             <td></td>
             <td></td>
-            <td>
-              <b>
-                <?= toRupiah($sisaSaldo) ?>
-              </b>
+            <td style="text-align: right;">
+              <b><?= toRupiah($sisaSaldo) ?></b>
             </td>
           </tr>
         </tbody>
       </table>
     <?php endforeach; ?>
-
   <?php else: ?>
-
     <div style="text-align: center;font-size:16px;" role="alert">
       <h6> Silahkan Pilih Akun yang Akan Dieksekusi</h6>
     </div>
   <?php endif; ?>
 </body>
-
 </html>

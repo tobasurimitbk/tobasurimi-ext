@@ -177,107 +177,125 @@ class PanjarPinjamanTransactionModel extends Model
     }
 
     public function get_new_no(
-        $jenis,
-        $divisi,
-        $bank_id,
-        $bln,
-        $thn,
-        $last_day,
-        $companyID
-    ) {
-        $banksModel = new BanksModel();
-        
-        // Step 1: Get bank code
-        $kodeBank = '';
-        if (!empty($bank_id)) {
-            $bankData = $banksModel->select('name')
-                                ->where('id', $bank_id)
-                                ->first();
-            if ($bankData) {
-                $name = strtoupper($bankData['name']);
-                if (strpos($name, 'BRI') !== false) {
-                    $kodeBank = 'BRI';
-                } elseif (strpos($name, 'MANDIRI') !== false) {
-                    $kodeBank = 'MND';
-                } elseif (strpos($name, 'BNI') !== false) {
-                    $kodeBank = 'KBA';
-                } elseif (strpos($name, 'BCA') !== false) {
-                    $kodeBank = 'BCI';
-                }
-            }
-        }
-
-        $kodeDivisi = '';
-        if (!empty($divisi)) {
-            $divisiUpper = strtoupper($divisi);
-            if (strpos($divisiUpper, 'PTS') !== false) {
-                $kodeDivisi = ($jenis == 'MERAH') ? 'MKN' : 'KKN';
-            } elseif (strpos($divisiUpper, 'CANNING') !== false) {
-                $kodeDivisi = ($jenis == 'MERAH') ? 'CNM' : 'CNK';
-            } elseif (strpos($divisiUpper, 'FROZEN I') !== false) {
-                $kodeDivisi = ($jenis == 'MERAH') ? 'FRM' : 'FRK';
-            } elseif (strpos($divisiUpper, 'FROZEN II') !== false) {
-                $kodeDivisi = ($jenis == 'MERAH') ? 'FSM' : 'FSK';
-            } elseif (strpos($divisiUpper, 'GLOBAL') !== false) {
-                $kodeDivisi = ($jenis == 'MERAH') ? 'GBM' : 'GBK';
-            } elseif (strpos($divisiUpper, 'OCS') !== false) {
-                $kodeDivisi = ($jenis == 'MERAH') ? 'OCM' : 'OCK';
-            }
-        }
-
-        // Step 3: Build search pattern based on whether bank code exists
-        $searchPattern = $kodeDivisi . '/';
-        if (!empty($kodeBank)) {
-            $searchPattern .= $kodeBank . '/';
-        }
-        $searchPattern .= $thn . '/' . $bln . '/';
-
-        // Step 4: Check all relevant tables for the highest number
-        $db = \Config\Database::connect();
-        
-        $tablesToCheck = [
-            'other_payment' => 'no_pembayaran',
-            'local_po_payments' => 'payment_no',
-            'local_po_payment_bp' => 'payment_no',
-            'panjar_pinjaman_transaction' => 'no_transaction',
-        ];
-        
-        $maxNumber = 0;
-        
-        foreach ($tablesToCheck as $table => $column) {
-            $builder = $db->table($table);
+            $jenis,
+            $divisi,
+            $paymentMethod,
+            $bank_id,
+            $bln,
+            $thn,
+            $last_day,
+            $companyID
+        ) {
+            $banksModel = new BanksModel();
             
-            $lastRecord = $builder->select($column)
-                                ->like($column, $searchPattern, 'after')
-                                ->where('createdAt >=', "{$thn}-{$bln}-01 00:00:00")
-                                ->where('createdAt <=', "{$last_day} 23:59:59")
-                                ->where('company_id', $companyID)
-                                ->where('deletedAt', null)
-                                ->orderBy($column, 'DESC')
-                                ->get(1)
-                                ->getRowArray();
-
-            if ($lastRecord) {
-                try {
-                    $lastParts = explode('/', $lastRecord[$column]);
-                    $currentNumber = (int)end($lastParts);
-                    $maxNumber = max($maxNumber, $currentNumber);
-                } catch (Exception $e) {
-                    log_message('error', "Failed to parse number from {$table}.{$column}: " . $e->getMessage());
+            // Step 1: Get bank code (only if payment method is BANK)
+            $kodeBank = '';
+            if (!empty($bank_id) && strtoupper($paymentMethod) !== 'CASH') {
+                $bankData = $banksModel->select('name')
+                                    ->where('id', $bank_id)
+                                    ->first();
+                if ($bankData) {
+                    $name = strtoupper($bankData['name']);
+                    if (strpos($name, 'BRI') !== false) {
+                        $kodeBank = 'BRI';
+                    } elseif (strpos($name, 'MANDIRI') !== false) {
+                        $kodeBank = 'MND';
+                    } elseif (strpos($name, 'BNI') !== false) {
+                        $kodeBank = 'KBA';
+                    } elseif (strpos($name, 'BCA') !== false) {
+                        $kodeBank = 'BCI';
+                    }
                 }
             }
-        }
 
-        // Step 5: Generate new number
-        $counterNext = str_pad($maxNumber + 1, 4, '0', STR_PAD_LEFT);
-        
-        // Build final number
-        $prefix = $kodeDivisi . '/';
-        if (!empty($kodeBank)) {
-            $prefix .= $kodeBank . '/';
+            $kodeDivisi = '';
+            // Only get division code if payment method is CASH or if bank code is empty (fallback)
+            if (!empty($divisi) && (strtoupper($paymentMethod) === 'CASH' || empty($kodeBank))) {
+                $divisiUpper = strtoupper($divisi);
+                if (strpos($divisiUpper, 'PTS') !== false) {
+                    $kodeDivisi = ($jenis == 'MERAH') ? 'MKN' : 'KKN';
+                } elseif (strpos($divisiUpper, 'CANNING') !== false) {
+                    $kodeDivisi = ($jenis == 'MERAH') ? 'CNM' : 'CNK';
+                } elseif (strpos($divisiUpper, 'FROZEN I') !== false) {
+                    $kodeDivisi = ($jenis == 'MERAH') ? 'FRM' : 'FRK';
+                } elseif (strpos($divisiUpper, 'FROZEN II') !== false) {
+                    $kodeDivisi = ($jenis == 'MERAH') ? 'FSM' : 'FSK';
+                } elseif (strpos($divisiUpper, 'GLOBAL') !== false) {
+                    $kodeDivisi = ($jenis == 'MERAH') ? 'GBM' : 'GBK';
+                } elseif (strpos($divisiUpper, 'OCS') !== false) {
+                    $kodeDivisi = ($jenis == 'MERAH') ? 'OCM' : 'OCK';
+                }
+            }
+
+            // Step 3: Build search pattern
+            $searchPattern = '';
+            
+            // Use division code for CASH, bank code for BANK
+            if (strtoupper($paymentMethod) === 'CASH') {
+                $searchPattern = $kodeDivisi . '/';
+            } else {
+                if (!empty($kodeBank)) {
+                    $searchPattern = $kodeBank . '/';
+                } elseif (!empty($kodeDivisi)) { // Fallback to division code if no bank code
+                    $searchPattern = $kodeDivisi . '/';
+                }
+            }
+            
+            $searchPattern .= $thn . '/' . $bln . '/';
+
+            // Step 4: Check all relevant tables for the highest number
+            $db = \Config\Database::connect();
+            
+            $tablesToCheck = [
+                'other_payment' => 'no_pembayaran',
+                'local_po_payments' => 'payment_no',
+                'local_po_payment_bp' => 'payment_no',
+                'panjar_pinjaman_transaction' => 'no_transaction',
+            ];
+            
+            $maxNumber = 0;
+            
+            foreach ($tablesToCheck as $table => $column) {
+                $builder = $db->table($table);
+                
+                $lastRecord = $builder->select($column)
+                                    ->like($column, $searchPattern, 'after')
+                                    ->where('createdAt >=', "{$thn}-{$bln}-01 00:00:00")
+                                    ->where('createdAt <=', "{$last_day} 23:59:59")
+                                    ->where('company_id', $companyID)
+                                    ->where('deletedAt', null)
+                                    ->orderBy($column, 'DESC')
+                                    ->get(1)
+                                    ->getRowArray();
+
+                if ($lastRecord) {
+                    try {
+                        $lastParts = explode('/', $lastRecord[$column]);
+                        $currentNumber = (int)end($lastParts);
+                        $maxNumber = max($maxNumber, $currentNumber);
+                    } catch (Exception $e) {
+                        log_message('error', "Failed to parse number from {$table}.{$column}: " . $e->getMessage());
+                    }
+                }
+            }
+
+            // Step 5: Generate new number
+            $counterNext = str_pad($maxNumber + 1, 4, '0', STR_PAD_LEFT);
+            
+            // Build final number based on payment method
+            $prefix = '';
+            if (strtoupper($paymentMethod) === 'CASH') {
+                $prefix = $kodeDivisi . '/';
+            } else {
+                if (!empty($kodeBank)) {
+                    $prefix = $kodeBank . '/';
+                } elseif (!empty($kodeDivisi)) { // Fallback to division code if no bank code
+                    $prefix = $kodeDivisi . '/';
+                }
+            }
+            $prefix .= $thn . '/' . $bln . '/';
+            
+            return $prefix . $counterNext;
         }
-        $prefix .= $thn . '/' . $bln . '/';
-        
-        return $prefix . $counterNext;
-    }
+ 
 }
