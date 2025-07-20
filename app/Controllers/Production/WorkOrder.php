@@ -309,10 +309,12 @@ class WorkOrder extends BaseController
     {
 
         $request_date = date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("request_date"))));
+        $department_id = $this->request->getVar("department_id");
         if (empty($this->request->getVar("request_date"))) {
             $no = $this->workOrdersModel->get_no(
                 date('m'),
                 date('Y'),
+                $department_id
             );
         } else {
             $tanggalExplode = explode('-', $request_date);
@@ -322,6 +324,7 @@ class WorkOrder extends BaseController
             $no = $this->workOrdersModel->get_no(
                 $month,
                 $year,
+                $department_id
             );
         }
 

@@ -123,30 +123,24 @@ class WorkOrdersModel extends Model
         ];
     }
 
-    public function get_no($bln, $thn)
+    public function get_no($bln, $thn, $department)
     {
         $romanNumb = [
-            'I',
-            'II',
-            'III',
-            'IV',
-            'V',
-            'VI',
-            'VII',
-            'VIII',
-            'IX',
-            'X',
-            'XI',
-            'XII',
+            'I', 'II', 'III', 'IV', 'V', 'VI',
+            'VII', 'VIII', 'IX', 'X', 'XI', 'XII',
         ];
 
         $first_day = "$thn-$bln-01";
         $last_day = date("Y-m-t", strtotime($first_day));
-        $lastStr = $romanNumb[$bln - 1] . '/' . $thn;
+        $monthRoman = $romanNumb[$bln - 1];
+        $lastStr = "{$monthRoman}/{$thn}";
+
+        // Bersihkan department dari spasi
+        $department = trim($department);
 
         $builder = $this->db->table('work_orders');
         $builder->select('wo_no');
-        $builder->where('deletedAt IS NULL'); // Gunakan IS NULL agar lebih aman
+        $builder->where('deletedAt IS NULL');
         $builder->where('company_id', session()->get("login")->this_company_id);
         $builder->where('request_date >=', $first_day);
         $builder->where('request_date <=', $last_day);
@@ -154,17 +148,18 @@ class WorkOrdersModel extends Model
         $builder->orderBy('id', "desc");
         $query = $builder->get();
 
-        $kode = 'PRD';
+        $kode = 'WO'; // sesuai format baru
         $lastWO = '0001';
 
-        $result = $query->getRowArray(); // Ambil satu baris data
+        $result = $query->getRowArray();
 
         if ($result && isset($result['wo_no'])) {
             $lastWO = explode('/', $result['wo_no']);
             $lastWO = intval(end($lastWO)) + 1;
-            $lastWO = sprintf("%04d", $lastWO);
+            $lastWO = sprintf("%05d", $lastWO); // pakai 5 digit (00001) sesuai contohmu
         }
 
-        return "{$kode}/{$lastStr}/{$lastWO}";
+        return "{$kode}/{$department}/{$lastStr}/{$lastWO}";
     }
+
 }

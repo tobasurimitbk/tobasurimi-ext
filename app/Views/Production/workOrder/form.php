@@ -145,7 +145,7 @@
                                 <select class="form-select kode_barang" name="kode_barang" id="kode_barang" aria-label="Floating label select example">
                                     <option data-barang_id="" data-nama="" data-satuan="" value=""></option>
                                 </select>
-                                <label for="floatingInput">Kode Barang</label>
+                                <label for="floatingInput">Pilih Barang</label>
                             </div>
                         </div>
                         <div class="col-md-4">
@@ -258,7 +258,7 @@
 
         // KODE BARANG
         $('.kode_barang').select2({
-            placeholder: "Pilih Kode Barang",
+            placeholder: "Pilih Barang",
             theme: "bootstrap-5",
             dropdownParent: $(".detail-modal"),
             tags: false,
@@ -304,6 +304,10 @@
         <?php else: ?>
             // Ketika Tanggal Dokumen DIedit Maka Nomor Menyesuaikan
             $('#date_production').change(function() {
+                changeStatus();
+            });
+
+            $('#department_id').change(function() {
                 changeStatus();
             });
         <?php endif; ?>
@@ -699,13 +703,15 @@
     const changeStatus = function() {
         let value = document.getElementById('auto_generate').checked ? true : false;
         let date_production = $('#date_production').val();
+        let departmentText = $('#department_id option:selected').text();
         if (value) {
             $.ajax({
                 url: `<?= base_url("/work-order/generate-kode-produksi"); ?>`,
                 method: "GET",
                 dataType: "json",
                 data: {
-                    request_date: date_production // Nomor Mengikuti Tanggal Pembuatan Dokumen
+                    request_date: date_production, // Nomor Mengikuti Tanggal Pembuatan Dokumen
+                    department_id: department_id
                 },
                 success: function(res) {
                     if (res) {
