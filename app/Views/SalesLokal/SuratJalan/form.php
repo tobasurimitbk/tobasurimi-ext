@@ -138,6 +138,21 @@
                     </div>
                 </div>
 
+                <div class="row">
+                    <?php if (session()->get("login")->this_company_id != 16) { ?>
+                        <div class="col-md-4">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <select class="form-select company_id" name="company_id" id="company_id">
+                                    <option <?= !empty($data) ? ($data->id_company == "1" ? "selected" : "") : ""; ?> value="1">KIM 1</option>
+                                    <option <?= !empty($data) ? ($data->id_company == "2" ? "selected" : "") : ""; ?> value="2">KIM 2</option>
+                                    <option <?= !empty($data) ? ($data->id_company == "15" ? "selected" : "") : ""; ?> value="15">GLOBAL</option>
+                                </select>
+                                <label for="floatingInput">Pilih Company</label>
+                            </div>
+                        </div>
+                    <?php } ?>
+                </div>
+
                 <!-- List Barang -->
                 <div class="col-subtitle-modal">
                     <div class="row mt-3">
@@ -311,11 +326,13 @@
         $(".id_customer").change(function() {
             if ($(".id_customer").val()) {
                 let customerId = $(".id_customer").val();
+
                 $.ajax({
                     url: "<?= base_url('/surat-jalan/sales-order'); ?>" + "/" + customerId,
                     method: "GET",
                     dataType: "json",
                     success: function(res) {
+                        console.log(res);
                         $(".id_so").empty();
                         $(".id_So").append(`<option value=""></option>`);
 
@@ -336,6 +353,8 @@
                         });
 
                         $('#tagihan_ke').val(res.customerData.address);
+                        $('#salesName').val(res.customerData.salesName);
+                        $('#termin').val(res.customerData.termin);
                         $('#no_telp').val(res.customerData.phone);
                     }
                 })
@@ -357,9 +376,15 @@
             let jenis_penjualan = $this.find("option:selected").data("jenis_penjualan");
             let nama_ecommerce = $this.find("option:selected").data("nama_ecommerce");
 
-            $('#termin').val(termin);
-            $('#salesName').val(sales);
-            $('#no_po').val(no_po);
+            if (termin) {
+                $('#termin').val(termin);
+            }
+            if (sales) {
+                $('#salesName').val(sales);
+            }
+            if (no_po) {
+                $('#no_po').val(no_po);
+            }
 
             $('#jenis_penjualan').val(jenis_penjualan);
             $('#nama_ecommerce').val(nama_ecommerce);
