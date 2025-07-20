@@ -711,7 +711,7 @@
                 dataType: "json",
                 data: {
                     request_date: date_production, // Nomor Mengikuti Tanggal Pembuatan Dokumen
-                    department_id: department_id
+                    department_id: departmentText
                 },
                 success: function(res) {
                     if (res) {
