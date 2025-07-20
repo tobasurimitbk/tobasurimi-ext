@@ -515,14 +515,15 @@ class SuratJalan extends BaseController
     public function dropDownSalesOrder($idCustomer)
     {
         $customerData = $this->CustomerModel->asObject()
-            ->select('customers.*')
+            ->select('customers.*, employees.name as salesName')
+            ->join('employees', 'employees.id = customers.sales_id', 'left')
             ->find($idCustomer);
 
         $condition = [
             'id_customer'               => $idCustomer,
             'tipe_sales_order'          => 'LOKAL',
             // "sales_order.id_company"    => $this->this_company_id,
-            'posting'         => 1,
+            // 'posting'         => 1,
             'surat_jalan_so_id'         => null,
             'sales_order_invoice_id'    => null
         ];
