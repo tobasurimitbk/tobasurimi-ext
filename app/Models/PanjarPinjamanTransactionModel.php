@@ -176,7 +176,7 @@ class PanjarPinjamanTransactionModel extends Model
         return $generatedNo;
     }
 
-        public function get_new_no(
+    public function get_new_no(
             $jenis,
             $divisi,
             $paymentMethod,
