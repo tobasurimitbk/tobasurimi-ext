@@ -196,6 +196,7 @@ class OrderForm extends BaseController
                 "createdAt" => date("d/m/Y", strtotime($data->createdAt)),
                 "order_date" => date("d/m/Y", strtotime($data->order_date)),
                 "shipping_date" => $data->shipping_date == "0000-00-00" ? "" : date("d/m/Y", strtotime($data->shipping_date)),
+                "company_name" => $data->company_name,
                 "nama_customer" => $customerName,
                 "destination" => $data->destination,
                 "qty_barang" => count($this->SalesOrderDetailModel->where('id_sales_order', $data->id)->where('deletedAt', null)->where('tipe_input', "order_form")->findAll()),

@@ -98,6 +98,7 @@ class SalesOrderModel extends Model
             'qty_barang'             => 'sales_order.qty_barang',
             'total_harga'             => 'sales_order.total_harga',
             'salesName'             => 'employees.name',
+            'company'             => 'companies.company',
             'keterangan'      => 'sales_order.keterangan',
             'createdAt'         => 'sales_order.createdAt',
             'updatedAt'         => 'sales_order.updatedAt',
@@ -107,11 +108,14 @@ class SalesOrderModel extends Model
         $sort = $availableSort[$addCondition['sort'] ?? 'createdAt'] ?? 'sales_order.createdAt';
         $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'DESC';
 
-        $selectQry = "sales_order.*, employees.name as salesName";
+        $selectQry = "sales_order.*, 
+        employees.name as salesName, 
+        companies.company AS company_name";
 
         $salesOrderLokal = $this->asObject()
             ->select($selectQry)
-            ->join('employees', 'employees.id = sales_order.sales_id')
+            ->join('employees', 'employees.id = sales_order.sales_id', 'left')
+            ->join('companies', 'companies.id = sales_order.id_company', 'left')
             ->where($condition)
             ->orderBy($sort, $sortType);
 

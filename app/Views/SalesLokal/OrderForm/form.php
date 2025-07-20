@@ -280,7 +280,7 @@
             </div>
             <div class="modal-body">
                 <form class="detail-form" role="form" method="POST" enctype="multipart/form-data">
-                    <input autocomplete="one-time-code" type="hidden" class="id_detail" name="id_detail" id="id_detail" />
+                    <input autocomplete="one-time-code" type="text" class="id_detail" name="id_detail" id="id_detail" />
                     <!-- <input autocomplete="one-time-code" type="hidden" class="id_barang" name="id_barang" id="id_barang" /> -->
 
                     <div class="row">
@@ -311,7 +311,7 @@
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" onkeyup="this.value = greatFormatRupiah(this.value);" type="text" class="form-control harga" name="harga" id="harga" placeholder="Harga Barang">
+                                <input autocomplete="one-time-code" onkeyup="this.value = greatFormatRupiah(this.value);" onchange="this.value = greatFormatRupiah(this.value);" type="text" class="form-control harga" name="harga" id="harga" placeholder="Harga Barang">
                                 <label for="floatingInput">Harga Barang</label>
                             </div>
                         </div>
@@ -349,7 +349,7 @@
                         </div>
                     </div>
                     <div class="row">
-                        <div class="col-md-6">
+                        <div class="col-md-6" style="display: none;">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <input autocomplete="one-time-code" type="text" class="form-control keterangan" name="keterangan" id="keterangan" placeholder="Keterangan">
                                 <label for="floatingInput">Keterangan</label>
@@ -712,7 +712,8 @@
                     let disableButton = "<?= !empty($data) ? ((($data->used == "USED") or ($data->surat_jalan_so_id != NULL) or ($data->sales_order_invoice_id != NULL)) ? 'disabled' : '') : '' ?>";
                     return `
                     <div class="">
-                        <button data-no="${row.no}" data-id="${row.id}" class="" ${disableButton}><i class="fa fa-trash" aria-hidden="true"></i></button>
+                        <button data-no="${row.no}" data-id="${row.id}" class="edit-table-detail" ${disableButton}><i class="fa fa-edit" aria-hidden="true"></i></button>
+                        <button data-no="${row.no}" data-id="${row.id}" class="delete-button" ${disableButton}><i class="fa fa-trash" aria-hidden="true"></i></button>
                     </div>
                 `;
 
@@ -794,7 +795,7 @@
         <?php
         } ?>
 
-        $('.dataTable tbody').on('click', 'button', function() {
+        $('.dataTable tbody').on('click', '.delete-button', function() {
             let rowData = table.row($(this).parents('tr')).data();
             let dataNo = $(this).data('no');
             let dataId = $(this).data('id');
@@ -867,7 +868,33 @@
             reCountTotal();
         });
         generateCodeMasterBarang();
-        getBarang();
+        // getBarang();
+        $('.dataTable tbody').on('click', '.edit-table-detail', function() {
+            let rowData = table.row($(this).parents('tr')).data();
+            let dataIdBarang = rowData.id_barang;
+            let dataQty = rowData.qty;
+            let dataHargaBarang = rowData.harga_barang;
+            let dataDiscountPercentage = rowData.discount_percentage;
+            let dataDiscountUnit = rowData.discount_unit;
+            let dataKeterangan = rowData.keterangan;
+            let dataIdDetail = rowData.id;
+
+            $(".title-detail-name").text("Update");
+
+            console.log(rowData);
+
+            getBarangAsync(dataIdBarang).then(() => {
+                $(".harga").val(dataHargaBarang).change();
+                $(".qty").val(dataQty).change();
+                $(".discount_percentage").val(dataDiscountPercentage).change();
+                $(".discount_unit").val(dataDiscountUnit).change();
+                $(".keterangan").val(dataKeterangan).change();
+                $(".id_detail").val(dataIdDetail).change();
+                $(".detail-modal").modal("show");
+            }).catch((err) => {
+                console.error("Gagal ambil data barang:", err);
+            });
+        });
         <?php if (empty($data)) : ?>
             $('#auto_generate').prop('checked', true).change();
         <?php endif; ?>
@@ -1588,68 +1615,6 @@
             }
         });
 
-
-        $(document).on('click', '.edit-table-detail', function() {
-            $(".title-detail-name").text("Update")
-            $(".delete-detail").css('display', '');
-
-            let id_barang = $(this).data('id_barang')
-            let nama_barang = $(this).data('nama_barang')
-            let tipe_pelanggan = $(this).data('tipe_pelanggan')
-            let harga = $(this).data('harga')
-            let qty = $(this).data('qty')
-            let amount = $(this).data('amount')
-            let warehouseName = $(this).data('warehouse_name')
-            let keterangan = $(this).data('keterangan')
-            let dept = $(this).data('dept')
-            let idWarehouse = $(this).data('id_warehouse')
-            let statusppn = $(this).data('statusppn')
-            let tax = $(this).data('tax')
-            let discount = $(this).data('discount_percentage')
-            let row = $(this).data('row')
-            let id = $(this).data('id')
-            let valData = 0
-
-            validator_detail.resetForm();
-            validator_detail.reset();
-
-            $(".id_detail").val(id)
-            // $(".harga").val(parseInt(harga))
-            $(".qty").val(qty)
-            $(".tipe_pelanggan").val(tipe_pelanggan)
-            $(".amount").val(amount)
-            $(".keterangan").val(keterangan)
-            $(".statusppn").val(statusppn)
-            $(".tax").val(tax)
-            $(".discount_percentage").val(discount)
-            $(".dept").val(dept)
-            $("#warehouse").val(idWarehouse)
-            $("#warehouse").text(warehouseName)
-
-            $.ajax({
-                url: `<?= base_url("order-form-lokal/barangAll"); ?>`,
-                method: "GET",
-                dataType: "json",
-                success: function(res) {
-
-                    // $(".id_barang").empty();
-
-                    $(".id_barang").append(`<option data-satuan="" data-warehouse_id="" data-harga="" data-statusppn="" data-warehouse_name="" data-id_item="" value=""></option>`);
-
-                    res.dataBarang.forEach(function(item) {
-                        if (item.id == id_barang) {
-                            valData = item.id_barang
-                        }
-                        $(".id_barang").append(`<option data-code="${item.kode_barang}" data-harga="${item.harga_jual}" data-statusppn="${item.harga_jual}" data-satuan="${item.nama_satuan}" data-warehouse_id="${idWarehouse}" data-warehouse_name="${item.warehouse_name}" data-id_item="${item.id_barang}  value="${item.id_barang}" ${item.id_barang==id_barang?'selected':''}>${item.nama_barang}</option>`);
-                    })
-
-                    $(".id_barang").val(valData).change();
-                    $(".detail-modal").modal("show");
-                }
-            })
-
-        });
-
         $(".btn-submit").click(function() {
             $(".detail-modal").modal("hide")
 
@@ -1898,6 +1863,14 @@
             $(".amount").val(amount);
         });
 
+        $(".harga, .qty").change(function() {
+            let harga = $(".harga").val() ? $(".harga").val().replaceAll(",", "") : 0;
+            let qty = $(".qty").val() ? parseFloat($(".qty").val()) : 0;
+
+            let amount = (harga * qty).toLocaleString();
+            $(".amount").val(amount);
+        });
+
         $(".discount_percentage").keyup(function() {
             if ($(".discount_percentage").val()) {
                 if ($(".discount_unit option:selected").val() == 'percent' && $(".discount_percentage").val() > 100) {
@@ -1948,13 +1921,13 @@
             const discAmt = discountUnit == "percent" ? amount * (discountPercentage / 100) : discountPercentage;
             const discountedAmt = amount - discAmt;
 
-            console.log(discAmt, discountedAmt, amount);
+            console.log(list_items);
 
 
             const currentItemList = table.rows().data().toArray();
             let validate_same = currentItemList.findIndex((obj) => obj.id_barang == id_barang && obj.warehouse_id == warehouseId);
 
-            if (validate_same >= 0) {
+            if (validate_same >= 0 && row_detail == 0) {
                 Swal.fire({
                     icon: 'error',
                     title: 'Barang tidak boleh sama',
@@ -1963,12 +1936,109 @@
 
             } else {
                 // update detail
-                if (row_detail) {} else {
+                if (row_detail != 0) {
+                    console.log("Editing row with ID:", row_detail);
+
+                    // 1. Cari index di list_items
+                    const itemIndex = list_items.findIndex(item => item.id == row_detail);
+                    console.log("Found in list_items at index:", itemIndex);
+
+                    if (itemIndex !== -1) {
+                        // Hitung nilai diskon dan amount baru
+                        const discAmt = discountUnit == "percent" ?
+                            amount * (discountPercentage / 100) :
+                            discountPercentage;
+
+                        const discountedAmt = amount - discAmt;
+
+                        // 2. Update item di list_items
+                        const updatedItem = {
+                            ...list_items[itemIndex],
+                            id_barang: id_barang,
+                            nama_barang: nama_barang,
+                            harga_barang: harga,
+                            qty: qty,
+                            amount: amount,
+                            discountedAmt: discountedAmt,
+                            keterangan: keterangan,
+                            statusppn: statusppn,
+                            tax: tax,
+                            taxAmt: amount * (tax / 100),
+                            discount_percentage: discountPercentage,
+                            dept: dept,
+                            warehouse_id: warehouseId,
+                            warhouse_name: warhouseName,
+                            kode_barang: selectedData.code,
+                            satuan: selectedData.satuan,
+                            disc: discountPercentage,
+                            discAmt: discAmt,
+                            discUnit: discountUnit,
+                            barangTotal: amount
+                        };
+
+                        list_items[itemIndex] = updatedItem;
+                        console.log("Updated list_items:", list_items[itemIndex]);
+
+                        // 3. Update baris di tabel
+                        let rowUpdated = false;
+                        const rows = table.rows().indexes().toArray();
+
+                        for (let i = 0; i < rows.length; i++) {
+                            const rowData = table.row(rows[i]).data();
+                            if (rowData.id == row_detail) {
+                                const newData = {
+                                    ...rowData,
+                                    id_barang: id_barang,
+                                    kode_barang: selectedData.code,
+                                    nama_barang: nama_barang,
+                                    qty: qty,
+                                    satuan: selectedData.satuan,
+                                    harga_barang: harga,
+                                    barangTotal: amount,
+                                    disc: discountPercentage,
+                                    statusppn: statusppn,
+                                    tax: tax,
+                                    taxAmt: amount * (tax / 100),
+                                    keterangan: keterangan,
+                                    discAmt: discAmt,
+                                    discUnit: discountUnit,
+                                    amount: discountedAmt,
+                                    dept: dept,
+                                    warehouse_id: warehouseId,
+                                    warehouse_name: warhouseName
+                                };
+
+                                table.row(rows[i]).data(newData).invalidate();
+                                rowUpdated = true;
+                                console.log("Updated table row:", newData);
+                                break;
+                            }
+                        }
+
+                        if (rowUpdated) {
+                            table.draw(); // Refresh tampilan tabel
+                            console.log("Table refreshed");
+                        } else {
+                            console.warn("Row not found in table with ID:", row_detail);
+                        }
+
+                        // 4. Hitung ulang total
+                        reCountTotal();
+
+                        // 5. Reset form dan tutup modal
+                        $(".detail-form")[0].reset();
+                        $(".detail-modal").modal("hide");
+                        console.log("Modal closed");
+                    } else {
+                        console.warn("Item not found in list_items with ID:", row_detail);
+                    }
+                } else {
                     if ($(".detail-form").valid()) {
+                        let id = generateRandomId();
 
                         no = no + 1;
                         list_items.push({
-                            id: "",
+                            id: id,
                             no: no,
                             row: row + 1,
                             id_barang: id_barang,
@@ -1997,7 +2067,7 @@
                         });
 
                         table.row.add({
-                            id: "",
+                            id: id,
                             no: no,
                             id_barang: id_barang,
                             kode_barang: selectedData.code,
@@ -2207,6 +2277,49 @@
         })
     }
 
+    function getBarangAsync(selectedIdBarang = null) {
+        return new Promise((resolve, reject) => {
+            $.ajax({
+                url: `<?= base_url("order-form-lokal/barangAll"); ?>`,
+                method: "GET",
+                dataType: "json",
+                success: function(res) {
+                    const $select = $(".id_barang");
+                    $select.empty();
+                    $select.append(`<option data-satuan="" data-warehouse_id="" data-harga="" data-statusppn="" data-warehouse_name="" data-id_item="" value=""></option>`);
+
+                    res.dataBarang.forEach(function(item) {
+                        $select.append(`
+                            <option
+                                data-code="${item.kode_barang}"
+                                data-harga="${item.harga_jual}"
+                                data-statusppn="${item.statusppn}"
+                                data-satuan="${item.nama_satuan}"
+                                data-warehouse_id="${item.warehouse_id}"
+                                data-harga="${item.harga_barang}"
+                                data-warehouse_name="${item.warehouse_name}"
+                                data-id_item="${item.id}"
+                                value="${item.id}"
+                            >
+                                ${item.nama_barang}
+                            </option>
+                        `);
+                    });
+
+                    // Pilih value jika disediakan
+                    if (selectedIdBarang !== null) {
+                        $select.val(selectedIdBarang).trigger("change");
+                    }
+
+                    resolve();
+                },
+                error: function(err) {
+                    reject(err);
+                }
+            });
+        });
+    }
+
     function generateCodeMasterBarang() {
         let csrfToken = '<?= csrf_token() ?>';
         let value = document.getElementById('generate_new_code').checked ? true : false;
@@ -2288,6 +2401,15 @@
         } else {
             callback(false);
         }
+    }
+
+    function generateRandomId(length = 4) {
+        const chars = '0123456789';
+        let result = '';
+        for (let i = 0; i < length; i++) {
+            result += chars.charAt(Math.floor(Math.random() * chars.length));
+        }
+        return result;
     }
 
     // Company
