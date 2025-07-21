@@ -359,7 +359,7 @@
                                 <label class="form-label font-weight-bold modal-sub-title">Detail Specs List (Only Departement PTS)</label>
                             </div>
                             <div class="col-md-6">
-                                <button class="btn btn-show-detail btn-add btn-block float-right" type="button">
+                                <button class="btn btn-show-detail btn-add btn-block float-right" id="btnAddDetailSpecs" type="button">
                                     <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Add Specs
                                 </button>
                             </div>
@@ -529,6 +529,39 @@
                 <div class="modal-footer">
                     <button type="button" class="btn btn-discard mr-2" id="btnHideSizeBreakdownModal">Back</button>
                     <button type="submit" class="btn btn-submit-form" id="btnSubmitSizeBreakDown">Update</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="modal detail-modal" id="detailSpecsModal" tabindex="1">
+    <div class="modal-dialog" style="min-width: 900px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title title-secondary">Create Detail Specs List</h5>
+            </div>
+            <form class="create-form-detail-specs-list" role="form" method="POST">
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input autocomplete="one-time-code" type="text" class="form-control grade" name="grade" id="grade" placeholder="Grade">
+                                <label for="floatingInput">Grade</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input autocomplete="one-time-code" type="text" class="form-control specification" name="specification" id="specification" placeholder="Specification">
+                                <label for="floatingInput">Specification</label>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-discard mr-2" id="btnDetailSpecsHide">Back</button>
+                    <button type="submit" class="btn btn-submit-form" id="btnSubmitSpecsDetail">Update</button>
                 </div>
             </form>
         </div>
@@ -962,6 +995,15 @@
 
     $('#btnHideSizeBreakdownModal').click(function() {
         $('#updateQtyOrderFormModal').modal('hide');
+    });
+
+    $('#btnAddDetailSpecs').click(function() {
+        $('#detailSpecsModal').modal('show');
+    });
+
+    $('#btnDetailSpecsHide').click(function() {
+        $('#detailSpecsModal').modal('hide');
+
     });
 
     $('.btn-submit-detail').click(function() {
