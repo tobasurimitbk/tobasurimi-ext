@@ -123,7 +123,7 @@
 
 <body>
     <!-- First section -->
-    <div class="section" style="margin-top: 0.2in;">
+    <div class="section" style="margin-top: 4px;">
         <div class="fold-mark fold-mark-1"></div>
         <table class="w-100">
             <tr>
