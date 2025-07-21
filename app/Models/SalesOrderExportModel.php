@@ -270,4 +270,204 @@ class SalesOrderExportModel extends Model
             'sortType'  => $sortType
         ];
     }
+
+    public function getDetailSalesKontrakInOrderForm($salesContractId, $salesOrderExportId = null)
+    {
+        $salesKontrakDetailModel = new SalesKontrakDetailModel();
+        $salesContractSizeBreakdownModel = new SalesContractSizeBreakdownModel();
+        $salesOrderExportDetailModel = new SalesOrderExportDetailModel();
+        $salesKontrakModel = new SalesKontrakModel();
+        $salesOrderExportModel = new SalesOrderExportModel();
+
+        $salesContractDetailList = [];
+
+        $selectQryDetail = "
+            sales_contract_detail.*,
+            barang_master_sales.kode_barang,
+            barang_master_sales.barang_name
+        ";
+
+        $salesKontrakDetail = $salesKontrakDetailModel
+            ->select($selectQryDetail)
+            ->join('barang_master_sales', 'barang_master_sales.id = sales_contract_detail.barang_master_sales_id', 'left')
+            ->where('sales_contract_detail.deletedAt', null)
+            ->where('sales_contract_id', $salesContractId)
+            ->findAll();
+
+        foreach ($salesKontrakDetail as $sd) {
+
+            $sizeBreakdown = [];
+
+            $salesContractSize = $salesContractSizeBreakdownModel
+                ->select('sales_contract_size_breakdown.*,satuans.kode_satuan')
+                ->join('satuans', 'satuans.id = sales_contract_size_breakdown.satuan_size_id', 'left')
+                ->where('sales_contract_detail_id', $sd['id'])
+                ->findAll();
+
+            $qtySisa = 0;
+            $totalSisa = 0;
+
+            foreach ($salesContractSize as $s) {
+
+                $result = $salesOrderExportDetailModel
+                    ->select('SUM(qty) as total_qty')
+                    ->where('sales_contract_size_breakdown_id', $s['id'])
+                    ->where('deletedAt', null)
+                    ->first(); // Gunakan first() karena SUM akan kembalikan satu baris saja
+
+                $totalQtySalesOrder = $result['total_qty'] ?? 0;
+                $totalQtySisa = $s['qty'] - $totalQtySalesOrder;
+
+                if ($totalQtySisa < $s['total'] && $salesOrderExportId == null) {
+                    // MASIH ADA SISA BRO 
+                    // PAS CREATE
+                    array_push($sizeBreakdown, [
+                        'id_detail_breakdown' => $s['id'],
+                        'size' => $s['size'],
+                        'grade' => $s['grade'],
+                        'packing' => $s['packing'],
+                        'can' => $s['can'],
+                        'cased' => $s['cased'],
+                        'kg' => $s['kg'],
+                        'lb' => $s['lb'],
+                        'inner_box' => $s['inner_box'],
+                        'pc' => $s['pc'],
+                        'bag' => $s['bag'],
+                        'persen' => $s['persen'],
+                        'remark' => $s['remark'],
+                        'satuan_size_id' => $s['satuan_size_id'],
+                        'satuan_size_code' => $s['kode_satuan'],
+                        'palet' => $s['palet'],
+                        'qty' => $s['qty'],
+                        'harga' => $s['harga'],
+                        'total' => $s['total'],
+                        //-------------------------------
+                        'qty_sisa' => $totalQtySisa,
+                        'total_sisa' => $s['harga'] * $totalQtySisa
+                    ]);
+
+                    $qtySisa += $totalQtySisa;
+                    $totalSisa += $s['harga'] * $totalQtySisa;
+                } else {
+                    // PAS EDIT
+                    $salesOrderDetailExport = $salesOrderExportDetailModel
+                        ->where('sales_order_export_id', $salesOrderExportId)
+                        ->where('sales_contract_size_breakdown_id', $s['id'])
+                        ->first();
+
+                    if ($salesOrderDetailExport != null) {
+                        array_push($sizeBreakdown, [
+                            'id_detail_breakdown' => $s['id'],
+                            'size' => $s['size'],
+                            'grade' => $s['grade'],
+                            'packing' => $s['packing'],
+                            'can' => $s['can'],
+                            'cased' => $s['cased'],
+                            'kg' => $s['kg'],
+                            'lb' => $s['lb'],
+                            'inner_box' => $s['inner_box'],
+                            'pc' => $s['pc'],
+                            'bag' => $s['bag'],
+                            'persen' => $s['persen'],
+                            'remark' => $s['remark'],
+                            'satuan_size_id' => $s['satuan_size_id'],
+                            'satuan_size_code' => $s['kode_satuan'],
+                            'palet' => $s['palet'],
+                            'qty' => $s['qty'],
+                            'harga' => $s['harga'],
+                            'total' => $s['total'],
+                            //-------------------------------
+                            'qty_sisa' => $salesOrderDetailExport['qty'],
+                            'total_sisa' => $s['harga'] * $salesOrderDetailExport['qty']
+                        ]);
+
+                        $qtySisa += $salesOrderDetailExport['qty'];
+                        $totalSisa += $s['harga'] * $salesOrderDetailExport['qty'];
+                    }
+                }
+            }
+
+            array_push($salesContractDetailList, [
+                'id' => $sd['id'],
+                'kode_barang' => $sd['kode_barang'],
+                'barang_name' => $sd['barang_name'],
+                'brand' => $sd['brand'],
+                'specs' => $sd['specs'],
+                'species' => $sd['species'],
+                'packing' => $sd['kemasan'],
+                'qty' => $sd['qty'],
+                'harga' => $sd['harga'],
+                'total_harga' => $sd['total_harga'],
+                //--------------------------
+                'qty_sisa' => $qtySisa,
+                'total_sisa' => $totalSisa,
+                'size_breakdown' => $sizeBreakdown
+            ]);
+        }
+
+        $salesKontrak = $salesKontrakModel
+            ->select('sales_contract.*,customers.name AS customer_name')
+            ->join('customers', 'customers.id = sales_contract.customer_id', 'left')
+            ->where('sales_contract.id', $salesContractId)
+            ->first();
+
+        // HARGA ORI
+        $royaltyPrice = $salesKontrak['royalty_price'];
+        $rebatePrice = $salesKontrak['rebate_price'];
+        $canDeductionPrice  = $salesKontrak['can_deduction_price'];
+        $estimatedFreightPrice = $salesKontrak['estimated_freight_price'];
+        $othersPrice = $salesKontrak['others_price'];
+        $othersType = $salesKontrak['others_type'];
+
+        // SUM AN DATA
+        $selectQryAdditionalSalesOrder = "
+            SUM(royalty_price),
+            SUM(rebate_price),
+            SUM(can_deduction_price),
+            SUM(estimated_freight_price),
+            SUM(others_price),
+            others_type
+        ";
+
+        $resultAdditionalSalesOrder = $salesOrderExportModel
+            ->select($selectQryAdditionalSalesOrder)
+            ->where('sales_contract_id', $salesContractId)
+            ->where('deletedAt', null)
+            ->first();
+
+        $royaltyPriceFinal = $royaltyPrice - ($resultAdditionalSalesOrder['royalt_price'] ?? 0);
+        $rebatePriceFinal = $rebatePrice - ($resultAdditionalSalesOrder['rebate_price'] ?? 0);
+        $canDeductionPriceFinal = $canDeductionPrice - ($resultAdditionalSalesOrder['can_deduction_price'] ?? 0);
+        $estimatedFreightPriceFinal = $estimatedFreightPrice - ($resultAdditionalSalesOrder['estimated_freight_price'] ?? 0);
+        $othersPriceFinal = $othersPrice - ($resultAdditionalSalesOrder['others_price'] ?? 0);
+        $othersTypeFinal = $othersType;
+
+        if ($salesOrderExportId != null) {
+            // PAS UPDATE PAKAI DEFAULT
+            $salesOrderExport = $salesOrderExportModel
+                ->where('sales_order_export_id', $salesOrderExportId)
+                ->first();
+
+            $royaltyPriceFinal = $salesOrderExport['royalt_price'];
+            $rebatePriceFinal = $salesOrderExport['rebate_price'];
+            $canDeductionPriceFinal = $salesOrderExport['can_deduction_price'];
+            $estimatedFreightPriceFinal = $salesOrderExport['estimated_freight_price'];
+            $othersPriceFinal = $salesOrderExport['others_price'];
+            $othersTypeFinal = $salesOrderExport['others_type'];
+        }
+
+
+        $finalResultList = [
+            'royaltyPriceFinal' => $royaltyPriceFinal,
+            'rebatePriceFinal' => $rebatePriceFinal,
+            'canDeductionPriceFinal' => $canDeductionPriceFinal,
+            'estimatedFreightPriceFinal' => $estimatedFreightPriceFinal,
+            'othersPriceFinal' => $othersPriceFinal,
+            'othersTypeFinal' => $othersTypeFinal,
+            'salesContractDetailList' => $salesContractDetailList,
+            'salesContract' => $salesKontrak
+        ];
+
+        return $finalResultList;
+    }
 }

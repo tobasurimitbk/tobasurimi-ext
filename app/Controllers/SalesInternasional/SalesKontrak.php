@@ -406,11 +406,8 @@ class SalesKontrak extends BaseController
             ->first();
 
         if ($salesContract != null) {
-            return response()->setJSON([
-                'message' => "Nomor sales kontrak sudah digunakan oleh anda atau sales lain, silahkan checklist lalu unchecklist no sales kontrak",
-                'status' => false,
-                'token' => csrf_token()
-            ]);
+            // JIKA SUDAH DIGUNAKEN SALES LAIN MAKA GENERATE YANG BARU
+            $salesContractNo = $this->getNoStr();
         }
 
         $this->salesKontrakModel->update($id, [
@@ -429,7 +426,7 @@ class SalesKontrak extends BaseController
             'no_container' => $this->request->getVar('no_container'),
             'payment_term' => $this->request->getVar('payment_term'),
             'potongan_harga' => $this->request->getVar('potongan_harga'),
-            'sales_contract_no' => $this->request->getVar('sales_contract_no'),
+            'sales_contract_no' => $salesContractNo,
             'total_container' => $this->request->getVar('total_container'),
             'shipment_date' => $this->request->getVar("shipment_date"),
             'shipment_insurance' => $this->request->getVar('shipment_insurance'),
@@ -682,12 +679,18 @@ class SalesKontrak extends BaseController
 
     public function getNo()
     {
-        $no = $this->salesKontrakModel->get_no(date('Y'), date('y'), $this->this_company_id);
+        $no = $this->getNoStr();
 
         return response()->setJSON([
             'token' => csrf_hash(),
             'status' => true,
             'data' => $no
         ]);
+    }
+
+    private function getNoStr()
+    {
+        $no = $this->salesKontrakModel->get_no(date('Y'), date('y'), $this->this_company_id);
+        return $no;
     }
 }

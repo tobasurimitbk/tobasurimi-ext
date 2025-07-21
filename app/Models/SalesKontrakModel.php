@@ -203,4 +203,23 @@ class SalesKontrakModel extends Model
             ->findAll();
         return $salesKontrak;
     }
+
+
+    public function getSalesKontrakList($divisiId)
+    {
+        $isAdmin = session()->get("login")->is_admin;
+        $userId = session()->get("login")->user_id;
+
+        $query = $this->asArray();
+
+        if (!$isAdmin) {
+            // Bukan Admin
+            $query->where('createdBy', $userId);
+        }
+
+        return $query->where('deletedAt', null)
+            ->where('divisi_id', $divisiId)
+            ->where('status_posting', 1)
+            ->findAll();
+    }
 }
