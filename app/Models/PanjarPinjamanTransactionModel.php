@@ -177,7 +177,7 @@ class PanjarPinjamanTransactionModel extends Model
         return $generatedNo;
     }
 
-    public function get_new_no(
+       public function get_new_no(
     $jenis,
     $divisi,
     $paymentMethod,
@@ -210,41 +210,60 @@ class PanjarPinjamanTransactionModel extends Model
     }
 
     $kodeDivisi = '';
-    // Only get division code if payment method is CASH or if bank code is empty (fallback)
+    // Get division code based on jenis as before
     if (!empty($divisi) && (strtoupper($paymentMethod) === 'CASH' || empty($kodeBank))) {
         $divisiUpper = strtoupper($divisi);
         if (strpos($divisiUpper, 'PTS') !== false) {
-            $kodeDivisi = 'PTS'; // Simplified division code without jenis
+            $kodeDivisi = ($jenis == 'MERAH') ? 'MKN' : 'KKN';
         } elseif (strpos($divisiUpper, 'CANNING') !== false) {
-            $kodeDivisi = 'CAN';
+            $kodeDivisi = ($jenis == 'MERAH') ? 'CNM' : 'CNK';
         } elseif (strpos($divisiUpper, 'FROZEN I') !== false) {
-            $kodeDivisi = 'FR1';
+            $kodeDivisi = ($jenis == 'MERAH') ? 'FRM' : 'FRK';
         } elseif (strpos($divisiUpper, 'FROZEN II') !== false) {
-            $kodeDivisi = 'FR2';
+            $kodeDivisi = ($jenis == 'MERAH') ? 'FSM' : 'FSK';
         } elseif (strpos($divisiUpper, 'GLOBAL') !== false) {
-            $kodeDivisi = 'GBL';
+            $kodeDivisi = ($jenis == 'MERAH') ? 'GBM' : 'GBK';
         } elseif (strpos($divisiUpper, 'OCS') !== false) {
-            $kodeDivisi = 'OCS';
+            $kodeDivisi = ($jenis == 'MERAH') ? 'OCM' : 'OCK';
         }
     }
 
-    // Step 3: Build search pattern
-    $searchPattern = '';
+    // Step 3: Build base search pattern (without jenis-specific code)
+    $baseSearchPattern = '';
     
-    // Use division code for CASH, bank code for BANK
+    // For CASH payments, use base department code (without jenis)
     if (strtoupper($paymentMethod) === 'CASH') {
-        $searchPattern = $kodeDivisi . '/';
+        $divisiUpper = strtoupper($divisi);
+        if (strpos($divisiUpper, 'PTS') !== false) {
+            $baseSearchPattern = 'PTS/';
+        } elseif (strpos($divisiUpper, 'CANNING') !== false) {
+            $baseSearchPattern = 'CAN/';
+        } elseif (strpos($divisiUpper, 'FROZEN I') !== false) {
+            $baseSearchPattern = 'FR1/';
+        } elseif (strpos($divisiUpper, 'FROZEN II') !== false) {
+            $baseSearchPattern = 'FR2/';
+        } elseif (strpos($divisiUpper, 'GLOBAL') !== false) {
+            $baseSearchPattern = 'GBL/';
+        } elseif (strpos($divisiUpper, 'OCS') !== false) {
+            $baseSearchPattern = 'OCS/';
+        }
     } else {
+        // For BANK payments, use bank code
         if (!empty($kodeBank)) {
-            $searchPattern = $kodeBank . '/';
-        } elseif (!empty($kodeDivisi)) { // Fallback to division code if no bank code
-            $searchPattern = $kodeDivisi . '/';
+            $baseSearchPattern = $kodeBank . '/';
+        } elseif (!empty($divisi)) { // Fallback to base department code if no bank code
+            $divisiUpper = strtoupper($divisi);
+            if (strpos($divisiUpper, 'PTS') !== false) {
+                $baseSearchPattern = 'PTS/';
+            } elseif (strpos($divisiUpper, 'CANNING') !== false) {
+                $baseSearchPattern = 'CAN/';
+            } // ... and so on for other departments
         }
     }
     
-    $searchPattern .= $thn . '/' . $bln . '/';
+    $baseSearchPattern .= $thn . '/' . $bln . '/';
 
-    // Step 4: Check all relevant tables for the highest number
+    // Step 4: Check all relevant tables for the highest number using base pattern
     $db = \Config\Database::connect();
     
     $tablesToCheck = [
@@ -260,7 +279,7 @@ class PanjarPinjamanTransactionModel extends Model
         $builder = $db->table($table);
         
         $lastRecord = $builder->select($column)
-                            ->like($column, $searchPattern, 'after')
+                            ->like($column, $baseSearchPattern, 'after')
                             ->where('createdAt >=', "{$thn}-{$bln}-01 00:00:00")
                             ->where('createdAt <=', "{$last_day} 23:59:59")
                             ->where('company_id', $companyID)
@@ -283,7 +302,7 @@ class PanjarPinjamanTransactionModel extends Model
     // Step 5: Generate new number
     $counterNext = str_pad($maxNumber + 1, 4, '0', STR_PAD_LEFT);
     
-    // Build final number based on payment method
+    // Build final number using the original kodeDivisi (with jenis) or kodeBank
     $prefix = '';
     if (strtoupper($paymentMethod) === 'CASH') {
         $prefix = $kodeDivisi . '/';
