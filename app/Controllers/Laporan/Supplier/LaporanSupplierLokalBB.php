@@ -2188,14 +2188,14 @@ class LaporanSupplierLokalBB extends BaseController
                     $dpp = $val * $qty;
                     $pph = 0;
                 }
-                return [$dpp, $pph, $dpp - $pph];
+                return [round($dpp, 2), round($pph, 2), round($dpp - $pph, 2)];
             };
 
             [$dppUmum, $pphUmum, $totalUmum] = $perhitungan($row->dppUmum);
             [$dppHarian, $pphHarian, $totalHarian] = $perhitungan($row->dppHarian);
             [$dppBulanan, $pphBulanan, $totalBulanan] = $perhitungan($row->dppBulanan);
 
-            // === Subsidi ===
+            // === Subsidi === (SAMA PERSIS DENGAN EXPORT)
             $isFixed = $row->subsidi != 0;
             $subsidiRow = $isFixed
                 ? ($row->subsidi * ($qty / ($totalQtyPerPO[$poKey] ?: 1)))
@@ -2211,9 +2211,12 @@ class LaporanSupplierLokalBB extends BaseController
                 $dppSubsidi = $subsidiRow;
                 $pphSubsidi = 0;
             }
-            $totalSubsidi = $dppSubsidi - $pphSubsidi;
 
-            $totalRow = $totalUmum + $totalHarian + $totalBulanan + $totalSubsidi;
+            // PEMBULATAN TIAP KOMPONEN SUBSIDI
+            $dppSubsidi = round($dppSubsidi, 2);
+            $pphSubsidi = round($pphSubsidi, 2);
+            $totalSubsidi = round($dppSubsidi - $pphSubsidi, 2);
+            $totalRow = round($totalUmum + $totalHarian + $totalBulanan + $totalSubsidi, 2);
 
             // Kelompokkan berdasarkan barangName terlebih dahulu
             if (!isset($groupedByBarang[$barangName])) {
@@ -2261,7 +2264,7 @@ class LaporanSupplierLokalBB extends BaseController
             $g['totalSubsidi'] += $totalSubsidi;
             $g['totalRow'] += $totalRow;
 
-            // Akumulasi total keseluruhan
+            // Akumulasi total keseluruhan (tanpa pembulatan)
             $totalSummary['qtyPO'] += $qty;
             $totalSummary['dppUmum'] += $dppUmum;
             $totalSummary['pphUmum'] += $pphUmum;
