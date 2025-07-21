@@ -135,8 +135,8 @@ class WorkOrdersModel extends Model
         $monthRoman = $romanNumb[$bln - 1];
         $lastStr = "{$monthRoman}/{$thn}";
 
-        // Bersihkan department dari spasi
-        $department = trim($department);
+        // Bersihkan spasi: hilangkan semua spasi, bukan hanya trim
+        $department = str_replace(' ', '', trim($department));
 
         $builder = $this->db->table('work_orders');
         $builder->select('wo_no');
@@ -148,7 +148,7 @@ class WorkOrdersModel extends Model
         $builder->orderBy('id', "desc");
         $query = $builder->get();
 
-        $kode = 'WO'; // sesuai format baru
+        $kode = 'WO';
         $lastWO = '0001';
 
         $result = $query->getRowArray();
@@ -156,7 +156,7 @@ class WorkOrdersModel extends Model
         if ($result && isset($result['wo_no'])) {
             $lastWO = explode('/', $result['wo_no']);
             $lastWO = intval(end($lastWO)) + 1;
-            $lastWO = sprintf("%05d", $lastWO); // pakai 5 digit (00001) sesuai contohmu
+            $lastWO = sprintf("%04d", $lastWO);
         }
 
         return "{$kode}/{$department}/{$lastStr}/{$lastWO}";
