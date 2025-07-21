@@ -210,40 +210,35 @@ class PanjarPinjamanTransactionModel extends Model
     }
 
     $kodeDivisi = '';
-    $baseKodeDivisi = ''; // Untuk pencarian nomor terakhir tanpa M/K
+    // Only get division code if payment method is CASH or if bank code is empty (fallback)
     if (!empty($divisi) && (strtoupper($paymentMethod) === 'CASH' || empty($kodeBank))) {
         $divisiUpper = strtoupper($divisi);
         if (strpos($divisiUpper, 'PTS') !== false) {
-            $kodeDivisi = ($jenis == 'MERAH') ? 'MKN' : 'KKN';
-            $baseKodeDivisi = 'MK'; // Dua karakter pertama tanpa N/K
+            $kodeDivisi = 'PTS'; // Simplified division code without jenis
         } elseif (strpos($divisiUpper, 'CANNING') !== false) {
-            $kodeDivisi = ($jenis == 'MERAH') ? 'CNM' : 'CNK';
-            $baseKodeDivisi = 'CN'; // Dua karakter pertama tanpa M/K
+            $kodeDivisi = 'CAN';
         } elseif (strpos($divisiUpper, 'FROZEN I') !== false) {
-            $kodeDivisi = ($jenis == 'MERAH') ? 'FRM' : 'FRK';
-            $baseKodeDivisi = 'FR';
+            $kodeDivisi = 'FR1';
         } elseif (strpos($divisiUpper, 'FROZEN II') !== false) {
-            $kodeDivisi = ($jenis == 'MERAH') ? 'FSM' : 'FSK';
-            $baseKodeDivisi = 'FS';
+            $kodeDivisi = 'FR2';
         } elseif (strpos($divisiUpper, 'GLOBAL') !== false) {
-            $kodeDivisi = ($jenis == 'MERAH') ? 'GBM' : 'GBK';
-            $baseKodeDivisi = 'GB';
+            $kodeDivisi = 'GBL';
         } elseif (strpos($divisiUpper, 'OCS') !== false) {
-            $kodeDivisi = ($jenis == 'MERAH') ? 'OCM' : 'OCK';
-            $baseKodeDivisi = 'OC';
+            $kodeDivisi = 'OCS';
         }
     }
 
-    // Step 3: Build search pattern - Gunakan baseKodeDivisi untuk pencarian nomor terakhir
+    // Step 3: Build search pattern
     $searchPattern = '';
     
+    // Use division code for CASH, bank code for BANK
     if (strtoupper($paymentMethod) === 'CASH') {
-        $searchPattern = $baseKodeDivisi . '*/'; // Gunakan wildcard untuk karakter terakhir
+        $searchPattern = $kodeDivisi . '/';
     } else {
         if (!empty($kodeBank)) {
             $searchPattern = $kodeBank . '/';
-        } elseif (!empty($baseKodeDivisi)) {
-            $searchPattern = $baseKodeDivisi . '*/'; // Gunakan wildcard untuk karakter terakhir
+        } elseif (!empty($kodeDivisi)) { // Fallback to division code if no bank code
+            $searchPattern = $kodeDivisi . '/';
         }
     }
     
@@ -288,14 +283,14 @@ class PanjarPinjamanTransactionModel extends Model
     // Step 5: Generate new number
     $counterNext = str_pad($maxNumber + 1, 4, '0', STR_PAD_LEFT);
     
-    // Build final number - tetap gunakan kodeDivisi lengkap (dengan M/K)
+    // Build final number based on payment method
     $prefix = '';
     if (strtoupper($paymentMethod) === 'CASH') {
         $prefix = $kodeDivisi . '/';
     } else {
         if (!empty($kodeBank)) {
             $prefix = $kodeBank . '/';
-        } elseif (!empty($kodeDivisi)) {
+        } elseif (!empty($kodeDivisi)) { // Fallback to division code if no bank code
             $prefix = $kodeDivisi . '/';
         }
     }
