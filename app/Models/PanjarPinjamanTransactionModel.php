@@ -22,6 +22,7 @@ class PanjarPinjamanTransactionModel extends Model
         'bank_id',
         'divisi_id',
         'no_transaction',
+        'payment_method',
         'is_posted',
         'keterangan'
     ];
