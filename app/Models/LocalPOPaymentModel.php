@@ -1345,7 +1345,6 @@ class LocalPOPaymentModel extends Model
     public function getlistLPBmonth() {}
 
 
-    
     public function get_new_no(
         $jenis,
         $divisi,
