@@ -116,14 +116,14 @@
         
         .dotted-line {
             border-top: 1px dotted #000;
-            margin: 3px 0;
+            margin: 10px 0;
         }
     </style>
 </head>
 
 <body>
     <!-- First section -->
-    <div class="section" style="margin-top: 0.2in;">
+    <div class="section" style="margin-top: 0.1in;">
         <div class="fold-mark fold-mark-1"></div>
         <table class="w-100">
             <tr>
