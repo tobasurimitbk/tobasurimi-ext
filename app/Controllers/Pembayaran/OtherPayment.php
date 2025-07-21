@@ -109,7 +109,6 @@ class OtherPayment extends BaseController
     public function createAction()
     {
         $payload = $this->request->getJSON(true);
-
         $noPembayaran = $payload['no_pembayaran'];
         $existing = $this->otherPaymentModel->where('no_pembayaran', $noPembayaran)->first();
 
@@ -128,6 +127,7 @@ class OtherPayment extends BaseController
             'no_pembayaran'  => $payload['no_pembayaran'],
             'bayar_ke'       => $payload['bayar_ke'],
             'jenis_pembayaran'          => $payload['jenis_pembayaran'],
+            'metode_pembayaran'          => $payload['metode_pembayaran'],
             'keterangan'          => $payload['keterangan_parent'],
             'nominal'          => $payload['total_all_amount'],
             'akun_selisih'         => $payload['akun_selisih'],
@@ -150,7 +150,6 @@ class OtherPayment extends BaseController
             $detailData = [
                 'other_payment_id'     => $parentId,
                 'tanggal_pembayaran'   => date("Y-m-d", strtotime(str_replace("/", "-", $detail['tanggal']))),
-                'metode_pembayaran'    => $detail['metode_pembayaran'],
                 'nominal'              => $detail['jumlah_idr'],
                 'pembayaran_oleh'      => $detail['pembayaran_oleh'],
                 'valas_id'             => $detail['valas_id'],
@@ -200,6 +199,7 @@ class OtherPayment extends BaseController
             'no_pembayaran'  => $payload['no_pembayaran'],
             'bayar_ke'       => $payload['bayar_ke'],
             'jenis_pembayaran'          => $payload['jenis_pembayaran'],
+            'metode_pembayaran'          => $payload['metode_pembayaran'],
             'keterangan'          => $payload['keterangan_parent'],
             'nominal'          => $payload['total_all_amount'],
             'akun_selisih'         => $payload['akun_selisih'],
@@ -226,7 +226,6 @@ class OtherPayment extends BaseController
             $detailData = [
                 'other_payment_id'     => $parentId,
                 'tanggal_pembayaran'   => date("Y-m-d", strtotime(str_replace("/", "-", $detail['tanggal']))),
-                'metode_pembayaran'    => $detail['metode_pembayaran'],
                 'nominal'              => $detail['jumlah_idr'],
                 'pembayaran_oleh'      => $detail['pembayaran_oleh'],
                 'akun_kas'             => $akunKas,
@@ -312,7 +311,6 @@ class OtherPayment extends BaseController
             $formattedDetails[] = [
                 'id' => encrypt($detail['id']),
                 'tanggal' => date('d/m/Y', strtotime($detail['tanggal_pembayaran'])),
-                'metode_pembayaran' => $detail['metode_pembayaran'],
                 'nominal_pembayaran' => number_format($detail['nominal'], 0, ',', '.'),
                 'pembayaran_oleh' => $detail['pembayaran_oleh'],
                 'akun_kas' => $detail['akun_kas'],
@@ -335,7 +333,9 @@ class OtherPayment extends BaseController
                 'parent' => [
                     'id' => encrypt($parentData['id']),
                     'no_pembayaran' => $parentData['no_pembayaran'],
+                    'metode_pembayaran' => $parentData['metode_pembayaran'],
                     'divisi_id' => $parentData['divisi_id'],
+                    'bank_id' => $parentData['bank_id'],
                     'bayar_ke' => $parentData['bayar_ke'],
                     'akun_selisih' => $parentData['akun_selisih'],
                     'akun_kas' => $parentData['akun_kas'],
@@ -359,10 +359,12 @@ class OtherPayment extends BaseController
         $jenis = $this->request->getGet('jenisPembayaran');
         $divisi = str_replace(' ', '', trim($this->request->getGet('divisiId')));
         $bank = str_replace(' ', '', trim($this->request->getGet('bankId')));
+        $metodePembayaran = $this->request->getGet('metodePembayaran');
 
         $paymentNo = $otherPaymentModel->get_new_no(
             $jenis,
             $divisi,
+            $metodePembayaran,
             $bank,
             date('m'),
             date('Y'),
