@@ -812,6 +812,7 @@ class PanjarSupplier extends BaseController
                     "id" => encrypt($transaction->id),
                     "no_transaction" => $transaction->no_transaction,
                     "type" => $transaction->type,
+                    "payment_method" => $transaction->payment_method,
                     "createdAt" => $transaction->createdAt,
                     "keterangan" => $transaction->keterangan,
                     "divisi_id" => $transaction->divisi_id,
