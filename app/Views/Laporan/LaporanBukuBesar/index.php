@@ -189,7 +189,7 @@
                                             <td><?= $r['supplier_name'] ?></td>
                                             <td><?= $r['no_transaksi'] ?></td>
                                             <td><?= $r['keterangan'] ?></td>
-                                            <td><?= toRupiah((float)$r['kredit'] != 0 ? $r['kredit'] : $r['debit']) . " <b>{$r['valas']}</b>" ?></td>
+                                            <td><?= toRupiah((float)$r['kredit'] != 0 ? $r['kredit'] : $r['debit']) . ((float)$r['kurs'] != 1 ? " <b>{$r['valas']}</b>" : "") ?></td>
                                             <td><?= $r['kurs'] == "1" ? "" : toRupiah($r['kurs']) ?></td>
                                             <td><?= toRupiah($r['debit'] * $r['kurs']) ?></td>
                                             <td><?= toRupiah($r['kredit']) ?></td>
