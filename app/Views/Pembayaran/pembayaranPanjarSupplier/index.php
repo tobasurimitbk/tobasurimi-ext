@@ -338,6 +338,8 @@
     let details = [];
     let editingIndex = -1;
     let isEditMode = false;
+    let initialValues = {};
+
 
     const table = $('.dataTable').DataTable({
 
@@ -674,6 +676,8 @@
     // Modal close handler - Reset semua state
     $('#add_modal').on('hidden.bs.modal', function() {
         // 1. Reset form utama
+        isEditMode = false;
+        initialValues = {};
         $('.create-form')[0].reset();
         
         // 2. Reset select2
@@ -744,45 +748,40 @@
     });
 
 
-    $('#jenis').select2({
-        placeholder: "Pilih Jenis",
-        theme: "bootstrap-5",
-        dropdownParent: $(".add-modal .modal-content")
-    }).change(function() {
-        if (!$('#id').val()) { // Only generate if not in edit mode (no ID present)
-            generatePaymentNumber();    
-        }
-    });
+    function initSelect2() {
+        $('#jenis').select2({
+            placeholder: "Pilih Jenis",
+            theme: "bootstrap-5",
+            dropdownParent: $(".add-modal .modal-content")
+        }).on('change', function() {
+            handleFieldChange(this);
+        });
 
-    $('#divisi_id').select2({
-        placeholder: "Pilih Departemen",
-        theme: "bootstrap-5",
-        dropdownParent: $('#add_modal .modal-content')
-    }).change(function() {
-        if (!$('#id').val()) { // Only generate if not in edit mode
-            generatePaymentNumber();    
-        }
-    });
+        $('#divisi_id').select2({
+            placeholder: "Pilih Departemen",
+            theme: "bootstrap-5",
+            dropdownParent: $('#add_modal .modal-content')
+        }).on('change', function() {
+            handleFieldChange(this);
+        });
 
-    $('#bank_id').select2({
-        placeholder: "Pilih Bank",
-        theme: "bootstrap-5",
-        dropdownParent: $('#add_modal .modal-content')
-    }).change(function() {
-        if (!$('#id').val()) { // Only generate if not in edit mode
-            generatePaymentNumber();    
-        }
-    });
+        $('#bank_id').select2({
+            placeholder: "Pilih Bank",
+            theme: "bootstrap-5",
+            dropdownParent: $('#add_modal .modal-content')
+        }).on('change', function() {
+            handleFieldChange(this);
+        });
 
-    $('#payment_method').select2({
-        placeholder: "Pilih Metode Pembayaran",
-        theme: "bootstrap-5",
-        dropdownParent: $('#add_modal .modal-content')
-    }).change(function() {
-        if (!$('#id').val()) { // Only generate if not in edit mode
-            generatePaymentNumber();    
-        }
-    });
+        $('#payment_method').select2({
+            placeholder: "Pilih Metode Pembayaran",
+            theme: "bootstrap-5",
+            dropdownParent: $('#add_modal .modal-content')
+        }).on('change', function() {
+            handleFieldChange(this);
+        });
+    }
+
     
 
     $("#tipe_supplier, #supplier_id, #tipe, #jenis_transaksi, #jenis")
@@ -807,6 +806,21 @@
         const index = $(this).data('index');
         editDetail(index);
     });
+
+    function handleFieldChange(element) {
+        if (!isEditMode) {
+            generatePaymentNumber();
+            return;
+        }
+        
+        // Untuk mode edit, hanya generate jika nilai berubah
+        let currentField = $(element).attr('id');
+        let currentValue = $(element).val();
+        
+        if (initialValues[currentField] !== currentValue) {
+            generatePaymentNumber(true);
+        }
+    }
 
     function editDetail(index) {
         const detail = details[index];
@@ -857,6 +871,54 @@
         });
     }
 
+    function generatePaymentNumber(forceGenerate = false) {
+        // Jika di mode edit dan bukan force generate, skip
+        if (isEditMode && !forceGenerate) return;
+        
+        // Get current values
+        let currentValues = {
+            divisi_id: $("#divisi_id").val(),
+            bank_id: $("#bank_id").val(),
+            payment_method: $("#payment_method").val(),
+            jenis: $("#jenis").val()
+        };
+        
+        // Jika nilai sama dengan initial values, skip
+        if (isEditMode && JSON.stringify(currentValues) === JSON.stringify(initialValues)) return;
+        
+        // Proses generate nomor
+        let jenisPembayaran = $("#jenis option:selected").text();
+        let divisiId = $("#divisi_id option:selected").text();
+        let paymentMethod = $("#payment_method option:selected").text();
+        let bankId = $("#bank_id option:selected").val();
+        
+        const csrfToken = '<?= csrf_token() ?>';
+        const csrf = $(`[name="${csrfToken}"]`);
+        
+        let url = "<?= base_url('panjar-supplier/generate-no-panjar'); ?>";
+        url += `?jenisPembayaran=${encodeURIComponent(jenisPembayaran)}&divisiId=${encodeURIComponent(divisiId)}&paymentMethod=${encodeURIComponent(paymentMethod)}&bankId=${encodeURIComponent(bankId)}`;
+        
+        $("#no_transaksi").attr("readonly", true);
+        
+        $.ajax({
+            url: url,
+            method: "GET",
+            dataType: "json",
+            beforeSend: function(xhr) {
+                xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+            },
+            success: function(response) {
+                csrf.val(response.token);
+                $("#no_transaksi").val(response.paymentNo);
+            },
+            error: function() {
+                $("#no_transaksi").attr("readonly", false);
+                Swal.fire("Error", "Gagal generate nomor", "error");
+            }
+        });
+    }
+
+
     $('#dataTable tbody').on('click', 'tr td:not(.actions):not(.dataTables_empty)', function() {
         const data = table.row(this).data();
         const modal = $(".add-modal");
@@ -870,14 +932,22 @@
             url: "panjar-supplier/id/" + data.id,
             method: "GET",
             dataType: "json",
-            success: function(res) {
+           success: function(res) {
                 if (res.status) {
-                    // Restore original form
                     modal.find('.modal-body').html($('#modal-template').html());
+                    isEditMode = true; // Set mode edit
+        
+                    // Simpan nilai awal
+                    initialValues = {
+                        divisi_id: res.data.transaction.divisi_id,
+                        bank_id: res.data.transaction.bank_id,
+                        payment_method: res.data.transaction.payment_method,
+                        jenis: res.data.transaction.type
+                    };
 
                     // Clear existing details
                     details = [];
-
+                    
                     // Populate parent form
                     $('#id').val(res.data.transaction.id);
                     $('#no_transaksi').val(res.data.transaction.no_transaction);
@@ -1172,6 +1242,7 @@
             $(".title-name").text("Tambah Data Panjar & Pinjaman");
             $(".delete-btn").css('display', 'none');
             $(".add-modal").modal("show");
+            initSelect2()
             $(".btn-submit-form").show();
             $(".create-form input, .create-form select, .btn-add-detail").prop("disabled", false);
         });
@@ -1526,54 +1597,6 @@
         }
     }
 
-    function generatePaymentNumber() {
-        // Get selected divisi and bank values
-        let jenisPembayaran = $("#jenis option:selected").text();
-        let divisiId = $("#divisi_id option:selected").text();
-        let paymentMethod = $("#payment_method option:selected").text();
-        let bankId = $("#bank_id option:selected").val();
-        
-        // Only generate if this is a new record (empty detail)
-        <?php if(empty($detail)): ?>
-            const csrfToken = '<?= csrf_token() ?>';
-            const csrf = $(`[name="${csrfToken}"]`);
-            
-            // Build URL with query parameters
-            let url = "<?= base_url('panjar-supplier/generate-no-panjar'); ?>";
-            url += `?jenisPembayaran=${encodeURIComponent(jenisPembayaran)}&divisiId=${encodeURIComponent(divisiId)}&paymentMethod=${encodeURIComponent(paymentMethod)}&bankId=${encodeURIComponent(bankId)}`;
-            
-            // Additional data if needed
-            var formData = new FormData();
-            formData.append("payment_date", $("#payment_date").val());
-            
-            $("#no_transaksi").attr("readonly", true);
-            
-            $.ajax({
-                url: url,
-                method: "GET",
-                data: formData,
-                dataType: "json",
-                beforeSend: function(xhr) {
-                    xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                },
-                processData: false,
-                contentType: false,
-                success: function(response) {
-                    csrf.val(response.token);
-                    $("#no_transaksi").val(response.paymentNo);
-                },
-                error: function(xhr, status, error) {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Terjadi kesalahan pada sistem',
-                        text: 'Gagal menghasilkan nomor pembayaran otomatis',
-                        confirmButtonColor: '#4e73df',
-                    });
-                    $("#no_transaksi").attr("readonly", false);
-                }
-            });
-        <?php endif; ?>
-    }
 </script>
 
 
