@@ -454,14 +454,14 @@
                             </td>
 
                             <!-- Kolom 2: Tabel Satuan -->
-                            <td style="width: 50%; text-align: center; vertical-align: middle;">
+                            <td style="width: auto; text-align: center; vertical-align: middle;">
                                 <?php if ($currentItemSaleskontrakdetail === $totalSalesKontrakdetail): ?>
                                     <?php if (!empty($groupBySatuan)) : ?>
-                                        <table style="width: auto; margin: 0 auto; border-collapse: collapse; font-size: 9px;">
+                                        <table style="width: 15%; margin: 0 auto; border-collapse: collapse; font-size: 9px;">
                                             <thead>
                                                 <tr style="background-color: #f3f4f6;">
                                                     <?php foreach ($groupBySatuan as $satuan => $data): ?>
-                                                        <th style="padding: 5px; border: 1px solid #ddd; text-align: center;"><?= $satuan ?></th>
+                                                        <th style="padding: 5px; border: 1px solid #ddd; text-align: right;"><?= $satuan ?></th>
                                                     <?php endforeach; ?>
                                                 </tr>
                                             </thead>

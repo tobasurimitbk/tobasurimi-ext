@@ -74,7 +74,7 @@
     </div>
     <div class="card">
         <div class="card-body">
-            <form class="create-form form-add-spp" role="form" method="POST" enctype="multipart/form-data">
+            <form class="create-form form-add-spp" role="form" method="POST" enctype="multipart/form-data" id="form-parent">
                 <!-- Otomatis Terisi BC 3.0 -->
                 <input type="hidden" name="aju_document_type" id="aju_document_type" value="<?= $dataAJU[0]['id'] ?>">
                 <div class="row">
@@ -82,7 +82,6 @@
                         <label class="form-label font-weight-bold lable-title">Data Header</label>
                     </div>
                 </div>
-
                 <input autocomplete="one-time-code" value="<?= $id ?? "" ?>" type="hidden" class="id" name="id" id="id" />
                 <?= csrf_field() ?>
                 <div class="row">
@@ -202,9 +201,9 @@
                                     <th>Brand</th>
                                     <th>Packing</th>
                                     <th>Specs</th>
-                                    <th>Qty</th>
+                                    <!-- <th>Qty</th>
                                     <th>Unit Price</th>
-                                    <th>Total Amount</th>
+                                    <th>Total Amount</th> -->
                                 </tr>
                             </thead>
                             <tbody id="body-detail-table-barang">
@@ -212,11 +211,7 @@
                             </tbody>
                             <tfoot id="foot-detail-table-barang">
                                 <tr>
-                                    <td colspan="6"></td>
-                                    <td><b>TOTAL</b></td>
-                                    <td><b>0,00</b></td>
-                                    <td><b>0,00</b></td>
-                                    <td><b>0,00</b></td>
+                                    <td colspan="7">Item List Empty</td>
                                 </tr>
                             </tfoot>
                         </table>
@@ -238,7 +233,7 @@
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3">
-                            <input autocomplete="one-time-code" type="text" class="form-control palet_fumigation_number" id="palet_fumigation_number" name="palet_fumigation_number" placeholder="Pallet & Fumigation Number (Optional)" oninput="this.value = greatFormatRupiah(this.value)">
+                            <input autocomplete="one-time-code" type="text" class="form-control palet_fumigation_price" id="palet_fumigation_price" name="palet_fumigation_price" placeholder="Pallet & Fumigation Number (Optional)" oninput="this.value = greatFormatRupiah(this.value)">
                             <label for="floatingInput">Pallet & Fumigation Number (Optional)</label>
                         </div>
                     </div>
@@ -286,7 +281,7 @@
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3">
-                            <input autocomplete="one-time-code" type="text" class="form-control consigne" id="consigne" name="consigne" placeholder="Consigne (Optional)">
+                            <input autocomplete="one-time-code" type="text" class="form-control consigne_docs" id="consigne_docs" name="consigne_docs" placeholder="Consign (Optional)">
                             <label for="floatingInput">Consigne (Optional)</label>
                         </div>
                     </div>
@@ -298,7 +293,7 @@
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3">
-                            <input autocomplete="one-time-code" type="text" class="form-control additional_details" id="additional_details" name="additional_details" placeholder="Additional Details (Optional)">
+                            <input autocomplete="one-time-code" type="text" class="form-control additional_detail_docs" id="additional_detail_docs" name="additional_detail_docs" placeholder="Additional Details (Optional)">
                             <label for="floatingInput">Additional Details (Optional)</label>
                         </div>
                     </div>
@@ -313,42 +308,42 @@
                 <div class="row">
                     <div class="col-sm-6 mt-2 mb-3">
                         <label class="text-dark">Product Specs (Optional)</label>
-                        <textarea class="form-control tiny product_specs" id="product_specs"></textarea>
+                        <textarea class="form-control tiny product_specs" name="product_specs" id="product_specs"></textarea>
                     </div>
 
                     <div class="col-sm-6 mt-2 mb-3">
                         <label class="text-dark">Processing Method (Optional)</label>
-                        <textarea class="form-control tiny processing_method" id="processing_method"></textarea>
+                        <textarea class="form-control tiny processing_method" name="processing_method" id="processing_method"></textarea>
                     </div>
 
                     <div class="col-sm-6 mt-3 mb-3">
                         <label class="text-dark">Packaging (Optional)</label>
-                        <textarea class="form-control tiny packaging" id="packaging"></textarea>
+                        <textarea class="form-control tiny packaging" name="packaging" id="packaging"></textarea>
                     </div>
 
                     <div class="col-sm-6 mt-3 mb-3">
                         <label class="text-dark">Code Stamping (Optional)</label>
-                        <textarea class="form-control tiny code_stamping" id="code_stamping"></textarea>
+                        <textarea class="form-control tiny code_stamping" name="code_stamping" id="code_stamping"></textarea>
                     </div>
 
                     <div class="col-sm-6 mt-3 mb-3">
                         <label class="text-dark">Loading (Optional)</label>
-                        <textarea class="form-control tiny loading" id="loading"></textarea>
+                        <textarea class="form-control tiny loading" name="loading" id="loading"></textarea>
                     </div>
 
                     <div class="col-sm-6 mt-3 mb-3">
                         <label class="text-dark">Foto Loading (Optional)</label>
-                        <textarea class="form-control tiny foto_loading" id="foto_loading"></textarea>
+                        <textarea class="form-control tiny foto_loading" name="foto_loading" id="foto_loading"></textarea>
                     </div>
 
                     <div class="col-sm-6 mt-3 mb-3">
                         <label class="text-dark">Stuffing (Optional)</label>
-                        <textarea class="form-control tiny stuffing" id="stuffing"></textarea>
+                        <textarea class="form-control tiny stuffing" name="stuffing" id="stuffing"></textarea>
                     </div>
 
                     <div class="col-sm-6 mt-3 mb-3">
                         <label class="text-dark">Additional Details (Optional)</label>
-                        <textarea class="form-control tiny additional_detail" id="additional_detail"></textarea>
+                        <textarea class="form-control tiny additional_detail" name="additional_detail" id="additional_detail"></textarea>
                     </div>
                 </div>
 
@@ -367,10 +362,10 @@
                     </div>
                     <div class="row">
                         <div class="table-responsive">
-                            <table class="table table-bordered nowrap table-hover-tobasurimi dataTable" id="dataTable2" width="100%" cellspacing="0">
+                            <table class="table table-bordered nowrap table-hover-tobasurimi dataTable" id="detailSpecsListTable" width="100%" cellspacing="0">
                                 <thead class="thead-dark">
                                     <tr>
-                                        <th>No</th>
+                                        <th style="width: 10px;">No</th>
                                         <th>Grade</th>
                                         <th>Specification</th>
                                         <th style="width: 100px;">Action</th>
@@ -402,7 +397,59 @@
             </div>
             <form class="create-form-size-breakdown" role="form" method="POST">
                 <div class="modal-body">
+                    <input type="hidden" name="id_detail" id="id_detail">
                     <input type="hidden" name="id_detail_breakdown" id="id_detail_breakdown">
+                    <div class="row mt-1">
+                        <div class="col mb-3">
+                            <h6 class="<?= session()->get('theme') == "dark" ? "text-white" : "text-dark" ?>">
+                                Price & Qty Order Form
+                            </h6>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input oninput="preventNegativeInput(this);validateMaxPrice(this);" autocomplete="one-time-code" type="text" class="form-control qty" name="qty" id="qty" placeholder="Qty">
+                                <label for="floatingInput">Qty Order Form</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <select disabled class="form-select satuan_size_id" name="satuan_size_id" id="satuan_size_id">
+                                    <option value=""></option>
+                                    <?php foreach ($dataSatuan as $d) : ?>
+                                        <option value="<?= $d['id'] ?>"><?= $d['kode_satuan'] ?></option>
+                                    <?php endforeach; ?>
+                                </select>
+                                <label for="floatingInput" style="z-index: 1;">Unit</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input onkeyup="this.value = greatFormatRupiah(this.value)" autocomplete="one-time-code" type="text" class="form-control harga" name="harga" id="harga" placeholder="Harga Satuan">
+                                <label for="floatingInput">Unit Price</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3">
+                                <input autocomplete="one-time-code" type="text" class="form-control remark" id="remark" name="remark" placeholder="Remark">
+                                <label for="floatingInput">Remark (Optional)</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input autocomplete="one-time-code" type="text" readonly="true" class="form-control total" name="total" id="total" placeholder="Total">
+                                <label for="floatingInput">Total Price</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row mt-3">
+                        <div class="col mb-3">
+                            <h6 class="<?= session()->get('theme') == "dark" ? "text-white" : "text-dark" ?>">
+                                Detail Size & Breakdown
+                            </h6>
+                        </div>
+                    </div>
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
@@ -483,52 +530,11 @@
                             </div>
                         </div>
                     </div>
-                    <div class="row mt-3">
-                        <div class="col mb-3">
-                            <h6 class="<?= session()->get('theme') == "dark" ? "text-white" : "text-dark" ?>">Price Data</h6>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <input oninput="preventNegativeInput(this)" autocomplete="one-time-code" type="text" class="form-control qty" name="qty" id="qty" placeholder="Qty">
-                                <label for="floatingInput">Qty Order Form</label>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <select disabled class="form-select satuan_size_id" name="satuan_size_id" id="satuan_size_id">
-                                    <option value=""></option>
-                                    <?php foreach ($dataSatuan as $d) : ?>
-                                        <option value="<?= $d['id'] ?>"><?= $d['kode_satuan'] ?></option>
-                                    <?php endforeach; ?>
-                                </select>
-                                <label for="floatingInput" style="z-index: 1;">Unit</label>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <input onkeyup="this.value = greatFormatRupiah(this.value)" autocomplete="one-time-code" type="text" class="form-control harga" name="harga" id="harga" placeholder="Harga Satuan">
-                                <label for="floatingInput">Unit Price</label>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-floating mb-3">
-                                <input autocomplete="one-time-code" type="text" class="form-control remark" id="remark" name="remark" placeholder="Remark">
-                                <label for="floatingInput">Remark (Optional)</label>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" type="text" readonly="true" class="form-control total" name="total" id="total" placeholder="Total">
-                                <label for="floatingInput">Total Price</label>
-                            </div>
-                        </div>
-                    </div>
+
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-discard mr-2" id="btnHideSizeBreakdownModal">Back</button>
-                    <button type="submit" class="btn btn-submit-form" id="btnSubmitSizeBreakDown">Update</button>
+                    <button type="button" class="btn btn-submit-form" id="btnSubmitSizeBreakDown">Update</button>
                 </div>
             </form>
         </div>
@@ -539,14 +545,15 @@
     <div class="modal-dialog" style="min-width: 900px;">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title title-secondary">Create Detail Specs List</h5>
+                <h5 class="modal-title title-secondary"><label id="label-detail-specs"></label> Detail Specs List</h5>
             </div>
             <form class="create-form-detail-specs-list" role="form" method="POST">
+                <input type="hidden" name="id_detail_specs_list" id="id_detail_specs_list">
                 <div class="modal-body">
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" type="text" class="form-control grade" name="grade" id="grade" placeholder="Grade">
+                                <input autocomplete="one-time-code" type="text" class="form-control grade_pts" name="grade_pts" id="grade_pts" placeholder="Grade">
                                 <label for="floatingInput">Grade</label>
                             </div>
                         </div>
@@ -561,7 +568,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-discard mr-2" id="btnDetailSpecsHide">Back</button>
-                    <button type="submit" class="btn btn-submit-form" id="btnSubmitSpecsDetail">Update</button>
+                    <button type="button" class="btn btn-submit-form" id="btnSubmitSpecsDetail">Save</button>
                 </div>
             </form>
         </div>
@@ -571,7 +578,6 @@
     const csrfToken = '<?= csrf_token() ?>';
     var listDataSalesKontrak = [];
     var listDetailSpecs = [];
-    var totalAmount = 0;
     // HIDE DETAIL SPECS LIST
     $('#component-detail-specs-list').hide();
 
@@ -624,7 +630,6 @@
         }).change(function() {
             dropdownSalesKontrak();
         });
-
 
         //CSS SELECT2 FLOATING LABEL
         $('.sales_contract_id, .divisi_id')
@@ -763,33 +768,39 @@
             })
         })
 
-        var validator = $(".create-form").validate({
+        var validator = $("#form-parent").validate({
             rules: {
-                no_sales_order: {
+                sales_order_export_no: {
+                    required: true
+                },
+                divisi_id: {
                     required: true
                 },
                 sales_contract_id: {
                     required: true
                 },
-                documents_required: {
+                tanggal: {
                     required: true
                 },
-                special_instructions: {
+                payment_term: {
                     required: true
                 }
             },
             messages: {
-                no_sales_order: {
-                    required: "No sales order wajib diisi"
+                sales_order_export_no: {
+                    required: "Sales order no required"
+                },
+                divisi_id: {
+                    required: "Departemen required"
                 },
                 sales_contract_id: {
-                    required: "Sales kontrak wajib diisi"
+                    required: "Select sales contract"
                 },
-                documents_required: {
-                    required: "Dokumen Required Wajib Diisi"
+                tanggal: {
+                    required: "Sales order date required"
                 },
-                special_instructions: {
-                    required: "Special Instructions Wajib Diisi"
+                payment_term: {
+                    required: "Payment term required"
                 }
             },
             errorElement: 'span',
@@ -814,118 +825,224 @@
             },
         });
 
-        $(".btn-submit-parent").click(function() {
-            $(".detail-modal").modal("hide")
+        var validatorDetailSpecs = $(".create-form-detail-specs-list").validate({
+            rules: {
+                grade: {
+                    required: true
+                },
+                specification: {
+                    required: true
+                },
+            },
+            messages: {
+                grade: {
+                    required: "Grade required"
+                },
+                specification: {
+                    required: "Specification required"
+                },
+            },
+            errorElement: 'span',
+            errorClass: 'text-danger',
+            errorPlacement: function(error, element) {
+                var elem = $(element);
+                if (elem.hasClass("select2-hidden-accessible")) {
+                    element = $("#select2-" + elem.attr("id") + "-container").parent();
+                    error.insertAfter(element);
+                } else {
+                    error.insertAfter(element);
+                }
+            },
+            highlight: function(element) {
+                $(element).closest('.form-group').addClass('has-error');
+                $(element).addClass('select-class');
 
-            if ($(".create-form").valid()) {
-                Swal.fire({
-                    icon: 'question',
-                    title: 'Simpan Data?',
-                    confirmButtonColor: '#4e73df',
-                    cancelButtonColor: '#d33',
-                    showCancelButton: true,
-                    reverseButtons: true,
-                    confirmButtonText: 'Simpan',
-                    cancelButtonText: 'Kembali',
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        const csrf = $(`[name="${csrfToken}"]`);
-                        setLoading()
-                        let data = new FormData(document.querySelector(".create-form"));
+            },
+            unhighlight: function(element) {
+                $(element).closest('.form-group').removeClass('has-error');
+                $(element).removeClass('select-class');
+            },
+        });
 
-                        let id = $(".id").val();
-                        data.append("items", JSON.stringify(listBarang));
-                        // UPDATE
-                        if (id) {
-                            $.ajax({
-                                url: "<?= base_url("order-form-internasional/update"); ?>",
-                                data: data,
-                                beforeSend: function(xhr) {
-                                    xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                                },
-                                method: "POST",
-                                dataType: "json",
-                                processData: false,
-                                contentType: false,
-                                success: function(response) {
-                                    csrf.val(response.token);
-                                    if (response.status) {
-                                        Swal.fire({
-                                                icon: 'success',
-                                                title: response.message,
-                                                confirmButtonColor: '#4e73df',
-                                            })
-                                            .then(() => {
-                                                var id = response.id; // Menyimpan nilai response.id ke dalam variabel id
-                                                window.location.href = "<?= base_url("order-form-internasional") ?>"; // Mengarahkan ke URL dengan menambahkan id ke belakangnya
-                                            })
-                                        stopLoading();
-                                    } else {
-                                        Swal.fire({
-                                            icon: 'error',
-                                            title: response.message,
-                                            confirmButtonColor: '#4e73df',
-                                        })
-                                        stopLoading()
-                                    }
-                                },
-                                onError: function(response) {
-                                    csrf.val(response.token);
-                                    Swal.fire({
-                                        icon: 'error',
-                                        title: 'Data Gagal Disimpan, coba Lagi',
-                                        confirmButtonColor: '#4e73df',
-                                    })
-                                    stopLoading()
-                                }
-                            });
-                        } else {
-                            $.ajax({
-                                url: "<?= base_url("order-form-internasional/save"); ?>",
-                                data: data,
-                                beforeSend: function(xhr) {
-                                    xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                                },
-                                method: "POST",
-                                dataType: "json",
-                                processData: false,
-                                contentType: false,
-                                success: function(response) {
-                                    csrf.val(response.token);
-                                    if (response.status) {
-                                        Swal.fire({
-                                                icon: 'success',
-                                                title: response.message,
-                                                confirmButtonColor: '#4e73df',
-                                            })
-                                            .then(() => {
-                                                var id = response.id; // Menyimpan nilai response.id ke dalam variabel id
-                                                window.location.href = "<?= base_url("order-form-internasional") ?>"; // Mengarahkan ke URL dengan menambahkan id ke belakangnya
-                                            })
-                                        stopLoading();
-                                    } else {
-                                        Swal.fire({
-                                            icon: 'error',
-                                            title: response.message,
-                                            confirmButtonColor: '#4e73df',
-                                        })
-                                        stopLoading()
-                                    }
-                                },
-                                onError: function(response) {
-                                    csrf.val(response.token);
-                                    Swal.fire({
-                                        icon: 'error',
-                                        title: 'Data Gagal Disimpan, coba Lagi',
-                                        confirmButtonColor: '#4e73df',
-                                    })
-                                    stopLoading()
-                                }
-                            });
+        var validatorQtyOrderForm = $(".create-form-size-breakdown").validate({
+            rules: {
+                qty: {
+                    required: true
+                },
+            },
+            messages: {
+                qty: {
+                    required: "Qty order form required"
+                },
+            },
+            errorElement: 'span',
+            errorClass: 'text-danger',
+            errorPlacement: function(error, element) {
+                var elem = $(element);
+                if (elem.hasClass("select2-hidden-accessible")) {
+                    element = $("#select2-" + elem.attr("id") + "-container").parent();
+                    error.insertAfter(element);
+                } else {
+                    error.insertAfter(element);
+                }
+            },
+            highlight: function(element) {
+                $(element).closest('.form-group').addClass('has-error');
+                $(element).addClass('select-class');
+
+            },
+            unhighlight: function(element) {
+                $(element).closest('.form-group').removeClass('has-error');
+                $(element).removeClass('select-class');
+            },
+        });
+
+
+        $('#btnSubmitSpecsDetail').click(function(e) {
+            e.preventDefault();
+            if ($('.create-form-detail-specs-list').valid()) {
+                var idDetailSpecList = $('#id_detail_specs_list').val();
+                var grade_pts = $('#grade_pts').val();
+                var specification = $('#specification').val();
+
+                if (idDetailSpecList) {
+                    // UPDATE
+                    var index = null;
+                    for (var i = 0; i < listDetailSpecs.length; i++) {
+                        if (listDetailSpecs[i].id_detail_specs_list == idDetailSpecList) {
+                            index = i;
+                            break;
                         }
                     }
-                })
+
+                    listDetailSpecs[index].grade = grade_pts;
+                    listDetailSpecs[index].specification = specification;
+
+                } else {
+                    // CREATE
+                    idDetailSpecList = getID();
+                    listDetailSpecs.push({
+                        id_detail_specs_list: idDetailSpecList,
+                        grade: grade_pts,
+                        specification: specification
+                    });
+                }
+
+                $('#detailSpecsModal').modal('hide');
+                drawTableDetailSpecs(listDetailSpecs);
+
             }
+        })
+
+
+        $(".btn-submit-parent").click(function() {
+            var id = $('#id').val();
+
+            if (listDataSalesKontrak.length === 0) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Please Select Sales Contract',
+                    confirmButtonColor: '#4e73df',
+                })
+            } else {
+
+                if ($("#form-parent").valid()) {
+                    Swal.fire({
+                        icon: 'question',
+                        title: id ? 'Update Data ?' : 'Create Data ?',
+                        confirmButtonColor: '#4e73df',
+                        cancelButtonColor: '#d33',
+                        showCancelButton: true,
+                        reverseButtons: true,
+                        confirmButtonText: 'Save',
+                        cancelButtonText: 'Back',
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            // Init tiny ke textarea
+                            tinymce.triggerSave();
+
+                            const csrf = $(`[name="${csrfToken}"]`);
+                            let data = new FormData(document.querySelector("#form-parent"));
+
+                            data.append("listDetailSpecs", JSON.stringify(listDetailSpecs));
+                            data.append("listDataSalesKontrak", JSON.stringify(listDataSalesKontrak));
+
+                            // UPDATE
+                            if (id) {
+                                $.ajax({
+                                    url: "<?= base_url("order-form-internasional/update"); ?>",
+                                    data: data,
+                                    beforeSend: function(xhr) {
+                                        setLoading();
+                                        xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                                    },
+                                    complete: function() {
+                                        stopLoading();
+                                    },
+                                    method: "POST",
+                                    dataType: "json",
+                                    processData: false,
+                                    contentType: false,
+                                    success: function(response) {
+                                        if (response.status) {
+                                            Swal.fire({
+                                                    icon: 'success',
+                                                    title: response.message,
+                                                    confirmButtonColor: '#4e73df',
+                                                })
+                                                .then(() => {
+                                                    window.location.href = "<?= base_url("order-form-internasional") ?>";
+                                                })
+                                        } else {
+                                            Swal.fire({
+                                                icon: 'error',
+                                                title: response.message,
+                                                confirmButtonColor: '#4e73df',
+                                            })
+                                        }
+                                    }
+                                });
+                            } else {
+                                $.ajax({
+                                    url: "<?= base_url("order-form-internasional/save"); ?>",
+                                    data: data,
+                                    beforeSend: function(xhr) {
+                                        setLoading();
+                                        xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                                    },
+                                    complete: function() {
+                                        stopLoading();
+                                    },
+                                    method: "POST",
+                                    dataType: "json",
+                                    processData: false,
+                                    contentType: false,
+                                    success: function(response) {
+                                        if (response.status) {
+                                            Swal.fire({
+                                                    icon: 'success',
+                                                    title: response.message,
+                                                    confirmButtonColor: '#4e73df',
+                                                })
+                                                .then(() => {
+                                                    window.location.href = "<?= base_url("order-form-internasional") ?>";
+                                                })
+                                        } else {
+                                            Swal.fire({
+                                                icon: 'error',
+                                                title: response.message,
+                                                confirmButtonColor: '#4e73df',
+                                            })
+                                        }
+                                    },
+
+                                });
+                            }
+                        }
+                    })
+                }
+            }
+
         })
     })
 
@@ -968,6 +1085,7 @@
             }
         }
 
+        $('#id_detail').val(itemSalesContractDetail.id);
         $('#id_detail_breakdown').val(itemSizeBreakdown.id_detail_breakdown);
         $('#size').val(itemSizeBreakdown.size).attr('readonly', true);
         $('#grade').val(itemSizeBreakdown.grade).attr('readonly', true);
@@ -984,26 +1102,72 @@
         $('#palet').val(itemSizeBreakdown.palet).attr('readonly', true);
         $('#remark').val(itemSizeBreakdown.remark).attr('readonly', true);
 
-        $('#qty').val(itemSizeBreakdown.qty_sisa);
+        $('#qty').data('max', itemSizeBreakdown.qty_sisa);
+        $('#qty').val(itemSizeBreakdown.qty_input);
         $('#harga').val(greatFormatRupiah(itemSizeBreakdown.harga)).attr('readonly', true);
-        $('#total').val(greatFormatRupiah(itemSizeBreakdown.total_sisa)).attr('readonly', true);
+        $('#total').val(greatFormatRupiah(itemSizeBreakdown.total_input)).attr('readonly', true);
         $('#satuan_size_id').val(itemSizeBreakdown.satuan_size_id).change();
 
         $('#updateQtyOrderFormModal').modal('show');
 
     }
 
+    $('#btnSubmitSizeBreakDown').click(function() {
+        if ($('.create-form-size-breakdown').valid()) {
+            var qty_input = $('#qty').val();
+            var id_detail = $('#id_detail').val();
+            var id_detail_breakdown = $('#id_detail_breakdown').val();
+            var total_input = destroyFormatRupiah($('#total').val());
+
+            var indexSalesKontrakDetail = null;
+            var indexSizeBreakDown = null;
+            var listSalesContractDetail = listDataSalesKontrak.salesContractDetailList;
+            for (var i = 0; i < listSalesContractDetail.length; i++) {
+                if (listSalesContractDetail[i].id == id_detail) {
+                    indexSalesKontrakDetail = i;
+                    break;
+                }
+            }
+
+            for (var i = 0; i < listSalesContractDetail[indexSalesKontrakDetail].size_breakdown.length; i++) {
+                if (listSalesContractDetail[indexSalesKontrakDetail].size_breakdown[i].id_detail_breakdown == id_detail_breakdown) {
+                    indexSizeBreakDown = i;
+                    break;
+                }
+            }
+
+            // Ubah Qty Input nya
+            listDataSalesKontrak.salesContractDetailList[indexSalesKontrakDetail].size_breakdown[indexSizeBreakDown].qty_input = qty_input;
+            listDataSalesKontrak.salesContractDetailList[indexSalesKontrakDetail].size_breakdown[indexSizeBreakDown].total_input = total_input;
+
+            drawTable(listDataSalesKontrak);
+            recalculateGrandTotal();
+            $('#updateQtyOrderFormModal').modal('hide');
+
+        }
+
+    });
+
     $('#btnHideSizeBreakdownModal').click(function() {
         $('#updateQtyOrderFormModal').modal('hide');
     });
 
     $('#btnAddDetailSpecs').click(function() {
+        resetFormDetailSpecs();
+        $('#label-detail-specs').text("Create ");
         $('#detailSpecsModal').modal('show');
     });
 
     $('#btnDetailSpecsHide').click(function() {
         $('#detailSpecsModal').modal('hide');
+    });
 
+    $('#qty').keyup(function() {
+        var harga = destroyFormatRupiah($('#harga').val() || 0);
+        var qty = parseFloat($('#qty').val());
+        var total = harga * qty;
+
+        $('#total').val(greatFormatRupiah(total));
     });
 
     $('.btn-submit-detail').click(function() {
@@ -1035,6 +1199,12 @@
         $('.detail-modal').modal('hide');
     });
 
+    function resetFormDetailSpecs() {
+        $('#id_detail_specs_list').val(null);
+        $('#grade_pts').val(null);
+        $('#specification').val(null);
+    }
+
     function getDetailSalesKontrak() {
         var salesContractId = $('#sales_contract_id option:selected').val();
 
@@ -1059,7 +1229,8 @@
                 $('#destination').val(listDataSalesKontrak.salesContract.dicharge_port);
                 $('#deadline').val(listDataSalesKontrak.salesContract.shipment_date);
                 $('#po_no').val(listDataSalesKontrak.salesContract.po_no);
-
+                $('#consigne_docs').val(listDataSalesKontrak.salesContract.customer_name);
+                $('#payment_term').val(listDataSalesKontrak.salesContract.payment_term);
             },
             error: function(xhr, status, error) {
                 console.error(xhr.responseText);
@@ -1084,11 +1255,7 @@
         if (listDataSalesKontrak.length === 0) {
             row += `
             <tr>
-                <td colspan="6"></td>
-                <td><b>TOTAL</b></td>
-                <td><b>0,00</b></td>
-                <td><b>0,00</b></td>
-                <td><b>0,00</b></td>
+                <td colspan="7">Item List Empty</td>
             </tr>
         `;
             $('#foot-detail-table-barang').append(row);
@@ -1103,9 +1270,6 @@
                 newRow.append(`<td>${item.brand}</td>`);
                 newRow.append(`<td>${item.packing}</td>`);
                 newRow.append(`<td>${item.specs}</td>`);
-                newRow.append(`<td>${greatFormatRupiah(item.qty_sisa)}</td>`);
-                newRow.append(`<td>${greatFormatRupiah(item.harga)}</td>`);
-                newRow.append(`<td>${greatFormatRupiah(item.total_sisa)}</td>`);
                 tbody.append(newRow);
 
                 // === Row Kedua: Breakdown Table ===
@@ -1155,9 +1319,9 @@
                 let totalPersenSize = 0;
 
                 item.size_breakdown.forEach(size => {
-                    let qty = parseFloat(size.qty_sisa) || 0;
+                    let qty = parseFloat(size.qty_input) || 0;
                     let harga = parseFloat(size.harga) || 0;
-                    let total = parseFloat(size.total_sisa) || 0;
+                    let total = parseFloat(size.total_input) || 0;
                     let persen = parseFloat(size.persen) || 0;
 
                     totalQtySize += qty;
@@ -1173,16 +1337,10 @@
                             <button type="button" class="btn btn-warning posting-spp mr-1" onclick="detailRow('${item.id}', '${size.id_detail_breakdown}')">
                                 <i class="fa fa-pencil fa-sm" aria-hidden="true"></i>
                             </button>
-                            <button type="button" class="btn btn-danger" onclick="deleteRow('${item.id}', '${size.id_detail_breakdown}')">
-                                <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
-                            </button>
                         <?php endif; ?>
                     <?php else : ?>
                         <button type="button" class="btn btn-warning posting-spp mr-1" onclick="detailRow('${item.id}', '${size.id_detail_breakdown}')">
                             <i class="fa fa-pencil fa-sm" aria-hidden="true"></i>
-                        </button>
-                        <button type="button" class="btn btn-danger" onclick="deleteRow('${item.id}', '${size.id_detail_breakdown}')">
-                            <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
                         </button>
                     <?php endif; ?>
                 `;
@@ -1217,12 +1375,12 @@
                 innerTable.find('.total-price').html(`<b>${greatFormatRupiah(totalHargaSize.toFixed(2))}</b>`);
                 innerTable.find('.total-amount').html(`<b>${greatFormatRupiah(totalAmountSize.toFixed(2))}</b>`);
 
-                detailRow.append(`<td colspan="13"><b>SIZE & BREAKDOWN</b><br>${innerTable.prop('outerHTML')}</td>`);
+                detailRow.append(`<td colspan="7"><b>SIZE & BREAKDOWN</b><br>${innerTable.prop('outerHTML')}</td>`);
                 tbody.append(detailRow);
 
-                totalQty += parseFloat(item.qty_sisa);
+                totalQty += parseFloat(item.qty_input);
                 totalHarga += destroyFormatRupiah(item.harga);
-                totalTotalHarga += destroyFormatRupiah(item.total_sisa);
+                totalTotalHarga += destroyFormatRupiah(item.total_input);
 
             });
 
@@ -1232,15 +1390,13 @@
                 totalTotalHarga -= listDataSalesKontrak.royaltyPriceFinal;
                 additionalPrice += `
                     <tr class="bg-light">
-                        <td colspan="6" class="text-end"><b>ROYALTY</b></td>
-                        <td><b></b></td>
-                        <td><b></b></td>
-                        <td>
+                        <td colspan="4" class="text-end"><b>ROYALTY (${listDataSalesKontrak.salesContract.royalty})</b></td>
+                        <td colspan="2">
                             <input type="text" 
-                                id="royalty"
-                                name="royalty"
+                                id="royalty_price"
+                                name="royalty_price"
                                 class="form-control form-control-sm"
-                                oninput="this.value = greatFormatRupiah(this.value)"
+                                oninput="this.value = greatFormatRupiah(this.value);recalculateGrandTotal();validateMaxPrice(this)"
                                 data-max="${listDataSalesKontrak.royaltyPriceFinal}"
                                 value="${greatFormatRupiah(listDataSalesKontrak.royaltyPriceFinal)}" 
                         </td>
@@ -1254,15 +1410,13 @@
                 totalTotalHarga -= listDataSalesKontrak.rebatePriceFinal;
                 additionalPrice += `
                     <tr class="bg-light">
-                        <td colspan="6" class="text-end"><b>REBATE</b></td>
-                        <td><b></b></td>
-                        <td><b></b></td>
-                        <td>
+                        <td colspan="4" class="text-end"><b>REBATE (${listDataSalesKontrak.salesContract.rebate})</b></td>
+                        <td colspan="2">
                             <input type="text" 
-                                id="rebate"
-                                name="rebate"
+                                id="rebate_price"
+                                name="rebate_price"
                                 class="form-control form-control-sm"
-                                oninput="this.value = greatFormatRupiah(this.value)"
+                                oninput="this.value = greatFormatRupiah(this.value);recalculateGrandTotal();validateMaxPrice(this)"
                                 data-max="${listDataSalesKontrak.rebatePriceFinal}"
                                 value="${greatFormatRupiah(listDataSalesKontrak.rebatePriceFinal)}" 
                         </td>
@@ -1275,15 +1429,13 @@
                 totalTotalHarga -= listDataSalesKontrak.canDeductionPriceFinal;
                 additionalPrice += `
                     <tr class="bg-light">
-                        <td colspan="6" class="text-end"><b>CAN DEDUCTION</b></td>
-                        <td><b></b></td>
-                        <td><b></b></td>
-                        <td>
+                        <td colspan="4" class="text-end"><b>CAN DEDUCTION (${listDataSalesKontrak.salesContract.can_deduction})</b></td>
+                        <td colspan="2">
                             <input type="text" 
                                 id="can_deduction_price"
                                 name="can_deduction_price"
                                 class="form-control form-control-sm"
-                                oninput="this.value = greatFormatRupiah(this.value)"
+                                oninput="this.value = greatFormatRupiah(this.value);recalculateGrandTotal();validateMaxPrice(this)"
                                 data-max="${listDataSalesKontrak.canDeductionPriceFinal}"
                                 value="${greatFormatRupiah(listDataSalesKontrak.canDeductionPriceFinal)}" 
                         </td>
@@ -1296,15 +1448,13 @@
                 totalTotalHarga += listDataSalesKontrak.estimatedFreightPriceFinal;
                 additionalPrice += `
                     <tr class="bg-light">
-                        <td colspan="6" class="text-end"><b>ESTIMATED FREIGHT</b></td>
-                        <td><b></b></td>
-                        <td><b></b></td>
-                        <td>
+                        <td colspan="4" class="text-end"><b>ESTIMATED FREIGHT (${listDataSalesKontrak.salesContract.estimated_freight})</b></td>
+                        <td colspan="2">
                             <input type="text" 
                                 id="estimated_freight_price"
                                 name="estimated_freight_price"
                                 class="form-control form-control-sm"
-                                oninput="this.value = greatFormatRupiah(this.value)"
+                                oninput="this.value = greatFormatRupiah(this.value);recalculateGrandTotal();validateMaxPrice(this)"
                                 data-max="${listDataSalesKontrak.estimatedFreightPriceFinal}"
                                 value="${greatFormatRupiah(listDataSalesKontrak.estimatedFreightPriceFinal)}" 
                         </td>
@@ -1324,15 +1474,13 @@
                 additionalPrice += `
                     <input type="hidden" value="${listDataSalesKontrak.othersTypeFinal}" name="others_type" id="others_type"/>
                     <tr class="bg-light">
-                        <td colspan="6" class="text-end"><b>OTHER PRICE</b></td>
-                        <td><b></b></td>
-                        <td><b></b></td>
-                        <td>
+                        <td colspan="4" class="text-end"><b>OTHER PRICE (${listDataSalesKontrak.salesContract.others})</b></td>
+                        <td colspan="2">
                             <input type="text" 
                                 id="others_price"
                                 name="others_price"
                                 class="form-control form-control-sm"
-                                oninput="this.value = greatFormatRupiah(this.value)"
+                                oninput="this.value = greatFormatRupiah(this.value);recalculateGrandTotal();validateMaxPrice(this)"
                                 data-max="${listDataSalesKontrak.othersPriceFinal}"
                                 value="${greatFormatRupiah(listDataSalesKontrak.othersPriceFinal)}" 
                         </td>
@@ -1347,10 +1495,9 @@
             const totalRow = $(`
                 ${additionalPrice}
                 <tr class="bg-light">
-                    <td colspan="6" class="text-end"><b>TOTAL</b></td>
-                    <td><b></b></td>
-                    <td><b></b></td>
-                    <td><b>${greatFormatRupiah(totalTotalHarga.toFixed(2))}</b></td>
+                    <td colspan="4" class="text-end"><b>TOTAL</b></td>
+                    <td style="text-align:left;"><b id="total_txt">${greatFormatRupiah(totalTotalHarga.toFixed(2))}</b></td>
+                    <td></td>
                     <td></td>
                 </tr>
             `);
@@ -1358,47 +1505,129 @@
         }
     }
 
-    function updateRemark(input) {
-        const csrf = $(` [name = "${csrfToken}"] `);
-        const remarkId = $(input).attr("data-id") // Ambil ID input
-        const remarkValue = $(input).val(); // Ambil nilai remark
+    function drawTableDetailSpecs(listDetailSpecs) {
+        $('#body-detail-specs').empty();
+        $('#foot-detail-specs').empty();
+        var row = '';
+        var no = 1;
+        const table = $('#detailSpecsListTable');
+        if (listDetailSpecs.length === 0) {
+            row += `
+                    <tr>
+                        <td colspan="4">List Detail Specs Empty</td>
+                    </tr>
+                `;
+            $('#foot-detail-specs').append(row);
+        } else {
+            listDetailSpecs.map(item => {
+                var newRow = $('<tr style="color:whitesmoke;">');
+                newRow.append($('<td style="text-align:center;">').text(no++));
+                newRow.append($('<td>').text(item.grade));
+                newRow.append($('<td>').text(item.specification));
+                newRow.append($('<td>').html(
+                    <?php if (!empty($dataSalesExport)) : ?> <?php if ($dataSalesExport['status'] == "POSTED") : ?> `-`
+                        <?php else : ?> `
+                        <button type="button" class="btn btn-warning posting-spp mr-1" onclick="detailRowSpecs('${item.id_detail_specs_list}')">
+                                <i class="fa fa-pencil fa-sm" aria-hidden="true"></i>
+                            </button><button type="button" class="btn btn-danger" onclick="deleteRowSpecs('${item.id_detail_specs_list}')">
+                                <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
+                            </button>
+                    `
+                        <?php endif; ?>
 
-        $.ajax({
-            url: "<?= base_url("order-form-internasional/update-remark"); ?>",
-            data: {
-                id: remarkId,
-                remark: remarkValue, // Kirim nilai remark
-                status: "POSTED"
-            },
-            method: "POST",
-            dataType: "json",
-            beforeSend: function(xhr) {
-                xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                setLoading();
-            },
-            complete: function() {
-                stopLoading();
-            },
-            success: function(response) {
-                if (response.status) {
-                    Swal.fire({
-                            icon: 'success',
-                            title: response.message,
-                            confirmButtonColor: '#4e73df',
-                        })
-                        .then(() => {
-                            stopLoading()
-                        })
-                } else {
-                    Swal.fire({
-                        icon: 'error',
-                        title: response.message,
-                        confirmButtonColor: '#4e73df',
-                    })
-                    stopLoading()
-                }
+                    <?php else : ?> `
+                        <button type="button" class="btn btn-warning posting-spp mr-1" onclick="detailRowSpecs('${item.id_detail_specs_list}')">
+                                <i class="fa fa-pencil fa-sm" aria-hidden="true"></i>
+                            </button><button type="button" class="btn btn-danger" onclick="deleteRowSpecs('${item.id_detail_specs_list}')">
+                                <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
+                            </button>
+                    `
+                    <?php endif; ?>
+                ));
+
+                table.find('tbody').append(newRow);
+            });
+        }
+    }
+
+    function detailRowSpecs(id_detail_specs_list) {
+        var item = null;
+        for (var i = 0; i < listDetailSpecs.length; i++) {
+            if (listDetailSpecs[i].id_detail_specs_list == id_detail_specs_list) {
+                item = listDetailSpecs[i];
+                break;
             }
+        }
+
+        $('#id_detail_specs_list').val(item.id_detail_specs_list);
+        $('#grade_pts').val(item.grade);
+        $('#specification').val(item.specification);
+
+        $('#label-detail-specs').text("Update ");
+        $('#detailSpecsModal').modal('show');
+    }
+
+    function deleteRowSpecs(id_detail_specs_list) {
+        var indexToRemove = -1;
+        for (var i = 0; i < listDetailSpecs.length; i++) {
+            if (listDetailSpecs[i].id_detail_specs_list == id_detail_specs_list) {
+                indexToRemove = i;
+                break;
+            }
+        }
+        if (indexToRemove !== -1) {
+            listDetailSpecs.splice(indexToRemove, 1);
+        }
+        drawTableDetailSpecs(listDetailSpecs);
+    }
+
+    function recalculateGrandTotal() {
+        var total = 0;
+        listDataSalesKontrak.salesContractDetailList.map((item, index) => {
+            item.size_breakdown.forEach(size => {
+                total += parseFloat(size.total_input) || 0;
+            })
         });
+
+        var royaltyPrice = destroyFormatRupiah($('#royalty_price').val() || 0);
+        var rebatePrice = destroyFormatRupiah($('#rebate_price').val() || 0);
+        var canDeductionPrice = destroyFormatRupiah($('#can_deduction_price').val());
+        var estimatedFreightPrice = destroyFormatRupiah($('#estimated_freight_price').val());
+        var othersPrice = destroyFormatRupiah($('#others_price').val());
+
+        if (royaltyPrice > 0) {
+            total -= royaltyPrice;
+        }
+
+        if (rebatePrice > 0) {
+            total -= rebatePrice;
+        }
+
+        if (canDeductionPrice > 0) {
+            total -= canDeductionPrice;
+        }
+
+        if (estimatedFreightPrice > 0) {
+            total -= estimatedFreightPrice;
+        }
+
+        if (listDataSalesKontrak.others_type == "PLUS") {
+            total += othersPrice;
+        } else {
+            total -= othersPrice;
+        }
+
+        $('#total_txt').text(greatFormatRupiah(total));
+    }
+
+    function validateMaxPrice(elementx) {
+        var element = $(elementx);
+        var maxPrice = element.data('max');
+        var userInput = destroyFormatRupiah(element.val());
+
+        if (userInput > maxPrice) {
+            element.val(greatFormatRupiah(maxPrice));
+        }
     }
 
     function updateOrder(input) {
