@@ -1159,12 +1159,12 @@ class LocalPOPaymentModel extends Model
 
             // Format tanggal & update data PO
             $p['tanggal_PO'] = date('d/m/Y', strtotime($p['tanggal_PO']));
-            $p['total_tagihan'] = number_format($p['total_before_pph'], 2, '.', '');
-            $p['total_tagihan_number'] = number_format($p['total_before_pph'], 2, '.', '');
+            $p['total_tagihan'] = number_format($p['total_after_pph'], 2, '.', '');
+            $p['total_tagihan_number'] = number_format($p['total_after_pph'], 2, '.', '');
             $p['total_tagihan_pph'] = number_format($p['total_before_pph'] - $p['total_after_pph'], 2, '.', '');
             $p['total_paid'] = number_format($totalPaid, 2, '.', '');
             $p['total_paid_pph'] = number_format($totalPaidPPH, 2, '.', '');
-            $p['sisa_tagihan'] = number_format($p['total_before_pph'] - $totalPaid, 2, '.', '');
+            $p['sisa_tagihan'] = number_format($p['total_after_pph'] - $totalPaid, 2, '.', '');
             $p['sisa_tagihan_pph'] = number_format($p['total_tagihan_pph'] - $totalPaidPPH, 2, '.', '');
             $p['total_qty_diterima'] = number_format($p['total_qty_diterima'], 2, '.', '');
         }
@@ -1345,7 +1345,7 @@ class LocalPOPaymentModel extends Model
     public function getlistLPBmonth() {}
 
 
-    public function get_new_no(
+        public function get_new_no(
         $jenis,
         $divisi,
         $paymentMethod,
@@ -1378,46 +1378,110 @@ class LocalPOPaymentModel extends Model
         }
 
         $kodeDivisi = '';
-        $baseKodeDivisi = ''; // Untuk pencarian nomor terakhir tanpa M/K
-        if (!empty($divisi) && (strtoupper($paymentMethod) === 'CASH' || empty($kodeBank))) {
-            $divisiUpper = strtoupper($divisi);
+        $divisiKey = '';
+        $divisiUpper = !empty($divisi) ? strtoupper($divisi) : '';
+
+        if (!empty($divisiUpper)) {
             if (strpos($divisiUpper, 'PTS') !== false) {
                 $kodeDivisi = ($jenis == 'MERAH') ? 'MKN' : 'KKN';
-                $baseKodeDivisi = 'MK'; // Dua karakter pertama tanpa N/K
+                $divisiKey = 'PTS';
             } elseif (strpos($divisiUpper, 'CANNING') !== false) {
                 $kodeDivisi = ($jenis == 'MERAH') ? 'CNM' : 'CNK';
-                $baseKodeDivisi = 'CN'; // Dua karakter pertama tanpa M/K
-            } elseif (strpos($divisiUpper, 'FROZEN I') !== false) {
+                $divisiKey = 'CANNING';
+            } elseif (strpos($divisiUpper, 'FRZI') !== false) {
                 $kodeDivisi = ($jenis == 'MERAH') ? 'FRM' : 'FRK';
-                $baseKodeDivisi = 'FR';
-            } elseif (strpos($divisiUpper, 'FROZEN II') !== false) {
+                $divisiKey = 'FRZI';
+            } elseif (strpos($divisiUpper, 'FRZII') !== false) {
                 $kodeDivisi = ($jenis == 'MERAH') ? 'FSM' : 'FSK';
-                $baseKodeDivisi = 'FS';
+                $divisiKey = 'FRZII';
             } elseif (strpos($divisiUpper, 'GLOBAL') !== false) {
                 $kodeDivisi = ($jenis == 'MERAH') ? 'GBM' : 'GBK';
-                $baseKodeDivisi = 'GB';
+                $divisiKey = 'GLOBAL';
             } elseif (strpos($divisiUpper, 'OCS') !== false) {
                 $kodeDivisi = ($jenis == 'MERAH') ? 'OCM' : 'OCK';
-                $baseKodeDivisi = 'OC';
+                $divisiKey = 'OCS';
             }
         }
 
-        // Step 3: Build search pattern - Gunakan baseKodeDivisi untuk pencarian nomor terakhir
-        $searchPattern = '';
-        
+        // Determine the display prefix
+        $displayPrefix = '';
         if (strtoupper($paymentMethod) === 'CASH') {
-            $searchPattern = $baseKodeDivisi . '*/'; // Gunakan wildcard untuk karakter terakhir
+            $displayPrefix = $kodeDivisi . '/';
         } else {
             if (!empty($kodeBank)) {
-                $searchPattern = $kodeBank . '/';
-            } elseif (!empty($baseKodeDivisi)) {
-                $searchPattern = $baseKodeDivisi . '*/'; // Gunakan wildcard untuk karakter terakhir
+                $displayPrefix = $kodeBank . '/';
+            } elseif (!empty($kodeDivisi)) {
+                $displayPrefix = $kodeDivisi . '/';
             }
         }
-        
-        $searchPattern .= $thn . '/' . $bln . '/';
+        $displayPrefix .= $thn . '/' . $bln . '/';
 
-        // Step 4: Check all relevant tables for the highest number
+        // Build search patterns for all possible variations
+        $searchPatterns = [];
+        
+        if (strtoupper($paymentMethod) === 'CASH') {
+            if (!empty($divisiKey)) {
+                switch ($divisiKey) {
+                    case 'PTS':
+                        $searchPatterns[] = 'MKN/' . $thn . '/' . $bln . '/';
+                        $searchPatterns[] = 'KKN/' . $thn . '/' . $bln . '/';
+                        break;
+                    case 'CANNING':
+                        $searchPatterns[] = 'CNM/' . $thn . '/' . $bln . '/';
+                        $searchPatterns[] = 'CNK/' . $thn . '/' . $bln . '/';
+                        break;
+                    case 'FRZI':
+                        $searchPatterns[] = 'FRM/' . $thn . '/' . $bln . '/';
+                        $searchPatterns[] = 'FRK/' . $thn . '/' . $bln . '/';
+                        break;
+                    case 'FRZII':
+                        $searchPatterns[] = 'FSM/' . $thn . '/' . $bln . '/';
+                        $searchPatterns[] = 'FSK/' . $thn . '/' . $bln . '/';
+                        break;
+                    case 'GLOBAL':
+                        $searchPatterns[] = 'GBM/' . $thn . '/' . $bln . '/';
+                        $searchPatterns[] = 'GBK/' . $thn . '/' . $bln . '/';
+                        break;
+                    case 'OCS':
+                        $searchPatterns[] = 'OCM/' . $thn . '/' . $bln . '/';
+                        $searchPatterns[] = 'OCK/' . $thn . '/' . $bln . '/';
+                        break;
+                }
+            }
+        } else {
+            if (!empty($kodeBank)) {
+                $searchPatterns[] = $kodeBank . '/' . $thn . '/' . $bln . '/';
+            } elseif (!empty($divisiKey)) {
+                switch ($divisiKey) {
+                    case 'PTS':
+                        $searchPatterns[] = 'MKN/' . $thn . '/' . $bln . '/';
+                        $searchPatterns[] = 'KKN/' . $thn . '/' . $bln . '/';
+                        break;
+                    case 'CANNING':
+                        $searchPatterns[] = 'CNM/' . $thn . '/' . $bln . '/';
+                        $searchPatterns[] = 'CNK/' . $thn . '/' . $bln . '/';
+                        break;
+                    case 'FRZI':
+                        $searchPatterns[] = 'FRM/' . $thn . '/' . $bln . '/';
+                        $searchPatterns[] = 'FRK/' . $thn . '/' . $bln . '/';
+                        break;
+                    case 'FRZII':
+                        $searchPatterns[] = 'FSM/' . $thn . '/' . $bln . '/';
+                        $searchPatterns[] = 'FSK/' . $thn . '/' . $bln . '/';
+                        break;
+                    case 'GLOBAL':
+                        $searchPatterns[] = 'GBM/' . $thn . '/' . $bln . '/';
+                        $searchPatterns[] = 'GBK/' . $thn . '/' . $bln . '/';
+                        break;
+                    case 'OCS':
+                        $searchPatterns[] = 'OCM/' . $thn . '/' . $bln . '/';
+                        $searchPatterns[] = 'OCK/' . $thn . '/' . $bln . '/';
+                        break;
+                }
+            }
+        }
+
+        // Check all relevant tables for the highest number
         $db = \Config\Database::connect();
         
         $tablesToCheck = [
@@ -1432,44 +1496,33 @@ class LocalPOPaymentModel extends Model
         foreach ($tablesToCheck as $table => $column) {
             $builder = $db->table($table);
             
-            $lastRecord = $builder->select($column)
-                                ->like($column, $searchPattern, 'after')
-                                ->where('createdAt >=', "{$thn}-{$bln}-01 00:00:00")
-                                ->where('createdAt <=', "{$last_day} 23:59:59")
-                                ->where('company_id', $companyID)
-                                ->where('deletedAt', null)
-                                ->orderBy($column, 'DESC')
-                                ->get(1)
-                                ->getRowArray();
+            foreach ($searchPatterns as $pattern) {
+                $lastRecord = $builder->select($column)
+                                    ->like($column, $pattern, 'after')
+                                    ->where('createdAt >=', "{$thn}-{$bln}-01 00:00:00")
+                                    ->where('createdAt <=', "{$last_day} 23:59:59")
+                                    ->where('company_id', $companyID)
+                                    ->where('deletedAt', null)
+                                    ->orderBy($column, 'DESC')
+                                    ->get(1)
+                                    ->getRowArray();
 
-            if ($lastRecord) {
-                try {
-                    $lastParts = explode('/', $lastRecord[$column]);
-                    $currentNumber = (int)end($lastParts);
-                    $maxNumber = max($maxNumber, $currentNumber);
-                } catch (Exception $e) {
-                    log_message('error', "Failed to parse number from {$table}.{$column}: " . $e->getMessage());
+                if ($lastRecord) {
+                    try {
+                        $lastParts = explode('/', $lastRecord[$column]);
+                        $currentNumber = (int)end($lastParts);
+                        $maxNumber = max($maxNumber, $currentNumber);
+                    } catch (Exception $e) {
+                        log_message('error', "Failed to parse number from {$table}.{$column}: " . $e->getMessage());
+                    }
                 }
             }
         }
 
-        // Step 5: Generate new number
+        // Generate new number
         $counterNext = str_pad($maxNumber + 1, 4, '0', STR_PAD_LEFT);
         
-        // Build final number - tetap gunakan kodeDivisi lengkap (dengan M/K)
-        $prefix = '';
-        if (strtoupper($paymentMethod) === 'CASH') {
-            $prefix = $kodeDivisi . '/';
-        } else {
-            if (!empty($kodeBank)) {
-                $prefix = $kodeBank . '/';
-            } elseif (!empty($kodeDivisi)) {
-                $prefix = $kodeDivisi . '/';
-            }
-        }
-        $prefix .= $thn . '/' . $bln . '/';
-        
-        return $prefix . $counterNext;
+        return $displayPrefix . $counterNext;
     }
     
 }

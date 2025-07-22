@@ -428,13 +428,13 @@
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <input autocomplete="one-time-code" value="" type="text" class="form-control brand" id="brand" name="brand" placeholder="Brand">
-                                <label for="floatingInput">Brand</label>
+                                <label for="floatingInput">Brand (Opsional)</label>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <input autocomplete="one-time-code" value="" type="text" class="form-control packing" id="packing" name="packing" placeholder="Packing">
-                                <label for="floatingInput">Packing</label>
+                                <label for="floatingInput">Packing (Opsional)</label>
                             </div>
                         </div>
                         <div class="col-md-6">
@@ -1258,12 +1258,12 @@
             // species: {
             //     required: true
             // },
-            brand: {
-                required: true
-            },
-            packing: {
-                required: true
-            },
+            // brand: {
+            //     required: true
+            // },
+            // packing: {
+            //     required: true
+            // },
             // specs: {
             //     required: true
             // }
@@ -1275,12 +1275,12 @@
             // species: {
             //     required: "Species Wajib Diisi"
             // },
-            brand: {
-                required: "Brand is required"
-            },
-            packing: {
-                required: "Packing is required"
-            },
+            // brand: {
+            //     required: "Brand is required"
+            // },
+            // packing: {
+            //     required: "Packing is required"
+            // },
             // specs: {
             //     required: "Species Wajib Diisi"
             // }

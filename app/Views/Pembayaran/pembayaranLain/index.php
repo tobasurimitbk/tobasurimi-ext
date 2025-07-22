@@ -305,6 +305,8 @@
     let details = [];
     let sort = "id";
     let sortType = "desc";
+    let isEditMode = false;
+    let initialValues = {};
 
     const csrfToken = '<?= csrf_token() ?>';
     const csrf = $(`[name="${csrfToken}"]`);
@@ -573,64 +575,68 @@
 
 
         // Initialize Select2 for dropdowns
-        $('#divisi_id').select2({
-            placeholder: "Pilih Departemen",
-            theme: "bootstrap-5",
-            dropdownParent: $('#add_modal .modal-content') // Updated to match modal structure
-        }).change(function() {
-            generatePaymentNumber();    
-        });
-        
-        $('#bank_id').select2({
-            placeholder: "Pilih Bank",
-            theme: "bootstrap-5",
-            dropdownParent: $('#add_modal .modal-content') // Updated to match modal structure
-        }).change(function() {
-            generatePaymentNumber();    
-        });
+        function initSelect2() {
+            $('#divisi_id').select2({
+                placeholder: "Pilih Departemen",
+                theme: "bootstrap-5",
+                dropdownParent: $('#add_modal .modal-content')
+            }).on('change', function() {
+                handleFieldChange(this);
+            });
+            
+            $('#bank_id').select2({
+                placeholder: "Pilih Bank",
+                theme: "bootstrap-5",
+                dropdownParent: $('#add_modal .modal-content')
+            }).on('change', function() {
+                handleFieldChange(this);
+            });
 
-        $('#valas').select2({
-            placeholder: "Pilih Mata Uang",
-            theme: "bootstrap-5",
-            dropdownParent: $('#add_modal .modal-content')
-        }).on('change', function() {
-            let id = $(this).val();
-            if (id && id != 30) {
-                getNilaiKurs(id);
-            } else {
-                $('#kurs').val(1);
-            }
-        });
+            $('#metode_pembayaran').select2({
+                placeholder: "Pilih Metode Pembayaran",
+                theme: "bootstrap-5",
+                dropdownParent: $('#add_modal .modal-content')
+            }).on('change', function() {
+                handleFieldChange(this);
+            });
 
-        $('#metode_pembayaran').select2({
-            placeholder: "Pilih Metode Pembayaran",
-            theme: "bootstrap-5",
-            dropdownParent: $('#add_modal .modal-content')
-        }).change(function() {
-            generatePaymentNumber();    
-        });
+            $('#jenis_pembayaran').select2({
+                placeholder: "Pilih Jenis Pembayaran",
+                theme: "bootstrap-5",
+                dropdownParent: $('#add_modal .modal-content')
+            }).on('change', function(e) {
+                const jenis = $(this).val();
+                updateAccountLabels(jenis);
+                details = [];
+                handleFieldChange(this);
+            });
 
-        $('#akun_kas').select2({
-            placeholder: "Pilih Debit",
-            theme: "bootstrap-5",
-            dropdownParent: $('#add_modal .modal-content')
-        });
+            $('#valas').select2({
+                placeholder: "Pilih Mata Uang",
+                theme: "bootstrap-5",
+                dropdownParent: $('#add_modal .modal-content')
+            }).on('change', function() {
+                let id = $(this).val();
+                if (id && id != 30) {
+                    getNilaiKurs(id);
+                } else {
+                    $('#kurs').val(1);
+                }
+            });
 
-        $('#akun_selisih').select2({
-            placeholder: "Pilih Kredit",
-            theme: "bootstrap-5",
-            dropdownParent: $('#add_modal .modal-content')
-        });
+            $('#akun_kas').select2({
+                placeholder: "Pilih Debit",
+                theme: "bootstrap-5",
+                dropdownParent: $('#add_modal .modal-content')
+            });
 
-        $('#jenis_pembayaran').select2({
-            placeholder: "Pilih Jenis Pembayaran",
-            theme: "bootstrap-5",
-            dropdownParent: $('#add_modal .modal-content')
-        }).on('change', function(e) {
-            const jenis = $(this).val();
-            updateAccountLabels(jenis);
-            details = [];
-        });
+            $('#akun_selisih').select2({
+                placeholder: "Pilih Kredit",
+                theme: "bootstrap-5",
+                dropdownParent: $('#add_modal .modal-content')
+            });
+        }
+
         updateAccountLabels($('#jenis_pembayaran').val());
 
         $("#tanggal").datepicker({
@@ -675,6 +681,26 @@
 
             $('#jumlah').val(greatFormatRupiah(jumlahIdr / kurs));
         });
+
+        function handleFieldChange(element) {
+            if (!isEditMode) {
+                generatePaymentNumber();
+                return;
+            }
+            
+            let currentField = $(element).attr('id');
+            let currentValue = $(element).val();
+            
+            // Debugging: Log perubahan nilai
+            console.log(`Field changed: ${currentField}`, 
+                        `Old value: ${initialValues[currentField]}`, 
+                        `New value: ${currentValue}`);
+            
+            if (initialValues[currentField] !== currentValue) {
+                generatePaymentNumber(true);
+            }
+        }
+
 
 
         function getNilaiKurs(id) {
@@ -927,9 +953,6 @@
             });
         }
 
-
-
-
         $('#add_modal').on('hidden.bs.modal', function() {
             // Reset all form fields
             $('.create-form')[0].reset();
@@ -987,7 +1010,6 @@
             clearDetailForm();
             refreshValidation(); // bersihin styling error kalau sudah valid
         });
-
 
         // Refresh details table
         function refreshDetailsTable() {
@@ -1084,11 +1106,18 @@
             $(".create-form")[0].reset()
             $(".delete-btn").css('display', 'none');
             $(".add-modal").modal("show")
+            initSelect2();
         })
 
         $(".btn-hide-form").click(function() {
             $(".add-modal").modal("hide")
         })
+
+        $('.add-modal').on('hidden.bs.modal', function() {
+            isEditMode = false;
+            initialValues = {};
+            console.log('Modal closed - edit mode reset');
+        });
 
         $(".search").keyup(function() {
             table.ajax.reload();
@@ -1104,7 +1133,7 @@
 
         $('#dataTable tbody').on('click', 'tr td:not(.actions):not(.dataTables_empty)', function() {
             const data = table.row(this).data();
-            $(".create-form")[0].reset()
+            $(".create-form")[0].reset();
             $(".delete-btn").css('display', '');
             let id = data.id;
             $(".title-name").text("Update Pembayaran Lain");
@@ -1114,15 +1143,9 @@
 
             $.ajax({
                 url: "<?= base_url("pembayaran-lain/get"); ?>",
-                data: {
-                    id: id
-                },
-                beforeSend: function() {
-                    setLoading();
-                },
-                complete: function() {
-                    stopLoading();
-                },
+                data: { id: id },
+                beforeSend: function() { setLoading(); },
+                complete: function() { stopLoading(); },
                 method: "GET",
                 dataType: "json",
                 success: function(res) {
@@ -1130,28 +1153,34 @@
                         // Reset form and clear details
                         resetForm();
                         details = [];
-
-                        // Set parent data
+                        
+                        // Simpan nilai awal SEBELUM mengisi form
                         const parent = res.data.parent;
+                        initialValues = {
+                            divisi_id: parent.divisi_id,
+                            bank_id: parent.bank_id,
+                            metode_pembayaran: parent.metode_pembayaran,
+                            jenis_pembayaran: parent.jenis_pembayaran
+                        };
+                        
+                        // Set parent data
                         const metode = parent.metode_pembayaran;
                         $('#id').val(parent.id);
                         $("#no_pembayaran").val(parent.no_pembayaran);
                         $("#metode_pembayaran").val(metode).trigger('change');
-                        $('#divisi_id').val(parent.divisi_id).change();
-                        $('#bank_id').val(parent.bank_id).change();
+                        $('#divisi_id').val(parent.divisi_id).trigger('change');
+                        $('#bank_id').val(parent.bank_id).trigger('change');
                         $('#bayar_ke').val(parent.bayar_ke);
-                        $('#akun_selisih').val(parent.akun_selisih).change();
+                        $('#akun_selisih').val(parent.akun_selisih).trigger('change');
                         $('#keterangan_parent').val(parent.keterangan_parent);
                         $('#total_all_amount').val(parent.total_all_amount);
 
                         // Handle jenis pembayaran dan akun
-                        $('#jenis_pembayaran').val(parent.jenis_pembayaran).change();
+                        $('#jenis_pembayaran').val(parent.jenis_pembayaran).trigger('change');
 
                         // Untuk MERAH: akun_selisih parent sebenarnya adalah akun_kas
                         if (parent.jenis_pembayaran === 'MERAH' && parent.akun_kas) {
-                            $('#akun_selisih').val(parent.akun_kas).change();
-                        } else {
-                            $('#akun_selisih').val(parent.akun_selisih).change();
+                            $('#akun_selisih').val(parent.akun_kas).trigger('change');
                         }
 
                         // Disable fields if needed
@@ -1182,6 +1211,9 @@
                             refreshDetailsTable();
                         }
 
+                        // Set mode edit setelah semua data diisi
+                        isEditMode = true;
+                        console.log('Edit mode activated');
                         $(".add-modal").modal("show");
                     } else {
                         Swal.fire({
@@ -1201,7 +1233,7 @@
                 }
             });
         });
-
+       
         $(".btn-submit-form").click(function() {
             if ($(".create-form").valid()) {
                 Swal.fire({
@@ -1516,54 +1548,68 @@
         $('#akun_kas, #valas').val('').trigger('change');
     }
 
-    function generatePaymentNumber() {
-        // Get selected divisi and bank values
-        let jenisPembayaran = $("#jenis option:selected").text();
+    function generatePaymentNumber(forceGenerate = false) {
+        // Debugging: Log status generate
+        console.log(`Generate called - Edit mode: ${isEditMode}, Force: ${forceGenerate}`);
+        
+        // Jika di mode edit dan bukan force generate, skip
+        if (isEditMode && !forceGenerate) {
+            console.log('Skipped generate in edit mode');
+            return;
+        }
+        
+        // Get current values
+        let currentValues = {
+            divisi_id: $("#divisi_id").val(),
+            bank_id: $("#bank_id").val(),
+            metode_pembayaran: $("#metode_pembayaran").val(),
+            jenis_pembayaran: $("#jenis_pembayaran").val()
+        };
+        
+        // Jika nilai sama dengan initial values, skip
+        if (isEditMode && JSON.stringify(currentValues) === JSON.stringify(initialValues)) {
+            console.log('Skipped generate - values unchanged');
+            return;
+        }
+        
+        // Proses generate nomor
+        let jenisPembayaran = $("#jenis_pembayaran option:selected").text();
         let metodePembayaran = $("#metode_pembayaran option:selected").val();
         let divisiId = $("#divisi_id option:selected").text();
         let bankId = $("#bank_id option:selected").val();
         
-        // Only generate if this is a new record (empty detail)
-        <?php if(empty($detail)): ?>
-            const csrfToken = '<?= csrf_token() ?>';
-            const csrf = $(`[name="${csrfToken}"]`);
-            
-            // Build URL with query parameters
-            let url = "<?= base_url('pembayaran-lain/generate-no-pembayaran'); ?>";
-            url += `?jenisPembayaran=${encodeURIComponent(jenisPembayaran)}&divisiId=${encodeURIComponent(divisiId)}&metodePembayaran=${encodeURIComponent(metodePembayaran)}&bankId=${encodeURIComponent(bankId)}`;
-            
-            // Additional data if needed
-            var formData = new FormData();
-            formData.append("payment_date", $("#payment_date").val());
-            
-            $(".no_pembayaran").attr("readonly", true);
-            
-            $.ajax({
-                url: url,
-                method: "GET",
-                data: formData,
-                dataType: "json",
-                beforeSend: function(xhr) {
-                    xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                },
-                processData: false,
-                contentType: false,
-                success: function(response) {
-                    csrf.val(response.token);
-                    $(".no_pembayaran").val(response.paymentNo);
-                },
-                error: function(xhr, status, error) {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Terjadi kesalahan pada sistem',
-                        text: 'Gagal menghasilkan nomor pembayaran otomatis',
-                        confirmButtonColor: '#4e73df',
-                    });
-                    $(".no_pembayaran").attr("readonly", false);
-                }
-            });
-        <?php endif; ?>
+        const csrfToken = '<?= csrf_token() ?>';
+        const csrf = $(`[name="${csrfToken}"]`);
+        
+        let url = "<?= base_url('pembayaran-lain/generate-no-pembayaran'); ?>";
+        url += `?jenisPembayaran=${encodeURIComponent(jenisPembayaran)}&divisiId=${encodeURIComponent(divisiId)}&metodePembayaran=${encodeURIComponent(metodePembayaran)}&bankId=${encodeURIComponent(bankId)}`;
+        
+        $(".no_pembayaran").attr("readonly", true);
+        
+        $.ajax({
+            url: url,
+            method: "GET",
+            dataType: "json",
+            beforeSend: function(xhr) {
+                xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+            },
+            success: function(response) {
+                csrf.val(response.token);
+                $(".no_pembayaran").val(response.paymentNo);
+                console.log('Generated payment number:', response.paymentNo);
+            },
+            error: function(xhr, status, error) {
+                console.error('Error generating payment number:', error);
+                $(".no_pembayaran").attr("readonly", false);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Terjadi kesalahan pada sistem',
+                    text: 'Gagal menghasilkan nomor pembayaran otomatis',
+                    confirmButtonColor: '#4e73df',
+                });
+            }
+        });
     }
-    
+        
 </script>
 <?= $this->endSection(); ?>
