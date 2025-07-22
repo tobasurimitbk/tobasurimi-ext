@@ -76,10 +76,10 @@
                                 <th onclick="changeSort('suplierName')" class="sort" rowspan="2">Supplier</th>
                                 <th rowspan="2">Qty</th>
                                 <th rowspan="2">Satuan</th>
-                                <th colspan="3">Harian</th>
-                                <th colspan="3">Tambahan Harian</th>
-                                <th colspan="3">Tambahan Bulanan</th>
-                                <th colspan="3">Subsidi</th>
+                                <th colspan="3" style="text-align: center;">Harian</th>
+                                <th colspan="3" style="text-align: center;">Tambahan Harian</th>
+                                <th colspan="3" style="text-align: center;">Tambahan Bulanan</th>
+                                <th colspan="3" style="text-align: center;">Tambahan Langsung</th>
                                 <th rowspan="2">Total</th>
 
                             </tr>

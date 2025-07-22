@@ -28,7 +28,7 @@
                     </div>
                     <div class="card-wrap">
                         <div class="card-header">
-                            <h4>Pendapatan Supplier</h4>
+                            <h4>Pendapatan Supplier Per PO</h4>
                         </div>
                     </div>
                 </div>

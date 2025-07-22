@@ -206,12 +206,24 @@
                     </div>
                     <div class="col-md-8">
                         <div class="row">
+                            <?php if (session()->get("login")->this_company_id != 16) { ?>
+                                <div class="col-md-2">
+                                    <div class="form-floating mb-3" style="height: 50px;">
+                                        <select class="form-select company_ids" name="company_ids" id="company_ids">
+                                            <option <?= !empty($data) ? ($data->id_company == "1" ? "selected" : "") : ""; ?> value="1">KIM 1</option>
+                                            <option <?= !empty($data) ? ($data->id_company == "2" ? "selected" : "") : ""; ?> value="2">KIM 2</option>
+                                            <option <?= !empty($data) ? ($data->id_company == "15" ? "selected" : "") : ""; ?> value="15">GLOBAL</option>
+                                        </select>
+                                        <label for="floatingInput">Pilih Company</label>
+                                    </div>
+                                </div>
+                            <?php } ?>
                             <div class="col-md-2">
                                 <div class="mb-3" style="height: 50px;">
                                     <label for="floatingInput">Pajak</label>
                                     <div class="switch-form-pinjaman-karyawan">
                                         <label class="switch">
-                                            <input autocomplete="one-time-code" class="tax_status" name="tax_status" id="tax_status" type="checkbox" <?= !empty($data->status_tax) ? ($data->status_tax == 'true') ? 'checked' : '' : ''; ?>>
+                                            <input autocomplete="one-time-code" class="tax_status" name="tax_status" id="tax_status" type="checkbox" <?= !empty($data->status_tax) ? (($data->status_tax == 'true') ? 'checked' : '') : ''; ?>>
                                             <span class="slider round"></span>
                                         </label>
                                     </div>
@@ -228,12 +240,12 @@
                                     <label for="floatingInput">Pajak</label>
                                 </div>
                             </div>
-                            <div class="col-md-3">
+                            <div class="col-md-2">
                                 <div class="mb-3" style="height: 50px;">
                                     <label for="floatingInput">Include Pajak</label>
                                     <div class="switch-form-pinjaman-karyawan">
                                         <label class="switch">
-                                            <input autocomplete="one-time-code" class="include_tax" name="include_tax" id="include_tax" type="checkbox" <?= !empty($data->termasuk_pa) ? ($data->termasuk_pa == 'true') ? 'checked' : '' : ''; ?>>
+                                            <input autocomplete="one-time-code" class="include_tax" name="include_tax" id="include_tax" type="checkbox" <?= !empty($data->termasuk_pa) ? (($data->termasuk_pa == 'true') ? 'checked' : '') : ''; ?>>
                                             <span class="slider round"></span>
                                         </label>
                                     </div>
@@ -270,6 +282,7 @@
                                     <th>Harga Satuan</th>
                                     <th>Discount</th>
                                     <th>Amount</th>
+                                    <th></th>
                                 </tr>
                             </thead>
                             <tbody class="body-detail-table" id="body-detail-table" style="cursor: pointer;">
@@ -486,6 +499,20 @@
             {
                 data: "amount",
                 className: "text-center"
+            },
+            {
+                data: "id",
+                className: "text-center actions",
+                render: function(data, type, row) {
+                    let id = row.id;
+                    return `
+                    <div class="">
+                        <button data-no="${row.no}" data-id="${row.id}" class="edit-table-detail"><i class="fa fa-edit" aria-hidden="true"></i></button>
+                        <button data-no="${row.no}" data-id="${row.id}" class="delete-button"><i class="fa fa-trash" aria-hidden="true"></i></button>
+                    </div>
+                `;
+
+                }
             }
         ],
         columnDefs: [{
@@ -519,6 +546,83 @@
                 $('#includeTaxText').html('(Termasuk Pajak)');
             <?php endif; ?>
         <?php endif; ?>
+
+        $('.dataTable tbody').on('click', '.delete-button', function(e) {
+            e.preventDefault();
+            let rowData = table.row($(this).parents('tr')).data();
+            let dataNo = $(this).data('no');
+            let dataId = $(this).data('id');
+            const csrf = $(`[name="${csrfToken}"]`);
+
+            console.log(rowData);
+
+
+            if (dataId) {
+                Swal.fire({
+                    icon: 'question',
+                    title: 'Yakin akan di hapus?',
+                    confirmButtonColor: '#4e73df',
+                    cancelButtonColor: '#d33',
+                    showCancelButton: true,
+                    reverseButtons: true,
+                    confirmButtonText: 'Hapus',
+                    cancelButtonText: 'Kembali',
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $.ajax({
+                            url: "<?= base_url("order-form-lokal/delete-detail"); ?>",
+                            data: {
+                                id: dataId,
+                            },
+                            beforeSend: function(xhr) {
+                                xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                                setLoading();
+                            },
+                            complete: function() {
+                                stopLoading();
+                            },
+                            method: "POST",
+                            dataType: "json",
+                            success: function(response) {
+                                csrf.val(response.token);
+                                if (response.status) {
+                                    Swal.fire({
+                                            icon: 'success',
+                                            title: response.message,
+                                            confirmButtonColor: '#4e73df',
+                                        })
+                                        .then(() => {
+                                            // Update the list_items array
+                                            list_items = list_items.filter(item => item.id !== dataId);
+                                            // Redraw the table with the updated list_items
+                                            table.clear().rows.add(list_items).draw();
+                                            reCountTotal();
+                                        })
+                                } else {
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: response.message,
+                                        confirmButtonColor: '#e74a3b',
+                                    });
+                                }
+                            },
+                        });
+                    }
+                })
+            } else {
+                // Hapus item dari array JavaScript dan gambar ulang tabel
+                console.log(list_items);
+                // console.log(table);
+                let indexToRemove = list_items.findIndex(item => item.no === dataNo);
+                if (indexToRemove !== -1) {
+                    list_items.splice(indexToRemove, 1);
+
+                }
+                table.clear().rows.add(list_items).draw();
+                console.log(list_items);
+            }
+            reCountTotal();
+        });
 
         $(".btn-show-modal").click(function() {
             $(".title-detail-name").text("Tambah");
@@ -567,13 +671,14 @@
             let qtyNowBarang = $(".qty-sekarang").val();
             let qtyinputBarang = $(".qty-invoice").val();
             let codeSatuan = $(".id_barang option:selected").data("kode_satuan");
+            let id = generateRandomId();
 
             // Menambahkan data ke dalam list_items
             list_items.push({
                 amount: amountBarang, // Jumlah total
                 disc: discBarang, // Diskon
                 harga_barang: hargaBarang, // Harga barang per unit
-                id: null, // ID item
+                id: id, // ID item
                 id_barang: idBarang, // ID barang
                 id_sales_order: null, // ID sales order
                 kode_barang: codeBarang, // Kode barang
@@ -696,15 +801,21 @@
             allowClear: true
         })
 
+        $('#company_ids').select2({
+            placeholder: "Pilih Company",
+            theme: "bootstrap-5",
+            allowClear: true
+        })
+
         //CSS SELECT2 FLOATING LABEL
-        $('.ship_via, .id_customer, .id_surat_jalan, .id_barang')
+        $('.ship_via, .id_customer, .id_surat_jalan, .id_barang, #company_ids')
             .parent('div')
             .children('span')
             .children('span')
             .children('span')
             .css('height', ' calc(3.5rem + 2px)');
 
-        $('.ship_via, .id_customer, .id_surat_jalan, .id_barang')
+        $('.ship_via, .id_customer, .id_surat_jalan, .id_barang, #company_ids')
             .parent('div')
             .children('span')
             .children('span')
@@ -712,7 +823,7 @@
             .children('span')
             .css('margin-top', '22px').css('margin-left', '-7px');
 
-        $('.ship_via, .id_customer, .id_surat_jalan, #doc_type, .termin, .id_barang')
+        $('.ship_via, .id_customer, .id_surat_jalan, #doc_type, .termin, .id_barang, #company_ids')
             .parent('div')
             .find('label')
             .css('z-index', '1');
@@ -1499,6 +1610,15 @@
             $("#no_faktur").attr("readonly", false);
             // $("#no_faktur").val("");
         }
+    }
+
+    function generateRandomId(length = 4) {
+        const chars = '0123456789';
+        let result = '';
+        for (let i = 0; i < length; i++) {
+            result += chars.charAt(Math.floor(Math.random() * chars.length));
+        }
+        return result;
     }
 </script>
 

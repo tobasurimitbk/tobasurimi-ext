@@ -103,11 +103,11 @@
                                 <th onclick="changeSort('barangName')" class="sort" rowspan="2">Bahan Baku</th>
                                 <th onclick="changeSort('barangName')" class="sort" rowspan="2">Satuan</th>
                                 <th onclick="changeSort('barangName')" class="sort" rowspan="2">Qty</th>
-                                <th colspan="3">Harian</th>
-                                <th colspan="3">Tambahan Harian</th>
-                                <th colspan="3">Tambahan Bulanan</th>
-                                <th colspan="3">Subsidi</th>
-                                <th rowspan="2">Total</th>
+                                <th colspan="3" style="text-align: center;">Harian</th>
+                                <th colspan="3" style="text-align: center;">Tambahan Harian</th>
+                                <th colspan="3" style="text-align: center;">Tambahan Bulanan</th>
+                                <th colspan="3" style="text-align: center;">Tambahan Langsung</th>
+                                <th rowspan="2" style="text-align: center;">Total</th>
                             </tr>
                             <tr>
                                 <th>DPP</th>
@@ -253,7 +253,7 @@
                 className: "text-center"
             },
             {
-                data: "subsidi",
+                data: "dppSubsidi",
                 className: "text-center"
             },
             {
@@ -288,7 +288,7 @@
                 12: 'dppBulanan',
                 13: 'pphBulanan',
                 14: 'totalBulanan',
-                15: 'subsidi',
+                15: 'dppSubsidi',
                 16: 'pphSubsidi',
                 17: 'totalSubsidi',
                 18: 'totalRow'

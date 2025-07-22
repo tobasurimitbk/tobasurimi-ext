@@ -169,7 +169,6 @@ class Invoice extends BaseController
                 $dataSumAmount = $this->SalesOrderInvoiceDetailModel->getSumAmount($data->id);
             }
 
-
             array_push($dataAllSalesOrderInvoice, [
                 "no"                => $no++,
                 "id"                => encrypt($data->id),
@@ -1034,8 +1033,6 @@ class Invoice extends BaseController
 
         return $documentList->findAll();
     }
-
-
 
     private function  getDocDataaaa(string $docType, $docId): object
     {
