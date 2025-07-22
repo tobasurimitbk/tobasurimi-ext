@@ -869,14 +869,6 @@ class POLokalBahanBaku extends BaseController
                     $pphTax = 0.0025;
                 }
 
-                $objPph = [
-                    "None" => 0,
-                    "Supplier" => 1,
-                    "Company" => -1,
-                ];
-
-                $pphTax *= $objPph[$dataPO->pph];
-
                 // Simpan nilai asli PPh
                 $dataPO->nilai_pph2 = ($dataPO->po_date <= '2025-06-30') ? (!empty($dataPO->supplierNPWP) ? 0.0025 : 0.005) : 0.0025;
                 $dataPO->nilai_pph = 1 - $dataPO->nilai_pph2;
@@ -891,13 +883,32 @@ class POLokalBahanBaku extends BaseController
                     $totalQty += $qty;
                 }
 
+                // var_dump($totalPrice);
+
+                if ($dataPO->pph == "Company") {
+                    $totalPrice = $totalPrice;
+                    $pph = $totalPrice * 0;
+                    $totalDailyPrice = $totalDailyPrice;
+                    $pphDaily = $totalDailyPrice * 0;
+                } else if ($dataPO->pph == "Supplier") {
+                    $totalPrice = $totalPrice;
+                    $pph = $totalPrice * $dataPO->nilai_pph2;
+                    $totalDailyPrice = $totalDailyPrice;
+                    $pphDaily = $totalDailyPrice * $dataPO->nilai_pph2;
+                } else {
+                    $totalPrice = $totalPrice;
+                    $pph = $totalPrice * 0;
+                    $totalDailyPrice = $totalDailyPrice;
+                    $pphDaily = $totalDailyPrice * 0;
+                }
+
                 // Format yang akan dikirim ke view
                 $dataPO->kode_satuan = $dataPODetail[0]->kode_satuan ?? '';
                 $dataPO->totalPriceRaw = round($totalPrice, 2);
                 $dataPO->totalDailyPriceRaw = round($totalDailyPrice, 2);
                 $dataPO->totalQtyRaw = round($totalQty, 2);
-                $dataPO->totalPphRaw = round($totalPrice * $pphTax, 2);
-                $dataPO->totalDailyPphRaw = round($totalDailyPrice * $pphTax, 2);
+                $dataPO->totalPphRaw = round($pph, 2);
+                $dataPO->totalDailyPphRaw = round($pphDaily, 2);
                 $dataPO->totalPaidRaw = round($totalPrice - $dataPO->totalPphRaw, 2);
                 $dataPO->totalDailyPaidRaw = round($totalDailyPrice - $dataPO->totalDailyPphRaw, 2);
 
@@ -922,7 +933,7 @@ class POLokalBahanBaku extends BaseController
                 }
 
                 $selisih = round($selisih, 2);
-                $selisihPph = round($selisih * $pphTax, 2);
+                $selisihPph = $dataPO->pph != "None" ? round($selisih * $pphTax, 2) : 0;
                 $selisihPaid = round($selisih - $selisihPph, 2);
 
                 $dataPO->selisih = $selisih;
