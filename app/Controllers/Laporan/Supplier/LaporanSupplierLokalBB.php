@@ -1180,9 +1180,13 @@ class LaporanSupplierLokalBB extends BaseController
                     $poData['dppSubsidi'] = $totalSubsidi / $poData['nilai_pph'];
                     $poData['pphSubsidi'] = $poData['dppSubsidi'] * $poData['nilai_pph2'];
                     $poData['totalSubsidi'] = $poData['dppSubsidi'] - $poData['pphSubsidi'];
-                } else {
+                } else if ($poData['pphMode'] === "Supplier") {
                     $poData['dppSubsidi'] = $totalSubsidi;
                     $poData['pphSubsidi'] = $poData['dppSubsidi'] * $poData['nilai_pph2'];
+                    $poData['totalSubsidi'] = $poData['dppSubsidi'] - $poData['pphSubsidi'];
+                } else {
+                    $poData['dppSubsidi'] = $totalSubsidi;
+                    $poData['pphSubsidi'] = 0;
                     $poData['totalSubsidi'] = $poData['dppSubsidi'] - $poData['pphSubsidi'];
                 }
             } else {
@@ -1191,9 +1195,13 @@ class LaporanSupplierLokalBB extends BaseController
                     $poData['dppSubsidi'] = $poData['subsidi_value'] / (1 - $poData['nilai_pph2']);
                     $poData['pphSubsidi'] = $poData['dppSubsidi'] * $poData['nilai_pph2'];
                     $poData['totalSubsidi'] = $poData['dppSubsidi'] - $poData['pphSubsidi'];
-                } else {
+                } else if ($poData['pphMode'] === "Supplier") {
                     $poData['dppSubsidi'] = $poData['subsidi_value'];
                     $poData['pphSubsidi'] = $poData['dppSubsidi'] * $poData['nilai_pph2'];
+                    $poData['totalSubsidi'] = $poData['dppSubsidi'] - $poData['pphSubsidi'];
+                } else {
+                    $poData['dppSubsidi'] = $poData['subsidi_value'];
+                    $poData['pphSubsidi'] = 0;
                     $poData['totalSubsidi'] = $poData['dppSubsidi'] - $poData['pphSubsidi'];
                 }
             }
@@ -1458,9 +1466,13 @@ class LaporanSupplierLokalBB extends BaseController
                     $poData['dppSubsidi'] = $totalSubsidi / $poData['nilai_pph'];
                     $poData['pphSubsidi'] = $poData['dppSubsidi'] * $poData['nilai_pph2'];
                     $poData['totalSubsidi'] = $poData['dppSubsidi'] - $poData['pphSubsidi'];
-                } else {
+                } else if ($poData['pphMode'] === "Supplier") {
                     $poData['dppSubsidi'] = $totalSubsidi;
                     $poData['pphSubsidi'] = $poData['dppSubsidi'] * $poData['nilai_pph2'];
+                    $poData['totalSubsidi'] = $poData['dppSubsidi'] - $poData['pphSubsidi'];
+                } else {
+                    $poData['dppSubsidi'] = $totalSubsidi;
+                    $poData['pphSubsidi'] = 0;
                     $poData['totalSubsidi'] = $poData['dppSubsidi'] - $poData['pphSubsidi'];
                 }
             } else {
@@ -1469,9 +1481,13 @@ class LaporanSupplierLokalBB extends BaseController
                     $poData['dppSubsidi'] = $poData['subsidi_value'] / $poData['nilai_pph'];
                     $poData['pphSubsidi'] = $poData['dppSubsidi'] * $poData['nilai_pph2'];
                     $poData['totalSubsidi'] = $poData['dppSubsidi'] - $poData['pphSubsidi'];
-                } else {
+                } else if ($poData['pphMode'] === "Supplier") {
                     $poData['dppSubsidi'] = $poData['subsidi_value'];
                     $poData['pphSubsidi'] = $poData['dppSubsidi'] * $poData['nilai_pph2'];
+                    $poData['totalSubsidi'] = $poData['dppSubsidi'] - $poData['pphSubsidi'];
+                } else {
+                    $poData['dppSubsidi'] = $poData['subsidi_value'];
+                    $poData['pphSubsidi'] = 0;
                     $poData['totalSubsidi'] = $poData['dppSubsidi'] - $poData['pphSubsidi'];
                 }
             }
@@ -1731,9 +1747,13 @@ class LaporanSupplierLokalBB extends BaseController
                     $poData['dppSubsidi'] = $totalSubsidi / $poData['nilai_pph'];
                     $poData['pphSubsidi'] = $poData['dppSubsidi'] * $poData['nilai_pph2'];
                     $poData['totalSubsidi'] = $poData['dppSubsidi'] - $poData['pphSubsidi'];
-                } else {
+                } else if ($poData['pphMode'] === "Supplier") {
                     $poData['dppSubsidi'] = $totalSubsidi;
                     $poData['pphSubsidi'] = $poData['dppSubsidi'] * $poData['nilai_pph2'];
+                    $poData['totalSubsidi'] = $poData['dppSubsidi'] - $poData['pphSubsidi'];
+                } else {
+                    $poData['dppSubsidi'] = $totalSubsidi;
+                    $poData['pphSubsidi'] = 0;
                     $poData['totalSubsidi'] = $poData['dppSubsidi'] - $poData['pphSubsidi'];
                 }
             } else {
@@ -1741,9 +1761,13 @@ class LaporanSupplierLokalBB extends BaseController
                     $poData['dppSubsidi'] = $poData['subsidi_value'] / $poData['nilai_pph'];
                     $poData['pphSubsidi'] = $poData['dppSubsidi'] * $poData['nilai_pph2'];
                     $poData['totalSubsidi'] = $poData['dppSubsidi'] - $poData['pphSubsidi'];
-                } else {
+                } else if ($poData['pphMode'] === "Supplier") {
                     $poData['dppSubsidi'] = $poData['subsidi_value'];
                     $poData['pphSubsidi'] = $poData['dppSubsidi'] * $poData['nilai_pph2'];
+                    $poData['totalSubsidi'] = $poData['dppSubsidi'] - $poData['pphSubsidi'];
+                } else {
+                    $poData['dppSubsidi'] = $poData['subsidi_value'];
+                    $poData['pphSubsidi'] = 0;
                     $poData['totalSubsidi'] = $poData['dppSubsidi'] - $poData['pphSubsidi'];
                 }
             }
