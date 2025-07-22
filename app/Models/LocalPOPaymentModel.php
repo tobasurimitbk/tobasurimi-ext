@@ -1159,12 +1159,12 @@ class LocalPOPaymentModel extends Model
 
             // Format tanggal & update data PO
             $p['tanggal_PO'] = date('d/m/Y', strtotime($p['tanggal_PO']));
-            $p['total_tagihan'] = number_format($p['total_before_pph'], 2, '.', '');
-            $p['total_tagihan_number'] = number_format($p['total_before_pph'], 2, '.', '');
-            $p['total_tagihan_pph'] = number_format($p['total_before_pph'] - $p['total_after_pph'], 2, '.', '');
+            $p['total_tagihan'] = number_format($p['total_after_pph'], 2, '.', '');
+            $p['total_tagihan_number'] = number_format($p['total_after_pph'], 2, '.', '');
+            $p['total_tagihan_pph'] = number_format($p['total_after_pph'] - $p['total_before_pph'], 2, '.', '');
             $p['total_paid'] = number_format($totalPaid, 2, '.', '');
             $p['total_paid_pph'] = number_format($totalPaidPPH, 2, '.', '');
-            $p['sisa_tagihan'] = number_format($p['total_before_pph'] - $totalPaid, 2, '.', '');
+            $p['sisa_tagihan'] = number_format($p['total_after_pph'] - $totalPaid, 2, '.', '');
             $p['sisa_tagihan_pph'] = number_format($p['total_tagihan_pph'] - $totalPaidPPH, 2, '.', '');
             $p['total_qty_diterima'] = number_format($p['total_qty_diterima'], 2, '.', '');
         }
