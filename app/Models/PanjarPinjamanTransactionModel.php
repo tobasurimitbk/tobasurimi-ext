@@ -105,7 +105,7 @@ class PanjarPinjamanTransactionModel extends Model
         if (!empty($addCondition['search'])) {
             $builder->groupStart() // Start a group for OR conditions
                 ->like('ppt.no_transaction', $addCondition['search'])
-                ->orLike('supplier_name', $addCondition['search'])
+                ->orLike('suppliers.name', $addCondition['search'])
                 ->groupEnd(); // End the OR group
         }
 
