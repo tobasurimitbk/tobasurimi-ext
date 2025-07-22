@@ -90,6 +90,18 @@
                                 </div>
                                 <div class="col-md-6">
                                     <div class="form-floating mb-3" style="height: 50px;">
+                                        <select class="form-select" name="metode_pembayaran" id="metode_pembayaran">
+                                            <option selected value="">Pilih Metode Pembayaran</option>
+                                            <option value="Bank">Bank</option>
+                                            <option value="Cash">Cash</option>
+                                        </select>
+                                        <label for="floatingInput" style="z-index: 1;">Metode Pembayaran</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-floating mb-3" style="height: 50px;">
                                         <textarea autocomplete="one-time-code" style="height: 88px;" type="text" class="form-control keterangan_parent" name="keterangan_parent" id="keterangan_parent" placeholder="Keterangan"></textarea>
                                         <label for="floatingInput">Keterangan</label>
                                     </div>
@@ -114,16 +126,6 @@
                                         <div class="input-group-prepend group-prepend-password align-items-center">
                                             <i style="cursor: pointer; z-index: 99; margin-bottom: 6px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-po-date"></i>
                                         </div>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="form-floating mb-3" style="height: 50px;">
-                                        <select class="form-select" name="metode_pembayaran" id="metode_pembayaran">
-                                            <option selected value="">Pilih Metode Pembayaran</option>
-                                            <option value="Bank">Bank</option>
-                                            <option value="Cash">Cash</option>
-                                        </select>
-                                        <label for="floatingInput" style="z-index: 1;">Metode Pembayaran</label>
                                     </div>
                                 </div>
                             </div>
@@ -207,7 +209,6 @@
                                         <thead>
                                             <tr>
                                                 <th>Tanggal</th>
-                                                <th>Metode</th>
                                                 <th>Akun Debit</th>
                                                 <th>Akun Kredit</th>
                                                 <th>Valas</th>
@@ -462,6 +463,9 @@
                 divisi_id: {
                     required: true
                 },
+                metode_pembayaran: {
+                    required: true
+                },
                 bayar_ke: {
                     required: true
                 },
@@ -477,11 +481,6 @@
 
                 // Child/detail section rules
                 tanggal: {
-                    required: function() {
-                        return $("#detail-table tbody tr").length === 0;
-                    }
-                },
-                metode_pembayaran: {
                     required: function() {
                         return $("#detail-table tbody tr").length === 0;
                     }
@@ -607,6 +606,8 @@
             placeholder: "Pilih Metode Pembayaran",
             theme: "bootstrap-5",
             dropdownParent: $('#add_modal .modal-content')
+        }).change(function() {
+            generatePaymentNumber();    
         });
 
         $('#akun_kas').select2({
@@ -726,7 +727,6 @@
                 tbody.append(`
                     <tr>
                         <td>${detail.tanggal}</td>
-                        <td>${detail.metode_pembayaran}</td>
                         <td>${debitAccount}</td>
                         <td>${creditAccount}</td>
                         <td>${detail.valas}</td>
@@ -753,7 +753,6 @@
             const jenisPembayaran = $('#jenis_pembayaran').val();
             const detail = {
                 tanggal: $('#tanggal').val(),
-                metode_pembayaran: $('#metode_pembayaran').val(),
                 pembayaran_oleh: $('#pembayaran_oleh').val(),
                 akun_kas: $('#akun_kas').val(),
                 akun_kas_name: $('#akun_kas option:selected').text(),
@@ -872,7 +871,6 @@
             // Cek apakah field kosong atau nominal 0
             if (
                 !$('#tanggal').val() ||
-                !$('#metode_pembayaran').val() ||
                 !nominalClean || // bisa tambah pengecekan nominal < 1 kalau mau
                 !$('#pembayaran_oleh').val() ||
                 !$('#akun_kas').val()
@@ -880,7 +878,7 @@
                 isValid = false;
 
                 // Highlight all detail fields (khususnya yang kosong)
-                $('#tanggal, #metode_pembayaran, #pembayaran_oleh, #akun_kas').each(function() {
+                $('#tanggal, #pembayaran_oleh, #akun_kas').each(function() {
                     const value = $(this).val();
                     const fieldId = $(this).attr('id');
 
@@ -907,7 +905,6 @@
             // Special handling for detail fields
             const hasDetails = $("#detail-table tbody tr").length > 0;
             const detailFields = ['#tanggal',
-                '#metode_pembayaran',
                 '#pembayaran_oleh',
                 '#valas',
                 '#kurs',
@@ -972,7 +969,6 @@
 
             const detail = {
                 tanggal: $('#tanggal').val(),
-                metode_pembayaran: $('#metode_pembayaran').val(),
                 pembayaran_oleh: $('#pembayaran_oleh').val(),
                 akun_kas: $('#akun_kas').val(),
                 akun_kas_name: $('#akun_kas option:selected').text(),
@@ -1017,7 +1013,6 @@
                 tbody.append(`
                     <tr>
                         <td>${detail.tanggal}</td>
-                        <td>${detail.metode_pembayaran}</td>
                         <td>${debitAccount}</td>
                         <td>${creditAccount}</td>
                         <td>${detail.valas}</td>
@@ -1055,7 +1050,7 @@
         // Clear detail form
         function clearDetailForm() {
             $('#tanggal, #keterangan, #kurs, #jumlah, #jumlah_idr').val('');
-            $('#metode_pembayaran, #akun_kas, #valas').val('').trigger('change');
+            $('#akun_kas, #valas').val('').trigger('change');
         }
 
         // Handle final submissiono
@@ -1138,8 +1133,10 @@
 
                         // Set parent data
                         const parent = res.data.parent;
+                        const metode = parent.metode_pembayaran;
                         $('#id').val(parent.id);
                         $("#no_pembayaran").val(parent.no_pembayaran);
+                        $("#metode_pembayaran").val(metode).trigger('change');
                         $('#divisi_id').val(parent.divisi_id).change();
                         $('#bank_id').val(parent.bank_id).change();
                         $('#bayar_ke').val(parent.bayar_ke);
@@ -1169,7 +1166,6 @@
                                 details.push({
                                     id: detail.id,
                                     tanggal: detail.tanggal,
-                                    metode_pembayaran: detail.metode_pembayaran,
                                     pembayaran_oleh: detail.pembayaran_oleh,
                                     akun_kas: parent.jenis_pembayaran == "PUTIH" ? detail.akun_kas : detail.akun_selisih,
                                     akun_kas_name: detail.akun_kas_name,
@@ -1229,6 +1225,7 @@
                             divisi_id: $('#divisi_id').val(),
                             bank_id: $('#bank_id').val(),
                             no_pembayaran: $('#no_pembayaran').val(),
+                            metode_pembayaran: $('#metode_pembayaran').val(),
                             bayar_ke: $('#bayar_ke').val(),
                             akun_selisih: $('#akun_selisih').val(),
                             total_all_amount: destroyFormatRupiah($('#total_all_amount').val()),
@@ -1237,7 +1234,6 @@
                             details: details.map(detail => ({
                                 id: detail.id || '',
                                 tanggal: detail.tanggal,
-                                metode_pembayaran: detail.metode_pembayaran,
                                 pembayaran_oleh: detail.pembayaran_oleh,
                                 akun_kas: detail.akun_kas,
                                 valas: detail.valas,
@@ -1490,7 +1486,6 @@
         
         // Populate all form fields
         $('#tanggal').val(detail.tanggal);
-        $('#metode_pembayaran').val(detail.metode_pembayaran).trigger('change');
         $('#pembayaran_oleh').val(detail.pembayaran_oleh);
         $('#akun_kas').val(detail.akun_kas).trigger('change');
         $('#keterangan').val(detail.keterangan);
@@ -1518,12 +1513,13 @@
     // Clear detail form
     function clearDetailForm() {
         $('#tanggal, #keterangan, #kurs, #jumlah, #jumlah_idr').val('');
-        $('#metode_pembayaran, #akun_kas, #valas').val('').trigger('change');
+        $('#akun_kas, #valas').val('').trigger('change');
     }
 
     function generatePaymentNumber() {
         // Get selected divisi and bank values
         let jenisPembayaran = $("#jenis option:selected").text();
+        let metodePembayaran = $("#metode_pembayaran option:selected").val();
         let divisiId = $("#divisi_id option:selected").text();
         let bankId = $("#bank_id option:selected").val();
         
@@ -1534,7 +1530,7 @@
             
             // Build URL with query parameters
             let url = "<?= base_url('pembayaran-lain/generate-no-pembayaran'); ?>";
-            url += `?jenisPembayaran=${encodeURIComponent(jenisPembayaran)}&divisiId=${encodeURIComponent(divisiId)}&bankId=${encodeURIComponent(bankId)}`;
+            url += `?jenisPembayaran=${encodeURIComponent(jenisPembayaran)}&divisiId=${encodeURIComponent(divisiId)}&metodePembayaran=${encodeURIComponent(metodePembayaran)}&bankId=${encodeURIComponent(bankId)}`;
             
             // Additional data if needed
             var formData = new FormData();

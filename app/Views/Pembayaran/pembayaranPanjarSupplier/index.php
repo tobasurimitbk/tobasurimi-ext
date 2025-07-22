@@ -87,6 +87,16 @@
                             <div class="row">
                                 <div class="col-md-6">
                                     <div class="form-floating mb-3" style="height: 50px;">
+                                        <select class="form-select " name="payment_method" id="payment_method">
+                                            <option disabled selected value="">Pilih Metode Pembayaran</option>
+                                            <option value="Cash">Cash</option>
+                                            <option value="Bank">Bank</option>
+                                        </select>
+                                        <label for="floatingInput" style="z-index: 1;">Metode Pembayaran</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-floating mb-3" style="height: 50px;">
                                         <input autocomplete="one-time-code" type="text" class="form-control keterangan" name="keterangan" id="keterangan" placeholder="Keterangan" value="">
                                         <label for="floatingInput">Keterangan</label>
                                     </div>
@@ -763,6 +773,16 @@
             generatePaymentNumber();    
         }
     });
+
+    $('#payment_method').select2({
+        placeholder: "Pilih Metode Pembayaran",
+        theme: "bootstrap-5",
+        dropdownParent: $('#add_modal .modal-content')
+    }).change(function() {
+        if (!$('#id').val()) { // Only generate if not in edit mode
+            generatePaymentNumber();    
+        }
+    });
     
 
     $("#tipe_supplier, #supplier_id, #tipe, #jenis_transaksi, #jenis")
@@ -862,6 +882,7 @@
                     $('#id').val(res.data.transaction.id);
                     $('#no_transaksi').val(res.data.transaction.no_transaction);
                     $('#divisi_id').val(res.data.transaction.divisi_id).trigger('change');
+                    $('#payment_method').val(res.data.transaction.payment_method).trigger('change');
                     $('#bank_id').val(res.data.transaction.bank_id).trigger('change');
                     $('#jenis').val(res.data.transaction.type).trigger('change');
                     $('#tipe_supplier').val(res.data.supplier?.type || '');
@@ -1184,6 +1205,7 @@
 
                         // Add main form data
                         data.append('no_transaksi', $('#no_transaksi').val());
+                        data.append('payment_method', $('#payment_method option:selected').val());
                         data.append('jenis', $('#jenis').val());
                         data.append('bank_id', $('#bank_id').val());
                         data.append('divisi_id', $('#divisi_id').val());
@@ -1508,6 +1530,7 @@
         // Get selected divisi and bank values
         let jenisPembayaran = $("#jenis option:selected").text();
         let divisiId = $("#divisi_id option:selected").text();
+        let paymentMethod = $("#payment_method option:selected").text();
         let bankId = $("#bank_id option:selected").val();
         
         // Only generate if this is a new record (empty detail)
@@ -1517,7 +1540,7 @@
             
             // Build URL with query parameters
             let url = "<?= base_url('panjar-supplier/generate-no-panjar'); ?>";
-            url += `?jenisPembayaran=${encodeURIComponent(jenisPembayaran)}&divisiId=${encodeURIComponent(divisiId)}&bankId=${encodeURIComponent(bankId)}`;
+            url += `?jenisPembayaran=${encodeURIComponent(jenisPembayaran)}&divisiId=${encodeURIComponent(divisiId)}&paymentMethod=${encodeURIComponent(paymentMethod)}&bankId=${encodeURIComponent(bankId)}`;
             
             // Additional data if needed
             var formData = new FormData();

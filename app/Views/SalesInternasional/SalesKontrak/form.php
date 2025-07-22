@@ -409,7 +409,7 @@
                     <div class="col-md-4">
                         <div class="input-group">
                             <div class="input-group-prepend">
-                                <select name="others_type" id="others_type" class="form-control others_type">
+                                <select <?= !empty($dataSalesKontrak) ? ($dataSalesKontrak['status_posting']  ? 'disabled=true' : '') : ''; ?> name="others_type" id="others_type" class="form-control others_type">
                                     <option <?= !empty($dataSalesKontrak) ? ($dataSalesKontrak['others_type'] == "PLUS" ? 'selected' : '') : '' ?> value="PLUS">PLUS (+)</option>
                                     <option <?= !empty($dataSalesKontrak) ? ($dataSalesKontrak['others_type'] == "MINUS" ? 'selected' : '')  : '' ?> value="MINUS">MINUS (-)</option>
                                 </select>

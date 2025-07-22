@@ -6,6 +6,7 @@ use App\Controllers\BaseController;
 use App\Models\BarangMasterSalesModel;
 use App\Models\CountryModel;
 use App\Models\CustomerModel;
+use App\Models\DivisisModel;
 use App\Models\MetadataModel;
 use App\Models\SalesKontrakDetailModel;
 use App\Models\SalesKontrakModel;
@@ -32,6 +33,7 @@ class OrderForm extends BaseController
     protected $barangMasterSalesModel;
     protected $salesOrderExportModel;
     protected $salesOrderExportDetailModel;
+    protected $divisiModel;
     protected $dompdf;
 
     public function __construct()
@@ -50,6 +52,7 @@ class OrderForm extends BaseController
         $this->barangMasterSalesModel = new BarangMasterSalesModel();
         $this->salesOrderExportModel = new SalesOrderExportModel();
         $this->salesOrderExportDetailModel = new SalesOrderExportDetailModel();
+        $this->divisiModel = new DivisisModel();
         $this->dompdf = new Dompdf();
     }
 
@@ -144,6 +147,8 @@ class OrderForm extends BaseController
         $dataSatuan = $this->satuanModel->findAll();
         $dataBarang = $this->barangMasterSalesModel->where('company_id', $this->this_company_id)->orderBy('createdAt', "DESC")->findAll();
         $dataAJU = $this->metaDataModel->getBCUsed('so_internasional');
+        $dataDivisi = $this->divisiModel->getDivisiAccess();
+
         $data = [
             "dataCustomer" => $dataCustomer,
             "dataCountry" => $dataCountry,
@@ -152,6 +157,7 @@ class OrderForm extends BaseController
             'dataSatuan' => $dataSatuan,
             'dataBarang' => $dataBarang,
             "dataAJU" => $dataAJU,
+            "dataDivisi" => $dataDivisi
         ];
 
         return view('SalesInternasional/OrderForm/form', $data);
@@ -259,48 +265,13 @@ class OrderForm extends BaseController
 
     public function dropdownSalesKontrak()
     {
-        $dataSalesKontrakFilter = [];
-        $dataSalesKontrak = $this->salesKontrakModel->getSalesKontrakForOrderForm($this->this_user_id, '1', $this->this_company_id);
+        $divisiId = $this->request->getVar('divisi_id');
+        $dataSalesKontrak = $this->salesKontrakModel->getSalesKontrakList(
+            $divisiId
+        );
 
-        foreach ($dataSalesKontrak as $value) {
-            $totalQtyDetail = 0;
-            $dataDetailExport = $this->salesOrderExportDetailModel
-                ->select('sales_order_export.*, sales_order_detail_export.*, SUM(sales_order_detail_export.qty) AS qtyOrder')
-                ->join('sales_order_export', 'sales_order_export.sales_order_export_id = sales_order_detail_export.sales_order_export_id', 'left')
-                ->where('sales_order_detail_export.sales_contract_detail_id', $value['idContractDetail'])
-                ->where('sales_order_export.status', "POSTED")
-                ->groupBy('sales_order_export.sales_order_export_id')
-                ->findAll();
-
-            if (count($dataDetailExport) > 0) {
-                foreach ($dataDetailExport as $valueExportDetail) {
-                    $totalQtyDetail += $valueExportDetail['qtyOrder'];
-                }
-                if ($value['qtyContract'] > $totalQtyDetail) {
-                    $dataSalesKontrakFilter[] = $value;
-                }
-            } else {
-                $dataSalesKontrakFilter[] = $value;
-            }
-        }
-
-        // Hapus duplikat dari $dataSalesKontrakFilter
-        $temp_array = [];
-        $key_array = [];
-
-        foreach ($dataSalesKontrakFilter as $val) {
-            if (!in_array($val['id'], $key_array)) {
-                $key_array[] = $val['id'];
-                $temp_array[] = $val;
-            }
-        }
-
-        for ($i = 0; $i < count($temp_array); $i++) {
-            $temp_array[$i]['due_date'] = date('d/m/Y', strtotime($temp_array[$i]['due_date']));
-            $temp_array[$i]['shipment_date'] = date('d/m/Y', strtotime($temp_array[$i]['shipment_date']));
-        }
         return response()->setJSON([
-            'data' => $temp_array,
+            'data' => $dataSalesKontrak,
             'token' => csrf_hash(),
             'status' => true
         ]);
@@ -308,44 +279,28 @@ class OrderForm extends BaseController
 
     public function getDetailSalesKontrak()
     {
-        $dataSalesKontrakFilter = [];
-        $id = $this->request->getGet("id");
-        if (empty($id)) {
+        $salesContractId = $this->request->getVar("sales_contract_id");
+        $id = $this->request->getVar('id');
+
+        if (empty($salesContractId)) {
             return response()->setJSON([
                 'data' => [],
                 'token' => csrf_hash(),
                 'status' => true
             ]);
         }
-        // $dataSalesKontrak = $this->salesKontrakModel->getSalesKontrak($this->this_user_id);
-        $dataSalesKontrakDetail = $this->salesKontrakDetailModel->detail($id);
-        // var_dump($id);
-        // var_dump($dataSalesKontrakDetail);
-        foreach ($dataSalesKontrakDetail as $value) {
-            $totalQtyDetail = 0;
-            $dataDetailExport = $this->salesOrderExportDetailModel
-                ->select('sales_order_export.*, sales_order_detail_export.*, SUM(sales_order_detail_export.qty) AS qtyOrder')
-                ->join('sales_order_export', 'sales_order_export.sales_order_export_id = sales_order_detail_export.sales_order_export_id', 'left')
-                ->where('sales_order_detail_export.sales_contract_detail_id', $value['id_detail'])
-                ->where('sales_order_export.status', "POSTED")
-                ->groupBy('sales_order_export.sales_order_export_id') // Ubah ke sales order export ID
-                ->findAll();
-            if (count($dataDetailExport) > 0) { // Periksa apakah ada hasil query
-                foreach ($dataDetailExport as $valueExportDetail) {
-                    $totalQtyDetail += $valueExportDetail['qtyOrder'];
-                }
-                if ($value['qty'] > $totalQtyDetail) {
-                    $value['qty_awal'] = $value['qty'];
-                    $value['qty'] = $value['qty'] - $totalQtyDetail;
-                    $dataSalesKontrakFilter[] = $value; // Tambahkan ke array jika kondisi terpenuhi
-                }
-            } else {
-                $value['qty_awal'] = $value['qty'];
-                $dataSalesKontrakFilter[] = $value; // Tambahkan ke array jika tidak ada hasil query
-            }
+
+        if (empty($id)) {
+            $id = null;
         }
+
+        $data = $this->salesOrderExportModel->getDetailSalesKontrakInOrderForm(
+            $salesContractId,
+            $id
+        );
+
         return response()->setJSON([
-            'data' => $dataSalesKontrakFilter,
+            'data' => $data,
             'token' => csrf_hash(),
             'status' => true
         ]);

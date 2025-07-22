@@ -118,12 +118,13 @@ class PanjarSupplier extends BaseController
                 "supplier_id" => $this->request->getVar('supplier_id'),
                 "bank_id" => $this->request->getVar('bank_id'),
                 "divisi_id" => $this->request->getVar('divisi_id'),
+                "payment_method" => $this->request->getVar('payment_method'),
                 "type" => $this->request->getVar('jenis'),
                 "no_transaction" => $this->request->getPost("no_transaksi"),
                 "keterangan" => $this->request->getPost("keterangan"),
             ];
 
-            // Start transaction
+            // Start 
             $this->panjarPinjamanTransactionModel->db->transBegin();
 
             // Insert parent transaction
@@ -292,6 +293,7 @@ class PanjarSupplier extends BaseController
             $parentData = [
                 "supplier_id" => $this->request->getVar('supplier_id'),
                 "bank_id" => $this->request->getVar('bank_id'),
+                "payment_method" => $this->request->getVar('payment_method'),
                 "divisi_id" => $this->request->getVar('divisi_id'),
                 "type" => $this->request->getVar('jenis'),
                 "no_transaction" => $this->request->getPost("no_transaksi"),
@@ -810,6 +812,7 @@ class PanjarSupplier extends BaseController
                     "id" => encrypt($transaction->id),
                     "no_transaction" => $transaction->no_transaction,
                     "type" => $transaction->type,
+                    "payment_method" => $transaction->payment_method,
                     "createdAt" => $transaction->createdAt,
                     "keterangan" => $transaction->keterangan,
                     "divisi_id" => $transaction->divisi_id,
@@ -860,12 +863,14 @@ class PanjarSupplier extends BaseController
     {
         $panjarPinjamanSupplierModel = new PanjarPinjamanTransactionModel();
         $jenis = $this->request->getGet('jenisPembayaran');
+        $metodePembayaran = $this->request->getGet('paymentMethod');
         $divisi = str_replace(' ', '', trim($this->request->getGet('divisiId')));
         $bank = str_replace(' ', '', trim($this->request->getGet('bankId')));
 
         $paymentNo = $panjarPinjamanSupplierModel->get_new_no(
             $jenis,
             $divisi,
+            $metodePembayaran,
             $bank,
             date('m'),
             date('Y'),

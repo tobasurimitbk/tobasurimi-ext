@@ -119,6 +119,7 @@ class OtherPaymentModel extends Model
     public function get_new_no(
         $jenis,
         $divisi,
+        $paymentMethod,
         $bank_id,
         $bln,
         $thn,
@@ -127,9 +128,9 @@ class OtherPaymentModel extends Model
     ) {
         $banksModel = new BanksModel();
         
-        // Step 1: Get bank code
+        // Step 1: Get bank code (only if payment method is BANK)
         $kodeBank = '';
-        if (!empty($bank_id)) {
+        if (!empty($bank_id) && strtoupper($paymentMethod) !== 'CASH') {
             $bankData = $banksModel->select('name')
                                 ->where('id', $bank_id)
                                 ->first();
@@ -148,31 +149,110 @@ class OtherPaymentModel extends Model
         }
 
         $kodeDivisi = '';
-        if (!empty($divisi)) {
-            $divisiUpper = strtoupper($divisi);
+        $divisiKey = '';
+        $divisiUpper = !empty($divisi) ? strtoupper($divisi) : '';
+
+        if (!empty($divisiUpper)) {
             if (strpos($divisiUpper, 'PTS') !== false) {
                 $kodeDivisi = ($jenis == 'MERAH') ? 'MKN' : 'KKN';
+                $divisiKey = 'PTS';
             } elseif (strpos($divisiUpper, 'CANNING') !== false) {
                 $kodeDivisi = ($jenis == 'MERAH') ? 'CNM' : 'CNK';
-            } elseif (strpos($divisiUpper, 'FROZEN I') !== false) {
+                $divisiKey = 'CANNING';
+            } elseif (strpos($divisiUpper, 'FRZI') !== false) {
                 $kodeDivisi = ($jenis == 'MERAH') ? 'FRM' : 'FRK';
-            } elseif (strpos($divisiUpper, 'FROZEN II') !== false) {
+                $divisiKey = 'FRZI';
+            } elseif (strpos($divisiUpper, 'FRZII') !== false) {
                 $kodeDivisi = ($jenis == 'MERAH') ? 'FSM' : 'FSK';
+                $divisiKey = 'FRZII';
             } elseif (strpos($divisiUpper, 'GLOBAL') !== false) {
                 $kodeDivisi = ($jenis == 'MERAH') ? 'GBM' : 'GBK';
+                $divisiKey = 'GLOBAL';
             } elseif (strpos($divisiUpper, 'OCS') !== false) {
                 $kodeDivisi = ($jenis == 'MERAH') ? 'OCM' : 'OCK';
+                $divisiKey = 'OCS';
             }
         }
 
-        // Step 3: Build search pattern based on whether bank code exists
-        $searchPattern = $kodeDivisi . '/';
-        if (!empty($kodeBank)) {
-            $searchPattern .= $kodeBank . '/';
+        // Determine the display prefix
+        $displayPrefix = '';
+        if (strtoupper($paymentMethod) === 'CASH') {
+            $displayPrefix = $kodeDivisi . '/';
+        } else {
+            if (!empty($kodeBank)) {
+                $displayPrefix = $kodeBank . '/';
+            } elseif (!empty($kodeDivisi)) {
+                $displayPrefix = $kodeDivisi . '/';
+            }
         }
-        $searchPattern .= $thn . '/' . $bln . '/';
+        $displayPrefix .= $thn . '/' . $bln . '/';
 
-        // Step 4: Check all relevant tables for the highest number
+        // Build search patterns for all possible variations
+        $searchPatterns = [];
+        
+        if (strtoupper($paymentMethod) === 'CASH') {
+            if (!empty($divisiKey)) {
+                switch ($divisiKey) {
+                    case 'PTS':
+                        $searchPatterns[] = 'MKN/' . $thn . '/' . $bln . '/';
+                        $searchPatterns[] = 'KKN/' . $thn . '/' . $bln . '/';
+                        break;
+                    case 'CANNING':
+                        $searchPatterns[] = 'CNM/' . $thn . '/' . $bln . '/';
+                        $searchPatterns[] = 'CNK/' . $thn . '/' . $bln . '/';
+                        break;
+                    case 'FRZI':
+                        $searchPatterns[] = 'FRM/' . $thn . '/' . $bln . '/';
+                        $searchPatterns[] = 'FRK/' . $thn . '/' . $bln . '/';
+                        break;
+                    case 'FRZII':
+                        $searchPatterns[] = 'FSM/' . $thn . '/' . $bln . '/';
+                        $searchPatterns[] = 'FSK/' . $thn . '/' . $bln . '/';
+                        break;
+                    case 'GLOBAL':
+                        $searchPatterns[] = 'GBM/' . $thn . '/' . $bln . '/';
+                        $searchPatterns[] = 'GBK/' . $thn . '/' . $bln . '/';
+                        break;
+                    case 'OCS':
+                        $searchPatterns[] = 'OCM/' . $thn . '/' . $bln . '/';
+                        $searchPatterns[] = 'OCK/' . $thn . '/' . $bln . '/';
+                        break;
+                }
+            }
+        } else {
+            if (!empty($kodeBank)) {
+                $searchPatterns[] = $kodeBank . '/' . $thn . '/' . $bln . '/';
+            } elseif (!empty($divisiKey)) {
+                switch ($divisiKey) {
+                    case 'PTS':
+                        $searchPatterns[] = 'MKN/' . $thn . '/' . $bln . '/';
+                        $searchPatterns[] = 'KKN/' . $thn . '/' . $bln . '/';
+                        break;
+                    case 'CANNING':
+                        $searchPatterns[] = 'CNM/' . $thn . '/' . $bln . '/';
+                        $searchPatterns[] = 'CNK/' . $thn . '/' . $bln . '/';
+                        break;
+                    case 'FRZI':
+                        $searchPatterns[] = 'FRM/' . $thn . '/' . $bln . '/';
+                        $searchPatterns[] = 'FRK/' . $thn . '/' . $bln . '/';
+                        break;
+                    case 'FRZII':
+                        $searchPatterns[] = 'FSM/' . $thn . '/' . $bln . '/';
+                        $searchPatterns[] = 'FSK/' . $thn . '/' . $bln . '/';
+                        break;
+                    case 'GLOBAL':
+                        $searchPatterns[] = 'GBM/' . $thn . '/' . $bln . '/';
+                        $searchPatterns[] = 'GBK/' . $thn . '/' . $bln . '/';
+                        break;
+                    case 'OCS':
+                        $searchPatterns[] = 'OCM/' . $thn . '/' . $bln . '/';
+                        $searchPatterns[] = 'OCK/' . $thn . '/' . $bln . '/';
+                        break;
+                }
+            }
+        }
+
+        // Check all relevant tables for the highest number
         $db = \Config\Database::connect();
         
         $tablesToCheck = [
@@ -187,38 +267,33 @@ class OtherPaymentModel extends Model
         foreach ($tablesToCheck as $table => $column) {
             $builder = $db->table($table);
             
-            $lastRecord = $builder->select($column)
-                                ->like($column, $searchPattern, 'after')
-                                ->where('createdAt >=', "{$thn}-{$bln}-01 00:00:00")
-                                ->where('createdAt <=', "{$last_day} 23:59:59")
-                                ->where('company_id', $companyID)
-                                ->where('deletedAt', null)
-                                ->orderBy($column, 'DESC')
-                                ->get(1)
-                                ->getRowArray();
+            foreach ($searchPatterns as $pattern) {
+                $lastRecord = $builder->select($column)
+                                    ->like($column, $pattern, 'after')
+                                    ->where('createdAt >=', "{$thn}-{$bln}-01 00:00:00")
+                                    ->where('createdAt <=', "{$last_day} 23:59:59")
+                                    ->where('company_id', $companyID)
+                                    ->where('deletedAt', null)
+                                    ->orderBy($column, 'DESC')
+                                    ->get(1)
+                                    ->getRowArray();
 
-            if ($lastRecord) {
-                try {
-                    $lastParts = explode('/', $lastRecord[$column]);
-                    $currentNumber = (int)end($lastParts);
-                    $maxNumber = max($maxNumber, $currentNumber);
-                } catch (Exception $e) {
-                    log_message('error', "Failed to parse number from {$table}.{$column}: " . $e->getMessage());
+                if ($lastRecord) {
+                    try {
+                        $lastParts = explode('/', $lastRecord[$column]);
+                        $currentNumber = (int)end($lastParts);
+                        $maxNumber = max($maxNumber, $currentNumber);
+                    } catch (Exception $e) {
+                        log_message('error', "Failed to parse number from {$table}.{$column}: " . $e->getMessage());
+                    }
                 }
             }
         }
 
-        // Step 5: Generate new number
+        // Generate new number
         $counterNext = str_pad($maxNumber + 1, 4, '0', STR_PAD_LEFT);
         
-        // Build final number
-        $prefix = $kodeDivisi . '/';
-        if (!empty($kodeBank)) {
-            $prefix .= $kodeBank . '/';
-        }
-        $prefix .= $thn . '/' . $bln . '/';
-        
-        return $prefix . $counterNext;
+        return $displayPrefix . $counterNext;
     }
 
 }

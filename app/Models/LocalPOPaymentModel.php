@@ -1345,7 +1345,6 @@ class LocalPOPaymentModel extends Model
     public function getlistLPBmonth() {}
 
 
-    
     public function get_new_no(
         $jenis,
         $divisi,
@@ -1379,35 +1378,40 @@ class LocalPOPaymentModel extends Model
         }
 
         $kodeDivisi = '';
-        // Only get division code if payment method is CASH or if bank code is empty (fallback)
+        $baseKodeDivisi = ''; // Untuk pencarian nomor terakhir tanpa M/K
         if (!empty($divisi) && (strtoupper($paymentMethod) === 'CASH' || empty($kodeBank))) {
             $divisiUpper = strtoupper($divisi);
             if (strpos($divisiUpper, 'PTS') !== false) {
                 $kodeDivisi = ($jenis == 'MERAH') ? 'MKN' : 'KKN';
+                $baseKodeDivisi = 'MK'; // Dua karakter pertama tanpa N/K
             } elseif (strpos($divisiUpper, 'CANNING') !== false) {
                 $kodeDivisi = ($jenis == 'MERAH') ? 'CNM' : 'CNK';
+                $baseKodeDivisi = 'CN'; // Dua karakter pertama tanpa M/K
             } elseif (strpos($divisiUpper, 'FROZEN I') !== false) {
                 $kodeDivisi = ($jenis == 'MERAH') ? 'FRM' : 'FRK';
+                $baseKodeDivisi = 'FR';
             } elseif (strpos($divisiUpper, 'FROZEN II') !== false) {
                 $kodeDivisi = ($jenis == 'MERAH') ? 'FSM' : 'FSK';
+                $baseKodeDivisi = 'FS';
             } elseif (strpos($divisiUpper, 'GLOBAL') !== false) {
                 $kodeDivisi = ($jenis == 'MERAH') ? 'GBM' : 'GBK';
+                $baseKodeDivisi = 'GB';
             } elseif (strpos($divisiUpper, 'OCS') !== false) {
                 $kodeDivisi = ($jenis == 'MERAH') ? 'OCM' : 'OCK';
+                $baseKodeDivisi = 'OC';
             }
         }
 
-        // Step 3: Build search pattern
+        // Step 3: Build search pattern - Gunakan baseKodeDivisi untuk pencarian nomor terakhir
         $searchPattern = '';
         
-        // Use division code for CASH, bank code for BANK
         if (strtoupper($paymentMethod) === 'CASH') {
-            $searchPattern = $kodeDivisi . '/';
+            $searchPattern = $baseKodeDivisi . '*/'; // Gunakan wildcard untuk karakter terakhir
         } else {
             if (!empty($kodeBank)) {
                 $searchPattern = $kodeBank . '/';
-            } elseif (!empty($kodeDivisi)) { // Fallback to division code if no bank code
-                $searchPattern = $kodeDivisi . '/';
+            } elseif (!empty($baseKodeDivisi)) {
+                $searchPattern = $baseKodeDivisi . '*/'; // Gunakan wildcard untuk karakter terakhir
             }
         }
         
@@ -1452,14 +1456,14 @@ class LocalPOPaymentModel extends Model
         // Step 5: Generate new number
         $counterNext = str_pad($maxNumber + 1, 4, '0', STR_PAD_LEFT);
         
-        // Build final number based on payment method
+        // Build final number - tetap gunakan kodeDivisi lengkap (dengan M/K)
         $prefix = '';
         if (strtoupper($paymentMethod) === 'CASH') {
             $prefix = $kodeDivisi . '/';
         } else {
             if (!empty($kodeBank)) {
                 $prefix = $kodeBank . '/';
-            } elseif (!empty($kodeDivisi)) { // Fallback to division code if no bank code
+            } elseif (!empty($kodeDivisi)) {
                 $prefix = $kodeDivisi . '/';
             }
         }
