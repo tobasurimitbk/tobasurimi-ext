@@ -13,24 +13,8 @@ class SalesOrderExportModel extends Model
     protected $insertID         = 0;
     protected $returnType       = 'array';
     protected $useSoftDeletes   = true;
-    protected $protectFields    = true;
-    protected $allowedFields    = [
-        'sales_order_export_id',
-        'sales_order_export_no',
-        'sales_contract_id',
-        'bc_type',
-        'company_id',
-        'status',
-        'keterangan_unpost',
-        'jumlah_unpost',
-        'used',
-        'user_id',
-        'documents_required',
-        'special_instructions',
-        'createdAt',
-        'updatedAt',
-        'deletedAt'
-    ];
+    protected $protectFields    = false;
+    protected $allowedFields    = [];
 
     // Dates
     protected $useTimestamps = true;
@@ -304,8 +288,9 @@ class SalesOrderExportModel extends Model
                 ->where('sales_contract_detail_id', $sd['id'])
                 ->findAll();
 
+            $qtyInput = 0;
             $qtySisa = 0;
-            $totalSisa = 0;
+            $totalInput = 0;
 
             foreach ($salesContractSize as $s) {
 
@@ -343,11 +328,14 @@ class SalesOrderExportModel extends Model
                         'total' => $s['total'],
                         //-------------------------------
                         'qty_sisa' => $totalQtySisa,
-                        'total_sisa' => $s['harga'] * $totalQtySisa
+                        'qty_input' => $totalQtySisa,
+                        'total_sisa' => $s['harga'] * $totalQtySisa,
+                        'total_input' => $s['harga'] * $totalQtySisa
                     ]);
 
+                    $qtyInput += $totalQtySisa;
                     $qtySisa += $totalQtySisa;
-                    $totalSisa += $s['harga'] * $totalQtySisa;
+                    $totalInput += $s['harga'] * $qtyInput;
                 } else {
                     // PAS EDIT
                     $salesOrderDetailExport = $salesOrderExportDetailModel
@@ -377,12 +365,16 @@ class SalesOrderExportModel extends Model
                             'harga' => $s['harga'],
                             'total' => $s['total'],
                             //-------------------------------
-                            'qty_sisa' => $salesOrderDetailExport['qty'],
-                            'total_sisa' => $s['harga'] * $salesOrderDetailExport['qty']
+                            'qty_sisa' => $salesOrderDetailExport['qty'] + $totalQtySisa,
+                            'qty_input' => $salesOrderDetailExport['qty'],
+                            'total_sisa' => $s['harga'] * ($salesOrderDetailExport['qty'] + $totalQtySisa),
+                            'total_input' => $s['harga'] * $$salesOrderDetailExport['qty']
+
                         ]);
 
-                        $qtySisa += $salesOrderDetailExport['qty'];
-                        $totalSisa += $s['harga'] * $salesOrderDetailExport['qty'];
+                        $qtyInput +=  $salesOrderDetailExport['qty'];
+                        $qtySisa += $salesOrderDetailExport['qty'] + $totalQtySisa;
+                        $totalInput += $s['harga'] * $qtyInput;
                     }
                 }
             }
@@ -400,7 +392,8 @@ class SalesOrderExportModel extends Model
                 'total_harga' => $sd['total_harga'],
                 //--------------------------
                 'qty_sisa' => $qtySisa,
-                'total_sisa' => $totalSisa,
+                'qty_input' => $qtyInput,
+                'total_input' => $totalInput,
                 'size_breakdown' => $sizeBreakdown
             ]);
         }

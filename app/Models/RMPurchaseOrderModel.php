@@ -536,6 +536,7 @@ class RMPurchaseOrderModel extends Model
         $selectQry = "
         suppliers.no_npwp AS supplierNpwp,
         suppliers.name AS supplierName, 
+        rm_purchase_orders.id AS po_id, 
         rm_purchase_orders.po_no AS poNum, 
         rm_purchase_orders.po_date AS poDate, 
         rm_purchase_orders.barang_id,
