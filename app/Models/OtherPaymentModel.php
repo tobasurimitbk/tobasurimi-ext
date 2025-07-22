@@ -159,12 +159,12 @@ class OtherPaymentModel extends Model
             } elseif (strpos($divisiUpper, 'CANNING') !== false) {
                 $kodeDivisi = ($jenis == 'MERAH') ? 'CNM' : 'CNK';
                 $divisiKey = 'CANNING';
-            } elseif (strpos($divisiUpper, 'FRZI') !== false) {
+            } elseif (strpos($divisiUpper, 'FROZENI') !== false) {
                 $kodeDivisi = ($jenis == 'MERAH') ? 'FRM' : 'FRK';
-                $divisiKey = 'FRZI';
-            } elseif (strpos($divisiUpper, 'FRZII') !== false) {
+                $divisiKey = 'FROZENI';
+            } elseif (strpos($divisiUpper, 'FROZENII') !== false) {
                 $kodeDivisi = ($jenis == 'MERAH') ? 'FSM' : 'FSK';
-                $divisiKey = 'FRZII';
+                $divisiKey = 'FROZENII';
             } elseif (strpos($divisiUpper, 'GLOBAL') !== false) {
                 $kodeDivisi = ($jenis == 'MERAH') ? 'GBM' : 'GBK';
                 $divisiKey = 'GLOBAL';
@@ -201,11 +201,11 @@ class OtherPaymentModel extends Model
                         $searchPatterns[] = 'CNM/' . $thn . '/' . $bln . '/';
                         $searchPatterns[] = 'CNK/' . $thn . '/' . $bln . '/';
                         break;
-                    case 'FRZI':
+                    case 'FROZENI':
                         $searchPatterns[] = 'FRM/' . $thn . '/' . $bln . '/';
                         $searchPatterns[] = 'FRK/' . $thn . '/' . $bln . '/';
                         break;
-                    case 'FRZII':
+                    case 'FROZENII':
                         $searchPatterns[] = 'FSM/' . $thn . '/' . $bln . '/';
                         $searchPatterns[] = 'FSK/' . $thn . '/' . $bln . '/';
                         break;
@@ -232,11 +232,11 @@ class OtherPaymentModel extends Model
                         $searchPatterns[] = 'CNM/' . $thn . '/' . $bln . '/';
                         $searchPatterns[] = 'CNK/' . $thn . '/' . $bln . '/';
                         break;
-                    case 'FRZI':
+                    case 'FROZENI':
                         $searchPatterns[] = 'FRM/' . $thn . '/' . $bln . '/';
                         $searchPatterns[] = 'FRK/' . $thn . '/' . $bln . '/';
                         break;
-                    case 'FRZII':
+                    case 'FROZENII':
                         $searchPatterns[] = 'FSM/' . $thn . '/' . $bln . '/';
                         $searchPatterns[] = 'FSK/' . $thn . '/' . $bln . '/';
                         break;
