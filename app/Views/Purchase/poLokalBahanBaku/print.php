@@ -601,9 +601,9 @@
                     <td>Dibayarkan</td>
                     <td>Rp.</td>
                     <?php if ($dataPO->pph === "Company") { ?>
-                        <td class="txt-right"><?= number_format(($nilai_total_harian - ($nilai_total_harian * $dataPO->nilai_pph2)), 2, '.', ',') ?></td>
+                        <td class="txt-right"><?= number_format(($nilai_total_harian - round(($nilai_total_harian * $dataPO->nilai_pph2), 2)), 2, '.', ',') ?></td>
                     <?php } else if ($dataPO->pph === "Supplier") { ?>
-                        <td class="txt-right"><?= number_format(($nilai_total_harian - ($nilai_total_harian * $dataPO->nilai_pph2)), 2, '.', ',') ?></td>
+                        <td class="txt-right"><?= number_format(($nilai_total_harian - round(($nilai_total_harian * $dataPO->nilai_pph2), 2)), 2, '.', ',') ?></td>
 
                     <?php } else { ?> <td class="txt-right"><?= number_format(formatter($nilai_total_harian, "STR_TO_FLOAT"), 2, '.', ',') ?></td>
                     <?php } ?>
