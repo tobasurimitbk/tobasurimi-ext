@@ -660,6 +660,8 @@
     // HIDE MODAL
     $('.btn-discard').click(function() {
 
+        allowModalClose = true;
+
         // Clear input fields
         $('.add-modal input').val('');
         $('.add-modal textarea').val('');
@@ -683,7 +685,7 @@
             });
             return false;
         }
-
+        
         if (!allowModalClose) return;
 
         // 1. Reset form utama
