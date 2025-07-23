@@ -96,10 +96,10 @@ class PanjarPinjamanTransactionModel extends Model
         // Filter tambahan
         if (!empty($addCondition['status'])) {
             if ($addCondition['status'] == 'ALL') {
-                $builder->whereIn('is_posted', ['0', '1']);
+                $builder->whereIn('ppt.is_posted', ['0', '1']);
             } else {
                 $status = $addCondition['status'] == "NOT_POSTING" ? '0' : '1';
-                $builder->where('is_posted', $status);
+                $builder->where('ppt.is_posted', $status);
             }
         }
 
