@@ -209,8 +209,8 @@
                                         <thead>
                                             <tr>
                                                 <th>Tanggal</th>
-                                                <th>Akun Debit</th>
                                                 <th>Akun Kredit</th>
+                                                <th>Akun Debit</th>
                                                 <th>Valas</th>
                                                 <th>Jumlah Transaksi</th>
                                                 <th>Kurs</th>
