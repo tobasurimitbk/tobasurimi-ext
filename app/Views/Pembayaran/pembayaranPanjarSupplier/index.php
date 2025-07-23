@@ -721,12 +721,6 @@
         resetAllForm();
     });
 
-    // $('#tipe_supplier').select2({
-    //     placeholder: "Pilih Tipe Supplier",
-    //     theme: "bootstrap-5",
-    //     dropdownParent: $(".add-modal .modal-content")
-    // });
-
     $('#tipe').select2({
         placeholder: "Pilih Tipe Panjar",
         theme: "bootstrap-5",
@@ -1089,12 +1083,16 @@
                 return;
             }
 
+            const jenisTransaksi = $('#jenis_transaksi').val();
+            
             const detail = {
                 tanggal: $('#tanggal').val(),
-                jenis_transaksi: $('#jenis_transaksi').val(),
+                jenis_transaksi: jenisTransaksi,
                 nominal_pembayaran: $('#nominal_pembayaran').val(),
                 akun_kas: $('#akun_kas').val(),
+                akun_kas_name: $('#akun_kas option:selected').text(), // Tambahkan ini
                 akun_selisih: $('#akun_selisih').val(),
+                akun_selisih_name: $('#akun_selisih option:selected').text(), // Tambahkan ini
                 keterangan: $('#keterangan_detail').val()
             };
 
@@ -1109,7 +1107,7 @@
             editingIndex = -1;
             $('.btn-update-detail').hide();
             $('.btn-add-detail').show();
-        }   
+        }  
 
 
         // Event handler untuk tombol update
