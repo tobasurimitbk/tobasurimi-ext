@@ -1983,7 +1983,7 @@ class LaporanSupplierLokalBB extends BaseController
             // Alokasikan subsidi dari perhitungan per PO
             $poSubsidi = $subsidiPerPO[$poKey] ?? null;
             if ($poSubsidi) {
-                $proporsi = round($qty / $totalQtyPerPO[$poKey], 2);
+                $proporsi = $qty / $totalQtyPerPO[$poKey];
                 $dppSubsidi = $poSubsidi['dppSubsidi'] * $proporsi;
                 $pphSubsidi = $poSubsidi['pphSubsidi'] * $proporsi;
                 $totalSubsidi = $poSubsidi['totalSubsidi'] * $proporsi;
@@ -2051,7 +2051,7 @@ class LaporanSupplierLokalBB extends BaseController
             $totalSummary['totalBulanan'] += $totalBulanan;
             $totalSummary['subsidi'] += $dppSubsidi;
             $totalSummary['pphSubsidi'] += $pphSubsidi;
-            $totalSummary['totalSubsidi'] += $totalSubsidi;
+            // $totalSummary['totalSubsidi'] += $totalSubsidi;
             $totalSummary['totalRow'] += $totalRow;
         }
 
@@ -2072,8 +2072,14 @@ class LaporanSupplierLokalBB extends BaseController
         $paginatedData = array_slice($flatData, ($currentPage - 1) * $pageSize, $pageSize);
 
         // Format output
+        $totalSubsidiFinal = 0;
+        $totalRowFinal = 0;
         foreach ($paginatedData as $i => &$row) {
             $row['no'] = ($currentPage - 1) * $pageSize + $i + 1;
+            $row['totalSubsidi'] = $row['subsidi'] - $row['pphSubsidi'];
+            $row['totalRow'] = $row['totalUmum'] + $row['totalHarian'] + $row['totalBulanan'] + $row['totalSubsidi'];
+            $totalSubsidiFinal += $row['totalSubsidi'];
+            $totalRowFinal += $row['totalRow'];
             foreach ($row as $key => $val) {
                 if (is_numeric($val) && $key !== 'no') {
                     $row[$key] = number_format($val, 2, '.', ',');
@@ -2084,7 +2090,13 @@ class LaporanSupplierLokalBB extends BaseController
         // Format total summary
         $formattedSummary = [];
         foreach ($totalSummary as $key => $val) {
-            $formattedSummary[$key] = number_format($val, 2, '.', ',');
+            if ($key === 'totalSubsidi') {
+                $formattedSummary[$key] = number_format($totalSubsidiFinal, 2, '.', ',');
+            } else if ($key === 'totalRow') {
+                $formattedSummary[$key] = number_format($totalRowFinal, 2, '.', ',');
+            } else {
+                $formattedSummary[$key] = number_format($val, 2, '.', ',');
+            }
         }
 
         echo json_encode([
