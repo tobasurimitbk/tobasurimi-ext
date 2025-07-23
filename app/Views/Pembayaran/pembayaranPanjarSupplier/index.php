@@ -797,9 +797,9 @@
             placeholder: "Pilih Metode Pembayaran"
         });
 
-        // Jika bukan silent mode, pasang event handler
+        // Jika bukan silent mode, pasang event handler khusus untuk generate nomor
         if (!silent) {
-            $('#jenis, #divisi_id, #bank_id, #payment_method').off('change').on('change', function() {
+            $('#jenis, #divisi_id, #bank_id, #payment_method').off('change.select2-generate').on('change.select2-generate', function() {
                 handleFieldChange(this);
             });
         }
@@ -949,27 +949,58 @@
 
                     details = [];
 
-                    // Inisialisasi Select2 dalam mode SILENT (tanpa event handler)
-                    initSelect2(true);
+                    // Inisialisasi Select2 dalam mode normal TAPI dengan namespace event
+                    initSelect2();
 
-                    // Set nilai ke form TANPA memicu event change
+                    // Set nilai ke form dengan trigger khusus yang tidak memicu generate
                     $('#id').val(res.data.transaction.id);
                     $('#no_transaksi').val(res.data.transaction.no_transaction);
                     
-                    // Gunakan .val().trigger('change.select2') khusus untuk Select2
+                    // Gunakan trigger internal Select2 tanpa memicu event kita
                     $('#divisi_id').val(res.data.transaction.divisi_id).trigger('change.select2');
                     $('#payment_method').val(res.data.transaction.payment_method).trigger('change.select2');
                     $('#bank_id').val(res.data.transaction.bank_id).trigger('change.select2');
                     $('#jenis').val(res.data.transaction.type).trigger('change.select2');
                     
-                    // Pasang kembali event handler NORMAL setelah semua nilai di-set
-                    initSelect2();
-
-                    // Lanjutkan dengan field lainnya...
+                    // Set field lainnya
                     $('#tipe_supplier').val(res.data.supplier?.type || '');
                     $('#keterangan').val(res.data.transaction.keterangan || '');
 
-                    // ... (kode lainnya tetap sama)
+                    // Simpan supplier ID untuk keperluan re-select setelah append dropdown
+                    if (res.data.supplier) {
+                        selectedSupplierId = res.data.supplier.id;
+                    }
+
+                    // Populate detail data
+                    res.data.details.forEach(detail => {
+                        const newDetail = {
+                            id: detail.id,
+                            tanggal: detail.payment_date,
+                            jenis_transaksi: detail.jenis_transaksi,
+                            nominal_pembayaran: greatFormatRupiah(detail.nominal_pembayaran),
+                            akun_kas: detail.akun_kas.id,
+                            akun_kas_name: detail.akun_kas.name || $('#akun_kas option[value="' + detail.akun_kas + '"]').text(),
+                            akun_selisih: detail.akun_selisih.id,
+                            akun_selisih_name: detail.akun_selisih.name || $('#akun_selisih option[value="' + detail.akun_selisih + '"]').text(),
+                            keterangan: detail.keterangan,
+                        };
+                        details.push(newDetail);
+                    });
+
+                    // Refresh tabel detail - PASTIKAN fungsi ini dipanggil
+                    refreshDetailsTable();
+
+                    // Handle post status
+                    if (res.data.transaction.is_posted == 1) {
+                        $(".delete-form, .btn-submit-form").hide();
+                        $(".create-form input, .create-form select, .btn-add-detail").prop("disabled", true);
+                    } else {
+                        $(".delete-form, .btn-submit-form").show();
+                        $(".create-form input, .create-form select, .btn-add-detail").prop("disabled", false);
+                    }
+
+                    // Trigger supplier list update
+                    $('#tipe_supplier').trigger('change');
 
                 } else {
                     modal.modal("hide");
