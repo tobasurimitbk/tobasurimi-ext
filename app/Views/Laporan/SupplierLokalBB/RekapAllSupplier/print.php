@@ -199,7 +199,7 @@
                         'dppBulanan' => 0,
                         'pphBulanan' => 0,
                         'totalBulanan' => 0,
-                        'dppSubsidi' => 0,
+                        'subsidi' => 0,
                         'pphSubsidi' => 0,
                         'totalSubsidi' => 0,
                         'totalRow' => 0,
@@ -232,7 +232,7 @@
                             <td class="col-amount text-right"><?= number_format($group['totalBulanan'], 2); ?></td>
 
                             <!-- Subsidi -->
-                            <td class="col-amount text-right"><?= number_format($group['dppSubsidi'], 2); ?></td>
+                            <td class="col-amount text-right"><?= number_format($group['subsidi'], 2); ?></td>
                             <td class="col-amount text-right"><?= number_format($group['pphSubsidi'], 2); ?></td>
                             <td class="col-amount text-right"><?= number_format($group['totalSubsidi'], 2); ?></td>
 
@@ -251,7 +251,7 @@
                         $subTotal['dppBulanan'] += $group['dppBulanan'];
                         $subTotal['pphBulanan'] += $group['pphBulanan'];
                         $subTotal['totalBulanan'] += $group['totalBulanan'];
-                        $subTotal['dppSubsidi'] += $group['dppSubsidi'];
+                        $subTotal['subsidi'] += $group['subsidi'];
                         $subTotal['pphSubsidi'] += $group['pphSubsidi'];
                         $subTotal['totalSubsidi'] += $group['totalSubsidi'];
                         $subTotal['totalRow'] += $group['totalRow'];
@@ -275,7 +275,7 @@
                         <td class="col-amount text-right"><?= number_format($subTotal['pphBulanan'], 2); ?></td>
                         <td class="col-amount text-right"><?= number_format($subTotal['totalBulanan'], 2); ?></td>
 
-                        <td class="col-amount text-right"><?= number_format($subTotal['dppSubsidi'], 2); ?></td>
+                        <td class="col-amount text-right"><?= number_format($subTotal['subsidi'], 2); ?></td>
                         <td class="col-amount text-right"><?= number_format($subTotal['pphSubsidi'], 2); ?></td>
                         <td class="col-amount text-right"><?= number_format($subTotal['totalSubsidi'], 2); ?></td>
 

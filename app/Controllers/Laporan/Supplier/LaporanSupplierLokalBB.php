@@ -1479,6 +1479,8 @@ class LaporanSupplierLokalBB extends BaseController
         $addCondition = [
             "dateStart"    => $this->request->getGet("dateStart") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getGet("dateStart")))) : "",
             "dateEnd"      => $this->request->getGet("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getGet("dateEnd")))) : "",
+            "sort"         => 'rm_purchase_orders.po_date, divisis.id',
+            "sortType"     => $this->request->getGet("sortType"),
             "supplierId"   => $this->request->getGet("filter_supplier"),
             "barangId"     => $this->request->getGet("filter_barang"),
             "warehouseId"  => $this->request->getGet("filter_warehouse"),
@@ -1772,8 +1774,8 @@ class LaporanSupplierLokalBB extends BaseController
                     $col = chr(65 + $i);
                     $cell = "{$col}{$rowExcel}";
                     $sheet->setCellValue($cell, $val);
-                    if ($i >= 6) {
-                        $format = $i === 6 ? '#,##0' : '#,##0.00';
+                    if ($i >= 5) {
+                        $format = $i === 5 ? '#,##0' : '#,##0.00';
                         $sheet->getStyle($cell)->getNumberFormat()->setFormatCode($format);
                     }
                 }
@@ -1799,10 +1801,11 @@ class LaporanSupplierLokalBB extends BaseController
 
             // TAMPILKAN TOTAL PER BARANG
             $sheet->setCellValue("A{$rowExcel}", "TOTAL {$barangName}");
-            $sheet->mergeCells("A{$rowExcel}:G{$rowExcel}");
+            $sheet->mergeCells("A{$rowExcel}:F{$rowExcel}");
             $sheet->getStyle("A{$rowExcel}:T{$rowExcel}")->getFont()->setBold(true);
 
             // Isi nilai total per kolom
+            $sheet->setCellValue("G{$rowExcel}", $totalBarang['qtyPO']);
             $sheet->setCellValue("H{$rowExcel}", $totalBarang['dppUmum']);
             $sheet->setCellValue("I{$rowExcel}", $totalBarang['pphUmum']);
             $sheet->setCellValue("J{$rowExcel}", $totalBarang['totalUmum']);
@@ -1818,7 +1821,7 @@ class LaporanSupplierLokalBB extends BaseController
             $sheet->setCellValue("T{$rowExcel}", $totalBarang['totalRow']);     // [BARU]
 
             // Format angka untuk total
-            $numberCols = ['H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T'];
+            $numberCols = ['G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T'];
             foreach ($numberCols as $col) {
                 $sheet->getStyle("{$col}{$rowExcel}")->getNumberFormat()->setFormatCode('#,##0.00');
             }
