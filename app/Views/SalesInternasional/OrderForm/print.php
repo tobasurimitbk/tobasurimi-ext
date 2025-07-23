@@ -117,12 +117,84 @@
 
 <body>
     <?php if (!empty($dataSO) && !empty($dataSODetail)) { ?>
+
+        <table border="0" style="width: 100%;">
+            <tr style="vertical-align: top;">
+                <?php if ($company['id'] != 15): ?>
+                    <td>
+                        <div style="text-align: right; margin-left:-20px; margin-right:40px; ">
+                            <img src="<?= $company['logo'] ?>" style="width: 150px; text-align:right; margin-top:-17px" alt="">
+                        </div>
+                    </td>
+                <?php endif; ?>
+                <?php if ($company['id'] == 1 || $company['id'] == 2): ?>
+                    <td>
+                        <h1 style="margin-top:-10px; margin-left:-30px;">
+                            <b><?= strtoupper($company['holding_company']) ?></b>
+                            <?php if ($company['id'] == 1): ?>
+                                <!-- Ini Kim 1 Yha -->
+                                <b>
+                                    PLANT I
+                                </b>
+                            <?php endif; ?>
+                        </h1>
+                        <table style="width: 100%; margin-top:-15px; margin-left:-30px; font-size:12px;">
+
+                            <tr style="vertical-align: top;">
+                                <td style="width: 50px;">Office</td>
+                                <td>:</td>
+                                <td>
+                                    <?= $company['office_kop'] ?>
+                                </td>
+                            </tr>
+                            <tr style="vertical-align: top;">
+                                <td>Factory</td>
+                                <td>:</td>
+                                <td><b><?= $company['factory'] ?></b></td>
+                            </tr>
+                        </table>
+                    </td>
+                <?php endif ?>
+                <?php if ($company['id'] == 15): ?>
+                    <td style="text-align: center;">
+                        <h1 style="margin-top: -10px;">
+                            <b><?= strtoupper($company['holding_company']) ?></b>
+                        </h1>
+                        <table style="width: 100%; margin-top: -15px; font-size: 12px;">
+                            <tr>
+                                <td style="text-align: center;">
+                                    <?= $company['factory'] ?>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+
+                <?php endif; ?>
+
+                <?php if ($company['id'] == 16): ?>
+                    <td style="text-align: left;">
+                        <h1 style="margin-top: -10px;">
+                            <b><?= strtoupper($company['holding_company']) ?></b>
+                        </h1>
+                        <table style="width: 100%; margin-top: -15px; font-size: 12px;">
+                            <tr>
+                                <td style="text-align: left;">
+                                    <?= str_replace('?', '', $company['factory']) ?>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+
+                <?php endif; ?>
+            </tr>
+        </table>
+        <hr style="margin-top: -1px;">
+
         <div class="header">
             <div class="txt-center">
                 <h3>
-                    <?= strtoupper($dataSO->holding_company) ?> (<?= $dataSO->company ?>) <br>
-                    <span style="margin-top: 10px;">
-                        ORDER FORM #<?= $dataSO->total_container ?>
+                    <span style="margin-top: -20px;">
+                        ORDER FORM <?= $dataSO->container ?>
                     </span>
                 </h3>
             </div>
@@ -131,35 +203,37 @@
                 <tr>
                     <td>
                         <table class="label">
-                            <tr>
-                                <td>CONSIGNE / PEMBELI</td>
-                                <td>:</td>
-                                <td><?= $dataSO->customer_name ?></td>
-                            </tr>
+                            <?php if ($displayPrice == "true") : ?>
+                                <tr>
+                                    <td>CONSIGNEE</td>
+                                    <td>:</td>
+                                    <td><?= $dataSO->customer_name ?></td>
+                                </tr>
+                            <?php endif ?>
                             <tr>
                                 <td>TAX ID#</td>
                                 <td>:</td>
                                 <td><?= $dataSO->tax_id ?></td>
                             </tr>
                             <tr>
-                                <td>DESTINATION / TUJUAN</td>
+                                <td>DESTINATION</td>
                                 <td>:</td>
                                 <td><?= $dataSO->dicharge_port ?></td>
                             </tr>
                             <tr>
                                 <td>DEADLINE</td>
                                 <td>:</td>
-                                <td><?= $dataSO->shipment_date ?></td>
+                                <td><?= $dataSO->deadline ?></td>
                             </tr>
                         </table>
                     </td>
                     <td>
                         <table class="label" style="width: 100%;">
-                            <tr style="text-align: right;">
+                            <!-- <tr style="text-align: right;">
                                 <td>ORDER NO</td>
                                 <td>:</td>
                                 <td style="width: 150px;"><?= $dataSO->sales_order_export_no ?></td>
-                            </tr>
+                            </tr> -->
                             <tr style="text-align: right;">
                                 <td>CONTRACT NO</td>
                                 <td>:</td>
@@ -198,7 +272,7 @@
                         <th style="padding: 6px; text-align: left; font-weight: bold; border: 1px solid #ddd;">
                             DESCRIPTION OF GOODS
                             <span style="float: right;">
-                                HARGA (<?= $dataSO->mata_uang ?>) <br>
+                                PRICE (<?= $dataSO->mata_uang ?>) <br>
                                 <?= $dataSO->tipe_harga . " " . ($dataSO->tipe_harga == "FOB" ? $dataSO->loading_port : $dataSO->dicharge_port) ?>
                             </span>
                         </th>
@@ -267,11 +341,13 @@
                                         'packing' => ['label' => 'Packing', 'width' => '8%'],
                                         'can' => ['label' => 'Can', 'width' => '7%'],
                                         'cased' => ['label' => 'Case', 'width' => '7%'],
+                                        'case' => ['label' => 'Case', 'width' => '7%'],
                                         'kg' => ['label' => 'Kg', 'width' => '7%'],
                                         'lb' => ['label' => 'LB', 'width' => '7%'],
                                         'inner_box' => ['label' => 'Inner', 'width' => '8%'],
                                         'pc' => ['label' => 'PC', 'width' => '7%'],
                                         'bag' => ['label' => 'Bag', 'width' => '7%'],
+                                        'cup' => ['label' => 'Cup', 'width' => '6%'],
                                         'persen' => ['label' => '%', 'width' => '6%'],
                                         'remark' => ['label' => 'Remarks', 'width' => '10%'],
                                         'palet' => ['label' => 'Pallet', 'width' => '10%']
@@ -330,7 +406,12 @@
                                                     <tr>
                                                         <?php foreach ($columns_to_show as $col => $col_data): ?>
                                                             <?php if ($col != 'persen'): ?>
-                                                                <td style="padding: 3px; border: 1px solid #ddd;"><?= $breakdown[$col] ?></td>
+                                                                <td style="padding: 3px; border: 1px solid #ddd;">
+                                                                    <?= $breakdown[$col] ?> <br>
+                                                                    <?php if (!empty($breakdown["note_" . $col])): ?>
+                                                                        (<?= $breakdown["note_" . $col] ?>)
+                                                                    <?php endif; ?>
+                                                                </td>
                                                             <?php endif; ?>
                                                         <?php endforeach; ?>
 
@@ -404,15 +485,24 @@
                     }
 
                     // Handle others untuk order form (can be positive or negative)
-                    $others_value_so = 0;
-                    if ($dataSO->additional_detail_price > 0) {
-                        $others_value = (float) $dataSO->additional_detail_price;
-                        if ($dataSO->additional_detail_type == "PLUS") {
-                            $total_adjustments += $others_value;
+                    // $others_value_so = 0;
+                    // if ($dataSO->additional_detail_price > 0) {
+                    //     $others_value = (float) $dataSO->additional_detail_price;
+                    //     if ($dataSO->additional_detail_type == "PLUS") {
+                    //         $total_adjustments += $others_value;
+                    //     } else {
+                    //         $total_adjustments -= $others_value;
+                    //     }
+                    // }
+
+                    foreach ($dataSalesExportAdditional as $d) {
+                        if ($d['additional_detail_type'] == "PLUS") {
+                            $total_adjustments += $d['additional_detail_price'];
                         } else {
-                            $total_adjustments -= $others_value;
+                            $total_adjustments -= $d['additional_detail_price'];
                         }
                     }
+
 
                     // Palet fumigation
                     if ($dataSO->palet_fumigation > 0) {
@@ -498,15 +588,15 @@
                     <?php endif; ?>
 
                     <!-- Additional Details -->
-                    <?php if ($dataSO->additional_detail_price > 0): ?>
+                    <?php foreach ($dataSalesExportAdditional as $d): ?>
                         <tr style="font-weight: bold; background-color: #e9ecef; font-size:10px;" class="price">
                             <td style="padding: 6px; border: 1px solid #ddd;"></td>
                             <td style="padding: 6px; border: 1px solid #ddd; text-align: right;">
-                                <span style="float: left;"><?= $dataSO->additional_detail_docs ?></span>
-                                <?= number_format($dataSO->additional_detail_price, 2) ?>
+                                <span style="float: left;"><?= $d['additional_detail'] ?></span>
+                                <?= number_format($d['additional_detail_price'], 2) ?>
                             </td>
                         </tr>
-                    <?php endif; ?>
+                    <?php endforeach; ?>
 
                     <!-- Final Amount Row -->
                     <tr style="font-weight: bold; background-color: #e9ecef; font-size:10px;">
@@ -696,29 +786,27 @@
                     </tr>
 
                     <?php if (count($dataSalesOrderSpecs) != 0): ?>
-                        <tr>
-                            <b>
-                                UPDATE PRODUCT SPECS
-                            </b>
-                            <table style="width: 100%;" border="0">
-                                <?php foreach ($dataSalesOrderSpecs as $d): ?>
-
+                        <div style="margin: 10px 0;">
+                            <div style="font-weight: bold; margin-bottom: 5px;">PRODUCT SPECS</div>
+                            <table style="width: auto; border-collapse: collapse; margin-left: 10px;">
+                                <thead>
                                     <tr>
-                                        <td style="width: 100px;">
-                                            <?= $d['grade'] ?>
-                                        </td>
-                                        <td style="width: 10px;">
-                                            :
-                                        </td>
-                                        <td>
-                                            <?= $d['specification'] ?>
-                                        </td>
+                                        <th style="text-align: left; padding: 4px 8px; border-bottom: 1px solid #000;">GRADE</th>
+                                        <th style="text-align: left; padding: 4px 8px; border-bottom: 1px solid #000;">SPECIFICATIONS</th>
                                     </tr>
-                                <?php endforeach; ?>
+                                </thead>
+                                <tbody>
+                                    <?php foreach ($dataSalesOrderSpecs as $d): ?>
+                                        <tr>
+                                            <td style="width: 100px; padding: 4px 8px;"><?= htmlspecialchars($d['grade']) ?></td>
+                                            <td style="padding: 4px 8px;"><?= htmlspecialchars($d['specification']) ?></td>
+                                        </tr>
+                                    <?php endforeach; ?>
+                                </tbody>
                             </table>
-
-                        </tr>
+                        </div>
                     <?php endif; ?>
+
                     <tr>
                         <td>
                             <b>

@@ -6,6 +6,7 @@ use App\Controllers\BaseController;
 use App\Models\BanksModel;
 use App\Models\CustomerModel;
 use App\Models\BarangMasterSalesModel;
+use App\Models\CompaniesModel;
 use App\Models\CountryModel;
 use App\Models\EmployeesModel;
 use App\Models\DivisisModel;
@@ -41,6 +42,7 @@ class SalesKontrak extends BaseController
     protected $bankModel;
     protected $salesContractSizeBreakdownModel;
     protected $salesContractRevisionModel;
+    protected $companyModel;
 
     public function __construct()
     {
@@ -63,6 +65,7 @@ class SalesKontrak extends BaseController
         $this->bankModel = new BanksModel();
         $this->salesContractSizeBreakdownModel = new SalesContractSizeBreakdownModel();
         $this->salesContractRevisionModel = new SalesContractRevisionModel();
+        $this->companyModel = new CompaniesModel();
     }
 
     public function index()
@@ -256,6 +259,7 @@ class SalesKontrak extends BaseController
                 "status_closed"         => count($isClosed) > 0 ? '1' : '0',
                 "keterangan_unpost"         => $data->keterangan_unpost,
                 "jumlah_unpost"             => $data->jumlah_unpost,
+                "divisi" => $data->divisi
             ]);
         }
 
@@ -639,7 +643,8 @@ class SalesKontrak extends BaseController
             'salesKontrak' => $salesKontrak,
             'customer' => $this->customerModel->find($salesKontrak['customer_id']),
             'salesKontrakdetail' => $salesKontrakDetail,
-            'revisionList' => $this->salesContractRevisionModel->where('sales_contract_id', $id)->findAll()
+            'revisionList' => $this->salesContractRevisionModel->where('sales_contract_id', $id)->findAll(),
+            "company" => $this->companyModel->where('id', $salesKontrak['company_id'])->first(),
         ];
 
         $this->dompdf->loadHtml(view('SalesInternasional/SalesKontrak/print', $data));

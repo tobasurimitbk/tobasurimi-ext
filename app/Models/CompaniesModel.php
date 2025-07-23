@@ -10,25 +10,11 @@ class CompaniesModel extends Model
     protected $primaryKey = 'id';
     protected $useAutoIncrement = true;
     protected $useSoftDeletes   = true;
-    protected $allowedFields = [
-        'id',
-        'logo',
-        'company',
-        'holding_company',
-        'address',
-        'province_id',
-        'city_id',
-        'zip_code',
-        'phone',
-        'email',
-        'invoice_account',
-        'createdAt',
-        'updatedAt',
-        'deletedAt'
-    ];
+    protected $allowedFields = [];
     protected $createdField  = 'createdAt';
     protected $updatedField  = 'updatedAt';
     protected $deletedField  = 'deletedAt';
+    protected $protectFields    = false;
 
     public function get_by_in_id($id)
     {

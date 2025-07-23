@@ -48,11 +48,11 @@
                             <tr>
                                 <th>No</th>
                                 <th onclick="changeSort('sales_contract_no')" class="sort">No. SC</th>
+                                <th onclick="changeSort('divisi')" class="sort">Department</th>
                                 <th onclick="changeSort('customer_name')" class="sort">Buyer</th>
                                 <th onclick="changeSort('dicharge_port')" class="sort">Dicharge Port</th>
                                 <th onclick="changeSort('shipment_date')" class="sort">Shipment Date</th>
                                 <th onclick="changeSort('createdAt')" class="sort">Creation Date</th>
-                                <th class="sort">Unpost Description</th>
                                 <th class="sort">Number of Unposts</th>
                                 <th>Action</th>
                             </tr>
@@ -148,6 +148,9 @@
                 data: "sales_contract_no",
                 className: "text-left"
             }, {
+                data: "divisi",
+                className: "text-left",
+            }, {
                 data: "customer_name",
                 className: "text-left",
             }, {
@@ -158,9 +161,6 @@
                 className: "text-left",
             }, {
                 data: "createdAt",
-                className: "text-left",
-            }, {
-                data: "keterangan_unpost",
                 className: "text-left",
             }, {
                 data: "jumlah_unpost",
