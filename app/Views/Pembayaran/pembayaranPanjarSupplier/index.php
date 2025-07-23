@@ -624,8 +624,6 @@
             $.ajax({
                 url: "<?= base_url('panjar-supplier/list-supplier'); ?>",
                 method: "GET",
-                beforeSend: setLoading,
-                complete: stopLoading,
                 data: { type_supplier: typeSupplier },
                 dataType: "json",
                 success: function(res) {
@@ -822,12 +820,9 @@
         $(".title-name").text("Tambah Data Panjar & Pinjaman");
         $(".delete-btn").hide();
         $(".add-modal").modal("show");
+        initSelect2(); 
         $(".btn-submit-form").show();
         $(".create-form input, .create-form select, .btn-add-detail").prop("disabled", false);
-    });
-
-    $('.add-modal').on('shown.bs.modal', function () {
-        initSelect2(); // Jalankan saat modal benar-benar sudah tampil
     });
 
 
@@ -881,9 +876,7 @@
                         processData: false,
                         contentType: false,
                         headers: { "X-CSRF-TOKEN": csrf },
-                        beforeSend: startLoading,
                         success: function(response) {
-                            stopLoading();
                             if (response.status) {
                                 showAlert('success', response.message, function() {
                                     $(".add-modal").modal("hide");
@@ -894,7 +887,6 @@
                             }
                         },
                         error: function(response) {
-                            stopLoading();
                             if (response.responseJSON) {
                                 showAlert('error', response.responseJSON.message || 'Data Gagal Disimpan, coba Lagi');
                             } else {
@@ -1038,8 +1030,6 @@
                     url: "<?= base_url("panjar-supplier/update-status"); ?>",
                     data: { id: id, status: status },
                     headers: { "X-CSRF-TOKEN": csrfToken },
-                    beforeSend: setLoading,
-                    complete: stopLoading,
                     method: "POST",
                     dataType: "json",
                     success: function(response) {
@@ -1067,8 +1057,6 @@
                     url: "<?= base_url("panjar-supplier/delete"); ?>",
                     data: { id: id },
                     headers: { "X-CSRF-TOKEN": csrfToken },
-                    beforeSend: setLoading,
-                    complete: stopLoading,
                     method: "POST",
                     dataType: "json",
                     success: function(response) {
@@ -1151,13 +1139,13 @@
         });
     }
 
-    function setLoading() {
-        $('.btn-submit-form').prop('disabled', true).html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Memproses...');
-    }
+    // function setLoading() {
+    //     $('.btn-submit-form').prop('disabled', true).html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Memproses...');
+    // }
 
-    function stopLoading() {
-        $('.btn-submit-form').prop('disabled', false).html('Simpan Semua');
-    }
+    // function stopLoading() {
+    //     $('.btn-submit-form').prop('disabled', false).html('Simpan Semua');
+    // }
 
     function changeSort(val) {
         if (sort !== val) {
