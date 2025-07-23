@@ -953,7 +953,7 @@
                     $('#payment_method').val(res.data.transaction.payment_method).trigger('change');
                     $('#bank_id').val(res.data.transaction.bank_id).trigger('change');
                     $('#jenis').val(res.data.transaction.type).trigger('change');
-                    $('#tipe_supplier').val(res.data.supplier?.type || '');
+                    $('#tipe_supplier').val(res.data.supplier?.type).trigger('change');
                     $('#keterangan').val(res.data.transaction.keterangan || '');
 
                     // Populate supplier dropdown
