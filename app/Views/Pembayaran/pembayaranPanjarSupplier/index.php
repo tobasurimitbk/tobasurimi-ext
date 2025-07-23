@@ -688,11 +688,7 @@
             });
             return false;
         }
-    });
-
-    // Reset handler with SweetAlert and proper cleanup
-    $('#add_modal').on('hidden.bs.modal', function() {
-        // Only proceed if closing was allowed
+        
         if (!allowModalClose) return;
 
         // 1. Reset form utama
