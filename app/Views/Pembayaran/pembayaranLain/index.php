@@ -700,6 +700,7 @@
                     }
                 }
             }
+            
         });
 
         $('#jumlah').keyup(function() {
@@ -747,7 +748,35 @@
             }
         }
 
-
+        function updateKeteranganParent(newKeterangan) {
+            // Get current textarea value
+            const textarea = $('#keterangan_parent');
+            let currentValue = textarea.val().trim();
+            
+            // Skip if new keterangan is empty
+            if (!newKeterangan || newKeterangan.trim() === '') {
+                return;
+            }
+            
+            // Split existing values into array (and clean them)
+            let keteranganList = currentValue.split(',')
+                .map(item => item.trim())
+                .filter(item => item !== '');
+            
+            // Check if value already exists (case insensitive)
+            const exists = keteranganList.some(item => 
+                item.toLowerCase() === newKeterangan.trim().toLowerCase()
+            );
+            
+            // Append if not exists
+            if (!exists) {
+                if (keteranganList.length > 0) {
+                    textarea.val(currentValue + ', ' + newKeterangan.trim());
+                } else {
+                    textarea.val(newKeterangan.trim());
+                }
+            }
+        }
 
         function getNilaiKurs(id) {
             $.ajax({
@@ -836,6 +865,7 @@
             kurs: $('#kurs').val(),
             jumlah_idr: $('#jumlah_idr').val(),
             jenis_pembayaran: jenisPembayaran
+            updateKeteranganParent(detail.keterangan);
         };
 
         // Get the old keterangan before updating
@@ -1073,11 +1103,11 @@
                 jumlah_idr: $('#jumlah_idr').val(),
                 jenis_pembayaran: jenisPembayaran
             };
-
             details.push(detail);
             refreshDetailsTable();
             clearDetailForm();
             refreshValidation(); // bersihin styling error kalau sudah valid
+            updateKeteranganParent(detail.keterangan);
         });
 
         // Refresh details table
