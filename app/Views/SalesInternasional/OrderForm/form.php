@@ -7,6 +7,11 @@
         padding: 0.35rem !important;
         vertical-align: middle;
     }
+
+    .form-switch-lg .form-check-input {
+        width: 4rem;
+        height: 1.5rem;
+    }
 </style>
 
 <?php if (session()->get('theme') == "dark"): ?>
@@ -41,7 +46,7 @@
             </a>
             <?php if (!empty($dataSalesExport)) { ?>
                 <?php if (can('Penjualan Ekspor', 'Order Form', 'p')): ?>
-                    <button class="btn btn-warning btn-print float-right">
+                    <button class="btn btn-warning btn-print float-right" onclick="print('<?= encrypt($dataSalesExport->sales_order_export_id) ?>')">
                         Print
                     </button>
                 <?php endif; ?>
@@ -104,10 +109,11 @@
                                 class="form-select divisi_id"
                                 aria-label="Floating label select example"
                                 name="divisi_id"
+                                <?= !empty($dataSalesExport) ? 'disabled' : '' ?>
                                 id="divisi_id">
                                 <option value=""></option>
                                 <?php foreach ($dataDivisi as $d) : ?>
-                                    <option value="<?= $d['id'] ?>">
+                                    <option <?= !empty($dataSalesExport) ? ($dataSalesExport->divisi_id == $d['id'] ? 'selected' : '') : '' ?> value="<?= $d['id'] ?>">
                                         <?= $d['divisi'] ?>
                                     </option>
                                 <?php endforeach; ?>
@@ -118,8 +124,9 @@
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <?php if (!empty($dataSalesExport)) { ?>
-                                <input readonly autocomplete="one-time-code" value="<?= $dataSalesExport->sales_contract_id ?>" type="hidden" class="form-control sales_kontrak_id" id="sales_kontrak_id" name="sales_kontrak_id" placeholder="Sales Kontrak">
-                                <input readonly autocomplete="one-time-code" value="<?= $dataSalesExport->sales_contract_no ?>" type="text" class="form-control sales_kontrak_no" id="sales_kontrak_no" name="sales_kontrak_no" placeholder="Sales Kontrak">
+                                <select <?= !empty($dataSalesExport) ? 'disabled' : '' ?> class="form-select sales_contract_id" name="sales_contract_id" id="sales_contract_id">
+                                    <option selected value="<?= $dataSalesKontrak['id'] ?>"><?= $dataSalesKontrak['sales_contract_no'] ?></option>
+                                </select>
                             <?php } ?>
                             <?php if (empty($dataSalesExport)) { ?>
                                 <select class="form-select sales_contract_id" name="sales_contract_id" id="sales_contract_id">
@@ -142,7 +149,7 @@
                         <div class="form-floating mb-3" style="height: 50px;">
                             <div class="input-group input-group-password">
                                 <div class="form-floating mb-3" style="height: 50px;">
-                                    <input autocomplete="one-time-code" class="form-control input-picker tanggal" id="tanggal" name="tanggal" placeholder="Sales Order Date" value="<?= date('d/m/Y')  ?>">
+                                    <input <?= !empty($dataSalesExport) ? ($dataSalesExport->status == "POSTED" ? 'readonly' : '') : '' ?> autocomplete="one-time-code" class="form-control input-picker tanggal" id="tanggal" name="tanggal" placeholder="Sales Order Date" value="<?= !empty($dataSalesExport) ? date('d/m/Y', strtotime($dataSalesExport->tanggal)) : date('d/m/Y')  ?>">
                                     <label for="floatingInput">Sales Order Date</label>
                                 </div>
                                 <div class="input-group-prepend group-prepend-password align-items-center">
@@ -153,31 +160,31 @@
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3">
-                            <input autocomplete="one-time-code" type="text" class="form-control tax_id" id="tax_id" name="tax_id" placeholder="Tax Id (Optional)">
+                            <input <?= !empty($dataSalesExport) ? ($dataSalesExport->status == "POSTED" ? 'readonly' : '') : '' ?> autocomplete="one-time-code" value="<?= !empty($dataSalesExport) ? $dataSalesExport->tax_id : '' ?>" type="text" class="form-control tax_id" id="tax_id" name="tax_id" placeholder="Tax Id (Optional)">
                             <label for="floatingInput">Tax ID (Optional)</label>
                         </div>
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3">
-                            <input autocomplete="one-time-code" type="text" class="form-control consigne" id="consigne" name="consigne" placeholder="Consigne / Buyer" readonly>
+                            <input autocomplete="one-time-code" type="text" class="form-control consigne" id="consigne" name="consigne" placeholder="Consigne / Buyer" readonly value="<?= !empty($dataSalesExport) ? $dataSalesExport->customer_name : '' ?>">
                             <label for="floatingInput">Consigne / Buyer</label>
                         </div>
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3">
-                            <input autocomplete="one-time-code" type="text" class="form-control destination" id="destination" name="destination" placeholder="Destination" readonly>
+                            <input autocomplete="one-time-code" type="text" class="form-control destination" id="destination" name="destination" placeholder="Destination" readonly value="<?= !empty($dataSalesExport) ? $dataSalesExport->dicharge_port : '' ?>">
                             <label for="floatingInput">Destination</label>
                         </div>
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3">
-                            <input autocomplete="one-time-code" type="text" class="form-control deadline" id="deadline" name="deadline" placeholder="Deadline" readonly>
+                            <input autocomplete="one-time-code" type="text" class="form-control deadline" id="deadline" name="deadline" placeholder="Deadline" readonly value="<?= !empty($dataSalesExport) ? $dataSalesExport->shipment_date : '' ?>">
                             <label for="floatingInput">Deadline</label>
                         </div>
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3">
-                            <input autocomplete="one-time-code" type="text" class="form-control po_no" id="po_no" name="po_no" placeholder="PO Number" readonly>
+                            <input autocomplete="one-time-code" type="text" class="form-control po_no" id="po_no" name="po_no" placeholder="PO Number" readonly value="<?= !empty($dataSalesExport) ? $dataSalesExport->customer_po_no : '' ?>">
                             <label for="floatingInput">PO No</label>
                         </div>
                     </div>
@@ -221,25 +228,25 @@
                 <div class="row mt-3">
                     <div class="col-md-4">
                         <div class="form-floating mb-3">
-                            <input autocomplete="one-time-code" type="text" class="form-control commision" id="commision" name="commision" placeholder="Commision (Optional)">
+                            <input autocomplete="one-time-code" type="text" class="form-control commision" id="commision" name="commision" placeholder="Commision (Optional)" value="<?= !empty($dataSalesExport) ? $dataSalesExport->commision : '' ?>">
                             <label for="floatingInput">Commision (Optional)</label>
                         </div>
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3">
-                            <input autocomplete="one-time-code" type="text" class="form-control palet_fumigation" id="palet_fumigation" name="palet_fumigation" placeholder="Pallet & Fumigation (Optional)">
+                            <input autocomplete="one-time-code" type="text" class="form-control palet_fumigation" id="palet_fumigation" name="palet_fumigation" placeholder="Pallet & Fumigation (Optional)" value="<?= !empty($dataSalesExport) ? $dataSalesExport->palet_fumigation : '' ?>">
                             <label for="floatingInput">Pallet & Fumigation (Optional)</label>
                         </div>
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3">
-                            <input autocomplete="one-time-code" type="text" class="form-control palet_fumigation_price" id="palet_fumigation_price" name="palet_fumigation_price" placeholder="Pallet & Fumigation Number (Optional)" oninput="this.value = greatFormatRupiah(this.value)">
+                            <input autocomplete="one-time-code" type="text" class="form-control palet_fumigation_price" id="palet_fumigation_price" name="palet_fumigation_price" value="<?= !empty($dataSalesExport) ? number_format($dataSalesExport->palet_fumigation_price) : '' ?>" placeholder="Pallet & Fumigation Number (Optional)" oninput="this.value = greatFormatRupiah(this.value)">
                             <label for="floatingInput">Pallet & Fumigation Number (Optional)</label>
                         </div>
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" value="" type="text" class="form-control additional_detail" id="additional_detail" name="additional_detail" placeholder="Additional Details (Optional)">
+                            <input autocomplete="one-time-code" value="<?= !empty($dataSalesExport) ? $dataSalesExport->additional_detail_docs : '' ?>" type="text" class="form-control additional_detail_docs" id="additional_detail_docs" name="additional_detail_docs" placeholder="Additional Details (Optional)">
                             <label for="floatingInput">Additional Details (Optional)</label>
                         </div>
                     </div>
@@ -247,12 +254,12 @@
                         <div class="input-group">
                             <div class="input-group-prepend">
                                 <select name="additional_detail_type" id="additional_detail_type" class="form-control additional_detail_type">
-                                    <option value="PLUS">PLUS (+)</option>
-                                    <option value="MINUS">MINUS (-)</option>
+                                    <option <?= !empty($dataSalesExport) ? ($dataSalesExport->additional_detail_type == "PLUS" ? 'selected' : '') : '' ?> value="PLUS">PLUS (+)</option>
+                                    <option <?= !empty($dataSalesExport) ?  ($dataSalesExport->additional_detail_type == "MINUS" ? 'selected' : '') : '' ?> value="MINUS">MINUS (-)</option>
                                 </select>
                             </div>
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" value="" type="text" oninput="this.value = greatFormatRupiah(this.value)" class="form-control additional_detail_price" id="additional_detail_price" name="additional_detail_price" placeholder="Additional Detail Price (Optional)">
+                                <input autocomplete="one-time-code" value="<?= !empty($dataSalesExport) ? number_format($dataSalesExport->additional_detail_price) : '' ?>" type="text" oninput="this.value = greatFormatRupiah(this.value)" class="form-control additional_detail_price" id="additional_detail_price" name="additional_detail_price" placeholder="Additional Detail Price (Optional)">
                                 <label for="floatingInput">Additional Details Number (Optional)</label>
                             </div>
                         </div>
@@ -269,31 +276,31 @@
                 <div class="row">
                     <div class="col-md-4">
                         <div class="form-floating mb-3">
-                            <input autocomplete="one-time-code" type="text" class="form-control payment_term" id="payment_term" name="payment_term" placeholder="Payment Term">
+                            <input autocomplete="one-time-code" value="<?= !empty($dataSalesExport) ? $dataSalesExport->payment_term : '' ?>" type="text" class="form-control payment_term" id="payment_term" name="payment_term" placeholder="Payment Term">
                             <label for="floatingInput">Payment Term</label>
                         </div>
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3">
-                            <input autocomplete="one-time-code" type="text" class="form-control shipment_an" id="shipment_an" name="shipment_an" placeholder="Shipment A/N (Optional)">
+                            <input autocomplete="one-time-code" value="<?= !empty($dataSalesExport) ? $dataSalesExport->shipment_an : '' ?>" type="text" class="form-control shipment_an" id="shipment_an" name="shipment_an" placeholder="Shipment A/N (Optional)">
                             <label for="floatingInput">Shipment A/N (Optional)</label>
                         </div>
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3">
-                            <input autocomplete="one-time-code" type="text" class="form-control consigne_docs" id="consigne_docs" name="consigne_docs" placeholder="Consign (Optional)">
+                            <input autocomplete="one-time-code" value="<?= !empty($dataSalesExport) ? $dataSalesExport->consigne_docs : '' ?>" type="text" class="form-control consigne_docs" id="consigne_docs" name="consigne_docs" placeholder="Consign (Optional)">
                             <label for="floatingInput">Consigne (Optional)</label>
                         </div>
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3">
-                            <input autocomplete="one-time-code" type="text" class="form-control notify_party" id="notify_party" name="notify_party" placeholder="Notify Party (Optional)">
+                            <input autocomplete="one-time-code" value="<?= !empty($dataSalesExport) ? $dataSalesExport->notify_party : '' ?>" type="text" class="form-control notify_party" id="notify_party" name="notify_party" placeholder="Notify Party (Optional)">
                             <label for="floatingInput">Notify Party (Optional)</label>
                         </div>
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3">
-                            <input autocomplete="one-time-code" type="text" class="form-control additional_detail_docs" id="additional_detail_docs" name="additional_detail_docs" placeholder="Additional Details (Optional)">
+                            <input autocomplete="one-time-code" value="<?= !empty($dataSalesExport) ? $dataSalesExport->additional_detail_docs : '' ?>" type="text" class="form-control additional_detail_docs" id="additional_detail_docs" name="additional_detail_docs" placeholder="Additional Details (Optional)">
                             <label for="floatingInput">Additional Details (Optional)</label>
                         </div>
                     </div>
@@ -308,42 +315,42 @@
                 <div class="row">
                     <div class="col-sm-6 mt-2 mb-3">
                         <label class="text-dark">Product Specs (Optional)</label>
-                        <textarea class="form-control tiny product_specs" name="product_specs" id="product_specs"></textarea>
+                        <textarea class="form-control tiny product_specs" name="product_specs" id="product_specs"><?= !empty($dataSalesExport) ? $dataSalesExport->product_specs : '' ?></textarea>
                     </div>
 
                     <div class="col-sm-6 mt-2 mb-3">
                         <label class="text-dark">Processing Method (Optional)</label>
-                        <textarea class="form-control tiny processing_method" name="processing_method" id="processing_method"></textarea>
+                        <textarea class="form-control tiny processing_method" name="processing_method" id="processing_method"><?= !empty($dataSalesExport) ? $dataSalesExport->processing_method : '' ?></textarea>
                     </div>
 
                     <div class="col-sm-6 mt-3 mb-3">
                         <label class="text-dark">Packaging (Optional)</label>
-                        <textarea class="form-control tiny packaging" name="packaging" id="packaging"></textarea>
+                        <textarea class="form-control tiny packaging" name="packaging" id="packaging"><?= !empty($dataSalesExport) ? $dataSalesExport->packaging : '' ?></textarea>
                     </div>
 
                     <div class="col-sm-6 mt-3 mb-3">
                         <label class="text-dark">Code Stamping (Optional)</label>
-                        <textarea class="form-control tiny code_stamping" name="code_stamping" id="code_stamping"></textarea>
+                        <textarea class="form-control tiny code_stamping" name="code_stamping" id="code_stamping"><?= !empty($dataSalesExport) ? $dataSalesExport->code_stamping : '' ?></textarea>
                     </div>
 
                     <div class="col-sm-6 mt-3 mb-3">
                         <label class="text-dark">Loading (Optional)</label>
-                        <textarea class="form-control tiny loading" name="loading" id="loading"></textarea>
+                        <textarea class="form-control tiny loading" name="loading" id="loading"><?= !empty($dataSalesExport) ? $dataSalesExport->loading : '' ?></textarea>
                     </div>
 
                     <div class="col-sm-6 mt-3 mb-3">
                         <label class="text-dark">Foto Loading (Optional)</label>
-                        <textarea class="form-control tiny foto_loading" name="foto_loading" id="foto_loading"></textarea>
+                        <textarea class="form-control tiny foto_loading" name="foto_loading" id="foto_loading"><?= !empty($dataSalesExport) ? $dataSalesExport->foto_loading : '' ?></textarea>
                     </div>
 
                     <div class="col-sm-6 mt-3 mb-3">
                         <label class="text-dark">Stuffing (Optional)</label>
-                        <textarea class="form-control tiny stuffing" name="stuffing" id="stuffing"></textarea>
+                        <textarea class="form-control tiny stuffing" name="stuffing" id="stuffing"><?= !empty($dataSalesExport) ? $dataSalesExport->stuffing : '' ?></textarea>
                     </div>
 
                     <div class="col-sm-6 mt-3 mb-3">
                         <label class="text-dark">Additional Details (Optional)</label>
-                        <textarea class="form-control tiny additional_detail" name="additional_detail" id="additional_detail"></textarea>
+                        <textarea class="form-control tiny additional_detail" name="additional_detail" id="additional_detail"><?= !empty($dataSalesExport) ? $dataSalesExport->additional_detail : '' ?></textarea>
                     </div>
                 </div>
 
@@ -574,6 +581,39 @@
         </div>
     </div>
 </div>
+
+<div class="modal print-modal" tabindex="1">
+    <div class="modal-dialog" style="min-width: 900px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title title-secondary">Print Configuration</h5>
+            </div>
+            <form>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form">
+                                <label class="text-dark">
+                                    Display Price in Printout ? (If Active, Price Show in Printout OrderForm)
+                                </label>
+                                <div class="form-control border-0 custom-toggle-switch" style="margin-top: -15px;">
+                                    <div class="form-check form-switch form-switch-lg">
+                                        <input class="form-check-input display_price" type="checkbox" value="1" name="display_price" id="display_price">
+                                        <label class="form-check-label"></label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-discard btn-hide-print mr-3">Back</button>
+                    <button type="button" class="btn btn-submit-form" onclick="printAction()">Print Order Form</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 <script>
     const csrfToken = '<?= csrf_token() ?>';
     var listDataSalesKontrak = [];
@@ -581,32 +621,29 @@
     // HIDE DETAIL SPECS LIST
     $('#component-detail-specs-list').hide();
 
+
     $(document).ready(function() {
         <?php if (!empty($dataSalesExport)) { ?>
-            <?php if (!empty($dataSalesExportDetail)) { ?>
-                <?php foreach ($dataSalesExportDetail as $sales) { ?>
-                    listBarang.push({
-                        id: "<?= $sales->barang_id ?>",
-                        barang_name: "<?= $sales->barang_name ?>",
-                        harga: "<?= $sales->hargaContract ?>",
-                        id_detail_sales_order: "<?= $sales->sales_order_export_detail_id ?>",
-                        kemasan: "<?= $sales->kemasan ?>",
-                        kode_barang: "<?= $sales->barang_kode ?>",
-                        qty: <?= floatval($sales->qtyContract)  ?>,
-                        remark: "<?= $sales->remark ?>",
-                        satuan_order_id: "<?= $sales->satuan_id ?>",
-                        satuan_order_name: "<?= $sales->kode_satuan ?>",
-                        total: <?= floatval($sales->totalHargaContract) ?>,
-                        qtyOrder: <?= floatval($sales->qty) ?>,
-                        hargaOrder: <?= floatval($sales->harga_barang) ?>,
-                        totalHargaOrder: <?= floatval($sales->total_harga_barang) ?>,
-                    });
-                <?php } ?>
-                drawTable();
-            <?php } ?>
+            listDataSalesKontrak = <?= json_encode($dataSalesExportDetail) ?>;
+            <?php foreach ($dataSalesExportSpecs as $s) : ?>
+                listDetailSpecs.push({
+                    id_detail_specs_list: "<?= $s['id'] ?>",
+                    grade: "<?= $s['grade'] ?>",
+                    specification: "<?= $s['specification'] ?>",
+                });
+            <?php endforeach; ?>
+            drawTable(listDataSalesKontrak);
+            drawTableDetailSpecs(listDetailSpecs);
         <?php } else { ?>
 
         <?php } ?>
+
+
+        <?php if (!empty($dataSalesExport)): ?>
+            <?php if ($dataSalesExport->divisi == "PTS"): ?>
+                $('#component-detail-specs-list').show();
+            <?php endif; ?>
+        <?php endif; ?>
 
         // Sales Kontrak
         $('.sales_contract_id').select2({
@@ -963,6 +1000,21 @@
 
                             const csrf = $(`[name="${csrfToken}"]`);
                             let data = new FormData(document.querySelector("#form-parent"));
+                            let royaltyPrice = destroyFormatRupiah($('#royalty_price').val());
+                            let rebatePrice = destroyFormatRupiah($('#rebate_price').val());
+                            let canDeductionPrice = destroyFormatRupiah($('#can_deduction_price').val());
+                            let estimatedFreightPrice = destroyFormatRupiah($('#estimated_freight_price').val());
+                            let paletFumigationPrice = destroyFormatRupiah($('#palet_fumigation_price').val());
+                            let additionalDetailPrice = destroyFormatRupiah($('#additional_detail_price').val());
+                            let othersPrice = destroyFormatRupiah($('#others_price').val());
+
+                            data.set('royalty_price', royaltyPrice);
+                            data.set('rebate_price', rebatePrice);
+                            data.set('can_deduction_price', canDeductionPrice);
+                            data.set('estimated_freight_price', estimatedFreightPrice);
+                            data.set('palet_fumigation_price', paletFumigationPrice);
+                            data.set('additional_detail_price', additionalDetailPrice);
+                            data.set('others_price', othersPrice);
 
                             data.append("listDetailSpecs", JSON.stringify(listDetailSpecs));
                             data.append("listDataSalesKontrak", JSON.stringify(listDataSalesKontrak));
@@ -1207,6 +1259,7 @@
 
     function getDetailSalesKontrak() {
         var salesContractId = $('#sales_contract_id option:selected').val();
+        var id = $('#id').val();
 
         $.ajax({
             url: `<?= base_url("order-form-internasional/get/detail-sales-kontrak"); ?>`,
@@ -1219,7 +1272,8 @@
                 stopLoading();
             },
             data: {
-                sales_contract_id: salesContractId
+                sales_contract_id: salesContractId,
+                id: id,
             }, // Memasukkan id ke dalam data yang dikirim
             success: function(res) {
                 listDataSalesKontrak = res.data;
@@ -1331,7 +1385,7 @@
 
                     const actionButton = `
                     <?php if (!empty($dataSalesExport)) : ?>
-                        <?php if ($dataSalesExport['status'] == "POSTED") : ?>
+                        <?php if ($dataSalesExport->status == "POSTED") : ?>
                             -
                         <?php else : ?>
                             <button type="button" class="btn btn-warning posting-spp mr-1" onclick="detailRow('${item.id}', '${size.id_detail_breakdown}')">
@@ -1397,7 +1451,7 @@
                                 name="royalty_price"
                                 class="form-control form-control-sm"
                                 oninput="this.value = greatFormatRupiah(this.value);recalculateGrandTotal();validateMaxPrice(this)"
-                                data-max="${listDataSalesKontrak.royaltyPriceFinal}"
+                                data-max="${listDataSalesKontrak.royaltyPriceMax}"
                                 value="${greatFormatRupiah(listDataSalesKontrak.royaltyPriceFinal)}" 
                         </td>
                         <td></td>
@@ -1417,7 +1471,7 @@
                                 name="rebate_price"
                                 class="form-control form-control-sm"
                                 oninput="this.value = greatFormatRupiah(this.value);recalculateGrandTotal();validateMaxPrice(this)"
-                                data-max="${listDataSalesKontrak.rebatePriceFinal}"
+                                data-max="${listDataSalesKontrak.rebatepriceMax}"
                                 value="${greatFormatRupiah(listDataSalesKontrak.rebatePriceFinal)}" 
                         </td>
                         <td></td>
@@ -1436,7 +1490,7 @@
                                 name="can_deduction_price"
                                 class="form-control form-control-sm"
                                 oninput="this.value = greatFormatRupiah(this.value);recalculateGrandTotal();validateMaxPrice(this)"
-                                data-max="${listDataSalesKontrak.canDeductionPriceFinal}"
+                                data-max="${listDataSalesKontrak.canDeductionPriceMax}"
                                 value="${greatFormatRupiah(listDataSalesKontrak.canDeductionPriceFinal)}" 
                         </td>
                         <td></td>
@@ -1455,7 +1509,7 @@
                                 name="estimated_freight_price"
                                 class="form-control form-control-sm"
                                 oninput="this.value = greatFormatRupiah(this.value);recalculateGrandTotal();validateMaxPrice(this)"
-                                data-max="${listDataSalesKontrak.estimatedFreightPriceFinal}"
+                                data-max="${listDataSalesKontrak.estimatedFreightPriceMax}"
                                 value="${greatFormatRupiah(listDataSalesKontrak.estimatedFreightPriceFinal)}" 
                         </td>
                         <td></td>
@@ -1481,7 +1535,7 @@
                                 name="others_price"
                                 class="form-control form-control-sm"
                                 oninput="this.value = greatFormatRupiah(this.value);recalculateGrandTotal();validateMaxPrice(this)"
-                                data-max="${listDataSalesKontrak.othersPriceFinal}"
+                                data-max="${listDataSalesKontrak.othersPriceMax}"
                                 value="${greatFormatRupiah(listDataSalesKontrak.othersPriceFinal)}" 
                         </td>
                         <td></td>
@@ -1496,7 +1550,7 @@
                 ${additionalPrice}
                 <tr class="bg-light">
                     <td colspan="4" class="text-end"><b>TOTAL</b></td>
-                    <td style="text-align:left;"><b id="total_txt">${greatFormatRupiah(totalTotalHarga.toFixed(2))}</b></td>
+                    <td style="text-align:left;"><b id="total_txt">${greatFormatRupiah(totalTotalHarga)}</b></td>
                     <td></td>
                     <td></td>
                 </tr>
@@ -1525,7 +1579,7 @@
                 newRow.append($('<td>').text(item.grade));
                 newRow.append($('<td>').text(item.specification));
                 newRow.append($('<td>').html(
-                    <?php if (!empty($dataSalesExport)) : ?> <?php if ($dataSalesExport['status'] == "POSTED") : ?> `-`
+                    <?php if (!empty($dataSalesExport)) : ?> <?php if ($dataSalesExport->status == "POSTED") : ?> `-`
                         <?php else : ?> `
                         <button type="button" class="btn btn-warning posting-spp mr-1" onclick="detailRowSpecs('${item.id_detail_specs_list}')">
                                 <i class="fa fa-pencil fa-sm" aria-hidden="true"></i>
@@ -1711,10 +1765,6 @@
         }
     }
 
-    const print = function(url) {
-        window.open(url, "_blank");
-    }
-
     function preventNegativeInput(inputElement) {
         var inputValue = inputElement.value;
         var numericValue = inputValue.replace(/[^0-9.]/g, '');
@@ -1750,6 +1800,26 @@
             $('#sales_order_export_no').attr('readonly', false);
         }
 
+    }
+
+    const print = function(id) {
+        $('.id').val(id);
+        $('.print-modal').modal('show');
+    }
+
+    $('.btn-hide-print').click(function() {
+        $('.print-modal').modal('hide');
+    });
+
+    const printAction = function() {
+        var id = $('.id').val();
+        var display_price = $('.display_price').is(':checked');
+        if (id == "") {
+            alert("Failed Print : Order form not found");
+        } else {
+            var url = "/order-form-internasional/print/" + id + '?display_price=' + display_price
+            window.open(url, "_blank");
+        }
     }
 </script>
 <?= $this->endSection(); ?>

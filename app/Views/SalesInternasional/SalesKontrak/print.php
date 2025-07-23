@@ -235,7 +235,8 @@
                                 'pc' => ['label' => 'PC', 'width' => '7%'],
                                 'bag' => ['label' => 'Bag', 'width' => '7%'],
                                 'persen' => ['label' => '%', 'width' => '6%'],
-                                'remark' => ['label' => 'Remarks', 'width' => '10%']
+                                'remark' => ['label' => 'Remarks', 'width' => '10%'],
+                                'palet' => ['label' => 'Pallet', 'width' => '10%']
                             ];
 
                             // Check which columns have data
