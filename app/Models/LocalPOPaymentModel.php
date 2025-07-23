@@ -1394,6 +1394,12 @@ class LocalPOPaymentModel extends Model
             } elseif (strpos($divisiUpper, 'FROZENII') !== false) {
                 $kodeDivisi = ($jenis == 'MERAH') ? 'FSM' : 'FSK';
                 $divisiKey = 'FROZENII';
+            } elseif (strpos($divisiUpper, 'FROZEN1') !== false) {
+                $kodeDivisi = ($jenis == 'MERAH') ? 'FRM' : 'FRK';
+                $divisiKey = 'FROZEN1';
+            } elseif (strpos($divisiUpper, 'FROZEN2') !== false) {
+                $kodeDivisi = ($jenis == 'MERAH') ? 'FSM' : 'FSK';
+                $divisiKey = 'FROZEN2';
             } elseif (strpos($divisiUpper, 'FRZI') !== false) {
                 $kodeDivisi = ($jenis == 'MERAH') ? 'FRM' : 'FRK';
                 $divisiKey = 'FRZI';
@@ -1444,6 +1450,14 @@ class LocalPOPaymentModel extends Model
                         $searchPatterns[] = 'FSM/' . $thn . '/' . $bln . '/';
                         $searchPatterns[] = 'FSK/' . $thn . '/' . $bln . '/';
                         break;
+                    case 'FROZEN1':
+                        $searchPatterns[] = 'FRM/' . $thn . '/' . $bln . '/';
+                        $searchPatterns[] = 'FRK/' . $thn . '/' . $bln . '/';
+                        break;
+                    case 'FROZEN2':
+                        $searchPatterns[] = 'FSM/' . $thn . '/' . $bln . '/';
+                        $searchPatterns[] = 'FSK/' . $thn . '/' . $bln . '/';
+                        break;
                     case 'FRZI':
                         $searchPatterns[] = 'FRM/' . $thn . '/' . $bln . '/';
                         $searchPatterns[] = 'FRK/' . $thn . '/' . $bln . '/';
@@ -1480,6 +1494,14 @@ class LocalPOPaymentModel extends Model
                         $searchPatterns[] = 'FRK/' . $thn . '/' . $bln . '/';
                         break;
                     case 'FROZENII':
+                        $searchPatterns[] = 'FSM/' . $thn . '/' . $bln . '/';
+                        $searchPatterns[] = 'FSK/' . $thn . '/' . $bln . '/';
+                        break;
+                    case 'FROZEN1':
+                        $searchPatterns[] = 'FRM/' . $thn . '/' . $bln . '/';
+                        $searchPatterns[] = 'FRK/' . $thn . '/' . $bln . '/';
+                        break;
+                    case 'FROZEN2':
                         $searchPatterns[] = 'FSM/' . $thn . '/' . $bln . '/';
                         $searchPatterns[] = 'FSK/' . $thn . '/' . $bln . '/';
                         break;
@@ -1546,4 +1568,6 @@ class LocalPOPaymentModel extends Model
         
         return $displayPrefix . $counterNext;
     }
+
+
 }

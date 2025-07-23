@@ -154,7 +154,7 @@ class PanjarSupplier extends BaseController
                         "supplier_id" => $this->request->getVar('supplier_id'),
                         "payment_date" => date('Y-m-d', strtotime(str_replace('/', '-', $detail['tanggal']))),
                         "jenis_transaksi" => $detail['jenis_transaksi'],
-                        "total_pinjaman" => repairDouble($detail['nominal_pembayaran']),
+                        "total_pinjaman" => $detail['nominal_pembayaran'],
                         "akun_kas" => $detail['akun_kas'],
                         "akun_selisih" => $detail['akun_selisih'],
                         "keterangan" => $detail['keterangan'],
@@ -169,7 +169,7 @@ class PanjarSupplier extends BaseController
                         "supplier_id" => $this->request->getVar('supplier_id'),
                         "payment_date" => date('Y-m-d', strtotime(str_replace('/', '-', $detail['tanggal']))),
                         "jenis_panjar" => $detail['jenis_transaksi'],
-                        "total_panjar" => repairDouble($detail['nominal_pembayaran']),
+                        "total_panjar" => $detail['nominal_pembayaran'],
                         "akun_kas" => $detail['akun_kas'],
                         "akun_selisih" => $detail['akun_selisih'],
                         "keterangan" => $detail['keterangan'],
@@ -336,7 +336,7 @@ class PanjarSupplier extends BaseController
                         "supplier_id" => $this->request->getVar('supplier_id'),
                         "payment_date" => date('Y-m-d', strtotime(str_replace('/', '-', $detail['tanggal']))),
                         "jenis_transaksi" => $detail['jenis_transaksi'],
-                        "total_pinjaman" => repairDouble($detail['nominal_pembayaran']),
+                        "total_pinjaman" => $detail['nominal_pembayaran'],
                         "akun_kas" => $detail['akun_kas'],
                         "akun_selisih" => $detail['akun_selisih'],
                         "keterangan" => $detail["keterangan"],
@@ -351,7 +351,7 @@ class PanjarSupplier extends BaseController
                         "supplier_id" => $this->request->getVar('supplier_id'),
                         "payment_date" => date('Y-m-d', strtotime(str_replace('/', '-', $detail['tanggal']))),
                         "jenis_panjar" => $detail['jenis_transaksi'],
-                        "total_panjar" => repairDouble($detail['nominal_pembayaran']),
+                        "total_panjar" => $detail['nominal_pembayaran'],
                         "akun_kas" => $detail['akun_kas'],
                         "akun_selisih" => $detail['akun_selisih'],
                         "keterangan" => $detail["keterangan"],
@@ -610,6 +610,7 @@ class PanjarSupplier extends BaseController
         $payload = [
             "pageSize"      => $this->request->getGet("length") ?? 10,
             "currentPage"   => ($this->request->getGet("start") / ($this->request->getGet("length") ?? 10)) + 1,
+            "status"        => $this->request->getGet("status")['value'] ?? $this->request->getGet("status") ?? '',
             "search"        => $this->request->getGet("search")['value'] ?? $this->request->getGet("search") ?? '',
             "sort"          => $this->request->getGet("order")[0]['column'] ?? $this->request->getGet("sort") ?? 'payment_date',
             "sortType"      => $this->request->getGet("order")[0]['dir'] ?? $this->request->getGet("sortType") ?? 'DESC',
@@ -620,6 +621,7 @@ class PanjarSupplier extends BaseController
         $addCondition = [
             "search"        => $payload['search'],
             "sort"          => $payload['sort'],
+            "status"        => $payload['status'],
             "sortType"      => $payload['sortType'],
             "dateStart"     => $payload['dateStart'],
             "dateEnd"       => $payload['dateEnd'],
@@ -629,7 +631,6 @@ class PanjarSupplier extends BaseController
             'ppt.company_id'        => $this->this_company_id,
             'ppt.deletedAt'         => null,
         ];
-
 
         $limit = $payload["pageSize"];
         $offset = $this->request->getGet("start") ?? 0;

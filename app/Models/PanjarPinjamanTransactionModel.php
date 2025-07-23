@@ -21,6 +21,7 @@ class PanjarPinjamanTransactionModel extends Model
         'company_id',
         'bank_id',
         'divisi_id',
+        'payment_method',
         'no_transaction',
         'is_posted',
         'keterangan'
@@ -95,10 +96,10 @@ class PanjarPinjamanTransactionModel extends Model
         // Filter tambahan
         if (!empty($addCondition['status'])) {
             if ($addCondition['status'] == 'ALL') {
-                $builder->whereIn('is_posted', ['0', '1']);
+                $builder->whereIn('ppt.is_posted', ['0', '1']);
             } else {
                 $status = $addCondition['status'] == "NOT_POSTING" ? '0' : '1';
-                $builder->where('is_posted', $status);
+                $builder->where('ppt.is_posted', $status);
             }
         }
 
@@ -179,7 +180,7 @@ class PanjarPinjamanTransactionModel extends Model
         return $generatedNo;
     }
 
-    public function get_new_no(
+public function get_new_no(
         $jenis,
         $divisi,
         $paymentMethod,
@@ -228,6 +229,12 @@ class PanjarPinjamanTransactionModel extends Model
             } elseif (strpos($divisiUpper, 'FROZENII') !== false) {
                 $kodeDivisi = ($jenis == 'MERAH') ? 'FSM' : 'FSK';
                 $divisiKey = 'FROZENII';
+            } elseif (strpos($divisiUpper, 'FROZEN1') !== false) {
+                $kodeDivisi = ($jenis == 'MERAH') ? 'FRM' : 'FRK';
+                $divisiKey = 'FROZEN1';
+            } elseif (strpos($divisiUpper, 'FROZEN2') !== false) {
+                $kodeDivisi = ($jenis == 'MERAH') ? 'FSM' : 'FSK';
+                $divisiKey = 'FROZEN2';
             } elseif (strpos($divisiUpper, 'FRZI') !== false) {
                 $kodeDivisi = ($jenis == 'MERAH') ? 'FRM' : 'FRK';
                 $divisiKey = 'FRZI';
@@ -278,6 +285,14 @@ class PanjarPinjamanTransactionModel extends Model
                         $searchPatterns[] = 'FSM/' . $thn . '/' . $bln . '/';
                         $searchPatterns[] = 'FSK/' . $thn . '/' . $bln . '/';
                         break;
+                    case 'FROZEN1':
+                        $searchPatterns[] = 'FRM/' . $thn . '/' . $bln . '/';
+                        $searchPatterns[] = 'FRK/' . $thn . '/' . $bln . '/';
+                        break;
+                    case 'FROZEN2':
+                        $searchPatterns[] = 'FSM/' . $thn . '/' . $bln . '/';
+                        $searchPatterns[] = 'FSK/' . $thn . '/' . $bln . '/';
+                        break;
                     case 'FRZI':
                         $searchPatterns[] = 'FRM/' . $thn . '/' . $bln . '/';
                         $searchPatterns[] = 'FRK/' . $thn . '/' . $bln . '/';
@@ -314,6 +329,14 @@ class PanjarPinjamanTransactionModel extends Model
                         $searchPatterns[] = 'FRK/' . $thn . '/' . $bln . '/';
                         break;
                     case 'FROZENII':
+                        $searchPatterns[] = 'FSM/' . $thn . '/' . $bln . '/';
+                        $searchPatterns[] = 'FSK/' . $thn . '/' . $bln . '/';
+                        break;
+                    case 'FROZEN1':
+                        $searchPatterns[] = 'FRM/' . $thn . '/' . $bln . '/';
+                        $searchPatterns[] = 'FRK/' . $thn . '/' . $bln . '/';
+                        break;
+                    case 'FROZEN2':
                         $searchPatterns[] = 'FSM/' . $thn . '/' . $bln . '/';
                         $searchPatterns[] = 'FSK/' . $thn . '/' . $bln . '/';
                         break;

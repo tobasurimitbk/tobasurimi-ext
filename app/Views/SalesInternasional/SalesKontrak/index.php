@@ -54,7 +54,6 @@
                                 <th onclick="changeSort('createdAt')" class="sort">Creation Date</th>
                                 <th class="sort">Unpost Description</th>
                                 <th class="sort">Number of Unposts</th>
-                                <th>Status</th>
                                 <th>Action</th>
                             </tr>
                         </thead>
@@ -143,42 +142,29 @@
         searching: false,
         columns: [{
                 data: "no",
-                className: "text-center",
+                className: "text-left",
                 orderable: false
             }, {
                 data: "sales_contract_no",
-                className: "text-center"
+                className: "text-left"
             }, {
                 data: "customer_name",
-                className: "text-center"
+                className: "text-left",
             }, {
                 data: "dicharge_port",
-                className: "text-center"
+                className: "text-left",
             }, {
                 data: "shipment_date",
-                className: "text-center"
+                className: "text-left",
             }, {
                 data: "createdAt",
-                className: "text-center"
+                className: "text-left",
             }, {
                 data: "keterangan_unpost",
-                className: "text-center"
+                className: "text-left",
             }, {
                 data: "jumlah_unpost",
-                className: "text-center"
-            }, {
-                data: "id",
-                className: "text-center actions",
-                searchable: false,
-                sortable: false,
-                render: function(data, type, row) {
-                    let state = '0';
-                    if (state == '0') {
-                        return '<i data-toggle="tooltip" title="Qty Order Form Belum Lengkap" class="fa-solid fa-square text-danger"></i>';
-                    } else {
-                        return '<i data-toggle="tooltip" title="Qty Order Form Sudah Lengkap" class="fa-solid fa-square text-success"></i>';
-                    }
-                },
+                className: "text-left",
             },
             {
                 data: "id",
@@ -485,6 +471,15 @@
         const data = table.row(this).data();
         location.replace(`<?= base_url("sales-kontrak/id/"); ?>${data.id}`);
     })
+
+    const changeSort = function(val) {
+        if (sort !== val) {
+            sortType = "asc";
+            sort = val;
+        } else {
+            sortType = sortType === "asc" ? "desc" : "asc";
+        }
+    }
 </script>
 
 <?= $this->endSection(); ?>

@@ -1,13 +1,20 @@
 <?= $this->extend('layouts/template'); ?>
 <?= $this->Section('content'); ?>
-
+<style>
+    .form-switch-lg .form-check-input {
+        width: 4rem;
+        height: 1.5rem;
+    }
+</style>
 <!-- Begin Page Content -->
 <section class="section">
     <div class="section-header">
-        <h1>Sales Order Internasional</h1>
-        <a class="btn btn-show-form btn-add float-right" href="<?= base_url("order-form-internasional/create"); ?>">
-            <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
-        </a>
+        <h1>Order Form Ekspor</h1>
+        <?php if (can('Penjualan Ekspor', 'Order Form', 'c')): ?>
+            <a class="btn btn-show-form btn-add float-right" href="<?= base_url("order-form-internasional/create"); ?>">
+                <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Add New
+            </a>
+        <?php endif; ?>
     </div>
     <?= csrf_field() ?>
     <div class="card">
@@ -15,7 +22,7 @@
             <div class="row justify-content-end row-col-spp">
                 <div class="col mb-3">
                     <div class="input-group input-group-password">
-                        <input autocomplete="one-time-code" class="form-control input-picker dateStart" id="dateStart" name="dateStart" placeholder="Tanggal Mulai" value="01<?= date('/m/Y') ?>">
+                        <input autocomplete="one-time-code" class="form-control input-picker dateStart" id="dateStart" name="dateStart" placeholder="Start Date" value="01<?= date('/m/Y') ?>">
                         <div class="input-group-prepend group-prepend-password align-items-center">
                             <i style="cursor: pointer; z-index: 99; margin-bottom: 10px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-dateStart"></i>
                         </div>
@@ -23,7 +30,7 @@
                 </div>
                 <div class="col mb-3">
                     <div class="input-group input-group-password">
-                        <input autocomplete="one-time-code" class="form-control input-picker dateEnd" id="dateEnd" name="dateEnd" placeholder="Tanggal Akhir">
+                        <input autocomplete="one-time-code" class="form-control input-picker dateEnd" id="dateEnd" name="dateEnd" placeholder="End Date">
                         <div class="input-group-prepend group-prepend-password align-items-center">
                             <i style="cursor: pointer; z-index: 99; margin-bottom: 10px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-dateEnd"></i>
                         </div>
@@ -31,12 +38,12 @@
                 </div>
                 <div class="col-md-3">
                     <select class="form-select status" name="status" id="status" aria-label="Floating label select example">
-                        <option value="BELUM POSTING">STATUS : BELUM POSTING</option>
-                        <option value="SUDAH POSTING">STATUS : SUDAH POSTING</option>
+                        <option value="BELUM POSTING">STATUS : NOT POSTED</option>
+                        <option value="SUDAH POSTING">STATUS : POSTED</option>
                     </select>
                 </div>
                 <div class="col-md-3">
-                    <input autocomplete="one-time-code" class="form-control search form-out-search" placeholder="Cari No. Sales Order Form" value="" />
+                    <input autocomplete="one-time-code" class="form-control search form-out-search" placeholder="Search Data" value="" />
                 </div>
             </div>
             <div class="row">
@@ -45,15 +52,14 @@
                         <thead class="thead-dark">
                             <tr>
                                 <th>No</th>
-                                <th onclick="changeSort('sales_order_export_no')" class="sort">No. Sales Order Form</th>
-                                <th onclick="changeSort('customer_po_no')" class="sort">No. PO</th>
+                                <th onclick="changeSort('tanggal')" class="sort">Date</th>
+                                <th onclick="changeSort('sales_order_export_no')" class="sort">Order Form No</th>
+                                <th onclick="changeSort('customer_po_no')" class="sort">PO No</th>
                                 <th onclick="changeSort('customer_name')" class="sort">Buyer</th>
-                                <th onclick="changeSort('dicharge_port')" class="sort">Tujuan Pengiriman</th>
+                                <th onclick="changeSort('dicharge_port')" class="sort">Destination</th>
                                 <th onclick="changeSort('shipment_date')" class="sort">Shipment Date</th>
-                                <th onclick="changeSort('createdAt')" class="sort">Tanggal Pembuatan</th>
-                                <th onclick="changeSort('status')" class="sort">Status</th>
-                                <th class="sort">Keterangan Unpost</th>
-                                <th class="sort">Jumlah Unpost</th>
+                                <th class="sort">Unpost Description</th>
+                                <th class="sort">Number Unpost</th>
                                 <th class="sort">Action</th>
                             </tr>
                         </thead>
@@ -71,30 +77,71 @@
     <div class="modal-dialog" style="min-width: 900px;">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title title-secondary">Unposting Sales Order</h5>
+                <h5 class="modal-title title-secondary">Unposting Order Form</h5>
             </div>
-            <div class="modal-body">
-                <input type="hidden" name="id_sales_order" class="id_sales_order" id="id_sales_order">
-                <div class="row">
-                    <div class="col-md-12">
-                        <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" type="text" class="form-control keterangan_unpost" name="keterangan_unpost" id="keterangan_unpost" placeholder="Keterangan Unpost">
-                            <label for="floatingInput">Keterangan Unpost</label>
+            <form class="form-unposting">
+                <div class="modal-body">
+                    <input type="hidden" name="id" class="id" id="id">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input autocomplete="one-time-code" type="text" class="form-control date_revision" name="date_revision" id="date_revision" placeholder="Date Revision">
+                                <label for="floatingInput">Date Revision</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input autocomplete="one-time-code" type="text" class="form-control keterangan_unpost" name="keterangan_unpost" id="keterangan_unpost" placeholder="Keterangan Unpost (Opsional)">
+                                <label for="floatingInput">Note Unposting (Opsional)</label>
+                            </div>
                         </div>
                     </div>
                 </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-hide-detail btn-discard mr-3">Back</button>
+                    <button type="button" onclick="updateStatus('NEW', '-')" class="btn btn-submit-form btn-submit-detail">Un Posting</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="modal print-modal" tabindex="1">
+    <div class="modal-dialog" style="min-width: 900px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title title-secondary">Print Configuration</h5>
             </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-hide-detail btn-discard mr-3">Kembali</button>
-                <button type="button" onclick="updateStatus('NEW', 'NEW')" class="btn btn-submit-form btn-submit-detail">Un Posting</button>
-            </div>
+            <form>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form">
+                                <label class="text-dark">
+                                    Display Price in Printout ? (If Active, Price Show in Printout OrderForm)
+                                </label>
+                                <div class="form-control border-0 custom-toggle-switch" style="margin-top: -15px;">
+                                    <div class="form-check form-switch form-switch-lg">
+                                        <input class="form-check-input display_price" type="checkbox" value="1" name="display_price" id="display_price">
+                                        <label class="form-check-label"></label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-discard btn-hide-print mr-3">Back</button>
+                    <button type="button" class="btn btn-submit-form" onclick="printAction()">Print Order Form</button>
+                </div>
+            </form>
         </div>
     </div>
 </div>
 
 <script>
     const csrfToken = '<?= csrf_token() ?>';
-    let sort = "sales_order_export_no";
+    let sort = "tanggal";
     let sortType = "desc";
 
     const table = $('.dataTable').DataTable({
@@ -138,32 +185,32 @@
             className: "text-center",
             orderable: false
         }, {
+            data: "tanggal",
+            className: "text-left"
+        }, {
             data: "sales_order_export_no",
-            className: "text-center"
+            className: "text-left"
         }, {
             data: "customer_po_no",
-            className: "text-center"
+            className: "text-left"
         }, {
             data: "customer_name",
-            className: "text-center"
+            className: "text-left"
         }, {
             data: "dicharge_port",
-            className: "text-center"
+            className: "text-left"
         }, {
             data: "shipment_date",
-            className: "text-center"
-        }, {
-            data: "createdAt",
-            className: "text-center"
-        }, {
-            data: "status",
-            className: "text-center"
+            className: "text-left"
         }, {
             data: "keterangan_unpost",
-            className: "text-center"
+            className: "text-left",
+            orderable: false
+
         }, {
             data: "jumlah_unpost",
-            className: "text-center"
+            className: "text-left",
+            orderable: false
         }, {
             data: "id",
             className: "text-center actions",
@@ -177,8 +224,14 @@
                     if (used == "NOT USED") {
                         return `
                         <?php if (can('Penjualan Ekspor', 'Order Form', 'a')): ?>
-                            <button data-toggle="tooltip" title="Posting" onclick="updateStatus('${id}', 'POSTED')" class="btn btn-success posting-spp">
+                            <button data-toggle="tooltip" title="Posting" onclick="updateStatus('${id}', '1')" class="btn btn-success posting-spp">
                                 <i class="fa fa-paper-plane fa-sm" aria-hidden="true"></i>
+                            </button>
+                            <?php endif; ?>
+                   
+                            <?php if (can('Penjualan Ekspor', 'Order Form', 'p')): ?>
+                            <button data-toggle="tooltip" title="Print" class="btn btn-warning btn-print" onclick="print('${id}')" style="box-shadow: none !important;">
+                                <i class="fa fa-print fa-sm" aria-hidden="true"></i>
                             </button>
                             <?php endif; ?>
                             <?php if (can('Penjualan Ekspor', 'Order Form', 'd')): ?>
@@ -186,16 +239,11 @@
                                 <i class="fa fa-trash"></i>
                             </button>
                             <?php endif; ?>
-                            <?php if (can('Penjualan Ekspor', 'Order Form', 'p')): ?>
-                            <button data-toggle="tooltip" title="Print" class="btn btn-warning btn-print" onclick="print('<?= base_url("order-form-internasional/print/"); ?>${id}')" style="box-shadow: none !important;">
-                                <i class="fa fa-print fa-sm" aria-hidden="true"></i>
-                            </button>
-                            <?php endif; ?>
                         `
                     } else {
                         return `
                             <?php if (can('Penjualan Ekspor', 'Order Form', 'p')): ?>
-                            <button data-toggle="tooltip" title="Print" class="btn btn-warning btn-print" onclick="print('<?= base_url("order-form-internasional/print/"); ?>${id}')" style="box-shadow: none !important;">
+                            <button data-toggle="tooltip" title="Print" class="btn btn-warning btn-print" onclick="print('${id}')" style="box-shadow: none !important;">
                                 <i class="fa fa-print fa-sm" aria-hidden="true"></i>
                             </button>
                             <?php endif; ?>
@@ -205,12 +253,12 @@
                     if (used == "NOT USED") {
                         return `
                             <?php if (can('Penjualan Ekspor', 'Order Form', 'ua')): ?>
-                            <button data-toggle="tooltip" title="Un Posting" onclick="updateStatus('${id}', 'UNPOST')" type="button" class="btn btn-danger" >
+                            <button data-toggle="tooltip" title="Un Posting" onclick="updateStatus('${id}', '0')" type="button" class="btn btn-danger" >
                                 <i class="fa fa-ban" aria-hidden="true"></i>
                             </button>
                             <?php endif; ?>
                             <?php if (can('Penjualan Ekspor', 'Order Form', 'ua')): ?>
-                            <button data-toggle="tooltip" title="Print" class="btn btn-warning btn-print" onclick="print('<?= base_url("order-form-internasional/print/"); ?>${id}')" style="box-shadow: none !important;">
+                            <button data-toggle="tooltip" title="Print" class="btn btn-warning btn-print" onclick="print('${id}')" style="box-shadow: none !important;">
                                 <i class="fa fa-print fa-sm" aria-hidden="true"></i>
                             </button>
                             <?php endif; ?>
@@ -218,7 +266,7 @@
                     } else {
                         return `
                             <?php if (can('Penjualan Ekspor', 'Order Form', 'p')): ?>
-                            <button data-toggle="tooltip" title="Print" class="btn btn-warning btn-print" onclick="print('<?= base_url("order-form-internasional/print/"); ?>${id}')" style="box-shadow: none !important;">
+                            <button data-toggle="tooltip" title="Print" class="btn btn-warning btn-print" onclick="print('${id}')" style="box-shadow: none !important;">
                                 <i class="fa fa-print fa-sm" aria-hidden="true"></i>
                             </button>
                             <?php endif; ?>
@@ -258,6 +306,14 @@
             table.ajax.reload();
         })
 
+
+        $(".date_revision").datepicker({
+            todayHighlight: true,
+            format: "dd/mm/yyyy",
+            orientation: "bottom auto",
+            autoclose: true
+        })
+
         $(".dateStart").datepicker({
             todayHighlight: true,
             format: "dd/mm/yyyy",
@@ -286,14 +342,30 @@
         })
 
         $(".btn-hide-detail").click(function() {
-            $(".id_sales_order").val("");
+            $(".id").val("");
             $(".keterangan_unpost").val("");
             $(".unpost-modal").modal("hide");
-        })
+        });
+
+        $('.btn-hide-print').click(function() {
+            $('.print-modal').modal('hide');
+        });
     })
 
-    const print = function(url) {
-        window.open(url, "_blank");
+    const print = function(id) {
+        $('.id').val(id);
+        $('.print-modal').modal('show');
+    }
+
+    const printAction = function() {
+        var id = $('.id').val();
+        var display_price = $('.display_price').is(':checked');
+        if (id == "") {
+            alert("Failed Print : Order form not found");
+        } else {
+            var url = "/order-form-internasional/print/" + id + '?display_price=' + display_price
+            window.open(url, "_blank");
+        }
     }
 
     const handleDelete = function(id, tipe) {
@@ -342,64 +414,97 @@
     }
 
     const updateStatus = function(id, status) {
-        if (status == "UNPOST") {
-            $(".id_sales_order").val(id);
+        if (status == 0) {
+            $(".id").val(id);
             $(".unpost-modal").modal("show");
         } else {
             if (id == 'NEW') {
-                id = $(".id_sales_order").val();
+                id = $(".id").val();
                 ket = $(".keterangan_unpost").val();
+                status = 0;
             } else {
                 id = id;
                 ket = "-";
             }
-            Swal.fire({
-                icon: 'question',
-                title: status == 'POSTED' ? 'Yakin akan diposting ?' : 'Batalkan Posting ?',
-                confirmButtonColor: '#4e73df',
-                cancelButtonColor: '#d33',
-                showCancelButton: true,
-                reverseButtons: true,
-                confirmButtonText: 'Simpan',
-                cancelButtonText: 'Kembali',
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    const csrf = $(`[name="${csrfToken}"]`);
-                    $(".id_sales_order").val("");
-                    $(".keterangan_unpost").val("");
-                    $(".unpost-modal").modal("hide");
-                    $.ajax({
-                        url: "<?= base_url("order-form-internasional/update-status"); ?>",
-                        data: {
-                            id: id,
-                            status: status,
-                            keterangan: ket,
-                        },
-                        beforeSend: function(xhr) {
-                            xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                            setLoading();
-                        },
-                        complete: function() {
-                            stopLoading();
-                        },
-                        method: "POST",
-                        dataType: "json",
-                        success: function(response) {
-                            csrf.val(response.token);
-                            if (response.status) {
-                                Swal.fire({
-                                        icon: 'success',
-                                        title: response.message,
-                                        confirmButtonColor: '#4e73df',
-                                    })
-                                    .then(() => {
-                                        table.ajax.reload()
-                                    })
-                            }
-                        },
-                    });
+
+
+            var state = true;
+            var date_revision = $('#date_revision').val();
+            if (status == 0) {
+                // MAU UNPOSTING
+                if (date_revision == "") {
+                    state = false;
+                    Swal.fire({
+                        icon: 'error',
+                        title: "Form Date Revision Required",
+                        confirmButtonColor: '#4e73df',
+                    })
                 }
-            })
+            }
+
+            if (state) {
+                Swal.fire({
+                    icon: 'question',
+                    title: status == 0 ? 'Unpost ?' : 'Post ?',
+                    confirmButtonColor: '#4e73df',
+                    cancelButtonColor: '#d33',
+                    showCancelButton: true,
+                    reverseButtons: true,
+                    confirmButtonText: 'Save',
+                    cancelButtonText: 'Back',
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        const csrf = $(`[name="${csrfToken}"]`);
+
+                        $.ajax({
+                            url: "<?= base_url("order-form-internasional/update-status"); ?>",
+                            data: {
+                                id: id,
+                                status: status,
+                                date_revision: date_revision,
+                                keterangan: ket,
+                            },
+                            beforeSend: function(xhr) {
+                                xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                                setLoading();
+                            },
+                            complete: function() {
+                                stopLoading();
+                                $(".id").val("");
+                                $(".keterangan_unpost").val("");
+                                $(".unpost-modal").modal("hide");
+                            },
+                            method: "POST",
+                            dataType: "json",
+                            success: function(response) {
+                                csrf.val(response.token);
+                                if (response.status) {
+                                    Swal.fire({
+                                            icon: 'success',
+                                            title: response.message,
+                                            confirmButtonColor: '#4e73df',
+                                        })
+                                        .then(() => {
+                                            table.ajax.reload()
+                                        })
+                                }
+                            },
+                        });
+                    }
+                })
+            }
+
+
+        }
+    }
+
+
+    const changeSort = function(val) {
+        if (sort !== val) {
+            sortType = "asc";
+            sort = val;
+        } else {
+            sortType = sortType === "asc" ? "desc" : "asc";
         }
     }
 </script>

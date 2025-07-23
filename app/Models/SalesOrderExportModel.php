@@ -42,22 +42,24 @@ class SalesOrderExportModel extends Model
 
     public function getList($condition, $addCondition, $limit = 10, $offset = 0)
     {
-        $db = \Config\Database::connect();
         $availableSort = [
             'sales_order_export_no' => 'sales_order_export.sales_order_export_no',
             'customer_name'         => 'customers.name',
             'due_date'              => 'sales_contract.due_date',
             'shipment_date'         => 'sales_contract.shipment_date',
-            'createdAt'             => 'sales_order_export.createdAt',
-            'updatedAt'             => 'sales_order_export.updatedAt',
+            'tanggal'               => 'sales_order_export.tanggal',
         ];
+
         $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
 
         $sort = $availableSort[$addCondition['sort'] ?? 'createdAt'] ?? 'sales_order_export.createdAt';
         $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'DESC';
 
-        $selectQry = "sales_order_export.*, sales_contract.*, 
-                      customers.name AS customer_name";
+        $selectQry = "sales_order_export.*, 
+                        sales_contract.customer_po_no,
+                        sales_contract.dicharge_port,
+                        sales_contract.shipment_date,
+                        customers.name AS customer_name";
         $salesDataQry = $this->asObject()
             ->select($selectQry)
             ->where($condition)
@@ -72,7 +74,8 @@ class SalesOrderExportModel extends Model
         }
 
         if ($addCondition['search']) {
-            $salesDataQry->like('sales_order_export.sales_order_export_no', $addCondition['search'])
+            $salesDataQry
+                ->like('sales_order_export.sales_order_export_no', $addCondition['search'])
                 ->orLike('sales_contract.customer_po_no', $addCondition['search'])
                 ->orLike('customers.name', $addCondition['search']);
         }
@@ -94,10 +97,10 @@ class SalesOrderExportModel extends Model
         if (!empty($addCondition['dateStart']) || !empty($addCondition['dateEnd'])) {
             $salesDataQry->groupStart(); //
             if (!empty($addCondition['dateStart'])) {
-                $salesDataQry->where('DATE(sales_order_export.createdAt) >=', $addCondition['dateStart']);
+                $salesDataQry->where('DATE(sales_order_export.tanggal) >=', $addCondition['dateStart']);
             }
             if (!empty($addCondition['dateEnd'])) {
-                $salesDataQry->where('DATE(sales_order_export.createdAt) <=', $addCondition['dateEnd']);
+                $salesDataQry->where('DATE(sales_order_export.tanggal) <=', $addCondition['dateEnd']);
             }
             $salesDataQry->groupEnd();
         }
@@ -116,12 +119,34 @@ class SalesOrderExportModel extends Model
 
     public function getById($id)
     {
-        $selectQry = "sales_order_export.*, customers.name as customer_name,sales_contract.customer_po_no,sales_contract.*";
+        $selectQry = "
+            sales_order_export.*, 
+            customers.name as customer_name,
+            sales_contract.sales_contract_no,
+            sales_contract.customer_po_no,
+            sales_contract.total_container,
+            sales_contract.dicharge_port,
+            sales_contract.shipment_date,
+            sales_contract.tipe_harga,
+            sales_contract.loading_port,
+            sales_contract.royalty,
+            sales_contract.rebate,
+            sales_contract.can_deduction,
+            sales_contract.estimated_freight,
+            sales_contract.others,
+
+
+            metadata.value as mata_uang,
+            companies.holding_company,
+            companies.company
+        ";
 
         $salesData = $this->asObject()
             ->select($selectQry)
-            ->join('sales_contract', 'sales_contract.id = sales_order_export.sales_contract_id', 'LEFT')
-            ->join('customers', 'customers.id = sales_contract.customer_id', 'LEFT')
+            ->join('sales_contract', 'sales_contract.id = sales_order_export.sales_contract_id', 'left')
+            ->join('customers', 'customers.id = sales_contract.customer_id', 'left')
+            ->join('companies', 'companies.id = sales_order_export.company_id', 'left')
+            ->join('metadata', 'metadata.id = sales_contract.currency', 'left')
             ->where('sales_order_export.deletedAt', NULL)
             ->find($id);
 
@@ -303,7 +328,7 @@ class SalesOrderExportModel extends Model
                 $totalQtySalesOrder = $result['total_qty'] ?? 0;
                 $totalQtySisa = $s['qty'] - $totalQtySalesOrder;
 
-                if ($totalQtySisa < $s['total'] && $salesOrderExportId == null) {
+                if ($totalQtySisa > 0 && $salesOrderExportId == null) {
                     // MASIH ADA SISA BRO 
                     // PAS CREATE
                     array_push($sizeBreakdown, [
@@ -368,13 +393,13 @@ class SalesOrderExportModel extends Model
                             'qty_sisa' => $salesOrderDetailExport['qty'] + $totalQtySisa,
                             'qty_input' => $salesOrderDetailExport['qty'],
                             'total_sisa' => $s['harga'] * ($salesOrderDetailExport['qty'] + $totalQtySisa),
-                            'total_input' => $s['harga'] * $$salesOrderDetailExport['qty']
+                            'total_input' => \floatval($s['harga'] * $salesOrderDetailExport['qty'])
 
                         ]);
 
                         $qtyInput +=  $salesOrderDetailExport['qty'];
                         $qtySisa += $salesOrderDetailExport['qty'] + $totalQtySisa;
-                        $totalInput += $s['harga'] * $qtyInput;
+                        $totalInput += floatval($s['harga'] * $qtyInput);
                     }
                 }
             }
@@ -393,7 +418,7 @@ class SalesOrderExportModel extends Model
                 //--------------------------
                 'qty_sisa' => $qtySisa,
                 'qty_input' => $qtyInput,
-                'total_input' => $totalInput,
+                'total_input' => \floatval($totalInput),
                 'size_breakdown' => $sizeBreakdown
             ]);
         }
@@ -414,11 +439,11 @@ class SalesOrderExportModel extends Model
 
         // SUM AN DATA
         $selectQryAdditionalSalesOrder = "
-            SUM(royalty_price),
-            SUM(rebate_price),
-            SUM(can_deduction_price),
-            SUM(estimated_freight_price),
-            SUM(others_price),
+            SUM(royalty_price) AS royalty_price,
+            SUM(rebate_price) AS rebate_price,
+            SUM(can_deduction_price) AS can_deduction_price,
+            SUM(estimated_freight_price) AS estimated_freight_price,
+            SUM(others_price) AS others_price,
             others_type
         ";
 
@@ -428,12 +453,19 @@ class SalesOrderExportModel extends Model
             ->where('deletedAt', null)
             ->first();
 
-        $royaltyPriceFinal = $royaltyPrice - ($resultAdditionalSalesOrder['royalt_price'] ?? 0);
+        $royaltyPriceFinal = $royaltyPrice - ($resultAdditionalSalesOrder['royalty_price'] ?? 0);
         $rebatePriceFinal = $rebatePrice - ($resultAdditionalSalesOrder['rebate_price'] ?? 0);
         $canDeductionPriceFinal = $canDeductionPrice - ($resultAdditionalSalesOrder['can_deduction_price'] ?? 0);
         $estimatedFreightPriceFinal = $estimatedFreightPrice - ($resultAdditionalSalesOrder['estimated_freight_price'] ?? 0);
         $othersPriceFinal = $othersPrice - ($resultAdditionalSalesOrder['others_price'] ?? 0);
         $othersTypeFinal = $othersType;
+
+        $royaltyPriceMax = $royaltyPriceFinal;
+        $rebatepriceMax = $rebatePriceFinal;
+        $canDeductionPriceMax = $canDeductionPriceFinal;
+        $estimatedFreightPriceMax = $estimatedFreightPriceFinal;
+        $othersPriceMax = $othersTypeFinal;
+
 
         if ($salesOrderExportId != null) {
             // PAS UPDATE PAKAI DEFAULT
@@ -441,7 +473,13 @@ class SalesOrderExportModel extends Model
                 ->where('sales_order_export_id', $salesOrderExportId)
                 ->first();
 
-            $royaltyPriceFinal = $salesOrderExport['royalt_price'];
+            $royaltyPriceMax  = $royaltyPriceMax + $salesOrderExport['royalty_price'];
+            $rebatepriceMax = $rebatePriceFinal + $salesOrderExport['rebate_price'];
+            $canDeductionPriceMax = $canDeductionPriceFinal + $salesOrderExport['can_deduction_price'];
+            $estimatedFreightPriceMax = $estimatedFreightPriceFinal + $salesOrderExport['estimated_freight_price'];
+            $othersPriceMax = $othersPriceFinal +  $salesOrderExport['others_price'];
+
+            $royaltyPriceFinal = $salesOrderExport['royalty_price'];
             $rebatePriceFinal = $salesOrderExport['rebate_price'];
             $canDeductionPriceFinal = $salesOrderExport['can_deduction_price'];
             $estimatedFreightPriceFinal = $salesOrderExport['estimated_freight_price'];
@@ -449,13 +487,40 @@ class SalesOrderExportModel extends Model
             $othersTypeFinal = $salesOrderExport['others_type'];
         }
 
+        // Repair
+        $salesContractDetailList = array_values(array_filter($salesContractDetailList, function ($item) {
+            if (empty($item['size_breakdown'])) {
+                // Drop jika size_breakdown kosong
+                return false;
+            }
+
+            // Cek jika semua qty_input dalam size_breakdown adalah 0
+            $allQtyInputZero = array_reduce($item['size_breakdown'], function ($carry, $sb) {
+                return $carry && ($sb['qty_input'] == 0);
+            }, true);
+
+            if ($allQtyInputZero) {
+                // Hide size_breakdown jika semua qty_input 0
+                unset($item['size_breakdown']);
+            }
+
+            return true;
+        }));
+
 
         $finalResultList = [
-            'royaltyPriceFinal' => $royaltyPriceFinal,
-            'rebatePriceFinal' => $rebatePriceFinal,
-            'canDeductionPriceFinal' => $canDeductionPriceFinal,
-            'estimatedFreightPriceFinal' => $estimatedFreightPriceFinal,
-            'othersPriceFinal' => $othersPriceFinal,
+            // Max
+            'royaltyPriceMax' => \floatval($royaltyPriceMax),
+            'rebatepriceMax' => \floatval($rebatepriceMax),
+            'canDeductionPriceMax' => \floatval($canDeductionPriceMax),
+            'estimatedFreightPriceMax' => \floatval($estimatedFreightPriceMax),
+            'othersPriceMax' => \floatval($othersPriceMax),
+            // Final Dibayar
+            'royaltyPriceFinal' => \floatval($royaltyPriceFinal),
+            'rebatePriceFinal' => \floatval($rebatePriceFinal),
+            'canDeductionPriceFinal' => \floatval($canDeductionPriceFinal),
+            'estimatedFreightPriceFinal' => \floatval($estimatedFreightPriceFinal),
+            'othersPriceFinal' => \floatval($othersPriceFinal),
             'othersTypeFinal' => $othersTypeFinal,
             'salesContractDetailList' => $salesContractDetailList,
             'salesContract' => $salesKontrak

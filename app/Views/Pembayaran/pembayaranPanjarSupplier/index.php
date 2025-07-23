@@ -1,6 +1,5 @@
 <?= $this->extend('layouts/template'); ?>
 <?= $this->Section('content'); ?>
-<meta name="csrf-token" content="<?= csrf_hash() ?>">
 
 <div class="modal add-modal" id="add_modal" tabindex="-1">
     <div class="modal-dialog" style="min-width: 1200px">
@@ -360,10 +359,9 @@
             dataSrc: "data",
             data: function(data) {
                 data.search = $(".search").val();
-                data.status = $(".is_posted").val();
                 data.dateStart = $(".dateStart").val();
                 data.dateEnd = $(".dateEnd").val();
-                data.panjar_status = $('.panjar_status option:selected').val();
+                data.status = $('.panjar_status option:selected').val();
                 data.sort = sort;
                 data.sortType = sortType;
             }
@@ -919,6 +917,9 @@
     }
 
 
+    let selectedSupplierId = null; // Global variable untuk simpan supplier ID saat edit
+
+    // Event saat klik baris table untuk edit data
     $('#dataTable tbody').on('click', 'tr td:not(.actions):not(.dataTables_empty)', function() {
         const data = table.row(this).data();
         const modal = $(".add-modal");
@@ -927,17 +928,16 @@
         modal.modal("show");
         $('#auto_generate').hide();
 
-        // AJAX to get details
+        // AJAX get detail data
         $.ajax({
             url: "panjar-supplier/id/" + data.id,
             method: "GET",
             dataType: "json",
-           success: function(res) {
+            success: function(res) {
                 if (res.status) {
                     modal.find('.modal-body').html($('#modal-template').html());
-                    isEditMode = true; // Set mode edit
-        
-                    // Simpan nilai awal
+                    isEditMode = true;
+
                     initialValues = {
                         divisi_id: res.data.transaction.divisi_id,
                         bank_id: res.data.transaction.bank_id,
@@ -945,10 +945,9 @@
                         jenis: res.data.transaction.type
                     };
 
-                    // Clear existing details
                     details = [];
-                    
-                    // Populate parent form
+
+                    // Populate form
                     $('#id').val(res.data.transaction.id);
                     $('#no_transaksi').val(res.data.transaction.no_transaction);
                     $('#divisi_id').val(res.data.transaction.divisi_id).trigger('change');
@@ -956,18 +955,18 @@
                     $('#bank_id').val(res.data.transaction.bank_id).trigger('change');
                     $('#jenis').val(res.data.transaction.type).trigger('change');
                     $('#tipe_supplier').val(res.data.supplier?.type || '');
+
                     $('#keterangan').val(res.data.transaction.keterangan || '');
 
-                    // Populate supplier dropdown
+                    // Simpan supplier ID untuk keperluan re-select setelah append dropdown
                     if (res.data.supplier) {
-                        const supplierOption = `<option value="${res.data.supplier.id}" selected>${res.data.supplier.name}</option>`;
-                        $('#supplier_id').html(supplierOption);
+                        selectedSupplierId = res.data.supplier.id;
                     }
 
-                    // Process and add each detail to the details array
+                    // Populate detail data
                     res.data.details.forEach(detail => {
                         const newDetail = {
-                            id: detail.id, // Preserve original ID for updates
+                            id: detail.id,
                             tanggal: detail.payment_date,
                             jenis_transaksi: detail.jenis_transaksi,
                             nominal_pembayaran: greatFormatRupiah(detail.nominal_pembayaran),
@@ -980,10 +979,10 @@
                         details.push(newDetail);
                     });
 
-                    // Refresh the table
+                    // Refresh tabel detail
                     refreshDetailsTable();
 
-                    // Handle posting status
+                    // Handle post status
                     if (res.data.transaction.is_posted == 1) {
                         $(".delete-form, .btn-submit-form").hide();
                         $(".create-form input, .create-form select, .btn-add-detail").prop("disabled", true);
@@ -991,6 +990,9 @@
                         $(".delete-form, .btn-submit-form").show();
                         $(".create-form input, .create-form select, .btn-add-detail").prop("disabled", false);
                     }
+
+                    // Trigger supplier list update agar dropdown di-refresh berdasarkan tipe
+                    $('#tipe_supplier').trigger('change');
 
                 } else {
                     modal.modal("hide");
@@ -1005,32 +1007,40 @@
         });
     });
 
-
-    // GET SUPPLIER BY TYPE
+    // GET SUPPLIER BY TYPE (triggered saat tipe supplier berubah)
     $('#tipe_supplier').change(function() {
         var typeSupplier = $('#tipe_supplier option:selected').val();
         if (typeSupplier != '') {
             $.ajax({
                 url: `<?= base_url('panjar-supplier/list-supplier'); ?>`,
                 method: "GET",
+                data: {
+                    type_supplier: typeSupplier,
+                },
                 beforeSend: function() {
                     setLoading();
                 },
                 complete: function() {
                     stopLoading();
                 },
-                data: {
-                    type_supplier: typeSupplier,
-                },
                 dataType: "json",
                 success: function(res) {
-                    // APPEND TO DROPDOWN
-                    appendDropdownSupplier(res.data);
+                    appendDropdownSupplier(res.data); // akan handle selected ID juga
                 }
             });
         }
-
     });
+
+    // APPEND DATA SUPPLIER BY TYPE
+    function appendDropdownSupplier(data) {
+        $(".supplier_id").empty();
+        $(".supplier_id").append(`<option value="">-- Pilih Supplier --</option>`);
+        data.forEach(function(item) {
+            const selected = (item.id == selectedSupplierId) ? 'selected' : '';
+            $(".supplier_id").append(`<option value="${item.id}" ${selected}>${item.name}</option>`);
+        });
+    }
+
 
 
     $(document).ready(function() {
@@ -1242,9 +1252,11 @@
             $(".title-name").text("Tambah Data Panjar & Pinjaman");
             $(".delete-btn").css('display', 'none');
             $(".add-modal").modal("show");
-            initSelect2()
+            initSelect2();
             $(".btn-submit-form").show();
             $(".create-form input, .create-form select, .btn-add-detail").prop("disabled", false);
+
+            selectedSupplierId = null; // Reset supplier ID saat tambah baru
         });
 
         // Handle submit form
@@ -1366,15 +1378,6 @@
         }
     });
 
-
-    // APPEND DATA SUPPLIER BY TYPE
-    function appendDropdownSupplier(data) {
-        $(".supplier_id").empty()
-        $(".supplier_id").append(`<option value=""></option>`)
-        data.forEach(function(item) {
-            $(".supplier_id").append(`<option value="${item.id}">${item.name}</option>`)
-        })
-    }
 
 
     const changeSort = function(val) {

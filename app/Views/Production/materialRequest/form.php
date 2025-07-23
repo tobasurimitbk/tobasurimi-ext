@@ -173,7 +173,7 @@
                                         <option value="<?= $s['id'] ?>"><?= $s['name']  ?></option>
                                     <?php endforeach; ?>
                                 </select>
-                                <label for="floatingInput" style="z-index: 1;">Supplier</label>
+                                <label for="floatingInput" style="z-index: 1;">Supplier (Opsional)</label>
                             </div>
                         </div>
                         <div class="col-md-4" id="vendor_barang_id_select">
