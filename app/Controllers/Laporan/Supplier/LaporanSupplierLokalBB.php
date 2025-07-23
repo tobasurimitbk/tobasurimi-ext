@@ -340,6 +340,8 @@ class LaporanSupplierLokalBB extends BaseController
         $addCondition = [
             "dateStart"    => $this->request->getGet("dateStart") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getGet("dateStart")))) : "",
             "dateEnd"      => $this->request->getGet("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getGet("dateEnd")))) : "",
+            "sort"         => 'rm_purchase_orders.po_date, divisis.id',
+            "sortType"     => $this->request->getGet("sortType"),
             "supplierId"   => $this->request->getGet("filter_supplier"),
             "barangId"     => $this->request->getGet("filter_barang"),
             "warehouseId"  => $this->request->getGet("filter_warehouse"),
@@ -751,6 +753,8 @@ class LaporanSupplierLokalBB extends BaseController
         $addCondition = [
             "dateStart"    => $this->request->getGet("dateStart") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getGet("dateStart")))) : "",
             "dateEnd"      => $this->request->getGet("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getGet("dateEnd")))) : "",
+            "sort"         => 'rm_purchase_orders.po_date, divisis.id',
+            "sortType"     => $this->request->getGet("sortType"),
             "supplierId"   => $this->request->getGet("filter_supplier"),
             "barangId"     => $this->request->getGet("filter_barang"),
             "warehouseId"  => $this->request->getGet("filter_warehouse"),
@@ -779,6 +783,9 @@ class LaporanSupplierLokalBB extends BaseController
         $summaryPerBarang = [];
         foreach ($groupedData as $barang => $items) {
             $totals = [
+                'totalQtyPO' => 0,
+
+                'totalDppUmum' => 0,
                 'totalDppUmum' => 0,
                 'totalPphUmum' => 0,
                 'totalTotalUmum' => 0,
@@ -796,6 +803,8 @@ class LaporanSupplierLokalBB extends BaseController
 
             foreach ($items as $item) {
                 // Gunakan nilai langsung dari proses
+                $totals['totalQtyPO'] += $item['qtyPO'];
+
                 $totals['totalDppUmum'] += $item['dppUmum'];
                 $totals['totalPphUmum'] += $item['pphUmum'];
                 $totals['totalTotalUmum'] += $item['totalUmum'];

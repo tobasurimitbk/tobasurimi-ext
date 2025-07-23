@@ -134,7 +134,7 @@
                         <th colspan="3" class="col-group">Harian</th>
                         <th colspan="3" class="col-group">Tambahan Harian</th>
                         <th colspan="3" class="col-group">Tambahan Bulanan</th>
-                        <th colspan="3" class="col-group">Subsidi</th>
+                        <th colspan="3" class="col-group">Tambahan Langsung</th>
                         <th rowspan="2" class="col-group">Total</th>
                     </tr>
                     <tr>
@@ -187,7 +187,9 @@
                     <?php endforeach; ?>
 
                     <tr style="font-weight: bold; background-color: #eee;">
-                        <td colspan="9">TOTAL <?= strtoupper($barangName); ?></td>
+                        <td colspan="6">TOTAL <?= strtoupper($barangName); ?></td>
+                        <td><?= number_format($group['summary']['totalQtyPO'], 2); ?></td>
+                        <td colspan="2"></td>
 
                         <td><?= number_format($group['summary']['totalDppUmum'], 2); ?></td>
                         <td><?= number_format($group['summary']['totalPphUmum'], 2); ?></td>
