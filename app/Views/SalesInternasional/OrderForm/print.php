@@ -130,13 +130,17 @@
                 <?php if ($company['id'] == 1 || $company['id'] == 2): ?>
                     <td>
                         <h1 style="margin-top:-10px; margin-left:-30px;">
-                            <b><?= strtoupper(str_ireplace('Tbk', '', $company['holding_company'])) ?></b>
-                            <?php if ($company['id'] == 1): ?>
-                                <!-- Ini Kim 1 Yha -->
-                                <b style="text-align: center;">
-                                    PLANT I
-                                </b>
-                            <?php endif; ?>
+                            <center>
+
+                                <b><?= strtoupper(str_ireplace(', Tbk', '', $company['holding_company'])) ?></b>
+                                <?php if ($company['id'] == 1): ?>
+                                    <!-- Ini Kim 1 Yha -->
+                                    <b style="text-align: center;">
+                                        PLANT I
+                                    </b>
+
+                                <?php endif; ?>
+                            </center>
                         </h1>
                         <table style="width: 100%; margin-top:-15px; margin-left:-30px; font-size:12px;">
 
