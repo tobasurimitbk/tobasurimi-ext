@@ -1240,9 +1240,12 @@
             $(".title-name").text("Tambah Data Panjar & Pinjaman");
             $(".delete-btn").css('display', 'none');
             $(".add-modal").modal("show");
-            initSelect2()
             $(".btn-submit-form").show();
             $(".create-form input, .create-form select, .btn-add-detail").prop("disabled", false);
+        });
+
+        $('.add-modal').on('shown.bs.modal', function() {
+            initSelect2();
         });
 
         // Handle submit form
