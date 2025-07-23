@@ -930,7 +930,7 @@
             url: "panjar-supplier/id/" + data.id,
             method: "GET",
             dataType: "json",
-           success: function(res) {
+            success: function(res) {
                 if (res.status) {
                     modal.find('.modal-body').html($('#modal-template').html());
                     isEditMode = true; // Set mode edit
@@ -953,13 +953,35 @@
                     $('#payment_method').val(res.data.transaction.payment_method).trigger('change');
                     $('#bank_id').val(res.data.transaction.bank_id).trigger('change');
                     $('#jenis').val(res.data.transaction.type).trigger('change');
-                    $('#tipe_supplier').val(res.data.supplier?.type).trigger('change');
                     $('#keterangan').val(res.data.transaction.keterangan || '');
 
-                    // Populate supplier dropdown
-                    if (res.data.supplier) {
-                        const supplierOption = `<option value="${res.data.supplier.id}" selected>${res.data.supplier.name}</option>`;
-                        $('#supplier_id').html(supplierOption);
+                    // Set tipe supplier dan trigger change
+                    if (res.data.supplier?.type) {
+                        $('#tipe_supplier').val(res.data.supplier.type).trigger('change');
+                        
+                        // Tunggu sampai dropdown supplier terisi (asynchronous)
+                        let supplierDropdownReady = false;
+                        
+                        // Buat callback untuk ketika dropdown supplier siap
+                        const onSupplierDropdownReady = function() {
+                            if (res.data.supplier) {
+                                const supplierOption = new Option(res.data.supplier.name, res.data.supplier.id, true, true);
+                                $('#supplier_id').append(supplierOption).trigger('change');
+                            }
+                            // Hapus event listener setelah selesai
+                            $('#supplier_id').off('select2:open', onSupplierDropdownReady);
+                        };
+                        
+                        // Tambahkan event listener untuk ketika dropdown supplier dibuka
+                        $('#supplier_id').on('select2:open', onSupplierDropdownReady);
+                        
+                        // Juga coba langsung set setelah beberapa delay (fallback)
+                        setTimeout(function() {
+                            if ($('#supplier_id option').length > 0 && res.data.supplier) {
+                                const supplierOption = new Option(res.data.supplier.name, res.data.supplier.id, true, true);
+                                $('#supplier_id').append(supplierOption).trigger('change');
+                            }
+                        }, 500);
                     }
 
                     // Process and add each detail to the details array
@@ -1030,6 +1052,22 @@
 
     });
 
+
+    function appendDropdownSupplier(data) {
+        const supplierDropdown = $('#supplier_id');
+        supplierDropdown.empty(); // Kosongkan dulu
+        
+        // Tambahkan opsi default
+        supplierDropdown.append('<option value="">Pilih Supplier</option>');
+        
+        // Tambahkan semua opsi supplier
+        data.forEach(supplier => {
+            supplierDropdown.append(`<option value="${supplier.id}">${supplier.name}</option>`);
+        });
+        
+        // Trigger change untuk refresh select2
+        supplierDropdown.trigger('change');
+    }
 
     $(document).ready(function() {
 
