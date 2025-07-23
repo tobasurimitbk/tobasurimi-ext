@@ -360,10 +360,9 @@
             dataSrc: "data",
             data: function(data) {
                 data.search = $(".search").val();
-                data.status = $(".is_posted").val();
                 data.dateStart = $(".dateStart").val();
                 data.dateEnd = $(".dateEnd").val();
-                data.panjar_status = $('.panjar_status option:selected').val();
+                data.status = $('.panjar_status option:selected').val();
                 data.sort = sort;
                 data.sortType = sortType;
             }

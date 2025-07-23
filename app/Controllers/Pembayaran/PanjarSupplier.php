@@ -621,7 +621,7 @@ class PanjarSupplier extends BaseController
         $addCondition = [
             "search"        => $payload['search'],
             "sort"          => $payload['sort'],
-            "status"          => $payload['status'],
+            "status"        => $payload['status'],
             "sortType"      => $payload['sortType'],
             "dateStart"     => $payload['dateStart'],
             "dateEnd"       => $payload['dateEnd'],
