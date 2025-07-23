@@ -2069,17 +2069,21 @@ class LaporanSupplierLokalBB extends BaseController
         });
 
         $totalGrouped = count($flatData);
-        $paginatedData = array_slice($flatData, ($currentPage - 1) * $pageSize, $pageSize);
 
-        // Format output
         $totalSubsidiFinal = 0;
         $totalRowFinal = 0;
-        foreach ($paginatedData as $i => &$row) {
-            $row['no'] = ($currentPage - 1) * $pageSize + $i + 1;
+        foreach ($flatData as $key => $row) {
             $row['totalSubsidi'] = $row['subsidi'] - $row['pphSubsidi'];
             $row['totalRow'] = $row['totalUmum'] + $row['totalHarian'] + $row['totalBulanan'] + $row['totalSubsidi'];
             $totalSubsidiFinal += $row['totalSubsidi'];
             $totalRowFinal += $row['totalRow'];
+        }
+
+        $paginatedData = array_slice($flatData, ($currentPage - 1) * $pageSize, $pageSize);
+
+        // Format output
+        foreach ($paginatedData as $i => &$row) {
+            $row['no'] = ($currentPage - 1) * $pageSize + $i + 1;
             foreach ($row as $key => $val) {
                 if (is_numeric($val) && $key !== 'no') {
                     $row[$key] = number_format($val, 2, '.', ',');
