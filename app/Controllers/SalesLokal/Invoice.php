@@ -283,15 +283,15 @@ class Invoice extends BaseController
                 "terms"             => $postData['termin'] ?? '',
                 "ship_via_id"       => $postData['ship_via'],
                 "keterangan"        => $postData['keterangan'],
-                "dpp"               => str_replace(',', '', $postData['dpp']),
-                "ppn"               => str_replace(',', '', $postData['ppn']),
-                "total_invoice"     => str_replace(',', '', $postData['total_invoice']),
+                "dpp"               => str_replace('.', '', $postData['dpp']),
+                "ppn"               => str_replace('.', '', $postData['ppn']),
+                "total_invoice"     => str_replace('.', '', $postData['total_invoice']),
                 "termasuk_pa"       => $this->request->getPost('include_tax') ? 'true' : 'false',
                 "status_tax"        => $this->request->getPost('tax_status') ? 'true' : 'false',
                 "tipe_invoice"      => 'LOKAL',
                 "status_pelunasan"  => 'UNPAID',
                 "id_company"        => ($this->this_company_id != 16)
-                    ? $this->request->getPost('company_id')
+                    ? $this->request->getPost('company_ids')
                     : $this->this_company_id,
                 "tax_id"            => $this->request->getPost('taxes'),
                 "tax_value"         => ($tax = $this->taxModel->find($this->request->getPost('taxes'))) ? $tax['tax_value'] : null,
@@ -510,9 +510,6 @@ class Invoice extends BaseController
     {
         $payload =  $this->request->getVar();
 
-        //echo json_encode($payload);
-        //return;
-
         $validate = $this->validate([
             "no_faktur" => [
                 "rules" => "required",
@@ -546,17 +543,8 @@ class Invoice extends BaseController
             $postData = $this->request->getPost();
             $postItemsData = json_decode($this->request->getPost('items'), true);
 
-            // var_dump($postItemsData['id_detail_invoice'][0]);
-            // die();
-
-            // var_dump($postItemsData);
-            // die();
-
-
             $soInvData = $this->SalesOrderInvoiceModel->asObject()
                 ->find($payload['id']);
-
-
 
             if (empty($soInvData)) {
                 $data = [
@@ -590,11 +578,14 @@ class Invoice extends BaseController
                 "ship_via_id"       => $postData['ship_via'],
                 "keterangan"        => $postData['keterangan'],
                 "jenis_penjualan"   => $postData['jenis_penjualan'],
-                "dpp"               => str_replace(',', '', $postData['dpp']),
-                "ppn"               => str_replace(',', '', $postData['ppn']),
-                "total_invoice"     => str_replace(',', '', $postData['total_invoice']),
+                "dpp"               => str_replace('.', '', $postData['dpp']),
+                "ppn"               => str_replace('.', '', $postData['ppn']),
+                "total_invoice"     => str_replace('.', '', $postData['total_invoice']),
                 "termasuk_pa"       => $this->request->getPost('include_tax') ? 'true' : 'false',
                 "status_tax"        => $this->request->getPost('tax_status') ? 'true' : 'false',
+                "id_company"        => ($this->this_company_id != 16)
+                    ? $this->request->getPost('company_ids')
+                    : $this->this_company_id,
 
             ];
 

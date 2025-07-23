@@ -210,7 +210,7 @@
                                 <div class="col-md-2">
                                     <div class="form-floating mb-3" style="height: 50px;">
                                         <select class="form-select company_ids" name="company_ids" id="company_ids">
-                                            <option <?= !empty($data) ? ($data->id_company == "1" ? "selected" : "") : ""; ?> value="1">KIM 1</option>
+                                            <option <?= !empty($data) ? ($data->id_company == "1" ? "selected" : "") : "selected"; ?> value="1">KIM 1</option>
                                             <option <?= !empty($data) ? ($data->id_company == "2" ? "selected" : "") : ""; ?> value="2">KIM 2</option>
                                             <option <?= !empty($data) ? ($data->id_company == "15" ? "selected" : "") : ""; ?> value="15">GLOBAL</option>
                                         </select>
@@ -507,7 +507,6 @@
                     let id = row.id;
                     return `
                     <div class="">
-                        <button data-no="${row.no}" data-id="${row.id}" class="edit-table-detail"><i class="fa fa-edit" aria-hidden="true"></i></button>
                         <button data-no="${row.no}" data-id="${row.id}" class="delete-button"><i class="fa fa-trash" aria-hidden="true"></i></button>
                     </div>
                 `;
@@ -554,73 +553,13 @@
             let dataId = $(this).data('id');
             const csrf = $(`[name="${csrfToken}"]`);
 
-            console.log(rowData);
+            let indexToRemove = list_items.findIndex(item => item.no === dataNo);
+            if (indexToRemove !== -1) {
+                list_items.splice(indexToRemove, 1);
 
-
-            if (dataId) {
-                Swal.fire({
-                    icon: 'question',
-                    title: 'Yakin akan di hapus?',
-                    confirmButtonColor: '#4e73df',
-                    cancelButtonColor: '#d33',
-                    showCancelButton: true,
-                    reverseButtons: true,
-                    confirmButtonText: 'Hapus',
-                    cancelButtonText: 'Kembali',
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        $.ajax({
-                            url: "<?= base_url("order-form-lokal/delete-detail"); ?>",
-                            data: {
-                                id: dataId,
-                            },
-                            beforeSend: function(xhr) {
-                                xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                                setLoading();
-                            },
-                            complete: function() {
-                                stopLoading();
-                            },
-                            method: "POST",
-                            dataType: "json",
-                            success: function(response) {
-                                csrf.val(response.token);
-                                if (response.status) {
-                                    Swal.fire({
-                                            icon: 'success',
-                                            title: response.message,
-                                            confirmButtonColor: '#4e73df',
-                                        })
-                                        .then(() => {
-                                            // Update the list_items array
-                                            list_items = list_items.filter(item => item.id !== dataId);
-                                            // Redraw the table with the updated list_items
-                                            table.clear().rows.add(list_items).draw();
-                                            reCountTotal();
-                                        })
-                                } else {
-                                    Swal.fire({
-                                        icon: 'error',
-                                        title: response.message,
-                                        confirmButtonColor: '#e74a3b',
-                                    });
-                                }
-                            },
-                        });
-                    }
-                })
-            } else {
-                // Hapus item dari array JavaScript dan gambar ulang tabel
-                console.log(list_items);
-                // console.log(table);
-                let indexToRemove = list_items.findIndex(item => item.no === dataNo);
-                if (indexToRemove !== -1) {
-                    list_items.splice(indexToRemove, 1);
-
-                }
-                table.clear().rows.add(list_items).draw();
-                console.log(list_items);
             }
+            table.clear().rows.add(list_items).draw();
+
             reCountTotal();
         });
 
@@ -1091,6 +1030,9 @@
         var noDocument = $('#doc_id option:selected').text()
         isValid = true;
 
+        console.log(list_items);
+
+
         $.each(list_items, function(i, v) {
             var element = $('input[data-id="' + v.id + '"].input-qty');
             var input_user = parseFloat(element.val());
@@ -1305,6 +1247,9 @@
         let taxTotalHtml = 0;
         let grandTotal = 0;
 
+        console.log(list_items);
+
+
         list_items.forEach((obj) => {
 
             let itemAmt = parseFloat(obj.amount.replaceAll(',', '')) || 0;
@@ -1355,15 +1300,23 @@
                 dataError = list_items[i];
                 isValid = false;
             } else {
-                list_items[i].qty_sekarang = stok_max.toFixed(4);
-                list_items[i].qty_input = input_user.toFixed(4);
-
+                list_items[i].qty_sekarang = stok_max.toFixed(2);
+                list_items[i].qty_input = input_user.toFixed(2);
 
                 // Calculate the amount and format it using .toLocaleString()
-                var amount = parseFloat(v.disc.replace(',', '')) != 0 ? (parseFloat(v.harga_barang.replace(',', '')) -
-                        ((parseFloat(v.harga_barang.replace(',', '')) * parseFloat(v.disc.replace(',', ''))) / 100)) *
-                    parseFloat(v.qty_input) : parseFloat(v.harga_barang.replace(',', '')) * parseFloat(v.qty_input);
-                list_items[i].amount = amount.toLocaleString();
+                if (v.discUnit == "rupiah") {
+                    var amount = parseFloat(v.disc.replace(',', '')) != 0 ?
+                        (parseFloat(v.harga_barang.replace(',', '')) - parseFloat(v.disc.replace(',', ''))) * parseFloat(v.qty_input) :
+                        parseFloat(v.harga_barang.replace(',', '')) * parseFloat(v.qty_input);
+                } else {
+                    var amount = parseFloat(v.disc.replace(',', '')) != 0 ?
+                        (parseFloat(v.harga_barang.replace(',', '')) - ((parseFloat(v.harga_barang.replace(',', '')) * parseFloat(v.disc.replace(',', ''))) / 100)) * parseFloat(v.qty_input) :
+                        parseFloat(v.harga_barang.replace(',', '')) * parseFloat(v.qty_input);
+                }
+                list_items[i].amount = amount.toLocaleString('en-US', {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2
+                })
             }
         });
         table.clear();
