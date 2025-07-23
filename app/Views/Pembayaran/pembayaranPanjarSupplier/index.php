@@ -744,7 +744,30 @@
         theme: "bootstrap-5",
         dropdownParent: $(".add-modal .modal-content")
     });
+    
 
+    $("#tipe_supplier, #supplier_id, #tipe, #jenis_transaksi, #jenis")
+        .parent('div')
+        .find('label')
+        .css('z-index', '1');
+
+    $("#tanggal").datepicker({
+        todayHighlight: true,
+        format: "dd/mm/yyyy",
+        orientation: "bottom auto",
+        autoclose: true,
+        language: 'id',
+        todayBtn: "linked"
+    }).on('changeDate', function(e) {
+        $(this).valid();
+    });
+
+
+    $(document).on('click', '.btn-edit-detail', function(e) {
+        e.preventDefault();
+        const index = $(this).data('index');
+        editDetail(index);
+    });
 
     function initSelect2() {
         $('#jenis').select2({
@@ -780,32 +803,9 @@
         });
     }
 
-    
-
-    $("#tipe_supplier, #supplier_id, #tipe, #jenis_transaksi, #jenis")
-        .parent('div')
-        .find('label')
-        .css('z-index', '1');
-
-    $("#tanggal").datepicker({
-        todayHighlight: true,
-        format: "dd/mm/yyyy",
-        orientation: "bottom auto",
-        autoclose: true,
-        language: 'id',
-        todayBtn: "linked"
-    }).on('changeDate', function(e) {
-        $(this).valid();
-    });
-
-
-    $(document).on('click', '.btn-edit-detail', function(e) {
-        e.preventDefault();
-        const index = $(this).data('index');
-        editDetail(index);
-    });
 
     function handleFieldChange(element) {
+        console.log(isEditMode);
         if (!isEditMode) {
             generatePaymentNumber();
             return;
@@ -926,7 +926,6 @@
         $(".title-name").text("Edit Data Panjar & Pinjaman");
 
         modal.modal("show");
-        initSelect2();
         $('#auto_generate').hide();
 
         // AJAX get detail data
