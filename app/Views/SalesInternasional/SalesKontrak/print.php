@@ -109,10 +109,10 @@
             <?php if ($company['id'] == 1 || $company['id'] == 2): ?>
                 <td>
                     <h1 style="margin-top:-10px; margin-left:-30px;">
-                        <b><?= strtoupper($company['holding_company']) ?></b>
+                        <b><?= strtoupper(str_ireplace('Tbk', '', $company['holding_company'])) ?></b>
                         <?php if ($company['id'] == 1): ?>
                             <!-- Ini Kim 1 Yha -->
-                            <b>
+                            <b style="text-align: center;">
                                 PLANT I
                             </b>
                         <?php endif; ?>
