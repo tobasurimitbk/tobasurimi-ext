@@ -2144,6 +2144,8 @@ class LaporanSupplierLokalBB extends BaseController
             "dateStart"    => $this->request->getGet("dateStart") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getGet("dateStart")))) : "",
             "dateEnd"      => $this->request->getGet("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getGet("dateEnd")))) : "",
             "divisiId"     => $this->request->getGet("filter_divisi"),
+            "sort"         => 'rm_purchase_orders.po_date, divisis.id',
+            "sortType"     => $this->request->getGet("sortType"),
             "barangId"     => $this->request->getGet("filter_barang"),
         ];
 
@@ -2485,6 +2487,8 @@ class LaporanSupplierLokalBB extends BaseController
             "dateStart"    => $this->request->getGet("dateStart") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getGet("dateStart")))) : "",
             "dateEnd"      => $this->request->getGet("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getGet("dateEnd")))) : "",
             "divisiId"     => $this->request->getGet("filter_divisi"),
+            "sort"         => 'rm_purchase_orders.po_date, divisis.id',
+            "sortType"     => $this->request->getGet("sortType"),
             "barangId"     => $this->request->getGet("filter_barang"),
         ];
 

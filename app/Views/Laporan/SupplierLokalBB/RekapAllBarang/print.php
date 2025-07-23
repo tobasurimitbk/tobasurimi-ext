@@ -206,27 +206,6 @@
                 </tr>
             <?php endforeach; ?>
 
-            <?php if (!empty($grandTotals)) : ?>
-                <tr class="grand-total-row">
-                    <td colspan="4" class="text-left">GRAND TOTAL</td>
-                    <td class="text-right"><?= number_format($grandTotals['qtyPO'], 2) ?></td>
-                    <td></td>
-                    <td class="text-right"><?= number_format($grandTotals['dppUmum'], 2) ?></td>
-                    <td class="text-right"><?= number_format($grandTotals['pphUmum'], 2) ?></td>
-                    <td class="text-right"><?= number_format($grandTotals['totalUmum'], 2) ?></td>
-                    <td class="text-right"><?= number_format($grandTotals['dppHarian'], 2) ?></td>
-                    <td class="text-right"><?= number_format($grandTotals['pphHarian'], 2) ?></td>
-                    <td class="text-right"><?= number_format($grandTotals['totalHarian'], 2) ?></td>
-                    <td class="text-right"><?= number_format($grandTotals['dppBulanan'], 2) ?></td>
-                    <td class="text-right"><?= number_format($grandTotals['pphBulanan'], 2) ?></td>
-                    <td class="text-right"><?= number_format($grandTotals['totalBulanan'], 2) ?></td>
-                    <td class="text-right"><?= number_format($grandTotals['subsidi'], 2) ?></td>
-                    <td class="text-right"><?= number_format($grandTotals['pphSubsidi'], 2) ?></td>
-                    <td class="text-right"><?= number_format($grandTotals['totalSubsidi'], 2) ?></td>
-                    <td class="text-right"><?= number_format($grandTotals['totalRow'], 2) ?></td>
-                </tr>
-            <?php endif; ?>
-
             <?php if (empty($groupedData)) : ?>
                 <tr>
                     <td colspan="19" class="text-center">Tidak ada data yang tersedia</td>
