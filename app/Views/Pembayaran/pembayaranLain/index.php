@@ -474,9 +474,6 @@
                 akun_selisih: {
                     required: true
                 },
-                keterangan_parent: {
-                    required: true
-                },
                 total_all_amount: {
                     required: true
                 },
@@ -510,9 +507,6 @@
                 },
                 divisi_id: {
                     required: "Departemen wajib diisi"
-                },
-                keterangan_parent: {
-                    required: "Keterangan wajib diisi"
                 },
                 total_all_amount: {
                     required: "Total wajib Terisi"
@@ -652,8 +646,60 @@
 
         // When adding a detail
         $('.btn-add-detail').click(function() {
-            // ... your existing code ...
-            refreshValidation();
+            // Jalankan validasi detail dulu
+            const akunSelisih = $('#akun_selisih option:selected').val();
+            const jenisPembayaran = $('#jenis_pembayaran option:selected').val();
+            let messageErr = '';
+            if (akunSelisih == '') {
+                if (jenisPembayaran == 'PUTIH') {
+                    messageErr = "Akun Kredit Wajib Diisi"
+                } else {
+                    messageErr = "Akun Debit Wajib Diisi";
+                }
+                alert(messageErr)
+                return;
+            }
+
+            if (!validateDetails()) {
+                refreshValidation(); // buat update styling error
+                return; // stop proses kalau gak valid
+            }
+
+            const detail = {
+                tanggal: $('#tanggal').val(),
+                pembayaran_oleh: $('#pembayaran_oleh').val(),
+                akun_kas: $('#akun_kas').val(),
+                akun_kas_name: $('#akun_kas option:selected').text(),
+                akun_selisih_name: $('#akun_selisih option:selected').text(),
+                keterangan: $('#keterangan').val(),
+                valas: $('#valas option:selected').text(),
+                valas_id: $('#valas option:selected').val(),
+                jumlah: $('#jumlah').val(),
+                kurs: $('#kurs').val(),
+                jumlah_idr: $('#jumlah_idr').val(),
+                jenis_pembayaran: jenisPembayaran
+            };
+
+            details.push(detail);
+            refreshDetailsTable();
+            clearDetailForm();
+            refreshValidation(); // bersihin styling error kalau sudah valid
+            
+            // Handle keterangan_parent textarea
+            const currentKeterangan = $('#keterangan_parent').val();
+            const newKeterangan = detail.keterangan;
+            
+            if (newKeterangan) {
+                if (currentKeterangan === '') {
+                    $('#keterangan_parent').val(newKeterangan);
+                } else {
+                    // Split existing values and check for duplicates
+                    const existingValues = currentKeterangan.split(',');
+                    if (!existingValues.includes(newKeterangan)) {
+                        $('#keterangan_parent').val(currentKeterangan + ', ' + newKeterangan);
+                    }
+                }
+            }
         });
 
         $('#jumlah').keyup(function() {
@@ -770,38 +816,61 @@
             });
         }
 
-        function updateDetail(index) {
-            if (!validateDetails()) {
-                refreshValidation();
-                return;
-            }
-
-            const jenisPembayaran = $('#jenis_pembayaran').val();
-            const detail = {
-                tanggal: $('#tanggal').val(),
-                pembayaran_oleh: $('#pembayaran_oleh').val(),
-                akun_kas: $('#akun_kas').val(),
-                akun_kas_name: $('#akun_kas option:selected').text(),
-                akun_selisih_name: $('#akun_selisih option:selected').text(),
-                keterangan: $('#keterangan').val(),
-                valas: $('#valas option:selected').text(),
-                valas_id: $('#valas option:selected').val(),
-                jumlah: $('#jumlah').val(),
-                kurs: $('#kurs').val(),
-                jumlah_idr: $('#jumlah_idr').val(),
-                jenis_pembayaran: jenisPembayaran
-            };
-
-            details[index] = detail;
-            refreshDetailsTable();
-            clearDetailForm();
+    function updateDetail(index) {
+        if (!validateDetails()) {
             refreshValidation();
-            
-            // Reset editing state
-            editingIndex = -1;
-            $('.btn-update-detail').hide();
-            $('.btn-add-detail').show();
+            return;
         }
+
+        const jenisPembayaran = $('#jenis_pembayaran').val();
+        const detail = {
+            tanggal: $('#tanggal').val(),
+            pembayaran_oleh: $('#pembayaran_oleh').val(),
+            akun_kas: $('#akun_kas').val(),
+            akun_kas_name: $('#akun_kas option:selected').text(),
+            akun_selisih_name: $('#akun_selisih option:selected').text(),
+            keterangan: $('#keterangan').val(),
+            valas: $('#valas option:selected').text(),
+            valas_id: $('#valas option:selected').val(),
+            jumlah: $('#jumlah').val(),
+            kurs: $('#kurs').val(),
+            jumlah_idr: $('#jumlah_idr').val(),
+            jenis_pembayaran: jenisPembayaran
+        };
+
+        // Get the old keterangan before updating
+        const oldKeterangan = details[index].keterangan;
+        
+        // Update the detail
+        details[index] = detail;
+        refreshDetailsTable();
+        clearDetailForm();
+        refreshValidation();
+        
+        // Handle keterangan_parent textarea update
+        const currentKeteranganParent = $('#keterangan_parent').val();
+        const newKeterangan = detail.keterangan;
+        
+        if (newKeterangan) {
+            // Remove old keterangan if it exists
+            let keteranganArray = currentKeteranganParent.split(',')
+                .map(item => item.trim())
+                .filter(item => item !== '' && item !== oldKeterangan);
+            
+            // Add new keterangan if it's not already present
+            if (!keteranganArray.includes(newKeterangan)) {
+                keteranganArray.push(newKeterangan);
+            }
+            
+            // Update the textarea
+            $('#keterangan_parent').val(keteranganArray.join(', '));
+        }
+        
+        // Reset editing state
+        editingIndex = -1;
+        $('.btn-update-detail').hide();
+        $('.btn-add-detail').show();
+    }
 
         
         $('.btn-update-detail').hide();
