@@ -926,6 +926,7 @@
         $(".title-name").text("Edit Data Panjar & Pinjaman");
 
         modal.modal("show");
+        initSelect2();
         $('#auto_generate').hide();
 
         // AJAX get detail data
