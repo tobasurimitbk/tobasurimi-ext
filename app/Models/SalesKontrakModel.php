@@ -49,6 +49,7 @@ class SalesKontrakModel extends Model
             'shipment_date'         => 'sales_contract.shipment_date',
             'createdAt'             => 'sales_contract.createdAt',
             'updatedAt'             => 'sales_contract.updatedAt',
+            'divisi'                => 'sales_contract.divisi_id',
         ];
         $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
 
@@ -56,11 +57,13 @@ class SalesKontrakModel extends Model
         $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'DESC';
 
         $selectQry = "sales_contract.*, 
-                      customers.name AS customer_name";
+                      customers.name AS customer_name,
+                      divisis.divisi";
         $salesDataQry = $this->asObject()
             ->select($selectQry)
             ->where($condition)
             ->join('customers', 'customers.id = sales_contract.customer_id', 'left')
+            ->join('divisis', 'divisis.id = sales_contract.divisi_id', 'left')
             ->orderBy($sort, $sortType);
 
         $totalData = $salesDataQry->countAllResults(false);
@@ -72,7 +75,8 @@ class SalesKontrakModel extends Model
         if ($addCondition['search']) {
             $salesDataQry->like('sales_contract.sales_contract_no', $addCondition['search'])
                 ->orLike('sales_contract.customer_po_no', $addCondition['search'])
-                ->orLike('customers.name', $addCondition['search']);
+                ->orLike('customers.name', $addCondition['search'])
+                ->orLike('divisis.divisi', $addCondition['search']);
         }
 
         if ($addCondition['status_posting']) {

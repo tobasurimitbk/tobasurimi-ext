@@ -103,34 +103,34 @@ class Company extends BaseController
                 "address" => [
                     "rules" => "required"
                 ],
-                "phone" => [
-                    "rules" => "required|min_length[10]|max_length[16]",
-                    'errors' => [
-                        'min_length' => 'Nomor HP harus memiliki panjang minimal 10 digit',
-                        'max_length' => 'Nomor HP tidak boleh lebih dari 16 digit',
-                        'required' => 'Nomor telpon harus diisi',
-                    ]
-                ],
-                "zip_code" => [
-                    "rules" => "required|exact_length[5]",
-                    'errors' => [
-                        'exact_length' => 'Kode pos wajib diisi tepat 5 digit',
-                        'required' => 'Kode pos harus diisi',
+                // "phone" => [
+                //     "rules" => "required|min_length[10]|max_length[16]",
+                //     'errors' => [
+                //         'min_length' => 'Nomor HP harus memiliki panjang minimal 10 digit',
+                //         'max_length' => 'Nomor HP tidak boleh lebih dari 16 digit',
+                //         'required' => 'Nomor telpon harus diisi',
+                //     ]
+                // ],
+                // "zip_code" => [
+                //     "rules" => "required|exact_length[5]",
+                //     'errors' => [
+                //         'exact_length' => 'Kode pos wajib diisi tepat 5 digit',
+                //         'required' => 'Kode pos harus diisi',
 
-                    ]
-                ],
+                //     ]
+                // ],
                 "province_id" => [
                     "rules" => "required"
                 ],
                 "city_id" => [
                     "rules" => "required"
                 ],
-                "email" => [
-                    "rules" => "permit_empty|valid_email",
-                    'errors' => [
-                        'valid_email' => 'Email harus valid'
-                    ]
-                ],
+                // "email" => [
+                //     "rules" => "permit_empty|valid_email",
+                //     'errors' => [
+                //         'valid_email' => 'Email harus valid'
+                //     ]
+                // ],
             ];
 
             if ($this->validate($rules)) {
@@ -148,7 +148,12 @@ class Company extends BaseController
                     "email" => $this->request->getPost("email"),
                     "zip_code" => $this->request->getPost("zip_code"),
                     "province_id" => formatter($this->request->getPost("province_id"), "STR_TO_INT"),
-                    "city_id" => formatter($this->request->getPost("city_id"), "STR_TO_INT")
+                    "city_id" => formatter($this->request->getPost("city_id"), "STR_TO_INT"),
+                    "website" => $this->request->getPost("website"),
+                    "fax" => $this->request->getPost("fax"),
+                    "factory" => $this->request->getPost("factory"),
+                    "office_kop" => $this->request->getPost("office_kop")
+
                 ];
 
                 if (!empty($file->getName())) {
@@ -224,34 +229,34 @@ class Company extends BaseController
                 "address" => [
                     "rules" => "required"
                 ],
-                "phone" => [
-                    "rules" => "required|min_length[10]|max_length[16]",
-                    'errors' => [
-                        'min_length' => 'Nomor HP harus memiliki panjang minimal 10 digit',
-                        'max_length' => 'Nomor HP tidak boleh lebih dari 16 digit',
-                        'required' => 'Nomor telpon harus diisi',
-                    ]
-                ],
-                "zip_code" => [
-                    "rules" => "required|exact_length[5]",
-                    'errors' => [
-                        'exact_length' => 'Kode pos wajib diisi tepat 5 digit',
-                        'required' => 'Kode pos harus diisi',
+                // "phone" => [
+                //     "rules" => "required|min_length[10]|max_length[16]",
+                //     'errors' => [
+                //         'min_length' => 'Nomor HP harus memiliki panjang minimal 10 digit',
+                //         'max_length' => 'Nomor HP tidak boleh lebih dari 16 digit',
+                //         'required' => 'Nomor telpon harus diisi',
+                //     ]
+                // ],
+                // "zip_code" => [
+                //     "rules" => "required|exact_length[5]",
+                //     'errors' => [
+                //         'exact_length' => 'Kode pos wajib diisi tepat 5 digit',
+                //         'required' => 'Kode pos harus diisi',
 
-                    ]
-                ],
+                //     ]
+                // ],
                 "province_id" => [
                     "rules" => "required"
                 ],
                 "city_id" => [
                     "rules" => "required"
                 ],
-                "email" => [
-                    "rules" => "permit_empty|valid_email",
-                    'errors' => [
-                        'valid_email' => 'Email harus valid'
-                    ]
-                ],
+                // "email" => [
+                //     "rules" => "permit_empty|valid_email",
+                //     'errors' => [
+                //         'valid_email' => 'Email harus valid'
+                //     ]
+                // ],
             ];
 
             if ($this->validate($rules)) {
@@ -269,7 +274,11 @@ class Company extends BaseController
                     "email" => $this->request->getPost("email"),
                     "zip_code" => $this->request->getPost("zip_code"),
                     "province_id" => formatter($this->request->getPost("province_id"), "STR_TO_INT"),
-                    "city_id" => formatter($this->request->getPost("city_id"), "STR_TO_INT")
+                    "city_id" => formatter($this->request->getPost("city_id"), "STR_TO_INT"),
+                    "website" => $this->request->getPost("website"),
+                    "fax" => $this->request->getPost("fax"),
+                    "factory" => $this->request->getPost("factory"),
+                    "office_kop" => $this->request->getPost("office_kop")
                 ];
 
                 $companySameName = $this->CompaniesModel

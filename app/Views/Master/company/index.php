@@ -52,13 +52,40 @@
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" type="text" class="form-control phone" id="phone" name="phone" placeholder="Phone" maxlength="30">
+                                <input autocomplete="one-time-code" type="text" class="form-control phone" id="phone" name="phone" placeholder="Phone">
                                 <label for="floatingInput">Nomor Telepon</label>
                             </div>
                         </div>
                     </div>
                     <div class="row">
-                        <div class="col-md-4">
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input autocomplete="one-time-code" type="text" class="form-control website" id="website" name="website" placeholder="Website (Optional)">
+                                <label for="floatingInput">Website (Optional)</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input autocomplete="one-time-code" type="text" class="form-control fax" id="fax" name="fax" placeholder="Fax (Optional)">
+                                <label for="floatingInput">Fax (Optional)</label>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3">
+                                <textarea autocomplete="one-time-code" class="form-control factory text-area-all" id="factory" name="factory" placeholder="Factory (Optional)"></textarea>
+                                <label for="floatingInput">Factory (Optional)</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3">
+                                <textarea autocomplete="one-time-code" class="form-control office_kop text-area-all" id="office_kop" name="office_kop" placeholder="Office Kop Surat (Optional)"></textarea>
+                                <label for="floatingInput">Office Kop Surat (Optional)</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <select class="form-select province_id" name="province_id" id="province_id" onchange="getCity()">
                                     <option value=""></option>
@@ -75,7 +102,7 @@
                                 <label for="floatingInput">Provinsi</label>
                             </div>
                         </div>
-                        <div class="col-md-4">
+                        <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <select class="form-select city_id" name="city_id" id="city_id">
                                     <option value=""></option>
@@ -83,7 +110,7 @@
                                 <label for="floatingInput">Kota</label>
                             </div>
                         </div>
-                        <div class="col-md-4">
+                        <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <input autocomplete="one-time-code" type="text" class="form-control zip_code" id="zip_code" name="zip_code" placeholder="Zip Code">
                                 <label for="floatingInput">Kode Pos</label>
@@ -181,40 +208,40 @@
         searching: false,
         columns: [{
                 data: "no",
-                className: "text-center",
+                className: "text-left",
                 sortable: false
             },
             {
                 data: "company",
-                className: "text-center"
+                className: "text-left"
             },
             {
                 data: "holding_company",
-                className: "text-center"
+                className: "text-left"
             },
             {
                 data: "address",
-                className: "text-center"
+                className: "text-left"
             },
             {
                 data: "phone",
-                className: "text-center"
+                className: "text-left"
             },
             {
                 data: "email",
-                className: "text-center"
+                className: "text-left"
             },
             {
                 data: "province_name",
-                className: "text-center"
+                className: "text-left"
             },
             {
                 data: "city_name",
-                className: "text-center"
+                className: "text-left"
             },
             {
                 data: "zip_code",
-                className: "text-center"
+                className: "text-left"
             }
         ],
         columnDefs: [{
@@ -232,9 +259,7 @@
     });
 
     $(document).ready(function() {
-        $(".phone").mask("0000000000000")
 
-        $(".zip_code").mask("00000")
 
         // PROVINCE
         $('.province_id').select2({
@@ -315,9 +340,6 @@
                 city_id: {
                     required: true
                 },
-                email: {
-                    email: true,
-                },
             },
             messages: {
                 logo: {
@@ -344,9 +366,7 @@
                 city_id: {
                     required: "Kota wajib diisi"
                 },
-                email: {
-                    email: "Email harus valid",
-                },
+
             },
             errorElement: 'span',
             errorClass: 'text-danger',
@@ -423,6 +443,11 @@
                         $(".email").val(res.data.email);
                         $(".phone").val(res.data.phone);
                         $(".province_id").val(res.data.province_id).change();
+                        $(".website").val(res.data.website);
+                        $('.fax').val(res.data.fax);
+                        $('.factory').val(res.data.factory);
+                        $('.office_kop').val(res.data.office_kop);
+
 
                         // AJAX GET CITY
                         $.ajax({

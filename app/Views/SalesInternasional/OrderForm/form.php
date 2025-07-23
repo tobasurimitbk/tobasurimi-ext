@@ -166,6 +166,18 @@
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3">
+                            <input <?= !empty($dataSalesExport) ? ($dataSalesExport->status == "POSTED" ? 'readonly' : '') : '' ?> autocomplete="one-time-code" type="text" class="form-control deadline" id="deadline" name="deadline" placeholder="Deadline" value="<?= !empty($dataSalesExport) ? $dataSalesExport->deadline : '' ?>">
+                            <label for="floatingInput">Deadline</label>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-floating mb-3">
+                            <input <?= !empty($dataSalesExport) ? ($dataSalesExport->status == "POSTED" ? 'readonly' : '') : '' ?> autocomplete="one-time-code" type="text" class="form-control container" id="container" name="container" placeholder="No  Container" value="<?= !empty($dataSalesExport) ? $dataSalesExport->container : '' ?>">
+                            <label for="floatingInput">No Container</label>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-floating mb-3">
                             <input autocomplete="one-time-code" type="text" class="form-control consigne" id="consigne" name="consigne" placeholder="Consigne / Buyer" readonly value="<?= !empty($dataSalesExport) ? $dataSalesExport->customer_name : '' ?>">
                             <label for="floatingInput">Consigne / Buyer</label>
                         </div>
@@ -176,12 +188,7 @@
                             <label for="floatingInput">Destination</label>
                         </div>
                     </div>
-                    <div class="col-md-4">
-                        <div class="form-floating mb-3">
-                            <input autocomplete="one-time-code" type="text" class="form-control deadline" id="deadline" name="deadline" placeholder="Deadline" readonly value="<?= !empty($dataSalesExport) ? $dataSalesExport->shipment_date : '' ?>">
-                            <label for="floatingInput">Deadline</label>
-                        </div>
-                    </div>
+
                     <div class="col-md-4">
                         <div class="form-floating mb-3">
                             <input autocomplete="one-time-code" type="text" class="form-control po_no" id="po_no" name="po_no" placeholder="PO Number" readonly value="<?= !empty($dataSalesExport) ? $dataSalesExport->customer_po_no : '' ?>">
@@ -208,6 +215,7 @@
                                     <th>Brand</th>
                                     <th>Packing</th>
                                     <th>Specs</th>
+                                    <th>Action</th>
                                     <!-- <th>Qty</th>
                                     <th>Unit Price</th>
                                     <th>Total Amount</th> -->
@@ -218,7 +226,7 @@
                             </tbody>
                             <tfoot id="foot-detail-table-barang">
                                 <tr>
-                                    <td colspan="7">Item List Empty</td>
+                                    <td colspan="8">Item List Empty</td>
                                 </tr>
                             </tfoot>
                         </table>
@@ -244,7 +252,7 @@
                             <label for="floatingInput">Pallet & Fumigation Number (Optional)</label>
                         </div>
                     </div>
-                    <div class="col-md-4">
+                    <!-- <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <input autocomplete="one-time-code" value="<?= !empty($dataSalesExport) ? $dataSalesExport->additional_detail_docs : '' ?>" type="text" class="form-control additional_detail_docs" id="additional_detail_docs" name="additional_detail_docs" placeholder="Additional Details (Optional)">
                             <label for="floatingInput">Additional Details (Optional)</label>
@@ -263,9 +271,47 @@
                                 <label for="floatingInput">Additional Details Number (Optional)</label>
                             </div>
                         </div>
-                    </div>
+                    </div> -->
 
                 </div>
+
+
+                <div class="col-subtitle-modal mt-5">
+                    <div class="row mt-3">
+                        <div class="col-md-6">
+                            <label class="form-label font-weight-bold modal-sub-title">Additional List</label>
+                        </div>
+                        <div class="col-md-6">
+                            <button class="btn btn-show-detail btn-add btn-block float-right" id="btnAdditionalList" type="button" style="width: 90% !important;">
+                                <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Add List
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="table-responsive">
+                        <table class="table table-bordered nowrap table-hover-tobasurimi dataTable" id="additionalDetailTable" width="100%" cellspacing="0">
+                            <thead class="thead-dark">
+                                <tr>
+                                    <th style="width: 10px;">No</th>
+                                    <th>Additional Details</th>
+                                    <th style="width: 120px;">Total Price</th>
+                                    <th style="width: 100px;">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody class="body-additional-detail" id="body-additional-detail">
+
+                            </tbody>
+                            <tfoot class="foot-additional-detail" id="foot-additional-detail">
+                                <tr>
+                                    <td colspan="4">List Additional Empty</td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+
 
                 <div class="row">
                     <div class="col mb-3">
@@ -450,94 +496,186 @@
                             </div>
                         </div>
                     </div>
-                    <div class="row mt-3">
-                        <div class="col mb-3">
-                            <h6 class="<?= session()->get('theme') == "dark" ? "text-white" : "text-dark" ?>">
-                                Detail Size & Breakdown
-                            </h6>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" type="text" class="form-control size" name="size" id="size" placeholder="Size (Optional)">
-                                <label for="floatingInput">Size (Optional)</label>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" type="text" class="form-control grade" name="grade" id="grade" placeholder="Grade (Optional)">
-                                <label for="floatingInput">Grade (Optional)</label>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" type="text" class="form-control packing_size" name="packing_size" id="packing_size" placeholder="Packing (Optional)">
-                                <label for="floatingInput">Packing (Optional)</label>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" type="text" class="form-control can" name="can" id="can" placeholder="Can (Optional)">
-                                <label for="floatingInput">Can (Optional)</label>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" type="text" class="form-control case" name="case" id="case" placeholder="Case (Optional)">
-                                <label for="floatingInput">Case (Optional)</label>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" type="text" class="form-control kg" name="kg" id="kg" placeholder="Kg (Optional)">
-                                <label for="floatingInput">Kg (Optional)</label>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" type="text" class="form-control lb" name="lb" id="lb" placeholder="Lb (Optional)">
-                                <label for="floatingInput">Lb (Optional)</label>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" type="text" class="form-control inner_box" name="inner_box" id="inner_box" placeholder="Inner Box (Optional)">
-                                <label for="floatingInput">Inner Box (Optional)</label>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" type="text" class="form-control pc" name="pc" id="pc" placeholder="Pc (Optional)">
-                                <label for="floatingInput">PC (Optional)</label>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" type="text" class="form-control bag" name="bag" id="bag" placeholder="Bag (Optional)">
-                                <label for="floatingInput">Bag (Optional)</label>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" type="text" class="form-control persen" name="persen" id="persen" placeholder="Persen (Optional)" oninput="this.value = greatFormatRupiah(this.value)">
-                                <label for="floatingInput">Percentage % (Optional)</label>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" type="text" class="form-control cup" name="cup" id="cup" placeholder="Cup (Optional)">
-                                <label for="floatingInput">Cup (Optional)</label>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" type="text" class="form-control palet" name="palet" id="palet" placeholder="Cup (Optional)">
-                                <label for="floatingInput">Pallet (Optional)</label>
-                            </div>
-                        </div>
-                    </div>
 
+                    <ul class="nav nav-tabs mt-3" id="myTab" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="home-tab" data-toggle="tab" data-target="#home1" type="button" role="tab" aria-controls="home" aria-selected="true">
+                                Add Note Size & Breakdown
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="profile-tab" data-toggle="tab" data-target="#profile1" type="button" role="tab" aria-controls="profile" aria-selected="false">
+                                Detail Size & Breakdown
+                            </button>
+                        </li>
+                    </ul>
+
+                    <div class="tab-content" id="myTabContent">
+                        <div class="tab-pane fade show active" id="home1" role="tabpanel" aria-labelledby="home-tab">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-floating mb-3" style="height: 50px;">
+                                        <input autocomplete="one-time-code" type="text" class="form-control note_size" name="note_size" id="note_size" placeholder="Note Size (Optional)">
+                                        <label for="floatingInput">Note Size (Optional)</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-floating mb-3" style="height: 50px;">
+                                        <input autocomplete="one-time-code" type="text" class="form-control note_grade" name="note_grade" id="note_grade" placeholder="Note Grade (Optional)">
+                                        <label for="floatingInput">Note Grade (Optional)</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-floating mb-3" style="height: 50px;">
+                                        <input autocomplete="one-time-code" type="text" class="form-control note_packing_size" name="note_packing_size" id="note_packing_size" placeholder="Note Packing (Optional)">
+                                        <label for="floatingInput">Note Packing (Optional)</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-floating mb-3" style="height: 50px;">
+                                        <input autocomplete="one-time-code" type="text" class="form-control note_can" name="note_can" id="note_can" placeholder="Note Can (Optional)">
+                                        <label for="floatingInput">Note Can (Optional)</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-floating mb-3" style="height: 50px;">
+                                        <input autocomplete="one-time-code" type="text" class="form-control note_case" name="note_case" id="note_case" placeholder="Note Case (Optional)">
+                                        <label for="floatingInput">Note Case (Optional)</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-floating mb-3" style="height: 50px;">
+                                        <input autocomplete="one-time-code" type="text" class="form-control note_kg" name="note_kg" id="note_kg" placeholder="Note Kg (Optional)">
+                                        <label for="floatingInput">Note Kg (Optional)</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-floating mb-3" style="height: 50px;">
+                                        <input autocomplete="one-time-code" type="text" class="form-control note_lb" name="note_lb" id="note_lb" placeholder="Note Lb (Optional)">
+                                        <label for="floatingInput">Note Lb (Optional)</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-floating mb-3" style="height: 50px;">
+                                        <input autocomplete="one-time-code" type="text" class="form-control note_inner_box" name="note_inner_box" id="note_inner_box" placeholder="Note Inner Box (Optional)">
+                                        <label for="floatingInput">Note Inner Box (Optional)</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-floating mb-3" style="height: 50px;">
+                                        <input autocomplete="one-time-code" type="text" class="form-control note_pc" name="note_pc" id="note_pc" placeholder="Note Pc (Optional)">
+                                        <label for="floatingInput">Note PC (Optional)</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-floating mb-3" style="height: 50px;">
+                                        <input autocomplete="one-time-code" type="text" class="form-control note_bag" name="note_bag" id="note_bag" placeholder="Note Bag (Optional)">
+                                        <label for="floatingInput">Note Bag (Optional)</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-floating mb-3" style="height: 50px;">
+                                        <input autocomplete="one-time-code" type="text" class="form-control note_persen" name="note_persen" id="note_persen" placeholder="Note Persen (Optional)">
+                                        <label for="floatingInput">Note Percentage % (Optional)</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-floating mb-3" style="height: 50px;">
+                                        <input autocomplete="one-time-code" type="text" class="form-control note_cup" name="note_cup" id="note_cup" placeholder="Note Cup (Optional)">
+                                        <label for="floatingInput">Note Cup (Optional)</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-floating mb-3" style="height: 50px;">
+                                        <input autocomplete="one-time-code" type="text" class="form-control note_palet" name="note_palet" id="note_palet" placeholder="Note Pallet (Optional)">
+                                        <label for="floatingInput">Note Pallet (Optional)</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="tab-pane fade" id="profile1" role="tabpanel" aria-labelledby="profile-tab">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-floating mb-3" style="height: 50px;">
+                                        <input autocomplete="one-time-code" type="text" class="form-control size" name="size" id="size" placeholder="Size (Optional)">
+                                        <label for="floatingInput">Size (Optional)</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-floating mb-3" style="height: 50px;">
+                                        <input autocomplete="one-time-code" type="text" class="form-control grade" name="grade" id="grade" placeholder="Grade (Optional)">
+                                        <label for="floatingInput">Grade (Optional)</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-floating mb-3" style="height: 50px;">
+                                        <input autocomplete="one-time-code" type="text" class="form-control packing_size" name="packing_size" id="packing_size" placeholder="Packing (Optional)">
+                                        <label for="floatingInput">Packing (Optional)</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-floating mb-3" style="height: 50px;">
+                                        <input autocomplete="one-time-code" type="text" class="form-control can" name="can" id="can" placeholder="Can (Optional)">
+                                        <label for="floatingInput">Can (Optional)</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-floating mb-3" style="height: 50px;">
+                                        <input autocomplete="one-time-code" type="text" class="form-control case" name="case" id="case" placeholder="Case (Optional)">
+                                        <label for="floatingInput">Case (Optional)</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-floating mb-3" style="height: 50px;">
+                                        <input autocomplete="one-time-code" type="text" class="form-control kg" name="kg" id="kg" placeholder="Kg (Optional)">
+                                        <label for="floatingInput">Kg (Optional)</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-floating mb-3" style="height: 50px;">
+                                        <input autocomplete="one-time-code" type="text" class="form-control lb" name="lb" id="lb" placeholder="Lb (Optional)">
+                                        <label for="floatingInput">Lb (Optional)</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-floating mb-3" style="height: 50px;">
+                                        <input autocomplete="one-time-code" type="text" class="form-control inner_box" name="inner_box" id="inner_box" placeholder="Inner Box (Optional)">
+                                        <label for="floatingInput">Inner Box (Optional)</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-floating mb-3" style="height: 50px;">
+                                        <input autocomplete="one-time-code" type="text" class="form-control pc" name="pc" id="pc" placeholder="Pc (Optional)">
+                                        <label for="floatingInput">PC (Optional)</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-floating mb-3" style="height: 50px;">
+                                        <input autocomplete="one-time-code" type="text" class="form-control bag" name="bag" id="bag" placeholder="Bag (Optional)">
+                                        <label for="floatingInput">Bag (Optional)</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-floating mb-3" style="height: 50px;">
+                                        <input autocomplete="one-time-code" type="text" class="form-control persen" name="persen" id="persen" placeholder="Persen (Optional)" oninput="this.value = greatFormatRupiah(this.value)">
+                                        <label for="floatingInput">Percentage % (Optional)</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-floating mb-3" style="height: 50px;">
+                                        <input autocomplete="one-time-code" type="text" class="form-control cup" name="cup" id="cup" placeholder="Cup (Optional)">
+                                        <label for="floatingInput">Cup (Optional)</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-floating mb-3" style="height: 50px;">
+                                        <input autocomplete="one-time-code" type="text" class="form-control palet" name="palet" id="palet" placeholder="Cup (Optional)">
+                                        <label for="floatingInput">Pallet (Optional)</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-discard mr-2" id="btnHideSizeBreakdownModal">Back</button>
@@ -582,6 +720,101 @@
     </div>
 </div>
 
+<div class="modal detail-modal" id="additionalDetailModal" tabindex="1">
+    <div class="modal-dialog" style="min-width: 900px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title title-secondary"><label id="label-detail-additional"></label> Additional List</h5>
+            </div>
+            <form class="create-form-additional" role="form" method="POST">
+                <input type="hidden" name="id_additional_detail" id="id_detail_additional">
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input autocomplete="one-time-code" type="text" class="form-control additional_detail_docs2" id="additional_detail_docs2" name="additional_detail_docs2" placeholder="Additional Details">
+                                <label for="floatingInput">Additional Details</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <select name="additional_detail_type" id="additional_detail_type" class="form-control additional_detail_type">
+                                        <option value="PLUS">PLUS (+)</option>
+                                        <option value="MINUS">MINUS (-)</option>
+                                    </select>
+                                </div>
+                                <div class="form-floating mb-3" style="height: 50px;">
+                                    <input autocomplete="one-time-code" type="text" oninput="this.value = greatFormatRupiah(this.value)" class="form-control additional_detail_price" id="additional_detail_price" name="additional_detail_price" placeholder="Additional Detail Price">
+                                    <label for="floatingInput">Additional Details Number</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-discard mr-2" id="btnHideAdditional">Back</button>
+                    <button type="button" class="btn btn-submit-form" id="btnSubmitAdditional">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="modal detail-modal" tabindex="1" id="productSubtitleModal">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title title-secondary">Update Product Subtitle</h5>
+            </div>
+            <form class="detail-form">
+
+                <div class="modal-body">
+                    <input type="hidden" name="id_detail_subtitle" class="id_detail_subtitle" id="id_detail_subtitle">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input autocomplete="one-time-code" readonly value="" type="text" class="form-control product_name" id="product_name" name="product_name" placeholder="Product Name">
+                                <label for="floatingInput">Product Name</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input autocomplete="one-time-code" value="" type="text" class="form-control brand" id="brand" name="brand" placeholder="Brand">
+                                <label for="floatingInput">Brand (Opsional)</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input autocomplete="one-time-code" value="" type="text" class="form-control packing" id="packing" name="packing" placeholder="Packing">
+                                <label for="floatingInput">Packing (Opsional)</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input autocomplete="one-time-code" value="" type="text" class="form-control species" id="species" name="species" placeholder="Species (Optional)">
+                                <label for="floatingInput">Species (Optional)</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input autocomplete="one-time-code" value="" type="text" class="form-control specs" id="specs" name="specs" placeholder="Specs (Optional)">
+                                <label for="floatingInput">Specs (Optional)</label>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-hide-detail btn-discard mr-3" id="btn-hide-subtitle">Back</button>
+                    <button type="button" class="btn btn-submit-form" id="btn-submit-subtitle">Update</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
 <div class="modal print-modal" tabindex="1">
     <div class="modal-dialog" style="min-width: 900px;">
         <div class="modal-content">
@@ -614,10 +847,46 @@
         </div>
     </div>
 </div>
+
+<div class="modal unpost-modal" tabindex="1">
+    <div class="modal-dialog" style="min-width: 900px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title title-secondary">Unposting Order Form</h5>
+            </div>
+            <form class="form-unposting">
+                <div class="modal-body">
+                    <input type="hidden" name="id" class="id" id="id">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input autocomplete="one-time-code" type="text" class="form-control date_revision" name="date_revision" id="date_revision" placeholder="Date Revision">
+                                <label for="floatingInput">Date Revision</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input autocomplete="one-time-code" type="text" class="form-control keterangan_unpost" name="keterangan_unpost" id="keterangan_unpost" placeholder="Keterangan Unpost (Opsional)">
+                                <label for="floatingInput">Note Unposting (Opsional)</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-hide-detail btn-discard mr-3">Back</button>
+                    <button type="button" onclick="unPosting()" class="btn btn-submit-form btn-submit-detail">Un Posting</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
 <script>
     const csrfToken = '<?= csrf_token() ?>';
     var listDataSalesKontrak = [];
     var listDetailSpecs = [];
+    var listAdditional = [];
     // HIDE DETAIL SPECS LIST
     $('#component-detail-specs-list').hide();
 
@@ -632,8 +901,19 @@
                     specification: "<?= $s['specification'] ?>",
                 });
             <?php endforeach; ?>
+
+            <?php foreach ($dataSalesExportAdditional as $s): ?>
+                listAdditional.push({
+                    id_detail_additional: "<?= $s['id'] ?>",
+                    additional_detail: "<?= $s['additional_detail'] ?>",
+                    additional_detail_type: "<?= $s['additional_detail_type'] ?>",
+                    additional_detail_price: "<?= $s['additional_detail_price'] ?>",
+                });
+            <?php endforeach ?>
+
             drawTable(listDataSalesKontrak);
             drawTableDetailSpecs(listDetailSpecs);
+            drawTableAdditionalList(listAdditional);
         <?php } else { ?>
 
         <?php } ?>
@@ -660,6 +940,13 @@
             orientation: "bottom auto",
             autoclose: true
         });
+
+        $(".date_revision").datepicker({
+            todayHighlight: true,
+            format: "dd/mm/yyyy",
+            orientation: "bottom auto",
+            autoclose: true
+        })
 
         $('.divisi_id').select2({
             placeholder: "Select Department",
@@ -688,6 +975,11 @@
             .parent('div')
             .find('label')
             .css('z-index', '1');
+
+        $(".btn-hide-detail").click(function() {
+            $(".keterangan_unpost").val("");
+            $(".unpost-modal").modal("hide");
+        });
 
         $(".posting-so").click(function() {
             Swal.fire({
@@ -748,62 +1040,12 @@
         })
 
         $(".unposting-so").click(function() {
-            Swal.fire({
-                icon: 'question',
-                title: 'Yakin akan di Unposting?',
-                confirmButtonColor: '#4e73df',
-                cancelButtonColor: '#d33',
-                showCancelButton: true,
-                reverseButtons: true,
-                confirmButtonText: 'Unposting',
-                cancelButtonText: 'Kembali',
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    const csrf = $(`[name="${csrfToken}"]`);
-                    $.ajax({
-                        url: "<?= base_url("order-form-internasional/update-status"); ?>",
-                        data: {
-                            id: $(".id").val(),
-                            status: "NEW"
-                        },
-                        beforeSend: function(xhr) {
-                            xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                        },
-                        method: "POST",
-                        dataType: "json",
-                        success: function(response) {
-                            csrf.val(response.token);
-                            if (response.status) {
-                                Swal.fire({
-                                        icon: 'success',
-                                        title: response.message,
-                                        confirmButtonColor: '#4e73df',
-                                    })
-                                    .then(() => {
-                                        window.location.href = "<?= base_url("order-form-internasional"); ?>"
-                                    })
-                            } else {
-                                Swal.fire({
-                                    icon: 'error',
-                                    title: response.message,
-                                    confirmButtonColor: '#4e73df',
-                                })
-                                stopLoading()
-                            }
-                        },
-                        onError: function(response) {
-                            csrf.val(response.token);
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Data Gagal Diubah, coba Lagi',
-                                confirmButtonColor: '#4e73df',
-                            })
-                            stopLoading()
-                        }
-                    });
-                }
-            })
-        })
+
+            $(".unpost-modal").modal("show");
+
+        });
+
+
 
         var validator = $("#form-parent").validate({
             rules: {
@@ -820,6 +1062,12 @@
                     required: true
                 },
                 payment_term: {
+                    required: true
+                },
+                deadline: {
+                    required: true
+                },
+                container: {
                     required: true
                 }
             },
@@ -838,6 +1086,12 @@
                 },
                 payment_term: {
                     required: "Payment term required"
+                },
+                deadline: {
+                    required: "Deadline required"
+                },
+                container: {
+                    required: "Container required"
                 }
             },
             errorElement: 'span',
@@ -934,6 +1188,45 @@
             },
         });
 
+        var validatorAdditionalDetail = $(".create-form-additional").validate({
+            rules: {
+                additional_detail_docs2: {
+                    required: true
+                },
+                additional_detail_price: {
+                    required: true
+                },
+            },
+            messages: {
+                additional_detail_docs2: {
+                    required: "Additional detail required"
+                },
+                additional_detail_price: {
+                    required: "Additional detail price required"
+                },
+            },
+            errorElement: 'span',
+            errorClass: 'text-danger',
+            errorPlacement: function(error, element) {
+                var elem = $(element);
+                if (elem.hasClass("select2-hidden-accessible")) {
+                    element = $("#select2-" + elem.attr("id") + "-container").parent();
+                    error.insertAfter(element);
+                } else {
+                    error.insertAfter(element);
+                }
+            },
+            highlight: function(element) {
+                $(element).closest('.form-group').addClass('has-error');
+                $(element).addClass('select-class');
+
+            },
+            unhighlight: function(element) {
+                $(element).closest('.form-group').removeClass('has-error');
+                $(element).removeClass('select-class');
+            },
+        });
+
 
         $('#btnSubmitSpecsDetail').click(function(e) {
             e.preventDefault();
@@ -969,7 +1262,71 @@
                 drawTableDetailSpecs(listDetailSpecs);
 
             }
-        })
+        });
+
+        $('#btnSubmitAdditional').click(function(e) {
+            e.preventDefault();
+            if ($('.create-form-additional').valid()) {
+                var idAdditionalDetail = $('#id_detail_additional').val();
+                var additionalDetail = $('#additional_detail_docs2').val();
+                var additionalDetailType = $('#additional_detail_type').val();
+                var additionalDetailPrice = destroyFormatRupiah($('#additional_detail_price').val());
+
+                if (idAdditionalDetail) {
+                    // UPDATE
+                    var index = null;
+                    for (var i = 0; i < listAdditional.length; i++) {
+                        if (listAdditional[i].id_detail_additional == idAdditionalDetail) {
+                            index = i;
+                            break;
+                        }
+                    }
+
+                    listAdditional[index].additional_detail = additionalDetail;
+                    listAdditional[index].additional_detail_type = additionalDetailType;
+                    listAdditional[index].additional_detail_price = additionalDetailPrice;
+                } else {
+                    // CREATE
+                    idAdditionalDetail = getID();
+                    listAdditional.push({
+                        id_detail_additional: idAdditionalDetail,
+                        additional_detail: additionalDetail,
+                        additional_detail_type: additionalDetailType,
+                        additional_detail_price: additionalDetailPrice
+                    });
+                }
+
+                $('#additionalDetailModal').modal('hide');
+                drawTableAdditionalList(listAdditional);
+            }
+        });
+
+        $('#btn-submit-subtitle').click(function(e) {
+            e.preventDefault();
+
+            var idSubtitle = $('#id_detail_subtitle').val();
+            var listSalesContractDetail = listDataSalesKontrak.salesContractDetailList;
+            var indexSalesKontrakDetail = 0;
+            for (var i = 0; i < listSalesContractDetail.length; i++) {
+                if (listSalesContractDetail[i].id == idSubtitle) {
+                    indexSalesKontrakDetail = i;
+                    break;
+                }
+            }
+
+            var brand = $('#brand').val();
+            var packing = $('#packing').val();
+            var species = $('#species').val();
+            var specs = $('#specs').val();
+
+            listDataSalesKontrak.salesContractDetailList[indexSalesKontrakDetail].brand = brand;
+            listDataSalesKontrak.salesContractDetailList[indexSalesKontrakDetail].packing = packing;
+            listDataSalesKontrak.salesContractDetailList[indexSalesKontrakDetail].species = species;
+            listDataSalesKontrak.salesContractDetailList[indexSalesKontrakDetail].specs = specs;
+
+            drawTable(listDataSalesKontrak);
+            $('#productSubtitleModal').modal('hide');
+        });
 
 
         $(".btn-submit-parent").click(function() {
@@ -1005,7 +1362,7 @@
                             let canDeductionPrice = destroyFormatRupiah($('#can_deduction_price').val());
                             let estimatedFreightPrice = destroyFormatRupiah($('#estimated_freight_price').val());
                             let paletFumigationPrice = destroyFormatRupiah($('#palet_fumigation_price').val());
-                            let additionalDetailPrice = destroyFormatRupiah($('#additional_detail_price').val());
+                            // let additionalDetailPrice = destroyFormatRupiah($('#additional_detail_price').val());
                             let othersPrice = destroyFormatRupiah($('#others_price').val());
 
                             data.set('royalty_price', royaltyPrice);
@@ -1013,11 +1370,12 @@
                             data.set('can_deduction_price', canDeductionPrice);
                             data.set('estimated_freight_price', estimatedFreightPrice);
                             data.set('palet_fumigation_price', paletFumigationPrice);
-                            data.set('additional_detail_price', additionalDetailPrice);
+                            // data.set('additional_detail_price', additionalDetailPrice);
                             data.set('others_price', othersPrice);
 
                             data.append("listDetailSpecs", JSON.stringify(listDetailSpecs));
                             data.append("listDataSalesKontrak", JSON.stringify(listDataSalesKontrak));
+                            data.append("listAdditional", JSON.stringify(listAdditional));
 
                             // UPDATE
                             if (id) {
@@ -1137,6 +1495,7 @@
             }
         }
 
+        // Detail Size
         $('#id_detail').val(itemSalesContractDetail.id);
         $('#id_detail_breakdown').val(itemSizeBreakdown.id_detail_breakdown);
         $('#size').val(itemSizeBreakdown.size).attr('readonly', true);
@@ -1153,7 +1512,21 @@
         $('#cup').val(itemSizeBreakdown.cup).attr('readonly', true);
         $('#palet').val(itemSizeBreakdown.palet).attr('readonly', true);
         $('#remark').val(itemSizeBreakdown.remark).attr('readonly', true);
-
+        // Note Size
+        $('#note_size').val(itemSizeBreakdown.note_size);
+        $('#note_grade').val(itemSizeBreakdown.note_grade);
+        $('#note_packing_size').val(itemSizeBreakdown.note_packing_size);
+        $('#note_can').val(itemSizeBreakdown.note_can);
+        $('#note_case').val(itemSizeBreakdown.note_case);
+        $('#note_kg').val(itemSizeBreakdown.note_kg);
+        $('#note_lb').val(itemSizeBreakdown.note_lb);
+        $('#note_inner_box').val(itemSizeBreakdown.note_inner_box);
+        $('#note_pc').val(itemSizeBreakdown.note_pc);
+        $('#note_bag').val(itemSizeBreakdown.note_bag);
+        $('#note_persen').val(itemSizeBreakdown.note_persen);
+        $('#note_cup').val(itemSizeBreakdown.note_cup);
+        $('#note_palet').val(itemSizeBreakdown.note_palet);
+        // Qty
         $('#qty').data('max', itemSizeBreakdown.qty_sisa);
         $('#qty').val(itemSizeBreakdown.qty_input);
         $('#harga').val(greatFormatRupiah(itemSizeBreakdown.harga)).attr('readonly', true);
@@ -1192,6 +1565,33 @@
             listDataSalesKontrak.salesContractDetailList[indexSalesKontrakDetail].size_breakdown[indexSizeBreakDown].qty_input = qty_input;
             listDataSalesKontrak.salesContractDetailList[indexSalesKontrakDetail].size_breakdown[indexSizeBreakDown].total_input = total_input;
 
+            var noteSize = $('#note_size').val();
+            var noteGrade = $('#note_grade').val();
+            var notePackingSize = $('#note_packing_size').val();
+            var noteCan = $('#note_can').val();
+            var noteCase = $('#note_case').val();
+            var noteKg = $('#note_kg').val();
+            var noteLb = $('#note_lb').val();
+            var noteInnerBox = $('#note_inner_box').val();
+            var notePc = $('#note_pc').val();
+            var noteBag = $('#note_bag').val();
+            var notePersen = $('#note_persen').val();
+            var noteCup = $('#note_cup').val();
+            var notePalet = $('#note_palet').val();
+            // Update Note Size
+            listDataSalesKontrak.salesContractDetailList[indexSalesKontrakDetail].size_breakdown[indexSizeBreakDown].note_size = noteSize;
+            listDataSalesKontrak.salesContractDetailList[indexSalesKontrakDetail].size_breakdown[indexSizeBreakDown].note_grade = noteGrade;
+            listDataSalesKontrak.salesContractDetailList[indexSalesKontrakDetail].size_breakdown[indexSizeBreakDown].note_packing_size = notePackingSize;
+            listDataSalesKontrak.salesContractDetailList[indexSalesKontrakDetail].size_breakdown[indexSizeBreakDown].note_can = noteCan;
+            listDataSalesKontrak.salesContractDetailList[indexSalesKontrakDetail].size_breakdown[indexSizeBreakDown].note_case = noteCase;
+            listDataSalesKontrak.salesContractDetailList[indexSalesKontrakDetail].size_breakdown[indexSizeBreakDown].note_kg = noteKg;
+            listDataSalesKontrak.salesContractDetailList[indexSalesKontrakDetail].size_breakdown[indexSizeBreakDown].note_lb = noteLb;
+            listDataSalesKontrak.salesContractDetailList[indexSalesKontrakDetail].size_breakdown[indexSizeBreakDown].note_inner_box = noteInnerBox;
+            listDataSalesKontrak.salesContractDetailList[indexSalesKontrakDetail].size_breakdown[indexSizeBreakDown].note_pc = notePc;
+            listDataSalesKontrak.salesContractDetailList[indexSalesKontrakDetail].size_breakdown[indexSizeBreakDown].note_bag = noteBag;
+            listDataSalesKontrak.salesContractDetailList[indexSalesKontrakDetail].size_breakdown[indexSizeBreakDown].note_persen = notePersen;
+            listDataSalesKontrak.salesContractDetailList[indexSalesKontrakDetail].size_breakdown[indexSizeBreakDown].note_cup = noteCup;
+            listDataSalesKontrak.salesContractDetailList[indexSalesKontrakDetail].size_breakdown[indexSizeBreakDown].note_palet = notePalet;
             drawTable(listDataSalesKontrak);
             recalculateGrandTotal();
             $('#updateQtyOrderFormModal').modal('hide');
@@ -1222,39 +1622,35 @@
         $('#total').val(greatFormatRupiah(total));
     });
 
-    $('.btn-submit-detail').click(function() {
-        var id_detail = $('#id_detail').val();
-        var remark = $('#remark').val();
-
-        if (remark == '') {
-            Swal.fire({
-                icon: 'error',
-                title: "Remark Wajib Diisi",
-                confirmButtonColor: '#4e73df',
-            })
-        } else {
-            var index = null;
-            for (var i = 0; i < listBarang.length; i++) {
-                if (listBarang[i].id == id_detail) {
-                    index = i;
-                    break;
-                }
-            }
-
-            listBarang[i].remark = remark;
-            drawTable();
-            $('.detail-modal').modal('hide');
-        }
-    });
-
     $('.btn-hide-detail').click(function() {
         $('.detail-modal').modal('hide');
+    });
+
+    $('#btnAdditionalList').click(function() {
+        resetFormAdditional();
+        $('#label-detail-additional').text('Create ');
+        $('#additionalDetailModal').modal('show');
+    });
+
+    $('#btnHideAdditional').click(function() {
+        $('#additionalDetailModal').modal('hide');
+    });
+
+    $('#btn-hide-subtitle').click(function() {
+        $('#productSubtitleModal').modal('hide');
     });
 
     function resetFormDetailSpecs() {
         $('#id_detail_specs_list').val(null);
         $('#grade_pts').val(null);
         $('#specification').val(null);
+    }
+
+    function resetFormAdditional() {
+        $('#id_detail_additional').val(null);
+        $('#additional_detail_docs2').val(null);
+        $('#additional_detail_type').val("PLUS").change();
+        $('#additional_detail_price').val(null);
     }
 
     function getDetailSalesKontrak() {
@@ -1281,9 +1677,9 @@
                 // DRAW SENSITECH INFORMATION
                 $('#consigne').val(listDataSalesKontrak.salesContract.customer_name);
                 $('#destination').val(listDataSalesKontrak.salesContract.dicharge_port);
-                $('#deadline').val(listDataSalesKontrak.salesContract.shipment_date);
+                // $('#deadline').val(listDataSalesKontrak.salesContract.shipment_date);
                 $('#po_no').val(listDataSalesKontrak.salesContract.po_no);
-                $('#consigne_docs').val(listDataSalesKontrak.salesContract.customer_name);
+                // $('#consigne_docs').val(listDataSalesKontrak.salesContract.customer_name);
                 $('#payment_term').val(listDataSalesKontrak.salesContract.payment_term);
             },
             error: function(xhr, status, error) {
@@ -1316,6 +1712,23 @@
         } else {
 
             listDataSalesKontrak.salesContractDetailList.map((item, index) => {
+                const actionButtonSubtitle = `
+                    <?php if (!empty($dataSalesExport)) : ?>
+                        <?php if ($dataSalesExport->status == "POSTED") : ?>
+                            -
+                        <?php else : ?>
+                            <button type="button" class="btn btn-warning posting-spp mr-1" onclick="detailRowSubtitle('${item.id}')">
+                                <i class="fa fa-pencil fa-sm" aria-hidden="true"></i>
+                            </button>
+                        <?php endif; ?>
+                    <?php else : ?>
+                        <button type="button" class="btn btn-warning posting-spp mr-1" onclick="detailRowSubtitle('${item.id}')">
+                            <i class="fa fa-pencil fa-sm" aria-hidden="true"></i>
+                        </button>
+                    <?php endif; ?>
+                `;
+
+
                 const newRow = $('<tr style="color:whitesmoke;">');
                 newRow.append(`<td style="text-align:center;">${no++}</td>`);
                 newRow.append(`<td>${item.kode_barang}</td>`);
@@ -1324,6 +1737,7 @@
                 newRow.append(`<td>${item.brand}</td>`);
                 newRow.append(`<td>${item.packing}</td>`);
                 newRow.append(`<td>${item.specs}</td>`);
+                newRow.append(`<td>${actionButtonSubtitle}</td>`)
                 tbody.append(newRow);
 
                 // === Row Kedua: Breakdown Table ===
@@ -1429,8 +1843,10 @@
                 innerTable.find('.total-price').html(`<b>${greatFormatRupiah(totalHargaSize.toFixed(2))}</b>`);
                 innerTable.find('.total-amount').html(`<b>${greatFormatRupiah(totalAmountSize.toFixed(2))}</b>`);
 
-                detailRow.append(`<td colspan="7"><b>SIZE & BREAKDOWN</b><br>${innerTable.prop('outerHTML')}</td>`);
+                detailRow.append(`<td colspan="8"><b>SIZE & BREAKDOWN</b><br>${innerTable.prop('outerHTML')}</td>`);
                 tbody.append(detailRow);
+
+                console.log(destroyFormatRupiah(item.total_input));
 
                 totalQty += parseFloat(item.qty_input);
                 totalHarga += destroyFormatRupiah(item.harga);
@@ -1438,13 +1854,16 @@
 
             });
 
+
+            console.log("tOTALTOTALHARGA", totalTotalHarga);
+
             var additionalPrice = '';
 
             if (listDataSalesKontrak.royaltyPriceFinal > 0) {
                 totalTotalHarga -= listDataSalesKontrak.royaltyPriceFinal;
                 additionalPrice += `
                     <tr class="bg-light">
-                        <td colspan="4" class="text-end"><b>ROYALTY (${listDataSalesKontrak.salesContract.royalty})</b></td>
+                        <td colspan="5" class="text-end"><b>ROYALTY (${listDataSalesKontrak.salesContract.royalty})</b></td>
                         <td colspan="2">
                             <input type="text" 
                                 id="royalty_price"
@@ -1464,7 +1883,7 @@
                 totalTotalHarga -= listDataSalesKontrak.rebatePriceFinal;
                 additionalPrice += `
                     <tr class="bg-light">
-                        <td colspan="4" class="text-end"><b>REBATE (${listDataSalesKontrak.salesContract.rebate})</b></td>
+                        <td colspan="5" class="text-end"><b>REBATE (${listDataSalesKontrak.salesContract.rebate})</b></td>
                         <td colspan="2">
                             <input type="text" 
                                 id="rebate_price"
@@ -1483,7 +1902,7 @@
                 totalTotalHarga -= listDataSalesKontrak.canDeductionPriceFinal;
                 additionalPrice += `
                     <tr class="bg-light">
-                        <td colspan="4" class="text-end"><b>CAN DEDUCTION (${listDataSalesKontrak.salesContract.can_deduction})</b></td>
+                        <td colspan="5" class="text-end"><b>CAN DEDUCTION (${listDataSalesKontrak.salesContract.can_deduction})</b></td>
                         <td colspan="2">
                             <input type="text" 
                                 id="can_deduction_price"
@@ -1502,7 +1921,7 @@
                 totalTotalHarga += listDataSalesKontrak.estimatedFreightPriceFinal;
                 additionalPrice += `
                     <tr class="bg-light">
-                        <td colspan="4" class="text-end"><b>ESTIMATED FREIGHT (${listDataSalesKontrak.salesContract.estimated_freight})</b></td>
+                        <td colspan="5" class="text-end"><b>ESTIMATED FREIGHT (${listDataSalesKontrak.salesContract.estimated_freight})</b></td>
                         <td colspan="2">
                             <input type="text" 
                                 id="estimated_freight_price"
@@ -1528,7 +1947,7 @@
                 additionalPrice += `
                     <input type="hidden" value="${listDataSalesKontrak.othersTypeFinal}" name="others_type" id="others_type"/>
                     <tr class="bg-light">
-                        <td colspan="4" class="text-end"><b>OTHER PRICE (${listDataSalesKontrak.salesContract.others})</b></td>
+                        <td colspan="5" class="text-end"><b>OTHER PRICE (${listDataSalesKontrak.salesContract.others})</b></td>
                         <td colspan="2">
                             <input type="text" 
                                 id="others_price"
@@ -1549,7 +1968,7 @@
             const totalRow = $(`
                 ${additionalPrice}
                 <tr class="bg-light">
-                    <td colspan="4" class="text-end"><b>TOTAL</b></td>
+                    <td colspan="5" class="text-end"><b>TOTAL</b></td>
                     <td style="text-align:left;"><b id="total_txt">${greatFormatRupiah(totalTotalHarga)}</b></td>
                     <td></td>
                     <td></td>
@@ -1604,6 +2023,76 @@
         }
     }
 
+    function drawTableAdditionalList(listAdditional) {
+        $('#body-additional-detail').empty();
+        $('#foot-additional-detail').empty();
+        var row = '';
+        var no = 1;
+        const table = $('#additionalDetailTable');
+        if (listAdditional.length === 0) {
+            row += `
+                    <tr>
+                        <td colspan="4">List Additional Empty</td>
+                    </tr>
+                `;
+            $('#foot-additional-detail').append(row);
+        } else {
+            listAdditional.map(item => {
+                var iconOperator = item.additional_detail_type == "PLUS" ? "(+)" : "(-)";
+                var newRow = $('<tr style="color:whitesmoke;">');
+                newRow.append($('<td style="text-align:center;">').text(no++));
+                newRow.append($('<td>').text(item.additional_detail));
+                newRow.append($('<td>').text(iconOperator + " " + greatFormatRupiah(item.additional_detail_price)));
+                newRow.append($('<td>').html(
+                    <?php if (!empty($dataSalesExport)) : ?> <?php if ($dataSalesExport->status == "POSTED") : ?> `-`
+                        <?php else : ?> `
+                        <button type="button" class="btn btn-warning posting-spp mr-1" onclick="detailRowAdditional('${item.id_detail_additional}')">
+                                <i class="fa fa-pencil fa-sm" aria-hidden="true"></i>
+                            </button><button type="button" class="btn btn-danger" onclick="deleteRowAdditional('${item.id_detail_additional}')">
+                                <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
+                            </button>
+                    `
+                        <?php endif; ?>
+
+                    <?php else : ?> `
+                        <button type="button" class="btn btn-warning posting-spp mr-1" onclick="detailRowAdditional('${item.id_detail_additional}')">
+                                <i class="fa fa-pencil fa-sm" aria-hidden="true"></i>
+                            </button><button type="button" class="btn btn-danger" onclick="deleteRowAdditional('${item.id_detail_additional}')">
+                                <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
+                            </button>
+                    `
+                    <?php endif; ?>
+                ));
+
+                table.find('tbody').append(newRow);
+            });
+        }
+    }
+
+    function detailRowSubtitle(id) {
+        var itemSalesContractDetail = null;
+        var listSalesContractDetail = listDataSalesKontrak.salesContractDetailList;
+
+        for (var i = 0; i < listSalesContractDetail.length; i++) {
+            if (listSalesContractDetail[i].id == id) {
+                itemSalesContractDetail = listSalesContractDetail[i];
+                break;
+            }
+        }
+
+        console.log(itemSalesContractDetail);
+
+        $('#id_detail_subtitle').val(itemSalesContractDetail.id);
+        $('#product_name').val(itemSalesContractDetail.barang_name);
+        $('#brand').val(itemSalesContractDetail.brand);
+        $('#packing').val(itemSalesContractDetail.packing);
+        $('#species').val(itemSalesContractDetail.species);
+        $('#specs').val(itemSalesContractDetail.specs);
+
+        $('#productSubtitleModal').modal('show');
+
+    }
+
     function detailRowSpecs(id_detail_specs_list) {
         var item = null;
         for (var i = 0; i < listDetailSpecs.length; i++) {
@@ -1635,6 +2124,39 @@
         drawTableDetailSpecs(listDetailSpecs);
     }
 
+    function detailRowAdditional(id_detail_additional) {
+        var item = null;
+        for (var i = 0; i < listAdditional.length; i++) {
+            if (listAdditional[i].id_detail_additional == id_detail_additional) {
+                item = listAdditional[i];
+                break;
+            }
+        }
+
+        $('#id_detail_additional').val(item.id_detail_additional);
+        $('#additional_detail_docs2').val(item.additional_detail);
+        $('#additional_detail_type').val(item.additional_detail_type);
+        $('#additional_detail_price').val(greatFormatRupiah(item.additional_detail_price));
+
+        $('#label-detail-additional').text("Update ");
+        $('#additionalDetailModal').modal('show');
+    }
+
+    function deleteRowAdditional(id_detail_additional) {
+        var indexToRemove = -1;
+        for (var i = 0; i < listAdditional.length; i++) {
+            if (listAdditional[i].id_detail_additional == id_detail_additional) {
+                indexToRemove = i;
+                break;
+            }
+        }
+        if (indexToRemove !== -1) {
+            listAdditional.splice(indexToRemove, 1);
+        }
+        drawTableAdditionalList(listAdditional);
+    }
+
+
     function recalculateGrandTotal() {
         var total = 0;
         listDataSalesKontrak.salesContractDetailList.map((item, index) => {
@@ -1642,6 +2164,8 @@
                 total += parseFloat(size.total_input) || 0;
             })
         });
+
+        console.log(total);
 
         var royaltyPrice = destroyFormatRupiah($('#royalty_price').val() || 0);
         var rebatePrice = destroyFormatRupiah($('#rebate_price').val() || 0);
@@ -1662,14 +2186,18 @@
         }
 
         if (estimatedFreightPrice > 0) {
-            total -= estimatedFreightPrice;
+            total += estimatedFreightPrice;
         }
 
-        if (listDataSalesKontrak.others_type == "PLUS") {
+        if (listDataSalesKontrak.othersTypeFinal == "PLUS") {
             total += othersPrice;
         } else {
             total -= othersPrice;
         }
+
+        console.log(listDataSalesKontrak);
+
+        console.log(royaltyPrice, rebatePrice, canDeductionPrice, estimatedFreightPrice, othersPrice, listDataSalesKontrak.othersTypeFinal);
 
         $('#total_txt').text(greatFormatRupiah(total));
     }
@@ -1810,6 +2338,57 @@
     $('.btn-hide-print').click(function() {
         $('.print-modal').modal('hide');
     });
+
+    function unPosting() {
+        var csrf = $(`[name="${csrfToken}"]`);
+        var date_revision = $('#date_revision').val();
+        var keterangan = $('#keterangan_unpost').val();
+        var state = true;
+
+        // MAU UNPOSTING
+        if (date_revision == "") {
+            state = false;
+            Swal.fire({
+                icon: 'error',
+                title: "Form Date Revision Required",
+                confirmButtonColor: '#4e73df',
+            })
+        } else {
+            $.ajax({
+                url: "<?= base_url("order-form-internasional/update-status"); ?>",
+                data: {
+                    id: $(".id").val(),
+                    status: "0",
+                    date_revision: date_revision,
+                    keterangan: keterangan,
+                },
+                beforeSend: function(xhr) {
+                    xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                    stopLoading()
+                },
+                complete: function() {
+                    stopLoading();
+                },
+                method: "POST",
+                dataType: "json",
+                success: function(response) {
+                    csrf.val(response.token);
+                    if (response.status) {
+                        Swal.fire({
+                                icon: 'success',
+                                title: response.message,
+                                confirmButtonColor: '#4e73df',
+                            })
+                            .then(() => {
+                                location.reload();
+                            })
+                    }
+                },
+            });
+        }
+
+
+    }
 
     const printAction = function() {
         var id = $('.id').val();
