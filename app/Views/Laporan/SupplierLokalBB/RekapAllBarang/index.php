@@ -285,91 +285,30 @@
             }
         },
         footerCallback: function(row, data, start, end, display) {
-            var api = this.api();
+            const api = this.api();
 
-            function parseNumber(value) {
-                return typeof value === 'string' ?
-                    parseFloat(value.replace(/,/g, '')) || 0 :
-                    typeof value === 'number' ?
-                    value :
-                    0;
+            const total = api.ajax.json().totalSummary;
+
+            if (total) {
+                $('.total-qty').html(total.qtyPO);
+                $('.total-dpp-umum').html(total.dppUmum);
+                $('.total-pph-umum').html(total.pphUmum);
+                $('.total-total-umum').html(total.totalUmum);
+
+                $('.total-dpp-harian').html(total.dppHarian);
+                $('.total-pph-harian').html(total.pphHarian);
+                $('.total-total-harian').html(total.totalHarian);
+
+                $('.total-dpp-bulanan').html(total.dppBulanan);
+                $('.total-pph-bulanan').html(total.pphBulanan);
+                $('.total-total-bulanan').html(total.totalBulanan);
+
+                $('.total-dpp-subsidi').html(total.subsidi);
+                $('.total-pph-subsidi').html(total.pphSubsidi);
+                $('.total-total-subsidi').html(total.totalSubsidi);
+
+                $('.total-total-row').html(total.totalRow);
             }
-
-            function totalCol(index) {
-                return api
-                    .column(index, {
-                        page: 'current'
-                    })
-                    .data()
-                    .reduce(function(a, b) {
-                        return parseNumber(a) + parseNumber(b);
-                    }, 0);
-            }
-
-            // urutan index kolom (sesuai columns array):
-            const indexes = {
-                qty: 4,
-                dppUmum: 6,
-                pphUmum: 7,
-                totalUmum: 8,
-                dppHarian: 9,
-                pphHarian: 10,
-                totalHarian: 11,
-                dppBulanan: 12,
-                pphBulanan: 13,
-                totalBulanan: 14,
-                dppSubsidi: 15,
-                pphSubsidi: 16,
-                totalSubsidi: 17,
-                totalRow: 18,
-            };
-
-            $('.total-qty').html(totalCol(indexes.qty).toLocaleString('en-US', {
-                minimumFractionDigits: 2
-            }));
-            $('.total-dpp-umum').html(totalCol(indexes.dppUmum).toLocaleString('en-US', {
-                minimumFractionDigits: 2
-            }));
-            $('.total-pph-umum').html(totalCol(indexes.pphUmum).toLocaleString('en-US', {
-                minimumFractionDigits: 2
-            }));
-            $('.total-total-umum').html(totalCol(indexes.totalUmum).toLocaleString('en-US', {
-                minimumFractionDigits: 2
-            }));
-
-            $('.total-dpp-harian').html(totalCol(indexes.dppHarian).toLocaleString('en-US', {
-                minimumFractionDigits: 2
-            }));
-            $('.total-pph-harian').html(totalCol(indexes.pphHarian).toLocaleString('en-US', {
-                minimumFractionDigits: 2
-            }));
-            $('.total-total-harian').html(totalCol(indexes.totalHarian).toLocaleString('en-US', {
-                minimumFractionDigits: 2
-            }));
-
-            $('.total-dpp-bulanan').html(totalCol(indexes.dppBulanan).toLocaleString('en-US', {
-                minimumFractionDigits: 2
-            }));
-            $('.total-pph-bulanan').html(totalCol(indexes.pphBulanan).toLocaleString('en-US', {
-                minimumFractionDigits: 2
-            }));
-            $('.total-total-bulanan').html(totalCol(indexes.totalBulanan).toLocaleString('en-US', {
-                minimumFractionDigits: 2
-            }));
-
-            $('.total-dpp-subsidi').html(totalCol(indexes.dppSubsidi).toLocaleString('en-US', {
-                minimumFractionDigits: 2
-            }));
-            $('.total-pph-subsidi').html(totalCol(indexes.pphSubsidi).toLocaleString('en-US', {
-                minimumFractionDigits: 2
-            }));
-            $('.total-total-subsidi').html(totalCol(indexes.totalSubsidi).toLocaleString('en-US', {
-                minimumFractionDigits: 2
-            }));
-
-            $('.total-total-row').html(totalCol(indexes.totalRow).toLocaleString('en-US', {
-                minimumFractionDigits: 2
-            }));
         },
     })
 
