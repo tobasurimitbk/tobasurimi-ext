@@ -1,6 +1,5 @@
 <?= $this->extend('layouts/template'); ?>
 <?= $this->Section('content'); ?>
-<meta name="csrf-token" content="<?= csrf_hash() ?>">
 
 <div class="modal add-modal" id="add_modal" tabindex="-1">
     <div class="modal-dialog" style="min-width: 1200px">
