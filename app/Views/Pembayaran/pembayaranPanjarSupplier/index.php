@@ -660,11 +660,6 @@
     // HIDE MODAL
     $('.btn-discard').click(function() {
 
-        if(confirm('Anda yakin ingin menutup modal?')) {
-            allowModalClose = true;
-            $('#add_modal').modal('hide');
-        }
-
         // Clear input fields
         $('.add-modal input').val('');
         $('.add-modal textarea').val('');
@@ -688,7 +683,7 @@
             });
             return false;
         }
-        
+
         if (!allowModalClose) return;
 
         // 1. Reset form utama
