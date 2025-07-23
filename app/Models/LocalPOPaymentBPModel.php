@@ -266,7 +266,7 @@ class LocalPOPaymentBPModel extends Model
         return $payments;
     }
 
-       public function get_new_no(
+    public function get_new_no(
         $jenis,
         $divisi,
         $paymentMethod,
@@ -315,6 +315,12 @@ class LocalPOPaymentBPModel extends Model
             } elseif (strpos($divisiUpper, 'FROZENII') !== false) {
                 $kodeDivisi = ($jenis == 'MERAH') ? 'FSM' : 'FSK';
                 $divisiKey = 'FROZENII';
+            } elseif (strpos($divisiUpper, 'FRZI') !== false) {
+                $kodeDivisi = ($jenis == 'MERAH') ? 'FRM' : 'FRK';
+                $divisiKey = 'FRZI';
+            } elseif (strpos($divisiUpper, 'FRZII') !== false) {
+                $kodeDivisi = ($jenis == 'MERAH') ? 'FSM' : 'FSK';
+                $divisiKey = 'FRZII';
             } elseif (strpos($divisiUpper, 'GLOBAL') !== false) {
                 $kodeDivisi = ($jenis == 'MERAH') ? 'GBM' : 'GBK';
                 $divisiKey = 'GLOBAL';
@@ -359,6 +365,14 @@ class LocalPOPaymentBPModel extends Model
                         $searchPatterns[] = 'FSM/' . $thn . '/' . $bln . '/';
                         $searchPatterns[] = 'FSK/' . $thn . '/' . $bln . '/';
                         break;
+                    case 'FRZI':
+                        $searchPatterns[] = 'FRM/' . $thn . '/' . $bln . '/';
+                        $searchPatterns[] = 'FRK/' . $thn . '/' . $bln . '/';
+                        break;
+                    case 'FRZII':
+                        $searchPatterns[] = 'FSM/' . $thn . '/' . $bln . '/';
+                        $searchPatterns[] = 'FSK/' . $thn . '/' . $bln . '/';
+                        break;
                     case 'GLOBAL':
                         $searchPatterns[] = 'GBM/' . $thn . '/' . $bln . '/';
                         $searchPatterns[] = 'GBK/' . $thn . '/' . $bln . '/';
@@ -387,6 +401,14 @@ class LocalPOPaymentBPModel extends Model
                         $searchPatterns[] = 'FRK/' . $thn . '/' . $bln . '/';
                         break;
                     case 'FROZENII':
+                        $searchPatterns[] = 'FSM/' . $thn . '/' . $bln . '/';
+                        $searchPatterns[] = 'FSK/' . $thn . '/' . $bln . '/';
+                        break;
+                    case 'FRZI':
+                        $searchPatterns[] = 'FRM/' . $thn . '/' . $bln . '/';
+                        $searchPatterns[] = 'FRK/' . $thn . '/' . $bln . '/';
+                        break;
+                    case 'FRZII':
                         $searchPatterns[] = 'FSM/' . $thn . '/' . $bln . '/';
                         $searchPatterns[] = 'FSK/' . $thn . '/' . $bln . '/';
                         break;
