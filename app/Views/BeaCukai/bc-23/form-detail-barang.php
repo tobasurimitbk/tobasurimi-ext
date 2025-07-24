@@ -336,7 +336,7 @@
                             </div>
                             <div class="mt-1">
                                 <div class="form-floating mb-3">
-                                    <input id="barang_detail_nilai_tarif" name="barang_detail_nilai_tarif" type="number" min="0" max="100" class="form-control barang_detail_nilai_tarif" placeholder="" oninput="$(this).val(Math.max(0, Math.min(100, $(this).val())))">
+                                    <input id="barang_detail_nilai_tarif" name="barang_detail_nilai_tarif" type="text" class="form-control barang_detail_nilai_tarif" placeholder="">
                                     <label>Nilai Tarif (%)</label>
                                 </div>
                             </div>
