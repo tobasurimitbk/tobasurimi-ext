@@ -2434,7 +2434,7 @@ class LaporanSupplierLokalBB extends BaseController
         }
 
         $writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet);
-        $filename = 'laporan_rekap_per_barang_' . date('Ymd_His') . '.xlsx';
+        $filename = 'Laporan_Rekap_All_Barang_' . date('Ymd_His') . '.xlsx';
 
         header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
         header("Content-Disposition: attachment;filename=\"{$filename}\"");
