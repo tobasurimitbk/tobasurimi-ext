@@ -72,7 +72,10 @@
 
         <tbody>
           <tr>
-            <td colspan="8">Saldo Awal : </td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td colspan="4">Saldo Awal : </td>
             <td><?= toRupiah($j['saldo_lama']) ?></td>
           </tr>
           <?php
