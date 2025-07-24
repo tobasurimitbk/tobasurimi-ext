@@ -48,6 +48,7 @@ class SalesOrderExportModel extends Model
             'due_date'              => 'sales_contract.due_date',
             'shipment_date'         => 'sales_contract.shipment_date',
             'tanggal'               => 'sales_order_export.tanggal',
+            'divisi_id'               => 'sales_order_export.divisi_id',
         ];
 
         $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
@@ -59,12 +60,14 @@ class SalesOrderExportModel extends Model
                         sales_contract.customer_po_no,
                         sales_contract.dicharge_port,
                         sales_contract.shipment_date,
-                        customers.name AS customer_name";
+                        customers.name AS customer_name,
+                        divisis.divisi";
         $salesDataQry = $this->asObject()
             ->select($selectQry)
             ->where($condition)
             ->join('sales_contract', 'sales_contract.id = sales_order_export.sales_contract_id', 'left')
             ->join('customers', 'customers.id = sales_contract.customer_id', 'left')
+            ->join('divisis', 'divisis.id = sales_order_export.divisi_id', 'left')
             ->orderBy($sort, $sortType);
 
         $totalData = $salesDataQry->countAllResults(false);
@@ -77,7 +80,8 @@ class SalesOrderExportModel extends Model
             $salesDataQry
                 ->like('sales_order_export.sales_order_export_no', $addCondition['search'])
                 ->orLike('sales_contract.customer_po_no', $addCondition['search'])
-                ->orLike('customers.name', $addCondition['search']);
+                ->orLike('customers.name', $addCondition['search'])
+                ->orLike('divisis.divisi', $addCondition['search']);
         }
 
         if ($addCondition['status']) {
@@ -280,13 +284,14 @@ class SalesOrderExportModel extends Model
         ];
     }
 
-    public function getDetailSalesKontrakInOrderForm($salesContractId, $salesOrderExportId = null)
+    public function getDetailSalesKontrakInOrderForm($salesContractId, $salesOrderExportId = null, $isPrint = false)
     {
         $salesKontrakDetailModel = new SalesKontrakDetailModel();
         $salesContractSizeBreakdownModel = new SalesContractSizeBreakdownModel();
         $salesOrderExportDetailModel = new SalesOrderExportDetailModel();
         $salesKontrakModel = new SalesKontrakModel();
         $salesOrderExportModel = new SalesOrderExportModel();
+        $salesOrderExportSubtitleModel = new SalesOrderExportSubtitleModel();
 
         $salesContractDetailList = [];
 
@@ -351,7 +356,21 @@ class SalesOrderExportModel extends Model
                         'qty' => $s['qty'],
                         'harga' => $s['harga'],
                         'total' => $s['total'],
-                        //-------------------------------
+                        //------------------------------
+                        'note_size' => "",
+                        'note_grade' => "",
+                        'note_packing' => "",
+                        'note_can' => "",
+                        'note_case' => "",
+                        'note_kg' => "",
+                        'note_lb' => "",
+                        'note_inner_box' => "",
+                        'note_pc' => "",
+                        'note_bag' => "",
+                        'note_persen' => "",
+                        'note_cup' => "",
+                        'note_palet' => "",
+                        //-----------------------------
                         'qty_sisa' => $totalQtySisa,
                         'qty_input' => $totalQtySisa,
                         'total_sisa' => $s['harga'] * $totalQtySisa,
@@ -360,15 +379,17 @@ class SalesOrderExportModel extends Model
 
                     $qtyInput += $totalQtySisa;
                     $qtySisa += $totalQtySisa;
-                    $totalInput += $s['harga'] * $qtyInput;
+                    $totalInput += $s['harga'] * $$totalQtySisa;
                 } else {
-                    // PAS EDIT
+
                     $salesOrderDetailExport = $salesOrderExportDetailModel
                         ->where('sales_order_export_id', $salesOrderExportId)
                         ->where('sales_contract_size_breakdown_id', $s['id'])
                         ->first();
 
-                    if ($salesOrderDetailExport != null) {
+                    if ($salesOrderDetailExport != null && $isPrint == false) {
+
+                        // EDIT NING FORM
                         array_push($sizeBreakdown, [
                             'id_detail_breakdown' => $s['id'],
                             'size' => $s['size'],
@@ -389,6 +410,20 @@ class SalesOrderExportModel extends Model
                             'qty' => $s['qty'],
                             'harga' => $s['harga'],
                             'total' => $s['total'],
+                            //---------------------------------------------------
+                            'note_size' => $salesOrderDetailExport['note_size'],
+                            'note_grade' => $salesOrderDetailExport['note_grade'],
+                            'note_packing' => $salesOrderDetailExport['note_packing'],
+                            'note_can' =>  $salesOrderDetailExport['note_can'],
+                            'note_case' => $salesOrderDetailExport['note_case'],
+                            'note_kg' => $salesOrderDetailExport['note_kg'],
+                            'note_lb' => $salesOrderDetailExport['note_lb'],
+                            'note_inner_box' => $salesOrderDetailExport['note_inner_box'],
+                            'note_pc' => $salesOrderDetailExport['note_pc'],
+                            'note_bag' => $salesOrderDetailExport['note_bag'],
+                            'note_persen' => $salesOrderDetailExport['note_persen'],
+                            'note_cup' => $salesOrderDetailExport['note_cup'],
+                            'note_palet' => $salesOrderDetailExport['note_palet'],
                             //-------------------------------
                             'qty_sisa' => $salesOrderDetailExport['qty'] + $totalQtySisa,
                             'qty_input' => $salesOrderDetailExport['qty'],
@@ -397,21 +432,88 @@ class SalesOrderExportModel extends Model
 
                         ]);
 
+                        // \array_push($kontol, [
+                        //     'id_detail_breakdown' => $s['id'],
+                        //     'hasil_sum' => floatval($s['harga'] * $salesOrderDetailExport['qty']),
+                        //     'qtyInput' => $salesOrderDetailExport['qty'],
+                        //     'harga' => $s['harga']
+                        // ]);
+
+
                         $qtyInput +=  $salesOrderDetailExport['qty'];
                         $qtySisa += $salesOrderDetailExport['qty'] + $totalQtySisa;
-                        $totalInput += floatval($s['harga'] * $qtyInput);
+                        $totalInput += floatval($s['harga'] * $salesOrderDetailExport['qty']);
+                    } else if ($salesOrderDetailExport['qty'] != 0 && $isPrint == true) {
+                        // INI PAS PRINT
+                        array_push($sizeBreakdown, [
+                            'id_detail_breakdown' => $s['id'],
+                            'size' => $s['size'],
+                            'grade' => $s['grade'],
+                            'packing' => $s['packing'],
+                            'can' => $s['can'],
+                            'cased' => $s['cased'],
+                            'kg' => $s['kg'],
+                            'lb' => $s['lb'],
+                            'inner_box' => $s['inner_box'],
+                            'pc' => $s['pc'],
+                            'bag' => $s['bag'],
+                            'persen' => $s['persen'],
+                            'remark' => $s['remark'],
+                            'satuan_size_id' => $s['satuan_size_id'],
+                            'satuan_size_code' => $s['kode_satuan'],
+                            'palet' => $s['palet'],
+                            'qty' => $s['qty'],
+                            'harga' => $s['harga'],
+                            'total' => $s['total'],
+                            //---------------------------------------------------
+                            'note_size' => $salesOrderDetailExport['note_size'],
+                            'note_grade' => $salesOrderDetailExport['note_grade'],
+                            'note_packing' => $salesOrderDetailExport['note_packing'],
+                            'note_can' =>  $salesOrderDetailExport['note_can'],
+                            'note_case' => $salesOrderDetailExport['note_case'],
+                            'note_kg' => $salesOrderDetailExport['note_kg'],
+                            'note_lb' => $salesOrderDetailExport['note_lb'],
+                            'note_inner_box' => $salesOrderDetailExport['note_inner_box'],
+                            'note_pc' => $salesOrderDetailExport['note_pc'],
+                            'note_bag' => $salesOrderDetailExport['note_bag'],
+                            'note_persen' => $salesOrderDetailExport['note_persen'],
+                            'note_cup' => $salesOrderDetailExport['note_cup'],
+                            'note_palet' => $salesOrderDetailExport['note_palet'],
+                            //-------------------------------
+                            'qty_sisa' => $salesOrderDetailExport['qty'],
+                            'qty_input' => \floatval($salesOrderDetailExport['qty']),
+                            'total_sisa' => $s['harga'] * ($salesOrderDetailExport['qty']),
+                            'total_input' => \floatval($s['harga'] * $salesOrderDetailExport['qty'])
+
+                        ]);
+
+                        $qtyInput +=  $salesOrderDetailExport['qty'];
+                        $qtySisa += $salesOrderDetailExport['qty'];
+                        $totalInput += floatval($s['harga'] *  $salesOrderDetailExport['qty']);
                     }
                 }
+            }
+
+
+
+
+            $subTitle = null;
+            // PAS EDIT
+            if ($salesOrderExportId != null) {
+                $subTitle = $salesOrderExportSubtitleModel
+                    ->where('sales_order_export_id', $salesOrderExportId)
+                    ->where('sales_contract_detail_id', $sd['id'])
+                    ->first();
             }
 
             array_push($salesContractDetailList, [
                 'id' => $sd['id'],
                 'kode_barang' => $sd['kode_barang'],
                 'barang_name' => $sd['barang_name'],
-                'brand' => $sd['brand'],
-                'specs' => $sd['specs'],
-                'species' => $sd['species'],
-                'packing' => $sd['kemasan'],
+                'brand' => $subTitle == null ? $sd['brand'] : $subTitle['brand'],
+                'specs' => $subTitle == null ? $sd['specs'] : $subTitle['specs'],
+                'species' => $subTitle == null ? $sd['species'] : $subTitle['species'],
+                'packing' =>  $subTitle == null ?  $sd['kemasan'] : $subTitle['packing'],
                 'qty' => $sd['qty'],
                 'harga' => $sd['harga'],
                 'total_harga' => $sd['total_harga'],

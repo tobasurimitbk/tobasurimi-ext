@@ -56,7 +56,7 @@
                 <?php } ?>
                 <?php if ($dataSalesKontrak['status_posting'] && !$isClosed) { ?>
                     <?php if (can('Penjualan Ekspor', 'Sales Kontrak', 'ua')) : ?>
-                        <button class="btn btn-success posting-spp unposting-so float-right" onclick="updateStatusPosting('0')">
+                        <button class="btn btn-success posting-spp unposting-so float-right">
                             Un Posting
                         </button>
                     <?php endif; ?>
@@ -845,6 +845,41 @@
     </div>
 </div>
 
+
+<div class="modal unpost-modal" tabindex="1">
+    <div class="modal-dialog" style="min-width: 900px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title title-secondary">Unposting Sales Kontrak</h5>
+            </div>
+            <form class="form-unposting">
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input autocomplete="one-time-code" type="text" class="form-control date_revision" name="date_revision" id="date_revision" placeholder="Date Revision">
+                                <label for="floatingInput">Date Revision</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input autocomplete="one-time-code" type="text" class="form-control keterangan_unpost" name="keterangan_unpost" id="keterangan_unpost" placeholder="Keterangan Unpost (Opsional)">
+                                <label for="floatingInput">Note Unposting (Opsional)</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-hide-detail btn-discard mr-3">Back</button>
+                    <button type="button" onclick="unPosting()" class="btn btn-submit-form btn-submit-detail">Un Posting</button>
+                </div>
+            </form>
+
+
+        </div>
+    </div>
+</div>
+
 <script>
     const csrfToken = '<?= csrf_token() ?>';
     var listBarang = [];
@@ -878,6 +913,13 @@
     <?php endif; ?>
 
     $(".due_date").datepicker({
+        todayHighlight: true,
+        format: "dd/mm/yyyy",
+        orientation: "bottom auto",
+        autoclose: true
+    })
+
+    $(".date_revision").datepicker({
         todayHighlight: true,
         format: "dd/mm/yyyy",
         orientation: "bottom auto",
@@ -1887,6 +1929,11 @@
         $(".detail-modal").modal("hide")
     })
 
+    $(".unposting-so").click(function() {
+
+        $(".unpost-modal").modal("show");
+
+    });
 
     generateCodeMasterBarang();
     getListMasterBarang();
@@ -2398,7 +2445,7 @@
     function updateStatusPosting(status) {
         Swal.fire({
             icon: 'question',
-            title: status == '0' ? 'Un Posting Sales Kontrak ?' : 'Posting Sales Kontrak ?',
+            title: status == '0' ? 'Un Posted ?' : 'Posted ?',
             confirmButtonColor: '#4e73df',
             cancelButtonColor: '#d33',
             showCancelButton: true,
@@ -2441,6 +2488,61 @@
             }
         })
     }
+
+    function unPosting() {
+        var csrf = $(`[name="${csrfToken}"]`);
+        var date_revision = $('#date_revision').val();
+        var keterangan = $('#keterangan_unpost').val();
+        var state = true;
+
+        // MAU UNPOSTING
+        if (date_revision == "") {
+            state = false;
+            Swal.fire({
+                icon: 'error',
+                title: "Form Date Revision Required",
+                confirmButtonColor: '#4e73df',
+            })
+        } else {
+            $.ajax({
+                url: "<?= base_url("sales-kontrak/update-status"); ?>",
+                data: {
+                    id: $(".id").val(),
+                    status: "0",
+                    date_revision: date_revision,
+                    keterangan: keterangan,
+                },
+                beforeSend: function(xhr) {
+                    xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                    stopLoading()
+                },
+                complete: function() {
+                    stopLoading();
+                },
+                method: "POST",
+                dataType: "json",
+                success: function(response) {
+                    csrf.val(response.token);
+                    if (response.status) {
+                        Swal.fire({
+                                icon: 'success',
+                                title: response.message,
+                                confirmButtonColor: '#4e73df',
+                            })
+                            .then(() => {
+                                location.reload();
+                            })
+                    }
+                },
+            });
+        }
+
+    }
+
+    $(".btn-hide-detail").click(function() {
+        $(".keterangan_unpost").val("");
+        $(".unpost-modal").modal("hide");
+    })
 
     $(".delete-parent").click(function() {
         Swal.fire({

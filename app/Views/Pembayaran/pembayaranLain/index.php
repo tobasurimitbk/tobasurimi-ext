@@ -685,22 +685,6 @@
             clearDetailForm();
             refreshValidation(); // bersihin styling error kalau sudah valid
             
-            // Handle keterangan_parent textarea
-            const currentKeterangan = $('#keterangan_parent').val();
-            const newKeterangan = detail.keterangan;
-            
-            if (newKeterangan) {
-                if (currentKeterangan === '') {
-                    $('#keterangan_parent').val(newKeterangan);
-                } else {
-                    // Split existing values and check for duplicates
-                    const existingValues = currentKeterangan.split(',');
-                    if (!existingValues.includes(newKeterangan)) {
-                        $('#keterangan_parent').val(currentKeterangan + ', ' + newKeterangan);
-                    }
-                }
-            }
-            
         });
 
         $('#jumlah').keyup(function() {
@@ -745,36 +729,6 @@
             
             if (initialValues[currentField] !== currentValue) {
                 generatePaymentNumber(true);
-            }
-        }
-
-        function updateKeteranganParent(newKeterangan) {
-            // Get current textarea value
-            const textarea = $('#keterangan_parent');
-            let currentValue = textarea.val().trim();
-            
-            // Skip if new keterangan is empty
-            if (!newKeterangan || newKeterangan.trim() === '') {
-                return;
-            }
-            
-            // Split existing values into array (and clean them)
-            let keteranganList = currentValue.split(',')
-                .map(item => item.trim())
-                .filter(item => item !== '');
-            
-            // Check if value already exists (case insensitive)
-            const exists = keteranganList.some(item => 
-                item.toLowerCase() === newKeterangan.trim().toLowerCase()
-            );
-            
-            // Append if not exists
-            if (!exists) {
-                if (keteranganList.length > 0) {
-                    textarea.val(currentValue + ', ' + newKeterangan.trim());
-                } else {
-                    textarea.val(newKeterangan.trim());
-                }
             }
         }
 
@@ -865,7 +819,6 @@
             kurs: $('#kurs').val(),
             jumlah_idr: $('#jumlah_idr').val(),
             jenis_pembayaran: jenisPembayaran
-            updateKeteranganParent(detail.keterangan);
         };
 
         // Get the old keterangan before updating
@@ -876,25 +829,6 @@
         refreshDetailsTable();
         clearDetailForm();
         refreshValidation();
-        
-        // Handle keterangan_parent textarea update
-        const currentKeteranganParent = $('#keterangan_parent').val();
-        const newKeterangan = detail.keterangan;
-        
-        if (newKeterangan) {
-            // Remove old keterangan if it exists
-            let keteranganArray = currentKeteranganParent.split(',')
-                .map(item => item.trim())
-                .filter(item => item !== '' && item !== oldKeterangan);
-            
-            // Add new keterangan if it's not already present
-            if (!keteranganArray.includes(newKeterangan)) {
-                keteranganArray.push(newKeterangan);
-            }
-            
-            // Update the textarea
-            $('#keterangan_parent').val(keteranganArray.join(', '));
-        }
         
         // Reset editing state
         editingIndex = -1;
@@ -1107,7 +1041,6 @@
             refreshDetailsTable();
             clearDetailForm();
             refreshValidation(); // bersihin styling error kalau sudah valid
-            updateKeteranganParent(detail.keterangan);
         });
 
         // Refresh details table

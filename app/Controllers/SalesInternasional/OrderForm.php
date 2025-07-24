@@ -4,16 +4,19 @@ namespace App\Controllers\SalesInternasional;
 
 use App\Controllers\BaseController;
 use App\Models\BarangMasterSalesModel;
+use App\Models\CompaniesModel;
 use App\Models\CountryModel;
 use App\Models\CustomerModel;
 use App\Models\DivisisModel;
 use App\Models\MetadataModel;
 use App\Models\SalesKontrakDetailModel;
 use App\Models\SalesKontrakModel;
+use App\Models\SalesOrderExportAdditionalModel;
 use App\Models\SalesOrderExportDetailModel;
 use App\Models\SalesOrderExportModel;
 use App\Models\SalesOrderExportRevisionModel;
 use App\Models\SalesOrderExportSpecsModel;
+use App\Models\SalesOrderExportSubtitleModel;
 use App\Models\SatuansModel;
 use App\Models\StockDetailModel;
 use Dompdf\Dompdf;
@@ -39,6 +42,9 @@ class OrderForm extends BaseController
     protected $divisiModel;
     protected $salesOrderExportSpecsModel;
     protected $salesOrderExportRevisionModel;
+    protected $salesOrderExportAdditionalModel;
+    protected $salesOrderExportSubtitleModel;
+    protected $companyModel;
     protected $dompdf;
 
     public function __construct()
@@ -60,6 +66,9 @@ class OrderForm extends BaseController
         $this->divisiModel = new DivisisModel();
         $this->salesOrderExportSpecsModel = new SalesOrderExportSpecsModel();
         $this->salesOrderExportRevisionModel = new SalesOrderExportRevisionModel();
+        $this->salesOrderExportAdditionalModel = new SalesOrderExportAdditionalModel();
+        $this->salesOrderExportSubtitleModel = new SalesOrderExportSubtitleModel();
+        $this->companyModel = new CompaniesModel();
         $this->dompdf = new Dompdf();
     }
 
@@ -124,6 +133,7 @@ class OrderForm extends BaseController
                 "used"                      => $data->used,
                 "keterangan_unpost"         => $data->keterangan_unpost,
                 "jumlah_unpost"             => $data->jumlah_unpost,
+                "divisi"                    => $data->divisi
             ]);
         }
 
@@ -210,6 +220,8 @@ class OrderForm extends BaseController
                 'loading' => $this->request->getVar('loading'),
                 'foto_loading' => $this->request->getVar('foto_loading'),
                 'stuffing' => $this->request->getVar('stuffing'),
+                'deadline' => $this->request->getVar('deadline'),
+                'container' => $this->request->getVar('container'),
                 'status' => "NEW",
                 'used' => "NOT USED",
             ]);
@@ -227,6 +239,15 @@ class OrderForm extends BaseController
             $listDataSalesKontrak = json_decode($_POST['listDataSalesKontrak']);
 
             foreach ($listDataSalesKontrak->salesContractDetailList as $s) {
+                $this->salesOrderExportSubtitleModel->insert([
+                    'sales_order_export_id' => $salesOrderExportId,
+                    'sales_contract_detail_id' => $s->id,
+                    'brand' => $s->brand,
+                    'packing' => $s->packing,
+                    'species' => $s->species,
+                    'specs' => $s->specs
+                ]);
+
                 foreach ($s->size_breakdown as $sb) {
                     $this->salesOrderExportDetailModel->insert([
                         'sales_order_export_id' => $salesOrderExportId,
@@ -235,9 +256,33 @@ class OrderForm extends BaseController
                         'satuan_id' => $sb->satuan_size_id,
                         'qty' => $sb->qty_input,
                         'harga_barang' => $sb->harga,
-                        'total_harga_barang' => $sb->total_input
+                        'total_harga_barang' => $sb->total_input,
+                        // Note
+                        'note_size' => $sb->note_size,
+                        'note_grade' => $sb->note_grade,
+                        'note_packing' => $sb->note_packing,
+                        'note_can' => $sb->note_can,
+                        'note_case' => $sb->note_case,
+                        'note_kg' => $sb->note_kg,
+                        'note_lb' => $sb->note_lb,
+                        'note_inner_box' => $sb->note_inner_box,
+                        'note_pc' => $sb->note_pc,
+                        'note_bag' => $sb->note_bag,
+                        'note_persen' => $sb->note_persen,
+                        'note_cup' => $sb->note_cup,
+                        'note_palet' => $sb->note_palet,
                     ]);
                 }
+            }
+
+            // Insert List Additonal
+            foreach (json_decode($_POST['listAdditional']) as $l) {
+                $this->salesOrderExportAdditionalModel->insert([
+                    'sales_order_export_id' => $salesOrderExportId,
+                    'additional_detail' => $l->additional_detail,
+                    'additional_detail_type' => $l->additional_detail_type,
+                    'additional_detail_price' => $l->additional_detail_price
+                ]);
             }
 
             $db->transCommit();
@@ -400,6 +445,10 @@ class OrderForm extends BaseController
             ->where('id', $dataSalesExport->sales_contract_id)
             ->first();
 
+        $dataSalesExportAdditional = $this->salesOrderExportAdditionalModel
+            ->where('sales_order_export_id', $id)
+            ->findAll();
+
         $dataAJU = $this->metaDataModel->getBCUsed('so_internasional');
         $dataDivisi = $this->divisiModel->getDivisiAccess();
 
@@ -411,9 +460,9 @@ class OrderForm extends BaseController
             "dataDivisi" => $dataDivisi,
             "dataSalesExportDetail" => $dataSalesExportDetail,
             "dataSalesExportSpecs" => $dataSalesExportSpecs,
-            "dataSalesKontrak" => $dataSalesKontrak
+            "dataSalesKontrak" => $dataSalesKontrak,
+            "dataSalesExportAdditional" => $dataSalesExportAdditional
         ];
-
 
         return view('SalesInternasional/OrderForm/form', $data);
     }
@@ -475,45 +524,113 @@ class OrderForm extends BaseController
                 'loading' => $this->request->getVar('loading'),
                 'foto_loading' => $this->request->getVar('foto_loading'),
                 'stuffing' => $this->request->getVar('stuffing'),
+                'deadline' => $this->request->getVar('deadline'),
+                'container' => $this->request->getVar('container'),
             ]);
 
-            // Insert Detail Specs
-            $idSalesOrderExportSpecsNotDeleted = [];
-            foreach (json_decode($_POST['listDetailSpecs']) as $l) {
-                $check = $this->salesOrderExportSpecsModel
-                    ->where('id', $l->id_detail_specs_list)
-                    ->first();
+            $listDataSalesKontrak = json_decode($_POST['listDataSalesKontrak']);
 
-                if ($check != null) {
-                    $this->salesOrderExportSpecsModel->update($check['id'], [
-                        'grade' => $l->grade,
-                        'specification' => $l->specification
-                    ]);
-
-                    array_push($idSalesOrderExportSpecsNotDeleted, $check['id']);
-                } else {
-
-                    $idSalesOrderExportSpecs = $this->salesOrderExportSpecsModel->insert([
-                        'sales_order_export_id' => $id,
-                        'grade' => $l->grade,
-                        'specification' => $l->specification
-                    ]);
-
-                    array_push($idSalesOrderExportSpecsNotDeleted, $idSalesOrderExportSpecs);
-                }
-            }
-
-            $this->salesOrderExportSpecsModel->whereNotIn('id', $idSalesOrderExportSpecsNotDeleted)
+            // Hapus SalesOrderExportSubtitle
+            $this->salesOrderExportSubtitleModel
                 ->where('sales_order_export_id', $id)
                 ->delete();
 
-            $this->salesOrderExportSpecsModel->where('sales_order_export_id', $id)->delete();
+            $idSalesOrderDetailExportNotDeleted = [];
+            foreach ($listDataSalesKontrak->salesContractDetailList as $s) {
+
+                $this->salesOrderExportSubtitleModel->insert([
+                    'sales_order_export_id' => $id,
+                    'sales_contract_detail_id' => $s->id,
+                    'brand' => $s->brand,
+                    'packing' => $s->packing,
+                    'species' => $s->species,
+                    'specs' => $s->specs
+                ]);
+
+                foreach ($s->size_breakdown as $sb) {
+                    $check = $this->salesOrderExportDetailModel
+                        ->where('sales_order_export_id', $id)
+                        ->where('sales_contract_size_breakdown_id', $sb->id_detail_breakdown)
+                        ->first();
+
+                    if ($check != null) {
+                        // Update
+                        $this->salesOrderExportDetailModel->update($check['sales_order_export_detail_id'], [
+                            'sales_contract_size_breakdown_id' => $sb->id_detail_breakdown,
+                            'sales_contract_detail_id' => $s->id,
+                            'satuan_id' => $sb->satuan_size_id,
+                            'qty' => $sb->qty_input,
+                            'harga_barang' => $sb->harga,
+                            'total_harga_barang' => $sb->total_input,
+                            // Note
+                            'note_size' => $sb->note_size,
+                            'note_grade' => $sb->note_grade,
+                            'note_packing' => $sb->note_packing,
+                            'note_can' => $sb->note_can,
+                            'note_case' => $sb->note_case,
+                            'note_kg' => $sb->note_kg,
+                            'note_lb' => $sb->note_lb,
+                            'note_inner_box' => $sb->note_inner_box,
+                            'note_pc' => $sb->note_pc,
+                            'note_bag' => $sb->note_bag,
+                            'note_persen' => $sb->note_persen,
+                            'note_cup' => $sb->note_cup,
+                            'note_palet' => $sb->note_palet,
+                        ]);
+
+                        array_push($idSalesOrderDetailExportNotDeleted, $check['sales_order_export_detail_id']);
+                    } else {
+                        // Create
+                        $idSalesOrderDetailExport = $this->salesOrderExportDetailModel->insert([
+                            'sales_order_export_id' => $id,
+                            'sales_contract_size_breakdown_id' => $sb->id_detail_breakdown,
+                            'sales_contract_detail_id' => $s->id,
+                            'satuan_id' => $sb->satuan_size_id,
+                            'qty' => $sb->qty_input,
+                            'harga_barang' => $sb->harga,
+                            'total_harga_barang' => $sb->total_input,
+                            // Note
+                            'note_size' => $sb->note_size,
+                            'note_grade' => $sb->note_grade,
+                            'note_packing' => $sb->note_packing,
+                            'note_can' => $sb->note_can,
+                            'note_case' => $sb->note_case,
+                            'note_kg' => $sb->note_kg,
+                            'note_lb' => $sb->note_lb,
+                            'note_inner_box' => $sb->note_inner_box,
+                            'note_pc' => $sb->note_pc,
+                            'note_bag' => $sb->note_bag,
+                            'note_persen' => $sb->note_persen,
+                            'note_cup' => $sb->note_cup,
+                            'note_palet' => $sb->note_palet,
+                        ]);
+
+                        array_push($idSalesOrderDetailExportNotDeleted, $idSalesOrderDetailExport);
+                    }
+                }
+            }
+
+            $this->salesOrderExportDetailModel->whereNotIn('sales_order_export_detail_id', $idSalesOrderDetailExportNotDeleted)->delete();
+
 
             foreach (json_decode($_POST['listDetailSpecs']) as $l) {
                 $this->salesOrderExportSpecsModel->insert([
                     'sales_order_export_id' => $id,
                     'grade' => $l->grade,
                     'specification' => $l->specification
+                ]);
+            }
+
+            $this->salesOrderExportAdditionalModel
+                ->where('sales_order_export_id', $id)
+                ->delete();
+
+            foreach (json_decode($_POST['listAdditional']) as $l) {
+                $this->salesOrderExportAdditionalModel->insert([
+                    'sales_order_export_id' => $id,
+                    'additional_detail' => $l->additional_detail,
+                    'additional_detail_type' => $l->additional_detail_type,
+                    'additional_detail_price' => $l->additional_detail_price
                 ]);
             }
 
@@ -627,7 +744,8 @@ class OrderForm extends BaseController
         $dataSODetail =  $this->salesOrderExportModel
             ->getDetailSalesKontrakInOrderForm(
                 $dataSO->sales_contract_id,
-                $id
+                $id,
+                true
             );
         $dataSalesOrderRevision = $this->salesOrderExportRevisionModel
             ->where('sales_order_export_id', $dataSO->sales_order_export_id)
@@ -639,12 +757,18 @@ class OrderForm extends BaseController
             ->where('sales_order_export_id', $id)
             ->findAll();
 
+        $dataSalesExportAdditional = $this->salesOrderExportAdditionalModel
+            ->where('sales_order_export_id', $id)
+            ->findAll();
+
         $data = [
             "displayPrice" => $displayPrice,
             "dataSO" => $dataSO,
             "dataSODetail" => $dataSODetail,
             "dataSalesOrderRevision" => $dataSalesOrderRevision,
-            "dataSalesOrderSpecs" => $dataSalesOrderSpecs
+            "dataSalesOrderSpecs" => $dataSalesOrderSpecs,
+            "dataSalesExportAdditional" => $dataSalesExportAdditional,
+            "company" => $this->companyModel->where('id', $dataSO->company_id)->first(),
         ];
 
 
@@ -666,6 +790,7 @@ class OrderForm extends BaseController
         $this->salesOrderExportModel->delete($id);
         $this->salesOrderExportDetailModel->where('sales_order_export_id', $id)->delete();
         $this->salesOrderExportSpecsModel->where('sales_order_export_id', $id)->delete();
+        $this->salesOrderExportDetailModel->where('sales_order_export_id', $id)->delete();
 
         return response()->setJSON([
             'message' => "Order Form Deleted",

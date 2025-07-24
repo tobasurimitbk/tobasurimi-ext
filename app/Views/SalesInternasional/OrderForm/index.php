@@ -53,12 +53,12 @@
                             <tr>
                                 <th>No</th>
                                 <th onclick="changeSort('tanggal')" class="sort">Date</th>
+                                <th onclick="changeSort('divisi_id')" class="sort">Department</th>
                                 <th onclick="changeSort('sales_order_export_no')" class="sort">Order Form No</th>
                                 <th onclick="changeSort('customer_po_no')" class="sort">PO No</th>
                                 <th onclick="changeSort('customer_name')" class="sort">Buyer</th>
                                 <th onclick="changeSort('dicharge_port')" class="sort">Destination</th>
                                 <th onclick="changeSort('shipment_date')" class="sort">Shipment Date</th>
-                                <th class="sort">Unpost Description</th>
                                 <th class="sort">Number Unpost</th>
                                 <th class="sort">Action</th>
                             </tr>
@@ -188,6 +188,10 @@
             data: "tanggal",
             className: "text-left"
         }, {
+            data: "divisi",
+            className: "text-left",
+
+        }, {
             data: "sales_order_export_no",
             className: "text-left"
         }, {
@@ -202,11 +206,6 @@
         }, {
             data: "shipment_date",
             className: "text-left"
-        }, {
-            data: "keterangan_unpost",
-            className: "text-left",
-            orderable: false
-
         }, {
             data: "jumlah_unpost",
             className: "text-left",

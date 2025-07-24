@@ -22,7 +22,7 @@
                                 <div class="col-md-6">
                                     <div class="input-group input-group-password">
                                         <div class="form-floating mb-3" style="height: 50px;">
-                                            <input autocomplete="one-time-code" type="text" class="form-control name" id="no_transaksi" name="no_transaksi" placeholder="No Transaksi">
+                                            <input autocomplete="one-time-code" type="text" class="form-control name" id="no_transaksi" name="no_transaksi" placeholder="No Transaksi" readonly>
                                             <label for="no_transaksi">No Transaksi</label>
                                         </div>
                                     </div>
@@ -655,9 +655,12 @@
     $('.delete-form').click(deleteForm);
 
 
+    let allowModalClose = false;
+
     // HIDE MODAL
     $('.btn-discard').click(function() {
-        // Reset form validation
+
+        allowModalClose = true;
 
         // Clear input fields
         $('.add-modal input').val('');
@@ -671,8 +674,20 @@
         $('.add-modal').modal('hide');
     });
 
-    // Modal close handler - Reset semua state
-    $('#add_modal').on('hidden.bs.modal', function() {
+    $('#add_modal').on('hide.bs.modal', function(e) {
+        if (!allowModalClose) {
+            e.preventDefault();
+            Swal.fire({
+                title: 'Peringatan',
+                text: 'Silakan gunakan tombol Tutup di bawah untuk menutup modal',
+                icon: 'info',
+                confirmButtonText: 'OK'
+            });
+            return false;
+        }
+        
+        if (!allowModalClose) return;
+
         // 1. Reset form utama
         isEditMode = false;
         initialValues = {};
@@ -709,6 +724,9 @@
         
         // 10. Reset ID jika ada
         $("#id").val('');
+        
+        // Reset flag for next time
+        allowModalClose = false;
     });
 
     // Fungsi reset tambahan yang bisa dipanggil manual
@@ -720,12 +738,6 @@
     $('.btn-cancel-form').click(function() {
         resetAllForm();
     });
-
-    // $('#tipe_supplier').select2({
-    //     placeholder: "Pilih Tipe Supplier",
-    //     theme: "bootstrap-5",
-    //     dropdownParent: $(".add-modal .modal-content")
-    // });
 
     $('#tipe').select2({
         placeholder: "Pilih Tipe Panjar",
@@ -773,36 +785,56 @@
     function initSelect2(silent = false) {
         const commonOptions = {
             theme: "bootstrap-5",
-            dropdownParent: $('#add_modal .modal-content')
+            dropdownParent: $('#add_modal .modal-content'),
+            minimumResultsForSearch: 10 // Tambahkan opsi pencarian
         };
 
-        // Inisialisasi Select2 untuk semua field
-        $('#jenis').select2({
-            ...commonOptions,
-            placeholder: "Pilih Jenis"
-        });
-        
-        $('#divisi_id').select2({
-            ...commonOptions,
-            placeholder: "Pilih Departemen"
-        });
-        
-        $('#bank_id').select2({
-            ...commonOptions,
-            placeholder: "Pilih Bank"
-        });
-        
-        $('#payment_method').select2({
-            ...commonOptions,
-            placeholder: "Pilih Metode Pembayaran"
+        // Daftar field select2 yang akan diinisialisasi
+        const select2Fields = [
+            { id: '#jenis', placeholder: "Pilih Jenis" },
+            { id: '#divisi_id', placeholder: "Pilih Departemen" },
+            { id: '#bank_id', placeholder: "Pilih Bank" },
+            { id: '#payment_method', placeholder: "Pilih Metode Pembayaran" }
+        ];
+
+        // Inisialisasi semua field sekaligus
+        select2Fields.forEach(field => {
+            $(field.id).select2({
+                ...commonOptions,
+                placeholder: field.placeholder
+            }).data('select2').$container.addClass('select2-custom-style');
         });
 
-        // Jika bukan silent mode, pasang event handler khusus untuk generate nomor
+        // Handler untuk perubahan field dengan debounce
         if (!silent) {
-            $('#jenis, #divisi_id, #bank_id, #payment_method').off('change.select2-generate').on('change.select2-generate', function() {
-                handleFieldChange(this);
+            let changeTimeout;
+            
+            // Hapus semua event handler sebelumnya untuk menghindari duplikasi
+            $('#jenis, #divisi_id, #bank_id, #payment_method').off('change.select2-generate');
+            
+            // Pasang handler baru dengan debounce
+            $('#jenis, #divisi_id, #bank_id, #payment_method').on('change.select2-generate', function() {
+                clearTimeout(changeTimeout);
+                
+                // Dapatkan konteks field yang berubah
+                const changedField = this;
+                
+                changeTimeout = setTimeout(() => {
+                    // Tambahkan pengecekan modal terbuka
+                    if ($('#add_modal').is(':visible')) {
+                        handleFieldChange(changedField);
+                    }
+                }, 300); // Debounce 300ms
             });
         }
+
+        // Tambahkan handler untuk modal close
+        $('#add_modal').off('hidden.bs.modal.select2-cleanup').on('hidden.bs.modal.select2-cleanup', function() {
+            // Destroy select2 instance saat modal ditutup
+            select2Fields.forEach(field => {
+                $(field.id).select2('destroy');
+            });
+        });
     }
 
     function handleFieldChange(element, silent = false) {
@@ -1089,12 +1121,16 @@
                 return;
             }
 
+            const jenisTransaksi = $('#jenis_transaksi').val();
+            
             const detail = {
                 tanggal: $('#tanggal').val(),
-                jenis_transaksi: $('#jenis_transaksi').val(),
+                jenis_transaksi: jenisTransaksi,
                 nominal_pembayaran: $('#nominal_pembayaran').val(),
                 akun_kas: $('#akun_kas').val(),
+                akun_kas_name: $('#akun_kas option:selected').text(), // Tambahkan ini
                 akun_selisih: $('#akun_selisih').val(),
+                akun_selisih_name: $('#akun_selisih option:selected').text(), // Tambahkan ini
                 keterangan: $('#keterangan_detail').val()
             };
 
@@ -1109,7 +1145,7 @@
             editingIndex = -1;
             $('.btn-update-detail').hide();
             $('.btn-add-detail').show();
-        }   
+        }  
 
 
         // Event handler untuk tombol update
