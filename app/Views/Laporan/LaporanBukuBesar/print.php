@@ -96,9 +96,9 @@
               <td style="text-align: left;"><?= $r['keterangan'] ?></td> <!-- Left aligned for better readability -->
               <td><?= toRupiah($r['kredit'] / $r['kurs']) . " " . "<b>" . $r['valas'] . "</b>" ?></td>
               <td><?= $r['kurs'] == "1" ? "" : toRupiah($r['kurs']) ?></td>
-              <td style="text-align: right;"><?= toRupiah($r['debit'] * $r['kurs']) ?></td>
-              <td style="text-align: right;"><?= toRupiah($r['kredit']) ?></td>
-              <td style="text-align: right;"><?= toRupiah($sisaSaldo) ?></td>
+              <td style="text-align: center;"><?= toRupiah($r['debit'] * $r['kurs']) ?></td>
+              <td style="text-align: center;"><?= toRupiah($r['kredit']) ?></td>
+              <td style="text-align: center;"><?= toRupiah($sisaSaldo) ?></td>
             </tr>
           <?php endforeach; ?>
           <tr>
