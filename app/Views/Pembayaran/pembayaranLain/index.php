@@ -779,11 +779,14 @@
             }
 
             const jenisPembayaran = $('#jenis_pembayaran').val();
+            
+            // Update detail yang sedang diedit
             const detail = {
                 tanggal: $('#tanggal').val(),
                 pembayaran_oleh: $('#pembayaran_oleh').val(),
                 akun_kas: $('#akun_kas').val(),
                 akun_kas_name: $('#akun_kas option:selected').text(),
+                akun_selisih: $('#akun_selisih').val(),
                 akun_selisih_name: $('#akun_selisih option:selected').text(),
                 keterangan: $('#keterangan').val(),
                 valas: $('#valas option:selected').text(),
@@ -794,11 +797,20 @@
                 jenis_pembayaran: jenisPembayaran
             };
 
-            // Get the old keterangan before updating
-            const oldKeterangan = details[index].keterangan;
-            
-            // Update the detail
+            // Update detail di array
             details[index] = detail;
+
+            // Looping semua detail dan sesuaikan posisi akun
+            details.forEach(d => {
+                if (jenisPembayaran === 'PUTIH') {
+                    d.akun_selisih_name = $('#akun_selisih option:selected').text();
+                    d.akun_selisih = $('#akun_selisih').val();
+                } else {
+                    d.akun_kas_name = $('#akun_selisih option:selected').text();
+                    d.akun_kas = $('#akun_selisih').val();
+                }
+            });
+
             refreshDetailsTable();
             clearDetailForm();
             refreshValidation();
@@ -1121,6 +1133,8 @@
             $(".add-modal").modal("show");
         });
 
+        
+
         function handleFieldChange(element) {
             if (!isEditMode) {
                 generatePaymentNumber();
@@ -1136,9 +1150,78 @@
             }
         }
 
-        $(".btn-hide-form").click(function() {
-            $(".add-modal").modal("hide")
-        })
+        let allowModalClose = false;
+        // HIDE MODAL
+        $('.btn-discard').click(function() {
+
+            allowModalClose = true;
+
+            // Clear input fields
+            $('.add-modal input').val('');
+            $('.add-modal textarea').val('');
+            $('.add-modal select').val('').trigger('change');
+
+            // // Reset other cached data or state
+            $('.add-modal .error-message').text('');
+            $('.add-modal .preview-image').attr('src', '');
+            // Hide modal
+            $('.add-modal').modal('hide');
+        });
+
+        $('#add_modal').on('hide.bs.modal', function(e) {
+            if (!allowModalClose) {
+                e.preventDefault();
+                Swal.fire({
+                    title: 'Peringatan',
+                    text: 'Silakan gunakan tombol Tutup di bawah untuk menutup modal',
+                    icon: 'info',
+                    confirmButtonText: 'OK'
+                });
+                return false;
+            }
+            
+            if (!allowModalClose) return;
+
+            // 1. Reset form utama
+            isEditMode = false;
+            initialValues = {};
+            $('.create-form')[0].reset();
+            
+            // 2. Reset select2
+            $('.form-select').val('').trigger('change');
+            
+            // 3. Clear detail table
+            $('#detail-table tbody').empty();
+            
+            // 4. Reset array details
+            details = [];
+            
+            // 5. Reset editing state
+            editingIndex = -1;
+            
+            // 6. Reset tombol
+            $('.btn-add-detail').show();
+            $('.btn-update-detail').hide();
+            
+            // 7. Reset validasi
+            $('.is-invalid').removeClass('is-invalid');
+            $('.has-error').removeClass('has-error');
+            $('.text-danger').remove();
+            
+            // 8. Reset field khusus
+            $('#auto_generate').show();
+            $('#no_transaksi').val('').prop('disabled', false);
+            
+            // 9. Reset title dan tombol delete
+            $(".title-name").text("Tambah Data Panjar & Pinjaman");
+            $(".delete-btn").hide();
+            
+            // 10. Reset ID jika ada
+            $("#id").val('');
+            
+            // Reset flag for next time
+            allowModalClose = false;
+        });
 
         $(".search").keyup(function() {
             table.ajax.reload();
