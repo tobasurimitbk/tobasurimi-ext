@@ -655,12 +655,9 @@
     $('.delete-form').click(deleteForm);
 
 
-    let allowModalClose = false;
-
     // HIDE MODAL
     $('.btn-discard').click(function() {
 
-        allowModalClose = true;
 
         // Clear input fields
         $('.add-modal input').val('');
@@ -675,18 +672,6 @@
     });
 
     $('#add_modal').on('hide.bs.modal', function(e) {
-        if (!allowModalClose) {
-            e.preventDefault();
-            Swal.fire({
-                title: 'Peringatan',
-                text: 'Silakan gunakan tombol Tutup di bawah untuk menutup modal',
-                icon: 'info',
-                confirmButtonText: 'OK'
-            });
-            return false;
-        }
-        
-        if (!allowModalClose) return;
 
         // 1. Reset form utama
         isEditMode = false;
