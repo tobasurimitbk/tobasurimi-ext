@@ -61,12 +61,12 @@
             <th style="width: 7%;">Tanggal</th>
             <th style="width: 8%;">No Trx</th>
             <th style="width: 10%;">Supplier</th>
-            <th style="width: 30%;">Desc</th> <!-- Significantly wider description column -->
+            <th style="width: 25%;">Desc</th> <!-- Significantly wider description column -->
             <th style="width: 8%;">Currency</th>
             <th style="width: 7%;">Exch</th>
-            <th style="width: 10%;">Debit</th>
-            <th style="width: 10%;">Kredit</th>
-            <th style="width: 10%;">Balance</th>
+            <th style="width: 12%;">Debit</th>
+            <th style="width: 12%;">Kredit</th>
+            <th style="width: 11%;">Balance</th>
           </tr>
         </thead>
 
@@ -96,9 +96,9 @@
               <td style="text-align: left;"><?= $r['keterangan'] ?></td> <!-- Left aligned for better readability -->
               <td><?= toRupiah($r['kredit'] / $r['kurs']) . " " . "<b>" . $r['valas'] . "</b>" ?></td>
               <td><?= $r['kurs'] == "1" ? "" : toRupiah($r['kurs']) ?></td>
-              <td style="text-align: center;"><?= toRupiah($r['debit'] * $r['kurs']) ?></td>
-              <td style="text-align: center;"><?= toRupiah($r['kredit']) ?></td>
-              <td style="text-align: center;"><?= toRupiah($sisaSaldo) ?></td>
+              <td style="text-align: right;"><?= toRupiah($r['debit'] * $r['kurs']) ?></td>
+              <td style="text-align: right;"><?= toRupiah($r['kredit']) ?></td>
+              <td style="text-align: right;"><?= toRupiah($sisaSaldo) ?></td>
             </tr>
           <?php endforeach; ?>
           <tr>
