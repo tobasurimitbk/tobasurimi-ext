@@ -1,6 +1,5 @@
 <?= $this->extend('layouts/template'); ?>
 <?= $this->Section('content'); ?>
-<meta name="csrf-token" content="<?= csrf_hash() ?>">
 
 <div class="modal add-modal" id="add_modal" tabindex="-1">
     <div class="modal-dialog" style="min-width: 1200px">
@@ -307,6 +306,7 @@
     let sortType = "desc";
     let isEditMode = false;
     let initialValues = {};
+    let select2Initialized = false;
 
     const csrfToken = '<?= csrf_token() ?>';
     const csrf = $(`[name="${csrfToken}"]`);
@@ -566,71 +566,7 @@
                 return true;
             }
         });
-
-
-        // Initialize Select2 for dropdowns
-        function initSelect2() {
-            $('#divisi_id').select2({
-                placeholder: "Pilih Departemen",
-                theme: "bootstrap-5",
-                dropdownParent: $('#add_modal .modal-content')
-            }).on('change', function() {
-                handleFieldChange(this);
-            });
-            
-            $('#bank_id').select2({
-                placeholder: "Pilih Bank",
-                theme: "bootstrap-5",
-                dropdownParent: $('#add_modal .modal-content')
-            }).on('change', function() {
-                handleFieldChange(this);
-            });
-
-            $('#metode_pembayaran').select2({
-                placeholder: "Pilih Metode Pembayaran",
-                theme: "bootstrap-5",
-                dropdownParent: $('#add_modal .modal-content')
-            }).on('change', function() {
-                handleFieldChange(this);
-            });
-
-            $('#jenis_pembayaran').select2({
-                placeholder: "Pilih Jenis Pembayaran",
-                theme: "bootstrap-5",
-                dropdownParent: $('#add_modal .modal-content')
-            }).on('change', function(e) {
-                const jenis = $(this).val();
-                updateAccountLabels(jenis);
-                details = [];
-                handleFieldChange(this);
-            });
-
-            $('#valas').select2({
-                placeholder: "Pilih Mata Uang",
-                theme: "bootstrap-5",
-                dropdownParent: $('#add_modal .modal-content')
-            }).on('change', function() {
-                let id = $(this).val();
-                if (id && id != 30) {
-                    getNilaiKurs(id);
-                } else {
-                    $('#kurs').val(1);
-                }
-            });
-
-            $('#akun_kas').select2({
-                placeholder: "Pilih Debit",
-                theme: "bootstrap-5",
-                dropdownParent: $('#add_modal .modal-content')
-            });
-
-            $('#akun_selisih').select2({
-                placeholder: "Pilih Kredit",
-                theme: "bootstrap-5",
-                dropdownParent: $('#add_modal .modal-content')
-            });
-        }
-
+        
         updateAccountLabels($('#jenis_pembayaran').val());
 
         $("#tanggal").datepicker({
@@ -669,6 +605,7 @@
                 tanggal: $('#tanggal').val(),
                 pembayaran_oleh: $('#pembayaran_oleh').val(),
                 akun_kas: $('#akun_kas').val(),
+                akun_selisih: $('#akun_selisih').val(),
                 akun_kas_name: $('#akun_kas option:selected').text(),
                 akun_selisih_name: $('#akun_selisih option:selected').text(),
                 keterangan: $('#keterangan').val(),
@@ -713,23 +650,84 @@
             $('#jumlah').val(greatFormatRupiah(jumlahIdr / kurs));
         });
 
-        function handleFieldChange(element) {
-            if (!isEditMode) {
-                generatePaymentNumber();
-                return;
+        function initSelect2(silent = false) {
+            const commonOptions = {
+                theme: "bootstrap-5",
+                dropdownParent: $('#add_modal .modal-content'),
+                minimumResultsForSearch: 10
+            };
+
+            // Daftar field select2
+            const select2Fields = [
+                { id: '#jenis', placeholder: "Pilih Jenis" },
+                { id: '#divisi_id', placeholder: "Pilih Departemen" },
+                { id: '#bank_id', placeholder: "Pilih Bank" },
+                { id: '#jenis_pembayaran', placeholder: "Pilih Jenis Pembayaran" },
+                { id: '#payment_method', placeholder: "Pilih Metode Pembayaran" },
+                { id: '#valas', placeholder: "Pilih Mata Uang" },
+                { id: '#akun_kas', placeholder: "Pilih Debit" },
+                { id: '#akun_selisih', placeholder: "Pilih Kredit" }
+            ];
+
+            // Hapus semua event handler terkait
+            $('#jenis, #divisi_id, #bank_id, #jenis_pembayaran, #payment_method, #valas').off('.select2-handlers');
+
+            // Inisialisasi semua field Select2
+            select2Fields.forEach(field => {
+                if ($(field.id).length) {
+                    $(field.id).select2({
+                        ...commonOptions,
+                        placeholder: field.placeholder
+                    }).data('select2').$container.addClass('select2-custom-style');
+                }
+            });
+
+            // Handler perubahan field (dengan debounce) hanya jika tidak silent
+            if (!silent) {
+                let changeTimeout;
+
+                $('#jenis, #divisi_id, #bank_id, #jenis_pembayaran, #payment_method').on('change.select2-handlers', function() {
+                    clearTimeout(changeTimeout);
+                    const changedField = this;
+                    const changedFieldId = $(changedField).attr('id'); // dapatkan ID field yang berubah
+
+                    changeTimeout = setTimeout(() => {
+                        if ($('#add_modal').is(':visible')) {
+                            // Jika yang berubah adalah field jenis_pembayaran
+                            if (changedFieldId === 'jenis_pembayaran') {
+                                const jenisPembayaran = $(changedField).val();
+                                updateAccountLabels(jenisPembayaran); // update label akun
+                            }
+                            // Jika yang berubah adalah field jenis
+                            else if (changedFieldId === 'jenis') {
+                                details = []; // reset details
+                            }
+                            
+                            // Selalu panggil handleFieldChange
+                            handleFieldChange(changedField);
+                        }
+                    }, 300); // debounce 300ms
+                });
+
+                // Handler khusus untuk valas
+                $('#valas').on('change.select2-handlers', function() {
+                    const id = $(this).val();
+                    if (id && id != 30) {
+                        getNilaiKurs(id);
+                    } else {
+                        $('#kurs').val(1);
+                    }
+                });
             }
-            
-            let currentField = $(element).attr('id');
-            let currentValue = $(element).val();
-            
-            // Debugging: Log perubahan nilai
-            console.log(`Field changed: ${currentField}`, 
-                        `Old value: ${initialValues[currentField]}`, 
-                        `New value: ${currentValue}`);
-            
-            if (initialValues[currentField] !== currentValue) {
-                generatePaymentNumber(true);
-            }
+
+            // Destroy select2 saat modal ditutup
+            $('#add_modal').off('hidden.bs.modal.select2-cleanup').on('hidden.bs.modal.select2-cleanup', function () {
+                select2Fields.forEach(field => {
+                    if ($(field.id).data('select2')) {
+                        $(field.id).select2('destroy');
+                    }
+                });
+            });
         }
 
         function getNilaiKurs(id) {
@@ -774,68 +772,42 @@
             refreshValidation();
         });
 
-        function refreshDetailsTable() {
-            const tbody = $('#detail-table tbody');
-            tbody.empty();
+        function updateDetail(index) {
+            if (!validateDetails()) {
+                refreshValidation();
+                return;
+            }
 
-            details.forEach((detail, index) => {
-                tbody.append(`
-                    <tr>
-                        <td>${detail.tanggal}</td>
-                        <td>${debitAccount}</td>
-                        <td>${creditAccount}</td>
-                        <td>${detail.valas}</td>
-                        <td>${detail.jumlah}</td>
-                        <td>${detail.kurs}</td>
-                        <td>${detail.jumlah_idr}</td>
-                        <td>${detail.pembayaran_oleh}</td>
-                        <td>${detail.keterangan}</td>
-                        <td>
-                            <button type="button" class="btn btn-warning btn-sm btn-edit-detail" data-index="${index}">Edit</button>
-                            <button type="button" class="btn btn-danger btn-sm btn-remove-detail" data-index="${index}">Hapus</button>
-                        </td>
-                    </tr>
-                `);
-            });
-        }
+            const jenisPembayaran = $('#jenis_pembayaran').val();
+            const detail = {
+                tanggal: $('#tanggal').val(),
+                pembayaran_oleh: $('#pembayaran_oleh').val(),
+                akun_kas: $('#akun_kas').val(),
+                akun_kas_name: $('#akun_kas option:selected').text(),
+                akun_selisih_name: $('#akun_selisih option:selected').text(),
+                keterangan: $('#keterangan').val(),
+                valas: $('#valas option:selected').text(),
+                valas_id: $('#valas option:selected').val(),
+                jumlah: $('#jumlah').val(),
+                kurs: $('#kurs').val(),
+                jumlah_idr: $('#jumlah_idr').val(),
+                jenis_pembayaran: jenisPembayaran
+            };
 
-    function updateDetail(index) {
-        if (!validateDetails()) {
+            // Get the old keterangan before updating
+            const oldKeterangan = details[index].keterangan;
+            
+            // Update the detail
+            details[index] = detail;
+            refreshDetailsTable();
+            clearDetailForm();
             refreshValidation();
-            return;
+            
+            // Reset editing state
+            editingIndex = -1;
+            $('.btn-update-detail').hide();
+            $('.btn-add-detail').show();
         }
-
-        const jenisPembayaran = $('#jenis_pembayaran').val();
-        const detail = {
-            tanggal: $('#tanggal').val(),
-            pembayaran_oleh: $('#pembayaran_oleh').val(),
-            akun_kas: $('#akun_kas').val(),
-            akun_kas_name: $('#akun_kas option:selected').text(),
-            akun_selisih_name: $('#akun_selisih option:selected').text(),
-            keterangan: $('#keterangan').val(),
-            valas: $('#valas option:selected').text(),
-            valas_id: $('#valas option:selected').val(),
-            jumlah: $('#jumlah').val(),
-            kurs: $('#kurs').val(),
-            jumlah_idr: $('#jumlah_idr').val(),
-            jenis_pembayaran: jenisPembayaran
-        };
-
-        // Get the old keterangan before updating
-        const oldKeterangan = details[index].keterangan;
-        
-        // Update the detail
-        details[index] = detail;
-        refreshDetailsTable();
-        clearDetailForm();
-        refreshValidation();
-        
-        // Reset editing state
-        editingIndex = -1;
-        $('.btn-update-detail').hide();
-        $('.btn-add-detail').show();
-    }
-
         
         $('.btn-update-detail').hide();
 
@@ -899,6 +871,8 @@
                     dropdownParent: $('#add_modal .modal-content')
                 });
             }
+
+            refreshDetailsTable();
         }
         
         // Handle final submission
@@ -1028,6 +1002,7 @@
                 pembayaran_oleh: $('#pembayaran_oleh').val(),
                 akun_kas: $('#akun_kas').val(),
                 akun_kas_name: $('#akun_kas option:selected').text(),
+                akun_selisih: $('#akun_selisih').val(),
                 akun_selisih_name: $('#akun_selisih option:selected').text(),
                 keterangan: $('#keterangan').val(),
                 valas: $('#valas option:selected').text(),
@@ -1043,32 +1018,31 @@
             refreshValidation(); // bersihin styling error kalau sudah valid
         });
 
-        // Refresh details table
         function refreshDetailsTable() {
             const tbody = $('#detail-table tbody');
             tbody.empty();
 
             details.forEach((detail, index) => {
-
+                // Determine debit and credit accounts based on jenis_pembayaran
                 let debitAccount, creditAccount;
-                if (detail.dataBE) {
+                
+                if ($('#jenis_pembayaran').val() == 'PUTIH') {
+                    // For PUTIH type:
+                    // Cash Account is Debit, Difference Account is Credit
                     debitAccount = detail.akun_kas_name;
                     creditAccount = detail.akun_selisih_name;
                 } else {
-                    if (detail.jenis_pembayaran === 'PUTIH') {
-                        debitAccount = detail.akun_kas_name;
-                        creditAccount = detail.akun_selisih_name;
-                    } else {
-                        debitAccount = detail.akun_selisih_name;
-                        creditAccount = detail.akun_kas_name;
-                    }
+                    // For non-PUTIH types (MERAH/HITAM):
+                    // Difference Account is Debit, Cash Account is Credit
+                    debitAccount = detail.akun_selisih_name;
+                    creditAccount = detail.akun_kas_name;
                 }
 
                 tbody.append(`
                     <tr>
                         <td>${detail.tanggal}</td>
-                        <td>${debitAccount}</td>
-                        <td>${creditAccount}</td>
+                        <td>${creditAccount}</td> <!-- Credit Column -->
+                        <td>${debitAccount}</td>  <!-- Debit Column -->
                         <td>${detail.valas}</td>
                         <td>${greatFormatRupiah(detail.jumlah)}</td>
                         <td>${greatFormatRupiah(detail.kurs)}</td>
@@ -1083,14 +1057,12 @@
                 `);
             });
 
-            // Menghitung total jumlah_idr
+            // Calculate total jumlah_idr
             const totalAmount = details.reduce((sum, detail) => {
-                // Pastikan jumlah_idr adalah number, jika tidak konversi ke number
                 const amount = destroyFormatRupiah(detail.jumlah_idr) || 0;
                 return sum + amount;
             }, 0);
 
-            // Memasukkan total ke input
             $('#total_all_amount').val(greatFormatRupiah(totalAmount));
         }
 
@@ -1122,34 +1094,51 @@
                 bayar_ke: $('#bayar_ke').val(),
                 details: details
             };
-
-            // Submit via AJAX or form submission
-            // ...
         });
 
         $(".dataTable_info").addClass("pt-0");
 
         $(".btn-show-form").click(function() {
+            // Reset state
+            isEditMode = false;
+            initialValues = {};
+            
+            // Reset form
             $(".id").val("");
             $(".title-name").text("Tambah Pembayaran Lain");
             validator.resetForm();
             validator.reset();
             resetForm();
-            $(".create-form")[0].reset()
+            $(".create-form")[0].reset();
             $(".delete-btn").css('display', 'none');
-            $(".add-modal").modal("show")
+            
+            // Initialize with silent mode first
             initSelect2();
-        })
+            
+            // Set default values WITHOUT triggering change events
+            $('#divisi_id, #bank_id, #metode_pembayaran, #jenis_pembayaran').val(null);
+            
+            $(".add-modal").modal("show");
+        });
+
+        function handleFieldChange(element) {
+            if (!isEditMode) {
+                generatePaymentNumber();
+                return;
+            }
+            
+            let currentField = $(element).attr('id');
+            let currentValue = $(element).val();
+            
+            if (initialValues[currentField] !== currentValue) {
+                console.log('Field value changed - generating payment number');
+                generatePaymentNumber(true);
+            }
+        }
 
         $(".btn-hide-form").click(function() {
             $(".add-modal").modal("hide")
         })
-
-        $('.add-modal').on('hidden.bs.modal', function() {
-            isEditMode = false;
-            initialValues = {};
-            console.log('Modal closed - edit mode reset');
-        });
 
         $(".search").keyup(function() {
             table.ajax.reload();
@@ -1186,7 +1175,7 @@
                         resetForm();
                         details = [];
                         
-                        // Simpan nilai awal SEBELUM mengisi form
+                        // Store initial values BEFORE populating form
                         const parent = res.data.parent;
                         initialValues = {
                             divisi_id: parent.divisi_id,
@@ -1194,28 +1183,35 @@
                             metode_pembayaran: parent.metode_pembayaran,
                             jenis_pembayaran: parent.jenis_pembayaran
                         };
+
+                        // Update account labels based on jenis_pembayaran FIRST
+                        updateAccountLabels(parent.jenis_pembayaran);
+
+                        // Now initialize with proper handlers
+                        initSelect2();
                         
-                        // Set parent data
-                        const metode = parent.metode_pembayaran;
+                        // Set parent data WITHOUT triggering change events
                         $('#id').val(parent.id);
                         $("#no_pembayaran").val(parent.no_pembayaran);
-                        $("#metode_pembayaran").val(metode).trigger('change');
-                        $('#divisi_id').val(parent.divisi_id).trigger('change');
-                        $('#bank_id').val(parent.bank_id).trigger('change');
+                        
+                        // Use Select2's internal trigger
+                        $('#divisi_id').val(parent.divisi_id).trigger('change.select2');
+                        $('#bank_id').val(parent.bank_id).trigger('change.select2');
+                        $('#metode_pembayaran').val(parent.metode_pembayaran).trigger('change.select2');
+                        $('#jenis_pembayaran').val(parent.jenis_pembayaran).trigger('change.select2');
+                        
+                        // Set other fields
                         $('#bayar_ke').val(parent.bayar_ke);
                         $('#akun_selisih').val(parent.akun_selisih).trigger('change');
                         $('#keterangan_parent').val(parent.keterangan_parent);
                         $('#total_all_amount').val(parent.total_all_amount);
 
-                        // Handle jenis pembayaran dan akun
-                        $('#jenis_pembayaran').val(parent.jenis_pembayaran).trigger('change');
-
-                        // Untuk MERAH: akun_selisih parent sebenarnya adalah akun_kas
+                        // Handle MERAH case
                         if (parent.jenis_pembayaran === 'MERAH' && parent.akun_kas) {
                             $('#akun_selisih').val(parent.akun_kas).trigger('change');
                         }
 
-                        // Disable fields if needed
+                        // Disable fields if posted
                         if (parent.status_posting === "1") {
                             $("#no_pembayaran").attr('disabled', true);
                             disabledForm();
@@ -1229,8 +1225,10 @@
                                     tanggal: detail.tanggal,
                                     pembayaran_oleh: detail.pembayaran_oleh,
                                     akun_kas: parent.jenis_pembayaran == "PUTIH" ? detail.akun_kas : detail.akun_selisih,
+                                    akun_selisih: parent.jenis_pembayaran == "PUTIH" ? detail.akun_selisih : detail.akun_kas,
                                     akun_kas_name: detail.akun_kas_name,
                                     akun_selisih_name: detail.akun_selisih_name,
+                                    jenis_pembayaran: parent.jenis_pembayaran,
                                     keterangan: detail.keterangan,
                                     valas: detail.valas,
                                     valas_id: detail.valas_id,
@@ -1243,9 +1241,7 @@
                             refreshDetailsTable();
                         }
 
-                        // Set mode edit setelah semua data diisi
                         isEditMode = true;
-                        console.log('Edit mode activated');
                         $(".add-modal").modal("show");
                     } else {
                         Swal.fire({
@@ -1547,24 +1543,17 @@
 
     function editDetail(index) {
         const detail = details[index];
-        
+        console.log(detail)
         // Populate all form fields
         $('#tanggal').val(detail.tanggal);
         $('#pembayaran_oleh').val(detail.pembayaran_oleh);
-        $('#akun_kas').val(detail.akun_kas).trigger('change');
         $('#keterangan').val(detail.keterangan);
         $('#valas').val(detail.valas_id).trigger('change');
         $('#jumlah').val(detail.jumlah);
         $('#kurs').val(detail.kurs);
         $('#jumlah_idr').val(detail.jumlah_idr);
-        
-        // Set akun selisih based on payment type
-        if (detail.jenis_pembayaran === 'PUTIH') {
-            $('#akun_selisih').val(detail.akun_selisih).trigger('change');
-        } else {
-            // For MERAH, the roles are reversed
-            $('#akun_selisih').val(detail.akun_kas).trigger('change');
-        }
+        $('#akun_selisih').val(detail.akun_selisih).trigger('change');
+        $('#akun_kas').val(detail.akun_kas).trigger('change');
         
         // Update editing index
         editingIndex = index;
