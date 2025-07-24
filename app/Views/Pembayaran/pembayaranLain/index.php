@@ -1164,48 +1164,6 @@
             $('.add-modal').modal('hide');
         });
 
-        $('#add_modal').on('hide.bs.modal', function(e) {
-            // 1. Reset form utama
-            isEditMode = false;
-            initialValues = {};
-            $('.create-form')[0].reset();
-            
-            // 2. Reset select2
-            $('.form-select').val('').trigger('change');
-            
-            // 3. Clear detail table
-            $('#detail-table tbody').empty();
-            
-            // 4. Reset array details
-            details = [];
-            
-            // 5. Reset editing state
-            editingIndex = -1;
-            
-            // 6. Reset tombol
-            $('.btn-add-detail').show();
-            $('.btn-update-detail').hide();
-            
-            // 7. Reset validasi
-            $('.is-invalid').removeClass('is-invalid');
-            $('.has-error').removeClass('has-error');
-            $('.text-danger').remove();
-            
-            // 8. Reset field khusus
-            $('#auto_generate').show();
-            $('#no_transaksi').val('').prop('disabled', false);
-            
-            // 9. Reset title dan tombol delete
-            $(".title-name").text("Tambah Data Panjar & Pinjaman");
-            $(".delete-btn").hide();
-            
-            // 10. Reset ID jika ada
-            $("#id").val('');
-            
-            // Reset flag for next time
-            allowModalClose = false;
-        });
-
         $(".search").keyup(function() {
             table.ajax.reload();
         })
