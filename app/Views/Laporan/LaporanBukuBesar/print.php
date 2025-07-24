@@ -61,12 +61,12 @@
             <th style="width: 7%;">Tanggal</th>
             <th style="width: 8%;">No Trx</th>
             <th style="width: 10%;">Supplier</th>
-            <th style="width: 25%;">Desc</th> <!-- Significantly wider description column -->
+            <th style="width: 20%;">Desc</th> <!-- Significantly wider description column -->
             <th style="width: 8%;">Currency</th>
             <th style="width: 7%;">Exch</th>
             <th style="width: 12%;">Debit</th>
             <th style="width: 12%;">Kredit</th>
-            <th style="width: 11%;">Balance</th>
+            <th style="width: 16%;">Balance</th>
           </tr>
         </thead>
 
