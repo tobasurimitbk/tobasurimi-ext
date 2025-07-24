@@ -610,7 +610,10 @@ class OrderForm extends BaseController
                 }
             }
 
-            $this->salesOrderExportDetailModel->whereNotIn('sales_order_export_detail_id', $idSalesOrderDetailExportNotDeleted)->delete();
+            $this->salesOrderExportDetailModel
+                ->whereNotIn('sales_order_export_detail_id', $idSalesOrderDetailExportNotDeleted)
+                ->where('sales_order_export_id', $id)
+                ->delete();
 
 
             foreach (json_decode($_POST['listDetailSpecs']) as $l) {

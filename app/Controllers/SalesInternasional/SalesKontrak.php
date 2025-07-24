@@ -70,7 +70,12 @@ class SalesKontrak extends BaseController
 
     public function index()
     {
-        return view('SalesInternasional/SalesKontrak/index');
+        $dataCompany = $this->companyModel->whereIn('id', [1, 2])->findAll();
+        $data = [
+            "dataCompany" => $dataCompany
+
+        ];
+        return view('SalesInternasional/SalesKontrak/index', $data);
     }
 
     public function createView()
@@ -91,6 +96,7 @@ class SalesKontrak extends BaseController
         ];
         $sales = $this->employessModel->getEmployeesComplete($this->this_company_id, $condition);
         $dataBank = $this->bankModel->where('company_id', $this->this_company_id)->findAll();
+        $dataCompany = $this->companyModel->whereIn('id', [1, 2])->findAll();
 
         $data = [
             "dataCustomer" => $dataCustomer,
@@ -101,7 +107,8 @@ class SalesKontrak extends BaseController
             'dataSatuan' => $dataSatuan,
             'dataBarang' => $dataBarang,
             "dataSales" => $sales,
-            "dataBank" => $dataBank
+            "dataBank" => $dataBank,
+            "dataCompany" => $dataCompany
         ];
 
 
@@ -130,6 +137,7 @@ class SalesKontrak extends BaseController
         ];
         $sales = $this->employessModel->getEmployeesComplete($this->this_company_id, $condition);
         $dataBank = $this->bankModel->where('company_id', $this->this_company_id)->findAll();
+        $dataCompany = $this->companyModel->whereIn('id', [1, 2])->findAll();
 
         if ($dataSalesKontrak == null) {
             return redirect()->to('sales-kontrak');
@@ -147,7 +155,8 @@ class SalesKontrak extends BaseController
             'dataSalesKontrakDetail' => $dataSalesKontrakDetail,
             'isClosed' => count($isClosed) == 0 ? '0' : '1',
             "dataSales" => $sales,
-            "dataBank" => $dataBank
+            "dataBank" => $dataBank,
+            "dataCompany" => $dataCompany
         ];
 
         return view('SalesInternasional/SalesKontrak/form', $data);
@@ -646,6 +655,16 @@ class SalesKontrak extends BaseController
             'revisionList' => $this->salesContractRevisionModel->where('sales_contract_id', $id)->findAll(),
             "company" => $this->companyModel->where('id', $salesKontrak['company_id'])->first(),
         ];
+
+        $letterHeadCompany = $this->request->getGet('letter_head_company');
+        if (!empty($letterHeadCompany)) {
+            $data['company'] =  $this->companyModel->where('id', $letterHeadCompany)->first();
+        }
+
+        if ($data['company'] == null) {
+            var_dump("State Exception : company not found, please back to previous page");
+            die;
+        }
 
         $this->dompdf->loadHtml(view('SalesInternasional/SalesKontrak/print', $data));
         $this->dompdf->setPaper('Legal', 'portrait');
