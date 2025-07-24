@@ -779,11 +779,14 @@
             }
 
             const jenisPembayaran = $('#jenis_pembayaran').val();
+            
+            // Update detail yang sedang diedit
             const detail = {
                 tanggal: $('#tanggal').val(),
                 pembayaran_oleh: $('#pembayaran_oleh').val(),
                 akun_kas: $('#akun_kas').val(),
                 akun_kas_name: $('#akun_kas option:selected').text(),
+                akun_selisih: $('#akun_selisih').val(),
                 akun_selisih_name: $('#akun_selisih option:selected').text(),
                 keterangan: $('#keterangan').val(),
                 valas: $('#valas option:selected').text(),
@@ -794,11 +797,20 @@
                 jenis_pembayaran: jenisPembayaran
             };
 
-            // Get the old keterangan before updating
-            const oldKeterangan = details[index].keterangan;
-            
-            // Update the detail
+            // Update detail di array
             details[index] = detail;
+
+            // Looping semua detail dan sesuaikan posisi akun
+            details.forEach(d => {
+                if (jenisPembayaran === 'PUTIH') {
+                    d.akun_selisih_name = $('#akun_selisih option:selected').text();
+                    d.akun_selisih = $('#akun_selisih').val();
+                } else {
+                    d.akun_kas_name = $('#akun_selisih option:selected').text();
+                    d.akun_kas = $('#akun_selisih').val();
+                }
+            });
+
             refreshDetailsTable();
             clearDetailForm();
             refreshValidation();
@@ -1121,6 +1133,8 @@
             $(".add-modal").modal("show");
         });
 
+        
+
         function handleFieldChange(element) {
             if (!isEditMode) {
                 generatePaymentNumber();
@@ -1136,9 +1150,19 @@
             }
         }
 
-        $(".btn-hide-form").click(function() {
-            $(".add-modal").modal("hide")
-        })
+        $('.btn-discard').click(function() {
+
+            // Clear input fields
+            $('.add-modal input').val('');
+            $('.add-modal textarea').val('');
+            $('.add-modal select').val('').trigger('change');
+
+            // // Reset other cached data or state
+            $('.add-modal .error-message').text('');
+            $('.add-modal .preview-image').attr('src', '');
+            // Hide modal
+            $('.add-modal').modal('hide');
+        });
 
         $(".search").keyup(function() {
             table.ajax.reload();

@@ -655,13 +655,8 @@
     $('.delete-form').click(deleteForm);
 
 
-    let allowModalClose = false;
-
     // HIDE MODAL
     $('.btn-discard').click(function() {
-
-        allowModalClose = true;
-
         // Clear input fields
         $('.add-modal input').val('');
         $('.add-modal textarea').val('');
@@ -674,60 +669,46 @@
         $('.add-modal').modal('hide');
     });
 
-    $('#add_modal').on('hide.bs.modal', function(e) {
-        if (!allowModalClose) {
-            e.preventDefault();
-            Swal.fire({
-                title: 'Peringatan',
-                text: 'Silakan gunakan tombol Tutup di bawah untuk menutup modal',
-                icon: 'info',
-                confirmButtonText: 'OK'
-            });
-            return false;
-        }
-        
-        if (!allowModalClose) return;
+    // $('#add_modal').on('hide.bs.modal', function(e) {
 
-        // 1. Reset form utama
-        isEditMode = false;
-        initialValues = {};
-        $('.create-form')[0].reset();
+    //     // 1. Reset form utama
+    //     isEditMode = false;
+    //     initialValues = {};
+    //     // $('.create-form')[0].reset();
         
-        // 2. Reset select2
-        $('.form-select').val('').trigger('change');
+    //     // // 2. Reset select2
+    //     // $('.form-select').val('').trigger('change');
         
-        // 3. Clear detail table
-        $('#detail-table tbody').empty();
+    //     // 3. Clear detail table
+    //     $('#detail-table tbody').empty();
         
-        // 4. Reset array details
-        details = [];
+    //     // 4. Reset array details
+    //     details = [];
         
-        // 5. Reset editing state
-        editingIndex = -1;
+    //     // 5. Reset editing state
+    //     editingIndex = -1;
         
-        // 6. Reset tombol
-        $('.btn-add-detail').show();
-        $('.btn-update-detail').hide();
+    //     // 6. Reset tombol
+    //     $('.btn-add-detail').show();
+    //     $('.btn-update-detail').hide();
         
-        // 7. Reset validasi
-        $('.is-invalid').removeClass('is-invalid');
-        $('.has-error').removeClass('has-error');
-        $('.text-danger').remove();
+    //     // 7. Reset validasi
+    //     $('.is-invalid').removeClass('is-invalid');
+    //     $('.has-error').removeClass('has-error');
+    //     $('.text-danger').remove();
         
-        // 8. Reset field khusus
-        $('#auto_generate').show();
-        $('#no_transaksi').val('').prop('disabled', false);
+    //     // 8. Reset field khusus
+    //     $('#auto_generate').show();
+    //     $('#no_transaksi').val('').prop('disabled', false);
         
-        // 9. Reset title dan tombol delete
-        $(".title-name").text("Tambah Data Panjar & Pinjaman");
-        $(".delete-btn").hide();
+    //     // 9. Reset title dan tombol delete
+    //     $(".title-name").text("Tambah Data Panjar & Pinjaman");
+    //     $(".delete-btn").hide();
         
-        // 10. Reset ID jika ada
-        $("#id").val('');
+    //     // 10. Reset ID jika ada
+    //     $("#id").val('');
         
-        // Reset flag for next time
-        allowModalClose = false;
-    });
+    // });
 
     // Fungsi reset tambahan yang bisa dipanggil manual
     function resetAllForm() {
