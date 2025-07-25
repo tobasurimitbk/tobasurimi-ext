@@ -45,7 +45,7 @@
                                 <div class="col-md-6">
                                     <div class="form-floating form-pembayaran-po mb-3" style="height: 50px;">
                                         <select class="form-select" name="bank_id" id="bank_id">
-                                                <option disabled selected value=""></option>
+                                                <option selected value=""></option>
                                             <?php foreach ($bankList as $b) : ?>
                                                 <option value="<?= $b['id'] ?>"><?= strtoupper($b['kode_bank']) ?></option>
                                             <?php endforeach ?>
