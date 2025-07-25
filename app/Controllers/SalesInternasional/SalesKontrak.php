@@ -459,7 +459,7 @@ class SalesKontrak extends BaseController
             'others' => $this->request->getVar('others'),
             'others_price' => $this->request->getVar('others_price'),
             'others_type' => $this->request->getVar('others_type'),
-            'createdBy' => $this->this_user_id,
+            // 'createdBy' => $this->this_user_id,
         ]);
 
         // get all id detail

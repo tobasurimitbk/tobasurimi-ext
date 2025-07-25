@@ -495,7 +495,7 @@ class OrderForm extends BaseController
                 'sales_order_export_no' => $salesOrderNo,
                 // 'sales_contract_id' => $this->request->getVar('sales_contract_id'),
                 'company_id' => $this->this_company_id,
-                'user_id' => $this->this_user_id,
+                // 'user_id' => $this->this_user_id,
                 'bc_type' => $this->request->getVar('aju_document_type'),
                 "tanggal" => $this->request->getVar("tanggal") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getVar("tanggal")))) : "",
                 // 'divisi_id' => $this->request->getVar('divisi_id'),
