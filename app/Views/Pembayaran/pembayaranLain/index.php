@@ -800,15 +800,14 @@
 
             // Update detail di array
             details[index] = detail;
-
-            // Looping semua detail dan sesuaikan posisi akun
+            
             details.forEach(d => {
-                if (jenisPembayaran === 'PUTIH') {
-                    d.akun_selisih_name = $('#akun_selisih option:selected').text();
-                    d.akun_selisih = $('#akun_selisih').val();
-                } else {
+                if (jenisPembayaran == 'PUTIH') {
                     d.akun_kas_name = $('#akun_selisih option:selected').text();
                     d.akun_kas = $('#akun_selisih').val();
+                } else {
+                    d.akun_selisih_name = $('#akun_selisih option:selected').text();
+                    d.akun_selisih = $('#akun_selisih').val();
                 }
             });
 
