@@ -45,7 +45,7 @@
                                 <div class="col-md-6">
                                     <div class="form-floating form-pembayaran-po mb-3" style="height: 50px;">
                                         <select class="form-select" name="bank_id" id="bank_id">
-                                                <option selected value=""></option>
+                                                <option value="">Pilih Bank</option>
                                             <?php foreach ($bankList as $b) : ?>
                                                 <option value="<?= $b['id'] ?>"><?= strtoupper($b['kode_bank']) ?></option>
                                             <?php endforeach ?>
@@ -767,7 +767,8 @@
         const commonOptions = {
             theme: "bootstrap-5",
             dropdownParent: $('#add_modal .modal-content'),
-            minimumResultsForSearch: 10 // Tambahkan opsi pencarian
+            minimumResultsForSearch: 10, // Tambahkan opsi pencarian
+            allowClear: true, // Tambahkan opsi ini
         };
 
         // Daftar field select2 yang akan diinisialisasi
