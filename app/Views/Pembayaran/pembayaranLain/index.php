@@ -43,12 +43,12 @@
                                 <div class="col-md-6">
                                     <div class="form-floating form-pembayaran-po mb-3" style="height: 50px;">
                                         <select class="form-select" name="bank_id" id="bank_id">
-                                                <option selected value=""></option>
+                                                <option selected disabled value="">Pilih Bank</option>
                                             <?php foreach ($bankList as $b) : ?>
                                                 <option value="<?= $b['id'] ?>"><?= strtoupper($b['kode_bank']) ?></option>
                                             <?php endforeach ?>
                                         </select>
-                                        <label for="floatingInput" style="z-index: 1;">Kode Bank (Opsional)</label>
+                                        <label for="bank_id" style="z-index: 1;">Kode Bank (Opsional)</label>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
@@ -654,7 +654,8 @@
             const commonOptions = {
                 theme: "bootstrap-5",
                 dropdownParent: $('#add_modal .modal-content'),
-                minimumResultsForSearch: 10
+                minimumResultsForSearch: 10,
+                allowClear: true, // Tambahkan opsi ini
             };
 
             // Daftar field select2
