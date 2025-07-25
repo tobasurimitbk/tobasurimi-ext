@@ -292,8 +292,13 @@
                                 <span style="display: inline-block; width: 65px; font-weight: bold;">SPECS:</span> <?= trim($detail['specs']) ?> <br>
                             <?php endif; ?>
 
-                            <span style="display: inline-block; width: 65px; font-weight: bold;">BRAND:</span> <?= trim($detail['brand']) ?> <br>
-                            <span style="display: inline-block; width: 65px; font-weight: bold;">PACKING:</span> <?= trim($detail['kemasan']) ?> <br>
+                            <?php if (!empty($detail['brand'])): ?>
+                                <span style="display: inline-block; width: 65px; font-weight: bold;">BRAND:</span> <?= trim($detail['brand']) ?> <br>
+                            <?php endif; ?>
+
+                            <?php if (!empty($detail['kemasan'])): ?>
+                                <span style="display: inline-block; width: 65px; font-weight: bold;">PACKING:</span> <?= trim($detail['kemasan']) ?> <br>
+                            <?php endif; ?>
                         </div>
 
                         <?php if (!empty($detail['size_breakdown'])): ?>
