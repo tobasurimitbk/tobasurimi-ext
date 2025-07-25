@@ -575,8 +575,6 @@ class MaterialRequest extends BaseController
         try {
             $id = decrypt($this->request->getPost("id"));
             $mr_detail = json_decode($this->request->getVar("listMaterial"));
-            // var_dump($mr_detail);
-            // exit;
             $no = $this->request->getVar('req_no');
 
             $checkDuplicate = $this->materialRequestModel->where('company_id', $this->this_company_id)
