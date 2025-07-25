@@ -379,7 +379,7 @@ class SalesOrderExportModel extends Model
 
                     $qtyInput += $totalQtySisa;
                     $qtySisa += $totalQtySisa;
-                    $totalInput += $s['harga'] * $$totalQtySisa;
+                    $totalInput += $s['harga'] * $totalQtySisa;
                 } else {
 
                     $salesOrderDetailExport = $salesOrderExportDetailModel
