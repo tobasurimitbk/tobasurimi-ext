@@ -860,6 +860,7 @@ class POLokalBahanBaku extends BaseController
 
                 $totalPrice = 0.0;
                 $totalDailyPrice = 0.0;
+                $totalMonthlyPrice = 0.0;
                 $totalQty = 0.0;
 
                 // Hitung tarif PPh
@@ -876,9 +877,11 @@ class POLokalBahanBaku extends BaseController
                 foreach ($dataPODetail as $value) {
                     $price = formatter($value->general_price, "CURR_TO_FLOAT");
                     $daily = formatter($value->daily_price, "CURR_TO_FLOAT");
+                    $monthly = formatter($value->monthly_price, "CURR_TO_FLOAT");
                     $qty = formatter($value->qty, "CURR_TO_FLOAT");
 
                     $totalPrice += $price * $qty;
+                    $totalMonthlyPrice += $monthly * $qty;
                     $totalDailyPrice += $daily * $qty;
                     $totalQty += $qty;
                 }
@@ -889,28 +892,37 @@ class POLokalBahanBaku extends BaseController
                     $totalPrice = $totalPrice;
                     $pph = $totalPrice * 0;
                     $totalDailyPrice = $totalDailyPrice;
+                    $totalMonthlyPrice = $totalMonthlyPrice;
                     $pphDaily = $totalDailyPrice * 0;
+                    $pphMonthly = $totalMonthlyPrice * 0;
                 } else if ($dataPO->pph == "Supplier") {
                     $totalPrice = $totalPrice;
                     $pph = $totalPrice * $dataPO->nilai_pph2;
                     $totalDailyPrice = $totalDailyPrice;
+                    $totalMonthlyPrice = $totalMonthlyPrice;
                     $pphDaily = $totalDailyPrice * $dataPO->nilai_pph2;
+                    $pphMonthly = $totalMonthlyPrice * $dataPO->nilai_pph2;
                 } else {
                     $totalPrice = $totalPrice;
                     $pph = $totalPrice * 0;
                     $totalDailyPrice = $totalDailyPrice;
+                    $totalMonthlyPrice = $totalMonthlyPrice;
                     $pphDaily = $totalDailyPrice * 0;
+                    $pphMonthly = $totalMonthlyPrice * 0;
                 }
 
                 // Format yang akan dikirim ke view
                 $dataPO->kode_satuan = $dataPODetail[0]->kode_satuan ?? '';
                 $dataPO->totalPriceRaw = round($totalPrice, 2);
                 $dataPO->totalDailyPriceRaw = round($totalDailyPrice, 2);
+                $dataPO->totalMonthlyPriceRaw = round($totalMonthlyPrice, 2);
                 $dataPO->totalQtyRaw = round($totalQty, 2);
                 $dataPO->totalPphRaw = round($pph, 2);
                 $dataPO->totalDailyPphRaw = round($pphDaily, 2);
+                $dataPO->totalMonthlyPphRaw = round($pphMonthly, 2);
                 $dataPO->totalPaidRaw = round($totalPrice - $dataPO->totalPphRaw, 2);
                 $dataPO->totalDailyPaidRaw = round($totalDailyPrice - $dataPO->totalDailyPphRaw, 2);
+                $dataPO->totalMonthlyPaidRaw = round($totalMonthlyPrice - $dataPO->totalMonthlyPphRaw, 2);
 
                 $dataPO->totalPrice = number_format($dataPO->totalPriceRaw, 2, '.', ',');
                 $dataPO->totalDailyPrice = number_format($dataPO->totalDailyPriceRaw, 2, '.', ',');
@@ -919,12 +931,15 @@ class POLokalBahanBaku extends BaseController
                 $dataPO->totalDailyPph = number_format($dataPO->totalDailyPphRaw, 2, '.', ',');
                 $dataPO->totalPaid = number_format($dataPO->totalPaidRaw, 2, '.', ',');
                 $dataPO->totalDailyPaid = number_format($dataPO->totalDailyPaidRaw, 2, '.', ',');
+                $dataPO->totalMonthlyPaid = number_format($dataPO->totalMonthlyPaidRaw, 2, '.', ',');
 
                 // Konsistensi dengan nilai asli
                 $dataPO->totalPaidTerbilang = terbilang($dataPO->totalPaidRaw);
                 $dataPO->totalDailyPaidTerbilang = terbilang($dataPO->totalDailyPaidRaw);
+                $dataPO->totalMonthlyPaidTerbilang = terbilang($dataPO->totalMonthlyPaidRaw);
                 $dataPO->amount = terbilang($dataPO->totalPriceRaw);
                 $dataPO->amountDaily = terbilang($dataPO->totalDailyPriceRaw);
+                $dataPO->amountMonthly = terbilang($dataPO->totalMonthlyPriceRaw);
 
                 if ($dataPO->pph == "Company") {
                     $selisih = (($dataPO->cong_batasan ?? 0) - ($dataPO->cong_sebenarnya ?? 0) + $dataPO->subsidi_langsung) / $dataPO->nilai_pph;
@@ -945,7 +960,7 @@ class POLokalBahanBaku extends BaseController
                 // Siapkan data sebagai array untuk view
                 $data = (array) $dataPO;
             }
-
+            
             $filename = "Bukti Pengeluaran Bahan Baku";
             $this->dompdf->loadHtml(view('Purchase/poLokalBahanBaku/print-pengeluaran', $data));
             $width_mm = 216;
