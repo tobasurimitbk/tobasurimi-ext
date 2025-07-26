@@ -1017,7 +1017,7 @@
                             <button class="btn btn-sm btn-warning btn-edit-detail" data-index="${index}">
                                 <i class="fas fa-edit"></i>
                             </button>
-                            <button class="btn btn-sm btn-danger btn-remove-detail" data-index="${index}">
+                            <button class="btn btn-sm btn-danger btn-remove-detail" type="button" data-index="${index}">
                                 <i class="fas fa-trash"></i>
                             </button>
                         </td>
