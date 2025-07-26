@@ -595,12 +595,19 @@
                     </tr>
                     <tr>
                         <td>
+                            <?php if ($dataSO->document_required != ""): ?>
+                                <b>
+                                    - DOCUMENT REQUIRED
+                                </b>
+                                <br>
+                                <?= $dataSO->document_required ?><br>
+                            <?php endif; ?>
                             <?php if ($dataSO->payment_term != ""): ?>
                                 <b>
                                     - PAYMENT TERM
                                 </b>
                                 <br>
-                                <?= $dataSO->payment_term ?>
+                                <?= $dataSO->payment_term ?><br>
                             <?php endif; ?>
 
                             <?php if ($dataSO->shipment_an != ""): ?>
@@ -608,7 +615,7 @@
                                     - SHIPMENT A/N
                                 </b>
                                 <br>
-                                <?= $dataSO->shipment_an ?>
+                                <?= $dataSO->shipment_an ?> <br>
                             <?php endif; ?>
 
                             <?php if ($dataSO->consigne_docs != ""): ?>
@@ -616,7 +623,7 @@
                                     - CONSIGNEE
                                 </b>
                                 <br>
-                                <?= $dataSO->consigne_docs ?>
+                                <?= $dataSO->consigne_docs ?> <br>
                             <?php endif; ?>
 
                             <?php if ($dataSO->notify_party != ""): ?>
@@ -624,7 +631,7 @@
                                     - NOTIFY PARTY
                                 </b>
                                 <br>
-                                <?= $dataSO->notify_party ?>
+                                <?= $dataSO->notify_party ?> <br>
                             <?php endif; ?>
 
                             <?php if ($dataSO->additional_detail_docs != ""): ?>
