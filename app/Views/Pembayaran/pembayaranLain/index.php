@@ -749,11 +749,6 @@
                             $('#kurs').val(greatFormatRupiah(res.data.nilai_kurs));
                         }
                     } else {
-                        // Swal.fire({
-                        //     icon: 'error',
-                        //     title: res.message,
-                        //     confirmButtonColor: '#4e73df',
-                        // });
                         $('#kurs').val(greatFormatRupiah(1));
                     }
                 },
@@ -1534,7 +1529,7 @@
         $('#tanggal').val(detail.tanggal);
         $('#pembayaran_oleh').val(detail.pembayaran_oleh);
         $('#keterangan').val(detail.keterangan);
-        $('#valas').val(detail.valas_id).trigger('change');
+        $('#valas').val(detail.valas_id);
         $('#jumlah').val(detail.jumlah);
         $('#kurs').val(detail.kurs);
         $('#jumlah_idr').val(detail.jumlah_idr);
