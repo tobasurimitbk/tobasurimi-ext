@@ -810,7 +810,7 @@
             updateDetail(index);
         });
         // Remove detail
-        $(document).on('click', '.btn-remove-detail', function() {
+        $(document).on('click', '.btn-remove-detail', function(e) {
             e.preventDefault(); // Ini yang paling penting
             e.stopPropagation();
             const index = $(this).data('index');
