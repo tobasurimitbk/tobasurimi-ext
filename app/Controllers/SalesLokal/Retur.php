@@ -193,8 +193,8 @@ class Retur extends BaseController
         $postData = $this->request->getPost();
         $returnData = json_decode($postData["returnedItems"], true);
 
-        var_dump($postData);
-        exit;
+        // var_dump($postData);
+        // exit;
 
         $rules = [
             "id_customer" => [
@@ -728,6 +728,7 @@ class Retur extends BaseController
                 barang_master_sales.barang_name as nama_barang, 
                 satuans.kode_satuan as satuan,
                 sales_order_detail.qty_sekarang as qty,
+                sales_order_detail.id_barang as id_barang,
                 sales_order_detail.harga_barang,
                 sales_order_detail.discount_percentage as disc,
                 sales_order_detail.discount_unit as discUnit,
@@ -772,6 +773,7 @@ class Retur extends BaseController
                 barang_master_sales.barang_name as nama_barang, 
                 satuans.kode_satuan as satuan,
                 sales_order_invoice_detail.qty_invoice as qty,
+                sales_order_invoice_detail.id_barang_invoice as id_barang,
                 sales_order_invoice_detail.harga_barang_invoice as harga_barang,
                 sales_order_invoice_detail.discount_percentage_invoice as disc,
                 sales_order_invoice_detail.discount_unit_invoice as discUnit,
