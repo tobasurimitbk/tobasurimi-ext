@@ -159,15 +159,42 @@
                     <h1 style="margin-top: -10px;">
                         <b><?= strtoupper($company['holding_company']) ?></b>
                     </h1>
+
+                    <?php
+                    // Fungsi untuk memberi spasi antar huruf hanya pada teks, bukan HTML tag
+                    function spacedTextPreserveHTML($html)
+                    {
+                        // Pisahkan tag dan text
+                        return preg_replace_callback('/(<[^>]+>)|([^<]+)/u', function ($matches) {
+                            if (!empty($matches[1])) {
+                                // Tag HTML, biarkan
+                                return $matches[1];
+                            } else {
+                                // Teks biasa, beri spasi tiap huruf
+                                $text = (trim($matches[2]));
+                                $chars = preg_split('//u', $text, -1, PREG_SPLIT_NO_EMPTY);
+                                return implode(' ', $chars);
+                            }
+                        }, $html);
+                    }
+
+                    // Bersihkan karakter aneh
+                    $factoryText = preg_replace('/[^\P{C}?]+/u', '', $company['factory']);
+
+                    // Proses dengan aman
+                    $factoryTextWithSpacing = spacedTextPreserveHTML($factoryText);
+                    ?>
+
                     <table style="width: 100%; margin-top: -15px; font-size: 12px;">
                         <tr>
-                            <td style="text-align: left;">
-                                <?= preg_replace('/[^\P{C}?]+/u', '', trim($company['factory'])) ?>
-
+                            <td style="text-align: justify;">
+                                <?= $factoryTextWithSpacing ?>
                             </td>
                         </tr>
                     </table>
                 </td>
+
+
 
             <?php endif; ?>
         </tr>
@@ -312,7 +339,7 @@
             $currentItemSaleskontrakdetail = 0;
             foreach ($salesKontrakdetail as $key => $detail) {
                 $currentItemSaleskontrakdetail++;
-                $total_amount = $total_amount + formatter($detail["total_harga"], "STR_TO_INT");
+                $total_amount = $total_amount + formatter($detail["total_harga"], "STR_TO_FLOAT");
                 $total_qty += $detail['qty'];
             ?>
                 <tr style="border-bottom: 1px solid #eee;">
