@@ -1528,8 +1528,9 @@
 
     function editDetail(index) {
         const detail = details[index];
-        console.log(detail)
-        // Populate all form fields
+        const jenisPembayaran = $('#jenis_pembayaran').val();
+        
+        // Populate form fields with conditional logic
         $('#tanggal').val(detail.tanggal);
         $('#pembayaran_oleh').val(detail.pembayaran_oleh);
         $('#keterangan').val(detail.keterangan);
@@ -1537,15 +1538,30 @@
         $('#jumlah').val(detail.jumlah);
         $('#kurs').val(detail.kurs);
         $('#jumlah_idr').val(detail.jumlah_idr);
-        $('#akun_selisih').val(detail.akun_selisih).trigger('change');
-        $('#akun_kas').val(detail.akun_kas).trigger('change');
         
-        // Update editing index
+        // Handle account selection based on payment type
+        $('#akun_kas').val(
+            jenisPembayaran === 'PUTIH' 
+                ? detail.akun_kas 
+                : detail.akun_selisih
+        ).trigger('change');
+        $('#akun_selisih').val(
+            jenisPembayaran === 'PUTIH' 
+                ? detail.akun_selisih 
+                : detail.akun_kas
+        ).trigger('change');
+
+        // Update editing state
         editingIndex = index;
         
-        // Change button state
+        // Toggle buttons
         $('.btn-add-detail').hide();
         $('.btn-update-detail').show().data('index', index);
+        
+        // Scroll to detail form for better UX
+        $('html, body').animate({
+            scrollTop: $('.card-body').offset().top
+        }, 300);
     }
 
     // Clear detail form
