@@ -85,7 +85,7 @@
             </div>
             <div class="modal-body">
                 <div class="table-responsive">
-                    <table class="table table-bordered nowrap table-hover-tobasurimi" width="100%" cellspacing="0">
+                    <table class="table table-responsive table-bordered nowrap table-hover-tobasurimi" width="100%" cellspacing="0">
                         <thead class="thead-dark">
                             <tr>
                                 <th width="5%">No</th>

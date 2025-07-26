@@ -735,8 +735,8 @@ class PembayaranPOLokal extends BaseController
                 "po_number"         => $resultlpb,
                 "payment_date"      => $data->payment_date,
                 "payment_method"    => strtoupper($data->payment_method),
-                "amount"            => number_format($data->amount - $data->amount_pajak ?? 0, 0, ',', '.'),
-                "total_sum_amount"            => number_format($data->total_sum_amount ?? 0, 0, ',', '.'),
+                "amount"            => number_format($data->amount ?? 0, 0, ',', '.'),
+                "total_sum_amount"  => number_format($data->total_sum_amount ?? 0, 0, ',', '.'),
                 "tipe_bayar"        => strtoupper($data->type_bayar),
                 'status_posting'    => $data->status_posting
             ]);

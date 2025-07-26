@@ -475,6 +475,128 @@
             </tr>
         </table>
     </div>
+
+
+    <?php if ($totalMonthlyPaid != 0) { ?>
+
+          <!-- Fourth section -->
+        <div class="section">
+            <table class="w-100">
+                <tr>
+                    <td>
+                        <table>
+                            <tr>
+                                <td style="font-size: 18px; font-weight: bold;"><u>BUKTI PENGELUARAN</u></td>
+                                <td>
+                                    <div style="margin-bottom: 0.25rem;margin-left: 70px">
+                                        <div class="box-sm bukti-pengeluaran"></div>
+                                        <div class="bukti-pengeluaran">KAS</div>
+                                    </div>
+                                    <div style="margin-left: 70px">
+                                        <div class="box-sm bukti-pengeluaran"></div>
+                                        <div class="bukti-pengeluaran">BANK</div>
+                                    </div>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                    <td>
+                        <table class="bank-table border-collapse" style="float: right;">
+                            <tr>
+                                <th colspan="2">NO</th>
+                                <th>BANK</th>
+                            </tr>
+                            <tr>
+                                <td>CEK</td>
+                                <td style="width: 95px;"></td>
+                                <td style="width: 95px;"></td>
+                            </tr>
+                            <tr>
+                                <td>GIRO</td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+            </table>
+
+            <div class="d-flex w-100 mt-5">
+                <div style="display: inline-block;">
+                    <table>
+                        <tr>
+                            <td>TGL</td>
+                            <td>. <u><?= date('d-M-Y', strtotime($po_date)) ?></u></td>
+                        </tr>
+                        <tr>
+                            <td>DIBAYAR KEPADA</td>
+                            <td>: <u><?= $supplierName ?></u></td>
+                        </tr>
+                    </table>
+                </div>
+                <div style="display: inline-block;vertical-align: top;float: right;">
+                    <table>
+                        <tr>
+                            <td>NO BUKTI:</td>
+                            <td style="border-bottom: 1px solid #000; width: 170px;"></td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+
+            <table class="w-100 bank-table border-collapse">
+                <tr>
+                    <th class="txt-center" style="width: 400px;">KETERANGAN</th>
+                    <th class="txt-center">JUMLAH</th>
+                    <th class="txt-center" style="width: 100px;">NO. PERKIRAAN</th>
+                </tr>
+                <tr>
+                    <td>Pembayaran <?= $barangName ?> sebanyak <?= $totalQty . " " . $kode_satuan ?> (No: <?= $po_no ?>)</td>
+                    <td class="txt-right">Rp <?= $totalMonthlyPaid ?></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <th class="txt-right">TOTAL</th>
+                    <th class="txt-right">Rp <?= $totalMonthlyPaid ?></th>
+                    <th></th>
+                </tr>
+            </table>
+
+            <div style="margin-top: 0.5rem;margin-bottom: 0.5rem">
+                <span>TERBILANG:</span>
+                <span style="text-transform: uppercase;"><u><?= $totalMonthlyPaid != 0 ? ($totalMonthlyPaidTerbilang) . ' RUPIAH' : ''?></u></span>
+            </div>
+
+            <table class="w-100 sign-table border-collapse">
+                <tr>
+                    <td class="txt-center" style="width: 5% !important;">DISETUJUI</td>
+                    <td class="txt-center" style="width: 5% !important;">DIKETAHUI</td>
+                    <td class="txt-center" style="width: 5% !important;">DIPERIKSA</td>
+                    <td class="txt-center" style="width: 5% !important;">KASIR</td>
+                    <td class="txt-center" style="width: 5% !important;">DIBUKUKAN</td>
+                    <td class="txt-center" style="width: 15% !important;">DITERIMA OLEH</td>
+                </tr>
+                <tr>
+                    <td style="height: 50px;"></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>TGL</td>
+                    <td>TGL</td>
+                    <td>TGL</td>
+                    <td>TGL</td>
+                    <td>TGL</td>
+                    <td class="txt-center"><?= $supplierName ?></td>
+                </tr>
+            </table>
+        </div>
+
+    <?php } ?>
+
 </body>
 
 </html>

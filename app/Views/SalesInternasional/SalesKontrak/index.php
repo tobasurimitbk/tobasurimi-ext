@@ -102,6 +102,48 @@
     </div>
 </div>
 
+<?php if (session()->get('login')->this_company_id == 1): ?>
+    <div class="modal letterhead-modal" tabindex="1">
+        <div class="modal-dialog" style="min-width: 900px;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title title-secondary">Select Letterhead</h5>
+                </div>
+                <form class="form-unposting">
+                    <input type="hidden" name="url_print" id="url_print">
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-floating mb-3" style="height: 50px;">
+                                    <select
+                                        class="form-select company_id"
+                                        aria-label="Floating label select example"
+                                        name="company_id"
+                                        id="company_id">
+                                        <option value=""></option>
+                                        <?php foreach ($dataCompany as $d) : ?>
+                                            <option value="<?= $d['id'] ?>" <?= $d['id'] == 1 ? 'selected' : '' ?>>
+                                                <?= $d['company'] ?>
+                                            </option>
+                                        <?php endforeach; ?>
+                                    </select>
+                                    <label for="floatingInput" style="z-index: 1;">Select Letterhead Printout</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-hide-detail btn-discard mr-3" id="btn-hide-modal-letterhead">Back</button>
+                        <button type="button" onclick="print2()" class="btn btn-submit-form btn-submit-detail">Print Sales Kontrak</button>
+                    </div>
+                </form>
+
+
+            </div>
+        </div>
+    </div>
+<?php endif; ?>
+
 <script>
     const csrfToken = '<?= csrf_token() ?>';
     let sort = "createdAt";
@@ -447,9 +489,35 @@
     }
 
 
-    const print = function(url) {
-        window.open(url, "_blank");
-    }
+    <?php if (session()->get('login')->this_company_id == 1): ?>
+        // Jika Kim 1 Maka Milih Pakai Kop Mana
+        var print = function(url) {
+            $('#url_print').val(url);
+            $('.letterhead-modal').modal('show');
+        }
+        var print2 = function() {
+            var companyId = $('#company_id option:selected').val();
+            if (companyId == '') {
+                Swal.fire({
+                    icon: 'error',
+                    title: "Select Letterhead Printout",
+                    confirmButtonColor: '#4e73df',
+                })
+            } else {
+                var url_print = $('#url_print').val();
+                window.open(url_print + '?letter_head_company=' + companyId, "_blank");
+            }
+        }
+
+        $('#btn-hide-modal-letterhead').click(function() {
+            $('.letterhead-modal').modal('hide');
+        });
+    <?php else: ?>
+        var print = function(url) {
+            window.open(url, "_blank");
+        }
+    <?php endif; ?>
+
 
     $(".dataTable_info").addClass("pt-0");
 
@@ -480,6 +548,40 @@
             sortType = sortType === "asc" ? "desc" : "asc";
         }
     }
+
+    $('#company_id').select2({
+        placeholder: "Select Letterhead Printout",
+        theme: "bootstrap-5",
+        dropdownParent: $('.letterhead-modal')
+    });
+
+    $('.company_id')
+        .parent('div')
+        .children('span')
+        .children('span')
+        .children('span')
+        .css('height', ' calc(3.5rem + 2px)');
+
+    $('.company_id')
+        .parent('div')
+        .children('span')
+        .children('span')
+        .children('span')
+        .children('span')
+        .css('margin-top', '22px').css('margin-left', '-7px');
+
+    $('.company_id')
+        .parent('div')
+        .children('span')
+        .children('span')
+        .children('span')
+        .children('span')
+        .css('margin-top', '22px').css('margin-left', '-7px');
+
+    $('.company_id')
+        .parent('div')
+        .find('label')
+        .css('z-index', '1');
 </script>
 
 <?= $this->endSection(); ?>

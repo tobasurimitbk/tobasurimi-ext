@@ -109,78 +109,74 @@ class OtherPayment extends BaseController
     public function createAction()
     {
         $payload = $this->request->getJSON(true);
-        $noPembayaran = $payload['no_pembayaran'];
-        $existing = $this->otherPaymentModel->where('no_pembayaran', $noPembayaran)->first();
-
-        if ($existing !== null) {
+        
+        // Validasi no_pembayaran
+        $existing = $this->otherPaymentModel->where('no_pembayaran', $payload['no_pembayaran'])->first();
+        if ($existing) {
             return $this->response->setJSON([
                 'status' => false,
-                'message' => "No pembayaran " . $noPembayaran . " sudah ada",
+                'message' => "No pembayaran sudah ada",
                 'token' => csrf_hash()
             ]);
         }
 
+        // Sederhanakan parent data
         $parentData = [
-            'company_id'     => $this->this_company_id,
-            'divisi_id'      => $payload['divisi_id'],
-            'bank_id'      => $payload['bank_id'],
-            'no_pembayaran'  => $payload['no_pembayaran'],
-            'bayar_ke'       => $payload['bayar_ke'],
-            'jenis_pembayaran'          => $payload['jenis_pembayaran'],
-            'metode_pembayaran'          => $payload['metode_pembayaran'],
-            'keterangan'          => $payload['keterangan_parent'],
-            'nominal'          => $payload['total_all_amount'],
-            'akun_selisih'         => $payload['akun_selisih'],
-            'akun_selisih'     => ($payload['jenis_pembayaran'] === 'PUTIH') ? $payload['akun_selisih'] : null,
-            'akun_kas'         => ($payload['jenis_pembayaran'] === 'MERAH') ? $payload['akun_selisih'] : null,
+            'company_id' => $this->this_company_id,
+            'divisi_id' => $payload['divisi_id'],
+            'bank_id' => $payload['bank_id'],
+            'no_pembayaran' => $payload['no_pembayaran'],
+            'bayar_ke' => $payload['bayar_ke'],
+            'jenis_pembayaran' => $payload['jenis_pembayaran'],
+            'metode_pembayaran' => $payload['metode_pembayaran'],
+            'keterangan' => $payload['keterangan_parent'],
+            'nominal' => $payload['total_all_amount'],
+            // SELALU simpan akun_selisih dan akun_kas sesuai jenis
+            'akun_selisih' => $payload['jenis_pembayaran'] === 'PUTIH' ? $payload['akun_selisih'] : null,
+            'akun_kas' => $payload['jenis_pembayaran'] === 'MERAH' ? $payload['akun_selisih'] : null,
         ];
 
         $parentId = $this->otherPaymentModel->insert($parentData);
 
+        // Proses details
+        $latestDate = null;
         foreach ($payload['details'] as $detail) {
-
-            if ($payload['jenis_pembayaran'] === 'MERAH') {
-                $akunKas = $payload['akun_selisih'];
-                $akunSelisih = $detail['akun_kas'];
-            } else {
-                $akunKas = $detail['akun_kas'];
-                $akunSelisih = $payload['akun_selisih'];
-            }
-
             $detailData = [
-                'other_payment_id'     => $parentId,
-                'tanggal_pembayaran'   => date("Y-m-d", strtotime(str_replace("/", "-", $detail['tanggal']))),
-                'nominal'              => $detail['jumlah_idr'],
-                'pembayaran_oleh'      => $detail['pembayaran_oleh'],
-                'valas_id'             => $detail['valas_id'],
-                'kurs'                 => $detail['kurs'],
-                'jumlah'               => $detail['jumlah'],
-                'jumlah_idr'           => $detail['jumlah_idr'],
-                'akun_kas'             => $akunKas,
-                'akun_selisih'         => $akunSelisih,
-                'keterangan'           => $detail['keterangan'] ?? null
+                'other_payment_id' => $parentId,
+                'tanggal_pembayaran' => date("Y-m-d", strtotime(str_replace("/", "-", $detail['tanggal']))),
+                'nominal' => $detail['jumlah_idr'],
+                'pembayaran_oleh' => $detail['pembayaran_oleh'],
+                'valas_id' => $detail['valas_id'],
+                'kurs' => $detail['kurs'],
+                'jumlah' => $detail['jumlah'],
+                'jumlah_idr' => $detail['jumlah_idr'],
+                'keterangan' => $detail['keterangan'] ?? null,
+                // Konsisten: akun_kas selalu debit, akun_selisih selalu kredit
+                'akun_kas' => $detail['akun_kas'],
+                'akun_selisih' => $payload['jenis_pembayaran'] === 'PUTIH' 
+                    ? $payload['akun_selisih'] 
+                    : $detail['akun_kas']
             ];
-            $tanggal = $detailData['tanggal_pembayaran'];
 
             $this->otherPaymentDetailModel->insert($detailData);
+            $latestDate = $detailData['tanggal_pembayaran'];
         }
 
-        // Update Tanggal
-        $this->otherPaymentModel->update($parentId, ['tanggal' => $tanggal]);
+        if ($latestDate) {
+            $this->otherPaymentModel->update($parentId, ['tanggal' => $latestDate]);
+        }
 
         return $this->response->setJSON([
-            'token' => csrf_hash(),
             'status' => true,
-            'message' => "Pembayaran lain-lain berhasil disimpan",
+            'message' => "Data berhasil disimpan",
+            'token' => csrf_hash()
         ]);
     }
 
 
     public function updateAction()
     {
-        // Ambil data JSON dari body
         $payload = $this->request->getJSON(true);
-
         $parentId = decrypt($payload['id']) ?? null;
 
         if (!$parentId) {
@@ -191,62 +187,58 @@ class OtherPayment extends BaseController
             ]);
         }
 
-        // 1. Update Parent Data
+        // 1. Update Parent Data - Konsisten dengan createAction
         $parentData = [
-            'company_id'     => $this->this_company_id,
-            'divisi_id'      => $payload['divisi_id'],
-            'bank_id'      => $payload['bank_id'],
-            'no_pembayaran'  => $payload['no_pembayaran'],
-            'bayar_ke'       => $payload['bayar_ke'],
-            'jenis_pembayaran'          => $payload['jenis_pembayaran'],
-            'metode_pembayaran'          => $payload['metode_pembayaran'],
-            'keterangan'          => $payload['keterangan_parent'],
-            'nominal'          => $payload['total_all_amount'],
-            'akun_selisih'         => $payload['akun_selisih'],
-            'akun_selisih'     => ($payload['jenis_pembayaran'] === 'PUTIH') ? $payload['akun_selisih'] : null,
-            'akun_kas'         => ($payload['jenis_pembayaran'] === 'MERAH') ? $payload['akun_selisih'] : null,
+            'divisi_id' => $payload['divisi_id'],
+            'bank_id' => $payload['bank_id'],
+            'no_pembayaran' => $payload['no_pembayaran'],
+            'bayar_ke' => $payload['bayar_ke'],
+            'jenis_pembayaran' => $payload['jenis_pembayaran'],
+            'metode_pembayaran' => $payload['metode_pembayaran'],
+            'keterangan' => $payload['keterangan_parent'],
+            'nominal' => $payload['total_all_amount'],
+            // Tetap konsisten dengan logika create
+            'akun_selisih' => $payload['jenis_pembayaran'] === 'PUTIH' ? $payload['akun_selisih'] : null,
+            'akun_kas' => $payload['jenis_pembayaran'] === 'MERAH' ? $payload['akun_selisih'] : null,
         ];
         $this->otherPaymentModel->update($parentId, $parentData);
 
         // 2. Handle Details
-        $existingDetails   = $this->otherPaymentDetailModel->where('other_payment_id', $parentId)->findAll();
+        $existingDetails = $this->otherPaymentDetailModel->where('other_payment_id', $parentId)->findAll();
         $existingDetailIds = array_column($existingDetails, 'id');
         $submittedDetailIds = [];
+        $latestDate = null;
 
         foreach ($payload['details'] as $detail) {
-
-            if ($payload['jenis_pembayaran'] === 'MERAH') {
-                $akunKas = $payload['akun_selisih'];
-                $akunSelisih = $detail['akun_kas'];
-            } else {
-                $akunKas = $detail['akun_kas'];
-                $akunSelisih = $payload['akun_selisih'];
-            }
-
+            $detailId = !empty($detail['id']) ? decrypt($detail['id']) : null;
+            
             $detailData = [
-                'other_payment_id'     => $parentId,
-                'tanggal_pembayaran'   => date("Y-m-d", strtotime(str_replace("/", "-", $detail['tanggal']))),
-                'nominal'              => $detail['jumlah_idr'],
-                'pembayaran_oleh'      => $detail['pembayaran_oleh'],
-                'akun_kas'             => $akunKas,
-                'akun_selisih'         => $akunSelisih,
-                'valas_id'             => $detail['valas_id'],
-                'kurs'                 => $detail['kurs'],
-                'jumlah'               => $detail['jumlah'],
-                'jumlah_idr'           => $detail['jumlah_idr'],
-                'keterangan'           => $detail['keterangan'] ?? null
+                'other_payment_id' => $parentId,
+                'tanggal_pembayaran' => date("Y-m-d", strtotime(str_replace("/", "-", $detail['tanggal']))),
+                'nominal' => $detail['jumlah_idr'],
+                'pembayaran_oleh' => $detail['pembayaran_oleh'],
+                'valas_id' => $detail['valas_id'],
+                'kurs' => $detail['kurs'],
+                'jumlah' => $detail['jumlah'],
+                'jumlah_idr' => $detail['jumlah_idr'],
+                'keterangan' => $detail['keterangan'] ?? null,
+                // Logika konsisten dengan create:
+                'akun_kas' => $detail['akun_kas'], // Selalu debit dari detail
+                'akun_selisih' => $payload['jenis_pembayaran'] === 'PUTIH' 
+                    ? $payload['akun_selisih'] 
+                    : $detail['akun_kas'] // Untuk MERAH, akun_selisih di child = akun_kas
             ];
 
-            if (!empty(decrypt($detail['id']))) {
-                // Update
-                $this->otherPaymentDetailModel->update(decrypt($detail['id']), $detailData);
-                $submittedDetailIds[] = decrypt($detail['id']);
+            if ($detailId && in_array($detailId, $existingDetailIds)) {
+                // Update existing detail
+                $this->otherPaymentDetailModel->update($detailId, $detailData);
+                $submittedDetailIds[] = $detailId;
             } else {
-                // Insert
+                // Insert new detail
                 $this->otherPaymentDetailModel->insert($detailData);
             }
 
-            $tanggal = $detailData['tanggal_pembayaran'];
+            $latestDate = $detailData['tanggal_pembayaran'];
         }
 
         // 3. Delete removed details
@@ -255,7 +247,10 @@ class OtherPayment extends BaseController
             $this->otherPaymentDetailModel->whereIn('id', $detailsToDelete)->delete();
         }
 
-        $this->otherPaymentModel->update($parentId, ['tanggal' => $tanggal]);
+        // Update tanggal terakhir
+        if ($latestDate) {
+            $this->otherPaymentModel->update($parentId, ['tanggal' => $latestDate]);
+        }
 
         return $this->response->setJSON([
             'token' => csrf_hash(),

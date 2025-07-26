@@ -45,7 +45,7 @@
         }
 
         .mt-1 {
-            margin-top: 1rem;
+            margin-top: 0.6rem;
         }
 
         .txt-left {
@@ -78,7 +78,7 @@
 
         .label-header {
             font-weight: bold;
-            font-size: 12px;
+            font-size: 11px;
         }
 
         .po-customer {
@@ -97,21 +97,21 @@
 
 <body>
 
-    <table border="0" style="width: 100%;">
+    <table border="0" style="width: 100%; margin-top:-20px;">
         <tr style="vertical-align: top;">
             <?php if ($company['id'] != 15): ?>
                 <td>
                     <div style="text-align: right; margin-left:-20px; margin-right:40px; ">
-                        <img src="<?= $company['logo'] ?>" style="width: 150px; text-align:right; margin-top:-17px" alt="">
+                        <img src="<?= $company['logo'] ?>" style="width: 120px; height:100px; text-align:right; margin-top:-17px" alt="">
                     </div>
                 </td>
             <?php endif; ?>
             <?php if ($company['id'] == 1 || $company['id'] == 2): ?>
                 <td>
-                    <h1 style="margin-top:-10px; margin-left:-30px;">
+                    <h2 style="margin-top:-10px; margin-left:-30px;">
                         <center>
 
-                            <b><?= strtoupper(str_ireplace(', Tbk', '', $company['holding_company'])) ?></b>
+                            <b><?= strtoupper(str_ireplace(', Tbk', '', $company['holding_company'])) ?></b> <br>
                             <?php if ($company['id'] == 1): ?>
                                 <!-- Ini Kim 1 Yha -->
                                 <b style="text-align: center;">
@@ -120,8 +120,8 @@
 
                             <?php endif; ?>
                         </center>
-                    </h1>
-                    <table style="width: 100%; margin-top:-15px; margin-left:-30px; font-size:12px;">
+                    </h2>
+                    <table style="width: 100%; margin-top:-15px; margin-left:-30px; font-size:10px;">
 
                         <tr style="vertical-align: top;">
                             <td style="width: 50px;">Office</td>
@@ -143,7 +143,7 @@
                     <h1 style="margin-top: -10px;">
                         <b><?= strtoupper($company['holding_company']) ?></b>
                     </h1>
-                    <table style="width: 100%; margin-top: -15px; font-size: 12px;">
+                    <table style="width: 100%; margin-top: -15px; font-size: 13px;">
                         <tr>
                             <td style="text-align: center;">
                                 <?= $company['factory'] ?>
@@ -162,7 +162,8 @@
                     <table style="width: 100%; margin-top: -15px; font-size: 12px;">
                         <tr>
                             <td style="text-align: left;">
-                                <?= str_replace('?', '', $company['factory']) ?>
+                                <?= preg_replace('/[^\P{C}?]+/u', '', trim($company['factory'])) ?>
+
                             </td>
                         </tr>
                     </table>
@@ -291,8 +292,13 @@
                                 <span style="display: inline-block; width: 65px; font-weight: bold;">SPECS:</span> <?= trim($detail['specs']) ?> <br>
                             <?php endif; ?>
 
-                            <span style="display: inline-block; width: 65px; font-weight: bold;">BRAND:</span> <?= trim($detail['brand']) ?> <br>
-                            <span style="display: inline-block; width: 65px; font-weight: bold;">PACKING:</span> <?= trim($detail['kemasan']) ?> <br>
+                            <?php if (!empty($detail['brand'])): ?>
+                                <span style="display: inline-block; width: 65px; font-weight: bold;">BRAND:</span> <?= trim($detail['brand']) ?> <br>
+                            <?php endif; ?>
+
+                            <?php if (!empty($detail['kemasan'])): ?>
+                                <span style="display: inline-block; width: 65px; font-weight: bold;">PACKING:</span> <?= trim($detail['kemasan']) ?> <br>
+                            <?php endif; ?>
                         </div>
 
                         <?php if (!empty($detail['size_breakdown'])): ?>
@@ -718,7 +724,7 @@
         </thead>
         <tbody>
             <tr>
-                <td style="height: 100px;"></td>
+                <td style="height: 80px;"></td>
                 <td></td>
             </tr>
             <tr>

@@ -118,87 +118,11 @@
 <body>
     <?php if (!empty($dataSO) && !empty($dataSODetail)) { ?>
 
-        <table border="0" style="width: 100%;">
-            <tr style="vertical-align: top;">
-                <?php if ($company['id'] != 15): ?>
-                    <td>
-                        <div style="text-align: right; margin-left:-20px; margin-right:40px; ">
-                            <img src="<?= $company['logo'] ?>" style="width: 150px; text-align:right; margin-top:-17px" alt="">
-                        </div>
-                    </td>
-                <?php endif; ?>
-                <?php if ($company['id'] == 1 || $company['id'] == 2): ?>
-                    <td>
-                        <h1 style="margin-top:-10px; margin-left:-30px;">
-                            <center>
-
-                                <b><?= strtoupper(str_ireplace(', Tbk', '', $company['holding_company'])) ?></b>
-                                <?php if ($company['id'] == 1): ?>
-                                    <!-- Ini Kim 1 Yha -->
-                                    <b style="text-align: center;">
-                                        PLANT I
-                                    </b>
-
-                                <?php endif; ?>
-                            </center>
-                        </h1>
-                        <table style="width: 100%; margin-top:-15px; margin-left:-30px; font-size:12px;">
-
-                            <tr style="vertical-align: top;">
-                                <td style="width: 50px;">Office</td>
-                                <td>:</td>
-                                <td>
-                                    <?= $company['office_kop'] ?>
-                                </td>
-                            </tr>
-                            <tr style="vertical-align: top;">
-                                <td>Factory</td>
-                                <td>:</td>
-                                <td><b><?= $company['factory'] ?></b></td>
-                            </tr>
-                        </table>
-                    </td>
-                <?php endif ?>
-                <?php if ($company['id'] == 15): ?>
-                    <td style="text-align: center;">
-                        <h1 style="margin-top: -10px;">
-                            <b><?= strtoupper($company['holding_company']) ?></b>
-                        </h1>
-                        <table style="width: 100%; margin-top: -15px; font-size: 12px;">
-                            <tr>
-                                <td style="text-align: center;">
-                                    <?= $company['factory'] ?>
-                                </td>
-                            </tr>
-                        </table>
-                    </td>
-
-                <?php endif; ?>
-
-                <?php if ($company['id'] == 16): ?>
-                    <td style="text-align: left;">
-                        <h1 style="margin-top: -10px;">
-                            <b><?= strtoupper($company['holding_company']) ?></b>
-                        </h1>
-                        <table style="width: 100%; margin-top: -15px; font-size: 12px;">
-                            <tr>
-                                <td style="text-align: left;">
-                                    <?= str_replace('?', '', $company['factory']) ?>
-                                </td>
-                            </tr>
-                        </table>
-                    </td>
-
-                <?php endif; ?>
-            </tr>
-        </table>
-        <hr style="margin-top: -1px;">
-
         <div class="header">
             <div class="txt-center">
                 <h3>
                     <span style="margin-top: -20px;">
-                        ORDER FORM <?= $dataSO->container ?>
+                        ORDER FORM <br> <?= $dataSO->container ?>
                     </span>
                 </h3>
             </div>

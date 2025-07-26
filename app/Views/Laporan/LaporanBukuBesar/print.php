@@ -61,18 +61,21 @@
             <th style="width: 7%;">Tanggal</th>
             <th style="width: 8%;">No Trx</th>
             <th style="width: 10%;">Supplier</th>
-            <th style="width: 35%;">Desc</th> <!-- Significantly wider description column -->
+            <th style="width: 20%;">Desc</th> <!-- Significantly wider description column -->
             <th style="width: 8%;">Currency</th>
             <th style="width: 7%;">Exch</th>
-            <th style="width: 8%;">Debit</th>
-            <th style="width: 8%;">Kredit</th>
-            <th style="width: 9%;">Balance</th>
+            <th style="width: 12%;">Debit</th>
+            <th style="width: 12%;">Kredit</th>
+            <th style="width: 16%;">Balance</th>
           </tr>
         </thead>
 
         <tbody>
           <tr>
-            <td colspan="8">Saldo Awal : </td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td colspan="5">Saldo Awal : </td>
             <td><?= toRupiah($j['saldo_lama']) ?></td>
           </tr>
           <?php
