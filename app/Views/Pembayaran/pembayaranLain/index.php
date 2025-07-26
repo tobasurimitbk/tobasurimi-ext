@@ -54,6 +54,7 @@
                                 <div class="col-md-6">
                                     <div class="form-floating mb-3" style="height: 50px;">
                                         <select class="form-select" name="jenis_pembayaran" id="jenis_pembayaran" required>
+                                            <option selected disabled value="">Pilih Bank</option>
                                             <option value="PUTIH">PUTIH</option>
                                             <option value="MERAH">MERAH</option>
                                         </select>
@@ -774,15 +775,13 @@
         });
 
         function updateDetail(index) {
-            if (!validateDetails()) {
-                refreshValidation();
-                return;
-            }
+            if (!validateDetails()) return;
 
             const jenisPembayaran = $('#jenis_pembayaran').val();
             
-            // Update detail yang sedang diedit
-            const detail = {
+            // Update detail
+            details[index] = {
+                ...details[index],
                 tanggal: $('#tanggal').val(),
                 pembayaran_oleh: $('#pembayaran_oleh').val(),
                 akun_kas: $('#akun_kas').val(),
@@ -798,25 +797,8 @@
                 jenis_pembayaran: jenisPembayaran
             };
 
-            // Update detail di array
-            details[index] = detail;
-            
-            details.forEach(d => {
-                if (jenisPembayaran == 'PUTIH') {
-                    d.akun_kas_name = $('#akun_selisih option:selected').text();
-                    d.akun_kas = $('#akun_selisih').val();
-                } else {
-                    d.akun_selisih_name = $('#akun_selisih option:selected').text();
-                    d.akun_selisih = $('#akun_selisih').val();
-                }
-            });
-
             refreshDetailsTable();
             clearDetailForm();
-            refreshValidation();
-            
-            // Reset editing state
-            editingIndex = -1;
             $('.btn-update-detail').hide();
             $('.btn-add-detail').show();
         }
@@ -886,26 +868,6 @@
 
             refreshDetailsTable();
         }
-        
-        // Handle final submission
-        $('.btn-submit-form').click(function() {
-            if (details.length === 0) {
-                alert('Tambahkan setidaknya satu detail pembayaran');
-                return;
-            }
-
-            const formData = {
-                no_pembayaran: $('#no_pembayaran').val(),
-                divisi_id: $('#divisi_id').val(),
-                bank_id: $('#bank_id').val(),
-                valas: $('#valas').val(),
-                bayar_ke: $('#bayar_ke').val(),
-                details: details
-            };
-
-            // Submit via AJAX or form submission
-            // ...
-        });
 
         // Custom validation for details
         function validateDetails() {
@@ -989,93 +951,92 @@
 
 
         $('.btn-add-detail').click(function() {
-            // Jalankan validasi detail dulu
+            // Validasi
             const akunSelisih = $('#akun_selisih option:selected').val();
             const jenisPembayaran = $('#jenis_pembayaran option:selected').val();
-            let messageErr = '';
+            
             if (akunSelisih == '') {
-                if (jenisPembayaran == 'PUTIH') {
-                    messageErr = "Akun Kredit Wajib Diisi"
-                } else {
-                    messageErr = "Akun Debit Wajib Diisi";
-                }
-                alert(messageErr)
+                const messageErr = jenisPembayaran == 'PUTIH' 
+                    ? "Akun Kredit Wajib Diisi" 
+                    : "Akun Debit Wajib Diisi";
+                alert(messageErr);
                 return;
             }
 
             if (!validateDetails()) {
-                refreshValidation(); // buat update styling error
-                return; // stop proses kalau gak valid
+                refreshValidation();
+                return;
             }
 
-
+            // Prepare detail data - KONSISTEN dengan struktur BE
             const detail = {
                 tanggal: $('#tanggal').val(),
                 pembayaran_oleh: $('#pembayaran_oleh').val(),
-                akun_kas: $('#akun_kas').val(),
-                akun_kas_name: $('#akun_kas option:selected').text(),
-                akun_selisih: $('#akun_selisih').val(),
-                akun_selisih_name: $('#akun_selisih option:selected').text(),
                 keterangan: $('#keterangan').val(),
                 valas: $('#valas option:selected').text(),
                 valas_id: $('#valas option:selected').val(),
                 jumlah: $('#jumlah').val(),
                 kurs: $('#kurs').val(),
                 jumlah_idr: $('#jumlah_idr').val(),
-                jenis_pembayaran: jenisPembayaran
+                jenis_pembayaran: jenisPembayaran,
+                
+                // SELALU simpan akun_kas sebagai debit (sesuai pilihan user)
+                akun_kas: $('#akun_kas').val(),
+                akun_kas_name: $('#akun_kas option:selected').text(),
+                
+                // Untuk akun_selisih, sesuaikan dengan jenis pembayaran
+                akun_selisih: jenisPembayaran === 'PUTIH' 
+                    ? $('#akun_selisih').val()  // PUTIH: ambil dari parent
+                    : $('#akun_kas').val(),     // MERAH: sama dengan akun_kas
+                akun_selisih_name: jenisPembayaran === 'PUTIH'
+                    ? $('#akun_selisih option:selected').text()
+                    : $('#akun_kas option:selected').text()
             };
+
             details.push(detail);
             refreshDetailsTable();
             clearDetailForm();
-            refreshValidation(); // bersihin styling error kalau sudah valid
+            refreshValidation();
         });
 
         function refreshDetailsTable() {
-            const tbody = $('#detail-table tbody');
-            tbody.empty();
-
+            const tableBody = $('#detail-table tbody');
+            tableBody.empty();
+            
+            let totalAllAmount = 0;
+            
             details.forEach((detail, index) => {
-                // Determine debit and credit accounts based on jenis_pembayaran
-                let debitAccount, creditAccount;
+                // Format nilai sesuai kebutuhan
+                const jumlahIDR = formatRupiah(detail.jumlah_idr);
+                totalAllAmount += parseFloat(destroyFormatRupiah(detail.jumlah_idr));
                 
-                if ($('#jenis_pembayaran').val() == 'PUTIH') {
-                    // For PUTIH type:
-                    // Cash Account is Debit, Difference Account is Credit
-                    debitAccount = detail.akun_kas_name;
-                    creditAccount = detail.akun_selisih_name;
-                } else {
-                    // For non-PUTIH types (MERAH/HITAM):
-                    // Difference Account is Debit, Cash Account is Credit
-                    debitAccount = detail.akun_selisih_name;
-                    creditAccount = detail.akun_kas_name;
-                }
-
-                tbody.append(`
+                // Tampilkan data sesuai jenis pembayaran
+                const row = `
                     <tr>
                         <td>${detail.tanggal}</td>
-                        <td>${creditAccount}</td> <!-- Credit Column -->
-                        <td>${debitAccount}</td>  <!-- Debit Column -->
+                        <td>${detail.jenis_pembayaran === 'PUTIH' ? detail.akun_selisih_name : detail.akun_kas_name}</td>
+                        <td>${detail.jenis_pembayaran === 'PUTIH' ? detail.akun_kas_name : detail.akun_selisih_name}</td>
                         <td>${detail.valas}</td>
-                        <td>${greatFormatRupiah(detail.jumlah)}</td>
-                        <td>${greatFormatRupiah(detail.kurs)}</td>
-                        <td>${greatFormatRupiah(detail.jumlah_idr)}</td>
+                        <td>${detail.jumlah}</td>
+                        <td>${detail.kurs}</td>
+                        <td>${jumlahIDR}</td>
                         <td>${detail.pembayaran_oleh}</td>
-                        <td>${detail.keterangan}</td>
-                        <td>
-                            <button type="button" class="btn btn-warning btn-sm btn-edit-detail" data-index="${index}">Edit</button>
-                            <button type="button" class="btn btn-danger btn-sm btn-remove-detail" data-index="${index}">Hapus</button>
+                        <td>${detail.keterangan || ''}</td>
+                        <td class="actions">
+                            <button class="btn btn-sm btn-warning btn-edit-detail" data-index="${index}">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="btn btn-sm btn-danger btn-delete-detail" data-index="${index}">
+                                <i class="fas fa-trash"></i>
+                            </button>
                         </td>
                     </tr>
-                `);
+                `;
+                tableBody.append(row);
             });
-
-            // Calculate total jumlah_idr
-            const totalAmount = details.reduce((sum, detail) => {
-                const amount = destroyFormatRupiah(detail.jumlah_idr) || 0;
-                return sum + amount;
-            }, 0);
-
-            $('#total_all_amount').val(greatFormatRupiah(totalAmount));
+            
+            // Update total amount
+            $('#total_all_amount').val(formatRupiah(totalAllAmount.toString()));
         }
 
         // Remove detail
