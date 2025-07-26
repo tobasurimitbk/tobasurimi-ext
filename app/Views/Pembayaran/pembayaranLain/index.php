@@ -21,7 +21,7 @@
 
                                 <div class="col-md-6">
                                     <div class="form-floating mb-3" style="height: 50px;">
-                                        <input autocomplete="one-time-code" type="text" class="form-control no_pembayaran" name="no_pembayaran" id="no_pembayaran" placeholder="No Pembayaran">
+                                        <input autocomplete="one-time-code" type="text" class="form-control no_pembayaran" name="no_pembayaran" id="no_pembayaran" placeholder="No Pembayaran" readonly>
                                         <label for="floatingInput">No Pembayaran</label>
                                     </div>
                                 </div>
@@ -763,12 +763,6 @@
             });
         }
 
-        // When removing a detail
-        $(document).on('click', '.btn-remove-detail', function() {
-            // ... your existing code ...
-            refreshValidation();
-        });
-
         function updateDetail(index) {
             if (!validateDetails()) return;
 
@@ -817,6 +811,8 @@
         });
         // Remove detail
         $(document).on('click', '.btn-remove-detail', function() {
+            e.preventDefault(); // Ini yang paling penting
+            e.stopPropagation();
             const index = $(this).data('index');
             details.splice(index, 1);
             refreshDetailsTable();
@@ -1021,7 +1017,7 @@
                             <button class="btn btn-sm btn-warning btn-edit-detail" data-index="${index}">
                                 <i class="fas fa-edit"></i>
                             </button>
-                            <button class="btn btn-sm btn-danger btn-delete-detail" data-index="${index}">
+                            <button class="btn btn-sm btn-danger btn-remove-detail" data-index="${index}">
                                 <i class="fas fa-trash"></i>
                             </button>
                         </td>
@@ -1033,13 +1029,6 @@
             // Update total amount
             $('#total_all_amount').val(formatRupiah(totalAllAmount.toString()));
         }
-
-        // Remove detail
-        $(document).on('click', '.btn-remove-detail', function() {
-            const index = $(this).data('index');
-            details.splice(index, -1);
-            refreshDetailsTable();
-        });
 
         // Clear detail form
         function clearDetailForm() {
