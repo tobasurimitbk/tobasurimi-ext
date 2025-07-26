@@ -9,6 +9,7 @@ use App\Models\AllNoMOdel;
 use App\Models\CustomerModel;
 use App\Models\SalesOrderInvoiceDetailModel;
 use App\Models\SalesOrderModel;
+use App\Models\SalesOrderDetailModel;
 use App\Models\SalesOrderReturnModel;
 use App\Models\SalesOrderInvoiceModel;
 use App\Models\SalesOrderReturnDetailModel;
@@ -31,6 +32,7 @@ class Retur extends BaseController
 
     private $customerModel;
     private $soModel;
+    private $soDetailModel;
     private $soReturnModel;
     private $soReturnDetailModel;
     protected $WarehousesModel;
@@ -57,6 +59,7 @@ class Retur extends BaseController
         $this->is_admin = session()->get("login")->is_admin;
         $this->customerModel = new CustomerModel();
         $this->soModel = new SalesOrderModel();
+        $this->soDetailModel = new SalesOrderDetailModel();
         $this->WarehousesModel = new WarehousesModel();
         $this->soReturnModel = new SalesOrderReturnModel();
         $this->soReturnDetailModel = new SalesOrderReturnDetailModel();
@@ -79,6 +82,7 @@ class Retur extends BaseController
     public function createView()
     {
         $customerList = $this->customerModel->asObject()
+            ->where('tipe_customer', 'LOKAL')
             ->findAll();
         $invoiceList = $this->soInvModel->asObject()
             ->select('sales_order_invoice.*, customers.id as customer_id, customers.name as customer_name, customers.kode as customer_kode, customers.address as customer_address')
@@ -189,6 +193,9 @@ class Retur extends BaseController
         $postData = $this->request->getPost();
         $returnData = json_decode($postData["returnedItems"], true);
 
+        var_dump($postData);
+        exit;
+
         $rules = [
             "id_customer" => [
                 "rules" => "required|numeric",
@@ -241,22 +248,23 @@ class Retur extends BaseController
 
         $returnDate = $postData['return_date'];
         $idWarehouse = decrypt($postData['id_warehouse']);
-        $idInvoice = decrypt($postData['id_invoice']);
 
         try {
-
             $values = [
                 "id_user"             => $this->userId,
-                "id_invoice"             => $idInvoice,
-                "id_warehouse"             => $idWarehouse,
-                "no_return"             => $postData['no_surat_retur'],
-                "note"             => $postData['note'],
-                "id_company"        => $this->this_company_id,
-                "tanggal_return"           => date("Y-m-d", strtotime(str_replace("/", "-", $returnDate))),
+                "id_invoice"          => $postData['reference_id'],
+                "id_warehouse"        => $idWarehouse,
+                "no_return"           => $postData['no_surat_retur'],
+                "note"                => $postData['note'],
+                "id_company"          => $this->this_company_id,
+                "tanggal_return"      => date("Y-m-d", strtotime(str_replace("/", "-", $returnDate))),
+                "sumber"              => $postData['sumber_select'],
             ];
             $id =  $this->soReturnModel->insert($values);
 
-            $this->soInvModel->update($idInvoice, ['id_sales_order_return' =>  $id]);
+            if ($postData['sumber_select'] == "invoice") {
+                $this->soInvModel->update($postData['reference_id'], ['id_sales_order_return' =>  $id]);
+            }
 
             foreach ($returnData as $value) {
                 $valueDetail = [
@@ -265,6 +273,7 @@ class Retur extends BaseController
                     'qty_return'                    => $value['qtyReturn'],
                     'keterangan_return'             => "-",
                     'discount_percentage_return'    => $value['disc'],
+                    'discount_unit_return'          => $value['discUnit'],
                     'harga_barang_return'           => $value['harga_barang'],
                     'tax_return'                    => isset($value['tax']) ? $value['tax'] : 0,
                     'amount_return'                 => $value['amount'],
@@ -309,14 +318,14 @@ class Retur extends BaseController
 
             $stuffingLokalData = [];
             if ($invoiceData['document_type'] == "pengiriman") {
-                 $SJSODATA  = $this->suratJalanSoModel->where('sales_order_invoice_id', $invoiceData['id'] ?? null)->where('deletedAt', null)->first();
-                 $salesOrderData = $this->soModel->where('surat_jalan_so_id', $SJSODATA['id'] ?? null)->where('deletedAt', null)->first();
-                 $stuffingLokalData = $this->stuffingLokalModel->where('sales_order_id', $salesOrderData["id"] ?? null)->where('deletedAt', null)->first();
+                $SJSODATA  = $this->suratJalanSoModel->where('sales_order_invoice_id', $invoiceData['id'] ?? null)->where('deletedAt', null)->first();
+                $salesOrderData = $this->soModel->where('surat_jalan_so_id', $SJSODATA['id'] ?? null)->where('deletedAt', null)->first();
+                $stuffingLokalData = $this->stuffingLokalModel->where('sales_order_id', $salesOrderData["id"] ?? null)->where('deletedAt', null)->first();
             } else if ($invoiceData['document_type'] == "pesanan") {
                 $salesOrderData = $this->soModel->where('sales_order_invoice_id', $invoiceData['id'] ?? null)->where('deletedAt', null)->first();
                 $stuffingLokalData = $this->stuffingLokalModel->where('sales_order_id', $salesOrderData["id"] ?? null)->where('deletedAt', null)->first();
             }
-            
+
             if (!$stuffingLokalData) {
                 return $this->sendResponse(false, "Data Invoice dengan Nomor Faktur {$invoiceData["no_faktur"]} belum di Stuffingkan");
             }
@@ -328,7 +337,7 @@ class Retur extends BaseController
                     ->select([
                         'sales_order_return_detail.id as id_sales_order_return_detail',
                         'stuffing_lokal_detail.qty',
-                        'stuffing_lokal_detail.divisi_id', 
+                        'stuffing_lokal_detail.divisi_id',
                         'stuffing_lokal_detail.barang1_id_warehouse',
                         'stuffing_lokal_detail.barang2_id_warehouse',
                         'stuffing_lokal_detail.bc_id_warehouse',
@@ -344,13 +353,12 @@ class Retur extends BaseController
                     ->join('stuffing_lokal_detail', 'stuffing_lokal_detail.stuffing_lokal_id = stuffing_lokal.id', 'left')
                     ->where('sales_order_return_detail.id_sales_order_return', $id)
                     ->findAll();
-
             } else if ($invoiceData['document_type'] == "pesanan") {
                 $returnDetailData = $this->soReturnDetailModel
                     ->select([
                         'sales_order_return_detail.id as id_sales_order_return_detail',
                         'stuffing_lokal_detail.qty',
-                        'stuffing_lokal_detail.divisi_id', 
+                        'stuffing_lokal_detail.divisi_id',
                         'stuffing_lokal_detail.barang1_id_warehouse',
                         'stuffing_lokal_detail.barang2_id_warehouse',
                         'stuffing_lokal_detail.bc_id_warehouse',
@@ -365,7 +373,6 @@ class Retur extends BaseController
                     ->join('stuffing_lokal_detail', 'stuffing_lokal_detail.stuffing_lokal_id = stuffing_lokal.id', 'left')
                     ->where('sales_order_return_detail.id_sales_order_return', $id)
                     ->findAll();
-
             }
 
             if (!$returnDetailData) {
@@ -453,9 +460,6 @@ class Retur extends BaseController
         ]);
         return;
     }
-
-
-
 
     public function getById($id)
     {
@@ -575,6 +579,7 @@ class Retur extends BaseController
                         'qty_return'                    => $value['qtyReturn'],
                         'keterangan_return'             => "-",
                         'discount_percentage_return'    => $value['disc'],
+                        'discount_unit_return'          => $value['discUnit'],
                         'harga_barang_return'           => $value['harga_barang'],
                         'tax_return'                    => isset($value['tax']) ? $value['tax'] : 0,
                         'amount_return'                 => $value['amount'],
@@ -587,6 +592,7 @@ class Retur extends BaseController
                         'qty_return'                    => $value['qtyReturn'],
                         'keterangan_return'             => "-",
                         'discount_percentage_return'    => $value['disc'],
+                        'discount_unit_return'          => $value['discUnit'],
                         'harga_barang_return'           => $value['harga_barang'],
                         'tax_return'                    => isset($value['tax']) ? $value['tax'] : 0,
                         'amount_return'                 => $value['amount'],
@@ -676,5 +682,107 @@ class Retur extends BaseController
     {
         $noReturn = $this->soReturnModel->generateNoReturn();
         return json_encode($noReturn);
+    }
+
+    public function getOrderForm($customerId = null)
+    {
+        $orderForm = $this->soDetailModel
+            ->select('sales_order.id, sales_order.no_sales_order as no_reference, GROUP_CONCAT(barang_master_sales.barang_name) as barang_name')
+            ->join('sales_order', 'sales_order.id = sales_order_detail.id_sales_order', 'left')
+            ->join('barang_master_sales', 'barang_master_sales.id = sales_order_detail.id_barang', 'left')
+            ->where('sales_order.id_customer', $customerId)
+            ->groupBy('sales_order_detail.id_sales_order')
+            ->findAll();
+
+        return json_encode($orderForm);
+    }
+
+    public function getSuratJalan($customerId = null)
+    {
+        $suratJalan = $this->suratJalanSoModel
+            ->select('surat_jalan_so.id, surat_jalan_so.no_surat_jalan as no_reference')
+            ->where('surat_jalan_so.id_customer', $customerId)
+            ->findAll();
+
+        return json_encode($suratJalan);
+    }
+
+    public function getInvoice($customerId = null)
+    {
+        $salesInvoice = $this->soInvDetailModel
+            ->select('sales_order_invoice.id, sales_order_invoice.no_faktur as no_reference, GROUP_CONCAT(barang_master_sales.barang_name) as barang_name')
+            ->join('sales_order_invoice', 'sales_order_invoice.id = sales_order_invoice_detail.id_sales_order_invoice', 'left')
+            ->join('barang_master_sales', 'barang_master_sales.id = sales_order_invoice_detail.id_barang_invoice', 'left')
+            ->where('sales_order_invoice.id_customer', $customerId)
+            ->findAll();
+
+        return json_encode($salesInvoice);
+    }
+
+    public function getOrderFormDetail($customerId = null, $id = null)
+    {
+        $orderForm = $this->soDetailModel
+            ->select('sales_order.id, 
+                sales_order.no_sales_order as no_reference, 
+                barang_master_sales.kode_barang, 
+                barang_master_sales.barang_name as nama_barang, 
+                satuans.kode_satuan as satuan,
+                sales_order_detail.qty_sekarang as qty,
+                sales_order_detail.harga_barang,
+                sales_order_detail.discount_percentage as disc,
+                sales_order_detail.discount_unit as discUnit,
+                sales_order_detail.amount as amount')
+            ->join('sales_order', 'sales_order.id = sales_order_detail.id_sales_order', 'left')
+            ->join('barang_master_sales', 'barang_master_sales.id = sales_order_detail.id_barang', 'left')
+            ->join('satuans', 'satuans.id = barang_master_sales.satuan_id', 'left')
+            ->where('sales_order_detail.id_sales_order', $id)
+            ->where('sales_order.id_customer', $customerId)
+            ->findAll();
+
+        return json_encode($orderForm);
+    }
+
+    public function getSuratJalanDetail($customerId = null, $id = null)
+    {
+        $suratJalan = $this->suratJalanSoModel
+            ->select('surat_jalan_so.id, surat_jalan_so.no_surat_jalan as no_reference, surat_jalan_so.multiple_id_so')
+            ->where('surat_jalan_so.id_customer', $customerId)
+            ->where('surat_jalan_so.id', $id)
+            ->first();
+
+        // Decode string JSON menjadi array
+        $ids = json_decode($suratJalan['multiple_id_so'], true);
+
+        // Pastikan decoding berhasil dan hasilnya array
+        if (!is_array($ids)) {
+            $ids = [];
+        }
+
+        $dataDetail = $this->soDetailModel->getItemListByIds($ids);
+
+        return json_encode($dataDetail);
+    }
+
+    public function getInvoiceDetail($customerId = null, $id = null)
+    {
+        $salesInvoice = $this->soInvDetailModel
+            ->select('sales_order_invoice.id, 
+                sales_order_invoice.no_faktur as no_reference, 
+                barang_master_sales.kode_barang, 
+                barang_master_sales.barang_name as nama_barang, 
+                satuans.kode_satuan as satuan,
+                sales_order_invoice_detail.qty_invoice as qty,
+                sales_order_invoice_detail.harga_barang_invoice as harga_barang,
+                sales_order_invoice_detail.discount_percentage_invoice as disc,
+                sales_order_invoice_detail.discount_unit_invoice as discUnit,
+                sales_order_invoice_detail.amount_invoice as amount')
+            ->join('sales_order_invoice', 'sales_order_invoice.id = sales_order_invoice_detail.id_sales_order_invoice', 'left')
+            ->join('barang_master_sales', 'barang_master_sales.id = sales_order_invoice_detail.id_barang_invoice', 'left')
+            ->join('satuans', 'satuans.id = barang_master_sales.satuan_id', 'left')
+            ->where('sales_order_invoice_detail.id_sales_order_invoice', $id)
+            ->where('sales_order_invoice.id_customer', $customerId)
+            ->findAll();
+
+        return json_encode($salesInvoice);
     }
 }

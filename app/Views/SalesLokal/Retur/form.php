@@ -22,7 +22,7 @@
                 <input autocomplete="one-time-code" type="hidden" class="id" name="id" id="id" value="<?= !empty($data) ? $data->id : ""; ?>" />
                 <?= csrf_field() ?>
                 <div class="row">
-                    <div class="col-md-4">
+                    <div class="col-md-6">
                         <div class="input-group input-group-password">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <input readonly autocomplete="one-time-code" type="text" class="form-control no_surat_jalan" id="no_surat_retur" name="no_surat_retur" value="<?= !empty($data) ? $data->no_return : $noReturn; ?>" placeholder="Nomor surat Return">
@@ -33,50 +33,57 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-4">
+                    <div class="col-md-6">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <input autocomplete="one-time-code" " class=" form-control input-picker shipping_date" id="return_date" name="return_date" value="<?= $data->return_date ?? ""; ?>" <?= !empty($data) ? 'readonly'  : ''; ?>>
                             <label for="floatingInput">Tanggal Return</label>
                         </div>
                     </div>
-                    <div class="col-md-4">
-                        <div class="form-floating mb-3" style="height: 50px;">
-                            <select class="form-select id_invoice" name="id_invoice" id="id_invoice" <?= !empty($data) ? 'disabled'  : ''; ?>>
-                                <option value=""></option>
-                                <?php foreach ($dataInvoice ?? [] as $invoice) : ?>
-                                    <option data-customer_id="<?= $invoice->customer_id; ?>" data-customer_name="<?= $invoice->customer_name; ?>" data-customer_address="<?= $invoice->customer_address; ?>" value="<?= $invoice->id; ?>" <?= !empty($data) ? ($data->id_invoice === $invoice->id ? "selected" : "") : ""; ?>><?= $invoice->no_faktur; ?> - <?= $invoice->customer_kode; ?> <?= $invoice->customer_name; ?></option>
-                                <?php endforeach; ?>
-                            </select>
-                            <label for="floatingInput">No. Invoice - Customer</label>
-                        </div>
-                    </div>
                 </div>
 
                 <div class="row">
-                    <div class="col-md-4">
+                    <div class="col-md-6">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <select readonly class="form-select id_customer" name="id_customer" id="id_customer" <?= !empty($data) ? ($data->customer_id === true ? 'disabled=true' : '') : ''; ?>>
+                            <select class="form-select id_customer" name="id_customer" id="id_customer">
                                 <option value=""></option>
                                 <?php foreach ($dataCustomers ?? [] as $customer) : ?>
-                                    <option value="<?= $customer->id; ?>" <?= !empty($data) ? ($data->customer_id === $customer->id ? "selected" : "") : ""; ?>><?= $customer->name; ?></option>
+                                    <option value="<?= $customer->id; ?>" data-address="<?= $customer->address; ?>" <?= !empty($data) ? ($data->customer_id === $customer->id ? "selected" : "") : ""; ?>><?= $customer->name; ?></option>
                                 <?php endforeach; ?>
                             </select>
                             <label for="floatingInput">Nama Customer</label>
                         </div>
                     </div>
-                    <div class="col-md-4">
+                    <div class="col-md-6">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <input autocomplete="one-time-code" " class=" form-control" id="customerAddress" name="customerAddress" disabled value="<?= $data->customerAddress ?? ''; ?>">
                             <label for="floatingInput">Alamat</label>
                         </div>
                     </div>
-                    <!-- <div class="col-md-4">
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" type="text" class="form-control" id="nama_sales" name="nama_sales" disabled value=" <?= $data->no_surat_retur ?? ""; ?>" placeholder="Nomor surat Return">
-                            <label for="floatingInput">Nama Sales</label>
+                            <select class="form-select sumber_select" name="sumber_select" id="sumber_select" <?= !empty($data) ? 'disabled'  : ''; ?>>
+                                <option value="order_form" selected>Order Form</option>
+                                <option value="surat_jalan">Surat Jalan</option>
+                                <option value="invoice">Invoice</option>
+                            </select>
+                            <label for="floatingInput">Sumber Data</label>
                         </div>
-                    </div> -->
-                    <div class="col-md-4">
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <select class="form-select reference_id" name="reference_id" id="reference_id" <?= !empty($data) ? 'disabled'  : ''; ?>>
+                                <option value=""></option>
+                            </select>
+                            <label for="floatingInput">No Reference</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <select class="form-select id_warehouse" name="id_warehouse" id="id_warehouse" <?= !empty($data) ? 'disabled'  : ''; ?>>
                                 <option value=""></option>
@@ -87,10 +94,7 @@
                             <label for="floatingInput">Warehouse Tujuan</label>
                         </div>
                     </div>
-                </div>
-
-                <div class="row">
-                    <div class="col-md-4">
+                    <div class="col-md-6">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <textarea autocomplete="one-time-code" class="form-control" id="note" name="note" placeholder="Keterangan"><?= $data->note ?? ""; ?></textarea>
                             <label for="floatingInput">Keterangan</label>
@@ -112,14 +116,13 @@
                         <table class="table table-bordered nowrap table-hover-tobasurimi dataTable table-tambah-spp" width="100%" cellspacing="0">
                             <thead class="thead-dark">
                                 <tr>
-                                    <th>No.</th>
                                     <th>Kode Barang</th>
                                     <th>Nama Barang</th>
                                     <th>Qty Invoice</th>
                                     <th>Qty Return</th>
                                     <th>Satuan</th>
                                     <th>Harga Satuan</th>
-                                    <th>Discount (%)</th>
+                                    <th>Discount</th>
                                     <th>Amount</th>
                                 </tr>
                             </thead>
@@ -128,8 +131,8 @@
                         </table>
                     </div>
                 </div>
+            </form>
         </div>
-        </form>
     </div>
     </div>
 </section>
@@ -137,85 +140,90 @@
 
 <script>
     const csrfToken = '<?= csrf_token() ?>';
+    var itemList = [];
 
-    $(document).ready(function() {
-
-        const table = $('.dataTable').DataTable({
-
-            processing: true,
-            info: false,
-            paging: false,
-            fixedHeader: true,
-            display: "stripe",
-            searching: false,
-            ordering: false,
-            columns: [{
-                    data: "no",
-                    className: "text-center",
-                },
-                {
-                    data: "kode_barang",
-                    className: "text-center"
-                },
-                {
-                    data: "nama_barang",
-                    className: "text-center"
-                },
-                {
-                    data: "qty",
-                    className: "text-center",
-                },
-                {
-                    data: null,
-                    className: "text-center",
-                    render: function(data, type, row) {
-                        var qty = row.qtyReturn ? row.qtyReturn : row.qty;
-                        return `<input type="text" style="height: 40px; padding-bottom: 12px;" class="form-control" value="${qty}">`
-                    }
-                },
-                {
-                    data: "satuan",
-                    className: "text-center"
-                },
-                {
-                    data: "harga_barang",
-                    className: "text-center",
-                    render: function(data, type, row) {
-                        return greatFormatRupiah(destroyFormatRupiah(data));
-                    }
-                },
-                {
-                    data: "disc",
-                    className: "text-center",
-                },
-                {
-                    data: "amount",
-                    className: "text-center",
-                    render: function(data, type, row) {
-                        return greatFormatRupiah(destroyFormatRupiah(data));
-                    }
+    const table = $('.dataTable').DataTable({
+        processing: true,
+        info: false,
+        paging: false,
+        fixedHeader: true,
+        display: "stripe",
+        searching: false,
+        ordering: false,
+        columns: [{
+                data: "kode_barang",
+                className: "text-center"
+            },
+            {
+                data: "nama_barang",
+                className: "text-center"
+            },
+            {
+                data: "qty",
+                className: "text-center",
+            },
+            {
+                data: null,
+                className: "text-center",
+                render: function(data, type, row) {
+                    var qty = row.qtyReturn ? row.qtyReturn : row.qty;
+                    return `<input type="text" style="height: 40px; padding-bottom: 12px;" class="form-control" value="${qty}">`
                 }
-            ],
-            columnDefs: [{
-                defaultContent: "-",
-                targets: "_all"
-            }],
-            language: {
-                emptyTable: "Tidak Ada Data",
-                lengthMenu: "Show _MENU_ entries",
-                paginate: {
-                    previous: '<i class="fa fa-angle-left"></i>',
-                    next: '<i class="fa fa-angle-right"></i>'
+            },
+            {
+                data: "satuan",
+                className: "text-center"
+            },
+            {
+                data: "harga_barang",
+                className: "text-center",
+                render: function(data, type, row) {
+                    return greatFormatRupiah(destroyFormatRupiah(data));
+                }
+            },
+            {
+                data: "disc",
+                className: "text-center",
+            },
+            {
+                data: "amount",
+                className: "text-center",
+                render: function(data, type, row) {
+                    return greatFormatRupiah(destroyFormatRupiah(data));
                 }
             }
-        });
+        ],
+        columnDefs: [{
+            defaultContent: "-",
+            targets: "_all"
+        }],
+        language: {
+            emptyTable: "Tidak Ada Data",
+            lengthMenu: "Show _MENU_ entries",
+            paginate: {
+                previous: '<i class="fa fa-angle-left"></i>',
+                next: '<i class="fa fa-angle-right"></i>'
+            }
+        }
+    });
+
+    $(document).ready(function() {
+        getReferenceData();
+        getReferenceDataDetail();
+
 
         // Customer
         $('.id_customer').select2({
             placeholder: "",
             theme: "bootstrap-5",
-            disabled: true
-        })
+            allowClear: true
+        }).change(function() {
+            let address = $('.id_customer option:selected').data('address');
+            $('#customerAddress').val(address).change();
+
+            getReferenceData()
+            getReferenceDataDetail()
+        });
 
         // invoice
         $('.id_warehouse').select2({
@@ -225,29 +233,23 @@
         });
 
         // invoice
-        $('.id_invoice').select2({
+        $('.reference_id').select2({
             placeholder: "",
             theme: "bootstrap-5",
             allowClear: true
         }).change(function() {
-            const customerAddress = $(this).find(':selected').data('customer_address') ? $(this).find(':selected').data('customer_address') : "";
-            const customerId = $(this).find(':selected').data('customer_id') ? $(this).find(':selected').data('customer_id') : "";
-            // const customerName = $(this).find(':selected').data('customer_name') ? $(this).find(':selected').data('customer_name') : "";
-            // const salesName = $(this).find(':selected').data('tipepelanggan') ? $(this).find(':selected').data('tipepelanggan') : "";
-
-            $('#id_customer').val(customerId).change();
-            $('#customerAddress').val(customerAddress);
+            getReferenceDataDetail();
         });
 
         //CSS SELECT2 FLOATING LABEL
-        $('.id_customer, .id_invoice')
+        $('.id_customer, .reference_id')
             .parent('div')
             .children('span')
             .children('span')
             .children('span')
             .css('height', ' calc(3.5rem + 2px)');
 
-        $('.id_customer, .id_invoice, .id_warehouse')
+        $('.id_customer, .reference_id, .id_warehouse')
             .parent('div')
             .children('span')
             .children('span')
@@ -255,7 +257,7 @@
             .children('span')
             .css('margin-top', '22px').css('margin-left', '-7px');
 
-        $('.id_customer, .id_invoice, .id_warehouse')
+        $('.id_customer, .reference_id, .id_warehouse')
             .parent('div')
             .find('label')
             .css('z-index', '1');
@@ -267,25 +269,10 @@
             autoclose: true
         });
 
-        $(".id_invoice").change(function() {
-            if ($(".id_invoice").val()) {
-                const id = $(this).val();
-
-                $.ajax({
-                    url: `<?= base_url('return-barang-sales/get-detail-invoice/'); ?>${id}`,
-                    method: "GET",
-                    dataType: "json",
-                    success: function(res) {
-
-                        table.clear();
-                        table.rows.add(res).draw(false);
-                    }
-                })
-
-            } else {
-                $(".id_customer").attr("readonly", false)
-            }
-        });
+        $('.sumber_select').change(function() {
+            getReferenceData();
+            getReferenceDataDetail();
+        })
 
         $(".btn-delete").click(function() {
             const csrf = $(`[name="${csrfToken}"]`);
@@ -337,7 +324,7 @@
             var isValid = true;
             var dataError = null;
             $(".id_customer").attr("disabled", false)
-            $(".id_invoice").attr("disabled", false)
+            $(".reference_id").attr("disabled", false)
             const dataTab = table.rows().every(function(rowIdx) {
                 const inputVal = $(this.node()).first().find('input').val();
                 const rowData = table.row(rowIdx).data();
@@ -472,7 +459,6 @@
         });
 
         <?php if (!empty($dataDetail)) : ?>
-            var itemList = [];
             <?php foreach ($dataDetail as $value) : ?>
                 itemList.push(<?= json_encode($value); ?>);
             <?php endforeach; ?>
@@ -489,7 +475,7 @@
             shipping_date: {
                 required: true
             },
-            id_invoice: {
+            reference_id: {
                 required: true
             },
             id_warehouse: {
@@ -506,7 +492,7 @@
             shipping_date: {
                 required: "Tanggal return wajib diisi"
             },
-            id_invoice: {
+            reference_id: {
                 required: "No invoice wajib diisi"
             },
             id_warehouse: {
@@ -564,6 +550,123 @@
         } else {
             $("#no_surat_retur").attr("readonly", false);
             // $("#no_surat_retur").val("");
+        }
+    }
+
+    function getReferenceData() {
+        let sumber = $('.sumber_select option:selected').val();
+        let customer = $('.id_customer option:selected').val();
+        if (sumber == "order_form" && customer) {
+            getOrderForm(sumber, customer);
+        } else if (sumber == "surat_jalan") {
+            getSuratJalan(sumber, customer);
+        } else {
+            getInvoice(sumber, customer);
+        }
+    }
+
+    function getOrderForm(sumber, customer) {
+        if (sumber == "order_form" && customer) {
+            $.ajax({
+                url: `<?= base_url("/return-barang-sales/get-order-form/"); ?>${customer}`,
+                method: "GET",
+                dataType: "json",
+                success: function(res) {
+                    const $select = $("#reference_id");
+                    $select.empty(); // Hapus semua option sebelumnya
+                    $select.append(`<option value=""></option>`); // Tambahkan option kosong
+
+                    if (res && res.length > 0) {
+                        res.forEach(function(item) {
+                            $select.append(`<option value="${item.id}">${item.no_reference} - ${item.barang_name}</option>`);
+                        });
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Data Tidak Ada',
+                            confirmButtonColor: '#4e73df',
+                        });
+                    }
+                }
+            })
+        }
+    }
+
+    function getSuratJalan(sumber, customer) {
+        if (sumber == "surat_jalan" && customer) {
+            $.ajax({
+                url: `<?= base_url("/return-barang-sales/get-surat-jalan/"); ?>${customer}`,
+                method: "GET",
+                dataType: "json",
+                success: function(res) {
+                    const $select = $("#reference_id");
+                    $select.empty(); // Hapus semua option sebelumnya
+                    $select.append(`<option value=""></option>`); // Tambahkan option kosong
+
+                    if (res && res.length > 0) {
+                        res.forEach(function(item) {
+                            $select.append(`<option value="${item.id}">${item.no_reference}</option>`);
+                        });
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Data Tidak Ada',
+                            confirmButtonColor: '#4e73df',
+                        });
+                    }
+                }
+            })
+        }
+    }
+
+    function getInvoice(sumber, customer) {
+        if (sumber == "invoice" && customer) {
+            $.ajax({
+                url: `<?= base_url("/return-barang-sales/get-invoice/"); ?>${customer}`,
+                method: "GET",
+                dataType: "json",
+                success: function(res) {
+                    const $select = $("#reference_id");
+                    $select.empty(); // Hapus semua option sebelumnya
+                    $select.append(`<option value=""></option>`); // Tambahkan option kosong
+
+                    if (res && res.length > 0) {
+                        res.forEach(function(item) {
+                            $select.append(`<option value="${item.id}">${item.no_reference}</option>`);
+                        });
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Data Tidak Ada',
+                            confirmButtonColor: '#4e73df',
+                        });
+                    }
+                }
+            })
+        }
+    }
+
+    function getReferenceDataDetail() {
+        let sumber = $('.sumber_select option:selected').val();
+        let customer = $('.id_customer option:selected').val();
+        let reference = $('.reference_id option:selected').val();
+
+        // Kosongkan list item dan bersihkan tabel
+        itemList = [];
+        table.clear().draw(); // Ini akan menghapus semua baris di tabel dan menggambar ulang
+
+        if (sumber && customer && reference) {
+            $.ajax({
+                url: `<?= base_url("/return-barang-sales/get-"); ?>${sumber}/${customer}/${reference}`,
+                method: "GET",
+                dataType: "json",
+                success: function(res) {
+                    res.forEach(element => {
+                        itemList.push(element);
+                    });
+                    table.rows.add(itemList).draw(false); // Tambahkan data baru ke tabel
+                }
+            });
         }
     }
 </script>

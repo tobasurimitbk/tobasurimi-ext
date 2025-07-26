@@ -620,6 +620,12 @@ $routes->post('/return-barang-sales/delete', 'SalesLokal\Retur::delete', ['filte
 $routes->post('/return-barang-sales/approve', 'SalesLokal\Retur::approve', ['filter' => 'Auth']);
 $routes->get('/return-barang-sales/get-detail-invoice/(:segment)', 'SalesLokal\Retur::getInvoiceNumberList/$1', ['filter' => 'Auth']);
 $routes->get('/return-barang-sales/get-nomor-surat-return', 'SalesLokal\Retur::getNomorSuratReturn', ['filter' => 'Auth']);
+$routes->get('/return-barang-sales/get-order-form/(:segment)', 'SalesLokal\Retur::getOrderForm/$1', ['filter' => 'Auth']);
+$routes->get('/return-barang-sales/get-surat-jalan/(:segment)', 'SalesLokal\Retur::getSuratJalan/$1', ['filter' => 'Auth']);
+$routes->get('/return-barang-sales/get-invoice/(:segment)', 'SalesLokal\Retur::getInvoice/$1', ['filter' => 'Auth']);
+$routes->get('/return-barang-sales/get-order_form/(:segment)/(:segment)', 'SalesLokal\Retur::getOrderFormDetail/$1/$2', ['filter' => 'Auth']);
+$routes->get('/return-barang-sales/get-surat_jalan/(:segment)/(:segment)', 'SalesLokal\Retur::getSuratJalanDetail/$1/$2', ['filter' => 'Auth']);
+$routes->get('/return-barang-sales/get-invoice/(:segment)/(:segment)', 'SalesLokal\Retur::getInvoiceDetail/$1/$2', ['filter' => 'Auth']);
 
 // Retur Pembelian
 $routes->get('/retur-barang', 'Purchase\ReturPembelian::index', ['filter' => 'Auth']);

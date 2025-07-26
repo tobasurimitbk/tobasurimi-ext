@@ -308,6 +308,7 @@ class Invoice extends BaseController
                         "qty_invoice"                   => $value['qty_input'],
                         "keterangan_invoice"            => "-",
                         "discount_percentage_invoice"   => $value['disc'],
+                        "discount_unit_invoice"         => $value['discUnit'],
                         "harga_barang_invoice"          => str_replace(',', '', $value['harga_barang']),
                         "tax_invoice"                   => str_replace(',', '', $value['tax']),
                         "amount_invoice"                => str_replace(',', '', $value['amount']),
