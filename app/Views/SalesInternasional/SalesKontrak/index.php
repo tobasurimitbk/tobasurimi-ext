@@ -48,7 +48,7 @@
                             <tr>
                                 <th>No</th>
                                 <th onclick="changeSort('sales_contract_no')" class="sort">No. SC</th>
-                                <th onclick="changeSort('divisi')" class="sort">Department</th>
+                                <!-- <th onclick="changeSort('divisi')" class="sort">Department</th> -->
                                 <th onclick="changeSort('customer_name')" class="sort">Buyer</th>
                                 <th onclick="changeSort('dicharge_port')" class="sort">Dicharge Port</th>
                                 <th onclick="changeSort('shipment_date')" class="sort">Shipment Date</th>
@@ -189,9 +189,6 @@
             }, {
                 data: "sales_contract_no",
                 className: "text-left"
-            }, {
-                data: "divisi",
-                className: "text-left",
             }, {
                 data: "customer_name",
                 className: "text-left",

@@ -356,6 +356,10 @@ class SalesOrderExportModel extends Model
                         'qty' => $s['qty'],
                         'harga' => $s['harga'],
                         'total' => $s['total'],
+                        //----------------------------
+                        'qty_convertion' => 0,
+                        'satuan_convertion_id' => null,
+                        'satuan_convertion_kode' => "",
                         //------------------------------
                         'note_size' => "",
                         'note_grade' => "",
@@ -380,9 +384,11 @@ class SalesOrderExportModel extends Model
                     $qtyInput += $totalQtySisa;
                     $qtySisa += $totalQtySisa;
                     $totalInput += $s['harga'] * $totalQtySisa;
-                } else {
+                } else if ($salesOrderExportId != null) {
 
                     $salesOrderDetailExport = $salesOrderExportDetailModel
+                        ->select('sales_order_detail_export.*, satuans.kode_satuan as kode_satuan_konversi')
+                        ->join('satuans', 'satuans.id = sales_order_detail_export.satuan_convertion_id', 'left')
                         ->where('sales_order_export_id', $salesOrderExportId)
                         ->where('sales_contract_size_breakdown_id', $s['id'])
                         ->first();
@@ -410,6 +416,10 @@ class SalesOrderExportModel extends Model
                             'qty' => $s['qty'],
                             'harga' => $s['harga'],
                             'total' => $s['total'],
+                            //-------------------------------------------------
+                            'qty_convertion' => $salesOrderDetailExport['qty_convertion'],
+                            'satuan_convertion_id' => $salesOrderDetailExport['satuan_convertion_id'],
+                            'satuan_convertion_kode' => $salesOrderDetailExport['kode_satuan_konversi'],
                             //---------------------------------------------------
                             'note_size' => $salesOrderDetailExport['note_size'],
                             'note_grade' => $salesOrderDetailExport['note_grade'],
@@ -431,13 +441,6 @@ class SalesOrderExportModel extends Model
                             'total_input' => \floatval($s['harga'] * $salesOrderDetailExport['qty'])
 
                         ]);
-
-                        // \array_push($kontol, [
-                        //     'id_detail_breakdown' => $s['id'],
-                        //     'hasil_sum' => floatval($s['harga'] * $salesOrderDetailExport['qty']),
-                        //     'qtyInput' => $salesOrderDetailExport['qty'],
-                        //     'harga' => $s['harga']
-                        // ]);
 
 
                         $qtyInput +=  $salesOrderDetailExport['qty'];
@@ -465,6 +468,10 @@ class SalesOrderExportModel extends Model
                             'qty' => $s['qty'],
                             'harga' => $s['harga'],
                             'total' => $s['total'],
+                            //-------------------------------------------------
+                            'qty_convertion' => $salesOrderDetailExport['qty_convertion'],
+                            'satuan_convertion_id' => $salesOrderDetailExport['satuan_convertion_id'],
+                            'satuan_convertion_kode' => $salesOrderDetailExport['kode_satuan_konversi'],
                             //---------------------------------------------------
                             'note_size' => $salesOrderDetailExport['note_size'],
                             'note_grade' => $salesOrderDetailExport['note_grade'],
@@ -494,13 +501,12 @@ class SalesOrderExportModel extends Model
                 }
             }
 
-
-
-
             $subTitle = null;
             // PAS EDIT
             if ($salesOrderExportId != null) {
                 $subTitle = $salesOrderExportSubtitleModel
+                    ->select('sales_order_export_subtitle.*,divisis.divisi')
+                    ->join('divisis', 'divisis.id = sales_order_export_subtitle.divisi_id', 'left')
                     ->where('sales_order_export_id', $salesOrderExportId)
                     ->where('sales_contract_detail_id', $sd['id'])
                     ->first();
@@ -514,6 +520,8 @@ class SalesOrderExportModel extends Model
                 'specs' => $subTitle == null ? $sd['specs'] : $subTitle['specs'],
                 'species' => $subTitle == null ? $sd['species'] : $subTitle['species'],
                 'packing' =>  $subTitle == null ?  $sd['kemasan'] : $subTitle['packing'],
+                'divisi_id' => $subTitle == null ? null : $subTitle['divisi_id'],
+                'divisi_name' => $subTitle == null ? "" : $subTitle['divisi'],
                 'qty' => $sd['qty'],
                 'harga' => $sd['harga'],
                 'total_harga' => $sd['total_harga'],
@@ -629,5 +637,42 @@ class SalesOrderExportModel extends Model
         ];
 
         return $finalResultList;
+    }
+
+    public function getSalesOrderSpecs($salesOrderExportId)
+    {
+
+        $salesOrderExportSpecsModel = new SalesOrderExportSpecsModel();
+        $salesOrderExportSpecsDetailModel = new SalesOrderExportSpecsDetailModel();
+
+        $salesOrderExportSpecs = $salesOrderExportSpecsModel
+            ->where('sales_order_export_id', $salesOrderExportId)
+            ->findAll();
+
+        $result = array();
+
+        foreach ($salesOrderExportSpecs as $s) {
+
+            $gradeSpecs = array();
+            $salesOrderExportSpecsDetail = $salesOrderExportSpecsDetailModel
+                ->where('sales_order_export_specs_id', $s['id'])
+                ->findAll();
+
+            foreach ($salesOrderExportSpecsDetail as $so) {
+                array_push($gradeSpecs, [
+                    'id_grade_specs' => $so['id'],
+                    'grade' => $so['grade'],
+                    'specification' => $so['specification']
+                ]);
+            }
+
+            array_push($result, [
+                'id_detail_specs_list' => $s['id'],
+                'size_packing' => $s['size_packing'],
+                'grade_specs' => $gradeSpecs,
+            ]);
+        }
+
+        return $result;
     }
 }

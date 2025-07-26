@@ -198,30 +198,66 @@
 
         </div>
         <div class="d-flex flex-column">
-            <div class="txt-left">
-                <label class="label-header">SELLER: PT.TOBA SURIMI INDUSTRIES</label>
-            </div>
-            <div class="txt-left">
-                <label class="label-header">BUYER: <?= $salesKontrak['customer_name']; ?></label>
-            </div>
-            <div class="txt-left">
-                <label class="label-header">BANK: <?= $salesKontrak['nama_bank']; ?></label>
-            </div>
-            <div class="txt-left">
-                <label class="label-header">SWIFT CODE: <?= $salesKontrak['kode_bank']; ?></label>
-            </div>
-            <div class="txt-left">
-                <label class="label-header">ACCOUNT # : <?= $salesKontrak['no_rekening']; ?></label>
-            </div>
-            <div class="txt-left">
-                <label class="label-header">BENEFICIARY # : <?= $salesKontrak['atas_nama']; ?></label>
-            </div>
-            <!-- <div class="txt-right rev-customer">
-                <label class="label-header">Revision: <?= $salesKontrak['jumlah_unpost']; ?></label>
-            </div> -->
+            <table>
+                <tr>
+                    <td>
+                        <label class="label-header">SELLER</label>
+                    </td>
+                    <td>:</td>
+                    <td>
+                        <label class="label-header"> <?= strtoupper(str_ireplace(', Tbk', '', $company['holding_company'])) ?></label>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="label-header">BUYER</label>
+                    </td>
+                    <td>:</td>
+                    <td>
+                        <label class="label-header"> <?= $salesKontrak['customer_name']; ?></label>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="label-header">BANK</label>
+                    </td>
+                    <td>:</td>
+                    <td>
+                        <label class="label-header"> <?= $salesKontrak['nama_bank']; ?></label>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="label-header">SWIFT CODE</label>
+                    </td>
+                    <td>:</td>
+                    <td>
+                        <label class="label-header"> <?= $salesKontrak['kode_bank']; ?></label>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="label-header">ACCOUNT # </label>
+                    </td>
+                    <td>:</td>
+                    <td>
+                        <label class="label-header"> <?= $salesKontrak['no_rekening']; ?></label>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="label-header">BENEFICIARY # </label>
+                    </td>
+                    <td>:</td>
+                    <td>
+                        <label class="label-header"> <?= $salesKontrak['atas_nama'] ?></label>
+                    </td>
+                </tr>
+            </table>
+
         </div>
         <div class="mt-1 justify-content-center">
-            <label class="label-header">
+            <label class="label-header" style="color: red;">
                 <?= $salesKontrak['banking_information'] ?>
             </label>
         </div>
@@ -316,7 +352,7 @@
                                 'inner_box' => ['label' => 'Inner', 'width' => '8%'],
                                 'pc' => ['label' => 'PC', 'width' => '7%'],
                                 'bag' => ['label' => 'Bag', 'width' => '7%'],
-                                'persen' => ['label' => '%', 'width' => '6%'],
+                                'persen' => ['label' => '%', 'width' => '3%'],
                                 'remark' => ['label' => 'Remarks', 'width' => '10%'],
                                 'palet' => ['label' => 'Pallet', 'width' => '10%']
                             ];
@@ -333,6 +369,7 @@
 
                             // Check if percentage column exists and should be shown
                             $show_persen_column = isset($columns_to_show['persen']);
+                            $show_cased_column = isset($columns_to_show['cased']);
                             ?>
 
                             <div style="margin-top: 6px;">
@@ -341,18 +378,22 @@
                                     <thead>
                                         <tr style="background-color: #f3f4f6;">
                                             <?php foreach ($columns_to_show as $col => $col_data): ?>
-                                                <?php if ($col != 'persen'): ?>
+                                                <?php if ($col != 'persen' && $col != 'cased'): ?>
                                                     <th style="padding: 3px; border: 1px solid #ddd; width: <?= $col_data['width'] ?>"><?= $col_data['label'] ?></th>
                                                 <?php endif; ?>
                                             <?php endforeach; ?>
+
+                                            <?php if ($show_cased_column): ?>
+                                                <th style="padding: 3px; border: 1px solid #ddd; width: 6%;text-align: right;">Case</th>
+                                            <?php endif; ?>
 
                                             <?php if ($show_persen_column): ?>
                                                 <th style="padding: 3px; border: 1px solid #ddd; width: 6%;text-align: right;">%</th>
                                             <?php endif; ?>
 
-                                            <th style=" padding: 3px; border: 1px solid #ddd; width: 9%; text-align: right;">Qty</th>
-                                            <th style="padding: 3px; border: 1px solid #ddd; width: 10%; text-align: right;">Unit Price</th>
-                                            <th style="padding: 3px; border: 1px solid #ddd; width: 10%; text-align: right;">Total Amount</th>
+                                            <th style=" padding: 3px; border: 1px solid #ddd; width: 3%; text-align: right;">Qty</th>
+                                            <th style="padding: 3px; border: 1px solid #ddd; width: 3%; text-align: right;">Unit Price</th>
+                                            <th style="padding: 3px; border: 1px solid #ddd; width: 3%; text-align: right;">Total Amount</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -361,6 +402,8 @@
                                         $breakdown_total = 0;
                                         $breakdown_unit_price_total = 0;
                                         $breakdown_persen = 0;
+                                        $breakdown_cased = 0;
+
                                         foreach ($detail['size_breakdown'] as $breakdown):
                                             $breakdown_qty += $breakdown['qty'];
                                             $breakdown_total += $breakdown['total'];
@@ -369,13 +412,23 @@
                                                 $breakdown_persen += $breakdown['persen'];
                                                 $total_persen += $breakdown['persen'];
                                             }
+
+                                            if (isset($breakdown['cased']) && is_numeric($breakdown['cased'])) {
+                                                $breakdown_cased += $breakdown['cased'];
+                                            }
                                         ?>
                                             <tr>
                                                 <?php foreach ($columns_to_show as $col => $col_data): ?>
-                                                    <?php if ($col != 'persen'): ?>
+                                                    <?php if ($col != 'persen' && $col != 'cased'): ?>
                                                         <td style="padding: 3px; border: 1px solid #ddd;"><?= $breakdown[$col] ?></td>
                                                     <?php endif; ?>
                                                 <?php endforeach; ?>
+
+                                                <?php if ($show_cased_column): ?>
+                                                    <td style="padding: 3px; border: 1px solid #ddd; text-align: right;">
+                                                        <?= !empty($breakdown['cased']) ? number_format($breakdown['cased'], 2) : '' ?>
+                                                    </td>
+                                                <?php endif; ?>
 
                                                 <?php if ($show_persen_column): ?>
                                                     <td style="padding: 3px; border: 1px solid #ddd; text-align: right;">
@@ -389,9 +442,31 @@
                                             </tr>
                                         <?php endforeach; ?>
                                     </tbody>
+                                    <?php
+                                    // Hitung jumlah kolom utama (misalnya dari thead)
+                                    $base_columns = count($columns_to_show);
+
+                                    if ($show_cased_column) {
+                                        $base_columns -= 1;
+                                    }
+
+                                    if ($show_persen_column) {
+                                        $base_columns -= 1;
+                                    }
+
+                                    ?>
+
                                     <tfoot>
                                         <tr style="background-color: #e9ecef;">
-                                            <td colspan="<?= count($columns_to_show) - ($show_persen_column ? 1 : 0) ?>" style="padding: 3px; border: 1px solid #ddd; text-align: right; font-weight: bold;">TOTAL</td>
+                                            <td colspan="<?= $base_columns ?>" style="padding: 3px; border: 1px solid #ddd; text-align: right; font-weight: bold;">
+                                                TOTAL
+                                            </td>
+
+                                            <?php if ($show_cased_column): ?>
+                                                <td style="padding: 3px; border: 1px solid #ddd; text-align: right; font-weight: bold;">
+                                                    <?= $breakdown_cased > 0 ? number_format($breakdown_cased, 2) : '' ?>
+                                                </td>
+                                            <?php endif; ?>
 
                                             <?php if ($show_persen_column): ?>
                                                 <td style="padding: 3px; border: 1px solid #ddd; text-align: right; font-weight: bold;">
@@ -399,11 +474,16 @@
                                                 </td>
                                             <?php endif; ?>
 
-                                            <td style="padding: 3px; border: 1px solid #ddd; text-align: right; font-weight: bold;"><?= number_format($breakdown_qty, 2) . " " . $breakdown['satuan_size_code'] ?></td>
+                                            <td style="padding: 3px; border: 1px solid #ddd; text-align: right; font-weight: bold;">
+                                                <?= number_format($breakdown_qty, 2) . " " . $breakdown['satuan_size_code'] ?>
+                                            </td>
                                             <td style="padding: 3px; border: 1px solid #ddd; text-align: right; font-weight: bold;">-</td>
-                                            <td style="padding: 3px; border: 1px solid #ddd; text-align: right; font-weight: bold;"><?= number_format($breakdown_total, 2) ?></td>
+                                            <td style="padding: 3px; border: 1px solid #ddd; text-align: right; font-weight: bold;">
+                                                <?= number_format($breakdown_total, 2) ?>
+                                            </td>
                                         </tr>
                                     </tfoot>
+
                                 </table>
                             </div>
                         <?php endif; ?>
@@ -718,7 +798,7 @@
                     <label class="label-header"><?= $customer != null ? $customer['name'] : ''; ?></label>
                 </th>
                 <th>
-                    <label class="label-header">PT. TOBA SURIMI INDUSTRIES</label>
+                    <label class="label-header"><?= strtoupper(str_ireplace(', Tbk', '', $company['holding_company'])) ?></label>
                 </th>
             </tr>
         </thead>

@@ -319,7 +319,7 @@ class SalesKontrak extends BaseController
             'customer_id' => $this->request->getVar('customer_id'),
             'customer_po_no' => $this->request->getVar('customer_po_no'),
             'dicharge_port' => $this->request->getVar('dicharge_port'),
-            'divisi_id' => $this->request->getVar('divisi_id'),
+            // 'divisi_id' => $this->request->getVar('divisi_id'),
             'documents_required' => $this->request->getVar('documents_required'),
             'keterangan' => $this->request->getVar('keterangan'),
             'komisi' => $this->request->getVar('komisi'),
@@ -431,7 +431,7 @@ class SalesKontrak extends BaseController
             'customer_id' => $this->request->getVar('customer_id'),
             'customer_po_no' => $this->request->getVar('customer_po_no'),
             'dicharge_port' => $this->request->getVar('dicharge_port'),
-            'divisi_id' => $this->request->getVar('divisi_id'),
+            // 'divisi_id' => $this->request->getVar('divisi_id'),
             'documents_required' => $this->request->getVar('documents_required'),
             'keterangan' => $this->request->getVar('keterangan'),
             'komisi' => $this->request->getVar('komisi'),
@@ -665,6 +665,7 @@ class SalesKontrak extends BaseController
             var_dump("State Exception : company not found, please back to previous page");
             die;
         }
+
 
         $this->dompdf->loadHtml(view('SalesInternasional/SalesKontrak/print', $data));
         $this->dompdf->setPaper('Legal', 'portrait');

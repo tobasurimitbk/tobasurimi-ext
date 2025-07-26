@@ -209,10 +209,11 @@ class SalesKontrakModel extends Model
     }
 
 
-    public function getSalesKontrakList($divisiId)
+    public function getSalesKontrakList()
     {
         $isAdmin = session()->get("login")->is_admin;
         $userId = session()->get("login")->user_id;
+        $companyId = session()->get("login")->this_company_id;
 
         $query = $this->asArray();
 
@@ -222,7 +223,8 @@ class SalesKontrakModel extends Model
         }
 
         return $query->where('deletedAt', null)
-            ->where('divisi_id', $divisiId)
+            // ->where('divisi_id', $divisiId)
+            ->where('company_id', $companyId)
             ->where('status_posting', 1)
             ->findAll();
     }
