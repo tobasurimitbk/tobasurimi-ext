@@ -626,12 +626,12 @@ class Retur extends BaseController
         try {
             $id = decrypt($this->request->getPost("id"));
             if (!empty($id)) {
-                $dataDetail = $this->soInvDetailModel->where('id_sales_order_return', $id)->findAll();
+                $dataDetail = $this->soReturnDetailModel->where('id_sales_order_return', $id)->findAll();
 
                 foreach ($dataDetail as $item) {
-                    $this->soInvDetailModel->delete($item['id']);
+                    $this->soReturnDetailModel->delete($item['id']);
                 }
-                $this->soInvModel->delete($id);
+                $this->soReturnModel->delete($id);
 
                 $data = [
                     "status"            => true,
