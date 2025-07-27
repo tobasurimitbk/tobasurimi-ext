@@ -666,9 +666,8 @@ class SalesKontrak extends BaseController
             die;
         }
 
-
         $this->dompdf->loadHtml(view('SalesInternasional/SalesKontrak/print', $data));
-        $this->dompdf->setPaper('Legal', 'portrait');
+        $this->dompdf->setPaper('legal', 'portrait');
         $this->dompdf->render();
         $this->dompdf->stream($filename, array("Attachment" => false));
 

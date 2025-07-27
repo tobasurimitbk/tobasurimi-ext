@@ -6,6 +6,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= $salesKontrak['sales_contract_no'] ?></title>
     <style>
+        @media print {
+            body {
+                margin: 0;
+            }
+
+            @page {
+                size: 210mm 330mm;
+                margin: 20mm;
+            }
+        }
+
         .header {
             display: flex !important;
             justify-content: space-between !important;
@@ -78,7 +89,7 @@
 
         .label-header {
             font-weight: bold;
-            font-size: 11px;
+            font-size: 12px;
         }
 
         .po-customer {
@@ -102,7 +113,7 @@
             <?php if ($company['id'] != 15): ?>
                 <td>
                     <div style="text-align: right; margin-left:-20px; margin-right:40px; ">
-                        <img src="<?= $company['logo'] ?>" style="width: 120px; height:100px; text-align:right; margin-top:-17px" alt="">
+                        <img src="<?= $company['logo'] ?>" style="width: 140px; height:100px; text-align:right; margin-top:-17px" alt="">
                     </div>
                 </td>
             <?php endif; ?>
@@ -161,22 +172,34 @@
                     </h1>
 
                     <?php
-                    // Fungsi untuk memberi spasi antar huruf hanya pada teks, bukan HTML tag
                     function spacedTextPreserveHTML($html)
                     {
-                        // Pisahkan tag dan text
                         return preg_replace_callback('/(<[^>]+>)|([^<]+)/u', function ($matches) {
                             if (!empty($matches[1])) {
-                                // Tag HTML, biarkan
+                                // Jika ini adalah HTML tag, kembalikan tanpa perubahan
                                 return $matches[1];
                             } else {
-                                // Teks biasa, beri spasi tiap huruf
-                                $text = (trim($matches[2]));
-                                $chars = preg_split('//u', $text, -1, PREG_SPLIT_NO_EMPTY);
-                                return implode(' ', $chars);
+                                // Proses teks biasa
+                                $text = $matches[2];
+                                $result = '';
+                                $length = mb_strlen($text, 'UTF-8');
+
+                                for ($i = 0; $i < $length; $i++) {
+                                    $char = mb_substr($text, $i, 1, 'UTF-8');
+
+                                    if ($char === ' ') {
+                                        $result .= '  '; // 2 spasi untuk spasi asli
+                                    } else {
+                                        $result .= $char . ' '; // tambahkan spasi setelah setiap huruf
+                                    }
+                                }
+
+                                return rtrim($result); // Hapus spasi ekstra di akhir
                             }
                         }, $html);
                     }
+
+
 
                     // Bersihkan karakter aneh
                     $factoryText = preg_replace('/[^\P{C}?]+/u', '', $company['factory']);
@@ -185,7 +208,7 @@
                     $factoryTextWithSpacing = spacedTextPreserveHTML($factoryText);
                     ?>
 
-                    <table style="width: 100%; margin-top: -15px; font-size: 12px;">
+                    <table style="width: 100%; margin-top: -15px; font-size: 13px;">
                         <tr>
                             <td style="text-align: justify;">
                                 <?= $factoryTextWithSpacing ?>
@@ -193,9 +216,6 @@
                         </tr>
                     </table>
                 </td>
-
-
-
             <?php endif; ?>
         </tr>
     </table>
@@ -204,9 +224,9 @@
         <div class="txt-center"><label class="label-header">SALES CONTRACT</label></div>
         <div class="txt-center"><label class="label-header">NO. <?= $salesKontrak['sales_contract_no']; ?></label></div>
         <div class="d-flex flex-column">
-            <div class="txt-left">
-                <label class="label-header">DATE: <?= date('F d, Y', strtotime($salesKontrak['createdAt'])); ?></label>
-            </div>
+            <!-- <div class="txt-left">
+                <label class="label-header">DATE: </label>
+            </div> -->
             <div class="txt-right po-customer">
                 <?php if (!empty($salesKontrak['customer_po_no'])): ?>
                     <label class="label-header">PO NO: <?= $salesKontrak['customer_po_no']; ?></label>
@@ -226,6 +246,15 @@
         </div>
         <div class="d-flex flex-column">
             <table>
+                <tr>
+                    <td>
+                        <label class="label-header">DATE</label>
+                    </td>
+                    <td>:</td>
+                    <td>
+                        <label class="label-header"><?= date('F d, Y', strtotime($salesKontrak['createdAt'])); ?></label>
+                    </td>
+                </tr>
                 <tr>
                     <td>
                         <label class="label-header">SELLER</label>
@@ -347,21 +376,38 @@
                     <td style="padding: 6px; border: 1px solid #ddd; vertical-align: top;">
                         <div style="font-weight: bold; font-size: 9px;"><?= $detail["nama_barang"]; ?></div>
                         <div style="font-size: 9px; margin-top: 4px; line-height: 1.4;">
-                            <?php if (!empty($detail['species'])): ?>
-                                <span style="display: inline-block; width: 65px; font-weight: bold;">SPECIES:</span> <?= trim($detail['species']) ?> <br>
-                            <?php endif; ?>
+                            <table>
+                                <?php if (!empty($detail['species'])): ?>
+                                    <tr>
+                                        <td style="display: inline-block; font-weight: bold; ">SPECIES</td>
+                                        <td>:</td>
+                                        <td><?= trim($detail['species']) ?></td>
+                                    </tr>
+                                <?php endif; ?>
+                                <?php if (!empty($detail['specs'])): ?>
+                                    <tr>
+                                        <td style="display: inline-block; font-weight: bold;">SPECS</td>
+                                        <td>:</td>
+                                        <td><?= trim($detail['specs']) ?></td>
+                                    </tr>
+                                <?php endif; ?>
+                                <?php if (!empty($detail['brand'])): ?>
+                                    <tr>
+                                        <td style="display: inline-block; font-weight: bold;">BRAND</td>
+                                        <td>:</td>
+                                        <td><?= trim($detail['brand']) ?></td>
+                                    </tr>
+                                <?php endif; ?>
+                                <?php if (!empty($detail['kemasan'])): ?>
+                                    <tr>
+                                        <td style="display: inline-block; font-weight: bold;">PACKING</td>
+                                        <td>:</td>
+                                        <td><?= trim($detail['kemasan']) ?></td>
+                                    </tr>
+                                <?php endif; ?>
 
-                            <?php if (!empty($detail['specs'])): ?>
-                                <span style="display: inline-block; width: 65px; font-weight: bold;">SPECS:</span> <?= trim($detail['specs']) ?> <br>
-                            <?php endif; ?>
+                            </table>
 
-                            <?php if (!empty($detail['brand'])): ?>
-                                <span style="display: inline-block; width: 65px; font-weight: bold;">BRAND:</span> <?= trim($detail['brand']) ?> <br>
-                            <?php endif; ?>
-
-                            <?php if (!empty($detail['kemasan'])): ?>
-                                <span style="display: inline-block; width: 65px; font-weight: bold;">PACKING:</span> <?= trim($detail['kemasan']) ?> <br>
-                            <?php endif; ?>
                         </div>
 
                         <?php if (!empty($detail['size_breakdown'])): ?>
@@ -411,16 +457,16 @@
                                             <?php endforeach; ?>
 
                                             <?php if ($show_cased_column): ?>
-                                                <th style="padding: 3px; border: 1px solid #ddd; width: 6%;text-align: right;">Case</th>
+                                                <th style="padding: 3px; border: 1px solid #ddd; width: 4%;text-align: right;">Case</th>
                                             <?php endif; ?>
 
                                             <?php if ($show_persen_column): ?>
-                                                <th style="padding: 3px; border: 1px solid #ddd; width: 6%;text-align: right;">%</th>
+                                                <th style="padding: 3px; border: 1px solid #ddd; width: 4%;text-align: right;">%</th>
                                             <?php endif; ?>
 
-                                            <th style=" padding: 3px; border: 1px solid #ddd; width: 3%; text-align: right;">Qty</th>
-                                            <th style="padding: 3px; border: 1px solid #ddd; width: 3%; text-align: right;">Unit Price</th>
-                                            <th style="padding: 3px; border: 1px solid #ddd; width: 3%; text-align: right;">Total Amount</th>
+                                            <th style=" padding: 3px; border: 1px solid #ddd; width: 4%; text-align: right;">Qty</th>
+                                            <th style="padding: 3px; border: 1px solid #ddd; width: 4%; text-align: right;">Unit Price</th>
+                                            <th style="padding: 3px; border: 1px solid #ddd; width: 4%; text-align: right;">Total Amount</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -644,17 +690,17 @@
                             </td>
 
                             <!-- Kolom 2: Tabel Satuan -->
-                            <td style="width: auto; text-align: center; vertical-align: middle;">
+                            <td style="width: 10px ; text-align: center; ">
                                 <?php if ($currentItemSaleskontrakdetail === $totalSalesKontrakdetail): ?>
                                     <?php if (!empty($groupBySatuan)) : ?>
-                                        <table style="width: 15%; margin: 0 auto; border-collapse: collapse; font-size: 9px;">
-                                            <thead>
+                                        <table style="width:auto; margin: 0 auto; border-collapse: collapse; font-size: 9px;">
+                                            <!-- <thead>
                                                 <tr style="background-color: #f3f4f6;">
                                                     <?php foreach ($groupBySatuan as $satuan => $data): ?>
                                                         <th style="padding: 5px; border: 1px solid #ddd; text-align: right;"><?= $satuan ?></th>
                                                     <?php endforeach; ?>
                                                 </tr>
-                                            </thead>
+                                            </thead> -->
                                             <tbody>
                                                 <tr>
                                                     <?php
@@ -662,7 +708,9 @@
                                                     foreach ($groupBySatuan as $satuan => $data):
                                                         $grand_total_qty += $data['qty'];
                                                     ?>
-                                                        <td style="padding: 5px; border: 1px solid #ddd; text-align: right;"><?= number_format($data['qty'], 2) ?></td>
+                                                        <td style="padding: 5px; border: 1px solid #ddd; text-align: right;">
+                                                            <?= number_format($data['qty'], 2) ?> <?= $satuan ?>
+                                                        </td>
                                                     <?php endforeach; ?>
                                                 </tr>
                                             </tbody>
@@ -831,7 +879,7 @@
         </thead>
         <tbody>
             <tr>
-                <td style="height: 80px;"></td>
+                <td style="height: 70px;"></td>
                 <td></td>
             </tr>
             <tr>

@@ -1976,7 +1976,7 @@
                 $('#destination').val(listDataSalesKontrak.salesContract.dicharge_port);
                 // $('#deadline').val(listDataSalesKontrak.salesContract.shipment_date);
                 $('#po_no').val(listDataSalesKontrak.salesContract.po_no);
-                $('#document_required').val(listDataSalesKontrak.salesContract.document_required);
+                $('#document_required').val(listDataSalesKontrak.salesContract.documents_required);
                 $('#payment_term').val(listDataSalesKontrak.salesContract.payment_term);
             },
             error: function(xhr, status, error) {}

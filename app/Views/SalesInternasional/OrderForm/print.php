@@ -251,9 +251,11 @@
                                     <span style="float: left;">
                                         <?= $detail["barang_name"]; ?>
                                     </span>
-                                    <span style="float: right;">
-                                        <?= $detail["divisi_name"]; ?>
-                                    </span>
+                                    <?php if (!empty($detail['divisi_name'])): ?>
+                                        <span style="float: right;">
+                                            DEPT. <?= $detail["divisi_name"]; ?>
+                                        </span>
+                                    <?php endif; ?>
                                 </div><br>
                                 <div style="font-size: 9px; margin-top: 4px; line-height: 1.4;">
                                     <?php if (!empty($detail['species'])): ?>
