@@ -872,6 +872,7 @@
                     url: "<?= base_url("pembayaran-po-lokal-bp/posting"); ?>",
                     data: {
                         id: id,
+                        status: 1,
                     },
                     beforeSend: function(xhr) {
                         setLoading();

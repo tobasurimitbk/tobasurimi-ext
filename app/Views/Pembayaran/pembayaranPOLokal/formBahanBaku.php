@@ -1219,6 +1219,7 @@
                     url: "<?= base_url("pembayaran-po-lokal-bb/posting"); ?>",
                     data: {
                         id: id,
+                        status: 1,
                     },
                     beforeSend: function(xhr) {
                         setLoading();
