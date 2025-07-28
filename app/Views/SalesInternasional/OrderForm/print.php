@@ -97,6 +97,10 @@
         .label {
             font-size: 12px;
         }
+
+        body {
+            font-family: 'DejaVu Sans', sans-serif;
+        }
     </style>
 
     <?php if ($displayPrice == "false"): ?>

@@ -796,11 +796,9 @@ class OrderForm extends BaseController
         ];
 
 
-
-        // dd($data['dataSODetail']);
-
         $this->dompdf->loadHtml(view('SalesInternasional/OrderForm/print', $data));
         $this->dompdf->setPaper('Legal', 'portrait');
+
         $this->dompdf->render();
         $this->dompdf->stream($filename, array("Attachment" => false));
 

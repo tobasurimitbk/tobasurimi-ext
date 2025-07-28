@@ -97,9 +97,9 @@ class Penomoran_ extends BaseController
         $poBahanBaku = $db->query("
             SELECT * 
             FROM rm_purchase_orders 
-            WHERE company_id = 1 
-            and po_date >= '2025-03-01' 
-            AND po_date <= '2025-03-31' 
+            WHERE company_id = 16 
+            and po_date >= '2025-07-01' 
+            AND po_date <= '2025-12-31' 
             AND deletedAt IS NULL 
             ORDER BY id ASC
         ");
@@ -824,9 +824,9 @@ class Penomoran_ extends BaseController
         $transaksiJurnalModel = new TransaksiJurnalModel();
         $penerimaanBarangModel = new PenerimaanBarangModel();
         // Loop
-        $companyId = 2;
-        $startDate = "2025-04-01";
-        $endDate = "2025-05-31";
+        $companyId = 1;
+        $startDate = "2025-07-01";
+        $endDate = "2025-07-31";
         $tipeTransaksi = "1406"; // PEMBELIAN
 
         $selectQry = "
@@ -838,22 +838,11 @@ class Penomoran_ extends BaseController
             transaksi_jurnal.valas,
             transaksi_jurnal.exchange_rate,
             transaksi_jurnal.total_debit,
-            transaksi_jurnal.no_bukti,                 
-            metadata.value as transaksi_type_name,
-            transaksi_pembelian.id_local_bb,
-            transaksi_pembelian.id_import_bb,
-            transaksi_pembelian.id_po_bp,
-            jurnal_umum.supplier_id,
-            suppliers.name as supplier_name,
-            am_purchase_orders.po_type
+            transaksi_jurnal.no_bukti,  
         ";
 
         $dataQry = $transaksiJurnalModel->asObject()->select($selectQry)
-            ->join('metadata', 'metadata.id = transaksi_jurnal.type_transaksi', 'left')
             ->join('jurnal_umum', 'jurnal_umum.id_transaksi = transaksi_jurnal.id', 'left')
-            ->join('transaksi_pembelian', 'transaksi_pembelian.id_transaksi_jurnal = transaksi_jurnal.id', 'left')
-            ->join('am_purchase_orders', 'am_purchase_orders.id = transaksi_pembelian.id_po_bp', 'left')
-            ->join('suppliers', 'suppliers.id = transaksi_pembelian.id_supplier', 'left')
             ->where('transaksi_jurnal.tanggal_transaksi >=', $startDate)
             ->where('transaksi_jurnal.tanggal_transaksi <=', $endDate)
             ->where('transaksi_jurnal.type_transaksi', $tipeTransaksi)
@@ -866,59 +855,87 @@ class Penomoran_ extends BaseController
         foreach ($dataQry as $d) {
             $penerimaanBarangId = null;
 
-            if ($d->id_local_bb != null) {
-                $penerimaanBarang = $penerimaanBarangModel
-                    ->select('penerimaan_barang.*,suppliers.name as supplier')
-                    ->join('suppliers', 'suppliers.id = penerimaan_barang.supplier_id', 'left')
-                    ->where('penerimaan_barang.company_id', $companyId)
-                    ->where('status_penerimaan', "LOKAL")
-                    ->where('tipe_bahan', "BAKU")
-                    ->like('multiple_po_id', $d->id_local_bb)
-                    ->first();
-                $penerimaanBarangId = $penerimaanBarang == null ? null : $penerimaanBarang['id'];
-            } elseif ($d->id_import_bb != null) {
-                $penerimaanBarang = $penerimaanBarangModel
-                    ->select('penerimaan_barang.*,suppliers.name as supplier')
-                    ->join('suppliers', 'suppliers.id = penerimaan_barang.supplier_id', 'left')
-                    ->where('penerimaan_barang.company_id', $companyId)
-                    ->where('status_penerimaan', "IMPORT")
-                    ->where('tipe_bahan', "BAKU")
-                    ->like('multiple_po_id', $d->id_import_bb)
-                    ->first();
-                $penerimaanBarangId = $penerimaanBarang == null ? null : $penerimaanBarang['id'];
-            } elseif ($d->id_po_bp != null) {
-                if ($d->po_type === "Lokal") {
-                    $penerimaanBarang = $penerimaanBarangModel
-                        ->select('penerimaan_barang.*,suppliers.name as supplier')
-                        ->join('suppliers', 'suppliers.id = penerimaan_barang.supplier_id', 'left')
-                        ->where('penerimaan_barang.company_id', $companyId)
-                        ->where('status_penerimaan', "LOKAL")
-                        ->where('tipe_bahan', "PENOLONG")
-                        ->like('multiple_po_id', $d->id_po_bp)
-                        ->first();
-                    $penerimaanBarangId = $penerimaanBarang == null ? null : $penerimaanBarang['id'];
-                } else {
-                    $penerimaanBarang = $penerimaanBarangModel
-                        ->select('penerimaan_barang.*,suppliers.name as supplier')
-                        ->join('suppliers', 'suppliers.id = penerimaan_barang.supplier_id', 'left')
-                        ->where('penerimaan_barang.company_id', $companyId)
-                        ->where('status_penerimaan', "IMPORT")
-                        ->where('tipe_bahan', "PENOLONG")
-                        ->like('multiple_po_id', $d->id_po_bp)
-                        ->first();
-                    $penerimaanBarangId = $penerimaanBarang == null ? null : $penerimaanBarang['id'];
-                }
+            $penerimaanBarang = $penerimaanBarangModel
+                ->select('penerimaan_barang.*')
+                ->where('penerimaan_barang.company_id', $companyId)
+                ->groupStart()
+                ->like('multiple_po_no', $d->uraian_transaksi)
+                ->groupEnd()
+                ->first();
+            $penerimaanBarangId = $penerimaanBarang == null ? null : $penerimaanBarang['id'];
+
+            if ($penerimaanBarangId != null) {
+                $transaksiJurnalModel->update($d->id, [
+                    'penerimaan_barang_id' => $penerimaanBarangId
+                ]);
+
+                $total++;
             }
-
-            $transaksiJurnalModel->update($d->id, [
-                'penerimaan_barang_id' => $penerimaanBarangId
-            ]);
-
-            $total++;
         }
+
 
         \var_dump("Total Updated", $total);
         die;
+    }
+
+    public function repairCustomerLokal()
+    {
+        $db = \Config\Database::connect();
+        $db->transStart();
+
+        $customer = $db->query("
+    SELECT 
+        c1.id AS old_id,
+        c2.id AS new_id,
+        c1.name AS old_name,
+        c2.name AS new_name,
+        c1.createdAt AS old_created,
+        c2.createdAt AS new_created
+    FROM customers c1
+    JOIN customers c2 
+        ON c1.id < c2.id
+        AND c1.deletedAt IS NULL
+        AND c2.deletedAt IS NULL
+        AND (
+            LOWER(c1.name) LIKE CONCAT('%', LOWER(c2.name), '%')
+            OR LOWER(c2.name) LIKE CONCAT('%', LOWER(c1.name), '%')
+        )
+    ORDER BY c1.createdAt DESC, c2.createdAt DESC
+");
+
+
+        try {
+            // dd($customer->getResult());
+            $salesOrderInvoiceModel = new SalesOrderInvoiceModel();
+            $berhasilUpdate = 0;
+
+            foreach ($customer->getResult() as $d) {
+
+                //
+                $salesOrderInvoice = $salesOrderInvoiceModel->asObject()->where('id_customer', $d->new_id)
+                    ->where('document_type', "import")
+                    ->findAll();
+
+                if (\count($salesOrderInvoice) != 0) {
+                    foreach ($salesOrderInvoice as $s) {
+                        $salesOrderInvoiceModel->update($s->id, [
+                            'id_customer' => $d->old_id
+                        ]);
+                        $berhasilUpdate++;
+                    }
+                }
+            }
+
+            $totalInvoiceImport =  $salesOrderInvoiceModel
+                ->where('document_type', "import")
+                ->findAll();
+
+            $db->transCommit();
+            dd("Puspa Ngaceng", $berhasilUpdate, "Novaldo Ngeblek", \count($totalInvoiceImport));
+        } catch (Exception $e) {
+            $db->transRollback();
+            echo "Error " . $e->getMessage();
+        }
     }
 }
 

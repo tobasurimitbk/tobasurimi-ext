@@ -1407,9 +1407,10 @@ $routes->group('bea-cukai-bc-40', ['filter' => 'Auth'], function ($routes) {
     $routes->get('detail-barang/(:segment)', 'BeaCukai\BC40::detailBarang/$1');
 
     // OUTSTANDING
-    $routes->get('bc-40-outstanding-all', 'BeaCukai\BC40::allOutstanding');
+    // $routes->get('bc-40-outstanding-all', 'BeaCukai\BC40::allOutstanding');
+    $routes->get('bc-40-outstanding-all', 'BeaCukai\BC40::allOutstandingServerSide');
     $routes->get('bc-40-outstanding', 'BeaCukai\BC40::viewOutstanding');
-    $routes->get('bc-40-outstanding-export', 'BeaCukai\BC40::OutstandingSheet');
+    $routes->get('bc-40-outstanding-export', 'BeaCukai\BC40::allOutstandingExcel');
 
     // FORM PURCHASE ORDER
     // HEADER
