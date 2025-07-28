@@ -64,17 +64,17 @@
                 <div class="row">
                     <div class="col-md-6">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <select class="form-select sumber_select" name="sumber_select" id="sumber_select" <?= !empty($data) ? 'disabled'  : ''; ?>>
-                                <option value="order_form" selected>Order Form</option>
-                                <option value="surat_jalan">Surat Jalan</option>
-                                <option value="invoice">Invoice</option>
+                            <select class="form-select sumber_select" name="sumber_select" id="sumber_select">
+                                <option value="order_form" <?= !empty($data) ? ($data->sumber == "order_form" ? "selected" : "") : "selected"; ?>>Order Form</option>
+                                <option value="surat_jalan" <?= !empty($data) ? ($data->sumber == "surat_jalan" ? "selected" : "") : ""; ?>>Surat Jalan</option>
+                                <option value="invoice" <?= !empty($data) ? ($data->sumber == "invoice" ? "selected" : "") : ""; ?>>Invoice</option>
                             </select>
                             <label for="floatingInput">Sumber Data</label>
                         </div>
                     </div>
                     <div class="col-md-6">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <select class="form-select reference_id" name="reference_id" id="reference_id" <?= !empty($data) ? 'disabled'  : ''; ?>>
+                            <select class="form-select reference_id" name="reference_id" id="reference_id">
                                 <option value=""></option>
                             </select>
                             <label for="floatingInput">No Reference</label>
@@ -85,7 +85,7 @@
                 <div class="row">
                     <div class="col-md-6">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <select class="form-select id_warehouse" name="id_warehouse" id="id_warehouse" <?= !empty($data) ? 'disabled'  : ''; ?>>
+                            <select class="form-select id_warehouse" name="id_warehouse" id="id_warehouse">
                                 <option value=""></option>
                                 <?php foreach ($dataWarehouse ?? [] as $warehouse) : ?>
                                     <option value="<?= $warehouse->id; ?>" <?= !empty($data) ? ($data->id_warehouse === $warehouse->id ? "selected" : "") : ""; ?>><?= $warehouse->warehouse_name; ?></option>
@@ -312,7 +312,7 @@
                                         confirmButtonColor: '#4e73df',
                                     })
                                     .then(() => {
-                                        location.reload();
+                                        window.location.href = "<?= base_url("return-barang-sales"); ?>";
                                     })
                             }
                         },

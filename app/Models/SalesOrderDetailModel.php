@@ -63,8 +63,8 @@ class SalesOrderDetailModel extends Model
         if (!is_array($ids)) $ids = [$ids];
 
         $selectQry = "sales_order_detail.id AS id,
-                    sales_order_detail.id_barang AS id_barang,
-                    barang_master_sales.kode_barang AS kode_barang,
+                      sales_order_detail.id_barang AS id_barang,
+                      barang_master_sales.kode_barang AS kode_barang,
                       barang_master_sales.barang_name AS nama_barang,
                       sales_order_detail.qty AS qty,
                       sales_order_detail.qty_sekarang AS qty_sekarang,

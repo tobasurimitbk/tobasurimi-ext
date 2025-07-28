@@ -98,7 +98,7 @@
             data: "customerName",
             className: "text-center"
         }, {
-            data: "invNo",
+            data: "refNo",
             className: "text-center"
         }, {
             data: "returnDate",
@@ -228,7 +228,7 @@
         })
     }
 
-    function edit(id){
+    function edit(id) {
         location.replace(`<?= base_url("return-barang-sales/details/"); ?>/${id}`);
     }
 </script>

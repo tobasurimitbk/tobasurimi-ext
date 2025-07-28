@@ -23,6 +23,7 @@ class SalesOrderReturnDetailModel extends Model
         'keterangan_return',
         'discount_percentage_return',
         'harga_barang_return',
+        'amount_return',
         'tax_return',
         'stock_id',
         'bc_id',
