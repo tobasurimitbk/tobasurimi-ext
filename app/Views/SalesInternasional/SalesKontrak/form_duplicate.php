@@ -72,7 +72,7 @@
                     </div>
                     <!-- <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <select <?= !empty($dataSalesKontrak) ? ($dataSalesKontrak['status_posting'] ? 'disabled=true' : '') : ''; ?>
+                            <select 
                                 class="form-select divisi_id"
                                 aria-label="Floating label select example"
                                 name="divisi_id"
@@ -135,7 +135,7 @@
                         <div class="form-floating mb-3" style="height: 50px;">
                             <input autocomplete="one-time-code" value="<?= !empty($dataSalesKontrak) ? $dataSalesKontrak['dicharge_port'] : ""; ?>" type="text" class="form-control dicharge_port" id="dicharge_port" name="dicharge_port" placeholder="Discharge Port">
                             <label for="floatingInput">Discharge Port</label>
-                        </div>
+                        </div>.
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
@@ -260,17 +260,9 @@
                             <label class="form-label font-weight-bold modal-sub-title">Item List</label>
                         </div>
                         <div class="col-md-6">
-                            <?php if (!empty($dataSalesKontrak)) { ?>
-                                <?php if (!$dataSalesKontrak['status_posting']) { ?>
-                                    <button class="btn btn-show-detail btn-add btn-block float-right" type="button" data-btn="detail-modal">
-                                        <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Add Product
-                                    </button>
-                                <?php } ?>
-                            <?php } else { ?>
-                                <button class="btn btn-show-detail btn-add btn-block float-right" type="button" data-btn="detail-modal">
-                                    <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Add Product
-                                </button>
-                            <?php } ?>
+                            <button class="btn btn-show-detail btn-add btn-block float-right" type="button" data-btn="detail-modal">
+                                <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Add Product
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -389,6 +381,7 @@
                 </div>
 
             </div>
+        </form>
     </div>
 </section>
 
@@ -847,6 +840,13 @@
         autoclose: true
     })
 
+    $(".date_revision").datepicker({
+        todayHighlight: true,
+        format: "dd/mm/yyyy",
+        orientation: "bottom auto",
+        autoclose: true
+    })
+
     $('#btnAddSizeBreakdownModal').click(function() {
         clearFormSizeBreakdown();
         $('.title-size-breakdown').text("Create ");
@@ -866,7 +866,7 @@
             var grade = $('#grade').val();
             var packing_size = $('#packing_size').val();
             var can = $('#can').val();
-            var cased = $('#case').val();
+            var cased = destroyFormatRupiah($('#case').val());
             var kg = $('#kg').val();
             var lb = $('#lb').val();
             var inner_box = $('#inner_box').val();
@@ -977,6 +977,12 @@
         dropdownParent: $('#addSizeBreakdownModal')
     })
 
+    $('#company_id').select2({
+        placeholder: "Select Letterhead Printout",
+        theme: "bootstrap-5",
+        dropdownParent: $('.letterhead-modal')
+    });
+
 
     // BARANG 
     $('.barang_master_sales_id').select2({
@@ -1053,7 +1059,7 @@
 
     // BROKER
     $('.print_out_broker').select2({
-        placeholder: "Pilih Print Out Broker",
+        placeholder: "Select Print Out Broker",
         theme: "bootstrap-5",
     })
 
@@ -1082,14 +1088,14 @@
     });
 
     //CSS SELECT2 FLOATING LABEL
-    $('.bank_id,.print_out_broker,.barang_master_sales_id,.satuan_id,.satuan_order_id,.tipe_harga,.currency,.country_id,.barang_master_sales_id,.customer_id,.type_barang,#sales_id,#divisi_id,#spesifikasi_id,#satuan_size_id')
+    $('.bank_id,.print_out_broker,.barang_master_sales_id,.satuan_id,.satuan_order_id,.tipe_harga,.currency,.country_id,.barang_master_sales_id,.customer_id,.type_barang,#sales_id,#divisi_id,#spesifikasi_id,#satuan_size_id,#company_id')
         .parent('div')
         .children('span')
         .children('span')
         .children('span')
         .css('height', ' calc(3.5rem + 2px)');
 
-    $('.bank_id,.print_out_broker,.barang_master_sales_id,.satuan_id,.satuan_order_id,.tipe_harga,.currency,.country_id,.barang_master_sales_id,.customer_id,.type_barang,#sales_id,#divisi_id,#spesifikasi_id,#satuan_size_id')
+    $('.bank_id,.print_out_broker,.barang_master_sales_id,.satuan_id,.satuan_order_id,.tipe_harga,.currency,.country_id,.barang_master_sales_id,.customer_id,.type_barang,#sales_id,#divisi_id,#spesifikasi_id,#satuan_size_id,#company_id')
         .parent('div')
         .children('span')
         .children('span')
@@ -1105,7 +1111,7 @@
         .children('span')
         .css('margin-top', '22px').css('margin-left', '-7px');
 
-    $('.bank_id,.print_out_broker,.barang_master_sales_id,.satuan_id,.satuan_order_id,.tipe_harga,.currency,.country_id,.barang_master_sales_id,.customer_id,#sales_id,#divisi_id,#spesifikasi_id,#satuan_size_id')
+    $('.bank_id,.print_out_broker,.barang_master_sales_id,.satuan_id,.satuan_order_id,.tipe_harga,.currency,.country_id,.barang_master_sales_id,.customer_id,#sales_id,#divisi_id,#spesifikasi_id,#satuan_size_id,#company_id')
         .parent('div')
         .find('label')
         .css('z-index', '1');
@@ -1702,7 +1708,6 @@
 
                 data.append("total_amount", totalAmount);
                 data.append("listBarang", listDataBarang);
-
                 // CREATE
                 Swal.fire({
                     icon: 'question',
@@ -1797,13 +1802,43 @@
         $(".detail-modal").modal("hide")
     })
 
+    $(".unposting-so").click(function() {
+
+        $(".unpost-modal").modal("show");
+
+    });
 
     generateCodeMasterBarang();
     getListMasterBarang();
 
-    function print(url) {
-        window.open(url, "_blank");
-    }
+    <?php if (session()->get('login')->this_company_id == 1): ?>
+        // Jika Kim 1 Maka Milih Pakai Kop Mana
+        var print = function(url) {
+            $('#url_print').val(url);
+            $('.letterhead-modal').modal('show');
+        }
+        var print2 = function() {
+            var companyId = $('#company_id option:selected').val();
+            if (companyId == '') {
+                Swal.fire({
+                    icon: 'error',
+                    title: "Select Letterhead Printout",
+                    confirmButtonColor: '#4e73df',
+                })
+            } else {
+                var url_print = $('#url_print').val();
+                window.open(url_print + '?letter_head_company=' + companyId, "_blank");
+            }
+        }
+
+        $('#btn-hide-modal-letterhead').click(function() {
+            $('.letterhead-modal').modal('hide');
+        });
+    <?php else: ?>
+        var print = function(url) {
+            window.open(url, "_blank");
+        }
+    <?php endif; ?>
 
     function detailRow(id) {
         var item = null;
@@ -1839,7 +1874,7 @@
         $('#grade').val(item.grade);
         $('#packing_size').val(item.packing_size);
         $('#can').val(item.can);
-        $('#case').val(item.cased);
+        $('#case').val(greatFormatRupiah(item.cased));
         $('#kg').val(item.kg);
         $('#lb').val(item.lb);
         $('#inner_box').val(item.inner_box);
@@ -1925,7 +1960,7 @@
             newRow.append(`<td>${greatFormatRupiah(item.total)}</td>`);
 
             const actionButton = `
-             <button type="button" class="btn btn-warning posting-spp mr-1" onclick="detailRow('${item.id_detail}')">
+                <button type="button" class="btn btn-warning posting-spp mr-1" onclick="detailRow('${item.id_detail}')">
                     <i class="fa fa-pencil fa-sm" aria-hidden="true"></i>
                 </button>
                 <button type="button" class="btn btn-danger" onclick="deleteRow('${item.id_detail}')">
@@ -2073,7 +2108,7 @@
                 newRow.append($('<td>').text(item.grade));
                 newRow.append($('<td>').text(item.packing));
                 newRow.append($('<td>').text(item.can));
-                newRow.append($('<td>').text(item.case));
+                newRow.append($('<td>').text(greatFormatRupiah(item.cased)));
                 newRow.append($('<td>').text(item.kg));
                 newRow.append($('<td>').text(item.lb));
                 newRow.append($('<td>').text(item.inner_box));
@@ -2094,7 +2129,7 @@
                             </button><button type="button" class="btn btn-danger" onclick="deleteRowSizeBreakdown('${item.id_detail_breakdown}')">
                                 <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
                             </button>
-                    `
+                   `
                 ));
 
                 totalQty += parseFloat(item.qty);
@@ -2284,7 +2319,7 @@
     function updateStatusPosting(status) {
         Swal.fire({
             icon: 'question',
-            title: status == '0' ? 'Un Posting Sales Kontrak ?' : 'Posting Sales Kontrak ?',
+            title: status == '0' ? 'Un Posted ?' : 'Posted ?',
             confirmButtonColor: '#4e73df',
             cancelButtonColor: '#d33',
             showCancelButton: true,
@@ -2327,6 +2362,61 @@
             }
         })
     }
+
+    function unPosting() {
+        var csrf = $(`[name="${csrfToken}"]`);
+        var date_revision = $('#date_revision').val();
+        var keterangan = $('#keterangan_unpost').val();
+        var state = true;
+
+        // MAU UNPOSTING
+        if (date_revision == "") {
+            state = false;
+            Swal.fire({
+                icon: 'error',
+                title: "Form Date Revision Required",
+                confirmButtonColor: '#4e73df',
+            })
+        } else {
+            $.ajax({
+                url: "<?= base_url("sales-kontrak/update-status"); ?>",
+                data: {
+                    id: $(".id").val(),
+                    status: "0",
+                    date_revision: date_revision,
+                    keterangan: keterangan,
+                },
+                beforeSend: function(xhr) {
+                    xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                    stopLoading()
+                },
+                complete: function() {
+                    stopLoading();
+                },
+                method: "POST",
+                dataType: "json",
+                success: function(response) {
+                    csrf.val(response.token);
+                    if (response.status) {
+                        Swal.fire({
+                                icon: 'success',
+                                title: response.message,
+                                confirmButtonColor: '#4e73df',
+                            })
+                            .then(() => {
+                                location.reload();
+                            })
+                    }
+                },
+            });
+        }
+
+    }
+
+    $(".btn-hide-detail").click(function() {
+        $(".keterangan_unpost").val("");
+        $(".unpost-modal").modal("hide");
+    })
 
     $(".delete-parent").click(function() {
         Swal.fire({
@@ -2447,4 +2537,5 @@
         $('#satuan_size_id').val(null).change();
     }
 </script>
+
 <?= $this->endSection(); ?>

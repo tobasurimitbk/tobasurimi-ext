@@ -245,7 +245,7 @@
 
                     foreach ($dataSODetail['salesContractDetailList'] as $key => $detail) {
                         $currentItemSaleskontrakdetail++;
-                        $total_amount = $total_amount + formatter($detail["total_input"], "STR_TO_INT");
+                        $total_amount = $total_amount + formatter($detail["total_input"], "STR_TO_FLOAT");
                         $total_qty += $detail['qty_input'];
                     ?>
                         <tr style="border-bottom: 1px solid #eee;">
