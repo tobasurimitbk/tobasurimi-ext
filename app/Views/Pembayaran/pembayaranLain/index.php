@@ -910,7 +910,6 @@
             return isValid;
         }
 
-
         // Update validation when adding/removing details
         function refreshValidation() {
             // Trigger validation on all fields
