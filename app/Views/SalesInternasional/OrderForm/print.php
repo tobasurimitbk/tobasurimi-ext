@@ -122,6 +122,8 @@
             <div class="txt-center">
                 <h3>
                     <span style="margin-top: -20px;">
+                        <?= strtoupper(str_ireplace(', Tbk', '', $company['holding_company']) . " (" . $company['company'] . ")") ?> <br>
+
                         ORDER FORM <br> <?= $dataSO->container ?>
                     </span>
                 </h3>
@@ -245,7 +247,16 @@
                         <tr style="border-bottom: 1px solid #eee;">
                             <td style="padding: 6px; border: 1px solid #ddd; vertical-align: top;"><?= $no++ ?></td>
                             <td style="padding: 6px; border: 1px solid #ddd; vertical-align: top;">
-                                <div style="font-weight: bold; font-size: 9px;"><?= $detail["barang_name"]; ?></div>
+                                <div style="font-weight: bold; font-size: 9px;">
+                                    <span style="float: left;">
+                                        <?= $detail["barang_name"]; ?>
+                                    </span>
+                                    <?php if (!empty($detail['divisi_name'])): ?>
+                                        <span style="float: right;">
+                                            DEPT. <?= $detail["divisi_name"]; ?>
+                                        </span>
+                                    <?php endif; ?>
+                                </div><br>
                                 <div style="font-size: 9px; margin-top: 4px; line-height: 1.4;">
                                     <?php if (!empty($detail['species'])): ?>
                                         <span style="display: inline-block; width: 65px; font-weight: bold;">SPECIES:</span> <?= trim($detail['species']) ?> <br>
@@ -276,7 +287,7 @@
                                         'pc' => ['label' => 'PC', 'width' => '7%'],
                                         'bag' => ['label' => 'Bag', 'width' => '7%'],
                                         'cup' => ['label' => 'Cup', 'width' => '6%'],
-                                        'persen' => ['label' => '%', 'width' => '6%'],
+                                        'persen' => ['label' => '%', 'width' => '3%'],
                                         'remark' => ['label' => 'Remarks', 'width' => '10%'],
                                         'palet' => ['label' => 'Pallet', 'width' => '10%']
 
@@ -311,9 +322,9 @@
                                                         <th style="padding: 3px; border: 1px solid #ddd; width: 6%;text-align: right;">%</th>
                                                     <?php endif; ?>
 
-                                                    <th style=" padding: 3px; border: 1px solid #ddd; width: 9%; text-align: right;">Qty</th>
-                                                    <th style="padding: 3px; border: 1px solid #ddd; width: 10%; text-align: right;" class="price">Unit Price</th>
-                                                    <th style="padding: 3px; border: 1px solid #ddd; width: 10%; text-align: right;" class="price">Total Amount</th>
+                                                    <th style=" padding: 3px; border: 1px solid #ddd; width: 3%; text-align: right;">Qty</th>
+                                                    <th style="padding: 3px; border: 1px solid #ddd; width: 3%; text-align: right;" class="price">Unit Price</th>
+                                                    <th style="padding: 3px; border: 1px solid #ddd; width: 3%; text-align: right;" class="price">Total Amount</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
@@ -586,13 +597,19 @@
                     </tr>
                     <tr>
                         <td>
+                            <?php if ($dataSO->document_required != ""): ?>
+                                <b>
+                                    - DOCUMENT REQUIRED
+                                </b>
+                                <br>
+                                <?= $dataSO->document_required ?><br>
+                            <?php endif; ?>
                             <?php if ($dataSO->payment_term != ""): ?>
                                 <b>
                                     - PAYMENT TERM
                                 </b>
                                 <br>
-                                <?= $dataSO->payment_term ?>
-                                <br><br>
+                                <?= $dataSO->payment_term ?><br>
                             <?php endif; ?>
 
                             <?php if ($dataSO->shipment_an != ""): ?>
@@ -600,8 +617,7 @@
                                     - SHIPMENT A/N
                                 </b>
                                 <br>
-                                <?= $dataSO->shipment_an ?>
-                                <br><br>
+                                <?= $dataSO->shipment_an ?> <br>
                             <?php endif; ?>
 
                             <?php if ($dataSO->consigne_docs != ""): ?>
@@ -609,8 +625,7 @@
                                     - CONSIGNEE
                                 </b>
                                 <br>
-                                <?= $dataSO->consigne_docs ?>
-                                <br><br>
+                                <?= $dataSO->consigne_docs ?> <br>
                             <?php endif; ?>
 
                             <?php if ($dataSO->notify_party != ""): ?>
@@ -618,8 +633,7 @@
                                     - NOTIFY PARTY
                                 </b>
                                 <br>
-                                <?= $dataSO->notify_party ?>
-                                <br><br>
+                                <?= $dataSO->notify_party ?> <br>
                             <?php endif; ?>
 
                             <?php if ($dataSO->additional_detail_docs != ""): ?>
@@ -715,33 +729,37 @@
 
                     <?php if (count($dataSalesOrderSpecs) != 0): ?>
                         <div style="margin: 10px 0;">
-                            <div style="font-weight: bold; margin-bottom: 5px;">PRODUCT SPECS</div>
-                            <table style="width: auto; border-collapse: collapse; margin-left: 10px;">
+                            <b>
+                                PRODUCT SPECS
+                            </b> <br>
+                            <table style="width: 50%; border: 1px solid black; border-collapse: collapse; margin-left:6px; margin-top:3px;" class="label">
                                 <thead>
                                     <tr>
-                                        <th style="text-align: left; padding: 4px 8px; border-bottom: 1px solid #000;">GRADE</th>
-                                        <th style="text-align: left; padding: 4px 8px; border-bottom: 1px solid #000;">SPECIFICATIONS</th>
+                                        <td><b>GRADE</b></td>
+                                        <td><b>SPECIFICATIONS</b></td>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     <?php foreach ($dataSalesOrderSpecs as $d): ?>
                                         <tr>
-                                            <td style="width: 100px; padding: 4px 8px;"><?= htmlspecialchars($d['grade']) ?></td>
-                                            <td style="padding: 4px 8px;"><?= htmlspecialchars($d['specification']) ?></td>
+                                            <td colspan="2">- <?= $d['size_packing'] ?></td>
                                         </tr>
+                                        <?php foreach ($d['grade_specs'] as $g): ?>
+                                            <tr>
+                                                <td><?= $g['grade'] ?></td>
+                                                <td><?= $g['specification'] ?></td>
+                                            </tr>
+                                        <?php endforeach; ?>
                                     <?php endforeach; ?>
+
                                 </tbody>
                             </table>
+                            </td>
+
                         </div>
                     <?php endif; ?>
 
-                    <tr>
-                        <td>
-                            <b>
-                                TERM OF PAYMENT : <?= $dataSO->payment_term ?>
-                            </b>
-                        </td>
-                    </tr>
+
                     <tr class="keep-together">
                         <td>
                             <b>
@@ -751,15 +769,59 @@
                     </tr>
 
                     <tr>
-                        <td style="border: none; padding: 0;">
-                            <table style="width: 100%; border-left: none; border-right: none; border-top: none; border-bottom: none; border-collapse: collapse;" class="label">
+                        <td style=" padding: 0;">
+                            <table style="width: 100%; border-collapse: collapse;" class="label">
                                 <tr>
-                                    <td style="border: 1px solid black; border-left: none; border-right: none; border-top: none; border-bottom: none;">M.DIRECTOR <br><br><br><br></td>
-                                    <td style="border: 1px solid black;border-right: none; border-top: none; border-bottom: none;">QC <br><br><br><br></td>
-                                    <td style="border: 1px solid black;border-right: none; border-top: none; border-bottom: none;">EXIM <br><br><br><br></td>
-                                    <td style="border: 1px solid black;border-right: none; border-top: none; border-bottom: none;">PROCUREMENT <br><br><br><br></td>
-                                    <td style="border: 1px solid black;border-right: none; border-top: none; border-bottom: none;">PRODUCTION <br><br><br><br></td>
-                                    <td style="border: 1px solid black;border-right: none; border-top: none; border-bottom: none;">MARKETING <br><br><br><br></td>
+                                    <td style="width: 16.66%; border: 1px solid black; border-left: none; border-top: none; border-bottom: none;">
+                                        M.DIRECTOR
+                                    </td>
+                                    <td style="width: 16.66%; border: 1px solid black; border-top: none; border-bottom: none;">
+                                        QC
+                                    </td>
+                                    <td style="width: 16.66%; border: 1px solid black; border-top: none; border-bottom: none;">
+                                        EXIM
+                                    </td>
+                                    <td style="width: 16.66%; border: 1px solid black; border-top: none; border-bottom: none;">
+                                        ACCOUNTING
+                                    </td>
+                                    <td style="width: 16.66%; border: 1px solid black; border-top: none; border-bottom: none;">
+                                        PRODUCTION
+                                    </td>
+                                    <td style="width: 16.66%; border: 1px solid black; border-right: none; border-top: none; border-bottom: none;">
+                                        MARKETING
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+
+                    </tr>
+                    <tr>
+                        <td style="border: none; padding: 0;">
+                            <table style="width: 100%; border-collapse: collapse;" class="label">
+                                <tr>
+                                    <td style="width: 16.66%; border: 1px solid black; border-left: none; border-top: none; border-bottom: none;">
+                                        <br><br><br><br>
+                                    </td>
+                                    <td style="width: 16.66%; border: 1px solid black; border-top: none; border-bottom: none;">
+                                        <br><br><br><br>
+
+                                    </td>
+                                    <td style="width: 16.66%; border: 1px solid black; border-top: none; border-bottom: none;">
+                                        <br><br><br><br>
+
+                                    </td>
+                                    <td style="width: 16.66%; border: 1px solid black; border-top: none; border-bottom: none;">
+                                        <br><br><br><br>
+
+                                    </td>
+                                    <td style="width: 16.66%; border: 1px solid black; border-top: none; border-bottom: none;">
+                                        <br><br><br><br>
+
+                                    </td>
+                                    <td style="width: 16.66%; border: 1px solid black; border-right: none; border-top: none; border-bottom: none;">
+                                        <br><br><br><br>
+
+                                    </td>
                                 </tr>
                             </table>
                         </td>

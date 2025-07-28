@@ -15,6 +15,7 @@ use App\Models\SalesOrderExportAdditionalModel;
 use App\Models\SalesOrderExportDetailModel;
 use App\Models\SalesOrderExportModel;
 use App\Models\SalesOrderExportRevisionModel;
+use App\Models\SalesOrderExportSpecsDetailModel;
 use App\Models\SalesOrderExportSpecsModel;
 use App\Models\SalesOrderExportSubtitleModel;
 use App\Models\SatuansModel;
@@ -44,6 +45,7 @@ class OrderForm extends BaseController
     protected $salesOrderExportRevisionModel;
     protected $salesOrderExportAdditionalModel;
     protected $salesOrderExportSubtitleModel;
+    protected $salesOrderExportSpecsDetailModel;
     protected $companyModel;
     protected $dompdf;
 
@@ -69,6 +71,7 @@ class OrderForm extends BaseController
         $this->salesOrderExportAdditionalModel = new SalesOrderExportAdditionalModel();
         $this->salesOrderExportSubtitleModel = new SalesOrderExportSubtitleModel();
         $this->companyModel = new CompaniesModel();
+        $this->salesOrderExportSpecsDetailModel = new SalesOrderExportSpecsDetailModel();
         $this->dompdf = new Dompdf();
     }
 
@@ -155,11 +158,13 @@ class OrderForm extends BaseController
         $dataSatuan = $this->satuanModel->findAll();
         $dataAJU = $this->metaDataModel->getBCUsed('so_internasional');
         $dataDivisi = $this->divisiModel->getDivisiAccess();
+        $dataSalesKontrak = $this->salesKontrakModel->getSalesKontrakList();
 
         $data = [
             'dataSatuan' => $dataSatuan,
             "dataAJU" => $dataAJU,
-            "dataDivisi" => $dataDivisi
+            "dataDivisi" => $dataDivisi,
+            "dataSalesKontrak" => $dataSalesKontrak
         ];
 
         return view('SalesInternasional/OrderForm/form', $data);
@@ -167,12 +172,6 @@ class OrderForm extends BaseController
 
     public function saveOrder()
     {
-
-        // return \response()->setJSON([
-        //     '$_POST' => $_POST,
-        //     'listDataSalesKontrak' => \json_decode($_POST['listDataSalesKontrak']),
-        //     'listDetailSpecs' => \json_decode($_POST['listDetailSpecs'])
-        // ]);
 
         $salesOrderNo = $this->request->getVar('sales_order_export_no');
 
@@ -194,7 +193,7 @@ class OrderForm extends BaseController
                 'user_id' => $this->this_user_id,
                 'bc_type' => $this->request->getVar('aju_document_type'),
                 "tanggal" => $this->request->getVar("tanggal") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getVar("tanggal")))) : "",
-                'divisi_id' => $this->request->getVar('divisi_id'),
+                // 'divisi_id' => $this->request->getVar('divisi_id'),
                 'tax_id' => $this->request->getVar('tax_id'),
                 'royalty_price' => $this->request->getVar('royalty_price'),
                 'rebate_price' => $this->request->getVar('rebate_price'),
@@ -222,18 +221,27 @@ class OrderForm extends BaseController
                 'stuffing' => $this->request->getVar('stuffing'),
                 'deadline' => $this->request->getVar('deadline'),
                 'container' => $this->request->getVar('container'),
+                'document_required' => $this->request->getVar('document_required'),
                 'status' => "NEW",
                 'used' => "NOT USED",
             ]);
 
             // Insert Detail Specs
             foreach (json_decode($_POST['listDetailSpecs']) as $l) {
-                $this->salesOrderExportSpecsModel->insert([
+                $salesOrderExportSpecsId = $this->salesOrderExportSpecsModel->insert([
                     'sales_order_export_id' => $salesOrderExportId,
-                    'grade' => $l->grade,
-                    'specification' => $l->specification
+                    'size_packing' => $l->size_packing,
                 ]);
+
+                foreach ($l->grade_specs as $g) {
+                    $this->salesOrderExportSpecsDetailModel->insert([
+                        'sales_order_export_specs_id' => $salesOrderExportSpecsId,
+                        'grade' => $g->grade,
+                        'specification' => $g->specification
+                    ]);
+                }
             }
+
 
             // Insert Sales Order Detail Export
             $listDataSalesKontrak = json_decode($_POST['listDataSalesKontrak']);
@@ -242,6 +250,7 @@ class OrderForm extends BaseController
                 $this->salesOrderExportSubtitleModel->insert([
                     'sales_order_export_id' => $salesOrderExportId,
                     'sales_contract_detail_id' => $s->id,
+                    'divisi_id' => $s->divisi_id,
                     'brand' => $s->brand,
                     'packing' => $s->packing,
                     'species' => $s->species,
@@ -257,6 +266,9 @@ class OrderForm extends BaseController
                         'qty' => $sb->qty_input,
                         'harga_barang' => $sb->harga,
                         'total_harga_barang' => $sb->total_input,
+                        // Konversinya
+                        'satuan_convertion_id' => $sb->satuan_convertion_id,
+                        'qty_convertion' => $sb->qty_convertion,
                         // Note
                         'note_size' => $sb->note_size,
                         'note_grade' => $sb->note_grade,
@@ -302,10 +314,7 @@ class OrderForm extends BaseController
 
     public function dropdownSalesKontrak()
     {
-        $divisiId = $this->request->getVar('divisi_id');
-        $dataSalesKontrak = $this->salesKontrakModel->getSalesKontrakList(
-            $divisiId
-        );
+        $dataSalesKontrak = $this->salesKontrakModel->getSalesKontrakList();
 
         return response()->setJSON([
             'data' => $dataSalesKontrak,
@@ -437,10 +446,7 @@ class OrderForm extends BaseController
                 $id
             );
 
-        $dataSalesExportSpecs = $this->salesOrderExportSpecsModel
-            ->where('sales_order_export_id', $id)
-            ->findAll();
-
+        $dataSalesExportSpecs = $this->salesOrderExportModel->getSalesOrderSpecs($id);
         $dataSalesKontrak = $this->salesKontrakModel
             ->where('id', $dataSalesExport->sales_contract_id)
             ->first();
@@ -526,6 +532,7 @@ class OrderForm extends BaseController
                 'stuffing' => $this->request->getVar('stuffing'),
                 'deadline' => $this->request->getVar('deadline'),
                 'container' => $this->request->getVar('container'),
+                'document_required' => $this->request->getVar('document_required'),
             ]);
 
             $listDataSalesKontrak = json_decode($_POST['listDataSalesKontrak']);
@@ -541,6 +548,7 @@ class OrderForm extends BaseController
                 $this->salesOrderExportSubtitleModel->insert([
                     'sales_order_export_id' => $id,
                     'sales_contract_detail_id' => $s->id,
+                    'divisi_id' => $s->divisi_id,
                     'brand' => $s->brand,
                     'packing' => $s->packing,
                     'species' => $s->species,
@@ -562,6 +570,9 @@ class OrderForm extends BaseController
                             'qty' => $sb->qty_input,
                             'harga_barang' => $sb->harga,
                             'total_harga_barang' => $sb->total_input,
+                            // Konversinya
+                            'satuan_convertion_id' => $sb->satuan_convertion_id,
+                            'qty_convertion' => $sb->qty_convertion,
                             // Note
                             'note_size' => $sb->note_size,
                             'note_grade' => $sb->note_grade,
@@ -589,6 +600,9 @@ class OrderForm extends BaseController
                             'qty' => $sb->qty_input,
                             'harga_barang' => $sb->harga,
                             'total_harga_barang' => $sb->total_input,
+                            // Konversinya
+                            'satuan_convertion_id' => $sb->satuan_convertion_id,
+                            'qty_convertion' => $sb->qty_convertion,
                             // Note
                             'note_size' => $sb->note_size,
                             'note_grade' => $sb->note_grade,
@@ -616,12 +630,21 @@ class OrderForm extends BaseController
                 ->delete();
 
 
+            // Old
+            $this->salesOrderExportSpecsModel->where('sales_order_export_id', $id)->delete();
             foreach (json_decode($_POST['listDetailSpecs']) as $l) {
-                $this->salesOrderExportSpecsModel->insert([
+                $salesOrderExportSpecsId = $this->salesOrderExportSpecsModel->insert([
                     'sales_order_export_id' => $id,
-                    'grade' => $l->grade,
-                    'specification' => $l->specification
+                    'size_packing' => $l->size_packing,
                 ]);
+
+                foreach ($l->grade_specs as $g) {
+                    $this->salesOrderExportSpecsDetailModel->insert([
+                        'sales_order_export_specs_id' => $salesOrderExportSpecsId,
+                        'grade' => $g->grade,
+                        'specification' => $g->specification
+                    ]);
+                }
             }
 
             $this->salesOrderExportAdditionalModel
@@ -756,9 +779,7 @@ class OrderForm extends BaseController
             ->orderBy('id', 'asc')
             ->findAll();
 
-        $dataSalesOrderSpecs = $this->salesOrderExportSpecsModel
-            ->where('sales_order_export_id', $id)
-            ->findAll();
+        $dataSalesExportSpecs = $this->salesOrderExportModel->getSalesOrderSpecs($id);
 
         $dataSalesExportAdditional = $this->salesOrderExportAdditionalModel
             ->where('sales_order_export_id', $id)
@@ -769,13 +790,12 @@ class OrderForm extends BaseController
             "dataSO" => $dataSO,
             "dataSODetail" => $dataSODetail,
             "dataSalesOrderRevision" => $dataSalesOrderRevision,
-            "dataSalesOrderSpecs" => $dataSalesOrderSpecs,
+            "dataSalesOrderSpecs" => $dataSalesExportSpecs,
             "dataSalesExportAdditional" => $dataSalesExportAdditional,
             "company" => $this->companyModel->where('id', $dataSO->company_id)->first(),
         ];
 
 
-        // dd($data['displayPrice']);
 
         // dd($data['dataSODetail']);
 

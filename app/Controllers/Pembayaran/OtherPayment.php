@@ -223,10 +223,12 @@ class OtherPayment extends BaseController
                 'jumlah_idr' => $detail['jumlah_idr'],
                 'keterangan' => $detail['keterangan'] ?? null,
                 // Logika konsisten dengan create:
-                'akun_kas' => $detail['akun_kas'], // Selalu debit dari detail
-                'akun_selisih' => $payload['jenis_pembayaran'] === 'PUTIH' 
+                'akun_kas' =>   $payload['jenis_pembayaran'] === 'PUTIH' 
                     ? $payload['akun_selisih'] 
-                    : $detail['akun_kas'] // Untuk MERAH, akun_selisih di child = akun_kas
+                    : $detail['akun_kas'], // Untuk MERAH, akun_selisih di child = akun_kas
+                'akun_selisih' => $payload['jenis_pembayaran'] === 'PUTIH' 
+                     ? $detail['akun_kas'] 
+                    : $payload['akun_selisih'] // Selalu debit dari detail
             ];
 
             if ($detailId && in_array($detailId, $existingDetailIds)) {

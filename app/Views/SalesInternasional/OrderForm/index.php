@@ -53,7 +53,7 @@
                             <tr>
                                 <th>No</th>
                                 <th onclick="changeSort('tanggal')" class="sort">Date</th>
-                                <th onclick="changeSort('divisi_id')" class="sort">Department</th>
+                                <!-- <th onclick="changeSort('divisi_id')" class="sort">Department</th> -->
                                 <th onclick="changeSort('sales_order_export_no')" class="sort">Order Form No</th>
                                 <th onclick="changeSort('customer_po_no')" class="sort">PO No</th>
                                 <th onclick="changeSort('customer_name')" class="sort">Buyer</th>
@@ -187,10 +187,6 @@
         }, {
             data: "tanggal",
             className: "text-left"
-        }, {
-            data: "divisi",
-            className: "text-left",
-
         }, {
             data: "sales_order_export_no",
             className: "text-left"

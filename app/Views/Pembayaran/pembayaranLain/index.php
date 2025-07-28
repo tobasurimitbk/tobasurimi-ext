@@ -21,7 +21,7 @@
 
                                 <div class="col-md-6">
                                     <div class="form-floating mb-3" style="height: 50px;">
-                                        <input autocomplete="one-time-code" type="text" class="form-control no_pembayaran" name="no_pembayaran" id="no_pembayaran" placeholder="No Pembayaran">
+                                        <input autocomplete="one-time-code" type="text" class="form-control no_pembayaran" name="no_pembayaran" id="no_pembayaran" placeholder="No Pembayaran" readonly>
                                         <label for="floatingInput">No Pembayaran</label>
                                     </div>
                                 </div>
@@ -638,7 +638,7 @@
             var kurs = destroyFormatRupiah($('#kurs').val() || 1);
             var jumlahIdr = destroyFormatRupiah($('#jumlah_idr').val() || 0);
 
-            $('#jumlah').val(greatFormatRupiah(jumlahIdr / kurs));
+            // $('#jumlah').val(greatFormatRupiah(jumlahIdr / kurs));
             $('#jumlah_idr').val(greatFormatRupiah(jumlah * kurs));
 
         });
@@ -749,11 +749,6 @@
                             $('#kurs').val(greatFormatRupiah(res.data.nilai_kurs));
                         }
                     } else {
-                        // Swal.fire({
-                        //     icon: 'error',
-                        //     title: res.message,
-                        //     confirmButtonColor: '#4e73df',
-                        // });
                         $('#kurs').val(greatFormatRupiah(1));
                     }
                 },
@@ -768,26 +763,36 @@
             });
         }
 
-        // When removing a detail
-        $(document).on('click', '.btn-remove-detail', function() {
-            // ... your existing code ...
-            refreshValidation();
-        });
-
         function updateDetail(index) {
             if (!validateDetails()) return;
 
-            const jenisPembayaran = $('#jenis_pembayaran').val();
+            const jenisPembayaran = $('#jenis_pembayaran option:selected').val();
+            
+            // Determine which account is which based on payment type
+            let akun_kas, akun_selisih, akun_kas_name, akun_selisih_name;
+            
+            if (jenisPembayaran == 'PUTIH') {
+                akun_kas = $('#akun_kas').val();
+                akun_selisih = $('#akun_selisih').val();
+                akun_kas_name = $('#akun_kas option:selected').text();
+                akun_selisih_name = $('#akun_selisih option:selected').text();
+            } else {
+                // For non-PUTIH, the accounts are reversed
+                akun_kas = $('#akun_selisih').val();
+                akun_selisih = $('#akun_kas').val();
+                akun_kas_name = $('#akun_selisih option:selected').text();
+                akun_selisih_name = $('#akun_kas option:selected').text();
+            }
             
             // Update detail
             details[index] = {
                 ...details[index],
                 tanggal: $('#tanggal').val(),
                 pembayaran_oleh: $('#pembayaran_oleh').val(),
-                akun_kas: $('#akun_kas').val(),
-                akun_kas_name: $('#akun_kas option:selected').text(),
-                akun_selisih: $('#akun_selisih').val(),
-                akun_selisih_name: $('#akun_selisih option:selected').text(),
+                akun_kas: akun_kas,
+                akun_kas_name: akun_kas_name,
+                akun_selisih: akun_selisih,
+                akun_selisih_name: akun_selisih_name,
                 keterangan: $('#keterangan').val(),
                 valas: $('#valas option:selected').text(),
                 valas_id: $('#valas option:selected').val(),
@@ -821,7 +826,9 @@
             updateDetail(index);
         });
         // Remove detail
-        $(document).on('click', '.btn-remove-detail', function() {
+        $(document).on('click', '.btn-remove-detail', function(e) {
+            e.preventDefault(); // Ini yang paling penting
+            e.stopPropagation();
             const index = $(this).data('index');
             details.splice(index, 1);
             refreshDetailsTable();
@@ -829,7 +836,7 @@
 
         // Function to update labels based on payment type
         function updateAccountLabels(jenis) {
-            if (jenis === 'PUTIH') {
+            if (jenis == 'PUTIH') {
                 // Update label
                 $('#akun_kas').parent().find('label').text('Debit');
                 $('#akun_selisih').parent().find('label').text('Kredit');
@@ -999,23 +1006,34 @@
             refreshValidation();
         });
 
+
         function refreshDetailsTable() {
             const tableBody = $('#detail-table tbody');
             tableBody.empty();
             
             let totalAllAmount = 0;
+            const jenisPembayaran = $('#jenis_pembayaran refreshDetailsTable').val(); // Ambil nilai dari dropdown
             
             details.forEach((detail, index) => {
-                // Format nilai sesuai kebutuhan
                 const jumlahIDR = formatRupiah(detail.jumlah_idr);
                 totalAllAmount += parseFloat(destroyFormatRupiah(detail.jumlah_idr));
                 
-                // Tampilkan data sesuai jenis pembayaran
+                // Determine column headers based on payment type
+                let creditCol, debitCol;
+                
+                if (jenisPembayaran == 'PUTIH') {
+                    creditCol = detail.akun_selisih_name; // Kredit
+                    debitCol = detail.akun_kas_name;      // Debit
+                } else {
+                    creditCol = detail.akun_kas_name;     // Kredit
+                    debitCol = detail.akun_selisih_name; // Debit
+                }
+                
                 const row = `
                     <tr>
                         <td>${detail.tanggal}</td>
-                        <td>${detail.jenis_pembayaran === 'PUTIH' ? detail.akun_selisih_name : detail.akun_kas_name}</td>
-                        <td>${detail.jenis_pembayaran === 'PUTIH' ? detail.akun_kas_name : detail.akun_selisih_name}</td>
+                        <td>${creditCol}</td>
+                        <td>${debitCol}</td>
                         <td>${detail.valas}</td>
                         <td>${detail.jumlah}</td>
                         <td>${detail.kurs}</td>
@@ -1026,7 +1044,7 @@
                             <button class="btn btn-sm btn-warning btn-edit-detail" data-index="${index}">
                                 <i class="fas fa-edit"></i>
                             </button>
-                            <button class="btn btn-sm btn-danger btn-delete-detail" data-index="${index}">
+                            <button class="btn btn-sm btn-danger btn-remove-detail" type="button" data-index="${index}">
                                 <i class="fas fa-trash"></i>
                             </button>
                         </td>
@@ -1034,17 +1052,23 @@
                 `;
                 tableBody.append(row);
             });
-            
+
+            updateTableHeaders(jenisPembayaran);
+
             // Update total amount
             $('#total_all_amount').val(formatRupiah(totalAllAmount.toString()));
         }
 
-        // Remove detail
-        $(document).on('click', '.btn-remove-detail', function() {
-            const index = $(this).data('index');
-            details.splice(index, -1);
-            refreshDetailsTable();
-        });
+
+        function updateTableHeaders(jenis) {
+            if (jenis == 'PUTIH') {
+                $('#detail-table thead tr th:nth-child(2)').text('Kredit');
+                $('#detail-table thead tr th:nth-child(3)').text('Debit');
+            } else {
+                $('#detail-table thead tr th:nth-child(2)').text('Debit');
+                $('#detail-table thead tr th:nth-child(3)').text('Kredit');
+            }
+        }
 
         // Clear detail form
         function clearDetailForm() {
@@ -1528,8 +1552,9 @@
 
     function editDetail(index) {
         const detail = details[index];
-        console.log(detail)
-        // Populate all form fields
+        const jenisPembayaran = $('#jenis_pembayaran option:selected').val();
+        
+        // Populate form fields
         $('#tanggal').val(detail.tanggal);
         $('#pembayaran_oleh').val(detail.pembayaran_oleh);
         $('#keterangan').val(detail.keterangan);
@@ -1537,16 +1562,30 @@
         $('#jumlah').val(detail.jumlah);
         $('#kurs').val(detail.kurs);
         $('#jumlah_idr').val(detail.jumlah_idr);
-        $('#akun_selisih').val(detail.akun_selisih).trigger('change');
-        $('#akun_kas').val(detail.akun_kas).trigger('change');
         
-        // Update editing index
+        // Handle account selection based on payment type
+        if (jenisPembayaran == 'PUTIH') {
+            $('#akun_kas').val(detail.akun_kas).trigger('change');
+            $('#akun_selisih').val(detail.akun_selisih).trigger('change');
+        } else {
+            // Swap the accounts for non-PUTIH payment type
+            $('#akun_kas').val(detail.akun_selisih).trigger('change');
+            $('#akun_selisih').val(detail.akun_kas).trigger('change');
+        }
+
+        // Update editing state
         editingIndex = index;
         
-        // Change button state
+        // Toggle buttons
         $('.btn-add-detail').hide();
         $('.btn-update-detail').show().data('index', index);
+        
+        // Scroll to detail form
+        $('html, body').animate({
+            scrollTop: $('.card-body').offset().top
+        }, 300);
     }
+
 
     // Clear detail form
     function clearDetailForm() {

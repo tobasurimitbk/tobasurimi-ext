@@ -6,6 +6,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= $salesKontrak['sales_contract_no'] ?></title>
     <style>
+        @media print {
+            body {
+                margin: 0;
+            }
+
+            @page {
+                size: 210mm 330mm;
+                margin: 20mm;
+            }
+        }
+
         .header {
             display: flex !important;
             justify-content: space-between !important;
@@ -78,7 +89,7 @@
 
         .label-header {
             font-weight: bold;
-            font-size: 11px;
+            font-size: 12px;
         }
 
         .po-customer {
@@ -102,7 +113,7 @@
             <?php if ($company['id'] != 15): ?>
                 <td>
                     <div style="text-align: right; margin-left:-20px; margin-right:40px; ">
-                        <img src="<?= $company['logo'] ?>" style="width: 120px; height:100px; text-align:right; margin-top:-17px" alt="">
+                        <img src="<?= $company['logo'] ?>" style="width: 140px; height:100px; text-align:right; margin-top:-17px" alt="">
                     </div>
                 </td>
             <?php endif; ?>
@@ -159,16 +170,52 @@
                     <h1 style="margin-top: -10px;">
                         <b><?= strtoupper($company['holding_company']) ?></b>
                     </h1>
-                    <table style="width: 100%; margin-top: -15px; font-size: 12px;">
-                        <tr>
-                            <td style="text-align: left;">
-                                <?= preg_replace('/[^\P{C}?]+/u', '', trim($company['factory'])) ?>
 
+                    <?php
+                    function spacedTextPreserveHTML($html)
+                    {
+                        return preg_replace_callback('/(<[^>]+>)|([^<]+)/u', function ($matches) {
+                            if (!empty($matches[1])) {
+                                // Jika ini adalah HTML tag, kembalikan tanpa perubahan
+                                return $matches[1];
+                            } else {
+                                // Proses teks biasa
+                                $text = $matches[2];
+                                $result = '';
+                                $length = mb_strlen($text, 'UTF-8');
+
+                                for ($i = 0; $i < $length; $i++) {
+                                    $char = mb_substr($text, $i, 1, 'UTF-8');
+
+                                    if ($char === ' ') {
+                                        $result .= '  '; // 2 spasi untuk spasi asli
+                                    } else {
+                                        $result .= $char . ' '; // tambahkan spasi setelah setiap huruf
+                                    }
+                                }
+
+                                return rtrim($result); // Hapus spasi ekstra di akhir
+                            }
+                        }, $html);
+                    }
+
+
+
+                    // Bersihkan karakter aneh
+                    $factoryText = preg_replace('/[^\P{C}?]+/u', '', $company['factory']);
+
+                    // Proses dengan aman
+                    $factoryTextWithSpacing = spacedTextPreserveHTML($factoryText);
+                    ?>
+
+                    <table style="width: 100%; margin-top: -15px; font-size: 13px;">
+                        <tr>
+                            <td style="text-align: justify;">
+                                <?= $factoryTextWithSpacing ?>
                             </td>
                         </tr>
                     </table>
                 </td>
-
             <?php endif; ?>
         </tr>
     </table>
@@ -177,9 +224,9 @@
         <div class="txt-center"><label class="label-header">SALES CONTRACT</label></div>
         <div class="txt-center"><label class="label-header">NO. <?= $salesKontrak['sales_contract_no']; ?></label></div>
         <div class="d-flex flex-column">
-            <div class="txt-left">
-                <label class="label-header">DATE: <?= date('F d, Y', strtotime($salesKontrak['createdAt'])); ?></label>
-            </div>
+            <!-- <div class="txt-left">
+                <label class="label-header">DATE: </label>
+            </div> -->
             <div class="txt-right po-customer">
                 <?php if (!empty($salesKontrak['customer_po_no'])): ?>
                     <label class="label-header">PO NO: <?= $salesKontrak['customer_po_no']; ?></label>
@@ -198,30 +245,75 @@
 
         </div>
         <div class="d-flex flex-column">
-            <div class="txt-left">
-                <label class="label-header">SELLER: PT.TOBA SURIMI INDUSTRIES</label>
-            </div>
-            <div class="txt-left">
-                <label class="label-header">BUYER: <?= $salesKontrak['customer_name']; ?></label>
-            </div>
-            <div class="txt-left">
-                <label class="label-header">BANK: <?= $salesKontrak['nama_bank']; ?></label>
-            </div>
-            <div class="txt-left">
-                <label class="label-header">SWIFT CODE: <?= $salesKontrak['kode_bank']; ?></label>
-            </div>
-            <div class="txt-left">
-                <label class="label-header">ACCOUNT # : <?= $salesKontrak['no_rekening']; ?></label>
-            </div>
-            <div class="txt-left">
-                <label class="label-header">BENEFICIARY # : <?= $salesKontrak['atas_nama']; ?></label>
-            </div>
-            <!-- <div class="txt-right rev-customer">
-                <label class="label-header">Revision: <?= $salesKontrak['jumlah_unpost']; ?></label>
-            </div> -->
+            <table>
+                <tr>
+                    <td>
+                        <label class="label-header">DATE</label>
+                    </td>
+                    <td>:</td>
+                    <td>
+                        <label class="label-header"><?= date('F d, Y', strtotime($salesKontrak['createdAt'])); ?></label>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="label-header">SELLER</label>
+                    </td>
+                    <td>:</td>
+                    <td>
+                        <label class="label-header"> <?= strtoupper(str_ireplace(', Tbk', '', $company['holding_company'])) ?></label>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="label-header">BUYER</label>
+                    </td>
+                    <td>:</td>
+                    <td>
+                        <label class="label-header"> <?= $salesKontrak['customer_name']; ?></label>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="label-header">BANK</label>
+                    </td>
+                    <td>:</td>
+                    <td>
+                        <label class="label-header"> <?= $salesKontrak['nama_bank']; ?></label>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="label-header">SWIFT CODE</label>
+                    </td>
+                    <td>:</td>
+                    <td>
+                        <label class="label-header"> <?= $salesKontrak['kode_bank']; ?></label>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="label-header">ACCOUNT # </label>
+                    </td>
+                    <td>:</td>
+                    <td>
+                        <label class="label-header"> <?= $salesKontrak['no_rekening']; ?></label>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="label-header">BENEFICIARY # </label>
+                    </td>
+                    <td>:</td>
+                    <td>
+                        <label class="label-header"> <?= $salesKontrak['atas_nama'] ?></label>
+                    </td>
+                </tr>
+            </table>
+
         </div>
         <div class="mt-1 justify-content-center">
-            <label class="label-header">
+            <label class="label-header" style="color: red;">
                 <?= $salesKontrak['banking_information'] ?>
             </label>
         </div>
@@ -276,7 +368,7 @@
             $currentItemSaleskontrakdetail = 0;
             foreach ($salesKontrakdetail as $key => $detail) {
                 $currentItemSaleskontrakdetail++;
-                $total_amount = $total_amount + formatter($detail["total_harga"], "STR_TO_INT");
+                $total_amount = $total_amount + formatter($detail["total_harga"], "STR_TO_FLOAT");
                 $total_qty += $detail['qty'];
             ?>
                 <tr style="border-bottom: 1px solid #eee;">
@@ -284,21 +376,38 @@
                     <td style="padding: 6px; border: 1px solid #ddd; vertical-align: top;">
                         <div style="font-weight: bold; font-size: 9px;"><?= $detail["nama_barang"]; ?></div>
                         <div style="font-size: 9px; margin-top: 4px; line-height: 1.4;">
-                            <?php if (!empty($detail['species'])): ?>
-                                <span style="display: inline-block; width: 65px; font-weight: bold;">SPECIES:</span> <?= trim($detail['species']) ?> <br>
-                            <?php endif; ?>
+                            <table>
+                                <?php if (!empty($detail['species'])): ?>
+                                    <tr>
+                                        <td style="display: inline-block; font-weight: bold; ">SPECIES</td>
+                                        <td>:</td>
+                                        <td><?= trim($detail['species']) ?></td>
+                                    </tr>
+                                <?php endif; ?>
+                                <?php if (!empty($detail['specs'])): ?>
+                                    <tr>
+                                        <td style="display: inline-block; font-weight: bold;">SPECS</td>
+                                        <td>:</td>
+                                        <td><?= trim($detail['specs']) ?></td>
+                                    </tr>
+                                <?php endif; ?>
+                                <?php if (!empty($detail['brand'])): ?>
+                                    <tr>
+                                        <td style="display: inline-block; font-weight: bold;">BRAND</td>
+                                        <td>:</td>
+                                        <td><?= trim($detail['brand']) ?></td>
+                                    </tr>
+                                <?php endif; ?>
+                                <?php if (!empty($detail['kemasan'])): ?>
+                                    <tr>
+                                        <td style="display: inline-block; font-weight: bold;">PACKING</td>
+                                        <td>:</td>
+                                        <td><?= trim($detail['kemasan']) ?></td>
+                                    </tr>
+                                <?php endif; ?>
 
-                            <?php if (!empty($detail['specs'])): ?>
-                                <span style="display: inline-block; width: 65px; font-weight: bold;">SPECS:</span> <?= trim($detail['specs']) ?> <br>
-                            <?php endif; ?>
+                            </table>
 
-                            <?php if (!empty($detail['brand'])): ?>
-                                <span style="display: inline-block; width: 65px; font-weight: bold;">BRAND:</span> <?= trim($detail['brand']) ?> <br>
-                            <?php endif; ?>
-
-                            <?php if (!empty($detail['kemasan'])): ?>
-                                <span style="display: inline-block; width: 65px; font-weight: bold;">PACKING:</span> <?= trim($detail['kemasan']) ?> <br>
-                            <?php endif; ?>
                         </div>
 
                         <?php if (!empty($detail['size_breakdown'])): ?>
@@ -316,7 +425,7 @@
                                 'inner_box' => ['label' => 'Inner', 'width' => '8%'],
                                 'pc' => ['label' => 'PC', 'width' => '7%'],
                                 'bag' => ['label' => 'Bag', 'width' => '7%'],
-                                'persen' => ['label' => '%', 'width' => '6%'],
+                                'persen' => ['label' => '%', 'width' => '3%'],
                                 'remark' => ['label' => 'Remarks', 'width' => '10%'],
                                 'palet' => ['label' => 'Pallet', 'width' => '10%']
                             ];
@@ -333,6 +442,7 @@
 
                             // Check if percentage column exists and should be shown
                             $show_persen_column = isset($columns_to_show['persen']);
+                            $show_cased_column = isset($columns_to_show['cased']);
                             ?>
 
                             <div style="margin-top: 6px;">
@@ -341,18 +451,22 @@
                                     <thead>
                                         <tr style="background-color: #f3f4f6;">
                                             <?php foreach ($columns_to_show as $col => $col_data): ?>
-                                                <?php if ($col != 'persen'): ?>
+                                                <?php if ($col != 'persen' && $col != 'cased'): ?>
                                                     <th style="padding: 3px; border: 1px solid #ddd; width: <?= $col_data['width'] ?>"><?= $col_data['label'] ?></th>
                                                 <?php endif; ?>
                                             <?php endforeach; ?>
 
-                                            <?php if ($show_persen_column): ?>
-                                                <th style="padding: 3px; border: 1px solid #ddd; width: 6%;text-align: right;">%</th>
+                                            <?php if ($show_cased_column): ?>
+                                                <th style="padding: 3px; border: 1px solid #ddd; width: 4%;text-align: right;">Case</th>
                                             <?php endif; ?>
 
-                                            <th style=" padding: 3px; border: 1px solid #ddd; width: 9%; text-align: right;">Qty</th>
-                                            <th style="padding: 3px; border: 1px solid #ddd; width: 10%; text-align: right;">Unit Price</th>
-                                            <th style="padding: 3px; border: 1px solid #ddd; width: 10%; text-align: right;">Total Amount</th>
+                                            <?php if ($show_persen_column): ?>
+                                                <th style="padding: 3px; border: 1px solid #ddd; width: 4%;text-align: right;">%</th>
+                                            <?php endif; ?>
+
+                                            <th style=" padding: 3px; border: 1px solid #ddd; width: 4%; text-align: right;">Qty</th>
+                                            <th style="padding: 3px; border: 1px solid #ddd; width: 4%; text-align: right;">Unit Price</th>
+                                            <th style="padding: 3px; border: 1px solid #ddd; width: 4%; text-align: right;">Total Amount</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -361,6 +475,8 @@
                                         $breakdown_total = 0;
                                         $breakdown_unit_price_total = 0;
                                         $breakdown_persen = 0;
+                                        $breakdown_cased = 0;
+
                                         foreach ($detail['size_breakdown'] as $breakdown):
                                             $breakdown_qty += $breakdown['qty'];
                                             $breakdown_total += $breakdown['total'];
@@ -369,13 +485,23 @@
                                                 $breakdown_persen += $breakdown['persen'];
                                                 $total_persen += $breakdown['persen'];
                                             }
+
+                                            if (isset($breakdown['cased']) && is_numeric($breakdown['cased'])) {
+                                                $breakdown_cased += $breakdown['cased'];
+                                            }
                                         ?>
                                             <tr>
                                                 <?php foreach ($columns_to_show as $col => $col_data): ?>
-                                                    <?php if ($col != 'persen'): ?>
+                                                    <?php if ($col != 'persen' && $col != 'cased'): ?>
                                                         <td style="padding: 3px; border: 1px solid #ddd;"><?= $breakdown[$col] ?></td>
                                                     <?php endif; ?>
                                                 <?php endforeach; ?>
+
+                                                <?php if ($show_cased_column): ?>
+                                                    <td style="padding: 3px; border: 1px solid #ddd; text-align: right;">
+                                                        <?= !empty($breakdown['cased']) ? number_format($breakdown['cased'], 2) : '' ?>
+                                                    </td>
+                                                <?php endif; ?>
 
                                                 <?php if ($show_persen_column): ?>
                                                     <td style="padding: 3px; border: 1px solid #ddd; text-align: right;">
@@ -389,9 +515,31 @@
                                             </tr>
                                         <?php endforeach; ?>
                                     </tbody>
+                                    <?php
+                                    // Hitung jumlah kolom utama (misalnya dari thead)
+                                    $base_columns = count($columns_to_show);
+
+                                    if ($show_cased_column) {
+                                        $base_columns -= 1;
+                                    }
+
+                                    if ($show_persen_column) {
+                                        $base_columns -= 1;
+                                    }
+
+                                    ?>
+
                                     <tfoot>
                                         <tr style="background-color: #e9ecef;">
-                                            <td colspan="<?= count($columns_to_show) - ($show_persen_column ? 1 : 0) ?>" style="padding: 3px; border: 1px solid #ddd; text-align: right; font-weight: bold;">TOTAL</td>
+                                            <td colspan="<?= $base_columns ?>" style="padding: 3px; border: 1px solid #ddd; text-align: right; font-weight: bold;">
+                                                TOTAL
+                                            </td>
+
+                                            <?php if ($show_cased_column): ?>
+                                                <td style="padding: 3px; border: 1px solid #ddd; text-align: right; font-weight: bold;">
+                                                    <?= $breakdown_cased > 0 ? number_format($breakdown_cased, 2) : '' ?>
+                                                </td>
+                                            <?php endif; ?>
 
                                             <?php if ($show_persen_column): ?>
                                                 <td style="padding: 3px; border: 1px solid #ddd; text-align: right; font-weight: bold;">
@@ -399,11 +547,16 @@
                                                 </td>
                                             <?php endif; ?>
 
-                                            <td style="padding: 3px; border: 1px solid #ddd; text-align: right; font-weight: bold;"><?= number_format($breakdown_qty, 2) . " " . $breakdown['satuan_size_code'] ?></td>
+                                            <td style="padding: 3px; border: 1px solid #ddd; text-align: right; font-weight: bold;">
+                                                <?= number_format($breakdown_qty, 2) . " " . $breakdown['satuan_size_code'] ?>
+                                            </td>
                                             <td style="padding: 3px; border: 1px solid #ddd; text-align: right; font-weight: bold;">-</td>
-                                            <td style="padding: 3px; border: 1px solid #ddd; text-align: right; font-weight: bold;"><?= number_format($breakdown_total, 2) ?></td>
+                                            <td style="padding: 3px; border: 1px solid #ddd; text-align: right; font-weight: bold;">
+                                                <?= number_format($breakdown_total, 2) ?>
+                                            </td>
                                         </tr>
                                     </tfoot>
+
                                 </table>
                             </div>
                         <?php endif; ?>
@@ -537,17 +690,17 @@
                             </td>
 
                             <!-- Kolom 2: Tabel Satuan -->
-                            <td style="width: auto; text-align: center; vertical-align: middle;">
+                            <td style="width: 10px ; text-align: center; ">
                                 <?php if ($currentItemSaleskontrakdetail === $totalSalesKontrakdetail): ?>
                                     <?php if (!empty($groupBySatuan)) : ?>
-                                        <table style="width: 15%; margin: 0 auto; border-collapse: collapse; font-size: 9px;">
-                                            <thead>
+                                        <table style="width:auto; margin: 0 auto; border-collapse: collapse; font-size: 9px;">
+                                            <!-- <thead>
                                                 <tr style="background-color: #f3f4f6;">
                                                     <?php foreach ($groupBySatuan as $satuan => $data): ?>
                                                         <th style="padding: 5px; border: 1px solid #ddd; text-align: right;"><?= $satuan ?></th>
                                                     <?php endforeach; ?>
                                                 </tr>
-                                            </thead>
+                                            </thead> -->
                                             <tbody>
                                                 <tr>
                                                     <?php
@@ -555,7 +708,9 @@
                                                     foreach ($groupBySatuan as $satuan => $data):
                                                         $grand_total_qty += $data['qty'];
                                                     ?>
-                                                        <td style="padding: 5px; border: 1px solid #ddd; text-align: right;"><?= number_format($data['qty'], 2) ?></td>
+                                                        <td style="padding: 5px; border: 1px solid #ddd; text-align: right;">
+                                                            <?= number_format($data['qty'], 2) ?> <?= $satuan ?>
+                                                        </td>
                                                     <?php endforeach; ?>
                                                 </tr>
                                             </tbody>
@@ -718,13 +873,13 @@
                     <label class="label-header"><?= $customer != null ? $customer['name'] : ''; ?></label>
                 </th>
                 <th>
-                    <label class="label-header">PT. TOBA SURIMI INDUSTRIES</label>
+                    <label class="label-header"><?= strtoupper(str_ireplace(', Tbk', '', $company['holding_company'])) ?></label>
                 </th>
             </tr>
         </thead>
         <tbody>
             <tr>
-                <td style="height: 80px;"></td>
+                <td style="height: 70px;"></td>
                 <td></td>
             </tr>
             <tr>

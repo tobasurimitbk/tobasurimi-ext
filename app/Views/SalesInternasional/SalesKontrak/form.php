@@ -105,7 +105,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-4">
+                    <!-- <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <select <?= !empty($dataSalesKontrak) ? ($dataSalesKontrak['status_posting'] ? 'disabled=true' : '') : ''; ?>
                                 class="form-select divisi_id"
@@ -122,7 +122,7 @@
                             </select>
                             <label for="floatingInput" style="z-index: 1;">Department</label>
                         </div>
-                    </div>
+                    </div> -->
                     <div class="col-md-4">
                         <div class="input-group">
                             <div class="form-floating mb-3" style="height: 50px;">
@@ -593,7 +593,7 @@
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" type="text" class="form-control case" name="case" id="case" placeholder="Case (Optional)">
+                                <input autocomplete="one-time-code" type="text" oninput="this.value = greatFormatRupiah(this.value)" class="form-control case" name="case" id="case" placeholder="Case (Optional)">
                                 <label for="floatingInput">Case (Optional)</label>
                             </div>
                         </div>
@@ -987,7 +987,7 @@
             var grade = $('#grade').val();
             var packing_size = $('#packing_size').val();
             var can = $('#can').val();
-            var cased = $('#case').val();
+            var cased = destroyFormatRupiah($('#case').val());
             var kg = $('#kg').val();
             var lb = $('#lb').val();
             var inner_box = $('#inner_box').val();
@@ -1288,9 +1288,9 @@
             print_out_broker: {
                 required: true
             },
-            divisi_id: {
-                required: true
-            },
+            // divisi_id: {
+            //     required: true
+            // },
             shipment_insurance: {
                 required: true
             },
@@ -1335,9 +1335,9 @@
             print_out_broker: {
                 required: "Broker printout is required"
             },
-            divisi_id: {
-                required: "Department selection is required"
-            },
+            // divisi_id: {
+            //     required: "Department selection is required"
+            // },
             shipment_insurance: {
                 required: "Shipment insurance is required"
             },
@@ -2049,7 +2049,7 @@
         $('#grade').val(item.grade);
         $('#packing_size').val(item.packing_size);
         $('#can').val(item.can);
-        $('#case').val(item.cased);
+        $('#case').val(greatFormatRupiah(item.cased));
         $('#kg').val(item.kg);
         $('#lb').val(item.lb);
         $('#inner_box').val(item.inner_box);
@@ -2296,7 +2296,7 @@
                 newRow.append($('<td>').text(item.grade));
                 newRow.append($('<td>').text(item.packing));
                 newRow.append($('<td>').text(item.can));
-                newRow.append($('<td>').text(item.case));
+                newRow.append($('<td>').text(greatFormatRupiah(item.cased)));
                 newRow.append($('<td>').text(item.kg));
                 newRow.append($('<td>').text(item.lb));
                 newRow.append($('<td>').text(item.inner_box));

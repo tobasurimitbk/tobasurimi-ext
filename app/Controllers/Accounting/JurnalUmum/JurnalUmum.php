@@ -2301,26 +2301,28 @@ class JurnalUmum extends BaseController
                     $result = [];
 
                     if ($otherPayment->jenis_pembayaran === 'PUTIH') {
-
+                        // PUTIH Logic: Parent Kredit, Child Debit
                         if ($isFirstTransaction) {
-                            $result[] = array(
+                            // Parent Entry (Kredit)
+                            $result[] = [
                                 'id_transaksi' => $id_transaksi_jurnal,
-                                'id_coa' => $detail['akun_selisih'],
+                                'id_coa' => $otherPayment->akun_selisih, // Parent COA for PUTIH
                                 'tanggal_jurnal' => $tanggal,
                                 'debit' => 0,
-                                'kredit' => $totalNominal, // Total semua nominal
+                                'kredit' => $totalNominal,
                                 'valas' => $detail['valas_id'],
                                 'kurs' => $detail['kurs'],
                                 'company_id' => $otherPayment->company_id,
                                 'divisi_id' => $otherPayment->divisi_id,
                                 'keterangan' => $otherPayment->keterangan,
                                 'id_inputer' => session()->get("login")->user_id
-                            );
+                            ];
                         }
 
-                        $result[] = array(
+                        // Child Entry (Debit)
+                        $result[] = [
                             'id_transaksi' => $id_transaksi_jurnal,
-                            'id_coa' => $detail['akun_kas'],
+                            'id_coa' => $detail['akun_kas'], // Debit from detail
                             'tanggal_jurnal' => $tanggal,
                             'debit' => $nominal,
                             'kredit' => 0,
@@ -2330,14 +2332,16 @@ class JurnalUmum extends BaseController
                             'divisi_id' => $otherPayment->divisi_id,
                             'keterangan' => $detail['keterangan'],
                             'id_inputer' => session()->get("login")->user_id
-                        );
+                        ];
                     } else {
+                        // MERAH Logic: Parent Debit, Child Kredit
                         if ($isFirstTransaction) {
-                            $result[] = array(
+                            // Parent Entry (Debit)
+                            $result[] = [
                                 'id_transaksi' => $id_transaksi_jurnal,
-                                'id_coa' => $detail['akun_kas'],
+                                'id_coa' => $otherPayment->akun_kas, // Parent COA for MERAH
                                 'tanggal_jurnal' => $tanggal,
-                                'debit' => $totalNominal, // Total semua nominal
+                                'debit' => $totalNominal,
                                 'kredit' => 0,
                                 'valas' => $detail['valas_id'],
                                 'kurs' => $detail['kurs'],
@@ -2345,12 +2349,13 @@ class JurnalUmum extends BaseController
                                 'divisi_id' => $otherPayment->divisi_id,
                                 'keterangan' => $otherPayment->keterangan,
                                 'id_inputer' => session()->get("login")->user_id
-                            );
+                            ];
                         }
 
-                        $result[] = array(
+                        // Child Entry (Kredit)
+                        $result[] = [
                             'id_transaksi' => $id_transaksi_jurnal,
-                            'id_coa' => $detail['akun_selisih'],
+                            'id_coa' => $detail['akun_kas'], // Kredit from detail (special case for MERAH)
                             'tanggal_jurnal' => $tanggal,
                             'debit' => 0,
                             'kredit' => $nominal,
@@ -2360,7 +2365,7 @@ class JurnalUmum extends BaseController
                             'divisi_id' => $otherPayment->divisi_id,
                             'keterangan' => $detail['keterangan'],
                             'id_inputer' => session()->get("login")->user_id
-                        );
+                        ];
                     }
 
                     $this->jurnalUmumModel->insertJurnalBatch($result);
