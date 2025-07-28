@@ -748,7 +748,7 @@
         table.find('tbody').empty();
         var no = 1;
         $.each(res.list, function(i, v) {
-            totalPrice += v.price;
+            totalPrice += Number(v.price);
             var dateSplit = v.lpb_date.split('-');
             var newRow = $('<tr>');
             newRow.append($('<td>').text(no++));
@@ -791,11 +791,10 @@
         table.find('tbody').append(newRow5);
 
         var newRow7 = $('<tr>');
-        newRow7.append($('<td style="text-align:right;" colspan="6">').text('Sub Total'));
+        newRow7.append($('<td style="text-align:right;" colspan="6">').text(''));
         newRow7.append($('<td class="subtotal">').text(greatFormatRupiah(totalPrice)));
         newRow7.append($('<td class="subtotalNominal hidden" style="display: none;">').text(greatFormatRupiah(totalPrice)));
         table.find('tbody').append(newRow7);
-
         // let sisaPembayaran = subTotal - paymentDetail.amount;
         // var newRow9 = $('<tr>');
         // newRow9.append($('<td style="text-align:right;" colspan="6"><b>Sisa Pembayaran</b></td>'));
@@ -873,6 +872,7 @@
                     url: "<?= base_url("pembayaran-po-lokal-bp/posting"); ?>",
                     data: {
                         id: id,
+                        status: 1,
                     },
                     beforeSend: function(xhr) {
                         setLoading();
