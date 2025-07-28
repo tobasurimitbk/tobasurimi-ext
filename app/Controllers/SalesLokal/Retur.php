@@ -467,6 +467,12 @@ class Retur extends BaseController
         $returnDataDetail = [];
 
         if ($returnData->sumber == "invoice") {
+            $dataReference = $this->soInvDetailModel
+                ->select('sales_order_invoice.id, sales_order_invoice.no_faktur as no_reference, GROUP_CONCAT(barang_master_sales.barang_name) as barang_name')
+                ->join('sales_order_invoice', 'sales_order_invoice.id = sales_order_invoice_detail.id_sales_order_invoice', 'left')
+                ->join('barang_master_sales', 'barang_master_sales.id = sales_order_invoice_detail.id_barang_invoice', 'left')
+                ->where('sales_order_invoice.id_customer', $returnData->id_customer)
+                ->findAll();
             $returnDataDetail = $this->soReturnDetailModel->asObject()
                 ->select('sales_order_return_detail.qty_return as qtyReturn, 
                     sales_order_return_detail.id_barang_return as id_barang, 
@@ -474,6 +480,7 @@ class Retur extends BaseController
                     sales_order_invoice_detail.qty_invoice as qty, 
                     sales_order_return_detail.amount_return as amount, 
                     sales_order_return_detail.discount_percentage_return as disc, 
+                    sales_order_return_detail.discount_unit_return as discUnit, 
                     sales_order_return_detail.harga_barang_return as harga_barang, 
                     barang_master_sales.kode_barang as kode_barang, 
                     barang_master_sales.barang_name as nama_barang, 
@@ -487,6 +494,13 @@ class Retur extends BaseController
                 ->where('sales_order_invoice_detail.id_sales_order_invoice',  $returnData->id_invoice)
                 ->findAll();
         } else if ($returnData->sumber == "order_form") {
+            $dataReference = $this->soDetailModel
+                ->select('sales_order.id, sales_order.no_sales_order as no_reference, GROUP_CONCAT(barang_master_sales.barang_name) as barang_name')
+                ->join('sales_order', 'sales_order.id = sales_order_detail.id_sales_order', 'left')
+                ->join('barang_master_sales', 'barang_master_sales.id = sales_order_detail.id_barang', 'left')
+                ->where('sales_order.id_customer', $returnData->id_customer)
+                ->groupBy('sales_order_detail.id_sales_order')
+                ->findAll();
             $returnDataDetail = $this->soReturnDetailModel->asObject()
                 ->select('sales_order_return_detail.qty_return as qtyReturn, 
                     sales_order_return_detail.id_barang_return as id_barang, 
@@ -494,6 +508,7 @@ class Retur extends BaseController
                     sales_order_detail.qty as qty, 
                     sales_order_return_detail.amount_return as amount, 
                     sales_order_return_detail.discount_percentage_return as disc, 
+                    sales_order_return_detail.discount_unit_return as discUnit, 
                     sales_order_return_detail.harga_barang_return as harga_barang, 
                     barang_master_sales.kode_barang as kode_barang, 
                     barang_master_sales.barang_name as nama_barang, 
@@ -507,6 +522,10 @@ class Retur extends BaseController
                 ->where('sales_order_detail.id_sales_order',  $returnData->id_invoice)
                 ->findAll();
         } else if ($returnData->sumber == "surat_jalan") {
+            $dataReference = $this->suratJalanSoModel
+                ->select('surat_jalan_so.id, surat_jalan_so.no_surat_jalan as no_reference')
+                ->where('surat_jalan_so.id_customer', $returnData->id_customer)
+                ->findAll();
             $suratJalan = $this->suratJalanSoModel
                 ->select('surat_jalan_so.id, surat_jalan_so.no_surat_jalan as no_reference, surat_jalan_so.multiple_id_so')
                 ->where('surat_jalan_so.id', $returnData->id_invoice)
@@ -527,6 +546,7 @@ class Retur extends BaseController
                     sales_order_detail.qty as qty, 
                     sales_order_return_detail.amount_return as amount, 
                     sales_order_return_detail.discount_percentage_return as disc, 
+                    sales_order_return_detail.discount_unit_return as discUnit, 
                     sales_order_return_detail.harga_barang_return as harga_barang, 
                     barang_master_sales.kode_barang as kode_barang, 
                     barang_master_sales.barang_name as nama_barang, 
@@ -555,14 +575,14 @@ class Retur extends BaseController
             ->where('company_id', $this->this_company_id)
             ->where('deletedAt', null)
             ->findAll();
-
-        $returnData->id_invoice = encrypt($returnData->id_invoice);
+            
         $returnData->id = encrypt($returnData->id);
 
         $data = [
             'data'                => $returnData,
             'dataDetail'          => $returnDataDetail,
             'dataCustomers'       => $customerList,
+            'dataReference'       => $dataReference,
             'invData'             => $invData,
             'dataWarehouse'       => $dataWarehouse,
         ];
@@ -573,7 +593,7 @@ class Retur extends BaseController
     {
         $postData = $this->request->getPost();
         $returnData = json_decode($postData["returnedItems"], true);
-
+        
         $rules = [
             "id_customer" => [
                 "rules" => "required|numeric",
@@ -581,10 +601,10 @@ class Retur extends BaseController
                     'required' => 'Customer tidak boleh kosong',
                 ]
             ],
-            "id_invoice" => [
+            "reference_id" => [
                 "rules" => "required",
                 "errors" => [
-                    "required" => 'Invoice tidak boleh kosong!'
+                    "required" => 'No reference tidak boleh kosong!'
                 ]
             ],
             "return_date" => [
@@ -619,7 +639,7 @@ class Retur extends BaseController
         }
 
         $returnDate = $postData['return_date'];
-        $idInvoice = decrypt($postData['id_invoice']);
+        $idInvoice = decrypt($postData['reference_id']);
 
         try {
 
@@ -653,7 +673,7 @@ class Retur extends BaseController
             }
 
             $data = [
-                "id"        => $postData['id_invoice'],
+                "id"        => $postData['reference_id'],
                 "status"    => true,
                 "message"   => "Data Berhasil disimpan",
                 'token'     => csrf_hash(),

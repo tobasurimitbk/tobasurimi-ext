@@ -76,6 +76,9 @@
                         <div class="form-floating mb-3" style="height: 50px;">
                             <select class="form-select reference_id" name="reference_id" id="reference_id">
                                 <option value=""></option>
+                                <?php foreach ($dataReference ?? [] as $value) : ?>
+                                    <option value="<?= $value['id']; ?>" <?= !empty($data) ? ($data->id_invoice === $value['id'] ? "selected" : "") : ""; ?>><?= $value['no_reference']; ?></option>
+                                <?php endforeach; ?>
                             </select>
                             <label for="floatingInput">No Reference</label>
                         </div>
@@ -208,8 +211,8 @@
     });
 
     $(document).ready(function() {
-        getReferenceData();
-        getReferenceDataDetail();
+        // getReferenceData();
+        // getReferenceDataDetail();
 
 
         // Customer
