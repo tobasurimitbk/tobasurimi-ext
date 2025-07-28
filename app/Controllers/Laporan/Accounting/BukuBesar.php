@@ -46,24 +46,33 @@ class BukuBesar extends BaseController
         $account = [];
 
         if (@$_POST['jenis_account'] == "header_account") {
-            $dataHeaderAccount = $this->HeaderAkunsModel->where('company_id', $this->this_company_id)->findAll();
+            $dataHeaderAccount = $this->HeaderAkunsModel
+                                    ->select('header_akuns.id, header_akuns.no_header, header_akuns.nama_header, companies.company')
+                                    ->join('companies', 'companies.id = header_akuns.company_id', 'left')
+                                    ->findAll();
             foreach ($dataHeaderAccount as $d) {
                 array_push($account, [
                     'id' => $d['id'],
                     'number' => $d['no_header'],
-                    'name' => $d['nama_header']
+                    'name' => $d['nama_header'],
+                    'company' => $d['company']
                 ]);
             }
         } else {
-            $dataSubAccount =  $this->Sub_AkunsModel->where('company_id', $this->this_company_id)->findAll();
+            $dataSubAccount =  $this->Sub_AkunsModel
+                                    ->select('sub_akuns.id, sub_akuns.no_sub, sub_akuns.nama_sub, companies.company')
+                                    ->join('companies', 'companies.id = sub_akuns.company_id', 'left')
+                                    ->findAll();
             foreach ($dataSubAccount as $d) {
                 array_push($account, [
                     'id' => $d['id'],
                     'number' => $d['no_sub'],
-                    'name' => $d['nama_sub']
+                    'name' => $d['nama_sub'],
+                    'company' => $d['company']
                 ]);
             }
         }
+
 
 
         if (!empty($this->request->getPost('dateStart')) && !empty($this->request->getPost('jenis_account')) && ($this->request->getPost('account_id') || $this->request->getPost('range_account_start_id'))) {

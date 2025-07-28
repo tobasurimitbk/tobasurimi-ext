@@ -86,7 +86,7 @@
                                     <option
                                         value="<?= $a['id']; ?>"
                                         <?= isset($_POST['account_id']) && in_array($a['id'], $_POST['account_id']) ? 'selected' : ''; ?>>
-                                        <?= $a['number'] . " " . $a['name']; ?>
+                                        <?= $a['number'] . " " . $a['name'] . " " . $a["company"]; ?>
                                     </option>
                                 <?php endforeach; ?>
                             </select>
