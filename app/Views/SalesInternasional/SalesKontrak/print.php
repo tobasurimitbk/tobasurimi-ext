@@ -214,7 +214,7 @@
                                     $char = mb_substr($text, $i, 1, 'UTF-8');
 
                                     if ($char === ' ') {
-                                        $result .= '  '; // 2 spasi untuk spasi asli
+                                        $result .= ''; // 2 spasi untuk spasi asli
                                     } else {
                                         $result .= $char . ' '; // tambahkan spasi setelah setiap huruf
                                     }
@@ -234,10 +234,41 @@
                     $factoryTextWithSpacing = spacedTextPreserveHTML($factoryText);
                     ?>
 
-                    <table style="width: 100%; margin-top: -15px; font-size: 13px;">
+                    <table style="width: 100%; margin-top: -15px; font-size: 14px;">
                         <tr>
                             <td style="text-align: justify;">
-                                <?= $factoryTextWithSpacing ?>
+                                <table style="font-size: 14px;">
+                                    <tr style="vertical-align: top;">
+                                        <td style="width: 60px;">Address</td>
+                                        <td style="width: 10px;">:</td>
+                                        <td style="letter-spacing: 1;">
+                                            Jalan Kima 7 / Kav. J-2, Kawasan Industri Makassar,
+                                            Makassar 90241, Sulawesi Selatan - INDONESIA
+                                        </td>
+                                    </tr>
+                                    <tr style="vertical-align: top;">
+                                        <td>Telp</td>
+                                        <td>:</td>
+                                        <td style="letter-spacing: 1;">
+                                            +62-411-514 827 ; 510 866 ; 510 687
+                                        </td>
+                                    </tr>
+                                    <tr style="vertical-align: top;">
+                                        <td>Fax</td>
+                                        <td>:</td>
+                                        <td style="letter-spacing: 1;">
+                                            +62-411-510 686
+                                        </td>
+                                    </tr>
+                                    <tr style="vertical-align: top;">
+                                        <td>Email</td>
+                                        <td>:</td>
+                                        <td style="letter-spacing: 1;">
+                                            oceanchampseafood@yahoo.com
+                                        </td>
+                                    </tr>
+                                </table>
+
                             </td>
                         </tr>
                     </table>
