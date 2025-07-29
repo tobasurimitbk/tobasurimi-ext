@@ -107,18 +107,19 @@
                         </div>
                     </div>
                     <div class="col-md-3">
-                        <div class="form-floating mb-3" style="height: 50px;">
+                        <div class="input-group">
                             <select class="form-select account-select" name="range_account_finish_id" id="range_account_finish_id">
                                 <!-- Opsi akan di-load secara dinamis -->
                             </select>
-                            <label for="floatingInput">Range Akhir Akun</label>
-                            <div class="input-group-append" style="height:50px;">
-                                <button class="btn btn-secondary" name="cariTanggal" type="submit">
-                                    <i class="fas fa-search"></i>
-                                </button>
-                            </div>
                         </div>
                     </div>
+                    <div class="col-md-4">
+                        <button class="btn btn-outline-secondary" type="submit" name="cariTanggal">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </div>
+
+
                 </div>
             </form>
             <?php if (count($jurnalUmum) > 0): ?>
