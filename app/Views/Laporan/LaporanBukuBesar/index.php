@@ -81,16 +81,10 @@
                     </div>
                     <div class="col-md-3">
                         <div class="form-floating" style="height: 50px;">
-                            <select class="form-select account_id" multiple name="account_id[]" id="account_id" onchange="changeAccount()">
-                                <?php foreach ($account as $a) : ?>
-                                    <option
-                                        value="<?= $a['id']; ?>"
-                                        <?= isset($_POST['account_id']) && in_array($a['id'], $_POST['account_id']) ? 'selected' : ''; ?>>
-                                        <?= $a['number'] . " " . $a['name'] . " " . $a["company"]; ?>
-                                    </option>
-                                <?php endforeach; ?>
+                            <select class="form-select account-select" name="account_id[]" id="account_id" multiple>
+                                <!-- Opsi akan di-load secara dinamis -->
                             </select>
-                            <label for="account_id">Pilih Akun (COA)</label>
+                            <label for="floatingInput">Pilih Akun (COA)</label>
                         </div>
                     </div>
                     <div class="col-md-3">
@@ -106,31 +100,18 @@
                     </div>
                     <div class="col-md-3">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <select class="form-select range_account_start_id" name="range_account_start_id" id="range_account_start_id" onchange="changeRangeAccount()">
-                                <option value="">Pilih Range Awal Akun</option>
-                                <?php foreach ($account as $a) : ?>
-                                    <option value="<?= $a['id']; ?>" <?= isset($_POST['range_account_start_id']) && $_POST['range_account_start_id'] == $a['id'] ? 'selected' : ''; ?>>
-                                        <?= $a['number'] . " " . $a['name']; ?>
-                                    </option>
-                                <?php endforeach; ?>
+                            <select class="form-select account-select" name="range_account_start_id" id="range_account_start_id">
+                                <!-- Opsi akan di-load secara dinamis -->
                             </select>
-                            <label for="range_account_start_id">Range Awal Akun</label>
+                            <label for="floatingInput">Range Awal Akun</label>
                         </div>
                     </div>
-
                     <div class="col-md-3">
-                        <div class="input-group mb-3">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <select class="form-select range_account_finish_id" name="range_account_finish_id" id="range_account_finish_id" onchange="changeRangeAccount()">
-                                    <option value="">Pilih Range Akhir Akun</option>
-                                    <?php foreach ($account as $a) : ?>
-                                        <option value="<?= $a['id']; ?>" <?= isset($_POST['range_account_finish_id']) && $_POST['range_account_finish_id'] == $a['id'] ? 'selected' : ''; ?>>
-                                            <?= $a['number'] . " " . $a['name']; ?>
-                                        </option>
-                                    <?php endforeach; ?>
-                                </select>
-                                <label for="range_account_finish_id">Range Akhir Akun</label>
-                            </div>
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <select class="form-select account-select" name="range_account_finish_id" id="range_account_finish_id">
+                                <!-- Opsi akan di-load secara dinamis -->
+                            </select>
+                            <label for="floatingInput">Range Akhir Akun</label>
                             <div class="input-group-append" style="height:50px;">
                                 <button class="btn btn-secondary" name="cariTanggal" type="submit">
                                     <i class="fas fa-search"></i>
@@ -138,14 +119,13 @@
                             </div>
                         </div>
                     </div>
-
                 </div>
             </form>
             <?php if (count($jurnalUmum) > 0): ?>
                 <div class="row">
                     <?php foreach ($jurnalUmum as $j): ?>
                         <div class="alert alert-secondary alert-dismissible fade show mt-3 text-black" role="alert">
-                            <b><?= $j['number'] ?> - <?= $j['name'] ?></b>
+                            <b><?= $j['number'] ?> - <?= $j['name'] ?> - <?= $j['company'] ?></b>
                         </div>
                         <div class="table-responsive">
                             <table class="table table-hover" id="myTable" width="100%" cellspacing="0">
@@ -254,10 +234,61 @@
 </section>
 
 <script>
+    
+        // Fungsi untuk memuat selected options
+        function loadSelectedOptions(selectElement, selectedIds) {
+            if (selectedIds && selectedIds.length > 0) {
+                $.ajax({
+                    url: '/laporan-accounting/bukubesar/get-sub-akun',
+                    data: { 
+                        ids: selectedIds,
+                        jenis_account: $('#jenis_account').val()
+                    },
+                    dataType: 'json'
+                }).done(function(data) {
+                    data.forEach(function(item) {
+                        var option = new Option(
+                            item.number + ' ' + item.name + ' ' + item.company,
+                            item.id,
+                            true,
+                            true
+                        );
+                        selectElement.append(option);
+                    });
+                    selectElement.trigger('change');
+                });
+            }
+        }
 
-</script>
+        // Inisialisasi Select2 untuk semua dropdown
+        function initSelect2() {
+            $('.account-select').select2({
+                placeholder: "Pilih Akun",
+                allowClear: true,
+                theme: "bootstrap-5",
+                ajax: {
+                    url: '/laporan-accounting/bukubesar/get-sub-akun',
+                    dataType: 'json',
+                    delay: 250,
+                    data: function(params) {
+                        return {
+                            search: params.term,
+                            jenis_account: $('#jenis_account').val()
+                        };
+                    },
+                    processResults: function(data) {
+                        return {
+                            results: data.map(item => ({
+                                id: item.id,
+                                text: item.number + ' ' + item.name + ' ' + item.company,
+                            }))
+                        };
+                    }
+                },
+                minimumInputLength: 1
+            });
+        }
 
-<script>
     $(document).ready(function() {
         // Mendapatkan tanggal saat ini
         var currentDate = new Date();
@@ -281,12 +312,25 @@
             autoclose: true
         });
 
-        //CSS SELECT2 FLOATING LABEL
-        $('.account_id').select2({
-            placeholder: "Pilih Account COA",
-            theme: "bootstrap-5",
-            allowClear: false
-        });
+        initSelect2();
+        
+        // Load selected options dari form submit
+        loadSelectedOptions(
+            $('#account_id'), 
+            <?= json_encode(isset($_POST['account_id']) ? $_POST['account_id'] : []) ?>
+        );
+        
+        loadSelectedOptions(
+            $('#range_account_start_id'), 
+            <?= json_encode(isset($_POST['range_account_start_id']) ? [$_POST['range_account_start_id']] : []) ?>
+        );
+        
+        loadSelectedOptions(
+            $('#range_account_finish_id'), 
+            <?= json_encode(isset($_POST['range_account_finish_id']) ? [$_POST['range_account_finish_id']] : []) ?>
+        );
+
+        
         $('.divisi_id').select2({
             placeholder: "Pilih Departemen",
             theme: "bootstrap-5",
@@ -297,16 +341,7 @@
             theme: "bootstrap-5",
             allowClear: false
         });
-        $('.range_account_start_id').select2({
-            placeholder: "Pilih Range Awal Akun",
-            theme: "bootstrap-5",
-            allowClear: true
-        });
-        $('.range_account_finish_id').select2({
-            placeholder: "Pilih Range Akhir Akun",
-            theme: "bootstrap-5",
-            allowClear: true
-        });
+
         $('.supplier_id').select2({
             placeholder: "Pilih Supplier",
             theme: "bootstrap-5",
