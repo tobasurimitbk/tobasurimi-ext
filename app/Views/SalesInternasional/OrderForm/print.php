@@ -97,6 +97,10 @@
         .label {
             font-size: 12px;
         }
+
+        body {
+            font-family: 'DejaVu Sans', sans-serif;
+        }
     </style>
 
     <?php if ($displayPrice == "false"): ?>
@@ -241,7 +245,7 @@
 
                     foreach ($dataSODetail['salesContractDetailList'] as $key => $detail) {
                         $currentItemSaleskontrakdetail++;
-                        $total_amount = $total_amount + formatter($detail["total_input"], "STR_TO_INT");
+                        $total_amount = $total_amount + formatter($detail["total_input"], "STR_TO_FLOAT");
                         $total_qty += $detail['qty_input'];
                     ?>
                         <tr style="border-bottom: 1px solid #eee;">
@@ -553,13 +557,13 @@
                                         <?php if ($currentItemSaleskontrakdetail === $totalSalesKontrakdetail): ?>
                                             <?php if (!empty($groupBySatuan)) : ?>
                                                 <table style="width: 15%; margin: 0 auto; border-collapse: collapse; font-size: 9px;">
-                                                    <thead>
+                                                    <!-- <thead>
                                                         <tr style="background-color: #f3f4f6;">
                                                             <?php foreach ($groupBySatuan as $satuan => $data): ?>
                                                                 <th style="padding: 5px; border: 1px solid #ddd; text-align: right;"><?= $satuan ?></th>
                                                             <?php endforeach; ?>
                                                         </tr>
-                                                    </thead>
+                                                    </thead> -->
                                                     <tbody>
                                                         <tr>
                                                             <?php
@@ -567,7 +571,7 @@
                                                             foreach ($groupBySatuan as $satuan => $data):
                                                                 $grand_total_qty += $data['qty_input'];
                                                             ?>
-                                                                <td style="padding: 5px; border: 1px solid #ddd; text-align: right;"><?= number_format($data['qty_input'], 2) ?></td>
+                                                                <td style="padding: 5px; border: 1px solid #ddd; text-align: right;"><?= number_format($data['qty_input'], 2) ?> <?= $satuan ?></td>
                                                             <?php endforeach; ?>
                                                         </tr>
                                                     </tbody>
@@ -588,6 +592,20 @@
             </table>
             <table border="1" style="width: 100%; border: 1px solid black; border-collapse: collapse;" class="label">
                 <tbody>
+                    <?php if ($dataSO->freight != ""): ?>
+                        <tr class="keep-together">
+                            <td>
+                                <b>
+                                    FREIGHT
+                                </b>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <?= $dataSO->freight ?>
+                            </td>
+                        </tr>
+                    <?php endif; ?>
                     <tr class="keep-together">
                         <td>
                             <b>
@@ -634,6 +652,14 @@
                                 </b>
                                 <br>
                                 <?= $dataSO->notify_party ?> <br>
+                            <?php endif; ?>
+
+                            <?php if ($dataSO->additional != ""): ?>
+                                <b>
+                                    - ADDITIONAL
+                                </b>
+                                <br>
+                                <?= $dataSO->additional ?> <br>
                             <?php endif; ?>
 
                             <?php if ($dataSO->additional_detail_docs != ""): ?>

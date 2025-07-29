@@ -872,6 +872,7 @@
                     url: "<?= base_url("pembayaran-po-lokal-bp/posting"); ?>",
                     data: {
                         id: id,
+                        divisi_id: $('#divisi_id option:selected').val(),
                         status: 1,
                     },
                     beforeSend: function(xhr) {

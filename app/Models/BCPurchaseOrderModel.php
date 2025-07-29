@@ -1075,4 +1075,6 @@ class BCPurchaseOrderModel extends Model
             'sortType'  => $sortType
         ];
     }
+
+    public function getListOutstandingBC40($condition, $addCondition, $limit = 10, $offset = 0) {}
 }

@@ -999,13 +999,15 @@ class PenerimaanBarangLokalBP extends BaseController
             if ($transaksiJurnal) {
                 $this->transaksiJurnalModel->where('penerimaan_barang_id', $id)->delete();
                 $this->jurnalUmumModel->where('id_transaksi', $transaksiJurnal['id']);
-            } else {
-                return response()->setJSON([
-                    'status' => false,
-                    'message' => "Gagal UnPosting : Jurnal Pembelian Tidak Ditemukan",
-                    'token' => csrf_hash()
-                ]);
             }
+
+            // else {
+            //     return response()->setJSON([
+            //         'status' => false,
+            //         'message' => "Gagal UnPosting : Jurnal Pembelian Tidak Ditemukan",
+            //         'token' => csrf_hash()
+            //     ]);
+            // }
 
             // foreach ($penerimaanBarangList as $p) {
 

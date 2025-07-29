@@ -38,46 +38,77 @@ class BukuBesar extends BaseController
         $this->divisiModel = new DivisisModel();
         $this->supplierModel = new SupplierModel();
     }
+
     public function index()
     {
         $divisi = $this->divisiModel->getDivisiAccess();
         $supplier = $this->supplierModel->where('company_id', $this->this_company_id)->where('deletedAt', null)->findAll();
 
-        $account = [];
-
-        if (@$_POST['jenis_account'] == "header_account") {
-            $dataHeaderAccount = $this->HeaderAkunsModel->where('company_id', $this->this_company_id)->findAll();
-            foreach ($dataHeaderAccount as $d) {
-                array_push($account, [
-                    'id' => $d['id'],
-                    'number' => $d['no_header'],
-                    'name' => $d['nama_header']
-                ]);
-            }
-        } else {
-            $dataSubAccount =  $this->Sub_AkunsModel->where('company_id', $this->this_company_id)->findAll();
-            foreach ($dataSubAccount as $d) {
-                array_push($account, [
-                    'id' => $d['id'],
-                    'number' => $d['no_sub'],
-                    'name' => $d['nama_sub']
-                ]);
-            }
-        }
-
-
         if (!empty($this->request->getPost('dateStart')) && !empty($this->request->getPost('jenis_account')) && ($this->request->getPost('account_id') || $this->request->getPost('range_account_start_id'))) {
             $dataJurnalUmum = $this->getDataBukuBesar();
         }
-
+        
         $data = [
             "supplier" => $supplier,
-            "account" => $account,
             "divisi" => $divisi,
             "jurnalUmum" => isset($dataJurnalUmum) ? $dataJurnalUmum : []
         ];
 
         return view('Laporan/LaporanBukuBesar/index', $data);
+    }
+
+    public function searchAccounts() {
+        $search = $this->request->getVar('search');
+        $jenisAccount = $this->request->getVar('jenis_account');
+        $ids = $this->request->getVar('ids'); // For handling selected options
+        
+        $results = [];
+        
+        if ($jenisAccount == "header_account") {
+            $headerBuilder = $this->HeaderAkunsModel
+                ->select('header_akuns.id, header_akuns.no_header as number, header_akuns.nama_header as name, companies.company')
+                ->join('companies', 'companies.id = header_akuns.company_id', 'left');
+                // ->where('header_akuns.company_id', $this->this_company_id);
+            
+            // If IDs are provided (for selected options)
+            if (!empty($ids)) {
+                $ids = is_array($ids) ? $ids : [$ids];
+                $headerBuilder->whereIn('header_akuns.id', $ids);
+                $results = $headerBuilder->orderBy('header_akuns.no_header', 'ASC')->findAll();
+            } 
+            // If searching
+            else if (!empty($search)) {
+                $headerBuilder->groupStart()
+                    ->like('header_akuns.no_header', $search)
+                    ->orLike('header_akuns.nama_header', $search)
+                    ->orLike('companies.company', $search)
+                    ->groupEnd();
+                $results = $headerBuilder->orderBy('header_akuns.no_header', 'ASC')->findAll(10);
+            }
+        } else {
+            $subBuilder = $this->Sub_AkunsModel
+                ->select('sub_akuns.id, sub_akuns.no_sub as number, sub_akuns.nama_sub as name, companies.company')
+                ->join('companies', 'companies.id = sub_akuns.company_id', 'left');
+                // ->where('sub_akuns.company_id', $this->this_company_id);
+            
+            // If IDs are provided (for selected options)
+            if (!empty($ids)) {
+                $ids = is_array($ids) ? $ids : [$ids];
+                $subBuilder->whereIn('sub_akuns.id', $ids);
+                $results = $subBuilder->orderBy('sub_akuns.no_sub', 'ASC')->findAll();
+            } 
+            // If searching
+            else if (!empty($search)) {
+                $subBuilder->groupStart()
+                    ->like('sub_akuns.no_sub', $search)
+                    ->orLike('sub_akuns.nama_sub', $search)
+                    ->orLike('companies.company', $search)
+                    ->groupEnd();
+                $results = $subBuilder->orderBy('sub_akuns.no_sub', 'ASC')->findAll(10);
+            }
+        }
+        
+        return $this->response->setJSON($results);
     }
 
     private function getDataBukuBesar()
@@ -167,22 +198,32 @@ class BukuBesar extends BaseController
         if (!empty($accountId)) {
             foreach ($accountId as $a) {
                 if ($jenisAccount == "sub_account") {
-                    $subAccount = $this->Sub_AkunsModel->find($a);
+                    $subAccount = $this->Sub_AkunsModel
+                                    ->where('sub_akuns.id', $a)
+                                    ->join('companies', 'companies.id = sub_akuns.company_id', 'left')
+                                    ->select('sub_akuns.*, companies.company')
+                                    ->first();
                     [$resultJurnalUmum, $saldoLama] = $fetchJurnalData([$a]);
                     $result[] = [
                         'id' => $subAccount['id'],
                         'number' => $subAccount['no_sub'],
+                        'company' => $subAccount['company'],
                         'name' => $subAccount['nama_sub'],
                         'saldo_lama' => $saldoLama,
                         'result' => $resultJurnalUmum,
                     ];
                 } else {
-                    $headerAccount = $this->HeaderAkunsModel->find($a);
+                    $headerAccount = $this->HeaderAkunsModel
+                                    ->where('header_akuns.id', $a)
+                                    ->join('companies', 'companies.id = header_akuns.company_id', 'left')
+                                    ->select('header_akuns.*, companies.company')
+                                    ->first();
                     $subAccountIds = $this->Sub_AkunsModel->where('header_id', $headerAccount['id'])->findColumn('id');
                     [$resultJurnalUmum, $saldoLama] = $fetchJurnalData($subAccountIds);
                     $result[] = [
                         'id' => $headerAccount['id'],
                         'number' => $headerAccount['no_header'],
+                        'company' => $subAccount['company'],
                         'name' => $headerAccount['nama_header'],
                         'saldo_lama' => $saldoLama,
                         'result' => $resultJurnalUmum,
@@ -192,7 +233,9 @@ class BukuBesar extends BaseController
         } elseif (!empty($rangeAccountStartId) && !empty($rangeAccountFinishId)) {
             $model = $jenisAccount == "sub_account" ? $this->Sub_AkunsModel : $this->HeaderAkunsModel;
             $accounts = $model->where('id >=', $rangeAccountStartId)
-                ->where('id <=', $rangeAccountFinishId)
+                ->where('sub_akuns.id <=', $rangeAccountFinishId)
+                ->join('companies', 'companies.id = sub_akuns.company_id', 'left')
+                ->select('sub_akuns.*, companies.company')
                 ->findAll();
             foreach ($accounts as $account) {
                 if ($jenisAccount == "sub_account") {
@@ -200,6 +243,7 @@ class BukuBesar extends BaseController
                     $result[] = [
                         'id' => $account['id'],
                         'number' => $account['no_sub'],
+                        'company' => $account['company'],
                         'name' => $account['nama_sub'],
                         'saldo_lama' => $saldoLama,
                         'result' => $resultJurnalUmum,
@@ -210,6 +254,7 @@ class BukuBesar extends BaseController
                     $result[] = [
                         'id' => $account['id'],
                         'number' => $account['no_header'],
+                        'company' => $account['company'],
                         'name' => $account['nama_header'],
                         'saldo_lama' => $saldoLama,
                         'result' => $resultJurnalUmum,

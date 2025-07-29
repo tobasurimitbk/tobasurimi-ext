@@ -162,6 +162,19 @@
                         </div>
                     </div>
                     <div class="col-md-4">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <div class="input-group input-group-password">
+                                <div class="form-floating mb-3" style="height: 50px;">
+                                    <input <?= !empty($dataSalesExport) ? ($dataSalesExport->status == "POSTED" ? 'readonly' : '') : '' ?> autocomplete="one-time-code" class="form-control input-picker actualy_shipment_date" id="actualy_shipment_date" name="actualy_shipment_date" placeholder="Actually Shipment Date" value="<?= !empty($dataSalesExport) ? ((!empty($dataSalesExport->actualy_shipment_date)) ? date('d/m/Y', strtotime($dataSalesExport->actualy_shipment_date)) : '') : '' ?>">
+                                    <label for="floatingInput">Actualy Shipment Date (Optional)</label>
+                                </div>
+                                <div class="input-group-prepend group-prepend-password align-items-center">
+                                    <i style="cursor: pointer; z-index: 99; margin-bottom: 8px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-po-date"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
                         <div class="form-floating mb-3">
                             <input <?= !empty($dataSalesExport) ? ($dataSalesExport->status == "POSTED" ? 'readonly' : '') : '' ?> autocomplete="one-time-code" value="<?= !empty($dataSalesExport) ? $dataSalesExport->tax_id : '' ?>" type="text" class="form-control tax_id" id="tax_id" name="tax_id" placeholder="Tax Id (Optional)">
                             <label for="floatingInput">Tax ID (Optional)</label>
@@ -177,6 +190,18 @@
                         <div class="form-floating mb-3">
                             <input <?= !empty($dataSalesExport) ? ($dataSalesExport->status == "POSTED" ? 'readonly' : '') : '' ?> autocomplete="one-time-code" type="text" class="form-control container" id="container" name="container" placeholder="No  Container" value="<?= !empty($dataSalesExport) ? $dataSalesExport->container : '' ?>">
                             <label for="floatingInput">No Container</label>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-floating mb-3">
+                            <input <?= !empty($dataSalesExport) ? ($dataSalesExport->status == "POSTED" ? 'readonly' : '') : '' ?> autocomplete="one-time-code" type="text" class="form-control freight" id="freight" name="freight" placeholder="Freight (Optional)" value="<?= !empty($dataSalesExport) ? $dataSalesExport->freight : '' ?>">
+                            <label for="floatingInput">Freight (Optional)</label>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-floating mb-3">
+                            <input <?= !empty($dataSalesExport) ? ($dataSalesExport->status == "POSTED" ? 'readonly' : '') : '' ?> autocomplete="one-time-code" type="text" class="form-control additional" id="additional" name="additional" placeholder="Additional (Optional)" value="<?= !empty($dataSalesExport) ? $dataSalesExport->additional : '' ?>">
+                            <label for="floatingInput">Additional (Optional)</label>
                         </div>
                     </div>
                     <div class="col-md-4">
@@ -1043,7 +1068,7 @@
             getDetailSalesKontrak();
         });
 
-        $("#tanggal").datepicker({
+        $("#tanggal,#actualy_shipment_date").datepicker({
             todayHighlight: true,
             format: "dd/mm/yyyy",
             orientation: "bottom auto",
@@ -1584,6 +1609,7 @@
             var document_required = $('#document_required').val();
             var payment_term = $('#payment_term').val();
 
+            console.log(listDataSalesKontrak);
 
             if (listDataSalesKontrak.length === 0) {
                 Swal.fire({
@@ -1605,116 +1631,147 @@
                 })
             } else {
 
-                if ($("#form-parent").valid()) {
-                    Swal.fire({
-                        icon: 'question',
-                        title: id ? 'Update Data ?' : 'Create Data ?',
-                        confirmButtonColor: '#4e73df',
-                        cancelButtonColor: '#d33',
-                        showCancelButton: true,
-                        reverseButtons: true,
-                        confirmButtonText: 'Save',
-                        cancelButtonText: 'Back',
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            // Init tiny ke textarea
-                            tinymce.triggerSave();
+                // Validasi Departemen
+                var itemFailed = null;
+                var sizeFailed = null;
+                $.each(listDataSalesKontrak.salesContractDetailList, function(i, v) {
+                    if (v.divisi_id == null || v.divisi_id == "") {
+                        itemFailed = v;
+                    }
 
-                            const csrf = $(`[name="${csrfToken}"]`);
-                            let data = new FormData(document.querySelector("#form-parent"));
-                            let royaltyPrice = destroyFormatRupiah($('#royalty_price').val());
-                            let rebatePrice = destroyFormatRupiah($('#rebate_price').val());
-                            let canDeductionPrice = destroyFormatRupiah($('#can_deduction_price').val());
-                            let estimatedFreightPrice = destroyFormatRupiah($('#estimated_freight_price').val());
-                            let paletFumigationPrice = destroyFormatRupiah($('#palet_fumigation_price').val());
-                            // let additionalDetailPrice = destroyFormatRupiah($('#additional_detail_price').val());
-                            let othersPrice = destroyFormatRupiah($('#others_price').val());
-
-                            data.set('royalty_price', royaltyPrice);
-                            data.set('rebate_price', rebatePrice);
-                            data.set('can_deduction_price', canDeductionPrice);
-                            data.set('estimated_freight_price', estimatedFreightPrice);
-                            data.set('palet_fumigation_price', paletFumigationPrice);
-                            // data.set('additional_detail_price', additionalDetailPrice);
-                            data.set('others_price', othersPrice);
-
-                            data.append("listDetailSpecs", JSON.stringify(listDetailSpecs));
-                            data.append("listDataSalesKontrak", JSON.stringify(listDataSalesKontrak));
-                            data.append("listAdditional", JSON.stringify(listAdditional));
-
-                            // UPDATE
-                            if (id) {
-                                $.ajax({
-                                    url: "<?= base_url("order-form-internasional/update"); ?>",
-                                    data: data,
-                                    beforeSend: function(xhr) {
-                                        setLoading();
-                                        xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                                    },
-                                    complete: function() {
-                                        stopLoading();
-                                    },
-                                    method: "POST",
-                                    dataType: "json",
-                                    processData: false,
-                                    contentType: false,
-                                    success: function(response) {
-                                        if (response.status) {
-                                            Swal.fire({
-                                                    icon: 'success',
-                                                    title: response.message,
-                                                    confirmButtonColor: '#4e73df',
-                                                })
-                                                .then(() => {
-                                                    window.location.href = "<?= base_url("order-form-internasional") ?>";
-                                                })
-                                        } else {
-                                            Swal.fire({
-                                                icon: 'error',
-                                                title: response.message,
-                                                confirmButtonColor: '#4e73df',
-                                            })
-                                        }
-                                    }
-                                });
-                            } else {
-                                $.ajax({
-                                    url: "<?= base_url("order-form-internasional/save"); ?>",
-                                    data: data,
-                                    beforeSend: function(xhr) {
-                                        setLoading();
-                                        xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                                    },
-                                    complete: function() {
-                                        stopLoading();
-                                    },
-                                    method: "POST",
-                                    dataType: "json",
-                                    processData: false,
-                                    contentType: false,
-                                    success: function(response) {
-                                        if (response.status) {
-                                            Swal.fire({
-                                                    icon: 'success',
-                                                    title: response.message,
-                                                    confirmButtonColor: '#4e73df',
-                                                })
-                                                .then(() => {
-                                                    window.location.href = "<?= base_url("order-form-internasional") ?>";
-                                                })
-                                        } else {
-                                            Swal.fire({
-                                                icon: 'error',
-                                                title: response.message,
-                                                confirmButtonColor: '#4e73df',
-                                            })
-                                        }
-                                    },
-
-                                });
-                            }
+                    $.each(v.size_breakdown, function(j, s) {
+                        if ((s.satuan_convertion_id == null || s.satuan_convertion_id == "") && s.qty != 0) {
+                            sizeFailed = s;
                         }
+                    });
+                });
+
+                if (itemFailed != null) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Department for item ' + itemFailed.barang_name + ' required !',
+                        confirmButtonColor: '#4e73df',
                     })
+                } else if (sizeFailed != null) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Fill in the Qty Order Form in Kg (red), if the goods are not included in the order form, fill in the qty with 0!',
+                        confirmButtonColor: '#4e73df',
+                    })
+                } else {
+
+                    if ($("#form-parent").valid()) {
+                        Swal.fire({
+                            icon: 'question',
+                            title: id ? 'Update Data ?' : 'Create Data ?',
+                            confirmButtonColor: '#4e73df',
+                            cancelButtonColor: '#d33',
+                            showCancelButton: true,
+                            reverseButtons: true,
+                            confirmButtonText: 'Save',
+                            cancelButtonText: 'Back',
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                // Init tiny ke textarea
+                                tinymce.triggerSave();
+
+                                const csrf = $(`[name="${csrfToken}"]`);
+                                let data = new FormData(document.querySelector("#form-parent"));
+                                let royaltyPrice = destroyFormatRupiah($('#royalty_price').val());
+                                let rebatePrice = destroyFormatRupiah($('#rebate_price').val());
+                                let canDeductionPrice = destroyFormatRupiah($('#can_deduction_price').val());
+                                let estimatedFreightPrice = destroyFormatRupiah($('#estimated_freight_price').val());
+                                let paletFumigationPrice = destroyFormatRupiah($('#palet_fumigation_price').val());
+                                // let additionalDetailPrice = destroyFormatRupiah($('#additional_detail_price').val());
+                                let othersPrice = destroyFormatRupiah($('#others_price').val());
+
+                                data.set('royalty_price', royaltyPrice);
+                                data.set('rebate_price', rebatePrice);
+                                data.set('can_deduction_price', canDeductionPrice);
+                                data.set('estimated_freight_price', estimatedFreightPrice);
+                                data.set('palet_fumigation_price', paletFumigationPrice);
+                                // data.set('additional_detail_price', additionalDetailPrice);
+                                data.set('others_price', othersPrice);
+
+                                data.append("listDetailSpecs", JSON.stringify(listDetailSpecs));
+                                data.append("listDataSalesKontrak", JSON.stringify(listDataSalesKontrak));
+                                data.append("listAdditional", JSON.stringify(listAdditional));
+
+                                // UPDATE
+                                if (id) {
+                                    $.ajax({
+                                        url: "<?= base_url("order-form-internasional/update"); ?>",
+                                        data: data,
+                                        beforeSend: function(xhr) {
+                                            setLoading();
+                                            xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                                        },
+                                        complete: function() {
+                                            stopLoading();
+                                        },
+                                        method: "POST",
+                                        dataType: "json",
+                                        processData: false,
+                                        contentType: false,
+                                        success: function(response) {
+                                            if (response.status) {
+                                                Swal.fire({
+                                                        icon: 'success',
+                                                        title: response.message,
+                                                        confirmButtonColor: '#4e73df',
+                                                    })
+                                                    .then(() => {
+                                                        window.location.href = "<?= base_url("order-form-internasional") ?>";
+                                                    })
+                                            } else {
+                                                Swal.fire({
+                                                    icon: 'error',
+                                                    title: response.message,
+                                                    confirmButtonColor: '#4e73df',
+                                                })
+                                            }
+                                        }
+                                    });
+                                } else {
+                                    $.ajax({
+                                        url: "<?= base_url("order-form-internasional/save"); ?>",
+                                        data: data,
+                                        beforeSend: function(xhr) {
+                                            setLoading();
+                                            xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                                        },
+                                        complete: function() {
+                                            stopLoading();
+                                        },
+                                        method: "POST",
+                                        dataType: "json",
+                                        processData: false,
+                                        contentType: false,
+                                        success: function(response) {
+                                            if (response.status) {
+                                                Swal.fire({
+                                                        icon: 'success',
+                                                        title: response.message,
+                                                        confirmButtonColor: '#4e73df',
+                                                    })
+                                                    .then(() => {
+                                                        window.location.href = "<?= base_url("order-form-internasional") ?>";
+                                                    })
+                                            } else {
+                                                Swal.fire({
+                                                    icon: 'error',
+                                                    title: response.message,
+                                                    confirmButtonColor: '#4e73df',
+                                                })
+                                            }
+                                        },
+
+                                    });
+                                }
+                            }
+                        })
+                    }
+
                 }
             }
 
@@ -2115,8 +2172,17 @@
                     <?php endif; ?>
                 `;
 
+                    var classCss = '';
+                    var styleColor = '';
+
+                    if ((size.satuan_convertion_id == null || size.satuan_convertion_id == "") && size.qty != 0) {
+                        classCss = 'bg-danger text-white';
+                        styleColor = 'color: white !important;font-weight:bold;';
+                    }
+
+
                     const row = `
-                <tr>
+                <tr class="${classCss}" style="${styleColor}">
                     <td>${size.size || ''}</td>
                     <td>${size.grade || ''}</td>
                     <td>${size.packing || ''}</td>

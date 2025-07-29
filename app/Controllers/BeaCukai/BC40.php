@@ -18,6 +18,7 @@ use App\Models\BCKontainerModel;
 use App\Models\BCPengangkutModel;
 use App\Models\BCPurchaseOrderModel;
 use App\Models\CeisaSettingModel;
+use App\Models\DivisisModel;
 use App\Models\HsCodesModel;
 use App\Models\KantorBeaCukaiModel;
 use App\Models\MetadataModel;
@@ -79,6 +80,7 @@ class BC40 extends BaseController
     protected $rmPurchaseOrderModel;
     protected $akunCeisa;
     protected $dompdf;
+    protected $divisiModel;
 
 
     public function __construct()
@@ -111,6 +113,7 @@ class BC40 extends BaseController
         $this->amPurchaseOrderModel = new AMPurchaseOrderModel();
         $this->rmPurchaseOrderModel = new RMPurchaseOrderModel();
         $this->dompdf = new Dompdf();
+        $this->divisiModel = new DivisisModel();
 
         $this->this_user_id = session()->get("login")->user_id;
         $this->this_company_id = session()->get("login")->this_company_id;
@@ -2340,7 +2343,411 @@ class BC40 extends BaseController
     }
     public function viewOutstanding()
     {
-        return view('BeaCukai/bc-40/bc40outstanding');
+        $data = [
+            'divisi' => $this->divisiModel->getDivisiAccess()
+        ];
+
+        return view('BeaCukai/bc-40/bc40outstanding', $data);
+    }
+    public function allOutstandingServerSide()
+    {
+        $draw = $this->request->getGet('draw');
+        $start = $this->request->getGet('start');
+        $length = $this->request->getGet('length');
+        $searchValue = $this->request->getGet('search');
+        $dateStart = $this->request->getVar("dateStart") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateStart")))) : "";
+        $dateEnd =  $this->request->getVar("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateEnd")))) : "";
+        $tipeBahan = $this->request->getGet('tipe_bahan');
+        $divisiId = $this->request->getGet('divisi_id');
+
+        $lpbUsed = $this->bcPurchaseOrderModel
+            ->where('company_id', $this->this_company_id)
+            ->where('deletedAt', null)
+            ->findAll();
+
+        $lpbUsedArr = [];
+        foreach ($lpbUsed as $used) {
+            $usedIds = json_decode($used['multiple_lpb_id']);
+            if (is_array($usedIds)) {
+                $lpbUsedArr = array_merge($lpbUsedArr, $usedIds);
+            }
+        }
+
+        $db = \Config\Database::connect();
+
+        $where = [];
+        if (!empty($dateStart) && !empty($dateEnd)) {
+            $where[] = "lpb_date BETWEEN '$dateStart' AND '$dateEnd'";
+        }
+        if (!empty($tipeBahan)) {
+            $where[] = "tipe_bahan = '$tipeBahan'";
+        }
+        if (!empty($divisiId)) {
+            $where[] = "divisis_id = '$divisiId'";
+        }
+        if (!empty($searchValue)) {
+            $search = $db->escapeLikeString($searchValue);
+            $where[] = "(supplier LIKE '%$search%' OR barang_name LIKE '%$search%' OR no_penerimaan_barang LIKE '%$search%' OR po_no LIKE '%$search%')";
+        }
+        if (!empty($lpbUsedArr)) {
+            $ids = implode(',', array_map('intval', $lpbUsedArr));
+            $where[] = "id NOT IN ($ids)";
+        }
+
+        $filterCondition = !empty($where) ? "WHERE " . implode(" AND ", $where) : "";
+
+        // UNION query
+        $mainQuery = "
+        SELECT * FROM (
+            SELECT 
+                pb.id,
+                pb.tanggal AS lpb_date,
+                pb.no_penerimaan_barang,
+                pb.status_penerimaan,
+                pb.tipe_bahan,
+                pb.jumlah_kemasan,
+                divisis.id as divisis_id,
+                divisis.divisi,
+                pod.po_no,
+                pod.po_date,
+                bm.barang_name,
+                bm.kode_barang,
+                s.name AS supplier,
+                satuan_lpb.kode_satuan AS kode_satuan_lpb,
+                satuan_po.kode_satuan AS kode_satuan_po,
+                satuan_kemasan.kode_satuan AS kode_satuan_kemasan,
+                kemasan.name AS nama_kemasan,
+                SUM(pbd.qty) AS qty_po,
+                SUM(pbd.jml_masuk) AS qty_lpb,
+                SUM(pbd.sub_total) AS sub_total
+            FROM penerimaan_barang pb
+            LEFT JOIN penerimaan_barang_detail pbd ON pbd.penerimaan_barang_id = pb.id
+            LEFT JOIN rm_purchase_orders pod ON pod.id = pbd.purchase_order_id
+            LEFT JOIN barang_master bm ON bm.id = pbd.barang_id
+            LEFT JOIN suppliers s ON s.id = pb.supplier_id
+            LEFT JOIN satuans satuan_lpb ON satuan_lpb.id = pbd.unit_konversi
+            LEFT JOIN satuans satuan_po ON satuan_po.id = pbd.unit
+            LEFT JOIN kemasan ON kemasan.id = pb.kemasan_id
+            LEFT JOIN satuans satuan_kemasan ON satuan_kemasan.id = kemasan.satuan_id
+            LEFT JOIN divisis ON divisis.id = pb.divisi_id
+            WHERE pb.tipe_bahan = 'BAKU'
+                AND pb.deletedAt IS NULL
+                AND pbd.deletedAt IS NULL
+                AND pb.status_penerimaan = 'LOKAL'
+                AND pb.status_post = 'FINISH'
+                AND pb.bc_type = '53'
+                AND pb.company_id = '{$this->this_company_id}'
+            GROUP BY pb.id, pbd.barang_id
+
+            UNION ALL
+
+            SELECT 
+                pb.id,
+                pb.tanggal AS lpb_date,
+                pb.no_penerimaan_barang,
+                pb.status_penerimaan,
+                pb.tipe_bahan,
+                pb.jumlah_kemasan,
+                divisis.id as divisis_id,
+                divisis.divisi,
+                pod.po_no,
+                pod.po_date,
+                bm.barang_name,
+                bm.kode_barang,
+                s.name AS supplier,
+                satuan_lpb.kode_satuan AS kode_satuan_lpb,
+                satuan_po.kode_satuan AS kode_satuan_po,
+                satuan_kemasan.kode_satuan AS kode_satuan_kemasan,
+                kemasan.name AS nama_kemasan,
+                SUM(pbd.qty) AS qty_po,
+                SUM(pbd.jml_masuk) AS qty_lpb,
+                SUM(pbd.sub_total) AS sub_total
+            FROM penerimaan_barang pb
+            LEFT JOIN penerimaan_barang_detail pbd ON pbd.penerimaan_barang_id = pb.id
+            LEFT JOIN am_purchase_orders pod ON pod.id = pbd.purchase_order_id
+            LEFT JOIN barang_master bm ON bm.id = pbd.barang_id
+            LEFT JOIN suppliers s ON s.id = pb.supplier_id
+            LEFT JOIN satuans satuan_lpb ON satuan_lpb.id = pbd.unit_konversi
+            LEFT JOIN satuans satuan_po ON satuan_po.id = pbd.unit
+            LEFT JOIN kemasan ON kemasan.id = pb.kemasan_id
+            LEFT JOIN satuans satuan_kemasan ON satuan_kemasan.id = kemasan.satuan_id
+            LEFT JOIN divisis ON divisis.id = pb.divisi_id
+            WHERE pb.tipe_bahan = 'PENOLONG'
+                AND pb.deletedAt IS NULL
+                AND pbd.deletedAt IS NULL
+                AND pb.status_penerimaan = 'LOKAL'
+                AND pb.status_post = 'FINISH'
+                AND pb.bc_type = '53'
+                AND pb.company_id = '{$this->this_company_id}'
+            GROUP BY pb.id, pbd.barang_id
+        ) AS dropdown
+        $filterCondition
+    ";
+
+        // Get total filtered records
+        $countQuery = $db->query($mainQuery);
+        $totalFiltered = count($countQuery->getResultArray());
+        $totalRecords = $totalFiltered;
+
+        // Add pagination
+        $mainQuery .= " LIMIT $length OFFSET $start";
+
+        $data = $db->query($mainQuery)->getResultArray();
+
+        $formatted = [];
+        $no = $start + 1;
+
+        foreach ($data as $row) {
+            $formatted[] = [
+                'no' => $no++,
+                'tipe_bahan' => "LOKAL " . $row['tipe_bahan'],
+                'divisi' => $row['divisi'],
+                'supplier' => $row['supplier'],
+                'po_date' => date('d/m/Y', strtotime($row['po_date'])),
+                'lpb_date' => date('d/m/Y', strtotime($row['lpb_date'])),
+                'no_penerimaan_barang' => $row['no_penerimaan_barang'],
+                'po_no' => $row['po_no'],
+                'kode_barang' => $row['kode_barang'],
+                'barang' => $row['barang_name'],
+                'qty_po' => number_format($row['qty_po'], 2) . " " . $row['kode_satuan_po'],
+                'qty_lpb' => number_format($row['qty_lpb'], 2) . " " . $row['kode_satuan_lpb'],
+                'kemasan' => $row['nama_kemasan'],
+                'qty_kemasan' => number_format($row['jumlah_kemasan'], 2) . " " . $row['kode_satuan_kemasan'],
+                'sub_total' => number_format($row['sub_total'], 2),
+            ];
+        }
+
+        return $this->response->setJSON([
+            'draw' => intval($draw),
+            'recordsTotal' => $totalRecords,
+            'recordsFiltered' => $totalFiltered,
+            'data' => $formatted,
+        ]);
+    }
+
+    public function allOutstandingExcel()
+    {
+        $dateStart = $this->request->getVar("dateStart") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateStart")))) : "";
+        $dateEnd =  $this->request->getVar("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateEnd")))) : "";
+        $tipeBahan = $this->request->getGet('tipe_bahan');
+        $divisiId = $this->request->getGet('divisi_id');
+
+        $lpbUsed = $this->bcPurchaseOrderModel
+            ->where('company_id', $this->this_company_id)
+            ->where('deletedAt', null)
+            ->findAll();
+
+        $lpbUsedArr = [];
+        foreach ($lpbUsed as $used) {
+            $usedIds = json_decode($used['multiple_lpb_id']);
+            if (is_array($usedIds)) {
+                $lpbUsedArr = array_merge($lpbUsedArr, $usedIds);
+            }
+        }
+
+        $db = \Config\Database::connect();
+
+        $where = [];
+        if (!empty($dateStart) && !empty($dateEnd)) {
+            $where[] = "lpb_date BETWEEN '$dateStart' AND '$dateEnd'";
+        }
+        if (!empty($tipeBahan)) {
+            $where[] = "tipe_bahan = '$tipeBahan'";
+        }
+        if (!empty($divisiId)) {
+            $where[] = "divisis_id = '$divisiId'";
+        }
+        if (!empty($searchValue)) {
+            $search = $db->escapeLikeString($searchValue);
+            $where[] = "(supplier LIKE '%$search%' OR barang_name LIKE '%$search%' OR no_penerimaan_barang LIKE '%$search%' OR po_no LIKE '%$search%')";
+        }
+        if (!empty($lpbUsedArr)) {
+            $ids = implode(',', array_map('intval', $lpbUsedArr));
+            $where[] = "id NOT IN ($ids)";
+        }
+
+        $filterCondition = !empty($where) ? "WHERE " . implode(" AND ", $where) : "";
+
+        // UNION query
+        $mainQuery = "
+        SELECT * FROM (
+            SELECT 
+                pb.id,
+                pb.tanggal AS lpb_date,
+                pb.no_penerimaan_barang,
+                pb.status_penerimaan,
+                pb.tipe_bahan,
+                pb.jumlah_kemasan,
+                divisis.id as divisis_id,
+                divisis.divisi,
+                pod.po_no,
+                pod.po_date,
+                bm.barang_name,
+                bm.kode_barang,
+                s.name AS supplier,
+                satuan_lpb.kode_satuan AS kode_satuan_lpb,
+                satuan_po.kode_satuan AS kode_satuan_po,
+                satuan_kemasan.kode_satuan AS kode_satuan_kemasan,
+                kemasan.name AS nama_kemasan,
+                SUM(pbd.qty) AS qty_po,
+                SUM(pbd.jml_masuk) AS qty_lpb,
+                SUM(pbd.sub_total) AS sub_total
+            FROM penerimaan_barang pb
+            LEFT JOIN penerimaan_barang_detail pbd ON pbd.penerimaan_barang_id = pb.id
+            LEFT JOIN rm_purchase_orders pod ON pod.id = pbd.purchase_order_id
+            LEFT JOIN barang_master bm ON bm.id = pbd.barang_id
+            LEFT JOIN suppliers s ON s.id = pb.supplier_id
+            LEFT JOIN satuans satuan_lpb ON satuan_lpb.id = pbd.unit_konversi
+            LEFT JOIN satuans satuan_po ON satuan_po.id = pbd.unit
+            LEFT JOIN kemasan ON kemasan.id = pb.kemasan_id
+            LEFT JOIN satuans satuan_kemasan ON satuan_kemasan.id = kemasan.satuan_id
+            LEFT JOIN divisis ON divisis.id = pb.divisi_id
+            WHERE pb.tipe_bahan = 'BAKU'
+                AND pb.deletedAt IS NULL
+                AND pbd.deletedAt IS NULL
+                AND pb.status_penerimaan = 'LOKAL'
+                AND pb.status_post = 'FINISH'
+                AND pb.bc_type = '53'
+                AND pb.company_id = '{$this->this_company_id}'
+            GROUP BY pb.id, pbd.barang_id
+
+            UNION ALL
+
+            SELECT 
+                pb.id,
+                pb.tanggal AS lpb_date,
+                pb.no_penerimaan_barang,
+                pb.status_penerimaan,
+                pb.tipe_bahan,
+                pb.jumlah_kemasan,
+                divisis.id as divisis_id,
+                divisis.divisi,
+                pod.po_no,
+                pod.po_date,
+                bm.barang_name,
+                bm.kode_barang,
+                s.name AS supplier,
+                satuan_lpb.kode_satuan AS kode_satuan_lpb,
+                satuan_po.kode_satuan AS kode_satuan_po,
+                satuan_kemasan.kode_satuan AS kode_satuan_kemasan,
+                kemasan.name AS nama_kemasan,
+                SUM(pbd.qty) AS qty_po,
+                SUM(pbd.jml_masuk) AS qty_lpb,
+                SUM(pbd.sub_total) AS sub_total
+            FROM penerimaan_barang pb
+            LEFT JOIN penerimaan_barang_detail pbd ON pbd.penerimaan_barang_id = pb.id
+            LEFT JOIN am_purchase_orders pod ON pod.id = pbd.purchase_order_id
+            LEFT JOIN barang_master bm ON bm.id = pbd.barang_id
+            LEFT JOIN suppliers s ON s.id = pb.supplier_id
+            LEFT JOIN satuans satuan_lpb ON satuan_lpb.id = pbd.unit_konversi
+            LEFT JOIN satuans satuan_po ON satuan_po.id = pbd.unit
+            LEFT JOIN kemasan ON kemasan.id = pb.kemasan_id
+            LEFT JOIN satuans satuan_kemasan ON satuan_kemasan.id = kemasan.satuan_id
+            LEFT JOIN divisis ON divisis.id = pb.divisi_id
+            WHERE pb.tipe_bahan = 'PENOLONG'
+                AND pb.deletedAt IS NULL
+                AND pbd.deletedAt IS NULL
+                AND pb.status_penerimaan = 'LOKAL'
+                AND pb.status_post = 'FINISH'
+                AND pb.bc_type = '53'
+                AND pb.company_id = '{$this->this_company_id}'
+            GROUP BY pb.id, pbd.barang_id
+        ) AS dropdown
+        $filterCondition
+    ";
+
+        $data = $db->query($mainQuery)->getResultArray();
+
+        $formatted = [];
+        $no = 1;
+
+        foreach ($data as $row) {
+            $formatted[] = [
+                'no' => $no++,
+                'tipe_bahan' => "LOKAL " . $row['tipe_bahan'],
+                'divisi' => $row['divisi'],
+                'supplier' => $row['supplier'],
+                'po_date' => date('d/m/Y', strtotime($row['po_date'])),
+                'lpb_date' => date('d/m/Y', strtotime($row['lpb_date'])),
+                'no_penerimaan_barang' => $row['no_penerimaan_barang'],
+                'po_no' => $row['po_no'],
+                'kode_barang' => $row['kode_barang'],
+                'barang' => $row['barang_name'],
+                'qty_po' => number_format($row['qty_po'], 2),
+                'satuan_po' => $row['kode_satuan_po'],
+                'qty_lpb' => number_format($row['qty_lpb'], 2),
+                'satuan_lpb' => $row['kode_satuan_lpb'],
+                'kemasan' => $row['nama_kemasan'],
+                'qty_kemasan' => number_format($row['jumlah_kemasan'], 2),
+                'satuan_kemasan' => $row['kode_satuan_kemasan'],
+                'sub_total' => number_format($row['sub_total'], 2),
+            ];
+        }
+
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+
+        $spreadsheet->setActiveSheetIndex(0)
+            ->setCellValue('A1', 'No')
+            ->setCellValue('B1', 'Tipe Bahan')
+            ->setCellValue('C1', 'Departemen')
+            ->setCellValue('D1', 'Supplier')
+            ->setCellValue('E1', 'Tgl PO')
+            ->setCellValue('F1', 'Tgl LPB')
+            ->setCellValue('G1', 'No LPB')
+            ->setCellValue('H1', 'No PO')
+            ->setCellValue('I1', 'Kode')
+            ->setCellValue('J1', 'Barang')
+            ->setCellValue('K1', 'Qty PO')
+            ->setCellValue('L1', 'Satuan PO')
+            ->setCellValue('M1', 'Qty LPB')
+            ->setCellValue('N1', 'Satuan LPB')
+            ->setCellValue('O1', 'Kemasan')
+            ->setCellValue('P1', 'Qty Kemasan')
+            ->setCellValue('Q1', 'Satuan Kemasan')
+            ->setCellValue('R1', 'Sub Total');
+
+        $no = 1;
+        $column = 2;
+
+        foreach ($formatted as $f) {
+            $spreadsheet->setActiveSheetIndex(0)
+                ->setCellValue('A' . $column, $no++)
+                ->setCellValue('B' . $column,  $f['tipe_bahan'])
+                ->setCellValue('C' . $column,  $f['divisi'])
+                ->setCellValue('D' . $column, $f['supplier'])
+                ->setCellValue('E' . $column, $f['po_date'])
+                ->setCellValue('F' . $column,  $f['lpb_date'])
+                ->setCellValue('G' . $column,  $f['no_penerimaan_barang'])
+                ->setCellValue('H' . $column,  $f['po_no'])
+                ->setCellValue('I' . $column,  $f['kode_barang'])
+                ->setCellValue('J' . $column, $f['barang'])
+                ->setCellValue('K' . $column,  $f['qty_po'])
+                ->setCellValue('L' . $column,  $f['satuan_po'])
+                ->setCellValue('M' . $column,  $f['qty_lpb'])
+                ->setCellValue('N' . $column,  $f['satuan_lpb'])
+                ->setCellValue('O' . $column,  $f['kemasan'])
+                ->setCellValue('P' . $column,  $f['qty_kemasan'])
+                ->setCellValue('Q' . $column,  $f['satuan_kemasan'])
+                ->setCellValue('R' . $column,  $f['sub_total']);
+
+            $column++;
+        }
+        $writer = new Xlsx($spreadsheet);
+        $filename = 'Rekap BC40';
+        foreach (range('A', 'K') as $columnID) {
+            $sheet->getColumnDimension($columnID)->setAutoSize(true);
+        }
+
+        $writer = new Xlsx($spreadsheet);
+        $filename = 'Laporan Outstanding BC 4.0 ' . $dateStart . " s.d " . $dateEnd;
+
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment;filename=' . $filename . '.xlsx');
+        header('Cache-Control: max-age=0');
+
+        $writer->save('php://output');
+        die;
     }
 
     public function allOutstanding()

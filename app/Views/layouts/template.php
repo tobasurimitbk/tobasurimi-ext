@@ -306,6 +306,7 @@
             $('.tiny').tinymce({
                 height: 300,
                 api_key: 'y9k86q7hldeb66uas38crgtorii72bzfadk84nmx0sazm2g1',
+                entity_encoding: 'raw'
             });
         });
     </script>

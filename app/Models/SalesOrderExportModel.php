@@ -446,57 +446,112 @@ class SalesOrderExportModel extends Model
                         $qtyInput +=  $salesOrderDetailExport['qty'];
                         $qtySisa += $salesOrderDetailExport['qty'] + $totalQtySisa;
                         $totalInput += floatval($s['harga'] * $salesOrderDetailExport['qty']);
-                    } else if ($salesOrderDetailExport['qty'] != 0 && $isPrint == true) {
-                        // INI PAS PRINT
-                        array_push($sizeBreakdown, [
-                            'id_detail_breakdown' => $s['id'],
-                            'size' => $s['size'],
-                            'grade' => $s['grade'],
-                            'packing' => $s['packing'],
-                            'can' => $s['can'],
-                            'cased' => $s['cased'],
-                            'kg' => $s['kg'],
-                            'lb' => $s['lb'],
-                            'inner_box' => $s['inner_box'],
-                            'pc' => $s['pc'],
-                            'bag' => $s['bag'],
-                            'persen' => $s['persen'],
-                            'remark' => $s['remark'],
-                            'satuan_size_id' => $s['satuan_size_id'],
-                            'satuan_size_code' => $s['kode_satuan'],
-                            'palet' => $s['palet'],
-                            'qty' => $s['qty'],
-                            'harga' => $s['harga'],
-                            'total' => $s['total'],
-                            //-------------------------------------------------
-                            'qty_convertion' => $salesOrderDetailExport['qty_convertion'],
-                            'satuan_convertion_id' => $salesOrderDetailExport['satuan_convertion_id'],
-                            'satuan_convertion_kode' => $salesOrderDetailExport['kode_satuan_konversi'],
-                            //---------------------------------------------------
-                            'note_size' => $salesOrderDetailExport['note_size'],
-                            'note_grade' => $salesOrderDetailExport['note_grade'],
-                            'note_packing' => $salesOrderDetailExport['note_packing'],
-                            'note_can' =>  $salesOrderDetailExport['note_can'],
-                            'note_case' => $salesOrderDetailExport['note_case'],
-                            'note_kg' => $salesOrderDetailExport['note_kg'],
-                            'note_lb' => $salesOrderDetailExport['note_lb'],
-                            'note_inner_box' => $salesOrderDetailExport['note_inner_box'],
-                            'note_pc' => $salesOrderDetailExport['note_pc'],
-                            'note_bag' => $salesOrderDetailExport['note_bag'],
-                            'note_persen' => $salesOrderDetailExport['note_persen'],
-                            'note_cup' => $salesOrderDetailExport['note_cup'],
-                            'note_palet' => $salesOrderDetailExport['note_palet'],
-                            //-------------------------------
-                            'qty_sisa' => $salesOrderDetailExport['qty'],
-                            'qty_input' => \floatval($salesOrderDetailExport['qty']),
-                            'total_sisa' => $s['harga'] * ($salesOrderDetailExport['qty']),
-                            'total_input' => \floatval($s['harga'] * $salesOrderDetailExport['qty'])
+                    } else {
+                        if ($salesOrderDetailExport != null) {
+                            if ($salesOrderDetailExport['qty'] != 0 && $isPrint == true) {
+                                // INI PAS PRINT
+                                array_push($sizeBreakdown, [
+                                    'id_detail_breakdown' => $s['id'],
+                                    'size' => $s['size'],
+                                    'grade' => $s['grade'],
+                                    'packing' => $s['packing'],
+                                    'can' => $s['can'],
+                                    'cased' => $s['cased'],
+                                    'kg' => $s['kg'],
+                                    'lb' => $s['lb'],
+                                    'inner_box' => $s['inner_box'],
+                                    'pc' => $s['pc'],
+                                    'bag' => $s['bag'],
+                                    'persen' => $s['persen'],
+                                    'remark' => $s['remark'],
+                                    'satuan_size_id' => $s['satuan_size_id'],
+                                    'satuan_size_code' => $s['kode_satuan'],
+                                    'palet' => $s['palet'],
+                                    'qty' => $s['qty'],
+                                    'harga' => $s['harga'],
+                                    'total' => $s['total'],
+                                    //-------------------------------------------------
+                                    'qty_convertion' => $salesOrderDetailExport['qty_convertion'],
+                                    'satuan_convertion_id' => $salesOrderDetailExport['satuan_convertion_id'],
+                                    'satuan_convertion_kode' => $salesOrderDetailExport['kode_satuan_konversi'],
+                                    //---------------------------------------------------
+                                    'note_size' => $salesOrderDetailExport['note_size'],
+                                    'note_grade' => $salesOrderDetailExport['note_grade'],
+                                    'note_packing' => $salesOrderDetailExport['note_packing'],
+                                    'note_can' =>  $salesOrderDetailExport['note_can'],
+                                    'note_case' => $salesOrderDetailExport['note_case'],
+                                    'note_kg' => $salesOrderDetailExport['note_kg'],
+                                    'note_lb' => $salesOrderDetailExport['note_lb'],
+                                    'note_inner_box' => $salesOrderDetailExport['note_inner_box'],
+                                    'note_pc' => $salesOrderDetailExport['note_pc'],
+                                    'note_bag' => $salesOrderDetailExport['note_bag'],
+                                    'note_persen' => $salesOrderDetailExport['note_persen'],
+                                    'note_cup' => $salesOrderDetailExport['note_cup'],
+                                    'note_palet' => $salesOrderDetailExport['note_palet'],
+                                    //-------------------------------
+                                    'qty_sisa' => $salesOrderDetailExport['qty'],
+                                    'qty_input' => \floatval($salesOrderDetailExport['qty']),
+                                    'total_sisa' => $s['harga'] * ($salesOrderDetailExport['qty']),
+                                    'total_input' => \floatval($s['harga'] * $salesOrderDetailExport['qty'])
 
-                        ]);
+                                ]);
 
-                        $qtyInput +=  $salesOrderDetailExport['qty'];
-                        $qtySisa += $salesOrderDetailExport['qty'];
-                        $totalInput += floatval($s['harga'] *  $salesOrderDetailExport['qty']);
+                                $qtyInput +=  $salesOrderDetailExport['qty'];
+                                $qtySisa += $salesOrderDetailExport['qty'];
+                                $totalInput += floatval($s['harga'] *  $salesOrderDetailExport['qty']);
+                            }
+                        } else {
+                            // EDIT NING FORM
+                            // MASIH ADA SISA BRO 
+                            array_push($sizeBreakdown, [
+                                'id_detail_breakdown' => $s['id'],
+                                'size' => $s['size'],
+                                'grade' => $s['grade'],
+                                'packing' => $s['packing'],
+                                'can' => $s['can'],
+                                'cased' => $s['cased'],
+                                'kg' => $s['kg'],
+                                'lb' => $s['lb'],
+                                'inner_box' => $s['inner_box'],
+                                'pc' => $s['pc'],
+                                'bag' => $s['bag'],
+                                'persen' => $s['persen'],
+                                'remark' => $s['remark'],
+                                'satuan_size_id' => $s['satuan_size_id'],
+                                'satuan_size_code' => $s['kode_satuan'],
+                                'palet' => $s['palet'],
+                                'qty' => $s['qty'],
+                                'harga' => $s['harga'],
+                                'total' => $s['total'],
+                                //----------------------------
+                                'qty_convertion' => 0,
+                                'satuan_convertion_id' => null,
+                                'satuan_convertion_kode' => "",
+                                //------------------------------
+                                'note_size' => "",
+                                'note_grade' => "",
+                                'note_packing' => "",
+                                'note_can' => "",
+                                'note_case' => "",
+                                'note_kg' => "",
+                                'note_lb' => "",
+                                'note_inner_box' => "",
+                                'note_pc' => "",
+                                'note_bag' => "",
+                                'note_persen' => "",
+                                'note_cup' => "",
+                                'note_palet' => "",
+                                //-----------------------------
+                                'qty_sisa' => $totalQtySisa,
+                                'qty_input' => $totalQtySisa,
+                                'total_sisa' => $s['harga'] * $totalQtySisa,
+                                'total_input' => $s['harga'] * $totalQtySisa
+                            ]);
+
+                            $qtyInput += $totalQtySisa;
+                            $qtySisa += $totalQtySisa;
+                            $totalInput += $s['harga'] * $totalQtySisa;
+                        }
                     }
                 }
             }

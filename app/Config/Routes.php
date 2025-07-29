@@ -1431,9 +1431,10 @@ $routes->group('bea-cukai-bc-40', ['filter' => 'Auth'], function ($routes) {
     $routes->get('detail-barang/(:segment)', 'BeaCukai\BC40::detailBarang/$1');
 
     // OUTSTANDING
-    $routes->get('bc-40-outstanding-all', 'BeaCukai\BC40::allOutstanding');
+    // $routes->get('bc-40-outstanding-all', 'BeaCukai\BC40::allOutstanding');
+    $routes->get('bc-40-outstanding-all', 'BeaCukai\BC40::allOutstandingServerSide');
     $routes->get('bc-40-outstanding', 'BeaCukai\BC40::viewOutstanding');
-    $routes->get('bc-40-outstanding-export', 'BeaCukai\BC40::OutstandingSheet');
+    $routes->get('bc-40-outstanding-export', 'BeaCukai\BC40::allOutstandingExcel');
 
     // FORM PURCHASE ORDER
     // HEADER
@@ -2100,6 +2101,7 @@ $routes->post('/laporan-accounting/bukubesar', 'Laporan\Accounting\BukuBesar::in
 $routes->post('/laporan-accounting/bukubesar/printPDF', 'Laporan\Accounting\BukuBesar::exportPDF', ['filter' => 'Auth']);
 $routes->get('/laporan-accounting/bukubesar/printExcel/(:segment)/(:segment)/(:segment)', 'Laporan\Accounting\BukuBesar::exportExcel/$1/$2/$3', ['filter' => 'Auth']);
 $routes->get('/laporan-accounting/bukubesar/dropdown-account', 'Laporan\Accounting\BukuBesar::dropdownAccount', ['filter' => 'Auth']);
+$routes->get('/laporan-accounting/bukubesar/get-sub-akun', 'Laporan\Accounting\BukuBesar::searchAccounts', ['filter' => 'Auth']);
 
 $routes->get('/laporan-accounting/jurnalumum', 'Laporan\Accounting\JurnalUmum::index', ['filter' => 'Auth']);
 $routes->post('/laporan-accounting/jurnalumum', 'Laporan\Accounting\JurnalUmum::index', ['filter' => 'Auth']);
