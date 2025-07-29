@@ -627,6 +627,30 @@ $routes->get('/return-barang-sales/get-order_form/(:segment)/(:segment)', 'Sales
 $routes->get('/return-barang-sales/get-surat_jalan/(:segment)/(:segment)', 'SalesLokal\Retur::getSuratJalanDetail/$1/$2', ['filter' => 'Auth']);
 $routes->get('/return-barang-sales/get-invoice/(:segment)/(:segment)', 'SalesLokal\Retur::getInvoiceDetail/$1/$2', ['filter' => 'Auth']);
 
+// Faktur Penjualan
+$routes->get('/faktur-sales', 'SalesLokal\Faktur::index', ['filter' => 'Auth']);
+$routes->get('/faktur-sales/barangAll', 'SalesLokal\Faktur::getAllBarang', ['filter' => 'Auth']);
+$routes->get('/faktur-sales/warehouseAll/(:segment)', 'SalesLokal\Faktur::getAllWarehouse/$1', ['filter' => 'Auth']);
+$routes->get('/faktur-sales/stok/(:segment)/(:segment)', 'SalesLokal\Faktur::getStockDetail/$1/$2', ['filter' => 'Auth']);
+$routes->get('/faktur-sales/getByCustomer/(:num)', 'SalesLokal\Faktur::getByCustomerId/$1', ['filter' => 'Auth']);
+$routes->get('/faktur-sales/id/(:segment)', 'SalesLokal\Faktur::getById/$1', ['filter' => 'Auth']);
+$routes->get('/faktur-sales/getmetaData/(:segment)', 'SalesLokal\Faktur::getMetaData/$1', ['filter' => 'Auth']);
+$routes->get('/faktur-sales/create', 'SalesLokal\Faktur::createView', ['filter' => 'Auth']);
+$routes->get('/faktur-sales/all', 'SalesLokal\Faktur::all', ['filter' => 'Auth']);
+$routes->post('/faktur-sales/save', 'SalesLokal\Faktur::save', ['filter' => 'Auth']);
+$routes->post('/faktur-sales/update', 'SalesLokal\Faktur::update', ['filter' => 'Auth']);
+$routes->post('/faktur-sales/delete', 'SalesLokal\Faktur::delete', ['filter' => 'Auth']);
+$routes->post('/faktur-sales/delete-detail', 'SalesLokal\Faktur::deleteOrderForm', ['filter' => 'Auth']);
+$routes->get('/faktur-sales/print/(:segment)', 'SalesLokal\Faktur::printOrder/$1', ['filter' => 'Auth']);
+$routes->get('/faktur-sales/getItemList', 'SalesLokal\Faktur::getItemListByIds', ['filter' => 'Auth']);
+$routes->get('/faktur-sales/getItemList/(:num)', 'SalesLokal\Faktur::getItemListById/$1', ['filter' => 'Auth']);
+$routes->get('/faktur-sales/histori-harga', 'SalesLokal\Faktur::HistoriHargaBarang', ['filter' => 'Auth']);
+$routes->post('/faktur-sales/posting', 'SalesLokal\Faktur::posting', ['filter' => 'Auth']);
+$routes->get('/faktur-sales/barangAll', 'SalesLokal\Faktur::getAllBarang', ['filter' => 'Auth']);
+$routes->get('/faktur-sales/customer', 'SalesLokal\Faktur::dropdownCustomer', ['filter' => 'Auth']);
+$routes->post('/faktur-sales/generate-no-order-form', 'SalesLokal\Faktur::generateNomorSalesOrder', ['filter' => 'Auth']);
+$routes->get('/faktur-sales/check-piutang/(:segment)', 'SalesLokal\Faktur::checkPiutang/$1', ['filter' => 'Auth']);
+
 // Retur Pembelian
 $routes->get('/retur-barang', 'Purchase\ReturPembelian::index', ['filter' => 'Auth']);
 $routes->get('/retur-barang/create', 'Purchase\ReturPembelian::create', ['filter' => 'Auth']);
@@ -781,7 +805,7 @@ $routes->get('/material-request/list-supplier', 'Production\MaterialRequest::get
 $routes->get('/material-request/list-stock-dokumen-bc', 'Production\MaterialRequest::getListStockByStockID', ['filter' => 'Auth']);
 $routes->get('/material-request/list-barang-stock-init-bahan-baku', 'Production\MaterialRequest::dropdownListBarangIsInit', ['filter' => 'Auth']);
 $routes->get('/material-request/warehouse', 'Purchase\POLokalBahanBaku::dropdownWarehouse', ['filter' => 'Auth']);
-$routes->get('/material-request/list-stock-dokumen-bc-bahan-baku', 'Production\MaterialRequest::getListStockMaterialRequestBahanBaku', ['filter' => 'Auth']);
+$routes->get('/material-request/list-stock-dokumen-bc-bahan-baku', 'Production\MaterialRequest::getListStockMaterialRequestBahanBakuNew', ['filter' => 'Auth']);
 // Material Request Penolong
 $routes->get('/material-request-penolong', 'Production\MaterialRequestPenolong::index', ['filter' => 'Auth']);
 $routes->get('/material-request-penolong/generate-kode-request', 'Production\MaterialRequestPenolong::generateKodeRequest', ['filter' => 'Auth']);
