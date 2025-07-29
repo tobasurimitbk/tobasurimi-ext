@@ -193,6 +193,9 @@ class OrderForm extends BaseController
                 'user_id' => $this->this_user_id,
                 'bc_type' => $this->request->getVar('aju_document_type'),
                 "tanggal" => $this->request->getVar("tanggal") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getVar("tanggal")))) : "",
+                "actualy_shipment_date" => $this->request->getVar("actualy_shipment_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getVar("actualy_shipment_date")))) : "",
+                'freight' => $this->request->getVar('freight'),
+                'additional' => $this->request->getVar('additional'),
                 // 'divisi_id' => $this->request->getVar('divisi_id'),
                 'tax_id' => $this->request->getVar('tax_id'),
                 'royalty_price' => $this->request->getVar('royalty_price'),
@@ -505,6 +508,9 @@ class OrderForm extends BaseController
                 'bc_type' => $this->request->getVar('aju_document_type'),
                 "tanggal" => $this->request->getVar("tanggal") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getVar("tanggal")))) : "",
                 // 'divisi_id' => $this->request->getVar('divisi_id'),
+                "actualy_shipment_date" => $this->request->getVar("actualy_shipment_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getVar("actualy_shipment_date")))) : "",
+                'freight' => $this->request->getVar('freight'),
+                'additional' => $this->request->getVar('additional'),
                 'tax_id' => $this->request->getVar('tax_id'),
                 'royalty_price' => $this->request->getVar('royalty_price'),
                 'rebate_price' => $this->request->getVar('rebate_price'),
@@ -800,7 +806,23 @@ class OrderForm extends BaseController
         $this->dompdf->setPaper('Legal', 'portrait');
 
         $this->dompdf->render();
+
+        // Tambahkan penomoran halaman
+        $canvas = $this->dompdf->getCanvas();
+        $font = $this->dompdf->getFontMetrics()->getFont('Helvetica', 'normal');
+        $fontSize = 9;
+
+        $canvas->page_script(function ($pageNumber, $pageCount, $canvas, $fontMetrics) use ($font, $fontSize) {
+            $text = "Page $pageNumber of $pageCount";
+            $textWidth = $fontMetrics->getTextWidth($text, $font, $fontSize);
+            $x = $canvas->get_width() - $textWidth - 20;
+            $y = $canvas->get_height() - 20;
+            $canvas->text($x, $y, $text, $font, $fontSize);
+        });
+
+        // Output PDF
         $this->dompdf->stream($filename, array("Attachment" => false));
+
 
         exit(0);
     }

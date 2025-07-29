@@ -15,6 +15,7 @@ use App\Models\SalesContractRevisionModel;
 use App\Models\SalesContractSizeBreakdownModel;
 use App\Models\SalesKontrakModel;
 use App\Models\SalesKontrakDetailModel;
+use App\Models\SalesOrderExportDetailModel;
 use App\Models\SalesOrderExportModel;
 use App\Models\SatuansModel;
 use App\Models\StockDetailModel;
@@ -42,6 +43,8 @@ class SalesKontrak extends BaseController
     protected $bankModel;
     protected $salesContractSizeBreakdownModel;
     protected $salesContractRevisionModel;
+    protected $salesOrderDetailExportModel;
+    protected $salesOrderExportDetailModel;
     protected $companyModel;
 
     public function __construct()
@@ -65,6 +68,7 @@ class SalesKontrak extends BaseController
         $this->bankModel = new BanksModel();
         $this->salesContractSizeBreakdownModel = new SalesContractSizeBreakdownModel();
         $this->salesContractRevisionModel = new SalesContractRevisionModel();
+        $this->salesOrderExportDetailModel = new SalesOrderExportDetailModel();
         $this->companyModel = new CompaniesModel();
     }
 
@@ -251,7 +255,7 @@ class SalesKontrak extends BaseController
         $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
 
         foreach ($salesKontrakData['data'] as $data) {
-            $isClosed = $this->salesOrderExportModel->where('sales_contract_id', $data->id)->where('deletedAt', null)->findAll();
+            $isClosed = $this->salesOrderExportModel->where('sales_contract_id', $data->id)->where('deletedAt', null)->where('status', "POSTED")->findAll();
             // var_dump($isClosed);
             // exit;
 
@@ -464,6 +468,7 @@ class SalesKontrak extends BaseController
 
         // get all id detail
         $id_detail_all = [];
+        $id_size_breakdown = [];
 
         foreach ($barangs as $b) {
             // CHECK
@@ -484,31 +489,62 @@ class SalesKontrak extends BaseController
                 ]);
 
                 // Hapus Dulu
-                $this->salesContractSizeBreakdownModel
-                    ->where('sales_contract_detail_id', $check['id'])
-                    ->delete();
+                // $check = $this->salesContractSizeBreakdownModel
+                //     ->where('sales_contract_detail_id', $check['id'])
+                //     ->delete();
 
                 foreach ($b->size_breakdown as $sb) {
-                    $this->salesContractSizeBreakdownModel->insert([
-                        'sales_contract_detail_id' => $check['id'],
-                        'bag' => $sb->bag,
-                        'can' => $sb->can,
-                        'cased' => $sb->cased,
-                        'grade' => $sb->grade,
-                        'inner_box' => $sb->inner_box,
-                        'kg' => $sb->kg,
-                        'lb' => $sb->lb,
-                        'packing' => $sb->packing,
-                        'pc' => $sb->pc,
-                        'persen' => $sb->persen,
-                        'remark' => $sb->remark,
-                        'size' => $sb->size,
-                        'qty' => $sb->qty,
-                        'harga' => $sb->harga,
-                        'total' => $sb->total,
-                        'palet' => $sb->palet,
-                        'satuan_size_id' => $sb->satuan_size_id
-                    ]);
+                    $checkBreakdown = $this->salesContractSizeBreakdownModel->where('id', $sb->id_detail_breakdown)->first();
+                    if ($checkBreakdown != null) {
+                        // UPDATE
+                        $this->salesContractSizeBreakdownModel->update($checkBreakdown['id'], [
+                            'sales_contract_detail_id' => $check['id'],
+                            'bag' => $sb->bag,
+                            'can' => $sb->can,
+                            'cased' => $sb->cased,
+                            'grade' => $sb->grade,
+                            'inner_box' => $sb->inner_box,
+                            'kg' => $sb->kg,
+                            'lb' => $sb->lb,
+                            'packing' => $sb->packing,
+                            'pc' => $sb->pc,
+                            'persen' => $sb->persen,
+                            'remark' => $sb->remark,
+                            'size' => $sb->size,
+                            'qty' => $sb->qty,
+                            'harga' => $sb->harga,
+                            'total' => $sb->total,
+                            'palet' => $sb->palet,
+                            'satuan_size_id' => $sb->satuan_size_id
+                        ]);
+
+                        array_push($id_size_breakdown, $checkBreakdown['id']);
+                        // Hapus Di 
+                    } else {
+                        // INSERT
+                        $id_size_breakdown_new = $this->salesContractSizeBreakdownModel->insert([
+                            'sales_contract_detail_id' => $check['id'],
+                            'bag' => $sb->bag,
+                            'can' => $sb->can,
+                            'cased' => $sb->cased,
+                            'grade' => $sb->grade,
+                            'inner_box' => $sb->inner_box,
+                            'kg' => $sb->kg,
+                            'lb' => $sb->lb,
+                            'packing' => $sb->packing,
+                            'pc' => $sb->pc,
+                            'persen' => $sb->persen,
+                            'remark' => $sb->remark,
+                            'size' => $sb->size,
+                            'qty' => $sb->qty,
+                            'harga' => $sb->harga,
+                            'total' => $sb->total,
+                            'palet' => $sb->palet,
+                            'satuan_size_id' => $sb->satuan_size_id
+                        ]);
+
+                        array_push($id_size_breakdown, $id_size_breakdown_new);
+                    }
                 }
 
                 array_push($id_detail_all, $check['id']);
@@ -532,7 +568,7 @@ class SalesKontrak extends BaseController
                 ]);
 
                 foreach ($b->size_breakdown as $sb) {
-                    $this->salesContractSizeBreakdownModel->insert([
+                    $id_size_breakdown_new = $this->salesContractSizeBreakdownModel->insert([
                         'sales_contract_detail_id' => $id_detail_new,
                         'bag' => $sb->bag,
                         'can' => $sb->can,
@@ -551,6 +587,8 @@ class SalesKontrak extends BaseController
                         'total' => $sb->total,
                         'satuan_size_id' => $sb->satuan_size_id
                     ]);
+
+                    array_push($id_size_breakdown, $id_size_breakdown_new);
                 }
 
 
@@ -559,6 +597,8 @@ class SalesKontrak extends BaseController
         }
 
         $this->salesKontrakDetailModel->where('sales_contract_id', $id)->whereNotIn('id', $id_detail_all)->delete();
+        $this->salesContractSizeBreakdownModel->whereNotIn('id', $id_size_breakdown)->delete();
+        $this->salesOrderExportDetailModel->whereNotIn('sales_contract_size_breakdown_id', $id_size_breakdown)->delete();
 
         return response()->setJSON([
             'message' => "Sales Kontrak Updated",
@@ -669,6 +709,21 @@ class SalesKontrak extends BaseController
         $this->dompdf->loadHtml(view('SalesInternasional/SalesKontrak/print', $data));
         $this->dompdf->setPaper('legal', 'portrait');
         $this->dompdf->render();
+
+        // Tambahkan penomoran halaman
+        $canvas = $this->dompdf->getCanvas();
+        $font = $this->dompdf->getFontMetrics()->getFont('Helvetica', 'normal');
+        $fontSize = 9;
+
+        $canvas->page_script(function ($pageNumber, $pageCount, $canvas, $fontMetrics) use ($font, $fontSize) {
+            $text = "Page $pageNumber of $pageCount";
+            $textWidth = $fontMetrics->getTextWidth($text, $font, $fontSize);
+            $x = $canvas->get_width() - $textWidth - 20;
+            $y = $canvas->get_height() - 20;
+            $canvas->text($x, $y, $text, $font, $fontSize);
+        });
+
+        // Output PDF
         $this->dompdf->stream($filename, array("Attachment" => false));
 
         exit(0);
