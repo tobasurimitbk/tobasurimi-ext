@@ -262,16 +262,37 @@
                                     <?php endif; ?>
                                 </div><br>
                                 <div style="font-size: 9px; margin-top: 4px; line-height: 1.4;">
-                                    <?php if (!empty($detail['species'])): ?>
-                                        <span style="display: inline-block; width: 65px; font-weight: bold;">SPECIES:</span> <?= trim($detail['species']) ?> <br>
-                                    <?php endif; ?>
+                                    <table>
+                                        <?php if (!empty($detail['species'])): ?>
+                                            <tr>
+                                                <td style="display: inline-block; font-weight: bold; ">SPECIES</td>
+                                                <td>:</td>
+                                                <td><?= trim($detail['species']) ?></td>
+                                            </tr>
+                                        <?php endif; ?>
+                                        <?php if (!empty($detail['specs'])): ?>
+                                            <tr>
+                                                <td style="display: inline-block; font-weight: bold;">SPECS</td>
+                                                <td>:</td>
+                                                <td><?= trim($detail['specs']) ?></td>
+                                            </tr>
+                                        <?php endif; ?>
+                                        <?php if (!empty($detail['brand'])): ?>
+                                            <tr>
+                                                <td style="display: inline-block; font-weight: bold;">BRAND</td>
+                                                <td>:</td>
+                                                <td><?= trim($detail['brand']) ?></td>
+                                            </tr>
+                                        <?php endif; ?>
+                                        <?php if (!empty($detail['kemasan'])): ?>
+                                            <tr>
+                                                <td style="display: inline-block; font-weight: bold;">PACKING</td>
+                                                <td>:</td>
+                                                <td><?= trim($detail['kemasan']) ?></td>
+                                            </tr>
+                                        <?php endif; ?>
 
-                                    <?php if (!empty($detail['specs'])): ?>
-                                        <span style="display: inline-block; width: 65px; font-weight: bold;">SPECS:</span> <?= trim($detail['specs']) ?> <br>
-                                    <?php endif; ?>
-
-                                    <span style="display: inline-block; width: 65px; font-weight: bold;">BRAND:</span> <?= trim($detail['brand']) ?> <br>
-                                    <span style="display: inline-block; width: 65px; font-weight: bold;">PACKING:</span> <?= trim($detail['packing']) ?> <br>
+                                    </table>
                                 </div>
 
                                 <?php if (!empty($detail['size_breakdown'])): ?>
@@ -571,7 +592,9 @@
                                                             foreach ($groupBySatuan as $satuan => $data):
                                                                 $grand_total_qty += $data['qty_input'];
                                                             ?>
-                                                                <td style="padding: 5px; border: 1px solid #ddd; text-align: right;"><?= number_format($data['qty_input'], 2) ?> <?= $satuan ?></td>
+                                                                <td style="padding: 5px; border: 1px solid #ddd; text-align: right; width:70px;">
+                                                                    <?= number_format($data['qty_input'], 2) ?> <?= $satuan ?>
+                                                                </td>
                                                             <?php endforeach; ?>
                                                         </tr>
                                                     </tbody>
@@ -660,6 +683,9 @@
                                 </b>
                                 <br>
                                 <?= $dataSO->additional ?> <br>
+                                <?php if ($dataSO->additional_2 != ""): ?>
+                                    <?= $dataSO->additional_2 ?> <br>
+                                <?php endif; ?>
                             <?php endif; ?>
 
                             <?php if ($dataSO->additional_detail_docs != ""): ?>
@@ -748,7 +774,7 @@
                                     - ADDITIONAL DETAIL
                                 </b>
                                 <br>
-                                <?= $dataSO->additional_detail ?>
+                                <?= $dataSO->additional_detail ?> <br>
                             <?php endif; ?>
                         </td>
                     </tr>

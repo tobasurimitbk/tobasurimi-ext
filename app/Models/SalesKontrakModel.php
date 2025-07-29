@@ -226,6 +226,7 @@ class SalesKontrakModel extends Model
             // ->where('divisi_id', $divisiId)
             ->where('company_id', $companyId)
             ->where('status_posting', 1)
+            ->orderBy('id', "desc")
             ->findAll();
     }
 }

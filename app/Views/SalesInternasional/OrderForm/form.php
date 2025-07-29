@@ -194,18 +194,6 @@
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3">
-                            <input <?= !empty($dataSalesExport) ? ($dataSalesExport->status == "POSTED" ? 'readonly' : '') : '' ?> autocomplete="one-time-code" type="text" class="form-control freight" id="freight" name="freight" placeholder="Freight (Optional)" value="<?= !empty($dataSalesExport) ? $dataSalesExport->freight : '' ?>">
-                            <label for="floatingInput">Freight (Optional)</label>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="form-floating mb-3">
-                            <input <?= !empty($dataSalesExport) ? ($dataSalesExport->status == "POSTED" ? 'readonly' : '') : '' ?> autocomplete="one-time-code" type="text" class="form-control additional" id="additional" name="additional" placeholder="Additional (Optional)" value="<?= !empty($dataSalesExport) ? $dataSalesExport->additional : '' ?>">
-                            <label for="floatingInput">Additional (Optional)</label>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="form-floating mb-3">
                             <input autocomplete="one-time-code" type="text" class="form-control consigne" id="consigne" name="consigne" placeholder="Consigne / Buyer" readonly value="<?= !empty($dataSalesExport) ? $dataSalesExport->customer_name : '' ?>">
                             <label for="floatingInput">Consigne / Buyer</label>
                         </div>
@@ -281,6 +269,24 @@
                             <label for="floatingInput">Pallet & Fumigation Number (Optional)</label>
                         </div>
                     </div>
+                    <div class="col-md-4">
+                        <div class="form-floating mb-3">
+                            <input <?= !empty($dataSalesExport) ? ($dataSalesExport->status == "POSTED" ? 'readonly' : '') : '' ?> autocomplete="one-time-code" type="text" class="form-control freight" id="freight" name="freight" placeholder="Freight (Optional)" value="<?= !empty($dataSalesExport) ? $dataSalesExport->freight : '' ?>">
+                            <label for="floatingInput">Freight (Optional)</label>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-floating mb-3">
+                            <input <?= !empty($dataSalesExport) ? ($dataSalesExport->status == "POSTED" ? 'readonly' : '') : '' ?> autocomplete="one-time-code" type="text" class="form-control additional" id="additional" name="additional" placeholder="Additional (Optional)" value="<?= !empty($dataSalesExport) ? $dataSalesExport->additional : '' ?>">
+                            <label for="floatingInput">Additional 1 (Optional)</label>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-floating mb-3">
+                            <input <?= !empty($dataSalesExport) ? ($dataSalesExport->status == "POSTED" ? 'readonly' : '') : '' ?> autocomplete="one-time-code" type="text" class="form-control additional_2" id="additional_2" name="additional_2" placeholder="Additional 2 (Optional)" value="<?= !empty($dataSalesExport) ? $dataSalesExport->additional_2 : '' ?>">
+                            <label for="floatingInput">Additional 2 (Optional)</label>
+                        </div>
+                    </div>
                     <!-- <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <input autocomplete="one-time-code" value="<?= !empty($dataSalesExport) ? $dataSalesExport->additional_detail_docs : '' ?>" type="text" class="form-control additional_detail_docs" id="additional_detail_docs" name="additional_detail_docs" placeholder="Additional Details (Optional)">
@@ -350,42 +356,42 @@
 
                 <div class="row">
                     <div class="col-md-4">
-                        <label class="text-dark">Document Required</label>
+                        <label>Document Required</label>
                         <div class="form-floating mb-3">
                             <input autocomplete="one-time-code" value="<?= !empty($dataSalesExport) ? $dataSalesExport->document_required : '' ?>" type="text" class="form-control tiny document_required" id="document_required" name="document_required" placeholder="Document Required">
                             <label for="floatingInput">Document Required</label>
                         </div>
                     </div>
                     <div class="col-md-4">
-                        <label class="text-dark">Payment Term</label>
+                        <label>Payment Term</label>
                         <div class="form-floating mb-3">
                             <input autocomplete="one-time-code" value="<?= !empty($dataSalesExport) ? $dataSalesExport->payment_term : '' ?>" type="text" class="form-control tiny payment_term" id="payment_term" name="payment_term" placeholder="Payment Term">
                             <label for="floatingInput">Payment Term</label>
                         </div>
                     </div>
                     <div class="col-md-4">
-                        <label class="text-dark">Shipment A/N (Optional)</label>
+                        <label>Shipment A/N (Optional)</label>
                         <div class="form-floating mb-3">
                             <input autocomplete="one-time-code" value="<?= !empty($dataSalesExport) ? $dataSalesExport->shipment_an : '' ?>" type="text" class="form-control tiny shipment_an" id="shipment_an" name="shipment_an" placeholder="Shipment A/N (Optional)">
                             <label for="floatingInput">Shipment A/N (Optional)</label>
                         </div>
                     </div>
                     <div class="col-md-4">
-                        <label class="text-dark">Consigne (Optional)</label>
+                        <label>Consigne (Optional)</label>
                         <div class="form-floating mb-3">
                             <input autocomplete="one-time-code" value="<?= !empty($dataSalesExport) ? $dataSalesExport->consigne_docs : '' ?>" type="text" class="form-control tiny consigne_docs" id="consigne_docs" name="consigne_docs" placeholder="Consign (Optional)">
                             <label for="floatingInput">Consigne (Optional)</label>
                         </div>
                     </div>
                     <div class="col-md-4">
-                        <label class="text-dark">Notify Party (Optional)</label>
+                        <label>Notify Party (Optional)</label>
                         <div class="form-floating mb-3">
                             <input autocomplete="one-time-code" value="<?= !empty($dataSalesExport) ? $dataSalesExport->notify_party : '' ?>" type="text" class="form-control tiny notify_party" id="notify_party" name="notify_party" placeholder="Notify Party (Optional)">
                             <label for="floatingInput">Notify Party (Optional)</label>
                         </div>
                     </div>
                     <div class="col-md-4">
-                        <label class="text-dark">Additional Details (Optional)</label>
+                        <label>Additional Details (Optional)</label>
                         <div class="form-floating mb-3">
                             <input autocomplete="one-time-code" value="<?= !empty($dataSalesExport) ? $dataSalesExport->additional_detail_docs : '' ?>" type="text" class="form-control tiny additional_detail_docs" id="additional_detail_docs" name="additional_detail_docs" placeholder="Additional Details (Optional)">
                             <label for="floatingInput">Additional Details (Optional)</label>
@@ -401,42 +407,42 @@
 
                 <div class="row">
                     <div class="col-sm-6 mt-2 mb-3">
-                        <label class="text-dark">Product Specs (Optional)</label>
+                        <label>Product Specs (Optional)</label>
                         <textarea class="form-control tiny product_specs" placeholder="Product Specs (Optional)" name="product_specs" id="product_specs"><?= !empty($dataSalesExport) ? $dataSalesExport->product_specs : '' ?></textarea>
                     </div>
 
                     <div class="col-sm-6 mt-2 mb-3">
-                        <label class="text-dark">Processing Method (Optional)</label>
+                        <label>Processing Method (Optional)</label>
                         <textarea class="form-control tiny processing_method" placeholder="Processing Method (Optional)" name="processing_method" id="processing_method"><?= !empty($dataSalesExport) ? $dataSalesExport->processing_method : '' ?></textarea>
                     </div>
 
                     <div class="col-sm-6 mt-3 mb-3">
-                        <label class="text-dark">Packaging (Optional)</label>
+                        <label>Packaging (Optional)</label>
                         <textarea class="form-control tiny packaging" placeholder="Packaging (Optional)" name="packaging" id="packaging"><?= !empty($dataSalesExport) ? $dataSalesExport->packaging : '' ?></textarea>
                     </div>
 
                     <div class="col-sm-6 mt-3 mb-3">
-                        <label class="text-dark">Code Stamping (Optional)</label>
+                        <label>Code Stamping (Optional)</label>
                         <textarea class="form-control tiny code_stamping" placeholder="Code Stamping (Optional)" name="code_stamping" id="code_stamping"><?= !empty($dataSalesExport) ? $dataSalesExport->code_stamping : '' ?></textarea>
                     </div>
 
                     <div class="col-sm-6 mt-3 mb-3">
-                        <label class="text-dark">Loading (Optional)</label>
+                        <label>Loading (Optional)</label>
                         <textarea class="form-control tiny loading" placeholder="Loading (Optional)" name="loading" id="loading"><?= !empty($dataSalesExport) ? $dataSalesExport->loading : '' ?></textarea>
                     </div>
 
                     <div class="col-sm-6 mt-3 mb-3">
-                        <label class="text-dark">Foto Loading (Optional)</label>
+                        <label>Foto Loading (Optional)</label>
                         <textarea class="form-control tiny foto_loading" placeholder="Foto Loading (Optional)" name="foto_loading" id="foto_loading"><?= !empty($dataSalesExport) ? $dataSalesExport->foto_loading : '' ?></textarea>
                     </div>
 
                     <div class="col-sm-6 mt-3 mb-3">
-                        <label class="text-dark">Stuffing (Optional)</label>
+                        <label>Stuffing (Optional)</label>
                         <textarea class="form-control tiny stuffing" placeholder="Stuffing (Optional)" name="stuffing" id="stuffing"><?= !empty($dataSalesExport) ? $dataSalesExport->stuffing : '' ?></textarea>
                     </div>
 
                     <div class="col-sm-6 mt-3 mb-3">
-                        <label class="text-dark">Additional Details (Optional)</label>
+                        <label>Additional Details (Optional)</label>
                         <textarea class="form-control tiny additional_detail" placeholder="Additional Details (Optional)" name="additional_detail" id="additional_detail"><?= !empty($dataSalesExport) ? $dataSalesExport->additional_detail : '' ?></textarea>
                     </div>
                 </div>
@@ -965,10 +971,10 @@
                     <div class="row">
                         <div class="col-md-12">
                             <div class="form">
-                                <label class="text-dark">
+                                <label>
                                     Display Price in Printout ? (If Active, Price Show in Printout OrderForm)
                                 </label>
-                                <div class="form-control border-0 custom-toggle-switch" style="margin-top: -15px;">
+                                <div class="form-control border-0 custom-toggle-switch" style="margin-top: -15px;<?= session()->get('theme') == 'dark' ? 'background-color:#474D54' : '' ?>">
                                     <div class="form-check form-switch form-switch-lg">
                                         <input class="form-check-input display_price" type="checkbox" value="1" name="display_price" id="display_price">
                                         <label class="form-check-label"></label>
@@ -976,6 +982,25 @@
                                 </div>
                             </div>
                         </div>
+                        <?php if (session()->get('login')->this_company_id == 1): ?>
+                            <div class="col-md-12 mt-3">
+                                <div class="form-floating mb-3" style="height: 50px;">
+                                    <select
+                                        class="form-select company_id"
+                                        aria-label="Floating label select example"
+                                        name="company_id"
+                                        id="company_id">
+                                        <option value=""></option>
+                                        <?php foreach ($dataCompany as $d) : ?>
+                                            <option value="<?= $d['id'] ?>" <?= $d['id'] == 1 ? 'selected' : '' ?>>
+                                                <?= $d['company'] ?>
+                                            </option>
+                                        <?php endforeach; ?>
+                                    </select>
+                                    <label for="floatingInput" style="z-index: 1;">Select Company Head In Printout</label>
+                                </div>
+                            </div>
+                        <?php endif; ?>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -2335,8 +2360,7 @@
                 ${additionalPrice}
                 <tr class="bg-light">
                     <td colspan="6" class="text-end"><b>TOTAL</b></td>
-                    <td style="text-align:left;"><b id="total_txt">${greatFormatRupiah(totalTotalHarga)}</b></td>
-                    <td></td>
+                    <td style="text-align:left;" colspan="2"><b id="total_txt">${greatFormatRupiah(totalTotalHarga)}</b></td>
                     <td></td>
                 </tr>
             `);
@@ -2862,10 +2886,18 @@
     const printAction = function() {
         var id = $('.id').val();
         var display_price = $('.display_price').is(':checked');
+        <?php if (session()->get('login')->this_company_id == 1): ?>
+            var company_id = $('#company_id option:selected').val();
+        <?php else: ?>
+            var company_id = "<?= session()->get('login')->this_company_id ?>";
+        <?php endif; ?>
+
         if (id == "") {
             alert("Failed Print : Order form not found");
+        } else if (company_id == "") {
+            alert("Please select company head")
         } else {
-            var url = "/order-form-internasional/print/" + id + '?display_price=' + display_price
+            var url = "/order-form-internasional/print/" + id + '?display_price=' + display_price + '&company_id=' + company_id
             window.open(url, "_blank");
         }
     }

@@ -242,29 +242,28 @@
                                         <td style="width: 60px;">Address</td>
                                         <td style="width: 10px;">:</td>
                                         <td style="letter-spacing: 1;">
-                                            Jalan Kima 7 / Kav. J-2, Kawasan Industri Makassar,
-                                            Makassar 90241, Sulawesi Selatan - INDONESIA
+                                            <?= $company['address'] ?>
                                         </td>
                                     </tr>
                                     <tr style="vertical-align: top;">
                                         <td>Telp</td>
                                         <td>:</td>
                                         <td style="letter-spacing: 1;">
-                                            +62-411-514 827 ; 510 866 ; 510 687
+                                            <?= $company['phone'] ?>
                                         </td>
                                     </tr>
                                     <tr style="vertical-align: top;">
                                         <td>Fax</td>
                                         <td>:</td>
                                         <td style="letter-spacing: 1;">
-                                            +62-411-510 686
+                                            <?= $company['fax'] ?>
                                         </td>
                                     </tr>
                                     <tr style="vertical-align: top;">
                                         <td>Email</td>
                                         <td>:</td>
                                         <td style="letter-spacing: 1;">
-                                            oceanchampseafood@yahoo.com
+                                            <?= $company['email'] ?>
                                         </td>
                                     </tr>
                                 </table>
@@ -765,7 +764,7 @@
                                                     foreach ($groupBySatuan as $satuan => $data):
                                                         $grand_total_qty += $data['qty'];
                                                     ?>
-                                                        <td style="padding: 5px; border: 1px solid #ddd; text-align: right;">
+                                                        <td style="padding: 5px; border: 1px solid #ddd; text-align: right;width:70px;">
                                                             <?= number_format($data['qty'], 2) ?> <?= $satuan ?>
                                                         </td>
                                                     <?php endforeach; ?>
@@ -970,11 +969,7 @@
                     </tr>
                 <?php endif ?>
             </tbody>
-
-
-
         </table>
-
 
         <!-- Final statement (no number) -->
         <div class="mt-1 txt-left">

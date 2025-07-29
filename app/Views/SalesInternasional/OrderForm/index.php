@@ -117,10 +117,10 @@
                     <div class="row">
                         <div class="col-md-12">
                             <div class="form">
-                                <label class="text-dark">
+                                <label class="<?= session()->get('theme') == 'dark' ? 'text-white' : 'text-dark' ?>">
                                     Display Price in Printout ? (If Active, Price Show in Printout OrderForm)
                                 </label>
-                                <div class="form-control border-0 custom-toggle-switch" style="margin-top: -15px;">
+                                <div class="form-control border-0 custom-toggle-switch" style="margin-top: -15px;<?= session()->get('theme') == 'dark' ? 'background-color:#474D54' : '' ?>">
                                     <div class="form-check form-switch form-switch-lg">
                                         <input class="form-check-input display_price" type="checkbox" value="1" name="display_price" id="display_price">
                                         <label class="form-check-label"></label>
@@ -128,6 +128,26 @@
                                 </div>
                             </div>
                         </div>
+                        <?php if (session()->get('login')->this_company_id == 1): ?>
+                            <div class="col-md-12 mt-3">
+                                <div class="form-floating mb-3" style="height: 50px;">
+                                    <select
+                                        class="form-select company_id"
+                                        aria-label="Floating label select example"
+                                        name="company_id"
+                                        id="company_id">
+                                        <option value=""></option>
+                                        <?php foreach ($dataCompany as $d) : ?>
+                                            <option value="<?= $d['id'] ?>" <?= $d['id'] == 1 ? 'selected' : '' ?>>
+                                                <?= $d['company'] ?>
+                                            </option>
+                                        <?php endforeach; ?>
+                                    </select>
+                                    <label for="floatingInput" style="z-index: 1;">Select Company Head In Printout</label>
+                                </div>
+                            </div>
+                        <?php endif; ?>
+
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -323,6 +343,40 @@
             autoclose: true
         })
 
+        $('#company_id').select2({
+            placeholder: "Select Company Head In Printout",
+            theme: "bootstrap-5",
+            dropdownParent: $('.print-modal')
+        });
+
+        $('.company_id')
+            .parent('div')
+            .children('span')
+            .children('span')
+            .children('span')
+            .css('height', ' calc(3.5rem + 2px)');
+
+        $('.company_id')
+            .parent('div')
+            .children('span')
+            .children('span')
+            .children('span')
+            .children('span')
+            .css('margin-top', '22px').css('margin-left', '-7px');
+
+        $('.company_id')
+            .parent('div')
+            .children('span')
+            .children('span')
+            .children('span')
+            .children('span')
+            .css('margin-top', '22px').css('margin-left', '-7px');
+
+        $('.company_id')
+            .parent('div')
+            .find('label')
+            .css('z-index', '1');
+
         $('.icon-dateStart').click(function() {
             $(".dateStart").focus();
         });
@@ -355,10 +409,18 @@
     const printAction = function() {
         var id = $('.id').val();
         var display_price = $('.display_price').is(':checked');
+        <?php if (session()->get('login')->this_company_id == 1): ?>
+            var company_id = $('#company_id option:selected').val();
+        <?php else: ?>
+            var company_id = "<?= session()->get('login')->this_company_id ?>";
+        <?php endif; ?>
+
         if (id == "") {
             alert("Failed Print : Order form not found");
+        } else if (company_id == "") {
+            alert("Please select company head")
         } else {
-            var url = "/order-form-internasional/print/" + id + '?display_price=' + display_price
+            var url = "/order-form-internasional/print/" + id + '?display_price=' + display_price + '&company_id=' + company_id
             window.open(url, "_blank");
         }
     }
@@ -482,6 +544,12 @@
                                         .then(() => {
                                             table.ajax.reload()
                                         })
+                                } else {
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: response.message,
+                                        confirmButtonColor: '#4e73df',
+                                    })
                                 }
                             },
                         });

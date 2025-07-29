@@ -357,9 +357,9 @@ class SalesOrderExportModel extends Model
                         'harga' => $s['harga'],
                         'total' => $s['total'],
                         //----------------------------
-                        'qty_convertion' => 0,
-                        'satuan_convertion_id' => null,
-                        'satuan_convertion_kode' => "",
+                        'qty_convertion' => $s['kode_satuan'] == "KG" && $s['qty'] != 0  ? $s['qty'] : 0, // Jika Kg Otomatis Ambil Aja
+                        'satuan_convertion_id' =>  $s['kode_satuan'] == "KG" && $s['qty'] != 0  ?  $s['satuan_size_id'] : null,
+                        'satuan_convertion_kode' => $s['kode_satuan'] == "KG" && $s['qty'] != 0 ?  $s['kode_satuan'] : "",
                         //------------------------------
                         'note_size' => "",
                         'note_grade' => "",
@@ -501,7 +501,6 @@ class SalesOrderExportModel extends Model
                                 $totalInput += floatval($s['harga'] *  $salesOrderDetailExport['qty']);
                             }
                         } else {
-                            // EDIT NING FORM
                             // MASIH ADA SISA BRO 
                             array_push($sizeBreakdown, [
                                 'id_detail_breakdown' => $s['id'],
@@ -524,9 +523,9 @@ class SalesOrderExportModel extends Model
                                 'harga' => $s['harga'],
                                 'total' => $s['total'],
                                 //----------------------------
-                                'qty_convertion' => 0,
-                                'satuan_convertion_id' => null,
-                                'satuan_convertion_kode' => "",
+                                'qty_convertion' => ($s['kode_satuan'] == "KG" && $totalQtySisa != 0) ? $totalQtySisa : 0, // Jika Kg Otomatis Ambil Aja
+                                'satuan_convertion_id' => ($s['kode_satuan'] == "KG" && $totalQtySisa != 0) ?  $s['satuan_size_id'] : null,
+                                'satuan_convertion_kode' => ($s['kode_satuan'] == "KG" && $totalQtySisa != 0) ?  $s['kode_satuan'] : "",
                                 //------------------------------
                                 'note_size' => "",
                                 'note_grade' => "",
