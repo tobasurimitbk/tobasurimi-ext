@@ -77,7 +77,12 @@ class OrderForm extends BaseController
 
     public function index()
     {
-        return view('SalesInternasional/OrderForm/index');
+        $dataCompany = $this->companyModel->whereIn('id', [1, 2])->findAll();
+        $data = [
+            "dataCompany" => $dataCompany
+
+        ];
+        return view('SalesInternasional/OrderForm/index', $data);
     }
 
     public function all()
@@ -159,12 +164,14 @@ class OrderForm extends BaseController
         $dataAJU = $this->metaDataModel->getBCUsed('so_internasional');
         $dataDivisi = $this->divisiModel->getDivisiAccess();
         $dataSalesKontrak = $this->salesKontrakModel->getSalesKontrakList();
+        $dataCompany = $this->companyModel->whereIn('id', [1, 2])->findAll();
 
         $data = [
             'dataSatuan' => $dataSatuan,
             "dataAJU" => $dataAJU,
             "dataDivisi" => $dataDivisi,
-            "dataSalesKontrak" => $dataSalesKontrak
+            "dataSalesKontrak" => $dataSalesKontrak,
+            "dataCompany" => $dataCompany
         ];
 
         return view('SalesInternasional/OrderForm/form', $data);
@@ -193,9 +200,10 @@ class OrderForm extends BaseController
                 'user_id' => $this->this_user_id,
                 'bc_type' => $this->request->getVar('aju_document_type'),
                 "tanggal" => $this->request->getVar("tanggal") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getVar("tanggal")))) : "",
-                "actualy_shipment_date" => $this->request->getVar("actualy_shipment_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getVar("actualy_shipment_date")))) : "",
+                "actualy_shipment_date" => $this->request->getVar("actualy_shipment_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getVar("actualy_shipment_date")))) : null,
                 'freight' => $this->request->getVar('freight'),
                 'additional' => $this->request->getVar('additional'),
+                'additional_2' => $this->request->getVar('additional_2'),
                 // 'divisi_id' => $this->request->getVar('divisi_id'),
                 'tax_id' => $this->request->getVar('tax_id'),
                 'royalty_price' => $this->request->getVar('royalty_price'),
@@ -460,6 +468,7 @@ class OrderForm extends BaseController
 
         $dataAJU = $this->metaDataModel->getBCUsed('so_internasional');
         $dataDivisi = $this->divisiModel->getDivisiAccess();
+        $dataCompany = $this->companyModel->whereIn('id', [1, 2])->findAll();
 
         $data = [
             "id" => encrypt($id),
@@ -470,7 +479,8 @@ class OrderForm extends BaseController
             "dataSalesExportDetail" => $dataSalesExportDetail,
             "dataSalesExportSpecs" => $dataSalesExportSpecs,
             "dataSalesKontrak" => $dataSalesKontrak,
-            "dataSalesExportAdditional" => $dataSalesExportAdditional
+            "dataSalesExportAdditional" => $dataSalesExportAdditional,
+            "dataCompany" => $dataCompany
         ];
 
         return view('SalesInternasional/OrderForm/form', $data);
@@ -508,9 +518,10 @@ class OrderForm extends BaseController
                 'bc_type' => $this->request->getVar('aju_document_type'),
                 "tanggal" => $this->request->getVar("tanggal") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getVar("tanggal")))) : "",
                 // 'divisi_id' => $this->request->getVar('divisi_id'),
-                "actualy_shipment_date" => $this->request->getVar("actualy_shipment_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getVar("actualy_shipment_date")))) : "",
+                "actualy_shipment_date" => $this->request->getVar("actualy_shipment_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getVar("actualy_shipment_date")))) : null,
                 'freight' => $this->request->getVar('freight'),
                 'additional' => $this->request->getVar('additional'),
+                'additional_2' => $this->request->getVar('additional_2'),
                 'tax_id' => $this->request->getVar('tax_id'),
                 'royalty_price' => $this->request->getVar('royalty_price'),
                 'rebate_price' => $this->request->getVar('rebate_price'),
@@ -706,6 +717,16 @@ class OrderForm extends BaseController
             ]);
         } else {
             // INI POSTING
+            // CEK APAKAH ACTUALY SHIPMENT DATE SUDAH ADA
+            $salesOrderExport = $this->salesOrderExportModel->where('sales_order_export_id', $id)->first();
+            if (empty($salesOrderExport['actualy_shipment_date']) || $salesOrderExport['actualy_shipment_date'] == null) {
+                return response()->setJSON([
+                    'message' => "Before posting the order form you must fill in the actual shipment date.",
+                    'token' => csrf_hash(),
+                    'status' => false
+                ]);
+            }
+
             $this->salesOrderExportModel->update($id, [
                 'status' => "POSTED",
             ]);
@@ -766,6 +787,7 @@ class OrderForm extends BaseController
 
         $dataSO = $this->salesOrderExportModel->getById($id);
         $displayPrice = $this->request->getVar('display_price');
+        $companyId = $this->request->getGet('company_id');
 
         if ($dataSO == null || empty($displayPrice)) {
             return redirect()->to('order-form-internasional');
@@ -801,6 +823,16 @@ class OrderForm extends BaseController
             "company" => $this->companyModel->where('id', $dataSO->company_id)->first(),
         ];
 
+        if (!empty($companyId)) {
+            $data['company'] = $this->companyModel->where('id', $companyId)->first();
+        }
+
+        if ($data['company'] == null) {
+            var_dump("State exception, company is not found please back to previous step");
+            die;
+        }
+
+        // dd($data['dataSODetail']);
 
         $this->dompdf->loadHtml(view('SalesInternasional/OrderForm/print', $data));
         $this->dompdf->setPaper('Legal', 'portrait');

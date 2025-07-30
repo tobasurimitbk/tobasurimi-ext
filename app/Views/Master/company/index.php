@@ -122,7 +122,9 @@
             <div class="modal-footer">
                 <button type="button" class="btn btn-hide-form btn-discard mr-2">Kembali</button>
                 <button type="submit" class="btn btn-submit-form">Simpan</button>
-                <button type="button" class="btn btn-discard delete-btn">Hapus</button>
+                <?php if (can('Master Data', 'Company', 'd')): ?>
+                    <button type="button" class="btn btn-discard delete-btn">Hapus</button>
+                <?php endif; ?>
             </div>
         </div>
     </div>
@@ -132,9 +134,11 @@
 <section class="section">
     <div class="section-header">
         <h1>Company</h1>
-        <button class="btn btn-show-form btn-add float-right" data-btn="create-modal">
-            <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
-        </button>
+        <?php if (can('Master Data', 'Company', 'c')): ?>
+            <button class="btn btn-show-form btn-add float-right" data-btn="create-modal">
+                <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
+            </button>
+        <?php endif; ?>
     </div>
     <div class="card">
         <div class="card-body">

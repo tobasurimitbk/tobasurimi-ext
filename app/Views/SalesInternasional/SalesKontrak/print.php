@@ -242,29 +242,28 @@
                                         <td style="width: 60px;">Address</td>
                                         <td style="width: 10px;">:</td>
                                         <td style="letter-spacing: 1;">
-                                            Jalan Kima 7 / Kav. J-2, Kawasan Industri Makassar,
-                                            Makassar 90241, Sulawesi Selatan - INDONESIA
+                                            <?= $company['address'] ?>
                                         </td>
                                     </tr>
                                     <tr style="vertical-align: top;">
                                         <td>Telp</td>
                                         <td>:</td>
                                         <td style="letter-spacing: 1;">
-                                            +62-411-514 827 ; 510 866 ; 510 687
+                                            <?= $company['phone'] ?>
                                         </td>
                                     </tr>
                                     <tr style="vertical-align: top;">
                                         <td>Fax</td>
                                         <td>:</td>
                                         <td style="letter-spacing: 1;">
-                                            +62-411-510 686
+                                            <?= $company['fax'] ?>
                                         </td>
                                     </tr>
                                     <tr style="vertical-align: top;">
                                         <td>Email</td>
                                         <td>:</td>
                                         <td style="letter-spacing: 1;">
-                                            oceanchampseafood@yahoo.com
+                                            <?= $company['email'] ?>
                                         </td>
                                     </tr>
                                 </table>
@@ -765,7 +764,7 @@
                                                     foreach ($groupBySatuan as $satuan => $data):
                                                         $grand_total_qty += $data['qty'];
                                                     ?>
-                                                        <td style="padding: 5px; border: 1px solid #ddd; text-align: right;">
+                                                        <td style="padding: 5px; border: 1px solid #ddd; text-align: right;width:70px;">
                                                             <?= number_format($data['qty'], 2) ?> <?= $satuan ?>
                                                         </td>
                                                     <?php endforeach; ?>
@@ -946,38 +945,34 @@
                 <!-- X. ADDITIONAL CLAUSES -->
                 <?php if (!empty($salesKontrak['special_instructions'])): ?>
                     <tr class="label-header">
-                        <td>
+                        <td style="width: 3%; vertical-align: top;">
                             <?= strtoupper(numToRoman($counter++)) ?>.
                         </td>
-                        <td>
-                            ADDITIONAL CLAUSES <br>
-
+                        <td style="width: 25%; vertical-align: top;">
+                            ADDITIONAL CLAUSES
                         </td>
-                        <td>
+                        <td style="width: 2%; vertical-align: top;">
                             :
                         </td>
-                        <td>
-
+                        <td style="width: 70%; vertical-align: top;">
+                            <?= $salesKontrak['special_instructions'] ?>
                         </td>
                     </tr>
-                    <tr class="label-header">
+
+                    <!-- <tr class="label-header">
                         <td>
                         </td>
                         <td colspan="3">
                             <?= $salesKontrak['special_instructions'] ?>
                         </td>
 
-                    </tr>
+                    </tr> -->
                 <?php endif ?>
             </tbody>
-
-
-
         </table>
-
-
+        <!-- <br> -->
         <!-- Final statement (no number) -->
-        <div class="mt-1 txt-left">
+        <div class="txt-left" style="margin-top: 1%;">
             <label class="label-header">
                 FOR THOSE ITEMS WHICH ARE NOT COVERED IN THIS CONTRACT, BOTH PARTIES WILL NEGOTIATE AND COME TO COMPROMISE.
             </label>
@@ -1008,8 +1003,7 @@
         return $result;
     }
     ?>
-    <br><br><br>
-    <table class="mt-1 sign-table border-collapse">
+    <table class="mt-1 sign-table border-collapse" style="margin-top: 10px;">
         <thead>
             <tr>
                 <th style="width: 350px;">
@@ -1040,7 +1034,9 @@
                     <div style="border-top: 1px solid !important; width: 80%;"></div>
                 </td>
                 <td>
-                    <?= $salesKontrak['signature_by'] ?>
+                    <b>
+                        <?= $salesKontrak['signature_by'] ?>
+                    </b>
                     <div style="border-top: 1px solid !important; width: 80%;"></div>
                 </td>
             </tr>
