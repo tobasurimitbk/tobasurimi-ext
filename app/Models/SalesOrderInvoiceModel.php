@@ -143,7 +143,12 @@ class SalesOrderInvoiceModel extends Model
         }
 
         $totalFilteredData = $salesOrderInvoiceLokal->countAllResults(false);
-        $data = $salesOrderInvoiceLokal->findAll($limit, $offset);
+
+        if ($limit && $offset) {
+            $data = $salesOrderInvoiceLokal->findAll($limit, $offset);
+        } else {
+            $data = $salesOrderInvoiceLokal->findAll();
+        }
 
         return [
             'data'              => $data,
