@@ -246,12 +246,12 @@
                     var id = row.id;
                     return `
                         <div class="mt-0">
-                            <?php if (can('Penjualan Lokal', 'Customer', 'u')) : ?>
+                            <?php if (can('Penjualan Lokal', 'Master Barang', 'u')) : ?>
                                 <a href="javascript:void(0)" onclick="edit('${id}')" data-toggle="tooltip" title="Detail" class="btn btn-primary">
                                     <i class="fas fa-edit"></i>
                                 </a>
                             <?php endif; ?>
-                            <?php if (can('Penjualan Lokal', 'Customer', 'd')) : ?>
+                            <?php if (can('Penjualan Lokal', 'Master Barang', 'd')) : ?>
                                 <button data-toggle="tooltip" title="Hapus" onclick="destroy('${id}')" class="btn btn-danger delete-parent">
                                     <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
                                 </button>
