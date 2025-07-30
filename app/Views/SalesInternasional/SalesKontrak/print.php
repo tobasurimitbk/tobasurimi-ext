@@ -894,6 +894,7 @@
                 <tr>
                     <td></td>
                     <td colspan="3">
+                        <br>
                         <label class="label-header">
                             FOR THOSE ITEMS WHICH ARE NOT COVERED IN THIS CONTRACT, BOTH PARTIES WILL NEGOTIATE AND COME TO COMPROMISE.
                         </label>
