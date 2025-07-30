@@ -13,11 +13,17 @@
 <section class="section">
     <div class="section-header">
         <h1>Faktur Penjualan</h1>
-        <?php if (can('Penjualan Lokal', 'Faktur Penjualan', 'c')) : ?>
-            <a class="btn btn-show-form btn-add float-right" href="<?= base_url("faktur-sales/create"); ?>">
-                <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
+        <div class="col-button-tambah-spp">
+            <a class="btn btn-warning btn-print float-right" href="#" target="_blank" id="btn-export">
+                <i class="fa fa-download"></i> Export
             </a>
-        <?php endif; ?>
+
+            <?php if (can('Penjualan Lokal', 'Faktur Penjualan', 'c')): ?>
+                <a class="btn btn-show-form btn-success float-right btn-submit" href="<?= base_url("faktur-sales/create"); ?>">
+                    <i class="fa fa-plus fa-sm me-1"></i> Tambah
+                </a>
+            <?php endif; ?>
+        </div>
     </div>
     <div class="card">
         <?php if (session()->getFlashdata('error') != null) : ?>
@@ -261,6 +267,21 @@
 
         $(".dateStart, .dateEnd, .filter_customer, .filter_surat_jalan, .filter_invoice").change(function() {
             table.ajax.reload();
+        });
+
+        $('#btn-export').on('click', function(e) {
+            e.preventDefault();
+
+            let search = $(".search").val();
+            let dateStart = $(".dateStart").val();
+            let dateEnd = $(".dateEnd").val();
+            let filter_customer = $(".filter_customer").val();
+            let filter_surat_jalan = $(".filter_surat_jalan").val();
+            let filter_invoice = $(".filter_invoice").val();
+
+            let exportUrl = `/faktur-sales/export-excel?search=${encodeURIComponent(search)}&sort=${sort}&sortType=${sortType}&dateStart=${encodeURIComponent(dateStart)}&dateEnd=${encodeURIComponent(dateEnd)}&filter_customer=${filter_customer}&filter_surat_jalan=${filter_surat_jalan}&filter_invoice=${filter_invoice}`;
+
+            window.open(exportUrl, '_blank');
         });
     })
 

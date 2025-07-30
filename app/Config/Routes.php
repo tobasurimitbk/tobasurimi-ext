@@ -654,6 +654,7 @@ $routes->get('/faktur-sales/barangAll', 'SalesLokal\Faktur::getAllBarang', ['fil
 $routes->get('/faktur-sales/customer', 'SalesLokal\Faktur::dropdownCustomer', ['filter' => 'Auth']);
 $routes->post('/faktur-sales/generate-no-order-form', 'SalesLokal\Faktur::generateNomorSalesOrder', ['filter' => 'Auth']);
 $routes->get('/faktur-sales/check-piutang/(:segment)', 'SalesLokal\Faktur::checkPiutang/$1', ['filter' => 'Auth']);
+$routes->get('/faktur-sales/export-excel', 'SalesLokal\Faktur::exportExcel', ['filter' => 'Auth']);
 
 // Retur Pembelian
 $routes->get('/retur-barang', 'Purchase\ReturPembelian::index', ['filter' => 'Auth']);
