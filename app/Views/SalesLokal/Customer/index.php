@@ -1,5 +1,14 @@
 <?= $this->extend('layouts/template'); ?>
 <?= $this->Section('content'); ?>
+<style>
+    .sticky-col {
+        position: sticky;
+        right: 0;
+        background-color: white;
+        z-index: 100;
+        border-left: 1px solid #ddd;
+    }
+</style>
 
 <div class="modal add-modal" id="add_modal" tabindex="-1">
     <div class="modal-dialog" style="min-width: 900px;">
