@@ -785,199 +785,164 @@
             </tr>
         </tbody>
     </table>
-    <div class="header" style="margin-top: 20px;">
+    <style>
+        .ttd-section {
+            page-break-inside: avoid;
+            margin-top: 20px;
+        }
 
-        <table style="border-spacing: 0 4px;">
+        .label-header {
+            font-weight: bold;
+            font-size: 12px;
+        }
+    </style>
+
+    <div class="header" style="margin-top: 20px;">
+        <table style="border-spacing: 0 4px; width: 100%;">
             <tbody>
                 <?php
-                $counter = 2; // Start counter for Roman numerals
+                $counter = 2;
 
-                // II. TOTAL AMOUNT
                 if ($grand_total > 0): ?>
                     <tr class="label-header">
-                        <td>
-                            <?= strtoupper(numToRoman($counter++)) ?>.
-                        </td>
-                        <td style="width: 180px;">
-                            TOTAL AMOUNT (<?= $salesKontrak['mata_uang'] ?>)
-                        </td>
-                        <td style="width: 10px;">
-                            :
-                        </td>
-                        <td>
-                            <?= number_format(
-                                $grand_total,
-                                2
-                            ) ?>
-
-                            (<?= strtoupper(terbilangInggris($grand_total)) ?>)
-                        </td>
+                        <td style="width: 25px;"><?= strtoupper(numToRoman($counter++)) ?>.</td>
+                        <td style="width: 180px;">TOTAL AMOUNT (<?= $salesKontrak['mata_uang'] ?>)</td>
+                        <td style="width: 10px;">:</td>
+                        <td><?= number_format($grand_total, 2) ?> (<?= strtoupper(terbilangInggris($grand_total)) ?>)</td>
                     </tr>
-
                 <?php endif; ?>
 
-                <!-- // III. TOLERANCE -->
                 <?php if (!empty($salesKontrak['tolerance'])): ?>
                     <tr class="label-header">
-                        <td>
-                            <?= strtoupper(numToRoman($counter++)) ?>.
-                        </td>
-                        <td>
-                            TOLERANCE
-                        </td>
-                        <td>
-                            :
-                        </td>
-                        <td>
-                            <?= $salesKontrak['tolerance'] ?>
-                        </td>
+                        <td><?= strtoupper(numToRoman($counter++)) ?>.</td>
+                        <td>TOLERANCE</td>
+                        <td>:</td>
+                        <td><?= $salesKontrak['tolerance'] ?></td>
                     </tr>
                 <?php endif ?>
 
-                <!-- // IV. SHIPMENT DATE -->
                 <?php if (!empty($salesKontrak['shipment_date'])): ?>
                     <tr class="label-header">
-                        <td>
-                            <?= strtoupper(numToRoman($counter++)) ?>.
-                        </td>
-                        <td>
-                            ESTIMATED SHIPMENT DATE
-                        </td>
-                        <td>
-                            :
-                        </td>
-                        <td>
-                            <?= $salesKontrak['shipment_date'] ?>
-                        </td>
+                        <td><?= strtoupper(numToRoman($counter++)) ?>.</td>
+                        <td>ESTIMATED SHIPMENT DATE</td>
+                        <td>:</td>
+                        <td><?= $salesKontrak['shipment_date'] ?></td>
                     </tr>
                 <?php endif ?>
 
-                <!-- // V. PORT OF LOADING -->
                 <?php if (!empty($salesKontrak['loading_port'])): ?>
                     <tr class="label-header">
-                        <td>
-                            <?= strtoupper(numToRoman($counter++)) ?>.
-                        </td>
-                        <td>
-                            PORT OF LOADING
-                        </td>
-                        <td>
-                            :
-                        </td>
-                        <td>
-                            <?= $salesKontrak['loading_port'] ?>
-                        </td>
+                        <td><?= strtoupper(numToRoman($counter++)) ?>.</td>
+                        <td>PORT OF LOADING</td>
+                        <td>:</td>
+                        <td><?= $salesKontrak['loading_port'] ?></td>
                     </tr>
                 <?php endif ?>
 
-                <!-- // VI. PORT OF DISCHARGE -->
                 <?php if (!empty($salesKontrak['dicharge_port'])): ?>
                     <tr class="label-header">
-                        <td>
-                            <?= strtoupper(numToRoman($counter++)) ?>.
-                        </td>
-                        <td>
-                            PORT OF DISCHARGE
-                        </td>
-                        <td>
-                            :
-                        </td>
-                        <td>
-                            <?= $salesKontrak['dicharge_port'] ?>
-                        </td>
+                        <td><?= strtoupper(numToRoman($counter++)) ?>.</td>
+                        <td>PORT OF DISCHARGE</td>
+                        <td>:</td>
+                        <td><?= $salesKontrak['dicharge_port'] ?></td>
                     </tr>
-                <?php endif ?>
-
-                <!-- // VII. PAYMENT TERM -->
-                <?php if (!empty($salesKontrak['payment_term'])): ?>
-                    <tr class="label-header">
-                        <td>
-                            <?= strtoupper(numToRoman($counter++)) ?>.
-                        </td>
-                        <td>
-                            PAYMENT TERM
-                        </td>
-                        <td>
-                            :
-                        </td>
-                        <td>
-                            <?= $salesKontrak['payment_term'] ?>
-                        </td>
-                    </tr>
-                <?php endif ?>
-
-                <!-- // VIII. INSURANCE -->
-                <?php if (!empty($salesKontrak['shipment_insurance'])): ?>
-                    <tr class="label-header">
-                        <td>
-                            <?= strtoupper(numToRoman($counter++)) ?>.
-                        </td>
-                        <td>
-                            INSURANCE
-                        </td>
-                        <td>
-                            :
-                        </td>
-                        <td>
-                            <?= $salesKontrak['shipment_insurance'] ?>
-                        </td>
-                    </tr>
-                <?php endif ?>
-
-                <!-- // IX. DOCUMENTS REQUIRED -->
-                <?php if (!empty($salesKontrak['documents_required'])): ?>
-                    <tr class="label-header">
-                        <td>
-                            <?= strtoupper(numToRoman($counter++)) ?>.
-                        </td>
-                        <td>
-                            DOCUMENT REQUIRED
-                        </td>
-                        <td>
-                            :
-                        </td>
-                        <td>
-                            <?= $salesKontrak['documents_required'] ?>
-                        </td>
-                    </tr>
-                <?php endif ?>
-
-                <!-- X. ADDITIONAL CLAUSES -->
-                <?php if (!empty($salesKontrak['special_instructions'])): ?>
-                    <tr class="label-header">
-                        <td style="width: 3%; vertical-align: top;">
-                            <?= strtoupper(numToRoman($counter++)) ?>.
-                        </td>
-                        <td style="width: 25%; vertical-align: top;">
-                            ADDITIONAL CLAUSES
-                        </td>
-                        <td style="width: 2%; vertical-align: top;">
-                            :
-                        </td>
-                        <td style="width: 70%; vertical-align: top;">
-                            <?= $salesKontrak['special_instructions'] ?>
-                        </td>
-                    </tr>
-
-                    <!-- <tr class="label-header">
-                        <td>
-                        </td>
-                        <td colspan="3">
-                            <?= $salesKontrak['special_instructions'] ?>
-                        </td>
-
-                    </tr> -->
                 <?php endif ?>
             </tbody>
         </table>
-        <!-- <br> -->
-        <!-- Final statement (no number) -->
-        <div class="txt-left" style="margin-top: 1%;">
-            <label class="label-header">
-                FOR THOSE ITEMS WHICH ARE NOT COVERED IN THIS CONTRACT, BOTH PARTIES WILL NEGOTIATE AND COME TO COMPROMISE.
-            </label>
-        </div>
     </div>
+
+    <!-- Mulai blok yang harus utuh di halaman yang sama -->
+    <div class="ttd-section" style="margin-top: -5px;">
+        <table style="border-spacing: 0 4px; width: 100%;">
+            <tbody>
+
+                <?php if (!empty($salesKontrak['payment_term'])): ?>
+                    <tr class="label-header">
+                        <td style="width: 25px;"><?= strtoupper(numToRoman($counter++)) ?>.</td>
+                        <td style="width: 180px;">PAYMENT TERM</td>
+                        <td style="width: 10px;">:</td>
+                        <td><?= $salesKontrak['payment_term'] ?></td>
+                    </tr>
+                <?php endif ?>
+
+                <?php if (!empty($salesKontrak['shipment_insurance'])): ?>
+                    <tr class="label-header">
+                        <td><?= strtoupper(numToRoman($counter++)) ?>.</td>
+                        <td>INSURANCE</td>
+                        <td>:</td>
+                        <td><?= $salesKontrak['shipment_insurance'] ?></td>
+                    </tr>
+                <?php endif ?>
+
+                <?php if (!empty($salesKontrak['documents_required'])): ?>
+                    <tr class="label-header">
+                        <td><?= strtoupper(numToRoman($counter++)) ?>.</td>
+                        <td>DOCUMENT REQUIRED</td>
+                        <td>:</td>
+                        <td><?= $salesKontrak['documents_required'] ?></td>
+                    </tr>
+                <?php endif ?>
+
+                <?php if (!empty($salesKontrak['special_instructions'])): ?>
+                    <tr class="label-header">
+                        <td style="vertical-align: top;"><?= strtoupper(numToRoman($counter++)) ?>.</td>
+                        <td style="vertical-align: top;">ADDITIONAL CLAUSES</td>
+                        <td style="vertical-align: top;">:</td>
+                        <td style="vertical-align: top;"><?= $salesKontrak['special_instructions'] ?></td>
+                    </tr>
+                <?php endif ?>
+                <tr>
+                    <td></td>
+                    <td colspan="3">
+                        <label class="label-header">
+                            FOR THOSE ITEMS WHICH ARE NOT COVERED IN THIS CONTRACT, BOTH PARTIES WILL NEGOTIATE AND COME TO COMPROMISE.
+                        </label>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <br>
+
+        <!-- SIGNATURE TABLE -->
+        <table class="mt-1 sign-table border-collapse" style="margin-top: 10px; width: 100%;">
+            <thead>
+                <tr>
+                    <th style="width: 350px;">
+                        <label class="label-header">THE BUYER,</label>
+                    </th>
+                    <th>
+                        <label class="label-header">THE SELLER,</label>
+                    </th>
+                </tr>
+                <tr>
+                    <th style="width: 350px;">
+                        <label class="label-header"><?= $customer != null ? $customer['name'] : ''; ?></label>
+                    </th>
+                    <th>
+                        <label class="label-header"><?= strtoupper(str_ireplace(', Tbk', '', $company['holding_company'])) ?></label>
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td style="height: 70px;"></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>
+                        &nbsp;
+                        <div style="border-top: 1px solid #000; width: 80%;">
+                        </div>
+                    </td>
+                    <td>
+                        <label class="label-header"><?= $salesKontrak['signature_by'] ?></label>
+                        <div style="border-top: 1px solid #000; width: 80%;"></div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
 
     <?php
     // Helper function to convert numbers to Roman numerals
@@ -1003,46 +968,6 @@
         return $result;
     }
     ?>
-    <table class="mt-1 sign-table border-collapse" style="margin-top: 10px;">
-        <thead>
-            <tr>
-                <th style="width: 350px;">
-                    <label class="label-header">THE BUYER,</label>
-                </th>
-                <th>
-                    <label class="label-header">THE SELLER,</label>
-                </th>
-            </tr>
-            <tr>
-                <th style="width: 350px;">
-                    <label class="label-header"><?= $customer != null ? $customer['name'] : ''; ?></label>
-                </th>
-                <th>
-                    <label class="label-header"><?= strtoupper(str_ireplace(', Tbk', '', $company['holding_company'])) ?></label>
-                </th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td style="height: 70px;"></td>
-                <td></td>
-            </tr>
-            <tr>
-                <td style="width: 350px;">
-                    <?= "&nbsp;" ?>
-
-                    <div style="border-top: 1px solid !important; width: 80%;"></div>
-                </td>
-                <td>
-                    <label class="label-header">
-
-                        <?= $salesKontrak['signature_by'] ?>
-                    </label>
-                    <div style="border-top: 1px solid !important; width: 80%;"></div>
-                </td>
-            </tr>
-        </tbody>
-    </table>
 </body>
 
 </html>

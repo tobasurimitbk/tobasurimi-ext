@@ -126,7 +126,7 @@
                 <div class="row">
                     <?php foreach ($jurnalUmum as $j): ?>
                         <div class="alert alert-secondary alert-dismissible fade show mt-3 text-black" role="alert">
-                            <b><?= $j['number'] ?> - <?= $j['name'] ?> - <?= $j['company'] ?></b>
+                            <b><?= $j['number'] ?> - <?= $j['name'] ?></b>
                         </div>
                         <div class="table-responsive">
                             <table class="table table-hover" id="myTable" width="100%" cellspacing="0">
