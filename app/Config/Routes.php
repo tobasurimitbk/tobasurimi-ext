@@ -629,6 +629,7 @@ $routes->get('/return-barang-sales/get-invoice/(:segment)', 'SalesLokal\Retur::g
 $routes->get('/return-barang-sales/get-order_form/(:segment)/(:segment)', 'SalesLokal\Retur::getOrderFormDetail/$1/$2', ['filter' => 'Auth']);
 $routes->get('/return-barang-sales/get-surat_jalan/(:segment)/(:segment)', 'SalesLokal\Retur::getSuratJalanDetail/$1/$2', ['filter' => 'Auth']);
 $routes->get('/return-barang-sales/get-invoice/(:segment)/(:segment)', 'SalesLokal\Retur::getInvoiceDetail/$1/$2', ['filter' => 'Auth']);
+$routes->get('/return-barang-sales/export-excel', 'SalesLokal\Retur::exportExcel', ['filter' => 'Auth']);
 
 // Faktur Penjualan
 $routes->get('/faktur-sales', 'SalesLokal\Faktur::index', ['filter' => 'Auth']);

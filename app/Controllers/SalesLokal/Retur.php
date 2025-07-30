@@ -575,7 +575,7 @@ class Retur extends BaseController
             ->where('company_id', $this->this_company_id)
             ->where('deletedAt', null)
             ->findAll();
-            
+
         $returnData->id = encrypt($returnData->id);
 
         $data = [
@@ -593,7 +593,7 @@ class Retur extends BaseController
     {
         $postData = $this->request->getPost();
         $returnData = json_decode($postData["returnedItems"], true);
-        
+
         $rules = [
             "id_customer" => [
                 "rules" => "required|numeric",
@@ -857,5 +857,69 @@ class Retur extends BaseController
             ->findAll();
 
         return json_encode($salesInvoice);
+    }
+
+    public function exportExcel()
+    {
+        $condition = [
+            "sales_order_return.deletedAt" => null,
+            "sales_order_return.id_company" => $this->this_company_id,
+        ];
+
+        if ($this->is_admin == '0') {
+            $condition["sales_order_return.id_user"] = $this->userId;
+        }
+
+        $addCondition = [
+            "search"    => $this->request->getGet("search"),
+            "sort"      => $this->request->getGet("sort"),
+            "sortType"  => $this->request->getGet("sortType"),
+            "dateStart" => $this->request->getGet("dateStart") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getGet("dateStart")))) : "",
+            "dateEnd"   => $this->request->getGet("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getGet("dateEnd")))) : "",
+        ];
+
+        // Ambil semua data tanpa pagination
+        $returnData = $this->soReturnModel->getAllReturn($condition, $addCondition, null, null);
+
+        $spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+
+        // Header Excel
+        $sheet->setCellValue('A1', 'No');
+        $sheet->setCellValue('B1', 'No Return');
+        $sheet->setCellValue('C1', 'Tanggal Return');
+        $sheet->setCellValue('D1', 'No Referensi');
+        $sheet->setCellValue('E1', 'Nama Customer');
+        $sheet->setCellValue('F1', 'Sudah Dibayar');
+        $sheet->setCellValue('G1', 'Status Approve');
+
+        $row = 2;
+        $no = 1;
+
+        foreach ($returnData['data'] as $data) {
+            $sheet->setCellValue("A{$row}", $no++);
+            $sheet->setCellValue("B{$row}", $data->returnNo);
+            $sheet->setCellValue("C{$row}", date("d/m/Y", strtotime($data->returnDate)));
+            $sheet->setCellValue("D{$row}", $data->refNo);
+            $sheet->setCellValue("E{$row}", $data->customerName);
+            $sheet->setCellValue("F{$row}", floatval($data->already_paid));
+            $sheet->setCellValue("G{$row}", $data->is_approved == 1 ? 'APPROVED' : 'WAITING');
+
+            // Format ribuan untuk kolom Sudah Dibayar
+            $sheet->getStyle("F{$row}")
+                ->getNumberFormat()
+                ->setFormatCode('#,##0');
+
+            $row++;
+        }
+
+        $filename = 'Export-Sales-Order-Return-' . date('YmdHis') . '.xlsx';
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header("Content-Disposition: attachment; filename=\"$filename\"");
+        header('Cache-Control: max-age=0');
+
+        $writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet);
+        $writer->save('php://output');
+        exit;
     }
 }
