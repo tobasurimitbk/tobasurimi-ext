@@ -891,13 +891,18 @@
                         <td style="vertical-align: top;"><?= $salesKontrak['special_instructions'] ?></td>
                     </tr>
                 <?php endif ?>
-
+                <tr>
+                    <td></td>
+                    <td colspan="3">
+                        <label class="label-header">
+                            FOR THOSE ITEMS WHICH ARE NOT COVERED IN THIS CONTRACT, BOTH PARTIES WILL NEGOTIATE AND COME TO COMPROMISE.
+                        </label>
+                    </td>
+                </tr>
             </tbody>
         </table>
         <br>
-        <label class="label-header">
-            FOR THOSE ITEMS WHICH ARE NOT COVERED IN THIS CONTRACT, BOTH PARTIES WILL NEGOTIATE AND COME TO COMPROMISE.
-        </label>
+
         <!-- SIGNATURE TABLE -->
         <table class="mt-1 sign-table border-collapse" style="margin-top: 10px; width: 100%;">
             <thead>
@@ -925,7 +930,9 @@
                 </tr>
                 <tr>
                     <td>
-                        <div style="border-top: 1px solid #000; width: 80%;"></div>
+                        &nbsp;
+                        <div style="border-top: 1px solid #000; width: 80%;">
+                        </div>
                     </td>
                     <td>
                         <label class="label-header"><?= $salesKontrak['signature_by'] ?></label>
