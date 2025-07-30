@@ -720,7 +720,7 @@ $routes->get('/customer-lokal/generate-no', 'Master\Customer::generateNo', ['fil
 $routes->post('/customer-lokal/save', 'Master\Customer::saveCustomer', ['filter' => 'Auth']);
 $routes->post('/customer-lokal/update', 'Master\Customer::updateCustomer', ['filter' => 'Auth']);
 $routes->post('/customer-lokal/delete', 'Master\Customer::deleteCustomer', ['filter' => 'Auth']);
-
+$routes->get('/customer-lokal/export-excel', 'SalesLokal\Customer::exportExcel', ['filter' => 'Auth']);
 
 // Customer Ekspor
 $routes->get('/customer-ekspor', 'SalesInternasional\Customer::index', ['filter' => 'Auth']);
