@@ -170,7 +170,7 @@ class BukuBesar extends BaseController
                 ->where('jurnal_umum.deletedAt', null)
                 ->where($condition)
                 ->whereIn('jurnal_umum.company_id', $companyId)
-                ->orderBy('transaksi_jurnal.no_transaksi', "DESC");
+                ->orderBy('transaksi_jurnal.no_transaksi', "ASC");
                 // ->orderBy('jurnal_umum.debit', "DESC");
 
             // Filter berdasarkan tanggal
