@@ -839,17 +839,18 @@ class OrderForm extends BaseController
 
         $this->dompdf->render();
 
-        // Tambahkan penomoran halaman
         $canvas = $this->dompdf->getCanvas();
         $font = $this->dompdf->getFontMetrics()->getFont('Helvetica', 'normal');
         $fontSize = 9;
 
         $canvas->page_script(function ($pageNumber, $pageCount, $canvas, $fontMetrics) use ($font, $fontSize) {
-            $text = "Page $pageNumber of $pageCount";
-            $textWidth = $fontMetrics->getTextWidth($text, $font, $fontSize);
-            $x = $canvas->get_width() - $textWidth - 20;
-            $y = $canvas->get_height() - 20;
-            $canvas->text($x, $y, $text, $font, $fontSize);
+            if ($pageCount > 1) {
+                $text = "Page $pageNumber of $pageCount";
+                $textWidth = $fontMetrics->getTextWidth($text, $font, $fontSize);
+                $x = $canvas->get_width() - $textWidth - 20;
+                $y = $canvas->get_height() - 20;
+                $canvas->text($x, $y, $text, $font, $fontSize);
+            }
         });
 
         // Output PDF
