@@ -130,16 +130,16 @@ class SuratJalan extends BaseController
             if ($data->sales_order_invoice_id) {
                 $dataSumAmount = $this->SalesOrderInvoiceDetailModel->getSumAmount($data->sales_order_invoice_id);
             }
-            if ($data->sales_id == NULL || $data->sales_id == "0") {
-                $customerSales = "-";
-            } else {
-                $getEmployee = $this->EmployeesModel->select("CONCAT(employees.nip, ' - ', employees.name) AS customerSales")->where('employees.id', $data->sales_id)->first();
-                if ($getEmployee && isset($getEmployee['customerSales'])) {
-                    $customerSales = $getEmployee['customerSales'];
-                } else {
-                    $customerSales = '-'; // atau null, atau string kosong, sesuai kebutuhan
-                }
-            }
+            // if ($data->sales_id == NULL || $data->sales_id == "0") {
+            //     $customerSales = "-";
+            // } else {
+            //     $getEmployee = $this->EmployeesModel->select("CONCAT(employees.nip, ' - ', employees.name) AS customerSales")->where('employees.id', $data->sales_id)->first();
+            //     if ($getEmployee && isset($getEmployee['customerSales'])) {
+            //         $customerSales = $getEmployee['customerSales'];
+            //     } else {
+            //         $customerSales = '-'; // atau null, atau string kosong, sesuai kebutuhan
+            //     }
+            // }
             array_push($dataAllSuratJalan, [
                 "no"            => $no++,
                 "id"            => encrypt($data->id),
@@ -148,7 +148,7 @@ class SuratJalan extends BaseController
                 "no_so"      => implode(', ', $dataNo),
                 "kode_pelanggan"        => $data->kode_pelanggan,
                 "nama_pelanggan" => $data->nama_pelanggan,
-                "customerSales" => $customerSales,
+                "customerSales" => $data->customerSales ?? "-",
                 "shipping_date"         => date("d-m-Y", strtotime($data->shipping_date)),
                 "sales_order_invoice_id" => $data->sales_order_invoice_id,
                 "print" => $data->counter_print,
@@ -349,7 +349,6 @@ class SuratJalan extends BaseController
             "id_user" => $dataSuratJalan->id_user,
             "dataSo" => $dataSo,
             "getJenisPenjualan" => $getJenisPenjualan
-
         ];
         // var_dump($dataSuratJalan->multiple_id_so);
         // // exit;

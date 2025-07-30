@@ -142,7 +142,7 @@
                     <?php if (session()->get("login")->this_company_id != 16) { ?>
                         <div class="col-md-4">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <select class="form-select company_id" name="company_id" id="company_id">
+                                <select class="form-select company_id" name="company_id" id="company_id" <?= (!empty($data) && $data->posting == 1 ? 'disabled' : '') ?>>
                                     <option <?= !empty($data) ? ($data->id_company == "1" ? "selected" : "") : ""; ?> value="1">KIM 1</option>
                                     <option <?= !empty($data) ? ($data->id_company == "2" ? "selected" : "") : ""; ?> value="2">KIM 2</option>
                                     <option <?= !empty($data) ? ($data->id_company == "15" ? "selected" : "") : ""; ?> value="15">GLOBAL</option>

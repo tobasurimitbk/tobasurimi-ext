@@ -223,7 +223,7 @@
                                 <th onclick="changeSort('nameSales')" class="sort">Nama Sales</th>
                                 <th onclick="changeSort('termin')" class="sort">Termin</th>
                                 <th onclick="changeSort('piutang')" class="sort">Limit</th>
-                                <th>Action</th>
+                                <th class="sticky-col">Action</th>
                             </tr>
                         </thead>
                         <tbody class="body-table" id="body-table">
@@ -302,7 +302,7 @@
             className: "text-center"
         }, {
             data: "id",
-            className: "text-center actions",
+            className: "text-center actions sticky-col",
             searchable: false,
             sortable: false,
             render: function(data, type, row) {

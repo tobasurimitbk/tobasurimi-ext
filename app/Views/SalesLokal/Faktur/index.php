@@ -415,9 +415,6 @@
                             <button data-toggle="tooltip" title="Print" class="btn btn-warning btn-print" onclick="print('<?= base_url("faktur-sales/print/"); ?>${id}')" style="box-shadow: none !important;">
                                 <i class="fa fa-print fa-sm" aria-hidden="true"></i>
                             </button>
-                            <button data-toggle="tooltip" title="posting" onclick="posting('${id}', '1')" class="btn btn-success posting-btn">
-                                <i class="fa fa-paper-plane"></i>
-                            </button>
                         `;
                     } else {
                         return `
@@ -530,8 +527,8 @@
             method: "GET",
             success: function(response) {
                 // console.log(response);
-                $('#order_no').val(response.sales_order.no_sales_order);
-                $('#customer_name').val(response.sales_order.name);
+                $('#order_no').val(response.sales_faktur.no_sales_order);
+                $('#customer_name').val(response.sales_faktur.name);
                 const table = $('#tableHistori');
                 var no = 1;
                 table.find('tbody').empty();

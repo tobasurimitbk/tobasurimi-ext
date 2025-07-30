@@ -80,12 +80,14 @@ class SuratJalanModel extends Model
         SUM(sales_order.total_harga) as total_harga, 
         SUM(sales_order.estimated_freight) as estimated_freight, 
         sales_order.tipe_sales_order,
+        CONCAT(employees.nip, ' - ', employees.name) AS customerSales
         ";
 
         $SuratJalan = $this->asObject()
             ->select($selectQry)
             ->join('customers', 'customers.id = surat_jalan_so.id_customer')
             ->join('sales_order', 'sales_order.surat_jalan_so_id = surat_jalan_so.id')
+            ->join('employees', 'employees.id = sales_order.sales_id', 'left')
             ->where($condition)
             ->groupBy('surat_jalan_so.no_surat_jalan')
             ->orderBy($sort, $sortType);
@@ -147,14 +149,15 @@ class SuratJalanModel extends Model
                       customers.address,customers.phone,
                       customers.address AS customerAddress,
                       customers.phone AS customerPhone,
-                      metadata.value AS customerTermin";
+                      metadata.value AS customerTermin,
+                      CONCAT(employees.nip, ' - ', employees.name) AS customerSales";
 
         $dataSuratJalan = $this->asObject()
             ->join('users', 'users.id = surat_jalan_so.id_user', 'left')
             ->join('customers', 'customers.id = surat_jalan_so.id_customer')
             ->join('sales_order', 'sales_order.surat_jalan_so_id = surat_jalan_so.id', 'left')
             ->join('metadata', 'metadata.id = sales_order.payment_terms', 'left')
-            // ->join('employees', 'employees.id = sales_order.sales_id')
+            ->join('employees', 'employees.id = sales_order.sales_id', 'left')
             ->select($selectQry)
             ->find($id);
 
