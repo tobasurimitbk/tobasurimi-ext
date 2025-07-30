@@ -80,7 +80,7 @@ class SuratJalanModel extends Model
         SUM(sales_order.total_harga) as total_harga, 
         SUM(sales_order.estimated_freight) as estimated_freight, 
         sales_order.tipe_sales_order,
-        CONCAT(employees.nip, ' - ', employees.name) AS customerSales
+        employees.name AS customerSales
         ";
 
         $SuratJalan = $this->asObject()
@@ -150,7 +150,7 @@ class SuratJalanModel extends Model
                       customers.address AS customerAddress,
                       customers.phone AS customerPhone,
                       metadata.value AS customerTermin,
-                      CONCAT(employees.nip, ' - ', employees.name) AS customerSales";
+                      employees.name AS customerSales";
 
         $dataSuratJalan = $this->asObject()
             ->join('users', 'users.id = surat_jalan_so.id_user', 'left')

@@ -90,84 +90,90 @@ class SalesOrderModel extends Model
 
     public function getAllSalesOrderLokal($condition, $addCondition, $limit = 10, $offset = 0)
     {
-        //disini
         $availableSort = [
-            'no_sales_order'          => 'sales_order.no_sales_order',
-            'order_date'          => 'sales_order.order_date',
-            'destination'            => 'sales_order.destination',
-            'qty_barang'             => 'sales_order.qty_barang',
-            'total_harga'             => 'sales_order.total_harga',
+            'no_sales_order'        => 'sales_order.no_sales_order',
+            'order_date'            => 'sales_order.order_date',
+            'destination'           => 'sales_order.destination',
+            'qty_barang'            => 'sales_order.qty_barang',
+            'total_harga'           => 'sales_order.total_harga',
             'salesName'             => 'employees.name',
-            'company'             => 'companies.company',
-            'keterangan'      => 'sales_order.keterangan',
-            'createdAt'         => 'sales_order.createdAt',
-            'updatedAt'         => 'sales_order.updatedAt',
+            'company'               => 'companies.company',
+            'keterangan'            => 'sales_order.keterangan',
+            'createdAt'             => 'sales_order.createdAt',
+            'updatedAt'             => 'sales_order.updatedAt',
         ];
         $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
 
-        $sort = $availableSort[$addCondition['sort'] ?? 'createdAt'] ?? 'sales_order.createdAt';
+        $sortField = $availableSort[$addCondition['sort'] ?? 'createdAt'] ?? 'sales_order.createdAt';
         $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'DESC';
 
-        $selectQry = "sales_order.*, 
-        employees.name as salesName, 
-        companies.company AS company_name";
-
-        $salesOrderLokal = $this->asObject()
-            ->select($selectQry)
+        $builder = $this->db->table('sales_order')
+            ->select("sales_order.*, 
+            employees.name as salesName, 
+            companies.company AS company_name,
+            CAST(SUBSTRING_INDEX(SUBSTRING_INDEX(no_sales_order, '/', -2), '/', 1) AS UNSIGNED) AS tahun_so,
+            FIELD(SUBSTRING_INDEX(SUBSTRING_INDEX(no_sales_order, '/', -3), '/', 1),
+                'I','II','III','IV','V','VI','VII','VIII','IX','X','XI','XII') AS bulan_so,
+            CAST(SUBSTRING_INDEX(no_sales_order, '/', -1) AS UNSIGNED) AS nomor_so")
             ->join('employees', 'employees.id = sales_order.sales_id', 'left')
             ->join('companies', 'companies.id = sales_order.id_company', 'left')
             ->where($condition)
-            ->orderBy($sort, $sortType);
+            ->where('tipe_sales_order', 'LOKAL');
 
-        $totalData = $salesOrderLokal->countAllResults(false);
-
-        if ($addCondition['search'] || $addCondition['dateStart'] || $addCondition['dateEnd'] || $addCondition['filter_invoice'] || $addCondition['filter_surat_jalan'] || $addCondition['filter_customer']) {
-            $salesOrderLokal->groupStart();
-        }
+        // Filtering
         if ($addCondition['search']) {
-            $salesOrderLokal
-                ->like('no_sales_order', $addCondition['search']);
+            $builder->like('no_sales_order', $addCondition['search']);
         }
-
-        $salesOrderLokal->where('tipe_sales_order', 'LOKAL');
 
         if ($addCondition['dateStart']) {
-            $salesOrderLokal->where('sales_order.order_date >=',  $addCondition['dateStart']);
+            $builder->where('sales_order.order_date >=', $addCondition['dateStart']);
         }
+
         if ($addCondition['dateEnd']) {
-            $salesOrderLokal->where('sales_order.order_date <=', $addCondition['dateEnd']);
+            $builder->where('sales_order.order_date <=', $addCondition['dateEnd']);
         }
 
         if ($addCondition['filter_customer']) {
-            $salesOrderLokal->where('sales_order.id_customer', $addCondition['filter_customer']);
+            $builder->where('sales_order.id_customer', $addCondition['filter_customer']);
         }
 
         if ($addCondition['filter_invoice'] == "belum") {
-            $salesOrderLokal->where('sales_order.sales_order_invoice_id', NULL);
-        }
-
-        if ($addCondition['filter_invoice'] == "sudah") {
-            $salesOrderLokal->where('sales_order.sales_order_invoice_id !=', NULL);
+            $builder->where('sales_order.sales_order_invoice_id', null);
+        } elseif ($addCondition['filter_invoice'] == "sudah") {
+            $builder->where('sales_order.sales_order_invoice_id IS NOT', null);
         }
 
         if ($addCondition['filter_surat_jalan'] == "belum") {
-            $salesOrderLokal->where('sales_order.surat_jalan_so_id', NULL);
+            $builder->where('sales_order.surat_jalan_so_id', null);
+        } elseif ($addCondition['filter_surat_jalan'] == "sudah") {
+            $builder->where('sales_order.surat_jalan_so_id IS NOT', null);
         }
 
-        if ($addCondition['filter_surat_jalan'] == "sudah") {
-            $salesOrderLokal->where('sales_order.surat_jalan_so_id !=', NULL);
-        }
-        if ($addCondition['search'] || $addCondition['dateStart'] || $addCondition['dateEnd'] || $addCondition['filter_invoice'] || $addCondition['filter_surat_jalan'] || $addCondition['filter_customer']) {
-            $salesOrderLokal->groupEnd();
-        }
+        // Clone builder untuk count data
+        $totalBuilder = clone $builder;
+        $totalFilteredData = $totalBuilder->countAllResults();
 
-        $totalFilteredData = $salesOrderLokal->countAllResults(false);
-
-        if ($limit && $offset) {
-            $data = $salesOrderLokal->findAll($limit, $offset);
+        // Sorting
+        if (($addCondition['sort'] ?? '') === 'no_sales_order') {
+            $builder->orderBy("tahun_so", $sortType)
+                ->orderBy("bulan_so", $sortType)
+                ->orderBy("nomor_so", $sortType);
         } else {
-            $data = $salesOrderLokal->findAll();
+            $builder->orderBy($sortField, $sortType);
         }
+
+        // Pagination
+        if ($limit && $offset >= 0) {
+            $builder->limit($limit, $limit * $offset);
+        }
+
+        $data = $builder->get()->getResult();
+
+        // Total tanpa filter
+        $totalData = $this->db->table('sales_order')
+            ->where($condition)
+            ->where('tipe_sales_order', 'LOKAL')
+            ->countAllResults();
 
         return [
             'data'              => $data,
