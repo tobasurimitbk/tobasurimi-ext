@@ -1034,9 +1034,10 @@
                     <div style="border-top: 1px solid !important; width: 80%;"></div>
                 </td>
                 <td>
-                    <b>
+                    <label class="label-header">
+
                         <?= $salesKontrak['signature_by'] ?>
-                    </b>
+                    </label>
                     <div style="border-top: 1px solid !important; width: 80%;"></div>
                 </td>
             </tr>
