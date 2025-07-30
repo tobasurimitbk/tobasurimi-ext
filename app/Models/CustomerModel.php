@@ -129,8 +129,13 @@ class CustomerModel extends Model
 
         $totalData = $customerDataQry->countAllResults(false);
         $totalFilteredData = $customerDataQry->countAllResults(false);
-        $data = $customerDataQry->orderBy($sort, $sortType)
-            ->findAll($limit, $offset);
+        if ($limit && $offset) {
+            $data = $customerDataQry->orderBy($sort, $sortType)
+                ->findAll($limit, $offset);
+        } else {
+            $data = $customerDataQry->orderBy($sort, $sortType)
+                ->findAll();
+        }
 
         return [
             'data'              => $data,
@@ -203,8 +208,14 @@ class CustomerModel extends Model
         }
 
         $totalFilteredData = $customerDataQry->countAllResults(false);
-        $data = $customerDataQry->orderBy($sort, $sortType)
-            ->findAll($limit, $offset);
+
+        if ($limit && $offset) {
+            $data = $customerDataQry->orderBy($sort, $sortType)
+                ->findAll($limit, $offset);
+        } else {
+            $data = $customerDataQry->orderBy($sort, $sortType)
+                ->findAll();
+        }
 
         return [
             'data'              => $data,

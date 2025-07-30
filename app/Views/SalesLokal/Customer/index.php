@@ -190,12 +190,18 @@
 <!-- Begin Page Content -->
 <section class="section">
     <div class="section-header">
-        <h1>Customer Lokal</h1>
-        <?php if (can('Penjualan Lokal', 'Customer', 'c')) : ?>
-            <button class="btn btn-show-form btn-add float-right btn-show-form-lokal" data-btn="create-modal">
-                <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
-            </button>
-        <?php endif; ?>
+        <h1 class="mb-2 mb-md-0">Customer Lokal</h1>
+        <div class="col-button-tambah-spp">
+            <a class="btn btn-warning btn-print float-right" href="#" target="_blank" id="btn-export">
+                <i class="fa fa-download"></i> Export
+            </a>
+
+            <?php if (can('Penjualan Lokal', 'Faktur Penjualan', 'c')): ?>
+                <button class="btn btn-show-form btn-success float-right btn-submit" data-btn="create-modal">
+                    <i class="fa fa-plus fa-sm me-1"></i> Tambah
+                </button>
+            <?php endif; ?>
+        </div>
     </div>
     <div class="card">
         <div class="card-body">
@@ -733,6 +739,17 @@
             .parent('div')
             .find('label')
             .css('z-index', '1');
+
+        $('#btn-export').on('click', function(e) {
+            e.preventDefault();
+
+            let customerType = "LOKAL";
+            let search = $(".form-search-lokal").val();
+
+            let exportUrl = `/customer-lokal/export-excel?customerType=${customerType}&search=${search}&sort=${sort}&sortType=${sortType}`;
+
+            window.open(exportUrl, '_blank');
+        });
 
         var validator = $(".create-form-lokal").validate({
             rules: {
