@@ -162,7 +162,12 @@ class SalesOrderModel extends Model
         }
 
         $totalFilteredData = $salesOrderLokal->countAllResults(false);
-        $data = $salesOrderLokal->findAll($limit, $offset);
+
+        if ($limit && $offset) {
+            $data = $salesOrderLokal->findAll($limit, $offset);
+        } else {
+            $data = $salesOrderLokal->findAll();
+        }
 
         return [
             'data'              => $data,

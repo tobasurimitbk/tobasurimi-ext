@@ -26,6 +26,8 @@ use App\Models\SuratJalanModel;
 use Error;
 use ErrorException;
 use Exception;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
 class OrderForm extends BaseController
 {
@@ -1165,5 +1167,95 @@ class OrderForm extends BaseController
         }
         echo json_encode($data);
         return;
+    }
+
+    public function exportExcel()
+    {
+        $limit = null;
+        $offset = null;
+
+        $condition = [
+            "sales_order.deletedAt" => null,
+        ];
+
+        if ($this->is_admin == '0') {
+            $condition['sales_order.id_user'] = $this->userId;
+        }
+
+        $addCondition = [
+            "search"              => $this->request->getGet("search"),
+            "sort"                => $this->request->getGet("sort"),
+            "sortType"            => $this->request->getGet("sortType"),
+            "filter_customer"     => $this->request->getGet("filter_customer"),
+            "filter_invoice"      => $this->request->getGet("filter_invoice"),
+            "filter_surat_jalan"  => $this->request->getGet("filter_surat_jalan"),
+            "dateStart"           => $this->request->getGet("dateStart") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateStart")))) : "",
+            "dateEnd"             => $this->request->getGet("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateEnd")))) : "",
+        ];
+
+        $dataOrderForm = $this->SalesOrderModel
+            ->getAllSalesOrderLokal($condition, $addCondition, $limit, $offset);
+
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+
+        // Header
+        $sheet->setCellValue('A1', 'No');
+        $sheet->setCellValue('B1', 'No Sales Order');
+        $sheet->setCellValue('C1', 'Tanggal Order');
+        $sheet->setCellValue('D1', 'Tanggal Kirim');
+        $sheet->setCellValue('E1', 'Nama Customer');
+        $sheet->setCellValue('F1', 'Nama Sales');
+        $sheet->setCellValue('G1', 'Qty Barang');
+        $sheet->setCellValue('H1', 'Total Harga');
+        $sheet->setCellValue('I1', 'Keterangan');
+
+        $row = 2;
+        $no = 1;
+
+        foreach ($dataOrderForm['data'] as $data) {
+            $customerName = '';
+            $dataCustomer = $this->CustomerModel->get_by_id($data->id_customer);
+            foreach ($dataCustomer as $datasC) {
+                $customerName = $datasC["name"];
+            }
+
+            $qtyBarang = count(
+                $this->SalesOrderDetailModel
+                    ->where('id_sales_order', $data->id)
+                    ->where('deletedAt', null)
+                    ->where('tipe_input', "order_form")
+                    ->findAll()
+            );
+
+            $totalHarga = $data->estimated_freight + $data->total_harga;
+
+            $sheet->setCellValue("A{$row}", $no++);
+            $sheet->setCellValue("B{$row}", $data->no_sales_order);
+            $sheet->setCellValue("C{$row}", date("d/m/Y", strtotime($data->order_date)));
+            $sheet->setCellValue("D{$row}", $data->shipping_date == "0000-00-00" ? "" : date("d/m/Y", strtotime($data->shipping_date)));
+            $sheet->setCellValue("E{$row}", $customerName);
+            $sheet->setCellValue("F{$row}", $data->salesName);
+            $sheet->setCellValue("G{$row}", $qtyBarang);
+            $sheet->setCellValue("H{$row}", floatval($totalHarga));
+            $sheet->setCellValue("I{$row}", $data->keterangan);
+
+            // Format angka kolom harga
+            $sheet->getStyle("H{$row}")
+                ->getNumberFormat()
+                ->setFormatCode('#,##0');
+
+            $row++;
+        }
+
+        $filename = 'Export-Sales-Order-Lokal-' . date('YmdHis') . '.xlsx';
+
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header("Content-Disposition: attachment; filename=\"$filename\"");
+        header('Cache-Control: max-age=0');
+
+        $writer = new Xlsx($spreadsheet);
+        $writer->save('php://output');
+        exit;
     }
 }
