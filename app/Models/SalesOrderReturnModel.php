@@ -118,7 +118,12 @@ class SalesOrderReturnModel extends Model
         }
 
         $totalFilteredData = $soReturn->countAllResults(false);
-        $data = $soReturn->findAll($limit, $offset);
+
+        if ($limit && $offset) {
+            $data = $soReturn->findAll($limit, $offset);
+        } else {
+            $data = $soReturn->findAll();
+        }
 
         return [
             'data'              => $data,

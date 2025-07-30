@@ -6,11 +6,17 @@
     <div class="section-header">
         <h1>Return Barang Sales</h1>
         <?= csrf_field() ?>
-        <?php if (can('Penjualan Lokal', 'Return Barang', 'c')) : ?>
-            <a class="btn btn-show-form btn-add float-right" href="<?= base_url("return-barang-sales/create"); ?>">
-                <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
+        <div class="col-button-tambah-spp">
+            <a class="btn btn-warning btn-print float-right" href="#" target="_blank" id="btn-export">
+                <i class="fa fa-download"></i> Export
             </a>
-        <?php endif; ?>
+
+            <?php if (can('Penjualan Lokal', 'Return Barang', 'c')): ?>
+                <a class="btn btn-show-form btn-success float-right btn-submit" href="<?= base_url("return-barang-sales/create"); ?>">
+                    <i class="fa fa-plus fa-sm me-1"></i> Tambah
+                </a>
+            <?php endif; ?>
+        </div>
     </div>
     <div class="card">
         <div class="card-body">
@@ -53,6 +59,18 @@
         $(".search").keyup(function() {
             table.ajax.reload();
         })
+
+        $('#btn-export').on('click', function(e) {
+            e.preventDefault();
+
+            let search = $(".search").val();
+            let dateStart = $(".dateStart").val();
+            let dateEnd = $(".dateEnd").val();
+
+            let exportUrl = `/return-barang-sales/export-excel?search=${encodeURIComponent(search)}&sort=${sort}&sortType=${sortType}&dateStart=${encodeURIComponent(dateStart)}&dateEnd=${encodeURIComponent(dateEnd)}`;
+
+            window.open(exportUrl, '_blank');
+        });
     })
 
     const table = $('.dataTable').DataTable({
