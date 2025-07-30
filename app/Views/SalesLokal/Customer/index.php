@@ -196,7 +196,7 @@
                 <i class="fa fa-download"></i> Export
             </a>
 
-            <?php if (can('Penjualan Lokal', 'Faktur Penjualan', 'c')): ?>
+            <?php if (can('Penjualan Lokal', 'Customer', 'c')): ?>
                 <button class="btn btn-show-form-lokal btn-success float-right btn-submit" data-btn="create-modal">
                     <i class="fa fa-plus fa-sm me-1"></i> Tambah
                 </button>
