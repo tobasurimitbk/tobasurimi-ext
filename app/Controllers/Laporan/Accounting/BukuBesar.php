@@ -202,34 +202,52 @@ class BukuBesar extends BaseController
                 if ($jenisAccount == "sub_account") {
                     $subAccount = $this->Sub_AkunsModel
                                     ->where('sub_akuns.id', $a)
+                                    ->where('sub_akuns.deletedAt', null)
                                     ->join('companies', 'companies.id = sub_akuns.company_id', 'left')
                                     ->select('sub_akuns.*, companies.company')
                                     ->first();
                     [$resultJurnalUmum, $saldoLama] = $fetchJurnalData([$a]);
-                    $result[] = [
-                        'id' => $subAccount['id'],
-                        'number' => $subAccount['no_sub'],
-                        'company' => $subAccount['company'],
-                        'name' => $subAccount['nama_sub'],
-                        'saldo_lama' => $saldoLama,
-                        'result' => $resultJurnalUmum,
-                    ];
+                    
+                    $key = $subAccount['nama_sub'];
+                    if (!isset($result[$key])) {
+                        $result[$key] = [
+                            'id' => $subAccount['id'],
+                            'number' => $subAccount['no_sub'],
+                            'company' => $subAccount['company'],
+                            'name' => $subAccount['nama_sub'],
+                            'saldo_lama' => $saldoLama,
+                            'result' => $resultJurnalUmum,
+                        ];
+                    } else {
+                        $result[$key]['saldo_lama'] += $saldoLama;
+                        $result[$key]['result'] = array_merge($result[$key]['result'], $resultJurnalUmum);
+                    }
                 } else {
                     $headerAccount = $this->HeaderAkunsModel
                                     ->where('header_akuns.id', $a)
+                                    ->where('header_akuns.deletedAt', null)
                                     ->join('companies', 'companies.id = header_akuns.company_id', 'left')
                                     ->select('header_akuns.*, companies.company')
                                     ->first();
+                    if ($headerAccount === null) {
+                        continue; // Lewati iterasi ini jika tidak ada data
+                    }
                     $subAccountIds = $this->Sub_AkunsModel->where('header_id', $headerAccount['id'])->findColumn('id');
                     [$resultJurnalUmum, $saldoLama] = $fetchJurnalData($subAccountIds);
-                    $result[] = [
-                        'id' => $headerAccount['id'],
-                        'number' => $headerAccount['no_header'],
-                        'company' => $subAccount['company'],
-                        'name' => $headerAccount['nama_header'],
-                        'saldo_lama' => $saldoLama,
-                        'result' => $resultJurnalUmum,
-                    ];
+                    $key = $headerAccount['nama_header'];
+                    if (!isset($result[$key])) {
+                        $result[$key] = [
+                            'id' => $headerAccount['id'],
+                            'number' => $headerAccount['no_header'],
+                            'company' => $headerAccount['company'],
+                            'name' => $headerAccount['nama_header'],
+                            'saldo_lama' => $saldoLama,
+                            'result' => $resultJurnalUmum,
+                        ];
+                    } else {
+                        $result[$key]['saldo_lama'] += $saldoLama;
+                        $result[$key]['result'] = array_merge($result[$key]['result'], $resultJurnalUmum);
+                    }
                 }
             }
         } elseif (!empty($rangeAccountStartId) && !empty($rangeAccountFinishId)) {
@@ -242,25 +260,37 @@ class BukuBesar extends BaseController
             foreach ($accounts as $account) {
                 if ($jenisAccount == "sub_account") {
                     [$resultJurnalUmum, $saldoLama] = $fetchJurnalData([$account['id']]);
-                    $result[] = [
-                        'id' => $account['id'],
-                        'number' => $account['no_sub'],
-                        'company' => $account['company'],
-                        'name' => $account['nama_sub'],
-                        'saldo_lama' => $saldoLama,
-                        'result' => $resultJurnalUmum,
-                    ];
+                    $key = $subAccount['nama_sub'];
+                    if (!isset($result[$key])) {
+                        $result[$key] = [
+                            'id' => $subAccount['id'],
+                            'number' => $subAccount['no_sub'],
+                            'company' => $subAccount['company'],
+                            'name' => $subAccount['nama_sub'],
+                            'saldo_lama' => $saldoLama,
+                            'result' => $resultJurnalUmum,
+                        ];
+                    } else {
+                        $result[$key]['saldo_lama'] += $saldoLama;
+                        $result[$key]['result'] = array_merge($result[$key]['result'], $resultJurnalUmum);
+                    }
                 } else {
                     $subAccountIds = $this->Sub_AkunsModel->where('header_id', $account['id'])->findColumn('id');
                     [$resultJurnalUmum, $saldoLama] = $fetchJurnalData($subAccountIds);
-                    $result[] = [
-                        'id' => $account['id'],
-                        'number' => $account['no_header'],
-                        'company' => $account['company'],
-                        'name' => $account['nama_header'],
-                        'saldo_lama' => $saldoLama,
-                        'result' => $resultJurnalUmum,
-                    ];
+                    $key = $headerAccount['nama_header'];
+                    if (!isset($result[$key])) {
+                        $result[$key] = [
+                            'id' => $headerAccount['id'],
+                            'number' => $headerAccount['no_header'],
+                            'company' => $headerAccount['company'],
+                            'name' => $headerAccount['nama_header'],
+                            'saldo_lama' => $saldoLama,
+                            'result' => $resultJurnalUmum,
+                        ];
+                    } else {
+                        $result[$key]['saldo_lama'] += $saldoLama;
+                        $result[$key]['result'] = array_merge($result[$key]['result'], $resultJurnalUmum);
+                    }
                 }
             }
         }
