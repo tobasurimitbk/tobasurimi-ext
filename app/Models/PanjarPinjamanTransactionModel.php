@@ -180,7 +180,7 @@ class PanjarPinjamanTransactionModel extends Model
         return $generatedNo;
     }
 
-public function get_new_no(
+     public function get_new_no(
         $jenis,
         $divisi,
         $paymentMethod,
@@ -376,13 +376,20 @@ public function get_new_no(
             $builder = $db->table($table);
             
             foreach ($searchPatterns as $pattern) {
-                $lastRecord = $builder->select($column)
-                                    ->like($column, $pattern, 'after')
-                                    ->where('createdAt >=', "{$thn}-{$bln}-01 00:00:00")
-                                    ->where('createdAt <=', "{$last_day} 23:59:59")
-                                    ->where('company_id', $companyID)
-                                    ->where('deletedAt', null)
-                                    ->orderBy($column, 'DESC')
+                $query = $builder->select($column)
+                        ->like($column, $pattern, 'after')
+                        ->where('createdAt >=', "{$thn}-{$bln}-01 00:00:00")
+                        ->where('createdAt <=', "{$last_day} 23:59:59")
+                        ->where('deletedAt', null);
+
+                    // Khusus untuk companyID 1 dan 2, gabungkan
+                    if (!in_array($companyID, [1, 2])) {
+                        $query->where('company_id', $companyID);
+                    } else {
+                        $query->whereIn('company_id', [1, 2]);
+                    }
+
+                $lastRecord = $query->orderBy($column, 'DESC')
                                     ->get(1)
                                     ->getRowArray();
 
