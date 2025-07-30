@@ -593,6 +593,7 @@ $routes->get('/invoice-penjualan-lokal/getItemList/(:num)', 'SalesLokal\Invoice:
 $routes->get('/invoice-penjualan-lokal/print/(:segment)', 'SalesLokal\Invoice::printInvoice/$1', ['filter' => 'Auth']);
 $routes->get('/invoice-penjualan-lokal/get-nomor-faktur', 'SalesLokal\Invoice::getNomorFaktur', ['filter' => 'Auth']);
 $routes->get('/invoice-penjualan-lokal/barangAll', 'SalesLokal\Invoice::getAllBarang', ['filter' => 'Auth']);
+$routes->get('/invoice-penjualan-lokal/export-excel', 'SalesLokal\Invoice::exportExcel', ['filter' => 'Auth']);
 // $routes->post('/invoice-penjualan-lokal/print',  'SalesLokal\Invoice::printInvoice', ['filter' => 'Auth']);
 
 // Surat Jalan

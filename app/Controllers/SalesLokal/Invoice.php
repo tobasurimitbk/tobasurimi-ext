@@ -1433,4 +1433,93 @@ class Invoice extends BaseController
         echo json_encode($data);
         return;
     }
+
+    public function exportExcel()
+    {
+        $condition = [
+            "sales_order_invoice.deletedAt" => null,
+            "sales_order_invoice.tipe_invoice" => 'LOKAL',
+        ];
+
+        if ($this->is_admin == '0') {
+            $condition["sales_order_invoice.id_user"] = $this->userId;
+        }
+
+        $addCondition = [
+            "search"                => $this->request->getGet("search"),
+            "sort"                  => $this->request->getGet("sort"),
+            "sortType"              => $this->request->getGet("sortType"),
+            "filter_jenis_dokumen" => $this->request->getGet("filter_jenis_dokumen"),
+            "filter_customer"       => $this->request->getGet("filter_customer"),
+            "dateStart"             => $this->request->getGet("dateStart") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getGet("dateStart")))) : "",
+            "dateEnd"               => $this->request->getGet("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getGet("dateEnd")))) : "",
+        ];
+
+        $dataSalesOrderInvoice = $this->SalesOrderInvoiceModel->getAllSalesOrderInvoiceLokal($condition, $addCondition, null, null);
+
+        $spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+
+        // Set header Excel
+        $sheet->setCellValue('A1', 'No');
+        $sheet->setCellValue('B1', 'No Faktur');
+        $sheet->setCellValue('C1', 'Tanggal Faktur');
+        $sheet->setCellValue('D1', 'Jenis Dokumen');
+        $sheet->setCellValue('E1', 'No Dokumen');
+        $sheet->setCellValue('F1', 'Kode Pelanggan');
+        $sheet->setCellValue('G1', 'Nama Pelanggan');
+        $sheet->setCellValue('H1', 'Nama Sales');
+        $sheet->setCellValue('I1', 'Tipe Invoice');
+        $sheet->setCellValue('J1', 'Total Invoice');
+        $sheet->setCellValue('K1', 'Keterangan');
+        $sheet->setCellValue('L1', 'Status Posting');
+        $sheet->setCellValue('M1', 'Counter Print');
+        $sheet->setCellValue('N1', 'Status Pembayaran');
+
+        $row = 2;
+        $no = 1;
+
+        foreach ($dataSalesOrderInvoice['data'] as $data) {
+            // Bersihkan string No Dokumen
+            $unwanted_characters = ['[', '"', ']'];
+            $cleaned_doc_no = str_replace($unwanted_characters, ' ', $data->doc_no);
+
+            // Status pembayaran
+            $statusPembayaran = ($data->status_pelunasan == "UNPAID") ? "BELUM LUNAS" : "LUNAS";
+
+            // Format angka: hanya ribuan (tanpa "Rp")
+            $total_invoice = floatval($data->total_invoice);
+
+            $sheet->setCellValue("A{$row}", $no++);
+            $sheet->setCellValue("B{$row}", $data->no_faktur);
+            $sheet->setCellValue("C{$row}", $data->tanggal_faktur);
+            $sheet->setCellValue("D{$row}", strtoupper($data->doc_type));
+            $sheet->setCellValue("E{$row}", $cleaned_doc_no);
+            $sheet->setCellValue("F{$row}", $data->kode_pelanggan);
+            $sheet->setCellValue("G{$row}", $data->nama_pelanggan);
+            $sheet->setCellValue("H{$row}", $data->salesName);
+            $sheet->setCellValue("I{$row}", $data->tipe_invoice);
+            $sheet->setCellValue("J{$row}", $total_invoice);
+            $sheet->setCellValue("K{$row}", $data->keterangan);
+            $sheet->setCellValue("L{$row}", $data->status_posting == 0 ? 'WAITING' : 'POSTING');
+            $sheet->setCellValue("M{$row}", $data->counter_print);
+            $sheet->setCellValue("N{$row}", $statusPembayaran);
+
+            // Format angka ribuan
+            $sheet->getStyle("J{$row}")
+                ->getNumberFormat()
+                ->setFormatCode('#,##0');
+
+            $row++;
+        }
+
+        $filename = 'Export-Sales-Order-Invoice-' . date('YmdHis') . '.xlsx';
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header("Content-Disposition: attachment; filename=\"$filename\"");
+        header('Cache-Control: max-age=0');
+
+        $writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet);
+        $writer->save('php://output');
+        exit;
+    }
 }

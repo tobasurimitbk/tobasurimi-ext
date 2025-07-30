@@ -13,11 +13,17 @@
 <section class="section">
     <div class="section-header">
         <h1>Invoice Penjualan Lokal</h1>
-        <?php if (can('Penjualan Lokal', 'Invoice', 'c')) : ?>
-            <a class="btn btn-show-form btn-add float-right" href="<?= base_url("invoice-penjualan-lokal/create"); ?>">
-                <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
+        <div class="col-button-tambah-spp">
+            <a class="btn btn-warning btn-print float-right" href="#" target="_blank" id="btn-export">
+                <i class="fa fa-download"></i> Export
             </a>
-        <?php endif; ?>
+
+            <?php if (can('Penjualan Lokal', 'Invoice', 'c')): ?>
+                <a class="btn btn-show-form btn-success float-right btn-submit" href="<?= base_url("invoice-penjualan-lokal/create"); ?>">
+                    <i class="fa fa-plus fa-sm me-1"></i> Tambah
+                </a>
+            <?php endif; ?>
+        </div>
     </div>
     <div class="card">
         <div class="card-body">
@@ -184,6 +190,20 @@
 
         $(".dateStart, .dateEnd, .filter_customer, .filter_jenis_dokumen").change(function() {
             table.ajax.reload();
+        });
+
+        $('#btn-export').on('click', function(e) {
+            e.preventDefault();
+
+            let search = $(".search").val();
+            let dateStart = $(".dateStart").val();
+            let dateEnd = $(".dateEnd").val();
+            let filter_customer = $(".filter_customer").val();
+            let filter_jenis_dokumen = $(".filter_jenis_dokumen").val();
+
+            let exportUrl = `/invoice-penjualan-lokal/export-excel?search=${encodeURIComponent(search)}&sort=${sort}&sortType=${sortType}&dateStart=${encodeURIComponent(dateStart)}&dateEnd=${encodeURIComponent(dateEnd)}&filter_customer=${filter_customer}&filter_jenis_dokumen=${filter_jenis_dokumen}`;
+
+            window.open(exportUrl, '_blank');
         });
     })
 
@@ -463,7 +483,7 @@
         window.open(url, "_blank");
     }
 
-    function edit(id){
+    function edit(id) {
         location.replace(`<?= base_url("invoice-penjualan-lokal/id"); ?>/${id}`);
     }
 </script>
