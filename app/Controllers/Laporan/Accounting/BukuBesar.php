@@ -171,7 +171,6 @@ class BukuBesar extends BaseController
                 ->where($condition)
                 ->whereIn('jurnal_umum.company_id', $companyId)
                 ->orderBy('transaksi_jurnal.no_transaksi', "ASC");
-                // ->orderBy('jurnal_umum.debit', "DESC");
 
             // Filter berdasarkan tanggal
             if ($dateStart) {
@@ -220,6 +219,10 @@ class BukuBesar extends BaseController
                     } else {
                         $result[$key]['saldo_lama'] += $saldoLama;
                         $result[$key]['result'] = array_merge($result[$key]['result'], $resultJurnalUmum);
+                        // Urutkan ASC berdasarkan no_transaksi
+                        usort($result[$key]['result'], function($a, $b) {
+                            return strcmp($a['no_transaksi'], $b['no_transaksi']);
+                        });
                     }
                 } else {
                     $headerAccount = $this->HeaderAkunsModel
@@ -246,6 +249,10 @@ class BukuBesar extends BaseController
                     } else {
                         $result[$key]['saldo_lama'] += $saldoLama;
                         $result[$key]['result'] = array_merge($result[$key]['result'], $resultJurnalUmum);
+                        // Urutkan ASC berdasarkan no_transaksi
+                        usort($result[$key]['result'], function($a, $b) {
+                            return strcmp($a['no_transaksi'], $b['no_transaksi']);
+                        });
                     }
                 }
             }
@@ -272,6 +279,10 @@ class BukuBesar extends BaseController
                     } else {
                         $result[$key]['saldo_lama'] += $saldoLama;
                         $result[$key]['result'] = array_merge($result[$key]['result'], $resultJurnalUmum);
+                        // Urutkan ASC berdasarkan no_transaksi
+                        usort($result[$key]['result'], function($a, $b) {
+                            return strcmp($a['no_transaksi'], $b['no_transaksi']);
+                        });
                     }
                 } else {
                     $subAccountIds = $this->Sub_AkunsModel->where('header_id', $account['id'])->findColumn('id');
@@ -288,7 +299,10 @@ class BukuBesar extends BaseController
                         ];
                     } else {
                         $result[$key]['saldo_lama'] += $saldoLama;
-                        $result[$key]['result'] = array_merge($result[$key]['result'], $resultJurnalUmum);
+                        $result[$key]['result'] = array_merge($result[$key]['result'], $resultJurnalUmum);// Urutkan ASC berdasarkan no_transaksi
+                        usort($result[$key]['result'], function($a, $b) {
+                            return strcmp($a['no_transaksi'], $b['no_transaksi']);
+                        });
                     }
                 }
             }
