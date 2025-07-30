@@ -7,6 +7,8 @@ use App\Models\BarangMasterSalesModel;
 use App\Models\MetadataModel;
 use App\Models\SatuansModel;
 use Exception;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
 class Barang extends BaseController
 {
@@ -235,5 +237,78 @@ class Barang extends BaseController
                 'token' => csrf_hash()
             ]);
         }
+    }
+
+    public function exportExcel()
+    {
+        $limit = null;
+        $offset = null;
+
+        $condition = [
+            'barang_master_sales.company_id' => $this->this_company_id,
+            'barang_master_sales.type_barang_sales' => 'LOKAL',
+            'barang_master_sales.deletedAt' => null,
+        ];
+
+        $addCondition = [
+            "search"        => $this->request->getGet("search"),
+            "type_barang"   => $this->request->getGet("type_barang"),
+            "sort"          => $this->request->getGet("sort"),
+            "sortType"      => $this->request->getGet("sortType"),
+        ];
+
+        $dataResult = $this->barangMasterSalesModel->getList($condition, $addCondition, $limit, $offset);
+
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+
+        // Header Excel
+        $sheet->setCellValue('A1', 'No');
+        $sheet->setCellValue('B1', 'Kode Barang');
+        $sheet->setCellValue('C1', 'Nama Barang');
+        $sheet->setCellValue('D1', 'Type Barang Sales');
+        $sheet->setCellValue('E1', 'Satuan');
+        $sheet->setCellValue('F1', 'Jenis Barang');
+        $sheet->setCellValue('G1', 'Harga Pokok');
+        $sheet->setCellValue('H1', 'Harga Jual');
+        $sheet->setCellValue('I1', 'Status PPN');
+
+        $row = 2;
+        $no = 1;
+
+        foreach ($dataResult['data'] as $data) {
+            $sheet->setCellValue("A{$row}", $no++);
+            $sheet->setCellValue("B{$row}", $data['kode_barang']);
+            $sheet->setCellValue("C{$row}", $data['barang_name']);
+            $sheet->setCellValue("D{$row}", $data['type_barang_sales']);
+            $sheet->setCellValue("E{$row}", $data['kode_satuan']);
+            $sheet->setCellValue("F{$row}", strtoupper(str_replace('_', ' ', $data['type_barang'])));
+
+            // Set numeric values without formatting
+            $sheet->setCellValue("G{$row}", floatval($data['harga_pokok']));
+            $sheet->setCellValue("H{$row}", floatval($data['harga_jual']));
+            $sheet->setCellValue("I{$row}", $data['status_ppn']);
+
+            // Apply Excel currency format (IDR style, can be customized)
+            $sheet->getStyle("G{$row}")
+                ->getNumberFormat()
+                ->setFormatCode('#,##0');
+
+            $sheet->getStyle("H{$row}")
+                ->getNumberFormat()
+                ->setFormatCode('#,##0');
+
+            $row++;
+        }
+
+        $filename = 'Export-Barang-Lokal-' . date('YmdHis') . '.xlsx';
+
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header("Content-Disposition: attachment; filename=\"$filename\"");
+        header('Cache-Control: max-age=0');
+
+        $writer = new Xlsx($spreadsheet);
+        $writer->save('php://output');
+        exit;
     }
 }

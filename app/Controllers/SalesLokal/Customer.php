@@ -189,12 +189,23 @@ class Customer extends BaseController
             $sheet->setCellValue("D{$row}", $data->name);
             $sheet->setCellValue("E{$row}", $data->phone);
             $sheet->setCellValue("F{$row}", $data->contact_person);
-            $sheet->setCellValue("G{$row}", number_format(floatval($data->saldo)));
+
+            // Saldo as number
+            $sheet->setCellValue("G{$row}", floatval($data->saldo));
+            $sheet->getStyle("G{$row}")
+                ->getNumberFormat()
+                ->setFormatCode('#,##0');
+
             $sheet->setCellValue("H{$row}", $data->currencyName);
             $sheet->setCellValue("I{$row}", $data->countryName);
             $sheet->setCellValue("J{$row}", $data->address);
             $sheet->setCellValue("K{$row}", $termin);
-            $sheet->setCellValue("L{$row}", number_format(floatval($data->piutang)));
+
+            // Piutang as number
+            $sheet->setCellValue("L{$row}", floatval($data->piutang));
+            $sheet->getStyle("L{$row}")
+                ->getNumberFormat()
+                ->setFormatCode('#,##0');
 
             $row++;
         }

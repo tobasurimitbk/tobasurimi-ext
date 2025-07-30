@@ -87,7 +87,12 @@ class BarangMasterSalesModel extends Model
         }
 
         $totalFilteredData = $barangDataQry->countAllResults(false);
-        $data = $barangDataQry->findAll($limit, $offset);
+
+        if ($limit && $offset) {
+            $data = $barangDataQry->findAll($limit, $offset);
+        } else {
+            $data = $barangDataQry->findAll();
+        }
 
         return [
             'data'              => $data,

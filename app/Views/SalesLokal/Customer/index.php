@@ -197,7 +197,7 @@
             </a>
 
             <?php if (can('Penjualan Lokal', 'Faktur Penjualan', 'c')): ?>
-                <button class="btn btn-show-form btn-success float-right btn-submit" data-btn="create-modal">
+                <button class="btn btn-show-form-lokal btn-success float-right btn-submit" data-btn="create-modal">
                     <i class="fa fa-plus fa-sm me-1"></i> Tambah
                 </button>
             <?php endif; ?>

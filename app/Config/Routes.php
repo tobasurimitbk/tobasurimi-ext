@@ -666,6 +666,7 @@ $routes->post('master-barang-lokal/save', 'SalesLokal\Barang::create', ['filter'
 $routes->post('master-barang-lokal/update', 'SalesLokal\Barang::update', ['filter' => 'Auth']);
 $routes->post('master-barang-lokal/delete', 'SalesLokal\Barang::delete', ['filter' => 'Auth']);
 $routes->post('master-barang-lokal/get', 'SalesLokal\Barang::get', ['filter' => 'Auth']);
+$routes->get('/master-barang-lokal/export-excel', 'SalesLokal\Barang::exportExcel', ['filter' => 'Auth']);
 
 // SALES INTERNASIONAL
 // Sales Kontrak

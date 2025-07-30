@@ -11,11 +11,17 @@
 <section class="section">
     <div class="section-header">
         <h1>Master Barang Sales Lokal</h1>
-        <?php if (can('Penjualan Lokal', 'Master Barang', 'c')) : ?>
-            <button class="btn btn-show-form btn-add float-right">
-                <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
-            </button>
-        <?php endif; ?>
+        <div class="col-button-tambah-spp">
+            <a class="btn btn-warning btn-print float-right" href="#" target="_blank" id="btn-export">
+                <i class="fa fa-download"></i> Export
+            </a>
+
+            <?php if (can('Penjualan Lokal', 'Master Barang', 'c')): ?>
+                <button class="btn btn-show-form btn-success float-right btn-submit" data-btn="create-modal">
+                    <i class="fa fa-plus fa-sm me-1"></i> Tambah
+                </button>
+            <?php endif; ?>
+        </div>
     </div>
     <div class="card">
         <div class="card-body">
@@ -464,7 +470,7 @@
     });
 
 
-    $('.btn-add').click(function() {
+    $('.btn-show-form').click(function() {
         resetForm();
         $('.input-generate').show();
         $('.type_barang').attr('disabled', false); // Enable the select element
@@ -494,6 +500,15 @@
         }
     });
 
+    $('#btn-export').on('click', function(e) {
+        e.preventDefault();
+
+        let search = $(".search").val();
+
+        let exportUrl = `/master-barang-lokal/export-excel?search=${search}&sort=${sort}&sortType=${sortType}`;
+
+        window.open(exportUrl, '_blank');
+    });
 
     $("#satuan_id").select2({
         theme: "bootstrap-5",
