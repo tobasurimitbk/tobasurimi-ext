@@ -103,6 +103,16 @@
         .justify-content-center {
             justify-content: center !important;
         }
+
+        .ttd-section {
+            page-break-inside: avoid;
+            margin-top: 20px;
+        }
+
+        .label-header {
+            font-weight: bold;
+            font-size: 12px;
+        }
     </style>
 </head>
 
@@ -349,7 +359,7 @@
                 </tr>
                 <tr>
                     <td>
-                        <label class="label-header">ACCOUNT # </label>
+                        <label class="label-header">ACCOUNT #</label>
                     </td>
                     <td>:</td>
                     <td>
@@ -358,7 +368,7 @@
                 </tr>
                 <tr>
                     <td>
-                        <label class="label-header">BENEFICIARY # </label>
+                        <label class="label-header">BENEFICIARY </label>
                     </td>
                     <td>:</td>
                     <td>
@@ -785,18 +795,6 @@
             </tr>
         </tbody>
     </table>
-    <style>
-        .ttd-section {
-            page-break-inside: avoid;
-            margin-top: 20px;
-        }
-
-        .label-header {
-            font-weight: bold;
-            font-size: 12px;
-        }
-    </style>
-
     <div class="header" style="margin-top: 20px;">
         <table style="border-spacing: 0 4px; width: 100%;">
             <tbody>
@@ -894,6 +892,7 @@
                 <tr>
                     <td></td>
                     <td colspan="3">
+                        <br>
                         <label class="label-header">
                             FOR THOSE ITEMS WHICH ARE NOT COVERED IN THIS CONTRACT, BOTH PARTIES WILL NEGOTIATE AND COME TO COMPROMISE.
                         </label>
