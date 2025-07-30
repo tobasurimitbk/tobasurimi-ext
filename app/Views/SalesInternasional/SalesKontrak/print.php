@@ -945,34 +945,34 @@
                 <!-- X. ADDITIONAL CLAUSES -->
                 <?php if (!empty($salesKontrak['special_instructions'])): ?>
                     <tr class="label-header">
-                        <td>
+                        <td style="width: 3%; vertical-align: top;">
                             <?= strtoupper(numToRoman($counter++)) ?>.
                         </td>
-                        <td>
-                            ADDITIONAL CLAUSES <br>
-
+                        <td style="width: 25%; vertical-align: top;">
+                            ADDITIONAL CLAUSES
                         </td>
-                        <td>
+                        <td style="width: 2%; vertical-align: top;">
                             :
                         </td>
-                        <td>
-
+                        <td style="width: 70%; vertical-align: top;">
+                            <?= $salesKontrak['special_instructions'] ?>
                         </td>
                     </tr>
-                    <tr class="label-header">
+
+                    <!-- <tr class="label-header">
                         <td>
                         </td>
                         <td colspan="3">
                             <?= $salesKontrak['special_instructions'] ?>
                         </td>
 
-                    </tr>
+                    </tr> -->
                 <?php endif ?>
             </tbody>
         </table>
-
+        <!-- <br> -->
         <!-- Final statement (no number) -->
-        <div class="mt-1 txt-left">
+        <div class="txt-left" style="margin-top: 1%;">
             <label class="label-header">
                 FOR THOSE ITEMS WHICH ARE NOT COVERED IN THIS CONTRACT, BOTH PARTIES WILL NEGOTIATE AND COME TO COMPROMISE.
             </label>
@@ -1003,8 +1003,7 @@
         return $result;
     }
     ?>
-    <br><br><br>
-    <table class="mt-1 sign-table border-collapse">
+    <table class="mt-1 sign-table border-collapse" style="margin-top: 10px;">
         <thead>
             <tr>
                 <th style="width: 350px;">
@@ -1035,7 +1034,9 @@
                     <div style="border-top: 1px solid !important; width: 80%;"></div>
                 </td>
                 <td>
-                    <?= $salesKontrak['signature_by'] ?>
+                    <b>
+                        <?= $salesKontrak['signature_by'] ?>
+                    </b>
                     <div style="border-top: 1px solid !important; width: 80%;"></div>
                 </td>
             </tr>
