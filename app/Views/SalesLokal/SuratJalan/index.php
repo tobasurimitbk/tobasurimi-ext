@@ -13,9 +13,17 @@
 <section class="section">
     <div class="section-header">
         <h1>Surat Jalan</h1>
-        <a class="btn btn-show-form btn-add float-right" href="<?= base_url("surat-jalan/create"); ?>">
-            <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
-        </a>
+        <div class="col-button-tambah-spp">
+            <a class="btn btn-warning btn-print float-right" href="#" target="_blank" id="btn-export">
+                <i class="fa fa-download"></i> Export
+            </a>
+
+            <?php if (can('Penjualan Lokal', 'Surat Jalan', 'c')): ?>
+                <a class="btn btn-show-form btn-success float-right btn-submit" href="<?= base_url("surat-jalan/create"); ?>">
+                    <i class="fa fa-plus fa-sm me-1"></i> Tambah
+                </a>
+            <?php endif; ?>
+        </div>
     </div>
     <div class="card">
         <div class="card-body">
@@ -178,6 +186,20 @@
 
         $(".dateStart, .dateEnd, .filter_customer, .filter_invoice").change(function() {
             table.ajax.reload();
+        });
+
+        $('#btn-export').on('click', function(e) {
+            e.preventDefault();
+
+            let search = $(".search").val();
+            let dateStart = $(".dateStart").val();
+            let dateEnd = $(".dateEnd").val();
+            let filter_customer = $(".filter_customer").val();
+            let filter_invoice = $(".filter_invoice").val();
+
+            let exportUrl = `/surat-jalan/export-excel?search=${encodeURIComponent(search)}&sort=${sort}&sortType=${sortType}&dateStart=${encodeURIComponent(dateStart)}&dateEnd=${encodeURIComponent(dateEnd)}&filter_customer=${filter_customer}&filter_invoice=${filter_invoice}`;
+
+            window.open(exportUrl, '_blank');
         });
     })
 
@@ -460,7 +482,7 @@
         window.open(url, "_blank");
     }
 
-    function edit(id){
+    function edit(id) {
         location.replace(`<?= base_url("surat-jalan/id"); ?>/${id}`);
     }
 </script>

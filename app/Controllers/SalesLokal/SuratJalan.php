@@ -16,6 +16,8 @@ use App\Models\SuratJalanModel;
 use App\Models\EmployeesModel;
 use App\Models\SalesOrderInvoiceDetailModel;
 use Exception;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
 class SuratJalan extends BaseController
 {
@@ -752,5 +754,88 @@ class SuratJalan extends BaseController
             echo json_encode($data);
         }
         return;
+    }
+
+    public function exportExcel()
+    {
+        $limit = null;
+        $offset = null;
+
+        $condition = [
+            "surat_jalan_so.deletedAt" => null,
+        ];
+
+        if ($this->is_admin == '0') {
+            $condition['surat_jalan_so.id_user'] = $this->userId;
+        }
+
+        $addCondition = [
+            "search"              => $this->request->getGet("search"),
+            "filter_invoice"      => $this->request->getGet("filter_invoice"),
+            "filter_customer"     => $this->request->getGet("filter_customer"),
+            "sort"                => $this->request->getGet("sort"),
+            "sortType"            => $this->request->getGet("sortType"),
+            "dateStart"           => $this->request->getGet("dateStart") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getGet("dateStart")))) : "",
+            "dateEnd"             => $this->request->getGet("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getGet("dateEnd")))) : "",
+        ];
+
+        $dataSuratJalan = $this->SuratJalanModel->getAllSuratJalan($condition, $addCondition, $limit, $offset);
+
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+
+        // Header Excel
+        $sheet->setCellValue('A1', 'No');
+        $sheet->setCellValue('B1', 'No Surat Jalan');
+        $sheet->setCellValue('C1', 'Tipe Sales Order');
+        $sheet->setCellValue('D1', 'No Sales Order');
+        $sheet->setCellValue('E1', 'Kode Pelanggan');
+        $sheet->setCellValue('F1', 'Nama Pelanggan');
+        $sheet->setCellValue('G1', 'Sales');
+        $sheet->setCellValue('H1', 'Tanggal Kirim');
+        $sheet->setCellValue('I1', 'Total Harga');
+
+        $row = 2;
+        $no = 1;
+
+        foreach ($dataSuratJalan['data'] as $data) {
+            $dataNo = json_decode($data->multiple_no_so, true);
+            $noSO = is_array($dataNo) ? implode(', ', $dataNo) : '';
+
+            if ($data->sales_id == NULL || $data->sales_id == "0") {
+                $customerSales = "-";
+            } else {
+                $getEmployee = $this->EmployeesModel->select("CONCAT(employees.nip, ' - ', employees.name) AS customerSales")->where('employees.id', $data->sales_id)->first();
+                $customerSales = $getEmployee['customerSales'] ?? '-';
+            }
+
+            $totalHarga = $data->estimated_freight + $data->total_harga;
+
+            $sheet->setCellValue("A{$row}", $no++);
+            $sheet->setCellValue("B{$row}", $data->no_surat_jalan);
+            $sheet->setCellValue("C{$row}", $data->tipe_sales_order);
+            $sheet->setCellValue("D{$row}", $noSO);
+            $sheet->setCellValue("E{$row}", $data->kode_pelanggan);
+            $sheet->setCellValue("F{$row}", $data->nama_pelanggan);
+            $sheet->setCellValue("G{$row}", $customerSales);
+            $sheet->setCellValue("H{$row}", date("d/m/Y", strtotime($data->shipping_date)));
+            $sheet->setCellValue("I{$row}", floatval($totalHarga));
+
+            // Format total harga
+            $sheet->getStyle("I{$row}")
+                ->getNumberFormat()
+                ->setFormatCode('#,##0');
+
+            $row++;
+        }
+
+        $filename = 'Export-Surat-Jalan-' . date('YmdHis') . '.xlsx';
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header("Content-Disposition: attachment; filename=\"$filename\"");
+        header('Cache-Control: max-age=0');
+
+        $writer = new Xlsx($spreadsheet);
+        $writer->save('php://output');
+        exit;
     }
 }
