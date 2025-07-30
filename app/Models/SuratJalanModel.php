@@ -122,7 +122,12 @@ class SuratJalanModel extends Model
         }
 
         $totalFilteredData = $SuratJalan->countAllResults(false);
-        $data = $SuratJalan->findAll($limit, $offset);
+
+        if ($limit && $offset) {
+            $data = $SuratJalan->findAll($limit, $offset);
+        } else {
+            $data = $SuratJalan->findAll();
+        }
 
         return [
             'data'              => $data,
