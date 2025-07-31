@@ -801,7 +801,21 @@
             let dataId = $(this).data('id');
             const csrf = $(`[name="${csrfToken}"]`);
 
-            if (dataId) {
+            console.log(dataId);
+            
+
+            if (dataId.length === 7 && /[a-zA-Z]/.test(dataId)) {
+                // Hapus item dari array JavaScript dan gambar ulang tabel
+                console.log(list_items);
+                // console.log(table);
+                let indexToRemove = list_items.findIndex(item => item.no === dataNo);
+                if (indexToRemove !== -1) {
+                    list_items.splice(indexToRemove, 1);
+
+                }
+                table.clear().rows.add(list_items).draw();
+                console.log(list_items);
+            } else {
                 Swal.fire({
                     icon: 'question',
                     title: 'Yakin akan di hapus?',
@@ -853,17 +867,6 @@
                         });
                     }
                 })
-            } else {
-                // Hapus item dari array JavaScript dan gambar ulang tabel
-                console.log(list_items);
-                // console.log(table);
-                let indexToRemove = list_items.findIndex(item => item.no === dataNo);
-                if (indexToRemove !== -1) {
-                    list_items.splice(indexToRemove, 1);
-
-                }
-                table.clear().rows.add(list_items).draw();
-                console.log(list_items);
             }
             reCountTotal();
         });
@@ -1856,19 +1859,19 @@
         });
 
         $(".harga, .qty").keyup(function() {
-            let harga = $(".harga").val() ? $(".harga").val().replaceAll(",", "") : 0;
+            let harga = $(".harga").val() ? destroyFormatRupiah($(".harga").val()) : 0;
             let qty = $(".qty").val() ? parseFloat($(".qty").val()) : 0;
 
-            let amount = (harga * qty).toLocaleString();
-            $(".amount").val(amount);
+            let amount = harga * qty;
+            $(".amount").val(greatFormatRupiah(amount));
         });
 
         $(".harga, .qty").change(function() {
-            let harga = $(".harga").val() ? $(".harga").val().replaceAll(",", "") : 0;
+            let harga = $(".harga").val() ? destroyFormatRupiah($(".harga").val()) : 0;
             let qty = $(".qty").val() ? parseFloat($(".qty").val()) : 0;
 
-            let amount = (harga * qty).toLocaleString();
-            $(".amount").val(amount);
+            let amount = harga * qty;
+            $(".amount").val(greatFormatRupiah(amount));
         });
 
         $(".discount_percentage").keyup(function() {
@@ -1906,9 +1909,9 @@
             let id_barang = $(".id_barang option:selected").val()
             let nama_barang = $(".id_barang option:selected").text()
             const selectedData = $(".id_barang option:selected").data();
-            let harga = $(".harga").val()
+            let harga = destroyFormatRupiah($(".harga").val())
             let qty = $(".qty").val()
-            let amount = $(".amount").val().replace(/\./g, '').replace(/\,/g, '.');
+            let amount = destroyFormatRupiah($(".amount").val());
             let keterangan = $(".keterangan").val()
             let statusppn = $(".statusppn").val()
             const tax = selectedData.tax;
@@ -2092,9 +2095,9 @@
 
                         reCountTotal();
 
-                        total_harga_barang = total_harga_barang + Number(harga.replaceAll(",", ""));
+                        total_harga_barang = total_harga_barang + harga;
                         total_qty = total_qty + Number(qty);
-                        total_harga = total_harga + Number(amount.replaceAll(",", ""));
+                        total_harga = total_harga + amount;
 
                         let tag_html = "";
                         let tag_total = "";
@@ -2403,8 +2406,8 @@
         }
     }
 
-    function generateRandomId(length = 4) {
-        const chars = '0123456789';
+    function generateRandomId(length = 7) {
+        const chars = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
         let result = '';
         for (let i = 0; i < length; i++) {
             result += chars.charAt(Math.floor(Math.random() * chars.length));
