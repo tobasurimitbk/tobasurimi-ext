@@ -232,6 +232,9 @@ class OrderForm extends BaseController
         $postData = $this->request->getPost();
         $postData["items"] = json_decode($postData["items"], true);
 
+        // var_dump($postData, $postData['items']);
+        // die;
+
         $rules = [
             "id_customer" => [
                 "rules" => "required|is_natural_no_zero",
@@ -394,7 +397,6 @@ class OrderForm extends BaseController
                 // $this->stockDetailModel->addOrReduceStock($row->id_barang, $row->warehouse_id, 'New', $row->qty, 'Out', '');
 
                 $totalQty = $totalQty + $row->qty;
-                $amountValue = $row->amount ? (float) str_replace(",", "", $row->amount) : 0;
                 // var_dump($row->amount);
                 // var_dump($amountValue);
                 // exit;
@@ -403,8 +405,8 @@ class OrderForm extends BaseController
                     "id_barang"             => $row->id_barang,
                     "qty"                   => number_format($row->qty, 2, '.', ''),
                     "qty_sekarang"          => number_format($row->qty, 2, '.', ''),
-                    "harga_barang"          => str_replace(',', '', $row->harga_barang),
-                    "amount"                => number_format($amountValue, 2, '.', ''),
+                    "harga_barang"          => number_format($row->harga_barang, 2, '.', ''),
+                    "amount"                => number_format($row->discountedAmt, 2, '.', ''),
                     "keterangan"            => $row->keterangan,
                     "discount_percentage"   => number_format($row->disc, 2, '.', ''),
                     "tipe_input"            => "order_form",
