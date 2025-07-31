@@ -15,6 +15,7 @@ use App\Models\PenerimaanBarangModel;
 use App\Models\RMImportPODetailModel;
 use App\Models\RMPurchaseOrderDetailModel;
 use App\Models\RMPurchaseOrderModel;
+use App\Models\SalesOrderExportModel;
 use App\Models\SalesOrderInvoiceModel;
 use App\Models\StockDetail2Model;
 use App\Models\StockDetailModel;
@@ -936,6 +937,11 @@ class Penomoran_ extends BaseController
             $db->transRollback();
             echo "Error " . $e->getMessage();
         }
+    }
+
+    public function generateShipmentValueOrderFormEkspor()
+    {
+        $salesOrderExportModel = new SalesOrderExportModel();
     }
 }
 

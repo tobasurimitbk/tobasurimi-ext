@@ -284,11 +284,11 @@
                                                 <td><?= trim($detail['brand']) ?></td>
                                             </tr>
                                         <?php endif; ?>
-                                        <?php if (!empty($detail['kemasan'])): ?>
+                                        <?php if (!empty($detail['packing'])): ?>
                                             <tr>
                                                 <td style="display: inline-block; font-weight: bold;">PACKING</td>
                                                 <td>:</td>
-                                                <td><?= trim($detail['kemasan']) ?></td>
+                                                <td><?= trim($detail['packing']) ?></td>
                                             </tr>
                                         <?php endif; ?>
 
@@ -476,14 +476,7 @@
                     // Calculate final amount
                     $grand_total = $total_amount + $total_adjustments;
                     ?>
-                    <?php if (!empty($dataSO->commision)): ?>
-                        <tr style="font-weight: bold; background-color: #e9ecef; font-size:10px;">
-                            <td style="padding: 6px; border: 1px solid #ddd;"></td>
-                            <td>
-                                <?= $dataSO->commision ?>
-                            </td>
-                        </tr>
-                    <?php endif; ?>
+
 
                     <!-- Royalty -->
                     <?php if ($dataSODetail['royaltyPriceFinal'] > 0): ?>
@@ -607,28 +600,54 @@
                                     <td style="width: 25%; text-align: right; vertical-align: middle; white-space: nowrap;" class="price">
                                         (<?= $dataSO->mata_uang ?>) <?= number_format($grand_total, 2) ?>
                                     </td>
+
                                 </tr>
+
                             </table>
                         </td>
                     </tr>
+
+                    <?php if (!empty($dataSO->commision)): ?>
+                        <tr style="font-weight: bold; background-color: #e9ecef; font-size:10px;">
+                            <td style="padding: 6px; border: 1px solid #ddd;"></td>
+                            <td style="padding: 6px; border: 1px solid #ddd;">
+                                <?= $dataSO->commision ?>
+                            </td>
+                        </tr>
+                    <?php endif; ?>
+
+                    <?php if ($dataSO->freight != ""): ?>
+                        <tr style="font-weight: bold; background-color: #e9ecef; font-size:10px;">
+                            <td style="padding: 6px; border: 1px solid #ddd;"></td>
+                            <td style="padding: 6px; border: 1px solid #ddd;">
+                                <b>
+                                    <?= $dataSO->freight ?>
+                                </b>
+                            </td>
+                        </tr>
+                    <?php endif; ?>
+                    <?php if ($dataSO->additional != ""): ?>
+                        <tr style="font-weight: bold; background-color: #e9ecef; font-size:10px;">
+                            <td style="padding: 6px; border: 1px solid #ddd;"></td>
+                            <td style="padding: 6px; border: 1px solid #ddd;">
+                                <?= $dataSO->additional ?>
+                            </td>
+                        </tr>
+                    <?php endif; ?>
+
+                    <?php if ($dataSO->additional_2 != ""): ?>
+                        <tr style="font-weight: bold; background-color: #e9ecef; font-size:10px;">
+                            <td style="padding: 6px; border: 1px solid #ddd;"></td>
+                            <td style="padding: 6px; border: 1px solid #ddd;">
+                                <?= $dataSO->additional_2 ?>
+                            </td>
+                        </tr>
+                    <?php endif; ?>
                 </tbody>
             </table>
             <table border="1" style="width: 100%; border: 1px solid black; border-collapse: collapse;" class="label">
                 <tbody>
-                    <?php if ($dataSO->freight != ""): ?>
-                        <tr class="keep-together">
-                            <td>
-                                <b>
-                                    FREIGHT
-                                </b>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <?= $dataSO->freight ?>
-                            </td>
-                        </tr>
-                    <?php endif; ?>
+
                     <tr class="keep-together">
                         <td>
                             <b>
@@ -677,7 +696,7 @@
                                 <?= $dataSO->notify_party ?> <br>
                             <?php endif; ?>
 
-                            <?php if ($dataSO->additional != ""): ?>
+                            <!-- <?php if ($dataSO->additional != ""): ?>
                                 <b>
                                     - ADDITIONAL
                                 </b>
@@ -686,7 +705,7 @@
                                 <?php if ($dataSO->additional_2 != ""): ?>
                                     <?= $dataSO->additional_2 ?> <br>
                                 <?php endif; ?>
-                            <?php endif; ?>
+                            <?php endif; ?> -->
 
                             <?php if ($dataSO->additional_detail_docs != ""): ?>
                                 <b>

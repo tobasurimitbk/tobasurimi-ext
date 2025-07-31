@@ -244,7 +244,7 @@
                     $factoryTextWithSpacing = spacedTextPreserveHTML($factoryText);
                     ?>
 
-                    <table style="width: 100%; margin-top: -15px; font-size: 14px;">
+                    <table style="width: 100%; margin-top: -28px; font-size: 14px;">
                         <tr>
                             <td style="text-align: justify;">
                                 <table style="font-size: 14px;">
@@ -795,7 +795,7 @@
             </tr>
         </tbody>
     </table>
-    <div class="header" style="margin-top: 20px;">
+    <div class="header" style="margin-top: 5px;">
         <table style="border-spacing: 0 4px; width: 100%;">
             <tbody>
                 <?php
@@ -903,7 +903,7 @@
         <br>
 
         <!-- SIGNATURE TABLE -->
-        <table class="mt-1 sign-table border-collapse" style="margin-top: 10px; width: 100%;">
+        <table class="mt-1 sign-table border-collapse" style="margin-top: -18px; width: 100%;">
             <thead>
                 <tr>
                     <th style="width: 350px;">

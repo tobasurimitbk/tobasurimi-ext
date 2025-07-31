@@ -178,7 +178,7 @@ class MaterialRequest extends BaseController
 
         if (!empty($id)) {
             $dataMaterialRequests = $this->materialRequestModel->asObject()->find($id);
-            $dataMaterialRequestDetailsBahanBaku = $this->materialRequestDetailsModel->getMaterialRequestBahanBakuDetail($id);
+            $dataMaterialRequestDetailsBahanBaku = $this->materialRequestDetailsModel->getMaterialRequestBahanBakuDetailNew($id);
             $dataMaterialRequestDetails = $this->materialRequestDetailsModel->asObject()
                 ->select(
                     '
@@ -222,6 +222,7 @@ class MaterialRequest extends BaseController
                     $value->barang_type_text = "BARANG SETENGAH JADI";
                 }
             }
+
             $data["dataMaterialRequests"] = $dataMaterialRequests;
             $data["dataMaterialRequestDetails"] = $dataMaterialRequestDetails;
             $data["dataMaterialRequestDetailsBahanBaku"] = $dataMaterialRequestDetailsBahanBaku;
@@ -391,7 +392,7 @@ class MaterialRequest extends BaseController
                     // Bahan Baku Po
                     $stockId = decrypt2($s->id);
                     $stockIdArr = json_decode($stockId);
-                    if (is_array($stockIdArr)) {
+                    if ($s->sumber != "JASA VENDOR") {
                         // STOK DARI SUPPLIER
                         $qtyDiambil = 0;
 
@@ -569,6 +570,93 @@ class MaterialRequest extends BaseController
         }
         return;
     }
+
+
+    public function createNew()
+    {
+        try {
+            $date_request = formatDMYtoYMD($this->request->getVar('date_request'));
+            $last_day = getLastDay();
+            $date_request_explode = explode("-", $date_request);
+            $reqNo = $this->request->getVar('req_no');
+            
+            if ($reqNo == "AUTO GENERATE") {
+                $no = $this->materialRequestModel->get_no($date_request_explode[2], $date_request_explode[1], $date_request_explode[0], $last_day, $this->this_company_id);
+            } else {
+                $no = $reqNo;
+            }
+
+            $dataMaterial = [
+                'company_id' => $this->this_company_id,
+                'divisi_id' => $this->request->getVar("department_id"),
+                'warehouse_id' => $this->request->getVar("warehouse_id"),
+                "production_date" => $this->request->getVar("date_production") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("date_production")))) : "",
+                "request_date" => $this->request->getVar("date_request") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("date_request")))) : "",
+                "req_no" => $no,
+                'is_posted' => 0,
+                'createdBy' => session()->get("login")->user_id,
+            ];
+            
+            $id = $this->materialRequestModel->insert($dataMaterial);
+            $mr_detail = json_decode($this->request->getVar("listMaterial"));
+
+            foreach ($mr_detail as $item) {
+                $stockId = decrypt($item->id);
+                $stockData = $this->stockModel->asObject()->where('id', $stockId)->first();
+
+                
+                $dataMaterialDetail = [
+                    'material_request_id' => $id,
+                    'divisi_id' => $item->departmentID,
+                    'warehouse_id' => $item->warehouseID,
+                    'divisi_tujuan_id' => $item->departmentTujuanID,
+                    'warehouse_tujuan_id' => $item->warehouseTujuanID,
+                    'barang1_id' => $stockData->barang1_id,
+                    'barang2_id' => $stockData->barang2_id,
+                    'nama_barang' => $item->barang,
+                    'satuan' => $item->satuan,
+                    'stock_id' => $stockId,
+                    'bc_id' => $item->bc_id,
+                    'supplier_id' => $item->supplier_id ?? null,
+                    'no_aju' => $item->no_aju,
+                    'ref_no' => $item->bc_type,
+                    'stock_date' => date('Y-m-d', strtotime(str_replace('/', '-', $item->stock_date))),
+                    'stock_dokumen' => $item->stock_dokumen,
+                    'barang_type' => $item->type_barang,
+                    'qty' => $item->qty2,
+                    'qty2' => $item->qty2,
+                    'qty_isi' => 0,
+                    'qty_now' => $item->qty2,
+                    'harga_umum' => (float)$item->harga_umum,
+                    'harga_harian' => (float)$item->harga_harian,
+                    'harga_bulanan' => (float)$item->harga_bulanan,
+                    'kondisi_barang' => 'request',
+                    'keterangan' => $item->keterangan ?? null,
+                ];
+
+                // Handle vendor items differently if needed
+                if ($item->type_barang == "bahan_baku" && isset($item->sumber) && $item->sumber == "JASA VENDOR") {
+                    $dataMaterialDetail['supplier_id'] = $item->vendor_id ?? null;
+                }
+
+                $this->materialRequestDetailsModel->insert($dataMaterialDetail);
+            }
+
+            return response()->setJSON([
+                "id" => encrypt($id),
+                "status" => true,
+                "message" => "Data Berhasil disimpan",
+                'token' => csrf_hash(),
+            ]);
+        } catch (\Exception $e) {
+            return response()->setJSON([
+                "status" => false,
+                "message" => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
+                'token' => csrf_hash()
+            ]);
+        }
+    }
+
 
     public function update()
     {
@@ -799,6 +887,149 @@ class MaterialRequest extends BaseController
             echo json_encode($data);
         }
         return;
+    }
+
+
+
+    public function updateNew()
+    {
+        try {
+            $id = decrypt($this->request->getPost("id"));
+            $mr_detail = json_decode($this->request->getVar("listMaterial"));
+            
+            $no = $this->request->getVar('req_no');
+
+            // Check for duplicate request number
+            $checkDuplicate = $this->materialRequestModel->where('company_id', $this->this_company_id)
+                ->where('req_no', $no)
+                ->where('id !=', $id)
+                ->where('deletedAt', null)
+                ->first();
+
+            if ($checkDuplicate != null) {
+                return response()->setJSON([
+                    "status" => false,
+                    "message" => "No Material Requests sudah ada",
+                    'token' => csrf_hash()
+                ]);
+            }
+
+            // Update main material request data
+            $dataMaterial = [
+                "production_date" => $this->request->getVar("date_production") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("date_production")))) : "",
+                "request_date" => $this->request->getVar("date_request") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("date_request")))) : "",
+                "req_no" => $no,
+            ];
+            $this->materialRequestModel->update($id, $dataMaterial);
+
+            // Delete existing details for bahan_baku
+            $this->materialRequestDetailsModel->where('material_request_id', $id)->where('barang_type', "bahan_baku")->delete();
+
+            // // Process each item in the material request
+
+            foreach ($mr_detail as $item) {
+                if ($item->type_barang == "bahan_baku") {
+                    // Handle bahan baku items
+                    $stockId = $item->stock_id;  
+                    $stockData = $this->stockModel->asObject()->where('id', $stockId)->first();
+
+                    $dataMaterialDetail = [
+                        'material_request_id' => $id,
+                        'divisi_id' => $item->departmentID,
+                        'warehouse_id' => $item->warehouseID,
+                        'divisi_tujuan_id' => $item->departmentTujuanID,
+                        'warehouse_tujuan_id' => $item->warehouseTujuanID,
+                        'barang1_id' => $stockData->barang1_id,
+                        'barang2_id' => $stockData->barang2_id,
+                        'nama_barang' => $item->barang,
+                        'satuan' => $item->satuan,
+                        'stock_id' => $stockId,
+                        'bc_id' => $item->bc_id,
+                        'supplier_id' => $item->supplier_id ?? null,
+                        'no_aju' => $item->no_aju,
+                        'ref_no' => $item->bc_type,
+                        'stock_date' => date('Y-m-d', strtotime(str_replace('/', '-', $item->stock_date))),
+                        'stock_dokumen' => $item->stock_dokumen,
+                        'barang_type' => $item->type_barang,
+                        'qty' => $item->qty2,
+                        'qty2' => $item->qty2,
+                        'qty_isi' => 0,
+                        'qty_now' => $item->qty2,
+                        'harga_umum' => (float)$item->harga_umum,
+                        'harga_harian' => (float)$item->harga_harian,
+                        'harga_bulanan' => (float)$item->harga_bulanan,
+                        'kondisi_barang' => 'request',
+                        'keterangan' => $item->keterangan ?? null,
+                    ];
+
+                    // Handle vendor items differently if needed
+                    if (isset($item->sumber) && $item->sumber == "JASA VENDOR") {
+                        $dataMaterialDetail['supplier_id'] = $item->vendor_id ?? null;
+                    }
+
+                    $this->materialRequestDetailsModel->insert($dataMaterialDetail);
+                } else {
+                    // Handle other types (bahan_jadi, etc.)
+                    if (!empty($item->id_material_request_detail)) {
+                        // Update existing detail
+                        $dataMaterialDetail = [
+                            'qty' => $item->qty,
+                            'qty2' => $item->qty2,
+                            'qty_isi' => $item->qty_isi,
+                            'qty_now' => ($item->type_barang == "bahan_jadi") ? $item->qty_isi : $item->qty2,
+                        ];
+                        $this->materialRequestDetailsModel->update($item->id_material_request_detail, $dataMaterialDetail);
+                    } else {
+                        // Insert new detail
+                        $stockData = $this->stockModel->asObject()->find($item->stock_id);
+                        $stockDetailData = $this->stockDetailModel->asObject()->find($item->stock_detail_id);
+
+                        $dataMaterialDetail = [
+                            'material_request_id' => $id,
+                            'divisi_id' => $item->departmentID,
+                            'warehouse_id' => $item->warehouseID,
+                            'divisi_tujuan_id' => $item->departmentTujuanID,
+                            'warehouse_tujuan_id' => $item->warehouseTujuanID,
+                            'barang1_id' => $stockData->barang1_id,
+                            'barang2_id' => $stockData->barang2_id,
+                            'nama_barang' => $item->barang,
+                            'satuan' => $item->satuan,
+                            'stock_id' => $item->stock_id,
+                            'bc_id' => $item->bc_id,
+                            'supplier_id' => $item->supplier_id,
+                            'no_aju' => $item->no_aju,
+                            'ref_no' => $item->bc_type,
+                            'stock_date' => $stockDetailData->stock_date,
+                            'stock_dokumen' => $item->stock_dokumen,
+                            'barang_type' => $item->type_barang,
+                            'qty' => $item->qty == 0 ? $item->stok_total : $item->qty,
+                            'qty2' => $item->qty2,
+                            'qty_isi' => $item->qty_isi,
+                            'qty_now' => ($item->type_barang == "bahan_jadi") ? $item->qty_isi : $item->qty2,
+                            'harga_umum' => (float)$item->harga_umum,
+                            'harga_harian' => (float)$item->harga_harian,
+                            'harga_bulanan' => (float)$item->harga_bulanan,
+                            'kondisi_barang' => 'request',
+                            'keterangan' => $item->keterangan,
+                        ];
+                        $this->materialRequestDetailsModel->insert($dataMaterialDetail);
+                    }
+                }
+            }
+
+            return response()->setJSON([
+                "id" => encrypt($id),
+                "status" => true,
+                "message" => "Data Berhasil disimpan",
+                'token' => csrf_hash(),
+            ]);
+        } catch (\Exception $e) {
+            return response()->setJSON([
+                "status" => false,
+                "message" => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
+                'token' => csrf_hash()
+            ]);
+        }
     }
 
     public function updateStatusPostedMaterialRequest()
@@ -1278,6 +1509,7 @@ class MaterialRequest extends BaseController
                 $dataResult = $this->stockDetail2Model->getStockListMaterialRequestFromLpb(
                     $condition
                 );
+
             } else {
                 // Untuk Dari Jasa Vendor
                 $condition = [
@@ -1310,21 +1542,37 @@ class MaterialRequest extends BaseController
                 $spesifikasi = isset($dataResult[$i]['spesifikasi']) ? $dataResult[$i]['spesifikasi'] : '';
                 $barangName = $dataResult[$i]['barang_name'];
 
-                $dataResult[$i]['stock_dokumen'] = $dataResult[$i]['stock_dokumen'] == null ? "-" : $dataResult[$i]['stock_dokumen'];
-                $dataResult[$i]['no_aju'] =  $dataResult[$i]['no_aju'] == "-" ? "-" : $dataResult[$i]['no_aju'];
-                $dataResult[$i]['bc_type'] = $dataResult[$i]['bc_type'] == null ? "NON PABEAN" : $dataResult[$i]['bc_type'];
-                $dataResult[$i]['satuan'] = $dataResult[$i]['kode_satuan'];
-                $dataResult[$i]['barang'] = $barangName . (!empty($spesifikasi) ? " - " . $spesifikasi : "");
-                $dataResult[$i]['sepsifikasi'] = $dataResult[$i]['spesifikasi'];
-                $dataResult[$i]['stock_date'] = date('d/m/Y', strtotime($dataResult[$i]['stock_date']));
-                $dataResult[$i]['stock_id'] = $dataResult[$i]['stock_id'];
-                $dataResult[$i]['type_barang'] = "bahan_baku";
-                $dataResult[$i]['type_barang_text'] = "BAHAN BAKU";
-                $dataResult[$i]['stok_total'] = floatval($dataResult[$i]['stok_total']);
-                $dataResult[$i]['no_daftar'] = $noDaftar;
-                $dataResult[$i]['id'] = encrypt($dataResult[$i]['stock_id']);
 
-                if (!empty($vendorId)) {
+                if (empty($vendorId)) {
+
+                    $dataResult[$i]['stock_dokumen'] = $dataResult[$i]['stock_dokumen'] == null ? "-" : $dataResult[$i]['stock_dokumen'];
+                    $dataResult[$i]['no_aju'] =  $dataResult[$i]['no_aju'] == "-" ? "-" : $dataResult[$i]['no_aju'];
+                    $dataResult[$i]['bc_type'] = $dataResult[$i]['bc_type'] == null ? "NON PABEAN" : $dataResult[$i]['bc_type'];
+                    $dataResult[$i]['satuan'] = $dataResult[$i]['kode_satuan'];
+                    $dataResult[$i]['barang'] = $barangName . (!empty($spesifikasi) ? " - " . $spesifikasi : "");
+                    $dataResult[$i]['sepsifikasi'] = $dataResult[$i]['spesifikasi'];
+                    $dataResult[$i]['stock_date'] = date('d/m/Y', strtotime($dataResult[$i]['stock_date']));
+                    $dataResult[$i]['stock_id'] = $dataResult[$i]['stock_id'];
+                    $dataResult[$i]['type_barang'] = "bahan_baku";
+                    $dataResult[$i]['type_barang_text'] = "BAHAN BAKU";
+                    $dataResult[$i]['stok_total'] = floatval($dataResult[$i]['stok_total']);
+                    $dataResult[$i]['no_daftar'] = $noDaftar;
+                    $dataResult[$i]['id'] = encrypt($dataResult[$i]['stock_id']);
+
+                } else {
+                    $dataResult[$i]['stock_dokumen'] = $dataResult[$i]['stock_dokumen'] == null ? "-" : $dataResult[$i]['stock_dokumen'];
+                    $dataResult[$i]['no_aju'] =  $dataResult[$i]['no_aju'] == "-" ? "-" : $dataResult[$i]['no_aju'];
+                    $dataResult[$i]['bc_type'] = $dataResult[$i]['bc_type'] == null ? "NON PABEAN" : $dataResult[$i]['bc_type'];
+                    $dataResult[$i]['satuan'] = $dataResult[$i]['kode_satuan'];
+                    $dataResult[$i]['barang'] = $barangName . (!empty($spesifikasi) ? " - " . $spesifikasi : "");
+                    $dataResult[$i]['sepsifikasi'] = $dataResult[$i]['spesifikasi'];
+                    $dataResult[$i]['stock_date'] = date('d/m/Y', strtotime($dataResult[$i]['stock_date']));
+                    $dataResult[$i]['stock_id'] = $dataResult[$i]['stock_id'];
+                    $dataResult[$i]['type_barang'] = $dataResult[$i]['type_barang'];
+                    $dataResult[$i]['type_barang_text'] = $dataResult[$i]['type_barang_text'];
+                    $dataResult[$i]['stok_total'] = floatval($dataResult[$i]['stok_total']);
+                    $dataResult[$i]['no_daftar'] = $noDaftar;
+                    $dataResult[$i]['id'] = encrypt($dataResult[$i]['stock_id']);
                     $dataResult[$i]['supplier_name'] = $dataResult[$i]['supplier_name'] . ' / ' . $dataResult[$i]['nama_vendor'];
                     $dataResult[$i]['sumber'] = "JASA VENDOR";
                 }

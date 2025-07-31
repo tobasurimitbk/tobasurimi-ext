@@ -718,6 +718,17 @@ $routes->post('/master-barang-internasional/generate-new-code', 'SalesInternasio
 $routes->post('/master-barang-internasional/import-excel', 'SalesInternasional\Barang::importExcel', ['filter' => 'Auth']);
 $routes->get('/master-barang-internasional/export-excel', 'SalesInternasional\Barang::exportExcel', ['filter' => 'Auth']);
 
+// Reports Ekspor
+$routes->get('/report-ekspor', 'SalesInternasional\ReportEkspor::index', ['filter' => 'Auth']);
+$routes->get('/report-ekspor/customer', 'SalesInternasional\ReportEkspor::indexByCustomer', ['filter' => 'Auth']);
+$routes->get('/report-ekspor/customer-all', 'SalesInternasional\ReportEkspor::allByCustomer', ['filter' => 'Auth']);
+$routes->get('/report-ekspor/customer-export', 'SalesInternasional\ReportEkspor::exportExcelByCustomer', ['filter' => 'Auth']);
+$routes->get('/report-ekspor/items', 'SalesInternasional\ReportEkspor::indexByItems', ['filter' => 'Auth']);
+$routes->get('/report-ekspor/items-all', 'SalesInternasional\ReportEkspor::allByItems', ['filter' => 'Auth']);
+$routes->get('/report-ekspor/items-export', 'SalesInternasional\ReportEkspor::exportExcelByItems', ['filter' => 'Auth']);
+
+
+
 // Customer Lokal
 $routes->get('/customer-lokal', 'SalesLokal\Customer::index', ['filter' => 'Auth']);
 $routes->get('/customer-lokal/all', 'SalesLokal\Customer::all', ['filter' => 'Auth']);
@@ -803,8 +814,8 @@ $routes->get('/material-request/all', 'Production\MaterialRequest::all', ['filte
 $routes->post('/material-request/delete', 'Production\MaterialRequest::deleteMR', ['filter' => 'Auth']);
 $routes->post('/material-request/delete-detail', 'Production\MaterialRequest::deleteMRDetail', ['filter' => 'Auth']);
 $routes->get('/material-request/data-detail-material', 'Production\MaterialRequest::allDetailMaterialRequest', ['filter' => 'Auth']);
-$routes->post('/material-request/save', 'Production\MaterialRequest::create', ['filter' => 'Auth']);
-$routes->post('/material-request/update', 'Production\MaterialRequest::update', ['filter' => 'Auth']);
+$routes->post('/material-request/save', 'Production\MaterialRequest::createNew', ['filter' => 'Auth']);
+$routes->post('/material-request/update', 'Production\MaterialRequest::updateNew', ['filter' => 'Auth']);
 $routes->post('/material-request/update-status', 'Production\MaterialRequest::updateStatusPostedMaterialRequest', ['filter' => 'Auth']);
 $routes->get('/material-request/list-barang-stock-init', 'Production\MaterialRequest::getListBarangIsInit', ['filter' => 'Auth']);
 $routes->get('/material-request/list-supplier', 'Production\MaterialRequest::getListSupplier', ['filter' => 'Auth']);

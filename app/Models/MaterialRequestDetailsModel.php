@@ -283,7 +283,6 @@ class MaterialRequestDetailsModel extends Model
             array_push($result, $stockList);
         }
 
-
         if ($jasaVendorIn == null) {
             // Untuk Stok Supplier
             $grouped = [];
@@ -418,6 +417,130 @@ class MaterialRequestDetailsModel extends Model
             }
         }
 
+
+        return $result;
+    }
+
+    public function getMaterialRequestBahanBakuDetailNew($materialRequestId)
+    {
+        // Inisialisasi model
+        $stockDetail2Model = new StockDetail2Model();
+        $stockModel = new StockModel();
+        $barangMasterModel = new BarangMasterModel();
+        $barangMasterSpesifikasiModel = new BarangMasterSpesifikasiModel();
+        $satuanModel = new SatuansModel();
+        $kemasanModel = new KemasanModel();
+        $metaDataModel = new MetadataModel();
+        $rmPurchaseOrderModel = new RMPurchaseOrderModel();
+        $jasaVendorInModel = new JasaVendorInModel();
+
+        $result = array();
+        $materialRequestDetail = $this->asArray()
+            ->select('
+                    material_request_details.*, 
+                    warehouse_asal.warehouse_name as warehouse_asal_text, 
+                    divisi_asal.divisi as divisi_asal_text,
+                    warehouse_tujuan.warehouse_name as warehouse_tujuan_text,
+                    divisi_tujuan.divisi as divisi_tujuan_text
+                ')
+            ->join('divisis as divisi_asal', 'divisi_asal.id = material_request_details.divisi_id', 'left')
+            ->join('divisis as divisi_tujuan', 'divisi_tujuan.id = material_request_details.divisi_tujuan_id', 'left')
+            ->join('warehouses as warehouse_asal', 'warehouse_asal.id = material_request_details.warehouse_id', 'left')
+            ->join('warehouses as warehouse_tujuan', 'warehouse_tujuan.id = material_request_details.warehouse_tujuan_id', 'left')
+            ->where('barang_type', "bahan_baku")
+            ->where('material_request_id', $materialRequestId)
+            ->findAll();
+
+        foreach ($materialRequestDetail as $m) {
+            // Dapatkan stock detail seperti sebelumnya
+            $stockList = $stockDetail2Model->getStockListDetail(
+                $m['stock_id'],
+                $m['bc_id'],
+                $m['no_aju'],
+                $m['stock_dokumen']
+            );
+            
+            // Jika tidak ada stock detail, lanjut ke berikutnya
+            if (empty($stockList)) {
+                continue;
+            }
+
+            $stock = $stockModel->find($m['stock_id']);
+
+            // Proses data barang
+            if ($stock['kemasan_id'] == 0) {
+                $barangMaster = $barangMasterModel->find($stock['barang1_id']);
+                $barangMasterSpesifikasi = $barangMasterSpesifikasiModel->find($stock['barang2_id']);
+                $satuan = $barangMasterSpesifikasi == null ? null : $satuanModel->find($barangMasterSpesifikasi['satuan_1']);
+                $barangName = $barangMaster['barang_name'];
+                $spesifikasi = $barangMasterSpesifikasi == null ? null : $barangMasterSpesifikasi['spesifikasi'];
+                $kodeBarang = $barangMaster['kode_barang'] ?? '';
+            } else {
+                $kemasan = $kemasanModel->find($stock['kemasan_id']);
+                $satuan = $satuanModel->find($kemasan['satuan_id']);
+                $barangName = $kemasan['name'];
+                $spesifikasi = "";
+                $kodeBarang = "";
+            }
+
+            // Proses data PO
+            $rmPurchaseOrder = $rmPurchaseOrderModel->where('po_no', $m['stock_dokumen'])
+                ->where('company_id', $stockList['company_id'])
+                ->first();
+
+            // Proses data vendor
+            $resultNoJasaVendorIn = strstr($m['stock_dokumen'], '(', true);
+            $noJasaVendorIn = trim($resultNoJasaVendorIn);
+            $supplierName = $stockList['supplier_name'];
+            $stockDate = $rmPurchaseOrder == null ? "" : date('d/m/Y', strtotime($rmPurchaseOrder['po_date']));
+
+            $jasaVendorIn = $jasaVendorInModel
+                ->select('jasa_vendor_in.*,vendors.name as nama_vendor')
+                ->join('vendors', 'vendors.id = jasa_vendor_in.vendor_id', 'left')
+                ->where('no_penerimaan_surat_jalan', $noJasaVendorIn)
+                ->where('jasa_vendor_in.company_id', session()->get("login")->this_company_id)
+                ->first();
+
+            $noDaftar = $stockDetail2Model->getNomorDaftar(
+                $m['no_aju'],
+                $m['bc_id']
+            );
+
+            $bcType = $metaDataModel->find($stockList['bc_id']);
+
+            // Gabungkan semua data ke dalam $stockList seperti sebelumnya
+            $stockList['qty'] = $m['qty'];
+            $stockList['no_aju'] = $stockList['no_aju'] == "-" ? "-" : $stockList['no_aju'];
+            $stockList['bc_type'] = $bcType == null ? "NON PABEAN" : $bcType['value'];
+            $stockList['satuan'] = $satuan == null ? '' : $satuan['kode_satuan'];
+            $stockList['barang'] = $barangName . (!empty($spesifikasi) ? " - " . $spesifikasi : "");
+            $stockList['stock_id'] = $m['stock_id'];
+            $stockList['stock_detail_id'] = $stockList['stock_detail_id'];
+            $stockList['type_barang'] = $stock['tipe_barang'];
+            $stockList['type_barang_text'] = strtoupper(str_replace('_', ' ', $stock['tipe_barang']));
+            $stockList['stok_total'] = ($stockList['stok_total']);
+            $stockList['stock_date'] = $jasaVendorIn == null ? $stockDate : date('d/m/Y', strtotime($jasaVendorIn['tanggal']));
+            $stockList['supplier_name'] = $jasaVendorIn == null ? $supplierName : $supplierName . ' / ' . $jasaVendorIn['nama_vendor'];
+            $stockList['divisi_id'] = $m['divisi_id'];
+            $stockList['divisi_tujuan_id'] = $m['divisi_tujuan_id'];
+            $stockList['divisi_asal_text'] = $m['divisi_asal_text'];
+            $stockList['divisi_tujuan_text'] = $m['divisi_tujuan_text'];
+            $stockList['qty2'] = $m['qty2'];
+            $stockList['qty_isi'] = $m['qty_isi'];
+            $stockList['kode_satuan'] = $m['satuan'];
+            $stockList['warehouse_id'] = $m['warehouse_id'];
+            $stockList['warehouse_asal_text'] = $m['warehouse_asal_text'];
+            $stockList['warehouse_tujuan_text'] = $m['warehouse_tujuan_text'];
+            $stockList['warehouse_tujuan_id'] = $m['warehouse_tujuan_id'];
+            $stockList['no_daftar'] = $noDaftar;
+            $stockList['harga_umum'] = $m['harga_umum'];
+            $stockList['harga_harian'] = $m['harga_harian'];
+            $stockList['harga_bulanan'] = $m['harga_bulanan'];
+            $stockList['spesifikasi'] = $spesifikasi;
+            $stockList['kode_barang'] = $kodeBarang;
+
+            $result[] = $stockList;
+        }
 
         return $result;
     }
