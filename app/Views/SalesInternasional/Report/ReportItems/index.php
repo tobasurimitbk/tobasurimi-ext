@@ -280,7 +280,7 @@
         if (dateStart == '' || dateEnd == '') {
             alert('Tanggal mulai & Tanggal Akhir wajib diisi');
         } else {
-            window.open('<?= base_url('report-ekspor/items-export') ?>?dateStart=' + dateStart + '?dateEnd=' + dateEnd + '&customer_id=' + customerId + '&barang_master_sales_id=' + barangMasterSalesId);
+            window.open('<?= base_url('report-ekspor/items-export') ?>?dateStart=' + dateStart + '&dateEnd=' + dateEnd + '&customer_id=' + customerId + '&barang_master_sales_id=' + barangMasterSalesId);
         }
 
     }

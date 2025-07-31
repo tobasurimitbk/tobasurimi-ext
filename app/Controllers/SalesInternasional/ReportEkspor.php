@@ -139,6 +139,8 @@ class ReportEkspor extends BaseController
             "dateEnd"       => $this->request->getVar("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateEnd")))) : "",
         ];
 
+        // dd($this->request->getVar("dateStart"));
+
 
         $filename = "Report Ekspor By Customer " . $addCondition['dateStart'] . " - " . $addCondition['dateEnd'];
 
@@ -351,12 +353,8 @@ class ReportEkspor extends BaseController
             "sortType"              => $this->request->getGet("sortType"),
             "customer_id"           => $this->request->getGet("customer_id"),
             "barang_master_sales_id" => $this->request->getVar('barang_master_sales_id'),
-            "dateStart"             => $this->request->getVar("dateStart")
-                ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateStart"))))
-                : "",
-            "dateEnd"               => $this->request->getVar("dateEnd")
-                ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateEnd"))))
-                : "",
+            "dateStart"     => $this->request->getVar("dateStart") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateStart")))) : "",
+            "dateEnd"       => $this->request->getVar("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateEnd")))) : "",
         ];
         $filename = "Report Ekspor By Items " . $addCondition['dateStart'] . " - " . $addCondition['dateEnd'];
         $salesOrderExport = $this->salesKontrakDetailModel->getListExportByItems($condition, $addCondition, 100000000, 0);
