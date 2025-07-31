@@ -665,14 +665,14 @@
                 { id: '#divisi_id', placeholder: "Pilih Departemen" },
                 { id: '#bank_id', placeholder: "Pilih Bank" },
                 { id: '#jenis_pembayaran', placeholder: "Pilih Jenis Pembayaran" },
-                { id: '#payment_method', placeholder: "Pilih Metode Pembayaran" },
+                { id: '#metode_pembayaran', placeholder: "Pilih Metode Pembayaran" },
                 { id: '#valas', placeholder: "Pilih Mata Uang" },
                 { id: '#akun_kas', placeholder: "Pilih Debit" },
                 { id: '#akun_selisih', placeholder: "Pilih Kredit" }
             ];
 
             // Hapus semua event handler terkait
-            $('#jenis, #divisi_id, #bank_id, #jenis_pembayaran, #payment_method, #valas').off('.select2-handlers');
+            $('#jenis, #divisi_id, #bank_id, #jenis_pembayaran, #metode_pembayaran, #valas').off('.select2-handlers');
 
             // Inisialisasi semua field Select2
             select2Fields.forEach(field => {
@@ -688,7 +688,7 @@
             if (!silent) {
                 let changeTimeout;
 
-                $('#jenis, #divisi_id, #bank_id, #jenis_pembayaran, #payment_method').on('change.select2-handlers', function() {
+                $('#jenis, #divisi_id, #bank_id, #jenis_pembayaran, #metode_pembayaran').on('change.select2-handlers', function() {
                     clearTimeout(changeTimeout);
                     const changedField = this;
                     const changedFieldId = $(changedField).attr('id'); // dapatkan ID field yang berubah
@@ -767,16 +767,20 @@
             if (!validateDetails()) return;
 
             const jenisPembayaran = $('#jenis_pembayaran option:selected').val();
+            const akunKasVal = $('#akun_kas').val();
+            const akunSelisihVal = $('#akun_selisih').val();
+            const akunKasName = $('#akun_kas option:selected').text();
+            const akunSelisihName = $('#akun_selisih option:selected').text();
             
             // Always store akun_kas and akun_selisih DIRECTLY (no swapping)
             const detail = {
                 ...details[index],
                 tanggal: $('#tanggal').val(),
                 pembayaran_oleh: $('#pembayaran_oleh').val(),
-                akun_kas: $('#akun_kas').val(),
-                akun_selisih: $('#akun_selisih').val(),
-                akun_kas_name: $('#akun_kas option:selected').text(),
-                akun_selisih_name: $('#akun_selisih option:selected').text(),
+                akun_selisih: jenisPembayaran == 'PUTIH' ? akunKasVal : akunSelisihVal,
+                akun_kas: jenisPembayaran == 'PUTIH' ? akunSelisihVal : akunKasVal,
+                akun_selisih_name: jenisPembayaran == 'PUTIH' ? akunKasName : akunSelisihName,
+                akun_kas_name: jenisPembayaran == 'PUTIH' ? akunSelisihName : akunKasName,
                 keterangan: $('#keterangan').val(),
                 valas: $('#valas option:selected').text(),
                 valas_id: $('#valas option:selected').val(),
@@ -958,8 +962,8 @@
             
             let totalAllAmount = 0;
             const jenisPembayaran = $('#jenis_pembayaran option:selected').val(); // Fix typo: remove "refreshDetailsTable"
-            const parentAkunSelisih = $('#akun_selisih  option:selected').val(); // Ambil dari parent form
-            const parentAkunSelisihName = $('#akun_selisih option:selected').text();
+            // const parentAkunSelisih = $('#akun_selisih  option:selected').val(); // Ambil dari parent form
+            // const parentAkunSelisihName = $('#akun_selisih option:selected').text();
 
             details.forEach((detail, index) => {
                 const jumlahIDR = formatRupiah(detail.jumlah_idr);
@@ -969,18 +973,18 @@
                  // Tampilkan sesuai jenis pembayaran
                 let creditCol, debitCol;
                 console.log(jenisPembayaran);
-                if (jenisPembayaran === 'PUTIH') {
-                    creditCol = detail.akun_selisih_name; // Parent (Kredit)
-                    debitCol = detail.akun_kas_name;      // Detail (Debit)
+                if (jenisPembayaran == 'PUTIH') {
+                    creditCol = detail.akun_kas_name; // Parent (Kredit)
+                    debitCol = detail.akun_selisih_name;      // Detail (Debit)
 
-                    details[index].akun_kas = parentAkunSelisih;
-                    details[index].akun_kas_name = parentAkunSelisihName;
+                    // details[index].akun_kas = parentAkunSelisih;
+                    // details[index].akun_kas_name = parentAkunSelisihName;
                 } else {
                     debitCol = detail.akun_selisih_name; // Parent (Debit)
                     creditCol = detail.akun_kas_name;    // Detail (Kredit)
                     
-                    details[index].akun_selisih = parentAkunSelisih;
-                    details[index].akun_selisih_name = parentAkunSelisihName;
+                    // details[index].akun_selisih = parentAkunSelisih;
+                    // details[index].akun_selisih_name = parentAkunSelisihName;
                 }
 
 
@@ -990,9 +994,9 @@
                         <td>${creditCol}</td>
                         <td>${debitCol}</td>
                         <td>${detail.valas}</td>
-                        <td>${detail.jumlah}</td>
+                        <td>${greatFormatRupiah(detail.jumlah)}</td>
                         <td>${detail.kurs}</td>
-                        <td>${jumlahIDR}</td>
+                        <td>${greatFormatRupiah(detail.jumlah_idr)}</td>
                         <td>${detail.pembayaran_oleh}</td>
                         <td>${detail.keterangan || ''}</td>
                         <td class="actions">
@@ -1257,7 +1261,8 @@
                                 id: detail.id || '',
                                 tanggal: detail.tanggal,
                                 pembayaran_oleh: detail.pembayaran_oleh,
-                                akun_kas: detail.akun_kas,
+                                akun_kas: detail.akun_kas, // Untuk MERAH, pakai akun_selisih parent (kredit)
+                                akun_selisih: detail.akun_selisih, // Untuk MERAH, pakai akun_kas detail (debit)
                                 valas: detail.valas,
                                 valas_id: detail.valas_id,
                                 kurs: destroyFormatRupiah(detail.kurs),
@@ -1517,12 +1522,12 @@
         $('#jumlah_idr').val(detail.jumlah_idr);
         
         // Always show original values (no conditional logic)
-        if (jenisPembayaran === 'PUTIH') {
+        if (jenisPembayaran == 'PUTIH') {
             $('#akun_kas').val(detail.akun_selisih).trigger('change');
-            $('#akun_selisih').val(detail.akun_seh).trigger('change');
+            // $('#akun_selisih').val(detail.akun_seh).trigger('change');
         } else {
             $('#akun_kas').val(detail.akun_kas).trigger('change');
-            $('#akun_selisih').val(detail.akun_selisih).trigger('change');
+            // $('#akun_selisih').val(detail.akun_selisih).trigger('change');
         }
 
 
