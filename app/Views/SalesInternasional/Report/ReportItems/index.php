@@ -248,7 +248,7 @@
         allowClear: true
     }).change(function() {});
 
-    $('#customer_id,#dateStart,#dateEnd').change(function() {
+    $('#customer_id,#dateStart,#dateEnd,#barang_master_sales_id').change(function() {
         table.ajax.reload();
     });
 
@@ -280,7 +280,7 @@
         if (dateStart == '' || dateEnd == '') {
             alert('Tanggal mulai & Tanggal Akhir wajib diisi');
         } else {
-            window.open('<?= base_url('report-ekspor/items-export') ?>?dateStart=' + dateStart + '?dateEnd=' + dateEnd + '&customer_id=' + customerId + '&barang_master_sales_id=' + barangMasterSalesId);
+            window.open('<?= base_url('report-ekspor/items-export') ?>?dateStart=' + dateStart + '&dateEnd=' + dateEnd + '&customer_id=' + customerId + '&barang_master_sales_id=' + barangMasterSalesId);
         }
 
     }

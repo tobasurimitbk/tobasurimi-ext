@@ -6,7 +6,9 @@ use App\Controllers\BaseController;
 use App\Models\BarangMasterSalesModel;
 use App\Models\CustomerModel;
 use App\Models\SalesKontrakDetailModel;
+use App\Models\SalesOrderExportDetailModel;
 use App\Models\SalesOrderExportModel;
+use PhpOffice\PhpSpreadsheet\Cell\DataType;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use PhpOffice\PhpSpreadsheet\Style\Alignment;
@@ -21,6 +23,7 @@ class ReportEkspor extends BaseController
     protected $salesOrderExportModel;
     protected $barangMasterSalesModel;
     protected $salesKontrakDetailModel;
+    protected $salesOrderExportDetailModel;
 
     public function __construct()
     {
@@ -31,6 +34,7 @@ class ReportEkspor extends BaseController
         $this->salesOrderExportModel = new SalesOrderExportModel();
         $this->barangMasterSalesModel = new BarangMasterSalesModel();
         $this->salesKontrakDetailModel = new SalesKontrakDetailModel();
+        $this->salesOrderExportDetailModel = new SalesOrderExportDetailModel();
     }
 
     public function index()
@@ -139,14 +143,12 @@ class ReportEkspor extends BaseController
             "dateEnd"       => $this->request->getVar("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateEnd")))) : "",
         ];
 
-
         $filename = "Report Ekspor By Customer " . $addCondition['dateStart'] . " - " . $addCondition['dateEnd'];
 
         $salesOrderExport = $this->salesOrderExportModel->getListExportByCustomer($condition, $addCondition, 100000000, 0);
         $dataResult = [];
         $no = 1;
 
-        // Penampung total
         $totalQtyConvertion = 0;
         $totalShipmentValue = 0;
         $totalShipmentValueNet = 0;
@@ -159,19 +161,17 @@ class ReportEkspor extends BaseController
                 "Customer"              => $data->customer_name,
                 "Container Number"      => $data->container,
                 "Actualy Shipment Date" => date('d/m/Y', strtotime($data->actualy_shipment_date)),
-                "Qty (Kg)"                => number_format($data->total_qty_convertion, 2),
+                "Qty (Kg)"              => (float) $data->total_qty_convertion,
                 "Valas"                 => $data->valas_name,
-                "Shipment Value"        => number_format($data->shipment_value, 2),
-                "Shipment Value Net"    => number_format($data->shipment_value_net, 2)
+                "Shipment Value"        => (float) $data->shipment_value,
+                "Shipment Value Net"    => (float) $data->shipment_value_net
             ];
 
-            // Akumulasi total
             $totalQtyConvertion += $data->total_qty_convertion;
             $totalShipmentValue += $data->shipment_value;
             $totalShipmentValueNet += $data->shipment_value_net;
         }
 
-        // Tambahkan baris GRAND TOTAL
         $dataResult[] = [
             "No"                    => '',
             "Acc Holder"            => '',
@@ -179,62 +179,60 @@ class ReportEkspor extends BaseController
             "Customer"              => '',
             "Container Number"      => '',
             "Actualy Shipment Date" => 'GRAND TOTAL',
-            "Qty (Kg)"                => number_format($totalQtyConvertion, 2),
+            "Qty (Kg)"              => (float) $totalQtyConvertion,
             "Valas"                 => '',
-            "Shipment Value"        => number_format($totalShipmentValue, 2),
-            "Shipment Value Net"    => number_format($totalShipmentValueNet, 2)
+            "Shipment Value"        => (float) $totalShipmentValue,
+            "Shipment Value Net"    => (float) $totalShipmentValueNet
         ];
 
-        // Buat spreadsheet
         $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
 
-        // Tulis header
         $row = 1;
         $headers = array_keys($dataResult[0]);
         $col = 'A';
+        $cols = [];
 
         foreach ($headers as $header) {
             $sheet->setCellValue($col . $row, $header);
-            // Auto size kolom
             $sheet->getColumnDimension($col)->setAutoSize(true);
+            $cols[] = $col;
             $col++;
         }
 
-        // Hitung kolom terakhir
-        $lastCol = chr(ord('A') + count($headers) - 1);
-
-        // Bold header
+        $lastCol = end($cols);
         $sheet->getStyle("A1:" . $lastCol . "1")->applyFromArray([
             'font' => ['bold' => true],
         ]);
 
-        // Tulis data
         $row++;
+
         foreach ($dataResult as $item) {
-            $col = 'A';
-            foreach ($item as $value) {
-                $sheet->setCellValue($col . $row, $value);
-                $col++;
+            foreach ($headers as $i => $header) {
+                $cell = $cols[$i] . $row;
+                $value = $item[$header] ?? '';
+
+                // Format kolom numerik
+                if (in_array($header, ['Qty (Kg)', 'Shipment Value', 'Shipment Value Net']) && is_numeric($value)) {
+                    $sheet->setCellValueExplicit($cell, $value, DataType::TYPE_NUMERIC);
+                    $sheet->getStyle($cell)->getNumberFormat()->setFormatCode('#,##0.00');
+                } else {
+                    $sheet->setCellValue($cell, $value);
+                }
             }
             $row++;
         }
 
-        // Tambahkan border untuk semua data termasuk header
-        $styleArray = [
+        $lastRow = $row - 1;
+        $sheet->getStyle("A1:" . $lastCol . $lastRow)->applyFromArray([
             'borders' => [
                 'allBorders' => [
                     'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
                     'color' => ['argb' => 'FF000000'],
                 ],
             ],
-        ];
+        ]);
 
-        // Hitung baris terakhir
-        $lastRow = $row - 1;
-        $sheet->getStyle("A1:" . $lastCol . $lastRow)->applyFromArray($styleArray);
-
-        // Export file
         $writer = new Xlsx($spreadsheet);
         header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
         header('Content-Disposition: attachment;filename="' . $filename . '.xlsx"');
@@ -279,6 +277,7 @@ class ReportEkspor extends BaseController
 
         $condition = [
             'sales_contract_detail.deletedAt' => null,
+            'sales_order_detail_export.deletedAt' => null,
             'sales_contract.company_id' => $this->this_company_id,
             'sales_order_export.status' => 'POSTED'
         ];
@@ -295,7 +294,7 @@ class ReportEkspor extends BaseController
 
         $limit = $this->request->getGet("length");
         $offset = $this->request->getGet("start");
-        $salesData = $this->salesKontrakDetailModel->getListExportByItems($condition, $addCondition, $limit, $offset);
+        $salesData = $this->salesOrderExportDetailModel->getListExportByItems($condition, $addCondition, $limit, $offset);
 
         $dataSales = [];
 
@@ -351,15 +350,11 @@ class ReportEkspor extends BaseController
             "sortType"              => $this->request->getGet("sortType"),
             "customer_id"           => $this->request->getGet("customer_id"),
             "barang_master_sales_id" => $this->request->getVar('barang_master_sales_id'),
-            "dateStart"             => $this->request->getVar("dateStart")
-                ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateStart"))))
-                : "",
-            "dateEnd"               => $this->request->getVar("dateEnd")
-                ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateEnd"))))
-                : "",
+            "dateStart"     => $this->request->getVar("dateStart") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateStart")))) : "",
+            "dateEnd"       => $this->request->getVar("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateEnd")))) : "",
         ];
         $filename = "Report Ekspor By Items " . $addCondition['dateStart'] . " - " . $addCondition['dateEnd'];
-        $salesOrderExport = $this->salesKontrakDetailModel->getListExportByItems($condition, $addCondition, 100000000, 0);
+        $salesOrderExport = $this->salesOrderExportDetailModel->getListExportByItems($condition, $addCondition, 100000000, 0);
 
         // Group data by product
         $grouped = [];
@@ -376,10 +371,8 @@ class ReportEkspor extends BaseController
             $subQty = 0;
             $subAmt = 0;
 
-            // Baris judul grup (merge & center)
             $dataRows[] = ['group_header' => strtoupper($productName)];
 
-            // Data detail
             foreach ($items as $d) {
                 $dataRows[] = [
                     "No"                    => $no++,
@@ -390,35 +383,32 @@ class ReportEkspor extends BaseController
                     "Actualy Shipment Date" => date('d/m/Y', strtotime($d->actualy_shipment_date)),
                     "Destination"           => $d->dicharge_port,
                     "Product"               => $d->barang_name,
-                    "Qty (Kg)"              => $d->total_qty_convertion,
+                    "Qty (Kg)"              => (float) $d->total_qty_convertion,
                     "Valas"                 => $d->valas_name,
-                    "Amount Value"          => number_format($d->total_harga_barang, 2),
+                    "Amount Value"          => (float) $d->total_harga_barang,
                     "Price Type"            => $d->tipe_harga,
                 ];
                 $subQty += $d->total_qty_convertion;
                 $subAmt += $d->total_harga_barang;
             }
 
-            // Baris TOTAL per produk (bold & rata kanan)
             $dataRows[] = [
                 "subtotal" => true,
                 "Product" => 'TOTAL',
                 "Qty (Kg)" => $subQty,
-                "Amount Value" => number_format($subAmt, 2),
+                "Amount Value" => $subAmt,
             ];
             $grandQty += $subQty;
             $grandAmt += $subAmt;
         }
 
-        // Baris GRAND TOTAL (bold & rata kanan)
         $dataRows[] = [
             "subtotal" => true,
             "Product" => 'GRAND TOTAL',
             "Qty (Kg)" => $grandQty,
-            "Amount Value" => number_format($grandAmt, 2),
+            "Amount Value" => $grandAmt,
         ];
 
-        // Persiapan spreadsheet
         $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
 
@@ -439,21 +429,19 @@ class ReportEkspor extends BaseController
         $cols = range('A', 'L');
         $row = 1;
 
-        // Tulis header
         foreach ($headers as $i => $h) {
             $sheet->setCellValue($cols[$i] . $row, $h);
             $sheet->getColumnDimension($cols[$i])->setAutoSize(true);
         }
+
         $sheet->getStyle("A1:L1")->applyFromArray([
             'font' => ['bold' => true],
             'alignment' => ['horizontal' => Alignment::HORIZONTAL_LEFT]
         ]);
 
-        // Tulis data dan styling khusus
         $row++;
         foreach ($dataRows as $item) {
             if (isset($item['group_header'])) {
-                // merge & center
                 $sheet->mergeCells("A{$row}:L{$row}");
                 $sheet->setCellValue("A{$row}", $item['group_header']);
                 $sheet->getStyle("A{$row}")->applyFromArray([
@@ -461,29 +449,36 @@ class ReportEkspor extends BaseController
                     'alignment' => ['horizontal' => Alignment::HORIZONTAL_LEFT]
                 ]);
             } elseif (!empty($item['subtotal'])) {
-                // Subtotal / Grand total: bold & align right
                 $sheet->setCellValue("H{$row}", $item['Product']);
-                $sheet->setCellValue("I{$row}", $item['Qty (Kg)']);
-                $sheet->setCellValue("K{$row}", $item['Amount Value']);
+                $sheet->setCellValueExplicit("I{$row}", $item['Qty (Kg)'], DataType::TYPE_NUMERIC);
+                $sheet->getStyle("I{$row}")->getNumberFormat()->setFormatCode('#,##0.00');
+
+                $sheet->setCellValueExplicit("K{$row}", $item['Amount Value'], DataType::TYPE_NUMERIC);
+                $sheet->getStyle("K{$row}")->getNumberFormat()->setFormatCode('#,##0.00');
+
                 $sheet->getStyle("H{$row}:K{$row}")->applyFromArray([
                     'font' => ['bold' => true],
                     'alignment' => ['horizontal' => Alignment::HORIZONTAL_RIGHT]
                 ]);
             } else {
                 foreach ($headers as $i => $h) {
-                    $sheet->setCellValue($cols[$i] . $row, $item[$h] ?? '');
+                    $value = $item[$h] ?? '';
+                    if (in_array($h, ['Qty (Kg)', 'Amount Value']) && is_numeric($value)) {
+                        $sheet->setCellValueExplicit($cols[$i] . $row, $value, DataType::TYPE_NUMERIC);
+                        $sheet->getStyle($cols[$i] . $row)->getNumberFormat()->setFormatCode('#,##0.00');
+                    } else {
+                        $sheet->setCellValue($cols[$i] . $row, $value);
+                    }
                 }
             }
             $row++;
         }
 
-        // Border
         $last = $row - 1;
         $sheet->getStyle("A1:L{$last}")->applyFromArray([
             'borders' => ['allBorders' => ['borderStyle' => Border::BORDER_THIN, 'color' => ['argb' => 'FF000000']]]
         ]);
 
-        // Output
         $writer = new Xlsx($spreadsheet);
         header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
         header('Content-Disposition: attachment;filename="' . $filename . '.xlsx"');
