@@ -11,13 +11,13 @@
 <!-- Begin Page Content -->
 <section class="section">
     <div class="section-header">
-        <h1 class="title-name"><?= !empty($data) ? "Update" : "Tambah"; ?> Faktur Penjualan</h1>
+        <h1 class="title-name"><?= !empty($data) ? "Update" : "Tambah"; ?> Faktur</h1>
         <div class="col-button-tambah-spp">
             <a class="btn btn-hide-form btn-discard float-right" href="<?= base_url("faktur-sales"); ?>">
                 Kembali
             </a>
 
-            <?php if (can('Penjualan Lokal', 'Faktur Penjualan', 'p')): ?>
+            <?php if (can('Penjualan Lokal', 'Faktur', 'p')): ?>
                 <?php if (!empty($data)) : ?>
                     <!-- <a class="btn btn-save float-right" href="#"> -->
                     <a class="btn btn-warning btn-print float-right" href="<?= base_url("faktur-sales/print/{$data->id}"); ?>" target="_blank">
