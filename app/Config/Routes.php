@@ -812,8 +812,8 @@ $routes->get('/material-request/all', 'Production\MaterialRequest::all', ['filte
 $routes->post('/material-request/delete', 'Production\MaterialRequest::deleteMR', ['filter' => 'Auth']);
 $routes->post('/material-request/delete-detail', 'Production\MaterialRequest::deleteMRDetail', ['filter' => 'Auth']);
 $routes->get('/material-request/data-detail-material', 'Production\MaterialRequest::allDetailMaterialRequest', ['filter' => 'Auth']);
-$routes->post('/material-request/save', 'Production\MaterialRequest::create', ['filter' => 'Auth']);
-$routes->post('/material-request/update', 'Production\MaterialRequest::update', ['filter' => 'Auth']);
+$routes->post('/material-request/save', 'Production\MaterialRequest::createNew', ['filter' => 'Auth']);
+$routes->post('/material-request/update', 'Production\MaterialRequest::updateNew', ['filter' => 'Auth']);
 $routes->post('/material-request/update-status', 'Production\MaterialRequest::updateStatusPostedMaterialRequest', ['filter' => 'Auth']);
 $routes->get('/material-request/list-barang-stock-init', 'Production\MaterialRequest::getListBarangIsInit', ['filter' => 'Auth']);
 $routes->get('/material-request/list-supplier', 'Production\MaterialRequest::getListSupplier', ['filter' => 'Auth']);
