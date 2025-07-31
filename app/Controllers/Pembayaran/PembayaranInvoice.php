@@ -93,9 +93,11 @@ class PembayaranInvoice extends BaseController
             ->join('sales_order_detail_export', 'sales_order_detail_export.sales_order_export_id = sales_order_export.sales_order_export_id', 'left')
             ->where('sales_order_export.deletedAt', null)
             ->where('sales_order_detail_export.deletedAt', null)
+            ->where('sales_order_export.status', "POSTED")
             ->where('sales_order_export.company_id', $this->this_company_id)
             ->groupBy('sales_order_detail_export.sales_order_export_id')
             ->findAll();
+
         foreach ($salesOrderExportData as $s) {
             $totalPembayaran = 0;
             $pembayaranInvoiceData = $this->pembayaranInvoiceModel
