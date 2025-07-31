@@ -12,13 +12,13 @@
 <!-- Begin Page Content -->
 <section class="section">
     <div class="section-header">
-        <h1>Faktur Penjualan</h1>
+        <h1>Faktur</h1>
         <div class="col-button-tambah-spp">
             <a class="btn btn-warning btn-print float-right" href="#" target="_blank" id="btn-export">
                 <i class="fa fa-download"></i> Export
             </a>
 
-            <?php if (can('Penjualan Lokal', 'Faktur Penjualan', 'c')): ?>
+            <?php if (can('Penjualan Lokal', 'Faktur', 'c')): ?>
                 <a class="btn btn-show-form btn-success float-right btn-submit" href="<?= base_url("faktur-sales/create"); ?>">
                     <i class="fa fa-plus fa-sm me-1"></i> Tambah
                 </a>
@@ -401,7 +401,7 @@
 
                     if (posting == 0) {
                         return `
-                            <?php if (can('Penjualan Lokal', 'Faktur Penjualan', 'u')) : ?>
+                            <?php if (can('Penjualan Lokal', 'Faktur', 'u')) : ?>
                                 <a href="javascript:void(0)" onclick="edit('${id}')" data-toggle="tooltip" title="Edit" class="btn btn-primary">
                                     <i class="fas fa-edit"></i>
                                 </a>
@@ -418,7 +418,7 @@
                         `;
                     } else {
                         return `
-                            <?php if (can('Penjualan Lokal', 'Faktur Penjualan', 'u')) : ?>
+                            <?php if (can('Penjualan Lokal', 'Faktur', 'u')) : ?>
                                 <a href="javascript:void(0)" onclick="edit('${id}')" data-toggle="tooltip" title="Edit" class="btn btn-primary">
                                     <i class="fas fa-edit"></i>
                                 </a>

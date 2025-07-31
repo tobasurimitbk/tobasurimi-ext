@@ -696,7 +696,7 @@
                                 <?= $dataSO->notify_party ?> <br>
                             <?php endif; ?>
 
-                            <?php if ($dataSO->additional != ""): ?>
+                            <!-- <?php if ($dataSO->additional != ""): ?>
                                 <b>
                                     - ADDITIONAL
                                 </b>
@@ -705,7 +705,7 @@
                                 <?php if ($dataSO->additional_2 != ""): ?>
                                     <?= $dataSO->additional_2 ?> <br>
                                 <?php endif; ?>
-                            <?php endif; ?>
+                            <?php endif; ?> -->
 
                             <?php if ($dataSO->additional_detail_docs != ""): ?>
                                 <b>

@@ -598,7 +598,7 @@ class SalesKontrak extends BaseController
 
         $this->salesKontrakDetailModel->where('sales_contract_id', $id)->whereNotIn('id', $id_detail_all)->delete();
         $this->salesContractSizeBreakdownModel->whereIn('sales_contract_detail_id', $id_detail_all)->whereNotIn('id', $id_size_breakdown)->delete();
-        $this->salesOrderExportDetailModel->whereNotIn('sales_contract_size_breakdown_id', $id_size_breakdown)->delete();
+        $this->salesOrderExportDetailModel->whereIn('sales_contract_detail_id', $id_detail_all)->whereNotIn('sales_contract_size_breakdown_id', $id_size_breakdown)->delete();
 
         return response()->setJSON([
             'message' => "Sales Kontrak Updated",

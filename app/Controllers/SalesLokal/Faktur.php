@@ -940,13 +940,16 @@ class Faktur extends BaseController
 
         $id = decrypt($id);
 
+        $companyData = $this->companyModel->asObject()
+            ->find($this->this_company_id);
+
         $soSelectQry = "sales_faktur.*,
                         DATE_FORMAT(sales_faktur.order_date, '%d %b %Y') AS order_date, 
                         DATE_FORMAT(sales_faktur.shipping_date, '%d %b %Y') AS shipping_date, 
                         customers.name AS customerName, 
                         customers.phone AS customerPhone, 
                         customers.address AS customerAddress,
-                        metadata.value AS termin,
+                        metadata.value AS terms,
                         companies.company";
         $salesOrderData = $this->SalesFakturModel->asObject()
             ->select($soSelectQry)
@@ -955,8 +958,20 @@ class Faktur extends BaseController
             ->join('companies', 'companies.id = sales_faktur.id_company', 'left')
             ->find($id);
 
+        $companyData = $this->companyModel->asObject()
+            ->find($salesOrderData->id_company);
+
         $soDet = $this->SalesFakturDetailModel->asObject()
-            ->select('barang_master_sales.barang_name AS namaBarang, barang_master_sales.kode_barang AS kodeBarang, sales_faktur_detail.qty AS qty, satuans.kode_satuan AS kodeSatuan')
+            ->select('  barang_master_sales.barang_name AS namaBarang, 
+                        barang_master_sales.kode_barang AS kodeBarang, 
+                        sales_faktur_detail.qty AS qty, 
+                        satuans.kode_satuan AS kodeSatuan,
+                        sales_faktur_detail.discount_percentage AS disc, 
+                        sales_faktur_detail.discount_unit AS discUnit,
+                        sales_faktur_detail.harga_barang AS harga,
+                        sales_faktur_detail.amount AS amount,
+                        sales_faktur_detail.tax AS tax,
+                        sales_faktur_detail.status_ppn AS status_ppn')
             ->join('barang_master_sales', 'barang_master_sales.id = sales_faktur_detail.id_barang')
             ->join('satuans', 'satuans.id = barang_master_sales.satuan_id')
             ->where('tipe_input', "order_form")
@@ -965,19 +980,13 @@ class Faktur extends BaseController
 
         $data = [
             'companyName'   => $salesOrderData->company,
+            'companyAccount' => $companyData->invoice_account,
             'soData'        => $salesOrderData,
             'soDet'         => $soDet
         ];
 
 
         $this->SalesFakturModel->update($id, ['counter_print' => $salesOrderData->counter_print + 1]);
-
-
-
-
-
-
-        // return view('SalesLokal/Faktur/print', $data);
 
         // load HTML content
         $domPdf->loadHtml(view('SalesLokal/Faktur/print', $data));

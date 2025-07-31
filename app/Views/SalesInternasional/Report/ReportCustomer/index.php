@@ -255,7 +255,7 @@
         if (dateStart == '' || dateEnd == '') {
             alert('Tanggal mulai & Tanggal Akhir wajib diisi');
         } else {
-            window.open('<?= base_url('report-ekspor/customer-export') ?>?dateStart=' + dateStart + '?dateEnd=' + dateEnd + '&customer_id=' + customerId);
+            window.open('<?= base_url('report-ekspor/customer-export') ?>?dateStart=' + dateStart + '&dateEnd=' + dateEnd + '&customer_id=' + customerId);
         }
 
     }

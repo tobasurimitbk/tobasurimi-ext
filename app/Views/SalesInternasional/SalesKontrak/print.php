@@ -903,7 +903,7 @@
         <br>
 
         <!-- SIGNATURE TABLE -->
-        <table class="mt-1 sign-table border-collapse" style="margin-top: 10px; width: 100%;">
+        <table class="mt-1 sign-table border-collapse" style="margin-top: -18px; width: 100%;">
             <thead>
                 <tr>
                     <th style="width: 350px;">

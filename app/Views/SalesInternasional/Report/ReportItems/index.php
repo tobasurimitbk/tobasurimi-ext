@@ -85,15 +85,15 @@
                                 <th style="text-align:left; width:10px;" onclick="changeSort('sales_order_export.sales_order_export_id')">No</th>
                                 <th style="text-align:left;" onclick="changeSort('sales_order_export.user_id')">Acc Holder</th>
                                 <th style="text-align:left;" onclick="changeSort('sales_order_export.sales_order_export_no')">Order Form No</th>
-                                <th style="text-align:left;" onclick="changeSort('sales_order_export.customer_id')">Customer</th>
+                                <th style="text-align:left;" onclick="changeSort('sales_contract.customer_id')">Customer</th>
                                 <th style="text-align:left;" onclick="changeSort('sales_order_export.container')">Container</th>
                                 <th style="text-align:left;" onclick="changeSort('sales_order_export.actualy_shipment_date')">Actualy Shipment Date</th>
-                                <th style="text-align:left;">Destination</th>
-                                <th style="text-align:left;">Product</th>
+                                <th style="text-align:left;" onclick="changeSort('sales_contract.dicharge_port')">Destination</th>
+                                <th style="text-align:left;" onclick="changeSort('sales_contract_detail.barang_master_sales_id')">Product</th>
                                 <th style="text-align:left;">Qty (Kg)</th>
                                 <th style="text-align:left;" onclick="changeSort('sales_order_export.valas_id')">Valas</th>
-                                <th style="text-align:left;" onclick="changeSort('sales_order_export.shipment_value')">Amount Value</th>
-                                <th style="text-align:left;" onclick="changeSort('sales_order_export.shipment_value_net')">Price Type</th>
+                                <th style="text-align:left;">Amount Value</th>
+                                <th style="text-align:left;" onclick="changeSort('sales_contract.tipe_harga')">Price Type</th>
                                 <th style="text-align:left;">Order Form</th>
                             </tr>
                         </thead>
@@ -121,122 +121,120 @@
     let sort = "sales_order_export.sales_order_export_id";
     let sortType = "desc";
 
-    // var table = $('#dataTable').DataTable({
-    //     processing: true,
-    //     serverSide: true,
-    //     ajax: {
-    //         url: "<?= base_url('report-ekspor/customer-all') ?>",
-    //         type: 'GET',
-    //         dataSrc: "data",
-    //         data: function(data) {
-    //             data.dateStart = $('.dateStart').val();
-    //             data.dateEnd = $('.dateEnd').val();
-    //             data.search = $('.search').val();
-    //             data.customer_id = $('.customer_id').val();
-    //             data.sort = sort;
-    //             data.sortType = sortType;
-    //         }
-    //     },
-    //     "initComplete": function(settings, json) {
-    //         $('.dataTables_length').empty();
-    //         $('.dataTables_length').html("<div><label class='text-center ml-2 mt-2'>Show <b class='entries-label'>25</b> Entries</label></div>");
-    //         $('.dataTable').wrap("<div style='overflow:auto; width:100%;position:relative;'></div>");
-    //     },
-    //     pageLength: 25,
-    //     display: "stripe",
-    //     searching: false,
-    //     columns: [{
-    //             data: 'no',
-    //             width: "2%"
-    //         },
-    //         {
-    //             data: 'acc_holder'
-    //         },
-    //         {
-    //             data: 'sales_order_export_no'
-    //         },
-    //         {
-    //             data: 'customer_name'
-    //         },
-    //         {
-    //             data: 'container'
-    //         },
-    //         {
-    //             data: 'actualy_shipment_date'
-    //         },
-    //         {
-    //             data: 'total_qty',
-    //             searchable: false,
-    //             sortable: false,
-    //         },
-    //         {
-    //             data: 'total_qty_convertion',
-    //             searchable: false,
-    //             sortable: false,
-    //             render: function(data) {
-    //                 return greatFormatRupiah(data)
-    //             }
-    //         },
-    //         {
-    //             data: 'valas'
-    //         },
-    //         {
-    //             data: 'shipment_value',
-    //             render: function(data) {
-    //                 return greatFormatRupiah(data)
-    //             }
-    //         },
-    //         {
-    //             data: 'shipment_value_net',
-    //             render: function(data) {
-    //                 return greatFormatRupiah(data)
-    //             }
-    //         },
-    //         {
-    //             data: 'id',
-    //             className: "text-center actions",
-    //             searchable: false,
-    //             sortable: false,
-    //             render: function(data, type, row) {
-    //                 let id = row.id;
-    //                 return `
-    //                         <button data-toggle="tooltip" title="Print" class="btn btn-warning btn-print" onclick="print('${id}')" style="box-shadow: none !important;">
-    //                             <i class="fa fa-print fa-sm" aria-hidden="true"></i>
-    //                         </button>
-    //                     `
-    //             }
-    //         },
-    //     ],
-    //     "drawCallback": function(settings) {
-    //         var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-toggle="tooltip"]'))
-    //         var tooltipList = tooltipTriggerList.map(function(tooltipTriggerEl) {
-    //             return new bootstrap.Tooltip(tooltipTriggerEl)
-    //         });
-    //     },
-    //     columnDefs: [{
-    //         defaultContent: "-",
-    //         targets: "_all"
-    //     }],
-    //     language: {
-    //         emptyTable: "Data Empty",
-    //         lengthMenu: "Show _MENU_ entries",
-    //         paginate: {
-    //             previous: '<i class="fa fa-angle-left"></i>',
-    //             next: '<i class="fa fa-angle-right"></i>'
-    //         }
-    //     },
-    //     footerCallback: function(row, data, start, end, display) {
-    //         const api = this.api();
+    var table = $('#dataTable').DataTable({
+        processing: true,
+        serverSide: true,
+        ajax: {
+            url: "<?= base_url('report-ekspor/items-all') ?>",
+            type: 'GET',
+            dataSrc: "data",
+            data: function(data) {
+                data.dateStart = $('.dateStart').val();
+                data.dateEnd = $('.dateEnd').val();
+                data.search = $('.search').val();
+                data.customer_id = $('.customer_id').val();
+                data.barang_master_sales_id = $('.barang_master_sales_id').val();
+                data.sort = sort;
+                data.sortType = sortType;
+            }
+        },
+        "initComplete": function(settings, json) {
+            $('.dataTables_length').empty();
+            $('.dataTables_length').html("<div><label class='text-center ml-2 mt-2'>Show <b class='entries-label'>25</b> Entries</label></div>");
+            $('.dataTable').wrap("<div style='overflow:auto; width:100%;position:relative;'></div>");
+        },
+        pageLength: 25,
+        display: "stripe",
+        searching: false,
+        columns: [{
+                data: 'no',
+                width: "2%"
+            },
+            {
+                data: 'acc_holder'
+            },
+            {
+                data: 'sales_order_export_no'
+            },
+            {
+                data: 'customer_name'
+            },
+            {
+                data: 'container'
+            },
+            {
+                data: 'actualy_shipment_date'
+            },
+            {
+                data: 'dicharge_port',
+            },
+            {
+                data: 'barang_name',
+            },
+            {
+                data: 'total_qty_convertion',
+                searchable: false,
+                sortable: false,
+                render: function(data) {
+                    return greatFormatRupiah(data)
+                }
+            },
+            {
+                data: 'valas'
+            },
+            {
+                data: 'amount_value',
+                render: function(data) {
+                    return greatFormatRupiah(data)
+                }
+            },
+            {
+                data: 'price_type',
+            },
+            {
+                data: 'id',
+                className: "text-center actions",
+                searchable: false,
+                sortable: false,
+                render: function(data, type, row) {
+                    let id = row.id;
+                    return `
+                            <button data-toggle="tooltip" title="Print" class="btn btn-warning btn-print" onclick="print('${id}')" style="box-shadow: none !important;">
+                                <i class="fa fa-print fa-sm" aria-hidden="true"></i>
+                            </button>
+                        `
+                }
+            },
+        ],
+        "drawCallback": function(settings) {
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-toggle="tooltip"]'))
+            var tooltipList = tooltipTriggerList.map(function(tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl)
+            });
+        },
+        columnDefs: [{
+            defaultContent: "-",
+            targets: "_all"
+        }],
+        language: {
+            emptyTable: "Data Empty",
+            lengthMenu: "Show _MENU_ entries",
+            paginate: {
+                previous: '<i class="fa fa-angle-left"></i>',
+                next: '<i class="fa fa-angle-right"></i>'
+            }
+        },
+        footerCallback: function(row, data, start, end, display) {
+            const api = this.api();
 
-    //         const total = api.ajax.json().footerTotals;
+            const total = api.ajax.json().footerTotals;
 
-    //         if (total) {
-    //             $('.totalQtyConvertion').html(greatFormatRupiah(total.totalQtyConvertion));
-    //             $('.totalShipmentValue').html(greatFormatRupiah(total.totalShipmentValue));
-    //             $('.totalShipmentValueNet').html(greatFormatRupiah(total.totalShipmentValueNet));
-    //         }
-    //     },
-    // });
+            if (total) {
+                $('.totalQtyConvertion').html(greatFormatRupiah(total.totalQtyConvertion));
+                $('.amountValue').html(greatFormatRupiah(total.amountValue));
+            }
+        },
+    });
 
     $('#customer_id').select2({
         placeholder: "Select Customer",
@@ -250,7 +248,7 @@
         allowClear: true
     }).change(function() {});
 
-    $('#customer_id,#dateStart,#dateEnd').change(function() {
+    $('#customer_id,#dateStart,#dateEnd,#barang_master_sales_id').change(function() {
         table.ajax.reload();
     });
 
@@ -277,11 +275,12 @@
         var dateStart = $('#dateStart').val();
         var dateEnd = $('#dateEnd').val();
         var customerId = $('#customer_id option:selected').val();
+        var barangMasterSalesId = $('#barang_master_sales_id option:selected').val();
 
         if (dateStart == '' || dateEnd == '') {
             alert('Tanggal mulai & Tanggal Akhir wajib diisi');
         } else {
-            window.open('<?= base_url('report-ekspor/customer-export') ?>?dateStart=' + dateStart + '?dateEnd=' + dateEnd + '&customer_id=' + customerId);
+            window.open('<?= base_url('report-ekspor/items-export') ?>?dateStart=' + dateStart + '&dateEnd=' + dateEnd + '&customer_id=' + customerId + '&barang_master_sales_id=' + barangMasterSalesId);
         }
 
     }
