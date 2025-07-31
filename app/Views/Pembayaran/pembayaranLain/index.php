@@ -581,50 +581,6 @@
             $(this).valid(); // Trigger validasi saat tanggal berubah
         });
 
-        // When adding a detail
-        $('.btn-add-detail').click(function() {
-            // Jalankan validasi detail dulu
-            const akunSelisih = $('#akun_selisih option:selected').val();
-            const jenisPembayaran = $('#jenis_pembayaran option:selected').val();
-            let messageErr = '';
-            if (akunSelisih == '') {
-                if (jenisPembayaran == 'PUTIH') {
-                    messageErr = "Akun Kredit Wajib Diisi"
-                } else {
-                    messageErr = "Akun Debit Wajib Diisi";
-                }
-                alert(messageErr)
-                return;
-            }
-
-            if (!validateDetails()) {
-                refreshValidation(); // buat update styling error
-                return; // stop proses kalau gak valid
-            }
-
-            const detail = {
-                tanggal: $('#tanggal').val(),
-                pembayaran_oleh: $('#pembayaran_oleh').val(),
-                akun_kas: $('#akun_kas').val(),
-                akun_selisih: $('#akun_selisih').val(),
-                akun_kas_name: $('#akun_kas option:selected').text(),
-                akun_selisih_name: $('#akun_selisih option:selected').text(),
-                keterangan: $('#keterangan').val(),
-                valas: $('#valas option:selected').text(),
-                valas_id: $('#valas option:selected').val(),
-                jumlah: $('#jumlah').val(),
-                kurs: $('#kurs').val(),
-                jumlah_idr: $('#jumlah_idr').val(),
-                jenis_pembayaran: jenisPembayaran
-            };
-
-            details.push(detail);
-            refreshDetailsTable();
-            clearDetailForm();
-            refreshValidation(); // bersihin styling error kalau sudah valid
-            
-        });
-
         $('#jumlah').keyup(function() {
             var jumlah = destroyFormatRupiah($('#jumlah').val() || 0);
             var kurs = destroyFormatRupiah($('#kurs').val() || 1);
@@ -936,6 +892,7 @@
             const akunSelisihVal = $('#akun_selisih').val();
             const akunKasName = $('#akun_kas option:selected').text();
             const akunSelisihName = $('#akun_selisih option:selected').text();
+
 
             // Prepare detail data - KONSISTEN dengan struktur BE
             const detail = {
@@ -1350,7 +1307,7 @@
             cancelButtonColor: '#d33',
             showCancelButton: true,
             reverseButtons: true,
-            confirmButtonText: 'Simpan',
+            confirmButtonText: 'Hapus',
             cancelButtonText: 'Kembali',
         }).then((result) => {
             if (result.isConfirmed) {
