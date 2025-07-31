@@ -120,6 +120,25 @@ class OtherPayment extends BaseController
             ]);
         }
 
+
+         // 2. Validasi company_id dari COA yang dipilih
+        $currentCompanyId = $this->this_company_id;
+        
+        // Cek akun parent (selisih/kas)
+        $parentAccountId = $payload['jenis_pembayaran'] === 'PUTIH' 
+            ? $payload['akun_selisih'] 
+            : $payload['akun_selisih']; // Untuk MERAH juga pakai akun_selisih dari payload
+        
+        $parentAccount = $this->subAkunsModel->where('id', $parentAccountId)->first();
+        
+        if (!$parentAccount || $parentAccount->company_id != $currentCompanyId) {
+            return $this->response->setJSON([
+                'status' => false,
+                'message' => "Akun tidak valid atau tidak sesuai dengan perusahaan saat ini",
+                'token' => csrf_hash()
+            ]);
+        }
+
         // Sederhanakan parent data
         $parentData = [
             'company_id' => $this->this_company_id,
@@ -152,10 +171,12 @@ class OtherPayment extends BaseController
                 'jumlah_idr' => $detail['jumlah_idr'],
                 'keterangan' => $detail['keterangan'] ?? null,
                 // Konsisten: akun_kas selalu debit, akun_selisih selalu kredit
-                'akun_kas' => $detail['akun_kas'],
-                'akun_selisih' => $payload['jenis_pembayaran'] === 'PUTIH' 
+                'akun_kas' =>   $payload['jenis_pembayaran'] === 'PUTIH' 
                     ? $payload['akun_selisih'] 
-                    : $detail['akun_kas']
+                    : $detail['akun_kas'], // Untuk MERAH, akun_selisih di child = akun_kas
+                'akun_selisih' => $payload['jenis_pembayaran'] === 'PUTIH' 
+                     ? $detail['akun_kas'] 
+                    : $payload['akun_selisih'] // Selalu debit dari detail
             ];
 
             $this->otherPaymentDetailModel->insert($detailData);
@@ -186,6 +207,24 @@ class OtherPayment extends BaseController
                 'message' => 'ID tidak ditemukan'
             ]);
         }
+
+        // 2. Validasi company_id dari COA yang dipilih
+        $currentCompanyId = $this->this_company_id;
+
+        $parentAccountId = $payload['jenis_pembayaran'] === 'PUTIH' 
+            ? $payload['akun_selisih'] 
+            : $payload['akun_selisih']; // Untuk MERAH juga pakai akun_selisih dari payload
+        
+        $parentAccount = $this->subAkunsModel->where('id', $parentAccountId)->first();
+        
+        if (!$parentAccount || $parentAccount['company_id'] != $currentCompanyId) {
+            return $this->response->setJSON([
+                'status' => false,
+                'message' => "Akun tidak valid atau tidak sesuai dengan perusahaan saat ini, silahkan mengreload halaman ini",
+                'token' => csrf_hash()
+            ]);
+        }
+
 
         // 1. Update Parent Data - Konsisten dengan createAction
         $parentData = [
