@@ -932,7 +932,6 @@
                 return;
             }
 
-            const jenisPembayaran = $('#jenis_pembayaran option:selected').val();
             const akunKasVal = $('#akun_kas').val();
             const akunSelisihVal = $('#akun_selisih').val();
             const akunKasName = $('#akun_kas option:selected').text();
