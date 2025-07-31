@@ -121,6 +121,239 @@ class SalesOrderExportModel extends Model
         ];
     }
 
+    public function getListExportByCustomer($condition, $addCondition, $limit = 10, $offset = 0)
+    {
+        $availableSort = [
+            'sales_order_export.sales_order_export_id'  => 'sales_order_export_id',
+            'sales_order_export.user_id'                => 'sales_order_export.user_id',
+            'sales_order_export.sales_order_export_no'  => 'sales_order_export.sales_order_export_no',
+            'sales_contract.customer_id'                => 'sales_contract.customer_id',
+            'sales_order_export.container'              => 'sales_order_export.container',
+            'sales_order_export.actualy_shipment_date'  => 'sales_order_export.actualy_shipment_date',
+            'sales_order_export.shipment_value'         => 'sales_order_export.shipment_value',
+            'sales_order_export.shipment_value_net'     => 'sales_order_export.shipment_value_net',
+            'sales_order_export.valas_id'               => 'sales_order_export.valas_id'
+
+        ];
+
+        $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
+
+        $sort = $availableSort[$addCondition['sort'] ?? 'createdAt'] ?? 'sales_order_export.sales_order_export_id';
+        $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'DESC';
+
+        $selectQry = "sales_order_export.*, 
+                        metadata.value AS valas_name,
+                        users.name AS acc_holder,
+                        customers.name AS customer_name,
+                        SUM(qty) AS total_qty,
+                        SUM(qty_convertion) AS total_qty_convertion,
+                        tb_satuan.kode_satuan AS kode_satuan,
+                        tb_satuan_konversi.kode_satuan AS kode_satuan_konversi";
+        $salesDataQry = $this->asObject()
+            ->select($selectQry)
+            ->where($condition)
+            ->join('sales_contract', 'sales_contract.id = sales_order_export.sales_contract_id', 'left')
+            ->join('customers', 'customers.id = sales_contract.customer_id', 'left')
+            ->join('sales_order_detail_export', 'sales_order_detail_export.sales_order_export_id = sales_order_export.sales_order_export_id', 'left')
+            ->join('satuans tb_satuan', 'tb_satuan.id = sales_order_detail_export.satuan_id', 'left')
+            ->join('satuans tb_satuan_konversi', 'tb_satuan_konversi.id = sales_order_detail_export.satuan_convertion_id', 'left')
+            ->join('metadata', 'sales_order_export.valas_id = metadata.id', 'left')
+            ->join('users', 'users.id = sales_order_export.user_id', 'left')
+            ->orderBy($sort, $sortType)
+            ->groupBy('sales_order_export.sales_order_export_id');
+
+        $totalData = $salesDataQry->countAllResults(false);
+
+        if ($addCondition['search']) {
+            $salesDataQry->groupStart();
+        }
+
+        if ($addCondition['search']) {
+            $salesDataQry
+                ->like('sales_order_export.sales_order_export_no', $addCondition['search'])
+                ->orLike('customers.name', $addCondition['search'])
+                ->orLike('users.name', $addCondition['search'])
+                ->orLike('sales_order_export.container', $addCondition['search']);
+        }
+
+        if ($addCondition['search']) {
+            $salesDataQry->groupEnd();
+        }
+
+        if ($addCondition['customer_id']) {
+            $salesDataQry->groupStart();
+            $salesDataQry->where('sales_contract.customer_id', $addCondition['customer_id']);
+            $salesDataQry->groupEnd();
+        }
+
+        if (!empty($addCondition['dateStart']) || !empty($addCondition['dateEnd'])) {
+            $salesDataQry->groupStart();
+            if (!empty($addCondition['dateStart'])) {
+                $salesDataQry->where('actualy_shipment_date >=', $addCondition['dateStart']);
+            }
+            if (!empty($addCondition['dateEnd'])) {
+                $salesDataQry->where('actualy_shipment_date <=', $addCondition['dateEnd']);
+            }
+            $salesDataQry->groupEnd();
+        }
+
+
+        $totalFilteredData = $salesDataQry->countAllResults(false);
+        $data = $salesDataQry->findAll($limit, $offset);
+
+
+        // Hitung shipment_value dan shipment_value_net tanpa join ke detail
+        $shipmentSum = $this->db->table('sales_order_export')
+            ->select('
+            SUM(sales_order_export.shipment_value) AS total_shipment_value_all,
+            SUM(sales_order_export.shipment_value_net) AS total_shipment_value_net_all
+        ')
+            ->join('sales_contract', 'sales_contract.id = sales_order_export.sales_contract_id', 'left')
+            ->join('customers', 'customers.id = sales_contract.customer_id', 'left')
+            ->join('metadata', 'sales_order_export.valas_id = metadata.id', 'left')
+            ->join('users', 'users.id = sales_order_export.user_id', 'left')
+            ->where($condition);
+
+        if ($addCondition['customer_id']) {
+            $shipmentSum->where('sales_contract.customer_id', $addCondition['customer_id']);
+        }
+        if ($addCondition['search']) {
+            $shipmentSum->groupStart()
+                ->like('sales_order_export.sales_order_export_no', $addCondition['search'])
+                ->orLike('customers.name', $addCondition['search'])
+                ->orLike('users.name', $addCondition['search'])
+                ->orLike('sales_order_export.container', $addCondition['search'])
+                ->groupEnd();
+        }
+        if (!empty($addCondition['dateStart']) || !empty($addCondition['dateEnd'])) {
+            $shipmentSum->groupStart();
+            if (!empty($addCondition['dateStart'])) {
+                $shipmentSum->where('actualy_shipment_date >=', $addCondition['dateStart']);
+            }
+            if (!empty($addCondition['dateEnd'])) {
+                $shipmentSum->where('actualy_shipment_date <=', $addCondition['dateEnd']);
+            }
+            $shipmentSum->groupEnd();
+        }
+
+        $shipmentSummary = $shipmentSum->get()->getRowArray();
+
+        // Hitung total_qty_convertion (boleh join detail)
+        $qtySum = $this->db->table('sales_order_export')
+            ->select('SUM(sales_order_detail_export.qty_convertion) AS total_qty_convertion_all')
+            ->join('sales_contract', 'sales_contract.id = sales_order_export.sales_contract_id', 'left')
+            ->join('customers', 'customers.id = sales_contract.customer_id', 'left')
+            ->join('sales_order_detail_export', 'sales_order_detail_export.sales_order_export_id = sales_order_export.sales_order_export_id', 'left')
+            ->join('metadata', 'sales_order_export.valas_id = metadata.id', 'left')
+            ->join('users', 'users.id = sales_order_export.user_id', 'left')
+            ->where($condition);
+
+        if ($addCondition['customer_id']) {
+            $qtySum->where('sales_contract.customer_id', $addCondition['customer_id']);
+        }
+        if ($addCondition['search']) {
+            $qtySum->groupStart()
+                ->like('sales_order_export.sales_order_export_no', $addCondition['search'])
+                ->orLike('customers.name', $addCondition['search'])
+                ->orLike('users.name', $addCondition['search'])
+                ->orLike('sales_order_export.container', $addCondition['search'])
+                ->groupEnd();
+        }
+        if (!empty($addCondition['dateStart']) || !empty($addCondition['dateEnd'])) {
+            $qtySum->groupStart();
+            if (!empty($addCondition['dateStart'])) {
+                $qtySum->where('actualy_shipment_date >=', $addCondition['dateStart']);
+            }
+            if (!empty($addCondition['dateEnd'])) {
+                $qtySum->where('actualy_shipment_date <=', $addCondition['dateEnd']);
+            }
+            $qtySum->groupEnd();
+        }
+
+        $qtySummary = $qtySum->get()->getRowArray();
+
+        // Gabungkan hasil
+        $summary = array_merge($shipmentSummary, $qtySummary);
+
+
+
+        return [
+            'data'              => $data,
+            'totalData'         => $totalData,
+            'totalFilteredData' => $totalFilteredData,
+            'sort'  => $sort,
+            'sortType'  => $sortType,
+            'totalQtyConvertion' => (float) ($summary['total_qty_convertion_all'] ?? 0),
+            'totalShipmentValue' => (float) ($summary['total_shipment_value_all'] ?? 0),
+            'totalShipmentValueNet' => (float) ($summary['total_shipment_value_net_all'] ?? 0),
+        ];
+    }
+
+    public function generateTotalPrice($salesOrderExportId)
+    {
+        $salesOrderExportAdditionalModel = new SalesOrderExportAdditionalModel();
+
+        $dataSO = $this->getById($salesOrderExportId);
+        $dataSODetail =  $this
+            ->getDetailSalesKontrakInOrderForm(
+                $dataSO->sales_contract_id,
+                $salesOrderExportId,
+                true
+            );
+
+        $dataSalesExportAdditional = $salesOrderExportAdditionalModel
+            ->where('sales_order_export_id', $salesOrderExportId)
+            ->findAll();
+
+        $totalAdjusment = 0;
+        $shipmentValue = 0; // Include Rebate dll
+        $shipmentValueNet = 0; // Original
+        foreach ($dataSODetail['salesContractDetailList'] as $detail) {
+            $shipmentValueNet += formatter($detail["total_input"], "STR_TO_FLOAT");
+        }
+
+        // DARI SALES KONTRAK YANG DIINPUT
+        if ($dataSODetail['royaltyPriceFinal'] > 0) {
+            $totalAdjusment -= $dataSODetail['royaltyPriceFinal'];
+        }
+        if ($dataSODetail['rebatePriceFinal'] > 0) {
+            $totalAdjusment -= $dataSODetail['rebatePriceFinal'];
+        }
+        if ($dataSODetail['canDeductionPriceFinal'] > 0) {
+            $totalAdjusment -= $dataSODetail['canDeductionPriceFinal'];
+        }
+        if ($dataSODetail['estimatedFreightPriceFinal'] > 0) {
+            $totalAdjusment += $dataSODetail['estimatedFreightPriceFinal'];
+        }
+        if ($dataSODetail['othersPriceFinal'] > 0) {
+            $others_value = (float) $dataSODetail['othersPriceFinal'];
+            if ($dataSODetail['othersTypeFinal'] == "PLUS") {
+                $totalAdjusment += $others_value;
+            } else {
+                $totalAdjusment -= $others_value;
+            }
+        }
+        // DARI SALES ORDER
+        foreach ($dataSalesExportAdditional as $d) {
+            if ($d['additional_detail_type'] == "PLUS") {
+                $totalAdjusment += $d['additional_detail_price'];
+            } else {
+                $totalAdjusment -= $d['additional_detail_price'];
+            }
+        }
+        if ($dataSO->palet_fumigation > 0) {
+            $totalAdjusment += $dataSO->palet_fumigation_price;
+        }
+
+        $shipmentValue = $shipmentValueNet + $totalAdjusment;
+
+        return [
+            'shipment_value' => $shipmentValue,
+            'shipment_value_net' => $shipmentValueNet,
+            'valas_id' => $dataSODetail['salesContract']['currency']
+        ];
+    }
+
     public function getById($id)
     {
         $selectQry = "

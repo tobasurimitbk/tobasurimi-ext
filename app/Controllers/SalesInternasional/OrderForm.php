@@ -308,6 +308,18 @@ class OrderForm extends BaseController
                 ]);
             }
 
+
+            // Update Shipment Value & Shipment Value Net & Valas
+            $shipmentDetail = $this->salesOrderExportModel->generateTotalPrice(
+                $salesOrderExportId
+            );
+
+            $this->salesOrderExportModel->update($salesOrderExportId, [
+                'shipment_value' => $shipmentDetail['shipment_value'],
+                'shipment_value_net' => $shipmentDetail['shipment_value_net'],
+                'valas_id' => $shipmentDetail['valas_id']
+            ]);
+
             $db->transCommit();
 
             return response()->setJSON([
@@ -676,6 +688,17 @@ class OrderForm extends BaseController
                     'additional_detail_price' => $l->additional_detail_price
                 ]);
             }
+
+            // Update Shipment Value & Shipment Value Net & Valas
+            $shipmentDetail = $this->salesOrderExportModel->generateTotalPrice(
+                $id
+            );
+
+            $this->salesOrderExportModel->update($id, [
+                'shipment_value' => $shipmentDetail['shipment_value'],
+                'shipment_value_net' => $shipmentDetail['shipment_value_net'],
+                'valas_id' => $shipmentDetail['valas_id']
+            ]);
 
             $db->transCommit();
 

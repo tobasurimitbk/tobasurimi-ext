@@ -135,7 +135,7 @@
                         <div class="form-floating mb-3" style="height: 50px;">
                             <input autocomplete="one-time-code" value="<?= !empty($dataSalesKontrak) ? $dataSalesKontrak['dicharge_port'] : ""; ?>" type="text" class="form-control dicharge_port" id="dicharge_port" name="dicharge_port" placeholder="Discharge Port">
                             <label for="floatingInput">Discharge Port</label>
-                        </div>.
+                        </div>
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">

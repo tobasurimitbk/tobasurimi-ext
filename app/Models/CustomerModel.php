@@ -379,7 +379,7 @@ class CustomerModel extends Model
             $query->where('user_id', $user_id);
         }
 
-        return $query->orderBy('kode', "DESC")->findAll();
+        return $query->orderBy('name', "ASC")->findAll();
     }
 
     public function getCustomerLokal($user_id, $is_admin)

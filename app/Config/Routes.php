@@ -718,6 +718,15 @@ $routes->post('/master-barang-internasional/generate-new-code', 'SalesInternasio
 $routes->post('/master-barang-internasional/import-excel', 'SalesInternasional\Barang::importExcel', ['filter' => 'Auth']);
 $routes->get('/master-barang-internasional/export-excel', 'SalesInternasional\Barang::exportExcel', ['filter' => 'Auth']);
 
+// Reports Ekspor
+$routes->get('/report-ekspor', 'SalesInternasional\ReportEkspor::index', ['filter' => 'Auth']);
+$routes->get('/report-ekspor/customer', 'SalesInternasional\ReportEkspor::indexByCustomer', ['filter' => 'Auth']);
+$routes->get('/report-ekspor/customer-all', 'SalesInternasional\ReportEkspor::allByCustomer', ['filter' => 'Auth']);
+$routes->get('/report-ekspor/customer-export', 'SalesInternasional\ReportEkspor::exportExcel', ['filter' => 'Auth']);
+$routes->get('/report-ekspor/items', 'SalesInternasional\ReportEkspor::indexByItems', ['filter' => 'Auth']);
+
+
+
 // Customer Lokal
 $routes->get('/customer-lokal', 'SalesLokal\Customer::index', ['filter' => 'Auth']);
 $routes->get('/customer-lokal/all', 'SalesLokal\Customer::all', ['filter' => 'Auth']);
