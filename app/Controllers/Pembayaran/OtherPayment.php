@@ -171,12 +171,8 @@ class OtherPayment extends BaseController
                 'jumlah_idr' => $detail['jumlah_idr'],
                 'keterangan' => $detail['keterangan'] ?? null,
                 // Konsisten: akun_kas selalu debit, akun_selisih selalu kredit
-                'akun_kas' => $payload['jenis_pembayaran']  === 'PUTIH' 
-                    ? $detail['akun_kas'] // Debit dari detail
-                    : $payload['akun_selisih'], // Kredit (pakai parent)
-                'akun_selisih' => $payload['jenis_pembayaran']  === 'PUTIH' 
-                    ? $payload['akun_selisih'] // Kredit (pakai parent)
-                    : $detail['akun_kas'] // Debit dari detail
+                'akun_kas' => $detail['akun_kas'],
+                'akun_selisih' => $detail['akun_selisih']
             ];
 
             $this->otherPaymentDetailModel->insert($detailData);
