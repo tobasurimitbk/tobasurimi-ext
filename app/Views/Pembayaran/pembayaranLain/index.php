@@ -932,6 +932,12 @@
                 return;
             }
 
+            const jenisPembayaran = $('#jenis_pembayaran option:selected').val();
+            const akunKasVal = $('#akun_kas').val();
+            const akunSelisihVal = $('#akun_selisih').val();
+            const akunKasName = $('#akun_kas option:selected').text();
+            const akunSelisihName = $('#akun_selisih option:selected').text();
+
             // Prepare detail data - KONSISTEN dengan struktur BE
             const detail = {
                 tanggal: $('#tanggal').val(),
@@ -943,10 +949,10 @@
                 kurs: $('#kurs').val(),
                 jumlah_idr: $('#jumlah_idr').val(),
                 jenis_pembayaran: jenisPembayaran,
-                akun_kas: $('#akun_kas').val(),           // Selalu dari field akun_kas
-                akun_kas_name: $('#akun_kas option:selected').text(),
-                akun_selisih: $('#akun_selisih').val(),    // Selalu dari field akun_selisih di header
-                akun_selisih_name: $('#akun_selisih option:selected').text(),
+                akun_selisih: jenisPembayaran == 'PUTIH' ? akunKasVal : akunSelisihVal,
+                akun_kas: jenisPembayaran == 'PUTIH' ? akunSelisihVal : akunKasVal,
+                akun_selisih_name: jenisPembayaran == 'PUTIH' ? akunKasName : akunSelisihName,
+                akun_kas_name: jenisPembayaran == 'PUTIH' ? akunSelisihName : akunKasName,
             };
 
             details.push(detail);
