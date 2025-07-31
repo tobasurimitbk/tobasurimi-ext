@@ -248,7 +248,7 @@
         allowClear: true
     }).change(function() {});
 
-    $('#customer_id,#dateStart,#dateEnd').change(function() {
+    $('#customer_id,#dateStart,#dateEnd,#barang_master_sales_id').change(function() {
         table.ajax.reload();
     });
 
