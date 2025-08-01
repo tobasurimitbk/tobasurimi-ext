@@ -479,9 +479,9 @@
 
 
                     <tr style="font-weight: bold; background-color: #e9ecef; font-size:10px;">
-                        <td style="padding: 6px; border: 1px solid #ddd;">TOTAL</td>
+                        <td style="padding: 6px; border: 1px solid #ddd;"></td>
                         <td style="padding: 6px; border: 1px solid #ddd; text-align: right;">
-                            <span style="float: left;"><?= $dataSO->royalty ?></span>
+                            <span style="float: left;">TOTAL</span>
                             <?= number_format($total_amount, 2) ?>
                         </td>
                     </tr>
