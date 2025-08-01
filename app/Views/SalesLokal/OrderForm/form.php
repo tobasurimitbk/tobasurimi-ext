@@ -1851,6 +1851,9 @@
             $(".statusppn").val('')
             $(".amount").val('')
             $(".keterangan").val('')
+            $(".discount_percentage").val('')
+            $(".satuan").val('')
+            $(".keteranganppn").val('')
 
             $(".id_barang").val('')
 
@@ -2111,13 +2114,13 @@
                         tag_total += "<b>TOTAL</b>";
                         tag_total += "</td>";
                         tag_total += "<td>";
-                        tag_total += `<b>${total_harga_barang.toLocaleString()}</b>`;
+                        tag_total += `<b>${greatFormatRupiah(total_harga_barang)}</b>`;
                         tag_total += "</td>";
                         tag_total += "<td>";
                         tag_total += `<b>${total_qty}</b>`;
                         tag_total += "</td>";
                         tag_total += "<td>";
-                        tag_total += `<b>${total_harga.toLocaleString()}</b>`;
+                        tag_total += `<b>${greatFormatRupiah(total_harga)}</b>`;
                         tag_total += "</td>";
                         tag_total += "<td colspan='3'>";
                         tag_total += "</td>";
@@ -2170,11 +2173,11 @@
                 $('#includeTaxText').html('');
             }
 
-            $('#itemSubTotal').html(itemSubTotal.toLocaleString());
-            $('#discTotal').html(discTotal.toLocaleString());
+            $('#itemSubTotal').html(greatFormatRupiah(itemSubTotal));
+            $('#discTotal').html(greatFormatRupiah(discTotal));
 
             const grandTotal = itemSubTotal + estimatedFreight + taxTotal - discTotal;
-            $('#grandTotal').html(grandTotal.toLocaleString());
+            $('#grandTotal').html(greatFormatRupiah(grandTotal));
         };
 
         $('#tax_status').change(function() {

@@ -1859,16 +1859,16 @@
             let harga = $(".harga").val() ? $(".harga").val().replaceAll(",", "") : 0;
             let qty = $(".qty").val() ? parseFloat($(".qty").val()) : 0;
 
-            let amount = (harga * qty).toLocaleString();
-            $(".amount").val(amount);
+            let amount = (harga * qty);
+            $(".amount").val(greatFormatRupiah(amount));
         });
 
         $(".harga, .qty").change(function() {
             let harga = $(".harga").val() ? $(".harga").val().replaceAll(",", "") : 0;
             let qty = $(".qty").val() ? parseFloat($(".qty").val()) : 0;
 
-            let amount = (harga * qty).toLocaleString();
-            $(".amount").val(amount);
+            let amount = (harga * qty);
+            $(".amount").val(greatFormatRupiah(amount));
         });
 
         $(".discount_percentage").keyup(function() {
@@ -2108,13 +2108,13 @@
                         tag_total += "<b>TOTAL</b>";
                         tag_total += "</td>";
                         tag_total += "<td>";
-                        tag_total += `<b>${total_harga_barang.toLocaleString()}</b>`;
+                        tag_total += `<b>${greatFormatRupiah(total_harga_barang)}</b>`;
                         tag_total += "</td>";
                         tag_total += "<td>";
                         tag_total += `<b>${total_qty}</b>`;
                         tag_total += "</td>";
                         tag_total += "<td>";
-                        tag_total += `<b>${total_harga.toLocaleString()}</b>`;
+                        tag_total += `<b>${greatFormatRupiah(total_harga)}</b>`;
                         tag_total += "</td>";
                         tag_total += "<td colspan='3'>";
                         tag_total += "</td>";
@@ -2167,11 +2167,11 @@
                 $('#includeTaxText').html('');
             }
 
-            $('#itemSubTotal').html(itemSubTotal.toLocaleString());
-            $('#discTotal').html(discTotal.toLocaleString());
+            $('#itemSubTotal').html(greatFormatRupiah(itemSubTotal));
+            $('#discTotal').html(greatFormatRupiah(discTotal));
 
             const grandTotal = itemSubTotal + estimatedFreight + taxTotal - discTotal;
-            $('#grandTotal').html(grandTotal.toLocaleString());
+            $('#grandTotal').html(greatFormatRupiah(grandTotal));
         };
 
         $('#tax_status').change(function() {
