@@ -763,7 +763,7 @@
                     discAmt: "<?= $payload['discount_unit'] ?? "percent" ?>" == 'percent' ? <?= $payload['barangTotal'] ?> * (<?= $payload['discount_percentage'] ?? 0 ?> / 100) : <?= $payload['discount_percentage'] ?? 0 ?>,
                 });
 
-                console.log(list_items);
+                // console.log(list_items);
 
 
                 table.row.add({
@@ -801,12 +801,12 @@
             let dataId = $(this).data('id');
             const csrf = $(`[name="${csrfToken}"]`);
 
-            console.log(dataId);
+            // console.log(dataId);
             
 
             if (dataId.length === 7 && /[a-zA-Z]/.test(dataId)) {
                 // Hapus item dari array JavaScript dan gambar ulang tabel
-                console.log(list_items);
+                // console.log(list_items);
                 // console.log(table);
                 let indexToRemove = list_items.findIndex(item => item.no === dataNo);
                 if (indexToRemove !== -1) {
@@ -814,7 +814,7 @@
 
                 }
                 table.clear().rows.add(list_items).draw();
-                console.log(list_items);
+                // console.log(list_items);
             } else {
                 Swal.fire({
                     icon: 'question',
@@ -877,8 +877,8 @@
             let dataIdBarang = rowData.id_barang;
             let dataQty = rowData.qty;
             let dataHargaBarang = rowData.harga_barang;
-            let dataDiscountPercentage = rowData.discount_percentage;
-            let dataDiscountUnit = rowData.discount_unit;
+            let dataDiscountPercentage = rowData.discount_percentage ?? rowData.disc;
+            let dataDiscountUnit = rowData.discount_unit ?? rowData.discUnit;
             let dataKeterangan = rowData.keterangan;
             let dataIdDetail = rowData.id;
 
@@ -1914,7 +1914,7 @@
         })
 
         $(".btn-submit-detail").click(function() {
-            let row_detail = $(".id_detail").val() ? Number($(".id_detail").val()) : 0;
+            let row_detail = $(".id_detail").val() ? $(".id_detail").val() : 0;
             let id_barang = $(".id_barang option:selected").val()
             let nama_barang = $(".id_barang option:selected").text()
             const selectedData = $(".id_barang option:selected").data();
@@ -1933,7 +1933,7 @@
             const discAmt = discountUnit == "percent" ? amount * (discountPercentage / 100) : discountPercentage;
             const discountedAmt = amount - discAmt;
 
-            console.log(list_items);
+            // console.log(list_items);
 
 
             const currentItemList = table.rows().data().toArray();
@@ -1949,11 +1949,11 @@
             } else {
                 // update detail
                 if (row_detail != 0) {
-                    console.log("Editing row with ID:", row_detail);
+                    // console.log("Editing row with ID:", row_detail);
 
                     // 1. Cari index di list_items
                     const itemIndex = list_items.findIndex(item => item.id == row_detail);
-                    console.log("Found in list_items at index:", itemIndex);
+                    // console.log("Found in list_items at index:", itemIndex);
 
                     if (itemIndex !== -1) {
                         // Hitung nilai diskon dan amount baru
@@ -1989,7 +1989,7 @@
                         };
 
                         list_items[itemIndex] = updatedItem;
-                        console.log("Updated list_items:", list_items[itemIndex]);
+                        // console.log("Updated list_items:", list_items[itemIndex]);
 
                         // 3. Update baris di tabel
                         let rowUpdated = false;
@@ -2022,14 +2022,14 @@
 
                                 table.row(rows[i]).data(newData).invalidate();
                                 rowUpdated = true;
-                                console.log("Updated table row:", newData);
+                                // console.log("Updated table row:", newData);
                                 break;
                             }
                         }
 
                         if (rowUpdated) {
                             table.draw(); // Refresh tampilan tabel
-                            console.log("Table refreshed");
+                            // console.log("Table refreshed");
                         } else {
                             console.warn("Row not found in table with ID:", row_detail);
                         }
@@ -2040,7 +2040,7 @@
                         // 5. Reset form dan tutup modal
                         $(".detail-form")[0].reset();
                         $(".detail-modal").modal("hide");
-                        console.log("Modal closed");
+                        // console.log("Modal closed");
                     } else {
                         console.warn("Item not found in list_items with ID:", row_detail);
                     }
@@ -2294,6 +2294,12 @@
             $.ajax({
                 url: `<?= base_url("order-form-lokal/barangAll"); ?>`,
                 method: "GET",
+                beforeSend: function() {
+                    setLoading();
+                },
+                complete: function() {
+                    stopLoading();
+                },
                 dataType: "json",
                 success: function(res) {
                     const $select = $(".id_barang");
@@ -2401,7 +2407,7 @@
                 },
                 dataType: "json",
                 success: function(res) {
-                    console.log(res);
+                    // console.log(res);
                     // Panggil callback dengan status dari response
                     callback(res.status);
                 },

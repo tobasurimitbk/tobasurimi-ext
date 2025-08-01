@@ -1902,7 +1902,7 @@
         })
 
         $(".btn-submit-detail").click(function() {
-            let row_detail = $(".id_detail").val() ? Number($(".id_detail").val()) : 0;
+            let row_detail = $(".id_detail").val() ? $(".id_detail").val() : 0;
             let id_barang = $(".id_barang option:selected").val()
             let nama_barang = $(".id_barang option:selected").text()
             const selectedData = $(".id_barang option:selected").data();
@@ -2282,6 +2282,12 @@
             $.ajax({
                 url: `<?= base_url("faktur-sales/barangAll"); ?>`,
                 method: "GET",
+                beforeSend: function() {
+                    setLoading();
+                },
+                complete: function() {
+                    stopLoading();
+                },
                 dataType: "json",
                 success: function(res) {
                     const $select = $(".id_barang");
