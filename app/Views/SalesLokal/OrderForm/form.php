@@ -524,7 +524,7 @@
                             </div>
                         </div>
                         <div class="col-md-4">
-                            <div class="form-floating mb-3" style="height: 50px;">
+                            <div class="form-floating mb-3 sales-text-field" style="height: 50px;display:none;">
                                 <!-- <input autocomplete="one-time-code" type="text" disabled value="<?= session()->get('login')->name; ?>" class="form-control sales_id" id="sales_id" name="sales_id" placeholder="Nama Sales"> -->
                                 <select class="form-select sales_id" name="sales_id" id="sales_id">
                                     <option value=""></option>
@@ -1104,7 +1104,13 @@
             theme: "bootstrap-5",
             dropdownParent: $(".addCustomerModal"),
             allowClear: true
-        })
+        }).change(function() {
+            if ($(this).val() == '1') {
+                $('.sales-text-field').show();
+            } else {
+                $('.sales-text-field').hide();
+            }
+        });
 
         //CSS SELECT2 FLOATING LABEL
         $('.id_customer, .satuan_id, .sales_id, .termin, .id_sales, .jenis_penjualan, .id_barang, .province_parent_id, .city_parent_id, #tipe_pelanggan_customer, #currency, #jenis_penjualan_customer,#company_id')
