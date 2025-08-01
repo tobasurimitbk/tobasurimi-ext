@@ -691,7 +691,7 @@
                     <td style="padding: 6px; border: 1px solid #ddd;"></td>
                     <td style="padding: 6px; border: 1px solid #ddd; text-align: right; color:red;">
                         <span style="float: left;"><?= $salesKontrak['royalty'] ?></span>
-                        ( - ) <?= number_format($salesKontrak['royalty_price'], 2) ?>
+                        ( <?= number_format($salesKontrak['royalty_price'], 2) ?> )
                     </td>
                 </tr>
             <?php endif; ?>
@@ -702,7 +702,7 @@
                     <td style="padding: 6px; border: 1px solid #ddd;"></td>
                     <td style="padding: 6px; border: 1px solid #ddd; text-align: right; color:red;">
                         <span style="float: left;"><?= $salesKontrak['rebate'] ?></span>
-                        ( - ) <?= number_format($salesKontrak['rebate_price'], 2) ?>
+                        ( <?= number_format($salesKontrak['rebate_price'], 2) ?> )
                     </td>
                 </tr>
             <?php endif; ?>
@@ -713,7 +713,7 @@
                     <td style="padding: 6px; border: 1px solid #ddd;"></td>
                     <td style="padding: 6px; border: 1px solid #ddd; text-align: right; color:red;">
                         <span style="float: left;"><?= $salesKontrak['can_deduction'] ?></span>
-                        ( - ) <?= number_format($salesKontrak['can_deduction_price'], 2) ?>
+                        ( <?= number_format($salesKontrak['can_deduction_price'], 2) ?> )
                     </td>
                 </tr>
             <?php endif; ?>
@@ -735,7 +735,7 @@
                     <td style="padding: 6px; border: 1px solid #ddd;"></td>
                     <td style="padding: 6px; border: 1px solid #ddd; text-align: right;">
                         <span style="float: left;"><?= $salesKontrak['others'] ?></span>
-                        <?= $salesKontrak['others_type'] == "MINUS" ? "( - ) " . number_format($salesKontrak['others_price'], 2) : number_format($salesKontrak['others_price'], 2) ?>
+                        <?= $salesKontrak['others_type'] == "MINUS" ? "( " . number_format($salesKontrak['others_price'], 2) . " )" : number_format($salesKontrak['others_price'], 2) ?>
                     </td>
                 </tr>
             <?php endif; ?>

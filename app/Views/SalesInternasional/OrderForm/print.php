@@ -492,7 +492,7 @@
                             <td style="padding: 6px; border: 1px solid #ddd;"></td>
                             <td style="padding: 6px; border: 1px solid #ddd; text-align: right; color:red;">
                                 <span style="float: left;"><?= $dataSO->royalty ?></span>
-                                ( - ) <?= number_format($dataSODetail['royaltyPriceFinal'], 2) ?>
+                                ( <?= number_format($dataSODetail['royaltyPriceFinal'], 2) ?> )
                             </td>
                         </tr>
                     <?php endif; ?>
@@ -503,7 +503,7 @@
                             <td style="padding: 6px; border: 1px solid #ddd;"></td>
                             <td style="padding: 6px; border: 1px solid #ddd; text-align: right; color:red;">
                                 <span style="float: left;"><?= $dataSO->rebate ?></span>
-                                ( - ) <?= number_format($dataSODetail['rebatePriceFinal'], 2) ?>
+                                ( <?= number_format($dataSODetail['rebatePriceFinal'], 2) ?> )
                             </td>
                         </tr>
                     <?php endif; ?>
@@ -514,7 +514,7 @@
                             <td style="padding: 6px; border: 1px solid #ddd;"></td>
                             <td style="padding: 6px; border: 1px solid #ddd; text-align: right; color:red;">
                                 <span style="float: left;"><?= $dataSO->can_deduction ?></span>
-                                ( - ) <?= number_format($dataSODetail['canDeductionPriceFinal'], 2) ?>
+                                ( <?= number_format($dataSODetail['canDeductionPriceFinal'], 2) ?> )
                             </td>
                         </tr>
                     <?php endif; ?>
@@ -536,7 +536,7 @@
                             <td style="padding: 6px; border: 1px solid #ddd;"></td>
                             <td style="padding: 6px; border: 1px solid #ddd; text-align: right;">
                                 <span style="float: left;"><?= $dataSO->others_type ?></span>
-                                <?= $dataSODetail['othersPriceFinal'] == "PLUS" ? "( - ) " . number_format($dataSODetail['othersPriceFinal'], 2) : number_format($dataSODetail['othersPriceFinal'], 2) ?>
+                                <?= $dataSODetail['othersPriceFinal'] == "PLUS" ? "( " . number_format($dataSODetail['othersPriceFinal'], 2) . " )" : number_format($dataSODetail['othersPriceFinal'], 2) ?>
                             </td>
                         </tr>
                     <?php endif; ?>
@@ -558,7 +558,7 @@
                             <td style="padding: 6px; border: 1px solid #ddd;"></td>
                             <td style="<?= $d['additional_detail_type'] == "MINUS" ? 'padding: 6px; border: 1px solid #ddd; text-align: right; color:red;' : 'padding: 6px; border: 1px solid #ddd; text-align: right;' ?>">
                                 <span style="float: left;"><?= $d['additional_detail'] ?></span>
-                                <?= $d['additional_detail_type'] == "MINUS" ? "( - ) " . number_format($d['additional_detail_price'], 2) : number_format($d['additional_detail_price'], 2) ?>
+                                <?= $d['additional_detail_type'] == "MINUS" ? "( " . number_format($d['additional_detail_price'], 2) . " )" : number_format($d['additional_detail_price'], 2) ?>
                             </td>
                         </tr>
                     <?php endforeach; ?>
