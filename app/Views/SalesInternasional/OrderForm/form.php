@@ -188,8 +188,8 @@
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3">
-                            <input <?= !empty($dataSalesExport) ? ($dataSalesExport->status == "POSTED" ? 'readonly' : '') : '' ?> autocomplete="one-time-code" type="text" class="form-control container" id="container" name="container" placeholder="No  Container" value="<?= !empty($dataSalesExport) ? $dataSalesExport->container : '' ?>">
-                            <label for="floatingInput">No Container</label>
+                            <input <?= !empty($dataSalesExport) ? ($dataSalesExport->status == "POSTED" ? 'readonly' : '') : '' ?> autocomplete="one-time-code" type="text" class="form-control container" id="container" name="container" placeholder="No. Container (Optional)" value="<?= !empty($dataSalesExport) ? $dataSalesExport->container : '' ?>">
+                            <label for="floatingInput">No. Container (Optional)</label>
                         </div>
                     </div>
                     <div class="col-md-4">
@@ -1225,9 +1225,9 @@
                 deadline: {
                     required: true
                 },
-                container: {
-                    required: true
-                },
+                // container: {
+                //     required: true
+                // },
                 document_required: {
                     required: true
                 }
@@ -1251,9 +1251,9 @@
                 deadline: {
                     required: "Deadline required"
                 },
-                container: {
-                    required: "Container required"
-                },
+                // container: {
+                //     required: "Container required"
+                // },
                 document_required: {
                     required: "Document required"
                 }
