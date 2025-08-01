@@ -391,10 +391,10 @@
     <div class="header">
         <div class="mt-1 txt-left"><label class="label-header"> I. DESCRIPTION OF GOODS </label></div>
     </div>
-    <table style="width: 100%; border-collapse: collapse; margin-top: 4px; font-family: Arial, sans-serif; font-size: 9px;">
+    <table style="width: 100%; border-collapse: collapse; margin-top: 4px; font-family: Arial, sans-serif; font-size: 11px;">
         <thead>
             <tr style="background-color: #f8f9fa; border-bottom: 2px solid #dee2e6;">
-                <th style="padding: 6px; text-align: left; font-weight: bold; border: 1px solid #ddd; width: 4%; height:1.5%;">NO</th>
+                <th style="padding: 6px; text-align: left; font-weight: bold; border: 1px solid #ddd; width: 4%; height:2%;">NO</th>
                 <th style="padding: 6px; text-align: left; font-weight: bold; border: 1px solid #ddd;">
                     PRODUCT
                     <span style="float: right;">
@@ -440,8 +440,8 @@
                 <tr style="border-bottom: 1px solid #eee;">
                     <td style="padding: 6px; border: 1px solid #ddd; vertical-align: top;"><?= $no++ ?></td>
                     <td style="padding: 6px; border: 1px solid #ddd; vertical-align: top;">
-                        <div style="font-weight: bold; font-size: 9px;"><?= $detail["nama_barang"]; ?></div>
-                        <div style="font-size: 9px; margin-top: 4px; line-height: 1.4;">
+                        <div style="font-weight: bold; font-size: 11px;"><?= $detail["nama_barang"]; ?></div>
+                        <div style="font-size: 11px; margin-top: 4px; line-height: 1.4;">
                             <table>
                                 <?php if (!empty($detail['species'])): ?>
                                     <tr>
@@ -512,8 +512,8 @@
                             ?>
 
                             <div style="margin-top: 6px;">
-                                <div style="font-size: 9px; font-weight: bold;">SIZE BREAKDOWN:</div>
-                                <table style="width: 100%; border-collapse: collapse; margin-top: 4px; font-size: 9px;">
+                                <div style="font-size: 11px; font-weight: bold;">SIZE BREAKDOWN:</div>
+                                <table style="width: 100%; border-collapse: collapse; margin-top: 4px; font-size: 11px;">
                                     <thead>
                                         <tr style="background-color: #f3f4f6;">
                                             <?php foreach ($columns_to_show as $col => $col_data): ?>
@@ -523,16 +523,16 @@
                                             <?php endforeach; ?>
 
                                             <?php if ($show_cased_column): ?>
-                                                <th style="padding: 3px; border: 1px solid #ddd; width: 4%;text-align: right;">Case</th>
+                                                <th style="padding: 3px; border: 1px solid #ddd; width: 4.5%;text-align: right;">Case</th>
                                             <?php endif; ?>
 
                                             <?php if ($show_persen_column): ?>
-                                                <th style="padding: 3px; border: 1px solid #ddd; width: 4%;text-align: right;">%</th>
+                                                <th style="padding: 3px; border: 1px solid #ddd; width: 4.5%;text-align: right;">%</th>
                                             <?php endif; ?>
 
-                                            <th style=" padding: 3px; border: 1px solid #ddd; width: 4%; text-align: right;">Qty</th>
-                                            <th style="padding: 3px; border: 1px solid #ddd; width: 4%; text-align: right;">Unit Price</th>
-                                            <th style="padding: 3px; border: 1px solid #ddd; width: 4%; text-align: right;">Total Amount</th>
+                                            <th style=" padding: 3px; border: 1px solid #ddd; width: 4.5%; text-align: right;">Qty</th>
+                                            <th style="padding: 3px; border: 1px solid #ddd; width: 4.5%; text-align: right;">Unit Price</th>
+                                            <th style="padding: 3px; border: 1px solid #ddd; width: 4.5%; text-align: right;">Total Amount</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -759,7 +759,7 @@
                             <td style="width: 10px ; text-align: center; ">
                                 <?php if ($currentItemSaleskontrakdetail === $totalSalesKontrakdetail): ?>
                                     <?php if (!empty($groupBySatuan)) : ?>
-                                        <table style="width:auto; margin: 0 auto; border-collapse: collapse; font-size: 9px;">
+                                        <table style="width:auto; margin: 0 auto; border-collapse: collapse; font-size: 11px;">
                                             <!-- <thead>
                                                 <tr style="background-color: #f3f4f6;">
                                                     <?php foreach ($groupBySatuan as $satuan => $data): ?>
@@ -774,7 +774,7 @@
                                                     foreach ($groupBySatuan as $satuan => $data):
                                                         $grand_total_qty += $data['qty'];
                                                     ?>
-                                                        <td style="padding: 5px; border: 1px solid #ddd; text-align: right;width:70px;">
+                                                        <td style="padding: 5px; border: 1px solid #ddd; text-align: right;width:80px;">
                                                             <?= number_format($data['qty'], 2) ?> <?= $satuan ?>
                                                         </td>
                                                     <?php endforeach; ?>

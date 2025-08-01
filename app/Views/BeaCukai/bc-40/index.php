@@ -112,8 +112,8 @@
                                 <!-- <th onclick="changeSort('bc_purchase_order.multiple_lpb_id')" class="sort" style="text-align: center;">No LPB</th>
                                 <th onclick="changeSort('bc_purchase_order.multiple_po_id')" class="sort" style="text-align: center;">No PO</th> -->
                                 <th style="text-align: center;">Total Barang</th>
-                                <th style="text-align: center;">Status Posting</th>
-                                <th style="text-align: center;">Status Kirim</th>
+                                <th style="text-align: center;">Posting</th>
+                                <th style="text-align: center;">Doc Ceisa</th>
                                 <th style="text-align: center;">Action</th>
                             </tr>
                         </thead>
@@ -226,25 +226,25 @@
             },
             {
                 data: "supplier_name",
-                className: "text-center"
+                className: "text-left"
             },
             {
                 data: "tanggal_bc_40",
-                className: "text-center",
+                className: "text-left",
             },
             {
                 data: "no_aju",
-                className: "text-center"
+                className: "text-left"
             },
             {
                 data: "po_type",
-                className: "text-center",
+                className: "text-left",
             },
             {
                 data: "total_barang",
                 searchable: false,
                 sortable: false,
-                className: "text-center",
+                className: "text-left",
             },
             // {
             //     data: "lpb_no",
@@ -259,18 +259,19 @@
                 className: "text-center",
                 searchable: false,
                 sortable: false,
+                width: "5%",
                 render: function(data, type, row) {
                     let htmlRes = '';
 
                     if (row.status_posting == "1") {
                         htmlRes += `
                             <div class="text-success">
-                                SUDAH POSTING
+                               <i class="fa-solid fa-check"></i>
                             </div>`
                     } else {
                         htmlRes += `
                             <div class="text-danger">
-                                BELUM POSTING
+                               <i class="fa-solid fa-x"></i>
                             </div>`
                     }
 

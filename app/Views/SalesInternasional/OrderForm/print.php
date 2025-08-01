@@ -95,7 +95,7 @@
         }
 
         .label {
-            font-size: 12px;
+            font-size: 11px;
         }
 
         body {
@@ -199,10 +199,10 @@
             </table>
 
 
-            <table style="width: 100%; border-collapse: collapse; margin-top: 4px; font-family: Arial, sans-serif; font-size: 9px;">
+            <table style="width: 100%; border-collapse: collapse; margin-top: 4px; font-family: Arial, sans-serif; font-size: 11px;">
                 <thead>
                     <tr style="background-color: #f8f9fa; border-bottom: 2px solid #dee2e6;">
-                        <th style="padding: 6px; text-align: left; font-weight: bold; border: 1px solid #ddd; width: 4%; height:1.5%;">NO</th>
+                        <th style="padding: 6px; text-align: left; font-weight: bold; border: 1px solid #ddd; width: 4%; height:2%;">NO</th>
                         <th style="padding: 6px; text-align: left; font-weight: bold; border: 1px solid #ddd;">
                             DESCRIPTION OF GOODS
                             <span style="float: right;">
@@ -251,7 +251,7 @@
                         <tr style="border-bottom: 1px solid #eee;">
                             <td style="padding: 6px; border: 1px solid #ddd; vertical-align: top;"><?= $no++ ?></td>
                             <td style="padding: 6px; border: 1px solid #ddd; vertical-align: top;">
-                                <div style="font-weight: bold; font-size: 9px;">
+                                <div style="font-weight: bold; font-size: 11px;">
                                     <span style="float: left;">
                                         <?= $detail["barang_name"]; ?>
                                     </span>
@@ -261,7 +261,7 @@
                                         </span>
                                     <?php endif; ?>
                                 </div><br>
-                                <div style="font-size: 9px; margin-top: 4px; line-height: 1.4;">
+                                <div style="font-size: 11px; margin-top: 4px; line-height: 1.4;">
                                     <table>
                                         <?php if (!empty($detail['species'])): ?>
                                             <tr>
@@ -333,8 +333,8 @@
                                     ?>
 
                                     <div style="margin-top: 6px;">
-                                        <div style="font-size: 9px; font-weight: bold;">SIZE BREAKDOWN:</div>
-                                        <table style="width: 100%; border-collapse: collapse; margin-top: 4px; font-size: 9px;">
+                                        <div style="font-size: 11px; font-weight: bold;">SIZE BREAKDOWN:</div>
+                                        <table style="width: 100%; border-collapse: collapse; margin-top: 4px; font-size: 11px;">
                                             <thead>
                                                 <tr style="background-color: #f3f4f6;">
                                                     <?php foreach ($columns_to_show as $col => $col_data): ?>
@@ -347,9 +347,9 @@
                                                         <th style="padding: 3px; border: 1px solid #ddd; width: 6%;text-align: right;">%</th>
                                                     <?php endif; ?>
 
-                                                    <th style=" padding: 3px; border: 1px solid #ddd; width: 3%; text-align: right;">Qty</th>
-                                                    <th style="padding: 3px; border: 1px solid #ddd; width: 3%; text-align: right;" class="price">Unit Price</th>
-                                                    <th style="padding: 3px; border: 1px solid #ddd; width: 3%; text-align: right;" class="price">Total Amount</th>
+                                                    <th style=" padding: 3px; border: 1px solid #ddd; width: 4.5%; text-align: right;">Qty</th>
+                                                    <th style="padding: 3px; border: 1px solid #ddd; width: 4.5%; text-align: right;" class="price">Unit Price</th>
+                                                    <th style="padding: 3px; border: 1px solid #ddd; width: 4.5%; text-align: right;" class="price">Total Amount</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
@@ -570,7 +570,7 @@
                                     <td style="width: auto; text-align: center; vertical-align: middle;">
                                         <?php if ($currentItemSaleskontrakdetail === $totalSalesKontrakdetail): ?>
                                             <?php if (!empty($groupBySatuan)) : ?>
-                                                <table style="width: 15%; margin: 0 auto; border-collapse: collapse; font-size: 9px;">
+                                                <table style="width: 15%; margin: 0 auto; border-collapse: collapse; font-size: 11px;">
                                                     <!-- <thead>
                                                         <tr style="background-color: #f3f4f6;">
                                                             <?php foreach ($groupBySatuan as $satuan => $data): ?>
@@ -585,7 +585,7 @@
                                                             foreach ($groupBySatuan as $satuan => $data):
                                                                 $grand_total_qty += $data['qty_input'];
                                                             ?>
-                                                                <td style="padding: 5px; border: 1px solid #ddd; text-align: right; width:70px;">
+                                                                <td style="padding: 5px; border: 1px solid #ddd; text-align: right; width:80px;">
                                                                     <?= number_format($data['qty_input'], 2) ?> <?= $satuan ?>
                                                                 </td>
                                                             <?php endforeach; ?>

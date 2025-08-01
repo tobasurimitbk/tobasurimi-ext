@@ -235,7 +235,7 @@
         if (dateStart == '' || dateEnd == '') {
             alert('Tanggal mulai & Tanggal Akhir wajib diisi');
         } else {
-            window.open('<?= base_url('bea-cukai-bc-40/bc-40-outstanding-export') ?>?dateStart=' + dateStart + '?dateEnd=' + dateEnd + '&tipe_bahan=' + tipeBahan + '&divisi_id' + divisiId);
+            window.open('<?= base_url('bea-cukai-bc-40/bc-40-outstanding-export') ?>?dateStart=' + dateStart + '&dateEnd=' + dateEnd + '&tipe_bahan=' + tipeBahan + '&divisi_id=' + divisiId);
         }
 
     }
