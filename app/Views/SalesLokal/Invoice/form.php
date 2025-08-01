@@ -538,9 +538,9 @@
         <?php endif; ?>
 
         <?php if (!empty($data->dpp) || !empty($data->ppn) || !empty($data->total_invoice)) : ?>
-            $('#taxTotal').html(<?= $data->ppn; ?>.toLocaleString());
-            $('#itemSubTotal').html(<?= $data->dpp; ?>.toLocaleString());
-            $('#grandTotal').html(<?= $data->total_invoice; ?>.toLocaleString());
+            $('#taxTotal').html(greatFormatRupiah(<?= $data->ppn; ?>));
+            $('#itemSubTotal').html(greatFormatRupiah(<?= $data->dpp; ?>));
+            $('#grandTotal').html(greatFormatRupiah(<?= $data->total_invoice; ?>));
             <?php if (!empty($data->termasuk_pa) && ($data->termasuk_pa == 'true')) : ?>
                 $('#includeTaxText').html('(Termasuk Pajak)');
             <?php endif; ?>
@@ -1281,11 +1281,11 @@
         grandTotal = taxStatus && includeTax ? itemSubTotal - (taxStatus ? taxTotalHtml : 0) : itemSubTotal + (taxStatus ? taxTotalHtml : 0);
 
         // Update tampilan HTML
-        $('#itemSubTotal').html(itemSubTotal.toLocaleString());
-        $('#taxTotal').html(taxTotalHtml.toLocaleString());
+        $('#itemSubTotal').html(greatFormatRupiah(itemSubTotal));
+        $('#taxTotal').html(greatFormatRupiah(taxTotalHtml));
         $('#taxValue').html(taxes);
         $('#includeTaxText').html(taxStatus && includeTax ? '(Termasuk Pajak)' : '');
-        $('#grandTotal').html(grandTotal.toLocaleString());
+        $('#grandTotal').html(greatFormatRupiah(grandTotal));
     };
 
     function definisiQtyInput() {
@@ -1313,10 +1313,7 @@
                         (parseFloat(v.harga_barang.replace(',', '')) - ((parseFloat(v.harga_barang.replace(',', '')) * parseFloat(v.disc.replace(',', ''))) / 100)) * parseFloat(v.qty_input) :
                         parseFloat(v.harga_barang.replace(',', '')) * parseFloat(v.qty_input);
                 }
-                list_items[i].amount = amount.toLocaleString('en-US', {
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2
-                })
+                list_items[i].amount = greatFormatRupiah(amount)
             }
         });
         table.clear();
