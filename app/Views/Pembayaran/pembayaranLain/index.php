@@ -568,7 +568,7 @@
             }
         });
         
-        updateAccountLabels($('#jenis_pembayaran').val());
+        updateAccountLabels($('#jenis_pembayaran option:selected').val());
 
         $("#tanggal").datepicker({
             todayHighlight: true,
@@ -579,50 +579,6 @@
             todayBtn: "linked"
         }).on('changeDate', function(e) {
             $(this).valid(); // Trigger validasi saat tanggal berubah
-        });
-
-        // When adding a detail
-        $('.btn-add-detail').click(function() {
-            // Jalankan validasi detail dulu
-            const akunSelisih = $('#akun_selisih option:selected').val();
-            const jenisPembayaran = $('#jenis_pembayaran option:selected').val();
-            let messageErr = '';
-            if (akunSelisih == '') {
-                if (jenisPembayaran == 'PUTIH') {
-                    messageErr = "Akun Kredit Wajib Diisi"
-                } else {
-                    messageErr = "Akun Debit Wajib Diisi";
-                }
-                alert(messageErr)
-                return;
-            }
-
-            if (!validateDetails()) {
-                refreshValidation(); // buat update styling error
-                return; // stop proses kalau gak valid
-            }
-
-            const detail = {
-                tanggal: $('#tanggal').val(),
-                pembayaran_oleh: $('#pembayaran_oleh').val(),
-                akun_kas: $('#akun_kas').val(),
-                akun_selisih: $('#akun_selisih').val(),
-                akun_kas_name: $('#akun_kas option:selected').text(),
-                akun_selisih_name: $('#akun_selisih option:selected').text(),
-                keterangan: $('#keterangan').val(),
-                valas: $('#valas option:selected').text(),
-                valas_id: $('#valas option:selected').val(),
-                jumlah: $('#jumlah').val(),
-                kurs: $('#kurs').val(),
-                jumlah_idr: $('#jumlah_idr').val(),
-                jenis_pembayaran: jenisPembayaran
-            };
-
-            details.push(detail);
-            refreshDetailsTable();
-            clearDetailForm();
-            refreshValidation(); // bersihin styling error kalau sudah valid
-            
         });
 
         $('#jumlah').keyup(function() {
@@ -665,14 +621,14 @@
                 { id: '#divisi_id', placeholder: "Pilih Departemen" },
                 { id: '#bank_id', placeholder: "Pilih Bank" },
                 { id: '#jenis_pembayaran', placeholder: "Pilih Jenis Pembayaran" },
-                { id: '#payment_method', placeholder: "Pilih Metode Pembayaran" },
+                { id: '#metode_pembayaran', placeholder: "Pilih Metode Pembayaran" },
                 { id: '#valas', placeholder: "Pilih Mata Uang" },
                 { id: '#akun_kas', placeholder: "Pilih Debit" },
                 { id: '#akun_selisih', placeholder: "Pilih Kredit" }
             ];
 
             // Hapus semua event handler terkait
-            $('#jenis, #divisi_id, #bank_id, #jenis_pembayaran, #payment_method, #valas').off('.select2-handlers');
+            $('#jenis, #divisi_id, #bank_id, #jenis_pembayaran, #metode_pembayaran, #valas').off('.select2-handlers');
 
             // Inisialisasi semua field Select2
             select2Fields.forEach(field => {
@@ -688,7 +644,7 @@
             if (!silent) {
                 let changeTimeout;
 
-                $('#jenis, #divisi_id, #bank_id, #jenis_pembayaran, #payment_method').on('change.select2-handlers', function() {
+                $('#jenis, #divisi_id, #bank_id, #jenis_pembayaran, #metode_pembayaran').on('change.select2-handlers', function() {
                     clearTimeout(changeTimeout);
                     const changedField = this;
                     const changedFieldId = $(changedField).attr('id'); // dapatkan ID field yang berubah
@@ -767,32 +723,20 @@
             if (!validateDetails()) return;
 
             const jenisPembayaran = $('#jenis_pembayaran option:selected').val();
+            const akunKasVal = $('#akun_kas').val();
+            const akunSelisihVal = $('#akun_selisih').val();
+            const akunKasName = $('#akun_kas option:selected').text();
+            const akunSelisihName = $('#akun_selisih option:selected').text();
             
-            // Determine which account is which based on payment type
-            let akun_kas, akun_selisih, akun_kas_name, akun_selisih_name;
-            
-            if (jenisPembayaran == 'PUTIH') {
-                akun_kas = $('#akun_kas').val();
-                akun_selisih = $('#akun_selisih').val();
-                akun_kas_name = $('#akun_kas option:selected').text();
-                akun_selisih_name = $('#akun_selisih option:selected').text();
-            } else {
-                // For non-PUTIH, the accounts are reversed
-                akun_kas = $('#akun_selisih').val();
-                akun_selisih = $('#akun_kas').val();
-                akun_kas_name = $('#akun_selisih option:selected').text();
-                akun_selisih_name = $('#akun_kas option:selected').text();
-            }
-            
-            // Update detail
-            details[index] = {
+            // Always store akun_kas and akun_selisih DIRECTLY (no swapping)
+            const detail = {
                 ...details[index],
                 tanggal: $('#tanggal').val(),
                 pembayaran_oleh: $('#pembayaran_oleh').val(),
-                akun_kas: akun_kas,
-                akun_kas_name: akun_kas_name,
-                akun_selisih: akun_selisih,
-                akun_selisih_name: akun_selisih_name,
+                akun_selisih: jenisPembayaran == 'PUTIH' ? akunKasVal : akunSelisihVal,
+                akun_kas: jenisPembayaran == 'PUTIH' ? akunSelisihVal : akunKasVal,
+                akun_selisih_name: jenisPembayaran == 'PUTIH' ? akunKasName : akunSelisihName,
+                akun_kas_name: jenisPembayaran == 'PUTIH' ? akunSelisihName : akunKasName,
                 keterangan: $('#keterangan').val(),
                 valas: $('#valas option:selected').text(),
                 valas_id: $('#valas option:selected').val(),
@@ -802,12 +746,13 @@
                 jenis_pembayaran: jenisPembayaran
             };
 
+            details[index] = detail;
             refreshDetailsTable();
             clearDetailForm();
             $('.btn-update-detail').hide();
             $('.btn-add-detail').show();
         }
-        
+
         $('.btn-update-detail').hide();
 
         // Event handler untuk tombol edit
@@ -836,44 +781,13 @@
 
         // Function to update labels based on payment type
         function updateAccountLabels(jenis) {
-            if (jenis == 'PUTIH') {
-                // Update label
-                $('#akun_kas').parent().find('label').text('Debit');
+            if (jenis === 'PUTIH') {
                 $('#akun_selisih').parent().find('label').text('Kredit');
-
-                // Update placeholder Select2
-                $('#akun_kas').select2({
-                    placeholder: "Pilih Akun Debit",
-                    theme: "bootstrap-5",
-                    dropdownParent: $('#add_modal .modal-content')
-                });
-
-                $('#akun_selisih').select2({
-                    placeholder: "Pilih Akun Kredit",
-                    theme: "bootstrap-5",
-                    dropdownParent: $('#add_modal .modal-content')
-                });
-
-            } else if (jenis === 'MERAH') {
-                // Update label
+                $('#akun_kas').parent().find('label').text('Debit');
+            } else {
                 $('#akun_kas').parent().find('label').text('Kredit');
                 $('#akun_selisih').parent().find('label').text('Debit');
-
-                // Update placeholder Select2
-                $('#akun_kas').select2({
-                    placeholder: "Pilih Akun Kredit",
-                    theme: "bootstrap-5",
-                    dropdownParent: $('#add_modal .modal-content')
-                });
-
-                $('#akun_selisih').select2({
-                    placeholder: "Pilih Akun Debit",
-                    theme: "bootstrap-5",
-                    dropdownParent: $('#add_modal .modal-content')
-                });
             }
-
-            refreshDetailsTable();
         }
 
         // Custom validation for details
@@ -974,6 +888,12 @@
                 return;
             }
 
+            const akunKasVal = $('#akun_kas').val();
+            const akunSelisihVal = $('#akun_selisih').val();
+            const akunKasName = $('#akun_kas option:selected').text();
+            const akunSelisihName = $('#akun_selisih option:selected').text();
+
+
             // Prepare detail data - KONSISTEN dengan struktur BE
             const detail = {
                 tanggal: $('#tanggal').val(),
@@ -985,18 +905,10 @@
                 kurs: $('#kurs').val(),
                 jumlah_idr: $('#jumlah_idr').val(),
                 jenis_pembayaran: jenisPembayaran,
-                
-                // SELALU simpan akun_kas sebagai debit (sesuai pilihan user)
-                akun_kas: $('#akun_kas').val(),
-                akun_kas_name: $('#akun_kas option:selected').text(),
-                
-                // Untuk akun_selisih, sesuaikan dengan jenis pembayaran
-                akun_selisih: jenisPembayaran === 'PUTIH' 
-                    ? $('#akun_selisih').val()  // PUTIH: ambil dari parent
-                    : $('#akun_kas').val(),     // MERAH: sama dengan akun_kas
-                akun_selisih_name: jenisPembayaran === 'PUTIH'
-                    ? $('#akun_selisih option:selected').text()
-                    : $('#akun_kas option:selected').text()
+                akun_selisih: jenisPembayaran == 'PUTIH' ? akunKasVal : akunSelisihVal,
+                akun_kas: jenisPembayaran == 'PUTIH' ? akunSelisihVal : akunKasVal,
+                akun_selisih_name: jenisPembayaran == 'PUTIH' ? akunKasName : akunSelisihName,
+                akun_kas_name: jenisPembayaran == 'PUTIH' ? akunSelisihName : akunKasName,
             };
 
             details.push(detail);
@@ -1011,39 +923,49 @@
             tableBody.empty();
             
             let totalAllAmount = 0;
-            const jenisPembayaran = $('#jenis_pembayaran refreshDetailsTable').val(); // Ambil nilai dari dropdown
-            
+            const jenisPembayaran = $('#jenis_pembayaran option:selected').val(); // Fix typo: remove "refreshDetailsTable"
+            // const parentAkunSelisih = $('#akun_selisih  option:selected').val(); // Ambil dari parent form
+            // const parentAkunSelisihName = $('#akun_selisih option:selected').text();
+
             details.forEach((detail, index) => {
                 const jumlahIDR = formatRupiah(detail.jumlah_idr);
                 totalAllAmount += parseFloat(destroyFormatRupiah(detail.jumlah_idr));
                 
-                // Determine column headers based on payment type
+                // SWAP ONLY FOR DISPLAY (not storage)
+                 // Tampilkan sesuai jenis pembayaran
                 let creditCol, debitCol;
-                
+                console.log(jenisPembayaran);
                 if (jenisPembayaran == 'PUTIH') {
-                    creditCol = detail.akun_selisih_name; // Kredit
-                    debitCol = detail.akun_kas_name;      // Debit
+                    creditCol = detail.akun_kas_name; // Parent (Kredit)
+                    debitCol = detail.akun_selisih_name;      // Detail (Debit)
+
+                    // details[index].akun_kas = parentAkunSelisih;
+                    // details[index].akun_kas_name = parentAkunSelisihName;
                 } else {
-                    creditCol = detail.akun_kas_name;     // Kredit
-                    debitCol = detail.akun_selisih_name; // Debit
+                    debitCol = detail.akun_selisih_name; // Parent (Debit)
+                    creditCol = detail.akun_kas_name;    // Detail (Kredit)
+                    
+                    // details[index].akun_selisih = parentAkunSelisih;
+                    // details[index].akun_selisih_name = parentAkunSelisihName;
                 }
-                
+
+
                 const row = `
                     <tr>
                         <td>${detail.tanggal}</td>
                         <td>${creditCol}</td>
                         <td>${debitCol}</td>
                         <td>${detail.valas}</td>
-                        <td>${detail.jumlah}</td>
+                        <td>${greatFormatRupiah(detail.jumlah)}</td>
                         <td>${detail.kurs}</td>
-                        <td>${jumlahIDR}</td>
+                        <td>${greatFormatRupiah(detail.jumlah_idr)}</td>
                         <td>${detail.pembayaran_oleh}</td>
                         <td>${detail.keterangan || ''}</td>
                         <td class="actions">
                             <button class="btn btn-sm btn-warning btn-edit-detail" data-index="${index}">
                                 <i class="fas fa-edit"></i>
                             </button>
-                            <button class="btn btn-sm btn-danger btn-remove-detail" type="button" data-index="${index}">
+                            <button class="btn btn-sm btn-danger btn-remove-detail" data-index="${index}">
                                 <i class="fas fa-trash"></i>
                             </button>
                         </td>
@@ -1053,19 +975,17 @@
             });
 
             updateTableHeaders(jenisPembayaran);
-
-            // Update total amount
             $('#total_all_amount').val(formatRupiah(totalAllAmount.toString()));
         }
 
 
         function updateTableHeaders(jenis) {
-            if (jenis == 'PUTIH') {
-                $('#detail-table thead tr th:nth-child(2)').text('Kredit');
-                $('#detail-table thead tr th:nth-child(3)').text('Debit');
+            if (jenis === 'PUTIH') {
+                $('#detail-table thead tr th:nth-child(2)').text('Kredit (Parent)');
+                $('#detail-table thead tr th:nth-child(3)').text('Debit (Detail)');
             } else {
-                $('#detail-table thead tr th:nth-child(2)').text('Debit');
-                $('#detail-table thead tr th:nth-child(3)').text('Kredit');
+                $('#detail-table thead tr th:nth-child(2)').text('Kredit (Detail)');
+                $('#detail-table thead tr th:nth-child(3)').text('Debit (Parent)');
             }
         }
 
@@ -1232,8 +1152,8 @@
                                     id: detail.id,
                                     tanggal: detail.tanggal,
                                     pembayaran_oleh: detail.pembayaran_oleh,
-                                    akun_kas: parent.jenis_pembayaran == "PUTIH" ? detail.akun_kas : detail.akun_selisih,
-                                    akun_selisih: parent.jenis_pembayaran == "PUTIH" ? detail.akun_selisih : detail.akun_kas,
+                                    akun_kas: detail.akun_kas,
+                                    akun_selisih: detail.akun_selisih,
                                     akun_kas_name: detail.akun_kas_name,
                                     akun_selisih_name: detail.akun_selisih_name,
                                     jenis_pembayaran: parent.jenis_pembayaran,
@@ -1285,7 +1205,7 @@
                     if (result.isConfirmed) {
                         const csrf = $('meta[name="csrf-token"]').attr('content');
                         let id = $('#id').val();
-                        const jenisPembayaran = $('#jenis_pembayaran').val();
+                        const jenisPembayaran = $('#jenis_pembayaran option:selected').val();
 
                         // Prepare data with proper formatting
                         const requestData = {
@@ -1303,7 +1223,8 @@
                                 id: detail.id || '',
                                 tanggal: detail.tanggal,
                                 pembayaran_oleh: detail.pembayaran_oleh,
-                                akun_kas: detail.akun_kas,
+                                akun_kas: detail.akun_kas, // Untuk MERAH, pakai akun_selisih parent (kredit)
+                                akun_selisih: detail.akun_selisih, // Untuk MERAH, pakai akun_kas detail (debit)
                                 valas: detail.valas,
                                 valas_id: detail.valas_id,
                                 kurs: destroyFormatRupiah(detail.kurs),
@@ -1386,7 +1307,7 @@
             cancelButtonColor: '#d33',
             showCancelButton: true,
             reverseButtons: true,
-            confirmButtonText: 'Simpan',
+            confirmButtonText: 'Hapus',
             cancelButtonText: 'Kembali',
         }).then((result) => {
             if (result.isConfirmed) {
@@ -1553,7 +1474,7 @@
         const detail = details[index];
         const jenisPembayaran = $('#jenis_pembayaran option:selected').val();
         
-        // Populate form fields
+        // Populate form fields AS IS (no swapping)
         $('#tanggal').val(detail.tanggal);
         $('#pembayaran_oleh').val(detail.pembayaran_oleh);
         $('#keterangan').val(detail.keterangan);
@@ -1562,24 +1483,20 @@
         $('#kurs').val(detail.kurs);
         $('#jumlah_idr').val(detail.jumlah_idr);
         
-        // Handle account selection based on payment type
+        // Always show original values (no conditional logic)
         if (jenisPembayaran == 'PUTIH') {
-            $('#akun_kas').val(detail.akun_kas).trigger('change');
-            $('#akun_selisih').val(detail.akun_selisih).trigger('change');
-        } else {
-            // Swap the accounts for non-PUTIH payment type
             $('#akun_kas').val(detail.akun_selisih).trigger('change');
-            $('#akun_selisih').val(detail.akun_kas).trigger('change');
+            // $('#akun_selisih').val(detail.akun_seh).trigger('change');
+        } else {
+            $('#akun_kas').val(detail.akun_kas).trigger('change');
+            // $('#akun_selisih').val(detail.akun_selisih).trigger('change');
         }
 
-        // Update editing state
+
         editingIndex = index;
-        
-        // Toggle buttons
         $('.btn-add-detail').hide();
         $('.btn-update-detail').show().data('index', index);
         
-        // Scroll to detail form
         $('html, body').animate({
             scrollTop: $('.card-body').offset().top
         }, 300);

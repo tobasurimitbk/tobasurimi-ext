@@ -120,6 +120,25 @@ class OtherPayment extends BaseController
             ]);
         }
 
+
+         // 2. Validasi company_id dari COA yang dipilih
+        $currentCompanyId = $this->this_company_id;
+        
+        // Cek akun parent (selisih/kas)
+        $parentAccountId = $payload['jenis_pembayaran'] === 'PUTIH' 
+            ? $payload['akun_selisih'] 
+            : $payload['akun_selisih']; // Untuk MERAH juga pakai akun_selisih dari payload
+        
+        $parentAccount = $this->subAkunsModel->where('id', $parentAccountId)->first();
+        
+        if (!$parentAccount || $parentAccount['company_id'] != $currentCompanyId) {
+            return $this->response->setJSON([
+                'status' => false,
+                'message' => "Akun tidak valid atau tidak sesuai dengan perusahaan saat ini",
+                'token' => csrf_hash()
+            ]);
+        }
+
         // Sederhanakan parent data
         $parentData = [
             'company_id' => $this->this_company_id,
@@ -153,9 +172,7 @@ class OtherPayment extends BaseController
                 'keterangan' => $detail['keterangan'] ?? null,
                 // Konsisten: akun_kas selalu debit, akun_selisih selalu kredit
                 'akun_kas' => $detail['akun_kas'],
-                'akun_selisih' => $payload['jenis_pembayaran'] === 'PUTIH' 
-                    ? $payload['akun_selisih'] 
-                    : $detail['akun_kas']
+                'akun_selisih' => $detail['akun_selisih']
             ];
 
             $this->otherPaymentDetailModel->insert($detailData);
@@ -187,6 +204,23 @@ class OtherPayment extends BaseController
             ]);
         }
 
+        // 2. Validasi company_id dari COA yang dipilih
+        $currentCompanyId = $this->this_company_id;
+
+        $parentAccountId = $payload['jenis_pembayaran'] === 'PUTIH' 
+            ? $payload['akun_selisih'] 
+            : $payload['akun_selisih']; // Untuk MERAH juga pakai akun_selisih dari payload
+        
+        $parentAccount = $this->subAkunsModel->where('id', $parentAccountId)->first();
+        
+        if (!$parentAccount || $parentAccount['company_id'] != $currentCompanyId) {
+            return $this->response->setJSON([
+                'status' => false,
+                'message' => "Akun tidak valid atau tidak sesuai dengan perusahaan saat ini, silahkan mengreload halaman ini",
+                'token' => csrf_hash()
+            ]);
+        }
+
         // 1. Update Parent Data - Konsisten dengan createAction
         $parentData = [
             'divisi_id' => $payload['divisi_id'],
@@ -198,8 +232,8 @@ class OtherPayment extends BaseController
             'keterangan' => $payload['keterangan_parent'],
             'nominal' => $payload['total_all_amount'],
             // Tetap konsisten dengan logika create
-            'akun_selisih' => $payload['jenis_pembayaran'] === 'PUTIH' ? $payload['akun_selisih'] : null,
-            'akun_kas' => $payload['jenis_pembayaran'] === 'MERAH' ? $payload['akun_selisih'] : null,
+            'akun_selisih' => $payload['jenis_pembayaran'] == 'PUTIH' ? $payload['akun_selisih'] : null,
+            'akun_kas' => $payload['jenis_pembayaran'] == 'MERAH' ? $payload['akun_selisih'] : null,
         ];
         $this->otherPaymentModel->update($parentId, $parentData);
 
@@ -223,12 +257,8 @@ class OtherPayment extends BaseController
                 'jumlah_idr' => $detail['jumlah_idr'],
                 'keterangan' => $detail['keterangan'] ?? null,
                 // Logika konsisten dengan create:
-                'akun_kas' =>   $payload['jenis_pembayaran'] === 'PUTIH' 
-                    ? $payload['akun_selisih'] 
-                    : $detail['akun_kas'], // Untuk MERAH, akun_selisih di child = akun_kas
-                'akun_selisih' => $payload['jenis_pembayaran'] === 'PUTIH' 
-                     ? $detail['akun_kas'] 
-                    : $payload['akun_selisih'] // Selalu debit dari detail
+                'akun_kas' => $detail['akun_kas'],
+                'akun_selisih' => $detail['akun_selisih']
             ];
 
             if ($detailId && in_array($detailId, $existingDetailIds)) {
