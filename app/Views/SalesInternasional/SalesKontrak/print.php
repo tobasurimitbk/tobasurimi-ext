@@ -669,7 +669,7 @@
 
             <!-- Quantity Row -->
             <!-- <?php if (count($groupBySatuan) == 1): ?>
-                <tr style="font-weight: bold; background-color: #e9ecef; font-size:10px;">
+                <tr style="font-weight: bold; background-color: #e9ecef; font-size: 11px;">
                     <td style="padding: 6px; border: 1px solid #ddd;"></td>
                     <td style="padding: 6px; border: 1px solid #ddd; text-align: right;">
                         <span style="float: left;">TOTAL QTY</span>
@@ -677,43 +677,50 @@
                     </td>
                 </tr>
             <?php endif; ?> -->
+            <tr style="font-weight: bold; background-color: #e9ecef; font-size: 11px;">
+                <td style="padding: 6px; border: 1px solid #ddd;"></td>
+                <td style="padding: 6px; border: 1px solid #ddd; text-align: right;">
+                    <span style="float: left;">TOTAL</span>
+                    <?= number_format($total_amount, 2) ?>
+                </td>
+            </tr>
 
             <!-- Royalty -->
             <?php if ($salesKontrak['royalty_price'] > 0): ?>
-                <tr style="font-weight: bold; background-color: #e9ecef; font-size:10px;">
+                <tr style="font-weight: bold; background-color: #e9ecef; font-size: 11px;">
                     <td style="padding: 6px; border: 1px solid #ddd;"></td>
-                    <td style="padding: 6px; border: 1px solid #ddd; text-align: right;">
+                    <td style="padding: 6px; border: 1px solid #ddd; text-align: right; color:red;">
                         <span style="float: left;"><?= $salesKontrak['royalty'] ?></span>
-                        <?= number_format($salesKontrak['royalty_price'], 2) ?>
+                        ( <?= number_format($salesKontrak['royalty_price'], 2) ?> )
                     </td>
                 </tr>
             <?php endif; ?>
 
             <!-- Rebate -->
             <?php if ($salesKontrak['rebate_price'] > 0): ?>
-                <tr style="font-weight: bold; background-color: #e9ecef; font-size:10px;">
+                <tr style="font-weight: bold; background-color: #e9ecef; font-size: 11px;">
                     <td style="padding: 6px; border: 1px solid #ddd;"></td>
-                    <td style="padding: 6px; border: 1px solid #ddd; text-align: right;">
+                    <td style="padding: 6px; border: 1px solid #ddd; text-align: right; color:red;">
                         <span style="float: left;"><?= $salesKontrak['rebate'] ?></span>
-                        <?= number_format($salesKontrak['rebate_price'], 2) ?>
+                        ( <?= number_format($salesKontrak['rebate_price'], 2) ?> )
                     </td>
                 </tr>
             <?php endif; ?>
 
             <!-- Can Deduction -->
             <?php if ($salesKontrak['can_deduction_price'] > 0): ?>
-                <tr style="font-weight: bold; background-color: #e9ecef; font-size:10px;">
+                <tr style="font-weight: bold; background-color: #e9ecef; font-size: 11px;">
                     <td style="padding: 6px; border: 1px solid #ddd;"></td>
-                    <td style="padding: 6px; border: 1px solid #ddd; text-align: right;">
+                    <td style="padding: 6px; border: 1px solid #ddd; text-align: right; color:red;">
                         <span style="float: left;"><?= $salesKontrak['can_deduction'] ?></span>
-                        <?= number_format($salesKontrak['can_deduction_price'], 2) ?>
+                        ( <?= number_format($salesKontrak['can_deduction_price'], 2) ?> )
                     </td>
                 </tr>
             <?php endif; ?>
 
             <!-- Freight -->
             <?php if ($salesKontrak['estimated_freight_price'] > 0): ?>
-                <tr style="font-weight: bold; background-color: #e9ecef; font-size:10px;">
+                <tr style="font-weight: bold; background-color: #e9ecef; font-size: 11px;">
                     <td style="padding: 6px; border: 1px solid #ddd;"></td>
                     <td style="padding: 6px; border: 1px solid #ddd; text-align: right;">
                         <span style="float: left;"><?= $salesKontrak['estimated_freight'] ?></span>
@@ -724,18 +731,18 @@
 
             <!-- Others (with +/- sign) -->
             <?php if ($salesKontrak['others_price'] > 0): ?>
-                <tr style="font-weight: bold; background-color: #e9ecef; font-size:10px;">
+                <tr style="font-weight: bold; background-color: #e9ecef; font-size: 11px;">
                     <td style="padding: 6px; border: 1px solid #ddd;"></td>
                     <td style="padding: 6px; border: 1px solid #ddd; text-align: right;">
                         <span style="float: left;"><?= $salesKontrak['others'] ?></span>
-                        <?= number_format($salesKontrak['others_price'], 2) ?>
+                        <?= $salesKontrak['others_type'] == "MINUS" ? "( " . number_format($salesKontrak['others_price'], 2) . " )" : number_format($salesKontrak['others_price'], 2) ?>
                     </td>
                 </tr>
             <?php endif; ?>
 
             <!-- Percentage Row (if exists) -->
             <!-- <?php if ($total_persen > 0): ?>
-                <tr style="font-weight: bold; background-color: #e9ecef; font-size:10px;">
+                <tr style="font-weight: bold; background-color: #e9ecef; font-size: 11px;">
                     <td style="padding: 6px; border: 1px solid #ddd;"></td>
                     <td style="padding: 6px; border: 1px solid #ddd; text-align: right;">
                         <span style="float: left;">TOTAL %</span>
@@ -745,14 +752,16 @@
             <?php endif; ?> -->
 
             <!-- Final Amount Row -->
-            <tr style="font-weight: bold; background-color: #e9ecef; font-size:10px;">
+            <tr style="font-weight: bold; background-color: #e9ecef; font-size: 11px;">
                 <td style="padding: 6px; border: 1px solid #ddd;"></td>
                 <td style="padding: 6px; border: 1px solid #ddd;">
                     <table style="width: 100%; table-layout: fixed;">
                         <tr style="vertical-align: middle;">
                             <!-- Kolom 1: GRAND TOTAL Label -->
                             <td style="width: 25%; text-align: left; vertical-align: middle; white-space: nowrap;">
-                                GRAND TOTAL <?= !empty($salesKontrak['total_container']) ? "(" . $salesKontrak['total_container'] . ")" : "" ?>
+                                <span style="margin-left: -3px;">
+                                    GRAND TOTAL <?= !empty($salesKontrak['total_container']) ? "(" . $salesKontrak['total_container'] . ")" : "" ?>
+                                </span>
                             </td>
 
                             <!-- Kolom 2: Tabel Satuan -->

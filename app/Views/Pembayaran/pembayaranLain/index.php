@@ -1264,6 +1264,15 @@
                                         $(".add-modal").modal("hide");
                                         resetForm();
                                         details = []; // Clear details array
+                                        location.reload();
+                                    });
+                                } else if (response.reload) {
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: response.message,
+                                        confirmButtonColor: '#4e73df',
+                                    }).then(() => {
+                                        location.reload();
                                     });
                                 } else {
                                     Swal.fire({
@@ -1440,7 +1449,8 @@
                                 text: response.message,
                                 confirmButtonColor: '#4e73df',
                             }).then(() => {
-                                table.ajax.reload();
+                                // table.ajax.reload();
+                                location.reload();
                             });
                         }
                     },
