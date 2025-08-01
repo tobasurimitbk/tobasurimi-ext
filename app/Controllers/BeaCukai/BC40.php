@@ -2661,7 +2661,12 @@ class BC40 extends BaseController
         $formatted = [];
         $no = 1;
 
+        // Tambahkan di awal fungsi setelah inisialisasi $formatted
+        $totalSubTotal = 0;
+
         foreach ($data as $row) {
+            $totalSubTotal += floatval($row['sub_total']); // Kumpulkan total as angka
+
             $formatted[] = [
                 'no' => $no++,
                 'tipe_bahan' => "LOKAL " . $row['tipe_bahan'],
@@ -2673,81 +2678,130 @@ class BC40 extends BaseController
                 'po_no' => $row['po_no'],
                 'kode_barang' => $row['kode_barang'],
                 'barang' => $row['barang_name'],
-                'qty_po' => number_format($row['qty_po'], 2),
+                'qty_po' => floatval($row['qty_po']),
                 'satuan_po' => $row['kode_satuan_po'],
-                'qty_lpb' => number_format($row['qty_lpb'], 2),
+                'qty_lpb' => floatval($row['qty_lpb']),
                 'satuan_lpb' => $row['kode_satuan_lpb'],
                 'kemasan' => $row['nama_kemasan'],
-                'qty_kemasan' => number_format($row['jumlah_kemasan'], 2),
+                'qty_kemasan' => floatval($row['jumlah_kemasan']),
                 'satuan_kemasan' => $row['kode_satuan_kemasan'],
-                'sub_total' => number_format($row['sub_total'], 2),
+                'sub_total' => floatval($row['sub_total']),
             ];
         }
 
+        // Spreadsheet + headers
         $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
 
-        $spreadsheet->setActiveSheetIndex(0)
-            ->setCellValue('A1', 'No')
-            ->setCellValue('B1', 'Tipe Bahan')
-            ->setCellValue('C1', 'Departemen')
-            ->setCellValue('D1', 'Supplier')
-            ->setCellValue('E1', 'Tgl PO')
-            ->setCellValue('F1', 'Tgl LPB')
-            ->setCellValue('G1', 'No LPB')
-            ->setCellValue('H1', 'No PO')
-            ->setCellValue('I1', 'Kode')
-            ->setCellValue('J1', 'Barang')
-            ->setCellValue('K1', 'Qty PO')
-            ->setCellValue('L1', 'Satuan PO')
-            ->setCellValue('M1', 'Qty LPB')
-            ->setCellValue('N1', 'Satuan LPB')
-            ->setCellValue('O1', 'Kemasan')
-            ->setCellValue('P1', 'Qty Kemasan')
-            ->setCellValue('Q1', 'Satuan Kemasan')
-            ->setCellValue('R1', 'Sub Total');
+        // Header
+        $headers = [
+            'No',
+            'Tipe Bahan',
+            'Departemen',
+            'Supplier',
+            'Tgl PO',
+            'Tgl LPB',
+            'No LPB',
+            'No PO',
+            'Kode',
+            'Barang',
+            'Qty PO',
+            'Satuan PO',
+            'Qty LPB',
+            'Satuan LPB',
+            'Kemasan',
+            'Qty Kemasan',
+            'Satuan Kemasan',
+            'Sub Total'
+        ];
 
+        $sheet->fromArray($headers, NULL, 'A1');
+
+        // Bold header
+        $sheet->getStyle('A1:R1')->applyFromArray([
+            'font' => ['bold' => true],
+        ]);
+
+        // Data rows
+        $rowNum = 2;
         $no = 1;
-        $column = 2;
-
         foreach ($formatted as $f) {
-            $spreadsheet->setActiveSheetIndex(0)
-                ->setCellValue('A' . $column, $no++)
-                ->setCellValue('B' . $column,  $f['tipe_bahan'])
-                ->setCellValue('C' . $column,  $f['divisi'])
-                ->setCellValue('D' . $column, $f['supplier'])
-                ->setCellValue('E' . $column, $f['po_date'])
-                ->setCellValue('F' . $column,  $f['lpb_date'])
-                ->setCellValue('G' . $column,  $f['no_penerimaan_barang'])
-                ->setCellValue('H' . $column,  $f['po_no'])
-                ->setCellValue('I' . $column,  $f['kode_barang'])
-                ->setCellValue('J' . $column, $f['barang'])
-                ->setCellValue('K' . $column,  $f['qty_po'])
-                ->setCellValue('L' . $column,  $f['satuan_po'])
-                ->setCellValue('M' . $column,  $f['qty_lpb'])
-                ->setCellValue('N' . $column,  $f['satuan_lpb'])
-                ->setCellValue('O' . $column,  $f['kemasan'])
-                ->setCellValue('P' . $column,  $f['qty_kemasan'])
-                ->setCellValue('Q' . $column,  $f['satuan_kemasan'])
-                ->setCellValue('R' . $column,  $f['sub_total']);
-
-            $column++;
-        }
-        $writer = new Xlsx($spreadsheet);
-        $filename = 'Rekap BC40';
-        foreach (range('A', 'K') as $columnID) {
-            $sheet->getColumnDimension($columnID)->setAutoSize(true);
+            $sheet->setCellValue('A' . $rowNum, $no++)
+                ->setCellValue('B' . $rowNum, $f['tipe_bahan'])
+                ->setCellValue('C' . $rowNum, $f['divisi'])
+                ->setCellValue('D' . $rowNum, $f['supplier'])
+                ->setCellValue('E' . $rowNum, $f['po_date'])
+                ->setCellValue('F' . $rowNum, $f['lpb_date'])
+                ->setCellValue('G' . $rowNum, $f['no_penerimaan_barang'])
+                ->setCellValue('H' . $rowNum, $f['po_no'])
+                ->setCellValue('I' . $rowNum, $f['kode_barang'])
+                ->setCellValue('J' . $rowNum, $f['barang'])
+                ->setCellValue('K' . $rowNum, $f['qty_po'])
+                ->setCellValue('L' . $rowNum, $f['satuan_po'])
+                ->setCellValue('M' . $rowNum, $f['qty_lpb'])
+                ->setCellValue('N' . $rowNum, $f['satuan_lpb'])
+                ->setCellValue('O' . $rowNum, $f['kemasan'])
+                ->setCellValue('P' . $rowNum, $f['qty_kemasan'])
+                ->setCellValue('Q' . $rowNum, $f['satuan_kemasan'])
+                ->setCellValue('R' . $rowNum, $f['sub_total']);
+            $rowNum++;
         }
 
+        // Grand Total row
+        $sheet->setCellValue('Q' . $rowNum, 'GRAND TOTAL');
+        $sheet->setCellValue('R' . $rowNum, $totalSubTotal);
+
+        // Bold Grand Total row
+        $sheet->getStyle("Q$rowNum:R$rowNum")->applyFromArray([
+            'font' => ['bold' => true]
+        ]);
+
+        // Border untuk semua
+        $lastRow = $rowNum;
+        $sheet->getStyle("A1:R$lastRow")->applyFromArray([
+            'borders' => [
+                'allBorders' => [
+                    'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
+                    'color' => ['argb' => 'FF000000'],
+                ],
+            ],
+        ]);
+
+        // Auto size
+        foreach (range('A', 'R') as $col) {
+            $sheet->getColumnDimension($col)->setAutoSize(true);
+        }
+
+        // Format kolom Sub Total sebagai Rupiah
+        // Format angka di kolom Sub Total (kolom R), tanpa simbol Rp
+        $sheet->getStyle("R2:R$lastRow")
+            ->getNumberFormat()
+            ->setFormatCode('#,##0.00');
+
+
+
+        // Border
+        $sheet->getStyle("A1:R$lastRow")->applyFromArray([
+            'borders' => [
+                'allBorders' => [
+                    'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
+                    'color' => ['argb' => 'FF000000'],
+                ],
+            ],
+        ]);
+
+
+
+
+        // Export
         $writer = new Xlsx($spreadsheet);
         $filename = 'Laporan Outstanding BC 4.0 ' . $dateStart . " s.d " . $dateEnd;
 
         header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-        header('Content-Disposition: attachment;filename=' . $filename . '.xlsx');
+        header('Content-Disposition: attachment;filename="' . $filename . '.xlsx"');
         header('Cache-Control: max-age=0');
-
         $writer->save('php://output');
-        die;
+        exit;
     }
 
     public function allOutstanding()
