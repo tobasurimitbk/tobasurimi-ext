@@ -121,7 +121,7 @@ class OtherPayment extends BaseController
         }
 
 
-         // 2. Validasi company_id dari COA yang dipilih
+        // 2. Validasi company_id dari COA yang dipilih
         $currentCompanyId = $this->this_company_id;
         
         // Cek akun parent (selisih/kas)
@@ -135,7 +135,8 @@ class OtherPayment extends BaseController
             return $this->response->setJSON([
                 'status' => false,
                 'message' => "Akun tidak valid atau tidak sesuai dengan perusahaan saat ini",
-                'token' => csrf_hash()
+                'token' => csrf_hash(),
+                'reload' => true
             ]);
         }
 
@@ -151,8 +152,8 @@ class OtherPayment extends BaseController
             'keterangan' => $payload['keterangan_parent'],
             'nominal' => $payload['total_all_amount'],
             // SELALU simpan akun_selisih dan akun_kas sesuai jenis
-            'akun_selisih' => $payload['jenis_pembayaran'] === 'PUTIH' ? $payload['akun_selisih'] : null,
-            'akun_kas' => $payload['jenis_pembayaran'] === 'MERAH' ? $payload['akun_selisih'] : null,
+            'akun_selisih' => $payload['jenis_pembayaran'] == 'PUTIH' ? $payload['akun_selisih'] : null,
+            'akun_kas' => $payload['jenis_pembayaran'] == 'MERAH' ? $payload['akun_selisih'] : null,
         ];
 
         $parentId = $this->otherPaymentModel->insert($parentData);
