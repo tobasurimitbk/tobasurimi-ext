@@ -122,7 +122,7 @@
 <body>
     <?php if (!empty($dataSO) && !empty($dataSODetail)) { ?>
 
-        <div class="header">
+        <div class="header" style="margin-top: -30px;">
             <div class="txt-center">
                 <h3>
                     <span style="margin-top: -20px;">
