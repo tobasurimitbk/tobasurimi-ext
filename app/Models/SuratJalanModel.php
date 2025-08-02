@@ -156,7 +156,7 @@ class SuratJalanModel extends Model
             ->join('users', 'users.id = surat_jalan_so.id_user', 'left')
             ->join('customers', 'customers.id = surat_jalan_so.id_customer')
             ->join('sales_order', 'sales_order.surat_jalan_so_id = surat_jalan_so.id', 'left')
-            ->join('metadata', 'metadata.id = sales_order.payment_terms', 'left')
+            ->join('metadata', 'metadata.id = customers.termin', 'left')
             ->join('employees', 'employees.id = sales_order.sales_id', 'left')
             ->select($selectQry)
             ->find($id);

@@ -516,8 +516,9 @@ class SuratJalan extends BaseController
     public function dropDownSalesOrder($idCustomer)
     {
         $customerData = $this->CustomerModel->asObject()
-            ->select('customers.*, employees.name as salesName')
+            ->select('customers.*, employees.name as salesName, metadata.value AS customerTermin')
             ->join('employees', 'employees.id = customers.sales_id', 'left')
+            ->join('metadata', 'metadata.id = customers.termin', 'left')
             ->find($idCustomer);
 
         $condition = [

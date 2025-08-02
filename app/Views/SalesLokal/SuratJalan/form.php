@@ -79,13 +79,13 @@
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" class="form-control" id="no_telp" name="no_telp" value="<?= $data->customerPhone ?? ''; ?>" <?= (!empty($data) && $data->posting == 1 ? 'readonly' : '') ?>>
+                            <input autocomplete="one-time-code" class="form-control" id="no_telp" name="no_telp" value="<?= $data->customerPhone ?? ''; ?>" readonly>
                             <label for="floatingInput">No. Telp</label>
                         </div>
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" class="form-control" id="termin" name="termin" value="<?= $data->customerTermin ?? ''; ?>" <?= (!empty($data) && $data->posting == 1 ? 'readonly' : '') ?>>
+                            <input autocomplete="one-time-code" class="form-control" id="termin" name="termin" value="<?= $data->customerTermin ?? ''; ?>" readonly>
                             <label for="floatingInput">Termin</label>
                         </div>
                     </div>
@@ -94,7 +94,7 @@
                 <div class="row">
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" class="form-control" id="salesName" name="salesName" value="<?= $data->customerSales ?? ''; ?>" <?= (!empty($data) && $data->posting == 1 ? 'readonly' : '') ?>>
+                            <input autocomplete="one-time-code" class="form-control" id="salesName" name="salesName" value="<?= $data->customerSales ?? ''; ?>" readonly>
                             <label for="floatingInput">Nama Sales</label>
                         </div>
                     </div>
@@ -354,7 +354,7 @@
 
                         $('#tagihan_ke').val(res.customerData.address);
                         $('#salesName').val(res.customerData.salesName);
-                        $('#termin').val(res.customerData.termin);
+                        $('#termin').val(res.customerData.customerTermin);
                         $('#no_telp').val(res.customerData.phone);
                     }
                 })
