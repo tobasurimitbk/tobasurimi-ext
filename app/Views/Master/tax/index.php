@@ -36,19 +36,19 @@
                         </div>
                         <div class="col-md-4">
                             <div class="form-floating mb-3" style="height: 50px;">
-                               <select class="form-select akun_kredit" name="akun_kredit" id="akun_kredit">
-                                        <option value="" data-id="">Pilih Akun Kredit</option>
+                                <select class="form-select akun_kredit" name="akun_kredit" id="akun_kredit">
+                                    <option value="" data-id="">Pilih Akun Kredit</option>
                                     <?php foreach ($akun_coa as $a) : ?>
                                         <option value="<?= $a->id ?>"><?= $a->nama_sub ?> || <?= $a->no_sub ?></option>
                                     <?php endforeach ?>
                                 </select>
-                                <label style="z-index: 1;" for="floatingInput">Akun debit</label>
+                                <label style="z-index: 1;" for="floatingInput">Akun Kredit</label>
                             </div>
                         </div>
                         <div class="col-md-4">
                             <div class="form-floating mb-3" style="height: 50px;">
-                               <select class="form-select akun_debit" name="akun_debit" id="akun_debit">
-                                       <option value="" data-id="">Pilih Akun Debit</option>
+                                <select class="form-select akun_debit" name="akun_debit" id="akun_debit">
+                                    <option value="" data-id="">Pilih Akun Debit</option>
                                     <?php foreach ($akun_coa as $a) : ?>
                                         <option value="<?= $a->id ?>"><?= $a->nama_sub ?> || <?= $a->no_sub ?></option>
                                     <?php endforeach ?>
