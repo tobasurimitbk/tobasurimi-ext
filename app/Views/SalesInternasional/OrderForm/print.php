@@ -128,7 +128,7 @@
                     <span style="margin-top: -20px;">
                         <?= strtoupper(str_ireplace(', Tbk', '', $company['holding_company']) . " (" . $company['company'] . ")") ?> <br>
 
-                        ORDER FORM <br> <?= $dataSO->container ?>
+                        ORDER FORM <?= $dataSO->container ?>
                     </span>
                 </h3>
             </div>
@@ -144,11 +144,13 @@
                                     <td><?= $dataSO->customer_name ?></td>
                                 </tr>
                             <?php endif ?>
-                            <tr>
-                                <td>TAX ID#</td>
-                                <td>:</td>
-                                <td><?= $dataSO->tax_id ?></td>
-                            </tr>
+                            <?php if (!empty($dataSO->tax_id)): ?>
+                                <tr>
+                                    <td>TAX ID#</td>
+                                    <td>:</td>
+                                    <td><?= $dataSO->tax_id ?></td>
+                                </tr>
+                            <?php endif; ?>
                             <tr>
                                 <td>DESTINATION</td>
                                 <td>:</td>
