@@ -2160,6 +2160,7 @@
             const estimatedFreightVal = $('#estimated_freight').val() || '0';
             const estimatedFreight = +estimatedFreightVal.replace(/\,/g, '');
 
+            console.log(itemList);
 
             itemList.map((obj) => {
                 itemSubTotal += +obj.barangTotal;
@@ -2173,17 +2174,20 @@
                 }
             });
 
+            console.log(discTotal);
+            
+
             if (taxStatus || includeTax) {
                 $('#includeTaxText').html('(Termasuk Pajak)');
             } else {
                 $('#includeTaxText').html('');
             }
 
-            $('#itemSubTotal').html(greatFormatRupiah(itemSubTotal));
-            $('#discTotal').html(greatFormatRupiah(discTotal));
+            $('#itemSubTotal').html(greatFormatRupiah(itemSubTotal.toFixed(2)));
+            $('#discTotal').html(greatFormatRupiah(discTotal.toFixed(2)));
 
             const grandTotal = itemSubTotal + estimatedFreight + taxTotal - discTotal;
-            $('#grandTotal').html(greatFormatRupiah(grandTotal));
+            $('#grandTotal').html(greatFormatRupiah(grandTotal.toFixed(2)));
         };
 
         $('#tax_status').change(function() {

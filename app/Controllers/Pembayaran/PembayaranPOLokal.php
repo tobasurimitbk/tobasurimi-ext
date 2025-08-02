@@ -1439,6 +1439,7 @@ class PembayaranPOLokal extends BaseController
         $metodePembayaran = $this->request->getGet('paymentMethod');
         $divisi = str_replace(' ', '', trim($this->request->getGet('divisiId')));
         $bank = str_replace(' ', '', trim($this->request->getGet('bankId')));
+        $tanggalPembayaran = $this->request->getGet('tanggalPembayaran');
 
         $paymentNo = $localPOPaymentModel->get_new_no(
             $jenis,
@@ -1448,7 +1449,8 @@ class PembayaranPOLokal extends BaseController
             date('m'),
             date('Y'),
             getLastDay(),
-            $this->this_company_id
+            $this->this_company_id,
+            $tanggalPembayaran,
         );
 
         return response()->setJSON([
@@ -1497,6 +1499,7 @@ class PembayaranPOLokal extends BaseController
         $paymentMethod = $this->request->getvar('paymentMethod');
         $divisi = str_replace(' ', '', trim($this->request->getvar('divisiId')));
         $bank = str_replace(' ', '', trim($this->request->getvar('bankId')));
+        $tanggalPembayaran = $this->request->getGet('tanggalPembayaran');
 
         $paymentNo = $localPOPaymentBPModel->get_new_no(
             $jenis,
@@ -1506,7 +1509,8 @@ class PembayaranPOLokal extends BaseController
             date('m'),
             date('Y'),
             getLastDay(),
-            $this->this_company_id
+            $this->this_company_id,
+            $tanggalPembayaran,
         );
 
         return response()->setJSON([
