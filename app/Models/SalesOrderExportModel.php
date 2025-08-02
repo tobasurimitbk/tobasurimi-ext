@@ -178,6 +178,7 @@ class SalesOrderExportModel extends Model
                 ->like('sales_order_export.sales_order_export_no', $addCondition['search'])
                 ->orLike('customers.name', $addCondition['search'])
                 ->orLike('users.name', $addCondition['search'])
+                ->orLike('sales_order_export.deadline', $addCondition['search'])
                 ->orLike('sales_order_export.container', $addCondition['search']);
         }
 
@@ -240,6 +241,7 @@ class SalesOrderExportModel extends Model
                 ->like('sales_order_export.sales_order_export_no', $addCondition['search'])
                 ->orLike('customers.name', $addCondition['search'])
                 ->orLike('users.name', $addCondition['search'])
+                ->orLike('sales_order_export.deadline', $addCondition['search'])
                 ->orLike('sales_order_export.container', $addCondition['search'])
                 ->groupEnd();
         }
@@ -283,6 +285,7 @@ class SalesOrderExportModel extends Model
                 ->like('sales_order_export.sales_order_export_no', $addCondition['search'])
                 ->orLike('customers.name', $addCondition['search'])
                 ->orLike('users.name', $addCondition['search'])
+                ->orLike('sales_order_export.deadline', $addCondition['search'])
                 ->orLike('sales_order_export.container', $addCondition['search'])
                 ->groupEnd();
         }
