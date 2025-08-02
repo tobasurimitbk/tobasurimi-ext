@@ -125,8 +125,8 @@ class SuratJalanModel extends Model
 
         $totalFilteredData = $SuratJalan->countAllResults(false);
 
-        if ($limit && $offset) {
-            $data = $SuratJalan->findAll($limit, $offset);
+        if ($limit !== null && $offset !== null) {
+            $data = $SuratJalan->findAll((int)$limit, (int)$offset);
         } else {
             $data = $SuratJalan->findAll();
         }
