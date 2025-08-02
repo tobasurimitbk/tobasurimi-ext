@@ -119,6 +119,7 @@ class PanjarSupplier extends BaseController
                 "bank_id" => $this->request->getVar('bank_id'),
                 "divisi_id" => $this->request->getVar('divisi_id'),
                 "payment_method" => $this->request->getVar('payment_method'),
+                "tanggal" => $this->request->getVar('tanggal_pembayaran'),
                 "type" => $this->request->getVar('jenis'),
                 "no_transaction" => $this->request->getPost("no_transaksi"),
                 "keterangan" => $this->request->getPost("keterangan"),
@@ -294,6 +295,7 @@ class PanjarSupplier extends BaseController
                 "supplier_id" => $this->request->getVar('supplier_id'),
                 "bank_id" => $this->request->getVar('bank_id'),
                 "payment_method" => $this->request->getVar('payment_method'),
+                "tanggal" => $this->request->getVar('tanggal_pembayaran'),
                 "divisi_id" => $this->request->getVar('divisi_id'),
                 "type" => $this->request->getVar('jenis'),
                 "no_transaction" => $this->request->getPost("no_transaksi"),
@@ -814,6 +816,7 @@ class PanjarSupplier extends BaseController
                     "no_transaction" => $transaction->no_transaction,
                     "type" => $transaction->type,
                     "payment_method" => $transaction->payment_method,
+                    "tanggal_pembayaran" => $transaction->tanggal,
                     "createdAt" => $transaction->createdAt,
                     "keterangan" => $transaction->keterangan,
                     "divisi_id" => $transaction->divisi_id,
@@ -867,6 +870,7 @@ class PanjarSupplier extends BaseController
         $metodePembayaran = $this->request->getGet('paymentMethod');
         $divisi = str_replace(' ', '', trim($this->request->getGet('divisiId')));
         $bank = str_replace(' ', '', trim($this->request->getGet('bankId')));
+        $tanggalPembayaran = $this->request->getGet('tanggalPembayaran');
 
         $paymentNo = $panjarPinjamanSupplierModel->get_new_no(
             $jenis,
@@ -876,7 +880,8 @@ class PanjarSupplier extends BaseController
             date('m'),
             date('Y'),
             getLastDay(),
-            $this->this_company_id
+            $this->this_company_id,
+            $tanggalPembayaran,
         );
 
         return response()->setJSON([

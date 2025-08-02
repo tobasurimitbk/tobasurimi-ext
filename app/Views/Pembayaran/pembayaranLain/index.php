@@ -101,6 +101,17 @@
                             </div>
                             <div class="row">
                                 <div class="col-md-6">
+                                    <div class="input-group input-group-password">
+                                        <div class="form-floating mb-3" style="height: 50px;">
+                                            <input autocomplete="one-time-code" class="form-control input-picker tanggal_pembayaran" id="tanggal_pembayaran" name="tanggal_pembayaran" placeholder="Tanggal Jatuh Tempo">
+                                            <label for="floatingInput">Tanggal Pembayaran Parent</label>
+                                        </div>
+                                        <div class="input-group-prepend group-prepend-password align-items-center">
+                                            <i style="cursor: pointer; z-index: 99; margin-bottom: 6px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-po-date"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
                                     <div class="form-floating mb-3" style="height: 50px;">
                                         <textarea autocomplete="one-time-code" style="height: 88px;" type="text" class="form-control keterangan_parent" name="keterangan_parent" id="keterangan_parent" placeholder="Keterangan"></textarea>
                                         <label for="floatingInput">Keterangan</label>
@@ -579,6 +590,18 @@
             todayBtn: "linked"
         }).on('changeDate', function(e) {
             $(this).valid(); // Trigger validasi saat tanggal berubah
+        });
+
+        $("#tanggal_pembayaran").datepicker({
+            todayHighlight: true,
+            format: "dd/mm/yyyy",
+            orientation: "bottom auto",
+            autoclose: true,
+            language: 'id', // opsional untuk bahasa Indonesia
+            todayBtn: "linked"
+        }).on('changeDate', function(e) {
+            $(this).valid(); // Trigger validasi saat tanggal berubah
+            generatePaymentNumber(true)
         });
 
         $('#jumlah').keyup(function() {
@@ -1109,7 +1132,8 @@
                             divisi_id: parent.divisi_id,
                             bank_id: parent.bank_id,
                             metode_pembayaran: parent.metode_pembayaran,
-                            jenis_pembayaran: parent.jenis_pembayaran
+                            jenis_pembayaran: parent.jenis_pembayaran,
+                            tanggal_pembayaran: parent.tanggal_pembayaran
                         };
 
                         // Update account labels based on jenis_pembayaran FIRST
@@ -1121,6 +1145,7 @@
                         // Set parent data WITHOUT triggering change events
                         $('#id').val(parent.id);
                         $("#no_pembayaran").val(parent.no_pembayaran);
+                        $("#tanggal_pembayaran").val(parent.tanggal_pembayaran);
                         
                         // Use Select2's internal trigger
                         $('#divisi_id').val(parent.divisi_id).trigger('change.select2');
@@ -1214,6 +1239,7 @@
                             bank_id: $('#bank_id').val(),
                             no_pembayaran: $('#no_pembayaran').val(),
                             metode_pembayaran: $('#metode_pembayaran').val(),
+                            tanggal_pembayaran: $('#tanggal_pembayaran').val(),
                             bayar_ke: $('#bayar_ke').val(),
                             akun_selisih: $('#akun_selisih').val(),
                             total_all_amount: destroyFormatRupiah($('#total_all_amount').val()),
@@ -1534,7 +1560,8 @@
             divisi_id: $("#divisi_id").val(),
             bank_id: $("#bank_id").val(),
             metode_pembayaran: $("#metode_pembayaran").val(),
-            jenis_pembayaran: $("#jenis_pembayaran").val()
+            jenis_pembayaran: $("#jenis_pembayaran").val(),
+            tanggal_pembayaran: $("#tanggal_pembayaran").val(),
         };
         
         // Jika nilai sama dengan initial values, skip
@@ -1548,12 +1575,13 @@
         let metodePembayaran = $("#metode_pembayaran option:selected").val();
         let divisiId = $("#divisi_id option:selected").text();
         let bankId = $("#bank_id option:selected").val();
+        let tanggalPembayaran = $("#tanggal_pembayaran").val();
         
         const csrfToken = '<?= csrf_token() ?>';
         const csrf = $(`[name="${csrfToken}"]`);
         
         let url = "<?= base_url('pembayaran-lain/generate-no-pembayaran'); ?>";
-        url += `?jenisPembayaran=${encodeURIComponent(jenisPembayaran)}&divisiId=${encodeURIComponent(divisiId)}&metodePembayaran=${encodeURIComponent(metodePembayaran)}&bankId=${encodeURIComponent(bankId)}`;
+        url += `?jenisPembayaran=${encodeURIComponent(jenisPembayaran)}&divisiId=${encodeURIComponent(divisiId)}&metodePembayaran=${encodeURIComponent(metodePembayaran)}&bankId=${encodeURIComponent(bankId)}&tanggalPembayaran=${encodeURIComponent(tanggalPembayaran)}`;
         
         $(".no_pembayaran").attr("readonly", true);
         

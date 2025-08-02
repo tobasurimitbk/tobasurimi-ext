@@ -478,7 +478,7 @@
                     ?>
 
 
-                    <?php if ($displayPrice == "true"): ?>
+                    <?php if ($displayPrice == "true" && $totalSalesKontrakdetail > 1): ?>
                         <tr style="font-weight: bold; background-color: #e9ecef; font-size:11px;">
                             <td style="padding: 6px; border: 1px solid #ddd;"></td>
                             <td style="padding: 6px; border: 1px solid #ddd; text-align: right;">
@@ -660,7 +660,7 @@
             <table border="1" style="width: 100%; border: 1px solid black; border-collapse: collapse;" class="label">
                 <tbody>
 
-                    <tr class="keep-together">
+                    <tr>
                         <td>
                             <b>
                                 DOCS & CERTIFICATE REQUIRED
@@ -674,14 +674,14 @@
                                     - DOCUMENT REQUIRED
                                 </b>
                                 <br>
-                                <?= $dataSO->document_required ?><br>
+                                <?= $dataSO->document_required ?>
                             <?php endif; ?>
                             <?php if ($dataSO->payment_term != ""): ?>
                                 <b>
                                     - PAYMENT TERM
                                 </b>
                                 <br>
-                                <?= $dataSO->payment_term ?><br>
+                                <?= $dataSO->payment_term ?>
                             <?php endif; ?>
 
                             <?php if ($dataSO->shipment_an != ""): ?>
@@ -689,7 +689,7 @@
                                     - SHIPMENT A/N
                                 </b>
                                 <br>
-                                <?= $dataSO->shipment_an ?> <br>
+                                <?= $dataSO->shipment_an ?>
                             <?php endif; ?>
 
                             <?php if ($dataSO->consigne_docs != ""): ?>
@@ -697,7 +697,7 @@
                                     - CONSIGNEE
                                 </b>
                                 <br>
-                                <?= $dataSO->consigne_docs ?> <br>
+                                <?= $dataSO->consigne_docs ?>
                             <?php endif; ?>
 
                             <?php if ($dataSO->notify_party != ""): ?>
@@ -705,7 +705,7 @@
                                     - NOTIFY PARTY
                                 </b>
                                 <br>
-                                <?= $dataSO->notify_party ?> <br>
+                                <?= $dataSO->notify_party ?>
                             <?php endif; ?>
 
                             <!-- <?php if ($dataSO->additional != ""): ?>
@@ -743,7 +743,7 @@
                                 </b>
                                 <br>
                                 <?= $dataSO->product_specs ?>
-                                <br>
+
                             <?php endif; ?>
 
                             <?php if ($dataSO->processing_method != ""): ?>
@@ -752,7 +752,7 @@
                                 </b>
                                 <br>
                                 <?= $dataSO->processing_method ?>
-                                <br>
+
                             <?php endif; ?>
 
                             <?php if ($dataSO->packaging != ""): ?>
@@ -761,7 +761,6 @@
                                 </b>
                                 <br>
                                 <?= $dataSO->packaging ?>
-                                <br>
                             <?php endif; ?>
 
                             <?php if ($dataSO->code_stamping != ""): ?>
@@ -770,7 +769,6 @@
                                 </b>
                                 <br>
                                 <?= $dataSO->code_stamping ?>
-                                <br>
                             <?php endif; ?>
 
                             <?php if ($dataSO->loading != ""): ?>
@@ -805,7 +803,7 @@
                                     - ADDITIONAL DETAIL
                                 </b>
                                 <br>
-                                <?= $dataSO->additional_detail ?> <br>
+                                <?= $dataSO->additional_detail ?>
                             <?php endif; ?>
                         </td>
                     </tr>
