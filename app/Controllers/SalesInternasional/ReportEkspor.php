@@ -4,6 +4,7 @@ namespace App\Controllers\SalesInternasional;
 
 use App\Controllers\BaseController;
 use App\Models\BarangMasterSalesModel;
+use App\Models\CompaniesModel;
 use App\Models\CustomerModel;
 use App\Models\SalesKontrakDetailModel;
 use App\Models\SalesOrderExportDetailModel;
@@ -24,6 +25,7 @@ class ReportEkspor extends BaseController
     protected $barangMasterSalesModel;
     protected $salesKontrakDetailModel;
     protected $salesOrderExportDetailModel;
+    protected $companyModel;
 
     public function __construct()
     {
@@ -35,6 +37,7 @@ class ReportEkspor extends BaseController
         $this->barangMasterSalesModel = new BarangMasterSalesModel();
         $this->salesKontrakDetailModel = new SalesKontrakDetailModel();
         $this->salesOrderExportDetailModel = new SalesOrderExportDetailModel();
+        $this->companyModel = new CompaniesModel();
     }
 
     public function index()
@@ -49,8 +52,13 @@ class ReportEkspor extends BaseController
             $this->is_admin
         );
 
+        $dataAccHolder = $this->salesOrderExportModel->getAccHolder();
+        $dataCompany = $this->companyModel->where('deletedAt', null)->findAll();
+
         $data = [
-            'dataCustomer' => $dataCustomer
+            'dataCustomer' => $dataCustomer,
+            "dataAccHolder" => $dataAccHolder,
+            "dataCompany" => $dataCompany
         ];
 
         return view('SalesInternasional/Report/ReportCustomer/index', $data);
@@ -77,6 +85,8 @@ class ReportEkspor extends BaseController
             "sort"          => $this->request->getGet("sort"),
             "sortType"      => $this->request->getGet("sortType"),
             "customer_id"   => $this->request->getGet("customer_id"),
+            "company_id"    => $this->request->getGet('company_id'),
+            "user_id"       => $this->request->getGet('user_id'),
             "dateStart"     => $this->request->getVar("dateStart") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateStart")))) : "",
             "dateEnd"       => $this->request->getVar("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateEnd")))) : "",
         ];
@@ -93,16 +103,19 @@ class ReportEkspor extends BaseController
             array_push($dataSales, [
                 "no"                        => $no++,
                 "id"                        => encrypt($data->sales_order_export_id),
+                "sales_contract_id"         => encrypt($data->sales_contract_id),
                 "acc_holder"                => $data->acc_holder,
                 "sales_order_export_no"     => $data->sales_order_export_no,
                 "customer_name"             => $data->customer_name,
                 "container"                 => $data->container,
-                "actualy_shipment_date"     => date('d/m/Y', strtotime($data->actualy_shipment_date)),
-                "total_qty"                 => number_format(floatval($data->total_qty), 2) . " " . $data->kode_satuan,
+                "actualy_shipment_date"     => !empty($data->actualy_shipment_date) ? date('d/m/Y', strtotime($data->actualy_shipment_date)) : "",
+                "deadline"                  => $data->deadline,
                 "total_qty_convertion"      => $data->total_qty_convertion,
+                "company"                   => $data->company,
                 "valas"                     => $data->valas_name,
                 "shipment_value"            => $data->shipment_value,
                 "shipment_value_net"        => $data->shipment_value_net,
+                "total_qty"                 => number_format(floatval($data->total_qty), 2) . " " . $data->kode_satuan,
             ]);
         }
 
@@ -139,6 +152,8 @@ class ReportEkspor extends BaseController
             "sort"          => $this->request->getGet("sort"),
             "sortType"      => $this->request->getGet("sortType"),
             "customer_id"   => $this->request->getGet("customer_id"),
+            "company_id"    => $this->request->getGet('company_id'),
+            "user_id"       => $this->request->getGet('user_id'),
             "dateStart"     => $this->request->getVar("dateStart") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateStart")))) : "",
             "dateEnd"       => $this->request->getVar("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateEnd")))) : "",
         ];
@@ -159,12 +174,14 @@ class ReportEkspor extends BaseController
                 "Acc Holder"            => $data->acc_holder,
                 "Order Form No"         => $data->sales_order_export_no,
                 "Customer"              => $data->customer_name,
-                "Container Number"      => $data->container,
-                "Actualy Shipment Date" => date('d/m/Y', strtotime($data->actualy_shipment_date)),
+                "Container"             => $data->container,
+                "Actualy Shipment Date" =>  !empty($data->actualy_shipment_date) ? date('d/m/Y', strtotime($data->actualy_shipment_date)) : "",
+                "Deadline"              => $data->deadline,
                 "Qty (Kg)"              => (float) $data->total_qty_convertion,
+                "Plant"                 => $data->company,
                 "Valas"                 => $data->valas_name,
-                "Shipment Value"        => (float) $data->shipment_value,
-                "Shipment Value Net"    => (float) $data->shipment_value_net
+                "Amount"                => (float) $data->shipment_value,
+                "Amount Net"            => (float) $data->shipment_value_net
             ];
 
             $totalQtyConvertion += $data->total_qty_convertion;
@@ -177,12 +194,13 @@ class ReportEkspor extends BaseController
             "Acc Holder"            => '',
             "Order Form No"         => '',
             "Customer"              => '',
-            "Container Number"      => '',
+            "Container"             => '',
             "Actualy Shipment Date" => 'GRAND TOTAL',
             "Qty (Kg)"              => (float) $totalQtyConvertion,
+            "Plant"                 => '',
             "Valas"                 => '',
-            "Shipment Value"        => (float) $totalShipmentValue,
-            "Shipment Value Net"    => (float) $totalShipmentValueNet
+            "Amount"                => (float) $totalShipmentValue,
+            "Amount Net"            => (float) $totalShipmentValueNet
         ];
 
         $spreadsheet = new Spreadsheet();
@@ -213,7 +231,7 @@ class ReportEkspor extends BaseController
                 $value = $item[$header] ?? '';
 
                 // Format kolom numerik
-                if (in_array($header, ['Qty (Kg)', 'Shipment Value', 'Shipment Value Net']) && is_numeric($value)) {
+                if (in_array($header, ['Qty (Kg)', 'Amount', 'Amount Net']) && is_numeric($value)) {
                     $sheet->setCellValueExplicit($cell, $value, DataType::TYPE_NUMERIC);
                     $sheet->getStyle($cell)->getNumberFormat()->setFormatCode('#,##0.00');
                 } else {
@@ -255,10 +273,14 @@ class ReportEkspor extends BaseController
             ->orderBy('barang_name', "asc")
             ->findAll();
 
+        $dataAccHolder = $this->salesOrderExportModel->getAccHolder();
+        $dataCompany = $this->companyModel->where('deletedAt', null)->findAll();
+
         $data = [
             'dataCustomer' => $dataCustomer,
-            'dataBarangSales' => $dataBarangSales
-
+            'dataBarangSales' => $dataBarangSales,
+            "dataAccHolder" => $dataAccHolder,
+            "dataCompany" => $dataCompany
         ];
 
         return view('SalesInternasional/Report/ReportItems/index', $data);
@@ -288,6 +310,8 @@ class ReportEkspor extends BaseController
             "sortType"      => $this->request->getGet("sortType"),
             "customer_id"              => $this->request->getGet("customer_id"),
             "barang_master_sales_id"   => $this->request->getGet("barang_master_sales_id"),
+            "user_id"       => $this->request->getVar('user_id'),
+            "company_id"    => $this->request->getVar('company_id'),
             "dateStart"     => $this->request->getVar("dateStart") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateStart")))) : "",
             "dateEnd"       => $this->request->getVar("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateEnd")))) : "",
         ];
@@ -304,12 +328,15 @@ class ReportEkspor extends BaseController
             array_push($dataSales, [
                 "no"                        => $no++,
                 "id"                        => encrypt($data->sales_order_export_id),
+                "sales_contract_id"         => encrypt($data->sales_contract_id),
                 "acc_holder"                => $data->acc_holder,
                 "sales_order_export_no"     => $data->sales_order_export_no,
                 "customer_name"             => $data->customer_name,
                 "container"                 => $data->container,
-                "actualy_shipment_date"     => date('d/m/Y', strtotime($data->actualy_shipment_date)),
+                "actualy_shipment_date"     => !empty($data->actualy_shipment_date) ? date('d/m/Y', strtotime($data->actualy_shipment_date)) : "",
+                "deadline"                  => $data->deadline,
                 "dicharge_port"             => $data->dicharge_port,
+                "company"                   => $data->company,
                 "barang_name"               => $data->barang_name,
                 "total_qty_convertion"      => $data->total_qty_convertion,
                 "valas"                     => $data->valas_name,
@@ -336,7 +363,6 @@ class ReportEkspor extends BaseController
         return;
     }
 
-
     public function exportExcelByItems()
     {
         $condition = [
@@ -344,19 +370,22 @@ class ReportEkspor extends BaseController
             'sales_order_export.deletedAt' => null,
             'sales_order_export.status' => 'POSTED'
         ];
+
         $addCondition = [
             "search"                => $this->request->getGet("search"),
             "sort"                  => $this->request->getGet("sort"),
             "sortType"              => $this->request->getGet("sortType"),
             "customer_id"           => $this->request->getGet("customer_id"),
             "barang_master_sales_id" => $this->request->getVar('barang_master_sales_id'),
-            "dateStart"     => $this->request->getVar("dateStart") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateStart")))) : "",
-            "dateEnd"       => $this->request->getVar("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateEnd")))) : "",
+            "user_id"               => $this->request->getVar('user_id'),
+            "company_id"            => $this->request->getVar('company_id'),
+            "dateStart"             => $this->request->getVar("dateStart") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateStart")))) : "",
+            "dateEnd"               => $this->request->getVar("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateEnd")))) : "",
         ];
+
         $filename = "Report Ekspor By Items " . $addCondition['dateStart'] . " - " . $addCondition['dateEnd'];
         $salesOrderExport = $this->salesOrderExportDetailModel->getListExportByItems($condition, $addCondition, 100000000, 0);
 
-        // Group data by product
         $grouped = [];
         foreach ($salesOrderExport['data'] as $d) {
             $grouped[$d->barang_name][] = $d;
@@ -380,12 +409,14 @@ class ReportEkspor extends BaseController
                     "Order Form No"         => $d->sales_order_export_no,
                     "Customer"              => $d->customer_name,
                     "Container Number"      => $d->container,
-                    "Actualy Shipment Date" => date('d/m/Y', strtotime($d->actualy_shipment_date)),
+                    "Actualy Shipment Date" => !empty($d->actualy_shipment_date) ? date('d/m/Y', strtotime($d->actualy_shipment_date)) : "",
+                    "Deadline"              => $d->deadline,
                     "Destination"           => $d->dicharge_port,
+                    "Plant"                 => $d->company,
                     "Product"               => $d->barang_name,
                     "Qty (Kg)"              => (float) $d->total_qty_convertion,
                     "Valas"                 => $d->valas_name,
-                    "Amount Value"          => (float) $d->total_harga_barang,
+                    "Amount"                => (float) $d->total_harga_barang,
                     "Price Type"            => $d->tipe_harga,
                 ];
                 $subQty += $d->total_qty_convertion;
@@ -393,20 +424,21 @@ class ReportEkspor extends BaseController
             }
 
             $dataRows[] = [
-                "subtotal" => true,
-                "Product" => 'TOTAL',
-                "Qty (Kg)" => $subQty,
-                "Amount Value" => $subAmt,
+                "subtotal"  => true,
+                "Product"   => 'TOTAL',
+                "Qty (Kg)"  => $subQty,
+                "Amount"    => $subAmt,
             ];
+
             $grandQty += $subQty;
             $grandAmt += $subAmt;
         }
 
         $dataRows[] = [
-            "subtotal" => true,
-            "Product" => 'GRAND TOTAL',
-            "Qty (Kg)" => $grandQty,
-            "Amount Value" => $grandAmt,
+            "subtotal"  => true,
+            "Product"   => 'GRAND TOTAL',
+            "Qty (Kg)"  => $grandQty,
+            "Amount"    => $grandAmt,
         ];
 
         $spreadsheet = new Spreadsheet();
@@ -419,14 +451,17 @@ class ReportEkspor extends BaseController
             "Customer",
             "Container Number",
             "Actualy Shipment Date",
+            "Deadline",
             "Destination",
+            "Plant",
             "Product",
             "Qty (Kg)",
             "Valas",
-            "Amount Value",
+            "Amount",
             "Price Type"
         ];
-        $cols = range('A', 'L');
+
+        $cols = range('A', chr(ord('A') + count($headers) - 1)); // Otomatis dari A sampai N (14 kolom)
         $row = 1;
 
         foreach ($headers as $i => $h) {
@@ -434,7 +469,7 @@ class ReportEkspor extends BaseController
             $sheet->getColumnDimension($cols[$i])->setAutoSize(true);
         }
 
-        $sheet->getStyle("A1:L1")->applyFromArray([
+        $sheet->getStyle("A1:" . end($cols) . "1")->applyFromArray([
             'font' => ['bold' => true],
             'alignment' => ['horizontal' => Alignment::HORIZONTAL_LEFT]
         ]);
@@ -442,32 +477,34 @@ class ReportEkspor extends BaseController
         $row++;
         foreach ($dataRows as $item) {
             if (isset($item['group_header'])) {
-                $sheet->mergeCells("A{$row}:L{$row}");
+                $sheet->mergeCells("A{$row}:" . end($cols) . "{$row}");
                 $sheet->setCellValue("A{$row}", $item['group_header']);
                 $sheet->getStyle("A{$row}")->applyFromArray([
                     'font' => ['bold' => true],
                     'alignment' => ['horizontal' => Alignment::HORIZONTAL_LEFT]
                 ]);
             } elseif (!empty($item['subtotal'])) {
-                $sheet->setCellValue("H{$row}", $item['Product']);
-                $sheet->setCellValueExplicit("I{$row}", $item['Qty (Kg)'], DataType::TYPE_NUMERIC);
-                $sheet->getStyle("I{$row}")->getNumberFormat()->setFormatCode('#,##0.00');
-
-                $sheet->setCellValueExplicit("K{$row}", $item['Amount Value'], DataType::TYPE_NUMERIC);
+                $sheet->setCellValue("J{$row}", $item['Product']); // Kolom Product
+                $sheet->setCellValueExplicit("K{$row}", $item['Qty (Kg)'], DataType::TYPE_NUMERIC); // Qty (Kg)
                 $sheet->getStyle("K{$row}")->getNumberFormat()->setFormatCode('#,##0.00');
 
-                $sheet->getStyle("H{$row}:K{$row}")->applyFromArray([
+                $sheet->setCellValueExplicit("M{$row}", $item['Amount'], DataType::TYPE_NUMERIC); // Amount
+                $sheet->getStyle("M{$row}")->getNumberFormat()->setFormatCode('#,##0.00');
+
+                $sheet->getStyle("J{$row}:M{$row}")->applyFromArray([
                     'font' => ['bold' => true],
                     'alignment' => ['horizontal' => Alignment::HORIZONTAL_RIGHT]
                 ]);
             } else {
                 foreach ($headers as $i => $h) {
                     $value = $item[$h] ?? '';
-                    if (in_array($h, ['Qty (Kg)', 'Amount Value']) && is_numeric($value)) {
-                        $sheet->setCellValueExplicit($cols[$i] . $row, $value, DataType::TYPE_NUMERIC);
-                        $sheet->getStyle($cols[$i] . $row)->getNumberFormat()->setFormatCode('#,##0.00');
+                    $cell = $cols[$i] . $row;
+
+                    if (in_array($h, ['Qty (Kg)', 'Amount']) && is_numeric($value)) {
+                        $sheet->setCellValueExplicit($cell, $value, DataType::TYPE_NUMERIC);
+                        $sheet->getStyle($cell)->getNumberFormat()->setFormatCode('#,##0.00');
                     } else {
-                        $sheet->setCellValue($cols[$i] . $row, $value);
+                        $sheet->setCellValue($cell, $value);
                     }
                 }
             }
@@ -475,7 +512,7 @@ class ReportEkspor extends BaseController
         }
 
         $last = $row - 1;
-        $sheet->getStyle("A1:L{$last}")->applyFromArray([
+        $sheet->getStyle("A1:" . end($cols) . "{$last}")->applyFromArray([
             'borders' => ['allBorders' => ['borderStyle' => Border::BORDER_THIN, 'color' => ['argb' => 'FF000000']]]
         ]);
 
