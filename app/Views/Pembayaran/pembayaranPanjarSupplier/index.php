@@ -95,6 +95,19 @@
                                     </div>
                                 </div>
                                 <div class="col-md-6">
+                                    <div class="input-group input-group-password">
+                                        <div class="form-floating mb-3" style="height: 50px;">
+                                            <input autocomplete="one-time-code" class="form-control input-picker tanggal_pembayaran" id="tanggal_pembayaran" name="tanggal_pembayaran" placeholder="Tanggal Jatuh Tempo">
+                                            <label for="floatingInput">Tanggal Pembayaran Parent</label>
+                                        </div>
+                                        <div class="input-group-prepend group-prepend-password align-items-center">
+                                            <i style="cursor: pointer; z-index: 99; margin-bottom: 6px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-po-date"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                 <div class="col-md-6">
                                     <div class="form-floating mb-3" style="height: 50px;">
                                         <input autocomplete="one-time-code" type="text" class="form-control keterangan" name="keterangan" id="keterangan" placeholder="Keterangan" value="">
                                         <label for="floatingInput">Keterangan</label>
@@ -737,7 +750,20 @@
         theme: "bootstrap-5",
         dropdownParent: $(".add-modal .modal-content")
     });
-    
+
+
+    $("#tanggal_pembayaran").datepicker({
+        todayHighlight: true,
+        format: "dd/mm/yyyy",
+        orientation: "bottom auto",
+        autoclose: true,
+        language: 'id', // opsional untuk bahasa Indonesia
+        todayBtn: "linked"
+    }).on('changeDate', function(e) {
+        $(this).valid(); // Trigger validasi saat tanggal berubah
+        generatePaymentNumber()
+    });
+
 
     $("#tipe_supplier, #supplier_id, #tipe, #jenis_transaksi, #jenis")
         .parent('div')
@@ -845,7 +871,8 @@
             divisi_id: $("#divisi_id").val(),
             bank_id: $("#bank_id").val(),
             payment_method: $("#payment_method").val(),
-            jenis: $("#jenis").val()
+            jenis: $("#jenis").val(),
+            tanggal_pembayaran: $("#tanggal_pembayaran").val()
         };
         
         // Jika nilai sama dengan initial values, skip
@@ -856,12 +883,13 @@
         let divisiId = $("#divisi_id option:selected").text();
         let paymentMethod = $("#payment_method option:selected").text();
         let bankId = $("#bank_id option:selected").val();
+        let tanggalPembayaran = $("#tanggal_pembayaran").val();
         
         const csrfToken = '<?= csrf_token() ?>';
         const csrf = $(`[name="${csrfToken}"]`);
         
         let url = "<?= base_url('panjar-supplier/generate-no-panjar'); ?>";
-        url += `?jenisPembayaran=${encodeURIComponent(jenisPembayaran)}&divisiId=${encodeURIComponent(divisiId)}&paymentMethod=${encodeURIComponent(paymentMethod)}&bankId=${encodeURIComponent(bankId)}`;
+        url += `?jenisPembayaran=${encodeURIComponent(jenisPembayaran)}&divisiId=${encodeURIComponent(divisiId)}&paymentMethod=${encodeURIComponent(paymentMethod)}&bankId=${encodeURIComponent(bankId)}&tanggalPembayaran=${encodeURIComponent(tanggalPembayaran)}`;
         
         $("#no_transaksi").attr("readonly", true);
         
@@ -958,7 +986,8 @@
                         divisi_id: res.data.transaction.divisi_id,
                         bank_id: res.data.transaction.bank_id,
                         payment_method: res.data.transaction.payment_method,
-                        jenis: res.data.transaction.type
+                        jenis: res.data.transaction.type,
+                        tanggal_pembayaran: res.data.transaction.tanggal_pembayaran
                     };
 
                     details = [];
@@ -968,6 +997,7 @@
 
                     // Set nilai ke form dengan trigger khusus yang tidak memicu generate
                     $('#id').val(res.data.transaction.id);
+                    $('#tanggal_pembayaran').val(res.data.transaction.tanggal_pembayaran);
                     $('#no_transaksi').val(res.data.transaction.no_transaction);
                     
                     // Gunakan trigger internal Select2 tanpa memicu event kita
@@ -1317,6 +1347,7 @@
                         data.append('payment_method', $('#payment_method option:selected').val());
                         data.append('jenis', $('#jenis').val());
                         data.append('bank_id', $('#bank_id').val());
+                        data.append('tanggal_pembayaran', $('#tanggal_pembayaran').val());
                         data.append('divisi_id', $('#divisi_id').val());
                         data.append('tipe_supplier', $('#tipe_supplier').val());
                         data.append('supplier_id', $('#supplier_id').val());

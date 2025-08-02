@@ -146,12 +146,12 @@ class OtherPayment extends BaseController
             'divisi_id' => $payload['divisi_id'],
             'bank_id' => $payload['bank_id'],
             'no_pembayaran' => $payload['no_pembayaran'],
+            'tanggal' => $payload['tanggal_pembayaran'],
             'bayar_ke' => $payload['bayar_ke'],
             'jenis_pembayaran' => $payload['jenis_pembayaran'],
             'metode_pembayaran' => $payload['metode_pembayaran'],
             'keterangan' => $payload['keterangan_parent'],
             'nominal' => $payload['total_all_amount'],
-            // SELALU simpan akun_selisih dan akun_kas sesuai jenis
             'akun_selisih' => $payload['jenis_pembayaran'] == 'PUTIH' ? $payload['akun_selisih'] : null,
             'akun_kas' => $payload['jenis_pembayaran'] == 'MERAH' ? $payload['akun_selisih'] : null,
         ];
@@ -180,8 +180,8 @@ class OtherPayment extends BaseController
             $latestDate = $detailData['tanggal_pembayaran'];
         }
 
-        if ($latestDate) {
-            $this->otherPaymentModel->update($parentId, ['tanggal' => $latestDate]);
+        if ($payload['tanggal_pembayaran']) {
+            $this->otherPaymentModel->update($parentId, ['tanggal' => $payload['tanggal_pembayaran']]);
         }
 
         return $this->response->setJSON([
@@ -222,7 +222,6 @@ class OtherPayment extends BaseController
             ]);
         }
 
-        // 1. Update Parent Data - Konsisten dengan createAction
         $parentData = [
             'divisi_id' => $payload['divisi_id'],
             'bank_id' => $payload['bank_id'],
@@ -232,7 +231,6 @@ class OtherPayment extends BaseController
             'metode_pembayaran' => $payload['metode_pembayaran'],
             'keterangan' => $payload['keterangan_parent'],
             'nominal' => $payload['total_all_amount'],
-            // Tetap konsisten dengan logika create
             'akun_selisih' => $payload['jenis_pembayaran'] == 'PUTIH' ? $payload['akun_selisih'] : null,
             'akun_kas' => $payload['jenis_pembayaran'] == 'MERAH' ? $payload['akun_selisih'] : null,
         ];
@@ -282,7 +280,7 @@ class OtherPayment extends BaseController
 
         // Update tanggal terakhir
         if ($latestDate) {
-            $this->otherPaymentModel->update($parentId, ['tanggal' => $latestDate]);
+            $this->otherPaymentModel->update($parentId, ['tanggal' => date("Y-m-d", strtotime(str_replace("/", "-", $payload['tanggal_pembayaran'])))]);
         }
 
         return $this->response->setJSON([
@@ -365,6 +363,7 @@ class OtherPayment extends BaseController
                     'divisi_id' => $parentData['divisi_id'],
                     'bank_id' => $parentData['bank_id'],
                     'bayar_ke' => $parentData['bayar_ke'],
+                    'tanggal_pembayaran' => date('d/m/Y', strtotime($parentData['tanggal'])),
                     'akun_selisih' => $parentData['akun_selisih'],
                     'akun_kas' => $parentData['akun_kas'],
                     'jenis_pembayaran' => $parentData['jenis_pembayaran'],
@@ -388,6 +387,7 @@ class OtherPayment extends BaseController
         $divisi = str_replace(' ', '', trim($this->request->getGet('divisiId')));
         $bank = str_replace(' ', '', trim($this->request->getGet('bankId')));
         $metodePembayaran = $this->request->getGet('metodePembayaran');
+        $tanggalPembayaran = $this->request->getGet('tanggalPembayaran');
 
         $paymentNo = $otherPaymentModel->get_new_no(
             $jenis,
@@ -397,7 +397,8 @@ class OtherPayment extends BaseController
             date('m'),
             date('Y'),
             getLastDay(),
-            $this->this_company_id
+            $this->this_company_id,
+            $tanggalPembayaran,
         );
 
         return response()->setJSON([

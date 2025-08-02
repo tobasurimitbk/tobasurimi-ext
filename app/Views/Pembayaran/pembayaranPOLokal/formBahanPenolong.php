@@ -386,6 +386,8 @@
             format: "dd/mm/yyyy",
             orientation: "bottom auto",
             autoclose: true
+        }).change(function() {
+            generatePaymentNumber();
         });
 
         $('#akun_kas').select2({
@@ -1059,6 +1061,7 @@
         formData.append("divisiId", $("#divisi_id option:selected").text());
         formData.append("jenisPembayaran", $("#jenis_pembayaran option:selected").text());
         formData.append("paymentMethod", $("#payment_method option:selected").text());
+        formData.append("tanggalPembayaran", $("#payment_date").val());
 
         $(".no_bukti_pembayaran").attr("readonly", true);
 
