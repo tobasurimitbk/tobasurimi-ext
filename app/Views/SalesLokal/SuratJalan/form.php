@@ -398,13 +398,15 @@
                 dataType: "json",
                 success: function(res) {
                     let so = $this.val();
+
                     if (so.length != 0) {
 
                         res.map((row) => {
                             const amount = parseFloat(row.amount)
                             const disc = parseFloat(row.disc)
-                            const discUnit = 'row.discUnit'
-                            row.amount = discUnit == 'percent' ? (amount * (100 - disc)) / 100 : amount - disc
+                            const discUnit = row.discUnit
+                            console.log(discUnit);
+                            // row.amount = discUnit == 'percent' ? (amount * (100 - disc)) / 100 : amount - disc
                         })
                         table.clear();
 
@@ -419,6 +421,8 @@
 
         <?php if (!empty($data)) : ?>
             const itemList = <?= json_encode($data->itemList); ?>;
+            console.log(itemList);
+
             table.rows.add(itemList).draw(false);
         <?php endif; ?>
 
