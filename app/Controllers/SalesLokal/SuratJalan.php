@@ -380,7 +380,7 @@ class SuratJalan extends BaseController
             ],
         ]);
 
-        $id = $this->request->getPost('id');
+        $id = decrypt($this->request->getPost('id'));
         if (!$validate) {
             // echo json_encode($payload);
             //return;
