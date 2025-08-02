@@ -61,7 +61,7 @@
                             <select class="form-select id_so" name="id_so[]" id="id_so[]" multiple <?= (!empty($data) && $data->posting == 1 ? 'disabled' : '') ?>>
                                 <option value=""></option>
                                 <?php foreach ($dataSo ?? [] as $so) : ?>
-                                    <option value="<?= $so->id; ?>,<?= $so->no_sales_order ?>" <?= !empty($data) && in_array($so->id, $data->multiple_id_so) ? "selected" : ""; ?>>
+                                    <option value="<?= $so->id; ?>" <?= !empty($data) && in_array($so->id, $data->multiple_id_so) ? "selected" : ""; ?>>
                                         <?= $so->no_sales_order; ?>
                                     </option>
                                 <?php endforeach; ?>

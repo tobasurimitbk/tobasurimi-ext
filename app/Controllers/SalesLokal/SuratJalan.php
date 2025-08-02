@@ -412,7 +412,6 @@ class SuratJalan extends BaseController
         $shippingDate = $this->request->getPost('shipping_date');
 
         $values = [
-            "id_user"       => $this->userId,
             "id_customer"   => $this->request->getPost('id_customer'),
             "shipping_date" =>  $shippingDate ? date("Y-m-d", strtotime(str_replace("/", "-", $shippingDate))) : "",
             "no_surat_jalan" => strtoupper($this->request->getVar('no_surat_jalan')),
