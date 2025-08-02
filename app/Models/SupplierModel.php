@@ -236,6 +236,25 @@ class SupplierModel extends Model
         return $results;
     }
 
+
+    public function getSupplierAll()
+    {
+        $arrCondition = [
+            'deletedAt' => null,
+            'company_id' => session()->get('login')->this_company_id,
+        ];
+
+        $builder = $this->db->table('suppliers');
+        $builder->where($arrCondition);
+        $builder->orderBy('suppliers.name', "ASC");
+        $query = $builder->get();
+        $results = $query->getResultArray();
+        foreach ($results as &$result) {
+            $result['name'] = strtoupper($result['name']);
+        }
+        return $results;
+    }
+
     public function generateSupplierCode($type, $company_id): string
     {
         // Template untuk kode berdasarkan tipe
