@@ -741,14 +741,14 @@ class OrderForm extends BaseController
         } else {
             // INI POSTING
             // CEK APAKAH ACTUALY SHIPMENT DATE SUDAH ADA
-            $salesOrderExport = $this->salesOrderExportModel->where('sales_order_export_id', $id)->first();
-            if (empty($salesOrderExport['actualy_shipment_date']) || $salesOrderExport['actualy_shipment_date'] == null) {
-                return response()->setJSON([
-                    'message' => "Before posting the order form you must fill in the actual shipment date.",
-                    'token' => csrf_hash(),
-                    'status' => false
-                ]);
-            }
+            // $salesOrderExport = $this->salesOrderExportModel->where('sales_order_export_id', $id)->first();
+            // if (empty($salesOrderExport['actualy_shipment_date']) || $salesOrderExport['actualy_shipment_date'] == null) {
+            //     return response()->setJSON([
+            //         'message' => "Before posting the order form you must fill in the actual shipment date.",
+            //         'token' => csrf_hash(),
+            //         'status' => false
+            //     ]);
+            // }
 
             $this->salesOrderExportModel->update($id, [
                 'status' => "POSTED",

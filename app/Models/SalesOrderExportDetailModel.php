@@ -54,8 +54,9 @@ class SalesOrderExportDetailModel extends Model
             'sales_contract.dicharge_port'                  => 'sales_contract.dicharge_port',
             'sales_contract_detail.barang_master_sales_id'  => 'sales_contract_detail.barang_master_sales_id',
             'sales_order_export.valas_id'                   => 'sales_order_export.valas_id',
-            'sales_contract.tipe_harga'                     => 'sales_contract.tipe_harga'
-
+            'sales_contract.tipe_harga'                     => 'sales_contract.tipe_harga',
+            'sales_order_export.deadline'                   => 'sales_order_export.deadline',
+            'sales_order_export.company_id'                 => 'sales_order_export.company_id',
         ];
 
         $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
@@ -68,9 +69,11 @@ class SalesOrderExportDetailModel extends Model
             sales_order_export.sales_order_export_no,
             sales_order_export.container,
             sales_order_export.actualy_shipment_date,
+            sales_order_export.deadline,
             sales_contract.dicharge_port,                        
             sales_contract.tipe_harga,
             sales_order_detail_export.sales_order_export_id,
+            companies.company,
             metadata.value AS valas_name,
             users.name AS acc_holder,
             customers.name AS customer_name,
@@ -89,6 +92,7 @@ class SalesOrderExportDetailModel extends Model
             ->join('sales_order_export', 'sales_order_export.sales_order_export_id = sales_order_detail_export.sales_order_export_id', 'left')
             ->join('metadata', 'metadata.id = sales_order_export.valas_id', 'left')
             ->join('users', 'users.id = sales_order_export.user_id', 'left')
+            ->join('companies', 'companies.id = sales_order_export.company_id', 'left')
             ->groupBy('sales_order_detail_export.sales_contract_detail_id')
             ->orderBy($sort, $sortType);
 
@@ -103,7 +107,8 @@ class SalesOrderExportDetailModel extends Model
                 ->like('sales_order_export.sales_order_export_no', $addCondition['search'])
                 ->orLike('customers.name', $addCondition['search'])
                 ->orLike('users.name', $addCondition['search'])
-                ->orLike('sales_order_export.container', $addCondition['search']);
+                ->orLike('sales_order_export.container', $addCondition['search'])
+                ->orLike('barang_master_sales.barang_name', $addCondition['search']);
         }
 
         if ($addCondition['search']) {
@@ -122,6 +127,17 @@ class SalesOrderExportDetailModel extends Model
             $salesDataQry->groupEnd();
         }
 
+        if ($addCondition['user_id']) {
+            $salesDataQry->groupStart();
+            $salesDataQry->where('sales_order_export.user_id', $addCondition['user_id']);
+            $salesDataQry->groupEnd();
+        }
+
+        if ($addCondition['company_id']) {
+            $salesDataQry->groupStart();
+            $salesDataQry->where('sales_order_export.company_id', $addCondition['company_id']);
+            $salesDataQry->groupEnd();
+        }
 
         if (!empty($addCondition['dateStart']) || !empty($addCondition['dateEnd'])) {
             $salesDataQry->groupStart();
@@ -150,6 +166,8 @@ class SalesOrderExportDetailModel extends Model
             ->join('sales_order_export', 'sales_order_export.sales_order_export_id = sales_order_detail_export.sales_order_export_id', 'left')
             ->join('customers', 'customers.id = sales_contract.customer_id', 'left')
             ->join('users', 'users.id = sales_order_export.user_id', 'left')
+            ->join('companies', 'companies.id = sales_order_export.company_id', 'left')
+            ->join('barang_master_sales', 'barang_master_sales.id = sales_contract_detail.barang_master_sales_id', 'left')
             ->where($condition);
 
         if (!empty($addCondition['search'])) {
@@ -158,6 +176,7 @@ class SalesOrderExportDetailModel extends Model
                 ->orLike('customers.name', $addCondition['search'])
                 ->orLike('users.name', $addCondition['search'])
                 ->orLike('sales_order_export.container', $addCondition['search'])
+                ->orLike('barang_master_sales.barang_name', $addCondition['search'])
                 ->groupEnd();
         }
 
@@ -175,6 +194,14 @@ class SalesOrderExportDetailModel extends Model
 
         if (!empty($addCondition['dateEnd'])) {
             $grandTotalQry->where('actualy_shipment_date <=', $addCondition['dateEnd']);
+        }
+
+        if (!empty($addCondition['user_id'])) {
+            $grandTotalQry->where('sales_order_export.user_id', $addCondition['user_id']);
+        }
+
+        if (!empty($addCondition['company_id'])) {
+            $grandTotalQry->where('sales_order_export.company_id', $addCondition['company_id']);
         }
 
         $grandTotal = $grandTotalQry->get()->getRowArray();

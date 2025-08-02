@@ -61,6 +61,7 @@ class SalesOrderExportModel extends Model
                         sales_contract.dicharge_port,
                         sales_contract.shipment_date,
                         customers.name AS customer_name,
+                        companies.company,
                         divisis.divisi";
         $salesDataQry = $this->asObject()
             ->select($selectQry)
@@ -68,6 +69,7 @@ class SalesOrderExportModel extends Model
             ->join('sales_contract', 'sales_contract.id = sales_order_export.sales_contract_id', 'left')
             ->join('customers', 'customers.id = sales_contract.customer_id', 'left')
             ->join('divisis', 'divisis.id = sales_order_export.divisi_id', 'left')
+            ->join('companies', 'companies.id = sales_order_export.user_id', 'left')
             ->orderBy($sort, $sortType);
 
         $totalData = $salesDataQry->countAllResults(false);
@@ -132,7 +134,8 @@ class SalesOrderExportModel extends Model
             'sales_order_export.actualy_shipment_date'  => 'sales_order_export.actualy_shipment_date',
             'sales_order_export.shipment_value'         => 'sales_order_export.shipment_value',
             'sales_order_export.shipment_value_net'     => 'sales_order_export.shipment_value_net',
-            'sales_order_export.valas_id'               => 'sales_order_export.valas_id'
+            'sales_order_export.deadline'               => 'sales_order_export.deadline',
+            'sales_order_export.company_id'             => 'sales_order_export.company_id'
 
         ];
 
@@ -142,6 +145,7 @@ class SalesOrderExportModel extends Model
         $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'DESC';
 
         $selectQry = "sales_order_export.*, 
+                        companies.company,
                         metadata.value AS valas_name,
                         users.name AS acc_holder,
                         customers.name AS customer_name,
@@ -152,6 +156,7 @@ class SalesOrderExportModel extends Model
         $salesDataQry = $this->asObject()
             ->select($selectQry)
             ->where($condition)
+            ->join('companies', 'sales_order_export.company_id = companies.id', 'left')
             ->join('sales_contract', 'sales_contract.id = sales_order_export.sales_contract_id', 'left')
             ->join('customers', 'customers.id = sales_contract.customer_id', 'left')
             ->join('sales_order_detail_export', 'sales_order_detail_export.sales_order_export_id = sales_order_export.sales_order_export_id', 'left')
@@ -186,6 +191,18 @@ class SalesOrderExportModel extends Model
             $salesDataQry->groupEnd();
         }
 
+        if ($addCondition['company_id']) {
+            $salesDataQry->groupStart();
+            $salesDataQry->where('sales_order_export.company_id', $addCondition['company_id']);
+            $salesDataQry->groupEnd();
+        }
+
+        if ($addCondition['user_id']) {
+            $salesDataQry->groupStart();
+            $salesDataQry->where('sales_order_export.user_id', $addCondition['user_id']);
+            $salesDataQry->groupEnd();
+        }
+
         if (!empty($addCondition['dateStart']) || !empty($addCondition['dateEnd'])) {
             $salesDataQry->groupStart();
             if (!empty($addCondition['dateStart'])) {
@@ -208,6 +225,7 @@ class SalesOrderExportModel extends Model
             SUM(sales_order_export.shipment_value) AS total_shipment_value_all,
             SUM(sales_order_export.shipment_value_net) AS total_shipment_value_net_all
         ')
+            ->join('companies', 'sales_order_export.company_id = companies.id', 'left')
             ->join('sales_contract', 'sales_contract.id = sales_order_export.sales_contract_id', 'left')
             ->join('customers', 'customers.id = sales_contract.customer_id', 'left')
             ->join('metadata', 'sales_order_export.valas_id = metadata.id', 'left')
@@ -225,6 +243,14 @@ class SalesOrderExportModel extends Model
                 ->orLike('sales_order_export.container', $addCondition['search'])
                 ->groupEnd();
         }
+
+        if ($addCondition['company_id']) {
+            $shipmentSum->where('sales_order_export.company_id', $addCondition['company_id']);
+        }
+
+        if ($addCondition['user_id']) {
+            $shipmentSum->where('sales_order_export.user_id', $addCondition['user_id']);
+        }
         if (!empty($addCondition['dateStart']) || !empty($addCondition['dateEnd'])) {
             $shipmentSum->groupStart();
             if (!empty($addCondition['dateStart'])) {
@@ -241,6 +267,7 @@ class SalesOrderExportModel extends Model
         // Hitung total_qty_convertion (boleh join detail)
         $qtySum = $this->db->table('sales_order_export')
             ->select('SUM(sales_order_detail_export.qty_convertion) AS total_qty_convertion_all')
+            ->join('companies', 'sales_order_export.company_id = companies.id', 'left')
             ->join('sales_contract', 'sales_contract.id = sales_order_export.sales_contract_id', 'left')
             ->join('customers', 'customers.id = sales_contract.customer_id', 'left')
             ->join('sales_order_detail_export', 'sales_order_detail_export.sales_order_export_id = sales_order_export.sales_order_export_id', 'left')
@@ -258,6 +285,14 @@ class SalesOrderExportModel extends Model
                 ->orLike('users.name', $addCondition['search'])
                 ->orLike('sales_order_export.container', $addCondition['search'])
                 ->groupEnd();
+        }
+
+        if ($addCondition['company_id']) {
+            $qtySum->where('sales_order_export.company_id', $addCondition['company_id']);
+        }
+
+        if ($addCondition['user_id']) {
+            $qtySum->where('sales_order_export.user_id', $addCondition['user_id']);
         }
         if (!empty($addCondition['dateStart']) || !empty($addCondition['dateEnd'])) {
             $qtySum->groupStart();
@@ -961,5 +996,22 @@ class SalesOrderExportModel extends Model
         }
 
         return $result;
+    }
+
+    public function getAccHolder()
+    {
+        $usersModel = new UserModel();
+        $userId = [];
+
+        $salesOrderExport = $this->asArray()
+            ->where('deletedAt', null)
+            ->findAll();
+
+        foreach ($salesOrderExport as $s) {
+            array_push($userId, $s['user_id']);
+        }
+
+        $user = $usersModel->whereIn('id', $userId)->orderBy('name', "asc")->findAll();
+        return $user;
     }
 }
