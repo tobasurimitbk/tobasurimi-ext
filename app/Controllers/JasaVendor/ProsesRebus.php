@@ -133,7 +133,7 @@ class ProsesRebus extends BaseController
             'tipeBarang' => $this->metaDataModel->where('deletedAt', null)->where('name', "Kategori Barang")->findAll(),
             'tanggal' => date('Y-m-d'),
             'divisi' => $this->divisiModel->getDivisiAccess(),
-            'supplier' => $this->supplierModel->getSupplierByType("BAHAN BAKU")
+            'supplier' => $this->supplierModel->getSupplierAll()
         ];
 
         return view('jasaVendor/prosesRebus/form', $data);
