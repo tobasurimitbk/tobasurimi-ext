@@ -135,7 +135,8 @@ class SalesOrderExportModel extends Model
             'sales_order_export.shipment_value'         => 'sales_order_export.shipment_value',
             'sales_order_export.shipment_value_net'     => 'sales_order_export.shipment_value_net',
             'sales_order_export.deadline'               => 'sales_order_export.deadline',
-            'sales_order_export.company_id'             => 'sales_order_export.company_id'
+            'sales_order_export.company_id'             => 'sales_order_export.company_id',
+            'sales_contract.tipe_harga'                 => 'sales_contract.tipe_harga'
 
         ];
 
@@ -146,6 +147,7 @@ class SalesOrderExportModel extends Model
 
         $selectQry = "sales_order_export.*, 
                         companies.company,
+                        sales_contract.tipe_harga,
                         metadata.value AS valas_name,
                         users.name AS acc_holder,
                         customers.name AS customer_name,

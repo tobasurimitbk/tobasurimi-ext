@@ -43,7 +43,7 @@ $routes->get('/403', function () {
     return view('errors/html/error_403');
 });
 
-// $routes->get('/jurnal-update-lpb', 'Warehouse\Penomoran_::repairJurnalUmumLpbBp');
+$routes->get('/update-ekspor', 'Warehouse\Penomoran_::generateShipmentValueOrderFormEkspor');
 // $routes->get('/delete-transaksi-jurnal', 'Accounting\TutupBuku\TutupBukuController::deleteTransaksiJurnalLama');
 // $routes->get('/update-transaksi-jurnal', 'Accounting\TutupBuku\TutupBukuController::updateTransaksiJurnalBahanBaku');
 
@@ -726,6 +726,10 @@ $routes->get('/report-ekspor/customer-export', 'SalesInternasional\ReportEkspor:
 $routes->get('/report-ekspor/items', 'SalesInternasional\ReportEkspor::indexByItems', ['filter' => 'Auth']);
 $routes->get('/report-ekspor/items-all', 'SalesInternasional\ReportEkspor::allByItems', ['filter' => 'Auth']);
 $routes->get('/report-ekspor/items-export', 'SalesInternasional\ReportEkspor::exportExcelByItems', ['filter' => 'Auth']);
+$routes->get('/report-ekspor/account-holder', 'SalesInternasional\ReportEkspor::indexAccountHolder', ['filter' => 'Auth']);
+$routes->get('/report-ekspor/account-holder-all', 'SalesInternasional\ReportEkspor::allByAccountHolder', ['filter' => 'Auth']);
+$routes->get('/report-ekspor/account-holder/id/(:segment)', 'SalesInternasional\ReportEkspor::detailByAccountHolder/$1', ['filter' => 'Auth']);
+$routes->get('/report-ekspor/account-holder-export', 'SalesInternasional\ReportEkspor::exportExcelByAccountHolder', ['filter' => 'Auth']);
 
 
 

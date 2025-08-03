@@ -486,11 +486,13 @@
                                 'packing' => ['label' => 'Packing', 'width' => '8%'],
                                 'can' => ['label' => 'Can', 'width' => '7%'],
                                 'cased' => ['label' => 'Case', 'width' => '7%'],
+                                'case' => ['label' => 'Case', 'width' => '7%'],
                                 'kg' => ['label' => 'Kg', 'width' => '7%'],
                                 'lb' => ['label' => 'LB', 'width' => '7%'],
                                 'inner_box' => ['label' => 'Inner', 'width' => '8%'],
                                 'pc' => ['label' => 'PC', 'width' => '7%'],
                                 'bag' => ['label' => 'Bag', 'width' => '7%'],
+                                'cup' => ['label' => 'Cup', 'width' => '6%'],
                                 'persen' => ['label' => '%', 'width' => '3%'],
                                 'remark' => ['label' => 'Remarks', 'width' => '10%'],
                                 'palet' => ['label' => 'Pallet', 'width' => '10%']
