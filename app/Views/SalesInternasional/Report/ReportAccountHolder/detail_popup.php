@@ -1,24 +1,27 @@
-<?= $this->extend('layouts/template'); ?>
+<?= $this->extend('layouts/template-new-window'); ?>
 <?= $this->Section('content'); ?>
-
 <section class="section">
     <div class="section-header">
-        <h1>Report By Customer</h1>
-
-        <div class="col-button-tambah-spp">
-            <a class="btn btn-warning btn-print float-right text-white" onclick="exportExcel()">
-                <i class="fa-solid fa-print"></i> Export
-            </a>
-            <a class="btn btn-hide-form btn-discard float-right " href="<?= base_url("report-ekspor"); ?>">
-                Back
-            </a>
-        </div>
-
+        <h1>DETAIL BY ACCOUNT HOLDERS</h1>
+        <button onclick="exportExcel()" style="right: 10px;" class="btn btn-discard btn-dropdown-export float-right" type="button" aria-expanded="false">
+            <i class="fa-solid fa-print"></i> Export
+        </button>
     </div>
     <div class="card">
         <div class="card-body">
+
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="form-floating mb-3" style="height: 50px;">
+                        <input disabled autocomplete="one-time-code" value="<?= $user['name']  ?>" type="text" class="form-control ">
+                        <label for="floatingInput">Account Holder</label>
+                    </div>
+                </div>
+
+            </div>
+
             <div class="row mb-3">
-                <div class="col-md-2">
+                <div class="col-md-3">
                     <div class="input-group">
                         <div class="form-floating" style="height: 50px;">
                             <input placeholder="" class="form-control dateStart" id="dateStart" name="dateStart" aria-label="Floating label select example" />
@@ -31,7 +34,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-md-2">
+                <div class="col-md-3">
                     <div class="input-group">
                         <div class="form-floating" style="height: 50px;">
                             <input placeholder="" class="form-control dateEnd" id="dateEnd" name="dateEnd" aria-label="Floating label select example" />
@@ -44,7 +47,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-md-2">
+                <div class="col-md-3">
                     <div class="form-floating mb-3">
                         <select class="form-select customer_id" name="customer_id" id="customer_id">
                             <option value="" data-code=""></option>
@@ -57,7 +60,20 @@
                         <label style="z-index: 1;">Select Customer</label>
                     </div>
                 </div>
-                <div class="col-md-2">
+                <div class="col-md-3">
+                    <div class="form-floating mb-3">
+                        <select class="form-select barang_master_sales_id" name="barang_master_sales_id" id="barang_master_sales_id">
+                            <option value="" data-code=""></option>
+                            <?php foreach ($dataBarangSales as $d): ?>
+                                <option value="<?= $d['id'] ?>">
+                                    <?= $d['barang_name'] ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                        <label style="z-index: 1;">Select Items</label>
+                    </div>
+                </div>
+                <div class="col-md-3">
                     <div class="form-floating mb-3">
                         <select class="form-select user_id" name="user_id" id="user_id">
                             <option value="" data-code=""></option>
@@ -70,7 +86,7 @@
                         <label style="z-index: 1;">Select Acc Holder</label>
                     </div>
                 </div>
-                <div class="col-md-2">
+                <div class="col-md-3">
                     <div class="form-floating mb-3">
                         <select class="form-select company_id" name="company_id" id="company_id">
                             <option value="" data-code=""></option>
@@ -83,10 +99,10 @@
                         <label style="z-index: 1;">Select Plant</label>
                     </div>
                 </div>
-                <div class="col-md-2">
+                <div class="col-md-3">
                     <div class="form-floating" style="height: 50px;">
                         <input placeholder="" class="form-control search" id="search" name="search" aria-label="Floating label select example" />
-                        <label style="z-index: 1;" style="z-index: 1;">Search</label>
+                        <label style="z-index: 1;" style="z-index: 1;">Cari Data</label>
                     </div>
                 </div>
             </div>
@@ -96,21 +112,22 @@
                         <thead class="thead-dark">
                             <tr style="text-align: center;">
                                 <th style="text-align:left; width:10px;" onclick="changeSort('sales_order_export.sales_order_export_id')">No</th>
-                                <th style="text-align:left;" onclick="changeSort('sales_order_export.user_id')">Acc Holder</th>
+                                <!-- <th style="text-align:left;" onclick="changeSort('sales_order_export.user_id')">Acc Holder</th> -->
                                 <th style="text-align:left;" onclick="changeSort('sales_order_export.sales_order_export_no')">Order Form No</th>
-                                <th style="text-align:left;" onclick="changeSort('sales_order_export.customer_id')">Customer</th>
+                                <th style="text-align:left;" onclick="changeSort('sales_contract.customer_id')">Customer</th>
                                 <th style="text-align:left;" onclick="changeSort('sales_order_export.container')">Container</th>
                                 <th style="text-align:left;" onclick="changeSort('sales_order_export.actualy_shipment_date')">Actualy Shipment Date</th>
                                 <th style="text-align:left;" onclick="changeSort('sales_order_export.deadline')">Deadline</th>
-                                <th style="text-align:left;">Qty (Kg)</th>
+                                <th style="text-align:left;" onclick="changeSort('sales_contract.dicharge_port')">Destination</th>
                                 <th style="text-align:left;" onclick="changeSort('sales_order_export.company_id')">Plant</th>
+                                <th style="text-align:left;" onclick="changeSort('sales_contract_detail.barang_master_sales_id')">Product</th>
+                                <th style="text-align:left;">Qty Order Form</th>
+                                <th style="text-align:left;">Qty (Kg)</th>
                                 <th style="text-align:left;" onclick="changeSort('sales_order_export.valas_id')">Valas</th>
-                                <th style="text-align:left;" onclick="changeSort('sales_order_export.shipment_value')">Amount</th>
-                                <th style="text-align:left;" onclick="changeSort('sales_order_export.shipment_value_net')">Value Net</th>
+                                <th style="text-align:left;">Amount</th>
                                 <th style="text-align:left;" onclick="changeSort('sales_contract.tipe_harga')">Price Type</th>
                                 <th style="text-align:left;">OF</th>
                                 <th style="text-align:left;">SC</th>
-
                             </tr>
                         </thead>
                         <tbody class="body-table" id="body-table">
@@ -118,12 +135,10 @@
                         </tbody>
                         <tfoot>
                             <tr>
-                                <th colspan="7" class="text-right">GRAND TOTAL</th>
+                                <th colspan="10" class="text-right">GRAND TOTAL</th>
                                 <th class="text-left totalQtyConvertion"></th>
                                 <th></th>
-                                <th></th>
-                                <th class="text-left totalShipmentValue"></th>
-                                <th class="text-left totalShipmentValueNet"></th>
+                                <th class="text-left amountValue"></th>
                                 <th></th>
                                 <th></th>
                                 <th></th>
@@ -144,7 +159,7 @@
         processing: true,
         serverSide: true,
         ajax: {
-            url: "<?= base_url('report-ekspor/customer-all') ?>",
+            url: "<?= base_url('report-ekspor/items-all') ?>",
             type: 'GET',
             dataSrc: "data",
             data: function(data) {
@@ -152,7 +167,8 @@
                 data.dateEnd = $('.dateEnd').val();
                 data.search = $('.search').val();
                 data.customer_id = $('.customer_id').val();
-                data.user_id = $('.user_id').val();
+                data.barang_master_sales_id = $('.barang_master_sales_id').val();
+                data.user_id = "<?= $user['id'] ?>";
                 data.company_id = $('.company_id').val();
                 data.sort = sort;
                 data.sortType = sortType;
@@ -170,9 +186,9 @@
                 data: 'no',
                 width: "2%"
             },
-            {
-                data: 'acc_holder'
-            },
+            // {
+            //     data: 'acc_holder'
+            // },
             {
                 data: 'sales_order_export_no'
             },
@@ -186,7 +202,21 @@
                 data: 'actualy_shipment_date'
             },
             {
-                data: 'deadline'
+                data: 'deadline',
+            },
+            {
+                data: 'dicharge_port',
+            },
+            {
+                data: 'company',
+            },
+            {
+                data: 'barang_name',
+            },
+            {
+                data: 'total_qty',
+                searchable: false,
+                sortable: false,
             },
             {
                 data: 'total_qty_convertion',
@@ -197,25 +227,16 @@
                 }
             },
             {
-                data: 'company'
-            },
-            {
                 data: 'valas'
             },
             {
-                data: 'shipment_value',
+                data: 'amount_value',
                 render: function(data) {
                     return greatFormatRupiah(data)
                 }
             },
             {
-                data: 'shipment_value_net',
-                render: function(data) {
-                    return greatFormatRupiah(data)
-                }
-            },
-            {
-                data: 'tipe_harga'
+                data: 'price_type',
             },
             {
                 data: 'id',
@@ -271,8 +292,7 @@
 
             if (total) {
                 $('.totalQtyConvertion').html(greatFormatRupiah(total.totalQtyConvertion));
-                $('.totalShipmentValue').html(greatFormatRupiah(total.totalShipmentValue));
-                $('.totalShipmentValueNet').html(greatFormatRupiah(total.totalShipmentValueNet));
+                $('.amountValue').html(greatFormatRupiah(total.amountValue));
             }
         },
     });
@@ -293,6 +313,14 @@
         table.ajax.reload();
     });
 
+    $('#barang_master_sales_id').select2({
+        placeholder: "Select Items",
+        theme: "bootstrap-5",
+        allowClear: true
+    }).on('change select2:clear', function() {
+        table.ajax.reload();
+    });
+
     $('#company_id').select2({
         placeholder: "Select Plant",
         theme: "bootstrap-5",
@@ -301,7 +329,7 @@
         table.ajax.reload();
     });
 
-    $('#customer_id,#dateStart,#dateEnd,#user_id').change(function() {
+    $('#customer_id,#dateStart,#dateEnd,#barang_master_sales_id,#user_id,#company_id').change(function() {
         table.ajax.reload();
     });
 
@@ -309,7 +337,7 @@
         table.ajax.reload();
     })
 
-    $("#customer_id,#user_id,#company_id")
+    $("#customer_id,#barang_master_sales_id,#user_id,#company_id")
         .parent('div')
         .children('span')
         .children('span')
@@ -328,21 +356,19 @@
         var dateStart = $('#dateStart').val();
         var dateEnd = $('#dateEnd').val();
         var customerId = $('#customer_id option:selected').val();
-        var userId = $('#user_id option:selected').val();
+        var barangMasterSalesId = $('#barang_master_sales_id option:selected').val();
+        var userId = "<?= $user['id'] ?>";
         var companyId = $('#company_id option:selected').val();
         var search = $('#search').val();
 
-        window.open('<?= base_url('report-ekspor/customer-export') ?>?dateStart=' +
-            dateStart + '&dateEnd=' +
-            dateEnd + '&customer_id=' +
-            customerId + '&user_id=' + userId +
-            '&company_id=' + companyId + '&search=' + search
+        window.open('<?= base_url('report-ekspor/items-export') ?>?dateStart=' +
+            dateStart + '&dateEnd=' + dateEnd +
+            '&customer_id=' + customerId +
+            '&barang_master_sales_id=' + barangMasterSalesId +
+            '&user_id=' + userId +
+            '&company_id=' + companyId +
+            '&search=' + search
         );
-
-        // if (dateStart == '' || dateEnd == '') {
-        //     alert('Tanggal mulai & Tanggal Akhir wajib diisi');
-        // } else {}
-
     }
 
     const printOF = function(id) {
@@ -364,6 +390,4 @@
         }
     }
 </script>
-
-
 <?= $this->endSection(); ?>

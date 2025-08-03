@@ -118,6 +118,7 @@
                                 <th style="text-align:left;" onclick="changeSort('sales_contract.dicharge_port')">Destination</th>
                                 <th style="text-align:left;" onclick="changeSort('sales_order_export.company_id')">Plant</th>
                                 <th style="text-align:left;" onclick="changeSort('sales_contract_detail.barang_master_sales_id')">Product</th>
+                                <th style="text-align:left;">Qty Order Form</th>
                                 <th style="text-align:left;">Qty (Kg)</th>
                                 <th style="text-align:left;" onclick="changeSort('sales_order_export.valas_id')">Valas</th>
                                 <th style="text-align:left;">Amount</th>
@@ -131,7 +132,7 @@
                         </tbody>
                         <tfoot>
                             <tr>
-                                <th colspan="10" class="text-right">GRAND TOTAL</th>
+                                <th colspan="11" class="text-right">GRAND TOTAL</th>
                                 <th class="text-left totalQtyConvertion"></th>
                                 <th></th>
                                 <th class="text-left amountValue"></th>
@@ -210,6 +211,11 @@
                 data: 'barang_name',
             },
             {
+                data: 'total_qty',
+                searchable: false,
+                sortable: false,
+            },
+            {
                 data: 'total_qty_convertion',
                 searchable: false,
                 sortable: false,
@@ -249,7 +255,7 @@
                 searchable: false,
                 sortable: false,
                 render: function(data, type, row) {
-                    let id = row.id;
+                    let id = row.sales_contract_id;
                     return `
                             <button data-toggle="tooltip" title="Print" class="btn btn-warning btn-print" onclick="printSC('${id}')" style="box-shadow: none !important;">
                                 <i class="fa fa-print fa-sm" aria-hidden="true"></i>
@@ -357,7 +363,7 @@
             '&customer_id=' + customerId +
             '&barang_master_sales_id=' + barangMasterSalesId +
             '&user_id=' + userId +
-            '&company_id=' + userId +
+            '&company_id=' + companyId +
             '&search=' + search
         );
     }
