@@ -74,12 +74,14 @@ class SalesOrderDetailModel extends Model
                       sales_order_detail.tax AS tax,
                       sales_order_detail.amount AS amount,
                       sales_order_detail.id_sales_order,
-                      sales_order_detail.harga_barang AS harga_barang";
+                      sales_order_detail.harga_barang AS harga_barang,
+                      sales_order.id_company";
 
         $datas = $this->asObject()
             ->select($selectQry)
             ->join('barang_master_sales', 'barang_master_sales.id = sales_order_detail.id_barang AND barang_master_sales.deletedAt IS NULL')
             ->join('satuans', 'satuans.id = barang_master_sales.satuan_id', 'LEFT')
+            ->join('sales_order', 'sales_order.id = sales_order_detail.id_sales_order', 'LEFT')
             // ->where('qty_sekarang !=', 0)
             ->where('tipe_input', 'order_form')
             ->whereIn('id_sales_order', $ids)

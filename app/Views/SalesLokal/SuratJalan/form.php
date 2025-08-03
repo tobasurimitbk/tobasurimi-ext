@@ -405,7 +405,7 @@
                             const amount = parseFloat(row.amount)
                             const disc = parseFloat(row.disc)
                             const discUnit = row.discUnit
-                            console.log(discUnit);
+                            console.log(row);
                             // row.amount = discUnit == 'percent' ? (amount * (100 - disc)) / 100 : amount - disc
                         })
                         table.clear();

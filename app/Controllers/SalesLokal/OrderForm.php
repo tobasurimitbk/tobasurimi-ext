@@ -914,7 +914,7 @@ class OrderForm extends BaseController
         echo json_encode($data);
     }
 
-    public function getItemListbyIds()
+    public function getItemListByIds()
     {
         $ids = $this->request->getGet('ids');
 

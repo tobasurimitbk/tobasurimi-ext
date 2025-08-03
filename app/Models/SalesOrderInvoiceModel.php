@@ -144,8 +144,8 @@ class SalesOrderInvoiceModel extends Model
 
         $totalFilteredData = $salesOrderInvoiceLokal->countAllResults(false);
 
-        if ($limit && $offset) {
-            $data = $salesOrderInvoiceLokal->findAll($limit, $offset);
+        if ($limit !== null && $offset !== null) {
+            $data = $salesOrderInvoiceLokal->findAll((int)$limit, (int)$offset);
         } else {
             $data = $salesOrderInvoiceLokal->findAll();
         }
