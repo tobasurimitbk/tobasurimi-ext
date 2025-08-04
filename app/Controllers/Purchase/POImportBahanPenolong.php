@@ -76,9 +76,9 @@ class POImportBahanPenolong extends BaseController
         $company = $this->companyModel->find($this->this_company_id);
 
         if ($this->this_company_id == 1) {
-            $consigneName = strtoupper($company['holding_company']) . " (PLANT 1)";
+            $consigneName = strtoupper(str_ireplace(', Tbk', '', $company['holding_company'])) . " (PLANT 1)";
         } else {
-            $consigneName = strtoupper($company['holding_company']);
+            $consigneName = strtoupper(str_ireplace(', Tbk', '', $company['holding_company']));
         }
 
         $data = [
