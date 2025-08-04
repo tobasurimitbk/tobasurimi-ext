@@ -349,7 +349,7 @@
                             } else {
                                 jenis_penjualanan_name = "";
                             }
-                            $(".id_so").append(`<option  value="${item.id}" data-jenis_penjualan="${jenis_penjualanan_name}"  data-no_po="${item.no_po}" data-nama_ecommerce="${item.nama_ecommerce}" data-termin="${item.customerTermin}" data-sales="${item.salesName}">${item.no_sales_order}</option>`);
+                            $(".id_so").append(`<option  value="${item.id}" data-jenis_penjualan="${jenis_penjualanan_name}"  data-no_po="${item.no_po}" data-nama_ecommerce="${item.nama_ecommerce}" data-termin="${item.customerTermin}" data-sales="${item.salesName}" data-company="${item.id_company}">${item.no_sales_order}</option>`);
                         });
 
                         $('#tagihan_ke').val(res.customerData.address);
@@ -372,6 +372,7 @@
             let termin = $this.find("option:selected").data("termin");
             let sales = $this.find("option:selected").data("sales");
             let no_po = $this.find("option:selected").data("no_po");
+            let company = $this.find("option:selected").data("company");
 
             let jenis_penjualan = $this.find("option:selected").data("jenis_penjualan");
             let nama_ecommerce = $this.find("option:selected").data("nama_ecommerce");
@@ -384,6 +385,9 @@
             }
             if (no_po) {
                 $('#no_po').val(no_po);
+            }
+            if (company) {
+                $('#company_id').val(company).change();
             }
 
             $('#jenis_penjualan').val(jenis_penjualan);

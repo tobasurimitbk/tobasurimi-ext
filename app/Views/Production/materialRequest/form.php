@@ -402,28 +402,30 @@
                                         <th style="text-align: center;">Departemen / Warehouse Tujuan</th>
                                         <th style="text-align: center;">Supplier / Vendor</th>
                                         <th style="text-align: center;">No PO / No VBM</th>
-                                        <!-- <th style="text-align: center;">Tipe Barang</th> -->
-                                        <!-- <th style="text-align: center;">Dokumen Pabean</th> -->
-                                        <!-- <th style="text-align: center;">No Aju / No Daftar</th> -->
                                         <th style="text-align: center;">Tgl PO / Tgl Vendor Masuk</th>
                                         <th style="text-align: center;">Barang - Spesifikasi</th>
                                         <th style="text-align: center;">Satuan</th>
                                         <th style="text-align: center;">Qty Awal</th>
                                         <th style="text-align: center;">Qty Direquest</th>
-                                        <!-- <th style="text-align: center;">Qty Sortir</th> -->
                                         <th style="text-align: center;">Action</th>
                                     </tr>
                                 </thead>
                                 <tbody class="body-table">
                                 </tbody>
+                                <tfoot class="footer-table">
+                                    <td style="text-align: center; font-weight: bold;" colspan="8">Total</td>
+                                    <td style="text-align: right; font-weight: bold;"><span class="nilai-total-bahan-baku-awal">0</span></td>
+                                    <td style="text-align: right; font-weight: bold;"><span class="nilai-total-bahan-baku-request">0</span></td>
+                                    <td style="text-align: right; font-weight: bold;"></td>
+                                </tfoot>
                             </table>
                         </div>
                     </div>
-                    <div class="row mt-3">
+                    <!-- <div class="row mt-3">
                         <div class="col-md-6">
-                            <label class="form-label font-weight-bold total-bahan-baku-request">Total Bahan Baku Request : <span class="nilai-total-bahan-baku-request">0</span></label>
+                            <label class="form-label font-weight-bold total-bahan-baku-request">Total Bahan Baku Request : </label>
                         </div>
-                    </div>
+                    </div> -->
                 </div>
                 <div class="tab-pane fade" id="profile1" role="tabpanel" aria-labelledby="profile-tab">
                     <div class="row mt-3">
@@ -447,14 +449,20 @@
                                 </thead>
                                 <tbody class="body-table">
                                 </tbody>
+                                <tfoot class="footer-table">
+                                    <td style="text-align: center; font-weight: bold;" colspan="9">Total</td>
+                                    <td style="text-align: right; font-weight: bold;"><span class="nilai-total-barang-scrap-awal">0</span></td>
+                                    <td style="text-align: right; font-weight: bold;"><span class="nilai-total-barang-scrap-request">0</span></td>
+                                    <td style="text-align: right; font-weight: bold;"></td>
+                                </tfoot>
                             </table>
                         </div>
                     </div>
-                    <div class="row mt-3">
+                    <!-- <div class="row mt-3">
                         <div class="col-md-6">
                             <label class="form-label font-weight-bold total-barang-scrap-request">Total Barang Scrap Request : <span class="nilai-total-barang-scrap-request">0</span></label>
                         </div>
-                    </div>
+                    </div> -->
                 </div>
                 <div class="tab-pane fade" id="contact2" role="tabpanel" aria-labelledby="contact-tab">
                     <div class="row mt-3">
@@ -478,14 +486,20 @@
                                 </thead>
                                 <tbody class="body-table">
                                 </tbody>
+                                <tfoot class="footer-table">
+                                    <td style="text-align: center; font-weight: bold;" colspan="9">Total</td>
+                                    <td style="text-align: right; font-weight: bold;"><span class="nilai-total-barang-setengah-jadi-awal">0</span></td>
+                                    <td style="text-align: right; font-weight: bold;"><span class="nilai-total-barang-setengah-jadi-request">0</span></td>
+                                    <td style="text-align: right; font-weight: bold;"></td>
+                                </tfoot>
                             </table>
                         </div>
                     </div>
-                    <div class="row mt-3">
+                    <!-- <div class="row mt-3">
                         <div class="col-md-6">
                             <label class="form-label font-weight-bold total-barang-setengah-jadi-request">Total Barang Setengah Jadi Request : <span class="nilai-total-barang-setengah-jadi-request">0</span></label>
                         </div>
-                    </div>
+                    </div> -->
                 </div>
                 <div class="tab-pane fade" id="contact1" role="tabpanel" aria-labelledby="contact-tab">
                     <div class="row mt-3">
@@ -510,14 +524,21 @@
                                 </thead>
                                 <tbody class="body-table">
                                 </tbody>
+                                <tfoot class="footer-table">
+                                    <td style="text-align: center; font-weight: bold;" colspan="9">Total</td>
+                                    <td style="text-align: right; font-weight: bold;"><span class="nilai-total-barang-jadi-awal">0</span></td>
+                                    <td style="text-align: right; font-weight: bold;"><span class="nilai-total-barang-jadi-request">0</span></td>
+                                    <td style="text-align: right; font-weight: bold;"><span class="nilai-total-isi-barang-jadi-request">0</span></td>
+                                    <td style="text-align: right; font-weight: bold;"></td>
+                                </tfoot>
                             </table>
                         </div>
                     </div>
-                    <div class="row mt-3">
+                    <!-- <div class="row mt-3">
                         <div class="col-md-6">
                             <label class="form-label font-weight-bold total-barang-jadi-request">Total Barang Jadi Request : <span class="nilai-total-barang-jadi-request">0</span></label>
                         </div>
-                    </div>
+                    </div> -->
                 </div>
             </div>
 
@@ -543,139 +564,88 @@
 
     <?php if (!empty($dataMaterialRequestDetailsBahanBaku)): ?>
         <?php foreach ($dataMaterialRequestDetailsBahanBaku as $materialRequestDetails): ?>
-            listStockSelectedBahanBaku.push({
-                id: '<?= $materialRequestDetails['id'] ?>',
-                id_material_request_detail: undefined,
-                stock_detail_id: '<?= $materialRequestDetails['stock_detail_id'] ?>',
-                supplier_id: '<?= $materialRequestDetails['supplier_id'] ?>',
-                harga_umum: '<?= $materialRequestDetails['harga_umum'] ?>',
-                harga_harian: '<?= $materialRequestDetails['harga_harian'] ?>',
-                harga_bulanan: '<?= $materialRequestDetails['harga_bulanan'] ?>',
-                keterangan: '',
-                barang: '<?= $materialRequestDetails['barang'] ?>',
-                bc_id: '<?= $materialRequestDetails['bc_id'] ?>',
-                bc_type: '<?= $materialRequestDetails['bc_type'] ?>',
-                departmentID: '<?= $materialRequestDetails['divisi_id'] ?>',
-                departmentText: '<?= $materialRequestDetails['divisi_asal_text'] ?>',
-                departmentTujuanText: '<?= $materialRequestDetails['divisi_tujuan_text'] ?>',
-                departmentTujuanID: '<?= $materialRequestDetails['divisi_tujuan_id'] ?>',
-                warehouseTujuanID: '<?= $materialRequestDetails['warehouse_tujuan_id']  ?>',
-                no_aju: '<?= $materialRequestDetails['no_aju'] ?>',
-                no_dokumen_1: '-',
-                no_dokumen_2: '-',
-                qty: '<?= floatval($materialRequestDetails['qty']) ?>',
-                qty2: '<?= floatval($materialRequestDetails['qty2']) ?>',
-                qty_isi: '<?= floatval($materialRequestDetails['qty_isi']) ?>',
-                satuan: '<?= $materialRequestDetails['kode_satuan'] ?>',
-                stock_date: '<?= $materialRequestDetails['stock_date'] ?>',
-                stock_dokumen: '<?= $materialRequestDetails['stock_dokumen'] ?>',
-                stock_id: '<?= $materialRequestDetails['stock_id'] ?>',
-                stok_total: '<?= floatval($materialRequestDetails['stok_total']) ?>',
-                supplier_name: '<?= $materialRequestDetails['supplier_name'] ?>',
-                type_barang: '<?= $materialRequestDetails['type_barang'] ?>',
-                type_barang_text: '<?= $materialRequestDetails['type_barang_text'] ?>',
-                warehouseID: '<?= $materialRequestDetails['warehouse_id'] ?>',
-                warehouseText: '<?= $materialRequestDetails['warehouse_asal_text'] ?>',
-                warehouseTujuanText: '<?= $materialRequestDetails['warehouse_tujuan_text'] ?>',
-                no_daftar: '<?= $materialRequestDetails['no_daftar'] ?>'
-            });
+            listStockSelectedBahanBaku.push(<?= json_encode([
+                'id' => $materialRequestDetails['id'],
+                'id_material_request_detail' => null,
+                'stock_detail_id' => $materialRequestDetails['stock_detail_id'],
+                'supplier_id' => $materialRequestDetails['supplier_id'],
+                'harga_umum' => $materialRequestDetails['harga_umum'],
+                'harga_harian' => $materialRequestDetails['harga_harian'],
+                'harga_bulanan' => $materialRequestDetails['harga_bulanan'],
+                'keterangan' => '',
+                'barang' => $materialRequestDetails['barang'],
+                'bc_id' => $materialRequestDetails['bc_id'],
+                'bc_type' => $materialRequestDetails['bc_type'],
+                'departmentID' => $materialRequestDetails['divisi_id'],
+                'departmentText' => $materialRequestDetails['divisi_asal_text'],
+                'departmentTujuanText' => $materialRequestDetails['divisi_tujuan_text'],
+                'departmentTujuanID' => $materialRequestDetails['divisi_tujuan_id'],
+                'warehouseTujuanID' => $materialRequestDetails['warehouse_tujuan_id'],
+                'no_aju' => $materialRequestDetails['no_aju'],
+                'no_dokumen_1' => '-',
+                'no_dokumen_2' => '-',
+                'qty' => floatval($materialRequestDetails['qty']),
+                'qty2' => floatval($materialRequestDetails['qty2']),
+                'qty_isi' => floatval($materialRequestDetails['qty_isi']),
+                'satuan' => $materialRequestDetails['kode_satuan'],
+                'stock_date' => $materialRequestDetails['stock_date'],
+                'stock_dokumen' => $materialRequestDetails['stock_dokumen'],
+                'stock_id' => $materialRequestDetails['stock_id'],
+                'stok_total' => floatval($materialRequestDetails['stok_total']),
+                'supplier_name' => $materialRequestDetails['supplier_name'],
+                'type_barang' => $materialRequestDetails['type_barang'],
+                'type_barang_text' => $materialRequestDetails['type_barang_text'],
+                'warehouseID' => $materialRequestDetails['warehouse_id'],
+                'warehouseText' => $materialRequestDetails['warehouse_asal_text'],
+                'warehouseTujuanText' => $materialRequestDetails['warehouse_tujuan_text'],
+                'no_daftar' => $materialRequestDetails['no_daftar'],
+            ]) ?>);
         <?php endforeach; ?>
     <?php endif; ?>
 
-    <?php if (!empty($dataMaterialRequestDetails)) : ?>
-        <?php foreach ($dataMaterialRequestDetails as $materialRequestDetails) : ?>
-            <?php if ($materialRequestDetails->barang_type == "bahan_setengah_jadi") { ?>
-                listStockSelectedBahanSetengahJadi.push({
-                    id_material_request_detail: '<?= $materialRequestDetails->id ?>',
-                    barang: '<?= $materialRequestDetails->nama_barang ?>',
-                    bc_id: '<?= $materialRequestDetails->bc_id ?>',
-                    bc_type: '<?= $materialRequestDetails->ref_no ?>',
-                    departmentID: '<?= $materialRequestDetails->divisi_id ?>',
-                    departmentText: '<?= $materialRequestDetails->divisi_asal_text ?>',
-                    departmentTujuanText: '<?= $materialRequestDetails->divisi_tujuan_text ?>',
-                    departmentTujuanID: '<?= $materialRequestDetails->divisi_tujuan_id ?>',
-                    warehouseTujuanID: '<?= $materialRequestDetails->warehouse_tujuan_id ?>',
-                    no_aju: '<?= $materialRequestDetails->no_aju ?>',
-                    no_dokumen_1: '-',
-                    no_dokumen_2: '-',
-                    qty: '<?= floatval($materialRequestDetails->qty) ?>',
-                    qty2: '<?= floatval($materialRequestDetails->qty2) ?>',
-                    qty_isi: '<?= floatval($materialRequestDetails->qty_isi) ?>',
-                    satuan: '<?= $materialRequestDetails->kode_satuan ?>',
-                    stock_date: '<?= date('d/m/Y', strtotime($materialRequestDetails->stock_date)) ?>',
-                    stock_dokumen: '<?= $materialRequestDetails->stock_dokumen ?>',
-                    stock_id: '<?= $materialRequestDetails->stock_id ?>',
-                    stok_total: '<?= floatval($materialRequestDetails->qty) ?>',
-                    supplier_name: '-',
-                    type_barang: '<?= $materialRequestDetails->barang_type ?>',
-                    type_barang_text: '<?= $materialRequestDetails->barang_type_text ?>',
-                    warehouseID: '<?= $materialRequestDetails->warehouse_id ?>',
-                    warehouseText: '<?= $materialRequestDetails->warehouse_tujuan_text ?>',
-                    warehouseTujuanText: '<?= $materialRequestDetails->warehouse_tujuan_text ?>',
-                    no_daftar: '<?= $materialRequestDetails->no_daftar ?>'
-                });
-            <?php } elseif ($materialRequestDetails->barang_type == "bahan_jadi") { ?>
-                listStockSelectedBahanJadi.push({
-                    id_material_request_detail: '<?= $materialRequestDetails->id ?>',
-                    barang: '<?= $materialRequestDetails->nama_barang ?>',
-                    bc_id: '<?= $materialRequestDetails->bc_id ?>',
-                    bc_type: '<?= $materialRequestDetails->ref_no ?>',
-                    departmentID: '<?= $materialRequestDetails->divisi_id ?>',
-                    departmentText: '<?= $materialRequestDetails->divisi_asal_text ?>',
-                    departmentTujuanText: '<?= $materialRequestDetails->divisi_tujuan_text ?>',
-                    departmentTujuanID: '<?= $materialRequestDetails->divisi_tujuan_id ?>',
-                    warehouseTujuanID: '<?= $materialRequestDetails->warehouse_tujuan_id ?>',
-                    no_aju: '<?= $materialRequestDetails->no_aju ?>',
-                    no_dokumen_1: '-',
-                    no_dokumen_2: '-',
-                    qty: '<?= floatval($materialRequestDetails->qty) ?>',
-                    qty2: '<?= floatval($materialRequestDetails->qty2) ?>',
-                    qty_isi: '<?= floatval($materialRequestDetails->qty_isi) ?>',
-                    satuan: '<?= $materialRequestDetails->kode_satuan ?>',
-                    stock_date: '<?= date('d/m/Y', strtotime($materialRequestDetails->stock_date)) ?>',
-                    stock_dokumen: '<?= $materialRequestDetails->stock_dokumen ?>',
-                    stock_id: '<?= $materialRequestDetails->stock_id ?>',
-                    stok_total: '<?= floatval($materialRequestDetails->qty) ?>',
-                    supplier_name: '-',
-                    type_barang: '<?= $materialRequestDetails->barang_type ?>',
-                    type_barang_text: '<?= $materialRequestDetails->barang_type_text ?>',
-                    warehouseID: '<?= $materialRequestDetails->warehouse_id ?>',
-                    warehouseText: '<?= $materialRequestDetails->warehouse_tujuan_text ?>',
-                    warehouseTujuanText: '<?= $materialRequestDetails->warehouse_tujuan_text ?>',
-                    no_daftar: '<?= $materialRequestDetails->no_daftar ?>'
-                });
-            <?php } elseif ($materialRequestDetails->barang_type == "bahan_scrap") { ?>
-                listStockSelectedBahan.push({
-                    id_material_request_detail: '<?= $materialRequestDetails->id ?>',
-                    barang: '<?= $materialRequestDetails->nama_barang ?>',
-                    bc_id: '<?= $materialRequestDetails->bc_id ?>',
-                    bc_type: '<?= $materialRequestDetails->ref_no ?>',
-                    departmentID: '<?= $materialRequestDetails->divisi_id ?>',
-                    departmentText: '<?= $materialRequestDetails->divisi_asal_text ?>',
-                    departmentTujuanText: '<?= $materialRequestDetails->divisi_tujuan_text ?>',
-                    departmentTujuanID: '<?= $materialRequestDetails->divisi_tujuan_id ?>',
-                    warehouseTujuanID: '<?= $materialRequestDetails->warehouse_tujuan_id ?>',
-                    no_aju: '<?= $materialRequestDetails->no_aju ?>',
-                    no_dokumen_1: '-',
-                    no_dokumen_2: '-',
-                    qty: '<?= floatval($materialRequestDetails->qty) ?>',
-                    qty2: '<?= floatval($materialRequestDetails->qty2) ?>',
-                    qty_isi: '<?= floatval($materialRequestDetails->qty_isi) ?>',
-                    satuan: '<?= $materialRequestDetails->kode_satuan ?>',
-                    stock_date: '<?= date('d/m/Y', strtotime($materialRequestDetails->stock_date)) ?>',
-                    stock_dokumen: '<?= $materialRequestDetails->stock_dokumen ?>',
-                    stock_id: '<?= $materialRequestDetails->stock_id ?>',
-                    stok_total: '<?= floatval($materialRequestDetails->qty) ?>',
-                    supplier_name: '-',
-                    type_barang: '<?= $materialRequestDetails->barang_type ?>',
-                    type_barang_text: '<?= $materialRequestDetails->barang_type_text ?>',
-                    warehouseID: '<?= $materialRequestDetails->warehouse_id ?>',
-                    warehouseText: '<?= $materialRequestDetails->warehouse_tujuan_text ?>',
-                    warehouseTujuanText: '<?= $materialRequestDetails->warehouse_tujuan_text ?>',
-                    no_daftar: '<?= $materialRequestDetails->no_daftar ?>'
-                });
-            <?php } ?>
+    <?php if (!empty($dataMaterialRequestDetails)): ?>
+        <?php foreach ($dataMaterialRequestDetails as $materialRequestDetails): ?>
+            <?php
+                $item = [
+                    'id_material_request_detail' => $materialRequestDetails->id,
+                    'barang' => $materialRequestDetails->nama_barang,
+                    'bc_id' => $materialRequestDetails->bc_id,
+                    'bc_type' => $materialRequestDetails->ref_no,
+                    'departmentID' => $materialRequestDetails->divisi_id,
+                    'departmentText' => $materialRequestDetails->divisi_asal_text,
+                    'departmentTujuanText' => $materialRequestDetails->divisi_tujuan_text,
+                    'departmentTujuanID' => $materialRequestDetails->divisi_tujuan_id,
+                    'warehouseTujuanID' => $materialRequestDetails->warehouse_tujuan_id,
+                    'no_aju' => $materialRequestDetails->no_aju,
+                    'no_dokumen_1' => '-',
+                    'no_dokumen_2' => '-',
+                    'qty' => floatval($materialRequestDetails->qty),
+                    'qty2' => floatval($materialRequestDetails->qty2),
+                    'qty_isi' => floatval($materialRequestDetails->qty_isi),
+                    'satuan' => $materialRequestDetails->kode_satuan,
+                    'stock_date' => date('d/m/Y', strtotime($materialRequestDetails->stock_date)),
+                    'stock_dokumen' => $materialRequestDetails->stock_dokumen,
+                    'stock_id' => $materialRequestDetails->stock_id,
+                    'stok_total' => floatval($materialRequestDetails->qty),
+                    'supplier_name' => '-',
+                    'type_barang' => $materialRequestDetails->barang_type,
+                    'type_barang_text' => $materialRequestDetails->barang_type_text,
+                    'warehouseID' => $materialRequestDetails->warehouse_id,
+                    'warehouseText' => $materialRequestDetails->warehouse_tujuan_text,
+                    'warehouseTujuanText' => $materialRequestDetails->warehouse_tujuan_text,
+                    'no_daftar' => $materialRequestDetails->no_daftar,
+                ];
+            ?>
+
+            <?php if ($materialRequestDetails->barang_type == 'bahan_setengah_jadi'): ?>
+                listStockSelectedBahanSetengahJadi.push(<?= json_encode($item) ?>);
+            <?php elseif ($materialRequestDetails->barang_type == 'bahan_jadi'): ?>
+                listStockSelectedBahanJadi.push(<?= json_encode($item) ?>);
+            <?php elseif ($materialRequestDetails->barang_type == 'bahan_scrap'): ?>
+                listStockSelectedBahan.push(<?= json_encode($item) ?>);
+            <?php endif; ?>
         <?php endforeach; ?>
+
         drawTableSelectedItemBahanBaku(listStockSelectedBahanBaku);
         drawTableSelectedItemBahan(listStockSelectedBahan);
         drawTableSelectedItemBahanSetengahJadi(listStockSelectedBahanSetengahJadi);
@@ -1054,7 +1024,7 @@
                 $.each(listStockSelectedBahanBaku, function(i, v) {
                     if (parseFloat(listStockSelectedBahanBaku[i].qty2) > parseFloat(listStockSelectedBahanBaku[i].stok_total) || isNaN(listStockSelectedBahanBaku[i].qty2) || listStockSelectedBahanBaku[i].qty2 == undefined || parseFloat(listStockSelectedBahanBaku[i].qty2) == 0) {
                         dataError = listStockSelectedBahanBaku[i];
-                        console.log("Kesini", listStockSelectedBahanBaku[i]);
+                        // console.log("Kesini", listStockSelectedBahanBaku[i]);
                         isValid = false;
                     }
                 });
@@ -1062,7 +1032,7 @@
                 $.each(listStockSelectedBahan, function(i, v) {
                     if (parseFloat(listStockSelectedBahan[i].qty2) > parseFloat(listStockSelectedBahan[i].stok_total) || isNaN(listStockSelectedBahan[i].qty2) || listStockSelectedBahan[i].qty2 == undefined || parseFloat(listStockSelectedBahan[i].qty2) == 0) {
                         dataError = listStockSelectedBahan[i];
-                        console.log("Kesin2");
+                        // console.log("Kesin2");
 
                         isValid = false;
                     }
@@ -1071,7 +1041,7 @@
                 $.each(listStockSelectedBahanSetengahJadi, function(i, v) {
                     if (parseFloat(listStockSelectedBahanSetengahJadi[i].qty2) > parseFloat(listStockSelectedBahanSetengahJadi[i].stok_total) || isNaN(listStockSelectedBahanSetengahJadi[i].qty2) || listStockSelectedBahanSetengahJadi[i].qty2 == undefined || parseFloat(listStockSelectedBahanSetengahJadi[i].qty2) == 0) {
                         dataError = listStockSelectedBahanSetengahJadi[i];
-                        console.log("Kesin3");
+                        // console.log("Kesin3");
 
                         isValid = false;
                     }
@@ -1080,13 +1050,13 @@
                 $.each(listStockSelectedBahanJadi, function(i, v) {
                     if (parseFloat(listStockSelectedBahanJadi[i].qty2) > parseFloat(listStockSelectedBahanJadi[i].stok_total) || isNaN(listStockSelectedBahanJadi[i].qty2) || listStockSelectedBahanJadi[i].qty2 == undefined || parseFloat(listStockSelectedBahanJadi[i].qty2) == 0 || isNaN(listStockSelectedBahanJadi[i].qty_isi) || listStockSelectedBahanJadi[i].qty_isi == undefined || parseFloat(listStockSelectedBahanJadi[i].qty_isi) == 0) {
                         dataError = listStockSelectedBahanJadi[i];
-                        console.log("Kesin4");
+                        // console.log("Kesin4");
 
                         isValid = false;
                     }
                 });
 
-                console.log(listStockSelectedBahanBaku, listStockSelectedBahan);
+                // console.log(listStockSelectedBahanBaku, listStockSelectedBahan);
 
 
                 if (!isValid) {
@@ -1312,7 +1282,7 @@
             dataType: "json",
             success: function(res) {
                 // LIST STOK PER BC
-                console.log(res.data);
+                // console.log(res.data);
                 listStockAsal = [];
                 listStockAsal = res.data;
                 drawTableAsalBarang(res.data);
@@ -1367,7 +1337,7 @@
     }
 
     const posting = function(id, status_posting) {
-        console.log(id);
+        // console.log(id);
         Swal.fire({
             icon: 'question',
             title: status_posting == "1" ? "Yakin Akan Diposting ?" : "Yakin Akan di Unposting ?",
@@ -1396,7 +1366,7 @@
                     dataType: "json",
                     success: function(response) {
                         csrf.val(response.token);
-                        console.log(response);
+                        // console.log(response);
 
                         if (response.status) {
                             Swal.fire({
@@ -1586,7 +1556,7 @@
             var currentID = v.id;
 
             if (listStockAsal[i].type_barang == "bahan_baku") {
-                console.log(currentID, dataIds);
+                // console.log(currentID, dataIds);
 
                 if ($.inArray(currentID, dataIds) !== -1) {
                     var isIDSelected = $.grep(listStockSelectedBahanBaku, function(item) {
@@ -1965,10 +1935,15 @@
 
     function updateTotalQtyRequest() {
         var totalQty = 0;
+        var totalQtyAwal = 0;
+        console.log(listStockSelectedBahanBaku);
+        
         $.each(listStockSelectedBahanBaku, function(i, v) {
+            totalQtyAwal += parseFloat(listStockSelectedBahanBaku[i].stok_total) || 0;
             totalQty += parseFloat(listStockSelectedBahanBaku[i].qty2) || 0;
         });
         $('.nilai-total-bahan-baku-request').text(greatFormatRupiah(totalQty.toFixed(4)));
+        $('.nilai-total-bahan-baku-awal').text(greatFormatRupiah(totalQtyAwal.toFixed(4)));
     }
 
     function drawTableSelectedItemBahanSetengahJadi(data) {
@@ -2050,10 +2025,13 @@
     }
 
     function updateTotalQtyRequestSetengahJadi() {
+        var totalQtyAwal = 0;
         var totalQty = 0;
         $.each(listStockSelectedBahanSetengahJadi, function(i, v) {
+            totalQtyAwal += parseFloat(listStockSelectedBahanSetengahJadi[i].stok_total) || 0;
             totalQty += parseFloat(listStockSelectedBahanSetengahJadi[i].qty2) || 0;
         });
+        $('.nilai-total-barang-setengah-jadi-awal').text(greatFormatRupiah(totalQtyAwal));
         $('.nilai-total-barang-setengah-jadi-request').text(greatFormatRupiah(totalQty));
     }
 
@@ -2137,9 +2115,12 @@
 
     function updateTotalQtyRequestScrap() {
         var totalQty = 0;
+        var totalQtyAwal = 0;
         $.each(listStockSelectedBahan, function(i, v) {
+            totalQtyAwal += parseFloat(listStockSelectedBahan[i].stok_total) || 0;
             totalQty += parseFloat(listStockSelectedBahan[i].qty2) || 0;
         });
+        $('.nilai-total-barang-scrap-awal').text(greatFormatRupiah(totalQtyAwal));
         $('.nilai-total-barang-scrap-request').text(greatFormatRupiah(totalQty));
     }
 
@@ -2229,11 +2210,19 @@
     }
 
     function updateTotalQtyRequestJadi() {
+        var totalQtyAwal = 0;
         var totalQty = 0;
+        var totalQtyIsi = 0;
+        console.log(listStockSelectedBahanJadi);
+        
         $.each(listStockSelectedBahanJadi, function(i, v) {
+            totalQtyAwal += parseFloat(listStockSelectedBahanJadi[i].stok_total) || 0;
             totalQty += parseFloat(listStockSelectedBahanJadi[i].qty2) || 0;
+            totalQtyIsi += parseFloat(listStockSelectedBahanJadi[i].qty_isi) || 0;
         });
+        $('.nilai-total-barang-jadi-awal').text(greatFormatRupiah(totalQtyAwal));
         $('.nilai-total-barang-jadi-request').text(greatFormatRupiah(totalQty));
+        $('.nilai-total-isi-barang-jadi-request').text(greatFormatRupiah(totalQtyIsi));
     }
 
     function getIDListDataSelected() {
@@ -2259,7 +2248,7 @@
             }
         }
         if (iddetail) {
-            console.log(iddetail);
+            // console.log(iddetail);
             Swal.fire({
                 icon: 'question',
                 title: 'Yakin akan di hapus?',
@@ -2319,7 +2308,7 @@
             }
         }
         if (iddetail) {
-            console.log(iddetail);
+            // console.log(iddetail);
             Swal.fire({
                 icon: 'question',
                 title: 'Yakin akan di hapus?',
@@ -2379,7 +2368,7 @@
             }
         }
         if (iddetail) {
-            console.log(iddetail);
+            // console.log(iddetail);
             Swal.fire({
                 icon: 'question',
                 title: 'Yakin akan di hapus?',
@@ -2439,7 +2428,7 @@
             }
         }
         if (iddetail) {
-            console.log(iddetail);
+            // console.log(iddetail);
             Swal.fire({
                 icon: 'question',
                 title: 'Yakin akan di hapus?',
@@ -2683,8 +2672,9 @@
                 stock_id: $(".spesifikasi_id option:selected").data('stock_id'),
                 supplier_id: $(".supplier_id option:selected").val(),
                 vendor_id: $('.vendor_barang_id option:selected').val(),
-                divisi_asal_bahan_baku_id: $(".divisi_asal_bahan_baku_id").val(),
-                warehouse_asal_bahan_baku_id: $(".warehouse_asal_bahan_baku_id").val()
+                divisi_asal_bahan_baku_id: $(".divisi_asal_bahan_baku_id option:selected").val(),
+                warehouse_asal_bahan_baku_id: $(".warehouse_asal_bahan_baku_id option:selected").val(),
+                type_asal_barang: $(".type_asal_barang option:selected").val()
             },
             dataType: "json",
             success: function(res) {

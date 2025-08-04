@@ -993,7 +993,7 @@ class Invoice extends BaseController
 
         if ($documentType === 'pesanan') {
             $documentList = $this->SalesOrderModel->asObject()
-                ->select('sales_order.id, sales_order.no_sales_order AS doc_no')
+                ->select('sales_order.id, sales_order.no_sales_order AS doc_no, sales_order.id_company')
                 ->join('sales_order_detail', 'sales_order_detail.id_sales_order = sales_order.id')
                 ->where('sales_order.id_customer', $customer_id)
                 ->where('sales_order.surat_jalan_so_id', NULL)
@@ -1002,7 +1002,7 @@ class Invoice extends BaseController
                 ->groupBy('sales_order.no_sales_order');
         } else { // pengiriman
             $documentList = $this->SuratJalanModel->asObject()
-                ->select('surat_jalan_so.id, surat_jalan_so.no_surat_jalan AS doc_no')
+                ->select('surat_jalan_so.id, surat_jalan_so.no_surat_jalan AS doc_no, surat_jalan_so.id_company')
                 ->join('sales_order', 'sales_order.surat_jalan_so_id = surat_jalan_so.id', 'left')
                 ->join('sales_order_detail', 'sales_order_detail.id_sales_order = sales_order.id')
                 ->where('sales_order.id_customer', $customer_id)
@@ -1050,10 +1050,11 @@ class Invoice extends BaseController
                 customers.name AS customerName, 
                 customers.address AS customerAddress, 
                 CONCAT(employees.nip , ' - ', employees.name) AS salesName, 
-                metadata.id AS termin")
+                metadata.id AS termin,
+                customers.termin as termin_id")
                 ->join('customers', 'customers.id = sales_order.id_customer', 'left')
                 ->join('employees', 'employees.id = sales_order.sales_id', 'left')
-                ->join('metadata', 'metadata.id = sales_order.payment_terms', 'left')
+                ->join('metadata', 'metadata.id = customers.termin', 'left')
                 ->where('sales_order.id', $docId)
                 ->where('sales_order.posting', 1)
                 ->first();
@@ -1073,13 +1074,14 @@ class Invoice extends BaseController
                           customers.name AS customerName, 
                           customers.address AS customerAddress,  
                           CONCAT(employees.nip , ' - ', employees.name) AS salesName, 
-                          metadata.id AS termin";
+                          metadata.id AS termin,
+                          customers.termin as termin_id";
             $suratJalanData = $this->SuratJalanModel->asObject()
                 ->select($selectQry)
                 ->join('customers', 'customers.id = surat_jalan_so.id_customer', 'left')
                 ->join('sales_order', 'sales_order.surat_jalan_so_id = surat_jalan_so.id', 'left')
                 ->join('employees', 'employees.id = sales_order.sales_id', 'left')
-                ->join('metadata', 'metadata.id = sales_order.payment_terms', 'left')
+                ->join('metadata', 'metadata.id = customers.termin', 'left')
                 ->where('surat_jalan_so.id', $docId)
                 ->where('surat_jalan_so.posting', 1)
                 ->first();
@@ -1098,11 +1100,12 @@ class Invoice extends BaseController
                             sales_order_invoice.nama_ecommerce, 
                             customers.name AS customerName, 
                             customers.address AS customerAddress, 
-                            metadata.id AS termin";
+                            metadata.id AS termin,
+                            customers.termin as termin_id";
             $soData = $this->SalesOrderInvoiceModel->asObject()
                 ->select($selectQry)
                 ->join('customers', 'customers.id = sales_order_invoice.id_customer', 'left')
-                ->join('metadata', 'metadata.id = sales_order_invoice.terms', 'left')
+                ->join('metadata', 'metadata.id = customers.termin', 'left')
                 ->where('sales_order_invoice.id', $docId)
                 ->first();
 

@@ -1494,17 +1494,26 @@ class MaterialRequest extends BaseController
         $vendorId = $this->request->getVar('vendor_id');
         $divisiAsalId = $this->request->getVar('divisi_asal_bahan_baku_id');
         $warehouseAsalId = $this->request->getVar('warehouse_asal_bahan_baku_id');
+        $typeAsalBarang = $this->request->getVar('type_asal_barang');
+        
+        if ((!empty($this->request->getVar('stock_id')) || !empty($this->request->getVar('barang_master_id'))) || !empty($typeAsalBarang)) {
 
-        if ((!empty($this->request->getVar('stock_id')) || !empty($this->request->getVar('barang_master_id'))) && (!empty($supplierId) || !empty($vendorId))) {
-
-            if (!empty($supplierId) && !empty($barangMasterId)) {
+            if (!empty($typeAsalBarang) && $typeAsalBarang == "SUPPLIER") {
+                if (!empty($supplierId)) {
                 // Untuk Dari Po & Supplier
-                $condition = [
-                    'stock.divisi_id' => $divisiAsalId,
-                    'stock.warehouse_id' => $warehouseAsalId,
-                    'stock_details2.supplier_id' => $this->request->getVar('supplier_id'),
-                    'stock.barang1_id' => $barangMasterId,
-                ];
+                    $condition = [
+                        'stock.divisi_id' => $divisiAsalId,
+                        'stock.warehouse_id' => $warehouseAsalId,
+                        'stock_details2.supplier_id' => $this->request->getVar('supplier_id'),
+                        'stock.barang1_id' => $barangMasterId,
+                    ];
+                }else{
+                    $condition = [
+                        'stock.divisi_id' => $divisiAsalId,
+                        'stock.warehouse_id' => $warehouseAsalId,
+                        'stock.barang1_id' => $barangMasterId,
+                    ];
+                }
 
                 $dataResult = $this->stockDetail2Model->getStockListMaterialRequestFromLpb(
                     $condition
