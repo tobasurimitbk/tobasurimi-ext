@@ -67,7 +67,7 @@
     <?php include('header.php') ?>
     <div class="root-form-view">
         <div class="card">
-            <div class="card-header" style="font-weight: bold; color:black;">
+            <div class="card-header" style="font-weight: bold;">
                 BC 3.0 - PEMBERITAHUAN EKSPOR BARANG
             </div>
             <div class="card-body">

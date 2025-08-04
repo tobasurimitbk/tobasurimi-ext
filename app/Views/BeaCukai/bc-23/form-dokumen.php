@@ -10,7 +10,7 @@
 <section class="section section-form">
     <?php include('header.php') ?>
     <div class="card">
-        <div class="card-header" style="font-weight: bold; color:black;">
+        <div class="card-header" style="font-weight: bold;">
             BC 2.3 - PEMBERITAHUAN IMPOR BARANG UNTUK DITIMBUN DI TEMPAT PENIMBUNAN BERIKAT
         </div>
         <?= csrf_field() ?>

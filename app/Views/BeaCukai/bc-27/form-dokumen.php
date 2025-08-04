@@ -10,7 +10,7 @@
 <section class="section section-form">
     <?php include('header.php') ?>
     <div class="card">
-        <div class="card-header" style="font-weight: bold; color:black;">
+        <div class="card-header" style="font-weight: bold;">
             BC 2.7 - PEMBERITAHUAN PENGELUARAN UNTUK DIANGKUT DARI TEMPAT PENIMBUNAN BERIKAT KE TEMPAT PENIMBUNAN BERIKAT LAINNYA
         </div>
         <?= csrf_field() ?>

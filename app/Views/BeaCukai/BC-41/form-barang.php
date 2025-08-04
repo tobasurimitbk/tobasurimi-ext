@@ -14,7 +14,7 @@
 
     include('header.php') ?>
     <div class="card">
-        <div class="card-header" style="font-weight: bold; color:black;">
+        <div class="card-header" style="font-weight: bold;">
             BC 4.1 - PEMBERITAHUAN PENGELUARAN KEMBALI BARANG ASAL TEMPAT LAIN DALAM DAERAH PABEAN DARI TEMPAT PENIMBUNAN BERIKAT
         </div>
         <div class="card-body">

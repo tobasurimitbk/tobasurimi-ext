@@ -16,7 +16,7 @@
         <div class="col-sm-12 mt-1">
             <div class="card">
                 <form class="create-form" method="post">
-                    <div class="card-header" style="font-weight: bold; color:black;">
+                    <div class="card-header" style="font-weight: bold;">
                         AKUN CEISA PERUSAHAAN
                     </div>
                     <?= csrf_field() ?>

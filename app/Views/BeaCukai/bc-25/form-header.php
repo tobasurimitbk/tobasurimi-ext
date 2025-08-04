@@ -11,7 +11,7 @@
     <?php include_once('header.php') ?>
     <div class="root-form-view">
         <div class="card">
-            <div class="card-header" style="font-weight: bold; color:black;">
+            <div class="card-header" style="font-weight: bold;">
                 BC 2.5 - PEMBERITAHUAN IMPOR BARANG DARI TEMPAT PENIMBUNAN BERIKAT
             </div>
             <div class="card-body">

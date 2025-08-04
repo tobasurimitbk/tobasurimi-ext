@@ -786,7 +786,7 @@
                 table.find('tbody').append(newRow);
             });
 
-            var newRow = $('<tr style="color:whitesmoke;');
+            var newRow = $('<tr>');
             newRow.append($('<td style="text-align: right;" colspan="8">').html("<b>GRAND TOTAL</b>"));
             newRow.append($('<td style="text-align:center;">').text(greatFormatRupiah(totalQtyPo.toFixed(2))));
             newRow.append($('<td style="text-align:center;">').text(greatFormatRupiah(totalQtyDiterima.toFixed(2))));
