@@ -82,7 +82,7 @@
                                 if (!empty($dataCustomers)) {
                                     foreach ($dataCustomers as $customer) {
                                 ?>
-                                        <option value="<?= $customer['id']; ?>" <?= !empty($data) ? ($data->id_customer === $customer['id'] ? "selected" : "") : ""; ?>><?= $customer['name']; ?></option>
+                                        <option value="<?= $customer['id']; ?>" <?= !empty($data) ? ($data->id_customer === $customer['id'] ? "selected" : "") : ""; ?> data-termin="<?= $customer['termin']; ?>" data-address="<?= $customer['address']; ?>" data-sales="<?= $customer['salesNama']; ?>" data-jenispenjualan="<?= $customer['jenis_penjualan']; ?>"><?= $customer['name']; ?></option>
                                 <?php
                                     }
                                 }
@@ -121,12 +121,9 @@
                         </div>
                     </div>
 
-
-
-
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input type="text" class="form-control" id="customerAddress" value="<?= $documentData->customerAddress ?? '' ?>">
+                            <input type="text" class="form-control" id="customerAddress" value="<?= $documentData->customerAddress ?? '' ?>" readonly>
                             <label for="floatingInput">Alamat Konsumen</label>
                         </div>
                     </div>
@@ -163,7 +160,7 @@
 
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input type="text" class="form-control" id="salesName" value="<?= $documentData->salesName ?? '' ?>">
+                            <input type="text" class="form-control" id="salesName" value="<?= $documentData->salesName ?? '' ?>" readonly>
                             <label for="floatingInput">Nama Sales</label>
                         </div>
                     </div>
@@ -172,7 +169,7 @@
                 <div class="row">
                     <div class="col-md-4 nama_ecommerce_div">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" type="text" class="form-control nama_ecommerce" id="nama_ecommerce" name="nama_ecommerce" value="<?= $data->nama_ecommerce ?? ''; ?>">
+                            <input autocomplete="one-time-code" type="text" class="form-control nama_ecommerce" id="nama_ecommerce" name="nama_ecommerce" value="<?= $data->nama_ecommerce ?? ''; ?>" readonly>
                             <label for="floatingInput">Nama Ecommerce</label>
                         </div>
                     </div>
@@ -677,9 +674,20 @@
         }).change(function() {
 
             let customerId = $('.id_customer option:selected').val();
+            let customerTermin = $('.id_customer option:selected').data('termin');
+            let customerAddress = $('.id_customer option:selected').data('address');
+            let jenisPenjualan = $('.id_customer option:selected').data('jenispenjualan');
+            let customerSales = $('.id_customer option:selected').data('sales');
             let docType = $('#doc_type option:selected').val();
 
+            console.log(customerId, customerTermin, customerAddress, jenisPenjualan, customerSales);
+
             getDocumentList(docType, customerId);
+
+            $('#termin').val(customerTermin).change();
+            $('#customerAddress').val(customerAddress);
+            $('#jenis_penjualan').val(jenisPenjualan).change();
+            $('#salesName').val(customerSales);
         });
 
         $("#tanggal_faktur").datepicker({
@@ -797,7 +805,7 @@
                         success: function(res) {
                             $("#doc_id").empty();
                             res.data.forEach(function(item) {
-                                $("#doc_id").append(`<option value="${item.id}">${item.doc_no}</option>`);
+                                $("#doc_id").append(`<option value="${item.id}" data-company="${item.id_company}">${item.doc_no}</option>`);
                             });
                             $("#doc_id").trigger('change');
                         }
@@ -840,6 +848,11 @@
         }).change(function() {
 
             var selectedDocs = $(this).val();
+            let company = $(this).find("option:selected").data("company");
+
+            if (company) {
+                $('#company_ids').val(company).change();
+            }
 
             <?php if (!empty($data)) : ?>
                 <?php if (isset($data->document_id)) : ?>
@@ -880,14 +893,10 @@
                     method: "GET",
                     dataType: "json",
                     success: function(res) {
+                        console.log(res);
+
                         // Populate the form fields with document data
-                        $('#salesName').val(res.salesName);
-                        $('#customerName').val(res.customerName);
-                        $('#customerAddress').val(res.customerAddress);
-                        $('#nama_ecommerce').val(res.nama_ecommerce);
                         $('#no_po').val(res.no_po);
-                        $('#termin').val(res.termin).change();
-                        $('#jenis_penjualan').val(res.jenis_penjualan).change();
                         // Add items to list_items array
                         res.itemList.forEach(function(item) {
                             list_items.push(item);
@@ -1030,7 +1039,7 @@
         var noDocument = $('#doc_id option:selected').text()
         isValid = true;
 
-        console.log(list_items);
+        // console.log(list_items);
 
 
         $.each(list_items, function(i, v) {
@@ -1247,7 +1256,7 @@
         let taxTotalHtml = 0;
         let grandTotal = 0;
 
-        console.log(list_items);
+        // console.log(list_items);
 
 
         list_items.forEach((obj) => {

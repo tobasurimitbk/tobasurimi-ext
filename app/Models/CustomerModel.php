@@ -385,7 +385,8 @@ class CustomerModel extends Model
     public function getCustomerLokal($user_id, $is_admin)
     {
         $query = $this->asArray()
-            ->select('customers.*, customers.sales_id AS salesName')
+            ->select('customers.*, customers.sales_id AS salesName, employees.name as salesNama')
+            ->join('employees', 'employees.id = customers.sales_id', 'left')
             ->where('customers.deletedAt', null)
             ->where('customers.tipe_customer', 'LOKAL');
 
