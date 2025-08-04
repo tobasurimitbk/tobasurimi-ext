@@ -149,7 +149,13 @@ class BC40Model extends Model
 
     public function get($bcPurchaseOrderID)
     {
-        return $this->asArray()->where('bc_purchase_order_id', $bcPurchaseOrderID)->where('deletedAt', null)->first();
+        return $this->asArray()
+            ->select('bc_40.*,suppliers.name,suppliers.no_npwp,suppliers.address')
+            ->join('bc_purchase_order', 'bc_40.bc_purchase_order_id = bc_purchase_order.id', 'left')
+            ->join('suppliers', 'suppliers.id = bc_purchase_order.supplier_id', 'left')
+            ->where('bc_purchase_order_id', $bcPurchaseOrderID)
+            ->where('bc_40.deletedAt', null)
+            ->first();
     }
 
     public function isCompleteFormHeader($bcPurchaseOrderID)

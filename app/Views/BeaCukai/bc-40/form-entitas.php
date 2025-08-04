@@ -82,19 +82,19 @@
                             <div class="mt-1">
                                 <div class="mt-1">
                                     <div class="form-floating mb-3">
-                                        <input id="pengirim_npwp" value="<?= $bcEntitas != null ? $bcEntitas['npwp_pemasok'] : '' ?>" name="pengirim_npwp" type="number" class="form-control pengirim_npwp" placeholder="">
+                                        <input id="pengirim_npwp" value="<?= $bcEntitas != null ? $bcEntitas['npwp_pemasok'] : $bc40['no_npwp'] ?>" name="pengirim_npwp" type="number" class="form-control pengirim_npwp" placeholder="">
                                         <label>NPWP</label>
                                     </div>
                                 </div>
                                 <div class="mt-1">
                                     <div class="form-floating mb-3">
-                                        <input id="pengirim_nama" value="<?= $bcEntitas != null ? $bcEntitas['nama_pemasok'] : '' ?>" name="pengirim_nama" type="text" class="form-control pengirim_nama" placeholder="">
+                                        <input id="pengirim_nama" value="<?= $bcEntitas != null ? $bcEntitas['nama_pemasok'] : $bc40['name']  ?>" name="pengirim_nama" type="text" class="form-control pengirim_nama" placeholder="">
                                         <label>Nama</label>
                                     </div>
                                 </div>
                                 <div class="mt-1">
                                     <div class="form-floating mb-3">
-                                        <textarea name="pengirim_alamat" id="pengirim_alamat" class="form-control pengirim_alamat" style="height: 100px;"><?= $bcEntitas != null ? $bcEntitas['alamat_pemasok'] : '' ?></textarea>
+                                        <textarea name="pengirim_alamat" id="pengirim_alamat" class="form-control pengirim_alamat" style="height: 100px;"><?= $bcEntitas != null ? $bcEntitas['alamat_pemasok'] : $bc40['address']  ?></textarea>
                                         <label>Alamat</label>
                                     </div>
                                 </div>
