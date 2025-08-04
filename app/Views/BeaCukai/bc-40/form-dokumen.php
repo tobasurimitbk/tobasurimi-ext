@@ -10,7 +10,7 @@
 <section class="section section-form">
     <?php include('header.php') ?>
     <div class="card">
-        <div class="card-header" style="font-weight: bold; color:black;">
+        <div class="card-header" style="font-weight: bold;">
             BC 4.0 - PEMBERITAHUAN PEMASUKAN BARANG ASAL TEMPAT LAIN DALAM DAERAH PABEAN KE TEMPAT PENIMBUNAN BERIKAT
         </div>
         <?= csrf_field() ?>

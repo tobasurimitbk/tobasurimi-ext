@@ -11,7 +11,7 @@
 
     <?php include('header.php') ?>
     <div class="card">
-        <div class="card-header" style="font-weight: bold; color:black;">
+        <div class="card-header" style="font-weight: bold;">
             BC 4.0 - PEMBERITAHUAN PEMASUKAN BARANG ASAL TEMPAT LAIN DALAM DAERAH PABEAN KE TEMPAT PENIMBUNAN BERIKAT
         </div>
         <div class="card-body">
@@ -46,7 +46,7 @@
                         <tr style="color: black;">
                             <td width="150px"><b>Tgl LPB</b></td>
                             <td width="10px">:</td>
-                            <td><?= date('d/m/Y', strtotime($barangDetail['lpb_date'])) ?></td>
+                            <td><?= $barangDetail['lpb_date'] ?></td>
                         </tr>
                         <tr style="color: black; height: 20px;">
                             <td colspan="3"></td>
@@ -159,7 +159,7 @@
                             </label>
                             <div class="mt-1">
                                 <div class="form-floating mb-3">
-                                    <input value="<?= $barangDetail['qty_lpb'] ?>" readonly id="barang_detail_jumlah_satuan" name="barang_detail_jumlah_satuan" type="text" class="form-control barang_detail_jumlah_satuan" placeholder="">
+                                    <input value="<?= number_format($barangDetail['qty_lpb'], 2) ?>" readonly id="barang_detail_jumlah_satuan" name="barang_detail_jumlah_satuan" type="text" class="form-control barang_detail_jumlah_satuan" placeholder="">
                                     <label>Jumlah Satuan</label>
                                     <small><i>Jumlah diterima sesuai dengan LPB</i></small>
                                 </div>

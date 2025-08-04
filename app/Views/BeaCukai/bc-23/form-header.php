@@ -11,7 +11,7 @@
     <?php include('header.php') ?>
     <div class="root-form-view">
         <div class="card">
-            <div class="card-header" style="font-weight: bold; color:black;">
+            <div class="card-header" style="font-weight: bold;">
                 BC 2.3 - PEMBERITAHUAN IMPOR BARANG UNTUK DITIMBUN DI TEMPAT PENIMBUNAN BERIKAT
             </div>
             <div class="card-body">
@@ -59,7 +59,7 @@
                                     <label style="z-index: 1;">Pilih Kode Kantor Pabean Bongkar</label>
                                 </div>
                             </div>
-                           
+
                             <div class="mt-1">
                                 <div class="form-floating mb-3" style="height: 50px;">
                                     <select class="form-select header_kantor_pabean_pengawas" disabled id="header_kantor_pabean_pengawas" name="header_kantor_pabean_pengawas" aria-label="Floating label select example">
@@ -154,12 +154,12 @@
         ajax: { // Ganti $.ajax dengan ajax
             url: `<?= base_url("bea-cukai-bc-23/api/get-pelabuhan"); ?>`,
             method: "GET",
-            data: function (params) {
+            data: function(params) {
                 return {
                     header_kantor_pabean_bongkar: params.term // Mengambil input pengguna
                 };
             },
-            processResults: function (data) {
+            processResults: function(data) {
                 if (data.data.status === false) {
                     Swal.fire({
                         icon: 'error',
@@ -167,20 +167,26 @@
                         confirmButtonColor: '#4e73df',
                         confirmButtonText: 'Ok'
                     });
-                    return { results: [] }; // Mengembalikan hasil kosong jika ada error
+                    return {
+                        results: []
+                    }; // Mengembalikan hasil kosong jika ada error
                 } else {
-                    let results = $.map(data.data.data, function (v) {
+                    let results = $.map(data.data.data, function(v) {
                         return {
                             id: v.kodePelabuhan,
                             text: v.kodePelabuhan + ' - ' + v.namaPelabuhan
                         };
                     });
-                    return { results: results }; // Mengembalikan hasil yang diproses
+                    return {
+                        results: results
+                    }; // Mengembalikan hasil yang diproses
                 }
             },
-            error: function (xhr, status, error) {
+            error: function(xhr, status, error) {
                 console.error("AJAX Error: ", status, error);
-                return { results: [] }; // Mengembalikan hasil kosong saat error
+                return {
+                    results: []
+                }; // Mengembalikan hasil kosong saat error
             }
         }
     });

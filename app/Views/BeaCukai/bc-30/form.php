@@ -44,7 +44,7 @@
     </div>
 
     <div class="card">
-        <div class="card-header" style="font-weight: bold; color:black;">
+        <div class="card-header" style="font-weight: bold;">
             DATA BARANG UNTUK PEMBUATAN DOKUMEN BEA CUKAI 3.0
         </div>
         <div class="card-body">

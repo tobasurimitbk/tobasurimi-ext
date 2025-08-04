@@ -52,7 +52,7 @@
     </div>
     <form class="create-form">
         <div class="card">
-            <div class="card-header" style="font-weight: bold; color:black;">
+            <div class="card-header" style="font-weight: bold;">
                 DATA MUTASI PPBKB
             </div>
             <div class="card-body">

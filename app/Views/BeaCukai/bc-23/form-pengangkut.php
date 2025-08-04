@@ -11,7 +11,7 @@
     <?php include('header.php') ?>
     <div class="root-form-view">
         <div class="card">
-            <div class="card-header" style="font-weight: bold; color:black;">
+            <div class="card-header" style="font-weight: bold;">
                 BC 2.3 - PEMBERITAHUAN IMPOR BARANG UNTUK DITIMBUN DI TEMPAT PENIMBUNAN BERIKAT
             </div>
             <div class="card-body">
