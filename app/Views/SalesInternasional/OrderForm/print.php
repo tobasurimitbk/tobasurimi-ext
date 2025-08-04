@@ -175,11 +175,11 @@
                                 <td>:</td>
                                 <td><?= $dataSO->sales_contract_no ?></td>
                             </tr>
-                            <?php if (!empty($dataSO->customer_po_no)): ?>
+                            <?php if (!empty($dataSO->po_no)): ?>
                                 <tr style="text-align: right;">
                                     <td>PO NO</td>
                                     <td>:</td>
-                                    <td><?= $dataSO->customer_po_no ?></td>
+                                    <td><?= $dataSO->po_no ?></td>
                                 </tr>
                             <?php endif; ?>
                             <tr style="text-align: right;">

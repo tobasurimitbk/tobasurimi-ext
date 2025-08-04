@@ -207,8 +207,8 @@
 
                     <div class="col-md-4">
                         <div class="form-floating mb-3">
-                            <input autocomplete="one-time-code" type="text" class="form-control po_no" id="po_no" name="po_no" placeholder="PO Number" readonly value="<?= !empty($dataSalesExport) ? $dataSalesExport->customer_po_no : '' ?>">
-                            <label for="floatingInput">PO No</label>
+                            <input autocomplete="one-time-code" type="text" class="form-control po_no" id="po_no" name="po_no" placeholder="PO No (Opsional)" value="<?= !empty($dataSalesExport) ? $dataSalesExport->po_no : '' ?>">
+                            <label for="floatingInput">PO No (Opsional)</label>
                         </div>
                     </div>
                 </div>
