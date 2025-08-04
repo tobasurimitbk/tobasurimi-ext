@@ -191,7 +191,7 @@
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" <?= !empty($dataPOImport) ? ($dataPOImport->is_posted == "1" ? 'disabled=true' : '') : ''; ?> value="<?= !empty($dataPOImport) ? $dataPOImport->consigne : ""; ?>" type="text" class="form-control consigne" id="consigne" name="consigne" placeholder="Consigne (Opsional)">
+                            <input autocomplete="one-time-code" <?= !empty($dataPOImport) ? ($dataPOImport->is_posted == "1" ? 'disabled=true' : '') : ''; ?> value="<?= !empty($dataPOImport) ? $dataPOImport->consigne : $consigneName; ?>" type="text" class="form-control consigne" id="consigne" name="consigne" placeholder="Consigne (Opsional)">
                             <label for="floatingInput">Consigne (Opsional)</label>
                         </div>
                     </div>
