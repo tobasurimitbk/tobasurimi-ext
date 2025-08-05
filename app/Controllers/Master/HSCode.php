@@ -253,9 +253,9 @@ class HSCode extends BaseController
     {
         try {
             $rules = [
-                "komoditi" => [
-                    "rules" => "required"
-                ],
+                // "komoditi" => [
+                //     "rules" => "required"
+                // ],
                 "code" => [
                     "rules" => "required|is_unique[hs_codes.code]",
                     'errors' => [
@@ -323,9 +323,9 @@ class HSCode extends BaseController
     {
         try {
             $rules = [
-                "komoditi" => [
-                    "rules" => "required"
-                ],
+                // "komoditi" => [
+                //     "rules" => "required"
+                // ],
                 "code" => [
                     "rules" => "required"
                 ],

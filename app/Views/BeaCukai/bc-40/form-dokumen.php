@@ -23,7 +23,7 @@
                             <select class="form-select dokumen_jenis_dokumen" id="dokumen_jenis_dokumen" name="dokumen_jenis_dokumen" aria-label="Floating label select example">
                                 <option value=""></option>
                                 <?php foreach ($kodeDokumen as $k) : ?>
-                                    <option value="<?= encrypt($k['description']) ?>">
+                                    <option <?= $k['description'] == "315" ? 'selected' : '' ?> value="<?= encrypt($k['description']) ?>">
                                         <?= strtoupper($k['description']) . " - " . strtoupper($k['value']) . "" ?>
                                     </option>
                                 <?php endforeach; ?>
@@ -33,14 +33,14 @@
                     </div>
                     <div class="col-sm-4 mt-1">
                         <div class="form-floating mb-3">
-                            <input id="dokumen_nomor_dokumen" name="dokumen_nomor_dokumen" type="text" class="form-control dokumen_nomor_dokumen" placeholder="">
+                            <input value="<?= ($po != null) ? $po['po_no'] : '' ?>" id="dokumen_nomor_dokumen" name="dokumen_nomor_dokumen" type="text" class="form-control dokumen_nomor_dokumen" placeholder="">
                             <label>Nomor Dokumen</label>
                         </div>
                     </div>
                     <div class="col-sm-4 mt-1">
                         <div class="input-group input-group-password">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" name="dokumen_tanggal" type="text" placeholder="" class="form-control dokumen_tanggal" id="dokumen_tanggal">
+                                <input value="<?= ($po != null) ? date('d/m/Y', strtotime($po['po_date'])) : '' ?>" autocomplete="one-time-code" name="dokumen_tanggal" type="text" placeholder="" class="form-control dokumen_tanggal" id="dokumen_tanggal">
                                 <label>Tanggal Dokumen</label>
                             </div>
                             <div class="input-group-prepend group-prepend-password align-items-center">

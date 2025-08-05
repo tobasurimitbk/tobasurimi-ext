@@ -470,15 +470,18 @@ class BC40 extends BaseController
                 'alamat_entitas' => $this->request->getVar('pengusaha_tpb_alamat'),
                 'nama_entitas' => $this->request->getVar('pengusaha_tpb_nama'),
                 'nib_entitas' => $this->request->getVar('pengusaha_tpb_nib'),
+                'nitku_entitas' => $this->request->getVar('pengusaha_tpb_nitku'),
                 'nomor_identitas' => $this->request->getVar('pengusaha_tpb_npwp'),
                 'nomor_ijin_entitas' => $this->request->getVar('pengusaha_tpb_nomor_ijin_tpb'),
                 'tanggal_ijin_entitas' =>  $this->request->getVar('pengusaha_tpb_tanggal_skep_tpb') ? date_format(date_create_from_format("d/m/Y", $this->request->getVar('pengusaha_tpb_tanggal_skep_tpb')), "Y-m-d") : "",
                 'nama_pemasok' => $this->request->getVar('pengirim_nama'),
                 'alamat_pemasok' => $this->request->getVar('pengirim_alamat'),
+                'nitku_pemasok' => $this->request->getVar('pengirim_nitku'),
                 'npwp_pemasok' => $this->request->getVar('pengirim_npwp'),
                 'npwp_pemilik_barang' => $this->request->getVar('pemilik_barang_npwp'),
                 'nama_pemilik_barang' => $this->request->getVar('pemilik_barang_nama'),
-                'alamat_pemilik_barang' => $this->request->getVar('pemilik_barang_alamat')
+                'alamat_pemilik_barang' => $this->request->getVar('pemilik_barang_alamat'),
+                'nitku_pemilik_barang' => $this->request->getVar('pemilik_barang_nitku'),
             ]);
         } else {
             // update
@@ -488,15 +491,18 @@ class BC40 extends BaseController
                 'alamat_entitas' => $this->request->getVar('pengusaha_tpb_alamat'),
                 'nama_entitas' => $this->request->getVar('pengusaha_tpb_nama'),
                 'nib_entitas' => $this->request->getVar('pengusaha_tpb_nib'),
+                'nitku_entitas' => $this->request->getVar('pengusaha_tpb_nitku'),
                 'nomor_identitas' => $this->request->getVar('pengusaha_tpb_npwp'),
                 'nomor_ijin_entitas' => $this->request->getVar('pengusaha_tpb_nomor_ijin_tpb'),
                 'tanggal_ijin_entitas' =>  $this->request->getVar('pengusaha_tpb_tanggal_skep_tpb') ? date_format(date_create_from_format("d/m/Y", $this->request->getVar('pengusaha_tpb_tanggal_skep_tpb')), "Y-m-d") : "",
                 'nama_pemasok' => $this->request->getVar('pengirim_nama'),
                 'alamat_pemasok' => $this->request->getVar('pengirim_alamat'),
+                'nitku_pemasok' => $this->request->getVar('pengirim_nitku'),
                 'npwp_pemasok' => $this->request->getVar('pengirim_npwp'),
                 'npwp_pemilik_barang' => $this->request->getVar('pemilik_barang_npwp'),
                 'nama_pemilik_barang' => $this->request->getVar('pemilik_barang_nama'),
-                'alamat_pemilik_barang' => $this->request->getVar('pemilik_barang_alamat')
+                'alamat_pemilik_barang' => $this->request->getVar('pemilik_barang_alamat'),
+                'nitku_pemilik_barang' => $this->request->getVar('pemilik_barang_nitku'),
             ]);
         }
 
@@ -518,12 +524,16 @@ class BC40 extends BaseController
 
         $this->setFlashDataNavigatorSession($bcPurchaseOrderID);
 
+        // HANYA PO BAHAN BAKU
+        $po = $this->rmPurchaseOrderModel->whereIn('id', json_decode($bcPo['multiple_po_id']))->first();
+
         $data = [
             'kodeDokumen' => $this->metaDataModel
                 ->where('name', "Dokumen")
                 ->orderBy('description', "ASC")
                 ->findAll(),
-            'bcPo' => $bcPo
+            'bcPo' => $bcPo,
+            'po' => $po,
         ];
 
         return view('BeaCukai/bc-40/form-dokumen', $data);

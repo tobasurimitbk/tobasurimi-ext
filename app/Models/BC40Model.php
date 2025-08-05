@@ -150,7 +150,7 @@ class BC40Model extends Model
     public function get($bcPurchaseOrderID)
     {
         return $this->asArray()
-            ->select('bc_40.*,suppliers.name,suppliers.no_npwp,suppliers.address')
+            ->select('bc_40.*,suppliers.name,suppliers.no_npwp,suppliers.address,suppliers.no_ktp')
             ->join('bc_purchase_order', 'bc_40.bc_purchase_order_id = bc_purchase_order.id', 'left')
             ->join('suppliers', 'suppliers.id = bc_purchase_order.supplier_id', 'left')
             ->where('bc_purchase_order_id', $bcPurchaseOrderID)

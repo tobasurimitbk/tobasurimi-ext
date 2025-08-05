@@ -38,6 +38,12 @@
                             </div>
                             <div class="mt-1">
                                 <div class="form-floating mb-3">
+                                    <input id="pengusaha_tpb_nitku" value="<?= $bcEntitas == null ? "" : ($bcEntitas['nitku_entitas'] != null ? $bcEntitas['nitku_entitas'] : "")  ?>" name="pengusaha_tpb_nitku" type="text" class="form-control pengusaha_tpb_nitku" placeholder="">
+                                    <label>NITKU</label>
+                                </div>
+                            </div>
+                            <div class="mt-1">
+                                <div class="form-floating mb-3">
                                     <input id="pengusaha_tpb_nama" value="<?= $bcEntitas == null ? "" : ($bcEntitas['nama_entitas'] != null ? $bcEntitas['nama_entitas'] : "")  ?>" name="pengusaha_tpb_nama" type="text" class="form-control pengusaha_tpb_nama" placeholder="">
                                     <label>Nama</label>
                                 </div>
@@ -82,8 +88,14 @@
                             <div class="mt-1">
                                 <div class="mt-1">
                                     <div class="form-floating mb-3">
-                                        <input id="pengirim_npwp" value="<?= $bcEntitas != null ? $bcEntitas['npwp_pemasok'] : $bc40['no_npwp'] ?>" name="pengirim_npwp" type="number" class="form-control pengirim_npwp" placeholder="">
-                                        <label>NPWP</label>
+                                        <input id="pengirim_npwp" value="<?= $bcEntitas != null ? $bcEntitas['npwp_pemasok'] : $bc40['no_ktp'] ?>" name="pengirim_npwp" type="number" class="form-control pengirim_npwp" placeholder="">
+                                        <label>NPWP / NO KTP</label>
+                                    </div>
+                                </div>
+                                <div class="mt-1">
+                                    <div class="form-floating mb-3">
+                                        <input id="pengirim_nitku" value="<?= $bcEntitas == null ? (!empty($bc40['no_ktp']) ? $bc40['no_ktp'] . "000000" : "") : ($bcEntitas['nitku_pemasok'] != null ? $bcEntitas['nitku_pemasok'] : "")  ?>" name="pengirim_nitku" type="text" class="form-control pengirim_nitku" placeholder="">
+                                        <label>NITKU</label>
                                     </div>
                                 </div>
                                 <div class="mt-1">
@@ -109,6 +121,12 @@
                                 <div class="form-floating mb-3">
                                     <input id="pemilik_barang_npwp" value="<?= $bcEntitas == null ? '' : ($bcEntitas['npwp_pemilik_barang'] == null ? '' : $bcEntitas['npwp_pemilik_barang'])  ?>" name="pemilik_barang_npwp" type="number" class="form-control pemilik_barang_npwp" placeholder="">
                                     <label>NPWP</label>
+                                </div>
+                            </div>
+                            <div class="mt-1">
+                                <div class="form-floating mb-3">
+                                    <input id="pemilik_barang_nitku" value="<?= $bcEntitas == null ? "" : ($bcEntitas['nitku_pemilik_barang'] != null ? $bcEntitas['nitku_pemilik_barang'] : "")  ?>" name="pemilik_barang_nitku" type="text" class="form-control pemilik_barang_nitku" placeholder="">
+                                    <label>NITKU</label>
                                 </div>
                             </div>
                             <div class="mt-1">
@@ -172,6 +190,12 @@
         $('#pemilik_barang_npwp').val(npwpPengusaha)
         $('#pemilik_barang_nama').val(namaPengusaha);
         $('#pemilik_barang_alamat').val(alamatPengusaha);
+
+        // UPDATE NITKU
+        // NITKU NPWP + 6 DIGIT 0
+        var nol = "000000";
+        $('#pengusaha_tpb_nitku').val(npwpPengusaha + '' + nol);
+        $('#pemilik_barang_nitku').val(npwpPengusaha + '' + nol);
 
         // DROPDOPWN NOMOR IZIN TPB
         getListNoIjinTPB();
@@ -253,7 +277,7 @@
                 required: "NIB pengusaha TPB wajib diisi"
             },
             pengirim_npwp: {
-                required: "Npwp pengirim wajib diisi"
+                required: "Npwp / no ktp pengirim wajib diisi"
             },
             pengirim_nama: {
                 required: "Nama pengirim wajib diisi"
