@@ -579,7 +579,7 @@ class MaterialRequest extends BaseController
             $last_day = getLastDay();
             $date_request_explode = explode("-", $date_request);
             $reqNo = $this->request->getVar('req_no');
-            
+
             if ($reqNo == "AUTO GENERATE") {
                 $no = $this->materialRequestModel->get_no($date_request_explode[2], $date_request_explode[1], $date_request_explode[0], $last_day, $this->this_company_id);
             } else {
@@ -596,7 +596,7 @@ class MaterialRequest extends BaseController
                 'is_posted' => 0,
                 'createdBy' => session()->get("login")->user_id,
             ];
-            
+
             $id = $this->materialRequestModel->insert($dataMaterial);
             $mr_detail = json_decode($this->request->getVar("listMaterial"));
 
@@ -604,7 +604,7 @@ class MaterialRequest extends BaseController
                 $stockId = decrypt($item->id);
                 $stockData = $this->stockModel->asObject()->where('id', $stockId)->first();
 
-                
+
                 $dataMaterialDetail = [
                     'material_request_id' => $id,
                     'divisi_id' => $item->departmentID,
@@ -896,7 +896,7 @@ class MaterialRequest extends BaseController
         try {
             $id = decrypt($this->request->getPost("id"));
             $mr_detail = json_decode($this->request->getVar("listMaterial"));
-            
+
             $no = $this->request->getVar('req_no');
 
             // Check for duplicate request number
@@ -930,7 +930,7 @@ class MaterialRequest extends BaseController
             foreach ($mr_detail as $item) {
                 if ($item->type_barang == "bahan_baku") {
                     // Handle bahan baku items
-                    $stockId = $item->stock_id;  
+                    $stockId = $item->stock_id;
                     $stockData = $this->stockModel->asObject()->where('id', $stockId)->first();
 
                     $dataMaterialDetail = [
@@ -1495,19 +1495,19 @@ class MaterialRequest extends BaseController
         $divisiAsalId = $this->request->getVar('divisi_asal_bahan_baku_id');
         $warehouseAsalId = $this->request->getVar('warehouse_asal_bahan_baku_id');
         $typeAsalBarang = $this->request->getVar('type_asal_barang');
-        
+
         if ((!empty($this->request->getVar('stock_id')) || !empty($this->request->getVar('barang_master_id'))) || !empty($typeAsalBarang)) {
 
             if (!empty($typeAsalBarang) && $typeAsalBarang == "SUPPLIER") {
                 if (!empty($supplierId)) {
-                // Untuk Dari Po & Supplier
+                    // Untuk Dari Po & Supplier
                     $condition = [
                         'stock.divisi_id' => $divisiAsalId,
                         'stock.warehouse_id' => $warehouseAsalId,
                         'stock_details2.supplier_id' => $this->request->getVar('supplier_id'),
                         'stock.barang1_id' => $barangMasterId,
                     ];
-                }else{
+                } else {
                     $condition = [
                         'stock.divisi_id' => $divisiAsalId,
                         'stock.warehouse_id' => $warehouseAsalId,
@@ -1518,7 +1518,6 @@ class MaterialRequest extends BaseController
                 $dataResult = $this->stockDetail2Model->getStockListMaterialRequestFromLpb(
                     $condition
                 );
-
             } else {
                 // Untuk Dari Jasa Vendor
                 $condition = [
@@ -1566,8 +1565,7 @@ class MaterialRequest extends BaseController
                     $dataResult[$i]['type_barang_text'] = "BAHAN BAKU";
                     $dataResult[$i]['stok_total'] = floatval($dataResult[$i]['stok_total']);
                     $dataResult[$i]['no_daftar'] = $noDaftar;
-                    $dataResult[$i]['id'] = encrypt($dataResult[$i]['stock_id']);
-
+                    $dataResult[$i]['id'] = encrypt($dataResult[$i]['stock_id']) . '-' . encrypt($dataResult[$i]['id']);
                 } else {
                     $dataResult[$i]['stock_dokumen'] = $dataResult[$i]['stock_dokumen'] == null ? "-" : $dataResult[$i]['stock_dokumen'];
                     $dataResult[$i]['no_aju'] =  $dataResult[$i]['no_aju'] == "-" ? "-" : $dataResult[$i]['no_aju'];
@@ -1581,7 +1579,7 @@ class MaterialRequest extends BaseController
                     $dataResult[$i]['type_barang_text'] = $dataResult[$i]['type_barang_text'];
                     $dataResult[$i]['stok_total'] = floatval($dataResult[$i]['stok_total']);
                     $dataResult[$i]['no_daftar'] = $noDaftar;
-                    $dataResult[$i]['id'] = encrypt($dataResult[$i]['stock_id']);
+                    $dataResult[$i]['id'] = encrypt($dataResult[$i]['stock_id']) . '-' . encrypt($dataResult[$i]['id']);
                     $dataResult[$i]['supplier_name'] = $dataResult[$i]['supplier_name'] . ' / ' . $dataResult[$i]['nama_vendor'];
                     $dataResult[$i]['sumber'] = "JASA VENDOR";
                 }
@@ -1589,7 +1587,7 @@ class MaterialRequest extends BaseController
                 if ($dataResult[$i]['stok_total'] > 0) {
                     array_push($resultArr, $dataResult[$i]);
                 }
-            }   
+            }
 
             return response()->setJSON([
                 'data' => $resultArr,
