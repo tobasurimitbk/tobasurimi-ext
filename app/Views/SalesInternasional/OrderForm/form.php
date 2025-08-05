@@ -207,8 +207,8 @@
 
                     <div class="col-md-4">
                         <div class="form-floating mb-3">
-                            <input autocomplete="one-time-code" type="text" class="form-control po_no" id="po_no" name="po_no" placeholder="PO Number" readonly value="<?= !empty($dataSalesExport) ? $dataSalesExport->customer_po_no : '' ?>">
-                            <label for="floatingInput">PO No</label>
+                            <input autocomplete="one-time-code" type="text" class="form-control po_no" id="po_no" name="po_no" placeholder="PO No (Opsional)" value="<?= !empty($dataSalesExport) ? $dataSalesExport->po_no : '' ?>">
+                            <label for="floatingInput">PO No (Opsional)</label>
                         </div>
                     </div>
                 </div>
@@ -358,43 +358,37 @@
                     <div class="col-md-4">
                         <label>Document Required</label>
                         <div class="form-floating mb-3">
-                            <input autocomplete="one-time-code" value="<?= !empty($dataSalesExport) ? $dataSalesExport->document_required : '' ?>" type="text" class="form-control tiny document_required" id="document_required" name="document_required" placeholder="Document Required">
-                            <label for="floatingInput">Document Required</label>
+                            <textarea placeholder="Document Required" class="form-control tiny document_required" id="document_required" name="document_required"><?= !empty($dataSalesExport) ? $dataSalesExport->document_required : '' ?>"</textarea>
                         </div>
                     </div>
                     <div class="col-md-4">
                         <label>Payment Term</label>
                         <div class="form-floating mb-3">
-                            <input autocomplete="one-time-code" value="<?= !empty($dataSalesExport) ? $dataSalesExport->payment_term : '' ?>" type="text" class="form-control tiny payment_term" id="payment_term" name="payment_term" placeholder="Payment Term">
-                            <label for="floatingInput">Payment Term</label>
+                            <textarea placeholder="Payment Term" class="form-control tiny payment_term" id="payment_term" name="payment_term"><?= !empty($dataSalesExport) ? $dataSalesExport->payment_term : '' ?></textarea>
                         </div>
                     </div>
                     <div class="col-md-4">
                         <label>Shipment A/N (Optional)</label>
                         <div class="form-floating mb-3">
-                            <input autocomplete="one-time-code" value="<?= !empty($dataSalesExport) ? $dataSalesExport->shipment_an : '' ?>" type="text" class="form-control tiny shipment_an" id="shipment_an" name="shipment_an" placeholder="Shipment A/N (Optional)">
-                            <label for="floatingInput">Shipment A/N (Optional)</label>
+                            <textarea class="form-control tiny shipment_an" id="shipment_an" name="shipment_an" placeholder="Shipment A/N (Optional)"><?= !empty($dataSalesExport) ? $dataSalesExport->shipment_an : '' ?></textarea>
                         </div>
                     </div>
                     <div class="col-md-4">
                         <label>Consigne (Optional)</label>
                         <div class="form-floating mb-3">
-                            <input autocomplete="one-time-code" value="<?= !empty($dataSalesExport) ? $dataSalesExport->consigne_docs : '' ?>" type="text" class="form-control tiny consigne_docs" id="consigne_docs" name="consigne_docs" placeholder="Consign (Optional)">
-                            <label for="floatingInput">Consigne (Optional)</label>
+                            <textarea class="form-control tiny consigne_docs" id="consigne_docs" name="consigne_docs" placeholder="Consign (Optional)"><?= !empty($dataSalesExport) ? $dataSalesExport->consigne_docs : '' ?></textarea>
                         </div>
                     </div>
                     <div class="col-md-4">
                         <label>Notify Party (Optional)</label>
                         <div class="form-floating mb-3">
-                            <input autocomplete="one-time-code" value="<?= !empty($dataSalesExport) ? $dataSalesExport->notify_party : '' ?>" type="text" class="form-control tiny notify_party" id="notify_party" name="notify_party" placeholder="Notify Party (Optional)">
-                            <label for="floatingInput">Notify Party (Optional)</label>
+                            <textarea class="form-control tiny notify_party" id="notify_party" name="notify_party" placeholder="Notify Party (Optional)"><?= !empty($dataSalesExport) ? $dataSalesExport->notify_party : '' ?></textarea>
                         </div>
                     </div>
                     <div class="col-md-4">
                         <label>Additional Details (Optional)</label>
                         <div class="form-floating mb-3">
-                            <input autocomplete="one-time-code" value="<?= !empty($dataSalesExport) ? $dataSalesExport->additional_detail_docs : '' ?>" type="text" class="form-control tiny additional_detail_docs" id="additional_detail_docs" name="additional_detail_docs" placeholder="Additional Details (Optional)">
-                            <label for="floatingInput">Additional Details (Optional)</label>
+                            <textarea class="form-control tiny additional_detail_docs" id="additional_detail_docs" name="additional_detail_docs" placeholder="Additional Details (Optional)"><?= !empty($dataSalesExport) ? $dataSalesExport->additional_detail_docs : '' ?></textarea>
                         </div>
                     </div>
                 </div>

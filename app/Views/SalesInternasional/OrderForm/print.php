@@ -95,7 +95,7 @@
         }
 
         .label {
-            font-size: 11px;
+            font-size: 12px;
         }
 
         body {
@@ -175,11 +175,11 @@
                                 <td>:</td>
                                 <td><?= $dataSO->sales_contract_no ?></td>
                             </tr>
-                            <?php if (!empty($dataSO->customer_po_no)): ?>
+                            <?php if (!empty($dataSO->po_no)): ?>
                                 <tr style="text-align: right;">
                                     <td>PO NO</td>
                                     <td>:</td>
-                                    <td><?= $dataSO->customer_po_no ?></td>
+                                    <td><?= $dataSO->po_no ?></td>
                                 </tr>
                             <?php endif; ?>
                             <tr style="text-align: right;">
@@ -201,7 +201,7 @@
             </table>
 
 
-            <table style="width: 100%; border-collapse: collapse; margin-top: 4px; font-family: Arial, sans-serif; font-size: 11px;">
+            <table style="width: 100%; border-collapse: collapse; margin-top: 4px; font-family: Arial, sans-serif; font-size: 12px;">
                 <thead>
                     <tr style="background-color: #f8f9fa; border-bottom: 2px solid #dee2e6;">
                         <th style="padding: 6px; text-align: left; font-weight: bold; border: 1px solid #ddd; width: 4%; height:2%;">NO</th>
@@ -253,7 +253,7 @@
                         <tr style="border-bottom: 1px solid #eee;">
                             <td style="padding: 6px; border: 1px solid #ddd; vertical-align: top;"><?= $no++ ?></td>
                             <td style="padding: 6px; border: 1px solid #ddd; vertical-align: top;">
-                                <div style="font-weight: bold; font-size: 11px;">
+                                <div style="font-weight: bold; font-size: 12px;">
                                     <span style="float: left;">
                                         <?= $detail["barang_name"]; ?>
                                     </span>
@@ -263,7 +263,7 @@
                                         </span>
                                     <?php endif; ?>
                                 </div><br>
-                                <div style="font-size: 11px; margin-top: 4px; line-height: 1.4;">
+                                <div style="font-size: 12px; margin-top: 4px; line-height: 1.4;">
                                     <table>
                                         <?php if (!empty($detail['species'])): ?>
                                             <tr>
@@ -335,8 +335,8 @@
                                     ?>
 
                                     <div style="margin-top: 6px;">
-                                        <div style="font-size: 11px; font-weight: bold;">SIZE BREAKDOWN:</div>
-                                        <table style="width: 100%; border-collapse: collapse; margin-top: 4px; font-size: 11px;">
+                                        <div style="font-size: 12px; font-weight: bold;">SIZE BREAKDOWN:</div>
+                                        <table style="width: 100%; border-collapse: collapse; margin-top: 4px; font-size: 12px;">
                                             <thead>
                                                 <tr style="background-color: #f3f4f6;">
                                                     <?php foreach ($columns_to_show as $col => $col_data): ?>
@@ -349,9 +349,9 @@
                                                         <th style="padding: 3px; border: 1px solid #ddd; width: 6%;text-align: right;">%</th>
                                                     <?php endif; ?>
 
-                                                    <th style=" padding: 3px; border: 1px solid #ddd; width: 4.5%; text-align: right;">Qty</th>
-                                                    <th style="padding: 3px; border: 1px solid #ddd; width: 4.5%; text-align: right;" class="price">Unit Price</th>
-                                                    <th style="padding: 3px; border: 1px solid #ddd; width: 4.5%; text-align: right;" class="price">Total Amount</th>
+                                                    <th style=" padding: 3px; border: 1px solid #ddd; width: 5%; text-align: right;">Qty</th>
+                                                    <th style="padding: 3px; border: 1px solid #ddd; width: 5%; text-align: right;" class="price">Unit Price</th>
+                                                    <th style="padding: 3px; border: 1px solid #ddd; width: 5%; text-align: right;" class="price">Total Amount</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
@@ -481,7 +481,7 @@
 
 
                     <?php if ($displayPrice == "true" && $totalSalesKontrakdetail > 1): ?>
-                        <tr style="font-weight: bold; background-color: #e9ecef; font-size:11px;">
+                        <tr style="font-weight: bold; background-color: #e9ecef; font-size: 12px;">
                             <td style="padding: 6px; border: 1px solid #ddd;"></td>
                             <td style="padding: 6px; border: 1px solid #ddd; text-align: right;">
                                 <span style="float: left;">TOTAL</span>
@@ -492,7 +492,7 @@
 
                     <!-- Royalty -->
                     <?php if ($dataSODetail['royaltyPriceFinal'] > 0): ?>
-                        <tr style="font-weight: bold; background-color: #e9ecef; font-size:11px;" class="price">
+                        <tr style="font-weight: bold; background-color: #e9ecef; font-size: 12px;" class="price">
                             <td style="padding: 6px; border: 1px solid #ddd;"></td>
                             <td style="padding: 6px; border: 1px solid #ddd; text-align: right; color:red;">
                                 <span style="float: left;"><?= $dataSO->royalty ?></span>
@@ -503,7 +503,7 @@
 
                     <!-- Rebate -->
                     <?php if ($dataSODetail['rebatePriceFinal'] > 0): ?>
-                        <tr style="font-weight: bold; background-color: #e9ecef; font-size:11px;" class="price">
+                        <tr style="font-weight: bold; background-color: #e9ecef; font-size: 12px;" class="price">
                             <td style="padding: 6px; border: 1px solid #ddd;"></td>
                             <td style="padding: 6px; border: 1px solid #ddd; text-align: right; color:red;">
                                 <span style="float: left;"><?= $dataSO->rebate ?></span>
@@ -514,7 +514,7 @@
 
                     <!-- Can Deduction -->
                     <?php if ($dataSODetail['canDeductionPriceFinal'] > 0): ?>
-                        <tr style="font-weight: bold; background-color: #e9ecef; font-size:11px;" class="price">
+                        <tr style="font-weight: bold; background-color: #e9ecef; font-size: 12px;" class="price">
                             <td style="padding: 6px; border: 1px solid #ddd;"></td>
                             <td style="padding: 6px; border: 1px solid #ddd; text-align: right; color:red;">
                                 <span style="float: left;"><?= $dataSO->can_deduction ?></span>
@@ -525,7 +525,7 @@
 
                     <!-- Freight -->
                     <?php if ($dataSODetail['estimatedFreightPriceFinal'] > 0): ?>
-                        <tr style="font-weight: bold; background-color: #e9ecef; font-size:11px;" class="price">
+                        <tr style="font-weight: bold; background-color: #e9ecef; font-size: 12px;" class="price">
                             <td style="padding: 6px; border: 1px solid #ddd;"></td>
                             <td style="padding: 6px; border: 1px solid #ddd; text-align: right;">
                                 <span style="float: left;"><?= $dataSO->estimated_freight ?></span>
@@ -536,7 +536,7 @@
 
                     <!-- Others (with +/- sign) -->
                     <?php if ($dataSODetail['othersPriceFinal'] > 0): ?>
-                        <tr style="font-weight: bold; background-color: #e9ecef; font-size:11px;" class="price">
+                        <tr style="font-weight: bold; background-color: #e9ecef; font-size: 12px;" class="price">
                             <td style="padding: 6px; border: 1px solid #ddd;"></td>
                             <td style="padding: 6px; border: 1px solid #ddd; text-align: right;">
                                 <span style="float: left;"><?= $dataSO->others_type ?></span>
@@ -547,7 +547,7 @@
 
                     <!-- Palet & Fumigation -->
                     <?php if ($dataSO->palet_fumigation > 0): ?>
-                        <tr style="font-weight: bold; background-color: #e9ecef; font-size:11px;" class="price">
+                        <tr style="font-weight: bold; background-color: #e9ecef; font-size: 12px;" class="price">
                             <td style="padding: 6px; border: 1px solid #ddd;"></td>
                             <td style="padding: 6px; border: 1px solid #ddd; text-align: right;">
                                 <span style="float: left;"><?= $dataSO->palet_fumigation ?></span>
@@ -558,7 +558,7 @@
 
                     <!-- Additional Details -->
                     <?php foreach ($dataSalesExportAdditional as $d): ?>
-                        <tr style="font-weight: bold; background-color: #e9ecef; font-size:11px;" class="price">
+                        <tr style="font-weight: bold; background-color: #e9ecef; font-size: 12px;" class="price">
                             <td style="padding: 6px; border: 1px solid #ddd;"></td>
                             <td style="<?= $d['additional_detail_type'] == "MINUS" ? 'padding: 6px; border: 1px solid #ddd; text-align: right; color:red;' : 'padding: 6px; border: 1px solid #ddd; text-align: right;' ?>">
                                 <span style="float: left;"><?= $d['additional_detail'] ?></span>
@@ -568,14 +568,14 @@
                     <?php endforeach; ?>
 
                     <!-- Final Amount Row -->
-                    <tr style="font-weight: bold; background-color: #e9ecef; font-size:11px;">
+                    <tr style="font-weight: bold; background-color: #e9ecef; font-size: 12px;">
                         <td style="padding: 6px; border: 1px solid #ddd;"></td>
                         <td style="padding: 6px; border: 1px solid #ddd;">
                             <table style="width: 100%; table-layout: fixed;">
                                 <tr style="vertical-align: middle;">
                                     <!-- Kolom 1: GRAND TOTAL Label -->
                                     <td style="width: 25%; text-align: left; vertical-align: middle; white-space: nowrap;">
-                                        <span style="margin-left: -3px;">
+                                        <span style="margin-left: -3px; font-size:12px;">
                                             GRAND TOTAL <?= !empty($salesKontrak['total_container']) ? "(" . $salesKontrak['total_container'] . ")" : "" ?>
                                         </span>
                                     </td>
@@ -584,7 +584,7 @@
                                     <td style="width: auto; text-align: center; vertical-align: middle;">
                                         <?php if ($currentItemSaleskontrakdetail === $totalSalesKontrakdetail): ?>
                                             <?php if (!empty($groupBySatuan)) : ?>
-                                                <table style="width: 15%; margin: 0 auto; border-collapse: collapse; font-size: 11px;">
+                                                <table style="width: 15%; margin: 0 auto; border-collapse: collapse; font-size: 12px;">
                                                     <!-- <thead>
                                                         <tr style="background-color: #f3f4f6;">
                                                             <?php foreach ($groupBySatuan as $satuan => $data): ?>
@@ -611,7 +611,7 @@
                                     </td>
 
                                     <!-- Kolom 3: Nilai Grand Total -->
-                                    <td style="width: 25%; text-align: right; vertical-align: middle; white-space: nowrap;" class="price">
+                                    <td style="width: 25%; text-align: right; vertical-align: middle; white-space: nowrap;font-size:12px;" class="price">
                                         (<?= $dataSO->mata_uang ?>) <?= number_format($grand_total, 2) ?>
                                     </td>
 
@@ -622,7 +622,7 @@
                     </tr>
 
                     <?php if (!empty($dataSO->commision)): ?>
-                        <tr style="font-weight: bold; background-color: #e9ecef; font-size:11px;">
+                        <tr style="font-weight: bold; background-color: #e9ecef; font-size: 12px;">
                             <td style="padding: 6px; border: 1px solid #ddd;"></td>
                             <td style="padding: 6px; border: 1px solid #ddd;">
                                 <?= $dataSO->commision ?>
@@ -631,7 +631,7 @@
                     <?php endif; ?>
 
                     <?php if ($dataSO->freight != ""): ?>
-                        <tr style="font-weight: bold; background-color: #e9ecef; font-size:11px;">
+                        <tr style="font-weight: bold; background-color: #e9ecef; font-size: 12px;">
                             <td style="padding: 6px; border: 1px solid #ddd;"></td>
                             <td style="padding: 6px; border: 1px solid #ddd;">
                                 <b>
@@ -641,7 +641,7 @@
                         </tr>
                     <?php endif; ?>
                     <?php if ($dataSO->additional != ""): ?>
-                        <tr style="font-weight: bold; background-color: #e9ecef; font-size:11px;">
+                        <tr style="font-weight: bold; background-color: #e9ecef; font-size: 12px;">
                             <td style="padding: 6px; border: 1px solid #ddd;"></td>
                             <td style="padding: 6px; border: 1px solid #ddd;">
                                 <?= $dataSO->additional ?>
@@ -650,7 +650,7 @@
                     <?php endif; ?>
 
                     <?php if ($dataSO->additional_2 != ""): ?>
-                        <tr style="font-weight: bold; background-color: #e9ecef; font-size:11px;">
+                        <tr style="font-weight: bold; background-color: #e9ecef; font-size: 12px;">
                             <td style="padding: 6px; border: 1px solid #ddd;"></td>
                             <td style="padding: 6px; border: 1px solid #ddd;">
                                 <?= $dataSO->additional_2 ?>

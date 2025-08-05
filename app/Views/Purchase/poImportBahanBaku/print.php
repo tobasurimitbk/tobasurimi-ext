@@ -320,7 +320,7 @@
             <tr>
                 <td>ATTN</td>
                 <td>:</td>
-                <td></td>
+                <td><?= $dataPO->note ?></td>
             </tr>
             <tr>
                 <td>DESTINATION</td>

@@ -69,6 +69,15 @@ class POImportBahanBaku extends BaseController
 
     public function createPOImportBahanBaku()
     {
+
+        $company = $this->companyModel->find($this->this_company_id);
+
+        if ($this->this_company_id == 1) {
+            $consigneName = strtoupper(str_ireplace(', Tbk', '', $company['holding_company'])) . " (PLANT 1)";
+        } else {
+            $consigneName = strtoupper(str_ireplace(', Tbk', '', $company['holding_company']));
+        }
+
         $data = [
             "divisi" => $this->divisisModel->getDivisiAccess(),
             "today" => date("d/m/Y"),
@@ -81,7 +90,8 @@ class POImportBahanBaku extends BaseController
             ]),
             "satuan" => $this->satuanModel->getSatuanAll(),
             "dataValuta" => $this->metadataModel->get_by_name('Valuta'),
-            "dataShipment" => $this->metadataModel->get_by_name('Shipment')
+            "dataShipment" => $this->metadataModel->get_by_name('Shipment'),
+            "consigneName" => $consigneName
         ];
 
 

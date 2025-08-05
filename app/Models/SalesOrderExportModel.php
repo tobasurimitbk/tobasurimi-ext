@@ -48,7 +48,8 @@ class SalesOrderExportModel extends Model
             'due_date'              => 'sales_contract.due_date',
             'shipment_date'         => 'sales_contract.shipment_date',
             'tanggal'               => 'sales_order_export.tanggal',
-            'divisi_id'               => 'sales_order_export.divisi_id',
+            'divisi_id'             => 'sales_order_export.divisi_id',
+            'po_no'                 => 'sales_order_export.po_no',
         ];
 
         $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];

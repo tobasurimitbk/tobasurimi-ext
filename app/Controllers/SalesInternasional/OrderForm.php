@@ -132,7 +132,7 @@ class OrderForm extends BaseController
                 "no"                        => $no++,
                 "id"                        => encrypt($data->sales_order_export_id),
                 "sales_order_export_no"     => $data->sales_order_export_no,
-                "customer_po_no"            => $data->customer_po_no,
+                "customer_po_no"            => $data->po_no,
                 "customer_name"             => $data->customer_name,
                 "dicharge_port"             => $data->dicharge_port,
                 "shipment_date"             => $data->shipment_date,
@@ -233,6 +233,7 @@ class OrderForm extends BaseController
                 'deadline' => $this->request->getVar('deadline'),
                 'container' => $this->request->getVar('container'),
                 'document_required' => $this->request->getVar('document_required'),
+                'po_no' => $this->request->getVar('po_no'),
                 'status' => "NEW",
                 'used' => "NOT USED",
             ]);
@@ -562,6 +563,7 @@ class OrderForm extends BaseController
                 'deadline' => $this->request->getVar('deadline'),
                 'container' => $this->request->getVar('container'),
                 'document_required' => $this->request->getVar('document_required'),
+                'po_no' => $this->request->getVar('po_no'),
             ]);
 
             $listDataSalesKontrak = json_decode($_POST['listDataSalesKontrak']);
