@@ -565,76 +565,76 @@
     <?php if (!empty($dataMaterialRequestDetailsBahanBaku)): ?>
         <?php foreach ($dataMaterialRequestDetailsBahanBaku as $materialRequestDetails): ?>
             listStockSelectedBahanBaku.push(<?= json_encode([
-                'id' => $materialRequestDetails['id'],
-                'id_material_request_detail' => null,
-                'stock_detail_id' => $materialRequestDetails['stock_detail_id'],
-                'supplier_id' => $materialRequestDetails['supplier_id'],
-                'harga_umum' => $materialRequestDetails['harga_umum'],
-                'harga_harian' => $materialRequestDetails['harga_harian'],
-                'harga_bulanan' => $materialRequestDetails['harga_bulanan'],
-                'keterangan' => '',
-                'barang' => $materialRequestDetails['barang'],
-                'bc_id' => $materialRequestDetails['bc_id'],
-                'bc_type' => $materialRequestDetails['bc_type'],
-                'departmentID' => $materialRequestDetails['divisi_id'],
-                'departmentText' => $materialRequestDetails['divisi_asal_text'],
-                'departmentTujuanText' => $materialRequestDetails['divisi_tujuan_text'],
-                'departmentTujuanID' => $materialRequestDetails['divisi_tujuan_id'],
-                'warehouseTujuanID' => $materialRequestDetails['warehouse_tujuan_id'],
-                'no_aju' => $materialRequestDetails['no_aju'],
-                'no_dokumen_1' => '-',
-                'no_dokumen_2' => '-',
-                'qty' => floatval($materialRequestDetails['qty']),
-                'qty2' => floatval($materialRequestDetails['qty2']),
-                'qty_isi' => floatval($materialRequestDetails['qty_isi']),
-                'satuan' => $materialRequestDetails['kode_satuan'],
-                'stock_date' => $materialRequestDetails['stock_date'],
-                'stock_dokumen' => $materialRequestDetails['stock_dokumen'],
-                'stock_id' => $materialRequestDetails['stock_id'],
-                'stok_total' => floatval($materialRequestDetails['stok_total']),
-                'supplier_name' => $materialRequestDetails['supplier_name'],
-                'type_barang' => $materialRequestDetails['type_barang'],
-                'type_barang_text' => $materialRequestDetails['type_barang_text'],
-                'warehouseID' => $materialRequestDetails['warehouse_id'],
-                'warehouseText' => $materialRequestDetails['warehouse_asal_text'],
-                'warehouseTujuanText' => $materialRequestDetails['warehouse_tujuan_text'],
-                'no_daftar' => $materialRequestDetails['no_daftar'],
-            ]) ?>);
+                                                'id' => $materialRequestDetails['id'],
+                                                'id_material_request_detail' => null,
+                                                'stock_detail_id' => $materialRequestDetails['stock_detail_id'],
+                                                'supplier_id' => $materialRequestDetails['supplier_id'],
+                                                'harga_umum' => $materialRequestDetails['harga_umum'],
+                                                'harga_harian' => $materialRequestDetails['harga_harian'],
+                                                'harga_bulanan' => $materialRequestDetails['harga_bulanan'],
+                                                'keterangan' => '',
+                                                'barang' => $materialRequestDetails['barang'],
+                                                'bc_id' => $materialRequestDetails['bc_id'],
+                                                'bc_type' => $materialRequestDetails['bc_type'],
+                                                'departmentID' => $materialRequestDetails['divisi_id'],
+                                                'departmentText' => $materialRequestDetails['divisi_asal_text'],
+                                                'departmentTujuanText' => $materialRequestDetails['divisi_tujuan_text'],
+                                                'departmentTujuanID' => $materialRequestDetails['divisi_tujuan_id'],
+                                                'warehouseTujuanID' => $materialRequestDetails['warehouse_tujuan_id'],
+                                                'no_aju' => $materialRequestDetails['no_aju'],
+                                                'no_dokumen_1' => '-',
+                                                'no_dokumen_2' => '-',
+                                                'qty' => floatval($materialRequestDetails['qty']),
+                                                'qty2' => floatval($materialRequestDetails['qty2']),
+                                                'qty_isi' => floatval($materialRequestDetails['qty_isi']),
+                                                'satuan' => $materialRequestDetails['kode_satuan'],
+                                                'stock_date' => $materialRequestDetails['stock_date'],
+                                                'stock_dokumen' => $materialRequestDetails['stock_dokumen'],
+                                                'stock_id' => $materialRequestDetails['stock_id'],
+                                                'stok_total' => floatval($materialRequestDetails['stok_total']),
+                                                'supplier_name' => $materialRequestDetails['supplier_name'],
+                                                'type_barang' => $materialRequestDetails['type_barang'],
+                                                'type_barang_text' => $materialRequestDetails['type_barang_text'],
+                                                'warehouseID' => $materialRequestDetails['warehouse_id'],
+                                                'warehouseText' => $materialRequestDetails['warehouse_asal_text'],
+                                                'warehouseTujuanText' => $materialRequestDetails['warehouse_tujuan_text'],
+                                                'no_daftar' => $materialRequestDetails['no_daftar'],
+                                            ]) ?>);
         <?php endforeach; ?>
     <?php endif; ?>
 
     <?php if (!empty($dataMaterialRequestDetails)): ?>
         <?php foreach ($dataMaterialRequestDetails as $materialRequestDetails): ?>
             <?php
-                $item = [
-                    'id_material_request_detail' => $materialRequestDetails->id,
-                    'barang' => $materialRequestDetails->nama_barang,
-                    'bc_id' => $materialRequestDetails->bc_id,
-                    'bc_type' => $materialRequestDetails->ref_no,
-                    'departmentID' => $materialRequestDetails->divisi_id,
-                    'departmentText' => $materialRequestDetails->divisi_asal_text,
-                    'departmentTujuanText' => $materialRequestDetails->divisi_tujuan_text,
-                    'departmentTujuanID' => $materialRequestDetails->divisi_tujuan_id,
-                    'warehouseTujuanID' => $materialRequestDetails->warehouse_tujuan_id,
-                    'no_aju' => $materialRequestDetails->no_aju,
-                    'no_dokumen_1' => '-',
-                    'no_dokumen_2' => '-',
-                    'qty' => floatval($materialRequestDetails->qty),
-                    'qty2' => floatval($materialRequestDetails->qty2),
-                    'qty_isi' => floatval($materialRequestDetails->qty_isi),
-                    'satuan' => $materialRequestDetails->kode_satuan,
-                    'stock_date' => date('d/m/Y', strtotime($materialRequestDetails->stock_date)),
-                    'stock_dokumen' => $materialRequestDetails->stock_dokumen,
-                    'stock_id' => $materialRequestDetails->stock_id,
-                    'stok_total' => floatval($materialRequestDetails->qty),
-                    'supplier_name' => '-',
-                    'type_barang' => $materialRequestDetails->barang_type,
-                    'type_barang_text' => $materialRequestDetails->barang_type_text,
-                    'warehouseID' => $materialRequestDetails->warehouse_id,
-                    'warehouseText' => $materialRequestDetails->warehouse_tujuan_text,
-                    'warehouseTujuanText' => $materialRequestDetails->warehouse_tujuan_text,
-                    'no_daftar' => $materialRequestDetails->no_daftar,
-                ];
+            $item = [
+                'id_material_request_detail' => $materialRequestDetails->id,
+                'barang' => $materialRequestDetails->nama_barang,
+                'bc_id' => $materialRequestDetails->bc_id,
+                'bc_type' => $materialRequestDetails->ref_no,
+                'departmentID' => $materialRequestDetails->divisi_id,
+                'departmentText' => $materialRequestDetails->divisi_asal_text,
+                'departmentTujuanText' => $materialRequestDetails->divisi_tujuan_text,
+                'departmentTujuanID' => $materialRequestDetails->divisi_tujuan_id,
+                'warehouseTujuanID' => $materialRequestDetails->warehouse_tujuan_id,
+                'no_aju' => $materialRequestDetails->no_aju,
+                'no_dokumen_1' => '-',
+                'no_dokumen_2' => '-',
+                'qty' => floatval($materialRequestDetails->qty),
+                'qty2' => floatval($materialRequestDetails->qty2),
+                'qty_isi' => floatval($materialRequestDetails->qty_isi),
+                'satuan' => $materialRequestDetails->kode_satuan,
+                'stock_date' => date('d/m/Y', strtotime($materialRequestDetails->stock_date)),
+                'stock_dokumen' => $materialRequestDetails->stock_dokumen,
+                'stock_id' => $materialRequestDetails->stock_id,
+                'stok_total' => floatval($materialRequestDetails->qty),
+                'supplier_name' => '-',
+                'type_barang' => $materialRequestDetails->barang_type,
+                'type_barang_text' => $materialRequestDetails->barang_type_text,
+                'warehouseID' => $materialRequestDetails->warehouse_id,
+                'warehouseText' => $materialRequestDetails->warehouse_tujuan_text,
+                'warehouseTujuanText' => $materialRequestDetails->warehouse_tujuan_text,
+                'no_daftar' => $materialRequestDetails->no_daftar,
+            ];
             ?>
 
             <?php if ($materialRequestDetails->barang_type == 'bahan_setengah_jadi'): ?>
@@ -1285,6 +1285,7 @@
                 // console.log(res.data);
                 listStockAsal = [];
                 listStockAsal = res.data;
+                console.log(res.data);
                 drawTableAsalBarang(res.data);
             }
         });
@@ -1710,7 +1711,7 @@
                 totalStokTotal += parseFloat(v.stok_total);
             });
             // deleteByStockID(stockID);
-            if (qtyMutasiFifo > parseFloat(totalStokTotal.toFixed(4))) {
+            if (parseFloat(qtyMutasiFifo) > parseFloat(totalStokTotal.toFixed(4))) {
                 Swal.fire({
                     icon: 'error',
                     title: 'Terjadi Kesalahan : Stok barang tidak cukup !',
@@ -1727,8 +1728,12 @@
                             var isIDSelected = $.grep(listStockSelectedBahanBaku, function(item) {
                                 return item.id == currentID;
                             }).length > 0;
-                            if (!isIDSelected && qtyMutasiFifo != 0 && parseFloat(listStockAsal[i].stok_total) != 0) {
-                                var mutasiQty = Math.min(qtyMutasiFifo, parseFloat(listStockAsal[i].stok_total));
+                            console.log(listStockAsal[i], isIDSelected, parseFloat(qtyMutasiFifo), parseFloat(listStockAsal[i].stok_total));
+
+                            if (!isIDSelected && parseFloat(qtyMutasiFifo) > 0 && parseFloat(listStockAsal[i].stok_total) > 0) {
+                                var mutasiQty = Math.min(parseFloat(qtyMutasiFifo), parseFloat(listStockAsal[i].stok_total));
+                                console.log(mutasiQty);
+
                                 listStockAsal[i].stok_total = parseFloat(listStockAsal[i].stok_total);
                                 listStockAsal[i].qty = 0;
                                 listStockAsal[i].qty_isi = 0;
@@ -1743,7 +1748,7 @@
                                 listStockAsal[i].warehouseTujuanText = warehouseTujuanText;
                                 listStockAsal[i].qty2 = parseFloat(mutasiQty.toFixed(4));
                                 listStockSelectedBahanBaku.push(listStockAsal[i]);
-                                qtyMutasiFifo = qtyMutasiFifo - mutasiQty;
+                                qtyMutasiFifo = parseFloat(qtyMutasiFifo) - mutasiQty;
                             }
                         }
                     } else if (listStockAsal[i].type_barang == "bahan_jadi") {
@@ -1752,8 +1757,8 @@
                             var isIDSelected = $.grep(listStockSelectedBahanJadi, function(item) {
                                 return item.id == Number(currentID);
                             }).length > 0;
-                            if (!isIDSelected && qtyMutasiFifo != 0 && parseFloat(listStockAsal[i].stok_total) != 0) {
-                                var mutasiQty = Math.min(qtyMutasiFifo, parseFloat(listStockAsal[i].stok_total));
+                            if (!isIDSelected && parseFloat(qtyMutasiFifo) > 0 && parseFloat(listStockAsal[i].stok_total) > 0) {
+                                var mutasiQty = Math.min(parseFloat(qtyMutasiFifo), parseFloat(listStockAsal[i].stok_total));
                                 listStockAsal[i].stok_total = parseFloat(listStockAsal[i].stok_total);
                                 listStockAsal[i].qty = 0;
                                 listStockAsal[i].qty_isi = 0;
@@ -1768,7 +1773,7 @@
                                 listStockAsal[i].warehouseTujuanText = warehouseTujuanText;
                                 listStockAsal[i].qty2 = parseFloat(mutasiQty.toFixed(4));
                                 listStockSelectedBahanJadi.push(listStockAsal[i]);
-                                qtyMutasiFifo = qtyMutasiFifo - mutasiQty;
+                                qtyMutasiFifo = parseFloat(qtyMutasiFifo) - mutasiQty;
                             }
                         }
                     } else if (listStockAsal[i].type_barang == "bahan_setengah_jadi") {
@@ -1777,8 +1782,8 @@
                             var isIDSelected = $.grep(listStockSelectedBahanSetengahJadi, function(item) {
                                 return item.id == Number(currentID);
                             }).length > 0;
-                            if (!isIDSelected && qtyMutasiFifo != 0 && parseFloat(listStockAsal[i].stok_total) != 0) {
-                                var mutasiQty = Math.min(qtyMutasiFifo, parseFloat(listStockAsal[i].stok_total));
+                            if (!isIDSelected && parseFloat(qtyMutasiFifo) > 0 && parseFloat(listStockAsal[i].stok_total) > 0) {
+                                var mutasiQty = Math.min(parseFloat(qtyMutasiFifo), parseFloat(listStockAsal[i].stok_total));
                                 listStockAsal[i].stok_total = parseFloat(listStockAsal[i].stok_total);
                                 listStockAsal[i].qty = 0;
                                 listStockAsal[i].qty_isi = 0;
@@ -1793,7 +1798,7 @@
                                 listStockAsal[i].warehouseTujuanText = warehouseTujuanText;
                                 listStockAsal[i].qty2 = parseFloat(mutasiQty.toFixed(4));
                                 listStockSelectedBahanSetengahJadi.push(listStockAsal[i]);
-                                qtyMutasiFifo = qtyMutasiFifo - mutasiQty;
+                                qtyMutasiFifo = parseFloat(qtyMutasiFifo) - mutasiQty;
                             }
                         }
                     } else {
@@ -1802,8 +1807,8 @@
                             var isIDSelected = $.grep(listStockSelectedBahan, function(item) {
                                 return item.id == Number(currentID);
                             }).length > 0;
-                            if (!isIDSelected && qtyMutasiFifo != 0 && parseFloat(listStockAsal[i].stok_total) != 0) {
-                                var mutasiQty = Math.min(qtyMutasiFifo, parseFloat(listStockAsal[i].stok_total));
+                            if (!isIDSelected && parseFloat(qtyMutasiFifo) > 0 && parseFloat(listStockAsal[i].stok_total) > 0) {
+                                var mutasiQty = Math.min(parseFloat(qtyMutasiFifo), parseFloat(listStockAsal[i].stok_total));
                                 listStockAsal[i].stok_total = parseFloat(listStockAsal[i].stok_total);
                                 listStockAsal[i].qty = 0;
                                 listStockAsal[i].qty_isi = 0;
@@ -1818,13 +1823,16 @@
                                 listStockAsal[i].warehouseTujuanText = warehouseTujuanText;
                                 listStockAsal[i].qty2 = parseFloat(mutasiQty.toFixed(4));
                                 listStockSelectedBahan.push(listStockAsal[i]);
-                                qtyMutasiFifo = qtyMutasiFifo - mutasiQty;
+                                qtyMutasiFifo = parseFloat(qtyMutasiFifo) - mutasiQty;
                             }
                         }
                     }
                 });
             }
         }
+        // console.log(listStockAsal);
+        // console.log(listStockSelectedBahanBaku);
+
         drawTableSelectedItemBahanBaku(listStockSelectedBahanBaku);
         drawTableSelectedItemBahan(listStockSelectedBahan);
         drawTableSelectedItemBahanSetengahJadi(listStockSelectedBahanSetengahJadi);
@@ -1936,8 +1944,8 @@
     function updateTotalQtyRequest() {
         var totalQty = 0;
         var totalQtyAwal = 0;
-        console.log(listStockSelectedBahanBaku);
-        
+        // console.log(listStockSelectedBahanBaku);
+
         $.each(listStockSelectedBahanBaku, function(i, v) {
             totalQtyAwal += parseFloat(listStockSelectedBahanBaku[i].stok_total) || 0;
             totalQty += parseFloat(listStockSelectedBahanBaku[i].qty2) || 0;
@@ -2213,8 +2221,8 @@
         var totalQtyAwal = 0;
         var totalQty = 0;
         var totalQtyIsi = 0;
-        console.log(listStockSelectedBahanJadi);
-        
+        // console.log(listStockSelectedBahanJadi);
+
         $.each(listStockSelectedBahanJadi, function(i, v) {
             totalQtyAwal += parseFloat(listStockSelectedBahanJadi[i].stok_total) || 0;
             totalQty += parseFloat(listStockSelectedBahanJadi[i].qty2) || 0;
@@ -2681,6 +2689,8 @@
                 // LIST STOK PER BC
                 listStockAsal = [];
                 listStockAsal = res.data;
+                console.log(res.data);
+
                 drawTableAsalBarang(res.data);
             }
         });
