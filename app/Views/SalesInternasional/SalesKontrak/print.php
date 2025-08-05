@@ -380,7 +380,7 @@
         </div>
         <div class="mt-1 justify-content-center">
             <label class="label-header" style="color: red;">
-                <?= $salesKontrak['banking_information'] ?>
+                <?= nl2br(htmlspecialchars($salesKontrak['banking_information'])) ?>
             </label>
         </div>
 
@@ -864,13 +864,12 @@
     <div class="ttd-section" style="margin-top: -5px;">
         <table style="border-spacing: 0 4px; width: 100%;">
             <tbody>
-
                 <?php if (!empty($salesKontrak['payment_term'])): ?>
                     <tr class="label-header">
-                        <td style="width: 25px;"><?= strtoupper(numToRoman($counter++)) ?>.</td>
-                        <td style="width: 180px;">PAYMENT TERM</td>
-                        <td style="width: 10px;">:</td>
-                        <td><?= $salesKontrak['payment_term'] ?></td>
+                        <td style="width: 25px; vertical-align: top;"><?= strtoupper(numToRoman($counter++)) ?>.</td>
+                        <td style="width: 180px; vertical-align: top;">PAYMENT TERM</td>
+                        <td style="width: 10px; vertical-align: top;">:</td>
+                        <td><?= nl2br(htmlspecialchars($salesKontrak['payment_term'])) ?></td>
                     </tr>
                 <?php endif ?>
 
@@ -888,7 +887,7 @@
                         <td><?= strtoupper(numToRoman($counter++)) ?>.</td>
                         <td>DOCUMENT REQUIRED</td>
                         <td>:</td>
-                        <td><?= $salesKontrak['documents_required'] ?></td>
+                        <td><?= nl2br(htmlspecialchars($salesKontrak['documents_required'])) ?></td>
                     </tr>
                 <?php endif ?>
 
@@ -897,7 +896,7 @@
                         <td style="vertical-align: top;"><?= strtoupper(numToRoman($counter++)) ?>.</td>
                         <td style="vertical-align: top;">ADDITIONAL CLAUSES</td>
                         <td style="vertical-align: top;">:</td>
-                        <td style="vertical-align: top;"><?= $salesKontrak['special_instructions'] ?></td>
+                        <td style="vertical-align: top;"><?= nl2br(htmlspecialchars($salesKontrak['special_instructions'])) ?></td>
                     </tr>
                 <?php endif ?>
                 <tr>
