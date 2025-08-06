@@ -364,15 +364,16 @@ class OrderForm extends BaseController
                 "id_customer"           => $postData['id_customer'],
                 "shipping_date"           => $shippingDate,
                 "destination"           => $postData['destination'],
-                "jenis_penjualan"           => $postData['jenis_penjualan'],
+                "jenis_penjualan"       => $postData['jenis_penjualan'],
                 "sales_id"              => isset($postData['id_sales']) ? $postData['id_sales'] : NULL,
-                "nama_ecommerce"           => $postData['nama_ecommerce'] ? $postData['nama_ecommerce'] : "",
+                "nama_ecommerce"        => $postData['nama_ecommerce'] ? $postData['nama_ecommerce'] : "",
                 "order_date"            => $orderDate,
                 "total_harga"           => $postData['total'],
-                "keterangan" => $postData['parent_keterangan'],
+                "keterangan"            => $postData['parent_keterangan'],
+                "payment_terms"         => $postData['termin'],
                 "id_company"            => $this->this_company_id != 16 ? $this->request->getVar('company_id') : $this->this_company_id,
                 "tipe_sales_order"      => 'LOKAL',
-                "ppn"      => $status_ppn
+                "ppn"                   => $status_ppn
             ];
 
             $checkSO = $this->SalesOrderModel->where('UPPER(no_sales_order)', strtoupper($this->request->getVar('no_sales_order')))->findAll();
@@ -672,15 +673,16 @@ class OrderForm extends BaseController
                     'destination' =>  $postData['destination'],
                     "jenis_penjualan"           => $postData['jenis_penjualan'],
                     "sales_id"              => isset($postData['id_sales']) ? $postData['id_sales'] : NULL,
-                    "nama_ecommerce"           => $postData['nama_ecommerce'] ? $postData['nama_ecommerce'] : "",
+                    "nama_ecommerce"        => $postData['nama_ecommerce'] ? $postData['nama_ecommerce'] : "",
                     "order_date"            => $orderDate,
-                    'total_harga' => $total_harga,
-                    "keterangan" => $postData['parent_keterangan'],
+                    'total_harga'           => $total_harga,
+                    "keterangan"            => $postData['parent_keterangan'],
                     "id_company"            => $this->this_company_id != 16 ? $this->request->getVar('company_id') : $this->this_company_id,
-                    'qty_barang' => $totalQty,
-                    'ppn' => $status_ppn,
-                    'no_po' => $this->request->getVar('no_po'),
-                    'estimated_freight' => $this->request->getVar('estimated_freight')
+                    'qty_barang'            => $totalQty,
+                    'ppn'                   => $status_ppn,
+                    'no_po'                 => $this->request->getVar('no_po'),
+                    'estimated_freight'     => $this->request->getVar('estimated_freight'),
+                    "payment_terms"         => $postData['termin'],
                 ]
             );
 

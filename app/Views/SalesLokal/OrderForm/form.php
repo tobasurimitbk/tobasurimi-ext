@@ -139,7 +139,7 @@
                             <select class="form-select termin" name="termin" id="termin_order_form">
                                 <option value=""></option>
                                 <?php foreach ($dataTermin ?? [] as $termin) : ?>
-                                    <option <?= (!empty($data) && $data->termin_id == $termin['id'] ? 'selected' : '') ?> value="<?= $termin['id']; ?>"><?= $termin['value']; ?></option>
+                                    <option <?= (!empty($data) && $data->payment_terms == $termin['id'] ? 'selected' : '') ?> value="<?= $termin['id']; ?>"><?= $termin['value']; ?></option>
                                 <?php endforeach; ?>
                             </select>
                             <!-- <input autocomplete="one-time-code" type="text" class="form-control" id="termin" name="termin" readonly value="<?= $data->termin ?? '' ?>"> -->
