@@ -739,7 +739,7 @@ class BeaCukaiApi
                 'kodeJenisEntitas' => $b['kode_jenis_entitas'],
                 'namaEntitas' => $b['nama_entitas'],
                 'nibEntitas' => $b['nib_entitas'],
-                'nomorIdentitas' => $b['nomor_identitas'],
+                'nomorIdentitas' => $b['nitku_entitas'],
                 'nomorIjinEntitas' => $b['nomor_ijin_entitas'],
                 'tanggalIjinEntitas' => $b['tanggal_ijin_entitas'],
                 'seriEntitas' => 1,
@@ -753,7 +753,7 @@ class BeaCukaiApi
                 'kodeJenisEntitas' => $b['kode_jenis_entitas'],
                 'namaEntitas' => $b['nama_pemilik_barang'],
                 'nibEntitas' => $b['nib_entitas'],
-                'nomorIdentitas' => $b['npwp_pemilik_barang'],
+                'nomorIdentitas' => $b['nitku_pemilik_barang'],
                 'nomorIjinEntitas' => $b['nomor_ijin_entitas'],
                 'tanggalIjinEntitas' => $b['tanggal_ijin_entitas'],
                 'seriEntitas' => 2,
@@ -767,7 +767,7 @@ class BeaCukaiApi
                 'kodeJenisEntitas' => $b['kode_jenis_entitas'],
                 'namaEntitas' => $b['nama_pemasok'],
                 'nibEntitas' => $b['nib_entitas'],
-                'nomorIdentitas' => $b['npwp_pemasok'],
+                'nomorIdentitas' => $b['nitku_pemasok'],
                 'nomorIjinEntitas' => $b['nomor_ijin_entitas'],
                 'tanggalIjinEntitas' => $b['tanggal_ijin_entitas'],
                 'seriEntitas' => 3,
@@ -815,7 +815,7 @@ class BeaCukaiApi
             $barangTarifArr[] = [
                 'kodeFasilitasTarif' => $b['kode_fasilitas_tarif'],
                 'kodeJenisPungutan' => $b['kode_jenis_pungutan'],
-                'nilaiPungutan' => (float)$b['nilai_bayar'] == null ? 0 : (float)$b['nilai_bayar'],
+                'nilaiPungutan' => (float)$b['nilai_bayar'] == null ? 0 : roundNumber((float)$b['nilai_bayar'], 0.01),
             ];
         }
 
@@ -861,11 +861,11 @@ class BeaCukaiApi
                 ->where('deletedAt', null)
                 ->findAll();
 
-            $barangTarifArr = [];
+            $barangTarifArr1 = [];
             foreach ($barangTarifData as $bt) {
-                $barangTarifArr[] = [
+                $barangTarifArr1[] = [
                     'kodeJenisTarif' => $bt['kode_jenis_tarif'],
-                    'jumlahSatuan' => 0,
+                    'jumlahSatuan' => (float)$b['jumlah_satuan'],
                     'kodeFasilitasTarif' => $bt['kode_fasilitas_tarif'],
                     'kodeSatuanBarang' => $bt['kode_satuan_barang'],
                     'nilaiBayar' => roundNumber($bt['nilai_bayar'], 0.01),
@@ -875,10 +875,10 @@ class BeaCukaiApi
                     'tarif' => (float) $bt['tarif_bea_masuk'],
                     'tarifFasilitas' => (float) $bt['tarif_fasilitas'],
                     'kodeJenisPungutan' => $bt['kode_jenis_pungutan'],
-                    'nilaiPungutan' => 0
+                    'nilaiPungutan' => roundNumber($bt['nilai_bayar'], 0.01),
                 ];
             }
-            $barang['barangTarif'] = $barangTarifArr;
+            $barang['barangTarif'] = $barangTarifArr1;
             $barangArr[] = $barang;
         }
 
