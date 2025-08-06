@@ -43,7 +43,8 @@ $routes->get('/403', function () {
     return view('errors/html/error_403');
 });
 
-$routes->get('/update-ekspor', 'Warehouse\Penomoran_::generateShipmentValueOrderFormEkspor');
+$routes->get('/generate-no-ktp', 'Warehouse\Penomoran_::generateNoKtpSupplier');
+
 // $routes->get('/delete-transaksi-jurnal', 'Accounting\TutupBuku\TutupBukuController::deleteTransaksiJurnalLama');
 // $routes->get('/update-transaksi-jurnal', 'Accounting\TutupBuku\TutupBukuController::updateTransaksiJurnalBahanBaku');
 
@@ -1504,6 +1505,7 @@ $routes->group('bea-cukai-bc-40', ['filter' => 'Auth'], function ($routes) {
     $routes->post('id/delete', 'BeaCukai\BC40::delete');
     $routes->get('api/kirim-dokumen/(:segment)', 'BeaCukai\BC40::kirimCeisa/$1');
     $routes->post('id/update-no-aju-bulk', 'BeaCukai\BC40::updateNoAjuBulk');
+    $routes->get('sync-no-daftar', 'BeaCukai\BC40::syncNoDaftar');
 });
 
 // BC 2.7

@@ -360,6 +360,47 @@ class BeaCukaiApi
         }
     }
 
+    public function getResponseByNoAju($noAju)
+    {
+        $token = $this->getTokenApi();
+        if ($token['status'] === false) {
+            return [
+                'status' => false,
+                'message' => $token['message']
+            ];
+        }
+
+        $endPoint = $this->baseUrl . "/openapi/status/" . $noAju;
+        $headers = array(
+            'Content-Type: application/json',
+            'Authorization: Bearer ' . $token['token'],
+        );
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $endPoint);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+        $response = curl_exec($ch);
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+
+        if (curl_errno($ch)) {
+            return [
+                'message' => curl_error($ch) . ". Code " . $httpCode,
+                'status' => false
+            ];
+        } else {
+            $responseData = json_decode($response);
+
+            if ($httpCode == 200) {
+                return $responseData;
+            } else {
+                return [
+                    'message' => "Sisi Server Ceisa Error : " . $httpCode,
+                    'status' => false
+                ];
+            }
+        }
+    }
+
     public function getResponPdf($path)
     {
         $token = $this->getTokenApi();

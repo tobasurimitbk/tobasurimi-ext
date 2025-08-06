@@ -76,9 +76,21 @@
                         </div>
                     </div>
                     <div class="col-sm-4">
-                        <div class="form-floating mb-3">
-                            <input value="<?= $bcPo['no_daftar'] ?>" autocomplete="one-time-code" type="number" class="form-control no_daftar" id="no_daftar" name="no_daftar" placeholder="No Daftar">
-                            <label for="floatingInput">Nomor Daftar</label>
+                        <div class="input-group">
+
+                            <div class="form-floating mb-3">
+                                <input value="<?= $bcPo['no_daftar'] ?>" autocomplete="one-time-code" type="number" class="form-control no_daftar" id="no_daftar" name="no_daftar" placeholder="No Daftar">
+                                <label for="floatingInput">Nomor Daftar</label>
+                            </div>
+                            <?php if (!empty($bc40)): ?>
+                                <?php if ($bc40['status_dokumen'] == "Sudah Kirim"): ?>
+                                    <div class="input-group-append" style="height:50px;">
+                                        <button class="btn btn-success" data-toggle="modal" type="button" onclick="ambilNoDaftar()">
+                                            <i class="fa-solid fa-download"></i>
+                                        </button>
+                                    </div>
+                                <?php endif; ?>
+                            <?php endif; ?>
                         </div>
                     </div>
                     <div class="col-sm-4">
@@ -925,6 +937,43 @@
         $('#no_urut_dokumen').val(splitValues[3]);
         $('#kode_kantor').val(splitValues[1]);
         $('#modalUpdateNoAju').modal('show');
+    }
+
+    function ambilNoDaftar() {
+        $.ajax({
+            url: `<?= base_url("bea-cukai-bc-40/sync-no-daftar"); ?>`,
+            method: "GET",
+            data: {
+                bc_purchase_order_id: "<?= $bcPo['id'] ?>"
+            },
+            beforeSend: function(xhr) {
+                setLoading();
+                xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+            },
+            complete: function() {
+                stopLoading();
+            },
+            success: function(res) {
+                if (res.status) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: res.message,
+                        confirmButtonColor: '#4e73df',
+                        confirmButtonText: 'Ok'
+                    }).then((result) => {
+                        location.reload();
+                    });
+
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: res.message,
+                        confirmButtonColor: '#4e73df',
+                        confirmButtonText: 'Ok'
+                    })
+                }
+            }
+        })
     }
 </script>
 <?= $this->endSection(); ?>

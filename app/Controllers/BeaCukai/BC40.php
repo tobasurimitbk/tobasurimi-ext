@@ -301,6 +301,7 @@ class BC40 extends BaseController
         $data = [
             'noAju' => $noAju,
             'bcPo' => $bcPo,
+            'bc40' => $bc40,
             'daftarPoUsed' => $this->bcPurchaseOrderModel->findDetailBarangWithSpek($bcPurchaseOrderID),
         ];
 
@@ -3157,6 +3158,44 @@ class BC40 extends BaseController
                     'status' => false,
                 ]);
             }
+        }
+    }
+
+    public function syncNoDaftar()
+    {
+        try {
+            $bcPurchaseOrderId = $this->request->getVar('bc_purchase_order_id');
+            $bc40 = $this->bc40Model->where('bc_purchase_order_id', $bcPurchaseOrderId)->first();
+
+            $username = ($this->akunCeisa == null ? "" : $this->akunCeisa['username']);
+            $password = ($this->akunCeisa == null ? "" : $this->akunCeisa['password']);
+            $beacukaiApi = new BeaCukaiApi($username, $password);
+            $noAju = str_replace('-', '',   $bc40['no_aju']);
+
+            $response = $beacukaiApi->getResponseByNoAju(
+                $noAju
+            );
+
+            if ($response->status == "Failed") {
+                return response()->setJSON([
+                    'status' => false,
+                    'message' => $response->message
+                ]);
+            }
+
+            $this->bcPurchaseOrderModel->update($bcPurchaseOrderId, [
+                'no_daftar' => $response->dataRespon[0]->nomorDaftar
+            ]);
+
+            return response()->setJSON([
+                'status' => true,
+                'message' => "No Daftar berhasil disinkronkan dengan sistem Ceisa"
+            ]);
+        } catch (Exception $e) {
+            return response()->setJSON([
+                'status' => false,
+                'message' => $e->getMessage()
+            ]);
         }
     }
 }

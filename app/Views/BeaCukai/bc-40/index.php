@@ -7,10 +7,10 @@
         <div class="col-button-tambah-spp">
             <?php if ($akunCeisa != null) : ?>
                 <?php if ($akunCeisa['status_integrasi']) : ?>
-                    <a href="<?= base_url('bea-cukai-bc-40/online') ?>" class="btn btn-discard btn-dropdown-export float-right" type="button">
+                    <!-- <a href="<?= base_url('bea-cukai-bc-40/online') ?>" class="btn btn-discard btn-dropdown-export float-right" type="button">
                         <i class="fa fa-upload fa-sm" aria-hidden="true"></i>
                         Status Respon
-                    </a>
+                    </a> -->
                     <a href="<?= base_url('bea-cukai-bc-40/bc-40-outstanding') ?>" class="btn btn-save float-right" type="button">
                         <i class="fa fa-ship fa-sm" aria-hidden="true"></i>
                         Outstanding
