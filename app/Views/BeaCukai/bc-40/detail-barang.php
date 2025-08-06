@@ -111,6 +111,92 @@
                 </div>
             </div>
 
+            <?php if ($dataResponse != null): ?>
+                <div class="row mt-3">
+                    <div class="col mb-3">
+                        <div class="alert alert-secondary">
+                            <label class="form-label font-weight-bold text-black lable-title">DETAIL RESPON DOKUMEN</label>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input disabled autocomplete="one-time-code" value="<?= $dataResponse->dataRespon[0]->nomorRespon ?>" type="text" class="form-control " id="" name="" placeholder="">
+                                <label for="floatingInput">No Respon</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input disabled autocomplete="one-time-code" value="<?= $dataResponse->dataRespon[0]->tanggalRespon ?>" type="text" class="form-control " id="" name="" placeholder="">
+                                <label for="floatingInput">Tanggal Respon</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input disabled autocomplete="one-time-code" value="<?= $dataResponse->dataRespon[0]->keterangan  ?>" type="text" class="form-control " id="" name="" placeholder="">
+                                <label for="floatingInput">Keterangan</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <?php if ($dataResponse->dataRespon[0]->pdf != null): ?>
+                                <div class="section-header">
+                                    <div class="col-button-tambah-spp">
+
+                                        <a onclick="pdf('<?= $dataResponse->dataRespon[0]->pdf ?>')" href="#" type="button" class="btn btn-save float-right">
+                                            <i class="fa-solid fa-file-pdf mr-2"></i> PDF
+                                        </a>
+                                    </div>
+                                </div>
+                            <?php endif; ?>
+                        </div>
+                    </div>
+                </div>
+                <table class="table table-bordered nowrap table-hover-tobasurimi dataTable table-list-lpb" id="dataTables" width="100%" cellspacing="0">
+                    <thead class="thead-dark">
+                        <tr>
+                            <th style="text-align: center; width:10px;">No</th>
+                            <th>Waktu Status</th>
+                            <th>Keterangan</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php $no = 1; ?>
+                        <?php foreach ($dataResponse->dataStatus as $d): ?>
+                            <tr>
+                                <td><?= $no++ ?></td>
+                                <td><?= date('d/m/Y H:i:s', strtotime($d->waktuStatus)) ?></td>
+                                <td><?= $d->keterangan ?></td>
+                            </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+                <script>
+                    function pdf(url) {
+                        $.ajax({
+                            url: "<?= base_url('bea-cukai-bc-40/download-response') ?>",
+                            type: 'GET',
+                            data: {
+                                path: url
+                            },
+                            xhrFields: {
+                                responseType: 'blob'
+                            },
+                            success: function(blob) {
+                                var url = window.URL.createObjectURL(blob);
+                                var a = document.createElement('a');
+                                a.href = url;
+                                a.download = 'download.pdf';
+                                document.body.appendChild(a);
+                                a.click();
+                                a.remove();
+                            },
+                            error: function(error) {
+                                alert('Error downloading PDF');
+                            }
+                        });
+                    }
+                </script>
+            <?php endif; ?>
         </div>
     </div>
 </section>

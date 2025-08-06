@@ -327,10 +327,35 @@ class BC40 extends BaseController
         } else {
             $noAju = "";
         }
+
+        $dataResponse = null;
+        if ($bc40['status_dokumen'] == "Sudah Kirim") {
+            $username = ($this->akunCeisa == null ? "" : $this->akunCeisa['username']);
+            $password = ($this->akunCeisa == null ? "" : $this->akunCeisa['password']);
+
+            $beacukaiApi = new BeaCukaiApi($username, $password);
+            $noAju = str_replace('-', '',   $bc40['no_aju']);
+
+            $response = $beacukaiApi->getResponseByNoAju(
+                $noAju
+            );
+
+            if (is_array($response)) {
+                // Gagal Dari Ceisa
+                $dataResponse = null;
+            } else {
+                if ($response->status == "Failed") {
+                    $dataResponse = null;
+                }
+                $dataResponse = $response;
+            }
+        }
+
         $data = [
             'daftarPoUsed' => $this->bcPurchaseOrderModel->findDetailBarangWithSpek($bcPurchaseOrderID),
             'bcPo' => $bcPo,
-            'noAju' => $noAju
+            'noAju' => $noAju,
+            'dataResponse' => $dataResponse
         ];
         return view('BeaCukai/bc-40/detail-barang', $data);
     }
