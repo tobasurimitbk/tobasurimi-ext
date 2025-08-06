@@ -2,7 +2,7 @@
   "$schema": "http://json-schema.org/draft-07/schema#",
   "type": "object",
   "title": "Schema Kirim Dokumen BC 40",
-  "description": "JSON Schema untuk Kirim Dokumen Pabean v.0.3. Terdiri atas data header dan data barang. Data header merupakan data umum dokumen pabean sedangkan data barang merupakan data detil atas barang pada dokumen pabean",
+  "description": "JSON Schema untuk Kirim Dokumen Pabean v.0.5. Terdiri atas data header dan data barang. Data header merupakan data umum dokumen pabean sedangkan data barang merupakan data detil atas barang pada dokumen pabean",
   "properties": {
     "asalData": {
       "type": "string",
@@ -613,9 +613,9 @@
               "message": "Harga patokan maksimal 18 digit dengan empat angka dibelakang koma"
             },
             "isiPerKemasan": {
-              "type": "integer",
-              "description": "Isi per kemasan barang",
-              "message": "Isi per kemasan barang"
+              "type": "number",
+              "description": "Isi per kemasan",
+              "multipleOf": 0.01
             },
             "jumlahKemasan": {
               "type": "number",
@@ -634,7 +634,7 @@
             "jumlahSatuan": {
               "type": "number",
               "description": "Sesuai kolom formulir BC 4.0 - D.29 Jumlah Satuan",
-              "maxlength": 20,
+              "maxlength": 24,
               "multipleOf": 0.0001,
               "message": "Jumlah satuan maksimal 20 digit dengan empat angka dibelakang koma"
             },
@@ -770,8 +770,8 @@
                     "jumlahSatuan": {
                       "type": "number",
                       "description": "jumlah satuan barang tarif PPN",
-                      "maxlength": 18,
-                      "multipleOf": 0.01,
+                      "maxlength": 24,
+                      "multipleOf": 0.0001,
                       "message": "Jumlah satuan maksimal 18 digit dengan dua angka dibelakang koma"
                     },
                     "kodeFasilitasTarif": {
