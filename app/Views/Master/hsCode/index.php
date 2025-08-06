@@ -14,8 +14,8 @@
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" type="text" class="form-control komoditi" id="komoditi" name="komoditi" placeholder="Komoditi">
-                                <label for="floatingInput">Komoditi</label>
+                                <input autocomplete="one-time-code" type="text" class="form-control komoditi" id="komoditi" name="komoditi" placeholder="Komoditi (Opsional)">
+                                <label for="floatingInput">Komoditi (Opsional)</label>
                             </div>
                         </div>
                         <div class="col-md-6">
@@ -237,9 +237,9 @@
 
         var validator = $(".create-form").validate({
             rules: {
-                komoditi: {
-                    required: true
-                },
+                // komoditi: {
+                //     required: true
+                // },
                 code: {
                     required: true
                 },
@@ -251,9 +251,9 @@
                 }
             },
             messages: {
-                komoditi: {
-                    required: "Komoditi wajib diisi"
-                },
+                // komoditi: {
+                //     required: "Komoditi wajib diisi"
+                // },
                 code: {
                     required: "Kode wajib diisi"
                 },

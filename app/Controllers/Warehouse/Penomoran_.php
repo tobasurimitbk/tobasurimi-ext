@@ -11,6 +11,7 @@ use App\Models\DivisisModel;
 use App\Models\JamKerjaDetailModel;
 use App\Models\JamKerjaModel;
 use App\Models\JurnalUmumModel;
+use App\Models\MetadataModel;
 use App\Models\PenerimaanBarangModel;
 use App\Models\RMImportPODetailModel;
 use App\Models\RMPurchaseOrderDetailModel;
@@ -19,6 +20,7 @@ use App\Models\SalesOrderExportModel;
 use App\Models\SalesOrderInvoiceModel;
 use App\Models\StockDetail2Model;
 use App\Models\StockDetailModel;
+use App\Models\SupplierModel;
 use App\Models\TransaksiJurnalModel;
 use DateTime;
 use Exception;
@@ -942,6 +944,127 @@ class Penomoran_ extends BaseController
     public function generateShipmentValueOrderFormEkspor()
     {
         $salesOrderExportModel = new SalesOrderExportModel();
+        $list = $salesOrderExportModel->where('deletedAt', null)->findAll();
+
+        foreach ($list as $l) {
+            // Update Shipment Value & Shipment Value Net & Valas
+            $shipmentDetail = $salesOrderExportModel->generateTotalPrice(
+                $l['sales_order_export_id']
+            );
+
+            $salesOrderExportModel->update($l['sales_order_export_id'], [
+                'shipment_value' => $shipmentDetail['shipment_value'],
+                'shipment_value_net' => $shipmentDetail['shipment_value_net'],
+                'valas_id' => $shipmentDetail['valas_id']
+            ]);
+        }
+
+        echo "Oke";
+    }
+
+    public function drawExcelSatuanView()
+    {
+        return view('tes');
+    }
+
+    public function drawExcelSatuanAction()
+    {
+
+        $db = \Config\Database::connect();
+        try {
+            $metaDataModel = new MetadataModel();
+            $file = $this->request->getFile('file');
+
+            if (!$file->isValid()) {
+                return $this->response->setJSON([
+                    'status' => false,
+                    'message' => 'File tidak valid'
+                ]);
+            }
+
+            // Load spreadsheet
+            $spreadsheet = IOFactory::load($file->getTempName());
+            $sheet = $spreadsheet->getActiveSheet();
+
+            $data = [];
+            foreach ($sheet->getRowIterator(2) as $row) {
+                $cellIterator = $row->getCellIterator();
+                $cellIterator->setIterateOnlyExistingCells(false);
+
+                $rowData = [];
+                foreach ($cellIterator as $cell) {
+                    $rowData[] = $cell->getValue();
+                }
+
+                // Hapus ** dari kode satuan
+                $kodeSatuan = isset($rowData[0]) ? preg_replace('/\*+/', '', trim($rowData[0])) : null;
+                $namaSatuan = isset($rowData[1]) ? trim($rowData[1]) : null;
+
+                if ($kodeSatuan && $namaSatuan) {
+                    $data[] = [
+                        'kode_satuan' => $kodeSatuan,
+                        'nama_satuan' => $namaSatuan,
+                    ];
+                }
+            }
+
+            // Ambil semua kode satuan yang sudah ada di database dalam satu query
+            $kodeList = array_column($data, 'kode_satuan');
+
+            $existingRecords = $metaDataModel
+                ->where('name', 'Kode Satuan BC')
+                ->whereIn('value', $kodeList)
+                ->findAll();
+
+            // Buat array untuk lookup cepat
+            $existingValues = array_column($existingRecords, 'value');
+            $existingMap = array_flip($existingValues);
+
+            $resultData = [];
+            foreach ($data as $d) {
+                if (!isset($existingMap[$d['kode_satuan']])) {
+                    $resultData[] = [
+                        'name' => "Kode Satuan BC",
+                        'value' => $d['kode_satuan'],
+                        'description' => $d['nama_satuan']
+                    ];
+                }
+            }
+
+            $metaDataModel->insertBatch($resultData);
+            $db->transCommit();
+
+            \dd("OK");
+        } catch (Exception $e) {
+
+            $db->transRollback();
+            dd($e->getMessage());
+        }
+    }
+
+    public function generateNoKtpSupplier()
+    {
+        $supplierModel = new SupplierModel();
+        $supplier = $supplierModel->where('deletedAt', null)
+            ->where('type', "BAHAN BAKU")
+            ->findAll();
+
+        foreach ($supplier as $s) {
+            $alamat = $s['address'];
+            $noKtp = null;
+
+            // Tangkap angka berapa pun setelah "NIK:"
+            if (preg_match('/NIK\s*:\s*(\d+)/', $alamat, $matches)) {
+                $noKtp = $matches[1];
+
+                $supplierModel->update($s['id'], [
+                    'no_ktp' => $noKtp
+                ]);
+            }
+        }
+
+        echo "DONE";
+        die;
     }
 }
 
