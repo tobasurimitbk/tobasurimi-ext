@@ -134,7 +134,7 @@
                         <div class="form-floating mb-3" style="height: 50px;">
 
                             <select class="form-select termin" id="termin" name="termin">
-                                <?php if ($termin != "") : ?>
+                                <?php if (!empty($termin)) : ?>
                                     <option value=""></option>
                                     <?php foreach ($termin as $row) : ?>
                                         <option value="<?= $row['id'] ?>" <?= $data->terms == $row['id'] ? 'selected' : '' ?>><?= $row['value'] ?></option>
@@ -526,7 +526,7 @@
     });
     // Display the date on the webpage
     $(document).ready(function() {
-        <?php if ($termin == "") : ?>
+        <?php if (!empty($termin)) : ?>
             getTerminList(this.value);
         <?php endif; ?>
 

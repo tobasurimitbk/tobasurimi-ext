@@ -85,7 +85,18 @@
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" class="form-control" id="termin" name="termin" value="<?= $data->customerTermin ?? ''; ?>" readonly>
+                            <!-- <input autocomplete="one-time-code" class="form-control" id="termin" name="termin" value="<?= $data->customerTermin ?? ''; ?>" readonly>
+                            <label for="floatingInput">Termin</label> -->
+
+                            <select class="form-select termin" id="termin" name="termin">
+                                <?php if (!empty($termin)) : ?>
+                                    <option value=""></option>
+                                    <?php foreach ($termin as $row) : ?>
+                                        <option value="<?= $row['id'] ?>" <?= ($data->terms == null ? $data->termin : $data->terms) == $row['id'] ? 'selected' : '' ?>><?= $row['value'] ?></option>
+                                    <?php endforeach; ?>
+                                <?php endif; ?>
+
+                            </select>
                             <label for="floatingInput">Termin</label>
                         </div>
                     </div>
@@ -200,6 +211,9 @@
     const csrfToken = '<?= csrf_token() ?>';
 
     $(document).ready(function() {
+        <?php if (empty($termin)) : ?>
+            getTerminList(this.value);
+        <?php endif; ?>
         // Deklarasikan variabel table di level yang lebih tinggi
         let table;
 
@@ -303,15 +317,21 @@
             allowClear: true
         })
 
+        $('#termin').select2({
+            placeholder: "Pilih Termin",
+            theme: "bootstrap-5",
+            allowClear: true
+        })
+
         //CSS SELECT2 FLOATING LABEL
-        $('.id_customer, #company_id')
+        $('.id_customer, #company_id, #termin')
             .parent('div')
             .children('span')
             .children('span')
             .children('span')
             .css('height', ' calc(3.5rem + 2px)');
 
-        $('.id_customer, #company_id')
+        $('.id_customer, #company_id, #termin')
             .parent('div')
             .children('span')
             .children('span')
@@ -319,7 +339,7 @@
             .children('span')
             .css('margin-top', '22px').css('margin-left', '-7px');
 
-        $('.id_customer, #company_id')
+        $('.id_customer, #company_id, #termin')
             .parent('div')
             .find('label')
             .css('z-index', '1');
@@ -389,12 +409,12 @@
                             } else {
                                 jenis_penjualanan_name = "";
                             }
-                            $(".id_so").append(`<option  value="${item.id}" data-jenis_penjualan="${jenis_penjualanan_name}"  data-no_po="${item.no_po}" data-nama_ecommerce="${item.nama_ecommerce}" data-termin="${item.customerTermin}" data-sales="${item.salesName}" data-company="${item.id_company}" data-keterangan="${item.keterangan}" data-no_po="${item.no_po}">${item.no_sales_order}</option>`);
+                            $(".id_so").append(`<option  value="${item.id}" data-jenis_penjualan="${jenis_penjualanan_name}"  data-no_po="${item.no_po}" data-nama_ecommerce="${item.nama_ecommerce}" data-termin="${item.termin}" data-sales="${item.salesName}" data-company="${item.id_company}" data-keterangan="${item.keterangan}" data-no_po="${item.no_po}">${item.no_sales_order}</option>`);
                         });
 
                         $('#tagihan_ke').val(res.customerData.address);
                         $('#salesName').val(res.customerData.salesName);
-                        $('#termin').val(res.customerData.customerTermin);
+                        $('#termin').val(res.customerData.termin).change();
                         $('#no_telp').val(res.customerData.phone);
                     }
                 })
@@ -487,6 +507,32 @@
             table.rows.add(itemList).draw(false);
             calculateTotals();
         <?php endif; ?>
+
+        function getTerminList() {
+            $.ajax({
+                url: `<?= base_url("metadata/dropdown"); ?>`,
+                method: "GET",
+                data: {
+                    name: 'termin'
+                },
+                beforeSend: function() {
+                    setLoading();
+                },
+                complete: function() {
+                    stopLoading();
+                },
+                dataType: "json",
+                success: function(result) {
+                    $(".termin").empty()
+                    $(".termin").append(`<option value=""></option>`)
+                    result.data.forEach(function(item) {
+                        $(".termin").append(`<option value="${item.id}">${item.value.toUpperCase()}</option>`)
+                    })
+
+                    $(".termin").val("").change();
+                }
+            })
+        }
 
     })
 

@@ -14,6 +14,7 @@ use App\Models\CustomerModel;
 use App\Models\AllNoModel;
 use App\Models\SuratJalanModel;
 use App\Models\EmployeesModel;
+use App\Models\MetadataModel;
 use App\Models\SalesOrderInvoiceDetailModel;
 use Exception;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
@@ -35,6 +36,7 @@ class SuratJalan extends BaseController
     private $SuratJalanModel;
     private $EmployeesModel;
     private $AllNoModel;
+    private $metaDataModel;
 
     public function __construct()
     {
@@ -52,6 +54,7 @@ class SuratJalan extends BaseController
         $this->AllNoModel = new AllNoModel();
         $this->SuratJalanModel = new SuratJalanModel();
         $this->EmployeesModel = new EmployeesModel();
+        $this->metaDataModel = new MetadataModel();
     }
 
     public function index()
@@ -253,18 +256,21 @@ class SuratJalan extends BaseController
             // start transaction
             $this->SuratJalanModel->db->transException(true)->transStart();
             $values = [
-                "id_user"       => $this->userId,
-                "id_customer"   => $this->request->getPost('id_customer'),
-                "shipping_date" =>  $shippingDate ? date("Y-m-d", strtotime(str_replace("/", "-", $shippingDate))) : "",
-                "no_surat_jalan" => strtoupper($this->request->getVar('no_surat_jalan')),
-                "no_po"         => $this->request->getPost('no_po'),
-                "note"          => $this->request->getPost('note'),
-                'multiple_id_so' => json_encode($idArray),
-                'multiple_no_so' => json_encode($noArray),
-                "id_company"    => ($this->this_company_id != 16)
+                "id_user"           => $this->userId,
+                "id_customer"       => $this->request->getPost('id_customer'),
+                "shipping_date"     =>  $shippingDate ? date("Y-m-d", strtotime(str_replace("/", "-", $shippingDate))) : "",
+                "no_surat_jalan"    => strtoupper($this->request->getVar('no_surat_jalan')),
+                "no_po"             => $this->request->getPost('no_po'),
+                "note"              => $this->request->getPost('note'),
+                "terms"             => $this->request->getPost('termin'),
+                'multiple_id_so'    => json_encode($idArray),
+                'multiple_no_so'    => json_encode($noArray),
+                "id_company"        => ($this->this_company_id != 16)
                     ? $this->request->getPost('company_id')
                     : $this->this_company_id,
             ];
+            // var_dump($values);
+            // die;
             $checkSJ = $this->SuratJalanModel->where('deletedAt', NULL)->where('UPPER(no_surat_jalan)', strtoupper($this->request->getVar('no_surat_jalan')))->findAll();
             if ($checkSJ) {
                 $data = [
@@ -343,12 +349,19 @@ class SuratJalan extends BaseController
             $getJenisPenjualan = "";
         }
 
+        $dataTermin = $this->metaDataModel
+            ->where('metadata.deletedAt', null)
+            ->where('metadata.name', 'Termin')
+            ->orderBy('CAST(metadata.value AS DECIMAL)', 'ASC')
+            ->findAll();
+
         $data = [
             "data" => $dataSuratJalan,
             "dataCustomers" => $customers,
             "id_user" => $dataSuratJalan->id_user,
             "dataSo" => $dataSo,
-            "getJenisPenjualan" => $getJenisPenjualan
+            "getJenisPenjualan" => $getJenisPenjualan,
+            "termin" => $dataTermin,
         ];
         // var_dump($dataSuratJalan->multiple_id_so);
         // // exit;
@@ -412,17 +425,20 @@ class SuratJalan extends BaseController
         $shippingDate = $this->request->getPost('shipping_date');
 
         $values = [
-            "id_customer"   => $this->request->getPost('id_customer'),
-            "shipping_date" =>  $shippingDate ? date("Y-m-d", strtotime(str_replace("/", "-", $shippingDate))) : "",
-            "no_surat_jalan" => strtoupper($this->request->getVar('no_surat_jalan')),
-            "no_po"         => $this->request->getPost('no_po'),
-            "note"          => $this->request->getPost('note'),
-            'multiple_id_so' => json_encode($idArray),
-            'multiple_no_so' => json_encode($noArray),
-            "id_company"    => ($this->this_company_id != 16)
+            "id_customer"       => $this->request->getPost('id_customer'),
+            "shipping_date"     =>  $shippingDate ? date("Y-m-d", strtotime(str_replace("/", "-", $shippingDate))) : "",
+            "no_surat_jalan"    => strtoupper($this->request->getVar('no_surat_jalan')),
+            "no_po"             => $this->request->getPost('no_po'),
+            "note"              => $this->request->getPost('note'),
+            "terms"             => $this->request->getPost('termin'),
+            'multiple_id_so'    => json_encode($idArray),
+            'multiple_no_so'    => json_encode($noArray),
+            "id_company"        => ($this->this_company_id != 16)
                 ? $this->request->getPost('company_id')
                 : $this->this_company_id,
         ];
+        // var_dump($values);
+        // die;
         try {
 
             // Create a new validation instance

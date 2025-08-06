@@ -27,7 +27,8 @@ class SuratJalanModel extends Model
         'counter_print',
         'note',
         'id_company',
-        'posting'
+        'posting',
+        'terms'
     ];
 
     // Dates
@@ -142,13 +143,14 @@ class SuratJalanModel extends Model
     {
         $selectQry = "surat_jalan_so.*,
                       sales_order.jenis_penjualan,
-                      sales_order.no_po,
+                      surat_jalan_so.no_po,
                       sales_order.nama_ecommerce,
                       users.name as seller_name,
                       customers.name as customer_name ,
                       customers.address,customers.phone,
                       customers.address AS customerAddress,
                       customers.phone AS customerPhone,
+                      customers.termin,
                       metadata.value AS customerTermin,
                       employees.name AS customerSales";
 
