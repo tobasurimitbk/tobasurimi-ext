@@ -1556,8 +1556,8 @@ class BC40 extends BaseController
 
         $payload = $this->generatePayload($bcPurchaseOrderID);
 
-        // return \response()->setJSON($payload);
-        // die;
+        return \response()->setJSON($payload);
+        die;
 
         $res = $beacukaiApi->kirimDokumenBC($payload, false);
         if ($res['status'] == false) {
