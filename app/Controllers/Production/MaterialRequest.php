@@ -601,7 +601,7 @@ class MaterialRequest extends BaseController
             $mr_detail = json_decode($this->request->getVar("listMaterial"));
 
             foreach ($mr_detail as $item) {
-                $stockId = decrypt($item->id);
+                $stockId = ($item->stock_id);
                 $stockData = $this->stockModel->asObject()->where('id', $stockId)->first();
 
 

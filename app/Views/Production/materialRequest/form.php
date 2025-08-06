@@ -950,9 +950,6 @@
             date_request: {
                 required: true
             },
-            date_production: {
-                required: true
-            },
             req_no: {
                 required: true
             },
@@ -966,9 +963,6 @@
         messages: {
             date_request: {
                 required: "Tanggal request wajib diisi"
-            },
-            date_production: {
-                required: "Tanggal produksi wajib diisi"
             },
             req_no: {
                 required: "Nomor request wajib diisi"
