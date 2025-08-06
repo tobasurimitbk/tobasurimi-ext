@@ -993,7 +993,12 @@ class Invoice extends BaseController
 
         if ($documentType === 'pesanan') {
             $documentList = $this->SalesOrderModel->asObject()
-                ->select('sales_order.id, sales_order.no_sales_order AS doc_no, sales_order.id_company')
+                ->select('sales_order.id, 
+                sales_order.no_sales_order AS doc_no, 
+                sales_order.id_company, 
+                sales_order.no_po,
+                sales_order.keterangan,
+                ')
                 ->join('sales_order_detail', 'sales_order_detail.id_sales_order = sales_order.id')
                 ->where('sales_order.id_customer', $customer_id)
                 ->where('sales_order.surat_jalan_so_id', NULL)
@@ -1002,7 +1007,11 @@ class Invoice extends BaseController
                 ->groupBy('sales_order.no_sales_order');
         } else { // pengiriman
             $documentList = $this->SuratJalanModel->asObject()
-                ->select('surat_jalan_so.id, surat_jalan_so.no_surat_jalan AS doc_no, surat_jalan_so.id_company')
+                ->select('surat_jalan_so.id, 
+                surat_jalan_so.no_surat_jalan AS doc_no, 
+                surat_jalan_so.id_company,
+                surat_jalan_so.no_po,
+                surat_jalan_so.note as keterangan,')
                 ->join('sales_order', 'sales_order.surat_jalan_so_id = surat_jalan_so.id', 'left')
                 ->join('sales_order_detail', 'sales_order_detail.id_sales_order = sales_order.id')
                 ->where('sales_order.id_customer', $customer_id)

@@ -805,7 +805,7 @@
                         success: function(res) {
                             $("#doc_id").empty();
                             res.data.forEach(function(item) {
-                                $("#doc_id").append(`<option value="${item.id}" data-company="${item.id_company}">${item.doc_no}</option>`);
+                                $("#doc_id").append(`<option value="${item.id}" data-company="${item.id_company}" data-keterangan="${item.keterangan}" data-no_po="${item.no_po}">${item.doc_no}</option>`);
                             });
                             $("#doc_id").trigger('change');
                         }
@@ -854,9 +854,24 @@
                 $('#company_ids').val(company).change();
             }
 
+            let selectedOptions = $(this).find("option:selected");
+            let keteranganList = [];
+            let noPoList = [];
+
+            selectedOptions.each(function() {
+                let ket = $(this).data("keterangan");
+                let po = $(this).data("no_po");
+
+                if (ket) keteranganList.push(ket);
+                if (po) noPoList.push(po);
+            });
+
+            $('#keterangan').val(keteranganList.filter(Boolean).join(', ')).change();
+            $('#no_po').val(noPoList.filter(Boolean).join(', ')).change();
+
+
             <?php if (!empty($data)) : ?>
                 <?php if (isset($data->document_id)) : ?>
-
                     var array1 = [<?= ($data->document_id) ?>];
                     var difference = selectedDocs.filter(item => !array1.includes(Number(item)));
 
@@ -866,13 +881,10 @@
                     }
                 <?php endif; ?>
             <?php else : ?>
-
                 if (selectedDocs && selectedDocs.length > 0) {
                     selectedDocs.forEach(docId => getDocumentData(docId));
                 }
-
             <?php endif; ?>
-
 
             // Remove items for documents that are no longer selected
             updateItemList(selectedDocs);
@@ -1271,7 +1283,7 @@
             if (taxStatus) {
                 taxAmt = itemAmt * (taxes / 100);
             } else {
-                taxAmt = itemAmt * ((+obj.tax) / 100);
+                taxAmt = 0;
             }
 
             if (taxStatus && includeTax) {
