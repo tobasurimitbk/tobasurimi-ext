@@ -206,7 +206,7 @@
         // Fungsi untuk menghitung total
         function calculateTotals() {
             if (!table) return; // Pastikan tabel sudah diinisialisasi
-            
+
             let totalQty = 0;
             let totalHarga = 0;
             let totalDisc = 0;
@@ -214,7 +214,7 @@
 
             // Ambil semua baris data
             const allData = table.rows().data().toArray();
-            
+
             allData.forEach(row => {
                 totalQty += parseFloat(row.qty) || 0;
                 totalHarga += destroyFormatRupiah(row.harga_barang) || 0;
@@ -389,7 +389,7 @@
                             } else {
                                 jenis_penjualanan_name = "";
                             }
-                            $(".id_so").append(`<option  value="${item.id}" data-jenis_penjualan="${jenis_penjualanan_name}"  data-no_po="${item.no_po}" data-nama_ecommerce="${item.nama_ecommerce}" data-termin="${item.customerTermin}" data-sales="${item.salesName}" data-company="${item.id_company}">${item.no_sales_order}</option>`);
+                            $(".id_so").append(`<option  value="${item.id}" data-jenis_penjualan="${jenis_penjualanan_name}"  data-no_po="${item.no_po}" data-nama_ecommerce="${item.nama_ecommerce}" data-termin="${item.customerTermin}" data-sales="${item.salesName}" data-company="${item.id_company}" data-keterangan="${item.keterangan}" data-no_po="${item.no_po}">${item.no_sales_order}</option>`);
                         });
 
                         $('#tagihan_ke').val(res.customerData.address);
@@ -432,6 +432,21 @@
 
             $('#jenis_penjualan').val(jenis_penjualan);
             $('#nama_ecommerce').val(nama_ecommerce);
+
+            let selectedOptions = $(this).find("option:selected");
+            let keteranganList = [];
+            let noPoList = [];
+
+            selectedOptions.each(function() {
+                let ket = $(this).data("keterangan");
+                let po = $(this).data("no_po");
+
+                if (ket) keteranganList.push(ket);
+                if (po) noPoList.push(po);
+            });
+
+            $('#note').val(keteranganList.filter(Boolean).join(', ')).change();
+            $('#no_po').val(noPoList.filter(Boolean).join(', ')).change();
 
             $.ajax({
                 url: `<?= base_url('/order-form-lokal/getItemList'); ?>`,

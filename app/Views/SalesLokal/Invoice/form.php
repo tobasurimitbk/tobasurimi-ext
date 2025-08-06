@@ -869,7 +869,6 @@
             $('#keterangan').val(keteranganList.filter(Boolean).join(', ')).change();
             $('#no_po').val(noPoList.filter(Boolean).join(', ')).change();
 
-
             <?php if (!empty($data)) : ?>
                 <?php if (isset($data->document_id)) : ?>
                     var array1 = [<?= ($data->document_id) ?>];
