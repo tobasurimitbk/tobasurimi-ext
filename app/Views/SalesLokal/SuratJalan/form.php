@@ -177,6 +177,16 @@
                                 </tr>
                             </thead>
                             <tbody class="body-detail-table" id="body-detail-table" style="cursor: pointer;"></tbody>
+                            <tfoot>
+                                <tr>
+                                    <th colspan="2" style="text-align: right;">Total:</th>
+                                    <th class="text-center" id="total-qty">0</th>
+                                    <th></th>
+                                    <th class="text-center" id="total-harga">Rp 0</th>
+                                    <th class="text-center" id="total-disc">0</th>
+                                    <th class="text-center" id="total-amount">Rp 0</th>
+                                </tr>
+                            </tfoot>
                         </table>
                     </div>
                 </div>
@@ -190,8 +200,37 @@
     const csrfToken = '<?= csrf_token() ?>';
 
     $(document).ready(function() {
-        const table = $('.dataTable').DataTable({
+        // Deklarasikan variabel table di level yang lebih tinggi
+        let table;
 
+        // Fungsi untuk menghitung total
+        function calculateTotals() {
+            if (!table) return; // Pastikan tabel sudah diinisialisasi
+            
+            let totalQty = 0;
+            let totalHarga = 0;
+            let totalDisc = 0;
+            let totalAmount = 0;
+
+            // Ambil semua baris data
+            const allData = table.rows().data().toArray();
+            
+            allData.forEach(row => {
+                totalQty += parseFloat(row.qty) || 0;
+                totalHarga += destroyFormatRupiah(row.harga_barang) || 0;
+                totalDisc += parseFloat(row.disc) || 0;
+                totalAmount += destroyFormatRupiah(row.amount) || 0;
+            });
+
+            // Update footer
+            $('#total-qty').text(totalQty.toFixed(2));
+            $('#total-harga').text(greatFormatRupiah(totalHarga));
+            $('#total-disc').text(totalDisc.toFixed(2));
+            $('#total-amount').text(greatFormatRupiah(totalAmount));
+        }
+
+        // Inisialisasi tabel
+        table = $('.dataTable').DataTable({
             processing: true,
             info: false,
             paging: false,
@@ -245,9 +284,10 @@
                     previous: '<i class="fa fa-angle-left"></i>',
                     next: '<i class="fa fa-angle-right"></i>'
                 }
+            },
+            footerCallback: function(row, data, start, end, display) {
+                calculateTotals();
             }
-
-
         });
 
         // Customer
@@ -415,6 +455,7 @@
                         table.clear();
 
                         table.rows.add(res).draw(false);
+                        calculateTotals();
                     } else {
                         table.clear().draw(false);
                     }
@@ -422,12 +463,14 @@
             })
         });
 
+        calculateTotals();
 
         <?php if (!empty($data)) : ?>
             const itemList = <?= json_encode($data->itemList); ?>;
             console.log(itemList);
 
             table.rows.add(itemList).draw(false);
+            calculateTotals();
         <?php endif; ?>
 
     })
