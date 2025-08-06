@@ -90,7 +90,7 @@
                     <div class="col-md-6">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <?php if (!isset($data)) : ?>
-                                <select class="form-select kode_produksi" name="kode_produksi" id="kode_produksi" aria-label="Floating label select example">
+                                <select class="form-select kode_produksi" name="kode_produksi[]" id="kode_produksi" aria-label="Floating label select example" multiple="multiple">
                                     <option value=""></option>
                                     <?php if (isset($dataWorkOrder)) : ?>
                                         <?php foreach ($dataWorkOrder ?? [] as $dataWO) : ?>
@@ -1082,46 +1082,52 @@
         });
 
         $(".kode_produksi").on('change', function() {
-            if ($(this).val()) {
-                let nama_barang = $(".kode_produksi option:selected").data("nama-barang") ? $(".kode_produksi option:selected").data("nama-barang") : "";
-                let standart_production = $(".kode_produksi option:selected").data("standart-production") ? $(".kode_produksi option:selected").data("standart-production") : "";
-                let warehouse_id = $(".kode_produksi option:selected").data("warehouse") ? $(".kode_produksi option:selected").data("warehouse") : "";
-                let divisi_id = $(".kode_produksi option:selected").data("divisi") ? $(".kode_produksi option:selected").data("divisi") : "";
+            let selectedValues = $(this).val();
+            
+            if (selectedValues && selectedValues.length > 0) {
+                // For multiple selection, you might need to decide how to handle the data
+                // Here I'm just taking the first selected item's data as an example
+                let firstSelectedOption = $(this).find('option:selected').first();
+                
+                let nama_barang = firstSelectedOption.data("nama-barang") || "";
+                let standart_production = firstSelectedOption.data("standart-production") || "";
+                let warehouse_id = firstSelectedOption.data("warehouse") || "";
+                let divisi_id = firstSelectedOption.data("divisi") || "";
 
                 $(".barang_jadi").val(nama_barang);
                 $(".standart_production").val(standart_production);
                 $(".warehouse_id_order").val(warehouse_id).change();
                 $(".department_id_order").val(divisi_id).change();
+                
                 setLoading();
+                
+                // For multiple values, you might need to adjust your AJAX calls
+                // Here's an example using the first selected value
+                let firstKodeProduksi = selectedValues[0];
+                
                 $.ajax({
                     url: `<?= base_url('production-result/material-request'); ?>`,
                     method: "GET",
                     data: {
-                        kode_produksi: $(this).val(),
+                        kode_produksi: selectedValues, // Kirim array ID
                     },
                     dataType: "json",
                     success: function(res) {
-                        stopLoading()
+                        stopLoading();
                         if (res.status) {
-                            // Clear existing options
                             $('.kode_request').empty();
-                            // Append a default option
                             $('.kode_request').append(`<option value=""></option>`);
-                            // Iterate over each item in the response data
                             res.data.forEach(function(item) {
-                                // Append an option for each item
-                                $('.kode_request').append(`<option  value="${item.id}" data-tanggal-request="${item.request_date}"  data-user-request="${item.user_name}" data-warehouse-request="${item.warehouse_id}" data-divisi-request="${item.divisi_id}">${item.req_no}</option>`);
+                                $('.kode_request').append(`<option value="${item.id}" data-tanggal-request="${item.request_date}" data-user-request="${item.user_name}" data-warehouse-request="${item.warehouse_id}" data-divisi-request="${item.divisi_id}">${item.req_no}</option>`);
                             });
                         } else {
-                            stopLoading()
+                            stopLoading();
                             Swal.fire({
                                 icon: 'error',
                                 title: 'Data Material Request Tidak Ada',
                                 confirmButtonColor: '#4e73df',
-                            })
-                            // Clear existing options
+                            });
                             $('.kode_request').empty();
-                            // Append a default option
                             $('.kode_request').append(`<option value=""></option>`);
                             $('.date_request').val();
                             list_items_barang_jadi = [];
@@ -1131,11 +1137,12 @@
                         }
                     },
                 });
+                
                 $.ajax({
                     url: `<?= base_url('production-result/list-work-order'); ?>`,
                     method: "GET",
                     data: {
-                        kode_produksi: $(this).val(),
+                        kode_produksi: selectedValues, // Kirim array ID
                     },
                     dataType: "json",
                     success: function(res) {
@@ -1163,43 +1170,38 @@
                         value=""></option>`);
 
                         res.data.forEach(function(item) {
-                            // Push each item into the list_items_barang_jadi array
                             $(".kode_barang_add").append(`<option 
                             data-barang_detail_id="${getID()}" 
                             data-detail_work_order="${item.id}" 
                             data-barang1_id="${item.barang1_id}" 
                             data-barang2_id="${item.barang2_id}" 
                             data-barang_name="${item.barang_name + " - " + item.spesifikasi}" 
-                            
                             data-kode_barang="${item.kode_barang}" 
                             data-kode_satuan="${item.kode_satuan}" 
                             data-nama_barang="${item.nama_barang}" 
                             data-warehouse_id="${item.warehouse_id}" 
-                            
                             data-divisi_id="${item.divisi_id}" 
                             data-note="${item.note}" 
                             data-qty="${0}" 
                             data-qty2="${0}" 
-                            
                             data-qty_isi="${0}" 
                             data-type_barang="${item.type_barang}" 
                             data-type_barang_text="${item.type_barang_text}" 
                             data-unit="${item.unit}" 
-                            
                             value="${item.kode_barang}">(${item.kode_barang}) ${item.barang_name + " - " + item.spesifikasi}</option>`);
                         });
                         $(".kode_barang_add").val("").change();
-                        // drawTableBarangJadi();
                         stopLoading();
                     }
                 });
+                
             } else {
                 $(".barang_jadi").val("");
                 $(".standart_production").val("");
                 $(".warehouse_id_produksi").val("").change();
                 $(".divisi_id_produksi").val("").change();
             }
-        })
+        });
 
         $(".kode_barang_add").change(function() {
             if ($(this).val()) {

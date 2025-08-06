@@ -641,7 +641,7 @@ class ProductionResult extends BaseController
         $month = idate('m');
         $year = date('y');
         $romanMonth = romanMonthNumber($month);
-        $numberTemplate = "PR/$romanMonth/$year/";
+        $numberTemplate = "PRD/$romanMonth/$year/";
 
         $lastData = $this->productionResultModel->asObject()
             ->like('pr_no', $numberTemplate)
@@ -652,11 +652,11 @@ class ProductionResult extends BaseController
         if (!empty($lastData)) {
             $asd = explode('/', $lastData->pr_no);
             $lastIncrement = intval($asd[3]) + 1;
-            $paddedNumber = str_pad($lastIncrement, 3, 0, STR_PAD_LEFT);
+            $paddedNumber = str_pad($lastIncrement, 4, 0, STR_PAD_LEFT);
 
             $invNumber = $numberTemplate . $paddedNumber;
         } else {
-            $invNumber = $numberTemplate . '001';
+            $invNumber = $numberTemplate . '0001';
         }
 
         return $invNumber;
@@ -664,10 +664,21 @@ class ProductionResult extends BaseController
 
     public function getListWorkOrderByID()
     {
-        if (!empty($this->request->getVar('kode_produksi'))) {
-            $dataResult = $this->workOrderDetailsModel->getWorkOrderDetailByWorkOrderID(
-                $this->request->getVar('kode_produksi')
-            );
+        $kodeProduksi = $this->request->getVar('kode_produksi');
+        
+        if (!empty($kodeProduksi)) {
+            // Jika multiple ID, konversi ke array
+            $woIds = is_array($kodeProduksi) ? $kodeProduksi : [$kodeProduksi];
+            
+            // Modifikasi query untuk menangani multiple ID
+            $dataResult = $this->workOrderDetailsModel
+                ->select('work_order_details.*, barang.nama_barang, barang.spesifikasi, barang.kode_barang, satuan.unit')
+                ->join('barang', 'barang.id = work_order_details.barang1_id', 'left')
+                ->join('satuan', 'satuan.id = barang.satuan_id', 'left')
+                ->whereIn('work_order_details.work_order_id', $woIds) // Gunakan whereIn untuk multiple ID
+                ->where('work_order_details.deletedAt', null)
+                ->findAll();
+                
             foreach ($dataResult as $key => &$value) {
                 if ($value['type_barang'] == "bahan_baku") {
                     $value['type_barang_text'] = "BAHAN BAKU";
@@ -683,6 +694,7 @@ class ProductionResult extends BaseController
                     $value['type_barang_text'] = "BAHAN SETENGAH JADI";
                 }
             }
+            
             return response()->setJSON([
                 'data' => $dataResult,
                 'token' => csrf_hash(),
@@ -720,6 +732,11 @@ class ProductionResult extends BaseController
 
     public function getListMaterialRequestByWOID()
     {
+        $kodeProduksi = $this->request->getVar('kode_produksi');
+        
+        // Jika multiple ID, konversi ke array
+        $woIds = is_array($kodeProduksi) ? $kodeProduksi : [$kodeProduksi];
+        
         $dataMaterialRequest = $this->materialRequestModel->asObject()
             ->select('material_requests.*, GROUP_CONCAT(material_request_details.nama_barang SEPARATOR \', \') AS nama_barang, users.name AS user_name')
             ->join('material_request_details', 'material_request_details.material_request_id = material_requests.id', 'left')
@@ -729,9 +746,10 @@ class ProductionResult extends BaseController
             ->where('material_requests.deletedAt', null)
             ->where('material_request_details.deletedAt', null)
             ->where('material_request_details.qty_now >', 0)
-            // ->where('material_requests.work_order_id', $this->request->getVar('kode_produksi'))
+            ->whereIn('material_requests.work_order_id', $woIds) // Gunakan whereIn untuk multiple ID
             ->groupBy('material_request_details.material_request_id')
             ->find();
+            
         if ($dataMaterialRequest) {
             return response()->setJSON([
                 'data' => $dataMaterialRequest,
@@ -745,7 +763,7 @@ class ProductionResult extends BaseController
             ]);
         }
     }
-
+    
     public function updateStatusPostedProductionResult()
     {
         try {

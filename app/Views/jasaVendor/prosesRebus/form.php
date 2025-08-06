@@ -220,7 +220,6 @@
                                         <th style="text-align: center;">No PO</th>
                                         <th style="text-align: center;">Supplier</th>
                                         <th style="text-align: center;">Dokumen Pabean</th>
-                                        <!-- <th style="text-align: center;">No Aju / No Daftar</th> -->
                                         <th style="text-align: center;">Tgl PO</th>
                                         <th style="text-align: center;">Barang - Spesifikasi</th>
                                         <th style="text-align: center;">Satuan</th>
@@ -261,7 +260,7 @@
 
                                     <th style="text-align: center;">Barang - Spesifikasi</th>
                                     <th style="text-align: center;">Sisa Qty</th>
-                                    <th style="text-align: center;">Qty Rebus</th>
+                                    <th style="text-align: center; min-width: 100px;">Qty Rebus</th>
                                     <th style="text-align: center;">Satuan Rebus</th>
 
                                     <th style="text-align: center;">Barang - Spesifikasi</th>
@@ -718,29 +717,89 @@
                 var dataErrorHasilRebus = null;
 
                 if (typePengambilanStock == "PABEAN") {
+                    // Reset status validasi
+                    isValidRebus = true;
+                    isValidHasilRebus = true;
+                    dataErrorRebus = null;
+                    dataErrorHasilRebus = null;
+                    
+                    // Reset semua class error terlebih dahulu
+                    $('.qty-rebus-input, .qty-hasil-input, .total-hasil-input').removeClass('is-invalid');
+                    
+                    // Validasi per item
                     $.each(listStockSelected, function(i, v) {
-                        var element_rebus = $('input[data-id="' + v.id + '"].qty_rebus');
-                        var element_hasil_rebus = $('input[data-id="' + v.id + '"].qty_hasil_rebus');
+                        var element_rebus = $('input.qty-rebus-input[data-id="' + v.id + '"]');
+                        var element_hasil_rebus = $('input.qty-hasil-input[data-id="' + v.id + '"]');
 
-                        var input_user_rebus = parseFloat(element_rebus.val());
-                        var input_user_hasil_rebus = parseFloat(element_hasil_rebus.val());
-                        var stok_max = parseFloat(element_rebus.data('stok_total'));
+                        var input_user_rebus = destroyFormatRupiah(element_rebus.val()) || 0;
+                        var input_user_hasil_rebus = destroyFormatRupiah(element_hasil_rebus.val()) || 0;
+                        var stok_max = destroyFormatRupiah(element_rebus.data('stok_total')) || 0;
 
-                        if (input_user_rebus > stok_max || isNaN(input_user_rebus) || input_user_rebus == undefined || input_user_rebus == 0) {
-                            dataErrorRebus = listStockSelected[i];
-                            isValidRebus = false;
+                        // Validasi qty rebus
+                        if (input_user_rebus <= 0 || isNaN(input_user_rebus)) {
+                            element_rebus.addClass('is-invalid');
+                            if (isValidRebus) {
+                                dataErrorRebus = listStockSelected[i];
+                                isValidRebus = false;
+                            }
+                        } else if (input_user_rebus > stok_max) {
+                            element_rebus.addClass('is-invalid');
+                            if (isValidRebus) {
+                                dataErrorRebus = listStockSelected[i];
+                                isValidRebus = false;
+                            }
                         } else {
                             listStockSelected[i].qty = input_user_rebus;
                         }
 
-                        if (isNaN(input_user_hasil_rebus) || input_user_hasil_rebus == undefined || input_user_hasil_rebus == 0) {
-                            dataErrorHasilRebus = listStockSelected[i];
-                            isValidHasilRebus = false;
+                        // Validasi qty hasil rebus
+                        if (input_user_hasil_rebus <= 0 || isNaN(input_user_hasil_rebus)) {
+                            element_hasil_rebus.addClass('is-invalid');
+                            if (isValidHasilRebus) {
+                                dataErrorHasilRebus = listStockSelected[i];
+                                isValidHasilRebus = false;
+                            }
                         } else {
                             listStockSelected[i].output.qty = input_user_hasil_rebus;
                         }
-
                     });
+
+                    // Validasi total hasil rebus per grup
+                    $('.total-hasil-input').each(function() {
+                        const val = parseFloat($(this).val()) || 0;
+                        if (val <= 0 || isNaN(val)) {
+                            $(this).addClass('is-invalid');
+                            isValidHasilRebus = false;
+                        }
+                    });
+
+                    // Tampilkan pesan error
+                    if (!isValidRebus) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Qty Rebus Tidak Valid',
+                            html: `Barang: <strong>${dataErrorRebus.barang}</strong><br>
+                                Dokumen: ${dataErrorRebus.bc_type || '-'} / ${dataErrorRebus.no_aju || '-'}<br>
+                                <span class="text-danger">Qty rebus harus lebih dari 0 dan tidak melebihi stok maksimal</span>`,
+                            confirmButtonColor: '#4e73df',
+                            confirmButtonText: 'Ok'
+                        });
+                        return false;
+                    }
+
+                    if (!isValidHasilRebus) {
+                        const errorItem = dataErrorHasilRebus || listStockSelected[0];
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Qty Hasil Rebus Tidak Valid',
+                            html: `Barang: <strong>${errorItem.output?.barang || 'Tidak Diketahui'}</strong><br>
+                                Dokumen: ${errorItem.bc_type || '-'} / ${errorItem.no_aju || '-'}<br>
+                                <span class="text-danger">Qty hasil rebus harus lebih dari 0</span>`,
+                            confirmButtonColor: '#4e73df',
+                            confirmButtonText: 'Ok'
+                        });
+                        return false;
+                    }
                 }
 
                 if (!isValidRebus) {
@@ -1042,84 +1101,231 @@
     }
 
     function drawTableSelectedItem(data) {
+        const $tbody = $('#selectedItemTable .body-table');
+        $tbody.empty();
 
-        var typePengambilanStok = $('#type_pengambilan_stock option:selected').val();
-        const table = $('#selectedItemTable');
-        table.find('tbody').empty();
-        table.find('tfoot').empty();
-
-        if (data.length == 0) {
-            var newRow = $('<tr>');
-            newRow.append($('<td colspan="14" style="text-align:center">Tidak Ada Barang</td>'));
-            table.find('tfoot').append(newRow);
+        if (data.length === 0) {
+            $('#foot-detail-table').show();
+            return;
         } else {
-            var no = 1;
-            var totalQtyRebus = 0;
-            var totalQtyHasilRebus = 0;
-            $.each(data, function(i, v) {
-                var newRow = $('<tr>');
-                newRow.append($('<td style="text-align: center;">').html(
-                    `
-                   ${no++} 
-                `
-                ));
-                newRow.append($('<td style="text-align: center;">').text(v.sumber));
-                newRow.append($('<td style="text-align: center;">').text(v.stock_dokumen));
-                newRow.append($('<td style="text-align: center;">').text(v.supplier_name));
-                // newRow.append($('<td style="text-align: center;">').text(v.bc_type + '/' + v.no_aju));
-                newRow.append($('<td style="text-align: center;">').text(v.stock_date));
-                newRow.append($('<td style="text-align: center;">').text(v.barang));
-                newRow.append($('<td style="text-align: center;">').text(v.stok_total));
-
-                if (typePengambilanStok == "FIFO") {
-                    newRow.append($('<td style="text-align: center;">').text(
-                        v.qty
-                    ));
-                } else {
-                    newRow.append($('<td style="text-align: center;">').html(
-                        `
-                    <input <?= !empty($prosesRebus) ? (($prosesRebus['status_posting'] == "1") ? 'disabled' : '') : '' ?> style="height: 40px; padding-bottom: 10px;" class="form-control qty_rebus" oninput="preventNegativeInput(this)" autocomplete="one-time-code" data-id="${v.id}" data-stok_total="${v.stok_total}" class="form-control" type="text" value="${v.qty}">
-                `
-                    ));
-                }
-
-                newRow.append($('<td style="text-align: center;">').text(v.satuan));
-                newRow.append($('<td style="text-align: center;">').text(v.output.barang));
-
-                if (typePengambilanStok == "FIFO") {
-                    newRow.append($('<td style="text-align: center;">').text(
-                        v.output.qty
-                    ));
-                } else {
-                    newRow.append($('<td style="text-align: center;">').html(
-                        `
-                    <input <?= !empty($prosesRebus) ? (($prosesRebus['status_posting'] == "1") ? 'disabled' : '') : '' ?> style="height: 40px; padding-bottom: 10px;" class="form-control qty_hasil_rebus" oninput="preventNegativeInput(this)" autocomplete="one-time-code" data-id="${v.id}" data-stok_total="${v.stok_total}" class="form-control" type="text" value="${v.output.qty}">
-                `
-                    ));
-                }
-
-                newRow.append($('<td style="text-align: center;">').text(v.output.kode_satuan));
-                newRow.append($('<td style="text-align: center;">').html(
-                    `
-                    <button <?= !empty($prosesRebus) ? (($prosesRebus['status_posting'] == "1") ? 'disabled' : '') : '' ?> type="button" class="btn btn-danger" onclick="deleteDetail(${v.id})" ><i class="fa fa-trash fa-sm" aria-hidden="true"></i></button>
-                `
-                ));
-                table.find('tbody').append(newRow);
-
-                totalQtyRebus += Number(v.qty);
-                totalQtyHasilRebus += Number(v.output.qty);
-            });
-
-            var newRow = $('<tr style="color:whitesmoke; background-color:#f2c996;">');
-            newRow.append($('<td style="text-align: right;" colspan="8">').html("<b>GRAND TOTAL</b>"));
-            newRow.append($('<td style="text-align: center;">').text(totalQtyRebus.toFixed(2)));
-            newRow.append($('<td colspan ="1">').text(''));
-            newRow.append($('<td style="text-align: center;">').text(totalQtyHasilRebus.toFixed(2)));
-            newRow.append($('<td colspan ="3">').text(''));
-            table.find('tbody').append(newRow);
+            $('#foot-detail-table').hide();
         }
 
+        // Group by stock_id hasil rebus
+        const grouped = {};
+        data.forEach(item => {
+            const key = item.output?.stock_id || 'undefined';
+            if (!grouped[key]) grouped[key] = [];
+            grouped[key].push(item);
+        });
+
+        let rowIndex = 1;
+
+        for (const stockID in grouped) {
+            const group = grouped[stockID];
+            const groupName = group[0].output?.barang || 'Tidak Diketahui';
+            const satuan = group[0].output?.kode_satuan || '-';
+
+            // Hitung total hasil rebus per group
+            let totalHasilGroup = 0;
+            group.forEach(item => {
+                totalHasilGroup += parseFloat(item.output?.qty || 0);
+            });
+
+            // --- Tambah input total hasil rebus per group (diletakkan sebelum baris data) ---
+            const groupRow = $(`
+                <tr class="group-row" data-stock-id="${stockID}" style="background-color: #fcf8e3;">
+                    <td colspan="9" style="text-align: right; font-weight: bold;">
+                    </td>
+                    <td colspan="5">
+                        <input type="number" step="0.001" min="0" 
+                            class="form-control total-hasil-input" 
+                            data-stock-id="${stockID}" 
+                            value="${totalHasilGroup.toFixed(3)}"
+                            placeholder="Masukkan total hasil rebus ${groupName} (${satuan})" />
+                    </td>
+                </tr>
+            `);
+            $tbody.append(groupRow);
+
+            // --- Baris Data ---
+            group.forEach((item, i) => {
+                const tr = $(`
+                    <tr class="data-row" data-group="${stockID}" data-index="${i}">
+                        <td style="text-align: center;">${rowIndex++}</td>
+                        <td>${item.sumber || '-'}</td>
+                        <td>${item.stock_dokumen || '-'}</td>
+                        <td>${item.supplier_name || '-'}</td>
+                        <td>${item.stock_date || '-'}</td>
+                        <td>${item.barang || '-'}</td>
+                        <td style="text-align: right;">${parseFloat(item.stok_total).toFixed(3)}</td>
+                        <td>
+                            <input type="number" step="0.001" min="0" 
+                                class="form-control qty-rebus-input" 
+                                value="${item.qty || 0}" 
+                                data-stok_total="${parseFloat(item.stok_total)}"
+                                data-index="${i}" data-id="${item.id}" />
+                        </td>
+                        <td>${item.satuan || '-'}</td>
+
+                        <td>${item.output?.barang || '-'}</td>
+                        <td>
+                            <input type="number" step="0.001" min="0" 
+                                class="form-control qty-hasil-input" 
+                                name="qty_hasil_rebus[]" 
+                                data-id="${item.id}"
+                                data-index="${i}"
+                                value="${item.output?.qty || 0}" readonly />
+                        </td>
+                        <td>${item.output?.kode_satuan || '-'}</td>
+                        <td><button type="button" class="btn btn-danger btn-sm btn-remove-row">Hapus</button></td>
+                    </tr>
+                `);
+                $tbody.append(tr);
+            });
+        }
+
+        // --- Tambah Total Keseluruhan Rebus & Hasil Rebus ---
+        updateTotalRow();
+
+        $('.total-hasil-input').off('input').on('input', function() {
+            const stockID = $(this).data('stock-id');
+            const inputValue = $(this).val();
+            const totalQty = parseFloat(inputValue);
+            
+            // Jika input kosong atau tidak valid, set semua ke 0
+            if (inputValue === "" || isNaN(totalQty) || totalQty <= 0) {
+                // Set semua qty hasil di grup ini ke 0
+                const groupRows = $(`tr.data-row[data-group="${stockID}"]`);
+                
+                groupRows.each(function() {
+                    $(this).find('.qty-hasil-input').val('0');
+                });
+                
+                // Update listStockSelected
+                listStockSelected.forEach(item => {
+                    if (item.output?.stock_id == stockID) {
+                        item.output.qty = 0;
+                    }
+                });
+                
+                updateTotalRow();
+                return;
+            }
+            
+            // Jika input valid, bagi secara merata
+            const groupRows = $(`tr.data-row[data-group="${stockID}"]`);
+            const jumlahBaris = groupRows.length;
+            const qtyPerBaris = (totalQty / jumlahBaris).toFixed(3);
+            
+            groupRows.each(function() {
+                $(this).find('.qty-hasil-input').val(qtyPerBaris);
+            });
+            
+            // Sync ke listStockSelected
+            listStockSelected.forEach(item => {
+                if (item.output?.stock_id == stockID) {
+                    item.output.qty = parseFloat(qtyPerBaris);
+                }
+            });
+            
+            updateTotalRow();
+        });
+
+        // --- Logic Ubah Qty Rebus Manual ---
+        $('.qty-rebus-input').off('input').on('input', function () {
+            const index = $(this).data('index');
+            const newVal = parseFloat($(this).val());
+            
+            if (!isNaN(newVal) && listStockSelected[index]) {
+                listStockSelected[index].qty = newVal;
+            }
+            updateTotalRow();
+        });
+
+        function updateTotalRow() {
+            let totalQtyRebus = 0;
+            let totalQtyHasilRebus = 0;
+
+            // Hitung total rebus dari masing-masing baris input qty rebus
+            $('.qty-rebus-input').each(function () {
+                const val = parseFloat($(this).val());
+                if (!isNaN(val)) totalQtyRebus += val;
+            });
+
+            // Hitung total hasil rebus dari input qty hasil rebus per item
+            $('.qty-hasil-input').each(function () {
+                const val = parseFloat($(this).val());
+                if (!isNaN(val)) totalQtyHasilRebus += val;
+            });
+
+            // Hapus semua total row yang sudah ada
+            $('.grand-total-row').remove();
+
+            // Buat hanya satu grand total row di bagian paling bawah
+            const totalRow = $(`
+                <tr class="grand-total-row" style="background-color: #d1ecf1; font-weight: bold;">
+                    <td colspan="7" style="text-align: right;">GRAND TOTAL</td>
+                    <td style="text-align: right;">${totalQtyRebus.toFixed(3)}</td>
+                    <td colspan="1"></td>
+                    <td colspan="2" style="text-align: right;">${totalQtyHasilRebus.toFixed(3)}</td>
+                    <td colspan="2"></td>
+                </tr>
+            `);
+
+            $tbody.append(totalRow);
+            
+            // Panggil validasi setelah update total
+            validateRebusInputs();
+        }
+
+        // Fungsi validasi
+        function validateRebusInputs() {
+            let isValidRebus = true;
+            let isValidHasilRebus = true;
+            
+            $('.qty-rebus-input').each(function() {
+                const inputVal = parseFloat($(this).val());
+                const stokMax = parseFloat($(this).data('stok_total'));
+                
+                if (isNaN(inputVal) || inputVal <= 0 || inputVal > stokMax) {
+                    isValidRebus = false;
+                    $(this).addClass('is-invalid');
+                } else {
+                    $(this).removeClass('is-invalid');
+                }
+            });
+            
+            $('.qty-hasil-input, .total-hasil-input').each(function() {
+                const inputVal = parseFloat($(this).val());
+                
+                if (isNaN(inputVal) || inputVal <= 0) {
+                    isValidHasilRebus = false;
+                    $(this).addClass('is-invalid');
+                } else {
+                    $(this).removeClass('is-invalid');
+                }
+            });
+            
+            // Update status validasi untuk digunakan di form submit
+            window.isValidRebus = isValidRebus;
+            window.isValidHasilRebus = isValidHasilRebus;
+        }
+
+        // --- Tombol Hapus ---
+        $('.btn-remove-row').click(function () {
+            const $tr = $(this).closest('tr');
+            const index = $tr.data('index');
+            const stockID = $tr.data('group');
+
+            // Hapus dari list
+            listStockSelected.splice(index, 1);
+
+            // Redraw
+            drawTableSelectedItem(listStockSelected);
+        });
     }
+  
 
     function deleteDetail(id) {
         var indexToRemove = -1;
@@ -1134,7 +1340,6 @@
             drawTableSelectedItem(listStockSelected);
         }
     }
-
 
     function preventNegativeInput(inputElement) {
         var inputValue = inputElement.value;
