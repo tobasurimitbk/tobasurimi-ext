@@ -827,7 +827,7 @@ class BeaCukaiApi
                 'diskon' => (float)$b['diskon'],
                 'hargaEkspor' => (float)$b['harga_ekspor'],
                 'hargaPenyerahan' => (float)$b['harga_ekspor'],
-                'hargaSatuan' => (float)((float)$b['harga_ekspor'] / (float)$b['jumlah_satuan']),
+                'hargaSatuan' => round((float)$b['harga_ekspor'] / (float)$b['jumlah_satuan'], 2),
                 'isiPerKemasan' => (int)$b['jumlah_satuan'],
                 'jumlahRealisasi' => 0,
                 'jumlahSatuan' => (float)$b['jumlah_satuan'],
