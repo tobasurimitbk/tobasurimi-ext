@@ -217,23 +217,23 @@
                             </label>
                             <div class="mt-1">
                                 <div class="form-floating">
-                                    <input readonly id="barang_detail_harga_penyerahan" value="<?= number_format($barangDetail['harga']) ?>" maxlength="24" name="barang_detail_harga_penyerahan" type="text" class="form-control barang_detail_harga_penyerahan" placeholder="" onkeyup="this.value = greatFormatRupiah(this.value)">
+                                    <input readonly id="barang_detail_harga_penyerahan" value="<?= number_format($barangDetail['harga'], 2) ?>" maxlength="24" name="barang_detail_harga_penyerahan" type="text" class="form-control barang_detail_harga_penyerahan" placeholder="" onkeyup="this.value = greatFormatRupiah(this.value)">
                                     <label>Harga Penyerahan</label>
                                     <small><i>Harga penyerahan sesuai dengan total harga LPB diterima <br> (termasuk diskon & biaya tambahan)</i></small><br>
-                                    <small class="mb-3"><i>Harga Sebelum Diskon: <?= number_format($barangDetail['harga_sebelum_diskon']) ?></i></small>
+                                    <small class="mb-3"><i>Harga Sebelum Diskon: <?= number_format($barangDetail['harga_sebelum_diskon'], 2) ?></i></small>
                                 </div>
                             </div>
 
                             <div class="mt-1">
                                 <div class="form-floating">
-                                    <input id="barang_detail_harga_penggantian" readonly maxlength="24" name="barang_detail_harga_penggantian" type="text" value="<?= number_format($barangDetail['biaya_tambahan']) ?>" class="form-control barang_detail_harga_penggantian" placeholder="" onkeyup="this.value = greatFormatRupiah(this.value)">
+                                    <input id="barang_detail_harga_penggantian" readonly maxlength="24" name="barang_detail_harga_penggantian" type="text" value="<?= number_format($barangDetail['biaya_tambahan'], 2) ?>" class="form-control barang_detail_harga_penggantian" placeholder="" onkeyup="this.value = greatFormatRupiah(this.value)">
                                     <label>Harga Penggantian/Nilai Jasa</label>
                                     <small class="mb-3"><i>Diambil dari biaya tambahan Purchase Order</i></small>
                                 </div>
                             </div>
                             <div class="mt-1">
                                 <div class="form-floating mb-3">
-                                    <input id="barang_detail_diskon" readonly maxlength="24" name="barang_detail_diskon" type="text" value="<?= number_format($barangDetail['diskon']) ?>" class="form-control barang_detail_fob" placeholder="" onkeyup="this.value = greatFormatRupiah(this.value)">
+                                    <input id="barang_detail_diskon" readonly maxlength="24" name="barang_detail_diskon" type="text" value="<?= number_format($barangDetail['diskon'], 2) ?>" class="form-control barang_detail_fob" placeholder="" onkeyup="this.value = greatFormatRupiah(this.value)">
                                     <label>Diskon</label>
                                 </div>
                             </div>

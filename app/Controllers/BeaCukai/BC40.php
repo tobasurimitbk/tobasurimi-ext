@@ -950,22 +950,22 @@ class BC40 extends BaseController
                 'no_aju' => $this->generateNomorAju(),
 
                 // 'harga_penyerahan' => convertRupiahToNumber($this->request->getVar('harga_nilai_pabean')),
-                'nilai_jasa' => convertRupiahToNumber($this->request->getVar('nilai_jasa')),
-                'uang_muka' => convertRupiahToNumber($this->request->getVar('nilai_uang_muka')),
-                'harga_perolehan' => convertRupiahToNumber($this->request->getVar('harga_perolehan')),
-                'volume' => convertRupiahToNumber($this->request->getVar('volume')),
-                'bruto' => convertRupiahToNumber($this->request->getVar('berat_kotor')),
-                'netto' => convertRupiahToNumber($this->request->getVar('berat_bersih')),
+                'nilai_jasa' => ($this->request->getVar('nilai_jasa')),
+                'uang_muka' => ($this->request->getVar('nilai_uang_muka')),
+                'harga_perolehan' => ($this->request->getVar('harga_perolehan')),
+                'volume' => ($this->request->getVar('volume')),
+                'bruto' => ($this->request->getVar('berat_kotor')),
+                'netto' => ($this->request->getVar('berat_bersih')),
             ]);
         } else {
             $this->bc40Model->update($lastData['id'], [
                 // 'harga_penyerahan' => convertRupiahToNumber($this->request->getVar('harga_nilai_pabean')),
-                'nilai_jasa' => convertRupiahToNumber($this->request->getVar('nilai_jasa')),
-                'uang_muka' => convertRupiahToNumber($this->request->getVar('nilai_uang_muka')),
-                'harga_perolehan' => convertRupiahToNumber($this->request->getVar('harga_perolehan')),
-                'volume' => convertRupiahToNumber($this->request->getVar('volume')),
-                'bruto' => convertRupiahToNumber($this->request->getVar('berat_kotor')),
-                'netto' => convertRupiahToNumber($this->request->getVar('berat_bersih')),
+                'nilai_jasa' => ($this->request->getVar('nilai_jasa')),
+                'uang_muka' => ($this->request->getVar('nilai_uang_muka')),
+                'harga_perolehan' => ($this->request->getVar('harga_perolehan')),
+                'volume' => ($this->request->getVar('volume')),
+                'bruto' => ($this->request->getVar('berat_kotor')),
+                'netto' => ($this->request->getVar('berat_bersih')),
             ]);
         }
 
@@ -1076,11 +1076,11 @@ class BC40 extends BaseController
                 'kode_satuan_barang' => decrypt($this->request->getVar('barang_detail_kode_satuan_barang')),
                 'jumlah_kemasan' => $this->request->getvar('barang_detail_jumlah_kemasan'),
                 'kode_jenis_kemasan' => decrypt($this->request->getVar('barang_detail_kode_jenis_kemasan')),
-                'netto' => trim(convertRupiahToNumber($this->request->getVar('barang_detail_berat_bersih'))),
-                'harga_ekspor' => trim(convertRupiahToNumber($this->request->getVar('barang_detail_harga_penyerahan'))),
-                'nilai_tambah' => trim(convertRupiahToNumber($this->request->getVar('barang_detail_harga_penggantian'))),
-                'diskon' => trim(convertRupiahToNumber($this->request->getVar('barang_detail_diskon'))),
-                'volume' => trim(convertRupiahToNumber($this->request->getVar('barang_detail_volume')))
+                'netto' => $this->request->getVar('barang_detail_berat_bersih'),
+                'harga_ekspor' => $this->request->getVar('barang_detail_harga_penyerahan'),
+                'nilai_tambah' => $this->request->getVar('barang_detail_harga_penggantian'),
+                'diskon' => $this->request->getVar('barang_detail_diskon'),
+                'volume' => $this->request->getVar('barang_detail_volume')
             ]);
         } else {
             $this->bcBarangModel->update($bcBarang['id'], [
@@ -1101,11 +1101,11 @@ class BC40 extends BaseController
                 'kode_satuan_barang' => decrypt($this->request->getVar('barang_detail_kode_satuan_barang')),
                 'jumlah_kemasan' => $this->request->getvar('barang_detail_jumlah_kemasan'),
                 'kode_jenis_kemasan' => decrypt($this->request->getVar('barang_detail_kode_jenis_kemasan')),
-                'netto' => trim(convertRupiahToNumber($this->request->getVar('barang_detail_berat_bersih'))),
-                'harga_ekspor' => trim(convertRupiahToNumber($this->request->getVar('barang_detail_harga_penyerahan'))),
-                'nilai_tambah' => trim(convertRupiahToNumber(trim($this->request->getVar('barang_detail_harga_penggantian')))),
-                'diskon' => trim(convertRupiahToNumber($this->request->getVar('barang_detail_diskon'))),
-                'volume' => trim(convertRupiahToNumber($this->request->getVar('barang_detail_volume')))
+                'netto' => $this->request->getVar('barang_detail_berat_bersih'),
+                'harga_ekspor' => $this->request->getVar('barang_detail_harga_penyerahan'),
+                'nilai_tambah' => $this->request->getVar('barang_detail_harga_penggantian'),
+                'diskon' => $this->request->getVar('barang_detail_diskon'),
+                'volume' => $this->request->getVar('barang_detail_volume')
             ]);
         }
 
@@ -1556,6 +1556,9 @@ class BC40 extends BaseController
 
         $payload = $this->generatePayload($bcPurchaseOrderID);
 
+        // return \response()->setJSON($payload);
+        // die;
+
         $res = $beacukaiApi->kirimDokumenBC($payload, false);
         if ($res['status'] == false) {
             return response()->setJSON([
@@ -1692,7 +1695,7 @@ class BC40 extends BaseController
         $ceisaSetting = $this->ceisaSettingModel->where('company_id', $this->this_company_id)->first();
         $kodeDokumenbc40Static = $this->metaDataModel->where('name', "Kode BC40 Static")->first();
 
-        $kodeKantorStatic = $ceisaSetting['kode_kantor_pabean'];
+        $kodeKantorStatic = $ceisaSetting['kode_unik'] == null ? $ceisaSetting['kode_kantor_pabean'] : $ceisaSetting['kode_unik'];
         $tanggalAju = date('Ymd');
         $sequenceNoUrutPengajuan = "";
 
@@ -1817,8 +1820,10 @@ class BC40 extends BaseController
     {
         $supplierId = $this->request->getVar('supplier_id');
         $poType = $this->request->getVar('po_type');
+        $startDate = $this->request->getVar("start_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getVar("start_date")))) : "";
+        $endDate = $this->request->getVar("end_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getVar("end_date")))) : "";
 
-        $result = $this->getListDataPurchaseOrderExport($poType, $supplierId, '', '');
+        $result = $this->getListDataPurchaseOrderExport($poType, $supplierId, $startDate, $endDate);
 
         $data = [
             'result' => $result,
@@ -1839,7 +1844,10 @@ class BC40 extends BaseController
     {
         $supplierId = $this->request->getVar('supplier_id');
         $poType = $this->request->getVar('po_type');
-        $result = $this->getListDataPurchaseOrderExport($poType, $supplierId, '', '');
+        $startDate = $this->request->getVar("start_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getVar("start_date")))) : "";
+        $endDate = $this->request->getVar("end_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getVar("end_date")))) : "";
+
+        $result = $this->getListDataPurchaseOrderExport($poType, $supplierId, $startDate, $endDate);
 
         $filename = "List Purchase Order";
 
@@ -2416,7 +2424,7 @@ class BC40 extends BaseController
                 pb.status_penerimaan,
                 pb.tipe_bahan,
                 pb.jumlah_kemasan,
-                divisis.id as divisis_id,
+                divisis.id AS divisis_id,
                 divisis.divisi,
                 pod.po_no,
                 pod.po_date,
@@ -2429,7 +2437,7 @@ class BC40 extends BaseController
                 kemasan.name AS nama_kemasan,
                 SUM(pbd.qty) AS qty_po,
                 SUM(pbd.jml_masuk) AS qty_lpb,
-                SUM(pbd.sub_total) AS sub_total
+                po.total_before_pph AS sub_total
             FROM penerimaan_barang pb
             LEFT JOIN penerimaan_barang_detail pbd ON pbd.penerimaan_barang_id = pb.id
             LEFT JOIN rm_purchase_orders pod ON pod.id = pbd.purchase_order_id
@@ -2440,6 +2448,7 @@ class BC40 extends BaseController
             LEFT JOIN kemasan ON kemasan.id = pb.kemasan_id
             LEFT JOIN satuans satuan_kemasan ON satuan_kemasan.id = kemasan.satuan_id
             LEFT JOIN divisis ON divisis.id = pb.divisi_id
+            LEFT JOIN rm_purchase_orders po ON FIND_IN_SET(po.id, REPLACE(REPLACE(REPLACE(pb.multiple_po_id, '[', ''), ']', ''), ' ', '')) > 0
             WHERE pb.tipe_bahan = 'BAKU'
                 AND pb.deletedAt IS NULL
                 AND pbd.deletedAt IS NULL
@@ -2588,7 +2597,7 @@ class BC40 extends BaseController
                 pb.status_penerimaan,
                 pb.tipe_bahan,
                 pb.jumlah_kemasan,
-                divisis.id as divisis_id,
+                divisis.id AS divisis_id,
                 divisis.divisi,
                 pod.po_no,
                 pod.po_date,
@@ -2601,7 +2610,7 @@ class BC40 extends BaseController
                 kemasan.name AS nama_kemasan,
                 SUM(pbd.qty) AS qty_po,
                 SUM(pbd.jml_masuk) AS qty_lpb,
-                SUM(pbd.sub_total) AS sub_total
+                po.total_before_pph AS sub_total
             FROM penerimaan_barang pb
             LEFT JOIN penerimaan_barang_detail pbd ON pbd.penerimaan_barang_id = pb.id
             LEFT JOIN rm_purchase_orders pod ON pod.id = pbd.purchase_order_id
@@ -2612,6 +2621,7 @@ class BC40 extends BaseController
             LEFT JOIN kemasan ON kemasan.id = pb.kemasan_id
             LEFT JOIN satuans satuan_kemasan ON satuan_kemasan.id = kemasan.satuan_id
             LEFT JOIN divisis ON divisis.id = pb.divisi_id
+            LEFT JOIN rm_purchase_orders po ON FIND_IN_SET(po.id, REPLACE(REPLACE(REPLACE(pb.multiple_po_id, '[', ''), ']', ''), ' ', '')) > 0
             WHERE pb.tipe_bahan = 'BAKU'
                 AND pb.deletedAt IS NULL
                 AND pbd.deletedAt IS NULL

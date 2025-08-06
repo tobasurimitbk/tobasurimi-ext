@@ -743,7 +743,7 @@ class BeaCukaiApi
                 'nomorIjinEntitas' => $b['nomor_ijin_entitas'],
                 'tanggalIjinEntitas' => $b['tanggal_ijin_entitas'],
                 'seriEntitas' => 1,
-                'kodeJenisIdentitas' => '5'
+                'kodeJenisIdentitas' => '6'
             ];
 
             $entitasArr[] = [
@@ -757,7 +757,7 @@ class BeaCukaiApi
                 'nomorIjinEntitas' => $b['nomor_ijin_entitas'],
                 'tanggalIjinEntitas' => $b['tanggal_ijin_entitas'],
                 'seriEntitas' => 2,
-                'kodeJenisIdentitas' => '5'
+                'kodeJenisIdentitas' => '6'
             ];
 
             $entitasArr[] = [
@@ -771,7 +771,7 @@ class BeaCukaiApi
                 'nomorIjinEntitas' => $b['nomor_ijin_entitas'],
                 'tanggalIjinEntitas' => $b['tanggal_ijin_entitas'],
                 'seriEntitas' => 3,
-                'kodeJenisIdentitas' => '5'
+                'kodeJenisIdentitas' => '6'
             ];
         }
 
@@ -827,7 +827,7 @@ class BeaCukaiApi
                 'diskon' => (float)$b['diskon'],
                 'hargaEkspor' => (float)$b['harga_ekspor'],
                 'hargaPenyerahan' => (float)$b['harga_ekspor'],
-                'hargaSatuan' => (int)((float)$b['harga_ekspor'] / (float)$b['jumlah_satuan']),
+                'hargaSatuan' => (float)((float)$b['harga_ekspor'] / (float)$b['jumlah_satuan']),
                 'isiPerKemasan' => (int)$b['jumlah_satuan'],
                 'jumlahRealisasi' => 0,
                 'jumlahSatuan' => (float)$b['jumlah_satuan'],

@@ -50,7 +50,8 @@ class IntegrasiCeisa extends BaseController
                 'nama' => strtoupper($this->request->getVar('nama')),
                 'tempat' => strtoupper($this->request->getVar('tempat')),
                 'jabatan' => strtoupper($this->request->getVar('jabatan')),
-                'status_integrasi' => $loginCeisa
+                'status_integrasi' => $loginCeisa,
+                'kode_unik' => $this->request->getVar('kode_unik')
             ]);
         } else {
             // INSERT
@@ -63,7 +64,8 @@ class IntegrasiCeisa extends BaseController
                 'nama' => strtoupper($this->request->getVar('nama')),
                 'tempat' => strtoupper($this->request->getVar('tempat')),
                 'jabatan' => strtoupper($this->request->getVar('jabatan')),
-                'status_integrasi' => $loginCeisa
+                'status_integrasi' => $loginCeisa,
+                'kode_unik' => $this->request->getVar('kode_unik')
             ]);
         }
 

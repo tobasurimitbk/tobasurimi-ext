@@ -394,13 +394,15 @@
     function printPdf() {
         var supplierId = $(".supplier_id option:selected").val();
         var poType = $(".po_type option:selected").val();
+        var startDate = $(".start_date").val();
+        var endDate = $(".end_date").val();
 
-        if (supplierId && poType) {
-            window.open("<?= base_url('bea-cukai-bc-40/export-pdf') ?>?supplier_id=" + supplierId + "&po_type=" + poType, "_blank");
+        if (supplierId && poType && startDate && endDate) {
+            window.open("<?= base_url('bea-cukai-bc-40/export-pdf') ?>?supplier_id=" + supplierId + "&po_type=" + poType + "&start_date=" + startDate + "&end_date=" + endDate, "_blank");
         } else {
             Swal.fire({
                 icon: 'error',
-                title: "Pilih Tipe Purchase Order dan Supplier Dahulu",
+                title: "Pilih Tipe Purchase Order & Supplier & Tanggal PO Dahulu",
                 confirmButtonColor: '#4e73df',
                 confirmButtonText: 'Ok'
             });
@@ -410,13 +412,15 @@
     function printExcel() {
         var supplierId = $(".supplier_id option:selected").val();
         var poType = $(".po_type option:selected").val();
+        var startDate = $(".start_date").val();
+        var endDate = $(".end_date").val();
 
-        if (supplierId && poType) {
-            window.open("<?= base_url('bea-cukai-bc-40/export-excel') ?>?supplier_id=" + supplierId + "&po_type=" + poType, "_blank");
+        if (supplierId && poType && startDate && endDate) {
+            window.open("<?= base_url('bea-cukai-bc-40/export-excel') ?>?supplier_id=" + supplierId + "&po_type=" + poType + "&start_date=" + startDate + "&end_date=" + endDate, "_blank");
         } else {
             Swal.fire({
                 icon: 'error',
-                title: "Pilih Tipe Purchase Order dan Supplier Dahulu",
+                title: "Pilih Tipe Purchase Order & Supplier & Tanggal PO Dahulu",
                 confirmButtonColor: '#4e73df',
                 confirmButtonText: 'Ok'
             });

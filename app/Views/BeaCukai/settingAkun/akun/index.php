@@ -65,6 +65,20 @@
                             </div>
                             <div class="col-sm-3">
                                 <div class="mt-1">
+                                    <div class="form-floating">
+                                        <input id="kode_unik" value="<?= !empty($akunCeisa) ? $akunCeisa['kode_unik'] : '' ?>" type="text" class="form-control kode_unik" name="kode_unik" placeholder="">
+                                        <label>Kode Unik Perusahaan (Untuk No Aju)</label>
+                                    </div>
+
+                                </div>
+                                <label class="mb-3">
+                                    <i>
+                                        000040-<span class="text-danger">017189</span>-20250806-006655
+                                    </i>
+                                </label>
+                            </div>
+                            <div class="col-sm-3">
+                                <div class="mt-1">
                                     <div class="form-floating mb-3">
                                         <input id="username" value="" type="text" class="form-control username" name="username" placeholder="">
                                         <label>Username</label>
@@ -153,6 +167,12 @@
             },
             jabatan: {
                 required: true
+            },
+            kode_unik: {
+                required: true,
+                digits: true,
+                minlength: 6,
+                maxlength: 6
             }
         },
         messages: {
@@ -173,6 +193,12 @@
             },
             jabatan: {
                 required: "Jabatan wajib diisi"
+            },
+            kode_unik: {
+                required: "Kode unik wajib diisi (untuk no aju)",
+                digits: "Kode unik harus berupa angka",
+                minlength: "Kode unik harus 6 digit",
+                maxlength: "Kode unik harus 6 digit"
             }
         },
         errorElement: 'span',
