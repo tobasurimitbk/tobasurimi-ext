@@ -303,7 +303,7 @@
                         `;
                 <?php endif; ?>
 
-                <?php if (can('Lokal', 'Surat Jalan', 'd')): ?>
+                <?php if (can('Penjualan Lokal', 'Surat Jalan', 'd')): ?>
                     btn_delete = `
                         <button type="button" onclick="handleDelete('${id}')" class="btn btn-discard delete-btn btn-trash"><i class="fa fa-trash"></i></button>
                         `;
