@@ -119,7 +119,7 @@ class PanjarSupplier extends BaseController
                 "bank_id" => $this->request->getVar('bank_id'),
                 "divisi_id" => $this->request->getVar('divisi_id'),
                 "payment_method" => $this->request->getVar('payment_method'),
-                "tanggal" => $this->request->getVar('tanggal_pembayaran'),
+                "tanggal" => date('Y-m-d', strtotime(str_replace('/', '-', $this->request->getVar('tanggal_pembayaran')))),
                 "type" => $this->request->getVar('jenis'),
                 "no_transaction" => $this->request->getPost("no_transaksi"),
                 "keterangan" => $this->request->getPost("keterangan"),
@@ -295,7 +295,7 @@ class PanjarSupplier extends BaseController
                 "supplier_id" => $this->request->getVar('supplier_id'),
                 "bank_id" => $this->request->getVar('bank_id'),
                 "payment_method" => $this->request->getVar('payment_method'),
-                "tanggal" => $this->request->getVar('tanggal_pembayaran'),
+                "tanggal" => date('Y-m-d', strtotime(str_replace('/', '-', $this->request->getVar('tanggal_pembayaran')))),
                 "divisi_id" => $this->request->getVar('divisi_id'),
                 "type" => $this->request->getVar('jenis'),
                 "no_transaction" => $this->request->getPost("no_transaksi"),
@@ -653,7 +653,7 @@ class PanjarSupplier extends BaseController
                 "is_posted"          => $data->is_posted,
                 "supplier"      => $data->supplier_name,
                 "nominal" => $data->total_pinjaman + $data->total_panjar,
-                "createdAt"    => date('d/m/Y', strtotime($data->createdAt)),
+                "createdAt"    => date('d/m/Y', strtotime($data->tanggal)),
             ];
         }
 
