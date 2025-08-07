@@ -290,6 +290,7 @@
             barang_name: "<?= str_replace('"', '\"', $d['barang_name'])  ?>",
             kode_barang: "<?= $d['kode_barang'] ?>",
             harga_number: "<?= $d['harga'] ?>",
+            kode_satuan_lpb: "<?= $d['kode_satuan_lpb'] ?>"
         })
         drawTablePurchaseOrderUsed(listDataSelected);
     <?php endforeach; ?>
@@ -711,8 +712,8 @@
                     newRow.append($('<td style="text-align:center;">').text(v.spp_no));
                     newRow.append($('<td style="text-align:center;">').text(v.kode_barang));
                     newRow.append($('<td style="text-align:center;">').text(v.barang_name));
-                    newRow.append($('<td style="text-align:center;">').text(parseFloat(v.qty_po)));
-                    newRow.append($('<td style="text-align:center;">').text(parseFloat(v.qty_lpb)));
+                    newRow.append($('<td style="text-align:center;">').text(parseFloat(v.qty_po) + " " + v.kode_satuan_po));
+                    newRow.append($('<td style="text-align:center;">').text(parseFloat(v.qty_lpb) + " " + v.kode_satuan_lpb));
                     newRow.append($('<td style="text-align:center;">').text(greatFormatRupiah(v.harga_number)));
                     table.find('tbody').append(newRow);
                 });
@@ -787,7 +788,7 @@
                 newRow.append($('<td style="text-align: center;">').text(v.barang_name));
                 newRow.append($('<td style="text-align: center;">').text(parseFloat(v.qty_po)));
                 newRow.append($('<td style="text-align: center;">').text(parseFloat(v.qty_lpb)));
-                newRow.append($('<td style="text-align: center;">').text(parseFloat(v.qty_lpb_konversi)));
+                newRow.append($('<td style="text-align: center;">').text(parseFloat(v.qty_lpb_konversi) + " " + v.kode_satuan_lpb));
                 newRow.append($('<td style="text-align: center;">').text(greatFormatRupiah(v.harga_number)));
 
                 newRow.append($('<td style="text-align: center;">').html(

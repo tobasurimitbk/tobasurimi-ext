@@ -7,10 +7,10 @@
         <div class="col-button-tambah-spp">
             <?php if ($akunCeisa != null) : ?>
                 <?php if ($akunCeisa['status_integrasi']) : ?>
-                    <a href="<?= base_url('bea-cukai-bc-23/online') ?>" class="btn btn-discard btn-dropdown-export float-right" type="button">
+                    <!-- <a href="<?= base_url('bea-cukai-bc-23/online') ?>" class="btn btn-discard btn-dropdown-export float-right" type="button">
                         <i class="fa fa-upload fa-sm" aria-hidden="true"></i>
                         Status Respon
-                    </a>
+                    </a> -->
                     <a href="<?= base_url('bea-cukai-bc-23/bc-23-outstanding') ?>" class="btn btn-save float-right" type="button">
                         <i class="fa fa-ship fa-sm" aria-hidden="true"></i>
                         Outstanding
@@ -102,17 +102,15 @@
                     <table class="table table-bordered nowrap table-hover-tobasurimi dataTable" id="dataTable" width="100%" cellspacing="0">
                         <thead class="thead-dark">
                             <tr>
-                                <th style="text-align: center;">No</th>
-                                <th onclick="changeSort('bc_purchase_order.supplier_id')" class="sort" style="text-align: center;">Supplier</th>
-                                <th onclick="changeSort('bc_23.createdAt')" class="sort" style="text-align: center;">Tanggal</th>
-                                <th onclick="changeSort('bc_23.no_aju')" class="sort" style="text-align: center;">No Aju / No Daftar</th>
-                                <th onclick="changeSort('bc_purchase_order.po_type')" style="text-align: center;">Jenis PO</th>
-                                <!-- <th onclick="changeSort('bc_purchase_order.multiple_lpb_id')" class="sort" style="text-align: center;">No LPB</th>
-                                <th onclick="changeSort('bc_purchase_order.multiple_po_id')" class="sort" style="text-align: center;">No PO</th> -->
-                                <th style="text-align: center;">Total Barang</th>
-                                <th style="text-align: center;">Status Posting</th>
-                                <th style="text-align: center;">Status Kirim</th>
-                                <th style="text-align: center;">Action</th>
+                                <th>No</th>
+                                <th onclick="changeSort('bc_purchase_order.supplier_id')" class="sort">Supplier</th>
+                                <th onclick="changeSort('bc_23.createdAt')" class="sort">Tanggal</th>
+                                <th onclick="changeSort('bc_23.no_aju')" class="sort">No Aju / No Daftar</th>
+                                <th onclick="changeSort('bc_purchase_order.po_type')">Jenis PO</th>
+                                <th>Total Barang</th>
+                                <th>Posting</th>
+                                <th>Doc Ceisa</th>
+                                <th>Action</th>
                             </tr>
                         </thead>
                         <tbody class="body-table" id="body-table" style="cursor: pointer;">
@@ -220,31 +218,31 @@
         searching: false,
         columns: [{
                 data: "no",
-                className: "text-center",
+                className: "text-left",
                 sortable: false,
                 width: "5%"
             },
             {
                 data: "supplier_name",
-                className: "text-center"
+                className: "text-left"
             },
             {
                 data: "tanggal_bc_23",
-                className: "text-center",
+                className: "text-left",
             },
             {
                 data: "no_aju",
-                className: "text-center"
+                className: "text-left"
             },
             {
                 data: "po_type",
-                className: "text-center",
+                className: "text-left",
             },
             {
                 data: "total_barang",
                 searchable: false,
                 sortable: false,
-                className: "text-center",
+                className: "text-left",
             },
             // {
             //     data: "lpb_no",
@@ -256,7 +254,7 @@
             // },
             {
                 data: "status_posting",
-                className: "text-center",
+                className: "text-left",
                 searchable: false,
                 sortable: false,
                 render: function(data, type, row) {
@@ -265,12 +263,12 @@
                     if (row.status_posting == "1") {
                         htmlRes += `
                             <div class="text-success">
-                                SUDAH POSTING
+                                <i class="fa-solid fa-check"></i>
                             </div>`
                     } else {
                         htmlRes += `
                             <div class="text-danger">
-                                BELUM POSTING
+                                <i class="fa-solid fa-x"></i>
                             </div>`
                     }
 

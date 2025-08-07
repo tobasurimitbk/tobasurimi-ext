@@ -95,6 +95,7 @@
                             <th style="text-align: center;">Barang</th>
                             <th style="text-align: center;">Qty PO</th>
                             <th style="text-align: center;">Qty Diterima</th>
+                            <th style="text-align: center;">Valas</th>
                             <th style="text-align: center;">Harga</th>
                         </tr>
                     </thead>
@@ -349,8 +350,9 @@
                     newRow.append($('<td style="text-align:center;">').text(v.po_no));
                     newRow.append($('<td style="text-align:center;">').text(v.kode_barang));
                     newRow.append($('<td style="text-align:center;">').text(v.barang_name));
-                    newRow.append($('<td style="text-align:center;">').text(parseFloat(v.qty_po)));
-                    newRow.append($('<td style="text-align:center;">').text(parseFloat(v.qty_lpb)));
+                    newRow.append($('<td style="text-align:center;">').text(parseFloat(v.qty_po) + " " + v.kode_satuan_po));
+                    newRow.append($('<td style="text-align:center;">').text(parseFloat(v.qty_lpb) + " " + v.kode_satuan_lpb));
+                    newRow.append($('<td style="text-align:center;">').text(v.valas));
                     newRow.append($('<td style="text-align:center;">').text(v.harga));
                     table.find('tbody').append(newRow);
                 });
@@ -392,9 +394,11 @@
     function printPdf() {
         var supplierId = $(".supplier_id option:selected").val();
         var poType = $(".po_type option:selected").val();
+        var startDate = $(".start_date").val();
+        var endDate = $(".end_date").val();
 
-        if (supplierId && poType) {
-            window.open("<?= base_url('bea-cukai-bc-23/export-pdf') ?>?supplier_id=" + supplierId + "&po_type=" + poType, "_blank");
+        if (supplierId && poType && startDate && endDate) {
+            window.open("<?= base_url('bea-cukai-bc-23/export-pdf') ?>?supplier_id=" + supplierId + "&po_type=" + poType + "&start_date=" + startDate + "&end_date=" + endDate, "_blank");
         } else {
             Swal.fire({
                 icon: 'error',
@@ -408,9 +412,11 @@
     function printExcel() {
         var supplierId = $(".supplier_id option:selected").val();
         var poType = $(".po_type option:selected").val();
+        var startDate = $(".start_date").val();
+        var endDate = $(".end_date").val();
 
-        if (supplierId && poType) {
-            window.open("<?= base_url('bea-cukai-bc-23/export-excel') ?>?supplier_id=" + supplierId + "&po_type=" + poType, "_blank");
+        if (supplierId && poType && startDate && endDate) {
+            window.open("<?= base_url('bea-cukai-bc-23/export-excel') ?>?supplier_id=" + supplierId + "&po_type=" + poType + "&start_date=" + startDate + "&end_date=" + endDate, "_blank");
         } else {
             Swal.fire({
                 icon: 'error',

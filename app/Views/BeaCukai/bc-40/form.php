@@ -351,8 +351,8 @@
                     newRow.append($('<td style="text-align:center;">').text(v.spp_no));
                     newRow.append($('<td style="text-align:center;">').text(v.kode_barang));
                     newRow.append($('<td style="text-align:center;">').text(v.barang_name));
-                    newRow.append($('<td style="text-align:center;">').text(parseFloat(v.qty_po)));
-                    newRow.append($('<td style="text-align:center;">').text(parseFloat(v.qty_lpb)));
+                    newRow.append($('<td style="text-align:center;">').text(parseFloat(v.qty_po) + " " + v.kode_satuan_po));
+                    newRow.append($('<td style="text-align:center;">').text(parseFloat(v.qty_lpb) + " " + v.kode_satuan_lpb));
                     newRow.append($('<td style="text-align:center;">').text(v.harga));
                     table.find('tbody').append(newRow);
                 });

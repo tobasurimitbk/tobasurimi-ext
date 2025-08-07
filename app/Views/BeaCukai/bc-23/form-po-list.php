@@ -139,6 +139,7 @@
                                     <th style="text-align: center;">Barang</th>
                                     <th style="text-align: center;">Qty PO</th>
                                     <th style="text-align: center;">Qty Diterima</th>
+                                    <th style="text-align: center;">Valas</th>
                                     <th style="text-align: center;">Harga</th>
                                 </tr>
                             </thead>
@@ -168,6 +169,7 @@
                                     <th style="text-align: center;">Qty PO</th>
                                     <th style="text-align: center;">Qty Diterima</th>
                                     <th style="text-align: center;">Qty Diterima (Konversi)</th>
+                                    <th style="text-align: center;">Valas</th>
                                     <th style="text-align: center;">Harga</th>
                                     <th style="text-align: center;">Action</th>
                                 </tr>
@@ -176,7 +178,7 @@
                             </tbody>
                             <tfoot class="foot-detail-table" id="foot-detail-table">
                                 <tr>
-                                    <td colspan="11" style="text-align: center;">
+                                    <td colspan="12" style="text-align: center;">
                                         Tidak Ada Barang
                                     </td>
                                 </tr>
@@ -271,6 +273,8 @@
             barang_name: "<?= $d['barang_name'] ?>",
             kode_barang: "<?= $d['kode_barang'] ?>",
             harga_number: "<?= $d['harga'] ?>",
+            kode_satuan_lpb: "<?= $d['kode_satuan_lpb'] ?>",
+            valas: "<?= $d['valas'] ?>"
         })
         drawTablePurchaseOrderUsed(listDataSelected);
     <?php endforeach; ?>
@@ -607,9 +611,10 @@
                     newRow.append($('<td style="text-align:center;">').text(v.po_no));
                     newRow.append($('<td style="text-align:center;">').text(v.kode_barang));
                     newRow.append($('<td style="text-align:center;">').text(v.barang_name));
-                    newRow.append($('<td style="text-align:center;">').text(parseFloat(v.qty_po)));
-                    newRow.append($('<td style="text-align:center;">').text(parseFloat(v.qty_lpb)));
-                    newRow.append($('<td style="text-align:center;">').text(v.harga));
+                    newRow.append($('<td style="text-align:center;">').text(parseFloat(v.qty_po) + " " + v.kode_satuan_po));
+                    newRow.append($('<td style="text-align:center;">').text(parseFloat(v.qty_lpb) + " " + v.kode_satuan_lpb));
+                    newRow.append($('<td style="text-align:center;">').text(v.valas));
+                    newRow.append($('<td style="text-align:center;">').text(greatFormatRupiah(v.harga_number)));
                     table.find('tbody').append(newRow);
                 });
 
@@ -672,9 +677,9 @@
                 newRow.append($('<td style="text-align: center;">').text(v.barang_name));
                 newRow.append($('<td style="text-align: center;">').text(parseFloat(v.qty_po)));
                 newRow.append($('<td style="text-align: center;">').text(parseFloat(v.qty_lpb)));
-                newRow.append($('<td style="text-align: center;">').text(parseFloat(v.qty_lpb_konversi)));
+                newRow.append($('<td style="text-align: center;">').text(parseFloat(v.qty_lpb_konversi) + " " + v.kode_satuan_lpb));
+                newRow.append($('<td style="text-align: center;">').text(v.valas));
                 newRow.append($('<td style="text-align: center;">').text(greatFormatRupiah(v.harga_number)));
-
                 newRow.append($('<td style="text-align: center;">').html(
                     `
                     <button <?= !empty($bcPo) ? (($bcPo['status_posting'] == "1") ? 'disabled' : '') : '' ?> type="button" class="btn btn-danger" onclick="deleteDetail(${v.penerimaan_barang_id})" ><i class="fa fa-trash fa-sm" aria-hidden="true"></i></button>
