@@ -2300,7 +2300,7 @@ class JurnalUmum extends BaseController
                     // 2. Buat jurnal umum: kredit akun kas, debit akun selisih
                     $result = [];
 
-                    if ($otherPayment->jenis_pembayaran === 'PUTIH') {
+                    if ($otherPayment->jenis_pembayaran == 'PUTIH') {
                         // PUTIH Logic: Parent Kredit, Child Debit
                         if ($isFirstTransaction) {
                             // Parent Entry (Kredit)
@@ -2322,7 +2322,7 @@ class JurnalUmum extends BaseController
                         // Child Entry (Debit)
                         $result[] = [
                             'id_transaksi' => $id_transaksi_jurnal,
-                            'id_coa' => $detail['akun_kas'], // Debit from detail
+                            'id_coa' => $detail['akun_selisih'], // Debit from detail
                             'tanggal_jurnal' => $tanggal,
                             'debit' => $nominal,
                             'kredit' => 0,
