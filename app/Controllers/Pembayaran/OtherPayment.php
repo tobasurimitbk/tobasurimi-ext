@@ -146,7 +146,6 @@ class OtherPayment extends BaseController
             'divisi_id' => $payload['divisi_id'],
             'bank_id' => $payload['bank_id'],
             'no_pembayaran' => $payload['no_pembayaran'],
-            'tanggal' => $payload['tanggal_pembayaran'],
             'bayar_ke' => $payload['bayar_ke'],
             'jenis_pembayaran' => $payload['jenis_pembayaran'],
             'metode_pembayaran' => $payload['metode_pembayaran'],
@@ -181,7 +180,7 @@ class OtherPayment extends BaseController
         }
 
         if ($payload['tanggal_pembayaran']) {
-            $this->otherPaymentModel->update($parentId, ['tanggal' => $payload['tanggal_pembayaran']]);
+            $this->otherPaymentModel->update($parentId, ['tanggal' => date("Y-m-d", strtotime(str_replace("/", "-", $payload['tanggal_pembayaran'])))]);
         }
 
         return $this->response->setJSON([
