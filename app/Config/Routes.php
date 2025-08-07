@@ -2160,28 +2160,23 @@ $routes->get('/laporan-supplier-lokal-bb/pendapatan-supplier/all-pendapatan-supp
 $routes->get('/laporan-supplier-lokal-bb/pendapatan-supplier/print', 'Laporan\Supplier\LaporanSupplierLokalBB::exportPDFPendapatanSupplier', ['filter' => 'Auth']);
 $routes->get('/laporan-supplier-lokal-bb/pendapatan-supplier/export-excel', 'Laporan\Supplier\LaporanSupplierLokalBB::exportPendapatanSupplierLokalBBToExcel', ['filter' => 'Auth']);
 
-$routes->get('/laporan-supplier-lokal-bb/rincian-perbarang', 'Laporan\Supplier\LaporanSupplierLokalBB::laporanRincianPerbarang', ['filter' => 'Auth']);
-$routes->get('/laporan-supplier-lokal-bb/rincian-perbarang/all-rincian-perbarang', 'Laporan\Supplier\LaporanSupplierLokalBB::allLaporanRincianPerbarang', ['filter' => 'Auth']);
-$routes->get('/laporan-supplier-lokal-bb/rincian-perbarang/print', 'Laporan\Supplier\LaporanSupplierLokalBB::exportPDFLaporanRincianPerbarang', ['filter' => 'Auth']);
+$routes->get('/laporan-supplier-lokal-bb/pendapatan-supplier-pembelian', 'Laporan\Supplier\LaporanSupplierLokalBB::laporanPendapatanSupplierPembelian', ['filter' => 'Auth']);
+$routes->get('/laporan-supplier-lokal-bb/pendapatan-supplier-pembelian/print', 'Laporan\Supplier\LaporanSupplierLokalBB::exportPDFPendapatanSupplierPembelian', ['filter' => 'Auth']);
+$routes->get('/laporan-supplier-lokal-bb/pendapatan-supplier-pembelian/export-excel', 'Laporan\Supplier\LaporanSupplierLokalBB::exportPendapatanSupplierLokalBBToExcelPembelian', ['filter' => 'Auth']);
 
 $routes->get('/laporan-supplier-lokal-bb/rekap-all-supplier', 'Laporan\Supplier\LaporanSupplierLokalBB::laporanRekapAllSupplier', ['filter' => 'Auth']);
 $routes->get('/laporan-supplier-lokal-bb/rekap-all-supplier/all-rekap-all-supplier', 'Laporan\Supplier\LaporanSupplierLokalBB::allLaporanRekapAllSupplier', ['filter' => 'Auth']);
 $routes->get('/laporan-supplier-lokal-bb/rekap-all-supplier/print', 'Laporan\Supplier\LaporanSupplierLokalBB::exportPDFLaporanRekapAllSupplier', ['filter' => 'Auth']);
 $routes->get('/laporan-supplier-lokal-bb/rekap-all-supplier/print-excel', 'Laporan\Supplier\LaporanSupplierLokalBB::exportExcelLaporanRekapAllSupplier', ['filter' => 'Auth']);
 
-$routes->get('/laporan-supplier-lokal-bb/rekap-persupplier', 'Laporan\Supplier\LaporanSupplierLokalBB::laporanRekapPerSupplier', ['filter' => 'Auth']);
-$routes->get('/laporan-supplier-lokal-bb/rekap-persupplier/all-rekap-persupplier', 'Laporan\Supplier\LaporanSupplierLokalBB::allLaporanRekapPersupplier', ['filter' => 'Auth']);
-$routes->get('/laporan-supplier-lokal-bb/rekap-persupplier/print', 'Laporan\Supplier\LaporanSupplierLokalBB::exportPDFLaporanRekapPersupplier', ['filter' => 'Auth']);
-
-
 $routes->get('/laporan-supplier-lokal-bb/rekap-all-barang', 'Laporan\Supplier\LaporanSupplierLokalBB::laporanRekapAllBarang', ['filter' => 'Auth']);
 $routes->get('/laporan-supplier-lokal-bb/rekap-all-barang/all-rekap-all-barang', 'Laporan\Supplier\LaporanSupplierLokalBB::allLaporanRekapAllBarang', ['filter' => 'Auth']);
 $routes->get('/laporan-supplier-lokal-bb/rekap-all-barang/print', 'Laporan\Supplier\LaporanSupplierLokalBB::exportPDFLaporanRekapAllBarang', ['filter' => 'Auth']);
 $routes->get('/laporan-supplier-lokal-bb/rekap-all-barang/export-excel', 'Laporan\Supplier\LaporanSupplierLokalBB::exportExcelLaporanRekapAllBarang', ['filter' => 'Auth']);
 
-$routes->get('/laporan-supplier-lokal-bb/rekap-perbarang', 'Laporan\Supplier\LaporanSupplierLokalBB::laporanRekapPerbarang', ['filter' => 'Auth']);
-$routes->get('/laporan-supplier-lokal-bb/rekap-perbarang/all-rekap-perbarang', 'Laporan\Supplier\LaporanSupplierLokalBB::allLaporanRekapPerbarang', ['filter' => 'Auth']);
-$routes->get('/laporan-supplier-lokal-bb/rekap-perbarang/print', 'Laporan\Supplier\LaporanSupplierLokalBB::exportPDFLaporanRekapPerbarang', ['filter' => 'Auth']);
+$routes->get('/laporan-supplier-lokal-bb/rekap-all-supplier-pembelian', 'Laporan\Supplier\LaporanSupplierLokalBB::laporanRekapAllSupplierPembelian', ['filter' => 'Auth']);
+$routes->get('/laporan-supplier-lokal-bb/rekap-all-supplier-pembelian/print', 'Laporan\Supplier\LaporanSupplierLokalBB::exportPDFLaporanRekapAllSupplierPembelian', ['filter' => 'Auth']);
+$routes->get('/laporan-supplier-lokal-bb/rekap-all-supplier-pembelian/print-excel', 'Laporan\Supplier\LaporanSupplierLokalBB::exportExcelLaporanRekapAllSupplierPembelian', ['filter' => 'Auth']);
 
 //Laporan Warehouse
 $routes->get('/laporan-warehouse', 'Laporan\Warehouse\LaporanWarehouse::index', ['filter' => 'Auth']);
