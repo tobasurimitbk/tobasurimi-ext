@@ -82,7 +82,7 @@
                                 if (!empty($dataCustomers)) {
                                     foreach ($dataCustomers as $customer) {
                                 ?>
-                                        <option value="<?= $customer['id']; ?>" <?= !empty($data) ? ($data->id_customer === $customer['id'] ? "selected" : "") : ""; ?> data-termin="<?= $customer['termin']; ?>" data-address="<?= $customer['address']; ?>" data-sales="<?= $customer['salesNama']; ?>" data-jenispenjualan="<?= $customer['jenis_penjualan']; ?>"><?= $customer['name']; ?></option>
+                                        <option value="<?= $customer['id']; ?>" <?= !empty($data) ? ($data->id_customer === $customer['id'] ? "selected" : "") : ""; ?> data-termin="<?= $customer['termin']; ?>" data-address="<?= $customer['address']; ?>"><?= $customer['name']; ?></option>
                                 <?php
                                     }
                                 }
@@ -134,7 +134,7 @@
                         <div class="form-floating mb-3" style="height: 50px;">
 
                             <select class="form-select termin" id="termin" name="termin">
-                                <?php if (!empty($termin)) : ?>
+                                <?php if ($termin != "") : ?>
                                     <option value=""></option>
                                     <?php foreach ($termin as $row) : ?>
                                         <option value="<?= $row['id'] ?>" <?= $data->terms == $row['id'] ? 'selected' : '' ?>><?= $row['value'] ?></option>
@@ -526,7 +526,7 @@
     });
     // Display the date on the webpage
     $(document).ready(function() {
-        <?php if (!empty($termin)) : ?>
+        <?php if ($termin == "") : ?>
             getTerminList(this.value);
         <?php endif; ?>
 
@@ -674,20 +674,12 @@
         }).change(function() {
 
             let customerId = $('.id_customer option:selected').val();
-            let customerTermin = $('.id_customer option:selected').data('termin');
             let customerAddress = $('.id_customer option:selected').data('address');
-            let jenisPenjualan = $('.id_customer option:selected').data('jenispenjualan');
-            let customerSales = $('.id_customer option:selected').data('sales');
             let docType = $('#doc_type option:selected').val();
-
-            console.log(customerId, customerTermin, customerAddress, jenisPenjualan, customerSales);
 
             getDocumentList(docType, customerId);
 
-            $('#termin').val(customerTermin).change();
             $('#customerAddress').val(customerAddress);
-            $('#jenis_penjualan').val(jenisPenjualan).change();
-            $('#salesName').val(customerSales);
         });
 
         $("#tanggal_faktur").datepicker({
@@ -805,7 +797,7 @@
                         success: function(res) {
                             $("#doc_id").empty();
                             res.data.forEach(function(item) {
-                                $("#doc_id").append(`<option value="${item.id}" data-company="${item.id_company}" data-keterangan="${item.keterangan}" data-no_po="${item.no_po}">${item.doc_no}</option>`);
+                                $("#doc_id").append(`<option value="${item.id}" data-company="${item.id_company}" data-keterangan="${item.keterangan}" data-no_po="${item.no_po}" data-termin="${item.termin}" data-jenis_penjualan="${item.jenis_penjualan}" data-sales="${item.salesName}">${item.doc_no}</option>`);
                             });
                             $("#doc_id").trigger('change');
                         }
@@ -849,9 +841,24 @@
 
             var selectedDocs = $(this).val();
             let company = $(this).find("option:selected").data("company");
+            let customerTermin = $(this).find("option:selected").data('termin');
+            let jenisPenjualan = $(this).find("option:selected").data('jenis_penjualan');
+            let customerSales = $(this).find("option:selected").data('sales');
 
             if (company) {
                 $('#company_ids').val(company).change();
+            }
+
+            if (customerTermin) {
+                $('#termin').val(customerTermin).change();
+            }
+
+            if (jenisPenjualan) {
+                $('#jenis_penjualan').val(jenisPenjualan).change();
+            }
+
+            if (customerSales) {
+                $('#salesName').val(customerSales);
             }
 
             let selectedOptions = $(this).find("option:selected");
@@ -890,7 +897,6 @@
 
         });
 
-
         function getDocumentData(docId) {
             <?php if (empty($data)) : ?>
                 table.clear();
@@ -904,7 +910,7 @@
                     method: "GET",
                     dataType: "json",
                     success: function(res) {
-                        console.log(res);
+                        // console.log(res);
 
                         // Populate the form fields with document data
                         $('#no_po').val(res.no_po);
@@ -1101,9 +1107,9 @@
                         data.append("noDocument", JSON.stringify(noDocument))
                         data.append("items", JSON.stringify(list_items));
 
-                        const ppn = $('#taxTotal').html();
-                        const dpp = $('#itemSubTotal').html()
-                        const totalInvoice = $('#grandTotal').html();
+                        const ppn = destroyFormatRupiah($('#taxTotal').html());
+                        const dpp = destroyFormatRupiah($('#itemSubTotal').html())
+                        const totalInvoice = destroyFormatRupiah($('#grandTotal').html());
                         const noSuratJalan = $('.id_surat_jalan').find(":selected").text()
                         const idCustomer = $('.id_customer').find(":selected").val()
                         let id = $(".id").val();

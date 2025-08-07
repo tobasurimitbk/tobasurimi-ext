@@ -998,8 +998,12 @@ class Invoice extends BaseController
                 sales_order.id_company, 
                 sales_order.no_po,
                 sales_order.keterangan,
+                sales_order.payment_terms as termin,
+                sales_order.jenis_penjualan as jenis_penjualan,
+                employees.name as salesName
                 ')
                 ->join('sales_order_detail', 'sales_order_detail.id_sales_order = sales_order.id')
+                ->join('employees', 'employees.id = sales_order.sales_id', 'left')
                 ->where('sales_order.id_customer', $customer_id)
                 ->where('sales_order.surat_jalan_so_id', NULL)
                 ->where('sales_order_detail.qty_sekarang !=', 0)
@@ -1011,9 +1015,14 @@ class Invoice extends BaseController
                 surat_jalan_so.no_surat_jalan AS doc_no, 
                 surat_jalan_so.id_company,
                 surat_jalan_so.no_po,
-                surat_jalan_so.note as keterangan,')
+                surat_jalan_so.note as keterangan,
+                surat_jalan_so.terms as termin,
+                sales_order.jenis_penjualan as jenis_penjualan,
+                employees.name as salesName
+                ')
                 ->join('sales_order', 'sales_order.surat_jalan_so_id = surat_jalan_so.id', 'left')
                 ->join('sales_order_detail', 'sales_order_detail.id_sales_order = sales_order.id')
+                ->join('employees', 'employees.id = sales_order.sales_id', 'left')
                 ->where('sales_order.id_customer', $customer_id)
                 ->where('sales_order_detail.qty_sekarang !=', 0)
                 // ->where('sales_order.id_company', $this->this_company_id)
