@@ -358,7 +358,7 @@
                     <div class="col-md-4">
                         <label>Document Required</label>
                         <div class="form-floating mb-3">
-                            <textarea placeholder="Document Required" class="form-control tiny document_required" id="document_required" name="document_required"><?= !empty($dataSalesExport) ? $dataSalesExport->document_required : '' ?>"</textarea>
+                            <textarea placeholder="Document Required" class="form-control tiny document_required" id="document_required" name="document_required"><?= !empty($dataSalesExport) ? $dataSalesExport->document_required : '' ?></textarea>
                         </div>
                     </div>
                     <div class="col-md-4">
