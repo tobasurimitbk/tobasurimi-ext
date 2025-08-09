@@ -129,4 +129,161 @@ class SalesKontrakDetailModel extends Model
 
         return $dataResult;
     }
+
+    public function getListReportByContract($condition, $addCondition, $limit = 10, $offset = 0)
+    {
+        $availableSort = [
+            'sales_contract.id'      => 'sales_contract.id',
+            'sales_contract.createdBy'                    => 'sales_contract.createdBy',
+            'sales_contract.sales_contract_no'      => 'sales_contract.sales_contract_no',
+            'sales_contract.customer_id'                    => 'sales_contract.customer_id',
+            'sales_contract.no_container'                  => 'sales_contract.no_container',
+            'sales_contract.shipment_date'                  => 'sales_contract.shipment_date',
+            'sales_contract.dicharge_port'                  => 'sales_contract.dicharge_port',
+            'sales_contract.loading_port'  => 'sales_contract.loading_port',
+            'sales_contract.company_id'                   => 'sales_contract.company_id',
+            'sales_contract_detail.barang_master_sales_id'  => 'sales_contract_detail.barang_master_sales_id',
+            'sales_contract_detail.qty'                   => 'sales_contract_detail.qty',
+            'sales_contract.currency'                 => 'sales_contract.currency',
+            'sales_contract_detail.total_harga'         => 'sales_contract_detail.total_harga',
+            'sales_contract.tipe_harga'                 => 'sales_contract.tipe_harga',
+
+        ];
+
+        $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
+
+        $sort = $availableSort[$addCondition['sort'] ?? 'createdAt'] ?? 'sales_contract.id';
+        $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'DESC';
+
+        $selectQry = "
+            sales_contract_detail.*, 
+            sales_contract.sales_contract_no,
+            sales_contract.no_container,
+            sales_contract.shipment_date,
+            sales_contract.loading_port,
+            sales_contract.dicharge_port,
+            sales_contract.tipe_harga,
+            users.name AS acc_holder,
+            customers.name AS customer_name,
+            companies.company,
+            barang_master_sales.barang_name,
+            metadata.value AS valas_name
+        ";
+
+        $salesDataQry = $this->asObject()
+            ->select($selectQry)
+            ->where($condition)
+            ->join('sales_contract', 'sales_contract.id = sales_contract_detail.sales_contract_id', 'left')
+            ->join('barang_master_sales', 'barang_master_sales.id = sales_contract_detail.barang_master_sales_id', 'left')
+            ->join('customers', 'customers.id = sales_contract.customer_id', 'left')
+            ->join('metadata', 'metadata.id = sales_contract.currency', 'left')
+            ->join('users', 'users.id = sales_contract.createdBy', 'left')
+            ->join('companies', 'companies.id = sales_contract.company_id', 'left')
+            ->groupBy('sales_contract_detail.barang_master_sales_id')
+            ->orderBy($sort, $sortType);
+
+        $totalData = $salesDataQry->countAllResults(false);
+
+        if ($addCondition['search']) {
+            $salesDataQry
+                ->groupStart()
+                ->like('sales_contract.sales_contract_no', $addCondition['search'])
+                ->orLike('customers.name', $addCondition['search'])
+                ->orLike('users.name', $addCondition['search'])
+                ->orLike('sales_contract.no_container', $addCondition['search'])
+                ->orLike('sales_contract.shipment_date', $addCondition['search'])
+                ->orLike('barang_master_sales.barang_name', $addCondition['search'])
+                ->groupEnd();
+        }
+
+        if ($addCondition['customer_id']) {
+            $salesDataQry->groupStart();
+            $salesDataQry->where('sales_contract.customer_id', $addCondition['customer_id']);
+            $salesDataQry->groupEnd();
+        }
+
+        if ($addCondition['barang_master_sales_id']) {
+            $salesDataQry->groupStart();
+            $salesDataQry->where('sales_contract_detail.barang_master_sales_id', $addCondition['barang_master_sales_id']);
+            $salesDataQry->groupEnd();
+        }
+
+        if ($addCondition['user_id']) {
+            $salesDataQry->groupStart();
+            $salesDataQry->where('sales_contract.createdBy', $addCondition['user_id']);
+            $salesDataQry->groupEnd();
+        }
+
+        if ($addCondition['company_id']) {
+            $salesDataQry->groupStart();
+            $salesDataQry->where('sales_contract.company_id', $addCondition['company_id']);
+            $salesDataQry->groupEnd();
+        }
+
+        $totalFilteredData = $salesDataQry->countAllResults(false);
+        $data = $salesDataQry->findAll($limit, $offset);
+
+
+        // 7. Grand total query (tanpa group dan limit)
+        // $grandTotalQry = $this->db->table('sales_contract_detail')
+        //     ->select("
+        //     SUM(sales_contract_detail.total_harga) AS grand_total_harga_barang,
+        // ")
+        //     ->join('sales_contract', 'sales_contract.id = sales_contract_detail.sales_contract_id', 'left')
+        //     ->join('barang_master_sales', 'barang_master_sales.id = sales_contract_detail.barang_master_sales_id', 'left')
+        //     ->join('customers', 'customers.id = sales_contract.customer_id', 'left')
+        //     ->join('metadata', 'metadata.id = sales_contract.currency', 'left')
+        //     ->join('users', 'users.id = sales_contract.createdBy', 'left')
+        //     ->join('companies', 'companies.id = sales_contract.company_id', 'left')
+        //     ->where('sales_contract_detail.deletedAt', null)
+        //     ->where($condition);
+
+        // if ($addCondition['search']) {
+        //     $grandTotalQry
+        //         ->groupStart()
+        //         ->like('sales_contract.sales_contract_no', $addCondition['search'])
+        //         ->orLike('customers.name', $addCondition['search'])
+        //         ->orLike('users.name', $addCondition['search'])
+        //         ->orLike('sales_contract.no_container', $addCondition['search'])
+        //         ->orLike('sales_contract.shipment_date', $addCondition['search'])
+        //         ->orLike('barang_master_sales.barang_name', $addCondition['search'])
+        //         ->groupEnd();
+        // }
+
+        // if ($addCondition['customer_id']) {
+        //     $grandTotalQry->groupStart();
+        //     $grandTotalQry->where('sales_contract.customer_id', $addCondition['customer_id']);
+        //     $grandTotalQry->groupEnd();
+        // }
+
+        // if ($addCondition['barang_master_sales_id']) {
+        //     $grandTotalQry->groupStart();
+        //     $grandTotalQry->where('sales_contract_detail.barang_master_sales_id', $addCondition['barang_master_sales_id']);
+        //     $grandTotalQry->groupEnd();
+        // }
+
+        // if ($addCondition['user_id']) {
+        //     $grandTotalQry->groupStart();
+        //     $grandTotalQry->where('sales_contract.createdBy', $addCondition['user_id']);
+        //     $grandTotalQry->groupEnd();
+        // }
+
+        // if ($addCondition['company_id']) {
+        //     $grandTotalQry->groupStart();
+        //     $grandTotalQry->where('sales_contract.company_id', $addCondition['company_id']);
+        //     $grandTotalQry->groupEnd();
+        // }
+
+        // $grandTotal = $grandTotalQry->get()->getRowArray();
+
+        // 8. Return final data
+        return [
+            'data'               => $data,
+            'totalData'          => $totalData,
+            'totalFilteredData'  => $totalFilteredData,
+            // 'amountValue'        => $grandTotal['grand_total_harga_barang'] ?? 0,
+            'sort'               => $sort,
+            'sortType'           => $sortType,
+        ];
+    }
 }

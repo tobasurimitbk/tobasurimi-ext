@@ -731,6 +731,9 @@ $routes->get('/report-ekspor/account-holder', 'SalesInternasional\ReportEkspor::
 $routes->get('/report-ekspor/account-holder-all', 'SalesInternasional\ReportEkspor::allByAccountHolder', ['filter' => 'Auth']);
 $routes->get('/report-ekspor/account-holder/id/(:segment)', 'SalesInternasional\ReportEkspor::detailByAccountHolder/$1', ['filter' => 'Auth']);
 $routes->get('/report-ekspor/account-holder-export', 'SalesInternasional\ReportEkspor::exportExcelByAccountHolder', ['filter' => 'Auth']);
+$routes->get('/report-ekspor/contract', 'SalesInternasional\ReportEkspor::indexByContract', ['filter' => 'Auth']);
+$routes->get('/report-ekspor/contract-all', 'SalesInternasional\ReportEkspor::allByContract', ['filter' => 'Auth']);
+$routes->get('/report-ekspor/contract-export', 'SalesInternasional\ReportEkspor::exportExcelByContract', ['filter' => 'Auth']);
 
 
 

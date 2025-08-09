@@ -96,7 +96,7 @@ class SalesOrderExportDetailModel extends Model
             ->join('users', 'users.id = sales_order_export.user_id', 'left')
             ->join('companies', 'companies.id = sales_order_export.company_id', 'left')
             ->join('satuans', 'satuans.id = sales_order_detail_export.satuan_id', 'left')
-            ->groupBy('sales_order_detail_export.sales_order_export_detail_id')
+            ->groupBy('sales_order_detail_export.sales_contract_detail_id')
             ->orderBy($sort, $sortType);
 
         $totalData = $salesDataQry->countAllResults(false);
@@ -226,72 +226,63 @@ class SalesOrderExportDetailModel extends Model
     {
         $availableSort = [
             'sales_order_export.user_id' => 'sales_order_export.user_id',
-            'total_qty_convertion' => 'total_qty_convertion',
-            'total_harga_barang' => 'total_harga_barang'
+            'total_qty_convertion'       => 'total_qty_convertion',
+            'total_harga_barang'         => 'total_harga_barang'
         ];
 
         $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
 
-        $sort = $availableSort[$addCondition['sort'] ?? 'sales_order_export.user_id'] ?? 'sales_order_export.user_id';
+        $sort     = $availableSort[$addCondition['sort'] ?? 'sales_order_export.user_id'] ?? 'sales_order_export.user_id';
         $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'DESC';
 
-        $selectQry = "
-        sales_order_export.user_id,
-        users.name AS acc_holder,
-        SUM(sales_order_detail_export.qty_convertion) AS total_qty_convertion,
-        SUM(sales_order_detail_export.total_harga_barang) AS total_harga_barang
-    ";
-
-        $salesDataQry = $this->asObject()
-            ->select($selectQry)
+        // Base query
+        $baseQry = $this->db->table('sales_order_detail_export')
+            ->select("
+            sales_order_export.user_id,
+            users.name AS acc_holder,
+            SUM(sales_order_detail_export.qty_convertion) AS total_qty_convertion,
+            SUM(sales_order_detail_export.total_harga_barang) AS total_harga_barang
+        ")
             ->join('sales_order_export', 'sales_order_export.sales_order_export_id = sales_order_detail_export.sales_order_export_id', 'left')
             ->join('users', 'users.id = sales_order_export.user_id', 'left')
             ->where($condition)
             ->groupBy('sales_order_export.user_id');
 
+        // Filter search
         if (!empty($addCondition['search'])) {
-            $salesDataQry->groupStart();
-            $salesDataQry->like('users.name', $addCondition['search']);
-            $salesDataQry->groupEnd();
+            $baseQry->groupStart()
+                ->like('users.name', $addCondition['search'])
+                ->groupEnd();
         }
 
+        // Filter year
         if (!empty($addCondition['year'])) {
-            $salesDataQry->groupStart();
-            $salesDataQry->where('YEAR(actualy_shipment_date)', $addCondition['year']);
-            $salesDataQry->groupEnd();
+            $baseQry->groupStart()
+                ->where('YEAR(actualy_shipment_date)', $addCondition['year'])
+                ->groupEnd();
         }
 
-        // Hitung total sebelum orderBy agar tidak error
-        $totalData = $salesDataQry->countAllResults(false);
-        $totalFilteredData = $salesDataQry->countAllResults(false);
+        // Count total data (tanpa limit/offset)
+        $totalDataQry = clone $baseQry;
+        $totalData    = $totalDataQry->countAllResults();
 
-        // Tambahkan urutan sort setelah count
-        $salesDataQry->orderBy($sort, $sortType);
+        // Count total filtered data
+        $totalFilteredData = $totalData; // karena filter sudah diterapkan di $baseQry
 
-        $data = $salesDataQry->findAll($limit, $offset);
+        // Data dengan limit dan sort
+        $dataQry = clone $baseQry;
+        $data = $dataQry
+            ->orderBy($sort, $sortType)
+            ->get($limit, $offset)
+            ->getResult();
 
-        // GRAND TOTAL
-        $grandTotalQry = $this->db->table('sales_order_detail_export')
+        // Grand total dihitung dari subquery yang sama persis dengan data utama
+        $grandTotalQry = $this->db->newQuery()
             ->select("
-            SUM(sales_order_detail_export.qty_convertion) AS grand_total_qty_convertion,
-            SUM(sales_order_detail_export.total_harga_barang) AS grand_total_harga_barang
+            SUM(total_qty_convertion) AS grand_total_qty_convertion,
+            SUM(total_harga_barang) AS grand_total_harga_barang
         ")
-            ->join('sales_order_export', 'sales_order_export.sales_order_export_id = sales_order_detail_export.sales_order_export_id', 'left')
-            ->join('users', 'users.id = sales_order_export.user_id', 'left')
-            ->groupBy('sales_order_export.user_id')
-            ->where($condition);
-
-        if (!empty($addCondition['search'])) {
-            $grandTotalQry->groupStart();
-            $grandTotalQry->like('users.name', $addCondition['search']);
-            $grandTotalQry->groupEnd();
-        }
-
-        if (!empty($addCondition['year'])) {
-            $grandTotalQry->groupStart();
-            $grandTotalQry->where('YEAR(actualy_shipment_date)', $addCondition['year']);
-            $grandTotalQry->groupEnd();
-        }
+            ->fromSubquery($baseQry, 't');
 
         $grandTotal = $grandTotalQry->get()->getRowArray();
 
@@ -301,10 +292,11 @@ class SalesOrderExportDetailModel extends Model
             'totalFilteredData'  => $totalFilteredData,
             'sort'               => $sort,
             'sortType'           => $sortType,
-            'totalQtyConvertion' => $grandTotal['grand_total_qty_convertion'] ?? 0,
-            'amountValue'        => $grandTotal['grand_total_harga_barang'] ?? 0,
+            'totalQtyConvertion' => (float)($grandTotal['grand_total_qty_convertion'] ?? 0),
+            'amountValue'        => (float)($grandTotal['grand_total_harga_barang'] ?? 0),
         ];
     }
+
 
 
 

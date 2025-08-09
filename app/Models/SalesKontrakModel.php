@@ -68,29 +68,24 @@ class SalesKontrakModel extends Model
 
         $totalData = $salesDataQry->countAllResults(false);
 
-        if ($addCondition['search'] || $addCondition['status_posting']) {
-            $salesDataQry->groupStart();
-        }
-
         if ($addCondition['search']) {
-            $salesDataQry->like('sales_contract.sales_contract_no', $addCondition['search'])
+            $salesDataQry
+                ->groupStart()
+                ->like('sales_contract.sales_contract_no', $addCondition['search'])
                 ->orLike('sales_contract.customer_po_no', $addCondition['search'])
                 ->orLike('customers.name', $addCondition['search'])
-                ->orLike('divisis.divisi', $addCondition['search']);
+                ->orLike('divisis.divisi', $addCondition['search'])
+                ->groupEnd();
         }
 
         if ($addCondition['status_posting']) {
             if ($addCondition['status_posting'] == "SUDAH POSTING") {
                 $salesDataQry
                     ->where('sales_contract.status_posting', '1');
-            } else {
+            } else if ($addCondition['status_posting'] == "BELUM POSTING") {
                 $salesDataQry
                     ->where('sales_contract.status_posting', '0');
             }
-        }
-
-        if ($addCondition['search'] || $addCondition['status_posting']) {
-            $salesDataQry->groupEnd();
         }
 
         if (!empty($addCondition['dateStart']) || !empty($addCondition['dateEnd'])) {
@@ -228,5 +223,22 @@ class SalesKontrakModel extends Model
             ->where('status_posting', 1)
             ->orderBy('id', "desc")
             ->findAll();
+    }
+
+    public function getAccHolder()
+    {
+        $usersModel = new UserModel();
+        $userId = [];
+
+        $salesContract = $this->asArray()
+            ->where('deletedAt', null)
+            ->findAll();
+
+        foreach ($salesContract as $s) {
+            array_push($userId, $s['createdBy']);
+        }
+
+        $user = $usersModel->whereIn('id', $userId)->orderBy('name', "asc")->findAll();
+        return $user;
     }
 }

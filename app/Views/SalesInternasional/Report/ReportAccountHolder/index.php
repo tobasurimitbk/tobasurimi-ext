@@ -22,7 +22,7 @@
                     <div class="input-group">
                         <div class="form-floating" style="height: 50px;">
                             <input placeholder="" class="form-control year" id="year" name="year" aria-label="Floating label select example" value="" />
-                            <label style="z-index: 1;" style="z-index: 1;">Select Actualy Shipment Year</label>
+                            <label style="z-index: 1;" style="z-index: 1;">Select Actualy Year</label>
                         </div>
                         <div class="input-group-append" style="height:50px;">
                             <button disabled class="btn btn-secondary" type="button">
@@ -106,13 +106,13 @@
                 searchable: false,
                 sortable: false,
                 render: function(data) {
-                    return greatFormatRupiah(data)
+                    return greatFormatRupiah(data.toFixed(2))
                 }
             },
             {
                 data: 'total_harga_barang',
                 render: function(data) {
-                    return greatFormatRupiah(data)
+                    return greatFormatRupiah(data.toFixed(2))
                 }
             },
             {
@@ -156,8 +156,8 @@
             const total = api.ajax.json().footerTotals;
 
             if (total) {
-                $('.totalQtyConvertion').html(greatFormatRupiah(total.totalQtyConvertion));
-                $('.amountValue').html(greatFormatRupiah(total.amountValue));
+                $('.totalQtyConvertion').html(greatFormatRupiah(total.totalQtyConvertion.toFixed(2)));
+                $('.amountValue').html(greatFormatRupiah(total.amountValue.toFixed(2)));
             }
         },
 

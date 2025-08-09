@@ -6,7 +6,9 @@ use App\Controllers\BaseController;
 use App\Models\BarangMasterSalesModel;
 use App\Models\CompaniesModel;
 use App\Models\CustomerModel;
+use App\Models\SalesContractSizeBreakdownModel;
 use App\Models\SalesKontrakDetailModel;
+use App\Models\SalesKontrakModel;
 use App\Models\SalesOrderExportDetailModel;
 use App\Models\SalesOrderExportModel;
 use App\Models\UserModel;
@@ -28,6 +30,8 @@ class ReportEkspor extends BaseController
     protected $salesOrderExportDetailModel;
     protected $userModel;
     protected $companyModel;
+    protected $salesKontrakModel;
+    protected $salesContractSizeBreakdownModel;
 
     public function __construct()
     {
@@ -41,6 +45,8 @@ class ReportEkspor extends BaseController
         $this->salesOrderExportDetailModel = new SalesOrderExportDetailModel();
         $this->companyModel = new CompaniesModel();
         $this->userModel = new UserModel();
+        $this->salesKontrakModel = new SalesKontrakModel();
+        $this->salesContractSizeBreakdownModel = new SalesContractSizeBreakdownModel();
     }
 
     public function index()
@@ -78,7 +84,7 @@ class ReportEkspor extends BaseController
         ];
 
         $condition = [
-            'sales_order_export.company_id' => $this->this_company_id,
+            // 'sales_order_export.company_id' => $this->this_company_id,
             'sales_order_export.deletedAt' => null,
             'sales_order_export.status' => 'POSTED'
         ];
@@ -103,6 +109,17 @@ class ReportEkspor extends BaseController
         $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
 
         foreach ($salesData['data'] as $data) {
+
+            $salesOrderExportDetail =  $this->salesOrderExportDetailModel
+                ->select('
+                    SUM(qty_convertion) AS total_qty_convertion,
+                    SUM(qty) AS total_qty,
+                    satuans.kode_satuan
+                ')
+                ->join('satuans', 'satuans.id = sales_order_detail_export.satuan_id', 'left')
+                ->where('sales_order_detail_export.sales_order_export_id', $data->sales_order_export_id)
+                ->first();
+
             array_push($dataSales, [
                 "no"                        => $no++,
                 "id"                        => encrypt($data->sales_order_export_id),
@@ -113,20 +130,19 @@ class ReportEkspor extends BaseController
                 "container"                 => $data->container,
                 "actualy_shipment_date"     => !empty($data->actualy_shipment_date) ? date('d/m/Y', strtotime($data->actualy_shipment_date)) : "",
                 "deadline"                  => $data->deadline,
-                "total_qty_convertion"      => $data->total_qty_convertion,
+                "total_qty_convertion"      => $salesOrderExportDetail != null ? (float)$salesOrderExportDetail['total_qty_convertion'] : 0,
                 "company"                   => $data->company,
                 "valas"                     => $data->valas_name,
                 "shipment_value"            => $data->shipment_value,
                 "shipment_value_net"        => $data->shipment_value_net,
-                "total_qty"                 => number_format(floatval($data->total_qty), 2) . " " . $data->kode_satuan,
+                "total_qty"                 => $salesOrderExportDetail != null ? number_format($salesOrderExportDetail['total_qty'], 2) . " " . $salesOrderExportDetail['kode_satuan'] : 0,
                 "tipe_harga"                => $data->tipe_harga,
             ]);
         }
-
         $footerTotals = [
-            'totalQtyConvertion' => $salesData['totalQtyConvertion'],
-            'totalShipmentValue' => $salesData['totalShipmentValue'],
-            'totalShipmentValueNet' => $salesData['totalShipmentValueNet'],
+            'totalQtyConvertion' => (float)$salesData['totalQtyConvertion'],
+            'totalShipmentValue' => (float)$salesData['totalShipmentValue'],
+            'totalShipmentValueNet' => (float)$salesData['totalShipmentValueNet'],
         ];
 
         $data = [
@@ -146,7 +162,7 @@ class ReportEkspor extends BaseController
     public function exportExcelByCustomer()
     {
         $condition = [
-            'sales_order_export.company_id' => $this->this_company_id,
+            // 'sales_order_export.company_id' => $this->this_company_id,
             'sales_order_export.deletedAt' => null,
             'sales_order_export.status' => 'POSTED'
         ];
@@ -173,23 +189,33 @@ class ReportEkspor extends BaseController
         $totalShipmentValueNet = 0;
 
         foreach ($salesOrderExport['data'] as $data) {
+            $salesOrderExportDetail =  $this->salesOrderExportDetailModel
+                ->select('
+                    SUM(qty_convertion) AS total_qty_convertion,
+                    SUM(qty) AS total_qty,
+                    satuans.kode_satuan
+                ')
+                ->join('satuans', 'satuans.id = sales_order_detail_export.satuan_id', 'left')
+                ->where('sales_order_detail_export.sales_order_export_id', $data->sales_order_export_id)
+                ->first();
+
             $dataResult[] = [
                 "No"                    => $no++,
                 "Acc Holder"            => $data->acc_holder,
                 "Order Form No"         => $data->sales_order_export_no,
                 "Customer"              => $data->customer_name,
                 "Container"             => $data->container,
-                "Actualy Shipment Date" =>  !empty($data->actualy_shipment_date) ? date('d/m/Y', strtotime($data->actualy_shipment_date)) : "",
+                "Actualy Date" =>  !empty($data->actualy_shipment_date) ? date('d/m/Y', strtotime($data->actualy_shipment_date)) : "",
                 "Deadline"              => $data->deadline,
-                "Qty (Kg)"              => (float) $data->total_qty_convertion,
+                "Qty (Kg)"              => $salesOrderExportDetail != null ? (float)$salesOrderExportDetail['total_qty_convertion'] : 0,
                 "Plant"                 => $data->company,
-                "Valas"                 => $data->valas_name,
+                "Currency"                 => $data->valas_name,
                 "Amount"                => (float) $data->shipment_value,
                 "Amount Net"            => (float) $data->shipment_value_net,
                 "Price Type"            => $data->tipe_harga,
             ];
 
-            $totalQtyConvertion += $data->total_qty_convertion;
+            $totalQtyConvertion +=  $salesOrderExportDetail != null ? (float)$salesOrderExportDetail['total_qty_convertion'] : 0;
             $totalShipmentValue += $data->shipment_value;
             $totalShipmentValueNet += $data->shipment_value_net;
         }
@@ -200,10 +226,10 @@ class ReportEkspor extends BaseController
             "Order Form No"         => '',
             "Customer"              => '',
             "Container"             => '',
-            "Actualy Shipment Date" => 'GRAND TOTAL',
+            "Actualy Date" => 'GRAND TOTAL',
             "Qty (Kg)"              => (float) $totalQtyConvertion,
             "Plant"                 => '',
-            "Valas"                 => '',
+            "Currency"                 => '',
             "Amount"                => (float) $totalShipmentValue,
             "Amount Net"            => (float) $totalShipmentValueNet,
             "Price Type"            => ''
@@ -305,7 +331,7 @@ class ReportEkspor extends BaseController
 
         $condition = [
             'sales_order_detail_export.deletedAt' => null,
-            'sales_contract.company_id' => $this->this_company_id,
+            // 'sales_contract.company_id' => $this->this_company_id,
             'sales_order_export.status' => 'POSTED'
         ];
 
@@ -354,8 +380,8 @@ class ReportEkspor extends BaseController
         }
 
         $footerTotals = [
-            'totalQtyConvertion' => $salesData['totalQtyConvertion'],
-            'amountValue' => $salesData['amountValue'],
+            'totalQtyConvertion' => (float)$salesData['totalQtyConvertion'],
+            'amountValue' => (float)$salesData['amountValue'],
         ];
 
         $data = [
@@ -373,7 +399,7 @@ class ReportEkspor extends BaseController
     public function exportExcelByItems()
     {
         $condition = [
-            'sales_order_export.company_id' => $this->this_company_id,
+            // 'sales_order_export.company_id' => $this->this_company_id,
             'sales_order_export.deletedAt' => null,
             'sales_order_export.status' => 'POSTED'
         ];
@@ -424,7 +450,7 @@ class ReportEkspor extends BaseController
                     "Qty OF" => $d->total_qty,
                     "Unit OF" => $d->kode_satuan,
                     "Qty (Kg)" => (float)$d->total_qty_convertion,
-                    "Valas" => $d->valas_name,
+                    "Currency" => $d->valas_name,
                     "Amount" => (float)$d->total_harga_barang,
                     "Price Type" => $d->tipe_harga,
                 ];
@@ -467,7 +493,7 @@ class ReportEkspor extends BaseController
             "Qty OF",
             "Unit OF",
             "Qty (Kg)",
-            "Valas",
+            "Currency",
             "Amount",
             "Price Type"
         ];
@@ -561,8 +587,9 @@ class ReportEkspor extends BaseController
         ];
 
         $condition = [
-            'sales_order_export.company_id' => $this->this_company_id,
+            // 'sales_order_export.company_id' => $this->this_company_id,
             'sales_order_export.deletedAt' => null,
+            'sales_order_detail_export.deletedAt' => null,
             'sales_order_export.status' => 'POSTED'
         ];
 
@@ -586,14 +613,14 @@ class ReportEkspor extends BaseController
                 "no"                                => $no++,
                 "id"                                => encrypt($data->user_id),
                 "acc_holder"                        => $data->acc_holder,
-                "total_qty_convertion"              => $data->total_qty_convertion,
-                "total_harga_barang"                => $data->total_harga_barang,
+                "total_qty_convertion"              => (float)$data->total_qty_convertion,
+                "total_harga_barang"                => (float)$data->total_harga_barang,
             ]);
         }
 
         $footerTotals = [
-            'totalQtyConvertion' => $salesData['totalQtyConvertion'],
-            'amountValue' => $salesData['amountValue'],
+            'totalQtyConvertion' => (float)$salesData['totalQtyConvertion'],
+            'amountValue' => (float)$salesData['amountValue'],
         ];
 
         $data = [
@@ -643,15 +670,8 @@ class ReportEkspor extends BaseController
 
     public function exportExcelByAccountHolder()
     {
-        $payload = [
-            "pageSize"      => $this->request->getGet("length"),
-            "search"        => $this->request->getGet("search"),
-            "sort"          => $this->request->getGet("sort"),
-            "sortType"      => $this->request->getGet("sortType"),
-        ];
-
         $condition = [
-            'sales_order_export.company_id' => $this->this_company_id,
+            // 'sales_order_export.company_id' => $this->this_company_id,
             'sales_order_export.deletedAt' => null,
             'sales_order_export.status' => 'POSTED'
         ];
@@ -740,6 +760,218 @@ class ReportEkspor extends BaseController
         header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
         header("Content-Disposition: attachment; filename=\"$filename\"");
         header('Cache-Control: max-age=0');
+        $writer->save('php://output');
+        exit;
+    }
+
+    public function indexByContract()
+    {
+        $dataCustomer = $this->customerModel->getCustomerEkspor(
+            $this->this_user_id,
+            $this->is_admin
+        );
+
+        $dataBarangSales = $this->barangMasterSalesModel
+            ->where('company_id', $this->this_company_id)
+            ->where('type_barang_sales', "EKSPOR")
+            ->where('deletedAt', null)
+            ->orderBy('barang_name', "asc")
+            ->findAll();
+
+        $dataAccHolder = $this->salesKontrakModel->getAccHolder();
+        $dataCompany = $this->companyModel->where('deletedAt', null)->findAll();
+
+        $data = [
+            'dataCustomer' => $dataCustomer,
+            'dataBarangSales' => $dataBarangSales,
+            "dataAccHolder" => $dataAccHolder,
+            "dataCompany" => $dataCompany
+        ];
+
+        return view('SalesInternasional/Report/ReportSalesKontrak/index', $data);
+    }
+
+    public function allByContract()
+    {
+        $payload = [
+            "pageSize"      => $this->request->getGet("length"),
+            "currentPage"   => ($this->request->getGet("start") / $this->request->getGet("length")) + 1,
+            "search"        => $this->request->getGet("search"),
+            "sort"          => $this->request->getGet("sort"),
+            "sortType"      => $this->request->getGet("sortType"),
+        ];
+
+        $condition = [
+            'sales_contract_detail.deletedAt' => null,
+            'sales_contract.status_posting' => '1',
+        ];
+
+        $addCondition = [
+            "search"        => $this->request->getGet("search"),
+            "sort"          => $this->request->getGet("sort"),
+            "sortType"      => $this->request->getGet("sortType"),
+            "customer_id"              => $this->request->getGet("customer_id"),
+            "barang_master_sales_id"   => $this->request->getGet("barang_master_sales_id"),
+            "user_id"       => $this->request->getVar('user_id'),
+            "company_id"    => $this->request->getVar('company_id'),
+            "dateStart"     => $this->request->getVar("dateStart") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateStart")))) : "",
+            "dateEnd"       => $this->request->getVar("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateEnd")))) : "",
+        ];
+
+        $limit = $this->request->getGet("length");
+        $offset = $this->request->getGet("start");
+        $salesData = $this->salesKontrakDetailModel->getListReportByContract($condition, $addCondition, $limit, $offset);
+
+        $dataSales = [];
+
+        $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
+
+        foreach ($salesData['data'] as $data) {
+            $salesContractBreakdown = $this->salesContractSizeBreakdownModel
+                ->select('satuans.kode_satuan')
+                ->join('satuans', 'satuans.id = sales_contract_size_breakdown.satuan_size_id', 'left')
+                ->where('sales_contract_detail_id', $data->id)
+                ->first();
+
+            $kodeSatuan = $salesContractBreakdown != null ? $salesContractBreakdown['kode_satuan'] : "";
+
+            array_push($dataSales, [
+                "no"                        => $no++,
+                "id"                        => encrypt($data->id),
+                'sales_contract_id'         => encrypt($data->sales_contract_id),
+                "acc_holder"                => $data->acc_holder,
+                "sales_contract_no"         => $data->sales_contract_no,
+                "customer_name"             => $data->customer_name,
+                "no_container"              => $data->no_container,
+                "shipment_date"             => $data->shipment_date,
+                "loading_port"              => $data->loading_port,
+                "dicharge_port"             => $data->dicharge_port,
+                "company"                   => $data->company,
+                "barang_name"               => $data->barang_name,
+                "total_qty"                 => number_format($data->qty, 2) . " " . $kodeSatuan,
+                "total_harga"                 => (float)$data->total_harga,
+                "valas"                     => $data->valas_name,
+                "price_type"                => $data->tipe_harga,
+            ]);
+        }
+
+        // $footerTotals = [
+        //     'amountValue' => (float)$salesData['amountValue'],
+        // ];
+
+        $data = [
+            "draw"              => intval($this->request->getGet("draw")),
+            "recordsTotal"      => $salesData['totalData'],
+            "recordsFiltered"   => $salesData['totalFilteredData'],
+            "data"              => $dataSales,
+            "payload"           => $payload,
+            // "footerTotals"      => $footerTotals
+        ];
+
+        echo json_encode($data);
+        return;
+    }
+
+    public function exportExcelByContract()
+    {
+        $condition = [
+            'sales_contract_detail.deletedAt' => null,
+            'sales_contract.status_posting'   => '1',
+        ];
+
+        $addCondition = [
+            "search"                => $this->request->getGet("search"),
+            "sort"                  => $this->request->getGet("sort"),
+            "sortType"              => $this->request->getGet("sortType"),
+            "customer_id"           => $this->request->getGet("customer_id"),
+            "barang_master_sales_id" => $this->request->getGet("barang_master_sales_id"),
+            "user_id"               => $this->request->getVar('user_id'),
+            "company_id"            => $this->request->getVar('company_id'),
+            "dateStart"             => $this->request->getVar("dateStart") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateStart")))) : "",
+            "dateEnd"               => $this->request->getVar("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateEnd")))) : "",
+        ];
+
+        $salesData = $this->salesKontrakDetailModel->getListReportByContract($condition, $addCondition, 100000000, 0);
+
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+
+        // Header tabel
+        $headers = [
+            'No',
+            'Acc Holder',
+            'Contract No',
+            'Customer',
+            'Container',
+            'Shipment Date',
+            'Loading Port',
+            'Discharge Port',
+            'Plant',
+            'Product',
+            'Qty',
+            'Currency',
+            'Amount',
+            'Price Type'
+        ];
+
+        // Set header
+        $col = 'A';
+        foreach ($headers as $header) {
+            $sheet->setCellValue($col . '1', $header);
+            $col++;
+        }
+
+        // Bold header + auto size
+        $sheet->getStyle('A1:O1')->getFont()->setBold(true);
+        foreach (range('A', 'O') as $columnID) {
+            $sheet->getColumnDimension($columnID)->setAutoSize(true);
+        }
+
+        // Data isi
+        $row = 2;
+        $no = 1;
+        $grandTotal = 0;
+
+        foreach ($salesData['data'] as $data) {
+            $salesContractBreakdown = $this->salesContractSizeBreakdownModel
+                ->select('satuans.kode_satuan')
+                ->join('satuans', 'satuans.id = sales_contract_size_breakdown.satuan_size_id', 'left')
+                ->where('sales_contract_detail_id', $data->id)
+                ->first();
+
+            $kodeSatuan = $salesContractBreakdown != null ? $salesContractBreakdown['kode_satuan'] : "";
+
+            $sheet->setCellValue('A' . $row, $no++);
+            $sheet->setCellValue('B' . $row, $data->acc_holder);
+            $sheet->setCellValue('C' . $row, $data->sales_contract_no);
+            $sheet->setCellValue('D' . $row, $data->customer_name);
+            $sheet->setCellValue('E' . $row, $data->no_container);
+            $sheet->setCellValue('F' . $row, $data->shipment_date);
+            $sheet->setCellValue('G' . $row, $data->loading_port);
+            $sheet->setCellValue('H' . $row, $data->dicharge_port);
+            $sheet->setCellValue('I' . $row, $data->company);
+            $sheet->setCellValue('J' . $row, $data->barang_name);
+            $sheet->setCellValue('K' . $row, number_format($data->qty, 2) . " " . $kodeSatuan);
+            $sheet->setCellValue('L' . $row, $data->valas_name);
+            $sheet->setCellValue('M' . $row, $data->total_harga);
+            $sheet->setCellValue('N' . $row, $data->tipe_harga);
+
+            $grandTotal += (float)$data->total_harga;
+            $row++;
+        }
+
+        // Grand total
+        $sheet->setCellValue('L' . $row, 'GRAND TOTAL');
+        $sheet->setCellValue('M' . $row, $grandTotal);
+        $sheet->getStyle('L' . $row . ':M' . $row)->getFont()->setBold(true);
+
+        // Output Excel
+        $fileName = 'Export_Sales_Contract_' . date('Ymd_His') . '.xlsx';
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header("Content-Disposition: attachment; filename=\"$fileName\"");
+        header('Cache-Control: max-age=0');
+
+        $writer = new Xlsx($spreadsheet);
         $writer->save('php://output');
         exit;
     }
