@@ -118,7 +118,7 @@
                         <div class="form-floating mb-3" style="height: 50px;">
                             <select <?= !empty($prosesRebus) ? ($prosesRebus['status_posting'] ? 'disabled' : '') : '' ?> class="form-select type_pengambilan_stock" id="type_pengambilan_stock" name="type_pengambilan_stock" aria-label="Floating label select example">
                                 <option value=""></option>
-                                <option <?= !empty($prosesRebus) ? ($prosesRebus['tipe_pengambilan_stock'] == "PABEAN" ? 'selected' : '') : '' ?> value="PABEAN">PABEAN</option>
+                                <option <?= !empty($prosesRebus) ? ($prosesRebus['tipe_pengambilan_stock'] == "PABEAN" ? 'selected' : '') : '' ?> value="PABEAN" selected>PABEAN</option>
                                 <option <?= !empty($prosesRebus) ? ($prosesRebus['tipe_pengambilan_stock'] == "FIFO" ? 'selected' : '') : '' ?> value="FIFO">FIFO</option>
                             </select>
                             <label for="floatingInput" style="z-index: 1;">Tipe Pengambilan Stok</label>
@@ -1113,6 +1113,7 @@
 
         // Group by stock_id hasil rebus
         const grouped = {};
+        console.log(data)
         data.forEach(item => {
             const key = item.output?.stock_id || 'undefined';
             if (!grouped[key]) grouped[key] = [];

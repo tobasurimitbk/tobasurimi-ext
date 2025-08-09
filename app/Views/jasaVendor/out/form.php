@@ -216,11 +216,8 @@
                             </div>
                         </div>
 
-                        <div class="col-md-4 form-fifo">
-                            <div class="form-floating" style="height: 50px;">
-                                <input placeholder="Qty" oninput="preventNegativeInput(this)" class="form-control qty_keluar_fifo" id="qty_keluar_fifo" name="qty_keluar_fifo" />
-                                <label for="floatingInput" style="z-index: 1;">Qty Dikeluarkan</label>
-                            </div>
+                        <div class="col-md-12 col-table-button-tts">
+                             <button type="button" class="btn btn-primary" id="select-item-inventori-btn">Submit</button>
                         </div>
                     </div>
                 </form>
@@ -250,6 +247,12 @@
                                 <tbody class="body-table">
                                 </tbody>
                             </table>
+                            <div class="col-md-4 mb-3 form-fifo">
+                                <div class="form-floating" style="height: 50px;">
+                                    <input placeholder="Qty" oninput="preventNegativeInput(this)" class="form-control qty_keluar_fifo" id="qty_keluar_fifo" name="qty_keluar_fifo" />
+                                    <label for="floatingInput" style="z-index: 1;">Qty Dikeluarkan</label>
+                                </div>
+                            </div>
                             <button type="button" class="btn btn-primary" id="select-item-btn">Pilih</button>
                         </div>
                     </div>
@@ -500,16 +503,16 @@
         placeholder: "Pilih Udang / Kepiting (Kirim Ke Vendor)",
         theme: "bootstrap-5",
         allowClear: true
-    }).change(function() {
-        // LIST DOKUMEN PABEAN
-        getListDokumenPabean();
     });
 
     $('#supplier_id').select2({
         placeholder: "Pilih Supplier",
         theme: "bootstrap-5",
         allowClear: true
-    }).change(function() {
+    });
+
+    // Then add click handler for the Pilih button
+    $('#select-item-inventori-btn').click(function() {
         // LIST DOKUMEN PABEAN
         getListDokumenPabean();
     });
@@ -630,46 +633,79 @@
                 cancelButtonColor: '#d33',
                 reverseButtons: true,
                 confirmButtonText: 'Oke',
-            })
-        } else {
-            var totalStokTotal = 0;
-            $.each(listStockAsal, function(i, v) {
-                totalStokTotal += parseFloat(v.stok_total);
             });
-
-            if (qtyKeluarFifo > totalStokTotal) {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Terjadi Kesalahan : Stok barang yang akan keluar tidak cukup !',
-                    confirmButtonColor: '#4e73df',
-                    cancelButtonColor: '#d33',
-                    reverseButtons: true,
-                    confirmButtonText: 'Oke',
-                })
-            } else {
-                deleteByStockID(stockOutID);
-                // STOK APPEND
-                $.each(listStockAsal, function(i, v) {
-                    var currentID = Number(v.id);
-                    if ($.inArray(currentID, dataIds) == -1) {
-                        var isIDSelected = $.grep(listStockSelected, function(item) {
-                            return item.id == Number(currentID);
-                        }).length > 0;
-                        if (!isIDSelected && qtyKeluarFifo != 0 && parseFloat(listStockAsal[i].stok_total) != 0) {
-                            var keluarQty = Math.min(qtyKeluarFifo, parseFloat(listStockAsal[i].stok_total));
-                            listStockAsal[i].stok_total = parseFloat(listStockAsal[i].stok_total);
-                            listStockAsal[i].qty = parseFloat(keluarQty.toFixed(4));
-
-                            listStockSelected.push(listStockAsal[i]);
-                            qtyKeluarFifo = qtyKeluarFifo - keluarQty;
-                        }
-                    }
-                });
-                drawTableSelectedItem(listStockSelected);
-            }
-
+            return;
         }
 
+        var totalStokTotal = 0;
+        $.each(listStockAsal, function(i, v) {
+            totalStokTotal += parseFloat(v.stok_total);
+        });
+
+        if (qtyKeluarFifo > totalStokTotal) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Terjadi Kesalahan : Stok barang yang akan keluar tidak cukup !',
+                confirmButtonColor: '#4e73df',
+                cancelButtonColor: '#d33',
+                reverseButtons: true,
+                confirmButtonText: 'Oke',
+            });
+            return;
+        }
+
+        // Delete existing items with the same stock ID
+        deleteByStockID(stockOutID);
+
+        // Sort by date (FIFO) if needed
+        // listStockAsal.sort((a, b) => new Date(a.stock_date) - new Date(b.stock_date));
+
+        // First, try to find exact matches where stok_total equals qtyKeluarFifo
+        var exactMatch = listStockAsal.find(item => 
+            parseFloat(item.stok_total) === qtyKeluarFifo && 
+            !dataIds.includes(Number(item.id)) &&
+            $.grep(listStockSelected, selectedItem => selectedItem.id == Number(item.id)).length === 0);
+
+        if (exactMatch) {
+            exactMatch.qty = parseFloat(exactMatch.stok_total);
+            listStockSelected.push(exactMatch);
+            qtyKeluarFifo = 0;
+        } else {
+            // If no exact match, find items with sufficient quantity
+            var sufficientItem = listStockAsal.find(item => 
+                parseFloat(item.stok_total) >= qtyKeluarFifo && 
+                !dataIds.includes(Number(item.id)) &&
+                $.grep(listStockSelected, selectedItem => selectedItem.id == Number(item.id)).length === 0);
+
+            if (sufficientItem) {
+                sufficientItem.qty = qtyKeluarFifo;
+                listStockSelected.push(sufficientItem);
+                qtyKeluarFifo = 0;
+            } else {
+                // If no single item has enough, take the largest available first
+                 listStockAsal.sort((a, b) => new Date(a.stock_date) - new Date(b.stock_date));
+
+                // Process items in FIFO order
+                for (let i = 0; i < listStockAsal.length && qtyKeluarFifo > 0; i++) {
+                    const item = listStockAsal[i];
+                    const isSelected = dataIds.includes(Number(item.id)) || 
+                        $.grep(listStockSelected, selectedItem => selectedItem.id == Number(item.id)).length > 0;
+                    
+                    if (!isSelected && parseFloat(item.stok_total) > 0) {
+                        const availableQty = parseFloat(item.stok_total);
+                        const takenQty = Math.min(availableQty, qtyKeluarFifo);
+                        
+                        const newItem = {...item}; // Create a copy
+                        newItem.qty = parseFloat(takenQty.toFixed(4));
+                        listStockSelected.push(newItem);
+                        
+                        qtyKeluarFifo -= takenQty;
+                    }
+                }
+            }
+        }
+
+        drawTableSelectedItem(listStockSelected);
     }
 
     function deleteByStockID(stockID) {
@@ -899,7 +935,7 @@
             dataType: "json",
             success: function(res) {
                 // LIST STOK PER BC
-                listStockAsal = [];
+                // listStockAsal = [];
                 listStockAsal = res.data;
                 drawTableAsalBarang(res.data);
             }
@@ -1042,18 +1078,16 @@
     }
 
     function deleteDetail(id) {
-        var indexToRemove = -1;
-        for (var i = 0; i < listStockSelected.length; i++) {
-            if (listStockSelected[i].id == id) {
-                indexToRemove = i;
-                break;
-            }
-        }
-        if (indexToRemove !== -1) {
-            listStockSelected.splice(indexToRemove, 1);
-            drawTableSelectedItem(listStockSelected);
-        }
+        // Pastikan id jadi angka biar perbandingan aman
+        id = Number(id);
+
+        // Filter list, sisakan item yang ID-nya beda
+        listStockSelected = listStockSelected.filter(item => Number(item.id) !== id);
+
+        // Gambar ulang tabel
+        drawTableSelectedItem(listStockSelected);
     }
+
 
 
     function preventNegativeInput(inputElement) {
