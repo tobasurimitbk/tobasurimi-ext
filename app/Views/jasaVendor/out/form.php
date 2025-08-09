@@ -637,10 +637,10 @@
             return;
         }
 
-        var totalStokTotal = 0;
-        $.each(listStockAsal, function(i, v) {
-            totalStokTotal += parseFloat(v.stok_total);
-        });
+        // Ambil data real dari tabel (bukan array global)
+        var listStockAsalTable = getStockDataFromTable();
+
+        var totalStokTotal = listStockAsalTable.reduce((sum, v) => sum + parseFloat(v.stok_total || 0), 0);
 
         if (qtyKeluarFifo > totalStokTotal) {
             Swal.fire({
@@ -657,48 +657,43 @@
         // Delete existing items with the same stock ID
         deleteByStockID(stockOutID);
 
-        // Sort by date (FIFO) if needed
-        // listStockAsal.sort((a, b) => new Date(a.stock_date) - new Date(b.stock_date));
-
-        // First, try to find exact matches where stok_total equals qtyKeluarFifo
-        var exactMatch = listStockAsal.find(item => 
+        // FIFO logic tetap sama tapi pakai listStockAsalTable
+        var exactMatch = listStockAsalTable.find(item => 
             parseFloat(item.stok_total) === qtyKeluarFifo && 
-            !dataIds.includes(Number(item.id)) &&
-            $.grep(listStockSelected, selectedItem => selectedItem.id == Number(item.id)).length === 0);
+            !dataIds.includes(item.id) &&
+            $.grep(listStockSelected, selectedItem => selectedItem.id == item.id).length === 0
+        );
 
         if (exactMatch) {
             exactMatch.qty = parseFloat(exactMatch.stok_total);
             listStockSelected.push(exactMatch);
             qtyKeluarFifo = 0;
         } else {
-            // If no exact match, find items with sufficient quantity
-            var sufficientItem = listStockAsal.find(item => 
+            var sufficientItem = listStockAsalTable.find(item => 
                 parseFloat(item.stok_total) >= qtyKeluarFifo && 
-                !dataIds.includes(Number(item.id)) &&
-                $.grep(listStockSelected, selectedItem => selectedItem.id == Number(item.id)).length === 0);
+                !dataIds.includes(item.id) &&
+                $.grep(listStockSelected, selectedItem => selectedItem.id == item.id).length === 0
+            );
 
             if (sufficientItem) {
                 sufficientItem.qty = qtyKeluarFifo;
                 listStockSelected.push(sufficientItem);
                 qtyKeluarFifo = 0;
             } else {
-                // If no single item has enough, take the largest available first
-                 listStockAsal.sort((a, b) => new Date(a.stock_date) - new Date(b.stock_date));
-
-                // Process items in FIFO order
-                for (let i = 0; i < listStockAsal.length && qtyKeluarFifo > 0; i++) {
-                    const item = listStockAsal[i];
-                    const isSelected = dataIds.includes(Number(item.id)) || 
-                        $.grep(listStockSelected, selectedItem => selectedItem.id == Number(item.id)).length > 0;
+                listStockAsalTable.sort((a, b) => new Date(a.stock_date) - new Date(b.stock_date));
+                for (let i = 0; i < listStockAsalTable.length && qtyKeluarFifo > 0; i++) {
+                    const item = listStockAsalTable[i];
+                    const isSelected = dataIds.includes(item.id) || 
+                        $.grep(listStockSelected, selectedItem => selectedItem.id == item.id).length > 0;
                     
                     if (!isSelected && parseFloat(item.stok_total) > 0) {
                         const availableQty = parseFloat(item.stok_total);
                         const takenQty = Math.min(availableQty, qtyKeluarFifo);
-                        
-                        const newItem = {...item}; // Create a copy
+
+                        const newItem = {...item};
                         newItem.qty = parseFloat(takenQty.toFixed(4));
                         listStockSelected.push(newItem);
-                        
+
                         qtyKeluarFifo -= takenQty;
                     }
                 }
