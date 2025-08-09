@@ -943,27 +943,65 @@
     }
 
     function drawTableAsalBarang(data) {
-        if ($.fn.DataTable.isDataTable('#dataTable')) {
-            $('#dataTable').DataTable().clear().draw();
-            dataTable.destroy();
+        if (!$.fn.DataTable.isDataTable('#dataTable')) {
+            dataTable = $('#dataTable').DataTable({
+                processing: false,
+                serverSide: false,
+                ordering: true,
+                order: [],
+                fixedHeader: true,
+                initComplete: function() {
+                    $('.dataTables_length').empty();
+                    $('.dataTables_length').html("<div><label class='text-center ml-2 mt-2'>Show <b class='entries-label'>25</b> Entries</label></div>");
+                    $('.dataTable').wrap("<div style='overflow:auto; width:100%;position:relative;'></div>");
+                },
+                display: "stripe",
+                searching: true,
+                lengthMenu: [
+                    [100],
+                    [100]
+                ],
+                language: {
+                    emptyTable: "Tidak Ada Data",
+                    lengthMenu: "Show _MENU_ entries",
+                    paginate: {
+                        previous: '<i class="fa fa-angle-left"></i>',
+                        next: '<i class="fa fa-angle-right"></i>'
+                    }
+                }
+            });
         }
-        const table = $('#dataTable');
+
         var typePengambilanStok = $('#type_pengambilan_stock option:selected').val();
+        var typeAsalBarang = $('#type_asal_barang option:selected').val();
 
         $.each(data, function(i, v) {
+
+            // 🔹 Cek apakah sudah ada di tabel
+            var isDuplicate = false;
+            $('#dataTable tbody tr').each(function() {
+                var existingStockId = $(this).find('input.child').data('id');
+                var existingSumber = $(this).find('td:eq(1)').text().trim();
+                if (existingStockId == v.id && v.sumber == "JASA VENDOR" && typeAsalBarang == "SUPPLIER") {
+                    isDuplicate = true;
+                    return false; // break loop
+                }
+            });
+
+            // 🔹 Kalau duplikat sesuai kondisi -> skip
+            if (isDuplicate) {
+                return;
+            }
+
+            // 🔹 Append data baru
             var newRow = $('<tr>');
             if (typePengambilanStok == "FIFO" || parseFloat(v.stok_total) == 0) {
-                newRow.append($('<td style="text-align: center;">').html(
-                    `
-                `
-                ));
+                newRow.append($('<td style="text-align: center;">').html(``));
             } else {
                 newRow.append($('<td style="text-align: center;">').html(
-                    `
-                    <div class="form-check">
+                    `<div class="form-check">
                         <input data-id="${v.id}" data-stok_total="${v.stok_total}" autocomplete="one-time-code" class="form-check-input child" type="checkbox">
-                    </div>
-                `
+                    </div>`
                 ));
             }
 
@@ -971,44 +1009,15 @@
             newRow.append($('<td style="text-align:center;">').text(v.stock_dokumen));
             newRow.append($('<td style="text-align:center;">').text(v.supplier_name));
             newRow.append($('<td style="text-align:center;">').text(v.bc_type));
-            // newRow.append($('<td style="text-align:center;">').text(v.no_aju));
             newRow.append($('<td style="text-align:center;">').text(v.stock_date));
             newRow.append($('<td style="text-align:center;">').text(v.barang));
             newRow.append($('<td style="text-align:center;">').text(v.satuan));
             newRow.append($('<td style="text-align:center;">').text(v.stok_total));
-            table.find('tbody').append(newRow);
+
+            dataTable.row.add(newRow).draw(false);
         });
-
-        dataTable = $('#dataTable').DataTable({
-
-            processing: false,
-            serverSide: false,
-            ordering: true,
-            order: [],
-            fixedHeader: true,
-            "initComplete": function(settings, json) {
-                $('.dataTables_length').empty();
-                $('.dataTables_length').html("<div><label class='text-center ml-2 mt-2'>Show <b class='entries-label'>25</b> Entries</label></div>");
-                $('.dataTable').wrap("<div style='overflow:auto; width:100%;position:relative;'></div>");
-            },
-            display: "stripe",
-            searching: true,
-            lengthMenu: [
-                [100],
-                [100]
-            ],
-            language: {
-                emptyTable: "Tidak Ada Data",
-                lengthMenu: "Show _MENU_ entries",
-                paginate: {
-                    previous: '<i class="fa fa-angle-left"></i>',
-                    next: '<i class="fa fa-angle-right"></i>'
-                }
-            }
-        });
-
-        dataTable.draw();
     }
+
 
     function drawTableSelectedItem(data) {
         var typePengambilanStok = $('#type_pengambilan_stock option:selected').val();
