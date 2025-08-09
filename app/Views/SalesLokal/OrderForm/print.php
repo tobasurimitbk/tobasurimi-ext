@@ -150,7 +150,7 @@
                 <div class="txt-bold txt-center" style="font-size: 25px; margin-bottom:3px;">ORDER FORM</div>
                 <table class="w-100" style="border: 0.5px solid;border-radius: 7px;margin-right: 0">
                     <tr>
-                        <td style="border-right: 1px solid;border-right-style: dashed">
+                        <td style="border-right: 0.5px solid;border-right-style: dashed">
                             <div>Tgl. Pemesanan</div>
                             <div class="txt-center"><?= $soData->order_date ?></div>
                         </td>
@@ -164,7 +164,7 @@
                             <div>No. PO</div>
                             <div class="txt-center"><?= $soData->no_po ?></div>
                         </td>
-                        <td style="border-top: 1px solid;border-top-style: dashed">
+                        <td style="border-top: 0.5px solid;border-top-style: dashed">
                             <div>Tgl. Pengiriman</div>
                             <div class="txt-center"><?= $soData->shipping_date ?></div>
                         </td>
