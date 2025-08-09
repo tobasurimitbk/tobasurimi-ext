@@ -111,12 +111,16 @@ class BCPurchaseOrderModel extends Model
                     barang_master.barang_name, " ", 
                     IFNULL(GROUP_CONCAT(DISTINCT barang_master_spesifikasi.spesifikasi SEPARATOR ", "), "")
                 ) AS barang_name, 
-                barang_master.kode_barang
+                barang_master.kode_barang,
+                satuan_lpb.kode_satuan as kode_satuan_lpb,
+                satuan_po.kode_satuan as kode_satuan_po
             ')
                 ->join('penerimaan_barang_detail', 'penerimaan_barang_detail.penerimaan_barang_id = penerimaan_barang.id', 'left')
                 ->join('rm_purchase_orders', 'penerimaan_barang_detail.purchase_order_id = rm_purchase_orders.id', 'left')
                 ->join('barang_master', 'barang_master.id = penerimaan_barang_detail.barang_id', 'left')
                 ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = penerimaan_barang_detail.spesifikasi_id', 'left')
+                ->join('satuans satuan_lpb', 'satuan_lpb.id = penerimaan_barang_detail.unit_konversi', 'left')
+                ->join('satuans satuan_po', 'satuan_po.id = penerimaan_barang_detail.unit', 'left')
                 ->where('penerimaan_barang.status_penerimaan', "LOKAL")
                 ->where('penerimaan_barang.tipe_bahan', "BAKU")
                 ->where('penerimaan_barang.supplier_id', $first['supplier_id'])
@@ -147,13 +151,19 @@ class BCPurchaseOrderModel extends Model
                 am_purchase_orders.po_date,
                 purchase_requests.spp_no,
                 CONCAT(barang_master.barang_name, " ", barang_master_spesifikasi.spesifikasi) AS barang_name,
-                barang_master.kode_barang
+                barang_master.kode_barang,
+                barang_master.kode_barang,
+                barang_master_spesifikasi.spesifikasi,
+                satuan_lpb.kode_satuan as kode_satuan_lpb,
+                satuan_po.kode_satuan as kode_satuan_po
             ')
                 ->join('penerimaan_barang_detail', 'penerimaan_barang_detail.penerimaan_barang_id = penerimaan_barang.id', 'left')
                 ->join('am_purchase_orders', 'penerimaan_barang_detail.purchase_order_id = am_purchase_orders.id', 'left')
                 ->join('barang_master', 'barang_master.id = penerimaan_barang_detail.barang_id', 'left')
                 ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = penerimaan_barang_detail.spesifikasi_id', 'left')
                 ->join('purchase_requests', 'purchase_requests.id = am_purchase_orders.purchase_request_id', 'left')
+                ->join('satuans satuan_lpb', 'satuan_lpb.id = penerimaan_barang_detail.unit_konversi', 'left')
+                ->join('satuans satuan_po', 'satuan_po.id = penerimaan_barang_detail.unit', 'left')
                 ->where('penerimaan_barang.status_penerimaan', "LOKAL")
                 ->where('penerimaan_barang.tipe_bahan', "PENOLONG")
                 ->where('penerimaan_barang.supplier_id', $first['supplier_id'])
@@ -183,12 +193,18 @@ class BCPurchaseOrderModel extends Model
                 rm_import_pos.po_no,
                 rm_import_pos.po_date,
                 CONCAT(barang_master.barang_name, " ", barang_master_spesifikasi.spesifikasi) AS barang_name,
-                barang_master.kode_barang
+                barang_master.kode_barang,
+                satuan_lpb.kode_satuan as kode_satuan_lpb,
+                satuan_po.kode_satuan as kode_satuan_po,
+                metadata.value as valas
             ')
                 ->join('penerimaan_barang_detail', 'penerimaan_barang_detail.penerimaan_barang_id = penerimaan_barang.id', 'left')
                 ->join('rm_import_pos', 'penerimaan_barang_detail.purchase_order_id = rm_import_pos.id', 'left')
                 ->join('barang_master', 'barang_master.id = penerimaan_barang_detail.barang_id', 'left')
                 ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = penerimaan_barang_detail.spesifikasi_id', 'left')
+                ->join('satuans satuan_lpb', 'satuan_lpb.id = penerimaan_barang_detail.unit_konversi', 'left')
+                ->join('satuans satuan_po', 'satuan_po.id = penerimaan_barang_detail.unit', 'left')
+                ->join('metadata', 'metadata.id = rm_import_pos.currency', 'left')
                 ->where('penerimaan_barang.status_penerimaan', "IMPORT")
                 ->where('penerimaan_barang.tipe_bahan', "BAKU")
                 ->where('penerimaan_barang.supplier_id', $first['supplier_id'])
@@ -218,12 +234,18 @@ class BCPurchaseOrderModel extends Model
                 am_purchase_orders.po_no,
                 am_purchase_orders.po_date,
                 CONCAT(barang_master.barang_name, " ", barang_master_spesifikasi.spesifikasi) AS barang_name,
-                barang_master.kode_barang
+                barang_master.kode_barang,
+                satuan_lpb.kode_satuan as kode_satuan_lpb,
+                satuan_po.kode_satuan as kode_satuan_po,
+                metadata.value as valas,
             ')
                 ->join('penerimaan_barang_detail', 'penerimaan_barang_detail.penerimaan_barang_id = penerimaan_barang.id', 'left')
                 ->join('am_purchase_orders', 'penerimaan_barang_detail.purchase_order_id = am_purchase_orders.id', 'left')
                 ->join('barang_master', 'barang_master.id = penerimaan_barang_detail.barang_id', 'left')
                 ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = penerimaan_barang_detail.spesifikasi_id', 'left')
+                ->join('satuans satuan_lpb', 'satuan_lpb.id = penerimaan_barang_detail.unit_konversi', 'left')
+                ->join('satuans satuan_po', 'satuan_po.id = penerimaan_barang_detail.unit', 'left')
+                ->join('metadata', 'metadata.id = am_purchase_orders.currency', 'left')
                 ->where('penerimaan_barang.status_penerimaan', "IMPORT")
                 ->where('penerimaan_barang.tipe_bahan', "PENOLONG")
                 ->where('penerimaan_barang.supplier_id', $first['supplier_id'])
@@ -257,7 +279,10 @@ class BCPurchaseOrderModel extends Model
                 'po_date' => date('d/m/Y', strtotime($p['po_date'])),
                 'barang_name' => $p['barang_name'],
                 'kode_barang' => $p['kode_barang'],
-                'harga' => $p['sub_total']
+                'harga' => $p['sub_total'],
+                'kode_satuan_lpb' => $p['kode_satuan_lpb'],
+                'kode_satuan_po' => $p['kode_satuan_po'],
+                'valas' => isset($p['valas']) ? $p['valas'] : ""
             ];
         }
 

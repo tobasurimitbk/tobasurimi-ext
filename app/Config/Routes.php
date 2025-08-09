@@ -1374,9 +1374,9 @@ $routes->group('bea-cukai-bc-23', ['filter' => 'Auth'], function ($routes) {
     $routes->get('detail-barang/(:segment)', 'BeaCukai\BC23::detailBarang/$1');
 
     // OUTSTANDING
-    $routes->get('bc-23-outstanding-all', 'BeaCukai\BC23::allOutstanding');
+    $routes->get('bc-23-outstanding-all', 'BeaCukai\BC23::allOutstandingServerSide');
     $routes->get('bc-23-outstanding', 'BeaCukai\BC23::viewOutstanding');
-    $routes->get('bc-23-outstanding-export', 'BeaCukai\BC23::OutstandingSheet');
+    $routes->get('bc-23-outstanding-export', 'BeaCukai\BC23::OutstandingExcel');
 
     // HEADER
     $routes->get('id/header/(:segment)', 'BeaCukai\BC23::createHeaderView/$1');

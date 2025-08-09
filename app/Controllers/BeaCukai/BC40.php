@@ -1983,6 +1983,8 @@ class BC40 extends BaseController
                     rm_purchase_orders.po_no,
                     rm_purchase_orders.po_date,
                     rm_purchase_orders.total_before_pph as sub_total,
+                    satuan_lpb.kode_satuan as kode_satuan_lpb,
+                    satuan_po.kode_satuan as kode_satuan_po,
                     barang_master.barang_name,
                     barang_master.kode_barang,
                     GROUP_CONCAT(DISTINCT barang_master_spesifikasi.spesifikasi SEPARATOR ", ") AS spesifikasi
@@ -1992,6 +1994,8 @@ class BC40 extends BaseController
                 ->join('suppliers', 'suppliers.id = penerimaan_barang.supplier_id', 'left')
                 ->join('barang_master', 'barang_master.id = penerimaan_barang_detail.barang_id', 'left')
                 ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = penerimaan_barang_detail.spesifikasi_id', 'left')
+                ->join('satuans satuan_lpb', 'satuan_lpb.id = penerimaan_barang_detail.unit_konversi', 'left')
+                ->join('satuans satuan_po', 'satuan_po.id = penerimaan_barang_detail.unit', 'left')
                 ->where('penerimaan_barang.status_penerimaan', "LOKAL")
                 ->where('penerimaan_barang.tipe_bahan', "BAKU")
                 ->where('penerimaan_barang.bc_type', '53')
@@ -2032,6 +2036,8 @@ class BC40 extends BaseController
                 penerimaan_barang_detail.barang_id,
                 am_purchase_orders.po_no,
                 am_purchase_orders.po_date,
+                satuan_lpb.kode_satuan as kode_satuan_lpb,
+                satuan_po.kode_satuan as kode_satuan_po,
                 purchase_requests.spp_no,
                 barang_master.barang_name,
                 barang_master.kode_barang,
@@ -2043,6 +2049,8 @@ class BC40 extends BaseController
                 ->join('barang_master', 'barang_master.id = penerimaan_barang_detail.barang_id', 'left')
                 ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = penerimaan_barang_detail.spesifikasi_id', 'left')
                 ->join('purchase_requests', 'purchase_requests.id = am_purchase_orders.purchase_request_id', 'left')
+                ->join('satuans satuan_lpb', 'satuan_lpb.id = penerimaan_barang_detail.unit_konversi', 'left')
+                ->join('satuans satuan_po', 'satuan_po.id = penerimaan_barang_detail.unit', 'left')
                 ->where('penerimaan_barang.status_penerimaan', "LOKAL")
                 ->where('penerimaan_barang.tipe_bahan', "PENOLONG")
                 ->where('penerimaan_barang.bc_type', '53')
@@ -2080,6 +2088,9 @@ class BC40 extends BaseController
                     SUM(penerimaan_barang_detail.jml_masuk_konversi) AS qty_lpb_konversi,
                     SUM(penerimaan_barang_detail.qty) AS qty_po,
                     SUM(penerimaan_barang_detail.sub_total) AS sub_total,
+                    satuan_lpb.kode_satuan as kode_satuan_lpb,
+                    satuan_po.kode_satuan as kode_satuan_po,
+                    metadata.value as valas,
                     penerimaan_barang_detail.barang_id,
                     rm_import_pos.po_no,
                     rm_import_pos.po_date,
@@ -2092,6 +2103,9 @@ class BC40 extends BaseController
                 ->join('suppliers', 'suppliers.id = penerimaan_barang.supplier_id', 'left')
                 ->join('barang_master', 'barang_master.id = penerimaan_barang_detail.barang_id', 'left')
                 ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = penerimaan_barang_detail.spesifikasi_id', 'left')
+                ->join('satuans satuan_lpb', 'satuan_lpb.id = penerimaan_barang_detail.unit_konversi', 'left')
+                ->join('satuans satuan_po', 'satuan_po.id = penerimaan_barang_detail.unit', 'left')
+                ->join('metadata', 'metadata.id = rm_import_pos.currency', 'left')
                 ->where('penerimaan_barang.status_penerimaan', "IMPORT")
                 ->where('penerimaan_barang.tipe_bahan', "BAKU")
                 ->where('penerimaan_barang.bc_type', '48')
@@ -2129,6 +2143,9 @@ class BC40 extends BaseController
                 SUM(penerimaan_barang_detail.jml_masuk_konversi) AS qty_lpb_konversi,
                 SUM(penerimaan_barang_detail.qty) AS qty_po,
                 SUM(penerimaan_barang_detail.sub_total) AS sub_total,
+                satuan_lpb.kode_satuan as kode_satuan_lpb,
+                satuan_po.kode_satuan as kode_satuan_po,
+                metadata.value as valas,
                 penerimaan_barang_detail.barang_id,
                 am_purchase_orders.po_no,
                 am_purchase_orders.po_date,
@@ -2141,6 +2158,9 @@ class BC40 extends BaseController
                 ->join('suppliers', 'suppliers.id = penerimaan_barang.supplier_id', 'left')
                 ->join('barang_master', 'barang_master.id = penerimaan_barang_detail.barang_id', 'left')
                 ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = penerimaan_barang_detail.spesifikasi_id', 'left')
+                ->join('satuans satuan_lpb', 'satuan_lpb.id = penerimaan_barang_detail.unit_konversi', 'left')
+                ->join('satuans satuan_po', 'satuan_po.id = penerimaan_barang_detail.unit', 'left')
+                ->join('metadata', 'metadata.id = am_purchase_orders.currency', 'left')
                 ->where('penerimaan_barang.status_penerimaan', "IMPORT")
                 ->where('penerimaan_barang.tipe_bahan', "PENOLONG")
                 ->where('penerimaan_barang.bc_type', '48')
@@ -2197,7 +2217,10 @@ class BC40 extends BaseController
                     'kode_barang' => $p['kode_barang'],
                     'harga' => number_format($p['sub_total'], 2),
                     'harga_number' => $p['sub_total'],
-                    'supplier_name' => $p['supplier_name']
+                    'supplier_name' => $p['supplier_name'],
+                    'kode_satuan_lpb' => $p['kode_satuan_lpb'],
+                    'kode_satuan_po' => $p['kode_satuan_po'],
+                    'valas' => isset($p['valas']) ? $p['valas'] : ""
                 ];
             } else {
                 if (!in_array($p['id'], $lpbUsedArr)) {
@@ -2217,7 +2240,10 @@ class BC40 extends BaseController
                         'kode_barang' => $p['kode_barang'],
                         'harga' => number_format($p['sub_total'], 2),
                         'harga_number' => $p['sub_total'],
-                        'supplier_name' => $p['supplier_name']
+                        'supplier_name' => $p['supplier_name'],
+                        'kode_satuan_lpb' => $p['kode_satuan_lpb'],
+                        'kode_satuan_po' => $p['kode_satuan_po'],
+                        'valas' => isset($p['valas']) ? $p['valas'] : ""
                     ];
                 }
             }
@@ -2580,6 +2606,7 @@ class BC40 extends BaseController
         $lpbUsed = $this->bcPurchaseOrderModel
             ->where('company_id', $this->this_company_id)
             ->where('deletedAt', null)
+            ->whereIn('po_type', ["LOKAL BAKU", "LOKAL PENOLONG"])
             ->findAll();
 
         $lpbUsedArr = [];
@@ -2848,200 +2875,6 @@ class BC40 extends BaseController
         header('Cache-Control: max-age=0');
         $writer->save('php://output');
         exit;
-    }
-
-    public function allOutstanding()
-    {
-
-        $lpbUsed = $this->bcPurchaseOrderModel->where('company_id', $this->this_company_id)->where('deletedAt', null)->findAll();
-        $lpbUsedArr = [];
-        $allPenerimaanBarangidArr = [];
-        $lpbNotUsedArr = [];
-        $allPenerimaanBarangid = $this->penerimaanBarangModel->select('id')->where('company_id', $this->this_company_id)->where('deletedAt', null)->findAll();
-        foreach ($allPenerimaanBarangid as $all) {
-            array_push($allPenerimaanBarangidArr, $all['id']);
-        }
-
-        foreach ($lpbUsed as $p) {
-            $lpbArr = json_decode($p['multiple_lpb_id']);
-            foreach ($lpbArr as $l) {
-                array_push($lpbUsedArr, $l);
-            }
-        }
-
-        $lpbNotUsedArr = array_diff($allPenerimaanBarangidArr, $lpbUsedArr);
-
-        $list = [];
-        foreach ($lpbNotUsedArr as $l) {
-            $tipe = $this->penerimaanBarangModel
-                ->select('id, tipe_bahan, status_penerimaan')
-                ->where('penerimaan_barang.id', $l)
-                ->first();
-
-
-            if ($tipe['tipe_bahan'] == 'BAKU') {
-                $po = $this->penerimaanBarangModel
-                    ->select('
-                penerimaan_barang.id,
-                penerimaan_barang.tanggal AS lpb_date,
-                penerimaan_barang.no_penerimaan_barang,
-                penerimaan_barang.status_penerimaan,
-                penerimaan_barang.tipe_bahan,
-                penerimaan_barang_detail.purchase_order_id,
-                SUM(penerimaan_barang_detail.jml_masuk) AS qty_lpb,
-                SUM(penerimaan_barang_detail.qty) AS qty_po,
-                SUM(penerimaan_barang_detail.sub_total) AS sub_total,
-                penerimaan_barang_detail.barang_id,
-                suppliers.name,
-                rm_purchase_orders.po_no,
-                rm_purchase_orders.po_date,
-                barang_master.barang_name,
-                barang_master.kode_barang
-                ')
-                    ->join('penerimaan_barang_detail', 'penerimaan_barang_detail.penerimaan_barang_id = penerimaan_barang.id', 'left')
-                    ->join('rm_purchase_orders', 'penerimaan_barang_detail.purchase_order_id = rm_purchase_orders.id', 'left')
-                    ->join('barang_master', 'barang_master.id = penerimaan_barang_detail.barang_id', 'left')
-                    ->join('suppliers', 'penerimaan_barang.supplier_id = suppliers.id', 'left')
-                    ->where('penerimaan_barang.status_penerimaan', "LOKAL")
-                    ->where('penerimaan_barang.id', $tipe['id'])
-                    ->where('penerimaan_barang.bc_type', '53')
-                    ->where('penerimaan_barang.deletedAt', null)
-                    ->where('penerimaan_barang_detail.deletedAt', null)
-                    ->where('penerimaan_barang.company_id', $this->this_company_id)
-                    ->orderBy('penerimaan_barang.createdAt', "DESC")
-                    ->groupBy('barang_id')
-                    ->groupBy('id')
-                    ->findAll();
-
-
-                if ($po != null) {
-                    foreach ($po as $row) {
-                        array_push($list, [
-                            'supplier' => $row['name'],
-                            'status_penerimaan' => $row['status_penerimaan'],
-                            'tipe_bahan' => $row['tipe_bahan'],
-                            'po_date' => date('Y/m/d', strtotime($row['po_date'])),
-                            'lpb_date' => date('Y/m/d', strtotime($row['lpb_date'])),
-                            'no_penerimaan_barang' => $row['no_penerimaan_barang'],
-                            'po_no' => $row['po_no'],
-                            'kode_barang' => $row['kode_barang'],
-                            'barang' => $row['barang_name'],
-                            'qty_po' => round($row['qty_po'], 2),
-                            'qty_lpb' => round($row['qty_lpb'], 2),
-                            'sub_total' => number_format($row['sub_total'], 2)
-                        ]);
-                    }
-                }
-            } elseif ($tipe['tipe_bahan'] == 'PENOLONG') {
-                $po = $this->penerimaanBarangModel
-                    ->select('
-                    penerimaan_barang.id,
-                    penerimaan_barang.tanggal AS lpb_date,
-                    penerimaan_barang.no_penerimaan_barang,
-                    penerimaan_barang.status_penerimaan,
-                    penerimaan_barang.tipe_bahan,
-                    penerimaan_barang_detail.purchase_order_id,
-                    SUM(penerimaan_barang_detail.jml_masuk) AS qty_lpb,
-                    SUM(penerimaan_barang_detail.qty) AS qty_po,
-                    SUM(penerimaan_barang_detail.sub_total) AS sub_total,
-                    penerimaan_barang_detail.barang_id,
-                    suppliers.name,
-                    am_purchase_orders.po_no,
-                    am_purchase_orders.po_date,
-                    barang_master.barang_name,
-                    barang_master.kode_barang
-                ')
-                    ->join('penerimaan_barang_detail', 'penerimaan_barang_detail.penerimaan_barang_id = penerimaan_barang.id', 'left')
-                    ->join('am_purchase_orders', 'penerimaan_barang_detail.purchase_order_id = am_purchase_orders.id', 'left')
-                    ->join('barang_master', 'barang_master.id = penerimaan_barang_detail.barang_id', 'left')
-                    ->join('suppliers', 'penerimaan_barang.supplier_id = suppliers.id', 'left')
-                    ->where('penerimaan_barang.status_penerimaan', "LOKAL")
-                    ->where('penerimaan_barang.id', $tipe['id'])
-                    ->where('penerimaan_barang.bc_type', '53')
-                    ->where('penerimaan_barang.deletedAt', null)
-                    ->where('penerimaan_barang_detail.deletedAt', null)
-                    ->where('penerimaan_barang.company_id', $this->this_company_id)
-                    ->orderBy('penerimaan_barang.createdAt', "DESC")
-                    ->groupBy('barang_id')
-                    ->groupBy('id')
-                    ->findAll();
-                if ($po != null) {
-                    foreach ($po as $row) {
-                        array_push($list, [
-                            'supplier' => $row['name'],
-                            'status_penerimaan' => $row['status_penerimaan'],
-                            'tipe_bahan' => $row['tipe_bahan'],
-                            'po_date' => $row['po_date'],
-                            'lpb_date' => $row['lpb_date'],
-                            'no_penerimaan_barang' => $row['no_penerimaan_barang'],
-                            'po_no' => $row['po_no'],
-                            'kode_barang' => $row['kode_barang'],
-                            'barang' => $row['barang_name'],
-                            'qty_po' => round($row['qty_po'], 2),
-                            'qty_lpb' => round($row['qty_lpb'], 2),
-                            'sub_total' => number_format($row['sub_total'], 2)
-                        ]);
-                    }
-                }
-            }
-        }
-
-        return json_encode($list);
-    }
-
-    public function OutstandingSheet()
-    {
-        $list = json_decode($this->allOutstanding());
-
-        $spreadsheet = new Spreadsheet();
-        $sheet = $spreadsheet->getActiveSheet();
-
-        $spreadsheet->setActiveSheetIndex(0)
-            ->setCellValue('A1', 'No.')
-            ->setCellValue('B1', 'Tipe PO')
-            ->setCellValue('C1', 'Tgl PO')
-            ->setCellValue('D1', 'Tgl LPB')
-            ->setCellValue('E1', 'No LPB')
-            ->setCellValue('F1', 'No PO')
-            ->setCellValue('G1', 'Kode')
-            ->setCellValue('H1', 'Barang')
-            ->setCellValue('I1', 'Qty PO')
-            ->setCellValue('J1', 'Qty Diterima')
-            ->setCellValue('K1', 'Harga');
-
-        $no = 1;
-        $column = 2;
-
-        foreach ($list as $l) {
-            $spreadsheet->setActiveSheetIndex(0)
-                ->setCellValue('A' . $column, $no++)
-                ->setCellValue('B' . $column,  $l->status_penerimaan . " " . $l->tipe_bahan)
-                ->setCellValue('C' . $column,  $l->po_date)
-                ->setCellValue('D' . $column,  $l->lpb_date)
-                ->setCellValue('E' . $column,  $l->no_penerimaan_barang)
-                ->setCellValue('F' . $column,  $l->po_no)
-                ->setCellValue('G' . $column,  $l->kode_barang)
-                ->setCellValue('H' . $column,  $l->barang)
-                ->setCellValue('I' . $column,  $l->qty_po)
-                ->setCellValue('J' . $column,  $l->qty_lpb)
-                ->setCellValue('K' . $column,  $l->sub_total);
-            $column++;
-        }
-        $writer = new Xlsx($spreadsheet);
-        $filename = 'Rekap BC40';
-        foreach (range('A', 'K') as $columnID) {
-            $sheet->getColumnDimension($columnID)->setAutoSize(true);
-        }
-
-        $writer = new Xlsx($spreadsheet);
-        $filename = 'Laporan-Outstanding-BC-4.0';
-
-        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-        header('Content-Disposition: attachment;filename=' . $filename . '.xlsx');
-        header('Cache-Control: max-age=0');
-
-        $writer->save('php://output');
-        die;
     }
 
     public function unPosting()

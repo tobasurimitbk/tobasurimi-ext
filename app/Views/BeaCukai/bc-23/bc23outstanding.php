@@ -6,7 +6,7 @@
         <h1>BC 2.3 Outstanding</h1>
 
         <div class="col-button-tambah-spp">
-            <a class="btn btn-warning btn-print float-right text-white" target="_blank" href=" <?= base_url("bea-cukai-bc-23/bc-23-outstanding-export"); ?>">
+            <a class="btn btn-warning btn-print float-right text-white" href="#" onclick="exportExcel()">
                 <i class="fa-solid fa-print"></i> Export
             </a>
             <a class="btn btn-hide-form btn-discard float-right " href="<?= base_url(" bea-cukai-bc-23"); ?>">
@@ -17,24 +17,84 @@
     </div>
     <div class="card">
         <div class="card-body">
+            <div class="row mb-3">
+                <div class="col-md-2">
+                    <div class="input-group">
+                        <div class="form-floating" style="height: 50px;">
+                            <input placeholder="" class="form-control dateStart" id="dateStart" name="dateStart" aria-label="Floating label select example" value="01/<?= date("m/Y") ?>" />
+                            <label style="z-index: 1;" style="z-index: 1;">Tanggal Awal LPB</label>
+                        </div>
+                        <div class="input-group-append" style="height:50px;">
+                            <button disabled class="btn btn-secondary" type="button">
+                                <i class="fas fa-calendar-alt"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="input-group">
+                        <div class="form-floating" style="height: 50px;">
+                            <input placeholder="" class="form-control dateEnd" id="dateEnd" name="dateEnd" aria-label="Floating label select example" value="<?= date('t/m/Y') ?>" />
+                            <label style="z-index: 1;" style="z-index: 1;">Tanggal Akhir LPB</label>
+                        </div>
+                        <div class="input-group-append" style="height:50px;">
+                            <button disabled class="btn btn-secondary" type="button">
+                                <i class="fas fa-calendar-alt"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="form-floating mb-3">
+                        <select class="form-select tipe_bahan" name="tipe_bahan" id="tipe_bahan">
+                            <option value="" data-code=""></option>
+                            <option value="BAKU">IMPORT BAKU</option>
+                            <option value="PENOLONG">IMPORT PENOLONG</option>
 
+                        </select>
+                        <label style="z-index: 1;">Tipe Bahan</label>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="form-floating mb-3">
+                        <select class="form-select divisi_id" name="divisi_id" id="divisi_id">
+                            <option value="" data-code=""></option>
+                            <?php foreach ($divisi as $d) : ?>
+                                <option value="<?= $d['id']; ?>"><?= $d["divisi"]; ?></option>
+                            <?php endforeach; ?>
+
+                        </select>
+                        <label style="z-index: 1;">Pilih Departemen</label>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="form-floating" style="height: 50px;">
+                        <input placeholder="" class="form-control search" id="search" name="search" aria-label="Floating label select example" />
+                        <label style="z-index: 1;" style="z-index: 1;">Cari Data</label>
+                    </div>
+                </div>
+            </div>
             <div class="row">
                 <div class="table-responsive">
                     <table class="table table-bordered nowrap table-hover-tobasurimi dataTable" id="dataTable" width="100%" cellspacing="0">
                         <thead class="thead-dark">
                             <tr style="text-align: center;">
-                                <th style="text-align:center;">No</th>
-                                <th style="text-align:center;">Supplier</th>
-                                <th style="text-align:center;">Tipe PO</th>
-                                <th style="text-align:center;">Tgl PO</th>
-                                <th style="text-align:center;">Tgl LPB </th>
-                                <th style="text-align:center;">No LPB</th>
-                                <th style="text-align:center;">No PO</th>
-                                <th style="text-align:center;">Kode</th>
-                                <th style="text-align:center;">Barang</th>
-                                <th style="text-align:center;">Qty PO</th>
-                                <th style="text-align:center;">Qty Diterima</th>
-                                <th style="text-align:center;">Harga</th>
+                                <th>No</th>
+                                <th>Tipe Bahan</th>
+                                <th>Departemen</th>
+                                <th>Supplier</th>
+                                <th>Tgl PO</th>
+                                <th>Tgl LPB </th>
+                                <th>No LPB</th>
+                                <th>No PO</th>
+                                <th>Kode</th>
+                                <th>Barang</th>
+                                <th>Qty PO</th>
+                                <th>Qty LPB</th>
+                                <th>Kemasan</th>
+                                <th>Qty Kemasan</th>
+                                <th>Valas</th>
+                                <th>Total Harga</th>
                             </tr>
                         </thead>
                         <tbody class="body-table" id="body-table">
@@ -48,56 +108,140 @@
 </section>
 
 <script>
-    let sort = "id";
-    let sortType = "desc";
-    $(document).ready(function() {
-        drawTable();
+    var table = $('#dataTable').DataTable({
+        processing: true,
+        serverSide: true,
+        ajax: {
+            url: "<?= base_url('bea-cukai-bc-23/bc-23-outstanding-all') ?>",
+            type: 'GET',
+            dataSrc: "data",
+            data: function(data) {
+                data.dateStart = $('.dateStart').val();
+                data.dateEnd = $('.dateEnd').val();
+                data.search = $('.search').val();
+                data.tipe_bahan = $('.tipe_bahan').val();
+                data.divisi_id = $('.divisi_id').val();
+            }
+        },
+        "initComplete": function(settings, json) {
+            $('.dataTables_length').empty();
+            $('.dataTables_length').html("<div><label class='text-center ml-2 mt-2'>Show <b class='entries-label'>25</b> Entries</label></div>");
+            $('.dataTable').wrap("<div style='overflow:auto; width:100%;position:relative;'></div>");
+        },
+        pageLength: 25, // <- Ini untuk default 25 per halaman
+        display: "stripe",
+        searching: false,
+        columns: [{
+                data: 'no',
+                width: "5%"
+            },
+            {
+                data: 'tipe_bahan'
+            },
+            {
+                data: 'divisi'
+            },
+            {
+                data: 'supplier'
+            },
+            {
+                data: 'po_date'
+            },
+            {
+                data: 'lpb_date'
+            },
+            {
+                data: 'no_penerimaan_barang'
+            },
+            {
+                data: 'po_no'
+            },
+            {
+                data: 'kode_barang'
+            },
+            {
+                data: 'barang'
+            },
+            {
+                data: 'qty_po'
+            },
+            {
+                data: 'qty_lpb'
+            },
+            {
+                data: 'kemasan'
+            },
+            {
+                data: 'qty_kemasan'
+            },
+            {
+                data: 'valas'
+            },
+            {
+                data: 'sub_total'
+            }
+        ],
+        columnDefs: [{
+            defaultContent: "-",
+            targets: "_all"
+        }],
+        language: {
+            emptyTable: "Tidak ada penerimaan outstanding BC 2.3",
+            lengthMenu: "Show _MENU_ entries",
+            paginate: {
+                previous: '<i class="fa fa-angle-left"></i>',
+                next: '<i class="fa fa-angle-right"></i>'
+            }
+        }
+    });
+
+    $('#divisi_id').select2({
+        placeholder: "Pilih Departemen",
+        theme: "bootstrap-5",
+        allowClear: true
+    }).change(function() {});
+
+    $('#tipe_bahan').select2({
+        placeholder: "Pilih Tipe Bahan",
+        theme: "bootstrap-5",
+        allowClear: true
+    }).change(function() {});
+
+    $('#divisi_id,#tipe_bahan,#dateStart,#dateEnd').change(function() {
+        table.ajax.reload();
+    });
+
+    $('#search').keyup(function() {
+        table.ajax.reload();
     })
 
-    function drawTable() {
-        $.ajax({
-            url: '<?= base_url('bea-cukai-bc-23/bc-23-outstanding-all') ?>',
-            method: "GET",
-            data: {
+    $("#divisi_id,#tipe_bahan")
+        .parent('div')
+        .children('span')
+        .children('span')
+        .children('span')
+        .children('span')
+        .css('margin-top', '22px').css('margin-left', '-7px');
 
-            },
-            beforeSend: function() {
-                setLoading();
-            },
-            complete: function() {
-                stopLoading();
-            },
-            dataType: "json",
-            success: function(res) {
-                const table = $('#dataTable');
-                table.find('tbody').empty();
-                var no = 1
-                if (res.length > 0) {
-                    $.each(res, function(i, v) {
-                        var newRow = $('<tr style="border: none">');
-                        newRow.append($('<td style="text-align:center;">').text(no++));
-                        newRow.append($('<td style="text-align:center;">').text(v.supplier));
-                        newRow.append($('<td style="text-align:center;">').text(v.status_penerimaan + " " + v.tipe_bahan));
-                        newRow.append($('<td style="text-align:center;">').text(v.po_date));
-                        newRow.append($('<td style="text-align:center;">').text(v.lpb_date));
-                        newRow.append($('<td style="text-align:center;">').text(v.no_penerimaan_barang));
-                        newRow.append($('<td style="text-align:center;">').text(v.po_no));
-                        newRow.append($('<td style="text-align:center;">').text(v.kode_barang));
-                        newRow.append($('<td style="text-align:center;">').text(v.barang));
-                        newRow.append($('<td style="text-align:center;">').text(v.qty_po));
-                        newRow.append($('<td style="text-align:center;">').text(v.qty_lpb));
-                        newRow.append($('<td style="text-align:center;">').text(v.sub_total));
-                        table.find('tbody').append(newRow);
-                    });
-                } else {
-                    var newRow = $('<tr style="border: none">');
-                    newRow.append($('<td colspan ="12"  style="text-align:center;">').text("Tidak ada Dokumen Bea Cukai"));
-                    table.find('tbody').append(newRow);
-                }
+    $(".dateStart,.dateEnd").datepicker({
+        todayHighlight: true,
+        format: "dd/mm/yyyy",
+        orientation: "bottom auto",
+        autoclose: true
+    })
 
+    function exportExcel() {
+        var dateStart = $('#dateStart').val();
+        var dateEnd = $('#dateEnd').val();
+        var tipeBahan = $('#tipe_bahan').val();
+        var divisiId = $('#divisi_id').val();
 
-            }
-        })
+        if (dateStart == '' || dateEnd == '') {
+            alert('Tanggal mulai & Tanggal Akhir wajib diisi');
+        } else {
+            window.open('<?= base_url('bea-cukai-bc-23/bc-23-outstanding-export') ?>?dateStart=' + dateStart + '&dateEnd=' + dateEnd + '&tipe_bahan=' + tipeBahan + '&divisi_id=' + divisiId);
+        }
+
     }
 </script>
 
