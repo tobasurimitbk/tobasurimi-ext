@@ -976,19 +976,21 @@
         var typeAsalBarang = $('#type_asal_barang option:selected').val();
 
         $.each(data, function(i, v) {
+            // 🔹 Skip semua JASA VENDOR kalau typeAsalBarang = SUPPLIER
+            if (v.sumber === "JASA VENDOR" && typeAsalBarang === "SUPPLIER") {
+                return; // lanjut ke item berikutnya
+            }
 
             // 🔹 Cek apakah sudah ada di tabel
             var isDuplicate = false;
             $('#dataTable tbody tr').each(function() {
                 var existingStockId = $(this).find('input.child').data('id');
-                var existingSumber = $(this).find('td:eq(1)').text().trim();
-                if (existingStockId == v.id && v.sumber == "JASA VENDOR" && typeAsalBarang == "SUPPLIER") {
+                if (existingStockId == v.id) {
                     isDuplicate = true;
                     return false; // break loop
                 }
             });
 
-            // 🔹 Kalau duplikat sesuai kondisi -> skip
             if (isDuplicate) {
                 return;
             }
