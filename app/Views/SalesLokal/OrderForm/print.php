@@ -9,6 +9,7 @@
         body {
             font-size: 12px;
             font-family: 'Lucida Console', monospace;
+            font-weight: 700;
         }
 
         @page {
