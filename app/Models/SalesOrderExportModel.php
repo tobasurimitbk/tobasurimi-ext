@@ -75,30 +75,25 @@ class SalesOrderExportModel extends Model
 
         $totalData = $salesDataQry->countAllResults(false);
 
-        if ($addCondition['search'] || $addCondition['status']) {
-            $salesDataQry->groupStart();
-        }
 
         if ($addCondition['search']) {
             $salesDataQry
+                ->groupStart()
                 ->like('sales_order_export.sales_order_export_no', $addCondition['search'])
                 ->orLike('sales_contract.customer_po_no', $addCondition['search'])
                 ->orLike('customers.name', $addCondition['search'])
-                ->orLike('divisis.divisi', $addCondition['search']);
+                ->orLike('divisis.divisi', $addCondition['search'])
+                ->groupEnd();
         }
 
         if ($addCondition['status']) {
             if ($addCondition['status'] == "SUDAH POSTING") {
                 $salesDataQry
                     ->where('sales_order_export.status', 'POSTED');
-            } else {
+            } else if ($addCondition['status'] == "BELUM POSTING") {
                 $salesDataQry
                     ->where('sales_order_export.status', 'NEW');
             }
-        }
-
-        if ($addCondition['search'] || $addCondition['status']) {
-            $salesDataQry->groupEnd();
         }
 
         if (!empty($addCondition['dateStart']) || !empty($addCondition['dateEnd'])) {
@@ -151,20 +146,13 @@ class SalesOrderExportModel extends Model
                         sales_contract.tipe_harga,
                         metadata.value AS valas_name,
                         users.name AS acc_holder,
-                        customers.name AS customer_name,
-                        SUM(qty) AS total_qty,
-                        SUM(qty_convertion) AS total_qty_convertion,
-                        tb_satuan.kode_satuan AS kode_satuan,
-                        tb_satuan_konversi.kode_satuan AS kode_satuan_konversi";
+                        customers.name AS customer_name";
         $salesDataQry = $this->asObject()
             ->select($selectQry)
             ->where($condition)
             ->join('companies', 'sales_order_export.company_id = companies.id', 'left')
             ->join('sales_contract', 'sales_contract.id = sales_order_export.sales_contract_id', 'left')
             ->join('customers', 'customers.id = sales_contract.customer_id', 'left')
-            ->join('sales_order_detail_export', 'sales_order_detail_export.sales_order_export_id = sales_order_export.sales_order_export_id', 'left')
-            ->join('satuans tb_satuan', 'tb_satuan.id = sales_order_detail_export.satuan_id', 'left')
-            ->join('satuans tb_satuan_konversi', 'tb_satuan_konversi.id = sales_order_detail_export.satuan_convertion_id', 'left')
             ->join('metadata', 'sales_order_export.valas_id = metadata.id', 'left')
             ->join('users', 'users.id = sales_order_export.user_id', 'left')
             ->orderBy($sort, $sortType)
@@ -270,15 +258,16 @@ class SalesOrderExportModel extends Model
         $shipmentSummary = $shipmentSum->get()->getRowArray();
 
         // Hitung total_qty_convertion (boleh join detail)
-        $qtySum = $this->db->table('sales_order_export')
+        $qtySum = $this->db->table('sales_order_detail_export')
             ->select('SUM(sales_order_detail_export.qty_convertion) AS total_qty_convertion_all')
+            ->join('sales_order_export', 'sales_order_export.sales_order_export_id = sales_order_detail_export.sales_order_export_id', 'left')
             ->join('companies', 'sales_order_export.company_id = companies.id', 'left')
             ->join('sales_contract', 'sales_contract.id = sales_order_export.sales_contract_id', 'left')
             ->join('customers', 'customers.id = sales_contract.customer_id', 'left')
-            ->join('sales_order_detail_export', 'sales_order_detail_export.sales_order_export_id = sales_order_export.sales_order_export_id', 'left')
             ->join('metadata', 'sales_order_export.valas_id = metadata.id', 'left')
             ->join('users', 'users.id = sales_order_export.user_id', 'left')
-            ->where($condition);
+            ->where($condition)
+            ->where('sales_order_detail_export.deletedAt', null);
 
         if ($addCondition['customer_id']) {
             $qtySum->where('sales_contract.customer_id', $addCondition['customer_id']);
@@ -316,15 +305,13 @@ class SalesOrderExportModel extends Model
         // Gabungkan hasil
         $summary = array_merge($shipmentSummary, $qtySummary);
 
-
-
         return [
             'data'              => $data,
             'totalData'         => $totalData,
             'totalFilteredData' => $totalFilteredData,
             'sort'  => $sort,
             'sortType'  => $sortType,
-            'totalQtyConvertion' => (float) ($summary['total_qty_convertion_all'] ?? 0),
+            'totalQtyConvertion' => (float) ($qtySummary['total_qty_convertion_all'] ?? 0),
             'totalShipmentValue' => (float) ($summary['total_shipment_value_all'] ?? 0),
             'totalShipmentValueNet' => (float) ($summary['total_shipment_value_net_all'] ?? 0),
         ];

@@ -22,7 +22,7 @@
                     <div class="input-group">
                         <div class="form-floating" style="height: 50px;">
                             <input placeholder="" class="form-control dateStart" id="dateStart" name="dateStart" aria-label="Floating label select example" />
-                            <label style="z-index: 1;" style="z-index: 1;">Start Actualy Shipment Date</label>
+                            <label style="z-index: 1;" style="z-index: 1;">Start Actualy Date</label>
                         </div>
                         <div class="input-group-append" style="height:50px;">
                             <button disabled class="btn btn-secondary" type="button">
@@ -35,7 +35,7 @@
                     <div class="input-group">
                         <div class="form-floating" style="height: 50px;">
                             <input placeholder="" class="form-control dateEnd" id="dateEnd" name="dateEnd" aria-label="Floating label select example" />
-                            <label style="z-index: 1;" style="z-index: 1;">End Actualy Shipment Date</label>
+                            <label style="z-index: 1;" style="z-index: 1;">End Actualy Date</label>
                         </div>
                         <div class="input-group-append" style="height:50px;">
                             <button disabled class="btn btn-secondary" type="button">
@@ -113,14 +113,14 @@
                                 <th style="text-align:left;" onclick="changeSort('sales_order_export.sales_order_export_no')">Order Form No</th>
                                 <th style="text-align:left;" onclick="changeSort('sales_contract.customer_id')">Customer</th>
                                 <th style="text-align:left;" onclick="changeSort('sales_order_export.container')">Container</th>
-                                <th style="text-align:left;" onclick="changeSort('sales_order_export.actualy_shipment_date')">Actualy Shipment Date</th>
+                                <th style="text-align:left;" onclick="changeSort('sales_order_export.actualy_shipment_date')">Actualy Date</th>
                                 <th style="text-align:left;" onclick="changeSort('sales_order_export.deadline')">Deadline</th>
                                 <th style="text-align:left;" onclick="changeSort('sales_contract.dicharge_port')">Destination</th>
                                 <th style="text-align:left;" onclick="changeSort('sales_order_export.company_id')">Plant</th>
                                 <th style="text-align:left;" onclick="changeSort('sales_contract_detail.barang_master_sales_id')">Product</th>
                                 <th style="text-align:left;">Qty Order Form</th>
                                 <th style="text-align:left;">Qty (Kg)</th>
-                                <th style="text-align:left;" onclick="changeSort('sales_order_export.valas_id')">Valas</th>
+                                <th style="text-align:left;" onclick="changeSort('sales_order_export.valas_id')">Currency</th>
                                 <th style="text-align:left;">Amount</th>
                                 <th style="text-align:left;" onclick="changeSort('sales_contract.tipe_harga')">Price Type</th>
                                 <th style="text-align:left;">OF</th>
@@ -288,8 +288,8 @@
             const total = api.ajax.json().footerTotals;
 
             if (total) {
-                $('.totalQtyConvertion').html(greatFormatRupiah(total.totalQtyConvertion));
-                $('.amountValue').html(greatFormatRupiah(total.amountValue));
+                $('.totalQtyConvertion').html(greatFormatRupiah(total.totalQtyConvertion.toFixed(2)));
+                $('.amountValue').html(greatFormatRupiah(total.amountValue.toFixed(2)));
             }
         },
     });

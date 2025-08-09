@@ -38,8 +38,9 @@
                 </div>
                 <div class="col-md-3">
                     <select class="form-select status" name="status" id="status" aria-label="Floating label select example">
-                        <option value="BELUM POSTING">STATUS : NOT POSTED</option>
+                        <option value="ALL" selected>STATUS : ALL</option>
                         <option value="SUDAH POSTING">STATUS : POSTED</option>
+                        <option value="BELUM POSTING">STATUS : NOT POSTED</option>
                     </select>
                 </div>
                 <div class="col-md-3">
