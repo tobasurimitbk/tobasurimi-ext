@@ -8,8 +8,7 @@
     <style>
         body {
             font-size: 12px;
-            /* Ukuran font diperkecil */
-            font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+            font-family: 'Courier New', monospace; /* Font monospace */
         }
 
         @page {
@@ -273,7 +272,7 @@
                 <div class="rounded-border">
                     <table class="w-100 txt-bold" style="border-collapse: collapse;">
                         <tr>
-                            <td style="border-right: 1px solid;width: 100px">Total Invoice : </td>
+                            <td style="border-right: 1px solid;width: 100px;">Total Invoice</td>
                             <td class="txt-right">Rp. <?= number_format($invData->total_invoice) ?></td>
                         </tr>
                     </table>

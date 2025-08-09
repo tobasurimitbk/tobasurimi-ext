@@ -8,7 +8,7 @@
     <style>
         body {
             font-size: 12px;
-            font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+            font-family: 'Courier New', monospace; /* Font monospace */
         }
 
         @page {
@@ -203,29 +203,29 @@
         <tr>
             <td colspan="2"></td>
             <td>
-                <div class="txt-right" style="border: 1px solid;">Biaya Lain-lain: </div>
+                <div class="txt-right" style="border: 1px solid; padding: 3px;">Biaya Lain-lain: </div>
             </td>
             <td>
-                <div class="txt-right" style="border: 1px solid;">0</div>
+                <div class="txt-right" style="border: 1px solid; padding: 3px;">0</div>
             </td>
         </tr>
         <tr>
             <td style="width: 1px;">Terbilang</td>
-            <td style="width: 65%;">
-                <div style="border: 1px solid;"><?= terbilang($totalInv) ?></div>
+            <td style="width: 55%;">
+                <div style="border: 1px solid; padding: 3px;"><?= terbilang($totalInv) ?></div>
             </td>
             <td>
-                <div class="txt-right" style="border: 1px solid;">Total Faktur: </div>
+                <div class="txt-right" style="border: 1px solid; padding: 3px;">Total Faktur: </div>
             </td>
             <td>
-                <div class="txt-right" style="border: 1px solid;"><?= number_format($totalInv) ?></div>
+                <div class="txt-right" style="border: 1px solid; padding: 3px;"><?= number_format($totalInv) ?></div>
             </td>
         </tr>
     </table>
 
     <table class="w-100">
         <tr>
-            <td style="width: 350px;">
+            <td style="width: 375px;">
                 <div>Catatan: </div>
                 <div>Surat Jalan ini tidak berfungsi sebagai Penagihan</div>
                 <div>Barang yang sudah diterima tidak dapat dikembalikan</div>
@@ -240,7 +240,7 @@
         </tr>
     </table>
 
-    <table class="signature-table">
+    <table class="signature-table" width="100%">
         <tr style="vertical-align: top;">
             <td style="height: 55px;border-bottom: 1px solid;width: 90px">Disiapkan</td>
             <td style="height: 55px;border-bottom: 1px solid;width: 90px">Disetujui Oleh</td>
