@@ -8,7 +8,7 @@
     <style>
         body {
             font-size: 12px;
-            font-family: Tahoma, sans-serif;
+            font-family: 'Lucida Console', monospace;
         }
 
         @page {
@@ -146,7 +146,7 @@
                     </table>
                 </div>
             </td>
-            <td style="text-align: right;">
+            <td style="width: 35%;text-align: right;">
                 <div class="txt-bold txt-center" style="font-size: 25px; margin-bottom:3px;">ORDER FORM</div>
                 <table class="w-100" style="border: 0.5px solid;border-radius: 7px;margin-right: 0">
                     <tr>
