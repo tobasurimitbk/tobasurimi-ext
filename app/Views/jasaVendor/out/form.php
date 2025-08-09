@@ -620,6 +620,30 @@
         drawTableAsalBarang([]);
     }
 
+    function getStockDataFromTable() {
+        var data = [];
+        $('#dataTable tbody tr').each(function() {
+            var $row = $(this);
+            var checkbox = $row.find('input.child');
+            var stockId = checkbox.data('id');
+
+            if (stockId) {
+                data.push({
+                    id: stockId,
+                    stok_total: parseFloat($row.find('td:eq(8)').text()) || 0,
+                    sumber: $row.find('td:eq(1)').text().trim(),
+                    stock_dokumen: $row.find('td:eq(2)').text().trim(),
+                    supplier_name: $row.find('td:eq(3)').text().trim(),
+                    bc_type: $row.find('td:eq(4)').text().trim(),
+                    stock_date: $row.find('td:eq(5)').text().trim(),
+                    barang: $row.find('td:eq(6)').text().trim(),
+                    satuan: $row.find('td:eq(7)').text().trim()
+                });
+            }
+        });
+        return data;
+    }
+
     function insertListFifo() {
         var dataIds = getIDListDataSelected();
         var qtyKeluarFifo = parseFloat($('#qty_keluar_fifo').val());
