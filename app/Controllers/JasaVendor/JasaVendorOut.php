@@ -454,7 +454,7 @@ class JasaVendorOut extends BaseController
             $this->jasaVendorOutModel->update($id, ['status_posting' => '0']);
             return response()->setJSON([
                 'status' => true,
-                'message' => "Jasa vendor pengeluaran barang berhasil diposting",
+                'message' => "Jasa vendor pengeluaran barang berhasil di Unposting",
                 'token' => csrf_hash(),
             ]);
         }
@@ -711,7 +711,7 @@ class JasaVendorOut extends BaseController
                     $dataResult[$i]['satuan'] = $dataResult[$i]['kode_satuan'];
                     $dataResult[$i]['barang'] = $dataResult[$i]['barang_name'];
                     $dataResult[$i]['sepsifikasi'] = $dataResult[$i]['spesifikasi'];
-                    $dataResult[$i]['stock_date'] = $rmPurchaseOrder == null ? "-" : date('d/m/Y', strtotime($rmPurchaseOrder['po_date']));
+                    $dataResult[$i]['stock_date'] = date('d/m/Y', strtotime($dataResult[$i]['stock_date']));
                     $dataResult[$i]['stock_id'] = $dataResult[$i]['stock_id'];
                     $dataResult[$i]['type_barang'] = $stock['tipe_barang'];
                     $dataResult[$i]['type_barang_text'] = strtoupper(str_replace('_', ' ', $stock['tipe_barang']));

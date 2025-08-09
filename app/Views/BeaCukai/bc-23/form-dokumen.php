@@ -19,8 +19,8 @@
                 <?php include_once('nav.php') ?>
                 <div class="alert alert-secondary alert-dismissible fade show mt-3 text-black" role="alert">
                     Urutan penginputan dokumen adalah <br>
-                    <b>Seri Dokumen 1 : Invoice</b> <br>
-                    <b>Seri Dokumen 2 : B/L atau AWB</b> <br>
+                    <b>Seri Dokumen 1 : B/L atau AWB</b> <br>
+                    <b>Seri Dokumen 2 : Invoices</b> <br>
                     <b>Seri Dokumen 3 : Dokumen Pelengkap</b>
                     <button type="button" class="close" data-dismiss="alert" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
