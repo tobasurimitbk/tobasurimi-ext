@@ -133,7 +133,7 @@
                             <select <?= !empty($jasaVendorOut) ? ($jasaVendorOut['status_posting'] ? 'disabled' : '') : '' ?> class="form-select type_pengambilan_stock" id="type_pengambilan_stock" name="type_pengambilan_stock">
                                 <option value=""></option>
                                 <option <?= !empty($jasaVendorOut) ? ($jasaVendorOut['tipe_pengambilan_stock'] == "PABEAN" ? 'selected' : '') : '' ?> value="PABEAN">PABEAN</option>
-                                <option <?= !empty($jasaVendorOut) ? ($jasaVendorOut['tipe_pengambilan_stock'] == "FIFO" ? 'selected' : '') : '' ?> value="FIFO" selected>FIFO</option>
+                                <option <?= !empty($jasaVendorOut) ? ($jasaVendorOut['tipe_pengambilan_stock'] == "FIFO" ? 'selected' : '') : '' ?> value="FIFO">FIFO</option>
                             </select>
                             <label for="floatingInput" style="z-index: 1;">Tipe Pengambilan Stok</label>
                         </div>
@@ -637,18 +637,20 @@
             return;
         }
 
-        var totalStokTotal = 0;
-        $.each(listStockAsal, function(i, v) {
-            totalStokTotal += parseFloat(v.stok_total);
-        });
+         // Calculate total available stock (excluding already selected items)
+        var totalAvailableStock = listStockAsal.reduce((total, item) => {
+            const isSelected = dataIds.includes(Number(item.id)) || 
+                listStockSelected.some(selectedItem => selectedItem.id === Number(item.id));
+            return isSelected ? total : total + parseFloat(item.stok_total || 0);
+        }, 0);
 
-        if (qtyKeluarFifo > totalStokTotal) {
+        // Stock availability validation
+        if (qtyKeluarFifo > totalAvailableStock) {
             Swal.fire({
                 icon: 'error',
-                title: 'Terjadi Kesalahan : Stok barang yang akan keluar tidak cukup !',
+                title: 'Stok Tidak Cukup',
+                text: `Stok tersedia: ${totalAvailableStock.toFixed(4)} (Permintaan: ${qtyKeluarFifo.toFixed(4)})`,
                 confirmButtonColor: '#4e73df',
-                cancelButtonColor: '#d33',
-                reverseButtons: true,
                 confirmButtonText: 'Oke',
             });
             return;
@@ -915,17 +917,28 @@
         });
     }
 
+    
+
+
+    // helper: parse stok_total aman
+    function parseFloatSafe(val) {
+        if (val === null || val === undefined || val === '') return 0;
+        return parseFloat(String(val).replace(/,/g, '.')) || 0;
+    }
+
+    // helper: buat key unik per record (ubah fields sesuai kebutuhan)
+    function makeUniqueKey(v) {
+        // include stock_dokumen & bc_id supaya satu id bisa punya banyak dokumen
+        return `${v.id}||${v.stock_dokumen || ''}||${v.bc_id || ''}`;
+    }
+
+    // GET & MERGE tanpa menghapus listStockAsal
     function getListDokumenPabean() {
-        // GET LIST STOCK PER DOKUMEN PABEAN
         $.ajax({
             url: `<?= base_url('jasa-vendor-out/list-stock-dokumen-bc'); ?>`,
             method: "GET",
-            beforeSend: function() {
-                setLoading();
-            },
-            complete: function() {
-                stopLoading();
-            },
+            beforeSend: function() { setLoading(); },
+            complete: function() { stopLoading(); },
             data: {
                 barang_master_id: $(".spesifikasi_id option:selected").data('barang_master_id'),
                 stock_id: $(".spesifikasi_id option:selected").data('stock_id'),
@@ -934,14 +947,45 @@
             },
             dataType: "json",
             success: function(res) {
-                // LIST STOK PER BC
-                // listStockAsal = [];
-                listStockAsal = res.data;
-                drawTableAsalBarang(res.data);
+                var typeAsalBarang = $('#type_asal_barang option:selected').val();
+
+                if (!Array.isArray(listStockAsal)) listStockAsal = [];
+
+                $.each(res.data, function(i, v) {
+                    // skip JASA VENDOR saat rule SUPPLIER
+                    if (v.sumber === "JASA VENDOR" && typeAsalBarang === "SUPPLIER") {
+                        return;
+                    }
+
+                    // normalisasi stok_total
+                    v.stok_total = parseFloatSafe(v.stok_total);
+
+                    // buat key unik
+                    var key = makeUniqueKey(v);
+
+                    // cari apakah udah ada record dengan key sama
+                    var idx = listStockAsal.findIndex(item => item._key === key);
+
+                    if (idx === -1) {
+                        // belum ada -> push (tambahkan _key supaya gampang cek nanti)
+                        v._key = key;
+                        listStockAsal.push(v);
+                    } else {
+                        // sudah ada -> update record (jika mau replace dengan versi terbaru)
+                        // kalau mau KEEP yang lama, ganti logika ini jadi `return;` saja
+                        v._key = key;
+                        // update fields penting (atau replace seluruh objek)
+                        listStockAsal[idx] = Object.assign({}, listStockAsal[idx], v);
+                    }
+                });
+
+                // render ulang tabel dari listStockAsal (sudah ter-merge & dedup)
+                drawTableAsalBarang(listStockAsal);
             }
         });
     }
 
+    // Render DataTable — clear dulu supaya gak nambah row lama
     function drawTableAsalBarang(data) {
         if (!$.fn.DataTable.isDataTable('#dataTable')) {
             dataTable = $('#dataTable').DataTable({
@@ -957,66 +1001,49 @@
                 },
                 display: "stripe",
                 searching: true,
-                lengthMenu: [
-                    [100],
-                    [100]
-                ],
+                lengthMenu: [[100],[100]],
                 language: {
                     emptyTable: "Tidak Ada Data",
                     lengthMenu: "Show _MENU_ entries",
-                    paginate: {
-                        previous: '<i class="fa fa-angle-left"></i>',
-                        next: '<i class="fa fa-angle-right"></i>'
-                    }
+                    paginate: { previous: '<i class="fa fa-angle-left"></i>', next: '<i class="fa fa-angle-right"></i>' }
                 }
             });
+        } else {
+            // Hapus semua baris lama sebelum tambahkan ulang
+            dataTable.clear();
         }
 
-        var typePengambilanStok = $('#type_pengambilan_stock option:selected').val();
-        var typeAsalBarang = $('#type_asal_barang option:selected').val();
+        // tambahkan rows (jangan draw tiap iterasi, draw sekali di akhir)
+        data.forEach(v => {
+            // kalau mau skip lagi kondisi tertentu, cek di sini (tapi seharusnya merge sudah memfilter)
+            var typePengambilanStok = $('#type_pengambilan_stock option:selected').val();
 
-        $.each(data, function(i, v) {
-
-            // 🔹 Cek apakah sudah ada di tabel
-            var isDuplicate = false;
-            $('#dataTable tbody tr').each(function() {
-                var existingStockId = $(this).find('input.child').data('id');
-                var existingSumber = $(this).find('td:eq(1)').text().trim();
-                if (existingStockId == v.id && v.sumber == "JASA VENDOR" && typeAsalBarang == "SUPPLIER") {
-                    isDuplicate = true;
-                    return false; // break loop
-                }
-            });
-
-            // 🔹 Kalau duplikat sesuai kondisi -> skip
-            if (isDuplicate) {
-                return;
-            }
-
-            // 🔹 Append data baru
-            var newRow = $('<tr>');
+            var $row = $('<tr>');
             if (typePengambilanStok == "FIFO" || parseFloat(v.stok_total) == 0) {
-                newRow.append($('<td style="text-align: center;">').html(``));
+                $row.append($('<td style="text-align: center;">').html(''));
             } else {
-                newRow.append($('<td style="text-align: center;">').html(
+                $row.append($('<td style="text-align: center;">').html(
                     `<div class="form-check">
                         <input data-id="${v.id}" data-stok_total="${v.stok_total}" autocomplete="one-time-code" class="form-check-input child" type="checkbox">
                     </div>`
                 ));
             }
 
-            newRow.append($('<td style="text-align:center;">').text(v.sumber));
-            newRow.append($('<td style="text-align:center;">').text(v.stock_dokumen));
-            newRow.append($('<td style="text-align:center;">').text(v.supplier_name));
-            newRow.append($('<td style="text-align:center;">').text(v.bc_type));
-            newRow.append($('<td style="text-align:center;">').text(v.stock_date));
-            newRow.append($('<td style="text-align:center;">').text(v.barang));
-            newRow.append($('<td style="text-align:center;">').text(v.satuan));
-            newRow.append($('<td style="text-align:center;">').text(v.stok_total));
+            $row.append($('<td style="text-align:center;">').text(v.sumber));
+            $row.append($('<td style="text-align:center;">').text(v.stock_dokumen));
+            $row.append($('<td style="text-align:center;">').text(v.supplier_name));
+            $row.append($('<td style="text-align:center;">').text(v.bc_type));
+            $row.append($('<td style="text-align:center;">').text(v.stock_date));
+            $row.append($('<td style="text-align:center;">').text(v.barang));
+            $row.append($('<td style="text-align:center;">').text(v.satuan));
+            $row.append($('<td style="text-align:center;">').text(v.stok_total));
 
-            dataTable.row.add(newRow).draw(false);
+            dataTable.row.add($row);
         });
+
+        dataTable.draw(false);
     }
+
 
 
     function drawTableSelectedItem(data) {
