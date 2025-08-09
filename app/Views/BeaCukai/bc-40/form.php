@@ -18,7 +18,7 @@
             <?php endif ?>
             <?php if (can('Bea Cukai', 'BC 4.0', 'c')) : ?>
                 <button class="btn btn-show-form btn-save float-right btn-submit-parent">
-                    Simpan
+                    Buat Dokumen
                 </button>
             <?php endif; ?>
         </div>

@@ -381,11 +381,15 @@ class BCPurchaseOrderModel extends Model
                 rm_import_pos.po_no,
                 rm_import_pos.po_date,
                 barang_master.barang_name,
-                barang_master.kode_barang
+                barang_master.kode_barang,
+                satuans.kode_satuan AS kode_satuan_lpb,
+                metadata.value AS valas
             ')
                 ->join('penerimaan_barang_detail', 'penerimaan_barang_detail.penerimaan_barang_id = penerimaan_barang.id', 'left')
                 ->join('rm_import_pos', 'penerimaan_barang_detail.purchase_order_id = rm_import_pos.id', 'left')
                 ->join('barang_master', 'barang_master.id = penerimaan_barang_detail.barang_id', 'left')
+                ->join('satuans', 'satuans.id = penerimaan_barang_detail.unit', 'left')
+                ->join('metadata', 'metadata.id = rm_import_pos.currency', 'left')
                 ->where('penerimaan_barang.status_penerimaan', "IMPORT")
                 ->where('penerimaan_barang.tipe_bahan', "BAKU")
                 ->where('penerimaan_barang.supplier_id', $first['supplier_id'])
@@ -414,11 +418,15 @@ class BCPurchaseOrderModel extends Model
                 am_purchase_orders.po_no,
                 am_purchase_orders.po_date,
                 barang_master.barang_name,
-                barang_master.kode_barang
+                barang_master.kode_barang,
+                satuans.kode_satuan AS kode_satuan_lpb,
+                metadata.value AS valas
             ')
                 ->join('penerimaan_barang_detail', 'penerimaan_barang_detail.penerimaan_barang_id = penerimaan_barang.id', 'left')
                 ->join('am_purchase_orders', 'penerimaan_barang_detail.purchase_order_id = am_purchase_orders.id', 'left')
                 ->join('barang_master', 'barang_master.id = penerimaan_barang_detail.barang_id', 'left')
+                ->join('satuans', 'satuans.id = penerimaan_barang_detail.unit', 'left')
+                ->join('metadata', 'metadata.id = am_purchase_orders.currency', 'left')
                 ->where('penerimaan_barang.status_penerimaan', "IMPORT")
                 ->where('penerimaan_barang.tipe_bahan', "PENOLONG")
                 ->where('penerimaan_barang.supplier_id', $first['supplier_id'])
@@ -450,7 +458,9 @@ class BCPurchaseOrderModel extends Model
                 'po_date' => date('d/m/Y', strtotime($p['po_date'])),
                 'barang_name' => $p['barang_name'],
                 'kode_barang' => $p['kode_barang'],
-                'harga' => $p['sub_total']
+                'harga' => $p['sub_total'],
+                'kode_satuan_lpb' => isset($p['kode_satuan_lpb']) ? $p['kode_satuan_lpb'] : "",
+                'valas' => isset($p['valas']) ? $p['valas'] : ""
             ];
         }
 

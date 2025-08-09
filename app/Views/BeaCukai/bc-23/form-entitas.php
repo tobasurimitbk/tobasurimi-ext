@@ -38,6 +38,12 @@
                             </div>
                             <div class="mt-1">
                                 <div class="form-floating mb-3">
+                                    <input id="pengusaha_tpb_nitku" value="<?= $bc23Entitas == null ? "" : ($bc23Entitas['nitku_entitas'] != null ? $bc23Entitas['nitku_entitas'] : "")  ?>" name="pengusaha_tpb_nitku" type="text" class="form-control pengusaha_tpb_nitku" placeholder="">
+                                    <label>NITKU</label>
+                                </div>
+                            </div>
+                            <div class="mt-1">
+                                <div class="form-floating mb-3">
                                     <input id="entitas_nama_importir" value="<?= $bc23Entitas == null ? '' : $bc23Entitas['nama_entitas'] ?>" name="entitas_nama_importir" type="text" class="form-control entitas_nama_importir" placeholder="">
                                     <label>Nama</label>
                                 </div>
@@ -82,13 +88,13 @@
                             <div class="mt-1">
                                 <div class="mt-1">
                                     <div class="form-floating mb-3">
-                                        <input id="entitas_nama_pemasok" value="<?= $bc23Entitas != null ? $bc23Entitas['nama_pemasok'] : '' ?>" name="entitas_nama_pemasok" type="text" class="form-control entitas_nama_pemasok" placeholder="">
+                                        <input id="entitas_nama_pemasok" value="<?= $bc23Entitas != null ? $bc23Entitas['nama_pemasok'] : $bc23['name'] ?>" name="entitas_nama_pemasok" type="text" class="form-control entitas_nama_pemasok" placeholder="">
                                         <label>Nama</label>
                                     </div>
                                 </div>
                                 <div class="mt-1">
                                     <div class="form-floating mb-3">
-                                        <textarea name="entitas_alamat_pemasok" id="entitas_alamat_pemasok" class="form-control entitas_alamat_pemasok" style="height: 100px;"><?= ($bc23Entitas != null) ? $bc23Entitas['alamat_pemasok'] : '' ?></textarea>
+                                        <textarea name="entitas_alamat_pemasok" id="entitas_alamat_pemasok" class="form-control entitas_alamat_pemasok" style="height: 100px;"><?= ($bc23Entitas != null) ? $bc23Entitas['alamat_pemasok'] : $bc23['address'] ?></textarea>
                                         <label>Alamat</label>
                                     </div>
                                 </div>
@@ -117,6 +123,12 @@
                                 <div class="form-floating mb-3">
                                     <input id="entitas_npwp_pemilik_barang" value="<?= $bc23Entitas != null ? $bc23Entitas['npwp_pemilik_barang'] : '' ?>" name="entitas_npwp_pemilik_barang" type="text" class="form-control entitas_npwp_pemilik_barang" placeholder="">
                                     <label>NPWP</label>
+                                </div>
+                            </div>
+                            <div class="mt-1">
+                                <div class="form-floating mb-3">
+                                    <input id="pemilik_barang_nitku" value="<?= $bc23Entitas == null ? "" : ($bc23Entitas['nitku_pemilik_barang'] != null ? $bc23Entitas['nitku_pemilik_barang'] : "")  ?>" name="pemilik_barang_nitku" type="text" class="form-control pemilik_barang_nitku" placeholder="">
+                                    <label>NITKU</label>
                                 </div>
                             </div>
                             <div class="mt-1">
@@ -190,6 +202,12 @@
         $('#entitas_nama_pemilik_barang').val(namaPengusaha);
         $('#entitas_alamat_pemilik_barang').val(alamatPengusaha);
         $('#entitas_nib').val(nibDefault);
+
+        // UPDATE NITKU
+        // NITKU NPWP + 6 DIGIT 0
+        var nol = "000000";
+        $('#pengusaha_tpb_nitku').val(npwpPengusaha + '' + nol);
+        $('#pemilik_barang_nitku').val(npwpPengusaha + '' + nol);
         // DROPDOPWN NOMOR IZIN TPB
         getListNoIjinTPB();
 

@@ -369,9 +369,14 @@ class BC23 extends BaseController
         $bcPo = $this->bcPurchaseOrderModel->find($bcPurchaseOrderID);
         $bc23Entitas = $this->bcEntitasModel->where('bc_purchase_order_id', $bcPurchaseOrderID)->where('deletedAt', null)->first();
         $pengusahaTPB = $this->pengusahaTPBModel->where('company_id', $this->this_company_id)->findAll();
+        $bc23 = $this->bc23Model->get($bcPurchaseOrderID);
 
         if ($bcPo == null) {
             return redirect()->to('bea-cukai-bc-23');
+        }
+
+        if ($bc23 == null) {
+            return \redirect()->to('bea-cukai-bc-23/id/header/' . \encrypt($bcPurchaseOrderID));
         }
 
         $this->setFlashDataNavigatorSession($bcPurchaseOrderID);
@@ -380,7 +385,8 @@ class BC23 extends BaseController
             'bc23Entitas' => $bc23Entitas,
             'kodeNegaraAsal' => $this->countryModel->findAll(),
             'pengusahaTPB' => $pengusahaTPB,
-            'bcPo' => $bcPo
+            'bcPo' => $bcPo,
+            'bc23' => $bc23
         ];
 
         return view('BeaCukai/bc-23/form-entitas', $data);
@@ -399,6 +405,7 @@ class BC23 extends BaseController
                 'alamat_entitas' => $this->request->getVar('entitas_alamat_importir'),
                 'nama_entitas' => $this->request->getVar('entitas_nama_importir'),
                 'nib_entitas' => $this->request->getVar('entitas_nib'),
+                'nitku_entitas' => $this->request->getVar('pengusaha_tpb_nitku'),
                 'nomor_identitas' => $this->request->getVar('entitas_npwp_importir'),
                 'nomor_ijin_entitas' => $this->request->getVar('entitas_nomor_ijin_tpb'),
                 'tanggal_ijin_entitas' =>  $this->request->getVar('entitas_tanggal_skep_tpb') ? date_format(date_create_from_format("d/m/Y", $this->request->getVar('entitas_tanggal_skep_tpb')), "Y-m-d") : "",
@@ -407,7 +414,8 @@ class BC23 extends BaseController
                 'kode_negara_pemasok' => decrypt($this->request->getVar('entitas_negara')),
                 'npwp_pemilik_barang' => $this->request->getVar('entitas_npwp_pemilik_barang'),
                 'nama_pemilik_barang' => $this->request->getVar('entitas_nama_pemilik_barang'),
-                'alamat_pemilik_barang' => $this->request->getVar('entitas_alamat_pemilik_barang')
+                'alamat_pemilik_barang' => $this->request->getVar('entitas_alamat_pemilik_barang'),
+                'nitku_pemilik_barang' => $this->request->getVar('pemilik_barang_nitku'),
             ]);
         } else {
             // update
@@ -417,6 +425,7 @@ class BC23 extends BaseController
                 'alamat_entitas' => $this->request->getVar('entitas_alamat_importir'),
                 'nama_entitas' => $this->request->getVar('entitas_nama_importir'),
                 'nib_entitas' => $this->request->getVar('entitas_nib'),
+                'nitku_entitas' => $this->request->getVar('pengusaha_tpb_nitku'),
                 'nomor_identitas' => $this->request->getVar('entitas_npwp_importir'),
                 'nomor_ijin_entitas' => $this->request->getVar('entitas_nomor_ijin_tpb'),
                 'tanggal_ijin_entitas' =>  $this->request->getVar('entitas_tanggal_skep_tpb') ? date_format(date_create_from_format("d/m/Y", $this->request->getVar('entitas_tanggal_skep_tpb')), "Y-m-d") : "",
@@ -425,7 +434,8 @@ class BC23 extends BaseController
                 'kode_negara_pemasok' => decrypt($this->request->getVar('entitas_negara')),
                 'npwp_pemilik_barang' => $this->request->getVar('entitas_npwp_pemilik_barang'),
                 'nama_pemilik_barang' => $this->request->getVar('entitas_nama_pemilik_barang'),
-                'alamat_pemilik_barang' => $this->request->getVar('entitas_alamat_pemilik_barang')
+                'alamat_pemilik_barang' => $this->request->getVar('entitas_alamat_pemilik_barang'),
+                'nitku_pemilik_barang' => $this->request->getVar('pemilik_barang_nitku'),
             ]);
         }
 
@@ -526,20 +536,20 @@ class BC23 extends BaseController
 
         if ($seriDokumen == 1) {
             // HARUS INVOICE 
-            if ($kodeDokumen != 380) {
-                return response()->setJSON([
-                    'status' => false,
-                    'token' => csrf_hash(),
-                    'message' => "Dokumen seri pertama wajib invoice ",
-                ]);
-            }
-        } elseif ($seriDokumen == 2) {
-            // HARUS BL/AWB
             if ($kodeDokumen != 705 && $kodeDokumen != 740) {
                 return response()->setJSON([
                     'status' => false,
                     'token' => csrf_hash(),
-                    'message' => "Dokumen seri kedua wajib BL / AWB ",
+                    'message' => "Dokumen seri kedua wajib BL / AWB",
+                ]);
+            }
+        } elseif ($seriDokumen == 2) {
+            // HARUS BL/AWB
+            if ($kodeDokumen != 380) {
+                return response()->setJSON([
+                    'status' => false,
+                    'token' => csrf_hash(),
+                    'message' => " Dokumen seri pertama wajib invoice",
                 ]);
             }
         }

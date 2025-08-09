@@ -7,8 +7,8 @@
         $bc23 = $bc23Model->get(decrypt(request()->uri->getSegment(4)));
         ?>
         <div class="col-button-tambah-spp">
-            <a class="btn btn-hide-form btn-discard float-right root-form-view" href="<?= base_url("bea-cukai-bc-23/po/" . encrypt($bcPo['id'])); ?>">
-                Kembali
+            <a class="btn btn-info btn-print float-right text-white" href="<?= base_url("bea-cukai-bc-23/po/" . encrypt($bcPo['id'])); ?>">
+                Data LPB
             </a>
             <?php if ($bc23 != null) : ?>
                 <button <?= $bc23['status_dokumen'] == 'Sudah Kirim' ? 'disabled' : '' ?> class="btn btn-show-form btn-save float-right btn-submit-parent root-form-view btn-submit-root-form-view" <?= ($isFinished == true) ? '' : 'disabled' ?> onclick="submitDokumen()">

@@ -43,6 +43,7 @@
                                 <th style="text-align: center;">Qty PO</th>
                                 <th style="text-align: center;">Qty Diterima</th>
                                 <th style="text-align: center;">Harga</th>
+                                <th style="text-align: center;">Valas</th>
                                 <th style="text-align: center;">Status</th>
                             </tr>
                         </thead>
@@ -70,9 +71,10 @@
                                     <td style="text-align: center;"><?= $l['po_no'] ?></td>
                                     <td style="text-align: center;"><?= $l['kode_barang'] ?></td>
                                     <td style="text-align: center;"><?= $l['barang_name'] ?></td>
-                                    <td style="text-align: center;"><?= number_format($l['qty_po']) ?></td>
-                                    <td style="text-align: center;"><?= number_format($l['qty_lpb']) ?></td>
+                                    <td style="text-align: center;"><?= number_format($l['qty_po'], 2) ?></td>
+                                    <td style="text-align: center;"><?= number_format($l['qty_lpb'], 2) . " " . $l['kode_satuan_lpb'] ?></td>
                                     <td style="text-align: center;"><?= number_format($l['harga'], 2) ?></td>
+                                    <td style="text-align: center;"><?= $l['valas'] ?></td>
                                     <td style="text-align: center;" class="body-table-info-status-barang-root-view" data-id="<?= encrypt($l['penerimaan_barang_id']) ?>">
                                         <?php if ($bcDokumenBarang == null) : ?>
                                             <span class="badge badge-danger">
@@ -95,9 +97,10 @@
                                 <td></td>
                                 <td></td>
                                 <td style="text-align: right;">Total</td>
-                                <td style="text-align: center;"><?= $qtyPoTotal ?></td>
-                                <td style="text-align: center;"><?= $qtyLpbTotal ?></td>
+                                <td style="text-align: center;"><?= number_format($qtyPoTotal, 2) ?></td>
+                                <td style="text-align: center;"><?= number_format($qtyLpbTotal, 2) ?></td>
                                 <td style="text-align: center;"><?= number_format($hargaTotal, 2) ?></td>
+                                <td></td>
                                 <td></td>
                             </tr>
                         </tbody>

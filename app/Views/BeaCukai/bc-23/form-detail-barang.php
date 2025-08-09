@@ -36,6 +36,22 @@
                 <table width="100%" class="mb-3">
                     <tbody>
                         <tr style="color: black;">
+                            <td width="150px"><b>Tgl PO</b></td>
+                            <td width="10px">:</td>
+                            <td><?= $barangDetail['po_date'] ?></td>
+                        </tr>
+                        <tr style="color: black; height: 20px;">
+                            <td colspan="3"></td>
+                        </tr>
+                        <tr style="color: black;">
+                            <td width="150px"><b>Tgl LPB</b></td>
+                            <td width="10px">:</td>
+                            <td><?= $barangDetail['lpb_date'] ?></td>
+                        </tr>
+                        <tr style="color: black; height: 20px;">
+                            <td colspan="3"></td>
+                        </tr>
+                        <tr style="color: black;">
                             <td width="150px"><b>Nomor LPB</b></td>
                             <td width="10px">:</td>
                             <td><?= $barangDetail['lpb_no'] ?></td>
@@ -177,7 +193,7 @@
                             </label>
                             <div class="mt-1">
                                 <div class="form-floating mb-3">
-                                    <input readonly id="barang_detail_harga" value="<?= number_format($barangDetail['harga'])  ?>" maxlength="24" name="barang_detail_harga" type="text" class="form-control barang_detail_harga" placeholder="" onkeyup="this.value = greatFormatRupiah(this.value)">
+                                    <input readonly id="barang_detail_harga" value="<?= number_format($barangDetail['harga'], 2)  ?>" name="barang_detail_harga" type="text" class="form-control barang_detail_harga" placeholder="" onkeyup="this.value = greatFormatRupiah(this.value)">
                                     <label>Harga</label>
                                     <small><i>Harga total sesuai dengan LPB diterima</i></small>
                                 </div>
@@ -185,44 +201,44 @@
 
                             <div class="mt-1">
                                 <div class="form-floating mb-3">
-                                    <input id="barang_detail_biaya_tambahan" maxlength="24" name="barang_detail_biaya_tambahan" type="text" value="<?= $bc23DokumenBarang == null ? "0,00" : number_format($bc23DokumenBarang['nilai_tambah']) ?>" class="form-control barang_detail_biaya_tambahan" placeholder="" onkeyup="this.value = greatFormatRupiah(this.value)">
+                                    <input id="barang_detail_biaya_tambahan" name="barang_detail_biaya_tambahan" type="text" value="<?= $bc23DokumenBarang == null ? "0,00" : number_format($bc23DokumenBarang['nilai_tambah']) ?>" class="form-control barang_detail_biaya_tambahan" placeholder="" onkeyup="this.value = greatFormatRupiah(this.value)">
                                     <label>Biaya Tambahan</label>
                                 </div>
                             </div>
                             <div class="mt-1">
                                 <div class="form-floating mb-3">
-                                    <input id="barang_detail_fob" readonly maxlength="24" name="barang_detail_fob" type="text" value="<?= number_format($barangDetail['harga']) ?>" class="form-control barang_detail_fob" placeholder="" onkeyup="this.value = greatFormatRupiah(this.value)">
+                                    <input id="barang_detail_fob" name="barang_detail_fob" type="text" value="<?= number_format($barangDetail['harga'], 2) ?>" class="form-control barang_detail_fob" placeholder="" onkeyup="this.value = greatFormatRupiah(this.value)">
                                     <label>FOB</label>
                                 </div>
                             </div>
                             <div class="mt-1">
                                 <div class="form-floating mb-3">
-                                    <input value="<?= $barangDetail['qty_lpb'] == 0 ? '0,00' : number_format($barangDetail['harga'] / $barangDetail['qty_lpb']) ?>" id="barang_detail_harga_satuan" maxlength="24" name="barang_detail_harga_satuan" type="text" readonly class="form-control barang_detail_harga_satuan" placeholder="" onkeyup="this.value = greatFormatRupiah(this.value)">
+                                    <input value="<?= $barangDetail['qty_lpb'] == 0 ? '0,00' : number_format($barangDetail['harga'] / $barangDetail['qty_lpb'], 2) ?>" id="barang_detail_harga_satuan" name="barang_detail_harga_satuan" type="text" class="form-control barang_detail_harga_satuan" placeholder="" onkeyup="this.value = greatFormatRupiah(this.value)">
                                     <label>Harga Satuan</label>
                                     <small><i>Harga satuan diambil dari total harga LPB dibagi jumlah diterima LPB</i></small>
                                 </div>
                             </div>
                             <div class="mt-1">
                                 <div class="form-floating mb-3">
-                                    <input id="barang_detail_freight" maxlength="24" name="barang_detail_freight" readonly type="text" value="<?= $bc23DokumenBarang == null ? "0,00" : number_format($bc23DokumenBarang['freight']) ?>" class="form-control barang_detail_freight" placeholder="" onkeyup="this.value = greatFormatRupiah(this.value)">
+                                    <input id="barang_detail_freight" name="barang_detail_freight" type="text" value="<?= $bc23DokumenBarang == null ? "0,00" : number_format($bc23DokumenBarang['freight'], 2) ?>" class="form-control barang_detail_freight" placeholder="" onkeyup="this.value = greatFormatRupiah(this.value)">
                                     <label>Freight</label>
                                 </div>
                             </div>
                             <div class="mt-1">
                                 <div class="form-floating mb-3">
-                                    <input id="barang_detail_asuransi" readonly maxlength="24" name="barang_detail_asuransi" type="text" value="<?= $bc23DokumenBarang == null ? "0,00" : number_format($bc23DokumenBarang['asuransi']) ?>" class="form-control barang_detail_asuransi" placeholder="" onkeyup="this.value = greatFormatRupiah(this.value)">
+                                    <input id="barang_detail_asuransi" name="barang_detail_asuransi" type="text" value="<?= $bc23DokumenBarang == null ? "0,00" : number_format($bc23DokumenBarang['asuransi'], 2) ?>" class="form-control barang_detail_asuransi" placeholder="" onkeyup="this.value = greatFormatRupiah(this.value)">
                                     <label>Asuransi</label>
                                 </div>
                             </div>
                             <div class="mt-1">
                                 <div class="form-floating mb-3">
-                                    <input id="barang_detail_cif" maxlength="24" name="barang_detail_cif" readonly type="text" value="<?= $bc23DokumenBarang == null ? "0,00" : number_format($bc23DokumenBarang['cif_rupiah']) ?>" class="form-control barang_detail_cif" placeholder="" onkeyup="this.value = greatFormatRupiah(this.value)">
+                                    <input id="barang_detail_cif" name="barang_detail_cif" type="text" value="<?= $bc23DokumenBarang == null ? "0,00" : number_format($bc23DokumenBarang['cif_rupiah'], 2) ?>" class="form-control barang_detail_cif" placeholder="" onkeyup="this.value = greatFormatRupiah(this.value)">
                                     <label>Nilai CIF</label>
                                 </div>
                             </div>
                             <div class="mt-1">
                                 <div class="form-floating mb-3">
-                                    <input readonly id="barang_detail_nilai_pabean" maxlength="24" name="barang_detail_nilai_pabean" type="text" value="<?= $bc23DokumenBarang == null ? "0,00" : number_format($bc23DokumenBarang['harga_ekspor']) ?>" class="form-control barang_detail_nilai_pabean" placeholder="" onkeyup="this.value = greatFormatRupiah(this.value)">
+                                    <input id="barang_detail_nilai_pabean" name="barang_detail_nilai_pabean" type="text" value="<?= $bc23DokumenBarang == null ? "0,00" : number_format($bc23DokumenBarang['harga_ekspor'], 2) ?>" class="form-control barang_detail_nilai_pabean" placeholder="" onkeyup="this.value = greatFormatRupiah(this.value)">
                                     <label>Nilai Pabean</label>
                                 </div>
                             </div>
