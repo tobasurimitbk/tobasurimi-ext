@@ -8,8 +8,7 @@
     <style>
         body {
             font-size: 12px;
-            font-family: 'Courier New', monospace;
-            font-weight: 700; /* Ketebalan utama untuk semua teks */
+            font-family: Tahoma, sans-serif;
         }
 
         @page {
@@ -17,10 +16,16 @@
             margin: 25px;
             padding: 25px;
         }
+        
+        .dot-matrix-bold {
+            font-weight: bold;
+            text-shadow: 0.4px 0 0 currentColor, -0.4px 0 0 currentColor;
+            letter-spacing: 0.02em;
+        }
 
         .company-name {
-            font-weight: 900; /* Ketebalan ekstra untuk perusahaan */
-            border: 1px solid;
+            font-weight: 700;
+            border: 0.5px solid;
             padding: 5px;
             border-radius: 7px;
             margin-bottom: 10px;
@@ -29,9 +34,10 @@
         }
 
         .description-container {
-            border: 1px solid;
+            border: 0.5px solid;
             border-radius: 7px;
             height: 50px;
+
             width: 60%;
             position: relative;
             padding-top: 7px;
@@ -45,31 +51,69 @@
             left: 15px;
             padding-left: 3px;
             padding-right: 5px;
-            font-weight: 900; /* Ketebalan ekstra */
         }
 
+        /* .item-table {
+            border: 0.5px solid;
+            width: 100%;
+
+            margin-top: 5px;
+            margin-bottom: 10px;
+            border-collapse: collapse;
+        }
+
+        .item-table th {
+            border-right: 1px solid;
+            border-bottom: 1px solid;
+        }
+
+        .item-table td {
+            border-right: 1px solid;
+        }
+
+        .signature-table {
+            border-spacing: 30px 0;
+            margin-top: 10px;
+        } */
+
         .item-table {
-            border: 1px solid black;
+            border: 0.5px solid black;
+            /* border luar */
             width: 100%;
             border-collapse: collapse;
             margin-top: 5px;
             margin-bottom: 10px;
         }
 
+        /* Semua sel: garis vertikal saja */
         .item-table th,
         .item-table td {
-            border-left: 1px solid black;
-            border-right: 1px solid black;
-            padding: 3px 4px;
-            font-weight: 800; /* Lebih tebal dari teks biasa */
+            border-left: 0.5px solid black;
+            border-right: 0.5px solid black;
+            border-top: none;
+            border-bottom: none;
+            padding: 2px 4px;
         }
 
+        /* Hapus border kiri kolom pertama */
+        .item-table th:first-child,
+        .item-table td:first-child {
+            border-left: none;
+        }
+
+        /* Hapus border kanan kolom terakhir */
+        .item-table th:last-child,
+        .item-table td:last-child {
+            border-right: none;
+        }
+
+        /* Hanya untuk baris thead: tambahkan garis horizontal bawah */
         .item-table thead tr {
-            border-bottom: 1px solid black;
+            border-bottom: 0.5px solid black;
         }
 
         .txt-bold {
-            font-weight: 900; /* Ketebalan maksimum */
+            font-weight: 700;
         }
 
         .txt-center {
@@ -79,30 +123,14 @@
         .w-100 {
             width: 100%;
         }
-
-        /* ---------- TEKNIK KHUSUS UNTUK PRINTER DOT MATRIX ---------- */
-        .dot-matrix-bold {
-            text-shadow: 0.35px 0 0 currentColor, -0.35px 0 0 currentColor;
-            letter-spacing: 0.02em;
-        }
-        
-        .order-title {
-            font-weight: 900;
-            font-size: 25px;
-            letter-spacing: 1px;
-        }
-        
-        table, tr, td, th {
-            font-weight: 800; /* Ketebalan khusus untuk tabel */
-        }
     </style>
 </head>
 
 <body>
     <table class="w-100">
         <tr>
-            <td style="width: 60%;padding-right: 100px">
-                <div class="company-name dot-matrix-bold">
+            <td style="width: 70%;padding-right: 100px">
+                <div class="company-name">
                     Toba Fish <br>
                     <?= $companyName ?>
                 </div>
@@ -110,33 +138,33 @@
                     <table class="w-100">
                         <tr>
                             <td style="width: 1px;vertical-align: top">Customer: </td>
-                            <td style="border: 1px solid;border-radius: 7px;padding: 5px" class="dot-matrix-bold">
-                                <div><?= $soData->customerName ?> - <?= $soData->customerPhone ?></div>
+                            <td style="border: 0.5px solid;border-radius: 7px;padding: 5px">
+                                <div class="txt-bold"><?= $soData->customerName ?> - <?= $soData->customerPhone ?></div>
                                 <div><?= $soData->customerAddress ?></div>
                             </td>
                         </tr>
                     </table>
                 </div>
             </td>
-            <td align="right" style="text-align: right;">
-                <div class="txt-bold txt-center order-title dot-matrix-bold" style="margin-bottom:3px;">ORDER FORM</div>
-                <table class="w-100" style="border: 1px solid;border-radius: 7px;margin-left: auto;margin-right: 0">
+            <td style="text-align: right;">
+                <div class="txt-bold txt-center" style="font-size: 25px; margin-bottom:3px;">ORDER FORM</div>
+                <table class="w-100" style="border: 0.5px solid;border-radius: 7px;margin-right: 0">
                     <tr>
-                        <td style="border-right: 1px solid;border-right-style: dashed" class="dot-matrix-bold">
+                        <td style="border-right: 1px solid;border-right-style: dashed">
                             <div>Tgl. Pemesanan</div>
                             <div class="txt-center"><?= $soData->order_date ?></div>
                         </td>
-                        <td class="dot-matrix-bold">
+                        <td>
                             <div>No. Pemesanan</div>
                             <div class="txt-center"><?= $soData->no_sales_order ?></div>
                         </td>
                     </tr>
                     <tr>
-                        <td style="border: 1px solid;border-style: dashed dashed hidden hidden" class="dot-matrix-bold">
+                        <td style="border: 0.5px solid;border-style: dashed dashed hidden hidden">
                             <div>No. PO</div>
                             <div class="txt-center"><?= $soData->no_po ?></div>
                         </td>
-                        <td style="border-top: 1px solid;border-top-style: dashed" class="dot-matrix-bold">
+                        <td style="border-top: 1px solid;border-top-style: dashed">
                             <div>Tgl. Pengiriman</div>
                             <div class="txt-center"><?= $soData->shipping_date ?></div>
                         </td>
@@ -149,20 +177,20 @@
     <table class="item-table">
         <thead>
             <tr>
-                <th class="dot-matrix-bold">No</th>
-                <th class="dot-matrix-bold">Item Description</th>
-                <th class="dot-matrix-bold">Qty</th>
-                <th class="dot-matrix-bold">Satuan</th>
+                <th>No</th>
+                <th>Item Description</th>
+                <th>Qty</th>
+                <th>Satuan</th>
             </tr>
         </thead>
         <tbody>
             <?php $no = 1; ?>
             <?php foreach ($soDet as $detail) : ?>
                 <tr>
-                    <td class="txt-center dot-matrix-bold" style="width: 10px;height: 1px;"><?= $no++ ?></td>
-                    <td class="dot-matrix-bold"><?= $detail->namaBarang ?></td>
-                    <td class="txt-center dot-matrix-bold"><?= $detail->qty ?></td>
-                    <td class="txt-center dot-matrix-bold"><?= $detail->kodeSatuan ?></td>
+                    <td class="txt-center" style="width: 10px;height: 1px;"><?= $no++ ?></td>
+                    <td><?= $detail->namaBarang ?></td>
+                    <td class="txt-center"><?= $detail->qty ?></td>
+                    <td class="txt-center"><?= $detail->kodeSatuan ?></td>
                 </tr>
             <?php endforeach; ?>
             <?php for ($i = 0; $i < (8 - count($soDet)); $i++) : ?>
@@ -174,27 +202,28 @@
                 </tr>
             <?php endfor; ?>
         </tbody>
+
     </table>
 
-    <div class="description-container dot-matrix-bold">
+    <div class="description-container">
         <label class="description-label">Description: </label>
-        <span class="dot-matrix-bold" style="font-weight: 800;"><?= $soData->keterangan ?></span>
+        <?= $soData->keterangan ?>
     </div>
 
     <table class="signature-table">
         <tr style="vertical-align: top;">
-            <td style="height: 65px;border-bottom: 1px solid;width: 90px" class="dot-matrix-bold">Sales</td>
+            <td style="height: 65px;border-bottom: 1px solid;width: 90px">Sales</td>
             <td style="width: 80px"></td>
-            <td style="height: 65px;border-bottom: 1px solid;width: 90px" class="dot-matrix-bold">Gudang</td>
+            <td style="height: 65px;border-bottom: 1px solid;width: 90px">Gudang</td>
             <td style="width: 80px"></td>
-            <td style="height: 65px;border-bottom: 1px solid;width: 90px" class="dot-matrix-bold">Produksi</td>
+            <td style="height: 65px;border-bottom: 1px solid;width: 90px">Produksi</td>
         </tr>
         <tr>
-            <td class="dot-matrix-bold">Date: </td>
+            <td>Date: </td>
             <td style="width: 80px"></td>
-            <td class="dot-matrix-bold">Date: </td>
+            <td>Date: </td>
             <td style="width: 80px"></td>
-            <td class="dot-matrix-bold">Date: </td>
+            <td>Date: </td>
         </tr>
     </table>
 
