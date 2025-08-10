@@ -49,7 +49,7 @@
 
                         <div class="mt-1">
                             <div class="form-floating mb-3">
-                                <input id="harga_ndpbm" value="<?= $bc23 != null ? ($bc23['ndpbm'] != null ? number_format($bc23['ndpbm']) : "0,00") : "0,00" ?>" name="harga_ndpbm" type="text" class="form-control harga_ndpbm" placeholder="" onkeyup="this.value = greatFormatRupiah(this.value)">
+                                <input id="harga_ndpbm" value="<?= $bc23 != null ? ($bc23['ndpbm'] != null ? number_format($bc23['ndpbm'], 2) : "0,00") : "0,00" ?>" name="harga_ndpbm" type="text" class="form-control harga_ndpbm" placeholder="" onkeyup="this.value = greatFormatRupiah(this.value)">
                                 <label>NDPBM</label>
                             </div>
                         </div>
@@ -68,19 +68,19 @@
                         </div>
                         <div class="mt-1">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input readonly id="harga_nilai_barang" value="<?= $bc23 != null ? ($bc23['nilai_barang'] != null ? number_format($bc23['nilai_barang']) : "0,00") : '0,00' ?>" name="harga_nilai_barang" type="text" class="harga_nilai_barang form-control" placeholder="" onkeyup="this.value = greatFormatRupiah(this.value)">
+                                <input id="harga_nilai_barang" value="<?= $bc23 != null ? ($bc23['nilai_barang'] != null ? number_format($bc23['nilai_barang'], 2) : "0,00") : '0,00' ?>" name="harga_nilai_barang" type="text" class="harga_nilai_barang form-control" placeholder="" onkeyup="this.value = greatFormatRupiah(this.value)">
                                 <label>Harga Barang</label>
                             </div>
                         </div>
                         <div class="mt-1">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input id="harga_cif" name="harga_cif" value="<?= $bc23 != null ? ($bc23['cif'] != null ? number_format($bc23['cif']) : '0,00') : '0,00' ?>" type="text" class="harga_cif form-control" placeholder="" onkeyup="this.value = greatFormatRupiah(this.value)">
+                                <input id="harga_cif" name="harga_cif" value="<?= $bc23 != null ? ($bc23['cif'] != null ? number_format($bc23['cif'], 2) : '0,00') : '0,00' ?>" type="text" class="harga_cif form-control" placeholder="" onkeyup="this.value = greatFormatRupiah(this.value)">
                                 <label>Harga Cif</label>
                             </div>
                         </div>
                         <div class="mt-1">
                             <div class="form-floating mb-3">
-                                <input id="harga_nilai_pabean" value="<?= $bc23 != null ? ($bc23['harga_penyerahan'] != null ? number_format($bc23['harga_penyerahan']) : '0,00') : '0,00' ?>" name="harga_nilai_pabean" type="text" class="form-control harga_nilai_pabean" placeholder="">
+                                <input id="harga_nilai_pabean" value="<?= $bc23 != null ? ($bc23['harga_penyerahan'] != null ? number_format($bc23['harga_penyerahan'], 2) : '0,00') : '0,00' ?>" name="harga_nilai_pabean" type="text" class="form-control harga_nilai_pabean" placeholder="">
                                 <label>Harga Barang Pabean</label>
                             </div>
                         </div>
@@ -248,7 +248,7 @@
     $('#harga_ndpbm').keyup(function() {
         var ndpbm = destroyFormatRupiah($(this).val()) || 0;
         var hargaBarang = destroyFormatRupiah($("#harga_nilai_barang").val()) || 0;
-        var hargaPabean = (Number(ndpbm) * Number(hargaBarang));
+        var hargaPabean = (Number(ndpbm) * Number(hargaBarang)).toFixed(2);
 
         $('#harga_cif').val(greatFormatRupiah(ndpbm));
         $('#harga_nilai_pabean').val(greatFormatRupiah(hargaPabean))
@@ -259,7 +259,7 @@
 
         var ndpbm = destroyFormatRupiah($("#harga_ndpbm").val()) || 0;
         var hargaBarang = destroyFormatRupiah($(this).val()) || 0;
-        var hargaPabean = (Number(ndpbm) * Number(hargaBarang));
+        var hargaPabean = (Number(ndpbm) * Number(hargaBarang)).toFixed(2);
 
         $('#harga_nilai_pabean').val(greatFormatRupiah(hargaPabean))
     });

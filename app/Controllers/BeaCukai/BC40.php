@@ -1271,9 +1271,9 @@ class BC40 extends BaseController
             'bc_type' => 40,
             'kode_jenis_pungutan' => decrypt($this->request->getVar('barang_detail_kode_jenis_pungutan')),
             'kode_jenis_tarif' => decrypt($this->request->getVar('barang_detail_kode_jenis_tarif')),
-            'tarif_bea_masuk' => convertRupiahToNumber($this->request->getVar('barang_detail_nilai_tarif')),
+            'tarif_bea_masuk' => ($this->request->getVar('barang_detail_nilai_tarif')),
             'kode_fasilitas_tarif' => decrypt($this->request->getVar('barang_detail_kode_fasilitas_tarif')),
-            'tarif_fasilitas' => convertRupiahToNumber($this->request->getVar('barang_detail_tarif_fasilitas')),
+            'tarif_fasilitas' => ($this->request->getVar('barang_detail_tarif_fasilitas')),
             'seri_barang' => $bc40Barang['seri_barang'],
             'kode_satuan_barang' => $bc40Barang['kode_satuan_barang'],
             'nilai_bayar' => $nilaiBayar
@@ -1599,7 +1599,7 @@ class BC40 extends BaseController
         return response()->setJSON([
             'token' => csrf_hash(),
             'status' => true,
-            'message' => "Dokumen BC 4.O Berhasil Dikirim Ke Ceisa",
+            'message' => "Dokumen BC 4.O Berhasil Online di Ceisa",
             'res' => $res,
         ]);
     }

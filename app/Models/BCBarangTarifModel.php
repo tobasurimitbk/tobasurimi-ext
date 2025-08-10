@@ -44,7 +44,7 @@ class BCBarangTarifModel extends Model
     {
 
         $sort = 'bc_barang_tarif.createdAt';
-        $sortType = 'DESC';
+        $sortType = 'ASC';
 
         $selectQry = "bc_barang_tarif.*";
 
@@ -70,12 +70,12 @@ class BCBarangTarifModel extends Model
     public function getByBcPurchaseOrder($id)
     {
         $selectQry = "kode_jenis_pungutan, nilai_bayar, kode_fasilitas_tarif";
-    
+
         $result = $this->asArray()
-                       ->select($selectQry)
-                       ->where('bc_purchase_order_id', $id)
-                       ->findAll();
-        
+            ->select($selectQry)
+            ->where('bc_purchase_order_id', $id)
+            ->findAll();
+
         return $result;
     }
 }

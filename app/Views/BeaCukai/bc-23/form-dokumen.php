@@ -15,6 +15,7 @@
         </div>
         <?= csrf_field() ?>
         <form id="form-dokumen">
+            <input type="hidden" name="bc_dokumen_id" id="bc_dokumen_id" class="bc_dokumen_id">
             <div class="card-body">
                 <?php include_once('nav.php') ?>
                 <div class="alert alert-secondary alert-dismissible fade show mt-3 text-black" role="alert">
@@ -181,7 +182,16 @@
                 searchable: false,
                 sortable: false,
                 render: function(data, type, row) {
-                    return `<button type="button" class="btn btn-danger" onclick="removeDokumen('${row.id}')" ><i class="fa fa-trash fa-sm" aria-hidden="true"></i></button>`;
+                    return `
+                    <div class="text-center">
+                        <button type="button" class="btn btn-warning" onclick="detailDokumen('${row.id}')" >
+                            <i class="fa fa-pencil fa-sm" aria-hidden="true"></i>
+                        </button>
+                        <button type="button" class="btn btn-danger" onclick="removeDokumen('${row.id}')" >
+                            <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
+                        </button>
+                    </div>
+                    `;
                 }
             }
 
@@ -247,10 +257,11 @@
     });
 
     $('.btn-submit-dokumen').click(function() {
+        var id = $('#bc_dokumen_id').val();
         if ($('#form-dokumen').valid()) {
             Swal.fire({
                 icon: 'question',
-                title: 'Simpan Dokumen ?',
+                title: id == '' ? 'Simpan Dokumen ?' : "Update Dokumen ?",
                 confirmButtonColor: '#4e73df',
                 cancelButtonColor: '#d33',
                 showCancelButton: true,
@@ -259,10 +270,21 @@
                 cancelButtonText: 'Kembali',
             }).then((result) => {
                 if (result.isConfirmed) {
+                    var id = $('#bc_dokumen_id').val();
+                    var url = '';
                     var formData = new FormData(document.querySelector("#form-dokumen"));
                     formData.append("bc_purchase_order_id", "<?= encrypt($bcPo['id']) ?>");
+
+                    if (id == '') {
+                        // Create
+                        url = "<?= base_url("bea-cukai-bc-23/id/dokumen/create"); ?>";
+                    } else {
+                        // Update
+                        url = "<?= base_url("bea-cukai-bc-23/id/dokumen/update"); ?>";
+                    }
+
                     $.ajax({
-                        url: "<?= base_url("bea-cukai-bc-23/id/dokumen/create"); ?>",
+                        url: url,
                         data: formData,
                         beforeSend: function(xhr) {
                             xhr.setRequestHeader('X-CSRF-Token', csrf.val());
@@ -279,9 +301,7 @@
                             if (response.status) {
                                 csrf.val(response.token);
                                 tableListInformasiDokumen.ajax.reload();
-                                $('#dokumen_jenis_dokumen').val(null).change();
-                                $('#dokumen_nomor_dokumen').val('');
-                                $('#dokumen_tanggal').val('');
+                                resetForm();
                             } else {
                                 Swal.fire({
                                     icon: 'error',
@@ -334,6 +354,45 @@
             }
         })
 
+    }
+
+    function detailDokumen(id) {
+        $.ajax({
+            url: "<?= base_url("bea-cukai-bc-23/id/dokumen-detail"); ?>",
+            data: {
+                id: id,
+            },
+            beforeSend: function(xhr) {
+                xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                setLoading();
+            },
+            complete: function() {
+                stopLoading();
+            },
+            method: "GET",
+            success: function(response) {
+                if (response.status) {
+                    $('#bc_dokumen_id').val(id);
+                    $('#dokumen_jenis_dokumen').val(response.data.kode_dokumen).change();
+                    $('#dokumen_nomor_dokumen').val(response.data.nomor_dokumen).change();
+                    $('#dokumen_tanggal').val(response.data.tanggal_dokumen);
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: response.message,
+                        confirmButtonColor: '#4e73df',
+                        confirmButtonText: 'Ok'
+                    });
+                }
+            },
+        });
+    }
+
+    function resetForm() {
+        $('#bc_dokumen_id').val(null);
+        $('#dokumen_jenis_dokumen').val(null).change();
+        $('#dokumen_nomor_dokumen').val('');
+        $('#dokumen_tanggal').val('');
     }
 </script>
 
