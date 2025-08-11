@@ -259,6 +259,8 @@
 
 
                                     <th style="text-align: center;">Barang - Spesifikasi</th>
+                                    <th style="text-align: center;">Sisa Qty PO</th>
+                                    <th style="text-align: center;">Sisa Qty LPB</th>
                                     <th style="text-align: center;">Sisa Qty</th>
                                     <th style="text-align: center; min-width: 100px;">Qty Rebus</th>
                                     <th style="text-align: center;">Satuan Rebus</th>
@@ -1159,6 +1161,8 @@
                         <td>${item.supplier_name || '-'}</td>
                         <td>${item.stock_date || '-'}</td>
                         <td>${item.barang || '-'}</td>
+                        <td style="text-align: right;">${parseFloat(item.total_penerimaan).toFixed(3)}</td>
+                        <td style="text-align: right;">${parseFloat(item.total_penerimaan).toFixed(3)}</td>
                         <td style="text-align: right;">${parseFloat(item.stok_total).toFixed(3)}</td>
                         <td>
                             <input type="number" step="0.001" min="0" 

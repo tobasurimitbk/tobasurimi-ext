@@ -532,6 +532,40 @@ class StockDetail2Model extends Model
             ->findAll();
     }
 
+
+
+    public function getStockListWithAddConditionNew($stockID, $condition)
+    {
+        return $this->asArray()
+            ->select('
+                suppliers.name AS supplier_name,
+                stock_details2.id,
+                stock_details2.bc_id,
+                stock_details2.no_aju,
+                stock_details2.stock_id,
+                stock_details2.stock_dokumen,
+                stock_details2.supplier_id,
+                stock_details.stock_date,
+                stock_details.sumber,
+
+                SUM(CASE WHEN stock_details.status = "In" THEN stock_details2.qty ELSE 0 END) - 
+                SUM(CASE WHEN stock_details.status = "Out" THEN stock_details2.qty ELSE 0 END) AS stok_total,
+
+                COALESCE(SUM(penerimaan_barang_detail.qty), 0) AS total_penerimaan
+            ')
+            ->join('stock_details', 'stock_details.id = stock_details2.stock_detail_id')
+            ->join('suppliers', 'suppliers.id = stock_details2.supplier_id', 'left')
+            ->join('penerimaan_barang', 'penerimaan_barang.no_penerimaan_barang = stock_details.no_dokumen', 'left')
+            ->join('penerimaan_barang_detail', 'penerimaan_barang_detail.penerimaan_barang_id = penerimaan_barang.id', 'left')
+            ->where('stock_details2.stock_id', $stockID)
+            ->where($condition)
+            ->groupBy('stock_details2.stock_dokumen, stock_details2.bc_id, stock_details2.no_aju')
+            ->having('stok_total >', 0)
+            ->orderBy('stock_details.createdAt', 'ASC')
+            ->findAll();
+    }
+
+
     public function getStockListJasaVendorOut($condition)
     {
         $builder = $this->asArray()
