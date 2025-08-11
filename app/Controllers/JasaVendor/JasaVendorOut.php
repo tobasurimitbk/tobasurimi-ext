@@ -659,134 +659,52 @@ class JasaVendorOut extends BaseController
         $supplierId = $this->request->getVar('supplier_id');
         $vendorId = $this->request->getVar('vendor_id');
 
-        if ((!empty($this->request->getVar('stock_id')) || !empty($this->request->getVar('barang_master_id'))) && (!empty($supplierId) || !empty($vendorId))) {
+        // if ((!empty($this->request->getVar('stock_id')) || !empty($barangMasterId)) && 
+        //     (!empty($supplierId) || !empty($vendorId))) {
 
             if (!empty($supplierId) && !empty($barangMasterId)) {
                 // Untuk Dari Po & Supplier
                 $condition = [
-                    'stock_details2.supplier_id' => $this->request->getVar('supplier_id'),
+                    'stock_details2.supplier_id' => $supplierId,
                     'stock.barang1_id' => $barangMasterId,
                 ];
-
-                $dataResult = $this->stockDetail2Model->getStockListJasaVendorOut(
-                    $condition
-                );
+                $dataResult = $this->stockDetail2Model->getStockListJasaVendorOut($condition);
+                
+                $resultArr = [];
+                foreach ($dataResult as $item) {
+                    if (floatval($item['stok_total']) <= 0) continue;
+                    
+                    $bcType = $this->metaDataModel->find($item['bc_id']);
+                    $stock = $this->stockModel->find($item['stock_id']);
+                    
+                    $resultArr[] = [
+                        'id' => $item['id'],
+                        'sumber' => $item['sumber'],
+                        'supplier_name' => $item['supplier_name'],
+                        'bc_type' => $bcType ? $bcType['value'] : 'NON PABEAN',
+                        'stock_dokumen' => $item['stock_dokumen'] ?? '-',
+                        'stock_date' => date('d/m/Y', strtotime($item['stock_date'])),
+                        'barang' => $item['barang_name'],
+                        'satuan' => $item['kode_satuan'],
+                        'stok_total' => floatval($item['stok_total'])
+                    ];
+                }
             } else {
                 // Untuk Dari Jasa Vendor
-                $condition = [
-                    'stock_details.sumber' => "JASA VENDOR",
-                ];
-
+                $condition = ['stock_details.sumber' => "JASA VENDOR"];
                 $dataResult = $this->stockDetail2Model->getStockListWithAddCondition(
-                    $this->request->getVar('stock_id'),
+                    $this->request->getVar('stock_id'), 
                     $condition
                 );
-            }
-
-
-            $resultArr = array();
-
-            if (!empty($supplierId)) {
-                // Khsus Dari Supplier
-                for ($i = 0; $i < count($dataResult); $i++) {
-                    $bcType = $this->metaDataModel->find($dataResult[$i]['bc_id']);
-                    $stock = $this->stockModel->find($dataResult[$i]['stock_id']);
-
-                    $rmPurchaseOrder = $this->rmPurchaseOrderModel->where('po_no', $dataResult[$i]['stock_dokumen'])
-                        ->where('company_id', $stock['company_id'])
-                        ->first();
-
-                    $stockDetail = $this->stockDetail2Model->getStockListDetail(
-                        $dataResult[$i]['stock_id'],
-                        $dataResult[$i]['bc_id'],
-                        $dataResult[$i]['no_aju'],
-                        $dataResult[$i]['stock_dokumen']
-                    );
-
-                    $noDaftar = $this->stockDetail2Model->getNomorDaftar($dataResult[$i]['no_aju'], $dataResult[$i]['bc_id']);
-
-                    $dataResult[$i]['stock_dokumen'] = $dataResult[$i]['stock_dokumen'] == null ? "-" : $dataResult[$i]['stock_dokumen'];
-                    $dataResult[$i]['no_aju'] =  $dataResult[$i]['no_aju'] == "-" ? "-" : $dataResult[$i]['no_aju'];
-                    $dataResult[$i]['bc_type'] = $bcType == null ? "NON PABEAN" : $bcType['value'];
-                    $dataResult[$i]['satuan'] = $dataResult[$i]['kode_satuan'];
-                    $dataResult[$i]['barang'] = $dataResult[$i]['barang_name'];
-                    $dataResult[$i]['sepsifikasi'] = $dataResult[$i]['spesifikasi'];
-                    $dataResult[$i]['stock_date'] = date('d/m/Y', strtotime($dataResult[$i]['stock_date']));
-                    $dataResult[$i]['stock_id'] = $dataResult[$i]['stock_id'];
-                    $dataResult[$i]['type_barang'] = $stock['tipe_barang'];
-                    $dataResult[$i]['type_barang_text'] = strtoupper(str_replace('_', ' ', $stock['tipe_barang']));
-                    $dataResult[$i]['stok_total'] = floatval($dataResult[$i]['stok_total']);
-                    $dataResult[$i]['no_daftar'] = $noDaftar;
-
-                    if ($stockDetail['stok_total'] > 0) {
-                        array_push($resultArr, $dataResult[$i]);
-                    }
-                }
-
-
-                $grouped = [];
-
-                foreach ($resultArr as $item) {
-                    $key = $item['stock_dokumen'] . '|' . $item['stock_date'];
-                    $spec = $item['spesifikasi'] ?? $item['sepsifikasi'] ?? '';
-                    $barang_name = $item['barang_name'];
-
-                    if (!isset($grouped[$key])) {
-                        $grouped[$key] = [
-                            'sumber' => $item['sumber'],
-                            'supplier_name' => $item['supplier_name'],
-                            'bc_type' => $item['bc_type'],
-                            'no_aju' => $item['no_aju'],
-                            'satuan' => $item['satuan'],
-                            'stock_dokumen' => $item['stock_dokumen'],
-                            'stock_date' => $item['stock_date'],
-                            'stok_total' => 0,
-                            'id' => [],
-                            'barang_name' => $barang_name,
-                            'spesifikasi_list' => [],
-                            'bc_id' => $item['bc_id'],
-                            'no_daftar' => $item['no_daftar'],
-                            'type_barang' => $item['type_barang'],
-                            'type_barang_text' => $item['type_barang_text']
-                        ];
-                    }
-
-                    $grouped[$key]['stok_total'] += $item['stok_total'];
-                    $grouped[$key]['id'][] = $item['stock_id'];
-                    $grouped[$key]['spesifikasi_list'][] = $spec;
-                }
-
-                // Hilangkan duplikat `id` dan `spesifikasi`, lalu susun ulang nama barang
-                foreach ($grouped as &$group) {
-                    $group['stok_total'] = floatval(number_format($group['stok_total'], 2));
-                    $group['id'] = encrypt(json_encode(array_values(array_unique($group['id']))));
-                    $group['spesifikasi_list'] = array_unique($group['spesifikasi_list']);
-                    $group['barang'] = trim($group['barang_name'] . ' ' . implode(', ', $group['spesifikasi_list']));
-                    unset($group['barang_name'], $group['spesifikasi_list']); // opsional, kalau mau lebih ringkas
-                }
-
-
-                $resultArr =  array_values($grouped);
-            } else {
-                // Dengan Spesifikasi
-                // Khsus Dari Vendor
-                $stock = $this->stockModel->find($this->request->getVar('stock_id'));
-                if ($stock['kemasan_id'] == 0) {
-                    $barangMaster = $this->barangMasterModel->find($stock['barang1_id']);
-                    $barangMasterSpesifikasi = $this->barangMasterSpesifikasiModel->find($stock['barang2_id']);
-                    $satuan = $this->satuanModel->find($barangMasterSpesifikasi['satuan_1']);
-                    $barangName = $barangMaster['barang_name'] . "-" . $barangMasterSpesifikasi['spesifikasi'];
-                } else {
-                    $kemasan = $this->kemasanModel->find($stock['kemasan_id']);
-                    $satuan = $this->satuanModel->find($kemasan['satuan_id']);
-                    $barangName = $kemasan['name'];
-                }
-
-                for ($i = 0; $i < count($dataResult); $i++) {
-                    $result = strstr($dataResult[$i]['stock_dokumen'], '(', true);
-                    $noJasaVendorIn = trim($result);
-                    $supplierName = $dataResult[$i]['supplier_name'];
-
+                
+                $resultArr = [];
+                foreach ($dataResult as $item) {
+                    if (floatval($item['stok_total']) <= 0) continue;
+                    
+                    $stock = $this->stockModel->find($item['stock_id']);
+                    $bcType = $this->metaDataModel->find($item['bc_id']);
+                    $noJasaVendorIn = trim(strstr($item['stock_dokumen'], '(', true));
+                    
                     $jasaVendorIn = $this->jasaVendorInModel
                         ->select('jasa_vendor_in.*,vendors.name as nama_vendor')
                         ->join('vendors', 'vendors.id = jasa_vendor_in.vendor_id', 'left')
@@ -794,37 +712,29 @@ class JasaVendorOut extends BaseController
                         ->where('jasa_vendor_in.company_id', $this->this_company_id)
                         ->where('vendor_id', $vendorId)
                         ->first();
-
-                    $bcType = $this->metaDataModel->find($dataResult[$i]['bc_id']);
-                    $noDaftar = $this->stockDetail2Model->getNomorDaftar($dataResult[$i]['no_aju'], $dataResult[$i]['bc_id']);
-
-                    $dataResult[$i]['stock_dokumen'] = $dataResult[$i]['stock_dokumen'] == null ? "-" : $dataResult[$i]['stock_dokumen'];
-                    $dataResult[$i]['no_aju'] =  $dataResult[$i]['no_aju'] == "-" ? "-" : $dataResult[$i]['no_aju'];
-                    $dataResult[$i]['bc_type'] = $bcType == null ? "NON PABEAN" : $bcType['value'];
-                    $dataResult[$i]['satuan'] = $satuan['kode_satuan'];
-                    $dataResult[$i]['barang'] = strtoupper($barangName);
-                    $dataResult[$i]['stock_date'] = $jasaVendorIn == null ? "-" : date('d/m/Y', strtotime($jasaVendorIn['tanggal']));
-                    $dataResult[$i]['stock_id'] = $dataResult[$i]['stock_id'];
-                    $dataResult[$i]['type_barang'] = $stock['tipe_barang'];
-                    $dataResult[$i]['type_barang_text'] = strtoupper(str_replace('_', ' ', $stock['tipe_barang']));
-                    $dataResult[$i]['stok_total'] = floatval($dataResult[$i]['stok_total']);
-                    $dataResult[$i]['supplier_name'] = $jasaVendorIn == null ? "-" : $supplierName . ' / ' . $jasaVendorIn['nama_vendor'];
-                    $dataResult[$i]['id'] = encrypt($dataResult[$i]['id']);
-                    $dataResult[$i]['no_daftar'] = $noDaftar;
-
-                    if ($jasaVendorIn != null && $dataResult[$i]['stok_total'] > 0) {
-                        array_push($resultArr, $dataResult[$i]);
-                    }
+                    
+                    if (!$jasaVendorIn) continue;
+                    
+                    $resultArr[] = [
+                        'id' => $item['id'],
+                        'sumber' => $item['sumber'],
+                        'supplier_name' => $item['supplier_name'] . ' / ' . $jasaVendorIn['nama_vendor'],
+                        'bc_type' => $bcType ? $bcType['value'] : 'NON PABEAN',
+                        'stock_dokumen' => $item['stock_dokumen'] ?? '-',
+                        'stock_date' => date('d/m/Y', strtotime($jasaVendorIn['tanggal'])),
+                        'barang' => $this->getBarangName($stock),
+                        'satuan' => $this->getSatuan($stock),
+                        'stok_total' => floatval($item['stok_total'])
+                    ];
                 }
             }
 
-
-            return response()->setJSON([
+            return $this->response->setJSON([
                 'data' => $resultArr,
                 'token' => csrf_hash(),
                 'status' => true
             ]);
-        }
+        
     }
 
 
