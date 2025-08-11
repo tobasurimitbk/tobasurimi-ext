@@ -246,7 +246,7 @@
                             <thead class="thead-dark">
                                 <tr>
                                     <th style="text-align: center;" colspan="5">Detail PO & LPB</th>
-                                    <th style="text-align: center;" colspan="4">Daftar Barang Rebus</th>
+                                    <th style="text-align: center;" colspan="5">Daftar Barang Rebus</th>
                                     <th style="text-align: center;" colspan="5">Daftar Barang Hasil Rebus</th>
                                 </tr>
                                 <tr>
@@ -275,7 +275,7 @@
                             </tbody>
                             <tfoot class="foot-detail-table" id="foot-detail-table">
                                 <tr>
-                                    <td colspan="14" style="text-align: center;">
+                                    <td colspan="16" style="text-align: center;">
                                         Tidak Ada Barang
                                     </td>
                                 </tr>
@@ -1270,7 +1270,7 @@
             // Buat hanya satu grand total row di bagian paling bawah
             const totalRow = $(`
                 <tr class="grand-total-row" style="background-color: #d1ecf1; font-weight: bold;">
-                    <td colspan="7" style="text-align: right;">GRAND TOTAL</td>
+                    <td colspan="9" style="text-align: right;">GRAND TOTAL</td>
                     <td style="text-align: right;">${totalQtyRebus.toFixed(3)}</td>
                     <td colspan="1"></td>
                     <td colspan="2" style="text-align: right;">${totalQtyHasilRebus.toFixed(3)}</td>
