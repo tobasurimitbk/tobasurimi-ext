@@ -1331,11 +1331,9 @@ class BC23 extends BaseController
                 }
 
                 // $nilaiBayar100 = $bc23Barang['harga_ekspor'] * (($nilaiTarif + $beaMasuk['nilai_bayar']) / 100);
-                $nilaiBayar100 = $bc23Barang['harga_ekspor'] * ($nilaiTarif / 100);
-                $nilaiBayar = $nilaiBayar100 / $tarifFasilitas;
+                $nilaiBayar = ($bc23Barang['harga_ekspor'] + $beaMasuk['nilai_bayar']) * ($nilaiTarif / 100);
             } else {
-                $nilaiBayar100 = $bc23Barang['harga_ekspor'] * ($nilaiTarif / 100);
-                $nilaiBayar = $nilaiBayar100 / $tarifFasilitas;
+                $nilaiBayar = $bc23Barang['harga_ekspor'] * ($nilaiTarif / 100);
             }
 
             $this->bcBarangTarifModel->insert([
@@ -1442,9 +1440,20 @@ class BC23 extends BaseController
             $nilaiTarif =  ($this->request->getVar('barang_detail_nilai_tarif'));
             $tarifFasilitas = ($this->request->getVar('barang_detail_tarif_fasilitas'));
             $tarifFasilitas = ($tarifFasilitas == 0) ? 1 : $tarifFasilitas;
+            $kodeJenisPungutanStr = decrypt($this->request->getVar('barang_detail_kode_jenis_pungutan'));
 
-            $nilaiBayar100 = $bc23Barang['harga_ekspor'] * ($nilaiTarif / 100);
-            $nilaiBayar = $nilaiBayar100 / $tarifFasilitas;
+            if ($kodeJenisPungutanStr == "BM") {
+                $nilaiBayar = $bc23Barang['harga_ekspor'] * ($nilaiTarif / 100);
+            } else {
+                $beaMasuk = $this->bcBarangTarifModel
+                    ->where('bc_purchase_order_id', $bcPurchaseOrderID)
+                    ->where('penerimaan_barang_id', $penerimaanBarangID)
+                    ->where('barang1_id', $barang1ID)
+                    ->where('kode_jenis_pungutan', "BM")
+                    ->first();
+
+                $nilaiBayar = ($bc23Barang['harga_ekspor'] + $beaMasuk['nilai_bayar']) * ($nilaiTarif / 100);
+            }
 
             $this->bcBarangTarifModel->update($id, [
                 'bc_purchase_order_id' => $bcPurchaseOrderID,

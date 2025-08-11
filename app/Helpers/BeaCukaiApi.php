@@ -641,7 +641,7 @@ class BeaCukaiApi
             // IMPORTIR ATAU PENGUSAHA TPB
             $entitasArr[] = [
                 'alamatEntitas' => $b['alamat_entitas'],
-                'kodeEntitas' => $b['kode_entitas'],
+                'kodeEntitas' => '3',
                 'kodeJenisIdentitas' => '6',
                 'namaEntitas' => $b['nama_entitas'],
                 'nibEntitas' => $b['nib_entitas'],
