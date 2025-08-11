@@ -566,7 +566,7 @@ class JasaVendorOut extends BaseController
                 ];
             }
 
-            $dataResult = $this->stockDetail2Model->getStockListWithAddCondition(
+            $dataResult = $this->stockDetail2Model->getStockListWithAddConditionNew(
                 $this->request->getVar('stock_id'),
                 $condition
             );
@@ -603,6 +603,7 @@ class JasaVendorOut extends BaseController
                     $dataResult[$i]['type_barang'] = $stock['tipe_barang'];
                     $dataResult[$i]['type_barang_text'] = strtoupper(str_replace('_', ' ', $stock['tipe_barang']));
                     $dataResult[$i]['stok_total'] = floatval($dataResult[$i]['stok_total']);
+                    $dataResult[$i]['total_penerimaan'] = floatval($dataResult[$i]['total_penerimaan']);
 
                     if ($dataResult[$i]['stok_total'] > 0) {
                         array_push($resultArr, $dataResult[$i]);
