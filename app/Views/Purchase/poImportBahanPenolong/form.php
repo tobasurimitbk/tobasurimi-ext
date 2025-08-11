@@ -600,7 +600,7 @@
         var harga_satuan;
         var total = destroyFormatRupiah($('#total').val()) || 0;
         harga_satuan = total / qty;
-        $('#harga_satuan').val(greatFormatRupiah(harga_satuan.toFixed(2)));
+        $('#harga_satuan').val(greatFormatRupiah(harga_satuan.toFixed(4)));
     });
 
     // VALIDATOR DETAIL
