@@ -656,6 +656,9 @@ class BC23 extends BaseController
             return redirect()->to('bea-cukai-bc-23');
         }
 
+        $bc23 = $this->bc23Model->where('bc_purchase_order_id', $bcPurchaseOrderID)->first();
+        $kodeKantorBongkar = $this->kantorBeaCukaiModel->where('kode', $bc23['kode_kantor_bongkar'])->first();
+
         $this->setFlashDataNavigatorSession($bcPurchaseOrderID);
 
         $data = [
@@ -664,7 +667,8 @@ class BC23 extends BaseController
             'bc23' => $this->bc23Model->get($bcPurchaseOrderID),
             'bc23Pengangkut' => $this->bcPengangkutModel->get($bcPurchaseOrderID),
             'bc23DokumenBL' => $bc23DokumenBL,
-            'bcPo' => $bcPo
+            'bcPo' => $bcPo,
+            'kodeKantorBongkar' => $kodeKantorBongkar
         ];
 
         return view('BeaCukai/bc-23/form-pengangkut', $data);
@@ -985,10 +989,26 @@ class BC23 extends BaseController
             ]);
         }
 
+        if ($bc23 == null) {
+            return response()->setJSON([
+                'message' => "Isi Tab Header terlebih dahulu",
+                'status' => false,
+                'token' => csrf_hash()
+            ]);
+        }
+
+        if ($bc23['kode_kantor_bongkar'] == null || $bc23['kode_kantor_bongkar'] == '') {
+            return response()->setJSON([
+                'message' => "Kode kantor bongkar di Tab Header wajib diisi",
+                'status' => false,
+                'token' => csrf_hash()
+            ]);
+        }
+
         $res = $beacukaiApi->getManifest(
             $bc23DokumenBL['nomor_dokumen'],
             date('d-m-Y', strtotime($bc23DokumenBL['tanggal_dokumen'])),
-            $bc23['kode_kantor'],
+            $bc23['kode_kantor_bongkar'],
             $namaImportirDefault['value']
         );
 
@@ -1002,13 +1022,22 @@ class BC23 extends BaseController
 
         $listKontainer = $res['data']->listContainer;
 
-        if ($listKontainer == null) {
+        if ($res['data']->respon != "") {
             return response()->setJSON([
                 'message' => $res['data']->respon,
                 'status' => false,
                 'token' => csrf_hash()
             ]);
         }
+
+        if (\count($listKontainer) == 0) {
+            return response()->setJSON([
+                'message' => "List Kontainer tidak ditemukan",
+                'status' => false,
+                'token' => csrf_hash()
+            ]);
+        }
+
         foreach ($listKontainer as $l) {
             $kontainerFirst = $this->bcKontainerModel
                 ->where('bc_purchase_order_id', $bcPurchaseOrderID)
@@ -2106,15 +2135,36 @@ class BC23 extends BaseController
             ]);
         }
 
+        if ($bc23 == null) {
+            return response()->setJSON([
+                'message' => "Isi Tab Header terlebih dahulu",
+                'status' => false,
+                'token' => csrf_hash()
+            ]);
+        }
+
+        if ($bc23['kode_kantor_bongkar'] == null || $bc23['kode_kantor_bongkar'] == '') {
+            return response()->setJSON([
+                'message' => "Kode kantor bongkar di Tab Header wajib diisi",
+                'status' => false,
+                'token' => csrf_hash()
+            ]);
+        }
+
         $res = $beacukaiApi->getManifest(
             $bc23DokumenBL['nomor_dokumen'],
             date('d-m-Y', strtotime($bc23DokumenBL['tanggal_dokumen'])),
-            $bc23['kode_kantor'],
+            $bc23['kode_kantor_bongkar'],
             $namaImportirDefault['value']
+        );
+
+        $resGudangTps = $beacukaiApi->getKodeTpsByKodeKantor(
+            $bc23['kode_kantor_bongkar']
         );
 
         return response()->setJSON([
             'data' => $res,
+            'gudangTps' => $resGudangTps,
             'status' => true,
             'token' => csrf_hash()
         ]);

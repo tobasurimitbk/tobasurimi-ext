@@ -169,7 +169,7 @@
                                     <?php if ($bc23DokumenBL != null) : ?>
                                         <div class="col-sm" style="margin-right: -10px;">
                                             <button style="border-color: #FFA426 !important; background-color: #FFA426 !important; margin-right: 10px !important;" id="btn-ambil-manifest" class="btn btn-add btn-block float-right">
-                                                <i class="fas fa-download mr-1"></i> Ambil B/L
+                                                <i class="fas fa-download mr-1"></i> Ambil AWB - B/L
                                             </button>
                                         </div>
                                     <?php endif; ?>
