@@ -568,6 +568,7 @@ class JasaVendorOut extends BaseController
 
             $dataResult = $this->stockDetail2Model->getStockListWithAddConditionNew(
                 $this->request->getVar('stock_id'),
+                $this->request->getVar('spesifikasi_id'),
                 $condition
             );
 

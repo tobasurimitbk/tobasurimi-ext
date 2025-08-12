@@ -1021,8 +1021,8 @@ $routes->get('/proses-rebus/list-barang-rebus', 'JasaVendor\ProsesRebus::dropdow
 $routes->get('/proses-rebus/list-stock-dokumen-bc', 'JasaVendor\JasaVendorOut::getListStockByStockID', ['filter' => 'Auth']);
 $routes->get('/proses-rebus/all',  'JasaVendor\ProsesRebus::all', ['filter' => 'Auth']);
 $routes->get('/proses-rebus/id/(:segment)',  'JasaVendor\ProsesRebus::detail/$1', ['filter' => 'Auth']);
-$routes->post('/proses-rebus/save',  'JasaVendor\ProsesRebus::createAction', ['filter' => 'Auth']);
-$routes->post('/proses-rebus/update',  'JasaVendor\ProsesRebus::updateAction', ['filter' => 'Auth']);
+$routes->post('/proses-rebus/save',  'JasaVendor\ProsesRebus::createActionNew', ['filter' => 'Auth']);
+$routes->post('/proses-rebus/update',  'JasaVendor\ProsesRebus::updateActionNew', ['filter' => 'Auth']);
 $routes->post('/proses-rebus/delete',  'JasaVendor\ProsesRebus::delete', ['filter' => 'Auth']);
 $routes->post('/proses-rebus/posting',  'JasaVendor\ProsesRebus::posting', ['filter' => 'Auth']);
 $routes->get('/proses-rebus/get-no',  'JasaVendor\ProsesRebus::getProsesRebusNo', ['filter' => 'Auth']);
