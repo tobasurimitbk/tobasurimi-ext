@@ -533,34 +533,30 @@ class StockDetail2Model extends Model
     }
 
 
-
     public function getStockListWithAddConditionNew($stockID, $spesifikasiId, $condition)
     {
-        // Siapkan potongan filter untuk subquery
         $spesifikasiFilter = '';
         if (!empty($spesifikasiId)) {
             $spesifikasiFilter = 'WHERE penerimaan_barang_detail.spesifikasi_id = ' . (int) $spesifikasiId;
         }
 
+        $select = "
+            MIN(suppliers.name) AS supplier_name,
+            MIN(stock_details2.id) AS id,
+            stock_details2.bc_id,
+            stock_details2.no_aju,
+            MIN(stock_details2.stock_id) AS stock_id,
+            stock_details2.stock_dokumen,
+            MIN(stock_details2.supplier_id) AS supplier_id,
+            MIN(stock_details.stock_date) AS stock_date,
+            MIN(stock_details.sumber) AS sumber,
+            SUM(CASE WHEN stock_details.status = 'In' THEN stock_details2.qty ELSE 0 END)
+            - SUM(CASE WHEN stock_details.status = 'Out' THEN stock_details2.qty ELSE 0 END) AS stok_total,
+            COALESCE(total_penerimaan_subquery.total_penerimaan, 0) AS total_penerimaan
+        ";
+
         return $this->asArray()
-            ->select('
-                suppliers.name AS supplier_name,
-                stock_details2.id,
-                stock_details2.bc_id,
-                stock_details2.no_aju,
-                stock_details2.stock_id,
-                stock_details2.stock_dokumen,
-                stock_details2.supplier_id,
-                stock_details.stock_date,
-                stock_details.sumber,
-
-                SUM(CASE WHEN stock_details.status = "In" THEN stock_details2.qty ELSE 0 END) 
-                - 
-                SUM(CASE WHEN stock_details.status = "Out" THEN stock_details2.qty ELSE 0 END) 
-                AS stok_total,
-
-                COALESCE(total_penerimaan_subquery.total_penerimaan, 0) AS total_penerimaan
-            ')
+            ->select($select, false) // <-- penting: jangan di-escape
             ->join('stock_details', 'stock_details.id = stock_details2.stock_detail_id')
             ->join('suppliers', 'suppliers.id = stock_details2.supplier_id', 'left')
             ->join('(
@@ -577,22 +573,11 @@ class StockDetail2Model extends Model
             'left')
             ->where('stock_details2.stock_id', $stockID)
             ->where($condition)
-            ->groupBy('
-                stock_details2.stock_dokumen, 
-                stock_details2.bc_id, 
-                stock_details2.no_aju, 
-                suppliers.name, 
-                stock_details2.id, 
-                stock_details2.stock_id, 
-                stock_details2.supplier_id, 
-                stock_details.stock_date, 
-                stock_details.sumber
-            ')
+            ->groupBy('stock_details2.stock_dokumen, stock_details2.bc_id, stock_details2.no_aju')
             ->having('stok_total >', 0)
-            ->orderBy('stock_details.createdAt', 'ASC')
+            ->orderBy('MIN(stock_details.createdAt)', 'ASC', false) // jangan di-escape
             ->findAll();
     }
-
 
 
     public function getStockListJasaVendorOut($condition)
@@ -629,9 +614,64 @@ class StockDetail2Model extends Model
                 $builder->where($field, $value);
             }
         }
-
+        
         return $builder
             ->groupBy('stock_details2.id, stock_details2.stock_dokumen, stock_details2.bc_id, stock_details2.no_aju')
+            ->having('stok_total >', 0)
+            ->orderBy('stock_details.createdAt', 'ASC')
+            ->findAll();
+    }
+
+
+    public function getStockListJasaVendorOutNew($condition)
+    {
+        $builder = $this->asArray()
+            ->select('
+                stock_details2.id AS id,
+                suppliers.name AS supplier_name,
+                stock_details2.stock_id,
+                stock_details2.stock_dokumen,
+                stock_details2.bc_id,
+                stock_details2.no_aju,
+                stock_details2.supplier_id,
+                stock_details.stock_date,
+                stock_details.sumber,
+                barang_master.barang_name,
+                barang_master_spesifikasi.spesifikasi,
+                satuans.kode_satuan,
+                SUM(CASE WHEN stock_details.status = "In" THEN stock_details2.qty ELSE 0 END)
+                - SUM(CASE WHEN stock_details.status = "Out" THEN stock_details2.qty ELSE 0 END) AS stok_total
+            ')
+            ->join('stock_details', 'stock_details.id = stock_details2.stock_detail_id')
+            ->join('suppliers', 'suppliers.id = stock_details2.supplier_id', 'left')
+            ->join('stock', 'stock.id = stock_details2.stock_id', 'left')
+            ->join('barang_master', 'barang_master.id = stock.barang1_id', 'left')
+            ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = stock.barang2_id', 'left')
+            ->join('satuans', 'satuans.id = barang_master_spesifikasi.satuan_1', 'left');
+
+        // Kondisi dinamis
+        foreach ($condition as $field => $value) {
+            if (is_array($value)) {
+                $builder->whereIn($field, $value);
+            } else {
+                $builder->where($field, $value);
+            }
+        }
+
+        return $builder
+            ->groupBy('
+                stock_details2.stock_id,
+                stock_details2.stock_dokumen,
+                stock_details2.bc_id,
+                stock_details2.no_aju,
+                stock_details2.supplier_id,
+                suppliers.name,
+                stock_details.stock_date,
+                stock_details.sumber,
+                barang_master.barang_name,
+                barang_master_spesifikasi.spesifikasi,
+                satuans.kode_satuan
+            ')
             ->having('stok_total >', 0)
             ->orderBy('stock_details.createdAt', 'ASC')
             ->findAll();
@@ -715,7 +755,6 @@ class StockDetail2Model extends Model
 
         return $dataQry;
     }
-
 
     public function getStockListMaterialRequestFromLpb($condition)
     {

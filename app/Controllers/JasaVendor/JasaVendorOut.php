@@ -572,6 +572,7 @@ class JasaVendorOut extends BaseController
                 $condition
             );
 
+
             $stock = $this->stockModel->find($this->request->getVar('stock_id'));
             if ($stock['kemasan_id'] == 0) {
                 $barangMaster = $this->barangMasterModel->find($stock['barang1_id']);
@@ -670,7 +671,9 @@ class JasaVendorOut extends BaseController
                     'stock_details2.supplier_id' => $supplierId,
                     'stock.barang1_id' => $barangMasterId,
                 ];
-                $dataResult = $this->stockDetail2Model->getStockListJasaVendorOut($condition);
+                $dataResult = $this->stockDetail2Model->getStockListJasaVendorOutNew($condition);
+                // var_dump($dataResult);
+                // die;
                 
                 $resultArr = [];
                 foreach ($dataResult as $item) {

@@ -259,8 +259,8 @@
 
 
                                     <th style="text-align: center;">Barang - Spesifikasi</th>
-                                    <th style="text-align: center;">Sisa Qty PO</th>
-                                    <th style="text-align: center;">Sisa Qty LPB</th>
+                                    <th style="text-align: center;">Qty PO</th>
+                                    <th style="text-align: center;">Qty LPB</th>
                                     <th style="text-align: center;">Sisa Qty</th>
                                     <th style="text-align: center; min-width: 100px;">Qty Rebus</th>
                                     <th style="text-align: center;">Satuan Rebus</th>
