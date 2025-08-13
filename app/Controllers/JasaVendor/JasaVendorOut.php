@@ -215,7 +215,7 @@ class JasaVendorOut extends BaseController
         foreach ($barang as $b) {
 
             // CEK STOK DARI PROSES REBUS
-            $stockId = decrypt($b->id);
+            $stockId = $b->id;
             $stockIdArr = json_decode($stockId);
 
             if (is_array($stockIdArr)) {
@@ -255,16 +255,22 @@ class JasaVendorOut extends BaseController
                     $b->no_aju,
                     $b->stock_dokumen
                 );
-                $stockRebus = $this->prosesRebusModel->where('no_rebus', $stockDetail['no_dokumen_1'])->first();
-                $this->jasaVendorOutDetailModel->insert([
-                    'proses_rebus_id' => $stockRebus == null ? null : $stockRebus['id'],
-                    'jasa_vendor_out_id' => $id,
-                    'stock_out_id' => $stockId,
-                    'bc_out_id' => $b->bc_id,
-                    'no_aju_out' => $b->no_aju,
-                    'stock_dokumen' => $b->stock_dokumen,
-                    'qty' => $b->qty
-                ]);
+
+                if ($stockDetail) {
+                    $stockRebus = $this->prosesRebusModel
+                        ->where('no_rebus', $stockDetail['no_dokumen_1'])
+                        ->first();
+
+                    $this->jasaVendorOutDetailModel->insert([
+                        'proses_rebus_id' => $stockRebus == null ? null : $stockRebus['id'],
+                        'jasa_vendor_out_id' => $id,
+                        'stock_out_id' => $stockId,
+                        'bc_out_id' => $b->bc_id,
+                        'no_aju_out' => $b->no_aju,
+                        'stock_dokumen' => $b->stock_dokumen,
+                        'qty' => $b->qty
+                    ]);
+                }
             }
         }
 
@@ -685,6 +691,8 @@ class JasaVendorOut extends BaseController
                     $resultArr[] = [
                         'id' => $item['id'],
                         'sumber' => $item['sumber'],
+                        'bc_id' => $item['bc_id'],
+                        'no_aju' => $item['no_aju'],
                         'supplier_name' => $item['supplier_name'],
                         'bc_type' => $bcType ? $bcType['value'] : 'NON PABEAN',
                         'stock_dokumen' => $item['stock_dokumen'] ?? '-',

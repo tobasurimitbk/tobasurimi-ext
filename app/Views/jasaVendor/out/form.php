@@ -1017,6 +1017,7 @@
                         return item.id === v.id && 
                             item.stock_dokumen === v.stock_dokumen && 
                             item.bc_id === v.bc_id;
+                            item.no_aju === v.no_aju;
                     });
 
                     if (!existingItem) {

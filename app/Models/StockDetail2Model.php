@@ -494,7 +494,7 @@ class StockDetail2Model extends Model
             ->join('suppliers', 'suppliers.id = stock_details2.supplier_id', 'left')
             ->join('barang_master', 'barang_master.id = stock.barang1_id', 'left')
             ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = stock.barang2_id', 'left')
-            ->where('stock_details2.stock_id', $stockID)
+            ->where('stock_details2.id', $stockID)
             ->where('stock_details2.bc_id', $bcID)
             ->where('stock_details2.no_aju', $noAju)
             ->where('stock_details2.stock_dokumen', $stockDokumen)
