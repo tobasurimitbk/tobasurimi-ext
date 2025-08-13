@@ -399,8 +399,6 @@ class SalesOrderExportModel extends Model
             sales_contract.can_deduction,
             sales_contract.estimated_freight,
             sales_contract.others,
-
-
             metadata.value as mata_uang,
             companies.holding_company,
             companies.company

@@ -775,6 +775,20 @@ $routes->get('order-form-lain/list-customer', 'PenjualanLain\SalesOrderLain::dro
 $routes->get('order-form-lain/hitung-konversi', 'PenjualanLain\SalesOrderLain::hitungKonversi', ['filter' => 'Auth']);
 $routes->get('order-form-lain/get-no', 'PenjualanLain\SalesOrderLain::getSalesOrderLainNo', ['filter' => 'Auth']);
 
+// BIAYA EXIM
+// VENDOR PELAYARAN
+$routes->get('/vendor-pelayaran', 'BiayaExim\Vendor\VendorPelayaran::index', ['filter' => 'Auth']);
+$routes->get('/vendor-pelayaran/all', 'BiayaExim\Vendor\VendorPelayaran::all', ['filter' => 'Auth']);
+$routes->post('/vendor-pelayaran/create', 'BiayaExim\Vendor\VendorPelayaran::store', ['filter' => 'Auth']);
+$routes->post('/vendor-pelayaran/update', 'BiayaExim\Vendor\VendorPelayaran::update', ['filter' => 'Auth']);
+$routes->post('/vendor-pelayaran/delete', 'BiayaExim\Vendor\VendorPelayaran::destroy', ['filter' => 'Auth']);
+$routes->get('/vendor-pelayaran/get', 'BiayaExim\Vendor\VendorPelayaran::get', ['filter' => 'Auth']);
+
+// BIAYA ESKPOR
+$routes->get('/biaya-eskpor', 'BiayaExim\BiayaEskpor\BiayaEskpor::index', ['filter' => 'Auth']);
+$routes->get('/biaya-eskpor/create', 'BiayaExim\BiayaEskpor\BiayaEskpor::create', ['filter' => 'Auth']);
+$routes->get('/biaya-eskpor/get-order-form', 'BiayaExim\BiayaEskpor\BiayaEskpor::getDetailOrderForm', ['filter' => 'Auth']);
+
 // PRODUKSI
 // Production Result
 $routes->get('/production-result', 'Production\ProductionResult::index', ['filter' => 'Auth']);
