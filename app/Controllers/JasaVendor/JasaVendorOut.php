@@ -385,14 +385,22 @@ class JasaVendorOut extends BaseController
         $jasaVendorOut = $this->jasaVendorOutModel->find($id);
         $jasaVendorOutDetail = $this->jasaVendorOutDetailModel->where('jasa_vendor_out_id', $id)->where('deletedAt', null)->findAll();
 
+
+        // // var_dump($jasaVendorOut);
+        // var_dump($jasaVendorOutDetail);
+        // die;
+
         foreach ($jasaVendorOutDetail as $j) {
-            $stock = $this->stockModel->find($j['stock_out_id']);
+            $stockDetail2 = $this->stockDetail2Model->find($j['stock_out_id']);
+            $stock = $this->stockModel->find($stockDetail2['stock_id']);
             $qty = $j['qty'];
 
-            if ($stock['tipe_barang'] == "kemasan") {
-                $barang2_id = $stock['kemasan_id'];
-            } else {
-                $barang2_id = $stock['barang2_id'];
+            if ($stock) {
+                if ($stock['tipe_barang'] == "kemasan") {
+                    $barang2_id = $stock['kemasan_id'];
+                } else {
+                    $barang2_id = $stock['barang2_id'];
+                }
             }
 
             // BARANG LAMA

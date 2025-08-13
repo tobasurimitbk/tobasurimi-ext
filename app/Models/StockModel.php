@@ -1313,7 +1313,8 @@ class StockModel extends Model
 
 
             foreach ($jasaVendorOutDetail as $j) {
-                $stock = $stockModel->find($j['stock_out_id']);
+                $stockDetail = $stockDetail2Model->find($j['stock_out_id']);
+                $stock = $stockModel->find($stockDetail['stock_id']);
 
                 $qty = $j['qty'];
 
