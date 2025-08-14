@@ -84,9 +84,9 @@
                         <thead class="thead-dark">
                             <tr>
                                 <th>No.</th>
-                                <th class="sort">Nama Tax</th>
-                                <th class="sort">Type Tax</th>
-                                <th class="sort">Nilai Tax</th>
+                                <th class="sort" onclick="changeSort('tax_name')">Nama Tax</th>
+                                <th class="sort" onclick="changeSort('tax_type')">Type Tax</th>
+                                <th class="sort" onclick="changeSort('tax_value')">Nilai Tax</th>
                                 <th class="sort">Akun Kredit</th>
                                 <th class="sort">Akun Debit</th>
                             </tr>
