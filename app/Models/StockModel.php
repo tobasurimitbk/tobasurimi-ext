@@ -666,6 +666,7 @@ class StockModel extends Model
         stock.barang2_id AS spesifikasi_id,
         CONCAT(UPPER(barang_master.barang_name), '-', UPPER(barang_master_spesifikasi.spesifikasi)) AS barang,
         barang_master.kode_barang,
+        barang_master.id,
         satuans.kode_satuan
     ";
 

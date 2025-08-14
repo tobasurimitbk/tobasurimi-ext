@@ -672,9 +672,11 @@ class JasaVendorOut extends BaseController
 
     public function getListStockJasaVendorOut()
     {
+
         $barangMasterId = $this->request->getVar('barang_master_id');
         $supplierId = $this->request->getVar('supplier_id');
         $vendorId = $this->request->getVar('vendor_id');
+        $stockId = $this->request->getVar('stock_id');
 
         // if ((!empty($this->request->getVar('stock_id')) || !empty($barangMasterId)) && 
         //     (!empty($supplierId) || !empty($vendorId))) {
@@ -712,12 +714,16 @@ class JasaVendorOut extends BaseController
                 }
             } else {
                 // Untuk Dari Jasa Vendor
-                $condition = ['stock_details.sumber' => "JASA VENDOR"];
+                $condition = [
+                    'stock_details.sumber' => "JASA VENDOR",
+                    // 'stock.barang1_id' => $barangMasterId,
+                ];
+
                 $dataResult = $this->stockDetail2Model->getStockListWithAddCondition(
-                    $this->request->getVar('stock_id'), 
+                    $stockId, 
                     $condition
                 );
-                
+
                 $resultArr = [];
                 foreach ($dataResult as $item) {
                     if (floatval($item['stok_total']) <= 0) continue;
@@ -725,17 +731,22 @@ class JasaVendorOut extends BaseController
                     $stock = $this->stockModel->find($item['stock_id']);
                     $bcType = $this->metaDataModel->find($item['bc_id']);
                     $noJasaVendorIn = trim(strstr($item['stock_dokumen'], '(', true));
-                    
-                    $jasaVendorIn = $this->jasaVendorInModel
-                        ->select('jasa_vendor_in.*,vendors.name as nama_vendor')
+                   
+                    $jasaVendorInQuery = $this->jasaVendorInModel
+                        ->select('jasa_vendor_in.*, vendors.name as nama_vendor')
                         ->join('vendors', 'vendors.id = jasa_vendor_in.vendor_id', 'left')
-                        ->where('no_penerimaan_surat_jalan', $noJasaVendorIn)
-                        ->where('jasa_vendor_in.company_id', $this->this_company_id)
-                        ->where('vendor_id', $vendorId)
-                        ->first();
-                    
+                        ->where('jasa_vendor_in.no_penerimaan_surat_jalan', $noJasaVendorIn)
+                        ->where('jasa_vendor_in.company_id', $this->this_company_id);
+
+                    // Tambahin filter vendor_id cuma kalau ada nilai
+                    if (!empty($vendorId)) {
+                        $jasaVendorInQuery->where('vendor_id', $vendorId);
+                    }
+
+                    $jasaVendorIn = $jasaVendorInQuery->first();
+
                     if (!$jasaVendorIn) continue;
-                    
+
                     $resultArr[] = [
                         'id' => $item['id'],
                         'sumber' => $item['sumber'],
@@ -743,8 +754,8 @@ class JasaVendorOut extends BaseController
                         'bc_type' => $bcType ? $bcType['value'] : 'NON PABEAN',
                         'stock_dokumen' => $item['stock_dokumen'] ?? '-',
                         'stock_date' => date('d/m/Y', strtotime($jasaVendorIn['tanggal'])),
-                        'barang' => $this->getBarangName($stock),
-                        'satuan' => $this->getSatuan($stock),
+                        'barang' => $item['barang'],
+                        'satuan' => $item['kode_satuan'],
                         'stok_total' => floatval($item['stok_total'])
                     ];
                 }

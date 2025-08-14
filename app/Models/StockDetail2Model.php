@@ -494,7 +494,7 @@ class StockDetail2Model extends Model
             ->join('suppliers', 'suppliers.id = stock_details2.supplier_id', 'left')
             ->join('barang_master', 'barang_master.id = stock.barang1_id', 'left')
             ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = stock.barang2_id', 'left')
-            ->where('stock_details2.id', $stockID)
+            ->where('stock_details2.stock_id', $stockID)
             ->where('stock_details2.bc_id', $bcID)
             ->where('stock_details2.no_aju', $noAju)
             ->where('stock_details2.stock_dokumen', $stockDokumen)
@@ -510,6 +510,7 @@ class StockDetail2Model extends Model
     {
         return $this->asArray()
             ->select('
+                CONCAT(barang_master.barang_name, " ", barang_master_spesifikasi.spesifikasi) AS barang,
                 suppliers.name AS supplier_name,
                 stock_details2.id,
                 stock_details2.bc_id,
@@ -519,12 +520,16 @@ class StockDetail2Model extends Model
                 stock_details2.supplier_id,
                 stock_details.stock_date,
                 stock_details.sumber,
+                satuans.kode_satuan,
                 SUM(CASE WHEN stock_details.status = "In" THEN stock_details2.qty ELSE 0 END) - 
                 SUM(CASE WHEN stock_details.status = "Out" THEN stock_details2.qty ELSE 0 END) AS stok_total
             ')
             ->join('stock_details', 'stock_details.id = stock_details2.stock_detail_id')
             ->join('suppliers', 'suppliers.id = stock_details2.supplier_id', 'left')
-            ->where('stock_details2.stock_id', $stockID)
+            ->join('stock', 'stock.id = stock_details2.stock_id', 'left') ->join('barang_master', 'barang_master.id = stock.barang1_id', 'left')
+            ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = stock.barang2_id', 'left')
+            ->join('satuans', 'satuans.id = barang_master_spesifikasi.satuan_1', 'left')
+            ->where('stock.id', $stockID)
             ->where($condition)
             ->groupBy('stock_details2.stock_dokumen, stock_details2.bc_id, stock_details2.no_aju')
             ->having('stok_total >', 0)

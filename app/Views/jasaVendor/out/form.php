@@ -641,35 +641,31 @@
         }
     });
 
+   // Ubah fungsi insertListPabean menjadi:
     function insertListPabean() {
         var checkedCheckboxes = $(".child:checked");
         var dataIds = checkedCheckboxes.map(function() {
-            return $(this).data("id");
+            return Number($(this).data("id")); // Konversi ke number
         }).get();
+        
         var id_selected = getIDListDataSelected();
-
-        console.log("Yang Di Checklist", dataIds);
-        console.log("Yang sudah masuk tabel bawah", id_selected);
+        
         $.each(listStockAsal, function(i, v) {
-            var currentID = v.id;
-            console.log("stok asal", currentID);
+            var currentID = Number(v.id); // Konversi ke number
             if ($.inArray(currentID, dataIds) !== -1) {
                 var isIDSelected = $.grep(listStockSelected, function(item) {
-                    return item.id == currentID;
+                    return Number(item.id) == currentID; // Konversi ke number
                 }).length > 0;
-                console.log("Selecteddddd", isIDSelected);
+                
                 if (!isIDSelected) {
                     listStockAsal[i].stok_total = parseFloat(listStockAsal[i].stok_total);
-                    listStockAsal[i].qty = 0;
+                    listStockAsal[i].qty = 1; // Ganti dari 0 ke 1 atau nilai default lain
                     listStockSelected.push(listStockAsal[i]);
                 }
             }
         });
+        console.log(listStockSelected);
         drawTableSelectedItem(listStockSelected);
-        // reset barang kirim ke vendor dan list bc nya
-        $('#spesifikasi_id').val(null).change();
-        $('#supplier_id').val(null).change();
-        drawTableAsalBarang([]);
     }
 
     function insertListFifo() {
@@ -1135,10 +1131,11 @@
         });
         
         dataTable.draw(false);
-        $('#dataTable tfoot th:last').text(totalQty);
+        $('#dataTable tfoot th:last').text(totalQty.toFixed(2)); // 2 angka di belakang koma
     }
 
     function drawTableSelectedItem(data) {
+        console.log(data)
         var typePengambilanStok = $('#type_pengambilan_stock option:selected').val();
         const table = $('#selectedItemTable');
         var no = 1;
