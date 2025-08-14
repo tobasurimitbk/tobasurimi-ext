@@ -788,6 +788,14 @@ $routes->get('/vendor-pelayaran/get', 'BiayaExim\Vendor\VendorPelayaran::get', [
 $routes->get('/biaya-eskpor', 'BiayaExim\BiayaEskpor\BiayaEskpor::index', ['filter' => 'Auth']);
 $routes->get('/biaya-eskpor/create', 'BiayaExim\BiayaEskpor\BiayaEskpor::create', ['filter' => 'Auth']);
 $routes->get('/biaya-eskpor/get-order-form', 'BiayaExim\BiayaEskpor\BiayaEskpor::getDetailOrderForm', ['filter' => 'Auth']);
+$routes->post('/biaya-eskpor/create', 'BiayaExim\BiayaEskpor\BiayaEskpor::store', ['filter' => 'Auth']);
+$routes->post('/biaya-eskpor/update', 'BiayaExim\BiayaEskpor\BiayaEskpor::update', ['filter' => 'Auth']);
+$routes->post('/biaya-eskpor/delete', 'BiayaExim\BiayaEskpor\BiayaEskpor::destroy', ['filter' => 'Auth']);
+$routes->post('/biaya-eskpor/posting', 'BiayaExim\BiayaEskpor\BiayaEskpor::posting', ['filter' => 'Auth']);
+$routes->post('/biaya-eskpor/unposting', 'BiayaExim\BiayaEskpor\BiayaEskpor::unposting', ['filter' => 'Auth']);
+$routes->get('/biaya-eskpor/all', 'BiayaExim\BiayaEskpor\BiayaEskpor::all', ['filter' => 'Auth']);
+$routes->get('/biaya-eskpor/id/(:segment)', 'BiayaExim\BiayaEskpor\BiayaEskpor::edit/$1', ['filter' => 'Auth']);
+$routes->get('/biaya-eskpor/print/(:segment)', 'BiayaExim\BiayaEskpor\BiayaEskpor::print/$1', ['filter' => 'Auth']);
 
 // PRODUKSI
 // Production Result

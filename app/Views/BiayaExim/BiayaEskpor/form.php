@@ -10,27 +10,28 @@
                 Kembali
             </a>
             <?php if (!empty($dataBiayaEskpor)) { ?>
-                <?php if (can('Penjualan Ekspor', 'Order Form', 'p')): ?>
-                    <button class="btn btn-warning btn-print float-right" onclick="print('<?= encrypt($dataBiayaEskpor->sales_order_export_id) ?>')">
+                <?php if (can('Biaya Exim', 'Biaya Ekspor', 'p')): ?>
+                    <button class="btn btn-warning btn-print float-right" onclick="print('<?= encrypt($dataBiayaEskpor['id']) ?>')">
                         Print
                     </button>
                 <?php endif; ?>
-                <?php if ($dataBiayaEskpor->status === "NEW") { ?>
-                    <?php if (can('Penjualan Ekspor', 'Order Form', 'a')): ?>
-                        <button class="btn btn-success posting-spp posting-so float-right">
-                            Posting
+                <?php if ($dataBiayaEskpor['status_posting'] == 0) { ?>
+                    <?php if (can('Biaya Exim', 'Biaya Ekspor', 'a')): ?>
+                        <button class="btn btn-success posting-spp posting-so float-right" onclick="posting()">
+                            Posting Audit
                         </button>
                     <?php endif; ?>
-                    <?php if (can('Penjualan Ekspor', 'Order Form', 'u')): ?>
+                    <?php if (can('Biaya Exim', 'Biaya Ekspor', 'u')): ?>
                         <button class="btn btn-show-form btn-save float-right btn-submit-parent">
-                            Simpan
+                            Update
                         </button>
                     <?php endif; ?>
                 <?php } ?>
-                <?php if ($dataBiayaEskpor->status === "POSTED") { ?>
-                    <?php if (can('Penjualan Ekspor', 'Order Form', 'ua')): ?>
-                        <button class="btn btn-success posting-spp unposting-so float-right">
-                            Unposting
+
+                <?php if ($dataBiayaEskpor['status_posting'] == 1) { ?>
+                    <?php if (can('Biaya Exim', 'Biaya Ekspor', 'ua')): ?>
+                        <button class="btn btn-success posting-spp unposting-so float-right" onclick="unposting()">
+                            Unposting Audit
                         </button>
                     <?php endif; ?>
                 <?php } ?>
@@ -50,14 +51,14 @@
                         <label class="form-label font-weight-bold lable-title">Data Header</label>
                     </div>
                 </div>
-                <input autocomplete="one-time-code" value="<?= $id ?? "" ?>" type="hidden" class="id" name="id" id="id" />
+                <input autocomplete="one-time-code" value="<?= !empty($dataBiayaEskpor) ? encrypt($dataBiayaEskpor['id']) : '' ?>" type="hidden" class="id" name="id" id="id" />
                 <?= csrf_field() ?>
                 <div class="row">
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <div class="input-group input-group-password">
                                 <div class="form-floating mb-3" style="height: 50px;">
-                                    <input autocomplete="one-time-code" type="text" value="<?= !empty($dataBiayaEskpor) ? $dataBiayaEskpor->sales_order_export_no : 'AUTO GENERATE' ?>" <?= !empty($dataBiayaEskpor) ? ($dataBiayaEskpor->status == "POSTED" ? 'readonly' : '') : 'readonly' ?> class="form-control no_invoice" id="no_invoice" name="no_invoice" placeholder="No Invoice" required>
+                                    <input autocomplete="one-time-code" type="text" value="<?= !empty($dataBiayaEskpor) ? $dataBiayaEskpor['no_invoice'] : 'AUTO GENERATE' ?>" <?= !empty($dataBiayaEskpor) ? ($dataBiayaEskpor['status_posting'] == 1 ? 'readonly' : '') : 'readonly' ?> class="form-control no_invoice" id="no_invoice" name="no_invoice" placeholder="No Invoice" required>
                                     <label for="floatingInput">No Invoice</label>
                                 </div>
                                 <div style="<?= !empty($dataBiayaEskpor) ? "display: none" : ""; ?>" class="input-generate input-group-prepend group-prepend-password align-items-center">
@@ -70,7 +71,7 @@
                         <div class="form-floating mb-3" style="height: 50px;">
                             <div class="input-group input-group-password">
                                 <div class="form-floating mb-3" style="height: 50px;">
-                                    <input autocomplete="one-time-code" class="form-control input-picker tanggal_invoice" id="tanggal_invoice" name="tanggal_invoice" placeholder="Tanggal Invoice" value="<?= !empty($dataBiayaEskpor) ? date('d/m/Y', strtotime($dataBiayaEskpor->tanggal)) : date('d/m/Y')  ?>">
+                                    <input <?= !empty($dataBiayaEskpor) ? ($dataBiayaEskpor['status_posting'] == 1 ? 'readonly' : '') : '' ?> autocomplete="one-time-code" class="form-control input-picker tanggal_invoice" id="tanggal_invoice" name="tanggal_invoice" placeholder="Tanggal Invoice" value="<?= !empty($dataBiayaEskpor) ? date('d/m/Y', strtotime($dataBiayaEskpor['tanggal_invoice'])) : date('d/m/Y')  ?>">
                                     <label for="floatingInput">Tanggal Invoice</label>
                                 </div>
                                 <div class="input-group-prepend group-prepend-password align-items-center">
@@ -81,10 +82,10 @@
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <select class="form-select divisi_id" name="divisi_id" id="divisi_id">
+                            <select <?= !empty($dataBiayaEskpor) ? ($dataBiayaEskpor['status_posting'] == 1 ? 'disabled' : '') : '' ?> class="form-select divisi_id" name="divisi_id" id="divisi_id">
                                 <option value=""></option>
                                 <?php foreach ($dataDivisi as $d): ?>
-                                    <option value=<?= $d['id'] ?>""><?= $d['divisi'] ?></option>
+                                    <option <?= !empty($dataBiayaEskpor) ? ($dataBiayaEskpor['divisi_id'] == $d['id'] ? 'selected' : '') : '' ?> value="<?= $d['id'] ?>"><?= $d['divisi'] ?></option>
                                 <?php endforeach; ?>
                             </select>
                             <label for="floatingInput">Departemen</label>
@@ -92,10 +93,10 @@
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <select class="form-select sales_order_export_id" name="sales_order_export_id" id="sales_order_export_id">
+                            <select <?= !empty($dataBiayaEskpor) ? ($dataBiayaEskpor['status_posting'] == 1 ? 'disabled' : '') : '' ?> class="form-select sales_order_export_id" name="sales_order_export_id" id="sales_order_export_id">
                                 <option value=""></option>
                                 <?php foreach ($dataSalesOrderExport as $d): ?>
-                                    <option value="<?= $d['sales_order_export_id'] ?>"><?= $d['sales_order_export_no'] ?></option>
+                                    <option <?= !empty($dataBiayaEskpor) ? ($dataBiayaEskpor['sales_order_export_id'] == $d['sales_order_export_id'] ? 'selected' : '') : '' ?> value="<?= $d['sales_order_export_id'] ?>"><?= $d['sales_order_export_no'] ?></option>
                                 <?php endforeach; ?>
                             </select>
                             <label for="floatingInput">Pilih Sales Order Ekspor</label>
@@ -103,29 +104,33 @@
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3">
-                            <input readonly autocomplete="one-time-code" value="" type="text" class="form-control payment_term" id="payment_term" name="payment_term" placeholder="Payment Term (Optional)">
+                            <input disabled autocomplete="one-time-code" value="<?= !empty($dataBiayaEskpor) ? $dataBiayaEskpor['payment_term'] : '' ?>" type="text" class="form-control payment_term" id="payment_term" name="payment_term" placeholder="Payment Term (Optional)">
                             <label for="floatingInput">Payment Term</label>
                         </div>
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3">
-                            <input readonly autocomplete="one-time-code" type="text" class="form-control destination" id="destination" name="destination" placeholder="Destination" value="<?= !empty($dataBiayaEskpor) ? $dataBiayaEskpor->deadline : '' ?>">
+                            <input disabled autocomplete="one-time-code" type="text" value="<?= !empty($dataBiayaEskpor) ? $dataBiayaEskpor['customer_name'] : '' ?>" class="form-control customer_name" id="customer_name" name="customer_name" placeholder="Customer">
+                            <label for="floatingInput">Customer</label>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-floating mb-3">
+                            <input disabled autocomplete="one-time-code" value="<?= !empty($dataBiayaEskpor) ? $dataBiayaEskpor['dicharge_port'] : '' ?>" type="text" class="form-control destination" id="destination" name="destination" placeholder="Destination">
                             <label for="floatingInput">Destination</label>
                         </div>
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3">
-                            <input readonly autocomplete="one-time-code" type="text" class="form-control no_container_order_form" id="no_container_order_form" name="no_container_order_form" placeholder="No Container" value="<?= !empty($dataBiayaEskpor) ? $dataBiayaEskpor->deadline : '' ?>">
-                            <label for="floatingInput">No Container</label>
+                            <input disabled autocomplete="one-time-code" type="text" value="<?= !empty($dataBiayaEskpor) ? $dataBiayaEskpor['container_orderform'] : '' ?>" class="form-control no_container_order_form" id="no_container_order_form" name="no_container_order_form" placeholder="No Container">
+                            <label for="floatingInput">No Container Order Form</label>
                         </div>
                     </div>
                 </div>
 
-
-
                 <div class="row">
                     <div class="col mb-3">
-                        <label class="form-label font-weight-bold lable-title">List Barang Eskpor</label>
+                        <label class="form-label font-weight-bold lable-title">List Barang yang di Eskpor</label>
                     </div>
                 </div>
 
@@ -139,7 +144,7 @@
                                     <th>Barang</th>
                                     <th style="text-align: right;">Qty Order Form</th>
                                     <th style="text-align: right;">Harga Satuan</th>
-                                    <th style="text-align: right;">Total Harga <span id="txt_valas" class="mr-1"></span> <span id="txt_tipe_harga"></span></th>
+                                    <th style="text-align: right;">Total Harga <span id="txt_valas" class="mr-0"></span> <span id="txt_tipe_harga"></span></th>
                                 </tr>
                             </thead>
                             <tbody id="body-detail-table-barang">
@@ -156,26 +161,26 @@
 
                 <div class="row">
                     <div class="col mb-3">
-                        <label class="form-label font-weight-bold lable-title">Detail Biaya</label>
+                        <label class="form-label font-weight-bold lable-title">Detail Biaya & Pengenaan Pajak Ekspor</label>
                     </div>
                 </div>
 
                 <div class="row">
                     <div class="col-md-4">
                         <div class="form-floating mb-3">
-                            <input autocomplete="one-time-code" type="text" class="form-control no_container" id="no_container" name="no_container" placeholder="No Container" value="<?= !empty($dataBiayaEskpor) ? $dataBiayaEskpor->deadline : '' ?>">
+                            <input <?= !empty($dataBiayaEskpor) ? ($dataBiayaEskpor['status_posting'] == 1 ? 'readonly' : '') : '' ?> autocomplete="one-time-code" type="text" class="form-control no_container" id="no_container" name="no_container" placeholder="No Container" value="<?= !empty($dataBiayaEskpor) ? $dataBiayaEskpor['no_container'] : '' ?>">
                             <label for="floatingInput">No Container</label>
                         </div>
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3">
-                            <input autocomplete="one-time-code" type="text" class="form-control no_seal" id="no_seal" name="no_seal" placeholder="No Seal" value="<?= !empty($dataBiayaEskpor) ? $dataBiayaEskpor->deadline : '' ?>">
+                            <input <?= !empty($dataBiayaEskpor) ? ($dataBiayaEskpor['status_posting'] == 1 ? 'readonly' : '') : '' ?> autocomplete="one-time-code" type="text" class="form-control no_seal" id="no_seal" name="no_seal" placeholder="No Seal" value="<?= !empty($dataBiayaEskpor) ? $dataBiayaEskpor['no_seal']  : '' ?>">
                             <label for="floatingInput">No Seal</label>
                         </div>
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3">
-                            <input autocomplete="one-time-code" type="text" class="form-control nama_kapal" id="nama_kapal" name="nama_kapal" placeholder="Nama Kapal" value="<?= !empty($dataBiayaEskpor) ? $dataBiayaEskpor->deadline : '' ?>">
+                            <input <?= !empty($dataBiayaEskpor) ? ($dataBiayaEskpor['status_posting'] == 1 ? 'readonly' : '') : '' ?> autocomplete="one-time-code" type="text" class="form-control nama_kapal" id="nama_kapal" name="nama_kapal" placeholder="Nama Kapal" value="<?= !empty($dataBiayaEskpor) ? $dataBiayaEskpor['nama_kapal']  : '' ?>">
                             <label for="floatingInput">Nama Kapal</label>
                         </div>
                     </div>
@@ -183,7 +188,7 @@
                         <div class="form-floating mb-3" style="height: 50px;">
                             <div class="input-group input-group-password">
                                 <div class="form-floating mb-3" style="height: 50px;">
-                                    <input autocomplete="one-time-code" class="form-control input-picker keberangkatan_kapal" id="keberangkatan_kapal" name="keberangkatan_kapal" placeholder="Keberangkatan Kapal" value="<?= !empty($dataBiayaEskpor) ? date('d/m/Y', strtotime($dataBiayaEskpor->tanggal)) : ''  ?>">
+                                    <input <?= !empty($dataBiayaEskpor) ? ($dataBiayaEskpor['status_posting'] == 1 ? 'readonly' : '') : '' ?> autocomplete="one-time-code" class="form-control input-picker keberangkatan_kapal" id="keberangkatan_kapal" name="keberangkatan_kapal" placeholder="Keberangkatan Kapal" value="<?= !empty($dataBiayaEskpor) ? date('d/m/Y', strtotime($dataBiayaEskpor['keberangkatan_kapal'])) : ''  ?>">
                                     <label for="floatingInput">Keberangkatan Kapal</label>
                                 </div>
                                 <div class="input-group-prepend group-prepend-password align-items-center">
@@ -194,7 +199,7 @@
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3">
-                            <input autocomplete="one-time-code" type="text" class="form-control no_surat_jalan" id="no_surat_jalan" name="no_surat_jalan" placeholder="No Surat Jalan" value="<?= !empty($dataBiayaEskpor) ? $dataBiayaEskpor->deadline : '' ?>">
+                            <input <?= !empty($dataBiayaEskpor) ? ($dataBiayaEskpor['status_posting'] == 1 ? 'readonly' : '') : '' ?> autocomplete="one-time-code" type="text" class="form-control no_surat_jalan" id="no_surat_jalan" name="no_surat_jalan" placeholder="No Surat Jalan" value="<?= !empty($dataBiayaEskpor) ? $dataBiayaEskpor['no_surat_jalan']  : '' ?>">
                             <label for="floatingInput">No Surat Jalan</label>
                         </div>
                     </div>
@@ -202,7 +207,7 @@
                         <div class="form-floating mb-3" style="height: 50px;">
                             <div class="input-group input-group-password">
                                 <div class="form-floating mb-3" style="height: 50px;">
-                                    <input autocomplete="one-time-code" class="form-control input-picker tanggal_surat_jalan" id="tanggal_surat_jalan" name="tanggal_surat_jalan" placeholder="Sales Order Date" value="<?= !empty($dataBiayaEskpor) ? date('d/m/Y', strtotime($dataBiayaEskpor->tanggal)) : ''  ?>">
+                                    <input <?= !empty($dataBiayaEskpor) ? ($dataBiayaEskpor['status_posting'] == 1 ? 'readonly' : '') : '' ?> autocomplete="one-time-code" class="form-control input-picker tanggal_surat_jalan" id="tanggal_surat_jalan" name="tanggal_surat_jalan" placeholder="Sales Order Date" value="<?= !empty($dataBiayaEskpor) ? date('d/m/Y', strtotime($dataBiayaEskpor['tanggal_surat_jalan'])) : ''  ?>">
                                     <label for="floatingInput">Tanggal Surat Jalan</label>
                                 </div>
                                 <div class="input-group-prepend group-prepend-password align-items-center">
@@ -213,22 +218,22 @@
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3">
-                            <input autocomplete="one-time-code" type="text" class="form-control no_kendaraan" id="no_kendaraan" name="no_kendaraan" placeholder="No Kendaraan" value="<?= !empty($dataBiayaEskpor) ? $dataBiayaEskpor->deadline : '' ?>">
+                            <input <?= !empty($dataBiayaEskpor) ? ($dataBiayaEskpor['status_posting'] == 1 ? 'readonly' : '') : '' ?> autocomplete="one-time-code" type="text" class="form-control no_kendaraan" id="no_kendaraan" name="no_kendaraan" placeholder="No Kendaraan" value="<?= !empty($dataBiayaEskpor) ? $dataBiayaEskpor['no_kendaraan']  : '' ?>">
                             <label for="floatingInput">No Kendaraan (Opsional)</label>
                         </div>
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3">
-                            <input autocomplete="one-time-code" type="text" class="form-control detail_kendaraan" id="detail_kendaraan" name="detail_kendaraan" placeholder="Detail Kendaraan" value="<?= !empty($dataBiayaEskpor) ? $dataBiayaEskpor->deadline : '' ?>">
+                            <input <?= !empty($dataBiayaEskpor) ? ($dataBiayaEskpor['status_posting'] == 1 ? 'readonly' : '') : '' ?> autocomplete="one-time-code" type="text" class="form-control detail_kendaraan" id="detail_kendaraan" name="detail_kendaraan" placeholder="Detail Kendaraan" value="<?= !empty($dataBiayaEskpor) ? $dataBiayaEskpor['detail_kendaraan']  : '' ?>">
                             <label for="floatingInput">Detail Kendaraan (Opsional)</label>
                         </div>
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <select class="form-select vendor_pelayaran_id" name="vendor_pelayaran_id" id="vendor_pelayaran_id">
+                            <select <?= !empty($dataBiayaEskpor) ? ($dataBiayaEskpor['status_posting'] == 1 ? 'disabled' : '') : '' ?> class="form-select vendor_pelayaran_id" name="vendor_pelayaran_id" id="vendor_pelayaran_id">
                                 <option value=""></option>
                                 <?php foreach ($dataVendorPelayaran as $d): ?>
-                                    <option value="<?= $d['id'] ?>"><?= $d['nama_vendor'] ?></option>
+                                    <option <?= !empty($dataBiayaEskpor) ? ($dataBiayaEskpor['vendor_pelayaran_id'] == $d['id'] ? 'selected' : '') : '' ?> value="<?= $d['id'] ?>"><?= $d['nama_vendor'] ?></option>
                                 <?php endforeach; ?>
                             </select>
                             <label for="floatingInput">Pilih Vendor / Pelayaran (Opsional)</label>
@@ -236,25 +241,25 @@
                     </div>
                     <div class="col-md-3">
                         <div class="form-floating mb-3">
-                            <input autocomplete="one-time-code" readonly type="text" class="form-control total_biaya_prev" id="total_biaya_prev" name="total_biaya_prev">
+                            <input autocomplete="one-time-code" disabled type="text" class="form-control total_biaya_prev" id="total_biaya_prev" name="total_biaya_prev">
                             <label for="floatingInput">Total Biaya Ekspor</label>
                         </div>
                     </div>
                     <div class="col-md-3">
                         <div class="form-floating mb-3">
-                            <input autocomplete="one-time-code" readonly type="text" class="form-control total_ppn_11_prev" id="total_ppn_11_prev" name="total_ppn_11_prev">
-                            <label for="floatingInput">Total PPN Masukan 11%</label>
+                            <input autocomplete="one-time-code" disabled type="text" class="form-control total_ppn_prev" id="total_ppn_prev" name="total_ppn_prev">
+                            <label for="floatingInput">Total Pajak PPN</label>
                         </div>
                     </div>
                     <div class="col-md-3">
                         <div class="form-floating mb-3">
-                            <input autocomplete="one-time-code" readonly type="text" class="form-control total_pph_21_prev" id="total_pph_21_prev" name="total_pph_21_prev">
-                            <label for="floatingInput">Total Potongan PPH Pasal 21</label>
+                            <input autocomplete="one-time-code" disabled type="text" class="form-control total_pph_prev" id="total_pph_prev" name="total_pph_prev">
+                            <label for="floatingInput">Total Potongan PPH</label>
                         </div>
                     </div>
                     <div class="col-md-3">
                         <div class="form-floating mb-3">
-                            <input autocomplete="one-time-code" readonly type="text" class="form-control total_faktur_prev" id="total_faktur_prev" name="total_faktur_prev">
+                            <input autocomplete="one-time-code" disabled type="text" class="form-control total_faktur_prev" id="total_faktur_prev" name="total_faktur_prev">
                             <label for="floatingInput">Nominal Faktur Final</label>
                         </div>
                     </div>
@@ -276,7 +281,7 @@
                                 <div class="col-md-6">
                                 </div>
                                 <div class="col-md-6">
-                                    <button class="btn btn-show-detail btn-add btn-block float-right" id="btnAddBiaya" type="button" style="width: 90% !important;">
+                                    <button <?= !empty($dataBiayaEskpor) ? ($dataBiayaEskpor['status_posting'] == 1 ? 'disabled' : '') : '' ?> class="btn btn-show-detail btn-add btn-block float-right" id="btnAddBiaya" type="button" style="width: 90% !important;">
                                         <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
                                     </button>
                                 </div>
@@ -313,7 +318,7 @@
                                 <div class="col-md-6">
                                 </div>
                                 <div class="col-md-6">
-                                    <button class="btn btn-show-detail btn-add btn-block float-right" id="btnAddPajakModal" type="button" style="width: 90% !important;">
+                                    <button <?= !empty($dataBiayaEskpor) ? ($dataBiayaEskpor['status_posting'] == 1 ? 'disabled' : '') : '' ?> class="btn btn-show-detail btn-add btn-block float-right" id="btnAddPajakModal" type="button" style="width: 90% !important;">
                                         <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
                                     </button>
                                 </div>
@@ -326,12 +331,12 @@
                                         <thead class="thead-dark">
                                             <tr>
                                                 <th style="text-align: center; width:10px;">No</th>
-                                                <th style="text-align: center;">Tgl Faktur Pajak</th>
-                                                <th style="text-align: center;">No Faktur Pajak</th>
-                                                <th style="text-align: center;">Pajak</th>
-                                                <th style="text-align: center;">Jumlah</th>
-                                                <th style="text-align: center;">Status</th>
-                                                <th style="text-align: center;">Keterangan</th>
+                                                <th style="text-align: left;">Tgl Faktur Pajak</th>
+                                                <th style="text-align: left;">No Faktur Pajak</th>
+                                                <th style="text-align: left;">Pajak</th>
+                                                <th style="text-align: left;">Nilai Pajak</th>
+                                                <th style="text-align: left;">Status</th>
+                                                <th style="text-align: left;">Keterangan</th>
                                                 <th style="text-align: center; width:100px">Action</th>
                                             </tr>
                                         </thead>
@@ -422,7 +427,7 @@
                                 <select class="form-select tax_id" name="tax_id" id="tax_id">
                                     <option value=""></option>
                                     <?php foreach ($dataPajak as $d): ?>
-                                        <option value="<?= $d['id'] ?>"><?= trim($d['name']) ?></option>
+                                        <option data-type_tax="<?= $d['type'] ?>" value="<?= $d['id'] ?>"><?= trim($d['name']) ?></option>
                                     <?php endforeach; ?>
                                 </select>
                                 <label for="floatingInput">Pilih Pajak</label>
@@ -464,41 +469,41 @@
 
 <script>
     const csrfToken = '<?= csrf_token() ?>';
-    var listDataSalesKontrak = [];
     var listBiayaEkspor = [];
-    var listAdditional = [];
     var listPajak = [];
-    // HIDE DETAIL SPECS LIST
-    // $('#component-detail-specs-list').hide();
 
 
     $(document).ready(function() {
         <?php if (!empty($dataBiayaEskpor)) { ?>
-            listDataSalesKontrak = <?= json_encode($dataBiayaEskporDetail) ?>;
-            listBiayaEkspor = <?= json_encode($dataBiayaEskporSpecs) ?>;
-
-            <?php foreach ($dataBiayaEskporAdditional as $s): ?>
-                listAdditional.push({
-                    id_detail_additional: "<?= $s['id'] ?>",
-                    additional_detail: "<?= $s['additional_detail'] ?>",
-                    additional_detail_type: "<?= $s['additional_detail_type'] ?>",
-                    additional_detail_price: "<?= $s['additional_detail_price'] ?>",
+            <?php foreach ($dataBiayaEksporDetail as $d): ?>
+                listBiayaEkspor.push({
+                    id_biaya_ekspor_detail: "<?= $d['id'] ?>",
+                    uraian_biaya: "<?= $d['uraian_biaya'] ?>",
+                    nilai_biaya: <?= floatval($d['nilai_biaya']) ?>,
                 });
             <?php endforeach ?>
 
-            drawTable(listDataSalesKontrak);
+            <?php foreach ($dataBiayaEksporPajak as $d): ?>
+                listPajak.push({
+                    id_biaya_ekspor_pajak: "<?= $d['id'] ?>",
+                    no_faktur_pajak: "<?= $d['no_faktur_pajak'] ?>",
+                    tanggal_faktur_pajak: "<?= date('d/m/Y', strtotime($d['tanggal_faktur_pajak'])) ?>",
+                    tax_id: "<?= $d['tax_id'] ?>",
+                    tax_name: "<?= trim($d['tax_name']) ?>",
+                    nilai_pajak: <?= floatval($d['nilai_pajak']) ?>,
+                    tax_status: "<?= trim($d['status_pajak']) ?>",
+                    keterangan_pajak: "<?= $d['keterangan_pajak'] ?>",
+                    type_tax: "<?= $d['type_tax'] ?>",
+                });
+            <?php endforeach ?>
+            getOrderFormEkspor(<?= $dataBiayaEskpor['sales_order_export_id'] ?>);
             drawTableBiayaEkspor(listBiayaEkspor);
-            drawTableAdditionalList(listAdditional);
+            drawTablePengenaanPajak(listPajak);
+            calculateTotalBiayaAndTax();
         <?php } else { ?>
 
         <?php } ?>
 
-
-        <?php if (!empty($dataBiayaEskpor)): ?>
-            <?php if ($dataBiayaEskpor->divisi == "PTS"): ?>
-                $('#component-detail-specs-list').show();
-            <?php endif; ?>
-        <?php endif; ?>
 
         $("#tanggal_invoice,#keberangkatan_kapal,#tanggal_surat_jalan,#tanggal_faktur_pajak").datepicker({
             todayHighlight: true,
@@ -559,124 +564,69 @@
             .find('label')
             .css('z-index', '1');
 
-
-        $(".posting-so").click(function() {
-            Swal.fire({
-                icon: 'question',
-                title: 'Yakin akan di Posting?',
-                confirmButtonColor: '#4e73df',
-                cancelButtonColor: '#d33',
-                showCancelButton: true,
-                reverseButtons: true,
-                confirmButtonText: 'Posting',
-                cancelButtonText: 'Kembali',
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    const csrf = $(`[name="${csrfToken}"]`);
-                    $.ajax({
-                        url: "<?= base_url("order-form-internasional/update-status"); ?>",
-                        data: {
-                            id: $(".id").val(),
-                            status: "POSTED"
-                        },
-                        beforeSend: function(xhr) {
-                            xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                        },
-                        method: "POST",
-                        dataType: "json",
-                        success: function(response) {
-                            csrf.val(response.token);
-                            if (response.status) {
-                                Swal.fire({
-                                        icon: 'success',
-                                        title: response.message,
-                                        confirmButtonColor: '#4e73df',
-                                    })
-                                    .then(() => {
-                                        window.location.href = "<?= base_url("order-form-internasional"); ?>"
-                                    })
-                            } else {
-                                Swal.fire({
-                                    icon: 'error',
-                                    title: response.message,
-                                    confirmButtonColor: '#4e73df',
-                                })
-                                stopLoading()
-                            }
-                        },
-                        onError: function(response) {
-                            csrf.val(response.token);
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Data Gagal Diubah, coba Lagi',
-                                confirmButtonColor: '#4e73df',
-                            })
-                            stopLoading()
-                        }
-                    });
-                }
-            })
-        })
-
-        $(".unposting-so").click(function() {
-
-            $(".unpost-modal").modal("show");
-
-        });
-
-
-
         var validator = $("#form-parent").validate({
             rules: {
-                sales_order_export_no: {
+                no_invoice: {
                     required: true
                 },
-                // divisi_id: {
-                //     required: true
-                // },
-                sales_contract_id: {
+                tanggal_invoice: {
                     required: true
                 },
-                tanggal: {
+                divisi_id: {
                     required: true
                 },
-                payment_term: {
+                sales_order_export_id: {
                     required: true
                 },
-                deadline: {
+                no_container: {
                     required: true
                 },
-                // container: {
-                //     required: true
-                // },
-                document_required: {
+                no_seal: {
+                    required: true
+                },
+                nama_kapal: {
+                    required: true
+                },
+                keberangkatan_kapal: {
+                    required: true
+                },
+                no_surat_jalan: {
+                    required: true
+                },
+                tanggal_surat_jalan: {
                     required: true
                 }
             },
             messages: {
-                sales_order_export_no: {
-                    required: "Sales order no required"
+                no_invoice: {
+                    required: "No invoice wajib diisi"
                 },
-                // divisi_id: {
-                //     required: "Departemen required"
-                // },
-                sales_contract_id: {
-                    required: "Select sales contract"
+                tanggal_invoice: {
+                    required: "Tanggal invoice wajib diisi"
                 },
-                tanggal: {
-                    required: "Sales order date required"
+                divisi_id: {
+                    required: "Departemen wajib diisi"
                 },
-                payment_term: {
-                    required: "Payment term required"
+                sales_order_export_id: {
+                    required: "Pilih Order form ekspor"
                 },
-                deadline: {
-                    required: "Deadline required"
+                no_container: {
+                    required: "No container wajib diisi"
                 },
-                // container: {
-                //     required: "Container required"
-                // },
-                document_required: {
-                    required: "Document required"
+                no_seal: {
+                    required: "No seal wajib diisi"
+                },
+                nama_kapal: {
+                    required: "Nama kapal wajib diisi"
+                },
+                keberangkatan_kapal: {
+                    required: "Keberangkatan kapal wajib diisi"
+                },
+                no_surat_jalan: {
+                    required: "No surat jalan wajib diisi"
+                },
+                tanggal_surat_jalan: {
+                    required: "Tanggal surat jalan wajib diisi"
                 }
             },
             errorElement: 'span',
@@ -834,6 +784,7 @@
 
                 $('#detailBiayaModal').modal('hide');
                 drawTableBiayaEkspor(listBiayaEkspor);
+                calculateTotalBiayaAndTax();
             }
         });
 
@@ -860,6 +811,7 @@
                 var nilaiPajak = destroyFormatRupiah($('#nilai_pajak').val());
                 var taxStatus = $('#tax_status option:selected').val();
                 var keteranganPajak = $('#keterangan_pajak').val();
+                var typeTax = $('#tax_id option:selected').data('type_tax');
 
                 if (idBiayaEksporPajak) {
                     // UPDATE
@@ -871,6 +823,7 @@
                         }
                     }
 
+                    listPajak[index].type_tax = typeTax;
                     listPajak[index].tanggal_faktur_pajak = tanggalFakturPajak;
                     listPajak[index].no_faktur_pajak = noFakturPajak;
                     listPajak[index].tax_id = taxId;
@@ -890,187 +843,87 @@
                         tax_name: taxName.trim(),
                         nilai_pajak: parseFloat(nilaiPajak),
                         tax_status: taxStatus,
-                        keterangan_pajak: keteranganPajak
+                        keterangan_pajak: keteranganPajak,
+                        type_tax: typeTax
                     });
                 }
 
                 drawTablePengenaanPajak(listPajak);
                 $('#detailPengenaanPajakModal').modal('hide');
-                console.log(listPajak);
+                calculateTotalBiayaAndTax();
             }
         });
 
         $(".btn-submit-parent").click(function() {
-            tinymce.triggerSave();
-
-            var id = $('#id').val();
-            var document_required = $('#document_required').val();
-            var payment_term = $('#payment_term').val();
-
-            console.log(listDataSalesKontrak);
-
-            if (listDataSalesKontrak.length === 0) {
+            if (listBiayaEkspor.length === 0) {
                 Swal.fire({
                     icon: 'error',
-                    title: 'Please Select Sales Contract',
-                    confirmButtonColor: '#4e73df',
-                })
-            } else if (document_required == '') {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Document required, is required',
-                    confirmButtonColor: '#4e73df',
-                })
-            } else if (payment_term == '') {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Payment term, is required',
+                    title: 'Wajib mengisikan biaya ekspor !',
                     confirmButtonColor: '#4e73df',
                 })
             } else {
-
-                // Validasi Departemen
-                var itemFailed = null;
-                var sizeFailed = null;
-                $.each(listDataSalesKontrak.salesContractDetailList, function(i, v) {
-                    if (v.divisi_id == null || v.divisi_id == "") {
-                        itemFailed = v;
-                    }
-
-                    $.each(v.size_breakdown, function(j, s) {
-                        if ((s.satuan_convertion_id == null || s.satuan_convertion_id == "") && s.qty != 0) {
-                            sizeFailed = s;
-                        }
-                    });
-                });
-
-                if (itemFailed != null) {
+                var id = $('#id').val();
+                if ($("#form-parent").valid()) {
                     Swal.fire({
-                        icon: 'error',
-                        title: 'Department for item ' + itemFailed.barang_name + ' required !',
+                        icon: 'question',
+                        title: id ? 'Update Data ?' : 'Simpan Data ?',
                         confirmButtonColor: '#4e73df',
-                    })
-                } else if (sizeFailed != null) {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Fill in the Qty Order Form in Kg (red), if the goods are not included in the order form, fill in the qty with 0!',
-                        confirmButtonColor: '#4e73df',
-                    })
-                } else {
+                        cancelButtonColor: '#d33',
+                        showCancelButton: true,
+                        reverseButtons: true,
+                        confirmButtonText: 'Save',
+                        cancelButtonText: 'Back',
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            const csrf = $(`[name="${csrfToken}"]`);
+                            let id = $('#id').val();
+                            let url = id == '' ? "<?= base_url('biaya-eskpor/create') ?>" : "<?= base_url('biaya-eskpor/update') ?>";
+                            let data = new FormData(document.querySelector("#form-parent"));
+                            let totalFaktur = destroyFormatRupiah($('#total_faktur_prev').val());
+                            let totalFakturBeforeTax = destroyFormatRupiah($('#total_biaya_prev').val());
 
-                    if ($("#form-parent").valid()) {
-                        Swal.fire({
-                            icon: 'question',
-                            title: id ? 'Update Data ?' : 'Create Data ?',
-                            confirmButtonColor: '#4e73df',
-                            cancelButtonColor: '#d33',
-                            showCancelButton: true,
-                            reverseButtons: true,
-                            confirmButtonText: 'Save',
-                            cancelButtonText: 'Back',
-                        }).then((result) => {
-                            if (result.isConfirmed) {
-                                // Init tiny ke textarea
-                                tinymce.triggerSave();
+                            data.append("total_faktur_before_tax", totalFakturBeforeTax);
+                            data.append("total_faktur", totalFaktur);
+                            data.append("listBiayaEkspor", JSON.stringify(listBiayaEkspor));
+                            data.append("listPajak", JSON.stringify(listPajak));
 
-                                const csrf = $(`[name="${csrfToken}"]`);
-                                let data = new FormData(document.querySelector("#form-parent"));
-                                let royaltyPrice = destroyFormatRupiah($('#royalty_price').val());
-                                let rebatePrice = destroyFormatRupiah($('#rebate_price').val());
-                                let canDeductionPrice = destroyFormatRupiah($('#can_deduction_price').val());
-                                let estimatedFreightPrice = destroyFormatRupiah($('#estimated_freight_price').val());
-                                let paletFumigationPrice = destroyFormatRupiah($('#palet_fumigation_price').val());
-                                // let additionalDetailPrice = destroyFormatRupiah($('#additional_detail_price').val());
-                                let othersPrice = destroyFormatRupiah($('#others_price').val());
-
-                                data.set('royalty_price', royaltyPrice);
-                                data.set('rebate_price', rebatePrice);
-                                data.set('can_deduction_price', canDeductionPrice);
-                                data.set('estimated_freight_price', estimatedFreightPrice);
-                                data.set('palet_fumigation_price', paletFumigationPrice);
-                                // data.set('additional_detail_price', additionalDetailPrice);
-                                data.set('others_price', othersPrice);
-
-                                data.append("listBiayaEkspor", JSON.stringify(listBiayaEkspor));
-                                data.append("listDataSalesKontrak", JSON.stringify(listDataSalesKontrak));
-                                data.append("listAdditional", JSON.stringify(listAdditional));
-
-                                // UPDATE
-                                if (id) {
-                                    $.ajax({
-                                        url: "<?= base_url("order-form-internasional/update"); ?>",
-                                        data: data,
-                                        beforeSend: function(xhr) {
-                                            setLoading();
-                                            xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                                        },
-                                        complete: function() {
-                                            stopLoading();
-                                        },
-                                        method: "POST",
-                                        dataType: "json",
-                                        processData: false,
-                                        contentType: false,
-                                        success: function(response) {
-                                            if (response.status) {
-                                                Swal.fire({
-                                                        icon: 'success',
-                                                        title: response.message,
-                                                        confirmButtonColor: '#4e73df',
-                                                    })
-                                                    .then(() => {
-                                                        window.location.href = "<?= base_url("order-form-internasional") ?>";
-                                                    })
-                                            } else {
-                                                Swal.fire({
-                                                    icon: 'error',
-                                                    title: response.message,
-                                                    confirmButtonColor: '#4e73df',
-                                                })
-                                            }
-                                        }
-                                    });
-                                } else {
-                                    $.ajax({
-                                        url: "<?= base_url("order-form-internasional/save"); ?>",
-                                        data: data,
-                                        beforeSend: function(xhr) {
-                                            setLoading();
-                                            xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                                        },
-                                        complete: function() {
-                                            stopLoading();
-                                        },
-                                        method: "POST",
-                                        dataType: "json",
-                                        processData: false,
-                                        contentType: false,
-                                        success: function(response) {
-                                            if (response.status) {
-                                                Swal.fire({
-                                                        icon: 'success',
-                                                        title: response.message,
-                                                        confirmButtonColor: '#4e73df',
-                                                    })
-                                                    .then(() => {
-                                                        window.location.href = "<?= base_url("order-form-internasional") ?>";
-                                                    })
-                                            } else {
-                                                Swal.fire({
-                                                    icon: 'error',
-                                                    title: response.message,
-                                                    confirmButtonColor: '#4e73df',
-                                                })
-                                            }
-                                        },
-
-                                    });
+                            $.ajax({
+                                url: url,
+                                data: data,
+                                beforeSend: function(xhr) {
+                                    setLoading();
+                                    xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                                },
+                                complete: function() {
+                                    stopLoading();
+                                },
+                                method: "POST",
+                                dataType: "json",
+                                processData: false,
+                                contentType: false,
+                                success: function(response) {
+                                    if (response.status) {
+                                        Swal.fire({
+                                                icon: 'success',
+                                                title: response.message,
+                                                confirmButtonColor: '#4e73df',
+                                            })
+                                            .then(() => {
+                                                window.location.href = "<?= base_url("biaya-eskpor") ?>";
+                                            })
+                                    } else {
+                                        Swal.fire({
+                                            icon: 'error',
+                                            title: response.message,
+                                            confirmButtonColor: '#4e73df',
+                                        })
+                                    }
                                 }
-                            }
-                        })
-                    }
-
+                            });
+                        }
+                    })
                 }
+
             }
 
         })
@@ -1099,6 +952,7 @@
                     $('#payment_term').val(dataSalesContract.payment_term);
                     $('#destination').val(dataSalesOrderExport.dicharge_port);
                     $('#no_container_order_form').val(dataSalesOrderExport.container);
+                    $('#customer_name').val(dataSalesContract.customer_name);
 
                     $('#txt_valas').text("(" + dataSalesOrderExport.mata_uang + ")");
                     $('#txt_tipe_harga').text("(" + dataSalesOrderExport.tipe_harga + ")");
@@ -1162,7 +1016,7 @@
                     <td>${item.uraian_biaya}</td>
                     <td class="text-right">${greatFormatRupiah(item.nilai_biaya)}</td>
                     <td class="text-center">
-                        <?php if (!empty($dataBiayaEskpor) && $dataBiayaEskpor->status == "POSTED") : ?>
+                        <?php if (!empty($dataBiayaEskpor) && $dataBiayaEskpor['status_posting'] == 1) : ?>
                             -
                         <?php else : ?>
                             <button type="button" class="btn btn-warning posting-spp mr-1" onclick="detailRowBiayaEkspor('${item.id_biaya_ekspor_detail}')">
@@ -1215,7 +1069,7 @@
                 newRow.append($('<td>').text(item.tax_status));
                 newRow.append($('<td>').text(item.keterangan_pajak));
                 newRow.append($('<td>').html(
-                    <?php if (!empty($dataBiayaEskpor)) : ?> <?php if ($dataBiayaEskpor->status == "POSTED") : ?> `-`
+                    <?php if (!empty($dataBiayaEskpor)) : ?> <?php if ($dataBiayaEskpor['status_posting'] == 1) : ?> `-`
                         <?php else : ?> `
                         <button type="button" class="btn btn-warning posting-spp mr-1" onclick="detailRowPajak('${item.id_biaya_ekspor_pajak}')">
                                 <i class="fa fa-pencil fa-sm" aria-hidden="true"></i>
@@ -1275,7 +1129,7 @@
         $('#tax_status').val(item.tax_status).change();
         $('#keterangan_pajak').val(item.keterangan_pajak);
 
-        $('#label-biaya-eskpor').text("Update ");
+        $('#label-pengenaan-pajak').text("Update ");
         $('#detailPengenaanPajakModal').modal('show');
     }
 
@@ -1291,6 +1145,7 @@
             listPajak.splice(indexToRemove, 1);
         }
         drawTablePengenaanPajak(listPajak);
+        calculateTotalBiayaAndTax();
     }
 
     function deleteRowBiayaEkspor(id_biaya_ekspor_detail) {
@@ -1305,6 +1160,7 @@
             listBiayaEkspor.splice(indexToRemove, 1);
         }
         drawTableBiayaEkspor(listBiayaEkspor);
+        calculateTotalBiayaAndTax();
     }
 
     function drawTableBarangEkspor(res) {
@@ -1345,7 +1201,6 @@
                 table.find('tbody').append(newRow);
             });
 
-            console.log(salesExport);
 
             // Tfoot rapi dan sesuai jumlah kolom
             if (salesExport.royaltyPriceFinal > 0) {
@@ -1443,83 +1298,124 @@
 
     }
 
+    function calculateTotalBiayaAndTax() {
+        var totalBiaya = 0;
+        var totalPajakPpn = 0;
+        var totalPajakPph = 0;
+
+        $.each(listBiayaEkspor, function(i, v) {
+            totalBiaya += v.nilai_biaya;
+        });
+
+        $.each(listPajak, function(i, v) {
+            if (v.type_tax == "ppn") {
+                totalPajakPpn += v.nilai_pajak;
+            } else {
+                totalPajakPph += v.nilai_pajak;
+            }
+        });
+
+        var nominalBiayaFaktur = totalBiaya + totalPajakPpn - totalPajakPph;
+        // Append
+        $('#total_biaya_prev').val(greatFormatRupiah(totalBiaya));
+        $('#total_ppn_prev').val(greatFormatRupiah(totalPajakPpn));
+        $('#total_pph_prev').val(greatFormatRupiah(totalPajakPph));
+        $('#total_faktur_prev').val(greatFormatRupiah(nominalBiayaFaktur));
+    }
+
     const print = function(id) {
-        $('.id').val(id);
-        $('.print-modal').modal('show');
+        window.open("<?= base_url('biaya-eskpor/print') ?>" + '/' + id, "_blank");
     }
 
-    $('.btn-hide-print').click(function() {
-        $('.print-modal').modal('hide');
-    });
-
-    function unPosting() {
-        var csrf = $(`[name="${csrfToken}"]`);
-        var date_revision = $('#date_revision').val();
-        var keterangan = $('#keterangan_unpost').val();
-        var state = true;
-
-        // MAU UNPOSTING
-        if (date_revision == "") {
-            state = false;
-            Swal.fire({
-                icon: 'error',
-                title: "Form Date Revision Required",
-                confirmButtonColor: '#4e73df',
-            })
-        } else {
-            $.ajax({
-                url: "<?= base_url("order-form-internasional/update-status"); ?>",
-                data: {
-                    id: $(".id").val(),
-                    status: "0",
-                    date_revision: date_revision,
-                    keterangan: keterangan,
-                },
-                beforeSend: function(xhr) {
-                    xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                    stopLoading()
-                },
-                complete: function() {
-                    stopLoading();
-                },
-                method: "POST",
-                dataType: "json",
-                success: function(response) {
-                    csrf.val(response.token);
-                    if (response.status) {
-                        Swal.fire({
-                                icon: 'success',
-                                title: response.message,
-                                confirmButtonColor: '#4e73df',
-                            })
-                            .then(() => {
-                                location.reload();
-                            })
-                    }
-                },
-            });
-        }
-
+    function posting() {
+        Swal.fire({
+            icon: 'question',
+            title: "Posting Data ?",
+            confirmButtonColor: '#4e73df',
+            cancelButtonColor: '#d33',
+            showCancelButton: true,
+            reverseButtons: true,
+            confirmButtonText: 'Save',
+            cancelButtonText: 'Back',
+        }).then((result) => {
+            if (result.isConfirmed) {
+                const csrf = $(`[name="${csrfToken}"]`);
+                $.ajax({
+                    url: "<?= base_url("biaya-eskpor/posting"); ?>",
+                    data: {
+                        id: $("#id").val(),
+                    },
+                    beforeSend: function(xhr) {
+                        xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                        setLoading()
+                    },
+                    complete: function() {
+                        stopLoading();
+                    },
+                    method: "POST",
+                    dataType: "json",
+                    success: function(response) {
+                        if (response.status) {
+                            Swal.fire({
+                                    icon: 'success',
+                                    title: response.message,
+                                    confirmButtonColor: '#4e73df',
+                                })
+                                .then(() => {
+                                    location.href = "<?= base_url('biaya-eskpor') ?>";
+                                })
+                        }
+                    },
+                });
+            }
+        })
 
     }
 
-    const printAction = function() {
-        var id = $('.id').val();
-        var display_price = $('.display_price').is(':checked');
-        <?php if (session()->get('login')->this_company_id == 1): ?>
-            var company_id = $('#company_id option:selected').val();
-        <?php else: ?>
-            var company_id = "<?= session()->get('login')->this_company_id ?>";
-        <?php endif; ?>
 
-        if (id == "") {
-            alert("Failed Print : Order form not found");
-        } else if (company_id == "") {
-            alert("Please select company head")
-        } else {
-            var url = "/order-form-internasional/print/" + id + '?display_price=' + display_price + '&company_id=' + company_id
-            window.open(url, "_blank");
-        }
+    function unposting() {
+        Swal.fire({
+            icon: 'question',
+            title: "Unposting Data ?",
+            confirmButtonColor: '#4e73df',
+            cancelButtonColor: '#d33',
+            showCancelButton: true,
+            reverseButtons: true,
+            confirmButtonText: 'Save',
+            cancelButtonText: 'Back',
+        }).then((result) => {
+            if (result.isConfirmed) {
+                const csrf = $(`[name="${csrfToken}"]`);
+                $.ajax({
+                    url: "<?= base_url("biaya-eskpor/unposting"); ?>",
+                    data: {
+                        id: $("#id").val(),
+                    },
+                    beforeSend: function(xhr) {
+                        xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                        setLoading()
+                    },
+                    complete: function() {
+                        stopLoading();
+                    },
+                    method: "POST",
+                    dataType: "json",
+                    success: function(response) {
+                        if (response.status) {
+                            Swal.fire({
+                                    icon: 'success',
+                                    title: response.message,
+                                    confirmButtonColor: '#4e73df',
+                                })
+                                .then(() => {
+                                    location.reload();
+                                })
+                        }
+                    },
+                });
+            }
+        })
+
     }
 </script>
 <?= $this->endSection(); ?>
