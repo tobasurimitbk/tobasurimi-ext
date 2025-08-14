@@ -816,7 +816,15 @@
                         if (result.isConfirmed) {
                             let id = $('#id').val();
                             let data = new FormData(document.querySelector(".create-form"));
+
+                            // Ambil semua field dari .detail-form
+                            document.querySelectorAll(".detail-form [name]").forEach(el => {
+                                data.append(el.name, el.value);
+                            });
+
+                            // Append list barang
                             data.append('listBarang', JSON.stringify(listStockSelected));
+
 
                             if (id) {
                                 // UPDATE

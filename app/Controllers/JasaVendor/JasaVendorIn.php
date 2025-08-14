@@ -405,11 +405,15 @@ class JasaVendorIn extends BaseController
             $jasaVendorOut = $this->jasaVendorOutModel->find($j['jasa_vendor_out_id']);
             $jasaVendorOutDetail = $this->jasaVendorOutDetailModel->find($j['jasa_vendor_out_detail_id']);
 
-            $stockOldDetail = $this->stockDetail2Model->getStockListDetail(
+            // $stockOldDetail = $this->stockDetail2Model->getStockListDetail(
+            //     $jasaVendorOutDetail['stock_out_id'],
+            //     $jasaVendorOutDetail['bc_out_id'],
+            //     $jasaVendorOutDetail['no_aju_out'],
+            //     $jasaVendorOutDetail['stock_dokumen']
+            // );
+
+            $stockOldDetail = $this->stockDetail2Model->getStockListDetailNew(
                 $jasaVendorOutDetail['stock_out_id'],
-                $jasaVendorOutDetail['bc_out_id'],
-                $jasaVendorOutDetail['no_aju_out'],
-                $jasaVendorOutDetail['stock_dokumen']
             );
 
             // DETAIL

@@ -1326,11 +1326,15 @@ class StockModel extends Model
                 }
 
                 // BARANG LAMA
-                $stockOldDetail = $stockDetail2Model->getStockListDetail(
-                    $j['stock_out_id'],
-                    $j['bc_out_id'],
-                    $j['no_aju_out'],
-                    $j['stock_dokumen']
+                // $stockOldDetail = $stockDetail2Model->getStockListDetail(
+                //     $j['stock_out_id'],
+                //     $j['bc_out_id'],
+                //     $j['no_aju_out'],
+                //     $j['stock_dokumen']
+                // );
+
+                $stockOldDetail = $stockDetail2Model->getStockListDetailNew(
+                    $j['stock_out_id']
                 );
 
                 $stok = $stockModel->insertStok(
@@ -1358,7 +1362,7 @@ class StockModel extends Model
                 // SUB DETAIL
                 $stockDetail2Model->insertStokDetail2(
                     $j['bc_out_id'],
-                    $j['stock_out_id'],
+                    $stok,
                     $stokDetail,
                     $qty,
                     $j['no_aju_out'],

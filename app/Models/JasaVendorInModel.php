@@ -133,11 +133,15 @@ class JasaVendorInModel extends Model
         foreach ($jasaVendorOutData as $j) {
             $stockDetail = $stockDetail2Model->find($j['stock_out_id']);
             $stockBarangOut = $stockModel->find($stockDetail['stock_id']);
-            $stockListOutDetail = $stockDetail2Model->getStockListDetail(
-                $j['stock_out_id'],
-                $j['bc_out_id'],
-                $j['no_aju_out'],
-                $j['stock_dokumen']
+            // $stockListOutDetail = $stockDetail2Model->getStockListDetail(
+            //     $j['stock_out_id'],
+            //     $j['bc_out_id'],
+            //     $j['no_aju_out'],
+            //     $j['stock_dokumen']
+            // );
+
+            $stockListOutDetail = $stockDetail2Model->getStockListDetailNew(
+                $j['stock_out_id']
             );
 
             $barangOut = self::getDetailBarang($stockBarangOut);
