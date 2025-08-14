@@ -145,8 +145,8 @@
             <div style="display: inline-block;">
                 <table>
                     <tr>
-                        <td>NO INVOICE:</td>
-                        <td><?= $dataBiayaEkspor['no_invoice'] ?></td>
+                        <td>NO INVOICE</td>
+                        <td>: <?= $dataBiayaEkspor['no_invoice'] ?></td>
                     </tr>
                     <tr>
                         <td>TGL</td>
@@ -277,8 +277,8 @@
                     <div style="display: inline-block;">
                         <table>
                             <tr>
-                                <td>NO INVOICE:</td>
-                                <td><?= $dataBiayaEkspor['no_invoice'] ?></td>
+                                <td>NO INVOICE</td>
+                                <td>: <?= $dataBiayaEkspor['no_invoice'] ?></td>
                             </tr>
                             <tr>
                                 <td>TGL</td>
