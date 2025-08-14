@@ -93,11 +93,24 @@
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
+                            <select <?= !empty($dataBiayaEskpor) ? ($dataBiayaEskpor['status_posting'] == 1 ? 'disabled' : '') : '' ?> class="form-select customer_id" name="customer_id" id="customer_id">
+                                <option value=""></option>
+                                <?php foreach ($dataCustomer as $d): ?>
+                                    <option <?= !empty($dataBiayaEskpor) ? ($dataBiayaEskpor['customer_id'] == $d['id'] ? 'selected' : '') : '' ?> value="<?= $d['id'] ?>"><?= $d['name'] ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                            <label for="floatingInput">Pilih Customer</label>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-floating mb-3" style="height: 50px;">
                             <select <?= !empty($dataBiayaEskpor) ? ($dataBiayaEskpor['status_posting'] == 1 ? 'disabled' : '') : '' ?> class="form-select sales_order_export_id" name="sales_order_export_id" id="sales_order_export_id">
                                 <option value=""></option>
-                                <?php foreach ($dataSalesOrderExport as $d): ?>
-                                    <option <?= !empty($dataBiayaEskpor) ? ($dataBiayaEskpor['sales_order_export_id'] == $d['sales_order_export_id'] ? 'selected' : '') : '' ?> value="<?= $d['sales_order_export_id'] ?>"><?= $d['sales_order_export_no'] ?></option>
-                                <?php endforeach; ?>
+                                <?php if (!empty($dataSalesOrderExport)): ?>
+                                    <?php foreach ($dataSalesOrderExport as $d): ?>
+                                        <option <?= !empty($dataBiayaEskpor) ? ($dataBiayaEskpor['sales_order_export_id'] == $d['sales_order_export_id'] ? 'selected' : '') : '' ?> value="<?= $d['sales_order_export_id'] ?>"><?= $d['sales_order_export_no'] . " - CONTAINER : " . $d['container'] . " PO : " . $d['po_no'] ?></option>
+                                    <?php endforeach; ?>
+                                <?php endif; ?>
                             </select>
                             <label for="floatingInput">Pilih Sales Order Ekspor</label>
                         </div>
@@ -110,12 +123,6 @@
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3">
-                            <input disabled autocomplete="one-time-code" type="text" value="<?= !empty($dataBiayaEskpor) ? $dataBiayaEskpor['customer_name'] : '' ?>" class="form-control customer_name" id="customer_name" name="customer_name" placeholder="Customer">
-                            <label for="floatingInput">Customer</label>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="form-floating mb-3">
                             <input disabled autocomplete="one-time-code" value="<?= !empty($dataBiayaEskpor) ? $dataBiayaEskpor['dicharge_port'] : '' ?>" type="text" class="form-control destination" id="destination" name="destination" placeholder="Destination">
                             <label for="floatingInput">Destination</label>
                         </div>
@@ -124,6 +131,12 @@
                         <div class="form-floating mb-3">
                             <input disabled autocomplete="one-time-code" type="text" value="<?= !empty($dataBiayaEskpor) ? $dataBiayaEskpor['container_orderform'] : '' ?>" class="form-control no_container_order_form" id="no_container_order_form" name="no_container_order_form" placeholder="No Container">
                             <label for="floatingInput">No Container Order Form</label>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-floating mb-3">
+                            <input disabled autocomplete="one-time-code" type="text" value="<?= !empty($dataBiayaEskpor) ? $dataBiayaEskpor['po_no'] : '' ?>" class="form-control po_no" id="po_no" name="po_no" placeholder="No PO">
+                            <label for="floatingInput">No PO</label>
                         </div>
                     </div>
                 </div>
@@ -200,15 +213,15 @@
                     <div class="col-md-4">
                         <div class="form-floating mb-3">
                             <input <?= !empty($dataBiayaEskpor) ? ($dataBiayaEskpor['status_posting'] == 1 ? 'readonly' : '') : '' ?> autocomplete="one-time-code" type="text" class="form-control no_surat_jalan" id="no_surat_jalan" name="no_surat_jalan" placeholder="No Surat Jalan" value="<?= !empty($dataBiayaEskpor) ? $dataBiayaEskpor['no_surat_jalan']  : '' ?>">
-                            <label for="floatingInput">No Surat Jalan</label>
+                            <label for="floatingInput">No Surat Jalan (Opsional)</label>
                         </div>
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <div class="input-group input-group-password">
                                 <div class="form-floating mb-3" style="height: 50px;">
-                                    <input <?= !empty($dataBiayaEskpor) ? ($dataBiayaEskpor['status_posting'] == 1 ? 'readonly' : '') : '' ?> autocomplete="one-time-code" class="form-control input-picker tanggal_surat_jalan" id="tanggal_surat_jalan" name="tanggal_surat_jalan" placeholder="Sales Order Date" value="<?= !empty($dataBiayaEskpor) ? date('d/m/Y', strtotime($dataBiayaEskpor['tanggal_surat_jalan'])) : ''  ?>">
-                                    <label for="floatingInput">Tanggal Surat Jalan</label>
+                                    <input <?= !empty($dataBiayaEskpor) ? ($dataBiayaEskpor['status_posting'] == 1 ? 'readonly' : '') : '' ?> autocomplete="one-time-code" class="form-control input-picker tanggal_surat_jalan" id="tanggal_surat_jalan" name="tanggal_surat_jalan" placeholder="Sales Order Date" value="<?= !empty($dataBiayaEskpor) ? ($dataBiayaEskpor['tanggal_surat_jalan'] != null ? date('d/m/Y', strtotime($dataBiayaEskpor['tanggal_surat_jalan'])) : '') : ''  ?>">
+                                    <label for="floatingInput">Tanggal Surat Jalan (Opsional)</label>
                                 </div>
                                 <div class="input-group-prepend group-prepend-password align-items-center">
                                     <i style="cursor: pointer; z-index: 99; margin-bottom: 8px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-po-date"></i>
@@ -512,6 +525,14 @@
             autoclose: true
         });
 
+        $('.customer_id').select2({
+            placeholder: "Pilih Customer",
+            theme: "bootstrap-5",
+        }).change(function() {
+            var customerId = $('#customer_id option:selected').val();
+            getDropdownSalesOrderExport(customerId);
+        });
+
         $('.divisi_id').select2({
             placeholder: "Pilih Departemen",
             theme: "bootstrap-5",
@@ -544,14 +565,14 @@
         }).change(function() {});
 
         //CSS SELECT2 FLOATING LABEL
-        $('.sales_order_export_id, .divisi_id, .vendor_pelayaran_id, .tax_id, .tax_status')
+        $('.sales_order_export_id, .divisi_id, .vendor_pelayaran_id, .tax_id, .tax_status, .customer_id')
             .parent('div')
             .children('span')
             .children('span')
             .children('span')
             .css('height', ' calc(3.5rem + 2px)');
 
-        $('.sales_order_export_id, .divisi_id, .vendor_pelayaran_id, .tax_id, .tax_status')
+        $('.sales_order_export_id, .divisi_id, .vendor_pelayaran_id, .tax_id, .tax_status, .customer_id')
             .parent('div')
             .children('span')
             .children('span')
@@ -559,7 +580,7 @@
             .children('span')
             .css('margin-top', '22px').css('margin-left', '-7px');
 
-        $('.sales_order_export_id, .divisi_id, .vendor_pelayaran_id, .tax_id, .tax_status')
+        $('.sales_order_export_id, .divisi_id, .vendor_pelayaran_id, .tax_id, .tax_status, .customer_id')
             .parent('div')
             .find('label')
             .css('z-index', '1');
@@ -590,12 +611,12 @@
                 keberangkatan_kapal: {
                     required: true
                 },
-                no_surat_jalan: {
-                    required: true
-                },
-                tanggal_surat_jalan: {
-                    required: true
-                }
+                // no_surat_jalan: {
+                //     required: true
+                // },
+                // tanggal_surat_jalan: {
+                //     required: true
+                // }
             },
             messages: {
                 no_invoice: {
@@ -622,12 +643,12 @@
                 keberangkatan_kapal: {
                     required: "Keberangkatan kapal wajib diisi"
                 },
-                no_surat_jalan: {
-                    required: "No surat jalan wajib diisi"
-                },
-                tanggal_surat_jalan: {
-                    required: "Tanggal surat jalan wajib diisi"
-                }
+                // no_surat_jalan: {
+                //     required: "No surat jalan wajib diisi"
+                // },
+                // tanggal_surat_jalan: {
+                //     required: "Tanggal surat jalan wajib diisi"
+                // }
             },
             errorElement: 'span',
             errorClass: 'text-danger',
@@ -946,20 +967,21 @@
             success: function(res) {
                 if (res.status) {
                     // Readonly Append
-                    var dataSalesOrderExport = res.dataSalesOrderExport;
-                    var dataSalesContract = res.dataSalesExportDetail.salesContract;
+                    if (res.dataSalesOrderExport != null) {
+                        var dataSalesOrderExport = res.dataSalesOrderExport;
+                        var dataSalesContract = res.dataSalesExportDetail.salesContract;
 
-                    $('#payment_term').val(dataSalesContract.payment_term);
-                    $('#destination').val(dataSalesOrderExport.dicharge_port);
-                    $('#no_container_order_form').val(dataSalesOrderExport.container);
-                    $('#customer_name').val(dataSalesContract.customer_name);
+                        $('#payment_term').val(dataSalesContract.payment_term);
+                        $('#destination').val(dataSalesOrderExport.dicharge_port);
+                        $('#no_container_order_form').val(dataSalesOrderExport.container);
+                        $('#po_no').val(dataSalesOrderExport.po_no);
 
-                    $('#txt_valas').text("(" + dataSalesOrderExport.mata_uang + ")");
-                    $('#txt_tipe_harga').text("(" + dataSalesOrderExport.tipe_harga + ")");
+                        $('#txt_valas').text("(" + dataSalesOrderExport.mata_uang + ")");
+                        $('#txt_tipe_harga').text("(" + dataSalesOrderExport.tipe_harga + ")");
 
-                    // DrawTable Detail Barang
-                    drawTableBarangEkspor(res);
-
+                        // DrawTable Detail Barang
+                        drawTableBarangEkspor(res);
+                    }
                 } else {
                     Swal.fire({
                         icon: 'error',
@@ -967,6 +989,46 @@
                         confirmButtonColor: '#4e73df',
                     })
                 }
+            }
+        })
+    }
+
+    function getDropdownSalesOrderExport(customerId) {
+        $.ajax({
+            url: `<?= base_url("biaya-eskpor/get-sales-order-export"); ?>`,
+            method: "GET",
+            beforeSend: function() {
+                setLoading();
+            },
+            complete: function() {
+                stopLoading();
+            },
+            data: {
+                customer_id: customerId,
+            },
+            dataType: "json",
+            success: function(res) {
+                var poNo = "";
+                var container = "";
+                var result = "";
+                $(".sales_order_export_id").empty();
+                $(".sales_order_export_id").append(`<option value=""></option>`);
+                res.data.forEach(function(item) {
+                    if (item.po_no != null) {
+                        poNo = item.po_no;
+                    }
+
+                    if (container != null) {
+                        container = item.container;
+                    }
+
+                    // if (container != "" || poNo != "") {
+                    result = " - CONTAINER : " + container + " PO : " + poNo;
+                    // }
+
+                    $(".sales_order_export_id").append(`<option value="${item.sales_order_export_id.trim()}">${item.sales_order_export_no+" "+result}</option>`);
+                })
+                $(".sales_order_export_id").val("").change();
             }
         })
     }

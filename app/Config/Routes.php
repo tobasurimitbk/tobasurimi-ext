@@ -796,6 +796,8 @@ $routes->post('/biaya-eskpor/unposting', 'BiayaExim\BiayaEskpor\BiayaEskpor::unp
 $routes->get('/biaya-eskpor/all', 'BiayaExim\BiayaEskpor\BiayaEskpor::all', ['filter' => 'Auth']);
 $routes->get('/biaya-eskpor/id/(:segment)', 'BiayaExim\BiayaEskpor\BiayaEskpor::edit/$1', ['filter' => 'Auth']);
 $routes->get('/biaya-eskpor/print/(:segment)', 'BiayaExim\BiayaEskpor\BiayaEskpor::print/$1', ['filter' => 'Auth']);
+$routes->get('/biaya-eskpor/get-sales-order-export', 'BiayaExim\BiayaEskpor\BiayaEskpor::getSalesOrderExportByCustomerId', ['filter' => 'Auth']);
+$routes->get('/biaya-eskpor/export-excel', 'BiayaExim\BiayaEskpor\BiayaEskpor::exportExcel', ['filter' => 'Auth']);
 
 // PRODUKSI
 // Production Result

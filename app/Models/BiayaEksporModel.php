@@ -65,7 +65,9 @@ class BiayaEksporModel extends Model
             customers.name as customer_name,
             vendor_pelayaran.nama_vendor,
             sales_contract.dicharge_port,
-            divisis.divisi
+            sales_contract.payment_term,
+            divisis.divisi,
+            sales_order_export.po_no
         ";
 
         $dataQry = $this->asArray()
@@ -163,6 +165,7 @@ class BiayaEksporModel extends Model
             sales_contract.payment_term,
             sales_contract.tipe_harga,
             sales_order_export.container as container_orderform,
+            sales_order_export.po_no,
             metadata.value as valas,
             customers.name as customer_name
         ')

@@ -5,11 +5,17 @@
 <section class="section">
     <div class="section-header">
         <h1>Biaya Ekspor</h1>
-        <?php if (can('Biaya Exim', 'Biaya Ekspor', 'c')) : ?>
-            <a class="btn btn-show-form btn-add float-right" href="<?= base_url("biaya-eskpor/create"); ?>">
-                <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
+        <div class="col-button-tambah-spp">
+            <a class="btn btn-warning btn-print float-right" href="#" onclick="exportExcel()">
+                <i class="fa fa-download"></i> Export
             </a>
-        <?php endif; ?>
+
+            <?php if (can('Biaya Exim', 'Biaya Ekspor', 'c')) : ?>
+                <a class="btn btn-show-form btn-success float-right" href="<?= base_url("biaya-eskpor/create"); ?>">
+                    <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
+                </a>
+            <?php endif; ?>
+        </div>
     </div>
     <?= csrf_field() ?>
     <div class="card">
@@ -39,7 +45,7 @@
                     </select>
                 </div>
                 <div class="col-md-3">
-                    <input autocomplete="one-time-code" class="form-control search form-out-search" placeholder="Search Data" value="" />
+                    <input autocomplete="one-time-code" class="form-control search form-out-search" placeholder="Search Data" id="search" value="" />
                 </div>
             </div>
             <div class="row">
@@ -332,6 +338,14 @@
         window.location.href = `/biaya-eskpor/id/${id}`;
     }
 
+    function exportExcel() {
+        var dateStart = $('#dateStart').val();
+        var dateEnd = $('#dateEnd').val();
+        var statusPosting = $('#status_posting').val();
+        var search = $('#search').val();
+
+        window.location.href = "<?= base_url('biaya-eskpor/export-excel') ?>" + '?dateStart=' + dateStart + '&dateEnd=' + dateEnd + '&status_posting=' + statusPosting + '&search=' + search;
+    }
 
     const print = function(url) {
         window.open(url, "_blank");

@@ -145,6 +145,10 @@
             <div style="display: inline-block;">
                 <table>
                     <tr>
+                        <td>NO INVOICE:</td>
+                        <td><?= $dataBiayaEkspor['no_invoice'] ?></td>
+                    </tr>
+                    <tr>
                         <td>TGL</td>
                         <td>: <?= date('d/m/Y', strtotime($dataBiayaEkspor['tanggal_invoice'])) ?></td>
                     </tr>
@@ -152,13 +156,14 @@
                         <td>DIBAYAR KEPADA</td>
                         <td>: <?= $dataBiayaEkspor['nama_vendor'] ?></td>
                     </tr>
+
                 </table>
             </div>
             <div style="display: inline-block;vertical-align: top; float: right;">
                 <table>
                     <tr>
                         <td>NO BUKTI:</td>
-                        <td><?= $dataBiayaEkspor['no_invoice'] ?></td>
+                        <td></td>
                     </tr>
                 </table>
             </div>
@@ -272,6 +277,10 @@
                     <div style="display: inline-block;">
                         <table>
                             <tr>
+                                <td>NO INVOICE:</td>
+                                <td><?= $dataBiayaEkspor['no_invoice'] ?></td>
+                            </tr>
+                            <tr>
                                 <td>TGL</td>
                                 <td>: <?= date('d/m/Y', strtotime($dataBiayaEkspor['tanggal_invoice'])) ?></td>
                             </tr>
@@ -285,7 +294,7 @@
                         <table>
                             <tr>
                                 <td>NO BUKTI:</td>
-                                <td><?= $dataBiayaEkspor['no_invoice'] ?></td>
+                                <td></td>
                             </tr>
                         </table>
                     </div>

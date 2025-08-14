@@ -6,12 +6,17 @@ use App\Controllers\BaseController;
 use App\Models\BiayaEksporDetailModel;
 use App\Models\BiayaEksporModel;
 use App\Models\BiayaEksporPajakModel;
+use App\Models\CustomerModel;
 use App\Models\DivisisModel;
 use App\Models\SalesOrderExportModel;
 use App\Models\TaxModel;
 use App\Models\VendorPelayaranModel;
 use Dompdf\Dompdf;
 use Exception;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+use PhpOffice\PhpSpreadsheet\Style\Fill;
+use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
 
 class BiayaEskpor extends BaseController
 {
@@ -23,6 +28,7 @@ class BiayaEskpor extends BaseController
     protected $biayaEksporModel;
     protected $biayaEksporDetailModel;
     protected $biayaEksporPajakModel;
+    protected $customerModel;
     protected $dompdf;
 
     public function __construct()
@@ -35,6 +41,7 @@ class BiayaEskpor extends BaseController
         $this->biayaEksporModel = new BiayaEksporModel();
         $this->biayaEksporDetailModel = new BiayaEksporDetailModel();
         $this->biayaEksporPajakModel = new BiayaEksporPajakModel();
+        $this->customerModel = new CustomerModel();
         $this->dompdf = new Dompdf();
     }
 
@@ -119,13 +126,13 @@ class BiayaEskpor extends BaseController
             ->orderBy('type', "asc")
             ->findAll();
         $dataVendorPelayaran = $this->vendorPelayaranModel->where('deletedAt', null)->where('company_id', $this->this_company_id)->orderBy('nama_vendor', "asc")->findAll();
-        $dataSalesOrderExport = $this->salesOrderExportModel->where('company_id', $this->this_company_id)->where('deletedAt', null)->orderBy('sales_order_export_id', "desc")->findAll();
+        $dataCustomer = $this->customerModel->getCustomerList("INTERNASIONAL");
 
         $data = [
             "dataDivisi" => $dataDivisi,
             "dataPajak" => $dataPajak,
             "dataVendorPelayaran" => $dataVendorPelayaran,
-            "dataSalesOrderExport" => $dataSalesOrderExport
+            "dataCustomer" => $dataCustomer
         ];
 
         return view('BiayaExim/BiayaEskpor/form', $data);
@@ -146,7 +153,7 @@ class BiayaEskpor extends BaseController
             ->orderBy('type', "asc")
             ->findAll();
         $dataVendorPelayaran = $this->vendorPelayaranModel->where('deletedAt', null)->where('company_id', $this->this_company_id)->orderBy('nama_vendor', "asc")->findAll();
-        $dataSalesOrderExport = $this->salesOrderExportModel->where('company_id', $this->this_company_id)->where('deletedAt', null)->orderBy('sales_order_export_id', "desc")->findAll();
+        $dataSalesOrderExport = $this->salesOrderExportModel->where('sales_order_export_id', $dataBiayaEskpor['sales_order_export_id'])->findAll();
         $dataBiayaEksporPajak = $this->biayaEksporPajakModel
             ->select('biaya_ekspor_pajak.*,taxes.type as type_tax, taxes.name as tax_name')
             ->join('taxes', 'taxes.id = biaya_ekspor_pajak.tax_id', 'left')
@@ -157,6 +164,7 @@ class BiayaEskpor extends BaseController
             ->where('biaya_ekspor_id', $id)
             ->where('deletedAt', null)
             ->findAll();
+        $dataCustomer = $this->customerModel->getCustomerList("INTERNASIONAL");
 
         $data = [
             "dataDivisi" => $dataDivisi,
@@ -165,7 +173,8 @@ class BiayaEskpor extends BaseController
             "dataSalesOrderExport" => $dataSalesOrderExport,
             "dataBiayaEskpor" => $dataBiayaEskpor,
             "dataBiayaEksporPajak" => $dataBiayaEksporPajak,
-            "dataBiayaEksporDetail" => $dataBiayaEksporDetail
+            "dataBiayaEksporDetail" => $dataBiayaEksporDetail,
+            "dataCustomer" => $dataCustomer
         ];
 
         return view('BiayaExim/BiayaEskpor/form', $data);
@@ -267,6 +276,13 @@ class BiayaEskpor extends BaseController
     {
         try {
             $salesOrderExportId = $this->request->getVar('sales_order_export_id');
+            if (empty($salesOrderExportId)) {
+                return \response()->setJSON([
+                    'dataSalesExportDetail' => null,
+                    'dataSalesOrderExport' => null,
+                    'status' => true
+                ]);
+            }
             $salesOrderExport = $this->salesOrderExportModel->getById($salesOrderExportId);
 
             $dataSalesExportDetail =  $this->salesOrderExportModel
@@ -332,6 +348,7 @@ class BiayaEskpor extends BaseController
                 'detail_kendaraan' => $this->request->getVar('detail_kendaraan'),
                 'total_faktur_before_tax' => $this->request->getVar('total_faktur_before_tax'),
                 'total_faktur' => $this->request->getVar('total_faktur'),
+                'customer_id' => $this->request->getVar('customer_id'),
                 'status_posting' => 0
             ]);
 
@@ -404,6 +421,7 @@ class BiayaEskpor extends BaseController
                 'detail_kendaraan' => $this->request->getVar('detail_kendaraan'),
                 'total_faktur_before_tax' => $this->request->getVar('total_faktur_before_tax'),
                 'total_faktur' => $this->request->getVar('total_faktur'),
+                'customer_id' => $this->request->getVar('customer_id'),
             ]);
 
             $idBiayaEksporDetailUsedArr = array();
@@ -554,5 +572,183 @@ class BiayaEskpor extends BaseController
         } else {
             return false;
         }
+    }
+
+    public function getSalesOrderExportByCustomerId()
+    {
+        $customerId = $this->request->getVar('customer_id');
+        if (!empty($customerId)) {
+            $dataResult = $this->salesOrderExportModel->getSalesOrderExportByCustomerId(
+                $customerId
+            );
+            return response()->setJSON([
+                'data' => $dataResult,
+                'status' => true,
+                'token' => csrf_hash()
+            ]);
+        }
+    }
+
+    public function exportExcel()
+    {
+        $condition = [
+            "biaya_ekspor.company_id" => $this->this_company_id,
+            "biaya_ekspor.deletedAt" => NULL,
+        ];
+
+        $addCondition = [
+            "search"        => $this->request->getGet("search"),
+            "dateStart"     => $this->request->getVar("dateStart") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateStart")))) : "",
+            "dateEnd"       => $this->request->getVar("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateEnd")))) : "",
+            "status_posting" => $this->request->getGet("status_posting"),
+            "sort"          => $this->request->getGet("sort"),
+            "sortType"      => $this->request->getGet("sortType"),
+        ];
+
+        $biayaEkspor = $this->biayaEksporModel->getList($condition, $addCondition, 100000000, 0);
+
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+
+        // === Header utama ===
+        $headers = [
+            'NO',
+            'NO INVOICE',
+            'TANGGAL INVOICE',
+            'DEPARTEMEN',
+            'CUSTOMER',
+            'PAYMENT TERM',
+            'DESTINATION',
+            'NO PO',
+            'NO CONTAINER',
+            'NO SEAL',
+            'NAMA KAPAL',
+            'KEBERANGKATAN KAPAL',
+            'NO SURAT JALAN',
+            'TANGGAL SURAT JALAN',
+            'NO KENDARAAN',
+            'DETAIL KENDARAAN',
+            'VENDOR / PELAYARAN',
+            'TOTAL INVOICE'
+        ];
+
+        $col = 'A';
+        foreach ($headers as $header) {
+            $sheet->setCellValue($col . '1', strtoupper($header));
+            $col++;
+        }
+
+        // Style header utama
+        $sheet->getStyle('A1:R1')->getFont()->setBold(true)->setSize(11);
+        $sheet->getStyle('A1:R1')->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setARGB('FFDCE6F1'); // biru lembut
+        $sheet->getStyle('A1:R1')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+        foreach (range('A', 'R') as $columnID) {
+            $sheet->getColumnDimension($columnID)->setAutoSize(true);
+        }
+
+        $row = 2;
+        $no = 1;
+
+        foreach ($biayaEkspor['data'] as $data) {
+
+            // Baris utama
+            $sheet->setCellValue("A{$row}", $no++);
+            $sheet->setCellValue("B{$row}", $data['no_invoice']);
+            $sheet->setCellValue("C{$row}", $data['tanggal_invoice']);
+            $sheet->setCellValue("D{$row}", $data['divisi']);
+            $sheet->setCellValue("E{$row}", $data['customer_name']);
+            $sheet->setCellValue("F{$row}", $data['payment_term']);
+            $sheet->setCellValue("G{$row}", $data['dicharge_port']);
+            $sheet->setCellValue("H{$row}", $data['po_no']);
+            $sheet->setCellValue("I{$row}", $data['no_container']);
+            $sheet->setCellValue("J{$row}", $data['no_seal']);
+            $sheet->setCellValue("K{$row}", $data['nama_kapal']);
+            $sheet->setCellValue("L{$row}", $data['keberangkatan_kapal']);
+            $sheet->setCellValue("M{$row}", $data['no_surat_jalan']);
+            $sheet->setCellValue("N{$row}", $data['tanggal_surat_jalan']);
+            $sheet->setCellValue("O{$row}", $data['no_kendaraan']);
+            $sheet->setCellValue("P{$row}", $data['detail_kendaraan']);
+            $sheet->setCellValue("Q{$row}", $data['nama_vendor']);
+            $sheet->setCellValue("R{$row}", $data['total_faktur']);
+
+            // Format angka rupiah (tanpa Rp)
+            $sheet->getStyle("R{$row}")->getNumberFormat()->setFormatCode(NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1);
+
+            $row++;
+
+            // === Detail Pajak ===
+            $pajakHeader = ['TGL FAKTUR PAJAK', 'NO FAKTUR PAJAK', 'PAJAK', 'NILAI PAJAK', 'STATUS', 'KETERANGAN'];
+            $col = 'B';
+            foreach ($pajakHeader as $header) {
+                $sheet->setCellValue($col . $row, strtoupper($header));
+                $sheet->getStyle($col . $row)->getFont()->setBold(true);
+                $sheet->getStyle($col . $row)->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setARGB('FFF2F2F2');
+                $col++;
+            }
+            $row++;
+
+            $detailPajak = $this->biayaEksporPajakModel
+                ->select('biaya_ekspor_pajak.*, taxes.type as type_tax, taxes.name as tax_name')
+                ->join('taxes', 'taxes.id = biaya_ekspor_pajak.tax_id', 'left')
+                ->where('biaya_ekspor_pajak.biaya_ekspor_id', $data['id'])
+                ->where('biaya_ekspor_pajak.deletedAt', null)
+                ->findAll();
+
+            if ($detailPajak) {
+                foreach ($detailPajak as $pjk) {
+                    $sheet->setCellValue("B{$row}", $pjk['tanggal_faktur_pajak']);
+                    $sheet->setCellValue("C{$row}", $pjk['no_faktur_pajak']);
+                    $sheet->setCellValue("D{$row}", $pjk['tax_name']);
+                    $sheet->setCellValue("E{$row}", $pjk['nilai_pajak']);
+                    $sheet->getStyle("E{$row}")->getNumberFormat()->setFormatCode(NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1);
+                    $sheet->setCellValue("F{$row}", $pjk['status_pajak']);
+                    $sheet->setCellValue("G{$row}", $pjk['keterangan_pajak']);
+                    $row++;
+                }
+            } else {
+                $sheet->setCellValue("B{$row}", "- Tidak ada pajak -");
+                $row++;
+            }
+
+            // === Detail Biaya ===
+            $biayaHeader = ['DETAIL BIAYA', 'NILAI BIAYA'];
+            $col = 'B';
+            foreach ($biayaHeader as $header) {
+                $sheet->setCellValue($col . $row, strtoupper($header));
+                $sheet->getStyle($col . $row)->getFont()->setBold(true);
+                $sheet->getStyle($col . $row)->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setARGB('FFF2F2F2');
+                $col++;
+            }
+            $row++;
+
+            $detailBiaya = $this->biayaEksporDetailModel
+                ->where('biaya_ekspor_id', $data['id'])
+                ->where('deletedAt', null)
+                ->findAll();
+
+            if ($detailBiaya) {
+                foreach ($detailBiaya as $by) {
+                    $sheet->setCellValue("B{$row}", $by['uraian_biaya']);
+                    $sheet->setCellValue("C{$row}", $by['nilai_biaya']);
+                    $sheet->getStyle("C{$row}")->getNumberFormat()->setFormatCode(NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1);
+                    $row++;
+                }
+            } else {
+                $sheet->setCellValue("B{$row}", "- Tidak ada biaya -");
+                $row++;
+            }
+
+            // Baris kosong sebelum invoice berikutnya
+            $row++;
+        }
+
+        $fileName = 'Export_Biaya_Ekspor_' . time() . '.xlsx';
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header("Content-Disposition: attachment; filename=\"$fileName\"");
+        header('Cache-Control: max-age=0');
+
+        $writer = new Xlsx($spreadsheet);
+        $writer->save('php://output');
+        exit;
     }
 }

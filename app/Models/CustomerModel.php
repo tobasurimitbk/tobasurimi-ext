@@ -490,4 +490,15 @@ class CustomerModel extends Model
 
         return $generatedNo;
     }
+
+    public function getCustomerList($tipe_customer)
+    {
+        $resQry = $this->asArray()
+            ->where('tipe_customer', $tipe_customer)
+            ->where('deletedAt', null)
+            ->where('company_id', session()->get("login")->this_company_id)
+            ->orderBy('name', "asc")
+            ->findAll();
+        return $resQry;
+    }
 }
