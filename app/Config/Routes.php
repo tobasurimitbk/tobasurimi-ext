@@ -1065,8 +1065,8 @@ $routes->get('/jasa-vendor-out/warehouse', 'Purchase\POLokalBahanBaku::dropdownW
 $routes->get('/jasa-vendor-out/list-barang-stock-init', 'JasaVendor\JasaVendorOut::dropdownListBarangIsInit', ['filter' => 'Auth']);
 $routes->get('/jasa-vendor-out/list-stock-dokumen-bc', 'JasaVendor\JasaVendorOut::getListStockJasaVendorOut', ['filter' => 'Auth']);
 $routes->get('/jasa-vendor-out/all', 'JasaVendor\JasaVendorOut::all', ['filter' => 'Auth']);
-$routes->post('/jasa-vendor-out/save',  'JasaVendor\JasaVendorOut::createActionNew', ['filter' => 'Auth']);
-$routes->post('/jasa-vendor-out/update',  'JasaVendor\JasaVendorOut::updateActionNew', ['filter' => 'Auth']);
+$routes->post('/jasa-vendor-out/save',  'JasaVendor\JasaVendorOut::createAction', ['filter' => 'Auth']);
+$routes->post('/jasa-vendor-out/update',  'JasaVendor\JasaVendorOut::updateAction', ['filter' => 'Auth']);
 $routes->post('/jasa-vendor-out/delete',  'JasaVendor\JasaVendorOut::delete', ['filter' => 'Auth']);
 $routes->post('/jasa-vendor-out/posting',  'JasaVendor\JasaVendorOut::posting', ['filter' => 'Auth']);
 $routes->post('/jasa-vendor-out/unposting',  'JasaVendor\JasaVendorOut::unPosting', ['filter' => 'Auth']);
@@ -1083,8 +1083,8 @@ $routes->get('/jasa-vendor-in/list-jasa-vendor-out', 'JasaVendor\JasaVendorIn::d
 $routes->get('/jasa-vendor-in/list-barang', 'JasaVendor\JasaVendorIn::dropdownListBarangKeluar', ['filter' => 'Auth']);
 $routes->get('/jasa-vendor-in/list-barang-masuk', 'JasaVendor\JasaVendorIn::dropdownListBarangMasuk', ['filter' => 'Auth']);
 $routes->get('/jasa-vendor-in/get-jasa-vendor-in-no',  'JasaVendor\JasaVendorIn::getJasaVendorInNo', ['filter' => 'Auth']);
-$routes->post('/jasa-vendor-in/save',  'JasaVendor\JasaVendorIn::createAction', ['filter' => 'Auth']);
-$routes->post('/jasa-vendor-in/update',  'JasaVendor\JasaVendorIn::updateAction', ['filter' => 'Auth']);
+$routes->post('/jasa-vendor-in/save',  'JasaVendor\JasaVendorIn::createActionNew', ['filter' => 'Auth']);
+$routes->post('/jasa-vendor-in/update',  'JasaVendor\JasaVendorIn::updateActionNew', ['filter' => 'Auth']);
 $routes->post('/jasa-vendor-in/delete',  'JasaVendor\JasaVendorIn::delete', ['filter' => 'Auth']);
 $routes->post('/jasa-vendor-in/posting',  'JasaVendor\JasaVendorIn::posting', ['filter' => 'Auth']);
 $routes->get('/jasa-vendor-in/id/(:segment)',  'JasaVendor\JasaVendorIn::detail/$1', ['filter' => 'Auth']);
