@@ -799,6 +799,12 @@ $routes->get('/biaya-eskpor/print/(:segment)', 'BiayaExim\BiayaEskpor\BiayaEskpo
 $routes->get('/biaya-eskpor/get-sales-order-export', 'BiayaExim\BiayaEskpor\BiayaEskpor::getSalesOrderExportByCustomerId', ['filter' => 'Auth']);
 $routes->get('/biaya-eskpor/export-excel', 'BiayaExim\BiayaEskpor\BiayaEskpor::exportExcel', ['filter' => 'Auth']);
 
+// BIAYA IMPOR
+$routes->get('/biaya-impor', 'BiayaExim\BiayaImpor\BiayaImpor::index', ['filter' => 'Auth']);
+$routes->get('/biaya-impor/create', 'BiayaExim\BiayaImpor\BiayaImpor::create', ['filter' => 'Auth']);
+$routes->get('/biaya-impor/dropdown-po', 'BiayaExim\BiayaImpor\BiayaImpor::dropdownPo', ['filter' => 'Auth']);
+$routes->get('/biaya-impor/get-detail-barang-po', 'BiayaExim\BiayaImpor\BiayaImpor::getDetailBarangPo', ['filter' => 'Auth']);
+
 // PRODUKSI
 // Production Result
 $routes->get('/production-result', 'Production\ProductionResult::index', ['filter' => 'Auth']);

@@ -1043,7 +1043,7 @@
                         diskon: $('#diskon').val() || 0,
                         harga_satuan: destroyFormatRupiah($('#harga_satuan').val()) || 0,
                         biaya_tambahan: destroyFormatRupiah($('#biaya_tambahan').val()) || 0,
-                        total: $('#total').val(),
+                        total: destroyFormatRupiah($('#total').val()),
                         note: $('#keterangan').val(),
                     }
 
@@ -1097,7 +1097,7 @@
             diskon: $('#diskon').val() || 0,
             harga_satuan: destroyFormatRupiah($('#harga_satuan').val()) || 0,
             biaya_tambahan: destroyFormatRupiah($('#biaya_tambahan').val()) || 0,
-            total: $('#total').val(),
+            total: destroyFormatRupiah($('#total').val()),
             note: $('#keterangan').val()
         });
         $(".detail-form input, .detail-form select").val("");
@@ -1130,7 +1130,7 @@
             newRow.append($('<td>').text(greatFormatRupiah(v.qty)));
             newRow.append($('<td>').text(v.nama_satuan));
             newRow.append($('<td>').text(greatFormatRupiah(v.biaya_tambahan)));
-            newRow.append($('<td>').text(v.total));
+            newRow.append($('<td>').text(greatFormatRupiah(v.total)));
             <?php if (!empty($dataPOImport)) : ?>
                 <?php if ($dataPOImport->is_posted) : ?>
                     newRow.append($('<td>').html(
