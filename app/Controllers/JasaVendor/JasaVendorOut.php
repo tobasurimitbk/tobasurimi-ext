@@ -212,6 +212,9 @@ class JasaVendorOut extends BaseController
 
         $barang = json_decode($this->request->getVar('listBarang'));
 
+        // var_dump($barang);
+        // die;
+
         foreach ($barang as $b) {
             // CEK STOK DARI PROSES REBUS
             $stockId = $b->id;
@@ -245,8 +248,12 @@ class JasaVendorOut extends BaseController
 
             } else {
                 // STOK JASA VENDOR
+                // $stockDetail = $this->stockDetail2Model->getStockListDetailNew(
+                //     $stockId
+                // );
+                $stockData = $this->stockDetail2Model->find($stockId);
                 $stockDetail = $this->stockDetail2Model->getStockListDetailNew(
-                    $stockId
+                     $stockId
                 );
 
                 if ($stockDetail) {
@@ -267,9 +274,9 @@ class JasaVendorOut extends BaseController
                         'proses_rebus_id'   => $stockRebus == null ? null : $stockRebus['id'],
                         'jasa_vendor_out_id'=> $id,
                         'stock_out_id'      => $stockId,
-                        'bc_out_id'         => $b->bc_id,
-                        'no_aju_out'        => $b->no_aju,
-                        'stock_dokumen'     => $b->stock_dokumen,
+                        'bc_out_id'     => !empty($b->bc_id) ? $b->bc_id : 0,
+                        'no_aju_out'    => !empty($b->no_aju) ? $b->no_aju : '-',
+                        'stock_dokumen' => !empty($b->stock_dokumen) ? $b->stock_dokumen : '-',
                         'qty'               => $b->qty
                     ]);
                 }
@@ -694,8 +701,6 @@ class JasaVendorOut extends BaseController
                     'stock.barang1_id' => $barangMasterId,
                 ];
                 $dataResult = $this->stockDetail2Model->getStockListJasaVendorOutNew($condition);
-                // var_dump($dataResult);
-                // die;
                 
                 $resultArr = [];
                 foreach ($dataResult as $item) {

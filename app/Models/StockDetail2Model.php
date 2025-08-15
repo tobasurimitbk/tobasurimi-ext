@@ -568,8 +568,11 @@ class StockDetail2Model extends Model
                 stock_details.stock_date,
                 stock_details.sumber,
                 satuans.kode_satuan,
-                SUM(CASE WHEN stock_details.status = "In" THEN stock_details2.qty ELSE 0 END) - 
-                SUM(CASE WHEN stock_details.status = "Out" THEN stock_details2.qty ELSE 0 END) AS stok_total
+                (SUM(CASE WHEN stock_details.status = "In" 
+                THEN stock_details2.qty ELSE 0 END) - 
+                SUM(CASE WHEN stock_details.status = "Out" 
+                THEN stock_details2.qty ELSE 0 END)) 
+                AS stok_total,        
             ')
             ->join('stock_details', 'stock_details.id = stock_details2.stock_detail_id')
             ->join('suppliers', 'suppliers.id = stock_details2.supplier_id', 'left')
@@ -691,8 +694,9 @@ class StockDetail2Model extends Model
                 barang_master.barang_name,
                 barang_master_spesifikasi.spesifikasi,
                 satuans.kode_satuan,
-                SUM(CASE WHEN stock_details.status = "In" THEN stock_details2.qty ELSE 0 END)
-                - SUM(CASE WHEN stock_details.status = "Out" THEN stock_details2.qty ELSE 0 END) AS stok_total
+                SUM(CASE WHEN LOWER(stock_details.status) = "in" THEN stock_details2.qty ELSE 0 END)
+                - SUM(CASE WHEN LOWER(stock_details.status) = "out" THEN stock_details2.qty ELSE 0 END) AS stok_total
+
             ')
             ->join('stock_details', 'stock_details.id = stock_details2.stock_detail_id')
             ->join('suppliers', 'suppliers.id = stock_details2.supplier_id', 'left')

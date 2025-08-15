@@ -1411,11 +1411,8 @@ class StockModel extends Model
             $jasaVendorOut = $jasaVendorOutModel->find($j['jasa_vendor_out_id']);
             $jasaVendorOutDetail = $jasaVendorOutDetailModel->find($j['jasa_vendor_out_detail_id']);
 
-            $stockOldDetail = $stockDetail2Model->getStockListDetail(
+            $stockOldDetail = $stockDetail2Model->getStockListDetailNew(
                 $jasaVendorOutDetail['stock_out_id'],
-                $jasaVendorOutDetail['bc_out_id'],
-                $jasaVendorOutDetail['no_aju_out'],
-                $jasaVendorOutDetail['stock_dokumen']
             );
 
             // DETAIL
