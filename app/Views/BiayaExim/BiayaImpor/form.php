@@ -10,18 +10,18 @@
                 Kembali
             </a>
             <?php if (!empty($dataBiayaImpor)) { ?>
-                <?php if (can('Biaya Exim', 'Biaya Ekspor', 'p')): ?>
+                <?php if (can('Biaya Exim', 'Biaya Impor', 'p')): ?>
                     <button class="btn btn-warning btn-print float-right" onclick="print('<?= encrypt($dataBiayaImpor['id']) ?>')">
                         Print
                     </button>
                 <?php endif; ?>
                 <?php if ($dataBiayaImpor['status_posting'] == 0) { ?>
-                    <?php if (can('Biaya Exim', 'Biaya Ekspor', 'a')): ?>
+                    <?php if (can('Biaya Exim', 'Biaya Impor', 'a')): ?>
                         <button class="btn btn-success posting-spp posting-so float-right" onclick="posting()">
                             Posting Audit
                         </button>
                     <?php endif; ?>
-                    <?php if (can('Biaya Exim', 'Biaya Ekspor', 'u')): ?>
+                    <?php if (can('Biaya Exim', 'Biaya Impor', 'u')): ?>
                         <button class="btn btn-show-form btn-save float-right btn-submit-parent">
                             Update
                         </button>
@@ -29,7 +29,7 @@
                 <?php } ?>
 
                 <?php if ($dataBiayaImpor['status_posting'] == 1) { ?>
-                    <?php if (can('Biaya Exim', 'Biaya Ekspor', 'ua')): ?>
+                    <?php if (can('Biaya Exim', 'Biaya Impor', 'ua')): ?>
                         <button class="btn btn-success posting-spp unposting-so float-right" onclick="unposting()">
                             Unposting Audit
                         </button>
@@ -95,8 +95,8 @@
                         <div class="form-floating mb-3" style="height: 50px;">
                             <select <?= !empty($dataBiayaImpor) ? ($dataBiayaImpor['status_posting'] == 1 ? 'disabled' : '') : '' ?> class="form-select tipe_po" name="tipe_po" id="tipe_po">
                                 <option value=""></option>
-                                <option value="IMPORT BAKU">IMPORT BAHAN BAKU</option>
-                                <option value="IMPORT PENOLONG">IMPORT BAHAN PENOLONG</option>
+                                <option <?= !empty($dataBiayaImpor) ? ($dataBiayaImpor['tipe_po'] == "IMPORT BAKU" ? 'selected' : '') : '' ?> value="IMPORT BAKU">IMPORT BAHAN BAKU</option>
+                                <option <?= !empty($dataBiayaImpor) ? ($dataBiayaImpor['tipe_po'] == "IMPORT PENOLONG" ? 'selected' : '') : '' ?> value="IMPORT PENOLONG">IMPORT BAHAN PENOLONG</option>
                             </select>
                             <label for="floatingInput">Pilih Tipe PO</label>
                         </div>
@@ -106,7 +106,7 @@
                             <select <?= !empty($dataBiayaImpor) ? ($dataBiayaImpor['status_posting'] == 1 ? 'disabled' : '') : '' ?> class="form-select supplier_id" name="supplier_id" id="supplier_id">
                                 <option value=""></option>
                                 <?php foreach ($dataSupplier as $d): ?>
-                                    <option value="<?= $d['id'] ?>"><?= $d['name'] ?></option>
+                                    <option <?= !empty($dataBiayaImpor) ? ($d['id'] == $dataBiayaImpor['supplier_id'] ? 'selected' : '') : '' ?> value="<?= $d['id'] ?>"><?= $d['name'] ?></option>
                                 <?php endforeach; ?>
                             </select>
                             <label for="floatingInput">Pilih Supplier</label>
@@ -116,10 +116,8 @@
                         <div class="form-floating mb-3" style="height: 50px;">
                             <select <?= !empty($dataBiayaImpor) ? ($dataBiayaImpor['status_posting'] == 1 ? 'disabled' : '') : '' ?> class="form-select po_id" name="po_id" id="po_id">
                                 <option value=""></option>
-                                <?php if (!empty($dataSalesOrderExport)): ?>
-                                    <?php foreach ($dataSalesOrderExport as $d): ?>
-                                        <option <?= !empty($dataBiayaImpor) ? ($dataBiayaImpor['sales_order_export_id'] == $d['sales_order_export_id'] ? 'selected' : '') : '' ?> value="<?= $d['sales_order_export_id'] ?>"><?= $d['sales_order_export_no'] . " - CONTAINER : " . $d['container'] . " PO : " . $d['po_no'] ?></option>
-                                    <?php endforeach; ?>
+                                <?php if (!empty($dataDetailPo)): ?>
+                                    <option selected value="<?= $dataDetailPo['id'] ?>"><?= $dataDetailPo['po_no'] ?></option>
                                 <?php endif; ?>
                             </select>
                             <label for="floatingInput">Pilih Nomor PO</label>
@@ -127,7 +125,7 @@
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3">
-                            <input <?= !empty($dataBiayaImpor) ? ($dataBiayaImpor['status_posting'] == 1 ? 'readonly' : '') : '' ?> autocomplete="one-time-code" type="text" class="form-control no_bl" id="no_bl" name="no_bl" placeholder="No B/L" value="<?= !empty($dataBiayaImpor) ? $dataBiayaImpor['no_container'] : '' ?>">
+                            <input <?= !empty($dataBiayaImpor) ? ($dataBiayaImpor['status_posting'] == 1 ? 'readonly' : '') : '' ?> autocomplete="one-time-code" type="text" class="form-control no_bl" id="no_bl" name="no_bl" placeholder="No B/L" value="<?= !empty($dataBiayaImpor) ? $dataBiayaImpor['no_bl'] : '' ?>">
                             <label for="floatingInput">No B/L</label>
                         </div>
                     </div>
@@ -144,25 +142,25 @@
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3">
-                            <input autocomplete="one-time-code" disabled type="text" class="form-control shipper_prev" id="shipper_prev" name="shipper_prev">
+                            <input autocomplete="one-time-code" readonly type="text" class="form-control shipper_prev" id="shipper_prev" name="shipper_prev">
                             <label for="floatingInput">Shipper</label>
                         </div>
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3">
-                            <input autocomplete="one-time-code" disabled type="text" class="form-control consigne_prev" id="consigne_prev" name="consigne_prev">
+                            <input autocomplete="one-time-code" readonly type="text" class="form-control consigne_prev" id="consigne_prev" name="consigne_prev">
                             <label for="floatingInput">Consigne</label>
                         </div>
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3">
-                            <input autocomplete="one-time-code" disabled type="text" class="form-control port_of_origin_prev" id="port_of_origin_prev" name="port_of_origin_prev">
+                            <input autocomplete="one-time-code" readonly type="text" class="form-control port_of_origin_prev" id="port_of_origin_prev" name="port_of_origin_prev">
                             <label for="floatingInput">Port Of Origin</label>
                         </div>
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3">
-                            <input autocomplete="one-time-code" disabled type="text" class="form-control port_of_destination" id="port_of_destination" name="port_of_destination">
+                            <input autocomplete="one-time-code" readonly type="text" class="form-control port_of_destination_prev" id="port_of_destination_prev" name="port_of_destination_prev">
                             <label for="floatingInput">Port Of Destination</label>
                         </div>
                     </div>
@@ -430,7 +428,7 @@
                 <h5 class="modal-title title-secondary"><label id="label-pengenaan-pajak"></label> Pengenaan Pajak</h5>
             </div>
             <form id="form-pengenaan-pajak" role="form" method="POST">
-                <input type="hidden" name="id_biaya_ekspor_pajak" id="id_biaya_ekspor_pajak">
+                <input type="hidden" name="id_biaya_impor_pajak" id="id_biaya_impor_pajak">
                 <div class="modal-body">
                     <div class="row">
                         <div class="col-md-6">
@@ -538,17 +536,21 @@
 
     $(document).ready(function() {
         <?php if (!empty($dataBiayaImpor)) { ?>
-            <?php foreach ($dataBiayaEksporDetail as $d): ?>
+            <?php foreach ($dataBiayaImporDetail as $d): ?>
                 listBiayaImpor.push({
                     id_biaya_impor_detail: "<?= $d['id'] ?>",
                     uraian_biaya: "<?= $d['uraian_biaya'] ?>",
+                    valas_id: "<?= $d['valas_id'] ?>",
+                    valas_name: "<?= $d['valas_name'] ?>",
                     nilai_biaya: <?= floatval($d['nilai_biaya']) ?>,
+                    nilai_exchange_rate: <?= floatval($d['nilai_exchange_rate']) ?>,
+                    nilai_biaya_idr: <?= floatval($d['nilai_biaya_idr']) ?>
                 });
             <?php endforeach ?>
 
-            <?php foreach ($dataBiayaEksporPajak as $d): ?>
+            <?php foreach ($dataBiayaImporPajak as $d): ?>
                 listPajak.push({
-                    id_biaya_ekspor_pajak: "<?= $d['id'] ?>",
+                    id_biaya_impor_pajak: "<?= $d['id'] ?>",
                     no_faktur_pajak: "<?= $d['no_faktur_pajak'] ?>",
                     tanggal_faktur_pajak: "<?= date('d/m/Y', strtotime($d['tanggal_faktur_pajak'])) ?>",
                     tax_id: "<?= $d['tax_id'] ?>",
@@ -559,9 +561,19 @@
                     type_tax: "<?= $d['type_tax'] ?>",
                 });
             <?php endforeach ?>
-            getPoDetail(<?= $dataBiayaImpor['sales_order_export_id'] ?>);
+
+            <?php foreach ($dataContainer as $d): ?>
+                listContainer.push({
+                    id_container: "<?= $d['id'] ?>",
+                    no_container: "<?= $d['no_container'] ?>",
+                    detail_container: "<?= $d['detail_container'] ?>"
+                })
+            <?php endforeach; ?>
+
+            getPoDetail("<?= $dataBiayaImpor['tipe_po'] ?>", "<?= $dataBiayaImpor['po_id'] ?>");
             drawTableBiayaEkspor(listBiayaImpor);
             drawTablePengenaanPajak(listPajak);
+            drawTableDetailContainer(listContainer);
             calculateTotalBiayaAndTax();
         <?php } else { ?>
 
@@ -662,19 +674,19 @@
                 divisi_id: {
                     required: true
                 },
-                sales_order_export_id: {
+                tipe_po: {
                     required: true
                 },
-                no_container: {
+                supplier_id: {
                     required: true
                 },
-                no_seal: {
+                po_id: {
                     required: true
                 },
-                nama_kapal: {
+                no_bl: {
                     required: true
                 },
-                keberangkatan_kapal: {
+                vendor_pelayaran_id: {
                     required: true
                 },
                 // no_surat_jalan: {
@@ -694,20 +706,20 @@
                 divisi_id: {
                     required: "Departemen wajib diisi"
                 },
-                sales_order_export_id: {
-                    required: "Pilih Order form ekspor"
+                tipe_po: {
+                    required: "Tipe PO wajib diisi"
                 },
-                no_container: {
-                    required: "No container wajib diisi"
+                supplier_id: {
+                    required: "Supplier wajib diisi"
                 },
-                no_seal: {
-                    required: "No seal wajib diisi"
+                po_id: {
+                    required: "Nomor po wajib diisi"
                 },
-                nama_kapal: {
-                    required: "Nama kapal wajib diisi"
+                no_bl: {
+                    required: "Nomor b/l wajib diisi"
                 },
-                keberangkatan_kapal: {
-                    required: "Keberangkatan kapal wajib diisi"
+                vendor_pelayaran_id: {
+                    required: "Vendor pelayaran wajib diisi"
                 },
                 // no_surat_jalan: {
                 //     required: "No surat jalan wajib diisi"
@@ -996,7 +1008,7 @@
         $('#btnSubmitPengenaanPajak').click(function(e) {
             e.preventDefault();
             if ($('#form-pengenaan-pajak').valid()) {
-                var idBiayaEksporPajak = $('#id_biaya_ekspor_pajak').val();
+                var idBiayaEksporPajak = $('#id_biaya_impor_pajak').val();
                 var tanggalFakturPajak = $('#tanggal_faktur_pajak').val();
                 var noFakturPajak = $('#no_faktur_pajak').val();
                 var taxId = $('#tax_id option:selected').val();
@@ -1010,7 +1022,7 @@
                     // UPDATE
                     var index = null;
                     for (var i = 0; i < listPajak.length; i++) {
-                        if (listPajak[i].id_biaya_ekspor_pajak == idBiayaEksporPajak) {
+                        if (listPajak[i].id_biaya_impor_pajak == idBiayaEksporPajak) {
                             index = i;
                             break;
                         }
@@ -1029,7 +1041,7 @@
                     // Create
                     idBiayaEksporPajak = getID();
                     listPajak.push({
-                        id_biaya_ekspor_pajak: idBiayaEksporPajak,
+                        id_biaya_impor_pajak: idBiayaEksporPajak,
                         no_faktur_pajak: noFakturPajak,
                         tanggal_faktur_pajak: tanggalFakturPajak,
                         tax_id: taxId,
@@ -1051,7 +1063,7 @@
             if (listBiayaImpor.length === 0) {
                 Swal.fire({
                     icon: 'error',
-                    title: 'Wajib mengisikan biaya ekspor !',
+                    title: 'Wajib mengisikan biaya impor !',
                     confirmButtonColor: '#4e73df',
                 })
             } else {
@@ -1070,7 +1082,7 @@
                         if (result.isConfirmed) {
                             const csrf = $(`[name="${csrfToken}"]`);
                             let id = $('#id').val();
-                            let url = id == '' ? "<?= base_url('biaya-eskpor/create') ?>" : "<?= base_url('biaya-eskpor/update') ?>";
+                            let url = id == '' ? "<?= base_url('biaya-impor/create') ?>" : "<?= base_url('biaya-impor/update') ?>";
                             let data = new FormData(document.querySelector("#form-parent"));
                             let totalFaktur = destroyFormatRupiah($('#total_faktur_prev').val());
                             let totalFakturBeforeTax = destroyFormatRupiah($('#total_biaya_prev').val());
@@ -1079,6 +1091,7 @@
                             data.append("total_faktur", totalFaktur);
                             data.append("listBiayaImpor", JSON.stringify(listBiayaImpor));
                             data.append("listPajak", JSON.stringify(listPajak));
+                            data.append("listContainer", JSON.stringify(listContainer));
 
                             $.ajax({
                                 url: url,
@@ -1102,7 +1115,7 @@
                                                 confirmButtonColor: '#4e73df',
                                             })
                                             .then(() => {
-                                                window.location.href = "<?= base_url("biaya-eskpor") ?>";
+                                                window.location.href = "<?= base_url("biaya-impor") ?>";
                                             })
                                     } else {
                                         Swal.fire({
@@ -1158,7 +1171,7 @@
                         $('#shipper_prev').val(dataPo.shipper);
                         $('#consigne_prev').val(dataPo.consigne);
                         $('#port_of_origin_prev').val(dataPo.port_origin);
-                        $('#port_of_destination').val(dataPo.port_destination);
+                        $('#port_of_destination_prev').val(dataPo.port_destination);
 
                         $('#txt_valas').text("(" + dataPo.valas_name + ")");
 
@@ -1216,7 +1229,7 @@
     }
 
     function resetFormPengenaanPajak() {
-        $('#id_biaya_ekspor_pajak').val(null);
+        $('#id_biaya_impor_pajak').val(null);
         $('#tanggal_faktur_pajak').val(null);
         $('#no_faktur_pajak').val(null);
         $('#tax_id').val(null).change();
@@ -1315,19 +1328,19 @@
                 newRow.append($('<td>').html(
                     <?php if (!empty($dataBiayaImpor)) : ?> <?php if ($dataBiayaImpor['status_posting'] == 1) : ?> `-`
                         <?php else : ?> `
-                        <button type="button" class="btn btn-warning posting-spp mr-1" onclick="detailRowPajak('${item.id_biaya_ekspor_pajak}')">
+                        <button type="button" class="btn btn-warning posting-spp mr-1" onclick="detailRowPajak('${item.id_biaya_impor_pajak}')">
                                 <i class="fa fa-pencil fa-sm" aria-hidden="true"></i>
                             </button>
-                            <button type="button" class="btn btn-danger" onclick="deleteRowPajak('${item.id_biaya_ekspor_pajak}')">
+                            <button type="button" class="btn btn-danger" onclick="deleteRowPajak('${item.id_biaya_impor_pajak}')">
                                 <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
                             </button>
                     `
                         <?php endif; ?>
 
                     <?php else : ?> `
-                        <button type="button" class="btn btn-warning posting-spp mr-1" onclick="detailRowPajak('${item.id_biaya_ekspor_pajak}')">
+                        <button type="button" class="btn btn-warning posting-spp mr-1" onclick="detailRowPajak('${item.id_biaya_impor_pajak}')">
                                 <i class="fa fa-pencil fa-sm" aria-hidden="true"></i>
-                            </button><button type="button" class="btn btn-danger" onclick="deleteRowPajak('${item.id_biaya_ekspor_pajak}')">
+                            </button><button type="button" class="btn btn-danger" onclick="deleteRowPajak('${item.id_biaya_impor_pajak}')">
                                 <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
                             </button>
                     `
@@ -1402,16 +1415,16 @@
         $('#detailBiayaModal').modal('show');
     }
 
-    function detailRowPajak(id_biaya_ekspor_pajak) {
+    function detailRowPajak(id_biaya_impor_pajak) {
         var item = null;
         for (var i = 0; i < listPajak.length; i++) {
-            if (listPajak[i].id_biaya_ekspor_pajak == id_biaya_ekspor_pajak) {
+            if (listPajak[i].id_biaya_impor_pajak == id_biaya_impor_pajak) {
                 item = listPajak[i];
                 break;
             }
         }
 
-        $('#id_biaya_ekspor_pajak').val(item.id_biaya_ekspor_pajak);
+        $('#id_biaya_impor_pajak').val(item.id_biaya_impor_pajak);
         $('#tanggal_faktur_pajak').val(item.tanggal_faktur_pajak);
         $('#no_faktur_pajak').val(item.no_faktur_pajak);
         $('#tax_id').val(item.tax_id).change();
@@ -1454,10 +1467,10 @@
         drawTableDetailContainer(listContainer);
     }
 
-    function deleteRowPajak(id_biaya_ekspor_pajak) {
+    function deleteRowPajak(id_biaya_impor_pajak) {
         var indexToRemove = -1;
         for (var i = 0; i < listPajak.length; i++) {
-            if (listPajak[i].id_biaya_ekspor_pajak == id_biaya_ekspor_pajak) {
+            if (listPajak[i].id_biaya_impor_pajak == id_biaya_impor_pajak) {
                 indexToRemove = i;
                 break;
             }
@@ -1565,7 +1578,7 @@
     }
 
     const print = function(id) {
-        window.open("<?= base_url('biaya-eskpor/print') ?>" + '/' + id, "_blank");
+        window.open("<?= base_url('biaya-impor/print') ?>" + '/' + id, "_blank");
     }
 
     function posting() {
@@ -1582,7 +1595,7 @@
             if (result.isConfirmed) {
                 const csrf = $(`[name="${csrfToken}"]`);
                 $.ajax({
-                    url: "<?= base_url("biaya-eskpor/posting"); ?>",
+                    url: "<?= base_url("biaya-impor/posting"); ?>",
                     data: {
                         id: $("#id").val(),
                     },
@@ -1603,7 +1616,7 @@
                                     confirmButtonColor: '#4e73df',
                                 })
                                 .then(() => {
-                                    location.href = "<?= base_url('biaya-eskpor') ?>";
+                                    location.href = "<?= base_url('biaya-impor') ?>";
                                 })
                         }
                     },
@@ -1628,7 +1641,7 @@
             if (result.isConfirmed) {
                 const csrf = $(`[name="${csrfToken}"]`);
                 $.ajax({
-                    url: "<?= base_url("biaya-eskpor/unposting"); ?>",
+                    url: "<?= base_url("biaya-impor/unposting"); ?>",
                     data: {
                         id: $("#id").val(),
                     },

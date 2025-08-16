@@ -804,6 +804,15 @@ $routes->get('/biaya-impor', 'BiayaExim\BiayaImpor\BiayaImpor::index', ['filter'
 $routes->get('/biaya-impor/create', 'BiayaExim\BiayaImpor\BiayaImpor::create', ['filter' => 'Auth']);
 $routes->get('/biaya-impor/dropdown-po', 'BiayaExim\BiayaImpor\BiayaImpor::dropdownPo', ['filter' => 'Auth']);
 $routes->get('/biaya-impor/get-detail-barang-po', 'BiayaExim\BiayaImpor\BiayaImpor::getDetailBarangPo', ['filter' => 'Auth']);
+$routes->post('/biaya-impor/create', 'BiayaExim\BiayaImpor\BiayaImpor::store', ['filter' => 'Auth']);
+$routes->post('/biaya-impor/update', 'BiayaExim\BiayaImpor\BiayaImpor::update', ['filter' => 'Auth']);
+$routes->post('/biaya-impor/delete', 'BiayaExim\BiayaImpor\BiayaImpor::delete', ['filter' => 'Auth']);
+$routes->post('/biaya-impor/posting', 'BiayaExim\BiayaImpor\BiayaImpor::posting', ['filter' => 'Auth']);
+$routes->post('/biaya-impor/unposting', 'BiayaExim\BiayaImpor\BiayaImpor::unposting', ['filter' => 'Auth']);
+$routes->get('/biaya-impor/all', 'BiayaExim\BiayaImpor\BiayaImpor::all', ['filter' => 'Auth']);
+$routes->get('/biaya-impor/id/(:segment)', 'BiayaExim\BiayaImpor\BiayaImpor::edit/$1', ['filter' => 'Auth']);
+$routes->get('/biaya-impor/print/(:segment)', 'BiayaExim\BiayaImpor\BiayaImpor::print/$1', ['filter' => 'Auth']);
+$routes->get('/biaya-impor/export-excel', 'BiayaExim\BiayaImpor\BiayaImpor::exportExcel', ['filter' => 'Auth']);
 
 // PRODUKSI
 // Production Result

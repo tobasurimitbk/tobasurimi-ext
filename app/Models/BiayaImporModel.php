@@ -12,8 +12,8 @@ class BiayaImporModel extends Model
     protected $useAutoIncrement = true;
     protected $insertID         = 0;
     protected $returnType       = 'array';
-    protected $useSoftDeletes   = false;
-    protected $protectFields    = true;
+    protected $useSoftDeletes   = true;
+    protected $protectFields    = false;
     protected $allowedFields    = [];
 
     // Dates
@@ -39,6 +39,88 @@ class BiayaImporModel extends Model
     protected $afterFind      = [];
     protected $beforeDelete   = [];
     protected $afterDelete    = [];
+
+    public function getList($condition, $addCondition, $limit = 10, $offset = 0)
+    {
+        $availableSort = [
+            'biaya_impor.id'     => 'biaya_impor.id',
+            'biaya_impor.divisi_id'     => 'biaya_impor.divisi_id',
+            'biaya_impor.tanggal_invoice'         => 'biaya_impor.tanggal_invoice',
+            'biaya_impor.no_invoice'               => 'biaya_impor.no_invoice',
+            'suppliers.name'               => 'suppliers.name',
+            'biaya_impor.port_of_origin'               =>  'biaya_impor.port_of_origin',
+            'biaya_impor.port_of_destination'               =>  'biaya_impor.port_of_destination',
+            'biaya_impor.vendor_pelayaran_id'               => 'biaya_impor.vendor_pelayaran_id',
+            'biaya_impor.total_faktur' => 'biaya_impor.total_faktur',
+            'biaya_impor.status_posting'               => 'biaya_impor.status_posting',
+        ];
+
+        $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
+
+        $sort = $availableSort[$addCondition['sort'] ?? 'createdAt'] ?? 'tanggal_invoice';
+        $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'DESC';
+
+        $selectQry = "biaya_impor.*,
+            suppliers.name as supplier_name,
+            vendor_pelayaran.nama_vendor,
+            divisis.divisi
+        ";
+
+        $dataQry = $this->asArray()
+            ->select($selectQry)
+            ->join('vendor_pelayaran', 'vendor_pelayaran.id = biaya_impor.vendor_pelayaran_id', 'left')
+            ->join('suppliers', 'suppliers.id = biaya_impor.supplier_id', 'left')
+            ->join('divisis', 'divisis.id = biaya_impor.divisi_id', 'left')
+            ->where($condition);
+
+        $totalData = $dataQry->countAllResults(false);
+
+        if (!empty($addCondition['dateStart']) || !empty($addCondition['dateEnd'])) {
+            $dataQry->groupStart();
+            if (!empty($addCondition['dateStart'])) {
+                $dataQry->where('tanggal_invoice >=', $addCondition['dateStart']);
+            }
+            if (!empty($addCondition['dateEnd'])) {
+                $dataQry->where('tanggal_invoice <=', $addCondition['dateEnd']);
+            }
+            $dataQry->groupEnd();
+        }
+
+        if ($addCondition['status_posting']) {
+            if ($addCondition['status_posting'] == "SUDAH POSTING") {
+                $dataQry
+                    ->where('biaya_impor.status_posting', 1);
+            } else if ($addCondition['status_posting'] == "BELUM POSTING") {
+                $dataQry
+                    ->where('biaya_impor.status_posting', 0);
+            }
+        }
+
+        if (isset($addCondition['search']) && !empty($addCondition['search'])) {
+            $dataQry->groupStart()
+                ->like('no_invoice', $addCondition['search'])
+                ->orLike('biaya_impor.port_of_origin', $addCondition['search'])
+                ->orLike('biaya_impor.port_of_destination', $addCondition['search'])
+                ->orLike('suppliers.name', $addCondition['search'])
+                ->orLike('vendor_pelayaran.nama_vendor', $addCondition['search'])
+                ->orLike('biaya_impor.total_faktur', $addCondition['search'])
+                ->orLike('divisis.divisi', $addCondition['search'])
+                ->groupEnd();
+        }
+
+        $totalFilteredData = $dataQry->countAllResults(false);
+
+        $data = $dataQry->orderBy($sort, $sortType)
+            ->findAll($limit, $offset);
+
+        return [
+            'data'              => $data,
+            'totalData'         => $totalData,
+            'totalFilteredData' => $totalFilteredData,
+            'sort'              => $sort,
+            'sortType'          => $sortType
+        ];
+    }
 
     public function getDropdownPo($supplierId, $tipePo)
     {
@@ -169,5 +251,33 @@ class BiayaImporModel extends Model
             'po_detail' => $poDetail,
             'po_barang' => $poBarangList
         ];
+    }
+
+    public function generateNumber($tanggalInvoice)
+    {
+        $tanggalTerimaExplode = explode('/', $tanggalInvoice);
+
+        $month = $tanggalTerimaExplode[1];
+        $year = substr($tanggalTerimaExplode[2], -2);
+        $romanMonth = romanMonthNumber($month);
+        $numberTemplate = "/INV/$romanMonth/$year";
+
+        $lastData = $this->asObject()
+            ->where('company_id', session()->get("login")->this_company_id)
+            ->like('no_invoice', $numberTemplate, 'before')
+            ->orderBy('createdAt', 'DESC')
+            ->first();
+
+        $invNumber = '001' . $numberTemplate;
+
+        if (!empty($lastData)) {
+            $asd = explode('/', $lastData->no_invoice);
+            $lastIncrement = intval($asd[0]) + 1;
+            $paddedNumber = str_pad($lastIncrement, 3, 0, STR_PAD_LEFT);
+
+            $invNumber = $paddedNumber . $numberTemplate;
+        }
+
+        return $invNumber;
     }
 }

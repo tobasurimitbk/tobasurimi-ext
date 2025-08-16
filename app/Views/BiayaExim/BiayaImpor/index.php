@@ -54,15 +54,15 @@
                         <thead class="thead-dark">
                             <tr>
                                 <th onclick="changeSort('biaya_ekspor.id')">No</th>
-                                <th onclick="changeSort('biaya_ekspor.divisi_id')" class="sort">Departemen</th>
-                                <th onclick="changeSort('biaya_ekspor.tanggal_invoice')" class="sort">Tanggal</th>
-                                <th onclick="changeSort('biaya_ekspor.no_invoice')" class="sort">Invoice</th>
-                                <th onclick="changeSort('biaya_ekspor.no_container')" class="sort">Supplier</th>
-                                <th onclick="changeSort('customers.name')" class="sort">Port Of Origin</th>
-                                <th onclick="changeSort('sales_contract.dicharge_port')" class="sort">Port Of Destination</th>
-                                <th onclick="changeSort('vendor_pelayaran.nama_vendor')" class="sort">Vendor</th>
-                                <th onclick="changeSort('biaya_ekspor.total_faktur')" class="sort">Total</th>
-                                <th onclick="changeSort('biaya_ekspor.status_posting')" class="sort">Audit</th>
+                                <th onclick="changeSort('biaya_impor.divisi_id')" class="sort">Departemen</th>
+                                <th onclick="changeSort('biaya_impor.tanggal_invoice')" class="sort">Tanggal</th>
+                                <th onclick="changeSort('biaya_impor.no_invoice')" class="sort">Invoice</th>
+                                <th onclick="changeSort('suppliers.name')" class="sort">Supplier</th>
+                                <th onclick="changeSort('biaya_impor.port_of_origin')" class="sort">Port Of Origin</th>
+                                <th onclick="changeSort('biaya_impor.port_of_destination')" class="sort">Port Of Destination</th>
+                                <th onclick="changeSort('biaya_impor.vendor_pelayaran_id')" class="sort">Vendor</th>
+                                <th onclick="changeSort('biaya_impor.total_faktur')" class="sort">Total</th>
+                                <th onclick="changeSort('biaya_impor.status_posting')" class="sort">Audit</th>
                                 <th>Action</th>
                             </tr>
                         </thead>
@@ -83,181 +83,181 @@
     let sort = "biaya_ekspor.tanggal_invoice";
     let sortType = "desc";
 
-    // const table = $('.dataTable').DataTable({
+    const table = $('.dataTable').DataTable({
 
-    //     processing: true,
-    //     serverSide: true,
-    //     ordering: true,
-    //     order: [
-    //         [1, 'asc']
-    //     ],
-    //     fixedHeader: true,
-    //     lengthMenu: [
-    //         [25],
-    //         [25],
-    //     ],
-    //     pageLength: 25,
-    //     ajax: {
-    //         url: "<?= base_url("biaya-eskpor/all"); ?>",
-    //         dataSrc: "data",
-    //         data: function(data) {
-    //             data.search = $(".search").val();
-    //             data.status_posting = $(".status_posting").val();
-    //             data.dateStart = $(".dateStart").val();
-    //             data.dateEnd = $(".dateEnd").val();
-    //             data.sort = sort;
-    //             data.sortType = sortType;
-    //         }
-    //     },
-    //     initComplete: function(settings, json) {
-    //         $('.dataTables_length').empty();
-    //         $('.dataTables_length').html("<div><label class='text-center ml-2 mt-2'>Show <b class='entries-label'>25</b> Entries</label></div>");
-    //         $('.dataTable').wrap("<div style='overflow:auto; width:100%;position:relative;'></div>");
-    //     },
-    //     display: "stripe",
-    //     searching: false,
-    //     columns: [{
-    //             data: "no",
-    //             className: "text-left",
-    //         }, {
-    //             data: "divisi",
-    //             className: "text-left"
-    //         }, {
-    //             data: "tanggal_invoice",
-    //             className: "text-left"
-    //         }, {
-    //             data: "no_invoice",
-    //             className: "text-left",
-    //         }, {
-    //             data: "no_container",
-    //             className: "text-left",
-    //         }, {
-    //             data: "customer_name",
-    //             className: "text-left",
-    //         }, {
-    //             data: "dicharge_port",
-    //             className: "text-left",
-    //         }, {
-    //             data: "nama_vendor",
-    //             className: "text-left",
-    //         },
-    //         {
-    //             data: "total_faktur",
-    //             className: "text-left",
-    //             render: function(data) {
-    //                 return greatFormatRupiah(data);
-    //             }
-    //         },
-    //         {
-    //             data: "status_posting",
-    //             className: "text-center",
-    //             searchable: false,
-    //             sortable: false,
-    //             width: "5%",
-    //             render: function(data, type, row) {
-    //                 let htmlRes = '';
+        processing: true,
+        serverSide: true,
+        ordering: true,
+        order: [
+            [1, 'asc']
+        ],
+        fixedHeader: true,
+        lengthMenu: [
+            [25],
+            [25],
+        ],
+        pageLength: 25,
+        ajax: {
+            url: "<?= base_url("biaya-impor/all"); ?>",
+            dataSrc: "data",
+            data: function(data) {
+                data.search = $(".search").val();
+                data.status_posting = $(".status_posting").val();
+                data.dateStart = $(".dateStart").val();
+                data.dateEnd = $(".dateEnd").val();
+                data.sort = sort;
+                data.sortType = sortType;
+            }
+        },
+        initComplete: function(settings, json) {
+            $('.dataTables_length').empty();
+            $('.dataTables_length').html("<div><label class='text-center ml-2 mt-2'>Show <b class='entries-label'>25</b> Entries</label></div>");
+            $('.dataTable').wrap("<div style='overflow:auto; width:100%;position:relative;'></div>");
+        },
+        display: "stripe",
+        searching: false,
+        columns: [{
+                data: "no",
+                className: "text-left",
+            }, {
+                data: "divisi",
+                className: "text-left"
+            }, {
+                data: "tanggal_invoice",
+                className: "text-left"
+            }, {
+                data: "no_invoice",
+                className: "text-left",
+            }, {
+                data: "supplier_name",
+                className: "text-left",
+            }, {
+                data: "port_of_origin",
+                className: "text-left",
+            }, {
+                data: "port_of_destination",
+                className: "text-left",
+            }, {
+                data: "nama_vendor",
+                className: "text-left",
+            },
+            {
+                data: "total_faktur",
+                className: "text-left",
+                render: function(data) {
+                    return greatFormatRupiah(data);
+                }
+            },
+            {
+                data: "status_posting",
+                className: "text-center",
+                searchable: false,
+                sortable: false,
+                width: "5%",
+                render: function(data, type, row) {
+                    let htmlRes = '';
 
-    //                 if (row.status_posting == 1) {
-    //                     htmlRes += `
-    //                         <div class="text-success">
-    //                            <i class="fa-solid fa-check"></i>
-    //                         </div>`
-    //                 } else {
-    //                     htmlRes += `
-    //                         <div class="text-danger">
-    //                            <i class="fa-solid fa-x"></i>
-    //                         </div>`
-    //                 }
+                    if (row.status_posting == 1) {
+                        htmlRes += `
+                            <div class="text-success">
+                               <i class="fa-solid fa-check"></i>
+                            </div>`
+                    } else {
+                        htmlRes += `
+                            <div class="text-danger">
+                               <i class="fa-solid fa-x"></i>
+                            </div>`
+                    }
 
-    //                 return htmlRes;
-    //             }
-    //         },
-    //         {
-    //             data: "id",
-    //             className: "text-center actions",
-    //             searchable: false,
-    //             sortable: false,
-    //             render: function(data, type, row) {
-    //                 let id = row.id;
-    //                 let status_posting = row.status_posting;
+                    return htmlRes;
+                }
+            },
+            {
+                data: "id",
+                className: "text-center actions",
+                searchable: false,
+                sortable: false,
+                render: function(data, type, row) {
+                    let id = row.id;
+                    let status_posting = row.status_posting;
 
-    //                 let res = '';
+                    let res = '';
 
-    //                 if (status_posting === "0") {
-    //                     res += `
-    //                     <div class="mt-0">
-    //                       <?php if (can('Biaya Exim', 'Biaya Ekspor', 'u')) : ?>
-    //                         <a href="javascript:void(0)" onclick="edit('${id}')" data-toggle="tooltip" title="Edit" class="btn btn-primary">
-    //                             <i class="fas fa-edit"></i>
-    //                         </a>
-    //                     <?php endif; ?>
-    //                         <?php if (can('Biaya Exim', 'Biaya Ekspor', 'p')) : ?>
-    //                             <button data-toggle="tooltip" title="Print" class="btn btn-warning btn-print" onclick="print('<?= base_url("biaya-eskpor/print/"); ?>${id}')" style="box-shadow: none !important;">
-    //                                 <i class="fa fa-print fa-sm" aria-hidden="true"></i>
-    //                             </button>
-    //                         <?php endif; ?>
-    //                         <?php if (can('Biaya Exim', 'Biaya Ekspor', 'a')) : ?>
-    //                             <button data-toggle="tooltip" title="Posting Audit" onclick="posting('${id}')" class="btn btn-success posting-spp">
-    //                                 <i class="fa fa-paper-plane fa-sm" aria-hidden="true"></i>
-    //                             </button>
-    //                         <?php endif; ?>
-    //                         <?php if (can('Biaya Exim', 'Biaya Ekspor', 'd')) : ?>
-    //                             <button data-toggle="tooltip" title="Delete" onclick="remove('${id}')" class="btn btn-danger delete-parent">
-    //                                 <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
-    //                             </button>
-    //                         <?php endif; ?>
-    //                         </div>
-    //                     `;
-    //                 }
+                    if (status_posting === "0") {
+                        res += `
+                        <div class="mt-0">
+                          <?php if (can('Biaya Exim', 'Biaya Ekspor', 'u')) : ?>
+                            <a href="javascript:void(0)" onclick="edit('${id}')" data-toggle="tooltip" title="Edit" class="btn btn-primary">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                        <?php endif; ?>
+                            <?php if (can('Biaya Exim', 'Biaya Ekspor', 'p')) : ?>
+                                <button data-toggle="tooltip" title="Print" class="btn btn-warning btn-print" onclick="print('<?= base_url("biaya-impor/print/"); ?>${id}')" style="box-shadow: none !important;">
+                                    <i class="fa fa-print fa-sm" aria-hidden="true"></i>
+                                </button>
+                            <?php endif; ?>
+                            <?php if (can('Biaya Exim', 'Biaya Ekspor', 'a')) : ?>
+                                <button data-toggle="tooltip" title="Posting Audit" onclick="posting('${id}')" class="btn btn-success posting-spp">
+                                    <i class="fa fa-paper-plane fa-sm" aria-hidden="true"></i>
+                                </button>
+                            <?php endif; ?>
+                            <?php if (can('Biaya Exim', 'Biaya Ekspor', 'd')) : ?>
+                                <button data-toggle="tooltip" title="Delete" onclick="remove('${id}')" class="btn btn-danger delete-parent">
+                                    <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
+                                </button>
+                            <?php endif; ?>
+                            </div>
+                        `;
+                    }
 
-    //                 if (status_posting === "1") {
-    //                     res += `
-    //                      <?php if (can('Biaya Exim', 'Biaya Ekspor', 'u')) : ?>
-    //                         <a href="javascript:void(0)" onclick="edit('${id}')" data-toggle="tooltip" title="Edit" class="btn btn-primary">
-    //                             <i class="fas fa-edit"></i>
-    //                         </a>
-    //                     <?php endif; ?>
-    //                     <?php if (can('Biaya Exim', 'Biaya Ekspor', 'p')) : ?>
-    //                         <button data-toggle="tooltip" title="Print" class="btn btn-warning btn-print" onclick="print('<?= base_url("biaya-eskpor/print/"); ?>${id}')" style="box-shadow: none !important;">
-    //                             <i class="fa fa-print fa-sm" aria-hidden="true"></i>
-    //                         </button>
+                    if (status_posting === "1") {
+                        res += `
+                         <?php if (can('Biaya Exim', 'Biaya Ekspor', 'u')) : ?>
+                            <a href="javascript:void(0)" onclick="edit('${id}')" data-toggle="tooltip" title="Edit" class="btn btn-primary">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                        <?php endif; ?>
+                        <?php if (can('Biaya Exim', 'Biaya Ekspor', 'p')) : ?>
+                            <button data-toggle="tooltip" title="Print" class="btn btn-warning btn-print" onclick="print('<?= base_url("biaya-impor/print/"); ?>${id}')" style="box-shadow: none !important;">
+                                <i class="fa fa-print fa-sm" aria-hidden="true"></i>
+                            </button>
 
-    //                     <?php endif; ?>
-    //                       <?php if (can('Biaya Exim', 'Biaya Ekspor', 'ua')) : ?>
-    //                             <button data-toggle="tooltip" title="Un-Posting" onclick="unposting('${id}')" class="btn btn-danger posting-spp">
-    //                                 <i class="fa-solid fa-ban"></i>    
-    //                             </button>
-    //                         <?php endif; ?>
-    //                     `;
-    //                 }
+                        <?php endif; ?>
+                          <?php if (can('Biaya Exim', 'Biaya Ekspor', 'ua')) : ?>
+                                <button data-toggle="tooltip" title="Un-Posting" onclick="unposting('${id}')" class="btn btn-danger posting-spp">
+                                    <i class="fa-solid fa-ban"></i>    
+                                </button>
+                            <?php endif; ?>
+                        `;
+                    }
 
-    //                 return `
-    //                 <div class="mt-0">
-    //                     ${res}
-    //                 </div>
-    //                 `;
-    //             }
-    //         }
-    //     ],
-    //     "drawCallback": function(settings) {
-    //         var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-toggle="tooltip"]'))
-    //         var tooltipList = tooltipTriggerList.map(function(tooltipTriggerEl) {
-    //             return new bootstrap.Tooltip(tooltipTriggerEl)
-    //         });
-    //     },
-    //     columnDefs: [{
-    //         defaultContent: "-",
-    //         targets: "_all"
-    //     }],
-    //     language: {
-    //         emptyTable: "Tidak ada data",
-    //         lengthMenu: "Show _MENU_ entries",
-    //         paginate: {
-    //             previous: '<i class="fa fa-angle-left"></i>',
-    //             next: '<i class="fa fa-angle-right"></i>'
-    //         }
-    //     }
-    // });
+                    return `
+                    <div class="mt-0">
+                        ${res}
+                    </div>
+                    `;
+                }
+            }
+        ],
+        "drawCallback": function(settings) {
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-toggle="tooltip"]'))
+            var tooltipList = tooltipTriggerList.map(function(tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl)
+            });
+        },
+        columnDefs: [{
+            defaultContent: "-",
+            targets: "_all"
+        }],
+        language: {
+            emptyTable: "Tidak ada data",
+            lengthMenu: "Show _MENU_ entries",
+            paginate: {
+                previous: '<i class="fa fa-angle-left"></i>',
+                next: '<i class="fa fa-angle-right"></i>'
+            }
+        }
+    });
 
     $(".dateStart").datepicker({
         todayHighlight: true,
@@ -303,7 +303,7 @@
             if (result.isConfirmed) {
                 const csrf = $(`[name="${csrfToken}"]`);
                 $.ajax({
-                    url: "<?= base_url("biaya-eskpor/delete"); ?>",
+                    url: "<?= base_url("biaya-impor/delete"); ?>",
                     data: {
                         id: id,
                     },
@@ -335,7 +335,7 @@
     }
 
     function edit(id) {
-        window.location.href = `/biaya-eskpor/id/${id}`;
+        window.location.href = `/biaya-impor/id/${id}`;
     }
 
     function exportExcel() {
@@ -344,7 +344,7 @@
         var statusPosting = $('#status_posting').val();
         var search = $('#search').val();
 
-        window.location.href = "<?= base_url('biaya-eskpor/export-excel') ?>" + '?dateStart=' + dateStart + '&dateEnd=' + dateEnd + '&status_posting=' + statusPosting + '&search=' + search;
+        window.location.href = "<?= base_url('biaya-impor/export-excel') ?>" + '?dateStart=' + dateStart + '&dateEnd=' + dateEnd + '&status_posting=' + statusPosting + '&search=' + search;
     }
 
     const print = function(url) {
@@ -365,7 +365,7 @@
             if (result.isConfirmed) {
                 const csrf = $(`[name="${csrfToken}"]`);
                 $.ajax({
-                    url: "<?= base_url("biaya-eskpor/posting"); ?>",
+                    url: "<?= base_url("biaya-impor/posting"); ?>",
                     data: {
                         id: id,
                     },
@@ -411,7 +411,7 @@
             if (result.isConfirmed) {
                 const csrf = $(`[name="${csrfToken}"]`);
                 $.ajax({
-                    url: "<?= base_url("biaya-eskpor/unposting"); ?>",
+                    url: "<?= base_url("biaya-impor/unposting"); ?>",
                     data: {
                         id: id,
                     },
