@@ -169,7 +169,7 @@
 
                 <div class="row">
                     <div class="col mb-3">
-                        <label class="form-label font-weight-bold lable-title">List Barang yang di Eskpor</label>
+                        <label class="form-label font-weight-bold lable-title">List Barang Impor</label>
                     </div>
                 </div>
 
@@ -191,7 +191,7 @@
                             </tbody>
                             <tfoot id="foot-detail-table-barang">
                                 <tr>
-                                    <td colspan="6">List Barang Eskpor Tidak Ada</td>
+                                    <td colspan="6">List Barang Impor Tidak Ada</td>
                                 </tr>
                             </tfoot>
                         </table>
@@ -1222,7 +1222,7 @@
         $('#uraian_biaya').val(null);
         $('#nilai_biaya').val(null);
         $('#valas_id').val(null).change();
-        $('#exchange_rate').val(null).change();
+        $('#exchange_rate').val(1).change();
         $('#nilai_biaya_idr').val(null).change();
 
         drawTableBiayaEkspor(listBiayaImpor);
@@ -1268,7 +1268,7 @@
                 <tr style="color:whitesmoke;">
                     <td class="text-center">${no++}</td>
                     <td>${item.uraian_biaya}</td>
-                    <td>${item.valas_name}</td>
+                    <td class="text-right">${item.valas_name}</td>
                     <td class="text-right">${greatFormatRupiah(item.nilai_biaya)}</td>
                     <td class="text-right">${greatFormatRupiah(item.nilai_exchange_rate)}</td>
                     <td class="text-right">${greatFormatRupiah(item.nilai_biaya_idr)}</td>
@@ -1409,7 +1409,10 @@
 
         $('#id_biaya_impor_detail').val(item.id_biaya_impor_detail);
         $('#uraian_biaya').val(item.uraian_biaya);
+        $('#valas_id').val(item.valas_id).change();
         $('#nilai_biaya').val(greatFormatRupiah(item.nilai_biaya));
+        $('#exchange_rate').val(greatFormatRupiah(item.nilai_exchange_rate));
+        $('#nilai_biaya_idr').val(greatFormatRupiah(item.nilai_biaya_idr));
 
         $('#label-biaya-impor').text("Update ");
         $('#detailBiayaModal').modal('show');
@@ -1508,7 +1511,7 @@
         if (dataPoDetail.length === 0) {
             row += `
                     <tr>
-                        <td colspan="8">List Barang Eskpor Tidak Ada</td>
+                        <td colspan="8">List Barang Impor Tidak Ada</td>
                     </tr>
                 `;
             $('#foot-detail-table-barang').append(row);
