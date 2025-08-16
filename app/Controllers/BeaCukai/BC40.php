@@ -2489,7 +2489,7 @@ class BC40 extends BaseController
                 kemasan.name AS nama_kemasan,
                 SUM(pbd.qty) AS qty_po,
                 SUM(pbd.jml_masuk) AS qty_lpb,
-                po.total_before_pph AS sub_total
+                pod.total_before_pph AS sub_total
             FROM penerimaan_barang pb
             LEFT JOIN penerimaan_barang_detail pbd ON pbd.penerimaan_barang_id = pb.id
             LEFT JOIN rm_purchase_orders pod ON pod.id = pbd.purchase_order_id
@@ -2500,7 +2500,6 @@ class BC40 extends BaseController
             LEFT JOIN kemasan ON kemasan.id = pb.kemasan_id
             LEFT JOIN satuans satuan_kemasan ON satuan_kemasan.id = kemasan.satuan_id
             LEFT JOIN divisis ON divisis.id = pb.divisi_id
-            LEFT JOIN rm_purchase_orders po ON FIND_IN_SET(po.id, REPLACE(REPLACE(REPLACE(pb.multiple_po_id, '[', ''), ']', ''), ' ', '')) > 0
             WHERE pb.tipe_bahan = 'BAKU'
                 AND pb.deletedAt IS NULL
                 AND pbd.deletedAt IS NULL
@@ -2663,7 +2662,7 @@ class BC40 extends BaseController
                 kemasan.name AS nama_kemasan,
                 SUM(pbd.qty) AS qty_po,
                 SUM(pbd.jml_masuk) AS qty_lpb,
-                po.total_before_pph AS sub_total
+                pod.total_before_pph AS sub_total
             FROM penerimaan_barang pb
             LEFT JOIN penerimaan_barang_detail pbd ON pbd.penerimaan_barang_id = pb.id
             LEFT JOIN rm_purchase_orders pod ON pod.id = pbd.purchase_order_id
@@ -2674,7 +2673,6 @@ class BC40 extends BaseController
             LEFT JOIN kemasan ON kemasan.id = pb.kemasan_id
             LEFT JOIN satuans satuan_kemasan ON satuan_kemasan.id = kemasan.satuan_id
             LEFT JOIN divisis ON divisis.id = pb.divisi_id
-            LEFT JOIN rm_purchase_orders po ON FIND_IN_SET(po.id, REPLACE(REPLACE(REPLACE(pb.multiple_po_id, '[', ''), ']', ''), ' ', '')) > 0
             WHERE pb.tipe_bahan = 'BAKU'
                 AND pb.deletedAt IS NULL
                 AND pbd.deletedAt IS NULL

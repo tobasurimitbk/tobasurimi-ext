@@ -2543,7 +2543,6 @@ class BC23 extends BaseController
             LEFT JOIN kemasan ON kemasan.id = pb.kemasan_id
             LEFT JOIN satuans satuan_kemasan ON satuan_kemasan.id = kemasan.satuan_id
             LEFT JOIN divisis ON divisis.id = pb.divisi_id
-            LEFT JOIN rm_import_pos po_multi ON FIND_IN_SET(po_multi.id, REPLACE(REPLACE(REPLACE(pb.multiple_po_id, '[', ''), ']', ''), ' ', '')) > 0
             WHERE pb.tipe_bahan = 'BAKU'
                 AND pb.deletedAt IS NULL
                 AND pbd.deletedAt IS NULL
@@ -2726,7 +2725,6 @@ class BC23 extends BaseController
             LEFT JOIN kemasan ON kemasan.id = pb.kemasan_id
             LEFT JOIN satuans satuan_kemasan ON satuan_kemasan.id = kemasan.satuan_id
             LEFT JOIN divisis ON divisis.id = pb.divisi_id
-            LEFT JOIN rm_import_pos po_multi ON FIND_IN_SET(po_multi.id, REPLACE(REPLACE(REPLACE(pb.multiple_po_id, '[', ''), ']', ''), ' ', '')) > 0
             WHERE pb.tipe_bahan = 'BAKU'
                 AND pb.deletedAt IS NULL
                 AND pbd.deletedAt IS NULL
