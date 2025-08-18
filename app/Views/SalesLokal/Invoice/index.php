@@ -18,7 +18,7 @@
                 <i class="fa fa-download"></i> Export
             </a>
 
-            <?php if (can('Penjualan Lokal', 'Invoice', 'c')): ?>
+            <?php if (can('Penjualan Lokal', 'Faktur Penjualan', 'c')): ?>
                 <a class="btn btn-show-form btn-success float-right btn-submit" href="<?= base_url("invoice-penjualan-lokal/create"); ?>">
                     <i class="fa fa-plus fa-sm me-1"></i> Tambah
                 </a>
@@ -310,7 +310,7 @@
                     let btn_print = '';
                     let btn_delete = '';
 
-                    <?php if (can('Penjualan Lokal', 'Invoice', 'p')): ?>
+                    <?php if (can('Penjualan Lokal', 'Faktur Penjualan', 'p')): ?>
                         btn_print = `
                             <button data-toggle="tooltip" title="Print" class="btn btn-warning btn-print" onclick="print('<?= base_url("invoice-penjualan-lokal/print/"); ?>${id}')" style="box-shadow: none !important;">
                                 <i class="fa fa-print fa-sm" aria-hidden="true"></i>
@@ -318,13 +318,13 @@
                         `;
                     <?php endif; ?>
 
-                    <?php if (can('Penjualan Lokal', 'Invoice', 'd')): ?>
+                    <?php if (can('Penjualan Lokal', 'Faktur Penjualan', 'd')): ?>
                         btn_delete = `
                             <button type="button" onclick="handleDelete('${id}')" class="btn btn-discard delete-btn btn-trash"><i class="fa fa-trash"></i></button>
                         `;
                     <?php endif; ?>
 
-                    <?php if (can('Penjualan Lokal', 'Invoice', 'u')) : ?>
+                    <?php if (can('Penjualan Lokal', 'Faktur Penjualan', 'u')) : ?>
                         btn_edit = `
                         <a href="javascript:void(0)" onclick="edit('${id}')" data-toggle="tooltip" title="Edit" class="btn btn-primary">
                             <i class="fas fa-edit"></i>

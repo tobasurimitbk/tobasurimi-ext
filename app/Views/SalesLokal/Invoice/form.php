@@ -255,11 +255,14 @@
                 <!-- list barang -->
                 <div class="col-subtitle-modal">
                     <div class="row mt-3">
-                        <div class="col-md-10">
+                        <div class="col-md-6">
                             <label class="form-label font-weight-bold modal-sub-title">List Barang</label>
                         </div>
-                        <div class="col-md-2">
-                            <button type="button" class="btn btn-success float-right btn-show-modal" style="display: none;"><i class="fa fa-plus mr-1"></i>Add Barang</button>
+
+                        <div class="col-md-6">
+                            <button type="button" class="btn btn-show-modal btn-add btn-block float-right <?= (!empty($data) && $data->status_posting == 1) ? 'disabled' : '' ?>" data-btn="detail-modal">
+                                <i class="fa fa-plus fa-sm mr-2 " aria-hidden="true"></i>Tambah
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -310,7 +313,6 @@
         </div>
     </div>
 </section>
-
 <!-- modal barang -->
 <div class="modal detail-modal" tabindex="1">
     <div class="modal-dialog" style="min-width: 900px;">
@@ -325,11 +327,20 @@
 
                     <div class="row">
                         <div class="col-md-6">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <select class="form-select id_barang" name="id_barang" id="id_barang" aria-label="Floating label select example">
-                                    <option value=""></option>
-                                </select>
-                                <label for="floatingInput">Nama Barang</label>
+                            <div class="input-group">
+                                <div class="form-floating mb-3" style="height: 50px;">
+                                    <select class="form-select id_barang" name="id_barang" id="id_barang" aria-label="Floating label select example">
+                                        <option value=""></option>
+                                    </select>
+                                    <label for="floatingInput">Nama Barang</label>
+                                </div>
+                                <?php if (can('Penjualan Lokal', 'Master Barang', 'c')) : ?>
+                                    <div class="input-group-append" style="height:50px;">
+                                        <button class="btn btn-success btn-barang-add" id="btn-barang-add" data-toggle="modal" type="button">
+                                            <i class="fas fa-plus"></i>
+                                        </button>
+                                    </div>
+                                <?php endif; ?>
                             </div>
                         </div>
                         <div class="col-md-6">
@@ -342,28 +353,14 @@
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" onkeyup="this.value = this.value.replace(/[^0-9.]/g, '').replace(/\.(?=.*\.)/g, '');" type="text" class="form-control harga" name="harga" id="harga" placeholder="Harga Barang">
+                                <input autocomplete="one-time-code" onkeyup="this.value = greatFormatRupiah(this.value);" onchange="this.value = greatFormatRupiah(this.value);" type="text" class="form-control harga" name="harga" id="harga" placeholder="Harga Barang">
                                 <label for="floatingInput">Harga Barang</label>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" type="text" oninput="this.value=this.value.replace(/[^0-9.]/g,'').replace(/\.(?=.*\.)/g, '');" class="form-control qty-awal" name="qty_awal" id="qty-awal" placeholder="Qty Awal" readonly>
-                                <label for="floatingInput">Qty Awal</label>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" onkeyup="this.value = this.value.replace(/[^0-9.]/g, '').replace(/\.(?=.*\.)/g, '');" type="text" class="form-control qty-sekarang" name="qty_sekarang" id="qty-sekarang" placeholder="Qty Sekarang" readonly>
-                                <label for="floatingInput">Qty Sekarang</label>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" type="text" oninput="this.value=this.value.replace(/[^0-9.]/g,'').replace(/\.(?=.*\.)/g, '');" class="form-control qty-invoice" name="qty_invoice" id="qty-invoice" placeholder="Qty Invoice">
-                                <label for="floatingInput">Qty Invoice</label>
+                                <input autocomplete="one-time-code" type="text" oninput="this.value=this.value.replace(/[^0-9.]/g,'').replace(/\.(?=.*\.)/g, '');" class="form-control qty" name="qty" id="qty" placeholder="Qty">
+                                <label for="floatingInput">Qty</label>
                             </div>
                         </div>
                     </div>
@@ -375,14 +372,26 @@
                             </div>
                         </div>
                         <div class="col-md-6">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" type="text" class="form-control discount_percentage" name="discount_percentage" id="discount_percentage" placeholder="discount">
-                                <label for="floatingInput">Disc</label>
+                            <div class="mb-3">
+                                <!-- <label for="discount_input" class="form-label">disc%</label> -->
+                                <div class="input-group" style="height: 50px;">
+                                    <input
+                                        autocomplete="one-time-code"
+                                        type="text"
+                                        class="form-control discount_percentage"
+                                        name="discount_percentage"
+                                        id="discount_percentage"
+                                        placeholder="Discount">
+                                    <select class="form-select discount_unit" name="discount_unit" id="discount_unit" style="max-width: 100px;">
+                                        <option value="percent" selected>%</option>
+                                        <option value="rupiah">Rp</option>
+                                    </select>
+                                </div>
                             </div>
                         </div>
                     </div>
                     <div class="row">
-                        <div class="col-md-6">
+                        <div class="col-md-6" style="display: none;">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <input autocomplete="one-time-code" type="text" class="form-control keterangan" name="keterangan" id="keterangan" placeholder="Keterangan">
                                 <label for="floatingInput">Keterangan</label>
@@ -396,18 +405,6 @@
                             </div>
                         </div>
                     </div>
-                    <?php if (session()->get("login")->this_company_id != 16) { ?>
-                        <div class="col-md-4">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <select class="form-select company_id" name="company_id" id="company_id" <?= !empty($data) ? 'disabled' : ''; ?>>
-                                    <option value="1">KIM 1</option>
-                                    <option value="2">KIM 2</option>
-                                    <option value="15">GLOBAL</option>
-                                </select>
-                                <label for="floatingInput">Pilih Customer</label>
-                            </div>
-                        </div>
-                    <?php } ?>
                 </form>
             </div>
             <div class="modal-footer">
@@ -419,13 +416,20 @@
     </div>
 </div>
 
-
 <script>
     const csrfToken = '<?= csrf_token() ?>';
     // Get the current date
     var currentDate = new Date();
 
     let list_items = [];
+    let list_delete = [];
+    var row = 0;
+    var total_harga_barang = 0;
+    var total_qty = 0;
+    var total_harga = 0;
+    var priceEdit = 0;
+    var totalPriceEdit = 0;
+    let no = 0;
 
     // Format the date to your desired representation
     // var formattedDate = currentDate.toLocaleString().slice(0, 9); // You can use other formatting methods if needed
@@ -475,10 +479,7 @@
                         } else {
                             return qtyValue;
                         }
-
                     <?php endif; ?>
-
-
                 }
             },
             {
@@ -487,7 +488,10 @@
             },
             {
                 data: "harga_barang",
-                className: "text-center"
+                className: "text-center",
+                render: function(data, type, row) {
+                    return greatFormatRupiah(destroyFormatRupiah(data));
+                }
             },
             {
                 data: "disc",
@@ -495,7 +499,10 @@
             },
             {
                 data: "amount",
-                className: "text-center"
+                className: "text-center",
+                render: function(data, type, row) {
+                    return greatFormatRupiah(destroyFormatRupiah(data));
+                }
             },
             {
                 data: "id",
@@ -524,6 +531,59 @@
             }
         }
     });
+
+    const reCountTotal = () => {
+        const taxStatus = $('#tax_status').is(':checked');
+        const includeTax = $('#include_tax').is(':checked');
+        let taxes = parseFloat($('#taxes option:selected').data('tax_value')) || 0;
+
+        const itemList = table.rows().data();
+
+        let itemSubTotal = 0;
+        let discTotal = 0;
+        let taxTotalHtml = 0;
+        let grandTotal = 0;
+
+        console.log(list_items);
+
+
+        list_items.forEach((obj) => {
+
+            let itemAmt = destroyFormatRupiah(obj.amount) || 0;
+            let discUnit = obj.discUnit;
+            let discPercent = discUnit == 'percent' ? Math.min(Math.max(destroyFormatRupiah(obj.disc) || 0, 0), 100) : destroyFormatRupiah(obj.disc); // Validasi diskon antara 0-100%
+            let taxAmt = 0;
+
+            discTotal += discUnit == 'percent' ? (discPercent / 100) * itemAmt : discPercent; // Hitung total diskon
+
+            if (taxStatus) {
+                taxAmt = itemAmt * (taxes / 100);
+            } else {
+                taxAmt = 0;
+            }
+
+            if (taxStatus && includeTax) {
+                tax = itemAmt * (taxes / 100);
+                itemSubTotal += itemAmt + tax;
+                taxTotalHtml += tax; // Pajak dihitung dari selisih
+            } else {
+                itemSubTotal += itemAmt;
+                taxTotalHtml += taxAmt;
+            }
+        });
+
+        // Pastikan total tidak negatif
+        itemSubTotal = Math.max(0, itemSubTotal);
+        taxTotalHtml = Math.max(0, taxTotalHtml);
+        grandTotal = taxStatus && includeTax ? itemSubTotal - (taxStatus ? taxTotalHtml : 0) : itemSubTotal + (taxStatus ? taxTotalHtml : 0);
+
+        // Update tampilan HTML
+        $('#itemSubTotal').html(greatFormatRupiah(itemSubTotal));
+        $('#taxTotal').html(greatFormatRupiah(taxTotalHtml));
+        $('#taxValue').html(taxes);
+        $('#includeTaxText').html(taxStatus && includeTax ? '(Termasuk Pajak)' : '');
+        $('#grandTotal').html(greatFormatRupiah(grandTotal));
+    };
     // Display the date on the webpage
     $(document).ready(function() {
         <?php if ($termin == "") : ?>
@@ -595,45 +655,14 @@
             $(".detail-modal").modal('hide');
         });
 
-        $(".btn-submit-detail").click(function() {
 
-            let amountBarang = $(".amount").val();
-            let discBarang = $(".discount_percentage").val();
-            let hargaBarang = $(".harga").val();
-            let idBarang = $(".id_barang option:selected").val();
-            let codeBarang = $(".id_barang option:selected").data("code");
-            let namaBarang = $(".id_barang option:selected").data("nama");
-            let qtyBarang = $(".qty-awal").val();
-            let qtyNowBarang = $(".qty-sekarang").val();
-            let qtyinputBarang = $(".qty-invoice").val();
-            let codeSatuan = $(".id_barang option:selected").data("kode_satuan");
-            let id = generateRandomId();
 
-            // Menambahkan data ke dalam list_items
-            list_items.push({
-                amount: amountBarang, // Jumlah total
-                disc: discBarang, // Diskon
-                harga_barang: hargaBarang, // Harga barang per unit
-                id: id, // ID item
-                id_barang: idBarang, // ID barang
-                id_sales_order: null, // ID sales order
-                kode_barang: codeBarang, // Kode barang
-                nama_barang: namaBarang, // Nama barang
-                no: 1, // Nomor urutan barang
-                qty: qtyBarang, // Jumlah barang
-                qty_sekarang: qtyNowBarang, // Jumlah barang yang tersedia
-                qty_input: qtyinputBarang, // Jumlah barang yang tersedia
-                satuan: codeSatuan, // Satuan barang
-                tax: null, // Pajak (kosong/null jika tidak ada)
-                taxChecked: "11.00", // Pajak yang dipilih
-                total_harga_barang: amountBarang // Total harga barang
-            });
+        $(".btn-hide-detail").click(function() {
+            $(".detail-modal").modal("hide")
+        });
 
-            // Update DataTable
-            table.rows.add(list_items).draw(false);
-
-            reCountTotal();
-
+        $(".btn-show-detail").click(function() {
+            $(".title-detail-name").text("Tambah");
 
             $(".id_detail").val('')
             $(".id_barang").empty('')
@@ -645,9 +674,253 @@
             $(".statusppn").val('')
             $(".amount").val('')
             $(".keterangan").val('')
+            $(".discount_percentage").val('')
+            $(".satuan").val('')
+            $(".keteranganppn").val('')
 
             $(".id_barang").val('')
-            $(".detail-modal").modal('hide');
+
+            getBarang();
+            $(".detail-modal").modal("show");
+        });
+
+        $(".harga, .qty").keyup(function() {
+            let harga = $(".harga").val() ? destroyFormatRupiah($(".harga").val()) : 0;
+            let qty = $(".qty").val() ? parseFloat($(".qty").val()) : 0;
+
+            let amount = harga * qty;
+            $(".amount").val(greatFormatRupiah(amount));
+        });
+
+        $(".harga, .qty").change(function() {
+            let harga = $(".harga").val() ? destroyFormatRupiah($(".harga").val()) : 0;
+            let qty = $(".qty").val() ? parseFloat($(".qty").val()) : 0;
+
+            let amount = harga * qty;
+            $(".amount").val(greatFormatRupiah(amount));
+        });
+
+        $(".discount_percentage").keyup(function() {
+            if ($(".discount_percentage").val()) {
+                if ($(".discount_unit option:selected").val() == 'percent' && $(".discount_percentage").val() > 100) {
+                    $(".discount_percentage").val(100)
+                }
+                if ($(".discount_unit option:selected").val() == 'percent' && $(".discount_percentage").val() < 0) {
+                    $(".discount_percentage").val();
+                }
+            } else {
+                $(".discount_percentage").val();
+            }
+        })
+
+        $(".discount_unit").change(function() {
+            let discVal = $(".discount_percentage").val();
+            if (discVal) {
+                if ($(".discount_unit option:selected").val() == 'percent' && discVal > 100) {
+                    $(".discount_percentage").val(100)
+                }
+                if ($(".discount_unit option:selected").val() == 'percent' && discVal < 0) {
+                    $(".discount_percentage").val();
+                }
+                if ($(".discount_unit option:selected").val() == 'rupiah') {
+                    $(".discount_percentage").val(discVal)
+                }
+            } else {
+                $(".discount_percentage").val();
+            }
+        })
+
+        $(".btn-submit-detail").click(function(e) {
+            e.preventDefault();
+
+            let row_detail = $(".id_detail").val() ? $(".id_detail").val() : 0;
+            let id_barang = $(".id_barang option:selected").val()
+            let nama_barang = $(".id_barang option:selected").text()
+            const selectedData = $(".id_barang option:selected").data();
+            let harga = destroyFormatRupiah($(".harga").val())
+            let qty = $(".qty").val()
+            let amount = destroyFormatRupiah($(".amount").val());
+            let keterangan = $(".keterangan").val()
+            let statusppn = $(".statusppn").val()
+            const tax = selectedData.tax;
+            let discountPercentage = $(".discount_percentage").val() || 0;
+            let discountUnit = $(".discount_unit option:selected").val() || "percent";
+            let dept = $(".dept").val()
+            let warehouseId = $(".warehouse").val()
+            let warhouseName = $(".warehouse").text()
+
+            const discAmt = discountUnit == "percent" ? amount * (discountPercentage / 100) : discountPercentage;
+            const discountedAmt = amount - discAmt;
+
+            const currentItemList = table.rows().data().toArray();
+            let validate_same = currentItemList.findIndex((obj) => obj.id_barang == id_barang && obj.warehouse_id == warehouseId);
+
+            console.log(row_detail);
+
+            if (validate_same >= 0 && row_detail == 0) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Barang tidak boleh sama',
+                    confirmButtonColor: '#4e73df',
+                })
+
+            } else {
+                // update detail
+                if (row_detail != 0) {
+                    const itemIndex = list_items.findIndex(item => item.id == row_detail);
+
+                    if (itemIndex !== -1) {
+                        const discAmt = discountUnit == "percent" ?
+                            amount * (discountPercentage / 100) :
+                            discountPercentage;
+
+                        const discountedAmt = amount - discAmt;
+
+                        // 2. Update item di list_items
+                        const updatedItem = {
+                            ...list_items[itemIndex],
+                            id_barang: id_barang,
+                            nama_barang: nama_barang,
+                            harga_barang: harga,
+                            qty: qty,
+                            qty_input: qty,
+                            qty_sekarang: qty,
+                            amount: amount,
+                            discountedAmt: discountedAmt,
+                            keterangan: keterangan,
+                            statusppn: statusppn,
+                            tax: tax,
+                            taxAmt: amount * (tax / 100),
+                            discount_percentage: discountPercentage,
+                            dept: dept,
+                            warehouse_id: warehouseId,
+                            warhouse_name: warhouseName,
+                            kode_barang: selectedData.code,
+                            satuan: selectedData.satuan,
+                            disc: discountPercentage,
+                            discAmt: discAmt,
+                            discUnit: discountUnit,
+                            barangTotal: amount
+                        };
+
+                        list_items[itemIndex] = updatedItem;
+
+                        let rowUpdated = false;
+                        const rows = table.rows().indexes().toArray();
+
+                        for (let i = 0; i < rows.length; i++) {
+                            const rowData = table.row(rows[i]).data();
+                            if (rowData.id == row_detail) {
+                                const newData = {
+                                    ...rowData,
+                                    id_barang: id_barang,
+                                    kode_barang: selectedData.code,
+                                    nama_barang: nama_barang,
+                                    qty: qty,
+                                    qty_input: qty,
+                                    qty_sekarang: qty,
+                                    satuan: selectedData.satuan,
+                                    harga_barang: harga,
+                                    barangTotal: amount,
+                                    disc: discountPercentage,
+                                    statusppn: statusppn,
+                                    tax: tax,
+                                    taxAmt: amount * (tax / 100),
+                                    keterangan: keterangan,
+                                    discAmt: discAmt,
+                                    discUnit: discountUnit,
+                                    amount: discountedAmt,
+                                    dept: dept,
+                                    warehouse_id: warehouseId,
+                                    warehouse_name: warhouseName
+                                };
+
+                                table.row(rows[i]).data(newData).invalidate();
+                                rowUpdated = true;
+                                break;
+                            }
+                        }
+
+                        if (rowUpdated) {
+                            table.draw();
+                        } else {
+                            console.warn("Row not found in table with ID:", row_detail);
+                        }
+
+                        $(".detail-form")[0].reset();
+                        $(".detail-modal").modal("hide");
+                    } else {
+                        console.warn("Item not found in list_items with ID:", row_detail);
+                    }
+                } else {
+                    if ($(".detail-form").valid()) {
+                        let id = generateRandomId();
+
+                        no = no + 1;
+                        list_items.push({
+                            id: id,
+                            no: no,
+                            row: row + 1,
+                            id_barang: id_barang,
+                            nama_barang: nama_barang,
+                            harga_barang: harga,
+                            qty: qty,
+                            qty_input: qty,
+                            qty_sekarang: qty,
+                            amount: amount,
+                            discountedAmt: discountedAmt,
+                            keterangan: keterangan,
+                            statusppn: statusppn,
+                            tax: tax,
+                            taxAmt: amount * (tax / 100),
+                            discount_percentage: discountPercentage,
+                            dept: dept,
+                            warehouse_id: warehouseId,
+                            warhouse_name: warhouseName,
+
+                            kode_barang: selectedData.code,
+                            satuan: selectedData.satuan,
+                            disc: discountPercentage,
+                            discAmt: discAmt,
+                            discUnit: discountUnit,
+                            isDeleted: false,
+
+                            barangTotal: amount,
+                        });
+
+                        table.row.add({
+                            id: id,
+                            no: no,
+                            id_barang: id_barang,
+                            kode_barang: selectedData.code,
+                            nama_barang: nama_barang,
+                            qty: qty,
+                            qty_input: qty,
+                            qty_sekarang: qty,
+                            satuan: selectedData.satuan,
+                            harga_barang: harga,
+                            barangTotal: amount,
+                            disc: discountPercentage,
+                            statusppn: statusppn,
+                            tax: tax,
+                            taxAmt: amount * (tax / 100),
+                            keterangan: keterangan,
+                            discAmt: discAmt,
+                            discUnit: discountUnit,
+                            amount: discountedAmt,
+                            dept: dept,
+                            warehouse_id: warehouseId,
+                            warehouse_name: warhouseName,
+                            isDeleted: false
+                        }).draw(false);
+
+                        $(".detail-modal").modal("hide")
+                        row = row + 1;
+                    }
+
+                }
+            }
+            reCountTotal();
         });
 
         $('.ship_via, .termin, .id_barang').select2({
@@ -704,8 +977,11 @@
                 let idBarang = $(".id_barang option:selected").data("id_item") ? $(".id_barang option:selected").data("id_item") : "";
                 let satuan = $(".id_barang option:selected").data("satuan") ? $(".id_barang option:selected").data("satuan") : "";
                 let statusppn = $(".id_barang option:selected").data("statusppn");
-                let qtyStock = $(".id_barang option:selected").data("qty") ? $(".id_barang option:selected").data("qty") : "";
+                let warehouseId = $(".id_barang option:selected").data("warehouse_id") ? $(".id_barang option:selected").data("warehouse_id") : "";
+                let warehouseName = $(".id_barang option:selected").data("warehouse_name") ? $(".id_barang option:selected").data("warehouse_name") : "";
                 let harga = $(".id_barang option:selected").data("harga") ? $(".id_barang option:selected").data("harga") : 0;
+
+                // let stok = $(".id_barang option:selected").data("stok") ? $(".id_barang option:selected").data("stok") : "";
 
                 $(".nama_barang").attr("readonly", nama ? true : false);
                 if (statusppn == 1) {
@@ -717,20 +993,40 @@
 
                 $(".statusppn").val(statusppn);
                 $(".nama_barang").val(nama);
+                $(".warehouse").on('change', function() {
+                    let idBarang = $(".id_barang option:selected").data("id_item") ? $(".id_barang option:selected").data("id_item") : "";
+                    let warehouseId = $(this).val();
+                    $(".stok").val("");
+                    $.ajax({
+                        url: "<?= base_url('/order-form-lokal/stok'); ?>" + "/" + idBarang + "/" + warehouseId,
+                        method: "GET",
+                        dataType: "json",
+                        success: function(res) {
+                            //bug di penjualan lokal
+                            // $(".warehouse").append(`<option value=""></option>`);
+                            if (res.dataDetailStock.length > 0) {
+                                // You can set the value of .stok based on the selected warehouse here
+                                let selectedWarehouse = res.dataDetailStock; // Assuming you want the first item in the response
+                                $(".stok").val(res.dataDetailStock);
+                            }
+                        }
+                    })
+                });
                 $(".satuan").val(satuan);
-                $(".harga").val(harga);
-                $(".qty-awal").val(qtyStock);
-                $(".qty-sekarang").val(qtyStock);
+                $(".harga").val(greatFormatRupiah(harga));
 
             } else {
                 $(".nama_barang").attr("readonly", false)
+                // $(".harga").val("0");
+                $(".qty").val("");
                 $(".amount").val("0");
                 $(".keterangan").val("").change();
                 $(".statusppn").val("");
                 $(".tax").val("");
-                $(".discount_percentage").val("0");
-                $(".qty-awal").val("");
-                $(".qty-sekarang").val("");
+                $(".discount_percentage").val();
+                $(".dept").val("");
+                $(".warehouse").val("");
+                $(".id_warehouse").val("");
             }
         });
 
@@ -987,15 +1283,21 @@
 
     function getBarang() {
         $.ajax({
-            url: `<?= base_url("invoice-penjualan-lokal/barangAll"); ?>`,
+            url: `<?= base_url("order-form-lokal/barangAll"); ?>`,
             method: "GET",
             dataType: "json",
             success: function(res) {
                 $(".id_barang").empty();
-                $(".id_barang").append(`<option data-satuan="" data-harga="" data-statusppn="" data-id_item="" value=""></option>`);
+
+                $(".id_barang").append(`<option data-satuan="" data-warehouse_id="" data-harga="" data-statusppn="" data-warehouse_name="" data-id_item="" value=""></option>`);
+
+
+
                 res.dataBarang.forEach(function(item) {
-                    $(".id_barang").append(`<option data-code="${item.kode_barang}" data-nama="${item.nama_barang}" data-harga="${item.harga_jual}" data-statusppn="${item.statusppn}" data-satuan="${item.nama_satuan}" data-kode_satuan="${item.kode_satuan}" data-harga="${item.harga_barang}" data-qty="${item.qty_stock}" data-id_item="${item.id}" value="${item.id}">${item.nama_barang}</option>`);
-                });
+                    $(".id_barang").append(`<option data-code="${item.kode_barang}" data-harga="${item.harga_jual}" data-statusppn="${item.statusppn}" data-satuan="${item.nama_satuan}" data-warehouse_id="${item.warehouse_id}" data-harga="${item.harga_barang}" data-warehouse_name="${item.warehouse_name}" data-id_item="${item.id}" value="${item.id}">${item.nama_barang}</option>`);
+                })
+                // console.log(res.dataBarang);
+
                 $(".id_barang").val("").change();
             }
         })
@@ -1261,59 +1563,6 @@
         reCountTotal();
     }
 
-    const reCountTotal = () => {
-        const taxStatus = $('#tax_status').is(':checked');
-        const includeTax = $('#include_tax').is(':checked');
-        let taxes = parseFloat($('#taxes option:selected').data('tax_value')) || 0;
-
-        const itemList = table.rows().data();
-
-        let itemSubTotal = 0;
-        let discTotal = 0;
-        let taxTotalHtml = 0;
-        let grandTotal = 0;
-
-        // console.log(list_items);
-
-
-        list_items.forEach((obj) => {
-
-            let itemAmt = parseFloat(obj.amount.replaceAll(',', '')) || 0;
-            let discUnit = obj.discUnit;
-            let discPercent = discUnit == 'percent' ? Math.min(Math.max(parseFloat(obj.disc) || 0, 0), 100) : obj.disc; // Validasi diskon antara 0-100%
-            let taxAmt = 0;
-
-            discTotal += discUnit == 'percent' ? (discPercent / 100) * itemAmt : discPercent; // Hitung total diskon
-
-            if (taxStatus) {
-                taxAmt = itemAmt * (taxes / 100);
-            } else {
-                taxAmt = 0;
-            }
-
-            if (taxStatus && includeTax) {
-                tax = itemAmt * (taxes / 100);
-                itemSubTotal += itemAmt + tax;
-                taxTotalHtml += tax; // Pajak dihitung dari selisih
-            } else {
-                itemSubTotal += itemAmt;
-                taxTotalHtml += taxAmt;
-            }
-        });
-
-        // Pastikan total tidak negatif
-        itemSubTotal = Math.max(0, itemSubTotal);
-        taxTotalHtml = Math.max(0, taxTotalHtml);
-        grandTotal = taxStatus && includeTax ? itemSubTotal - (taxStatus ? taxTotalHtml : 0) : itemSubTotal + (taxStatus ? taxTotalHtml : 0);
-
-        // Update tampilan HTML
-        $('#itemSubTotal').html(greatFormatRupiah(itemSubTotal));
-        $('#taxTotal').html(greatFormatRupiah(taxTotalHtml));
-        $('#taxValue').html(taxes);
-        $('#includeTaxText').html(taxStatus && includeTax ? '(Termasuk Pajak)' : '');
-        $('#grandTotal').html(greatFormatRupiah(grandTotal));
-    };
-
     function definisiQtyInput() {
 
         $.each(list_items, function(i, v) {
@@ -1331,13 +1580,13 @@
 
                 // Calculate the amount and format it using .toLocaleString()
                 if (v.discUnit == "rupiah") {
-                    var amount = parseFloat(v.disc.replace(',', '')) != 0 ?
-                        (parseFloat(v.harga_barang.replace(',', '')) - parseFloat(v.disc.replace(',', ''))) * parseFloat(v.qty_input) :
-                        parseFloat(v.harga_barang.replace(',', '')) * parseFloat(v.qty_input);
+                    var amount = destroyFormatRupiah(v.disc) != 0 ?
+                        (destroyFormatRupiah(v.harga_barang) - destroyFormatRupiah(v.disc)) * destroyFormatRupiah(v.qty_input) :
+                        destroyFormatRupiah(v.harga_barang) * destroyFormatRupiah(v.qty_input);
                 } else {
-                    var amount = parseFloat(v.disc.replace(',', '')) != 0 ?
-                        (parseFloat(v.harga_barang.replace(',', '')) - ((parseFloat(v.harga_barang.replace(',', '')) * parseFloat(v.disc.replace(',', ''))) / 100)) * parseFloat(v.qty_input) :
-                        parseFloat(v.harga_barang.replace(',', '')) * parseFloat(v.qty_input);
+                    var amount = destroyFormatRupiah(v.disc) != 0 ?
+                        (destroyFormatRupiah(v.harga_barang) - ((destroyFormatRupiah(v.harga_barang) * destroyFormatRupiah(v.disc)) / 100)) * destroyFormatRupiah(v.qty_input) :
+                        destroyFormatRupiah(v.harga_barang) * destroyFormatRupiah(v.qty_input);
                 }
                 list_items[i].amount = greatFormatRupiah(amount)
             }

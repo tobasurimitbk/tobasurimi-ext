@@ -4,8 +4,8 @@ namespace App\Controllers\SalesLokal;
 
 use App\Controllers\BaseController;
 use App\Models\BanksModel;
-use App\Models\CustomerModel; 
-use App\Models\SupplierLokalModel; 
+use App\Models\CustomerModel;
+use App\Models\SupplierLokalModel;
 use App\Models\EmployeesModel;
 use App\Models\MetadataModel;
 use App\Models\ProvincesModel;
@@ -228,9 +228,9 @@ class SupplierLokal extends BaseController
         if (!empty($id)) {
             $id = decrypt($id);
             $res = $this->SupplierLokalModel->get_by_id($id, '1');
-            $country =  $this->countryModel->where('id', $res[0]['country_id'])->first();
+            // $country =  $this->countryModel->where('id', $res[0]['country_id'])->first();
             $res[0]['id'] = encrypt($res[0]['id']);
-            $res[0]['country_id'] = $country == null ? 0 : $country['id'];
+            // $res[0]['country_id'] = $country == null ? 0 : $country['id'];
 
             if (count($res) > 0) {
                 $data = [
@@ -449,24 +449,24 @@ class SupplierLokal extends BaseController
                     "company_id" => $this->this_company_id,
                     // "user_id" => $this->this_user_id,
                     // "kode" => $this->request->getPost("kode"),
-                    "name" => strtoupper($this->request->getVar("name")),
-                    "address" => strtoupper($this->request->getVar("address")),
-                    "nik" => $this->request->getPost("nik"),
-                    "no_npwp" => $this->request->getPost("no_npwp"),
-                    "phone" => $this->request->getPost("phone"),
-                    "contact_person" => $this->request->getPost("contact_person"),
-                    "email" => $this->request->getPost("email"),
-                    "postal_code" => $this->request->getPost("parent_postal_code"),
-                    "province_id" => $this->request->getPost("province_parent_id"),
-                    "city_id" => $this->request->getPost("city_parent_id"),
-                    "tipe_pelanggan" => $this->request->getPost("tipe_pelanggan"),
-                    "nik" => $this->request->getPost("nik"),
-                    "termin" => $this->request->getPost("termin"),
-                    "currency" => $this->request->getPost("currency"),
-                    "country_id" => $this->request->getPost('country_id'),
-                    "piutang" =>  $this->request->getPost("piutang"),
-                    "tipe_customer" => $this->request->getPost("tipe_customer"),
-                    "jenis_penjualan" => $this->request->getPost("jenis_penjualan"),
+                    "name" => strtoupper($this->request->getVar("name")) ?? null,
+                    "address" => strtoupper($this->request->getVar("address")) ?? null,
+                    "nik" => $this->request->getPost("nik") ?? null,
+                    "no_npwp" => $this->request->getPost("no_npwp") ?? null,
+                    "phone" => $this->request->getPost("phone") ?? null,
+                    "contact_person" => $this->request->getPost("contact_person") ?? null,
+                    "email" => $this->request->getPost("email") ?? null,
+                    "postal_code" => $this->request->getPost("parent_postal_code") ?? null,
+                    "province_id" => $this->request->getPost("province_parent_id") ?? null,
+                    "city_id" => $this->request->getPost("city_parent_id") ?? null,
+                    "tipe_pelanggan" => $this->request->getPost("tipe_pelanggan") ?? null,
+                    "nik" => $this->request->getPost("nik") ?? null,
+                    "termin" => $this->request->getPost("termin") ?? null,
+                    "currency" => $this->request->getPost("currency") ?? null,
+                    "country_id" => $this->request->getPost('country_id') ?? null,
+                    "piutang" =>  $this->request->getPost("piutang") ?? null,
+                    "tipe_customer" => $this->request->getPost("tipe_customer") ?? null,
+                    "jenis_penjualan" => $this->request->getPost("jenis_penjualan") ?? null,
                     "sales_id" => $this->request->getPost("sales_id") ?? null,
                 ];
 
@@ -512,20 +512,12 @@ class SupplierLokal extends BaseController
             $id = decrypt($this->request->getPost("id"));
 
             if (!empty($id)) {
-                $res_list = $this->ListAddressesModel->get_by_customer_id($id);
-                for ($i = 0; $i < count($res_list); $i++) {
-                    $values = [
-                        "deletedAt" => date("Y-m-d H:i:s")
-                    ];
-                    $this->ListAddressesModel->update($res_list[$i]["id"], $values);
-                }
-                // handle if null
-                if (count($res_list) == 0) {
-                    $values = [
-                        "deletedAt" => date("Y-m-d H:i:s")
-                    ];
-                    $this->ListAddressesModel->update($id, $values);
-                }
+                // $supplier = $this->SupplierLokalModel->find($id);
+
+                $values = [
+                    "deletedAt" => date("Y-m-d H:i:s")
+                ];
+
                 if ($this->SupplierLokalModel->update($id, $values)) {
                     $data = [
                         "status"            => true,
