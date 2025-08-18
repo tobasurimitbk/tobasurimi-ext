@@ -19,6 +19,32 @@
         <div class="card-body">
             <div class="row mb-3">
                 <div class="col-md-3">
+                    <div class="input-group">
+                        <div class="form-floating" style="height: 50px;">
+                            <input placeholder="" class="form-control dateStart" id="dateStart" name="dateStart" aria-label="Floating label select example" />
+                            <label style="z-index: 1;" style="z-index: 1;">Start Creation Date</label>
+                        </div>
+                        <div class="input-group-append" style="height:50px;">
+                            <button disabled class="btn btn-secondary" type="button">
+                                <i class="fas fa-calendar-alt"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="input-group">
+                        <div class="form-floating" style="height: 50px;">
+                            <input placeholder="" class="form-control dateEnd" id="dateEnd" name="dateEnd" aria-label="Floating label select example" />
+                            <label style="z-index: 1;" style="z-index: 1;">End Creation Date</label>
+                        </div>
+                        <div class="input-group-append" style="height:50px;">
+                            <button disabled class="btn btn-secondary" type="button">
+                                <i class="fas fa-calendar-alt"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
                     <div class="form-floating mb-3">
                         <select class="form-select customer_id" name="customer_id" id="customer_id">
                             <option value="" data-code=""></option>
@@ -83,6 +109,7 @@
                         <thead class="thead-dark">
                             <tr style="text-align: center;">
                                 <th style="text-align:left; width:10px;" onclick="changeSort('sales_contract.id')">No</th>
+                                <th style="text-align:left;" onclick="changeSort('sales_contract.createdAt')">Creation Date</th>
                                 <th style="text-align:left;" onclick="changeSort('sales_contract.createdBy')">Acc Holder</th>
                                 <th style="text-align:left;" onclick="changeSort('sales_contract.sales_contract_no')">Contract No</th>
                                 <th style="text-align:left;" onclick="changeSort('sales_contract.customer_id')">Customer</th>
@@ -130,6 +157,8 @@
             type: 'GET',
             dataSrc: "data",
             data: function(data) {
+                data.dateStart = $('.dateStart').val();
+                data.dateEnd = $('.dateEnd').val();
                 data.search = $('.search').val();
                 data.customer_id = $('.customer_id').val();
                 data.barang_master_sales_id = $('.barang_master_sales_id').val();
@@ -150,6 +179,9 @@
         columns: [{
                 data: 'no',
                 width: "2%"
+            },
+            {
+                data: 'createdAt'
             },
             {
                 data: 'acc_holder'
@@ -300,12 +332,16 @@
         var userId = $('#user_id option:selected').val();
         var companyId = $('#company_id option:selected').val();
         var search = $('#search').val();
+        var dateStart = $('#dateStart').val();
+        var dateEnd = $('#dateEnd').val();
 
         window.open('<?= base_url('report-ekspor/contract-export') ?>?customer_id=' + customerId +
             '&barang_master_sales_id=' + barangMasterSalesId +
             '&user_id=' + userId +
             '&company_id=' + companyId +
-            '&search=' + search
+            '&search=' + search +
+            '&dateStart=' + dateStart +
+            '&dateEnd=' + dateEnd
         );
     }
 

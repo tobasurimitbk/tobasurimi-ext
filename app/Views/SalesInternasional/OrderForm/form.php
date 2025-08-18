@@ -166,7 +166,7 @@
                             <div class="input-group input-group-password">
                                 <div class="form-floating mb-3" style="height: 50px;">
                                     <input <?= !empty($dataSalesExport) ? ($dataSalesExport->status == "POSTED" ? 'readonly' : '') : '' ?> autocomplete="one-time-code" class="form-control input-picker actualy_shipment_date" id="actualy_shipment_date" name="actualy_shipment_date" placeholder="Actually Shipment Date" value="<?= !empty($dataSalesExport) ? ((!empty($dataSalesExport->actualy_shipment_date)) ? date('d/m/Y', strtotime($dataSalesExport->actualy_shipment_date)) : '') : '' ?>">
-                                    <label for="floatingInput">Actualy Shipment Date (Optional)</label>
+                                    <label for="floatingInput">Actual Shipment Date (Optional)</label>
                                 </div>
                                 <div class="input-group-prepend group-prepend-password align-items-center">
                                     <i style="cursor: pointer; z-index: 99; margin-bottom: 8px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-po-date"></i>

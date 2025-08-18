@@ -824,6 +824,9 @@ $routes->get('/biaya-impor/id/(:segment)', 'BiayaExim\BiayaImpor\BiayaImpor::edi
 $routes->get('/biaya-impor/print/(:segment)', 'BiayaExim\BiayaImpor\BiayaImpor::print/$1', ['filter' => 'Auth']);
 $routes->get('/biaya-impor/export-excel', 'BiayaExim\BiayaImpor\BiayaImpor::exportExcel', ['filter' => 'Auth']);
 
+// BIAYA LOKAL
+$routes->get('/biaya-lokal', 'BiayaExim\BiayaLokal\BiayaLokal::index', ['filter' => 'Auth']);
+
 // PRODUKSI
 // Production Result
 $routes->get('/production-result', 'Production\ProductionResult::index', ['filter' => 'Auth']);
