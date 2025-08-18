@@ -140,7 +140,7 @@
                             </div>
                             <div class="mt-1">
                                 <div class="form-floating mb-3">
-                                    <input id="barang_detail_spesifikasi_lain" name="barang_detail_spesifikasi_lain" type="text" class="form-control barang_detail_spesifikasi_lain" value="<?= $bc23DokumenBarang != null ? $bc23DokumenBarang['spesifikasi_lain'] : '' ?>" placeholder="">
+                                    <input id="barang_detail_spesifikasi_lain" name="barang_detail_spesifikasi_lain" type="text" class="form-control barang_detail_spesifikasi_lain" value="<?= $bc23DokumenBarang != null ? $bc23DokumenBarang['spesifikasi_lain'] : '-' ?>" placeholder="">
                                     <label>Spesifikasi Lain</label>
                                 </div>
                             </div>
@@ -175,39 +175,33 @@
                                     <label style="z-index: 1;">Negara</label>
                                 </div>
                             </div>
-                            <div class="mt-1">
-                                <div class="form-floating mb-3" style="height: 50px;">
-                                    <select class="form-select persentase_jenis_negara" id="persentase_jenis_negara" name="persentase_jenis_negara" aria-label="Floating label select example">
-                                        <option value=""></option>
-                                        <?php foreach ($jenisNegara as $k) : ?>
-                                            <option <?= $bc23DokumenBarang != null ? ($bc23DokumenBarang['persentase_jenis_negara'] == $k['description'] ? 'selected' : '') : '' ?> value="<?= ($k['description']) ?>">
-                                                <?= $k['value'] . " / " . $k['description'] . "%" ?>
-                                            </option>
-                                        <?php endforeach; ?>
-                                    </select>
-                                    <label style="z-index: 1;">Wilayah Lokasi Negara Pengirim</label>
-                                </div>
-                            </div>
                             <label class="form-label font-weight-bold lable-title mb-3">
                                 Harga
                             </label>
                             <div class="mt-1">
-                                <div class="form-floating mb-3">
-                                    <input readonly id="barang_detail_harga" value="<?= number_format($barangDetail['harga'], 2)  ?>" name="barang_detail_harga" type="text" class="form-control barang_detail_harga" placeholder="" onkeyup="this.value = greatFormatRupiah(this.value)">
-                                    <label>Harga</label>
-                                    <small><i>Harga total sesuai dengan LPB diterima</i></small>
+                                <div class="input-group mb-3">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text">
+                                            <?= $barangDetail['valas'] ?>
+                                        </span>
+                                    </div>
+                                    <div class="form-floating">
+                                        <input readonly id="barang_detail_harga" value="<?= number_format($barangDetail['harga'], 2)  ?>" name="barang_detail_harga" type="text" class="form-control barang_detail_harga" placeholder="" onkeyup="this.value = greatFormatRupiah(this.value)">
+                                        <label>Harga</label>
+                                        <small><i>Harga total sesuai dengan LPB diterima</i></small>
+                                    </div>
                                 </div>
                             </div>
 
                             <div class="mt-1">
                                 <div class="form-floating mb-3">
-                                    <input id="barang_detail_biaya_tambahan" name="barang_detail_biaya_tambahan" type="text" value="<?= $bc23DokumenBarang == null ? "0,00" : number_format($bc23DokumenBarang['nilai_tambah']) ?>" class="form-control barang_detail_biaya_tambahan" placeholder="" onkeyup="this.value = greatFormatRupiah(this.value)">
+                                    <input id="barang_detail_biaya_tambahan" name="barang_detail_biaya_tambahan" type="text" value="<?= $bc23DokumenBarang == null ? "0,00" : number_format($bc23DokumenBarang['nilai_tambah'], 2) ?>" class="form-control barang_detail_biaya_tambahan" placeholder="" onkeyup="this.value = greatFormatRupiah(this.value)">
                                     <label>Biaya Tambahan</label>
                                 </div>
                             </div>
                             <div class="mt-1">
                                 <div class="form-floating mb-3">
-                                    <input id="barang_detail_fob" name="barang_detail_fob" type="text" value="<?= number_format($barangDetail['harga'], 2) ?>" class="form-control barang_detail_fob" placeholder="" onkeyup="this.value = greatFormatRupiah(this.value)">
+                                    <input id="barang_detail_fob" name="barang_detail_fob" type="text" value="<?= $bc23DokumenBarang == null ? "0,00" : number_format($bc23DokumenBarang['fob'], 2) ?>" class="form-control barang_detail_fob" placeholder="" onkeyup="this.value = greatFormatRupiah(this.value)">
                                     <label>FOB</label>
                                 </div>
                             </div>
@@ -232,14 +226,15 @@
                             </div>
                             <div class="mt-1">
                                 <div class="form-floating mb-3">
-                                    <input id="barang_detail_cif" name="barang_detail_cif" type="text" value="<?= $bc23DokumenBarang == null ? "0,00" : number_format($bc23DokumenBarang['cif_rupiah'], 2) ?>" class="form-control barang_detail_cif" placeholder="" onkeyup="this.value = greatFormatRupiah(this.value)">
+                                    <input id="barang_detail_cif" name="barang_detail_cif" readonly type="text" value="<?= $bc23DokumenBarang == null ? number_format($barangDetail['harga'], 2) : number_format($bc23DokumenBarang['cif_rupiah'], 2) ?>" class="form-control barang_detail_cif" placeholder="" onkeyup="this.value = greatFormatRupiah(this.value)">
                                     <label>Nilai CIF</label>
                                 </div>
                             </div>
                             <div class="mt-1">
                                 <div class="form-floating mb-3">
-                                    <input id="barang_detail_nilai_pabean" name="barang_detail_nilai_pabean" type="text" value="<?= $bc23DokumenBarang == null ? "0,00" : number_format($bc23DokumenBarang['harga_ekspor'], 2) ?>" class="form-control barang_detail_nilai_pabean" placeholder="" onkeyup="this.value = greatFormatRupiah(this.value)">
+                                    <input id="barang_detail_nilai_pabean" name="barang_detail_nilai_pabean" readonly type="text" value="<?= $bc23DokumenBarang == null ? number_format($barangDetail['harga'] * $bc23['ndpbm'], 2) : number_format($bc23DokumenBarang['harga_ekspor'], 2) ?>" class="form-control barang_detail_nilai_pabean" placeholder="" onkeyup="this.value = greatFormatRupiah(this.value)">
                                     <label>Nilai Pabean</label>
+                                    <small><i>Nilai pabean diambil dari nilai CIF dikalikan dengan Harga barang</i></small>
                                 </div>
                             </div>
                         </div>
@@ -290,7 +285,7 @@
                             </div>
                             <div class="mt-1">
                                 <div class="form-floating mb-3">
-                                    <input value="<?= $bc23DokumenBarang != null ? number_format($bc23DokumenBarang['netto']) : '' ?>" id="barang_detail_berat_bersih" name="barang_detail_berat_bersih" type="text" class="form-control barang_detail_berat_bersih" placeholder="" onkeyup="this.value = greatFormatRupiah(this.value)">
+                                    <input value="<?= $bc23DokumenBarang != null ? number_format($bc23DokumenBarang['netto'], 2) : '' ?>" id="barang_detail_berat_bersih" name="barang_detail_berat_bersih" type="text" class="form-control barang_detail_berat_bersih" placeholder="" onkeyup="this.value = greatFormatRupiah(this.value)">
                                     <label>Berat Bersih (Kg)</label>
                                 </div>
                             </div>
@@ -323,7 +318,17 @@
                         <label class="form-label font-weight-bold lable-title mb-3">
                             Pungutan
                         </label>
+                        <div class="alert alert-secondary alert-dismissible fade show mt-3 text-black" role="alert">
+                            Urutan penginputan pungutan adalah <br>
+                            <b>Seri 1 : Bea Masuk / Bea Masuk KITE</b> <br>
+                            <b>Seri 2 : PPH Impor</b> <br>
+                            <b>Seri 3 : PPN Impor</b>
+                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
                         <form id="form-pungutan">
+                            <input type="hidden" name="bc_barang_tarif_id" id="bc_barang_tarif_id" class="bc_barang_tarif_id">
                             <div class="mt-1">
                                 <div class="form-floating mb-3">
                                     <select class="form-select barang_detail_kode_jenis_pungutan" id="barang_detail_kode_jenis_pungutan" name="barang_detail_kode_jenis_pungutan" aria-label="Floating label select example">
@@ -352,7 +357,7 @@
                             </div>
                             <div class="mt-1">
                                 <div class="form-floating mb-3">
-                                    <input id="barang_detail_nilai_tarif" name="barang_detail_nilai_tarif" type="text" class="form-control barang_detail_nilai_tarif" placeholder="">
+                                    <input id="barang_detail_nilai_tarif" name="barang_detail_nilai_tarif" type="number" class="form-control barang_detail_nilai_tarif" placeholder="">
                                     <label>Nilai Tarif (%)</label>
                                 </div>
                             </div>
@@ -534,7 +539,7 @@
                 data.penerimaan_barang_id = "<?= encrypt($barangDetail['penerimaan_barang_id']) ?>";
                 data.barang1_id = "<?= encrypt($barangDetail['barang1_id']) ?>";
                 data.sort = "bc_23_barang_tarif.createdAt";
-                data.sortType = "DESC";
+                data.sortType = "ASC";
             }
         },
         "initComplete": function(settings, json) {
@@ -586,7 +591,16 @@
                 searchable: false,
                 sortable: false,
                 render: function(data, type, row) {
-                    return `<button type="button" class="btn btn-danger" onclick="removePungutan('${row.id}')" ><i class="fa fa-trash fa-sm" aria-hidden="true"></i></button>`;
+                    return `
+                        <div class="text-center">
+                           <button type="button" class="btn btn-warning" onclick="detailPungutan('${row.id}')" >
+                                <i class="fa fa-pencil fa-sm" aria-hidden="true"></i>
+                            </button>
+                            <button type="button" class="btn btn-danger" onclick="removePungutan('${row.id}')" >
+                                <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
+                            </button>
+                        </div>
+                        `;
                 }
             }
 
@@ -779,9 +793,6 @@
             barang_detail_negara: {
                 required: true
             },
-            persentase_jenis_negara: {
-                required: true
-            },
             barang_detail_harga: {
                 required: true
             },
@@ -850,9 +861,6 @@
             barang_detail_negara: {
                 required: "Pilih negara"
             },
-            persentase_jenis_negara: {
-                required: "Pilih lokasi negara"
-            },
             barang_detail_harga: {
                 required: "Harga wajib diisi"
             },
@@ -918,9 +926,10 @@
 
     $('.btn-submit-pungutan').click(function() {
         if ($('#form-pungutan').valid()) {
+            var id = $('#bc_barang_tarif_id').val();
             Swal.fire({
                 icon: 'question',
-                title: 'Simpan Pungutan ?',
+                title: id == '' ? 'Simpan Pungutan ?' : 'Update Pungutan ?',
                 confirmButtonColor: '#4e73df',
                 cancelButtonColor: '#d33',
                 showCancelButton: true,
@@ -930,12 +939,21 @@
             }).then((result) => {
                 if (result.isConfirmed) {
                     var formData = new FormData(document.querySelector("#form-pungutan"));
+                    var id = $('#bc_barang_tarif_id').val();
+                    var url = '';
                     formData.append("penerimaan_barang_id", "<?= encrypt($barangDetail['penerimaan_barang_id']) ?>");
                     formData.append("barang1_id", "<?= encrypt($barangDetail['barang1_id']) ?>");
                     formData.append("bc_purchase_order_id", "<?= encrypt($bcPo['id']) ?>");
+                    if (id) {
+                        // Update
+                        url = "<?= base_url("bea-cukai-bc-23/id/barang-pungutan-update"); ?>";
+                    } else {
+                        // Create
+                        url = "<?= base_url("bea-cukai-bc-23/id/barang-pungutan-create"); ?>";
 
+                    }
                     $.ajax({
-                        url: "<?= base_url("bea-cukai-bc-23/id/barang-pungutan-create"); ?>",
+                        url: url,
                         data: formData,
                         beforeSend: function(xhr) {
                             xhr.setRequestHeader('X-CSRF-Token', csrf.val());
@@ -952,19 +970,13 @@
                             csrf.val(response.token);
                             if (response.status) {
                                 tableListInformasiPungutan.ajax.reload();
-                                $('#barang_detail_kode_jenis_pungutan').val(null).change();
-                                $('#barang_detail_kode_jenis_tarif').val(null).change();
-                                $('#barang_detail_nilai_tarif').val('');
-                                $('#barang_detail_kode_fasilitas_tarif').val(null).change();
-                                $('#barang_detail_tarif_fasilitas').val('100');
+                                resetFormPungutan();
                             } else {
                                 Swal.fire({
                                     icon: 'error',
                                     title: response.message,
                                     confirmButtonColor: '#4e73df',
                                     confirmButtonText: 'Ok'
-                                }).then((result) => {
-                                    tableListInformasiPungutan.ajax.reload();
                                 });
                             }
                         },
@@ -974,6 +986,49 @@
 
         }
     });
+
+    function detailPungutan(id) {
+        $.ajax({
+            url: "<?= base_url("bea-cukai-bc-23/id/barang-pungutan-detail"); ?>",
+            data: {
+                id: id,
+            },
+            beforeSend: function(xhr) {
+                xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                setLoading();
+            },
+            complete: function() {
+                stopLoading();
+            },
+            method: "GET",
+            success: function(response) {
+                if (response.status) {
+                    $('#bc_barang_tarif_id').val(id);
+                    $('#barang_detail_kode_jenis_pungutan').val(response.data.kode_jenis_pungutan).change();
+                    $('#barang_detail_kode_jenis_tarif').val(response.data.kode_jenis_tarif).change();
+                    $('#barang_detail_nilai_tarif').val(response.data.nilai_tarif);
+                    $('#barang_detail_kode_fasilitas_tarif').val(response.data.kode_fasilitas_tarif).change();
+                    $('#barang_detail_tarif_fasilitas').val(response.data.tarif_fasilitas).change();
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: response.message,
+                        confirmButtonColor: '#4e73df',
+                        confirmButtonText: 'Ok'
+                    });
+                }
+            },
+        });
+    }
+
+    function resetFormPungutan() {
+        $('#bc_barang_tarif_id').val(null);
+        $('#barang_detail_kode_jenis_pungutan').val(null).change();
+        $('#barang_detail_kode_jenis_tarif').val(null).change();
+        $('#barang_detail_nilai_tarif').val('');
+        $('#barang_detail_kode_fasilitas_tarif').val(null).change();
+        $('#barang_detail_tarif_fasilitas').val('100');
+    }
 
     $('.btn-simpan-detail-barang-form-view').click(function() {
         if ($('#form-barang-dokumen').valid()) {

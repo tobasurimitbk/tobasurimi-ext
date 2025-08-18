@@ -150,13 +150,196 @@ class ProsesRebus extends BaseController
         $data = [
             'tipeBarang' => $this->metaDataModel->where('deletedAt', null)->where('name', "Kategori Barang")->findAll(),
             'prosesRebus' => $prosesRebus,
-            'prosesRebusDetail' => $this->prosesRebusDetailModel->getProsesRebusDetail($id),
+            'prosesRebusDetail' => $this->prosesRebusDetailModel->getProsesRebusDetail2($id),
             'divisi' => $this->divisiModel->where('id', $prosesRebus['divisi_id'])->findAll(),
             'warehouse' => $this->warehouseModel->where('id', $prosesRebus['warehouse_id'])->findAll(),
             'supplier' => $this->supplierModel->getSupplierByType("BAHAN BAKU")
         ];
 
+
         return view('jasaVendor/prosesRebus/form', $data);
+    }
+
+    public function createActionNew()
+    {
+        $barangs = json_decode($_POST['listBarang']);
+
+        if (count($barangs) == 0) {
+            return response()->setJSON([
+                'status' => false,
+                'message' => "Barang tidak boleh kosong",
+                'token' => csrf_hash()
+            ]);
+        }
+
+        $check = $this->prosesRebusModel
+                ->where('no_rebus', $this->request->getVar('no_rebus'))
+                ->where('deletedAt', null)
+                ->first();
+
+        if ($check != null) {
+            return response()->setJSON([
+                'message' => "Nomor Rebus Sudah Ada",
+                'token' => csrf_hash(),
+                'status' => false,
+            ]);
+        }
+
+        $id = $this->prosesRebusModel->insert([
+            'company_id' => $this->this_company_id,
+            'divisi_id' => $this->request->getVar('divisi_id'),
+            'warehouse_id' => $this->request->getVar('warehouse_id'),
+            'tipe_pengambilan_stock' => $this->request->getVar('type_pengambilan_stock'),
+            'no_rebus' => $this->request->getVar('no_rebus'),
+            "tanggal" => $this->request->getVar("tanggal") ? date_format(date_create_from_format("d/m/Y", $this->request->getVar("tanggal")), "Y-m-d") : "",
+            "tanggal_selesai" => $this->request->getVar("tanggal_selesai") ? date_format(date_create_from_format("d/m/Y", $this->request->getVar("tanggal_selesai")), "Y-m-d") : "",
+            'keterangan' => $this->request->getVar('keterangan'),
+            'type_barang' => "bahan_baku",
+            'status_posting' => '0'
+        ]);
+
+        foreach ($barangs as $b) {
+            // Get current stock quantity
+            $stockDetail = $this->stockDetail2Model->getStockListDetail(
+                $b->stock_id,
+                $b->bc_id,
+                $b->no_aju,
+                $b->stock_dokumen
+            );
+            
+            $qty_stok_sistem = $stockDetail['stok_total'] ?? 0;
+            $qty_input_user = $b->qty;
+            
+            // Hitung qty bersih dan kotor
+            $qty_bersih = min($qty_input_user, $qty_stok_sistem); // Ambil yang terkecil
+            $qty_kotor = max($qty_input_user - $qty_stok_sistem, 0); // Selisihnya (kalau ada)
+
+            $this->prosesRebusDetailModel->insert([
+                'proses_rebus_id' => $id,
+                'stock_rebus_id' => $b->stock_id,
+                'bc_rebus_id' => $b->bc_id,
+                'no_aju_rebus' => $b->no_aju,
+                'qty_rebus' => $qty_bersih, // <-- INI YANG DIUBAH, pakai qty bersih
+                'stock_hasil_rebus_id' => $b->output->stock_id,
+                'stock_dokumen' => $b->stock_dokumen,
+                'qty_hasil_rebus' => $b->output->qty,
+                'qty_kotor' => $qty_kotor
+            ]);
+        }
+
+        return response()->setJSON([
+            'message' => "Proses Rebus Berhasil Disimpan",
+            'token' => csrf_hash(),
+            'status' => true,
+            'id' => encrypt($id)
+        ]);
+    }
+
+
+    public function updateActionNew()
+    {
+        $barangs = json_decode($_POST['listBarang']);
+
+        if (count($barangs) == 0) {
+            return response()->setJSON([
+                'status' => false,
+                'message' => "Barang tidak boleh kosong",
+                'token' => csrf_hash()
+            ]);
+        }
+
+        $id = decrypt($this->request->getVar('id'));
+
+        // Update header data
+        $this->prosesRebusModel->update($id, [
+            'company_id' => $this->this_company_id,
+            'divisi_id' => $this->request->getVar('divisi_id'),
+            'warehouse_id' => $this->request->getVar('warehouse_id'),
+            "tanggal" => $this->request->getVar("tanggal") ? date_format(date_create_from_format("d/m/Y", $this->request->getVar("tanggal")), "Y-m-d") : "",
+            "tanggal_selesai" => $this->request->getVar("tanggal_selesai") ? date_format(date_create_from_format("d/m/Y", $this->request->getVar("tanggal_selesai")), "Y-m-d") : "",
+            'keterangan' => $this->request->getVar('keterangan'),
+            'tipe_pengambilan_stock' => $this->request->getVar('type_pengambilan_stock'),
+            'type_barang' => "bahan_baku",
+            'status_posting' => '0' // Reset posting status when updated
+        ]);
+
+        $id_detail_all = [];
+
+        foreach ($barangs as $b) {
+            // Get current stock quantity
+            $stockDetail = $this->stockDetail2Model->getStockListDetail(
+                $b->stock_id,
+                $b->bc_id,
+                $b->no_aju,
+                $b->stock_dokumen
+            );
+            
+            $qty_stok_sistem = $stockDetail['qty'] ?? 0;
+            $qty_input_user = $b->qty;
+            
+            // Calculate clean and excess quantities
+            $qty_bersih = min($qty_input_user, $qty_stok_sistem);
+            $qty_kotor = max($qty_input_user - $qty_stok_sistem, 0);
+
+            // Check if record exists
+            $check = $this->prosesRebusDetailModel
+                ->where('proses_rebus_id', $id)
+                ->where('stock_rebus_id', $b->stock_id)
+                ->where('bc_rebus_id', $b->bc_id)
+                ->where('no_aju_rebus', $b->no_aju)
+                ->where('stock_hasil_rebus_id', $b->output->stock_id)
+                ->where('stock_dokumen', $b->stock_dokumen)
+                ->first();
+
+            if ($check != null) {
+                // UPDATE existing record with calculated quantities
+                $this->prosesRebusDetailModel->update($check['id'], [
+                    'proses_rebus_id' => $id,
+                    'stock_rebus_id' => $b->stock_id,
+                    'bc_rebus_id' => $b->bc_id,
+                    'no_aju_rebus' => $b->no_aju,
+                    'qty_rebus' => $qty_bersih, // Use calculated clean quantity
+                    'stock_hasil_rebus_id' => $b->output->stock_id,
+                    'stock_dokumen' => $b->stock_dokumen,
+                    'qty_hasil_rebus' => $b->output->qty,
+                    'qty_kotor' => $qty_kotor // Store excess quantity
+                ]);
+                array_push($id_detail_all, $check['id']);
+            } else {
+                // For new records, delete any existing conflicting records first
+                $this->prosesRebusDetailModel
+                    ->where('proses_rebus_id', $id)
+                    ->where('stock_rebus_id', $b->stock_id)
+                    ->where('bc_rebus_id', $b->bc_id)
+                    ->where('no_aju_rebus', $b->no_aju)
+                    ->where('stock_hasil_rebus_id', $b->output->stock_id)
+                    ->where('stock_dokumen', $b->stock_dokumen)
+                    ->delete();
+
+                // INSERT new record with calculated quantities
+                $id_detail_new = $this->prosesRebusDetailModel->insert([
+                    'proses_rebus_id' => $id,
+                    'stock_rebus_id' => $b->stock_id,
+                    'bc_rebus_id' => $b->bc_id,
+                    'no_aju_rebus' => $b->no_aju,
+                    'qty_rebus' => $qty_bersih, // Use calculated clean quantity
+                    'stock_hasil_rebus_id' => $b->output->stock_id,
+                    'stock_dokumen' => $b->stock_dokumen,
+                    'qty_hasil_rebus' => $b->output->qty,
+                    'qty_kotor' => $qty_kotor // Store excess quantity
+                ]);
+                array_push($id_detail_all, $id_detail_new);
+            }
+        }
+
+        // Delete any detail records not included in the update
+        $this->prosesRebusDetailModel->where('proses_rebus_id', $id)->whereNotIn('id', $id_detail_all)->delete();
+
+        return response()->setJSON([
+            'message' => "Proses Rebus Berhasil Diupdate",
+            'token' => csrf_hash(),
+            'status' => true,
+        ]);
     }
 
     public function createAction()
@@ -423,6 +606,130 @@ class ProsesRebus extends BaseController
     }
 
 
+    public function postingNew()
+    {
+        $id = decrypt($this->request->getVar('id'));
+
+        $prosesRebus = $this->prosesRebusModel->find($id);
+        $prosesRebusDetail = $this->prosesRebusDetailModel->where('proses_rebus_id', $id)->findAll();
+
+        foreach ($prosesRebusDetail as $p) {
+            // BARANG OUT DARI INVENTORI
+            $stockRebus = $this->stockModel->find($p['stock_rebus_id']);
+            $stockHasilRebus = $this->stockModel->find($p['stock_hasil_rebus_id']);
+
+            // BARANG LAMA
+            $stockRebusDetail = $this->stockDetail2Model->getStockListDetail(
+                $p['stock_rebus_id'],
+                $p['bc_rebus_id'],
+                $p['no_aju_rebus'],
+                $p['stock_dokumen']
+            );
+
+            // Hitung qty yang akan diproses
+            $qty_stok_sistem = $stockRebusDetail['qty'] ?? 0;
+            $qty_rebus_input = $p['qty_rebus'];
+            $qty_kotor = 0;
+
+            if ($qty_rebus_input > $qty_stok_sistem) {
+                $qty_kotor = $qty_rebus_input - $qty_stok_sistem;
+                $qty_rebus_input = $qty_stok_sistem;
+            }
+
+            // Update qty kotor di database
+            $this->prosesRebusDetailModel->update($p['id'], ['qty_kotor' => $qty_kotor]);
+
+            // Proses stok keluar (hanya untuk qty yang ada di sistem)
+            if ($qty_rebus_input > 0) {
+                $stok = $this->stockModel->insertStok(
+                    $prosesRebus['company_id'],
+                    $prosesRebus['warehouse_id'],
+                    $prosesRebus['divisi_id'],
+                    "bahan_baku",
+                    $stockRebus['barang1_id'],
+                    $stockRebus['barang2_id'],
+                    ($qty_rebus_input * -1)
+                );
+
+                // DETAIL
+                $stokDetail = $this->stockDetailModel->insertStokDetail(
+                    $stok,
+                    $qty_rebus_input,
+                    "Out",
+                    date('Y-m-d'),
+                    $this->this_user_id,
+                    "REBUS",
+                    $prosesRebus['no_rebus'],
+                    $prosesRebus['keterangan']
+                );
+
+                // SUB DETAIL
+                $this->stockDetail2Model->insertStokDetail2(
+                    $p['bc_rebus_id'],
+                    $p['stock_rebus_id'],
+                    $stokDetail,
+                    $qty_rebus_input,
+                    $p['no_aju_rebus'],
+                    $prosesRebus['no_rebus'],
+                    $p['stock_dokumen'],
+                    $stockRebusDetail['supplier_id'],
+                    $stockRebusDetail['harga_umum'],
+                    $stockRebusDetail['harga_harian'],
+                    $stockRebusDetail['harga_bulanan'],
+                    $stockRebusDetail['no_po']
+                );
+            }
+
+            // -----
+            // BARANG IN KE INVENTORI (proses seperti biasa)
+            $stok = $this->stockModel->insertStok(
+                $prosesRebus['company_id'],
+                $prosesRebus['warehouse_id'],
+                $prosesRebus['divisi_id'],
+                "bahan_baku",
+                $stockHasilRebus['barang1_id'],
+                $stockHasilRebus['barang2_id'],
+                $p['qty_hasil_rebus']
+            );
+
+            // DETAIL
+            $stokDetail = $this->stockDetailModel->insertStokDetail(
+                $stok,
+                $p['qty_hasil_rebus'],
+                "In",
+                date('Y-m-d'),
+                $this->this_user_id,
+                "REBUS",
+                $prosesRebus['no_rebus'],
+                $prosesRebus['keterangan']
+            );
+
+            // SUB DETAIL
+            $this->stockDetail2Model->insertStokDetail2(
+                $p['bc_rebus_id'],
+                $p['stock_hasil_rebus_id'],
+                $stokDetail,
+                $p['qty_hasil_rebus'],
+                $p['no_aju_rebus'],
+                $prosesRebus['no_rebus'],
+                $prosesRebus['no_rebus'] . " ( " . $p['stock_dokumen'] . " )",
+                $stockRebusDetail['supplier_id'],
+                $stockRebusDetail['harga_umum'],
+                $stockRebusDetail['harga_harian'],
+                $stockRebusDetail['harga_bulanan'],
+                $stockRebusDetail['no_po']
+            );
+        }
+
+        $this->prosesRebusModel->update($id, ['status_posting' => '1']);
+        return response()->setJSON([
+            'message' => "Proses rebus berhasil diposting",
+            'status' => true,
+            'token' => csrf_hash()
+        ]);
+    }
+
+
     public function unPosting()
     {
         $id = decrypt($this->request->getVar('id'));
@@ -498,6 +805,126 @@ class ProsesRebus extends BaseController
                 $p['bc_rebus_id'],
                 $p['no_aju_rebus'],
                 $p['stock_dokumen']
+            );
+
+            // DETAIL
+            $stokDetail = $this->stockDetailModel->insertStokDetail(
+                $stok,
+                $p['qty_hasil_rebus'],
+                "Out",
+                date('Y-m-d'),
+                $this->this_user_id,
+                "REBUS",
+                $prosesRebus['no_rebus'],
+                $prosesRebus['keterangan']
+            );
+
+            // SUB DETAIL
+            $this->stockDetail2Model->insertStokDetail2(
+                $p['bc_rebus_id'],
+                $p['stock_hasil_rebus_id'],
+                $stokDetail,
+                $p['qty_hasil_rebus'],
+                $p['no_aju_rebus'],
+                $prosesRebus['no_rebus'],
+                $prosesRebus['no_rebus'] . " ( " . $p['stock_dokumen'] . " )",
+                $stockRebusDetail['supplier_id'],
+                $stockRebusDetail['harga_umum'],
+                $stockRebusDetail['harga_harian'],
+                $stockRebusDetail['harga_bulanan'],
+                $stockRebusDetail['no_po']
+            );
+        }
+
+        $this->prosesRebusModel->update($id, ['status_posting' => '0']);
+
+        return response()->setJSON([
+            'message' => "Proses rebus berhasil diunposting",
+            'status' => true,
+            'token' => csrf_hash()
+        ]);
+    }
+
+
+    public function unPostingNew()
+    {
+        $id = decrypt($this->request->getVar('id'));
+
+        $prosesRebus = $this->prosesRebusModel->find($id);
+        $prosesRebusDetail = $this->prosesRebusDetailModel->where('proses_rebus_id', $id)->findAll();
+
+        foreach ($prosesRebusDetail as $p) {
+            // BARANG OUT DARI INVENTORI
+            $stockRebus = $this->stockModel->find($p['stock_rebus_id']);
+            $stockHasilRebus = $this->stockModel->find($p['stock_hasil_rebus_id']);
+
+            // BARANG LAMA
+            $stockRebusDetail = $this->stockDetail2Model->getStockListDetail(
+                $p['stock_rebus_id'],
+                $p['bc_rebus_id'],
+                $p['no_aju_rebus'],
+                $p['stock_dokumen']
+            );
+
+            // Hitung qty yang akan diproses (konsisten dengan posting)
+            $qty_stok_sistem = $stockRebusDetail['qty'] ?? 0;
+            $qty_rebus_input = $p['qty_rebus'];
+            $qty_kotor = $p['qty_kotor'] ?? 0; // Ambil nilai qty kotor dari database
+            
+            // Jika ada qty kotor, kita hanya mengembalikan qty yang benar-benar dikurangi dari stok sistem
+            $qty_to_return = ($qty_rebus_input > $qty_stok_sistem) ? $qty_stok_sistem : $qty_rebus_input;
+
+            // BARANG IN YANG DIREBUS (kembalikan stok)
+            if ($qty_to_return > 0) {
+                $stok = $this->stockModel->insertStok(
+                    $prosesRebus['company_id'],
+                    $prosesRebus['warehouse_id'],
+                    $prosesRebus['divisi_id'],
+                    "bahan_baku",
+                    $stockRebus['barang1_id'],
+                    $stockRebus['barang2_id'],
+                    $qty_to_return // Kembalikan qty yang sebenarnya dikurangi dari sistem
+                );
+
+                // DETAIL
+                $stokDetail = $this->stockDetailModel->insertStokDetail(
+                    $stok,
+                    $qty_to_return,
+                    "In",
+                    date('Y-m-d'),
+                    $this->this_user_id,
+                    "REBUS",
+                    $prosesRebus['no_rebus'],
+                    $prosesRebus['keterangan']
+                );
+
+                // SUB DETAIL
+                $this->stockDetail2Model->insertStokDetail2(
+                    $p['bc_rebus_id'],
+                    $p['stock_rebus_id'],
+                    $stokDetail,
+                    $qty_to_return,
+                    $p['no_aju_rebus'],
+                    $prosesRebus['no_rebus'],
+                    $p['stock_dokumen'],
+                    $stockRebusDetail['supplier_id'],
+                    $stockRebusDetail['harga_umum'],
+                    $stockRebusDetail['harga_harian'],
+                    $stockRebusDetail['harga_bulanan'],
+                    $stockRebusDetail['no_po']
+                );
+            }
+
+            // -----
+            // BARANG OUT HASIL REBUS (proses seperti biasa)
+            $stok = $this->stockModel->insertStok(
+                $prosesRebus['company_id'],
+                $prosesRebus['warehouse_id'],
+                $prosesRebus['divisi_id'],
+                "bahan_baku",
+                $stockHasilRebus['barang1_id'],
+                $stockHasilRebus['barang2_id'],
+                ($p['qty_hasil_rebus'] * -1) // dikembalikan jadi minus
             );
 
             // DETAIL

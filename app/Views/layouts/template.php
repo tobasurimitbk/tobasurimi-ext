@@ -305,7 +305,7 @@
         $(document).ready(function() {
             $('.tiny').tinymce({
                 height: 300,
-                api_key: 'y9k86q7hldeb66uas38crgtorii72bzfadk84nmx0sazm2g1',
+                api_key: 'als0m788jdqt5uyi4cdjta19b2pru68z0klwewz3dthh6gsw',
                 entity_encoding: 'raw'
             });
         });

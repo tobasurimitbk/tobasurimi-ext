@@ -70,8 +70,8 @@ class Tax extends BaseController
                 "tax_name"      => $data->name,
                 "tax_type"      => strtoupper($data->type),
                 "tax_value"     => $data->tax_value,
-                "akun_kredit"     => $data->akun_kredit_nama ."|". $data->akun_kredit_no,
-                "akun_debit"     => $data->akun_debit_nama ."|". $data->akun_debit_no,
+                "akun_kredit"     => $data->akun_kredit_nama . " ( " . $data->akun_kredit_no . " )",
+                "akun_debit"     => $data->akun_debit_nama . " ( " . $data->akun_debit_no . " )",
             ]);
         }
 
@@ -108,7 +108,7 @@ class Tax extends BaseController
                     'errors' => [
                         'required' => 'Nilai tax tidak boleh kosong'
                     ]
-                    ],
+                ],
                 "akun_kredit" => [
                     "rules" => "required",
                     'errors' => [

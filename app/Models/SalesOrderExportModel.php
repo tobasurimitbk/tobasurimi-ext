@@ -399,8 +399,6 @@ class SalesOrderExportModel extends Model
             sales_contract.can_deduction,
             sales_contract.estimated_freight,
             sales_contract.others,
-
-
             metadata.value as mata_uang,
             companies.holding_company,
             companies.company
@@ -1006,5 +1004,18 @@ class SalesOrderExportModel extends Model
 
         $user = $usersModel->whereIn('id', $userId)->orderBy('name', "asc")->findAll();
         return $user;
+    }
+
+    public function getSalesOrderExportByCustomerId($customerId)
+    {
+        $resultQry = $this->asArray()
+            ->select('sales_order_export.*')
+            ->join('sales_contract', 'sales_contract.id = sales_order_export.sales_contract_id', 'left')
+            ->where('sales_contract.customer_id', $customerId)
+            ->where('sales_order_export.deletedAt', null)
+            ->orderBy('sales_order_export.sales_order_export_id', "desc")
+            ->findAll();
+
+        return $resultQry;
     }
 }

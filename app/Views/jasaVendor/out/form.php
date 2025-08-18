@@ -1,6 +1,50 @@
 <?= $this->extend('layouts/template'); ?>
 <?= $this->Section('content'); ?>
 
+<style>
+    /* Pastikan container form-floating tidak mengubah posisi */
+    .form-floating > .select2-container--bootstrap-5 .select2-selection--multiple {
+        min-height: 100% !important;
+        height: 50px !important; /* Tinggi fix */
+        padding: 4px 6px !important;
+        display: block !important;
+        border: 1px solid #ced4da !important;
+        border-radius: 0.375rem !important;
+        overflow-y: auto;   /* Scroll vertikal */
+        overflow-x: hidden;
+        white-space: normal;
+    }
+
+    /* Chip/tag pilihan */
+    .select2-container--bootstrap-5 .select2-selection__choice {
+        background-color: #e9ecef !important;
+        border: none !important;
+        padding: 2px 6px !important;
+        margin: 2px 4px 0 0 !important;
+        font-size: 0.8rem !important;
+        border-radius: 0.25rem !important;
+        display: inline-flex;
+        align-items: center;
+    }
+
+    /* Ikon X di chip */
+    .select2-container--bootstrap-5 .select2-selection__choice__remove {
+        margin-right: 4px !important;
+    }
+
+    /* Search box di dalam multiple select */
+    .select2-container--bootstrap-5 .select2-search--inline {
+        display: inline-flex;
+        align-items: center;
+    }
+    .select2-container--bootstrap-5 .select2-search--inline .select2-search__field {
+        margin-top: 0 !important;
+        padding: 0 !important;
+        height: auto !important;
+    }
+    
+</style>
+
 <section class="section">
     <div class="section-header">
         <h1><?= empty($jasaVendorOut) ? "Tambah Jasa Vendor Barang Keluar" : "Update Jasa Vendor Barang Keluar" ?></h1>
@@ -185,14 +229,13 @@
                             </div>
                         </div>
                         <div class="col-md-4" id="supplier_id_select">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <select class="form-select supplier_id" id="supplier_id" name="supplier_id">
-                                    <option value=""></option>
+                            <div class="form-floating mb-3" id="supplier_id_select" style="height: 50px;">
+                                <select class="form-select supplier_id" id="supplier_id" name="supplier_id[]" multiple>
                                     <?php foreach ($supplier as $s): ?>
-                                        <option value="<?= $s['id'] ?>"><?= $s['name']  ?></option>
+                                        <option value="<?= $s['id'] ?>"><?= $s['name'] ?></option>
                                     <?php endforeach; ?>
                                 </select>
-                                <label for="floatingInput" style="z-index: 1;">Supplier</label>
+                                <label for="supplier_id">Pilih Supplier (Bisa multiple)</label>
                             </div>
                         </div>
                         <div class="col-md-4" id="vendor_barang_id_select">
@@ -214,10 +257,6 @@
                                 </select>
                                 <label for="floatingInput" style="z-index: 1;">Udang / Kepiting (Kirim Ke Vendor)</label>
                             </div>
-                        </div>
-
-                        <div class="col-md-12 col-table-button-tts">
-                             <button type="button" class="btn btn-primary" id="select-item-inventori-btn">Submit</button>
                         </div>
                     </div>
                 </form>
@@ -246,6 +285,12 @@
                                 </thead>
                                 <tbody class="body-table">
                                 </tbody>
+                                <tfoot>
+                                    <tr>
+                                        <th colspan="8" style="text-align:right">Total:</th>
+                                        <th></th>
+                                    </tr>
+                                </tfoot>
                             </table>
                             <div class="col-md-4 mb-3 form-fifo">
                                 <div class="form-floating" style="height: 50px;">
@@ -502,18 +547,25 @@
     $('#spesifikasi_id').select2({
         placeholder: "Pilih Udang / Kepiting (Kirim Ke Vendor)",
         theme: "bootstrap-5",
-        allowClear: true
+        allowClear: true,
+    }).change(function() {
+        listStockAsal = [];
+        drawTableAsalBarang(listStockAsal);
+        getListDokumenPabean();
     });
 
     $('#supplier_id').select2({
         placeholder: "Pilih Supplier",
         theme: "bootstrap-5",
-        allowClear: true
-    });
-
-    // Then add click handler for the Pilih button
-    $('#select-item-inventori-btn').click(function() {
-        // LIST DOKUMEN PABEAN
+        multiple: true,
+        // allowClear: true,
+        width: '100%',
+        dropdownParent: $('#supplier_id_select')
+    }).change(function() {
+        // GET LIST BARANG
+        getListBarang();
+        listStockAsal = [];
+        drawTableAsalBarang(listStockAsal);
         getListDokumenPabean();
     });
 
@@ -589,35 +641,31 @@
         }
     });
 
+   // Ubah fungsi insertListPabean menjadi:
     function insertListPabean() {
         var checkedCheckboxes = $(".child:checked");
         var dataIds = checkedCheckboxes.map(function() {
-            return $(this).data("id");
+            return Number($(this).data("id")); // Konversi ke number
         }).get();
+        
         var id_selected = getIDListDataSelected();
-
-        console.log("Yang Di Checklist", dataIds);
-        console.log("Yang sudah masuk tabel bawah", id_selected);
+        
         $.each(listStockAsal, function(i, v) {
-            var currentID = v.id;
-            console.log("stok asal", currentID);
+            var currentID = Number(v.id); // Konversi ke number
             if ($.inArray(currentID, dataIds) !== -1) {
                 var isIDSelected = $.grep(listStockSelected, function(item) {
-                    return item.id == currentID;
+                    return Number(item.id) == currentID; // Konversi ke number
                 }).length > 0;
-                console.log("Selecteddddd", isIDSelected);
+                
                 if (!isIDSelected) {
                     listStockAsal[i].stok_total = parseFloat(listStockAsal[i].stok_total);
-                    listStockAsal[i].qty = 0;
+                    listStockAsal[i].qty = 1; // Ganti dari 0 ke 1 atau nilai default lain
                     listStockSelected.push(listStockAsal[i]);
                 }
             }
         });
+        console.log(listStockSelected);
         drawTableSelectedItem(listStockSelected);
-        // reset barang kirim ke vendor dan list bc nya
-        $('#spesifikasi_id').val(null).change();
-        $('#supplier_id').val(null).change();
-        drawTableAsalBarang([]);
     }
 
     function insertListFifo() {
@@ -768,7 +816,15 @@
                         if (result.isConfirmed) {
                             let id = $('#id').val();
                             let data = new FormData(document.querySelector(".create-form"));
+
+                            // Ambil semua field dari .detail-form
+                            document.querySelectorAll(".detail-form [name]").forEach(el => {
+                                data.append(el.name, el.value);
+                            });
+
+                            // Append list barang
                             data.append('listBarang', JSON.stringify(listStockSelected));
+
 
                             if (id) {
                                 // UPDATE
@@ -942,7 +998,7 @@
             data: {
                 barang_master_id: $(".spesifikasi_id option:selected").data('barang_master_id'),
                 stock_id: $(".spesifikasi_id option:selected").data('stock_id'),
-                supplier_id: $(".supplier_id option:selected").val(),
+                supplier_id: $('#supplier_id').select2('val'),
                 vendor_id: $('.vendor_barang_id option:selected').val()
             },
             dataType: "json",
@@ -958,34 +1014,36 @@
                     }
 
                     // normalisasi stok_total
-                    v.stok_total = parseFloatSafe(v.stok_total);
+                    v.stok_total = parseFloat(v.stok_total) || 0;
 
-                    // buat key unik
-                    var key = makeUniqueKey(v);
+                    // cari apakah sudah ada di listStockAsal
+                    var existingItem = listStockAsal.find(function(item) {
+                        return item.id === v.id && 
+                            item.stock_dokumen === v.stock_dokumen && 
+                            item.bc_id === v.bc_id;
+                            item.no_aju === v.no_aju;
+                    });
 
-                    // cari apakah udah ada record dengan key sama
-                    var idx = listStockAsal.findIndex(item => item._key === key);
-
-                    if (idx === -1) {
-                        // belum ada -> push (tambahkan _key supaya gampang cek nanti)
-                        v._key = key;
+                    if (!existingItem) {
+                        // tambahkan baru
                         listStockAsal.push(v);
                     } else {
-                        // sudah ada -> update record (jika mau replace dengan versi terbaru)
-                        // kalau mau KEEP yang lama, ganti logika ini jadi `return;` saja
-                        v._key = key;
-                        // update fields penting (atau replace seluruh objek)
-                        listStockAsal[idx] = Object.assign({}, listStockAsal[idx], v);
+                        // update yang sudah ada
+                        existingItem.stok_total = v.stok_total;
+                        existingItem.sumber = v.sumber;
+                        existingItem.supplier_name = v.supplier_name;
+                        existingItem.bc_type = v.bc_type;
+                        existingItem.stock_date = v.stock_date;
+                        existingItem.barang = v.barang;
+                        existingItem.satuan = v.satuan;
                     }
                 });
 
-                // render ulang tabel dari listStockAsal (sudah ter-merge & dedup)
                 drawTableAsalBarang(listStockAsal);
             }
         });
     }
 
-    // Render DataTable — clear dulu supaya gak nambah row lama
     function drawTableAsalBarang(data) {
         if (!$.fn.DataTable.isDataTable('#dataTable')) {
             dataTable = $('#dataTable').DataTable({
@@ -1005,48 +1063,87 @@
                 language: {
                     emptyTable: "Tidak Ada Data",
                     lengthMenu: "Show _MENU_ entries",
-                    paginate: { previous: '<i class="fa fa-angle-left"></i>', next: '<i class="fa fa-angle-right"></i>' }
+                    paginate: {
+                        previous: '<i class="fa fa-angle-left"></i>',
+                        next: '<i class="fa fa-angle-right"></i>'
+                    }
+                },
+                footerCallback: function (row, data, start, end, display) {
+                    var api = this.api();
+
+                    // Parsing angka
+                    var intVal = function (i) {
+                        if (typeof i === 'string') {
+                            return parseFloat(i.replace(/,/g, '')) || 0;
+                        }
+                        if (typeof i === 'number') {
+                            return i;
+                        }
+                        return 0;
+                    };
+
+                    // Total keseluruhan
+                    var total = api
+                        .column(8) // kolom Qty (0-based)
+                        .data()
+                        .reduce(function (a, b) {
+                            return intVal(a) + intVal(b);
+                        }, 0);
+
+                    // Total per halaman
+                    var pageTotal = api
+                        .column(8, { page: 'current'} )
+                        .data()
+                        .reduce(function (a, b) {
+                            return intVal(a) + intVal(b);
+                        }, 0);
+
+                    // Update footer
+                    $(api.column(8).footer()).html(
+                        pageTotal.toFixed(2) + ' (Total: ' + total.toFixed(2) + ')'
+                    );
                 }
             });
         } else {
-            // Hapus semua baris lama sebelum tambahkan ulang
             dataTable.clear();
         }
 
-        // tambahkan rows (jangan draw tiap iterasi, draw sekali di akhir)
-        data.forEach(v => {
-            // kalau mau skip lagi kondisi tertentu, cek di sini (tapi seharusnya merge sudah memfilter)
-            var typePengambilanStok = $('#type_pengambilan_stock option:selected').val();
+        var typePengambilanStok = $('#type_pengambilan_stock option:selected').val();
+        var totalQty = 0;
 
-            var $row = $('<tr>');
-            if (typePengambilanStok == "FIFO" || parseFloat(v.stok_total) == 0) {
-                $row.append($('<td style="text-align: center;">').html(''));
+        data.forEach(function(v) {
+            totalQty += parseFloat(v.stok_total) || 0;
+            var row = $('<tr>');
+            
+            if (typePengambilanStok == "FIFO" || v.stok_total == 0) {
+                row.append($('<td style="text-align: center;">').html(''));
             } else {
-                $row.append($('<td style="text-align: center;">').html(
+                row.append($('<td style="text-align: center;">').html(
                     `<div class="form-check">
-                        <input data-id="${v.id}" data-stok_total="${v.stok_total}" autocomplete="one-time-code" class="form-check-input child" type="checkbox">
+                        <input data-id="${v.id}" data-stok_total="${v.stok_total}" 
+                            class="form-check-input child" type="checkbox">
                     </div>`
                 ));
             }
 
-            $row.append($('<td style="text-align:center;">').text(v.sumber));
-            $row.append($('<td style="text-align:center;">').text(v.stock_dokumen));
-            $row.append($('<td style="text-align:center;">').text(v.supplier_name));
-            $row.append($('<td style="text-align:center;">').text(v.bc_type));
-            $row.append($('<td style="text-align:center;">').text(v.stock_date));
-            $row.append($('<td style="text-align:center;">').text(v.barang));
-            $row.append($('<td style="text-align:center;">').text(v.satuan));
-            $row.append($('<td style="text-align:center;">').text(v.stok_total));
+            row.append($('<td style="text-align:center;">').text(v.sumber || '-'));
+            row.append($('<td style="text-align:center;">').text(v.stock_dokumen || '-'));
+            row.append($('<td style="text-align:center;">').text(v.supplier_name || '-'));
+            row.append($('<td style="text-align:center;">').text(v.bc_type || '-'));
+            row.append($('<td style="text-align:center;">').text(v.stock_date || '-'));
+            row.append($('<td style="text-align:center;">').text(v.barang || '-'));
+            row.append($('<td style="text-align:center;">').text(v.satuan || '-'));
+            row.append($('<td style="text-align:center;">').text(parseFloat(v.stok_total) || 0));
 
-            dataTable.row.add($row);
+            dataTable.row.add(row);
         });
-
+        
         dataTable.draw(false);
+        $('#dataTable tfoot th:last').text(totalQty.toFixed(2)); // 2 angka di belakang koma
     }
 
-
-
     function drawTableSelectedItem(data) {
+        console.log(data)
         var typePengambilanStok = $('#type_pengambilan_stock option:selected').val();
         const table = $('#selectedItemTable');
         var no = 1;

@@ -343,7 +343,7 @@
             <table border="1" style="width: 100%; margin-top:10px;" class="table no-border">
                 <thead>
                     <tr>
-                        <td style="text-align: center;">MARKS & NO</td>
+                        <td style="text-align: center; width:50px;">MARKS & NO</td>
                         <td style="text-align: center;">PARTICULAR</td>
                         <td style="text-align: center;">QTTY</td>
                         <td style="text-align: center;">UNIT PRICE <br>USD</td>
@@ -369,7 +369,7 @@
                         <tr>
                             <td style="text-align: center; border:0px;"><?= $no++; ?></td>
                             <td style="border:0px;">
-                                <?= $detail["nama_barang"] . " " . $detail['spesifikasi'] . ($detail['note'] == null ? "" : " ( " . $detail['note'] . " )") ?>
+                                <?= $detail["nama_barang"] . " " . $detail['spesifikasi'] . ($detail['note'] == null ? "" : " (" . $detail['note'] . ")") ?>
                             </td>
                             <td style="text-align: center;border:0px;">
                                 <?= $detail["qty"] . " " . $detail["kode_satuan"] ?>

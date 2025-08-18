@@ -785,6 +785,45 @@ $routes->get('order-form-lain/list-customer', 'PenjualanLain\SalesOrderLain::dro
 $routes->get('order-form-lain/hitung-konversi', 'PenjualanLain\SalesOrderLain::hitungKonversi', ['filter' => 'Auth']);
 $routes->get('order-form-lain/get-no', 'PenjualanLain\SalesOrderLain::getSalesOrderLainNo', ['filter' => 'Auth']);
 
+// BIAYA EXIM
+// VENDOR PELAYARAN
+$routes->get('/vendor-pelayaran', 'BiayaExim\Vendor\VendorPelayaran::index', ['filter' => 'Auth']);
+$routes->get('/vendor-pelayaran/all', 'BiayaExim\Vendor\VendorPelayaran::all', ['filter' => 'Auth']);
+$routes->post('/vendor-pelayaran/create', 'BiayaExim\Vendor\VendorPelayaran::store', ['filter' => 'Auth']);
+$routes->post('/vendor-pelayaran/update', 'BiayaExim\Vendor\VendorPelayaran::update', ['filter' => 'Auth']);
+$routes->post('/vendor-pelayaran/delete', 'BiayaExim\Vendor\VendorPelayaran::destroy', ['filter' => 'Auth']);
+$routes->get('/vendor-pelayaran/get', 'BiayaExim\Vendor\VendorPelayaran::get', ['filter' => 'Auth']);
+
+// BIAYA ESKPOR
+$routes->get('/biaya-eskpor', 'BiayaExim\BiayaEskpor\BiayaEskpor::index', ['filter' => 'Auth']);
+$routes->get('/biaya-eskpor/create', 'BiayaExim\BiayaEskpor\BiayaEskpor::create', ['filter' => 'Auth']);
+$routes->get('/biaya-eskpor/get-order-form', 'BiayaExim\BiayaEskpor\BiayaEskpor::getDetailOrderForm', ['filter' => 'Auth']);
+$routes->post('/biaya-eskpor/create', 'BiayaExim\BiayaEskpor\BiayaEskpor::store', ['filter' => 'Auth']);
+$routes->post('/biaya-eskpor/update', 'BiayaExim\BiayaEskpor\BiayaEskpor::update', ['filter' => 'Auth']);
+$routes->post('/biaya-eskpor/delete', 'BiayaExim\BiayaEskpor\BiayaEskpor::destroy', ['filter' => 'Auth']);
+$routes->post('/biaya-eskpor/posting', 'BiayaExim\BiayaEskpor\BiayaEskpor::posting', ['filter' => 'Auth']);
+$routes->post('/biaya-eskpor/unposting', 'BiayaExim\BiayaEskpor\BiayaEskpor::unposting', ['filter' => 'Auth']);
+$routes->get('/biaya-eskpor/all', 'BiayaExim\BiayaEskpor\BiayaEskpor::all', ['filter' => 'Auth']);
+$routes->get('/biaya-eskpor/id/(:segment)', 'BiayaExim\BiayaEskpor\BiayaEskpor::edit/$1', ['filter' => 'Auth']);
+$routes->get('/biaya-eskpor/print/(:segment)', 'BiayaExim\BiayaEskpor\BiayaEskpor::print/$1', ['filter' => 'Auth']);
+$routes->get('/biaya-eskpor/get-sales-order-export', 'BiayaExim\BiayaEskpor\BiayaEskpor::getSalesOrderExportByCustomerId', ['filter' => 'Auth']);
+$routes->get('/biaya-eskpor/export-excel', 'BiayaExim\BiayaEskpor\BiayaEskpor::exportExcel', ['filter' => 'Auth']);
+
+// BIAYA IMPOR
+$routes->get('/biaya-impor', 'BiayaExim\BiayaImpor\BiayaImpor::index', ['filter' => 'Auth']);
+$routes->get('/biaya-impor/create', 'BiayaExim\BiayaImpor\BiayaImpor::create', ['filter' => 'Auth']);
+$routes->get('/biaya-impor/dropdown-po', 'BiayaExim\BiayaImpor\BiayaImpor::dropdownPo', ['filter' => 'Auth']);
+$routes->get('/biaya-impor/get-detail-barang-po', 'BiayaExim\BiayaImpor\BiayaImpor::getDetailBarangPo', ['filter' => 'Auth']);
+$routes->post('/biaya-impor/create', 'BiayaExim\BiayaImpor\BiayaImpor::store', ['filter' => 'Auth']);
+$routes->post('/biaya-impor/update', 'BiayaExim\BiayaImpor\BiayaImpor::update', ['filter' => 'Auth']);
+$routes->post('/biaya-impor/delete', 'BiayaExim\BiayaImpor\BiayaImpor::delete', ['filter' => 'Auth']);
+$routes->post('/biaya-impor/posting', 'BiayaExim\BiayaImpor\BiayaImpor::posting', ['filter' => 'Auth']);
+$routes->post('/biaya-impor/unposting', 'BiayaExim\BiayaImpor\BiayaImpor::unposting', ['filter' => 'Auth']);
+$routes->get('/biaya-impor/all', 'BiayaExim\BiayaImpor\BiayaImpor::all', ['filter' => 'Auth']);
+$routes->get('/biaya-impor/id/(:segment)', 'BiayaExim\BiayaImpor\BiayaImpor::edit/$1', ['filter' => 'Auth']);
+$routes->get('/biaya-impor/print/(:segment)', 'BiayaExim\BiayaImpor\BiayaImpor::print/$1', ['filter' => 'Auth']);
+$routes->get('/biaya-impor/export-excel', 'BiayaExim\BiayaImpor\BiayaImpor::exportExcel', ['filter' => 'Auth']);
+
 // PRODUKSI
 // Production Result
 $routes->get('/production-result', 'Production\ProductionResult::index', ['filter' => 'Auth']);
@@ -1031,8 +1070,8 @@ $routes->get('/proses-rebus/list-barang-rebus', 'JasaVendor\ProsesRebus::dropdow
 $routes->get('/proses-rebus/list-stock-dokumen-bc', 'JasaVendor\JasaVendorOut::getListStockByStockID', ['filter' => 'Auth']);
 $routes->get('/proses-rebus/all',  'JasaVendor\ProsesRebus::all', ['filter' => 'Auth']);
 $routes->get('/proses-rebus/id/(:segment)',  'JasaVendor\ProsesRebus::detail/$1', ['filter' => 'Auth']);
-$routes->post('/proses-rebus/save',  'JasaVendor\ProsesRebus::createAction', ['filter' => 'Auth']);
-$routes->post('/proses-rebus/update',  'JasaVendor\ProsesRebus::updateAction', ['filter' => 'Auth']);
+$routes->post('/proses-rebus/save',  'JasaVendor\ProsesRebus::createActionNew', ['filter' => 'Auth']);
+$routes->post('/proses-rebus/update',  'JasaVendor\ProsesRebus::updateActionNew', ['filter' => 'Auth']);
 $routes->post('/proses-rebus/delete',  'JasaVendor\ProsesRebus::delete', ['filter' => 'Auth']);
 $routes->post('/proses-rebus/posting',  'JasaVendor\ProsesRebus::posting', ['filter' => 'Auth']);
 $routes->get('/proses-rebus/get-no',  'JasaVendor\ProsesRebus::getProsesRebusNo', ['filter' => 'Auth']);
@@ -1063,8 +1102,8 @@ $routes->get('/jasa-vendor-in/list-jasa-vendor-out', 'JasaVendor\JasaVendorIn::d
 $routes->get('/jasa-vendor-in/list-barang', 'JasaVendor\JasaVendorIn::dropdownListBarangKeluar', ['filter' => 'Auth']);
 $routes->get('/jasa-vendor-in/list-barang-masuk', 'JasaVendor\JasaVendorIn::dropdownListBarangMasuk', ['filter' => 'Auth']);
 $routes->get('/jasa-vendor-in/get-jasa-vendor-in-no',  'JasaVendor\JasaVendorIn::getJasaVendorInNo', ['filter' => 'Auth']);
-$routes->post('/jasa-vendor-in/save',  'JasaVendor\JasaVendorIn::createAction', ['filter' => 'Auth']);
-$routes->post('/jasa-vendor-in/update',  'JasaVendor\JasaVendorIn::updateAction', ['filter' => 'Auth']);
+$routes->post('/jasa-vendor-in/save',  'JasaVendor\JasaVendorIn::createActionNew', ['filter' => 'Auth']);
+$routes->post('/jasa-vendor-in/update',  'JasaVendor\JasaVendorIn::updateActionNew', ['filter' => 'Auth']);
 $routes->post('/jasa-vendor-in/delete',  'JasaVendor\JasaVendorIn::delete', ['filter' => 'Auth']);
 $routes->post('/jasa-vendor-in/posting',  'JasaVendor\JasaVendorIn::posting', ['filter' => 'Auth']);
 $routes->get('/jasa-vendor-in/id/(:segment)',  'JasaVendor\JasaVendorIn::detail/$1', ['filter' => 'Auth']);
@@ -1402,6 +1441,8 @@ $routes->group('bea-cukai-bc-23', ['filter' => 'Auth'], function ($routes) {
     $routes->get('id/dokumen/data/all', 'BeaCukai\BC23::allDokumen');
     $routes->post('id/dokumen/create', 'BeaCukai\BC23::createDokumenAction');
     $routes->post('id/dokumen/delete', 'BeaCukai\BC23::deleteDokumenAction');
+    $routes->get('id/dokumen-detail', 'BeaCukai\BC23::getDetailDokumen');
+    $routes->post('id/dokumen/update', 'BeaCukai\BC23::updateDokumenAction');
     // PENGANGKUT
     $routes->get('id/pengangkut/(:segment)', 'BeaCukai\BC23::createPengangkutView/$1');
     $routes->post('id/pengangkut', 'BeaCukai\BC23::createPengangkutAction');
@@ -1422,6 +1463,8 @@ $routes->group('bea-cukai-bc-23', ['filter' => 'Auth'], function ($routes) {
     $routes->get('id/barang-pungutan-all', 'BeaCukai\BC23::allPungutan');
     $routes->post('id/barang-pungutan-create', 'BeaCukai\BC23::createPungutanAction');
     $routes->post('id/barang-pungutan-delete', 'BeaCukai\BC23::deletePungutanAction');
+    $routes->get('id/barang-pungutan-detail', 'BeaCukai\BC23::getDetailPungutan');
+    $routes->post('id/barang-pungutan-update', 'BeaCukai\BC23::updatePungutanAction');
     $routes->get('id/barang-dokumen-all', 'BeaCukai\BC23::allDokumenBarang');
     $routes->post('id/barang-dokumen-create', 'BeaCukai\BC23::createBarangDokumenAction');
     $routes->post('id/barang-dokumen-delete', 'BeaCukai\BC23::deleteBarangDokumenAction');

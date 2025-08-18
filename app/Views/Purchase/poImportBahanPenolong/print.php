@@ -375,7 +375,7 @@
                                 <?= $detail["qty"] . " " . $detail["kode_satuan"] ?>
                             </td>
                             <td style="text-align: center;border:0px;">
-                                <?= number_format($detail["price"], 2) ?>
+                                <?= number_format($detail["price"], 4) ?>
                             </td>
                             <td style="text-align: center;border:0px;">
                                 <?= number_format($totalWithAdditional, 2, '.', ','); ?>

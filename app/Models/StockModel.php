@@ -666,6 +666,7 @@ class StockModel extends Model
         stock.barang2_id AS spesifikasi_id,
         CONCAT(UPPER(barang_master.barang_name), '-', UPPER(barang_master_spesifikasi.spesifikasi)) AS barang,
         barang_master.kode_barang,
+        barang_master.id,
         satuans.kode_satuan
     ";
 
@@ -1313,7 +1314,8 @@ class StockModel extends Model
 
 
             foreach ($jasaVendorOutDetail as $j) {
-                $stock = $stockModel->find($j['stock_out_id']);
+                $stockDetail = $stockDetail2Model->find($j['stock_out_id']);
+                $stock = $stockModel->find($stockDetail['stock_id']);
 
                 $qty = $j['qty'];
 
@@ -1324,11 +1326,15 @@ class StockModel extends Model
                 }
 
                 // BARANG LAMA
-                $stockOldDetail = $stockDetail2Model->getStockListDetail(
-                    $j['stock_out_id'],
-                    $j['bc_out_id'],
-                    $j['no_aju_out'],
-                    $j['stock_dokumen']
+                // $stockOldDetail = $stockDetail2Model->getStockListDetail(
+                //     $j['stock_out_id'],
+                //     $j['bc_out_id'],
+                //     $j['no_aju_out'],
+                //     $j['stock_dokumen']
+                // );
+
+                $stockOldDetail = $stockDetail2Model->getStockListDetailNew(
+                    $j['stock_out_id']
                 );
 
                 $stok = $stockModel->insertStok(
@@ -1356,7 +1362,7 @@ class StockModel extends Model
                 // SUB DETAIL
                 $stockDetail2Model->insertStokDetail2(
                     $j['bc_out_id'],
-                    $j['stock_out_id'],
+                    $stok,
                     $stokDetail,
                     $qty,
                     $j['no_aju_out'],
@@ -1405,11 +1411,8 @@ class StockModel extends Model
             $jasaVendorOut = $jasaVendorOutModel->find($j['jasa_vendor_out_id']);
             $jasaVendorOutDetail = $jasaVendorOutDetailModel->find($j['jasa_vendor_out_detail_id']);
 
-            $stockOldDetail = $stockDetail2Model->getStockListDetail(
+            $stockOldDetail = $stockDetail2Model->getStockListDetailNew(
                 $jasaVendorOutDetail['stock_out_id'],
-                $jasaVendorOutDetail['bc_out_id'],
-                $jasaVendorOutDetail['no_aju_out'],
-                $jasaVendorOutDetail['stock_dokumen']
             );
 
             // DETAIL

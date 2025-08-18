@@ -533,6 +533,7 @@ class BeaCukaiApi
             'posBc11' => $bcData['pos_bc_11'],
             'seri' => (int)$bcData['seri'],
             'subposBc11' => $bcData['sub_pos_bc_11'],
+            'subsubposBc11' => $bcData['sub_pos_bc_11'],
             'tanggalBc11' => $bcData['tanggal_bc_11'],
             'tanggalTiba' =>  $bcData['tanggal_bc_11'], // ?
             'tanggalTtd' => $bcData['tanggal_ttd'],
@@ -557,7 +558,7 @@ class BeaCukaiApi
             $barang = [
                 'idBarang' => $b['id'],
                 'asuransi' => (float)$b['asuransi'],
-                'cif' => (float)$bcData['cif'],
+                'cif' => (float)$b['harga_perolehan_barang'],
                 'diskon' => (float)$b['diskon'], // ?
                 'fob' => (float)$b['fob'],
                 'freight' => (float)$b['freight'],
@@ -595,6 +596,7 @@ class BeaCukaiApi
             $barangTarifData = $BCBarangTarifModel
                 ->where('bc_purchase_order_id', $b['bc_purchase_order_id'])
                 ->where('penerimaan_barang_id', $b['penerimaan_barang_id'])
+                ->where('barang1_id', $b['barang1_id'])
                 ->where('deletedAt', null)
                 ->findAll();
 
@@ -606,7 +608,7 @@ class BeaCukaiApi
                     'kodeFasilitasTarif' => $bt['kode_fasilitas_tarif'],
                     'kodeSatuanBarang' => $bt['kode_satuan_barang'],
                     'kodeJenisPungutan' => $bt['kode_jenis_pungutan'],
-                    'nilaiBayar' => roundNumber($bt['nilai_bayar'], 0.01),
+                    'nilaiBayar' => (float)$bt['nilai_bayar'],
                     'nilaiFasilitas' => 0, // ?
                     'nilaiSudahDilunasi' => 0, // ?
                     'seriBarang' => (int)$bt['seri_barang'],
@@ -619,6 +621,7 @@ class BeaCukaiApi
             $barangDokumenData = $BCBarangDokumenModel
                 ->where('bc_purchase_order_id', $b['bc_purchase_order_id'])
                 ->where('penerimaan_barang_id', $b['penerimaan_barang_id'])
+                ->where('barang1_id', $b['barang1_id'])
                 ->where('deletedAt', null)
                 ->findAll();
 
@@ -638,39 +641,32 @@ class BeaCukaiApi
             // IMPORTIR ATAU PENGUSAHA TPB
             $entitasArr[] = [
                 'alamatEntitas' => $b['alamat_entitas'],
-                'kodeEntitas' => $b['kode_entitas'],
-                'kodeJenisIdentitas' => $b['kode_jenis_entitas'],
+                'kodeEntitas' => '3',
+                'kodeJenisIdentitas' => '6',
                 'namaEntitas' => $b['nama_entitas'],
                 'nibEntitas' => $b['nib_entitas'],
-                'nomorIdentitas' => $b['nomor_identitas'],
+                'nomorIdentitas' => $b['nitku_entitas'],
                 'nomorIjinEntitas' => $b['nomor_ijin_entitas'],
                 'tanggalIjinEntitas' => $b['tanggal_ijin_entitas'],
-                'seriEntitas' => (int)$b['seri_entitas']
+                'seriEntitas' => 1
             ];
             // PEMASOK
             $entitasArr[] = [
                 'alamatEntitas' => $b['alamat_pemasok'],
                 'kodeEntitas' => '5',
-                'kodeJenisIdentitas' => $b['kode_jenis_entitas'],
-                'namaEntitas' => $b['nama_pemasok'],
                 'kodeNegara' => $b['kode_negara_pemasok'],
+                'namaEntitas' => $b['nama_pemasok'],
                 'seriEntitas' => 2
             ];
             // PEMILIK BARANG
             $entitasArr[] = [
                 'alamatEntitas' => $b['alamat_pemilik_barang'],
                 'kodeEntitas' => '7',
-                'kodeJenisIdentitas' => $b['kode_jenis_entitas'],
-                'namaEntitas' => $b['nama_pemilik_barang'],
-                'nibEntitas' => $b['nib_entitas'],
-                'nomorIdentitas' => $b['npwp_pemilik_barang'],
-                'nomorIjinEntitas' => $b['nomor_ijin_entitas'],
-                'tanggalIjinEntitas' => $b['tanggal_ijin_entitas'],
+                'kodeJenisIdentitas' => '6',
                 'kodeStatus' => '3', // KODE STATUS PENGUSAHA
-                'nomorIjinEntitas' => $b['nomor_ijin_entitas'],
-                'tanggalIjinEntitas' => $b['tanggal_ijin_entitas'],
-                'kodeJenisApi' => '1',
-                'seriEntitas' => 3
+                'namaEntitas' => $b['nama_pemilik_barang'],
+                'nomorIdentitas' => $b['nitku_pemilik_barang'],
+                'seriEntitas' => 3,
             ];
         }
 
@@ -694,15 +690,43 @@ class BeaCukaiApi
             ];
         }
 
+        $seriDokumen = 1;
+        $seriDokumen = 1;
+
         foreach ($bcDokumen as $b) {
-            $dokumenArr[] = [
-                'kodeDokumen' => $b['kode_dokumen'],
-                'nomorDokumen' => $b['nomor_dokumen'],
-                'seriDokumen' => (int)$b['seri_dokumen'],
-                'tanggalDokumen' => $b['tanggal_dokumen'],
-                'idDokumen' => $b['id_dokumen']
-            ];
+            if ($b['kode_dokumen'] == 380) {
+                $dokumenArr[] = [
+                    'kodeDokumen'    => $b['kode_dokumen'],
+                    'nomorDokumen'   => $b['nomor_dokumen'],
+                    'seriDokumen'    => 1,
+                    'tanggalDokumen' => $b['tanggal_dokumen'],
+                    'idDokumen'      => $b['id_dokumen']
+                ];
+                $seriDokumen++;
+            } elseif ($b['kode_dokumen'] == 705 || $b['kode_dokumen'] == 740) {
+                $dokumenArr[] = [
+                    'kodeDokumen'    => $b['kode_dokumen'],
+                    'nomorDokumen'   => $b['nomor_dokumen'],
+                    'seriDokumen'    => 2,
+                    'tanggalDokumen' => $b['tanggal_dokumen'],
+                    'idDokumen'      => $b['id_dokumen']
+                ];
+                $seriDokumen++;
+            } else {
+                $dokumenArr[] = [
+                    'kodeDokumen'    => $b['kode_dokumen'],
+                    'nomorDokumen'   => $b['nomor_dokumen'],
+                    'seriDokumen'    => $seriDokumen++,
+                    'tanggalDokumen' => $b['tanggal_dokumen'],
+                    'idDokumen'      => $b['id_dokumen']
+                ];
+            }
         }
+
+        // Urutkan berdasarkan seriDokumen
+        usort($dokumenArr, function ($a, $b) {
+            return $a['seriDokumen'] <=> $b['seriDokumen'];
+        });
 
         foreach ($bcPengangkut as $b) {
             $pengangkutArr[] = [
@@ -744,7 +768,7 @@ class BeaCukaiApi
             'kodeTujuanPengiriman' => $bcData['kode_tujuan_pengiriman'],
             'kotaTtd' => $bcData['kota_ttd'],
             'namaTtd' => $bcData['nama_ttd'],
-            'netto' => (int)$bcData['netto'],
+            'netto' => (float)$bcData['netto'],
             'nik' => $bcData['nik'] == null ? "-" : $bcData['nik'],
             'nomorAju' => str_replace('-', '', $bcData['no_aju']),
             'seri' => (int)$bcData['seri'],

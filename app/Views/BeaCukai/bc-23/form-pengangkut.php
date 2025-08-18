@@ -18,7 +18,7 @@
                 <?php include_once('nav.php') ?>
                 <form id="form-pengangkut">
                     <?= csrf_field() ?>
-                    <div class="alert alert-info alert-dismissible fade show mt-3 text-white" role="alert">
+                    <div class="alert alert-danger alert-dismissible fade show mt-3 text-white" role="alert">
                         <strong id="text-respon-ceisa"></strong>
                         <button type="button" class="close" data-dismiss="alert" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
@@ -127,18 +127,41 @@
                                 </div>
                             </div>
                             <div class="mt-1">
-                                <div class="form-floating mb-3">
-                                    <input id="pengangkutan_pelabuhan_bongkar" value="<?= $bc23 != null ? $bc23['kode_pelabuhan_bongkar'] : '' ?>" readonly name="pengangkutan_pelabuhan_bongkar" type="text" class="form-control pengangkutan_pelabuhan_bongkar" placeholder="">
-                                    <label>Kode Pelabuhan Bongkar</label>
+                                <div class="row">
+                                    <div class="col-sm-6">
+                                        <div class="form-floating mb-3">
+                                            <input id="pengangkutan_pelabuhan_bongkar" value="<?= $bc23 != null ? $bc23['kode_pelabuhan_bongkar'] : '' ?>" readonly name="pengangkutan_pelabuhan_bongkar" type="text" class="form-control pengangkutan_pelabuhan_bongkar" placeholder="">
+                                            <label>Kode Pelabuhan Bongkar</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <div class="form-floating mb-3">
+                                            <input id="pengangkutan_pelabuhan_bongkar" value="<?= $kodeKantorBongkar != null ? $kodeKantorBongkar['kode'] . " - " . $kodeKantorBongkar['kantor_name'] : '' ?>" readonly name="pengangkutan_pelabuhan_bongkar" type="text" class="form-control pengangkutan_pelabuhan_bongkar" placeholder="">
+                                            <label>Kantor Pabean Bongkar</label>
+                                        </div>
+                                    </div>
                                 </div>
+
                             </div>
                             <div class="mt-1">
-                                <div class="form-floating mb-2">
+                                <!-- <div class="form-floating mb-2">
                                     <input id="pengangkutan_tempat_penimbunan" value="<?= $bc23 != null ? $bc23['kode_tps'] : '' ?>" name="pengangkutan_tempat_penimbunan" type="text" class="form-control pengangkutan_tempat_penimbunan" placeholder="">
                                     <label>Kode Tempat Penimbunan</label>
+                                </div> -->
+
+                                <div class="form-floating mb-2" style="height: 50px;">
+                                    <select class="form-select pengangkutan_tempat_penimbunan" id="pengangkutan_tempat_penimbunan" name="pengangkutan_tempat_penimbunan" aria-label="Floating label select example">
+                                        <option value=""></option>
+                                        <?php if ($bc23['kode_tps'] != null): ?>
+                                            <option selected value="<?= $bc23['kode_tps'] ?>">
+                                                <?= $bc23['kode_tps'] ?>
+                                            </option>
+                                        <?php endif; ?>
+                                    </select>
+                                    <label style="z-index: 1;">Kode Tempat Penimbunan</label>
                                 </div>
                             </div>
-                            <div class="mt-0">
+                            <div class="mt-3">
                                 <a href="#" <?= $bc23DokumenBL == null ? 'disabled' : '' ?> class="btn btn-warning btn-block mt-2" id="btn-ambil-manifest" style="float: right;">
                                     <?= $bc23DokumenBL == null ? "Dokumen B/L atau AWB belum diisi" : "Ambil Data Manifest Dokumen B/L" ?>
                                 </a>
@@ -175,6 +198,11 @@
 
     $('#pengangkutan_kode_bendera').select2({
         placeholder: "Pilih Bendera",
+        theme: "bootstrap-5",
+    });
+
+    $('#pengangkutan_tempat_penimbunan').select2({
+        placeholder: "Pilih Kode Tempat Penimbunan",
         theme: "bootstrap-5",
     });
 
@@ -323,15 +351,21 @@
                 if (res.status) {
                     if (res.data.status) {
                         var manifestData = res.data.data;
+                        var gudangTpsData = res.gudangTps;
+                        let noPos = manifestData.noPos || "";
+                        noPos = noPos.padEnd(12, '0');
                         // alert
-                        $('.alert-dismissible').show();
-                        $('#text-respon-ceisa').text(manifestData.respon);
+                        if (manifestData.respon != null) {
+                            $('.alert-dismissible').show();
+                            $('#text-respon-ceisa').text(manifestData.respon);
+                        }
+
                         // append
                         $('#bc_11_no_bc_11').val(manifestData.noBc11);
                         $('#bc_11_tanggal_bc_11').val(manifestData.tglBc11);
-                        $('#bc_11_pos_bc_11').val(manifestData.noPos);
-                        $('#bc_11_sub_pos_bc_11').val(manifestData.noPos);
-                        $('#bc_11_sub_sub_pos_bc_11').val(manifestData.noPos);
+                        $('#bc_11_pos_bc_11').val(noPos.substring(0, 4));
+                        $('#bc_11_sub_pos_bc_11').val(noPos.substring(4, 8));
+                        $('#bc_11_sub_sub_pos_bc_11').val(noPos.substring(8, 12));
                         $('#pengangkutan_cara_pengangkutan').val(manifestData.caraPengangkutan).change();
                         $('#pengangkutan_nama_sarana_pengangkut').val(manifestData.namaSaranaPengangkut);
                         $('#pengangkutan_nomor_pengangkut').val(manifestData.noVoyage);
@@ -339,6 +373,14 @@
                         $('#pengangkutan_pelabuhan_muat').val(manifestData.pelAsal);
                         $('#pengangkutan_pelabuhan_transit').val(manifestData.pelTransit);
                         $('#pengangkutan_tempat_penimbunan').val(manifestData.kodeGudang);
+
+                        // APPEND pengangkutan_tempat_penimbunan
+                        $(".pengangkutan_tempat_penimbunan").empty()
+                        $(".pengangkutan_tempat_penimbunan").append(`<option value=""></option>`)
+                        gudangTpsData.data.forEach(function(item) {
+                            $(".pengangkutan_tempat_penimbunan").append(`<option value="${item.kodeGudang}">(${item.kodeGudang}) ${item.namaGudang}</option>`)
+                        })
+                        $(".pengangkutan_tempat_penimbunan").val(null).change();
 
                     } else {
                         Swal.fire({

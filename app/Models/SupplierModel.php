@@ -236,6 +236,28 @@ class SupplierModel extends Model
         return $results;
     }
 
+  public function getSupplierJasVend()
+    {
+        $arrCondition = [
+            'deletedAt'  => null,
+            'company_id' => session()->get('login')->this_company_id,
+        ];
+
+        $builder = $this->db->table('suppliers');
+        $builder->where($arrCondition);
+        $builder->where('type !=', 'BAHAN PENOLONG'); // cara aman di CI4
+        $builder->orderBy('suppliers.name', "ASC");
+
+        $results = $builder->get()->getResultArray();
+
+        foreach ($results as &$result) {
+            $result['name'] = strtoupper($result['name']);
+        }
+
+        return $results;
+}
+
+
 
     public function getSupplierAll()
     {

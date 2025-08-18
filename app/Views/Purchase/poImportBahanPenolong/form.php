@@ -600,7 +600,7 @@
         var harga_satuan;
         var total = destroyFormatRupiah($('#total').val()) || 0;
         harga_satuan = total / qty;
-        $('#harga_satuan').val(greatFormatRupiah(harga_satuan.toFixed(2)));
+        $('#harga_satuan').val(greatFormatRupiah(harga_satuan));
     });
 
     // VALIDATOR DETAIL
@@ -1027,7 +1027,7 @@
                         diskon: $('#diskon').val() || 0,
                         harga_satuan: destroyFormatRupiah($('#harga_satuan').val()) || 0,
                         biaya_tambahan: destroyFormatRupiah($('#biaya_tambahan').val()) || 0,
-                        total: $('#total').val() || 0,
+                        total: destroyFormatRupiah($('#total').val()) || 0,
                         note: $('#keterangan').val(),
                     };
 
@@ -1080,7 +1080,7 @@
             diskon: $('#diskon').val() || 0,
             harga_satuan: destroyFormatRupiah($('#harga_satuan').val()) || 0,
             biaya_tambahan: destroyFormatRupiah($('#biaya_tambahan').val()) || 0,
-            total: $('#total').val() || 0,
+            total: destroyFormatRupiah($('#total').val()) || 0,
             note: $('#keterangan').val(),
         });
         $(".detail-form input, .detail-form select").val("");
@@ -1111,11 +1111,11 @@
             newRow.append($('<td>').text(v.kode_barang));
             newRow.append($('<td>').text(v.nama_barang));
             newRow.append($('<td>').text(v.note));
-            newRow.append($('<td>').text(greatFormatRupiah(v.harga_satuan)));
+            newRow.append($('<td>').text(greatFormatRupiah(v.harga_satuan.toFixed(4))));
             newRow.append($('<td>').text(greatFormatRupiah(v.qty)));
             newRow.append($('<td>').text(v.nama_satuan));
             newRow.append($('<td>').text(greatFormatRupiah(v.biaya_tambahan)));
-            newRow.append($('<td>').text(v.total));
+            newRow.append($('<td>').text(greatFormatRupiah(v.total)));
             <?php if (!empty($dataPOImport)) : ?>
                 <?php if ($dataPOImport->is_posted) : ?>
                     console.log("posted : " + v);
@@ -1158,7 +1158,7 @@
         table.find('tfoot').empty();
         var newRow = $('<tr>');
         newRow.append($('<td style="text-align:right;" colspan="4"><b>TOTAL</b></td>'));
-        newRow.append($('<td style="text-align:left;"><b>' + greatFormatRupiah(totalHargaSatuan.toFixed(2)) + '</b></td>'));
+        newRow.append($('<td style="text-align:left;"><b>' + greatFormatRupiah(totalHargaSatuan.toFixed(4)) + '</b></td>'));
         newRow.append($('<td style="text-align:left;"><b>' + greatFormatRupiah(totalQty.toFixed(2)) + '</b></td>'));
         newRow.append($('<td style="text-align:left;"></td>'));
         newRow.append($('<td style="text-align:left;"><b>' + greatFormatRupiah(totalTambahan.toFixed(2)) + '</b></td>'));

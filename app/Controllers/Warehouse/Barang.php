@@ -210,6 +210,7 @@ class Barang extends BaseController
             'parent_type_id' => decrypt($this->request->getVar('parent_type_id')),
             // 'divisi_id' => decrypt($this->request->getVar('divisi_id')),
             'barang_name' => $this->request->getVar('barang_name'),
+            'kode_barang' => $this->request->getVar('kode_barang'),
             'type_barang' => $type,
             'minimum_stock' => str_replace('.', '', $this->request->getVar('minimum_stock')),
         ]);

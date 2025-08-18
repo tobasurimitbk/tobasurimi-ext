@@ -413,7 +413,7 @@
                     <?php if (!can('Master Barang', 'Bahan Baku', 'u')) : ?>
                         $('.btn-submit-master-barang').hide();
                     <?php endif; ?>
-                    $('input[name="kode_barang"]').attr('readonly', true);
+                    // $('input[name="kode_barang"]').attr('readonly', true);
                     $('#generate_new_code').hide();
                     $('input[name="kode_barang"]').val(res.data.kode_barang);
                     $('select[name="parent_type_id"]').val(res.data.parent_type_id).change();
