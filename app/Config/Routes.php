@@ -747,6 +747,16 @@ $routes->post('/customer-lokal/update', 'Master\Customer::updateCustomer', ['fil
 $routes->post('/customer-lokal/delete', 'Master\Customer::deleteCustomer', ['filter' => 'Auth']);
 $routes->get('/customer-lokal/export-excel', 'SalesLokal\Customer::exportExcel', ['filter' => 'Auth']);
 
+// Supplier Lokal
+$routes->get('/supplier-lokal', 'SalesLokal\SupplierLokal::index', ['filter' => 'Auth']);
+$routes->get('/supplier-lokal/all', 'SalesLokal\SupplierLokal::all', ['filter' => 'Auth']);
+$routes->get('/supplier-lokal/id/(:segment)', 'SalesLokal\SupplierLokal::getByIdCustomer/$1', ['filter' => 'Auth']);
+$routes->get('/supplier-lokal/generate-no', 'SalesLokal\SupplierLokal::generateNo', ['filter' => 'Auth']);
+$routes->post('/supplier-lokal/save', 'SalesLokal\SupplierLokal::saveCustomer', ['filter' => 'Auth']);
+$routes->post('/supplier-lokal/update', 'SalesLokal\SupplierLokal::updateCustomer', ['filter' => 'Auth']);
+$routes->post('/supplier-lokal/delete', 'SalesLokal\SupplierLokal::deleteCustomer', ['filter' => 'Auth']);
+$routes->get('/supplier-lokal/export-excel', 'SalesLokal\SupplierLokal::exportExcel', ['filter' => 'Auth']);
+
 // Customer Ekspor
 $routes->get('/customer-ekspor', 'SalesInternasional\Customer::index', ['filter' => 'Auth']);
 $routes->get('/customer-ekspor/all', 'SalesInternasional\Customer::all', ['filter' => 'Auth']);

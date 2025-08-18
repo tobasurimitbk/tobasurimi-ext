@@ -2105,7 +2105,7 @@
                         reCountTotal();
 
                         total_harga_barang = total_harga_barang + harga;
-                        total_qty = total_qty + Number(qty);
+                        total_qty = total_qty + qty;
                         total_harga = total_harga + amount;
 
                         let tag_html = "";

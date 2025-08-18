@@ -31,7 +31,8 @@
             border-radius: 7px;
             margin-bottom: 10px;
             display: inline-block;
-            min-width: 70px
+            min-width: 70px;
+            font-size: 15px;
         }
 
         .description-container {
@@ -148,7 +149,7 @@
                 </div>
             </td>
             <td style="width: 35%;text-align: right;">
-                <div class="txt-bold txt-center" style="font-size: 25px; margin-bottom:3px;">ORDER FORM</div>
+                <div class="txt-bold txt-center" style="font-size: 35px; margin-bottom:3px;">ORDER FORM</div>
                 <table class="w-100" style="border: 0.5px solid;border-radius: 7px;margin-right: 0">
                     <tr>
                         <td style="border-right: 0.5px solid;border-right-style: dashed">

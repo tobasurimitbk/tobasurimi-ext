@@ -146,15 +146,15 @@ class MaterialRequest extends BaseController
 
         $dataWarehouse = $this->warehousesModel->asObject()->where('company_id', $this->this_company_id)->find();
         $dataDivisi = $this->divisiModel->getDivisiAccess();
-        // $dataWorkOrder = $this->workOrdersModel->asObject()
-        //     ->select('work_orders.*, GROUP_CONCAT(work_order_details.nama_barang SEPARATOR \', \') AS nama_barang')
-        //     ->join('work_order_details', 'work_order_details.work_order_id = work_orders.id', 'left')
-        //     ->where('company_id', $this->this_company_id)
-        //     ->where('work_orders.is_posted', "0")
-        //     ->where('work_orders.deletedAt', null)
-        //     ->where('work_order_details.deletedAt', null)
-        //     ->groupBy('work_order_details.work_order_id')
-        //     ->find();
+        $dataWorkOrder = $this->workOrdersModel->asObject()
+            ->select('work_orders.*, GROUP_CONCAT(work_order_details.nama_barang SEPARATOR \', \') AS nama_barang')
+            ->join('work_order_details', 'work_order_details.work_order_id = work_orders.id', 'left')
+            ->where('company_id', $this->this_company_id)
+            // ->where('work_orders.is_posted', "0")
+            ->where('work_orders.deletedAt', null)
+            ->where('work_order_details.deletedAt', null)
+            ->groupBy('work_order_details.work_order_id')
+            ->find();
 
         $dataVendor = $this->vendorModel->where('deletedAt', null)->where('company_id', $this->this_company_id)->orderBy('name', "ASC")->findAll();
         $dataSupplierBahanBaku = $this->supplierModel->getSupplierByType("BAHAN BAKU");
@@ -173,7 +173,8 @@ class MaterialRequest extends BaseController
             "dataDivisi" => $dataDivisi,
             "dataWarehouse" => $dataWarehouse,
             "dataVendor" => $dataVendor,
-            "dataSupplierBahanBaku" => $dataSupplierBahanBaku
+            "dataSupplierBahanBaku" => $dataSupplierBahanBaku,
+            "dataWorkOrder" => $dataWorkOrder,
         ];
 
         if (!empty($id)) {
@@ -370,7 +371,7 @@ class MaterialRequest extends BaseController
             // }
 
             $dataMaterial = [
-                // "work_order_id" => $this->request->getPost("kode_produksi"),
+                "work_order_id" => $this->request->getPost("kode_produksi"),
                 'company_id' => $this->this_company_id,
                 'divisi_id' => $this->request->getVar("department_id"),
                 'warehouse_id' => $this->request->getVar("warehouse_id"),

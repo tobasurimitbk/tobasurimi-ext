@@ -47,6 +47,40 @@
             <form class="create-form" role="form" method="POST" enctype="multipart/form-data">
                 <input autocomplete="one-time-code" type="hidden" value="<?= !empty($ids) ? $ids : ""; ?>" class="id" name="id" id="id" />
                 <?= csrf_field() ?>
+                <div class="row mt-3">
+                    <div class="col mb-3">
+                        <label class="form-label font-weight-bold lable-title">Data Produksi</label>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <?php if (isset($dataMaterialRequestswithwo)) { ?>
+                                <input value="<?= ($dataMaterialRequestswithwo) ? $dataMaterialRequestswithwo->wo_no : "" ?>" autocomplete="one-time-code" type="text" class="form-control kode_produksi_detail" name="kode_produksi_detail" id="kode_produksi_detail" placeholder="Kode Produksi" readonly>
+                            <?php } else { ?>
+                                <select class="form-select kode_produksi" name="kode_produksi" id="kode_produksi" aria-label="Floating label select example">
+                                    <option value=""></option>
+                                    <?php foreach ($dataWorkOrder ?? [] as $dataWO) : ?>
+                                        <option value="<?= $dataWO->id ?>" data-nama-barang="<?= $dataWO->nama_barang ?>" data-standart-production="<?= $dataWO->standart_production ?>"><?= $dataWO->wo_no ?> - <?= $dataWO->nama_barang ?></option>
+                                    <?php endforeach; ?>
+                                </select>
+                            <?php } ?>
+                            <label for="floatingInput">Kode Produksi</label>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <input value="<?= !empty($dataMaterialRequestswithwo) ? $dataMaterialRequestswithwo->nama_barang : "" ?>" autocomplete="one-time-code" type="text" class="form-control barang_jadi" name="barang_jadi" id="barang_jadi" placeholder="Barang Jadi" readonly>
+                            <label for="floatingInput">Barang Jadi</label>
+                        </div>
+                    </div>
+                    <!-- <div class="col-md-4">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <input autocomplete="one-time-code" type="text" class="form-control standart_production" name="standart_production" id="standart_production" placeholder="Jumlah Standart Produksi" readonly>
+                            <label for="floatingInput">Jumlah Standart Produksi</label>
+                        </div>
+                    </div> -->
+                </div>
 
                 <div class="row mt-3">
                     <div class="col mb-3">
@@ -747,6 +781,34 @@
         getListDokumenPabean();
     });
 
+        // Kode Produksi
+        $('.kode_produksi').select2({
+            placeholder: "Pilih kode Produksi",
+            theme: "bootstrap-5",
+            allowClear: true
+        });
+
+        //CSS SELECT2 FLOATING LABEL
+        $('.kode_produksi')
+            .parent('div')
+            .children('span')
+            .children('span')
+            .children('span')
+            .css('height', ' calc(3.5rem + 2px)');
+
+        $('.kode_produksi')
+            .parent('div')
+            .children('span')
+            .children('span')
+            .children('span')
+            .children('span')
+            .css('margin-top', '22px').css('margin-left', '-7px');
+
+        $('.kode_produksi')
+            .parent('div')
+            .find('label')
+            .css('z-index', '1');
+
     $('.kode_barang').select2({
         placeholder: "Pilih Kode Barang",
         theme: "bootstrap-5",
@@ -1143,18 +1205,18 @@
         }
     });
 
-    // $(".kode_produksi").change(function() {
-    //     if ($(".kode_produksi option:selected").val()) {
-    //         let nama_barang = $(".kode_produksi option:selected").data("nama-barang") ? $(".kode_produksi option:selected").data("nama-barang") : "";
-    //         let standart_production = $(".kode_produksi option:selected").data("standart-production") ? $(".kode_produksi option:selected").data("standart-production") : "";
+    $(".kode_produksi").change(function() {
+        if ($(".kode_produksi option:selected").val()) {
+            let nama_barang = $(".kode_produksi option:selected").data("nama-barang") ? $(".kode_produksi option:selected").data("nama-barang") : "";
+            let standart_production = $(".kode_produksi option:selected").data("standart-production") ? $(".kode_produksi option:selected").data("standart-production") : "";
 
-    //         $(".barang_jadi").val(nama_barang);
-    //         $(".standart_production").val(standart_production);
-    //     } else {
-    //         $(".barang_jadi").val("");
-    //         $(".standart_production").val("");
-    //     }
-    // })
+            $(".barang_jadi").val(nama_barang);
+            $(".standart_production").val(standart_production);
+        } else {
+            $(".barang_jadi").val("");
+            $(".standart_production").val("");
+        }
+    })
 
     $('.btn-hide-detail').click(function() {
         $('.detail-modal').modal('hide');

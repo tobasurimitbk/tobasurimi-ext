@@ -24,6 +24,7 @@ use App\Models\MetadataModel;
 use App\Models\ProvincesModel;
 use App\Models\SalesOrderInvoiceModel;
 use App\Models\SatuansModel;
+use App\Models\SupplierLokalModel;
 use App\Models\SuratJalanModel;
 use Error;
 use ErrorException;
@@ -56,6 +57,7 @@ class Faktur extends BaseController
     protected $satuanModel;
     protected $suratJalanModel;
     protected $salesOrderInvoiceModel;
+    protected $supplierLokalModel;
 
     private $userId;
 
@@ -83,6 +85,7 @@ class Faktur extends BaseController
         $this->db = \Config\Database::connect();
         $this->suratJalanModel = new SuratJalanModel();
         $this->salesOrderInvoiceModel = new SalesOrderInvoiceModel();
+        $this->supplierLokalModel = new SupplierLokalModel();
 
         $this->userId = session()->get("login")->user_id;
         $this->is_admin = session()->get("login")->is_admin;
@@ -103,7 +106,7 @@ class Faktur extends BaseController
         $dataBanks = $this->BanksModel->search_list(array(), 'name');
         $dataSatuan = $this->satuanModel->findAll();
         //Get Customers
-        $customers = $this->CustomerModel->getCustomerLokal($this->userId, $this->is_admin);
+        $customers = $this->supplierLokalModel->getCustomerLokal($this->userId, $this->is_admin);
         $condition = [
             'jabatan_name' => "MARKETING LOKAL"
         ];
@@ -191,7 +194,7 @@ class Faktur extends BaseController
         $dataSalesOrder = [];
         foreach ($dataOrderForm['data'] as $data) {
             $customerName = "";
-            $dataCustomer = $this->CustomerModel->get_by_id($data->id_customer);
+            $dataCustomer = $this->supplierLokalModel->get_by_id($data->id_customer);
 
             foreach ($dataCustomer as $datasC) {
                 $customerName = $datasC["name"];
@@ -251,12 +254,12 @@ class Faktur extends BaseController
                     'required' => 'Tanggal pemesananan tidak boleh kosong',
                 ]
             ],
-            "shipping_date" => [
-                "rules" => "required|valid_date[d/m/Y]",
-                'errors' => [
-                    'required' => 'tanggal pengiriman tidak boleh kosong',
-                ]
-            ],
+            // "shipping_date" => [
+            //     "rules" => "required|valid_date[d/m/Y]",
+            //     'errors' => [
+            //         'required' => 'tanggal pengiriman tidak boleh kosong',
+            //     ]
+            // ],
             // "estimated_freight" => [
             //     "rules" => "permit_empty",
             //     'errors' => [
@@ -269,12 +272,12 @@ class Faktur extends BaseController
                     'required' => 'total harga tidak boleh kosong',
                 ]
             ],
-            "tipe_sales_order" => [
-                "rules" => "required",
-                'errors' => [
-                    'required' => 'tipe sales order tidak boleh kosong',
-                ],
-            ],
+            // "tipe_sales_order" => [
+            //     "rules" => "required",
+            //     'errors' => [
+            //         'required' => 'tipe sales order tidak boleh kosong',
+            //     ],
+            // ],
             "items" => [
                 "rules" => "required",
                 'errors' => [
@@ -344,13 +347,13 @@ class Faktur extends BaseController
         }
 
         // check customer
-        $customerData = $this->CustomerModel->asObject()
+        $customerData = $this->supplierLokalModel->asObject()
             ->find($postData['id_customer']);
 
         if (empty($customerData)) {
             $data = [
                 "status"    => false,
-                "message"   => 'Customer tidak ditemukan!',
+                "message"   => 'Supplier Lokal tidak ditemukan!',
                 'token'     => csrf_hash(),
             ];
             echo json_encode($data);
@@ -358,24 +361,25 @@ class Faktur extends BaseController
         }
         try {
             $this->SalesFakturModel->db->transException(true)->transStart();
-            $orderDate = date('Y-m-d', strtotime(str_replace('/', '-', $postData['order_date'])));
-            $shippingDate = date('Y-m-d', strtotime(str_replace('/', '-', $postData['shipping_date'])));
+            $orderDate = date('Y-m-d', strtotime(str_replace('/', '-', $postData['order_date'] ?? null)));
+            $shippingDate = date('Y-m-d', strtotime(str_replace('/', '-', $postData['shipping_date'] ?? null)));
 
             $values = [
                 "no_sales_order"        => strtoupper($postData['no_sales_order']),
                 "id_user"               => $this->userId,
-                "id_customer"           => $postData['id_customer'],
-                "shipping_date"           => $shippingDate,
-                "destination"           => $postData['destination'],
-                "jenis_penjualan"           => $postData['jenis_penjualan'],
+                "id_customer"           => $postData['id_customer'] ?? null,
+                "shipping_date"         => $shippingDate ?? null,
+                "destination"           => $postData['destination'] ?? null,
+                "jenis_penjualan"       => $postData['jenis_penjualan'] ?? null,
                 "sales_id"              => isset($postData['id_sales']) ? $postData['id_sales'] : NULL,
-                "nama_ecommerce"           => $postData['nama_ecommerce'] ? $postData['nama_ecommerce'] : "",
-                "order_date"            => $orderDate,
-                "total_harga"           => $postData['total'],
-                "keterangan" => $postData['parent_keterangan'],
+                "nama_ecommerce"        => isset($postData['nama_ecommerce']) ? $postData['nama_ecommerce'] : NULL,
+                "order_date"            => $orderDate ?? null,
+                "total_harga"           => $postData['total'] ?? null,
+                "keterangan"            => $postData['parent_keterangan'] ?? null,
+                "payment_terms"         => isset($postData['termin']) ? $postData['termin'] : NULL,
                 "id_company"            => $this->this_company_id != 16 ? $this->request->getVar('company_id') : $this->this_company_id,
                 "tipe_sales_order"      => 'LOKAL',
-                "ppn"      => $status_ppn
+                "ppn"                   => $status_ppn
             ];
 
             $checkSO = $this->SalesFakturModel->where('UPPER(no_sales_order)', strtoupper($this->request->getVar('no_sales_order')))->findAll();
@@ -468,10 +472,10 @@ class Faktur extends BaseController
             $detail['taxAmt'] = $detail['barangTotal'] * $detail['tax'] / 100;
         }
 
-        $customers = $this->CustomerModel
-            ->select('customers.*, customers.sales_id AS salesName, metadata.value AS termin')
-            ->join('employees', 'employees.id = customers.sales_id', 'left')
-            ->join('metadata', 'metadata.id = customers.termin', 'left')
+        $customers = $this->supplierLokalModel
+            ->select('supplier_lokals.*, supplier_lokals.sales_id AS salesName, metadata.value AS termin')
+            ->join('employees', 'employees.id = supplier_lokals.sales_id', 'left')
+            ->join('metadata', 'metadata.id = supplier_lokals.termin', 'left')
             ->findAll();
 
         $condition = [
@@ -618,7 +622,7 @@ class Faktur extends BaseController
         try {
             $this->SalesFakturModel->db->transException(true)->transStart();
             $orderDate = date('Y-m-d', strtotime(str_replace('/', '-', $postData['order_date'])));
-            $shippingDate = date('Y-m-d', strtotime(str_replace('/', '-', $postData['shipping_date'])));
+            $shippingDate = date('Y-m-d', strtotime(str_replace('/', '-', $postData['shipping_date'] ?? null)));
             $estimatedFreight = str_replace(',', '', $postData['estimated_freight']);
 
             $totalQty = 0;
@@ -633,7 +637,7 @@ class Faktur extends BaseController
                         "id_sales_order"        => $id,
                         "id_barang"             => $row->id_barang,
                         "qty"                   => $row->qty,
-                        "qty_sekarang"                   => $row->qty,
+                        "qty_sekarang"          => $row->qty,
                         "harga_barang"          => str_replace(',', '', $row->harga_barang),
                         "amount"                => number_format($amountValue, 2, '.', ''),
                         "keterangan"            => $row->keterangan,
@@ -651,7 +655,7 @@ class Faktur extends BaseController
                         "id_sales_order"        => $id,
                         "id_barang"             => $row->id_barang,
                         "qty"                   => $row->qty,
-                        "qty_sekarang"                   => $row->qty,
+                        "qty_sekarang"          => $row->qty,
                         "harga_barang"          => str_replace(',', '', $row->harga_barang),
                         "amount"                => number_format($amountValue, 2, '.', ''),
                         "keterangan"            => $row->keterangan,
@@ -672,19 +676,20 @@ class Faktur extends BaseController
                 [
                     "no_sales_order"        => strtoupper($postData['no_sales_order']),
                     "id_customer"           => $postData['id_customer'],
-                    'shipping_date' => $shippingDate,
-                    'destination' =>  $postData['destination'],
-                    "jenis_penjualan"           => $postData['jenis_penjualan'],
+                    'shipping_date'         => $shippingDate ?? null,
+                    'destination'           => $postData['destination'] ?? null,
+                    "jenis_penjualan"       => $postData['jenis_penjualan'] ?? null,
                     "sales_id"              => isset($postData['id_sales']) ? $postData['id_sales'] : NULL,
-                    "nama_ecommerce"           => $postData['nama_ecommerce'] ? $postData['nama_ecommerce'] : "",
-                    "order_date"            => $orderDate,
-                    'total_harga' => $total_harga,
-                    "keterangan" => $postData['parent_keterangan'],
+                    "nama_ecommerce"        => isset($postData['nama_ecommerce']) ? $postData['nama_ecommerce'] : null,
+                    "order_date"            => $orderDate ?? null,
+                    'total_harga'           => $total_harga ?? null,
+                    "keterangan"            => $postData['parent_keterangan'] ?? null,
+                    "payment_terms"         => isset($postData['termin']) ? $postData['termin'] : NULL,
                     "id_company"            => $this->this_company_id != 16 ? $this->request->getVar('company_id') : $this->this_company_id,
-                    'qty_barang' => $totalQty,
-                    'ppn' => $status_ppn,
-                    'no_po' => $this->request->getVar('no_po'),
-                    'estimated_freight' => $this->request->getVar('estimated_freight')
+                    'qty_barang'            => $totalQty ?? null,
+                    'ppn'                   => $status_ppn ?? null,
+                    'no_po'                 => $this->request->getVar('no_po') ?? null,
+                    'estimated_freight'     => $this->request->getVar('estimated_freight') ?? null
                 ]
             );
 
