@@ -742,6 +742,7 @@
                 list_items.push({
                     no: no,
                     id: <?= $payload['id'] ?>,
+                    id_detail: <?= $payload['id'] ?>,
                     id_barang: <?= $payload['id_barang'] ?>,
                     nama_barang: "<?= $payload['nama_barang'] ?>",
                     harga: "<?= $payload['harga_barang'] ?>",
@@ -769,6 +770,7 @@
                 table.row.add({
                     no: no,
                     id: <?= $payload['id'] ?>,
+                    id_detail: <?= $payload['id'] ?>,
                     id_barang: <?= $payload['id_barang'] ?>,
                     nama_barang: "<?= $payload['nama_barang'] ?>",
                     harga: "<?= $payload['harga_barang'] ?>",
@@ -801,8 +803,8 @@
             let dataId = $(this).data('id');
             const csrf = $(`[name="${csrfToken}"]`);
 
-            // console.log(dataId);
-            
+            console.log(dataId);
+
 
             if (dataId.length === 7 && /[a-zA-Z]/.test(dataId)) {
                 // Hapus item dari array JavaScript dan gambar ulang tabel
@@ -2175,7 +2177,7 @@
             });
 
             console.log(discTotal);
-            
+
 
             if (taxStatus || includeTax) {
                 $('#includeTaxText').html('(Termasuk Pajak)');

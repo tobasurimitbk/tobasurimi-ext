@@ -625,7 +625,7 @@ class OrderForm extends BaseController
 
                 $amountValue = $row->amount ? (float) str_replace(",", "", $row->amount) : 0;
                 $total_harga +=  $amountValue - ($amountValue * ($row->disc / 100));
-                if ($row->id == 0 || $row->id == null || $row->id == "") {
+                if (!isset($row->id_detail)) {
                     $valueBarang = [
                         "id_sales_order"        => $id,
                         "id_barang"             => $row->id_barang,
@@ -791,7 +791,7 @@ class OrderForm extends BaseController
 
         $this->SalesOrderDetailModel->delete($id);
 
-        $getAllBarangSalesOrderDetail = $this->SalesOrderDetailModel->select('qty, harga_barang, discount_percentage, amount')->where('id_sales_order', $getBarangSalesOrderDetail['id_sales_order'])->where('id_barang !=', 85)->findAll();
+        $getAllBarangSalesOrderDetail = $this->SalesOrderDetailModel->select('qty, harga_barang, discount_percentage, amount, discount_unit')->where('id_sales_order', $getBarangSalesOrderDetail['id_sales_order'])->where('id_barang !=', 85)->findAll();
 
         $totalQty = 0;
         $total_harga = 0;
