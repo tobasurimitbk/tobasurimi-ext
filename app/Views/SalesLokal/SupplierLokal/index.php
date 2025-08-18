@@ -228,9 +228,9 @@
                                 <th onclick="changeSort('name')" class="sort">Nama Supplier Lokal</th>
                                 <th onclick="changeSort('phone')" class="sort">Kontak</th>
                                 <th onclick="changeSort('address')" class="sort">Alamat</th>
-                                <th onclick="changeSort('nameSales')" class="sort">Nama Sales</th>
+                                <!-- <th onclick="changeSort('nameSales')" class="sort">Nama Sales</th> -->
                                 <th onclick="changeSort('termin')" class="sort">Termin</th>
-                                <th onclick="changeSort('piutang')" class="sort">Limit</th>
+                                <!-- <th onclick="changeSort('piutang')" class="sort">Limit</th> -->
                                 <th class="sticky-col">Action</th>
                             </tr>
                         </thead>
@@ -283,39 +283,43 @@
         display: "stripe",
         searching: false,
         columns: [{
-            data: "no",
-            className: "text-center",
-            sortable: false,
-            width: "5%"
-        }, {
-            data: "kode",
-            className: "text-left"
-        }, {
-            data: "name",
-            className: "text-left"
-        }, {
-            data: "phone",
-            className: "text-left"
-        }, {
-            data: "address",
-            className: "text-left"
-        }, {
-            data: "namaSales",
-            className: "text-left"
-        }, {
-            data: "termin",
-            className: "text-center"
-        }, {
-            data: "piutang",
-            className: "text-center"
-        }, {
-            data: "id",
-            className: "text-center actions sticky-col",
-            searchable: false,
-            sortable: false,
-            render: function(data, type, row) {
-                var id = row.id;
-                return `
+                data: "no",
+                className: "text-center",
+                sortable: false,
+                width: "5%"
+            }, {
+                data: "kode",
+                className: "text-left"
+            }, {
+                data: "name",
+                className: "text-left"
+            }, {
+                data: "phone",
+                className: "text-left"
+            }, {
+                data: "address",
+                className: "text-left"
+            },
+            // {
+            //     data: "namaSales",
+            //     className: "text-left"
+            // }, 
+            {
+                data: "termin",
+                className: "text-center"
+            },
+            // {
+            //     data: "piutang",
+            //     className: "text-center"
+            // }, 
+            {
+                data: "id",
+                className: "text-center actions sticky-col",
+                searchable: false,
+                sortable: false,
+                render: function(data, type, row) {
+                    var id = row.id;
+                    return `
                     <div class="mt-0">
                         <?php if (can('Penjualan Lokal', 'Supplier Lokal', 'u')) : ?>
                             <a href="javascript:void(0)" onclick="edit('${id}')" data-toggle="tooltip" title="Edit" class="btn btn-primary">
@@ -329,8 +333,9 @@
                         <?php endif; ?>
                     </div>
                 `
-            }
-        }, ],
+                }
+            },
+        ],
         columnDefs: [{
             defaultContent: "-",
             targets: "_all"
