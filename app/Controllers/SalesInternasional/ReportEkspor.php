@@ -205,7 +205,7 @@ class ReportEkspor extends BaseController
                 "Order Form No"         => $data->sales_order_export_no,
                 "Customer"              => $data->customer_name,
                 "Container"             => $data->container,
-                "Actualy Date" =>  !empty($data->actualy_shipment_date) ? date('d/m/Y', strtotime($data->actualy_shipment_date)) : "",
+                "Actual Date" =>  !empty($data->actualy_shipment_date) ? date('d/m/Y', strtotime($data->actualy_shipment_date)) : "",
                 "Deadline"              => $data->deadline,
                 "Qty (Kg)"              => $salesOrderExportDetail != null ? (float)$salesOrderExportDetail['total_qty_convertion'] : 0,
                 "Plant"                 => $data->company,
@@ -226,7 +226,7 @@ class ReportEkspor extends BaseController
             "Order Form No"         => '',
             "Customer"              => '',
             "Container"             => '',
-            "Actualy Date" => 'GRAND TOTAL',
+            "Actual Date" => 'GRAND TOTAL',
             "Qty (Kg)"              => (float) $totalQtyConvertion,
             "Plant"                 => '',
             "Currency"                 => '',
@@ -299,7 +299,7 @@ class ReportEkspor extends BaseController
         );
 
         $dataBarangSales = $this->barangMasterSalesModel
-            ->where('company_id', $this->this_company_id)
+            //->where('company_id', $this->this_company_id)
             ->where('type_barang_sales', "EKSPOR")
             ->where('deletedAt', null)
             ->orderBy('barang_name', "asc")
@@ -442,7 +442,7 @@ class ReportEkspor extends BaseController
                     "Order Form No" => $d->sales_order_export_no,
                     "Customer" => $d->customer_name,
                     "Container Number" => $d->container,
-                    "Actualy Shipment Date" => !empty($d->actualy_shipment_date) ? date('d/m/Y', strtotime($d->actualy_shipment_date)) : "",
+                    "Actual Shipment Date" => !empty($d->actualy_shipment_date) ? date('d/m/Y', strtotime($d->actualy_shipment_date)) : "",
                     "Deadline" => $d->deadline,
                     "Destination" => $d->dicharge_port,
                     "Plant" => $d->company,
@@ -485,7 +485,7 @@ class ReportEkspor extends BaseController
             "Order Form No",
             "Customer",
             "Container Number",
-            "Actualy Shipment Date",
+            "Actual Shipment Date",
             "Deadline",
             "Destination",
             "Plant",
@@ -648,7 +648,7 @@ class ReportEkspor extends BaseController
         );
 
         $dataBarangSales = $this->barangMasterSalesModel
-            ->where('company_id', $this->this_company_id)
+            // ->where('company_id', $this->this_company_id)
             ->where('type_barang_sales', "EKSPOR")
             ->where('deletedAt', null)
             ->orderBy('barang_name', "asc")
@@ -772,7 +772,7 @@ class ReportEkspor extends BaseController
         );
 
         $dataBarangSales = $this->barangMasterSalesModel
-            ->where('company_id', $this->this_company_id)
+            //->where('company_id', $this->this_company_id)
             ->where('type_barang_sales', "EKSPOR")
             ->where('deletedAt', null)
             ->orderBy('barang_name', "asc")
@@ -852,6 +852,7 @@ class ReportEkspor extends BaseController
                 "total_harga"                 => (float)$data->total_harga,
                 "valas"                     => $data->valas_name,
                 "price_type"                => $data->tipe_harga,
+                "createdAt"                => date('d/m/Y', strtotime($data->createdAt))
             ]);
         }
 
@@ -899,6 +900,7 @@ class ReportEkspor extends BaseController
         // Header tabel
         $headers = [
             'No',
+            'Creation Date',
             'Acc Holder',
             'Contract No',
             'Customer',
@@ -942,19 +944,20 @@ class ReportEkspor extends BaseController
             $kodeSatuan = $salesContractBreakdown != null ? $salesContractBreakdown['kode_satuan'] : "";
 
             $sheet->setCellValue('A' . $row, $no++);
-            $sheet->setCellValue('B' . $row, $data->acc_holder);
-            $sheet->setCellValue('C' . $row, $data->sales_contract_no);
-            $sheet->setCellValue('D' . $row, $data->customer_name);
-            $sheet->setCellValue('E' . $row, $data->no_container);
-            $sheet->setCellValue('F' . $row, $data->shipment_date);
-            $sheet->setCellValue('G' . $row, $data->loading_port);
-            $sheet->setCellValue('H' . $row, $data->dicharge_port);
-            $sheet->setCellValue('I' . $row, $data->company);
-            $sheet->setCellValue('J' . $row, $data->barang_name);
-            $sheet->setCellValue('K' . $row, number_format($data->qty, 2) . " " . $kodeSatuan);
-            $sheet->setCellValue('L' . $row, $data->valas_name);
-            $sheet->setCellValue('M' . $row, $data->total_harga);
-            $sheet->setCellValue('N' . $row, $data->tipe_harga);
+            $sheet->setCellValue('B' . $row, date('d/m/Y', strtotime($data->createdAt)));
+            $sheet->setCellValue('C' . $row, $data->acc_holder);
+            $sheet->setCellValue('D' . $row, $data->sales_contract_no);
+            $sheet->setCellValue('E' . $row, $data->customer_name);
+            $sheet->setCellValue('F' . $row, $data->no_container);
+            $sheet->setCellValue('G' . $row, $data->shipment_date);
+            $sheet->setCellValue('H' . $row, $data->loading_port);
+            $sheet->setCellValue('I' . $row, $data->dicharge_port);
+            $sheet->setCellValue('J' . $row, $data->company);
+            $sheet->setCellValue('K' . $row, $data->barang_name);
+            $sheet->setCellValue('L' . $row, number_format($data->qty, 2) . " " . $kodeSatuan);
+            $sheet->setCellValue('M' . $row, $data->valas_name);
+            $sheet->setCellValue('N' . $row, $data->total_harga);
+            $sheet->setCellValue('O' . $row, $data->tipe_harga);
 
             $grandTotal += (float)$data->total_harga;
             $row++;
@@ -962,8 +965,8 @@ class ReportEkspor extends BaseController
 
         // Grand total
         $sheet->setCellValue('L' . $row, 'GRAND TOTAL');
-        $sheet->setCellValue('M' . $row, $grandTotal);
-        $sheet->getStyle('L' . $row . ':M' . $row)->getFont()->setBold(true);
+        $sheet->setCellValue('N' . $row, $grandTotal);
+        $sheet->getStyle('L' . $row . ':N' . $row)->getFont()->setBold(true);
 
         // Output Excel
         $fileName = 'Export_Sales_Contract_' . date('Ymd_His') . '.xlsx';

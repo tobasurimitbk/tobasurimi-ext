@@ -22,7 +22,7 @@
                     <div class="input-group">
                         <div class="form-floating" style="height: 50px;">
                             <input placeholder="" class="form-control year" id="year" name="year" aria-label="Floating label select example" value="" />
-                            <label style="z-index: 1;" style="z-index: 1;">Select Actualy Year</label>
+                            <label style="z-index: 1;" style="z-index: 1;">Select Actual Year</label>
                         </div>
                         <div class="input-group-append" style="height:50px;">
                             <button disabled class="btn btn-secondary" type="button">

@@ -147,7 +147,7 @@ class SalesKontrakDetailModel extends Model
             'sales_contract.currency'                 => 'sales_contract.currency',
             'sales_contract_detail.total_harga'         => 'sales_contract_detail.total_harga',
             'sales_contract.tipe_harga'                 => 'sales_contract.tipe_harga',
-
+            'sales_contract.createdAt'                 => 'sales_contract.createdAt',
         ];
 
         $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
@@ -211,6 +211,17 @@ class SalesKontrakDetailModel extends Model
         if ($addCondition['user_id']) {
             $salesDataQry->groupStart();
             $salesDataQry->where('sales_contract.createdBy', $addCondition['user_id']);
+            $salesDataQry->groupEnd();
+        }
+
+        if (!empty($addCondition['dateStart']) || !empty($addCondition['dateEnd'])) {
+            $salesDataQry->groupStart(); //
+            if (!empty($addCondition['dateStart'])) {
+                $salesDataQry->where('DATE(sales_contract.createdAt) >=', $addCondition['dateStart']);
+            }
+            if (!empty($addCondition['dateEnd'])) {
+                $salesDataQry->where('DATE(sales_contract.createdAt) <=', $addCondition['dateEnd']);
+            }
             $salesDataQry->groupEnd();
         }
 

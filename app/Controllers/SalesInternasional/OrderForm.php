@@ -742,7 +742,7 @@ class OrderForm extends BaseController
             ]);
         } else {
             // INI POSTING
-            // CEK APAKAH ACTUALY SHIPMENT DATE SUDAH ADA
+            // CEK APAKAH Actual Shipment Date SUDAH ADA
             // $salesOrderExport = $this->salesOrderExportModel->where('sales_order_export_id', $id)->first();
             // if (empty($salesOrderExport['actualy_shipment_date']) || $salesOrderExport['actualy_shipment_date'] == null) {
             //     return response()->setJSON([
