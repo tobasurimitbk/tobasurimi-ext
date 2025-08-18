@@ -115,7 +115,7 @@
                                 <th onclick="changeSort('order_date')" class="sort">Tanggal Order</th>
                                 <!-- <th onclick="changeSort('shipping_date')" class="sort">Tanggal Dikirim</th> -->
                                 <th onclick="changeSort('company')" class="sort">Company</th>
-                                <th onclick="changeSort('nama_customer')" class="sort">Nama Customer</th>
+                                <th onclick="changeSort('nama_customer')" class="sort">Nama Supplier Lokal</th>
                                 <!-- <th onclick="changeSort('destination')" class="sort">Destinasi</th>
                                 <th onclick="changeSort('salesName')" class="sort">Nama Sales</th> -->
                                 <th onclick="changeSort('qty_barang')" class="sort">QTY Barang</th>
