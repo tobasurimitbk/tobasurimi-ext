@@ -344,12 +344,12 @@
                     let spesifikasi_id = row.spesifikasi_id;
 
                     return `
-                        <?php if (can('Master Barang', 'Bahan Scrap', 'u')) : ?>
+                        <?php if (can('Master Barang', 'Barang Scrap', 'u')) : ?>
                             <a href="javascript:void(0)" onclick="edit('${id}')" data-toggle="tooltip" title="Edit" class="btn btn-primary">
                                 <i class="fas fa-edit"></i>
                             </a>
                         <?php endif; ?>
-                         <?php if (can('Master Barang', 'Bahan Scrap', 'd')) : ?>
+                         <?php if (can('Master Barang', 'Barang Scrap', 'd')) : ?>
                             <button data-toggle="tooltip" title="Hapus" onclick="removeSpek('${spesifikasi_id}')" class="btn btn-danger delete-parent">
                                 <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
                             </button>
