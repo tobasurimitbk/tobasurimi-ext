@@ -326,7 +326,7 @@
 
                 <?php if (can('Penjualan Lokal', 'Surat Jalan', 'u')) : ?>
                     btn_edit = `
-                    <a href="javascript:void(0)" onclick="edit('${id}')" data-toggle="tooltip" title="Edit" class="btn btn-primary">
+                    <a href="<?= base_url("surat-jalan/id"); ?>/${id}" data-toggle="tooltip" title="Edit" class="btn btn-primary">
                         <i class="fas fa-edit"></i>
                     </a>`;
                 <?php endif; ?>

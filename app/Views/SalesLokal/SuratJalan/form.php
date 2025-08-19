@@ -177,8 +177,8 @@
                         </div>
 
                         <div class="col-md-6">
-                            <button type="button" class="btn btn-show-detail btn-add btn-block float-right <?= (!empty($data) && $data->posting == 1) ? 'disabled' : '' ?> <?= !empty($data) ? ((($data->used == "USED") or ($data->surat_jalan_so_id != NULL) or ($data->sales_order_invoice_id != NULL)) ? 'disabled' : '') : '' ?>" data-btn="detail-modal">
-                                <i class="fa fa-plus fa-sm mr-2 " aria-hidden="true"></i>Tambah
+                            <button type="button" class="btn btn-show-detail btn-add btn-block float-right <?= (!empty($data) && $data->posting == 1) ? 'disabled' : '' ?>" data-btn="detail-modal">
+                                <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
                             </button>
                         </div>
                     </div>
@@ -419,7 +419,7 @@
                     className: "text-center actions",
                     render: function(data, type, row) {
                         let id = row.id;
-                        let disableButton = "<?= !empty($data) ? ((($data->used == "USED") or ($data->surat_jalan_so_id != NULL) or ($data->sales_order_invoice_id != NULL)) ? 'disabled' : '') : '' ?>";
+                        let disableButton = "";
                         return `
                             <div class="">
                                 <button type="button" data-no="${row.no}" data-id="${row.id}" class="edit-table-detail" ${disableButton}><i class="fa fa-edit" aria-hidden="true"></i></button>
