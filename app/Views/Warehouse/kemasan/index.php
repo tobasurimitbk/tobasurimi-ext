@@ -36,9 +36,10 @@
                                 <th onclick="changeSort('kemasan.name')" class="sort">Kemasan</th>
                                 <th onclick="changeSort('parent_barang.parent_name')" class="sort">Kategori</th>
                                 <th onclick="changeSort('satuans.kode_satuan')" class="sort">Satuan</th>
+                                <th style="width: 100px;">Action</th>
                             </tr>
                         </thead>
-                        <tbody class="body-table" id="body-table" style="cursor: pointer;">
+                        <tbody class="body-table" id="body-table">
                         </tbody>
                     </table>
                 </div>
@@ -109,9 +110,7 @@
             <div class="modal-footer">
                 <button type="button" class="btn btn-hide-form btn-discard mr-2">Kembali</button>
                 <button type="submit" class="btn btn-submit-form btn-submit-form-parent">Simpan</button>
-                <?php if (can('Master Barang', 'Kemasan', 'd')) : ?>
-                    <button type="button" class="btn btn-discard delete-btn">Hapus</button>
-                <?php endif; ?>
+
             </div>
         </div>
     </div>
@@ -201,22 +200,51 @@
             },
             {
                 data: "kode",
-                className: "text-center",
+                className: "text-left",
             },
             {
                 data: "name",
-                className: "text-center",
+                className: "text-left",
             },
             {
                 data: "parent_name",
-                className: "text-center",
+                className: "text-left",
             },
             {
                 data: "kode_satuan",
-                className: "text-center",
+                className: "text-left",
             },
+            {
+                data: "id",
+                className: "text-center actions",
+                searchable: false,
+                sortable: false,
+                render: function(data, type, row) {
+                    let id = row.id;
+
+                    return `
+                        <?php if (can('Master Barang', 'Kemasan', 'u')) : ?>
+                            <a href="javascript:void(0)" onclick="edit('${id}')" data-toggle="tooltip" title="Edit" class="btn btn-primary">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                        <?php endif; ?>
+                         <?php if (can('Master Barang', 'Kemasan', 'd')) : ?>
+                            <button data-toggle="tooltip" title="Hapus" onclick="remove('${id}')" class="btn btn-danger delete-parent">
+                                <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
+                            </button>
+                        <?php endif; ?>
+                         
+                    `
+                }
+            }
 
         ],
+        "drawCallback": function(settings) {
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-toggle="tooltip"]'))
+            var tooltipList = tooltipTriggerList.map(function(tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl)
+            });
+        },
         columnDefs: [{
             defaultContent: "-",
             targets: "_all"
@@ -284,43 +312,43 @@
         dropdownParent: $('#add_modal')
     });
 
-    $('#dataTable tbody').on('click', 'tr td:not(.actions):not(.dataTables_empty)', function() {
-        resetForm();
-        const data = table.row(this).data();
-        let id = data.id;
-        let formData = new FormData();
-        formData.append("id", id);
+    // $('#dataTable tbody').on('click', 'tr td:not(.actions):not(.dataTables_empty)', function() {
+    //     resetForm();
+    //     const data = table.row(this).data();
+    //     let id = data.id;
+    //     let formData = new FormData();
+    //     formData.append("id", id);
 
-        $.ajax({
-            url: "<?= base_url("kemasan/get"); ?>",
-            data: formData,
-            beforeSend: function(xhr) {
-                xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                setLoading();
-            },
-            complete: function() {
-                stopLoading();
-            },
-            method: "POST",
-            dataType: "json",
-            processData: false,
-            contentType: false,
-            success: function(res) {
-                csrf.val();
-                $('.id').val(res.data.id);
-                $('.kode').val(res.data.kode);
-                $('.name').val(res.data.name);
-                $('.parent_type_id').val(res.data.parent_type_id).change();
-                $('.satuan_id').val(res.data.satuan_id).change();
+    //     $.ajax({
+    //         url: "<?= base_url("kemasan/get"); ?>",
+    //         data: formData,
+    //         beforeSend: function(xhr) {
+    //             xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+    //             setLoading();
+    //         },
+    //         complete: function() {
+    //             stopLoading();
+    //         },
+    //         method: "POST",
+    //         dataType: "json",
+    //         processData: false,
+    //         contentType: false,
+    //         success: function(res) {
+    //             csrf.val();
+    //             $('.id').val(res.data.id);
+    //             $('.kode').val(res.data.kode);
+    //             $('.name').val(res.data.name);
+    //             $('.parent_type_id').val(res.data.parent_type_id).change();
+    //             $('.satuan_id').val(res.data.satuan_id).change();
 
-                $('.input-generate').hide();
-                $('.kode').attr('readonly', true);
-                $('#add_modal').modal('show');
-                $('.delete-btn').show();
-                $('.title-name').text('Update Kemasan')
-            }
-        })
-    });
+    //             $('.input-generate').hide();
+    //             $('.kode').attr('readonly', true);
+    //             $('#add_modal').modal('show');
+    //             $('.delete-btn').show();
+    //             $('.title-name').text('Update Kemasan')
+    //         }
+    //     })
+    // });
 
     $('.btn-submit-excel').click(function() {
         if ($('.form-excel').valid()) {
@@ -375,6 +403,90 @@
             })
         }
     });
+
+    function edit(id) {
+        resetForm();
+        let formData = new FormData();
+        formData.append("id", id);
+
+        $.ajax({
+            url: "<?= base_url("kemasan/get"); ?>",
+            data: formData,
+            beforeSend: function(xhr) {
+                xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                setLoading();
+            },
+            complete: function() {
+                stopLoading();
+            },
+            method: "POST",
+            dataType: "json",
+            processData: false,
+            contentType: false,
+            success: function(res) {
+                csrf.val();
+                $('.id').val(res.data.id);
+                $('.kode').val(res.data.kode);
+                $('.name').val(res.data.name);
+                $('.parent_type_id').val(res.data.parent_type_id).change();
+                $('.satuan_id').val(res.data.satuan_id).change();
+
+                $('.input-generate').hide();
+                // $('.kode').attr('readonly', true);
+                $('#add_modal').modal('show');
+                $('.delete-btn').show();
+                $('.title-name').text('Update Kemasan')
+            }
+        })
+    }
+
+    function remove(id) {
+        Swal.fire({
+            icon: 'question',
+            title: 'Hapus Kemasan ?',
+            confirmButtonColor: '#4e73df',
+            cancelButtonColor: '#d33',
+            showCancelButton: true,
+            reverseButtons: true,
+            confirmButtonText: 'Hapus',
+            cancelButtonText: 'Kembali',
+        }).then((result) => {
+            if (result.isConfirmed) {
+                let csrf = $(`[name="${csrfToken}"]`);
+                $.ajax({
+                    url: "<?= base_url("kemasan/delete"); ?>",
+                    data: {
+                        id: id
+                    },
+                    beforeSend: function(xhr) {
+                        xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                        setLoading();
+                    },
+                    complete: function() {
+                        stopLoading();
+                    },
+                    method: "POST",
+                    dataType: "json",
+                    success: function(response) {
+                        csrf.val(response.token);
+
+                        Swal.fire({
+                            icon: 'success',
+                            title: response.message,
+                            confirmButtonColor: '#4e73df',
+                            reverseButtons: true,
+                            confirmButtonText: 'Oke',
+                        }).then((result) => {
+                            table.ajax.reload();
+                            $('#add_modal').modal('hide');
+                            resetForm();
+                        })
+
+                    },
+                });
+            }
+        })
+    }
 
 
     var validator_excel = $(".form-excel").validate({
@@ -570,56 +682,9 @@
         }
     });
 
-    $(".delete-btn").click(function() {
-        var parentName = $('#parentName').val();
+    // $(".delete-btn").click(function() {
 
-        Swal.fire({
-            icon: 'question',
-            title: 'Hapus Kemasan ?',
-            confirmButtonColor: '#4e73df',
-            cancelButtonColor: '#d33',
-            showCancelButton: true,
-            reverseButtons: true,
-            confirmButtonText: 'Hapus',
-            cancelButtonText: 'Kembali',
-        }).then((result) => {
-            if (result.isConfirmed) {
-                let csrf = $(`[name="${csrfToken}"]`);
-                let id = $('input[name="id"]').val();
-                $.ajax({
-                    url: "<?= base_url("kemasan/delete"); ?>",
-                    data: {
-                        id: id
-                    },
-                    beforeSend: function(xhr) {
-                        xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                        setLoading();
-                    },
-                    complete: function() {
-                        stopLoading();
-                    },
-                    method: "POST",
-                    dataType: "json",
-                    success: function(response) {
-                        csrf.val(response.token);
-
-                        Swal.fire({
-                            icon: 'success',
-                            title: response.message,
-                            confirmButtonColor: '#4e73df',
-                            reverseButtons: true,
-                            confirmButtonText: 'Oke',
-                        }).then((result) => {
-                            table.ajax.reload();
-                            $('#add_modal').modal('hide');
-                            resetForm();
-                        })
-
-                    },
-                });
-            }
-        })
-    });
+    // });
 
     function resetForm() {
         $(".id").val(null);

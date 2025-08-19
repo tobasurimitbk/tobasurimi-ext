@@ -297,17 +297,45 @@ class Barang extends BaseController
 
     public function deleteSpek()
     {
-        $id = ($this->request->getVar('id'));
         $barangSpesifikasiModel = new BarangMasterSpesifikasiModel();
-        $barangSpesifikasiModel->update($id, [
-            'deletedAt' => date('Y-m-d H:i:s')
-        ]);
+        $barangMasterModel = new BarangMasterModel();
 
-        return response()->setJSON([
-            'status' => true,
-            'message' => "Spesifikasi berhasil dihapus",
-            'token' => csrf_hash()
-        ]);
+        try {
+            $id = ($this->request->getVar('id'));
+
+            // First yang akan didelete
+            $barangMasterSpesifikasi = $barangSpesifikasiModel
+                ->where('id', $id)
+                ->first();
+            // Hapus spek
+            $barangSpesifikasiModel->update($id, [
+                'deletedAt' => date('Y-m-d H:i:s')
+            ]);
+
+            // Cek Total Spek
+            // Jika Total Spek Kosong Hapus Parent Barang
+            $barangMasterSpesifikasiAll = $barangSpesifikasiModel
+                ->where('deletedAt', null)
+                ->where('barang_master_id', $barangMasterSpesifikasi['barang_master_id'])
+                ->findAll();
+
+            if (count($barangMasterSpesifikasiAll) == 0) {
+                // Tinggal Parent Aja Maka Hapus Parent nya
+                $barangMasterModel->delete($barangMasterSpesifikasi['barang_master_id']);
+            }
+
+            return response()->setJSON([
+                'status' => true,
+                'message' => "Barang spesifikasi berhasil dihapus",
+                'token' => csrf_hash()
+            ]);
+        } catch (Exception $e) {
+            return \response()->setJSON([
+                'status' => false,
+                'token' => \csrf_hash(),
+                'message' => $e->getMessage()
+            ]);
+        }
     }
 
     public function get()

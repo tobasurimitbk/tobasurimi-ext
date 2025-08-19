@@ -816,7 +816,7 @@ $routes->get('/biaya-impor/dropdown-po', 'BiayaExim\BiayaImpor\BiayaImpor::dropd
 $routes->get('/biaya-impor/get-detail-barang-po', 'BiayaExim\BiayaImpor\BiayaImpor::getDetailBarangPo', ['filter' => 'Auth']);
 $routes->post('/biaya-impor/create', 'BiayaExim\BiayaImpor\BiayaImpor::store', ['filter' => 'Auth']);
 $routes->post('/biaya-impor/update', 'BiayaExim\BiayaImpor\BiayaImpor::update', ['filter' => 'Auth']);
-$routes->post('/biaya-impor/delete', 'BiayaExim\BiayaImpor\BiayaImpor::delete', ['filter' => 'Auth']);
+$routes->post('/biaya-impor/delete', 'BiayaExim\BiayaImpor\BiayaImpor::destroy', ['filter' => 'Auth']);
 $routes->post('/biaya-impor/posting', 'BiayaExim\BiayaImpor\BiayaImpor::posting', ['filter' => 'Auth']);
 $routes->post('/biaya-impor/unposting', 'BiayaExim\BiayaImpor\BiayaImpor::unposting', ['filter' => 'Auth']);
 $routes->get('/biaya-impor/all', 'BiayaExim\BiayaImpor\BiayaImpor::all', ['filter' => 'Auth']);

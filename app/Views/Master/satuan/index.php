@@ -147,10 +147,10 @@
             width: "5%"
         }, {
             data: "kode_satuan",
-            className: "text-center"
+            className: "text-left"
         }, {
             data: "nama_satuan",
-            className: "text-center"
+            className: "text-left"
         }],
         columnDefs: [{
             defaultContent: "-",
