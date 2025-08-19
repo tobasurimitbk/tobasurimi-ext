@@ -50,7 +50,7 @@ class BiayaEksporModel extends Model
             'biaya_ekspor.no_invoice'               => 'biaya_ekspor.no_invoice',
             'biaya_ekspor.no_container'               => 'biaya_ekspor.no_container',
             'customers.name'               =>     'customers.name',
-            'sales_contract.dicharge_port'               =>  'sales_contract.dicharge_port',
+            'biaya_ekspor.destination'               =>  'biaya_ekspor.destination',
             'vendor_pelayaran.nama_vendor'               =>  'vendor_pelayaran.nama_vendor',
             'biaya_ekspor.total_faktur'               => 'biaya_ekspor.total_faktur',
             'biaya_ekspor.status_posting'               => 'biaya_ekspor.status_posting',
@@ -64,18 +64,13 @@ class BiayaEksporModel extends Model
         $selectQry = "biaya_ekspor.*,
             customers.name as customer_name,
             vendor_pelayaran.nama_vendor,
-            sales_contract.dicharge_port,
-            sales_contract.payment_term,
-            divisis.divisi,
-            sales_order_export.po_no
+            divisis.divisi
         ";
 
         $dataQry = $this->asArray()
             ->select($selectQry)
             ->join('vendor_pelayaran', 'vendor_pelayaran.id = biaya_ekspor.vendor_pelayaran_id', 'left')
-            ->join('sales_order_export', 'sales_order_export.sales_order_export_id = biaya_ekspor.sales_order_export_id', 'left')
-            ->join('sales_contract', 'sales_contract.id = sales_order_export.sales_contract_id', 'left')
-            ->join('customers', 'customers.id = sales_contract.customer_id', 'left')
+            ->join('customers', 'customers.id = biaya_ekspor.customer_id', 'left')
             ->join('divisis', 'divisis.id = biaya_ekspor.divisi_id', 'left')
             ->where($condition);
 
@@ -161,18 +156,9 @@ class BiayaEksporModel extends Model
     {
         $resQry = $this->select('
             biaya_ekspor.*,
-            sales_contract.dicharge_port,
-            sales_contract.payment_term,
-            sales_contract.tipe_harga,
-            sales_order_export.container as container_orderform,
-            sales_order_export.po_no,
-            metadata.value as valas,
             customers.name as customer_name
         ')
-            ->join('sales_order_export', 'sales_order_export.sales_order_export_id = biaya_ekspor.sales_order_export_id', 'left')
-            ->join('sales_contract', 'sales_contract.id = sales_order_export.sales_contract_id', 'left')
-            ->join('metadata', 'sales_order_export.valas_id = metadata.id', 'left')
-            ->join('customers', 'customers.id = sales_contract.customer_id', 'left')
+            ->join('customers', 'customers.id = biaya_ekspor.customer_id', 'left')
             ->where('biaya_ekspor.id', $id)
             ->first();
 

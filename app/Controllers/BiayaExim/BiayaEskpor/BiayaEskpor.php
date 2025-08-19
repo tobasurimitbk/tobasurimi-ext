@@ -3,12 +3,16 @@
 namespace App\Controllers\BiayaExim\BiayaEskpor;
 
 use App\Controllers\BaseController;
+use App\Models\BarangMasterSalesModel;
+use App\Models\BiayaEksporBarangModel;
 use App\Models\BiayaEksporDetailModel;
 use App\Models\BiayaEksporModel;
 use App\Models\BiayaEksporPajakModel;
 use App\Models\CustomerModel;
 use App\Models\DivisisModel;
+use App\Models\MetadataModel;
 use App\Models\SalesOrderExportModel;
+use App\Models\SatuansModel;
 use App\Models\TaxModel;
 use App\Models\VendorPelayaranModel;
 use Dompdf\Dompdf;
@@ -29,6 +33,10 @@ class BiayaEskpor extends BaseController
     protected $biayaEksporDetailModel;
     protected $biayaEksporPajakModel;
     protected $customerModel;
+    protected $barangMasterSalesModel;
+    protected $metadataModel;
+    protected $satuanModel;
+    protected $biayaEksporBarangModel;
     protected $dompdf;
 
     public function __construct()
@@ -42,6 +50,10 @@ class BiayaEskpor extends BaseController
         $this->biayaEksporDetailModel = new BiayaEksporDetailModel();
         $this->biayaEksporPajakModel = new BiayaEksporPajakModel();
         $this->customerModel = new CustomerModel();
+        $this->barangMasterSalesModel = new BarangMasterSalesModel();
+        $this->metadataModel = new MetadataModel();
+        $this->satuanModel = new SatuansModel();
+        $this->biayaEksporBarangModel = new BiayaEksporBarangModel();
         $this->dompdf = new Dompdf();
     }
 
@@ -97,7 +109,7 @@ class BiayaEskpor extends BaseController
                 "no_invoice"        => $data['no_invoice'],
                 "no_container"        => $data['no_container'],
                 "customer_name"        => $data['customer_name'],
-                "dicharge_port"        => $data['dicharge_port'],
+                "destination"        => $data['destination'],
                 "nama_vendor"        => $data['nama_vendor'],
                 "total_faktur"        => (float)$data['total_faktur'],
                 "status_posting"        => $data['status_posting'],
@@ -127,12 +139,18 @@ class BiayaEskpor extends BaseController
             ->findAll();
         $dataVendorPelayaran = $this->vendorPelayaranModel->where('deletedAt', null)->where('company_id', $this->this_company_id)->orderBy('nama_vendor', "asc")->findAll();
         $dataCustomer = $this->customerModel->getCustomerList("INTERNASIONAL");
+        $dataBarang = $this->barangMasterSalesModel->where('type_barang', "bahan_jadi")->where('type_barang_sales', "EKSPOR")->where('deletedAt', null)->orderBy('barang_name', "ASC")->findAll();
+        $dataValuta = $this->metadataModel->where('name', "Valuta")->orderBy('value', "asc")->findAll();
+        $dataSatuan = $this->satuanModel->where('deletedAt', null)->findAll();
 
         $data = [
             "dataDivisi" => $dataDivisi,
             "dataPajak" => $dataPajak,
             "dataVendorPelayaran" => $dataVendorPelayaran,
-            "dataCustomer" => $dataCustomer
+            "dataCustomer" => $dataCustomer,
+            "dataBarang" => $dataBarang,
+            "dataValuta" => $dataValuta,
+            "dataSatuan" => $dataSatuan
         ];
 
         return view('BiayaExim/BiayaEskpor/form', $data);
@@ -165,6 +183,10 @@ class BiayaEskpor extends BaseController
             ->where('deletedAt', null)
             ->findAll();
         $dataCustomer = $this->customerModel->getCustomerList("INTERNASIONAL");
+        $dataBarang = $this->barangMasterSalesModel->where('type_barang', "bahan_jadi")->where('type_barang_sales', "EKSPOR")->where('deletedAt', null)->orderBy('barang_name', "ASC")->findAll();
+        $dataValuta = $this->metadataModel->where('name', "Valuta")->orderBy('value', "asc")->findAll();
+        $dataSatuan = $this->satuanModel->where('deletedAt', null)->findAll();
+        $dataDetailBarang = $this->biayaEksporBarangModel->getListBarang($id);
 
         $data = [
             "dataDivisi" => $dataDivisi,
@@ -174,7 +196,11 @@ class BiayaEskpor extends BaseController
             "dataBiayaEskpor" => $dataBiayaEskpor,
             "dataBiayaEksporPajak" => $dataBiayaEksporPajak,
             "dataBiayaEksporDetail" => $dataBiayaEksporDetail,
-            "dataCustomer" => $dataCustomer
+            "dataCustomer" => $dataCustomer,
+            "dataBarang" => $dataBarang,
+            "dataValuta" => $dataValuta,
+            "dataSatuan" => $dataSatuan,
+            "dataDetailBarang" => $dataDetailBarang
         ];
 
         return view('BiayaExim/BiayaEskpor/form', $data);
@@ -335,7 +361,7 @@ class BiayaEskpor extends BaseController
                 'company_id' => $this->this_company_id,
                 'divisi_id' => $this->request->getVar('divisi_id'),
                 'vendor_pelayaran_id' => $this->request->getVar('vendor_pelayaran_id'),
-                'sales_order_export_id' => $this->request->getVar('sales_order_export_id'),
+                'sales_order_export_id' => !empty($this->request->getVar('sales_order_export_id')) ? $this->request->getVar('sales_order_export_id') : null,
                 'no_invoice' => $noInvoice,
                 'tanggal_invoice' =>  $this->request->getVar("tanggal_invoice") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getVar("tanggal_invoice")))) : null,
                 'no_container' => $this->request->getVar('no_container'),
@@ -346,11 +372,27 @@ class BiayaEskpor extends BaseController
                 'tanggal_surat_jalan' =>  $this->request->getVar("tanggal_surat_jalan") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getVar("tanggal_surat_jalan")))) : null,
                 'no_kendaraan' => $this->request->getVar('no_kendaraan'),
                 'detail_kendaraan' => $this->request->getVar('detail_kendaraan'),
+                'payment_term' => $this->request->getVar('payment_term'),
+                'destination' => $this->request->getVar('destination'),
+                'no_container_order_form' => $this->request->getVar('no_container_order_form'),
+                'po_no' => $this->request->getVar('po_no'),
                 'total_faktur_before_tax' => $this->request->getVar('total_faktur_before_tax'),
                 'total_faktur' => $this->request->getVar('total_faktur'),
                 'customer_id' => $this->request->getVar('customer_id'),
                 'status_posting' => 0
             ]);
+
+            foreach (\json_decode($_POST['listBarang']) as $l) {
+                $this->biayaEksporBarangModel->insert([
+                    'biaya_ekspor_id' => $biayaEksporId,
+                    'barang_master_sales_id' => $l->barang_id,
+                    'valas_id' => $l->valas_id,
+                    'satuan_id' => $l->satuan_id,
+                    'qty_barang' => $l->qty_barang,
+                    'harga_satuan' => $l->harga_satuan,
+                    'total_harga' => $l->total_harga
+                ]);
+            }
 
             foreach (\json_decode($_POST['listBiayaEkspor']) as $l) {
                 $this->biayaEksporDetailModel->insert([
@@ -408,7 +450,7 @@ class BiayaEskpor extends BaseController
             $this->biayaEksporModel->update($id, [
                 'divisi_id' => $this->request->getVar('divisi_id'),
                 'vendor_pelayaran_id' => $this->request->getVar('vendor_pelayaran_id'),
-                'sales_order_export_id' => $this->request->getVar('sales_order_export_id'),
+                'sales_order_export_id' => !empty($this->request->getVar('sales_order_export_id')) ? $this->request->getVar('sales_order_export_id') : null,
                 'no_invoice' => $noInvoice,
                 'tanggal_invoice' =>  $this->request->getVar("tanggal_invoice") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getVar("tanggal_invoice")))) : null,
                 'no_container' => $this->request->getVar('no_container'),
@@ -419,6 +461,10 @@ class BiayaEskpor extends BaseController
                 'tanggal_surat_jalan' =>  $this->request->getVar("tanggal_surat_jalan") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getVar("tanggal_surat_jalan")))) : null,
                 'no_kendaraan' => $this->request->getVar('no_kendaraan'),
                 'detail_kendaraan' => $this->request->getVar('detail_kendaraan'),
+                'payment_term' => $this->request->getVar('payment_term'),
+                'destination' => $this->request->getVar('destination'),
+                'no_container_order_form' => $this->request->getVar('no_container_order_form'),
+                'po_no' => $this->request->getVar('po_no'),
                 'total_faktur_before_tax' => $this->request->getVar('total_faktur_before_tax'),
                 'total_faktur' => $this->request->getVar('total_faktur'),
                 'customer_id' => $this->request->getVar('customer_id'),
@@ -489,6 +535,19 @@ class BiayaEskpor extends BaseController
                 ->where('biaya_ekspor_id', $id)
                 ->delete();
 
+            $this->biayaEksporBarangModel->where('biaya_ekspor_id', $id)->delete();
+            foreach (\json_decode($_POST['listBarang']) as $l) {
+                $this->biayaEksporBarangModel->insert([
+                    'biaya_ekspor_id' => $id,
+                    'barang_master_sales_id' => $l->barang_id,
+                    'valas_id' => $l->valas_id,
+                    'satuan_id' => $l->satuan_id,
+                    'qty_barang' => $l->qty_barang,
+                    'harga_satuan' => $l->harga_satuan,
+                    'total_harga' => $l->total_harga
+                ]);
+            }
+
             $db->transCommit();
 
             return response()->setJSON([
@@ -513,6 +572,7 @@ class BiayaEskpor extends BaseController
             $this->biayaEksporModel->delete($id);
             $this->biayaEksporDetailModel->where('biaya_ekspor_id', $id)->delete();
             $this->biayaEksporPajakModel->where('biaya_ekspor_id', $id)->delete();
+            $this->biayaEksporBarangModel->where('biaya_ekspor_id', $id)->delete();
 
             return response()->setJSON([
                 'status' => true,
@@ -658,7 +718,7 @@ class BiayaEskpor extends BaseController
             $sheet->setCellValue("D{$row}", $data['divisi']);
             $sheet->setCellValue("E{$row}", $data['customer_name']);
             $sheet->setCellValue("F{$row}", $data['payment_term']);
-            $sheet->setCellValue("G{$row}", $data['dicharge_port']);
+            $sheet->setCellValue("G{$row}", $data['destination']);
             $sheet->setCellValue("H{$row}", $data['po_no']);
             $sheet->setCellValue("I{$row}", $data['no_container']);
             $sheet->setCellValue("J{$row}", $data['no_seal']);
@@ -735,6 +795,39 @@ class BiayaEskpor extends BaseController
                 }
             } else {
                 $sheet->setCellValue("B{$row}", "- Tidak ada biaya -");
+                $row++;
+            }
+
+            // === Detail Barang ===
+            $barangHeader = ['KODE BARANG', 'BARANG', 'QTY', 'SATUAN', 'HARGA SATUAN', 'TOTAL HARGA'];
+            $col = 'B';
+            foreach ($barangHeader as $header) {
+                $sheet->setCellValue($col . $row, strtoupper($header));
+                $sheet->getStyle($col . $row)->getFont()->setBold(true);
+                $sheet->getStyle($col . $row)->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setARGB('FFF2F2F2');
+                $col++;
+            }
+            $row++;
+
+            $detailBarang = $this->biayaEksporBarangModel
+                ->getListBarang($data['id']);
+
+            if ($detailBarang) {
+                foreach ($detailBarang as $by) {
+                    $sheet->setCellValue("B{$row}", $by['kode_barang']);
+                    $sheet->setCellValue("C{$row}", $by['barang_name']);
+                    $sheet->setCellValue("D{$row}", $by['qty_barang']);
+                    $sheet->setCellValue("E{$row}", $by['kode_satuan']);
+                    $sheet->setCellValue("F{$row}", $by['harga_satuan']);
+                    $sheet->setCellValue("G{$row}", $by['total_harga']);
+
+                    $sheet->getStyle("D{$row}")->getNumberFormat()->setFormatCode(NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1);
+                    $sheet->getStyle("F{$row}")->getNumberFormat()->setFormatCode(NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1);
+                    $sheet->getStyle("G{$row}")->getNumberFormat()->setFormatCode(NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1);
+                    $row++;
+                }
+            } else {
+                $sheet->setCellValue("B{$row}", "- Tidak ada barang -");
                 $row++;
             }
 

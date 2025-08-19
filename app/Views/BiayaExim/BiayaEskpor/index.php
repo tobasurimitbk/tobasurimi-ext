@@ -80,7 +80,7 @@
 
 <script>
     const csrfToken = '<?= csrf_token() ?>';
-    let sort = "biaya_ekspor.tanggal_invoice";
+    let sort = "biaya_ekspor.id";
     let sortType = "desc";
 
     const table = $('.dataTable').DataTable({
@@ -135,7 +135,7 @@
                 data: "customer_name",
                 className: "text-left",
             }, {
-                data: "dicharge_port",
+                data: "destination",
                 className: "text-left",
             }, {
                 data: "nama_vendor",

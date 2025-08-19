@@ -827,6 +827,7 @@ class SalesOrderExportModel extends Model
 
             array_push($salesContractDetailList, [
                 'id' => $sd['id'],
+                'barang_id' => $sd['barang_master_sales_id'],
                 'kode_barang' => $sd['kode_barang'],
                 'barang_name' => $sd['barang_name'],
                 'brand' => $subTitle == null ? $sd['brand'] : $subTitle['brand'],

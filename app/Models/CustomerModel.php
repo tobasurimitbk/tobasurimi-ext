@@ -496,7 +496,7 @@ class CustomerModel extends Model
         $resQry = $this->asArray()
             ->where('tipe_customer', $tipe_customer)
             ->where('deletedAt', null)
-            ->where('company_id', session()->get("login")->this_company_id)
+            // ->where('company_id', session()->get("login")->this_company_id)
             ->orderBy('name', "asc")
             ->findAll();
         return $resQry;
