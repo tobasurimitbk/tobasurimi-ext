@@ -1055,9 +1055,9 @@ class PembayaranInvoice extends BaseController
                     'keterangan' =>  $this->request->getVar('keterangan'),
                     'type_invoice' => "EKSPOR",
                     'tanggal' => date('Y-m-d', strtotime(str_replace('/', '-', $this->request->getVar('payment_date')))),
-                    'total_invoice' => repairDouble($this->request->getVar('total_amount_invoice')),
-                    'potongan' => $this->request->getVar('potongan') ? repairDouble($this->request->getVar('potongan')) : 0,
-                    'total_bayar' => repairDouble($this->request->getVar('total_bayar')),
+                    'total_invoice' => $this->request->getVar('total_amount_invoice'),
+                    'potongan' => $this->request->getVar('potongan') ? $this->request->getVar('potongan'): 0,
+                    'total_bayar' => $this->request->getVar('total_bayar'),
                     'akun_kas' => $this->request->getVar('akun_kas'),
                     'akun_selisih' => $this->request->getVar('akun_selisih'),
                     'status_posting' => '0'

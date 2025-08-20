@@ -407,7 +407,8 @@
                     }).then((result) => {
                         if (result.isConfirmed) {
                             let formData = new FormData(document.querySelector(".create-form"));
-                            formData.append('total_amount_invoice', $(".total_amount_invoice").text());
+                            formData.append('total_amount_invoice', destroyFormatRupiah($(".total-bayar").text()));
+                            formData.append('potongan', destroyFormatRupiah($(".potongan").text()));
                             $.ajax({
                                 url: "<?= base_url("/pembayaran-invoice/update"); ?>",
                                 data: formData,
@@ -470,7 +471,8 @@
                     }).then((result) => {
                         if (result.isConfirmed) {
                             const data = new FormData(document.querySelector(".create-form"));
-                            data.append('total_amount_invoice', $(".total_amount_invoice").text());
+                            data.append('total_amount_invoice', destroyFormatRupiah($(".total-bayar").text()));
+                            data.append('potongan', destroyFormatRupiah($(".potongan").text()));
                             $.ajax({
                                 url: "<?= base_url("pembayaran-invoice/save"); ?>",
                                 data: data,
