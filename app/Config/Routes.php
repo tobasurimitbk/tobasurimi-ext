@@ -826,6 +826,16 @@ $routes->get('/biaya-impor/export-excel', 'BiayaExim\BiayaImpor\BiayaImpor::expo
 
 // BIAYA LOKAL
 $routes->get('/biaya-lokal', 'BiayaExim\BiayaLokal\BiayaLokal::index', ['filter' => 'Auth']);
+$routes->get('/biaya-lokal/create', 'BiayaExim\BiayaLokal\BiayaLokal::create', ['filter' => 'Auth']);
+$routes->post('/biaya-lokal/create', 'BiayaExim\BiayaLokal\BiayaLokal::store', ['filter' => 'Auth']);
+$routes->post('/biaya-lokal/update', 'BiayaExim\BiayaLokal\BiayaLokal::update', ['filter' => 'Auth']);
+$routes->post('/biaya-lokal/delete', 'BiayaExim\BiayaLokal\BiayaLokal::destroy', ['filter' => 'Auth']);
+$routes->post('/biaya-lokal/posting', 'BiayaExim\BiayaLokal\BiayaLokal::posting', ['filter' => 'Auth']);
+$routes->post('/biaya-lokal/unposting', 'BiayaExim\BiayaLokal\BiayaLokal::unposting', ['filter' => 'Auth']);
+$routes->get('/biaya-lokal/all', 'BiayaExim\BiayaLokal\BiayaLokal::all', ['filter' => 'Auth']);
+$routes->get('/biaya-lokal/id/(:segment)', 'BiayaExim\BiayaLokal\BiayaLokal::edit/$1', ['filter' => 'Auth']);
+$routes->get('/biaya-lokal/print/(:segment)', 'BiayaExim\BiayaLokal\BiayaLokal::print/$1', ['filter' => 'Auth']);
+$routes->get('/biaya-lokal/export-excel', 'BiayaExim\BiayaLokal\BiayaLokal::exportExcel', ['filter' => 'Auth']);
 
 // PRODUKSI
 // Production Result

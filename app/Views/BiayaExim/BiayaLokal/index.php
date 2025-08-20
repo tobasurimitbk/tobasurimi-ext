@@ -9,9 +9,8 @@
             <a class="btn btn-warning btn-print float-right" href="#" onclick="exportExcel()">
                 <i class="fa fa-download"></i> Export
             </a>
-
-            <?php if (can('Biaya Exim', 'Biaya Impor', 'c')) : ?>
-                <a class="btn btn-show-form btn-success float-right" href="<?= base_url("biaya-impor/create"); ?>">
+            <?php if (can('Biaya Exim', 'Biaya Lokal', 'c')) : ?>
+                <a class="btn btn-show-form btn-success float-right" href="<?= base_url("biaya-lokal/create"); ?>">
                     <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
                 </a>
             <?php endif; ?>
@@ -57,9 +56,6 @@
                                 <th onclick="changeSort('biaya_impor.divisi_id')" class="sort">Departemen</th>
                                 <th onclick="changeSort('biaya_impor.tanggal_invoice')" class="sort">Tanggal</th>
                                 <th onclick="changeSort('biaya_impor.no_invoice')" class="sort">Invoice</th>
-                                <th onclick="changeSort('suppliers.name')" class="sort">Supplier</th>
-                                <th onclick="changeSort('biaya_impor.port_of_origin')" class="sort">Port Of Origin</th>
-                                <th onclick="changeSort('biaya_impor.port_of_destination')" class="sort">Port Of Destination</th>
                                 <th onclick="changeSort('biaya_impor.vendor_pelayaran_id')" class="sort">Vendor</th>
                                 <th onclick="changeSort('biaya_impor.total_faktur')" class="sort">Total</th>
                                 <th onclick="changeSort('biaya_impor.status_posting')" class="sort">Audit</th>
@@ -98,7 +94,7 @@
         ],
         pageLength: 25,
         ajax: {
-            url: "<?= base_url("biaya-impor/all"); ?>",
+            url: "<?= base_url("biaya-lokal/all"); ?>",
             dataSrc: "data",
             data: function(data) {
                 data.search = $(".search").val();
@@ -127,15 +123,6 @@
                 className: "text-left"
             }, {
                 data: "no_invoice",
-                className: "text-left",
-            }, {
-                data: "supplier_name",
-                className: "text-left",
-            }, {
-                data: "port_of_origin",
-                className: "text-left",
-            }, {
-                data: "port_of_destination",
                 className: "text-left",
             }, {
                 data: "nama_vendor",
@@ -186,22 +173,22 @@
                     if (status_posting === "0") {
                         res += `
                         <div class="mt-0">
-                          <?php if (can('Biaya Exim', 'Biaya Ekspor', 'u')) : ?>
+                          <?php if (can('Biaya Exim', 'Biaya Lokal', 'u')) : ?>
                             <a href="javascript:void(0)" onclick="edit('${id}')" data-toggle="tooltip" title="Edit" class="btn btn-primary">
                                 <i class="fas fa-edit"></i>
                             </a>
                         <?php endif; ?>
-                            <?php if (can('Biaya Exim', 'Biaya Ekspor', 'p')) : ?>
-                                <button data-toggle="tooltip" title="Print" class="btn btn-warning btn-print" onclick="print('<?= base_url("biaya-impor/print/"); ?>${id}')" style="box-shadow: none !important;">
+                            <?php if (can('Biaya Exim', 'Biaya Lokal', 'p')) : ?>
+                                <button data-toggle="tooltip" title="Print" class="btn btn-warning btn-print" onclick="print('<?= base_url("biaya-lokal/print/"); ?>${id}')" style="box-shadow: none !important;">
                                     <i class="fa fa-print fa-sm" aria-hidden="true"></i>
                                 </button>
                             <?php endif; ?>
-                            <?php if (can('Biaya Exim', 'Biaya Ekspor', 'a')) : ?>
+                            <?php if (can('Biaya Exim', 'Biaya Lokal', 'a')) : ?>
                                 <button data-toggle="tooltip" title="Posting Audit" onclick="posting('${id}')" class="btn btn-success posting-spp">
                                     <i class="fa fa-paper-plane fa-sm" aria-hidden="true"></i>
                                 </button>
                             <?php endif; ?>
-                            <?php if (can('Biaya Exim', 'Biaya Ekspor', 'd')) : ?>
+                            <?php if (can('Biaya Exim', 'Biaya Lokal', 'd')) : ?>
                                 <button data-toggle="tooltip" title="Delete" onclick="remove('${id}')" class="btn btn-danger delete-parent">
                                     <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
                                 </button>
@@ -212,18 +199,18 @@
 
                     if (status_posting === "1") {
                         res += `
-                         <?php if (can('Biaya Exim', 'Biaya Ekspor', 'u')) : ?>
+                         <?php if (can('Biaya Exim', 'Biaya Lokal', 'u')) : ?>
                             <a href="javascript:void(0)" onclick="edit('${id}')" data-toggle="tooltip" title="Edit" class="btn btn-primary">
                                 <i class="fas fa-edit"></i>
                             </a>
                         <?php endif; ?>
-                        <?php if (can('Biaya Exim', 'Biaya Ekspor', 'p')) : ?>
-                            <button data-toggle="tooltip" title="Print" class="btn btn-warning btn-print" onclick="print('<?= base_url("biaya-impor/print/"); ?>${id}')" style="box-shadow: none !important;">
+                        <?php if (can('Biaya Exim', 'Biaya Lokal', 'p')) : ?>
+                            <button data-toggle="tooltip" title="Print" class="btn btn-warning btn-print" onclick="print('<?= base_url("biaya-lokal/print/"); ?>${id}')" style="box-shadow: none !important;">
                                 <i class="fa fa-print fa-sm" aria-hidden="true"></i>
                             </button>
 
                         <?php endif; ?>
-                          <?php if (can('Biaya Exim', 'Biaya Ekspor', 'ua')) : ?>
+                          <?php if (can('Biaya Exim', 'Biaya Lokal', 'ua')) : ?>
                                 <button data-toggle="tooltip" title="Un-Posting" onclick="unposting('${id}')" class="btn btn-danger posting-spp">
                                     <i class="fa-solid fa-ban"></i>    
                                 </button>
@@ -303,7 +290,7 @@
             if (result.isConfirmed) {
                 const csrf = $(`[name="${csrfToken}"]`);
                 $.ajax({
-                    url: "<?= base_url("biaya-impor/delete"); ?>",
+                    url: "<?= base_url("biaya-lokal/delete"); ?>",
                     data: {
                         id: id,
                     },
@@ -335,7 +322,7 @@
     }
 
     function edit(id) {
-        window.location.href = `/biaya-impor/id/${id}`;
+        window.location.href = `/biaya-lokal/id/${id}`;
     }
 
     function exportExcel() {
@@ -344,7 +331,7 @@
         var statusPosting = $('#status_posting').val();
         var search = $('#search').val();
 
-        window.location.href = "<?= base_url('biaya-impor/export-excel') ?>" + '?dateStart=' + dateStart + '&dateEnd=' + dateEnd + '&status_posting=' + statusPosting + '&search=' + search;
+        window.location.href = "<?= base_url('biaya-lokal/export-excel') ?>" + '?dateStart=' + dateStart + '&dateEnd=' + dateEnd + '&status_posting=' + statusPosting + '&search=' + search;
     }
 
     const print = function(url) {
@@ -365,7 +352,7 @@
             if (result.isConfirmed) {
                 const csrf = $(`[name="${csrfToken}"]`);
                 $.ajax({
-                    url: "<?= base_url("biaya-impor/posting"); ?>",
+                    url: "<?= base_url("biaya-lokal/posting"); ?>",
                     data: {
                         id: id,
                     },
@@ -411,7 +398,7 @@
             if (result.isConfirmed) {
                 const csrf = $(`[name="${csrfToken}"]`);
                 $.ajax({
-                    url: "<?= base_url("biaya-impor/unposting"); ?>",
+                    url: "<?= base_url("biaya-lokal/unposting"); ?>",
                     data: {
                         id: id,
                     },
@@ -447,12 +434,6 @@
 
     $(".status_posting, .dateStart, .dateEnd").change(function() {
         table.ajax.reload();
-    })
-
-    $(".btn-hide-detail").click(function() {
-        $(".id_sales_order").val("");
-        $(".keterangan_unpost").val("");
-        $(".unpost-modal").modal("hide");
     })
 
     $(".search").keyup(function() {

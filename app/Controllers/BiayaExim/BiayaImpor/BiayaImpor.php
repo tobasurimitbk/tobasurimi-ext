@@ -361,7 +361,7 @@ class BiayaImpor extends BaseController
                 'company_id' => $this->this_company_id,
                 'divisi_id' => $this->request->getVar('divisi_id'),
                 'vendor_pelayaran_id' => $this->request->getVar('vendor_pelayaran_id'),
-                'po_id' => $this->request->getVar('po_id'),
+                'po_id' => !empty($this->request->getVar('po_id')) ? $this->request->getVar('po_id') : null,
                 'supplier_id' => $this->request->getVar('supplier_id'),
                 'tanggal_invoice' =>  $this->request->getVar("tanggal_invoice") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getVar("tanggal_invoice")))) : null,
                 'no_invoice' => $noInvoice,
@@ -458,7 +458,7 @@ class BiayaImpor extends BaseController
             $this->biayaImporModel->update($id, [
                 'divisi_id' => $this->request->getVar('divisi_id'),
                 'vendor_pelayaran_id' => $this->request->getVar('vendor_pelayaran_id'),
-                'po_id' => $this->request->getVar('po_id'),
+                'po_id' => !empty($this->request->getVar('po_id')) ? $this->request->getVar('po_id') : null,
                 'supplier_id' => $this->request->getVar('supplier_id'),
                 'tanggal_invoice' =>  $this->request->getVar("tanggal_invoice") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getVar("tanggal_invoice")))) : null,
                 'no_invoice' => $noInvoice,
