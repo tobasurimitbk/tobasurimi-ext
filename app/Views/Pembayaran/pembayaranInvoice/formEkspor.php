@@ -406,12 +406,22 @@
                         cancelButtonText: 'Kembali',
                     }).then((result) => {
                         if (result.isConfirmed) {
-                            let formData = new FormData(document.querySelector(".create-form"));
-                            formData.append('total_amount_invoice', destroyFormatRupiah($(".total-bayar").text()));
-                            formData.append('potongan', destroyFormatRupiah($(".potongan").text()));
+                            const form = document.querySelector(".create-form");
+                            const data = new FormData(form);
+                            // ambil value aslinya
+                            let totalBayar = form.querySelector('input[name="total_bayar"]').value;
+                            let potongan = form.querySelector('input[name="potongan"]').value;
+
+                            // convert pakai fungsi destroyFormatFunction (misal: "40.000" → 40000)
+                            totalBayar = destroyFormatRupiah(totalBayar);
+                            potongan = destroyFormatRupiah(potongan);
+
+                            // set ulang ke FormData biar yang terkirim udah bersih
+                            data.set("total_bayar", totalBayar);
+                            data.set("potongan", potongan);
                             $.ajax({
                                 url: "<?= base_url("/pembayaran-invoice/update"); ?>",
-                                data: formData,
+                                data: data,
                                 beforeSend: function(xhr) {
                                     setLoading();
                                     xhr.setRequestHeader('X-CSRF-Token', csrf.val());
@@ -470,9 +480,20 @@
                         cancelButtonText: 'Kembali',
                     }).then((result) => {
                         if (result.isConfirmed) {
-                            const data = new FormData(document.querySelector(".create-form"));
-                            data.append('total_amount_invoice', destroyFormatRupiah($(".total-bayar").text()));
-                            data.append('potongan', destroyFormatRupiah($(".potongan").text()));
+                            const form = document.querySelector(".create-form");
+                            const data = new FormData(form);
+                            // ambil value aslinya
+                            let totalBayar = form.querySelector('input[name="total_bayar"]').value;
+                            let potongan = form.querySelector('input[name="potongan"]').value;
+
+                            // convert pakai fungsi destroyFormatFunction (misal: "40.000" → 40000)
+                            totalBayar = destroyFormatRupiah(totalBayar);
+                            potongan = destroyFormatRupiah(potongan);
+
+                            // set ulang ke FormData biar yang terkirim udah bersih
+                            data.set("total_bayar", totalBayar);
+                            data.set("potongan", potongan);
+
                             $.ajax({
                                 url: "<?= base_url("pembayaran-invoice/save"); ?>",
                                 data: data,
@@ -685,7 +706,7 @@
         var numericValue = inputValue.replace(/[^0-9.]/g, '');
         numericValue = numericValue.replace(/^0+/g, '');
         numericValue = numericValue.replace(/^\./g, '0.');
-        if (parseFloat(numericValue) < 0 || isNaN(parseFloat(numericValue))) {
+        if (destroyFormatRupiah(numericValue) < 0 || isNaN(destroyFormatRupiah(numericValue))) {
             input.value = '0';
         } else {
             input.value = numericValue;
@@ -897,13 +918,13 @@
 
 
                 $(document).on("input", ".total-bayar, .potongan", function() {
-                    var potongan = $('.potongan').val() ? convertRupiahToNumber($('.potongan').val()) : 0;
+                    var potongan = destroyFormatRupiah($('.potongan').val()) ? destroyFormatRupiah($('.potongan').val()) : 0;
 
                     // hitung ulang limit_bayar dengan potongan
-                    var newLimit = parseFloat(grandTotal) - parseFloat(total_invoice) - parseFloat(potongan);
+                    var newLimit = destroyFormatRupiah(grandTotal) - destroyFormatRupiah(total_invoice) - destroyFormatRupiah(potongan);
 
                     // update attribute limitInputBayar pakai nilai baru
-                    $('input.total-bayar').attr('oninput', `limitInputBayar(this, ${newLimit})`);
+                    $('input.total-bayar').attr('oninput', `limitInputBayar(this, ${destroyFormatRupiah(newLimit)})`);
 
                     // kalau ada potongan valid, auto update total bayar
                     if ($('.potongan').val() !== "" && potongan > 0) {
