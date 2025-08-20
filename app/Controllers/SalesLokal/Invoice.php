@@ -1134,9 +1134,9 @@ class Invoice extends BaseController
             $customerName = $soData->customerName ?? "-";
             $customerAddress = $soData->customerAddress ?? "-";
         }
-        
+
         $itemList = $this->SalesOrderDetailModel->getItemListByIds($soId);
-        
+
         $itemListPosting = $this->SalesOrderDetailModel->getItemListPostingByIds($soId);
         $itemTax = $this->taxModel->where('id', '4')->asObject()->findAll();
 

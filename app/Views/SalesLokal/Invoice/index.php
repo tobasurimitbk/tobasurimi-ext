@@ -49,7 +49,7 @@
                         </div>
                         <div class="input-group-append" style="height:50px;">
                             <button disabled class="btn btn-secondary" type="button">
-                                <i class="fas fa-calendar-alt"></i>
+                                <i class="fas faucalendar-alt"></i>
                             </button>
                         </div>
                     </div>
@@ -127,41 +127,107 @@
     let list_address = [];
     let list_delete = [];
     var row = 0;
+    let table; // Deklarasi variabel table di luar document.ready
 
-    $('.filter_customer').select2({
-        placeholder: "Pilih Customer",
-        theme: "bootstrap-5",
-        allowClear: true,
-    });
+    // Fungsi untuk menyimpan state DataTable ke sessionStorage
+    function saveTableState() {
+        try {
+            const tableState = {
+                search: $(".search").val(),
+                sort: sort,
+                sortType: sortType,
+                dateStart: $(".dateStart").val(),
+                dateEnd: $(".dateEnd").val(),
+                filter_customer: $(".filter_customer").val(),
+                filter_jenis_dokumen: $(".filter_jenis_dokumen").val(),
+                page: table.page(),
+                length: table.page.len()
+            };
+            sessionStorage.setItem('invoicePenjualanLokalTableState', JSON.stringify(tableState));
+            console.log('State saved:', tableState);
+        } catch (e) {
+            console.error('Error saving table state:', e);
+        }
+    }
 
-    $('.filter_jenis_dokumen').select2({
-        placeholder: "Pilih Jenis Dokumen",
-        theme: "bootstrap-5",
-        allowClear: true,
-    });
+    // Fungsi untuk memuat state DataTable dari sessionStorage
+    function loadTableState() {
+        try {
+            const savedState = sessionStorage.getItem('invoicePenjualanLokalTableState');
+            if (savedState) {
+                const state = JSON.parse(savedState);
 
-    //CSS SELECT2 FLOATING LABEL
-    $('.filter_customer, .filter_jenis_dokumen')
-        .parent('div')
-        .children('span')
-        .children('span')
-        .children('span')
-        .css('height', ' calc(3.5rem + 2px)');
+                // Terapkan state yang disimpan
+                $(".search").val(state.search || '');
+                sort = state.sort || '';
+                sortType = state.sortType || 'desc';
+                $(".dateStart").val(state.dateStart || '');
+                $(".dateEnd").val(state.dateEnd || '');
 
-    $('.filter_customer, .filter_jenis_dokumen')
-        .parent('div')
-        .children('span')
-        .children('span')
-        .children('span')
-        .children('span')
-        .css('margin-top', '22px').css('margin-left', '-7px');
+                if (state.filter_customer) {
+                    $(".filter_customer").val(state.filter_customer).trigger('change');
+                }
 
-    $('.filter_customer, .filter_jenis_dokumen')
-        .parent('div')
-        .find('label')
-        .css('z-index', '1');
+                if (state.filter_jenis_dokumen) {
+                    $(".filter_jenis_dokumen").val(state.filter_jenis_dokumen).trigger('change');
+                }
+
+                // Hapus state setelah dimuat
+                sessionStorage.removeItem('invoicePenjualanLokalTableState');
+
+                console.log('State loaded:', state);
+                return state;
+            }
+        } catch (e) {
+            console.error('Error loading table state:', e);
+            sessionStorage.removeItem('invoicePenjualanLokalTableState');
+        }
+        return null;
+    }
 
     $(document).ready(function() {
+        // Cek dukungan sessionStorage
+        if (typeof(Storage) === "undefined") {
+            console.error("Browser doesn't support sessionStorage");
+            return;
+        }
+
+        // Muat state DataTable jika ada
+        const savedState = loadTableState();
+
+        $('.filter_customer').select2({
+            placeholder: "Pilih Customer",
+            theme: "bootstrap-5",
+            allowClear: true,
+        });
+
+        $('.filter_jenis_dokumen').select2({
+            placeholder: "Pilih Jenis Dokumen",
+            theme: "bootstrap-5",
+            allowClear: true,
+        });
+
+        //CSS SELECT2 FLOATING LABEL
+        $('.filter_customer, .filter_jenis_dokumen')
+            .parent('div')
+            .children('span')
+            .children('span')
+            .children('span')
+            .css('height', ' calc(3.5rem + 2px)');
+
+        $('.filter_customer, .filter_jenis_dokumen')
+            .parent('div')
+            .children('span')
+            .children('span')
+            .children('span')
+            .children('span')
+            .css('margin-top', '22px').css('margin-left', '-7px');
+
+        $('.filter_customer, .filter_jenis_dokumen')
+            .parent('div')
+            .find('label')
+            .css('z-index', '1');
+
         $(".dateStart").datepicker({
             todayHighlight: true,
             format: "dd/mm/yyyy",
@@ -184,6 +250,160 @@
             $(".dateEnd").focus();
         });
 
+        // Inisialisasi DataTable
+        table = $('.dataTable').DataTable({
+            processing: true,
+            serverSide: true,
+            ordering: true,
+            order: [
+                [1, 'asc']
+            ],
+            fixedHeader: true,
+            lengthMenu: [
+                [25],
+                [25],
+            ],
+            pageLength: 25,
+            ajax: {
+                url: "<?= base_url("invoice-penjualan-lokal/all"); ?>",
+                dataSrc: "data",
+                data: function(data) {
+                    data.search = $(".search").val();
+                    data.sort = sort;
+                    data.sortType = sortType;
+                    data.dateStart = $(".dateStart").val();
+                    data.dateEnd = $(".dateEnd").val();
+                    data.filter_customer = $(".filter_customer").val();
+                    data.filter_jenis_dokumen = $(".filter_jenis_dokumen").val();
+                }
+            },
+            // scrollX: true,
+            "initComplete": function(settings, json) {
+                $('.dataTables_length').empty();
+                $('.dataTables_length').html("<div><label class='text-center ml-2 mt-2'>Show <b class='entries-label'>25</b> Entries</label></div>");
+                $('.dataTable').wrap("<div style='overflow:auto; width:100%;position:relative;'></div>");
+
+                // Setel halaman yang disimpan setelah DataTable selesai dimuat
+                if (savedState && savedState.page !== undefined) {
+                    setTimeout(() => {
+                        table.page(savedState.page).draw('page');
+                    }, 100);
+                }
+            },
+            //responsive: true,
+            display: "stripe",
+            searching: false,
+            columns: [{
+                    data: "no",
+                    className: "text-center",
+                    sortable: false
+                },
+                {
+                    data: "no_faktur",
+                    className: "text-center"
+                },
+                {
+                    data: "tanggal_faktur",
+                    className: "text-center"
+                },
+                {
+                    data: "nama_pelanggan",
+                    className: "text-center"
+                },
+                {
+                    data: "nama_sales",
+                    className: "text-center"
+                },
+                {
+                    data: "tipe_invoice",
+                    className: "text-center"
+                },
+                {
+                    data: "document_type",
+                    className: "text-center"
+                },
+                {
+                    data: "document_no",
+                    className: "text-center"
+                },
+                {
+                    data: "total_invoice",
+                    className: "text-center"
+                },
+                {
+                    data: "status_pembayaran",
+                    className: "text-center"
+                },
+                {
+                    data: "status",
+                    className: "text-center"
+                },
+                {
+                    data: "counter_print",
+                    className: "text-center",
+                    render: function(data, type, row) {
+                        if (data && data != 0) {
+                            return "<i class='fa fa-check' aria-hidden='true' style='color:green;'></i>";
+                        } else { // Otherwise, display a dash "-"
+                            return "<i class='fa fa-minus' aria-hidden='true' style='color:red;'></i>";
+                        }
+                    }
+                },
+                {
+                    data: "id",
+                    className: "text-center actions sticky-col",
+                    searchable: false,
+                    sortable: false,
+                    render: function(data, type, row) {
+                        let id = row.id;
+                        let status = row.status
+                        let btn_print = '';
+                        let btn_delete = '';
+
+                        <?php if (can('Penjualan Lokal', 'Faktur Penjualan', 'p')): ?>
+                            btn_print = `
+                                <button data-toggle="tooltip" title="Print" class="btn btn-warning btn-print" onclick="print('<?= base_url("invoice-penjualan-lokal/print/"); ?>${id}')" style="box-shadow: none !important;">
+                                    <i class="fa fa-print fa-sm" aria-hidden="true"></i>
+                                </button>
+                            `;
+                        <?php endif; ?>
+
+                        <?php if (can('Penjualan Lokal', 'Faktur Penjualan', 'd')): ?>
+                            btn_delete = `
+                                <button type="button" onclick="handleDelete('${id}')" class="btn btn-discard delete-btn btn-trash"><i class="fa fa-trash"></i></button>
+                            `;
+                        <?php endif; ?>
+
+                        <?php if (can('Penjualan Lokal', 'Faktur Penjualan', 'u')) : ?>
+                            btn_edit = `
+                            <a href="javascript:void(0)" onclick="edit('${id}')" data-toggle="tooltip" title="Edit" class="btn btn-primary">
+                                <i class="fas fa-edit"></i>
+                            </a>`;
+                        <?php endif; ?>
+
+                        if (status == "WAITING") {
+                            return `${btn_edit}${btn_print}${btn_delete}`;
+                        } else {
+                            return `${btn_edit}${btn_print}`;
+                        }
+                    }
+                }
+            ],
+            columnDefs: [{
+                defaultContent: "-",
+                targets: "_all"
+            }],
+            language: {
+                emptyTable: "Tidak Ada Data",
+                lengthMenu: "Show _MENU_ entries",
+                paginate: {
+                    previous: '<i class="fa fa-angle-left"></i>',
+                    next: '<i class="fa fa-angle-right"></i>'
+                }
+            }
+        });
+
+        // Event handlers setelah DataTable diinisialisasi
         $(".search").keyup(function() {
             table.ajax.reload();
         })
@@ -207,154 +427,11 @@
         });
     })
 
-    const table = $('.dataTable').DataTable({
-
-        processing: true,
-        serverSide: true,
-        ordering: true,
-        order: [
-            [1, 'asc']
-        ],
-        fixedHeader: true,
-        lengthMenu: [
-            [25],
-            [25],
-        ],
-        pageLength: 25,
-        ajax: {
-            url: "<?= base_url("invoice-penjualan-lokal/all"); ?>",
-            dataSrc: "data",
-            data: function(data) {
-                data.search = $(".search").val();
-                data.sort = sort;
-                data.sortType = sortType;
-                data.dateStart = $(".dateStart").val();
-                data.dateEnd = $(".dateEnd").val();
-                data.filter_customer = $(".filter_customer").val();
-                data.filter_jenis_dokumen = $(".filter_jenis_dokumen").val();
-            }
-        },
-        // scrollX: true,
-        "initComplete": function(settings, json) {
-            $('.dataTables_length').empty();
-            $('.dataTables_length').html("<div><label class='text-center ml-2 mt-2'>Show <b class='entries-label'>25</b> Entries</label></div>");
-            $('.dataTable').wrap("<div style='overflow:auto; width:100%;position:relative;'></div>");
-        },
-        //responsive: true,
-        display: "stripe",
-        searching: false,
-        columns: [{
-                data: "no",
-                className: "text-center",
-                sortable: false
-            },
-            {
-                data: "no_faktur",
-                className: "text-center"
-            },
-            {
-                data: "tanggal_faktur",
-                className: "text-center"
-            },
-            {
-                data: "nama_pelanggan",
-                className: "text-center"
-            },
-            {
-                data: "nama_sales",
-                className: "text-center"
-            },
-            {
-                data: "tipe_invoice",
-                className: "text-center"
-            },
-            {
-                data: "document_type",
-                className: "text-center"
-            },
-            {
-                data: "document_no",
-                className: "text-center"
-            },
-            {
-                data: "total_invoice",
-                className: "text-center"
-            },
-            {
-                data: "status_pembayaran",
-                className: "text-center"
-            },
-            {
-                data: "status",
-                className: "text-center"
-            },
-            {
-                data: "counter_print",
-                className: "text-center",
-                render: function(data, type, row) {
-                    if (data && data != 0) {
-                        return "<i class='fa fa-check' aria-hidden='true' style='color:green;'></i>";
-                    } else { // Otherwise, display a dash "-"
-                        return "<i class='fa fa-minus' aria-hidden='true' style='color:red;'></i>";
-                    }
-                }
-            },
-            {
-                data: "id",
-                className: "text-center actions sticky-col",
-                searchable: false,
-                sortable: false,
-                render: function(data, type, row) {
-                    let id = row.id;
-                    let status = row.status
-                    let btn_print = '';
-                    let btn_delete = '';
-
-                    <?php if (can('Penjualan Lokal', 'Faktur Penjualan', 'p')): ?>
-                        btn_print = `
-                            <button data-toggle="tooltip" title="Print" class="btn btn-warning btn-print" onclick="print('<?= base_url("invoice-penjualan-lokal/print/"); ?>${id}')" style="box-shadow: none !important;">
-                                <i class="fa fa-print fa-sm" aria-hidden="true"></i>
-                            </button>
-                        `;
-                    <?php endif; ?>
-
-                    <?php if (can('Penjualan Lokal', 'Faktur Penjualan', 'd')): ?>
-                        btn_delete = `
-                            <button type="button" onclick="handleDelete('${id}')" class="btn btn-discard delete-btn btn-trash"><i class="fa fa-trash"></i></button>
-                        `;
-                    <?php endif; ?>
-
-                    <?php if (can('Penjualan Lokal', 'Faktur Penjualan', 'u')) : ?>
-                        btn_edit = `
-                        <a href="javascript:void(0)" onclick="edit('${id}')" data-toggle="tooltip" title="Edit" class="btn btn-primary">
-                            <i class="fas fa-edit"></i>
-                        </a>`;
-                    <?php endif; ?>
-
-
-                    if (status == "WAITING") {
-                        return `${btn_edit}${btn_print}${btn_delete}`;
-                    } else {
-                        return `${btn_edit}${btn_print}`;
-
-                    }
-
-                }
-            }
-        ],
-        columnDefs: [{
-            defaultContent: "-",
-            targets: "_all"
-        }],
-        language: {
-            emptyTable: "Tidak Ada Data",
-            lengthMenu: "Show _MENU_ entries",
-            paginate: {
-                previous: '<i class="fa fa-angle-left"></i>',
-                next: '<i class="fa fa-angle-right"></i>'
-            }
-        }
-    });
+    // Simpan state sebelum navigasi
+    function edit(id) {
+        saveTableState();
+        location.replace(`<?= base_url("invoice-penjualan-lokal/id"); ?>/${id}`);
+    }
 
     // delete
     function handleDelete(id) {
@@ -477,14 +554,11 @@
         } else {
             sortType = sortType === "asc" ? "desc" : "asc";
         }
+        table.ajax.reload();
     }
 
     const print = function(url) {
         window.open(url, "_blank");
-    }
-
-    function edit(id) {
-        location.replace(`<?= base_url("invoice-penjualan-lokal/id"); ?>/${id}`);
     }
 </script>
 <?= $this->endSection(); ?>

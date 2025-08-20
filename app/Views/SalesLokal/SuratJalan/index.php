@@ -123,40 +123,106 @@
     let list_address = [];
     let list_delete = [];
     var row = 0;
+    let table; // Deklarasi variabel table di luar document.ready
 
-    $('.filter_customer').select2({
-        placeholder: "Pilih Customer",
-        theme: "bootstrap-5",
-        allowClear: true,
-    });
+    // Fungsi untuk menyimpan state DataTable ke sessionStorage
+    function saveTableState() {
+        try {
+            const tableState = {
+                search: $(".search").val(),
+                sort: sort,
+                sortType: sortType,
+                dateStart: $(".dateStart").val(),
+                dateEnd: $(".dateEnd").val(),
+                filter_customer: $(".filter_customer").val(),
+                filter_invoice: $(".filter_invoice").val(),
+                page: table.page(),
+                length: table.page.len()
+            };
+            sessionStorage.setItem('suratJalanTableState', JSON.stringify(tableState));
+            console.log('State saved:', tableState);
+        } catch (e) {
+            console.error('Error saving table state:', e);
+        }
+    }
 
-    $('.filter_invoice').select2({
-        placeholder: "Pilih Invoice",
-        theme: "bootstrap-5",
-        allowClear: true,
-    });
-    //CSS SELECT2 FLOATING LABEL
-    $('.filter_customer, .filter_invoice')
-        .parent('div')
-        .children('span')
-        .children('span')
-        .children('span')
-        .css('height', ' calc(3.5rem + 2px)');
+    // Fungsi untuk memuat state DataTable dari sessionStorage
+    function loadTableState() {
+        try {
+            const savedState = sessionStorage.getItem('suratJalanTableState');
+            if (savedState) {
+                const state = JSON.parse(savedState);
 
-    $('.filter_customer, .filter_invoice')
-        .parent('div')
-        .children('span')
-        .children('span')
-        .children('span')
-        .children('span')
-        .css('margin-top', '22px').css('margin-left', '-7px');
+                // Terapkan state yang disimpan
+                $(".search").val(state.search || '');
+                sort = state.sort || '';
+                sortType = state.sortType || 'desc';
+                $(".dateStart").val(state.dateStart || '');
+                $(".dateEnd").val(state.dateEnd || '');
 
-    $('.filter_customer, .filter_invoice')
-        .parent('div')
-        .find('label')
-        .css('z-index', '1');
+                if (state.filter_customer) {
+                    $(".filter_customer").val(state.filter_customer).trigger('change');
+                }
+
+                if (state.filter_invoice) {
+                    $(".filter_invoice").val(state.filter_invoice).trigger('change');
+                }
+
+                // Hapus state setelah dimuat
+                sessionStorage.removeItem('suratJalanTableState');
+
+                console.log('State loaded:', state);
+                return state;
+            }
+        } catch (e) {
+            console.error('Error loading table state:', e);
+            sessionStorage.removeItem('suratJalanTableState');
+        }
+        return null;
+    }
 
     $(document).ready(function() {
+        // Cek dukungan sessionStorage
+        if (typeof(Storage) === "undefined") {
+            console.error("Browser doesn't support sessionStorage");
+            return;
+        }
+
+        // Muat state DataTable jika ada
+        const savedState = loadTableState();
+
+        $('.filter_customer').select2({
+            placeholder: "Pilih Customer",
+            theme: "bootstrap-5",
+            allowClear: true,
+        });
+
+        $('.filter_invoice').select2({
+            placeholder: "Pilih Invoice",
+            theme: "bootstrap-5",
+            allowClear: true,
+        });
+
+        //CSS SELECT2 FLOATING LABEL
+        $('.filter_customer, .filter_invoice')
+            .parent('div')
+            .children('span')
+            .children('span')
+            .children('span')
+            .css('height', ' calc(3.5rem + 2px)');
+
+        $('.filter_customer, .filter_invoice')
+            .parent('div')
+            .children('span')
+            .children('span')
+            .children('span')
+            .children('span')
+            .css('margin-top', '22px').css('margin-left', '-7px');
+
+        $('.filter_customer, .filter_invoice')
+            .parent('div')
+            .find('label')
+            .css('z-index', '1');
 
         $(".dateStart").datepicker({
             todayHighlight: true,
@@ -180,6 +246,160 @@
             $(".dateEnd").focus();
         });
 
+        // Inisialisasi DataTable
+        table = $('.dataTable').DataTable({
+            processing: true,
+            serverSide: true,
+            ordering: true,
+            order: [
+                [1, 'asc']
+            ],
+            fixedHeader: true,
+            lengthMenu: [
+                [25],
+                [25],
+            ],
+            pageLength: 25,
+            ajax: {
+                url: "<?= base_url("surat-jalan/all"); ?>",
+                dataSrc: "data",
+                data: function(data) {
+                    data.search = $(".search").val();
+                    data.sort = sort;
+                    data.sortType = sortType;
+                    data.dateStart = $(".dateStart").val();
+                    data.dateEnd = $(".dateEnd").val();
+                    data.filter_customer = $(".filter_customer").val();
+                    data.filter_invoice = $(".filter_invoice").val();
+                }
+            },
+            // scrollX: true,
+            "initComplete": function(settings, json) {
+                $('.dataTables_length').empty();
+                $('.dataTables_length').html("<div><label class='text-center ml-2 mt-2'>Show <b class='entries-label'>25</b> Entries</label></div>");
+                $('.dataTable').wrap("<div style='overflow:auto; width:100%;position:relative;'></div>");
+
+                // Setel halaman yang disimpan setelah DataTable selesai dimuat
+                if (savedState && savedState.page !== undefined) {
+                    setTimeout(() => {
+                        table.page(savedState.page).draw('page');
+                    }, 100);
+                }
+            },
+            //responsive: true,
+            display: "stripe",
+            searching: false,
+            columns: [{
+                data: "no",
+                className: "text-center",
+                sortable: false
+            }, {
+                data: "no_surat_jalan",
+                className: "text-center"
+            }, {
+                data: "nama_pelanggan",
+                className: "text-center"
+            }, {
+                data: "customerSales",
+                className: "text-center"
+            }, {
+                data: "tipe_sales_order",
+                className: "text-center"
+            }, {
+                data: "shipping_date",
+                className: "text-center"
+            }, {
+                data: "sales_order_invoice_id",
+                className: "text-center",
+                render: function(data, type, row) {
+                    if (data && data !== "") {
+                        return "<i class='fa fa-check' aria-hidden='true' style='color:green;'></i>";
+                    } else { // Otherwise, display a dash "-"
+                        return "<i class='fa fa-minus' aria-hidden='true' style='color:red;'></i>";
+                    }
+                }
+            }, {
+                data: "print",
+                className: "text-center",
+                render: function(data, type, row) {
+                    if (data && data !== "0") {
+                        return "<i class='fa fa-check' aria-hidden='true' style='color:green;'></i>";
+                    } else { // Otherwise, display a dash "-"
+                        return "<i class='fa fa-minus' aria-hidden='true' style='color:red;'></i>";
+                    }
+                }
+            }, {
+                data: "total_harga",
+                className: "text-center",
+                render: function(data, type, row) {
+                    return greatFormatRupiah(destroyFormatRupiah(data));
+                }
+            }, {
+                data: "id",
+                className: "text-center actions sticky-col",
+                searchable: false,
+                sortable: false,
+                render: function(data, type, row) {
+                    let id = row.id;
+                    let btn_delete = ``;
+                    let btn_print = ``;
+                    let btn_posting = ``;
+                    let btn_edit = ``;
+
+                    <?php if (can('Penjualan Lokal', 'Surat Jalan', 'p')): ?>
+                        btn_print = `
+                            <button data-toggle="tooltip" title="Print" class="btn btn-warning btn-print" onclick="print('<?= base_url("surat-jalan/print/"); ?>${id}')" style="box-shadow: none !important;">
+                                <i class="fa fa-print fa-sm" aria-hidden="true"></i>
+                            </button>
+                            `;
+                    <?php endif; ?>
+
+                    <?php if (can('Penjualan Lokal', 'Surat Jalan', 'd')): ?>
+                        btn_delete = `
+                            <button type="button" onclick="handleDelete('${id}')" class="btn btn-discard delete-btn btn-trash"><i class="fa fa-trash"></i></button>
+                            `;
+                    <?php endif; ?>
+
+                    // Cek nilai kolom posting
+                    if (row.posting == 0) {
+                        btn_posting = `
+                            <button data-toggle="tooltip" title="posting" onclick="posting('${id}', '1')" class="btn btn-success posting-btn">
+                                <i class="fa fa-paper-plane"></i>
+                            </button>
+                        `;
+                    } else {
+                        btn_posting = `
+                             <button data-toggle="tooltip" title="Unposting" onclick="posting('${id}', '0')" class="btn btn-danger unposting-btn">
+                                <i class="fa fa-undo"></i>
+                            </button>
+                        `;
+                    }
+
+                    <?php if (can('Penjualan Lokal', 'Surat Jalan', 'u')) : ?>
+                        btn_edit = `
+                        <a href="javascript:void(0)" onclick="edit('${id}')" data-toggle="tooltip" title="Edit" class="btn btn-primary">
+                            <i class="fas fa-edit"></i>
+                        </a>`;
+                    <?php endif; ?>
+
+                    return `${btn_edit}${btn_print}${btn_delete}${btn_posting}`;
+                }
+            }],
+            columnDefs: [{
+                defaultContent: "-",
+                targets: "_all"
+            }],
+            language: {
+                emptyTable: "Tidak Ada Data",
+                lengthMenu: "Show _MENU_ entries",
+                paginate: {
+                    previous: '<i class="fa fa-angle-left"></i>',
+                    next: '<i class="fa fa-angle-right"></i>'
+                }
+            }
+        });
+
+        // Event handlers setelah DataTable diinisialisasi
         $(".search").keyup(function() {
             table.ajax.reload();
         })
@@ -203,150 +423,11 @@
         });
     })
 
-    const table = $('.dataTable').DataTable({
-
-        processing: true,
-        serverSide: true,
-        ordering: true,
-        order: [
-            [1, 'asc']
-        ],
-        fixedHeader: true,
-        lengthMenu: [
-            [25],
-            [25],
-        ],
-        pageLength: 25,
-        ajax: {
-            url: "<?= base_url("surat-jalan/all"); ?>",
-            dataSrc: "data",
-            data: function(data) {
-                data.search = $(".search").val();
-                data.sort = sort;
-                data.sortType = sortType;
-                data.dateStart = $(".dateStart").val();
-                data.dateEnd = $(".dateEnd").val();
-                data.filter_customer = $(".filter_customer").val();
-                data.filter_invoice = $(".filter_invoice").val();
-            }
-        },
-        // scrollX: true,
-        "initComplete": function(settings, json) {
-            $('.dataTables_length').empty();
-            $('.dataTables_length').html("<div><label class='text-center ml-2 mt-2'>Show <b class='entries-label'>25</b> Entries</label></div>");
-            $('.dataTable').wrap("<div style='overflow:auto; width:100%;position:relative;'></div>");
-        },
-        //responsive: true,
-        display: "stripe",
-        searching: false,
-        columns: [{
-            data: "no",
-            className: "text-center",
-            sortable: false
-        }, {
-            data: "no_surat_jalan",
-            className: "text-center"
-        }, {
-            data: "nama_pelanggan",
-            className: "text-center"
-        }, {
-            data: "customerSales",
-            className: "text-center"
-        }, {
-            data: "tipe_sales_order",
-            className: "text-center"
-        }, {
-            data: "shipping_date",
-            className: "text-center"
-        }, {
-            data: "sales_order_invoice_id",
-            className: "text-center",
-            render: function(data, type, row) {
-                if (data && data !== "") {
-                    return "<i class='fa fa-check' aria-hidden='true' style='color:green;'></i>";
-                } else { // Otherwise, display a dash "-"
-                    return "<i class='fa fa-minus' aria-hidden='true' style='color:red;'></i>";
-                }
-            }
-        }, {
-            data: "print",
-            className: "text-center",
-            render: function(data, type, row) {
-                if (data && data !== "0") {
-                    return "<i class='fa fa-check' aria-hidden='true' style='color:green;'></i>";
-                } else { // Otherwise, display a dash "-"
-                    return "<i class='fa fa-minus' aria-hidden='true' style='color:red;'></i>";
-                }
-            }
-        }, {
-            data: "total_harga",
-            className: "text-center",
-            render: function(data, type, row) {
-                return greatFormatRupiah(destroyFormatRupiah(data));
-            }
-        }, {
-            data: "id",
-            className: "text-center actions sticky-col",
-            searchable: false,
-            sortable: false,
-            render: function(data, type, row) {
-                let id = row.id;
-                let btn_delete = ``;
-                let btn_print = ``;
-                let btn_posting = ``;
-
-                <?php if (can('Penjualan Lokal', 'Surat Jalan', 'p')): ?>
-                    btn_print = `
-                        <button data-toggle="tooltip" title="Print" class="btn btn-warning btn-print" onclick="print('<?= base_url("surat-jalan/print/"); ?>${id}')" style="box-shadow: none !important;">
-                            <i class="fa fa-print fa-sm" aria-hidden="true"></i>
-                        </button>
-                        `;
-                <?php endif; ?>
-
-                <?php if (can('Penjualan Lokal', 'Surat Jalan', 'd')): ?>
-                    btn_delete = `
-                        <button type="button" onclick="handleDelete('${id}')" class="btn btn-discard delete-btn btn-trash"><i class="fa fa-trash"></i></button>
-                        `;
-                <?php endif; ?>
-
-                // Cek nilai kolom posting
-                if (row.posting == 0) {
-                    btn_posting = `
-                        <button data-toggle="tooltip" title="posting" onclick="posting('${id}', '1')" class="btn btn-success posting-btn">
-                            <i class="fa fa-paper-plane"></i>
-                        </button>
-                    `;
-                } else {
-                    btn_posting = `
-                         <button data-toggle="tooltip" title="Unposting" onclick="posting('${id}', '0')" class="btn btn-danger unposting-btn">
-                            <i class="fa fa-undo"></i>
-                        </button>
-                    `;
-                }
-
-                <?php if (can('Penjualan Lokal', 'Surat Jalan', 'u')) : ?>
-                    btn_edit = `
-                    <a href="<?= base_url("surat-jalan/id"); ?>/${id}" data-toggle="tooltip" title="Edit" class="btn btn-primary">
-                        <i class="fas fa-edit"></i>
-                    </a>`;
-                <?php endif; ?>
-
-                return `${btn_edit}${btn_print}${btn_delete}${btn_posting}`;
-            }
-        }],
-        columnDefs: [{
-            defaultContent: "-",
-            targets: "_all"
-        }],
-        language: {
-            emptyTable: "Tidak Ada Data",
-            lengthMenu: "Show _MENU_ entries",
-            paginate: {
-                previous: '<i class="fa fa-angle-left"></i>',
-                next: '<i class="fa fa-angle-right"></i>'
-            }
-        }
-    });
+    // Simpan state sebelum navigasi
+    function edit(id) {
+        saveTableState();
+        location.replace(`<?= base_url("surat-jalan/id"); ?>/${id}`);
+    }
 
     // delete
     function handleDelete(id) {
@@ -476,14 +557,11 @@
         } else {
             sortType = sortType === "asc" ? "desc" : "asc";
         }
+        table.ajax.reload();
     }
 
     const print = function(url) {
         window.open(url, "_blank");
-    }
-
-    function edit(id) {
-        location.replace(`<?= base_url("surat-jalan/id"); ?>/${id}`);
     }
 </script>
 <?= $this->endSection(); ?>
