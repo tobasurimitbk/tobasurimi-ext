@@ -202,46 +202,72 @@
 
     // Fungsi untuk menyimpan state DataTable ke sessionStorage
     function saveTableState() {
-        const tableState = {
-            search: $(".search").val(),
-            sort: sort,
-            sortType: sortType,
-            dateStart: $(".dateStart").val(),
-            dateEnd: $(".dateEnd").val(),
-            filter_customer: $(".filter_customer").val(),
-            filter_surat_jalan: $(".filter_surat_jalan").val(),
-            filter_invoice: $(".filter_invoice").val(),
-            page: table.page(),
-            length: table.page.len()
-        };
-        sessionStorage.setItem('orderFormTableState', JSON.stringify(tableState));
+        try {
+            const tableState = {
+                search: $(".search").val(),
+                sort: sort,
+                sortType: sortType,
+                dateStart: $(".dateStart").val(),
+                dateEnd: $(".dateEnd").val(),
+                filter_customer: $(".filter_customer").val(),
+                filter_surat_jalan: $(".filter_surat_jalan").val(),
+                filter_invoice: $(".filter_invoice").val(),
+                page: table.page(),
+                length: table.page.len()
+            };
+            sessionStorage.setItem('orderFormTableState', JSON.stringify(tableState));
+            console.log('State saved:', tableState);
+        } catch (e) {
+            console.error('Error saving table state:', e);
+        }
     }
 
     // Fungsi untuk memuat state DataTable dari sessionStorage
     function loadTableState() {
-        const savedState = sessionStorage.getItem('orderFormTableState');
-        if (savedState) {
-            const state = JSON.parse(savedState);
-            
-            // Terapkan state yang disimpan
-            $(".search").val(state.search);
-            sort = state.sort;
-            sortType = state.sortType;
-            $(".dateStart").val(state.dateStart);
-            $(".dateEnd").val(state.dateEnd);
-            $(".filter_customer").val(state.filter_customer).trigger('change');
-            $(".filter_surat_jalan").val(state.filter_surat_jalan).trigger('change');
-            $(".filter_invoice").val(state.filter_invoice).trigger('change');
-            
-            // Hapus state setelah dimuat
+        try {
+            const savedState = sessionStorage.getItem('orderFormTableState');
+            if (savedState) {
+                const state = JSON.parse(savedState);
+                
+                // Terapkan state yang disimpan
+                $(".search").val(state.search || '');
+                sort = state.sort || '';
+                sortType = state.sortType || 'desc';
+                $(".dateStart").val(state.dateStart || '');
+                $(".dateEnd").val(state.dateEnd || '');
+                
+                if (state.filter_customer) {
+                    $(".filter_customer").val(state.filter_customer).trigger('change');
+                }
+                
+                if (state.filter_surat_jalan) {
+                    $(".filter_surat_jalan").val(state.filter_surat_jalan).trigger('change');
+                }
+                
+                if (state.filter_invoice) {
+                    $(".filter_invoice").val(state.filter_invoice).trigger('change');
+                }
+                
+                // Hapus state setelah dimuat
+                sessionStorage.removeItem('orderFormTableState');
+                
+                console.log('State loaded:', state);
+                return state;
+            }
+        } catch (e) {
+            console.error('Error loading table state:', e);
             sessionStorage.removeItem('orderFormTableState');
-            
-            return state;
         }
         return null;
     }
 
     $(document).ready(function() {
+        // Cek dukungan sessionStorage
+        if (typeof(Storage) === "undefined") {
+            console.error("Browser doesn't support sessionStorage");
+            return;
+        }
+
         // Muat state DataTable jika ada
         const savedState = loadTableState();
         
@@ -341,12 +367,10 @@
                 $('.dataTable').wrap("<div style='overflow:auto; width:100%;position:relative;'></div>");
                 
                 // Setel halaman yang disimpan setelah DataTable selesai dimuat
-                if (savedState) {
-                    if (savedState.page !== undefined) {
-                        setTimeout(() => {
-                            table.page(savedState.page).draw('page');
-                        }, 100);
-                    }
+                if (savedState && savedState.page !== undefined) {
+                    setTimeout(() => {
+                        table.page(savedState.page).draw('page');
+                    }, 100);
                 }
             },
             //responsive: true,
@@ -432,7 +456,7 @@
                         if (posting == 0) {
                             return `
                                 <?php if (can('Penjualan Lokal', 'Order Form', 'u')) : ?>
-                                    <a href="<?= base_url("order-form-lokal/id"); ?>/${id}" data-toggle="tooltip" title="Edit" class="btn btn-primary">
+                                    <a href="javascript:void(0)" onclick="edit('${id}')" data-toggle="tooltip" title="Edit" class="btn btn-primary">
                                         <i class="fas fa-edit"></i>
                                     </a>
                                 <?php endif; ?>
@@ -452,7 +476,7 @@
                         } else {
                             return `
                                 <?php if (can('Penjualan Lokal', 'Order Form', 'u')) : ?>
-                                    <a href="<?= base_url("order-form-lokal/id"); ?>/${id}" data-toggle="tooltip" title="Edit" class="btn btn-primary">
+                                    <a href="javascript:void(0)" onclick="edit('${id}')" data-toggle="tooltip" title="Edit" class="btn btn-primary">
                                         <i class="fas fa-edit"></i>
                                     </a>
                                 <?php endif; ?>
