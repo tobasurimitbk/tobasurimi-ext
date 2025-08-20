@@ -390,10 +390,6 @@ class SupplierLokalModel extends Model
             ->where('supplier_lokals.deletedAt', null)
             ->where('supplier_lokals.tipe_customer', 'LOKAL');
 
-        if (!$is_admin) {
-            $query->where('supplier_lokals.user_id', $user_id);
-        }
-
         return $query->orderBy('createdAt', "DESC")->findAll();
     }
 

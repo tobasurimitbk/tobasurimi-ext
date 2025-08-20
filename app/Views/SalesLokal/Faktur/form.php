@@ -79,13 +79,8 @@
                                     }
                                     ?>
                                 </select>
-                                <label for="floatingInput">Nama Supplier Lokal</label>
+                                <label for="floatingInput">Nama Vendor Lokal</label>
                             </div>
-                            <!-- <div class="input-group-append" style="height:50px;">
-                                <button class="btn btn-success btn-customer-add <?= !empty($data) ? ((($data->used == "USED") or ($data->surat_jalan_so_id != NULL) or ($data->sales_order_invoice_id != NULL)) ? 'disabled' : '') : '' ?>" id="btn-customer-add" data-toggle="modal" type="button" <?= (!empty($data) && $data->posting == 1) ? 'disabled' : '' ?>>
-                                    <i class="fas fa-plus"></i>
-                                </button>
-                            </div> -->
                         </div>
                     </div>
                 </div>
@@ -849,7 +844,7 @@
         })
         // Customer
         $('.id_customer').select2({
-            placeholder: "Pilih Nama Supplier Lokal",
+            placeholder: "Pilih Nama Vendor Lokal",
             allowClear: true,
             theme: "bootstrap-5"
         }).change(function() {
