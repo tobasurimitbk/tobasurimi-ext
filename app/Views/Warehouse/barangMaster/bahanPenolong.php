@@ -53,10 +53,10 @@
                                 <th class="sort" style="text-align:left;">Harga Terakhir</th>
                                 <th class="sort" style="text-align:left;">Supplier Terakhir</th>
                                 <th class="sort" style="text-align:center;">Akun COA</th>
-                                <th class="sort" style="text-align: center;">Histori</th>
+                                <th class="sort" style="text-align: center;">Action</th>
                             </tr>
                         </thead>
-                        <tbody class="body-table" id="body-table" style="cursor: pointer;">
+                        <tbody class="body-table" id="body-table">
                         </tbody>
                     </table>
                 </div>
@@ -469,17 +469,34 @@
                 searchable: false,
                 sortable: false,
                 render: function(data, type, row) {
+                    let id = row.id;
+                    let spesifikasi_id = row.spesifikasi_id;
+
                     return `
-                    <div class="mt-0 actions">
-                        <button onclick="displayHistory('${row.spesifikasi_id}')" class="btn btn-success posting-spp actions">
+                        <?php if (can('Master Barang', 'Bahan Penolong', 'u')) : ?>
+                            <a href="javascript:void(0)" onclick="edit('${id}')" data-toggle="tooltip" title="Edit" class="btn btn-primary">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                        <?php endif; ?>
+                         <?php if (can('Master Barang', 'Bahan Penolong', 'd')) : ?>
+                            <button data-toggle="tooltip" title="Hapus" onclick="removeSpek('${spesifikasi_id}')" class="btn btn-danger delete-parent">
+                                <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
+                            </button>
+                        <?php endif; ?>
+                           <button onclick="displayHistory('${row.spesifikasi_id}')" class="btn btn-success posting-spp actions" data-toggle="tooltip" title="Histori">
                             <i class="fa-solid fa-clock-rotate-left"></i>
                         </button>
-                    </div>
-                `
+                    `
                 }
             }
 
         ],
+        "drawCallback": function(settings) {
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-toggle="tooltip"]'))
+            var tooltipList = tooltipTriggerList.map(function(tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl)
+            });
+        },
         columnDefs: [{
             defaultContent: "-",
             targets: "_all"
@@ -567,64 +584,64 @@
         });
 
 
-        $('#dataTable tbody').on('click', 'tr td:not(.actions):not(.dataTables_empty)', function() {
-            let data = table.row(this).data();
-            let id = data.id;
-            let csrf = $(`[name="${csrfToken}"]`);
-            $(".create-form :input:not([name='type'])").val('');
-            $.ajax({
-                url: "<?= base_url('barang-master/get') ?>",
-                data: {
-                    id: id
-                },
-                beforeSend: function(xhr) {
-                    xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                },
-                method: "POST",
-                dataType: "json",
-                success: function(res) {
-                    $('.delete-btn').show();
-                    $('.title-name').text("Update Bahan Penolong");
-                    <?php if (!can('Master Barang', 'Bahan Penolong', 'u')) : ?>
-                        $('.btn-submit-master-barang').hide();
-                    <?php endif; ?>
-                    // $('input[name="kode_barang"]').attr('readonly', true);
-                    $('#generate_new_code').hide();
-                    $('input[name="kode_barang"]').val(res.data.kode_barang);
-                    $('select[name="parent_type_id"]').val(res.data.parent_type_id).change();
-                    $('input[name="barang_name"]').val(res.data.barang_name);
-                    $('input[name="id"]').val(res.data.id);
+        // $('#dataTable tbody').on('click', 'tr td:not(.actions):not(.dataTables_empty)', function() {
+        //     let data = table.row(this).data();
+        //     let id = data.id;
+        //     let csrf = $(`[name="${csrfToken}"]`);
+        //     $(".create-form :input:not([name='type'])").val('');
+        //     $.ajax({
+        //         url: "<?= base_url('barang-master/get') ?>",
+        //         data: {
+        //             id: id
+        //         },
+        //         beforeSend: function(xhr) {
+        //             xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+        //         },
+        //         method: "POST",
+        //         dataType: "json",
+        //         success: function(res) {
+        //             $('.delete-btn').show();
+        //             $('.title-name').text("Update Bahan Penolong");
+        //             <?php if (!can('Master Barang', 'Bahan Penolong', 'u')) : ?>
+        //                 $('.btn-submit-master-barang').hide();
+        //             <?php endif; ?>
+        //             // $('input[name="kode_barang"]').attr('readonly', true);
+        //             $('#generate_new_code').hide();
+        //             $('input[name="kode_barang"]').val(res.data.kode_barang);
+        //             $('select[name="parent_type_id"]').val(res.data.parent_type_id).change();
+        //             $('input[name="barang_name"]').val(res.data.barang_name);
+        //             $('input[name="id"]').val(res.data.id);
 
 
-                    // Iterate through dataSpekDetail and append rows to the table
-                    if (res.dataSpekDetail && res.dataSpekDetail.length > 0) {
-                        list_items.splice(0, list_items.length);
-                        res.dataSpekDetail.forEach(function(item) {
-                            list_items.push({
-                                'spek_id': getID(),
-                                'spesifikasi_id': item.id,
-                                'spesifikasi': item.spesifikasi,
-                                'satuan_1': item.satuan_1,
-                                'satuan_1_text': item.satuan1_text,
-                                'satuan_2': item.satuan_2,
-                                'satuan_2_text': item.satuan2_text,
-                                'konversi_satuan_2': item.konversi_satuan_2,
-                                'satuan_3': item.satuan_3,
-                                'satuan_3_text': item.satuan3_text,
-                                'konversi_satuan_3': item.konversi_satuan_3
-                            });
-                            resetFormDetail();
-                            drawTable();
-                        });
-                    }
-                    validator_spek.resetForm();
-                    validator_spek.reset();
-                    validator.resetForm();
-                    validator.reset();
-                    $('.add-modal').modal('show');
-                }
-            })
-        })
+        //             // Iterate through dataSpekDetail and append rows to the table
+        //             if (res.dataSpekDetail && res.dataSpekDetail.length > 0) {
+        //                 list_items.splice(0, list_items.length);
+        //                 res.dataSpekDetail.forEach(function(item) {
+        //                     list_items.push({
+        //                         'spek_id': getID(),
+        //                         'spesifikasi_id': item.id,
+        //                         'spesifikasi': item.spesifikasi,
+        //                         'satuan_1': item.satuan_1,
+        //                         'satuan_1_text': item.satuan1_text,
+        //                         'satuan_2': item.satuan_2,
+        //                         'satuan_2_text': item.satuan2_text,
+        //                         'konversi_satuan_2': item.konversi_satuan_2,
+        //                         'satuan_3': item.satuan_3,
+        //                         'satuan_3_text': item.satuan3_text,
+        //                         'konversi_satuan_3': item.konversi_satuan_3
+        //                     });
+        //                     resetFormDetail();
+        //                     drawTable();
+        //                 });
+        //             }
+        //             validator_spek.resetForm();
+        //             validator_spek.reset();
+        //             validator.resetForm();
+        //             validator.reset();
+        //             $('.add-modal').modal('show');
+        //         }
+        //     })
+        // })
         $('.btn-submit-master-barang').click(function(e) {
             e.preventDefault();
             if (list_items.length === 0) {
@@ -1022,6 +1039,115 @@
         }
     });
 
+    function edit(id) {
+        let csrf = $(`[name="${csrfToken}"]`);
+        $(".create-form :input:not([name='type'])").val('');
+        $.ajax({
+            url: "<?= base_url('barang-master/get') ?>",
+            data: {
+                id: id
+            },
+            beforeSend: function(xhr) {
+                xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+            },
+            method: "POST",
+            dataType: "json",
+            success: function(res) {
+                $('.delete-btn').show();
+                $('.title-name').text("Update Bahan Penolong");
+                <?php if (!can('Master Barang', 'Bahan Penolong', 'u')) : ?>
+                    $('.btn-submit-master-barang').hide();
+                <?php endif; ?>
+                // $('input[name="kode_barang"]').attr('readonly', true);
+                $('#generate_new_code').hide();
+                $('input[name="kode_barang"]').val(res.data.kode_barang);
+                $('select[name="parent_type_id"]').val(res.data.parent_type_id).change();
+                $('input[name="barang_name"]').val(res.data.barang_name);
+                $('input[name="id"]').val(res.data.id);
+
+
+                // Iterate through dataSpekDetail and append rows to the table
+                if (res.dataSpekDetail && res.dataSpekDetail.length > 0) {
+                    list_items.splice(0, list_items.length);
+                    res.dataSpekDetail.forEach(function(item) {
+                        list_items.push({
+                            'spek_id': getID(),
+                            'spesifikasi_id': item.id,
+                            'spesifikasi': item.spesifikasi,
+                            'satuan_1': item.satuan_1,
+                            'satuan_1_text': item.satuan1_text,
+                            'satuan_2': item.satuan_2,
+                            'satuan_2_text': item.satuan2_text,
+                            'konversi_satuan_2': item.konversi_satuan_2,
+                            'satuan_3': item.satuan_3,
+                            'satuan_3_text': item.satuan3_text,
+                            'konversi_satuan_3': item.konversi_satuan_3
+                        });
+                        resetFormDetail();
+                        drawTable();
+                    });
+                }
+                validator_spek.resetForm();
+                validator_spek.reset();
+                validator.resetForm();
+                validator.reset();
+                $('.add-modal').modal('show');
+            }
+        })
+    }
+
+    function removeSpek(spesifikasi_id) {
+        Swal.fire({
+            icon: 'question',
+            title: 'Hapus Data ?',
+            confirmButtonColor: '#4e73df',
+            cancelButtonColor: '#d33',
+            showCancelButton: true,
+            reverseButtons: true,
+            confirmButtonText: 'Hapus',
+            cancelButtonText: 'Kembali',
+        }).then((result) => {
+            if (result.isConfirmed) {
+                const csrf = $(`[name="${csrfToken}"]`);
+                $.ajax({
+                    url: "<?= base_url("barang-master/delete-spek"); ?>",
+                    data: {
+                        id: spesifikasi_id
+                    },
+                    beforeSend: function(xhr) {
+                        setLoading();
+                        xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                    },
+                    complete: function() {
+                        stopLoading();
+                    },
+                    method: "POST",
+                    dataType: "json",
+                    success: function(response) {
+                        csrf.val(response.token);
+                        if (response.status) {
+                            Swal.fire({
+                                    icon: 'success',
+                                    title: response.message,
+                                    confirmButtonColor: '#4e73df',
+                                })
+                                .then(() => {
+                                    table.ajax.reload()
+                                });
+                        }
+                    },
+                    onError: function(response) {
+                        csrf.val(response.token);
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Data Gagal Dihapus, coba Lagi',
+                            confirmButtonColor: '#4e73df',
+                        })
+                    }
+                });
+            }
+        })
+    }
 
     var validator_excel = $(".form-excel").validate({
         rules: {

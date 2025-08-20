@@ -57,7 +57,7 @@ class BiayaImporModel extends Model
 
         $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
 
-        $sort = $availableSort[$addCondition['sort'] ?? 'createdAt'] ?? 'tanggal_invoice';
+        $sort = $availableSort[$addCondition['sort'] ?? 'createdAt'] ?? 'biaya_impor.id';
         $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'DESC';
 
         $selectQry = "biaya_impor.*,
@@ -173,8 +173,10 @@ class BiayaImporModel extends Model
         $rmImportPosModel = new RMImportPOModel();
         $rmImportPosDetailModel = new RMImportPODetailModel();
 
+        $tipePo = "";
+        $poListBb = $rmImportPosModel->where('id', $poId)->first();
 
-        if ($tipePo == "IMPORT BAKU") {
+        if ($tipePo == "IMPORT BAKU" && $poListBb != null) {
             // PO IMPORT BAHAN BAKU
             $poList = $rmImportPosModel
                 ->select('rm_import_pos.*,suppliers.name as supplier_name, metadata.value as valas_name')
@@ -197,6 +199,8 @@ class BiayaImporModel extends Model
                 ->where('rm_import_po_details.deletedAt', null)
                 ->where('rm_import_po_details.rm_import_po_id', $poId)
                 ->findAll();
+
+            $tipePo = "IMPORT BAKU";
         } else {
             // PO IMPORT BAHAN PENOLONG
             $poList = $amPurchaseOrderModel
@@ -220,6 +224,8 @@ class BiayaImporModel extends Model
                 ->where('am_purchase_order_details.deletedAt', null)
                 ->where('am_purchase_order_details.am_purchase_order_id', $poId)
                 ->findAll();
+
+            $tipePo = "IMPORT PENOLONG";
         }
 
         // PO LIST
@@ -230,19 +236,26 @@ class BiayaImporModel extends Model
             'port_origin' => $poList['port_origin'],
             'port_destination' => $poList['port_destination'],
             'valas_name' => $poList['valas_name'],
-            'shipper' => $poList['shipper']
+            'valas_id' => $poList['currency'],
+            'shipper' => $poList['shipper'],
+            "tipe_po" => $tipePo
         ];
 
         $poBarangList = array();
         foreach ($poBarang as $b) {
             array_push($poBarangList, [
+                'id' => $b['id'],
+                'barang_id' => $b['barang_id'],
+                'spesifikasi_id' => $b['spesifikasi_id'],
                 'kode_barang' => $b['kode_barang'],
                 'barang_name' => $b['barang_name'],
                 'spesifikasi' => $b['spesifikasi'],
                 'qty' => (float)$b['qty'],
                 'kode_satuan' => $b['kode_satuan'],
                 'harga_satuan' => (float)$b['price'],
-                'total_harga' => (float)$b['total']
+                'total_harga' => (float)$b['total'],
+                'unit' => $b['unit'],
+                'kode_satuan' => $b['kode_satuan']
             ]);
         }
 

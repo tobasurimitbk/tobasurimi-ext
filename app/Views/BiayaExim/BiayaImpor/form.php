@@ -91,16 +91,7 @@
                             <label for="floatingInput">Departemen</label>
                         </div>
                     </div>
-                    <div class="col-sm-4">
-                        <div class="form-floating mb-3" style="height: 50px;">
-                            <select <?= !empty($dataBiayaImpor) ? ($dataBiayaImpor['status_posting'] == 1 ? 'disabled' : '') : '' ?> class="form-select tipe_po" name="tipe_po" id="tipe_po">
-                                <option value=""></option>
-                                <option <?= !empty($dataBiayaImpor) ? ($dataBiayaImpor['tipe_po'] == "IMPORT BAKU" ? 'selected' : '') : '' ?> value="IMPORT BAKU">IMPORT BAHAN BAKU</option>
-                                <option <?= !empty($dataBiayaImpor) ? ($dataBiayaImpor['tipe_po'] == "IMPORT PENOLONG" ? 'selected' : '') : '' ?> value="IMPORT PENOLONG">IMPORT BAHAN PENOLONG</option>
-                            </select>
-                            <label for="floatingInput">Pilih Tipe PO</label>
-                        </div>
-                    </div>
+
                     <div class="col-sm-4">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <select <?= !empty($dataBiayaImpor) ? ($dataBiayaImpor['status_posting'] == 1 ? 'disabled' : '') : '' ?> class="form-select supplier_id" name="supplier_id" id="supplier_id">
@@ -113,22 +104,35 @@
                         </div>
                     </div>
                     <div class="col-md-4">
-                        <div class="form-floating mb-3" style="height: 50px;">
-                            <select <?= !empty($dataBiayaImpor) ? ($dataBiayaImpor['status_posting'] == 1 ? 'disabled' : '') : '' ?> class="form-select po_id" name="po_id" id="po_id">
-                                <option value=""></option>
-                                <?php if (!empty($dataDetailPo)): ?>
-                                    <option selected value="<?= $dataDetailPo['id'] ?>"><?= $dataDetailPo['po_no'] ?></option>
-                                <?php endif; ?>
-                            </select>
-                            <label for="floatingInput">Pilih Nomor PO</label>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
                         <div class="form-floating mb-3">
                             <input <?= !empty($dataBiayaImpor) ? ($dataBiayaImpor['status_posting'] == 1 ? 'readonly' : '') : '' ?> autocomplete="one-time-code" type="text" class="form-control no_bl" id="no_bl" name="no_bl" placeholder="No B/L" value="<?= !empty($dataBiayaImpor) ? $dataBiayaImpor['no_bl'] : '' ?>">
                             <label for="floatingInput">No B/L</label>
                         </div>
                     </div>
+                    <div class="col-sm-4">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <select <?= !empty($dataBiayaImpor) ? ($dataBiayaImpor['status_posting'] == 1 ? 'disabled' : '') : '' ?> class="form-select tipe_po" name="tipe_po" id="tipe_po">
+                                <option value=""></option>
+                                <option <?= !empty($dataBiayaImpor) ? ($dataBiayaImpor['tipe_po'] == "IMPORT BAKU" ? 'selected' : '') : '' ?> value="IMPORT BAKU">IMPORT BAHAN BAKU</option>
+                                <option <?= !empty($dataBiayaImpor) ? ($dataBiayaImpor['tipe_po'] == "IMPORT PENOLONG" ? 'selected' : '') : '' ?> value="IMPORT PENOLONG">IMPORT BAHAN PENOLONG</option>
+                            </select>
+                            <label for="floatingInput">Pilih Tipe PO (Opsional)</label>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <select <?= !empty($dataBiayaImpor) ? ($dataBiayaImpor['status_posting'] == 1 ? 'disabled' : '') : '' ?> class="form-select po_id" name="po_id" id="po_id">
+                                <option value=""></option>
+                                <?php if (!empty($dataPoDetail)): ?>
+                                    <?php if ($dataPoDetail != null): ?>
+                                        <option selected value="<?= $dataPoDetail['id'] ?>"><?= $dataPoDetail['po_no'] ?></option>
+                                    <?php endif; ?>
+                                <?php endif; ?>
+                            </select>
+                            <label for="floatingInput">Pilih Nomor PO (Opsional)</label>
+                        </div>
+                    </div>
+
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <select <?= !empty($dataBiayaImpor) ? ($dataBiayaImpor['status_posting'] == 1 ? 'disabled' : '') : '' ?> class="form-select vendor_pelayaran_id" name="vendor_pelayaran_id" id="vendor_pelayaran_id">
@@ -142,38 +146,43 @@
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3">
-                            <input autocomplete="one-time-code" readonly type="text" class="form-control shipper_prev" id="shipper_prev" name="shipper_prev">
-                            <label for="floatingInput">Shipper</label>
+                            <input autocomplete="one-time-code" type="text" class="form-control shipper_prev" id="shipper_prev" name="shipper_prev" <?= !empty($dataBiayaImpor) ? ($dataBiayaImpor['status_posting'] == 1 ? 'readonly' : '') : '' ?> value="<?= !empty($dataBiayaImpor) ? $dataBiayaImpor['shipper'] : '' ?>">
+                            <label for="floatingInput">Shipper (Opsional)</label>
                         </div>
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3">
-                            <input autocomplete="one-time-code" readonly type="text" class="form-control consigne_prev" id="consigne_prev" name="consigne_prev">
-                            <label for="floatingInput">Consigne</label>
+                            <input autocomplete="one-time-code" type="text" class="form-control consigne_prev" id="consigne_prev" name="consigne_prev" <?= !empty($dataBiayaImpor) ? ($dataBiayaImpor['status_posting'] == 1 ? 'readonly' : '') : '' ?> value="<?= !empty($dataBiayaImpor) ? $dataBiayaImpor['consigne'] : '' ?>">
+                            <label for="floatingInput">Consigne (Opsional)</label>
                         </div>
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3">
-                            <input autocomplete="one-time-code" readonly type="text" class="form-control port_of_origin_prev" id="port_of_origin_prev" name="port_of_origin_prev">
-                            <label for="floatingInput">Port Of Origin</label>
+                            <input autocomplete="one-time-code" type="text" class="form-control port_of_origin_prev" id="port_of_origin_prev" name="port_of_origin_prev" <?= !empty($dataBiayaImpor) ? ($dataBiayaImpor['status_posting'] == 1 ? 'readonly' : '') : '' ?> value="<?= !empty($dataBiayaImpor) ? $dataBiayaImpor['port_of_origin'] : '' ?>">
+                            <label for="floatingInput">Port Of Origin (Opsional)</label>
                         </div>
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3">
-                            <input autocomplete="one-time-code" readonly type="text" class="form-control port_of_destination_prev" id="port_of_destination_prev" name="port_of_destination_prev">
-                            <label for="floatingInput">Port Of Destination</label>
+                            <input autocomplete="one-time-code" type="text" class="form-control port_of_destination_prev" id="port_of_destination_prev" name="port_of_destination_prev" <?= !empty($dataBiayaImpor) ? ($dataBiayaImpor['status_posting'] == 1 ? 'readonly' : '') : '' ?> value="<?= !empty($dataBiayaImpor) ? $dataBiayaImpor['port_of_destination'] : '' ?>">
+                            <label for="floatingInput">Port Of Destination (Opsional)</label>
                         </div>
                     </div>
 
                 </div>
-
-                <div class="row">
-                    <div class="col mb-3">
-                        <label class="form-label font-weight-bold lable-title">List Barang Impor</label>
-                    </div>
-                </div>
-
                 <div class="row mb-4">
+                    <div class="col-subtitle-modal">
+                        <div class="row mt-3">
+                            <div class="col-md-6">
+                                <label class="form-label font-weight-bold lable-title" style="margin-bottom: -30px;">List Barang yang di Impor</label>
+                            </div>
+                            <div class="col-md-6">
+                                <button <?= !empty($dataBiayaImpor) ? ($dataBiayaImpor['status_posting'] == 1 ? 'disabled' : '') : '' ?> class="btn btn-show-detail btn-add btn-block float-right" id="btnAddBarangDetail" type="button" style="width: 90% !important;">
+                                    <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
+                                </button>
+                            </div>
+                        </div>
+                    </div>
                     <div class="table-responsive">
                         <table class="table table-bordered nowrap table-hover-tobasurimi dataTable" id="dataTableBarang" width="100%" cellspacing="0">
                             <thead class="thead-dark">
@@ -184,6 +193,7 @@
                                     <th style="text-align: right;">Qty PO</th>
                                     <th style="text-align: right;">Harga Satuan</th>
                                     <th style="text-align: right;">Total Harga <span id="txt_valas" class="mr-0"></span></th>
+                                    <th style="text-align: center;">Action</th>
                                 </tr>
                             </thead>
                             <tbody id="body-detail-table-barang">
@@ -191,7 +201,7 @@
                             </tbody>
                             <tfoot id="foot-detail-table-barang">
                                 <tr>
-                                    <td colspan="6">List Barang Impor Tidak Ada</td>
+                                    <td colspan="7">List Barang Impor Tidak Ada</td>
                                 </tr>
                             </tfoot>
                         </table>
@@ -527,12 +537,85 @@
     </div>
 </div>
 
+<div class="modal detail-modal" id="detailBarang" tabindex="1">
+    <div class="modal-dialog" style="min-width: 900px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title title-secondary"><label id="label-detail-barang"></label> Barang Impor</h5>
+            </div>
+            <form id="form-detail-barang" role="form" method="POST">
+                <input type="hidden" name="id_detail_barang" id="id_detail_barang">
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <select class="form-select spesifikasi_id" name="spesifikasi_id" id="spesifikasi_id">
+                                    <option value=""></option>
+                                    <?php foreach ($dataBarang as $d): ?>
+                                        <option data-kode_barang="<?= $d['kode_barang'] ?>" data-barang_name="<?= str_replace(['"', "'"], '', $d['barang_name_master'] . " - " . $d['spesifikasi'])  ?>" value="<?= $d['barang_master_spesifikasi_id'] ?>"><?= "(" . $d['kode_barang'] . ") " . $d['barang_name_master'] . " - " . $d['spesifikasi'] ?></option>
+                                    <?php endforeach; ?>
+                                </select>
+                                <label for="floatingInput">Pilih Barang</label>
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <select class="form-select valas_barang_id" name="valas_barang_id" id="valas_barang_id">
+                                    <option value=""></option>
+                                    <?php foreach ($dataValas as $d): ?>
+                                        <option data-valas_name="<?= $d['value'] ?>" value="<?= $d['id'] ?>"><?= $d['value'] . " - " . $d['description'] ?></option>
+                                    <?php endforeach; ?>
+                                </select>
+                                <label for="floatingInput">Pilih Currency</label>
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input autocomplete="one-time-code" type="text" class="form-control" id="qty_barang" name="qty_barang" placeholder="Qty Barang" onkeyup="this.value = greatFormatRupiah(this.value)">
+                                <label for="floatingInput">Qty Barang</label>
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <select class="form-select satuan_id" name="satuan_id" id="satuan_id">
+                                    <option value=""></option>
+                                    <?php foreach ($dataSatuan as $d): ?>
+                                        <option data-kode_satuan="<?= $d['kode_satuan'] ?>" value="<?= $d['id'] ?>"><?= $d['kode_satuan']  ?></option>
+                                    <?php endforeach; ?>
+                                </select>
+                                <label for="floatingInput">Pilih Satuan</label>
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input autocomplete="one-time-code" type="text" class="form-control" id="harga_satuan" name="harga_satuan" placeholder="Qty Barang" onkeyup="this.value = greatFormatRupiah(this.value)">
+                                <label for="floatingInput">Harga Barang</label>
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input readonly autocomplete="one-time-code" type="text" class="form-control" id="total_harga" name="total_harga" placeholder="Total Harga" onkeyup="this.value = greatFormatRupiah(this.value)">
+                                <label for="floatingInput">Total Harga</label>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-discard mr-2" id="btnHideDetailBarang">Kembali</button>
+                    <button type="button" class="btn btn-submit-form" id="btnSubmitDetailBarang">Simpan</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
 <script>
     const csrfToken = '<?= csrf_token() ?>';
     var listBiayaImpor = [];
     var listPajak = [];
     var listContainer = [];
-
+    var listBarang = [];
 
     $(document).ready(function() {
         <?php if (!empty($dataBiayaImpor)) { ?>
@@ -570,7 +653,23 @@
                 })
             <?php endforeach; ?>
 
-            getPoDetail("<?= $dataBiayaImpor['tipe_po'] ?>", "<?= $dataBiayaImpor['po_id'] ?>");
+            <?php foreach ($dataDetailBarang as $d): ?>
+                listBarang.push({
+                    id_detail_barang: "<?= $d['id'] ?>",
+                    spesifikasi_id: "<?= $d['spesifikasi_id'] ?>",
+                    kode_barang: "<?= $d['kode_barang'] ?>",
+                    barang_name: "<?= $d['barang_name'] . " " . $d['spesifikasi'] ?>",
+                    valas_id: "<?= $d['valas_id'] ?>",
+                    valas_name: "<?= $d['valas_name'] ?>",
+                    qty_barang: <?= (float)$d['qty_barang'] ?>,
+                    harga_satuan: <?= (float)$d['harga_satuan'] ?>,
+                    total_harga: <?= (float)$d['total_harga'] ?>,
+                    satuan_id: "<?= $d['satuan_id'] ?>",
+                    kode_satuan: "<?= $d['kode_satuan'] ?>",
+                });
+            <?php endforeach; ?>
+
+            drawTableBarangImport(listBarang);
             drawTableBiayaEkspor(listBiayaImpor);
             drawTablePengenaanPajak(listPajak);
             drawTableDetailContainer(listContainer);
@@ -596,13 +695,10 @@
             dropdownPo(tipePo, supplierId);
         });
 
-
         $('.tipe_po').select2({
             placeholder: "Pilih Tipe PO",
             theme: "bootstrap-5",
-        }).change(function() {
-            $('#supplier_id').val(null).change();
-        });
+        }).change(function() {});
 
         $('.divisi_id').select2({
             placeholder: "Pilih Departemen",
@@ -636,6 +732,24 @@
             dropdownParent: $('#detailPengenaanPajakModal')
         }).change(function() {});
 
+        $('.spesifikasi_id').select2({
+            placeholder: "Pilih Barang",
+            theme: "bootstrap-5",
+            dropdownParent: $('#detailBarang')
+        }).change(function() {});
+
+        $('.satuan_id').select2({
+            placeholder: "Pilih Satuan",
+            theme: "bootstrap-5",
+            dropdownParent: $('#detailBarang')
+        }).change(function() {});
+
+        $('.valas_barang_id').select2({
+            placeholder: "Pilih Currency",
+            theme: "bootstrap-5",
+            dropdownParent: $('#detailBarang')
+        }).change(function() {});
+
         $('.valas_id').select2({
             placeholder: "Pilih Currency",
             theme: "bootstrap-5",
@@ -643,14 +757,14 @@
         }).change(function() {});
 
         //CSS SELECT2 FLOATING LABEL
-        $('.po_id, .divisi_id, .vendor_pelayaran_id, .tax_id, .tax_status, .supplier_id, .tipe_po, .valas_id')
+        $('.po_id, .divisi_id, .vendor_pelayaran_id, .tax_id, .tax_status, .supplier_id, .tipe_po, .valas_id,.spesifikasi_id,.satuan_id,.valas_barang_id')
             .parent('div')
             .children('span')
             .children('span')
             .children('span')
             .css('height', ' calc(3.5rem + 2px)');
 
-        $('.po_id, .divisi_id, .vendor_pelayaran_id, .tax_id, .tax_status, .supplier_id, .tipe_po, .valas_id')
+        $('.po_id, .divisi_id, .vendor_pelayaran_id, .tax_id, .tax_status, .supplier_id, .tipe_po, .valas_id.valas_id,.spesifikasi_id,.satuan_id,.valas_barang_id')
             .parent('div')
             .children('span')
             .children('span')
@@ -658,7 +772,7 @@
             .children('span')
             .css('margin-top', '22px').css('margin-left', '-7px');
 
-        $('.po_id, .divisi_id, .vendor_pelayaran_id, .tax_id, .tax_status, .supplier_id, .tipe_po, .valas_id')
+        $('.po_id, .divisi_id, .vendor_pelayaran_id, .tax_id, .tax_status, .supplier_id, .tipe_po, .valas_id.valas_id,.spesifikasi_id,.satuan_id,.valas_barang_id')
             .parent('div')
             .find('label')
             .css('z-index', '1');
@@ -674,21 +788,21 @@
                 divisi_id: {
                     required: true
                 },
-                tipe_po: {
-                    required: true
-                },
+                // tipe_po: {
+                //     required: true
+                // },
                 supplier_id: {
                     required: true
                 },
-                po_id: {
-                    required: true
-                },
+                // po_id: {
+                //     required: true
+                // },
                 no_bl: {
                     required: true
                 },
-                vendor_pelayaran_id: {
-                    required: true
-                },
+                // vendor_pelayaran_id: {
+                //     required: true
+                // },
                 // no_surat_jalan: {
                 //     required: true
                 // },
@@ -706,21 +820,21 @@
                 divisi_id: {
                     required: "Departemen wajib diisi"
                 },
-                tipe_po: {
-                    required: "Tipe PO wajib diisi"
-                },
+                // tipe_po: {
+                //     required: "Tipe PO wajib diisi"
+                // },
                 supplier_id: {
                     required: "Supplier wajib diisi"
                 },
-                po_id: {
-                    required: "Nomor po wajib diisi"
-                },
+                // po_id: {
+                //     required: "Nomor po wajib diisi"
+                // },
                 no_bl: {
                     required: "Nomor b/l wajib diisi"
                 },
-                vendor_pelayaran_id: {
-                    required: "Vendor pelayaran wajib diisi"
-                },
+                // vendor_pelayaran_id: {
+                //     required: "Vendor pelayaran wajib diisi"
+                // },
                 // no_surat_jalan: {
                 //     required: "No surat jalan wajib diisi"
                 // },
@@ -891,6 +1005,70 @@
             },
         });
 
+
+        var validatorDetailBarang = $("#form-detail-barang").validate({
+            rules: {
+                spesifikasi_id: {
+                    required: true
+                },
+                valas_barang_id: {
+                    required: true
+                },
+                qty_barang: {
+                    required: true
+                },
+                satuan_id: {
+                    required: true
+                },
+                harga_satuan: {
+                    required: true
+                },
+                total_harga: {
+                    required: true
+                },
+            },
+            messages: {
+                spesifikasi_id: {
+                    required: "Pilih barang"
+                },
+                valas_barang_id: {
+                    required: "Pilih currency"
+                },
+                qty_barang: {
+                    required: "Qty barang wajib diisi"
+                },
+                satuan_id: {
+                    required: "Pilih satuan"
+                },
+                harga_satuan: {
+                    required: "Harga satuan wajib diisi"
+                },
+                total_harga: {
+                    required: "Total harga wajib diisi"
+                },
+            },
+            errorElement: 'span',
+            errorClass: 'text-danger',
+            errorPlacement: function(error, element) {
+                var elem = $(element);
+                if (elem.hasClass("select2-hidden-accessible")) {
+                    element = $("#select2-" + elem.attr("id") + "-container").parent();
+                    error.insertAfter(element);
+                } else {
+                    error.insertAfter(element);
+                }
+            },
+            highlight: function(element) {
+                $(element).closest('.form-group').addClass('has-error');
+                $(element).addClass('select-class');
+
+            },
+            unhighlight: function(element) {
+                $(element).closest('.form-group').removeClass('has-error');
+                $(element).removeClass('select-class');
+            },
+        });
+
         $('#btnAddBiaya').click(function(e) {
             e.preventDefault();
             $("#label-biaya-impor").text("Tambah ");
@@ -903,6 +1081,26 @@
             $('#detailBiayaModal').modal('hide');
         });
 
+        $('#btnAddBarangDetail').click(function(e) {
+            e.preventDefault();
+            $('#label-detail-barang').text('Tambah ');
+            $('#detailBarang').modal('show');
+            resetFormDetailBarang();
+        });
+
+        $('#btnHideDetailBarang').click(function(e) {
+            e.preventDefault();
+            $('#detailBarang').modal('hide');
+        });
+
+        $('#qty_barang,#harga_satuan').keyup(function(e) {
+            e.preventDefault();
+            var qtyBarang = destroyFormatRupiah($('#qty_barang').val());
+            var hargaSatuan = destroyFormatRupiah($('#harga_satuan').val());
+            var totalHarga = parseFloat(qtyBarang) * parseFloat(hargaSatuan);
+            $('#total_harga').val(greatFormatRupiah(totalHarga));
+        });
+
         $('#nilai_biaya,#exchange_rate').keyup(function(e) {
             e.preventDefault();
             var nilaiBiaya = destroyFormatRupiah($('#nilai_biaya').val());
@@ -910,7 +1108,7 @@
             var nilaiIdr = nilaiBiaya * exchangeRate;
 
             $('#nilai_biaya_idr').val(greatFormatRupiah(nilaiIdr.toFixed(2)));
-        })
+        });
 
         $('#btnSubmitDetailBiaya').click(function(e) {
             e.preventDefault();
@@ -1066,6 +1264,12 @@
                     title: 'Wajib mengisikan biaya impor !',
                     confirmButtonColor: '#4e73df',
                 })
+            } else if (listBarang.length === 0) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Wajib mengisikan barang impor !',
+                    confirmButtonColor: '#4e73df',
+                })
             } else {
                 var id = $('#id').val();
                 if ($("#form-parent").valid()) {
@@ -1092,6 +1296,7 @@
                             data.append("listBiayaImpor", JSON.stringify(listBiayaImpor));
                             data.append("listPajak", JSON.stringify(listPajak));
                             data.append("listContainer", JSON.stringify(listContainer));
+                            data.append("listBarang", JSON.stringify(listBarang));
 
                             $.ajax({
                                 url: url,
@@ -1172,11 +1377,29 @@
                         $('#consigne_prev').val(dataPo.consigne);
                         $('#port_of_origin_prev').val(dataPo.port_origin);
                         $('#port_of_destination_prev').val(dataPo.port_destination);
-
+                        $('#tipe_po').val(dataPo.tipe_po).change();
                         $('#txt_valas').text("(" + dataPo.valas_name + ")");
 
+
+                        listBarang = [];
+                        $.each(dataPoDetail, function(i, v) {
+                            listBarang.push({
+                                id_detail_barang: v.id,
+                                spesifikasi_id: v.spesifikasi_id,
+                                kode_barang: v.kode_barang,
+                                barang_name: v.barang_name + " " + v.spesifikasi,
+                                valas_id: dataPo.valas_id,
+                                valas_name: dataPo.valas_name,
+                                qty_barang: v.qty,
+                                harga_satuan: v.harga_satuan,
+                                total_harga: v.total_harga,
+                                satuan_id: v.unit,
+                                kode_satuan: v.kode_satuan,
+                            });
+                        });
+
                         // DrawTable Detail Barang
-                        drawTablePoDetail(dataPoDetail);
+                        drawTableBarangImport(listBarang);
                     }
 
                 } else {
@@ -1216,6 +1439,15 @@
         })
     }
 
+    function resetFormDetailBarang() {
+        $('#id_detail_barang').val(null);
+        $('#spesifikasi_id').val(null).change();
+        $('#valas_barang_id').val(null).change();
+        $('#satuan_id').val(null).change();
+        $('#qty_barang').val(null);
+        $('#harga_satuan').val(null);
+        $('#total_harga').val(null);
+    }
 
     function resetFormBiayaImpor() {
         $('#id_biaya_impor_detail').val(null);
@@ -1242,6 +1474,164 @@
         $('#id_container').val(null);
         $('#no_container').val(null);
         $('#detail_container').val(null);
+    }
+
+    $('#btnSubmitDetailBarang').click(function(e) {
+        e.preventDefault();
+        if ($('#form-detail-barang').valid()) {
+            var idBarangDetail = $('#id_detail_barang').val();
+            var spesifikasiId = $('#spesifikasi_id option:selected').val();
+            var kodeBarang = $('#spesifikasi_id option:selected').data('kode_barang');
+            var barangName = $('#spesifikasi_id option:selected').data('barang_name');
+            var valasId = $('#valas_barang_id option:selected').val();
+            var valasName = $('#valas_barang_id option:selected').data('valas_name');
+            var satuanId = $('#satuan_id option:selected').val();
+            var kodeSatuan = $('#satuan_id option:selected').data('kode_satuan');
+            var qtyBarang = destroyFormatRupiah($('#qty_barang').val());
+            var hargaSatuan = destroyFormatRupiah($('#harga_satuan').val());
+            var totalHarga = destroyFormatRupiah($('#total_harga').val());
+
+            if (idBarangDetail) {
+                // UPDATE
+                var index = null;
+                for (var i = 0; i < listBarang.length; i++) {
+                    if (listBarang[i].id_detail_barang == idBarangDetail) {
+                        index = i;
+                        break;
+                    }
+                }
+
+                listBarang[index].spesifikasi_id = spesifikasiId;
+                listBarang[index].kode_barang = kodeBarang;
+                listBarang[index].barang_name = barangName;
+                listBarang[index].valas_id = valasId;
+                listBarang[index].valas_name = valasName;
+                listBarang[index].qty_barang = qtyBarang;
+                listBarang[index].harga_satuan = hargaSatuan;
+                listBarang[index].total_harga = totalHarga;
+                listBarang[index].kode_satuan = kodeSatuan;
+                listBarang[index].satuan_id = satuanId;
+            } else {
+                // INSERT
+                listBarang.push({
+                    id_detail_barang: getID(),
+                    spesifikasi_id: spesifikasiId,
+                    kode_barang: kodeBarang,
+                    barang_name: barangName,
+                    valas_id: valasId,
+                    valas_name: valasName,
+                    qty_barang: qtyBarang,
+                    harga_satuan: hargaSatuan,
+                    total_harga: totalHarga,
+                    satuan_id: satuanId,
+                    kode_satuan: kodeSatuan
+                });
+            }
+
+            drawTableBarangImport(listBarang);
+            $('#detailBarang').modal('hide');
+        }
+    });
+
+    function drawTableBarangImport(listBarang) {
+
+        $('#body-detail-table-barang').empty();
+        $('#foot-detail-table-barang').empty();
+        var row = '';
+        var no = 1;
+        const table = $('#dataTableBarang');
+        const tfoot = table.find('#foot-detail-table-barang');
+
+        if (listBarang.length === 0) {
+            $('#txt_valas').text("");
+            row += `
+                    <tr>
+                        <td colspan="7">List Barang Impor Tidak Ada</td>
+                    </tr>
+                `;
+            $('#foot-detail-table-barang').append(row);
+        } else {
+            var totalTotalHarga = 0;
+            listBarang.map(item => {
+                totalTotalHarga += item.total_harga;
+
+                // Valas
+                $('#txt_valas').text(" (" + item.valas_name + ")");
+
+                var newRow = $('<tr style="color:whitesmoke;">');
+                newRow.append($('<td style="text-align:center;">').text(no++));
+                newRow.append($('<td>').text(item.kode_barang));
+                newRow.append($('<td>').text(item.barang_name));
+                newRow.append($('<td class="text-right">').text(greatFormatRupiah(item.qty_barang) + " " + item.kode_satuan));
+                newRow.append($('<td class="text-right">').text(greatFormatRupiah(item.harga_satuan.toFixed(2))));
+                newRow.append($('<td class="text-right">').text(greatFormatRupiah(item.total_harga)));
+                newRow.append($('<td class="text-center">').html(
+                    <?php if (!empty($dataBiayaImpor)) : ?> <?php if ($dataBiayaImpor['status_posting'] == 1) : ?> `-`
+                        <?php else : ?> `
+                        <button type="button" class="btn btn-warning posting-spp mr-1" onclick="detailRowBarang('${item.id_detail_barang}')">
+                                <i class="fa fa-pencil fa-sm" aria-hidden="true"></i>
+                            </button>
+                            <button type="button" class="btn btn-danger" onclick="deleteRowBarang('${item.id_detail_barang}')">
+                                <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
+                            </button>
+                    `
+                        <?php endif; ?>
+
+                    <?php else : ?> `
+                        <button type="button" class="btn btn-warning posting-spp mr-1" onclick="detailRowBarang('${item.id_detail_barang}')">
+                                <i class="fa fa-pencil fa-sm" aria-hidden="true"></i>
+                            </button><button type="button" class="btn btn-danger" onclick="deleteRowBarang('${item.id_detail_barang}')">
+                                <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
+                            </button>
+                    `
+                    <?php endif; ?>
+                ));
+                table.find('tbody').append(newRow);
+            });
+            tfoot.append(`
+                    <tr>
+                        <th colspan="5" class="text-right">GRAND TOTAL</th>
+                        <th class="text-right">${greatFormatRupiah(totalTotalHarga.toFixed(2))}</th>
+                        <th class="text-right"></th>
+                    </tr>
+                `);
+
+        }
+    }
+
+    function detailRowBarang(id_detail_barang) {
+        var item = null;
+        for (var i = 0; i < listBarang.length; i++) {
+            if (listBarang[i].id_detail_barang == id_detail_barang) {
+                item = listBarang[i];
+                break;
+            }
+        }
+
+        $('#id_detail_barang').val(item.id_detail_barang);
+        $('#spesifikasi_id').val(item.spesifikasi_id).change();
+        $('#valas_barang_id').val(item.valas_id).change();
+        $('#satuan_id').val(item.satuan_id).change();
+        $('#qty_barang').val(greatFormatRupiah(item.qty_barang));
+        $('#harga_satuan').val(greatFormatRupiah(item.harga_satuan));
+        $('#total_harga').val(greatFormatRupiah(item.total_harga));
+
+        $('#label-detail-barang').text("Update ");
+        $('#detailBarang').modal('show');
+    }
+
+    function deleteRowBarang(id_detail_barang) {
+        var indexToRemove = -1;
+        for (var i = 0; i < listBarang.length; i++) {
+            if (listBarang[i].id_detail_barang == id_detail_barang) {
+                indexToRemove = i;
+                break;
+            }
+        }
+        if (indexToRemove !== -1) {
+            listBarang.splice(indexToRemove, 1);
+        }
+        drawTableBarangImport(listBarang);
     }
 
     function drawTableBiayaEkspor(listBiayaImpor) {
@@ -1500,34 +1890,34 @@
         calculateTotalBiayaAndTax();
     }
 
-    function drawTablePoDetail(dataPoDetail) {
-        $('#body-detail-table-barang').empty();
-        $('#foot-detail-table-barang').empty();
-        var row = '';
-        var no = 1;
-        const table = $('#dataTableBarang');
-        const tfoot = table.find('#foot-detail-table-barang');
+    // function drawTablePoDetail(dataPoDetail) {
+    //     $('#body-detail-table-barang').empty();
+    //     $('#foot-detail-table-barang').empty();
+    //     var row = '';
+    //     var no = 1;
+    //     const table = $('#dataTableBarang');
+    //     const tfoot = table.find('#foot-detail-table-barang');
 
-        if (dataPoDetail.length === 0) {
-            row += `
-                    <tr>
-                        <td colspan="8">List Barang Impor Tidak Ada</td>
-                    </tr>
-                `;
-            $('#foot-detail-table-barang').append(row);
-        } else {
-            dataPoDetail.map(item => {
-                var newRow = $('<tr style="color:whitesmoke;">');
-                newRow.append($('<td style="text-align:center;">').text(no++));
-                newRow.append($('<td>').text(item.kode_barang));
-                newRow.append($('<td>').text(item.barang_name + ' - ' + item.spesifikasi));
-                newRow.append($('<td class="text-right">').text(greatFormatRupiah(item.qty.toFixed(2)) + " " + item.kode_satuan));
-                newRow.append($('<td class="text-right">').text(greatFormatRupiah(item.harga_satuan.toFixed(2))));
-                newRow.append($('<td class="text-right">').text(greatFormatRupiah(item.total_harga.toFixed(2))));
-                table.find('tbody').append(newRow);
-            });
-        }
-    }
+    //     if (dataPoDetail.length === 0) {
+    //         row += `
+    //                 <tr>
+    //                     <td colspan="8">List Barang Impor Tidak Ada</td>
+    //                 </tr>
+    //             `;
+    //         $('#foot-detail-table-barang').append(row);
+    //     } else {
+    //         dataPoDetail.map(item => {
+    //             var newRow = $('<tr style="color:whitesmoke;">');
+    //             newRow.append($('<td style="text-align:center;">').text(no++));
+    //             newRow.append($('<td>').text(item.kode_barang));
+    //             newRow.append($('<td>').text(item.barang_name + ' - ' + item.spesifikasi));
+    //             newRow.append($('<td class="text-right">').text(greatFormatRupiah(item.qty.toFixed(2)) + " " + item.kode_satuan));
+    //             newRow.append($('<td class="text-right">').text(greatFormatRupiah(item.harga_satuan.toFixed(2))));
+    //             newRow.append($('<td class="text-right">').text(greatFormatRupiah(item.total_harga.toFixed(2))));
+    //             table.find('tbody').append(newRow);
+    //         });
+    //     }
+    // }
 
 
     function getID() {
@@ -1579,7 +1969,6 @@
         $('#total_pph_prev').val(greatFormatRupiah(totalPajakPph));
         $('#total_faktur_prev').val(greatFormatRupiah(nominalBiayaFaktur));
     }
-
     const print = function(id) {
         window.open("<?= base_url('biaya-impor/print') ?>" + '/' + id, "_blank");
     }

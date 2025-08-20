@@ -137,7 +137,7 @@
                 width: "5%"
             }, {
                 data: "parent_name",
-                className: "text-center",
+                className: "text-left",
             }, ],
             columnDefs: [{
                 defaultContent: "-",

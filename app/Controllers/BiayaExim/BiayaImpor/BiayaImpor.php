@@ -3,12 +3,15 @@
 namespace App\Controllers\BiayaExim\BiayaImpor;
 
 use App\Controllers\BaseController;
+use App\Models\BarangMasterModel;
+use App\Models\BiayaImporBarangModel;
 use App\Models\BiayaImporContainerModel;
 use App\Models\BiayaImporDetailModel;
 use App\Models\BiayaImporModel;
 use App\Models\BiayaImporPajakModel;
 use App\Models\DivisisModel;
 use App\Models\MetadataModel;
+use App\Models\SatuansModel;
 use App\Models\SupplierModel;
 use App\Models\TaxModel;
 use App\Models\VendorPelayaranModel;
@@ -32,6 +35,9 @@ class BiayaImpor extends BaseController
     protected $biayaImporDetailModel;
     protected $biayaImporPajakModel;
     protected $biayaImporContainerModel;
+    protected $satuanModel;
+    protected $barangMasterModel;
+    protected $biayaImporBarangModel;
 
     public function __construct()
     {
@@ -46,6 +52,9 @@ class BiayaImpor extends BaseController
         $this->biayaImporDetailModel = new BiayaImporDetailModel();
         $this->biayaImporPajakModel = new BiayaImporPajakModel();
         $this->biayaImporContainerModel = new BiayaImporContainerModel();
+        $this->barangMasterModel = new BarangMasterModel();
+        $this->satuanModel = new SatuansModel();
+        $this->biayaImporBarangModel = new BiayaImporBarangModel();
     }
 
     public function index()
@@ -130,13 +139,21 @@ class BiayaImpor extends BaseController
         $dataVendorPelayaran = $this->vendorPelayaranModel->where('deletedAt', null)->where('company_id', $this->this_company_id)->orderBy('nama_vendor', "asc")->findAll();
         $dataSupplier = $this->supplierModel->getSupplierByType("INTERNASIONAL");
         $dataValas = $this->metadataModel->where('name', "Valuta")->where('deletedAt', null)->orderBy('value', "ASC")->findAll();
+        $dataSatuan = $this->satuanModel->where('deletedAt', null)->findAll();
+        $dataBarang = $this->barangMasterModel->getBarangByTypeWithSpec([
+            'barang_master.company_id' => $this->this_company_id,
+            'barang_master.deletedAt' => null,
+            'barang_master_spesifikasi.deletedAt' => null
+        ]);
 
         $data = [
             "dataDivisi" => $dataDivisi,
             "dataPajak" => $dataPajak,
             "dataVendorPelayaran" => $dataVendorPelayaran,
             "dataSupplier" => $dataSupplier,
-            "dataValas" => $dataValas
+            "dataValas" => $dataValas,
+            "dataSatuan" => $dataSatuan,
+            "dataBarang" => $dataBarang
         ];
 
 
@@ -185,10 +202,23 @@ class BiayaImpor extends BaseController
             ->where('deletedAt', null)
             ->findAll();
 
-        $dataDetailPo = $this->biayaImporModel->getDetailBarangPo(
-            $dataBiayaImpor['po_id'],
-            $dataBiayaImpor['tipe_po']
+        $dataDetailBarang = $this->biayaImporBarangModel->getListBarang(
+            $id
         );
+
+        $dataPoDetail = null;
+        if ($dataBiayaImpor['po_id'] != null && !empty($dataBiayaImpor['po_id'])) {
+            $dataPoDetail = $this->biayaImporModel->getDetailBarangPo(
+                $dataBiayaImpor['po_id'],
+                $dataBiayaImpor['tipe_po']
+            )['po_detail'];
+        }
+        $dataSatuan = $this->satuanModel->where('deletedAt', null)->findAll();
+        $dataBarang = $this->barangMasterModel->getBarangByTypeWithSpec([
+            'barang_master.company_id' => $this->this_company_id,
+            'barang_master.deletedAt' => null,
+            'barang_master_spesifikasi.deletedAt' => null
+        ]);
 
         $data = [
             "dataDivisi" => $dataDivisi,
@@ -198,9 +228,12 @@ class BiayaImpor extends BaseController
             "dataValas" => $dataValas,
             "dataBiayaImporPajak" => $dataBiayaImporPajak,
             "dataBiayaImporDetail" => $dataBiayaImporDetail,
-            "dataDetailPo" => $dataDetailPo['po_detail'],
+            "dataDetailBarang" => $dataDetailBarang,
             "dataBiayaImpor" => $dataBiayaImpor,
-            "dataContainer" => $dataContainer
+            "dataContainer" => $dataContainer,
+            "dataSatuan" => $dataSatuan,
+            "dataBarang" => $dataBarang,
+            "dataPoDetail" => $dataPoDetail
         ];
 
         return view('BiayaExim/BiayaImpor/form', $data);
@@ -303,7 +336,8 @@ class BiayaImpor extends BaseController
         //     'POST' => $_POST,
         //     'listPajak' => \json_decode($_POST['listPajak']),
         //     'listBiayaEkspor' => \json_decode($_POST['listBiayaImpor']),
-        //     'listContainer' => \json_decode($_POST['listContainer'])
+        //     'listContainer' => \json_decode($_POST['listContainer']),
+        //     'listBarang' => \json_decode($_POST['listBarang'])
         // ]);
 
         $db = \Config\Database::connect();
@@ -331,12 +365,12 @@ class BiayaImpor extends BaseController
                 'supplier_id' => $this->request->getVar('supplier_id'),
                 'tanggal_invoice' =>  $this->request->getVar("tanggal_invoice") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getVar("tanggal_invoice")))) : null,
                 'no_invoice' => $noInvoice,
-                'tipe_po' => $this->request->getVar('tipe_po'),
+                'tipe_po' => !empty($this->request->getVar('tipe_po')) ? $this->request->getVar('tipe_po') : null,
                 'no_bl' => $this->request->getVar('no_bl'),
-                'shipper' => $this->request->getVar('shipper_prev'),
-                'consigne' => $this->request->getVar('consigne_prev'),
-                'port_of_origin' => $this->request->getVar('port_of_origin_prev'),
-                'port_of_destination' => $this->request->getVar('port_of_destination_prev'),
+                'shipper' => !empty($this->request->getVar('shipper_prev')) ? $this->request->getVar('shipper_prev') : null,
+                'consigne' => !empty($this->request->getVar('consigne_prev')) ? $this->request->getVar('consigne_prev') : null,
+                'port_of_origin' => !empty($this->request->getVar('port_of_origin_prev')) ? $this->request->getVar('port_of_origin_prev') : null,
+                'port_of_destination' => !empty($this->request->getVar('port_of_destination_prev')) ? $this->request->getVar('port_of_destination_prev') : null,
                 'total_faktur_before_tax' => $this->request->getVar('total_faktur_before_tax'),
                 'total_faktur' => $this->request->getVar('total_faktur'),
                 'status_posting' => 0
@@ -373,8 +407,19 @@ class BiayaImpor extends BaseController
                 ]);
             }
 
-            $db->transCommit();
+            foreach (\json_decode($_POST['listBarang']) as $l) {
+                $this->biayaImporBarangModel->insert([
+                    'biaya_impor_id' => $biayaImporId,
+                    'spesifikasi_id' => $l->spesifikasi_id,
+                    'valas_id' => $l->valas_id,
+                    'satuan_id' => $l->satuan_id,
+                    'qty_barang' => $l->qty_barang,
+                    'harga_satuan' => $l->harga_satuan,
+                    'total_harga' => $l->total_harga
+                ]);
+            }
 
+            $db->transCommit();
 
             return response()->setJSON([
                 'message' => "Data berhasil disimpan",
@@ -417,12 +462,12 @@ class BiayaImpor extends BaseController
                 'supplier_id' => $this->request->getVar('supplier_id'),
                 'tanggal_invoice' =>  $this->request->getVar("tanggal_invoice") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getVar("tanggal_invoice")))) : null,
                 'no_invoice' => $noInvoice,
-                'tipe_po' => $this->request->getVar('tipe_po'),
+                'tipe_po' => !empty($this->request->getVar('tipe_po')) ? $this->request->getVar('tipe_po') : null,
                 'no_bl' => $this->request->getVar('no_bl'),
-                'shipper' => $this->request->getVar('shipper_prev'),
-                'consigne' => $this->request->getVar('consigne_prev'),
-                'port_of_origin' => $this->request->getVar('port_of_origin_prev'),
-                'port_of_destination' => $this->request->getVar('port_of_destination_prev'),
+                'shipper' => !empty($this->request->getVar('shipper_prev')) ? $this->request->getVar('shipper_prev') : null,
+                'consigne' => !empty($this->request->getVar('consigne_prev')) ? $this->request->getVar('consigne_prev') : null,
+                'port_of_origin' => !empty($this->request->getVar('port_of_origin_prev')) ? $this->request->getVar('port_of_origin_prev') : null,
+                'port_of_destination' => !empty($this->request->getVar('port_of_destination_prev')) ? $this->request->getVar('port_of_destination_prev') : null,
                 'total_faktur_before_tax' => $this->request->getVar('total_faktur_before_tax'),
                 'total_faktur' => $this->request->getVar('total_faktur'),
                 'status_posting' => 0
@@ -512,6 +557,19 @@ class BiayaImpor extends BaseController
                 }
             }
 
+            $this->biayaImporBarangModel->where('biaya_impor_id', $id)->delete();
+            foreach (\json_decode($_POST['listBarang']) as $l) {
+                $this->biayaImporBarangModel->insert([
+                    'biaya_impor_id' => $id,
+                    'spesifikasi_id' => $l->spesifikasi_id,
+                    'valas_id' => $l->valas_id,
+                    'satuan_id' => $l->satuan_id,
+                    'qty_barang' => $l->qty_barang,
+                    'harga_satuan' => $l->harga_satuan,
+                    'total_harga' => $l->total_harga
+                ]);
+            }
+
             $this->biayaImporContainerModel->whereNotIn('id', $idBiayaImporContainerUsed)
                 ->where('biaya_impor_id', $id)
                 ->delete();
@@ -545,6 +603,7 @@ class BiayaImpor extends BaseController
             $this->biayaImporDetailModel->where('biaya_impor_id', $id)->delete();
             $this->biayaImporPajakModel->where('biaya_impor_id', $id)->delete();
             $this->biayaImporContainerModel->where('biaya_impor_id', $id)->delete();
+            $this->biayaImporBarangModel->where('biaya_impor_id', $id)->delete();
 
             return \response()->setJSON([
                 'status' => true,
@@ -878,6 +937,38 @@ class BiayaImpor extends BaseController
                 $row++;
             }
 
+            // === Detail Barang ===
+            $barangHeader = ['KODE BARANG', 'BARANG', 'QTY', 'SATUAN', 'HARGA SATUAN', 'TOTAL HARGA'];
+            $col = 'B';
+            foreach ($barangHeader as $header) {
+                $sheet->setCellValue($col . $row, strtoupper($header));
+                $sheet->getStyle($col . $row)->getFont()->setBold(true);
+                $sheet->getStyle($col . $row)->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setARGB('FFF2F2F2');
+                $col++;
+            }
+            $row++;
+
+            $detailBarang = $this->biayaImporBarangModel
+                ->getListBarang($data['id']);
+
+            if ($detailBarang) {
+                foreach ($detailBarang as $by) {
+                    $sheet->setCellValue("B{$row}", $by['kode_barang']);
+                    $sheet->setCellValue("C{$row}", $by['barang_name'] . " " . $by['spesifikasi']);
+                    $sheet->setCellValue("D{$row}", $by['qty_barang']);
+                    $sheet->setCellValue("E{$row}", $by['kode_satuan']);
+                    $sheet->setCellValue("F{$row}", $by['harga_satuan']);
+                    $sheet->setCellValue("G{$row}", $by['total_harga']);
+
+                    $sheet->getStyle("D{$row}")->getNumberFormat()->setFormatCode(NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1);
+                    $sheet->getStyle("F{$row}")->getNumberFormat()->setFormatCode(NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1);
+                    $sheet->getStyle("G{$row}")->getNumberFormat()->setFormatCode(NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1);
+                    $row++;
+                }
+            } else {
+                $sheet->setCellValue("B{$row}", "- Tidak ada barang -");
+                $row++;
+            }
 
             // Spasi antar invoice
             $row++;
