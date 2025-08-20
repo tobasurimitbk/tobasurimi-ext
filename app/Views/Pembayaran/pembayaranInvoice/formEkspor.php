@@ -211,6 +211,7 @@
                                     <tr>
                                         <th style="text-align: center;">Kode Barang</th>
                                         <th style="text-align: center;">Nama Barang</th>
+                                        <th style="text-align: center;">Spesifikasi Barang</th>
                                         <th style="text-align: center;">Qty</th>
                                         <th style="text-align: center;">Harga Satuan</th>
                                         <th style="text-align: center;">Sub Total</th>
@@ -405,11 +406,22 @@
                         cancelButtonText: 'Kembali',
                     }).then((result) => {
                         if (result.isConfirmed) {
-                            let formData = new FormData(document.querySelector(".create-form"));
-                            formData.append('total_amount_invoice', $(".total_amount_invoice").text());
+                            const form = document.querySelector(".create-form");
+                            const data = new FormData(form);
+                            // ambil value aslinya
+                            let totalBayar = form.querySelector('input[name="total_bayar"]').value;
+                            let potongan = form.querySelector('input[name="potongan"]').value;
+
+                            // convert pakai fungsi destroyFormatFunction (misal: "40.000" → 40000)
+                            totalBayar = destroyFormatRupiah(totalBayar);
+                            potongan = destroyFormatRupiah(potongan);
+
+                            // set ulang ke FormData biar yang terkirim udah bersih
+                            data.set("total_bayar", totalBayar);
+                            data.set("potongan", potongan);
                             $.ajax({
                                 url: "<?= base_url("/pembayaran-invoice/update"); ?>",
-                                data: formData,
+                                data: data,
                                 beforeSend: function(xhr) {
                                     setLoading();
                                     xhr.setRequestHeader('X-CSRF-Token', csrf.val());
@@ -468,8 +480,20 @@
                         cancelButtonText: 'Kembali',
                     }).then((result) => {
                         if (result.isConfirmed) {
-                            const data = new FormData(document.querySelector(".create-form"));
-                            data.append('total_amount_invoice', $(".total_amount_invoice").text());
+                            const form = document.querySelector(".create-form");
+                            const data = new FormData(form);
+                            // ambil value aslinya
+                            let totalBayar = form.querySelector('input[name="total_bayar"]').value;
+                            let potongan = form.querySelector('input[name="potongan"]').value;
+
+                            // convert pakai fungsi destroyFormatFunction (misal: "40.000" → 40000)
+                            totalBayar = destroyFormatRupiah(totalBayar);
+                            potongan = destroyFormatRupiah(potongan);
+
+                            // set ulang ke FormData biar yang terkirim udah bersih
+                            data.set("total_bayar", totalBayar);
+                            data.set("potongan", potongan);
+
                             $.ajax({
                                 url: "<?= base_url("pembayaran-invoice/save"); ?>",
                                 data: data,
@@ -682,7 +706,7 @@
         var numericValue = inputValue.replace(/[^0-9.]/g, '');
         numericValue = numericValue.replace(/^0+/g, '');
         numericValue = numericValue.replace(/^\./g, '0.');
-        if (parseFloat(numericValue) < 0 || isNaN(parseFloat(numericValue))) {
+        if (destroyFormatRupiah(numericValue) < 0 || isNaN(destroyFormatRupiah(numericValue))) {
             input.value = '0';
         } else {
             input.value = numericValue;
@@ -740,58 +764,174 @@
                 var total_amount = 0;
                 var total_invoice = 0;
                 var limit_bayar = 0;
+
+                // barang
                 $.each(res.data, function(index, item) {
                     var newRow = $('<tr style="color:whitesmoke;">');
-                    newRow.append($('<td style="text-align:center;" >').text(item.barang_kode));
+                    newRow.append($('<td style="text-align:center;" >').text(item.kode_barang));
                     newRow.append($('<td style="text-align:center;">').text(item.barang_name));
+                    newRow.append($('<td style="text-align:center;">').text(item.specs));
                     newRow.append($('<td style="text-align:center;">').text(item.qty));
-                    newRow.append($('<td style="text-align:center;">').text(formatRupiah2(item.harga_barang)));
-                    newRow.append($('<td style="text-align:center;">').text(formatRupiah2(item.total_harga_barang)));
+                    newRow.append($('<td style="text-align:center;">').text(greatFormatRupiah(item.harga_barang)));
+                    newRow.append($('<td style="text-align:center;">').text(greatFormatRupiah(item.total_harga)));
                     table.find('tbody').append(newRow);
-                    total_amount += parseFloat(item.total_harga_barang);
+                    total_amount += parseFloat(item.total_harga);
                 });
+
+                // total pembayaran
                 total_invoice = res.totalPembayaran;
+
                 var newRow0 = $('<tr style="color:whitesmoke;">');
-                newRow0.append($('<td colspan="4" style="text-align: right;">').text("Total Pembayaran"));
-                newRow0.append($('<td style="text-align:center;">').text(formatRupiah2(total_amount)));
+                newRow0.append($('<td colspan="5" style="text-align: right;">').text("Total Harga Barang"));
+                newRow0.append($('<td style="text-align:center;">').text(greatFormatRupiah(total_amount)));
                 table.find('tbody').append(newRow0);
 
+                // mapping label + rule (+ berarti nambah biaya, - berarti ngurangin biaya)
+                const biayaMap = {
+                    commision: { label: "Commission", sign: "-" },
+                    palet_fumigation: { label: "Palet Fumigation", sign: "-" },
+                    palet_fumigation_price: { label: "Palet Fumigation Price", sign: "-" },
+                    freight: { label: "Freight", sign: "-" },
+                    additional: { label: "Additional", sign: "-" },
+                    additional_2: { label: "Additional 2", sign: "-" },
+                    rebate_price: { label: "Rebate Price", sign: "-" },
+                    royalty_price: { label: "Royalty Price", sign: "-" },
+                    estimated_freight_price: { label: "Estimated Freight Price", sign: "-" },
+                    can_deduction_price: { label: "Can Deduction", sign: "+" } // special case
+                };
+
+                var tambahan = 0;
+                const extra = res.salesOrderExportData;
+                // looping semua key selain other_price
+                for (const key in biayaMap) {
+                    if (extra[key] && parseFloat(extra[key]) != 0) {
+                        const val = parseFloat(extra[key]);
+                        const row = $('<tr style="color:whitesmoke;">');
+                        row.append($('<td colspan="5" style="text-align: right;">').text(biayaMap[key].label));
+
+                        // tampilkan dengan tanda plus/minus biar jelas
+                        let displayVal = (biayaMap[key].sign === "-" ? "- " : "+ ") + greatFormatRupiah(val);
+                        row.append($('<td style="text-align:center;">').text(displayVal));
+                        table.find('tbody').append(row);
+
+                        // hitung total
+                        if (biayaMap[key].sign === "+") {
+                            tambahan += val;   // biaya menambah total
+                        } else {
+                            tambahan -= val;   // deduction mengurangi total
+                        }
+                    }
+                }
+
+                // handle khusus untuk other_price + other_type
+                if (extra.others_price && parseFloat(extra.others_price) != 0) {
+                    const val = parseFloat(extra.others_price);
+                    const type = (extra.others_type || "PLUS").toUpperCase(); // default PLUS kalau kosong
+                    const row = $('<tr style="color:whitesmoke;">');
+                    row.append($('<td colspan="5" style="text-align: right;">').text("Other Price"));
+
+                    let displayVal = (type === "MINUS" ? "- " : "+ ") + greatFormatRupiah(val);
+                    row.append($('<td style="text-align:center;">').text(displayVal));
+                    table.find('tbody').append(row);
+
+                    if (type === "PLUS") {
+                        tambahan += val;
+                    } else {
+                        tambahan -= val;
+                    }
+                }
+
+
+                // ================= Tambahin salesOrderExportAdditionalData (dinamis) =================
+                if (res.salesOrderExportAdditionalData && res.salesOrderExportAdditionalData.length > 0) {
+                    $.each(res.salesOrderExportAdditionalData, function(i, item) {
+                        var val = parseFloat(item.additional_detail_price);
+                        if (item.additional_detail_type === "PLUS") {
+                            total_amount += val;
+                        } else {
+                            total_amount -= val;
+                        }
+
+                        var row = $('<tr style="color:whitesmoke;">');
+                        row.append($('<td colspan="5" style="text-align:right;">').text(item.additional_detail));
+                        row.append($('<td style="text-align:center;">').text(greatFormatRupiah(val)));
+                        table.find('tbody').append(row);
+                    });
+                }
+
+                // total akhir
+                var grandTotal = total_amount + tambahan;
+
+                var newRowGrand = $('<tr style="color:yellow; font-weight:bold;">');
+                newRowGrand.append($('<td colspan="5" style="text-align: right;">').text("Grand Total"));
+                newRowGrand.append($('<td style="text-align:center;">').text(greatFormatRupiah(grandTotal)));
+                table.find('tbody').append(newRowGrand);
+
+
+                // total sudah dibayar
                 var newRow1 = $('<tr style="color:whitesmoke;">');
-                newRow1.append($('<td colspan="4" style="text-align: right;">').text("Total Sudah Dibayar"));
-                newRow1.append($('<td class="total_dibayar" style="text-align:center;">').text(formatRupiah2(total_invoice)));
+                newRow1.append($('<td colspan="5" style="text-align: right;">').text("Total Sudah Dibayar"));
+                newRow1.append($('<td class="total_dibayar" style="text-align:center;">').text(greatFormatRupiah(total_invoice)));
                 table.find('tbody').append(newRow1);
 
+                // sisa pembayaran
                 var newRow2 = $('<tr style="color:whitesmoke;">');
-                newRow2.append($('<td colspan="4" style="text-align: right;">').text("Sisa Pembayaran"));
-                newRow2.append($('<td class="total_amount_invoice" style="text-align:center;">').text(formatRupiah2(total_amount - total_invoice)));
+                newRow2.append($('<td colspan="5" style="text-align: right;">').text("Sisa Pembayaran"));
+                newRow2.append($('<td class="total_amount_invoice" style="text-align:center;">').text(greatFormatRupiah(grandTotal - total_invoice)));
                 table.find('tbody').append(newRow2);
 
-                limit_bayar = parseFloat(total_amount) - parseFloat(total_invoice);
+                limit_bayar = parseFloat(grandTotal) - parseFloat(total_invoice);
 
+                // Potongan
+                var potonganVal = `<?= !empty($detail) ? formatRupiah($detail['potongan']) : '' ?>`;
                 var newRow3 = $('<tr style="color:whitesmoke;">');
-                newRow3.append($('<td colspan="4" style="text-align: right;">').text("Potongan"));
+                newRow3.append($('<td colspan="5" style="text-align: right;">').text("Potongan"));
                 newRow3.append($('<td style="text-align:center;"><b>' +
-                    `<input autocomplete="one-time-code" data-id="" <?= !empty($detail) ? ($detail['status_posting'] == 1 ? 'disabled' : '') : ""  ?> onchange="this.value = formatRupiah2(this.value)" class="form-control potongan trigger-input" type="text" value="<?= !empty($detail) ? formatRupiah($detail['potongan'])  : '' ?>" name="potongan" oninput="limitInputBayar(this, ${limit_bayar})">` +
+                    `<input autocomplete="one-time-code" data-id="" <?= !empty($detail) ? ($detail['status_posting'] == 1 ? 'disabled' : '') : "" ?>
+                        onchange="this.value = greatFormatRupiah(this.value)"
+                        class="form-control potongan trigger-input"
+                        type="text"
+                        value="${potonganVal}"
+                        name="potongan"
+                        oninput="limitInputBayar(this, ${limit_bayar})">` +
                     '</b></td>'));
                 table.find('tbody').append(newRow3);
 
+                // Total Bayar
+                // kalau value dari BE kosong/null → fallback pakai limit_bayar
+                var bayarVal = `<?= !empty($detail) ? formatRupiah($detail['total_bayar']) : '' ?>`;
+                if (!bayarVal || bayarVal === "0") {
+                    bayarVal = greatFormatRupiah(limit_bayar);
+                }
+
                 var newRow4 = $('<tr style="color:whitesmoke;">');
-                newRow4.append($('<td colspan="4" style="text-align: right;">').text("Anda Membayar Sebesar"));
+                newRow4.append($('<td colspan="5" style="text-align: right;">').text("Anda Membayar Sebesar"));
                 newRow4.append($('<td style="text-align:center;"><b>' +
-                    `<input autocomplete="one-time-code" data-id="" <?= !empty($detail) ? ($detail['status_posting'] == 1 ? 'disabled' : '') : ""  ?> onchange="this.value = formatRupiah2(this.value)" class="form-control total-bayar trigger-input" type="text" value="<?= !empty($detail) ? formatRupiah($detail['total_bayar'])  : '' ?>" name = "total_bayar"> ` +
+                    `<input autocomplete="one-time-code" data-id="" <?= !empty($detail) ? ($detail['status_posting'] == 1 ? 'disabled' : '') : "" ?>
+                        onchange="this.value = greatFormatRupiah(this.value)"
+                        class="form-control total-bayar trigger-input"
+                        type="text"
+                        value="${bayarVal}"
+                        name="total_bayar"> ` +
                     '</b></td>'));
                 table.find('tbody').append(newRow4);
 
+
                 $(document).on("input", ".total-bayar, .potongan", function() {
-                    var potongan = $('.potongan').val() ? convertRupiahToNumber($('.potongan').val()) : 0;
-                    limit_bayar = parseFloat(total_amount) - parseFloat(total_invoice) - parseFloat(potongan);
+                    var potongan = destroyFormatRupiah($('.potongan').val()) ? destroyFormatRupiah($('.potongan').val()) : 0;
 
-                    $('input.total-bayar').attr('oninput', `limitInputBayar(this, ${limit_bayar})`);
+                    // hitung ulang limit_bayar dengan potongan
+                    var newLimit = destroyFormatRupiah(grandTotal) - destroyFormatRupiah(total_invoice) - destroyFormatRupiah(potongan);
 
-                    if ($('.potongan').val() != "" || $('.potongan').val() != 0) {
-                        $('.total-bayar').val(limit_bayar).change()
+                    // update attribute limitInputBayar pakai nilai baru
+                    $('input.total-bayar').attr('oninput', `limitInputBayar(this, ${destroyFormatRupiah(newLimit)})`);
+
+                    // kalau ada potongan valid, auto update total bayar
+                    if ($('.potongan').val() !== "" && potongan > 0) {
+                        $('.total-bayar').val(greatFormatRupiah(newLimit)).change();
                     }
                 });
+
             }
         })
     }
