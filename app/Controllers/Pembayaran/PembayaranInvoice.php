@@ -20,6 +20,7 @@ use App\Models\SalesOrderLainModel;
 use App\Models\SalesOrderLainDetailModel;
 use App\Models\SalesOrderExportModel;
 use App\Models\SalesOrderExportDetailModel;
+use App\Models\SalesOrderExportAdditionalModel;
 use App\Models\MetadataModel;
 use App\Models\PembayaranInvoiceDetailModel;
 use App\Models\SalesOrderReturnDetailModel;
@@ -41,6 +42,7 @@ class PembayaranInvoice extends BaseController
     protected $salesOrderLainDetailModel;
     protected $salesOrderExportModel;
     protected $salesOrderExportDetailModel;
+    protected $salesOrderExportAdditionalModel;
     protected $salesOrderInvoiceModel;
     protected $salesOrderInvoiceDetailModel;
     protected $salesOrderReturnModel;
@@ -65,6 +67,7 @@ class PembayaranInvoice extends BaseController
         $this->salesOrderLainModel = new SalesOrderLainModel();
         $this->salesOrderLainDetailModel = new SalesOrderLainDetailModel();
         $this->salesOrderExportModel = new SalesOrderExportModel();
+        $this->salesOrderExportAdditionalModel = new SalesOrderExportAdditionalModel();
         $this->salesOrderExportDetailModel = new SalesOrderExportDetailModel();
         $this->salesOrderInvoiceModel = new SalesOrderInvoiceModel();
         $this->salesOrderInvoiceDetailModel = new SalesOrderInvoiceDetailModel();
@@ -810,16 +813,48 @@ class PembayaranInvoice extends BaseController
         $dataBarang = [];
         $totalPembayaran = 0;
         $totalAmountInvoice = 0;
-        $salesOrderInvoiceData = $this->salesOrderInvoiceModel->where('id', $id)->first();
+        $salesOrderExportData = $this->salesOrderExportModel
+            ->select('
+                sales_order_export_id,
+                commision,
+                palet_fumigation,
+                palet_fumigation_price,
+                freight,
+                additional,
+                additional_2,
+                rebate_price,
+                royalty_price,
+                can_deduction_price,
+                estimated_freight_price,
+                others_type,
+                others_price,
+            ')
+            ->where('sales_order_export_id', $id)
+            ->first();
+        $salesOrderExportAdditionalData = $this->salesOrderExportAdditionalModel
+            ->where('sales_order_export_id', $id)
+            ->findAll();
         $salesOrderExportDetailData = $this->salesOrderExportDetailModel
-            ->select('harga_barang, qty, total_harga_barang, barang_kode, barang_name')
+            ->select('
+                barang_master_sales.kode_barang,
+                barang_master_sales.barang_name,
+                SUM(sales_order_detail_export.qty) as total_qty,
+                SUM(sales_order_detail_export.total_harga_barang) as total_harga,
+                sales_order_detail_export.harga_barang,
+                sales_contract_detail.specs,
+            ')
+            ->join('sales_contract_detail', 'sales_order_detail_export.sales_contract_detail_id = sales_contract_detail.id', 'left')
+            ->join('barang_master_sales', 'sales_contract_detail.barang_master_sales_id = barang_master_sales.id', 'left')
             ->where('sales_order_detail_export.sales_order_export_id', $id)
             ->where('sales_order_detail_export.deletedAt', null)
+            ->groupBy('barang_master_sales.kode_barang, barang_master_sales.barang_name, sales_order_detail_export.harga_barang')
             ->findAll();
-        foreach ($salesOrderExportDetailData as $s) {
-            $totalAmountInvoice += $s['total_harga_barang'];
-            array_push($dataBarang, $s);
-        }
+
+            foreach ($salesOrderExportDetailData as $s) {
+                $totalAmountInvoice += $s['total_harga'];
+                array_push($dataBarang, $s);
+            }
+
         $pembayaranInvoiceData = $this->pembayaranInvoiceModel
             ->where('pembayaran_invoice.company_id', $this->this_company_id)
             ->where('pembayaran_invoice.invoice_id', $id)
@@ -833,6 +868,8 @@ class PembayaranInvoice extends BaseController
         // if ($totalAmountInvoice >= $totalPembayaran) {
         $data = [
             'data' => $dataBarang,
+            'salesOrderExportData'  => $salesOrderExportData,
+            'salesOrderExportAdditionalData'  => $salesOrderExportAdditionalData,
             'totalPembayaran' => $totalPembayaran,
             'status' => true
         ];
@@ -1025,6 +1062,25 @@ class PembayaranInvoice extends BaseController
                     'akun_selisih' => $this->request->getVar('akun_selisih'),
                     'status_posting' => '0'
                 ]);
+
+                $salesOrderExportData = $this->salesOrderExportModel
+                    ->select('
+                        sales_order_export_id,
+                        commision,
+                        palet_fumigation,
+                        palet_fumigation_price,
+                        freight,
+                        additional,
+                        additional_2,
+                        rebate_price,
+                        royalty_price,
+                        can_deduction_price,
+                        estimated_freight_price,
+                        others_type,
+                        others_price,
+                    ')
+                    ->where('sales_order_export_id', $id)
+                    ->first();
 
                 return response()->setJSON([
                     'id' => encrypt($id),
