@@ -589,7 +589,7 @@
             <?php foreach ($dataBiayaEksporDetail as $d): ?>
                 listBiayaEkspor.push({
                     id_biaya_ekspor_detail: "<?= $d['id'] ?>",
-                    uraian_biaya: "<?= $d['uraian_biaya'] ?>",
+                    uraian_biaya: "<?= str_replace(array("\r", "\n"), '', trim($d['uraian_biaya'])) ?>",
                     nilai_biaya: <?= floatval($d['nilai_biaya']) ?>,
                 });
             <?php endforeach ?>
@@ -1336,7 +1336,7 @@
     function resetFormDetailBarang() {
         $('#id_detail_barang').val(null);
         $('#barang_id').val(null).change();
-        $('#valas_id').val(null).change();
+        $('#valas_id').val(30).change();
         $('#satuan_id').val(null).change();
         $('#qty_barang').val(null);
         $('#harga_satuan').val(null);

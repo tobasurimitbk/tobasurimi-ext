@@ -105,6 +105,19 @@
                             </div>
                         </div>
                     </div>
+                    <div class="col-md-4">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <div class="input-group input-group-password">
+                                <div class="form-floating mb-3" style="height: 50px;">
+                                    <input <?= !empty($dataSalesKontrak) ? ($dataSalesKontrak['status_posting']  ? 'readonly=true' : '') : ''; ?> autocomplete="one-time-code" class="form-control input-picker created_at" id="created_at" name="created_at" placeholder="Creation Date" value="<?= !empty($dataSalesKontrak) ? date('d/m/Y', strtotime($dataSalesKontrak['createdAt'])) : date('d/m/Y')  ?>">
+                                    <label for="floatingInput">Creation Date</label>
+                                </div>
+                                <div class="input-group-prepend group-prepend-password align-items-center">
+                                    <i style="cursor: pointer; z-index: 99; margin-bottom: 8px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-po-date"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                     <!-- <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <select <?= !empty($dataSalesKontrak) ? ($dataSalesKontrak['status_posting'] ? 'disabled=true' : '') : ''; ?>
@@ -272,7 +285,7 @@
                     </div>
                     <div class="col-md-6">
                         <div class="form-floating">
-                            <textarea autocomplete="one-time-code" <?= !empty($dataSalesKontrak) ? ($dataSalesKontrak['status_posting']  ? 'readonly=true' : '') : ''; ?> class="full-textarea form-control banking_information" id="banking_information" name="banking_information" placeholder="Banking Information"><?= !empty($dataSalesKontrak) ? $dataSalesKontrak['banking_information'] : ""; ?></textarea>
+                            <textarea autocomplete="one-time-code" <?= !empty($dataSalesKontrak) ? ($dataSalesKontrak['status_posting']  ? 'readonly=true' : '') : ''; ?> class="full-textarea form-control banking_information" id="banking_information" name="banking_information" placeholder="Banking Information"><?= !empty($dataSalesKontrak) ? $dataSalesKontrak['banking_information'] : $bankInfo['value']; ?></textarea>
                             <label for="floatingInput">Banking Information</label>
                         </div>
                     </div>
@@ -1072,12 +1085,12 @@
 
     })
 
-    // $(".shipment_date").datepicker({
-    //     todayHighlight: true,
-    //     format: "dd/mm/yyyy",
-    //     orientation: "bottom auto",
-    //     autoclose: true
-    // })
+    $(".created_at").datepicker({
+        todayHighlight: true,
+        format: "dd/mm/yyyy",
+        orientation: "bottom auto",
+        autoclose: true
+    })
 
     $('.icon-due-date').click(function() {
         $(".due_date").focus();

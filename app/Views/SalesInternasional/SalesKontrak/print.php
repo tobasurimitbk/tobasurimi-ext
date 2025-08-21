@@ -318,7 +318,7 @@
                     </td>
                     <td>:</td>
                     <td>
-                        <label class="label-header"><?= date('F d, Y', strtotime($salesKontrak['createdAt'])); ?></label>
+                        <label class="label-header"><?= strtoupper(date('F d, Y', strtotime($salesKontrak['createdAt']))); ?></label>
                     </td>
                 </tr>
                 <tr>

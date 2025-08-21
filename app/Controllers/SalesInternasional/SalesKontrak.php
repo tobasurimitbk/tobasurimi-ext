@@ -45,6 +45,7 @@ class SalesKontrak extends BaseController
     protected $salesContractRevisionModel;
     protected $salesOrderDetailExportModel;
     protected $salesOrderExportDetailModel;
+    protected $metadataModel;
     protected $companyModel;
 
     public function __construct()
@@ -70,6 +71,7 @@ class SalesKontrak extends BaseController
         $this->salesContractRevisionModel = new SalesContractRevisionModel();
         $this->salesOrderExportDetailModel = new SalesOrderExportDetailModel();
         $this->companyModel = new CompaniesModel();
+        $this->metadataModel = new MetadataModel();
     }
 
     public function index()
@@ -101,6 +103,22 @@ class SalesKontrak extends BaseController
         $sales = $this->employessModel->getEmployeesComplete($this->this_company_id, $condition);
         $dataBank = $this->bankModel->where('company_id', $this->this_company_id)->findAll();
         $dataCompany = $this->companyModel->whereIn('id', [1, 2])->findAll();
+        if ($this->this_company_id == 2 || $this->this_company_id == 1) {
+            // Kim 1 atau Kim 2
+            $bankInfo = $this->metadataModel
+                ->where('name', 'bank_info_kim')
+                ->first();
+        } elseif ($this->this_company_id == 15) {
+            // Global
+            $bankInfo = $this->metadataModel
+                ->where('name', 'bank_info_global')
+                ->first();
+        } else {
+            // Ocs
+            $bankInfo = $this->metadataModel
+                ->where('name', 'bank_info_ocs')
+                ->first();
+        }
 
         $data = [
             "dataCustomer" => $dataCustomer,
@@ -112,7 +130,8 @@ class SalesKontrak extends BaseController
             'dataBarang' => $dataBarang,
             "dataSales" => $sales,
             "dataBank" => $dataBank,
-            "dataCompany" => $dataCompany
+            "dataCompany" => $dataCompany,
+            "bankInfo" => $bankInfo
         ];
 
 
@@ -352,6 +371,7 @@ class SalesKontrak extends BaseController
             'others_price' => $this->request->getVar('others_price'),
             'others_type' => $this->request->getVar('others_type'),
             'createdBy' => $this->this_user_id,
+            'createdAt' =>  $this->request->getVar("created_at") ? date("Y-m-d H:i:s", strtotime(str_replace("/", "-", $this->request->getVar("created_at")))) : "",
             'status_posting' => '0',
         ]);
 
@@ -463,6 +483,7 @@ class SalesKontrak extends BaseController
             'others' => $this->request->getVar('others'),
             'others_price' => $this->request->getVar('others_price'),
             'others_type' => $this->request->getVar('others_type'),
+            'createdAt' =>  $this->request->getVar("created_at") ? date("Y-m-d H:i:s", strtotime(str_replace("/", "-", $this->request->getVar("created_at")))) : "",
             // 'createdBy' => $this->this_user_id,
         ]);
 
