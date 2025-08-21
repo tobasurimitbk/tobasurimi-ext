@@ -371,7 +371,7 @@
             <?php foreach ($dataBiayaLokalDetail as $d): ?>
                 listBiayaLokal.push({
                     id_biaya_lokal_detail: "<?= $d['id'] ?>",
-                    uraian_biaya: "<?= $d['uraian_biaya'] ?>",
+                    uraian_biaya: "<?= str_replace(array("\r", "\n"), '', trim($d['uraian_biaya'])) ?>",
                     valas_id: "<?= $d['valas_id'] ?>",
                     valas_name: "<?= $d['valas_name'] ?>",
                     nilai_biaya: <?= floatval($d['nilai_biaya']) ?>,
@@ -833,21 +833,11 @@
         $('#id_biaya_lokal_detail').val(null);
         $('#uraian_biaya').val(null);
         $('#nilai_biaya').val(null);
-        $('#valas_id').val(null).change();
+        $('#valas_id').val(30).change();
         $('#exchange_rate').val(1).change();
         $('#nilai_biaya_idr').val(null).change();
 
         drawTableBiayaLokal(listBiayaLokal);
-    }
-
-    function resetFormDetailBarang() {
-        $('#id_detail_barang').val(null);
-        $('#barang_id').val(null).change();
-        $('#valas_id').val(null).change();
-        $('#satuan_id').val(null).change();
-        $('#qty_barang').val(null);
-        $('#harga_satuan').val(null);
-        $('#total_harga').val(null);
     }
 
     function resetFormPengenaanPajak() {

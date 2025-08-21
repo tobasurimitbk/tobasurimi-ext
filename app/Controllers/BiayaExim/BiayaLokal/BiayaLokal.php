@@ -268,7 +268,7 @@ class BiayaLokal extends BaseController
         $data['totalDikembalikan'] = $totalDikembalikan;
 
         $this->dompdf->loadHtml(view('BiayaExim/BiayaLokal/print', $data));
-        $this->dompdf->setPaper('A5', 'landscape');
+        $this->dompdf->setPaper('legal', 'portrait');
         $this->dompdf->render();
         $this->dompdf->stream($filename, array("Attachment" => false));
         exit(0);

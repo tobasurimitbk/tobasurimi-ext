@@ -58,7 +58,7 @@
                     <?php endif; ?>
                     <?php if (can('Penjualan Ekspor', 'Order Form', 'u')): ?>
                         <button class="btn btn-show-form btn-save float-right btn-submit-parent">
-                            Simpan
+                            Update
                         </button>
                     <?php endif; ?>
                 <?php } ?>
