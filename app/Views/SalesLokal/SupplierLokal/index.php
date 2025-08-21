@@ -14,7 +14,7 @@
     <div class="modal-dialog" style="min-width: 900px;">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title"><label class="title-name"></label> Supplier Lokal</h5>
+                <h5 class="modal-title"><label class="title-name"></label> Vendor Lokal</h5>
             </div>
             <div class="modal-body">
                 <form class="create-form-lokal" role="form" method="POST" enctype="multipart/form-data">
@@ -26,8 +26,8 @@
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <div class="input-group input-group-password">
                                     <div class="form-floating mb-3" style="height: 50px;">
-                                        <input readonly autocomplete="one-time-code" type="text" class="form-control kode" id="kode" name="kode" placeholder="Kode Supplier Lokal">
-                                        <label for="floatingInput">Kode Supplier Lokal</label>
+                                        <input readonly autocomplete="one-time-code" type="text" class="form-control kode" id="kode" name="kode" placeholder="Kode Vendor Lokal">
+                                        <label for="floatingInput">Kode Vendor Lokal</label>
                                     </div>
                                     <div class="input-generate input-group-prepend group-prepend-password align-items-center">
                                         <input autocomplete="one-time-code" style="z-index: 99; margin-bottom: 10px; margin-left: -30px;" class="auto_generate" id="auto_generate" name="auto_generate" type="checkbox" onchange="changeStatus()">
@@ -187,7 +187,7 @@
             <div class="modal-footer">
                 <button type="button" class="btn btn-hide-form btn-discard mr-2">Kembali</button>
                 <button type="submit" class="btn btn-submit-form btn-submit-parent-lokal">Simpan</button>
-                <?php if (can('Penjualan Lokal', 'Supplier Lokal', 'd')) : ?>
+                <?php if (can('Penjualan Lokal', 'Vendor Lokal', 'd')) : ?>
                     <button type="button" class="btn btn-discard delete-btn delete-form">Hapus</button>
                 <?php endif; ?>
             </div>
@@ -198,13 +198,13 @@
 <!-- Begin Page Content -->
 <section class="section">
     <div class="section-header">
-        <h1 class="mb-2 mb-md-0">Supplier Lokal</h1>
+        <h1 class="mb-2 mb-md-0">Vendor Lokal</h1>
         <div class="col-button-tambah-spp">
             <a class="btn btn-warning btn-print float-right" href="#" target="_blank" id="btn-export">
                 <i class="fa fa-download"></i> Export
             </a>
 
-            <?php if (can('Penjualan Lokal', 'Supplier Lokal', 'c')): ?>
+            <?php if (can('Penjualan Lokal', 'Vendor Lokal', 'c')): ?>
                 <button class="btn btn-show-form-lokal btn-success float-right btn-submit" data-btn="create-modal">
                     <i class="fa fa-plus fa-sm me-1"></i> Tambah
                 </button>
@@ -215,7 +215,7 @@
         <div class="card-body">
             <div class="row  justify-content-end ">
                 <div class="col-sm-3 mb-3" style="float: right;">
-                    <input autocomplete="one-time-code" class="form-control search form-out-search mr-3 form-search-lokal" placeholder="Cari Kode / Supplier Lokal / Sales" value="" />
+                    <input autocomplete="one-time-code" class="form-control search form-out-search mr-3 form-search-lokal" placeholder="Cari Kode / Vendor Lokal / Sales" value="" />
                 </div>
             </div>
             <div class="table-responsive">
@@ -225,7 +225,7 @@
                             <tr>
                                 <th>No.</th>
                                 <th onclick="changeSort('kode')" class="sort">Kode</th>
-                                <th onclick="changeSort('name')" class="sort">Nama Supplier Lokal</th>
+                                <th onclick="changeSort('name')" class="sort">Nama Vendor Lokal</th>
                                 <th onclick="changeSort('phone')" class="sort">Kontak</th>
                                 <th onclick="changeSort('address')" class="sort">Alamat</th>
                                 <!-- <th onclick="changeSort('nameSales')" class="sort">Nama Sales</th> -->
@@ -321,12 +321,12 @@
                     var id = row.id;
                     return `
                     <div class="mt-0">
-                        <?php if (can('Penjualan Lokal', 'Supplier Lokal', 'u')) : ?>
+                        <?php if (can('Penjualan Lokal', 'Vendor Lokal', 'u')) : ?>
                             <a href="javascript:void(0)" onclick="edit('${id}')" data-toggle="tooltip" title="Edit" class="btn btn-primary">
                                 <i class="fas fa-edit"></i>
                             </a>
                         <?php endif; ?>
-                        <?php if (can('Penjualan Lokal', 'Supplier Lokal', 'd')) : ?>
+                        <?php if (can('Penjualan Lokal', 'Vendor Lokal', 'd')) : ?>
                             <button data-toggle="tooltip" title="Hapus" onclick="destroy('${id}')" class="btn btn-danger delete-parent">
                                 <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
                             </button>
@@ -979,7 +979,7 @@
                         data.append("currency", "30");
 
                         if (id) {
-                            <?php if (can('Penjualan Lokal', 'Supplier Lokal', 'u')) : ?>
+                            <?php if (can('Penjualan Lokal', 'Vendor Lokal', 'u')) : ?>
                                 $.ajax({
                                     url: "<?= base_url("supplier-lokal/update"); ?>",
                                     data: data,
