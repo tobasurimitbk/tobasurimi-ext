@@ -132,38 +132,66 @@ class SalesOrderReturnModel extends Model
         ];
     }
 
+    // public function generateNoReturn(): string
+    // {
+    //     $format = "RETURN";
+    //     $month = idate('m');
+    //     $year = date('Y');
+    //     $formatMonth = str_pad($month, 2, 0, STR_PAD_LEFT);
+    //     $numberTemplate = "/$year/$formatMonth/";
+
+    //     $lastData = $this->asObject()
+    //         ->where("no_return LIKE '%$numberTemplate%'")
+    //         ->orderBy('createdAt', 'DESC')
+    //         ->first();
+
+    //     $dummyNum = 0;
+    //     if (!empty($lastData)) {
+    //         $asd = explode('/', $lastData->no_return);
+    //         foreach ($asd as $key => $item) {
+    //             if ($key === 3) {
+    //                 if (preg_match('/^(.*?)(\d+)$/', $item, $matches)) {
+    //                     $prefix = $matches[1]; // "inv"
+    //                     $number = $matches[2]; // "nomer invoice"
+    //                 }
+    //             }
+    //         }
+    //         $numbers = $number + 1; // increment nomer invoice
+
+    //         $invNumber = $format . $numberTemplate . $numbers;
+    //     } else {
+    //         $numbers = 1; // nomer invoice awal jika tidak ada data
+
+    //         $invNumber = $format . $numberTemplate . $numbers;
+    //     }
+
+    //     return $invNumber;
+    // }
+
     public function generateNoReturn(): string
     {
         $format = "RETURN";
         $month = idate('m');
         $year = date('Y');
-        $formatMonth = str_pad($month, 2, 0, STR_PAD_LEFT);
-        $numberTemplate = "/$year/$formatMonth/";
+        $formatMonth = str_pad($month, 2, '0', STR_PAD_LEFT);
+        $numberTemplate = "/" . $year . "/" . $formatMonth . "/";
 
+        // Ambil data terakhir
         $lastData = $this->asObject()
-            ->where("no_return LIKE '%$numberTemplate%'")
             ->orderBy('createdAt', 'DESC')
             ->first();
 
-        $dummyNum = 0;
-        if (!empty($lastData)) {
-            $asd = explode('/', $lastData->no_return);
-            foreach ($asd as $key => $item) {
-                if ($key === 3) {
-                    if (preg_match('/^(.*?)(\d+)$/', $item, $matches)) {
-                        $prefix = $matches[1]; // "inv"
-                        $number = $matches[2]; // "nomer invoice"
-                    }
-                }
-            }
-            $numbers = $number + 1; // increment nomer invoice
-
-            $invNumber = $format . $numberTemplate . $numbers;
+        if ($lastData && !empty($lastData->no_return)) {
+            $parts = explode('/', $lastData->no_return);
+            $lastNumber = isset($parts[3]) && is_numeric($parts[3]) ? intval($parts[3]) : 0;
+            $nextNumber = $lastNumber + 1;
         } else {
-            $numbers = 1; // nomer invoice awal jika tidak ada data
-
-            $invNumber = $format . $numberTemplate . $numbers;
+            $nextNumber = 1;
         }
+
+        // format nomor jadi 3 digit
+        $paddedNumber = str_pad($nextNumber, 3, '0', STR_PAD_LEFT);
+        $invNumber = $format . $numberTemplate . $paddedNumber;
 
         return $invNumber;
     }

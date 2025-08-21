@@ -992,6 +992,55 @@ class OrderForm extends BaseController
         exit();
     }
 
+    // public function generateNomorSalesOrder()
+    // {
+    //     $code = "TSI";
+    //     $currentYear = date('y'); // 2 digit
+    //     $currentMonth = date('n'); // 1-12
+    //     $romawi = ['', 'I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI', 'XII'];
+    //     $numberTemplate = $code . "/" . $romawi[$currentMonth] . "/" . $currentYear . "/";
+
+    //     $listData = $this->SalesOrderModel->asObject()
+    //         ->like('no_sales_order', $numberTemplate)
+    //         ->orderBy('no_sales_order', 'ASC') // penting: ASC buat gap detect
+    //         ->findAll();
+
+    //     $existingNumbers = [];
+
+    //     foreach ($listData as $data) {
+    //         $parts = explode('/', $data->no_sales_order);
+    //         if (isset($parts[3]) && is_numeric($parts[3])) {
+    //             $existingNumbers[] = intval($parts[3]);
+    //         }
+    //     }
+
+    //     sort($existingNumbers);
+
+    //     $nextNumber = 1;
+    //     $foundGap = false;
+
+    //     foreach ($existingNumbers as $num) {
+    //         if ($num != $nextNumber) {
+    //             $foundGap = true;
+    //             break;
+    //         }
+    //         $nextNumber++;
+    //     }
+
+    //     if (!$foundGap) {
+    //         $nextNumber = empty($existingNumbers) ? 1 : end($existingNumbers) + 1;
+    //     }
+
+    //     $paddedNumber = str_pad($nextNumber, 3, '0', STR_PAD_LEFT);
+    //     $invNumber = $numberTemplate . $paddedNumber;
+
+    //     return response()->setJSON([
+    //         'data' => $invNumber,
+    //         'token' => csrf_hash(),
+    //         'status' => true
+    //     ]);
+    // }
+
     public function generateNomorSalesOrder()
     {
         $code = "TSI";
@@ -1000,37 +1049,24 @@ class OrderForm extends BaseController
         $romawi = ['', 'I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI', 'XII'];
         $numberTemplate = $code . "/" . $romawi[$currentMonth] . "/" . $currentYear . "/";
 
+        // Ambil data terakhir
         $listData = $this->SalesOrderModel->asObject()
-            ->like('no_sales_order', $numberTemplate)
-            ->orderBy('no_sales_order', 'ASC') // penting: ASC buat gap detect
-            ->findAll();
+            ->orderBy('createdAt', 'DESC')
+            ->first();
 
-        $existingNumbers = [];
+        if ($listData && !empty($listData->no_sales_order)) {
+            // pecah nomor terakhir
+            $parts = explode('/', $listData->no_sales_order);
 
-        foreach ($listData as $data) {
-            $parts = explode('/', $data->no_sales_order);
-            if (isset($parts[3]) && is_numeric($parts[3])) {
-                $existingNumbers[] = intval($parts[3]);
-            }
+            // ambil bagian terakhir sebagai nomor urut
+            $lastNumber = isset($parts[3]) && is_numeric($parts[3]) ? intval($parts[3]) : 0;
+            $nextNumber = $lastNumber + 1;
+        } else {
+            // kalau kosong mulai dari 1
+            $nextNumber = 1;
         }
 
-        sort($existingNumbers);
-
-        $nextNumber = 1;
-        $foundGap = false;
-
-        foreach ($existingNumbers as $num) {
-            if ($num != $nextNumber) {
-                $foundGap = true;
-                break;
-            }
-            $nextNumber++;
-        }
-
-        if (!$foundGap) {
-            $nextNumber = empty($existingNumbers) ? 1 : end($existingNumbers) + 1;
-        }
-
+        // format nomor urut 3 digit
         $paddedNumber = str_pad($nextNumber, 3, '0', STR_PAD_LEFT);
         $invNumber = $numberTemplate . $paddedNumber;
 
@@ -1040,7 +1076,6 @@ class OrderForm extends BaseController
             'status' => true
         ]);
     }
-
 
     public function getMetaData($id)
     {

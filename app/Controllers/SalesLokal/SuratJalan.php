@@ -685,6 +685,55 @@ class SuratJalan extends BaseController
         exit();
     }
 
+    // public function generateNomorSuratJalan()
+    // {
+    //     $code = "TSI/SJ";
+    //     $currentYear = date('y'); // 2 digit tahun
+    //     $currentMonth = date('n'); // 1-12
+    //     $romawi = ['', 'I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI', 'XII'];
+    //     $numberTemplate = $code . "/" . $romawi[$currentMonth] . "/" . $currentYear . "/";
+
+    //     $listData = $this->SuratJalanModel->asObject()
+    //         ->like('no_surat_jalan', $numberTemplate)
+    //         ->orderBy('no_surat_jalan', 'ASC') // penting buat gap-check
+    //         ->findAll();
+
+    //     $existingNumbers = [];
+
+    //     foreach ($listData as $data) {
+    //         $parts = explode('/', $data->no_surat_jalan);
+    //         if (isset($parts[4]) && is_numeric($parts[4])) {
+    //             $existingNumbers[] = intval($parts[4]);
+    //         }
+    //     }
+
+    //     sort($existingNumbers);
+
+    //     $nextNumber = 1;
+    //     $foundGap = false;
+
+    //     foreach ($existingNumbers as $num) {
+    //         if ($num != $nextNumber) {
+    //             $foundGap = true;
+    //             break;
+    //         }
+    //         $nextNumber++;
+    //     }
+
+    //     if (!$foundGap) {
+    //         $nextNumber = empty($existingNumbers) ? 1 : end($existingNumbers) + 1;
+    //     }
+
+    //     $paddedNumber = str_pad($nextNumber, 3, '0', STR_PAD_LEFT);
+    //     $invNumber = $numberTemplate . $paddedNumber;
+
+    //     return response()->setJSON([
+    //         'data' => $invNumber,
+    //         'token' => csrf_hash(),
+    //         'status' => true
+    //     ]);
+    // }
+
     public function generateNomorSuratJalan()
     {
         $code = "TSI/SJ";
@@ -693,37 +742,20 @@ class SuratJalan extends BaseController
         $romawi = ['', 'I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI', 'XII'];
         $numberTemplate = $code . "/" . $romawi[$currentMonth] . "/" . $currentYear . "/";
 
-        $listData = $this->SuratJalanModel->asObject()
-            ->like('no_surat_jalan', $numberTemplate)
-            ->orderBy('no_surat_jalan', 'ASC') // penting buat gap-check
-            ->findAll();
+        // Ambil data terakhir sesuai bulan & tahun
+        $lastData = $this->SuratJalanModel->asObject()
+            ->orderBy('createdAt', 'DESC')
+            ->first();
 
-        $existingNumbers = [];
-
-        foreach ($listData as $data) {
-            $parts = explode('/', $data->no_surat_jalan);
-            if (isset($parts[4]) && is_numeric($parts[4])) {
-                $existingNumbers[] = intval($parts[4]);
-            }
+        if ($lastData && !empty($lastData->no_surat_jalan)) {
+            $parts = explode('/', $lastData->no_surat_jalan);
+            $lastNumber = isset($parts[4]) && is_numeric($parts[4]) ? intval($parts[4]) : 0;
+            $nextNumber = $lastNumber + 1;
+        } else {
+            $nextNumber = 1;
         }
 
-        sort($existingNumbers);
-
-        $nextNumber = 1;
-        $foundGap = false;
-
-        foreach ($existingNumbers as $num) {
-            if ($num != $nextNumber) {
-                $foundGap = true;
-                break;
-            }
-            $nextNumber++;
-        }
-
-        if (!$foundGap) {
-            $nextNumber = empty($existingNumbers) ? 1 : end($existingNumbers) + 1;
-        }
-
+        // Format jadi 3 digit
         $paddedNumber = str_pad($nextNumber, 3, '0', STR_PAD_LEFT);
         $invNumber = $numberTemplate . $paddedNumber;
 

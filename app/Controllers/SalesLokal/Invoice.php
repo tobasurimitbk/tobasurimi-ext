@@ -1361,6 +1361,48 @@ class Invoice extends BaseController
         ]);
     }
 
+    // public function getNomorFaktur()
+    // {
+    //     $code = "LKL/INV";
+    //     $currentYear = date('y'); // 2 digit
+    //     $currentMonth = date('n'); // 1-12 tanpa nol depan
+    //     $romawi = ['', 'I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI', 'XII'];
+    //     $numberTemplate = $code . "/" . $currentYear . "/" . $romawi[$currentMonth] . "/";
+
+    //     $listData = $this->SalesOrderInvoiceModel->asObject()
+    //         ->like('no_faktur', $numberTemplate)
+    //         ->orderBy('no_faktur', 'ASC')
+    //         ->findAll();
+
+    //     $existingNumbers = [];
+
+    //     foreach ($listData as $data) {
+    //         $parts = explode('/', $data->no_faktur);
+    //         if (isset($parts[4]) && is_numeric($parts[4])) {
+    //             $existingNumbers[] = intval($parts[4]);
+    //         }
+    //     }
+
+    //     sort($existingNumbers);
+
+    //     $nextNumber = 1;
+    //     foreach ($existingNumbers as $num) {
+    //         if ($num != $nextNumber) {
+    //             break; // ketemu celah
+    //         }
+    //         $nextNumber++;
+    //     }
+
+    //     $paddedNumber = str_pad($nextNumber, 3, '0', STR_PAD_LEFT);
+    //     $invNumber = $numberTemplate . $paddedNumber;
+
+    //     return response()->setJSON([
+    //         'data' => $invNumber,
+    //         'token' => csrf_hash(),
+    //         'status' => true
+    //     ]);
+    // }
+
     public function getNomorFaktur()
     {
         $code = "LKL/INV";
@@ -1369,30 +1411,20 @@ class Invoice extends BaseController
         $romawi = ['', 'I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI', 'XII'];
         $numberTemplate = $code . "/" . $currentYear . "/" . $romawi[$currentMonth] . "/";
 
-        $listData = $this->SalesOrderInvoiceModel->asObject()
-            ->like('no_faktur', $numberTemplate)
-            ->orderBy('no_faktur', 'ASC')
-            ->findAll();
+        // Ambil faktur terakhir
+        $lastData = $this->SalesOrderInvoiceModel->asObject()
+            ->orderBy('createdAt', 'DESC')
+            ->first();
 
-        $existingNumbers = [];
-
-        foreach ($listData as $data) {
-            $parts = explode('/', $data->no_faktur);
-            if (isset($parts[4]) && is_numeric($parts[4])) {
-                $existingNumbers[] = intval($parts[4]);
-            }
+        if ($lastData && !empty($lastData->no_faktur)) {
+            $parts = explode('/', $lastData->no_faktur);
+            $lastNumber = isset($parts[4]) && is_numeric($parts[4]) ? intval($parts[4]) : 0;
+            $nextNumber = $lastNumber + 1;
+        } else {
+            $nextNumber = 1;
         }
 
-        sort($existingNumbers);
-
-        $nextNumber = 1;
-        foreach ($existingNumbers as $num) {
-            if ($num != $nextNumber) {
-                break; // ketemu celah
-            }
-            $nextNumber++;
-        }
-
+        // Format 3 digit
         $paddedNumber = str_pad($nextNumber, 3, '0', STR_PAD_LEFT);
         $invNumber = $numberTemplate . $paddedNumber;
 
