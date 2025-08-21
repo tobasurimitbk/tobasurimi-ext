@@ -664,7 +664,6 @@
                 }
             }
         });
-        console.log(listStockSelected);
         drawTableSelectedItem(listStockSelected);
     }
 
