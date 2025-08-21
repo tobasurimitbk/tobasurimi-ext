@@ -659,7 +659,7 @@
                 
                 if (!isIDSelected) {
                     listStockAsal[i].stok_total = parseFloat(listStockAsal[i].stok_total);
-                    listStockAsal[i].qty = parseFloat(listStockAsal[i].stok_total); // Ganti dari 0 ke 1 atau nilai default lain
+                    listStockAsal[i].qty = 0; // Ganti dari 0 ke 1 atau nilai default lain
                     listStockSelected.push(listStockAsal[i]);
                 }
             }
