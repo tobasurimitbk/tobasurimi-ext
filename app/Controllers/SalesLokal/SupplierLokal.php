@@ -82,7 +82,7 @@ class SupplierLokal extends BaseController
             $condition = [
                 'tipe_customer' => $this->request->getGet('customerType'),
                 'supplier_lokals.deletedAt' => null,
-                'supplier_lokals.user_id' => session()->get('login')->user_id
+                // 'supplier_lokals.user_id' => session()->get('login')->user_id
             ];
         }
 
@@ -148,7 +148,7 @@ class SupplierLokal extends BaseController
         ];
 
         if ($this->is_admin == '0') {
-            $condition['supplier_lokals.user_id'] = session()->get('login')->user_id;
+            // $condition['supplier_lokals.user_id'] = session()->get('login')->user_id;
         }
 
         $addCondition = [
