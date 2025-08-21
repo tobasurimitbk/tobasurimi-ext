@@ -693,6 +693,7 @@ class SalesKontrak extends BaseController
                 '
                 sales_contract.*,
                 customers.name as customer_name,
+                customers.address,
                 banks.kode_bank,
                 banks.name as nama_bank,
                 banks.atas_nama,

@@ -52,14 +52,14 @@
                     <table class="table table-bordered nowrap table-hover-tobasurimi dataTable" id="dataTable" width="100%" cellspacing="0">
                         <thead class="thead-dark">
                             <tr>
-                                <th onclick="changeSort('biaya_ekspor.id')">No</th>
+                                <th onclick="changeSort('biaya_ekspor.id')" style="width: 10px;">No</th>
                                 <th onclick="changeSort('biaya_impor.divisi_id')" class="sort">Departemen</th>
                                 <th onclick="changeSort('biaya_impor.tanggal_invoice')" class="sort">Tanggal</th>
                                 <th onclick="changeSort('biaya_impor.no_invoice')" class="sort">Invoice</th>
                                 <th onclick="changeSort('biaya_impor.vendor_pelayaran_id')" class="sort">Vendor</th>
                                 <th onclick="changeSort('biaya_impor.total_faktur')" class="sort">Total</th>
                                 <th onclick="changeSort('biaya_impor.status_posting')" class="sort">Audit</th>
-                                <th>Action</th>
+                                <th style="width: 120px;">Action</th>
                             </tr>
                         </thead>
                         <tbody class="body-table" id="body-table">
