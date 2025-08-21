@@ -191,7 +191,7 @@
                                     <th>Kode Barang</th>
                                     <th>Barang</th>
                                     <th style="text-align: right;">Qty PO</th>
-                                    <th style="text-align: right;">Harga Satuan</th>
+                                    <!-- <th style="text-align: right;">Harga Satuan</th> -->
                                     <th style="text-align: right;">Total Harga <span id="txt_valas" class="mr-0"></span></th>
                                     <th style="text-align: center;">Action</th>
                                 </tr>
@@ -201,7 +201,7 @@
                             </tbody>
                             <tfoot id="foot-detail-table-barang">
                                 <tr>
-                                    <td colspan="7">List Barang Impor Tidak Ada</td>
+                                    <td colspan="6">List Barang Impor Tidak Ada</td>
                                 </tr>
                             </tfoot>
                         </table>
@@ -559,45 +559,58 @@
                             </div>
                         </div>
                         <div class="col-md-12">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <select class="form-select valas_barang_id" name="valas_barang_id" id="valas_barang_id">
-                                    <option value=""></option>
-                                    <?php foreach ($dataValas as $d): ?>
-                                        <option data-valas_name="<?= $d['value'] ?>" value="<?= $d['id'] ?>"><?= $d['value'] . " - " . $d['description'] ?></option>
-                                    <?php endforeach; ?>
-                                </select>
-                                <label for="floatingInput">Pilih Currency</label>
+                            <div class="row">
+                                <div class="col-sm-6">
+                                    <div class="form-floating mb-3" style="height: 50px;">
+                                        <select class="form-select valas_barang_id" name="valas_barang_id" id="valas_barang_id">
+                                            <option value=""></option>
+                                            <?php foreach ($dataValas as $d): ?>
+                                                <option data-valas_name="<?= $d['value'] ?>" value="<?= $d['id'] ?>"><?= $d['value'] . " - " . $d['description'] ?></option>
+                                            <?php endforeach; ?>
+                                        </select>
+                                        <label for="floatingInput">Pilih Currency</label>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="form-floating mb-3" style="height: 50px;">
+                                        <input autocomplete="one-time-code" type="text" class="form-control" id="total_harga" name="total_harga" placeholder="Total Harga" onkeyup="this.value = greatFormatRupiah(this.value)">
+                                        <label for="floatingInput">Total Harga</label>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                         <div class="col-md-12">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" type="text" class="form-control" id="qty_barang" name="qty_barang" placeholder="Qty Barang" onkeyup="this.value = greatFormatRupiah(this.value)">
-                                <label for="floatingInput">Qty Barang</label>
+                            <div class="row">
+                                <div class="col-sm-6">
+                                    <div class="form-floating mb-3" style="height: 50px;">
+                                        <select class="form-select satuan_id" name="satuan_id" id="satuan_id">
+                                            <option value=""></option>
+                                            <?php foreach ($dataSatuan as $d): ?>
+                                                <option data-kode_satuan="<?= $d['kode_satuan'] ?>" value="<?= $d['id'] ?>"><?= $d['kode_satuan']  ?></option>
+                                            <?php endforeach; ?>
+                                        </select>
+                                        <label for="floatingInput">Pilih Satuan</label>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="form-floating mb-3" style="height: 50px;">
+                                        <input autocomplete="one-time-code" type="text" class="form-control" id="qty_barang" name="qty_barang" placeholder="Qty Barang" onkeyup="this.value = greatFormatRupiah(this.value)">
+                                        <label for="floatingInput">Qty Barang</label>
+                                    </div>
+                                </div>
                             </div>
+
                         </div>
-                        <div class="col-md-12">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <select class="form-select satuan_id" name="satuan_id" id="satuan_id">
-                                    <option value=""></option>
-                                    <?php foreach ($dataSatuan as $d): ?>
-                                        <option data-kode_satuan="<?= $d['kode_satuan'] ?>" value="<?= $d['id'] ?>"><?= $d['kode_satuan']  ?></option>
-                                    <?php endforeach; ?>
-                                </select>
-                                <label for="floatingInput">Pilih Satuan</label>
-                            </div>
-                        </div>
-                        <div class="col-md-12">
+                        <!-- <div class="col-md-12">
+
+                        </div> -->
+                        <div class="col-md-12" style="display: none;">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <input autocomplete="one-time-code" type="text" class="form-control" id="harga_satuan" name="harga_satuan" placeholder="Qty Barang" onkeyup="this.value = greatFormatRupiah(this.value)">
                                 <label for="floatingInput">Harga Barang</label>
                             </div>
                         </div>
-                        <div class="col-md-12">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <input readonly autocomplete="one-time-code" type="text" class="form-control" id="total_harga" name="total_harga" placeholder="Total Harga" onkeyup="this.value = greatFormatRupiah(this.value)">
-                                <label for="floatingInput">Total Harga</label>
-                            </div>
-                        </div>
+
                     </div>
 
                 </div>
@@ -1020,9 +1033,9 @@
                 satuan_id: {
                     required: true
                 },
-                harga_satuan: {
-                    required: true
-                },
+                // harga_satuan: {
+                //     required: true
+                // },
                 total_harga: {
                     required: true
                 },
@@ -1040,9 +1053,9 @@
                 satuan_id: {
                     required: "Pilih satuan"
                 },
-                harga_satuan: {
-                    required: "Harga satuan wajib diisi"
-                },
+                // harga_satuan: {
+                //     required: "Harga satuan wajib diisi"
+                // },
                 total_harga: {
                     required: "Total harga wajib diisi"
                 },
@@ -1093,13 +1106,21 @@
             $('#detailBarang').modal('hide');
         });
 
-        $('#qty_barang,#harga_satuan').keyup(function(e) {
+        // $('#qty_barang,#harga_satuan').keyup(function(e) {
+        //     e.preventDefault();
+        //     var qtyBarang = destroyFormatRupiah($('#qty_barang').val());
+        //     var hargaSatuan = destroyFormatRupiah($('#harga_satuan').val());
+        //     var totalHarga = parseFloat(qtyBarang) * parseFloat(hargaSatuan);
+        //     $('#total_harga').val(greatFormatRupiah(totalHarga));
+        // });
+
+        $('#total_harga,#qty_barang').keyup(function(e) {
             e.preventDefault();
             var qtyBarang = destroyFormatRupiah($('#qty_barang').val());
-            var hargaSatuan = destroyFormatRupiah($('#harga_satuan').val());
-            var totalHarga = parseFloat(qtyBarang) * parseFloat(hargaSatuan);
-            $('#total_harga').val(greatFormatRupiah(totalHarga));
-        });
+            var totalHarga = destroyFormatRupiah($('#total_harga').val());
+            var hargaSatuan = parseFloat(parseFloat(totalHarga) / parseFloat(qtyBarang)).toFixed(2);
+            $('#harga_satuan').val(greatFormatRupiah(hargaSatuan));
+        })
 
         $('#nilai_biaya,#exchange_rate').keyup(function(e) {
             e.preventDefault();
@@ -1546,7 +1567,7 @@
             $('#txt_valas').text("");
             row += `
                     <tr>
-                        <td colspan="7">List Barang Impor Tidak Ada</td>
+                        <td colspan="6">List Barang Impor Tidak Ada</td>
                     </tr>
                 `;
             $('#foot-detail-table-barang').append(row);
@@ -1563,7 +1584,7 @@
                 newRow.append($('<td>').text(item.kode_barang));
                 newRow.append($('<td>').text(item.barang_name));
                 newRow.append($('<td class="text-right">').text(greatFormatRupiah(item.qty_barang) + " " + item.kode_satuan));
-                newRow.append($('<td class="text-right">').text(greatFormatRupiah(item.harga_satuan.toFixed(2))));
+                // newRow.append($('<td class="text-right">').text(greatFormatRupiah(item.harga_satuan.toFixed(2))));
                 newRow.append($('<td class="text-right">').text(greatFormatRupiah(item.total_harga)));
                 newRow.append($('<td class="text-center">').html(
                     <?php if (!empty($dataBiayaImpor)) : ?> <?php if ($dataBiayaImpor['status_posting'] == 1) : ?> `-`
@@ -1590,7 +1611,7 @@
             });
             tfoot.append(`
                     <tr>
-                        <th colspan="5" class="text-right">GRAND TOTAL</th>
+                        <th colspan="4" class="text-right">GRAND TOTAL</th>
                         <th class="text-right">${greatFormatRupiah(totalTotalHarga.toFixed(2))}</th>
                         <th class="text-right"></th>
                     </tr>
