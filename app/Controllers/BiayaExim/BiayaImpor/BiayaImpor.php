@@ -938,7 +938,7 @@ class BiayaImpor extends BaseController
             }
 
             // === Detail Barang ===
-            $barangHeader = ['KODE BARANG', 'BARANG', 'QTY', 'SATUAN', 'HARGA SATUAN', 'TOTAL HARGA'];
+            $barangHeader = ['KODE BARANG', 'BARANG', 'QTY', 'SATUAN', 'TOTAL HARGA'];
             $col = 'B';
             foreach ($barangHeader as $header) {
                 $sheet->setCellValue($col . $row, strtoupper($header));
@@ -957,12 +957,10 @@ class BiayaImpor extends BaseController
                     $sheet->setCellValue("C{$row}", $by['barang_name'] . " " . $by['spesifikasi']);
                     $sheet->setCellValue("D{$row}", $by['qty_barang']);
                     $sheet->setCellValue("E{$row}", $by['kode_satuan']);
-                    $sheet->setCellValue("F{$row}", $by['harga_satuan']);
-                    $sheet->setCellValue("G{$row}", $by['total_harga']);
+                    $sheet->setCellValue("F{$row}", $by['total_harga']);
 
                     $sheet->getStyle("D{$row}")->getNumberFormat()->setFormatCode(NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1);
                     $sheet->getStyle("F{$row}")->getNumberFormat()->setFormatCode(NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1);
-                    $sheet->getStyle("G{$row}")->getNumberFormat()->setFormatCode(NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1);
                     $row++;
                 }
             } else {
