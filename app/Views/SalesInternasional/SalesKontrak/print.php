@@ -841,7 +841,7 @@
                         <td style="width: 25px;"><?= strtoupper(numToRoman($counter++)) ?>.</td>
                         <td style="width: 180px;">TOTAL AMOUNT (<?= $salesKontrak['mata_uang'] ?>)</td>
                         <td style="width: 10px;">:</td>
-                        <td><?= number_format($grand_total, 2) ?> (<?= strtoupper(terbilangInggris($grand_total)) ?>)</td>
+                        <td><?= number_format($grand_total, 2) ?> (<?= strtoupper(terbilangInggris($grand_total)) . " ONLY" ?>)</td>
                     </tr>
                 <?php endif; ?>
 
