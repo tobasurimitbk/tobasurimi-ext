@@ -1175,9 +1175,9 @@
                         <td>${item.supplier_name || '-'}</td>
                         <td>${item.stock_date || '-'}</td>
                         <td>${item.barang || '-'}</td>
-                        <td style="text-align: right;">${parseFloat(item.total_penerimaan)}</td>
-                        <td style="text-align: right;">${parseFloat(item.total_penerimaan)}</td>
-                        <td style="text-align: right;">${parseFloat(item.stok_total)}</td>
+                        <td style="text-align: right;">${greatFormatRupiah(item.total_penerimaan)}</td>
+                        <td style="text-align: right;">${greatFormatRupiah(item.total_penerimaan)}</td>
+                        <td style="text-align: right;">${greatFormatRupiah(item.stok_total)}</td>
                         <td>
                             <input type="text" step="0.001" min="0" 
                                 class="form-control qty-rebus-input" 
