@@ -3,6 +3,7 @@
 namespace App\Controllers\BiayaExim\PIPeb;
 
 use App\Controllers\BaseController;
+use App\Models\MetadataModel;
 use App\Models\SalesOrderExportModel;
 use Exception;
 
@@ -10,16 +11,22 @@ class PIPeb extends BaseController
 {
     protected $this_company_id;
     protected $salesOrderExportModel;
+    protected $metaDataModel;
 
     public function __construct()
     {
         $this->salesOrderExportModel = new SalesOrderExportModel();
         $this->this_company_id = session()->get("login")->this_company_id;
+        $this->metaDataModel = new MetadataModel();
     }
 
     public function index()
     {
-        return view('BiayaExim/PIPeb/index');
+        $dataValuta = $this->metaDataModel->get_by_name('Valuta');
+        $data = [
+            "dataValuta" => $dataValuta
+        ];
+        return view('BiayaExim/PIPeb/index', $data);
     }
 
     public function all()
@@ -66,8 +73,10 @@ class PIPeb extends BaseController
                 "sales_order_export_no"     => $data->sales_order_export_no,
                 "dicharge_port"             => $data->dicharge_port,
                 "status_invoice"            => $data->status_invoice,
-                "nilai_pi"                  => "(" . $data->valas_name . ") " . \number_format($data->shipment_value, 2),
-                "nilai_peb"                 => (float)$data->nilai_peb
+                "nilai_pi"                  => $data->valas_pi_name == null ? "" :  "(" . $data->valas_pi_name . ") " . \number_format($data->shipment_value, 2),
+                "nilai_peb"                 =>  $data->valas_peb_name == null ? "" : "(" . $data->valas_peb_name . ") " . \number_format($data->nilai_peb, 2),
+                "nilai_peb_idr"                 => $data->nilai_peb_idr == null ? "" :  (float)$data->nilai_peb_idr,
+                "exchange_rate_peb"                 => $data->exchange_rate_peb == null ? "" :  (float)$data->exchange_rate_peb,
             ]);
         }
 
@@ -88,8 +97,11 @@ class PIPeb extends BaseController
         try {
             $id = $this->request->getVar('id');
             $tanggalInvoice = $this->request->getVar("tanggal_invoice") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getVar("tanggal_invoice")))) : "";
-            $nilaiPeb = $this->request->getVar('nilai_peb');
             $noInvoice = $this->request->getVar('no_invoice');
+            $valasIdPeb = $this->request->getVar('valas_id_peb');
+            $nilaiPeb = $this->request->getVar('nilai_peb');
+            $exchangeRatePeb = $this->request->getVar('exchange_rate_peb');
+            $nilaiPebIdr = $this->request->getVar('nilai_peb_idr');
 
             $checkNumber = $this->salesOrderExportModel
                 ->where('no_invoice', $noInvoice)
@@ -108,7 +120,10 @@ class PIPeb extends BaseController
                 'no_invoice' => $this->request->getVar('no_invoice'),
                 'tanggal_invoice' => $tanggalInvoice,
                 'nilai_peb' => $nilaiPeb,
-                'status_invoice' => "TERBIT"
+                'status_invoice' => "TERBIT",
+                'valas_id_peb' => $valasIdPeb,
+                'exchange_rate_peb' => $exchangeRatePeb,
+                'nilai_peb_idr' => $nilaiPebIdr
             ]);
 
             return \response()->setJSON([
@@ -131,8 +146,12 @@ class PIPeb extends BaseController
             'id' => $id,
             'no_invoice' => $salesOrderExport['no_invoice'],
             'tanggal_invoice' => $salesOrderExport['tanggal_invoice'] != null ? date('d/m/Y', \strtotime($salesOrderExport['tanggal_invoice'])) : "",
+            'valas_id_peb' => $salesOrderExport['valas_id_peb'],
             'nilai_peb' => (float)$salesOrderExport['nilai_peb'],
-            'nilai_pi' => (float)$salesOrderExport['shipment_value']
+            'exchange_rate_peb' => (float)$salesOrderExport['exchange_rate_peb'],
+            'nilai_peb_idr' => (float)$salesOrderExport['nilai_peb_idr'],
+            'valas_id_pi' => $salesOrderExport['valas_id'],
+            'nilai_pi' => (float)$salesOrderExport['shipment_value'],
         ];
         return \response()->setJSON([
             'status' => true,

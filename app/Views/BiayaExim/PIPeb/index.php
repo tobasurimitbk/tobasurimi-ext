@@ -48,9 +48,10 @@
                                 <th onclick="changeSort('sales_contract.customer_id')" class="sort">Customer</th>
                                 <th onclick="changeSort('sales_order_export.sales_order_export_no')" class="sort">No OF</th>
                                 <th onclick="changeSort('sales_contract.dicharge_port')" class="sort">Destination</th>
-                                <!-- <th onclick="changeSort('sales_order_export.status_invoice')" class="sort">Status Invoice</th> -->
                                 <th onclick="changeSort('sales_order_export.nilai_pi')" class="sort">Nilai PI</th>
-                                <th onclick="changeSort('sales_order_export.shipment_value')" class="sort">Nilai PEB (IDR)</th>
+                                <th onclick="changeSort('sales_order_export.nilai_peb')" class="sort">Nilai PEB</th>
+                                <th onclick="changeSort('sales_order_export.exchange_rate_peb')" class="sort">Exchange Rate</th>
+                                <th onclick="changeSort('sales_order_export.nilai_peb_idr')" class="sort">Nilai PEB (IDR)</th>
                                 <th style="width: 120px;">Action</th>
                             </tr>
                         </thead>
@@ -89,8 +90,55 @@
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" type="text" onkeyup="this.value = greatFormatRupiah(this.value)" class="form-control nilai_peb" name="nilai_peb" id="nilai_peb" placeholder="Nilai PEB (IDR)">
+                                <select
+                                    class="form-select valas_id_peb"
+                                    aria-label="Floating label select example"
+                                    name="valas_id_peb"
+                                    id="valas_id_peb">
+                                    <option value=""></option>
+                                    <?php foreach ($dataValuta as $d) : ?>
+                                        <option value="<?= $d['id'] ?>">
+                                            <?= $d['value'] ?>
+                                        </option>
+                                    <?php endforeach; ?>
+                                </select>
+                                <label for="floatingInput" style="z-index: 1;">Pilih Valas PEB</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input autocomplete="one-time-code" type="text" onkeyup="this.value = greatFormatRupiah(this.value)" class="form-control nilai_peb" name="nilai_peb" id="nilai_peb" placeholder="Nilai PEB">
+                                <label for="floatingInput">Nilai PEB</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input autocomplete="one-time-code" type="text" onkeyup="this.value = greatFormatRupiah(this.value)" class="form-control exchange_rate_peb" name="exchange_rate_peb" id="exchange_rate_peb" placeholder="Exchange Rate PEB">
+                                <label for="floatingInput">Exchange Rate PEB</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input readonly autocomplete="one-time-code" type="text" class="form-control nilai_peb_idr" name="nilai_peb_idr" id="nilai_peb_idr" placeholder="Nilai PEB (IDR)">
                                 <label for="floatingInput">Nilai PEB (IDR)</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <select
+                                    disabled
+                                    class="form-select valas_id_pi"
+                                    aria-label="Floating label select example"
+                                    name="valas_id_pi"
+                                    id="valas_id_pi">
+                                    <option value=""></option>
+                                    <?php foreach ($dataValuta as $d) : ?>
+                                        <option value="<?= $d['id'] ?>">
+                                            <?= $d['value'] ?>
+                                        </option>
+                                    <?php endforeach; ?>
+                                </select>
+                                <label for="floatingInput" style="z-index: 1;">Pilih Valas PI</label>
                             </div>
                         </div>
                         <div class="col-md-6">
@@ -176,6 +224,17 @@
             {
                 data: "nilai_peb",
                 className: "text-left",
+            },
+            {
+                data: "exchange_rate_peb",
+                className: "text-left",
+                render: function(data) {
+                    return greatFormatRupiah(data)
+                }
+            },
+            {
+                data: "nilai_peb_idr",
+                className: "text-left",
                 render: function(data) {
                     return greatFormatRupiah(data)
                 }
@@ -238,6 +297,12 @@
         autoclose: true
     })
 
+    $('.valas_id_peb').select2({
+        placeholder: "Pilih Valas PEB",
+        theme: "bootstrap-5",
+        dropdownParent: $('#modalPiPeb')
+    }).change(function() {});
+
     $('.icon-dateStart').click(function() {
         $(".dateStart").focus();
     });
@@ -269,7 +334,16 @@
             tanggal_invoice: {
                 required: true
             },
+            valas_id_peb: {
+                required: true
+            },
             nilai_peb: {
+                required: true
+            },
+            exchange_rate_peb: {
+                required: true
+            },
+            nilai_peb_idr: {
                 required: true
             },
             nilai_pi: {
@@ -283,8 +357,17 @@
             tanggal_invoice: {
                 required: "Tanggal invoice wajib diisi"
             },
+            valas_id_peb: {
+                required: "Pilih Valas PEB"
+            },
             nilai_peb: {
                 required: "Nilai PEB wajib diisi"
+            },
+            exchange_rate_peb: {
+                required: "Exchange Rate PEB wajib diisi"
+            },
+            nilai_peb_idr: {
+                required: "Nilai PEB IDR wajib diisi"
             },
             nilai_pi: {
                 required: "Nilai PI wajib diisi"
@@ -318,7 +401,12 @@
             const csrf = $(`[name="${csrfToken}"]`);
             let data = new FormData(document.querySelector(".form-pi-peb"));
             let nilaiPeb = destroyFormatRupiah($('#nilai_peb').val());
+            let exchangeRatePeb = destroyFormatRupiah($('#exchange_rate_peb').val());
+            let nilaiPebIdr = destroyFormatRupiah($('#nilai_peb_idr').val());
+
             data.set("nilai_peb", nilaiPeb);
+            data.set("exchange_rate_peb", exchangeRatePeb);
+            data.set("nilai_peb_idr", nilaiPebIdr);
 
             Swal.fire({
                 icon: 'question',
@@ -391,8 +479,12 @@
                 $('#id').val(res.data.id);
                 $('#no_invoice').val(res.data.no_invoice);
                 $('#tanggal_invoice').val(res.data.tanggal_invoice);
-                $('#nilai_pi').val(greatFormatRupiah(res.data.nilai_pi));
+                $('#valas_id_peb').val(res.data.valas_id_peb).change();
                 $('#nilai_peb').val(greatFormatRupiah(res.data.nilai_peb));
+                $('#exchange_rate_peb').val(greatFormatRupiah(res.data.exchange_rate_peb));
+                $('#nilai_peb_idr').val(greatFormatRupiah(res.data.nilai_peb_idr));
+                $('#valas_id_pi').val(res.data.valas_id_pi);
+                $('#nilai_pi').val(greatFormatRupiah(res.data.nilai_pi));
 
                 if (res.data.no_invoice == null) {
                     $('.btn-submit-detail').text('Terbitkan Invoice');
@@ -408,7 +500,33 @@
         })
     }
 
+    $('.valas_id_peb')
+        .parent('div')
+        .children('span')
+        .children('span')
+        .children('span')
+        .css('height', ' calc(3.5rem + 2px)');
 
+    $('.valas_id_peb')
+        .parent('div')
+        .children('span')
+        .children('span')
+        .children('span')
+        .children('span')
+        .css('margin-top', '22px').css('margin-left', '-7px');
+
+    $('.valas_id_peb')
+        .parent('div')
+        .find('label')
+        .css('z-index', '1');
+
+    $('#nilai_peb,#exchange_rate_peb').keyup(function(e) {
+        e.preventDefault();
+        var nilaiPeb = destroyFormatRupiah($('#nilai_peb').val());
+        var exchangeRatePeb = destroyFormatRupiah($('#exchange_rate_peb').val());
+        var nilaiPebIdr = parseFloat(parseFloat(nilaiPeb) * parseFloat(exchangeRatePeb)).toFixed(2);
+        $('#nilai_peb_idr').val(greatFormatRupiah(nilaiPebIdr));
+    });
 
     const changeSort = function(val) {
         if (sort !== val) {
