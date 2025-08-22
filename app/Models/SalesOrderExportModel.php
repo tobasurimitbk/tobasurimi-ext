@@ -1019,4 +1019,81 @@ class SalesOrderExportModel extends Model
 
         return $resultQry;
     }
+
+    public function getListPiPeb($condition, $addCondition, $limit = 10, $offset = 0)
+    {
+        $availableSort = [
+            'sales_order_export.sales_order_export_id' => 'sales_order_export.sales_order_export_id',
+            'sales_order_export.no_invoice'         => 'sales_order_export.no_invoice',
+            'sales_order_export.tanggal_invoice'         => 'sales_order_export.tanggal_invoice',
+            'sales_order_export.sales_order_export_no' => 'sales_order_export.sales_order_export_no',
+            'sales_contract.customer_id'         => 'sales_contract.customer_id',
+            'sales_contract.dicharge_port'               => 'sales_contract.dicharge_port',
+            'sales_order_export.status_invoice'             => 'sales_order_export.status_invoice',
+            'sales_order_export.nilai_pi' => 'sales_order_export.nilai_pi',
+            'sales_order_export.shipment_value' => 'sales_order_export.shipment_value',
+        ];
+
+        $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
+
+        $sort = $availableSort[$addCondition['sort'] ?? 'createdAt'] ?? 'sales_order_export.createdAt';
+        $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'DESC';
+
+        $selectQry = "sales_order_export.*, 
+                        sales_contract.dicharge_port,
+                        customers.name AS customer_name,
+                        metadata.value as valas_name";
+        $salesDataQry = $this->asObject()
+            ->select($selectQry)
+            ->where($condition)
+            ->join('sales_contract', 'sales_contract.id = sales_order_export.sales_contract_id', 'left')
+            ->join('customers', 'customers.id = sales_contract.customer_id', 'left')
+            ->join('metadata', 'metadata.id = sales_order_export.valas_id', 'left')
+            ->orderBy($sort, $sortType);
+
+        $totalData = $salesDataQry->countAllResults(false);
+
+
+        if ($addCondition['search']) {
+            $salesDataQry
+                ->groupStart()
+                ->like('sales_order_export.sales_order_export_no', $addCondition['search'])
+                ->orLike('sales_contract.destination', $addCondition['search'])
+                ->orLike('sales_contract.no_invoice', $addCondition['search'])
+                ->orLike('customers.name', $addCondition['search'])
+                ->groupEnd();
+        }
+
+        if ($addCondition['status_invoice']) {
+            if ($addCondition['status_invoice'] == "TERBIT") {
+                $salesDataQry
+                    ->where('sales_order_export.status_invoice', 'TERBIT');
+            } else if ($addCondition['status_invoice'] == "BELUM TERBIT") {
+                $salesDataQry
+                    ->where('sales_order_export.status_invoice', 'BELUM TERBIT');
+            }
+        }
+
+        if (!empty($addCondition['dateStart']) || !empty($addCondition['dateEnd'])) {
+            $salesDataQry->groupStart(); //
+            if (!empty($addCondition['dateStart'])) {
+                $salesDataQry->where('DATE(sales_order_export.tanggal_invoice) >=', $addCondition['dateStart']);
+            }
+            if (!empty($addCondition['dateEnd'])) {
+                $salesDataQry->where('DATE(sales_order_export.tanggal_invoice) <=', $addCondition['dateEnd']);
+            }
+            $salesDataQry->groupEnd();
+        }
+
+
+        $totalFilteredData = $salesDataQry->countAllResults(false);
+        $data = $salesDataQry->findAll($limit, $offset);
+        return [
+            'data'              => $data,
+            'totalData'         => $totalData,
+            'totalFilteredData' => $totalFilteredData,
+            'sort'  => $sort,
+            'sortType'  => $sortType
+        ];
+    }
 }

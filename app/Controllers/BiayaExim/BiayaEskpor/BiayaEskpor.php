@@ -14,6 +14,7 @@ use App\Models\MetadataModel;
 use App\Models\SalesOrderExportModel;
 use App\Models\SatuansModel;
 use App\Models\TaxModel;
+use App\Models\UserModel;
 use App\Models\VendorPelayaranModel;
 use Dompdf\Dompdf;
 use Exception;
@@ -37,6 +38,7 @@ class BiayaEskpor extends BaseController
     protected $metadataModel;
     protected $satuanModel;
     protected $biayaEksporBarangModel;
+    protected $usersModel;
     protected $dompdf;
 
     public function __construct()
@@ -54,12 +56,17 @@ class BiayaEskpor extends BaseController
         $this->metadataModel = new MetadataModel();
         $this->satuanModel = new SatuansModel();
         $this->biayaEksporBarangModel = new BiayaEksporBarangModel();
+        $this->usersModel = new UserModel();
         $this->dompdf = new Dompdf();
     }
 
     public function index()
     {
-        return view('BiayaExim/BiayaEskpor/index');
+        $dataUser = $this->usersModel->orderBy('name', 'asc')->where('deletedAt', null)->findAll();
+        $data = [
+            'dataUser' => $dataUser
+        ];
+        return view('BiayaExim/BiayaEskpor/index', $data);
     }
 
     public function all()
@@ -112,8 +119,10 @@ class BiayaEskpor extends BaseController
                 "destination"        => $data['destination'],
                 "nama_vendor"        => $data['nama_vendor'],
                 "total_faktur"        => (float)$data['total_faktur'],
-                "status_posting"        => $data['status_posting'],
-
+                "status_posting_exim"        => $data['status_posting_exim'],
+                "status_posting_acc"        => $data['status_posting_acc'],
+                "status_posting_audit"        => $data['status_posting_audit'],
+                "status_bayar" => $data['status_bayar']
             ]);
         }
 
@@ -379,7 +388,6 @@ class BiayaEskpor extends BaseController
                 'total_faktur_before_tax' => $this->request->getVar('total_faktur_before_tax'),
                 'total_faktur' => $this->request->getVar('total_faktur'),
                 'customer_id' => $this->request->getVar('customer_id'),
-                'status_posting' => 0
             ]);
 
             foreach (\json_decode($_POST['listBarang']) as $l) {
@@ -843,5 +851,61 @@ class BiayaEskpor extends BaseController
         $writer = new Xlsx($spreadsheet);
         $writer->save('php://output');
         exit;
+    }
+
+    public function getStatusPosting()
+    {
+        try {
+            $id = \decrypt($this->request->getVar('id'));
+            $biayaEkspor = $this->biayaEksporModel
+                ->where('id', $id)
+                ->first();
+
+            return response()->setJSON([
+                'status' => true,
+                'token' => \csrf_hash(),
+                'data' => $biayaEkspor
+            ]);
+        } catch (Exception $e) {
+            return \response()->setJSON([
+                'status' => false,
+                'token' => \csrf_hash(),
+                'message' => $e->getMessage()
+            ]);
+        }
+    }
+
+    public function updateStatusPosting()
+    {
+        try {
+            $id = $this->request->getVar('id');
+            $statusPostingExim = $this->request->getVar('status_posting_exim');
+            $userEximPosted = $this->request->getVar('user_exim_posted');
+            $statusPostingAcc = $this->request->getVar('status_posting_acc');
+            $userAccPosted = $this->request->getVar('user_acc_posted');
+            $statusPostingAudit = $this->request->getVar('status_posting_audit');
+            $userAuditPosted = $this->request->getVar('user_audit_posted');
+
+            $this->biayaEksporModel->update($id, [
+                'status_posting_exim' => $statusPostingExim,
+                'user_exim_posted' => $userEximPosted,
+                'status_posting_acc' => $statusPostingAcc,
+                'user_acc_posted' => $userAccPosted,
+                'status_posting_audit' => $statusPostingAudit,
+                'user_audit_posted' => $userAuditPosted
+            ]);
+
+            return \response()->setJSON([
+                'status' => true,
+                'token' => \csrf_hash(),
+                'message' => "Status posting berhasil diperbaruhi"
+            ]);
+        } catch (Exception $e) {
+            return \response()->setJSON([
+                'status' => false,
+                'token' => \csrf_hash(),
+                'message' => $e->getMessage()
+            ]);
+        }
     }
 }

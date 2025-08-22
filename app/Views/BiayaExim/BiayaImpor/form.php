@@ -15,12 +15,7 @@
                         Print
                     </button>
                 <?php endif; ?>
-                <?php if ($dataBiayaImpor['status_posting'] == 0) { ?>
-                    <?php if (can('Biaya Exim', 'Biaya Impor', 'a')): ?>
-                        <button class="btn btn-success posting-spp posting-so float-right" onclick="posting()">
-                            Posting Audit
-                        </button>
-                    <?php endif; ?>
+                <?php if ($dataBiayaImpor['status_bayar'] == 0) { ?>
                     <?php if (can('Biaya Exim', 'Biaya Impor', 'u')): ?>
                         <button class="btn btn-show-form btn-save float-right btn-submit-parent">
                             Update
@@ -28,13 +23,6 @@
                     <?php endif; ?>
                 <?php } ?>
 
-                <?php if ($dataBiayaImpor['status_posting'] == 1) { ?>
-                    <?php if (can('Biaya Exim', 'Biaya Impor', 'ua')): ?>
-                        <button class="btn btn-success posting-spp unposting-so float-right" onclick="unposting()">
-                            Unposting Audit
-                        </button>
-                    <?php endif; ?>
-                <?php } ?>
 
             <?php } else { ?>
                 <button class="btn btn-show-form btn-save float-right btn-submit-parent">
@@ -58,7 +46,7 @@
                         <div class="form-floating mb-3" style="height: 50px;">
                             <div class="input-group input-group-password">
                                 <div class="form-floating mb-3" style="height: 50px;">
-                                    <input autocomplete="one-time-code" type="text" value="<?= !empty($dataBiayaImpor) ? $dataBiayaImpor['no_invoice'] : 'AUTO GENERATE' ?>" <?= !empty($dataBiayaImpor) ? ($dataBiayaImpor['status_posting'] == 1 ? 'readonly' : '') : 'readonly' ?> class="form-control no_invoice" id="no_invoice" name="no_invoice" placeholder="No Invoice" required>
+                                    <input autocomplete="one-time-code" type="text" value="<?= !empty($dataBiayaImpor) ? $dataBiayaImpor['no_invoice'] : 'AUTO GENERATE' ?>" <?= !empty($dataBiayaImpor) ? ($dataBiayaImpor['status_bayar'] == 1 ? 'readonly' : '') : 'readonly' ?> class="form-control no_invoice" id="no_invoice" name="no_invoice" placeholder="No Invoice" required>
                                     <label for="floatingInput">No Invoice</label>
                                 </div>
                                 <div style="<?= !empty($dataBiayaImpor) ? "display: none" : ""; ?>" class="input-generate input-group-prepend group-prepend-password align-items-center">
@@ -71,7 +59,7 @@
                         <div class="form-floating mb-3" style="height: 50px;">
                             <div class="input-group input-group-password">
                                 <div class="form-floating mb-3" style="height: 50px;">
-                                    <input <?= !empty($dataBiayaImpor) ? ($dataBiayaImpor['status_posting'] == 1 ? 'readonly' : '') : '' ?> autocomplete="one-time-code" class="form-control input-picker tanggal_invoice" id="tanggal_invoice" name="tanggal_invoice" placeholder="Tanggal Invoice" value="<?= !empty($dataBiayaImpor) ? date('d/m/Y', strtotime($dataBiayaImpor['tanggal_invoice'])) : date('d/m/Y')  ?>">
+                                    <input <?= !empty($dataBiayaImpor) ? ($dataBiayaImpor['status_bayar'] == 1 ? 'readonly' : '') : '' ?> autocomplete="one-time-code" class="form-control input-picker tanggal_invoice" id="tanggal_invoice" name="tanggal_invoice" placeholder="Tanggal Invoice" value="<?= !empty($dataBiayaImpor) ? date('d/m/Y', strtotime($dataBiayaImpor['tanggal_invoice'])) : date('d/m/Y')  ?>">
                                     <label for="floatingInput">Tanggal Invoice</label>
                                 </div>
                                 <div class="input-group-prepend group-prepend-password align-items-center">
@@ -82,7 +70,7 @@
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <select <?= !empty($dataBiayaImpor) ? ($dataBiayaImpor['status_posting'] == 1 ? 'disabled' : '') : '' ?> class="form-select divisi_id" name="divisi_id" id="divisi_id">
+                            <select <?= !empty($dataBiayaImpor) ? ($dataBiayaImpor['status_bayar'] == 1 ? 'disabled' : '') : '' ?> class="form-select divisi_id" name="divisi_id" id="divisi_id">
                                 <option value=""></option>
                                 <?php foreach ($dataDivisi as $d): ?>
                                     <option <?= !empty($dataBiayaImpor) ? ($dataBiayaImpor['divisi_id'] == $d['id'] ? 'selected' : '') : '' ?> value="<?= $d['id'] ?>"><?= $d['divisi'] ?></option>
@@ -94,7 +82,7 @@
 
                     <div class="col-sm-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <select <?= !empty($dataBiayaImpor) ? ($dataBiayaImpor['status_posting'] == 1 ? 'disabled' : '') : '' ?> class="form-select supplier_id" name="supplier_id" id="supplier_id">
+                            <select <?= !empty($dataBiayaImpor) ? ($dataBiayaImpor['status_bayar'] == 1 ? 'disabled' : '') : '' ?> class="form-select supplier_id" name="supplier_id" id="supplier_id">
                                 <option value=""></option>
                                 <?php foreach ($dataSupplier as $d): ?>
                                     <option <?= !empty($dataBiayaImpor) ? ($d['id'] == $dataBiayaImpor['supplier_id'] ? 'selected' : '') : '' ?> value="<?= $d['id'] ?>"><?= $d['name'] ?></option>
@@ -105,13 +93,13 @@
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3">
-                            <input <?= !empty($dataBiayaImpor) ? ($dataBiayaImpor['status_posting'] == 1 ? 'readonly' : '') : '' ?> autocomplete="one-time-code" type="text" class="form-control no_bl" id="no_bl" name="no_bl" placeholder="No B/L" value="<?= !empty($dataBiayaImpor) ? $dataBiayaImpor['no_bl'] : '' ?>">
+                            <input <?= !empty($dataBiayaImpor) ? ($dataBiayaImpor['status_bayar'] == 1 ? 'readonly' : '') : '' ?> autocomplete="one-time-code" type="text" class="form-control no_bl" id="no_bl" name="no_bl" placeholder="No B/L" value="<?= !empty($dataBiayaImpor) ? $dataBiayaImpor['no_bl'] : '' ?>">
                             <label for="floatingInput">No B/L</label>
                         </div>
                     </div>
                     <div class="col-sm-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <select <?= !empty($dataBiayaImpor) ? ($dataBiayaImpor['status_posting'] == 1 ? 'disabled' : '') : '' ?> class="form-select tipe_po" name="tipe_po" id="tipe_po">
+                            <select <?= !empty($dataBiayaImpor) ? ($dataBiayaImpor['status_bayar'] == 1 ? 'disabled' : '') : '' ?> class="form-select tipe_po" name="tipe_po" id="tipe_po">
                                 <option value=""></option>
                                 <option <?= !empty($dataBiayaImpor) ? ($dataBiayaImpor['tipe_po'] == "IMPORT BAKU" ? 'selected' : '') : '' ?> value="IMPORT BAKU">IMPORT BAHAN BAKU</option>
                                 <option <?= !empty($dataBiayaImpor) ? ($dataBiayaImpor['tipe_po'] == "IMPORT PENOLONG" ? 'selected' : '') : '' ?> value="IMPORT PENOLONG">IMPORT BAHAN PENOLONG</option>
@@ -121,7 +109,7 @@
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <select <?= !empty($dataBiayaImpor) ? ($dataBiayaImpor['status_posting'] == 1 ? 'disabled' : '') : '' ?> class="form-select po_id" name="po_id" id="po_id">
+                            <select <?= !empty($dataBiayaImpor) ? ($dataBiayaImpor['status_bayar'] == 1 ? 'disabled' : '') : '' ?> class="form-select po_id" name="po_id" id="po_id">
                                 <option value=""></option>
                                 <?php if (!empty($dataPoDetail)): ?>
                                     <?php if ($dataPoDetail != null): ?>
@@ -135,7 +123,7 @@
 
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <select <?= !empty($dataBiayaImpor) ? ($dataBiayaImpor['status_posting'] == 1 ? 'disabled' : '') : '' ?> class="form-select vendor_pelayaran_id" name="vendor_pelayaran_id" id="vendor_pelayaran_id">
+                            <select <?= !empty($dataBiayaImpor) ? ($dataBiayaImpor['status_bayar'] == 1 ? 'disabled' : '') : '' ?> class="form-select vendor_pelayaran_id" name="vendor_pelayaran_id" id="vendor_pelayaran_id">
                                 <option value=""></option>
                                 <?php foreach ($dataVendorPelayaran as $d): ?>
                                     <option <?= !empty($dataBiayaImpor) ? ($dataBiayaImpor['vendor_pelayaran_id'] == $d['id'] ? 'selected' : '') : '' ?> value="<?= $d['id'] ?>"><?= $d['nama_vendor'] ?></option>
@@ -146,25 +134,25 @@
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3">
-                            <input autocomplete="one-time-code" type="text" class="form-control shipper_prev" id="shipper_prev" name="shipper_prev" <?= !empty($dataBiayaImpor) ? ($dataBiayaImpor['status_posting'] == 1 ? 'readonly' : '') : '' ?> value="<?= !empty($dataBiayaImpor) ? $dataBiayaImpor['shipper'] : '' ?>">
+                            <input autocomplete="one-time-code" type="text" class="form-control shipper_prev" id="shipper_prev" name="shipper_prev" <?= !empty($dataBiayaImpor) ? ($dataBiayaImpor['status_bayar'] == 1 ? 'readonly' : '') : '' ?> value="<?= !empty($dataBiayaImpor) ? $dataBiayaImpor['shipper'] : '' ?>">
                             <label for="floatingInput">Shipper (Opsional)</label>
                         </div>
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3">
-                            <input autocomplete="one-time-code" type="text" class="form-control consigne_prev" id="consigne_prev" name="consigne_prev" <?= !empty($dataBiayaImpor) ? ($dataBiayaImpor['status_posting'] == 1 ? 'readonly' : '') : '' ?> value="<?= !empty($dataBiayaImpor) ? $dataBiayaImpor['consigne'] : '' ?>">
+                            <input autocomplete="one-time-code" type="text" class="form-control consigne_prev" id="consigne_prev" name="consigne_prev" <?= !empty($dataBiayaImpor) ? ($dataBiayaImpor['status_bayar'] == 1 ? 'readonly' : '') : '' ?> value="<?= !empty($dataBiayaImpor) ? $dataBiayaImpor['consigne'] : '' ?>">
                             <label for="floatingInput">Consigne (Opsional)</label>
                         </div>
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3">
-                            <input autocomplete="one-time-code" type="text" class="form-control port_of_origin_prev" id="port_of_origin_prev" name="port_of_origin_prev" <?= !empty($dataBiayaImpor) ? ($dataBiayaImpor['status_posting'] == 1 ? 'readonly' : '') : '' ?> value="<?= !empty($dataBiayaImpor) ? $dataBiayaImpor['port_of_origin'] : '' ?>">
+                            <input autocomplete="one-time-code" type="text" class="form-control port_of_origin_prev" id="port_of_origin_prev" name="port_of_origin_prev" <?= !empty($dataBiayaImpor) ? ($dataBiayaImpor['status_bayar'] == 1 ? 'readonly' : '') : '' ?> value="<?= !empty($dataBiayaImpor) ? $dataBiayaImpor['port_of_origin'] : '' ?>">
                             <label for="floatingInput">Port Of Origin (Opsional)</label>
                         </div>
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3">
-                            <input autocomplete="one-time-code" type="text" class="form-control port_of_destination_prev" id="port_of_destination_prev" name="port_of_destination_prev" <?= !empty($dataBiayaImpor) ? ($dataBiayaImpor['status_posting'] == 1 ? 'readonly' : '') : '' ?> value="<?= !empty($dataBiayaImpor) ? $dataBiayaImpor['port_of_destination'] : '' ?>">
+                            <input autocomplete="one-time-code" type="text" class="form-control port_of_destination_prev" id="port_of_destination_prev" name="port_of_destination_prev" <?= !empty($dataBiayaImpor) ? ($dataBiayaImpor['status_bayar'] == 1 ? 'readonly' : '') : '' ?> value="<?= !empty($dataBiayaImpor) ? $dataBiayaImpor['port_of_destination'] : '' ?>">
                             <label for="floatingInput">Port Of Destination (Opsional)</label>
                         </div>
                     </div>
@@ -177,7 +165,7 @@
                                 <label class="form-label font-weight-bold lable-title" style="margin-bottom: -30px;">List Barang yang di Impor</label>
                             </div>
                             <div class="col-md-6">
-                                <button <?= !empty($dataBiayaImpor) ? ($dataBiayaImpor['status_posting'] == 1 ? 'disabled' : '') : '' ?> class="btn btn-show-detail btn-add btn-block float-right" id="btnAddBarangDetail" type="button" style="width: 90% !important;">
+                                <button <?= !empty($dataBiayaImpor) ? ($dataBiayaImpor['status_bayar'] == 1 ? 'disabled' : '') : '' ?> class="btn btn-show-detail btn-add btn-block float-right" id="btnAddBarangDetail" type="button" style="width: 90% !important;">
                                     <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
                                 </button>
                             </div>
@@ -254,7 +242,7 @@
                                 <div class="col-md-6">
                                 </div>
                                 <div class="col-md-6">
-                                    <button <?= !empty($dataBiayaImpor) ? ($dataBiayaImpor['status_posting'] == 1 ? 'disabled' : '') : '' ?> class="btn btn-show-detail btn-add btn-block float-right" id="btnAddBiaya" type="button" style="width: 90% !important;">
+                                    <button <?= !empty($dataBiayaImpor) ? ($dataBiayaImpor['status_bayar'] == 1 ? 'disabled' : '') : '' ?> class="btn btn-show-detail btn-add btn-block float-right" id="btnAddBiaya" type="button" style="width: 90% !important;">
                                         <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
                                     </button>
                                 </div>
@@ -294,7 +282,7 @@
                                 <div class="col-md-6">
                                 </div>
                                 <div class="col-md-6">
-                                    <button <?= !empty($dataBiayaImpor) ? ($dataBiayaImpor['status_posting'] == 1 ? 'disabled' : '') : '' ?> class="btn btn-show-detail btn-add btn-block float-right" id="btnAddPajakModal" type="button" style="width: 90% !important;">
+                                    <button <?= !empty($dataBiayaImpor) ? ($dataBiayaImpor['status_bayar'] == 1 ? 'disabled' : '') : '' ?> class="btn btn-show-detail btn-add btn-block float-right" id="btnAddPajakModal" type="button" style="width: 90% !important;">
                                         <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
                                     </button>
                                 </div>
@@ -335,7 +323,7 @@
                                 <div class="col-md-6">
                                 </div>
                                 <div class="col-md-6">
-                                    <button <?= !empty($dataBiayaImpor) ? ($dataBiayaImpor['status_posting'] == 1 ? 'disabled' : '') : '' ?> class="btn btn-show-detail btn-add btn-block float-right" id="btnAddContainer" type="button" style="width: 90% !important;">
+                                    <button <?= !empty($dataBiayaImpor) ? ($dataBiayaImpor['status_bayar'] == 1 ? 'disabled' : '') : '' ?> class="btn btn-show-detail btn-add btn-block float-right" id="btnAddContainer" type="button" style="width: 90% !important;">
                                         <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
                                     </button>
                                 </div>
@@ -1587,7 +1575,7 @@
                 // newRow.append($('<td class="text-right">').text(greatFormatRupiah(item.harga_satuan.toFixed(2))));
                 newRow.append($('<td class="text-right">').text(greatFormatRupiah(item.total_harga)));
                 newRow.append($('<td class="text-center">').html(
-                    <?php if (!empty($dataBiayaImpor)) : ?> <?php if ($dataBiayaImpor['status_posting'] == 1) : ?> `-`
+                    <?php if (!empty($dataBiayaImpor)) : ?> <?php if ($dataBiayaImpor['status_bayar'] == 1) : ?> `-`
                         <?php else : ?> `
                         <button type="button" class="btn btn-warning posting-spp mr-1" onclick="detailRowBarang('${item.id_detail_barang}')">
                                 <i class="fa fa-pencil fa-sm" aria-hidden="true"></i>
@@ -1684,7 +1672,7 @@
                     <td class="text-right">${greatFormatRupiah(item.nilai_exchange_rate)}</td>
                     <td class="text-right">${greatFormatRupiah(item.nilai_biaya_idr)}</td>
                     <td class="text-center">
-                        <?php if (!empty($dataBiayaImpor) && $dataBiayaImpor['status_posting'] == 1) : ?>
+                        <?php if (!empty($dataBiayaImpor) && $dataBiayaImpor['status_bayar'] == 1) : ?>
                             -
                         <?php else : ?>
                             <button type="button" class="btn btn-warning posting-spp mr-1" onclick="detailRowBiayaEkspor('${item.id_biaya_impor_detail}')">
@@ -1737,7 +1725,7 @@
                 newRow.append($('<td>').text(item.tax_status));
                 newRow.append($('<td>').text(item.keterangan_pajak));
                 newRow.append($('<td>').html(
-                    <?php if (!empty($dataBiayaImpor)) : ?> <?php if ($dataBiayaImpor['status_posting'] == 1) : ?> `-`
+                    <?php if (!empty($dataBiayaImpor)) : ?> <?php if ($dataBiayaImpor['status_bayar'] == 1) : ?> `-`
                         <?php else : ?> `
                         <button type="button" class="btn btn-warning posting-spp mr-1" onclick="detailRowPajak('${item.id_biaya_impor_pajak}')">
                                 <i class="fa fa-pencil fa-sm" aria-hidden="true"></i>
@@ -1783,7 +1771,7 @@
                 newRow.append($('<td>').text(item.no_container));
                 newRow.append($('<td>').text(item.detail_container));
                 newRow.append($('<td>').html(
-                    <?php if (!empty($dataBiayaImpor)) : ?> <?php if ($dataBiayaImpor['status_posting'] == 1) : ?> `-`
+                    <?php if (!empty($dataBiayaImpor)) : ?> <?php if ($dataBiayaImpor['status_bayar'] == 1) : ?> `-`
                         <?php else : ?> `
                         <button type="button" class="btn btn-warning posting-spp mr-1" onclick="detailRowContainer('${item.id_container}')">
                                 <i class="fa fa-pencil fa-sm" aria-hidden="true"></i>

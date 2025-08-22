@@ -14,6 +14,7 @@ use App\Models\MetadataModel;
 use App\Models\SatuansModel;
 use App\Models\SupplierModel;
 use App\Models\TaxModel;
+use App\Models\UserModel;
 use App\Models\VendorPelayaranModel;
 use Dompdf\Dompdf;
 use Exception;
@@ -38,6 +39,7 @@ class BiayaImpor extends BaseController
     protected $satuanModel;
     protected $barangMasterModel;
     protected $biayaImporBarangModel;
+    protected $usersModel;
 
     public function __construct()
     {
@@ -54,12 +56,17 @@ class BiayaImpor extends BaseController
         $this->biayaImporContainerModel = new BiayaImporContainerModel();
         $this->barangMasterModel = new BarangMasterModel();
         $this->satuanModel = new SatuansModel();
+        $this->usersModel = new UserModel();
         $this->biayaImporBarangModel = new BiayaImporBarangModel();
     }
 
     public function index()
     {
-        return view('BiayaExim/BiayaImpor/index');
+        $dataUser = $this->usersModel->orderBy('name', 'asc')->where('deletedAt', null)->findAll();
+        $data = [
+            'dataUser' => $dataUser
+        ];
+        return view('BiayaExim/BiayaImpor/index', $data);
     }
 
     public function all()
@@ -112,7 +119,10 @@ class BiayaImpor extends BaseController
                 "port_of_destination"        => $data['port_of_destination'],
                 "nama_vendor"        => $data['nama_vendor'],
                 "total_faktur"        => (float)$data['total_faktur'],
-                "status_posting"        => $data['status_posting'],
+                "status_posting_exim"        => $data['status_posting_exim'],
+                "status_posting_acc"        => $data['status_posting_acc'],
+                "status_posting_audit"        => $data['status_posting_audit'],
+                "status_bayar" => $data['status_bayar']
             ]);
         }
 
@@ -373,7 +383,6 @@ class BiayaImpor extends BaseController
                 'port_of_destination' => !empty($this->request->getVar('port_of_destination_prev')) ? $this->request->getVar('port_of_destination_prev') : null,
                 'total_faktur_before_tax' => $this->request->getVar('total_faktur_before_tax'),
                 'total_faktur' => $this->request->getVar('total_faktur'),
-                'status_posting' => 0
             ]);
 
             foreach (\json_decode($_POST['listBiayaImpor']) as $l) {
@@ -470,7 +479,6 @@ class BiayaImpor extends BaseController
                 'port_of_destination' => !empty($this->request->getVar('port_of_destination_prev')) ? $this->request->getVar('port_of_destination_prev') : null,
                 'total_faktur_before_tax' => $this->request->getVar('total_faktur_before_tax'),
                 'total_faktur' => $this->request->getVar('total_faktur'),
-                'status_posting' => 0
             ]);
 
             $idBiayaImporUsed = array();
@@ -619,27 +627,7 @@ class BiayaImpor extends BaseController
         }
     }
 
-    public function posting()
-    {
-        $id = \decrypt($this->request->getVar('id'));
-        $this->biayaImporModel->update($id, ['status_posting' => 1]);
-        return response()->setJSON([
-            'status' => true,
-            'token' => csrf_hash(),
-            'message' => "Data berhasil diposting"
-        ]);
-    }
 
-    public function unposting()
-    {
-        $id = \decrypt($this->request->getVar('id'));
-        $this->biayaImporModel->update($id, ['status_posting' => 0]);
-        return response()->setJSON([
-            'status' => true,
-            'token' => csrf_hash(),
-            'message' => "Data berhasil diunposting"
-        ]);
-    }
 
     public function dropdownPo()
     {
@@ -989,5 +977,61 @@ class BiayaImpor extends BaseController
                 $writer->save('php://output');
                 return ob_get_clean();
             })());
+    }
+
+    public function getStatusPosting()
+    {
+        try {
+            $id = \decrypt($this->request->getVar('id'));
+            $biayaImpor = $this->biayaImporModel
+                ->where('id', $id)
+                ->first();
+
+            return response()->setJSON([
+                'status' => true,
+                'token' => \csrf_hash(),
+                'data' => $biayaImpor
+            ]);
+        } catch (Exception $e) {
+            return \response()->setJSON([
+                'status' => false,
+                'token' => \csrf_hash(),
+                'message' => $e->getMessage()
+            ]);
+        }
+    }
+
+    public function updateStatusPosting()
+    {
+        try {
+            $id = $this->request->getVar('id');
+            $statusPostingExim = $this->request->getVar('status_posting_exim');
+            $userEximPosted = $this->request->getVar('user_exim_posted');
+            $statusPostingAcc = $this->request->getVar('status_posting_acc');
+            $userAccPosted = $this->request->getVar('user_acc_posted');
+            $statusPostingAudit = $this->request->getVar('status_posting_audit');
+            $userAuditPosted = $this->request->getVar('user_audit_posted');
+
+            $this->biayaImporModel->update($id, [
+                'status_posting_exim' => $statusPostingExim,
+                'user_exim_posted' => $userEximPosted,
+                'status_posting_acc' => $statusPostingAcc,
+                'user_acc_posted' => $userAccPosted,
+                'status_posting_audit' => $statusPostingAudit,
+                'user_audit_posted' => $userAuditPosted
+            ]);
+
+            return \response()->setJSON([
+                'status' => true,
+                'token' => \csrf_hash(),
+                'message' => "Status posting berhasil diperbaruhi"
+            ]);
+        } catch (Exception $e) {
+            return \response()->setJSON([
+                'status' => false,
+                'token' => \csrf_hash(),
+                'message' => $e->getMessage()
+            ]);
+        }
     }
 }
