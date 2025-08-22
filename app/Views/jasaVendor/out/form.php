@@ -1132,7 +1132,7 @@
             row.append($('<td style="text-align:center;">').text(v.stock_date || '-'));
             row.append($('<td style="text-align:center;">').text(v.barang || '-'));
             row.append($('<td style="text-align:center;">').text(v.satuan || '-'));
-            row.append($('<td style="text-align:center;">').text(parseFloat(v.stok_total) || 0));
+            row.append($('<td style="text-align:center;">').text(greatFormatRupiah(v.stok_total) || 0));
 
             dataTable.row.add(row);
         });
@@ -1176,7 +1176,7 @@
                 newRow.append($('<td style="text-align: center;">').text(v.satuan));
                 newRow.append($('<td style="text-align: center;">').text(greatFormatRupiah(v.stok_total)));
                 if (typePengambilanStok == "FIFO") {
-                    newRow.append($('<td style="text-align: center;">').text(v.qty));
+                    newRow.append($('<td style="text-align: center;">').text(greatFormatRupiah(v.qty)));
                 } else {
                     newRow.append($('<td style="text-align: center;">').html(
                         `

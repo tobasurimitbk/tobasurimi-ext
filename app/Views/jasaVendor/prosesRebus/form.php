@@ -1077,7 +1077,7 @@
             newRow.append($('<td style="text-align:center;">').text(v.stock_date));
             newRow.append($('<td style="text-align:center;">').text(v.barang));
             newRow.append($('<td style="text-align:center;">').text(v.satuan));
-            newRow.append($('<td style="text-align:center;">').text(v.stok_total));
+            newRow.append($('<td style="text-align:center;">').text(greatFormatRupiah(v.stok_total)));
             table.find('tbody').append(newRow);
         });
 
