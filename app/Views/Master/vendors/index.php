@@ -134,6 +134,50 @@
                             </div>
                         </div>
                     </div> -->
+                    <!-- BONUS AREA -->
+                    <div class="col-subtitle-modal mt-3">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <h5 class="modal-sub-title">Bonus Vendor</h5>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input type="text" onkeyup="this.value = greatFormatRupiah(this.value)" class="form-control bonus_vendor" id="bonus_vendor" name="bonus_vendor" placeholder="Bonus Vendor">
+                                <label for="bonus_vendor">BONUS VENDOR</label>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input type="text" onkeyup="this.value = greatFormatRupiah(this.value)" class="form-control bonus_jb" id="bonus_jb" name="bonus_jb" placeholder="JB">
+                                <label for="bonus_jb">JB</label>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input type="text" onkeyup="this.value = greatFormatRupiah(this.value)" class="form-control bonus_xl" id="bonus_xl" name="bonus_xl" placeholder="XL">
+                                <label for="bonus_xl">XL</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input type="text" onkeyup="this.value = greatFormatRupiah(this.value)" class="form-control bonus_lp" id="bonus_lp" name="bonus_lp" placeholder="LP">
+                                <label for="bonus_lp">LP</label>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input type="text" onkeyup="this.value = greatFormatRupiah(this.value)" class="form-control bonus_cl" id="bonus_cl" name="bonus_cl" placeholder="CL">
+                                <label for="bonus_cl">CL</label>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- END BONUS AREA -->
+
                 </form>
                 <div class="col-subtitle-modal">
                     <div class="row mt-3">
