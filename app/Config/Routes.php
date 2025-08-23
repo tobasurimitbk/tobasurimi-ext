@@ -1545,6 +1545,7 @@ $routes->group('bea-cukai-bc-40', ['filter' => 'Auth'], function ($routes) {
     $routes->get('id/dokumen/data/all', 'BeaCukai\BC40::allDokumen');
     $routes->post('id/dokumen/create', 'BeaCukai\BC40::createDokumenAction');
     $routes->post('id/dokumen/delete', 'BeaCukai\BC40::deleteDokumenAction');
+    $routes->post('id/dokumen-generate', 'BeaCukai\BC40::autoCreateDokumen');
     // PENGANGKUT
     $routes->get('id/pengangkut/(:segment)', 'BeaCukai\BC40::createPengangkutView/$1');
     $routes->post('id/pengangkut', 'BeaCukai\BC40::createPengangkutAction');
