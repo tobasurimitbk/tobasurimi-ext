@@ -348,12 +348,12 @@
                                                     <?php endforeach; ?>
 
                                                     <?php if ($show_persen_column): ?>
-                                                        <th style="padding: 3px; border: 1px solid #ddd; width: 6%;text-align: right;">%</th>
+                                                        <th style="padding: 3px; border: 1px solid #ddd; width: 4%;text-align: right;">%</th>
                                                     <?php endif; ?>
 
-                                                    <th style=" padding: 3px; border: 1px solid #ddd; width: 5%; text-align: right;">Qty</th>
-                                                    <th style="padding: 3px; border: 1px solid #ddd; width: 5%; text-align: right;" class="price">Unit Price</th>
-                                                    <th style="padding: 3px; border: 1px solid #ddd; width: 5%; text-align: right;" class="price">Total Amount</th>
+                                                    <th style=" padding: 3px; border: 1px solid #ddd; width: 6%; text-align: right;">Qty</th>
+                                                    <th style="padding: 3px; border: 1px solid #ddd; width: 6%; text-align: right;" class="price">Unit Price</th>
+                                                    <th style="padding: 3px; border: 1px solid #ddd; width: 6%; text-align: right;" class="price">Total Amount</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
@@ -601,7 +601,7 @@
                                                             foreach ($groupBySatuan as $satuan => $data):
                                                                 $grand_total_qty += $data['qty_input'];
                                                             ?>
-                                                                <td style="padding: 5px; border: 1px solid #ddd; text-align: right; width:80px;">
+                                                                <td style="padding: 5px; border: 1px solid #ddd; text-align: right; width:90px;">
                                                                     <?= number_format($data['qty_input'], 2) ?> <?= $satuan ?>
                                                                 </td>
                                                             <?php endforeach; ?>
