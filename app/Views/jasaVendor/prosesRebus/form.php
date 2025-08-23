@@ -577,7 +577,7 @@
         var id_selected = getIDListDataSelected();
         var barangIn = $('#spesifikasi_hasil_rebus_id option:selected');
 
-        if (barangIn.data('stock_id') == "" || barangIn.data('stock_id') == undefined) {
+        if (barangIn.data('barang') == "" || barangIn.data('barang') == undefined) {
             Swal.fire({
                 icon: 'error',
                 title: 'Hasil Barang Rebus Wajib Dipilih !',
@@ -1017,7 +1017,7 @@
 
     function getListBarangHasilRebus() {
         $.ajax({
-            url: `<?= base_url('proses-rebus/list-barang-rebus'); ?>`,
+            url: `<?= base_url('jasa-vendor-in/list-barang-masuk'); ?>`,
             method: "GET",
             beforeSend: function() {
                 setLoading();
@@ -1026,10 +1026,7 @@
                 stopLoading();
             },
             data: {
-                stock_id: $(".spesifikasi_rebus_id option:selected").data('stock_id'),
                 type_barang: $(".type_barang option:selected").val(),
-                divisi_id: $(".divisi_id option:selected").val(),
-                warehouse_id: $(".warehouse_id option:selected").val(),
             },
             dataType: "json",
             success: function(res) {
