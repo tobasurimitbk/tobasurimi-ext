@@ -2,9 +2,11 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= $dataSO->sales_order_export_no ?></title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <style>
         .header {
             display: flex !important;
@@ -98,8 +100,8 @@
             font-size: 12px;
         }
 
-        body {
-            font-family: 'Times New Roman', Times, serif
+        * {
+            font-family: 'DejaVu Serif' !important;
         }
     </style>
 
