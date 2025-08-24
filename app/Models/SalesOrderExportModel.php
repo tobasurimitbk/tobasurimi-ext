@@ -1061,8 +1061,8 @@ class SalesOrderExportModel extends Model
             $salesDataQry
                 ->groupStart()
                 ->like('sales_order_export.sales_order_export_no', $addCondition['search'])
-                ->orLike('sales_contract.destination', $addCondition['search'])
-                ->orLike('sales_contract.no_invoice', $addCondition['search'])
+                ->orLike('sales_contract.dicharge_port', $addCondition['search'])
+                ->orLike('sales_order_export.no_invoice', $addCondition['search'])
                 ->orLike('customers.name', $addCondition['search'])
                 ->groupEnd();
         }
@@ -1098,5 +1098,90 @@ class SalesOrderExportModel extends Model
             'sort'  => $sort,
             'sortType'  => $sortType
         ];
+    }
+
+    public function generateCodePI($companyId)
+    {
+        $metaDataModel = new MetadataModel();
+        $salesOrderExportModel = new SalesOrderExportModel();
+
+        $year = date('Y');
+        if ($companyId == 1) {
+            $codeInv = "TSI2";
+        } elseif ($companyId == 2) {
+            $codeInv = "TSI";
+        } elseif ($companyId == 15) {
+            $codeInv = "GPS";
+        } else {
+            $codeInv = "OCS";
+        }
+
+        // Template Invoice
+        $invTempleate = $codeInv . "/" . $year;
+
+        // Ambil Format Code dari Metadata
+        $formatCodeFirst = $metaDataModel
+            ->where('name', "inv_pi_peb")
+            ->first();
+
+        $formatCode = explode(',', $formatCodeFirst['value']); // misal: [C,H,N,M,E,I,J,U,L,O]
+        $base = count($formatCode);
+
+        // Cari invoice terakhir
+        $salesOrderExport = $salesOrderExportModel
+            ->where('company_id', $companyId)
+            ->where('deletedAt', null)
+            ->orderBy('sales_order_export_id', "desc")
+            ->first();
+
+        // Hitung index berikutnya
+        $lastCode = null;
+        if ($salesOrderExport && $salesOrderExport['no_invoice']) {
+            // Ambil kode setelah template, misal "TSI/2025/CN" → ambil "CN"
+            $parts = explode('/', $salesOrderExport['no_invoice']);
+            $lastCode = end($parts);
+        }
+
+        $nextCode = $this->getNextCode($lastCode, $formatCode);
+
+        return $invTempleate . "/" . $nextCode;
+    }
+
+    public function getNextCode($lastCode,  $formatCode)
+    {
+        $base = count($formatCode);
+
+        // kalau belum ada kode → pakai pertama
+        if (!$lastCode) {
+            return $formatCode[0];
+        }
+
+        // mapping huruf ke index
+        $map = array_flip($formatCode);
+
+        // ubah kode huruf ke angka (basis-N, Excel style)
+        $index = 0;
+        $len = strlen($lastCode);
+        for ($i = 0; $i < $len; $i++) {
+            $char = $lastCode[$i];
+            if (!isset($map[$char])) {
+                throw new \Exception("Invalid code: " . $lastCode);
+            }
+            $index = $index * $base + ($map[$char] + 1); // +1 supaya mirip Excel
+        }
+
+        // increment
+        $index++;
+
+        // convert balik ke huruf
+        $result = '';
+        while ($index > 0) {
+            $index--; // offset Excel style
+            $rem = $index % $base;
+            $result = $formatCode[$rem] . $result;
+            $index = intdiv($index, $base);
+        }
+
+        return $result;
     }
 }

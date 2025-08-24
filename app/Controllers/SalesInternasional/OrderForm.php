@@ -193,6 +193,7 @@ class OrderForm extends BaseController
         $db->transBegin();
 
         try {
+            $noInvoice = $this->salesOrderExportModel->generateCodePI($this->this_company_id);
             $salesOrderExportId = $this->salesOrderExportModel->insert([
                 'sales_order_export_no' => $salesOrderNo,
                 'sales_contract_id' => $this->request->getVar('sales_contract_id'),
@@ -234,7 +235,10 @@ class OrderForm extends BaseController
                 'container' => $this->request->getVar('container'),
                 'document_required' => $this->request->getVar('document_required'),
                 'po_no' => $this->request->getVar('po_no'),
+                'no_invoice' => $noInvoice,
+                'tanggal_invoice' => $this->request->getVar("tanggal") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getVar("tanggal")))) : "",
                 'status' => "NEW",
+                'status_invoice' => "TERBIT",
                 'used' => "NOT USED",
             ]);
 
@@ -564,6 +568,7 @@ class OrderForm extends BaseController
                 'container' => $this->request->getVar('container'),
                 'document_required' => $this->request->getVar('document_required'),
                 'po_no' => $this->request->getVar('po_no'),
+                'tanggal_invoice' => $this->request->getVar("tanggal") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getVar("tanggal")))) : "",
             ]);
 
             $listDataSalesKontrak = json_decode($_POST['listDataSalesKontrak']);

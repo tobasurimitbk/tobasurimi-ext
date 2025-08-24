@@ -43,7 +43,7 @@ $routes->get('/403', function () {
     return view('errors/html/error_403');
 });
 
-$routes->get('/generate-no-ktp', 'Warehouse\Penomoran_::generateNoKtpSupplier');
+$routes->get('/generate-invoice-peb', 'Warehouse\Penomoran_::autoGenerateNoInvoiceTglInvoice');
 
 // $routes->get('/delete-transaksi-jurnal', 'Accounting\TutupBuku\TutupBukuController::deleteTransaksiJurnalLama');
 // $routes->get('/update-transaksi-jurnal', 'Accounting\TutupBuku\TutupBukuController::updateTransaksiJurnalBahanBaku');

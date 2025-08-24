@@ -78,13 +78,13 @@
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" type="text" class="form-control no_invoice" name="no_invoice" id="no_invoice" placeholder="Nomor Invoice">
+                                <input readonly autocomplete="one-time-code" type="text" class="form-control no_invoice" name="no_invoice" id="no_invoice" placeholder="Nomor Invoice">
                                 <label for="floatingInput">Nomor Invoice</label>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" type="text" class="form-control tanggal_invoice" name="tanggal_invoice" id="tanggal_invoice" placeholder="Tanggal Invoice">
+                                <input readonly autocomplete="one-time-code" type="text" class="form-control tanggal_invoice" name="tanggal_invoice" id="tanggal_invoice" placeholder="Tanggal Invoice">
                                 <label for="floatingInput">Tanggal Invoice</label>
                             </div>
                         </div>
@@ -151,7 +151,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-hide-detail btn-discard mr-3">Kembali</button>
-                    <button type="button" class="btn btn-submit-form btn-submit-detail">Update Invoice</button>
+                    <button type="button" class="btn btn-submit-form btn-submit-detail">Update PEB</button>
                 </div>
             </form>
         </div>
@@ -249,14 +249,14 @@
                     let id = row.id;
                     if (status_invoice == "TERBIT") {
                         return `
-                            <button data-toggle="tooltip" title="Update Invoice" onclick="terbitkanInvoice('${id}')" class="btn btn-success">
-                                Update Invoice
+                            <button data-toggle="tooltip" title="Update PEB" onclick="terbitkanInvoice('${id}')" class="btn btn-success">
+                                Update PEB
                             </button>
                         `
                     } else {
                         return `
-                          <button data-toggle="tooltip" title="Terbitkan Invoice" onclick="terbitkanInvoice('${id}')" class="btn btn-danger">
-                            Terbitkan Invoice
+                          <button data-toggle="tooltip" title="Create PEB" onclick="terbitkanInvoice('${id}')" class="btn btn-danger">
+                            Create PEB
                         </button>
                     `
                     }
@@ -487,11 +487,11 @@
                 $('#nilai_pi').val(greatFormatRupiah(res.data.nilai_pi));
 
                 if (res.data.no_invoice == null) {
-                    $('.btn-submit-detail').text('Terbitkan Invoice');
-                    $('#label-update-pi-peb').text("Terbitkan Invoice");
+                    $('.btn-submit-detail').text('Tambah PEB');
+                    $('#label-update-pi-peb').text("Tambah PEB");
                 } else {
-                    $('.btn-submit-detail').text('Update Invoice');
-                    $('#label-update-pi-peb').text("Update Invoice");
+                    $('.btn-submit-detail').text('Update PEB');
+                    $('#label-update-pi-peb').text("Update PEB");
 
                 }
 
