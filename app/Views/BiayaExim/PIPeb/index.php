@@ -142,9 +142,15 @@
                             </div>
                         </div>
                         <div class="col-md-6">
-                            <div class="form-floating mb-3" style="height: 50px;">
+                            <div class="form-floating mb-2" style="height: 50px;">
                                 <input disabled autocomplete="one-time-code" type="text" onkeyup="this.value = greatFormatRupiah(this.value)" class="form-control nilai_pi" name="nilai_pi" id="nilai_pi" placeholder="Nilai Peformance Invoice">
                                 <label for="floatingInput">Nilai Peformance Invoice</label>
+                            </div>
+                            <div>
+                                <a href="#" onclick="ambilNilaiPeb()" class="btn btn-warning btn-block" id="btn-ambil-manifest" style="float: right;">
+                                    Ambil Nilai PEB dari BC 3.0
+                                </a>
+
                             </div>
                         </div>
                     </div>
@@ -498,6 +504,15 @@
                 $('#modalPiPeb').modal('show');
             }
         })
+    }
+
+    function ambilNilaiPeb() {
+        Swal.fire({
+            icon: 'error',
+            title: "Fitur ini sedang dikembangkan, silahkan isi nilai PEB manual terlebih dahulu :)",
+            confirmButtonColor: '#4e73df',
+            confirmButtonText: 'Ok'
+        });
     }
 
     $('.valas_id_peb')
