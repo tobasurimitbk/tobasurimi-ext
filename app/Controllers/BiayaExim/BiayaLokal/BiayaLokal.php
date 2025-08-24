@@ -771,4 +771,45 @@ class BiayaLokal extends BaseController
             ]);
         }
     }
+
+    public function detail($id)
+    {
+        $id = \decrypt($id);
+        $dataBiayaLokal = $this->biayaLokalModel
+            ->select(
+                'biaya_lokal.*,
+                vendor_pelayaran.nama_vendor,
+                divisis.divisi
+            '
+            )
+            ->join('vendor_pelayaran', 'vendor_pelayaran.id = biaya_lokal.vendor_pelayaran_id', 'left')
+            ->join('divisis', 'divisis.id = biaya_lokal.divisi_id', 'left')
+            ->where('biaya_lokal.id', $id)
+            ->first();
+        $dataBiayaLokalDetail = $this->biayaLokalDetailModel
+            ->select('biaya_lokal_detail.*,metadata.value as valas_name')
+            ->join('metadata', 'metadata.id = biaya_lokal_detail.valas_id', 'left')
+            ->where('biaya_lokal_id', $id)
+            ->where('biaya_lokal_detail.deletedAt', null)
+            ->findAll();
+        $dataBiayaLokalPajak = $this->biayaLokalPajakModel
+            ->select(
+                '
+                biaya_lokal_pajak.*,
+                taxes.type as type_tax, 
+                taxes.name as tax_name
+            '
+            )
+            ->join('taxes', 'taxes.id = biaya_lokal_pajak.tax_id', 'left')
+            ->where('biaya_lokal_id', $id)
+            ->where('biaya_lokal_pajak.deletedAt', null)
+            ->findAll();
+        $data = [
+            'dataBiayaLokal' => $dataBiayaLokal,
+            'dataBiayaLokalDetail' => $dataBiayaLokalDetail,
+            'dataBiayaLokalPajak' => $dataBiayaLokalPajak,
+        ];
+
+        return \view('BiayaExim/BiayaLokal/detail', $data);
+    }
 }

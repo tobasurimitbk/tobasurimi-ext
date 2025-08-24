@@ -808,6 +808,7 @@ $routes->get('/biaya-eskpor/print/(:segment)', 'BiayaExim\BiayaEskpor\BiayaEskpo
 $routes->get('/biaya-eskpor/get-sales-order-export', 'BiayaExim\BiayaEskpor\BiayaEskpor::getSalesOrderExportByCustomerId', ['filter' => 'Auth']);
 $routes->get('/biaya-eskpor/export-excel', 'BiayaExim\BiayaEskpor\BiayaEskpor::exportExcel', ['filter' => 'Auth']);
 $routes->get('/biaya-eskpor/get-status-posting', 'BiayaExim\BiayaEskpor\BiayaEskpor::getStatusPosting', ['filter' => 'Auth']);
+$routes->get('/biaya-eskpor/detail/(:segment)', 'BiayaExim\BiayaEskpor\BiayaEskpor::detail/$1', ['filter' => 'Auth']);
 
 // BIAYA IMPOR
 $routes->get('/biaya-impor', 'BiayaExim\BiayaImpor\BiayaImpor::index', ['filter' => 'Auth']);
@@ -823,6 +824,7 @@ $routes->get('/biaya-impor/id/(:segment)', 'BiayaExim\BiayaImpor\BiayaImpor::edi
 $routes->get('/biaya-impor/print/(:segment)', 'BiayaExim\BiayaImpor\BiayaImpor::print/$1', ['filter' => 'Auth']);
 $routes->get('/biaya-impor/export-excel', 'BiayaExim\BiayaImpor\BiayaImpor::exportExcel', ['filter' => 'Auth']);
 $routes->get('/biaya-impor/get-status-posting', 'BiayaExim\BiayaImpor\BiayaImpor::getStatusPosting', ['filter' => 'Auth']);
+$routes->get('/biaya-impor/detail/(:segment)', 'BiayaExim\BiayaImpor\BiayaImpor::detail/$1', ['filter' => 'Auth']);
 
 // BIAYA LOKAL
 $routes->get('/biaya-lokal', 'BiayaExim\BiayaLokal\BiayaLokal::index', ['filter' => 'Auth']);
@@ -836,6 +838,7 @@ $routes->get('/biaya-lokal/id/(:segment)', 'BiayaExim\BiayaLokal\BiayaLokal::edi
 $routes->get('/biaya-lokal/print/(:segment)', 'BiayaExim\BiayaLokal\BiayaLokal::print/$1', ['filter' => 'Auth']);
 $routes->get('/biaya-lokal/export-excel', 'BiayaExim\BiayaLokal\BiayaLokal::exportExcel', ['filter' => 'Auth']);
 $routes->get('/biaya-lokal/get-status-posting', 'BiayaExim\BiayaLokal\BiayaLokal::getStatusPosting', ['filter' => 'Auth']);
+$routes->get('/biaya-lokal/detail/(:segment)', 'BiayaExim\BiayaLokal\BiayaLokal::detail/$1', ['filter' => 'Auth']);
 
 // PI & PEB
 $routes->get('/pi-peb', 'BiayaExim\PIPeb\PIPeb::index', ['filter' => 'Auth']);

@@ -199,7 +199,7 @@
                     <div class="col-md-3">
                         <div class="form-floating mb-3">
                             <input autocomplete="one-time-code" disabled type="text" class="form-control total_biaya_prev" id="total_biaya_prev" name="total_biaya_prev">
-                            <label for="floatingInput">Total Biaya Ekspor</label>
+                            <label for="floatingInput">Total Biaya Impor</label>
                         </div>
                     </div>
                     <div class="col-md-3">
@@ -225,7 +225,7 @@
 
                 <ul class="nav nav-tabs" id="myTab" role="tablist">
                     <li class="nav-item">
-                        <a class="nav-link active" id="home-tab" data-toggle="tab" href="#home" role="tab" aria-controls="home" aria-selected="true">List Biaya Ekspor</a>
+                        <a class="nav-link active" id="home-tab" data-toggle="tab" href="#home" role="tab" aria-controls="home" aria-selected="true">List Biaya Impor</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" id="profile-tab" data-toggle="tab" href="#profile" role="tab" aria-controls="profile" aria-selected="false">Pengenaan Pajak</a>

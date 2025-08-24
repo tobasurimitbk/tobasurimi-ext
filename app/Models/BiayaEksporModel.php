@@ -171,9 +171,13 @@ class BiayaEksporModel extends Model
     {
         $resQry = $this->select('
             biaya_ekspor.*,
-            customers.name as customer_name
+            customers.name as customer_name,
+            divisis.divisi,
+            vendor_pelayaran.nama_vendor
         ')
             ->join('customers', 'customers.id = biaya_ekspor.customer_id', 'left')
+            ->join('divisis', 'divisis.id = biaya_ekspor.divisi_id', 'left')
+            ->join('vendor_pelayaran', 'vendor_pelayaran.id = biaya_ekspor.vendor_pelayaran_id', 'left')
             ->where('biaya_ekspor.id', $id)
             ->first();
 

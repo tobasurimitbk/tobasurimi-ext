@@ -1034,4 +1034,59 @@ class BiayaImpor extends BaseController
             ]);
         }
     }
+
+    public function detail($id)
+    {
+        $id = \decrypt($id);
+        $dataBiayaImpor = $this->biayaImporModel
+            ->select(
+                'biaya_impor.*,
+                vendor_pelayaran.nama_vendor,
+                suppliers.name as supplier_name,
+                divisis.divisi
+                '
+            )
+            ->join('vendor_pelayaran', 'vendor_pelayaran.id = biaya_impor.vendor_pelayaran_id', 'left')
+            ->join('suppliers', 'suppliers.id = biaya_impor.supplier_id', 'left')
+            ->join('divisis', 'divisis.id = biaya_impor.divisi_id', 'left')
+            ->where('biaya_impor.id', $id)
+            ->first();
+
+        $dataDetailBarang = $this->biayaImporBarangModel->getListBarang(
+            $id
+        );
+        $dataBiayaImporPajak = $this->biayaImporPajakModel
+            ->select(
+                '
+                biaya_impor_pajak.*,
+                taxes.type as type_tax, 
+                taxes.name as tax_name
+            '
+            )
+            ->join('taxes', 'taxes.id = biaya_impor_pajak.tax_id', 'left')
+            ->where('biaya_impor_id', $id)
+            ->where('biaya_impor_pajak.deletedAt', null)
+            ->findAll();
+        $dataBiayaImporDetail = $this->biayaImporDetailModel
+            ->select('biaya_impor_detail.*,metadata.value as valas_name')
+            ->join('metadata', 'metadata.id = biaya_impor_detail.valas_id', 'left')
+            ->where('biaya_impor_id', $id)
+            ->where('biaya_impor_detail.deletedAt', null)
+            ->findAll();
+
+        $dataContainer = $this->biayaImporContainerModel
+            ->where('biaya_impor_id', $id)
+            ->where('deletedAt', null)
+            ->findAll();
+
+        $data = [
+            'dataBiayaImpor' => $dataBiayaImpor,
+            'dataDetailBarang' => $dataDetailBarang,
+            'dataBiayaImporPajak' => $dataBiayaImporPajak,
+            'dataBiayaImporDetail' => $dataBiayaImporDetail,
+            'dataContainer' => $dataContainer
+        ];
+
+        return \view('BiayaExim/BiayaImpor/detail', $data);
+    }
 }

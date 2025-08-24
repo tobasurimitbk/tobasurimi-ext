@@ -372,6 +372,9 @@
                     let res = '';
                     res += `
                         <div class="mt-0">
+                           <button data-toggle="tooltip" title="Detail" onclick="detail('${id}')" class="btn btn-info">
+                                <i class="fa fa-eye fa-sm" aria-hidden="true"></i>
+                            </button>
                           <?php if (can('Biaya Exim', 'Biaya Ekspor', 'u')) : ?>
                             <a href="javascript:void(0)" onclick="edit('${id}')" data-toggle="tooltip" title="Edit" class="btn btn-primary">
                                 <i class="fas fa-edit"></i>
@@ -502,13 +505,36 @@
         window.location.href = `/biaya-impor/id/${id}`;
     }
 
+    function detail(id) {
+        const width = 800;
+        const height = 600;
+        const left = window.innerWidth / 2 - width / 2;
+        const top = window.innerHeight / 2 - height / 2;
+
+        window.open(
+            "<?= base_url('biaya-impor/detail/') ?>" + id,
+            "_blank",
+            `width=${width},height=${height},top=${top},left=${left},resizable=yes`
+        );
+
+    }
+
+
     function exportExcel() {
         var dateStart = $('#dateStart').val();
         var dateEnd = $('#dateEnd').val();
         var statusPosting = $('#status_posting').val();
         var search = $('#search').val();
 
-        window.location.href = "<?= base_url('biaya-impor/export-excel') ?>" + '?dateStart=' + dateStart + '&dateEnd=' + dateEnd + '&status_posting=' + statusPosting + '&search=' + search;
+        if (dateStart == '' && dateEnd == '') {
+            Swal.fire({
+                icon: 'error',
+                title: "Pilih Tanggal Awal dan Tanggal Akhir",
+                confirmButtonColor: '#4e73df',
+            })
+        } else {
+            window.location.href = "<?= base_url('biaya-impor/export-excel') ?>" + '?dateStart=' + dateStart + '&dateEnd=' + dateEnd + '&status_posting=' + statusPosting + '&search=' + search;
+        }
     }
 
     const print = function(url) {

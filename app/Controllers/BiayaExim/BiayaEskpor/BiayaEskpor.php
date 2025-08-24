@@ -908,4 +908,30 @@ class BiayaEskpor extends BaseController
             ]);
         }
     }
+
+    public function detail($id)
+    {
+        $id = \decrypt($id);
+        $dataBiayaEskpor = $this->biayaEksporModel->getById($id);
+        $dataDetailBarang = $this->biayaEksporBarangModel->getListBarang($id);
+        $dataBiayaEksporPajak = $this->biayaEksporPajakModel
+            ->select('biaya_ekspor_pajak.*,taxes.type as type_tax, taxes.name as tax_name')
+            ->join('taxes', 'taxes.id = biaya_ekspor_pajak.tax_id', 'left')
+            ->where('biaya_ekspor_pajak.biaya_ekspor_id', $id)
+            ->where('biaya_ekspor_pajak.deletedAt', null)
+            ->findAll();
+        $dataBiayaEksporDetail = $this->biayaEksporDetailModel
+            ->where('biaya_ekspor_id', $id)
+            ->where('deletedAt', null)
+            ->findAll();
+
+        $data = [
+            'dataBiayaEskpor' => $dataBiayaEskpor,
+            'dataDetailBarang' => $dataDetailBarang,
+            'dataBiayaEksporPajak' => $dataBiayaEksporPajak,
+            'dataBiayaEksporDetail' => $dataBiayaEksporDetail
+        ];
+
+        return \view('BiayaExim/BiayaEskpor/detail', $data);
+    }
 }
