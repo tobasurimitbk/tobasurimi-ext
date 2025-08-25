@@ -386,6 +386,7 @@
                 total_penerimaan: "<?= $m['total_penerimaan'] ?>",
                 output: {
                     barang: "<?= $m['output']['barang'] ?>",
+                    barang_id: "<?= $m['output']['barang_id'] ?>",
                     kode_satuan: "<?= $m['output']['kode_satuan'] ?>",
                     stock_id: "<?= $m['output']['stock_id'] ?>",
                     qty: "<?= $m['output']['qty'] ?>"
@@ -577,7 +578,7 @@
         var id_selected = getIDListDataSelected();
         var barangIn = $('#spesifikasi_hasil_rebus_id option:selected');
 
-        if (barangIn.data('barang') == "" || barangIn.data('barang') == undefined) {
+        if (barangIn.data('barang_id') == "" || barangIn.data('barang_id') == undefined) {
             Swal.fire({
                 icon: 'error',
                 title: 'Hasil Barang Rebus Wajib Dipilih !',
@@ -598,6 +599,7 @@
                         listStockAsal[i].qty = 0;
                         listStockAsal[i].output = {
                             barang: barangIn.data('barang'),
+                            barang_id: barangIn.data('barang_id'),
                             kode_satuan: barangIn.data('kode_satuan'),
                             stock_id: barangIn.data('stock_id'),
                             qty: 0
@@ -681,6 +683,7 @@
                     if ($.inArray(v.id, idStockInserted) !== -1) { // Cek apakah elemen ditemukan dalam array
                         listStockSelected[i].output = {
                             barang: barangIn.data('barang'),
+                            barang_id: barangIn.data('barang_id'),
                             kode_satuan: barangIn.data('kode_satuan'),
                             stock_id: barangIn.data('stock_id'),
                             qty: qtyHasilBagi
@@ -1033,7 +1036,7 @@
                 $(".spesifikasi_hasil_rebus_id").empty()
                 $(".spesifikasi_hasil_rebus_id").append(`<option value=""></option>`)
                 res.data.forEach(function(item) {
-                    $(".spesifikasi_hasil_rebus_id").append(`<option data-stock_id="${item.stock_id}" data-kode_barang="${item.kode_barang}" data-barang="${item.barang}" data-kode_satuan="${item.kode_satuan}" value="${item.spesifikasi_rebus_id}">(${item.kode_barang}) ${item.barang}</option>`)
+                    $(".spesifikasi_hasil_rebus_id").append(`<option data-barang_id="${item.spesifikasi_id}" data-stock_id="${item.stock_id}" data-kode_barang="${item.kode_barang}" data-barang="${item.barang}" data-kode_satuan="${item.kode_satuan}" value="${item.spesifikasi_rebus_id}">(${item.kode_barang}) ${item.barang}</option>`)
                 })
                 $(".spesifikasi_hasil_rebus_id").val();
             }
