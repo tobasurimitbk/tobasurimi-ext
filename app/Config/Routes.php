@@ -43,7 +43,7 @@ $routes->get('/403', function () {
     return view('errors/html/error_403');
 });
 
-$routes->get('/generate-no-ktp', 'Warehouse\Penomoran_::generateNoKtpSupplier');
+$routes->get('/generate-invoice-peb', 'Warehouse\Penomoran_::autoGenerateNoInvoiceTglInvoice');
 
 // $routes->get('/delete-transaksi-jurnal', 'Accounting\TutupBuku\TutupBukuController::deleteTransaksiJurnalLama');
 // $routes->get('/update-transaksi-jurnal', 'Accounting\TutupBuku\TutupBukuController::updateTransaksiJurnalBahanBaku');
@@ -801,13 +801,14 @@ $routes->get('/biaya-eskpor/get-order-form', 'BiayaExim\BiayaEskpor\BiayaEskpor:
 $routes->post('/biaya-eskpor/create', 'BiayaExim\BiayaEskpor\BiayaEskpor::store', ['filter' => 'Auth']);
 $routes->post('/biaya-eskpor/update', 'BiayaExim\BiayaEskpor\BiayaEskpor::update', ['filter' => 'Auth']);
 $routes->post('/biaya-eskpor/delete', 'BiayaExim\BiayaEskpor\BiayaEskpor::destroy', ['filter' => 'Auth']);
-$routes->post('/biaya-eskpor/posting', 'BiayaExim\BiayaEskpor\BiayaEskpor::posting', ['filter' => 'Auth']);
-$routes->post('/biaya-eskpor/unposting', 'BiayaExim\BiayaEskpor\BiayaEskpor::unposting', ['filter' => 'Auth']);
+$routes->post('/biaya-eskpor/update-status-posting', 'BiayaExim\BiayaEskpor\BiayaEskpor::updateStatusPosting', ['filter' => 'Auth']);
 $routes->get('/biaya-eskpor/all', 'BiayaExim\BiayaEskpor\BiayaEskpor::all', ['filter' => 'Auth']);
 $routes->get('/biaya-eskpor/id/(:segment)', 'BiayaExim\BiayaEskpor\BiayaEskpor::edit/$1', ['filter' => 'Auth']);
 $routes->get('/biaya-eskpor/print/(:segment)', 'BiayaExim\BiayaEskpor\BiayaEskpor::print/$1', ['filter' => 'Auth']);
 $routes->get('/biaya-eskpor/get-sales-order-export', 'BiayaExim\BiayaEskpor\BiayaEskpor::getSalesOrderExportByCustomerId', ['filter' => 'Auth']);
 $routes->get('/biaya-eskpor/export-excel', 'BiayaExim\BiayaEskpor\BiayaEskpor::exportExcel', ['filter' => 'Auth']);
+$routes->get('/biaya-eskpor/get-status-posting', 'BiayaExim\BiayaEskpor\BiayaEskpor::getStatusPosting', ['filter' => 'Auth']);
+$routes->get('/biaya-eskpor/detail/(:segment)', 'BiayaExim\BiayaEskpor\BiayaEskpor::detail/$1', ['filter' => 'Auth']);
 
 // BIAYA IMPOR
 $routes->get('/biaya-impor', 'BiayaExim\BiayaImpor\BiayaImpor::index', ['filter' => 'Auth']);
@@ -817,12 +818,13 @@ $routes->get('/biaya-impor/get-detail-barang-po', 'BiayaExim\BiayaImpor\BiayaImp
 $routes->post('/biaya-impor/create', 'BiayaExim\BiayaImpor\BiayaImpor::store', ['filter' => 'Auth']);
 $routes->post('/biaya-impor/update', 'BiayaExim\BiayaImpor\BiayaImpor::update', ['filter' => 'Auth']);
 $routes->post('/biaya-impor/delete', 'BiayaExim\BiayaImpor\BiayaImpor::destroy', ['filter' => 'Auth']);
-$routes->post('/biaya-impor/posting', 'BiayaExim\BiayaImpor\BiayaImpor::posting', ['filter' => 'Auth']);
-$routes->post('/biaya-impor/unposting', 'BiayaExim\BiayaImpor\BiayaImpor::unposting', ['filter' => 'Auth']);
+$routes->post('/biaya-impor/update-status-posting', 'BiayaExim\BiayaImpor\BiayaImpor::updateStatusPosting', ['filter' => 'Auth']);
 $routes->get('/biaya-impor/all', 'BiayaExim\BiayaImpor\BiayaImpor::all', ['filter' => 'Auth']);
 $routes->get('/biaya-impor/id/(:segment)', 'BiayaExim\BiayaImpor\BiayaImpor::edit/$1', ['filter' => 'Auth']);
 $routes->get('/biaya-impor/print/(:segment)', 'BiayaExim\BiayaImpor\BiayaImpor::print/$1', ['filter' => 'Auth']);
 $routes->get('/biaya-impor/export-excel', 'BiayaExim\BiayaImpor\BiayaImpor::exportExcel', ['filter' => 'Auth']);
+$routes->get('/biaya-impor/get-status-posting', 'BiayaExim\BiayaImpor\BiayaImpor::getStatusPosting', ['filter' => 'Auth']);
+$routes->get('/biaya-impor/detail/(:segment)', 'BiayaExim\BiayaImpor\BiayaImpor::detail/$1', ['filter' => 'Auth']);
 
 // BIAYA LOKAL
 $routes->get('/biaya-lokal', 'BiayaExim\BiayaLokal\BiayaLokal::index', ['filter' => 'Auth']);
@@ -830,12 +832,19 @@ $routes->get('/biaya-lokal/create', 'BiayaExim\BiayaLokal\BiayaLokal::create', [
 $routes->post('/biaya-lokal/create', 'BiayaExim\BiayaLokal\BiayaLokal::store', ['filter' => 'Auth']);
 $routes->post('/biaya-lokal/update', 'BiayaExim\BiayaLokal\BiayaLokal::update', ['filter' => 'Auth']);
 $routes->post('/biaya-lokal/delete', 'BiayaExim\BiayaLokal\BiayaLokal::destroy', ['filter' => 'Auth']);
-$routes->post('/biaya-lokal/posting', 'BiayaExim\BiayaLokal\BiayaLokal::posting', ['filter' => 'Auth']);
-$routes->post('/biaya-lokal/unposting', 'BiayaExim\BiayaLokal\BiayaLokal::unposting', ['filter' => 'Auth']);
+$routes->post('/biaya-lokal/update-status-posting', 'BiayaExim\BiayaLokal\BiayaLokal::updateStatusPosting', ['filter' => 'Auth']);
 $routes->get('/biaya-lokal/all', 'BiayaExim\BiayaLokal\BiayaLokal::all', ['filter' => 'Auth']);
 $routes->get('/biaya-lokal/id/(:segment)', 'BiayaExim\BiayaLokal\BiayaLokal::edit/$1', ['filter' => 'Auth']);
 $routes->get('/biaya-lokal/print/(:segment)', 'BiayaExim\BiayaLokal\BiayaLokal::print/$1', ['filter' => 'Auth']);
 $routes->get('/biaya-lokal/export-excel', 'BiayaExim\BiayaLokal\BiayaLokal::exportExcel', ['filter' => 'Auth']);
+$routes->get('/biaya-lokal/get-status-posting', 'BiayaExim\BiayaLokal\BiayaLokal::getStatusPosting', ['filter' => 'Auth']);
+$routes->get('/biaya-lokal/detail/(:segment)', 'BiayaExim\BiayaLokal\BiayaLokal::detail/$1', ['filter' => 'Auth']);
+
+// PI & PEB
+$routes->get('/pi-peb', 'BiayaExim\PIPeb\PIPeb::index', ['filter' => 'Auth']);
+$routes->get('/pi-peb/all', 'BiayaExim\PIPeb\PIPeb::all', ['filter' => 'Auth']);
+$routes->get('/pi-peb/get', 'BiayaExim\PIPeb\PIPeb::getPiPeb', ['filter' => 'Auth']);
+$routes->post('/pi-peb/update', 'BiayaExim\PIPeb\PIPeb::updatePiPeb', ['filter' => 'Auth']);
 
 // PRODUKSI
 // Production Result
@@ -1539,6 +1548,7 @@ $routes->group('bea-cukai-bc-40', ['filter' => 'Auth'], function ($routes) {
     $routes->get('id/dokumen/data/all', 'BeaCukai\BC40::allDokumen');
     $routes->post('id/dokumen/create', 'BeaCukai\BC40::createDokumenAction');
     $routes->post('id/dokumen/delete', 'BeaCukai\BC40::deleteDokumenAction');
+    $routes->post('id/dokumen-generate', 'BeaCukai\BC40::autoCreateDokumen');
     // PENGANGKUT
     $routes->get('id/pengangkut/(:segment)', 'BeaCukai\BC40::createPengangkutView/$1');
     $routes->post('id/pengangkut', 'BeaCukai\BC40::createPengangkutAction');

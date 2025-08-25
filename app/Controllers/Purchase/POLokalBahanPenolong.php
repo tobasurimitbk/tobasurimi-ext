@@ -314,7 +314,7 @@ class POLokalBahanPenolong extends BaseController
             ->select($selectQryPurchaseOrderDetail)
             ->join('barang_master', 'barang_master.id = am_purchase_order_details.barang_id')
             ->join('barang_master_spesifikasi', 'am_purchase_order_details.spesifikasi_id = barang_master_spesifikasi.id')
-            ->join('satuans', 'barang_master_spesifikasi.satuan_1 = satuans.id')
+            ->join('satuans', 'am_purchase_order_details.unit = satuans.id')
             ->where($amPurchaseOrderDetailCondition)
             ->findAll();
 

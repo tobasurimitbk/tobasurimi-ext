@@ -659,12 +659,11 @@
                 
                 if (!isIDSelected) {
                     listStockAsal[i].stok_total = parseFloat(listStockAsal[i].stok_total);
-                    listStockAsal[i].qty = 1; // Ganti dari 0 ke 1 atau nilai default lain
+                    listStockAsal[i].qty = 0; // Ganti dari 0 ke 1 atau nilai default lain
                     listStockSelected.push(listStockAsal[i]);
                 }
             }
         });
-        console.log(listStockSelected);
         drawTableSelectedItem(listStockSelected);
     }
 
@@ -1133,7 +1132,7 @@
             row.append($('<td style="text-align:center;">').text(v.stock_date || '-'));
             row.append($('<td style="text-align:center;">').text(v.barang || '-'));
             row.append($('<td style="text-align:center;">').text(v.satuan || '-'));
-            row.append($('<td style="text-align:center;">').text(parseFloat(v.stok_total) || 0));
+            row.append($('<td style="text-align:center;">').text(greatFormatRupiah(v.stok_total) || 0));
 
             dataTable.row.add(row);
         });
@@ -1143,7 +1142,6 @@
     }
 
     function drawTableSelectedItem(data) {
-        console.log(data)
         var typePengambilanStok = $('#type_pengambilan_stock option:selected').val();
         const table = $('#selectedItemTable');
         var no = 1;
@@ -1176,13 +1174,13 @@
                 newRow.append($('<td style="text-align: center;">').text(v.stock_date));
                 newRow.append($('<td style="text-align: center;">').text(v.barang));
                 newRow.append($('<td style="text-align: center;">').text(v.satuan));
-                newRow.append($('<td style="text-align: center;">').text(v.stok_total));
+                newRow.append($('<td style="text-align: center;">').text(greatFormatRupiah(v.stok_total)));
                 if (typePengambilanStok == "FIFO") {
-                    newRow.append($('<td style="text-align: center;">').text(v.qty));
+                    newRow.append($('<td style="text-align: center;">').text(greatFormatRupiah(v.qty)));
                 } else {
                     newRow.append($('<td style="text-align: center;">').html(
                         `
-                    <input <?= !empty($jasaVendorOut) ? (($jasaVendorOut['status_posting'] == "1") ? 'disabled' : '') : '' ?> class="form-control stok-out" oninput="preventNegativeInput(this)" autocomplete="one-time-code" data-id="${v.id}" data-stok_total="${v.stok_total}" class="form-control" type="text" value="${v.qty}">
+                    <input <?= !empty($jasaVendorOut) ? (($jasaVendorOut['status_posting'] == "1") ? 'disabled' : '') : '' ?> onkeyup="this.value = greatFormatRupiah(this.value)" class="form-control stok-out" oninput="preventNegativeInput(this)" autocomplete="one-time-code" data-id="${v.id}" data-stok_total="${v.stok_total}" class="form-control" type="text" value="${greatFormatRupiah(v.qty)}">
                 `
                     ));
                 }
@@ -1194,21 +1192,24 @@
                 ));
                 table.find('tbody').append(newRow);
 
-                totalQtyKeluar += Number(v.qty);
+                totalQtyKeluar += destroyFormatRupiah(v.qty);
             });
 
-            var newRow = $('<tr style="color:whitesmoke; background-color:#f2c996;">');
+            var newRow = $('<tr class="grand-total" style="color:whitesmoke; background-color:#f2c996;">');
             newRow.append($('<td style="text-align: right;" colspan="8">').html("<b>GRAND TOTAL</b>"));
-            newRow.append($('<td>').text(totalQtyKeluar.toFixed(2)));
+            newRow.append($('<td class="total-cell">').text(greatFormatRupiah(totalQtyKeluar)));
             newRow.append($('<td>').text(''));
             table.find('tbody').append(newRow);
 
-
+            $(document).on("input", ".stok-out", function() {
+                updateGrandTotal();
+            });
         }
 
 
 
     }
+    
 
     function deleteDetail(id) {
         // Pastikan id jadi angka biar perbandingan aman
@@ -1282,6 +1283,21 @@
         $('#warehouse_id').change();
 
     }
+
+    // fungsi hitung ulang total
+    function updateGrandTotal() {
+        var total = 0;
+        $('.stok-out').each(function() {
+            var val = $(this).val();
+            if (val && !isNaN(val)) {
+                total += parseFloat(val);
+            }
+        });
+
+        // update ke row grand total
+        $('#selectedItemTable tbody tr.grand-total td.total-cell').text(greatFormatRupiah(total) + '.00');
+    }
+
 
     const print = function(url) {
         window.open(url, "_blank");

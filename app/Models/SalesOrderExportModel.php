@@ -1019,4 +1019,169 @@ class SalesOrderExportModel extends Model
 
         return $resultQry;
     }
+
+    public function getListPiPeb($condition, $addCondition, $limit = 10, $offset = 0)
+    {
+        $availableSort = [
+            'sales_order_export.sales_order_export_id' => 'sales_order_export.sales_order_export_id',
+            'sales_order_export.no_invoice'         => 'sales_order_export.no_invoice',
+            'sales_order_export.tanggal_invoice'         => 'sales_order_export.tanggal_invoice',
+            'sales_order_export.sales_order_export_no' => 'sales_order_export.sales_order_export_no',
+            'sales_contract.customer_id'         => 'sales_contract.customer_id',
+            'sales_contract.dicharge_port'               => 'sales_contract.dicharge_port',
+            'sales_order_export.status_invoice'             => 'sales_order_export.status_invoice',
+            'sales_order_export.nilai_pi' => 'sales_order_export.nilai_pi',
+            'sales_order_export.shipment_value' => 'sales_order_export.shipment_value',
+            'sales_order_export.exchange_rate_peb' => 'sales_order_export.exchange_rate_peb',
+        ];
+
+        $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
+
+        $sort = $availableSort[$addCondition['sort'] ?? 'createdAt'] ?? 'sales_order_export.createdAt';
+        $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'DESC';
+
+        $selectQry = "sales_order_export.*, 
+                        sales_contract.dicharge_port,
+                        customers.name AS customer_name,
+                        valas_pi.value as valas_pi_name,
+                        valas_peb.value as valas_peb_name";
+        $salesDataQry = $this->asObject()
+            ->select($selectQry)
+            ->where($condition)
+            ->join('sales_contract', 'sales_contract.id = sales_order_export.sales_contract_id', 'left')
+            ->join('customers', 'customers.id = sales_contract.customer_id', 'left')
+            ->join('metadata as valas_pi', 'valas_pi.id = sales_order_export.valas_id', 'left')
+            ->join('metadata as valas_peb', 'valas_peb.id = sales_order_export.valas_id_peb', 'left')
+            ->orderBy($sort, $sortType);
+
+        $totalData = $salesDataQry->countAllResults(false);
+
+
+        if ($addCondition['search']) {
+            $salesDataQry
+                ->groupStart()
+                ->like('sales_order_export.sales_order_export_no', $addCondition['search'])
+                ->orLike('sales_contract.dicharge_port', $addCondition['search'])
+                ->orLike('sales_order_export.no_invoice', $addCondition['search'])
+                ->orLike('customers.name', $addCondition['search'])
+                ->groupEnd();
+        }
+
+        if ($addCondition['status_invoice']) {
+            if ($addCondition['status_invoice'] == "TERBIT") {
+                $salesDataQry
+                    ->where('sales_order_export.status_invoice', 'TERBIT');
+            } else if ($addCondition['status_invoice'] == "BELUM TERBIT") {
+                $salesDataQry
+                    ->where('sales_order_export.status_invoice', 'BELUM TERBIT');
+            }
+        }
+
+        if (!empty($addCondition['dateStart']) || !empty($addCondition['dateEnd'])) {
+            $salesDataQry->groupStart(); //
+            if (!empty($addCondition['dateStart'])) {
+                $salesDataQry->where('DATE(sales_order_export.tanggal_invoice) >=', $addCondition['dateStart']);
+            }
+            if (!empty($addCondition['dateEnd'])) {
+                $salesDataQry->where('DATE(sales_order_export.tanggal_invoice) <=', $addCondition['dateEnd']);
+            }
+            $salesDataQry->groupEnd();
+        }
+
+
+        $totalFilteredData = $salesDataQry->countAllResults(false);
+        $data = $salesDataQry->findAll($limit, $offset);
+        return [
+            'data'              => $data,
+            'totalData'         => $totalData,
+            'totalFilteredData' => $totalFilteredData,
+            'sort'  => $sort,
+            'sortType'  => $sortType
+        ];
+    }
+
+    public function generateCodePI($companyId)
+    {
+        $metaDataModel = new MetadataModel();
+        $salesOrderExportModel = new SalesOrderExportModel();
+
+        $year = date('Y');
+        if ($companyId == 1) {
+            $codeInv = "TSI2";
+        } elseif ($companyId == 2) {
+            $codeInv = "TSI";
+        } elseif ($companyId == 15) {
+            $codeInv = "GPS";
+        } else {
+            $codeInv = "OCS";
+        }
+
+        // Template Invoice
+        $invTempleate = $codeInv . "/" . $year;
+
+        // Ambil Format Code dari Metadata
+        $formatCodeFirst = $metaDataModel
+            ->where('name', "inv_pi_peb")
+            ->first();
+
+        $formatCode = explode(',', $formatCodeFirst['value']); // misal: [C,H,N,M,E,I,J,U,L,O]
+        $base = count($formatCode);
+
+        // Cari invoice terakhir
+        $salesOrderExport = $salesOrderExportModel
+            ->where('company_id', $companyId)
+            ->where('deletedAt', null)
+            ->orderBy('sales_order_export_id', "desc")
+            ->first();
+
+        // Hitung index berikutnya
+        $lastCode = null;
+        if ($salesOrderExport && $salesOrderExport['no_invoice']) {
+            // Ambil kode setelah template, misal "TSI/2025/CN" → ambil "CN"
+            $parts = explode('/', $salesOrderExport['no_invoice']);
+            $lastCode = end($parts);
+        }
+
+        $nextCode = $this->getNextCode($lastCode, $formatCode);
+
+        return $invTempleate . "/" . $nextCode;
+    }
+
+    public function getNextCode($lastCode,  $formatCode)
+    {
+        $base = count($formatCode);
+
+        // kalau belum ada kode → pakai pertama
+        if (!$lastCode) {
+            return $formatCode[0];
+        }
+
+        // mapping huruf ke index
+        $map = array_flip($formatCode);
+
+        // ubah kode huruf ke angka (basis-N, Excel style)
+        $index = 0;
+        $len = strlen($lastCode);
+        for ($i = 0; $i < $len; $i++) {
+            $char = $lastCode[$i];
+            if (!isset($map[$char])) {
+                throw new \Exception("Invalid code: " . $lastCode);
+            }
+            $index = $index * $base + ($map[$char] + 1); // +1 supaya mirip Excel
+        }
+
+        // increment
+        $index++;
+
+        // convert balik ke huruf
+        $result = '';
+        while ($index > 0) {
+            $index--; // offset Excel style
+            $rem = $index % $base;
+            $result = $formatCode[$rem] . $result;
+            $index = intdiv($index, $base);
+        }
+
+        return $result;
+    }
 }

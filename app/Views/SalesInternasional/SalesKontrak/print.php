@@ -113,6 +113,10 @@
             font-weight: bold;
             font-size: 12px;
         }
+
+        body {
+            font-family: 'Times New Roman', Times, serif
+        }
     </style>
 </head>
 
@@ -124,11 +128,11 @@
                 <td>
                     <?php if ($company['id'] == 2): ?>
                         <div style="text-align: right; margin-left:-20px; margin-right:40px; ">
-                            <img src="<?= $company['logo'] ?>" style="width: 140px; height:100px; text-align:right; margin-top:-17px" alt="">
+                            <img src="<?= $company['logo'] ?>" style="width: 140px; height:100px; text-align:right; margin-top:-5px" alt="">
                         </div>
                     <?php else : ?>
                         <div style="text-align: right; margin-left:-20px; margin-right:40px; ">
-                            <img src="<?= $company['logo'] ?>" style="width: 190px; text-align:right; margin-top:-17px" alt="">
+                            <img src="<?= $company['logo'] ?>" style="width: 190px; text-align:right; margin-top:-5px" alt="">
                         </div>
                     <?php endif; ?>
                 </td>
@@ -140,7 +144,7 @@
 
                             <b><?= strtoupper(str_ireplace(', Tbk', '', $company['holding_company'])) ?></b> <br>
                         </h1>
-                        <table style="width: 100%; margin-top:-15px; margin-left:-30px; font-size:12px;">
+                        <table style="width: 100%; margin-top:-25px; margin-left:-30px; font-size:12px;">
 
                             <tr style="vertical-align: top;">
                                 <td style="width: 50px;">Office</td>
@@ -332,15 +336,6 @@
                 </tr>
                 <tr>
                     <td>
-                        <label class="label-header">BUYER</label>
-                    </td>
-                    <td>:</td>
-                    <td>
-                        <label class="label-header"> <?= $salesKontrak['customer_name']; ?></label>
-                    </td>
-                </tr>
-                <tr>
-                    <td>
                         <label class="label-header">BANK</label>
                     </td>
                     <td>:</td>
@@ -375,6 +370,27 @@
                         <label class="label-header"> <?= $salesKontrak['atas_nama'] ?></label>
                     </td>
                 </tr>
+                <tr>
+                    <td>
+                        <label class="label-header">BUYER</label>
+                    </td>
+                    <td>:</td>
+                    <td>
+                        <label class="label-header"> <?= $salesKontrak['customer_name']; ?></label>
+                    </td>
+                </tr>
+                <?php if (!empty($salesKontrak['address'])): ?>
+                    <tr>
+                        <td>
+                            <label class="label-header">ADDRESS</label>
+                        </td>
+                        <td>:</td>
+                        <td>
+                            <label class="label-header"> <?= $salesKontrak['address']; ?></label>
+                        </td>
+                    </tr>
+                <?php endif ?>
+
             </table>
 
         </div>
@@ -391,7 +407,7 @@
     <div class="header">
         <div class="mt-1 txt-left"><label class="label-header"> I. DESCRIPTION OF GOODS </label></div>
     </div>
-    <table style="width: 100%; border-collapse: collapse; margin-top: 4px; font-family: Arial, sans-serif; font-size: 11px;">
+    <table style="width: 100%; border-collapse: collapse; margin-top: 4px; font-size: 11px;">
         <thead>
             <tr style="background-color: #f8f9fa; border-bottom: 2px solid #dee2e6;">
                 <th style="padding: 6px; text-align: left; font-weight: bold; border: 1px solid #ddd; width: 4%; height:2%;">NO</th>
@@ -481,21 +497,21 @@
                             // Identify which columns have data
                             $columns_to_show = [];
                             $all_columns = [
-                                'size' => ['label' => 'Size', 'width' => '8%'],
-                                'grade' => ['label' => 'Grade', 'width' => '8%'],
-                                'packing' => ['label' => 'Packing', 'width' => '8%'],
-                                'can' => ['label' => 'Can', 'width' => '7%'],
-                                'cased' => ['label' => 'Case', 'width' => '7%'],
-                                'case' => ['label' => 'Case', 'width' => '7%'],
-                                'kg' => ['label' => 'Kg', 'width' => '7%'],
-                                'lb' => ['label' => 'LB', 'width' => '7%'],
-                                'inner_box' => ['label' => 'Inner', 'width' => '8%'],
-                                'pc' => ['label' => 'PC', 'width' => '7%'],
-                                'bag' => ['label' => 'Bag', 'width' => '7%'],
-                                'cup' => ['label' => 'Cup', 'width' => '6%'],
-                                'persen' => ['label' => '%', 'width' => '3%'],
-                                'remark' => ['label' => 'Remarks', 'width' => '10%'],
-                                'palet' => ['label' => 'Pallet', 'width' => '10%']
+                                'size' => ['label' => 'SIZE', 'width' => '8%'], // tidak pakai qty
+                                'grade' => ['label' => 'GRADE', 'width' => '8%'], // tidak pakai qty
+                                'packing' => ['label' => 'PACKING', 'width' => '8%'], // tidak pakai qty
+                                'can' => ['label' => 'QTY (CAN)', 'width' => '7%'],
+                                'cased' => ['label' => 'QTY (CASE)', 'width' => '7%'],
+                                'case' => ['label' => 'QTY (CASE)', 'width' => '7%'],
+                                'kg' => ['label' => 'QTY (KG)', 'width' => '7%'],
+                                'lb' => ['label' => 'QTY (LB)', 'width' => '7%'],
+                                'inner_box' => ['label' => 'INNER', 'width' => '8%'],
+                                'pc' => ['label' => 'QTY (PC)', 'width' => '7%'],
+                                'bag' => ['label' => 'QTY (Bag)', 'width' => '7%'],
+                                'cup' => ['label' => 'QTY (CUP)', 'width' => '6%'],
+                                'persen' => ['label' => '%', 'width' => '3%'], // tidak pakai qty
+                                'remark' => ['label' => 'REMARK', 'width' => '10%'],  // tidak pakai qty
+                                'palet' => ['label' => 'PALLET', 'width' => '10%'] // tidak pakai qty
                             ];
 
                             // Check which columns have data
@@ -511,6 +527,12 @@
                             // Check if percentage column exists and should be shown
                             $show_persen_column = isset($columns_to_show['persen']);
                             $show_cased_column = isset($columns_to_show['cased']);
+
+                            // Ini untuk mengetahui Qty Satuan apa yang dipakek (ambil paling utama)
+                            $satuanQty = "";
+                            foreach ($detail['size_breakdown'] as $breakdown):
+                                $satuanQty =  $breakdown['satuan_size_code'];
+                            endforeach;
                             ?>
 
                             <div style="margin-top: 6px;">
@@ -525,16 +547,16 @@
                                             <?php endforeach; ?>
 
                                             <?php if ($show_cased_column): ?>
-                                                <th style="padding: 3px; border: 1px solid #ddd; width: 4.5%;text-align: right;">Case</th>
+                                                <th style="padding: 3px; border: 1px solid #ddd; width: 4.5%;text-align: center;">QTY (CASE)</th>
                                             <?php endif; ?>
 
                                             <?php if ($show_persen_column): ?>
-                                                <th style="padding: 3px; border: 1px solid #ddd; width: 4.5%;text-align: right;">%</th>
+                                                <th style="padding: 3px; border: 1px solid #ddd; width: 4.5%;text-align: center;">%</th>
                                             <?php endif; ?>
 
-                                            <th style=" padding: 3px; border: 1px solid #ddd; width: 4.5%; text-align: right;">Qty</th>
-                                            <th style="padding: 3px; border: 1px solid #ddd; width: 4.5%; text-align: right;">Unit Price</th>
-                                            <th style="padding: 3px; border: 1px solid #ddd; width: 4.5%; text-align: right;">Total Amount</th>
+                                            <th style=" padding: 3px; border: 1px solid #ddd; width: 4.5%; text-align: center;">QTY (<?= $satuanQty ?>)</th>
+                                            <th style="padding: 3px; border: 1px solid #ddd; width: 4.5%; text-align: center;">UNIT PRICE (<?= $salesKontrak['mata_uang'] . "/" . $satuanQty ?>)</th>
+                                            <th style="padding: 3px; border: 1px solid #ddd; width: 4.5%; text-align: center;">TOTAL AMOUNT (<?= $salesKontrak['mata_uang'] ?>)</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -577,7 +599,7 @@
                                                     </td>
                                                 <?php endif; ?>
 
-                                                <td style="padding: 3px; border: 1px solid #ddd; text-align: right;"><?= number_format($breakdown['qty'], 2) . " " . $breakdown['satuan_size_code'] ?></td>
+                                                <td style="padding: 3px; border: 1px solid #ddd; text-align: right;"><?= number_format($breakdown['qty'], 2)  ?></td>
                                                 <td style="padding: 3px; border: 1px solid #ddd; text-align: right;"><?= number_format($breakdown['harga'], 2) ?></td>
                                                 <td style="padding: 3px; border: 1px solid #ddd; text-align: right;"><?= number_format($breakdown['total'], 2) ?></td>
                                             </tr>
@@ -616,7 +638,7 @@
                                             <?php endif; ?>
 
                                             <td style="padding: 3px; border: 1px solid #ddd; text-align: right; font-weight: bold;">
-                                                <?= number_format($breakdown_qty, 2) . " " . $breakdown['satuan_size_code'] ?>
+                                                <?= number_format($breakdown_qty, 2)  ?>
                                             </td>
                                             <td style="padding: 3px; border: 1px solid #ddd; text-align: right; font-weight: bold;">-</td>
                                             <td style="padding: 3px; border: 1px solid #ddd; text-align: right; font-weight: bold;">
@@ -679,13 +701,15 @@
                     </td>
                 </tr>
             <?php endif; ?> -->
-            <tr style="font-weight: bold; background-color: #e9ecef; font-size: 11px;">
-                <td style="padding: 6px; border: 1px solid #ddd;"></td>
-                <td style="padding: 6px; border: 1px solid #ddd; text-align: right;">
-                    <span style="float: left;">TOTAL</span>
-                    <?= number_format($total_amount, 2) ?>
-                </td>
-            </tr>
+            <?php if ($total_adjustments != 0): ?>
+                <tr style="font-weight: bold; background-color: #e9ecef; font-size: 11px;">
+                    <td style="padding: 6px; border: 1px solid #ddd;"></td>
+                    <td style="padding: 6px; border: 1px solid #ddd; text-align: right;">
+                        <span style="float: left;">TOTAL</span>
+                        <?= number_format($total_amount, 2) ?>
+                    </td>
+                </tr>
+            <?php endif; ?>
 
             <!-- Royalty -->
             <?php if ($salesKontrak['royalty_price'] > 0): ?>
@@ -817,7 +841,7 @@
                         <td style="width: 25px;"><?= strtoupper(numToRoman($counter++)) ?>.</td>
                         <td style="width: 180px;">TOTAL AMOUNT (<?= $salesKontrak['mata_uang'] ?>)</td>
                         <td style="width: 10px;">:</td>
-                        <td><?= number_format($grand_total, 2) ?> (<?= strtoupper(terbilangInggris($grand_total)) ?>)</td>
+                        <td><?= number_format($grand_total, 2) ?> (<?= strtoupper(terbilangInggris($grand_total)) . " ONLY" ?>)</td>
                     </tr>
                 <?php endif; ?>
 

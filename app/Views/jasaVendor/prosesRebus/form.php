@@ -577,7 +577,7 @@
         var id_selected = getIDListDataSelected();
         var barangIn = $('#spesifikasi_hasil_rebus_id option:selected');
 
-        if (barangIn.data('stock_id') == "" || barangIn.data('stock_id') == undefined) {
+        if (barangIn.data('barang') == "" || barangIn.data('barang') == undefined) {
             Swal.fire({
                 icon: 'error',
                 title: 'Hasil Barang Rebus Wajib Dipilih !',
@@ -663,7 +663,7 @@
                         if (!isIDSelected && qtyRebusFifo != 0 && parseFloat(listStockAsal[i].stok_total) != 0) {
                             var rebusQty = Math.min(qtyRebusFifo, parseFloat(listStockAsal[i].stok_total));
                             listStockAsal[i].stok_total = parseFloat(listStockAsal[i].stok_total);
-                            listStockAsal[i].qty = parseFloat(rebusQty.toFixed(3));
+                            listStockAsal[i].qty = parseFloat(rebusQty);
 
                             listStockSelected.push(listStockAsal[i]);
                             qtyRebusFifo = qtyRebusFifo - rebusQty;
@@ -675,7 +675,7 @@
                 // STOK HASIL REBUS
                 var lengthStockSelected = idStockInserted.length;
                 var qtyHasilBagi = qtyHasilRebusFifo / lengthStockSelected;
-                qtyHasilBagi = qtyHasilBagi.toFixed(3);
+                qtyHasilBagi = qtyHasilBagi;
 
                 $.each(listStockSelected, function(i, v) {
                     if ($.inArray(v.id, idStockInserted) !== -1) { // Cek apakah elemen ditemukan dalam array
@@ -1017,7 +1017,7 @@
 
     function getListBarangHasilRebus() {
         $.ajax({
-            url: `<?= base_url('proses-rebus/list-barang-rebus'); ?>`,
+            url: `<?= base_url('jasa-vendor-in/list-barang-masuk'); ?>`,
             method: "GET",
             beforeSend: function() {
                 setLoading();
@@ -1026,10 +1026,7 @@
                 stopLoading();
             },
             data: {
-                stock_id: $(".spesifikasi_rebus_id option:selected").data('stock_id'),
                 type_barang: $(".type_barang option:selected").val(),
-                divisi_id: $(".divisi_id option:selected").val(),
-                warehouse_id: $(".warehouse_id option:selected").val(),
             },
             dataType: "json",
             success: function(res) {
@@ -1077,7 +1074,7 @@
             newRow.append($('<td style="text-align:center;">').text(v.stock_date));
             newRow.append($('<td style="text-align:center;">').text(v.barang));
             newRow.append($('<td style="text-align:center;">').text(v.satuan));
-            newRow.append($('<td style="text-align:center;">').text(v.stok_total));
+            newRow.append($('<td style="text-align:center;">').text(greatFormatRupiah(v.stok_total)));
             table.find('tbody').append(newRow);
         });
 
@@ -1113,6 +1110,7 @@
     }
 
     function drawTableSelectedItem(data) {
+        console.log(data)
         const $tbody = $('#selectedItemTable .body-table');
         $tbody.empty();
 
@@ -1151,10 +1149,11 @@
                     <td colspan="12" style="text-align: right; font-weight: bold;">
                     </td>
                     <td colspan="2">
-                        <input type="number" step="0.001" min="0" 
+                        <input step="0.001" min="0" 
                             class="form-control total-hasil-input" 
                             data-stock-id="${stockID}" 
-                            value="${totalHasilGroup.toFixed(3)}"
+                            onkeyup="this.value = greatFormatRupiah(this.value)"
+                            value="${greatFormatRupiah(totalHasilGroup)}"
                             placeholder="Masukkan total hasil rebus ${groupName} (${satuan})" />
                     </td>
                     <td style="text-align: right; font-weight: bold;">
@@ -1173,13 +1172,14 @@
                         <td>${item.supplier_name || '-'}</td>
                         <td>${item.stock_date || '-'}</td>
                         <td>${item.barang || '-'}</td>
-                        <td style="text-align: right;">${parseFloat(item.total_penerimaan).toFixed(3)}</td>
-                        <td style="text-align: right;">${parseFloat(item.total_penerimaan).toFixed(3)}</td>
-                        <td style="text-align: right;">${parseFloat(item.stok_total).toFixed(3)}</td>
+                        <td style="text-align: right;">${greatFormatRupiah(item.total_penerimaan)}</td>
+                        <td style="text-align: right;">${greatFormatRupiah(item.total_penerimaan)}</td>
+                        <td style="text-align: right;">${greatFormatRupiah(item.stok_total)}</td>
                         <td>
-                            <input type="number" step="0.001" min="0" 
+                            <input type="text" step="0.001" min="0" 
                                 class="form-control qty-rebus-input" 
                                 value="${item.qty || 0}" 
+                                onkeyup="this.value = greatFormatRupiah(this.value)"
                                 data-stok_total="${parseFloat(item.stok_total)}"
                                 data-index="${i}" data-id="${item.id}" />
                         </td>
@@ -1187,12 +1187,12 @@
 
                         <td>${item.output?.barang || '-'}</td>
                         <td>
-                            <input type="number" step="0.001" min="0" 
+                            <input type="text" step="0.001" min="0" 
                                 class="form-control qty-hasil-input" 
                                 name="qty_hasil_rebus[]" 
                                 data-id="${item.id}"
                                 data-index="${i}"
-                                value="${item.output?.qty || 0}" readonly />
+                                value="${greatFormatRupiah(item.output?.qty) || 0}" readonly />
                         </td>
                         <td>${item.output?.kode_satuan || '-'}</td>
                         <td><button type="button" class="btn btn-danger btn-sm btn-remove-row">Hapus</button></td>
@@ -1208,7 +1208,7 @@
         $('.total-hasil-input').off('input').on('input', function() {
             const stockID = $(this).data('stock-id');
             const inputValue = $(this).val();
-            const totalQty = parseFloat(inputValue);
+            const totalQty = destroyFormatRupiah(inputValue);
             
             // Jika input kosong atau tidak valid, set semua ke 0
             if (inputValue === "" || isNaN(totalQty) || totalQty <= 0) {
@@ -1233,10 +1233,10 @@
             // Jika input valid, bagi secara merata
             const groupRows = $(`tr.data-row[data-group="${stockID}"]`);
             const jumlahBaris = groupRows.length;
-            const qtyPerBaris = (totalQty / jumlahBaris).toFixed(3);
+            const qtyPerBaris = (totalQty / jumlahBaris);
             
             groupRows.each(function() {
-                $(this).find('.qty-hasil-input').val(qtyPerBaris);
+                $(this).find('.qty-hasil-input').val(greatFormatRupiah(qtyPerBaris));
             });
             
             // Sync ke listStockSelected
@@ -1261,13 +1261,13 @@
 
             // Hitung total rebus dari masing-masing baris input qty rebus
             $('.qty-rebus-input').each(function () {
-                const val = parseFloat($(this).val());
+                const val = destroyFormatRupiah($(this).val());
                 if (!isNaN(val)) totalQtyRebus += val;
             });
 
             // Hitung total hasil rebus dari input qty hasil rebus per item
             $('.qty-hasil-input').each(function () {
-                const val = parseFloat($(this).val());
+                const val = destroyFormatRupiah($(this).val());
                 if (!isNaN(val)) totalQtyHasilRebus += val;
             });
 
@@ -1278,9 +1278,9 @@
             const totalRow = $(`
                 <tr class="grand-total-row" style="background-color: #d1ecf1; font-weight: bold;">
                     <td colspan="9" style="text-align: right;">GRAND TOTAL</td>
-                    <td style="text-align: right;">${totalQtyRebus.toFixed(3)}</td>
+                    <td style="text-align: right;">${greatFormatRupiah(totalQtyRebus)}.000</td>
                     <td colspan="1"></td>
-                    <td colspan="2" style="text-align: right;">${totalQtyHasilRebus.toFixed(3)}</td>
+                    <td colspan="2" style="text-align: right;">${greatFormatRupiah(totalQtyHasilRebus)}.000</td>
                     <td colspan="2"></td>
                 </tr>
             `);

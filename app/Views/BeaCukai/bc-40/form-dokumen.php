@@ -23,7 +23,7 @@
                             <select class="form-select dokumen_jenis_dokumen" id="dokumen_jenis_dokumen" name="dokumen_jenis_dokumen" aria-label="Floating label select example">
                                 <option value=""></option>
                                 <?php foreach ($kodeDokumen as $k) : ?>
-                                    <option <?= $k['description'] == "315" ? 'selected' : '' ?> value="<?= encrypt($k['description']) ?>">
+                                    <option value="<?= encrypt($k['description']) ?>">
                                         <?= strtoupper($k['description']) . " - " . strtoupper($k['value']) . "" ?>
                                     </option>
                                 <?php endforeach; ?>
@@ -33,14 +33,14 @@
                     </div>
                     <div class="col-sm-4 mt-1">
                         <div class="form-floating mb-3">
-                            <input value="<?= ($po != null) ? $po['po_no'] : '' ?>" id="dokumen_nomor_dokumen" name="dokumen_nomor_dokumen" type="text" class="form-control dokumen_nomor_dokumen" placeholder="">
+                            <input value="" id=" dokumen_nomor_dokumen" name="dokumen_nomor_dokumen" type="text" class="form-control dokumen_nomor_dokumen" placeholder="">
                             <label>Nomor Dokumen</label>
                         </div>
                     </div>
                     <div class="col-sm-4 mt-1">
                         <div class="input-group input-group-password">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input value="<?= ($po != null) ? date('d/m/Y', strtotime($po['po_date'])) : '' ?>" autocomplete="one-time-code" name="dokumen_tanggal" type="text" placeholder="" class="form-control dokumen_tanggal" id="dokumen_tanggal">
+                                <input value="" autocomplete="one-time-code" name="dokumen_tanggal" type="text" placeholder="" class="form-control dokumen_tanggal" id="dokumen_tanggal">
                                 <label>Tanggal Dokumen</label>
                             </div>
                             <div class="input-group-prepend group-prepend-password align-items-center">
@@ -53,7 +53,12 @@
                     <div class="col-md-6"></div>
                     <div class="col-md-6">
                         <div class="row" style="float: right; margin-bottom:5px;">
-                            <div class="col-sm" style="margin-right: -20px;">
+                            <div class="col-sm" style="margin-right: -30px;">
+                                <button onclick="generateDokumen('<?= encrypt($bcPo['id']) ?>')" style="border-color: #FFA426 !important; background-color: #FFA426 !important; margin-right: 10px !important;" type="button" class="btn btn-add btn-block float-right">
+                                    <i class="fas fa-download mr-1"></i> Ambil Dokumen
+                                </button>
+                            </div>
+                            <div class="col-sm">
                                 <button type="button" class="btn btn-add btn-block float-right btn-submit-dokumen" style="float: right;">
                                     <i class="fa fa-plus fa-sm mr-1" aria-hidden="true"></i>Tambah
                                 </button>
@@ -318,7 +323,45 @@
                 });
             }
         })
+    }
 
+    function generateDokumen(bc_purchase_order_id) {
+        const csrf = $(`[name="${csrfToken}"]`);
+        $.ajax({
+            url: "<?= base_url("bea-cukai-bc-40/id/dokumen-generate"); ?>",
+            data: {
+                bc_purchase_order_id: bc_purchase_order_id
+            },
+            beforeSend: function(xhr) {
+                xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                setLoading();
+            },
+            complete: function() {
+                stopLoading();
+            },
+            method: "POST",
+            dataType: "json",
+            success: function(response) {
+                if (response.status) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: response.message,
+                        confirmButtonColor: '#4e73df',
+                    });
+
+                    csrf.val(response.token);
+                    tableListInformasiDokumen.ajax.reload();
+
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: response.message,
+                        confirmButtonColor: '#4e73df',
+                    });
+                }
+
+            },
+        });
     }
 </script>
 

@@ -15,23 +15,10 @@
                         Print
                     </button>
                 <?php endif; ?>
-                <?php if ($dataBiayaLokal['status_posting'] == 0) { ?>
-                    <?php if (can('Biaya Exim', 'Biaya Lokal', 'a')): ?>
-                        <button class="btn btn-success posting-spp posting-so float-right" onclick="posting()">
-                            Posting Audit
-                        </button>
-                    <?php endif; ?>
+                <?php if ($dataBiayaLokal['status_bayar'] == 0) { ?>
                     <?php if (can('Biaya Exim', 'Biaya Lokal', 'u')): ?>
                         <button class="btn btn-show-form btn-save float-right btn-submit-parent">
                             Update
-                        </button>
-                    <?php endif; ?>
-                <?php } ?>
-
-                <?php if ($dataBiayaLokal['status_posting'] == 1) { ?>
-                    <?php if (can('Biaya Exim', 'Biaya Lokal', 'ua')): ?>
-                        <button class="btn btn-success posting-spp unposting-so float-right" onclick="unposting()">
-                            Unposting Audit
                         </button>
                     <?php endif; ?>
                 <?php } ?>
@@ -58,7 +45,7 @@
                         <div class="form-floating mb-3" style="height: 50px;">
                             <div class="input-group input-group-password">
                                 <div class="form-floating mb-3" style="height: 50px;">
-                                    <input autocomplete="one-time-code" type="text" value="<?= !empty($dataBiayaLokal) ? $dataBiayaLokal['no_invoice'] : 'AUTO GENERATE' ?>" <?= !empty($dataBiayaLokal) ? ($dataBiayaLokal['status_posting'] == 1 ? 'readonly' : '') : 'readonly' ?> class="form-control no_invoice" id="no_invoice" name="no_invoice" placeholder="No Invoice" required>
+                                    <input autocomplete="one-time-code" type="text" value="<?= !empty($dataBiayaLokal) ? $dataBiayaLokal['no_invoice'] : 'AUTO GENERATE' ?>" <?= !empty($dataBiayaLokal) ? ($dataBiayaLokal['status_bayar'] == 1 ? 'readonly' : '') : 'readonly' ?> class="form-control no_invoice" id="no_invoice" name="no_invoice" placeholder="No Invoice" required>
                                     <label for="floatingInput">No Invoice</label>
                                 </div>
                                 <div style="<?= !empty($dataBiayaLokal) ? "display: none" : ""; ?>" class="input-generate input-group-prepend group-prepend-password align-items-center">
@@ -71,7 +58,7 @@
                         <div class="form-floating mb-3" style="height: 50px;">
                             <div class="input-group input-group-password">
                                 <div class="form-floating mb-3" style="height: 50px;">
-                                    <input <?= !empty($dataBiayaLokal) ? ($dataBiayaLokal['status_posting'] == 1 ? 'readonly' : '') : '' ?> autocomplete="one-time-code" class="form-control input-picker tanggal_invoice" id="tanggal_invoice" name="tanggal_invoice" placeholder="Tanggal Invoice" value="<?= !empty($dataBiayaLokal) ? date('d/m/Y', strtotime($dataBiayaLokal['tanggal_invoice'])) : date('d/m/Y')  ?>">
+                                    <input <?= !empty($dataBiayaLokal) ? ($dataBiayaLokal['status_bayar'] == 1 ? 'readonly' : '') : '' ?> autocomplete="one-time-code" class="form-control input-picker tanggal_invoice" id="tanggal_invoice" name="tanggal_invoice" placeholder="Tanggal Invoice" value="<?= !empty($dataBiayaLokal) ? date('d/m/Y', strtotime($dataBiayaLokal['tanggal_invoice'])) : date('d/m/Y')  ?>">
                                     <label for="floatingInput">Tanggal Invoice</label>
                                 </div>
                                 <div class="input-group-prepend group-prepend-password align-items-center">
@@ -82,7 +69,7 @@
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <select <?= !empty($dataBiayaLokal) ? ($dataBiayaLokal['status_posting'] == 1 ? 'disabled' : '') : '' ?> class="form-select divisi_id" name="divisi_id" id="divisi_id">
+                            <select <?= !empty($dataBiayaLokal) ? ($dataBiayaLokal['status_bayar'] == 1 ? 'disabled' : '') : '' ?> class="form-select divisi_id" name="divisi_id" id="divisi_id">
                                 <option value=""></option>
                                 <?php foreach ($dataDivisi as $d): ?>
                                     <option <?= !empty($dataBiayaLokal) ? ($dataBiayaLokal['divisi_id'] == $d['id'] ? 'selected' : '') : '' ?> value="<?= $d['id'] ?>"><?= $d['divisi'] ?></option>
@@ -93,7 +80,7 @@
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <select <?= !empty($dataBiayaLokal) ? ($dataBiayaLokal['status_posting'] == 1 ? 'disabled' : '') : '' ?> class="form-select vendor_pelayaran_id" name="vendor_pelayaran_id" id="vendor_pelayaran_id">
+                            <select <?= !empty($dataBiayaLokal) ? ($dataBiayaLokal['status_bayar'] == 1 ? 'disabled' : '') : '' ?> class="form-select vendor_pelayaran_id" name="vendor_pelayaran_id" id="vendor_pelayaran_id">
                                 <option value=""></option>
                                 <?php foreach ($dataVendorPelayaran as $d): ?>
                                     <option <?= !empty($dataBiayaLokal) ? ($dataBiayaLokal['vendor_pelayaran_id'] == $d['id'] ? 'selected' : '') : '' ?> value="<?= $d['id'] ?>"><?= $d['nama_vendor'] ?></option>
@@ -109,7 +96,7 @@
                     <div class="col-md-3">
                         <div class="form-floating mb-3">
                             <input autocomplete="one-time-code" disabled type="text" class="form-control total_biaya_prev" id="total_biaya_prev" name="total_biaya_prev">
-                            <label for="floatingInput">Total Biaya Ekspor</label>
+                            <label for="floatingInput">Total Biaya Lokal</label>
                         </div>
                     </div>
                     <div class="col-md-3">
@@ -134,7 +121,7 @@
 
                 <ul class="nav nav-tabs" id="myTab" role="tablist">
                     <li class="nav-item">
-                        <a class="nav-link active" id="home-tab" data-toggle="tab" href="#home" role="tab" aria-controls="home" aria-selected="true">List Biaya Ekspor</a>
+                        <a class="nav-link active" id="home-tab" data-toggle="tab" href="#home" role="tab" aria-controls="home" aria-selected="true">List Biaya Lokal</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" id="profile-tab" data-toggle="tab" href="#profile" role="tab" aria-controls="profile" aria-selected="false">Pengenaan Pajak</a>
@@ -148,7 +135,7 @@
                                 <div class="col-md-6">
                                 </div>
                                 <div class="col-md-6">
-                                    <button <?= !empty($dataBiayaLokal) ? ($dataBiayaLokal['status_posting'] == 1 ? 'disabled' : '') : '' ?> class="btn btn-show-detail btn-add btn-block float-right" id="btnAddBiaya" type="button" style="width: 90% !important;">
+                                    <button <?= !empty($dataBiayaLokal) ? ($dataBiayaLokal['status_bayar'] == 1 ? 'disabled' : '') : '' ?> class="btn btn-show-detail btn-add btn-block float-right" id="btnAddBiaya" type="button" style="width: 90% !important;">
                                         <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
                                     </button>
                                 </div>
@@ -188,7 +175,7 @@
                                 <div class="col-md-6">
                                 </div>
                                 <div class="col-md-6">
-                                    <button <?= !empty($dataBiayaLokal) ? ($dataBiayaLokal['status_posting'] == 1 ? 'disabled' : '') : '' ?> class="btn btn-show-detail btn-add btn-block float-right" id="btnAddPajakModal" type="button" style="width: 90% !important;">
+                                    <button <?= !empty($dataBiayaLokal) ? ($dataBiayaLokal['status_bayar'] == 1 ? 'disabled' : '') : '' ?> class="btn btn-show-detail btn-add btn-block float-right" id="btnAddPajakModal" type="button" style="width: 90% !important;">
                                         <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
                                     </button>
                                 </div>
@@ -879,7 +866,7 @@
                     <td class="text-right">${greatFormatRupiah(item.nilai_exchange_rate)}</td>
                     <td class="text-right">${greatFormatRupiah(item.nilai_biaya_idr)}</td>
                     <td class="text-center">
-                        <?php if (!empty($dataBiayaLokal) && $dataBiayaLokal['status_posting'] == 1) : ?>
+                        <?php if (!empty($dataBiayaLokal) && $dataBiayaLokal['status_bayar'] == 1) : ?>
                             -
                         <?php else : ?>
                             <button type="button" class="btn btn-warning posting-spp mr-1" onclick="detailRowBiayaLokal('${item.id_biaya_lokal_detail}')">
@@ -932,7 +919,7 @@
                 newRow.append($('<td>').text(item.tax_status));
                 newRow.append($('<td>').text(item.keterangan_pajak));
                 newRow.append($('<td>').html(
-                    <?php if (!empty($dataBiayaLokal)) : ?> <?php if ($dataBiayaLokal['status_posting'] == 1) : ?> `-`
+                    <?php if (!empty($dataBiayaLokal)) : ?> <?php if ($dataBiayaLokal['status_bayar'] == 1) : ?> `-`
                         <?php else : ?> `
                         <button type="button" class="btn btn-warning posting-spp mr-1" onclick="detailRowPajak('${item.id_biaya_lokal_pajak}')">
                                 <i class="fa fa-pencil fa-sm" aria-hidden="true"></i>

@@ -134,6 +134,113 @@
                             </div>
                         </div>
                     </div> -->
+                    <!-- UPAH AREA -->
+                    <div class="col-subtitle-modal mt-3">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <h5 class="modal-sub-title">Upah Vendor</h5>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input type="text" onkeyup="this.value = greatFormatRupiah(this.value)" class="form-control upah_vendor" id="upah_vendor" name="upah_vendor" placeholder="Upah Vendor">
+                                <label for="upah_vendor">UPAH VENDOR</label>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input type="text" onkeyup="this.value = greatFormatRupiah(this.value)" class="form-control upah_jb" id="upah_jb" name="upah_jb" placeholder="JB">
+                                <label for="upah_jb">JB</label>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input type="text" onkeyup="this.value = greatFormatRupiah(this.value)" class="form-control upah_xl" id="upah_xl" name="upah_xl" placeholder="XL">
+                                <label for="upah_xl">XL</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input type="text" onkeyup="this.value = greatFormatRupiah(this.value)" class="form-control upah_lp" id="upah_lp" name="upah_lp" placeholder="LP">
+                                <label for="upah_lp">LP</label>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input type="text" onkeyup="this.value = greatFormatRupiah(this.value)" class="form-control upah_cl" id="upah_cl" name="upah_cl" placeholder="CL">
+                                <label for="upah_cl">CL</label>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- END UPAH AREA -->
+
+                    <!-- KOMISI AREA -->
+                    <div class="col-subtitle-modal mt-3">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <h5 class="modal-sub-title">Komisi Vendor</h5>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input type="text" onkeyup="this.value = greatFormatRupiah(this.value)" class="form-control komisi_vendor" id="komisi_vendor" name="komisi_vendor" placeholder="Komisi Vendor">
+                                <label for="komisi_vendor">KOMISI VENDOR</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- END BONUS AREA -->
+
+                     <!-- BONUS AREA -->
+                    <div class="col-subtitle-modal mt-3">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <h5 class="modal-sub-title">Bonus Vendor</h5>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input type="text" onkeyup="this.value = greatFormatRupiah(this.value)" class="form-control bonus_vendor" id="bonus_vendor" name="bonus_vendor" placeholder="Bonus Vendor">
+                                <label for="bonus_vendor">BONUS VENDOR</label>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input type="text" onkeyup="this.value = greatFormatRupiah(this.value)" class="form-control bonus_jb" id="bonus_jb" name="bonus_jb" placeholder="JB">
+                                <label for="bonus_jb">JB</label>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input type="text" onkeyup="this.value = greatFormatRupiah(this.value)" class="form-control bonus_xl" id="bonus_xl" name="bonus_xl" placeholder="XL">
+                                <label for="bonus_xl">XL</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input type="text" onkeyup="this.value = greatFormatRupiah(this.value)" class="form-control bonus_lp" id="bonus_lp" name="bonus_lp" placeholder="LP">
+                                <label for="bonus_lp">LP</label>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input type="text" onkeyup="this.value = greatFormatRupiah(this.value)" class="form-control bonus_cl" id="bonus_cl" name="bonus_cl" placeholder="CL">
+                                <label for="bonus_cl">CL</label>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- END BONUS AREA -->
+
                 </form>
                 <div class="col-subtitle-modal">
                     <div class="row mt-3">
@@ -847,8 +954,23 @@
                         $(".email").val(res.data.email);
                         $(".no_rekening").val(res.data.no_rekening);
                         $(".parent_postal_code").val(res.data.postal_code);
-                        // $(".supplier_buyer").val(res.data.supplier_buyer).change();
-                        $(".province_parent_id").val(res.data.province_id).change();
+
+                        // ==== Tambahan Upah ====
+                        $(".upah_vendor").val(greatFormatRupiah(res.data.upah_vendor));
+                        $(".upah_jb").val(greatFormatRupiah(res.data.upah_jb));
+                        $(".upah_xl").val(greatFormatRupiah(res.data.upah_xl));
+                        $(".upah_lp").val(greatFormatRupiah(res.data.upah_lp));
+                        $(".upah_cl").val(greatFormatRupiah(res.data.upah_cl));
+
+                        // ==== Tambahan Komisi ====
+                        $(".komisi_vendor").val(greatFormatRupiah(res.data.komisi_vendor));
+
+                        // ==== Tambahan Bonus ====
+                        $(".bonus_vendor").val(greatFormatRupiah(res.data.bonus_vendor));
+                        $(".bonus_jb").val(greatFormatRupiah(res.data.bonus_jb));
+                        $(".bonus_xl").val(greatFormatRupiah(res.data.bonus_xl));
+                        $(".bonus_lp").val(greatFormatRupiah(res.data.bonus_lp));
+                        $(".bonus_cl").val(greatFormatRupiah(res.data.bonus_cl));
 
                         row = res.data.list_address.length;
 
@@ -1201,7 +1323,24 @@
                     }).then((result) => {
                         if (result.isConfirmed) {
                             const csrf = $(`[name="${csrfToken}"]`);
-                            let data = new FormData(document.querySelector(".create-form"));
+                            let form = document.querySelector(".create-form");
+                            let data = new FormData(form);
+
+                            // list field yang perlu di-destroy format rupiah
+                            let rupiahFields = [
+                                "upah_vendor", "upah_jb", "upah_xl", "upah_lp", "upah_cl",
+                                "komisi_vendor",
+                                "bonus_vendor", "bonus_jb", "bonus_xl", "bonus_lp", "bonus_cl"
+                            ];
+
+                            // bersihin satu²
+                            rupiahFields.forEach(field => {
+                                if (data.has(field)) {
+                                    let rawVal = form.querySelector(`[name="${field}"]`).value;
+                                    data.set(field, destroyFormatRupiah(rawVal));
+                                }
+                            });
+
 
                             let update_list_address = [];
                             let main_address = document.querySelector('input[name="main"]:checked').value;

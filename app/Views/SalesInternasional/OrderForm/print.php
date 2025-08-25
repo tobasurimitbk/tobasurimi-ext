@@ -2,9 +2,11 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= $dataSO->sales_order_export_no ?></title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <style>
         .header {
             display: flex !important;
@@ -98,8 +100,8 @@
             font-size: 12px;
         }
 
-        body {
-            font-family: 'DejaVu Sans', sans-serif;
+        * {
+            font-family: 'DejaVu Serif' !important;
         }
     </style>
 
@@ -201,10 +203,10 @@
             </table>
 
 
-            <table style="width: 100%; border-collapse: collapse; margin-top: 4px; font-family: Arial, sans-serif; font-size: 12px;">
+            <table style="width: 100%; border-collapse: collapse; margin-top: 4px; font-size: 12px;">
                 <thead>
                     <tr style="background-color: #f8f9fa; border-bottom: 2px solid #dee2e6;">
-                        <th style="padding: 6px; text-align: left; font-weight: bold; border: 1px solid #ddd; width: 4%; height:2%;">NO</th>
+                        <th style="padding: 6px; text-align: left; font-weight: bold; border: 1px solid #ddd; width: 4%; height:2.5%;">NO</th>
                         <th style="padding: 6px; text-align: left; font-weight: bold; border: 1px solid #ddd;">
                             DESCRIPTION OF GOODS
                             <span style="float: right;">
@@ -346,12 +348,12 @@
                                                     <?php endforeach; ?>
 
                                                     <?php if ($show_persen_column): ?>
-                                                        <th style="padding: 3px; border: 1px solid #ddd; width: 6%;text-align: right;">%</th>
+                                                        <th style="padding: 3px; border: 1px solid #ddd; width: 4%;text-align: right;">%</th>
                                                     <?php endif; ?>
 
-                                                    <th style=" padding: 3px; border: 1px solid #ddd; width: 5%; text-align: right;">Qty</th>
-                                                    <th style="padding: 3px; border: 1px solid #ddd; width: 5%; text-align: right;" class="price">Unit Price</th>
-                                                    <th style="padding: 3px; border: 1px solid #ddd; width: 5%; text-align: right;" class="price">Total Amount</th>
+                                                    <th style=" padding: 3px; border: 1px solid #ddd; width: 6%; text-align: right;">Qty</th>
+                                                    <th style="padding: 3px; border: 1px solid #ddd; width: 6%; text-align: right;" class="price">Unit Price</th>
+                                                    <th style="padding: 3px; border: 1px solid #ddd; width: 6%; text-align: right;" class="price">Total Amount</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
@@ -599,7 +601,7 @@
                                                             foreach ($groupBySatuan as $satuan => $data):
                                                                 $grand_total_qty += $data['qty_input'];
                                                             ?>
-                                                                <td style="padding: 5px; border: 1px solid #ddd; text-align: right; width:80px;">
+                                                                <td style="padding: 5px; border: 1px solid #ddd; text-align: right; width:90px;">
                                                                     <?= number_format($data['qty_input'], 2) ?> <?= $satuan ?>
                                                                 </td>
                                                             <?php endforeach; ?>

@@ -34,10 +34,10 @@
                             <tr>
                                 <th style="text-align: center; width:5px;">No</th>
                                 <th style="text-align: center;">Kode HS</th>
-                                <th style="text-align: center;">Tgl PO</th>
+                                <!-- <th style="text-align: center;">Tgl PO</th>
                                 <th style="text-align: center;">Tgl LPB</th>
                                 <th style="text-align: center;">No LPB</th>
-                                <th style="text-align: center;">No PO</th>
+                                <th style="text-align: center;">No PO</th> -->
                                 <th style="text-align: center;">Kode</th>
                                 <th style="text-align: center;">Barang</th>
                                 <th style="text-align: center;">Qty PO</th>
@@ -64,10 +64,10 @@
                                 <tr style="cursor: pointer;" data-bc_purchase_order_id="<?= encrypt($bcPo['id']) ?>" data-penerimaan_barang_id="<?= encrypt($l['penerimaan_barang_id']) ?>" data-barang1_id="<?= encrypt($l['barang1_id']) ?>">
                                     <td style="text-align: center;"><?= $no++; ?></td>
                                     <td style="text-align: center;"><?= $bcDokumenBarang == null ? "-" : $bcDokumenBarang['pos_tarif'] ?></td>
-                                    <td style="text-align: center;"><?= $l['po_date'] ?></td>
+                                    <!-- <td style="text-align: center;"><?= $l['po_date'] ?></td>
                                     <td style="text-align: center;"><?= $l['lpb_date'] ?></td>
                                     <td style="text-align: center;"><?= $l['lpb_no'] ?></td>
-                                    <td style="text-align: center;"><?= $l['po_no'] ?></td>
+                                    <td style="text-align: center;"><?= $l['po_no'] ?></td> -->
                                     <td style="text-align: center;"><?= $l['kode_barang'] ?></td>
                                     <td style="text-align: center;"><?= $l['barang_name'] ?></td>
                                     <td style="text-align: center;"><?= number_format($l['qty_po'], 2) ?></td>
@@ -87,10 +87,10 @@
                                 </tr>
                             <?php endforeach; ?>
                             <tr class="action">
+                                <!-- <td></td>
                                 <td></td>
                                 <td></td>
-                                <td></td>
-                                <td></td>
+                                <td></td> -->
                                 <td></td>
                                 <td></td>
                                 <td></td>

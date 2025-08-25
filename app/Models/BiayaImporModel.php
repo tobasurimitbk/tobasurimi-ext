@@ -52,7 +52,10 @@ class BiayaImporModel extends Model
             'biaya_impor.port_of_destination'               =>  'biaya_impor.port_of_destination',
             'biaya_impor.vendor_pelayaran_id'               => 'biaya_impor.vendor_pelayaran_id',
             'biaya_impor.total_faktur' => 'biaya_impor.total_faktur',
-            'biaya_impor.status_posting'               => 'biaya_impor.status_posting',
+            'biaya_impor.status_posting_exim'               => 'biaya_impor.status_posting_exim',
+            'biaya_impor.status_posting_acc'               => 'biaya_impor.status_posting_acc',
+            'biaya_impor.status_posting_audit'               => 'biaya_impor.status_posting_audit',
+            'biaya_impor.status_bayar'               => 'biaya_impor.status_bayar',
         ];
 
         $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
@@ -87,12 +90,24 @@ class BiayaImporModel extends Model
         }
 
         if ($addCondition['status_posting']) {
-            if ($addCondition['status_posting'] == "SUDAH POSTING") {
+            if ($addCondition['status_posting'] == "POSTING EXIM") {
                 $dataQry
-                    ->where('biaya_impor.status_posting', 1);
-            } else if ($addCondition['status_posting'] == "BELUM POSTING") {
+                    ->where('biaya_impor.status_posting_exim', 1);
+            } else if ($addCondition['status_posting'] == "BELUM POSTING EXIM") {
                 $dataQry
-                    ->where('biaya_impor.status_posting', 0);
+                    ->where('biaya_impor.status_posting_exim', 0);
+            } else if ($addCondition['status_posting'] == "POSTING ACC") {
+                $dataQry
+                    ->where('biaya_impor.status_posting_acc', 1);
+            } else if ($addCondition['status_posting'] == "BELUM POSTING ACC") {
+                $dataQry
+                    ->where('biaya_impor.status_posting_acc', 0);
+            } else if ($addCondition['status_posting'] == "POSTING AUDIT") {
+                $dataQry
+                    ->where('biaya_impor.status_posting_audit', 1);
+            } else if ($addCondition['status_posting'] == "BELUM POSTING AUDIT") {
+                $dataQry
+                    ->where('biaya_impor.status_posting_audit', 0);
             }
         }
 

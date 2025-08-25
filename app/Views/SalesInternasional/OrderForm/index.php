@@ -129,7 +129,7 @@
                                 </div>
                             </div>
                         </div>
-                        <?php if (session()->get('login')->this_company_id == 1): ?>
+                        <?php if (session()->get('login')->this_company_id == 1 || session()->get('login')->this_company_id == 2): ?>
                             <div class="col-md-12 mt-3">
                                 <div class="form-floating mb-3" style="height: 50px;">
                                     <select
@@ -410,7 +410,7 @@
     const printAction = function() {
         var id = $('.id').val();
         var display_price = $('.display_price').is(':checked');
-        <?php if (session()->get('login')->this_company_id == 1): ?>
+        <?php if (session()->get('login')->this_company_id == 1 || session()->get('login')->this_company_id == 2): ?>
             var company_id = $('#company_id option:selected').val();
         <?php else: ?>
             var company_id = "<?= session()->get('login')->this_company_id ?>";

@@ -26,6 +26,24 @@ class VendorModel extends Model
         'postal_code',
         // 'ap_id',
         // 'ar_id',
+
+        // ===== Tambahan Upah =====
+        'upah_vendor',
+        'upah_jb',
+        'upah_xl',
+        'upah_lp',
+        'upah_cl',
+
+        // ===== Tambahan Komisi =====
+        'komisi_vendor',
+
+        // ===== Tambahan Bonus =====
+        'bonus_vendor',
+        'bonus_jb',
+        'bonus_xl',
+        'bonus_lp',
+        'bonus_cl',
+
         'createdAt',
         'updatedAt',
         'deletedAt'

@@ -9,6 +9,7 @@ use App\Models\BiayaLokalPajakModel;
 use App\Models\DivisisModel;
 use App\Models\MetadataModel;
 use App\Models\TaxModel;
+use App\Models\UserModel;
 use App\Models\VendorPelayaranModel;
 use Dompdf\Dompdf;
 use Exception;
@@ -28,6 +29,7 @@ class BiayaLokal extends BaseController
     protected $biayaLokalModel;
     protected $biayaLokalPajakModel;
     protected $biayaLokalDetailModel;
+    protected $usersModel;
 
     public function __construct()
     {
@@ -40,11 +42,16 @@ class BiayaLokal extends BaseController
         $this->biayaLokalModel = new BiayaLokalModel();
         $this->biayaLokalPajakModel = new BiayaLokalPajakModel();
         $this->biayaLokalDetailModel = new BiayaLokalDetailModel();
+        $this->usersModel = new UserModel();
     }
 
     public function index()
     {
-        return view('BiayaExim/BiayaLokal/index');
+        $dataUser = $this->usersModel->orderBy('name', 'asc')->where('deletedAt', null)->findAll();
+        $data = [
+            'dataUser' => $dataUser
+        ];
+        return view('BiayaExim/BiayaLokal/index', $data);
     }
 
     public function all()
@@ -94,7 +101,10 @@ class BiayaLokal extends BaseController
                 "no_invoice"        => $data['no_invoice'],
                 "nama_vendor"        => $data['nama_vendor'],
                 "total_faktur"        => (float)$data['total_faktur'],
-                "status_posting"        => $data['status_posting'],
+                "status_posting_exim"        => $data['status_posting_exim'],
+                "status_posting_acc"        => $data['status_posting_acc'],
+                "status_posting_audit"        => $data['status_posting_audit'],
+                "status_bayar" => $data['status_bayar']
             ]);
         }
 
@@ -309,7 +319,6 @@ class BiayaLokal extends BaseController
                 'no_invoice' => $noInvoice,
                 'total_faktur_before_tax' => $this->request->getVar('total_faktur_before_tax'),
                 'total_faktur' => $this->request->getVar('total_faktur'),
-                'status_posting' => 0
             ]);
 
             foreach (\json_decode($_POST['listBiayaLokal']) as $l) {
@@ -380,7 +389,6 @@ class BiayaLokal extends BaseController
                 'no_invoice' => $noInvoice,
                 'total_faktur_before_tax' => $this->request->getVar('total_faktur_before_tax'),
                 'total_faktur' => $this->request->getVar('total_faktur'),
-                'status_posting' => 0
             ]);
 
             $idBiayaLokalDetailUsed = array();
@@ -482,29 +490,6 @@ class BiayaLokal extends BaseController
                 'message' => $e->getMessage()
             ]);
         }
-    }
-
-    public function posting()
-    {
-        $id = \decrypt($this->request->getVar('id'));
-        $this->biayaLokalModel->update($id, ['status_posting' => 1]);
-        return response()->setJSON([
-            'status' => true,
-            'token' => csrf_hash(),
-            'message' => "Data berhasil diposting"
-        ]);
-    }
-
-
-    public function unposting()
-    {
-        $id = \decrypt($this->request->getVar('id'));
-        $this->biayaLokalModel->update($id, ['status_posting' => 0]);
-        return response()->setJSON([
-            'status' => true,
-            'token' => csrf_hash(),
-            'message' => "Data berhasil diunposting"
-        ]);
     }
 
     public function exportExcel()
@@ -729,5 +714,102 @@ class BiayaLokal extends BaseController
         } else {
             return false;
         }
+    }
+
+    public function getStatusPosting()
+    {
+        try {
+            $id = \decrypt($this->request->getVar('id'));
+            $biayaLokal = $this->biayaLokalModel
+                ->where('id', $id)
+                ->first();
+
+            return response()->setJSON([
+                'status' => true,
+                'token' => \csrf_hash(),
+                'data' => $biayaLokal
+            ]);
+        } catch (Exception $e) {
+            return \response()->setJSON([
+                'status' => false,
+                'token' => \csrf_hash(),
+                'message' => $e->getMessage()
+            ]);
+        }
+    }
+
+    public function updateStatusPosting()
+    {
+        try {
+            $id = $this->request->getVar('id');
+            $statusPostingExim = $this->request->getVar('status_posting_exim');
+            $userEximPosted = $this->request->getVar('user_exim_posted');
+            $statusPostingAcc = $this->request->getVar('status_posting_acc');
+            $userAccPosted = $this->request->getVar('user_acc_posted');
+            $statusPostingAudit = $this->request->getVar('status_posting_audit');
+            $userAuditPosted = $this->request->getVar('user_audit_posted');
+
+            $this->biayaLokalModel->update($id, [
+                'status_posting_exim' => $statusPostingExim,
+                'user_exim_posted' => $userEximPosted,
+                'status_posting_acc' => $statusPostingAcc,
+                'user_acc_posted' => $userAccPosted,
+                'status_posting_audit' => $statusPostingAudit,
+                'user_audit_posted' => $userAuditPosted
+            ]);
+
+            return \response()->setJSON([
+                'status' => true,
+                'token' => \csrf_hash(),
+                'message' => "Status posting berhasil diperbaruhi"
+            ]);
+        } catch (Exception $e) {
+            return \response()->setJSON([
+                'status' => false,
+                'token' => \csrf_hash(),
+                'message' => $e->getMessage()
+            ]);
+        }
+    }
+
+    public function detail($id)
+    {
+        $id = \decrypt($id);
+        $dataBiayaLokal = $this->biayaLokalModel
+            ->select(
+                'biaya_lokal.*,
+                vendor_pelayaran.nama_vendor,
+                divisis.divisi
+            '
+            )
+            ->join('vendor_pelayaran', 'vendor_pelayaran.id = biaya_lokal.vendor_pelayaran_id', 'left')
+            ->join('divisis', 'divisis.id = biaya_lokal.divisi_id', 'left')
+            ->where('biaya_lokal.id', $id)
+            ->first();
+        $dataBiayaLokalDetail = $this->biayaLokalDetailModel
+            ->select('biaya_lokal_detail.*,metadata.value as valas_name')
+            ->join('metadata', 'metadata.id = biaya_lokal_detail.valas_id', 'left')
+            ->where('biaya_lokal_id', $id)
+            ->where('biaya_lokal_detail.deletedAt', null)
+            ->findAll();
+        $dataBiayaLokalPajak = $this->biayaLokalPajakModel
+            ->select(
+                '
+                biaya_lokal_pajak.*,
+                taxes.type as type_tax, 
+                taxes.name as tax_name
+            '
+            )
+            ->join('taxes', 'taxes.id = biaya_lokal_pajak.tax_id', 'left')
+            ->where('biaya_lokal_id', $id)
+            ->where('biaya_lokal_pajak.deletedAt', null)
+            ->findAll();
+        $data = [
+            'dataBiayaLokal' => $dataBiayaLokal,
+            'dataBiayaLokalDetail' => $dataBiayaLokalDetail,
+            'dataBiayaLokalPajak' => $dataBiayaLokalPajak,
+        ];
+
+        return \view('BiayaExim/BiayaLokal/detail', $data);
     }
 }

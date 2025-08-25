@@ -659,6 +659,61 @@ class BC40 extends BaseController
         ]);
     }
 
+    public function autoCreateDokumen()
+    {
+        try {
+            $bcPurchaseOrderId = decrypt($this->request->getVar('bc_purchase_order_id'));
+            $kodeDokumen = 315;
+
+            $bcPurchaseOrder = $this->bcPurchaseOrderModel->where('id', $bcPurchaseOrderId)->first();
+            $poIdArr = \json_decode($bcPurchaseOrder['multiple_po_id']);
+
+            if ($bcPurchaseOrder['po_type'] == "LOKAL BAKU") {
+                $poDetail = $this->rmPurchaseOrderModel
+                    ->whereIn('id', $poIdArr)
+                    ->findAll();
+            } else {
+                $poDetail = $this->amPurchaseOrderModel
+                    ->whereIn('id', $poIdArr)
+                    ->findAll();
+            }
+
+            // Hapus Dulu
+            $this->bcDokumenModel
+                ->where('bc_purchase_order_id', $bcPurchaseOrderId)
+                ->delete();
+
+            $seriDokumen = 1;
+            foreach ($poDetail as $p) {
+                $this->bcDokumenModel
+                    ->insert([
+                        'bc_purchase_order_id' => $bcPurchaseOrderId,
+                        'bc_type' => 40,
+                        'kode_dokumen' => $kodeDokumen,
+                        'nomor_dokumen' => $p['po_no'],
+                        'seri_dokumen' => $seriDokumen,
+                        'tanggal_dokumen' => $p['po_date'],
+                        'id_dokumen' => $p['id'],
+                        'seri_dokumen' => $seriDokumen
+                    ]);
+
+                $seriDokumen++;
+            }
+
+            return \response()->setJSON([
+                'status' => true,
+                'message' => "Dokumen berhasil digenerate",
+                'token' => \csrf_hash()
+            ]);
+        } catch (Exception $e) {
+            return \response()->setJSON([
+                'status' => true,
+                'token' => \csrf_hash(),
+                'message' => $e->getMessage()
+            ]);
+        }
+    }
+
     public function createPengangkutView($bcPurchaseOrderID)
     {
         $bcPurchaseOrderID = decrypt($bcPurchaseOrderID);

@@ -166,26 +166,45 @@ class Vendor extends BaseController
 
             if ($this->validate($rules)) {
                 $values = [
-                    "company_id" => $this->this_company_id,
-                    "kode" => $this->request->getPost("kode"),
-                    "name" => $this->request->getPost("name"),
-                    "address" => $this->request->getPost("address"),
-                    "no_npwp" => $this->request->getPost("no_npwp"),
-                    "phone" => $this->request->getPost("phone"),
-                    "contact_person" => $this->request->getPost("contact_person"),
-                    "email" => $this->request->getPost("email"),
-                    "bank_id" => $this->request->getPost("bank_id"),
-                    "nama_rekening" => $this->request->getPost("nama_rekening"),
-                    "no_rekening" => $this->request->getPost("no_rekening"),
+                    "company_id"      => $this->this_company_id,
+                    "kode"            => $this->request->getPost("kode"),
+                    "name"            => $this->request->getPost("name"),
+                    "address"         => $this->request->getPost("address"),
+                    "no_npwp"         => $this->request->getPost("no_npwp"),
+                    "phone"           => $this->request->getPost("phone"),
+                    "contact_person"  => $this->request->getPost("contact_person"),
+                    "email"           => $this->request->getPost("email"),
+                    "bank_id"         => $this->request->getPost("bank_id"),
+                    "nama_rekening"   => $this->request->getPost("nama_rekening"),
+                    "no_rekening"     => $this->request->getPost("no_rekening"),
                     // "supplier_buyer" => $this->request->getPost("supplier_buyer"),
-                    "province_id" => $this->request->getPost("province_parent_id"),
-                    "city_id" => $this->request->getPost("city_parent_id"),
-                    "postal_code" => $this->request->getPost("parent_postal_code"),
-                    // "ap_id" => formatter($this->request->getPost("ap_id"), "STR_TO_INT"),
-                    // "ar_id" => formatter($this->request->getPost("ar_id"), "STR_TO_INT"),
-                    "list_address" => json_decode($this->request->getPost("list_address"))
+                    "province_id"     => $this->request->getPost("province_parent_id"),
+                    "city_id"         => $this->request->getPost("city_parent_id"),
+                    "postal_code"     => $this->request->getPost("parent_postal_code"),
+                    // "ap_id"         => formatter($this->request->getPost("ap_id"), "STR_TO_INT"),
+                    // "ar_id"         => formatter($this->request->getPost("ar_id"), "STR_TO_INT"),
+                    "list_address"    => json_decode($this->request->getPost("list_address")),
+
+                    // ==== Tambahan Upah ====
+                    "upah_vendor"     => $this->request->getPost("upah_vendor"),
+                    "upah_jb"         => $this->request->getPost("upah_jb"),
+                    "upah_xl"         => $this->request->getPost("upah_xl"),
+                    "upah_lp"         => $this->request->getPost("upah_lp"),
+                    "upah_cl"         => $this->request->getPost("upah_cl"),
+
+                    // ==== Tambahan Komisi ====
+                    "komisi_vendor"   => $this->request->getPost("komisi_vendor"),
+
+                    // ==== Tambahan Bonus ====
+                    "bonus_vendor"    => $this->request->getPost("bonus_vendor"),
+                    "bonus_jb"        => $this->request->getPost("bonus_jb"),
+                    "bonus_xl"        => $this->request->getPost("bonus_xl"),
+                    "bonus_lp"        => $this->request->getPost("bonus_lp"),
+                    "bonus_cl"        => $this->request->getPost("bonus_cl"),
                 ];
+
                 $id = $this->VendorModel->insert($values);
+
                 if ($id > 0) {
                     $dlist_address = json_decode($this->request->getPost("list_address"), true);
                     for ($i = 0; $i < count($dlist_address); $i++) {
@@ -314,7 +333,24 @@ class Vendor extends BaseController
                     "postal_code" => $this->request->getPost("parent_postal_code"),
                     // "ap_id" => formatter($this->request->getPost("ap_id"), "STR_TO_INT"),
                     // "ar_id" => formatter($this->request->getPost("ar_id"), "STR_TO_INT"),
-                    "list_address" => json_decode($this->request->getPost("list_address"))
+                    "list_address" => json_decode($this->request->getPost("list_address")),
+
+                      // ==== Tambahan Upah ====
+                    "upah_vendor"     => $this->request->getPost("upah_vendor"),
+                    "upah_jb"         => $this->request->getPost("upah_jb"),
+                    "upah_xl"         => $this->request->getPost("upah_xl"),
+                    "upah_lp"         => $this->request->getPost("upah_lp"),
+                    "upah_cl"         => $this->request->getPost("upah_cl"),
+
+                    // ==== Tambahan Komisi ====
+                    "komisi_vendor"   => $this->request->getPost("komisi_vendor"),
+
+                    // ==== Tambahan Bonus ====
+                    "bonus_vendor"    => $this->request->getPost("bonus_vendor"),
+                    "bonus_jb"        => $this->request->getPost("bonus_jb"),
+                    "bonus_xl"        => $this->request->getPost("bonus_xl"),
+                    "bonus_lp"        => $this->request->getPost("bonus_lp"),
+                    "bonus_cl"        => $this->request->getPost("bonus_cl"),
                 ];
 
                 if ($this->VendorModel->update($id, $values)) {
