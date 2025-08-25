@@ -230,6 +230,7 @@ class MaterialRequest extends BaseController
             $data["ids"] = $ids;
         }
 
+
         return view('Production/materialRequest/form', $data);
     }
 
@@ -1576,8 +1577,8 @@ class MaterialRequest extends BaseController
                     $dataResult[$i]['sepsifikasi'] = $dataResult[$i]['spesifikasi'];
                     $dataResult[$i]['stock_date'] = date('d/m/Y', strtotime($dataResult[$i]['stock_date']));
                     $dataResult[$i]['stock_id'] = $dataResult[$i]['stock_id'];
-                    $dataResult[$i]['type_barang'] = $dataResult[$i]['type_barang'];
-                    $dataResult[$i]['type_barang_text'] = $dataResult[$i]['type_barang_text'];
+                    $dataResult[$i]['type_barang'] = "bahan_baku";
+                    $dataResult[$i]['type_barang_text'] = "BAHAN BAKU";
                     $dataResult[$i]['stok_total'] = floatval($dataResult[$i]['stok_total']);
                     $dataResult[$i]['no_daftar'] = $noDaftar;
                     $dataResult[$i]['id'] = encrypt($dataResult[$i]['stock_id']) . '-' . encrypt($dataResult[$i]['id']);
