@@ -230,7 +230,6 @@ class MaterialRequest extends BaseController
             $data["ids"] = $ids;
         }
 
-
         return view('Production/materialRequest/form', $data);
     }
 
@@ -588,6 +587,7 @@ class MaterialRequest extends BaseController
             }
 
             $dataMaterial = [
+                'work_order_id' => implode(",", $this->request->getVar("kode_produksi")),
                 'company_id' => $this->this_company_id,
                 'divisi_id' => $this->request->getVar("department_id"),
                 'warehouse_id' => $this->request->getVar("warehouse_id"),

@@ -1,5 +1,10 @@
 <?= $this->extend('layouts/template'); ?>
 <?= $this->Section('content'); ?>
+<style>
+    .kode_produksi+.select2-container--bootstrap-5 .select2-selection__choice {
+        font-size: 13px !important;
+    }
+</style>
 
 <!-- Begin Page Content -->
 <section class="section">
@@ -44,7 +49,7 @@
     </div>
     <div class="card">
         <div class="card-body">
-            <form class="create-form" role="form" method="POST" enctype="multipart/form-data">
+            <form class="create-form form-add-spp" role="form" method="POST" enctype="multipart/form-data">
                 <input autocomplete="one-time-code" type="hidden" value="<?= !empty($ids) ? $ids : ""; ?>" class="id" name="id" id="id" />
                 <?= csrf_field() ?>
                 <div class="row mt-3">
@@ -55,16 +60,21 @@
                 <div class="row">
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <?php if (isset($dataMaterialRequestswithwo)) { ?>
-                                <input value="<?= ($dataMaterialRequestswithwo) ? $dataMaterialRequestswithwo->wo_no : "" ?>" autocomplete="one-time-code" type="text" class="form-control kode_produksi_detail" name="kode_produksi_detail" id="kode_produksi_detail" placeholder="Kode Produksi" readonly>
-                            <?php } else { ?>
-                                <select class="form-select kode_produksi" name="kode_produksi" id="kode_produksi" aria-label="Floating label select example">
-                                    <option value=""></option>
-                                    <?php foreach ($dataWorkOrder ?? [] as $dataWO) : ?>
-                                        <option value="<?= $dataWO->id ?>" data-nama-barang="<?= $dataWO->nama_barang ?>" data-standart-production="<?= $dataWO->standart_production ?>"><?= $dataWO->wo_no ?> - <?= $dataWO->nama_barang ?></option>
-                                    <?php endforeach; ?>
-                                </select>
-                            <?php } ?>
+                            <select class="form-select kode_produksi" name="kode_produksi[]" id="kode_produksi[]" aria-label="Floating label select example" multiple>
+                                <option value=""></option>
+                                <?php
+                                $selectedWO = explode(",", $dataMaterialRequests->work_order_id ?? "");
+                                foreach ($dataWorkOrder ?? [] as $dataWO) :
+                                ?>
+                                    <option
+                                        value="<?= $dataWO->id ?>"
+                                        data-nama-barang="<?= $dataWO->nama_barang ?>"
+                                        data-standart-production="<?= $dataWO->standart_production ?>"
+                                        <?= (in_array($dataWO->id, $selectedWO ?? [])) ? 'selected' : '' ?>>
+                                        <?= $dataWO->wo_no ?> - <?= $dataWO->nama_barang ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
                             <label for="floatingInput">Kode Produksi</label>
                         </div>
                     </div>
@@ -595,6 +605,7 @@
 
     $('#vendor_barang_id_select').hide();
     $('.form-fifo').hide();
+    updateBarangJadi();
 
     <?php if (!empty($dataMaterialRequestDetailsBahanBaku)): ?>
         <?php foreach ($dataMaterialRequestDetailsBahanBaku as $materialRequestDetails): ?>
@@ -781,33 +792,33 @@
         getListDokumenPabean();
     });
 
-        // Kode Produksi
-        $('.kode_produksi').select2({
-            placeholder: "Pilih kode Produksi",
-            theme: "bootstrap-5",
-            allowClear: true
-        });
+    // Kode Produksi
+    $('.kode_produksi').select2({
+        placeholder: "",
+        theme: "bootstrap-5",
+        // allowClear: true
+    });
 
-        //CSS SELECT2 FLOATING LABEL
-        $('.kode_produksi')
-            .parent('div')
-            .children('span')
-            .children('span')
-            .children('span')
-            .css('height', ' calc(3.5rem + 2px)');
+    //CSS SELECT2 FLOATING LABEL
+    $('.kode_produksi')
+        .parent('div')
+        .children('span')
+        .children('span')
+        .children('span')
+        .css('height', ' calc(3.5rem + 2px)');
 
-        $('.kode_produksi')
-            .parent('div')
-            .children('span')
-            .children('span')
-            .children('span')
-            .children('span')
-            .css('margin-top', '22px').css('margin-left', '-7px');
+    $('.kode_produksi')
+        .parent('div')
+        .children('span')
+        .children('span')
+        .children('span')
+        .children('span')
+        .css('margin-top', '22px').css('margin-left', '-7px');
 
-        $('.kode_produksi')
-            .parent('div')
-            .find('label')
-            .css('z-index', '1');
+    $('.kode_produksi')
+        .parent('div')
+        .find('label')
+        .css('z-index', '1');
 
     $('.kode_barang').select2({
         placeholder: "Pilih Kode Barang",
@@ -1206,17 +1217,8 @@
     });
 
     $(".kode_produksi").change(function() {
-        if ($(".kode_produksi option:selected").val()) {
-            let nama_barang = $(".kode_produksi option:selected").data("nama-barang") ? $(".kode_produksi option:selected").data("nama-barang") : "";
-            let standart_production = $(".kode_produksi option:selected").data("standart-production") ? $(".kode_produksi option:selected").data("standart-production") : "";
-
-            $(".barang_jadi").val(nama_barang);
-            $(".standart_production").val(standart_production);
-        } else {
-            $(".barang_jadi").val("");
-            $(".standart_production").val("");
-        }
-    })
+        updateBarangJadi();
+    });
 
     $('.btn-hide-detail').click(function() {
         $('.detail-modal').modal('hide');
@@ -1680,7 +1682,7 @@
                         listStockAsal[i].departmentTujuanText = departmentTujuanText;
                         listStockAsal[i].warehouseTujuanID = warehouseTujuanID;
                         listStockAsal[i].warehouseTujuanText = warehouseTujuanText;
-                        listStockAsal[i].qty2 = parseFloat(mutasiQty.toFixed(4));
+                        listStockAsal[i].qty2 = parseFloat(mutasiQty.toFixed(2));
                         listStockSelectedBahanSetengahJadi.push(listStockAsal[i]);
                         qtyMutasiFifo = qtyMutasiFifo - mutasiQty;
                     }
@@ -1705,7 +1707,7 @@
                         listStockAsal[i].departmentTujuanText = departmentTujuanText;
                         listStockAsal[i].warehouseTujuanID = warehouseTujuanID;
                         listStockAsal[i].warehouseTujuanText = warehouseTujuanText;
-                        listStockAsal[i].qty2 = parseFloat(mutasiQty.toFixed(4));
+                        listStockAsal[i].qty2 = parseFloat(mutasiQty.toFixed(2));
                         listStockSelectedBahan.push(listStockAsal[i]);
                         qtyMutasiFifo = qtyMutasiFifo - mutasiQty;
                     }
@@ -1767,7 +1769,7 @@
                 totalStokTotal += parseFloat(v.stok_total);
             });
             // deleteByStockID(stockID);
-            if (parseFloat(qtyMutasiFifo) > parseFloat(totalStokTotal.toFixed(4))) {
+            if (parseFloat(qtyMutasiFifo) > parseFloat(totalStokTotal.toFixed(2))) {
                 Swal.fire({
                     icon: 'error',
                     title: 'Terjadi Kesalahan : Stok barang tidak cukup !',
@@ -1802,7 +1804,7 @@
                                 listStockAsal[i].departmentTujuanText = departmentTujuanText;
                                 listStockAsal[i].warehouseTujuanID = warehouseTujuanID;
                                 listStockAsal[i].warehouseTujuanText = warehouseTujuanText;
-                                listStockAsal[i].qty2 = parseFloat(mutasiQty.toFixed(4));
+                                listStockAsal[i].qty2 = parseFloat(mutasiQty.toFixed(2));
                                 listStockSelectedBahanBaku.push(listStockAsal[i]);
                                 qtyMutasiFifo = parseFloat(qtyMutasiFifo) - mutasiQty;
                             }
@@ -1827,7 +1829,7 @@
                                 listStockAsal[i].departmentTujuanText = departmentTujuanText;
                                 listStockAsal[i].warehouseTujuanID = warehouseTujuanID;
                                 listStockAsal[i].warehouseTujuanText = warehouseTujuanText;
-                                listStockAsal[i].qty2 = parseFloat(mutasiQty.toFixed(4));
+                                listStockAsal[i].qty2 = parseFloat(mutasiQty.toFixed(2));
                                 listStockSelectedBahanJadi.push(listStockAsal[i]);
                                 qtyMutasiFifo = parseFloat(qtyMutasiFifo) - mutasiQty;
                             }
@@ -1852,7 +1854,7 @@
                                 listStockAsal[i].departmentTujuanText = departmentTujuanText;
                                 listStockAsal[i].warehouseTujuanID = warehouseTujuanID;
                                 listStockAsal[i].warehouseTujuanText = warehouseTujuanText;
-                                listStockAsal[i].qty2 = parseFloat(mutasiQty.toFixed(4));
+                                listStockAsal[i].qty2 = parseFloat(mutasiQty.toFixed(2));
                                 listStockSelectedBahanSetengahJadi.push(listStockAsal[i]);
                                 qtyMutasiFifo = parseFloat(qtyMutasiFifo) - mutasiQty;
                             }
@@ -1877,7 +1879,7 @@
                                 listStockAsal[i].departmentTujuanText = departmentTujuanText;
                                 listStockAsal[i].warehouseTujuanID = warehouseTujuanID;
                                 listStockAsal[i].warehouseTujuanText = warehouseTujuanText;
-                                listStockAsal[i].qty2 = parseFloat(mutasiQty.toFixed(4));
+                                listStockAsal[i].qty2 = parseFloat(mutasiQty.toFixed(2));
                                 listStockSelectedBahan.push(listStockAsal[i]);
                                 qtyMutasiFifo = parseFloat(qtyMutasiFifo) - mutasiQty;
                             }
@@ -2006,8 +2008,8 @@
             totalQtyAwal += parseFloat(listStockSelectedBahanBaku[i].stok_total) || 0;
             totalQty += parseFloat(listStockSelectedBahanBaku[i].qty2) || 0;
         });
-        $('.nilai-total-bahan-baku-request').text(greatFormatRupiah(totalQty.toFixed(4)));
-        $('.nilai-total-bahan-baku-awal').text(greatFormatRupiah(totalQtyAwal.toFixed(4)));
+        $('.nilai-total-bahan-baku-request').text(greatFormatRupiah(totalQty.toFixed(2)));
+        $('.nilai-total-bahan-baku-awal').text(greatFormatRupiah(totalQtyAwal.toFixed(2)));
     }
 
     function drawTableSelectedItemBahanSetengahJadi(data) {
@@ -2768,14 +2770,25 @@
         drawTableAsalBarang([]);
     }
 
-    // function clearBahanBakuForm() {
-    //     $('#divisi_id').val(null).change();
-    //     $('#warehouse_id').val(null).change();
-    //     $('#supplier_id').val(null).change();
-    //     $('#vendor_barang_id').val(null).change();
-    //     $('#spesifikasi_id').val(null).change();
+    function updateBarangJadi() {
+        let selected = $(".kode_produksi option:selected");
 
-    // }
+        if (selected.length > 0) {
+            let nama_barang = [];
+            let standart_production = [];
+
+            selected.each(function() {
+                nama_barang.push($(this).data("nama-barang"));
+                standart_production.push($(this).data("standart-production"));
+            });
+
+            $(".barang_jadi").val(nama_barang.join(", "));
+            $(".standart_production").val(standart_production.join(", "));
+        } else {
+            $(".barang_jadi").val("");
+            $(".standart_production").val("");
+        }
+    }
 </script>
 
 <?= $this->endSection(); ?>
