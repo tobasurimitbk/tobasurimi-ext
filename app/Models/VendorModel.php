@@ -33,6 +33,9 @@ class VendorModel extends Model
         'upah_xl',
         'upah_lp',
         'upah_cl',
+        'upah_sp', 
+        'upah_mh', 
+        'upah_cf', 
 
         // ===== Tambahan Komisi =====
         'komisi_vendor',
@@ -43,6 +46,18 @@ class VendorModel extends Model
         'bonus_xl',
         'bonus_lp',
         'bonus_cl',
+        'bonus_sp',
+        'bonus_mh',
+        'bonus_cf',
+
+        // ===== Tambahan Bonus Karyawan Vendor =====
+        'bonus_karyawan_jb',
+        'bonus_karyawan_xl',
+        'bonus_karyawan_lp',
+        'bonus_karyawan_cl',
+        'bonus_karyawan_sp',
+        'bonus_karyawan_mh',
+        'bonus_karyawan_cf',
 
         'createdAt',
         'updatedAt',
