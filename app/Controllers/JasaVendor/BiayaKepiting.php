@@ -473,10 +473,15 @@ class BiayaKepiting extends BaseController
             $dataPerolehanGaji = $this->biayaKepitingModel->dropdownPerolehanGaji($id);
             $dataBonus = $this->biayaKepitingBonusModel->dropdownBarang($jasaVendorInID, $id);
         }
+
+        $dataVendorIn = $this->jasaVendorInModel->where('id', $jasaVendorInID)->first();
+        $dataVendor =  $this->vendorModel->where('id', $dataVendorIn['vendor_id'])->first();
+
         return response()->setJSON([
             'data' => $data,
             'dataPerolehanGaji' => $dataPerolehanGaji,
             'dataBonus' => $dataBonus,
+            'dataVendor' => $dataVendor,
             'token' => csrf_hash(),
             'status' => true
         ]);
@@ -487,11 +492,13 @@ class BiayaKepiting extends BaseController
         $listBarang = json_decode($_POST['listBarang']);
         $listPerolehanGaji = json_decode($_POST['listPerolehanGaji']);
         $listBonus = json_decode($_POST['listBonus']);
+        $listDataVendor = json_decode($_POST['listDataVendor']);
 
         return response()->setJSON([
             'data' => $listBarang,
             'dataPerolehanGaji' => $listPerolehanGaji,
             'dataBonus' => $listBonus,
+            'dataVendor' => $listDataVendor,
             'token' => csrf_hash(),
             'status' => true
         ]);
