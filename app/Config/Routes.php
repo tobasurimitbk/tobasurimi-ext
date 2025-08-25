@@ -809,6 +809,8 @@ $routes->get('/biaya-eskpor/get-sales-order-export', 'BiayaExim\BiayaEskpor\Biay
 $routes->get('/biaya-eskpor/export-excel', 'BiayaExim\BiayaEskpor\BiayaEskpor::exportExcel', ['filter' => 'Auth']);
 $routes->get('/biaya-eskpor/get-status-posting', 'BiayaExim\BiayaEskpor\BiayaEskpor::getStatusPosting', ['filter' => 'Auth']);
 $routes->get('/biaya-eskpor/detail/(:segment)', 'BiayaExim\BiayaEskpor\BiayaEskpor::detail/$1', ['filter' => 'Auth']);
+$routes->get('/biaya-eskpor/get-data-biaya', 'BiayaExim\BiayaEskpor\BiayaEskpor::getDataBiayaEkspor', ['filter' => 'Auth']);
+
 
 // BIAYA IMPOR
 $routes->get('/biaya-impor', 'BiayaExim\BiayaImpor\BiayaImpor::index', ['filter' => 'Auth']);
@@ -825,6 +827,7 @@ $routes->get('/biaya-impor/print/(:segment)', 'BiayaExim\BiayaImpor\BiayaImpor::
 $routes->get('/biaya-impor/export-excel', 'BiayaExim\BiayaImpor\BiayaImpor::exportExcel', ['filter' => 'Auth']);
 $routes->get('/biaya-impor/get-status-posting', 'BiayaExim\BiayaImpor\BiayaImpor::getStatusPosting', ['filter' => 'Auth']);
 $routes->get('/biaya-impor/detail/(:segment)', 'BiayaExim\BiayaImpor\BiayaImpor::detail/$1', ['filter' => 'Auth']);
+$routes->get('/biaya-impor/get-data-biaya', 'BiayaExim\BiayaImpor\BiayaImpor::getDataBiayaImpor', ['filter' => 'Auth']);
 
 // BIAYA LOKAL
 $routes->get('/biaya-lokal', 'BiayaExim\BiayaLokal\BiayaLokal::index', ['filter' => 'Auth']);
