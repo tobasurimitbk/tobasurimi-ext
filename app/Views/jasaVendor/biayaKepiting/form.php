@@ -253,6 +253,7 @@
     var listBarang = [];
     var listPerolehanGaji = [];
     var listBonus = [];
+    var listDataVendor= [];
 
     <?php if (!empty($biayaKepiting)) : ?>
         $.ajax({
@@ -267,6 +268,7 @@
                 csrf.val(res.token);
                 listBarang = res.data;
                 listPerolehanGaji = res.dataPerolehanGaji;
+                listDataVendor = res.dataVendor;
                 listBonus = res.dataBonus;
                 drawTable();
             }
@@ -780,6 +782,7 @@
                 listBarang = res.data;
                 listPerolehanGaji = res.dataPerolehanGaji;
                 listBonus = res.dataBonus;
+                listDataVendor = res.dataVendor;
                 drawTable();
             }
         });
@@ -801,7 +804,6 @@
                 `;
             $('.foot-detail-table').append(row);
         } else {
-
             var qtyKopekTotal = 0;
             var jumboTotal = 0;
             var exLumpTotal = 0;
@@ -875,8 +877,6 @@
                 cfTotal += parseFloat(v.cf);
                 totalTotal += total;
                 qtyKopekTotal += parseFloat(v.qty_kopek);
-                // totalRasio += parseFloat(rasio);
-
             });
 
             totalRasio = qtyKopekTotal == 0 ? 0 : ((totalTotal / qtyKopekTotal) * 100);
@@ -944,48 +944,86 @@
                 var tambahanMh = 0;
                 var tambahanCf = 0;
 
+                // Gunakan data vendor untuk perhitungan jika tersedia
+                var vendorData = listDataVendor || {};
+                
                 $.each(listPerolehanGaji, function(i, v) {
+                    // Gunakan nilai dari vendor jika tersedia, jika tidak gunakan nilai dari data
+                    if (v.value === 'upah_kopek') {
+                        v.jumbo = vendorData.upah_jb || v.jumbo;
+                        v.ex_lump = vendorData.upah_xl || v.ex_lump;
+                        v.lump = vendorData.upah_lp || v.lump;
+                        v.special = vendorData.upah_sp || v.special;
+                        v.claw = vendorData.upah_cl || v.claw;
+                        v.mh = vendorData.upah_mh || v.mh;
+                        v.cf = vendorData.upah_cf || v.cf;
+                    } else if (v.value === 'komisi_kg_daging') {
+                        v.jumbo = vendorData.komisi_vendor || v.jumbo;
+                        v.ex_lump = vendorData.komisi_vendor || v.ex_lump;
+                        v.lump = vendorData.komisi_vendor || v.lump;
+                        v.special = vendorData.komisi_vendor || v.special;
+                        v.claw = vendorData.komisi_vendor || v.claw;
+                        v.mh = vendorData.komisi_vendor || v.mh;
+                        v.cf = vendorData.komisi_vendor || v.cf;
+                    } else if (v.value === 'bonus_kg_daging') {
+                        v.jumbo = vendorData.bonus_vendor || v.jumbo;
+                        v.ex_lump = vendorData.bonus_vendor || v.ex_lump;
+                        v.lump = vendorData.bonus_vendor || v.lump;
+                        v.special = vendorData.bonus_vendor || v.special;
+                        v.claw = vendorData.bonus_vendor || v.claw;
+                        v.mh = vendorData.bonus_vendor || v.mh;
+                        v.cf = vendorData.bonus_vendor || v.cf;
+                    } else if (v.value === 'tamb_upah_kopek') {
+                        v.jumbo = vendorData.bonus_karyawan_jb || v.jumbo;
+                        v.ex_lump = vendorData.bonus_karyawan_xl || v.ex_lump;
+                        v.lump = vendorData.bonus_karyawan_lp || v.lump;
+                        v.special = vendorData.bonus_karyawan_sp || v.special;
+                        v.claw = vendorData.bonus_karyawan_cl || v.claw;
+                        v.mh = vendorData.bonus_karyawan_mh || v.mh;
+                        v.cf = vendorData.bonus_karyawan_cf || v.cf;
+                    }
+
                     var total = parseFloat(v.jumbo) + parseFloat(v.ex_lump) + parseFloat(v.lump) + parseFloat(v.special) + parseFloat(v.claw) + parseFloat(v.mh) + parseFloat(v.cf);
                     gajiTotal += total;
 
                     if (v.description == 'Upah Kopek') {
-                        upahKopekJumbo += v.jumbo;
-                        upahKopekExLump += v.ex_lump;
-                        upahKopekLump += v.lump;
-                        upahKopekSpecial += v.special;
-                        upahKopekClaw += v.claw;
-                        upahKopekMh += v.mh;
-                        upahKopekCf += v.cf;
+                        upahKopekJumbo = parseFloat(v.jumbo);
+                        upahKopekExLump = parseFloat(v.ex_lump);
+                        upahKopekLump = parseFloat(v.lump);
+                        upahKopekSpecial = parseFloat(v.special);
+                        upahKopekClaw = parseFloat(v.claw);
+                        upahKopekMh = parseFloat(v.mh);
+                        upahKopekCf = parseFloat(v.cf);
                     }
 
                     if (v.description == 'Komisi / Kg Daging') {
-                        komisiDagingJumbo += v.jumbo;
-                        komisiDagingExLump += v.ex_lump;
-                        komisiDagingLump += v.lump;
-                        komisiDagingSpecial += v.special;
-                        komisiDagingClaw += v.claw;
-                        komisiDagingMh += v.mh;
-                        komisiDagingCf += v.cf;
+                        komisiDagingJumbo = parseFloat(v.jumbo);
+                        komisiDagingExLump = parseFloat(v.ex_lump);
+                        komisiDagingLump = parseFloat(v.lump);
+                        komisiDagingSpecial = parseFloat(v.special);
+                        komisiDagingClaw = parseFloat(v.claw);
+                        komisiDagingMh = parseFloat(v.mh);
+                        komisiDagingCf = parseFloat(v.cf);
                     }
 
                     if (v.description == 'Bonus / Kg Daging') {
-                        bonusDagingJumbo += v.jumbo;
-                        bonusDagingExLump += v.ex_lump;
-                        bonusDagingLump += v.lump;
-                        bonusDagingSpecial += v.special;
-                        bonusDagingClaw += v.claw;
-                        bonusDagingMh += v.mh;
-                        bonusDagingCf += v.cf;
+                        bonusDagingJumbo = parseFloat(v.jumbo);
+                        bonusDagingExLump = parseFloat(v.ex_lump);
+                        bonusDagingLump = parseFloat(v.lump);
+                        bonusDagingSpecial = parseFloat(v.special);
+                        bonusDagingClaw = parseFloat(v.claw);
+                        bonusDagingMh = parseFloat(v.mh);
+                        bonusDagingCf = parseFloat(v.cf);
                     }
 
-                    if (v.value == 'tamb_upah_kopek') { // ex lump
-                        tambahanJumbo += v.jumbo;
-                        tambahanExLump += v.ex_lump;
-                        tambahanLump += v.lump;
-                        tambahanSpecial += v.special;
-                        tambahanClaw += v.claw;
-                        tambahanMh += v.mh;
-                        tambahanCf += v.cf;
+                    if (v.value == 'tamb_upah_kopek') {
+                        tambahanJumbo = parseFloat(v.jumbo);
+                        tambahanExLump = parseFloat(v.ex_lump);
+                        tambahanLump = parseFloat(v.lump);
+                        tambahanSpecial = parseFloat(v.special);
+                        tambahanClaw = parseFloat(v.claw);
+                        tambahanMh = parseFloat(v.mh);
+                        tambahanCf = parseFloat(v.cf);
                     }
 
                     var newRow = $('<tr  style="color:whitesmoke;">');
@@ -1002,9 +1040,10 @@
                     ));
                     newRow.append($('<td style="text-align: center;">').html(
                         `
-                            <input id="${i+'_2_lump'}" <?= !empty($biayaKepiting) ? (($biayaKepiting['status_posting'] == "1") ? 'disabled' : '') : '' ?> style="height: 40px; padding-bottom: 10px;" class="form-control ${v.value}_lump" oninput="preventNegativeInput(this)" autocomplete="one-time-code" class="form-control ${v.value}_lump" type="text" onkeyup="autoComplete()" value="${v.lump}">
+                            <input id="${i+'_2_lump'}" <?= !empty($biayaKepiting) ? (($biayaKepiting['status_posting'] == "1") ? 'disabled' : '') : '' ?> style="height: 40px; padding-bottom: 10px;" class="form-control ${v.value}_lump" oninput="preventNegativeInput(this)" autocomplete="one-time-code" type="text" onkeyup="autoComplete()" value="${v.lump}">
                         `
                     ));
+
                     newRow.append($('<td style="text-align: center;">').html(
                         `
                             <input id="${i+'_2_special'}" <?= !empty($biayaKepiting) ? (($biayaKepiting['status_posting'] == "1") ? 'disabled' : '') : '' ?> style="height: 40px; padding-bottom: 10px;" class="form-control ${v.value}_special" oninput="preventNegativeInput(this)" autocomplete="one-time-code" class="form-control ${v.value}_special" type="text" onkeyup="autoComplete()" value="${v.special}">
@@ -1027,11 +1066,9 @@
                     ));
                     newRow.append($('<td>').text(formatRupiah1(total.toFixed(2))));
                     table2.find('tbody').append(newRow);
-
-
-
                 });
 
+                // Hitung total berdasarkan jumlah aktual dan harga dari vendor
                 var totalUpahKopekJumbo = jumboTotal * upahKopekJumbo;
                 var totalUpahKopekExLump = exLumpTotal * upahKopekExLump;
                 var totalUpahKopekLump = lumpTotal * upahKopekLump;
@@ -1164,7 +1201,28 @@
             $('.body-table-3').empty();
             var no = 1;
             var totalBonusResult = 0;
+            
+            // Gunakan data vendor untuk bonus jika tersedia
+            var vendorData = listDataVendor || {};
+            
             $.each(listBonus, function(i, v) {
+                // Gunakan nilai bonus dari vendor jika tersedia
+                if (v.spesifikasi === "JB") {
+                    v.bonus_nominal = vendorData.bonus_jb || v.bonus_nominal;
+                } else if (v.spesifikasi === "SP LUMP") {
+                    v.bonus_nominal = vendorData.bonus_xl || v.bonus_nominal;
+                } else if (v.spesifikasi === "BF") {
+                    v.bonus_nominal = vendorData.bonus_lp || v.bonus_nominal;
+                } else if (v.spesifikasi === "SPL") {
+                    v.bonus_nominal = vendorData.bonus_sp || v.bonus_nominal;
+                } else if (v.spesifikasi === "CLAW") {
+                    v.bonus_nominal = vendorData.bonus_cl || v.bonus_nominal;
+                } else if (v.spesifikasi === "MH") {
+                    v.bonus_nominal = vendorData.bonus_mh || v.bonus_nominal;
+                } else if (v.spesifikasi === "CF") {
+                    v.bonus_nominal = vendorData.bonus_cf || v.bonus_nominal;
+                }
+                
                 var totalBonus = 0;
                 var newRow = $('<tr  style="color:whitesmoke;">');
                 totalBonus = parseFloat(v.kg_bonus) * parseFloat(v.bonus_nominal);
@@ -1196,11 +1254,7 @@
             newRow.append($('<td style="text-align: center;" colspan="5">').html("<b>GRAND TOTAL</b>"));
             newRow.append($('<td>').text(formatRupiah1(totalBonusResult.toFixed(2))));
             table3.find('tbody').append(newRow);
-
         }
-
-
-
     }
 
     function preventNegativeInput(inputElement) {
@@ -1340,7 +1394,6 @@
             listBarang[i].cf = barangCfElement.val();
         });
 
-
         $.each(listPerolehanGaji, function(i, v) {
             var hargaJumboElement = $('input.' + v.value + '_jumbo');
             var hargaExLumpElement = $('input.' + v.value + '_ex_lump');
@@ -1357,7 +1410,6 @@
             listPerolehanGaji[i].claw = hargaClawElement.val();
             listPerolehanGaji[i].mh = hargaMhElement.val();
             listPerolehanGaji[i].cf = hargaCfElement.val();
-
         });
 
         $.each(listBonus, function(i, v) {
@@ -1372,6 +1424,7 @@
         data.append('listBarang', JSON.stringify(listBarang));
         data.append('listPerolehanGaji', JSON.stringify(listPerolehanGaji));
         data.append("listBonus", JSON.stringify(listBonus));
+        data.append("listDataVendor", JSON.stringify(listDataVendor));
 
         if (request) {
             request.abort();
@@ -1393,6 +1446,7 @@
                 listBarang = res.data;
                 listPerolehanGaji = res.dataPerolehanGaji;
                 listBonus = res.dataBonus;
+                listDataVendor = res.dataVendor;
                 drawTable();
 
                 if (focusedElementId) {
@@ -1413,6 +1467,7 @@
             }
         });
     }
+
 </script>
 
 <?= $this->endSection(); ?>
