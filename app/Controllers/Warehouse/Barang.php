@@ -12,7 +12,9 @@ use App\Models\BarangMasterSpesifikasiModel;
 use App\Models\ParentBarangModel;
 use App\Models\SatuansModel;
 use App\Models\DivisisModel;
+use App\Models\MetadataModel;
 use App\Models\PenerimaanBarangDetailModel;
+use App\Models\Sub_AkunsModel;
 use Exception;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
@@ -21,12 +23,17 @@ use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
 class Barang extends BaseController
 {
-    protected $this_company_id;
-    private $kodeBahanBaku, $kodeBahanPenolong, $kodeBahanJadi, $kodeBahanScrap, $kodeBahanModal, $kodeBahanSetengahJadi;
+    protected $this_company_id, $isAccounting;
+    private $kodeBahanBaku, $kodeBahanPenolong, $kodeBahanJadi, $kodeBahanScrap, $kodeBahanModal, $kodeBahanSetengahJadi, $divisiModel, $metaDataModel;
 
     public function __construct()
     {
         $this->this_company_id = session()->get("login")->this_company_id;
+        $this->isAccounting = session()->get("login")->is_admin == '1' || session()->get("login")->this_role_name == 'ACCOUNTING' ? true : false;
+        $this->divisiModel = new DivisisModel();
+        $this->Sub_AkunsModel = new Sub_AkunsModel();
+        $this->metaDataModel = new MetadataModel();
+
         $this->kodeBahanBaku = "BL-BB";
         $this->kodeBahanPenolong = "BL-BP";
         $this->kodeBahanJadi = "BL-BJ";
@@ -39,10 +46,16 @@ class Barang extends BaseController
     {
         $parentBarangModel = new ParentBarangModel();
         $satuanModel = new SatuansModel();
+        $subAkunsModel = $this->Sub_AkunsModel->getAPAR($this->this_company_id);
+
         $data = [
             'type' => "bahan_baku",
             'kelompokBarang' => $parentBarangModel->where('parent_type', "bahan_baku")->where('company_id', $this->this_company_id)->where('deletedAt', null)->findAll(),
-            'satuanBarang' => $satuanModel->where('deletedAt', null)->findAll()
+            'satuanBarang' => $satuanModel->where('deletedAt', null)->findAll(),
+            'isAccounting' => $this->isAccounting,
+            'divisis' => $this->divisiModel->getDivisiAccess(),
+            'kategoriBarangAkun' => $this->metaDataModel->asObject()->where('name', 'kategori_barang_akun')->findAll(),
+            "subAkuns" => $subAkunsModel
         ];
 
         return view('Warehouse/barangMaster/bahanBaku', $data);
@@ -65,13 +78,10 @@ class Barang extends BaseController
     {
         $parentBarangModel = new ParentBarangModel();
         $satuanModel = new SatuansModel();
-        $divisisModel = new DivisisModel();
-        $divisisModelData = $divisisModel->asObject()->where('deletedAt', null)->findAll();
 
         $data = [
             'type' => "bahan_jadi",
             'kelompokBarang' => $parentBarangModel->where('parent_type', "bahan_jadi")->where('company_id', $this->this_company_id)->where('deletedAt', null)->findAll(),
-            'divisi' => $divisisModelData,
             'satuanBarang' => $satuanModel->where('deletedAt', null)->findAll()
         ];
 

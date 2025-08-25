@@ -214,7 +214,7 @@
                                             <th scope="col" style="width:90px">Action</th>
                                         </tr>
                                     </thead>
-                                    <tbody class="body-detail-table" id="body-detail-table" id="tbody2" style="cursor: pointer;">
+                                    <tbody class="body-detail-table" id="body-detail-table" style="cursor: pointer;">
                                     </tbody>
                                 </table>
                             </div>
@@ -223,7 +223,7 @@
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-hide-form btn-discard mr-2">Kembali</button>
+                <button type="button" class="btn btn-hide-form btn-discard btn-discard-add-modal mr-2">Kembali</button>
                 <button type="submit" class="btn btn-submit-form btn-submit-master-barang">Simpan</button>
                 <button type="button" class="btn btn-discard delete-btn">Hapus</button>
             </div>
@@ -250,6 +250,151 @@
             <div class="modal-footer">
                 <button type="button" class="btn btn-hide-form btn-discard btn-discard-import-excel mr-2">Kembali</button>
                 <button type="submit" class="btn btn-submit-form btn-submit-excel">Simpan</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal add-modal-akun-barang" tabindex="-1">
+    <div class="modal-dialog" style="min-width: 900px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Tambah Akun Barang</h5>
+            </div>
+            <div class="modal-body">
+                <form class="create-form-akun-barang" role="form" method="POST" enctype="multipart/form-data" onSubmit="return false">
+                    <input type="hidden" name="spek_id" class="spek_id" id="spek_id">
+                    <?= csrf_field() ?>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input readonly autocomplete="one-time-code" type="text" class="form-control" placeholder="Nama Barang" id="parentNameAkunBarang" name="parentNameAkunBarang">
+                                <label for="floatingInput">Nama Barang</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <select class="form-select divisi_id" name="divisi_id" id="divisi_id">
+                                    <option value=""></option>
+                                    <?php
+                                    if (!empty($divisis)) {
+                                        foreach ($divisis as $divisi) {
+                                    ?>
+                                            <option value="<?= $divisi['id']; ?>"><?= $divisi['divisi']; ?></option>
+                                    <?php
+                                        }
+                                    }
+                                    ?>
+                                </select>
+                                <label for="floatingInput">Departemen</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <select class="form-select akun_ap_id" name="akun_ap_id" id="akun_ap_id">
+                                    <option value=""></option>
+                                    <?php
+                                    if (!empty($subAkuns)) {
+                                        foreach ($subAkuns as $sub) {
+                                    ?>
+                                            <option value="<?= $sub->id; ?>"><?= $sub->no_sub; ?> <?= $sub->nama_sub; ?></option>
+                                    <?php
+                                        }
+                                    }
+                                    ?>
+                                </select>
+                                <?php if ($type == "bahan_jadi" || $type == "bahan_setengah_jadi") : ?>
+                                    <label for="floatingInput">Akun Persediaan</label>
+                                <?php else : ?>
+                                    <label for="floatingInput">Akun Pembelian</label>
+                                <?php endif; ?>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <select class="form-select akun_ar_id" name="akun_ar_id" id="akun_ar_id">
+                                    <option value="" data-code=""></option>
+                                    <?php
+                                    if (!empty($subAkuns)) {
+                                        foreach ($subAkuns as $sub_ar) {
+                                    ?>
+                                            <option value="<?= $sub_ar->id; ?>"><?= $sub_ar->no_sub; ?> <?= $sub_ar->nama_sub; ?></option>
+                                    <?php
+                                        }
+                                    }
+                                    ?>
+                                </select>
+                                <label for="floatingInput">Akun Penjualan</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <select class="form-select akun_pemakaian_id" name="akun_pemakaian_id" id="akun_pemakaian_id">
+                                    <option value="" data-code=""></option>
+                                    <?php
+                                    if (!empty($subAkuns)) {
+                                        foreach ($subAkuns as $sub_ar) {
+                                    ?>
+                                            <option value="<?= $sub_ar->id; ?>"><?= $sub_ar->no_sub; ?> <?= $sub_ar->nama_sub; ?></option>
+                                    <?php
+                                        }
+                                    }
+                                    ?>
+                                </select>
+                                <label for="floatingInput">Akun Pemakaian</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <select class="form-select kategori" name="kategori" id="kategori">
+                                    <option value="" data-code=""></option>
+                                    <?php
+                                    if (!empty($kategoriBarangAkun)) {
+                                        foreach ($kategoriBarangAkun as $kategoriBarang) {
+                                    ?>
+                                            <option value="<?= $kategoriBarang->id; ?>"><?= $kategoriBarang->description; ?></option>
+                                    <?php
+                                        }
+                                    }
+                                    ?>
+                                </select>
+                                <label for="floatingInput">Kategori Barang</label>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+
+                <!-- Tabel Sementara untuk Data Akun Barang -->
+                <div class="row mt-4">
+                    <div class="col-md-12">
+                        <div class="table-responsive">
+                            <table class="table table-bordered" id="tabel-akun-sementara">
+                                <thead>
+                                    <tr>
+                                        <th>Departemen</th>
+                                        <th>Akun Pembelian</th>
+                                        <th>Akun Penjualan</th>
+                                        <th>Akun Pemakaian</th>
+                                        <th>Kategori Barang</th>
+                                        <th>Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="body-akun-sementara">
+                                    <!-- Data akan ditampilkan di sini -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-add-to-table">Tambah ke Tabel</button>
+                <button type="button" class="btn btn-submit-form">Simpan</button>
+                <button type="button" class="btn btn-hide-form btn-discard btn-discard-add-modal-akun-barang mr-2">Kembali</button>
             </div>
         </div>
     </div>
@@ -407,7 +552,7 @@
             $('.add-modal').modal('show');
         });
 
-        $('.btn-discard').click(function() {
+        $('.btn-discard-add-modal').click(function() {
             $('.add-modal').modal('hide');
         });
 
@@ -666,8 +811,8 @@
             dataType: "json",
             success: function(res) {
                 $('.delete-btn').show();
-                $('.title-name').text("Update Bahan Penolong");
-                <?php if (!can('Master Barang', 'Bahan Penolong', 'u')) : ?>
+                $('.title-name').text("Update Bahan Baku");
+                <?php if (!can('Master Barang', 'Bahan Baku', 'u')) : ?>
                     $('.btn-submit-master-barang').hide();
                 <?php endif; ?>
                 // $('input[name="kode_barang"]').attr('readonly', true);
@@ -1242,6 +1387,22 @@
         });
     });
 
+    $(document).on('click', '.add-coa-table-detail', function(evt) {
+        resetFormAkunBarang();
+        $('.add-modal').modal('hide');
+        let spek_id = $(this).data('spek_id');
+        let spek = $(this).data('spesifikasi');
+        console.log(spek_id);
+        $('#spek_id').val(spek_id);
+        $('#parentNameAkunBarang').val(spek);
+        $('.add-modal-akun-barang').modal('show');
+    });
+
+    $('.btn-discard-add-modal-akun-barang').click(function() {
+        $('.add-modal-akun-barang').modal('hide');
+        $('.add-modal').modal('show');
+    });
+
     const drawTable = function() {
         $('.body-detail-table').empty();
         $('.tfoot').empty();
@@ -1256,6 +1417,14 @@
             $('.tfoot').append(row);
         } else {
             list_items.map(item => {
+                <?php if ($isAccounting) : ?>
+                    additionalRow = `
+                    <button class="btn btn-success add-coa-table-detail mr-1" data-spek_id="${item.spek_id}" data-spesifikasi="${item.spesifikasi}">
+                        <i class="fa fa-plus fa-2" aria-hidden="true"></i>
+                    </button>`;
+                <?php else : ?>
+                    additionalRow = ``;
+                <?php endif ?>
                 row += '<tr style="color:whitesmoke;">';
                 row += '<td>' + no + '</td>';
                 row += '<td>' + item.spesifikasi + '</td>';
@@ -1264,9 +1433,11 @@
                 row += '<td>' + item.satuan_3_text + '(' + item.konversi_satuan_3 + ' ' + item.satuan_1_text + ')</td>';
 
                 row += '<td>' + `
-                    <button class="btn btn-warning edit-table-detail mr-2" data-spek_id="${item.spek_id}">
+                    <button class="btn btn-warning edit-table-detail mr-1" data-spek_id="${item.spek_id}">
                         <i class="fa fa-pencil fa-sm" aria-hidden="true"></i>
-                    </button><button class="btn btn-danger" onclick="deleteRowDetail('${item.spek_id}', '${item.spesifikasi_id}')">
+                    </button>
+                    ${additionalRow}
+                    <button class="btn btn-danger" onclick="deleteRowDetail('${item.spek_id}', '${item.spesifikasi_id}')">
                         <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
                     </button>` +
                     '</td>';
@@ -1424,12 +1595,78 @@
         .parent('div')
         .find('label')
         .css('z-index', '1');
+
     $("#satuan1_id, #satuan2_id, #satuan3_id").select2({
         theme: "bootstrap-5",
         allowClear: true,
         placeholder: 'Pilih Satuan',
         dropdownParent: $(".add-modal .modal-content")
     });
+
+    //CSS SELECT2 FLOATING LABEL
+    $('.akun_ar_id, .akun_ap_id, .kategori, .akun_pemakaian_id, .divisi_id')
+        .parent('div')
+        .children('span')
+        .children('span')
+        .children('span')
+        .css('height', ' calc(3.5rem + 2px)');
+
+    $('.akun_ar_id, .akun_ap_id, .kategori, .akun_pemakaian_id, .divisi_id')
+        .parent('div')
+        .children('span')
+        .children('span')
+        .children('span')
+        .children('span')
+        .css('margin-top', '22px').css('margin-left', '-7px');
+
+    $('.akun_ar_id, .akun_ap_id, .kategori, .akun_pemakaian_id, .divisi_id')
+        .parent('div')
+        .find('label')
+        .css('z-index', '1');
+
+    // Divisi
+    $('.divisi_id').select2({
+        placeholder: "",
+        theme: "bootstrap-5",
+        dropdownParent: $(".add-modal-akun-barang .modal-content")
+    }).on("select2:open", () => {
+        document.querySelector(".select2-container--open .select2-search__field").focus()
+    })
+
+    // Akun AP
+    $('.akun_ap_id').select2({
+        placeholder: "",
+        theme: "bootstrap-5",
+        dropdownParent: $(".add-modal-akun-barang .modal-content")
+    }).on("select2:open", () => {
+        document.querySelector(".select2-container--open .select2-search__field").focus()
+    })
+
+    // Akun AR
+    $('.akun_ar_id').select2({
+        placeholder: "",
+        theme: "bootstrap-5",
+        dropdownParent: $(".add-modal-akun-barang .modal-content")
+    }).on("select2:open", () => {
+        document.querySelector(".select2-container--open .select2-search__field").focus()
+    })
+
+    $('.akun_pemakaian_id').select2({
+        placeholder: "",
+        theme: "bootstrap-5",
+        dropdownParent: $(".add-modal-akun-barang .modal-content")
+    }).on("select2:open", () => {
+        document.querySelector(".select2-container--open .select2-search__field").focus()
+    })
+
+    // Akun AR
+    $('.kategori').select2({
+        placeholder: "",
+        theme: "bootstrap-5",
+        dropdownParent: $(".add-modal-akun-barang .modal-content")
+    }).on("select2:open", () => {
+        document.querySelector(".select2-container--open .select2-search__field").focus()
+    })
 
     const changeSort = function(val) {
         if (sort !== val) {
@@ -1449,5 +1686,215 @@
         window.open(url + `?search=${search}&parent_type=${parent_type}&filter_coa=${filter_coa}&sort=${sort}&sortType=${sortType}`, "_blank");
     }
 </script>
+<script>
+    // Variabel untuk menyimpan data sementara
+    let list_akun_items = [];
 
+    // Fungsi untuk menambahkan data ke tabel sementara
+    $('.btn-add-to-table').click(function() {
+        // Ambil nilai dari form
+        let divisi_id = $('#divisi_id').val();
+        let divisi_text = $('#divisi_id option:selected').text();
+        let akun_ap_id = $('#akun_ap_id').val();
+        let akun_ap_text = $('#akun_ap_id option:selected').text();
+        let akun_ar_id = $('#akun_ar_id').val();
+        let akun_ar_text = $('#akun_ar_id option:selected').text();
+        let akun_pemakaian_id = $('#akun_pemakaian_id').val();
+        let akun_pemakaian_text = $('#akun_pemakaian_id option:selected').text();
+        let kategori_id = $('#kategori').val();
+        let kategori_text = $('#kategori option:selected').text();
+
+        // Validasi form
+        if (!divisi_id || !akun_ap_id || !akun_ar_id || !akun_pemakaian_id || !kategori_id) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Semua field harus diisi',
+                confirmButtonColor: '#4e73df',
+            });
+            return;
+        }
+
+        // Tambahkan ke array
+        list_akun_items.push({
+            divisi_id: divisi_id,
+            divisi_text: divisi_text,
+            akun_ap_id: akun_ap_id,
+            akun_ap_text: akun_ap_text,
+            akun_ar_id: akun_ar_id,
+            akun_ar_text: akun_ar_text,
+            akun_pemakaian_id: akun_pemakaian_id,
+            akun_pemakaian_text: akun_pemakaian_text,
+            kategori_id: kategori_id,
+            kategori_text: kategori_text
+        });
+
+        // Perbarui tabel
+        updateAkunTable();
+
+        // Reset form
+        resetFormAkunBarang();
+    });
+
+    // Fungsi untuk memperbarui tabel sementara
+    function updateAkunTable() {
+        let tableBody = $('#body-akun-sementara');
+        tableBody.empty();
+
+        if (list_akun_items.length === 0) {
+            tableBody.append('<tr><td colspan="6" class="text-center">Tidak ada data</td></tr>');
+            return;
+        }
+
+        list_akun_items.forEach((item, index) => {
+            let row = `<tr>
+            <td>${item.divisi_text}</td>
+            <td>${item.akun_ap_text}</td>
+            <td>${item.akun_ar_text}</td>
+            <td>${item.akun_pemakaian_text}</td>
+            <td>${item.kategori_text}</td>
+            <td>
+                <button class="btn btn-sm btn-warning edit-akun" data-index="${index}">
+                    <i class="fa fa-edit"></i>
+                </button>
+                <button class="btn btn-sm btn-danger hapus-akun" data-index="${index}">
+                    <i class="fa fa-trash"></i>
+                </button>
+            </td>
+        </tr>`;
+            tableBody.append(row);
+        });
+    }
+
+    // Fungsi untuk mengedit data di tabel sementara
+    $(document).on('click', '.edit-akun', function() {
+        let index = $(this).data('index');
+        let item = list_akun_items[index];
+
+        // Isi form dengan data yang dipilih
+        $('#divisi_id').val(item.divisi_id).trigger('change');
+        $('#akun_ap_id').val(item.akun_ap_id).trigger('change');
+        $('#akun_ar_id').val(item.akun_ar_id).trigger('change');
+        $('#akun_pemakaian_id').val(item.akun_pemakaian_id).trigger('change');
+        $('#kategori').val(item.kategori_id).trigger('change');
+
+        // Hapus item dari array (akan ditambahkan kembali setelah edit)
+        list_akun_items.splice(index, 1);
+
+        // Perbarui tabel
+        updateAkunTable();
+    });
+
+    // Fungsi untuk menghapus data dari tabel sementara
+    $(document).on('click', '.hapus-akun', function() {
+        let index = $(this).data('index');
+
+        Swal.fire({
+            icon: 'question',
+            title: 'Hapus Data?',
+            text: 'Apakah Anda yakin ingin menghapus data ini dari tabel?',
+            confirmButtonColor: '#4e73df',
+            cancelButtonColor: '#d33',
+            showCancelButton: true,
+            reverseButtons: true,
+            confirmButtonText: 'Hapus',
+            cancelButtonText: 'Batal',
+        }).then((result) => {
+            if (result.isConfirmed) {
+                list_akun_items.splice(index, 1);
+                updateAkunTable();
+            }
+        });
+    });
+
+    // Fungsi untuk reset form akun barang
+    function resetFormAkunBarang() {
+        $('#divisi_id').val('').trigger('change');
+        $('#akun_ap_id').val('').trigger('change');
+        $('#akun_ar_id').val('').trigger('change');
+        $('#akun_pemakaian_id').val('').trigger('change');
+        $('#kategori').val('').trigger('change');
+    }
+
+    // Fungsi untuk menyimpan data ke server
+    $('.btn-submit-form').click(function() {
+        if (list_akun_items.length === 0) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Tidak ada data untuk disimpan',
+                confirmButtonColor: '#4e73df',
+            });
+            return;
+        }
+
+        let barang_id = $('#barang_id').val();
+        let csrf = $(`[name="${csrfToken}"]`);
+
+        Swal.fire({
+            icon: 'question',
+            title: 'Simpan Data Akun?',
+            confirmButtonColor: '#4e73df',
+            cancelButtonColor: '#d33',
+            showCancelButton: true,
+            reverseButtons: true,
+            confirmButtonText: 'Simpan',
+            cancelButtonText: 'Batal',
+        }).then((result) => {
+            if (result.isConfirmed) {
+                setLoading();
+
+                // Kirim data ke server
+                $.ajax({
+                    url: "<?= base_url("barang-master/save-akun"); ?>",
+                    method: "POST",
+                    data: {
+                        barang_id: barang_id,
+                        items: list_akun_items,
+                        [csrfToken]: csrf.val()
+                    },
+                    dataType: "json",
+                    success: function(response) {
+                        stopLoading();
+                        csrf.val(response.token);
+
+                        if (response.status) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: response.message,
+                                confirmButtonColor: '#4e73df',
+                            }).then(() => {
+                                $('.add-modal-akun-barang').modal('hide');
+                                $('.add-modal').modal('show');
+                                list_akun_items = []; // Kosongkan data sementara
+                            });
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: response.message,
+                                confirmButtonColor: '#4e73df',
+                            });
+                        }
+                    },
+                    error: function() {
+                        stopLoading();
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Terjadi kesalahan saat menyimpan data',
+                            confirmButtonColor: '#4e73df',
+                        });
+                    }
+                });
+            }
+        });
+    });
+
+    // Inisialisasi tabel saat modal dibuka
+    $('.add-modal-akun-barang').on('show.bs.modal', function() {
+        updateAkunTable();
+    });
+
+    // Kosongkan data saat modal ditutup
+    $('.add-modal-akun-barang').on('hidden.bs.modal', function() {
+        list_akun_items = [];
+    });
+</script>
 <?= $this->endSection(); ?>
