@@ -3,6 +3,8 @@
 namespace App\Controllers\JasaVendor;
 
 use App\Controllers\BaseController;
+use App\Models\BarangMasterModel;
+use App\Models\BarangMasterSpesifikasiModel;
 use App\Models\DivisisModel;
 use App\Models\JasaVendorInDetailModel;
 use App\Models\JasaVendorOutDetailModel;
@@ -163,7 +165,6 @@ class ProsesRebus extends BaseController
     public function createActionNew()
     {
         $barangs = json_decode($_POST['listBarang']);
-
         if (count($barangs) == 0) {
             return response()->setJSON([
                 'status' => false,
@@ -221,6 +222,7 @@ class ProsesRebus extends BaseController
                 'no_aju_rebus' => $b->no_aju,
                 'qty_rebus' => $qty_bersih, // <-- INI YANG DIUBAH, pakai qty bersih
                 'stock_hasil_rebus_id' => $b->output->stock_id,
+                'barang_out_id' => $b->output->barang_id,
                 'stock_dokumen' => $b->stock_dokumen,
                 'qty_hasil_rebus' => $b->output->qty,
                 'qty_kotor' => $qty_kotor
@@ -300,6 +302,7 @@ class ProsesRebus extends BaseController
                     'no_aju_rebus' => $b->no_aju,
                     'qty_rebus' => $qty_bersih, // Use calculated clean quantity
                     'stock_hasil_rebus_id' => $b->output->stock_id,
+                    'barang_out_id' => $b->output->barang_id,
                     'stock_dokumen' => $b->stock_dokumen,
                     'qty_hasil_rebus' => $b->output->qty,
                     'qty_kotor' => $qty_kotor // Store excess quantity
@@ -324,6 +327,7 @@ class ProsesRebus extends BaseController
                     'no_aju_rebus' => $b->no_aju,
                     'qty_rebus' => $qty_bersih, // Use calculated clean quantity
                     'stock_hasil_rebus_id' => $b->output->stock_id,
+                    'barang_out_id' => $b->output->barang_id,
                     'stock_dokumen' => $b->stock_dokumen,
                     'qty_hasil_rebus' => $b->output->qty,
                     'qty_kotor' => $qty_kotor // Store excess quantity
@@ -501,6 +505,9 @@ class ProsesRebus extends BaseController
     {
         $id = decrypt($this->request->getVar('id'));
 
+        $barangMasterModel = new BarangMasterModel();
+        $barangMasterSpesifikasiModel = new BarangMasterSpesifikasiModel();
+
         $prosesRebus = $this->prosesRebusModel->find($id);
         $prosesRebusDetail = $this->prosesRebusDetailModel->where('proses_rebus_id', $id)->findAll();
 
@@ -509,6 +516,19 @@ class ProsesRebus extends BaseController
             $stockRebus = $this->stockModel->find($p['stock_rebus_id']);
             $stockHasilRebus = $this->stockModel->find($p['stock_hasil_rebus_id']);
 
+            if ($stockHasilRebus) {
+                // Kalau stok hasil rebus ada, langsung pakai datanya
+                $barang1Id = $stockHasilRebus['barang1_id'];
+                $barang2Id = $stockHasilRebus['barang2_id'];
+            } else {
+                // Kalau stok hasil rebus tidak ada, fallback dari barang_out_id
+                $barangMasterSpesifikasi = $barangMasterSpesifikasiModel->find($p['barang_out_id']);
+                $barangMaster = $barangMasterModel->find($barangMasterSpesifikasi['barang_master_id']);
+
+                $barang1Id = $barangMaster['id'] ?? null;               // amanin kalau null
+                $barang2Id = $barangMasterSpesifikasi['id'] ?? null;    // amanin kalau null
+            }
+           
             // BARANG LAMA
             $stockRebusDetail = $this->stockDetail2Model->getStockListDetail(
                 $p['stock_rebus_id'],
@@ -563,10 +583,11 @@ class ProsesRebus extends BaseController
                 $prosesRebus['warehouse_id'],
                 $prosesRebus['divisi_id'],
                 "bahan_baku",
-                $stockHasilRebus['barang1_id'],
-                $stockHasilRebus['barang2_id'],
+                $barang1Id,
+                $barang2Id,
                 $p['qty_hasil_rebus']
             );
+
 
             // DETAIL
             $stokDetail = $this->stockDetailModel->insertStokDetail(
@@ -583,7 +604,7 @@ class ProsesRebus extends BaseController
             // SUB DETAIL
             $this->stockDetail2Model->insertStokDetail2(
                 $p['bc_rebus_id'],
-                $p['stock_hasil_rebus_id'],
+                $stok,
                 $stokDetail,
                 $p['qty_hasil_rebus'],
                 $p['no_aju_rebus'],

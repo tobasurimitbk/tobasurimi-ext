@@ -297,7 +297,7 @@ class POLokalBahanPenolong extends BaseController
             barang_master.kode_barang,
             barang_master.barang_name AS nama_barang,
             barang_master_spesifikasi.spesifikasi AS spesifikasi_name,
-            satuans.nama_satuan,
+            satuans.kode_satuan as nama_satuan,
             am_purchase_order_details.pph,
             am_purchase_order_details.ppn,
             am_purchase_order_details.qty,

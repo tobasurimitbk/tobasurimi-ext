@@ -160,16 +160,26 @@ class ProsesRebusDetailModel extends Model
             }
 
             // === Barang output ===
-            if ($stockOutput['kemasan_id'] == 0) {
-                $barangMaster = $barangMasterModel->find($stockOutput['barang1_id']);
-                $barangMasterSpesifikasi = $barangMasterSpesifikasiModel->find($stockOutput['barang2_id']);
-                $barangNameOutput = $barangMaster != null && $barangMasterSpesifikasi != null ? $barangMaster['barang_name'] . "-" . $barangMasterSpesifikasi['spesifikasi'] : '';
-                $satuanOutput = $barangMasterSpesifikasi != null ? $satuanModel->find($barangMasterSpesifikasi['satuan_1']) : null;
-                $satuanOutputName = $satuanOutput == null ? "-" : $satuanOutput['kode_satuan'];
+            if ($stockOutput) {
+                if (!$stockOutput['kemasan_id'] == 0) {
+                    $barangMaster = $barangMasterModel->find($stockOutput['barang1_id']);
+                    $barangMasterSpesifikasi = $barangMasterSpesifikasiModel->find($stockOutput['barang2_id']);
+                    $barangIdOutput = $barangMasterSpesifikasi['id'];
+                    $barangNameOutput = $barangMaster != null && $barangMasterSpesifikasi != null ? $barangMaster['barang_name'] . "-" . $barangMasterSpesifikasi['spesifikasi'] : '';
+                    $satuanOutput = $barangMasterSpesifikasi != null ? $satuanModel->find($barangMasterSpesifikasi['satuan_1']) : null;
+                    $satuanOutputName = $satuanOutput == null ? "-" : $satuanOutput['kode_satuan'];
+                } else {
+                    $kemasan = $kemasanModel->find($stockOutput['kemasan_id']);
+                    $barangNameOutput = $kemasan['name'];
+                    $satuanOutput = $satuanModel->find($kemasan['id']);
+                    $satuanOutputName = $satuanOutput == null ? "-" : $satuanOutput['kode_satuan'];
+                }
             } else {
-                $kemasan = $kemasanModel->find($stockOutput['kemasan_id']);
-                $barangNameOutput = $kemasan['name'];
-                $satuanOutput = $satuanModel->find($kemasan['id']);
+                $barangMasterSpesifikasi = $barangMasterSpesifikasiModel->find($m['barang_out_id']);
+                $barangMaster = $barangMasterModel->find($barangMasterSpesifikasi['barang_master_id']);
+                $barangNameOutput = $barangMaster != null && $barangMasterSpesifikasi != null ? $barangMaster['barang_name'] . "-" . $barangMasterSpesifikasi['spesifikasi'] : '';
+                $barangIdOutput = $barangMasterSpesifikasi['id'];
+                $satuanOutput = $barangMasterSpesifikasi != null ? $satuanModel->find($barangMasterSpesifikasi['satuan_1']) : null;
                 $satuanOutputName = $satuanOutput == null ? "-" : $satuanOutput['kode_satuan'];
             }
 
@@ -211,8 +221,9 @@ class ProsesRebusDetailModel extends Model
             $stockList['total_penerimaan'] = $totalPenerimaan ?? 0;
             $stockList['output'] = [
                 'barang' => $barangNameOutput,
+                'barang_id' => $barangIdOutput,
                 'kode_satuan' => $satuanOutputName,
-                'stock_id' => $stockOutput['id'],
+                'stock_id' => !empty($stockOutput['id']) ? $stockOutput['id'] : 0,
                 'qty' => $m['qty_hasil_rebus']
             ];
 
