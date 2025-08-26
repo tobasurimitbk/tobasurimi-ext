@@ -1105,7 +1105,7 @@ class SalesOrderExportModel extends Model
         $metaDataModel = new MetadataModel();
         $salesOrderExportModel = new SalesOrderExportModel();
 
-        $year = date('Y');
+        $year = date('y');
         if ($companyId == 1) {
             $codeInv = "TSI2";
         } elseif ($companyId == 2) {
