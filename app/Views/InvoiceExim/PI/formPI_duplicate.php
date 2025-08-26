@@ -10,44 +10,14 @@
 <!-- Begin Page Content -->
 <section class="section">
     <div class="section-header">
-        <h1 class="title-name"><?= !empty($dataPI) ? "Update Proforma Invoice" : "Tambah Proforma Invoice" ?></h1>
+        <h1 class="title-name">Duplikasi Proforma Invoice</h1>
         <div class="col-button-tambah-spp">
             <a class="btn btn-hide-form btn-discard float-right" href="<?= base_url("proforma-invoice/detail/" . encrypt($dataSalesOrderExport->sales_order_export_id)); ?>">
                 Kembali
             </a>
-            <?php if (!empty($dataPI)) { ?>
-                <?php if (can('Invoice Exim', 'Proforma Invoice', 'p')): ?>
-                    <button class="btn btn-warning btn-print float-right" onclick="print('<?= encrypt($dataPI['id']) ?>')">
-                        Print
-                    </button>
-                <?php endif; ?>
-                <?php if ($dataPI['status_posting'] == 0) { ?>
-                    <?php if (can('Invoice Exim', 'Proforma Invoice', 'a')) : ?>
-                        <button class="btn btn-success posting-spp posting-so float-right" onclick="posting('<?= encrypt($dataPI['id']) ?>')">
-                            Posting
-                        </button>
-                    <?php endif; ?>
-                <?php } ?>
-                <?php if ($dataPI['status_posting'] == 0) { ?>
-                    <?php if (can('Invoice Exim', 'Proforma Invoice', 'u')): ?>
-                        <button class="btn btn-show-form btn-save float-right btn-submit-parent">
-                            Update
-                        </button>
-                    <?php endif; ?>
-                <?php } ?>
-                <?php if ($dataPI['status_posting'] == 1 && $dataPI['status_bayar'] == 0) { ?>
-                    <?php if (can('Invoice Exim', 'Proforma Invoice', 'ua')) : ?>
-                        <button class="btn btn-success posting-spp posting-so float-right" onclick="unposting('<?= encrypt($dataPI['id']) ?>')">
-                            UnPosting
-                        </button>
-                    <?php endif; ?>
-                <?php } ?>
-
-            <?php } else { ?>
-                <button class="btn btn-show-form btn-save float-right btn-submit-parent">
-                    Simpan
-                </button>
-            <?php } ?>
+            <button class="btn btn-show-form btn-save float-right btn-submit-parent">
+                Duplikasi
+            </button>
         </div>
     </div>
     <div class="card">
@@ -111,10 +81,10 @@
                         <div class="form-floating mb-3" style="height: 50px;">
                             <div class="input-group input-group-password">
                                 <div class="form-floating mb-3" style="height: 50px;">
-                                    <input autocomplete="one-time-code" type="text" value="<?= !empty($dataPI) ? $dataPI['no_pi'] : 'AUTO GENERATE' ?>" <?= !empty($dataPI) ? ($dataPI['status_posting'] == 1 ? 'readonly' : '') : 'readonly' ?> class="form-control no_invoice_pi" id="no_invoice_pi" name="no_invoice_pi" placeholder="No Invoice PI" required>
+                                    <input readonly autocomplete="one-time-code" type="text" value="AUTO GENERATE" class="form-control no_invoice_pi" id="no_invoice_pi" name="no_invoice_pi" placeholder="No Invoice PI" required>
                                     <label for="floatingInput">No PI</label>
                                 </div>
-                                <div style="<?= !empty($dataPI) ? "display: none" : ""; ?>" class="input-generate input-group-prepend group-prepend-password align-items-center">
+                                <div class="input-generate input-group-prepend group-prepend-password align-items-center">
                                     <input checked autocomplete="one-time-code" style="z-index: 99; margin-bottom: 10px; margin-left: -30px;" class="auto_generate" id="auto_generate" name="auto_generate" type="checkbox" onchange="changeStatus()">
                                 </div>
                             </div>
@@ -124,7 +94,7 @@
                         <div class="form-floating mb-3" style="height: 50px;">
                             <div class="input-group input-group-password">
                                 <div class="form-floating mb-3" style="height: 50px;">
-                                    <input <?= !empty($dataPI) ? ($dataPI['status_posting'] == 1 ? 'readonly' : '') : '' ?> autocomplete="one-time-code" class="form-control input-picker tanggal_pi" id="tanggal_pi" name="tanggal_pi" placeholder="Tanggal PI" value="<?= !empty($dataPI) ? date('d/m/Y', strtotime($dataPI['tanggal_pi'])) : date('d/m/Y')  ?>">
+                                    <input autocomplete="one-time-code" class="form-control input-picker tanggal_pi" id="tanggal_pi" name="tanggal_pi" placeholder="Tanggal PI" value="<?= !empty($dataPI) ? date('d/m/Y', strtotime($dataPI['tanggal_pi'])) : date('d/m/Y')  ?>">
                                     <label for="floatingInput">Tanggal PI</label>
                                 </div>
                                 <div class="input-group-prepend group-prepend-password align-items-center">
@@ -135,7 +105,7 @@
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <select <?= !empty($dataPI) ? ($dataPI['status_posting'] == 1 ? 'disabled' : '') : '' ?> class="form-select valas_id" id="valas_id" name="valas_id">
+                            <select class="form-select valas_id" id="valas_id" name="valas_id">
                                 <option value=""></option>
                                 <?php foreach ($dataValuta as $d) : ?>
                                     <option <?= !empty($dataPI) ? ($dataPI['valas_id'] == $d['id'] ? 'selected' : '') : '' ?> value="<?= $d["id"]; ?>"><?= $d["value"]  ?></option>
@@ -146,19 +116,19 @@
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3">
-                            <textarea <?= !empty($dataPI) ? ($dataPI['status_posting'] == 1 ? 'readonly' : '') : '' ?> class="full-textarea form-control payment_term_parent" id="payment_term_parent" name="payment_term_parent" placeholder="Payment Term"><?= !empty($dataPI) ? $dataPI['payment_term'] : strip_tags($dataSalesOrderExport->payment_term); ?></textarea>
+                            <textarea class="full-textarea form-control payment_term_parent" id="payment_term_parent" name="payment_term_parent" placeholder="Payment Term"><?= !empty($dataPI) ? $dataPI['payment_term'] : strip_tags($dataSalesOrderExport->payment_term); ?></textarea>
                             <label for="floatingInput">Term Of Payment</label>
                         </div>
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3">
-                            <textarea <?= !empty($dataPI) ? ($dataPI['status_posting'] == 1 ? 'readonly' : '') : '' ?> class="full-textarea form-control payment_instruction" id="payment_instruction" name="payment_instruction" placeholder="Payment Instruction"><?= !empty($dataPI) ? $dataPI['payment_instruction'] : '' ?></textarea>
+                            <textarea class="full-textarea form-control payment_instruction" id="payment_instruction" name="payment_instruction" placeholder="Payment Instruction"><?= !empty($dataPI) ? $dataPI['payment_instruction'] : '' ?></textarea>
                             <label for="floatingInput">Payment Instruction</label>
                         </div>
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <select <?= !empty($dataPI) ? ($dataPI['status_posting'] == 1 ? 'disabled' : '') : '' ?> class="form-select bank_id" id="bank_id" name="bank_id">
+                            <select class="form-select bank_id" id="bank_id" name="bank_id">
                                 <option value=""></option>
                                 <?php foreach ($dataBank as $d) : ?>
                                     <option <?= !empty($dataPI) ? ($dataPI['bank_id'] == $d['id'] ? 'selected' : '') : '' ?> value="<?= $d["id"]; ?>"><?= $d["name"] . " - " . $d['atas_nama'] . " - " . $d['no_rekening']; ?></option>
@@ -170,13 +140,13 @@
 
                     <div class="col-md-4">
                         <div class="form-floating mb-3">
-                            <input value="<?= !empty($dataPI) ? $dataPI['packing'] : '' ?>" <?= !empty($dataPI) ? ($dataPI['status_posting'] == 1 ? 'readonly' : '') : '' ?> autocomplete="one-time-code" type="text" class="form-control packing" id="packing" name="packing">
+                            <input value="<?= !empty($dataPI) ? $dataPI['packing'] : '' ?>" autocomplete="one-time-code" type="text" class="form-control packing" id="packing" name="packing">
                             <label for="floatingInput">Packing</label>
                         </div>
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3">
-                            <input value="<?= !empty($dataPI) ? $dataPI['packing'] : '' ?>" <?= !empty($dataPI) ? ($dataPI['status_posting'] == 1 ? 'readonly' : '') : '' ?> autocomplete="one-time-code" type="text" class="form-control penanda_tangan" id="penanda_tangan" name="penanda_tangan">
+                            <input value="<?= !empty($dataPI) ? $dataPI['packing'] : '' ?>" autocomplete="one-time-code" type="text" class="form-control penanda_tangan" id="penanda_tangan" name="penanda_tangan">
                             <label for="floatingInput">Penanda Tangan</label>
                         </div>
                     </div>
@@ -194,7 +164,7 @@
                             <label class="form-label font-weight-bold lable-title">List Barang Ekspor</label>
                         </div>
                         <div class="col-md-6">
-                            <button <?= !empty($dataPI) ? ($dataPI['status_posting'] == 1 ? 'disabled' : '') : '' ?> class="btn btn-show-detail btn-add btn-block float-right" id="btnAddBarang" type="button" style="width: 90% !important;">
+                            <button class="btn btn-show-detail btn-add btn-block float-right" id="btnAddBarang" type="button" style="width: 90% !important;">
                                 <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
                             </button>
                         </div>
@@ -233,7 +203,7 @@
                             <label class="form-label font-weight-bold lable-title">List Payment Term</label>
                         </div>
                         <div class="col-md-6">
-                            <button <?= !empty($dataPI) ? ($dataPI['status_posting'] == 1 ? 'disabled' : '') : '' ?> class="btn btn-show-detail btn-add btn-block float-right" id="btnAddPaymentTerm" type="button" style="width: 90% !important;">
+                            <button class="btn btn-show-detail btn-add btn-block float-right" id="btnAddPaymentTerm" type="button" style="width: 90% !important;">
                                 <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
                             </button>
                         </div>
@@ -772,11 +742,10 @@
                     confirmButtonColor: '#4e73df',
                 })
             } else {
-                var id = $('#id').val();
                 if ($("#form-parent").valid()) {
                     Swal.fire({
                         icon: 'question',
-                        title: id ? 'Update Data ?' : 'Simpan Data ?',
+                        title: 'Duplikasi Data ?',
                         confirmButtonColor: '#4e73df',
                         cancelButtonColor: '#d33',
                         showCancelButton: true,
@@ -786,8 +755,7 @@
                     }).then((result) => {
                         if (result.isConfirmed) {
                             const csrf = $(`[name="${csrfToken}"]`);
-                            let id = $('#id').val();
-                            let url = id == '' ? "<?= base_url('proforma-invoice/create') ?>" : "<?= base_url('proforma-invoice/update') ?>";
+                            let url = "<?= base_url('proforma-invoice/create') ?>";
                             let data = new FormData(document.querySelector("#form-parent"));
                             let totalPI = destroyFormatRupiah($('#total_pi').val());
 
@@ -882,16 +850,13 @@
                     <td class="text-right">${greatFormatRupiah(item.harga_satuan)}</td>
                     <td class="text-right">${greatFormatRupiah(item.total_harga)}</td>
                     <td class="text-center">
-                        <?php if (!empty($dataPI) && $dataPI['status_posting'] == 1) : ?>
-                            -
-                        <?php else : ?>
+                    
                             <button type="button" class="btn btn-warning posting-spp mr-1" onclick="detailRowBarang('${item.id_barang}')">
                                 <i class="fa fa-pencil fa-sm"></i>
                             </button>
                             <button type="button" class="btn btn-danger" onclick="deleteRowBarang('${item.id_barang}')">
                                 <i class="fa fa-trash fa-sm"></i>
                             </button>
-                        <?php endif; ?>
                     </td>
                 </tr>
             `);
@@ -938,25 +903,13 @@
                 newRow.append($('<td>').text(item.payment_term));
                 newRow.append($('<td class="text-right">').text(greatFormatRupiah(item.nilai_payment_term)));
                 newRow.append($('<td class="text-right">').html(
-                    <?php if (!empty($dataPI)) : ?> <?php if ($dataPI['status_posting'] == 1) : ?> `-`
-                        <?php else : ?> `
-                        <button type="button" class="btn btn-warning posting-spp mr-1" onclick="detailRowPaymentTerm('${item.id_payment_term}')">
-                                <i class="fa fa-pencil fa-sm" aria-hidden="true"></i>
-                            </button>
-                            <button type="button" class="btn btn-danger" onclick="deleteRowPaymentTerm('${item.id_payment_term}')">
-                                <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
-                            </button>
                     `
-                        <?php endif; ?>
-
-                    <?php else : ?> `
                         <button type="button" class="btn btn-warning posting-spp mr-1" onclick="detailRowPaymentTerm('${item.id_payment_term}')">
                                 <i class="fa fa-pencil fa-sm" aria-hidden="true"></i>
                             </button><button type="button" class="btn btn-danger" onclick="deleteRowPaymentTerm('${item.id_payment_term}')">
                                 <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
                             </button>
                     `
-                    <?php endif; ?>
                 ));
 
                 table.find('tbody').append(newRow);

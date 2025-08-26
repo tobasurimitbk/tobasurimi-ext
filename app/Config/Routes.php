@@ -849,6 +849,15 @@ $routes->get('/proforma-invoice', 'InvoiceExim\PI\PI::index', ['filter' => 'Auth
 $routes->get('/proforma-invoice/all-order-form', 'InvoiceExim\PI\PI::allOrderForm', ['filter' => 'Auth']);
 $routes->get('/proforma-invoice/detail/(:segment)', 'InvoiceExim\PI\PI::indexPI/$1', ['filter' => 'Auth']);
 $routes->get('/proforma-invoice/create/(:segment)', 'InvoiceExim\PI\PI::createPI/$1', ['filter' => 'Auth']);
+$routes->post('/proforma-invoice/create', 'InvoiceExim\PI\PI::storePI', ['filter' => 'Auth']);
+$routes->post('/proforma-invoice/update', 'InvoiceExim\PI\PI::updatePI', ['filter' => 'Auth']);
+$routes->post('/proforma-invoice/delete', 'InvoiceExim\PI\PI::destroyPI', ['filter' => 'Auth']);
+$routes->post('/proforma-invoice/posting', 'InvoiceExim\PI\PI::postingPI', ['filter' => 'Auth']);
+$routes->post('/proforma-invoice/unposting', 'InvoiceExim\PI\PI::unpostingPI', ['filter' => 'Auth']);
+$routes->get('/proforma-invoice/all-pi', 'InvoiceExim\PI\PI::allPI', ['filter' => 'Auth']);
+$routes->get('/proforma-invoice/duplicate/(:segment)', 'InvoiceExim\PI\PI::duplicatePI/$1', ['filter' => 'Auth']);
+$routes->get('/proforma-invoice/id/(:segment)', 'InvoiceExim\PI\PI::editPI/$1', ['filter' => 'Auth']);
+$routes->get('/proforma-invoice/print/(:segment)', 'InvoiceExim\PI\PI::printPI/$1', ['filter' => 'Auth']);
 
 // $routes->get('/pi-peb/get', 'BiayaExim\PIPeb\PIPeb::getPiPeb', ['filter' => 'Auth']);
 // $routes->post('/pi-peb/update', 'BiayaExim\PIPeb\PIPeb::updatePiPeb', ['filter' => 'Auth']);
