@@ -457,7 +457,7 @@
                 type_barang: "<?= $m['type_barang'] ?>",
                 type_barang_text: "<?= $m['type_barang_text'] ?>",
                 stock_date: "<?= $m['stock_date'] ?>",
-                qty: "<?= floatval($m['qty']) ?>",
+                qty: "<?= floatval($m['qty']) + (!empty($m['qty_kotor']) ? floatval($m['qty_kotor']) : 0) ?>",
             });
         <?php endforeach; ?>
         drawTableSelectedItem(listStockSelected);
@@ -780,28 +780,14 @@
 
                 if (typePengambilanStock == "PABEAN") {
                     $.each(listStockSelected, function(i, v) {
-                        var element = $('input[data-id="' + v.id + '"].stok-out');
-                        var input_user = parseFloat(element.val());
-                        var stok_max = parseFloat(element.data('stok_total'));
-
-                        if (input_user > stok_max || isNaN(input_user) || input_user == undefined || input_user == 0) {
-                            dataError = listStockSelected[i];
-                            isValid = false;
-                        } else {
-                            listStockSelected[i].qty = input_user;
-                        }
+                        const $el = $('input[data-id="' + v.id + '"].stok-out');
+                        const input_user = destroyFormatRupiah($el.val()); // <= INI KUNCI
+                        const stok_max = Number($el.data('stok_total')) || 0;
+                        listStockSelected[i].qty = input_user;
                     });
                 }
 
 
-                if (!isValid) {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Stok keluar, barang ' + dataError.barang + ' dengan dokumen ' + dataError.bc_type + ' / ' + dataError.no_aju + ' tidak valid!',
-                        confirmButtonColor: '#4e73df',
-                        confirmButtonText: 'Ok'
-                    });
-                } else {
                     Swal.fire({
                         icon: 'question',
                         title: 'Simpan Data ?',
@@ -895,7 +881,6 @@
                             }
                         }
                     });
-                }
 
             }
         }
@@ -1205,9 +1190,6 @@
                 updateGrandTotal();
             });
         }
-
-
-
     }
     
 
@@ -1286,16 +1268,13 @@
 
     // fungsi hitung ulang total
     function updateGrandTotal() {
-        var total = 0;
-        $('.stok-out').each(function() {
-            var val = $(this).val();
-            if (val && !isNaN(val)) {
-                total += parseFloat(val);
-            }
+        let total = 0;
+        $('.stok-out').each(function () {
+            total += destroyFormatRupiah($(this).val());
         });
-
-        // update ke row grand total
-        $('#selectedItemTable tbody tr.grand-total td.total-cell').text(greatFormatRupiah(total) + '.00');
+        // tampilkan clean (ga perlu paksa ".00", kalau mau tambahin ya boleh)
+        $('#selectedItemTable tbody tr.grand-total td.total-cell')
+            .text(greatFormatRupiah(total));
     }
 
 

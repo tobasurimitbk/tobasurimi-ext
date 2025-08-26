@@ -333,6 +333,7 @@ class JasaVendorOutDetailModel extends Model
                 ->first();
 
             $stockList['qty'] = $m['qty'] ?? 0;
+            $stockList['qty_kotor'] = $m['qty_kotor'] ?? 0;
             $bcType = isset($stockList['bc_id']) ? $metaDataModel->find($stockList['bc_id']) : null;
             $stockList['no_aju'] = isset($stockList['no_aju']) && $stockList['no_aju'] !== "-" ? $stockList['no_aju'] : "-";
             $stockList['bc_type'] = $bcType['value'] ?? "NON PABEAN";
