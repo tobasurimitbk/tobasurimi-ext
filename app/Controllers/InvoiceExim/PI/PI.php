@@ -1,23 +1,32 @@
 <?php
 
-namespace App\Controllers\BiayaExim\PIPeb;
+namespace App\Controllers\InvoiceExim\PI;
 
 use App\Controllers\BaseController;
+use App\Models\BanksModel;
+use App\Models\DivisisModel;
 use App\Models\MetadataModel;
 use App\Models\SalesOrderExportModel;
+use App\Models\SatuansModel;
 use Exception;
 
-class PIPeb extends BaseController
+class PI extends BaseController
 {
     protected $this_company_id;
     protected $salesOrderExportModel;
     protected $metaDataModel;
+    protected $divisiModel;
+    protected $bankModel;
+    protected $satuanModel;
 
     public function __construct()
     {
         $this->salesOrderExportModel = new SalesOrderExportModel();
         $this->this_company_id = session()->get("login")->this_company_id;
         $this->metaDataModel = new MetadataModel();
+        $this->divisiModel = new DivisisModel();
+        $this->bankModel = new BanksModel();
+        $this->satuanModel = new SatuansModel();
     }
 
     public function index()
@@ -26,10 +35,10 @@ class PIPeb extends BaseController
         $data = [
             "dataValuta" => $dataValuta
         ];
-        return view('BiayaExim/PIPeb/index', $data);
+        return view('InvoiceExim/PI/index', $data);
     }
 
-    public function all()
+    public function allOrderForm()
     {
         $payload = [
             "pageSize"      => $this->request->getGet("length"),
@@ -50,14 +59,13 @@ class PIPeb extends BaseController
             "search"        => $this->request->getGet("search"),
             "sort"          => $this->request->getGet("sort"),
             "sortType"      => $this->request->getGet("sortType"),
-            "status_invoice" => $this->request->getGet("status_invoice"),
             "dateStart"     => $this->request->getVar("dateStart") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateStart")))) : "",
             "dateEnd"       => $this->request->getVar("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateEnd")))) : "",
         ];
 
         $limit = $this->request->getGet("length");
         $offset = $this->request->getGet("start");
-        $salesData = $this->salesOrderExportModel->getListPiPeb($condition, $addCondition, $limit, $offset);
+        $salesData = $this->salesOrderExportModel->getListPeb($condition, $addCondition, $limit, $offset);
 
         $dataSales = [];
 
@@ -66,17 +74,14 @@ class PIPeb extends BaseController
         foreach ($salesData['data'] as $data) {
             array_push($dataSales, [
                 "no"                        => $no++,
-                "id"                        => $data->sales_order_export_id,
+                "id"                        => \encrypt($data->sales_order_export_id),
                 "no_invoice"                => $data->no_invoice,
                 "tanggal_invoice"           => $data->tanggal_invoice != "" ? date('d/m/Y', strtotime($data->tanggal_invoice)) : "-",
                 "customer_name"             => $data->customer_name,
                 "sales_order_export_no"     => $data->sales_order_export_no,
                 "dicharge_port"             => $data->dicharge_port,
                 "status_invoice"            => $data->status_invoice,
-                "nilai_pi"                  => $data->valas_pi_name == null ? "" :  "(" . $data->valas_pi_name . ") " . \number_format($data->shipment_value, 2),
-                "nilai_peb"                 =>  $data->valas_peb_name == null ? "" : "(" . $data->valas_peb_name . ") " . \number_format($data->nilai_peb, 2),
-                "nilai_peb_idr"                 => $data->nilai_peb_idr == null ? "" :  (float)$data->nilai_peb_idr,
-                "exchange_rate_peb"                 => $data->exchange_rate_peb == null ? "" :  (float)$data->exchange_rate_peb,
+                "nilai_peb"                 =>  "(" . $data->valas_peb_name . ") " . \number_format($data->shipment_value, 2),
             ]);
         }
 
@@ -90,6 +95,43 @@ class PIPeb extends BaseController
 
         echo json_encode($data);
         return;
+    }
+
+    public function indexPI($id)
+    {
+        $id = \decrypt($id);
+        $dataSalesOrderExport = $this->salesOrderExportModel->getById($id);
+        if ($dataSalesOrderExport == null) {
+            return \redirect()->to('proforma-invoice');
+        }
+
+        $data = [
+            'dataSalesOrderExport' => $dataSalesOrderExport
+        ];
+
+        return view('InvoiceExim/PI/indexPI', $data);
+    }
+
+    public function createPI($id)
+    {
+        $id = \decrypt($id);
+        $dataSalesOrderExport = $this->salesOrderExportModel->getById($id);
+        if ($dataSalesOrderExport == null) {
+            return \redirect()->to('proforma-invoice');
+        }
+        $dataValuta = $this->metaDataModel->where('name', "Valuta")->orderBy('value', "asc")->findAll();
+        $dataBank = $this->bankModel->where('company_id', $this->this_company_id)->findAll();
+        $dataSatuan = $this->satuanModel->findAll();
+
+        $data = [
+            'dataSalesOrderExport' => $dataSalesOrderExport,
+            'dataDivisi' => $this->divisiModel->getDivisiAccess(),
+            'dataValuta' => $dataValuta,
+            'dataBank' => $dataBank,
+            'dataSatuan' => $dataSatuan
+        ];
+
+        return view('InvoiceExim/PI/formPI', $data);
     }
 
     public function updatePiPeb()

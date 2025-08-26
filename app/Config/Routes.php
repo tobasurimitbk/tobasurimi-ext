@@ -843,11 +843,15 @@ $routes->get('/biaya-lokal/export-excel', 'BiayaExim\BiayaLokal\BiayaLokal::expo
 $routes->get('/biaya-lokal/get-status-posting', 'BiayaExim\BiayaLokal\BiayaLokal::getStatusPosting', ['filter' => 'Auth']);
 $routes->get('/biaya-lokal/detail/(:segment)', 'BiayaExim\BiayaLokal\BiayaLokal::detail/$1', ['filter' => 'Auth']);
 
-// PI & PEB
-$routes->get('/pi-peb', 'BiayaExim\PIPeb\PIPeb::index', ['filter' => 'Auth']);
-$routes->get('/pi-peb/all', 'BiayaExim\PIPeb\PIPeb::all', ['filter' => 'Auth']);
-$routes->get('/pi-peb/get', 'BiayaExim\PIPeb\PIPeb::getPiPeb', ['filter' => 'Auth']);
-$routes->post('/pi-peb/update', 'BiayaExim\PIPeb\PIPeb::updatePiPeb', ['filter' => 'Auth']);
+// INVOICE EXIM
+// PI
+$routes->get('/proforma-invoice', 'InvoiceExim\PI\PI::index', ['filter' => 'Auth']);
+$routes->get('/proforma-invoice/all-order-form', 'InvoiceExim\PI\PI::allOrderForm', ['filter' => 'Auth']);
+$routes->get('/proforma-invoice/detail/(:segment)', 'InvoiceExim\PI\PI::indexPI/$1', ['filter' => 'Auth']);
+$routes->get('/proforma-invoice/create/(:segment)', 'InvoiceExim\PI\PI::createPI/$1', ['filter' => 'Auth']);
+
+// $routes->get('/pi-peb/get', 'BiayaExim\PIPeb\PIPeb::getPiPeb', ['filter' => 'Auth']);
+// $routes->post('/pi-peb/update', 'BiayaExim\PIPeb\PIPeb::updatePiPeb', ['filter' => 'Auth']);
 
 // PRODUKSI
 // Production Result
