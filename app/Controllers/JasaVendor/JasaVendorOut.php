@@ -718,7 +718,7 @@ class JasaVendorOut extends BaseController
                         'bc_type' => $bcType ? $bcType['value'] : 'NON PABEAN',
                         'stock_dokumen' => $item['stock_dokumen'] ?? '-',
                         'stock_date' => date('d/m/Y', strtotime($item['stock_date'])),
-                        'barang' => $item['barang_name'],
+                        'barang' => $item['barang'],
                         'satuan' => $item['kode_satuan'],
                         'stok_total' => floatval($item['stok_total'])
                     ];
