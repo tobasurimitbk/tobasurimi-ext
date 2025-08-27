@@ -7,7 +7,7 @@ use App\Models\CustomerModel;
 use App\Models\SalesOrderInvoiceModel;
 use Dompdf\Dompdf;
 
-class PenjualanPerPelanggan extends BaseController
+class RincianPenjualanPerPelanggan extends BaseController
 {
     protected $this_company_id;
     protected $customerModel;
@@ -26,7 +26,7 @@ class PenjualanPerPelanggan extends BaseController
         $data = [
             'customer' => $customerData
         ];
-        return view('Laporan/LaporanSales/LaporanPerPelanggan/index', $data);
+        return view('Laporan/LaporanSales/LaporanRincianPerPelanggan/index', $data);
     }
 
     public function allTransaksi()
@@ -80,6 +80,8 @@ class PenjualanPerPelanggan extends BaseController
                         "total_invoice" => '',
                         "nama_pelanggan" => '',
                         "nama_sales" => '',
+                        "amt_harga_pokok" => '',
+                        "amt_laba" => '',
                         "is_total" => true,
                     ]);
                 }
@@ -98,6 +100,8 @@ class PenjualanPerPelanggan extends BaseController
                     "total_invoice" => '',
                     "nama_pelanggan" => '',
                     "nama_sales" => '',
+                    "amt_harga_pokok" => '',
+                    "amt_laba" => '',
                     "is_customer" => true,
                 ]);
             }
@@ -109,13 +113,15 @@ class PenjualanPerPelanggan extends BaseController
                 "no_faktur" => $data->no_faktur,
                 "tanggal_faktur" => $data->tanggal_faktur,
                 "keterangan" => $data->keterangan,
-                "total_invoice" => number_format(floatval($data->total_invoice)),
+                "total_invoice" => number_format(floatval($data->sum_amount_invoice)),
                 "nama_pelanggan" => $data->nama_pelanggan,
                 "nama_sales" => $data->salesName,
+                "amt_harga_pokok" => number_format(floatval($data->amt_harga_pokok)),
+                "amt_laba" => number_format(floatval($data->sum_amount_invoice) - (floatval($data->amt_harga_pokok))),
             ]);
 
             // Accumulate the total invoice per customer
-            $totalPerCustomer += floatval($data->total_invoice);
+            $totalPerCustomer += floatval($data->sum_amount_invoice);
         }
 
         // Add the total for the last customer
@@ -249,10 +255,10 @@ class PenjualanPerPelanggan extends BaseController
 
         // return view('Laporan/LaporanSales/LaporanPerPelanggan/print', $data);
 
-        $dompdf->loadHtml(view('Laporan/LaporanSales/LaporanPerPelanggan/print', $data));
+        $dompdf->loadHtml(view('Laporan/LaporanSales/LaporanRincianPerPelanggan/print', $data));
         $dompdf->setPaper('A4', 'landscape');
         $dompdf->render();
-        $dompdf->stream("Laporan Penjualan Per Pelanggan ", array("Attachment" => false));
+        $dompdf->stream("Laporan Rincian Penjualan Per Pelanggan ", array("Attachment" => false));
 
         exit(0);
     }

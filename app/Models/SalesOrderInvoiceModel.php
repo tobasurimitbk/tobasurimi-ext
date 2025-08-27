@@ -88,14 +88,22 @@ class SalesOrderInvoiceModel extends Model
         $sort = $availableSort[$addCondition['sort'] ?? 'createdAt'] ?? 'sales_order_invoice.createdAt';
         $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'DESC';
 
-        $selectQry = "sales_order_invoice.*,
+        $selectQry = "
+        sales_order_invoice.id,
+        sales_order_invoice.no_faktur,
+        sales_order_invoice.keterangan,
+        sales_order_invoice.total_invoice,
         sales_order_invoice.document_no AS doc_no,
         sales_order_invoice.document_type AS doc_type,
                       DATE_FORMAT(sales_order_invoice.tanggal_faktur, '%d/%m/%Y') AS tanggal_faktur,
                       customers.name AS nama_pelanggan,
                       customers.kode AS kode_pelanggan,
                       CONCAT(employees.nip , ' - ', employees.name) AS salesName,
-                      IFNULL(sales_order.no_sales_order, surat_jalan_so.no_surat_jalan) AS document_no";
+                      IFNULL(sales_order.no_sales_order, surat_jalan_so.no_surat_jalan) AS document_no,
+                      SUM(barang_master_sales.harga_pokok) AS sum_harga_pokok,
+                      SUM(barang_master_sales.harga_pokok * sales_order_invoice_detail.qty_invoice) AS amt_harga_pokok,
+                      SUM(sales_order_invoice_detail.qty_invoice) AS sum_qty_invoice,
+                      SUM(sales_order_invoice_detail.amount_invoice) AS sum_amount_invoice";
 
         $salesOrderInvoiceLokal = $this->asObject()
             ->select($selectQry)
@@ -103,7 +111,10 @@ class SalesOrderInvoiceModel extends Model
             ->join('employees', 'employees.id = customers.sales_id', 'left')
             ->join('sales_order', 'sales_order.id = sales_order_invoice.document_id AND sales_order_invoice.document_type = "pesanan"', 'LEFT')
             ->join('surat_jalan_so', 'surat_jalan_so.id = sales_order_invoice.document_id AND sales_order_invoice.document_type = "pengiriman"', 'LEFT')
+            ->join('sales_order_invoice_detail', 'sales_order_invoice_detail.id_sales_order_invoice = sales_order_invoice.id', 'LEFT')
+            ->join('barang_master_sales', 'barang_master_sales.id = sales_order_invoice_detail.id_barang_invoice', 'LEFT')
             ->where($condition)
+            ->groupBy('sales_order_invoice.id')
             ->orderBy($sort, $sortType);
 
         $totalData = $salesOrderInvoiceLokal->countAllResults(false);
