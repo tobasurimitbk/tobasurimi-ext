@@ -641,6 +641,7 @@
                         data.append('listBarang', JSON.stringify(listBarang));
                         data.append('listPerolehanGaji', JSON.stringify(listPerolehanGaji));
                         data.append("listBonus", JSON.stringify(listBonus));
+                        data.append("listDataVendor", JSON.stringify(listDataVendor));
 
                         if (id) {
                             // UPDATE
@@ -966,21 +967,21 @@
                         v.mh = vendorData.komisi_vendor || v.mh;
                         v.cf = vendorData.komisi_vendor || v.cf;
                     } else if (v.value === 'bonus_kg_daging') {
-                        v.jumbo = vendorData.bonus_vendor || v.jumbo;
-                        v.ex_lump = vendorData.bonus_vendor || v.ex_lump;
-                        v.lump = vendorData.bonus_vendor || v.lump;
-                        v.special = vendorData.bonus_vendor || v.special;
-                        v.claw = vendorData.bonus_vendor || v.claw;
-                        v.mh = vendorData.bonus_vendor || v.mh;
-                        v.cf = vendorData.bonus_vendor || v.cf;
+                        v.jumbo = vendorData.bonus_jb || v.jumbo;
+                        v.ex_lump = vendorData.bonus_xl || v.ex_lump;
+                        v.lump = vendorData.bonus_lp || v.lump;
+                        v.special = vendorData.bonus_sp || v.special;
+                        v.claw = vendorData.bonus_cl || v.claw;
+                        v.mh = vendorData.bonus_mh || v.mh;
+                        v.cf = vendorData.bonus_cf || v.cf;
                     } else if (v.value === 'tamb_upah_kopek') {
-                        v.jumbo = vendorData.bonus_karyawan_jb || v.jumbo;
-                        v.ex_lump = vendorData.bonus_karyawan_xl || v.ex_lump;
-                        v.lump = vendorData.bonus_karyawan_lp || v.lump;
-                        v.special = vendorData.bonus_karyawan_sp || v.special;
-                        v.claw = vendorData.bonus_karyawan_cl || v.claw;
-                        v.mh = vendorData.bonus_karyawan_mh || v.mh;
-                        v.cf = vendorData.bonus_karyawan_cf || v.cf;
+                        v.jumbo = vendorData.tambahan_upah_kopek_jb || v.jumbo;
+                        v.ex_lump = vendorData.tambahan_upah_kopek_xl || v.ex_lump;
+                        v.lump = vendorData.tambahan_upah_kopek_lp || v.lump;
+                        v.special = vendorData.tambahan_upah_kopek_sp || v.special;
+                        v.claw = vendorData.tambahan_upah_kopek_cl || v.claw;
+                        v.mh = vendorData.tambahan_upah_kopek_mh || v.mh;
+                        v.cf = vendorData.tambahan_upah_kopek_cf || v.cf;
                     }
 
                     var total = parseFloat(v.jumbo) + parseFloat(v.ex_lump) + parseFloat(v.lump) + parseFloat(v.special) + parseFloat(v.claw) + parseFloat(v.mh) + parseFloat(v.cf);
@@ -1208,19 +1209,19 @@
             $.each(listBonus, function(i, v) {
                 // Gunakan nilai bonus dari vendor jika tersedia
                 if (v.spesifikasi === "JB") {
-                    v.bonus_nominal = vendorData.bonus_jb || v.bonus_nominal;
+                    v.bonus_nominal = vendorData.bonus_karyawan_jb || v.bonus_nominal;
                 } else if (v.spesifikasi === "SP LUMP") {
-                    v.bonus_nominal = vendorData.bonus_xl || v.bonus_nominal;
+                    v.bonus_nominal = vendorData.bonus_karyawan_xl || v.bonus_nominal;
                 } else if (v.spesifikasi === "BF") {
-                    v.bonus_nominal = vendorData.bonus_lp || v.bonus_nominal;
+                    v.bonus_nominal = vendorData.bonus_karyawan_lp || v.bonus_nominal;
                 } else if (v.spesifikasi === "SPL") {
-                    v.bonus_nominal = vendorData.bonus_sp || v.bonus_nominal;
+                    v.bonus_nominal = vendorData.bonus_karyawan_sp || v.bonus_nominal;
                 } else if (v.spesifikasi === "CLAW") {
-                    v.bonus_nominal = vendorData.bonus_cl || v.bonus_nominal;
+                    v.bonus_nominal = vendorData.bonus_karyawan_cl || v.bonus_nominal;
                 } else if (v.spesifikasi === "MH") {
-                    v.bonus_nominal = vendorData.bonus_mh || v.bonus_nominal;
+                    v.bonus_nominal = vendorData.bonus_karyawan_mh || v.bonus_nominal;
                 } else if (v.spesifikasi === "CF") {
-                    v.bonus_nominal = vendorData.bonus_cf || v.bonus_nominal;
+                    v.bonus_nominal = vendorData.bonus_karyawan_cf || v.bonus_nominal;
                 }
                 
                 var totalBonus = 0;
@@ -1424,7 +1425,6 @@
         data.append('listBarang', JSON.stringify(listBarang));
         data.append('listPerolehanGaji', JSON.stringify(listPerolehanGaji));
         data.append("listBonus", JSON.stringify(listBonus));
-        data.append("listDataVendor", JSON.stringify(listDataVendor));
 
         if (request) {
             request.abort();
