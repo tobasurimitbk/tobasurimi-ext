@@ -717,6 +717,12 @@ class JasaVendorOut extends BaseController
                     
                     $bcType = $this->metaDataModel->find($item['bc_id']);
                     $stock = $this->stockModel->find($item['stock_id']);
+
+                    if ($item['sumber'] == "LPB") {
+                        $tanggal = date('d/m/Y', strtotime($this->rmPurchaseOrderModel->where('po_no', $item['stock_dokumen'])->first()['po_date']));
+                    } else {
+                        $tanggal = date('d/m/Y', strtotime($item['stock_date']));
+                    }
                     
                     $resultArr[] = [
                         'id' => $item['id'],
@@ -726,7 +732,7 @@ class JasaVendorOut extends BaseController
                         'supplier_name' => $item['supplier_name'],
                         'bc_type' => $bcType ? $bcType['value'] : 'NON PABEAN',
                         'stock_dokumen' => $item['stock_dokumen'] ?? '-',
-                        'stock_date' => date('d/m/Y', strtotime($item['stock_date'])),
+                        'stock_date' => $tanggal,
                         'barang' => $item['barang'],
                         'satuan' => $item['kode_satuan'],
                         'stok_total' => floatval($item['stok_total'])

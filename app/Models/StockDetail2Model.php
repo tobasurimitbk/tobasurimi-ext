@@ -690,7 +690,7 @@ class StockDetail2Model extends Model
                 stock_details2.bc_id,
                 stock_details2.no_aju,
                 stock_details2.supplier_id,
-                penerimaan_barang.tanggal as stock_date,
+                stock_details.stock_date,
                 stock_details.sumber,
                 CONCAT(barang_master.barang_name, " ", barang_master_spesifikasi.spesifikasi) AS barang,
                 satuans.kode_satuan,
@@ -699,7 +699,6 @@ class StockDetail2Model extends Model
 
             ')
             ->join('stock_details', 'stock_details.id = stock_details2.stock_detail_id')
-            ->join('penerimaan_barang', 'penerimaan_barang.no_penerimaan_barang = stock_details.no_dokumen', 'left')
             ->join('suppliers', 'suppliers.id = stock_details2.supplier_id', 'left')
             ->join('stock', 'stock.id = stock_details2.stock_id', 'left')
             ->join('barang_master', 'barang_master.id = stock.barang1_id', 'left')
