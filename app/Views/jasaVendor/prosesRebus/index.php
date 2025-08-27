@@ -85,6 +85,8 @@
                             <th onclick="changeSort('proses_rebus.createdAt')">Tanggal</th>
                             <th onclick="changeSort('divisi_id')">Departemen</th>
                             <th onclick="changeSort('warehouse_id')">Warehouse</th>
+                            <th>Barang Rebus</th>
+                            <th>Barang Hasil Rebus</th>
                             <th>Total Item</th>
                             <th>Action</th>
                         </tr>
@@ -158,6 +160,14 @@
             },
             {
                 data: "warehouse_name",
+                className: "text-center"
+            },
+            {
+                data: "barang_rebus",
+                className: "text-center"
+            },
+            {
+                data: "barang_hasi_rebus",
                 className: "text-center"
             },
             {
