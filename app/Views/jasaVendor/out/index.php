@@ -85,6 +85,7 @@
                             <th onclick="changeSort('jasa_vendor_out.createdAt')">Tanggal</th>
                             <th onclick="changeSort('divisi_id')">Departemen</th>
                             <th onclick="changeSort('warehouse_id')">Warehouse</th>
+                            <th>Barang</th>
                             <th>Total Item</th>
                             <th onclick="changeSort('vendor_id')">Vendor</th>
                             <th onclick="changeSort('status_closed')">Status</th>
@@ -161,6 +162,12 @@
             {
                 data: "warehouse_name",
                 className: "text-center"
+            },
+            {
+                data: "barang_name",
+                className: "text-center",
+                searchable: false,
+                sortable: false
             },
             {
                 data: "total_item",

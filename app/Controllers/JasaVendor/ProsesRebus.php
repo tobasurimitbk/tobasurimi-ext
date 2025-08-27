@@ -101,6 +101,34 @@ class ProsesRebus extends BaseController
                 ->where('deletedAt', null)
                 ->findAll();
 
+            if ($prosesRebusDetail[0]) {
+                $stockDetail = $this->stockDetail2Model->getStockListDetail(
+                    $prosesRebusDetail[0]['stock_rebus_id'],
+                    $prosesRebusDetail[0]['bc_rebus_id'],
+                    $prosesRebusDetail[0]['no_aju_rebus'],
+                    $prosesRebusDetail[0]['stock_dokumen']
+                );
+
+                $barangDiRebus = $stockDetail['barang_master'];
+
+                if ($prosesRebusDetail[0]['stock_hasil_rebus_id']) {
+                    $stockDetailKeluar = $this->stockDetail2Model->getStockListDetailForRebusAllNew(
+                        $prosesRebusDetail[0]['stock_hasil_rebus_id'],
+                    );
+
+                    $barangHasilRebus = $stockDetailKeluar['barang_master'] ?? null;
+                } else {
+                    $barangMasterModel = new BarangMasterModel();
+                    $barangMasterSpesifikasiModel = new BarangMasterSpesifikasiModel();
+
+                   
+                    $barangMasterSpesifikasi = $barangMasterSpesifikasiModel->find($prosesRebusDetail[0]['barang_out_id']);
+                    $barangMaster = $barangMasterModel->find($barangMasterSpesifikasi['barang_master_id']);
+
+                    $barangHasilRebus =  $barangMaster['barang_name'] ?? null;          // amanin kalau null
+                   
+                }
+            }
             $jasaVendorOutDetail = $this->jasaVendorOutDetailModel->where('deletedAt', null)->like('stock_dokumen', $data->no_rebus)->first();
 
             array_push($dataResult, [
@@ -110,6 +138,8 @@ class ProsesRebus extends BaseController
                 'status_used'           => $jasaVendorOutDetail == null ? 0 : 1,
                 "tanggal"               => date('d/m/Y', strtotime($data->tanggal)),
                 "divisi"                => $data->divisi,
+                "barang_rebus"          => $barangDiRebus,
+                "barang_hasi_rebus"     => $barangHasilRebus,
                 "warehouse_name"        => $data->warehouse_name,
                 "total_item"            => count($prosesRebusDetail),
                 "status_posting"        => $data->status_posting
