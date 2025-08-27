@@ -305,26 +305,20 @@ class BCPurchaseOrderModel extends Model
                     GROUP_CONCAT(DISTINCT penerimaan_barang.tanggal ORDER BY penerimaan_barang.tanggal ASC SEPARATOR ", ") AS lpb_date,
                     GROUP_CONCAT(DISTINCT penerimaan_barang.no_penerimaan_barang ORDER BY penerimaan_barang.tanggal ASC SEPARATOR ", ") AS no_penerimaan_barang,
                     penerimaan_barang_detail.penerimaan_barang_id,
+                    penerimaan_barang_detail.barang_id,
                     penerimaan_barang_detail.purchase_order_id,
+                    GROUP_CONCAT(DISTINCT penerimaan_barang_detail.purchase_order_id) AS purchase_order_ids,
                     penerimaan_barang_detail.id AS penerimaan_barang_detail_id,
                     SUM(penerimaan_barang_detail.jml_masuk) AS qty_lpb,
                     SUM(penerimaan_barang_detail.jml_masuk_konversi) AS qty_lpb_konversi,
                     SUM(penerimaan_barang_detail.qty) AS qty_po,
-                    SUM(po_sub.total_before_pph) AS sub_total,
-                    penerimaan_barang_detail.barang_id,
-                    GROUP_CONCAT(DISTINCT po_sub.po_no ORDER BY po_sub.po_date ASC SEPARATOR ", ") AS po_no,
-                    GROUP_CONCAT(DISTINCT po_sub.po_date ORDER BY po_sub.po_date ASC SEPARATOR ", ") AS po_date,
                     barang_master.barang_name,
-                    barang_master.kode_barang
+                    barang_master.kode_barang,
+                    GROUP_CONCAT(DISTINCT rm_purchase_orders.po_no ORDER BY rm_purchase_orders.po_date ASC SEPARATOR ", ") AS po_no,
+                    GROUP_CONCAT(DISTINCT rm_purchase_orders.po_date ORDER BY rm_purchase_orders.po_date ASC SEPARATOR ", ") AS po_date
                 ')
                 ->join('penerimaan_barang_detail', 'penerimaan_barang_detail.penerimaan_barang_id = penerimaan_barang.id', 'left')
-                // subquery untuk pastikan per PO
-                ->join(
-                    '(SELECT id, po_no, po_date, total_before_pph 
-             FROM rm_purchase_orders) po_sub',
-                    'penerimaan_barang_detail.purchase_order_id = po_sub.id',
-                    'left'
-                )
+                ->join('rm_purchase_orders', 'penerimaan_barang_detail.purchase_order_id = rm_purchase_orders.id', 'left')
                 ->join('barang_master', 'barang_master.id = penerimaan_barang_detail.barang_id', 'left')
                 ->where('penerimaan_barang.status_penerimaan', "LOKAL")
                 ->where('penerimaan_barang.tipe_bahan', "BAKU")
@@ -336,6 +330,21 @@ class BCPurchaseOrderModel extends Model
                 ->whereIn('penerimaan_barang_detail.purchase_order_id', $bcPurchaseOrderIDArr)
                 ->groupBy('penerimaan_barang_detail.barang_id')
                 ->findAll();
+
+            foreach ($po as &$row) {
+                // Pecah semua purchase_order_id dari GROUP_CONCAT
+                $purchaseOrderIds = explode(',', $row['purchase_order_ids']);
+
+                // Query SUM total_before_pph dari semua PO terkait barang ini
+                $sum = $this->db->table('rm_purchase_orders')
+                    ->selectSum('total_before_pph')
+                    ->whereIn('id', $purchaseOrderIds)
+                    ->get()
+                    ->getRow()
+                    ->total_before_pph;
+
+                $row['sub_total'] = $sum ?? 0;
+            }
         } else if ($first['po_type'] == "LOKAL PENOLONG") {
             // PO LOKAL BAHAN PENOLONG
             $po = $penerimaanBarangModel
@@ -495,24 +504,21 @@ class BCPurchaseOrderModel extends Model
                     penerimaan_barang.jumlah_kemasan,
                     GROUP_CONCAT(DISTINCT penerimaan_barang.tanggal ORDER BY penerimaan_barang.tanggal ASC SEPARATOR ", ") AS lpb_date,
                     GROUP_CONCAT(DISTINCT penerimaan_barang.no_penerimaan_barang ORDER BY penerimaan_barang.tanggal ASC SEPARATOR ", ") AS no_penerimaan_barang,
+                    GROUP_CONCAT(DISTINCT penerimaan_barang_detail.purchase_order_id) AS purchase_order_ids,
                     penerimaan_barang_detail.penerimaan_barang_id,
                     penerimaan_barang_detail.purchase_order_id,
                     penerimaan_barang_detail.id AS penerimaan_barang_detail_id,
                     SUM(penerimaan_barang_detail.jml_masuk) AS qty_lpb,
                     SUM(penerimaan_barang_detail.qty) AS qty_po,
-                    SUM(po_sub.total_before_pph) AS sub_total,
+                    0 AS sub_total,
                     penerimaan_barang_detail.barang_id,
-                    GROUP_CONCAT(DISTINCT po_sub.po_no ORDER BY po_sub.po_date ASC SEPARATOR ", ") AS po_no,
-                    GROUP_CONCAT(DISTINCT po_sub.po_date ORDER BY po_sub.po_date ASC SEPARATOR ", ") AS po_date,
+                    GROUP_CONCAT(DISTINCT rm_purchase_orders.po_no ORDER BY rm_purchase_orders.po_date ASC SEPARATOR ", ") AS po_no,
+                    GROUP_CONCAT(DISTINCT rm_purchase_orders.po_date ORDER BY rm_purchase_orders.po_date ASC SEPARATOR ", ") AS po_date,
                     barang_master.barang_name,
                     barang_master.kode_barang
                 ')
                 ->join('penerimaan_barang_detail', 'penerimaan_barang_detail.penerimaan_barang_id = penerimaan_barang.id', 'left')
-                ->join(
-                    '(SELECT id, po_no, po_date, total_before_pph FROM rm_purchase_orders) AS po_sub',
-                    'penerimaan_barang_detail.purchase_order_id = po_sub.id',
-                    'left'
-                )
+                ->join('rm_purchase_orders', 'penerimaan_barang_detail.purchase_order_id = rm_purchase_orders.id', 'left')
                 ->join('barang_master', 'barang_master.id = penerimaan_barang_detail.barang_id', 'left')
                 ->join('kemasan', 'kemasan.id = penerimaan_barang.kemasan_id', 'left')
                 ->where('penerimaan_barang.status_penerimaan', "LOKAL")
@@ -523,8 +529,23 @@ class BCPurchaseOrderModel extends Model
                 ->where('penerimaan_barang_detail.deletedAt', null)
                 ->where('penerimaan_barang_detail.barang_id', $barang1ID)
                 ->whereIn('penerimaan_barang_detail.penerimaan_barang_id', $penerimaanBarangIdArr)
-                ->groupBy('penerimaan_barang_detail.barang_id')
+                ->groupBy('barang_id')
                 ->first();
+
+            if ($po) {
+                $purchaseOrderIds = explode(',', $po['purchase_order_ids']);
+
+                if (!empty($purchaseOrderIds)) {
+                    $sum = $this->db->table('rm_purchase_orders')
+                        ->selectSum('total_before_pph')
+                        ->whereIn('id', $purchaseOrderIds)
+                        ->get()
+                        ->getRow()
+                        ->total_before_pph;
+
+                    $po['sub_total'] = $sum ?? 0;
+                }
+            }
 
 
             // CARI BIAYA TAMBAHAN (Karena Purchase Bahan Baku Tidak Ada Diskon dan Biaya Tambahan)
