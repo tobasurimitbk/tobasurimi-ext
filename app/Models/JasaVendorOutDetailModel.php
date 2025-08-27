@@ -300,9 +300,11 @@ class JasaVendorOutDetailModel extends Model
                     $barangMaster = $barangMasterModel->find($stock['barang1_id'] ?? null);
                     $barangMasterSpesifikasi = $barangMasterSpesifikasiModel->find($stock['barang2_id'] ?? null);
                     $satuan = $barangMasterSpesifikasi ? $satuanModel->find($barangMasterSpesifikasi['satuan_1'] ?? null) : null;
+                    // $barangName = ($barangMaster && $barangMasterSpesifikasi)
+                    //     ? $barangMaster['barang_name'] . "-" . $barangMasterSpesifikasi['spesifikasi']
+                    //     : '';
                     $barangName = ($barangMaster && $barangMasterSpesifikasi)
-                        ? $barangMaster['barang_name'] . "-" . $barangMasterSpesifikasi['spesifikasi']
-                        : '';
+                        ? $barangMaster['barang_name'] : '';
                 } else {
                     $kemasan = $kemasanModel->find($stock['kemasan_id'] ?? null);
                     $satuan = $kemasan ? $satuanModel->find($kemasan['satuan_id'] ?? null) : null;

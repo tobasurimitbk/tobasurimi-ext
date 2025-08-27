@@ -321,7 +321,8 @@ class PI extends BaseController
                 'total_pi' => $this->request->getVar('total_pi'),
                 'status_posting' => 0,
                 'status_bayar' => 0,
-                'penanda_tangan' => $this->request->getVar('penanda_tangan')
+                'penanda_tangan' => $this->request->getVar('penanda_tangan'),
+                'alamat_customer' => $this->request->getVar('alamat_customer')
             ]);
 
             foreach (\json_decode($_POST['listPaymentTerm']) as $l) {
@@ -329,7 +330,8 @@ class PI extends BaseController
                     'proforma_invoice_id' => $id,
                     'payment_term' => $l->payment_term,
                     'nilai_payment_term' => $l->nilai_payment_term,
-                    'is_penagihan' => $l->is_penagihan
+                    'is_penagihan' => $l->is_penagihan,
+                    'presentase' => $l->presentase
                 ]);
             }
 
@@ -388,7 +390,8 @@ class PI extends BaseController
                 'payment_instruction' => $this->request->getVar('payment_instruction'),
                 'packing' => $this->request->getVar('packing'),
                 'total_pi' => $this->request->getVar('total_pi'),
-                'penanda_tangan' => $this->request->getVar('penanda_tangan')
+                'penanda_tangan' => $this->request->getVar('penanda_tangan'),
+                'alamat_customer' => $this->request->getVar('alamat_customer')
             ]);
 
             $id_proforma_invoice_payment_term = [];
@@ -403,7 +406,8 @@ class PI extends BaseController
                         'proforma_invoice_id' => $id,
                         'payment_term' => $l->payment_term,
                         'nilai_payment_term' => $l->nilai_payment_term,
-                        'is_penagihan' => $l->is_penagihan
+                        'is_penagihan' => $l->is_penagihan,
+                        'presentase' => $l->presentase
                     ]);
                     \array_push($id_proforma_invoice_payment_term, $check['id']);
                 } else {
@@ -411,7 +415,8 @@ class PI extends BaseController
                         'proforma_invoice_id' => $id,
                         'payment_term' => $l->payment_term,
                         'nilai_payment_term' => $l->nilai_payment_term,
-                        'is_penagihan' => $l->is_penagihan
+                        'is_penagihan' => $l->is_penagihan,
+                        'presentase' => $l->presentase
                     ]);
                     \array_push($id_proforma_invoice_payment_term, $id_new);
                 }

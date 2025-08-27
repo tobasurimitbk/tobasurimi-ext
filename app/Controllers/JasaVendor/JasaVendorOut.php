@@ -130,6 +130,7 @@ class JasaVendorOut extends BaseController
                 "tanggal"               => date('d/m/Y', strtotime($data->tanggal)),
                 "divisi"                => $data->divisi,
                 "warehouse_name"        => $data->warehouse_name,
+                "barang_name"           => $jasaVendorOutDetail[0]['barang'] ?? '',
                 "total_item"            => count($jasaVendorOutDetail),
                 "vendor_name"           => $data->vendor_name,
                 "status_posting"        => $data->status_posting,

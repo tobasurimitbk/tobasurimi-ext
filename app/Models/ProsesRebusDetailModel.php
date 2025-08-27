@@ -161,7 +161,7 @@ class ProsesRebusDetailModel extends Model
 
             // === Barang output ===
             if ($stockOutput) {
-                if (!$stockOutput['kemasan_id'] == 0) {
+                if ($stockOutput['kemasan_id'] == 0) {
                     $barangMaster = $barangMasterModel->find($stockOutput['barang1_id']);
                     $barangMasterSpesifikasi = $barangMasterSpesifikasiModel->find($stockOutput['barang2_id']);
                     $barangIdOutput = $barangMasterSpesifikasi['id'];

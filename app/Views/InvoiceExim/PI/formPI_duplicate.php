@@ -47,7 +47,7 @@
                     <div class="col-md-4">
                         <div class="form-floating mb-3">
                             <input value="<?= $dataSalesOrderExport->sales_order_export_no ?>" autocomplete="one-time-code" disabled type="text" class="form-control">
-                            <label for="floatingInput">No Order Form</label>
+                            <label for="floatingInput">SC</label>
                         </div>
                     </div>
                     <div class="col-md-4">
@@ -58,7 +58,7 @@
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3">
-                            <input value="<?= $dataSalesOrderExport->address ?>" autocomplete="one-time-code" disabled type="text" class="form-control no_invoice">
+                            <input value="<?= !empty($dataPI) ? $dataPI['alamat_customer'] :  $dataSalesOrderExport->address ?>" autocomplete="one-time-code" type="text" name="alamat_customer" id="alamat_customer" class="form-control alamat_customer">
                             <label for="floatingInput">Alamat Customer</label>
                         </div>
                     </div>
@@ -306,15 +306,21 @@
                 <input type="hidden" name="id_payment_term" id="id_payment_term">
                 <div class="modal-body">
                     <div class="row">
-                        <div class="col-md-6">
+                        <div class="col-md-4">
                             <div class="form-floating mb-3" style="height: 100px;">
                                 <textarea name="payment_term" id="payment_term" class="form-control full-textarea payment_term" placeholder="Payment Term"></textarea>
                                 <label for="floatingInput">Keterangan Payment Term</label>
                             </div>
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-md-4">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" type="text" class="form-control" id="nilai_payment_term" name="nilai_payment_term" placeholder="Nilai Payment Term" onkeyup="this.value = greatFormatRupiah(this.value)">
+                                <input autocomplete="one-time-code" type="text" class="form-control" id="presentase" name="presentase" placeholder="Nilai Presentase" onkeyup="this.value = greatFormatRupiah(this.value)">
+                                <label for="floatingInput">Nilai Presentase</label>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input readonly autocomplete="one-time-code" type="text" class="form-control" id="nilai_payment_term" name="nilai_payment_term" placeholder="Nilai Payment Term" onkeyup="this.value = greatFormatRupiah(this.value)">
                                 <label for="floatingInput">Nilai Payment Term</label>
                             </div>
                         </div>
@@ -367,6 +373,7 @@
                     payment_term: "<?= $d['payment_term'] ?>",
                     nilai_payment_term: <?= floatval($d['nilai_payment_term']) ?>,
                     is_penagihan: <?= $d['is_penagihan'] ?>,
+                    presentase: <?= $d['presentase'] ?>
                 });
             <?php endforeach ?>
             drawTableBarang(listBarang);
@@ -558,6 +565,9 @@
                 payment_term: {
                     required: true
                 },
+                presentase: {
+                    required: true
+                },
                 nilai_payment_term: {
                     required: true
                 },
@@ -565,6 +575,9 @@
             messages: {
                 payment_term: {
                     required: "Payment term wajib diisi"
+                },
+                presentase: {
+                    required: "Presentase wajib diisi"
                 },
                 nilai_payment_term: {
                     required: "Nilai payment term wajib diisi"
@@ -595,9 +608,17 @@
 
         $('#btnAddPaymentTerm').click(function(e) {
             e.preventDefault();
-            $("#label-payment-term").text("Tambah ");
-            $('#paymentTermModal').modal('show');
-            resetFormPaymentTerm();
+            if (listBarang.length === 0) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Wajib mengisikan list barang terlebih dahulu !',
+                    confirmButtonColor: '#4e73df',
+                })
+            } else {
+                $("#label-payment-term").text("Tambah ");
+                $('#paymentTermModal').modal('show');
+                resetFormPaymentTerm();
+            }
         });
 
         $('#btnAddBarang').click(function(e) {
@@ -681,12 +702,26 @@
             $('#total_harga').val(greatFormatRupiah(totalHarga));
         });
 
+        $('#presentase').keyup(function(e) {
+            e.preventDefault();
+            var presentase = destroyFormatRupiah($('#presentase').val());
+            var totalNilaiBarang = 0;
+            $.each(listBarang, function(i, v) {
+                totalNilaiBarang += v.total_harga;
+            });
+
+            var presentaseDecimal = presentase / 100;
+            var nilaiPaymentTerm = presentaseDecimal * totalNilaiBarang;
+            $('#nilai_payment_term').val(greatFormatRupiah(nilaiPaymentTerm.toFixed()));
+        });
+
         $('#btnSubmitPaymentTerm').click(function(e) {
             e.preventDefault();
             if ($('#form-payment-term').valid()) {
                 var idPaymentTerm = $('#id_payment_term').val();
                 var paymentTerm = $('#payment_term').val();
                 var nilaiPaymentTerm = destroyFormatRupiah($('#nilai_payment_term').val());
+                var presentase = destroyFormatRupiah($('#presentase').val());
                 var isPenagihan = $('#is_penagihan').is(':checked');
 
                 if (idPaymentTerm) {
@@ -699,6 +734,7 @@
                         }
                     }
 
+                    listPaymentTerm[index].presentase = presentase;
                     listPaymentTerm[index].payment_term = paymentTerm;
                     listPaymentTerm[index].nilai_payment_term = parseFloat(nilaiPaymentTerm);
                     listPaymentTerm[index].is_penagihan = isPenagihan;
@@ -711,6 +747,7 @@
                         payment_term: paymentTerm,
                         nilai_payment_term: parseFloat(nilaiPaymentTerm),
                         is_penagihan: isPenagihan,
+                        presentase: presentase
                     });
                 }
 
@@ -807,6 +844,7 @@
         $('#id_payment_term').val(null);
         $('#payment_term').val(null);
         $('#nilai_payment_term').val(null);
+        $('#presentase').val(null);
         $('#is_penagihan').prop('checked', false);
     }
 
@@ -950,6 +988,7 @@
 
         $('#id_payment_term').val(item.id_payment_term);
         $('#payment_term').val(item.payment_term);
+        $('#presentase').val(greatFormatRupiah(item.presentase));
         $('#nilai_payment_term').val(greatFormatRupiah(item.nilai_payment_term));
         $('#is_penagihan').prop('checked', item.is_penagihan).change();
 
