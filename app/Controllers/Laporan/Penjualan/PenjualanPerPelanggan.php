@@ -60,76 +60,20 @@ class PenjualanPerPelanggan extends BaseController
         ];
 
         $dataSalesOrderInvoice = $this->salesOrderInvoiceModel
-            ->getAllSalesOrderInvoiceLokal($condition, $addCondition, $pageSize, $offset);
+            ->getLaporanPenjualanPerPelanggan($condition, $addCondition, $pageSize, $offset);
 
         $dataAllSalesOrderInvoice = [];
-        $currentCustomer = null;
-        $totalPerCustomer = 0;
         $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
 
         foreach ($dataSalesOrderInvoice['data'] as $data) {
-            if ($currentCustomer !== $data->nama_pelanggan) {
-                // Push the total row for the previous customer, if applicable
-                if ($currentCustomer !== null) {
-                    array_push($dataAllSalesOrderInvoice, [
-                        "no" => '',
-                        "id" => '',
-                        "no_faktur" => 'Total Invoice: Rp ' . number_format(floatval($totalPerCustomer)),
-                        "tanggal_faktur" => '',
-                        "keterangan" => '',
-                        "total_invoice" => '',
-                        "nama_pelanggan" => '',
-                        "nama_sales" => '',
-                        "is_total" => true,
-                    ]);
-                }
-
-                // Reset for the new customer
-                $currentCustomer = $data->nama_pelanggan;
-                $totalPerCustomer = 0;
-
-                // Add a row for the customer's name
-                array_push($dataAllSalesOrderInvoice, [
-                    "no" => '',
-                    "id" => '',
-                    "no_faktur" => $data->nama_pelanggan,
-                    "tanggal_faktur" => '',
-                    "keterangan" => '',
-                    "total_invoice" => '',
-                    "nama_pelanggan" => '',
-                    "nama_sales" => '',
-                    "is_customer" => true,
-                ]);
-            }
-
             // Add the regular invoice data
             array_push($dataAllSalesOrderInvoice, [
                 "no" => $no++,
                 "id" => encrypt($data->id),
-                "no_faktur" => $data->no_faktur,
-                "tanggal_faktur" => $data->tanggal_faktur,
-                "keterangan" => $data->keterangan,
-                "total_invoice" => number_format(floatval($data->total_invoice)),
+                "total_invoice" => number_format(floatval($data->sum_amount_invoice)),
                 "nama_pelanggan" => $data->nama_pelanggan,
-                "nama_sales" => $data->salesName,
-            ]);
-
-            // Accumulate the total invoice per customer
-            $totalPerCustomer += floatval($data->total_invoice);
-        }
-
-        // Add the total for the last customer
-        if ($currentCustomer !== null) {
-            array_push($dataAllSalesOrderInvoice, [
-                "no" => '',
-                "id" => '',
-                "no_faktur" => 'Total Invoice: Rp ' . number_format(floatval($totalPerCustomer)),
-                "tanggal_faktur" => '',
-                "keterangan" => '',
-                "total_invoice" => '',
-                "nama_pelanggan" => '',
-                "nama_sales" => '',
-                "is_total" => true,
+                "kode_pelanggan" => $data->kode_pelanggan,
+                "count_invoice" => $data->count_invoice,
             ]);
         }
 

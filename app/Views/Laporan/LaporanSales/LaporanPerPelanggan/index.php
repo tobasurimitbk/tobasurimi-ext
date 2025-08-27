@@ -71,12 +71,11 @@
                     <table class="table table-bordered nowrap table-hover-tobasurimi dataTable" id="dataTable" width="100%" cellspacing="0">
                         <thead class="thead-dark">
                             <tr>
-                                <th>No. Faktur</th>
-                                <th>Tanggal Faktur</th>
-                                <th>Keterangan</th>
-                                <th>Jumlah</th>
-                                <th>Nama Pelanggan</th>
-                                <th>Nama Penjual</th>
+                                <th class="text-center">No</th>
+                                <th class="text-center">Nama Pelanggan</th>
+                                <th class="text-center">No. Pelanggan</th>
+                                <th class="text-center">Jumlah Data</th>
+                                <th class="text-center">Jumlah</th>
                             </tr>
                         </thead>
                         <tbody class="body-table" id="body-table" style="cursor: pointer;">
@@ -95,7 +94,6 @@
     $(document).ready(function() {
         const csrfToken = '<?= csrf_token() ?>';
         const table = $('.dataTable').DataTable({
-
             processing: true,
             serverSide: true,
             ordering: true,
@@ -127,32 +125,22 @@
             },
             display: "stripe",
             searching: false,
-            createdRow: function(row, data, dataIndex) {
-                if (data.is_customer) {
-                    $(row).addClass('customer-row').find('td').attr('colspan', 6).removeClass('text-center').addClass('text-left font-weight-bold');
-                    $(row).find('td:not(:first)').remove(); // Remove other cells
-                } else if (data.is_total) {
-                    $(row).addClass('total-row').find('td').attr('colspan', 6).removeClass('text-center').addClass('text-left font-weight-bold');
-                    $(row).find('td:not(:first)').remove(); // Remove other cells
-                }
-            },
             columns: [{
-                data: "no_faktur",
+                data: "no",
+                className: "text-center",
+                sortable: false,
+                width: "5%"
+            }, {
+                data: "nama_pelanggan",
+                className: "text-left",
+            }, {
+                data: "kode_pelanggan",
                 className: "text-center",
             }, {
-                data: "tanggal_faktur",
-                className: "text-center",
-            }, {
-                data: "keterangan",
+                data: "count_invoice",
                 className: "text-center",
             }, {
                 data: "total_invoice",
-                className: "text-center",
-            }, {
-                data: "nama_pelanggan",
-                className: "text-center",
-            }, {
-                data: "nama_sales",
                 className: "text-center",
             }, ],
             columnDefs: [{
