@@ -87,6 +87,11 @@ class PI extends BaseController
         $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
 
         foreach ($salesData['data'] as $data) {
+            $totalInvPI = \count($this->proformaInvoiceModel
+                ->where('sales_order_export_id', $data->sales_order_export_id)
+                ->where('deletedAt', null)
+                ->findAll());
+
             array_push($dataSales, [
                 "no"                        => $no++,
                 "id"                        => \encrypt($data->sales_order_export_id),
@@ -97,6 +102,7 @@ class PI extends BaseController
                 "dicharge_port"             => $data->dicharge_port,
                 "status_invoice"            => $data->status_invoice,
                 "nilai_peb"                 =>  "(" . $data->valas_peb_name . ") " . \number_format($data->shipment_value, 2),
+                "total_inv_pi"              => $totalInvPI != 0 ? $totalInvPI . " Invoice" : ""
             ]);
         }
 

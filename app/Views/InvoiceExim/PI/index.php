@@ -42,6 +42,7 @@
                                 <th onclick="changeSort('sales_order_export.sales_order_export_no')" class="sort">No OF</th>
                                 <th onclick="changeSort('sales_contract.dicharge_port')" class="sort">Destination</th>
                                 <th onclick="changeSort('sales_order_export.shipment_value')" class="sort">Nilai PEB</th>
+                                <th>Total Inv PI</th>
                                 <th style="width: 120px;">Action</th>
                             </tr>
                         </thead>
@@ -116,6 +117,12 @@
             {
                 data: "nilai_peb",
                 className: "text-left",
+            },
+            {
+                data: "total_inv_pi",
+                className: "text-left",
+                searchable: false,
+                sortable: false,
             },
             {
                 data: "id",
