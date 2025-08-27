@@ -174,9 +174,11 @@
                             <select <?= !empty($poDetail) ? ($poDetail['is_posted'] ? 'disabled' : '') : '' ?> class="form-select ppn" name="ppn" id="ppn" aria-label="Floating label select example">
                                 <option value=""></option>
                                 <?php foreach ($ppn as $p) : ?>
-                                    <option value="<?= $p['id'] ?>">
-                                        <?= $p['name'] ?>
-                                    </option>
+                                    <?php if (in_array($p['id'], [4, 8, 12, 16])): ?>
+                                        <option value="<?= $p['id'] ?>">
+                                            <?= $p['name'] ?>
+                                        </option>
+                                    <?php endif; ?>
                                 <?php endforeach; ?>
                             </select>
                             <label for="floatingInput">Pilih PPN (Opsional)</label>

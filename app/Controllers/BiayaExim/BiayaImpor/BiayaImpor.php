@@ -64,7 +64,7 @@ class BiayaImpor extends BaseController
     {
         $dataUser = $this->usersModel->orderBy('name', 'asc')->where('deletedAt', null)->findAll();
         $data = [
-            'dataUser' => $dataUser
+            'dataUser' => $dataUser,
         ];
         return view('BiayaExim/BiayaImpor/index', $data);
     }
@@ -155,6 +155,7 @@ class BiayaImpor extends BaseController
             'barang_master.deletedAt' => null,
             'barang_master_spesifikasi.deletedAt' => null
         ]);
+        $dataBiayaImporList = $this->biayaImporModel->where('company_id', $this->this_company_id)->where('deletedAt', null)->orderBy('id', "desc")->findAll();
 
         $data = [
             "dataDivisi" => $dataDivisi,
@@ -163,7 +164,8 @@ class BiayaImpor extends BaseController
             "dataSupplier" => $dataSupplier,
             "dataValas" => $dataValas,
             "dataSatuan" => $dataSatuan,
-            "dataBarang" => $dataBarang
+            "dataBarang" => $dataBarang,
+            "dataBiayaImporList" => $dataBiayaImporList
         ];
 
 
@@ -361,12 +363,12 @@ class BiayaImpor extends BaseController
                 );
             }
 
-            if ($this->checkNumber($noInvoice, null) == false) {
-                return response()->setJSON([
-                    'status' => false,
-                    'message' => "No invoice sudah digunakan"
-                ]);
-            }
+            // if ($this->checkNumber($noInvoice, null) == false) {
+            //     return response()->setJSON([
+            //         'status' => false,
+            //         'message' => "No invoice sudah digunakan"
+            //     ]);
+            // }
             $biayaImporId = $this->biayaImporModel->insert([
                 'company_id' => $this->this_company_id,
                 'divisi_id' => $this->request->getVar('divisi_id'),
@@ -458,12 +460,12 @@ class BiayaImpor extends BaseController
             $id = \decrypt($this->request->getVar('id'));
             // dd($id);
             $noInvoice = $this->request->getVar('no_invoice');
-            if ($this->checkNumber($noInvoice, $id) == false) {
-                return response()->setJSON([
-                    'status' => false,
-                    'message' => "No invoice sudah digunakan"
-                ]);
-            }
+            // if ($this->checkNumber($noInvoice, $id) == false) {
+            //     return response()->setJSON([
+            //         'status' => false,
+            //         'message' => "No invoice sudah digunakan"
+            //     ]);
+            // }
             $this->biayaImporModel->update($id, [
                 'divisi_id' => $this->request->getVar('divisi_id'),
                 'vendor_pelayaran_id' => $this->request->getVar('vendor_pelayaran_id'),
@@ -1088,5 +1090,48 @@ class BiayaImpor extends BaseController
         ];
 
         return \view('BiayaExim/BiayaImpor/detail', $data);
+    }
+
+    public function getDataBiayaImpor()
+    {
+        try {
+            $id = $this->request->getVar('id');
+
+            if (empty($id)) {
+                return \response()->setJSON([
+                    'data' =>  null,
+                    'status' => true,
+                    'token' => \csrf_hash()
+                ]);
+            }
+
+            $dataBiayaImpor = $this->biayaImporModel->where('id', $id)->first();
+            $dataContainer = $this->biayaImporContainerModel
+                ->where('biaya_impor_id', $id)
+                ->where('deletedAt', null)
+
+                ->findAll();
+            $dataDetailBarang = $this->biayaImporBarangModel->getListBarang(
+                $id
+            );
+
+            $dataBiayaImpor['tanggal_invoice'] = \date('d/m/Y', \strtotime($dataBiayaImpor['tanggal_invoice']));
+
+            return \response()->setJSON([
+                'data' => [
+                    'dataBiayaImpor' => $dataBiayaImpor,
+                    'dataContainer' => $dataContainer,
+                    'dataDetailBarang' => $dataDetailBarang
+                ],
+                'status' => true,
+                'token' => \csrf_hash()
+            ]);
+        } catch (Exception $e) {
+            return \response()->setJSON([
+                'message' => $e->getMessage(),
+                'status' => false,
+                'token' => \csrf_hash()
+            ]);
+        }
     }
 }

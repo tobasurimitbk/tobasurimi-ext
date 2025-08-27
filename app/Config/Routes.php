@@ -809,6 +809,8 @@ $routes->get('/biaya-eskpor/get-sales-order-export', 'BiayaExim\BiayaEskpor\Biay
 $routes->get('/biaya-eskpor/export-excel', 'BiayaExim\BiayaEskpor\BiayaEskpor::exportExcel', ['filter' => 'Auth']);
 $routes->get('/biaya-eskpor/get-status-posting', 'BiayaExim\BiayaEskpor\BiayaEskpor::getStatusPosting', ['filter' => 'Auth']);
 $routes->get('/biaya-eskpor/detail/(:segment)', 'BiayaExim\BiayaEskpor\BiayaEskpor::detail/$1', ['filter' => 'Auth']);
+$routes->get('/biaya-eskpor/get-data-biaya', 'BiayaExim\BiayaEskpor\BiayaEskpor::getDataBiayaEkspor', ['filter' => 'Auth']);
+
 
 // BIAYA IMPOR
 $routes->get('/biaya-impor', 'BiayaExim\BiayaImpor\BiayaImpor::index', ['filter' => 'Auth']);
@@ -825,6 +827,7 @@ $routes->get('/biaya-impor/print/(:segment)', 'BiayaExim\BiayaImpor\BiayaImpor::
 $routes->get('/biaya-impor/export-excel', 'BiayaExim\BiayaImpor\BiayaImpor::exportExcel', ['filter' => 'Auth']);
 $routes->get('/biaya-impor/get-status-posting', 'BiayaExim\BiayaImpor\BiayaImpor::getStatusPosting', ['filter' => 'Auth']);
 $routes->get('/biaya-impor/detail/(:segment)', 'BiayaExim\BiayaImpor\BiayaImpor::detail/$1', ['filter' => 'Auth']);
+$routes->get('/biaya-impor/get-data-biaya', 'BiayaExim\BiayaImpor\BiayaImpor::getDataBiayaImpor', ['filter' => 'Auth']);
 
 // BIAYA LOKAL
 $routes->get('/biaya-lokal', 'BiayaExim\BiayaLokal\BiayaLokal::index', ['filter' => 'Auth']);
@@ -840,11 +843,24 @@ $routes->get('/biaya-lokal/export-excel', 'BiayaExim\BiayaLokal\BiayaLokal::expo
 $routes->get('/biaya-lokal/get-status-posting', 'BiayaExim\BiayaLokal\BiayaLokal::getStatusPosting', ['filter' => 'Auth']);
 $routes->get('/biaya-lokal/detail/(:segment)', 'BiayaExim\BiayaLokal\BiayaLokal::detail/$1', ['filter' => 'Auth']);
 
-// PI & PEB
-$routes->get('/pi-peb', 'BiayaExim\PIPeb\PIPeb::index', ['filter' => 'Auth']);
-$routes->get('/pi-peb/all', 'BiayaExim\PIPeb\PIPeb::all', ['filter' => 'Auth']);
-$routes->get('/pi-peb/get', 'BiayaExim\PIPeb\PIPeb::getPiPeb', ['filter' => 'Auth']);
-$routes->post('/pi-peb/update', 'BiayaExim\PIPeb\PIPeb::updatePiPeb', ['filter' => 'Auth']);
+// INVOICE EXIM
+// PI
+$routes->get('/proforma-invoice', 'InvoiceExim\PI\PI::index', ['filter' => 'Auth']);
+$routes->get('/proforma-invoice/all-order-form', 'InvoiceExim\PI\PI::allOrderForm', ['filter' => 'Auth']);
+$routes->get('/proforma-invoice/detail/(:segment)', 'InvoiceExim\PI\PI::indexPI/$1', ['filter' => 'Auth']);
+$routes->get('/proforma-invoice/create/(:segment)', 'InvoiceExim\PI\PI::createPI/$1', ['filter' => 'Auth']);
+$routes->post('/proforma-invoice/create', 'InvoiceExim\PI\PI::storePI', ['filter' => 'Auth']);
+$routes->post('/proforma-invoice/update', 'InvoiceExim\PI\PI::updatePI', ['filter' => 'Auth']);
+$routes->post('/proforma-invoice/delete', 'InvoiceExim\PI\PI::destroyPI', ['filter' => 'Auth']);
+$routes->post('/proforma-invoice/posting', 'InvoiceExim\PI\PI::postingPI', ['filter' => 'Auth']);
+$routes->post('/proforma-invoice/unposting', 'InvoiceExim\PI\PI::unpostingPI', ['filter' => 'Auth']);
+$routes->get('/proforma-invoice/all-pi', 'InvoiceExim\PI\PI::allPI', ['filter' => 'Auth']);
+$routes->get('/proforma-invoice/duplicate/(:segment)', 'InvoiceExim\PI\PI::duplicatePI/$1', ['filter' => 'Auth']);
+$routes->get('/proforma-invoice/id/(:segment)', 'InvoiceExim\PI\PI::editPI/$1', ['filter' => 'Auth']);
+$routes->get('/proforma-invoice/print/(:segment)', 'InvoiceExim\PI\PI::printPI/$1', ['filter' => 'Auth']);
+
+// $routes->get('/pi-peb/get', 'BiayaExim\PIPeb\PIPeb::getPiPeb', ['filter' => 'Auth']);
+// $routes->post('/pi-peb/update', 'BiayaExim\PIPeb\PIPeb::updatePiPeb', ['filter' => 'Auth']);
 
 // PRODUKSI
 // Production Result

@@ -43,16 +43,25 @@
                 <?= csrf_field() ?>
                 <div class="row">
                     <div class="col-md-4">
-                        <div class="form-floating mb-3" style="height: 50px;">
-                            <div class="input-group input-group-password">
-                                <div class="form-floating mb-3" style="height: 50px;">
-                                    <input autocomplete="one-time-code" type="text" value="<?= !empty($dataBiayaImpor) ? $dataBiayaImpor['no_invoice'] : 'AUTO GENERATE' ?>" <?= !empty($dataBiayaImpor) ? ($dataBiayaImpor['status_bayar'] == 1 ? 'readonly' : '') : 'readonly' ?> class="form-control no_invoice" id="no_invoice" name="no_invoice" placeholder="No Invoice" required>
-                                    <label for="floatingInput">No Invoice</label>
-                                </div>
-                                <div style="<?= !empty($dataBiayaImpor) ? "display: none" : ""; ?>" class="input-generate input-group-prepend group-prepend-password align-items-center">
-                                    <input checked autocomplete="one-time-code" style="z-index: 99; margin-bottom: 10px; margin-left: -30px;" class="auto_generate" id="auto_generate" name="auto_generate" type="checkbox" onchange="changeStatus()">
+                        <div class="input-group">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <div class="input-group input-group-password">
+                                    <div class="form-floating mb-3" style="height: 50px;">
+                                        <input autocomplete="one-time-code" type="text" value="<?= !empty($dataBiayaImpor) ? $dataBiayaImpor['no_invoice'] : 'AUTO GENERATE' ?>" <?= !empty($dataBiayaImpor) ? ($dataBiayaImpor['status_bayar'] == 1 ? 'readonly' : '') : 'readonly' ?> class="form-control no_invoice" id="no_invoice" name="no_invoice" placeholder="No Invoice" required>
+                                        <label for="floatingInput">No Invoice</label>
+                                    </div>
+                                    <div style="<?= !empty($dataBiayaImpor) ? "display: none" : ""; ?>" class="input-generate input-group-prepend group-prepend-password align-items-center">
+                                        <input checked autocomplete="one-time-code" style="z-index: 99; margin-bottom: 10px; margin-left: -30px;" class="auto_generate" id="auto_generate" name="auto_generate" type="checkbox" onchange="changeStatus()">
+                                    </div>
                                 </div>
                             </div>
+                            <?php if (!empty($dataBiayaImporList)): ?>
+                                <div class="input-group-append" style="height:50px;">
+                                    <button class="btn btn-success" id="btnCopyDataModal" type="button">
+                                        <i class="fa-solid fa-download"></i>
+                                    </button>
+                                </div>
+                            <?php endif ?>
                         </div>
                     </div>
                     <div class="col-md-4">
@@ -611,6 +620,41 @@
     </div>
 </div>
 
+<?php if (!empty($dataBiayaImporList)): ?>
+    <div class="modal detail-modal" id="copyDataModal" tabindex="1">
+        <div class="modal-dialog" style="min-width: 900px;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title title-secondary">Copy Biaya Impor</h5>
+                </div>
+                <form id="form-copy-biaya" role="form" method="POST">
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-floating mb-3" style="height: 50px;">
+                                    <select class="form-select biaya_impor_id_copy" name="biaya_impor_id_copy" id="biaya_impor_id_copy">
+                                        <option value=""></option>
+                                        <?php foreach ($dataBiayaImporList as $d): ?>
+                                            <option value="<?= $d['id'] ?>"><?= $d['no_invoice'] . " (" . $d['tanggal_invoice'] . ")" ?></option>
+                                        <?php endforeach; ?>
+                                    </select>
+                                    <label for="floatingInput">Pilih No Invoice / Aju</label>
+                                </div>
+                            </div>
+
+                        </div>
+                        <br>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-discard mr-2" id="btnHideCopyData">Kembali</button>
+                        <button type="button" class="btn btn-submit-form" id="btnSubmiCopyData">Copy Paste Data</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+<?php endif; ?>
+
 <script>
     const csrfToken = '<?= csrf_token() ?>';
     var listBiayaImpor = [];
@@ -757,15 +801,21 @@
             dropdownParent: $('#detailBiayaModal')
         }).change(function() {});
 
+        $('.biaya_impor_id_copy').select2({
+            placeholder: "Pilih No Invoice / Aju",
+            theme: "bootstrap-5",
+            dropdownParent: $('#copyDataModal')
+        }).change(function() {});
+
         //CSS SELECT2 FLOATING LABEL
-        $('.po_id, .divisi_id, .vendor_pelayaran_id, .tax_id, .tax_status, .supplier_id, .tipe_po, .valas_id,.spesifikasi_id,.satuan_id,.valas_barang_id')
+        $('.biaya_impor_id_copy,.po_id, .divisi_id, .vendor_pelayaran_id, .tax_id, .tax_status, .supplier_id, .tipe_po, .valas_id,.spesifikasi_id,.satuan_id,.valas_barang_id')
             .parent('div')
             .children('span')
             .children('span')
             .children('span')
             .css('height', ' calc(3.5rem + 2px)');
 
-        $('.po_id, .divisi_id, .vendor_pelayaran_id, .tax_id, .tax_status, .supplier_id, .tipe_po, .valas_id.valas_id,.spesifikasi_id,.satuan_id,.valas_barang_id')
+        $('.biaya_impor_id_copy,.po_id, .divisi_id, .vendor_pelayaran_id, .tax_id, .tax_status, .supplier_id, .tipe_po, .valas_id.valas_id,.spesifikasi_id,.satuan_id,.valas_barang_id')
             .parent('div')
             .children('span')
             .children('span')
@@ -773,7 +823,7 @@
             .children('span')
             .css('margin-top', '22px').css('margin-left', '-7px');
 
-        $('.po_id, .divisi_id, .vendor_pelayaran_id, .tax_id, .tax_status, .supplier_id, .tipe_po, .valas_id.valas_id,.spesifikasi_id,.satuan_id,.valas_barang_id')
+        $('.biaya_impor_id_copy,.po_id, .divisi_id, .vendor_pelayaran_id, .tax_id, .tax_status, .supplier_id, .tipe_po, .valas_id.valas_id,.spesifikasi_id,.satuan_id,.valas_barang_id')
             .parent('div')
             .find('label')
             .css('z-index', '1');
@@ -1070,6 +1120,50 @@
             },
         });
 
+
+        var validatorCopyBiaya = $("#form-copy-biaya").validate({
+            rules: {
+                biaya_impor_id_copy: {
+                    required: true
+                },
+            },
+            messages: {
+                biaya_impor_id_copy: {
+                    required: "Pilih No Invoice / Aju"
+                },
+            },
+            errorElement: 'span',
+            errorClass: 'text-danger',
+            errorPlacement: function(error, element) {
+                var elem = $(element);
+                if (elem.hasClass("select2-hidden-accessible")) {
+                    element = $("#select2-" + elem.attr("id") + "-container").parent();
+                    error.insertAfter(element);
+                } else {
+                    error.insertAfter(element);
+                }
+            },
+            highlight: function(element) {
+                $(element).closest('.form-group').addClass('has-error');
+                $(element).addClass('select-class');
+
+            },
+            unhighlight: function(element) {
+                $(element).closest('.form-group').removeClass('has-error');
+                $(element).removeClass('select-class');
+            },
+        });
+
+        $('#btnSubmiCopyData').click(function(e) {
+            e.preventDefault();
+
+            if ($('#form-copy-biaya').valid()) {
+                // Ajax Get Data
+                var id = $('#biaya_impor_id_copy option:selected').val();
+                getCopyData(id);
+            }
+        })
+
         $('#btnAddBiaya').click(function(e) {
             e.preventDefault();
             $("#label-biaya-impor").text("Tambah ");
@@ -1092,6 +1186,17 @@
         $('#btnHideDetailBarang').click(function(e) {
             e.preventDefault();
             $('#detailBarang').modal('hide');
+        });
+
+        $('#btnCopyDataModal').click(function(e) {
+            e.preventDefault();
+            $('#biaya_impor_id_copy').val(null).change();
+            $('#copyDataModal').modal('show');
+        });
+
+        $('#btnHideCopyData').click(function(e) {
+            e.preventDefault();
+            $('#copyDataModal').modal('hide');
         });
 
         // $('#qty_barang,#harga_satuan').keyup(function(e) {
@@ -1409,6 +1514,83 @@
 
                         // DrawTable Detail Barang
                         drawTableBarangImport(listBarang);
+                    }
+
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: res.message,
+                        confirmButtonColor: '#4e73df',
+                    })
+                }
+            }
+        })
+    }
+
+    function getCopyData(id) {
+        $.ajax({
+            url: `<?= base_url("biaya-impor/get-data-biaya"); ?>`,
+            method: "GET",
+            dataType: "json",
+            data: {
+                id: id,
+            },
+            beforeSend: function() {
+                setLoading();
+            },
+            complete: function() {
+                stopLoading();
+            },
+            success: function(res) {
+                if (res.status) {
+                    if (res.data != null) {
+                        var dataBiayaImpor = res.data.dataBiayaImpor;
+                        var dataDetailBarang = res.data.dataDetailBarang;
+                        var dataContainer = res.data.dataContainer;
+
+                        $('#auto_generate').prop('checked', false);
+                        $('#no_invoice').attr('readonly', false);
+                        // DATA BIAYA IMPOR
+                        $('#no_invoice').val(dataBiayaImpor.no_invoice);
+                        $('#tanggal_invoice').val(dataBiayaImpor.tanggal_invoice);
+                        $('#divisi_id').val(dataBiayaImpor.divisi_id).change();
+                        $('#supplier_id').val(dataBiayaImpor.supplier_id).change();
+                        $('#no_bl').val(dataBiayaImpor.no_bl).change();
+                        $('#tipe_po').val(dataBiayaImpor.tipe_po).change();
+                        $('#po_id').val(dataBiayaImpor.po_id).change();
+                        $('#vendor_pelayaran_id').val(dataBiayaImpor.vendor_pelayaran_id).change();
+                        $('#shipper_prev').val(dataBiayaImpor.shipper);
+                        $('#consigne_prev').val(dataBiayaImpor.consigne);
+                        $('#port_of_origin_prev').val(dataBiayaImpor.port_of_origin);
+                        $('#port_of_destination_prev').val(dataBiayaImpor.port_of_destination);
+                        // DETAIL BARANG
+                        $.each(dataDetailBarang, function(i, v) {
+                            listBarang.push({
+                                id_detail_barang: v.id,
+                                spesifikasi_id: v.spesifikasi_id,
+                                kode_barang: v.kode_barang,
+                                barang_name: v.barang_name,
+                                valas_id: v.valas_id,
+                                valas_name: v.valas_name,
+                                qty_barang: parseFloat(v.qty_barang),
+                                harga_satuan: parseFloat(v.harga_satuan),
+                                total_harga: parseFloat(v.total_harga),
+                                satuan_id: v.satuan_id,
+                                kode_satuan: v.kode_satuan
+                            });
+                        });
+                        // CONTAINER
+                        $.each(dataContainer, function(i, v) {
+                            listContainer.push({
+                                id_container: v.id,
+                                no_container: v.no_container,
+                                detail_container: v.detail_container
+                            });
+                        });
+
+                        drawTableBarangImport(listBarang);
+                        drawTableDetailContainer(listContainer);
+                        $('#copyDataModal').modal('hide');
                     }
 
                 } else {

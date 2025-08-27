@@ -387,6 +387,7 @@ class SalesOrderExportModel extends Model
         $selectQry = "
             sales_order_export.*, 
             customers.name as customer_name,
+            customers.address,
             sales_contract.sales_contract_no,
             sales_contract.customer_po_no,
             sales_contract.total_container,
@@ -1020,7 +1021,7 @@ class SalesOrderExportModel extends Model
         return $resultQry;
     }
 
-    public function getListPiPeb($condition, $addCondition, $limit = 10, $offset = 0)
+    public function getListPeb($condition, $addCondition, $limit = 10, $offset = 0)
     {
         $availableSort = [
             'sales_order_export.sales_order_export_id' => 'sales_order_export.sales_order_export_id',
@@ -1029,10 +1030,7 @@ class SalesOrderExportModel extends Model
             'sales_order_export.sales_order_export_no' => 'sales_order_export.sales_order_export_no',
             'sales_contract.customer_id'         => 'sales_contract.customer_id',
             'sales_contract.dicharge_port'               => 'sales_contract.dicharge_port',
-            'sales_order_export.status_invoice'             => 'sales_order_export.status_invoice',
-            'sales_order_export.nilai_pi' => 'sales_order_export.nilai_pi',
             'sales_order_export.shipment_value' => 'sales_order_export.shipment_value',
-            'sales_order_export.exchange_rate_peb' => 'sales_order_export.exchange_rate_peb',
         ];
 
         $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
@@ -1043,19 +1041,16 @@ class SalesOrderExportModel extends Model
         $selectQry = "sales_order_export.*, 
                         sales_contract.dicharge_port,
                         customers.name AS customer_name,
-                        valas_pi.value as valas_pi_name,
                         valas_peb.value as valas_peb_name";
         $salesDataQry = $this->asObject()
             ->select($selectQry)
             ->where($condition)
             ->join('sales_contract', 'sales_contract.id = sales_order_export.sales_contract_id', 'left')
             ->join('customers', 'customers.id = sales_contract.customer_id', 'left')
-            ->join('metadata as valas_pi', 'valas_pi.id = sales_order_export.valas_id', 'left')
-            ->join('metadata as valas_peb', 'valas_peb.id = sales_order_export.valas_id_peb', 'left')
+            ->join('metadata as valas_peb', 'valas_peb.id = sales_order_export.valas_id', 'left')
             ->orderBy($sort, $sortType);
 
         $totalData = $salesDataQry->countAllResults(false);
-
 
         if ($addCondition['search']) {
             $salesDataQry
@@ -1065,16 +1060,6 @@ class SalesOrderExportModel extends Model
                 ->orLike('sales_order_export.no_invoice', $addCondition['search'])
                 ->orLike('customers.name', $addCondition['search'])
                 ->groupEnd();
-        }
-
-        if ($addCondition['status_invoice']) {
-            if ($addCondition['status_invoice'] == "TERBIT") {
-                $salesDataQry
-                    ->where('sales_order_export.status_invoice', 'TERBIT');
-            } else if ($addCondition['status_invoice'] == "BELUM TERBIT") {
-                $salesDataQry
-                    ->where('sales_order_export.status_invoice', 'BELUM TERBIT');
-            }
         }
 
         if (!empty($addCondition['dateStart']) || !empty($addCondition['dateEnd'])) {
@@ -1105,7 +1090,7 @@ class SalesOrderExportModel extends Model
         $metaDataModel = new MetadataModel();
         $salesOrderExportModel = new SalesOrderExportModel();
 
-        $year = date('Y');
+        $year = date('y');
         if ($companyId == 1) {
             $codeInv = "TSI2";
         } elseif ($companyId == 2) {

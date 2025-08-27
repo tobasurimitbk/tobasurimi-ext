@@ -151,6 +151,7 @@ class BiayaEskpor extends BaseController
         $dataBarang = $this->barangMasterSalesModel->where('type_barang', "bahan_jadi")->where('type_barang_sales', "EKSPOR")->where('deletedAt', null)->orderBy('barang_name', "ASC")->findAll();
         $dataValuta = $this->metadataModel->where('name', "Valuta")->orderBy('value', "asc")->findAll();
         $dataSatuan = $this->satuanModel->where('deletedAt', null)->findAll();
+        $dataBiayaEksporList = $this->biayaEksporModel->where('company_id', $this->this_company_id)->where('deletedAt', null)->orderBy('id', "desc")->findAll();
 
         $data = [
             "dataDivisi" => $dataDivisi,
@@ -159,7 +160,8 @@ class BiayaEskpor extends BaseController
             "dataCustomer" => $dataCustomer,
             "dataBarang" => $dataBarang,
             "dataValuta" => $dataValuta,
-            "dataSatuan" => $dataSatuan
+            "dataSatuan" => $dataSatuan,
+            "dataBiayaEksporList" => $dataBiayaEksporList
         ];
 
         return view('BiayaExim/BiayaEskpor/form', $data);
@@ -359,12 +361,12 @@ class BiayaEskpor extends BaseController
                 );
             }
 
-            if ($this->checkNumber($noInvoice, null) == false) {
-                return response()->setJSON([
-                    'status' => false,
-                    'message' => "No invoice sudah digunakan"
-                ]);
-            }
+            // if ($this->checkNumber($noInvoice, null) == false) {
+            //     return response()->setJSON([
+            //         'status' => false,
+            //         'message' => "No invoice sudah digunakan"
+            //     ]);
+            // }
 
             $biayaEksporId = $this->biayaEksporModel->insert([
                 'company_id' => $this->this_company_id,
@@ -448,12 +450,12 @@ class BiayaEskpor extends BaseController
             $id = \decrypt($this->request->getVar('id'));
             $noInvoice = $this->request->getVar('no_invoice');
 
-            if ($this->checkNumber($noInvoice, $id) == false) {
-                return response()->setJSON([
-                    'status' => false,
-                    'message' => "No invoice sudah digunakan"
-                ]);
-            }
+            // if ($this->checkNumber($noInvoice, $id) == false) {
+            //     return response()->setJSON([
+            //         'status' => false,
+            //         'message' => "No invoice sudah digunakan"
+            //     ]);
+            // }
 
             $this->biayaEksporModel->update($id, [
                 'divisi_id' => $this->request->getVar('divisi_id'),
@@ -933,5 +935,41 @@ class BiayaEskpor extends BaseController
         ];
 
         return \view('BiayaExim/BiayaEskpor/detail', $data);
+    }
+
+    public function getDataBiayaEkspor()
+    {
+        try {
+            $id = $this->request->getVar('id');
+
+            if (empty($id)) {
+                return \response()->setJSON([
+                    'data' => null,
+                    'status' => true,
+                    'token' => \csrf_hash()
+                ]);
+            }
+
+            $dataBiayaEkspor = $this->biayaEksporModel->where('id', $id)->first();
+            $dataDetailBarang = $this->biayaEksporBarangModel->getListBarang($id);
+            $dataBiayaEkspor['tanggal_invoice'] = \date('d/m/Y', \strtotime($dataBiayaEkspor['tanggal_invoice']));
+            $dataBiayaEkspor['keberangkatan_kapal'] = $dataBiayaEkspor['keberangkatan_kapal'] != null ? \date('d/m/Y', \strtotime($dataBiayaEkspor['keberangkatan_kapal'])) : "";
+            $dataBiayaEkspor['tanggal_surat_jalan'] = $dataBiayaEkspor['tanggal_surat_jalan'] != null ? \date('d/m/Y', \strtotime($dataBiayaEkspor['tanggal_surat_jalan'])) : "";
+
+            return \response()->setJSON([
+                'data' => [
+                    'dataBiayaEkspor' => $dataBiayaEkspor,
+                    'dataDetailBarang' => $dataDetailBarang
+                ],
+                'status' => true,
+                'token' => \csrf_hash()
+            ]);
+        } catch (Exception $e) {
+            return \response()->setJSON([
+                'message' => $e->getMessage(),
+                'status' => false,
+                'token' => \csrf_hash()
+            ]);
+        }
     }
 }
