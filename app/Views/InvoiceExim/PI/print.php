@@ -526,7 +526,7 @@
                     <br>
                     <b>
                         <?= $dataPI['payment_instruction'] ?> <br>
-                        101/<?= $dataPI['no_pi'] ?> (<?= number_format($dataPI['total_pi'], 2) ?>)
+                        1011/<?= $dataPI['no_pi'] ?> (<?= number_format($dataPI['total_pi'], 2) ?>)
                     </b>
                 </td>
 
