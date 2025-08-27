@@ -685,7 +685,7 @@
                     tax_name: "<?= trim($d['tax_name']) ?>",
                     nilai_pajak: <?= floatval($d['nilai_pajak']) ?>,
                     tax_status: "<?= trim($d['status_pajak']) ?>",
-                    keterangan_pajak: "<?= $d['keterangan_pajak'] ?>",
+                    keterangan_pajak: "<?= str_replace(array("\r", "\n"), '', $d['keterangan_pajak']) ?>",
                     type_tax: "<?= $d['type_tax'] ?>",
                 });
             <?php endforeach ?>
@@ -694,7 +694,7 @@
                 listContainer.push({
                     id_container: "<?= $d['id'] ?>",
                     no_container: "<?= $d['no_container'] ?>",
-                    detail_container: "<?= $d['detail_container'] ?>"
+                    detail_container: "<?= str_replace(array("\r", "\n"), '', $d['detail_container']) ?>"
                 })
             <?php endforeach; ?>
 
