@@ -9,16 +9,19 @@
 <!-- Begin Page Content -->
 <section class="section">
     <div class="section-header">
-        <div class="col-md-10">
-            <h1>Laporan Rincian Penjualan Per Pelanggan</h1>
-        </div>
+        <h1>Laporan Rincian Penjualan Per Pelanggan</h1>
 
-        <div class="col-md-2 text-right">
-            <div class="btn-group">
-                <a class="nav-link btn btn-warning" onclick="printPDF('<?= base_url("/laporan-sales/rincian-sales-per-pelanggan/printPDF"); ?>')">Export PDF</a>
-                <!-- <a class="btn btn-warning" onclick="printExcel('<?= base_url("/laporan-accounting/pembelian/printExcel"); ?>')">Export Excel</a> -->
-            </div>
-        </div>
+            <button style="right: 10px;" class="btn btn-discard btn-dropdown-export dropdown-toggle float-right" type="button" id="dropdownMenuButtonExport" data-bs-toggle="dropdown" aria-expanded="false">
+                Export
+            </button>
+            <ul class="dropdown-menu list-dropdown-company" aria-labelledby="dropdownMenuButtonExport">
+                <li>
+                    <button class="dropdown-item" onclick="printPDF('<?= base_url("/laporan-sales/rincian-sales-per-pelanggan/printPDF"); ?>')">PDF</button>
+                </li>
+                <li>
+                    <button class="dropdown-item" onclick="printExcel('<?= base_url("/laporan-sales/rincian-sales-per-pelanggan/printExcel"); ?>')">EXCEL</button>
+                </li>
+            </ul>
     </div>
     <div class="card">
         <div class="card-body">
@@ -274,7 +277,6 @@
         var search = $(".search").val() ? $(".search").val() : "all";
         var filter = $(".filter_customer").val() ? $(".filter_customer").val() : "all";
         url2 = url + "/" + tanggal_awal + "/" + tanggal_akhir + "/" + filter + "/" + search;
-        // console.log(url2);
         window.open(url2, "_blank");
     }
 </script>
