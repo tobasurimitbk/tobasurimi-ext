@@ -308,10 +308,10 @@
                     <tr>
                         <td>ADDRESS</td>
                         <td>:</td>
-                        <td><?= $dataSalesOrderExport->address ?></td>
+                        <td><?= $dataPI['alamat_customer'] ?></td>
                     </tr>
                     <tr>
-                        <td>NO OF</td>
+                        <td>SC</td>
                         <td>:</td>
                         <td><?= $dataSalesOrderExport->sales_order_export_no ?></td>
                     </tr>
@@ -525,7 +525,8 @@
                     </b>
                     <br>
                     <b>
-                        <?= $dataPI['payment_instruction'] ?>
+                        <?= $dataPI['payment_instruction'] ?> <br>
+                        101/<?= $dataPI['no_pi'] ?> (<?= number_format($dataPI['total_pi'], 2) ?>)
                     </b>
                 </td>
 

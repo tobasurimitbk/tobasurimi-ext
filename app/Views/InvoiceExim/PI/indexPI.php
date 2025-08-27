@@ -27,7 +27,7 @@
                     <td><?= $dataSalesOrderExport->no_invoice ?></td>
                 </tr>
                 <tr>
-                    <td>No OF</td>
+                    <td>SC</td>
                     <td>:</td>
                     <td><?= $dataSalesOrderExport->sales_order_export_no ?></td>
                 </tr>
