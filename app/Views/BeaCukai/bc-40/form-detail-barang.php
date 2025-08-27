@@ -931,103 +931,90 @@
 
         if (isChecked) {
             // Tambah
-            Swal.fire({
-                icon: 'question',
-                title: "Simpan dokumen dengan nomor seri " + seriDokumen + " ?",
-                confirmButtonColor: '#4e73df',
-                cancelButtonColor: '#d33',
-                showCancelButton: true,
-                reverseButtons: true,
-                confirmButtonText: 'Ya',
-                cancelButtonText: 'Kembali',
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    var formData = new FormData();
-                    formData.append("penerimaan_barang_id", "<?= encrypt($barangDetail['penerimaan_barang_id']) ?>");
-                    formData.append("barang1_id", "<?= encrypt($barangDetail['barang1_id']) ?>");
-                    formData.append("bc_purchase_order_id", "<?= encrypt($bcPo['id']) ?>");
-                    formData.append("bc_dokumen_id", bc23DokumenID);
-                    formData.append("seri_dokumen", seriDokumen);
-                    $.ajax({
-                        url: "<?= base_url("bea-cukai-bc-40/id/barang-dokumen-create"); ?>",
-                        data: formData,
-                        beforeSend: function(xhr) {
-                            xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                            setLoading();
-                        },
-                        complete: function() {
-                            stopLoading();
-                        },
-                        method: "POST",
-                        dataType: "json",
-                        processData: false,
-                        contentType: false,
-                        success: function(response) {
-                            if (response.status) {
-                                csrf.val(response.token);
-                                Swal.fire({
-                                    icon: 'success',
-                                    title: response.message,
-                                    confirmButtonColor: '#4e73df',
-                                    confirmButtonText: 'Ok'
-                                }).then((result) => {
-                                    csrf.val(response.token);
-                                    tableListInformasiDokumen.ajax.reload();
-                                });
-                            }
-                        },
-                    });
-                } else {
-                    checkbox.prop('checked', false);
-                }
+            var formData = new FormData();
+            formData.append("penerimaan_barang_id", "<?= encrypt($barangDetail['penerimaan_barang_id']) ?>");
+            formData.append("barang1_id", "<?= encrypt($barangDetail['barang1_id']) ?>");
+            formData.append("bc_purchase_order_id", "<?= encrypt($bcPo['id']) ?>");
+            formData.append("bc_dokumen_id", bc23DokumenID);
+            formData.append("seri_dokumen", seriDokumen);
+            $.ajax({
+                url: "<?= base_url("bea-cukai-bc-40/id/barang-dokumen-create"); ?>",
+                data: formData,
+                beforeSend: function(xhr) {
+                    xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                    setLoading();
+                },
+                complete: function() {
+                    stopLoading();
+                },
+                method: "POST",
+                dataType: "json",
+                processData: false,
+                contentType: false,
+                success: function(response) {
+                    if (response.status) {
+                        csrf.val(response.token);
+                        Swal.fire({
+                            icon: 'success',
+                            title: response.message,
+                            confirmButtonColor: '#4e73df',
+                            confirmButtonText: 'Ok'
+                        }).then((result) => {
+                            csrf.val(response.token);
+                            tableListInformasiDokumen.ajax.reload();
+                        });
+                    }
+                },
             });
         } else {
             // Hapus
-            Swal.fire({
-                icon: 'question',
-                title: "Hapus dokumen dengan nomor seri " + seriDokumen + " ?",
-                confirmButtonColor: '#4e73df',
-                cancelButtonColor: '#d33',
-                showCancelButton: true,
-                reverseButtons: true,
-                confirmButtonText: 'Ya',
-                cancelButtonText: 'Kembali',
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    var formData = new FormData();
-                    formData.append("id", barangDokumenID);
-                    $.ajax({
-                        url: "<?= base_url("bea-cukai-bc-40/id/barang-dokumen-delete"); ?>",
-                        data: formData,
-                        beforeSend: function(xhr) {
-                            xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                            setLoading();
-                        },
-                        complete: function() {
-                            stopLoading();
-                        },
-                        method: "POST",
-                        dataType: "json",
-                        processData: false,
-                        contentType: false,
-                        success: function(response) {
-                            if (response.status) {
-                                Swal.fire({
-                                    icon: 'success',
-                                    title: response.message,
-                                    confirmButtonColor: '#4e73df',
-                                    confirmButtonText: 'Ok'
-                                }).then((result) => {
-                                    csrf.val(response.token);
-                                    tableListInformasiDokumen.ajax.reload();
-                                });
+            // Swal.fire({
+            //     icon: 'question',
+            //     title: "Hapus dokumen dengan nomor seri " + seriDokumen + " ?",
+            //     confirmButtonColor: '#4e73df',
+            //     cancelButtonColor: '#d33',
+            //     showCancelButton: true,
+            //     reverseButtons: true,
+            //     confirmButtonText: 'Ya',
+            //     cancelButtonText: 'Kembali',
+            // }).then((result) => {
+            //     if (result.isConfirmed) {
 
-                            }
-                        },
-                    });
-                } else {
-                    checkbox.prop('checked', true);
-                }
+            //     } else {
+            //         checkbox.prop('checked', true);
+            //     }
+            // });
+
+            var formData = new FormData();
+            formData.append("id", barangDokumenID);
+            $.ajax({
+                url: "<?= base_url("bea-cukai-bc-40/id/barang-dokumen-delete"); ?>",
+                data: formData,
+                beforeSend: function(xhr) {
+                    xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                    setLoading();
+                },
+                complete: function() {
+                    stopLoading();
+                },
+                method: "POST",
+                dataType: "json",
+                processData: false,
+                contentType: false,
+                success: function(response) {
+                    if (response.status) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: response.message,
+                            confirmButtonColor: '#4e73df',
+                            confirmButtonText: 'Ok'
+                        }).then((result) => {
+                            csrf.val(response.token);
+                            tableListInformasiDokumen.ajax.reload();
+                        });
+
+                    }
+                },
             });
         }
     });
