@@ -34,7 +34,7 @@
                 </div>
                 <div class="col-md-3 col mb-3">
                     <div class="form-group mb-3">
-                        <input autocomplete="one-time-code" class="form-control search form-out-search" placeholder="Ketik Nama Barang / Kode Barang" value="" style="height: 50px;" />
+                        <input autocomplete="one-time-code" class="form-control search form-out-search" placeholder="Cari Data" value="" style="height: 50px;" />
                     </div>
                 </div>
             </div>
@@ -47,11 +47,11 @@
                                 <th onclick="changeSort('kelompok_barang')" class="sort" style="text-align:left;">Kategori</th>
                                 <th onclick="changeSort('kode_barang')" class="sort" style="text-align:left;">Kode Barang</th>
                                 <th onclick="changeSort('barang_name')" class="sort" style="text-align:left;">Nama Barang</th>
-                                <th class="sort">Satuan</th>
+                                <th class="sort" onclick="changeSort('satuan_1')">Satuan</th>
                                 <th class="sort">Satuan 2</th>
                                 <th class="sort">Satuan 3</th>
-                                <th class="sort" style="text-align:left;">Harga Terakhir</th>
-                                <th class="sort" style="text-align:left;">Supplier Terakhir</th>
+                                <th class="sort" onclick="changeSort('supplier_terakhir')" style="text-align:left;">Harga Terakhir</th>
+                                <th class="sort" onclick="changeSort('harga_terakhir')" style="text-align:left;">Supplier Terakhir</th>
                                 <th class="sort" style="text-align:center;">Akun COA</th>
                                 <th class="sort" style="text-align: center;">Action</th>
                             </tr>
@@ -429,7 +429,6 @@
             {
                 data: "satuan",
                 className: "text-center",
-                sortable: false,
             },
             {
                 data: "satuan2",
@@ -444,12 +443,17 @@
             {
                 data: "harga_terakhir",
                 className: "text-left",
-                sortable: false,
+                render: function(data) {
+                    if (data == "") {
+                        return "-";
+                    } else {
+                        return greatFormatRupiah(data)
+                    }
+                }
             },
             {
                 data: "supplier_terakhir",
                 className: "text-left",
-                sortable: false,
             },
             {
                 data: "akun_coa", // Assuming "akun_coa" is the field name in your data source
@@ -875,10 +879,16 @@
                 className: "text-center"
             }, {
                 data: "price",
-                className: "text-center"
+                className: "text-center",
+                render: function(data) {
+                    return greatFormatRupiah(data);
+                }
             }, {
                 data: "sub_total",
-                className: "text-center"
+                className: "text-center",
+                render: function(data) {
+                    return greatFormatRupiah(data);
+                }
             }, {
                 data: "divisi",
                 className: "text-center"

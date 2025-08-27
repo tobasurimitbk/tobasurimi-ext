@@ -237,8 +237,9 @@ class BiayaEskpor extends BaseController
         $taxReturnTotal = 0;
 
         $dataBiayaEkspor = $this->biayaEksporModel
-            ->select("biaya_ekspor.*, vendor_pelayaran.nama_vendor")
+            ->select("biaya_ekspor.*, vendor_pelayaran.nama_vendor, divisis.divisi")
             ->join('vendor_pelayaran', 'vendor_pelayaran.id = biaya_ekspor.vendor_pelayaran_id', 'left')
+            ->join('divisis', 'divisis.id = biaya_ekspor.divisi_id', 'left')
             ->where('biaya_ekspor.id', $id)
             ->first();
 

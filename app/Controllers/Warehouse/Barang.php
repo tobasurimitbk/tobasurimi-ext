@@ -432,8 +432,8 @@ class Barang extends BaseController
         $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
 
         foreach ($res['data'] as $data) {
-            $lokalDetail = $amPurchaseOrderModel->historiHargaPOBahanPenolongFirst($data['id'], $data['spesifikasi_id'], "Lokal", $this->this_company_id);
-            $importDetail = $amPurchaseOrderModel->historiHargaPOBahanPenolongFirst($data['id'], $data['spesifikasi_id'], "Import", $this->this_company_id);
+            // $lokalDetail = $amPurchaseOrderModel->historiHargaPOBahanPenolongFirst($data['id'], $data['spesifikasi_id'], "Lokal", $this->this_company_id);
+            // $importDetail = $amPurchaseOrderModel->historiHargaPOBahanPenolongFirst($data['id'], $data['spesifikasi_id'], "Import", $this->this_company_id);
             $satuan1 = $satuanModel->asObject()->where('id', $data['satuan_1'])->where('deletedAt', null)->first();
             $satuan2 = $satuanModel->asObject()->where('id', $data['satuan_2'])->where('deletedAt', null)->first();
             $satuan3 = $satuanModel->asObject()->where('id', $data['satuan_3'])->where('deletedAt', null)->first();
@@ -443,14 +443,14 @@ class Barang extends BaseController
             $satuan3_kode = (isset($satuan3) && $data['satuan_3'] != 0) ? $satuan3->kode_satuan : "-";
             $accountBarang = $accountBarangModel->asObject()->where('company_id', $this->this_company_id)->where('barang_master_id', $data['id'])->where('deleted_at', null)->first();
 
-            if ($lokalDetail['createdAt'] != null && $aksesSupplierLokalBP) {
+            if ($aksesSupplierLokalBP) {
                 // LOKAL 
-                $hargaTerakhir = $lokalDetail['hargaTerakhir'];
-                $supplierTerakhir = $lokalDetail['supplierTerakhir'];
-            } elseif ($importDetail['createdAt'] != null && $aksesSupplierImportBP) {
+                $hargaTerakhir = $data['harga_terakhir'];
+                $supplierTerakhir = $data['supplier_terakhir_name'];
+            } elseif ($aksesSupplierImportBP) {
                 // IMPORT 
-                $hargaTerakhir = $importDetail['hargaTerakhir'];
-                $supplierTerakhir = $importDetail['supplierTerakhir'];
+                $hargaTerakhir = $data['harga_terakhir'];
+                $supplierTerakhir = $data['supplier_terakhir_name'];
             } else {
                 $hargaTerakhir = "-";
                 $supplierTerakhir = "-";
@@ -467,7 +467,7 @@ class Barang extends BaseController
                 "satuan2"               => $satuan2_kode == "-" ? "-" : $satuan2_kode,
                 "satuan3"               => $satuan3_kode == "-" ? "-" : $satuan3_kode,
                 "akun_coa"               => $accountBarang ? $accountBarang : "",
-                "harga_terakhir"  => $hargaTerakhir,
+                "harga_terakhir"  => $hargaTerakhir == null ? "" : (float)$hargaTerakhir,
                 "supplier_terakhir" => $supplierTerakhir,
             ]);
         }
@@ -611,8 +611,8 @@ class Barang extends BaseController
                 'note'                  => $data['note'],
                 'qty'                   => floatval($data['qty']),
                 'kode_satuan'           => $data['kode_satuan'],
-                "price"                 => number_format($data['harga'], 2, ',', '.'),
-                "sub_total"             => number_format($data['sub_total'], 2, ',', '.'),
+                "price"                 => (float)$data['harga'],
+                "sub_total"             => (float)$data['sub_total'],
             ]);
         }
 
@@ -700,6 +700,8 @@ class Barang extends BaseController
         $search     = $this->request->getGet('search');
         $sort       = $this->request->getGet('sort');
         $sortType   = $this->request->getGet('sortType');
+        $start_date = $this->request->getGet('start_date');
+        $end_date   = $this->request->getGet('end_date');
 
         $condition = [
             "am_purchase_orders.company_id"  => $this->this_company_id,
@@ -715,7 +717,9 @@ class Barang extends BaseController
             "search" => $search !== "all" ? $search : "",
             "sort" => $sort ?? "am_purchase_orders.id",
             "sortType" => $sortType ?? "desc",
-            "po_date" => $poDate ? date("Y-m-d", strtotime($poDate)) : ""
+            "po_date" => $poDate ? date("Y-m-d", strtotime($poDate)) : "",
+            "start_date" => $start_date,
+            "end_date" => $end_date
         ];
 
         $amPurchaseOrderModel = new AMPurchaseOrderModel();

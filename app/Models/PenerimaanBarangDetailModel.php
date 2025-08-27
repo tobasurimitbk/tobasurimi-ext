@@ -438,4 +438,53 @@ class PenerimaanBarangDetailModel extends Model
             'sortType'  => $sortType
         ];
     }
+
+    public function historiHargaPOBahanPenolongByLpbFirst(
+        $statusPenerimaan,
+        $tipeBahan,
+        $spesifikasiId,
+        $companyId
+    ) {
+        $condition = [
+            "penerimaan_barang.status_post" => "FINISH",
+            "penerimaan_barang.tipe_bahan" => $tipeBahan,
+            "penerimaan_barang.company_id"  => $companyId,
+            "penerimaan_barang_detail.spesifikasi_id" => $spesifikasiId,
+            "penerimaan_barang.deletedAt" => NULL,
+            "penerimaan_barang_detail.deletedAt" => NULL,
+            "penerimaan_barang.status_penerimaan" => $statusPenerimaan
+        ];
+
+        $selectQry = "
+            CONCAT(barang_master.barang_name, ' - ', barang_master_spesifikasi.spesifikasi) as nama_barang, 
+            am_purchase_orders.po_no,
+            penerimaan_barang.tanggal,
+            penerimaan_barang.supplier_id,
+            am_purchase_order_details.note,
+            suppliers.name as nama_supplier,
+            penerimaan_barang_detail.harga, 
+            penerimaan_barang_detail.qty,
+            penerimaan_barang_detail.sub_total, 
+            divisis.divisi,
+            satuans.kode_satuan,
+            purchase_requests.spp_no,
+            penerimaan_barang.no_penerimaan_barang
+        ";
+
+        $dataLPB = $this->asArray()
+            ->select($selectQry)
+            ->where($condition)
+            ->join('penerimaan_barang', 'penerimaan_barang.id = penerimaan_barang_detail.penerimaan_barang_id', 'left')
+            ->join('am_purchase_orders', 'am_purchase_orders.id  = penerimaan_barang_detail.purchase_order_id')
+            ->join('am_purchase_order_details', 'am_purchase_order_details.id  = penerimaan_barang_detail.purchase_order_details_id')
+            ->join('purchase_requests', 'purchase_requests.id = am_purchase_orders.purchase_request_id', 'left')
+            ->join('barang_master', 'barang_master.id = penerimaan_barang_detail.barang_id', 'left')
+            ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = penerimaan_barang_detail.spesifikasi_id', 'left')
+            ->join('suppliers', 'suppliers.id = am_purchase_orders.supplier_id', 'left')
+            ->join('divisis', 'divisis.id = penerimaan_barang.divisi_id', 'left')
+            ->join('satuans', 'satuans.id = penerimaan_barang_detail.unit', 'left')
+            ->first();
+
+        return $dataLPB;
+    }
 }

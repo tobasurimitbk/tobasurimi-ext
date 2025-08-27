@@ -62,6 +62,10 @@ class BarangMasterModel extends Model
             'kode_barang'       => 'barang_master.kode_barang',
             'barang_name'       => 'barang_master.barang_name',
             'createdAt'         => 'barang_master.createdAt',
+            'supplier_terakhir' => 'barang_master_spesifikasi.supplier_terakhir',
+            'harga_terakhir'    => 'barang_master_spesifikasi.harga_terakhir',
+            'satuan_1'          => 'barang_master_spesifikasi.satuan_1'
+
         ];
         $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
 
@@ -99,9 +103,12 @@ class BarangMasterModel extends Model
                 'barang_master_spesifikasi.satuan_3',
                 'barang_master_spesifikasi.konversi_satuan_3',
                 'parent_barang.parent_name AS kelompok_barang',
+                'suppliers.name as supplier_terakhir_name',
+                'barang_master_spesifikasi.harga_terakhir',
             ])
             ->join('parent_barang', 'parent_barang.id = barang_master.parent_type_id', 'left')
             ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.barang_master_id = barang_master.id', 'left')
+            ->join('suppliers', 'suppliers.id = barang_master_spesifikasi.supplier_terakhir', 'left')
             ->where($condition);
 
         if ($aksesSupplierLokalBP && !$aksesSupplierImportBP) {
@@ -124,6 +131,7 @@ class BarangMasterModel extends Model
                     ->orLike('LOWER(barang_master.kode_barang)', $word)
                     ->orLike('LOWER(parent_barang.parent_name)', $word)
                     ->orLike('LOWER(barang_master_spesifikasi.spesifikasi)', $word)
+                    ->orLike('LOWER(suppliers.name)', $word)
                     ->groupEnd();
             }
 
