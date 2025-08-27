@@ -321,6 +321,7 @@ class PI extends BaseController
                 'total_pi' => $this->request->getVar('total_pi'),
                 'status_posting' => 0,
                 'status_bayar' => 0,
+                'penanda_tangan' => $this->request->getVar('penanda_tangan')
             ]);
 
             foreach (\json_decode($_POST['listPaymentTerm']) as $l) {
@@ -387,6 +388,7 @@ class PI extends BaseController
                 'payment_instruction' => $this->request->getVar('payment_instruction'),
                 'packing' => $this->request->getVar('packing'),
                 'total_pi' => $this->request->getVar('total_pi'),
+                'penanda_tangan' => $this->request->getVar('penanda_tangan')
             ]);
 
             $id_proforma_invoice_payment_term = [];

@@ -176,7 +176,7 @@
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3">
-                            <input value="<?= !empty($dataPI) ? $dataPI['packing'] : '' ?>" <?= !empty($dataPI) ? ($dataPI['status_posting'] == 1 ? 'readonly' : '') : '' ?> autocomplete="one-time-code" type="text" class="form-control penanda_tangan" id="penanda_tangan" name="penanda_tangan">
+                            <input value="<?= !empty($dataPI) ? $dataPI['penanda_tangan'] : '' ?>" <?= !empty($dataPI) ? ($dataPI['status_posting'] == 1 ? 'readonly' : '') : '' ?> autocomplete="one-time-code" type="text" class="form-control penanda_tangan" id="penanda_tangan" name="penanda_tangan">
                             <label for="floatingInput">Penanda Tangan</label>
                         </div>
                     </div>
