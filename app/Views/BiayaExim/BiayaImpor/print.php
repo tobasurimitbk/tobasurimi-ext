@@ -101,9 +101,6 @@
 <body style="border: 0px solid;font-size: 11px;">
 
     <div style="margin-top:-10px;">
-        <center>
-            <?= $dataBiayaImpor['divisi'] ?>
-        </center>
         <table class="w-100">
             <tr>
                 <td>
@@ -165,9 +162,14 @@
             <div style="display: inline-block;vertical-align: top; float: right; margin-top:5px;">
                 <table>
                     <tr>
-                        <td>NO BUKTI:</td>
-                        <td></td>
+                        <td>NO BUKTI</td>
+                        <td>:</td>
                         <td>___________________________</td>
+                    </tr>
+                    <tr>
+                        <td>DEPT</td>
+                        <td>:</td>
+                        <td><?= $dataBiayaImpor['divisi'] ?></td>
                     </tr>
                 </table>
             </div>
@@ -236,13 +238,10 @@
 
     <?php if ($totalDikembalikan != 0) { ?>
         <!-- <div style="background-color: #ffe4e1; "> -->
-        <div style="margin-left: -45px;background-color: #ffe4e1; margin-right:-45px;">
+        <div style="margin-left: -45px;background-color: #d4a49fff; margin-right:-45px;">
             <div style="margin-top:40px; margin-left:45px; margin-right:45px;">
                 <hr style="border: 1px dashed #000;">
                 <br>
-                <center>
-                    <?= $dataBiayaImpor['divisi'] ?>
-                </center>
                 <table class="w-100">
                     <tr>
                         <td>
@@ -303,9 +302,14 @@
                     <div style="display: inline-block;vertical-align: top; float: right; margin-top:5px;">
                         <table>
                             <tr>
-                                <td>NO BUKTI:</td>
-                                <td></td>
+                                <td>NO BUKTI</td>
+                                <td>:</td>
                                 <td>___________________________</td>
+                            </tr>
+                            <tr>
+                                <td>DEPT</td>
+                                <td>:</td>
+                                <td><?= $dataBiayaImpor['divisi'] ?></td>
                             </tr>
                         </table>
                     </div>
