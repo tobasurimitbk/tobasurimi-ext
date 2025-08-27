@@ -6,6 +6,8 @@ use App\Controllers\BaseController;
 use App\Models\CustomerModel;
 use App\Models\SalesOrderInvoiceModel;
 use Dompdf\Dompdf;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
 class PenjualanPerPelanggan extends BaseController
 {
@@ -53,7 +55,7 @@ class PenjualanPerPelanggan extends BaseController
             "search" => $this->request->getGet("search"),
             "sort" => $this->request->getGet("sort"),
             "sortType" => $this->request->getGet("sortType"),
-            "filter_jenis_dokumen" => $this->request->getGet("filter_jenis_dokumen"),
+            "filter_jenis_dokumen" => $this->request->getGet("filter_jenis_dokumen") ?? null,
             "filter_customer" => $this->request->getGet("filter"),
             "dateStart" => $this->request->getGet("dateStart") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getGet("dateStart")))) : "",
             "dateEnd" => $this->request->getGet("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getGet("dateEnd")))) : "",
@@ -66,7 +68,6 @@ class PenjualanPerPelanggan extends BaseController
         $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
 
         foreach ($dataSalesOrderInvoice['data'] as $data) {
-            // Add the regular invoice data
             array_push($dataAllSalesOrderInvoice, [
                 "no" => $no++,
                 "id" => encrypt($data->id),
@@ -89,115 +90,160 @@ class PenjualanPerPelanggan extends BaseController
         return;
     }
 
-    public function LaporanPenjualanPrint($tglAwal, $tglAkhir, $filter, $search)
+    public function printPDF($tglAwal = "all", $tglAkhir = "now", $filter = "all", $search = "all")
     {
-        $dompdf = new Dompdf();
-
         $condition = [
-            "sales_order_invoice.id_company" => $this->this_company_id,
+            // "sales_order_invoice.id_company" => $this->this_company_id,
             "sales_order_invoice.deletedAt" => null,
             "sales_order_invoice.tipe_invoice" => 'LOKAL'
         ];
 
         $addCondition = [
-            "search" => $this->request->getGet("search"),
-            "sort" => $this->request->getGet("sort"),
-            "sortType" => $this->request->getGet("sortType"),
-            "filter_jenis_dokumen" => $this->request->getGet("filter_jenis_dokumen"),
-            "filter_customer" => $this->request->getGet("filter"),
-            "dateStart" => $this->request->getGet("dateStart") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getGet("dateStart")))) : "",
-            "dateEnd" => $this->request->getGet("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getGet("dateEnd")))) : "",
+            "search" => $search != "all" ? $search : null,
+            "filter_jenis_dokumen" => $this->request->getGet("filter_jenis_dokumen") ?? null,
+            "filter_customer" => $filter != "all" ? $filter : null,
+            "dateStart" => $tglAwal != "all" ? date("Y-m-d", strtotime($tglAwal)) : "",
+            "dateEnd" => $tglAkhir != "now" ? date("Y-m-d", strtotime($tglAkhir)) : "",
         ];
 
-        // Fetch sales order invoice data
+        // Get all data without pagination
         $dataSalesOrderInvoice = $this->salesOrderInvoiceModel
-            ->getAllSalesOrderInvoiceLokalWithoutLimit($condition, $addCondition);
+            ->getLaporanPenjualanPerPelanggan($condition, $addCondition, 0, 0);
 
         $dataAllSalesOrderInvoice = [];
-        $currentCustomer = null;
-        $totalPerCustomer = 0;
         $no = 1;
+        $totalAllInvoice = 0;
 
         foreach ($dataSalesOrderInvoice['data'] as $data) {
-            // Check if the customer has changed
-            if ($currentCustomer !== $data->nama_pelanggan) {
-                // If there's a previous customer, push their total row
-                if ($currentCustomer !== null) {
-                    array_push($dataAllSalesOrderInvoice, [
-                        "no" => '',
-                        "id" => '',
-                        "no_faktur" => number_format(floatval($totalPerCustomer)),
-                        "tanggal_faktur" => '',
-                        "keterangan" => '',
-                        "total_invoice" => '',
-                        "nama_pelanggan" => '',
-                        "nama_sales" => '',
-                        "is_total" => true,
-                    ]);
-                }
-
-                // Reset total for the new customer
-                $currentCustomer = $data->nama_pelanggan;
-                $totalPerCustomer = 0;
-
-                // Add a row for the new customer's name
-                array_push($dataAllSalesOrderInvoice, [
-                    "no" => '',
-                    "id" => '',
-                    "no_faktur" => $data->nama_pelanggan,
-                    "tanggal_faktur" => '',
-                    "keterangan" => '',
-                    "total_invoice" => '',
-                    "nama_pelanggan" => '',
-                    "nama_sales" => '',
-                    "is_customer" => true,
-                ]);
-            }
-
-            // Add the regular invoice data for this customer
+            $totalInvoice = floatval($data->sum_amount_invoice);
+            $totalAllInvoice += $totalInvoice;
+            
             array_push($dataAllSalesOrderInvoice, [
                 "no" => $no++,
-                "id" => encrypt($data->id),
-                "no_faktur" => $data->no_faktur,
-                "tanggal_faktur" => $data->tanggal_faktur,
-                "keterangan" => $data->keterangan,
-                "total_invoice" => number_format(floatval($data->total_invoice)),
+                "total_invoice" => number_format($totalInvoice),
                 "nama_pelanggan" => $data->nama_pelanggan,
-                "nama_sales" => $data->salesName,
-            ]);
-
-            // Accumulate the total invoice for this customer
-            $totalPerCustomer += floatval($data->total_invoice);
-        }
-
-        // After looping through all data, push the total row for the last customer
-        if ($currentCustomer !== null) {
-            array_push($dataAllSalesOrderInvoice, [
-                "no" => '',
-                "id" => '',
-                "no_faktur" => number_format(floatval($totalPerCustomer)),
-                "tanggal_faktur" => '',
-                "keterangan" => '',
-                "total_invoice" => '',
-                "nama_pelanggan" => '',
-                "nama_sales" => '',
-                "is_total" => true,
+                "kode_pelanggan" => $data->kode_pelanggan,
+                "count_invoice" => $data->count_invoice,
+                "raw_total" => $totalInvoice
             ]);
         }
 
         $data = [
             "data" => $dataAllSalesOrderInvoice,
+            "totalAllInvoice" => number_format($totalAllInvoice),
             "dateStart" => $tglAwal != "all" ? date("d/m/Y", strtotime($tglAwal)) : "All",
             "dateEnd" => $tglAkhir != "now" ? date("d/m/Y", strtotime($tglAkhir)) : "Now",
+            "filter_customer" => $filter != "all" ? $this->customerModel->find($filter)->name : "All",
+            "search" => $search != "all" ? $search : "All"
         ];
 
-        // return view('Laporan/LaporanSales/LaporanPerPelanggan/print', $data);
-
+        $dompdf = new Dompdf();
         $dompdf->loadHtml(view('Laporan/LaporanSales/LaporanPerPelanggan/print', $data));
-        $dompdf->setPaper('A4', 'landscape');
+        $dompdf->setPaper('A4', 'portrait');
         $dompdf->render();
-        $dompdf->stream("Laporan Penjualan Per Pelanggan ", array("Attachment" => false));
-
+        $dompdf->stream("Laporan Penjualan Per Pelanggan.pdf", array("Attachment" => false));
         exit(0);
+    }
+
+    public function printExcel($tglAwal = "all", $tglAkhir = "now", $filter = "all", $search = "all")
+    {
+        $condition = [
+            // "sales_order_invoice.id_company" => $this->this_company_id,
+            "sales_order_invoice.deletedAt" => null,
+            "sales_order_invoice.tipe_invoice" => 'LOKAL'
+        ];
+
+        $addCondition = [
+            "search" => $search != "all" ? $search : null,
+            "filter_jenis_dokumen" => $this->request->getGet("filter_jenis_dokumen") ?? null,
+            "filter_customer" => $filter != "all" ? $filter : null,
+            "dateStart" => $tglAwal != "all" ? date("Y-m-d", strtotime($tglAwal)) : "",
+            "dateEnd" => $tglAkhir != "now" ? date("Y-m-d", strtotime($tglAkhir)) : "",
+        ];
+
+        // Get all data without pagination
+        $dataSalesOrderInvoice = $this->salesOrderInvoiceModel
+            ->getLaporanPenjualanPerPelanggan($condition, $addCondition, 0, 0);
+
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+
+        // Set judul laporan
+        $sheet->setCellValue('A1', 'TOBA FISH');
+        $sheet->setCellValue('A2', 'LAPORAN PENJUALAN PER PELANGGAN');
+        $sheet->mergeCells('A1:E1');
+        $sheet->mergeCells('A2:E2');
+        $sheet->getStyle('A1:A2')->getFont()->setBold(true)->setSize(14);
+        $sheet->getStyle('A1:A2')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+        
+        // Set informasi filter
+        $sheet->setCellValue('A3', 'Periode: '. ($tglAwal != "all" ? date("d/m/Y", strtotime($tglAwal)) : "All") . ' - ' . ($tglAkhir != "now" ? date("d/m/Y", strtotime($tglAkhir)) : "Now"));
+        $sheet->mergeCells('A3:E3');
+        $sheet->getStyle('A3:A3')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+
+        // Set header tabel
+        $sheet->setCellValue('A5', 'No');
+        $sheet->setCellValue('B5', 'Nama Pelanggan');
+        $sheet->setCellValue('C5', 'Kode Pelanggan');
+        $sheet->setCellValue('D5', 'Jumlah Data');
+        $sheet->setCellValue('E5', 'Jumlah');
+
+        // Style header tabel
+        $headerStyle = [
+            'font' => ['bold' => true],
+            'alignment' => ['horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER],
+            'fill' => [
+                'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
+                'startColor' => ['argb' => 'FFE0E0E0']
+            ]
+        ];
+        $sheet->getStyle('A5:E5')->applyFromArray($headerStyle);
+
+        // Isi data
+        $row = 6;
+        $no = 1;
+        $totalAllInvoice = 0;
+
+        foreach ($dataSalesOrderInvoice['data'] as $data) {
+            $totalInvoice = floatval($data->sum_amount_invoice);
+            $totalAllInvoice += $totalInvoice;
+
+            $sheet->setCellValue('A' . $row, $no++);
+            $sheet->setCellValue('B' . $row, $data->nama_pelanggan);
+            $sheet->setCellValue('C' . $row, $data->kode_pelanggan);
+            $sheet->setCellValue('D' . $row, $data->count_invoice);
+            $sheet->setCellValue('E' . $row, $totalInvoice);
+            
+            $row++;
+        }
+
+        // Total
+        $sheet->setCellValue('A' . $row, 'TOTAL');
+        $sheet->mergeCells('A' . $row . ':D' . $row);
+        $sheet->setCellValue('E' . $row, $totalAllInvoice);
+        
+        $sheet->getStyle('A' . $row . ':E' . $row)->getFont()->setBold(true);
+        $sheet->getStyle('A' . $row . ':E' . $row)->getFill()
+            ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
+            ->getStartColor()->setARGB('FFE0E0E0');
+
+        // Format kolom jumlah
+        $sheet->getStyle('E7:E' . $row)->getNumberFormat()->setFormatCode('#,##0');
+
+        // Auto size columns
+        foreach(range('A','E') as $columnID) {
+            $sheet->getColumnDimension($columnID)->setAutoSize(true);
+        }
+
+        // Set judul file
+        $filename = "Laporan Penjualan Per Pelanggan.xlsx";
+
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment;filename="' . $filename . '"');
+        header('Cache-Control: max-age=0');
+
+        $writer = new Xlsx($spreadsheet);
+        $writer->save('php://output');
+        exit;
     }
 }

@@ -4,16 +4,19 @@
 <!-- Begin Page Content -->
 <section class="section">
     <div class="section-header">
-        <div class="col-md-10">
-            <h1>Laporan Penjualan Per Pelanggan</h1>
-        </div>
-
-        <div class="col-md-2 text-right">
-            <div class="btn-group">
-                <a class="nav-link btn btn-warning" onclick="printPDF('<?= base_url("/laporan-sales/sales-per-pelanggan/printPDF"); ?>')">Export PDF</a>
-                <!-- <a class="btn btn-warning" onclick="printExcel('<?= base_url("/laporan-accounting/pembelian/printExcel"); ?>')">Export Excel</a> -->
-            </div>
-        </div>
+        <h1>Laporan Penjualan Per Pelanggan</h1>
+        
+        <button style="right: 10px;" class="btn btn-discard btn-dropdown-export dropdown-toggle float-right" type="button" id="dropdownMenuButtonExport" data-bs-toggle="dropdown" aria-expanded="false">
+            Export
+        </button>
+        <ul class="dropdown-menu list-dropdown-company" aria-labelledby="dropdownMenuButtonExport">
+            <li>
+                <button class="dropdown-item" onclick="printPDF('<?= base_url("/laporan-sales/sales-per-pelanggan/printPDF"); ?>')">PDF</button>
+            </li>
+            <li>
+                <button class="dropdown-item" onclick="printExcel('<?= base_url("/laporan-sales/sales-per-pelanggan/printExcel"); ?>')">EXCEL</button>
+            </li>
+        </ul>
     </div>
     <div class="card">
         <div class="card-body">
@@ -97,9 +100,6 @@
             processing: true,
             serverSide: true,
             ordering: true,
-            order: [
-                [1, 'desc']
-            ],
             fixedHeader: true,
             lengthMenu: [
                 [25],
@@ -109,44 +109,36 @@
             ajax: {
                 url: "<?= base_url("laporan-sales/sales-per-pelanggan/all"); ?>",
                 dataSrc: "data",
-                data: function(data) {
-                    data.search = $(".search").val();
-                    data.filter = $(".filter_customer").val();
-                    data.dateStart = $(".dateStart").val();
-                    data.dateEnd = $(".dateEnd").val();
-                    data.sort = sort;
-                    data.sortType = sortType;
+                data: function(d) {
+                    d.search = $(".search").val();
+                    d.filter = $(".filter_customer").val();
+                    d.dateStart = $(".dateStart").val();
+                    d.dateEnd = $(".dateEnd").val();
+
+                    // mapping order dari datatables
+                    if (d.order && d.order.length > 0) {
+                        let orderColIdx = d.order[0].column;
+                        let orderDir = d.order[0].dir;
+
+                        // mapping ke nama field backend
+                        let colName = d.columns[orderColIdx].data;
+                        d.sort = colName;
+                        d.sortType = orderDir;
+                    }
                 }
-            },
-            "initComplete": function(settings, json) {
-                $('.dataTables_length').empty();
-                $('.dataTables_length').html("<div><label class='text-center ml-2 mt-2'>Show <b class='entries-label'>25</b> Entries</label></div>");
-                $('.dataTable').wrap("<div style='overflow:auto; width:100%;position:relative;'></div>");
             },
             display: "stripe",
             searching: false,
-            columns: [{
-                data: "no",
-                className: "text-center",
-                sortable: false,
-                width: "5%"
-            }, {
-                data: "nama_pelanggan",
-                className: "text-left",
-            }, {
-                data: "kode_pelanggan",
-                className: "text-center",
-            }, {
-                data: "count_invoice",
-                className: "text-center",
-            }, {
-                data: "total_invoice",
-                className: "text-center",
-            }, ],
-            columnDefs: [{
-                defaultContent: "-",
-                targets: "_all"
-            }],
+            columns: [
+                { data: "no", className: "text-center", sortable: false, width: "5%" },
+                { data: "nama_pelanggan", className: "text-left" },
+                { data: "kode_pelanggan", className: "text-center" },
+                { data: "count_invoice", className: "text-center" },
+                { data: "total_invoice", className: "text-center" },
+            ],
+            columnDefs: [
+                { defaultContent: "-", targets: "_all" }
+            ],
             language: {
                 emptyTable: "Tidak Ada Data",
                 lengthMenu: "Show _MENU_ entries",
@@ -227,17 +219,30 @@
         var tanggal_akhir = $(".dateEnd").val() ? convertDateFormat($(".dateEnd").val()) : "now";
         var search = $(".search").val() ? $(".search").val() : "all";
         var filter = $(".filter_customer").val() ? $(".filter_customer").val() : "all";
+        
+        // Encode parameters for URL
+        tanggal_awal = encodeURIComponent(tanggal_awal);
+        tanggal_akhir = encodeURIComponent(tanggal_akhir);
+        search = encodeURIComponent(search);
+        filter = encodeURIComponent(filter);
+        
         url2 = url + "/" + tanggal_awal + "/" + tanggal_akhir + "/" + filter + "/" + search;
-        // console.log(url2);
         window.open(url2, "_blank");
     }
+
     const printExcel = function(url) {
         var tanggal_awal = $(".dateStart").val() ? convertDateFormat($(".dateStart").val()) : "all";
         var tanggal_akhir = $(".dateEnd").val() ? convertDateFormat($(".dateEnd").val()) : "now";
         var search = $(".search").val() ? $(".search").val() : "all";
         var filter = $(".filter_customer").val() ? $(".filter_customer").val() : "all";
+        
+        // Encode parameters for URL
+        tanggal_awal = encodeURIComponent(tanggal_awal);
+        tanggal_akhir = encodeURIComponent(tanggal_akhir);
+        search = encodeURIComponent(search);
+        filter = encodeURIComponent(filter);
+        
         url2 = url + "/" + tanggal_awal + "/" + tanggal_akhir + "/" + filter + "/" + search;
-        // console.log(url2);
         window.open(url2, "_blank");
     }
 </script>

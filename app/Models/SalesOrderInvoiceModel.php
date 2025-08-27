@@ -175,19 +175,16 @@ class SalesOrderInvoiceModel extends Model
     public function getLaporanPenjualanPerPelanggan($condition, $addCondition, $limit = 10, $offset = 0)
     {
         $availableSort = [
-            'no_faktur'          => 'sales_order_invoice.no_faktur',
-            'nama_pelanggan'            => 'customers.name',
-            'kode_pelanggan'             => 'customers.kode',
-            'no_faktur'             => 'sales_order_invoice.no_faktur',
-            'total_invoice'      => 'sales_order_invoice.total_invoice',
-            'keterangan'      => 'sales_order_invoice.keterangan',
-            'createdAt'         => 'sales_order_invoice.createdAt',
-            'updatedAt'         => 'sales_order_invoice.updatedAt',
+            'nama_pelanggan'   => 'customers.name',
+            'kode_pelanggan'   => 'customers.kode',
+            'count_invoice'    => 'count_invoice', // alias harus bisa dipakai di order
+            'total_invoice'    => 'sum_amount_invoice', // pakai SUM result
         ];
+
         $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
 
-        $sort = $availableSort[$addCondition['sort'] ?? 'createdAt'] ?? 'sales_order_invoice.createdAt';
-        $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'DESC';
+        $sort = $availableSort[$addCondition['sort'] ?? 'total_invoice'] ?? 'sum_amount_invoice';
+        $sortType = $availableSortType[$addCondition['sortType'] ?? 'asc'] ?? 'ASC';
 
         $selectQry = "
                     sales_order_invoice.id,
@@ -197,7 +194,7 @@ class SalesOrderInvoiceModel extends Model
                     SUM(barang_master_sales.harga_pokok * sales_order_invoice_detail.qty_invoice) AS amt_harga_pokok,
                     SUM(sales_order_invoice_detail.qty_invoice) AS sum_qty_invoice,
                     SUM(sales_order_invoice_detail.amount_invoice) AS sum_amount_invoice,
-                    COUNT(sales_order_invoice.id) AS count_invoice";
+                    COUNT(DISTINCT sales_order_invoice.id) AS count_invoice";
 
         $salesOrderInvoiceLokal = $this->asObject()
             ->select($selectQry)
@@ -219,7 +216,8 @@ class SalesOrderInvoiceModel extends Model
 
         if ($addCondition['search']) {
             $salesOrderInvoiceLokal
-                ->like('no_faktur', $addCondition['search']);
+                ->like('customers.name', $addCondition['search'])
+                ->orLike('customers.kode', $addCondition['search']);
         }
 
         if ($addCondition['filter_customer']) {

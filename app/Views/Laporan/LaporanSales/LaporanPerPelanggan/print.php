@@ -1,109 +1,90 @@
 <!DOCTYPE html>
-<html lang="en">
-
+<html>
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Rincian Penjualan Per Pelanggan</title>
-  <style>
-    body {
-      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-      font-size: 5px;
-      padding: 20px;
-    }
-
-    h5 {
-      font-weight: normal;
-      font-size: 18px;
-      margin-bottom: 10px;
-      text-align: center;
-      font-weight: bold;
-      margin-top: 8px;
-    }
-
-    h6 {
-      font-weight: normal;
-      font-size: 13px;
-      text-align: center;
-      font-weight: bold;
-      margin-top: 10px;
-      margin-bottom: 10px;
-    }
-
-    @page {
-      size: 7.44in 10in landscape;
-      margin: 5px;
-      padding: 30px;
-    }
-
-    table {
-      border-collapse: collapse !important;
-    }
-
-    #table1,
-    th,
-    td {
-      border: 1px solid #999;
-      font-size: 12px;
-    }
-  </style>
-</head>
-
-<body>
-  <h6>TOBA FISH</h6>
-  <h5>Rincian Penjualan per Pelanggan</h5>
-  <h6>Dari <?= ($dateStart != "All") ? $dateStart : "-" ?> s/d <?= ($dateEnd != "Now") ? $dateEnd : "-" ?></h6>
-
-  <table width="100%" id="table1">
-    <thead>
-      <tr>
-        <th>No. Faktur</th>
-        <th>Tanggal Faktur</th>
-        <th>Keterangan</th>
-        <th>Jumlah</th>
-        <th>Nama Pelanggan</th>
-        <th>Nama Penjual</th>
-      </tr>
-    </thead>
-    <tbody>
-      <?php
-      $currentCustomer = null; // Variabel untuk melacak pelanggan saat ini
-      foreach ($data as $value) :
-        if (isset($value['is_customer'])) {
-          // Hanya tampilkan nama pelanggan jika belum ditampilkan
-          if ($currentCustomer !== $value['no_faktur']) {
-            $currentCustomer = $value['no_faktur'];
-      ?>
-            <tr>
-              <td colspan="6" style="font-weight: bold;"><?= $value['no_faktur'] ?></td>
-            </tr>
-          <?php
-          }
-        } elseif (isset($value['is_total'])) {
-          // Tampilkan total hanya untuk pelanggan yang sama
-          ?>
-          <tr>
-            <td colspan="3"></td>
-            <td style="font-weight: bold;"><?= $value['no_faktur'] ?></td>
-            <td colspan="2"></td>
-          </tr>
-        <?php
-        } else {
-        ?>
-          <tr>
-            <td><?= $value['no_faktur'] ?></td>
-            <td><?= $value['tanggal_faktur'] ?></td>
-            <td><?= $value['keterangan'] ?></td>
-            <td><?= $value['total_invoice'] ?></td>
-            <td><?= $value['nama_pelanggan'] ?></td>
-            <td><?= $value['nama_sales'] ?></td>
-          </tr>
-      <?php
+    <title>Laporan Penjualan Per Pelanggan</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            font-size: 10px;
         }
-      endforeach;
-      ?>
-    </tbody>
-  </table>
+        .header {
+            text-align: center;
+        }
+        .header h1 {
+            margin-bottom: 5px;
+        }
+        .info {
+            margin-bottom: 15px;
+        }
+        .text-center{
+            text-align: center;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        table, th, td {
+            border: 1px solid #000;
+        }
+        th, td {
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+            text-align: center;
+        }
+        .text-center {
+            text-align: center;
+        }
+        .text-right {
+            text-align: right;
+        }
+        .total-row {
+            font-weight: bold;
+            background-color: #e0e0e0;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h2>TOBA FISH</h2>
+        <h2 style="color: red;">PENJUALAN PER PELANGGAN</h2>
+        <p><strong>Periode:</strong> <?= $dateStart ?> - <?= $dateEnd ?></p>
+    </div>
+    
+    <table>
+        <thead>
+            <tr>
+                <th width="5%">No</th>
+                <th width="40%">Nama Pelanggan</th>
+                <th width="15%">Kode Pelanggan</th>
+                <th width="15%">Jumlah Data</th>
+                <th width="25%">Jumlah</th>
+            </tr>
+        </thead>
+        <tbody>
+            <?php if (!empty($data)): ?>
+                <?php foreach ($data as $row): ?>
+                <tr>
+                    <td class="text-center"><?= $row['no'] ?></td>
+                    <td><?= $row['nama_pelanggan'] ?></td>
+                    <td class="text-center"><?= $row['kode_pelanggan'] ?></td>
+                    <td class="text-center"><?= $row['count_invoice'] ?></td>
+                    <td class="text-right"><?= $row['total_invoice'] ?></td>
+                </tr>
+                <?php endforeach; ?>
+                <tr class="total-row">
+                    <td colspan="3" class="text-center">TOTAL</td>
+                    <td class="text-center"><?= array_sum(array_column($data, 'count_invoice')) ?></td>
+                    <td class="text-right"><?= $totalAllInvoice ?></td>
+                </tr>
+            <?php else: ?>
+                <tr>
+                    <td colspan="5" class="text-center">Tidak ada data</td>
+                </tr>
+            <?php endif; ?>
+        </tbody>
+    </table>
 </body>
-
 </html>
