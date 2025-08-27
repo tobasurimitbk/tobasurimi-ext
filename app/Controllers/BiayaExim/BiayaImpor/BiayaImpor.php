@@ -270,8 +270,9 @@ class BiayaImpor extends BaseController
         $taxReturnTotal = 0;
 
         $dataBiayaImpor = $this->biayaImporModel
-            ->select("biaya_impor.*, vendor_pelayaran.nama_vendor")
+            ->select("biaya_impor.*, vendor_pelayaran.nama_vendor, divisis.divisi")
             ->join('vendor_pelayaran', 'vendor_pelayaran.id = biaya_impor.vendor_pelayaran_id', 'left')
+            ->join('divisis', 'divisis.id = biaya_impor.divisi_id', 'left')
             ->where('biaya_impor.id', $id)
             ->first();
 
