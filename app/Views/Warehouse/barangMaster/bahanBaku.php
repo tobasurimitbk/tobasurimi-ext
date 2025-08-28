@@ -263,7 +263,7 @@
             </div>
             <div class="modal-body">
                 <form class="create-form-akun-barang" role="form" method="POST" enctype="multipart/form-data" onSubmit="return false">
-                    <input type="hidden" name="spek_id" class="spek_id" id="spek_id">
+                    <input type="text" name="spek_id_akun" class="spek_id_akun" id="spek_id_akun">
                     <?= csrf_field() ?>
                     <div class="row">
                         <div class="col-md-6">
@@ -366,7 +366,20 @@
                             </div>
                         </div>
                     </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <textarea class="form-control keterangan" placeholder="Keterangan" id="keterangan" name="keterangan" style="height: 100px;"></textarea>
+                                <label for="floatingInput">Keterangan</label>
+                            </div>
+                        </div>
+                    </div>
                 </form>
+
+                <!-- Tombol Tambah ke Tabel ditempatkan di sini, sebelum tabel -->
+                <div class="d-flex justify-content-end mt-5 mb-3">
+                    <button type="button" class="btn btn-primary btn-add-to-table">Tambah ke Tabel</button>
+                </div>
 
                 <!-- Tabel Sementara untuk Data Akun Barang -->
                 <div class="row mt-4">
@@ -380,6 +393,7 @@
                                         <th>Akun Penjualan</th>
                                         <th>Akun Pemakaian</th>
                                         <th>Kategori Barang</th>
+                                        <th>Keterangan</th>
                                         <th>Aksi</th>
                                     </tr>
                                 </thead>
@@ -392,7 +406,7 @@
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-add-to-table">Tambah ke Tabel</button>
+                <!-- Tombol Tambah ke Tabel dihapus dari sini -->
                 <button type="button" class="btn btn-submit-form">Simpan</button>
                 <button type="button" class="btn btn-hide-form btn-discard btn-discard-add-modal-akun-barang mr-2">Kembali</button>
             </div>
@@ -406,6 +420,7 @@
     const csrfToken = '<?= csrf_token() ?>';
 
     let list_items = [];
+    let list_akun_items = [];
 
     const table = $('.dataTable-barang').DataTable({
 
@@ -651,6 +666,7 @@
                             let csrf = $(`[name="${csrfToken}"]`);
                             let data = new FormData(document.querySelector(".create-form"));
                             data.append("items", JSON.stringify(list_items));
+                            data.append("akun_barang", JSON.stringify(list_akun_items));
 
                             if (id) {
                                 $.ajax({
@@ -1393,7 +1409,7 @@
         let spek_id = $(this).data('spek_id');
         let spek = $(this).data('spesifikasi');
         console.log(spek_id);
-        $('#spek_id').val(spek_id);
+        $('#spek_id_akun').val(spek_id).change();
         $('#parentNameAkunBarang').val(spek);
         $('.add-modal-akun-barang').modal('show');
     });
@@ -1687,12 +1703,10 @@
     }
 </script>
 <script>
-    // Variabel untuk menyimpan data sementara
-    let list_akun_items = [];
-
     // Fungsi untuk menambahkan data ke tabel sementara
     $('.btn-add-to-table').click(function() {
         // Ambil nilai dari form
+        let spek_id = $('#spek_id_akun').val();
         let divisi_id = $('#divisi_id').val();
         let divisi_text = $('#divisi_id option:selected').text();
         let akun_ap_id = $('#akun_ap_id').val();
@@ -1703,9 +1717,10 @@
         let akun_pemakaian_text = $('#akun_pemakaian_id option:selected').text();
         let kategori_id = $('#kategori').val();
         let kategori_text = $('#kategori option:selected').text();
+        let keterangan = $('#keterangan').val();
 
         // Validasi form
-        if (!divisi_id || !akun_ap_id || !akun_ar_id || !akun_pemakaian_id || !kategori_id) {
+        if (!spek_id || !divisi_id || !akun_ap_id || !akun_ar_id || !akun_pemakaian_id || !kategori_id) {
             Swal.fire({
                 icon: 'error',
                 title: 'Semua field harus diisi',
@@ -1716,6 +1731,7 @@
 
         // Tambahkan ke array
         list_akun_items.push({
+            spek_id: spek_id,
             divisi_id: divisi_id,
             divisi_text: divisi_text,
             akun_ap_id: akun_ap_id,
@@ -1725,7 +1741,8 @@
             akun_pemakaian_id: akun_pemakaian_id,
             akun_pemakaian_text: akun_pemakaian_text,
             kategori_id: kategori_id,
-            kategori_text: kategori_text
+            kategori_text: kategori_text,
+            keterangan: keterangan
         });
 
         // Perbarui tabel
@@ -1741,7 +1758,7 @@
         tableBody.empty();
 
         if (list_akun_items.length === 0) {
-            tableBody.append('<tr><td colspan="6" class="text-center">Tidak ada data</td></tr>');
+            tableBody.append('<tr><td colspan="7" class="text-center">Tidak ada data</td></tr>');
             return;
         }
 
@@ -1752,6 +1769,7 @@
             <td>${item.akun_ar_text}</td>
             <td>${item.akun_pemakaian_text}</td>
             <td>${item.kategori_text}</td>
+            <td>${item.keterangan}</td>
             <td>
                 <button class="btn btn-sm btn-warning edit-akun" data-index="${index}">
                     <i class="fa fa-edit"></i>
@@ -1771,11 +1789,13 @@
         let item = list_akun_items[index];
 
         // Isi form dengan data yang dipilih
+        $('#spek_id_akun').val(item.spek_id).trigger('change');
         $('#divisi_id').val(item.divisi_id).trigger('change');
         $('#akun_ap_id').val(item.akun_ap_id).trigger('change');
         $('#akun_ar_id').val(item.akun_ar_id).trigger('change');
         $('#akun_pemakaian_id').val(item.akun_pemakaian_id).trigger('change');
         $('#kategori').val(item.kategori_id).trigger('change');
+        $('#keterangan').val(item.keterangan).trigger('change');
 
         // Hapus item dari array (akan ditambahkan kembali setelah edit)
         list_akun_items.splice(index, 1);
@@ -1808,11 +1828,13 @@
 
     // Fungsi untuk reset form akun barang
     function resetFormAkunBarang() {
+        // $('#spek_id_akun').val('').trigger('change');
         $('#divisi_id').val('').trigger('change');
         $('#akun_ap_id').val('').trigger('change');
         $('#akun_ar_id').val('').trigger('change');
         $('#akun_pemakaian_id').val('').trigger('change');
         $('#kategori').val('').trigger('change');
+        $('#keterangan').val('').trigger('change');
     }
 
     // Fungsi untuk menyimpan data ke server
@@ -1826,7 +1848,7 @@
             return;
         }
 
-        let barang_id = $('#barang_id').val();
+        let spek_id = $('#spek_id_akun').val();
         let csrf = $(`[name="${csrfToken}"]`);
 
         Swal.fire({
@@ -1840,49 +1862,9 @@
             cancelButtonText: 'Batal',
         }).then((result) => {
             if (result.isConfirmed) {
-                setLoading();
-
-                // Kirim data ke server
-                $.ajax({
-                    url: "<?= base_url("barang-master/save-akun"); ?>",
-                    method: "POST",
-                    data: {
-                        barang_id: barang_id,
-                        items: list_akun_items,
-                        [csrfToken]: csrf.val()
-                    },
-                    dataType: "json",
-                    success: function(response) {
-                        stopLoading();
-                        csrf.val(response.token);
-
-                        if (response.status) {
-                            Swal.fire({
-                                icon: 'success',
-                                title: response.message,
-                                confirmButtonColor: '#4e73df',
-                            }).then(() => {
-                                $('.add-modal-akun-barang').modal('hide');
-                                $('.add-modal').modal('show');
-                                list_akun_items = []; // Kosongkan data sementara
-                            });
-                        } else {
-                            Swal.fire({
-                                icon: 'error',
-                                title: response.message,
-                                confirmButtonColor: '#4e73df',
-                            });
-                        }
-                    },
-                    error: function() {
-                        stopLoading();
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Terjadi kesalahan saat menyimpan data',
-                            confirmButtonColor: '#4e73df',
-                        });
-                    }
-                });
+                $('.add-modal-akun-barang').modal('hide');
+                $('.add-modal').modal('show');
+                resetFormAkunBarang();
             }
         });
     });
@@ -1890,11 +1872,6 @@
     // Inisialisasi tabel saat modal dibuka
     $('.add-modal-akun-barang').on('show.bs.modal', function() {
         updateAkunTable();
-    });
-
-    // Kosongkan data saat modal ditutup
-    $('.add-modal-akun-barang').on('hidden.bs.modal', function() {
-        list_akun_items = [];
     });
 </script>
 <?= $this->endSection(); ?>

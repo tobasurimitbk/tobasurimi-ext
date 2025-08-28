@@ -24,7 +24,7 @@ use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 class Barang extends BaseController
 {
     protected $this_company_id, $isAccounting;
-    private $kodeBahanBaku, $kodeBahanPenolong, $kodeBahanJadi, $kodeBahanScrap, $kodeBahanModal, $kodeBahanSetengahJadi, $divisiModel, $metaDataModel;
+    private $kodeBahanBaku, $kodeBahanPenolong, $kodeBahanJadi, $kodeBahanScrap, $kodeBahanModal, $kodeBahanSetengahJadi, $divisiModel, $metaDataModel, $accountBarangModel;
 
     public function __construct()
     {
@@ -33,6 +33,7 @@ class Barang extends BaseController
         $this->divisiModel = new DivisisModel();
         $this->Sub_AkunsModel = new Sub_AkunsModel();
         $this->metaDataModel = new MetadataModel();
+        $this->accountBarangModel = new AccountBarangModel();
 
         $this->kodeBahanBaku = "BL-BB";
         $this->kodeBahanPenolong = "BL-BP";
@@ -131,9 +132,12 @@ class Barang extends BaseController
     {
         $barangModel = new BarangMasterModel();
         $barangSpesifikasiModel = new BarangMasterSpesifikasiModel();
-        $result = array();
+        $accountBarangModel = new AccountBarangModel(); // pastikan sudah ada model ini
+
+        $result = [];
         $type = $this->request->getVar('type');
         $spek = json_decode($this->request->getVar("items"));
+        $akun_barang = json_decode($this->request->getVar("akun_barang"));
 
         $barang = $barangModel->where('kode_barang', $this->request->getVar('kode_barang'))
             ->where('company_id', $this->this_company_id)
@@ -149,43 +153,30 @@ class Barang extends BaseController
             ]);
         }
 
-        // $barangName = $barangModel->where('UPPER(barang_name)', strtoupper($this->request->getVar('barang_name')))
-        //     ->where('company_id', $this->this_company_id)
-        //     ->where('type_barang', $type)
-        //     ->where('parent_type_id', decrypt($this->request->getVar('parent_type_id')) == 0 ? $this->request->getVar('parent_type_id') : decrypt($this->request->getVar('parent_type_id')))
-        //     ->where('deletedAt', null)
-        //     ->first();
-
-        // if ($barangName != null) {
-        //     return response()->setJSON([
-        //         'status' => false,
-        //         'token' => csrf_hash(),
-        //         'message' => "Nama barang sudah ada"
-        //     ]);
-        // }
-
         $barangMasterID = $barangModel->insert([
             'company_id' => $this->this_company_id,
-            'parent_type_id' => decrypt($this->request->getVar('parent_type_id')) == 0 ? $this->request->getVar('parent_type_id') : decrypt($this->request->getVar('parent_type_id')),
-            // 'divisi_id' => decrypt($this->request->getVar('divisi_id')),
+            'parent_type_id' => decrypt($this->request->getVar('parent_type_id')) == 0
+                ? $this->request->getVar('parent_type_id')
+                : decrypt($this->request->getVar('parent_type_id')),
             'kode_barang' => $this->request->getVar('kode_barang'),
             'barang_name' => $this->request->getVar('barang_name'),
             'type_barang' => $type,
             'minimum_stock' => str_replace('.', '', $this->request->getVar('minimum_stock')),
         ]);
 
+        // Loop spesifikasi
         foreach ($spek as $value) {
-            // var_dump($_POST['primer'][$key]);
             $harga_jual = 0.0;
             $harga_pokok = 0.0;
-            if (isset($value->harga_pokok) && $value->harga_pokok) {
+            if (!empty($value->harga_pokok)) {
                 $harga_pokok = (float) str_replace(",", ".", str_replace(["Rp. ", "."], "", $value->harga_pokok));
             }
-
-            if (isset($value->harga_jual) && $value->harga_jual) {
+            if (!empty($value->harga_jual)) {
                 $harga_jual = (float) str_replace(",", ".", str_replace(["Rp. ", "."], "", $value->harga_jual));
             }
-            $result[] = array(
+
+            // insert spesifikasi
+            $spesifikasiID = $barangSpesifikasiModel->insert([
                 'barang_master_id' => $barangMasterID,
                 'spesifikasi' => $value->spesifikasi,
                 'satuan_1' => $value->satuan_1,
@@ -195,9 +186,35 @@ class Barang extends BaseController
                 'konversi_satuan_3' => $value->konversi_satuan_3 ? $value->konversi_satuan_3 : 1,
                 'harga_pokok' => $harga_pokok,
                 'harga_jual' => $harga_jual,
-            );
+            ]);
+
+            // ambil akun barang sesuai spek_id
+            foreach ($akun_barang as $akun) {
+                if ($akun->spek_id == $value->spek_id) {
+                    $checkAccount = $accountBarangModel->checkAccountBarang(
+                        $this->this_company_id,
+                        $akun->divisi_id,
+                        $barangMasterID,
+                        $spesifikasiID,
+                        $akun->keterangan
+                    );
+                    if (!$checkAccount) {
+                        $dataAkunBarang = [
+                            'divisi_id' => $akun->divisi_id,
+                            'barang_master_id' => $barangMasterID,
+                            'barang_master_spesifikasi_id' => $spesifikasiID,
+                            'company_id' => $this->this_company_id,
+                            'ap_id' => $akun->akun_ap_id,
+                            'ar_id' => $akun->akun_ar_id,
+                            'pemakaian_id' => $akun->akun_pemakaian_id,
+                            'kategori_id' => $akun->kategori_id,
+                            'keterangan' => $akun->keterangan,
+                        ];
+                        $accountBarangModel->insert($dataAkunBarang);
+                    }
+                }
+            }
         }
-        $barangSpesifikasiModel->insertBatch($result);
 
         return response()->setJSON([
             'status' => true,
@@ -211,63 +228,87 @@ class Barang extends BaseController
         $id = decrypt($this->request->getVar('id'));
         $barangModel = new BarangMasterModel();
         $barangSpesifikasiModel = new BarangMasterSpesifikasiModel();
-        $result = array();
-        $type = $this->request->getVar('type');
+        $accountBarangModel = new AccountBarangModel();
+
         $spek = json_decode($this->request->getVar("items"));
+        $akun_barang = json_decode($this->request->getVar("akun_barang"));
 
         $barangModel->update($id, [
             'company_id' => $this->this_company_id,
             'parent_type_id' => decrypt($this->request->getVar('parent_type_id')),
-            // 'divisi_id' => decrypt($this->request->getVar('divisi_id')),
             'barang_name' => $this->request->getVar('barang_name'),
             'kode_barang' => $this->request->getVar('kode_barang'),
-            'type_barang' => $type,
+            'type_barang' => $this->request->getVar('type'),
             'minimum_stock' => str_replace('.', '', $this->request->getVar('minimum_stock')),
         ]);
-        if ($spek) {
-            foreach ($spek as $key => $value) {
-                if ($value->spesifikasi_id) {
-                    $harga_jual = 0.0;
-                    $harga_pokok = 0.0;
-                    if (isset($value->harga_pokok) && $value->harga_pokok) {
-                        $harga_pokok = (float) str_replace(",", ".", str_replace(["Rp. ", "."], "", $value->harga_pokok));
-                    }
 
-                    if (isset($value->harga_jual) && $value->harga_jual) {
-                        $harga_jual = (float) str_replace(",", ".", str_replace(["Rp. ", "."], "", $value->harga_jual));
-                    }
+        if ($spek) {
+            foreach ($spek as $value) {
+                $harga_jual = 0.0;
+                $harga_pokok = 0.0;
+                if (!empty($value->harga_pokok)) {
+                    $harga_pokok = (float) str_replace(",", ".", str_replace(["Rp. ", "."], "", $value->harga_pokok));
+                }
+                if (!empty($value->harga_jual)) {
+                    $harga_jual = (float) str_replace(",", ".", str_replace(["Rp. ", "."], "", $value->harga_jual));
+                }
+
+                if (!empty($value->spesifikasi_id)) {
+                    // update spesifikasi
                     $barangSpesifikasiModel->update($value->spesifikasi_id, [
                         'spesifikasi' => $value->spesifikasi,
                         'satuan_1' => $value->satuan_1,
                         'satuan_2' => $value->satuan_2 != "" ? $value->satuan_2 : 0,
-                        'konversi_satuan_2' => $value->konversi_satuan_2 ? $value->konversi_satuan_2 : 1,
+                        'konversi_satuan_2' => $value->konversi_satuan_2 ?: 1,
                         'satuan_3' => $value->satuan_3 != "" ? $value->satuan_3 : 0,
-                        'konversi_satuan_3' => $value->konversi_satuan_3 ? $value->konversi_satuan_3 : 1,
+                        'konversi_satuan_3' => $value->konversi_satuan_3 ?: 1,
                         'harga_pokok' => $harga_pokok,
                         'harga_jual' => $harga_jual,
                     ]);
+                    $spesifikasiID = $value->spesifikasi_id;
                 } else {
-                    $harga_jual = 0.0;
-                    $harga_pokok = 0.0;
-                    if (isset($value->harga_pokok) && $value->harga_pokok) {
-                        $harga_pokok = (float) str_replace(",", ".", str_replace(["Rp. ", "."], "", $value->harga_pokok));
-                    }
-
-                    if (isset($value->harga_jual) && $value->harga_jual) {
-                        $harga_jual = (float) str_replace(",", ".", str_replace(["Rp. ", "."], "", $value->harga_jual));
-                    }
-                    $result = [
+                    // insert spesifikasi baru
+                    $spesifikasiID = $barangSpesifikasiModel->insert([
                         'barang_master_id' => $id,
                         'spesifikasi' => $value->spesifikasi,
                         'satuan_1' => $value->satuan_1,
                         'satuan_2' => $value->satuan_2 != "" ? $value->satuan_2 : 0,
-                        'konversi_satuan_2' => $value->konversi_satuan_2,
+                        'konversi_satuan_2' => $value->konversi_satuan_2 ?: 1,
                         'satuan_3' => $value->satuan_3 != "" ? $value->satuan_3 : 0,
-                        'konversi_satuan_3' => $value->konversi_satuan_3,
+                        'konversi_satuan_3' => $value->konversi_satuan_3 ?: 1,
                         'harga_pokok' => $harga_pokok,
                         'harga_jual' => $harga_jual,
-                    ];
-                    $barangSpesifikasiModel->insert($result);
+                    ]);
+                }
+
+                // hapus akun barang lama untuk spesifikasi ini
+                $accountBarangModel->where('barang_master_spesifikasi_id', $spesifikasiID)->delete();
+
+                // insert akun barang baru
+                foreach ($akun_barang as $akun) {
+                    if ($akun->spek_id == $value->spek_id) {
+                        $checkAccount = $accountBarangModel->checkAccountBarang(
+                            $this->this_company_id,
+                            $akun->divisi_id,
+                            $id,
+                            $spesifikasiID,
+                            $akun->keterangan
+                        );
+                        if (!$checkAccount) {
+                            $dataAkunBarang = [
+                                'divisi_id' => $akun->divisi_id,
+                                'barang_master_id' => $id,
+                                'barang_master_spesifikasi_id' => $spesifikasiID,
+                                'company_id' => $this->this_company_id,
+                                'ap_id' => $akun->akun_ap_id,
+                                'ar_id' => $akun->akun_ar_id,
+                                'pemakaian_id' => $akun->akun_pemakaian_id,
+                                'kategori_id' => $akun->kategori_id,
+                                'keterangan' => $akun->keterangan,
+                            ];
+                            $accountBarangModel->insert($dataAkunBarang);
+                        }
+                    }
                 }
             }
         }
@@ -275,7 +316,7 @@ class Barang extends BaseController
         return response()->setJSON([
             'status' => true,
             'token' => csrf_hash(),
-            'message' => "Barang baru berhasil diupdate"
+            'message' => "Barang berhasil diupdate"
         ]);
     }
 
@@ -1245,5 +1286,77 @@ class Barang extends BaseController
 
         echo $excelOutput;
         exit();
+    }
+
+    public function saveAkunBarang()
+    {
+        // $barangModel = new BarangMasterModel();
+        // $barangAkunModel = new BarangAkunModel(); // Pastikan model ini ada
+
+        $result = array();
+        $barangId = $this->request->getVar('barang_id');
+        $items = $this->request->getVar('items');
+
+        var_dump($items);
+        die;
+
+        // Decode items dari string JSON ke array
+        $akunBarang = json_decode($items);
+
+        // Validasi
+        if (empty($barangId) || empty($akunBarang)) {
+            return $this->response->setJSON([
+                'status' => false,
+                'token' => csrf_hash(),
+                'message' => "Data tidak valid"
+            ]);
+        }
+
+        // Cek apakah barang ada
+        $barang = $barangModel->find($barangId);
+        if (!$barang) {
+            return $this->response->setJSON([
+                'status' => false,
+                'token' => csrf_hash(),
+                'message' => "Barang tidak ditemukan"
+            ]);
+        }
+
+        // Mulai transaction
+        $db = \Config\Database::connect();
+        $db->transStart();
+
+        // Hapus akun barang yang lama (jika ada)
+        $barangAkunModel->where('barang_id', $barangId)->delete();
+
+        // Simpan setiap akun barang
+        foreach ($akunBarang as $item) {
+            $data = [
+                'barang_id' => $barangId,
+                'divisi_id' => $item->divisi_id,
+                'akun_ap_id' => $item->akun_ap_id,
+                'akun_ar_id' => $item->akun_ar_id,
+                'akun_pemakaian_id' => $item->akun_pemakaian_id,
+                'kategori_barang_id' => $item->kategori,
+                'created_at' => date('Y-m-d H:i:s')
+            ];
+            $barangAkunModel->insert($data);
+        }
+
+        $db->transComplete();
+
+        if ($db->transStatus() === FALSE) {
+            return $this->response->setJSON([
+                'status' => false,
+                'token' => csrf_hash(),
+                'message' => "Gagal menyimpan data akun barang"
+            ]);
+        }
+
+        return $this->response->setJSON([
+            'status' => true,
+            'token' => csrf_hash(),
+            'message' => "Akun barang berhasil disimpan"
+        ]);
     }
 }

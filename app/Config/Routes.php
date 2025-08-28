@@ -1081,6 +1081,7 @@ $routes->group('barang-master', ['filter' => 'Auth'], function ($routes) {
     $routes->post('import', 'Warehouse\Barang::import');
     $routes->get('export-excel', 'Warehouse\Barang::exportExcel');
     $routes->get('export-excel-history', 'Warehouse\Barang::exportExcelHistory');
+    $routes->post('save-akun', 'Warehouse\Barang::saveAkunBarang');
 });
 $routes->get('barang/supplier/(:num)', 'Warehouse\Barang::getBySupplier/$1', ['filter' => 'Auth']);
 $routes->get('barang-bahan-penolong/histori', 'Warehouse\Barang::historiHargaPOBahanPenolong', ['filter' => 'Auth']);
