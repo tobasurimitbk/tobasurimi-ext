@@ -106,23 +106,21 @@
             <table class="table" style="margin-top: 30px;">
                 <thead>
                     <tr style="text-align: center; font-weight:bold;">
-                        <td>
-                            Barang - Spesifikasi
-                        </td>
-                        <td>
-                            Satuan
-                        </td>
-                        <td>
-                            Qty Kotor
-                        </td>
-                        <td>
-                            Qty Bersih
-                        </td>
+                        <td>Barang - Spesifikasi</td>
+                        <td>Satuan</td>
+                        <td>Qty Kotor</td>
+                        <td>Qty Bersih</td>
                     </tr>
                 </thead>
 
                 <tbody>
-                    <?php foreach ($jasaVendorInDetail as $j) : ?>
+                    <?php 
+                    $totalKotor = 0;
+                    $totalBersih = 0;
+                    foreach ($jasaVendorInDetail as $j) : 
+                        $totalKotor += $j['qty_kotor'];
+                        $totalBersih += $j['qty_bersih'];
+                    ?>
                         <tr style="text-align: center; font-weight:bold;">
                             <td><?= strtoupper($j['barang_name']) . "-" . strtoupper($j['spesifikasi']) ?></td>
                             <td><?= $j['kode_satuan'] ?></td>
@@ -131,6 +129,14 @@
                         </tr>
                     <?php endforeach; ?>
                 </tbody>
+
+                <tfoot>
+                    <tr style="text-align: center; font-weight:bold; background: #f2f2f2;">
+                        <td colspan="2">TOTAL</td>
+                        <td><?= number_format($totalKotor, 3) ?></td>
+                        <td><?= number_format($totalBersih, 3) ?></td>
+                    </tr>
+                </tfoot>
             </table>
 
 
