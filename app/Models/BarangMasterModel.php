@@ -102,6 +102,7 @@ class BarangMasterModel extends Model
                 'barang_master_spesifikasi.konversi_satuan_2',
                 'barang_master_spesifikasi.satuan_3',
                 'barang_master_spesifikasi.konversi_satuan_3',
+                'barang_master_spesifikasi.supplier_terakhir',
                 'parent_barang.parent_name AS kelompok_barang',
                 'suppliers.name as supplier_terakhir_name',
                 'barang_master_spesifikasi.harga_terakhir',

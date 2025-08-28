@@ -188,29 +188,31 @@ class Barang extends BaseController
                 'harga_jual' => $harga_jual,
             ]);
 
-            // ambil akun barang sesuai spek_id
-            foreach ($akun_barang as $akun) {
-                if ($akun->spek_id == $value->spek_id) {
-                    $checkAccount = $accountBarangModel->checkAccountBarang(
-                        $this->this_company_id,
-                        $akun->divisi_id,
-                        $barangMasterID,
-                        $spesifikasiID,
-                        $akun->keterangan
-                    );
-                    if (!$checkAccount) {
-                        $dataAkunBarang = [
-                            'divisi_id' => $akun->divisi_id,
-                            'barang_master_id' => $barangMasterID,
-                            'barang_master_spesifikasi_id' => $spesifikasiID,
-                            'company_id' => $this->this_company_id,
-                            'ap_id' => $akun->akun_ap_id,
-                            'ar_id' => $akun->akun_ar_id,
-                            'pemakaian_id' => $akun->akun_pemakaian_id,
-                            'kategori_id' => $akun->kategori_id,
-                            'keterangan' => $akun->keterangan,
-                        ];
-                        $accountBarangModel->insert($dataAkunBarang);
+            if ($type == 'bahan_baku') {
+                // ambil akun barang sesuai spek_id
+                foreach ($akun_barang as $akun) {
+                    if ($akun->spek_id == $value->spek_id) {
+                        $checkAccount = $accountBarangModel->checkAccountBarang(
+                            $this->this_company_id,
+                            $akun->divisi_id,
+                            $barangMasterID,
+                            $spesifikasiID,
+                            $akun->keterangan
+                        );
+                        if (!$checkAccount) {
+                            $dataAkunBarang = [
+                                'divisi_id' => $akun->divisi_id,
+                                'barang_master_id' => $barangMasterID,
+                                'barang_master_spesifikasi_id' => $spesifikasiID,
+                                'company_id' => $this->this_company_id,
+                                'ap_id' => $akun->akun_ap_id,
+                                'ar_id' => $akun->akun_ar_id,
+                                'pemakaian_id' => $akun->akun_pemakaian_id,
+                                'kategori_id' => $akun->kategori_id,
+                                'keterangan' => $akun->keterangan,
+                            ];
+                            $accountBarangModel->insert($dataAkunBarang);
+                        }
                     }
                 }
             }
@@ -284,29 +286,32 @@ class Barang extends BaseController
                 // hapus akun barang lama untuk spesifikasi ini
                 $accountBarangModel->where('barang_master_spesifikasi_id', $spesifikasiID)->delete();
 
-                // insert akun barang baru
-                foreach ($akun_barang as $akun) {
-                    if ($akun->spek_id == $value->spek_id) {
-                        $checkAccount = $accountBarangModel->checkAccountBarang(
-                            $this->this_company_id,
-                            $akun->divisi_id,
-                            $id,
-                            $spesifikasiID,
-                            $akun->keterangan
-                        );
-                        if (!$checkAccount) {
-                            $dataAkunBarang = [
-                                'divisi_id' => $akun->divisi_id,
-                                'barang_master_id' => $id,
-                                'barang_master_spesifikasi_id' => $spesifikasiID,
-                                'company_id' => $this->this_company_id,
-                                'ap_id' => $akun->akun_ap_id,
-                                'ar_id' => $akun->akun_ar_id,
-                                'pemakaian_id' => $akun->akun_pemakaian_id,
-                                'kategori_id' => $akun->kategori_id,
-                                'keterangan' => $akun->keterangan,
-                            ];
-                            $accountBarangModel->insert($dataAkunBarang);
+
+                if ($this->request->getVar('type') == 'bahan_baku') {
+                    // insert akun barang baru
+                    foreach ($akun_barang as $akun) {
+                        if ($akun->spek_id == $value->spek_id) {
+                            $checkAccount = $accountBarangModel->checkAccountBarang(
+                                $this->this_company_id,
+                                $akun->divisi_id,
+                                $id,
+                                $spesifikasiID,
+                                $akun->keterangan
+                            );
+                            if (!$checkAccount) {
+                                $dataAkunBarang = [
+                                    'divisi_id' => $akun->divisi_id,
+                                    'barang_master_id' => $id,
+                                    'barang_master_spesifikasi_id' => $spesifikasiID,
+                                    'company_id' => $this->this_company_id,
+                                    'ap_id' => $akun->akun_ap_id,
+                                    'ar_id' => $akun->akun_ar_id,
+                                    'pemakaian_id' => $akun->akun_pemakaian_id,
+                                    'kategori_id' => $akun->kategori_id,
+                                    'keterangan' => $akun->keterangan,
+                                ];
+                                $accountBarangModel->insert($dataAkunBarang);
+                            }
                         }
                     }
                 }
