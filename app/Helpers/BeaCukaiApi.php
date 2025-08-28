@@ -910,7 +910,7 @@ class BeaCukaiApi
                 'ukuran' => $b['ukuran_barang'],
                 'uraian' => $b['uraian'],
                 'volume' => (float)$bcData['volume'],
-                'jumlahKemasan' => count($bcKemasan),
+                'jumlahKemasan' => (float)$b['jumlah_kemasan'],
                 'cifRupiah' => 0,
                 'hargaPerolehan' => 0,
                 'kodeAsalBahanBaku' => '1',
