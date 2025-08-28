@@ -192,6 +192,111 @@ class RMPurchaseOrderModel extends Model
     }
 
 
+    public function getListLaporanPurchaseOrder($condition = [], $addCondition = [], $limit = 10, $offset = 0)
+    {
+        $availableSort = [
+            'divisi'        => 'divisis.divisi',
+            'po_date'       => 'rm_purchase_orders.po_date',
+            'po_no'         => 'rm_purchase_orders.po_no',
+            'supplier_id'   => 'rm_purchase_orders.supplier_id',
+            'kode_barang'   => 'barang_master.kode_barang',
+            'barang_name'   => 'barang_master.barang_name',
+            'satuan_id'     => 'rm_purchase_order_details.satuan_id',
+            'uraian'        => 'rm_purchase_order_details.note',
+            'spesifikasi'   => 'barang_master_spesifikasi.spesifikasi',
+            'qty_order'     => 'qty_order',
+            'qty_diterima'  => 'qty_diterima',
+            'qty_sisa'      => 'qty_sisa',
+            'total_harga'   => 'rm_purchase_orders.total_before_pph',
+        ];
+        $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
+
+        $sort = $availableSort[$addCondition['sort'] ?? 'po_date'] ?? 'rm_purchase_orders.po_date';
+        $sortType = $availableSortType[strtolower($addCondition['sortType'] ?? 'desc')] ?? 'DESC';
+
+        // SELECT utama
+        $selectQry = "
+            rm_purchase_orders.id,
+            rm_purchase_orders.po_no,
+            rm_purchase_orders.po_date,
+            suppliers.name AS supplier_name,
+            divisis.divisi,
+            barang_master.kode_barang,
+            barang_master.barang_name,
+            satuans.kode_satuan,
+            IFNULL(GROUP_CONCAT(DISTINCT rm_purchase_order_details.note SEPARATOR ', '), '') AS uraian,
+            IFNULL(GROUP_CONCAT(DISTINCT barang_master_spesifikasi.spesifikasi SEPARATOR ', '), '') AS spesifikasi,
+            SUM(rm_purchase_order_details.qty) AS qty_order,
+            SUM(rm_purchase_order_details.qty_diterima) AS qty_diterima,
+            SUM(rm_purchase_order_details.remaining_qty) AS qty_sisa,
+            rm_purchase_orders.total_before_pph AS total_harga
+        ";
+
+        $builder = $this->asArray()
+            ->select($selectQry, false) // <-- protect(false) agar query tidak di-escape
+            ->join('suppliers', 'rm_purchase_orders.supplier_id = suppliers.id', 'left')
+            ->join('rm_purchase_order_details', 'rm_purchase_orders.id = rm_purchase_order_details.rm_purchase_order_id', 'left')
+            ->join('satuans', 'rm_purchase_order_details.satuan_id = satuans.id', 'left')
+            ->join('barang_master', 'rm_purchase_order_details.barang1_id = barang_master.id', 'left')
+            ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = rm_purchase_order_details.barang2_id', 'left')
+            ->join('divisis', 'divisis.id = rm_purchase_orders.divisi_id', 'left')
+            ->where($condition)
+            ->groupBy('rm_purchase_order_details.rm_purchase_order_id')
+            ->orderBy($sort, $sortType);
+
+        // Hitung total semua data (tanpa filter tambahan)
+        $totalData = $builder->countAllResults(false);
+
+        // Filter tambahan
+        if (!empty($addCondition['status_posting'])) {
+            if ($addCondition['status_posting'] == "SUDAH POSTING") {
+                $builder->groupStart();
+                $builder->where('rm_purchase_orders.is_posted', 1);
+                $builder->groupEnd();
+            } else if ($addCondition['status_posting'] == "BELUM POSTING") {
+                $builder->groupStart();
+                $builder->where('rm_purchase_orders.is_posted', 0);
+                $builder->groupEnd();
+            }
+        }
+        if (!empty($addCondition['dateStart'])) {
+            $builder->where('rm_purchase_orders.po_date >=', $addCondition['dateStart']);
+        }
+        if (!empty($addCondition['dateEnd'])) {
+            $builder->where('rm_purchase_orders.po_date <=', $addCondition['dateEnd']);
+        }
+        if (!empty($addCondition['divisi_id'])) {
+            $builder->where('rm_purchase_orders.divisi_id', $addCondition['divisi_id']);
+        }
+        if (!empty($addCondition['supplier_id'])) {
+            $builder->where('rm_purchase_orders.supplier_id', $addCondition['supplier_id']);
+        }
+        if (!empty($addCondition['search'])) {
+            $builder->groupStart()
+                ->like('rm_purchase_orders.po_no', $addCondition['search'])
+                ->orLike('suppliers.name', $addCondition['search'])
+                ->orLike('divisis.divisi', $addCondition['search'])
+                ->orLike('barang_master.barang_name', $addCondition['search'])
+                ->orLike('barang_master_spesifikasi.spesifikasi', $addCondition['search'])
+                ->groupEnd();
+        }
+
+
+
+        // Hitung total dengan filter → pakai clone supaya SELECT tidak hilang
+        $countBuilder = clone $builder;
+        $totalFilteredData = $countBuilder->countAllResults(false);
+
+        // Ambil data sesuai limit
+        $data = $builder->findAll($limit, $offset);
+
+        return [
+            'data'              => $data,
+            'totalData'         => $totalData,
+            'totalFilteredData' => $totalFilteredData
+        ];
+    }
+
     public function getTotalWithPPH($id)
     {
         // Ambil data PO berdasarkan ID
