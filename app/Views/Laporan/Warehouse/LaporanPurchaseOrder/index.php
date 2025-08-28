@@ -74,7 +74,7 @@
                                 <option value="<?= $divisi['id']; ?>"><?= $divisi['divisi']; ?></option>
                             <?php endforeach; ?>
                         </select>
-                        <label for="floatingInput">Filter Divisi</label>
+                        <label for="floatingInput">Filter Departemen</label>
                     </div>
                 </div>
                 <div class="col-md-3">
@@ -109,7 +109,7 @@
                                 <th onclick="changeSort('kode_barang')" class="sort">Kode Barang</th>
                                 <th onclick="changeSort('barang_name')" class="sort">Nama Barang</th>
                                 <th onclick="changeSort('satuan_id')" class="sort">Satuan</th>
-                                <th onclick="changeSort('uraian')" class="sort">Uraian</th>
+                                <th onclick="changeSort('uraian')" class="sort">Keterangan</th>
                                 <th onclick="changeSort('spesifikasi')" class="sort">Spesifikasi</th>
                                 <th onclick="changeSort('qty_order')" class="sort">Jml Order</th>
                                 <th onclick="changeSort('qty_diterima')" class="sort">Jml Diterima</th>
@@ -119,6 +119,12 @@
                         </thead>
                         <tbody class="body-table" id="body-table">
                         </tbody>
+                        <tfoot id="grandTotalHargaPrev">
+                            <tr>
+                                <th colspan="13" class="text-right">GRAND TOTAL</th>
+                                <th class="text-left grandTotalHarga"></th>
+                            </tr>
+                        </tfoot>
                     </table>
                 </div>
             </div>
@@ -249,7 +255,12 @@
                 previous: '<i class="fa fa-angle-left"></i>',
                 next: '<i class="fa fa-angle-right"></i>'
             }
-        }
+        },
+        footerCallback: function(row, data, start, end, display) {
+            const api = this.api();
+            const grandTotalHarga = api.ajax.json().grandTotalHarga;
+            $('.grandTotalHarga').html(greatFormatRupiah(grandTotalHarga.toFixed(2)));
+        },
     })
 
     const changeSort = function(val) {
@@ -283,7 +294,7 @@
         $(".dateEnd").focus();
     });
 
-    $(".search").keyup(function() {
+    $(".search").change(function() {
         table.ajax.reload();
     })
 
@@ -295,6 +306,14 @@
         placeholder: "Filter Tipe PO",
         theme: "bootstrap-5",
         allowClear: false
+    }).change(function(e) {
+        e.preventDefault();
+        var poType = $('.po_type option:selected').val();
+        if (poType == "LOKAL BB" || poType == "LOKAL BP") {
+            $('#grandTotalHargaPrev').show();
+        } else {
+            $('#grandTotalHargaPrev').hide();
+        }
     });
 
     $('.divisi_id').select2({

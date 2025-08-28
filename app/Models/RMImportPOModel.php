@@ -470,7 +470,7 @@ class RMImportPOModel extends Model
             barang_master.kode_barang,
             barang_master.barang_name,
             satuans.kode_satuan,
-            rm_import_pos.note AS uraian,
+            rm_import_po_details.note AS uraian,
             barang_master_spesifikasi.spesifikasi,
             rm_import_po_details.qty AS qty_order,
             rm_import_po_details.qty_diterima AS qty_diterima,

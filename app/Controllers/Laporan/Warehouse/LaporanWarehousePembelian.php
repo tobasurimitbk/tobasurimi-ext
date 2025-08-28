@@ -70,7 +70,6 @@ class LaporanWarehousePembelian extends BaseController
         $po_type = $this->request->getVar("po_type");
 
         $dataResult = array();
-
         if ($po_type == "LOKAL BB") {
             $condition = [
                 'rm_purchase_orders.deletedAt' => null,
@@ -129,7 +128,7 @@ class LaporanWarehousePembelian extends BaseController
 
         $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
         foreach ($dataPurchaseOrder['data'] as $data) {
-            $valasName = isset($data['valas_name']) ? $data['valas_name'] : "IDR";
+            $valasName = isset($data['valas_name']) ? $data['valas_name'] : "";
             array_push($dataResult, [
                 "no"                => $no++,
                 "divisi"            => $data['divisi'],
@@ -154,6 +153,7 @@ class LaporanWarehousePembelian extends BaseController
             "recordsFiltered"   => $dataPurchaseOrder['totalFilteredData'],
             'data'              => $dataResult,
             "payload"           => $payload,
+            "grandTotalHarga"   => isset($dataPurchaseOrder['grandTotalHarga']) ? (float)$dataPurchaseOrder['grandTotalHarga'] : 0
         ];
 
         echo json_encode($data);
@@ -237,15 +237,13 @@ class LaporanWarehousePembelian extends BaseController
         // Tambahin Periode di atas
         // ============================
         $periodeText = "Periode: " . date('d/m/Y', strtotime($addCondition['dateStart'])) . " s.d. " . date('d/m/Y', strtotime($addCondition['dateEnd']));
-
-        // Merge cell biar text center di atas tabel (misal header tabel ada 15 kolom = A sampai O)
         $sheet->mergeCells('A1:O1');
         $sheet->setCellValue('A1', $periodeText);
         $sheet->getStyle('A1')->getFont()->setBold(true);
         $sheet->getStyle('A1')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
 
         // ============================
-        // Header tabel (turun ke baris 2)
+        // Header tabel (baris 2)
         // ============================
         $header = [
             'No',
@@ -256,7 +254,7 @@ class LaporanWarehousePembelian extends BaseController
             'Kode Barang',
             'Nama Barang',
             'Satuan',
-            'Uraian',
+            'Keterangan',
             'Spesifikasi',
             'Qty Order',
             'Qty Diterima',
@@ -267,11 +265,23 @@ class LaporanWarehousePembelian extends BaseController
 
         $sheet->fromArray($header, null, 'A2');
 
+        // Styling header
+        $sheet->getStyle('A2:O2')->getFont()->setBold(true);
+        $sheet->getStyle('A2:O2')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+
         // Isi data mulai dari baris ke-3
         $row = 3;
         $no = 1;
+        $grandTotal = 0;
+
         foreach ($dataPurchaseOrder['data'] as $data) {
             $valasName = $data['valas_name'] ?? "IDR";
+            $totalHarga = (float) $data['total_harga'];
+            $grandTotal += $totalHarga;
+
+            $qtyDiterima = (!empty($data['qty_diterima']) ? (float)$data['qty_diterima'] : \number_format(0));
+            $qtySisa     = (!empty($data['qty_sisa']) ? (float)$data['qty_sisa'] : \number_format(0));
+
             $sheet->fromArray([
                 $no++,
                 $data['divisi'],
@@ -284,31 +294,50 @@ class LaporanWarehousePembelian extends BaseController
                 $data['uraian'],
                 $data['spesifikasi'],
                 (float) $data['qty_order'],
-                (float) $data['qty_diterima'],
-                (float) $data['qty_sisa'],
-                (float) $data['total_harga'],
+                $qtyDiterima,
+                $qtySisa,
+                $totalHarga, // tulis angka asli
                 $valasName
             ], null, 'A' . $row);
 
             $row++;
         }
 
-        // Styling header (baris 2)
-        $sheet->getStyle('A2:O2')->getFont()->setBold(true);
-        $sheet->getStyle('A2:O2')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
-        $sheet->getStyle('A2:O' . ($row - 1))->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_THIN);
+        // ============================
+        // Format kolom Total Harga
+        // ============================
+        $sheet->getStyle('N3:N' . ($row - 1))
+            ->getNumberFormat()
+            ->setFormatCode('#,##0.00');
+        $sheet->getStyle('N3:N' . ($row - 1))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_RIGHT);
+
+        // Border tabel
+        $sheet->getStyle('A2:O' . ($row - 1))->getBorders()->getAllBorders()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN);
+
+        // ============================
+        // Tambahin Grand Total
+        // ============================
+        if ($po_type == "LOKAL BB" || $po_type == "LOKAL BP") {
+            $sheet->mergeCells('A' . $row . ':M' . $row);
+            $sheet->setCellValue('A' . $row, 'GRAND TOTAL');
+            $sheet->getStyle('A' . $row)->getFont()->setBold(true);
+            $sheet->getStyle('A' . $row)->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_RIGHT);
+
+            $sheet->setCellValue('N' . $row, $grandTotal);
+            $sheet->getStyle('N' . $row)->getFont()->setBold(true);
+            $sheet->getStyle('N' . $row)->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_RIGHT);
+            $sheet->getStyle('N' . $row)->getNumberFormat()->setFormatCode('#,##0.00');
+        }
 
         // Auto size kolom
         foreach (range('A', 'O') as $col) {
             $sheet->getColumnDimension($col)->setAutoSize(true);
         }
 
-
         // Output file Excel
         $filename = 'laporan_purchase_order_' . date('Ymd_His') . '.xlsx';
         $writer = new Xlsx($spreadsheet);
 
-        // Supaya langsung download
         header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
         header("Content-Disposition: attachment;filename=\"$filename\"");
         header('Cache-Control: max-age=0');

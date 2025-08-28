@@ -820,7 +820,7 @@ class AMPurchaseOrderModel extends Model
             barang_master.kode_barang,
             barang_master.barang_name,
             satuans.kode_satuan,
-            am_purchase_orders.note AS uraian,
+            am_purchase_order_details.note AS uraian,
             barang_master_spesifikasi.spesifikasi,
             am_purchase_order_details.qty AS qty_order,
             am_purchase_order_details.qty_diterima AS qty_diterima,
@@ -840,7 +840,6 @@ class AMPurchaseOrderModel extends Model
             ->join('metadata', 'metadata.id = am_purchase_orders.currency', 'left')
             ->where($condition)
             ->orderBy($sort, $sortType);
-
 
         // Hitung total semua data (tanpa filter tambahan)
         $totalData = $builder->countAllResults(false);
@@ -876,6 +875,7 @@ class AMPurchaseOrderModel extends Model
                 ->orLike('divisis.divisi', $addCondition['search'])
                 ->orLike('barang_master.barang_name', $addCondition['search'])
                 ->orLike('barang_master_spesifikasi.spesifikasi', $addCondition['search'])
+                ->orLike('am_purchase_order_details.note', $addCondition['search'])
                 ->groupEnd();
         }
 
@@ -886,10 +886,59 @@ class AMPurchaseOrderModel extends Model
         // Ambil data sesuai limit
         $data = $builder->findAll($limit, $offset);
 
+        // Cari Data Untuk Di Sum Total nya
+        $qtySum = $this->db->table('am_purchase_orders')
+            ->select('SUM(am_purchase_order_details.total) AS total_harga')
+            ->join('suppliers', 'am_purchase_orders.supplier_id = suppliers.id', 'left')
+            ->join('am_purchase_order_details', 'am_purchase_orders.id = am_purchase_order_details.am_purchase_order_id', 'left')
+            ->join('satuans', 'am_purchase_order_details.unit = satuans.id', 'left')
+            ->join('barang_master', 'am_purchase_order_details.barang_id = barang_master.id', 'left')
+            ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = am_purchase_order_details.spesifikasi_id', 'left')
+            ->join('divisis', 'divisis.id = am_purchase_orders.division_id', 'left')
+            ->join('metadata', 'metadata.id = am_purchase_orders.currency', 'left')
+            ->where($condition);
+
+        if (!empty($addCondition['status_posting'])) {
+            if ($addCondition['status_posting'] == "SUDAH POSTING") {
+                $qtySum->groupStart();
+                $qtySum->where('am_purchase_orders.is_posted', 1);
+                $qtySum->groupEnd();
+            } else if ($addCondition['status_posting'] == "BELUM POSTING") {
+                $qtySum->groupStart();
+                $qtySum->where('am_purchase_orders.is_posted', 0);
+                $qtySum->groupEnd();
+            }
+        }
+        if (!empty($addCondition['dateStart'])) {
+            $qtySum->where('am_purchase_orders.po_date >=', $addCondition['dateStart']);
+        }
+        if (!empty($addCondition['dateEnd'])) {
+            $qtySum->where('am_purchase_orders.po_date <=', $addCondition['dateEnd']);
+        }
+        if (!empty($addCondition['divisi_id'])) {
+            $qtySum->where('am_purchase_orders.division_id', $addCondition['divisi_id']);
+        }
+        if (!empty($addCondition['supplier_id'])) {
+            $qtySum->where('am_purchase_orders.supplier_id', $addCondition['supplier_id']);
+        }
+        if (!empty($addCondition['search'])) {
+            $qtySum->groupStart()
+                ->like('am_purchase_orders.po_no', $addCondition['search'])
+                ->orLike('suppliers.name', $addCondition['search'])
+                ->orLike('divisis.divisi', $addCondition['search'])
+                ->orLike('barang_master.barang_name', $addCondition['search'])
+                ->orLike('barang_master_spesifikasi.spesifikasi', $addCondition['search'])
+                ->orLike('am_purchase_order_details.note', $addCondition['search'])
+                ->groupEnd();
+        }
+
+        $grandTotalHarga = $qtySum->get()->getRowArray();
+
         return [
             'data'              => $data,
             'totalData'         => $totalData,
-            'totalFilteredData' => $totalFilteredData
+            'totalFilteredData' => $totalFilteredData,
+            'grandTotalHarga'   => (float)$grandTotalHarga['total_harga']
         ];
     }
 }

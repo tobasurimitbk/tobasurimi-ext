@@ -281,8 +281,6 @@ class RMPurchaseOrderModel extends Model
                 ->groupEnd();
         }
 
-
-
         // Hitung total dengan filter → pakai clone supaya SELECT tidak hilang
         $countBuilder = clone $builder;
         $totalFilteredData = $countBuilder->countAllResults(false);
@@ -290,10 +288,60 @@ class RMPurchaseOrderModel extends Model
         // Ambil data sesuai limit
         $data = $builder->findAll($limit, $offset);
 
+        // Subquery untuk ambil unique PO sesuai filter & search
+        $sub = $this->db->table('rm_purchase_orders')
+            ->select('rm_purchase_orders.id, rm_purchase_orders.total_before_pph')
+            ->join('suppliers', 'rm_purchase_orders.supplier_id = suppliers.id', 'left')
+            ->join('rm_purchase_order_details', 'rm_purchase_orders.id = rm_purchase_order_details.rm_purchase_order_id', 'left')
+            ->join('satuans', 'rm_purchase_order_details.satuan_id = satuans.id', 'left')
+            ->join('barang_master', 'rm_purchase_order_details.barang1_id = barang_master.id', 'left')
+            ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = rm_purchase_order_details.barang2_id', 'left')
+            ->join('divisis', 'divisis.id = rm_purchase_orders.divisi_id', 'left')
+            ->where($condition)
+            ->groupBy('rm_purchase_orders.id'); // << penting! per PO, bukan per detail
+
+        // tambahin filter sama seperti sebelumnya
+        if (!empty($addCondition['status_posting'])) {
+            if ($addCondition['status_posting'] == "SUDAH POSTING") {
+                $sub->where('rm_purchase_orders.is_posted', 1);
+            } else if ($addCondition['status_posting'] == "BELUM POSTING") {
+                $sub->where('rm_purchase_orders.is_posted', 0);
+            }
+        }
+        if (!empty($addCondition['dateStart'])) {
+            $sub->where('rm_purchase_orders.po_date >=', $addCondition['dateStart']);
+        }
+        if (!empty($addCondition['dateEnd'])) {
+            $sub->where('rm_purchase_orders.po_date <=', $addCondition['dateEnd']);
+        }
+        if (!empty($addCondition['divisi_id'])) {
+            $sub->where('rm_purchase_orders.divisi_id', $addCondition['divisi_id']);
+        }
+        if (!empty($addCondition['supplier_id'])) {
+            $sub->where('rm_purchase_orders.supplier_id', $addCondition['supplier_id']);
+        }
+        if (!empty($addCondition['search'])) {
+            $sub->groupStart()
+                ->like('rm_purchase_orders.po_no', $addCondition['search'])
+                ->orLike('suppliers.name', $addCondition['search'])
+                ->orLike('divisis.divisi', $addCondition['search'])
+                ->orLike('barang_master.barang_name', $addCondition['search'])
+                ->orLike('barang_master_spesifikasi.spesifikasi', $addCondition['search'])
+                ->groupEnd();
+        }
+
+        // wrap ke subquery lalu SUM
+        $qtySum = $this->db->table("({$sub->getCompiledSelect()}) as po")
+            ->select('SUM(po.total_before_pph) as total_harga');
+
+        $grandTotalHarga = $qtySum->get()->getRowArray();
+
+
         return [
             'data'              => $data,
             'totalData'         => $totalData,
-            'totalFilteredData' => $totalFilteredData
+            'totalFilteredData' => $totalFilteredData,
+            'grandTotalHarga'   => (float)$grandTotalHarga['total_harga']
         ];
     }
 
