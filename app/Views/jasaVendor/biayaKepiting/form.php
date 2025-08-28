@@ -1425,6 +1425,7 @@
         data.append('listBarang', JSON.stringify(listBarang));
         data.append('listPerolehanGaji', JSON.stringify(listPerolehanGaji));
         data.append("listBonus", JSON.stringify(listBonus));
+        data.append("listDataVendor", JSON.stringify(listDataVendor));
 
         if (request) {
             request.abort();
