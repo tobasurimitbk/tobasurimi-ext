@@ -121,7 +121,7 @@ class JasaVendorOut extends BaseController
             $jasaVendorIn = $this->jasaVendorInModel->where('company_id', $this->this_company_id)->like('multiple_jasa_vendor_out_id', $data->id)->where('deletedAt', null)->first();
 
             $jasaVendorOutDetail = $this->jasaVendorOutDetailModel
-                ->getJasaVendorOutDetail2New($data->id);
+                ->getJasaVendorOutDetailForIndex($data->id);
 
             array_push($dataResult, [
                 "no"                    => $no++,
@@ -539,14 +539,16 @@ class JasaVendorOut extends BaseController
             barang_master_spesifikasi.spesifikasi
         ";
 
-        $jasaVendorOutDetail = $this->jasaVendorOutDetailModel->select($selectQryJasaVendorDetail)
-            ->join('stock', 'stock.id = jasa_vendor_out_detail.stock_out_id')
-            ->join('barang_master', 'barang_master.id = stock.barang1_id')
-            ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = stock.barang2_id')
-            ->join('satuans', 'satuans.id = barang_master_spesifikasi.satuan_1')
-            ->where('jasa_vendor_out_id', $jasaVendorOut['id'])
-            ->groupBy('jasa_vendor_out_detail.stock_out_id')
-            ->findAll();
+        // $jasaVendorOutDetail = $this->jasaVendorOutDetailModel->select($selectQryJasaVendorDetail)
+        //     ->join('stock', 'stock.id = jasa_vendor_out_detail.stock_out_id')
+        //     ->join('barang_master', 'barang_master.id = stock.barang1_id')
+        //     ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = stock.barang2_id')
+        //     ->join('satuans', 'satuans.id = barang_master_spesifikasi.satuan_1')
+        //     ->where('jasa_vendor_out_id', $jasaVendorOut['id'])
+        //     ->groupBy('jasa_vendor_out_detail.stock_out_id')
+        //     ->findAll();
+
+        $jasaVendorOutDetail = $this->jasaVendorOutDetailModel->getJasaVendorOutDetail2New($id);
 
         $data = [
             'jasaVendorOut' => $jasaVendorOut,

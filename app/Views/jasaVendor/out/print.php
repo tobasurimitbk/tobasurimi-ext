@@ -128,10 +128,10 @@
                         </td>
                     </tr>
                     <tr style="text-align: center; font-weight:bold;">
-                        <td>
+                        <!-- <td>
                             Banyaknya
-                        </td>
-                        <td colspan="3">
+                        </td> -->
+                        <td colspan="4">
                             Keterangan / Uraian Nama Barang
                         </td>
                         <td>
@@ -145,14 +145,14 @@
                 <tbody>
                     <?php foreach ($jasaVendorDetail as $j) : ?>
                         <tr style="text-align: center;">
-                            <td>
+                            <!-- <td>
 
-                            </td>
-                            <td colspan="3">
-                                <?= $j['barang_name'] . "-" . $j['spesifikasi'] ?>
+                            </td> -->
+                            <td colspan="4">
+                                <?= $j['barang'] ?>
                             </td>
                             <td>
-                                <?= number_format($j['qty'], 3) . " " . $j['kode_satuan'] ?>
+                                <?= number_format($j['qty'], 3) . " " . $j['satuan'] ?>
                             </td>
                             <td>
                                 <?= number_format($j['qty'], 3) ?>
