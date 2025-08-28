@@ -3,6 +3,8 @@
 namespace App\Controllers\JasaVendor;
 
 use App\Controllers\BaseController;
+use App\Models\BarangMasterModel;
+use App\Models\BarangMasterSpesifikasiModel;
 use App\Models\DivisisModel;
 use App\Models\JasaVendorInDetailModel;
 use App\Models\JasaVendorInModel;
@@ -106,6 +108,35 @@ class JasaVendorIn extends BaseController
                 ->where('deletedAt', null)
                 ->findAll();
 
+            $jasaVendorInDetail = $this->jasaVendorInDetailModel
+                ->where('jasa_vendor_in_id', $data->id)
+                ->where('deletedAt', null)
+                ->findAll();
+
+            $barangMasterModel = new BarangMasterModel();
+            $barangMasterSpesifikasiModel = new BarangMasterSpesifikasiModel();
+            
+            $barangName = null;
+            $processedMasterIds = []; // Array untuk melacak master_id yang sudah diproses
+
+            foreach($jasaVendorInDetail as $jvi) {
+                $barangMasterSpesifikasi = $barangMasterSpesifikasiModel->find($jvi['spesifikasi_in_id']);
+                $currentMasterId = $barangMasterSpesifikasi['barang_master_id'];
+                
+                // Cek jika master_id belum diproses
+                if (!in_array($currentMasterId, $processedMasterIds)) {
+                    $barangMaster = $barangMasterModel->find($currentMasterId);
+                    
+                    if ($barangName === null) {
+                        $barangName = $barangMaster['barang_name'];
+                    } else {
+                        $barangName .= ', ' . $barangMaster['barang_name'];
+                    }
+                    
+                    $processedMasterIds[] = $currentMasterId; // Tandai sebagai sudah diproses
+                }
+            }
+
             array_push($dataResult, [
                 "no"                    => $no++,
                 "id"                    => encrypt($data->id),
@@ -114,6 +145,7 @@ class JasaVendorIn extends BaseController
                 "no_surat_jalan_vendor" => $data->no_surat_jalan_vendor == "" ? "-" : $data->no_surat_jalan_vendor,
                 "tanggal"               => date('d/m/Y', strtotime($data->tanggal)),
                 "divisi"                => $data->divisi,
+                "barang"                => $barangName ?? 'Tidak ada barang',
                 "warehouse_name"        => $data->warehouse_name,
                 "total_item"            => count($jasaVendorInDetail),
                 "vendor_name"           => $data->vendor_name,
