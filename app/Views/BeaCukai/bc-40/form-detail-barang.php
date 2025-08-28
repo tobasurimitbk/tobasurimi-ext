@@ -878,12 +878,14 @@
                     var barangDetailDiskon = destroyFormatRupiah($('#barang_detail_diskon').val());
                     var barangDetailVolume = destroyFormatRupiah($('#barang_detail_volume').val());
                     var barangDetailBeratBersih = destroyFormatRupiah($('#barang_detail_berat_bersih').val());
+                    var barangDetailJumlahSatuan = destroyFormatRupiah($('#barang_detail_jumlah_satuan').val());
 
                     formData.set("barang_detail_harga_penyerahan", barangDetailHargaPenyerahan);
                     formData.set("barang_detail_harga_penggantian", barangDetailHargaPenggantian);
                     formData.set("barang_detail_diskon", barangDetailDiskon);
                     formData.set("barang_detail_volume", barangDetailVolume);
                     formData.set("barang_detail_berat_bersih", barangDetailBeratBersih);
+                    formData.set("barang_detail_jumlah_satuan", barangDetailJumlahSatuan);
 
                     formData.append("penerimaan_barang_id", "<?= encrypt($barangDetail['penerimaan_barang_id']) ?>");
                     formData.append("barang1_id", "<?= encrypt($barangDetail['barang1_id']) ?>");
