@@ -59,6 +59,15 @@ class VendorModel extends Model
         'bonus_karyawan_mh',
         'bonus_karyawan_cf',
 
+
+        'tambahan_upah_kopek_jb',
+        'tambahan_upah_kopek_xl',
+        'tambahan_upah_kopek_lp',
+        'tambahan_upah_kopek_cl',
+        'tambahan_upah_kopek_sp',
+        'tambahan_upah_kopek_mh',
+        'tambahan_upah_kopek_cf',
+
         'createdAt',
         'updatedAt',
         'deletedAt'

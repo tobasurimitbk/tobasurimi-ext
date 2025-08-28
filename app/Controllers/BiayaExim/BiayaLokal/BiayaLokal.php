@@ -212,8 +212,9 @@ class BiayaLokal extends BaseController
         $taxReturnTotal = 0;
 
         $dataBiayaLokal = $this->biayaLokalModel
-            ->select("biaya_lokal.*, vendor_pelayaran.nama_vendor")
+            ->select("biaya_lokal.*, vendor_pelayaran.nama_vendor, divisis.divisi")
             ->join('vendor_pelayaran', 'vendor_pelayaran.id = biaya_lokal.vendor_pelayaran_id', 'left')
+            ->join('divisis', 'divisis.id = biaya_lokal.divisi_id', 'left')
             ->where('biaya_lokal.id', $id)
             ->first();
 

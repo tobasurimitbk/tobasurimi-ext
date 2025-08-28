@@ -778,6 +778,14 @@ class PenerimaanBarangImportBP extends BaseController
                     $penerimaanBarang['supplier_id'],
                 );
             }
+
+            foreach ($penerimaanBarangList as $p) {
+                $this->barangMasterSpesifikasiModel
+                    ->update($p['spesifikasi_id'], [
+                        'harga_terakhir' => $p['harga'],
+                        'supplier_terakhir' => $penerimaanBarang['supplier_id']
+                    ]);
+            }
         } catch (Exception $e) {
             return response()->setJSON([
                 'status' => false,
@@ -891,6 +899,32 @@ class PenerimaanBarangImportBP extends BaseController
                 ->where(['id' => $id])
                 ->set(['status_post' => 'WAITING'])
                 ->update();
+
+            // UPDATE HARGA
+            foreach ($penerimaanBarangList as $p) {
+                $hargaTerakhir = $this->penerimaanBarangDetailModel
+                    ->historiHargaPOBahanPenolongByLpbFirst(
+                        "IMPORT",
+                        "PENOLONG",
+                        $p['spesifikasi_id'],
+                        $this->this_company_id
+                    );
+
+                if ($hargaTerakhir) {
+                    $this->barangMasterSpesifikasiModel
+                        ->update($p['spesifikasi_id'], [
+                            'harga_terakhir' => $hargaTerakhir['harga'],
+                            'supplier_terakhir' => $hargaTerakhir['supplier_id']
+                        ]);
+                } else {
+                    $this->barangMasterSpesifikasiModel
+                        ->update($p['spesifikasi_id'], [
+                            'harga_terakhir' => null,
+                            'supplier_terakhir' => null
+                        ]);
+                }
+            }
+
             $db->transCommit();
             return response()->setJSON([
                 'status' => true,

@@ -159,11 +159,17 @@
 
                 </table>
             </div>
-            <div style="display: inline-block;vertical-align: top; float: right;">
+            <div style="display: inline-block;vertical-align: top; float: right; margin-top:5px;">
                 <table>
                     <tr>
                         <td>NO BUKTI:</td>
                         <td></td>
+                        <td>___________________________</td>
+                    </tr>
+                    <tr>
+                        <td>DEPT</td>
+                        <td>:</td>
+                        <td><?= $dataBiayaEkspor['divisi'] ?></td>
                     </tr>
                 </table>
             </div>
@@ -231,131 +237,140 @@
     </div>
 
     <?php if ($totalDikembalikan != 0) { ?>
-        <div style="margin-top: 40px;">
-            <hr style="border: 1px dashed #000;">
-            <br>
-            <!-- <div style="padding: 25px; margin: 25px;"> -->
-            <table class="w-100">
-                <tr>
-                    <td>
+        <div style="margin-left: -45px;background-color: #d4a49fff; margin-right:-45px;">
+            <div style="margin-top:40px; margin-left:45px; margin-right:45px;">
+                <hr style="border: 1px dashed #000;">
+                <br>
+                <!-- <div style="padding: 25px; margin: 25px;"> -->
+                <table class="w-100">
+                    <tr>
+                        <td>
+                            <table>
+                                <tr>
+                                    <td>BUKTI PENERIMAAN</td>
+                                    <td>
+                                        <div style="margin-bottom: 0.25rem;">
+                                            <div class="box-sm bukti-pengeluaran"></div>
+                                            <div class="bukti-pengeluaran">KAS</div>
+                                        </div>
+                                        <div>
+                                            <div class="box-sm bukti-pengeluaran"></div>
+                                            <div class="bukti-pengeluaran">BANK</div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                        <td>
+                            <table class="bank-table border-collapse" style="float: right;">
+                                <tr>
+                                    <th colspan="2">NO</th>
+                                    <th>BANK</th>
+                                </tr>
+                                <tr>
+                                    <td>CEK</td>
+                                    <td style="width: 95px;"></td>
+                                    <td style="width: 95px;"></td>
+                                </tr>
+                                <tr>
+                                    <td>GIRO</td>
+                                    <td></td>
+                                    <td></td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                </table>
+
+                <div class="d-flex w-100">
+                    <div style="display: inline-block;">
                         <table>
                             <tr>
-                                <td>BUKTI PENERIMAAN</td>
-                                <td>
-                                    <div style="margin-bottom: 0.25rem;">
-                                        <div class="box-sm bukti-pengeluaran"></div>
-                                        <div class="bukti-pengeluaran">KAS</div>
-                                    </div>
-                                    <div>
-                                        <div class="box-sm bukti-pengeluaran"></div>
-                                        <div class="bukti-pengeluaran">BANK</div>
-                                    </div>
-                                </td>
+                                <td>NO INVOICE</td>
+                                <td>: <?= $dataBiayaEkspor['no_invoice'] ?></td>
+                            </tr>
+                            <tr>
+                                <td>TGL</td>
+                                <td>: <?= date('d/m/Y', strtotime($dataBiayaEkspor['tanggal_invoice'])) ?></td>
+                            </tr>
+                            <tr>
+                                <td>DIBAYAR KEPADA</td>
+                                <td>: <?= $dataBiayaEkspor['nama_vendor'] ?></td>
                             </tr>
                         </table>
-                    </td>
-                    <td>
-                        <table class="bank-table border-collapse" style="float: right;">
+                    </div>
+                    <div style="display: inline-block;vertical-align: top; float: right; margin-top:5px;">
+                        <table>
                             <tr>
-                                <th colspan="2">NO</th>
-                                <th>BANK</th>
+                                <td>NO BUKTI:</td>
+                                <td></td>
+                                <td>___________________________</td>
                             </tr>
                             <tr>
-                                <td>CEK</td>
-                                <td style="width: 95px;"></td>
-                                <td style="width: 95px;"></td>
-                            </tr>
-                            <tr>
-                                <td>GIRO</td>
-                                <td></td>
-                                <td></td>
+                                <td>DEPT</td>
+                                <td>:</td>
+                                <td><?= $dataBiayaEkspor['divisi'] ?></td>
                             </tr>
                         </table>
-                    </td>
-                </tr>
-            </table>
-
-            <div class="d-flex w-100">
-                <div style="display: inline-block;">
-                    <table>
-                        <tr>
-                            <td>NO INVOICE</td>
-                            <td>: <?= $dataBiayaEkspor['no_invoice'] ?></td>
-                        </tr>
-                        <tr>
-                            <td>TGL</td>
-                            <td>: <?= date('d/m/Y', strtotime($dataBiayaEkspor['tanggal_invoice'])) ?></td>
-                        </tr>
-                        <tr>
-                            <td>DIBAYAR KEPADA</td>
-                            <td>: <?= $dataBiayaEkspor['nama_vendor'] ?></td>
-                        </tr>
-                    </table>
+                    </div>
                 </div>
-                <div style="display: inline-block;vertical-align: top; float: right;">
-                    <table>
+
+                <table class="w-100 bank-table border-collapse">
+                    <tr>
+                        <th class="txt-left" style="width: 300px;">KETERANGAN</th>
+                        <th class="txt-right">JUMLAH</th>
+                        <th class="txt-left">NO. PERKIRAAN</th>
+                    </tr>
+                    <?php $totalPenerimaan = 0; ?>
+                    <?php foreach ($taxReturnData as $t) : ?>
+                        <?php $totalPenerimaan += $t['nilai_pajak']; ?>
                         <tr>
-                            <td>NO BUKTI:</td>
+                            <td><?= $t['tax_name'] . " - " . $t['no_faktur_pajak'] . (!empty($t['keterangan_pajak']) ? " - " . $t['keterangan_pajak'] : "") ?></td>
+                            <td class="txt-right"><?= number_format($t['nilai_pajak'], 2) ?></td>
                             <td></td>
                         </tr>
-                    </table>
-                </div>
-            </div>
-
-            <table class="w-100 bank-table border-collapse">
-                <tr>
-                    <th class="txt-left" style="width: 300px;">KETERANGAN</th>
-                    <th class="txt-right">JUMLAH</th>
-                    <th class="txt-left">NO. PERKIRAAN</th>
-                </tr>
-                <?php $totalPenerimaan = 0; ?>
-                <?php foreach ($taxReturnData as $t) : ?>
-                    <?php $totalPenerimaan += $t['nilai_pajak']; ?>
+                    <?php endforeach; ?>
                     <tr>
-                        <td><?= $t['tax_name'] . " - " . $t['no_faktur_pajak'] . (!empty($t['keterangan_pajak']) ? " - " . $t['keterangan_pajak'] : "") ?></td>
-                        <td class="txt-right"><?= number_format($t['nilai_pajak'], 2) ?></td>
+                        <th class="txt-right">TOTAL</th>
+                        <th class="txt-right"><?= number_format($totalPenerimaan, 2)  ?></th>
+                        <th></th>
+                    </tr>
+                </table>
+
+                <div style="margin-top: 0.5rem;margin-bottom: 0.5rem">
+                    <span>TERBILANG:</span>
+                    <span style="text-transform: uppercase;"><?= penyebut($totalPenerimaan) . ' RUPIAH' ?></span>
+                </div>
+
+                <table class="w-100 sign-table border-collapse">
+                    <tr>
+                        <td class="txt-center" style="width: 5% !important;">DISETUJUI</td>
+                        <td class="txt-center" style="width: 5% !important;">DIKETAHUI</td>
+                        <td class="txt-center" style="width: 5% !important;">DIPERIKSA</td>
+                        <td class="txt-center" style="width: 5% !important;">KASIR</td>
+                        <td class="txt-center" style="width: 5% !important;">DIBUKUKAN</td>
+                        <td class="txt-center" style="width: 15% !important;">DITERIMA OLEH</td>
+                    </tr>
+                    <tr>
+                        <td style="height: 50px;"></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
                         <td></td>
                     </tr>
-                <?php endforeach; ?>
-                <tr>
-                    <th class="txt-right">TOTAL</th>
-                    <th class="txt-right"><?= number_format($totalPenerimaan, 2)  ?></th>
-                    <th></th>
-                </tr>
-            </table>
-
-            <div style="margin-top: 0.5rem;margin-bottom: 0.5rem">
-                <span>TERBILANG:</span>
-                <span style="text-transform: uppercase;"><?= penyebut($totalPenerimaan) . ' RUPIAH' ?></span>
+                    <tr>
+                        <td>TGL</td>
+                        <td>TGL</td>
+                        <td>TGL</td>
+                        <td>TGL</td>
+                        <td>TGL</td>
+                        <td class="txt-center">NAMA JELAS & STEMPEL</td>
+                    </tr>
+                </table>
+                <!-- </div> -->
             </div>
-
-            <table class="w-100 sign-table border-collapse">
-                <tr>
-                    <td class="txt-center" style="width: 5% !important;">DISETUJUI</td>
-                    <td class="txt-center" style="width: 5% !important;">DIKETAHUI</td>
-                    <td class="txt-center" style="width: 5% !important;">DIPERIKSA</td>
-                    <td class="txt-center" style="width: 5% !important;">KASIR</td>
-                    <td class="txt-center" style="width: 5% !important;">DIBUKUKAN</td>
-                    <td class="txt-center" style="width: 15% !important;">DITERIMA OLEH</td>
-                </tr>
-                <tr>
-                    <td style="height: 50px;"></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                </tr>
-                <tr>
-                    <td>TGL</td>
-                    <td>TGL</td>
-                    <td>TGL</td>
-                    <td>TGL</td>
-                    <td>TGL</td>
-                    <td class="txt-center">NAMA JELAS & STEMPEL</td>
-                </tr>
-            </table>
-            <!-- </div> -->
+            <br>
         </div>
     <?php } ?>
 

@@ -86,7 +86,8 @@
                             <th onclick="changeSort('divisi_id')">Departemen</th>
                             <th onclick="changeSort('warehouse_id')">Warehouse</th>
                             <th>No Surat Jalan</th>
-                            <th onclick="changeSort('no_surat_jalan_vendor')">No Surat Jalan Vendor</th>
+                            <!-- <th onclick="changeSort('no_surat_jalan_vendor')">No Surat Jalan Vendor</th> -->
+                            <th >Barang</th>
                             <th onclick="changeSort('vendor_id')">Vendor</th>
                             <th>Action</th>
                         </tr>
@@ -168,9 +169,13 @@
                 searchable: false,
                 sortable: false
             },
+            // {
+            //     data: "no_surat_jalan_vendor",
+            //     className: "text-center",
+            // },
             {
-                data: "no_surat_jalan_vendor",
-                className: "text-center",
+                data: "barang",
+                className: "text-center"
             },
             {
                 data: "vendor_name",

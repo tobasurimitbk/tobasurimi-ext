@@ -217,7 +217,6 @@
                             </div>
                         </div>
                     </div>
-
                     <!-- END KOMISI AREA -->
 
                     <!-- BONUS AREA -->
@@ -285,6 +284,71 @@
                         </div>
                     </div>
                     <!-- END BONUS AREA -->
+
+                    <!-- TAMBAHAN UPAH KOPEK AREA -->
+                    <div class="col-subtitle-modal mt-3">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <h5 class="modal-sub-title">Tambahan Upah Kopek</h5>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input type="text" onkeyup="this.value = greatFormatRupiah(this.value)" 
+                                    class="form-control tambahan_upah_kopek_jb" id="tambahan_upah_kopek_jb" name="tambahan_upah_kopek_jb" placeholder="JB">
+                                <label for="tambahan_upah_kopek_jb">JB</label>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input type="text" onkeyup="this.value = greatFormatRupiah(this.value)" 
+                                    class="form-control tambahan_upah_kopek_xl" id="tambahan_upah_kopek_xl" name="tambahan_upah_kopek_xl" placeholder="XL">
+                                <label for="tambahan_upah_kopek_xl">XL</label>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input type="text" onkeyup="this.value = greatFormatRupiah(this.value)" 
+                                    class="form-control tambahan_upah_kopek_lp" id="tambahan_upah_kopek_lp" name="tambahan_upah_kopek_lp" placeholder="LP">
+                                <label for="tambahan_upah_kopek_lp">LP</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input type="text" onkeyup="this.value = greatFormatRupiah(this.value)" 
+                                    class="form-control tambahan_upah_kopek_cl" id="tambahan_upah_kopek_cl" name="tambahan_upah_kopek_cl" placeholder="CL">
+                                <label for="tambahan_upah_kopek_cl">CL</label>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input type="text" onkeyup="this.value = greatFormatRupiah(this.value)" 
+                                    class="form-control tambahan_upah_kopek_sp" id="tambahan_upah_kopek_sp" name="tambahan_upah_kopek_sp" placeholder="SP">
+                                <label for="tambahan_upah_kopek_sp">SP</label>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input type="text" onkeyup="this.value = greatFormatRupiah(this.value)" 
+                                    class="form-control tambahan_upah_kopek_mh" id="tambahan_upah_kopek_mh" name="tambahan_upah_kopek_mh" placeholder="MH">
+                                <label for="tambahan_upah_kopek_mh">MH</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input type="text" onkeyup="this.value = greatFormatRupiah(this.value)" 
+                                    class="form-control tambahan_upah_kopek_cf" id="tambahan_upah_kopek_cf" name="tambahan_upah_kopek_cf" placeholder="CF">
+                                <label for="tambahan_upah_kopek_cf">CF</label>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- END TAMBAHAN UPAH KOPEK AREA -->
 
                     <!-- BONUS KARYAWAN AREA -->
                     <div class="col-subtitle-modal mt-3">
@@ -1100,6 +1164,15 @@
                         $(".bonus_karyawan_mh").val(greatFormatRupiah(res.data.bonus_karyawan_mh));
                         $(".bonus_karyawan_cf").val(greatFormatRupiah(res.data.bonus_karyawan_cf));
 
+
+                        $(".tambahan_upah_kopek_jb").val(greatFormatRupiah(res.data.tambahan_upah_kopek_jb));
+                        $(".tambahan_upah_kopek_xl").val(greatFormatRupiah(res.data.tambahan_upah_kopek_xl));
+                        $(".tambahan_upah_kopek_lp").val(greatFormatRupiah(res.data.tambahan_upah_kopek_lp));
+                        $(".tambahan_upah_kopek_cl").val(greatFormatRupiah(res.data.tambahan_upah_kopek_cl));
+                        $(".tambahan_upah_kopek_sp").val(greatFormatRupiah(res.data.tambahan_upah_kopek_sp));
+                        $(".tambahan_upah_kopek_mh").val(greatFormatRupiah(res.data.tambahan_upah_kopek_mh));
+                        $(".tambahan_upah_kopek_cf").val(greatFormatRupiah(res.data.tambahan_upah_kopek_cf));
+
                         row = res.data.list_address.length;
 
                         list_address = [];
@@ -1470,7 +1543,12 @@
                                 // Bonus Karyawan Vendor
                                 "bonus_karyawan_jb", "bonus_karyawan_xl", "bonus_karyawan_lp",
                                 "bonus_karyawan_cl", "bonus_karyawan_sp", "bonus_karyawan_mh",
-                                "bonus_karyawan_cf"
+                                "bonus_karyawan_cf",
+
+                                // Tambahan Upah Kopek Vendor
+                                "tambahan_upah_kopek_jb", "tambahan_upah_kopek_xl", "tambahan_upah_kopek_lp",
+                                "tambahan_upah_kopek_cl", "tambahan_upah_kopek_sp", "tambahan_upah_kopek_mh",
+                                "tambahan_upah_kopek_cf"
                             ];
 
                             // bersihin satu²

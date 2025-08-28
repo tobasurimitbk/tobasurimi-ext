@@ -300,6 +300,105 @@ class JasaVendorOutDetailModel extends Model
                     $barangMaster = $barangMasterModel->find($stock['barang1_id'] ?? null);
                     $barangMasterSpesifikasi = $barangMasterSpesifikasiModel->find($stock['barang2_id'] ?? null);
                     $satuan = $barangMasterSpesifikasi ? $satuanModel->find($barangMasterSpesifikasi['satuan_1'] ?? null) : null;
+                    $barangName = ($barangMaster && $barangMasterSpesifikasi)
+                        ? $barangMaster['barang_name'] . "-" . $barangMasterSpesifikasi['spesifikasi']
+                        : '';
+                    // $barangName = ($barangMaster && $barangMasterSpesifikasi)
+                    //     ? $barangMaster['barang_name'] : '';
+                } else {
+                    $kemasan = $kemasanModel->find($stock['kemasan_id'] ?? null);
+                    $satuan = $kemasan ? $satuanModel->find($kemasan['satuan_id'] ?? null) : null;
+                    $barangName = $kemasan['name'] ?? '';
+                }
+            }
+
+            $rmPurchaseOrder = null;
+            if (isset($stockList['company_id'])) {
+                $rmPurchaseOrder = $rmPurchaseOrderModel
+                    ->where('po_no', $m['stock_dokumen'] ?? null)
+                    ->where('company_id', $stockList['company_id'])
+                    ->first();
+            }
+
+            $resultNoJasaVendorIn = strstr($m['stock_dokumen'] ?? '', '(', true);
+            $noJasaVendorIn = trim($resultNoJasaVendorIn ?: '');
+            $supplierName = $stockList['supplier_name'] ?? '';
+            $stockDate = $rmPurchaseOrder
+                ? date('d/m/Y', strtotime($rmPurchaseOrder['po_date']))
+                : '';
+
+            $jasaVendorIn = $jasaVendorInModel
+                ->select('jasa_vendor_in.*, vendors.name as nama_vendor')
+                ->join('vendors', 'vendors.id = jasa_vendor_in.vendor_id', 'left')
+                ->where('no_penerimaan_surat_jalan', $noJasaVendorIn)
+                ->where('jasa_vendor_in.company_id', session()->get("login")->this_company_id)
+                ->first();
+
+            $stockList['qty'] = $m['qty'] ?? 0;
+            $stockList['qty_kotor'] = $m['qty_kotor'] ?? 0;
+            $bcType = isset($stockList['bc_id']) ? $metaDataModel->find($stockList['bc_id']) : null;
+            $stockList['no_aju'] = isset($stockList['no_aju']) && $stockList['no_aju'] !== "-" ? $stockList['no_aju'] : "-";
+            $stockList['bc_type'] = $bcType['value'] ?? "NON PABEAN";
+            $stockList['satuan'] = $satuan['kode_satuan'] ?? '';
+            $stockList['barang'] = strtoupper($barangName);
+            $stockList['stock_id'] = $stockList['stock_id'] ?? null;
+            $stockList['type_barang'] = $stock['tipe_barang'] ?? '';
+            $stockList['type_barang_text'] = isset($stock['tipe_barang']) ? strtoupper(str_replace('_', ' ', $stock['tipe_barang'])) : '';
+            $stockList['stok_total'] = $stockList['stok_total'] ?? 0;
+            $stockList['stock_date'] = $jasaVendorIn
+                ? date('d/m/Y', strtotime($jasaVendorIn['tanggal']))
+                : $stockDate;
+            $stockList['supplier_name'] = $jasaVendorIn
+                ? $supplierName . ' / ' . ($jasaVendorIn['nama_vendor'] ?? '')
+                : $supplierName;
+
+            // id langsung encrypt tanpa grouping
+            $stockList['id'] = encrypt($stockList['stock_id']);
+
+            $result[] = $stockList;
+        }
+
+        return $result;
+    }
+
+    public function getJasaVendorOutDetailForIndex($jasaVendorOutID)
+    {
+        $stockDetail2Model = new StockDetail2Model();
+        $stockModel = new StockModel();
+        $barangMasterModel = new BarangMasterModel();
+        $barangMasterSpesifikasiModel = new BarangMasterSpesifikasiModel();
+        $satuanModel = new SatuansModel();
+        $kemasanModel = new KemasanModel();
+        $metaDataModel = new MetadataModel();
+        $rmPurchaseOrderModel = new RMPurchaseOrderModel();
+        $jasaVendorInModel = new JasaVendorInModel();
+
+        $result = [];
+
+        $jasaVendorOutDetail = $this->asArray()
+            ->where('jasa_vendor_out_id', $jasaVendorOutID)
+            ->findAll();
+
+        foreach ($jasaVendorOutDetail as $m) {
+
+            $stockList = $stockDetail2Model->getStockListDetailNew(
+                $m['stock_out_id']
+            );
+
+            $stockDetail = $stockDetail2Model->find($m['stock_out_id']);
+
+            if (!$stockList) continue;
+
+            $stock = $stockModel->find($stockDetail['stock_id'] ?? null);
+
+            $barangName = '';
+            $satuan = null;
+
+            if ($stock) {
+                if (isset($stock['kemasan_id']) && $stock['kemasan_id'] == 0) {
+                    $barangMaster = $barangMasterModel->find($stock['barang1_id'] ?? null);
+                    $barangMasterSpesifikasi = $barangMasterSpesifikasiModel->find($stock['barang2_id'] ?? null);
+                    $satuan = $barangMasterSpesifikasi ? $satuanModel->find($barangMasterSpesifikasi['satuan_1'] ?? null) : null;
                     // $barangName = ($barangMaster && $barangMasterSpesifikasi)
                     //     ? $barangMaster['barang_name'] . "-" . $barangMasterSpesifikasi['spesifikasi']
                     //     : '';
@@ -360,5 +459,4 @@ class JasaVendorOutDetailModel extends Model
 
         return $result;
     }
-
 }

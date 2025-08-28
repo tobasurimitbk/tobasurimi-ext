@@ -501,7 +501,7 @@ class BCPurchaseOrderModel extends Model
                 ->select('
                     kemasan.name AS kemasan_name,
                     penerimaan_barang.kemasan_id,
-                    penerimaan_barang.jumlah_kemasan,
+                    SUM(penerimaan_barang.jumlah_kemasan) AS jumlah_kemasan,
                     GROUP_CONCAT(DISTINCT penerimaan_barang.tanggal ORDER BY penerimaan_barang.tanggal ASC SEPARATOR ", ") AS lpb_date,
                     GROUP_CONCAT(DISTINCT penerimaan_barang.no_penerimaan_barang ORDER BY penerimaan_barang.tanggal ASC SEPARATOR ", ") AS no_penerimaan_barang,
                     GROUP_CONCAT(DISTINCT penerimaan_barang_detail.purchase_order_id) AS purchase_order_ids,

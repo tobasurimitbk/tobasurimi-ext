@@ -213,6 +213,15 @@ class Vendor extends BaseController
                     "bonus_karyawan_sp" => $this->request->getPost("bonus_karyawan_sp"),
                     "bonus_karyawan_mh" => $this->request->getPost("bonus_karyawan_mh"),
                     "bonus_karyawan_cf" => $this->request->getPost("bonus_karyawan_cf"),
+
+                    // ==== Tambahan Upah Kopek Karyawan ====
+                    "tambahan_upah_kopek_jb" => $this->request->getPost("tambahan_upah_kopek_jb"),
+                    "tambahan_upah_kopek_xl" => $this->request->getPost("tambahan_upah_kopek_xl"),
+                    "tambahan_upah_kopek_lp" => $this->request->getPost("tambahan_upah_kopek_lp"),
+                    "tambahan_upah_kopek_cl" => $this->request->getPost("tambahan_upah_kopek_cl"),
+                    "tambahan_upah_kopek_sp" => $this->request->getPost("tambahan_upah_kopek_sp"),
+                    "tambahan_upah_kopek_mh" => $this->request->getPost("tambahan_upah_kopek_mh"),
+                    "tambahan_upah_kopek_cf" => $this->request->getPost("tambahan_upah_kopek_cf"),
                 ];
 
                 $id = $this->VendorModel->insert($values);
@@ -377,6 +386,15 @@ class Vendor extends BaseController
                     "bonus_karyawan_sp" => $this->request->getPost("bonus_karyawan_sp"),
                     "bonus_karyawan_mh" => $this->request->getPost("bonus_karyawan_mh"),
                     "bonus_karyawan_cf" => $this->request->getPost("bonus_karyawan_cf"),
+
+                    // ==== Tambahan Upah Kopek Karyawan ====
+                    "tambahan_upah_kopek_jb" => $this->request->getPost("tambahan_upah_kopek_jb"),
+                    "tambahan_upah_kopek_xl" => $this->request->getPost("tambahan_upah_kopek_xl"),
+                    "tambahan_upah_kopek_lp" => $this->request->getPost("tambahan_upah_kopek_lp"),
+                    "tambahan_upah_kopek_cl" => $this->request->getPost("tambahan_upah_kopek_cl"),
+                    "tambahan_upah_kopek_sp" => $this->request->getPost("tambahan_upah_kopek_sp"),
+                    "tambahan_upah_kopek_mh" => $this->request->getPost("tambahan_upah_kopek_mh"),
+                    "tambahan_upah_kopek_cf" => $this->request->getPost("tambahan_upah_kopek_cf"),
                 ];
 
 

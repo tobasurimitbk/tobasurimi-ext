@@ -13,7 +13,7 @@
 
             @page {
                 size: 210mm 330mm;
-                margin: 20mm;
+                /* margin: 20mm; */
             }
         }
 
@@ -347,7 +347,7 @@
     }
     ?>
 
-    <table style="width: 100%; border-collapse: collapse; margin-top: 4px; font-size: 12px;">
+    <table style="width: 100%; border-collapse: collapse; margin-top: 4px; font-size: 12px; ">
         <thead>
             <tr style="background-color: #f8f9fa; border-bottom: 2px solid #dee2e6;">
                 <th style="padding: 6px; text-align: left; font-weight: bold; border: 1px solid #ddd; width: 4%; height:2.5%;">NO</th>
@@ -526,7 +526,7 @@
                     <br>
                     <b>
                         <?= $dataPI['payment_instruction'] ?> <br>
-                        101/<?= $dataPI['no_pi'] ?> (<?= number_format($dataPI['total_pi'], 2) ?>)
+                        1011/<?= $dataPI['no_pi'] ?> (<?= number_format($dataPI['total_pi'], 2) ?>)
                     </b>
                 </td>
 
