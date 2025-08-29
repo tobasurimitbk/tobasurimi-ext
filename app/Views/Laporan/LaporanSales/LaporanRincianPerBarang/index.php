@@ -5,7 +5,7 @@
 <section class="section">
     <div class="section-header">
         <div class="col-md-10">
-            <h1>Laporan Penjualan Per Barang</h1>
+            <h1>Laporan Rincian Penjualan Per Barang</h1>
         </div>
 
         <div class="col-md-2 text-right">
@@ -71,15 +71,15 @@
                     <table class="table table-bordered nowrap table-hover-tobasurimi dataTable" id="dataTable" width="100%" cellspacing="0">
                         <thead class="thead-dark">
                             <tr>
-                                <th>No</th>
-                                <th class="text-center">Keterangan Barang</th>
+                                <th>No. Faktur</th>
+                                <th>Tanggal Faktur</th>
+                                <th>Keterangan</th>
                                 <th>Kuantitas</th>
                                 <th>Satuan</th>
                                 <th>Jumlah</th>
-                                <th>Nilai HPP</th>
-                                <th>Laba Kotor</th>
-                                <th>Jumlah Data</th>
-                                <th>No Barang</th>
+                                <th>Nama Barang</th>
+                                <th>Nama Pelanggan</th>
+                                <th>Nama Penjual</th>
                             </tr>
                         </thead>
                         <tbody class="body-table" id="body-table" style="cursor: pointer;">
@@ -130,12 +130,24 @@
             },
             display: "stripe",
             searching: false,
+            createdRow: function(row, data, dataIndex) {
+                if (data.is_customer) {
+                    $(row).addClass('customer-row').find('td').attr('colspan', 6).removeClass('text-center').addClass('text-left font-weight-bold');
+                    $(row).find('td:not(:first)').remove(); // Remove other cells
+                } else if (data.is_total) {
+                    $(row).addClass('total-row').find('td').attr('colspan', 6).removeClass('text-center').addClass('text-left font-weight-bold');
+                    $(row).find('td:not(:first)').remove(); // Remove other cells
+                }
+            },
             columns: [{
-                data: "no",
+                data: "no_faktur",
                 className: "text-center",
             }, {
-                data: "barang_name",
-                className: "text-left",
+                data: "tanggal_faktur",
+                className: "text-center",
+            }, {
+                data: "keterangan",
+                className: "text-center",
             }, {
                 data: "qty_invoice",
                 className: "text-center",
@@ -143,19 +155,16 @@
                 data: "kode_satuan",
                 className: "text-center",
             }, {
-                data: "sum_amount_invoice",
+                data: "total_invoice",
                 className: "text-center",
             }, {
-                data: "amt_harga_pokok",
+                data: "barang_name",
                 className: "text-center",
             }, {
-                data: "amt_laba",
+                data: "nama_pelanggan",
                 className: "text-center",
             }, {
-                data: "count_invoice",
-                className: "text-center",
-            }, {
-                data: "kode_barang",
+                data: "nama_sales",
                 className: "text-center",
             }, ],
             columnDefs: [{

@@ -44,7 +44,7 @@ class PenjualanPerBarang extends BaseController
         ];
 
         $condition = [
-            "sales_order_invoice.id_company" => $this->this_company_id,
+            // "sales_order_invoice.id_company" => $this->this_company_id,
             "sales_order_invoice.deletedAt" => null,
             "sales_order_invoice.tipe_invoice" => 'LOKAL'
         ];
@@ -60,90 +60,23 @@ class PenjualanPerBarang extends BaseController
         ];
 
         $dataSalesOrderInvoice = $this->salesOrderInvoiceModel
-            ->getAllSalesOrderInvoiceLokalBarang($condition, $addCondition, $pageSize, $offset);
+            ->getSalesOrderInvoiceLokalPerBarang($condition, $addCondition, $pageSize, $offset);
 
         $dataAllSalesOrderInvoice = [];
-        $currentBarang = null;
-        $totalPerBarang = 0;
         $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
 
         foreach ($dataSalesOrderInvoice['data'] as $data) {
-            if ($currentBarang !== $data->id_barang_invoice) {
-                if ($currentBarang !== null) {
-                    array_push($dataAllSalesOrderInvoice, [
-                        "no" => '',
-                        "id" => '',
-                        "no_faktur" => 'Total Invoice: Rp ' . number_format(floatval($totalPerBarang)),
-                        "tanggal_faktur" => '',
-                        "keterangan" => '',
-                        "total_invoice" => '',
-                        "nama_pelanggan" => '',
-                        "nama_sales" => '',
-                        "is_total" => true,
-                        "id_barang" => '',
-                        "kode_barang" => '',
-                        "barang_name" => '',
-                        "qty_invoice" => '',
-                        "kode_satuan" => '',
-                    ]);
-                }
-
-                $currentBarang = $data->id_barang_invoice;
-                $totalPerBarang = 0;
-
-                array_push($dataAllSalesOrderInvoice, [
-                    "no" => '',
-                    "id" => '',
-                    "no_faktur" => $data->kode_barang . ' ' . $data->barang_name,
-                    "tanggal_faktur" => '',
-                    "keterangan" => '',
-                    "total_invoice" => '',
-                    "nama_pelanggan" => '',
-                    "nama_sales" => '',
-                    "is_customer" => true,
-                    "id_barang" => '',
-                    "kode_barang" => '',
-                    "barang_name" => '',
-                    "qty_invoice" => '',
-                    "kode_satuan" => '',
-                ]);
-            }
-
             array_push($dataAllSalesOrderInvoice, [
                 "no" => $no++,
                 "id" => encrypt($data->id),
-                "no_faktur" => $data->no_faktur,
-                "tanggal_faktur" => $data->tanggal_faktur,
-                "keterangan" => $data->keterangan,
-                "total_invoice" => number_format(floatval($data->total_invoice)),
-                "nama_pelanggan" => $data->nama_pelanggan,
-                "nama_sales" => $data->salesName,
-                "id_barang" => $data->id_barang_invoice,
-                "kode_barang" => $data->kode_barang,
                 "barang_name" => $data->barang_name,
-                "qty_invoice" => $data->qty_invoice,
+                "qty_invoice" => $data->sum_qty_invoice,
                 "kode_satuan" => $data->kode_satuan,
-            ]);
-
-            $totalPerBarang += floatval($data->total_invoice);
-        }
-
-        if ($currentBarang !== null) {
-            array_push($dataAllSalesOrderInvoice, [
-                "no" => '',
-                "id" => '',
-                "no_faktur" => 'Total Invoice: Rp ' . number_format(floatval($totalPerBarang)),
-                "tanggal_faktur" => '',
-                "keterangan" => '',
-                "total_invoice" => '',
-                "nama_pelanggan" => '',
-                "nama_sales" => '',
-                "is_total" => true,
-                "id_barang" => '',
-                "kode_barang" => '',
-                "barang_name" => '',
-                "qty_invoice" => '',
-                "kode_satuan" => '',
+                "sum_amount_invoice" => number_format(floatval($data->sum_amount_invoice)),
+                "amt_harga_pokok" => number_format(floatval($data->amt_harga_pokok)),
+                "amt_laba" => number_format(floatval($data->sum_amount_invoice) - floatval($data->amt_harga_pokok)),
+                "count_invoice" => $data->count_invoice,
+                "kode_barang" => $data->kode_barang,
             ]);
         }
 
