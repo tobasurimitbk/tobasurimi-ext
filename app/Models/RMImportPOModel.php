@@ -437,4 +437,108 @@ class RMImportPOModel extends Model
             'sortType'  => $sortType
         ];
     }
+
+    public function getListLaporanPurchaseOrder($condition = [], $addCondition = [], $limit = 10, $offset = 0)
+    {
+        $availableSort = [
+            'divisi'        => 'divisis.divisi',
+            'po_date'       => 'rm_import_pos.po_date',
+            'po_no'         => 'rm_import_pos.po_no',
+            'supplier_id'   => 'rm_import_pos.supplier_id',
+            'kode_barang'   => 'barang_master.kode_barang',
+            'barang_name'   => 'barang_master.barang_name',
+            'satuan_id'     => 'rm_import_po_details.unit',
+            'uraian'        => 'rm_import_po_details.note',
+            'spesifikasi'   => 'barang_master_spesifikasi.spesifikasi',
+            'qty_order'     => 'qty_order',
+            'qty_diterima'  => 'qty_diterima',
+            'qty_sisa'      => 'qty_sisa',
+            'total_harga'   => 'rm_import_po_details.total',
+        ];
+        $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
+
+        $sort = $availableSort[$addCondition['sort'] ?? 'po_date'] ?? 'rm_import_pos.po_date';
+        $sortType = $availableSortType[strtolower($addCondition['sortType'] ?? 'desc')] ?? 'DESC';
+
+        // SELECT utama
+        $selectQry = "
+            rm_import_pos.id,
+            rm_import_pos.po_no,
+            rm_import_pos.po_date,
+            suppliers.name AS supplier_name,
+            divisis.divisi,
+            barang_master.kode_barang,
+            barang_master.barang_name,
+            satuans.kode_satuan,
+            rm_import_po_details.note AS uraian,
+            barang_master_spesifikasi.spesifikasi,
+            rm_import_po_details.qty AS qty_order,
+            rm_import_po_details.qty_diterima AS qty_diterima,
+            rm_import_po_details.remaining_qty AS qty_sisa,
+            rm_import_po_details.total AS total_harga,
+            metadata.value as valas_name
+        ";
+
+        $builder = $this->asArray()
+            ->select($selectQry, false) // <-- protect(false) agar query tidak di-escape
+            ->join('suppliers', 'rm_import_pos.supplier_id = suppliers.id', 'left')
+            ->join('rm_import_po_details', 'rm_import_pos.id = rm_import_po_details.rm_import_po_id', 'left')
+            ->join('satuans', 'rm_import_po_details.unit = satuans.id', 'left')
+            ->join('barang_master', 'rm_import_po_details.barang_id = barang_master.id', 'left')
+            ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = rm_import_po_details.spesifikasi_id', 'left')
+            ->join('divisis', 'divisis.id = rm_import_pos.division_id', 'left')
+            ->join('metadata', 'metadata.id = rm_import_pos.currency', 'left')
+            ->where($condition)
+            ->orderBy($sort, $sortType);
+
+        // Hitung total semua data (tanpa filter tambahan)
+        $totalData = $builder->countAllResults(false);
+
+        // Filter tambahan
+        if (!empty($addCondition['status_posting'])) {
+            if ($addCondition['status_posting'] == "SUDAH POSTING") {
+                $builder->groupStart();
+                $builder->where('rm_import_pos.is_posted', 1);
+                $builder->groupEnd();
+            } else if ($addCondition['status_posting'] == "BELUM POSTING") {
+                $builder->groupStart();
+                $builder->where('rm_import_pos.is_posted', 0);
+                $builder->groupEnd();
+            }
+        }
+        if (!empty($addCondition['dateStart'])) {
+            $builder->where('rm_import_pos.po_date >=', $addCondition['dateStart']);
+        }
+        if (!empty($addCondition['dateEnd'])) {
+            $builder->where('rm_import_pos.po_date <=', $addCondition['dateEnd']);
+        }
+        if (!empty($addCondition['divisi_id'])) {
+            $builder->where('rm_import_pos.division_id', $addCondition['divisi_id']);
+        }
+        if (!empty($addCondition['supplier_id'])) {
+            $builder->where('rm_import_pos.supplier_id', $addCondition['supplier_id']);
+        }
+        if (!empty($addCondition['search'])) {
+            $builder->groupStart()
+                ->like('rm_import_pos.po_no', $addCondition['search'])
+                ->orLike('suppliers.name', $addCondition['search'])
+                ->orLike('divisis.divisi', $addCondition['search'])
+                ->orLike('barang_master.barang_name', $addCondition['search'])
+                ->orLike('barang_master_spesifikasi.spesifikasi', $addCondition['search'])
+                ->groupEnd();
+        }
+
+        // Hitung total dengan filter → pakai clone supaya SELECT tidak hilang
+        $countBuilder = clone $builder;
+        $totalFilteredData = $countBuilder->countAllResults(false);
+
+        // Ambil data sesuai limit
+        $data = $builder->findAll($limit, $offset);
+
+        return [
+            'data'              => $data,
+            'totalData'         => $totalData,
+            'totalFilteredData' => $totalFilteredData
+        ];
+    }
 }
