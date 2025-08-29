@@ -3,6 +3,7 @@
 namespace App\Controllers\Laporan\Penjualan;
 
 use App\Controllers\BaseController;
+use App\Models\BarangMasterSalesModel;
 use App\Models\CustomerModel;
 use App\Models\SalesOrderInvoiceModel;
 use Dompdf\Dompdf;
@@ -10,21 +11,21 @@ use Dompdf\Dompdf;
 class PenjualanPerBarang extends BaseController
 {
     protected $this_company_id;
-    protected $customerModel;
+    protected $barangMasterSalesModel;
     protected $salesOrderInvoiceModel;
 
     public function __construct()
     {
         $this->this_company_id = session()->get("login")->this_company_id;
-        $this->customerModel = new CustomerModel();
+        $this->barangMasterSalesModel = new BarangMasterSalesModel();
         $this->salesOrderInvoiceModel = new SalesOrderInvoiceModel();
     }
 
     public function index()
     {
-        $customerData = $this->customerModel->asObject()->findAll();
+        $barangMasterSalesData = $this->barangMasterSalesModel->asObject()->findAll();
         $data = [
-            'customer' => $customerData
+            'barangMasterSalesData' => $barangMasterSalesData
         ];
         return view('Laporan/LaporanSales/LaporanPerBarang/index', $data);
     }
@@ -54,7 +55,7 @@ class PenjualanPerBarang extends BaseController
             "sort" => $this->request->getGet("sort"),
             "sortType" => $this->request->getGet("sortType"),
             "filter_jenis_dokumen" => $this->request->getGet("filter_jenis_dokumen"),
-            "filter_customer" => $this->request->getGet("filter"),
+            "filter_barang" => $this->request->getGet("filter"),
             "dateStart" => $this->request->getGet("dateStart") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getGet("dateStart")))) : "",
             "dateEnd" => $this->request->getGet("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getGet("dateEnd")))) : "",
         ];
@@ -108,7 +109,7 @@ class PenjualanPerBarang extends BaseController
             "sort" => $this->request->getGet("sort"),
             "sortType" => $this->request->getGet("sortType"),
             "filter_jenis_dokumen" => $this->request->getGet("filter_jenis_dokumen"),
-            "filter_customer" => $this->request->getGet("filter"),
+            "filter_barang" => $this->request->getGet("filter"),
             "dateStart" => $this->request->getGet("dateStart") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getGet("dateStart")))) : "",
             "dateEnd" => $this->request->getGet("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getGet("dateEnd")))) : "",
         ];
