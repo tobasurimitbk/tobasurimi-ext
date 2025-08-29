@@ -948,12 +948,13 @@ class PenerimaanBarangModel extends Model
             ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = penerimaan_barang_detail.spesifikasi_id', 'left')
             ->join('satuans', 'satuans.id = penerimaan_barang_detail.unit', 'left')
             ->join(
-                '(SELECT id, multiple_lpb_id, createdAt, no_daftar, company_id, po_type 
+                '(SELECT id, multiple_lpb_id, multiple_lpb_id_text, createdAt, no_daftar, company_id, po_type 
                     FROM bc_purchase_order 
-                    WHERE company_id = ' .  session()->get("login")->this_company_id . ' 
-                        AND po_type =  "' . $addCondition['po_type'] . '" AND deletedAt is NULL
-                    ) bc_purchase_order',
-                'JSON_CONTAINS(bc_purchase_order.multiple_lpb_id, CAST(penerimaan_barang.id AS JSON), "$")',
+                    WHERE company_id = ' . session()->get("login")->this_company_id . ' 
+                    AND po_type = "' . $addCondition['po_type'] . '" 
+                    AND deletedAt IS NULL
+                ) bc_purchase_order',
+                "bc_purchase_order.multiple_lpb_id_text LIKE CONCAT('%\"', penerimaan_barang.id, '\"%')",
                 'left',
                 false
             )
@@ -1019,15 +1020,17 @@ class PenerimaanBarangModel extends Model
             ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = penerimaan_barang_detail.spesifikasi_id', 'left')
             ->join('satuans', 'satuans.id = penerimaan_barang_detail.unit', 'left')
             ->join(
-                '(SELECT id, multiple_lpb_id, createdAt, no_daftar, company_id, po_type 
+                '(SELECT id, multiple_lpb_id, multiple_lpb_id_text, createdAt, no_daftar, company_id, po_type 
                     FROM bc_purchase_order 
-                    WHERE company_id = ' .  session()->get("login")->this_company_id . ' 
-                        AND po_type =  "' . $addCondition['po_type'] . '" AND deletedAt is NULL
-                    ) bc_purchase_order',
-                'JSON_CONTAINS(bc_purchase_order.multiple_lpb_id, CAST(penerimaan_barang.id AS JSON), "$")',
+                    WHERE company_id = ' . session()->get("login")->this_company_id . ' 
+                    AND po_type = "' . $addCondition['po_type'] . '" 
+                    AND deletedAt IS NULL
+                ) bc_purchase_order',
+                "bc_purchase_order.multiple_lpb_id_text LIKE CONCAT('%\"', penerimaan_barang.id, '\"%')",
                 'left',
                 false
             )
+
             ->join('bc_40', 'bc_40.bc_purchase_order_id = bc_purchase_order.id', 'left')
             ->where($condition)
             ->groupBy('penerimaan_barang.id, penerimaan_barang_detail.purchase_order_id');
@@ -1147,12 +1150,13 @@ class PenerimaanBarangModel extends Model
             ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = penerimaan_barang_detail.spesifikasi_id', 'left')
             ->join('satuans', 'satuans.id = penerimaan_barang_detail.unit', 'left')
             ->join(
-                '(SELECT id, multiple_lpb_id, createdAt, no_daftar, company_id, po_type 
+                '(SELECT id, multiple_lpb_id, multiple_lpb_id_text, createdAt, no_daftar, company_id, po_type 
                     FROM bc_purchase_order 
-                    WHERE company_id = ' .  session()->get("login")->this_company_id . ' 
-                        AND po_type =  "' . $addCondition['po_type'] . '" AND deletedAt is NULL
-                    ) bc_purchase_order',
-                'JSON_CONTAINS(bc_purchase_order.multiple_lpb_id, CAST(penerimaan_barang.id AS JSON), "$")',
+                    WHERE company_id = ' . session()->get("login")->this_company_id . ' 
+                    AND po_type = "' . $addCondition['po_type'] . '" 
+                    AND deletedAt IS NULL
+                ) bc_purchase_order',
+                "bc_purchase_order.multiple_lpb_id_text LIKE CONCAT('%\"', penerimaan_barang.id, '\"%')",
                 'left',
                 false
             )
@@ -1220,12 +1224,13 @@ class PenerimaanBarangModel extends Model
             ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = penerimaan_barang_detail.spesifikasi_id', 'left')
             ->join('satuans', 'satuans.id = penerimaan_barang_detail.unit', 'left')
             ->join(
-                '(SELECT id, multiple_lpb_id, createdAt, no_daftar, company_id, po_type 
+                '(SELECT id, multiple_lpb_id, multiple_lpb_id_text, createdAt, no_daftar, company_id, po_type 
                     FROM bc_purchase_order 
-                    WHERE company_id = ' .  session()->get("login")->this_company_id . ' 
-                        AND po_type =  "' . $addCondition['po_type'] . '" AND deletedAt is NULL
-                    ) bc_purchase_order',
-                'JSON_CONTAINS(bc_purchase_order.multiple_lpb_id, CAST(penerimaan_barang.id AS JSON), "$")',
+                    WHERE company_id = ' . session()->get("login")->this_company_id . ' 
+                    AND po_type = "' . $addCondition['po_type'] . '" 
+                    AND deletedAt IS NULL
+                ) bc_purchase_order',
+                "bc_purchase_order.multiple_lpb_id_text LIKE CONCAT('%\"', penerimaan_barang.id, '\"%')",
                 'left',
                 false
             )
@@ -1346,12 +1351,13 @@ class PenerimaanBarangModel extends Model
             ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = penerimaan_barang_detail.spesifikasi_id', 'left')
             ->join('satuans', 'satuans.id = penerimaan_barang_detail.unit', 'left')
             ->join(
-                '(SELECT id, multiple_lpb_id, createdAt, no_daftar, company_id, po_type 
+                '(SELECT id, multiple_lpb_id, multiple_lpb_id_text, createdAt, no_daftar, company_id, po_type 
                     FROM bc_purchase_order 
-                    WHERE company_id = ' .  session()->get("login")->this_company_id . ' 
-                        AND po_type =  "' . $addCondition['po_type'] . '" AND deletedAt is NULL
-                    ) bc_purchase_order',
-                'JSON_CONTAINS(bc_purchase_order.multiple_lpb_id, CAST(penerimaan_barang.id AS JSON), "$")',
+                    WHERE company_id = ' . session()->get("login")->this_company_id . ' 
+                    AND po_type = "' . $addCondition['po_type'] . '" 
+                    AND deletedAt IS NULL
+                ) bc_purchase_order',
+                "bc_purchase_order.multiple_lpb_id_text LIKE CONCAT('%\"', penerimaan_barang.id, '\"%')",
                 'left',
                 false
             )
@@ -1419,12 +1425,13 @@ class PenerimaanBarangModel extends Model
             ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = penerimaan_barang_detail.spesifikasi_id', 'left')
             ->join('satuans', 'satuans.id = penerimaan_barang_detail.unit', 'left')
             ->join(
-                '(SELECT id, multiple_lpb_id, createdAt, no_daftar, company_id, po_type 
+                '(SELECT id, multiple_lpb_id, multiple_lpb_id_text, createdAt, no_daftar, company_id, po_type 
                     FROM bc_purchase_order 
-                    WHERE company_id = ' .  session()->get("login")->this_company_id . ' 
-                        AND po_type =  "' . $addCondition['po_type'] . '" AND deletedAt is NULL
-                    ) bc_purchase_order',
-                'JSON_CONTAINS(bc_purchase_order.multiple_lpb_id, CAST(penerimaan_barang.id AS JSON), "$")',
+                    WHERE company_id = ' . session()->get("login")->this_company_id . ' 
+                    AND po_type = "' . $addCondition['po_type'] . '" 
+                    AND deletedAt IS NULL
+                ) bc_purchase_order',
+                "bc_purchase_order.multiple_lpb_id_text LIKE CONCAT('%\"', penerimaan_barang.id, '\"%')",
                 'left',
                 false
             )
