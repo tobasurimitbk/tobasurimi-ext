@@ -361,6 +361,7 @@
         let divisi_id = $(".divisi_id").val();
         let supplier_id = $(".supplier_id").val();
         let search = $(".search").val();
+        let status_posting = $('.status_posting').val();
 
         if (dateStart == '' || dateEnd == '') {
             Swal.fire({
@@ -369,7 +370,7 @@
                 confirmButtonColor: '#4e73df',
             });
         } else {
-            var url = "<?= base_url('laporan-warehouse/purchase-order/excel') ?>" + '?dateStart=' + dateStart + '&dateEnd=' + dateEnd + '&po_type=' + po_type + '&divisi_id=' + divisi_id + '&supplier_id=' + supplier_id + '&search=' + search;
+            var url = "<?= base_url('laporan-warehouse/purchase-order/excel') ?>" + '?dateStart=' + dateStart + '&dateEnd=' + dateEnd + '&po_type=' + po_type + '&divisi_id=' + divisi_id + '&supplier_id=' + supplier_id + '&search=' + search + '&status_posting=' + status_posting;
             window.open(url);
         }
 

@@ -2292,10 +2292,10 @@ $routes->get('/laporan-warehouse/purchase-order/excel', 'Laporan\Warehouse\Lapor
 // $routes->get('/laporan-warehouse/purchase-order/print', 'Laporan\Warehouse\LaporanWarehouse::exportPDFLaporanPurchaseOrder', ['filter' => 'Auth']);
 
 
-$routes->get('/laporan-warehouse/penerimaan-barang', 'Laporan\Warehouse\LaporanWarehouse::laporanPenerimaanBarang', ['filter' => 'Auth']);
-$routes->get('/laporan-warehouse/penerimaan-barang/all-penerimaan-barang', 'Laporan\Warehouse\LaporanWarehouse::allLaporanPenerimaanBarang', ['filter' => 'Auth']);
-$routes->get('/laporan-warehouse/penerimaan-barang/print', 'Laporan\Warehouse\LaporanWarehouse::exportPDFLaporanPenerimaanBarang', ['filter' => 'Auth']);
-$routes->get('/laporan-warehouse/penerimaan-barang/excel', 'Laporan\Warehouse\LaporanWarehouse::exportExcelLaporanPenerimaanBarang', ['filter' => 'Auth']);
+$routes->get('/laporan-warehouse/penerimaan-barang', 'Laporan\Warehouse\LaporanWarehousePenerimaan::index', ['filter' => 'Auth']);
+$routes->get('/laporan-warehouse/penerimaan-barang/all-penerimaan-barang', 'Laporan\Warehouse\LaporanWarehousePenerimaan::all', ['filter' => 'Auth']);
+$routes->get('/laporan-warehouse/penerimaan-barang/excel', 'Laporan\Warehouse\LaporanWarehousePenerimaan::exportExcel', ['filter' => 'Auth']);
+// $routes->get('/laporan-warehouse/penerimaan-barang/print', 'Laporan\Warehouse\LaporanWarehouse::exportPDFLaporanPenerimaanBarang', ['filter' => 'Auth']);
 
 $routes->get('/laporan-warehouse/material-request', 'Laporan\Warehouse\LaporanWarehouse::laporanMaterialRequest', ['filter' => 'Auth']);
 $routes->get('/laporan-warehouse/material-request/all-material-request', 'Laporan\Warehouse\LaporanWarehouse::allLaporanMaterialRequest', ['filter' => 'Auth']);
