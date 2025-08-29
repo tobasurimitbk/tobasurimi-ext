@@ -7,6 +7,8 @@ use App\Models\BarangMasterSalesModel;
 use App\Models\CustomerModel;
 use App\Models\SalesOrderInvoiceModel;
 use Dompdf\Dompdf;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
 class PenjualanPerBarang extends BaseController
 {
@@ -150,7 +152,7 @@ class PenjualanPerBarang extends BaseController
             "totalData" => number_format($totalData),
             "dateStart" => $tglAwal != "all" ? date("d/m/Y", strtotime($tglAwal)) : "All",
             "dateEnd" => $tglAkhir != "now" ? date("d/m/Y", strtotime($tglAkhir)) : "Now",
-            "filter_customer" => $filter != "all" ? $this->barangMasterSalesModel->find($filter)['barang_name'] : "All",
+            "filter_barang" => $filter != "all" ? $this->barangMasterSalesModel->find($filter)['barang_name'] : "All",
             "search" => $search != "all" ? $search : "All"
         ];
 
@@ -173,37 +175,41 @@ class PenjualanPerBarang extends BaseController
         $addCondition = [
             "search" => $search != "all" ? $search : null,
             "filter_jenis_dokumen" => $this->request->getGet("filter_jenis_dokumen") ?? null,
-            "filter_customer" => $filter != "all" ? $filter : null,
+            "filter_barang" => $filter != "all" ? $filter : null,
             "dateStart" => $tglAwal != "all" ? date("Y-m-d", strtotime($tglAwal)) : "",
             "dateEnd" => $tglAkhir != "now" ? date("Y-m-d", strtotime($tglAkhir)) : "",
         ];
 
         // Get all data without pagination
         $dataSalesOrderInvoice = $this->salesOrderInvoiceModel
-            ->getLaporanPenjualanPerPelanggan($condition, $addCondition, 0, 0);
+            ->getSalesOrderInvoiceLokalPerBarang($condition, $addCondition, 0, 0);
 
         $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
 
         // Set judul laporan
         $sheet->setCellValue('A1', 'TOBA FISH');
-        $sheet->setCellValue('A2', 'LAPORAN PENJUALAN PER PELANGGAN');
-        $sheet->mergeCells('A1:E1');
-        $sheet->mergeCells('A2:E2');
+        $sheet->mergeCells('A1:I1');
+        $sheet->setCellValue('A2', 'LAPORAN PENJUALAN PER BARANG');
+        $sheet->mergeCells('A2:I2');
         $sheet->getStyle('A1:A2')->getFont()->setBold(true)->setSize(14);
         $sheet->getStyle('A1:A2')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
 
         // Set informasi filter
         $sheet->setCellValue('A3', 'Periode: ' . ($tglAwal != "all" ? date("d/m/Y", strtotime($tglAwal)) : "All") . ' - ' . ($tglAkhir != "now" ? date("d/m/Y", strtotime($tglAkhir)) : "Now"));
-        $sheet->mergeCells('A3:E3');
+        $sheet->mergeCells('A3:I3');
         $sheet->getStyle('A3:A3')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
 
         // Set header tabel
         $sheet->setCellValue('A5', 'No');
-        $sheet->setCellValue('B5', 'Nama Pelanggan');
-        $sheet->setCellValue('C5', 'Kode Pelanggan');
-        $sheet->setCellValue('D5', 'Jumlah Data');
+        $sheet->setCellValue('B5', 'Keterangan Barang');
+        $sheet->setCellValue('C5', 'Kuantitas');
+        $sheet->setCellValue('D5', 'Satuan');
         $sheet->setCellValue('E5', 'Jumlah');
+        $sheet->setCellValue('F5', 'Nilai HPP');
+        $sheet->setCellValue('G5', 'Laba Kotor');
+        $sheet->setCellValue('H5', 'Jumlah Data');
+        $sheet->setCellValue('I5', 'No. Barang');
 
         // Style header tabel
         $headerStyle = [
@@ -214,46 +220,72 @@ class PenjualanPerBarang extends BaseController
                 'startColor' => ['argb' => 'FFE0E0E0']
             ]
         ];
-        $sheet->getStyle('A5:E5')->applyFromArray($headerStyle);
+        $sheet->getStyle('A5:I5')->applyFromArray($headerStyle);
 
         // Isi data
         $row = 6;
         $no = 1;
+
+        $totalAllQtyInvoice = 0;
         $totalAllInvoice = 0;
+        $totalAllHpp = 0;
+        $totalAllLaba = 0;
+        $totalAllCountInvoice = 0;
 
         foreach ($dataSalesOrderInvoice['data'] as $data) {
+            $totalQtyInvoice = floatval($data->sum_qty_invoice);
             $totalInvoice = floatval($data->sum_amount_invoice);
+            $totalHpp = floatval($data->amt_harga_pokok);
+            $totalLaba = floatval($data->sum_amount_invoice) - floatval($data->amt_harga_pokok);
+            $totalCountInvoice = floatval($data->count_invoice);
+
+            $totalAllQtyInvoice += $totalQtyInvoice;
             $totalAllInvoice += $totalInvoice;
+            $totalAllHpp += $totalHpp;
+            $totalAllLaba += $totalLaba;
+            $totalAllCountInvoice += $totalCountInvoice;
 
             $sheet->setCellValue('A' . $row, $no++);
-            $sheet->setCellValue('B' . $row, $data->nama_pelanggan);
-            $sheet->setCellValue('C' . $row, $data->kode_pelanggan);
-            $sheet->setCellValue('D' . $row, $data->count_invoice);
+            $sheet->setCellValue('B' . $row, $data->barang_name);
+            $sheet->setCellValue('C' . $row, $totalQtyInvoice);
+            $sheet->setCellValue('D' . $row, $data->kode_satuan);
             $sheet->setCellValue('E' . $row, $totalInvoice);
+            $sheet->setCellValue('F' . $row, $totalHpp);
+            $sheet->setCellValue('G' . $row, $totalLaba);
+            $sheet->setCellValue('H' . $row, $totalCountInvoice);
+            $sheet->setCellValue('I' . $row, $data->kode_barang);
 
             $row++;
         }
 
         // Total
         $sheet->setCellValue('A' . $row, 'TOTAL');
-        $sheet->mergeCells('A' . $row . ':D' . $row);
+        $sheet->mergeCells('A' . $row . ':B' . $row);
+        $sheet->setCellValue('C' . $row, $totalAllQtyInvoice);
         $sheet->setCellValue('E' . $row, $totalAllInvoice);
+        $sheet->setCellValue('F' . $row, $totalAllHpp);
+        $sheet->setCellValue('G' . $row, $totalAllLaba);
+        $sheet->setCellValue('H' . $row, $totalAllCountInvoice);
 
-        $sheet->getStyle('A' . $row . ':E' . $row)->getFont()->setBold(true);
-        $sheet->getStyle('A' . $row . ':E' . $row)->getFill()
+        $sheet->getStyle('A' . $row . ':I' . $row)->getFont()->setBold(true);
+        $sheet->getStyle('A' . $row . ':I' . $row)->getFill()
             ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
             ->getStartColor()->setARGB('FFE0E0E0');
 
         // Format kolom jumlah
-        $sheet->getStyle('E7:E' . $row)->getNumberFormat()->setFormatCode('#,##0');
+        $sheet->getStyle('C6:C' . $row)->getNumberFormat()->setFormatCode('#,##0');
+        $sheet->getStyle('E6:E' . $row)->getNumberFormat()->setFormatCode('#,##0');
+        $sheet->getStyle('F6:F' . $row)->getNumberFormat()->setFormatCode('#,##0');
+        $sheet->getStyle('G6:G' . $row)->getNumberFormat()->setFormatCode('#,##0');
+        $sheet->getStyle('H6:H' . $row)->getNumberFormat()->setFormatCode('#,##0');
 
         // Auto size columns
-        foreach (range('A', 'E') as $columnID) {
+        foreach (range('A', 'I') as $columnID) {
             $sheet->getColumnDimension($columnID)->setAutoSize(true);
         }
 
         // Set judul file
-        $filename = "Laporan Penjualan Per Pelanggan.xlsx";
+        $filename = "Laporan Penjualan Per Barang.xlsx";
 
         header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
         header('Content-Disposition: attachment;filename="' . $filename . '"');
