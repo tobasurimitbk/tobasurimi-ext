@@ -174,54 +174,41 @@
 
     $('#btn-simpan-perubahan').click(function() {
         if ($('#form-header').valid()) {
-            Swal.fire({
-                icon: 'question',
-                title: 'Simpan Header ?',
-                confirmButtonColor: '#4e73df',
-                cancelButtonColor: '#d33',
-                showCancelButton: true,
-                reverseButtons: true,
-                confirmButtonText: 'Ya',
-                cancelButtonText: 'Kembali',
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    var formData = new FormData(document.querySelector("#form-header"));
-                    formData.append("header_kantor_pabean", $('#header_kantor_pabean').val());
-                    formData.append("bc_purchase_order_id", "<?= encrypt($bcPo['id']) ?>");
+            var formData = new FormData(document.querySelector("#form-header"));
+            formData.append("header_kantor_pabean", $('#header_kantor_pabean').val());
+            formData.append("bc_purchase_order_id", "<?= encrypt($bcPo['id']) ?>");
 
-                    $.ajax({
-                        url: "<?= base_url("bea-cukai-bc-40/id/header"); ?>",
-                        data: formData,
-                        beforeSend: function(xhr) {
-                            xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                            $('#btn-loading').show();
-                            $('#btn-simpan-perubahan').hide();
-                        },
-                        complete: function() {
-                            $('#btn-loading').hide();
-                            $('#btn-simpan-perubahan').show();
-                        },
-                        method: "POST",
-                        dataType: "json",
-                        processData: false,
-                        contentType: false,
-                        success: function(response) {
-                            if (response.status) {
-                                Swal.fire({
-                                    icon: 'success',
-                                    title: response.message,
-                                    confirmButtonColor: '#4e73df',
-                                    confirmButtonText: 'Ok'
-                                }).then((result) => {
-                                    if (result.isConfirmed) {
-                                        location.reload();
-                                    }
-                                });
+            $.ajax({
+                url: "<?= base_url("bea-cukai-bc-40/id/header"); ?>",
+                data: formData,
+                beforeSend: function(xhr) {
+                    xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                    $('#btn-loading').show();
+                    $('#btn-simpan-perubahan').hide();
+                },
+                complete: function() {
+                    $('#btn-loading').hide();
+                    $('#btn-simpan-perubahan').show();
+                },
+                method: "POST",
+                dataType: "json",
+                processData: false,
+                contentType: false,
+                success: function(response) {
+                    if (response.status) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: response.message,
+                            confirmButtonColor: '#4e73df',
+                            confirmButtonText: 'Ok'
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                location.reload();
                             }
-                        },
-                    });
-                }
-            })
+                        });
+                    }
+                },
+            });
         }
     });
 

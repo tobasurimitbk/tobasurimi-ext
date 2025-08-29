@@ -375,17 +375,17 @@
 
     var validator = $(".create-form").validate({
         rules: {
-            no_daftar: {
-                required: true
-            },
+            // no_daftar: {
+            //     required: true
+            // },
             tanggal: {
                 required: true
             },
         },
         messages: {
-            no_daftar: {
-                required: "Nomor Daftar Wajib Diisi"
-            },
+            // no_daftar: {
+            //     required: "Nomor Daftar Wajib Diisi"
+            // },
             tanggal: {
                 required: "Tanggal Wajib Diisi"
             },

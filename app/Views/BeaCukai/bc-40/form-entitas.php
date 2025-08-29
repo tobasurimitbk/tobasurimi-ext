@@ -321,53 +321,40 @@
 
     $('#btn-simpan-perubahan').click(function() {
         if ($('#form-entitas').valid()) {
-            Swal.fire({
-                icon: 'question',
-                title: 'Simpan Entitas ?',
-                confirmButtonColor: '#4e73df',
-                cancelButtonColor: '#d33',
-                showCancelButton: true,
-                reverseButtons: true,
-                confirmButtonText: 'Ya',
-                cancelButtonText: 'Kembali',
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    var formData = new FormData(document.querySelector("#form-entitas"));
-                    formData.append("bc_purchase_order_id", "<?= encrypt($bcPo['id']) ?>");
-                    formData.append("pengusaha_tpb_tanggal_skep_tpb", $('#pengusaha_tpb_tanggal_skep_tpb').val());
-                    $.ajax({
-                        url: "<?= base_url("bea-cukai-bc-40/id/entitas"); ?>",
-                        data: formData,
-                        beforeSend: function(xhr) {
-                            xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                            $('#btn-loading').show();
-                            $('#btn-simpan-perubahan').hide();
-                        },
-                        complete: function() {
-                            $('#btn-loading').hide();
-                            $('#btn-simpan-perubahan').show();
-                        },
-                        method: "POST",
-                        dataType: "json",
-                        processData: false,
-                        contentType: false,
-                        success: function(response) {
-                            if (response.status) {
-                                Swal.fire({
-                                    icon: 'success',
-                                    title: response.message,
-                                    confirmButtonColor: '#4e73df',
-                                    confirmButtonText: 'Ok'
-                                }).then((result) => {
-                                    if (result.isConfirmed) {
-                                        location.reload();
-                                    }
-                                });
+            var formData = new FormData(document.querySelector("#form-entitas"));
+            formData.append("bc_purchase_order_id", "<?= encrypt($bcPo['id']) ?>");
+            formData.append("pengusaha_tpb_tanggal_skep_tpb", $('#pengusaha_tpb_tanggal_skep_tpb').val());
+            $.ajax({
+                url: "<?= base_url("bea-cukai-bc-40/id/entitas"); ?>",
+                data: formData,
+                beforeSend: function(xhr) {
+                    xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                    $('#btn-loading').show();
+                    $('#btn-simpan-perubahan').hide();
+                },
+                complete: function() {
+                    $('#btn-loading').hide();
+                    $('#btn-simpan-perubahan').show();
+                },
+                method: "POST",
+                dataType: "json",
+                processData: false,
+                contentType: false,
+                success: function(response) {
+                    if (response.status) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: response.message,
+                            confirmButtonColor: '#4e73df',
+                            confirmButtonText: 'Ok'
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                location.reload();
                             }
-                        },
-                    });
-                }
-            })
+                        });
+                    }
+                },
+            });
 
         }
     });
