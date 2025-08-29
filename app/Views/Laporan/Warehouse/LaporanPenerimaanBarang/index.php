@@ -5,15 +5,11 @@
 <section class="section">
     <div class="section-header">
         <h1>Laporan Penerimaan Barang</h1>
-        <button class="btn btn-discard btn-dropdown-export dropdown-toggle float-right" type="button" id="dropdownMenuButtonExport" data-bs-toggle="dropdown" aria-expanded="false">
-            Export
-        </button>
-        <ul class="dropdown-menu list-dropdown-company" aria-labelledby="dropdownMenuButtonExport">
-            <li><button class="dropdown-item pdf" onclick="pdf('<?= base_url("/laporan-warehouse/penerimaan-barang/print"); ?>')">PDF</button></li>
-            <li><button class="dropdown-item pdf" onclick="pdf('<?= base_url("/laporan-warehouse/penerimaan-barang/excel"); ?>')">Excel</button></li>
 
-        </ul>
         <div class="col-button-tambah-spp">
+            <a class="btn btn-warning btn-print float-right" href="#" id="btnExport">
+                <i class="fa fa-download"></i> Export
+            </a>
             <a class="btn btn-hide-form btn-discard float-right" href="<?= base_url("laporan-warehouse"); ?>">
                 Kembali
             </a>
@@ -22,53 +18,83 @@
 
     <div class="card">
         <div class="card-body">
-            <div class="row justify-content-end row-col-spp">
-                <div class="col-md-4">
+            <div class="row justify-content-start">
+                <div class="col-md-3">
                     <div class="form-floating mb-3">
-                        <select class="form-select filter_bc_type" name="filter_bc_type" id="filter_bc_type">
-                            <option selected value="all" data-code="">All</option>
-                            <option value="BC 2.3" data-code="">BC 2.3</option>
-                            <option value="BC 2.7" data-code="">BC 2.7</option>
-                            <option value="BC 4.0" data-code="">BC 4.0</option>
-                            <option value="PPB KB" data-code="">PPB KB</option>
-                            <option value="Non Pabean" data-code="">Non Pabean</option>
+                        <select class="form-select lpb_type" name="lpb_type" id="lpb_type">
+                            <option selected value="LOKAL BB">LPB LOKAL BB</option>
+                            <option value="LOKAL BP">LPB LOKAL BP</option>
+                            <option value="IMPORT BB">LPB IMPORT BB</option>
+                            <option value="IMPORT BP">LPB IMPORT BP</option>
+                        </select>
+                        <label for="floatingInput">Filter Tipe LPB</label>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="form-floating mb-3">
+                        <select class="form-select bc_type" name="bc_type" id="bc_type">
+                            <option value=""></option>
+                            <option value="48">BC 2.3</option>
+                            <option value="52">BC 2.7</option>
+                            <option value="53">BC 4.0</option>
+                            <option value="1426">PPB KB</option>
+                            <option value="NON PABEAN">NON PABEAN</option>
                         </select>
                         <label for="floatingInput">Filter Tipe BC</label>
                     </div>
                 </div>
-                <div class="col-md-4">
-                    <div class="input-group">
-                        <input autocomplete="one-time-code" class="form-control input-picker dateStart" id="dateStart" name="dateStart" placeholder="Tanggal">
-                        <div class="input-group-prepend group-prepend-password align-items-center">
-                            <i style="cursor: pointer; z-index: 99; margin-bottom: 10px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-dateStart"></i>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="input-group">
-                        <input autocomplete="one-time-code" class="form-control input-picker dateEnd" id="dateEnd" name="dateEnd" placeholder="Tanggal">
-                        <div class="input-group-prepend group-prepend-password align-items-center">
-                            <i style="cursor: pointer; z-index: 99; margin-bottom: 10px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-dateEnd"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="row justify-content-end row-col-spp">
-                <div class="col-md-4">
+                <div class="col-md-3">
                     <div class="form-floating mb-3">
-                        <select class="form-select filter_divisi" name="filter_divisi" id="filter_divisi">
-                            <option selected value="">Semua Divisi</option>
+                        <select class="form-select status_posting" name="status_posting" id="status_posting">
+                            <option selected value="ALL">SEMUA</option>
+                            <option value="BELUM POSTING">BELUM POSTING</option>
+                            <option value="SUDAH POSTING">SUDAH POSTING</option>
+                        </select>
+                        <label for="floatingInput">Filter Status Posting</label>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="form-floating mb-3">
+                        <select class="form-select divisi_id" name="divisi_id" id="divisi_id">
+                            <option value=""></option>
                             <?php foreach ($divisis as $divisi) : ?>
                                 <option value="<?= $divisi['id']; ?>"><?= $divisi['divisi']; ?></option>
                             <?php endforeach; ?>
                         </select>
-                        <label for="floatingInput">Filter Divisi</label>
+                        <label for="floatingInput">Filter Departemen</label>
                     </div>
                 </div>
-                <div class="col-md-4">
+                <div class="col-md-3">
+                    <div class="input-group">
+                        <div class="form-floating" style="height: 50px;">
+                            <input placeholder="" class="form-control dateStart" id="dateStart" name="dateStart" aria-label="Floating label select example" />
+                            <label style="z-index: 1;" style="z-index: 1;">Tanggal LPB Awal</label>
+                        </div>
+                        <div class="input-group-append" style="height:50px;">
+                            <button disabled class="btn btn-secondary" type="button">
+                                <i class="fas fa-calendar-alt"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="input-group">
+                        <div class="form-floating" style="height: 50px;">
+                            <input placeholder="" class="form-control dateEnd" id="dateEnd" name="dateEnd" aria-label="Floating label select example" />
+                            <label style="z-index: 1;" style="z-index: 1;">Tanggal LPB Akhir</label>
+                        </div>
+                        <div class="input-group-append" style="height:50px;">
+                            <button disabled class="btn btn-secondary" type="button">
+                                <i class="fas fa-calendar-alt"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-3">
                     <div class="form-floating mb-3">
-                        <select class="form-select filter_supplier" name="filter_supplier" id="filter_supplier">
-                            <option selected value="">Semua Supplier</option>
+                        <select class="form-select supplier_id" name="supplier_id" id="supplier_id">
+                            <option value=""></option>
                             <?php foreach ($suppliers as $supplier) : ?>
                                 <option value="<?= $supplier['id']; ?>"><?= $supplier['name']; ?></option>
                             <?php endforeach; ?>
@@ -76,44 +102,50 @@
                         <label for="floatingInput">Filter Supplier</label>
                     </div>
                 </div>
-                <div class="col-md-4">
-                    <div class="form-floating mb-3">
-                        <select class="form-select filter_barang" name="filter_barang" id="filter_barang">
-                            <option selected value="">Semua Barang</option>
-                            <?php foreach ($barangs as $barang) : ?>
-                                <option value="<?= $barang['barang_master_spesifikasi_id']; ?>"><?= $barang['barang_name_master'] . ' ' . $barang['spesifikasi']; ?></option>
-                            <?php endforeach; ?>
-                        </select>
-                        <label for="floatingInput">Filter Barang</label>
+                <div class="col-md-3 mb-3">
+                    <div class="form-floating" style="height: 50px;">
+                        <input placeholder="" class="form-control search" id="search" name="search" aria-label="Floating label select example" />
+                        <label style="z-index: 1;" style="z-index: 1;">Cari Data</label>
                     </div>
                 </div>
             </div>
+
             <div class="row">
                 <div class="table-responsive">
                     <table class="table table-bordered nowrap table-hover-tobasurimi dataTable" id="dataTable" width="100%" cellspacing="0">
                         <thead class="thead-dark">
                             <tr>
                                 <th>No</th>
-                                <th onclick="changeSort('bc_type')" class="sort">Jenis Doc</th>
-                                <th onclick="changeSort('tanggal_bc')" class="sort">Tanggal Doc</th>
+                                <th onclick="changeSort('divisi')" class="sort">Dept</th>
+                                <th onclick="changeSort('supplier_id')" class="sort">Supplier</th>
+                                <th onclick="changeSort('bc_type')" class="sort">Doc</th>
+                                <th onclick="changeSort('tanggal_dokumen')" class="sort">Tgl Doc</th>
                                 <th onclick="changeSort('no_daftar')" class="sort">No Daftar</th>
                                 <th onclick="changeSort('no_aju')" class="sort">No Aju</th>
-                                <th onclick="changeSort('no_penerimaan_barang')" class="sort">No LPB</th>
-                                <th onclick="changeSort('tanggal_lpb')" class="sort">Tanggal Bukti</th>
-                                <th onclick="changeSort('po_no')" class="sort">No Order</th>
-                                <th onclick="changeSort('po_date')" class="sort">Tanggal Order</th>
-                                <th onclick="changeSort('divisi')" class="sort">Departemen</th>
+                                <th onclick="changeSort('tanggal_lpb')" class="sort">Tgl LPB</th>
+                                <th onclick="changeSort('no_lpb')" class="sort">No LPB</th>
+                                <th onclick="changeSort('po_date')" class="sort">Tgl PO</th>
+                                <th onclick="changeSort('po_no')" class="sort">No PO</th>
                                 <th onclick="changeSort('kode_barang')" class="sort">Kode Barang</th>
-                                <th onclick="changeSort('nama_barang_dok')" class="sort">Nama Barang</th>
-                                <th onclick="changeSort('kode_satuan')" class="sort">Kode Satuan</th>
-                                <th onclick="changeSort('qty')" class="sort">Jumlah Order</th>
-                                <th onclick="changeSort('jml_masuk')" class="sort">Jumlah Diterima</th>
+                                <th onclick="changeSort('barang_name')" class="sort">Nama Barang</th>
+                                <th onclick="changeSort('spesifikasi')" class="sort">Spesifikasi</th>
+                                <th onclick="changeSort('satuan_id')" class="sort">Satuan</th>
+                                <th onclick="changeSort('keterangan')" class="sort">Keterangan</th>
+                                <th onclick="changeSort('qty_order')" class="sort">Jml Order</th>
+                                <th onclick="changeSort('qty_diterima')" class="sort">Jml Diterima</th>
+                                <th onclick="changeSort('total_harga')" class="sort">Nilai</th>
 
                             </tr>
 
                         </thead>
                         <tbody class="body-table" id="body-table">
                         </tbody>
+                        <tfoot id="grandTotalHargaPrev">
+                            <tr>
+                                <th colspan="18" class="text-right">GRAND TOTAL</th>
+                                <th class="text-left grandTotalHarga"></th>
+                            </tr>
+                        </tfoot>
                     </table>
                 </div>
             </div>
@@ -128,7 +160,6 @@
     var row = 0;
 
     var table = $('.dataTable').DataTable({
-
         processing: true,
         serverSide: true,
         ordering: true,
@@ -145,15 +176,17 @@
             url: "<?= base_url("/laporan-warehouse/penerimaan-barang/all-penerimaan-barang"); ?>",
             dataSrc: "data",
             data: function(data) {
-                data.dateStart = $(".dateStart").val();
-                data.dateEnd = $(".dateEnd").val();
-                data.filter_bc_type = $(".filter_bc_type").val();
                 data.sort = sort;
                 data.sortType = sortType;
-                data.filter_divisi = $(".filter_divisi").val();
-                data.filter_supplier = $(".filter_supplier").val();
-                data.filter_barang = $(".filter_barang").val();
-                console.log(data);
+                data.bc_type = $(".bc_type").val();
+                data.dateStart = $(".dateStart").val();
+                data.dateEnd = $(".dateEnd").val();
+                data.lpb_type = $(".lpb_type").val();
+                data.divisi_id = $(".divisi_id").val();
+                data.supplier_id = $(".supplier_id").val();
+                data.status_posting = $(".status_posting").val();
+                data.search = $(".search").val();
+
             },
         },
         // scrollX: true,
@@ -167,67 +200,88 @@
         searching: false,
         columns: [{
                 data: "no",
-                className: "text-center",
+                className: "text-left",
                 sortable: false
             },
             {
-                data: "bc_type",
-                className: "text-center",
+                data: "divisi",
+                className: "text-left",
 
             },
             {
-                data: "tanggal_bc",
-                className: "text-center",
+                data: "supplier_name",
+                className: "text-left",
+            },
+            {
+                data: "bc_name",
+                className: "text-left",
+            },
+            {
+                data: "tanggal_dokumen",
+                className: "text-left",
             },
             {
                 data: "no_daftar",
-                className: "text-center",
+                className: "text-left",
             },
             {
                 data: "no_aju",
-                className: "text-center",
-            },
-            {
-                data: "no_penerimaan_barang",
-                className: "text-center",
+                className: "text-left",
             },
             {
                 data: "tanggal_lpb",
-                className: "text-center",
+                className: "text-left",
             },
             {
-                data: "po_no",
-                className: "text-center",
+                data: "no_lpb",
+                className: "text-left",
             },
             {
                 data: "po_date",
-                className: "text-center",
+                className: "text-left",
             },
             {
-                data: "divisi",
-                className: "text-center",
+                data: "po_no",
+                className: "text-left",
             },
             {
                 data: "kode_barang",
-                className: "text-center",
+                className: "text-left",
             },
             {
-                data: "nama_barang_dok",
-                className: "text-center",
+                data: "barang_name",
+                className: "text-left",
+            },
+            {
+                data: "spesifikasi",
+                className: "text-left",
             },
             {
                 data: "kode_satuan",
-                className: "text-center",
+                className: "text-left",
             },
             {
-                data: "qty",
-                className: "text-center",
+                data: "keterangan",
+                className: "text-left",
             },
             {
-                data: "jml_masuk",
-                className: "text-center",
+                data: "qty_order",
+                className: "text-left",
+                render: function(data) {
+                    return greatFormatRupiah(data.toFixed(2));
+                }
             },
-
+            {
+                data: "qty_diterima",
+                className: "text-left",
+                render: function(data) {
+                    return greatFormatRupiah(data.toFixed(2));
+                }
+            },
+            {
+                data: "total_harga",
+                className: "text-left",
+            },
         ],
         columnDefs: [{
             defaultContent: "-",
@@ -240,7 +294,17 @@
                 previous: '<i class="fa fa-angle-left"></i>',
                 next: '<i class="fa fa-angle-right"></i>'
             }
-        }
+        },
+        footerCallback: function(row, data, start, end, display) {
+            const api = this.api();
+            const grandTotalHarga = api.ajax.json().grandTotalHarga;
+            $('.grandTotalHarga').html(greatFormatRupiah(grandTotalHarga.toFixed(2)));
+        },
+        footerCallback: function(row, data, start, end, display) {
+            const api = this.api();
+            const grandTotalHarga = api.ajax.json().grandTotalHarga;
+            $('.grandTotalHarga').html(greatFormatRupiah(grandTotalHarga.toFixed(2)));
+        },
     })
 
     const changeSort = function(val) {
@@ -274,32 +338,62 @@
         $(".dateEnd").focus();
     });
 
-    $(".search").keyup(function() {
+    $(".search").change(function() {
         table.ajax.reload();
     })
 
-    $(".dateStart, .dateEnd, .filter_bc_type, .filter_divisi, .filter_supplier, .filter_barang").change(function() {
+    $(".dateStart, .dateEnd, .bc_type, .divisi_id, .supplier_id, .filter_barang,.status_posting").change(function() {
         table.ajax.reload();
     });
 
-    $('.filter_divisi, .filter_supplier, .filter_barang').select2({
+    $('.divisi_id').select2({
         theme: "bootstrap-5",
-        allowClear: true
+        allowClear: true,
+        placeholder: "Filter Departemen"
     })
 
-    $('.filter_bc_type').select2({
+    $('.status_posting').select2({
+        theme: "bootstrap-5",
+        allowClear: false,
+        placeholder: "Filter Status Posting"
+    })
+
+    $('.bc_type').select2({
+        theme: "bootstrap-5",
+        allowClear: true,
+        placeholder: "Filter BC"
+
+    })
+
+    $('.lpb_type').select2({
         theme: "bootstrap-5",
         allowClear: false
+    }).change(function(e) {
+        e.preventDefault();
+        var lpbType = $('.lpb_type option:selected').val();
+        if (lpbType == "LOKAL BB" || lpbType == "LOKAL BP") {
+            $('#grandTotalHargaPrev').show();
+        } else {
+            $('#grandTotalHargaPrev').hide();
+        }
+        table.ajax.reload();
     })
 
-    $('.filter_bc_type, .filter_divisi, .filter_supplier, .filter_barang')
+    $('.supplier_id').select2({
+        theme: "bootstrap-5",
+        allowClear: true,
+        placeholder: "Filter Supplier"
+    })
+
+
+    $('.bc_type, .divisi_id, .supplier_id, .status_posting,.lpb_type')
         .parent('div')
         .children('span')
         .children('span')
         .children('span')
         .css('height', ' calc(3.5rem + 2px)');
 
-    $('.filter_bc_type, .filter_divisi, .filter_supplier, .filter_barang')
+    $('.bc_type, .divisi_id, .supplier_id, .status_posting,.lpb_type')
         .parent('div')
         .children('span')
         .children('span')
@@ -307,22 +401,34 @@
         .children('span')
         .css('margin-top', '22px').css('margin-left', '-7px');
 
-    $('.filter_bc_type, .filter_divisi, .filter_supplier, .filter_barang')
+    $('.bc_type, .divisi_id, .supplier_id, .status_posting,.lpb_type')
         .parent('div')
         .find('label')
         .css('z-index', '1');
 
-    const pdf = function(url) {
-
+    $('#btnExport').click(function(e) {
+        e.preventDefault();
+        let lpb_type = $(".lpb_type").val();
+        let bc_type = $('.bc_type').val();
+        let status_posting = $('.status_posting').val();
+        let divisi_id = $(".divisi_id").val();
         let dateStart = $(".dateStart").val();
         let dateEnd = $(".dateEnd").val();
-        let filter_bc_type = $(".filter_bc_type").val();
-        let filter_divisi = $(".filter_divisi").val();
-        let filter_supplier = $(".filter_supplier").val();
-        let filter_barang = $(".filter_barang").val();
+        let supplier_id = $(".supplier_id").val();
+        let search = $(".search").val();
 
-        window.open(url + `?filter_bc_type=${filter_bc_type}&filter_divisi=${filter_divisi}&filter_supplier=${filter_supplier}&filter_barang=${filter_barang}&dateStart=${dateStart}&dateEnd=${dateEnd}&sort=${sort}&sortType=${sortType}`, "_blank");
-    }
+        if (dateStart == '' || dateEnd == '') {
+            Swal.fire({
+                icon: 'error',
+                title: 'Pilih tanggal mulai & tanggal selesai',
+                confirmButtonColor: '#4e73df',
+            });
+        } else {
+            var url = "<?= base_url('laporan-warehouse/penerimaan-barang/excel') ?>" + '?dateStart=' + dateStart + '&dateEnd=' + dateEnd + '&lpb_type=' + lpb_type + '&divisi_id=' + divisi_id + '&supplier_id=' + supplier_id + '&search=' + search + '&bc_type=' + bc_type + '&status_posting=' + status_posting;
+            window.open(url);
+        }
+
+    })
 </script>
 
 <?= $this->endSection(); ?>
