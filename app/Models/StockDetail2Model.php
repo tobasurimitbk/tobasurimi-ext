@@ -749,8 +749,8 @@ class StockDetail2Model extends Model
 
             ')
             ->join('stock_details', 'stock_details.id = stock_details2.stock_detail_id')
+            ->join('stock', 'stock.id = stock_details.stock_id', 'left')
             ->join('suppliers', 'suppliers.id = stock_details2.supplier_id', 'left')
-            ->join('stock', 'stock.id = stock_details2.stock_id', 'left')
             ->join('barang_master', 'barang_master.id = stock.barang1_id', 'left')
             ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = stock.barang2_id', 'left')
             ->join('satuans', 'satuans.id = barang_master_spesifikasi.satuan_1', 'left');
@@ -766,17 +766,8 @@ class StockDetail2Model extends Model
 
         return $builder
             ->groupBy('
-                stock_details2.stock_id,
                 stock_details2.stock_dokumen,
-                stock_details2.bc_id,
-                stock_details2.no_aju,
-                stock_details2.supplier_id,
-                suppliers.name,
-                stock_details.stock_date,
-                stock_details.sumber,
-                barang_master.barang_name,
-                barang_master_spesifikasi.spesifikasi,
-                satuans.kode_satuan
+                stock.id
             ')
             ->having('stok_total >', 0)
             ->orderBy('stock_details.createdAt', 'ASC')
