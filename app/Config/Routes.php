@@ -2366,8 +2366,12 @@ $routes->get('/laporan-sales/rincian-sales-per-pelanggan/printExcel/(:segment)/(
 
 $routes->get('/laporan-sales/sales-per-barang', 'Laporan\Penjualan\PenjualanPerBarang::index', ['filter' => 'Auth']);
 $routes->get('/laporan-sales/sales-per-barang/all', 'Laporan\Penjualan\PenjualanPerBarang::allTransaksi', ['filter' => 'Auth']);
-$routes->get('/laporan-sales/sales-per-barang/printPDF/(:segment)/(:segment)/(:segment)/(:segment)', 'Laporan\Penjualan\PenjualanPerBarang::printPDF/$1/$2/$3/$4', ['filter' => 'Auth']);
-$routes->get('/laporan-sales/sales-per-barang/printExcel/(:segment)/(:segment)/(:segment)/(:segment)', 'Laporan\Penjualan\PenjualanPerBarang::printExcel/$1/$2/$3/$4', ['filter' => 'Auth']);
+$routes->get('/laporan-sales/sales-per-barang/printPDFAll/(:segment)/(:segment)/(:segment)/(:segment)', 'Laporan\Penjualan\PenjualanPerBarang::printPDFAll/$1/$2/$3/$4', ['filter' => 'Auth']);
+$routes->get('/laporan-sales/sales-per-barang/printExcelAll/(:segment)/(:segment)/(:segment)/(:segment)', 'Laporan\Penjualan\PenjualanPerBarang::printExcelAll/$1/$2/$3/$4', ['filter' => 'Auth']);
+$routes->get('/laporan-sales/sales-per-barang/printPDFOmset/(:segment)/(:segment)/(:segment)/(:segment)', 'Laporan\Penjualan\PenjualanPerBarang::printPDFOmset/$1/$2/$3/$4', ['filter' => 'Auth']);
+$routes->get('/laporan-sales/sales-per-barang/printExcelOmset/(:segment)/(:segment)/(:segment)/(:segment)', 'Laporan\Penjualan\PenjualanPerBarang::printExcelOmset/$1/$2/$3/$4', ['filter' => 'Auth']);
+$routes->get('/laporan-sales/sales-per-barang/printPDFKuantitas/(:segment)/(:segment)/(:segment)/(:segment)', 'Laporan\Penjualan\PenjualanPerBarang::printPDFKuantitas/$1/$2/$3/$4', ['filter' => 'Auth']);
+$routes->get('/laporan-sales/sales-per-barang/printExcelKuantitas/(:segment)/(:segment)/(:segment)/(:segment)', 'Laporan\Penjualan\PenjualanPerBarang::printExcelKuantitas/$1/$2/$3/$4', ['filter' => 'Auth']);
 
 
 // RETUR LOKAL BB

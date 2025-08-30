@@ -5,7 +5,7 @@
 <section class="section">
     <div class="section-header">
         <h1>Laporan Penjualan Per Pelanggan</h1>
-        
+
         <button style="right: 10px;" class="btn btn-discard btn-dropdown-export dropdown-toggle float-right" type="button" id="dropdownMenuButtonExport" data-bs-toggle="dropdown" aria-expanded="false">
             Export
         </button>
@@ -129,16 +129,33 @@
             },
             display: "stripe",
             searching: false,
-            columns: [
-                { data: "no", className: "text-center", sortable: false, width: "5%" },
-                { data: "nama_pelanggan", className: "text-left" },
-                { data: "kode_pelanggan", className: "text-center" },
-                { data: "count_invoice", className: "text-center" },
-                { data: "total_invoice", className: "text-center" },
+            columns: [{
+                    data: "no",
+                    className: "text-center",
+                    sortable: false,
+                    width: "5%"
+                },
+                {
+                    data: "nama_pelanggan",
+                    className: "text-left"
+                },
+                {
+                    data: "kode_pelanggan",
+                    className: "text-center"
+                },
+                {
+                    data: "count_invoice",
+                    className: "text-center"
+                },
+                {
+                    data: "total_invoice",
+                    className: "text-center"
+                },
             ],
-            columnDefs: [
-                { defaultContent: "-", targets: "_all" }
-            ],
+            columnDefs: [{
+                defaultContent: "-",
+                targets: "_all"
+            }],
             language: {
                 emptyTable: "Tidak Ada Data",
                 lengthMenu: "Show _MENU_ entries",
@@ -219,13 +236,13 @@
         var tanggal_akhir = $(".dateEnd").val() ? convertDateFormat($(".dateEnd").val()) : "now";
         var search = $(".search").val() ? $(".search").val() : "all";
         var filter = $(".filter_customer").val() ? $(".filter_customer").val() : "all";
-        
+
         // Encode parameters for URL
         tanggal_awal = encodeURIComponent(tanggal_awal);
         tanggal_akhir = encodeURIComponent(tanggal_akhir);
         search = encodeURIComponent(search);
         filter = encodeURIComponent(filter);
-        
+
         url2 = url + "/" + tanggal_awal + "/" + tanggal_akhir + "/" + filter + "/" + search;
         window.open(url2, "_blank");
     }
@@ -235,13 +252,13 @@
         var tanggal_akhir = $(".dateEnd").val() ? convertDateFormat($(".dateEnd").val()) : "now";
         var search = $(".search").val() ? $(".search").val() : "all";
         var filter = $(".filter_customer").val() ? $(".filter_customer").val() : "all";
-        
+
         // Encode parameters for URL
         tanggal_awal = encodeURIComponent(tanggal_awal);
         tanggal_akhir = encodeURIComponent(tanggal_akhir);
         search = encodeURIComponent(search);
         filter = encodeURIComponent(filter);
-        
+
         url2 = url + "/" + tanggal_awal + "/" + tanggal_akhir + "/" + filter + "/" + search;
         window.open(url2, "_blank");
     }

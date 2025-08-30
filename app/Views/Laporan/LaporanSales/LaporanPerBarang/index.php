@@ -7,14 +7,38 @@
         <h1>Laporan Penjualan Per Barang</h1>
 
         <button style="right: 10px;" class="btn btn-discard btn-dropdown-export dropdown-toggle float-right" type="button" id="dropdownMenuButtonExport" data-bs-toggle="dropdown" aria-expanded="false">
-            Export
+            Export All
         </button>
         <ul class="dropdown-menu list-dropdown-company" aria-labelledby="dropdownMenuButtonExport">
             <li>
-                <button class="dropdown-item" onclick="printPDF('<?= base_url("/laporan-sales/sales-per-barang/printPDF"); ?>')">PDF</button>
+                <button class="dropdown-item" onclick="printPDF('<?= base_url("/laporan-sales/sales-per-barang/printPDFAll"); ?>')">PDF</button>
             </li>
             <li>
-                <button class="dropdown-item" onclick="printExcel('<?= base_url("/laporan-sales/sales-per-barang/printExcel"); ?>')">EXCEL</button>
+                <button class="dropdown-item" onclick="printExcel('<?= base_url("/laporan-sales/sales-per-barang/printExcelAll"); ?>')">EXCEL</button>
+            </li>
+        </ul>
+
+        <button style="right: 130px;" class="btn btn-discard btn-dropdown-export dropdown-toggle float-right" type="button" id="dropdownMenuButtonExport" data-bs-toggle="dropdown" aria-expanded="false">
+            Export Omset
+        </button>
+        <ul class="dropdown-menu list-dropdown-company" aria-labelledby="dropdownMenuButtonExport">
+            <li>
+                <button class="dropdown-item" onclick="printPDF('<?= base_url("/laporan-sales/sales-per-barang/printPDFOmset"); ?>')">PDF</button>
+            </li>
+            <li>
+                <button class="dropdown-item" onclick="printExcel('<?= base_url("/laporan-sales/sales-per-barang/printExcelOmset"); ?>')">EXCEL</button>
+            </li>
+        </ul>
+
+        <button style="right: 280px;" class="btn btn-discard btn-dropdown-export dropdown-toggle float-right" type="button" id="dropdownMenuButtonExport" data-bs-toggle="dropdown" aria-expanded="false">
+            Export Kuantitas
+        </button>
+        <ul class="dropdown-menu list-dropdown-company" aria-labelledby="dropdownMenuButtonExport">
+            <li>
+                <button class="dropdown-item" onclick="printPDF('<?= base_url("/laporan-sales/sales-per-barang/printPDFKuantitas"); ?>')">PDF</button>
+            </li>
+            <li>
+                <button class="dropdown-item" onclick="printExcel('<?= base_url("/laporan-sales/sales-per-barang/printExcelKuantitas"); ?>')">EXCEL</button>
             </li>
         </ul>
     </div>
