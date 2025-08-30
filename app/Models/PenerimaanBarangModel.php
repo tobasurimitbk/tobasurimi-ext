@@ -935,7 +935,8 @@ class PenerimaanBarangModel extends Model
             SUM(penerimaan_barang_detail.jml_masuk) AS qty_diterima,
             rm_purchase_orders.po_date,
             rm_purchase_orders.po_no,
-            rm_purchase_orders.total_before_pph AS total_harga
+            rm_purchase_orders.total_before_pph AS total_harga,
+            parent_barang.parent_name AS kategori_barang
         ";
         $builder = $this->asArray()
             ->select($selectQry)
@@ -950,6 +951,7 @@ class PenerimaanBarangModel extends Model
             ->join('barang_master', 'barang_master.id = penerimaan_barang_detail.barang_id', 'left')
             ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = penerimaan_barang_detail.spesifikasi_id', 'left')
             ->join('satuans', 'satuans.id = penerimaan_barang_detail.unit', 'left')
+            ->join('parent_barang', 'parent_barang.id = barang_master.parent_type_id', 'left')
             ->where($condition)
             ->groupBy('penerimaan_barang.id, penerimaan_barang_detail.purchase_order_id')
             ->orderBy($sort, $sortType);
@@ -1116,7 +1118,8 @@ class PenerimaanBarangModel extends Model
             am_purchase_orders.po_date,
             am_purchase_orders.po_no,
             penerimaan_barang_detail.sub_total AS total_harga,
-            tb_valas.value AS valas_name
+            tb_valas.value AS valas_name,
+            parent_barang.parent_name AS kategori_barang
         ";
         $builder = $this->db->table('penerimaan_barang_detail')
             ->select($selectQry)
@@ -1133,6 +1136,7 @@ class PenerimaanBarangModel extends Model
             ->join('barang_master', 'barang_master.id = penerimaan_barang_detail.barang_id', 'left')
             ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = penerimaan_barang_detail.spesifikasi_id', 'left')
             ->join('satuans', 'satuans.id = penerimaan_barang_detail.unit', 'left')
+            ->join('parent_barang', 'parent_barang.id = barang_master.parent_type_id', 'left')
             ->where($condition)
             ->groupBy('penerimaan_barang_detail.id')
             ->orderBy($sort, $sortType);
@@ -1299,7 +1303,8 @@ class PenerimaanBarangModel extends Model
             am_purchase_orders.po_date,
             am_purchase_orders.po_no,
             penerimaan_barang_detail.sub_total AS total_harga,
-            tb_valas.value AS valas_name
+            tb_valas.value AS valas_name,
+            parent_barang.parent_name AS kategori_barang
         ";
         $builder = $this->db->table('penerimaan_barang_detail')
             ->select($selectQry)
@@ -1316,6 +1321,7 @@ class PenerimaanBarangModel extends Model
             ->join('barang_master', 'barang_master.id = penerimaan_barang_detail.barang_id', 'left')
             ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = penerimaan_barang_detail.spesifikasi_id', 'left')
             ->join('satuans', 'satuans.id = penerimaan_barang_detail.unit', 'left')
+            ->join('parent_barang', 'parent_barang.id = barang_master.parent_type_id', 'left')
             ->where($condition)
             ->groupBy('penerimaan_barang_detail.id')
             ->orderBy($sort, $sortType);
@@ -1482,7 +1488,8 @@ class PenerimaanBarangModel extends Model
             rm_import_pos.po_date,
             rm_import_pos.po_no,
             penerimaan_barang_detail.sub_total AS total_harga,
-            tb_valas.value AS valas_name
+            tb_valas.value AS valas_name,
+            parent_barang.parent_name AS kategori_barang
         ";
         $builder = $this->db->table('penerimaan_barang_detail')
             ->select($selectQry)
@@ -1499,6 +1506,7 @@ class PenerimaanBarangModel extends Model
             ->join('barang_master', 'barang_master.id = penerimaan_barang_detail.barang_id', 'left')
             ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = penerimaan_barang_detail.spesifikasi_id', 'left')
             ->join('satuans', 'satuans.id = penerimaan_barang_detail.unit', 'left')
+            ->join('parent_barang', 'parent_barang.id = barang_master.parent_type_id', 'left')
             ->where($condition)
             ->groupBy('penerimaan_barang_detail.id')
             ->orderBy($sort, $sortType);
