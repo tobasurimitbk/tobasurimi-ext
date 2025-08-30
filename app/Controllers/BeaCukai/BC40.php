@@ -273,7 +273,9 @@ class BC40 extends BaseController
             'multiple_lpb_no' => str_replace(['\\"', '\\'], '', json_encode($lpbNoArr)),
         ]);
 
-        foreach ($lpbIdArr as $l) {
+        $lpbIdUnique = array_values(array_unique($lpbIdArr));
+
+        foreach ($lpbIdUnique as $l) {
             $this->bcPurchaseOrderLPBModel->insert([
                 'bc_purchase_order_id' => $id,
                 'penerimaan_barang_id' => $l
@@ -403,7 +405,9 @@ class BC40 extends BaseController
             ->builder()
             ->delete();
 
-        foreach ($lpbIdArr as $l) {
+        $lpbIdUnique = array_values(array_unique($lpbIdArr));
+
+        foreach ($lpbIdUnique as $l) {
             $this->bcPurchaseOrderLPBModel->insert([
                 'bc_purchase_order_id' => $bcPurchaseOrderID,
                 'penerimaan_barang_id' => $l
