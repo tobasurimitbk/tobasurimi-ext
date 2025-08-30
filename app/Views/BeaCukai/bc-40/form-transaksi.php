@@ -176,69 +176,56 @@
 
     $('#btn-simpan-perubahan').click(function() {
         if ($('#form-transaksi').valid()) {
-            Swal.fire({
-                icon: 'question',
-                title: 'Simpan Transaksi ?',
-                confirmButtonColor: '#4e73df',
-                cancelButtonColor: '#d33',
-                showCancelButton: true,
-                reverseButtons: true,
-                confirmButtonText: 'Ya',
-                cancelButtonText: 'Kembali',
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    var formData = new FormData(document.querySelector("#form-transaksi"));
-                    var hargaPenyerahan = destroyFormatRupiah($('#harga_penyerahan').val());
-                    var nilaiJasa = destroyFormatRupiah($('#nilai_jasa').val());
-                    var nilaiUangMuka = destroyFormatRupiah($('#nilai_uang_muka').val());
-                    var hargaPerolehan = destroyFormatRupiah($('#harga_perolehan').val());
-                    var volume = destroyFormatRupiah($('#volume').val());
-                    var beratKotor = destroyFormatRupiah($('#berat_kotor').val());
-                    var beratBersih = destroyFormatRupiah($('#berat_bersih').val());
+            var formData = new FormData(document.querySelector("#form-transaksi"));
+            var hargaPenyerahan = destroyFormatRupiah($('#harga_penyerahan').val());
+            var nilaiJasa = destroyFormatRupiah($('#nilai_jasa').val());
+            var nilaiUangMuka = destroyFormatRupiah($('#nilai_uang_muka').val());
+            var hargaPerolehan = destroyFormatRupiah($('#harga_perolehan').val());
+            var volume = destroyFormatRupiah($('#volume').val());
+            var beratKotor = destroyFormatRupiah($('#berat_kotor').val());
+            var beratBersih = destroyFormatRupiah($('#berat_bersih').val());
 
-                    formData.set('harga_penyerahan', hargaPenyerahan);
-                    formData.set('nilai_jasa', nilaiJasa);
-                    formData.set('nilai_uang_muka', nilaiUangMuka);
-                    formData.set('harga_perolehan', hargaPerolehan);
-                    formData.set('volume', volume);
-                    formData.set('berat_kotor', beratKotor);
-                    formData.set('berat_bersih', beratBersih);
+            formData.set('harga_penyerahan', hargaPenyerahan);
+            formData.set('nilai_jasa', nilaiJasa);
+            formData.set('nilai_uang_muka', nilaiUangMuka);
+            formData.set('harga_perolehan', hargaPerolehan);
+            formData.set('volume', volume);
+            formData.set('berat_kotor', beratKotor);
+            formData.set('berat_bersih', beratBersih);
 
-                    formData.append("bc_purchase_order_id", "<?= encrypt($bcPo['id']) ?>");
-                    $.ajax({
-                        url: "<?= base_url("bea-cukai-bc-40/id/transaksi"); ?>",
-                        data: formData,
-                        beforeSend: function(xhr) {
-                            xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                            $('#btn-loading').show();
-                            $('#btn-simpan-perubahan').hide();
-                        },
-                        complete: function() {
-                            $('#btn-loading').hide();
-                            $('#btn-simpan-perubahan').show();
-                        },
-                        method: "POST",
-                        dataType: "json",
-                        processData: false,
-                        contentType: false,
-                        success: function(response) {
-                            if (response.status) {
-                                csrf.val(response.token);
-                                Swal.fire({
-                                    icon: 'success',
-                                    title: response.message,
-                                    confirmButtonColor: '#4e73df',
-                                    confirmButtonText: 'Ok'
-                                }).then((result) => {
-                                    if (result.isConfirmed) {
-                                        location.reload();
-                                    }
-                                });
+            formData.append("bc_purchase_order_id", "<?= encrypt($bcPo['id']) ?>");
+            $.ajax({
+                url: "<?= base_url("bea-cukai-bc-40/id/transaksi"); ?>",
+                data: formData,
+                beforeSend: function(xhr) {
+                    xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                    $('#btn-loading').show();
+                    $('#btn-simpan-perubahan').hide();
+                },
+                complete: function() {
+                    $('#btn-loading').hide();
+                    $('#btn-simpan-perubahan').show();
+                },
+                method: "POST",
+                dataType: "json",
+                processData: false,
+                contentType: false,
+                success: function(response) {
+                    if (response.status) {
+                        csrf.val(response.token);
+                        Swal.fire({
+                            icon: 'success',
+                            title: response.message,
+                            confirmButtonColor: '#4e73df',
+                            confirmButtonText: 'Ok'
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                location.reload();
                             }
-                        },
-                    });
-                }
-            })
+                        });
+                    }
+                },
+            });
         }
     });
 </script>

@@ -543,93 +543,67 @@
 
     $('.btn-submit-kemasan').click(function() {
         if ($('#form-kemasan').valid()) {
-            Swal.fire({
-                icon: 'question',
-                title: 'Simpan Kemasan ?',
-                confirmButtonColor: '#4e73df',
-                cancelButtonColor: '#d33',
-                showCancelButton: true,
-                reverseButtons: true,
-                confirmButtonText: 'Ya',
-                cancelButtonText: 'Kembali',
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    var formData = new FormData(document.querySelector("#form-kemasan"));
-                    formData.append("bc_purchase_order_id", "<?= encrypt($bcPo['id']) ?>");
-                    $.ajax({
-                        url: "<?= base_url("bea-cukai-bc-40/id/kemasan-peti-kemas/kemasan/create"); ?>",
-                        data: formData,
-                        beforeSend: function(xhr) {
-                            xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                            setLoading();
-                        },
-                        complete: function() {
-                            stopLoading();
-                        },
-                        method: "POST",
-                        dataType: "json",
-                        processData: false,
-                        contentType: false,
-                        success: function(response) {
-                            if (response.status) {
-                                csrf.val(response.token);
-                                tableListInformasiKemasan.ajax.reload();
-                                $('#kemasan_seri_kemasan').val(response.kemasan_seri_kemasan);
-                                $('#kemasan_jenis_kemasan').val(null).change();
-                                $('#kemasan_kemasan_id').val(null).change();
-                                $('#kemasan_jumlah_kemasan').val('');
-                                $('#kemasan_merk_kemasan').val('');
-                            }
-                        },
-                    });
-                }
-            })
+            var formData = new FormData(document.querySelector("#form-kemasan"));
+            formData.append("bc_purchase_order_id", "<?= encrypt($bcPo['id']) ?>");
+            $.ajax({
+                url: "<?= base_url("bea-cukai-bc-40/id/kemasan-peti-kemas/kemasan/create"); ?>",
+                data: formData,
+                beforeSend: function(xhr) {
+                    xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                    setLoading();
+                },
+                complete: function() {
+                    stopLoading();
+                },
+                method: "POST",
+                dataType: "json",
+                processData: false,
+                contentType: false,
+                success: function(response) {
+                    if (response.status) {
+                        csrf.val(response.token);
+                        tableListInformasiKemasan.ajax.reload();
+                        $('#kemasan_seri_kemasan').val(response.kemasan_seri_kemasan);
+                        $('#kemasan_jenis_kemasan').val(null).change();
+                        $('#kemasan_kemasan_id').val(null).change();
+                        $('#kemasan_jumlah_kemasan').val('');
+                        $('#kemasan_merk_kemasan').val('');
+                    }
+                },
+            });
         }
     });
 
     $('.btn-submit-peti-kemas').click(function() {
         if ($('#form-kontainer').valid()) {
-            Swal.fire({
-                icon: 'question',
-                title: 'Simpan Peti Kemas ?',
-                confirmButtonColor: '#4e73df',
-                cancelButtonColor: '#d33',
-                showCancelButton: true,
-                reverseButtons: true,
-                confirmButtonText: 'Ya',
-                cancelButtonText: 'Kembali',
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    var formData = new FormData(document.querySelector("#form-kontainer"));
-                    formData.append("bc_purchase_order_id", "<?= encrypt($bcPo['id']) ?>");
-                    $.ajax({
-                        url: "<?= base_url("bea-cukai-bc-40/id/kemasan-peti-kemas/kontainer/create"); ?>",
-                        data: formData,
-                        beforeSend: function(xhr) {
-                            xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                            setLoading();
-                        },
-                        complete: function() {
-                            stopLoading();
-                        },
-                        method: "POST",
-                        dataType: "json",
-                        processData: false,
-                        contentType: false,
-                        success: function(response) {
-                            if (response.status) {
-                                csrf.val(response.token);
-                                tableListInformasiPetiKemas.ajax.reload();
-                                $('#kontainer_seri').val(response.kontainer_seri);
-                                $('#kontainer_nomor').val('');
-                                $('#kontainer_ukuran').val(null).change();
-                                $('#kontainer_jenis').val(null).change();
-                                $('#kontainer_tipe').val(null).change();
-                            }
-                        },
-                    });
-                }
-            })
+            var formData = new FormData(document.querySelector("#form-kontainer"));
+            formData.append("bc_purchase_order_id", "<?= encrypt($bcPo['id']) ?>");
+            $.ajax({
+                url: "<?= base_url("bea-cukai-bc-40/id/kemasan-peti-kemas/kontainer/create"); ?>",
+                data: formData,
+                beforeSend: function(xhr) {
+                    xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                    setLoading();
+                },
+                complete: function() {
+                    stopLoading();
+                },
+                method: "POST",
+                dataType: "json",
+                processData: false,
+                contentType: false,
+                success: function(response) {
+                    if (response.status) {
+                        csrf.val(response.token);
+                        tableListInformasiPetiKemas.ajax.reload();
+                        $('#kontainer_seri').val(response.kontainer_seri);
+                        $('#kontainer_nomor').val('');
+                        $('#kontainer_ukuran').val(null).change();
+                        $('#kontainer_jenis').val(null).change();
+                        $('#kontainer_tipe').val(null).change();
+                    }
+                },
+            });
         }
     });
 
@@ -672,81 +646,55 @@
 
 
     function removeKemasan(id) {
-        Swal.fire({
-            icon: 'question',
-            title: 'Hapus Kemasan ?',
-            confirmButtonColor: '#4e73df',
-            cancelButtonColor: '#d33',
-            showCancelButton: true,
-            reverseButtons: true,
-            confirmButtonText: 'Hapus',
-            cancelButtonText: 'Kembali',
-        }).then((result) => {
-            if (result.isConfirmed) {
-                const csrf = $(`[name="${csrfToken}"]`);
-                $.ajax({
-                    url: "<?= base_url("bea-cukai-bc-40/id/kemasan-peti-kemas/kemasan/delete"); ?>",
-                    data: {
-                        id: id
-                    },
-                    beforeSend: function(xhr) {
-                        xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                        setLoading();
-                    },
-                    complete: function() {
-                        stopLoading();
-                    },
-                    method: "POST",
-                    dataType: "json",
-                    success: function(response) {
-                        csrf.val(response.token);
-                        if (response.status) {
-                            tableListInformasiKemasan.ajax.reload();
-                            $('#kemasan_seri_kemasan').val(response.kemasan_seri_kemasan);
-                        }
-                    },
-                });
-            }
-        })
+        const csrf = $(`[name="${csrfToken}"]`);
+        $.ajax({
+            url: "<?= base_url("bea-cukai-bc-40/id/kemasan-peti-kemas/kemasan/delete"); ?>",
+            data: {
+                id: id
+            },
+            beforeSend: function(xhr) {
+                xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                setLoading();
+            },
+            complete: function() {
+                stopLoading();
+            },
+            method: "POST",
+            dataType: "json",
+            success: function(response) {
+                csrf.val(response.token);
+                if (response.status) {
+                    tableListInformasiKemasan.ajax.reload();
+                    $('#kemasan_seri_kemasan').val(response.kemasan_seri_kemasan);
+                }
+            },
+        });
     }
 
     function removeKontainer(id) {
-        Swal.fire({
-            icon: 'question',
-            title: 'Hapus Kontainer/Peti Kemas ?',
-            confirmButtonColor: '#4e73df',
-            cancelButtonColor: '#d33',
-            showCancelButton: true,
-            reverseButtons: true,
-            confirmButtonText: 'Hapus',
-            cancelButtonText: 'Kembali',
-        }).then((result) => {
-            if (result.isConfirmed) {
-                const csrf = $(`[name="${csrfToken}"]`);
-                $.ajax({
-                    url: "<?= base_url("bea-cukai-bc-40/id/kemasan-peti-kemas/kontainer/delete"); ?>",
-                    data: {
-                        id: id
-                    },
-                    beforeSend: function(xhr) {
-                        xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                        setLoading();
-                    },
-                    complete: function() {
-                        stopLoading();
-                    },
-                    method: "POST",
-                    dataType: "json",
-                    success: function(response) {
-                        csrf.val(response.token);
-                        if (response.status) {
-                            tableListInformasiPetiKemas.ajax.reload();
-                            $('#kontainer_seri').val(response.kontainer_seri);
-                        }
-                    },
-                });
-            }
-        })
+        const csrf = $(`[name="${csrfToken}"]`);
+        $.ajax({
+            url: "<?= base_url("bea-cukai-bc-40/id/kemasan-peti-kemas/kontainer/delete"); ?>",
+            data: {
+                id: id
+            },
+            beforeSend: function(xhr) {
+                xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                setLoading();
+            },
+            complete: function() {
+                stopLoading();
+            },
+            method: "POST",
+            dataType: "json",
+            success: function(response) {
+                csrf.val(response.token);
+                if (response.status) {
+                    tableListInformasiPetiKemas.ajax.reload();
+                    $('#kontainer_seri').val(response.kontainer_seri);
+                }
+            },
+        });
     }
 </script>
 

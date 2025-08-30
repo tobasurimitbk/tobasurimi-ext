@@ -16,6 +16,7 @@ use App\Models\BCEntitasModel;
 use App\Models\BCKemasanModel;
 use App\Models\BCKontainerModel;
 use App\Models\BCPengangkutModel;
+use App\Models\BCPurchaseOrderLPBModel;
 use App\Models\BCPurchaseOrderModel;
 use App\Models\CeisaSettingModel;
 use App\Models\DivisisModel;
@@ -81,6 +82,7 @@ class BC40 extends BaseController
     protected $akunCeisa;
     protected $dompdf;
     protected $divisiModel;
+    protected $bcPurchaseOrderLPBModel;
 
 
     public function __construct()
@@ -114,6 +116,7 @@ class BC40 extends BaseController
         $this->rmPurchaseOrderModel = new RMPurchaseOrderModel();
         $this->dompdf = new Dompdf();
         $this->divisiModel = new DivisisModel();
+        $this->bcPurchaseOrderLPBModel = new BCPurchaseOrderLPBModel();
 
         $this->this_user_id = session()->get("login")->user_id;
         $this->this_company_id = session()->get("login")->this_company_id;
@@ -270,6 +273,13 @@ class BC40 extends BaseController
             'multiple_lpb_no' => str_replace(['\\"', '\\'], '', json_encode($lpbNoArr)),
         ]);
 
+        foreach ($lpbIdArr as $l) {
+            $this->bcPurchaseOrderLPBModel->insert([
+                'bc_purchase_order_id' => $id,
+                'penerimaan_barang_id' => $l
+            ]);
+        }
+
         return response()->setJSON([
             'status' => true,
             'message' => "Sukses membuat dokumen bc purchase order",
@@ -387,6 +397,18 @@ class BC40 extends BaseController
             'no_daftar' => $this->request->getVar('no_daftar'),
             'createdAt' => date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("tanggal"))))
         ]);
+
+        $this->bcPurchaseOrderLPBModel
+            ->where('bc_purchase_order_id', $bcPurchaseOrderID)
+            ->builder()
+            ->delete();
+
+        foreach ($lpbIdArr as $l) {
+            $this->bcPurchaseOrderLPBModel->insert([
+                'bc_purchase_order_id' => $bcPurchaseOrderID,
+                'penerimaan_barang_id' => $l
+            ]);
+        }
 
         return response()->setJSON([
             'status' => true,
@@ -1649,13 +1671,17 @@ class BC40 extends BaseController
             ]);
         }
         // UPDATE STATUS
-        $this->bc40Model->set('status_dokumen', "Sudah Kirim")->where('bc_purchase_order_id', $bcPurchaseOrderID)->update();
+        //$this->bc40Model->set('status_dokumen', "Sudah Kirim")->where('bc_purchase_order_id', $bcPurchaseOrderID)->update();
+        $bc40 = $this->bc40Model->where('bc_purchase_order_id', $bcPurchaseOrderID)->first();
+        $this->bc40Model->update($bc40['id'], [
+            'status_dokumen' => "Sudah Kirim"
+        ]);
 
         return response()->setJSON([
             'token' => csrf_hash(),
             'status' => true,
             'message' => "Dokumen BC 4.O Berhasil Online di Ceisa",
-            'res' => $res,
+            // 'res' => $res,
         ]);
     }
 

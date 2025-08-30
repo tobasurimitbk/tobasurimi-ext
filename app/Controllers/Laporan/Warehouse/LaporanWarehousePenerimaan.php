@@ -97,7 +97,7 @@ class LaporanWarehousePenerimaan extends BaseController
 
             $addCondition['po_type'] = "LOKAL PENOLONG";
 
-            $dataLpb = $this->penerimaanBarangModel->getListLaporanPenerimaanBarangBahanPenolong(
+            $dataLpb = $this->penerimaanBarangModel->getListLaporanPenerimaanBarangBahanPenolongLokal(
                 $condition,
                 $addCondition,
                 $pageSize,
@@ -114,7 +114,7 @@ class LaporanWarehousePenerimaan extends BaseController
 
             $addCondition['po_type'] = "IMPORT PENOLONG";
 
-            $dataLpb = $this->penerimaanBarangModel->getListLaporanPenerimaanBarangBahanPenolong(
+            $dataLpb = $this->penerimaanBarangModel->getListLaporanPenerimaanBarangBahanPenolongImpor(
                 $condition,
                 $addCondition,
                 $pageSize,
@@ -225,7 +225,7 @@ class LaporanWarehousePenerimaan extends BaseController
 
             $addCondition['po_type'] = "LOKAL PENOLONG";
 
-            $dataLpb = $this->penerimaanBarangModel->getListLaporanPenerimaanBarangBahanPenolong(
+            $dataLpb = $this->penerimaanBarangModel->getListLaporanPenerimaanBarangBahanPenolongLokal(
                 $condition,
                 $addCondition,
                 100000000,
@@ -242,7 +242,7 @@ class LaporanWarehousePenerimaan extends BaseController
 
             $addCondition['po_type'] = "IMPORT PENOLONG";
 
-            $dataLpb = $this->penerimaanBarangModel->getListLaporanPenerimaanBarangBahanPenolong(
+            $dataLpb = $this->penerimaanBarangModel->getListLaporanPenerimaanBarangBahanPenolongImpor(
                 $condition,
                 $addCondition,
                 100000000,
