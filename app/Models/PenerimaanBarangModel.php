@@ -939,6 +939,9 @@ class PenerimaanBarangModel extends Model
         ";
         $builder = $this->asArray()
             ->select($selectQry)
+            ->join('bc_purchase_order_lpb', 'bc_purchase_order_lpb.penerimaan_barang_id = penerimaan_barang.id', 'left')
+            ->join('bc_purchase_order', 'bc_purchase_order.id = bc_purchase_order_lpb.bc_purchase_order_id', 'left')
+            ->join('bc_40', 'bc_40.bc_purchase_order_id = bc_purchase_order.id', 'left')
             ->join('penerimaan_barang_detail', 'penerimaan_barang_detail.penerimaan_barang_id = penerimaan_barang.id', 'left')
             ->join('rm_purchase_orders', 'rm_purchase_orders.id = penerimaan_barang_detail.purchase_order_id', 'left')
             ->join('divisis', 'divisis.id = penerimaan_barang.divisi_id', 'left')
@@ -947,9 +950,6 @@ class PenerimaanBarangModel extends Model
             ->join('barang_master', 'barang_master.id = penerimaan_barang_detail.barang_id', 'left')
             ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = penerimaan_barang_detail.spesifikasi_id', 'left')
             ->join('satuans', 'satuans.id = penerimaan_barang_detail.unit', 'left')
-            ->join('bc_purchase_order_lpb', 'bc_purchase_order_lpb.penerimaan_barang_id = penerimaan_barang.id', 'left')
-            ->join('bc_purchase_order', 'bc_purchase_order.id = bc_purchase_order_lpb.bc_purchase_order_id', 'left')
-            ->join('bc_40', 'bc_40.bc_purchase_order_id = bc_purchase_order.id', 'left')
             ->where($condition)
             ->groupBy('penerimaan_barang.id, penerimaan_barang_detail.purchase_order_id')
             ->orderBy($sort, $sortType);
@@ -1002,6 +1002,9 @@ class PenerimaanBarangModel extends Model
         // HITUNG TOTAL YAH
         $sub = $this->db->table('penerimaan_barang')
             ->select('rm_purchase_orders.id, rm_purchase_orders.total_before_pph')
+            ->join('bc_purchase_order_lpb', 'bc_purchase_order_lpb.penerimaan_barang_id = penerimaan_barang.id', 'left')
+            ->join('bc_purchase_order', 'bc_purchase_order.id = bc_purchase_order_lpb.bc_purchase_order_id', 'left')
+            ->join('bc_40', 'bc_40.bc_purchase_order_id = bc_purchase_order.id', 'left')
             ->join('penerimaan_barang_detail', 'penerimaan_barang_detail.penerimaan_barang_id = penerimaan_barang.id', 'left')
             ->join('rm_purchase_orders', 'rm_purchase_orders.id = penerimaan_barang_detail.purchase_order_id', 'left')
             ->join('divisis', 'divisis.id = penerimaan_barang.divisi_id', 'left')
@@ -1010,9 +1013,6 @@ class PenerimaanBarangModel extends Model
             ->join('barang_master', 'barang_master.id = penerimaan_barang_detail.barang_id', 'left')
             ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = penerimaan_barang_detail.spesifikasi_id', 'left')
             ->join('satuans', 'satuans.id = penerimaan_barang_detail.unit', 'left')
-            ->join('bc_purchase_order_lpb', 'bc_purchase_order_lpb.penerimaan_barang_id = penerimaan_barang.id', 'left')
-            ->join('bc_purchase_order', 'bc_purchase_order.id = bc_purchase_order_lpb.bc_purchase_order_id', 'left')
-            ->join('bc_40', 'bc_40.bc_purchase_order_id = bc_purchase_order.id', 'left')
             ->where($condition)
             ->groupBy('penerimaan_barang.id, penerimaan_barang_detail.purchase_order_id');
 
