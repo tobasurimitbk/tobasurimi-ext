@@ -22,8 +22,8 @@
                 <div class="col-md-3">
                     <div class="form-floating mb-3">
                         <select class="form-select lpb_type" name="lpb_type" id="lpb_type">
-                            <option selected value="LOKAL BB">LPB LOKAL BB</option>
-                            <option value="LOKAL BP">LPB LOKAL BP</option>
+                            <option value="LOKAL BB">LPB LOKAL BB</option>
+                            <option selected value="LOKAL BP">LPB LOKAL BP</option>
                             <option value="IMPORT BB">LPB IMPORT BB</option>
                             <option value="IMPORT BP">LPB IMPORT BP</option>
                         </select>
