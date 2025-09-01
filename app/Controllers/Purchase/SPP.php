@@ -4,6 +4,7 @@ namespace App\Controllers\Purchase;
 
 use App\Controllers\BaseController;
 use App\Models\AMPurchaseOrderModel;
+use App\Models\BarangMasterModel;
 use App\Models\SppModel;
 use App\Models\SppDetailModel;
 use App\Models\MetadataModel;
@@ -27,6 +28,7 @@ class SPP extends BaseController
     protected $AmPurchaseOrderModel;
     protected $RmPurchaseOrderModel;
     protected $RmImportPoModel;
+    protected $barangMasterModel;
 
     protected $this_company_id;
     protected $this_user_id;
@@ -46,6 +48,7 @@ class SPP extends BaseController
         $this->AmPurchaseOrderModel = new AMPurchaseOrderModel();
         $this->RmPurchaseOrderModel = new RMPurchaseOrderModel();
         $this->RmImportPoModel = new RMImportPOModel();
+        $this->barangMasterModel = new BarangMasterModel();
 
         $this->this_company_id = session()->get("login")->this_company_id;
         $this->this_user_id = session()->get("login")->user_id;
@@ -73,7 +76,7 @@ class SPP extends BaseController
             "dataSppType" => $dataSppType,
             "dataDivisi"  => $dataDivisi,
             'kelompokBarang' => $parentBarangModel->where('deletedAt', null)->findAll(),
-            'satuanBarang' => $satuanModel->where('deletedAt', null)->findAll()
+            'satuanBarang' => $satuanModel->where('deletedAt', null)->findAll(),
         ];
 
         return view('Purchase/spp/form', $data);
@@ -494,4 +497,70 @@ class SPP extends BaseController
             exit(0);
         }
     }
+
+    public function dropdownBarang(){
+        $search = $this->request->getVar('q'); 
+        $type = $this->request->getVar('type'); 
+
+        $data = $this->barangMasterModel->dropdownBarangType(
+            $type, 
+            $this->this_company_id, 
+            $search
+        );
+
+        $results = [];
+        foreach ($data as $item) {
+            $results[] = [
+                'id' => $item['id'], 
+                'text' => $item['kode_barang']." - ".$item['barang_name'],
+                'satuan_1' => $item['satuan_1'],
+                'satuan_2' => $item['satuan_2'],
+                'satuan_3' => $item['satuan_3'],
+                'barang_name_master' => $item['barang_name_master'],
+                'barang_spesifikasi_id' => $item['barang_master_spesifikasi_id'],
+                'barang_id' => $item['id'],
+                'nama' => $item['barang_name'],
+                'satuan_id' => $item['satuan_1'],
+                'kode_barang' => $item['kode_barang'],
+                'satuan' => $item['nama_satuan']
+            ];
+        }
+
+        return $this->response->setJSON(['results' => $results]);
+    }
+
+     public function dropdownBarangFirst(){
+        $search = $this->request->getVar('q'); 
+        $type = $this->request->getVar('type'); 
+        $id = decrypt($this->request->getVar('barang_spesifikasi_id'));
+
+        $data = $this->barangMasterModel->dropdownBarangType(
+            $type, 
+            $this->this_company_id, 
+            $search,
+            $id
+        );
+
+        $results = [];
+        foreach ($data as $item) {
+            $results[] = [
+                'id' => $item['id'], 
+                'text' => $item['kode_barang']." - ".$item['barang_name'],
+                'satuan_1' => $item['satuan_1'],
+                'satuan_2' => $item['satuan_2'],
+                'satuan_3' => $item['satuan_3'],
+                'barang_name_master' => $item['barang_name_master'],
+                'barang_spesifikasi_id' => $item['barang_master_spesifikasi_id'],
+                'barang_id' => $item['id'],
+                'nama' => $item['barang_name'],
+                'satuan_id' => $item['satuan_1'],
+                'kode_barang' => $item['kode_barang'],
+                'satuan' => $item['nama_satuan']
+            ];
+        }
+
+        return $this->response->setJSON(['data' => $results]);
+    }
+
+
 }
