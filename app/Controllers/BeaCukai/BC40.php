@@ -2351,7 +2351,7 @@ class BC40 extends BaseController
 
                 if($typeBahan == "bahan_baku"){
                     $rmPurchaseOrder = $this->rmPurchaseOrderModel->where('id', $poIdArr[$index])->first();
-                    if($rmPurchaseOrder['status_eksternal'] == "yes"){
+                    if($rmPurchaseOrder['status_external'] == "yes"){
                         // JIKA STATUS EKSTERNAL YES GA USAH INSERT KE INVENTORI
                         $statusInputStock = false;
                     }

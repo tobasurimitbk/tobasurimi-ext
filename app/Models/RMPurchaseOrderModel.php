@@ -41,7 +41,7 @@ class RMPurchaseOrderModel extends Model
         'status_penerimaan',
         'total_before_pph',
         'total_after_pph',
-        'status_eksternal'
+        'status_external'
     ];
 
     // Dates

@@ -568,7 +568,7 @@ class PenerimaanBarangModel extends Model
 
         // MASUKKAN STOK BARANG DAN KEMASAN JIKA NON PABEAN 
         // (JIKA ADA BC MASUK KE INVENTORI DI MODUL BEA CUKAI)
-        if ($rmDetail['bc_type'] == 0 && $rmDetail['status_eksternal'] == "no") {
+        if ($rmDetail['bc_type'] == 0 && $rmDetail['status_external'] == "no") {
 
             foreach ($rmBarangDetail as $r) {
                 // HANDLE STOK BARANG
@@ -712,7 +712,7 @@ class PenerimaanBarangModel extends Model
         $penerimaanBarangList = $penerimaanBarangDetailModel->where('penerimaan_barang_id', $lpbID)->where('deletedAt', null)->findAll();
 
         // NON PABEAN LANGSUNG INPUTKAN STOK NYA
-        if ($penerimaanBarang['bc_type'] == 0 && $rmDetail['status_eksternal'] == "no") {
+        if ($penerimaanBarang['bc_type'] == 0 && $rmDetail['status_external'] == "no") {
             // STOK BARANG DIINPUT
             // KHUSUS INTERNAL
             foreach ($penerimaanBarangList as $p) {

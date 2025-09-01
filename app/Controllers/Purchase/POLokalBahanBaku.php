@@ -364,7 +364,7 @@ class POLokalBahanBaku extends BaseController
             "total" => $this->request->getVar("total") ? formatter($this->request->getVar("total"), "STR_TO_INT") : 0,
             "is_posted" => false,
             "createdBy" => session()->get("login")->user_id,
-            'status_eksternal' => $statusEksternal
+            'status_external' => $statusEksternal
         ]);
 
         $this->sppModel->update($this->request->getVar('spp_id'), [
@@ -668,7 +668,7 @@ class POLokalBahanBaku extends BaseController
                     // cek if warehouse_id != null
                     if ($detail['warehouse_id'] != null && $detail['warehouse_id'] != 0) {
                         $penerimaanBarangId = $this->penerimaanBarangModel->generateLpbBB($detail['id'], $detail['warehouse_id'], $detail['bc_type'], $detail['po_date']);
-                        if($detail['status_eksternal'] == "no"){
+                        if($detail['status_external'] == "no"){
                             // JIka Status Eksternal Tidak Maka ga masuk kedalam stok
                             $result = $this->jurnalController->insertDataPembelian($id, "BAHAN BAKU", "LOKAL", "pembelian", $penerimaanBarangId);
 
