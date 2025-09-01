@@ -93,6 +93,22 @@
 
     }
 
+    function greatFormatQty(value) {
+        if (value == null || value === "") return "0.000";
+
+        // parsing kalau ada +
+        if (typeof value === "string" && value.includes("+")) {
+            let parts = value.split("+").map(v => parseFloat(v.trim()) || 0);
+            let sum = parts.reduce((a, b) => a + b, 0);
+            return sum.toFixed(3); // pastiin 3 angka belakang koma
+        }
+
+        let num = parseFloat(value) || 0;
+        return num.toFixed(3); // pastiin 3 angka belakang koma
+    }
+
+
+
     function destroyFormatRupiah(x) {
         if (typeof x === "number") return x; // Jika sudah angka, langsung kembalikan
         if (!x) return 0; // Jika null, undefined, atau kosong, kembalikan 0
