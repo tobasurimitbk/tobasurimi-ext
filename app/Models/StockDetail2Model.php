@@ -508,52 +508,63 @@ class StockDetail2Model extends Model
     }
 
 
-    public function getStockListDetailNew($stockID)
-    {
-        $selectQry = '
-            CONCAT(barang_master.barang_name, " ", barang_master_spesifikasi.spesifikasi) AS barang,
-            barang_master.barang_name AS barang_master,
-            suppliers.name AS supplier_name,
-            stock.company_id,
-            stock.barang1_id,
-            stock.barang2_id,
-            stock.kemasan_id,
-            stock_details2.id,
-            stock_details2.bc_id,
-            stock_details2.stock_detail_id,
-            stock_details2.no_aju,
-            stock_details2.stock_id,
+    public function getStockListDetailNew($stockDetail2Id)
+{
+    // Ambil anchor: stock_id + stock_dokumen dari row yang diklik/dipegang
+    $anchor = $this->asArray()
+        ->select('stock_id, stock_dokumen')
+        ->where('id', $stockDetail2Id)
+        ->first();
+
+    if (!$anchor) return null;
+
+    $selectQry = '
+        CONCAT(barang_master.barang_name, " ", barang_master_spesifikasi.spesifikasi) AS barang,
+        barang_master.barang_name AS barang_master,
+        suppliers.name AS supplier_name,
+        stock.company_id,
+        stock.barang1_id,
+        stock.barang2_id,
+        stock.kemasan_id,
+        stock_details2.id,
+        stock_details2.bc_id,
+        stock_details2.stock_detail_id,
+        stock_details2.no_aju,
+        stock_details2.stock_id,
+        stock_details2.stock_dokumen,
+        stock_details2.supplier_id,
+        stock_details2.harga_umum,
+        stock_details2.harga_harian,
+        stock_details2.harga_bulanan,
+        stock_details2.no_po,
+        stock_details.stock_date,
+        stock_details.sumber,
+        stock_details.no_dokumen AS no_dokumen_1,
+        (
+            COALESCE(SUM(CASE WHEN LOWER(stock_details.status) = "in"  THEN stock_details2.qty ELSE 0 END), 0)
+          - COALESCE(SUM(CASE WHEN LOWER(stock_details.status) = "out" THEN stock_details2.qty ELSE 0 END), 0)
+        ) AS stok_total
+    ';
+
+    return $this->asArray()
+        ->select($selectQry)
+        ->join('stock_details', 'stock_details.id = stock_details2.stock_detail_id')
+        ->join('stock', 'stock.id = stock_details.stock_id', 'left')
+        ->join('suppliers', 'suppliers.id = stock_details2.supplier_id', 'left')
+        ->join('barang_master', 'barang_master.id = stock.barang1_id', 'left')
+        ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = stock.barang2_id', 'left')
+        ->where('stock_details2.stock_id', $anchor['stock_id'])
+        ->where('stock_details2.stock_dokumen', $anchor['stock_dokumen'])
+        ->groupBy('
             stock_details2.stock_dokumen,
-            stock_details2.supplier_id,
-            stock_details2.harga_umum,
-            stock_details2.harga_harian,
-            stock_details2.harga_bulanan,
-            stock_details2.no_po,
-            stock_details.stock_date,
-            stock_details.sumber,
-            stock_details.no_dokumen AS no_dokumen_1,
-            (SUM(CASE WHEN stock_details.status = "In" 
-            THEN stock_details2.qty ELSE 0 END) - 
-            SUM(CASE WHEN stock_details.status = "Out" 
-            THEN stock_details2.qty ELSE 0 END)) 
-            AS stok_total,        
-        ';
+            stock.id
+        ')
+        ->orderBy('stock_details.createdAt', 'ASC')
+        ->first();
+}
 
-        $dataQry = $this->asArray()
-            ->select($selectQry)
-            ->join('stock_details', 'stock_details.id = stock_details2.stock_detail_id', 'left')
-            ->join('stock', 'stock.id = stock_details.stock_id', 'left')
-            ->join('suppliers', 'suppliers.id = stock_details2.supplier_id', 'left')
-            ->join('barang_master', 'barang_master.id = stock.barang1_id', 'left')
-            ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = stock.barang2_id', 'left')
-            ->where('stock_details2.id', $stockID)
-            ->groupBy('stock_details2.stock_dokumen')
-            ->groupBy('stock_details2.bc_id')
-            ->groupBy('stock_details2.no_aju')
-            ->first();
 
-        return $dataQry;
-    }
+
 
 
     public function getStockListDetailForRebusAllNew($stockID)
@@ -749,8 +760,8 @@ class StockDetail2Model extends Model
 
             ')
             ->join('stock_details', 'stock_details.id = stock_details2.stock_detail_id')
+            ->join('stock', 'stock.id = stock_details.stock_id', 'left')
             ->join('suppliers', 'suppliers.id = stock_details2.supplier_id', 'left')
-            ->join('stock', 'stock.id = stock_details2.stock_id', 'left')
             ->join('barang_master', 'barang_master.id = stock.barang1_id', 'left')
             ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = stock.barang2_id', 'left')
             ->join('satuans', 'satuans.id = barang_master_spesifikasi.satuan_1', 'left');
@@ -766,17 +777,8 @@ class StockDetail2Model extends Model
 
         return $builder
             ->groupBy('
-                stock_details2.stock_id,
                 stock_details2.stock_dokumen,
-                stock_details2.bc_id,
-                stock_details2.no_aju,
-                stock_details2.supplier_id,
-                suppliers.name,
-                stock_details.stock_date,
-                stock_details.sumber,
-                barang_master.barang_name,
-                barang_master_spesifikasi.spesifikasi,
-                satuans.kode_satuan
+                stock.id
             ')
             ->having('stok_total >', 0)
             ->orderBy('stock_details.createdAt', 'ASC')

@@ -282,6 +282,7 @@ class LaporanWarehousePenerimaan extends BaseController
                 "no_lpb"            => $data['no_lpb'],
                 "po_date"           => date('d/m/Y', strtotime($data['po_date'])),
                 "po_no"             => $data['po_no'],
+                "kategori_barang"             => $data['kategori_barang'],
                 "kode_barang"       => $data['kode_barang'],
                 "barang_name"       => $data['barang_name'],
                 "spesifikasi"      => $data['spesifikasi'],
@@ -289,6 +290,7 @@ class LaporanWarehousePenerimaan extends BaseController
                 "keterangan"      => $data['keterangan'],
                 "qty_order"       => (float)$data['qty_order'],
                 "qty_diterima"       => (float)$data['qty_diterima'],
+                "qty_sisa"           => $data['qty_order'] - $data['qty_diterima'],
                 "total_harga"       => (float)$data['total_harga'],
                 "valas_name" => $valasName
             ]);
@@ -306,6 +308,7 @@ class LaporanWarehousePenerimaan extends BaseController
             'No LPB',
             'Tgl PO',
             'No PO',
+            'Kategori Barang',
             'Kode Barang',
             'Nama Barang',
             'Spesifikasi',
@@ -313,9 +316,9 @@ class LaporanWarehousePenerimaan extends BaseController
             'Keterangan',
             'Qty Order',
             'Qty Diterima',
+            'Qty Sisa',
             'Total Harga',
             'Valas'
-
         ];
         // Ambil periode
         $dateStart = $addCondition['dateStart'] ? date("d/m/Y", strtotime($addCondition['dateStart'])) : "-";
@@ -369,13 +372,13 @@ class LaporanWarehousePenerimaan extends BaseController
         // === Grand Total ===
         if ($lpb_type == "LOKAL BB" || $lpb_type == "LOKAL BP") {
             $sheet->setCellValue("R" . $row, "Grand Total");
-            $sheet->setCellValue("S" . $row, $grandTotal);
+            $sheet->setCellValue("U" . $row, $grandTotal);
 
-            $sheet->mergeCells("A" . $row . ":R" . $row);
-            $sheet->getStyle("A" . $row . ":S" . $row)->getFont()->setBold(true);
-            $sheet->getStyle("A" . $row . ":S" . $row)->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_THIN);
+            $sheet->mergeCells("A" . $row . ":T" . $row);
+            $sheet->getStyle("A" . $row . ":U" . $row)->getFont()->setBold(true);
+            $sheet->getStyle("A" . $row . ":U" . $row)->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_THIN);
 
-            $sheet->getStyle("S" . $row)
+            $sheet->getStyle("U" . $row)
                 ->getNumberFormat()
                 ->setFormatCode(NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1);
         }
