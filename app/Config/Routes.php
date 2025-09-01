@@ -1145,6 +1145,7 @@ $routes->post('/jasa-vendor-in/save',  'JasaVendor\JasaVendorIn::createActionNew
 $routes->post('/jasa-vendor-in/update',  'JasaVendor\JasaVendorIn::updateActionNew', ['filter' => 'Auth']);
 $routes->post('/jasa-vendor-in/delete',  'JasaVendor\JasaVendorIn::delete', ['filter' => 'Auth']);
 $routes->post('/jasa-vendor-in/posting',  'JasaVendor\JasaVendorIn::posting', ['filter' => 'Auth']);
+$routes->post('/jasa-vendor-in/posting-bayar',  'JasaVendor\JasaVendorIn::postingBayar', ['filter' => 'Auth']);
 $routes->get('/jasa-vendor-in/id/(:segment)',  'JasaVendor\JasaVendorIn::detail/$1', ['filter' => 'Auth']);
 $routes->get('/jasa-vendor-in/print/(:segment)',  'JasaVendor\JasaVendorIn::print/$1', ['filter' => 'Auth']);
 $routes->get('/jasa-vendor-in/all',  'JasaVendor\JasaVendorIn::all', ['filter' => 'Auth']);

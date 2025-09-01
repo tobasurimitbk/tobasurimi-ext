@@ -794,7 +794,8 @@
         $('.foot-detail-table').empty();
         $('.body-table').empty();
         var no = 1;
-
+        let row = null;
+        
         if (listBarang.length == 0) {
             row += `
                     <tr>

@@ -131,7 +131,7 @@ class BiayaKepitingModel extends Model
             ->join('divisis', 'divisis.id = jasa_vendor_in.divisi_id', 'left')
             ->join('vendors', 'vendors.id = jasa_vendor_in.vendor_id', 'left')
             ->where('biaya_kepiting.jasa_vendor_in_id', null)
-            ->where('jasa_vendor_in.status_posting', '1')
+            ->where('jasa_vendor_in.status_bayar', '1')
             ->whereIn('jasa_vendor_in.divisi_id', $divisiArr)
             ->findAll();
 
@@ -156,7 +156,8 @@ class BiayaKepitingModel extends Model
         $jasaVendorIn = $jasaVendorInModel->find($jasaVendorInID);
 
         $jasaVendorOutIdArr = json_decode($jasaVendorIn['multiple_jasa_vendor_out_id']);
-
+        // var_dump($jasaVendorOutIdArr);
+        // die;
         // CREATE
         $selectQryJasaVendorOut = "
             barang_master.id AS barang_master_id,
@@ -171,7 +172,9 @@ class BiayaKepitingModel extends Model
         $jasaVendorOutDetail = $jasaVendorOutModel
             ->select($selectQryJasaVendorOut)
             ->join('jasa_vendor_out_detail', 'jasa_vendor_out_detail.jasa_vendor_out_id = jasa_vendor_out.id')
-            ->join('stock', 'stock.id = jasa_vendor_out_detail.stock_out_id')
+            ->join('stock_details2', 'stock_details2.id = jasa_vendor_out_detail.stock_out_id', 'left')
+            ->join('stock_details', 'stock_details.id = stock_details2.stock_detail_id', 'left')
+            ->join('stock', 'stock.id = stock_details.stock_id', 'left')
             ->join('barang_master', 'barang_master.id = stock.barang1_id')
             ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = stock.barang2_id')
             ->whereIn('jasa_vendor_out.id', $jasaVendorOutIdArr)
