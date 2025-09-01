@@ -450,7 +450,7 @@ class JasaVendorIn extends BaseController
 
         foreach ($barangs as $b) {
             foreach ($b->list_barang_masuk as $c) {
-                if ($c->qty_bersih != 0) {
+               
                     // Group berdasarkan spesifikasi + dokumen
                     $key = $c->spesifikasi_in_id . '_' . $b->stock_dokumen;
 
@@ -469,7 +469,7 @@ class JasaVendorIn extends BaseController
 
                     $groupedBarang[$key]['qty_kotor'] += $c->qty_kotor;
                     $groupedBarang[$key]['qty_bersih'] += $c->qty_bersih;
-                }
+
             }
         }
 
@@ -553,7 +553,7 @@ class JasaVendorIn extends BaseController
 
         foreach ($barangs as $b) {
             foreach ($b->list_barang_masuk as $c) {
-                if ($c->qty_bersih != 0) {
+               
                     // Group berdasarkan spesifikasi + dokumen
                     $key = $c->spesifikasi_in_id . '_' . $b->stock_dokumen;
 
@@ -572,7 +572,7 @@ class JasaVendorIn extends BaseController
 
                     $groupedBarang[$key]['qty_kotor'] += $c->qty_kotor;
                     $groupedBarang[$key]['qty_bersih'] += $c->qty_bersih;
-                }
+                
             }
         }
 
