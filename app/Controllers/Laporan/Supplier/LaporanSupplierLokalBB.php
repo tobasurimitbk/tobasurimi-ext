@@ -85,6 +85,7 @@ class LaporanSupplierLokalBB extends BaseController
             'rm_purchase_orders.company_id' => $this->this_company_id,
             'penerimaan_barang.deletedAt' => null,
             'penerimaan_barang_detail.deletedAt' => null,
+            'rm_purchase_orders.status_external' => 'no',
         ];
 
         $addCondition = [
@@ -335,6 +336,7 @@ class LaporanSupplierLokalBB extends BaseController
             'rm_purchase_orders.company_id' => $this->this_company_id,
             'penerimaan_barang.deletedAt' => null,
             'penerimaan_barang_detail.deletedAt' => null,
+            'rm_purchase_orders.status_external' => 'no',
         ];
 
         $addCondition = [
@@ -748,6 +750,7 @@ class LaporanSupplierLokalBB extends BaseController
             'rm_purchase_orders.company_id' => $this->this_company_id,
             'penerimaan_barang.deletedAt' => null,
             'penerimaan_barang_detail.deletedAt' => null,
+            'rm_purchase_orders.status_external' => 'no',
         ];
 
         $addCondition = [
@@ -869,6 +872,7 @@ class LaporanSupplierLokalBB extends BaseController
             'rm_purchase_orders.company_id' => $this->this_company_id,
             'penerimaan_barang.deletedAt' => null,
             'penerimaan_barang_detail.deletedAt' => null,
+            'rm_purchase_orders.status_external' => 'no',
         ];
 
         $addCondition = [
@@ -1064,6 +1068,7 @@ class LaporanSupplierLokalBB extends BaseController
             'rm_purchase_orders.company_id' => $this->this_company_id,
             'penerimaan_barang.deletedAt' => null,
             'penerimaan_barang_detail.deletedAt' => null,
+            'rm_purchase_orders.status_external' => 'no',
         ];
 
         $addCondition = [
@@ -1186,6 +1191,7 @@ class LaporanSupplierLokalBB extends BaseController
             'rm_purchase_orders.company_id' => $this->this_company_id,
             'penerimaan_barang.deletedAt' => null,
             'penerimaan_barang_detail.deletedAt' => null,
+            'rm_purchase_orders.status_external' => 'no',
         ];
 
         $addCondition = [
@@ -1471,6 +1477,7 @@ class LaporanSupplierLokalBB extends BaseController
             'rm_purchase_orders.company_id' => $this->this_company_id,
             'penerimaan_barang.deletedAt' => null,
             'penerimaan_barang_detail.deletedAt' => null,
+            'rm_purchase_orders.status_external' => 'no',
         ];
 
         $addCondition = [
@@ -1761,6 +1768,7 @@ class LaporanSupplierLokalBB extends BaseController
             'rm_purchase_orders.company_id' => $this->this_company_id,
             'penerimaan_barang.deletedAt' => null,
             'penerimaan_barang_detail.deletedAt' => null,
+            'rm_purchase_orders.status_external' => 'no',
         ];
 
         $addCondition = [
@@ -2150,6 +2158,7 @@ class LaporanSupplierLokalBB extends BaseController
             'rm_purchase_orders.company_id' => $this->this_company_id,
             'penerimaan_barang.deletedAt' => null,
             'penerimaan_barang_detail.deletedAt' => null,
+            'rm_purchase_orders.status_external' => 'no',
         ];
 
         $addCondition = [
@@ -2440,6 +2449,7 @@ class LaporanSupplierLokalBB extends BaseController
             'rm_purchase_orders.company_id' => $this->this_company_id,
             'penerimaan_barang.deletedAt' => null,
             'penerimaan_barang_detail.deletedAt' => null,
+            'rm_purchase_orders.status_external' => 'no',
         ];
 
         $addCondition = [
@@ -2778,6 +2788,7 @@ class LaporanSupplierLokalBB extends BaseController
             'penerimaan_barang.tipe_bahan' => 'BAKU',
             'rm_purchase_orders.company_id' => $this->this_company_id,
             'rm_purchase_orders.deletedAt' => null,
+            'rm_purchase_orders.status_external' => 'no',
         ];
 
         $addCondition = [
@@ -3051,6 +3062,7 @@ class LaporanSupplierLokalBB extends BaseController
             'penerimaan_barang.tipe_bahan' => 'BAKU',
             'rm_purchase_orders.company_id'  => $this->this_company_id,
             'rm_purchase_orders.deletedAt'  => null,
+            'rm_purchase_orders.status_external' => 'no',
         ];
 
         $addCondition = [
@@ -3394,6 +3406,7 @@ class LaporanSupplierLokalBB extends BaseController
             'penerimaan_barang.tipe_bahan' => 'BAKU',
             'rm_purchase_orders.company_id'  => $this->this_company_id,
             'rm_purchase_orders.deletedAt'  => null,
+            'rm_purchase_orders.status_external' => 'no',
         ];
 
         $addCondition = [

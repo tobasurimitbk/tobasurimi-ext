@@ -4,16 +4,19 @@
 <!-- Begin Page Content -->
 <section class="section">
     <div class="section-header">
-        <div class="col-md-10">
-            <h1>Laporan Rincian Penjualan Per Barang</h1>
-        </div>
+        <h1>Laporan Rincian Penjualan Per Barang</h1>
 
-        <div class="col-md-2 text-right">
-            <div class="btn-group">
-                <a class="nav-link btn btn-warning" onclick="printPDF('<?= base_url("/laporan-sales/sales-per-barang/printPDF"); ?>')">Export PDF</a>
-                <!-- <a class="btn btn-warning" onclick="printExcel('<?= base_url("/laporan-accounting/pembelian/printExcel"); ?>')">Export Excel</a> -->
-            </div>
-        </div>
+        <button style="right: 10px;" class="btn btn-discard btn-dropdown-export dropdown-toggle float-right" type="button" id="dropdownMenuButtonExport" data-bs-toggle="dropdown" aria-expanded="false">
+            Export All
+        </button>
+        <ul class="dropdown-menu list-dropdown-company" aria-labelledby="dropdownMenuButtonExport">
+            <li>
+                <button class="dropdown-item" onclick="printPDF('<?= base_url("/laporan-sales/rincian-sales-per-barang/printPDFAll"); ?>')">PDF</button>
+            </li>
+            <li>
+                <button class="dropdown-item" onclick="printExcel('<?= base_url("/laporan-sales/rincian-sales-per-barang/printExcelAll"); ?>')">EXCEL</button>
+            </li>
+        </ul>
     </div>
     <div class="card">
         <div class="card-body">
@@ -38,19 +41,19 @@
                         </div>
                         <div class="col-md-3">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <select class="form-select filter_customer" name="filter_customer" id="filter_customer">
+                                <select class="form-select filter_barang" name="filter_barang" id="filter_barang">
                                     <option value=""></option>
                                     <?php
-                                    if (!empty($customer)) {
-                                        foreach ($customer as $sub) {
+                                    if (!empty($barangMasterSalesData)) {
+                                        foreach ($barangMasterSalesData as $barang) {
                                     ?>
-                                            <option value="<?= $sub->id; ?>"><?= $sub->kode; ?> <?= $sub->name; ?></option>
+                                            <option value="<?= $barang->id; ?>"><?= $barang->kode_barang; ?> <?= $barang->barang_name; ?></option>
                                     <?php
                                         }
                                     }
                                     ?>
                                 </select>
-                                <label for="floatingInput">Pelanggan</label>
+                                <label for="floatingInput">Barang</label>
                             </div>
                         </div>
                         <div class="col-md-3" style="height: 50px;">
@@ -77,6 +80,8 @@
                                 <th>Kuantitas</th>
                                 <th>Satuan</th>
                                 <th>Jumlah</th>
+                                <th>Nilai HPP</th>
+                                <th>Laba Kotor</th>
                                 <th>Nama Barang</th>
                                 <th>Nama Pelanggan</th>
                                 <th>Nama Penjual</th>
@@ -112,7 +117,7 @@
             ],
             pageLength: 25,
             ajax: {
-                url: "<?= base_url("laporan-sales/sales-per-barang/all"); ?>",
+                url: "<?= base_url("laporan-sales/rincian-sales-per-barang/all"); ?>",
                 dataSrc: "data",
                 data: function(data) {
                     data.search = $(".search").val();
@@ -132,41 +137,65 @@
             searching: false,
             createdRow: function(row, data, dataIndex) {
                 if (data.is_customer) {
-                    $(row).addClass('customer-row').find('td').attr('colspan', 6).removeClass('text-center').addClass('text-left font-weight-bold');
+                    $(row).addClass('customer-row')
+                        .find('td')
+                        .attr('colspan', 9)
+                        .removeClass('text-center')
+                        .addClass('text-left txt-bold')
+                        .css('cssText', 'font-weight:700 !important;');
+
                     $(row).find('td:not(:first)').remove(); // Remove other cells
                 } else if (data.is_total) {
-                    $(row).addClass('total-row').find('td').attr('colspan', 6).removeClass('text-center').addClass('text-left font-weight-bold');
+                    $(row).addClass('total-row')
+                        .find('td')
+                        .attr('colspan', 9)
+                        .removeClass('text-center')
+                        .addClass('text-left txt-bold')
+                        .css('cssText', 'font-weight:700 !important;');
+
                     $(row).find('td:not(:first)').remove(); // Remove other cells
                 }
             },
             columns: [{
-                data: "no_faktur",
-                className: "text-center",
-            }, {
-                data: "tanggal_faktur",
-                className: "text-center",
-            }, {
-                data: "keterangan",
-                className: "text-center",
-            }, {
-                data: "qty_invoice",
-                className: "text-center",
-            }, {
-                data: "kode_satuan",
-                className: "text-center",
-            }, {
-                data: "total_invoice",
-                className: "text-center",
-            }, {
-                data: "barang_name",
-                className: "text-center",
-            }, {
-                data: "nama_pelanggan",
-                className: "text-center",
-            }, {
-                data: "nama_sales",
-                className: "text-center",
-            }, ],
+                    data: "no_faktur",
+                    className: "text-center",
+                }, {
+                    data: "tanggal_faktur",
+                    className: "text-center",
+                }, {
+                    data: "keterangan",
+                    className: "text-center",
+                }, {
+                    data: "qty_invoice",
+                    className: "text-center",
+                }, {
+                    data: "kode_satuan",
+                    className: "text-center",
+                }, {
+                    data: "total_invoice",
+                    className: "text-center",
+                },
+                {
+                    data: "amt_harga_pokok",
+                    className: "text-center",
+                },
+                {
+                    data: "amt_laba",
+                    className: "text-center",
+                },
+                {
+                    data: "barang_name",
+                    className: "text-center",
+                },
+                {
+                    data: "nama_pelanggan",
+                    className: "text-center",
+                },
+                {
+                    data: "nama_sales",
+                    className: "text-center",
+                }
+            ],
             columnDefs: [{
                 defaultContent: "-",
                 targets: "_all"

@@ -212,7 +212,7 @@ class KwitansiTb extends BaseController
 
         $allSuppliers = $this->supplierModel->getSupplierByType("BAHAN BAKU");
         $noKwitansi = '';
-        $pages = [];
+        $dataResult = [];
 
         foreach ($allSuppliers as $data) {
             if ($supplierSearch && stripos($data['name'], $supplierSearch) === false) continue;
@@ -237,7 +237,6 @@ class KwitansiTb extends BaseController
 
                 $tanggal = "$year-$month-" . date("t", strtotime("$year-$month-01"));
 
-                $kwitansiTBMerged = [];
                 $namaBarang = "";
                 $kodeSatuan = "";
                 $qtyTotal = 0;
@@ -255,14 +254,12 @@ class KwitansiTb extends BaseController
                 }
 
                 $kwitansiTBFinal = [
-                    'all' => [[
-                        'nama_barang' => $namaBarang,
+                    'nama_barang' => $namaBarang,
                         'kode_satuan' => $kodeSatuan,
                         'qty' => $qtyTotal,
                         'harga_bulanan' => $hargaBulananTotal,
                         'pph' => $pphTotal,
-                        'harga_bulanan_pph' => $hargaBulananPphTotal
-                    ]],
+                        'harga_bulanan_pph' => $hargaBulananPphTotal,
                     'supplier' => $kwitansiTB['supplier'],
                     'total' => $kwitansiTB['total']
                 ];
@@ -273,29 +270,26 @@ class KwitansiTb extends BaseController
                     'tanggal' => $tanggal,
                     'noKwitansi' => $noKwitansi,
                     'company' => $company,
-                    'kwitansis' => $kwitansiTBFinal,
+                    'kwintansi' => $kwitansiTBFinal,
                     'provinsi' => $provinsi
                 ];
 
-                // Render view ke string
-                $pages[] = view('Laporan/SupplierLokalBB/KwitansiTb/print', $data);
+                array_push($dataResult, $data);
+
             }
         }
 
-        if (empty($pages)) {
+        if (empty($dataResult)) {
             return redirect()->back()->with('error', 'Tidak ada data untuk dicetak.');
         }
-
-        // Gabungkan semua halaman dengan page break
-        $html = implode('', $pages);
 
         $options = new Options();
         $options->set('isHtml5ParserEnabled', true);
         $options->set('isRemoteEnabled', true);
 
         $dompdf = new Dompdf($options);
-        $dompdf->loadHtml($html);
-        $dompdf->setPaper('A4', 'portrait');
+        $dompdf->loadHtml(view('Laporan/SupplierLokalBB/KwitansiTb/print-all', ['dataResult'=>$dataResult]));
+        $dompdf->setPaper('F4', 'portrait');
         $dompdf->render();
         $dompdf->stream("Kwitansi_TB_Bulanan_$month-$year.pdf", ["Attachment" => false]);
         exit;

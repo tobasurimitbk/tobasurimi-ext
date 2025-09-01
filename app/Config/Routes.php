@@ -2374,6 +2374,10 @@ $routes->get('/laporan-sales/sales-per-barang/printExcelOmset/(:segment)/(:segme
 $routes->get('/laporan-sales/sales-per-barang/printPDFKuantitas/(:segment)/(:segment)/(:segment)/(:segment)', 'Laporan\Penjualan\PenjualanPerBarang::printPDFKuantitas/$1/$2/$3/$4', ['filter' => 'Auth']);
 $routes->get('/laporan-sales/sales-per-barang/printExcelKuantitas/(:segment)/(:segment)/(:segment)/(:segment)', 'Laporan\Penjualan\PenjualanPerBarang::printExcelKuantitas/$1/$2/$3/$4', ['filter' => 'Auth']);
 
+$routes->get('/laporan-sales/rincian-sales-per-barang', 'Laporan\Penjualan\RincianPenjualanPerBarang::index', ['filter' => 'Auth']);
+$routes->get('/laporan-sales/rincian-sales-per-barang/all', 'Laporan\Penjualan\RincianPenjualanPerBarang::allTransaksi', ['filter' => 'Auth']);
+$routes->get('/laporan-sales/rincian-sales-per-barang/printPDFAll/(:segment)/(:segment)/(:segment)/(:segment)', 'Laporan\Penjualan\RincianPenjualanPerBarang::printPDFAll/$1/$2/$3/$4', ['filter' => 'Auth']);
+$routes->get('/laporan-sales/rincian-sales-per-barang/printExcelAll/(:segment)/(:segment)/(:segment)/(:segment)', 'Laporan\Penjualan\RincianPenjualanPerBarang::printExcelAll/$1/$2/$3/$4', ['filter' => 'Auth']);
 
 // RETUR LOKAL BB
 $routes->get('/retur-po-lokal-bb', 'ReturPembelian\ReturPembelianLokalBB::index', ['filter' => 'Auth']);
