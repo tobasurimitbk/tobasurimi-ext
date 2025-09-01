@@ -1045,7 +1045,8 @@ $routes->get('/barang/dropdown/kategori', 'Warehouse\Barang::dropdownBarangKateg
 $routes->get('/barang/dropdown/type', 'Warehouse\Barang::dropdownBarangType', ['filter' => 'Auth']);
 $routes->get('/barang/dropdown/type-nospec', 'Warehouse\Barang::dropdownBarangTypeWithoutSpec', ['filter' => 'Auth']);
 $routes->get('/barang/dropdown/type-nospecwo', 'Warehouse\Barang::dropdownBarangTypeWithoutSpecWO', ['filter' => 'Auth']);
-
+$routes->get('/barang/dropdown/type-server', 'Purchase\SPP::dropdownBarang', ['filter' => 'Auth']);
+$routes->get('/barang/dropdown/type-server-first', 'Purchase\SPP::dropdownBarangFirst', ['filter' => 'Auth']);
 // ACCOUNT
 $routes->get('/kategori-account/dropdown', 'Master\Account::dropdownKategoriAccount', ['filter' => 'Auth']);
 $routes->get('/header-account/dropdown', 'Master\Account::dropdownHeaderAccount', ['filter' => 'Auth']);
