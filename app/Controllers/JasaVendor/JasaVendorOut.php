@@ -299,14 +299,11 @@ class JasaVendorOut extends BaseController
         $this->jasaVendorOutDetailModel->where('jasa_vendor_out_id', $id)->delete();
 
         foreach ($barang as $b) {
-            $stockId = $b->id; // di createAction ga di-decrypt, jadi samain aja
+           
+            $stockId = $b->id;
 
-            // Ambil detail stok sesuai parameter
-            $stockDetail = $this->stockDetail2Model->getStockListDetail(
-                $b->stockId,
-                $b->bc_id,
-                $b->no_aju,
-                $b->stock_dokumen
+            $stockDetail = $this->stockDetail2Model->getStockListDetailNew(
+                $stockId,
             );
 
             $qty_stok_sistem = $stockDetail['stok_total'] ?? 0;
