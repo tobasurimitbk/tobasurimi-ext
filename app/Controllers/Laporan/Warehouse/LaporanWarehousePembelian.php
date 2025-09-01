@@ -129,6 +129,7 @@ class LaporanWarehousePembelian extends BaseController
         $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
         foreach ($dataPurchaseOrder['data'] as $data) {
             $valasName = isset($data['valas_name']) ? $data['valas_name'] : "";
+            $sppNo = isset($data['spp_no']) ? $data['spp_no'] : "";
             array_push($dataResult, [
                 "no"                => $no++,
                 "divisi"            => $data['divisi'],
@@ -144,6 +145,7 @@ class LaporanWarehousePembelian extends BaseController
                 "qty_diterima"       => (float)$data['qty_diterima'],
                 "qty_sisa"       => (float)$data['qty_sisa'],
                 "total_harga"       => number_format($data['total_harga'], 2) . " " . $valasName,
+                "spp_no"            => $sppNo
             ]);
         }
 
@@ -248,14 +250,15 @@ class LaporanWarehousePembelian extends BaseController
         $header = [
             'No',
             'Departemen',
-            'PO Date',
-            'PO No',
+            'Tgl PO ',
+            'No PO',
+            'No SPP',
             'Supplier',
             'Kode Barang',
             'Nama Barang',
+            'Spesifikasi',
             'Satuan',
             'Keterangan',
-            'Spesifikasi',
             'Qty Order',
             'Qty Diterima',
             'Qty Sisa',
@@ -276,6 +279,7 @@ class LaporanWarehousePembelian extends BaseController
 
         foreach ($dataPurchaseOrder['data'] as $data) {
             $valasName = $data['valas_name'] ?? "IDR";
+            $noSpp = $data['spp_no'] ?? "";
             $totalHarga = (float) $data['total_harga'];
             $grandTotal += $totalHarga;
 
@@ -287,12 +291,13 @@ class LaporanWarehousePembelian extends BaseController
                 $data['divisi'],
                 date('d/m/Y', strtotime($data['po_date'])),
                 $data['po_no'],
+                $noSpp,
                 $data['supplier_name'],
                 $data['kode_barang'],
                 $data['barang_name'],
+                $data['spesifikasi'],  
                 $data['kode_satuan'],
                 $data['uraian'],
-                $data['spesifikasi'],
                 (float) $data['qty_order'],
                 $qtyDiterima,
                 $qtySisa,
@@ -306,31 +311,31 @@ class LaporanWarehousePembelian extends BaseController
         // ============================
         // Format kolom Total Harga
         // ============================
-        $sheet->getStyle('N3:N' . ($row - 1))
+        $sheet->getStyle('O3:O' . ($row - 1))
             ->getNumberFormat()
             ->setFormatCode('#,##0.00');
-        $sheet->getStyle('N3:N' . ($row - 1))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_RIGHT);
+        $sheet->getStyle('O3:O' . ($row - 1))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_RIGHT);
 
         // Border tabel
-        $sheet->getStyle('A2:O' . ($row - 1))->getBorders()->getAllBorders()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN);
+        $sheet->getStyle('A2:P' . ($row - 1))->getBorders()->getAllBorders()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN);
 
         // ============================
         // Tambahin Grand Total
         // ============================
         if ($po_type == "LOKAL BB" || $po_type == "LOKAL BP") {
-            $sheet->mergeCells('A' . $row . ':M' . $row);
+            $sheet->mergeCells('A' . $row . ':N' . $row);
             $sheet->setCellValue('A' . $row, 'GRAND TOTAL');
             $sheet->getStyle('A' . $row)->getFont()->setBold(true);
             $sheet->getStyle('A' . $row)->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_RIGHT);
 
-            $sheet->setCellValue('N' . $row, $grandTotal);
-            $sheet->getStyle('N' . $row)->getFont()->setBold(true);
-            $sheet->getStyle('N' . $row)->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_RIGHT);
-            $sheet->getStyle('N' . $row)->getNumberFormat()->setFormatCode('#,##0.00');
+            $sheet->setCellValue('O' . $row, $grandTotal);
+            $sheet->getStyle('O' . $row)->getFont()->setBold(true);
+            $sheet->getStyle('O' . $row)->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_RIGHT);
+            $sheet->getStyle('O' . $row)->getNumberFormat()->setFormatCode('#,##0.00');
         }
 
         // Auto size kolom
-        foreach (range('A', 'O') as $col) {
+        foreach (range('A', 'P') as $col) {
             $sheet->getColumnDimension($col)->setAutoSize(true);
         }
 

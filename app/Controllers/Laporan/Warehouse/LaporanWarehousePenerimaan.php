@@ -142,6 +142,8 @@ class LaporanWarehousePenerimaan extends BaseController
         $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
         foreach ($dataLpb['data'] as $data) {
             $valasName = isset($data['valas_name']) ? $data['valas_name'] : "";
+            // Harga satuan muncul disemua PO kecuali PO Lokal Bahan Baku
+            $hargaSatuan = isset($data['harga_satuan']) ? $data['harga_satuan'] : "";
             array_push($dataResult, [
                 "no"                => $no++,
                 "divisi"            => $data['divisi'],
@@ -159,6 +161,7 @@ class LaporanWarehousePenerimaan extends BaseController
                 "spesifikasi"      => $data['spesifikasi'],
                 "kode_satuan"        => $data['kode_satuan'],
                 "keterangan"      => $data['keterangan'],
+                "harga_satuan"      => $hargaSatuan == "" ? "" : number_format($hargaSatuan, 2),
                 "qty_order"       => (float)$data['qty_order'],
                 "qty_diterima"       => (float)$data['qty_diterima'],
                 "total_harga"       => number_format($data['total_harga'], 2) . " " . $valasName,
@@ -270,6 +273,7 @@ class LaporanWarehousePenerimaan extends BaseController
         $no =  1;
         foreach ($dataLpb['data'] as $data) {
             $valasName = isset($data['valas_name']) ? $data['valas_name'] : "IDR";
+            $hargaSatuan = isset($data['harga_satuan']) ? $data['harga_satuan'] : "";
             array_push($dataResult, [
                 "no"                => $no++,
                 "divisi"            => $data['divisi'],
@@ -287,6 +291,7 @@ class LaporanWarehousePenerimaan extends BaseController
                 "barang_name"       => $data['barang_name'],
                 "spesifikasi"      => $data['spesifikasi'],
                 "kode_satuan"        => $data['kode_satuan'],
+                "harga_satuan"      => (float)$hargaSatuan,
                 "keterangan"      => $data['keterangan'],
                 "qty_order"       => (float)$data['qty_order'],
                 "qty_diterima"       => (float)$data['qty_diterima'],
@@ -313,6 +318,7 @@ class LaporanWarehousePenerimaan extends BaseController
             'Nama Barang',
             'Spesifikasi',
             'Satuan',
+            'Harga Satuan',
             'Keterangan',
             'Qty Order',
             'Qty Diterima',
@@ -353,7 +359,13 @@ class LaporanWarehousePenerimaan extends BaseController
             foreach ($d as $key => $val) {
                 $sheet->setCellValue($col . $row, $val);
 
-                if ($key === "total_harga") {
+                if ($key === "harga_satuan") {
+                    $sheet->getStyle($col . $row)
+                        ->getNumberFormat()
+                        ->setFormatCode(NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1);
+                }
+
+                 if ($key === "total_harga") {
                     $sheet->getStyle($col . $row)
                         ->getNumberFormat()
                         ->setFormatCode(NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1);
@@ -371,14 +383,15 @@ class LaporanWarehousePenerimaan extends BaseController
 
         // === Grand Total ===
         if ($lpb_type == "LOKAL BB" || $lpb_type == "LOKAL BP") {
-            $sheet->setCellValue("R" . $row, "Grand Total");
-            $sheet->setCellValue("U" . $row, $grandTotal);
+            $sheet->setCellValue("U" . $row, "GRAND TOTAL");
+            $sheet->setCellValue("V" . $row, $grandTotal);
+            $sheet->getStyle('U' . $row)->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_RIGHT);
 
             $sheet->mergeCells("A" . $row . ":T" . $row);
-            $sheet->getStyle("A" . $row . ":U" . $row)->getFont()->setBold(true);
-            $sheet->getStyle("A" . $row . ":U" . $row)->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_THIN);
+            $sheet->getStyle("A" . $row . ":V" . $row)->getFont()->setBold(true);
+            $sheet->getStyle("A" . $row . ":V" . $row)->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_THIN);
 
-            $sheet->getStyle("U" . $row)
+            $sheet->getStyle("V" . $row)
                 ->getNumberFormat()
                 ->setFormatCode(NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1);
         }

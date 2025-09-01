@@ -40,7 +40,8 @@ class RMPurchaseOrderModel extends Model
         'createdBy',
         'status_penerimaan',
         'total_before_pph',
-        'total_after_pph'
+        'total_after_pph',
+        'status_eksternal'
     ];
 
     // Dates
