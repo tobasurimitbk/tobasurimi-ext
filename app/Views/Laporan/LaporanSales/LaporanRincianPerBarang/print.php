@@ -8,43 +8,49 @@
   <style>
     body {
       font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-      font-size: 5px;
+      font-size: 10px;
       padding: 20px;
     }
 
     h5 {
-      font-weight: normal;
-      font-size: 18px;
-      margin-bottom: 10px;
+      font-size: 16px;
       text-align: center;
       font-weight: bold;
-      margin-top: 8px;
+      margin: 6px 0;
     }
 
     h6 {
-      font-weight: normal;
-      font-size: 13px;
+      font-size: 12px;
       text-align: center;
       font-weight: bold;
-      margin-top: 10px;
-      margin-bottom: 10px;
+      margin: 6px 0;
     }
 
     @page {
-      size: 7.44in 10in landscape;
-      margin: 5px;
-      padding: 30px;
+      size: A4 landscape;
+      margin: 10px;
     }
 
     table {
       border-collapse: collapse !important;
+      width: 100%;
     }
 
-    #table1,
-    th,
-    td {
+    #table1 th,
+    #table1 td {
       border: 1px solid #999;
-      font-size: 12px;
+      font-size: 10px;
+      padding: 4px;
+    }
+
+    .group-row {
+      font-weight: bold;
+      background: #f0f0f0;
+    }
+
+    .total-row {
+      font-weight: bold;
+      background: #e0e0e0;
     }
   </style>
 </head>
@@ -52,9 +58,12 @@
 <body>
   <h6>TOBA FISH</h6>
   <h5>Rincian Penjualan per Barang</h5>
-  <h6>Dari <?= ($dateStart != "All") ? $dateStart : "-" ?> s/d <?= ($dateEnd != "Now") ? $dateEnd : "-" ?></h6>
+  <h6>
+    Dari <?= ($dateStart != "All") ? $dateStart : "-" ?>
+    s/d <?= ($dateEnd != "Now") ? $dateEnd : "-" ?>
+  </h6>
 
-  <table width="100%" id="table1">
+  <table id="table1">
     <thead>
       <tr>
         <th>No. Faktur</th>
@@ -63,51 +72,37 @@
         <th>Kuantitas</th>
         <th>Satuan</th>
         <th>Jumlah</th>
+        <th>Nilai HPP</th>
+        <th>Laba Kotor</th>
         <th>Nama Barang</th>
         <th>Nama Pelanggan</th>
         <th>Nama Penjual</th>
       </tr>
     </thead>
     <tbody>
-      <?php
-      $currentCustomer = null; // Variabel untuk melacak pelanggan saat ini
-      foreach ($data as $value) :
-        if (isset($value['is_customer'])) {
-          // Hanya tampilkan nama pelanggan jika belum ditampilkan
-          if ($currentCustomer !== $value['no_faktur']) {
-            $currentCustomer = $value['no_faktur'];
-      ?>
-            <tr>
-              <td colspan="9" style="font-weight: bold;"><?= $value['no_faktur'] ?></td>
-            </tr>
-          <?php
-          }
-        } elseif (isset($value['is_total'])) {
-          // Tampilkan total hanya untuk pelanggan yang sama
-          ?>
-          <tr>
-            <td colspan="5"></td>
-            <td style="font-weight: bold;"><?= $value['no_faktur'] ?></td>
-            <td colspan="3"></td>
+      <?php foreach ($data as $value) : ?>
+        <?php if (isset($value['is_customer']) && $value['is_customer']) : ?>
+          <tr class="group-row">
+            <td colspan="9"><?= $value['barang_name'] ?></td>
           </tr>
-        <?php
-        } else {
-        ?>
+        <?php elseif (isset($value['is_total']) && $value['is_total']) : ?>
+          <tr class="total-row">
+            <td colspan="9">Total</td>
+          </tr>
+        <?php else : ?>
           <tr>
             <td><?= $value['no_faktur'] ?></td>
             <td><?= $value['tanggal_faktur'] ?></td>
             <td><?= $value['keterangan'] ?></td>
-            <td><?= $value['qty_invoice'] ?></td>
+            <td style="text-align:right"><?= $value['qty_invoice'] ?></td>
             <td><?= $value['kode_satuan'] ?></td>
-            <td><?= $value['total_invoice'] ?></td>
+            <td style="text-align:right"><?= $value['total_invoice'] ?></td>
             <td><?= $value['barang_name'] ?></td>
             <td><?= $value['nama_pelanggan'] ?></td>
             <td><?= $value['nama_sales'] ?></td>
           </tr>
-      <?php
-        }
-      endforeach;
-      ?>
+        <?php endif; ?>
+      <?php endforeach; ?>
     </tbody>
   </table>
 </body>
