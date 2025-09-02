@@ -1274,7 +1274,7 @@
         });
         // tampilkan clean (ga perlu paksa ".00", kalau mau tambahin ya boleh)
         $('#selectedItemTable tbody tr.grand-total td.total-cell')
-            .text(greatFormatRupiah(total));
+            .text(greatFormatQty(total));
     }
 
 

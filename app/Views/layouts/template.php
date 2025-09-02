@@ -93,18 +93,23 @@
 
     }
 
+    
     function greatFormatQty(value) {
         if (value == null || value === "") return "0.000";
 
-        // parsing kalau ada +
+        console.log(value); // taruh sebelum return
+        
         if (typeof value === "string" && value.includes("+")) {
             let parts = value.split("+").map(v => parseFloat(v.trim()) || 0);
             let sum = parts.reduce((a, b) => a + b, 0);
-            return sum.toFixed(3); // pastiin 3 angka belakang koma
+
+            console.log(parts, sum); // taruh sebelum return
+
+            return (Math.round(sum * 1000) / 1000).toFixed(3); 
         }
 
         let num = parseFloat(value) || 0;
-        return num.toFixed(3); // pastiin 3 angka belakang koma
+        return (Math.round(num * 1000) / 1000).toFixed(3); 
     }
 
 
