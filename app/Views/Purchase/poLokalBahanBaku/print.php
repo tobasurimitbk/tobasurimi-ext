@@ -625,6 +625,10 @@
         </div>
 
         <div class=" <?= $dataPO->lpb == null ? '' : 'pagebreak' ?>">
+                <div style="border: 3px solid;border-style: double;width: 60%;padding: 0.5rem;">
+                    <?= strtoupper($dataPO->holding_company) ?> (<?= $dataPO->companyName ?>)<br>
+                    <?= $dataPO->companyAddress ?>
+                </div>
             <div style="padding: 0.5rem; text-align: center;">
                 <div style="text-decoration: underline; font-size: 1.2em;">KWITANSI TAMBAHAN</div>
                 <div>NO. NOTA : <?= $dataPO->po_no ?></div>

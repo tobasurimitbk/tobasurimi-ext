@@ -105,12 +105,13 @@
                                 <th onclick="changeSort('divisi')" class="sort">Dept</th>
                                 <th onclick="changeSort('po_date')" class="sort">Tgl PO</th>
                                 <th onclick="changeSort('po_no')" class="sort">No PO</th>
+                                <th onclick="changeSort('spp_no')" class="sort">No SPP</th>
                                 <th onclick="changeSort('supplier_id')" class="sort">Supplier</th>
                                 <th onclick="changeSort('kode_barang')" class="sort">Kode Barang</th>
                                 <th onclick="changeSort('barang_name')" class="sort">Nama Barang</th>
+                                <th onclick="changeSort('spesifikasi')" class="sort">Spesifikasi</th>
                                 <th onclick="changeSort('satuan_id')" class="sort">Satuan</th>
                                 <th onclick="changeSort('uraian')" class="sort">Keterangan</th>
-                                <th onclick="changeSort('spesifikasi')" class="sort">Spesifikasi</th>
                                 <th onclick="changeSort('qty_order')" class="sort">Jml Order</th>
                                 <th onclick="changeSort('qty_diterima')" class="sort">Jml Diterima</th>
                                 <th onclick="changeSort('qty_sisa')" class="sort">Sisa</th>
@@ -121,7 +122,7 @@
                         </tbody>
                         <tfoot id="grandTotalHargaPrev">
                             <tr>
-                                <th colspan="13" class="text-right">GRAND TOTAL</th>
+                                <th colspan="14" class="text-right">GRAND TOTAL</th>
                                 <th class="text-left grandTotalHarga"></th>
                             </tr>
                         </tfoot>
@@ -195,6 +196,10 @@
                 className: "text-left",
             },
             {
+                data: "spp_no",
+                className: "text-left",
+            },
+            {
                 data: "supplier_name",
                 className: "text-left",
             },
@@ -207,15 +212,15 @@
                 className: "text-left",
             },
             {
+                data: "spesifikasi",
+                className: "text-left",
+            },
+            {
                 data: "kode_satuan",
                 className: "text-left",
             },
             {
                 data: "uraian",
-                className: "text-left",
-            },
-            {
-                data: "spesifikasi",
                 className: "text-left",
             },
             {

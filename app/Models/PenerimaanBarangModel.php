@@ -568,7 +568,7 @@ class PenerimaanBarangModel extends Model
 
         // MASUKKAN STOK BARANG DAN KEMASAN JIKA NON PABEAN 
         // (JIKA ADA BC MASUK KE INVENTORI DI MODUL BEA CUKAI)
-        if ($rmDetail['bc_type'] == 0) {
+        if ($rmDetail['bc_type'] == 0 && $rmDetail['status_external'] == "no") {
 
             foreach ($rmBarangDetail as $r) {
                 // HANDLE STOK BARANG
@@ -712,8 +712,9 @@ class PenerimaanBarangModel extends Model
         $penerimaanBarangList = $penerimaanBarangDetailModel->where('penerimaan_barang_id', $lpbID)->where('deletedAt', null)->findAll();
 
         // NON PABEAN LANGSUNG INPUTKAN STOK NYA
-        if ($penerimaanBarang['bc_type'] == 0) {
+        if ($penerimaanBarang['bc_type'] == 0 && $rmDetail['status_external'] == "no") {
             // STOK BARANG DIINPUT
+            // KHUSUS INTERNAL
             foreach ($penerimaanBarangList as $p) {
                 // HEADER
                 $stok = $stockModel->insertStok(
@@ -910,6 +911,7 @@ class PenerimaanBarangModel extends Model
             'qty_order'       => 'qty_order',
             'qty_diterima'    => 'qty_diterima',
             'total_harga'     => 'rm_purchase_orders.total_before_pph',
+            'harga_satuan'    => 'penerimaan_barang_detail.harga'
         ];
         $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
 
@@ -1092,6 +1094,7 @@ class PenerimaanBarangModel extends Model
             'qty_order'       => 'qty_order',
             'qty_diterima'    => 'qty_diterima',
             'total_harga'     => 'penerimaan_barang_detail.sub_total',
+            'harga_satuan'    => 'penerimaan_barang_detail.harga'
         ];
         $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
 
@@ -1118,6 +1121,7 @@ class PenerimaanBarangModel extends Model
             am_purchase_orders.po_date,
             am_purchase_orders.po_no,
             penerimaan_barang_detail.sub_total AS total_harga,
+            penerimaan_barang_detail.harga AS harga_satuan,
             tb_valas.value AS valas_name,
             parent_barang.parent_name AS kategori_barang
         ";
@@ -1277,6 +1281,7 @@ class PenerimaanBarangModel extends Model
             'qty_order'       => 'qty_order',
             'qty_diterima'    => 'qty_diterima',
             'total_harga'     => 'penerimaan_barang_detail.sub_total',
+            'harga_satuan'    => 'penerimaan_barang_detail.harga'
         ];
         $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
 
@@ -1303,6 +1308,7 @@ class PenerimaanBarangModel extends Model
             am_purchase_orders.po_date,
             am_purchase_orders.po_no,
             penerimaan_barang_detail.sub_total AS total_harga,
+            penerimaan_barang_detail.harga AS harga_satuan,
             tb_valas.value AS valas_name,
             parent_barang.parent_name AS kategori_barang
         ";
@@ -1462,6 +1468,7 @@ class PenerimaanBarangModel extends Model
             'qty_order'       => 'qty_order',
             'qty_diterima'    => 'qty_diterima',
             'total_harga'     => 'penerimaan_barang_detail.total',
+            'harga_satuan'    => 'penerimaan_barang_detail.harga'
         ];
         $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
 
@@ -1488,6 +1495,7 @@ class PenerimaanBarangModel extends Model
             rm_import_pos.po_date,
             rm_import_pos.po_no,
             penerimaan_barang_detail.sub_total AS total_harga,
+            penerimaan_barang_detail.harga AS harga_satuan,
             tb_valas.value AS valas_name,
             parent_barang.parent_name AS kategori_barang
         ";
