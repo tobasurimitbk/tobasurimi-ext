@@ -401,11 +401,23 @@ class PenerimaanBarangLokalBP extends BaseController
             ]);
         }
 
+        $noPenerimaanBarang = $this->request->getVar('no_penerimaan_barang');
+        $tanggal = $this->request->getVar("tanggal_penerimaan_lpb") ? date_format(date_create_from_format("d/m/Y", $this->request->getVar("tanggal_penerimaan_lpb")), "Y-m-d") : "";
+        if ($noPenerimaanBarang == "AUTO GENERATE") {
+            $noPenerimaanBarang = $this->penerimaanBarangModel->get_no(
+                $tanggal,
+                $this->this_company_id,
+                "LOKAL",
+                "PENOLONG"
+            );
+        }
+
         $first = $this->penerimaanBarangModel->where('company_id', $this->this_company_id)
             ->where('no_penerimaan_barang', $this->request->getVar('no_penerimaan_barang'))
             ->where('status_penerimaan', "LOKAL")
             ->where('tipe_bahan', "PENOLONG")
             ->first();
+
         if ($first != null) {
             return response()->setJSON([
                 'token' => csrf_hash(),
@@ -421,7 +433,7 @@ class PenerimaanBarangLokalBP extends BaseController
             'divisi_id' => $this->request->getVar('divisi_id'),
             'kemasan_id' => $this->request->getVar('kemasan_id'),
             'warehouse_id' => $this->request->getVar('warehouse_id'),
-            'no_penerimaan_barang' => $this->request->getVar('no_penerimaan_barang'),
+            'no_penerimaan_barang' => $noPenerimaanBarang,
             "ongkos_kirim" => $this->request->getVar('ongkos_kirim'),
             'acceptance_type' => $this->request->getVar('acceptance_type'),
             'multiple_po_id' => str_replace(['\\"', '\\', '"'], '', json_encode($this->request->getVar('multiple_po_id'))),
@@ -433,7 +445,7 @@ class PenerimaanBarangLokalBP extends BaseController
             "tipe_bahan" => "PENOLONG",
             "status_post" => "WAITING",
             "status_penerimaan" => "LOKAL",
-            "tanggal" => $this->request->getVar("tanggal_penerimaan_lpb") ? date_format(date_create_from_format("d/m/Y", $this->request->getVar("tanggal_penerimaan_lpb")), "Y-m-d") : "",
+            "tanggal" => $tanggal,
         ]);
 
         foreach (json_decode($barangs) as $b) {
@@ -526,6 +538,22 @@ class PenerimaanBarangLokalBP extends BaseController
             ]);
         }
 
+        $noPenerimaanBarang = $this->request->getVar('no_penerimaan_barang');
+        $first = $this->penerimaanBarangModel->where('company_id', $this->this_company_id)
+            ->where('no_penerimaan_barang', $this->request->getVar('no_penerimaan_barang'))
+            ->where('status_penerimaan', "LOKAL")
+            ->where('tipe_bahan', "PENOLONG")
+            ->where('id !=', $id)
+            ->first();
+
+        if ($first != null) {
+            return response()->setJSON([
+                'token' => csrf_hash(),
+                'message' => "No Penerimaan Barang Sudah Ada",
+                'status' => false
+            ]);
+        }
+
         $this->penerimaanBarangModel->update($id, [
             'company_id' => $this->this_company_id,
             'bc_type' => $this->request->getVar('aju_document_type'),
@@ -534,7 +562,7 @@ class PenerimaanBarangLokalBP extends BaseController
             'kemasan_id' => $this->request->getVar('kemasan_id'),
             "ongkos_kirim" => $this->request->getVar('ongkos_kirim'),
             'warehouse_id' => $this->request->getVar('warehouse_id'),
-            'no_penerimaan_barang' => $this->request->getVar('no_penerimaan_barang'),
+            'no_penerimaan_barang' => $noPenerimaanBarang,
             'acceptance_type' => $this->request->getVar('acceptance_type'),
             'multiple_po_id' => str_replace(['\\"', '\\', '"'], '', json_encode($this->request->getVar('multiple_po_id'))),
             'multiple_po_no' => $this->request->getVar('multiple_po_no'),

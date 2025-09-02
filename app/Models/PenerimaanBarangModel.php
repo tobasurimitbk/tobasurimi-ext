@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use CodeIgniter\Model;
+use Doctrine\Instantiator\Exception\InvalidArgumentException;
 
 class PenerimaanBarangModel extends Model
 {
@@ -415,71 +416,127 @@ class PenerimaanBarangModel extends Model
         return $sppData;
     }
 
-    public function get_no($bln, $thn, $warehouseKode, $statusPenerimaan, $tipeBahan, $prefix)
+    public function get_no($tanggal, $companyId, $statusPenerimaan, $tipeBahan)
     {
-        $lastStr = convertBulanToAngkaRomawi($bln) . '/' . $thn;
-        $first_day = "$thn-$bln-01";
-        $last_day = date("Y-m-t", strtotime($first_day));
+        // Validasi input
+        if (empty($tanggal) || empty($companyId) || empty($statusPenerimaan) || empty($tipeBahan)) {
+            throw new InvalidArgumentException("Semua parameter harus diisi");
+        }
 
+        // Validasi format tanggal
+        if (!strtotime($tanggal)) {
+            throw new InvalidArgumentException("Format tanggal tidak valid");
+        }
+
+        // Ambil Tanggal
+        $tanggalArr = explode('-', $tanggal);
+        if (count($tanggalArr) < 3) {
+            throw new InvalidArgumentException("Format tanggal harus YYYY-MM-DD");
+        }
+
+        $bulanF = $tanggalArr[1];
+        $tahunF = date('y', strtotime($tanggal)); // Output contoh: 25
+
+        // Template dasar
+        $template = '';
+
+        // Mapping berdasarkan companyId
+        if ($companyId == 1) {
+            $prefix = ($statusPenerimaan == "LOKAL") ? "" : "IMP/";
+            if ($tipeBahan == "BAKU") {
+                $template = "LBB/F/" . $prefix . $bulanF . $tahunF;
+            } elseif ($tipeBahan == "PENOLONG") {
+                $template = "LPB/F/" . $prefix . $bulanF . $tahunF;
+            }
+        } elseif ($companyId == 2) {
+            $prefix = ($statusPenerimaan == "LOKAL") ? "" : "IMP/";
+            if ($tipeBahan == "BAKU") {
+                $template = "LBB/" . $prefix . $bulanF . $tahunF;
+            } elseif ($tipeBahan == "PENOLONG") {
+                $template = "LPB/" . $prefix . $bulanF . $tahunF;
+            }
+        } elseif ($companyId == 15) {
+            $prefix = ($statusPenerimaan == "LOKAL") ? "" : "IMP/";
+            if ($tipeBahan == "BAKU") {
+                $template = "LBB/" . $prefix . "G/" . $bulanF . $tahunF;
+            } elseif ($tipeBahan == "PENOLONG") {
+                $template = "LPB/" . $prefix . "G/" . $bulanF . $tahunF;
+            }
+        } elseif ($companyId == 16) {
+            $prefix = ($statusPenerimaan == "LOKAL") ? "" : "IMP/";
+            if ($tipeBahan == "BAKU") {
+                $template = "LBB/" . $prefix . "O/" . $bulanF . $tahunF;
+            } elseif ($tipeBahan == "PENOLONG") {
+                $template = "LPB/" . $prefix . "O/" . $bulanF . $tahunF;
+            }
+        }
+
+        // Jika template masih kosong, berarti kombinasi parameter tidak valid
+        if (empty($template)) {
+            throw new InvalidArgumentException("Kombinasi parameter tidak valid");
+        }
+
+        // Hitung tanggal akhir bulan
+        $lastDayOfMonth = date('Y-m-t', strtotime($tanggal));
+        $startDayOfMonth = date('Y-m') . "-01";
+
+        // Query cari nomor terakhir
         $builder = $this->db->table('penerimaan_barang');
         $builder->select('no_penerimaan_barang');
-        $builder->orderBy('no_penerimaan_barang', 'asc');
-        $builder->where('company_id', session()->get("login")->this_company_id);
-        $builder->where('status_penerimaan', $statusPenerimaan);
-        $builder->where('tipe_bahan', $tipeBahan);
-        $builder->where('tanggal >=', $first_day);
-        $builder->where('tanggal <=', $last_day);
-        $builder->where('penerimaan_barang.deletedAt', null);
-        $builder->where('deletedAt', null);
-        $builder->like('no_penerimaan_barang', $lastStr);
+        $builder->orderBy('no_penerimaan_barang', 'desc');
+        $builder->where([
+            'company_id' => $companyId,
+            'status_penerimaan' => $statusPenerimaan,
+            'tipe_bahan' => $tipeBahan,
+            'deletedAt' => null
+        ]);
+        $builder->where('tanggal >=', $startDayOfMonth);
+        $builder->where('tanggal <=', $lastDayOfMonth);
+        $builder->like('no_penerimaan_barang', $template, 'after');
         $query = $builder->get();
 
-        $kode = $prefix . '/' . $warehouseKode;
-
+        // Ambil semua existing number
         $existingNumbers = [];
+        foreach ($query->getResultArray() as $row) {
+            $string = $row['no_penerimaan_barang'];
+            $explode = explode('/', $string);
+            $last = end($explode);
 
-        // Ambil semua nomor yang sudah ada
-        if (!empty($query->getResultArray())) {
-            foreach ($query->getResultArray() as $string) {
-                $explode = explode('/', $string['no_penerimaan_barang']);
-                if (isset($explode[2]) && is_numeric($explode[2])) {
-                    $existingNumbers[] = intval($explode[2]);
+            // Pastikan bagian terakhir adalah angka
+            if (is_numeric($last)) {
+                $existingNumbers[] = intval($last);
+            }
+        }
+
+        // Jika tidak ada nomor yang ada, mulai dari 1
+        if (empty($existingNumbers)) {
+            $nextNumber = 1;
+        } else {
+            // Urutkan dan cari celah
+            sort($existingNumbers);
+            $nextNumber = 1;
+
+            foreach ($existingNumbers as $num) {
+                if ($num > $nextNumber) {
+                    // Ditemukan celah, gunakan celah ini
+                    break;
                 }
+                $nextNumber = $num + 1;
             }
         }
 
-        // Cari celah nomor atau gunakan nomor berikutnya
-        $lastPenerimaan = 1; // Nomor awal default
-        sort($existingNumbers); // Pastikan daftar nomor diurutkan
-
-        $foundGap = false; // Flag untuk mendeteksi celah
-
-        foreach ($existingNumbers as $number) {
-            if ($number != $lastPenerimaan) {
-                // Jika ada celah, gunakan nomor yang hilang
-                $foundGap = true;
-                break;
-            }
-            $lastPenerimaan++;
+        // Format nomor
+        if ($statusPenerimaan == "LOKAL" && $tipeBahan == "BAKU") {
+            // Lima digit
+            $formattedNumber = sprintf("%05d", $nextNumber);
+        } else {
+            // Empat digit
+            $formattedNumber = sprintf("%04d", $nextNumber);
         }
 
-        if (!$foundGap) {
-            // Jika tidak ada celah, lanjutkan dari nomor terakhir
-            $lastPenerimaan = empty($existingNumbers) ? 1 : end($existingNumbers) + 1;
-        }
-
-        // \var_dump($lastPenerimaan);
-        // die;
-
-        // Format nomor dengan dua digit
-        $formattedLastPenerimaan = sprintf("%02d", $lastPenerimaan);
-        $generatedNo = $kode . '/' . $formattedLastPenerimaan . '/' . $lastStr;
-        // \var_dump($generatedNo);
-        // die;
-        return $generatedNo;
+        // Hasil akhir
+        return $template . '/' . $formattedNumber;
     }
-
-
 
     public function getReceivedItemsBySupplier($supplierId, $condition = [], $limit = 10, $offset = 0)
     {
@@ -622,13 +679,14 @@ class PenerimaanBarangModel extends Model
 
         // no lpb
         $warehouseModel = new WarehousesModel();
-        $divisiModel = new DivisisModel();
         $warehouse = $warehouseModel->where('id', $warehouseID)->first();
-        $divisi = $divisiModel->where('id', $warehouse['divisi_id'])->first();
-        $tanggalExplode = explode('-', $rmDetail['po_date']);
-        $year = $tanggalExplode[0];
-        $month = $tanggalExplode[1];
-        $no = $penerimaanBarangModel->get_no($month, $year, $divisi['divisi'], "LOKAL", "BAKU", "LPB-LBB");
+        $no = $penerimaanBarangModel->get_no(
+            $rmDetail['po_date'],
+            $rmDetail['company_id'],
+            "LOKAL",
+            "BAKU",
+        );
+
 
         $payloadPenerimaanBarang = [
             "company_id" => $rmDetail['company_id'],

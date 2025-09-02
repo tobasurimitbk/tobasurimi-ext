@@ -330,16 +330,18 @@ class POLokalBahanBaku extends BaseController
                 ->first();
         }
 
+        $po_date = $this->request->getVar("po_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getVar("po_date")))) : "";
+
         if ($first != null) {
             // GENERATE YANG BARU
-            $po_no = $this->getNumberPo();
+            $po_no = $this->getNumberPoStr($po_date);
         } else {
             // AMBIL YANG LAMA
             $po_no = $this->request->getVar("po_no");
         }
 
         $statusEksternal = "no";
-        if(session()->get('login')->user_id == 119){
+        if (session()->get('login')->user_id == 119) {
             // Jika user bu nopita
             $statusEksternal = "yes";
         }
@@ -356,7 +358,7 @@ class POLokalBahanBaku extends BaseController
             "jumlah_kemasan" => $this->request->getVar('jumlah_kemasan'),
             "kemasan_tambahan" => $this->request->getVar('kemasan_tambahan'),
             "po_no" =>  $po_no,
-            "po_date" => $this->request->getVar("po_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getVar("po_date")))) : "",
+            "po_date" => $po_date,
             "pph" => $this->request->getVar("pph"),
             "cong_sebenarnya" => $this->request->getVar("cong_sebenarnya") ? formatter($this->request->getVar("cong_sebenarnya"), "STR_TO_INT") : 0,
             "cong_batasan" => $this->request->getVar("cong_batasan") ? formatter($this->request->getVar("cong_batasan"), "STR_TO_INT") : 0,
@@ -668,7 +670,7 @@ class POLokalBahanBaku extends BaseController
                     // cek if warehouse_id != null
                     if ($detail['warehouse_id'] != null && $detail['warehouse_id'] != 0) {
                         $penerimaanBarangId = $this->penerimaanBarangModel->generateLpbBB($detail['id'], $detail['warehouse_id'], $detail['bc_type'], $detail['po_date']);
-                        if($detail['status_external'] == "no"){
+                        if ($detail['status_external'] == "no") {
                             // JIka Status Eksternal Tidak Maka ga masuk kedalam stok
                             $result = $this->jurnalController->insertDataPembelian($id, "BAHAN BAKU", "LOKAL", "pembelian", $penerimaanBarangId);
 
@@ -688,7 +690,6 @@ class POLokalBahanBaku extends BaseController
                                 }
                             }
                         }
-                       
                     }
                 }
                 $this->RMPurchaseOrderModel->update($id, $payload);
@@ -971,7 +972,7 @@ class POLokalBahanBaku extends BaseController
                 // Siapkan data sebagai array untuk view
                 $data = (array) $dataPO;
             }
-            
+
             $filename = "Bukti Pengeluaran Bahan Baku";
             $this->dompdf->loadHtml(view('Purchase/poLokalBahanBaku/print-pengeluaran', $data));
             $width_mm = 216;
@@ -1212,6 +1213,22 @@ class POLokalBahanBaku extends BaseController
     {
         // yyyy-mm-dd
         $tanggal = date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("tanggal"))));
+        $tanggalExplode = explode('-', $tanggal);
+        $year = $tanggalExplode[0];
+        $month = $tanggalExplode[1];
+
+        $no = $this->RMPurchaseOrderModel->get_new_no_po(
+            $month,
+            $year,
+            $this->this_company_id
+        );
+
+        return $no;
+    }
+
+    public function getNumberPoStr($tanggal)
+    {
+        // yyyy-mm-dd
         $tanggalExplode = explode('-', $tanggal);
         $year = $tanggalExplode[0];
         $month = $tanggalExplode[1];

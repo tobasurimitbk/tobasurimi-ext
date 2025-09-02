@@ -86,7 +86,7 @@
 </head>
 
 <body>
-    <?php for ($i = 0; $i < 3; $i++): ?>
+    <?php for ($i = 0; $i < 2; $i++): ?>
         <div class="txt-center txt-bold" style="margin-top:-30px;"> <b>SURAT PERMINTAAN PEMBELIAN </b></div>
         <?php if (!empty($dataSPP)) { ?>
             <table class="mt-5">
@@ -108,8 +108,8 @@
                         <td class="table-border" style="width: 50px;"><b class="table-font-size">Qty</b></td>
                         <td class="table-border" style="width: 140px;"><b class="table-font-size">Keterangan</b></td>
                         <td class="table-border" style="width: 40px;"><b class="table-font-size">Supplier</b></td>
-                        <td class="table-border" style="width: 40px;"><b class="table-font-size">Harga</b></td>
-                        <td class="table-border" style="width: 40px;"><b class="table-font-size">PBP</b></td>
+                        <td class="table-border" style="width: 80px;"><b class="table-font-size">Harga</b></td>
+                        <!-- <td class="table-border" style="width: 40px;"><b class="table-font-size">PBP</b></td> -->
                     </tr>
                 </thead>
                 <tbody>
@@ -124,7 +124,7 @@
                             <td class="table-border"><b class="table-font-size"><?= $detail->note ?></b></td>
                             <td class="table-border"></td>
                             <td class="table-border"></td>
-                            <td class="table-border"></td>
+                            <!-- <td class="table-border"></td> -->
                         </tr>
                     <?php } ?>
                 </tbody>
