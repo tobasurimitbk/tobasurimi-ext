@@ -8,7 +8,7 @@
     <style>
         body {
             height: 100%;
-            font-size: 13px;
+            font-size: 12px;
             font-family: 'Times New Roman', Times, serif;
             text-transform: uppercase;
             /* font-weight: normal; */
@@ -309,7 +309,9 @@
         <div class="pagebreak">
             <div class="w-100 d-flex content-between">
                 <div style="width: 70%;padding: 0.5rem;">
-                    <?= strtoupper($dataPO->holding_company) ?> (<?= $dataPO->companyName ?>)<br>
+                    <div style="font-size: 14px;">
+                        <?= strtoupper($dataPO->holding_company) ?> (<?= $dataPO->companyName ?>)
+                    </div>
                     <?= $dataPO->companyAddress ?>
                 </div>
             </div><br>
@@ -359,29 +361,29 @@
                 foreach ($dataPODetail as $detail) {
                 ?>
                     <tr>
-                        <td style="border-left: 1px solid black; border-right: 1px solid black; height:5%;font-size:13px;"><?= $detail->peti ?></td>
-                        <td style="border-left: 1px solid black; border-right: 1px solid black; height:5%;font-size:13px;"><?= $dataPO->divisi ?></td>
-                        <td style="border-left: 1px solid black; border-right: 1px solid black; height:5%;font-size:13px;"><?= $detail->note ?></td>
-                        <td class="txt-right" style="border-left: 1px solid black; border-right: 1px solid black; height:5%;font-size:13px;"><?= $detail->qty ?></td>
+                        <td style="border-left: 1px solid black; border-right: 1px solid black;font-size:12px;"><?= $detail->peti ?></td>
+                        <td style="border-left: 1px solid black; border-right: 1px solid black;font-size:12px;"><?= $dataPO->divisi ?></td>
+                        <td style="border-left: 1px solid black; border-right: 1px solid black;font-size:12px;"><?= $detail->note ?></td>
+                        <td class="txt-right" style="border-left: 1px solid black; border-right: 1px solid black;font-size:12px;"><?= $detail->qty ?></td>
 
                         <?php if ($dataPO->pph === "None") {
                             $nilai_total_harian += ($detail->daily_price) * formatter($detail->qty, "STR_TO_FLOAT");
                             $nilai_total += ($detail->general_price) * formatter($detail->qty, "STR_TO_FLOAT");
                         ?>
-                            <td class="txt-right" style="border-left: 1px solid black; border-right: 1px solid black; height:5%;font-size:13px;"><?= number_format($detail->general_price, 2, '.', ',') ?></td>
-                            <td class="txt-right" style="border-left: 1px solid black; border-right: 1px solid black; height:5%;font-size:13px;"><?= number_format($detail->general_price * formatter($detail->qty, "STR_TO_FLOAT"), 2, '.', ',') ?></td>
+                            <td class="txt-right" style="border-left: 1px solid black; border-right: 1px solid black;font-size:12px;"><?= number_format($detail->general_price, 2, '.', ',') ?></td>
+                            <td class="txt-right" style="border-left: 1px solid black; border-right: 1px solid black;font-size:12px;"><?= number_format($detail->general_price * formatter($detail->qty, "STR_TO_FLOAT"), 2, '.', ',') ?></td>
                         <?php } elseif ($dataPO->pph === "Supplier") {
                             $nilai_total_harian += ($detail->daily_price) * formatter($detail->qty, "STR_TO_FLOAT");
                             $nilai_total += ($detail->general_price) * formatter($detail->qty, "STR_TO_FLOAT");
                         ?>
-                            <td class="txt-right" style="border-left: 1px solid black; border-right: 1px solid black; height:5%;font-size:13px;"><?= number_format($detail->general_price, 2, '.', ',') ?></td>
-                            <td class="txt-right" style="border-left: 1px solid black; border-right: 1px solid black; height:5%;font-size:13px;"><?= number_format($detail->general_price * formatter($detail->qty, "STR_TO_FLOAT"), 2, '.', ',') ?></td>
+                            <td class="txt-right" style="border-left: 1px solid black; border-right: 1px solid black;font-size:12px;"><?= number_format($detail->general_price, 2, '.', ',') ?></td>
+                            <td class="txt-right" style="border-left: 1px solid black; border-right: 1px solid black;font-size:12px;"><?= number_format($detail->general_price * formatter($detail->qty, "STR_TO_FLOAT"), 2, '.', ',') ?></td>
                         <?php } elseif ($dataPO->pph === "Company") {
                             $nilai_total_harian += ($detail->daily_price / $dataPO->nilai_pph) * formatter($detail->qty, "STR_TO_FLOAT");
                             $nilai_total += ($detail->general_price / $dataPO->nilai_pph) * formatter($detail->qty, "STR_TO_FLOAT");
                         ?>
-                            <td class="txt-right" style="border-left: 1px solid black; border-right: 1px solid black; height:5%;font-size:13px;"><?= number_format(($detail->general_price / $dataPO->nilai_pph), 2, '.', ',') ?></td>
-                            <td class="txt-right" style="border-left: 1px solid black; border-right: 1px solid black; height:5%;font-size:13px;"><?= number_format(($detail->general_price / $dataPO->nilai_pph) * formatter($detail->qty, "STR_TO_FLOAT"), 2, '.', ',') ?></td>
+                            <td class="txt-right" style="border-left: 1px solid black; border-right: 1px solid black;font-size:12px;"><?= number_format(($detail->general_price / $dataPO->nilai_pph), 2, '.', ',') ?></td>
+                            <td class="txt-right" style="border-left: 1px solid black; border-right: 1px solid black;font-size:12px;"><?= number_format(($detail->general_price / $dataPO->nilai_pph) * formatter($detail->qty, "STR_TO_FLOAT"), 2, '.', ',') ?></td>
                         <?php } ?>
                     </tr>
                 <?php } ?>
@@ -456,9 +458,11 @@
         <div class="pagebreak" style="padding-top: 10px;">
             <div class="w-100 d-flex content-between">
                 <div style="width: 70%;padding: 0.5rem;">
-                    <?= strtoupper($dataPO->holding_company) ?> (<?= $dataPO->companyName ?>)<br>
+                    <div style="font-size: 14px;">
+                        <?= strtoupper($dataPO->holding_company) ?> (<?= $dataPO->companyName ?>)
+                    </div>
                     <?= $dataPO->companyAddress ?>
-                </div>
+                </div><br>
                 <div style="padding: 0.5rem; text-align: center;">
                     <div style="text-decoration: underline; font-size: 1.2em;">
                         KWITANSI<br>
@@ -543,9 +547,11 @@
         <div class="pagebreak" style="padding-top: 10px;">
             <div class="w-100 d-flex content-between">
                 <div style="width: 70%;padding: 0.5rem;">
-                    <?= strtoupper($dataPO->holding_company) ?> (<?= $dataPO->companyName ?>)<br>
+                    <div style="font-size: 14px;">
+                        <?= strtoupper($dataPO->holding_company) ?> (<?= $dataPO->companyName ?>)
+                    </div>
                     <?= $dataPO->companyAddress ?>
-                </div>
+                </div><br>
                 <div style="padding: 0.5rem; text-align: center;">
                     <div style="text-decoration: underline; font-size: 1.2em;">KWITANSI HARIAN</div>
                     <div>No: <?= $dataPO->po_no ?></div>
@@ -626,9 +632,11 @@
 
         <div class=" <?= $dataPO->lpb == null ? '' : 'pagebreak' ?>">
             <div style="width: 70%;padding: 0.5rem;">
-                <?= strtoupper($dataPO->holding_company) ?> (<?= $dataPO->companyName ?>)<br>
+                <div style="font-size: 14px;">
+                    <?= strtoupper($dataPO->holding_company) ?> (<?= $dataPO->companyName ?>)
+                </div>
                 <?= $dataPO->companyAddress ?>
-            </div>
+            </div><br>
             <div style="padding: 0.5rem; text-align: center;">
                 <div style="text-decoration: underline; font-size: 1.2em;">KWITANSI TAMBAHAN</div>
                 <div>NO. NOTA : <?= $dataPO->po_no ?></div>
