@@ -308,7 +308,7 @@
     <?php if (!empty($dataPO) && !empty($dataPODetail)) { ?>
         <div class="pagebreak">
             <div class="w-100 d-flex content-between">
-                <div style="border: 3px solid;border-style: double;width: 60%;padding: 0.5rem;">
+                <div style="width: 60%;padding: 0.5rem;">
                     <?= strtoupper($dataPO->holding_company) ?> (<?= $dataPO->companyName ?>)<br>
                     <?= $dataPO->companyAddress ?>
                 </div>
@@ -455,7 +455,7 @@
 
         <div class="pagebreak" style="padding-top: 10px;">
             <div class="w-100 d-flex content-between">
-                <div style="border: 3px solid;border-style: double;width: 60%;padding: 0.5rem;">
+                <div style="width: 60%;padding: 0.5rem;">
                     <?= strtoupper($dataPO->holding_company) ?> (<?= $dataPO->companyName ?>)<br>
                     <?= $dataPO->companyAddress ?>
                 </div>
@@ -542,7 +542,7 @@
 
         <div class="pagebreak" style="padding-top: 10px;">
             <div class="w-100 d-flex content-between">
-                <div style="border: 3px solid;border-style: double;width: 60%;padding: 0.5rem;">
+                <div style="width: 60%;padding: 0.5rem;">
                     <?= strtoupper($dataPO->holding_company) ?> (<?= $dataPO->companyName ?>)<br>
                     <?= $dataPO->companyAddress ?>
                 </div>
@@ -625,10 +625,10 @@
         </div>
 
         <div class=" <?= $dataPO->lpb == null ? '' : 'pagebreak' ?>">
-                <div style="border: 3px solid;border-style: double;width: 60%;padding: 0.5rem;">
-                    <?= strtoupper($dataPO->holding_company) ?> (<?= $dataPO->companyName ?>)<br>
-                    <?= $dataPO->companyAddress ?>
-                </div>
+            <div style="width: 60%;padding: 0.5rem;">
+                <?= strtoupper($dataPO->holding_company) ?> (<?= $dataPO->companyName ?>)<br>
+                <?= $dataPO->companyAddress ?>
+            </div>
             <div style="padding: 0.5rem; text-align: center;">
                 <div style="text-decoration: underline; font-size: 1.2em;">KWITANSI TAMBAHAN</div>
                 <div>NO. NOTA : <?= $dataPO->po_no ?></div>

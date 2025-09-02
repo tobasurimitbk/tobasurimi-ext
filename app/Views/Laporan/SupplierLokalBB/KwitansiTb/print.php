@@ -170,7 +170,7 @@
                 No. Nota : <?= $noKwitansi ?>
             </div>
             <div class="w-50 d-flex content-between" style="margin-top: -40px;">
-                <div style="border: 3px solid;border-style: double;width: 60%;padding: 0.5rem;">
+                <div style="width: 60%;padding: 0.5rem;">
                     <?= $company['holding_company'] ?> (<?= $company['company'] ?>) <br>
                 </div>
 
