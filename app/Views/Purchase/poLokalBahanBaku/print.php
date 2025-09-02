@@ -405,7 +405,7 @@
                 </tr>
                 <tr>
                     <td class="skip" colspan="5" style="border: none!important;text-align: right;height:5%;font-size:13px;">DIBAYARKAN</td>
-                    <td class="txt-right" style="border: 1px solid black;height:5%;font-size:13px;">
+                    <td class="txt-right" style="border: 1px solid black;height:5%;font-size:14px;">
                         <?php
                         if ($dataPO->pph === "Company" || $dataPO->pph === "Supplier") {
                             echo number_format($nilai_total - ($nilai_total * $dataPO->nilai_pph2), 2, '.', ',');
@@ -494,12 +494,12 @@
             </table>
 
             <table class="mt-1" style="width: 30%;border: 0;border-bottom: 3px solid;border-style: double;">
-                <tr style="font-size:13px;">
+                <tr style="font-size:14px;">
                     <td>Bruto</td>
                     <td>Rp.</td>
                     <td class="txt-right"><?= number_format(formatter($nilai_total, "STR_TO_FLOAT"), 2, '.', ',') ?></td>
                 </tr>
-                <tr style="font-size:13px;">
+                <tr style="font-size:14px;">
                     <td>PPh</td>
                     <td>Rp.</td>
                     <?php if ($dataPO->pph === "Company" || $dataPO->pph === "Supplier") { ?>
@@ -513,7 +513,7 @@
                     <td>Rp.</td>
                     <td class="txt-right"><?= number_format(formatter($dataPO->subsidi_langsung, "STR_TO_FLOAT"), 2, '.', ',') ?></td>
                 </tr> -->
-                <tr style="font-size:13px;">
+                <tr style="font-size:14px;">
                     <td>Dibayarkan</td>
                     <td>Rp.</td>
                     <?php if ($dataPO->pph === "Company") { ?>
@@ -584,12 +584,12 @@
             </table>
 
             <table class="mt-05" style="width: 30%;border: 0;border-bottom: 3px solid;border-style: double;">
-                <tr style="font-size:13px;">
+                <tr style="font-size:14px;">
                     <td>Bruto</td>
                     <td>Rp.</td>
                     <td class="txt-right"><?= number_format(formatter($nilai_total_harian, "STR_TO_FLOAT"), 2, '.', ',') ?></td>
                 </tr>
-                <tr class="table-bordered" style="font-size:13px;">
+                <tr class="table-bordered" style="font-size:14px;">
                     <td>PPh</td>
                     <td>Rp.</td>
                     <?php if ($dataPO->pph === "Company" || $dataPO->pph === "Supplier") { ?>
@@ -603,7 +603,7 @@
                     <td>Rp.</td>
                     <td class="txt-right"><?= number_format(formatter($dataPO->subsidi_langsung, "STR_TO_FLOAT"), 2, '.', ',') ?></td>
                 </tr> -->
-                <tr style="font-size:13px;">
+                <tr style="font-size:14px;">
                     <td>Dibayarkan</td>
                     <td>Rp.</td>
                     <?php if ($dataPO->pph === "Company") { ?>
