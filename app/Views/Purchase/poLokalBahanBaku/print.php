@@ -9,7 +9,7 @@
         body {
             height: 100%;
             font-size: 12px;
-            font-family: 'Courier New', Courier, monospace;
+            font-family: 'Times New Roman', Times, serif;
             text-transform: uppercase;
             /* font-weight: normal; */
         }
