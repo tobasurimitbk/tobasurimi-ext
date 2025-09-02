@@ -8,7 +8,7 @@
     <style>
         body {
             height: 100%;
-            font-size: 12px;
+            font-size: 13px;
             font-family: 'Times New Roman', Times, serif;
             text-transform: uppercase;
             /* font-weight: normal; */
@@ -308,7 +308,7 @@
     <?php if (!empty($dataPO) && !empty($dataPODetail)) { ?>
         <div class="pagebreak">
             <div class="w-100 d-flex content-between">
-                <div style="width: 60%;padding: 0.5rem;">
+                <div style="width: 70%;padding: 0.5rem;">
                     <?= strtoupper($dataPO->holding_company) ?> (<?= $dataPO->companyName ?>)<br>
                     <?= $dataPO->companyAddress ?>
                 </div>
@@ -359,29 +359,29 @@
                 foreach ($dataPODetail as $detail) {
                 ?>
                     <tr>
-                        <td style="border-left: 1px solid black; border-right: 1px solid black;"><?= $detail->peti ?></td>
-                        <td style="border-left: 1px solid black; border-right: 1px solid black;"><?= $dataPO->divisi ?></td>
-                        <td style="border-left: 1px solid black; border-right: 1px solid black;"><?= $detail->note ?></td>
-                        <td class="txt-right" style="border-left: 1px solid black; border-right: 1px solid black;"><?= $detail->qty ?></td>
+                        <td style="border-left: 1px solid black; border-right: 1px solid black; height:5%;font-size:13px;"><?= $detail->peti ?></td>
+                        <td style="border-left: 1px solid black; border-right: 1px solid black; height:5%;font-size:13px;"><?= $dataPO->divisi ?></td>
+                        <td style="border-left: 1px solid black; border-right: 1px solid black; height:5%;font-size:13px;"><?= $detail->note ?></td>
+                        <td class="txt-right" style="border-left: 1px solid black; border-right: 1px solid black; height:5%;font-size:13px;"><?= $detail->qty ?></td>
 
                         <?php if ($dataPO->pph === "None") {
                             $nilai_total_harian += ($detail->daily_price) * formatter($detail->qty, "STR_TO_FLOAT");
                             $nilai_total += ($detail->general_price) * formatter($detail->qty, "STR_TO_FLOAT");
                         ?>
-                            <td class="txt-right" style="border-left: 1px solid black; border-right: 1px solid black;"><?= number_format($detail->general_price, 2, '.', ',') ?></td>
-                            <td class="txt-right" style="border-left: 1px solid black; border-right: 1px solid black;"><?= number_format($detail->general_price * formatter($detail->qty, "STR_TO_FLOAT"), 2, '.', ',') ?></td>
+                            <td class="txt-right" style="border-left: 1px solid black; border-right: 1px solid black; height:5%;font-size:13px;"><?= number_format($detail->general_price, 2, '.', ',') ?></td>
+                            <td class="txt-right" style="border-left: 1px solid black; border-right: 1px solid black; height:5%;font-size:13px;"><?= number_format($detail->general_price * formatter($detail->qty, "STR_TO_FLOAT"), 2, '.', ',') ?></td>
                         <?php } elseif ($dataPO->pph === "Supplier") {
                             $nilai_total_harian += ($detail->daily_price) * formatter($detail->qty, "STR_TO_FLOAT");
                             $nilai_total += ($detail->general_price) * formatter($detail->qty, "STR_TO_FLOAT");
                         ?>
-                            <td class="txt-right" style="border-left: 1px solid black; border-right: 1px solid black;"><?= number_format($detail->general_price, 2, '.', ',') ?></td>
-                            <td class="txt-right" style="border-left: 1px solid black; border-right: 1px solid black;"><?= number_format($detail->general_price * formatter($detail->qty, "STR_TO_FLOAT"), 2, '.', ',') ?></td>
+                            <td class="txt-right" style="border-left: 1px solid black; border-right: 1px solid black; height:5%;font-size:13px;"><?= number_format($detail->general_price, 2, '.', ',') ?></td>
+                            <td class="txt-right" style="border-left: 1px solid black; border-right: 1px solid black; height:5%;font-size:13px;"><?= number_format($detail->general_price * formatter($detail->qty, "STR_TO_FLOAT"), 2, '.', ',') ?></td>
                         <?php } elseif ($dataPO->pph === "Company") {
                             $nilai_total_harian += ($detail->daily_price / $dataPO->nilai_pph) * formatter($detail->qty, "STR_TO_FLOAT");
                             $nilai_total += ($detail->general_price / $dataPO->nilai_pph) * formatter($detail->qty, "STR_TO_FLOAT");
                         ?>
-                            <td class="txt-right" style="border-left: 1px solid black; border-right: 1px solid black;"><?= number_format(($detail->general_price / $dataPO->nilai_pph), 2, '.', ',') ?></td>
-                            <td class="txt-right" style="border-left: 1px solid black; border-right: 1px solid black;"><?= number_format(($detail->general_price / $dataPO->nilai_pph) * formatter($detail->qty, "STR_TO_FLOAT"), 2, '.', ',') ?></td>
+                            <td class="txt-right" style="border-left: 1px solid black; border-right: 1px solid black; height:5%;font-size:13px;"><?= number_format(($detail->general_price / $dataPO->nilai_pph), 2, '.', ',') ?></td>
+                            <td class="txt-right" style="border-left: 1px solid black; border-right: 1px solid black; height:5%;font-size:13px;"><?= number_format(($detail->general_price / $dataPO->nilai_pph) * formatter($detail->qty, "STR_TO_FLOAT"), 2, '.', ',') ?></td>
                         <?php } ?>
                     </tr>
                 <?php } ?>
@@ -455,7 +455,7 @@
 
         <div class="pagebreak" style="padding-top: 10px;">
             <div class="w-100 d-flex content-between">
-                <div style="width: 60%;padding: 0.5rem;">
+                <div style="width: 70%;padding: 0.5rem;">
                     <?= strtoupper($dataPO->holding_company) ?> (<?= $dataPO->companyName ?>)<br>
                     <?= $dataPO->companyAddress ?>
                 </div>
@@ -523,7 +523,7 @@
             </table>
 
 
-            <table class="w-100">
+            <table class="w-100" style="margin-top: 50px;">
                 <tr>
                     <td style="width: 70%;">
 
@@ -542,7 +542,7 @@
 
         <div class="pagebreak" style="padding-top: 10px;">
             <div class="w-100 d-flex content-between">
-                <div style="width: 60%;padding: 0.5rem;">
+                <div style="width: 70%;padding: 0.5rem;">
                     <?= strtoupper($dataPO->holding_company) ?> (<?= $dataPO->companyName ?>)<br>
                     <?= $dataPO->companyAddress ?>
                 </div>
@@ -611,7 +611,7 @@
             </table>
 
 
-            <table class="w-100">
+            <table class="w-100" style="margin-top: 50px;">
                 <td></td>
                 <td style="width: 30%;">
                     <div class="txt-center">
@@ -625,7 +625,7 @@
         </div>
 
         <div class=" <?= $dataPO->lpb == null ? '' : 'pagebreak' ?>">
-            <div style="width: 60%;padding: 0.5rem;">
+            <div style="width: 70%;padding: 0.5rem;">
                 <?= strtoupper($dataPO->holding_company) ?> (<?= $dataPO->companyName ?>)<br>
                 <?= $dataPO->companyAddress ?>
             </div>
@@ -813,10 +813,10 @@
                     <td class="sign-space" style="border: none!important;"></td>
                 </tr>
                 <tr>
-                    <td class="sign-name" style="border: none!important;">( &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; )</td>
-                    <td class="sign-name" style="border: none!important;">( &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; )</td>
-                    <td class="sign-name" style="border: none!important;">( &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; )</td>
-                    <td class="sign-name" style="border: none!important;">( &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; )</td>
+                    <td class="sign-name" style="border: none!important;">( &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; )</td>
+                    <td class="sign-name" style="border: none!important;">( &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; )</td>
+                    <td class="sign-name" style="border: none!important;">( &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; )</td>
+                    <td class="sign-name" style="border: none!important;">( &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; )</td>
                 </tr>
             </table>
         </div>
