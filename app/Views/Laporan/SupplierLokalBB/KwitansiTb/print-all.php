@@ -8,7 +8,7 @@
     <style>
         body {
             font-size: 12px;
-            font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+            font-family: 'Times New Roman', Times, serif;
             width: 8.27in;
             height: 13in;
             margin: 0;
@@ -172,21 +172,29 @@
             <?php foreach ($chunk as $index => $d): ?>
                 <div class="section">
                     <div class="fold-mark fold-mark-1"></div>
+                    <div class="d-flex content-between" style="margin-top: 0px;">
+                        <table style="width: 100%;">
+                            <tr>
+                                <td style="font-size:14px;">
+                                    <?= $d["company"]["holding_company"] ?> (<?= $d["company"]["company"] ?>)
 
-                    <div style="text-align: right;">
-                        <u>Tanggal: <?= date(
-                                        "d-m-Y",
-                                        strtotime($d["tanggal"])
-                                    ) ?></u>
-                        <br><br>
-                        KWITANSI BULANAN <br>
-                        No. Nota : <?= $d["noKwitansi"] ?>
-                    </div>
+                                </td>
+                                <td style="text-align: right;">
+                                    <u>Tanggal: <?= date(
+                                                    "d-m-Y",
+                                                    strtotime($d["tanggal"])
+                                                ) ?></u>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td></td>
+                                <td style="text-align: right;">
+                                    KWITANSI BULANAN <br>
+                                    No. Nota : <?= $d["noKwitansi"] ?>
+                                </td>
+                            </tr>
+                        </table>
 
-                    <div class="w-50 d-flex content-between" style="margin-top: 0px;">
-                        <div style="width: 60%;padding: 0.5rem;">
-                            <?= $d["company"]["holding_company"] ?> (<?= $d["company"]["company"] ?>)
-                        </div>
                     </div>
 
                     <table class="w-100 mt-2">
@@ -219,8 +227,8 @@
                         </tr>
                     </table>
 
-                    <table class="mt-1" style="width: 30%;border: 0;border-bottom: 3px solid;border-style: double;">
-                        <tr>
+                    <table class="mt-1" style="width: 30%;border: 0;border-bottom: 3px solid;border-style: double; margin-top:15px;">
+                        <tr style="font-size:14px;">
                             <td>Bruto</td>
                             <td>Rp.</td>
                             <td class="txt-right"><?= number_format(
@@ -230,7 +238,7 @@
                                                         ","
                                                     ) ?></td>
                         </tr>
-                        <tr>
+                        <tr style="font-size:14px;">
                             <td>PPh</td>
                             <td>Rp.</td>
                             <td class="txt-right"><?= number_format(
@@ -240,7 +248,7 @@
                                                         ","
                                                     ) ?></td>
                         </tr>
-                        <tr>
+                        <tr style="font-size:14px;">
                             <td>Dibayarkan</td>
                             <td>Rp.</td>
                             <td class="txt-right"><?= number_format(

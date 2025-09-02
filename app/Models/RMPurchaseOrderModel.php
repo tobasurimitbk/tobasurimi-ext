@@ -681,10 +681,16 @@ class RMPurchaseOrderModel extends Model
             if ($addCondition['sort'] == "rm_purchase_orders.po_date" || $addCondition['sort'] == "poDate") {
                 $sort = 'rm_purchase_orders.po_date, rm_purchase_orders.po_no';
                 $sortType = 'ASC';
+            } else {
+                $sort = $availableSort[$addCondition['sort'] ?? 'updatedAt'] ?? 'rm_purchase_orders.updatedAt';
+                $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'DESC';
             }
             if ($addCondition['sort'] == "rm_purchase_orders.po_date, divisis.id") {
                 $sort = 'divisis.id, rm_purchase_orders.po_date, rm_purchase_orders.po_no';
                 $sortType = 'ASC';
+            } else {
+                $sort = $availableSort[$addCondition['sort'] ?? 'updatedAt'] ?? 'rm_purchase_orders.updatedAt';
+                $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'DESC';
             }
         } else {
             $sort = $availableSort[$addCondition['sort'] ?? 'updatedAt'] ?? 'rm_purchase_orders.updatedAt';

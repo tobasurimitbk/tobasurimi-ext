@@ -7,8 +7,8 @@
     <title>Cetak Kwitansi TB</title>
     <style>
         body {
-            font-size: 15px;
-            font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+            font-size: 12px;
+            font-family: 'Times New Roman', Times, serif;
             text-transform: uppercase;
             font-weight: normal;
         }
@@ -160,18 +160,28 @@
 <body>
     <?php foreach ($kwitansis['all'] as $i => $kwitansi) : ?>
         <?php if ($i == 0) : ?>
-            <div style="text-align: right;">
+            <table style="width: 100%;">
+                <tr>
+                    <td style="font-size:14px;">
+                        <?= $company['holding_company'] ?> (<?= $company['company'] ?>) <br>
 
-                <u>
-                    Tanggal: <?= date('d-m-Y', strtotime($tanggal))  ?>
-                </u>
-                <br><br>
-                Kwitansi Bulanan <br>
-                No. Nota : <?= $noKwitansi ?>
-            </div>
+                    </td>
+                    <td style="text-align: right;">
+                        <u>
+                            Tanggal: <?= date('d-m-Y', strtotime($tanggal))  ?>
+                        </u>
+                    </td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td style="text-align: right;">
+                        Kwitansi Bulanan <br>
+                        No. Nota : <?= $noKwitansi ?>
+                    </td>
+                </tr>
+            </table>
             <div class="w-50 d-flex content-between" style="margin-top: -40px;">
                 <div style="width: 60%;padding: 0.5rem;">
-                    <?= $company['holding_company'] ?> (<?= $company['company'] ?>) <br>
                 </div>
 
             </div>
@@ -195,17 +205,17 @@
             </table>
 
             <table class="mt-1" style="width: 30%;border: 0;border-bottom: 3px solid;border-style: double;">
-                <tr>
+                <tr style="font-size:14px;">
                     <td>Bruto</td>
                     <td>Rp.</td>
                     <td class="txt-right"><?= number_format($kwitansi['harga_bulanan'], 2, '.', ',') ?></td>
                 </tr>
-                <tr>
+                <tr style="font-size:14px;">
                     <td>PPh</td>
                     <td>Rp.</td>
                     <td class="txt-right"><?= number_format($kwitansi['pph'], 2, '.', ',') ?></td>
                 </tr>
-                <tr>
+                <tr style="font-size:14px;">
                     <td>Dibayarkan</td>
                     <td>Rp.</td>
                     <td class="txt-right"><?= number_format($kwitansi['harga_bulanan_pph'], 2, '.', ',') ?></td>
@@ -221,21 +231,31 @@
             </div>
         <?php else : ?>
             <div class="page-break">
-                <div style="text-align: right;">
-                    <b>
-                        <u>
-                            Tanggal: <?= date('d-m-Y', strtotime($tanggal))  ?>
-                        </u>
-                    </b><br><br>
-                    <b>Kwitansi Bulanan</b> <br>
-                    No. Nota : <?= $noKwitansi ?>
-                </div>
-                <div class="w-50 d-flex content-between" style="margin-top: -40px;">
-                    <div style="border: 3px solid;border-style: double;width: 60%;padding: 0.5rem;">
-                        <b> <?= $company['holding_company'] ?> (<?= $company['company'] ?>)</b> <br>
-                    </div>
-                </div>
+                <table style="width: 100%;">
+                    <tr>
+                        <td style="font-size:14px;">
+                            <?= $company['holding_company'] ?> (<?= $company['company'] ?>) <br>
 
+                        </td>
+                        <td style="text-align: right;">
+                            <u>
+                                Tanggal: <?= date('d-m-Y', strtotime($tanggal))  ?>
+                            </u>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td style="text-align: right;">
+                            Kwitansi Bulanan <br>
+                            No. Nota : <?= $noKwitansi ?>
+                        </td>
+                    </tr>
+                </table>
+                <div class="w-50 d-flex content-between" style="margin-top: -40px;">
+                    <div style="width: 60%;padding: 0.5rem;">
+                    </div>
+
+                </div>
                 <table class="w-100 mt-2">
                     <tr>
                         <td style="vertical-align: top; width: 40%;">SUDAH TERIMA DARI <br> (RECEIVED FROM)</td>
@@ -255,17 +275,17 @@
                 </table>
 
                 <table class="mt-1" style="width: 30%;border: 0;border-bottom: 3px solid;border-style: double;">
-                    <tr>
+                    <tr style="font-size:14px;">
                         <td>Bruto</td>
                         <td>Rp.</td>
                         <td class="txt-right"><?= number_format(formatter($kwitansi['harga_bulanan'], "STR_TO_FLOAT"), 2, '.', ',') ?></td>
                     </tr>
-                    <tr>
+                    <tr style="font-size:14px;">
                         <td>PPh</td>
                         <td>Rp.</td>
                         <td class="txt-right"><?= number_format($kwitansi['pph'], 2, '.', ',') ?></td>
                     </tr>
-                    <tr>
+                    <tr style="font-size:14px;">
                         <td>Dibayarkan</td>
                         <td>Rp.</td>
                         <td class="txt-right"><?= number_format($kwitansi['harga_bulanan_pph'], 2, '.', ',') ?></td>
