@@ -113,7 +113,7 @@ class JasaVendorOut extends BaseController
             array_push($divisiArr, $d['id']);
         }
 
-        $dataQry = $this->jasaVendorOutModel->getList($condition, $divisiArr,  $addCondition, $limit, $offset);
+        $dataQry = $this->jasaVendorOutModel->getListNew($condition, $divisiArr,  $addCondition, $limit, $offset);
         $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
 
         foreach ($dataQry['data'] as $data) {
@@ -281,7 +281,6 @@ class JasaVendorOut extends BaseController
     public function updateAction()
     {
         $id = decrypt($this->request->getVar('id'));
-
         // Update header transaksi
         $this->jasaVendorOutModel->update($id, [
             'vendor_id'             => $this->request->getVar('vendor_id'),
@@ -291,9 +290,8 @@ class JasaVendorOut extends BaseController
             'tipe_pengambilan_stock'=> $this->request->getVar('type_pengambilan_stock'),
             'keterangan'            => $this->request->getVar('keterangan'),
             'no_surat_jalan'        => $this->request->getVar('no_surat_jalan'),
-            "tanggal" => $this->request->getVar("tanggal") ? date_format(date_create_from_format("d/m/Y", $this->request->getVar("tanggal")), "Y-m-d") : "",
+            "tanggal"               => $this->request->getVar("tanggal") ? date_format(date_create_from_format("d/m/Y", $this->request->getVar("tanggal")), "Y-m-d") : "",
             'tipe_barang' => "bahan_baku",
-            'no_kontainer' => $this->request->getVar('no_kontainer'),
         ]);
 
         $barang = json_decode($this->request->getVar('listBarang'));
@@ -397,6 +395,9 @@ class JasaVendorOut extends BaseController
             'tipe_pengambilan_stock'=> $this->request->getVar('type_pengambilan_stock'),
             'keterangan'            => $this->request->getVar('keterangan'),
             'no_surat_jalan'        => $this->request->getVar('no_surat_jalan'),
+            'tanggal'               => $this->request->getVar("tanggal") ? date_format(date_create_from_format("d/m/Y", $this->request->getVar("tanggal")), "Y-m-d") : "",
+            'tipe_barang'           => "bahan_baku",
+
         ]);
 
         $barang = json_decode($this->request->getVar('listBarang'));

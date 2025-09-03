@@ -68,7 +68,11 @@ class JasaVendorOutModel extends Model
             ->join('vendors', 'vendors.id = jasa_vendor_out.vendor_id', 'left')
             ->where($condition)
             ->whereIn('jasa_vendor_out.divisi_id', $conditionArr)
-            ->orderBy($sort, $sortType);
+            ->orderBy($sort, $sortType)
+            ->limit(10);
+
+        var_dump($dataQry);
+        die;
 
         $totalData = $dataQry->countAllResults(false);
 
@@ -106,6 +110,92 @@ class JasaVendorOutModel extends Model
 
         $totalFilteredData = $dataQry->countAllResults(false);
         $data = $dataQry->findAll($limit, $offset);
+
+        return [
+            'data'              => $data,
+            'totalData'         => $totalData,
+            'totalFilteredData' => $totalFilteredData,
+        ];
+    }
+
+    public function getListNew($condition, $conditionArr, $addCondition, $limit = 10, $offset = 0)
+    {
+        // daftar kolom yang bisa di-sort
+        $availableSort = [
+            'no_surat_jalan'          => 'no_surat_jalan',
+            'jasa_vendor_out.createdAt' => 'jasa_vendor_out.createdAt',
+            'jasa_vendor_out.divisi_id' => 'jasa_vendor_out.divisi_id',
+            'jasa_vendor_out.warehouse_id' => 'jasa_vendor_out.warehouse_id',
+            'vendor_id'               => 'vendor_id',
+            'status_closed'           => 'status_closed',
+        ];
+        $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
+
+        // tentukan sort & sortType
+        $sort     = $availableSort[$addCondition['sort'] ?? 'jasa_vendor_out.createdAt'] ?? 'jasa_vendor_out.createdAt';
+        $sortType = $availableSortType[strtolower($addCondition['sortType'] ?? 'desc')] ?? 'DESC';
+
+        // select & join dasar
+        $builder = $this->asObject()
+            ->select("
+                jasa_vendor_out.*,
+                divisis.divisi,
+                warehouses.warehouse_name,
+                vendors.name AS vendor_name
+            ")
+            ->join('divisis', 'divisis.id = jasa_vendor_out.divisi_id', 'left')
+            ->join('warehouses', 'warehouses.id = jasa_vendor_out.warehouse_id', 'left')
+            ->join('vendors', 'vendors.id = jasa_vendor_out.vendor_id', 'left')
+            ->where($condition)
+            ->whereIn('jasa_vendor_out.divisi_id', $conditionArr)
+            ->orderBy($sort, $sortType);
+
+        // total data sebelum filter tambahan
+        $totalData = $builder->countAllResults(false);
+
+        // filter tambahan
+        $hasFilter = !empty($addCondition['divisi_id'])
+            || !empty($addCondition['warehouse_id'])
+            || (isset($addCondition['status']) && $addCondition['status'] !== '')
+            || !empty($addCondition['no_surat_jalan'])
+            || !empty($addCondition['start_date'])
+            || !empty($addCondition['end_date']);
+
+        if ($hasFilter) {
+            $builder->groupStart();
+
+            if (!empty($addCondition['divisi_id'])) {
+                $builder->where('jasa_vendor_out.divisi_id', $addCondition['divisi_id']);
+            }
+
+            if (!empty($addCondition['warehouse_id'])) {
+                $builder->like('jasa_vendor_out.warehouse_id', $addCondition['warehouse_id']);
+            }
+
+            if (isset($addCondition['status']) && $addCondition['status'] !== '') {
+                $builder->where('status_posting', $addCondition['status']);
+            }
+
+            if (!empty($addCondition['no_surat_jalan'])) {
+                $builder->like('no_surat_jalan', $addCondition['no_surat_jalan']);
+            }
+
+            if (!empty($addCondition['start_date'])) {
+                $builder->where('tanggal >=', $addCondition['start_date']);
+            }
+
+            if (!empty($addCondition['end_date'])) {
+                $builder->where('tanggal <=', $addCondition['end_date']);
+            }
+
+            $builder->groupEnd();
+        }
+
+        // total setelah filter
+        $totalFilteredData = $builder->countAllResults(false);
+
+        // ambil data dengan paging
+        $data = $builder->findAll($limit, $offset);
 
         return [
             'data'              => $data,
