@@ -110,7 +110,7 @@
                             <select onchange="changeTipeSPP()" <?= !empty($dataSPP) ? ($dataSPP->is_posted === "1" ? 'disabled=true' : '')  : ''; ?> class="form-select spp_type" name="spp_type" id="spp_type" aria-label="Floating label select example">
                                 <option value=""></option>
                                 <?php foreach ($dataSppType as $d) : ?>
-                                    <option <?= (!empty($dataSPP) ? ($dataSPP->spp_type == trim($d['value']) ? 'selected' : '') : '') ?> value="<?= trim($d['value']) ?>"><?= strtoupper($d['value']) ?></option>
+                                    <option <?= (!empty($dataSPP) ? ($dataSPP->spp_type == trim($d['value']) ? 'selected' : '') : (trim($d['value']) == "Lokal BP" ? 'selected' : '')) ?> value="<?= trim($d['value']) ?>"><?= strtoupper($d['value']) ?></option>
                                 <?php endforeach; ?>
                             </select>
 
@@ -584,15 +584,47 @@
     });
 
 
-    // KODE BARANG
-    $('.kode_barang').select2({
-        matcher: customMatcher,
-        placeholder: "Pilih Kode Barang",
-        theme: "bootstrap-5",
-        dropdownParent: $(".detail-modal .modal-content"),
-        tags: false,
-        allowClear: true
-    });
+$('.kode_barang').select2({
+    placeholder: "Pilih Kode Barang",
+    theme: "bootstrap-5",
+    dropdownParent: $(".detail-modal .modal-content"),
+    ajax: {
+        url: '<?= base_url("barang/dropdown/type-server") ?>',
+        dataType: 'json',
+        delay: 250,
+        data: function(params) {
+            return {
+                q: params.term, 
+                type: getTypeSPP()
+            };
+        },
+        processResults: function(data) {
+            // Pastikan server mengembalikan data dengan struktur yang lengkap
+            return {
+                results: $.map(data.results, function(item) {
+                    return {
+                        id: item.id,
+                        text: item.text,
+                        // Tambahkan semua data attributes yang diperlukan
+                        satuan_1: item.satuan_1,
+                        satuan_2: item.satuan_2,
+                        satuan_3: item.satuan_3,
+                        barang_name_master: item.barang_name_master,
+                        barang_spesifikasi_id: item.barang_spesifikasi_id,
+                        barang_id: item.barang_id,
+                        nama: item.nama,
+                        satuan_id: item.satuan_id,
+                        kode_barang: item.kode_barang,
+                        satuan: item.satuan
+                    };
+                })
+            };
+        },
+        cache: true
+    },
+    minimumInputLength: 1
+});
+    
 
     $('.satuan_id').select2({
         placeholder: "Pilih Kode Satuan",
@@ -769,40 +801,54 @@
             type = "bahan_penolong";
         }
         $(".spp_type_bypass").val(type)
-        if (spp_type) {
-            $.ajax({
-                url: `<?= base_url("barang/dropdown/type"); ?>`,
-                method: "GET",
-                dataType: "json",
-                data: {
-                    type: type
-                },
-                success: function(res) {
-                    $(".kode_barang").empty();
-                    $(".kode_barang").append(`<option data-barang_name_master="" data-barang_id="" data-nama="" data-satuan_id="" data-satuan="" value=""></option>`);
-                    res.data.forEach(function(item) {
-                        $(".kode_barang").append(`<option data-satuan_1="${item.satuan_1}" data-satuan_2="${item.satuan_2}" data-satuan_3="${item.satuan_3}" data-barang_name_master="${item.barang_name_master}" data-barang_spesifikasi_id="${item.barang_master_spesifikasi_id}" data-barang_id="${item.id}" data-nama="${item.barang_name}" data-satuan_id="${item.satuan_1}" data-satuan="${item.nama_satuan}" value="${item.kode_barang}">${item.kode_barang} - ${item.barang_name}</option>`);
-                    })
-                    $(".kode_barang").val(null).change();
-                    $(".detail-modal").modal("show");
-                }
-            })
-        } else {
+
+        if(spp_type == ""){
             Swal.fire({
                 icon: 'error',
                 title: "Pilih Tipe SPP Dahulu",
                 confirmButtonColor: '#4e73df',
-            })
+            });
+            return;
+        }else{
+            $(".kode_barang").val(null).change();
+            $(".detail-modal").modal("show");
         }
 
-    })
+
+    });
+
+
 
     $(".btn-hide-detail").click(function() {
         $(".detail-modal").modal("hide")
-    })
+    });
 
-    $(".kode_barang").change(function() {
+    $('.kode_barang').on('select2:select', function (e) {
+        var data = e.params.data;
+        
+        // Set data attributes ke elemen option yang dipilih
+        var selectedOption = $(this).find('option:selected');
+        
+        // Set semua data attributes
+        selectedOption.data('satuan_1', data.satuan_1);
+        selectedOption.data('satuan_2', data.satuan_2);
+        selectedOption.data('satuan_3', data.satuan_3);
+        selectedOption.data('barang_name_master', data.barang_name_master);
+        selectedOption.data('barang_spesifikasi_id', data.barang_spesifikasi_id);
+        selectedOption.data('barang_id', data.barang_id);
+        selectedOption.data('nama', data.nama);
+        selectedOption.data('satuan_id', data.satuan_id);
+        selectedOption.data('kode_barang', data.kode_barang);
+        selectedOption.data('satuan', data.satuan);
+        
+        // Trigger change event manual
+        $(this).trigger('change');
+    });
+
+    $(".kode_barang").on('change', function(e) {
+         
         if ($(".kode_barang option:selected").val()) {
+            console.log($('.kode_barang option:selected').val());
             let nama = $(".kode_barang option:selected").data("nama") ? $(".kode_barang option:selected").data("nama") : "";
             let satuan = $(".kode_barang option:selected").data("satuan") ? $(".kode_barang option:selected").data("satuan") : "";
             let satuan_1 = $(".kode_barang option:selected").data("satuan_1") ? $(".kode_barang option:selected").data("satuan_1") : "";
@@ -924,24 +970,36 @@
         }
 
         $.ajax({
-            url: `<?= base_url("barang/dropdown/type"); ?>`,
+            url: `<?= base_url("barang/dropdown/type-server-first"); ?>`,
             method: "GET",
             dataType: "json",
             data: {
-                type: type
+                type: type,
+                barang_spesifikasi_id: barang_spesifikasi_id
             },
             success: function(res) {
                 $(".kode_barang").empty();
                 $(".kode_barang").append(`<option data-barang_name_master=""  data-barang_id="" data-nama="" data-satuan_id="" data-satuan="" value=""></option>`);
                 res.data.forEach(function(item) {
-                    if (barang_id === item.id && barang_spesifikasi_id === item.barang_master_spesifikasi_id) {
-                        $(".kode_barang").append(`<option selected data-satuan_1="${item.satuan_1}" data-satuan_2="${item.satuan_2}" data-satuan_3="${item.satuan_3}" data-barang_name_master="${item.barang_name_master}" data-barang_spesifikasi_id="${item.barang_master_spesifikasi_id}" data-barang_id="${item.id}" data-nama="${item.barang_name}" data-satuan_id="${item.satuan_1}" data-satuan="${item.nama_satuan}" value="${item.kode_barang}">${item.kode_barang} - ${item.barang_name}</option>`);
-                    } else {
-                        $(".kode_barang").append(`<option data-satuan_1="${item.satuan_1}" data-satuan_2="${item.satuan_2}" data-satuan_3="${item.satuan_3}" data-barang_name_master="${item.barang_name_master}" data-barang_spesifikasi_id="${item.barang_master_spesifikasi_id}" data-barang_id="${item.id}" data-nama="${item.barang_name}" data-satuan_id="${item.satuan_1}" data-satuan="${item.nama_satuan}" value="${item.kode_barang}">${item.kode_barang} - ${item.barang_name}</option>`);
+                    console.log(item, barang_id, barang_spesifikasi_id);
+                    if (barang_id == item.barang_id && barang_spesifikasi_id == item.barang_spesifikasi_id) {
+                        $(".kode_barang").append(`<option selected 
+                        data-satuan_1="${item.satuan_1}" 
+                        data-satuan_2="${item.satuan_2}" 
+                        data-satuan_3="${item.satuan_3}" 
+                        data-barang_name_master="${item.barang_name_master}" 
+                        data-barang_spesifikasi_id="${item.barang_spesifikasi_id}" 
+                        data-barang_id="${item.id}" 
+                        data-nama="${item.nama}" 
+                        data-satuan_id="${item.satuan_1}" 
+                        data-satuan="${item.nama_satuan}" 
+                        value="${item.kode_barang}">
+                        ${item.kode_barang} - ${item.nama}
+                        </option>`);
                     }
                 })
 
-                var kode_barang_selected = $(".kode_barang option:selected");
+                var kode_barang_selected = $(".kode_barang option:selected").change();
                 activeFieldSatuanId(
                     kode_barang_selected.data('satuan_1'),
                     kode_barang_selected.data('satuan_2'),
@@ -962,7 +1020,7 @@
         let barang_detail_id = $(".barang_detail_id").val();
         let barang_id = $(".barang_id").val()
         let barang_spesifikasi_id = $(".barang_spesifikasi_id").val();
-        let kode_barang = $(".kode_barang").val()
+        let kode_barang = $(".kode_barang option:selected").data('kode_barang');
         let nama_barang = $(".nama_barang").val()
         let nama_satuan = $(".satuan_id option:selected").data('kode_satuan')
         let satuan_id = $(".satuan_id option:selected").val()
@@ -1042,7 +1100,6 @@
                             'keterangan': keterangan
                         });
                     }
-
                     resetFormDetail();
                     drawTableDetail();
                     $(".detail-modal").modal("hide");
@@ -1051,6 +1108,8 @@
 
     }
     // }
+
+
 
     const updateStatusPosting = function(status) {
         Swal.fire({
@@ -1127,7 +1186,7 @@
                 row += '<td>' + item.satuan_3_text + '(' + item.konversi_satuan_3 + ' ' + item.satuan_1_text + ')</td>';
 
                 row += '<td>' + `
-                    <button class="btn btn-warning edit-table-detail-spek" data-spek_id="${item.spek_id}">
+                    <button class="btn btn-warning edit-table-detail-spek mr-1" data-spek_id="${item.spek_id}">
                         <i class="fa fa-pencil fa-sm" aria-hidden="true"></i>
                     </button><button class="btn btn-danger" onclick="deleteRowSpek('${item.spek_id}', '${item.spesifikasi_id}')">
                         <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
@@ -1573,90 +1632,46 @@
                             let csrf = $(`[name="${csrfToken}"]`);
                             let data = new FormData(document.querySelector(".create-form-barang"));
                             data.append("items", JSON.stringify(list_items_spek));
-
-                            if (id) {
-                                $.ajax({
-                                    url: "<?= base_url("barang-master/update"); ?>",
-                                    data: data,
-                                    beforeSend: function(xhr) {
-                                        xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                                    },
-                                    method: "POST",
-                                    dataType: "json",
-                                    processData: false,
-                                    contentType: false,
-                                    success: function(response) {
-                                        csrf.val(response.token);
-                                        if (response.status) {
-                                            Swal.fire({
-                                                    icon: 'success',
-                                                    title: response.message,
-                                                    confirmButtonColor: '#4e73df',
-                                                })
-                                                .then(() => {
-                                                    $(".add-modal").modal("hide");
-                                                })
-                                        } else {
-                                            Swal.fire({
-                                                icon: 'error',
+                            $.ajax({
+                                url: "<?= base_url("barang-master/save"); ?>",
+                                data: data,
+                                beforeSend: function(xhr) {
+                                    xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                                },
+                                method: "POST",
+                                dataType: "json",
+                                processData: false,
+                                contentType: false,
+                                success: function(response) {
+                                    csrf.val(response.token);
+                                    if (response.status) {
+                                        Swal.fire({
+                                                icon: 'success',
                                                 title: response.message,
                                                 confirmButtonColor: '#4e73df',
-                                            }).then(() => {
-
-                                            });
-                                        }
-                                    },
-                                    onError: function(response) {
-                                        csrf.val(response.token);
+                                            })
+                                            .then(() => {
+                                                $("#add_modal").modal("hide");
+                                            })
+                                    } else {
                                         Swal.fire({
                                             icon: 'error',
-                                            title: 'Data Gagal Disimpan, coba Lagi',
+                                            title: response.message,
                                             confirmButtonColor: '#4e73df',
-                                        })
-                                    }
-                                });
-                            } else {
-                                $.ajax({
-                                    url: "<?= base_url("barang-master/save"); ?>",
-                                    data: data,
-                                    beforeSend: function(xhr) {
-                                        xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                                    },
-                                    method: "POST",
-                                    dataType: "json",
-                                    processData: false,
-                                    contentType: false,
-                                    success: function(response) {
-                                        csrf.val(response.token);
-                                        if (response.status) {
-                                            Swal.fire({
-                                                    icon: 'success',
-                                                    title: response.message,
-                                                    confirmButtonColor: '#4e73df',
-                                                })
-                                                .then(() => {
-                                                    $(".add-modal").modal("hide");
-                                                })
-                                        } else {
-                                            Swal.fire({
-                                                icon: 'error',
-                                                title: response.message,
-                                                confirmButtonColor: '#4e73df',
-                                            }).then(() => {
+                                        }).then(() => {
 
-                                            });
-                                        }
-                                    },
-                                    onError: function(response) {
-                                        csrf.val(response.token);
-                                        Swal.fire({
-                                            icon: 'error',
-                                            title: 'Data Gagal Disimpan, coba Lagi',
-                                            confirmButtonColor: '#4e73df',
-                                        })
+                                        });
                                     }
-                                });
-                            }
+                                },
+                                onError: function(response) {
+                                    csrf.val(response.token);
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: 'Data Gagal Disimpan, coba Lagi',
+                                        confirmButtonColor: '#4e73df',
+                                    })
+                                }
+                            });
                         }
                     })
                 }
@@ -2244,45 +2259,45 @@
         drawTableDetail();
     <?php endif; ?>
 
-    $(document).keydown(function(e) {
-        if (e.keyCode === 116) {
-            e.preventDefault();
-            var spp_type = $('.spp_type').val().trim();
-            var type = "";
+    // $(document).keydown(function(e) {
+    //     if (e.keyCode === 116) {
+    //         e.preventDefault();
+    //         var spp_type = $('.spp_type').val().trim();
+    //         var type = "";
 
-            if (spp_type === "Import BB" || spp_type === "Lokal BB") {
-                type = "bahan_baku";
-            } else {
-                type = "bahan_penolong";
-            }
-            $(".spp_type_bypass").val(type)
-            if (spp_type) {
-                $.ajax({
-                    url: `<?= base_url("barang/dropdown/type"); ?>`,
-                    method: "GET",
-                    dataType: "json",
-                    data: {
-                        type: type
-                    },
-                    success: function(res) {
-                        $(".kode_barang").empty();
-                        $(".kode_barang").append(`<option data-barang_name_master="" data-barang_id="" data-nama="" data-satuan_id="" data-satuan="" value=""></option>`);
-                        res.data.forEach(function(item) {
-                            $(".kode_barang").append(`<option data-barang_name_master="${item.barang_name_master}" data-barang_spesifikasi_id="${item.barang_master_spesifikasi_id}" data-barang_id="${item.id}" data-nama="${item.barang_name}" data-satuan_id="${item.satuan_1}" data-satuan="${item.nama_satuan}" value="${item.kode_barang}">${item.kode_barang} - ${item.barang_name}</option>`);
-                        })
-                        $(".kode_barang").val("").change();
-                        $(".detail-modal").modal("show");
-                    }
-                })
-            } else {
-                Swal.fire({
-                    icon: 'error',
-                    title: "Pilih Tipe SPP Dahulu",
-                    confirmButtonColor: '#4e73df',
-                })
-            }
-        }
-    });
+    //         if (spp_type === "Import BB" || spp_type === "Lokal BB") {
+    //             type = "bahan_baku";
+    //         } else {
+    //             type = "bahan_penolong";
+    //         }
+    //         $(".spp_type_bypass").val(type)
+    //         if (spp_type) {
+    //             $.ajax({
+    //                 url: `<?= base_url("barang/dropdown/type"); ?>`,
+    //                 method: "GET",
+    //                 dataType: "json",
+    //                 data: {
+    //                     type: type
+    //                 },
+    //                 success: function(res) {
+    //                     $(".kode_barang").empty();
+    //                     $(".kode_barang").append(`<option data-barang_name_master="" data-barang_id="" data-nama="" data-satuan_id="" data-satuan="" value=""></option>`);
+    //                     res.data.forEach(function(item) {
+    //                         $(".kode_barang").append(`<option data-barang_name_master="${item.barang_name_master}" data-barang_spesifikasi_id="${item.barang_spesifikasi_id}" data-barang_id="${item.id}" data-nama="${item.barang_name}" data-satuan_id="${item.satuan_1}" data-satuan="${item.nama_satuan}" value="${item.kode_barang}">${item.kode_barang} - ${item.barang_name}</option>`);
+    //                     })
+    //                     $(".kode_barang").val("").change();
+    //                     $(".detail-modal").modal("show");
+    //                 }
+    //             })
+    //         } else {
+    //             Swal.fire({
+    //                 icon: 'error',
+    //                 title: "Pilih Tipe SPP Dahulu",
+    //                 confirmButtonColor: '#4e73df',
+    //             })
+    //         }
+    //     }
+    // });
 
     function activeFieldSatuanId(satuan_1, satuan_2, satuan_3) {
         const allowedValues = [String(satuan_1), String(satuan_2), String(satuan_3)];
@@ -2295,6 +2310,21 @@
                 }
             });
         });
+    }
+
+    function getTypeSPP(){
+        var spp_type = $('.spp_type').val().trim();
+        var type = "";
+
+        if (spp_type === "Import BB" || spp_type === "Lokal BB") {
+            type = "bahan_baku";
+        } else {
+            type = "bahan_penolong";
+        }
+
+        console.log(type);
+        console.log($('.spp_type').val().trim());
+        return type;
     }
 </script>
 <script>

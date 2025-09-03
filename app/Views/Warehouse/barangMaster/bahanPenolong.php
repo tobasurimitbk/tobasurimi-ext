@@ -66,7 +66,7 @@
 </section>
 
 <div class="modal add-modal m-t-bahan-baku" id="add_modal" tabindex="-1">
-    <div class="modal-dialog" style="min-width: 900px">
+    <div class="modal-dialog" style="min-width: 1300px">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title"><label class="title-name"></label></h5>
@@ -202,8 +202,16 @@
                 </div>
                 <div class="row">
                     <div class="col-md-12">
-                        <div class="row">
-                            <div class="table-responsive">
+                        <div class="row justify-content-end row-col-spp">
+                            <div class="col-md-3">
+                                <div class="form-floating mb-3" style="height: 50px;">
+                                    <input autocomplete="one-time-code" type="text" class="form-control" name="cari_spesifikasi" id="cari_spesifikasi" onkeyup="cariSpesifikasi(this.value)">
+                                    <label for="floatingInput">Cari Spesifikasi</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="table-responsive">
+                            <div class="overflow-auto" style="max-height: 500px;">
                                 <table class="table table-bordered nowrap table-hover-tobasurimi dataTable" id="" width="100%" cellspacing="0">
                                     <thead class="thead-dark">
                                         <tr>
@@ -219,6 +227,7 @@
                                     </tbody>
                                 </table>
                             </div>
+
                         </div>
                     </div>
                 </div>
@@ -1840,6 +1849,15 @@
         window.location.href = url + '?id=' + id + '&po_type=' + po_type +
             '&search=' + search + '&start_date=' + start_date + '&end_date=' + end_date;
     }
+
+    const cariSpesifikasi = function(value) {
+        let val = value.toLowerCase().trim();
+
+        $('#body-detail-table tr').filter(function() {
+            let rowText = $(this).text().toLowerCase();
+            $(this).toggle(rowText.indexOf(val) !== -1);
+        });
+    };
 </script>
 
 <?= $this->endSection(); ?>

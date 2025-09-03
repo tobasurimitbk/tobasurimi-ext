@@ -349,4 +349,65 @@ class BarangMasterModel extends Model
 
         return $dataResult1;
     }
-}
+
+    public function dropdownBarangType($type, $companyId, $search, $spesifikasiId = null)
+    {
+
+        $condition = [
+            'barang_master.company_id' => $companyId,
+            'barang_master.type_barang' => $type,
+        ];
+        
+        $selectQry = "barang_master.id, 
+                    barang_master.kode_barang, 
+                    barang_master.barang_name AS barang_name_master, 
+                    barang_master.parent_type_id, 
+                    satuans.nama_satuan,
+                    satuans.kode_satuan, 
+                    parent_barang.parent_name,
+                    barang_master_spesifikasi.id AS barang_master_spesifikasi_id, 
+                    barang_master_spesifikasi.spesifikasi,
+                    barang_master_spesifikasi.satuan_1,
+                    barang_master_spesifikasi.satuan_2,
+                    barang_master_spesifikasi.satuan_3";
+
+        $dataQry = $this->select($selectQry)
+            ->join('parent_barang', 'barang_master.parent_type_id = parent_barang.id', 'left')
+            ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.barang_master_id = barang_master.id', 'left')
+            ->join('satuans', 'barang_master_spesifikasi.satuan_1 = satuans.id', 'left')
+            ->where('barang_master.deletedAt', null)
+            ->where('barang_master_spesifikasi.deletedAt', null)
+            ->where($condition);
+
+
+        if($spesifikasiId != null){
+            $dataBarang = $dataQry->where('barang_master_spesifikasi.id', $spesifikasiId)->findAll();
+        }else{
+            $dataQry
+                ->groupStart()
+                ->like('barang_master.barang_name', $search)
+                ->orLike('barang_master_spesifikasi.spesifikasi', $search)
+                ->orLike('barang_master.kode_barang', $search)
+                ->groupEnd();
+
+            $dataBarang = $dataQry->findAll(100);
+        }
+
+
+
+        for ($i = 0; $i < count($dataBarang); $i++) {
+            $dataBarang[$i]['id'] = encrypt($dataBarang[$i]['id']);
+            $dataBarang[$i]['parent_type_id'] = encrypt($dataBarang[$i]['parent_type_id']);
+            $dataBarang[$i]['barang_master_spesifikasi_id'] = encrypt($dataBarang[$i]['barang_master_spesifikasi_id']);
+            $dataBarang[$i]['barang_name'] = trim(
+                str_replace(
+                    ["\"", "\t"], // hapus tanda " dan tab
+                    "'",           // ganti " dengan ', tab jadi hilang
+                    $dataBarang[$i]['barang_name_master'] . ' ' . $dataBarang[$i]['spesifikasi']
+                )
+            );
+
+        }
+
+        return $dataBarang;
+    }}

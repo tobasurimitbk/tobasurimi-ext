@@ -61,7 +61,7 @@ class LaporanSupplierLokalBB extends BaseController
     public function laporanPendapatanSupplier()
     {
         $data = [
-            'getPoNo' => $this->RMPurchaseOrderModel->select('id ,po_no')->where('deletedAt', NULL)->where('is_posted', '1')->where('company_id', $this->this_company_id)->findAll(),
+            'getPoNo' => $this->RMPurchaseOrderModel->select('id ,po_no')->where('deletedAt', NULL)->where('company_id', $this->this_company_id)->findAll(),
             'getSupplier' => $this->supplierModel->where('deletedAt', NULL)->where('type', 'BAHAN BAKU')->findAll(),
             'getWarehouse' => $this->warehousesModel->get_by_company_id($this->this_company_id),
             'getBarang' => $this->barangMasterModel->getBarangByType("bahan_baku"),
@@ -78,13 +78,14 @@ class LaporanSupplierLokalBB extends BaseController
         $currentPage = ($this->request->getGet("start") / $pageSize) + 1;
 
         $condition = [
-            'rm_purchase_orders.is_posted' => '1',
-            'penerimaan_barang.status_post' => 'FINISH',
-            'penerimaan_barang.status_penerimaan' => 'LOKAL',
-            'penerimaan_barang.tipe_bahan' => 'BAKU',
+            // 'rm_purchase_orders.is_posted' => '0',
+            // 'penerimaan_barang.status_post' => 'FINISH',
+            // 'penerimaan_barang.status_penerimaan' => 'LOKAL',
+            // 'penerimaan_barang.tipe_bahan' => 'BAKU',
+            'rm_purchase_orders.deletedAt' => null,
             'rm_purchase_orders.company_id' => $this->this_company_id,
-            'penerimaan_barang.deletedAt' => null,
-            'penerimaan_barang_detail.deletedAt' => null,
+            // 'penerimaan_barang.deletedAt' => null,
+            // 'penerimaan_barang_detail.deletedAt' => null,
             'rm_purchase_orders.status_external' => 'no',
         ];
 
@@ -329,13 +330,14 @@ class LaporanSupplierLokalBB extends BaseController
     public function exportPendapatanSupplierLokalBBToExcel()
     {
         $condition = [
-            'rm_purchase_orders.is_posted' => '1',
-            'penerimaan_barang.status_post' => 'FINISH',
-            'penerimaan_barang.status_penerimaan' => 'LOKAL',
-            'penerimaan_barang.tipe_bahan' => 'BAKU',
+            // 'rm_purchase_orders.is_posted' => '1',
+            // 'penerimaan_barang.status_post' => 'FINISH',
+            // 'penerimaan_barang.status_penerimaan' => 'LOKAL',
+            // 'penerimaan_barang.tipe_bahan' => 'BAKU',
             'rm_purchase_orders.company_id' => $this->this_company_id,
-            'penerimaan_barang.deletedAt' => null,
-            'penerimaan_barang_detail.deletedAt' => null,
+            'rm_purchase_orders.deletedAt' => null,
+            // 'penerimaan_barang.deletedAt' => null,
+            // 'penerimaan_barang_detail.deletedAt' => null,
             'rm_purchase_orders.status_external' => 'no',
         ];
 
@@ -743,13 +745,14 @@ class LaporanSupplierLokalBB extends BaseController
     public function exportPDFPendapatanSupplier()
     {
         $condition = [
-            'rm_purchase_orders.is_posted' => '1',
-            'penerimaan_barang.status_post' => 'FINISH',
-            'penerimaan_barang.status_penerimaan' => 'LOKAL',
-            'penerimaan_barang.tipe_bahan' => 'BAKU',
+            // 'rm_purchase_orders.is_posted' => '1',
+            // 'penerimaan_barang.status_post' => 'FINISH',
+            // 'penerimaan_barang.status_penerimaan' => 'LOKAL',
+            // 'penerimaan_barang.tipe_bahan' => 'BAKU',
             'rm_purchase_orders.company_id' => $this->this_company_id,
-            'penerimaan_barang.deletedAt' => null,
-            'penerimaan_barang_detail.deletedAt' => null,
+            'rm_purchase_orders.deletedAt' => null,
+            // 'penerimaan_barang.deletedAt' => null,
+            // 'penerimaan_barang_detail.deletedAt' => null,
             'rm_purchase_orders.status_external' => 'no',
         ];
 

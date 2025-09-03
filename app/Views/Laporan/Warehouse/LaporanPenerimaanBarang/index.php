@@ -130,11 +130,11 @@
                                 <th onclick="changeSort('barang_name')" class="sort">Nama Barang</th>
                                 <th onclick="changeSort('spesifikasi')" class="sort">Spesifikasi</th>
                                 <th onclick="changeSort('satuan_id')" class="sort">Satuan</th>
+                                <th onclick="changeSort('harga_satuan')" class="sort">Harga Satuan</th>
                                 <th onclick="changeSort('keterangan')" class="sort">Keterangan</th>
                                 <th onclick="changeSort('qty_order')" class="sort">Jml Order</th>
                                 <th onclick="changeSort('qty_diterima')" class="sort">Jml Diterima</th>
                                 <th onclick="changeSort('total_harga')" class="sort">Nilai</th>
-
                             </tr>
 
                         </thead>
@@ -142,7 +142,7 @@
                         </tbody>
                         <tfoot id="grandTotalHargaPrev">
                             <tr>
-                                <th colspan="18" class="text-right">GRAND TOTAL</th>
+                                <th colspan="19" class="text-right">GRAND TOTAL</th>
                                 <th class="text-left grandTotalHarga"></th>
                             </tr>
                         </tfoot>
@@ -258,6 +258,10 @@
             },
             {
                 data: "kode_satuan",
+                className: "text-left",
+            },
+            {
+                data: "harga_satuan",
                 className: "text-left",
             },
             {

@@ -149,7 +149,8 @@ class JasaVendorIn extends BaseController
                 "warehouse_name"        => $data->warehouse_name,
                 "total_item"            => count($jasaVendorInDetail),
                 "vendor_name"           => $data->vendor_name,
-                "status_posting"        => $data->status_posting
+                "status_posting"        => $data->status_posting,
+                "status_bayar"          => $data->status_bayar
             ]);
         }
 
@@ -449,7 +450,7 @@ class JasaVendorIn extends BaseController
 
         foreach ($barangs as $b) {
             foreach ($b->list_barang_masuk as $c) {
-                if ($c->qty_bersih != 0) {
+               
                     // Group berdasarkan spesifikasi + dokumen
                     $key = $c->spesifikasi_in_id . '_' . $b->stock_dokumen;
 
@@ -468,7 +469,7 @@ class JasaVendorIn extends BaseController
 
                     $groupedBarang[$key]['qty_kotor'] += $c->qty_kotor;
                     $groupedBarang[$key]['qty_bersih'] += $c->qty_bersih;
-                }
+
             }
         }
 
@@ -552,7 +553,7 @@ class JasaVendorIn extends BaseController
 
         foreach ($barangs as $b) {
             foreach ($b->list_barang_masuk as $c) {
-                if ($c->qty_bersih != 0) {
+               
                     // Group berdasarkan spesifikasi + dokumen
                     $key = $c->spesifikasi_in_id . '_' . $b->stock_dokumen;
 
@@ -571,7 +572,7 @@ class JasaVendorIn extends BaseController
 
                     $groupedBarang[$key]['qty_kotor'] += $c->qty_kotor;
                     $groupedBarang[$key]['qty_bersih'] += $c->qty_bersih;
-                }
+                
             }
         }
 
@@ -740,6 +741,56 @@ class JasaVendorIn extends BaseController
             ]);
         }
     }
+
+    public function postingBayar()
+    {
+        $id = decrypt($this->request->getVar('id'));
+
+        // Ambil data parent
+        $jasaVendorIn = $this->jasaVendorInModel->find($id);
+        if (!$jasaVendorIn) {
+            return response()->setJSON([
+                'message' => "Data Jasa Vendor Barang Masuk tidak ditemukan",
+                'status' => false,
+                'token' => csrf_hash()
+            ]);
+        }
+
+        // Ambil data detail
+        $jasaVendorInDetail = $this->jasaVendorInDetailModel
+            ->where('jasa_vendor_in_id', $id)
+            ->findAll();
+
+        if (empty($jasaVendorInDetail)) {
+            return response()->setJSON([
+                'message' => "Detail Jasa Vendor Barang Masuk tidak ditemukan",
+                'status' => false,
+                'token' => csrf_hash()
+            ]);
+        }
+
+        // Validasi qty_kotor
+        foreach ($jasaVendorInDetail as $j) {
+            if (empty($j['qty_kotor']) || floatval($j['qty_kotor']) <= 0) {
+                return response()->setJSON([
+                    'message' => "Gagal posting! Ada detail dengan qty kotor kosong / 0",
+                    'status' => false,
+                    'token' => csrf_hash()
+                ]);
+            }
+        }
+
+        // Kalau lolos validasi → update status
+        $this->jasaVendorInModel->update($id, ['status_bayar' => '1']);
+
+        return response()->setJSON([
+            'message' => "Jasa Vendor Barang Masuk berhasil Di Proses Pembayaran",
+            'status' => true,
+            'token' => csrf_hash()
+        ]);
+    }
+
+
 
     public function dropdownListBarangKeluar()
     {

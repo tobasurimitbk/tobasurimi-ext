@@ -188,10 +188,22 @@
                 render: function(data, type, row) {
                     let id = row.id;
                     let status = row.status_posting
+                    let status_bayar = row.status_bayar
 
                     if (status === "0") {
                         return `
                         <div class="mt-0">
+                        <?php if (can('Jasa Vendor', 'Barang Masuk', 'a')) : ?>
+                            ${status_bayar == "0" ? `
+                                <button data-toggle="tooltip" title="Posting" onclick="postingBayar('${id}')" class="btn btn-primary posting-spp">
+                                    <i class="fa fa-paper-plane fa-sm" aria-hidden="true"></i> Bayar
+                                </button>
+                            ` : `
+                                <button data-toggle="tooltip" title="Sudah Bayar" class="btn btn-secondary" disabled>
+                                    <i class="fa fa-check fa-sm"></i> Sudah Bayar
+                                </button>
+                            `}
+                        <?php endif; ?>
                         <?php if (can('Jasa Vendor', 'Barang Masuk', 'a')) : ?>
                             <button data-toggle="tooltip" title="Posting" onclick="posting('${id}')" class="btn btn-success posting-spp">
                                 <i class="fa fa-paper-plane fa-sm" aria-hidden="true"></i>
@@ -214,6 +226,15 @@
 
                         return `
                             <div class="mt-0">
+                                ${status_bayar == "0" ? `
+                                    <button data-toggle="tooltip" title="Posting" onclick="postingBayar('${id}')" class="btn btn-primary posting-spp">
+                                        <i class="fa fa-paper-plane fa-sm" aria-hidden="true"></i> Bayar
+                                    </button>
+                                ` : `
+                                    <button data-toggle="tooltip" title="Sudah Bayar" class="btn btn-secondary" disabled>
+                                        <i class="fa fa-check fa-sm"></i> Sudah Bayar
+                                    </button>
+                                `}
                                 <?php if (can('Jasa Vendor', 'Barang Masuk', 'p')) : ?>
                                     <button data-toggle="tooltip" title="Print" class="btn btn-warning btn-print" onclick="print('<?= base_url("jasa-vendor-in/print/"); ?>${id}')" style="box-shadow: none !important;">
                                         <i class="fa fa-print fa-sm" aria-hidden="true"></i>
@@ -391,6 +412,58 @@
             }
         })
     }
+
+
+    const postingBayar = function(id) {
+        Swal.fire({
+            icon: 'question',
+            title: 'Bayar Jasa Vendor Barang Masuk ?',
+            confirmButtonColor: '#4e73df',
+            cancelButtonColor: '#d33',
+            showCancelButton: true,
+            reverseButtons: true,
+            confirmButtonText: 'Simpan',
+            cancelButtonText: 'Kembali',
+        }).then((result) => {
+            if (result.isConfirmed) {
+                const csrf = $(`[name="${csrfToken}"]`);
+                $.ajax({
+                    url: "<?= base_url("jasa-vendor-in/posting-bayar"); ?>",
+                    data: {
+                        id: id
+                    },
+                    beforeSend: function(xhr) {
+                        setLoading();
+                        xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                    },
+                    complete: function() {
+                        stopLoading();
+                    },
+                    method: "POST",
+                    dataType: "json",
+                    success: function(response) {
+                        csrf.val(response.token);
+                        if (response.status) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: response.message,
+                                confirmButtonColor: '#4e73df',
+                            }).then((result) => {
+                                table.ajax.reload()
+                            });
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: response.message,
+                                confirmButtonColor: '#4e73df',
+                            })
+                        }
+                    },
+                });
+            }
+        })
+    }
+
 
     const unPosting = function(id) {
         Swal.fire({

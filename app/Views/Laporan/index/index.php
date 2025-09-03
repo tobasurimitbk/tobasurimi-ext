@@ -90,6 +90,20 @@
                 </div>
             </a>
         </div>
+        <div class="col-lg-3 col-md-6 col-sm-6 col-12">
+            <a href="<?= base_url('laporan-accounting/jasa-vendor') ?>">
+                <div class="card card-statistic-1">
+                    <div class="card-icon bg-danger">
+                        <i class="far fa-file"></i>
+                    </div>
+                    <div class="card-wrap">
+                        <div class="card-header">
+                            <h4>Laporan Jasa Vendor</h4>
+                        </div>
+                    </div>
+                </div>
+            </a>
+        </div>
         <!-- <div class="col-lg-3 col-md-6 col-sm-6 col-12">
             <a href="<?= base_url('laporan-accounting/neracasaldo') ?>">
                 <div class="card card-statistic-1">

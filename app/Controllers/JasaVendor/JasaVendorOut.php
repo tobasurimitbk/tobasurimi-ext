@@ -113,7 +113,7 @@ class JasaVendorOut extends BaseController
             array_push($divisiArr, $d['id']);
         }
 
-        $dataQry = $this->jasaVendorOutModel->getList($condition, $divisiArr,  $addCondition, $limit, $offset);
+        $dataQry = $this->jasaVendorOutModel->getListNew($condition, $divisiArr,  $addCondition, $limit, $offset);
         $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
 
         foreach ($dataQry['data'] as $data) {
@@ -281,7 +281,6 @@ class JasaVendorOut extends BaseController
     public function updateAction()
     {
         $id = decrypt($this->request->getVar('id'));
-
         // Update header transaksi
         $this->jasaVendorOutModel->update($id, [
             'vendor_id'             => $this->request->getVar('vendor_id'),
@@ -291,6 +290,8 @@ class JasaVendorOut extends BaseController
             'tipe_pengambilan_stock'=> $this->request->getVar('type_pengambilan_stock'),
             'keterangan'            => $this->request->getVar('keterangan'),
             'no_surat_jalan'        => $this->request->getVar('no_surat_jalan'),
+            "tanggal"               => $this->request->getVar("tanggal") ? date_format(date_create_from_format("d/m/Y", $this->request->getVar("tanggal")), "Y-m-d") : "",
+            'tipe_barang' => "bahan_baku",
         ]);
 
         $barang = json_decode($this->request->getVar('listBarang'));
@@ -381,6 +382,87 @@ class JasaVendorOut extends BaseController
         ]);
     }
 
+    public function updateActionNew()
+    {
+        $id = decrypt($this->request->getVar('id'));
+
+        // Update header transaksi
+        $this->jasaVendorOutModel->update($id, [
+            'vendor_id'             => $this->request->getVar('vendor_id'),
+            'divisi_id'             => $this->request->getVar('divisi_id'),
+            'warehouse_id'          => $this->request->getVar('warehouse_id'),
+            'no_kontainer'          => $this->request->getVar('no_kontainer'),
+            'tipe_pengambilan_stock'=> $this->request->getVar('type_pengambilan_stock'),
+            'keterangan'            => $this->request->getVar('keterangan'),
+            'no_surat_jalan'        => $this->request->getVar('no_surat_jalan'),
+            'tanggal'               => $this->request->getVar("tanggal") ? date_format(date_create_from_format("d/m/Y", $this->request->getVar("tanggal")), "Y-m-d") : "",
+            'tipe_barang'           => "bahan_baku",
+
+        ]);
+
+        $barang = json_decode($this->request->getVar('listBarang'));
+
+        // Hapus dulu semua detail lama
+        $this->jasaVendorOutDetailModel->where('jasa_vendor_out_id', $id)->delete();
+
+        foreach ($barang as $b) {
+            $stockId = $b->id;
+
+            $stockDetail = $this->stockDetail2Model->getStockListDetailNew($stockId);
+
+            $qty_stok_sistem = $stockDetail['stok_total'] ?? 0;
+            $qty_input_user  = $b->qty;
+
+            // Hitung qty bersih & kotor
+            $qty_bersih = min($qty_input_user, $qty_stok_sistem);
+            $qty_kotor  = max($qty_input_user - $qty_stok_sistem, 0);
+
+            if ($stockDetail) {
+                // Validasi stok
+                if (floatval($stockDetail['stok_total']) < floatval($b->qty)) {
+                    return $this->response->setJSON([
+                        'status'  => 'error',
+                        'message' => "Stok tidak mencukupi untuk dokumen {$b->stock_dokumen}. Sisa: {$stockDetail['stok_total']}, diminta: {$b->qty}"
+                    ]);
+                }
+
+                $stockRebus = $this->prosesRebusModel
+                    ->where('no_rebus', $stockDetail['no_dokumen_1'])
+                    ->first();
+
+                // Cek apakah detail sudah ada
+                $existing = $this->jasaVendorOutDetailModel
+                    ->where('jasa_vendor_out_id', $id)
+                    ->where('stock_out_id', $stockId)
+                    ->first();
+
+                $dataDetail = [
+                    'proses_rebus_id'    => $stockRebus == null ? null : $stockRebus['id'],
+                    'jasa_vendor_out_id' => $id,
+                    'stock_out_id'       => $stockId,
+                    'bc_out_id'          => !empty($b->bc_id) ? $b->bc_id : 0,
+                    'no_aju_out'         => !empty($b->no_aju) ? $b->no_aju : '-',
+                    'stock_dokumen'      => !empty($b->stock_dokumen) ? $b->stock_dokumen : '-',
+                    'qty'                => $qty_bersih,
+                    'qty_kotor'          => $qty_kotor,
+                ];
+
+                if ($existing) {
+                    // Update kalau sudah ada
+                    $this->jasaVendorOutDetailModel->update($existing['id'], $dataDetail);
+                } else {
+                    // Insert kalau belum ada
+                    $this->jasaVendorOutDetailModel->insert($dataDetail);
+                }
+            }
+        }
+
+        return response()->setJSON([
+            'status'  => true,
+            'message' => "Jasa vendor pengeluaran barang berhasil diupdate",
+            'token'   => csrf_hash(),
+        ]);
+    }
 
     public function delete()
     {

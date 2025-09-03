@@ -1045,7 +1045,8 @@ $routes->get('/barang/dropdown/kategori', 'Warehouse\Barang::dropdownBarangKateg
 $routes->get('/barang/dropdown/type', 'Warehouse\Barang::dropdownBarangType', ['filter' => 'Auth']);
 $routes->get('/barang/dropdown/type-nospec', 'Warehouse\Barang::dropdownBarangTypeWithoutSpec', ['filter' => 'Auth']);
 $routes->get('/barang/dropdown/type-nospecwo', 'Warehouse\Barang::dropdownBarangTypeWithoutSpecWO', ['filter' => 'Auth']);
-
+$routes->get('/barang/dropdown/type-server', 'Purchase\SPP::dropdownBarang', ['filter' => 'Auth']);
+$routes->get('/barang/dropdown/type-server-first', 'Purchase\SPP::dropdownBarangFirst', ['filter' => 'Auth']);
 // ACCOUNT
 $routes->get('/kategori-account/dropdown', 'Master\Account::dropdownKategoriAccount', ['filter' => 'Auth']);
 $routes->get('/header-account/dropdown', 'Master\Account::dropdownHeaderAccount', ['filter' => 'Auth']);
@@ -1124,7 +1125,7 @@ $routes->get('/jasa-vendor-out/list-barang-stock-init', 'JasaVendor\JasaVendorOu
 $routes->get('/jasa-vendor-out/list-stock-dokumen-bc', 'JasaVendor\JasaVendorOut::getListStockJasaVendorOut', ['filter' => 'Auth']);
 $routes->get('/jasa-vendor-out/all', 'JasaVendor\JasaVendorOut::all', ['filter' => 'Auth']);
 $routes->post('/jasa-vendor-out/save',  'JasaVendor\JasaVendorOut::createAction', ['filter' => 'Auth']);
-$routes->post('/jasa-vendor-out/update',  'JasaVendor\JasaVendorOut::updateAction', ['filter' => 'Auth']);
+$routes->post('/jasa-vendor-out/update',  'JasaVendor\JasaVendorOut::updateActionNew', ['filter' => 'Auth']);
 $routes->post('/jasa-vendor-out/delete',  'JasaVendor\JasaVendorOut::delete', ['filter' => 'Auth']);
 $routes->post('/jasa-vendor-out/posting',  'JasaVendor\JasaVendorOut::posting', ['filter' => 'Auth']);
 $routes->post('/jasa-vendor-out/unposting',  'JasaVendor\JasaVendorOut::unPosting', ['filter' => 'Auth']);
@@ -1145,6 +1146,7 @@ $routes->post('/jasa-vendor-in/save',  'JasaVendor\JasaVendorIn::createActionNew
 $routes->post('/jasa-vendor-in/update',  'JasaVendor\JasaVendorIn::updateActionNew', ['filter' => 'Auth']);
 $routes->post('/jasa-vendor-in/delete',  'JasaVendor\JasaVendorIn::delete', ['filter' => 'Auth']);
 $routes->post('/jasa-vendor-in/posting',  'JasaVendor\JasaVendorIn::posting', ['filter' => 'Auth']);
+$routes->post('/jasa-vendor-in/posting-bayar',  'JasaVendor\JasaVendorIn::postingBayar', ['filter' => 'Auth']);
 $routes->get('/jasa-vendor-in/id/(:segment)',  'JasaVendor\JasaVendorIn::detail/$1', ['filter' => 'Auth']);
 $routes->get('/jasa-vendor-in/print/(:segment)',  'JasaVendor\JasaVendorIn::print/$1', ['filter' => 'Auth']);
 $routes->get('/jasa-vendor-in/all',  'JasaVendor\JasaVendorIn::all', ['filter' => 'Auth']);
@@ -2244,6 +2246,12 @@ $routes->get('/laporan-accounting/costing', 'Laporan\Accounting\Costing::index',
 $routes->get('/laporan-accounting/costing/getdata', 'Laporan\Accounting\Costing::getCostingData', ['filter' => 'Auth']);
 $routes->get('/laporan-accounting/costing/printPDF/(:segment)/(:segment)/(:segment)/(:segment)', 'Laporan\Accounting\RekapKopek::LaporanKopekPrint/$1/$2/$3/$4', ['filter' => 'Auth']);
 $routes->get('/laporan-accounting/costing/printExcel/(:segment)/(:segment)/(:segment)/(:segment)', 'Laporan\Accounting\RekapKopek::exportExcel/$1/$2/$3/$4', ['filter' => 'Auth']);
+
+$routes->get('/laporan-accounting/jasa-vendor', 'Laporan\Accounting\JasaVendor::index', ['filter' => 'Auth']);
+$routes->post('/laporan-accounting/jasa-vendor', 'Laporan\Accounting\JasaVendor::getVendorData', ['filter' => 'Auth']);
+$routes->get('/laporan-accounting/jasa-vendor/printPDF/(:segment)/(:segment)', 'Laporan\Accounting\JasaVendor::exportPDF/$1/$2', ['filter' => 'Auth']);
+$routes->get('/laporan-accounting/jasa-vendor/printExcel/(:segment)/(:segment)', 'Laporan\Accounting\JasaVendor::exportExcel/$1/$2', ['filter' => 'Auth']);
+
 // Supplier Lokal BB
 $routes->get('/laporan-supplier-lokal-bb', 'Laporan\Supplier\LaporanSupplierLokalBB::index', ['filter' => 'Auth']);
 $routes->get('/laporan-supplier-lokal-bb/kwitansi-tb', 'Laporan\Supplier\KwitansiTb::index', ['filter' => 'Auth']);

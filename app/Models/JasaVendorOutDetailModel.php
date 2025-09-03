@@ -353,7 +353,7 @@ class JasaVendorOutDetailModel extends Model
                 : $supplierName;
 
             // id langsung encrypt tanpa grouping
-            $stockList['id'] = encrypt($stockList['stock_id']);
+            $stockList['id'] = $stockList['id'];
 
             $result[] = $stockList;
         }

@@ -1182,7 +1182,7 @@
 
             var newRow = $('<tr class="grand-total" style="color:whitesmoke; background-color:#f2c996;">');
             newRow.append($('<td style="text-align: right;" colspan="8">').html("<b>GRAND TOTAL</b>"));
-            newRow.append($('<td class="total-cell">').text(greatFormatRupiah(totalQtyKeluar)));
+            newRow.append($('<td class="total-cell">').text(greatFormatQty(totalQtyKeluar)));
             newRow.append($('<td>').text(''));
             table.find('tbody').append(newRow);
 
@@ -1274,7 +1274,7 @@
         });
         // tampilkan clean (ga perlu paksa ".00", kalau mau tambahin ya boleh)
         $('#selectedItemTable tbody tr.grand-total td.total-cell')
-            .text(greatFormatRupiah(total));
+            .text(greatFormatQty(total));
     }
 
 

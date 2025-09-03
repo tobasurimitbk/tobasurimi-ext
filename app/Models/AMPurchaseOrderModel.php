@@ -804,6 +804,7 @@ class AMPurchaseOrderModel extends Model
             'qty_diterima'  => 'qty_diterima',
             'qty_sisa'      => 'qty_sisa',
             'total_harga'   => 'am_purchase_order_details.total',
+            'spp_no'        => 'purchase_requests.spp_no'
         ];
         $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
 
@@ -826,7 +827,8 @@ class AMPurchaseOrderModel extends Model
             am_purchase_order_details.qty_diterima AS qty_diterima,
             am_purchase_order_details.remaining_qty AS qty_sisa,
             am_purchase_order_details.total AS total_harga,
-            metadata.value as valas_name
+            metadata.value as valas_name,
+            purchase_requests.spp_no
         ";
 
         $builder = $this->asArray()
@@ -838,6 +840,7 @@ class AMPurchaseOrderModel extends Model
             ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = am_purchase_order_details.spesifikasi_id', 'left')
             ->join('divisis', 'divisis.id = am_purchase_orders.division_id', 'left')
             ->join('metadata', 'metadata.id = am_purchase_orders.currency', 'left')
+            ->join('purchase_requests', 'purchase_requests.id = am_purchase_orders.purchase_request_id', 'left')
             ->where($condition)
             ->orderBy($sort, $sortType);
 
@@ -876,6 +879,7 @@ class AMPurchaseOrderModel extends Model
                 ->orLike('barang_master.barang_name', $addCondition['search'])
                 ->orLike('barang_master_spesifikasi.spesifikasi', $addCondition['search'])
                 ->orLike('am_purchase_order_details.note', $addCondition['search'])
+                ->orLike('purchase_requests.spp_no', $addCondition['search'])
                 ->groupEnd();
         }
 
@@ -896,6 +900,7 @@ class AMPurchaseOrderModel extends Model
             ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = am_purchase_order_details.spesifikasi_id', 'left')
             ->join('divisis', 'divisis.id = am_purchase_orders.division_id', 'left')
             ->join('metadata', 'metadata.id = am_purchase_orders.currency', 'left')
+            ->join('purchase_requests', 'purchase_requests.id = am_purchase_orders.purchase_request_id', 'left')
             ->where($condition);
 
         if (!empty($addCondition['status_posting'])) {
@@ -929,6 +934,7 @@ class AMPurchaseOrderModel extends Model
                 ->orLike('barang_master.barang_name', $addCondition['search'])
                 ->orLike('barang_master_spesifikasi.spesifikasi', $addCondition['search'])
                 ->orLike('am_purchase_order_details.note', $addCondition['search'])
+                ->orLike('purchase_requests.spp_no', $addCondition['search'])
                 ->groupEnd();
         }
 

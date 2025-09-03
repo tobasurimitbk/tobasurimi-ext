@@ -998,8 +998,8 @@
             });
             var newRow1 = $('<<tr style="color:whitesmoke; background-color:#f2c996;">>');
             newRow1.append($('<td colspan="4" style="text-align:right"><b>GRAND TOTAL</b></td>'));
-            newRow1.append($('<td class="total-qty-kotor">').text(totalQtyKotor.toFixed(2)));
-            newRow1.append($('<td class="total-qty-bersih">').text(totalQtyBersih.toFixed(2)));
+            newRow1.append($('<td class="total-qty-kotor">').text(greatFormatQty(totalQtyKotor)));
+            newRow1.append($('<td class="total-qty-bersih">').text(greatFormatQty(totalQtyBersih)));
             newRow1.append($('<td>'));
             table.find('tbody').append(newRow1);
 
@@ -1024,7 +1024,7 @@
                 newRow.append($('<td>').text(v.tipe_barang));
                 newRow.append($('<td>').text(v.kode_barang_out));
                 newRow.append($('<td>').text(v.barang_out));
-                newRow.append($('<td>').text(v.qty_out.toFixed(2)));
+                newRow.append($('<td>').text(greatFormatQty(v.qty_out)));
                 newRow.append($('<td>').text(v.satuan_out));
                 newRow.append($('<td>').text(v.list_barang_masuk.length + " Barang"));
                 newRow.append($('<td style="text-align: center;">').html(
