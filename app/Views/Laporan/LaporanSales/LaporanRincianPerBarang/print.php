@@ -52,7 +52,7 @@
 <body>
   <h1 style="text-align: center;">TOBA FISH</h1>
   <h2 style="text-align: center;">LAPORAN RINCIAN SALES PER BARANG</h2>
-  <p>Periode: <?= $dateStart ?> - <?= $dateEnd ?></p>
+  <p style="text-align: center;">Periode: <?= $dateStart ?> - <?= $dateEnd ?></p>
 
   <table>
     <thead>

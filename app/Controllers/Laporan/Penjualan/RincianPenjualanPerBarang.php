@@ -106,6 +106,12 @@ class RincianPenjualanPerBarang extends BaseController
 
             $laba = floatval($data->sum_amount_invoice) - floatval($data->amt_harga_pokok);
 
+            if ($data->jenis_penjualan == "1") {
+                $salesName = $data->salesName;
+            } else {
+                $salesName = "OFFICE";
+            }
+
             array_push($dataAllSalesOrderInvoice, [
                 "no" => $no++,
                 "id" => encrypt($data->id),
@@ -118,7 +124,7 @@ class RincianPenjualanPerBarang extends BaseController
                 "amt_harga_pokok" => number_format(floatval($data->amt_harga_pokok), 0, ',', '.'),
                 "amt_laba" => number_format($laba, 0, ',', '.'),
                 "nama_pelanggan" => $data->nama_pelanggan,
-                "nama_sales" => $data->salesName,
+                "nama_sales" => $salesName,
                 "id_barang" => $data->id_barang_invoice,
                 "kode_barang" => $data->kode_barang,
                 "barang_name" => $data->barang_name,
@@ -200,6 +206,12 @@ class RincianPenjualanPerBarang extends BaseController
 
             $laba = floatval($data->sum_amount_invoice) - floatval($data->amt_harga_pokok);
 
+            if ($data->jenis_penjualan == "1") {
+                $salesName = $data->salesName;
+            } else {
+                $salesName = "OFFICE";
+            }
+
             $dataAllSalesOrderInvoice[] = [
                 "no_faktur" => $data->no_faktur,
                 "tanggal_faktur" => $data->tanggal_faktur,
@@ -210,7 +222,7 @@ class RincianPenjualanPerBarang extends BaseController
                 "amt_harga_pokok" => number_format($data->amt_harga_pokok, 0, ',', '.'),
                 "amt_laba" => number_format($laba, 0, ',', '.'),
                 "nama_pelanggan" => $data->nama_pelanggan,
-                "nama_sales" => $data->salesName,
+                "nama_sales" => $salesName,
             ];
 
             $totalPerBarang += floatval($data->sum_amount_invoice);
@@ -267,15 +279,19 @@ class RincianPenjualanPerBarang extends BaseController
         $sheet->mergeCells('A1:K1');
         $sheet->setCellValue('A2', 'LAPORAN RINCIAN SALES PER BARANG');
         $sheet->mergeCells('A2:K2');
-        $sheet->getStyle('A1:A2')->getFont()->setBold(true)->setSize(14);
-        $sheet->getStyle('A1:A2')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+        $sheet->setCellValue('A3', 'PERIODE: ' . ($tglAwal != "all" ? date("d/m/Y", strtotime($tglAwal)) : "All") . ' - ' . ($tglAkhir != "now" ? date("d/m/Y", strtotime($tglAkhir)) : "Now"));
+        $sheet->mergeCells('A3:K3');
 
         // Header tabel
         $sheet->fromArray([
-            ["No Faktur", "Tanggal", "Keterangan", "Qty", "Satuan", "Total Invoice", "Nilai HPP", "Laba Kotor", "Nama Pelanggan", "Nama Sales"]
-        ], null, 'A4');
+            ["No Faktur", "Tanggal", "Keterangan", "Qty", "Satuan", "Total Invoice", "Nilai HPP", "Laba Kotor", "Nama Barang", "Nama Pelanggan", "Nama Sales"]
+        ], null, 'A5');
 
-        $row = 5;
+        $sheet->getStyle('A1:K4')->getFont()->setBold(true)->setSize(14);
+        $sheet->getStyle('A5:K5')->getFont()->setBold(true)->setSize(12);
+        $sheet->getStyle('A1:K5')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+
+        $row = 6;
         $currentBarang = null;
         $totalPerBarang = 0;
         $totalHPPPerBarang = 0;
@@ -308,6 +324,12 @@ class RincianPenjualanPerBarang extends BaseController
 
             $laba = floatval($data->sum_amount_invoice) - floatval($data->amt_harga_pokok);
 
+            if ($data->jenis_penjualan == "1") {
+                $salesName = $data->salesName;
+            } else {
+                $salesName = "OFFICE";
+            }
+
             $sheet->fromArray([
                 $data->no_faktur,
                 $data->tanggal_faktur,
@@ -317,8 +339,9 @@ class RincianPenjualanPerBarang extends BaseController
                 $data->sum_amount_invoice,
                 $data->amt_harga_pokok,
                 $laba,
+                $data->barang_name,
                 $data->nama_pelanggan,
-                $data->salesName,
+                $salesName,
             ], null, 'A' . $row);
 
             $totalPerBarang += floatval($data->sum_amount_invoice);
