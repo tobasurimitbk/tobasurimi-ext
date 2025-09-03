@@ -505,6 +505,7 @@ class BCPurchaseOrderModel extends Model
                     GROUP_CONCAT(DISTINCT penerimaan_barang.tanggal ORDER BY penerimaan_barang.tanggal ASC SEPARATOR ", ") AS lpb_date,
                     GROUP_CONCAT(DISTINCT penerimaan_barang.no_penerimaan_barang ORDER BY penerimaan_barang.tanggal ASC SEPARATOR ", ") AS no_penerimaan_barang,
                     GROUP_CONCAT(DISTINCT penerimaan_barang_detail.purchase_order_id) AS purchase_order_ids,
+                    GROUP_CONCAT(DISTINCT penerimaan_barang_detail.penerimaan_barang_id) AS penerimaan_barang_ids,
                     penerimaan_barang_detail.penerimaan_barang_id,
                     penerimaan_barang_detail.purchase_order_id,
                     penerimaan_barang_detail.id AS penerimaan_barang_detail_id,
@@ -534,6 +535,7 @@ class BCPurchaseOrderModel extends Model
 
             if ($po) {
                 $purchaseOrderIds = explode(',', $po['purchase_order_ids']);
+                $penerimaanBarangIds = explode(',', $po['penerimaan_barang_ids']);
 
                 if (!empty($purchaseOrderIds)) {
                     $sum = $this->db->table('rm_purchase_orders')
@@ -543,6 +545,14 @@ class BCPurchaseOrderModel extends Model
                         ->getRow()
                         ->total_before_pph;
 
+                    $sumKemasan = $this->db->table('penerimaan_barang')
+                        ->selectSum('jumlah_kemasan')
+                        ->whereIn('id', $penerimaanBarangIds)
+                        ->get()
+                        ->getRow()
+                        ->jumlah_kemasan;
+
+                    $po['jumlah_kemasan'] = $sumKemasan ?? 0;
                     $po['sub_total'] = $sum ?? 0;
                 }
             }
