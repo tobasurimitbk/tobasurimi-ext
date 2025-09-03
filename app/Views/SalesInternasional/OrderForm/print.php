@@ -128,7 +128,7 @@
             <div class="txt-center">
                 <h3>
                     <span style="margin-top: -20px;">
-                        <?= strtoupper(str_ireplace(', Tbk', '', $company['holding_company']) . " (" . $company['company'] . ")") ?> <br>
+                        <!-- <?= strtoupper(str_ireplace(', Tbk', '', $company['holding_company']) . " (" . $company['company'] . ")") ?> <br> -->
 
                         ORDER FORM <?= $dataSO->container ?>
                     </span>
@@ -265,31 +265,31 @@
                                         </span>
                                     <?php endif; ?>
                                 </div><br>
-                                <div style="font-size: 12px; margin-top: 4px; line-height: 1.4;">
+                                <div style="font-size: 12px; margin-top: 4px; ">
                                     <table>
                                         <?php if (!empty($detail['species'])): ?>
-                                            <tr>
+                                            <tr style="vertical-align: top;">
                                                 <td style="display: inline-block; font-weight: bold; ">SPECIES</td>
                                                 <td>:</td>
                                                 <td><?= trim($detail['species']) ?></td>
                                             </tr>
                                         <?php endif; ?>
                                         <?php if (!empty($detail['specs'])): ?>
-                                            <tr>
+                                            <tr style="vertical-align: top;">
                                                 <td style="display: inline-block; font-weight: bold;">SPECS</td>
                                                 <td>:</td>
                                                 <td><?= trim($detail['specs']) ?></td>
                                             </tr>
                                         <?php endif; ?>
                                         <?php if (!empty($detail['brand'])): ?>
-                                            <tr>
+                                            <tr style="vertical-align: top;">
                                                 <td style="display: inline-block; font-weight: bold;">BRAND</td>
                                                 <td>:</td>
                                                 <td><?= trim($detail['brand']) ?></td>
                                             </tr>
                                         <?php endif; ?>
                                         <?php if (!empty($detail['packing'])): ?>
-                                            <tr>
+                                            <tr style="vertical-align: top;">
                                                 <td style="display: inline-block; font-weight: bold;">PACKING</td>
                                                 <td>:</td>
                                                 <td><?= trim($detail['packing']) ?></td>
@@ -601,7 +601,7 @@
                                                             foreach ($groupBySatuan as $satuan => $data):
                                                                 $grand_total_qty += $data['qty_input'];
                                                             ?>
-                                                                <td style="padding: 5px; border: 1px solid #ddd; text-align: right; width:90px;">
+                                                                <td style="padding: 5px; border: 1px solid #ddd; text-align: right; width:100px;">
                                                                     <?= number_format($data['qty_input'], 2) ?> <?= $satuan ?>
                                                                 </td>
                                                             <?php endforeach; ?>
@@ -664,15 +664,17 @@
             <table border="1" style="width: 100%; border: 1px solid black; border-collapse: collapse;" class="label">
                 <tbody>
 
+                    <!-- <tr>
+                        <td>
+
+                        </td>
+                    </tr> -->
                     <tr>
                         <td>
                             <b>
                                 DOCS & CERTIFICATE REQUIRED
-                            </b>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
+                            </b><br>
+                            <hr>
                             <?php if ($dataSO->document_required != ""): ?>
                                 <b>
                                     - DOCUMENT REQUIRED
@@ -732,15 +734,17 @@
                             <?php endif; ?>
                         </td>
                     </tr>
-                    <tr class="keep-together">
+                    <!-- <tr class="keep-together">
+                        <td>
+
+                        </td>
+                    </tr> -->
+                    <tr>
                         <td>
                             <b>
                                 SPECIAL INSTRUCTIONS
-                            </b>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
+                            </b> <br>
+                            <hr>
                             <?php if ($dataSO->product_specs != ""): ?>
                                 <b>
                                     - PRODUCT SPECS
