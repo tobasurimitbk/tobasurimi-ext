@@ -21,7 +21,6 @@
     }
 
     th {
-      background-color: #f2f2f2;
       text-align: left;
     }
 
@@ -38,12 +37,10 @@
     }
 
     .group-header {
-      background-color: #e6e6e6;
       font-weight: bold;
     }
 
     .total-row {
-      background-color: #f2f2f2;
       font-weight: bold;
     }
   </style>
