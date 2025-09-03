@@ -291,6 +291,9 @@ class JasaVendorOut extends BaseController
             'tipe_pengambilan_stock'=> $this->request->getVar('type_pengambilan_stock'),
             'keterangan'            => $this->request->getVar('keterangan'),
             'no_surat_jalan'        => $this->request->getVar('no_surat_jalan'),
+            "tanggal" => $this->request->getVar("tanggal") ? date_format(date_create_from_format("d/m/Y", $this->request->getVar("tanggal")), "Y-m-d") : "",
+            'tipe_barang' => "bahan_baku",
+            'no_kontainer' => $this->request->getVar('no_kontainer'),
         ]);
 
         $barang = json_decode($this->request->getVar('listBarang'));

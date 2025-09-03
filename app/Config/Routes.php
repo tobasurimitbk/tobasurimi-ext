@@ -2246,6 +2246,12 @@ $routes->get('/laporan-accounting/costing', 'Laporan\Accounting\Costing::index',
 $routes->get('/laporan-accounting/costing/getdata', 'Laporan\Accounting\Costing::getCostingData', ['filter' => 'Auth']);
 $routes->get('/laporan-accounting/costing/printPDF/(:segment)/(:segment)/(:segment)/(:segment)', 'Laporan\Accounting\RekapKopek::LaporanKopekPrint/$1/$2/$3/$4', ['filter' => 'Auth']);
 $routes->get('/laporan-accounting/costing/printExcel/(:segment)/(:segment)/(:segment)/(:segment)', 'Laporan\Accounting\RekapKopek::exportExcel/$1/$2/$3/$4', ['filter' => 'Auth']);
+
+$routes->get('/laporan-accounting/jasa-vendor', 'Laporan\Accounting\JasaVendor::index', ['filter' => 'Auth']);
+$routes->post('/laporan-accounting/jasa-vendor', 'Laporan\Accounting\JasaVendor::getVendorData', ['filter' => 'Auth']);
+$routes->get('/laporan-accounting/jasa-vendor/printPDF/(:segment)/(:segment)', 'Laporan\Accounting\JasaVendor::exportPDF/$1/$2', ['filter' => 'Auth']);
+$routes->get('/laporan-accounting/jasa-vendor/printExcel/(:segment)/(:segment)', 'Laporan\Accounting\JasaVendor::exportExcel/$1/$2', ['filter' => 'Auth']);
+
 // Supplier Lokal BB
 $routes->get('/laporan-supplier-lokal-bb', 'Laporan\Supplier\LaporanSupplierLokalBB::index', ['filter' => 'Auth']);
 $routes->get('/laporan-supplier-lokal-bb/kwitansi-tb', 'Laporan\Supplier\KwitansiTb::index', ['filter' => 'Auth']);
