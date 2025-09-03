@@ -128,7 +128,7 @@
             <div class="txt-center">
                 <h3>
                     <span style="margin-top: -20px;">
-                        <!-- <?= strtoupper(str_ireplace(', Tbk', '', $company['holding_company']) . " (" . $company['company'] . ")") ?> <br> -->
+                        <?= strtoupper(str_ireplace(', Tbk', '', $company['holding_company'])) . " (" . $subCompany . ")" ?> <br>
 
                         ORDER FORM <?= $dataSO->container ?>
                     </span>
