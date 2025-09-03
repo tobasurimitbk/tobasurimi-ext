@@ -103,7 +103,6 @@
     $(document).ready(function() {
         const csrfToken = '<?= csrf_token() ?>';
         const table = $('.dataTable').DataTable({
-
             processing: true,
             serverSide: true,
             ordering: true,
@@ -121,7 +120,7 @@
                 dataSrc: "data",
                 data: function(data) {
                     data.search = $(".search").val();
-                    data.filter = $(".filter_customer").val();
+                    data.filter = $(".filter_barang").val();
                     data.dateStart = $(".dateStart").val();
                     data.dateEnd = $(".dateEnd").val();
                     data.sort = sort;
@@ -139,21 +138,23 @@
                 if (data.is_customer) {
                     $(row).addClass('customer-row')
                         .find('td')
-                        .attr('colspan', 9)
+                        .attr('colspan', 11)
                         .removeClass('text-center')
                         .addClass('text-left txt-bold')
                         .css('cssText', 'font-weight:700 !important;');
 
-                    $(row).find('td:not(:first)').remove(); // Remove other cells
+                    $(row).find('td:not(:first)').remove();
                 } else if (data.is_total) {
-                    $(row).addClass('total-row')
-                        .find('td')
-                        .attr('colspan', 9)
-                        .removeClass('text-center')
-                        .addClass('text-left txt-bold')
-                        .css('cssText', 'font-weight:700 !important;');
+                    $(row).addClass('total-row');
 
-                    $(row).find('td:not(:first)').remove(); // Remove other cells
+                    // Buat ulang isi row total
+                    $(row).html(`
+                        <td colspan="5" class="text-left txt-bold" style="font-weight:700!important">Total</td>
+                        <td class="text-center txt-bold" style="font-weight:700!important">${data.tanggal_faktur}</td>
+                        <td class="text-center txt-bold" style="font-weight:700!important">${data.keterangan}</td>
+                        <td class="text-center txt-bold" style="font-weight:700!important">${data.qty_invoice}</td>
+                        <td colspan="3"></td>
+                    `);
                 }
             },
             columns: [{
@@ -197,7 +198,7 @@
                 }
             ],
             columnDefs: [{
-                defaultContent: "-",
+                defaultContent: "",
                 targets: "_all"
             }],
             language: {
@@ -210,19 +211,19 @@
             }
         });
         //CSS SELECT2 FLOATING LABEL
-        $('.filter_customer').select2({
-            placeholder: "Filter Pelanggan",
+        $('.filter_barang').select2({
+            placeholder: "Filter Barang",
             theme: "bootstrap-5",
             allowClear: true
         });
-        $('.filter_customer')
+        $('.filter_barang')
             .parent('div')
             .children('span')
             .children('span')
             .children('span')
             .css('height', ' calc(3.5rem + 2px)');
 
-        $('.filter_customer')
+        $('.filter_barang')
             .parent('div')
             .children('span')
             .children('span')
@@ -230,7 +231,7 @@
             .children('span')
             .css('margin-top', '22px').css('margin-left', '-7px');
 
-        $('.filter_customer')
+        $('.filter_barang')
             .parent('div')
             .find('label')
             .css('z-index', '1');
@@ -261,7 +262,7 @@
             table.ajax.reload();
         })
 
-        $(".dateStart, .dateEnd, .filter_customer").change(function() {
+        $(".dateStart, .dateEnd, .filter_barang").change(function() {
             table.ajax.reload();
         })
 
@@ -279,7 +280,7 @@
         var tanggal_awal = $(".dateStart").val() ? convertDateFormat($(".dateStart").val()) : "all";
         var tanggal_akhir = $(".dateEnd").val() ? convertDateFormat($(".dateEnd").val()) : "now";
         var search = $(".search").val() ? $(".search").val() : "all";
-        var filter = $(".filter_customer").val() ? $(".filter_customer").val() : "all";
+        var filter = $(".filter_barang").val() ? $(".filter_barang").val() : "all";
         url2 = url + "/" + tanggal_awal + "/" + tanggal_akhir + "/" + filter + "/" + search;
         // console.log(url2);
         window.open(url2, "_blank");
@@ -288,7 +289,7 @@
         var tanggal_awal = $(".dateStart").val() ? convertDateFormat($(".dateStart").val()) : "all";
         var tanggal_akhir = $(".dateEnd").val() ? convertDateFormat($(".dateEnd").val()) : "now";
         var search = $(".search").val() ? $(".search").val() : "all";
-        var filter = $(".filter_customer").val() ? $(".filter_customer").val() : "all";
+        var filter = $(".filter_barang").val() ? $(".filter_barang").val() : "all";
         url2 = url + "/" + tanggal_awal + "/" + tanggal_akhir + "/" + filter + "/" + search;
         // console.log(url2);
         window.open(url2, "_blank");
