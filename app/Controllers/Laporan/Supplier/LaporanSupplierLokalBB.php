@@ -83,6 +83,7 @@ class LaporanSupplierLokalBB extends BaseController
             // 'penerimaan_barang.status_penerimaan' => 'LOKAL',
             // 'penerimaan_barang.tipe_bahan' => 'BAKU',
             'rm_purchase_orders.deletedAt' => null,
+            'rm_purchase_order_details.deletedAt' => null,
             'rm_purchase_orders.company_id' => $this->this_company_id,
             // 'penerimaan_barang.deletedAt' => null,
             // 'penerimaan_barang_detail.deletedAt' => null,
@@ -336,6 +337,7 @@ class LaporanSupplierLokalBB extends BaseController
             // 'penerimaan_barang.tipe_bahan' => 'BAKU',
             'rm_purchase_orders.company_id' => $this->this_company_id,
             'rm_purchase_orders.deletedAt' => null,
+            'rm_purchase_order_details.deletedAt' => null,
             // 'penerimaan_barang.deletedAt' => null,
             // 'penerimaan_barang_detail.deletedAt' => null,
             'rm_purchase_orders.status_external' => 'no',
@@ -751,6 +753,7 @@ class LaporanSupplierLokalBB extends BaseController
             // 'penerimaan_barang.tipe_bahan' => 'BAKU',
             'rm_purchase_orders.company_id' => $this->this_company_id,
             'rm_purchase_orders.deletedAt' => null,
+            'rm_purchase_order_details.deletedAt' => null,
             // 'penerimaan_barang.deletedAt' => null,
             // 'penerimaan_barang_detail.deletedAt' => null,
             'rm_purchase_orders.status_external' => 'no',
@@ -2791,6 +2794,7 @@ class LaporanSupplierLokalBB extends BaseController
             'penerimaan_barang.tipe_bahan' => 'BAKU',
             'rm_purchase_orders.company_id' => $this->this_company_id,
             'rm_purchase_orders.deletedAt' => null,
+            'rm_purchase_order_details.deletedAt' => null,
             'rm_purchase_orders.status_external' => 'no',
         ];
 
@@ -3065,6 +3069,7 @@ class LaporanSupplierLokalBB extends BaseController
             'penerimaan_barang.tipe_bahan' => 'BAKU',
             'rm_purchase_orders.company_id'  => $this->this_company_id,
             'rm_purchase_orders.deletedAt'  => null,
+            'rm_purchase_order_details.deletedAt' => null,
             'rm_purchase_orders.status_external' => 'no',
         ];
 
@@ -3409,6 +3414,7 @@ class LaporanSupplierLokalBB extends BaseController
             'penerimaan_barang.tipe_bahan' => 'BAKU',
             'rm_purchase_orders.company_id'  => $this->this_company_id,
             'rm_purchase_orders.deletedAt'  => null,
+            'rm_purchase_order_details.deletedAt' => null,
             'rm_purchase_orders.status_external' => 'no',
         ];
 
