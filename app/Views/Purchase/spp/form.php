@@ -201,11 +201,13 @@
                                     </select>
                                     <label for="floatingInput">Kode Barang</label>
                                 </div>
-                                <div class="input-group-append" style="height:50px;">
-                                    <button class="btn btn-success btn-add-barang" data-toggle="modal" type="button">
-                                        <i class="fas fa-plus"></i>
-                                    </button>
-                                </div>
+                                <?php if (can('Master Barang', 'Bahan Penolong', 'c')): ?>
+                                    <div class="input-group-append" style="height:50px;">
+                                        <button class="btn btn-success btn-add-barang" data-toggle="modal" type="button">
+                                            <i class="fas fa-plus"></i>
+                                        </button>
+                                    </div>
+                                <?php endif; ?>
                             </div>
                         </div>
                         <div class="col-md-6">
@@ -584,47 +586,47 @@
     });
 
 
-$('.kode_barang').select2({
-    placeholder: "Pilih Kode Barang",
-    theme: "bootstrap-5",
-    dropdownParent: $(".detail-modal .modal-content"),
-    ajax: {
-        url: '<?= base_url("barang/dropdown/type-server") ?>',
-        dataType: 'json',
-        delay: 250,
-        data: function(params) {
-            return {
-                q: params.term, 
-                type: getTypeSPP()
-            };
+    $('.kode_barang').select2({
+        placeholder: "Pilih Kode Barang",
+        theme: "bootstrap-5",
+        dropdownParent: $(".detail-modal .modal-content"),
+        ajax: {
+            url: '<?= base_url("barang/dropdown/type-server") ?>',
+            dataType: 'json',
+            delay: 250,
+            data: function(params) {
+                return {
+                    q: params.term,
+                    type: getTypeSPP()
+                };
+            },
+            processResults: function(data) {
+                // Pastikan server mengembalikan data dengan struktur yang lengkap
+                return {
+                    results: $.map(data.results, function(item) {
+                        return {
+                            id: item.id,
+                            text: item.text,
+                            // Tambahkan semua data attributes yang diperlukan
+                            satuan_1: item.satuan_1,
+                            satuan_2: item.satuan_2,
+                            satuan_3: item.satuan_3,
+                            barang_name_master: item.barang_name_master,
+                            barang_spesifikasi_id: item.barang_spesifikasi_id,
+                            barang_id: item.barang_id,
+                            nama: item.nama,
+                            satuan_id: item.satuan_id,
+                            kode_barang: item.kode_barang,
+                            satuan: item.satuan
+                        };
+                    })
+                };
+            },
+            cache: true
         },
-        processResults: function(data) {
-            // Pastikan server mengembalikan data dengan struktur yang lengkap
-            return {
-                results: $.map(data.results, function(item) {
-                    return {
-                        id: item.id,
-                        text: item.text,
-                        // Tambahkan semua data attributes yang diperlukan
-                        satuan_1: item.satuan_1,
-                        satuan_2: item.satuan_2,
-                        satuan_3: item.satuan_3,
-                        barang_name_master: item.barang_name_master,
-                        barang_spesifikasi_id: item.barang_spesifikasi_id,
-                        barang_id: item.barang_id,
-                        nama: item.nama,
-                        satuan_id: item.satuan_id,
-                        kode_barang: item.kode_barang,
-                        satuan: item.satuan
-                    };
-                })
-            };
-        },
-        cache: true
-    },
-    minimumInputLength: 1
-});
-    
+        minimumInputLength: 1
+    });
+
 
     $('.satuan_id').select2({
         placeholder: "Pilih Kode Satuan",
@@ -802,14 +804,14 @@ $('.kode_barang').select2({
         }
         $(".spp_type_bypass").val(type)
 
-        if(spp_type == ""){
+        if (spp_type == "") {
             Swal.fire({
                 icon: 'error',
                 title: "Pilih Tipe SPP Dahulu",
                 confirmButtonColor: '#4e73df',
             });
             return;
-        }else{
+        } else {
             $(".kode_barang").val(null).change();
             $(".detail-modal").modal("show");
         }
@@ -823,12 +825,12 @@ $('.kode_barang').select2({
         $(".detail-modal").modal("hide")
     });
 
-    $('.kode_barang').on('select2:select', function (e) {
+    $('.kode_barang').on('select2:select', function(e) {
         var data = e.params.data;
-        
+
         // Set data attributes ke elemen option yang dipilih
         var selectedOption = $(this).find('option:selected');
-        
+
         // Set semua data attributes
         selectedOption.data('satuan_1', data.satuan_1);
         selectedOption.data('satuan_2', data.satuan_2);
@@ -840,13 +842,13 @@ $('.kode_barang').select2({
         selectedOption.data('satuan_id', data.satuan_id);
         selectedOption.data('kode_barang', data.kode_barang);
         selectedOption.data('satuan', data.satuan);
-        
+
         // Trigger change event manual
         $(this).trigger('change');
     });
 
     $(".kode_barang").on('change', function(e) {
-         
+
         if ($(".kode_barang option:selected").val()) {
             console.log($('.kode_barang option:selected').val());
             let nama = $(".kode_barang option:selected").data("nama") ? $(".kode_barang option:selected").data("nama") : "";
@@ -2312,7 +2314,7 @@ $('.kode_barang').select2({
         });
     }
 
-    function getTypeSPP(){
+    function getTypeSPP() {
         var spp_type = $('.spp_type').val().trim();
         var type = "";
 
