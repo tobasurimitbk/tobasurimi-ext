@@ -2383,8 +2383,13 @@ $routes->get('/laporan-sales/sales-per-barang/printExcelKuantitas/(:segment)/(:s
 
 $routes->get('/laporan-sales/rincian-sales-per-barang', 'Laporan\Penjualan\RincianPenjualanPerBarang::index', ['filter' => 'Auth']);
 $routes->get('/laporan-sales/rincian-sales-per-barang/all', 'Laporan\Penjualan\RincianPenjualanPerBarang::allTransaksi', ['filter' => 'Auth']);
-$routes->get('/laporan-sales/rincian-sales-per-barang/printPDFAll/(:segment)/(:segment)/(:segment)/(:segment)', 'Laporan\Penjualan\RincianPenjualanPerBarang::printPDFAll/$1/$2/$3/$4', ['filter' => 'Auth']);
-$routes->get('/laporan-sales/rincian-sales-per-barang/printExcelAll/(:segment)/(:segment)/(:segment)/(:segment)', 'Laporan\Penjualan\RincianPenjualanPerBarang::printExcelAll/$1/$2/$3/$4', ['filter' => 'Auth']);
+$routes->get('/laporan-sales/pesanan-sales-per-pelanggan/printPDF/(:segment)/(:segment)/(:segment)/(:segment)', 'Laporan\Penjualan\PesananPenjualanPerPelanggan::printPDF/$1/$2/$3/$4', ['filter' => 'Auth']);
+$routes->get('/laporan-sales/pesanan-sales-per-pelanggan/printExcel/(:segment)/(:segment)/(:segment)/(:segment)', 'Laporan\Penjualan\PesananPenjualanPerPelanggan::printExcel/$1/$2/$3/$4', ['filter' => 'Auth']);
+
+$routes->get('/laporan-sales/pesanan-sales-per-pelanggan', 'Laporan\Penjualan\PesananPenjualanPerPelanggan::index', ['filter' => 'Auth']);
+$routes->get('/laporan-sales/pesanan-sales-per-pelanggan/all', 'Laporan\Penjualan\PesananPenjualanPerPelanggan::allTransaksi', ['filter' => 'Auth']);
+$routes->get('/laporan-sales/pesanan-sales-per-pelanggan/printPDF/(:segment)/(:segment)/(:segment)/(:segment)/(:segment)', 'Laporan\Penjualan\PesananPenjualanPerPelanggan::printPDF/$1/$2/$3/$4/$5', ['filter' => 'Auth']);
+$routes->get('/laporan-sales/pesanan-sales-per-pelanggan/printExcel/(:segment)/(:segment)/(:segment)/(:segment)/(:segment)', 'Laporan\Penjualan\PesananPenjualanPerPelanggan::printExcel/$1/$2/$3/$4/$5', ['filter' => 'Auth']);
 
 // RETUR LOKAL BB
 $routes->get('/retur-po-lokal-bb', 'ReturPembelian\ReturPembelianLokalBB::index', ['filter' => 'Auth']);

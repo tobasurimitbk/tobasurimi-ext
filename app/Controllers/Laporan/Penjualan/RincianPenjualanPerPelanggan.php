@@ -24,7 +24,10 @@ class RincianPenjualanPerPelanggan extends BaseController
 
     public function index()
     {
-        $customerData = $this->customerModel->asObject()->findAll();
+        $customerData = $this->customerModel->asObject()->where([
+            'deletedAt' => null,
+            'tipe_customer' => 'LOKAL'
+        ])->orderBy('name', 'ASC')->findAll();
         $data = [
             'customer' => $customerData
         ];
@@ -458,7 +461,7 @@ class RincianPenjualanPerPelanggan extends BaseController
                 $sheet->setCellValue('A' . $row, $item['no_faktur']);
                 $sheet->setCellValue('F' . $row, $item['amt_harga_pokok']);
                 $sheet->setCellValue('G' . $row, $item['amt_laba']);
-                
+
                 $sheet->getStyle('A' . $row . ':I' . $row)->getFont()->setBold(true);
                 $sheet->getStyle('A' . $row . ':I' . $row)->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('FFF2F2F2');
             } else {

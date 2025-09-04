@@ -17,7 +17,7 @@
             margin: 25px;
             padding: 25px;
         }
-        
+
         .dot-matrix-bold {
             font-weight: bold;
             text-shadow: 0.4px 0 0 currentColor, -0.4px 0 0 currentColor;
@@ -36,6 +36,7 @@
         }
 
         .description-container {
+            top: 2px;
             border: 0.5px solid;
             border-radius: 7px;
             height: 50px;
@@ -71,12 +72,11 @@
 
         .item-table td {
             border-right: 1px solid;
-        }
+        } */
 
         .signature-table {
-            border-spacing: 30px 0;
-            margin-top: 10px;
-        } */
+            margin-top: 5px;
+        }
 
         .item-table {
             border: 0.5px solid black;

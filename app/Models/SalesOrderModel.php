@@ -226,4 +226,99 @@ class SalesOrderModel extends Model
 
         return $dataSalesOrder;
     }
+
+    public function getLaporanPesananPenjualanPerPelanggan($condition, $addCondition, $limit = 10, $offset = 0)
+    {
+        $availableSort = [
+            'no_sales_order'     => 'sales_order.no_sales_order',
+            'nama_pelanggan'     => 'customers.name',
+            'amount'             => 'sales_order_detail.amount',
+            'createdAt'          => 'sales_order.createdAt',
+            'updatedAt'          => 'sales_order.updatedAt',
+        ];
+        $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
+
+        $sort = $availableSort[$addCondition['sort'] ?? 'createdAt'] ?? 'sales_order.createdAt';
+        $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'DESC';
+
+        $selectQry = "
+                    sales_order.id,
+                    sales_order.no_sales_order,
+                    sales_order.surat_jalan_so_id,
+                    sales_order.sales_order_invoice_id,
+                    DATE_FORMAT(sales_order.order_date, '%d/%m/%Y') AS order_date,
+                    DATE_FORMAT(sales_order.shipping_date, '%d/%m/%Y') AS shipping_date,
+                    customers.name AS nama_pelanggan,
+                    SUM(sales_order_detail.qty) AS sum_qty,
+                    SUM(sales_order_detail.amount) AS sum_amount";
+
+        $salesOrderLokal = $this->asObject()
+            ->select($selectQry)
+            ->join('customers', 'customers.id = sales_order.id_customer')
+            ->join('employees', 'employees.id = customers.sales_id', 'left')
+            ->join('sales_order_detail', 'sales_order_detail.id_sales_order = sales_order.id', 'LEFT')
+            ->join('barang_master_sales', 'barang_master_sales.id = sales_order_detail.id_barang', 'LEFT')
+            ->where($condition)
+            ->groupBy('sales_order.id')
+            ->orderBy('customers.name', 'ASC')
+            ->orderBy($sort, $sortType);
+
+        $totalData = $salesOrderLokal->countAllResults(false);
+
+        if ($addCondition['search'] || $addCondition['dateStart'] || $addCondition['dateEnd'] || $addCondition['dateStartShip'] || $addCondition['dateEndShip'] || $addCondition['filter_customer'] || $addCondition['filter_status']) {
+            $salesOrderLokal->groupStart();
+        }
+
+        if ($addCondition['search']) {
+            $salesOrderLokal
+                ->like('no_sales_order', $addCondition['search'])
+                ->orLike('customers.name', $addCondition['search']);
+        }
+
+        if ($addCondition['filter_customer']) {
+            $salesOrderLokal->where('sales_order.id_customer', $addCondition['filter_customer']);
+        }
+
+        if ($addCondition['dateStart']) {
+            $salesOrderLokal->where('sales_order.order_date >=',  $addCondition['dateStart']);
+        }
+        if ($addCondition['dateEnd']) {
+            $salesOrderLokal->where('sales_order.order_date <=', $addCondition['dateEnd']);
+        }
+
+        if ($addCondition['dateStartShip']) {
+            $salesOrderLokal->where('sales_order.shipping_date >=',  $addCondition['dateStartShip']);
+        }
+        if ($addCondition['dateEndShip']) {
+            $salesOrderLokal->where('sales_order.shipping_date <=', $addCondition['dateEndShip']);
+        }
+
+        if ($addCondition['filter_status'] == "belum") {
+            $salesOrderLokal->where('sales_order.surat_jalan_so_id', null)
+                ->where('sales_order.sales_order_invoice_id', null);
+        } elseif ($addCondition['filter_status'] == "selesai") {
+            $salesOrderLokal->groupStart();
+            $salesOrderLokal->where('sales_order.surat_jalan_so_id IS NOT', null);
+            $salesOrderLokal->orWhere('sales_order.sales_order_invoice_id IS NOT', null);
+            $salesOrderLokal->groupEnd();
+        }
+
+        if ($addCondition['search'] || $addCondition['dateStart'] || $addCondition['dateEnd'] || $addCondition['dateStartShip'] || $addCondition['dateEndShip'] || $addCondition['filter_customer'] || $addCondition['filter_status']) {
+            $salesOrderLokal->groupEnd();
+        }
+
+        $totalFilteredData = $salesOrderLokal->countAllResults(false);
+
+        if ($limit !== null && $offset !== null) {
+            $data = $salesOrderLokal->findAll((int)$limit, (int)$offset);
+        } else {
+            $data = $salesOrderLokal->findAll();
+        }
+
+        return [
+            'data'              => $data,
+            'totalData'         => $totalData,
+            'totalFilteredData' => $totalFilteredData
+        ];
+    }
 }

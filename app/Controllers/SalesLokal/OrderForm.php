@@ -971,10 +971,6 @@ class OrderForm extends BaseController
         $this->SalesOrderModel->update($id, ['counter_print' => $salesOrderData->counter_print + 1]);
 
 
-
-
-
-
         // return view('SalesLokal/OrderForm/print', $data);
 
         // load HTML content
