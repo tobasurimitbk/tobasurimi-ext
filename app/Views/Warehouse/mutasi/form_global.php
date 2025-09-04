@@ -58,7 +58,7 @@
                         <div class="form-floating mb-3" style="height: 50px;">
                             <div class="input-group input-group-password">
                                 <div class="form-floating mb-3" style="height: 50px;">
-                                    <input autocomplete="one-time-code" disabled class="form-control input-picker tanggal" id="tanggal" name="tanggal" placeholder="Tanggal Dibuat" value="<?= date('d/m/Y', strtotime(!empty($mutasiGlobal) ? $mutasiGlobal['tanggal'] : $tanggal)); ?>">
+                                    <input <?= !empty($mutasi) ? ($mutasi['status_posting'] ? 'disabled' : '') : '' ?> autocomplete="one-time-code" class="form-control input-picker tanggal" id="tanggal" name="tanggal" placeholder="Tanggal Dibuat" value="<?= date('d/m/Y', strtotime(!empty($mutasiGlobal) ? $mutasiGlobal['tanggal'] : $tanggal)); ?>">
                                     <label for="floatingInput">Tanggal Dibuat</label>
                                 </div>
                                 <div class="input-group-prepend group-prepend-password align-items-center">
@@ -394,6 +394,13 @@
         drawTableSelectedItem();
     });
 
+    $(".tanggal").datepicker({
+        todayHighlight: true,
+        format: "dd/mm/yyyy",
+        orientation: "bottom auto",
+        autoclose: true
+    })
+
     $('#company_tujuan_id').select2({
         placeholder: "Pilih Company Tujuan",
         theme: "bootstrap-5",
@@ -574,6 +581,9 @@
     // VALIDATOR
     var validator = $(".create-form").validate({
         rules: {
+            tanggal: {
+                required: true
+            },
             no_mutasi: {
                 required: true
             },
@@ -597,6 +607,9 @@
             }
         },
         messages: {
+            tanggal: {
+                required: "Tanggal wajib diisi"
+            },
             no_mutasi: {
                 required: "No mutasi wajib diisi"
             },
