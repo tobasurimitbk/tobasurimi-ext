@@ -923,6 +923,31 @@
         });
     }
 
+    function handleCalcInput(el, event) {
+        if (event.key === "Enter") {
+            let value = el.value.trim();
+
+            // Kalau kosong, langsung return
+            if (value === "") return;
+
+            try {
+                // Validasi: hanya angka, + - * / dan spasi
+                if (/^[0-9+\-*/. ]+$/.test(value)) {
+                    // Hitung hasil
+                    let result = eval(value); // hati-hati eval, tapi cukup aman kalau regex dibatasi
+                    if (!isNaN(result)) {
+                        el.value = greatFormatQty(result);
+                    }
+                } else {
+                    alert("Input tidak valid");
+                }
+            } catch (e) {
+                alert("Ekspresi salah!");
+            }
+        }
+    }
+
+
     function drawTable(listBarang) {
         const table = $('#dataTable');
         table.find('tbody').empty();
@@ -979,22 +1004,38 @@
                 newRow.append($('<td>').text(v.kode_satuan_in));
                 newRow.append($('<td style="text-align: center;">').html(
                     `
-                    <input <?= !empty($jasaVendorIn) ? (($jasaVendorIn['status_posting'] == "1") ? 'disabled' : '') : '' ?> style="height: 40px; padding-bottom: 10px;" class="form-control qty_kotor" oninput="preventNegativeInput(this)" autocomplete="one-time-code" data-spesifikasi_in_id="${v.spesifikasi_in_id}" class="form-control qty_kotor" type="text" value="${v.qty_kotor == '' || v.qty_kotor == 0 ? '' : v.qty_kotor.toFixed(2)}">
-                `
+                    <input <?= !empty($jasaVendorIn) ? (($jasaVendorIn['status_posting'] == "1") ? 'disabled' : '') : '' ?> 
+                        style="height: 40px; padding-bottom: 10px;" 
+                        class="form-control qty_kotor" 
+                        onkeydown="handleCalcInput(this, event)"
+                        autocomplete="one-time-code" 
+                        data-spesifikasi_in_id="${v.spesifikasi_in_id}" 
+                        type="text" 
+                        value="${v.qty_kotor == '' || v.qty_kotor == 0 ? '' : v.qty_kotor.toFixed(2)}">
+                    `
                 ));
+
                 newRow.append($('<td style="text-align: center;">').html(
                     `
-                    <input <?= !empty($jasaVendorIn) ? (($jasaVendorIn['status_posting'] == "1") ? 'disabled' : '') : '' ?> style="height: 40px; padding-bottom: 10px;" class="form-control qty_bersih" oninput="preventNegativeInput(this)" autocomplete="one-time-code" data-spesifikasi_in_id="${v.spesifikasi_in_id}" class="form-control qty_bersih" type="text" value="${v.qty_bersih == '' || v.qty_bersih == 0 ? '' :v.qty_bersih.toFixed(2)}">
-                `
+                    <input <?= !empty($jasaVendorIn) ? (($jasaVendorIn['status_posting'] == "1") ? 'disabled' : '') : '' ?> 
+                        style="height: 40px; padding-bottom: 10px;" 
+                        class="form-control qty_bersih" 
+                        onkeydown="handleCalcInput(this, event)"
+                        autocomplete="one-time-code" 
+                        data-spesifikasi_in_id="${v.spesifikasi_in_id}" 
+                        type="text" 
+                        value="${v.qty_bersih == '' || v.qty_bersih == 0 ? '' : v.qty_bersih.toFixed(2)}">
+                    `
                 ));
+
                 newRow.append($('<td style="text-align: center;">').html(
                     `
                     <button <?= !empty($jasaVendorIn) ? (($jasaVendorIn['status_posting'] == "1") ? 'disabled' : '') : '' ?> type="button" class="btn btn-danger" onclick="deleteDetail(${listBarangFirst.barang1_id}, '${v.spesifikasi_in_id}')" ><i class="fa fa-trash fa-sm" aria-hidden="true"></i></button>
                 `
                 ));
                 table.find('tbody').append(newRow);
-                totalQtyKotor += v.qty_kotor;
-                totalQtyBersih += v.qty_bersih;
+                totalQtyKotor += destroyFormatRupiah(v.qty_kotor);
+                totalQtyBersih += destroyFormatRupiah(v.qty_bersih);
             });
             var newRow1 = $('<<tr style="color:whitesmoke; background-color:#f2c996;">>');
             newRow1.append($('<td colspan="4" style="text-align:right"><b>GRAND TOTAL</b></td>'));
@@ -1258,21 +1299,48 @@
             }
         })
     }
-    $(document).on("input", ".qty_kotor", function() {
-        var sum = 0;
-        console.log("test");
-        $(".qty_kotor").each(function() {
-            sum += Number($(this).val());
-        });
-        $(".total-qty-kotor").text(sum.toFixed(2));
+    // Fungsi untuk evaluasi ekspresi (hanya angka + - * / .)
+    function evaluateExpression(val) {
+        if (!val) return 0;
+        val = val.trim();
+        if (/^[0-9+\-*/. ]+$/.test(val)) {
+            try {
+                let result = eval(val);
+                return isNaN(result) ? 0 : result;
+            } catch (e) {
+                return 0;
+            }
+        }
+        return parseFloat(val) || 0;
+    }
+
+    // Enter → kalkulasi & replace isi input
+    $(document).on("keydown", ".qty_kotor, .qty_bersih", function (e) {
+        if (e.key === "Enter") {
+            let value = $(this).val();
+            let result = evaluateExpression(value);
+            $(this).val(greatFormatQty(result)).trigger("input"); // update isi & trigger input biar total ke-refresh
+        }
     });
-    $(document).on("input", ".qty_bersih", function() {
+
+    // Kalkulasi total qty_kotor
+    $(document).on("input", ".qty_kotor", function () {
         var sum = 0;
-        $(".qty_bersih").each(function() {
-            sum += Number($(this).val());
+        $(".qty_kotor").each(function () {
+            sum += evaluateExpression($(this).val());
         });
-        $(".total-qty-bersih").text(sum.toFixed(2));
+        $(".total-qty-kotor").text(greatFormatQty(sum));
     });
+
+    // Kalkulasi total qty_bersih
+    $(document).on("input", ".qty_bersih", function () {
+        var sum = 0;
+        $(".qty_bersih").each(function () {
+            sum += evaluateExpression($(this).val());
+        });
+        $(".total-qty-bersih").text(greatFormatQty(sum));
+    });
+
 </script>
 
 <?= $this->endSection(); ?>
