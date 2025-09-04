@@ -528,8 +528,13 @@ class JasaVendorIn extends BaseController
             'company_id' => $this->this_company_id,
             'divisi_id' => $this->request->getVar('divisi_id'),
             'warehouse_id' => $this->request->getVar('warehouse_id'),
+            'vendor_id' => $this->request->getVar('vendor_id'),
+            "tanggal" => $this->request->getVar("tanggal")
+                ? date_format(date_create_from_format("d/m/Y", $this->request->getVar("tanggal")), "Y-m-d")
+                : "",
+            "no_surat_jalan_vendor" => $this->request->getVar('no_surat_jalan_vendor'),
             'status_closed_jasa_vendor_out' => $this->request->getVar('status_closed_jasa_vendor_out'),
-            'no_surat_jalan_vendor' => $this->request->getVar('no_surat_jalan_vendor'),
+            'no_penerimaan_surat_jalan' => $this->request->getVar('no_penerimaan_surat_jalan'),
             'multiple_jasa_vendor_out_id' => str_replace(['\\"', '\\', '"'], '', json_encode($this->request->getVar('multiple_jasa_vendor_out_id'))),
             'multiple_jasa_vendor_out_no' => str_replace(['\\"', '\\'], '', json_encode($jasaVendorOutNo)),
             'keterangan' => $this->request->getVar('keterangan')
@@ -605,7 +610,7 @@ class JasaVendorIn extends BaseController
             'token' => csrf_hash(),
             'status' => true
         ]);
-}
+    }
 
     public function delete()
     {
