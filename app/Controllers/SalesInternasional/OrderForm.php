@@ -817,7 +817,7 @@ class OrderForm extends BaseController
 
         $dataSO = $this->salesOrderExportModel->getById($id);
         $displayPrice = $this->request->getVar('display_price');
-        $companyId = $this->request->getGet('company_id');
+        // $companyId = $this->request->getGet('company_id');
 
         if ($dataSO == null || empty($displayPrice)) {
             return redirect()->to('order-form-internasional');
@@ -851,16 +851,23 @@ class OrderForm extends BaseController
             "dataSalesOrderSpecs" => $dataSalesExportSpecs,
             "dataSalesExportAdditional" => $dataSalesExportAdditional,
             "company" => $this->companyModel->where('id', $dataSO->company_id)->first(),
+            "subCompany" => ""
         ];
 
-        if (!empty($companyId)) {
-            $data['company'] = $this->companyModel->where('id', $companyId)->first();
+        if ($data['company']['id'] == 16) {
+            $data['subCompany'] = "OCS";
+        } else {
+            $data['subCompany'] = "TSI";
         }
 
-        if ($data['company'] == null) {
-            var_dump("State exception, company is not found please back to previous step");
-            die;
-        }
+        // if (!empty($companyId)) {
+        //     $data['company'] = $this->companyModel->where('id', $companyId)->first();
+        // }
+
+        // if ($data['company'] == null) {
+        //     var_dump("State exception, company is not found please back to previous step");
+        //     die;
+        // }
 
         // dd($data['dataSODetail']);
 

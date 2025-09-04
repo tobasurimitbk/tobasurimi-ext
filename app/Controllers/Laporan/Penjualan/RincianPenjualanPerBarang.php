@@ -68,31 +68,23 @@ class RincianPenjualanPerBarang extends BaseController
         $dataAllSalesOrderInvoice = [];
         $currentBarang = null;
         $totalPerBarang = 0;
+        $totalHppPerBarang = 0;
+        $totalLabaPerBarang = 0;
         $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
 
         foreach ($dataSalesOrderInvoice['data'] as $data) {
             if ($currentBarang !== $data->id_barang_invoice) {
                 if ($currentBarang !== null) {
                     array_push($dataAllSalesOrderInvoice, [
-                        "no" => '',
-                        "id" => '',
-                        "no_faktur" => 'Total Invoice: Rp ' . number_format(floatval($totalPerBarang)),
-                        "tanggal_faktur" => '',
-                        "keterangan" => '',
-                        "total_invoice" => '',
-                        "nama_pelanggan" => '',
-                        "nama_sales" => '',
+                        "no_faktur" => 'Total',
+                        "tanggal_faktur" => number_format($totalPerBarang, 0, ',', '.'),
+                        "keterangan" => number_format($totalHppPerBarang, 0, ',', '.'),
+                        "qty_invoice" => number_format($totalLabaPerBarang, 0, ',', '.'),
                         "is_total" => true,
-                        "id_barang" => '',
-                        "kode_barang" => '',
-                        "barang_name" => '',
-                        "qty_invoice" => '',
-                        "kode_satuan" => '',
                     ]);
                 }
 
                 $currentBarang = $data->id_barang_invoice;
-                $totalPerBarang = 0;
 
                 array_push($dataAllSalesOrderInvoice, [
                     "no" => '',
@@ -112,44 +104,44 @@ class RincianPenjualanPerBarang extends BaseController
                 ]);
             }
 
+            $laba = floatval($data->sum_amount_invoice) - floatval($data->amt_harga_pokok);
+
+            if ($data->jenis_penjualan == "1") {
+                $salesName = $data->salesName;
+            } else {
+                $salesName = "OFFICE";
+            }
+
             array_push($dataAllSalesOrderInvoice, [
                 "no" => $no++,
                 "id" => encrypt($data->id),
                 "no_faktur" => $data->no_faktur,
                 "tanggal_faktur" => $data->tanggal_faktur,
                 "keterangan" => $data->keterangan,
-                "total_invoice" => number_format(floatval($data->sum_amount_invoice)),
+                "qty_invoice" => $data->qty_invoice,
+                "kode_satuan" => $data->kode_satuan,
+                "total_invoice" => number_format(floatval($data->sum_amount_invoice), 0, ',', '.'),
+                "amt_harga_pokok" => number_format(floatval($data->amt_harga_pokok), 0, ',', '.'),
+                "amt_laba" => number_format($laba, 0, ',', '.'),
                 "nama_pelanggan" => $data->nama_pelanggan,
-                "nama_sales" => $data->salesName,
+                "nama_sales" => $salesName,
                 "id_barang" => $data->id_barang_invoice,
                 "kode_barang" => $data->kode_barang,
                 "barang_name" => $data->barang_name,
-                "qty_invoice" => $data->qty_invoice,
-                "kode_satuan" => $data->kode_satuan,
-                "sum_harga_pokok" => $data->sum_harga_pokok,
-                "amt_harga_pokok" => number_format($data->amt_harga_pokok),
-                "amt_laba" => number_format(floatval($data->sum_amount_invoice) - floatval($data->amt_harga_pokok)),
             ]);
 
-            $totalPerBarang += floatval($data->total_invoice);
+            $totalPerBarang += floatval($data->sum_amount_invoice);
+            $totalHppPerBarang += floatval($data->amt_harga_pokok);
+            $totalLabaPerBarang += floatval($laba);
         }
 
         if ($currentBarang !== null) {
             array_push($dataAllSalesOrderInvoice, [
-                "no" => '',
-                "id" => '',
-                "no_faktur" => 'Total Invoice: Rp ' . number_format(floatval($totalPerBarang)),
-                "tanggal_faktur" => '',
-                "keterangan" => '',
-                "total_invoice" => '',
-                "nama_pelanggan" => '',
-                "nama_sales" => '',
+                "no_faktur" => 'Total',
+                "tanggal_faktur" => number_format($totalPerBarang, 0, ',', '.'),
+                "keterangan" => number_format($totalHppPerBarang, 0, ',', '.'),
+                "qty_invoice" => number_format($totalLabaPerBarang, 0, ',', '.'),
                 "is_total" => true,
-                "id_barang" => '',
-                "kode_barang" => '',
-                "barang_name" => '',
-                "qty_invoice" => '',
-                "kode_satuan" => '',
             ]);
         }
 
@@ -180,25 +172,30 @@ class RincianPenjualanPerBarang extends BaseController
             "dateEnd" => $tglAkhir != "now" ? date("Y-m-d", strtotime($tglAkhir)) : "",
         ];
 
-        // Pakai query rincian, bukan summary
         $dataSalesOrderInvoice = $this->salesOrderInvoiceModel
             ->getAllSalesOrderInvoiceLokalBarang($condition, $addCondition, null, null);
 
         $dataAllSalesOrderInvoice = [];
         $currentBarang = null;
         $totalPerBarang = 0;
+        $totalHPPPerBarang = 0;
+        $totalLabaPerBarang = 0;
 
         foreach ($dataSalesOrderInvoice['data'] as $data) {
             if ($currentBarang !== $data->id_barang_invoice) {
                 if ($currentBarang !== null) {
                     $dataAllSalesOrderInvoice[] = [
                         "is_total" => true,
-                        "total_invoice" => number_format($totalPerBarang),
+                        "total_invoice" => number_format($totalPerBarang, 0, ',', '.'),
+                        "total_hpp" => number_format($totalHPPPerBarang, 0, ',', '.'),
+                        "total_laba" => number_format($totalLabaPerBarang, 0, ',', '.'),
                     ];
                 }
 
                 $currentBarang = $data->id_barang_invoice;
                 $totalPerBarang = 0;
+                $totalHPPPerBarang = 0;
+                $totalLabaPerBarang = 0;
 
                 $dataAllSalesOrderInvoice[] = [
                     "is_customer" => true,
@@ -207,29 +204,38 @@ class RincianPenjualanPerBarang extends BaseController
                 ];
             }
 
+            $laba = floatval($data->sum_amount_invoice) - floatval($data->amt_harga_pokok);
+
+            if ($data->jenis_penjualan == "1") {
+                $salesName = $data->salesName;
+            } else {
+                $salesName = "OFFICE";
+            }
+
             $dataAllSalesOrderInvoice[] = [
                 "no_faktur" => $data->no_faktur,
                 "tanggal_faktur" => $data->tanggal_faktur,
                 "keterangan" => $data->keterangan,
-                "total_invoice" => number_format($data->sum_amount_invoice),
-                "nama_pelanggan" => $data->nama_pelanggan,
-                "nama_sales" => $data->salesName,
-                "kode_barang" => $data->kode_barang,
-                "barang_name" => $data->barang_name,
                 "qty_invoice" => $data->qty_invoice,
                 "kode_satuan" => $data->kode_satuan,
-                "sum_harga_pokok" => $data->sum_harga_pokok,
-                "amt_harga_pokok" => number_format($data->amt_harga_pokok),
-                "amt_laba" => number_format(floatval($data->sum_amount_invoice) - floatval($data->amt_harga_pokok)),
+                "total_invoice" => number_format($data->sum_amount_invoice, 0, ',', '.'),
+                "amt_harga_pokok" => number_format($data->amt_harga_pokok, 0, ',', '.'),
+                "amt_laba" => number_format($laba, 0, ',', '.'),
+                "nama_pelanggan" => $data->nama_pelanggan,
+                "nama_sales" => $salesName,
             ];
 
-            $totalPerBarang += floatval($data->total_invoice);
+            $totalPerBarang += floatval($data->sum_amount_invoice);
+            $totalHPPPerBarang += floatval($data->amt_harga_pokok);
+            $totalLabaPerBarang += $laba;
         }
 
         if ($currentBarang !== null) {
             $dataAllSalesOrderInvoice[] = [
                 "is_total" => true,
-                "total_invoice" => number_format($totalPerBarang),
+                "total_invoice" => number_format($totalPerBarang, 0, ',', '.'),
+                "total_hpp" => number_format($totalHPPPerBarang, 0, ',', '.'),
+                "total_laba" => number_format($totalLabaPerBarang, 0, ',', '.'),
             ];
         }
 
@@ -270,37 +276,58 @@ class RincianPenjualanPerBarang extends BaseController
 
         // Header laporan
         $sheet->setCellValue('A1', 'TOBA FISH');
-        $sheet->mergeCells('A1:H1');
+        $sheet->mergeCells('A1:K1');
         $sheet->setCellValue('A2', 'LAPORAN RINCIAN SALES PER BARANG');
-        $sheet->mergeCells('A2:H2');
-        $sheet->getStyle('A1:A2')->getFont()->setBold(true)->setSize(14);
-        $sheet->getStyle('A1:A2')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+        $sheet->mergeCells('A2:K2');
+        $sheet->setCellValue('A3', 'PERIODE: ' . ($tglAwal != "all" ? date("d/m/Y", strtotime($tglAwal)) : "All") . ' - ' . ($tglAkhir != "now" ? date("d/m/Y", strtotime($tglAkhir)) : "Now"));
+        $sheet->mergeCells('A3:K3');
 
         // Header tabel
         $sheet->fromArray([
-            ["No Faktur", "Tanggal", "Keterangan", "Qty", "Satuan", "Total Invoice", "Nama Pelanggan", "Nama Sales"]
-        ], null, 'A4');
+            ["No Faktur", "Tanggal", "Keterangan", "Qty", "Satuan", "Total Invoice", "Nilai HPP", "Laba Kotor", "Nama Barang", "Nama Pelanggan", "Nama Sales"]
+        ], null, 'A5');
 
-        $row = 5;
+        $sheet->getStyle('A1:K4')->getFont()->setBold(true)->setSize(14);
+        $sheet->getStyle('A5:K5')->getFont()->setBold(true)->setSize(12);
+        $sheet->getStyle('A1:K5')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+
+        $row = 6;
         $currentBarang = null;
         $totalPerBarang = 0;
+        $totalHPPPerBarang = 0;
+        $totalLabaPerBarang = 0;
 
         foreach ($dataSalesOrderInvoice['data'] as $data) {
             if ($currentBarang !== $data->id_barang_invoice) {
                 if ($currentBarang !== null) {
+                    // Baris total per barang
                     $sheet->setCellValue('A' . $row, 'Total Invoice');
+                    $sheet->mergeCells('A' . $row . ':E' . $row);
                     $sheet->setCellValue('F' . $row, $totalPerBarang);
-                    $sheet->getStyle('A' . $row . ':H' . $row)->getFont()->setBold(true);
+                    $sheet->setCellValue('G' . $row, $totalHPPPerBarang);
+                    $sheet->setCellValue('H' . $row, $totalLabaPerBarang);
+                    $sheet->getStyle('A' . $row . ':K' . $row)->getFont()->setBold(true);
                     $row++;
                 }
 
                 $currentBarang = $data->id_barang_invoice;
                 $totalPerBarang = 0;
+                $totalHPPPerBarang = 0;
+                $totalLabaPerBarang = 0;
 
+                // Baris header barang
                 $sheet->setCellValue('A' . $row, $data->kode_barang . ' - ' . $data->barang_name);
-                $sheet->mergeCells('A' . $row . ':H' . $row);
+                $sheet->mergeCells('A' . $row . ':K' . $row);
                 $sheet->getStyle('A' . $row)->getFont()->setBold(true);
                 $row++;
+            }
+
+            $laba = floatval($data->sum_amount_invoice) - floatval($data->amt_harga_pokok);
+
+            if ($data->jenis_penjualan == "1") {
+                $salesName = $data->salesName;
+            } else {
+                $salesName = "OFFICE";
             }
 
             $sheet->fromArray([
@@ -309,22 +336,36 @@ class RincianPenjualanPerBarang extends BaseController
                 $data->keterangan,
                 $data->qty_invoice,
                 $data->kode_satuan,
-                $data->total_invoice,
+                $data->sum_amount_invoice,
+                $data->amt_harga_pokok,
+                $laba,
+                $data->barang_name,
                 $data->nama_pelanggan,
-                $data->salesName,
+                $salesName,
             ], null, 'A' . $row);
 
-            $totalPerBarang += floatval($data->total_invoice);
+            $totalPerBarang += floatval($data->sum_amount_invoice);
+            $totalHPPPerBarang += floatval($data->amt_harga_pokok);
+            $totalLabaPerBarang += $laba;
             $row++;
         }
 
         if ($currentBarang !== null) {
+            // Baris total per barang terakhir
             $sheet->setCellValue('A' . $row, 'Total Invoice');
+            $sheet->mergeCells('A' . $row . ':E' . $row);
             $sheet->setCellValue('F' . $row, $totalPerBarang);
-            $sheet->getStyle('A' . $row . ':H' . $row)->getFont()->setBold(true);
+            $sheet->setCellValue('G' . $row, $totalHPPPerBarang);
+            $sheet->setCellValue('H' . $row, $totalLabaPerBarang);
+            $sheet->getStyle('A' . $row . ':K' . $row)->getFont()->setBold(true);
         }
 
-        foreach (range('A', 'H') as $col) {
+        // Format kolom angka
+        $sheet->getStyle('F5:F' . $row)->getNumberFormat()->setFormatCode('#,##0');
+        $sheet->getStyle('G5:G' . $row)->getNumberFormat()->setFormatCode('#,##0');
+        $sheet->getStyle('H5:H' . $row)->getNumberFormat()->setFormatCode('#,##0');
+
+        foreach (range('A', 'K') as $col) {
             $sheet->getColumnDimension($col)->setAutoSize(true);
         }
 

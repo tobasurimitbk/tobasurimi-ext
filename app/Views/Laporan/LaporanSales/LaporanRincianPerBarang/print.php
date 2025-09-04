@@ -1,69 +1,57 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Rincian Penjualan Per Barang</title>
+  <title>Laporan Rincian Sales Per Barang</title>
   <style>
     body {
-      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      font-family: Arial, sans-serif;
       font-size: 10px;
-      padding: 20px;
-    }
-
-    h5 {
-      font-size: 16px;
-      text-align: center;
-      font-weight: bold;
-      margin: 6px 0;
-    }
-
-    h6 {
-      font-size: 12px;
-      text-align: center;
-      font-weight: bold;
-      margin: 6px 0;
-    }
-
-    @page {
-      size: A4 landscape;
-      margin: 10px;
     }
 
     table {
-      border-collapse: collapse !important;
       width: 100%;
+      border-collapse: collapse;
     }
 
-    #table1 th,
-    #table1 td {
-      border: 1px solid #999;
-      font-size: 10px;
-      padding: 4px;
+    th,
+    td {
+      border: 1px solid #ddd;
+      padding: 8px;
     }
 
-    .group-row {
+    th {
+      text-align: left;
+    }
+
+    .text-right {
+      text-align: right;
+    }
+
+    .text-center {
+      text-align: center;
+    }
+
+    .bold {
       font-weight: bold;
-      background: #f0f0f0;
+    }
+
+    .group-header {
+      font-weight: bold;
     }
 
     .total-row {
       font-weight: bold;
-      background: #e0e0e0;
     }
   </style>
 </head>
 
 <body>
-  <h6>TOBA FISH</h6>
-  <h5>Rincian Penjualan per Barang</h5>
-  <h6>
-    Dari <?= ($dateStart != "All") ? $dateStart : "-" ?>
-    s/d <?= ($dateEnd != "Now") ? $dateEnd : "-" ?>
-  </h6>
+  <h1 style="text-align: center;">TOBA FISH</h1>
+  <h2 style="text-align: center;">LAPORAN RINCIAN SALES PER BARANG</h2>
+  <p style="text-align: center;">Periode: <?= $dateStart ?> - <?= $dateEnd ?></p>
 
-  <table id="table1">
+  <table>
     <thead>
       <tr>
         <th>No. Faktur</th>
@@ -74,32 +62,36 @@
         <th>Jumlah</th>
         <th>Nilai HPP</th>
         <th>Laba Kotor</th>
-        <th>Nama Barang</th>
         <th>Nama Pelanggan</th>
         <th>Nama Penjual</th>
       </tr>
     </thead>
     <tbody>
-      <?php foreach ($data as $value) : ?>
-        <?php if (isset($value['is_customer']) && $value['is_customer']) : ?>
-          <tr class="group-row">
-            <td colspan="9"><?= $value['barang_name'] ?></td>
+      <?php foreach ($data as $row): ?>
+        <?php if (isset($row['is_customer']) && $row['is_customer']): ?>
+          <tr class="group-header">
+            <td colspan="10"><?= $row['kode_barang'] ?> - <?= $row['barang_name'] ?></td>
           </tr>
-        <?php elseif (isset($value['is_total']) && $value['is_total']) : ?>
+        <?php elseif (isset($row['is_total']) && $row['is_total']): ?>
           <tr class="total-row">
-            <td colspan="9">Total</td>
+            <td colspan="5">Total Invoice</td>
+            <td class="text-right"><?= $row['total_invoice'] ?></td>
+            <td class="text-right"><?= $row['total_hpp'] ?></td>
+            <td class="text-right"><?= $row['total_laba'] ?></td>
+            <td colspan="2"></td>
           </tr>
-        <?php else : ?>
+        <?php else: ?>
           <tr>
-            <td><?= $value['no_faktur'] ?></td>
-            <td><?= $value['tanggal_faktur'] ?></td>
-            <td><?= $value['keterangan'] ?></td>
-            <td style="text-align:right"><?= $value['qty_invoice'] ?></td>
-            <td><?= $value['kode_satuan'] ?></td>
-            <td style="text-align:right"><?= $value['total_invoice'] ?></td>
-            <td><?= $value['barang_name'] ?></td>
-            <td><?= $value['nama_pelanggan'] ?></td>
-            <td><?= $value['nama_sales'] ?></td>
+            <td><?= $row['no_faktur'] ?></td>
+            <td><?= $row['tanggal_faktur'] ?></td>
+            <td><?= $row['keterangan'] ?></td>
+            <td class="text-right"><?= $row['qty_invoice'] ?></td>
+            <td><?= $row['kode_satuan'] ?></td>
+            <td class="text-right"><?= $row['total_invoice'] ?></td>
+            <td class="text-right"><?= $row['amt_harga_pokok'] ?></td>
+            <td class="text-right"><?= $row['amt_laba'] ?></td>
+            <td><?= $row['nama_pelanggan'] ?></td>
+            <td><?= $row['nama_sales'] ?></td>
           </tr>
         <?php endif; ?>
       <?php endforeach; ?>

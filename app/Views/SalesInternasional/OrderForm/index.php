@@ -130,7 +130,7 @@
                             </div>
                         </div>
                         <?php if (session()->get('login')->this_company_id == 1 || session()->get('login')->this_company_id == 2): ?>
-                            <div class="col-md-12 mt-3">
+                            <!-- <div class="col-md-12 mt-3">
                                 <div class="form-floating mb-3" style="height: 50px;">
                                     <select
                                         class="form-select company_id"
@@ -146,7 +146,7 @@
                                     </select>
                                     <label for="floatingInput" style="z-index: 1;">Select Company Head In Printout</label>
                                 </div>
-                            </div>
+                            </div> -->
                         <?php endif; ?>
 
                     </div>

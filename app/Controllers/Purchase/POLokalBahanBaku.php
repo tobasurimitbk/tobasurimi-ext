@@ -330,7 +330,7 @@ class POLokalBahanBaku extends BaseController
                 ->first();
         }
 
-        $po_date = $this->request->getVar("po_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getVar("po_date")))) : "";
+        $po_date = $this->request->getVar("po_date") ? date_format(date_create_from_format("d/m/Y", $this->request->getVar("po_date")), "Y-m-d") : "";
 
         if ($first != null) {
             // GENERATE YANG BARU

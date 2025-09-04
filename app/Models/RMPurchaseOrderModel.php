@@ -532,6 +532,7 @@ class RMPurchaseOrderModel extends Model
                 ->where('rm_purchase_orders.po_date >=', $first_day)
                 ->where('rm_purchase_orders.po_date <=', $last_day)
                 ->where('rm_purchase_orders.company_id !=', 16)
+                ->where('rm_purchase_orders.company_id !=', 15)
                 ->orderBy('po_no', "DESC")
                 ->first();
         }
