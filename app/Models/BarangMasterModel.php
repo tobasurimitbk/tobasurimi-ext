@@ -357,7 +357,7 @@ class BarangMasterModel extends Model
             'barang_master.company_id' => $companyId,
             'barang_master.type_barang' => $type,
         ];
-        
+
         $selectQry = "barang_master.id, 
                     barang_master.kode_barang, 
                     barang_master.barang_name AS barang_name_master, 
@@ -380,13 +380,12 @@ class BarangMasterModel extends Model
             ->where($condition);
 
 
-        if($spesifikasiId != null){
+        if ($spesifikasiId != null) {
             $dataBarang = $dataQry->where('barang_master_spesifikasi.id', $spesifikasiId)->findAll();
-        }else{
+        } else {
             $dataQry
                 ->groupStart()
-                ->like('barang_master.barang_name', $search)
-                ->orLike('barang_master_spesifikasi.spesifikasi', $search)
+                ->like('CONCAT(barang_master.barang_name, " ", barang_master_spesifikasi.spesifikasi)', $search)
                 ->orLike('barang_master.kode_barang', $search)
                 ->groupEnd();
 
@@ -406,8 +405,8 @@ class BarangMasterModel extends Model
                     $dataBarang[$i]['barang_name_master'] . ' ' . $dataBarang[$i]['spesifikasi']
                 )
             );
-
         }
 
         return $dataBarang;
-    }}
+    }
+}
