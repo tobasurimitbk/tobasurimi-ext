@@ -182,9 +182,11 @@ class Mutasi extends BaseController
             ]);
         }
 
+        $tanggal = $this->request->getVar("tanggal") ? date_format(date_create_from_format("d/m/Y", $this->request->getVar("tanggal")), "Y-m-d") : "";
+
         $id = $this->mutasiModel->insert([
             'company_id' => $this->this_company_id,
-            'tanggal' => date('Y-m-d'),
+            'tanggal' => $tanggal,
             'no_mutasi' => $this->request->getVar('no_mutasi'),
             'divisi_asal_id' => $this->request->getVar('divisi_asal_id'),
             'divisi_tujuan_id' => $this->request->getVar('divisi_tujuan_id'),
@@ -218,9 +220,12 @@ class Mutasi extends BaseController
     public function updateAction()
     {
         $id = decrypt($this->request->getVar('id'));
+        $tanggal = $this->request->getVar("tanggal") ? date_format(date_create_from_format("d/m/Y", $this->request->getVar("tanggal")), "Y-m-d") : "";
+
 
         $this->mutasiModel->update($id, [
             'company_id' => $this->this_company_id,
+            'tanggal'   => $tanggal,
             // 'no_mutasi' => $this->request->getVar('no_mutasi'),
             'divisi_asal_id' => $this->request->getVar('divisi_asal_id'),
             'divisi_tujuan_id' => $this->request->getVar('divisi_tujuan_id'),
