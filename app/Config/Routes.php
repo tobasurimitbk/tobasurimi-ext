@@ -858,7 +858,20 @@ $routes->get('/proforma-invoice/all-pi', 'InvoiceExim\PI\PI::allPI', ['filter' =
 $routes->get('/proforma-invoice/duplicate/(:segment)', 'InvoiceExim\PI\PI::duplicatePI/$1', ['filter' => 'Auth']);
 $routes->get('/proforma-invoice/id/(:segment)', 'InvoiceExim\PI\PI::editPI/$1', ['filter' => 'Auth']);
 $routes->get('/proforma-invoice/print/(:segment)', 'InvoiceExim\PI\PI::printPI/$1', ['filter' => 'Auth']);
-
+// INVOICE PACKING CUSTOMER
+$routes->get('/invoice-packing-customer', 'InvoiceExim\InvPacking\InvPackingCustomer::index', ['filter' => 'Auth']);
+$routes->get('/invoice-packing-customer/all-order-form', 'InvoiceExim\InvPacking\InvPackingCustomer::allOrderForm', ['filter' => 'Auth']);
+$routes->get('/invoice-packing-customer/detail/(:segment)', 'InvoiceExim\InvPacking\InvPackingCustomer::indexInvPackingCustomer/$1', ['filter' => 'Auth']);
+$routes->get('/invoice-packing-customer/create/(:segment)', 'InvoiceExim\InvPacking\InvPackingCustomer::createPackingCustomer/$1', ['filter' => 'Auth']);
+$routes->post('/invoice-packing-customer/create', 'InvoiceExim\InvPacking\InvPackingCustomer::store', ['filter' => 'Auth']);
+$routes->post('/invoice-packing-customer/update', 'InvoiceExim\InvPacking\InvPackingCustomer::update', ['filter' => 'Auth']);
+$routes->post('/invoice-packing-customer/delete', 'InvoiceExim\InvPacking\InvPackingCustomer::destroy', ['filter' => 'Auth']);
+$routes->post('/invoice-packing-customer/posting', 'InvoiceExim\InvPacking\InvPackingCustomer::posting', ['filter' => 'Auth']);
+$routes->post('/invoice-packing-customer/unposting', 'InvoiceExim\InvPacking\InvPackingCustomer::unposting', ['filter' => 'Auth']);
+$routes->get('/invoice-packing-customer/all-invoice', 'InvoiceExim\InvPacking\InvPackingCustomer::allInvoice', ['filter' => 'Auth']);
+$routes->get('/invoice-packing-customer/duplicate/(:segment)', 'InvoiceExim\InvPacking\InvPackingCustomer::duplicatePackingCustomer/$1', ['filter' => 'Auth']);
+$routes->get('/invoice-packing-customer/id/(:segment)', 'InvoiceExim\InvPacking\InvPackingCustomer::updatePackingCustomer/$1', ['filter' => 'Auth']);
+$routes->get('/invoice-packing-customer/print/(:segment)', 'InvoiceExim\InvPacking\InvPackingCustomer::printPackingCustomer/$1', ['filter' => 'Auth']);
 // $routes->get('/pi-peb/get', 'BiayaExim\PIPeb\PIPeb::getPiPeb', ['filter' => 'Auth']);
 // $routes->post('/pi-peb/update', 'BiayaExim\PIPeb\PIPeb::updatePiPeb', ['filter' => 'Auth']);
 
