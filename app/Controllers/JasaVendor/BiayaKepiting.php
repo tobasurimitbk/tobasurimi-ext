@@ -13,6 +13,7 @@ use App\Models\JasaVendorInModel;
 use App\Models\MetadataModel;
 use App\Models\VendorModel;
 use App\Models\WarehousesModel;
+use App\Models\BarangMasterSpesifikasiModel;
 use Dompdf\Dompdf;
 
 class BiayaKepiting extends BaseController
@@ -30,6 +31,7 @@ class BiayaKepiting extends BaseController
     protected $vendorModel;
     protected $metaDataModel;
     protected $biayaKepitingBonusModel;
+    protected $barangMasterSpesifikasiModel;
     protected $dompdf;
 
     public function __construct()
@@ -46,6 +48,7 @@ class BiayaKepiting extends BaseController
         $this->vendorModel = new VendorModel();
         $this->metaDataModel = new MetadataModel();
         $this->biayaKepitingBonusModel = new BiayaKepitingBonusModel();
+        $this->barangMasterSpesifikasiModel = new BarangMasterSpesifikasiModel();
         $this->dompdf = new Dompdf();
     }
 
@@ -460,6 +463,37 @@ class BiayaKepiting extends BaseController
             'token' => csrf_hash()
         ]);
     }
+
+    public function searchBarang()
+    {
+        $term = $this->request->getGet('q');
+
+        $data = $this->barangMasterSpesifikasiModel
+            ->join('barang_master', 'barang_master.id = barang_master_spesifikasi.barang_master_id')
+            ->groupStart()
+                ->like('barang_master.barang_name', $term)
+            ->orLike('barang_master_spesifikasi.spek_name', $term)
+            ->groupEnd()
+            ->where('barang_master.deleted_at', null)
+            ->where('barang_master_spesifikasi.deleted_at', null)
+            ->where('barang_master.company_id', $this->this_company_id)
+            ->select('
+                barang_master_spesifikasi.id,
+                barang_master.barang_name,
+                barang_master_spesifikasi.spek_name,
+            ')
+            ->findAll(10); // limit biar ringan
+
+        $results = array_map(function ($row) {
+            return [
+                'id'     => $row['id'], // ID spek
+                'barang_name'   => $row['barang_name'] . ' - ' . $row['spek_name'], // tampil di select2
+            ];
+        }, $data);
+
+        return $this->response->setJSON($results);
+    }
+
 
     public function dropdownBarang()
     {

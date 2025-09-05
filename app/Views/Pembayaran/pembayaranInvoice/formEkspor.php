@@ -90,17 +90,6 @@
                             </div>
                         </div>
                     </div>
-                    <!-- <div class="col-md-4">
-                        <div class="form-floating form-pembayaran-po mb-3" style="height: 50px;">
-                            <select class="form-select jenis_dokumen" name="jenis_dokumen" id="jenis_dokumen">
-                                <option disabled selected value=""></option>
-                                <option value="lokal">Lokal</option>
-                                <option value="ekspor">Ekspor</option>
-                                <option value="lain">Lain-lain</option>
-                            </select>
-                            <label for="floatingInput" style="z-index: 1;">Jenis Dokumen</label>
-                        </div>
-                    </div> -->
                     <div class="col-md-4">
                         <div class="form-floating form-pembayaran-po mb-3" style="height: 50px;">
                             <select <?= !empty($detail) ? ($detail['status_posting'] == 1 ? 'disabled' : '') : ""  ?> class="form-select no_dokumen" name="no_dokumen" id="no_dokumen">
