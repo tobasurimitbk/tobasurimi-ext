@@ -461,6 +461,52 @@
 
     }
 
+
+    function remove(id) {
+        Swal.fire({
+            icon: 'question',
+            title: "Hapus Data ?",
+            confirmButtonColor: '#4e73df',
+            cancelButtonColor: '#d33',
+            showCancelButton: true,
+            reverseButtons: true,
+            confirmButtonText: 'Save',
+            cancelButtonText: 'Back',
+        }).then((result) => {
+            if (result.isConfirmed) {
+                const csrf = $(`[name="${csrfToken}"]`);
+                $.ajax({
+                    url: "<?= base_url("invoice-packing-customer/delete"); ?>",
+                    data: {
+                        id: id,
+                    },
+                    beforeSend: function(xhr) {
+                        xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                        setLoading()
+                    },
+                    complete: function() {
+                        stopLoading();
+                    },
+                    method: "POST",
+                    dataType: "json",
+                    success: function(response) {
+                        if (response.status) {
+                            Swal.fire({
+                                    icon: 'success',
+                                    title: response.message,
+                                    confirmButtonColor: '#4e73df',
+                                })
+                                .then(() => {
+                                    location.reload();
+                                })
+                        }
+                    },
+                });
+            }
+        })
+
+    }
+
     const changeSort = function(val) {
         if (sort !== val) {
             sortType = "asc";

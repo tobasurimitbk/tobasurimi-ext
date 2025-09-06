@@ -104,6 +104,7 @@ class InvPackingCustomer extends BaseController
         $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
 
         foreach ($salesData['data'] as $data) {
+            $jumlahInvoice = count($this->invPackingCustomerModel->where('sales_order_export_id', $data->sales_order_export_id)->where('deletedAt', null)->findAll());
 
             array_push($dataSales, [
                 "no"                        => $no++,
@@ -113,7 +114,7 @@ class InvPackingCustomer extends BaseController
                 "customer_name"             => $data->customer_name,
                 "sales_order_export_no"     => $data->sales_order_export_no,
                 "dicharge_port"             => $data->dicharge_port,
-                "status_invoice"            => 0,
+                "status_invoice"            => $jumlahInvoice == 0 ? 0 : 1,
             ]);
         }
 
