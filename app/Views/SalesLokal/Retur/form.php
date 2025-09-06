@@ -1,7 +1,6 @@
 <?= $this->extend('layouts/template'); ?>
 <?= $this->Section('content'); ?>
 
-
 <!-- Begin Page Content -->
 <section class="section">
     <div class="section-header">
@@ -131,6 +130,12 @@
                             </thead>
                             <tbody class="body-detail-table" id="body-detail-table" style="cursor: pointer;">
                             </tbody>
+                            <tfoot>
+                                <tr>
+                                    <th colspan="7" style="text-align: right;">Total Amount:</th>
+                                    <th id="total-amount" style="text-align: center;">0</th>
+                                </tr>
+                            </tfoot>
                         </table>
                     </div>
                 </div>
@@ -140,12 +145,31 @@
     </div>
 </section>
 
-
 <script>
     const csrfToken = '<?= csrf_token() ?>';
     var itemList = [];
 
-    const table = $('.dataTable').DataTable({
+    // Fungsi untuk menghitung amount per baris
+    function calculateRowAmount(rowData, qtyReturn) {
+        const harga = destroyFormatRupiah(rowData.harga_barang);
+        const disc = parseFloat(rowData.disc) || 0;
+        const amount = qtyReturn * harga * (1 - disc / 100);
+        return amount;
+    }
+
+    // Fungsi untuk memperbarui total amount
+    function updateTotalAmount() {
+        let total = 0;
+        if (typeof table !== 'undefined' && table) {
+            table.rows().every(function() {
+                const rowData = this.data();
+                total += parseFloat(destroyFormatRupiah(rowData.amount)) || 0;
+            });
+            $('#total-amount').text(greatFormatRupiah(total));
+        }
+    }
+
+    var table = $('.dataTable').DataTable({
         processing: true,
         info: false,
         paging: false,
@@ -170,7 +194,7 @@
                 className: "text-center",
                 render: function(data, type, row) {
                     var qty = row.qtyReturn ? row.qtyReturn : row.qty;
-                    return `<input type="text" style="height: 40px; padding-bottom: 12px;" class="form-control" value="${qty}">`
+                    return `<input type="number" min="0" max="${row.qty}" style="height: 40px; padding-bottom: 12px;" class="form-control qty-return-input" value="${qty}">`
                 }
             },
             {
@@ -190,7 +214,7 @@
             },
             {
                 data: "amount",
-                className: "text-center",
+                className: "text-center amount-cell",
                 render: function(data, type, row) {
                     return greatFormatRupiah(destroyFormatRupiah(data));
                 }
@@ -207,13 +231,17 @@
                 previous: '<i class="fa fa-angle-left"></i>',
                 next: '<i class="fa fa-angle-right"></i>'
             }
+        },
+        footerCallback: function(row, data, start, end, display) {
+            updateTotalAmount();
         }
     });
 
     $(document).ready(function() {
-        // getReferenceData();
-        // getReferenceDataDetail();
-
+        // Inisialisasi total amount
+        setTimeout(function() {
+            updateTotalAmount();
+        }, 100);
 
         // Customer
         $('.id_customer').select2({
@@ -323,6 +351,7 @@
                 }
             })
         });
+
         $(".btn-submit").click(function() {
             var isValid = true;
             var dataError = null;
@@ -335,6 +364,7 @@
                     isValid = false;
                 } else {
                     rowData.qtyReturn = inputVal;
+                    rowData.amount = destroyFormatRupiah(rowData.amount);
                 }
 
                 table.row(rowIdx).data(rowData);
@@ -466,8 +496,43 @@
                 itemList.push(<?= json_encode($value); ?>);
             <?php endforeach; ?>
             table.rows.add(itemList).draw(false);
+            updateTotalAmount();
         <?php endif; ?>
 
+        // Event listener untuk input qty return
+        $(document).on('input', '.qty-return-input', function() {
+            const $input = $(this);
+            const rowIndex = table.row($input.closest('tr')).index();
+            const rowData = table.row(rowIndex).data();
+
+            // Validasi input
+            const qtyReturn = parseFloat($input.val()) || 0;
+            const maxQty = parseFloat(rowData.qty) || 0;
+
+            if (qtyReturn > maxQty) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Qty return tidak boleh lebih besar dari Qty Invoice',
+                    confirmButtonColor: '#4e73df',
+                });
+                $input.val(maxQty);
+                return;
+            }
+
+            // Hitung amount baru
+            const newAmount = calculateRowAmount(rowData, qtyReturn);
+
+            // Update data di tabel
+            rowData.qtyReturn = qtyReturn;
+            rowData.amount = newAmount;
+            table.row(rowIndex).data(rowData);
+
+            // Update tampilan amount
+            table.cell(rowIndex, 7).data(greatFormatRupiah(newAmount)).draw(false);
+
+            // Update total amount
+            updateTotalAmount();
+        });
     })
 
     var validator = $(".create-form").validate({
@@ -668,6 +733,7 @@
                         itemList.push(element);
                     });
                     table.rows.add(itemList).draw(false); // Tambahkan data baru ke tabel
+                    updateTotalAmount(); // Update total amount setelah data dimuat
                 }
             });
         }

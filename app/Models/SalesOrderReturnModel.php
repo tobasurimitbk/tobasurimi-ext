@@ -195,4 +195,88 @@ class SalesOrderReturnModel extends Model
 
         return $invNumber;
     }
+
+    public function getAllSalesOrderReturnLokal($condition, $addCondition, $limit = 10, $offset = 0)
+    {
+        $availableSort = [
+            'no_faktur'          => 'sales_order_return.no_return',
+            'nama_pelanggan'     => 'customers.name',
+            'kode_pelanggan'     => 'customers.kode',
+            'total_invoice'      => 'sales_order_return.total_invoice',
+            'keterangan'         => 'sales_order_return.keterangan',
+            'createdAt'          => 'sales_order_return.createdAt',
+            'updatedAt'          => 'sales_order_return.updatedAt',
+        ];
+        $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
+
+        $sort = $availableSort[$addCondition['sort'] ?? 'createdAt'] ?? 'sales_order_return.createdAt';
+        $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'DESC';
+
+        $selectQry = "
+        sales_order_return.id,
+        sales_order_return.no_return,
+        CASE 
+            WHEN sales_order_return.sumber = 'invoice' THEN sales_order_invoice.no_faktur
+            WHEN sales_order_return.sumber = 'surat_jalan' THEN surat_jalan_so.no_surat_jalan
+            WHEN sales_order_return.sumber = 'order_form' THEN sales_order.no_sales_order
+            ELSE '-'
+        END AS no_dokumen,
+        DATE_FORMAT(sales_order_return.tanggal_return, '%d/%m/%Y') AS tanggal_return,
+        sales_order_return.note,
+        SUM(sales_order_return_detail.amount_return) AS sum_amount_return,
+        customers.name AS nama_pelanggan,
+        ";
+
+        $salesOrderReturnLokal = $this->asObject()
+            ->select($selectQry)
+            ->join('customers', 'customers.id = sales_order_return.id_customer')
+            ->join('sales_order', 'sales_order.id = sales_order_return.id_invoice AND sales_order_return.sumber = "order_form"', 'LEFT')
+            ->join('surat_jalan_so', 'surat_jalan_so.id = sales_order_return.id_invoice AND sales_order_return.sumber = "surat_jalan"', 'LEFT')
+            ->join('sales_order_invoice', 'sales_order_invoice.id = sales_order_return.id_invoice AND sales_order_return.sumber = "invoice"', 'LEFT')
+            ->join('sales_order_return_detail', 'sales_order_return_detail.id_sales_order_return = sales_order_return.id', 'LEFT')
+            ->join('barang_master_sales', 'barang_master_sales.id = sales_order_return_detail.id_barang_return', 'LEFT')
+            ->where($condition)
+            ->groupBy('sales_order_return.id')
+            ->orderBy($sort, $sortType);
+
+        $totalData = $salesOrderReturnLokal->countAllResults(false);
+
+        if ($addCondition['search'] || $addCondition['dateStart'] || $addCondition['dateEnd'] || $addCondition['filter_customer']) {
+            $salesOrderReturnLokal->groupStart();
+        }
+
+        if ($addCondition['search']) {
+            $salesOrderReturnLokal
+                ->like('no_return', $addCondition['search']);
+        }
+
+        if ($addCondition['filter_customer']) {
+            $salesOrderReturnLokal->where('sales_order_return.id_customer', $addCondition['filter_customer']);
+        }
+
+        if ($addCondition['dateStart']) {
+            $salesOrderReturnLokal->where('sales_order_return.tanggal_faktur >=',  $addCondition['dateStart']);
+        }
+        if ($addCondition['dateEnd']) {
+            $salesOrderReturnLokal->where('sales_order_return.tanggal_faktur <=', $addCondition['dateEnd']);
+        }
+
+        if ($addCondition['search'] || $addCondition['dateStart'] || $addCondition['dateEnd'] || $addCondition['filter_customer']) {
+            $salesOrderReturnLokal->groupEnd();
+        }
+
+        $totalFilteredData = $salesOrderReturnLokal->countAllResults(false);
+
+        if ($limit !== null && $offset !== null) {
+            $data = $salesOrderReturnLokal->findAll((int)$limit, (int)$offset);
+        } else {
+            $data = $salesOrderReturnLokal->findAll();
+        }
+
+        return [
+            'data'              => $data,
+            'totalData'         => $totalData,
+            'totalFilteredData' => $totalFilteredData
+        ];
+    }
 }
