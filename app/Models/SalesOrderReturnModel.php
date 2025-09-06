@@ -237,6 +237,7 @@ class SalesOrderReturnModel extends Model
             ->join('barang_master_sales', 'barang_master_sales.id = sales_order_return_detail.id_barang_return', 'LEFT')
             ->where($condition)
             ->groupBy('sales_order_return.id')
+            ->orderBy('sales_order_return.id_customer')
             ->orderBy($sort, $sortType);
 
         $totalData = $salesOrderReturnLokal->countAllResults(false);
