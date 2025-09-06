@@ -88,7 +88,7 @@
                                 <th onclick="changeSort('no_seal')" class="sort">No Seal</th>
                                 <th onclick="changeSort('vessels_name')" class="sort">Vessel's Name</th>
                                 <th onclick="changeSort('departure_date')" class="sort">Departure Date</th>
-                                <th onclick="changeSort('total_carton')" class="sort">Total Carton</th>
+                                <th onclick="changeSort('total_packing')" class="sort">Total Packing</th>
                                 <th onclick="changeSort('total_berat_bersih')" class="sort">Berat Bersih</th>
                                 <th onclick="changeSort('total_berat_kotor')" class="sort">Berat Kotor</th>
                                 <th onclick="changeSort('total_nilai_invoice')" class="sort">Nilai</th>
@@ -163,11 +163,8 @@
                 data: "departure_date",
                 className: "text-left",
             }, {
-                data: "total_carton",
+                data: "total_packing",
                 className: "text-left",
-                render: function(data) {
-                    return greatFormatRupiah(data);
-                }
             }, {
                 data: "total_berat_bersih",
                 className: "text-left",

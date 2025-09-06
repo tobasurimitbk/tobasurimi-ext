@@ -48,7 +48,7 @@ class InvPackingCustomerModel extends Model
             'no_seal'     => 'no_seal',
             'vessels_name'               => 'vessels_name',
             'departure_date'               => 'departure_date',
-            'total_carton'               =>  'total_carton',
+            'total_packing'               =>  'total_packing',
             'total_berat_bersih'               =>  'total_berat_bersih',
             'total_berat_kotor'               =>  'total_berat_kotor',
             'total_nilai_invoice'               =>  'total_nilai_invoice',

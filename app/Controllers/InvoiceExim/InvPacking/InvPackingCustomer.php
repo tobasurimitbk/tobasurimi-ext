@@ -165,6 +165,9 @@ class InvPackingCustomer extends BaseController
         $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
 
         foreach ($invData['data'] as $data) {
+            $invPackingCustomerPackSize = $this->invPackingCustomerPackSizeModel->getFirstByInvId(
+                $data->id
+            );
 
             array_push($dataInv, [
                 "no"                => $no++,
@@ -173,7 +176,7 @@ class InvPackingCustomer extends BaseController
                 "vessels_name"           => $data->vessels_name,
                 "no_seal"           => $data->no_seal,
                 "departure_date"    => $data->departure_date != "" ? date('d/m/Y', strtotime($data->departure_date)) : "-",
-                "total_carton"      => (float)$data->total_carton,
+                "total_packing"      => number_format($data->total_packing, 2) . " " . $invPackingCustomerPackSize['kode_satuan'],
                 "total_berat_bersih" => (float)$data->total_berat_bersih,
                 "total_berat_kotor"  => (float)$data->total_berat_kotor,
                 "total_nilai_invoice" => (float)$data->total_nilai_invoice,
@@ -367,13 +370,23 @@ class InvPackingCustomer extends BaseController
 
     public function store()
     {
+        // return response()->setJSON([
+        //     '_POST' => $_POST,
+        //     'listBarang' => json_decode($_POST['listBarang']),
+        //     'listPacking' => json_decode($_POST['listPacking']),
+        //     'listBiayaTambahan' => json_decode($_POST['listBiayaTambahan'])
+        // ]);
         $db = \Config\Database::connect();
         try {
             $db->transBegin();
             $invPCId = $this->invPackingCustomerModel->insert([
                 'company_id' => $this->this_company_id,
                 'sales_order_export_id' => $this->request->getVar('sales_order_export_id'),
+                'tanggal_invoice' => $this->request->getVar("tanggal_invoice") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("tanggal_invoice")))) : "",
                 'departure_date' => $this->request->getVar("departure_date") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("departure_date")))) : "",
+                'nama_customer' => $this->request->getVar('nama_customer'),
+                'loading_port' => $this->request->getVar('loading_port'),
+                'dicharge_port' => $this->request->getVar('dicharge_port'),
                 'vessels_name' => $this->request->getVar('vessels_name'),
                 'valas_id' => $this->request->getVar('valas_id'),
                 'payment_term' => $this->request->getVar('payment_term'),
@@ -388,7 +401,7 @@ class InvPackingCustomer extends BaseController
                 'email'  => $this->request->getVar('email'),
                 'penanda_tangan' => $this->request->getVar('penanda_tangan'),
                 'total_nilai_invoice' => $this->request->getVar('total_nilai_invoice'),
-                'total_carton' => $this->request->getVar('total_carton'),
+                'total_packing' => $this->request->getVar('total_packing'),
                 'total_berat_bersih' => $this->request->getVar('total_berat_bersih'),
                 'total_berat_kotor' => $this->request->getVar('total_berat_kotor')
             ]);
@@ -426,7 +439,11 @@ class InvPackingCustomer extends BaseController
 
             $this->invPackingCustomerModel->update($id, [
                 'sales_order_export_id' => $this->request->getVar('sales_order_export_id'),
+                'tanggal_invoice' => $this->request->getVar("tanggal_invoice") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("tanggal_invoice")))) : "",
                 'departure_date' => $this->request->getVar("departure_date") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("departure_date")))) : "",
+                'nama_customer' => $this->request->getVar('nama_customer'),
+                'loading_port' => $this->request->getVar('loading_port'),
+                'dicharge_port' => $this->request->getVar('dicharge_port'),
                 'vessels_name' => $this->request->getVar('vessels_name'),
                 'valas_id' => $this->request->getVar('valas_id'),
                 'payment_term' => $this->request->getVar('payment_term'),
@@ -441,7 +458,7 @@ class InvPackingCustomer extends BaseController
                 'email'  => $this->request->getVar('email'),
                 'penanda_tangan' => $this->request->getVar('penanda_tangan'),
                 'total_nilai_invoice' => $this->request->getVar('total_nilai_invoice'),
-                'total_carton' => $this->request->getVar('total_carton'),
+                'total_packing' => $this->request->getVar('total_packing'),
                 'total_berat_bersih' => $this->request->getVar('total_berat_bersih'),
                 'total_berat_kotor' => $this->request->getVar('total_berat_kotor')
             ]);
@@ -532,7 +549,6 @@ class InvPackingCustomer extends BaseController
                     'satuan_size_id' => $s->satuan_size_id,
                     'size' => $s->size,
                     'grade' => $s->grade,
-                    'packing' => $s->packing,
                     'can' => $s->can,
                     'cased' => $s->cased,
                     'kg' => $s->kg,
@@ -562,12 +578,23 @@ class InvPackingCustomer extends BaseController
                 $this->invPackingCustomerPackSizeModel->insert([
                     'inv_packing_customer_id' => $id,
                     'inv_packing_customer_pack_id' => $invPCPackId,
+                    'satuan_size_id' => $s->satuan_size_id,
+                    'size' => $s->size,
+                    'grade' => $s->grade,
                     'packing' => $s->packing,
-                    'can_dimension' => $s->can_dimension,
-                    'brand_packing' => $s->brand_packing,
-                    'eu_approval_number' => $s->eu_approval_number,
-                    'qty_carton' => $s->qty_carton,
-                    'qty_cans' => $s->qty_cans,
+                    'can' => $s->can,
+                    'cased' => $s->cased,
+                    'kg' => $s->kg,
+                    'lb' => $s->lb,
+                    'inner_box' => $s->inner_box,
+                    'pc' => $s->pc,
+                    'bag' => $s->bag,
+                    'palet' => $s->palet,
+                    'persen' => $s->persen,
+                    'remark' => $s->remark,
+                    'qty' => $s->qty,
+                    'harga' => $s->harga,
+                    'total' => $s->total,
                     'berat_bersih' => $s->berat_bersih,
                     'berat_kotor' => $s->berat_kotor,
                     'vgm' => $s->vgm,

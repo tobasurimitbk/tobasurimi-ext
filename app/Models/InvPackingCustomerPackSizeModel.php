@@ -39,4 +39,20 @@ class InvPackingCustomerPackSizeModel extends Model
     protected $afterFind      = [];
     protected $beforeDelete   = [];
     protected $afterDelete    = [];
+
+    public function getFirstByInvId($id)
+    {
+        $selectQry = "
+            inv_packing_customer_pack_size.*,
+            satuans.kode_satuan
+        ";
+
+        $result = $this->asArray()
+            ->select($selectQry)
+            ->join('satuans', 'satuans.id = inv_packing_customer_pack_size.satuan_size_id', 'left')
+            ->where('inv_packing_customer_id', $id)
+            ->first();
+
+        return $result;
+    }
 }
