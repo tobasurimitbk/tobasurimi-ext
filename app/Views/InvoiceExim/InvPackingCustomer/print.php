@@ -628,7 +628,7 @@
                     <table style="width: 100%;">
                         <tr>
                             <td>
-                                <b>TOTAL CARTON : <?= number_format($dataInvoice['total_carton'], 2) ?></b><br>
+                                <b>TOTAL : <?= number_format($dataInvoice['total_packing'], 2) . " " . $satuanQty ?></b><br>
                                 <b>NETTO WEIGHT : <?= number_format($dataInvoice['total_berat_bersih'], 2) ?></b><br>
                                 <b>GROSS WEIGHT : <?= number_format($dataInvoice['total_berat_kotor'], 2) ?></b><br>
 
@@ -987,16 +987,21 @@
                                 // Identify which columns have data
                                 $columns_to_show = [];
                                 $all_columns = [
-                                    'packing' => ['label' => 'Packing', 'width' => '8%'], // tidak pakai qty
-                                    'can_dimension' => ['label' => 'Can Dimension', 'width' => '8%'], // tidak pakai qty
-                                    'brand_packing' => ['label' => 'Brand', 'width' => '8%'], // tidak pakai qty
-                                    'eu_approval_number' => ['label' => 'Eu Approval Number', 'width' => '9%'],
-                                    'qty_carton' => ['label' => 'QTY (CARTON)', 'width' => '7%'],
-                                    'qty_cans' => ['label' => 'QTY (CANS)', 'width' => '7%'],
-                                    'berat_bersih' => ['label' => 'NETTO (KGS)', 'width' => '7%'],
-                                    'berat_kotor' => ['label' => 'GROSS (KGS)', 'width' => '7%'],
-                                    'vgm' => ['label' => 'VBM (KGS)', 'width' => '7%'],
-                                    'drammed' => ['label' => 'DRAMMED (KGS)', 'width' => '7%'],
+                                    'size' => ['label' => 'SIZE', 'width' => '8%'], // tidak pakai qty
+                                    'grade' => ['label' => 'GRADE', 'width' => '8%'], // tidak pakai qty
+                                    // 'packing' => ['label' => 'PACKING', 'width' => '8%'], // tidak pakai qty
+                                    'can' => ['label' => 'QTY (CAN)', 'width' => '7%'],
+                                    'cased' => ['label' => 'QTY (CASE)', 'width' => '7%'],
+                                    'case' => ['label' => 'QTY (CASE)', 'width' => '7%'],
+                                    'kg' => ['label' => 'QTY (KG)', 'width' => '7%'],
+                                    'lb' => ['label' => 'QTY (LB)', 'width' => '7%'],
+                                    'inner_box' => ['label' => 'INNER', 'width' => '8%'],
+                                    'pc' => ['label' => 'QTY (PC)', 'width' => '7%'],
+                                    'bag' => ['label' => 'QTY (Bag)', 'width' => '7%'],
+                                    'cup' => ['label' => 'QTY (CUP)', 'width' => '6%'],
+                                    'persen' => ['label' => '%', 'width' => '3%'], // tidak pakai qty
+                                    'remark' => ['label' => 'REMARK', 'width' => '10%'],  // tidak pakai qty
+                                    'palet' => ['label' => 'PALLET', 'width' => '10%'] // tidak pakai qty
                                 ];
 
                                 // Check which columns have data
@@ -1009,12 +1014,14 @@
                                     }
                                 }
 
-                                $show_carton_column = isset($columns_to_show['qty_carton']);
-                                $show_cans_column = isset($columns_to_show['qty_cans']);
-                                $show_berat_bersih_column = isset($columns_to_show['berat_bersih']);
-                                $show_berat_kotor_column = isset($columns_to_show['berat_kotor']);
-                                $show_vgm_column = isset($columns_to_show['vgm']);
-                                $show_drammed_column = isset($columns_to_show['drammed']);
+                                $show_persen_column = isset($columns_to_show['persen']);
+                                $show_cased_column = isset($columns_to_show['cased']);
+
+                                // Ini untuk mengetahui Qty Satuan apa yang dipakek (ambil paling utama)
+                                $satuanQty = "";
+                                foreach ($detail['size_breakdown'] as $breakdown):
+                                    $satuanQty =  $breakdown['satuan_size_code'];
+                                endforeach;
 
                                 ?>
 
@@ -1024,92 +1031,62 @@
                                         <thead>
                                             <tr style="background-color: #f3f4f6;">
                                                 <?php foreach ($columns_to_show as $col => $col_data): ?>
-                                                    <?php if ($col != 'qty_carton' && $col != 'qty_cans' && $col != 'berat_bersih' && $col != 'berat_kotor' && $col != 'vgm' && $col != 'drammed'): ?>
+                                                    <?php if ($col != 'persen' && $col != 'cased'): ?>
                                                         <th style="padding: 3px; border: 1px solid #ddd; width: <?= $col_data['width'] ?>"><?= $col_data['label'] ?></th>
                                                     <?php endif; ?>
                                                 <?php endforeach; ?>
 
-                                                <?php if ($show_carton_column): ?>
-                                                    <th style="padding: 3px; border: 1px solid #ddd; width: 4.5%;text-align: center;">QTY CARTONS</th>
+                                                <?php if ($show_cased_column): ?>
+                                                    <th style="padding: 3px; border: 1px solid #ddd; width: 4.5%;text-align: center;">QTY (CASE)</th>
                                                 <?php endif; ?>
 
-                                                <?php if ($show_cans_column): ?>
-                                                    <th style="padding: 3px; border: 1px solid #ddd; width: 4.5%;text-align: center;">QTY CANS</th>
+                                                <?php if ($show_persen_column): ?>
+                                                    <th style="padding: 3px; border: 1px solid #ddd; width: 4.5%;text-align: center;">%</th>
                                                 <?php endif; ?>
-                                                <?php if ($show_berat_bersih_column): ?>
-                                                    <th style="padding: 3px; border: 1px solid #ddd; width: 4.5%;text-align: center;">WEIGHT NETTO</th>
-                                                <?php endif; ?>
-                                                <?php if ($show_berat_kotor_column): ?>
-                                                    <th style="padding: 3px; border: 1px solid #ddd; width: 4.5%;text-align: center;">WEIGHT GROSS</th>
-                                                <?php endif; ?>
-                                                <?php if ($show_vgm_column): ?>
-                                                    <th style="padding: 3px; border: 1px solid #ddd; width: 4.5%;text-align: center;">WEIGHT VBM</th>
-                                                <?php endif; ?>
-                                                <?php if ($show_drammed_column): ?>
-                                                    <th style="padding: 3px; border: 1px solid #ddd; width: 4.5%;text-align: center;">WEIGHT DRAMMED</th>
-                                                <?php endif; ?>
+
+                                                <th style=" padding: 3px; border: 1px solid #ddd; width: 4.5%; text-align: center;">QTY (<?= $satuanQty ?>)</th>
                                             </tr>
                                         </thead>
                                         <tbody>
                                             <?php
-                                            $breakdown_carton = 0;
-                                            $breakdown_cans = 0;
-                                            $breakdown_berat_bersih = 0;
-                                            $breakdown_berat_kotor = 0;
-                                            $breakdown_vgm = 0;
-                                            $breakdown_drammed = 0;
+                                            $breakdown_qty = 0;
+                                            $breakdown_total = 0;
+                                            $breakdown_unit_price_total = 0;
+                                            $breakdown_persen = 0;
+                                            $breakdown_cased = 0;
 
                                             foreach ($detail['size_breakdown'] as $breakdown):
-                                                $breakdown_carton += $breakdown['qty_carton'];
-                                                $breakdown_cans += $breakdown['qty_cans'];
-                                                $breakdown_berat_bersih += $breakdown['berat_bersih'];
-                                                $breakdown_berat_kotor += $breakdown['berat_kotor'];
-                                                $breakdown_vgm += $breakdown['vgm'];
-                                                $breakdown_drammed += $breakdown['drammed'];
+                                                $breakdown_qty += $breakdown['qty'];
+                                                $breakdown_total += $breakdown['total'];
+                                                $breakdown_unit_price_total += $breakdown['harga'];
+                                                if (isset($breakdown['persen']) && is_numeric($breakdown['persen'])) {
+                                                    $breakdown_persen += $breakdown['persen'];
+                                                }
 
+                                                if (isset($breakdown['cased']) && is_numeric($breakdown['cased'])) {
+                                                    $breakdown_cased += $breakdown['cased'];
+                                                }
                                             ?>
                                                 <tr>
                                                     <?php foreach ($columns_to_show as $col => $col_data): ?>
-                                                        <?php if ($col != 'qty_carton' && $col != 'qty_cans' && $col != 'berat_bersih' && $col != 'berat_kotor' && $col != 'vgm' && $col != 'drammed'): ?>
+                                                        <?php if ($col != 'persen' && $col != 'cased'): ?>
                                                             <td style="padding: 3px; border: 1px solid #ddd;"><?= $breakdown[$col] ?></td>
                                                         <?php endif; ?>
                                                     <?php endforeach; ?>
 
-                                                    <?php if ($show_carton_column): ?>
+                                                    <?php if ($show_cased_column): ?>
                                                         <td style="padding: 3px; border: 1px solid #ddd; text-align: right;">
-                                                            <?= !empty($breakdown['qty_carton']) ? number_format($breakdown['qty_carton'], 2) : '' ?>
+                                                            <?= !empty($breakdown['cased']) ? number_format($breakdown['cased'], 2) : '' ?>
                                                         </td>
                                                     <?php endif; ?>
 
-                                                    <?php if ($show_cans_column): ?>
+                                                    <?php if ($show_persen_column): ?>
                                                         <td style="padding: 3px; border: 1px solid #ddd; text-align: right;">
-                                                            <?= !empty($breakdown['qty_cans']) ? number_format($breakdown['qty_cans'], 2) : '' ?>
+                                                            <?= !empty($breakdown['persen']) ? number_format($breakdown['persen'], 2) . " %" : '' ?>
                                                         </td>
                                                     <?php endif; ?>
 
-                                                    <?php if ($show_berat_bersih_column): ?>
-                                                        <td style="padding: 3px; border: 1px solid #ddd; text-align: right;">
-                                                            <?= !empty($breakdown['berat_bersih']) ? number_format($breakdown['berat_bersih'], 2) : '' ?>
-                                                        </td>
-                                                    <?php endif; ?>
-
-                                                    <?php if ($show_berat_kotor_column): ?>
-                                                        <td style="padding: 3px; border: 1px solid #ddd; text-align: right;">
-                                                            <?= !empty($breakdown['berat_kotor']) ? number_format($breakdown['berat_kotor'], 2) : '' ?>
-                                                        </td>
-                                                    <?php endif; ?>
-
-                                                    <?php if ($show_vgm_column): ?>
-                                                        <td style="padding: 3px; border: 1px solid #ddd; text-align: right;">
-                                                            <?= !empty($breakdown['vgm']) ? number_format($breakdown['vgm'], 2) : '' ?>
-                                                        </td>
-                                                    <?php endif; ?>
-
-                                                    <?php if ($show_drammed_column): ?>
-                                                        <td style="padding: 3px; border: 1px solid #ddd; text-align: right;">
-                                                            <?= !empty($breakdown['drammed']) ? number_format($breakdown['drammed'], 2) : '' ?>
-                                                        </td>
-                                                    <?php endif; ?>
+                                                    <td style="padding: 3px; border: 1px solid #ddd; text-align: right;"><?= number_format($breakdown['qty'], 2)  ?></td>
                                                 </tr>
                                             <?php endforeach; ?>
                                         </tbody>
@@ -1117,29 +1094,11 @@
                                         // Hitung jumlah kolom utama (misalnya dari thead)
                                         $base_columns = count($columns_to_show);
 
-                                        if ($show_carton_column) {
+                                        if ($show_cased_column) {
                                             $base_columns -= 1;
                                         }
 
-                                        if ($show_cans_column) {
-                                            $base_columns -= 1;
-                                        }
-
-                                        if ($show_berat_bersih_column) {
-                                            $base_columns -= 1;
-                                        }
-
-
-                                        if ($show_berat_kotor_column) {
-                                            $base_columns -= 1;
-                                        }
-
-                                        if ($show_vgm_column) {
-                                            $base_columns -= 1;
-                                        }
-
-
-                                        if ($show_drammed_column) {
+                                        if ($show_persen_column) {
                                             $base_columns -= 1;
                                         }
 
@@ -1151,37 +1110,22 @@
                                                     TOTAL
                                                 </td>
 
-                                                <?php if ($show_carton_column): ?>
+                                                <?php if ($show_cased_column): ?>
                                                     <td style="padding: 3px; border: 1px solid #ddd; text-align: right; font-weight: bold;">
-                                                        <?= $breakdown_carton > 0 ? number_format($breakdown_carton, 2) : '' ?>
+                                                        <?= $breakdown_cased > 0 ? number_format($breakdown_cased, 2) : '' ?>
                                                     </td>
                                                 <?php endif; ?>
 
-                                                <?php if ($show_cans_column): ?>
+                                                <?php if ($show_persen_column): ?>
                                                     <td style="padding: 3px; border: 1px solid #ddd; text-align: right; font-weight: bold;">
-                                                        <?= $breakdown_cans > 0 ? number_format($breakdown_cans, 2) : '' ?>
+                                                        <?= $breakdown_persen > 0 ? number_format($breakdown_persen, 2) . " %" : '' ?>
                                                     </td>
                                                 <?php endif; ?>
-                                                <?php if ($show_berat_bersih_column): ?>
-                                                    <td style="padding: 3px; border: 1px solid #ddd; text-align: right; font-weight: bold;">
-                                                        <?= number_format($breakdown_berat_bersih, 2)  ?>
-                                                    </td>
-                                                <?php endif; ?>
-                                                <?php if ($show_berat_kotor_column): ?>
-                                                    <td style="padding: 3px; border: 1px solid #ddd; text-align: right; font-weight: bold;">
-                                                        <?= number_format($breakdown_berat_kotor, 2) ?>
-                                                    </td>
-                                                <?php endif; ?>
-                                                <?php if ($show_vgm_column): ?>
-                                                    <td style="padding: 3px; border: 1px solid #ddd; text-align: right; font-weight: bold;">
-                                                        <?= number_format($breakdown_vgm, 2) ?>
-                                                    </td>
-                                                <?php endif; ?>
-                                                <?php if ($show_drammed_column): ?>
-                                                    <td style="padding: 3px; border: 1px solid #ddd; text-align: right; font-weight: bold;">
-                                                        <?= number_format($breakdown_drammed, 2) ?>
-                                                    </td>
-                                                <?php endif; ?>
+
+                                                <td style="padding: 3px; border: 1px solid #ddd; text-align: right; font-weight: bold;">
+                                                    <?= number_format($breakdown_qty, 2)  ?>
+                                                </td>
+
                                             </tr>
                                         </tfoot>
 

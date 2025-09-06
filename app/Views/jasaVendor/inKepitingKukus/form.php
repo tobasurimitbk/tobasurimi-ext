@@ -5,7 +5,7 @@
     <div class="section-header">
         <h1><?= empty($jasaVendorIn) ? "Tambah Jasa Vendor Barang Masuk" : "Update Jasa Vendor Barang Masuk" ?></h1>
         <div class="col-button-tambah-spp">
-            <a class="btn btn-hide-form btn-discard float-right" href="<?= base_url("jasa-vendor-in"); ?>">
+            <a class="btn btn-hide-form btn-discard float-right" href="<?= base_url("jasa-vendor-in-kepiting-kukus"); ?>">
                 Kembali
             </a>
             <?php if (!empty($jasaVendorIn)) : ?>
@@ -21,7 +21,7 @@
                         </button>
                     <?php endif; ?>
                     <?php if (can('Jasa Vendor', 'Barang Masuk', 'p')) : ?>
-                        <button class="btn btn-warning btn-print float-right" onclick="print('<?= base_url("jasa-vendor-in/print/"); ?><?= encrypt($jasaVendorIn['id']); ?>')">
+                        <button class="btn btn-warning btn-print float-right" onclick="print('<?= base_url("jasa-vendor-in-kepiting-kukus/print/"); ?><?= encrypt($jasaVendorIn['id']); ?>')">
                             Print
                         </button>
                     <?php endif; ?>
@@ -32,7 +32,7 @@
                     <?php endif; ?>
                 <?php else : ?>
                     <?php if (can('Jasa Vendor', 'Barang Masuk', 'p')) : ?>
-                        <button class="btn btn-warning btn-print float-right" onclick="print('<?= base_url("jasa-vendor-in/print/"); ?><?= encrypt($jasaVendorIn['id']); ?>')">
+                        <button class="btn btn-warning btn-print float-right" onclick="print('<?= base_url("jasa-vendor-in-kepiting-kukus/print/"); ?><?= encrypt($jasaVendorIn['id']); ?>')">
                             Print
                         </button>
                     <?php endif; ?>
@@ -173,23 +173,10 @@
                         <table class="table table-bordered nowrap table-hover-tobasurimi dataTable" id="dataTable" width="100%" border="1" cellspacing="0">
                             <thead class="thead-dark">
                                 <tr>
-                                    <th style="text-align: center;" colspan="6">Detail Barang Keluar</th>
-                                    <th style="text-align: center;" colspan="10">Daftar Barang Keluar</th>
-                                </tr>
-                                <tr>
                                     <th style="text-align: center;">No</th>
-                                    <th style="text-align: center;">Tipe Barang</th>
-                                    <th style="text-align: center;">Asal Barang</th>
-                                    <th style="text-align: center;">No Dokumen</th>
-                                    <th style="text-align: center;">Dokumen Pabean</th>
-                                    <th style="text-align: center;">Tgl PO</th>
-                                    <th style="text-align: center;">Supplier / Vendor</th>
-
-
                                     <th style="text-align: center;">Barang - Spesifikasi</th>
                                     <th style="text-align: center;">Qty Keluar</th>
                                     <th style="text-align: center;">Satuan Keluar</th>
-
                                 </tr>
                             </thead>
                             <tbody class="body-table">
@@ -216,13 +203,12 @@
                         <table class="table table-bordered nowrap table-hover-tobasurimi dataTable" id="dataTable3">
                             <thead>
                                 <tr>
-                                    <th style="text-align: center;" colspan="7">Daftar Barang Keluar</th>
+                                    <th style="text-align: center;" colspan="6">Daftar Barang Keluar</th>
                                     <th style="text-align: center;" colspan="1">Input Barang Masuk</th>
                                 </tr>
                                 <tr>
                                     <th style="text-align: center; width:10px;" scope="col">No</th>
-                                    <th style="text-align: center;" scope="col">Tipe Barang</th>
-                                    <th style="text-align: center;" scope="col">Kode</th>
+                                    <th style="text-align: center;" scope="col">Nomor Surat Jalan</th>
                                     <th style="text-align: center;" scope="col">Barang-Spesifikasi</th>
                                     <th style="text-align: center;" scope="col">Qty Keluar</th>
                                     <th style="text-align: center;" scope="col">Satuan Keluar</th>
@@ -349,7 +335,7 @@
     <?php if (!empty($jasaVendorIn)) : ?>
         let arr = $('.multiple_jasa_vendor_out_id').val();
         $.ajax({
-            url: `<?= base_url("jasa-vendor-in/list-barang"); ?>`,
+            url: `<?= base_url("jasa-vendor-in-kepiting-kukus/list-barang"); ?>`,
             method: "GET",
             data: {
                 multiple_jasa_vendor_out_id: JSON.stringify(arr),
@@ -419,7 +405,7 @@
     }).change(function() {
         let arr = $('.multiple_jasa_vendor_out_id').val();
         $.ajax({
-            url: `<?= base_url("jasa-vendor-in/list-barang"); ?>`,
+            url: `<?= base_url("jasa-vendor-in-kepiting-kukus/list-barang"); ?>`,
             method: "GET",
             data: {
                 multiple_jasa_vendor_out_id: JSON.stringify(arr),
@@ -631,7 +617,7 @@
                             if (id) {
                                 // UPDATE
                                 $.ajax({
-                                    url: "<?= base_url("jasa-vendor-in/update"); ?>",
+                                    url: "<?= base_url("jasa-vendor-in-kepiting-kukus/update"); ?>",
                                     data: data,
                                     beforeSend: function(xhr) {
                                         xhr.setRequestHeader('X-CSRF-Token', csrf.val());
@@ -653,7 +639,7 @@
                                                 confirmButtonText: 'Ok'
                                             }).then((result) => {
                                                 if (result.isConfirmed) {
-                                                    window.location.href = "<?= base_url("jasa-vendor-in") ?>";
+                                                    window.location.href = "<?= base_url("jasa-vendor-in-kepiting-kukus") ?>";
                                                 }
                                             });
                                         } else {
@@ -744,11 +730,13 @@
             var index = null;
 
             $.each(listBarangGroup, function(i, v) {
-                if (v.barang1_id == barang1_id) {
+                if (v.spesifikasi_out_id == barang1_id) {
                     index = i;
                     barangFirst = v;
                 }
             });
+
+            console.log(barangFirst.list_barang_masuk, spesifikasi_in_id)
 
             // EACH 
             var isAdd = false;
@@ -757,6 +745,8 @@
                     isAdd = true;
                 }
             });
+
+           
 
             if (!isAdd) {
                 listBarangGroup[index].list_barang_masuk.push({
@@ -791,7 +781,7 @@
         var isValidBersih = true;
 
         $.each(listBarangGroup, function(i, v) {
-            if (v.barang1_id == barang1_id) {
+            if (v.spesifikasi_out_id == barang1_id) {
                 index = i;
             }
         });
@@ -855,17 +845,17 @@
 
         var barangFirst = null;
         $.each(listBarangGroup, function(i, v) {
-            if (v.barang1_id == barang1_id) {
+            if (v.spesifikasi_out_id == barang1_id) {
                 barangFirst = v;
             }
         });
         $('#barang1_id').val(barang1_id);
-        $('#barang_keluar_name').val('(' + barangFirst.kode_barang_out + ') ' + barangFirst.barang_out);
+        $('#barang_keluar_name').val(barangFirst.barang_out);
         $('#satuan_barang_keluar').val(barangFirst.satuan_out);
         $('#qty_barang_keluar').val(parseFloat(barangFirst.qty_out).toFixed(2));
         if (barangFirst != null) {
             $.ajax({
-                url: `<?= base_url('jasa-vendor-in/list-barang-masuk'); ?>`,
+                url: `<?= base_url('jasa-vendor-in-kepiting-kukus/list-barang-masuk'); ?>`,
                 method: "GET",
                 beforeSend: function() {
                     setLoading();
@@ -900,7 +890,7 @@
     function getListDivisi() {
         // GET LIST DIVISI
         $.ajax({
-            url: `<?= base_url('jasa-vendor-in/divisi'); ?>`,
+            url: `<?= base_url('jasa-vendor-in-kepiting-kukus/divisi'); ?>`,
             method: "GET",
             beforeSend: function() {
                 setLoading();
@@ -962,13 +952,7 @@
             $.each(listBarang, function(i, v) {
                 var newRow = $('<tr style="color:whitesmoke;">');
                 newRow.append($('<td>').text(no++));
-                newRow.append($('<td>').text(v.tipe_barang));
-                newRow.append($('<td>').text(v.sumber));
-                newRow.append($('<td>').text(v.stock_dokumen));
-                newRow.append($('<td>').text(v.bc_name + '/' + v.no_aju));
-                newRow.append($('<td>').text(v.stock_date));
-                newRow.append($('<td>').text(v.supplier_name));
-                newRow.append($('<td>').text(v.barang_out));
+                newRow.append($('<td>').text(v.barang_out + (v.spesifikasi_out != null ? ' - ' + v.spesifikasi_out : '')));
                 newRow.append($('<td>').text(v.qty_out));
                 newRow.append($('<td>').text(v.satuan_out));
                 table.find('tbody').append(newRow);
@@ -985,7 +969,7 @@
         table.find('tfoot').empty();
 
         $.each(listBarangGroup, function(i, v) {
-            if (v.barang1_id == barang1_id) {
+            if (v.spesifikasi_out_id == barang1_id) {
                 listBarangFirst = v;
             }
         });
@@ -1062,15 +1046,14 @@
             $.each(listBarangGroup, function(i, v) {
                 var newRow = $('<tr style="color:whitesmoke;">');
                 newRow.append($('<td>').text(no++));
-                newRow.append($('<td>').text(v.tipe_barang));
-                newRow.append($('<td>').text(v.kode_barang_out));
+                newRow.append($('<td>').text(v.no_surat_jalan));
                 newRow.append($('<td>').text(v.barang_out));
                 newRow.append($('<td>').text(greatFormatQty(v.qty_out)));
                 newRow.append($('<td>').text(v.satuan_out));
                 newRow.append($('<td>').text(v.list_barang_masuk.length + " Barang"));
                 newRow.append($('<td style="text-align: center;">').html(
                     `
-                    <button type="button" class="btn btn-primary" onclick="displayDetailModal(${v.barang1_id})" data-toggle="tooltip"><i class="fas fa-pencil-alt"></i></button>
+                    <button type="button" class="btn btn-primary" onclick="displayDetailModal(${v.spesifikasi_out_id})" data-toggle="tooltip"><i class="fas fa-pencil-alt"></i></button>
                 `
                 ));
 
@@ -1118,7 +1101,7 @@
     function getListWarehouse() {
         // GET LIST DIVISI
         $.ajax({
-            url: `<?= base_url('jasa-vendor-in/warehouse'); ?>`,
+            url: `<?= base_url('jasa-vendor-in-kepiting-kukus/warehouse'); ?>`,
             method: "GET",
             beforeSend: function() {
                 setLoading();
@@ -1144,7 +1127,7 @@
 
     function getListJasaVendorOut() {
         $.ajax({
-            url: `<?= base_url('jasa-vendor-in/list-jasa-vendor-out'); ?>`,
+            url: `<?= base_url('jasa-vendor-in-kepiting-kukus/list-jasa-vendor-out-kepiting-kukus'); ?>`,
             method: "GET",
             beforeSend: function() {
                 setLoading();
@@ -1175,7 +1158,7 @@
         if (value) {
             $(".no_penerimaan_surat_jalan").attr("readonly", true);
             $.ajax({
-                url: `<?= base_url("jasa-vendor-in/get-jasa-vendor-in-no"); ?>`,
+                url: `<?= base_url("jasa-vendor-in-kepiting-kukus/get-jasa-vendor-in-no"); ?>`,
                 method: "GET",
                 data: {
                     warehouse_id: $('#warehouse_id option:selected').val(),

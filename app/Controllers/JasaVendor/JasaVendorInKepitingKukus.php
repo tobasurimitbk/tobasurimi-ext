@@ -91,8 +91,8 @@ class JasaVendorInKepitingKukus extends BaseController
         $dataResult = array();
 
         $condition = [
-            'jasa_vendor_in.company_id' => $this->this_company_id,
-            'jasa_vendor_in.deletedAt' => null,
+            'jasa_vendor_in_kepiting_kukus.company_id' => $this->this_company_id,
+            'jasa_vendor_in_kepiting_kukus.deletedAt' => null,
         ];
 
         foreach ($this->divisiModel->getDivisiAccess() as $d) {
@@ -105,38 +105,9 @@ class JasaVendorInKepitingKukus extends BaseController
         foreach ($dataQry['data'] as $data) {
 
             $jasaVendorInKepitingKukusDetail = $this->jasaVendorInKepitingKukusDetailModel
-                ->where('jasa_vendor_in_id', $data->id)
+                ->where('jasa_vendor_in_kepiting_kukus_id', $data->id)
                 ->where('deletedAt', null)
                 ->findAll();
-
-            $jasaVendorInKepitingKukusDetail = $this->jasaVendorInKepitingKukusDetailModel
-                ->where('jasa_vendor_in_id', $data->id)
-                ->where('deletedAt', null)
-                ->findAll();
-
-            $barangMasterModel = new BarangMasterModel();
-            $barangMasterSpesifikasiModel = new BarangMasterSpesifikasiModel();
-            
-            $barangName = null;
-            $processedMasterIds = []; // Array untuk melacak master_id yang sudah diproses
-
-            foreach($jasaVendorInKepitingKukusDetail as $jvi) {
-                $barangMasterSpesifikasi = $barangMasterSpesifikasiModel->find($jvi['spesifikasi_in_id']);
-                $currentMasterId = $barangMasterSpesifikasi['barang_master_id'];
-                
-                // Cek jika master_id belum diproses
-                if (!in_array($currentMasterId, $processedMasterIds)) {
-                    $barangMaster = $barangMasterModel->find($currentMasterId);
-                    
-                    if ($barangName === null) {
-                        $barangName = $barangMaster['barang_name'];
-                    } else {
-                        $barangName .= ', ' . $barangMaster['barang_name'];
-                    }
-                    
-                    $processedMasterIds[] = $currentMasterId; // Tandai sebagai sudah diproses
-                }
-            }
 
             array_push($dataResult, [
                 "no"                    => $no++,
@@ -146,7 +117,7 @@ class JasaVendorInKepitingKukus extends BaseController
                 "no_surat_jalan_vendor" => $data->no_surat_jalan_vendor == "" ? "-" : $data->no_surat_jalan_vendor,
                 "tanggal"               => date('d/m/Y', strtotime($data->tanggal)),
                 "divisi"                => $data->divisi,
-                "barang"                => $barangName ?? 'Tidak ada barang',
+                // "barang"                => $barangName ?? 'Tidak ada barang',
                 "warehouse_name"        => $data->warehouse_name,
                 "total_item"            => count($jasaVendorInKepitingKukusDetail),
                 "vendor_name"           => $data->vendor_name,
@@ -172,7 +143,7 @@ class JasaVendorInKepitingKukus extends BaseController
             'tanggal' => date('Y-m-d'),
             'vendor' => $this->vendorModel->where('deletedAt', null)->where('company_id', $this->this_company_id)->orderBy('name', "ASC")->findAll(),
         ];
-        return view('jasaVendor/in/form', $data);
+        return view('jasaVendor/inKepitingKukus/form', $data);
     }
 
     public function detail($id)
@@ -180,7 +151,7 @@ class JasaVendorInKepitingKukus extends BaseController
         $id = decrypt($id);
         $jasaVendorIn = $this->jasaVendorInKepitingKukusModel->find($id);
         if ($jasaVendorIn == null) {
-            return redirect()->to('jasa-vendor-in');
+            return redirect()->to('jasa-vendor-in-kepiting-kukus');
         }
 
         $data = [
@@ -190,7 +161,7 @@ class JasaVendorInKepitingKukus extends BaseController
             'warehouse' => $this->warehouseModel->where('id', $jasaVendorIn['warehouse_id'])->findAll()
         ];
 
-        return view('jasaVendor/in/form', $data);
+        return view('jasaVendor/inKepitingKukus/form', $data);
     }
 
     public function print($id)
@@ -198,7 +169,7 @@ class JasaVendorInKepitingKukus extends BaseController
         $id = decrypt($id);
         $jasaVendorIn = $this->jasaVendorInKepitingKukusModel->find($id);
         if ($jasaVendorIn == null) {
-            return redirect()->to('jasa-vendor-in');
+            return redirect()->to('jasa-vendor-in-kepiting-kukus');
         }
 
         $selectQryJasaVendorDetail = "
@@ -224,7 +195,7 @@ class JasaVendorInKepitingKukus extends BaseController
             'jasaVendorInKepitingKukusDetail' => $jasaVendorInKepitingKukusDetail
         ];
 
-        $this->dompdf->loadHtml(view('jasaVendor/in/print', $data));
+        $this->dompdf->loadHtml(view('jasaVendor/inKepitingKukus/print', $data));
         $this->dompdf->setPaper('A4', 'portrait');
         $this->dompdf->render();
         $this->dompdf->stream("Jasa Vendor Barang Masuk", array("Attachment" => false));
@@ -858,12 +829,12 @@ class JasaVendorInKepitingKukus extends BaseController
 
         $result = $this->jasaVendorOutKepitingKukusModel
             ->select('DISTINCT(divisis.id), divisis.divisi')
-            ->join('divisis', 'divisis.id = jasa_vendor_out.divisi_id', 'left')
-            ->whereIn('jasa_vendor_out.divisi_id', $divisiResult)
+            ->join('divisis', 'divisis.id = jasa_vendor_out_kepiting_kukus.divisi_id', 'left')
+            ->whereIn('jasa_vendor_out_kepiting_kukus.divisi_id', $divisiResult)
             ->where('vendor_id', $vendorID)
             ->where('status_posting', '1')
             ->where('status_closed', '0')
-            ->where('jasa_vendor_out.deletedAt', null)
+            ->where('jasa_vendor_out_kepiting_kukus.deletedAt', null)
             ->where('divisis.deletedAt', null)
             ->findAll();
 
@@ -881,12 +852,12 @@ class JasaVendorInKepitingKukus extends BaseController
 
         $result = $this->jasaVendorOutKepitingKukusModel
             ->select('DISTINCT(warehouses.id), warehouses.warehouse_name')
-            ->join('warehouses', 'warehouses.id = jasa_vendor_out.warehouse_id', 'left')
-            ->where('jasa_vendor_out.divisi_id', $divisiID)
+            ->join('warehouses', 'warehouses.id = jasa_vendor_out_kepiting_kukus.warehouse_id', 'left')
+            ->where('jasa_vendor_out_kepiting_kukus.divisi_id', $divisiID)
             ->where('vendor_id', $vendorID)
             ->where('status_posting', '1')
             ->where('status_closed', '0')
-            ->where('jasa_vendor_out.deletedAt', null)
+            ->where('jasa_vendor_out_kepiting_kukus.deletedAt', null)
             ->where('warehouses.deletedAt', null)
             ->findAll();
 

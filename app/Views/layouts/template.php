@@ -93,19 +93,19 @@
 
     }
 
-    
+
     function greatFormatQty(value) {
         if (value == null || value === "") return "0.000";
-        
+
         if (typeof value === "string" && value.includes("+")) {
             let parts = value.split("+").map(v => parseFloat(v.trim()) || 0);
             let sum = parts.reduce((a, b) => a + b, 0);
 
-            return (Math.round(sum * 1000) / 1000).toFixed(3); 
+            return (Math.round(sum * 1000) / 1000).toFixed(3);
         }
 
         let num = parseFloat(value) || 0;
-        return (Math.round(num * 1000) / 1000).toFixed(3); 
+        return (Math.round(num * 1000) / 1000).toFixed(3);
     }
 
 
@@ -322,7 +322,7 @@
         $(document).ready(function() {
             $('.tiny').tinymce({
                 height: 300,
-                api_key: 'als0m788jdqt5uyi4cdjta19b2pru68z0klwewz3dthh6gsw',
+                api_key: 'jk81l3s5gba8kom2elvg577vkhjm14rsyqdlnxiu4mrmuxpf',
                 entity_encoding: 'raw'
             });
         });

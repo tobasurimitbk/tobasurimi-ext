@@ -52,6 +52,8 @@ class InvPackingCustomerPackModel extends Model
         foreach ($invPCPack as $i) {
 
             $invPCPackSize = $invPackingCustomerPackSizeModel
+                ->select('inv_packing_customer_pack_size.*,satuans.kode_satuan as satuan_size_code')
+                ->join('satuans', 'satuans.id = inv_packing_customer_pack_size.satuan_size_id', 'left')
                 ->where('inv_packing_customer_pack_id', $i['id'])
                 ->where('inv_packing_customer_pack_size.deletedAt', null)
                 ->findAll();
@@ -68,12 +70,24 @@ class InvPackingCustomerPackModel extends Model
             foreach ($invPCPackSize as $s) {
                 array_push($resultPack['size_breakdown'], [
                     'id_detail_breakdown_packing' => $s['id'],
+                    'size' => $s['size'],
+                    'grade' => $s['grade'],
                     'packing' => $s['packing'],
-                    'can_dimension' => $s['can_dimension'],
-                    'brand_packing' => $s['brand_packing'],
-                    'eu_approval_number' => $s['eu_approval_number'],
-                    'qty_carton' => (float)$s['qty_carton'],
-                    'qty_cans' => (float)$s['qty_cans'],
+                    'can' => $s['can'],
+                    'cased' => $s['cased'],
+                    'kg' => $s['kg'],
+                    'lb' => $s['lb'],
+                    'inner_box' => $s['inner_box'],
+                    'pc' => $s['pc'],
+                    'bag' => $s['bag'],
+                    'palet' => $s['palet'],
+                    'persen' => $s['persen'],
+                    'qty' => (float)$s['qty'],
+                    'harga' => (float)$s['harga'],
+                    'total' => (float)$s['total'],
+                    'remark' => $s['remark'],
+                    'satuan_size_id' => $s['satuan_size_id'],
+                    'satuan_size_code' => $s['satuan_size_code'],
                     'berat_bersih' => (float)$s['berat_bersih'],
                     'berat_kotor' => (float)$s['berat_kotor'],
                     'vgm' => (float)$s['vgm'],

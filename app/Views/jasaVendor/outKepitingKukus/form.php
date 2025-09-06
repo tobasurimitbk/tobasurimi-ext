@@ -285,15 +285,23 @@
 
     <?php if (!empty($jasaVendorOut)) : ?>
         <?php foreach ($jasaVendorOutDetail as $m) : ?>
-
-            // tambahin ke select2 biar muncul sebagai selected
+            // bikin option preselect
             var option = new Option(
-                "<?= $m['barang'] ?> - <?= $m['spesifikasi'] ?>", // tampilannya
-                "<?= $m['spesifikasi_id'] ?>", // value
-                true,  // selected
-                true   // default selected
+                "<?= $m['barang'] ?> - <?= $m['spesifikasi'] ?>", 
+                "<?= $m['spesifikasi_id'] ?>",
+                true, 
+                true
             );
-            $(".spesifikasi_id").append(option).trigger("change");
+
+            // kasih data-* biar ga undefined
+            $(option).attr({
+                "data-master_barang": "<?= $m['barang'] ?>",
+                "data-spesifikasi": "<?= $m['spesifikasi'] ?>",
+                "data-satuan": "<?= $m['satuan'] ?>",
+                "data-qty": "<?= floatval($m['qty']) ?>"
+            });
+
+            $(".spesifikasi_id").append(option).trigger("change.select2");
 
             // push ke list selected
             listStockSelected.push({
@@ -306,14 +314,13 @@
             });
         <?php endforeach; ?>
 
-        // render tabel
+        // render tabel dari data edit
         drawTableSelectedItem(listStockSelected);
 
         <?php if ($jasaVendorOut['status_posting']) : ?>
             $('.detail-form-layout').hide()
         <?php endif; ?>
     <?php endif; ?>
-
 
 
     $("#tanggal").datepicker({
@@ -353,7 +360,6 @@
         getListWarehouse();
     });
 
-
     $(".spesifikasi_id").select2({
         placeholder: "Pilih Spesifikasi Barang",
         theme: "bootstrap-5",
@@ -391,23 +397,18 @@
             }
         }
     }).on("change", function (e) {
-        // ambil semua selected item
         let selectedData = $(this).select2("data");
 
-        listStockSelected = [];
-
-        selectedData.forEach(item => {
-            listStockSelected.push({
-                id: item.id,
-                master_barang: item.master_barang,
-                spesifikasi: item.spesifikasi,
-                satuan: item.satuan,
-                qty: 0,
-            });
-        });
+        listStockSelected = selectedData.map(item => ({
+            id: item.id,
+            detail_id: item.detail_id || null,
+            master_barang: item.master_barang || $(item.element).data("master_barang"),
+            spesifikasi: item.spesifikasi || $(item.element).data("spesifikasi"),
+            satuan: item.satuan || $(item.element).data("satuan"),
+            qty: item.qty || $(item.element).data("qty") || 0,
+        }));
 
         if (listStockSelected.length > 0) {
-            // kirim semua yang kepilih ke fungsi lo
             drawTableSelectedItem(listStockSelected);
         }
     });
@@ -681,7 +682,7 @@
     }
 
     function drawTableSelectedItem(data) {
-        console.log(data);
+        console.log(listStockSelected);
         const table = $('#selectedItemTable');
         var no = 1;
         $('.foot-detail-table').empty();

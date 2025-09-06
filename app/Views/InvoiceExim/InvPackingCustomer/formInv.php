@@ -70,7 +70,7 @@
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3">
-                            <input value="<?= date('d/m/Y', strtotime($dataSalesOrderExport->tanggal_invoice))  ?>" autocomplete="one-time-code" disabled type="text" class="form-control">
+                            <input <?= !empty($dataInvoice) ? ($dataInvoice['status_posting'] == 1 ? 'readonly' : '') : '' ?> value="<?= !empty($dataInvoice) ? date('d/m/Y', strtotime($dataInvoice['tanggal_invoice'])) : date('d/m/Y', strtotime($dataSalesOrderExport->tanggal_invoice))  ?>" autocomplete="one-time-code" name="tanggal_invoice" type="text" class="form-control tanggal_invoice" id="tanggal_invoice">
                             <label for="floatingInput">Tanggal Invoice</label>
                         </div>
                     </div>
@@ -82,19 +82,19 @@
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3">
-                            <input value="<?= $dataSalesOrderExport->customer_name ?>" autocomplete="one-time-code" disabled type="text" class="form-control no_invoice">
+                            <input <?= !empty($dataInvoice) ? ($dataInvoice['status_posting'] == 1 ? 'readonly' : '') : '' ?> value="<?= !empty($dataInvoice) ? $dataInvoice['nama_customer'] : $dataSalesOrderExport->customer_name ?>" autocomplete="one-time-code" name="nama_customer" type="text" class="form-control nama_customer">
                             <label for="floatingInput">Buyer / Customer</label>
                         </div>
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3">
-                            <input value="<?= strip_tags($dataSalesOrderExport->loading_port) ?>" autocomplete="one-time-code" disabled type="text" class="form-control no_invoice">
+                            <input <?= !empty($dataInvoice) ? ($dataInvoice['status_posting'] == 1 ? 'readonly' : '') : '' ?> value="<?= !empty($dataInvoice) ? $dataInvoice['loading_port'] : strip_tags($dataSalesOrderExport->loading_port) ?>" autocomplete="one-time-code" name="loading_port" type="text" class="form-control loading_port">
                             <label for="floatingInput">Port Of Loading</label>
                         </div>
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3">
-                            <input value="<?= strip_tags($dataSalesOrderExport->dicharge_port) ?>" autocomplete="one-time-code" disabled type="text" class="form-control no_invoice">
+                            <input <?= !empty($dataInvoice) ? ($dataInvoice['status_posting'] == 1 ? 'readonly' : '') : '' ?> value="<?= !empty($dataInvoice) ? $dataInvoice['dicharge_port'] :  strip_tags($dataSalesOrderExport->dicharge_port) ?>" autocomplete="one-time-code" name="dicharge_port" type="text" class="form-control dicharge_port">
                             <label for="floatingInput">Port Of Discharge</label>
                         </div>
                     </div>
@@ -218,8 +218,8 @@
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3">
-                            <input autocomplete="one-time-code" readonly type="text" class="form-control" id="total_carton" name="total_carton">
-                            <label for="floatingInput">Total Carton</label>
+                            <input autocomplete="one-time-code" readonly type="text" class="form-control total_packing" id="total_packing" name="total_packing">
+                            <label for="floatingInput">Total Packing</label>
                         </div>
                     </div>
                     <div class="col-md-4">
@@ -325,8 +325,8 @@
                             <label class="form-label font-weight-bold modal-sub-title"></label>
                         </div>
                         <div class="col-md-6">
-                            <button <?= !empty($dataInvoice) ? ($dataInvoice['status_posting'] == 1 ? 'disabled' : '') : '' ?> class="btn btn-show-detail btn-add btn-block float-right" id="btnAddPacking" type="button" style="width: 90% !important;">
-                                <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
+                            <button <?= !empty($dataInvoice) ? ($dataInvoice['status_posting'] == 1 ? 'disabled' : '') : '' ?> class="btn btn-show-detail btn-add btn-block float-right" id="btnRefreshPacking" type="button" style="width: 90% !important;">
+                                <i class="fa-solid fa-arrows-rotate mr-2"></i>Refresh
                             </button>
                         </div>
                     </div>
@@ -340,7 +340,7 @@
                                     <th style="width: 10px;">No</th>
                                     <th>HS Code</th>
                                     <th>Barang</th>
-                                    <th>Keterangan</th>
+                                    <th>Catatan / Note</th>
                                     <th style="width: 100px;">Action</th>
                                 </tr>
                             </thead>
@@ -475,13 +475,6 @@
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <input autocomplete="one-time-code" type="text" class="form-control size" name="size" id="size" placeholder="Size (Opsional)">
                                 <label for="floatingInput">Size (Opsional)</label>
-                            </div>
-                        </div>
-
-                        <div class="col-md-6">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" type="text" class="form-control packing_size" name="packing_size" id="packing_size" placeholder="Packing (Opsional)">
-                                <label for="floatingInput">Packing (Opsional)</label>
                             </div>
                         </div>
                         <div class="col-md-6">
@@ -673,18 +666,18 @@
                             </div>
                         </div>
 
-                        <div class="col-subtitle-modal">
+                        <!-- <div class="col-subtitle-modal">
                             <div class="row mt-3 justify-content-end">
                                 <div class="col-md-6">
                                     <label class="form-label font-weight-bold modal-sub-title"></label>
                                 </div>
                                 <div class="col-md-3">
-                                    <button class="btn btn-success btn-block float-right" type="button" id="btnAddPackingBreakdown">
+                                    <button class="btn btn-success btn-block float-right" type="button" id="btnRefreshPackingBreakdown">
                                         <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i> Tambah Packing
                                     </button>
                                 </div>
                             </div>
-                        </div>
+                        </div> -->
 
                     </div>
 
@@ -695,12 +688,22 @@
                                     <thead class="thead-dark">
                                         <tr>
                                             <th>No</th>
+                                            <th>Size</th>
+                                            <th>Grade</th>
                                             <th>Packing</th>
-                                            <th>Brand</th>
-                                            <th>Can Dimension</th>
-                                            <th>Eu Approval Number</th>
-                                            <th>Qty Karton</th>
-                                            <th>Qty Cans</th>
+                                            <th>Can</th>
+                                            <th>Case</th>
+                                            <th>Kg</th>
+                                            <th>LB</th>
+                                            <th>Inner Box</th>
+                                            <th>PC</th>
+                                            <th>Bag</th>
+                                            <th>Cup</th>
+                                            <th>Pallet</th>
+                                            <th>%</th>
+                                            <th>Remarks</th>
+                                            <th>Satuan</th>
+                                            <th>Qty</th>
                                             <th>Berat Bersih</th>
                                             <th>Berat Kotor</th>
                                             <th>VGM</th>
@@ -713,9 +716,8 @@
                                     </tbody>
                                     <tfoot class="tfoot-packing-breakdown">
                                         <tr>
-                                            <td colspan="4"></td>
+                                            <td colspan="15"></td>
                                             <td><b>TOTAL</b></td>
-                                            <td><b>0.00</b></td>
                                             <td><b>0.00</b></td>
                                             <td><b>0.00</b></td>
                                             <td><b>0.00</b></td>
@@ -750,18 +752,31 @@
                 <div class="modal-body">
                     <input type="hidden" name="id_detail_breakdown_packing" id="id_detail_breakdown_packing">
                     <div class="row">
+
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" type="text" class="form-control packing" name="packing" id="packing" placeholder="Nama Packing">
-                                <label for="floatingInput">Nama Packing</label>
+                                <input autocomplete="one-time-code" type="text" class="form-control packing" name="packing" id="packing" oninput="this.value = greatFormatRupiah(this.value)" placeholder="Packing">
+                                <label for="floatingInput">Total Packing</label>
                             </div>
                         </div>
                         <div class="col-md-6">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" type="text" class="form-control qty_carton" name="qty_carton" id="qty_carton" oninput="this.value = greatFormatRupiah(this.value)" placeholder="Qty Carton (Opsional)">
-                                <label for="floatingInput">Qty Karton</label>
+                            <div class="row">
+                                <div class="col-sm">
+                                    <div class="form-floating mb-3" style="height: 50px;">
+                                        <input autocomplete="one-time-code" type="text" class="form-control qty_packing" name="qty_packing" id="qty_packing" oninput="this.value = greatFormatRupiah(this.value)" readonly placeholder="Qty Packing (Opsional)">
+                                        <label for="floatingInput">Qty</label>
+                                    </div>
+                                </div>
+                                <div class="col-sm">
+                                    <div class="form-floating mb-3" style="height: 50px;">
+                                        <input autocomplete="one-time-code" type="text" class="form-control satuan_size_code" name="satuan_size_code" id="satuan_size_code" readonly placeholder="Satuan">
+                                        <label for="floatingInput">Satuan</label>
+                                    </div>
+                                </div>
                             </div>
+
                         </div>
+
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <input autocomplete="one-time-code" type="text" class="form-control berat_bersih" oninput="this.value = greatFormatRupiah(this.value)" name="berat_bersih" id="berat_bersih" placeholder="Berat Bersih (Opsional)">
@@ -770,36 +785,10 @@
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" type="text" class="form-control berat_kotor" oninput="this.value = greatFormatRupiah(this.value)" name="berat_kotor" id="berat_kotor" placeholder="Berat Kotor (Opsional)">
+                                <input readonly autocomplete="one-time-code" type="text" class="form-control berat_kotor" oninput="this.value = greatFormatRupiah(this.value)" name="berat_kotor" id="berat_kotor" placeholder="Berat Kotor (Opsional)">
                                 <label for="floatingInput">Berat Kotor (Kg)</label>
                             </div>
                         </div>
-                        <div class="col-md-6">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" type="text" class="form-control can_dimension" name="can_dimension" id="can_dimension" placeholder="Can Dimension (Opsional)">
-                                <label for="floatingInput">Can Dimension (Opsional)</label>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" type="text" class="form-control brand_packing" name="brand_packing" id="brand_packing" placeholder="Brand Packing (Opsional)">
-                                <label for="floatingInput">Brand Packing (Opsional)</label>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" type="text" class="form-control eu_approval_number" name="eu_approval_number" id="eu_approval_number" placeholder="Eu Approval Number (Opsional)">
-                                <label for="floatingInput">Eu Approval Number (Opsional)</label>
-                            </div>
-                        </div>
-
-                        <div class="col-md-6">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" type="text" oninput="this.value = greatFormatRupiah(this.value)" class="form-control qty_cans" name="qty_cans" id="qty_cans" placeholder="Qty Cans (Opsional)">
-                                <label for="floatingInput">Qty Cans (Opsional)</label>
-                            </div>
-                        </div>
-
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <input autocomplete="one-time-code" type="text" class="form-control vgm" oninput="this.value = greatFormatRupiah(this.value)" name="vgm" id="vgm" placeholder="VGM (Opsional)">
@@ -846,7 +835,7 @@
         <?php } ?>
 
 
-        $("#departure_date,#keberangkatan_kapal,#tanggal_surat_jalan,#tanggal_faktur_pajak").datepicker({
+        $("#departure_date,#tanggal_invoice").datepicker({
             todayHighlight: true,
             format: "dd/mm/yyyy",
             orientation: "bottom auto",
@@ -931,6 +920,18 @@
         // VALIDATOR PARENT BARANG  
         var validator = $("#form-parent").validate({
             rules: {
+                tanggal_invoice: {
+                    required: true
+                },
+                customer_name: {
+                    required: true
+                },
+                loading_port: {
+                    required: true
+                },
+                dicharge_port: {
+                    required: true
+                },
                 departure_date: {
                     required: true
                 },
@@ -963,6 +964,18 @@
                 },
             },
             messages: {
+                tanggal_invoice: {
+                    required: "Tanggal invoice wajib diisi"
+                },
+                customer_name: {
+                    required: "Customer wajib diisi"
+                },
+                loading_port: {
+                    required: "Loading port wajib diisi"
+                },
+                dicharge_port: {
+                    required: "Dicharge port wajib diisi"
+                },
                 departure_date: {
                     required: "Departure date wajib diisi"
                 },
@@ -1153,7 +1166,7 @@
             },
             messages: {
                 packing: {
-                    required: "Packing wajib diisi"
+                    required: "Total Packing wajib diisi"
                 },
                 berat_bersih: {
                     required: "Berat bersih wajib diisi"
@@ -1317,12 +1330,7 @@
             e.preventDefault();
             if ($('.create-form-breakdown-packing').valid()) {
                 var idDetailBreakdownPacking = $('#id_detail_breakdown_packing').val();
-                var packing = $('#packing').val();
-                var canDimension = $('#can_dimension').val();
-                var brandPacking = $('#brand_packing').val();
-                var euApprovalNumber = $('#eu_approval_number').val();
-                var qtyCarton = destroyFormatRupiah($('#qty_carton').val());
-                var qtyCans = destroyFormatRupiah($('#qty_cans').val());
+                var packing = destroyFormatRupiah($('#packing').val());
                 var beratBersih = destroyFormatRupiah($('#berat_bersih').val());
                 var beratKotor = destroyFormatRupiah($('#berat_kotor').val());
                 var vgm = destroyFormatRupiah($('#vgm').val());
@@ -1331,42 +1339,26 @@
                 var result = {
                     id_detail_breakdown_packing: idDetailBreakdownPacking,
                     packing: packing,
-                    can_dimension: canDimension,
-                    brand_packing: brandPacking,
-                    eu_approval_number: euApprovalNumber,
-                    qty_carton: qtyCarton,
-                    qty_cans: qtyCans,
                     berat_bersih: beratBersih,
                     berat_kotor: beratKotor,
                     vgm: vgm,
                     drammed: drammed
                 };
 
-                if (idDetailBreakdownPacking == '' || idDetailBreakdownPacking == null) {
-                    // Create
-                    result.id_detail_breakdown_packing = getID();
-                    listPackingSizeBreakdown.push(result);
-                } else {
-                    // Update
-                    var index = null;
-                    for (var i = 0; i < listPackingSizeBreakdown.length; i++) {
-                        if (listPackingSizeBreakdown[i].id_detail_breakdown_packing == idDetailBreakdownPacking) {
-                            index = i;
-                            break;
-                        }
+                // Update
+                var index = null;
+                for (var i = 0; i < listPackingSizeBreakdown.length; i++) {
+                    if (listPackingSizeBreakdown[i].id_detail_breakdown_packing == idDetailBreakdownPacking) {
+                        index = i;
+                        break;
                     }
-
-                    listPackingSizeBreakdown[index].packing = packing;
-                    listPackingSizeBreakdown[index].can_dimension = result.can_dimension;
-                    listPackingSizeBreakdown[index].brand_packing = result.brand_packing;
-                    listPackingSizeBreakdown[index].eu_approval_number = result.eu_approval_number;
-                    listPackingSizeBreakdown[index].qty_carton = result.qty_carton;
-                    listPackingSizeBreakdown[index].qty_cans = result.qty_cans;
-                    listPackingSizeBreakdown[index].berat_bersih = result.berat_bersih;
-                    listPackingSizeBreakdown[index].berat_kotor = result.berat_kotor;
-                    listPackingSizeBreakdown[index].vgm = result.vgm;
-                    listPackingSizeBreakdown[index].drammed = result.drammed;
                 }
+
+                listPackingSizeBreakdown[index].packing = packing;
+                listPackingSizeBreakdown[index].berat_bersih = result.berat_bersih;
+                listPackingSizeBreakdown[index].berat_kotor = result.berat_kotor;
+                listPackingSizeBreakdown[index].vgm = result.vgm;
+                listPackingSizeBreakdown[index].drammed = result.drammed;
 
                 drawTableListPackingSizeBreakDown(listPackingSizeBreakdown);
                 $('#addPackingBreakdownModal').modal('hide');
@@ -1374,17 +1366,12 @@
             }
         })
 
-        $('#btnAddPacking').click(function(e) {
+        $('#btnRefreshPacking').click(function(e) {
             e.preventDefault();
-            $('#packingModal').modal('show');
-            $('#label-modal-packing').text("Tambah ");
-            listPackingSizeBreakdown = [];
-            drawTableListPackingSizeBreakDown(listPackingSizeBreakdown);
-            resetFormPacking();
-
+            syncBarangPacking();
         });
 
-        $('#btnAddPackingBreakdown').click(function(e) {
+        $('#btnRefreshPackingBreakdown').click(function(e) {
             e.preventDefault();
             $('#addPackingBreakdownModal').modal("show");
             $('.title-breakdown-packing').text('Tambah ');
@@ -1423,6 +1410,15 @@
 
             $('#total_harga').val(greatFormatRupiah(totalHarga.toFixed(2)));
         });
+
+        $('#packing,#qty_packing,#berat_bersih').keyup(function(e) {
+            e.preventDefault();
+            var packing = destroyFormatRupiah($('#packing').val());
+            var qtyPacking = destroyFormatRupiah($('#qty_packing').val());
+            var beratBersih = destroyFormatRupiah($('#berat_bersih').val());
+            var beratKotor = (packing * qtyPacking) + beratBersih;
+            $('#berat_kotor').val(greatFormatRupiah(beratKotor));
+        })
 
         $('#btnHideBiayaTambahan').click(function() {
             $('#biayaTambahanModal').modal('hide');
@@ -1468,6 +1464,7 @@
 
                     $('#barangModal').modal('hide');
                     listSizeBreakdown = [];
+                    syncBarangPacking();
                     drawTableBarang(listBarang);
                 }
             }
@@ -1482,7 +1479,7 @@
                     confirmButtonColor: '#4e73df',
                 })
             } else {
-                if ($('#form-barang').valid()) {
+                if ($('#form-packing').valid()) {
                     var idPacking = $('#id_packing').val();
                     var namaBarangPacking = $('#nama_barang_packing').val();
                     var hsCode = $('#hs_code option:selected').val();
@@ -1614,12 +1611,12 @@
                             let url = id == '' ? "<?= base_url('invoice-packing-customer/create') ?>" : "<?= base_url('invoice-packing-customer/update') ?>";
                             let data = new FormData(document.querySelector("#form-parent"));
                             let totalNilaiInvoice = destroyFormatRupiah($('#total_nilai_invoice').val());
-                            let totalCarton = destroyFormatRupiah($('#total_carton').val());
+                            let totalPacking = destroyFormatRupiah($('#total_packing').val());
                             let totalBeratBersih = destroyFormatRupiah($('#total_berat_bersih').val());
                             let totalBeratKotor = destroyFormatRupiah($('#total_berat_kotor').val());
 
                             data.set("total_nilai_invoice", totalNilaiInvoice);
-                            data.set("total_carton", totalCarton);
+                            data.set("total_packing", totalPacking);
                             data.set("total_berat_bersih", totalBeratBersih);
                             data.set("total_berat_kotor", totalBeratKotor);
 
@@ -1668,7 +1665,6 @@
     })
 
     function drawTableListSizeBreakDown(listSizeBreakdown) {
-        console.log(listSizeBreakdown);
         $('.body-barang-size-breakdown').empty();
         $('.tfoot-detail-table-size-breakdown').empty();
         var row = '';
@@ -1761,9 +1757,8 @@
         if (listPackingSizeBreakdown.length === 0) {
             row += `
                     <tr>
-                        <td colspan="4"></td>
+                        <td colspan="15></td>
                         <td><b>TOTAL</b></td>
-                        <td><b>0.00</b></td>
                         <td><b>0.00</b></td>
                         <td><b>0.00</b></td>
                         <td><b>0.00</b></td>
@@ -1774,8 +1769,7 @@
                 `;
             $('.tfoot-packing-breakdown').append(row);
         } else {
-            var totalQtyCarton = 0;
-            var totalQtyCans = 0;
+            var totalQty = 0;
             var totalBeratBersih = 0;
             var totalBeratKotor = 0;
             var totalVgm = 0;
@@ -1784,12 +1778,22 @@
             listPackingSizeBreakdown.map(item => {
                 var newRow = $('<tr style="color:whitesmoke;">');
                 newRow.append($('<td style="text-align:center;">').text(no++));
+                newRow.append($('<td>').text(item.size));
+                newRow.append($('<td>').text(item.grade));
                 newRow.append($('<td>').text(item.packing));
-                newRow.append($('<td>').text(item.brand_packing));
-                newRow.append($('<td>').text(item.can_dimension));
-                newRow.append($('<td>').text(item.eu_approval_number));
-                newRow.append($('<td>').text(greatFormatRupiah(item.qty_carton)));
-                newRow.append($('<td>').text(greatFormatRupiah(item.qty_cans)));
+                newRow.append($('<td>').text(item.can));
+                newRow.append($('<td>').text(item.cased));
+                newRow.append($('<td>').text(item.kg));
+                newRow.append($('<td>').text(item.lb));
+                newRow.append($('<td>').text(item.inner_box));
+                newRow.append($('<td>').text(item.pc));
+                newRow.append($('<td>').text(item.bag));
+                newRow.append($('<td>').text(item.cup));
+                newRow.append($('<td>').text(item.palet));
+                newRow.append($('<td>').text(item.persen));
+                newRow.append($('<td>').text(item.remark));
+                newRow.append($('<td>').text(item.satuan_size_code));
+                newRow.append($('<td>').text(greatFormatRupiah(item.qty)));
                 newRow.append($('<td>').text(greatFormatRupiah(item.berat_bersih)));
                 newRow.append($('<td>').text(greatFormatRupiah(item.berat_kotor)));
                 newRow.append($('<td>').text(greatFormatRupiah(item.vgm)));
@@ -1815,8 +1819,7 @@
                     <?php endif; ?>
                 ));
 
-                totalQtyCarton += parseFloat(item.qty_carton);
-                totalQtyCans += destroyFormatRupiah(item.qty_cans);
+                totalQty += parseFloat(item.qty);
                 totalBeratBersih += destroyFormatRupiah(item.berat_bersih);
                 totalBeratKotor += destroyFormatRupiah(item.berat_kotor);
                 totalVgm += destroyFormatRupiah(item.vgm);
@@ -1827,10 +1830,9 @@
             $('#body-packing-breakdown').append(row);
             table.find('tfoot').empty();
             var newRow = $('<tr>');
-            newRow.append($('<td colspan="4"></td>'));
+            newRow.append($('<td colspan="15"></td>'));
             newRow.append($('<td><b>TOTAL</b></td>'));
-            newRow.append($('<td><b>' + greatFormatRupiah(totalQtyCarton.toFixed(2)) + '</b></td>'));
-            newRow.append($('<td><b>' + greatFormatRupiah(totalQtyCans.toFixed(2)) + '</b></td>'));
+            newRow.append($('<td><b>' + greatFormatRupiah(totalQty.toFixed(2)) + '</b></td>'));
             newRow.append($('<td><b>' + greatFormatRupiah(totalBeratBersih.toFixed(2)) + '</b></td>'));
             newRow.append($('<td><b>' + greatFormatRupiah(totalBeratKotor.toFixed(2)) + '</b></td>'));
             newRow.append($('<td><b>' + greatFormatRupiah(totalVgm.toFixed(2)) + '</b></td>'));
@@ -1882,12 +1884,10 @@
         }
         $('.title-breakdown-packing').text('Update ');
         $('#id_detail_breakdown_packing').val(item.id_detail_breakdown_packing);
-        $('#packing').val(item.packing);
-        $('#can_dimension').val(item.can_dimension);
-        $('#brand_packing').val(item.brand_packing);
-        $('#eu_approval_number').val(item.eu_approval_number);
-        $('#qty_carton').val(greatFormatRupiah(item.qty_carton));
-        $('#qty_cans').val(greatFormatRupiah(item.qty_cans));
+        $('#qty_packing').val(greatFormatRupiah(item.qty));
+        $('#satuan_size_code').val(item.satuan_size_code);
+        // YANG DI INSERT
+        $('#packing').val(greatFormatRupiah(item.packing));
         $('#berat_bersih').val(greatFormatRupiah(item.berat_bersih));
         $('#berat_kotor').val(greatFormatRupiah(item.berat_kotor));
         $('#vgm').val(greatFormatRupiah(item.vgm));
@@ -2045,12 +2045,21 @@
             <table class="table table-sm table-bordered mb-2 w-100">
                 <thead class="bg-warning text-dark">
                     <tr>
+                        <th>Size</th>
+                        <th>Grade</th>
                         <th>Packing</th>
-                        <th>Brand</th>
-                        <th>Can Dimension</th>
-                        <th>Eu Approval Number</th>
-                        <th>Qty Karton</th>
-                        <th>Qty Cans</th>
+                        <th>Can</th>
+                        <th>Case</th>
+                        <th>Kg</th>
+                        <th>LB</th>
+                        <th>Inner Box</th>
+                        <th>PC</th>
+                        <th>Bag</th>
+                        <th>Unit</th>
+                        <th>Remarks</th>
+                        <th>Pallet</th>
+                        <th>%</th>
+                        <th>Qty</th>
                         <th>Berat Bersih</th>
                         <th>Berat Kotor</th>
                         <th>VGM</th>
@@ -2060,9 +2069,8 @@
                 <tbody></tbody>
                 <tfoot>
                     <tr>
-                        <td colspan="4" class="text-end"><b>TOTAL</b></td>
-                        <td class="total-carton"><b>0.00</b></td>
-                        <td class="total-cans"><b>0.00</b></td>
+                        <td colspan="14" class="text-end"><b>TOTAL</b></td>
+                        <td class="total-qty"><b>0.00</b></td>
                         <td class="total-berat-bersih"><b>0.00</b></td>
                         <td class="total-berat-kotor"><b>0.00</b></td>
                         <td class="total-vgm"><b>0.00</b></td>
@@ -2073,23 +2081,20 @@
         `);
 
             const breakdownBody = innerTable.find('tbody');
-            let totalCarton = 0;
-            let totalCans = 0;
+            let totalQty = 0;
             let totalBeratBersih = 0;
             let totalBeratKotor = 0;
             let totalVgm = 0;
             let totalDrammed = 0;
 
             item.size_breakdown.forEach(size => {
-                let qty_carton = parseFloat(size.qty_carton) || 0;
-                let qty_cans = parseFloat(size.qty_cans) || 0;
+                let qty = parseFloat(size.qty) || 0;
                 let berat_bersih = parseFloat(size.berat_bersih) || 0;
                 let berat_kotor = parseFloat(size.berat_kotor) || 0;
                 let vgm = parseFloat(size.vgm) || 0;
                 let drammed = parseFloat(size.drammed) || 0;
 
-                totalCarton += qty_carton;
-                totalCans += qty_cans;
+                totalQty += qty;
                 totalBeratBersih += berat_bersih;
                 totalBeratKotor += berat_kotor;
                 totalVgm += vgm;
@@ -2097,12 +2102,21 @@
 
                 const row = `
                 <tr>
+                    <td>${size.size || ''}</td>
+                    <td>${size.grade || ''}</td>
                     <td>${size.packing || ''}</td>
-                    <td>${size.brand_packing || ''}</td>
-                    <td>${size.can_dimension || ''}</td>
-                    <td>${size.eu_approval_number || ''}</td>
-                    <td>${greatFormatRupiah(qty_carton.toFixed(2))}</td>
-                    <td>${greatFormatRupiah(qty_cans.toFixed(2))}</td>
+                    <td>${size.can || ''}</td>
+                    <td>${size.cased || ''}</td>
+                    <td>${size.kg || ''}</td>
+                    <td>${size.lb || ''}</td>
+                    <td>${size.inner_box || ''}</td>
+                    <td>${size.pc || ''}</td>
+                    <td>${size.bag || ''}</td>
+                    <td>${size.satuan_size_code || ''}</td>
+                    <td>${size.remark || ''}</td>
+                    <td>${size.palet || ''}</td>
+                    <td>${size.persen || ''}</td>
+                    <td>${greatFormatRupiah(qty.toFixed(2))}</td>
                     <td>${greatFormatRupiah(berat_bersih.toFixed(2))}</td>
                     <td>${greatFormatRupiah(berat_kotor.toFixed(2))}</td>
                     <td>${greatFormatRupiah(vgm.toFixed(2))}</td>
@@ -2112,8 +2126,7 @@
                 breakdownBody.append(row);
             });
 
-            innerTable.find('.total-carton').html(`<b>${greatFormatRupiah(totalCarton.toFixed(2))}</b>`);
-            innerTable.find('.total-cans').html(`<b>${greatFormatRupiah(totalCans.toFixed(2))}</b>`);
+            innerTable.find('.total-qty').html(`<b>${greatFormatRupiah(totalQty.toFixed(2))}</b>`);
             innerTable.find('.total-berat-bersih').html(`<b>${greatFormatRupiah(totalBeratBersih.toFixed(2))}</b>`);
             innerTable.find('.total-berat-kotor').html(`<b>${greatFormatRupiah(totalBeratKotor.toFixed(2))}</b>`);
             innerTable.find('.total-vgm').html(`<b>${greatFormatRupiah(totalVgm.toFixed(2))}</b>`);
@@ -2406,7 +2419,7 @@
     function recalculateTotal() {
         var totalInvoiceBarang = 0;
         var totalBiayaTambahan = 0;
-        var totalCarton = 0;
+        var totalPacking = 0;
         var totalBeratBersih = 0;
         var totalBeratKotor = 0;
         // List Barang
@@ -2426,23 +2439,20 @@
         // List Packing
         $.each(listPacking, function(i, v) {
             $.each(v.size_breakdown, function(j, s) {
-                totalCarton += parseFloat(s.qty_carton);
                 totalBeratBersih += parseFloat(s.berat_bersih);
                 totalBeratKotor += parseFloat(s.berat_kotor);
+                totalPacking += parseFloat(s.packing);
             });
         });
-        console.log(listPacking);
-        console.log(totalCarton, totalBeratBersih, totalBeratKotor);
         var totalInvoiceFinal = totalInvoiceBarang + totalBiayaTambahan;
         $('#total_nilai_invoice').val(greatFormatRupiah(totalInvoiceFinal));
-        $('#total_carton').val(greatFormatRupiah(totalCarton));
         $('#total_berat_bersih').val(greatFormatRupiah(totalBeratBersih));
         $('#total_berat_kotor').val(greatFormatRupiah(totalBeratKotor));
-
+        $('#total_packing').val(greatFormatRupiah(totalPacking));
     }
 
-    const print = function(id) {
-        window.open("<?= base_url('invoice-packing-customer/print') ?>" + '/' + id, "_blank");
+    const print = function(url) {
+        window.open(url, "_blank");
     }
 
     function posting() {
@@ -2533,6 +2543,53 @@
                 });
             }
         })
+    }
+
+    function syncBarangPacking() {
+        listPacking = [];
+        listBarang.forEach(item => {
+            var result_breakdown = [];
+            $.each(item.size_breakdown, function(j, s) {
+                result_breakdown.push({
+                    id_detail_breakdown_packing: getID(),
+                    size: s.size,
+                    grade: s.grade,
+                    packing: s.packing_size,
+                    can: s.can,
+                    cased: s.cased,
+                    kg: s.kg,
+                    lb: s.lb,
+                    inner_box: s.inner_box,
+                    pc: s.pc,
+                    bag: s.bag,
+                    palet: s.palet,
+                    persen: s.persen,
+                    qty: s.qty,
+                    harga: s.harga,
+                    total: s.total,
+                    remark: s.remark,
+                    satuan_size_id: s.satuan_size_id,
+                    satuan_size_code: s.satuan_size_code,
+                    berat_bersih: 0,
+                    berat_kotor: 0,
+                    vgm: 0,
+                    drammed: 0
+                });
+            })
+
+            var result = {
+                id_packing: getID(),
+                hs_code: null,
+                hs_code_name: '',
+                nama_barang_packing: item.nama_barang,
+                keterangan_packing: item.catatan,
+                size_breakdown: result_breakdown,
+            }
+
+            listPacking.push(result);
+        });
+        drawTablePacking(listPacking);
+
     }
 
     function resetFormPacking() {
