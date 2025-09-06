@@ -306,7 +306,7 @@ class StockModel extends Model
 
         return $result;
     }
-
+    
     public function isDefinedStockMaster(
         $company_id,
         $warehouse_id,

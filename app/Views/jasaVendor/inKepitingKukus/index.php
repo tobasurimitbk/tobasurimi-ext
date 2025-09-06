@@ -5,7 +5,7 @@
     <div class="section-header">
         <h1>Jasa Vendor Barang Masuk</h1>
         <?php if (can("Jasa Vendor", "Barang Masuk", "c")) : ?>
-            <a href="<?= base_url('jasa-vendor-in/create') ?>" type="button" class="btn btn-show-form btn-add float-right">
+            <a href="<?= base_url('jasa-vendor-in-kepiting-kukus/create') ?>" type="button" class="btn btn-show-form btn-add float-right">
                 <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
             </a>
         <?php endif; ?>
@@ -87,7 +87,6 @@
                             <th onclick="changeSort('warehouse_id')">Warehouse</th>
                             <th>No Surat Jalan</th>
                             <!-- <th onclick="changeSort('no_surat_jalan_vendor')">No Surat Jalan Vendor</th> -->
-                            <th >Barang</th>
                             <th onclick="changeSort('vendor_id')">Vendor</th>
                             <th>Action</th>
                         </tr>
@@ -121,7 +120,7 @@
         ],
         pageLength: 25,
         ajax: {
-            url: "<?= base_url("jasa-vendor-in/all"); ?>",
+            url: "<?= base_url("jasa-vendor-in-kepiting-kukus/all"); ?>",
             dataSrc: "data",
             data: function(data) {
                 data.divisi_id = $(".divisi_id").val();
@@ -169,14 +168,6 @@
                 searchable: false,
                 sortable: false
             },
-            // {
-            //     data: "no_surat_jalan_vendor",
-            //     className: "text-center",
-            // },
-            {
-                data: "barang",
-                className: "text-center"
-            },
             {
                 data: "vendor_name",
                 className: "text-center"
@@ -188,22 +179,10 @@
                 render: function(data, type, row) {
                     let id = row.id;
                     let status = row.status_posting
-                    let status_bayar = row.status_bayar
 
                     if (status === "0") {
                         return `
                         <div class="mt-0">
-                        <?php if (can('Jasa Vendor', 'Barang Masuk', 'a')) : ?>
-                            ${status_bayar == "0" ? `
-                                <button data-toggle="tooltip" title="Posting" onclick="postingBayar('${id}')" class="btn btn-primary posting-spp">
-                                    <i class="fa fa-paper-plane fa-sm" aria-hidden="true"></i> Bayar
-                                </button>
-                            ` : `
-                                <button data-toggle="tooltip" title="Sudah Bayar" class="btn btn-secondary" disabled>
-                                    <i class="fa fa-check fa-sm"></i> Sudah Bayar
-                                </button>
-                            `}
-                        <?php endif; ?>
                         <?php if (can('Jasa Vendor', 'Barang Masuk', 'a')) : ?>
                             <button data-toggle="tooltip" title="Posting" onclick="posting('${id}')" class="btn btn-success posting-spp">
                                 <i class="fa fa-paper-plane fa-sm" aria-hidden="true"></i>
@@ -226,15 +205,6 @@
 
                         return `
                             <div class="mt-0">
-                                ${status_bayar == "0" ? `
-                                    <button data-toggle="tooltip" title="Posting" onclick="postingBayar('${id}')" class="btn btn-primary posting-spp">
-                                        <i class="fa fa-paper-plane fa-sm" aria-hidden="true"></i> Bayar
-                                    </button>
-                                ` : `
-                                    <button data-toggle="tooltip" title="Sudah Bayar" class="btn btn-secondary" disabled>
-                                        <i class="fa fa-check fa-sm"></i> Sudah Bayar
-                                    </button>
-                                `}
                                 <?php if (can('Jasa Vendor', 'Barang Masuk', 'p')) : ?>
                                     <button data-toggle="tooltip" title="Print" class="btn btn-warning btn-print" onclick="print('<?= base_url("jasa-vendor-in/print/"); ?>${id}')" style="box-shadow: none !important;">
                                         <i class="fa fa-print fa-sm" aria-hidden="true"></i>
@@ -359,7 +329,7 @@
 
     $('#dataTable tbody').on('click', 'tr td:not(.actions):not(.dataTables_empty)', function() {
         const data = table.row(this).data();
-        location.replace(`<?= base_url("jasa-vendor-in/id"); ?>/${data.id}`);
+        location.replace(`<?= base_url("jasa-vendor-in-kepiting-kukus/id"); ?>/${data.id}`);
     });
 
 
