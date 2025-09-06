@@ -2451,8 +2451,8 @@
         $('#total_packing').val(greatFormatRupiah(totalPacking));
     }
 
-    const print = function(id) {
-        window.open("<?= base_url('invoice-packing-customer/print') ?>" + '/' + id, "_blank");
+    const print = function(url) {
+        window.open(url, "_blank");
     }
 
     function posting() {
