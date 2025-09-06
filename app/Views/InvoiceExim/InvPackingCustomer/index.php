@@ -4,7 +4,7 @@
 <!-- Begin Page Content -->
 <section class="section">
     <div class="section-header">
-        <h1>List Order Form Ekspor</h1>
+        <h1>List Order Form Ekspor (Invoice Customer)</h1>
     </div>
     <?= csrf_field() ?>
     <div class="card">
@@ -41,8 +41,7 @@
                                 <th onclick="changeSort('sales_contract.customer_id')" class="sort">Customer</th>
                                 <th onclick="changeSort('sales_order_export.sales_order_export_no')" class="sort">No SC</th>
                                 <th onclick="changeSort('sales_contract.dicharge_port')" class="sort">Destination</th>
-                                <th onclick="changeSort('sales_order_export.shipment_value')" class="sort">Nilai PEB</th>
-                                <th>Total Inv PI</th>
+                                <th class="sort">Invoice</th>
                                 <th style="width: 120px;">Action</th>
                             </tr>
                         </thead>
@@ -77,7 +76,7 @@
         ],
         pageLength: 25,
         ajax: {
-            url: "<?= base_url("proforma-invoice/all-order-form"); ?>",
+            url: "<?= base_url("invoice-packing-customer/all-order-form"); ?>",
             dataSrc: "data",
             data: function(data) {
                 data.search = $(".search").val();
@@ -115,14 +114,26 @@
                 className: "text-left",
             },
             {
-                data: "nilai_peb",
-                className: "text-left",
-            },
-            {
-                data: "total_inv_pi",
-                className: "text-left",
-                searchable: false,
-                sortable: false,
+                data: "status_invoice",
+                className: "text-center",
+                render: function(data, type, row) {
+                    let status_invoice = row.status_invoice;
+                    let htmlRes = '';
+
+                    if (row.status_invoice == 1) {
+                        htmlRes += `
+                            <div class="text-success">
+                               <i class="fa-solid fa-check"></i>
+                            </div>`
+                    } else {
+                        htmlRes += `
+                            <div class="text-danger">
+                               <i class="fa-solid fa-x"></i>
+                            </div>`
+                    }
+
+                    return htmlRes;
+                }
             },
             {
                 data: "id",
@@ -132,8 +143,8 @@
                 render: function(data, type, row) {
                     let id = row.id;
                     return `
-                          <button data-toggle="tooltip" title="Input PI" onclick="edit('${id}')" class="btn btn-danger">
-                            Input PI
+                          <button data-toggle="tooltip" title="List Inv" onclick="edit('${id}')" class="btn btn-danger">
+                            List Inv
                         </button>
                     `
                 }
@@ -191,7 +202,7 @@
     });
 
     function edit(id) {
-        window.location.href = "<?= base_url('proforma-invoice/detail') ?>" + '/' + id
+        window.location.href = "<?= base_url('invoice-packing-customer/detail') ?>" + '/' + id
     }
 
     const changeSort = function(val) {

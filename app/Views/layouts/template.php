@@ -96,14 +96,10 @@
     
     function greatFormatQty(value) {
         if (value == null || value === "") return "0.000";
-
-        console.log(value); // taruh sebelum return
         
         if (typeof value === "string" && value.includes("+")) {
             let parts = value.split("+").map(v => parseFloat(v.trim()) || 0);
             let sum = parts.reduce((a, b) => a + b, 0);
-
-            console.log(parts, sum); // taruh sebelum return
 
             return (Math.round(sum * 1000) / 1000).toFixed(3); 
         }
