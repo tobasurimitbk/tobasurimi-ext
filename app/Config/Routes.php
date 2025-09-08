@@ -532,6 +532,8 @@ $routes->get('/pembayaran-invoice/id/(:segment)', 'Pembayaran\PembayaranInvoice:
 $routes->get('/pembayaran-invoice/all', 'Pembayaran\PembayaranInvoice::getAllPembayaranInvoice', ['filter' => 'Auth']);
 $routes->get('/pembayaran-invoice/create', 'Pembayaran\PembayaranInvoice::createPembayaranInvoiceLokal', ['filter' => 'Auth']);
 $routes->get('/pembayaran-invoice/create-ekspor', 'Pembayaran\PembayaranInvoice::createPembayaranInvoiceEkspor', ['filter' => 'Auth']);
+$routes->get('/pembayaran-invoice/create-proforma-invoice', 'Pembayaran\PembayaranInvoice::createPembayaranInvoiceProformaInvoice', ['filter' => 'Auth']);
+$routes->get('/pembayaran-invoice/get-barang-sales-proforma-invoice', 'Pembayaran\PembayaranInvoice::getBarangSalesProformaInvoice', ['filter' => 'Auth']);
 $routes->get('/pembayaran-invoice/create-lain', 'Pembayaran\PembayaranInvoice::createPembayaranInvoiceLain', ['filter' => 'Auth']);
 $routes->get('/pembayaran-invoice/create-return', 'Pembayaran\PembayaranInvoice::createPembayaranInvoiceReturn', ['filter' => 'Auth']);
 $routes->get('/pembayaran-invoice/dropdown-invoice-return', 'Pembayaran\PembayaranInvoice::dropdownInvoiceReturn', ['filter' => 'Auth']);
