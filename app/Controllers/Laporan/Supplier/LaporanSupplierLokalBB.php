@@ -652,6 +652,14 @@ class LaporanSupplierLokalBB extends BaseController
                     $pph = 0;
                     $total = $dpp;
                 }
+
+                // bulatkan DPP & PPH ke 2 desimal dulu
+                $dpp = round($dpp, 2);
+                $pph = round($pph, 2);
+
+                // total = DPP - PPH yang sudah dibulatkan
+                $total = round($dpp - $pph, 2);
+
                 return [$dpp, $pph, $total];
             };
 
@@ -1373,6 +1381,14 @@ class LaporanSupplierLokalBB extends BaseController
                     $pph = 0;
                     $total = $dpp;
                 }
+
+                // bulatkan DPP & PPH ke 2 desimal dulu
+                $dpp = round($dpp, 2);
+                $pph = round($pph, 2);
+
+                // total = DPP - PPH yang sudah dibulatkan
+                $total = round($dpp - $pph, 2);
+
                 return [$dpp, $pph, $total];
             };
 
@@ -1628,6 +1644,14 @@ class LaporanSupplierLokalBB extends BaseController
                 $pph = 0;
                 $total = $dpp;
             }
+
+            // bulatkan DPP & PPH ke 2 desimal dulu
+            $dpp = round($dpp, 2);
+            $pph = round($pph, 2);
+
+            // total = DPP - PPH yang sudah dibulatkan
+            $total = round($dpp - $pph, 2);
+
             return [$dpp, $pph, $total];
         };
 
@@ -2309,6 +2333,14 @@ class LaporanSupplierLokalBB extends BaseController
                 $pph = 0;
                 $total = $dpp;
             }
+
+            // bulatkan DPP & PPH ke 2 desimal dulu
+            $dpp = round($dpp, 2);
+            $pph = round($pph, 2);
+
+            // total = DPP - PPH yang sudah dibulatkan
+            $total = round($dpp - $pph, 2);
+
             return [$dpp, $pph, $total];
         };
 
