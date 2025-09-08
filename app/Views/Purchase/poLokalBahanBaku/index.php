@@ -212,16 +212,16 @@
             {
                 data: "total_before_pph",
                 className: "text-center",
-                render: function(param) {
-                    return greatFormatRupiah(param);
-                }
+                // render: function(param) {
+                //     return greatFormatRupiah(param);
+                // }
             },
             {
                 data: "total_after_pph",
                 className: "text-center",
-                render: function(param) {
-                    return greatFormatRupiah(param);
-                }
+                // render: function(param) {
+                //     return greatFormatRupiah(param);
+                // }
             },
             {
                 data: "itemCount",
