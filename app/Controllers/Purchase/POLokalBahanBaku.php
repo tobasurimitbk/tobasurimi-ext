@@ -399,12 +399,25 @@ class POLokalBahanBaku extends BaseController
             $totalHarga += ($d['general_price'] + $d['daily_price'] + $d['monthly_price']) * $d['qty'];
         }
 
-        $totalFinal = $this->RMPurchaseOrderModel->generateTotalBeforeAndAfterPph($id);
+        $totalFinal = $this->RMPurchaseOrderModel->generateKomponenHarga($id);
 
         $this->RMPurchaseOrderModel->update($id, [
             'total' => $totalHarga  + $this->request->getVar("subsidi_langsung"),
-            'total_before_pph'  => $totalFinal['total_before_pph'],
-            'total_after_pph' => $totalFinal['total_after_pph']
+            'total_before_pph'  => $totalFinal['nilai_before_pph'],
+            'total_after_pph' => $totalFinal['nilai_after_pph'],
+            'dpp_umum' => $totalFinal['dpp_umum'],
+            'dpp_harian' => $totalFinal['dpp_harian'],
+            'dpp_bulanan' => $totalFinal['dpp_bulanan'],
+            'dpp_tambahan' => $totalFinal['dpp_tambahan'],
+            'pph_umum' => $totalFinal['pph_umum'],
+            'pph_harian' => $totalFinal['pph_harian'],
+            'pph_bulanan' => $totalFinal['pph_bulanan'],
+            'pph_tambahan' => $totalFinal['pph_tambahan'],
+            'nilai_total_umum' => $totalFinal['nilai_total_umum'],
+            'nilai_total_harian' => $totalFinal['nilai_total_harian'],
+            'nilai_total_bulanan' => $totalFinal['nilai_total_bulanan'],
+            'nilai_total_tambahan' => $totalFinal['nilai_total_tambahan'],
+            'nilai_total_qty' => $totalFinal['nilai_total_qty']
         ]);
 
         return response()->setJSON([
@@ -536,11 +549,26 @@ class POLokalBahanBaku extends BaseController
             ->whereNotIn('id', $id_detail_all)
             ->delete();
 
-        $totalFinal = $this->RMPurchaseOrderModel->generateTotalBeforeAndAfterPph($id);
+        $totalFinal = $this->RMPurchaseOrderModel->generateKomponenHarga($id);
+
 
         $this->RMPurchaseOrderModel->update($id, [
-            'total_before_pph'  => $totalFinal['total_before_pph'],
-            'total_after_pph' => $totalFinal['total_after_pph']
+            'total' => $totalHarga  + $this->request->getVar("subsidi_langsung"),
+            'total_before_pph'  => $totalFinal['nilai_before_pph'],
+            'total_after_pph' => $totalFinal['nilai_after_pph'],
+            'dpp_umum' => $totalFinal['dpp_umum'],
+            'dpp_harian' => $totalFinal['dpp_harian'],
+            'dpp_bulanan' => $totalFinal['dpp_bulanan'],
+            'dpp_tambahan' => $totalFinal['dpp_tambahan'],
+            'pph_umum' => $totalFinal['pph_umum'],
+            'pph_harian' => $totalFinal['pph_harian'],
+            'pph_bulanan' => $totalFinal['pph_bulanan'],
+            'pph_tambahan' => $totalFinal['pph_tambahan'],
+            'nilai_total_umum' => $totalFinal['nilai_total_umum'],
+            'nilai_total_harian' => $totalFinal['nilai_total_harian'],
+            'nilai_total_bulanan' => $totalFinal['nilai_total_bulanan'],
+            'nilai_total_tambahan' => $totalFinal['nilai_total_tambahan'],
+            'nilai_total_qty' => $totalFinal['nilai_total_qty']
         ]);
 
 
@@ -751,6 +779,89 @@ class POLokalBahanBaku extends BaseController
     }
 
     public function print($id = null)
+    {
+        if (is_numeric($id)) {
+            $id = $id;
+        } else {
+            $id = decrypt($id);
+        }
+        if ($id) {
+
+            $data = [];
+            $dataPO = $this->RMPurchaseOrderModel->getPoBBLokalById($id);
+            $dataPODetail = $this->RMPurchaseOrderDetailModel->getPoBBLokalDetailById($id);
+            $filename = $dataPO->po_no;
+            $pphMode = $dataPO->pph;
+            $hasNpwp = !empty($dataPO->supplierNpwp);
+
+            if ($dataPO->po_date <= '2025-06-30') {
+                // Dibawah bulan 7
+                $nilaiPph = $hasNpwp ? 0.9975 : 0.995;
+            } else {
+                // Diatas bulan 7
+                $nilaiPph = 0.9975;
+            }
+
+            $dataBarang = array();
+            $totalQty = 0;
+            foreach ($dataPODetail as $detail) {
+
+                if ($pphMode == "Company") {
+                    $generalPrice = $detail->general_price / $nilaiPph;
+                    $generalPriceTotal = ($detail->general_price / $nilaiPph) * $detail->qty;
+                } else {
+                    $generalPrice = $detail->general_price;
+                    $generalPriceTotal = $detail->general_price * $detail->qty;
+                }
+
+                $dataBarang[] = [
+                    'peti' => $detail->peti,
+                    'divisi' => $dataPO->divisi,
+                    'note' => $detail->note,
+                    'qty' => $detail->qty,
+                    'general_price' => $generalPrice,
+                    'general_price_total' => $generalPriceTotal
+                ];
+
+                $totalQty += $detail->qty;
+            }
+
+            if ($pphMode == "Company") {
+                $dataPO->selisih = (($dataPO->cong_batasan ? $dataPO->cong_batasan : 0) - ($dataPO->cong_sebenarnya ? $dataPO->cong_sebenarnya : 0) + $dataPO->subsidi_langsung) / $nilaiPph;
+            } else {
+                $dataPO->selisih = (($dataPO->cong_batasan ? $dataPO->cong_batasan : 0) - ($dataPO->cong_sebenarnya ? $dataPO->cong_sebenarnya : 0) + $dataPO->subsidi_langsung);
+            }
+
+            $lpbResult = $this->penerimaanBarangModel->where('status_penerimaan', "LOKAL")->where('tipe_bahan', "BAKU")->like('multiple_po_id', $id)->first();
+            $lpb = null;
+            $lpbDetail = null;
+
+            if ($lpbResult != null) {
+                $lpbDetail = $this->penerimaanBarangModel->getByIdPrintBahanBaku($lpbResult['id']);
+                $dataPenerimaanBarangDetail = $this->penerimaanBarangDetailModel->getPenerimaanBarangDetailByPenerimaanBarangId($lpbResult['id'], "BAKU", "LOKAL");
+                $lpb = $lpbResult;
+                $lpbDetail = $dataPenerimaanBarangDetail;
+            }
+
+
+            $data = [
+                'dataPO' => $dataPO,
+                'dataPODetail' => $dataPODetail,
+                'dataBarang' => $dataBarang,
+                'totalQty' => $totalQty,
+                'lpb' => $lpb,
+                'lpbDetail' => $lpbDetail
+            ];
+
+            $this->dompdf->loadHtml(view('Purchase/poLokalBahanBaku/print', $data));
+            $this->dompdf->setPaper('A4', 'portrait');
+            $this->dompdf->render();
+            $this->dompdf->stream($filename, array("Attachment" => false));
+            exit(0);
+        }
+    }
+
+    public function printBackup($id = null)
     {
         if (is_numeric($id)) {
             $id = $id;
