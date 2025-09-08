@@ -1554,7 +1554,7 @@ class RMPurchaseOrderModel extends Model
             $nilaiTotalTambahan = (float) number_format($dppTambahan - $pphTambahan, 2, '.', '');
         } else {
             $dppTambahan = (float)number_format(($dataPo->cong_batasan - $dataPo->cong_sebenarnya + $dataPo->subsidi_langsung) * $totalQty,  2, '.', '');
-            $pphTambahan = (float)number_format($dppTambahan * $nilaiPph2, 2, '.', '');
+            $pphTambahan = $pphMode == "None" ? 0 : (float)number_format($dppTambahan * $nilaiPph2, 2, '.', '');
             $nilaiTotalTambahan = (float) number_format($dppTambahan - $pphTambahan, 2, '.', '');
         }
 
