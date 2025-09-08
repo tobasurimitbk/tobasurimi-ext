@@ -839,7 +839,7 @@ class POLokalBahanBaku extends BaseController
             if ($lpbResult != null) {
                 $lpbDetail = $this->penerimaanBarangModel->getByIdPrintBahanBaku($lpbResult['id']);
                 $dataPenerimaanBarangDetail = $this->penerimaanBarangDetailModel->getPenerimaanBarangDetailByPenerimaanBarangId($lpbResult['id'], "BAKU", "LOKAL");
-                $lpb = $lpbResult;
+                $lpb = $lpbDetail;
                 $lpbDetail = $dataPenerimaanBarangDetail;
             }
 

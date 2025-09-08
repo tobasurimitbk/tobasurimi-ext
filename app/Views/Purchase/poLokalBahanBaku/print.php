@@ -679,7 +679,7 @@
                 </tr>
                 <tr>
                     <td>
-                        <div><span class="txt-bold">Tanggal : <?= $lpb->createdAt ? date("d/m/Y", strtotime($lpb->createdAt)) : ""; ?></span></div>
+                        <div><span class="txt-bold">Tanggal : <?= $lpb->tanggal ? date("d/m/Y", strtotime($lpb->tanggal)) : ""; ?></span></div>
                     </td>
                     <td>
                         <div><span class="txt-bold">Jenis Kemasan : <?= $lpb->kemasan; ?></span></div>
