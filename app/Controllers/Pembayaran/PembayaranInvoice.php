@@ -432,7 +432,7 @@ class PembayaranInvoice extends BaseController
 
         $paymentNo = "BNL/";
         $month = date('m');
-        $year = date('Y');
+        $year = date('y');
 
         $numberTemplate = $paymentNo . "$year/$month/";
         $lastData = $this->pembayaranInvoiceModel->asObject()
