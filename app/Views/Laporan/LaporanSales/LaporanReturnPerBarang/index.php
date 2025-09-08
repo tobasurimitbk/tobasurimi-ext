@@ -134,7 +134,7 @@
                 if (data.is_barang) {
                     $(row).addClass('customer-row')
                         .find('td')
-                        .attr('colspan', 7)
+                        .attr('colspan', 9)
                         .removeClass('text-center')
                         .addClass('text-left txt-bold')
                         .css('cssText', 'font-weight:700 !important;');
@@ -143,7 +143,7 @@
                 } else if (data.is_total) {
                     $(row).addClass('total-row')
                         .find('td')
-                        .attr('colspan', 7)
+                        .attr('colspan', 9)
                         .removeClass('text-center')
                         .addClass('text-left txt-bold')
                         .css('cssText', 'font-weight:700 !important;');

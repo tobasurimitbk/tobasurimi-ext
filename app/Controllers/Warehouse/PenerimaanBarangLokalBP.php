@@ -468,7 +468,8 @@ class PenerimaanBarangLokalBP extends BaseController
                     'nama_barang_dok' => $barang == null ? 0 : $barang['barang_name'],
                     'jml_masuk' => $b->jml_diterima_lpb,
                     'jml_masuk_konversi' => $b->jml_diterima_lpb_konversi,
-                    'unit_konversi' => $b->satuan_konversi_id
+                    'unit_konversi' => $b->satuan_konversi_id,
+                    'keterangan' => $b->keterangan
                 ]);
                 // update remeaning di detail po
                 $this->amPurchaseOrderDetailModel->where('id', $b->am_purchase_order_details_id)->where('am_purchase_order_id', $b->am_purchase_order_id)
@@ -578,6 +579,7 @@ class PenerimaanBarangLokalBP extends BaseController
         // $this->penerimaanBarangDetailModel->where('penerimaan_barang_id', $id)->delete();
         $penerimaanBarangDetailId = array();
         foreach (json_decode($barangs) as $b) {
+
             $poDetail = $this->amPurchaseOrderDetailModel->where('id', $b->am_purchase_order_details_id)->first();
             $barang = null;
             if ($poDetail != null) {
@@ -612,7 +614,8 @@ class PenerimaanBarangLokalBP extends BaseController
                         'nama_barang_dok' => $barang == null ? 0 : $barang['barang_name'],
                         'jml_masuk' => $b->jml_diterima_lpb,
                         'jml_masuk_konversi' => $b->jml_diterima_lpb_konversi,
-                        'unit_konversi' => $b->satuan_konversi_id
+                        'unit_konversi' => $b->satuan_konversi_id,
+                        'keterangan' => $b->keterangan
                     ]);
 
                     // update remeaning di detail po
@@ -638,7 +641,8 @@ class PenerimaanBarangLokalBP extends BaseController
                         'nama_barang_dok' => $barang == null ? 0 : $barang['barang_name'],
                         'jml_masuk' => $b->jml_diterima_lpb,
                         'jml_masuk_konversi' => $b->jml_diterima_lpb_konversi,
-                        'unit_konversi' => $b->satuan_konversi_id
+                        'unit_konversi' => $b->satuan_konversi_id,
+                        'keterangan' => $b->keterangan
                     ]);
                     // update remeaning di detail po
                     $this->amPurchaseOrderDetailModel->where('id', $b->am_purchase_order_details_id)->where('am_purchase_order_id', $b->am_purchase_order_id)
