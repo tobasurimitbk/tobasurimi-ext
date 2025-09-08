@@ -430,7 +430,7 @@ class PembayaranInvoice extends BaseController
     public function generateNoPembayaranInvoice()
     {
 
-        $paymentNo = "PI/";
+        $paymentNo = "BNL/";
         $month = date('m');
         $year = date('Y');
 
