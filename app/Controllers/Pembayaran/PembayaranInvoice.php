@@ -430,9 +430,9 @@ class PembayaranInvoice extends BaseController
     public function generateNoPembayaranInvoice()
     {
 
-        $paymentNo = "PI/";
+        $paymentNo = "BNL/";
         $month = date('m');
-        $year = date('Y');
+        $year = date('y');
 
         $numberTemplate = $paymentNo . "$year/$month/";
         $lastData = $this->pembayaranInvoiceModel->asObject()
