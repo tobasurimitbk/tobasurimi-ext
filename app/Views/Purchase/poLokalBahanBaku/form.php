@@ -899,7 +899,7 @@
         $(document).on('click', '.edit-table-detail', function(evt) {
             var id_detail = $(this).data("id");
             for (let i = 0; i < list_items.length; i++) {
-                if (list_items[i].id_detail === id_detail) {
+                if (list_items[i].id_detail == id_detail) {
                     console.log(list_items);
 
                     $.ajax({
