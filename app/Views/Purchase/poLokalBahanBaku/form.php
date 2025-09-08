@@ -1301,59 +1301,60 @@
             let validate_same = false;
 
             if ($(".detail-form").valid()) {
-                list_items.map((item, index) => {
-                    if (item.supplier_harga_id === supplier_harga_id && id_detail === "") {
-                        validate_same = true;
-                    }
-                });
+                // list_items.map((item, index) => {
+                //     if (item.supplier_harga_id === supplier_harga_id && id_detail === "") {
+                //         validate_same = true;
+                //     }
+                // });
 
-                if (validate_same) {
-                    Swal.fire({
-                        icon: 'error',
-                        title: "Spesifikasi Sudah Ada",
-                        confirmButtonColor: '#4e73df',
-                    })
+                // if (validate_same) {
+                //     Swal.fire({
+                //         icon: 'error',
+                //         title: "Spesifikasi Sudah Ada",
+                //         confirmButtonColor: '#4e73df',
+                //     })
+                // } else {
+
+                // }
+
+                if (id_detail) {
+                    list_items.map((item, index) => {
+                        //UPDATE
+                        if (item.id_detail === id_detail) {
+                            list_items[index].supplier_harga_id = supplier_harga_id;
+                            list_items[index].spesifikasi_id = spesifikasi_id;
+                            list_items[index].nama_spesifikasi = spesifikasi_name;
+                            list_items[index].satuan_id = satuan_id;
+                            list_items[index].kode_satuan = kode_satuan;
+                            list_items[index].peti = peti;
+                            list_items[index].quality = quality;
+                            list_items[index].harga = destroyFormatRupiah(harga);
+                            list_items[index].daily_price = destroyFormatRupiah(daily_price);
+                            list_items[index].qty = qty;
+                            list_items[index].total = destroyFormatRupiah(total);
+                            list_items[index].monthly_price = destroyFormatRupiah(monthly_price);
+                            list_items[index].keterangan = keterangan;
+                        }
+                    });
+
                 } else {
-                    if (id_detail) {
-                        list_items.map((item, index) => {
-                            //UPDATE
-                            if (item.id_detail === id_detail) {
-                                list_items[index].supplier_harga_id = supplier_harga_id;
-                                list_items[index].spesifikasi_id = spesifikasi_id;
-                                list_items[index].nama_spesifikasi = spesifikasi_name;
-                                list_items[index].satuan_id = satuan_id;
-                                list_items[index].kode_satuan = kode_satuan;
-                                list_items[index].peti = peti;
-                                list_items[index].quality = quality;
-                                list_items[index].harga = destroyFormatRupiah(harga);
-                                list_items[index].daily_price = destroyFormatRupiah(daily_price);
-                                list_items[index].qty = qty;
-                                list_items[index].total = destroyFormatRupiah(total);
-                                list_items[index].monthly_price = destroyFormatRupiah(monthly_price);
-                                list_items[index].keterangan = keterangan;
-                            }
-                        });
-
-                    } else {
-                        //CREATE
-                        list_items.push({
-                            id_detail: getID(),
-                            supplier_harga_id: supplier_harga_id,
-                            spesifikasi_id: spesifikasi_id,
-                            nama_spesifikasi: spesifikasi_name,
-                            satuan_id: satuan_id,
-                            kode_satuan: kode_satuan,
-                            peti: peti,
-                            quality: quality,
-                            harga: destroyFormatRupiah(harga),
-                            daily_price: destroyFormatRupiah(daily_price),
-                            qty: qty,
-                            total: destroyFormatRupiah(total),
-                            monthly_price: destroyFormatRupiah(monthly_price),
-                            keterangan: keterangan
-                        });
-                    }
-
+                    //CREATE
+                    list_items.push({
+                        id_detail: getID(),
+                        supplier_harga_id: supplier_harga_id,
+                        spesifikasi_id: spesifikasi_id,
+                        nama_spesifikasi: spesifikasi_name,
+                        satuan_id: satuan_id,
+                        kode_satuan: kode_satuan,
+                        peti: peti,
+                        quality: quality,
+                        harga: destroyFormatRupiah(harga),
+                        daily_price: destroyFormatRupiah(daily_price),
+                        qty: qty,
+                        total: destroyFormatRupiah(total),
+                        monthly_price: destroyFormatRupiah(monthly_price),
+                        keterangan: keterangan
+                    });
                 }
 
                 drawTable();
@@ -1742,7 +1743,7 @@
     <?php if (!empty($dataPOLokal)) : ?>
         <?php foreach ($dataPOLokal->rm_purchase_order_details as $detail) : ?>
             list_items.push({
-                id_detail: getID(),
+                id_detail: "<?= $detail->id ?>",
                 supplier_harga_id: "<?= $detail->supplier_harga_id ?>",
                 spesifikasi_id: "<?= $detail->barang2_id ?>",
                 nama_spesifikasi: "<?= $detail->spesifikasi ?>",

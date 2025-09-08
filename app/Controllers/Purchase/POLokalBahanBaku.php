@@ -476,9 +476,7 @@ class POLokalBahanBaku extends BaseController
         foreach (json_decode($this->request->getVar("items")) as $r) {
             $check = $this->RMPurchaseOrderDetailModel
                 ->where('rm_purchase_order_id', $id)
-                ->where('supplier_harga_id', $r->supplier_harga_id)
-                ->where('barang2_id', $r->spesifikasi_id)
-                ->where('barang1_id', $this->request->getVar('barang_id'))
+                ->where('id', $r->id_detail)
                 ->first();
 
             if ($check != null) {
@@ -503,12 +501,12 @@ class POLokalBahanBaku extends BaseController
             } else {
                 // NEW BARANG
                 // DELETE
-                $this->RMPurchaseOrderDetailModel
-                    ->where('rm_purchase_order_id', $id)
-                    ->where('supplier_harga_id', $r->supplier_harga_id)
-                    ->where('barang2_id', $r->spesifikasi_id)
-                    ->where('barang1_id', $this->request->getVar('barang_id'))
-                    ->delete();
+                // $this->RMPurchaseOrderDetailModel
+                //     ->where('rm_purchase_order_id', $id)
+                //     ->where('supplier_harga_id', $r->supplier_harga_id)
+                //     ->where('barang2_id', $r->spesifikasi_id)
+                //     ->where('barang1_id', $this->request->getVar('barang_id'))
+                //     ->delete();
 
                 // INSERT NEW
                 $id_detail_new = $this->RMPurchaseOrderDetailModel->insert([
