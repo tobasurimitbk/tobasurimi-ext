@@ -47,6 +47,9 @@
                     <a class="nav-link active" href="#">Pembayaran Invoice Ekspor</a>
                 </li>
                 <li class="nav-item">
+                    <a class="nav-link " href="<?= base_url('pembayaran-invoice/create-proforma-invoice') ?>">Pembayaran Proforma Invoice</a>
+                </li>
+                <li class="nav-item">
                     <a class="nav-link" href="<?= base_url('pembayaran-invoice/create-lain') ?>">Pembayaran Invoice Lain Lain</a>
                 </li>
                 <li class="nav-item">

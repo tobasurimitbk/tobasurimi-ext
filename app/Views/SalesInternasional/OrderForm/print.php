@@ -308,15 +308,15 @@
                                         'grade' => ['label' => 'Grade', 'width' => '8%'],
                                         'packing' => ['label' => 'Packing', 'width' => '8%'],
                                         'can' => ['label' => 'Can', 'width' => '7%'],
-                                        'cased' => ['label' => 'Case', 'width' => '7%'],
-                                        'case' => ['label' => 'Case', 'width' => '7%'],
+                                        'cased' => ['label' => 'Case', 'width' => '4%'],
+                                        'case' => ['label' => 'Case', 'width' => '4%'],
                                         'kg' => ['label' => 'Kg', 'width' => '7%'],
                                         'lb' => ['label' => 'LB', 'width' => '7%'],
                                         'inner_box' => ['label' => 'Inner', 'width' => '8%'],
                                         'pc' => ['label' => 'PC', 'width' => '7%'],
                                         'bag' => ['label' => 'Bag', 'width' => '7%'],
                                         'cup' => ['label' => 'Cup', 'width' => '6%'],
-                                        'persen' => ['label' => '%', 'width' => '3%'],
+                                        'persen' => ['label' => '%', 'width' => '6%'],
                                         'remark' => ['label' => 'Remarks', 'width' => '10%'],
                                         'palet' => ['label' => 'Pallet', 'width' => '10%']
 
@@ -348,10 +348,10 @@
                                                     <?php endforeach; ?>
 
                                                     <?php if ($show_persen_column): ?>
-                                                        <th style="padding: 3px; border: 1px solid #ddd; width: 4%;text-align: right;">%</th>
+                                                        <th style="padding: 3px; border: 1px solid #ddd; width: 5%;text-align: right;">%</th>
                                                     <?php endif; ?>
 
-                                                    <th style=" padding: 3px; border: 1px solid #ddd; width: 6%; text-align: right;">Qty</th>
+                                                    <th style=" padding: 3px; border: 1px solid #ddd; width: 8%; text-align: right;">Qty</th>
                                                     <th style="padding: 3px; border: 1px solid #ddd; width: 6%; text-align: right;" class="price">Unit Price</th>
                                                     <th style="padding: 3px; border: 1px solid #ddd; width: 6%; text-align: right;" class="price">Total Amount</th>
                                                 </tr>

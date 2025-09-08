@@ -1419,9 +1419,9 @@ class RMPurchaseOrderModel extends Model
         }
 
         if ($data->pph === "Supplier" || $data->pph === "Company") {
-            $nilaiTotalBulananWithPPH = $nilaiTotalBulanan - ($nilaiTotalBulanan * $nilaiPph2);
-            $nilaiTotalUmumWithPPH = $nilaiTotalUmum - ($nilaiTotalUmum * $nilaiPph2);
-            $nilaiTotalHarianWithPPH = $nilaiTotalHarian - ($nilaiTotalHarian * $nilaiPph2);
+            $nilaiTotalBulananWithPPH = $nilaiTotalBulanan - round($nilaiTotalBulanan * $nilaiPph2, 2);
+            $nilaiTotalUmumWithPPH = $nilaiTotalUmum - round($nilaiTotalUmum * $nilaiPph2, 2);
+            $nilaiTotalHarianWithPPH = $nilaiTotalHarian - round($nilaiTotalHarian * $nilaiPph2, 2);
         }
 
         if ($data->pph == "Company") {
@@ -1435,8 +1435,8 @@ class RMPurchaseOrderModel extends Model
         }
 
         // NILAI SEBELUM PPH
-        $totalBeforePph = $nilaiTotalBulanan + $nilaiTotalHarian + $nilaiTotalUmum +  abs($totalTambahan);
-        $totalAfterPph = $nilaiTotalBulananWithPPH + $nilaiTotalHarianWithPPH + $nilaiTotalUmumWithPPH + abs($totalTambahanWithPPH);
+        $totalBeforePph = round($nilaiTotalBulanan, 2) + round($nilaiTotalHarian, 2) + round($nilaiTotalUmum, 2) +  abs($totalTambahan);
+        $totalAfterPph = round($nilaiTotalBulananWithPPH, 2) + round($nilaiTotalHarianWithPPH, 2) + round($nilaiTotalUmumWithPPH, 2) + abs($totalTambahanWithPPH);
 
         // JIKA PPH TIDAK DITANGGUNG OLEH SIAPA SIAPA
         if ($totalAfterPph == 0 || $data->pph === "None") {

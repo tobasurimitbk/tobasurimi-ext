@@ -18,6 +18,8 @@ use App\Models\SalesOrderInvoiceModel;
 use App\Models\SalesOrderInvoiceDetailModel;
 use App\Models\SalesOrderLainModel;
 use App\Models\SalesOrderLainDetailModel;
+use App\Models\ProformaInvoiceBarangModel;
+use App\Models\ProformaInvoiceModel;
 use App\Models\SalesOrderExportModel;
 use App\Models\SalesOrderExportDetailModel;
 use App\Models\SalesOrderExportAdditionalModel;
@@ -47,6 +49,8 @@ class PembayaranInvoice extends BaseController
     protected $salesOrderInvoiceDetailModel;
     protected $salesOrderReturnModel;
     protected $salesOrderReturnDetailModel;
+    protected $proformaInvoiceModel;
+    protected $proformaInvoiceBarangModel;
     protected $pembayaranInvoiceDetailModel;
     protected $metaDataModel;
     protected $jurnalController;
@@ -70,6 +74,8 @@ class PembayaranInvoice extends BaseController
         $this->salesOrderExportAdditionalModel = new SalesOrderExportAdditionalModel();
         $this->salesOrderExportDetailModel = new SalesOrderExportDetailModel();
         $this->salesOrderInvoiceModel = new SalesOrderInvoiceModel();
+        $this->proformaInvoiceModel = new ProformaInvoiceModel();
+        $this->proformaInvoiceBarangModel = new ProformaInvoiceBarangModel();
         $this->salesOrderInvoiceDetailModel = new SalesOrderInvoiceDetailModel();
         $this->salesOrderReturnModel = new SalesOrderReturnModel();
         $this->salesOrderReturnDetailModel = new SalesOrderReturnDetailModel();
@@ -125,6 +131,54 @@ class PembayaranInvoice extends BaseController
             'divisi' => $this->divisiModel->getDivisiAccess()
         ];
         return view('Pembayaran/pembayaranInvoice/formEkspor', $data);
+    }
+
+    public function createPembayaranInvoiceProformaInvoice()
+    {
+        $subAkunsModel = $this->Sub_AkunsModel->asObject()
+            ->where('company_id', $this->this_company_id)
+            ->where('deletedAt', null)
+            ->findAll();
+        $dokumenList = [];
+        $customers = $this->customerModel->getCustomerLokal($this->user_id, $this->this_company_id);
+        $divisi = $this->divisiModel->getDivisiAccess();
+
+        $proformaInvoiceData = $this->proformaInvoiceModel
+            ->select('proforma_invoice.*, SUM(proforma_invoice_barang.total_harga) AS total_invoice')
+            ->join('proforma_invoice_barang', 'proforma_invoice_barang.proforma_invoice_id = proforma_invoice.id', 'left')
+            ->where('proforma_invoice.deletedAt', null)
+            ->where('proforma_invoice_barang.deletedAt', null)
+            ->where('proforma_invoice.status_posting', 0)
+            ->where('proforma_invoice.company_id', $this->this_company_id)
+            ->groupBy('proforma_invoice_barang.proforma_invoice_id')
+            ->findAll();
+            
+
+        foreach ($proformaInvoiceData as $s) {
+            $totalPembayaran = 0;
+            $pembayaranInvoiceData = $this->pembayaranInvoiceModel
+                ->where('pembayaran_invoice.company_id', $this->this_company_id)
+                ->where('pembayaran_invoice.invoice_id', $s['id'])
+                ->where('pembayaran_invoice.deletedAt', null)
+                ->where('pembayaran_invoice.type_invoice', "PROFORMA-INVOICE")
+                ->findAll();
+            foreach ($pembayaranInvoiceData as $ss) {
+                $totalPembayaran += $ss['total_bayar'];
+            }
+            if (floatval($s['total_pi']) > floatval($totalPembayaran)) {
+                array_push($dokumenList, $s);
+            }
+        }
+
+        $data = [
+            "customers" => $customers,
+            "divisi" => $divisi,
+            "subsAkuns" => $subAkunsModel,
+            "dokumenList" => $dokumenList,
+            "detail" => "",
+            'divisi' => $this->divisiModel->getDivisiAccess()
+        ];
+        return view('Pembayaran/pembayaranInvoice/formPI', $data);
     }
 
     public function createPembayaranInvoiceLain()
@@ -698,6 +752,99 @@ class PembayaranInvoice extends BaseController
                         "keterangan" => $p['keterangan'],
                         "keterangan_pajak" => $p['keterangan_pajak'],
                         "nominal_pajak" => $p['nominal_pajak'],
+                        "id_akun_kredit" => $p['id_akun_kas'],
+                        "id_akun_debit" => $p['id_akun_selisih'],
+                        "akun_kredit" => $p['no_sub_kas'] . ' - ' . $p['nama_sub_kas'],
+                        "akun_debit" => $p['no_sub_selisih'] . ' - ' . $p['nama_sub_selisih'],
+                    ]);
+                }
+
+                $pembayaranInvoiceData = $this->pembayaranInvoiceModel
+                    ->select('total_bayar, jenis_data')
+                    ->where('id', $pembayaranInvoiceId)
+                    ->first();
+
+
+                if ($pembayaranInvoiceData["jenis_data"] == "import") {
+                    $isImport = true;
+                }
+            }
+
+            if (empty($dataBarang)) {
+
+                $dataBarang = $this->salesOrderInvoiceModel->whereIn("id", $idArray)
+                    ->select('id as sales_order_invoice_id, no_faktur, tanggal_faktur, total_invoice as amount_invoice, document_type')
+                    ->findAll();
+
+                $dataBarang = $dataBarang;
+
+                $isImport = true;
+            }
+        }
+
+
+        return $this->response->setJSON([
+            'data' => $dataBarang,
+            'totalPembayaran' => $pembayaranInvoiceData['total_bayar'] ?? 0,
+            'status' => true,
+            'isImport' => $isImport,
+        ]);
+    }
+
+    public function getBarangSalesProformaInvoice()
+    {
+        $idArray = json_decode(decrypt($this->request->getVar('id')), true); // Decode array dari JSON
+        $pembayaranInvoiceId = decrypt($this->request->getVar('pembayaran_invoice_id'));
+
+        $dataBarang = [];
+        $isImport = false;
+        $totalPembayaran = 0;
+
+        // var_dump($idArray);
+        // die;
+
+        // $idArray = array_map('intval', $idArray);
+
+        if (!empty($idArray)) {
+            // Ambil data invoice berdasarkan ID jika tidak ada pembayaran_invoice_id
+            if (empty($pembayaranInvoiceId)) {
+                $proformaInvoiceBarangData = $this->proformaInvoiceBarangModel
+                    ->select('proforma_invoice.no_pi, proforma_invoice_barang.id as proforma_invoice_barang_id, proforma_invoice_barang.id as proforma_invoice_id, qty_barang, harga_satuan, total_harga, nama_barang')
+                    ->join('proforma_invoice', 'proforma_invoice_barang.proforma_invoice_id = proforma_invoice.id', 'left')
+                    ->where('proforma_invoice_id', $idArray)
+                    ->where('proforma_invoice_barang.deletedAt', null)
+                    ->findAll();
+                foreach ($proformaInvoiceBarangData as $s) {
+                    array_push($dataBarang, $s);
+                }
+
+                // var_dump($proformaInvoiceBarangData);
+                // die;
+            }
+
+            // Ambil data pembayaran jika pembayaran_invoice_id tersedia
+            if (!empty($pembayaranInvoiceId)) {
+                $pembayaranInvoiceDetail = $this->pembayaranInvoiceDetailModel
+                    ->join('sub_akuns as akun_kas', 'pembayaran_invoice_detail.akun_kredit = akun_kas.id', 'left')
+                    ->join('sub_akuns as akun_selisih', 'pembayaran_invoice_detail.akun_debit = akun_selisih.id', 'left')
+                    ->join('proforma_invoice_barang', 'pembayaran_invoice_detail.proforma_invoice_barang_id = proforma_invoice_barang.id', 'left')
+                    ->join('proforma_invoice', 'proforma_invoice_barang.proforma_invoice_id = proforma_invoice.id', 'left')
+                    ->select('barang_master_sales.nama_barang, barang_master_sales.kode_barang, proforma_invoice.no_faktur, proforma_invoice_barang.id as proforma_invoice_barang_id, proforma_invoice_barang.id as proforma_invoice_id, akun_kas.id as id_akun_kas, akun_selisih.id as id_akun_selisih, akun_kas.nama_sub as nama_sub_kas, akun_kas.no_sub as no_sub_kas, akun_selisih.nama_sub as nama_sub_selisih, akun_selisih.no_sub as no_sub_selisih, pembayaran_invoice_detail.*')
+                    ->where('pembayaran_invoice_id', $pembayaranInvoiceId)
+                    ->findAll();
+
+                foreach ($pembayaranInvoiceDetail as $p) {
+                    array_push($dataBarang, [
+                        "proforma_invoice_barang_id" => $p['proforma_invoice_barang_id'],
+                        "proforma_invoice_id" => $p['proforma_invoice_id'],
+                        "no_faktur" => $p['no_pi'],
+                        "qty_invoice" => $p['qty_barang'],
+                        "harga_barang_invoice" => $p['harga_satuan'],
+                        "amount_invoice" => $p['total_harga'],
+                        "barang_name" => $p['nama_barang'],
+                        "keterangan" => $p['keterangan'],
+                        // "keterangan_pajak" => $p['keterangan_pajak'],
+                        // "nominal_pajak" => $p['nominal_pajak'],
                         "id_akun_kredit" => $p['id_akun_kas'],
                         "id_akun_debit" => $p['id_akun_selisih'],
                         "akun_kredit" => $p['no_sub_kas'] . ' - ' . $p['nama_sub_kas'],
