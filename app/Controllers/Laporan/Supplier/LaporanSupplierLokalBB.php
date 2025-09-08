@@ -157,12 +157,9 @@ class LaporanSupplierLokalBB extends BaseController
                     $pph = 0;
                 }
 
-                // bulatkan DPP & PPH ke 2 desimal dulu
-                $dpp = round($dpp, 2);
-                $pph = round($pph, 2);
-
-                // total = DPP - PPH yang sudah dibulatkan
-                $total = round($dpp - $pph, 2);
+                $dpp = (float) sprintf('%.2f', $dpp);
+                $pph = (float) sprintf('%.2f', $pph);
+                $total = (float) sprintf('%.2f', $dpp - $pph);
 
                 return [$dpp, $pph, $total];
             };
