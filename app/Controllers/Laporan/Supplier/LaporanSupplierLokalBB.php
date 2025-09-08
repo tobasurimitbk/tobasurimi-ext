@@ -156,7 +156,15 @@ class LaporanSupplierLokalBB extends BaseController
                     $dpp = $nilai * $qty;
                     $pph = 0;
                 }
-                return [$dpp, $pph, $dpp - $pph];
+
+                // bulatkan DPP & PPH ke 2 desimal dulu
+                $dpp = round($dpp, 2);
+                $pph = round($pph, 2);
+
+                // total = DPP - PPH yang sudah dibulatkan
+                $total = round($dpp - $pph, 2);
+
+                return [$dpp, $pph, $total];
             };
 
             [$dppUmum, $pphUmum, $totalUmum] = $hitungDppPph($row->dppUmum, $qty);
