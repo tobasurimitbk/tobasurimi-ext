@@ -211,6 +211,8 @@ class JasaVendorOutKepitingKukus extends BaseController
             $this->jasaVendorOutKepitingKukusDetailModel->insert([ 
                 'jasa_vendor_out_kepiting_kukus_id'=> $id,
                 'spesifikasi_id'    => $b->id,
+                'supplier_id'       => $b->supplier_id,
+                'keterangan'        => $b->keterangan,
                 'qty'               => $b->qty,        
             ]);
         }
@@ -254,6 +256,8 @@ class JasaVendorOutKepitingKukus extends BaseController
             $this->jasaVendorOutKepitingKukusDetailModel->insert([
                 'jasa_vendor_out_kepiting_kukus_id' => $id,
                 'spesifikasi_id'    => $b->id,
+                'supplier_id'       => $b->supplier_id,
+                'keterangan'        => $b->keterangan,
                 'qty'                => $b->qty,
             ]);
         }

@@ -49,7 +49,7 @@ class JasaVendorInKepitingKukusModel extends Model
             'jasa_vendor_in_kepiting_kukus.divisi_id' => 'jasa_vendor_in_kepiting_kukus.divisi_id',
             'jasa_vendor_in_kepiting_kukus.warehouse_id' => 'jasa_vendor_in_kepiting_kukus.warehouse_id',
             'vendor_id' => 'vendor_id',
-            'no_surat_jalan_vendor' => 'no_surat_jalan_vendor',
+            // 'no_surat_jalan_vendor' => 'no_surat_jalan_vendor',
         ];
         $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
 
@@ -127,12 +127,15 @@ class JasaVendorInKepitingKukusModel extends Model
                 jasa_vendor_out_kepiting_kukus.no_surat_jalan,
                 barang_master_spesifikasi.spesifikasi AS spesifikasi_name,
                 barang_master.barang_name,
-                satuans.kode_satuan AS satuan
+                satuans.kode_satuan AS satuan,
+                suppliers.name AS supplier_name,
+                suppliers.id AS supplier_id
             ')
             ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = jasa_vendor_out_kepiting_kukus_detail.spesifikasi_id', 'left')
             ->join('barang_master', 'barang_master.id = barang_master_spesifikasi.barang_master_id', 'left')
             ->join('satuans', 'satuans.id = barang_master_spesifikasi.satuan_1', 'left')
             ->join('jasa_vendor_out_kepiting_kukus', 'jasa_vendor_out_kepiting_kukus.id = jasa_vendor_out_kepiting_kukus_detail.jasa_vendor_out_kepiting_kukus_id', 'left')
+            ->join('suppliers', 'suppliers.id = jasa_vendor_out_kepiting_kukus_detail.supplier_id', 'left')
             ->whereIn('jasa_vendor_out_kepiting_kukus_id', $jasaVendorOutArr)
             ->where('jasa_vendor_out_kepiting_kukus_detail.deletedAt', null)
             ->findAll();
@@ -146,27 +149,35 @@ class JasaVendorInKepitingKukusModel extends Model
                 $jasaVendorInDetail = $jasaVendorInKepitingKukusDetailModel
                     ->select('
                         jasa_vendor_in_kepiting_kukus_detail.*,
-                        barang_master_spesifikasi.nama AS spesifikasi_name,
-                        barang_master.nama AS barang_name,
-                        satuans.kode_satuan AS satuan
+                        barang_master_spesifikasi.spesifikasi AS spesifikasi_name,
+                        barang_master.barang_name AS barang_name,
+                        barang_master.kode_barang AS kode_barang,
+                        satuans.kode_satuan AS satuan,
+                        suppliers.name AS supplier_name,
+                        suppliers.id AS supplier_id
                     ')
-                    ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = jasa_vendor_in_kepiting_kukus_detail.spesifikasi_in_id')
-                    ->join('barang_master', 'barang_master.id = barang_master_spesifikasi.barang_master_id')
-                    ->join('satuans', 'satuans.id = barang_master.satuan_id')
-                    ->where('jasa_vendor_in_kepiting_kukus_id', $jasaVendorInID)
-                    ->where('jasa_vendor_out_kepiting_kukus_id', $j['jasa_vendor_out_kepiting_kukus_id'])
-                    ->where('jasa_vendor_out_detail_id', $j['id'])
+                    ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = jasa_vendor_in_kepiting_kukus_detail.spesifikasi_in_id', 'left')
+                    ->join('barang_master', 'barang_master.id = barang_master_spesifikasi.barang_master_id', 'left')
+                    ->join('jasa_vendor_out_kepiting_kukus_detail', 'jasa_vendor_out_kepiting_kukus_detail.id = jasa_vendor_in_kepiting_kukus_detail.jasa_vendor_out_kepiting_kukus_detail_id', 'left')
+                    ->join('suppliers', 'suppliers.id = jasa_vendor_out_kepiting_kukus_detail.supplier_id', 'left')
+                    ->join('satuans', 'satuans.id = barang_master_spesifikasi.satuan_1', 'left')
+                    ->where('jasa_vendor_in_kepiting_kukus_detail.jasa_vendor_in_kepiting_kukus_id', $jasaVendorInID)
+                    ->where('jasa_vendor_in_kepiting_kukus_detail.jasa_vendor_out_kepiting_kukus_id', $j['jasa_vendor_out_kepiting_kukus_id'])
+                    ->where('jasa_vendor_in_kepiting_kukus_detail.jasa_vendor_out_kepiting_kukus_detail_id', $j['id'])
                     ->findAll();
             }
 
             // data out
             $row = [
-                'jasa_vendor_out_detail_id' => $j['id'],
+                'jasa_vendor_out_kepiting_kukus_detail_id' => $j['id'],
                 "no_surat_jalan" => $j['no_surat_jalan'] ?? '',
                 'jasa_vendor_out_kepiting_kukus_id' => $j['jasa_vendor_out_kepiting_kukus_id'],
+                'supplier_name'    => $j['supplier_name'],
+                'supplier_id'       => $j['supplier_id'],
                 'spesifikasi_out_id'        => $j['spesifikasi_id'],
                 'barang_out'                => strtoupper($j['barang_name']),
                 'spesifikasi_out'           => strtoupper($j['spesifikasi_name']),
+                'keterangan'                => $j['keterangan'] ?? '',
                 'satuan_out'                => $j['satuan'],
                 'qty_out'                   => $j['qty'],
                 'list_barang_masuk'         => []
@@ -175,41 +186,51 @@ class JasaVendorInKepitingKukusModel extends Model
             // tambahin data in kalau ada
             foreach ($jasaVendorInDetail as $k) {
                 $row['list_barang_masuk'][] = [
-                    'jasa_vendor_out_detail_id' => $k['jasa_vendor_out_detail_id'],
+                    'jasa_vendor_out_kepiting_kukus_detail_id' => $k['jasa_vendor_out_kepiting_kukus_detail_id'],
                     'spesifikasi_in_id'         => $k['spesifikasi_in_id'],
-                    'barang_in'                 => strtoupper($k['barang_name']),
-                    'spesifikasi_in'            => strtoupper($k['spesifikasi_name']),
-                    'satuan_in'                 => $k['satuan'],
-                    'qty'                       => $k['qty'],
+                    'kode_barang_in'               => $k['kode_barang'],
+                    'barang_name_in'                 => strtoupper($k['barang_name'] + ($k['spesifikasi_name'] ? ' - ' . $k['spesifikasi_name'] : '')),
+                    // 'spesifikasi_in'            => strtoupper($k['spesifikasi_name']),
+                    'kode_satuan_in'                 => $k['satuan'],
+                    'qty_kotor'                 => $k['qty_kotor'],
                 ];
             }
 
             $result[] = $row;
         }
 
-        // group by jasa_vendor_out_kepiting_kukus_id
         $grouped = [];
         foreach ($result as $item) {
-            $barangId = $item['jasa_vendor_out_kepiting_kukus_id'];
+            // bikin key unik dari supplier + keterangan
+            $groupKey = $item['supplier_id'] . '|' . ($item['keterangan'] ?? '');
 
-            if (!isset($grouped[$barangId])) {
-                $grouped[$barangId] = [
-                    "no_surat_jalan" => $item['no_surat_jalan'] ?? '',
-                    "spesifikasi_out_id" => $barangId,
-                    "barang_out"         => $item['barang_out'],
-                    "spesifikasi_out"    => $item['spesifikasi_out'],
-                    "satuan_out"         => $item['satuan_out'],
-                    "qty_out"            => 0,
-                    "list_barang_masuk"  => []
+            if (!isset($grouped[$groupKey])) {
+                $grouped[$groupKey] = [
+                    "jasa_vendor_out_kepiting_kukus_detail_id" => $item['jasa_vendor_out_kepiting_kukus_detail_id'],
+                    "jasa_vendor_out_kepiting_kukus_id" => $item['jasa_vendor_out_kepiting_kukus_id'],
+                    "no_surat_jalan"   => $item['no_surat_jalan'] ?? '',
+                    "spesifikasi_out_id" => $item['spesifikasi_out_id'] ?? null,
+                    "supplier_name"    => $item['supplier_name'] ?? '',
+                    "supplier_id"      => $item['supplier_id'],
+                    "keterangan"       => $item['keterangan'] ?? '',
+                    "barang_out"       => $item['barang_out'],
+                    "spesifikasi_out"  => $item['spesifikasi_out'],
+                    "satuan_out"       => $item['satuan_out'],
+                    "qty_out"          => 0,
+                    "list_barang_masuk"=> []
                 ];
             }
 
-            $grouped[$barangId]["qty_out"] += $item['qty_out'];
+            $grouped[$groupKey]["qty_out"] += $item['qty_out'];
 
             foreach ($item['list_barang_masuk'] as $masuk) {
-                $grouped[$barangId]['list_barang_masuk'][] = $masuk;
+                $grouped[$groupKey]['list_barang_masuk'][] = $masuk;
             }
         }
+
+        // kalau mau hasilnya berupa array reindex
+        // $grouped = array_values($grouped);
+
 
         return [
             'dataDetail' => $result,
@@ -234,9 +255,9 @@ class JasaVendorInKepitingKukusModel extends Model
 
     public function getJasaVendorOutNo($jasaVendorOutID)
     {
-        $jasaVendorOutModel = new JasaVendorOutModel();
+        $jasaVendorOutKepitingKukusModel = new JasaVendorOutKepitingKukusModel();
         $result = array();
-        $dataQry = $jasaVendorOutModel->whereIn('id', $jasaVendorOutID)->where('deletedAt', null)->findAll();
+        $dataQry = $jasaVendorOutKepitingKukusModel->whereIn('id', $jasaVendorOutID)->where('deletedAt', null)->findAll();
 
         foreach ($dataQry as $d) {
             array_push($result, $d['no_surat_jalan']);

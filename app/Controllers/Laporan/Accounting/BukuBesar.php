@@ -68,8 +68,8 @@ class BukuBesar extends BaseController
             $headerBuilder = $this->HeaderAkunsModel
                 ->select('header_akuns.id, header_akuns.no_header as number, header_akuns.nama_header as name, companies.company')
                 ->where('header_akuns.deletedAt', null)
-                ->join('companies', 'companies.id = header_akuns.company_id', 'left');
-                // ->where('header_akuns.company_id', $this->this_company_id);
+                ->join('companies', 'companies.id = header_akuns.company_id', 'left')
+                ->where('header_akuns.company_id', $this->this_company_id);
             
             // If IDs are provided (for selected options)
             if (!empty($ids)) {
@@ -90,8 +90,8 @@ class BukuBesar extends BaseController
             $subBuilder = $this->Sub_AkunsModel
                 ->select('sub_akuns.id, sub_akuns.no_sub as number, sub_akuns.nama_sub as name, companies.company')
                  ->where('sub_akuns.deletedAt', null)
-                ->join('companies', 'companies.id = sub_akuns.company_id', 'left');
-                // ->where('sub_akuns.company_id', $this->this_company_id);
+                ->join('companies', 'companies.id = sub_akuns.company_id', 'left')
+                ->where('sub_akuns.company_id', $this->this_company_id);
             
             // If IDs are provided (for selected options)
             if (!empty($ids)) {

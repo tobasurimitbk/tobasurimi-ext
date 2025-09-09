@@ -174,6 +174,8 @@
                             <thead class="thead-dark">
                                 <tr>
                                     <th style="text-align: center;">No</th>
+                                    <th style="text-align: center;">Supplier</th>
+                                    <th style="text-align: center;">Keterangan</th>
                                     <th style="text-align: center;">Barang - Spesifikasi</th>
                                     <th style="text-align: center;">Qty Keluar</th>
                                     <th style="text-align: center;">Satuan Keluar</th>
@@ -204,11 +206,13 @@
                             <thead>
                                 <tr>
                                     <th style="text-align: center;" colspan="6">Daftar Barang Keluar</th>
-                                    <th style="text-align: center;" colspan="1">Input Barang Masuk</th>
+                                    <th style="text-align: center;" colspan="3">Input Barang Masuk</th>
                                 </tr>
                                 <tr>
                                     <th style="text-align: center; width:10px;" scope="col">No</th>
+                                    <th style="text-align: center;" scope="col">Supplier</th>
                                     <th style="text-align: center;" scope="col">Nomor Surat Jalan</th>
+                                    <th style="text-align: center;" scope="col">Keterangan</th>
                                     <th style="text-align: center;" scope="col">Barang-Spesifikasi</th>
                                     <th style="text-align: center;" scope="col">Qty Keluar</th>
                                     <th style="text-align: center;" scope="col">Satuan Keluar</th>
@@ -290,7 +294,7 @@
                                             <th scope="col">Barang</th>
                                             <th scope="col">Satuan</th>
                                             <th scope="col">Qty Kotor</th>
-                                            <th scope="col">Qty Bersih</th>
+                                            <!-- <th scope="col">Qty Bersih</th> -->
                                             <th scope="col">Action</th>
                                         </tr>
                                     </thead>
@@ -299,7 +303,7 @@
                                     </tbody>
                                     <tfoot class="foot-detail-table" id="foot-detail-table">
                                         <tr>
-                                            <td colspan="7" style="text-align: center;">
+                                            <td colspan="6" style="text-align: center;">
                                                 Tidak ada barang masuk </td>
                                         </tr>
                                     </tfoot>
@@ -580,7 +584,8 @@
                                     listBarang[j].list_barang_masuk = listBarang[j].list_barang_masuk.filter(item => item.spesifikasi_in_id !== z.spesifikasi_in_id);
 
                                     listBarang[j].list_barang_masuk.push({
-                                        jasa_vendor_out_detail_id: k.jasa_vendor_out_detail_id,
+                                        jasa_vendor_out_kepiting_kukus_detail_id: k.jasa_vendor_out_kepiting_kukus_detail_id,
+                                        jasa_vendor_out_kepiting_kukus_id: k.jasa_vendor_out_kepiting_kukus_id,
                                         barang1_id: z.barang1_id,
                                         spesifikasi_in_id: z.spesifikasi_in_id,
                                         kode_barang_in: z.kode_barang_in,
@@ -656,7 +661,7 @@
                             } else {
                                 // INSERT
                                 $.ajax({
-                                    url: "<?= base_url("jasa-vendor-in/save"); ?>",
+                                    url: "<?= base_url("jasa-vendor-in-kepiting-kukus/save"); ?>",
                                     data: data,
                                     beforeSend: function(xhr) {
                                         xhr.setRequestHeader('X-CSRF-Token', csrf.val());
@@ -678,7 +683,7 @@
                                                 confirmButtonText: 'Ok'
                                             }).then((result) => {
                                                 if (result.isConfirmed) {
-                                                    window.location.href = "<?= base_url("jasa-vendor-in") ?>";
+                                                    window.location.href = "<?= base_url("jasa-vendor-in-kepiting-kukus") ?>";
                                                 }
                                             });
                                         } else {
@@ -735,8 +740,6 @@
                     barangFirst = v;
                 }
             });
-
-            console.log(barangFirst.list_barang_masuk, spesifikasi_in_id)
 
             // EACH 
             var isAdd = false;
@@ -952,6 +955,8 @@
             $.each(listBarang, function(i, v) {
                 var newRow = $('<tr style="color:whitesmoke;">');
                 newRow.append($('<td>').text(no++));
+                newRow.append($('<td>').text(v.supplier_name));
+                newRow.append($('<td>').text(v.keterangan));
                 newRow.append($('<td>').text(v.barang_out + (v.spesifikasi_out != null ? ' - ' + v.spesifikasi_out : '')));
                 newRow.append($('<td>').text(v.qty_out));
                 newRow.append($('<td>').text(v.satuan_out));
@@ -995,22 +1000,22 @@
                         autocomplete="one-time-code" 
                         data-spesifikasi_in_id="${v.spesifikasi_in_id}" 
                         type="text" 
-                        value="${v.qty_kotor == '' || v.qty_kotor == 0 ? '' : v.qty_kotor.toFixed(2)}">
+                        value="${v.qty_kotor == '' || v.qty_kotor == 0 ? '' : v.qty_kotor}">
                     `
                 ));
 
-                newRow.append($('<td style="text-align: center;">').html(
-                    `
-                    <input <?= !empty($jasaVendorIn) ? (($jasaVendorIn['status_posting'] == "1") ? 'disabled' : '') : '' ?> 
-                        style="height: 40px; padding-bottom: 10px;" 
-                        class="form-control qty_bersih" 
-                        onkeydown="handleCalcInput(this, event)"
-                        autocomplete="one-time-code" 
-                        data-spesifikasi_in_id="${v.spesifikasi_in_id}" 
-                        type="text" 
-                        value="${v.qty_bersih == '' || v.qty_bersih == 0 ? '' : v.qty_bersih.toFixed(2)}">
-                    `
-                ));
+                // newRow.append($('<td style="text-align: center;">').html(
+                //     `
+                //     <input <?= !empty($jasaVendorIn) ? (($jasaVendorIn['status_posting'] == "1") ? 'disabled' : '') : '' ?> 
+                //         style="height: 40px; padding-bottom: 10px;" 
+                //         class="form-control qty_bersih" 
+                //         onkeydown="handleCalcInput(this, event)"
+                //         autocomplete="one-time-code" 
+                //         data-spesifikasi_in_id="${v.spesifikasi_in_id}" 
+                //         type="text" 
+                //         value="${v.qty_bersih == '' || v.qty_bersih == 0 ? '' : v.qty_bersih.toFixed(2)}">
+                //     `
+                // ));
 
                 newRow.append($('<td style="text-align: center;">').html(
                     `
@@ -1019,13 +1024,13 @@
                 ));
                 table.find('tbody').append(newRow);
                 totalQtyKotor += destroyFormatRupiah(v.qty_kotor);
-                totalQtyBersih += destroyFormatRupiah(v.qty_bersih);
+                // totalQtyBersih += destroyFormatRupiah(v.qty_bersih);
             });
             var newRow1 = $('<<tr style="color:whitesmoke; background-color:#f2c996;">>');
-            newRow1.append($('<td colspan="4" style="text-align:right"><b>GRAND TOTAL</b></td>'));
+            newRow1.append($('<td colspan="5" style="text-align:right"><b>GRAND TOTAL</b></td>'));
             newRow1.append($('<td class="total-qty-kotor">').text(greatFormatQty(totalQtyKotor)));
-            newRow1.append($('<td class="total-qty-bersih">').text(greatFormatQty(totalQtyBersih)));
-            newRow1.append($('<td>'));
+            // newRow1.append($('<td class="total-qty-bersih">').text(greatFormatQty(totalQtyBersih)));
+            // newRow1.append($('<td>'));
             table.find('tbody').append(newRow1);
 
 
@@ -1039,14 +1044,16 @@
 
         if (listBarangGroup.length == 0) {
             var newRow = $('<tr>');
-            newRow.append($('<td colspan="8" style="text-align:center">Tidak Ada Barang</td>'));
+            newRow.append($('<td colspan="9" style="text-align:center">Tidak Ada Barang</td>'));
             table.find('tfoot').append(newRow);
         } else {
             var no = 1;
             $.each(listBarangGroup, function(i, v) {
                 var newRow = $('<tr style="color:whitesmoke;">');
                 newRow.append($('<td>').text(no++));
+                newRow.append($('<td>').text(v.supplier_name));
                 newRow.append($('<td>').text(v.no_surat_jalan));
+                newRow.append($('<td>').text(v.keterangan));
                 newRow.append($('<td>').text(v.barang_out));
                 newRow.append($('<td>').text(greatFormatQty(v.qty_out)));
                 newRow.append($('<td>').text(v.satuan_out));
@@ -1204,7 +1211,7 @@
             if (result.isConfirmed) {
                 const csrf = $(`[name="${csrfToken}"]`);
                 $.ajax({
-                    url: "<?= base_url("jasa-vendor-in/posting"); ?>",
+                    url: "<?= base_url("jasa-vendor-in-kepiting-kukus/posting"); ?>",
                     data: {
                         id: id
                     },
@@ -1254,7 +1261,7 @@
             if (result.isConfirmed) {
                 const csrf = $(`[name="${csrfToken}"]`);
                 $.ajax({
-                    url: "<?= base_url("jasa-vendor-in/delete"); ?>",
+                    url: "<?= base_url("jasa-vendor-in-kepiting-kukus/delete"); ?>",
                     data: {
                         id: id
                     },
