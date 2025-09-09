@@ -196,7 +196,6 @@
     $(".dateEnd").val(formatDate(today));
 
     var table = $('.dataTable').DataTable({
-
         processing: true,
         serverSide: true,
         ordering: true,
