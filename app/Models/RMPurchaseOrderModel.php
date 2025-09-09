@@ -1660,41 +1660,59 @@ class RMPurchaseOrderModel extends Model
 
             if ($pphMode == "None" || $pphMode == "Supplier") {
                 // Jika Ditanggung Supplier dan Tidak DItanggung
-                $dppUmum += (float)number_format($detailPo['general_price'] * $detailPo['qty'], 2, '.', '');
-                $dppHarian += (float)number_format($detailPo['daily_price'] * $detailPo['qty'], 2, '.', '');
-                $dppBulanan += (float)number_format($detailPo['monthly_price'] * $detailPo['qty'], 2, '.', '');
+                $dppUmum += (float)(($detailPo['general_price'] * $detailPo['qty']));
+                $dppHarian += (float)(($detailPo['daily_price'] * $detailPo['qty']));
+                $dppBulanan += (float)(($detailPo['monthly_price'] * $detailPo['qty']));
             } else {
                 // DItanggung Company
-                $dppUmum += (float)number_format(($detailPo['general_price'] / $nilaiPph) * $detailPo['qty'], 2, '.', '');
-                $dppHarian += (float)number_format(($detailPo['daily_price'] / $nilaiPph) * $detailPo['qty'], 2, '.', '');
-                $dppBulanan += (float)number_format(($detailPo['monthly_price'] / $nilaiPph) * $detailPo['qty'], 2, '.', '');
+                $dppUmum += (float)((($detailPo['general_price'] / $nilaiPph) * $detailPo['qty']));
+                $dppHarian += (float)((($detailPo['daily_price'] / $nilaiPph) * $detailPo['qty']));
+                $dppBulanan += (float)((($detailPo['monthly_price'] / $nilaiPph) * $detailPo['qty']));
             }
 
             $totalQty += $detailPo['qty'];
         }
 
+        // Buletin hasil dpp
+        $dppUmum = custom_round($dppUmum);
+        $dppHarian = custom_round($dppHarian);
+        $dppBulanan = custom_round($dppBulanan);
+
         // Hitung Pph harga biasa
         if ($pphMode == "Supplier" || $pphMode == "Company") {
-            $pphUmum = (float)number_format($dppUmum * $nilaiPph2, 2, '.', '');
-            $pphHarian = (float)number_format($dppHarian * $nilaiPph2, 2, '.', '');
-            $pphBulanan = (float)number_format($dppBulanan * $nilaiPph2, 2, '.', '');
+            $pphUmum = (float)(($dppUmum * $nilaiPph2));
+            $pphHarian = (float)(($dppHarian * $nilaiPph2));
+            $pphBulanan = (float)(($dppBulanan * $nilaiPph2));
 
-            $nilaiTotalUmum = (float) number_format($dppUmum - $pphUmum, 2, '.', '');
-            $nilaiTotalHarian = (float) number_format($dppHarian - $pphHarian, 2, '.', '');
-            $nilaiTotalBulanan = (float) number_format($dppBulanan - $pphBulanan, 2, '.', '');
+            // Buletin hasil pph
+            $pphUmum = custom_round($pphUmum);
+            $pphHarian = custom_round($pphHarian);
+            $pphBulanan = custom_round($pphBulanan);
+
+
+            $nilaiTotalUmum = (float) (($dppUmum - $pphUmum));
+            $nilaiTotalHarian = (float) (($dppHarian - $pphHarian));
+            $nilaiTotalBulanan = (float) (($dppBulanan - $pphBulanan));
         }
 
         // Hitung pph dari tambahan langsung
         if ($pphMode == 'Company') {
             // Kalau Ditaggung Company di Up kan dulu pph nya
-            $dppTambahan = (float)number_format(($dataPo->cong_batasan - $dataPo->cong_sebenarnya + $dataPo->subsidi_langsung) / $nilaiPph, 2, '.', '');
-            $pphTambahan = (float)number_format($dppTambahan * $nilaiPph2,  2, '.', '');
-            $nilaiTotalTambahan = (float) number_format($dppTambahan - $pphTambahan, 2, '.', '');
+            $nilaiDppTambahan = custom_round($dataPo->cong_batasan - $dataPo->cong_sebenarnya + $dataPo->subsidi_langsung);
+
+            $dppTambahan = (float)custom_round($nilaiDppTambahan / $nilaiPph);
+            $pphTambahan = (float)(custom_round($dppTambahan * $nilaiPph2));
+
+            $nilaiTotalTambahan = (float) (custom_round($dppTambahan - $pphTambahan));
         } else {
-            $dppTambahan = (float)number_format(($dataPo->cong_batasan - $dataPo->cong_sebenarnya + $dataPo->subsidi_langsung) * $totalQty,  2, '.', '');
-            $pphTambahan = $pphMode == "None" ? 0 : (float)number_format($dppTambahan * $nilaiPph2, 2, '.', '');
-            $nilaiTotalTambahan = (float) number_format($dppTambahan - $pphTambahan, 2, '.', '');
+
+            $dppTambahan = (float)custom_round(($dataPo->cong_batasan - $dataPo->cong_sebenarnya + $dataPo->subsidi_langsung) * $totalQty);
+            $pphTambahan = $pphMode == "None" ? 0 : (float)(custom_round($dppTambahan * $nilaiPph2));
+            $nilaiTotalTambahan = (float) (custom_round($dppTambahan - $pphTambahan));
         }
+
+        // var_dump($dppHarian - $pphHarian);
+        // die;
 
         $nilaiBeforePph = $dppHarian + $dppUmum + $dppBulanan + abs($dppTambahan);
         $nilaiAfterPph = $nilaiTotalHarian + $nilaiTotalUmum + $nilaiTotalBulanan + abs($nilaiTotalTambahan);

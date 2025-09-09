@@ -581,3 +581,22 @@ function formatNpwp($value)
    }
    return $value; // Return the original value if it's not a string
 }
+
+
+function custom_round($value)
+{
+   // ambil 2 angka desimal
+   $decimal = $value * 100; // geser 2 angka
+   $fraction = $decimal - floor($decimal);
+
+   if ($fraction > 0 && $fraction < 0.5) {
+      // buang ke bawah
+      return floor($decimal) / 100;
+   } elseif ($fraction >= 0.5) {
+      // naik ke atas
+      return ceil($decimal) / 100;
+   } else {
+      // pas angka bulat
+      return $value;
+   }
+}
