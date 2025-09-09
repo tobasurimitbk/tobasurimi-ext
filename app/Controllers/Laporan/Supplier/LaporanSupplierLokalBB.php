@@ -226,9 +226,11 @@ class LaporanSupplierLokalBB extends BaseController
     public function exportPendapatanSupplierLokalBBToExcel()
     {
         $condition = [
-            'rm_purchase_orders.company_id' => $this->this_company_id,
             'rm_purchase_orders.deletedAt' => null,
+            'rm_purchase_orders.is_posted' => '1',
+            'rm_purchase_orders.status_penerimaan' => '1',
             'rm_purchase_order_details.deletedAt' => null,
+            'rm_purchase_orders.company_id' => $this->this_company_id,
             'rm_purchase_orders.status_external' => 'no',
         ];
 
@@ -294,7 +296,6 @@ class LaporanSupplierLokalBB extends BaseController
                 floatval($row->nilai_total_bulanan ?? 0) +
                 floatval($row->nilai_total_tambahan ?? 0);
 
-            // Masukkan ke group
             $groupedData[$barangName]['data'][] = $row;
 
             // Update summary
@@ -325,36 +326,48 @@ class LaporanSupplierLokalBB extends BaseController
         $sheet->getStyle("A{$rowNum}")->getFont()->setBold(true)->setSize(14);
         $rowNum += 2;
 
-        // Header
-        $headers = [
-            'No',
-            'Supplier',
-            'No PO',
-            'Tgl PO',
-            'Department',
-            'Gudang',
-            'Qty',
-            'Satuan',
-            'Unit',
-            'DPP Umum',
-            'PPh Umum',
-            'Total Umum',
-            'DPP Harian',
-            'PPh Harian',
-            'Total Harian',
-            'DPP Bulanan',
-            'PPh Bulanan',
-            'Total Bulanan',
-            'DPP Tambahan',
-            'PPh Tambahan',
-            'Total Tambahan',
-            'Total'
-        ];
-        $sheet->fromArray($headers, null, "A{$rowNum}");
-        $sheet->getStyle("A{$rowNum}:V{$rowNum}")->getFont()->setBold(true);
-        $rowNum++;
+        // Header multi-row
+        $sheet->setCellValue("A{$rowNum}", "No")->mergeCells("A{$rowNum}:A" . ($rowNum + 1));
+        $sheet->setCellValue("B{$rowNum}", "Supplier")->mergeCells("B{$rowNum}:B" . ($rowNum + 1));
+        $sheet->setCellValue("C{$rowNum}", "No PO")->mergeCells("C{$rowNum}:C" . ($rowNum + 1));
+        $sheet->setCellValue("D{$rowNum}", "Tgl PO")->mergeCells("D{$rowNum}:D" . ($rowNum + 1));
+        $sheet->setCellValue("E{$rowNum}", "Department")->mergeCells("E{$rowNum}:E" . ($rowNum + 1));
+        $sheet->setCellValue("F{$rowNum}", "Gudang")->mergeCells("F{$rowNum}:F" . ($rowNum + 1));
+        $sheet->setCellValue("G{$rowNum}", "Qty")->mergeCells("G{$rowNum}:G" . ($rowNum + 1));
+        $sheet->setCellValue("H{$rowNum}", "Satuan")->mergeCells("H{$rowNum}:H" . ($rowNum + 1));
+        $sheet->setCellValue("I{$rowNum}", "Unit")->mergeCells("I{$rowNum}:I" . ($rowNum + 1));
 
-        $cols = range('A', 'V'); // untuk bantu indexing kolom
+        $sheet->setCellValue("J{$rowNum}", "Umum")->mergeCells("J{$rowNum}:L{$rowNum}");
+        $sheet->setCellValue("M{$rowNum}", "Harian")->mergeCells("M{$rowNum}:O{$rowNum}");
+        $sheet->setCellValue("P{$rowNum}", "Bulanan")->mergeCells("P{$rowNum}:R{$rowNum}");
+        $sheet->setCellValue("S{$rowNum}", "Tambahan")->mergeCells("S{$rowNum}:U{$rowNum}");
+        $sheet->setCellValue("V{$rowNum}", "Total")->mergeCells("V{$rowNum}:V" . ($rowNum + 1));
+
+        $sheet->setCellValue("J" . ($rowNum + 1), "DPP");
+        $sheet->setCellValue("K" . ($rowNum + 1), "PPh");
+        $sheet->setCellValue("L" . ($rowNum + 1), "Dibayarkan");
+
+        $sheet->setCellValue("M" . ($rowNum + 1), "DPP");
+        $sheet->setCellValue("N" . ($rowNum + 1), "PPh");
+        $sheet->setCellValue("O" . ($rowNum + 1), "Dibayarkan");
+
+        $sheet->setCellValue("P" . ($rowNum + 1), "DPP");
+        $sheet->setCellValue("Q" . ($rowNum + 1), "PPh");
+        $sheet->setCellValue("R" . ($rowNum + 1), "Dibayarkan");
+
+        $sheet->setCellValue("S" . ($rowNum + 1), "DPP");
+        $sheet->setCellValue("T" . ($rowNum + 1), "PPh");
+        $sheet->setCellValue("U" . ($rowNum + 1), "Dibayarkan");
+
+        $sheet->getStyle("A{$rowNum}:V" . ($rowNum + 1))
+            ->getFont()->setBold(true);
+        $sheet->getStyle("A{$rowNum}:V" . ($rowNum + 1))
+            ->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER)
+            ->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER);
+
+        $rowNum += 2;
+
+        $cols = range('A', 'V');
         $grandTotals = [
             'qty' => 0,
             'dppUmum' => 0,
@@ -413,7 +426,7 @@ class LaporanSupplierLokalBB extends BaseController
             $sheet->getStyle("A{$rowNum}:V{$rowNum}")->getFont()->setBold(true);
 
             $idx = 6; // start di kolom G
-            $sheet->setCellValue($cols[$idx++] . $rowNum, $group['summary']['totalQtyPO']); // qty
+            $sheet->setCellValue($cols[$idx++] . $rowNum, $group['summary']['totalQtyPO']);
             $idx++; // skip Satuan
             $idx++; // skip Unit
             $sheet->setCellValue($cols[$idx++] . $rowNum, $group['summary']['dppUmum']);
