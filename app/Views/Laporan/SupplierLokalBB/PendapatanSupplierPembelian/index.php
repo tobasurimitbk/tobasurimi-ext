@@ -154,6 +154,20 @@
     let sortType = "asc";
     var row = 0;
 
+    const today = new Date();
+    const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
+
+    function formatDate(date) {
+        // Format dd/mm/yyyy
+        let dd = String(date.getDate()).padStart(2, '0');
+        let mm = String(date.getMonth() + 1).padStart(2, '0'); // Januari = 0
+        let yyyy = date.getFullYear();
+        return dd + '/' + mm + '/' + yyyy;
+    }
+
+    $(".dateStart").val(formatDate(firstDay));
+    $(".dateEnd").val(formatDate(today));
+
     var table = $('.dataTable').DataTable({
 
         processing: true,
@@ -231,7 +245,7 @@
                 className: "text-center",
             },
             {
-                data: "totalBulanan",
+                data: "nilai_total_bulanan",
                 className: "text-center",
             },
             {

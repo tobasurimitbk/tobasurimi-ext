@@ -80,10 +80,10 @@ class LaporanSupplierLokalBB extends BaseController
 
         $condition = [
             'rm_purchase_orders.deletedAt' => null,
-            'rm_purchase_orders.is_posted' => '1',
-            'rm_purchase_orders.status_penerimaan' => '1',
+            // 'rm_purchase_orders.is_posted' => '1',
+            // 'rm_purchase_orders.status_penerimaan' => '1',
             'rm_purchase_order_details.deletedAt' => null,
-            'rm_purchase_orders.company_id' => $this->this_company_id,
+            // 'rm_purchase_orders.company_id' => $this->this_company_id,
             'rm_purchase_orders.status_external' => 'no',
         ];
 
@@ -131,6 +131,7 @@ class LaporanSupplierLokalBB extends BaseController
 
         // --- Hitung total footer ---
         $totalsRaw = [
+            'qtyAll' => 0,
             'dppUmum' => 0,
             'pphUmum' => 0,
             'totalUmum' => 0,
@@ -147,6 +148,8 @@ class LaporanSupplierLokalBB extends BaseController
         ];
 
         foreach ($allData as $row) {
+            $qtyAll       = floatval($row->qtyPO ?? 0);
+
             $dppUmum       = floatval($row->dpp_umum ?? 0);
             $pphUmum       = floatval($row->pph_umum ?? 0);
             $totalUmum     = floatval($row->nilai_total_umum ?? 0);
@@ -165,6 +168,7 @@ class LaporanSupplierLokalBB extends BaseController
 
             $totalRow = $totalUmum + $totalHarian + $totalBulanan + $totalTambahan;
 
+            $totalsRaw['qtyAll']       += $qtyAll;
             $totalsRaw['dppUmum']       += $dppUmum;
             $totalsRaw['pphUmum']       += $pphUmum;
             $totalsRaw['totalUmum']     += $totalUmum;
