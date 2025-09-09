@@ -543,7 +543,7 @@
                 </div>
             </center>
 
-            <table class="w-100" style="margin-top: 10px;">
+            <table class="w-100" style="margin-top: 20px;">
                 <tr>
                     <td style="vertical-align: top; width: 20%;">Sudah Terima Dari <br> (Received From)</td>
                     <td style="vertical-align: top; width: 2%;">: </td>
