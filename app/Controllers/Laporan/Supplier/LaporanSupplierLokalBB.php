@@ -231,8 +231,8 @@ class LaporanSupplierLokalBB extends BaseController
     {
         $condition = [
             'rm_purchase_orders.deletedAt' => null,
-            'rm_purchase_orders.is_posted' => '1',
-            'rm_purchase_orders.status_penerimaan' => '1',
+            // 'rm_purchase_orders.is_posted' => '1',
+            // 'rm_purchase_orders.status_penerimaan' => '1',
             'rm_purchase_order_details.deletedAt' => null,
             'rm_purchase_orders.company_id' => $this->this_company_id,
             'rm_purchase_orders.status_external' => 'no',
@@ -494,8 +494,8 @@ class LaporanSupplierLokalBB extends BaseController
     {
         $condition = [
             'rm_purchase_orders.deletedAt' => null,
-            'rm_purchase_orders.is_posted' => '1',
-            'rm_purchase_orders.status_penerimaan' => '1',
+            // 'rm_purchase_orders.is_posted' => '1',
+            // 'rm_purchase_orders.status_penerimaan' => '1',
             'rm_purchase_order_details.deletedAt' => null,
             'rm_purchase_orders.company_id' => $this->this_company_id,
             'rm_purchase_orders.status_external' => 'no',
@@ -600,8 +600,8 @@ class LaporanSupplierLokalBB extends BaseController
     {
         $condition = [
             'rm_purchase_orders.deletedAt' => null,
-            'rm_purchase_orders.is_posted' => '1',
-            'rm_purchase_orders.status_penerimaan' => '1',
+            // 'rm_purchase_orders.is_posted' => '1',
+            // 'rm_purchase_orders.status_penerimaan' => '1',
             'rm_purchase_order_details.deletedAt' => null,
             'rm_purchase_orders.company_id' => $this->this_company_id,
             'rm_purchase_orders.status_external' => 'no',
@@ -812,13 +812,11 @@ class LaporanSupplierLokalBB extends BaseController
     public function exportPDFPendapatanSupplierPembelian()
     {
         $condition = [
-            'rm_purchase_orders.is_posted' => '1',
-            'penerimaan_barang.status_post' => 'FINISH',
-            'penerimaan_barang.status_penerimaan' => 'LOKAL',
-            'penerimaan_barang.tipe_bahan' => 'BAKU',
+            'rm_purchase_orders.deletedAt' => null,
+            // 'rm_purchase_orders.is_posted' => '1',
+            // 'rm_purchase_orders.status_penerimaan' => '1',
+            'rm_purchase_order_details.deletedAt' => null,
             'rm_purchase_orders.company_id' => $this->this_company_id,
-            'penerimaan_barang.deletedAt' => null,
-            'penerimaan_barang_detail.deletedAt' => null,
             'rm_purchase_orders.status_external' => 'no',
         ];
 
@@ -842,79 +840,65 @@ class LaporanSupplierLokalBB extends BaseController
             'warehouseName' => 'warehouses.warehouse_name',
         ];
 
-        $dataBBLokal = $this->RMPurchaseOrderModel->getPoBBLokalForSupplier($availableSort, $condition, $addCondition, null, null);
-        $processedData = $this->processLaporanPendapatanSupplier($dataBBLokal['data']);
+        $allData = $this->RMPurchaseOrderModel->getPoBBLokalForSupplierPerPO(
+            $availableSort,
+            $condition,
+            $addCondition,
+            null,
+            null
+        )['data'];
 
-        // Group by barangName
-        $groupedData = [];
-        foreach ($processedData as $item) {
-            $barangName = $item['barangName'] ?? 'Lainnya';
-            $groupedData[$barangName][] = $item;
-        }
+        // Hitung total sama persis
+        $totals = [
+            'dppUmum' => 0,
+            'pphUmum' => 0,
+            'totalUmum' => 0,
+            'dppHarian' => 0,
+            'pphHarian' => 0,
+            'totalHarian' => 0,
+            'dppBulanan' => 0,
+            'pphBulanan' => 0,
+            'totalBulanan' => 0,
+            'dppTambahan' => 0,
+            'pphTambahan' => 0,
+            'totalTambahan' => 0,
+            'totalRow' => 0
+        ];
 
-        $summaryPerBarang = [];
-        foreach ($groupedData as $barang => $items) {
-            $totals = [
-                'totalQtyPO' => 0,
+        foreach ($allData as $row) {
+            $totals['dppUmum']       += floatval($row->dpp_umum ?? 0);
+            $totals['pphUmum']       += floatval($row->pph_umum ?? 0);
+            $totals['totalUmum']     += floatval($row->nilai_total_umum ?? 0);
+            $totals['dppHarian']     += floatval($row->dpp_harian ?? 0);
+            $totals['pphHarian']     += floatval($row->pph_harian ?? 0);
+            $totals['totalHarian']   += floatval($row->nilai_total_harian ?? 0);
+            $totals['dppBulanan']    += floatval($row->dpp_bulanan ?? 0);
+            $totals['pphBulanan']    += floatval($row->pph_bulanan ?? 0);
+            $totals['totalBulanan']  += floatval($row->nilai_total_bulanan ?? 0);
+            $totals['dppTambahan']   += floatval($row->dpp_tambahan ?? 0);
+            $totals['pphTambahan']   += floatval($row->pph_tambahan ?? 0);
+            $totals['totalTambahan'] += floatval($row->nilai_total_tambahan ?? 0);
 
-                'totalDppUmum' => 0,
-                'totalDppUmum' => 0,
-                'totalPphUmum' => 0,
-                'totalTotalUmum' => 0,
-                'totalDppHarian' => 0,
-                'totalPphHarian' => 0,
-                'totalTotalHarian' => 0,
-                'totalDppBulanan' => 0,
-                'totalPphBulanan' => 0,
-                'totalTotalBulanan' => 0,
-                'totalDppSubsidi' => 0,
-                'totalPphSubsidi' => 0,
-                'totalTotalSubsidi' => 0,
-                'totalTotalRow' => 0,
-            ];
-
-            foreach ($items as $item) {
-                // Gunakan nilai langsung dari proses
-                $totals['totalQtyPO'] += $item['qtyPO'];
-
-                $totals['totalDppUmum'] += $item['dppUmum'];
-                $totals['totalPphUmum'] += $item['pphUmum'];
-                $totals['totalTotalUmum'] += $item['totalUmum'];
-
-                $totals['totalDppHarian'] += $item['dppHarian'];
-                $totals['totalPphHarian'] += $item['pphHarian'];
-                $totals['totalTotalHarian'] += $item['totalHarian'];
-
-                $totals['totalDppBulanan'] += $item['dppBulanan'];
-                $totals['totalPphBulanan'] += $item['pphBulanan'];
-                $totals['totalTotalBulanan'] += $item['totalBulanan'];
-
-                $totals['totalDppSubsidi'] += $item['subsidi'];
-                $totals['totalPphSubsidi'] += $item['pphSubsidi'];
-                $totals['totalTotalSubsidi'] += $item['totalSubsidi'];
-
-                $totals['totalTotalRow'] += $item['totalRow'];
-            }
-
-            $summaryPerBarang[$barang] = [
-                'data' => $items,
-                'summary' => $totals,
-            ];
+            $totals['totalRow']      += floatval($row->nilai_total_umum ?? 0)
+                + floatval($row->nilai_total_harian ?? 0)
+                + floatval($row->nilai_total_bulanan ?? 0)
+                + floatval($row->nilai_total_tambahan ?? 0);
         }
 
         $data = [
-            'header' => "Laporan Pendapatan Supplier Per PO",
+            'header' => "Laporan Pendapatan Supplier",
             'tanggalAwal' => $this->request->getVar('dateStart'),
             'tanggalAkhir' => $this->request->getVar('dateEnd'),
             'poNo' => $addCondition['poNo'] ?? 'ALL',
-            'groupedData' => $summaryPerBarang,
+            'data' => $allData,
+            'footerTotals' => $totals
         ];
 
         $domPdf = new Dompdf();
-        $domPdf->loadHtml(view('Laporan/SupplierLokalBB/PendapatanSupplierPembelian/print', $data));
+        $domPdf->loadHtml(view('Laporan/SupplierLokalBB/PendapatanSupplier/print', $data));
         $domPdf->setPaper('a4', 'landscape');
         $domPdf->render();
-        $domPdf->stream('Pendapatan Supplier Per PO', array("Attachment" => false));
+        $domPdf->stream('Pendapatan Supplier', array("Attachment" => false));
         exit();
     }
 
