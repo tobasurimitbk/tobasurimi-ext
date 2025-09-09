@@ -309,35 +309,55 @@
         <div class="pagebreak">
             <div class="w-100 d-flex content-between">
                 <div style="width: 70%;padding: 0.5rem;">
-                    <div style="font-size: 14px;">
-                        <?= strtoupper($dataPO->holding_company) ?> (<?= $dataPO->companyName ?>)
+                    <div style="font-size: 15px; font-weight:bold;">
+                        <u>
+                            <?= strtoupper($dataPO->holding_company) ?> (<?= $dataPO->companyName ?>)
+                        </u>
                     </div>
-                    <?= $dataPO->companyAddress ?>
+
                 </div>
             </div><br>
-            <table class="w-100">
+            <center style="margin-top: -10px;">
+                <div style="font-size: 15px; font-weight:bold;">
+                    <u>
+                        PURCHASE ORDER
+                    </u>
+                </div>
+                <div style="font-size: 13px;">
+                    No : <?= $dataPO->po_no ?>
+                </div>
+            </center>
+            <table class="w-100" style="margin-top: 5px;">
                 <tr>
-                    <td class="txt-underline txt-bold">PO LOKAL BAHAN BAKU</td>
-                    <td colspan="2"></td>
-                    <td class="txt-bold txt-right txt-underline">Tanggal: <?= $dataPO->po_date ? date("d/m/Y", strtotime($dataPO->po_date)) : ""; ?></td>
+                    <td>
+                        <table>
+                            <tr>
+                                <td>Supplier</td>
+                                <td>: <?= $dataPO->supplierName ?></td>
+                            </tr>
+                            <tr>
+                                <td>Bahan Baku</td>
+                                <td>: <?= $dataPO->barangName ?></td>
+                            </tr>
+                        </table>
+                    </td>
+                    <td>
+                        <table style="width: 100%;">
+                            <tr>
+                                <td style="text-align: right; width:130px;">Tanggal</td>
+                                <td style="text-align: right; width:50px;">: <?= date('d-M-Y', strtotime($dataPO->po_date)); ?></td>
+                            </tr>
+                            <tr>
+                                <td>&nbsp;</td>
+                                <td></td>
+                            </tr>
+                        </table>
+                    </td>
                 </tr>
             </table>
-            <table>
-                <tr>
-                    <td>No. Nota</td>
-                    <td>: <?= $dataPO->po_no ?></td>
-                </tr>
-                <tr>
-                    <td>Supplier</td>
-                    <td>: <?= $dataPO->supplierName ?></td>
-                </tr>
-                <tr>
-                    <td>Bahan Baku</td>
-                    <td>: <?= $dataPO->barangName ?></td>
-                </tr>
-            </table>
-            <table class="item-table">
-                <tr>
+
+            <table class="item-table" style="margin-top: 5px;">
+                <tr style="font-weight: 14px;">
                     <th class="column-table-normal">PETI / TONG</th>
                     <th class="column-table-normal">DEPARTEMEN</th>
                     <th class="column-table-normal">KETERANGAN</th>
@@ -359,28 +379,28 @@
                 ?>
                 <?php foreach ($dataBarang as $detail): ?>
                     <tr>
-                        <td style="border-left: 1px solid black; border-right: 1px solid black;font-size:12px;"><?= $detail['peti'] ?></td>
-                        <td style="border-left: 1px solid black; border-right: 1px solid black;font-size:12px;"><?= $detail['divisi'] ?></td>
-                        <td style="border-left: 1px solid black; border-right: 1px solid black;font-size:12px;"><?= $detail['note'] ?></td>
-                        <td class="txt-right" style="border-left: 1px solid black; border-right: 1px solid black;font-size:12px;"><?= $detail['qty'] ?></td>
-                        <td class="txt-right" style="border-left: 1px solid black; border-right: 1px solid black;font-size:12px;"><?= number_format($detail['general_price'], 2) ?></td>
-                        <td class="txt-right" style="border-left: 1px solid black; border-right: 1px solid black;font-size:12px;"><?= number_format($detail['general_price_total'], 2) ?></td>
+                        <td style="border-left: 1px solid black; border-right: 1px solid black;font-size:13px;"><?= $detail['peti'] ?></td>
+                        <td style="border-left: 1px solid black; border-right: 1px solid black;font-size:13px;"><?= $detail['divisi'] ?></td>
+                        <td style="border-left: 1px solid black; border-right: 1px solid black;font-size:13px;"><?= $detail['note'] ?></td>
+                        <td class="txt-right" style="border-left: 1px solid black; border-right: 1px solid black;font-size:13px;"><?= $detail['qty'] ?></td>
+                        <td class="txt-right" style="border-left: 1px solid black; border-right: 1px solid black;font-size:13px;"><?= number_format($detail['general_price'], 2) ?></td>
+                        <td class="txt-right" style="border-left: 1px solid black; border-right: 1px solid black;font-size:13px;"><?= number_format($detail['general_price_total'], 2) ?></td>
                     </tr>
                 <?php endforeach ?>
                 <tr>
-                    <td colspan="3" style="border-top: 1px solid black;border-left: none!important;text-align: right; height:5%;font-size:13px;">Total Qty</td>
-                    <td class="txt-right" style="border-top: 1px solid black; border-left: 1px solid black; border-bottom: 1px solid black; height:5%;font-size:13px;"><?= number_format($totalQty, 2) ?></td>
-                    <td class="txt-right" style="border-top: 1px solid black; border-left: 1px solid black; height:5%;font-size:13px;">JUMLAH</td>
-                    <td class="txt-right" style="border: 1px solid black;font-size:13px;"><?= number_format($dataPO->dpp_umum, 2) ?></td>
+                    <td colspan="3" style="border-top: 1px solid black;border-left: none!important;text-align: right; height:5%;font-size:14px;">Total Qty</td>
+                    <td class="txt-right" style="border-top: 1px solid black; border-left: 1px solid black; border-bottom: 1px solid black; height:5%;font-size:14px;"><?= number_format($totalQty, 2) ?></td>
+                    <td class="txt-right" style="border-top: 1px solid black; border-left: 1px solid black; height:5%;font-size:14px;">JUMLAH</td>
+                    <td class="txt-right" style="border: 1px solid black;font-size:14px;"><?= number_format($dataPO->dpp_umum, 2) ?></td>
                 </tr>
                 <tr>
-                    <td class="skip" colspan="5" style="border: none;text-align: right;height:5%;font-size:13px;;">PPH</td>
-                    <td class="txt-right" style="border: 1px solid black;height:5%;font-size:13px;">
+                    <td class="skip" colspan="5" style="border: none;text-align: right;height:5%;font-size:14px;;">PPH</td>
+                    <td class="txt-right" style="border: 1px solid black;height:5%;font-size:14px;">
                         <?= number_format($dataPO->pph_umum, 2) ?>
                     </td>
                 </tr>
                 <tr>
-                    <td class="skip" colspan="5" style="border: none!important;text-align: right;height:5%;font-size:13px;">DIBAYARKAN</td>
+                    <td class="skip" colspan="5" style="border: none!important;text-align: right;height:5%;font-size:14px;">DIBAYARKAN</td>
                     <td class="txt-right" style="border: 1px solid black;height:5%;font-size:14px;">
                         <?= number_format($dataPO->nilai_total_umum, 2) ?>
                     </td>
@@ -428,19 +448,25 @@
         <div class="pagebreak" style="padding-top: 10px;">
             <div class="w-100 d-flex content-between">
                 <div style="width: 70%;padding: 0.5rem;">
-                    <div style="font-size: 14px;">
-                        <?= strtoupper($dataPO->holding_company) ?> (<?= $dataPO->companyName ?>)
+                    <div style="font-size: 15px; font-weight:bold;">
+                        <u>
+                            <?= strtoupper($dataPO->holding_company) ?> (<?= $dataPO->companyName ?>)
+                        </u>
                     </div>
-                    <?= $dataPO->companyAddress ?>
-                </div><br>
-                <div style="padding: 0.5rem; text-align: center;">
-                    <div style="text-decoration: underline; font-size: 1.2em;">
-                        KWITANSI<br>
-                    </div>
-                    No : <?= $dataPO->po_no ?><br>
+
                 </div>
-            </div>
-            <table class="w-100 mt-05">
+            </div><br>
+            <center style="margin-top: -10px;">
+                <div style="font-size: 15px; font-weight:bold;">
+                    <u>
+                        KWITANSI
+                    </u>
+                </div>
+                <div style="font-size: 13px;">
+                    No : <?= $dataPO->po_no ?>
+                </div>
+            </center>
+            <table class="w-100 mt-05" style="margin-top: 10px;">
                 <tr>
                     <td style="vertical-align: top; width: 40%;">SUDAH TERIMA DARI (RECEIVED FROM)</td>
                     <td style="vertical-align: top;">: </td>
@@ -499,18 +525,25 @@
         <div class="pagebreak" style="padding-top: 10px;">
             <div class="w-100 d-flex content-between">
                 <div style="width: 70%;padding: 0.5rem;">
-                    <div style="font-size: 14px;">
-                        <?= strtoupper($dataPO->holding_company) ?> (<?= $dataPO->companyName ?>)
+                    <div style="font-size: 15px; font-weight:bold;">
+                        <u>
+                            <?= strtoupper($dataPO->holding_company) ?> (<?= $dataPO->companyName ?>)
+                        </u>
                     </div>
-                    <?= $dataPO->companyAddress ?>
-                </div><br>
-                <div style="padding: 0.5rem; text-align: center;">
-                    <div style="text-decoration: underline; font-size: 1.2em;">KWITANSI HARIAN</div>
-                    <div>No: <?= $dataPO->po_no ?></div>
                 </div>
-            </div>
+            </div><br>
+            <center style="margin-top: -10px;">
+                <div style="font-size: 15px; font-weight:bold;">
+                    <u>
+                        KWITANSI HARIAN
+                    </u>
+                </div>
+                <div style="font-size: 13px;">
+                    No : <?= $dataPO->po_no ?>
+                </div>
+            </center>
 
-            <table class="w-100">
+            <table class="w-100" style="margin-top: 10px;">
                 <tr>
                     <td style="vertical-align: top; width: 20%;">Sudah Terima Dari <br> (Received From)</td>
                     <td style="vertical-align: top; width: 2%;">: </td>
@@ -564,31 +597,53 @@
 
         <div class=" <?= $lpb == null ? '' : 'pagebreak' ?>">
             <div style="width: 70%;padding: 0.5rem;">
-                <div style="font-size: 14px;">
-                    <?= strtoupper($dataPO->holding_company) ?> (<?= $dataPO->companyName ?>)
+                <div style="width: 70%;padding: 0.5rem;">
+                    <div style="font-size: 15px; font-weight:bold;">
+                        <u>
+                            <?= strtoupper($dataPO->holding_company) ?> (<?= $dataPO->companyName ?>)
+                        </u>
+                    </div>
                 </div>
-                <?= $dataPO->companyAddress ?>
             </div><br>
-            <div style="padding: 0.5rem; text-align: center;">
-                <div style="text-decoration: underline; font-size: 1.2em;">KWITANSI TAMBAHAN</div>
-                <div>NO. NOTA : <?= $dataPO->po_no ?></div>
-            </div>
+            <center style="margin-top: -10px;">
+                <div style="font-size: 15px; font-weight:bold;">
+                    <u>
+                        KWITANSI TAMBAHAN
+                    </u>
+                </div>
+                <div style="font-size: 13px;">
+                    No : <?= $dataPO->po_no ?>
+                </div>
+            </center>
             <table class="w-100">
                 <tr>
-                    <td class="txt-bold txt-right txt-underline">Tanggal: <?= date('d/m/Y', strtotime($dataPO->po_date))  ?></td>
+                    <td>
+                        <table>
+                            <tr>
+                                <td>Supplier</td>
+                                <td>: <?= $dataPO->supplierName ?></td>
+                            </tr>
+                            <tr>
+                                <td>Bahan Baku</td>
+                                <td>: <?= $dataPO->barangName ?></td>
+                            </tr>
+                        </table>
+                    </td>
+                    <td>
+                        <table style="width: 100%;">
+                            <tr>
+                                <td style="text-align: right; width:130px;">Tanggal</td>
+                                <td style="text-align: right; width:50px;">: <?= date('d-M-Y', strtotime($dataPO->po_date)); ?></td>
+                            </tr>
+                            <tr>
+                                <td>&nbsp;</td>
+                                <td></td>
+                            </tr>
+                        </table>
+                    </td>
                 </tr>
             </table>
 
-            <table>
-                <tr>
-                    <td>Supplier</td>
-                    <td>: <?= $dataPO->supplierName ?></td>
-                </tr>
-                <tr>
-                    <td>Bahan Baku</td>
-                    <td>: <?= $dataPO->barangName ?></td>
-                </tr>
-            </table>
 
             <table class="cong-table item-table txt-right" style="border: 1px solid black;">
                 <tr>
@@ -599,25 +654,25 @@
                     <th class="column-table-normal">TOTAL TAMBAHAN</th>
                 </tr>
                 <tr>
-                    <td style="height: 5%;font-size:13px;"><?= number_format($totalQty ?? 0, 2) ?></td>
-                    <td style="height: 5%;font-size:13px;"><?= number_format($dataPO->cong_sebenarnya ?? 0, 2) ?></td>
-                    <td style="height: 5%;font-size:13px;"><?= number_format($dataPO->cong_batasan ?? 0, 2) ?></td>
-                    <td style="height: 5%;font-size:13px;"><?= number_format(abs($dataPO->selisih) ?? 0, 2) ?></td>
-                    <td style="border: 1px solid black !important;font-size:13px;"><?= number_format($dataPO->dpp_tambahan ?? 0, 2) ?></td>
+                    <td style="height: 5%;font-size:14px;"><?= number_format($totalQty ?? 0, 2) ?></td>
+                    <td style="height: 5%;font-size:14px;"><?= number_format($dataPO->cong_sebenarnya ?? 0, 2) ?></td>
+                    <td style="height: 5%;font-size:14px;"><?= number_format($dataPO->cong_batasan ?? 0, 2) ?></td>
+                    <td style="height: 5%;font-size:14px;"><?= number_format(abs($dataPO->selisih) ?? 0, 2) ?></td>
+                    <td style="border: 1px solid black !important;font-size:14px;"><?= number_format($dataPO->dpp_tambahan ?? 0, 2) ?></td>
                 </tr>
                 <tr>
                     <td style="height: 5%;"></td>
                     <td></td>
                     <td></td>
                     <td>PPH</td>
-                    <td style="border: 1px solid black !important;font-size:13px;"><?= number_format($dataPO->pph_tambahan ?? 0, 2) ?></td>
+                    <td style="border: 1px solid black !important;font-size:14px;"><?= number_format($dataPO->pph_tambahan ?? 0, 2) ?></td>
                 </tr>
                 <tr>
                     <td style="height: 5%;"></td>
                     <td></td>
                     <td></td>
                     <td>DIBAYARKAN</td>
-                    <td style="border: 1px solid black !important;font-size:13px;"><?= number_format($dataPO->nilai_total_tambahan ?? 0, 2) ?></td>
+                    <td style="border: 1px solid black !important;font-size:14px;"><?= number_format($dataPO->nilai_total_tambahan ?? 0, 2) ?></td>
                 </tr>
             </table>
             <table class="w-100 sign-table border-collapse signed-info footer mt-3" style="border: none!important;">
