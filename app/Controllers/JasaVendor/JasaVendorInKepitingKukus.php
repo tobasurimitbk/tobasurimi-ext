@@ -206,8 +206,6 @@ class JasaVendorInKepitingKukus extends BaseController
     public function createAction()
     {
         $barangs = json_decode($_POST['listBarang']);
-        var_dump($barangs);
-        die;
         $jasaVendorOutNo = $this->jasaVendorInKepitingKukusModel->getJasaVendorOutNo(
             $this->request->getVar('multiple_jasa_vendor_out_id')
         );

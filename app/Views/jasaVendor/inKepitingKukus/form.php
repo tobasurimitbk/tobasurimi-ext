@@ -248,6 +248,8 @@
                 <form class="create-form-barang-masuk" role="form" method="POST" enctype="multipart/form-data">
                     <?= csrf_field() ?>
                     <input type="hidden" name="barang1_id" id="barang1_id" class="barang1_id">
+                    <input type="hidden" name="supplier_id" id="supplier_id" class="supplier_id">
+                    <input type="hidden" name="keterangan" id="keterangan" class="keterangan">
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-floating mb-3">
@@ -555,54 +557,56 @@
 
                     // APPEND LIST BARANG GROUP KE LIST BARANG
                     // LOOP LIST BARANG GROUP
-                    $.each(listBarangGroup, function(i, v) {
-                        var totalDetailBarangKeluar = 0;
-                        var qtyKotorRes = 0;
-                        var qtyBersihRes = 0;
+                    // $.each(listBarangGroup, function(i, v) {
+                    //     var totalDetailBarangKeluar = 0;
+                    //     var qtyKotorRes = 0;
+                    //     var qtyBersihRes = 0;
 
-                        // LOOP LIST BARANG
-                        $.each(listBarang, function(j, k) {
+                    //     // LOOP LIST BARANG
+                    //     $.each(listBarangGroup, function (i, v) {
+                    //         // Hitung detail keluar dalam group ini
+                    //         var totalDetailBarangKeluar = listBarang.filter(k =>
+                    //             k.supplier_id == v.supplier_id && (k.keterangan || '') == (v.keterangan || '')
+                    //         ).length;
 
-                            if (v.barang1_id == k.barang1_id) {
-                                totalDetailBarangKeluar++;
-                            }
-                        });
+                    //         // Loop detail keluar
+                    //         $.each(listBarang, function (j, k) {
+                    //             if (v.supplier_id == k.supplier_id && (v.keterangan || '') == (k.keterangan || '')) {
 
-                        $.each(listBarang, function(j, k) {
+                    //                 if (!Array.isArray(listBarang[j].list_barang_masuk)) {
+                    //                     listBarang[j].list_barang_masuk = [];
+                    //                 }
 
-                            if (v.barang1_id == k.barang1_id) {
+                    //                 // Loop semua barang masuk dalam group ini
+                    //                 $.each(v.list_barang_masuk, function (y, z) {
+                    //                     var qtyKotorRes = (z.qty_kotor / totalDetailBarangKeluar).toFixed(2);
+                    //                     var qtyBersihRes = (z.qty_bersih / totalDetailBarangKeluar).toFixed(2);
 
-                                listBarang[j].list_barang_masuk = [];
+                    //                     // cek spesifikasi unik
+                    //                     var exist = listBarang[j].list_barang_masuk.find(
+                    //                         item => item.spesifikasi_in_id === z.spesifikasi_in_id
+                    //                     );
 
-                                $.each(v.list_barang_masuk, function(y, z) {
+                    //                     if (!exist) {
+                    //                         listBarang[j].list_barang_masuk.push({
+                    //                             jasa_vendor_out_kepiting_kukus_detail_id: k.jasa_vendor_out_kepiting_kukus_detail_id,
+                    //                             jasa_vendor_out_kepiting_kukus_id: k.jasa_vendor_out_kepiting_kukus_id,
+                    //                             supplier_id: v.supplier_id,
+                    //                             keterangan: v.keterangan,
+                    //                             spesifikasi_in_id: z.spesifikasi_in_id,
+                    //                             kode_barang_in: z.kode_barang_in,
+                    //                             barang_name_in: z.barang_name_in,
+                    //                             kode_satuan_in: z.kode_satuan_in,
+                    //                             qty_kotor: qtyKotorRes,
+                    //                             qty_bersih: qtyBersihRes
+                    //                         });
+                    //                     }
+                    //                 });
+                    //             }
+                    //         });
+                    //     });
 
-                                    qtyKotorRes = z.qty_kotor / totalDetailBarangKeluar;
-                                    qtyBersihRes = z.qty_bersih / totalDetailBarangKeluar;
-                                    qtyKotorRes = qtyKotorRes.toFixed(2);
-                                    qtyBersihRes = qtyBersihRes.toFixed(2);
-
-                                    listBarang[j].list_barang_masuk = listBarang[j].list_barang_masuk.filter(item => item.spesifikasi_in_id !== z.spesifikasi_in_id);
-
-                                    listBarang[j].list_barang_masuk.push({
-                                        jasa_vendor_out_kepiting_kukus_detail_id: k.jasa_vendor_out_kepiting_kukus_detail_id,
-                                        jasa_vendor_out_kepiting_kukus_id: k.jasa_vendor_out_kepiting_kukus_id,
-                                        barang1_id: z.barang1_id,
-                                        spesifikasi_in_id: z.spesifikasi_in_id,
-                                        kode_barang_in: z.kode_barang_in,
-                                        barang_name_in: z.barang_name_in,
-                                        kode_satuan_in: z.kode_satuan_in,
-                                        qty_kotor: qtyKotorRes,
-                                        qty_bersih: qtyBersihRes
-
-                                    });
-
-                                })
-
-                            }
-
-                        });
-
-                    });
+                    // });
 
                     Swal.fire({
                         icon: 'question',
@@ -617,7 +621,7 @@
                         if (result.isConfirmed) {
                             let id = $('#id').val();
                             let data = new FormData(document.querySelector(".create-form"));
-                            data.append('listBarang', JSON.stringify(listBarang));
+                            data.append('listBarang', JSON.stringify(listBarangGroup));
 
                             if (id) {
                                 // UPDATE
@@ -727,6 +731,8 @@
     $('#btn-stock-in-add').click(function() {
         if ($('.create-form-barang-masuk').valid()) {
             var barang1_id = $('#barang1_id').val();
+            var supplier_id = $('#supplier_id').val();
+            var keterangan = $('#keterangan').val();
             var spesifikasi_in_id = $('#spesifikasi_in_id option:selected').data('spesifikasi_id');
             var kode_barang_in = $('#spesifikasi_in_id option:selected').data('kode_barang');
             var barang_name_in = $('#spesifikasi_in_id option:selected').data('barang');
@@ -734,8 +740,9 @@
             var barangFirst = null;
             var index = null;
 
+            // FIND BARANG FIRST
             $.each(listBarangGroup, function(i, v) {
-                if (v.spesifikasi_out_id == barang1_id) {
+                if (v.supplier_id == supplier_id && (v.keterangan || '') == (keterangan || '')) {
                     index = i;
                     barangFirst = v;
                 }
@@ -743,17 +750,23 @@
 
             // EACH 
             var isAdd = false;
+
             $.each(barangFirst.list_barang_masuk, function(i, v) {
-                if (v.spesifikasi_in_id == spesifikasi_in_id) {
+                if (
+                    v.supplier_id == supplier_id &&
+                    (v.keterangan || '') == (keterangan || ''
+                    ) &&
+                    v.spesifikasi_in_id == spesifikasi_in_id
+                ) {
                     isAdd = true;
                 }
             });
 
-           
-
             if (!isAdd) {
                 listBarangGroup[index].list_barang_masuk.push({
                     barang1_id: barangFirst.barang1_id,
+                    supplier_id: supplier_id,
+                    keterangan: keterangan,
                     spesifikasi_in_id: spesifikasi_in_id,
                     kode_barang_in: kode_barang_in,
                     barang_name_in: barang_name_in,
@@ -771,20 +784,22 @@
             }
 
             // DRAW BARANG MASUK
-            drawTable2(barang1_id, listBarangGroup)
+            drawTable2(supplier_id, keterangan, listBarangGroup)
 
         }
     });
 
     $('.btn-submit-detail').click(function() {
         var barang1_id = $('#barang1_id').val();
+        var supplier_id = $('#supplier_id').val();
+        var keterangan = $('#keterangan').val();
         var index = null;
         var barangError = null;
         var isValidKotor = true;
         var isValidBersih = true;
 
         $.each(listBarangGroup, function(i, v) {
-            if (v.spesifikasi_out_id == barang1_id) {
+            if (v.supplier_id == supplier_id && (v.keterangan || '') == (keterangan || '')) {
                 index = i;
             }
         });
@@ -841,18 +856,24 @@
 
     });
 
-    function displayDetailModal(barang1_id) {
+    function displayDetailModal(supplier_id, keterangan) {
         // RESET VALIDATOR
         validatorBarangMasuk.resetForm();
         validatorBarangMasuk.reset();
 
         var barangFirst = null;
         $.each(listBarangGroup, function(i, v) {
-            if (v.spesifikasi_out_id == barang1_id) {
+            if (v.supplier_id == supplier_id && (v.keterangan || '') == (keterangan || '')) {
                 barangFirst = v;
             }
         });
-        $('#barang1_id').val(barang1_id);
+
+        // console.log("barang first", barangFirst);
+        // return;
+
+        $('#barang1_id').val(barangFirst.barang_master_out_id);
+        $('#supplier_id').val(barangFirst.supplier_id);
+        $('#keterangan').val(barangFirst.keterangan);
         $('#barang_keluar_name').val(barangFirst.barang_out);
         $('#satuan_barang_keluar').val(barangFirst.satuan_out);
         $('#qty_barang_keluar').val(parseFloat(barangFirst.qty_out).toFixed(2));
@@ -867,12 +888,14 @@
                     stopLoading();
                 },
                 data: {
-                    barang1_id: barangFirst.barang1_id,
+                    barang1_id: barangFirst.barang_master_out_id,
                     type_barang: "bahan_baku",
                 },
                 dataType: "json",
                 success: function(res) {
                     $('#update_detail_barang').modal('show')
+
+                    $('#update_detail_barang .modal-title').text("Detail List Barang Masuk - " + (barangFirst.supplier_name || ''));
 
                     $("#spesifikasi_in_id").empty()
                     $("#spesifikasi_in_id").append(`<option value=""></option>`)
@@ -881,7 +904,7 @@
                     })
                     $("#spesifikasi_in_id").val(null);
 
-                    drawTable2(barang1_id, listBarangGroup);
+                    drawTable2(supplier_id, keterangan, listBarangGroup);
                 }
             });
         } else {
@@ -965,7 +988,7 @@
         }
     }
 
-    function drawTable2(barang1_id, listBarangGroup) {
+    function drawTable2(supplier_id, keterangan, listBarangGroup) {
         var listBarangFirst = null;
         var totalQtyKotor = 0;
         var totalQtyBersih = 0;
@@ -973,8 +996,9 @@
         table.find('tbody').empty();
         table.find('tfoot').empty();
 
+
         $.each(listBarangGroup, function(i, v) {
-            if (v.spesifikasi_out_id == barang1_id) {
+            if (v.supplier_id == supplier_id &&(v.keterangan || '') == (keterangan || '')) {
                 listBarangFirst = v;
             }
         });
@@ -1019,7 +1043,7 @@
 
                 newRow.append($('<td style="text-align: center;">').html(
                     `
-                    <button <?= !empty($jasaVendorIn) ? (($jasaVendorIn['status_posting'] == "1") ? 'disabled' : '') : '' ?> type="button" class="btn btn-danger" onclick="deleteDetail(${listBarangFirst.barang1_id}, '${v.spesifikasi_in_id}')" ><i class="fa fa-trash fa-sm" aria-hidden="true"></i></button>
+                    <button <?= !empty($jasaVendorIn) ? (($jasaVendorIn['status_posting'] == "1") ? 'disabled' : '') : '' ?> type="button" class="btn btn-danger" onclick="deleteDetail(${supplier_id}, '${keterangan}', '${v.spesifikasi_in_id}')" ><i class="fa fa-trash fa-sm" aria-hidden="true"></i></button>
                 `
                 ));
                 table.find('tbody').append(newRow);
@@ -1060,7 +1084,7 @@
                 newRow.append($('<td>').text(v.list_barang_masuk.length + " Barang"));
                 newRow.append($('<td style="text-align: center;">').html(
                     `
-                    <button type="button" class="btn btn-primary" onclick="displayDetailModal(${v.spesifikasi_out_id})" data-toggle="tooltip"><i class="fas fa-pencil-alt"></i></button>
+                    <button type="button" class="btn btn-primary" onclick="displayDetailModal(${v.supplier_id}, '${v.keterangan}')" data-toggle="tooltip"><i class="fas fa-pencil-alt"></i></button>
                 `
                 ));
 
@@ -1069,12 +1093,12 @@
         }
     }
 
-    function deleteDetail(barang1_id, spesifikasi_in_id) {
+    function deleteDetail(supplier_id, keterangan, spesifikasi_in_id) {
         var index = null;
         var indexToRemove = -1;
 
         for (let i = 0; i < listBarangGroup.length; i++) {
-            if (listBarangGroup[i].barang1_id == barang1_id) {
+            if (listBarangGroup[i].supplier_id == supplier_id && listBarangGroup[i].keterangan == keterangan) {
                 index = i;
                 break;
             }
@@ -1089,7 +1113,7 @@
 
         if (indexToRemove !== -1) {
             listBarangGroup[index].list_barang_masuk.splice(indexToRemove, 1);
-            drawTable2(barang1_id, listBarangGroup);
+            drawTable2(supplier_id, keterangan, listBarangGroup);
         }
     }
 
