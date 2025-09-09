@@ -466,20 +466,20 @@
                     No : <?= $dataPO->po_no ?>
                 </div>
             </center>
-            <table class="w-100 mt-05" style="margin-top: 10px;">
+            <table class="w-100 mt-05" style="margin-top: 20px;">
                 <tr>
-                    <td style="vertical-align: top; width: 40%;">SUDAH TERIMA DARI (RECEIVED FROM)</td>
-                    <td style="vertical-align: top;">: </td>
+                    <td style="vertical-align: top; width: 20%;">SUDAH TERIMA DARI <br> (RECEIVED FROM)</td>
+                    <td style="vertical-align: top; width:2%;">: </td>
                     <td style="vertical-align: top; width: 55%;"><?= $dataPO->holdingCompany ?> (<?= $dataPO->companyName ?>)</td>
                 </tr>
                 <tr>
-                    <td style="vertical-align: top;">BANYAKNYA UANG (AMOUNT)</td>
+                    <td style="vertical-align: top;">BANYAKNYA UANG <br> (AMOUNT)</td>
                     <td style="vertical-align: top;">: </td>
-                    <td tyle="vertical-align: top;">
+                    <td style="vertical-align: top;">
                         <?= terbilang($dataPO->nilai_total_umum) ?> RUPIAH
                     </td>
                 <tr>
-                    <td style="vertical-align: top;">UNTUK PEMBAYARAN (FOR PAYMENT)</td>
+                    <td style="vertical-align: top;">UNTUK PEMBAYARAN <br> (FOR PAYMENT)</td>
                     <td style="vertical-align: top;">: </td>
                     <td style="vertical-align: top;">PEMBELIAN <?= $dataPO->barangName ?> SEBANYAK <?= $totalQty ?> KG DARI <?= $dataPO->supplierName ?></td>
                 </tr>
@@ -553,9 +553,7 @@
                 <tr>
                     <td style="vertical-align: top;">Banyaknya Uang <br> (Amount)</td>
                     <td style="vertical-align: top;">: </td>
-                    <td tyle="vertical-align: top;">
-                        <?= terbilang($dataPO->nilai_total_harian) ?> RUPIAH
-                    </td>
+                    <td style="vertical-align: top;"><?= terbilang($dataPO->nilai_total_harian) ?> RUPIAH</td>
                 </tr>
                 <tr>
                     <td style="vertical-align: top;">Untuk Pembayaran <br> (For Payment)</td>
