@@ -180,6 +180,21 @@
     let sortType = "asc";
     var row = 0;
 
+    // Set default tanggal: awal bulan - hari ini
+    const today = new Date();
+    const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
+
+    function formatDate(date) {
+        // Format dd/mm/yyyy
+        let dd = String(date.getDate()).padStart(2, '0');
+        let mm = String(date.getMonth() + 1).padStart(2, '0'); // Januari = 0
+        let yyyy = date.getFullYear();
+        return dd + '/' + mm + '/' + yyyy;
+    }
+
+    $(".dateStart").val(formatDate(firstDay));
+    $(".dateEnd").val(formatDate(today));
+
     var table = $('.dataTable').DataTable({
 
         processing: true,
@@ -261,52 +276,52 @@
                 className: "text-center",
             },
             {
-                data: "dppUmum",
+                data: "dpp_umum",
                 className: "text-center",
             },
             {
-                data: "pphUmum",
+                data: "pph_umum",
                 className: "text-center",
             },
             {
-                data: "totalUmum",
+                data: "nilai_total_umum",
                 className: "text-center",
             },
             {
-                data: "dppHarian",
+                data: "dpp_harian",
                 className: "text-center",
             },
             {
-                data: "pphHarian",
+                data: "pph_harian",
                 className: "text-center",
             },
             {
-                data: "totalHarian",
+                data: "nilai_total_harian",
                 className: "text-center",
             },
             {
-                data: "dppBulanan",
+                data: "dpp_bulanan",
                 className: "text-center",
             },
             {
-                data: "pphBulanan",
+                data: "pph_bulanan",
                 className: "text-center",
             },
             {
-                data: "totalBulanan",
+                data: "nilai_total_bulanan",
                 className: "text-center",
             },
             {
-                data: "subsidi",
+                data: "dpp_tambahan",
                 className: "text-center",
             },
             {
-                data: "pphSubsidi",
+                data: "pph_tambahan",
                 className: "text-center",
 
             },
             {
-                data: "totalSubsidi",
+                data: "nilai_total_tambahan",
                 className: "text-center",
             },
             {
@@ -342,9 +357,9 @@
                 $('#ft-pphBulanan').html(json.footerTotals.pphBulanan);
                 $('#ft-totalBulanan').html(json.footerTotals.totalBulanan);
 
-                $('#ft-subsidi').html(json.footerTotals.subsidi);
-                $('#ft-pphSubsidi').html(json.footerTotals.pphSubsidi);
-                $('#ft-totalSubsidi').html(json.footerTotals.totalSubsidi);
+                $('#ft-subsidi').html(json.footerTotals.dppTambahan);
+                $('#ft-pphSubsidi').html(json.footerTotals.pphTambahan);
+                $('#ft-totalSubsidi').html(json.footerTotals.totalTambahan);
 
                 $('#ft-totalRow').html(json.footerTotals.totalRow);
             }
