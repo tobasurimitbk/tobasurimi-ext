@@ -41,7 +41,20 @@ class RMPurchaseOrderModel extends Model
         'status_penerimaan',
         'total_before_pph',
         'total_after_pph',
-        'status_external'
+        'status_external',
+        'dpp_harian',
+        'pph_harian',
+        'dpp_bulanan',
+        'pph_bulanan',
+        'dpp_tambahan',
+        'pph_tambahan',
+        'dpp_umum',
+        'pph_umum',
+        'nilai_total_umum',
+        'nilai_total_harian',
+        'nilai_total_bulanan',
+        'nilai_total_tambahan',
+        'nilai_total_qty'
     ];
 
     // Dates
@@ -1584,6 +1597,129 @@ class RMPurchaseOrderModel extends Model
         return [
             'total_before_pph' => (float) number_format($totalBeforePph, 2, '.', ''),
             'total_after_pph' => (float) number_format($totalAfterPph, 2, '.', ''),
+        ];
+    }
+
+    public function generateKomponenHarga($id)
+    {
+        $rmPurchaseOrderDetailModel = new RMPurchaseOrderDetailModel();
+
+        // Get PO First
+        $selectQry = "rm_purchase_orders.id,
+            rm_purchase_orders.po_date,
+            rm_purchase_orders.po_no,
+            rm_purchase_orders.pph,
+            rm_purchase_orders.cong_batasan,
+            rm_purchase_orders.cong_sebenarnya,
+            rm_purchase_orders.subsidi_langsung,
+            rm_purchase_orders.is_posted,
+            rm_purchase_orders.status_penerimaan,
+            suppliers.name AS supplierName,
+            suppliers.no_npwp as supplierNPWP";
+
+        $dataPo = $this->asObject()
+            ->select($selectQry)
+            ->join('suppliers', 'rm_purchase_orders.supplier_id = suppliers.id', 'left')
+            ->where('rm_purchase_orders.id', $id)
+            ->first();
+
+        $hasNpwp = !empty($dataPo->supplierNpwp);
+        $pphMode = $dataPo->pph;
+
+        if ($dataPo->po_date <= '2025-06-30') {
+            // Dibawah bulan 7
+            $nilaiPph = $hasNpwp ? 0.9975 : 0.995;
+            $nilaiPph2 = $hasNpwp ? 0.0025 : 0.005;
+        } else {
+            // Diatas bulan 7
+            $nilaiPph = 0.9975;
+            $nilaiPph2 = 0.0025;
+        }
+
+        // Get PO Lokal Detail
+        $detailPurchaseOrder = $rmPurchaseOrderDetailModel
+            ->where('rm_purchase_order_id', $dataPo->id)
+            ->where('deletedAt', null)
+            ->findAll();
+
+        $totalQty = 0;
+        $dppUmum = 0;
+        $dppHarian = 0;
+        $dppBulanan = 0;
+        $dppTambahan = 0;
+        $pphUmum = 0;
+        $pphHarian = 0;
+        $pphBulanan = 0;
+        $pphTambahan = 0;
+        $nilaiTotalBulanan = 0;
+        $nilaiTotalUmum = 0;
+        $nilaiTotalHarian = 0;
+        $nilaiTotalTambahan = 0;
+
+        foreach ($detailPurchaseOrder as $detailPo) {
+
+            if ($pphMode == "None" || $pphMode == "Supplier") {
+                // Jika Ditanggung Supplier dan Tidak DItanggung
+                $dppUmum += (float)number_format($detailPo['general_price'] * $detailPo['qty'], 2, '.', '');
+                $dppHarian += (float)number_format($detailPo['daily_price'] * $detailPo['qty'], 2, '.', '');
+                $dppBulanan += (float)number_format($detailPo['monthly_price'] * $detailPo['qty'], 2, '.', '');
+            } else {
+                // DItanggung Company
+                $dppUmum += (float)number_format(($detailPo['general_price'] / $nilaiPph) * $detailPo['qty'], 2, '.', '');
+                $dppHarian += (float)number_format(($detailPo['daily_price'] / $nilaiPph) * $detailPo['qty'], 2, '.', '');
+                $dppBulanan += (float)number_format(($detailPo['monthly_price'] / $nilaiPph) * $detailPo['qty'], 2, '.', '');
+            }
+
+            $totalQty += $detailPo['qty'];
+        }
+
+        // Hitung Pph harga biasa
+        if ($pphMode == "Supplier" || $pphMode == "Company") {
+            $pphUmum = (float)number_format($dppUmum * $nilaiPph2, 2, '.', '');
+            $pphHarian = (float)number_format($dppHarian * $nilaiPph2, 2, '.', '');
+            $pphBulanan = (float)number_format($dppBulanan * $nilaiPph2, 2, '.', '');
+
+            $nilaiTotalUmum = (float) number_format($dppUmum - $pphUmum, 2, '.', '');
+            $nilaiTotalHarian = (float) number_format($dppHarian - $pphHarian, 2, '.', '');
+            $nilaiTotalBulanan = (float) number_format($dppBulanan - $pphBulanan, 2, '.', '');
+        }
+
+        // Hitung pph dari tambahan langsung
+        if ($pphMode == 'Company') {
+            // Kalau Ditaggung Company di Up kan dulu pph nya
+            $dppTambahan = (float)number_format(($dataPo->cong_batasan - $dataPo->cong_sebenarnya + $dataPo->subsidi_langsung) / $nilaiPph, 2, '.', '');
+            $pphTambahan = (float)number_format($dppTambahan * $nilaiPph2,  2, '.', '');
+            $nilaiTotalTambahan = (float) number_format($dppTambahan - $pphTambahan, 2, '.', '');
+        } else {
+            $dppTambahan = (float)number_format(($dataPo->cong_batasan - $dataPo->cong_sebenarnya + $dataPo->subsidi_langsung) * $totalQty,  2, '.', '');
+            $pphTambahan = $pphMode == "None" ? 0 : (float)number_format($dppTambahan * $nilaiPph2, 2, '.', '');
+            $nilaiTotalTambahan = (float) number_format($dppTambahan - $pphTambahan, 2, '.', '');
+        }
+
+        $nilaiBeforePph = $dppHarian + $dppUmum + $dppBulanan + abs($dppTambahan);
+        $nilaiAfterPph = $nilaiTotalHarian + $nilaiTotalUmum + $nilaiTotalBulanan + abs($nilaiTotalTambahan);
+
+        // JIka pph tidak ditanggung siapa siapa
+        if ($nilaiAfterPph == 0 || $dataPo->pph == "None") {
+            $nilaiAfterPph = $nilaiBeforePph;
+        }
+
+        return [
+            'nilai_before_pph' => $nilaiBeforePph,
+            'nilai_after_pph' => $nilaiAfterPph,
+            'dpp_umum' => $dppUmum,
+            'dpp_harian' => $dppHarian,
+            'dpp_bulanan' => $dppBulanan,
+            'dpp_tambahan' => $dppTambahan,
+            'pph_umum' => $pphUmum,
+            'pph_harian' => $pphHarian,
+            'pph_bulanan' => $pphBulanan,
+            'pph_tambahan' => $pphTambahan,
+            'nilai_total_umum' => $nilaiTotalUmum,
+            'nilai_total_harian' => $nilaiTotalHarian,
+            'nilai_total_bulanan' => $nilaiTotalBulanan,
+            'nilai_total_tambahan' => $nilaiTotalTambahan,
+            'nilai_total_qty' => $totalQty
         ];
     }
 
