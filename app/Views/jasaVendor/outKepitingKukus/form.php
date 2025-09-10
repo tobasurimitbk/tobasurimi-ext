@@ -216,7 +216,7 @@
                         <div class="col-md-3">
                             <div class="form-floating mb-3">
                                 <input type="text" placeholder="Keterangan" class="form-control keterangan_detail" id="keterangan_detail" name="keterangan_detail" />
-                                <label for="keterangan_detail">Keterangan (Opsional)</label>
+                                <label for="keterangan_detail">Keterangan</label>
                             </div>
                         </div>
                         <div class="col-md-3 d-flex align-items-center">
@@ -454,8 +454,13 @@
         let keterangan = $("#keterangan_detail").val();
         let detailId = $("#id_detail").val(); // kalau kosong berarti data baru
 
-        if (!spesifikasi || !supplierId) {
-            alert("Spesifikasi dan Supplier wajib dipilih!");
+        if (!spesifikasi || !supplierId || !keterangan) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Spesifikasi, Keterangan, dan Supplier yang akan dikirimkan ke vendor tidak boleh kosong !',
+                confirmButtonColor: '#4e73df',
+                confirmButtonText: 'Ok'
+            });
             return;
         }
 
