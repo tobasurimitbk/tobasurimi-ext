@@ -1409,6 +1409,8 @@
         let spek_id = $(this).data('spek_id');
         let spek = $(this).data('spesifikasi');
         console.log(spek_id);
+
+        list_akun_items = [];
         $('#spek_id_akun').val(spek_id).change();
         $('#parentNameAkunBarang').val(spek);
         $('.add-modal-akun-barang').modal('show');
@@ -1835,7 +1837,6 @@
         $('#akun_pemakaian_id').val('').trigger('change');
         $('#kategori').val('').trigger('change');
         $('#keterangan').val('').trigger('change');
-        list_akun_items = [];
     }
 
     // Fungsi untuk menyimpan data ke server
