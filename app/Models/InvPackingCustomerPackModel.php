@@ -72,26 +72,28 @@ class InvPackingCustomerPackModel extends Model
                     'id_detail_breakdown_packing' => $s['id'],
                     'size' => $s['size'],
                     'grade' => $s['grade'],
-                    'packing' => $s['packing'],
-                    'can' => $s['can'],
-                    'cased' => $s['cased'],
-                    'kg' => $s['kg'],
-                    'lb' => $s['lb'],
-                    'inner_box' => $s['inner_box'],
-                    'pc' => $s['pc'],
-                    'bag' => $s['bag'],
-                    'palet' => $s['palet'],
-                    'persen' => $s['persen'],
+                    'packing' => (float)$s['packing'],
+                    'can' => (float)$s['can'],
+                    'kg' => (float)$s['kg'],
+                    'lb' => (float)$s['lb'],
+                    'inner_box' => (float)$s['inner_box'],
+                    'pc' => (float)$s['pc'],
+                    'bag' => (float) $s['bag'],
+                    'palet' => (float)$s['palet'],
+                    'persen' => (float)$s['persen'],
                     'qty' => (float)$s['qty'],
                     'harga' => (float)$s['harga'],
                     'total' => (float)$s['total'],
-                    'remark' => $s['remark'],
                     'satuan_size_id' => $s['satuan_size_id'],
                     'satuan_size_code' => $s['satuan_size_code'],
                     'berat_bersih' => (float)$s['berat_bersih'],
                     'berat_kotor' => (float)$s['berat_kotor'],
                     'vgm' => (float)$s['vgm'],
-                    'drammed' => (float)$s['drammed']
+                    'drammed' => (float)$s['drammed'],
+                    'case' => (float)$s['cased'],
+                    'cup' => (float)$s['cup']
+
+
                 ]);
             }
 

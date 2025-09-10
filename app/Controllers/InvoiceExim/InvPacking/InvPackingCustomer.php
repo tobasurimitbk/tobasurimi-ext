@@ -165,9 +165,6 @@ class InvPackingCustomer extends BaseController
         $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
 
         foreach ($invData['data'] as $data) {
-            $invPackingCustomerPackSize = $this->invPackingCustomerPackSizeModel->getFirstByInvId(
-                $data->id
-            );
 
             array_push($dataInv, [
                 "no"                => $no++,
@@ -176,7 +173,6 @@ class InvPackingCustomer extends BaseController
                 "vessels_name"           => $data->vessels_name,
                 "no_seal"           => $data->no_seal,
                 "departure_date"    => $data->departure_date != "" ? date('d/m/Y', strtotime($data->departure_date)) : "-",
-                "total_packing"      => number_format($data->total_packing, 2) . " " . $invPackingCustomerPackSize['kode_satuan'],
                 "total_berat_bersih" => (float)$data->total_berat_bersih,
                 "total_berat_kotor"  => (float)$data->total_berat_kotor,
                 "total_nilai_invoice" => (float)$data->total_nilai_invoice,
@@ -383,25 +379,22 @@ class InvPackingCustomer extends BaseController
                 'company_id' => $this->this_company_id,
                 'sales_order_export_id' => $this->request->getVar('sales_order_export_id'),
                 'tanggal_invoice' => $this->request->getVar("tanggal_invoice") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("tanggal_invoice")))) : "",
-                'departure_date' => $this->request->getVar("departure_date") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("departure_date")))) : "",
                 'nama_customer' => $this->request->getVar('nama_customer'),
                 'loading_port' => $this->request->getVar('loading_port'),
                 'dicharge_port' => $this->request->getVar('dicharge_port'),
+                'departure_date' => $this->request->getVar("departure_date") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("departure_date")))) : "",
                 'vessels_name' => $this->request->getVar('vessels_name'),
                 'valas_id' => $this->request->getVar('valas_id'),
                 'payment_term' => $this->request->getVar('payment_term'),
                 'alamat' => $this->request->getVar('alamat'),
                 'notify_party' => $this->request->getVar('notify_party'),
+                'notify_party2' => $this->request->getVar('notify_party2'),
                 'no_container' => $this->request->getVar('no_container'),
                 'no_seal' => $this->request->getVar('no_seal'),
                 'country_of_origin' => $this->request->getVar('country_of_origin'),
-                'measurement' => $this->request->getVar('measurement'),
-                'phone' => $this->request->getVar('phone'),
-                'attn' => $this->request->getVar('attn'),
-                'email'  => $this->request->getVar('email'),
                 'penanda_tangan' => $this->request->getVar('penanda_tangan'),
+                'measurement' => $this->request->getVar('measurement'),
                 'total_nilai_invoice' => $this->request->getVar('total_nilai_invoice'),
-                'total_packing' => $this->request->getVar('total_packing'),
                 'total_berat_bersih' => $this->request->getVar('total_berat_bersih'),
                 'total_berat_kotor' => $this->request->getVar('total_berat_kotor')
             ]);
@@ -440,25 +433,22 @@ class InvPackingCustomer extends BaseController
             $this->invPackingCustomerModel->update($id, [
                 'sales_order_export_id' => $this->request->getVar('sales_order_export_id'),
                 'tanggal_invoice' => $this->request->getVar("tanggal_invoice") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("tanggal_invoice")))) : "",
-                'departure_date' => $this->request->getVar("departure_date") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("departure_date")))) : "",
                 'nama_customer' => $this->request->getVar('nama_customer'),
                 'loading_port' => $this->request->getVar('loading_port'),
                 'dicharge_port' => $this->request->getVar('dicharge_port'),
+                'departure_date' => $this->request->getVar("departure_date") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("departure_date")))) : "",
                 'vessels_name' => $this->request->getVar('vessels_name'),
                 'valas_id' => $this->request->getVar('valas_id'),
                 'payment_term' => $this->request->getVar('payment_term'),
                 'alamat' => $this->request->getVar('alamat'),
                 'notify_party' => $this->request->getVar('notify_party'),
+                'notify_party2' => $this->request->getVar('notify_party2'),
                 'no_container' => $this->request->getVar('no_container'),
                 'no_seal' => $this->request->getVar('no_seal'),
                 'country_of_origin' => $this->request->getVar('country_of_origin'),
-                'measurement' => $this->request->getVar('measurement'),
-                'phone' => $this->request->getVar('phone'),
-                'attn' => $this->request->getVar('attn'),
-                'email'  => $this->request->getVar('email'),
                 'penanda_tangan' => $this->request->getVar('penanda_tangan'),
+                'measurement' => $this->request->getVar('measurement'),
                 'total_nilai_invoice' => $this->request->getVar('total_nilai_invoice'),
-                'total_packing' => $this->request->getVar('total_packing'),
                 'total_berat_bersih' => $this->request->getVar('total_berat_bersih'),
                 'total_berat_kotor' => $this->request->getVar('total_berat_kotor')
             ]);
@@ -549,16 +539,6 @@ class InvPackingCustomer extends BaseController
                     'satuan_size_id' => $s->satuan_size_id,
                     'size' => $s->size,
                     'grade' => $s->grade,
-                    'can' => $s->can,
-                    'cased' => $s->cased,
-                    'kg' => $s->kg,
-                    'lb' => $s->lb,
-                    'inner_box' => $s->inner_box,
-                    'pc' => $s->pc,
-                    'bag' => $s->bag,
-                    'palet' => $s->palet,
-                    'persen' => $s->persen,
-                    'remark' => $s->remark,
                     'qty' => $s->qty,
                     'harga' => $s->harga,
                     'total' => $s->total
@@ -583,7 +563,6 @@ class InvPackingCustomer extends BaseController
                     'grade' => $s->grade,
                     'packing' => $s->packing,
                     'can' => $s->can,
-                    'cased' => $s->cased,
                     'kg' => $s->kg,
                     'lb' => $s->lb,
                     'inner_box' => $s->inner_box,
@@ -591,14 +570,15 @@ class InvPackingCustomer extends BaseController
                     'bag' => $s->bag,
                     'palet' => $s->palet,
                     'persen' => $s->persen,
-                    'remark' => $s->remark,
                     'qty' => $s->qty,
                     'harga' => $s->harga,
                     'total' => $s->total,
                     'berat_bersih' => $s->berat_bersih,
                     'berat_kotor' => $s->berat_kotor,
                     'vgm' => $s->vgm,
-                    'drammed' => $s->drammed
+                    'drammed' => $s->drammed,
+                    'cased' => $s->case,
+                    'cup' => $s->cup,
                 ]);
             }
         }
