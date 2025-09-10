@@ -289,16 +289,28 @@ class KwitansiTb extends BaseController
     {
         $month = $this->request->getGet('month');
         $year = $this->request->getGet('year');
-        $tbSearch = $this->request->getGet('tb_search');
-        $supplierSearch = $this->request->getGet('supplier_search');
 
-        $allSuppliers = $this->supplierModel->getSupplierByType("BAHAN BAKU");
-        $noKwitansi = '';
+        $condition = [
+            'MONTH(rm_purchase_orders.po_date)' => $month,
+            'YEAR(rm_purchase_orders.po_date)' => $year,
+            'rm_purchase_orders.deletedAt' => null,
+            'suppliers.deletedAt' => null,
+            'suppliers.company_id' => $this->this_company_id
+        ];
+
+        $allSuppliers = $this->supplierModel->select('suppliers.*,SUM(dpp_bulanan)')
+            ->join('rm_purchase_orders', 'rm_purchase_orders.supplier_id = suppliers.id', 'left')
+            ->where($condition)
+            ->groupBy('suppliers.id')
+            ->findAll();
+
         $dataResult = [];
 
-        foreach ($allSuppliers as $data) {
-            if ($supplierSearch && stripos($data['name'], $supplierSearch) === false) continue;
+        $company = (new CompaniesModel())->where('id', $this->this_company_id)->where('deletedAt', null)->first();
+        $provinsi = (new ProvincesModel())->where('id', $company['province_id'])->first();
+        $noKwitansi = '';
 
+        foreach ($allSuppliers as $data) {
             $kwitansiTB = $this->supplierModel->getKwitansiTBBySupplier(
                 $data['id'],
                 $year,
@@ -306,17 +318,9 @@ class KwitansiTb extends BaseController
             );
 
             $totalTB = $kwitansiTB['total'];
-            $masuk = false;
 
-            if ($tbSearch === "1" && $totalTB != 0) $masuk = true;
-            elseif ($tbSearch === "0" && $totalTB == 0) $masuk = true;
-            elseif ($tbSearch === null || $tbSearch === '') $masuk = true;
-
-            if ($masuk && $totalTB != 0) {
+            if ($totalTB != 0) {
                 $noKwitansi = ($noKwitansi == '') ? "001/KTB/$month/$year" : generateNoKwitansiTB($noKwitansi, $month, $year);
-                $company = (new CompaniesModel())->where('id', $this->this_company_id)->where('deletedAt', null)->first();
-                $provinsi = (new ProvincesModel())->where('id', $company['province_id'])->first();
-
                 $tanggal = "$year-$month-" . date("t", strtotime("$year-$month-01"));
 
                 $namaBarang = "";
