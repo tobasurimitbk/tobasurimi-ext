@@ -147,13 +147,13 @@
                                     <th style="text-align: center;">Qty Sebelum Kopek</th>
                                     <th style="text-align: center;">Rasio (%)</th>
 
-                                    <th style="text-align: center;">JUMBO</th>
+                                    <!-- <th style="text-align: center;">JUMBO</th>
                                     <th style="text-align: center;">EX LUMP</th>
                                     <th style="text-align: center;">LUMP</th>
                                     <th style="text-align: center;">SPESIAL</th>
                                     <th style="text-align: center;">CLAW</th>
                                     <th style="text-align: center;">MH</th>
-                                    <th style="text-align: center;">CF</th>
+                                    <th style="text-align: center;">CF</th> -->
 
                                     <th style="text-align: center;">TOTAL</th>
                                 </tr>
