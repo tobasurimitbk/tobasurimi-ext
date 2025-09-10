@@ -505,8 +505,7 @@ class JasaVendorOutKepitingKukus extends BaseController
             ->groupStart()
                 ->like('barang_master.barang_name', $term)
                 ->orLike('barang_master_spesifikasi.spesifikasi', $term)
-            ->groupEnd()
-            ->limit(40);
+            ->groupEnd();
 
         $data = $builder->get()->getResultArray();
 
