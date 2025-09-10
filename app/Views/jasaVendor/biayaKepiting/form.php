@@ -132,31 +132,8 @@
                 <div class="col-md-12">
                     <div class="table-responsive">
                         <table class="table table-bordered nowrap table-hover-tobasurimi dataTable" id="dataTable" width="100%" border="1" cellspacing="0"=>
-                            <thead class="thead-dark">
-                                <tr>
-                                    <th style="text-align: center;" colspan="3"></th>
-                                    <th style="text-align: center;" colspan="2">Kg Bahan Baku</th>
-                                    <th style="text-align: center;" colspan="8"></th>
-                                </tr>
-                                <tr>
-                                    <th style="text-align: center;">No</th>
-                                    <th style="text-align: center;">Tanggal Masuk</th>
-                                    <th style="text-align: center;">Supplier - Keterangan</th>
-
-
-                                    <th style="text-align: center;">Qty Sebelum Kopek</th>
-                                    <th style="text-align: center;">Rasio (%)</th>
-
-                                    <!-- <th style="text-align: center;">JUMBO</th>
-                                    <th style="text-align: center;">EX LUMP</th>
-                                    <th style="text-align: center;">LUMP</th>
-                                    <th style="text-align: center;">SPESIAL</th>
-                                    <th style="text-align: center;">CLAW</th>
-                                    <th style="text-align: center;">MH</th>
-                                    <th style="text-align: center;">CF</th> -->
-
-                                    <th style="text-align: center;">TOTAL</th>
-                                </tr>
+                            <thead class="thead-dark" id="dynamicHeader">
+                                <!-- Header akan diisi secara dinamis -->
                             </thead>
                             <tbody class="body-table">
                             </tbody>
@@ -821,475 +798,362 @@
         });
     }
 
+   // Fungsi untuk membuat header tabel secara dinamis
+    function buildDynamicHeader() {
+        const thead = $('#dynamicHeader');
+        thead.empty();
+        
+        // Baris pertama header
+        let firstRow = `<tr>
+            <th style="text-align: center;" colspan="3"></th>
+            <th style="text-align: center;" colspan="2">Kg Bahan Baku</th>
+            <th style="text-align: center;" colspan="${listBarang.thead ? listBarang.thead.length : 7}">Hasil Kopek</th>
+            <th style="text-align: center;" colspan="1"></th>
+        </tr>`;
+        
+        // Baris kedua header
+        let secondRow = `<tr>
+            <th style="text-align: center;">No</th>
+            <th style="text-align: center;">Tanggal Masuk</th>
+            <th style="text-align: center;">Supplier - Keterangan</th>
+            <th style="text-align: center;">Qty Sebelum Kopek</th>
+            <th style="text-align: center;">Rasio (%)</th>`;
+        
+        // Tambahkan kolom untuk setiap spesifikasi
+        if (listBarang.thead && listBarang.thead.length > 0) {
+            listBarang.thead.forEach(spec => {
+                secondRow += `<th style="text-align: center;">${spec}</th>`;
+            });
+        } else {
+            // Fallback jika tidak ada data thead
+            secondRow += `
+                <th style="text-align: center;">JUMBO</th>
+                <th style="text-align: center;">EX LUMP</th>
+                <th style="text-align: center;">LUMP</th>
+                <th style="text-align: center;">SPESIAL</th>
+                <th style="text-align: center;">CLAW</th>
+                <th style="text-align: center;">MH</th>
+                <th style="text-align: center;">CF</th>
+            `;
+        }
+        
+        secondRow += `<th style="text-align: center;">TOTAL</th></tr>`;
+        
+        thead.append(firstRow);
+        thead.append(secondRow);
+    }
+
+    // Fungsi utama untuk menggambar tabel
     function drawTable() {
         const table = $('#dataTable');
         $('.foot-detail-table').empty();
         $('.body-table').empty();
+        
+        // Bangun header dinamis
+        buildDynamicHeader();
+        
         var no = 1;
         let row = null;
         
-        if (listBarang.length == 0) {
-            row += `
-                    <tr>
-                        <td colspan="13" style="text-align: center;">
-                            Tidak Ada Barang
-                        </td>
-                    </tr>
-                `;
+        if (listBarang.data && listBarang.data.length == 0) {
+            row = `
+                <tr>
+                    <td colspan="${5 + (listBarang.thead ? listBarang.thead.length : 0)}" style="text-align: center;">
+                        Tidak Ada Barang
+                    </td>
+                </tr>
+            `;
             $('.foot-detail-table').append(row);
         } else {
+            var totalPerSpek = {}; // simpan total tiap spek
             var qtyKopekTotal = 0;
-            var jumboTotal = 0;
-            var exLumpTotal = 0;
-            var lumpTotal = 0;
-            var specialTotal = 0;
-            var clawTotal = 0;
-            var mhTotal = 0;
-            var cfTotal = 0;
             var totalTotal = 0;
-            var totalRasio = 0;
 
-            // DATATABLE 1
-            $.each(listBarang, function(i, v) {
-                var total = parseFloat(v.jumbo) + parseFloat(v.ex_lump) + parseFloat(v.lump) + parseFloat(v.special) + parseFloat(v.claw) + parseFloat(v.mh) + parseFloat(v.cf)
-                var rasio = total == 0.00 ? 0 : ((total / v.qty_kopek) * 100).toFixed(2);
-                var newRow = $('<tr  style="color:whitesmoke;">');
-                newRow.append($('<td style="text-align: center;">').html(
-                    `
-                            ${no++} 
-                        `
-                ));
+            // Proses data
+            $.each(listBarang.data, function(i, v) {
+                // Hitung total berdasarkan spesifikasi yang ada
+                let total = 0;
+                if (v.spek) {
+                    for (const [key, value] of Object.entries(v.spek)) {
+                        total += parseFloat(value || 0);
+                    }
+                }
+                
+                var rasio = total == 0.00 ? 0 : ((total / v.qty_sebelum_kopek) * 100).toFixed(2);
+                
+                var newRow = $('<tr style="color:whitesmoke;">');
+                newRow.append($('<td style="text-align: center;">').html(`${no++}`));
                 newRow.append($('<td style="text-align: center;">').text(v.tanggal_masuk));
-                newRow.append($('<td style="text-align: center;">').text(v.nama_barang));
-                newRow.append($('<td>').text(parseFloat(v.qty_kopek).toFixed(2)));
+                newRow.append($('<td style="text-align: center;">').text(v.supplier + ' - ' + v.keterangan));
+                newRow.append($('<td>').text(parseFloat(v.qty_sebelum_kopek).toFixed(2)));
                 newRow.append($('<td>').text(rasio + ' %'));
-                newRow.append($('<td style="text-align: center;">').html(
-                    `
-                            <input id="${i+'_1_jumbo'}" <?= !empty($biayaKepiting) ? (($biayaKepiting['status_posting'] == "1") ? 'disabled' : '') : '' ?> style="height: 40px; padding-bottom: 10px; min-width: 100px;" class="form-control jumbo" oninput="preventNegativeInput(this)" data-spesifikasi_id="${v.barang_master_spesifikasi_id}"  autocomplete="one-time-code" class="form-control jumbo" type="text" onkeyup="autoComplete()" value="${v.jumbo}">
-                        `
-                ));
-                newRow.append($('<td style="text-align: center;">').html(
-                    `
-                            <input id="${i+'_1_ex_lump'}" <?= !empty($biayaKepiting) ? (($biayaKepiting['status_posting'] == "1") ? 'disabled' : '') : '' ?> style="height: 40px; padding-bottom: 10px; min-width: 100px;" class="form-control ex_lump" oninput="preventNegativeInput(this)" data-spesifikasi_id="${v.barang_master_spesifikasi_id}" autocomplete="one-time-code" class="form-control ex_lump" onkeyup="autoComplete()" type="text" value="${v.ex_lump}">
-                        `
-                ));
-                newRow.append($('<td style="text-align: center;">').html(
-                    `
-                            <input id="${i+'_1_lump'}" <?= !empty($biayaKepiting) ? (($biayaKepiting['status_posting'] == "1") ? 'disabled' : '') : '' ?> style="height: 40px; padding-bottom: 10px; min-width: 100px;" class="form-control lump" oninput="preventNegativeInput(this)" data-spesifikasi_id="${v.barang_master_spesifikasi_id}" autocomplete="one-time-code" class="form-control lump" onkeyup="autoComplete()" type="text" value="${v.lump}">
-                        `
-                ));
-                newRow.append($('<td style="text-align: center;">').html(
-                    `
-                            <input id="${i+'_1_special'}" <?= !empty($biayaKepiting) ? (($biayaKepiting['status_posting'] == "1") ? 'disabled' : '') : '' ?> style="height: 40px; padding-bottom: 10px; min-width: 100px;" class="form-control special" oninput="preventNegativeInput(this)" data-spesifikasi_id="${v.barang_master_spesifikasi_id}" autocomplete="one-time-code" class="form-control special" onkeyup="autoComplete()" type="text" value="${v.special}">
-                        `
-                ));
-                newRow.append($('<td style="text-align: center;">').html(
-                    `
-                            <input id="${i+'_1_claw'}" <?= !empty($biayaKepiting) ? (($biayaKepiting['status_posting'] == "1") ? 'disabled' : '') : '' ?> style="height: 40px; padding-bottom: 10px; min-width: 100px;" class="form-control claw" oninput="preventNegativeInput(this)" data-spesifikasi_id="${v.barang_master_spesifikasi_id}" autocomplete="one-time-code" class="form-control claw" onkeyup="autoComplete()" type="text" value="${v.claw}">
-                        `
-                ));
-                newRow.append($('<td style="text-align: center;">').html(
-                    `
-                            <input id="${i+'_1_mh'}" <?= !empty($biayaKepiting) ? (($biayaKepiting['status_posting'] == "1") ? 'disabled' : '') : '' ?> style="height: 40px; padding-bottom: 10px; min-width: 100px;" class="form-control mh" oninput="preventNegativeInput(this)" data-spesifikasi_id="${v.barang_master_spesifikasi_id}" autocomplete="one-time-code" class="form-control mh" onkeyup="autoComplete()" type="text" value="${v.mh}">
-                        `
-                ));
-                newRow.append($('<td style="text-align: center;">').html(
-                    `
-                            <input id="${i+'_1_cf'}" <?= !empty($biayaKepiting) ? (($biayaKepiting['status_posting'] == "1") ? 'disabled' : '') : '' ?> style="height: 40px; padding-bottom: 10px; min-width: 100px;" class="form-control cf" oninput="preventNegativeInput(this)" data-spesifikasi_id="${v.barang_master_spesifikasi_id}" autocomplete="one-time-code" class="form-control cf" onkeyup="autoComplete()" type="text" value="${v.cf}">
-                        `
-                ));
+                
+                // Tambahkan input untuk setiap spesifikasi (dinamis)
+                if (listBarang.thead && listBarang.thead.length > 0) {
+                    listBarang.thead.forEach(spec => {
+                        const value = v.spek && v.spek[spec] ? v.spek[spec] : 0;
+
+                        newRow.append($('<td style="text-align: center;">').html(`
+                            <input id="${i+'_'+spec}" 
+                                style="height: 40px; padding-bottom: 10px; min-width: 100px;" 
+                                class="form-control ${spec.toLowerCase().replace(/\s+/g, '_')}" 
+                                oninput="preventNegativeInput(this)" 
+                                autocomplete="one-time-code" 
+                                type="text" 
+                                value="${value}">
+                        `));
+                        
+                        // Akumulasi total spek
+                        if (!totalPerSpek[spec]) totalPerSpek[spec] = 0;
+                        totalPerSpek[spec] += parseFloat(value || 0);
+                    });
+                }
 
                 newRow.append($('<td>').text(total.toFixed(3)));
                 table.find('tbody').append(newRow);
 
-                jumboTotal += parseFloat(v.jumbo);
-                exLumpTotal += parseFloat(v.ex_lump);
-                lumpTotal += parseFloat(v.lump);
-                specialTotal += parseFloat(v.special);
-                clawTotal += parseFloat(v.claw);
-                mhTotal += parseFloat(v.mh);
-                cfTotal += parseFloat(v.cf);
                 totalTotal += total;
-                qtyKopekTotal += parseFloat(v.qty_kopek);
+                qtyKopekTotal += parseFloat(v.qty_sebelum_kopek);
             });
 
-            totalRasio = qtyKopekTotal == 0 ? 0 : ((totalTotal / qtyKopekTotal) * 100);
+            var totalRasio = qtyKopekTotal == 0 ? 0 : ((totalTotal / qtyKopekTotal) * 100);
 
-            // GRAND TOTAL 1
-            var newRow = $('<tr style="color:whitesmoke; background-color:#f2c996;">');
-            newRow.append($('<td style="text-align: center;" colspan="3">').html("<b>TOTAL</b>"));
+            // GRAND TOTAL (dinamis)
+            var newRow = $('<tr class="bg-total">');
+            newRow.append($('<td style="text-align: center;">').html("<b>TOTAL</b>"));
+            newRow.append($('<td style="text-align: center;">')); // kosong biar balance
+            newRow.append($('<td style="text-align: center;">')); // kosong biar balance
             newRow.append($('<td>').text(qtyKopekTotal.toFixed(2)));
             newRow.append($('<td>').text(totalRasio.toFixed(2) + ' %'));
-            newRow.append($('<td>').text(jumboTotal.toFixed(2)));
-            newRow.append($('<td>').text(exLumpTotal.toFixed(2)));
-            newRow.append($('<td>').text(lumpTotal.toFixed(2)));
-            newRow.append($('<td>').text(specialTotal.toFixed(2)));
-            newRow.append($('<td>').text(clawTotal.toFixed(2)));
-            newRow.append($('<td>').text(mhTotal.toFixed(2)));
-            newRow.append($('<td>').text(cfTotal.toFixed(2)));
+            
+            if (listBarang.thead && listBarang.thead.length > 0) {
+                listBarang.thead.forEach(spec => {
+                    let totalSpec = totalPerSpek[spec] ? totalPerSpek[spec] : 0;
+                    newRow.append($('<td>').text(totalSpec.toFixed(2)));
+                });
+            }
+            
             newRow.append($('<td>').text(totalTotal.toFixed(3)));
             table.find('tbody').append(newRow);
-
-            // DATATABLE 2
-            const table2 = $('#dataTable2');
-            $('.foot-detail-table-2').empty();
-            $('.body-table-2').empty();
-
-            if (listPerolehanGaji.length == 0) {
-                row2 += `
-                    <tr>
-                        <td colspan="9" style="text-align: center;">
-                            Tidak Ada Barang
-                        </td>
-                    </tr>
-                `;
-                $('.foot-detail-table-2').append(row2);
-            } else {
-                var gajiTotal = 0;
-                var upahKopekJumbo = 0;
-                var upahKopekExLump = 0;
-                var upahKopekLump = 0;
-                var upahKopekSpecial = 0;
-                var upahKopekClaw = 0;
-                var upahKopekMh = 0;
-                var upahKopekCf = 0;
-
-                var komisiDagingJumbo = 0;
-                var komisiDagingExLump = 0;
-                var komisiDagingLump = 0;
-                var komisiDagingSpecial = 0;
-                var komisiDagingClaw = 0;
-                var komisiDagingMh = 0;
-                var komisiDagingCf = 0;
-
-                var bonusDagingJumbo = 0;
-                var bonusDagingExLump = 0;
-                var bonusDagingLump = 0;
-                var bonusDagingSpecial = 0;
-                var bonusDagingClaw = 0;
-                var bonusDagingMh = 0;
-                var bonusDagingCf = 0;
-
-                var tambahanJumbo = 0;
-                var tambahanExLump = 0;
-                var tambahanLump = 0;
-                var tambahanSpecial = 0;
-                var tambahanClaw = 0;
-                var tambahanMh = 0;
-                var tambahanCf = 0;
-
-                // Gunakan data vendor untuk perhitungan jika tersedia
-                var vendorData = listDataVendor || {};
-                
-                $.each(listPerolehanGaji, function(i, v) {
-                    // Gunakan nilai dari vendor jika tersedia, jika tidak gunakan nilai dari data
-                    if (v.value === 'upah_kopek') {
-                        v.jumbo = vendorData.upah_jb || v.jumbo;
-                        v.ex_lump = vendorData.upah_xl || v.ex_lump;
-                        v.lump = vendorData.upah_lp || v.lump;
-                        v.special = vendorData.upah_sp || v.special;
-                        v.claw = vendorData.upah_cl || v.claw;
-                        v.mh = vendorData.upah_mh || v.mh;
-                        v.cf = vendorData.upah_cf || v.cf;
-                    } else if (v.value === 'komisi_kg_daging') {
-                        v.jumbo = vendorData.komisi_vendor || v.jumbo;
-                        v.ex_lump = vendorData.komisi_vendor || v.ex_lump;
-                        v.lump = vendorData.komisi_vendor || v.lump;
-                        v.special = vendorData.komisi_vendor || v.special;
-                        v.claw = vendorData.komisi_vendor || v.claw;
-                        v.mh = vendorData.komisi_vendor || v.mh;
-                        v.cf = vendorData.komisi_vendor || v.cf;
-                    } else if (v.value === 'bonus_kg_daging') {
-                        v.jumbo = vendorData.bonus_jb || v.jumbo;
-                        v.ex_lump = vendorData.bonus_xl || v.ex_lump;
-                        v.lump = vendorData.bonus_lp || v.lump;
-                        v.special = vendorData.bonus_sp || v.special;
-                        v.claw = vendorData.bonus_cl || v.claw;
-                        v.mh = vendorData.bonus_mh || v.mh;
-                        v.cf = vendorData.bonus_cf || v.cf;
-                    } else if (v.value === 'tamb_upah_kopek') {
-                        v.jumbo = vendorData.tambahan_upah_kopek_jb || v.jumbo;
-                        v.ex_lump = vendorData.tambahan_upah_kopek_xl || v.ex_lump;
-                        v.lump = vendorData.tambahan_upah_kopek_lp || v.lump;
-                        v.special = vendorData.tambahan_upah_kopek_sp || v.special;
-                        v.claw = vendorData.tambahan_upah_kopek_cl || v.claw;
-                        v.mh = vendorData.tambahan_upah_kopek_mh || v.mh;
-                        v.cf = vendorData.tambahan_upah_kopek_cf || v.cf;
-                    }
-
-                    var total = parseFloat(v.jumbo) + parseFloat(v.ex_lump) + parseFloat(v.lump) + parseFloat(v.special) + parseFloat(v.claw) + parseFloat(v.mh) + parseFloat(v.cf);
-                    gajiTotal += total;
-
-                    if (v.description == 'Upah Kopek') {
-                        upahKopekJumbo = parseFloat(v.jumbo);
-                        upahKopekExLump = parseFloat(v.ex_lump);
-                        upahKopekLump = parseFloat(v.lump);
-                        upahKopekSpecial = parseFloat(v.special);
-                        upahKopekClaw = parseFloat(v.claw);
-                        upahKopekMh = parseFloat(v.mh);
-                        upahKopekCf = parseFloat(v.cf);
-                    }
-
-                    if (v.description == 'Komisi / Kg Daging') {
-                        komisiDagingJumbo = parseFloat(v.jumbo);
-                        komisiDagingExLump = parseFloat(v.ex_lump);
-                        komisiDagingLump = parseFloat(v.lump);
-                        komisiDagingSpecial = parseFloat(v.special);
-                        komisiDagingClaw = parseFloat(v.claw);
-                        komisiDagingMh = parseFloat(v.mh);
-                        komisiDagingCf = parseFloat(v.cf);
-                    }
-
-                    if (v.description == 'Bonus / Kg Daging') {
-                        bonusDagingJumbo = parseFloat(v.jumbo);
-                        bonusDagingExLump = parseFloat(v.ex_lump);
-                        bonusDagingLump = parseFloat(v.lump);
-                        bonusDagingSpecial = parseFloat(v.special);
-                        bonusDagingClaw = parseFloat(v.claw);
-                        bonusDagingMh = parseFloat(v.mh);
-                        bonusDagingCf = parseFloat(v.cf);
-                    }
-
-                    if (v.value == 'tamb_upah_kopek') {
-                        tambahanJumbo = parseFloat(v.jumbo);
-                        tambahanExLump = parseFloat(v.ex_lump);
-                        tambahanLump = parseFloat(v.lump);
-                        tambahanSpecial = parseFloat(v.special);
-                        tambahanClaw = parseFloat(v.claw);
-                        tambahanMh = parseFloat(v.mh);
-                        tambahanCf = parseFloat(v.cf);
-                    }
-
-                    var newRow = $('<tr  style="color:whitesmoke;">');
-                    newRow.append($('<td>').text(v.description));
-                    newRow.append($('<td style="text-align: center;">').html(
-                        `
-                            <input id="${i+'_2_jumbo'}" <?= !empty($biayaKepiting) ? (($biayaKepiting['status_posting'] == "1") ? 'disabled' : '') : '' ?> style="height: 40px; padding-bottom: 10px;" class="form-control ${v.value}_jumbo" oninput="preventNegativeInput(this)" autocomplete="one-time-code" class="form-control ${v.value}_jumbo" type="text" onkeyup="autoComplete()" value="${v.jumbo}">
-                        `
-                    ));
-                    newRow.append($('<td style="text-align: center;">').html(
-                        `
-                            <input id="${i+'_2_ex_lump'}" <?= !empty($biayaKepiting) ? (($biayaKepiting['status_posting'] == "1") ? 'disabled' : '') : '' ?> style="height: 40px; padding-bottom: 10px;" class="form-control ${v.value}_ex_lump" oninput="preventNegativeInput(this)" autocomplete="one-time-code" class="form-control ${v.value}_ex_lump" type="text" onkeyup="autoComplete()" value="${v.ex_lump}">
-                        `
-                    ));
-                    newRow.append($('<td style="text-align: center;">').html(
-                        `
-                            <input id="${i+'_2_lump'}" <?= !empty($biayaKepiting) ? (($biayaKepiting['status_posting'] == "1") ? 'disabled' : '') : '' ?> style="height: 40px; padding-bottom: 10px;" class="form-control ${v.value}_lump" oninput="preventNegativeInput(this)" autocomplete="one-time-code" type="text" onkeyup="autoComplete()" value="${v.lump}">
-                        `
-                    ));
-
-                    newRow.append($('<td style="text-align: center;">').html(
-                        `
-                            <input id="${i+'_2_special'}" <?= !empty($biayaKepiting) ? (($biayaKepiting['status_posting'] == "1") ? 'disabled' : '') : '' ?> style="height: 40px; padding-bottom: 10px;" class="form-control ${v.value}_special" oninput="preventNegativeInput(this)" autocomplete="one-time-code" class="form-control ${v.value}_special" type="text" onkeyup="autoComplete()" value="${v.special}">
-                        `
-                    ));
-                    newRow.append($('<td style="text-align: center;">').html(
-                        `
-                            <input id="${i+'_2_claw'}" <?= !empty($biayaKepiting) ? (($biayaKepiting['status_posting'] == "1") ? 'disabled' : '') : '' ?> style="height: 40px; padding-bottom: 10px;" class="form-control ${v.value}_claw" oninput="preventNegativeInput(this)" autocomplete="one-time-code" class="form-control ${v.value}_claw" type="text" onkeyup="autoComplete()" value="${v.claw}">
-                        `
-                    ));
-                    newRow.append($('<td style="text-align: center;">').html(
-                        `
-                            <input id="${i+'_2_mh'}" <?= !empty($biayaKepiting) ? (($biayaKepiting['status_posting'] == "1") ? 'disabled' : '') : '' ?> style="height: 40px; padding-bottom: 10px;" class="form-control ${v.value}_mh" oninput="preventNegativeInput(this)" autocomplete="one-time-code" class="form-control ${v.value}_mh" type="text" onkeyup="autoComplete()" value="${v.mh}">
-                        `
-                    ));
-                    newRow.append($('<td style="text-align: center;">').html(
-                        `
-                            <input id="${i+'_2_cf'}" <?= !empty($biayaKepiting) ? (($biayaKepiting['status_posting'] == "1") ? 'disabled' : '') : '' ?> style="height: 40px; padding-bottom: 10px;" class="form-control ${v.value}_cf" oninput="preventNegativeInput(this)" autocomplete="one-time-code" class="form-control ${v.value}_cf" type="text" onkeyup="autoComplete()" value="${v.cf}">
-                        `
-                    ));
-                    newRow.append($('<td>').text(formatRupiah1(total.toFixed(2))));
-                    table2.find('tbody').append(newRow);
-                });
-
-                // Hitung total berdasarkan jumlah aktual dan harga dari vendor
-                var totalUpahKopekJumbo = jumboTotal * upahKopekJumbo;
-                var totalUpahKopekExLump = exLumpTotal * upahKopekExLump;
-                var totalUpahKopekLump = lumpTotal * upahKopekLump;
-                var totalUpahKopekSpecial = specialTotal * upahKopekSpecial;
-                var totalUpahKopekClaw = clawTotal * upahKopekClaw;
-                var totalUpahKopekMh = mhTotal * upahKopekMh;
-                var totalUpahKopekCf = cfTotal * upahKopekCf;
-                var totalUpahKopek = totalUpahKopekJumbo + totalUpahKopekExLump + totalUpahKopekLump + totalUpahKopekSpecial + totalUpahKopekClaw + totalUpahKopekMh + totalUpahKopekCf;
-
-                var newRow3 = $('<tr style="color:whitesmoke; background-color:#f2c996;">');
-                newRow3.append($('<td style="text-align: center;">').html("<b>TOTAL UPAH KOPEK / KG</b>"));
-                newRow3.append($('<td>').text((totalUpahKopekJumbo != 0 ? formatRupiah1((totalUpahKopekJumbo).toFixed(2)) : '0')));
-                newRow3.append($('<td>').text((totalUpahKopekExLump != 0 ? formatRupiah1((totalUpahKopekExLump).toFixed(2)) : '0')));
-                newRow3.append($('<td>').text((totalUpahKopekLump != 0 ? formatRupiah1((totalUpahKopekLump).toFixed(2)) : '0')));
-                newRow3.append($('<td>').text((totalUpahKopekSpecial != 0 ? formatRupiah1((totalUpahKopekSpecial).toFixed(2)) : '0')));
-                newRow3.append($('<td>').text((totalUpahKopekClaw != 0 ? formatRupiah1((totalUpahKopekClaw).toFixed(2)) : '0')));
-                newRow3.append($('<td>').text((totalUpahKopekMh != 0 ? formatRupiah1((totalUpahKopekMh).toFixed(2)) : '0')));
-                newRow3.append($('<td>').text((totalUpahKopekCf != 0 ? formatRupiah1((totalUpahKopekCf).toFixed(2)) : '0')));
-
-                newRow3.append($('<td>').text(formatRupiah1(totalUpahKopek.toFixed(2))));
-                table2.find('tbody').append(newRow3);
-
-                var totalKomisiJumbo = jumboTotal * komisiDagingJumbo;
-                var totalKomisiExLump = exLumpTotal * komisiDagingExLump;
-                var totalKomisiLump = lumpTotal * komisiDagingLump;
-                var totalKomisiSpecial = specialTotal * komisiDagingSpecial;
-                var totalKomisiClaw = clawTotal * komisiDagingClaw;
-                var totalKomisiMh = mhTotal * komisiDagingMh;
-                var totalKomisiCf = cfTotal * komisiDagingCf;
-                var totalKomisi = totalKomisiJumbo + totalKomisiExLump + totalKomisiLump + totalKomisiSpecial + totalKomisiClaw + totalKomisiMh + totalKomisiCf;
-
-                var newRow4 = $('<tr style="color:whitesmoke; background-color:#f2c996;">');
-                newRow4.append($('<td style="text-align: center;">').html("<b>TOTAL KOMISI / KG</b>"));
-                newRow4.append($('<td>').text((totalKomisiJumbo != 0 ? formatRupiah1((totalKomisiJumbo).toFixed(2)) : '0')));
-                newRow4.append($('<td>').text((totalKomisiExLump != 0 ? formatRupiah1((totalKomisiExLump).toFixed(2)) : '0')));
-                newRow4.append($('<td>').text((totalKomisiLump != 0 ? formatRupiah1((totalKomisiLump).toFixed(2)) : '0')));
-                newRow4.append($('<td>').text((totalKomisiSpecial != 0 ? formatRupiah1((totalKomisiSpecial).toFixed(2)) : '0')));
-                newRow4.append($('<td>').text((totalKomisiClaw != 0 ? formatRupiah1((totalKomisiClaw).toFixed(2)) : '0')));
-                newRow4.append($('<td>').text((totalKomisiMh != 0 ? formatRupiah1((totalKomisiMh).toFixed(2)) : '0')));
-                newRow4.append($('<td>').text((totalKomisiCf != 0 ? formatRupiah1((totalKomisiCf).toFixed(2)) : '0')));
-
-                newRow4.append($('<td>').text(formatRupiah1(totalKomisi)));
-                table2.find('tbody').append(newRow4);
-
-                var totalBonusJumbo = jumboTotal * bonusDagingJumbo;
-                var totalBonusExLump = exLumpTotal * bonusDagingExLump;
-                var totalBonusLump = lumpTotal * bonusDagingLump;
-                var totalBonusSpecial = specialTotal * bonusDagingSpecial;
-                var totalBonusClaw = clawTotal * bonusDagingClaw;
-                var totalBonusMh = mhTotal * bonusDagingMh;
-                var totalBonusCf = cfTotal * bonusDagingCf;
-                var totalBonus = totalBonusJumbo + totalBonusExLump + totalBonusLump + totalBonusSpecial + totalBonusClaw + totalBonusMh + totalBonusCf;
-
-                var newRow5 = $('<tr style="color:whitesmoke; background-color:#f2c996;">');
-                newRow5.append($('<td style="text-align: center;">').html("<b>TOTAL BONUS / KG</b>"));
-                newRow5.append($('<td>').text((totalBonusJumbo != 0 ? formatRupiah1((totalBonusJumbo).toFixed(2)) : '0')));
-                newRow5.append($('<td>').text((totalBonusExLump != 0 ? formatRupiah1((totalBonusExLump).toFixed(2)) : '0')));
-                newRow5.append($('<td>').text((totalBonusLump != 0 ? formatRupiah1((totalBonusLump).toFixed(2)) : '0')));
-                newRow5.append($('<td>').text((totalBonusSpecial != 0 ? formatRupiah1((totalBonusSpecial).toFixed(2)) : '0')));
-                newRow5.append($('<td>').text((totalBonusClaw != 0 ? formatRupiah1((totalBonusClaw).toFixed(2)) : '0')));
-                newRow5.append($('<td>').text((totalBonusMh != 0 ? formatRupiah1((totalBonusMh).toFixed(2)) : '0')));
-                newRow5.append($('<td>').text((totalBonusCf != 0 ? formatRupiah1((totalBonusCf).toFixed(2)) : '0')));
-
-                newRow5.append($('<td>').text(formatRupiah1(totalBonus)));
-                table2.find('tbody').append(newRow5);
-
-                var totalTambahanJumbo = jumboTotal * tambahanJumbo;
-                var totalTambahanExLump = exLumpTotal * tambahanExLump;
-                var totalTambahanLump = lumpTotal * tambahanLump;
-                var totalTambahanSpecial = specialTotal * tambahanSpecial;
-                var totalTambahanClaw = clawTotal * tambahanClaw;
-                var totalTambahanMh = mhTotal * tambahanMh;
-                var totalTambahanCf = cfTotal * tambahanCf;
-                var totalTambahan = totalTambahanJumbo + totalTambahanExLump + totalTambahanLump + totalTambahanSpecial + totalTambahanClaw + totalTambahanMh + totalTambahanCf;
-
-                var newRow6 = $('<tr style="color:whitesmoke; background-color:#f2c996;">');
-                newRow6.append($('<td style="text-align: center;">').html("<b>TOTAL TAMBAHAN</b>"));
-                newRow6.append($('<td>').text((totalTambahanJumbo != 0 ? formatRupiah1((totalTambahanJumbo).toFixed(2)) : '0')));
-                newRow6.append($('<td>').text((totalTambahanExLump != 0 ? formatRupiah1((totalTambahanExLump).toFixed(2)) : '0')));
-                newRow6.append($('<td>').text((totalTambahanLump != 0 ? formatRupiah1((totalTambahanLump).toFixed(2)) : '0')));
-                newRow6.append($('<td>').text((totalTambahanSpecial != 0 ? formatRupiah1((totalTambahanSpecial).toFixed(2)) : '0')));
-                newRow6.append($('<td>').text((totalTambahanClaw != 0 ? formatRupiah1((totalTambahanClaw).toFixed(2)) : '0')));
-                newRow6.append($('<td>').text((totalTambahanMh != 0 ? formatRupiah1((totalTambahanMh).toFixed(2)) : '0')));
-                newRow6.append($('<td>').text((totalTambahanCf != 0 ? formatRupiah1((totalTambahanCf).toFixed(2)) : '0')));
-
-                newRow6.append($('<td>').text(formatRupiah1(totalTambahan)));
-                table2.find('tbody').append(newRow6);
-
-                var presentaseJumbo = jumboTotal != 0 ? (jumboTotal * 100 / totalTotal) : 0;
-                var presentaseExLump = exLumpTotal != 0 ? (exLumpTotal * 100 / totalTotal) : 0;
-                var presentaseLump = lumpTotal != 0 ? (lumpTotal * 100 / totalTotal) : 0;
-                var presentaseSpecial = specialTotal != 0 ? (specialTotal * 100 / totalTotal) : 0;
-                var presentaseClaw = clawTotal != 0 ? (clawTotal * 100 / totalTotal) : 0;
-                var presentaseMh = mhTotal != 0 ? (mhTotal * 100 / totalTotal) : 0;
-                var presentaseCf = cfTotal != 0 ? (cfTotal * 100 / totalTotal) : 0;
-                presentaseJumbo = Math.round(presentaseJumbo);
-                presentaseExLump = Math.round(presentaseExLump);
-                presentaseLump = Math.round(presentaseLump);
-                presentaseSpecial = Math.round(presentaseSpecial);
-                presentaseClaw = Math.round(presentaseClaw);
-                presentaseMh = Math.round(presentaseMh);
-                presentaseCf = Math.round(presentaseCf);
-
-                var totalPresentase = presentaseJumbo + presentaseExLump + presentaseLump + presentaseSpecial + presentaseClaw + presentaseMh + presentaseCf;
-
-                var newRow2 = $('<tr style="color:whitesmoke; background-color:#f2c996;">');
-                newRow2.append($('<td style="text-align: center;">').html("<b>PRESENTASE KOPEK</b>"));
-                newRow2.append($('<td>').text((presentaseJumbo != 0 ? (presentaseJumbo).toFixed(2) : '0') + ' %'));
-                newRow2.append($('<td>').text((presentaseExLump != 0 ? (presentaseExLump).toFixed(2) : '0') + ' %'));
-                newRow2.append($('<td>').text((presentaseLump != 0 ? (presentaseLump).toFixed(2) : '0') + ' %'));
-                newRow2.append($('<td>').text((presentaseSpecial != 0 ? (presentaseSpecial).toFixed(2) : '0') + ' %'));
-                newRow2.append($('<td>').text((presentaseClaw != 0 ? (presentaseClaw).toFixed(2) : '0') + ' %'));
-                newRow2.append($('<td>').text((presentaseMh != 0 ? (presentaseMh).toFixed(2) : '0') + ' %'));
-                newRow2.append($('<td>').text((presentaseCf != 0 ? (presentaseCf).toFixed(2) : '0') + ' %'));
-
-                newRow2.append($('<td>').text(totalPresentase.toFixed() + ' %'));
-                table2.find('tbody').append(newRow2);
-
-                // GRAND TOTAL 2    
-                var grandTotalUpahKopek = totalUpahKopek + totalKomisi + totalBonus + totalTambahan;
-                var newRow1 = $('<tr style="color:whitesmoke; background-color:#f2c996;">');
-                newRow1.append($('<td style="text-align: center;" colspan="8">').html("<b>GRAND TOTAL UPAH KOPEK</b>"));
-                newRow1.append($('<td>').text(formatRupiah1(grandTotalUpahKopek.toFixed(2))));
-                table2.find('tbody').append(newRow1);
-            }
-
-            // DATATABLE 3
-            const table3 = $('#dataTable3');
-            $('.foot-detail-table-3').empty();
-            $('.body-table-3').empty();
-            var no = 1;
-            var totalBonusResult = 0;
-            
-            // Gunakan data vendor untuk bonus jika tersedia
-            var vendorData = listDataVendor || {};
-            
-            $.each(listBonus, function(i, v) {
-                // Gunakan nilai bonus dari vendor jika tersedia
-                if (v.spesifikasi === "JB") {
-                    v.bonus_nominal = vendorData.bonus_karyawan_jb || v.bonus_nominal;
-                } else if (v.spesifikasi === "SP LUMP") {
-                    v.bonus_nominal = vendorData.bonus_karyawan_xl || v.bonus_nominal;
-                } else if (v.spesifikasi === "BF") {
-                    v.bonus_nominal = vendorData.bonus_karyawan_lp || v.bonus_nominal;
-                } else if (v.spesifikasi === "SPL") {
-                    v.bonus_nominal = vendorData.bonus_karyawan_sp || v.bonus_nominal;
-                } else if (v.spesifikasi === "CLAW") {
-                    v.bonus_nominal = vendorData.bonus_karyawan_cl || v.bonus_nominal;
-                } else if (v.spesifikasi === "MH") {
-                    v.bonus_nominal = vendorData.bonus_karyawan_mh || v.bonus_nominal;
-                } else if (v.spesifikasi === "CF") {
-                    v.bonus_nominal = vendorData.bonus_karyawan_cf || v.bonus_nominal;
-                }
-                
-                var totalBonus = 0;
-                var newRow = $('<tr  style="color:whitesmoke;">');
-                totalBonus = parseFloat(v.kg_bonus) * parseFloat(v.bonus_nominal);
-                totalBonusResult = totalBonusResult + totalBonus;
-                totalBonus = totalBonus.toFixed(2);
-
-                newRow.append($('<td style="text-align: center;">').html(
-                    `
-                            ${no++} 
-                        `
-                ));
-                newRow.append($('<td style="text-align: center;">').text(v.tanggal_masuk));
-                newRow.append($('<td style="text-align: center;">').text(v.nama_barang));
-                newRow.append($('<td style="text-align: center;">').html(
-                    `
-                            <input id="${i+'_3_kg'}" <?= !empty($biayaKepiting) ? (($biayaKepiting['status_posting'] == "1") ? 'disabled' : '') : '' ?> style="height: 40px; padding-bottom: 10px;" class="form-control kg_bonus" oninput="preventNegativeInput(this)" data-spesifikasi_id="${v.barang_master_spesifikasi_id}"  autocomplete="one-time-code" class="form-control kg_bonus" onkeyup="autoComplete()" type="text" value="${v.kg_bonus}">
-                        `
-                ));
-                newRow.append($('<td style="text-align: center;">').html(
-                    `
-                            <input id="${i+'_3_bonus'}" <?= !empty($biayaKepiting) ? (($biayaKepiting['status_posting'] == "1") ? 'disabled' : '') : '' ?> style="height: 40px; padding-bottom: 10px;" class="form-control bonus_nominal" oninput="preventNegativeInput(this)" data-spesifikasi_id="${v.barang_master_spesifikasi_id}" autocomplete="one-time-code" class="form-control bonus_nominal" onkeyup="autoComplete()" type="text" value="${v.bonus_nominal}">
-                        `
-                ));
-                newRow.append($('<td>').text(formatRupiah1(totalBonus)));
-                table3.find('tbody').append(newRow);
-            })
-
-            var newRow = $('<tr style="color:whitesmoke; background-color:#f2c996;">');
-            newRow.append($('<td style="text-align: center;" colspan="5">').html("<b>GRAND TOTAL</b>"));
-            newRow.append($('<td>').text(formatRupiah1(totalBonusResult.toFixed(2))));
-            table3.find('tbody').append(newRow);
         }
+        
+        // Inisialisasi DataTable
+        if ($.fn.DataTable.isDataTable('#dataTable')) {
+            $('#dataTable').DataTable().destroy();
+        }
+        $('#dataTable').DataTable({
+            scrollX: true,          // ⬅️ aktifin scroll horizontal
+            autoWidth: false,       // ⬅️ biar gak dipaksa balance kolom
+            responsive: false,      // ⬅️ jangan pakai responsive kalau mau scrollX
+            ordering: false,
+            paging: false,
+            searching: false,
+            info: false
+        });
+
+        // ---------- DATA TABLE 2 ----------
+const table2 = $('#dataTable2');
+$('.foot-detail-table-2').empty();
+$('.body-table-2').empty();
+
+if (listPerolehanGaji.length == 0) {
+    // buat row kosong di <tbody> (jangan colspan)
+    let emptyRow = $('<tr>');
+    for (let c=0; c<expectedCols2; c++) {
+        emptyRow.append($('<td>').css('text-align','center').text(c===0 ? 'Tidak Ada Data' : ''));
     }
+    $('.body-table-2').append(emptyRow);
+} else {
+    var gajiTotal = 0;
+    var hargaPerKategori = {}; 
+    var vendorData = listDataVendor || {};
+    
+    // init hargaPerKategori (sama seperti lu)
+    listPerolehanGaji.forEach(item => {
+        hargaPerKategori[item.value] = {};
+        if (item.value === 'upah_kopek') {
+            hargaPerKategori[item.value]['JB'] = vendorData.upah_jb || item.jumbo;
+            hargaPerKategori[item.value]['SP LUMP'] = vendorData.upah_xl || item.ex_lump;
+            hargaPerKategori[item.value]['BF'] = vendorData.upah_lp || item.lump;
+            hargaPerKategori[item.value]['SPL'] = vendorData.upah_sp || item.special;
+            hargaPerKategori[item.value]['CLAW'] = vendorData.upah_cl || item.claw;
+            hargaPerKategori[item.value]['MH'] = vendorData.upah_mh || item.mh;
+            hargaPerKategori[item.value]['CLAW FINGER'] = vendorData.upah_cf || item.cf;
+        } else if (item.value === 'komisi_kg_daging') {
+            const komisiValue = vendorData.komisi_vendor || item.jumbo;
+            (listBarang.thead || []).forEach(spec => {
+                hargaPerKategori[item.value][spec] = komisiValue;
+            });
+        } else if (item.value === 'bonus_kg_daging') {
+            hargaPerKategori[item.value]['JB'] = vendorData.bonus_jb || item.jumbo;
+            hargaPerKategori[item.value]['SP LUMP'] = vendorData.bonus_xl || item.ex_lump;
+            hargaPerKategori[item.value]['BF'] = vendorData.bonus_lp || item.lump;
+            hargaPerKategori[item.value]['SPL'] = vendorData.bonus_sp || item.special;
+            hargaPerKategori[item.value]['CLAW'] = vendorData.bonus_cl || item.claw;
+            hargaPerKategori[item.value]['MH'] = vendorData.bonus_mh || item.mh;
+            hargaPerKategori[item.value]['CLAW FINGER'] = vendorData.bonus_cf || item.cf;
+        } else if (item.value === 'tamb_upah_kopek') {
+            hargaPerKategori[item.value]['JB'] = vendorData.tambahan_upah_kopek_jb || item.jumbo;
+            hargaPerKategori[item.value]['SP LUMP'] = vendorData.tambahan_upah_kopek_xl || item.ex_lump;
+            hargaPerKategori[item.value]['BF'] = vendorData.tambahan_upah_kopek_lp || item.lump;
+            hargaPerKategori[item.value]['SPL'] = vendorData.tambahan_upah_kopek_sp || item.special;
+            hargaPerKategori[item.value]['CLAW'] = vendorData.tambahan_upah_kopek_cl || item.claw;
+            hargaPerKategori[item.value]['MH'] = vendorData.tambahan_upah_kopek_mh || item.mh;
+            hargaPerKategori[item.value]['CLAW FINGER'] = vendorData.tambahan_upah_kopek_cf || item.cf;
+        }
+    });
+
+    // row data (pastikan akses aman ke hargaPerKategori)
+    const specs = ["JB", "SP LUMP", "BF", "SPL", "CLAW", "MH", "CF"];
+    $.each(listPerolehanGaji, function(i, v) {
+        var total = 0;
+        var newRow = $('<tr style="color:whitesmoke;">');
+        newRow.append($('<td>').text(v.description || ''));
+
+        specs.forEach(spec => {
+            const value = (hargaPerKategori[v.value] && hargaPerKategori[v.value][spec]) ? hargaPerKategori[v.value][spec] : 0;
+            newRow.append($('<td style="text-align: center;">').html(`
+                <input id="${i+'_2_'+spec.replace(/\s+/g, '_')}" 
+                       class="form-control ${v.value}_${spec.replace(/\s+/g, '_')}" 
+                       type="text" 
+                       value="${value}">
+            `));
+            total += parseFloat(value || 0);
+        });
+
+        newRow.append($('<td>').text(formatRupiah1(total.toFixed(2))));
+        fillRowToCols(newRow, expectedCols2); // PENTING: isi td kosong jika kurang
+        table2.find('tbody').append(newRow);
+        gajiTotal += total;
+    });
+
+    // TOTAL per kategori -> gunakan expectedCols2 juga
+    const totalPerKategori = {};
+    Object.keys(hargaPerKategori).forEach(kategori => {
+        totalPerKategori[kategori] = 0;
+        (listBarang.thead || []).forEach(spec => {
+            const harga = parseFloat(hargaPerKategori[kategori][spec] || 0);
+            const qty = parseFloat(totalPerSpek && totalPerSpek[spec] ? totalPerSpek[spec] : 0);
+            totalPerKategori[kategori] += harga * qty;
+        });
+    });
+
+    Object.keys(hargaPerKategori).forEach(kategori => {
+        const kategoriName = listPerolehanGaji.find(item => item.value === kategori)?.description || kategori;
+        var newRow = $('<tr style="color:whitesmoke; background-color:#f2c996;">');
+        newRow.append($('<td style="text-align: center;">').html(`<b>TOTAL ${kategoriName.toUpperCase()}</b>`));
+        
+        // pastikan urutan spec sesuai header final; gunakan listBarang.thead jika ada,
+        // fallback ke specs
+        const headerSpecs = (listBarang.thead && listBarang.thead.length > 0) ? listBarang.thead : specs;
+        let totalKategori = 0;
+        headerSpecs.forEach(spec => {
+            const harga = parseFloat(hargaPerKategori[kategori][spec] || 0);
+            const qty = parseFloat(totalPerSpek && totalPerSpek[spec] ? totalPerSpek[spec] : 0);
+            const totalSpec = harga * qty;
+            totalKategori += totalSpec;
+            newRow.append($('<td>').text(totalSpec != 0 ? formatRupiah1(totalSpec.toFixed(2)) : '0'));
+        });
+
+        newRow.append($('<td>').text(formatRupiah1(totalKategori.toFixed(2))));
+        fillRowToCols(newRow, expectedCols2);
+        table2.find('tbody').append(newRow);
+    });
+
+    // PRESENTASE KOPEK -> pastikan jumlah kolom sama
+    var newRow2 = $('<tr style="color:whitesmoke; background-color:#f2c996;">');
+    newRow2.append($('<td style="text-align: center;">').html("<b>PRESENTASE KOPEK</b>"));
+    let totalPresentase = 0;
+    const headerSpecs = (listBarang.thead && listBarang.thead.length > 0) ? listBarang.thead : specs;
+    headerSpecs.forEach(spec => {
+        const presentase = totalPerSpek && totalPerSpek[spec] != 0 ? (totalPerSpek[spec] * 100 / totalTotal) : 0;
+        const presentaseRounded = Math.round(presentase);
+        totalPresentase += presentaseRounded;
+        newRow2.append($('<td>').text((presentaseRounded != 0 ? presentaseRounded.toFixed(2) : '0') + ' %'));
+    });
+    newRow2.append($('<td>').text(totalPresentase.toFixed() + ' %'));
+    fillRowToCols(newRow2, expectedCols2);
+    table2.find('tbody').append(newRow2);
+
+    // GRAND TOTAL (hindari colspan)
+    const grandTotalUpahKopek = Object.values(totalPerKategori).reduce((sum, value) => sum + value, 0);
+    var newRow1 = $('<tr style="color:whitesmoke; background-color:#f2c996;">');
+    // buat beberapa td kosong untuk mengisi kolom sebelum TOTAL, lalu satu td untuk grand total
+    // jumlah kosong = expectedCols2 - 1
+    for (let i=0;i<expectedCols2-1;i++){
+        if (i===0) newRow1.append($('<td style="text-align:center;">').html("<b>GRAND TOTAL UPAH KOPEK</b>"));
+        else newRow1.append($('<td>'));
+    }
+    newRow1.append($('<td>').text(formatRupiah1(grandTotalUpahKopek.toFixed(2))));
+    table2.find('tbody').append(newRow1);
+}
+
+// ---------- DATA TABLE 3 ----------
+const table3 = $('#dataTable3');
+$('.foot-detail-table-3').empty();
+$('.body-table-3').empty();
+var no = 1;
+var totalBonusResult = 0;
+var vendorData = listDataVendor || {};
+
+if (listBonus.length == 0) {
+    let emptyRow = $('<tr>');
+    for (let c=0; c<expectedCols3; c++) {
+        emptyRow.append($('<td>').css('text-align','center').text(c===0 ? 'Tidak Ada Data Bonus' : ''));
+    }
+    $('.body-table-3').append(emptyRow);
+} else {
+    $.each(listBonus, function(i, v) {
+        // safe assignment
+        if (v.spesifikasi === "JB") v.bonus_nominal = vendorData.bonus_karyawan_jb || v.bonus_nominal;
+        else if (v.spesifikasi === "SP LUMP") v.bonus_nominal = vendorData.bonus_karyawan_xl || v.bonus_nominal;
+        else if (v.spesifikasi === "BF") v.bonus_nominal = vendorData.bonus_karyawan_lp || v.bonus_nominal;
+        else if (v.spesifikasi === "SPL") v.bonus_nominal = vendorData.bonus_karyawan_sp || v.bonus_nominal;
+        else if (v.spesifikasi === "CLAW") v.bonus_nominal = vendorData.bonus_karyawan_cl || v.bonus_nominal;
+        else if (v.spesifikasi === "MH") v.bonus_nominal = vendorData.bonus_karyawan_mh || v.bonus_nominal;
+        else if (v.spesifikasi === "CF") v.bonus_nominal = vendorData.bonus_karyawan_cf || v.bonus_nominal;
+        
+        var totalBonus = parseFloat(v.kg_bonus || 0) * parseFloat(v.bonus_nominal || 0);
+        totalBonusResult += totalBonus;
+
+        var newRow = $('<tr style="color:whitesmoke;">');
+        newRow.append($('<td style="text-align: center;">').html(`${no++}`));
+        newRow.append($('<td style="text-align: center;">').text(v.tanggal_masuk));
+        newRow.append($('<td style="text-align: center;">').text(v.nama_barang));
+        newRow.append($('<td style="text-align: center;">').html(`<input id="${i+'_3_kg'}" class="form-control kg_bonus" ... value="${v.kg_bonus || 0}">`));
+        newRow.append($('<td style="text-align: center;">').html(`<input id="${i+'_3_bonus'}" class="form-control bonus_nominal" ... value="${v.bonus_nominal || 0}">`));
+        newRow.append($('<td>').text(formatRupiah1(totalBonus.toFixed(2))));
+        fillRowToCols(newRow, expectedCols3);
+        table3.find('tbody').append(newRow);
+    });
+
+    var newRow = $('<tr style="color:whitesmoke; background-color:#f2c996;">');
+    // isi 5 td kosong kecuali terakhir berisi grand total
+    for (let i=0; i<expectedCols3-1; i++){
+        if (i===0) newRow.append($('<td style="text-align:center;">').html("<b>GRAND TOTAL</b>"));
+        else newRow.append($('<td>'));
+    }
+    newRow.append($('<td>').text(formatRupiah1(totalBonusResult.toFixed(2))));
+    table3.find('tbody').append(newRow);
+}
+    }
+
+
+
+    // helper: pastikan row punya jumlah kolom yang sama dengan header akhir
+    function fillRowToCols($row, expectedCols) {
+        let curr = $row.find('td, th').length;
+        while (curr < expectedCols) {
+            $row.append($('<td>').html('')); // tambahin td kosong
+            curr++;
+        }
+        return $row;
+    }
+
+    // hitung berapa kolom final (ambil baris terakhir thead)
+    const expectedCols2 = $('#dataTable2 thead tr').last().find('th').length || 9;
+    const expectedCols3 = $('#dataTable3 thead tr').last().find('th').length || 6;
+
 
     function preventNegativeInput(inputElement) {
         var inputValue = inputElement.value;

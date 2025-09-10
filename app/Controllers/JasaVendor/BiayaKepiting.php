@@ -134,7 +134,7 @@ class BiayaKepiting extends BaseController
     {
         $data = [
             'tanggal' => date('Y-m-d'),
-            'jasaVendorIn' => $this->biayaKepitingModel->dropdownJasaVendorIn(),
+            'jasaVendorIn' => $this->biayaKepitingModel->dropdownJasaVendorKepitingKukusIn(),
         ];
 
         return view('jasaVendor/biayaKepiting/form', $data);
@@ -500,7 +500,8 @@ class BiayaKepiting extends BaseController
         $jasaVendorInID = $this->request->getVar('jasa_vendor_in_id');
         $id = $this->request->getVar('id');
         if (empty($id)) {
-            $data = $this->biayaKepitingModel->dropdownBarang($jasaVendorInID);
+            // $data = $this->biayaKepitingModel->dropdownBarang($jasaVendorInID);
+            $data = $this->biayaKepitingModel->dropdownBarangKepitingKukus($jasaVendorInID);
             $dataPerolehanGaji = $this->biayaKepitingModel->dropdownPerolehanGaji();
             $dataBonus = $this->biayaKepitingBonusModel->dropdownBarang($jasaVendorInID);
         } else {
