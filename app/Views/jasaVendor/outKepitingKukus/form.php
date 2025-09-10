@@ -935,7 +935,7 @@
             if (result.isConfirmed) {
                 const csrf = $(`[name="${csrfToken}"]`);
                 $.ajax({
-                    url: "<?= base_url("jasa-vendor-out/posting"); ?>",
+                    url: "<?= base_url("jasa-vendor-out-kepiting-kukus/posting"); ?>",
                     data: {
                         id: id
                     },
@@ -985,7 +985,7 @@
             if (result.isConfirmed) {
                 const csrf = $(`[name="${csrfToken}"]`);
                 $.ajax({
-                    url: "<?= base_url("jasa-vendor-out/delete"); ?>",
+                    url: "<?= base_url("jasa-vendor-out-kepiting-kukus/delete"); ?>",
                     data: {
                         id: id
                     },
