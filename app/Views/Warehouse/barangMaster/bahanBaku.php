@@ -263,7 +263,7 @@
             </div>
             <div class="modal-body">
                 <form class="create-form-akun-barang" role="form" method="POST" enctype="multipart/form-data" onSubmit="return false">
-                    <input type="text" name="spek_id_akun" class="spek_id_akun" id="spek_id_akun">
+                    <input type="hidden" name="spek_id_akun" class="spek_id_akun" id="spek_id_akun">
                     <?= csrf_field() ?>
                     <div class="row">
                         <div class="col-md-6">
@@ -1835,6 +1835,7 @@
         $('#akun_pemakaian_id').val('').trigger('change');
         $('#kategori').val('').trigger('change');
         $('#keterangan').val('').trigger('change');
+        list_akun_items = [];
     }
 
     // Fungsi untuk menyimpan data ke server
