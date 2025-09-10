@@ -263,7 +263,7 @@
             </div>
             <div class="modal-body">
                 <form class="create-form-akun-barang" role="form" method="POST" enctype="multipart/form-data" onSubmit="return false">
-                    <input type="text" name="spek_id_akun" class="spek_id_akun" id="spek_id_akun">
+                    <input type="hidden" name="spek_id_akun" class="spek_id_akun" id="spek_id_akun">
                     <?= csrf_field() ?>
                     <div class="row">
                         <div class="col-md-6">
@@ -1409,6 +1409,8 @@
         let spek_id = $(this).data('spek_id');
         let spek = $(this).data('spesifikasi');
         console.log(spek_id);
+
+        list_akun_items = [];
         $('#spek_id_akun').val(spek_id).change();
         $('#parentNameAkunBarang').val(spek);
         $('.add-modal-akun-barang').modal('show');
