@@ -176,7 +176,7 @@
                     let id = row.id;
                     let status = row.status_posting
                     let status_closed = row.status_closed;
-                    let un_posting = row.un_posting;
+                    // let un_posting = row.un_posting;
 
                     if (status === "0") {
                         return `
@@ -208,14 +208,14 @@
                                 </button>
                             `;
 
-                            if (un_posting) {
-                                res += `
-                                    <button data-toggle="tooltip" title="Un Posting" onclick="unPosting('${id}')" class="btn btn-danger posting-spp">
-                                        <i class="fa-solid fa-ban"></i>    
-                                    </button>
-                                `;
+                           
+                            res += `
+                                <button data-toggle="tooltip" title="Un Posting" onclick="unPosting('${id}')" class="btn btn-danger posting-spp">
+                                    <i class="fa-solid fa-ban"></i>    
+                                </button>
+                            `;
 
-                            }
+                            
 
                         }
 
