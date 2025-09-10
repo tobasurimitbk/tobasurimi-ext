@@ -1294,11 +1294,11 @@
                                                 <?php endif; ?>
 
                                                 <td style="padding: 3px; border: 1px solid #ddd; text-align: right; font-weight: bold;">
-                                                    <?= number_format($breakdown_berat_kotor, 2)  ?>
+                                                    <?= number_format($breakdown_berat_bersih, 2)  ?>
                                                 </td>
 
                                                 <td style="padding: 3px; border: 1px solid #ddd; text-align: right; font-weight: bold;">
-                                                    <?= number_format($breakdown_berat_bersih, 2)  ?>
+                                                    <?= number_format($breakdown_berat_kotor, 2)  ?>
                                                 </td>
 
                                                 <?php if ($show_vgm_column): ?>
