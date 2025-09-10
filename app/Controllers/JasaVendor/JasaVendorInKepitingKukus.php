@@ -100,6 +100,8 @@ class JasaVendorInKepitingKukus extends BaseController
         }
 
         $dataQry = $this->jasaVendorInKepitingKukusModel->getList($condition, $divisiArr,  $addCondition, $limit, $offset);
+        // var_dump($dataQry);
+        // die;
         $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
 
         foreach ($dataQry['data'] as $data) {
@@ -207,6 +209,7 @@ class JasaVendorInKepitingKukus extends BaseController
         $jasaVendorOutNo = $this->jasaVendorInKepitingKukusModel->getJasaVendorOutNo(
             $this->request->getVar('multiple_jasa_vendor_out_id')
         );
+
         if (count($barangs) == 0) {
             return response()->setJSON([
                 'status' => false,
@@ -251,26 +254,13 @@ class JasaVendorInKepitingKukus extends BaseController
         foreach ($barangs as $b) {
             // LIST BARANG MASUK
             foreach ($b->list_barang_masuk as $c) {
-                if ($c->qty_bersih != 0) {
-                    $stockInId = $this->stockModel->initStockBarang(
-                        $this->this_company_id,
-                        $this->request->getVar('divisi_id'),
-                        $this->request->getVar('warehouse_id'),
-                        "bahan_baku",
-                        $c->spesifikasi_in_id
-                    );
-
+                if ($c->qty_kotor != 0) {
                     $this->jasaVendorInKepitingKukusDetailModel->insert([
-                        'jasa_vendor_in_id' => $id,
-                        'jasa_vendor_out_id' => $b->jasa_vendor_out_id,
-                        'jasa_vendor_out_detail_id' => $b->jasa_vendor_out_detail_id,
+                        'jasa_vendor_in_kepiting_kukus_id' => $id,
+                        'jasa_vendor_out_kepiting_kukus_id' => $b->jasa_vendor_out_kepiting_kukus_id,
+                        'jasa_vendor_out_kepiting_kukus_detail_id' => $b->jasa_vendor_out_kepiting_kukus_detail_id,
                         'spesifikasi_in_id' => $c->spesifikasi_in_id,
-                        'stock_in_id' => $stockInId,
-                        'bc_in_id' => $b->bc_id,
-                        'no_aju_in' => $b->no_aju,
-                        'stock_dokumen' => $b->stock_dokumen,
-                        'qty_kotor' => $c->qty_kotor,
-                        'qty_bersih' => $c->qty_bersih
+                        'qty_kotor' => $c->qty_kotor
                     ]);
                 }
             }
@@ -327,27 +317,13 @@ class JasaVendorInKepitingKukus extends BaseController
         foreach ($barangs as $b) {
             // LIST BARANG MASUK
             foreach ($b->list_barang_masuk as $c) {
-                if ($c->qty_bersih != 0) {
-                    // INIT STOCK BARANG
-                    $stockInId = $this->stockModel->initStockBarang(
-                        $this->this_company_id,
-                        $this->request->getVar('divisi_id'),
-                        $this->request->getVar('warehouse_id'),
-                        "bahan_baku",
-                        $c->spesifikasi_in_id
-                    );
-
+                if ($c->qty_kotor != 0) {
                     $this->jasaVendorInKepitingKukusDetailModel->insert([
-                        'jasa_vendor_in_id' => $id,
-                        'jasa_vendor_out_id' => $b->jasa_vendor_out_id,
-                        'jasa_vendor_out_detail_id' => $b->jasa_vendor_out_detail_id,
+                        'jasa_vendor_in_kepiting_kukus_id' => $id,
+                        'jasa_vendor_out_kepiting_kukus_id' => $b->jasa_vendor_out_kepiting_kukus_id,
+                        'jasa_vendor_out_kepiting_kukus_detail_id' => $b->jasa_vendor_out_kepiting_kukus_detail_id,
                         'spesifikasi_in_id' => $c->spesifikasi_in_id,
-                        'stock_in_id' => $stockInId,
-                        'bc_in_id' => $b->bc_id,
-                        'no_aju_in' => $b->no_aju,
-                        'stock_dokumen' => $b->stock_dokumen,
-                        'qty_kotor' => $c->qty_kotor,
-                        'qty_bersih' => $c->qty_bersih
+                        'qty_kotor' => $c->qty_kotor
                     ]);
                 }
             }
@@ -365,6 +341,8 @@ class JasaVendorInKepitingKukus extends BaseController
     public function createActionNew()
     {
         $barangs = json_decode($_POST['listBarang']);
+        var_dump($barangs);
+        die;
         $jasaVendorOutNo = $this->jasaVendorInKepitingKukusModel->getJasaVendorOutNo(
             $this->request->getVar('multiple_jasa_vendor_out_id')
         );
@@ -424,16 +402,13 @@ class JasaVendorInKepitingKukus extends BaseController
             foreach ($b->list_barang_masuk as $c) {
                
                     // Group berdasarkan spesifikasi + dokumen
-                    $key = $c->spesifikasi_in_id . '_' . $b->stock_dokumen;
+                    $key = $c->supplier_id . '_' . $b->keterangan;
 
                     if (!isset($groupedBarang[$key])) {
                         $groupedBarang[$key] = [
                             'jasa_vendor_out_id' => $b->jasa_vendor_out_id,
                             'jasa_vendor_out_detail_id' => $b->jasa_vendor_out_detail_id, // ambil dari data pertama yang ketemu
                             'spesifikasi_in_id' => $c->spesifikasi_in_id,
-                            'bc_in_id' => $b->bc_id,
-                            'no_aju_in' => $b->no_aju,
-                            'stock_dokumen' => $b->stock_dokumen,
                             'qty_kotor' => 0,
                             'qty_bersih' => 0
                         ];
@@ -447,23 +422,12 @@ class JasaVendorInKepitingKukus extends BaseController
 
         // Step 2: Insert hasil grouping
         foreach ($groupedBarang as $gb) {
-            $stockInId = $this->stockModel->initStockBarang(
-                $this->this_company_id,
-                $this->request->getVar('divisi_id'),
-                $this->request->getVar('warehouse_id'),
-                "bahan_baku",
-                $gb['spesifikasi_in_id']
-            );
 
             $this->jasaVendorInKepitingKukusDetailModel->insert([
                 'jasa_vendor_in_id' => $id,
                 'jasa_vendor_out_id' => $gb['jasa_vendor_out_id'],
                 'jasa_vendor_out_detail_id' => $gb['jasa_vendor_out_detail_id'],
-                'spesifikasi_in_id' => $gb['spesifikasi_in_id'],
-                'stock_in_id' => $stockInId,
-                'bc_in_id' => $gb['bc_in_id'],
-                'no_aju_in' => $gb['no_aju_in'],
-                'stock_dokumen' => $gb['stock_dokumen'],
+                'spesifikasi_in_id' => $gb['spesifikasi_in_id'], 
                 'qty_kotor' => $gb['qty_kotor'],
                 'qty_bersih' => $gb['qty_bersih']
             ]);
@@ -598,7 +562,7 @@ class JasaVendorInKepitingKukus extends BaseController
         }
 
         $this->jasaVendorInKepitingKukusModel->delete($id);
-        $this->jasaVendorInKepitingKukusDetailModel->where('jasa_vendor_in_id', $id)->delete();
+        $this->jasaVendorInKepitingKukusDetailModel->where('jasa_vendor_in_kepiting_kukus_id', $id)->delete();
 
         return response()->setJSON([
             'message' => "Jasa Vendor Barang Masuk Berhasil Dihapus",
@@ -612,67 +576,9 @@ class JasaVendorInKepitingKukus extends BaseController
         $id = decrypt($this->request->getVar('id'));
 
         // BARANG IN KE INVENTORI DARI VENDOR
-        // INSERT INVENTORI (+)
-        $jasaVendorIn = $this->jasaVendorInKepitingKukusModel->find($id);
-        $jasaVendorInKepitingKukusDetail = $this->jasaVendorInKepitingKukusDetailModel->where('jasa_vendor_in_id', $id)->findAll();
-
-        foreach ($jasaVendorInKepitingKukusDetail as $j) {
-            $stock = $this->stockModel->find($j['stock_in_id']);
-            $qty = $j['qty_bersih'];
-
-            $stok = $this->stockModel->insertStok(
-                $jasaVendorIn['company_id'],
-                $jasaVendorIn['warehouse_id'],
-                $jasaVendorIn['divisi_id'],
-                "bahan_baku",
-                $stock['barang1_id'],
-                $stock['barang2_id'],
-                $qty
-            );
-
-            $jasaVendorOut = $this->jasaVendorOutKepitingKukusModel->find($j['jasa_vendor_out_id']);
-            $jasaVendorOutDetail = $this->jasaVendorOutKepitingKukusDetailModel->find($j['jasa_vendor_out_detail_id']);
-
-            // $stockOldDetail = $this->stockDetail2Model->getStockListDetail(
-            //     $jasaVendorOutDetail['stock_out_id'],
-            //     $jasaVendorOutDetail['bc_out_id'],
-            //     $jasaVendorOutDetail['no_aju_out'],
-            //     $jasaVendorOutDetail['stock_dokumen']
-            // );
-
-            $stockOldDetail = $this->stockDetail2Model->getStockListDetailNew(
-                $jasaVendorOutDetail['stock_out_id'],
-            );
-
-            // DETAIL
-            $stokDetail = $this->stockDetailModel->insertStokDetail(
-                $stok,
-                $qty,
-                "In",
-                $jasaVendorIn['tanggal'],
-                $this->this_user_id,
-                "JASA VENDOR",
-                $jasaVendorOut['no_surat_jalan'],
-                $jasaVendorIn['keterangan']
-            );
-
-            // SUB DETAIL
-            $this->stockDetail2Model->insertStokDetail2(
-                $j['bc_in_id'],
-                $j['stock_in_id'],
-                $stokDetail,
-                $qty,
-                $j['no_aju_in'],
-                $jasaVendorIn['no_penerimaan_surat_jalan'],
-                $jasaVendorIn['no_penerimaan_surat_jalan'] . " (" . $stockOldDetail['no_po'] . ")",
-                $stockOldDetail['supplier_id'],
-                $stockOldDetail['harga_umum'],
-                $stockOldDetail['harga_harian'],
-                $stockOldDetail['harga_bulanan'],
-                $stockOldDetail['no_po']
-            );
-        }
-
+        // // INSERT INVENTORI (+)
+        // $jasaVendorIn = $this->jasaVendorInKepitingKukusModel->find($id);
+        // $jasaVendorInKepitingKukusDetail = $this->jasaVendorInKepitingKukusDetailModel->where('jasa_vendor_in_id', $id)->findAll();
         $this->jasaVendorInKepitingKukusModel->update($id, ['status_posting' => '1']);
         return response()->setJSON([
             'message' => "Jasa Vendor Barang Masuk berhasil diposting",
@@ -685,19 +591,8 @@ class JasaVendorInKepitingKukus extends BaseController
     {
         try {
             $id = decrypt($this->request->getVar('id'));
-            $cekStockJasaVendorInUsed = $this->stockModel->checkStockJasaVendorInUsed(
-                $id
-            );
 
-            if ($cekStockJasaVendorInUsed != null) {
-                return response()->setJSON([
-                    'status' => false,
-                    'message' => "Gagal UnPosting : " . $cekStockJasaVendorInUsed,
-                    'token' => csrf_hash()
-                ]);
-            }
-
-            $this->stockModel->unPostingStockJasaVendorIn($id);
+            // $this->stockModel->unPostingStockJasaVendorIn($id);
 
             $this->jasaVendorInKepitingKukusModel->update($id, [
                 'status_posting' => '0'

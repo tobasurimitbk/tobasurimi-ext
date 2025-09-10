@@ -192,13 +192,35 @@
                 <form class="detail-form">
                     <input type="hidden" name="id_detail" class="id_detail" id="id_detail">
                     <div class="row">
-                        <div class="col-md-4">
-                            <div class="form-spp form-floating mb-3" style="height: 50px;">
-                                <select class="form-select spesifikasi_id" id="spesifikasi_id" name="spesifikasi_id[]" multiple>
-                                    <option value=""></option>
-
+                        <div class="col-md-3">
+                            <div class="form-spp form-floating mb-3">
+                                <select class="form-select spesifikasi_id" id="spesifikasi_id" name="spesifikasi_id[]">
+                                <option value=""></option>
                                 </select>
+                                <label for="spesifikasi_id">Pilih Spesifikasi Barang</label>
                             </div>
+                        </div>
+
+                        <div class="col-md-3">
+                            <div class="form-floating mb-3">
+                                <select class="form-select supplier_id" id="supplier_id" name="supplier_id">
+                                    <option value=""></option>
+                                <?php foreach ($supplier as $s): ?>
+                                    <option value="<?= $s['id'] ?>"><?= $s['name'] ?></option>
+                                <?php endforeach; ?>
+                                </select>
+                                <label for="supplier_id">Pilih Supplier</label>
+                            </div>
+                        </div>
+
+                        <div class="col-md-3">
+                            <div class="form-floating mb-3">
+                                <input type="text" placeholder="Keterangan" class="form-control keterangan_detail" id="keterangan_detail" name="keterangan_detail" />
+                                <label for="keterangan_detail">Keterangan (Opsional)</label>
+                            </div>
+                        </div>
+                        <div class="col-md-3 d-flex align-items-center">
+                            <button type="button" class="btn btn-primary" id="btnAddBarang">+ Tambah Barang</button>
                         </div>
                     </div>
                 </form>
@@ -215,8 +237,10 @@
                             <thead class="thead-dark">
                                 <tr>
                                     <th style="text-align: center;">#</th>
+                                    <th style="text-align: center;">Supplier</th>
                                     <th style="text-align: center;">Barang - Spesifikasi</th>
                                     <th style="text-align: center;">Satuan</th>
+                                    <th style="text-align: center;">Keterangan</th>
                                     <th style="text-align: center;">Qty Dikeluarkan</th>
                                     <th style="text-align: center;">Action</th>
                                 </tr>
@@ -285,23 +309,23 @@
 
     <?php if (!empty($jasaVendorOut)) : ?>
         <?php foreach ($jasaVendorOutDetail as $m) : ?>
-            // bikin option preselect
-            var option = new Option(
-                "<?= $m['barang'] ?> - <?= $m['spesifikasi'] ?>", 
-                "<?= $m['spesifikasi_id'] ?>",
-                true, 
-                true
-            );
+            // // bikin option preselect
+            // var option = new Option(
+            //     "<?= $m['barang'] ?> - <?= $m['spesifikasi'] ?>", 
+            //     "<?= $m['spesifikasi_id'] ?>",
+            //     true, 
+            //     true
+            // );
 
-            // kasih data-* biar ga undefined
-            $(option).attr({
-                "data-master_barang": "<?= $m['barang'] ?>",
-                "data-spesifikasi": "<?= $m['spesifikasi'] ?>",
-                "data-satuan": "<?= $m['satuan'] ?>",
-                "data-qty": "<?= floatval($m['qty']) ?>"
-            });
+            // // kasih data-* biar ga undefined
+            // $(option).attr({
+            //     "data-master_barang": "<?= $m['barang'] ?>",
+            //     "data-spesifikasi": "<?= $m['spesifikasi'] ?>",
+            //     "data-satuan": "<?= $m['satuan'] ?>",
+            //     "data-qty": "<?= floatval($m['qty']) ?>"
+            // });
 
-            $(".spesifikasi_id").append(option).trigger("change.select2");
+            // $(".spesifikasi_id").append(option).trigger("change.select2");
 
             // push ke list selected
             listStockSelected.push({
@@ -309,6 +333,9 @@
                 detail_id: "<?= $m['detail_id'] ?>",
                 satuan: "<?= $m['satuan'] ?>",
                 master_barang: "<?= $m['barang'] ?>",
+                supplier_text: "<?= $m['supplier'] ?>",
+                supplier_id: "<?= $m['supplier_id'] ?>",
+                keterangan: "<?= $m['keterangan'] ?>",
                 spesifikasi: "<?= $m['spesifikasi'] ?>",
                 qty: "<?= floatval($m['qty']) ?>",
             });
@@ -360,6 +387,12 @@
         getListWarehouse();
     });
 
+    $('#supplier_id').select2({
+        placeholder: "Pilih Supplier",
+        theme: "bootstrap-5",
+        width: '100%',
+    });
+
     $(".spesifikasi_id").select2({
         placeholder: "Pilih Spesifikasi Barang",
         theme: "bootstrap-5",
@@ -396,21 +429,65 @@
                 };
             }
         }
-    }).on("change", function (e) {
-        let selectedData = $(this).select2("data");
+    });
 
-        listStockSelected = selectedData.map(item => ({
-            id: item.id,
-            detail_id: item.detail_id || null,
-            master_barang: item.master_barang || $(item.element).data("master_barang"),
-            spesifikasi: item.spesifikasi || $(item.element).data("spesifikasi"),
-            satuan: item.satuan || $(item.element).data("satuan"),
-            qty: item.qty || $(item.element).data("qty") || 0,
-        }));
+    // .on("change", function (e) {
+    //     let selectedData = $(this).select2("data");
+
+    //     listStockSelected = selectedData.map(item => ({
+    //         id: item.id,
+    //         detail_id: item.detail_id || null,
+    //         master_barang: item.master_barang || $(item.element).data("master_barang"),
+    //         spesifikasi: item.spesifikasi || $(item.element).data("spesifikasi"),
+    //         satuan: item.satuan || $(item.element).data("satuan"),
+    //         qty: item.qty || $(item.element).data("qty") || 0,
+    //     }));
+
+    //     if (listStockSelected.length > 0) {
+    //         drawTableSelectedItem(listStockSelected);
+    //     }
+    // })
+
+    $("#btnAddBarang").on("click", function () {
+        let spesifikasi = $("#spesifikasi_id").select2("data");
+        let supplierId = $("#supplier_id").val();
+        let keterangan = $("#keterangan_detail").val();
+        let detailId = $("#id_detail").val(); // kalau kosong berarti data baru
+
+        if (!spesifikasi || !supplierId) {
+            alert("Spesifikasi dan Supplier wajib dipilih!");
+            return;
+        }
+
+       listStockSelected = [
+            ...listStockSelected,
+            ...spesifikasi
+                .filter(item => item.id)
+                .map(item => ({
+                    id: item.id,
+                    detail_id: detailId || null,
+                    master_barang: item.master_barang || $(item.element).data("master_barang"),
+                    spesifikasi: item.spesifikasi || $(item.element).data("spesifikasi"),
+                    satuan: item.satuan || $(item.element).data("satuan"),
+                    qty: item.qty || 0,
+                    supplier_id: supplierId,
+                    supplier_text: $("#supplier_id option:selected").text(),
+                    keterangan: keterangan
+                }))
+        ];
+
+
+        // push ke global array
+        // listStockSelected.push(...listStockSelected);
 
         if (listStockSelected.length > 0) {
             drawTableSelectedItem(listStockSelected);
         }
+
+        $("#spesifikasi_id").val(null).trigger("change"); 
+        $("#supplier_id").val("").trigger("change");
+        $("#keterangan_detail").val("");
+        $("#id_detail").val(""); // reset hidden field juga
     });
 
 
@@ -707,9 +784,10 @@
                    ${no++} 
                 `
                 ));
+                newRow.append($('<td style="text-align: center;">').text(v.supplier_text));
                 newRow.append($('<td style="text-align: center;">').text(v.master_barang + '-' + v.spesifikasi));
                 newRow.append($('<td style="text-align: center;">').text(v.satuan));
-              
+                newRow.append($('<td style="text-align: center;">').text(v.keterangan));
                 newRow.append($('<td style="text-align: center;">').html(
                     `
                     <input <?= !empty($jasaVendorOut) ? (($jasaVendorOut['status_posting'] == "1") ? 'disabled' : '') : '' ?> onkeyup="this.value = greatFormatRupiah(this.value)" class="form-control stok-out" oninput="preventNegativeInput(this)" autocomplete="one-time-code" data-id="${v.id}" class="form-control" type="text" value="${greatFormatRupiah(v.qty)}">
@@ -727,7 +805,7 @@
             });
 
             var newRow = $('<tr class="grand-total" style="color:whitesmoke; background-color:#f2c996;">');
-            newRow.append($('<td style="text-align: right;" colspan="3">').html("<b>GRAND TOTAL</b>"));
+            newRow.append($('<td style="text-align: right;" colspan="5">').html("<b>GRAND TOTAL</b>"));
             newRow.append($('<td class="total-cell">').text(greatFormatQty(totalQtyKeluar)));
             newRow.append($('<td>').text(''));
             table.find('tbody').append(newRow);

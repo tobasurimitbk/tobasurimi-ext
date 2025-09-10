@@ -84,10 +84,23 @@
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3 form-add-spp" style="height: 50px;">
-                            <select <?= !empty($biayaKepiting) ? 'disabled' : '' ?> class="form-select barang_id" multiple id="barang_id" name="barang_id[]" aria-label="Floating label select example">
-                                <option value=""></option>
+                            <select <?= !empty($biayaKepiting) ? 'disabled' : '' ?> class="form-select jasa_vendor_in_id" id="jasa_vendor_in_id" name="jasa_vendor_in_id" aria-label="Floating label select example">
+                                    <option value=""></option>
+                                <?php if (!empty($jasaVendorIn)) : ?>
+                                    <?php foreach ($jasaVendorIn as $j) : ?>
+                                        <option data-warehouse_id="<?= $j['warehouse_id'] ?>" data-vendor="<?= strtoupper($j['name']) ?>" data-divisi="<?= strtoupper($j['divisi']) ?>" value="<?= $j['id'] ?>">
+                                            <?= $j['no_penerimaan_surat_jalan'] ?>
+                                        </option>
+                                    <?php endforeach; ?>
+                                <?php else : ?>
+                                    <?php if (!empty($jasaVendorInDetail)) : ?>
+                                        <option selected value="<?= $jasaVendorInDetail['id'] ?>">
+                                            <?= $jasaVendorInDetail['no_penerimaan_surat_jalan'] ?>
+                                        </option>
+                                    <?php endif; ?>
+                                <?php endif; ?>
                             </select>
-                            <label for="floatingInput" style="z-index: 1;">Pilih Nama Barang</label>
+                            <label for="floatingInput" style="z-index: 1;">Pilih Nomor Penerimaan</label>
                         </div>
                     </div>
                     <div class="col-md-4">
@@ -128,7 +141,7 @@
                                 <tr>
                                     <th style="text-align: center;">No</th>
                                     <th style="text-align: center;">Tanggal Masuk</th>
-                                    <th style="text-align: center;">Barang</th>
+                                    <th style="text-align: center;">Supplier - Keterangan</th>
 
 
                                     <th style="text-align: center;">Qty Sebelum Kopek</th>
@@ -247,7 +260,7 @@
             url: `<?= base_url('biaya-kepiting/list-barang'); ?>`,
             method: "GET",
             data: {
-                barang_id: $(".barang_id option:selected").val(),
+                jasa_vendor_in_id: $(".jasa_vendor_in_id option:selected").val(),
                 id: $('.id').val()
             },
             dataType: "json",
@@ -269,52 +282,52 @@
         autoclose: true
     });
 
-    // $('.barang_id').select2({
-    //     placeholder: "Pilih Surat Jalan",
-    //     theme: "bootstrap-5",
-    // }).change(function() {
-    //     var selected = $('.barang_id option:selected');
-    //     $('.vendor').val(selected.data('vendor'));
-    //     $('.divisi').val(selected.data('divisi'));
-    //     $('.thead-bonus').text("Bonus Khusus Untuk " + selected.data('vendor'));
-
-    //     listDataBarang();
-    //     changeStatus();
-    // })
-    
-    
-    $('.barang_id').select2({
-        placeholder: "Pilih Barang Dan Spesifikasi",
+    $('.jasa_vendor_in_id').select2({
+        placeholder: "Pilih Surat Jalan",
         theme: "bootstrap-5",
-        minimumInputLength: 3, // ngetik min 3 huruf baru jalanin ajax
-        ajax: {
-            url: "<?= base_url('biaya-kepiting/search-barang'); ?>", // endpoint buat search
-            dataType: 'json',
-            delay: 250, // kasih jeda biar ga nembak server tiap huruf
-            data: function (params) {
-                return {
-                    q: params.term // keyword pencarian
-                };
-            },
-            processResults: function (data) {
-                return {
-                    results: data.map(function(item) {
-                        return {
-                            id: item.id, // value select
-                            text: item.barang_name, // label yang tampil
-                        }
-                    })
-                };
-            }
-        }
-    }).on("change", function () {
-        var selected = $('.barang_id').select2('data')[0];
+    }).change(function() {
+        var selected = $('.jasa_vendor_in_id option:selected');
+        $('.vendor').val(selected.data('vendor'));
+        $('.divisi').val(selected.data('divisi'));
+        $('.thead-bonus').text("Bonus Khusus Untuk " + selected.data('vendor'));
 
         listDataBarang();
         changeStatus();
-    });
+    })
+    
+    
+    // $('.jasa_vendor_in_id').select2({
+    //     placeholder: "Pilih Barang Dan Spesifikasi",
+    //     theme: "bootstrap-5",
+    //     minimumInputLength: 3, // ngetik min 3 huruf baru jalanin ajax
+    //     ajax: {
+    //         url: "<?= base_url('biaya-kepiting/search-barang'); ?>", // endpoint buat search
+    //         dataType: 'json',
+    //         delay: 250, // kasih jeda biar ga nembak server tiap huruf
+    //         data: function (params) {
+    //             return {
+    //                 q: params.term // keyword pencarian
+    //             };
+    //         },
+    //         processResults: function (data) {
+    //             return {
+    //                 results: data.map(function(item) {
+    //                     return {
+    //                         id: item.id, // value select
+    //                         text: item.barang_name, // label yang tampil
+    //                     }
+    //                 })
+    //             };
+    //         }
+    //     }
+    // }).on("change", function () {
+    //     var selected = $('.jasa_vendor_in_id').select2('data')[0];
 
-    $(".barang_id")
+    //     listDataBarang();
+    //     changeStatus();
+    // });
+
+    $(".jasa_vendor_in_id")
         .parent('div')
         .children('span')
         .children('span')
@@ -328,7 +341,7 @@
             tanggal: {
                 required: true
             },
-            barang_id: {
+            jasa_vendor_in_id: {
                 required: true
             },
         },
@@ -336,7 +349,7 @@
             tanggal: {
                 required: "Tanggal wajib diisi"
             },
-            barang_id: {
+            jasa_vendor_in_id: {
                 required: "Penerimaan surat jalan wajib diisi"
             },
         },
@@ -664,7 +677,7 @@
 
                         if (id) {
                             // UPDATE
-                            data.append("barang_id", $('#barang_id option:selected').val());
+                            data.append("jasa_vendor_in_id", $('#jasa_vendor_in_id option:selected').val());
                             $.ajax({
                                 url: "<?= base_url("biaya-kepiting/update"); ?>",
                                 data: data,
@@ -759,7 +772,7 @@
                 url: `<?= base_url("biaya-kepiting/get-no"); ?>`,
                 method: "GET",
                 data: {
-                    warehouse_id: $('#barang_id option:selected').data('warehouse_id')
+                    warehouse_id: $('#jasa_vendor_in_id option:selected').data('warehouse_id')
                 },
                 dataType: "json",
                 success: function(res) {
@@ -794,7 +807,7 @@
                 stopLoading();
             },
             data: {
-                barang_id: $(".barang_id option:selected").val(),
+                jasa_vendor_in_id: $(".jasa_vendor_in_id option:selected").val(),
             },
             dataType: "json",
             success: function(res) {

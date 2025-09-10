@@ -10,33 +10,33 @@
 <!-- Begin Page Content -->
 <section class="section">
     <div class="section-header">
-        <h1 class="title-name"><?= !empty($dataInvoice) ? "Update Commercial Invoice Customer" : "Tambah Commercial Invoice Customer" ?></h1>
+        <h1 class="title-name"><?= !empty($dataInvoice) ? "Update CIPL" : "Tambah CIPL" ?></h1>
         <div class="col-button-tambah-spp">
             <a class="btn btn-hide-form btn-discard float-right" href="<?= base_url("invoice-packing-customer/detail/" . encrypt($dataSalesOrderExport->sales_order_export_id)); ?>">
                 Kembali
             </a>
             <?php if (!empty($dataInvoice)) { ?>
-                <?php if (can('Invoice Exim', 'Inv Packing Customer', 'p')): ?>
+                <?php if (can('Invoice Exim', 'CIPL', 'p')): ?>
                     <button target="_blank" class="btn btn-warning btn-print float-right" onclick="print('<?= base_url('invoice-packing-customer/print/') . encrypt($dataInvoice['id']) ?>')">
                         Print
                     </button>
                 <?php endif; ?>
                 <?php if ($dataInvoice['status_posting'] == 0) { ?>
-                    <?php if (can('Invoice Exim', 'Inv Packing Customer', 'a')) : ?>
+                    <?php if (can('Invoice Exim', 'CIPL', 'a')) : ?>
                         <button class="btn btn-success posting-spp posting-so float-right" onclick="posting('<?= encrypt($dataInvoice['id']) ?>')">
                             Posting
                         </button>
                     <?php endif; ?>
                 <?php } ?>
                 <?php if ($dataInvoice['status_posting'] == 0) { ?>
-                    <?php if (can('Invoice Exim', 'Inv Packing Customer', 'u')): ?>
+                    <?php if (can('Invoice Exim', 'CIPL', 'u')): ?>
                         <button class="btn btn-show-form btn-save float-right btn-submit-parent">
                             Update
                         </button>
                     <?php endif; ?>
                 <?php } ?>
                 <?php if ($dataInvoice['status_posting'] == 1 && $dataInvoice['status_bayar'] == 0) { ?>
-                    <?php if (can('Invoice Exim', 'Inv Packing Customer', 'ua')) : ?>
+                    <?php if (can('Invoice Exim', 'CIPL', 'ua')) : ?>
                         <button class="btn btn-success posting-spp posting-so float-right" onclick="unposting('<?= encrypt($dataInvoice['id']) ?>')">
                             UnPosting
                         </button>
@@ -162,6 +162,12 @@
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3">
+                            <textarea <?= !empty($dataInvoice) ? ($dataInvoice['status_posting'] == 1 ? 'readonly' : '') : '' ?> class="full-textarea form-control notify_party2" id="notify_party2" name="notify_party2" placeholder="Notify Party 2"><?= !empty($dataInvoice) ? $dataInvoice['notify_party2'] : '' ?></textarea>
+                            <label for="floatingInput">Notify Party 2 (Opsional)</label>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-floating mb-3">
                             <input <?= !empty($dataInvoice) ? ($dataInvoice['status_posting'] == 1 ? 'readonly' : '') : '' ?> value="<?= !empty($dataInvoice) ? $dataInvoice['no_container'] : $dataSalesOrderExport->container ?>" autocomplete="one-time-code" type="text" class="form-control no_container" id="no_container" name="no_container" placeholder="No Container">
                             <label for="floatingInput">No Container</label>
                         </div>
@@ -191,35 +197,11 @@
                             <label for="floatingInput">Measurement (Opsional)</label>
                         </div>
                     </div>
-                    <div class="col-md-4">
-                        <div class="form-floating mb-3">
-                            <input <?= !empty($dataInvoice) ? ($dataInvoice['status_posting'] == 1 ? 'readonly' : '') : '' ?> value="<?= !empty($dataInvoice) ? $dataInvoice['phone'] : '' ?>" autocomplete=" one-time-code" type="text" class="form-control phone" placeholder="Phone (Opsional)" id="phone" name="phone">
-                            <label for="floatingInput">Phone (Optional)</label>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="form-floating mb-3">
-                            <input <?= !empty($dataInvoice) ? ($dataInvoice['status_posting'] == 1 ? 'readonly' : '') : '' ?> value="<?= !empty($dataInvoice) ? $dataInvoice['attn'] : '' ?>" autocomplete="one-time-code" type="text" class="form-control attn" placeholder="Attn (Opsional)" id="attn" name="attn">
-                            <label for="floatingInput">Attn (Optional)</label>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="form-floating mb-3">
-                            <input <?= !empty($dataInvoice) ? ($dataInvoice['status_posting'] == 1 ? 'readonly' : '') : '' ?> value="<?= !empty($dataInvoice) ? $dataInvoice['email'] : '' ?>" autocomplete=" one-time-code" type="text" placeholder="Email (Opsional)" class="form-control email" id="email" name="email">
-                            <label for="floatingInput">Email (Optional)</label>
-                        </div>
-                    </div>
 
                     <div class="col-md-4">
                         <div class="form-floating mb-3">
                             <input autocomplete="one-time-code" readonly type="text" class="form-control" id="total_nilai_invoice" name="total_nilai_invoice">
                             <label for="floatingInput">Nilai Invoice</label>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="form-floating mb-3">
-                            <input autocomplete="one-time-code" readonly type="text" class="form-control total_packing" id="total_packing" name="total_packing">
-                            <label for="floatingInput">Total Packing</label>
                         </div>
                     </div>
                     <div class="col-md-4">
@@ -408,18 +390,6 @@
                                             <th>No</th>
                                             <th>Size</th>
                                             <th>Grade</th>
-                                            <th>Packing</th>
-                                            <th>Can</th>
-                                            <th>Case</th>
-                                            <th>Kg</th>
-                                            <th>LB</th>
-                                            <th>Inner Box</th>
-                                            <th>PC</th>
-                                            <th>Bag</th>
-                                            <th>Cup</th>
-                                            <th>Pallet</th>
-                                            <th>%</th>
-                                            <th>Remarks</th>
                                             <th>Satuan</th>
                                             <th>Qty</th>
                                             <th>Harga Satuan</th>
@@ -432,10 +402,10 @@
                                     </tbody>
                                     <tfoot class="tfoot-detail-table-size-breakdown">
                                         <tr>
-                                            <td colspan="15"></td>
+                                            <td colspan="3"></td>
                                             <td><b>TOTAL</b></td>
                                             <td><b>0.00</b></td>
-                                            <td><b>0.00</b></td>
+                                            <td><b></b></td>
                                             <td><b>0.00</b></td>
                                             <td></td>
                                         </tr>
@@ -468,7 +438,7 @@
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <input autocomplete="one-time-code" type="text" class="form-control grade" name="grade" id="grade" placeholder="Grade (Opsional)">
-                                <label for="floatingInput">Grade (Opsional)</label>
+                                <label for="floatingInput">Grade</label>
                             </div>
                         </div>
                         <div class="col-md-6">
@@ -477,68 +447,8 @@
                                 <label for="floatingInput">Size (Opsional)</label>
                             </div>
                         </div>
-                        <div class="col-md-6">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" type="text" class="form-control can" name="can" id="can" placeholder="Can (Opsional)">
-                                <label for="floatingInput">Can (Opsional)</label>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" type="text" oninput="this.value = greatFormatRupiah(this.value)" class="form-control case" name="case" id="case" placeholder="Case (Opsional)">
-                                <label for="floatingInput">Case (Opsional)</label>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" type="text" class="form-control kg" name="kg" id="kg" placeholder="Kg (Opsional)">
-                                <label for="floatingInput">Kg (Opsional)</label>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" type="text" class="form-control lb" name="lb" id="lb" placeholder="Lb (Opsional)">
-                                <label for="floatingInput">Lb (Opsional)</label>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" type="text" class="form-control inner_box" name="inner_box" id="inner_box" placeholder="Inner Box (Opsional)">
-                                <label for="floatingInput">Inner Box (Opsional)</label>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" type="text" class="form-control pc" name="pc" id="pc" placeholder="Pc (Opsional)">
-                                <label for="floatingInput">PC (Opsional)</label>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" type="text" class="form-control bag" name="bag" id="bag" placeholder="Bag (Opsional)">
-                                <label for="floatingInput">Bag (Opsional)</label>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" type="text" class="form-control persen" name="persen" id="persen" placeholder="Persen (Opsional)" oninput="this.value = greatFormatRupiah(this.value)">
-                                <label for="floatingInput">Percentage % (Opsional)</label>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" type="text" class="form-control cup" name="cup" id="cup" placeholder="Cup (Opsional)">
-                                <label for="floatingInput">Cup (Opsional)</label>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" type="text" class="form-control palet" name="palet" id="palet" placeholder="Cup (Opsional)">
-                                <label for="floatingInput">Pallet (Opsional)</label>
-                            </div>
-                        </div>
                     </div>
-                    <div class="row mt-3">
+                    <div class="row mt-2">
                         <div class="col mb-3">
                             <h6 class="<?= session()->get('theme') == "dark" ? "text-white" : "text-dark" ?>">Detail Harga</h6>
                         </div>
@@ -565,12 +475,6 @@
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <input onkeyup="this.value = greatFormatRupiah(this.value)" autocomplete="one-time-code" type="text" class="form-control harga" name="harga" id="harga" placeholder="Harga Satuan">
                                 <label for="floatingInput">Harga Satuan</label>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-floating mb-3">
-                                <input autocomplete="one-time-code" type="text" class="form-control remark" id="remark" name="remark" placeholder="Remark">
-                                <label for="floatingInput">Remark (Opsional)</label>
                             </div>
                         </div>
                         <div class="col-md-6">
@@ -690,24 +594,20 @@
                                             <th>No</th>
                                             <th>Size</th>
                                             <th>Grade</th>
-                                            <th>Packing</th>
                                             <th>Can</th>
-                                            <th>Case</th>
+                                            <th>Case / Carton</th>
                                             <th>Kg</th>
                                             <th>LB</th>
                                             <th>Inner Box</th>
                                             <th>PC</th>
                                             <th>Bag</th>
+                                            <th>%</th>
                                             <th>Cup</th>
                                             <th>Pallet</th>
-                                            <th>%</th>
-                                            <th>Remarks</th>
-                                            <th>Satuan</th>
-                                            <th>Qty</th>
                                             <th>Berat Bersih</th>
                                             <th>Berat Kotor</th>
                                             <th>VGM</th>
-                                            <th>Drammed</th>
+                                            <th>Drained</th>
                                             <th>Action</th>
                                         </tr>
                                     </thead>
@@ -716,8 +616,17 @@
                                     </tbody>
                                     <tfoot class="tfoot-packing-breakdown">
                                         <tr>
-                                            <td colspan="15"></td>
+                                            <td colspan="2"></td>
                                             <td><b>TOTAL</b></td>
+                                            <td><b>0.00</b></td>
+                                            <td><b>0.00</b></td>
+                                            <td><b>0.00</b></td>
+                                            <td><b>0.00</b></td>
+                                            <td><b>0.00</b></td>
+                                            <td><b>0.00</b></td>
+                                            <td><b>0.00</b></td>
+                                            <td><b>0.00</b></td>
+                                            <td><b>0.00</b></td>
                                             <td><b>0.00</b></td>
                                             <td><b>0.00</b></td>
                                             <td><b>0.00</b></td>
@@ -752,61 +661,297 @@
                 <div class="modal-body">
                     <input type="hidden" name="id_detail_breakdown_packing" id="id_detail_breakdown_packing">
                     <div class="row">
-
-                        <div class="col-md-6">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" type="text" class="form-control packing" name="packing" id="packing" oninput="this.value = greatFormatRupiah(this.value)" placeholder="Packing">
-                                <label for="floatingInput">Total Packing</label>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="row">
-                                <div class="col-sm">
-                                    <div class="form-floating mb-3" style="height: 50px;">
-                                        <input autocomplete="one-time-code" type="text" class="form-control qty_packing" name="qty_packing" id="qty_packing" oninput="this.value = greatFormatRupiah(this.value)" readonly placeholder="Qty Packing (Opsional)">
-                                        <label for="floatingInput">Qty</label>
-                                    </div>
-                                </div>
-                                <div class="col-sm">
-                                    <div class="form-floating mb-3" style="height: 50px;">
-                                        <input autocomplete="one-time-code" type="text" class="form-control satuan_size_code" name="satuan_size_code" id="satuan_size_code" readonly placeholder="Satuan">
-                                        <label for="floatingInput">Satuan</label>
-                                    </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-floating mb-3" style="height: 50px;">
+                                    <input autocomplete="one-time-code" type="text" class="form-control grade_packing" readonly name="grade_packing" id="grade_packing" placeholder="Grade (Opsional)">
+                                    <label for="floatingInput">Grade (Opsional)</label>
                                 </div>
                             </div>
+                            <div class="col-md-6">
+                                <div class="form-floating mb-3" style="height: 50px;">
+                                    <input autocomplete="one-time-code" type="text" class="form-control size_packing" readonly name="size_packing" id="size_packing" placeholder="Size (Opsional)">
+                                    <label for="floatingInput">Size (Opsional)</label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="input-group input-group-password">
+                                    <div class="form-floating mb-3" style="height: 50px;">
+                                        <input autocomplete="one-time-code" type="text" oninput="this.value = greatFormatRupiah(this.value)" class="form-control can_packing" name="can_packing" id="can_packing" placeholder="Can (Opsional)">
+                                        <label for="floatingInput">Can (Opsional)</label>
+                                    </div>
+                                    <div class="input-group-append" style="height:50px;">
+                                        <button class="btn btn-primary btn-add-barang" data-toggle="modal" type="button" id="formulaCanBtn">
+                                            <i class="fa-solid fa-square-root-variable"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="input-group input-group-password">
+                                    <div class="form-floating mb-3" style="height: 50px;">
+                                        <input autocomplete="one-time-code" type="text" oninput="this.value = greatFormatRupiah(this.value)" class="form-control case_packing" name="case_packing" id="case_packing" placeholder="Case (Opsional)">
+                                        <label for="floatingInput">Case / Cartons (Opsional)</label>
+                                    </div>
+                                    <div class="input-group-append" style="height:50px;">
+                                        <button class="btn btn-primary btn-add-barang" data-toggle="modal" type="button" id="formulaCaseBtn">
+                                            <i class="fa-solid fa-square-root-variable"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-floating mb-3" style="height: 50px;">
+                                    <input autocomplete="one-time-code" type="text" class="form-control kg_packing" oninput="this.value = greatFormatRupiah(this.value)" name="kg_packing" id="kg_packing" placeholder="Kg (Opsional)">
+                                    <label for="floatingInput">Kg (Opsional)</label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-floating mb-3" style="height: 50px;">
+                                    <input autocomplete="one-time-code" type="text" class="form-control lb_packing" oninput="this.value = greatFormatRupiah(this.value)" name="lb_packing" id="lb_packing" placeholder="Lb (Opsional)">
+                                    <label for="floatingInput">Lb (Opsional)</label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-floating mb-3" style="height: 50px;">
+                                    <input autocomplete="one-time-code" type="text" class="form-control inner_box_packing" oninput="this.value = greatFormatRupiah(this.value)" name="inner_box_packing" id="inner_box_packing" placeholder="Inner Box (Opsional)">
+                                    <label for="floatingInput">Inner Box (Opsional)</label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-floating mb-3" style="height: 50px;">
+                                    <input autocomplete="one-time-code" type="text" class="form-control pc_packing" oninput="this.value = greatFormatRupiah(this.value)" name="pc_packing" id="pc_packing" placeholder="Pc (Opsional)">
+                                    <label for="floatingInput">PC (Opsional)</label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-floating mb-3" style="height: 50px;">
+                                    <input autocomplete="one-time-code" type="text" class="form-control bag_packing" oninput="this.value = greatFormatRupiah(this.value)" name="bag_packing" id="bag_packing" placeholder="Bag (Opsional)">
+                                    <label for="floatingInput">Bag (Opsional)</label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-floating mb-3" style="height: 50px;">
+                                    <input autocomplete="one-time-code" type="text" class="form-control persen_packing" name="persen_packing" id="persen_packing" placeholder="Persen (Opsional)" oninput="this.value = greatFormatRupiah(this.value)">
+                                    <label for="floatingInput">Percentage % (Opsional)</label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-floating mb-3" style="height: 50px;">
+                                    <input autocomplete="one-time-code" type="text" class="form-control cup_packing" oninput="this.value = greatFormatRupiah(this.value)" name="cup_packing" id="cup_packing" placeholder="Cup (Opsional)">
+                                    <label for="floatingInput">Cup (Opsional)</label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-floating mb-3" style="height: 50px;">
+                                    <input autocomplete="one-time-code" type="text" class="form-control palet_packing" oninput="this.value = greatFormatRupiah(this.value)" name="palet_packing" id="palet_packing" placeholder="Cup (Opsional)">
+                                    <label for="floatingInput">Pallet (Opsional)</label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="input-group input-group-password">
+                                    <div class="form-floating mb-3" style="height: 50px;">
+                                        <input autocomplete="one-time-code" type="text" class="form-control vgm" oninput="this.value = greatFormatRupiah(this.value)" name="vgm" id="vgm" placeholder="VGM (Opsional)">
+                                        <label for="floatingInput">VGM (Opsional)</label>
+                                    </div>
+                                    <div class="input-group-append" style="height:50px;">
+                                        <button class="btn btn-primary btn-add-barang" data-toggle="modal" type="button" id="formulaVgmBtn">
+                                            <i class="fa-solid fa-square-root-variable"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-floating mb-3" style="height: 50px;">
+                                    <input autocomplete="one-time-code" type="text" class="form-control packing" name="packing" id="packing" oninput="this.value = greatFormatRupiah(this.value)" placeholder="Packing">
+                                    <label for="floatingInput">Total Packing</label>
+                                </div>
+                            </div>
+                            <div class="col-md-12">
+                                <hr>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="row">
+                                    <div class="col-sm">
+                                        <div class="form-floating mb-3" style="height: 50px;">
+                                            <input autocomplete="one-time-code" type="text" class="form-control qty_packing" name="qty_packing" id="qty_packing" oninput="this.value = greatFormatRupiah(this.value)" readonly placeholder="Qty Packing (Opsional)">
+                                            <label for="floatingInput">Qty</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm">
+                                        <div class="form-floating mb-3" style="height: 50px;">
+                                            <input autocomplete="one-time-code" type="text" class="form-control satuan_size_code" name="satuan_size_code" id="satuan_size_code" readonly placeholder="Satuan">
+                                            <label for="floatingInput">Satuan</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-floating mb-3" style="height: 50px;">
+                                    <input autocomplete="one-time-code" type="text" class="form-control berat_bersih" oninput="this.value = greatFormatRupiah(this.value)" name="berat_bersih" id="berat_bersih" placeholder="Berat Bersih (Opsional)">
+                                    <label for="floatingInput">Berat Bersih (Kg)</label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-floating mb-3" style="height: 50px;">
+                                    <input readonly autocomplete="one-time-code" type="text" class="form-control berat_kotor" oninput="this.value = greatFormatRupiah(this.value)" name="berat_kotor" id="berat_kotor" placeholder="Berat Kotor (Opsional)">
+                                    <label for="floatingInput">Berat Kotor (Kg)</label>
+                                </div>
+                            </div>
 
-                        </div>
-
-                        <div class="col-md-6">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" type="text" class="form-control berat_bersih" oninput="this.value = greatFormatRupiah(this.value)" name="berat_bersih" id="berat_bersih" placeholder="Berat Bersih (Opsional)">
-                                <label for="floatingInput">Berat Bersih (Kg)</label>
+                            <div class="col-md-6">
+                                <div class="form-floating mb-3" style="height: 50px;">
+                                    <input autocomplete="one-time-code" type="text" class="form-control drammed" oninput="this.value = greatFormatRupiah(this.value)" name="drammed" id="drammed" placeholder="Drammed (Opsional)">
+                                    <label for="floatingInput">Drainned (Opsional)</label>
+                                </div>
                             </div>
                         </div>
-                        <div class="col-md-6">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <input readonly autocomplete="one-time-code" type="text" class="form-control berat_kotor" oninput="this.value = greatFormatRupiah(this.value)" name="berat_kotor" id="berat_kotor" placeholder="Berat Kotor (Opsional)">
-                                <label for="floatingInput">Berat Kotor (Kg)</label>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" type="text" class="form-control vgm" oninput="this.value = greatFormatRupiah(this.value)" name="vgm" id="vgm" placeholder="VGM (Opsional)">
-                                <label for="floatingInput">VGM (Opsional)</label>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" type="text" class="form-control drammed" oninput="this.value = greatFormatRupiah(this.value)" name="drammed" id="drammed" placeholder="Drammed (Opsional)">
-                                <label for="floatingInput">Drammed (Opsional)</label>
-                            </div>
-                        </div>
-
                     </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-discard mr-2" id="btnHidePackingBreakdown">Kembali</button>
                     <button type="submit" class="btn btn-submit-form" id="btnSubmitPackingBreakdown">Simpan</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="modal detail-modal" id="formulaCanModal" tabindex="1">
+    <div class="modal-dialog" style="min-width: 700px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title title-secondary">Formula Hitung Qty Can</h5>
+            </div>
+            <form class="create-form-formula-can" role="form" method="POST">
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="input-group">
+                                <div class="form-floating mb-3" style="height: 50px;">
+                                    <input readonly autocomplete="one-time-code" type="text" oninput="this.value = greatFormatRupiah(this.value)" class="form-control formula_qty_case_hitung_can" id="formula_qty_case_hitung_can" name="formula_qty_case_hitung_can" placeholder="Qty Case / Carton">
+                                    <label for="floatingInput">Qty Case / Carton</label>
+                                </div>
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text" id="basic-addon1">
+                                        *
+                                    </span>
+                                </div>
+                                <div class="form-floating mb-3" style="height: 50px;">
+                                    <input autocomplete="one-time-code" type="text" oninput="this.value = greatFormatRupiah(this.value)" class="form-control formula_bilangan_case_hitung_can" id="formula_bilangan_case_hitung_can" name="formula_bilangan_case_hitung_can" placeholder="Nilai Bilangan / Kemasan">
+                                    <label for="floatingInput">Qty / Case</label>
+                                </div>
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text" id="basic-addon1">
+                                        =
+                                    </span>
+                                </div>
+                                <div class="form-floating mb-3" style="height: 50px;">
+                                    <input readonly autocomplete="one-time-code" type="text" oninput="this.value = greatFormatRupiah(this.value)" class="form-control hasil_qty_can_hitung_can" id="hasil_qty_can_hitung_can" name="hasil_qty_can_hitung_can" placeholder="Qty Can">
+                                    <label for="floatingInput">Hasil Qty Can</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-discard mr-2" id="btnHideFormulaCan">Kembali</button>
+                    <button type="button" class="btn btn-submit-form" id="btnSubmitFormulaCan">Simpan</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="modal detail-modal" id="formulaCtModal" tabindex="1">
+    <div class="modal-dialog" style="min-width: 700px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title title-secondary">Formula Hitung Qty Case / Carton</h5>
+            </div>
+            <form class="create-form-formula-case" role="form" method="POST">
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="input-group">
+                                <div class="form-floating mb-3" style="height: 50px;">
+                                    <input readonly autocomplete="one-time-code" type="text" oninput="this.value = greatFormatRupiah(this.value)" class="form-control formula_qty_can_hitung_case" id="formula_qty_can_hitung_case" name="formula_qty_can_hitung_case" placeholder="Qty Can">
+                                    <label for="floatingInput">Qty Can</label>
+                                </div>
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text" id="basic-addon1">
+                                        /
+                                    </span>
+                                </div>
+                                <div class="form-floating mb-3" style="height: 50px;">
+                                    <input autocomplete="one-time-code" type="text" oninput="this.value = greatFormatRupiah(this.value)" class="form-control formula_bilangan_can_hitung_case" id="formula_bilangan_can_hitung_case" name="formula_bilangan_can_hitung_case" placeholder="Nilai Bilangan / Kemasan">
+                                    <label for="floatingInput">Qty / Can</label>
+                                </div>
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text" id="basic-addon1">
+                                        =
+                                    </span>
+                                </div>
+                                <div class="form-floating mb-3" style="height: 50px;">
+                                    <input readonly autocomplete="one-time-code" type="text" oninput="this.value = greatFormatRupiah(this.value)" class="form-control hasil_qty_case_hitung_case" id="hasil_qty_case_hitung_case" name="hasil_qty_case_hitung_case" placeholder="Qty Case / Carton">
+                                    <label for="floatingInput">Hasil Qty Case</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-discard mr-2" id="btnHideFormulaCase">Kembali</button>
+                    <button type="button" class="btn btn-submit-form" id="btnSubmitFormulaCase">Simpan</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="modal detail-modal" id="formulaVgm" tabindex="1">
+    <div class="modal-dialog" style="min-width: 700px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title title-secondary">Formula Hitung Qty VGM</h5>
+            </div>
+            <form class="create-form-formula-vgm" role="form" method="POST">
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="input-group">
+                                <div class="form-floating mb-3" style="height: 50px;">
+                                    <input readonly autocomplete="one-time-code" type="text" oninput="this.value = greatFormatRupiah(this.value)" class="form-control formula_berat_kotor_hitung_vgm" id="formula_berat_kotor_hitung_vgm" name="formula_berat_kotor_hitung_vgm" placeholder="Berat Kotor">
+                                    <label for="floatingInput">Qty Berat Kotor</label>
+                                </div>
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text" id="basic-addon1">
+                                        +
+                                    </span>
+                                </div>
+                                <div class="form-floating mb-3" style="height: 50px;">
+                                    <input autocomplete="one-time-code" type="text" oninput="this.value = greatFormatRupiah(this.value)" class="form-control formula_bilangan_hitung_vgm" id="formula_bilangan_hitung_vgm" name="formula_bilangan_hitung_vgm" placeholder="Nilai Bilangan">
+                                    <label for="floatingInput">Qty Empty Container</label>
+                                </div>
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text" id="basic-addon1">
+                                        =
+                                    </span>
+                                </div>
+                                <div class="form-floating mb-3" style="height: 50px;">
+                                    <input readonly autocomplete="one-time-code" type="text" oninput="this.value = greatFormatRupiah(this.value)" class="form-control hasil_vgm" id="hasil_vgm" name="hasil_vgm" placeholder="Qty VGM">
+                                    <label for="floatingInput">Qty Vgm</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-discard mr-2" id="btnHideFormulaVgm">Kembali</button>
+                    <button type="button" class="btn btn-submit-form" id="btnSubmitFormulaVGm">Simpan</button>
                 </div>
             </form>
         </div>
@@ -916,6 +1061,87 @@
             $('#label-detail-biaya-tambahan').text('Tambah ');
             $('#biayaTambahanModal').modal('show');
         });
+
+        $('#formulaCanBtn').click(function(e) {
+            e.preventDefault();
+            resetFormFormulaCan();
+            var casePackingVal = $('#case_packing').val();
+            if (casePackingVal == "") {
+                Swal.fire({
+                    icon: 'error',
+                    title: "Isikan terlebih dahulu Qty Can",
+                    confirmButtonColor: '#4e73df',
+                })
+            } else {
+                var casePacking = destroyFormatRupiah(casePackingVal);
+                $('#formula_qty_case_hitung_can').val(greatFormatRupiah(casePacking));
+                $('#formulaCanModal').modal('show');
+            }
+        });
+
+        $('#formulaVgmBtn').click(function(e) {
+            e.preventDefault();
+            resetFormFormulaVgm();
+            var beratKotor = $('#berat_kotor').val();
+            if (beratKotor == "") {
+                Swal.fire({
+                    icon: 'error',
+                    title: "Isikan terlebih dahulu berat kotor",
+                    confirmButtonColor: '#4e73df',
+                })
+            } else {
+                var beratKotor = destroyFormatRupiah(beratKotor);
+                $('#formula_berat_kotor_hitung_vgm').val(greatFormatRupiah(beratKotor));
+                $('#formulaVgm').modal('show');
+            }
+        });
+
+        $('#formulaCaseBtn').click(function(e) {
+            e.preventDefault();
+            resetFormFormulaCase();
+            var canPacking = destroyFormatRupiah($('#can_packing').val());
+            $('#formula_qty_can_hitung_case').val(greatFormatRupiah(canPacking));
+            $('#formulaCtModal').modal('show');
+        });
+
+        $('#btnHideFormulaVgm').click(function(e) {
+            e.preventDefault();
+            $('#formulaVgm').modal('hide');
+        });
+
+        $('#btnHideFormulaCan').click(function(e) {
+            e.preventDefault();
+            $('#formulaCanModal').modal('hide');
+        });
+
+        $('#btnHideFormulaCase').click(function(e) {
+            e.preventDefault();
+            $('#formulaCtModal').modal('hide');
+        });
+
+        $('#formula_bilangan_can_hitung_case').keyup(function(e) {
+            e.preventDefault();
+            var formulaQtyCan = destroyFormatRupiah($('#formula_qty_can_hitung_case').val());
+            var formulaBilanganCan = destroyFormatRupiah($('#formula_bilangan_can_hitung_case').val());
+            var hasilQtyCase = formulaQtyCan / formulaBilanganCan;
+            $('#hasil_qty_case_hitung_case').val(greatFormatRupiah(hasilQtyCase));
+        });
+
+        $('#formula_bilangan_case_hitung_can').keyup(function(e) {
+            e.preventDefault();
+            var formulaQtyCase = destroyFormatRupiah($('#formula_qty_case_hitung_can').val());
+            var formulaBilanganCase = destroyFormatRupiah($('#formula_bilangan_case_hitung_can').val());
+            var formulaQtyCan = formulaQtyCase * formulaBilanganCase;
+            $('#hasil_qty_can_hitung_can').val(greatFormatRupiah(formulaQtyCan));
+        });
+
+        $('#formula_bilangan_hitung_vgm').keyup(function(e) {
+            e.preventDefault();
+            var formulaBilangan = destroyFormatRupiah($('#formula_bilangan_hitung_vgm').val());
+            var beratKotor = destroyFormatRupiah($('#formula_berat_kotor_hitung_vgm').val());
+            var hasilVgm = formulaBilangan + beratKotor;
+            $('#hasil_vgm').val(greatFormatRupiah(hasilVgm));
+        })
 
         // VALIDATOR PARENT BARANG  
         var validator = $("#form-parent").validate({
@@ -1066,6 +1292,9 @@
         // VALIDATOR SIZE & BREAKDOWN
         var validatorSizeBreakdown = $('.create-form-size-breakdown').validate({
             rules: {
+                grade: {
+                    required: true
+                },
                 qty: {
                     required: true
                 },
@@ -1077,6 +1306,9 @@
                 }
             },
             messages: {
+                grade: {
+                    required: "Grade required"
+                },
                 qty: {
                     required: "Qty required"
                 },
@@ -1240,6 +1472,174 @@
             },
         });
 
+        // VALIDATOR FORMULA CAN
+        var validatorCan = $(".create-form-formula-can").validate({
+            rules: {
+                formula_qty_case_hitung_can: {
+                    required: true
+                },
+                formula_bilangan_case_hitung_can: {
+                    required: true
+                },
+                hasil_qty_can_hitung_can: {
+                    required: true
+                },
+            },
+            messages: {
+                formula_qty_case_hitung_can: {
+                    required: "Qty Case Wajib Diisi"
+                },
+                formula_bilangan_case_hitung_can: {
+                    required: "Qty Per Case Wajib Diisi"
+                },
+                hasil_qty_can_hitung_can: {
+                    required: "Hasil Formula Wajib Diisi"
+                },
+            },
+            errorElement: 'span',
+            errorClass: 'text-danger',
+            errorPlacement: function(error, element) {
+                var elem = $(element);
+                if (elem.hasClass("select2-hidden-accessible")) {
+                    element = $("#select2-" + elem.attr("id") + "-container").parent();
+                    error.insertAfter(element);
+                } else {
+                    error.insertAfter(element);
+                }
+            },
+            highlight: function(element) {
+                $(element).closest('.form-group').addClass('has-error');
+                $(element).addClass('select-class');
+
+            },
+            unhighlight: function(element) {
+                $(element).closest('.form-group').removeClass('has-error');
+                $(element).removeClass('select-class');
+            },
+        });
+
+        // FORMULA CASE
+        var validatorCase = $(".create-form-formula-case").validate({
+            rules: {
+                formula_qty_can_hitung_case: {
+                    required: true
+                },
+                formula_bilangan_can_hitung_case: {
+                    required: true
+                },
+                hasil_qty_case_hitung_case: {
+                    required: true
+                },
+            },
+            messages: {
+                formula_qty_can_hitung_case: {
+                    required: "Qty Can Wajib DIisi"
+                },
+                formula_bilangan_can_hitung_case: {
+                    required: "Qty Per Can Wajib Diisi"
+                },
+                hasil_qty_case_hitung_case: {
+                    required: "Hasil Formula Case Wajib Diisi"
+                },
+            },
+            errorElement: 'span',
+            errorClass: 'text-danger',
+            errorPlacement: function(error, element) {
+                var elem = $(element);
+                if (elem.hasClass("select2-hidden-accessible")) {
+                    element = $("#select2-" + elem.attr("id") + "-container").parent();
+                    error.insertAfter(element);
+                } else {
+                    error.insertAfter(element);
+                }
+            },
+            highlight: function(element) {
+                $(element).closest('.form-group').addClass('has-error');
+                $(element).addClass('select-class');
+
+            },
+            unhighlight: function(element) {
+                $(element).closest('.form-group').removeClass('has-error');
+                $(element).removeClass('select-class');
+            },
+        });
+
+        // FORMULA VGM
+        var validatorVgm = $(".create-form-formula-vgm").validate({
+            rules: {
+                formula_berat_kotor_hitung_vgm: {
+                    required: true
+                },
+                formula_bilangan_hitung_vgm: {
+                    required: true
+                },
+                hasil_vgm: {
+                    required: true
+                },
+            },
+            messages: {
+                formula_berat_kotor_hitung_vgm: {
+                    required: "Berat kotor wajib diisi"
+                },
+                formula_bilangan_hitung_vgm: {
+                    required: "Nilai bilangan wajib diisi"
+                },
+                hasil_vgm: {
+                    required: "Hasil VGM wajib diisi"
+                },
+            },
+            errorElement: 'span',
+            errorClass: 'text-danger',
+            errorPlacement: function(error, element) {
+                var elem = $(element);
+                if (elem.hasClass("select2-hidden-accessible")) {
+                    element = $("#select2-" + elem.attr("id") + "-container").parent();
+                    error.insertAfter(element);
+                } else {
+                    error.insertAfter(element);
+                }
+            },
+            highlight: function(element) {
+                $(element).closest('.form-group').addClass('has-error');
+                $(element).addClass('select-class');
+
+            },
+            unhighlight: function(element) {
+                $(element).closest('.form-group').removeClass('has-error');
+                $(element).removeClass('select-class');
+            },
+        });
+
+        $('#btnSubmitFormulaVGm').click(function(e) {
+            e.preventDefault();
+            if ($('.create-form-formula-vgm').valid()) {
+                var hasilVgm = destroyFormatRupiah($('#hasil_vgm').val());
+                $('#vgm').val(greatFormatRupiah(hasilVgm));
+                $('#formulaVgm').modal('hide');
+            }
+
+        });
+
+
+        $('#btnSubmitFormulaCan').click(function(e) {
+            e.preventDefault();
+            if ($('.create-form-formula-can').valid()) {
+                var formulaQtyCan = destroyFormatRupiah($('#hasil_qty_can_hitung_can').val());
+
+                $('#can_packing').val(greatFormatRupiah(formulaQtyCan));
+                $('#formulaCanModal').modal('hide');
+            }
+        });
+
+        $('#btnSubmitFormulaCase').click(function(e) {
+            e.preventDefault();
+            if ($('.create-form-formula-case').valid()) {
+                var formulaQtyCase = destroyFormatRupiah($('#hasil_qty_case_hitung_case').val());
+
+                $('#case_packing').val(greatFormatRupiah(formulaQtyCase));
+                $('#formulaCtModal').modal('hide');
+            }
+        })
 
         $('#btnSubmitSizeBreakDown').click(function(e) {
             e.preventDefault();
@@ -1247,20 +1647,9 @@
                 var id_detail_breakdown = $('#id_detail_breakdown').val();
                 var size = $('#size').val();
                 var grade = $('#grade').val();
-                var packing_size = $('#packing_size').val();
-                var can = $('#can').val();
-                var cased = destroyFormatRupiah($('#case').val());
-                var kg = $('#kg').val();
-                var lb = $('#lb').val();
-                var inner_box = $('#inner_box').val();
-                var pc = $('#pc').val();
-                var bag = $('#bag').val();
-                var palet = $('#palet').val();
-                var persen = destroyFormatRupiah($('#persen').val() || 0);
                 var qty = $('#qty').val();
                 var harga = destroyFormatRupiah($('#harga').val());
                 var total = destroyFormatRupiah($('#total').val());
-                var remark = $('#remark').val();
                 var satuan_size_id = $('#satuan_size_id option:selected').val();
                 var satuan_size_code = $('#satuan_size_id option:selected').text();
 
@@ -1268,20 +1657,9 @@
                     id_detail_breakdown: id_detail_breakdown,
                     size: size,
                     grade: grade,
-                    packing: packing_size,
-                    can: can,
-                    cased: cased,
-                    kg: kg,
-                    lb: lb,
-                    inner_box: inner_box,
-                    pc: pc,
-                    bag: bag,
-                    palet: palet,
-                    persen: persen,
                     qty: qty,
                     harga: harga,
                     total: harga * qty,
-                    remark: remark,
                     satuan_size_id: satuan_size_id,
                     satuan_size_code: satuan_size_code
                 }
@@ -1300,22 +1678,11 @@
                         }
                     }
 
-                    listSizeBreakdown[index].palet = palet;
                     listSizeBreakdown[index].size = result.size;
                     listSizeBreakdown[index].grade = result.grade;
-                    listSizeBreakdown[index].packing = result.packing;
-                    listSizeBreakdown[index].can = result.can;
-                    listSizeBreakdown[index].cased = result.cased;
-                    listSizeBreakdown[index].kg = result.kg;
-                    listSizeBreakdown[index].lb = result.lb;
-                    listSizeBreakdown[index].inner_box = result.inner_box;
-                    listSizeBreakdown[index].pc = result.pc;
-                    listSizeBreakdown[index].bag = result.bag;
-                    listSizeBreakdown[index].persen = result.persen;
                     listSizeBreakdown[index].qty = result.qty;
                     listSizeBreakdown[index].harga = result.harga;
                     listSizeBreakdown[index].total = result.total;
-                    listSizeBreakdown[index].remark = result.remark;
                     listSizeBreakdown[index].satuan_size_id = result.satuan_size_id;
                     listSizeBreakdown[index].satuan_size_code = result.satuan_size_code;
                 }
@@ -1330,6 +1697,18 @@
             e.preventDefault();
             if ($('.create-form-breakdown-packing').valid()) {
                 var idDetailBreakdownPacking = $('#id_detail_breakdown_packing').val();
+                //------------------------
+                var canPacking = destroyFormatRupiah($('#can_packing').val());
+                var casePacking = destroyFormatRupiah($('#case_packing').val());
+                var kgPacking = destroyFormatRupiah($('#kg_packing').val());
+                var lbPacking = destroyFormatRupiah($('#lb_packing').val());
+                var innerBoxPacking = destroyFormatRupiah($('#inner_box_packing').val());
+                var pcPacking = destroyFormatRupiah($('#pc_packing').val());
+                var bagPacking = destroyFormatRupiah($('#bag_packing').val());
+                var persenPacking = destroyFormatRupiah($('#persen_packing').val());
+                var cupPacking = destroyFormatRupiah($('#cup_packing').val());
+                var paletPacking = destroyFormatRupiah($('#palet_packing').val());
+                //---------------------------------
                 var packing = destroyFormatRupiah($('#packing').val());
                 var beratBersih = destroyFormatRupiah($('#berat_bersih').val());
                 var beratKotor = destroyFormatRupiah($('#berat_kotor').val());
@@ -1338,6 +1717,16 @@
 
                 var result = {
                     id_detail_breakdown_packing: idDetailBreakdownPacking,
+                    can: canPacking,
+                    case: casePacking,
+                    kg: kgPacking,
+                    lb: lbPacking,
+                    inner_box: innerBoxPacking,
+                    pc: pcPacking,
+                    bag: bagPacking,
+                    persen: persenPacking,
+                    cup: cupPacking,
+                    palet: paletPacking,
                     packing: packing,
                     berat_bersih: beratBersih,
                     berat_kotor: beratKotor,
@@ -1354,7 +1743,17 @@
                     }
                 }
 
-                listPackingSizeBreakdown[index].packing = packing;
+                listPackingSizeBreakdown[index].can = result.can;
+                listPackingSizeBreakdown[index].case = result.case;
+                listPackingSizeBreakdown[index].kg = result.kg;
+                listPackingSizeBreakdown[index].lb = result.lb;
+                listPackingSizeBreakdown[index].inner_box = result.inner_box;
+                listPackingSizeBreakdown[index].pc = result.pc;
+                listPackingSizeBreakdown[index].bag = result.bag;
+                listPackingSizeBreakdown[index].persen = result.persen;
+                listPackingSizeBreakdown[index].cup = result.cup;
+                listPackingSizeBreakdown[index].palet = result.palet;
+                listPackingSizeBreakdown[index].packing = result.packing;
                 listPackingSizeBreakdown[index].berat_bersih = result.berat_bersih;
                 listPackingSizeBreakdown[index].berat_kotor = result.berat_kotor;
                 listPackingSizeBreakdown[index].vgm = result.vgm;
@@ -1611,12 +2010,10 @@
                             let url = id == '' ? "<?= base_url('invoice-packing-customer/create') ?>" : "<?= base_url('invoice-packing-customer/update') ?>";
                             let data = new FormData(document.querySelector("#form-parent"));
                             let totalNilaiInvoice = destroyFormatRupiah($('#total_nilai_invoice').val());
-                            let totalPacking = destroyFormatRupiah($('#total_packing').val());
                             let totalBeratBersih = destroyFormatRupiah($('#total_berat_bersih').val());
                             let totalBeratKotor = destroyFormatRupiah($('#total_berat_kotor').val());
 
                             data.set("total_nilai_invoice", totalNilaiInvoice);
-                            data.set("total_packing", totalPacking);
                             data.set("total_berat_bersih", totalBeratBersih);
                             data.set("total_berat_kotor", totalBeratKotor);
 
@@ -1673,10 +2070,10 @@
         if (listSizeBreakdown.length === 0) {
             row += `
                     <tr>
-                        <td colspan="15"></td>
+                        <td colspan="3"></td>
                         <td><b>TOTAL</b></td>
                         <td><b>0.00</b></td>
-                        <td><b>0.00</b></td>
+                        <td><b></b></td>
                         <td><b>0.00</b></td>
                         <td></td>
                     </tr>
@@ -1692,18 +2089,6 @@
                 newRow.append($('<td style="text-align:center;">').text(no++));
                 newRow.append($('<td>').text(item.size));
                 newRow.append($('<td>').text(item.grade));
-                newRow.append($('<td>').text(item.packing));
-                newRow.append($('<td>').text(item.can));
-                newRow.append($('<td>').text(greatFormatRupiah(item.cased)));
-                newRow.append($('<td>').text(item.kg));
-                newRow.append($('<td>').text(item.lb));
-                newRow.append($('<td>').text(item.inner_box));
-                newRow.append($('<td>').text(item.pc));
-                newRow.append($('<td>').text(item.bag));
-                newRow.append($('<td>').text(item.cup));
-                newRow.append($('<td>').text(item.palet));
-                newRow.append($('<td>').text(item.persen));
-                newRow.append($('<td>').text(item.remark));
                 newRow.append($('<td>').text(item.satuan_size_code));
                 newRow.append($('<td>').text(greatFormatRupiah(item.qty)));
                 newRow.append($('<td>').text(greatFormatRupiah(item.harga)));
@@ -1738,10 +2123,10 @@
             $('#body-barang-size-breakdown').append(row);
             table.find('tfoot').empty();
             var newRow = $('<tr>');
-            newRow.append($('<td colspan="15"></td>'));
+            newRow.append($('<td colspan="3"></td>'));
             newRow.append($('<td><b>TOTAL</b></td>'));
             newRow.append($('<td><b>' + greatFormatRupiah(totalQty) + '</b></td>'));
-            newRow.append($('<td><b>' + greatFormatRupiah(totalHarga.toFixed(2)) + '</b></td>'));
+            newRow.append($('<td><b></b></td>'));
             newRow.append($('<td><b>' + greatFormatRupiah(totalTotalHarga.toFixed(2)) + '</b></td>'));
             newRow.append($('<td></td>'));
             table.find('tfoot').append(newRow);
@@ -1757,8 +2142,17 @@
         if (listPackingSizeBreakdown.length === 0) {
             row += `
                     <tr>
-                        <td colspan="15></td>
+                        <td colspan="2></td>
                         <td><b>TOTAL</b></td>
+                        <td><b>0.00</b></td>
+                        <td><b>0.00</b></td>
+                        <td><b>0.00</b></td>
+                        <td><b>0.00</b></td>
+                        <td><b>0.00</b></td>
+                        <td><b>0.00</b></td>
+                        <td><b>0.00</b></td>
+                        <td><b>0.00</b></td>
+                        <td><b>0.00</b></td>
                         <td><b>0.00</b></td>
                         <td><b>0.00</b></td>
                         <td><b>0.00</b></td>
@@ -1769,7 +2163,16 @@
                 `;
             $('.tfoot-packing-breakdown').append(row);
         } else {
-            var totalQty = 0;
+            var totalCan = 0;
+            var totalCased = 0;
+            var totalKg = 0;
+            var totalLb = 0;
+            var totalInnerBox = 0;
+            var totalPc = 0;
+            var totalBag = 0;
+            var totalPersen = 0;
+            var totalCup = 0;
+            var totalPalet = 0;
             var totalBeratBersih = 0;
             var totalBeratKotor = 0;
             var totalVgm = 0;
@@ -1780,24 +2183,21 @@
                 newRow.append($('<td style="text-align:center;">').text(no++));
                 newRow.append($('<td>').text(item.size));
                 newRow.append($('<td>').text(item.grade));
-                newRow.append($('<td>').text(item.packing));
-                newRow.append($('<td>').text(item.can));
-                newRow.append($('<td>').text(item.cased));
-                newRow.append($('<td>').text(item.kg));
-                newRow.append($('<td>').text(item.lb));
-                newRow.append($('<td>').text(item.inner_box));
-                newRow.append($('<td>').text(item.pc));
-                newRow.append($('<td>').text(item.bag));
-                newRow.append($('<td>').text(item.cup));
-                newRow.append($('<td>').text(item.palet));
-                newRow.append($('<td>').text(item.persen));
-                newRow.append($('<td>').text(item.remark));
-                newRow.append($('<td>').text(item.satuan_size_code));
-                newRow.append($('<td>').text(greatFormatRupiah(item.qty)));
+                newRow.append($('<td>').text(greatFormatRupiah(item.can)));
+                newRow.append($('<td>').text(greatFormatRupiah(item.case)));
+                newRow.append($('<td>').text(greatFormatRupiah(item.kg)));
+                newRow.append($('<td>').text(greatFormatRupiah(item.lb)));
+                newRow.append($('<td>').text(greatFormatRupiah(item.inner_box)));
+                newRow.append($('<td>').text(greatFormatRupiah(item.pc)));
+                newRow.append($('<td>').text(greatFormatRupiah(item.bag)));
+                newRow.append($('<td>').text(greatFormatRupiah(item.persen)));
+                newRow.append($('<td>').text(greatFormatRupiah(item.cup)));
+                newRow.append($('<td>').text(greatFormatRupiah(item.palet)));
                 newRow.append($('<td>').text(greatFormatRupiah(item.berat_bersih)));
                 newRow.append($('<td>').text(greatFormatRupiah(item.berat_kotor)));
                 newRow.append($('<td>').text(greatFormatRupiah(item.vgm)));
                 newRow.append($('<td>').text(greatFormatRupiah(item.drammed)));
+
                 newRow.append($('<td>').html(
                     <?php if (!empty($dataInvoice)) : ?> <?php if ($dataInvoice['status_posting']) : ?> `-`
                         <?php else : ?> `
@@ -1819,7 +2219,16 @@
                     <?php endif; ?>
                 ));
 
-                totalQty += parseFloat(item.qty);
+                totalCan += parseFloat(item.can);
+                totalCased += destroyFormatRupiah(item.case);
+                totalKg += destroyFormatRupiah(item.kg);
+                totalLb += destroyFormatRupiah(item.lb);
+                totalInnerBox += destroyFormatRupiah(item.inner_box);
+                totalPc += destroyFormatRupiah(item.pc);
+                totalBag += destroyFormatRupiah(item.bag);
+                totalPersen += destroyFormatRupiah(item.persen);
+                totalCup += destroyFormatRupiah(item.cup);
+                totalPalet += destroyFormatRupiah(item.palet);
                 totalBeratBersih += destroyFormatRupiah(item.berat_bersih);
                 totalBeratKotor += destroyFormatRupiah(item.berat_kotor);
                 totalVgm += destroyFormatRupiah(item.vgm);
@@ -1830,9 +2239,18 @@
             $('#body-packing-breakdown').append(row);
             table.find('tfoot').empty();
             var newRow = $('<tr>');
-            newRow.append($('<td colspan="15"></td>'));
+            newRow.append($('<td colspan="2"></td>'));
             newRow.append($('<td><b>TOTAL</b></td>'));
-            newRow.append($('<td><b>' + greatFormatRupiah(totalQty.toFixed(2)) + '</b></td>'));
+            newRow.append($('<td><b>' + greatFormatRupiah(totalCan.toFixed(2)) + '</b></td>'));
+            newRow.append($('<td><b>' + greatFormatRupiah(totalCased.toFixed(2)) + '</b></td>'));
+            newRow.append($('<td><b>' + greatFormatRupiah(totalKg.toFixed(2)) + '</b></td>'));
+            newRow.append($('<td><b>' + greatFormatRupiah(totalLb.toFixed(2)) + '</b></td>'));
+            newRow.append($('<td><b>' + greatFormatRupiah(totalInnerBox.toFixed(2)) + '</b></td>'));
+            newRow.append($('<td><b>' + greatFormatRupiah(totalPc.toFixed(2)) + '</b></td>'));
+            newRow.append($('<td><b>' + greatFormatRupiah(totalBag.toFixed(2)) + '</b></td>'));
+            newRow.append($('<td><b>' + greatFormatRupiah(totalPersen.toFixed(2)) + '</b></td>'));
+            newRow.append($('<td><b>' + greatFormatRupiah(totalCup.toFixed(2)) + '</b></td>'));
+            newRow.append($('<td><b>' + greatFormatRupiah(totalPalet.toFixed(2)) + '</b></td>'));
             newRow.append($('<td><b>' + greatFormatRupiah(totalBeratBersih.toFixed(2)) + '</b></td>'));
             newRow.append($('<td><b>' + greatFormatRupiah(totalBeratKotor.toFixed(2)) + '</b></td>'));
             newRow.append($('<td><b>' + greatFormatRupiah(totalVgm.toFixed(2)) + '</b></td>'));
@@ -1857,7 +2275,7 @@
         $('#grade').val(item.grade);
         $('#packing_size').val(item.packing_size);
         $('#can').val(item.can);
-        $('#case').val(greatFormatRupiah(item.cased));
+        $('#case').val(greatFormatRupiah(item.case));
         $('#kg').val(item.kg);
         $('#lb').val(item.lb);
         $('#inner_box').val(item.inner_box);
@@ -1867,7 +2285,6 @@
         $('#qty').val(item.qty);
         $('#harga').val(greatFormatRupiah(item.harga));
         $('#total').val(greatFormatRupiah(item.total));
-        $('#remark').val(item.remark);
         $('#satuan_size_id').val(item.satuan_size_id).change();
 
         $('.title-size-breakdown').text("Update ");
@@ -1882,6 +2299,21 @@
                 break;
             }
         }
+        console.log(item);
+        // -----------------------------
+        $('#grade_packing').val(item.grade);
+        $('#size_packing').val(item.size);
+        $('#can_packing').val(greatFormatRupiah(item.can));
+        $('#case_packing').val(greatFormatRupiah(item.qty));
+        $('#kg_packing').val(greatFormatRupiah(item.kg));
+        $('#lb_packing').val(greatFormatRupiah(item.lb));
+        $('#inner_box_packing').val(greatFormatRupiah(item.inner_box));
+        $('#pc_packing').val(greatFormatRupiah(item.pc));
+        $('#bag_packing').val(greatFormatRupiah(item.bag));
+        $('#persen_packing').val(greatFormatRupiah(item.persen));
+        $('#cup_packing').val(greatFormatRupiah(item.cup));
+        $('#palet_packing').val(greatFormatRupiah(item.palet));
+        // ------------------------------
         $('.title-breakdown-packing').text('Update ');
         $('#id_detail_breakdown_packing').val(item.id_detail_breakdown_packing);
         $('#qty_packing').val(greatFormatRupiah(item.qty));
@@ -2047,30 +2479,36 @@
                     <tr>
                         <th>Size</th>
                         <th>Grade</th>
-                        <th>Packing</th>
                         <th>Can</th>
-                        <th>Case</th>
+                        <th>Case / Carton</th>
                         <th>Kg</th>
                         <th>LB</th>
                         <th>Inner Box</th>
                         <th>PC</th>
                         <th>Bag</th>
-                        <th>Unit</th>
-                        <th>Remarks</th>
-                        <th>Pallet</th>
                         <th>%</th>
-                        <th>Qty</th>
+                        <th>Cup</th>
+                        <th>Pallet</th>
                         <th>Berat Bersih</th>
                         <th>Berat Kotor</th>
                         <th>VGM</th>
-                        <th>Drammed</th>
+                        <th>Drained</th>
                     </tr>
                 </thead>
                 <tbody></tbody>
                 <tfoot>
                     <tr>
-                        <td colspan="14" class="text-end"><b>TOTAL</b></td>
-                        <td class="total-qty"><b>0.00</b></td>
+                        <td colspan="2" class="text-end"><b>TOTAL</b></td>
+                        <td class="total-can"><b>0.00</b></td>
+                        <td class="total-case"><b>0.00</b></td>
+                        <td class="total-kg"><b>0.00</b></td>
+                        <td class="total-lb"><b>0.00</b></td>
+                        <td class="total-inner-box"><b>0.00</b></td>
+                        <td class="total-pc"><b>0.00</b></td>
+                        <td class="total-bag"><b>0.00</b></td>
+                        <td class="total-persen"><b>0.00</b></td>
+                        <td class="total-cup"><b>0.00</b></td>
+                        <td class="total-palet"><b>0.00</b></td>
                         <td class="total-berat-bersih"><b>0.00</b></td>
                         <td class="total-berat-kotor"><b>0.00</b></td>
                         <td class="total-vgm"><b>0.00</b></td>
@@ -2081,22 +2519,49 @@
         `);
 
             const breakdownBody = innerTable.find('tbody');
-            let totalQty = 0;
-            let totalBeratBersih = 0;
-            let totalBeratKotor = 0;
-            let totalVgm = 0;
-            let totalDrammed = 0;
+            var totalCan = 0;
+            var totalCase = 0;
+            var totalKg = 0;
+            var totalLb = 0;
+            var totalInnerBox = 0;
+            var totalPc = 0;
+            var totalBag = 0;
+            var totalPersen = 0;
+            var totalCup = 0;
+            var totalPalet = 0;
+            var totalBeratBersih = 0;
+            var totalBeratKotor = 0;
+            var totalVgm = 0;
+            var totalDrammed = 0;
 
             item.size_breakdown.forEach(size => {
-                let qty = parseFloat(size.qty) || 0;
-                let berat_bersih = parseFloat(size.berat_bersih) || 0;
-                let berat_kotor = parseFloat(size.berat_kotor) || 0;
+                let can = parseFloat(size.can) || 0;
+                let cased = parseFloat(size.case) || 0;
+                let kg = parseFloat(size.kg) || 0;
+                let lb = parseFloat(size.lb) || 0;
+                let innerBox = parseFloat(size.inner_box) || 0;
+                let pc = parseFloat(size.pc) || 0;
+                let bag = parseFloat(size.bag) || 0;
+                let persen = parseFloat(size.persen) || 0;
+                let cup = parseFloat(size.cup) || 0;
+                let palet = parseFloat(size.palet) || 0;
+                let beratBersih = parseFloat(size.berat_bersih) || 0;
+                let beratKotor = parseFloat(size.berat_kotor) || 0;
                 let vgm = parseFloat(size.vgm) || 0;
                 let drammed = parseFloat(size.drammed) || 0;
 
-                totalQty += qty;
-                totalBeratBersih += berat_bersih;
-                totalBeratKotor += berat_kotor;
+                totalCan += can;
+                totalCase += cased;
+                totalKg += kg;
+                totalLb += lb;
+                totalInnerBox += innerBox;
+                totalPc += pc;
+                totalBag += bag;
+                totalPersen += persen;
+                totalCup += cup;
+                totalPalet += palet;
+                totalBeratBersih += beratBersih;
+                totalBeratKotor += beratKotor;
                 totalVgm += vgm;
                 totalDrammed += drammed;
 
@@ -2104,21 +2569,18 @@
                 <tr>
                     <td>${size.size || ''}</td>
                     <td>${size.grade || ''}</td>
-                    <td>${size.packing || ''}</td>
-                    <td>${size.can || ''}</td>
-                    <td>${size.cased || ''}</td>
-                    <td>${size.kg || ''}</td>
-                    <td>${size.lb || ''}</td>
-                    <td>${size.inner_box || ''}</td>
-                    <td>${size.pc || ''}</td>
-                    <td>${size.bag || ''}</td>
-                    <td>${size.satuan_size_code || ''}</td>
-                    <td>${size.remark || ''}</td>
-                    <td>${size.palet || ''}</td>
-                    <td>${size.persen || ''}</td>
-                    <td>${greatFormatRupiah(qty.toFixed(2))}</td>
-                    <td>${greatFormatRupiah(berat_bersih.toFixed(2))}</td>
-                    <td>${greatFormatRupiah(berat_kotor.toFixed(2))}</td>
+                    <td>${greatFormatRupiah(can.toFixed(2)) || ''}</td>
+                    <td>${greatFormatRupiah(cased.toFixed(2)) || ''}</td>
+                    <td>${greatFormatRupiah(kg.toFixed(2)) || ''}</td>
+                    <td>${greatFormatRupiah(lb.toFixed(2)) || ''}</td>
+                    <td>${greatFormatRupiah(innerBox.toFixed(2)) || ''}</td>
+                    <td>${greatFormatRupiah(pc.toFixed(2)) || ''}</td>
+                    <td>${greatFormatRupiah(bag.toFixed(2)) || ''}</td>
+                    <td>${greatFormatRupiah(persen.toFixed(2)) || ''}</td>
+                    <td>${greatFormatRupiah(cup.toFixed(2)) || ''}</td>
+                    <td>${greatFormatRupiah(palet.toFixed(2)) || ''}</td>
+                    <td>${greatFormatRupiah(beratBersih.toFixed(2)) || ''}</td>
+                    <td>${greatFormatRupiah(beratKotor.toFixed(2)) || ''}</td>
                     <td>${greatFormatRupiah(vgm.toFixed(2))}</td>
                     <td>${greatFormatRupiah(drammed.toFixed(2))}</td>
                 </tr>
@@ -2126,13 +2588,22 @@
                 breakdownBody.append(row);
             });
 
-            innerTable.find('.total-qty').html(`<b>${greatFormatRupiah(totalQty.toFixed(2))}</b>`);
+            innerTable.find('.total-can').html(`<b>${greatFormatRupiah(totalCan.toFixed(2))}</b>`);
+            innerTable.find('.total-case').html(`<b>${greatFormatRupiah(totalCase.toFixed(2))}</b>`);
+            innerTable.find('.total-kg').html(`<b>${greatFormatRupiah(totalKg.toFixed(2))}</b>`);
+            innerTable.find('.total-lb').html(`<b>${greatFormatRupiah(totalLb.toFixed(2))}</b>`);
+            innerTable.find('.total-inner-box').html(`<b>${greatFormatRupiah(totalInnerBox.toFixed(2))}</b>`);
+            innerTable.find('.total-pc').html(`<b>${greatFormatRupiah(totalPc.toFixed(2))}</b>`);
+            innerTable.find('.total-bag').html(`<b>${greatFormatRupiah(totalBag.toFixed(2))}</b>`);
+            innerTable.find('.total-persen').html(`<b>${greatFormatRupiah(totalPersen.toFixed(2))}</b>`);
+            innerTable.find('.total-cup').html(`<b>${greatFormatRupiah(totalCup.toFixed(2))}</b>`);
+            innerTable.find('.total-palet').html(`<b>${greatFormatRupiah(totalPalet.toFixed(2))}</b>`);
             innerTable.find('.total-berat-bersih').html(`<b>${greatFormatRupiah(totalBeratBersih.toFixed(2))}</b>`);
             innerTable.find('.total-berat-kotor').html(`<b>${greatFormatRupiah(totalBeratKotor.toFixed(2))}</b>`);
             innerTable.find('.total-vgm').html(`<b>${greatFormatRupiah(totalVgm.toFixed(2))}</b>`);
             innerTable.find('.total-drammed').html(`<b>${greatFormatRupiah(totalDrammed.toFixed(2))}</b>`);
 
-            detailRow.append(`<td colspan="10"><b>DETAIL PACKING</b><br>${innerTable.prop('outerHTML')}</td>`);
+            detailRow.append(`<td colspan="16"><b>DETAIL PACKING</b><br>${innerTable.prop('outerHTML')}</td>`);
             tbody.append(detailRow);
         });
 
@@ -2198,18 +2669,7 @@
                     <tr>
                         <th>Size</th>
                         <th>Grade</th>
-                        <th>Packing</th>
-                        <th>Can</th>
-                        <th>Case</th>
-                        <th>Kg</th>
-                        <th>LB</th>
-                        <th>Inner Box</th>
-                        <th>PC</th>
-                        <th>Bag</th>
-                        <th>Unit</th>
-                        <th>Remarks</th>
-                        <th>Pallet</th>
-                        <th>%</th>
+                        <th>Satuan</th>
                         <th>Qty</th>
                         <th>Unit Price</th>
                         <th>Total Amount</th>
@@ -2218,10 +2678,9 @@
                 <tbody></tbody>
                 <tfoot>
                     <tr>
-                        <td colspan="13" class="text-end"><b>TOTAL</b></td>
-                        <td class="total-persen"><b>0.00</b></td>
+                        <td colspan="3" class="text-end"><b>TOTAL</b></td>
                         <td class="total-qty"><b>0.00</b></td>
-                        <td class="total-price"><b>0.00</b></td>
+                        <td class="total-price"></td>
                         <td class="total-amount"><b>0.00</b></td>
                     </tr>
                 </tfoot>
@@ -2230,37 +2689,21 @@
 
             const breakdownBody = innerTable.find('tbody');
             let totalQtySize = 0;
-            let totalHargaSize = 0;
             let totalAmountSize = 0;
-            let totalPersenSize = 0;
 
             item.size_breakdown.forEach(size => {
                 let qty = parseFloat(size.qty) || 0;
-                let harga = parseFloat(size.harga) || 0;
                 let total = parseFloat(size.total) || 0;
-                let persen = parseFloat(size.persen) || 0;
+                let harga = parseFloat(size.harga) || 0;
 
                 totalQtySize += qty;
-                totalHargaSize += harga;
                 totalAmountSize += total;
-                totalPersenSize += persen;
 
                 const row = `
                 <tr>
                     <td>${size.size || ''}</td>
                     <td>${size.grade || ''}</td>
-                    <td>${size.packing || ''}</td>
-                    <td>${size.can || ''}</td>
-                    <td>${size.cased || ''}</td>
-                    <td>${size.kg || ''}</td>
-                    <td>${size.lb || ''}</td>
-                    <td>${size.inner_box || ''}</td>
-                    <td>${size.pc || ''}</td>
-                    <td>${size.bag || ''}</td>
                     <td>${size.satuan_size_code || ''}</td>
-                    <td>${size.remark || ''}</td>
-                    <td>${size.palet || ''}</td>
-                    <td>${size.persen || ''}</td>
                     <td>${greatFormatRupiah(qty.toFixed(2))}</td>
                     <td>${greatFormatRupiah(harga.toFixed(2))}</td>
                     <td>${greatFormatRupiah(total.toFixed(2))}</td>
@@ -2269,12 +2712,10 @@
                 breakdownBody.append(row);
             });
 
-            innerTable.find('.total-persen').html(`<b>${totalPersenSize == 0 ? "" : greatFormatRupiah(totalPersenSize.toFixed(2))}</b>`);
             innerTable.find('.total-qty').html(`<b>${greatFormatRupiah(totalQtySize.toFixed(2))}</b>`);
-            innerTable.find('.total-price').html(`<b>${greatFormatRupiah(totalHargaSize.toFixed(2))}</b>`);
             innerTable.find('.total-amount').html(`<b>${greatFormatRupiah(totalAmountSize.toFixed(2))}</b>`);
 
-            detailRow.append(`<td colspan="13"><b>SIZE & BREAKDOWN</b><br>${innerTable.prop('outerHTML')}</td>`);
+            detailRow.append(`<td colspan="8"><b>SIZE & BREAKDOWN</b><br>${innerTable.prop('outerHTML')}</td>`);
             tbody.append(detailRow);
         });
 
@@ -2419,7 +2860,6 @@
     function recalculateTotal() {
         var totalInvoiceBarang = 0;
         var totalBiayaTambahan = 0;
-        var totalPacking = 0;
         var totalBeratBersih = 0;
         var totalBeratKotor = 0;
         // List Barang
@@ -2441,14 +2881,12 @@
             $.each(v.size_breakdown, function(j, s) {
                 totalBeratBersih += parseFloat(s.berat_bersih);
                 totalBeratKotor += parseFloat(s.berat_kotor);
-                totalPacking += parseFloat(s.packing);
             });
         });
         var totalInvoiceFinal = totalInvoiceBarang + totalBiayaTambahan;
         $('#total_nilai_invoice').val(greatFormatRupiah(totalInvoiceFinal));
         $('#total_berat_bersih').val(greatFormatRupiah(totalBeratBersih));
         $('#total_berat_kotor').val(greatFormatRupiah(totalBeratKotor));
-        $('#total_packing').val(greatFormatRupiah(totalPacking));
     }
 
     const print = function(url) {
@@ -2554,26 +2992,24 @@
                     id_detail_breakdown_packing: getID(),
                     size: s.size,
                     grade: s.grade,
-                    packing: s.packing_size,
-                    can: s.can,
-                    cased: s.cased,
-                    kg: s.kg,
-                    lb: s.lb,
-                    inner_box: s.inner_box,
-                    pc: s.pc,
-                    bag: s.bag,
-                    palet: s.palet,
-                    persen: s.persen,
+                    packing: null,
+                    can: null,
+                    kg: null,
+                    lb: null,
+                    inner_box: null,
+                    pc: null,
+                    bag: null,
+                    palet: null,
+                    persen: null,
                     qty: s.qty,
                     harga: s.harga,
                     total: s.total,
-                    remark: s.remark,
                     satuan_size_id: s.satuan_size_id,
                     satuan_size_code: s.satuan_size_code,
-                    berat_bersih: 0,
-                    berat_kotor: 0,
-                    vgm: 0,
-                    drammed: 0
+                    berat_bersih: null,
+                    berat_kotor: null,
+                    vgm: null,
+                    drammed: null
                 });
             })
 
@@ -2614,7 +3050,6 @@
         $('#persen').val(null);
         $('#qty').val(null);
         $('#harga').val(null);
-        $('#remark').val(null);
         $('#total').val(null);
         $('#satuan_size_id').val(null).change();
     }
@@ -2631,6 +3066,24 @@
         $('#berat_kotor').val(null);
         $('#vgm').val(null);
         $('#drammed').val(null);
+    }
+
+    function resetFormFormulaCan() {
+        $('#formula_qty_case_hitung_can').val(null);
+        $('#formula_bilangan_case_hitung_can').val(null);
+        $('#hasil_qty_can_hitung_can').val(null);
+    }
+
+    function resetFormFormulaCase() {
+        $('#formula_qty_can_hitung_case').val(null);
+        $('#formula_bilangan_can_hitung_case').val(null);
+        $('#hasil_qty_case_hitung_case').val(null);
+    }
+
+    function resetFormFormulaVgm() {
+        $('#formula_berat_kotor_hitung_vgm').val(null);
+        $('#formula_bilangan_hitung_vgm').val(null);
+        $('#hasil_vgm').val(null);
     }
 </script>
 <?= $this->endSection(); ?>

@@ -399,10 +399,14 @@ class JasaVendorOutKepitingKukusDetailModel extends Model
                 barang_master_spesifikasi.spesifikasi,
                 barang_master.barang_name as barang,
                 satuans.kode_satuan as satuan,
-                jasa_vendor_out_kepiting_kukus_detail.qty
+                jasa_vendor_out_kepiting_kukus_detail.qty,
+                suppliers.name as supplier,
+                suppliers.id as supplier_id,
+                jasa_vendor_out_kepiting_kukus_detail.keterangan
             ')
             ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = jasa_vendor_out_kepiting_kukus_detail.spesifikasi_id', 'left')
             ->join('barang_master', 'barang_master.id = barang_master_spesifikasi.barang_master_id', 'left')
+            ->join('suppliers', 'suppliers.id = jasa_vendor_out_kepiting_kukus_detail.supplier_id', 'left')
             ->join('satuans', 'satuans.id = barang_master_spesifikasi.satuan_1', 'left')
             ->where('jasa_vendor_out_kepiting_kukus_id', $jasaVendorOutKepitingKukusId)
             ->findAll();
@@ -412,6 +416,9 @@ class JasaVendorOutKepitingKukusDetailModel extends Model
                 "spesifikasi_id"  => $d['spesifikasi_id'],
                 'detail_id'       => $d['id'],
                 "satuan"          => $d['satuan'],
+                "supplier"        => $d['supplier'],
+                "supplier_id"     => $d['supplier_id'],
+                "keterangan"      => $d['keterangan'],
                 "barang"          => $d['barang'], // kalau mau bisa digabung master + spesifikasi name
                 "spesifikasi"     => $d['spesifikasi'],
                 "qty"             => floatval($d['qty']),

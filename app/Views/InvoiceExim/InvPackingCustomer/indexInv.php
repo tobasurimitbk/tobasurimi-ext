@@ -4,12 +4,12 @@
 <!-- Begin Page Content -->
 <section class="section">
     <div class="section-header">
-        <h1>List Commercial Invoice Customer</h1>
+        <h1>List CIPL</h1>
         <div class="col-button-tambah-spp">
             <a class="btn btn-hide-form btn-discard float-right" href="<?= base_url("invoice-packing-customer"); ?>">
                 Kembali
             </a>
-            <?php if (can('Invoice Exim', 'Inv Packing Customer', 'c')) : ?>
+            <?php if (can('Invoice Exim', 'CIPL', 'c')) : ?>
                 <a class="btn btn-show-form btn-success float-right" href="<?= base_url("invoice-packing-customer/create/" . encrypt($dataSalesOrderExport->sales_order_export_id)); ?>">
                     <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
                 </a>
@@ -88,7 +88,6 @@
                                 <th onclick="changeSort('no_seal')" class="sort">No Seal</th>
                                 <th onclick="changeSort('vessels_name')" class="sort">Vessel's Name</th>
                                 <th onclick="changeSort('departure_date')" class="sort">Departure Date</th>
-                                <th onclick="changeSort('total_packing')" class="sort">Total Packing</th>
                                 <th onclick="changeSort('total_berat_bersih')" class="sort">Berat Bersih</th>
                                 <th onclick="changeSort('total_berat_kotor')" class="sort">Berat Kotor</th>
                                 <th onclick="changeSort('total_nilai_invoice')" class="sort">Nilai</th>
@@ -161,9 +160,6 @@
                 className: "text-left"
             }, {
                 data: "departure_date",
-                className: "text-left",
-            }, {
-                data: "total_packing",
                 className: "text-left",
             }, {
                 data: "total_berat_bersih",
@@ -246,22 +242,22 @@
 
                     if (status_posting == "0") {
                         res += `
-                            <?php if (can('Invoice Exim', 'Inv Packing Customer', 'p')) : ?>
+                            <?php if (can('Invoice Exim', 'CIPL', 'p')) : ?>
                                 <button data-toggle="tooltip" title="Print" class="btn btn-warning btn-print" onclick="print('<?= base_url("invoice-packing-customer/print/"); ?>${id}')" style="box-shadow: none !important;">
                                     <i class="fa fa-print fa-sm" aria-hidden="true"></i>
                                 </button>
                             <?php endif; ?>
-                            <?php if (can('Invoice Exim', 'Inv Packing Customer', 'a')) : ?>
+                            <?php if (can('Invoice Exim', 'CIPL', 'a')) : ?>
                                 <button data-toggle="tooltip" title="Posting" onclick="posting('${id}')" class="btn btn-success posting-spp">
                                     <i class="fa fa-paper-plane fa-sm" aria-hidden="true"></i>
                                 </button>
                             <?php endif; ?>
-                            <?php if (can('Invoice Exim', 'Inv Packing Customer', 'd')) : ?>
+                            <?php if (can('Invoice Exim', 'CIPL', 'd')) : ?>
                                 <button data-toggle="tooltip" title="Delete" onclick="remove('${id}')" class="btn btn-danger delete-parent">
                                     <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
                                 </button>
                             <?php endif; ?>
-                                <?php if (can('Invoice Exim', 'Inv Packing Customer', 'c')) : ?>
+                                <?php if (can('Invoice Exim', 'CIPL', 'c')) : ?>
                                     <button data-toggle="tooltip" title="Duplicate" onclick="duplicate('${id}')" class="btn duplicate-btn text-white" style="background-color:#B8522A">
                                         <i class="fa fa-copy fa-sm" aria-hidden="true"></i>
                                     </button>
@@ -271,7 +267,7 @@
 
                     if (status_posting == "1") {
                         res += `
-                        <?php if (can('Invoice Exim', 'Inv Packing Customer', 'p')) : ?>
+                        <?php if (can('Invoice Exim', 'CIPL', 'p')) : ?>
                             <button data-toggle="tooltip" title="Print" class="btn btn-warning btn-print" onclick="print('<?= base_url("invoice-packing-customer/print/"); ?>${id}')" style="box-shadow: none !important;">
                                 <i class="fa fa-print fa-sm" aria-hidden="true"></i>
                             </button>
@@ -279,14 +275,14 @@
                         `;
 
                         res += `
-                            <?php if (can('Invoice Exim', 'Inv Packing Customer', 'ua')) : ?>
+                            <?php if (can('Invoice Exim', 'CIPL', 'ua')) : ?>
                                 <button data-toggle="tooltip" title="Un-Posting" onclick="unposting('${id}')" class="btn btn-danger posting-spp">
                                     <i class="fa-solid fa-ban"></i>    
                                 </button>
                             <?php endif; ?>
                             `;
 
-                        <?php if (can('Invoice Exim', 'Inv Packing Customer', 'c')) : ?>
+                        <?php if (can('Invoice Exim', 'CIPL', 'c')) : ?>
                             res += `
                                 <button data-toggle="tooltip" title="Duplicate" onclick="duplicate('${id}')" class="btn duplicate-btn text-white" style="background-color:#B8522A">
                                     <i class="fa fa-copy fa-sm" aria-hidden="true"></i>
@@ -299,7 +295,7 @@
 
                     return `
                         <div class="mt-0">
-                         <?php if (can('Invoice Exim', 'Inv Packing Customer', 'u')) : ?>
+                         <?php if (can('Invoice Exim', 'CIPL', 'u')) : ?>
                             <a href="javascript:void(0)" onclick="edit('${id}')" data-toggle="tooltip" title="Edit" class="btn btn-primary">
                                 <i class="fas fa-edit"></i>
                             </a>

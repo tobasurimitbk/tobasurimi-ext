@@ -280,8 +280,8 @@
                     processResults: function(data) {
                         return {
                             results: data.map(item => ({
-                                id: item.id,
-                                text: item.number + ' ' + item.name + ' ' + item.company,
+                                id: item.number,
+                                text: item.number + ' ' + item.name,
                             }))
                         };
                     }

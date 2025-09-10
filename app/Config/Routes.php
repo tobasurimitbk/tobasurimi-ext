@@ -1189,6 +1189,7 @@ $routes->get('/jasa-vendor-in-kepiting-kukus/search-barang',  'JasaVendor\JasaVe
 $routes->post('/jasa-vendor-in-kepiting-kukus/save',  'JasaVendor\JasaVendorInKepitingKukus::createAction', ['filter' => 'Auth']);
 $routes->post('/jasa-vendor-in-kepiting-kukus/update',  'JasaVendor\JasaVendorInKepitingKukus::updateAction', ['filter' => 'Auth']);
 $routes->post('/jasa-vendor-in-kepiting-kukus/posting',  'JasaVendor\JasaVendorInKepitingKukus::posting', ['filter' => 'Auth']);
+$routes->post('/jasa-vendor-in-kepiting-kukus/delete',  'JasaVendor\JasaVendorInKepitingKukus::delete', ['filter' => 'Auth']);
 $routes->post('/jasa-vendor-in-kepiting-kukus/unposting',  'JasaVendor\JasaVendorInKepitingKukus::unPosting', ['filter' => 'Auth']);
 $routes->get('/jasa-vendor-in-kepiting-kukus/list-jasa-vendor-out-kepiting-kukus', 'JasaVendor\JasaVendorInKepitingKukus::dropdownNoJasaVendorOut', ['filter' => 'Auth']);
 $routes->get('/jasa-vendor-in-kepiting-kukus/list-barang', 'JasaVendor\JasaVendorInKepitingKukus::dropdownListBarangKeluar', ['filter' => 'Auth']);

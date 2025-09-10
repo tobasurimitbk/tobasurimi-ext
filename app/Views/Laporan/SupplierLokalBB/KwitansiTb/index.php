@@ -13,7 +13,7 @@
                 <input type="hidden" name="month" id="export_month">
                 <input type="hidden" name="year" id="export_year">
                 <input type="hidden" name="tb_search" id="export_tb_search">
-                <input type="hidden" name="supplier_search" id="export_supplier_search">
+                <input type="hidden" name="search" id="export_search">
 
                 <button type="submit" class="btn btn-warning btn-print" id="btn-print-all">
                     Export
@@ -70,12 +70,12 @@
                     <div class="col-md-3">
                         <select class="form-select tb_search" name="tb_search" id="tb_search" aria-label="Floating label select example">
                             <option value="" selected>SEMUA SUPPLIER</option>
-                            <option value="1">SUPPLIER PUNYA NILAI TB</option>
-                            <option value="0">SUPPLIER TIDAK PUNYA NILAI TB</option>
+                            <option value="PUNYA TB">SUPPLIER PUNYA NILAI TB</option>
+                            <option value="TIDAK PUNYA TB">SUPPLIER TIDAK PUNYA NILAI TB</option>
                         </select>
                     </div>
                     <div class="col-md-3">
-                        <input autocomplete="one-time-code" class="form-control search supplier_search form-out-search" placeholder="Cari Supplier" value="" />
+                        <input autocomplete="one-time-code" class="form-control search form-out-search" placeholder="Cari Data" value="" />
                     </div>
                 </div>
             </div>
@@ -84,12 +84,12 @@
                     <table class="table table-bordered nowrap table-hover-tobasurimi dataTable" id="dataTable" width="100%" cellspacing="0">
                         <thead class="thead-dark">
                             <tr>
-                                <th style="width: 10; text-align:center">No</th>
-                                <th style="text-align: center;" class="sort">Supplier</th>
-                                <th style="text-align: center;" class="sort">Total</th>
-                                <th style="text-align: center;" class="sort">No Kwitansi</th>
-                                <th style="text-align: center;">Tanggal</th>
-                                <th style="text-align: center; width: 10; ">Print</th>
+                                <th style="width: 10px;">No</th>
+                                <th onclick="changeSort('name')">Supplier</th>
+                                <th>Total</th>
+                                <th>No Kwitansi</th>
+                                <th>Tanggal</th>
+                                <th style="width: 50px;">Print</th>
                             </tr>
                         </thead>
                         <tbody class="body-table" id="body-table">
@@ -109,7 +109,6 @@
     var row = 0;
 
     var table = $('.dataTable').DataTable({
-
         processing: true,
         serverSide: true,
         ordering: true,
@@ -129,7 +128,7 @@
                 data.year = $(".year").val();
                 data.month = $(".month").val();
                 data.tb_search = $(".tb_search").val();
-                data.supplier_search = $(".supplier_search").val();
+                data.search = $(".search").val();
                 data.sort = sort;
                 data.sortType = sortType;
             },
@@ -149,22 +148,22 @@
             sortable: false
         }, {
             data: "name",
-            className: "text-center"
+            className: "text-left",
         }, {
             data: "total",
+            className: "text-left",
             searchable: false,
             sortable: false,
-            className: "text-center"
         }, {
             data: "no_kwitansi",
             searchable: false,
             sortable: false,
-            className: "text-center"
+            className: "text-left"
         }, {
             data: "tanggal",
             searchable: false,
             sortable: false,
-            className: "text-center",
+            className: "text-left",
             render: function(data, type, row) {
                 if (row.is_print == "0") {
                     return "-";
@@ -233,7 +232,7 @@
         table.ajax.reload();
     });
 
-    $(".supplier_search").change(function() {
+    $(".search").change(function() {
         table.ajax.reload();
     })
 
@@ -251,9 +250,18 @@
         $('#export_month').val($('#month').val());
         $('#export_year').val($('#year').val());
         $('#export_tb_search').val($('#tb_search').val());
-        $('#export_supplier_search').val($('.supplier_search').val());
+        $('#export_search').val($('.search').val());
         $('#form-export-pdf').submit();
     });
+
+    const changeSort = function(val) {
+        if (sort !== val) {
+            sortType = "asc";
+            sort = val;
+        } else {
+            sortType = sortType === "asc" ? "desc" : "asc";
+        }
+    }
 </script>
 
 <?= $this->endSection(); ?>

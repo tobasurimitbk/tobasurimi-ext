@@ -236,7 +236,7 @@ class SupplierModel extends Model
         return $results;
     }
 
-  public function getSupplierJasVend()
+    public function getSupplierJasVend()
     {
         $arrCondition = [
             'deletedAt'  => null,
@@ -255,7 +255,7 @@ class SupplierModel extends Model
         }
 
         return $results;
-}
+    }
 
 
 
@@ -419,7 +419,6 @@ class SupplierModel extends Model
     public function getKwitansiTBBySupplier($supplierID, $year, $month)
     {
         $rmPurchaseOrderModel = new RMPurchaseOrderModel();
-        $rmPurchaseOrderDetailModel = new RMPurchaseOrderDetailModel();
         $supplierModel = new SupplierModel();
 
         $supplierDet = $supplierModel->where('id', $supplierID)->first();
@@ -428,11 +427,7 @@ class SupplierModel extends Model
             'MONTH(rm_purchase_orders.po_date)' => $month,
             'YEAR(rm_purchase_orders.po_date)' => $year,
             'rm_purchase_orders.supplier_id' => $supplierID,
-            'rm_purchase_orders.is_posted' => 1,
             'rm_purchase_orders.deletedAt' => null,
-            'rm_purchase_order_details.deletedAt' => null,
-            'rm_purchase_order_details.monthly_price !=' => null,
-            'rm_purchase_order_details.monthly_price !=' => 0,
         ];
 
         $selectQry = "
@@ -442,68 +437,34 @@ class SupplierModel extends Model
         rm_purchase_orders.cong_batasan,
         rm_purchase_orders.cong_sebenarnya,
         rm_purchase_orders.subsidi_langsung,
-        rm_purchase_order_details.monthly_price,
-        rm_purchase_order_details.qty,
-        barang_master.barang_name,
-        barang_master_spesifikasi.spesifikasi,
-        satuans.kode_satuan
+        SUM(rm_purchase_orders.nilai_total_qty) as qty_total,
+        SUM(rm_purchase_orders.nilai_total_bulanan) as total_bulanan,
+        SUM(rm_purchase_orders.pph_bulanan) as total_pph_bulanan,
+        SUM(rm_purchase_orders.dpp_bulanan) as total_dpp_bulanan,
+        barang_master.barang_name
     ";
 
         $res = $rmPurchaseOrderModel
             ->asObject()
             ->select($selectQry)
-            ->join('rm_purchase_order_details', 'rm_purchase_order_details.rm_purchase_order_id = rm_purchase_orders.id', 'left')
-            ->join('barang_master', 'barang_master.id = rm_purchase_order_details.barang1_id', 'left')
-            ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = rm_purchase_order_details.barang2_id', 'left')
-            ->join('satuans', 'barang_master_spesifikasi.satuan_1 = satuans.id', 'left')
+            ->join('barang_master', 'barang_master.id = rm_purchase_orders.barang_id', 'left')
             ->where($condition)
             ->findAll();
-
-
 
         $finalRes = [];
         $total = 0;
 
         foreach ($res as $r) {
-            $hasNpwp = !empty($supplierDet['no_npwp']);
-            if ($r->po_date <= "2025-07-01") {
-                $nilai_pph = $hasNpwp ? (1.00 - 0.0025) : (1.00 - 0.005);
-                $nilai_pph2 = $hasNpwp ? 0.0025 : 0.005;
-            } else {
-                $nilai_pph = $hasNpwp ? (1.00 - 0.0025) : (1.00 - 0.0025);
-                $nilai_pph2 = $hasNpwp ? 0.0025 : 0.0025;
-            }
-
-            $qty = $r->qty;
-            $hargaSatuan = $r->monthly_price;
-            $pphMode = $r->pph;
-
-            // Hitung DPP, PPh, dan setelah PPh hanya untuk monthly_price
-            if ($pphMode === "Company") {
-                $dpp = ($hargaSatuan / $nilai_pph) * $qty;
-                $pph = ($hargaSatuan / $nilai_pph * $nilai_pph2) * $qty;
-                $dibayarkan = $dpp - $pph;
-            } elseif ($pphMode === "Supplier") {
-                $dpp = $hargaSatuan * $qty;
-                $pph = ($pphMode === "Supplier") ? ($hargaSatuan * $nilai_pph2) * $qty : 0;
-                $dibayarkan = $dpp - $pph;
-            } else {
-                $dpp = $hargaSatuan * $qty;
-                $pph = ($pphMode === "Supplier") ? ($hargaSatuan * $nilai_pph2) * $qty : 0;
-                $dibayarkan = $dpp + $pph;
-            }
-
-            $total += $dibayarkan;
-
             $finalRes[] = [
                 'nama_barang' => $r->barang_name,
-                'spesifikasi' => $r->spesifikasi,
-                'kode_satuan' => $r->kode_satuan,
-                'qty'         => $qty,
-                'harga_bulanan' => $dpp,
-                'pph'         => $pph,
-                'harga_bulanan_pph' => $dibayarkan,
+                'kode_satuan' => "",
+                'qty'         => $r->qty_total,
+                'harga_bulanan' => $r->total_dpp_bulanan,
+                'pph'         => $r->total_pph_bulanan,
+                'harga_bulanan_pph' => $r->total_bulanan,
             ];
+
+            $total += $r->total_bulanan;
         }
 
         return [
@@ -521,5 +482,77 @@ class SupplierModel extends Model
             ->where('suppliers.id', $supplierID)
             ->where('suppliers.deletedAt', null)
             ->findAll();
+    }
+
+    public function getSupplierListKwitansiBulanan($condition, $addCondition, $limit = 10, $offset = 0)
+    {
+        $availableSort = [
+            'name'          => 'suppliers.name',
+            'total_bulanan' => 'total_bulanan',
+            'createdAt'     => 'suppliers.createdAt',
+        ];
+        $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
+
+        $sort     = $availableSort[$addCondition['sort'] ?? 'createdAt'];
+        $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'];
+
+        $selectQry = "
+        suppliers.*,
+        COALESCE(SUM(rm_purchase_orders.nilai_total_bulanan), 0) as total_bulanan
+    ";
+
+        $builder = $this->asArray()
+            ->select($selectQry)
+            ->join('rm_purchase_orders', 'rm_purchase_orders.supplier_id = suppliers.id', 'left')
+            ->where($condition)
+            ->groupBy('suppliers.id');
+
+        // filter by year_month
+        if (!empty($addCondition['year_month'])) {
+            // Bersihin input, pastikan format YYYY-MM
+            $yearMonth = preg_replace('/[^0-9\-]/', '', $addCondition['year_month']);
+            $yearMonth = date('Y-m', strtotime($yearMonth . '-01'));
+
+            $dateStart = $yearMonth . "-01";
+            $lastDay   = date("t", strtotime($dateStart));
+            $dateEnd   = $yearMonth . "-" . $lastDay;
+
+            $builder->where('rm_purchase_orders.po_date >=', $dateStart);
+            $builder->where('rm_purchase_orders.po_date <=', $dateEnd);
+        }
+
+
+        // search
+        if (!empty($addCondition['search'])) {
+            $builder->groupStart()
+                ->like('suppliers.name', $addCondition['search'])
+                ->groupEnd();
+        }
+
+        // filter by tb_search
+        if (!empty($addCondition['tb_search'])) {
+            if ($addCondition['tb_search'] == "PUNYA TB") {
+                $builder->having('total_bulanan >', 0);
+            } elseif ($addCondition['tb_search'] == "TIDAK PUNYA TB") {
+                $builder->having('total_bulanan <=', 0);
+            }
+        }
+
+        // clone builder buat total data
+        $builderTotal = clone $builder;
+        $builderFiltered = clone $builder;
+
+        $totalData = $builderTotal->countAllResults(false);
+        $totalFilteredData = $builderFiltered->countAllResults(false);
+
+        // ambil data
+        $data = $builder->orderBy($sort, $sortType)
+            ->findAll($limit, $offset);
+
+        return [
+            'data'              => $data,
+            'totalData'         => $totalData,
+            'totalFilteredData' => $totalFilteredData
+        ];
     }
 }

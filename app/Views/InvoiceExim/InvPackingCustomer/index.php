@@ -4,7 +4,7 @@
 <!-- Begin Page Content -->
 <section class="section">
     <div class="section-header">
-        <h1>List Order Form Ekspor (Invoice Customer)</h1>
+        <h1>List Order Form Ekspor (CIPL)</h1>
     </div>
     <?= csrf_field() ?>
     <div class="card">
@@ -41,7 +41,7 @@
                                 <th onclick="changeSort('sales_contract.customer_id')" class="sort">Customer</th>
                                 <th onclick="changeSort('sales_order_export.sales_order_export_no')" class="sort">No SC</th>
                                 <th onclick="changeSort('sales_contract.dicharge_port')" class="sort">Destination</th>
-                                <th class="sort">Invoice</th>
+                                <th class="sort">CIPL</th>
                                 <th style="width: 120px;">Action</th>
                             </tr>
                         </thead>
@@ -143,8 +143,8 @@
                 render: function(data, type, row) {
                     let id = row.id;
                     return `
-                          <button data-toggle="tooltip" title="List Inv" onclick="edit('${id}')" class="btn btn-danger">
-                            List Inv
+                          <button data-toggle="tooltip" title="List CIPL" onclick="edit('${id}')" class="btn btn-danger">
+                            CIPL
                         </button>
                     `
                 }

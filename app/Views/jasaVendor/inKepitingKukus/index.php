@@ -189,7 +189,7 @@
                             </button>
                         <?php endif; ?>
                         <?php if (can('Jasa Vendor', 'Barang Masuk', 'p')) : ?>
-                            <button data-toggle="tooltip" title="Print" class="btn btn-warning btn-print" onclick="print('<?= base_url("jasa-vendor-in/print/"); ?>${id}')" style="box-shadow: none !important;">
+                            <button data-toggle="tooltip" title="Print" class="btn btn-warning btn-print" onclick="print('<?= base_url("jasa-vendor-in-kepiting-kukus/print/"); ?>${id}')" style="box-shadow: none !important;">
                                 <i class="fa fa-print fa-sm" aria-hidden="true"></i>
                             </button>
                         <?php endif; ?>
@@ -206,7 +206,7 @@
                         return `
                             <div class="mt-0">
                                 <?php if (can('Jasa Vendor', 'Barang Masuk', 'p')) : ?>
-                                    <button data-toggle="tooltip" title="Print" class="btn btn-warning btn-print" onclick="print('<?= base_url("jasa-vendor-in/print/"); ?>${id}')" style="box-shadow: none !important;">
+                                    <button data-toggle="tooltip" title="Print" class="btn btn-warning btn-print" onclick="print('<?= base_url("jasa-vendor-in-kepiting-kukus/print/"); ?>${id}')" style="box-shadow: none !important;">
                                         <i class="fa fa-print fa-sm" aria-hidden="true"></i>
                                     </button>
                                 <?php endif; ?>
@@ -347,7 +347,7 @@
             if (result.isConfirmed) {
                 const csrf = $(`[name="${csrfToken}"]`);
                 $.ajax({
-                    url: "<?= base_url("jasa-vendor-in/posting"); ?>",
+                    url: "<?= base_url("jasa-vendor-in-kepiting-kukus/posting"); ?>",
                     data: {
                         id: id
                     },
@@ -398,7 +398,7 @@
             if (result.isConfirmed) {
                 const csrf = $(`[name="${csrfToken}"]`);
                 $.ajax({
-                    url: "<?= base_url("jasa-vendor-in/posting-bayar"); ?>",
+                    url: "<?= base_url("jasa-vendor-in-kepiting-kukus/posting-bayar"); ?>",
                     data: {
                         id: id
                     },
@@ -449,7 +449,7 @@
             if (result.isConfirmed) {
                 const csrf = $(`[name="${csrfToken}"]`);
                 $.ajax({
-                    url: "<?= base_url("jasa-vendor-in/unposting"); ?>",
+                    url: "<?= base_url("jasa-vendor-in-kepiting-kukus/unposting"); ?>",
                     data: {
                         id: id
                     },
@@ -499,7 +499,7 @@
             if (result.isConfirmed) {
                 const csrf = $(`[name="${csrfToken}"]`);
                 $.ajax({
-                    url: "<?= base_url("jasa-vendor-in/delete"); ?>",
+                    url: "<?= base_url("jasa-vendor-in-kepiting-kukus/delete"); ?>",
                     data: {
                         id: id
                     },
