@@ -229,6 +229,8 @@ class JasaVendorOutKepitingKukus extends BaseController
     { 
         $id = decrypt($this->request->getVar('id'));
 
+        $barang = json_decode($this->request->getVar('listBarang'));
+
         // Update header transaksi
         $this->jasaVendorOutKepitingKukusModel->update($id, [
             'vendor_id'             => $this->request->getVar('vendor_id'),

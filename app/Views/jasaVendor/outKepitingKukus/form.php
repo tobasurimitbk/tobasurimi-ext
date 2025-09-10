@@ -764,7 +764,6 @@
     }
 
     function drawTableSelectedItem(data) {
-        console.log(listStockSelected);
         const table = $('#selectedItemTable');
         var no = 1;
         $('.foot-detail-table').empty();
@@ -795,13 +794,13 @@
                 newRow.append($('<td style="text-align: center;">').text(v.keterangan));
                 newRow.append($('<td style="text-align: center;">').html(
                     `
-                    <input <?= !empty($jasaVendorOut) ? (($jasaVendorOut['status_posting'] == "1") ? 'disabled' : '') : '' ?> onkeyup="this.value = greatFormatRupiah(this.value)" class="form-control stok-out" oninput="preventNegativeInput(this)" autocomplete="one-time-code" data-id="${v.id}" class="form-control" type="text" value="${greatFormatRupiah(v.qty)}">
+                    <input <?= !empty($jasaVendorOut) ? (($jasaVendorOut['status_posting'] == "1") ? 'disabled' : '') : '' ?> onkeyup="this.value = greatFormatRupiah(this.value)" class="form-control stok-out" oninput="preventNegativeInput(this)" autocomplete="one-time-code" data-id="${v.detail_id}" class="form-control" type="text" value="${greatFormatRupiah(v.qty)}">
                 `
                 ));
 
                 newRow.append($('<td style="text-align: center;">').html(
                     `
-                    <button <?= !empty($jasaVendorOut) ? (($jasaVendorOut['status_posting'] == "1") ? 'disabled' : '') : '' ?> type="button" class="btn btn-danger" onclick="deleteDetail(${v.id})" ><i class="fa fa-trash fa-sm" aria-hidden="true"></i></button>
+                    <button <?= !empty($jasaVendorOut) ? (($jasaVendorOut['status_posting'] == "1") ? 'disabled' : '') : '' ?> type="button" class="btn btn-danger" onclick="deleteDetail(${v.detail_id})" ><i class="fa fa-trash fa-sm" aria-hidden="true"></i></button>
                 `
                 ));
                 table.find('tbody').append(newRow);
@@ -821,7 +820,7 @@
                 let val = destroyFormatRupiah($(this).val()) || 0;
 
                 // update ke listStockSelected
-                let item = listStockSelected.find(x => x.id == id);
+                let item = listStockSelected.find(x => x.detail_id == id);
                 if (item) {
                     item.qty = val;
                 }
