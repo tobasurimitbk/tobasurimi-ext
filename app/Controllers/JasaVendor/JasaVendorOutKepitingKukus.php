@@ -159,7 +159,11 @@ class JasaVendorOutKepitingKukus extends BaseController
     public function detail($id)
     {
         $id = decrypt($id);
-        $jasaVendorOut = $this->jasaVendorOutKepitingKukusModel->find($id);
+        $jasaVendorOut = $this->jasaVendorOutKepitingKukusModel
+                            ->select('jasa_vendor_out_kepiting_kukus.*, barang_master.id as barang_out_id, barang_master.barang_name')
+                            ->join('barang_master', 'barang_master.id = jasa_vendor_out_kepiting_kukus.barang_out_id')
+                            ->where('jasa_vendor_out_kepiting_kukus.id', $id)
+                            ->first();
 
         if ($jasaVendorOut == null) {
             return redirect()->to('jasa-vendor-out');
@@ -489,14 +493,6 @@ class JasaVendorOutKepitingKukus extends BaseController
         $term = $this->request->getGet('q');
         $barang = $this->request->getGet('barang_id');
 
-        if (strlen($term) < 3) {
-            return $this->response->setJSON([
-                'data' => [],
-                'status' => false,
-                'message' => 'Minimal 3 karakter'
-            ]);
-        }
-
         
 
         $builder = $this->barangMasterSpesifikasiModel
@@ -509,7 +505,7 @@ class JasaVendorOutKepitingKukus extends BaseController
             ->where('barang_master.company_id', $this->this_company_id)
             ->where('barang_master.type_barang', 'bahan_baku')
             ->groupStart()
-                ->orLike('barang_master_spesifikasi.spesifikasi', $term)
+                ->like('barang_master_spesifikasi.spesifikasi', "%{$term}%")
             ->groupEnd();
 
         $data = $builder->get()->getResultArray();
@@ -541,7 +537,7 @@ class JasaVendorOutKepitingKukus extends BaseController
             ->where('barang_master.company_id', $this->this_company_id)
             ->where('barang_master.type_barang', 'bahan_baku')
             ->groupStart()
-                ->like('barang_master.barang_name', $term)
+                ->like('barang_master.barang_name', "%{$term}%")
             ->groupEnd();
 
         $data = $builder->get()->getResultArray();
