@@ -459,7 +459,7 @@ class MaterialRequestDetailsModel extends Model
                 $m['no_aju'],
                 $m['stock_dokumen']
             );
-            
+
             // Jika tidak ada stock detail, lanjut ke berikutnya
             if (empty($stockList)) {
                 continue;
@@ -543,5 +543,27 @@ class MaterialRequestDetailsModel extends Model
         }
 
         return $result;
+    }
+
+    public function getMaterialRequestNotApprove($stockId, $bcId, $noAju, $stockDate, $stockDokumen)
+    {
+        $selectQry = '
+            SUM(material_request_details.qty) as qty
+        ';
+
+        $dataQry = $this->asArray()
+            ->select($selectQry)
+            ->join('material_requests', 'material_requests.id = material_request_details.material_request_id', 'left')
+            ->where('material_request_details.stock_id', $stockId)
+            ->where('material_request_details.bc_id', $bcId)
+            ->where('material_request_details.no_aju', $noAju)
+            ->where('material_request_details.stock_date', $stockDate)
+            ->where('material_request_details.stock_dokumen', $stockDokumen)
+            ->where('material_request_details.deletedAt', null)
+            ->where('material_requests.is_approve', null)
+            ->where('material_requests.deletedAt', null)
+            ->first();
+
+        return $dataQry;
     }
 }

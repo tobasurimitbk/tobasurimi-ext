@@ -1552,9 +1552,7 @@ class MaterialRequest extends BaseController
                 $spesifikasi = isset($dataResult[$i]['spesifikasi']) ? $dataResult[$i]['spesifikasi'] : '';
                 $barangName = $dataResult[$i]['barang_name'];
 
-
                 if (empty($vendorId)) {
-
                     $dataResult[$i]['stock_dokumen'] = $dataResult[$i]['stock_dokumen'] == null ? "-" : $dataResult[$i]['stock_dokumen'];
                     $dataResult[$i]['no_aju'] =  $dataResult[$i]['no_aju'] == "-" ? "-" : $dataResult[$i]['no_aju'];
                     $dataResult[$i]['bc_type'] = $dataResult[$i]['bc_type'] == null ? "NON PABEAN" : $dataResult[$i]['bc_type'];
@@ -1584,6 +1582,21 @@ class MaterialRequest extends BaseController
                     $dataResult[$i]['id'] = encrypt($dataResult[$i]['stock_id']) . '-' . encrypt($dataResult[$i]['id']);
                     $dataResult[$i]['supplier_name'] = $dataResult[$i]['supplier_name'] . ' / ' . $dataResult[$i]['nama_vendor'];
                     $dataResult[$i]['sumber'] = "JASA VENDOR";
+                }
+
+                $dataMaterialRequestNotApprove = $this->materialRequestDetailsModel->getMaterialRequestNotApprove(
+                    $dataResult[$i]['stock_id'],
+                    $dataResult[$i]['bc_id'],
+                    $dataResult[$i]['no_aju'],
+                    date('Y-m-d', strtotime(str_replace('/', '-', $dataResult[$i]['stock_date']))),
+                    $dataResult[$i]['stock_dokumen']
+                );
+
+                if ($dataMaterialRequestNotApprove) {
+                    $dataResult[$i]['is_requested'] = true;
+                    $dataResult[$i]['stok_total'] = $dataResult[$i]['stok_total'] - $dataMaterialRequestNotApprove['qty'];
+                } else {
+                    $dataResult[$i]['is_requested'] = false;
                 }
 
                 if ($dataResult[$i]['stok_total'] > 0) {
