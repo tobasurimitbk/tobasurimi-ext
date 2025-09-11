@@ -2349,9 +2349,9 @@ class BC40 extends BaseController
             foreach ($lpbIdArr as $index => $lpbId) {
                 $statusInputStock = true;
 
-                if($typeBahan == "bahan_baku"){
+                if ($typeBahan == "bahan_baku") {
                     $rmPurchaseOrder = $this->rmPurchaseOrderModel->where('id', $poIdArr[$index])->first();
-                    if($rmPurchaseOrder['status_external'] == "yes"){
+                    if ($rmPurchaseOrder['status_external'] == "yes") {
                         // JIKA STATUS EKSTERNAL YES GA USAH INSERT KE INVENTORI
                         $statusInputStock = false;
                     }
@@ -2364,7 +2364,7 @@ class BC40 extends BaseController
                     ->where('deletedAt', null)
                     ->findAll();
 
-                if($statusInputStock){
+                if ($statusInputStock) {
                     // CHECK STOK APAKAH SUDAH DIINISASI (INISIASI HEADER BARANG)
                     foreach ($penerimaanBarangList as $p) {
 
@@ -2498,8 +2498,6 @@ class BC40 extends BaseController
                         $penerimaanBarang['supplier_id'],
                     );
                 }
-
-              
             }
 
             return true;
