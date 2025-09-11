@@ -196,6 +196,7 @@ class JasaVendorOutKepitingKukus extends BaseController
         $id = $this->jasaVendorOutKepitingKukusModel->insert([
             'company_id' => $this->this_company_id,
             'vendor_id' => $this->request->getVar('vendor_id'),
+            'barang_out_id' => $this->request->getVar('barang_id'),
             'divisi_id' => $this->request->getVar('divisi_id'),
             'warehouse_id' => $this->request->getVar('warehouse_id'),
             'no_surat_jalan' => $this->request->getVar('no_surat_jalan'),
@@ -236,6 +237,7 @@ class JasaVendorOutKepitingKukus extends BaseController
             'vendor_id'             => $this->request->getVar('vendor_id'),
             'divisi_id'             => $this->request->getVar('divisi_id'),
             'warehouse_id'          => $this->request->getVar('warehouse_id'),
+            'barang_out_id'         => $this->request->getVar('barang_id'),
             'no_kontainer'          => $this->request->getVar('no_kontainer'),
             'keterangan'            => $this->request->getVar('keterangan'),
             'no_surat_jalan'        => $this->request->getVar('no_surat_jalan'),
@@ -485,6 +487,7 @@ class JasaVendorOutKepitingKukus extends BaseController
     public function searchBarang()
     {
         $term = $this->request->getGet('q');
+        $barang = $this->request->getGet('barang_id');
 
         if (strlen($term) < 3) {
             return $this->response->setJSON([
@@ -502,10 +505,10 @@ class JasaVendorOutKepitingKukus extends BaseController
             ->join('satuans', 'satuans.id = barang_master_spesifikasi.satuan_1')
             ->where('barang_master_spesifikasi.deletedAt', null)
             ->where('barang_master.deletedAt', null)
+            ->where('barang_master.id', $barang)
             ->where('barang_master.company_id', $this->this_company_id)
             ->where('barang_master.type_barang', 'bahan_baku')
             ->groupStart()
-                ->like('barang_master.barang_name', $term)
                 ->orLike('barang_master_spesifikasi.spesifikasi', $term)
             ->groupEnd();
 
@@ -518,6 +521,37 @@ class JasaVendorOutKepitingKukus extends BaseController
         ]);
     }
 
+
+    public function searchMasterBarang()
+    {
+        $term = $this->request->getGet('q');
+
+        if (strlen($term) < 3) {
+            return $this->response->setJSON([
+                'data' => [],
+                'status' => false,
+                'message' => 'Minimal 3 karakter'
+            ]);
+        }
+        
+
+        $builder = $this->barangMasterModel
+            ->select('barang_master.barang_name as master_barang, barang_master.id as id')
+            ->where('barang_master.deletedAt', null)
+            ->where('barang_master.company_id', $this->this_company_id)
+            ->where('barang_master.type_barang', 'bahan_baku')
+            ->groupStart()
+                ->like('barang_master.barang_name', $term)
+            ->groupEnd();
+
+        $data = $builder->get()->getResultArray();
+
+        return $this->response->setJSON([
+            'data'   => $data,
+            'status' => true,
+            'token'  => csrf_hash()
+        ]);
+    }
 
     public function getListStockByStockID()
     {

@@ -1174,6 +1174,7 @@ $routes->get('/jasa-vendor-out-kepiting-kukus/all',  'JasaVendor\JasaVendorOutKe
 $routes->get('/jasa-vendor-out-kepiting-kukus/id/(:segment)',  'JasaVendor\JasaVendorOutKepitingKukus::detail/$1', ['filter' => 'Auth']);
 $routes->get('/jasa-vendor-out-kepiting-kukus/create',  'JasaVendor\JasaVendorOutKepitingKukus::create', ['filter' => 'Auth']);
 $routes->get('/jasa-vendor-out-kepiting-kukus/search-barang',  'JasaVendor\JasaVendorOutKepitingKukus::searchBarang', ['filter' => 'Auth']);
+$routes->get('/jasa-vendor-out-kepiting-kukus/search-master-barang',  'JasaVendor\JasaVendorOutKepitingKukus::searchMasterBarang', ['filter' => 'Auth']);
 $routes->post('/jasa-vendor-out-kepiting-kukus/delete',  'JasaVendor\JasaVendorOutKepitingKukus::delete', ['filter' => 'Auth']);
 $routes->post('/jasa-vendor-out-kepiting-kukus/posting',  'JasaVendor\JasaVendorOutKepitingKukus::posting', ['filter' => 'Auth']);
 $routes->post('/jasa-vendor-out-kepiting-kukus/unposting',  'JasaVendor\JasaVendorOutKepitingKukus::unPosting', ['filter' => 'Auth']);

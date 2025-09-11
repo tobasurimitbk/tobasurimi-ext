@@ -172,6 +172,14 @@
                             <label for="floatingInput" style="z-index: 1;">Warehouse</label>
                         </div>
                     </div>
+                    <div class="col-md-3">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <select class="form-select barang_id" id="barang_id" name="barang_id">
+                                <option value=""></option>
+                            </select>
+                            <label for="floatingInput" style="z-index: 1;">Pilih Barang</label>
+                        </div>
+                    </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <input <?= !empty($jasaVendorOut) ? ($jasaVendorOut['status_posting'] ? 'disabled' : '') : '' ?> placeholder="Keterangan" value="<?= !empty($jasaVendorOut) ? $jasaVendorOut['keterangan'] : '' ?>" class="form-control keterangan" id="keterangan" name="keterangan" />
@@ -219,8 +227,16 @@
                                 <label for="keterangan_detail">Keterangan</label>
                             </div>
                         </div>
-                        <div class="col-md-3 d-flex align-items-center">
-                            <button type="button" class="btn btn-primary" id="btnAddBarang">+ Tambah Barang</button>
+                        <div class="col-md-3">
+                            <div class="form-floating mb-3">
+                                <button type="button" 
+                                    class="border-radius-2"
+                                    id="btnAddBarang"
+                                    style="width:30%;height: 50px;background-color:#4F46E5;border:none;color:white;"
+                                    >
+                                    <h3 class="fa fa-plus" style="font-size:18px;"></h3>
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </form>
@@ -393,11 +409,48 @@
         width: '100%',
     });
 
+
+    $("#barang_id").select2({
+        placeholder: "Pilih Barang",
+        theme: "bootstrap-5",
+        minimumInputLength: 3,
+        width: '100%',
+        ajax: {
+            delay: 300,
+            transport: function(params, success, failure) {
+                if (abortController) {
+                    abortController.abort();
+                }
+                abortController = new AbortController();
+
+                fetch("<?= base_url('jasa-vendor-out-kepiting-kukus/search-master-barang'); ?>?" + new URLSearchParams({
+                    q: params.data.term
+                }), {
+                    signal: abortController.signal
+                })
+                .then(res => res.json())
+                .then(success)
+                .catch(err => {
+                    if (err.name !== "AbortError") failure(err);
+                });
+            },
+            processResults: function(data) {
+                return {
+                    results: data.data.map(item => ({
+                        id: item.id,
+                        text: `${item.master_barang}`
+                    }))
+                };
+            }
+        }
+    });
+
     $(".spesifikasi_id").select2({
         placeholder: "Pilih Spesifikasi Barang",
         theme: "bootstrap-5",
         multiple: true,
         minimumInputLength: 3,
+        dropdownParent: $('.detail-form'), // sama juga
         ajax: {
             delay: 300,
             transport: function(params, success, failure) {
@@ -407,6 +460,7 @@
                 abortController = new AbortController();
 
                 fetch("<?= base_url('jasa-vendor-out-kepiting-kukus/search-barang'); ?>?" + new URLSearchParams({
+                    barang_id: $('#barang_id option:selected').val(),
                     q: params.data.term
                 }), {
                     signal: abortController.signal
