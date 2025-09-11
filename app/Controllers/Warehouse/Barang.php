@@ -652,8 +652,7 @@ class Barang extends BaseController
                 ->getHistoriLpbBahanPenolong(
                     strtoupper(trim($statusPenerimaan)),
                     "PENOLONG",
-                    $this->this_company_id,
-                    $data['spesifikasi_id']
+                    $data['id']
                 );
 
             array_push($rdata, [
