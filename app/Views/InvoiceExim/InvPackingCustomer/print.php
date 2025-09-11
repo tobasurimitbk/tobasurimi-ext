@@ -542,11 +542,13 @@
                                 <b>AMOUNT IN WORLD :</b><br>
                                 <b><?= strtoupper(terbilangInggris($dataInvoice['total_nilai_invoice'])) ?></b>
                             </td>
-                            <td>
-                                <b>
-                                    PLEASE FILL THE FOLLOWING CODES IN THE FIELD 70 ON SWIFT MT103
-                                </b>
-                            </td>
+                            <?php if (!empty($dataInvoice['payment_description'])): ?>
+                                <td>
+                                    <b>
+                                        <?= $dataInvoice['payment_description'] ?>
+                                    </b>
+                                </td>
+                            <?php endif; ?>
                         </tr>
                     </table>
                 </td>

@@ -488,4 +488,18 @@ class PenerimaanBarangDetailModel extends Model
 
         return $dataLPB;
     }
+
+    public function getHistoriLpbBahanPenolong($statusPenerimaaan, $tipeBahan, $poDetailId)
+    {
+        $penerimaanBarang = $this->asArray()
+            ->select('penerimaan_barang.*')
+            ->join('penerimaan_barang', 'penerimaan_barang.id = penerimaan_barang_detail.penerimaan_barang_id', 'left')
+            ->where('penerimaan_barang.status_penerimaan', $statusPenerimaaan)
+            ->where('penerimaan_barang.tipe_bahan', $tipeBahan)
+            ->where('penerimaan_barang_detail.purchase_order_details_id', $poDetailId)
+            ->orderBy('penerimaan_barang.tanggal', "desc")
+            ->first();
+
+        return $penerimaanBarang;
+    }
 }

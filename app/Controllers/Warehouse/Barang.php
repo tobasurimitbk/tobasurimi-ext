@@ -608,7 +608,7 @@ class Barang extends BaseController
 
     public function historiHargaPOBahanPenolong()
     {
-        $amPurchaseOrderModel = new AMPurchaseOrderModel();
+        $amPurchaseOrderDetailModel = new AMPurchaseOrderDetailModel();
         $penerimaanBarangDetailModel = new PenerimaanBarangDetailModel();
 
         $payload = [
@@ -620,13 +620,10 @@ class Barang extends BaseController
         ];
 
         $condition = [
-            "penerimaan_barang.status_post" => "FINISH",
-            "penerimaan_barang.tipe_bahan" => "PENOLONG",
-            "penerimaan_barang.company_id"  => $this->this_company_id,
-            "penerimaan_barang_detail.spesifikasi_id" => $this->request->getVar('id'),
-            "penerimaan_barang.deletedAt" => NULL,
-            "penerimaan_barang_detail.deletedAt" => NULL,
-            "penerimaan_barang.status_penerimaan" => strtoupper($this->request->getVar('po_type'))
+            "am_purchase_orders.company_id"  => $this->this_company_id,
+            "am_purchase_order_details.spesifikasi_id" => $this->request->getVar('id'),
+            "am_purchase_order_details.deletedAt" => NULL,
+            "am_purchase_orders.po_type" => $this->request->getVar('po_type')
         ];
 
         $addCondition = [
@@ -637,20 +634,34 @@ class Barang extends BaseController
             "end_date" => $this->request->getVar("end_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getVar("end_date")))) : "",
         ];
 
+        $statusPenerimaan = strtoupper($this->request->getVar('po_type'));
         $limit = $this->request->getGet("length");
         $offset = $this->request->getGet("start");
 
-        $res = $penerimaanBarangDetailModel->historiHargaPOBahanPenolongByLpb($condition, $addCondition, $limit, $offset);
+        $res = $amPurchaseOrderDetailModel->getListHistoryHargaByBarang(
+            $condition,
+            $addCondition,
+            $limit,
+            $offset
+        );
 
         $rdata = [];
         $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
         foreach ($res['data'] as $data) {
+            $penerimaanBarang = $penerimaanBarangDetailModel
+                ->getHistoriLpbBahanPenolong(
+                    strtoupper(trim($statusPenerimaan)),
+                    "PENOLONG",
+                    $this->this_company_id,
+                    $data['spesifikasi_id']
+                );
+
             array_push($rdata, [
                 "no"                    => $no++,
                 "po_no"                 => $data['po_no'],
-                "no_lpb"                => $data['no_penerimaan_barang'],
+                "no_lpb"                => $penerimaanBarang == null ? "" : $penerimaanBarang['no_penerimaan_barang'],
                 "spp_no"                => $data['spp_no'],
-                "po_date"               => date('d/m/Y', strtotime($data['tanggal'])),
+                "po_date"               => date('d/m/Y', strtotime($data['po_date'])),
                 "nama_supplier"         => $data['nama_supplier'],
                 "nama_barang"           => $data['nama_barang'],
                 'divisi'                => $data['divisi'],
@@ -676,6 +687,7 @@ class Barang extends BaseController
     public function historiHargaPOBahanPenolongBySupplier()
     {
         $amPurchaseOrderModel = new AMPurchaseOrderModel();
+        $penerimaanBarangDetailModel = new PenerimaanBarangDetailModel();
 
         $payload = [
             "pageSize" => $this->request->getGet("length"),
@@ -712,11 +724,18 @@ class Barang extends BaseController
         $rdata = [];
         $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
         foreach ($res['data'] as $data) {
+            $penerimaanBarang = $penerimaanBarangDetailModel
+                ->getHistoriLpbBahanPenolong(
+                    "LOKAL",
+                    "PENOLONG",
+                    $data['id']
+                );
+
             array_push($rdata, [
                 "no"                    => $no++,
                 "po_no"                 => $data['po_no'],
                 "spp_no"                => $data['spp_no'],
-                "no_penerimaan_barang"  => $data['no_penerimaan_barang'],
+                "no_penerimaan_barang"  => $penerimaanBarang == null ? "" : $penerimaanBarang['no_penerimaan_barang'],
                 "po_date"               => date('d/m/Y', strtotime($data['po_date'])),
                 "nama_supplier"         => $data['nama_supplier'],
                 "nama_barang"           => $data['nama_barang'],
@@ -768,6 +787,7 @@ class Barang extends BaseController
             "end_date" => $end_date
         ];
 
+        $penerimaanBarangDetailModel = new PenerimaanBarangDetailModel();
         $amPurchaseOrderModel = new AMPurchaseOrderModel();
         $res = $amPurchaseOrderModel->historiHargaPOBahanPenolong($condition, $addCondition, null, null);
 
@@ -790,9 +810,17 @@ class Barang extends BaseController
         $row = 2;
         $no = 1;
         foreach ($res['data'] as $data) {
+            $penerimaanBarang = $penerimaanBarangDetailModel
+                ->getHistoriLpbBahanPenolong(
+                    "LOKAL",
+                    "PENOLONG",
+                    $this->this_company_id,
+                    $data['spesifikasi_id']
+                );
+
             $sheet->setCellValue('A' . $row, $no++);
             $sheet->setCellValue('B' . $row, $data['spp_no']);
-            $sheet->setCellValue('C' . $row, $data['no_penerimaan_barang']);
+            $sheet->setCellValue('C' . $row, $penerimaanBarang == null ? "" : $penerimaanBarang['no_penerimaan_barang']);
             $sheet->setCellValue('D' . $row, date("d/m/Y", strtotime($data['po_date'])));
             $sheet->setCellValue('E' . $row, $data['nama_supplier']);
             $sheet->setCellValue('F' . $row, $data['nama_barang']);

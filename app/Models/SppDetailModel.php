@@ -71,4 +71,15 @@ class SppDetailModel extends Model
 
         return $sppDetailData;
     }
+
+    public function getDetailByPo($sppId, $barang1Id, $barang2Id)
+    {
+        $result = $this->asArray()->where('purchase_request_id', $sppId)
+            ->where('barang1_id', $barang1Id)
+            ->where('barang2_id', $barang2Id)
+            ->where('deletedAt', null)
+            ->first();
+
+        return $result;
+    }
 }

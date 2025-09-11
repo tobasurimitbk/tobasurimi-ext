@@ -3,6 +3,7 @@
 namespace App\Controllers\Purchase;
 
 use App\Controllers\BaseController;
+use App\Models\AMPurchaseOrderDetailModel;
 use App\Models\AMPurchaseOrderModel;
 use App\Models\BarangMasterModel;
 use App\Models\SppModel;
@@ -29,6 +30,7 @@ class SPP extends BaseController
     protected $RmPurchaseOrderModel;
     protected $RmImportPoModel;
     protected $barangMasterModel;
+    protected $amPurchaseOrderDetailModel;
 
     protected $this_company_id;
     protected $this_user_id;
@@ -46,6 +48,7 @@ class SPP extends BaseController
         $this->DivisisModel = new DivisisModel();
         $this->CompaniesModel = new CompaniesModel();
         $this->AmPurchaseOrderModel = new AMPurchaseOrderModel();
+        $this->amPurchaseOrderDetailModel = new AMPurchaseOrderDetailModel();
         $this->RmPurchaseOrderModel = new RMPurchaseOrderModel();
         $this->RmImportPoModel = new RMImportPOModel();
         $this->barangMasterModel = new BarangMasterModel();
@@ -298,11 +301,42 @@ class SPP extends BaseController
             ]);
         }
 
+        $this->updateKeteranganPo($id);
+
         return response()->setJSON([
             "status" => true,
             "message" => "Data Berhasil Diupdate",
             "token" => csrf_hash()
         ]);
+    }
+
+    public function updateKeteranganPo($sppId)
+    {
+        $amPurchaseOrderList = $this->AmPurchaseOrderModel
+            ->where('purchase_request_id', $sppId)
+            ->where('deletedAt', null)
+            ->findAll();
+
+        foreach ($amPurchaseOrderList as $po) {
+            $amPurchaseOrderDetailList = $this->amPurchaseOrderDetailModel
+                ->where('am_purchase_order_details.am_purchase_order_id', $po['id'])
+                ->where('deletedAt', null)
+                ->findAll();
+
+            foreach ($amPurchaseOrderDetailList as $poDetail) {
+                $poDetailBarang = $this->SppDetailModel->getDetailByPo(
+                    $sppId,
+                    $poDetail['barang_id'],
+                    $poDetail['spesifikasi_id']
+                );
+
+                if ($poDetailBarang) {
+                    $this->amPurchaseOrderDetailModel->update($poDetail['id'], [
+                        'note' => $poDetailBarang['note']
+                    ]);
+                }
+            }
+        }
     }
 
     public function updateStatusSPP()
@@ -498,21 +532,22 @@ class SPP extends BaseController
         }
     }
 
-    public function dropdownBarang(){
-        $search = $this->request->getVar('q'); 
-        $type = $this->request->getVar('type'); 
+    public function dropdownBarang()
+    {
+        $search = $this->request->getVar('q');
+        $type = $this->request->getVar('type');
 
         $data = $this->barangMasterModel->dropdownBarangType(
-            $type, 
-            $this->this_company_id, 
+            $type,
+            $this->this_company_id,
             $search
         );
 
         $results = [];
         foreach ($data as $item) {
             $results[] = [
-                'id' => $item['id'], 
-                'text' => $item['kode_barang']." - ".$item['barang_name'],
+                'id' => $item['id'],
+                'text' => $item['kode_barang'] . " - " . $item['barang_name'],
                 'satuan_1' => $item['satuan_1'],
                 'satuan_2' => $item['satuan_2'],
                 'satuan_3' => $item['satuan_3'],
@@ -529,14 +564,15 @@ class SPP extends BaseController
         return $this->response->setJSON(['results' => $results]);
     }
 
-     public function dropdownBarangFirst(){
-        $search = $this->request->getVar('q'); 
-        $type = $this->request->getVar('type'); 
+    public function dropdownBarangFirst()
+    {
+        $search = $this->request->getVar('q');
+        $type = $this->request->getVar('type');
         $id = decrypt($this->request->getVar('barang_spesifikasi_id'));
 
         $data = $this->barangMasterModel->dropdownBarangType(
-            $type, 
-            $this->this_company_id, 
+            $type,
+            $this->this_company_id,
             $search,
             $id
         );
@@ -544,8 +580,8 @@ class SPP extends BaseController
         $results = [];
         foreach ($data as $item) {
             $results[] = [
-                'id' => $item['id'], 
-                'text' => $item['kode_barang']." - ".$item['barang_name'],
+                'id' => $item['id'],
+                'text' => $item['kode_barang'] . " - " . $item['barang_name'],
                 'satuan_1' => $item['satuan_1'],
                 'satuan_2' => $item['satuan_2'],
                 'satuan_3' => $item['satuan_3'],
@@ -561,6 +597,4 @@ class SPP extends BaseController
 
         return $this->response->setJSON(['data' => $results]);
     }
-
-
 }

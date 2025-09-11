@@ -241,7 +241,7 @@
     </div>
 </div>
 <div class="modal fade" id="historiModal" tabindex="-1" role="dialog" aria-labelledby="historiModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-xl" role="document">
+    <div class="modal-dialog modal-xl" role="document" style="min-width: 1600px">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="historiModalLabel">Histori Purchase Order</h5>
@@ -271,10 +271,10 @@
                                     </ul>
                                 </div>
                                 <div class="col-md-3">
-                                    <input autocomplete="one-time-code" style="height: 40px;" value="" type="text" placeholder="Tanggal LPB" class="form-control form-control-lg po-start-date-lokal">
+                                    <input autocomplete="one-time-code" style="height: 40px;" value="" type="text" placeholder="Tanggal Awal PO" class="form-control form-control-lg po-start-date-lokal">
                                 </div>
                                 <div class="col-md-3">
-                                    <input autocomplete="one-time-code" style="height: 40px;" value="" type="text" placeholder="Tanggal LPB" class="form-control form-control-lg po-end-date-lokal" disabled>
+                                    <input autocomplete="one-time-code" style="height: 40px;" value="" type="text" placeholder="Tanggal Akhir PO" class="form-control form-control-lg po-end-date-lokal" disabled>
                                 </div>
                                 <div class="col-md-3">
                                     <input autocomplete="one-time-code" style="height: 40px;" placeholder="Cari Data" value="" type="text" class="form-control form-control-lg search-po-lokal">
@@ -288,13 +288,13 @@
                                         <th scope="col" onclick="changeShortPoLokal('am_purchase_orders.purchase_request_id')" class="sort">No SPP</th>
                                         <th scope="col" onclick="changeShortPoLokal('am_purchase_orders.po_no')" class="sort">No Po</th>
                                         <th scope="col" onclick="changeShortPoLokal('penerimaan_barang.no_penerimaan_barang')" class="sort">No LPB</th>
-                                        <th scope="col" onclick="changeShortPoLokal('penerimaan_barang.tanggal')" class="sort">Tgl LPB </th>
+                                        <th scope="col" onclick="changeShortPoLokal('penerimaan_barang.tanggal')" class="sort">Tgl PO</th>
                                         <th scope="col" onclick="changeShortPoLokal('suppliers.name')" class="sort">Supplier</th>
                                         <th scope="col" onclick="changeShortPoLokal('barang_master_spesifikasi.spesifikasi')" class="sort">Barang</th>
                                         <th scope="col" onclick="changeShortPoLokal('penerimaan_barang_detail.qty')" class="sort">Qty</th>
                                         <th scope="col" onclick="changeShortPoLokal('penerimaan_barang_detail.unit')" class="sort">Satuan</th>
                                         <th scope="col" onclick="changeShortPoLokal('penerimaan_barang_detail.harga')" class="sort">Harga</th>
-                                        <th scope="col" onclick="changeShortPoLokal('penerimaan_barang_detail.sub_total')" class="sort">Sub Total Harga</th>
+                                        <th scope="col" onclick="changeShortPoLokal('penerimaan_barang_detail.sub_total')" class="sort">Total Harga</th>
                                         <th scope="col" onclick="changeShortPoLokal('am_purchase_orders.division_id')" class="sort">Departemen</th>
                                         <th scope="col" onclick="changeShortPoLokal('am_purchase_orders.note')" class="sort">Keterangan</th>
                                     </tr>
@@ -870,7 +870,8 @@
                 className: "text-center"
             }, {
                 data: "no_lpb",
-                className: "text-center"
+                className: "text-center",
+                sortable: false
             }, {
                 data: "po_date",
                 className: "text-center"
@@ -882,7 +883,10 @@
                 className: "text-center"
             }, {
                 data: "qty",
-                className: "text-center"
+                className: "text-center",
+                render: function(data) {
+                    return greatFormatRupiah(data);
+                }
             }, {
                 data: "kode_satuan",
                 className: "text-center"
