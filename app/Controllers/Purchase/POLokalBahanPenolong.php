@@ -521,7 +521,7 @@ class POLokalBahanPenolong extends BaseController
             if ($hargaTerakhir) {
                 $this->barangMasterSpesifikasiModel
                     ->update($p['spesifikasi_id'], [
-                        'harga_terakhir' => $hargaTerakhir['harga'],
+                        'harga_terakhir' => $hargaTerakhir['price'],
                         'supplier_terakhir' => $hargaTerakhir['supplier_id']
                     ]);
             } else {
