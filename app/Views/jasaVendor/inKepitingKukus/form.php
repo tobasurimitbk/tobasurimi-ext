@@ -749,20 +749,20 @@
             });
 
             // EACH 
-            var isAdd = false;
+            // var isAdd = false;
 
-            $.each(barangFirst.list_barang_masuk, function(i, v) {
-                if (
-                    v.supplier_id == supplier_id &&
-                    (v.keterangan || '') == (keterangan || ''
-                    ) &&
-                    v.spesifikasi_in_id == spesifikasi_in_id
-                ) {
-                    isAdd = true;
-                }
-            });
+            // $.each(barangFirst.list_barang_masuk, function(i, v) {
+            //     if (
+            //         v.supplier_id == supplier_id &&
+            //         (v.keterangan || '') == (keterangan || ''
+            //         ) &&
+            //         v.spesifikasi_in_id == spesifikasi_in_id
+            //     ) {
+            //         isAdd = true;
+            //     }
+            // });
 
-            if (!isAdd) {
+            // if (!isAdd) {
                 listBarangGroup[index].list_barang_masuk.push({
                     barang1_id: barangFirst.barang1_id,
                     supplier_id: supplier_id,
@@ -774,14 +774,14 @@
                     qty_kotor: 0,
                     qty_bersih: 0
                 });
-            } else {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Barang masuk sudah ada !',
-                    confirmButtonColor: '#4e73df',
-                    confirmButtonText: 'Ok'
-                });
-            }
+            // } else {
+            //     Swal.fire({
+            //         icon: 'error',
+            //         title: 'Barang masuk sudah ada !',
+            //         confirmButtonColor: '#4e73df',
+            //         confirmButtonText: 'Ok'
+            //     });
+            // }
 
             // DRAW BARANG MASUK
             drawTable2(supplier_id, keterangan, listBarangGroup)

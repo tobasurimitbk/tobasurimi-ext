@@ -176,7 +176,7 @@
                     let id = row.id;
                     let status = row.status_posting
                     let status_closed = row.status_closed;
-                    let un_posting = row.un_posting;
+                    // let un_posting = row.un_posting;
 
                     if (status === "0") {
                         return `
@@ -187,7 +187,7 @@
                             </button>
                         <?php endif; ?>
                         <?php if (can('Jasa Vendor', 'Barang Keluar', 'p')) : ?>
-                            <button data-toggle="tooltip" title="Print" class="btn btn-warning btn-print" onclick="print('<?= base_url("jasa-vendor-out/print/"); ?>${id}')" style="box-shadow: none !important;">
+                            <button data-toggle="tooltip" title="Print" class="btn btn-warning btn-print" onclick="print('<?= base_url("jasa-vendor-out-kepiting-kukus/print/"); ?>${id}')" style="box-shadow: none !important;">
                                 <i class="fa fa-print fa-sm" aria-hidden="true"></i>
                             </button>
                         <?php endif; ?>
@@ -208,20 +208,20 @@
                                 </button>
                             `;
 
-                            if (un_posting) {
-                                res += `
-                                    <button data-toggle="tooltip" title="Un Posting" onclick="unPosting('${id}')" class="btn btn-danger posting-spp">
-                                        <i class="fa-solid fa-ban"></i>    
-                                    </button>
-                                `;
+                           
+                            res += `
+                                <button data-toggle="tooltip" title="Un Posting" onclick="unPosting('${id}')" class="btn btn-danger posting-spp">
+                                    <i class="fa-solid fa-ban"></i>    
+                                </button>
+                            `;
 
-                            }
+                            
 
                         }
 
                         <?php if (can('Jasa Vendor', 'Barang Keluar', 'p')) : ?>
                             res += `
-                                <button data-toggle="tooltip" title="Print" class="btn btn-warning btn-print" onclick="print('<?= base_url("jasa-vendor-out/print/"); ?>${id}')" style="box-shadow: none !important;">
+                                <button data-toggle="tooltip" title="Print" class="btn btn-warning btn-print" onclick="print('<?= base_url("jasa-vendor-out-kepiting-kukus/print/"); ?>${id}')" style="box-shadow: none !important;">
                                     <i class="fa fa-print fa-sm" aria-hidden="true"></i>
                                 </button>
                             `;
@@ -277,7 +277,7 @@
     }).change(function() {
         // GET WAREHOUSES
         $.ajax({
-            url: `<?= base_url('jasa-vendor-out/warehouse'); ?>`,
+            url: `<?= base_url('jasa-vendor-out-kepiting-kukus/warehouse'); ?>`,
             method: "GET",
             beforeSend: function() {
                 setLoading();
@@ -455,7 +455,7 @@
             if (result.isConfirmed) {
                 const csrf = $(`[name="${csrfToken}"]`);
                 $.ajax({
-                    url: "<?= base_url("jasa-vendor-out/delete"); ?>",
+                    url: "<?= base_url("jasa-vendor-out-kepiting-kukus/delete"); ?>",
                     data: {
                         id: id
                     },
@@ -499,7 +499,7 @@
             if (result.isConfirmed) {
                 const csrf = $(`[name="${csrfToken}"]`);
                 $.ajax({
-                    url: "<?= base_url("jasa-vendor-out/close"); ?>",
+                    url: "<?= base_url("jasa-vendor-out-kepiting-kukus/close"); ?>",
                     data: {
                         id: id
                     },

@@ -172,6 +172,14 @@
                             <label for="floatingInput" style="z-index: 1;">Warehouse</label>
                         </div>
                     </div>
+                    <div class="col-md-3">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <select class="form-select barang_id" id="barang_id" name="barang_id">
+                                <option value=""></option>
+                            </select>
+                            <label for="floatingInput" style="z-index: 1;">Pilih Barang</label>
+                        </div>
+                    </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <input <?= !empty($jasaVendorOut) ? ($jasaVendorOut['status_posting'] ? 'disabled' : '') : '' ?> placeholder="Keterangan" value="<?= !empty($jasaVendorOut) ? $jasaVendorOut['keterangan'] : '' ?>" class="form-control keterangan" id="keterangan" name="keterangan" />
@@ -216,11 +224,19 @@
                         <div class="col-md-3">
                             <div class="form-floating mb-3">
                                 <input type="text" placeholder="Keterangan" class="form-control keterangan_detail" id="keterangan_detail" name="keterangan_detail" />
-                                <label for="keterangan_detail">Keterangan (Opsional)</label>
+                                <label for="keterangan_detail">Keterangan</label>
                             </div>
                         </div>
-                        <div class="col-md-3 d-flex align-items-center">
-                            <button type="button" class="btn btn-primary" id="btnAddBarang">+ Tambah Barang</button>
+                        <div class="col-md-3">
+                            <div class="form-floating mb-3">
+                                <button type="button" 
+                                    class="border-radius-2"
+                                    id="btnAddBarang"
+                                    style="width:30%;height: 50px;background-color:#4F46E5;border:none;color:white;"
+                                    >
+                                    <h3 class="fa fa-plus" style="font-size:18px;"></h3>
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </form>
@@ -393,11 +409,48 @@
         width: '100%',
     });
 
+
+    $("#barang_id").select2({
+        placeholder: "Pilih Barang",
+        theme: "bootstrap-5",
+        minimumInputLength: 3,
+        width: '100%',
+        ajax: {
+            delay: 300,
+            transport: function(params, success, failure) {
+                if (abortController) {
+                    abortController.abort();
+                }
+                abortController = new AbortController();
+
+                fetch("<?= base_url('jasa-vendor-out-kepiting-kukus/search-master-barang'); ?>?" + new URLSearchParams({
+                    q: params.data.term
+                }), {
+                    signal: abortController.signal
+                })
+                .then(res => res.json())
+                .then(success)
+                .catch(err => {
+                    if (err.name !== "AbortError") failure(err);
+                });
+            },
+            processResults: function(data) {
+                return {
+                    results: data.data.map(item => ({
+                        id: item.id,
+                        text: `${item.master_barang}`
+                    }))
+                };
+            }
+        }
+    });
+
     $(".spesifikasi_id").select2({
         placeholder: "Pilih Spesifikasi Barang",
         theme: "bootstrap-5",
         multiple: true,
         minimumInputLength: 3,
+        dropdownParent: $('.detail-form'), // sama juga
         ajax: {
             delay: 300,
             transport: function(params, success, failure) {
@@ -407,6 +460,7 @@
                 abortController = new AbortController();
 
                 fetch("<?= base_url('jasa-vendor-out-kepiting-kukus/search-barang'); ?>?" + new URLSearchParams({
+                    barang_id: $('#barang_id option:selected').val(),
                     q: params.data.term
                 }), {
                     signal: abortController.signal
@@ -454,8 +508,13 @@
         let keterangan = $("#keterangan_detail").val();
         let detailId = $("#id_detail").val(); // kalau kosong berarti data baru
 
-        if (!spesifikasi || !supplierId) {
-            alert("Spesifikasi dan Supplier wajib dipilih!");
+        if (!spesifikasi || !supplierId || !keterangan) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Spesifikasi, Keterangan, dan Supplier yang akan dikirimkan ke vendor tidak boleh kosong !',
+                confirmButtonColor: '#4e73df',
+                confirmButtonText: 'Ok'
+            });
             return;
         }
 
@@ -759,7 +818,6 @@
     }
 
     function drawTableSelectedItem(data) {
-        console.log(listStockSelected);
         const table = $('#selectedItemTable');
         var no = 1;
         $('.foot-detail-table').empty();
@@ -790,13 +848,13 @@
                 newRow.append($('<td style="text-align: center;">').text(v.keterangan));
                 newRow.append($('<td style="text-align: center;">').html(
                     `
-                    <input <?= !empty($jasaVendorOut) ? (($jasaVendorOut['status_posting'] == "1") ? 'disabled' : '') : '' ?> onkeyup="this.value = greatFormatRupiah(this.value)" class="form-control stok-out" oninput="preventNegativeInput(this)" autocomplete="one-time-code" data-id="${v.id}" class="form-control" type="text" value="${greatFormatRupiah(v.qty)}">
+                    <input <?= !empty($jasaVendorOut) ? (($jasaVendorOut['status_posting'] == "1") ? 'disabled' : '') : '' ?> onkeyup="this.value = greatFormatRupiah(this.value)" class="form-control stok-out" oninput="preventNegativeInput(this)" autocomplete="one-time-code" data-id="${v.detail_id}" class="form-control" type="text" value="${greatFormatRupiah(v.qty)}">
                 `
                 ));
 
                 newRow.append($('<td style="text-align: center;">').html(
                     `
-                    <button <?= !empty($jasaVendorOut) ? (($jasaVendorOut['status_posting'] == "1") ? 'disabled' : '') : '' ?> type="button" class="btn btn-danger" onclick="deleteDetail(${v.id})" ><i class="fa fa-trash fa-sm" aria-hidden="true"></i></button>
+                    <button <?= !empty($jasaVendorOut) ? (($jasaVendorOut['status_posting'] == "1") ? 'disabled' : '') : '' ?> type="button" class="btn btn-danger" onclick="deleteDetail(${v.detail_id})" ><i class="fa fa-trash fa-sm" aria-hidden="true"></i></button>
                 `
                 ));
                 table.find('tbody').append(newRow);
@@ -816,7 +874,7 @@
                 let val = destroyFormatRupiah($(this).val()) || 0;
 
                 // update ke listStockSelected
-                let item = listStockSelected.find(x => x.id == id);
+                let item = listStockSelected.find(x => x.detail_id == id);
                 if (item) {
                     item.qty = val;
                 }
@@ -930,7 +988,7 @@
             if (result.isConfirmed) {
                 const csrf = $(`[name="${csrfToken}"]`);
                 $.ajax({
-                    url: "<?= base_url("jasa-vendor-out/posting"); ?>",
+                    url: "<?= base_url("jasa-vendor-out-kepiting-kukus/posting"); ?>",
                     data: {
                         id: id
                     },
@@ -980,7 +1038,7 @@
             if (result.isConfirmed) {
                 const csrf = $(`[name="${csrfToken}"]`);
                 $.ajax({
-                    url: "<?= base_url("jasa-vendor-out/delete"); ?>",
+                    url: "<?= base_url("jasa-vendor-out-kepiting-kukus/delete"); ?>",
                     data: {
                         id: id
                     },

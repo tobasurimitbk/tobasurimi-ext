@@ -146,6 +146,38 @@ class BiayaKepitingModel extends Model
         return $result;
     }
 
+    public function dropdownJasaVendorKepitingKukusIn()
+    {
+        $divisiModel = new DivisisModel();
+        $biayaUdangModel = new BiayaUdangModel();
+        $divisiArr = array();
+        $result = array();
+
+        foreach ($divisiModel->getDivisiAccess() as $d) {
+            array_push($divisiArr, $d['id']);
+        }
+
+        $resultBiayaKepiting = $this
+            ->select('jasa_vendor_in_kepiting_kukus.*,divisis.divisi,vendors.name')
+            ->join('jasa_vendor_in_kepiting_kukus', 'jasa_vendor_in_kepiting_kukus.id = biaya_kepiting.jasa_vendor_in_kepiting_kukus_id', 'right')
+            ->join('divisis', 'divisis.id = jasa_vendor_in_kepiting_kukus.divisi_id', 'left')
+            ->join('vendors', 'vendors.id = jasa_vendor_in_kepiting_kukus.vendor_id', 'left')
+            ->where('biaya_kepiting.jasa_vendor_in_kepiting_kukus_id', null)
+            ->where('jasa_vendor_in_kepiting_kukus.status_posting', '1')
+            ->where('jasa_vendor_in_kepiting_kukus.deletedAt', null)
+            ->whereIn('jasa_vendor_in_kepiting_kukus.divisi_id', $divisiArr)
+            ->findAll();
+
+        foreach ($resultBiayaKepiting as $r) {
+            $checkBiayaUdang = $biayaUdangModel->like('multiple_jasa_vendor_in_id', $r['id'])->first();
+            if ($checkBiayaUdang == null) {
+                array_push($result, $r);
+            }
+        }
+
+        return $result;
+    }
+
     public function dropdownBarang($jasaVendorInID, $id = null)
     {
         $jasaVendorInModel = new JasaVendorInModel();
@@ -214,6 +246,94 @@ class BiayaKepitingModel extends Model
         }
 
         return $jasaVendorOutDetail;
+    }
+
+    public function dropdownBarangKepitingKukus($jasaVendorInID, $id = null)
+    {
+        $jasaVendorInKepitingKukusModel   = new JasaVendorInKepitingKukusModel();
+        $jasaVendorInDetailModel          = new JasaVendorInKepitingKukusDetailModel();
+        $jasaVendorOutDetailModel         = new JasaVendorOutKepitingKukusDetailModel(); 
+        $biayaKepitingDetailModel         = new BiayaKepitingDetailModel();
+
+        // ambil header IN (buat tanggal masuk)
+        $jasaVendorIn = $jasaVendorInKepitingKukusModel->find($jasaVendorInID);
+
+        // 🔹 ambil semua OUT detail yg punya relasi ke IN ini
+        $outDetails = $jasaVendorOutDetailModel
+            ->select('
+                jasa_vendor_out_kepiting_kukus_detail.id,
+                jasa_vendor_out_kepiting_kukus_detail.supplier_id,
+                jasa_vendor_out_kepiting_kukus_detail.keterangan,
+                suppliers.name AS supplier_name,
+                MIN(jasa_vendor_out_kepiting_kukus.tanggal) AS tanggal_keluar,
+                SUM(jasa_vendor_out_kepiting_kukus_detail.qty) AS qty_kopek
+            ')
+            ->join('jasa_vendor_out_kepiting_kukus', 'jasa_vendor_out_kepiting_kukus.id = jasa_vendor_out_kepiting_kukus_detail.jasa_vendor_out_kepiting_kukus_id')
+            ->join('suppliers', 'suppliers.id = jasa_vendor_out_kepiting_kukus_detail.supplier_id', 'left')
+            ->join('jasa_vendor_in_kepiting_kukus_detail', 'jasa_vendor_in_kepiting_kukus_detail.jasa_vendor_out_kepiting_kukus_detail_id = jasa_vendor_out_kepiting_kukus_detail.id', 'inner')
+            ->where('jasa_vendor_in_kepiting_kukus_detail.jasa_vendor_in_kepiting_kukus_id', $jasaVendorInID)
+            ->where('jasa_vendor_out_kepiting_kukus_detail.deletedAt', null)
+            ->groupBy('jasa_vendor_out_kepiting_kukus_detail.supplier_id, jasa_vendor_out_kepiting_kukus_detail.keterangan, suppliers.name')
+            ->findAll();
+
+        $grouped = [];
+        $allSpek = [];
+
+        foreach ($outDetails as $outRow) {
+            $groupKey = $outRow['supplier_id'].'-'.$outRow['keterangan'];
+
+            // 🔹 ambil IN detail hanya untuk kombinasi supplier + keterangan ini
+            $inDetails = $jasaVendorInDetailModel
+                ->select('
+                    jasa_vendor_in_kepiting_kukus_detail.qty_kotor as qty,
+                    barang_master_spesifikasi.spesifikasi
+                ')
+                ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = jasa_vendor_in_kepiting_kukus_detail.spesifikasi_in_id')
+                ->where('jasa_vendor_in_kepiting_kukus_detail.jasa_vendor_out_kepiting_kukus_detail_id', $outRow['id'])
+                ->where('jasa_vendor_in_kepiting_kukus_detail.deletedAt', null)
+                ->findAll();
+
+            $grouped[$groupKey] = [
+                'supplier'       => $outRow['supplier_name'],
+                'keterangan'     => $outRow['keterangan'],
+                'qty_sebelum_kopek' => $outRow['qty_kopek'] ?? 0,
+                'tanggal_masuk'  => date('d/m/Y', strtotime($jasaVendorIn['tanggal'])),
+                'tanggal_keluar' => date('d/m/Y', strtotime($outRow['tanggal_keluar'])),
+                'spek'           => []
+            ];
+
+            foreach ($inDetails as $inRow) {
+                $spekName = strtoupper($inRow['spesifikasi']);
+                $allSpek[$spekName] = $spekName;
+
+                if (!isset($grouped[$groupKey]['spek'][$spekName])) {
+                    $grouped[$groupKey]['spek'][$spekName] = 0;
+                }
+
+                $grouped[$groupKey]['spek'][$spekName] += $inRow['qty'];
+            }
+
+            // 🔹 kalau edit mode → overwrite isi spek
+            if ($id != null) {
+                $biayaDetail = $biayaKepitingDetailModel
+                    ->where('biaya_kepiting_id', $id)
+                    ->where('jasa_vendor_in_id', $jasaVendorInID)
+                    ->where('supplier_id', $outRow['supplier_id'])
+                    ->where('keterangan', $outRow['keterangan'])
+                    ->first();
+
+                if ($biayaDetail) {
+                    foreach ($allSpek as $spekName) {
+                        $grouped[$groupKey]['spek'][$spekName] = $biayaDetail[strtolower($spekName)] ?? ($grouped[$groupKey]['spek'][$spekName] ?? 0);
+                    }
+                }
+            }
+        }
+
+        return [
+            'thead' => array_values($allSpek),
+            'data'  => array_values($grouped)
+        ];
     }
 
     public function dropdownBarangPrint($jasaVendorInID, $id = null)

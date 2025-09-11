@@ -312,7 +312,7 @@ class JasaVendorInKepitingKukus extends BaseController
         }
 
         // Delete first and insert again
-        $this->jasaVendorInKepitingKukusDetailModel->where('jasa_vendor_in_id', $id)->delete();
+        $this->jasaVendorInKepitingKukusDetailModel->where('jasa_vendor_in_kepiting_kukus_id', $id)->delete();
 
         foreach ($barangs as $b) {
             // LIST BARANG MASUK
