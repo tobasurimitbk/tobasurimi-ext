@@ -880,7 +880,7 @@ class BeaCukaiApi
             $barangTarifArr[] = [
                 'kodeFasilitasTarif' => $b['kode_fasilitas_tarif'],
                 'kodeJenisPungutan' => $b['kode_jenis_pungutan'],
-                'nilaiPungutan' => (float)$b['nilai_bayar'] == null ? 0 : roundNumber((float)$b['nilai_bayar'], 0.01),
+                'nilaiPungutan' => (float)$b['nilai_bayar'] == null ? 0 : round($b['nilai_bayar'], 2),
             ];
         }
 
@@ -933,14 +933,14 @@ class BeaCukaiApi
                     'jumlahSatuan' => (float)$b['jumlah_satuan'],
                     'kodeFasilitasTarif' => $bt['kode_fasilitas_tarif'],
                     'kodeSatuanBarang' => $bt['kode_satuan_barang'],
-                    'nilaiBayar' => roundNumber($bt['nilai_bayar'], 0.01),
+                    'nilaiBayar' => round($bt['nilai_bayar'], 2),
                     'nilaiFasilitas' => 0,
                     'nilaiSudahDilunasi' => 0,
                     'seriBarang' => (int)$bt['seri_barang'],
                     'tarif' => (float) $bt['tarif_bea_masuk'],
                     'tarifFasilitas' => (float) $bt['tarif_fasilitas'],
                     'kodeJenisPungutan' => $bt['kode_jenis_pungutan'],
-                    'nilaiPungutan' => roundNumber($bt['nilai_bayar'], 0.01),
+                    'nilaiPungutan' => round($bt['nilai_bayar'], 2),
                 ];
             }
             $barang['barangTarif'] = $barangTarifArr1;
