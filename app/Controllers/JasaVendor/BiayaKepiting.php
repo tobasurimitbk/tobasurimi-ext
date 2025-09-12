@@ -159,36 +159,147 @@ class BiayaKepiting extends BaseController
     }
 
 
+    // public function createAction()
+    // {
+
+    //     $listBarang = json_decode($_POST['listBarang']);
+    //     $listPerolehanGaji = json_decode($_POST['listPerolehanGaji']);
+    //     $listBonus = json_decode($_POST['listBonus']);
+    //     $jasaVendorIn = $this->jasaVendorInModel->find($this->request->getVar('jasa_vendor_in_id'));
+    //     $biayaKepiting = $this->biayaKepitingModel->where('company_id', $this->this_company_id)->where('no_pembayaran', $this->request->getVar('no_pembayaran'))->first();
+
+    //     if ($biayaKepiting != null) {
+    //         return response()->setJSON([
+    //             'message' => "No pembayaran sudah ada !",
+    //             'status' => false,
+    //             'token' => csrf_hash()
+    //         ]);
+    //     }
+
+    //     if (count($listBarang) == 0) {
+    //         return response()->setJSON([
+    //             'message' => "Barang tidak boleh kosong",
+    //             'status' => false,
+    //             'token' => csrf_hash()
+    //         ]);
+    //     }
+
+    //     if (count($listBonus) == 0) {
+    //         return response()->setJSON([
+    //             'message' => "Bonus tidak boleh kosong",
+    //             'status' => false,
+    //             'token' => csrf_hash()
+    //         ]);
+    //     }
+
+    //     $id = $this->biayaKepitingModel->insert([
+    //         'company_id' => $this->this_company_id,
+    //         'divisi_id' => $jasaVendorIn['divisi_id'],
+    //         'jasa_vendor_in_id' => $jasaVendorIn['id'],
+    //         'vendor_id' => $jasaVendorIn['vendor_id'],
+    //         'warehouse_id' => $jasaVendorIn['warehouse_id'],
+    //         'no_pembayaran' => $this->request->getVar('no_pembayaran'),
+    //         "tanggal" => $this->request->getVar("tanggal") ? date_format(date_create_from_format("d/m/Y", $this->request->getVar("tanggal")), "Y-m-d") : "",
+    //         'keterangan' => $this->request->getVar('keterangan'),
+    //         'status_posting' => '0'
+    //     ]);
+
+    //     foreach ($listBarang as $b) {
+    //         $this->biayaKepitingDetailModel->insert([
+    //             'biaya_kepiting_id' => $id,
+    //             'jasa_vendor_in_id' => $this->request->getVar('jasa_vendor_in_id'),
+    //             // 'barang_master_id' => $b->barang_master_id,
+    //             // 'barang_master_spesifikasi_id' => $b->barang_master_spesifikasi_id,
+    //             'jumbo' => $b->jumbo,
+    //             'ex_lump' => $b->ex_lump,
+    //             'lump' => $b->lump,
+    //             'special' => $b->special,
+    //             'claw' => $b->claw,
+    //             'mh' => $b->mh,
+    //             'cf' => $b->cf,
+    //         ]);
+    //     }
+
+    //     foreach ($listPerolehanGaji as $b) {
+    //         $this->biayaKepitingGajiModel->insert([
+    //             'biaya_kepiting_id' => $id,
+    //             'jumbo' => $b->jumbo,
+    //             'ex_lump' => $b->ex_lump,
+    //             'lump' => $b->lump,
+    //             'special' => $b->special,
+    //             'claw' => $b->claw,
+    //             'mh' => $b->mh,
+    //             'cf' => $b->cf,
+    //             'jenis' => $b->description
+    //         ]);
+    //     }
+
+    //     foreach ($listBonus as $b) {
+    //         if ($b->kg_bonus) {
+    //             $this->biayaKepitingBonusModel->insert([
+    //                 'biaya_kepiting_id' => $id,
+    //                 'jasa_vendor_in_id' => $this->request->getVar('jasa_vendor_in_id'),
+    //                 // 'barang_master_id' => $b->barang_master_id,
+    //                 // 'barang_master_spesifikasi_id' => $b->barang_master_spesifikasi_id,
+    //                 'kg_bonus' => $b->kg_bonus,
+    //                 'bonus_nominal' => $b->bonus_nominal
+    //             ]);
+    //         }
+    //     }
+
+    //     return response()->setJSON([
+    //         'message' => "Biaya kepiting berhasil disimpan",
+    //         'token' => csrf_token(),
+    //         'id' => encrypt($id),
+    //         'status' => true
+    //     ]);
+    // }
+
+
     public function createAction()
     {
-        $listBarang = json_decode($_POST['listBarang']);
-        $listPerolehanGaji = json_decode($_POST['listPerolehanGaji']);
-        $listBonus = json_decode($_POST['listBonus']);
+        // Decode data JSON dengan parameter true untuk mendapatkan array assosiatif
+        $listBarang = json_decode($this->request->getPost('listBarang'), true);
+        $listPerolehanGaji = json_decode($this->request->getPost('listPerolehanGaji'), true);
+        $listBonus = json_decode($this->request->getPost('listBonus'), true);
+        
         $jasaVendorIn = $this->jasaVendorInModel->find($this->request->getVar('jasa_vendor_in_id'));
-        $biayaKepiting = $this->biayaKepitingModel->where('company_id', $this->this_company_id)->where('no_pembayaran', $this->request->getVar('no_pembayaran'))->first();
+        $biayaKepiting = $this->biayaKepitingModel->where('company_id', $this->this_company_id)
+            ->where('no_pembayaran', $this->request->getVar('no_pembayaran'))
+            ->first();
 
         if ($biayaKepiting != null) {
-            return response()->setJSON([
-                'message' => "No pembayaran sudah ada !",
+            return $this->response->setJSON([
+                'message' => "No pembayaran sudah ada!",
                 'status' => false,
                 'token' => csrf_hash()
             ]);
         }
 
         if (count($listBarang) == 0) {
-            return response()->setJSON([
+            return $this->response->setJSON([
                 'message' => "Barang tidak boleh kosong",
                 'status' => false,
                 'token' => csrf_hash()
             ]);
         }
 
-        if (count($listBonus) == 0) {
-            return response()->setJSON([
-                'message' => "Bonus tidak boleh kosong",
-                'status' => false,
-                'token' => csrf_hash()
-            ]);
+        // Validasi bonus - ubah menjadi tidak wajib (opsional)
+        // if (count($listBonus) == 0) {
+        //     return $this->response->setJSON([
+        //         'message' => "Bonus tidak boleh kosong",
+        //         'status' => false,
+        //         'token' => csrf_hash()
+        //     ]);
+        // }
+
+        // Format tanggal
+        $tanggal = $this->request->getVar("tanggal");
+        if ($tanggal) {
+            $date = \DateTime::createFromFormat("d/m/Y", $tanggal);
+            $tanggalFormatted = $date ? $date->format("Y-m-d") : date("Y-m-d");
+        } else {
+            $tanggalFormatted = date("Y-m-d");
         }
 
         $id = $this->biayaKepitingModel->insert([
@@ -198,57 +309,77 @@ class BiayaKepiting extends BaseController
             'vendor_id' => $jasaVendorIn['vendor_id'],
             'warehouse_id' => $jasaVendorIn['warehouse_id'],
             'no_pembayaran' => $this->request->getVar('no_pembayaran'),
-            "tanggal" => $this->request->getVar("tanggal") ? date_format(date_create_from_format("d/m/Y", $this->request->getVar("tanggal")), "Y-m-d") : "",
+            "tanggal" => $tanggalFormatted,
             'keterangan' => $this->request->getVar('keterangan'),
-            'status_posting' => '0'
+            'status_posting' => '0',
         ]);
 
+        // Jika insert gagal
+        if (!$id) {
+            return $this->response->setJSON([
+                'message' => "Gagal menyimpan data biaya kepiting",
+                'status' => false,
+                'token' => csrf_hash()
+            ]);
+        }
+
+        // Simpan data barang
         foreach ($listBarang as $b) {
             $this->biayaKepitingDetailModel->insert([
                 'biaya_kepiting_id' => $id,
                 'jasa_vendor_in_id' => $this->request->getVar('jasa_vendor_in_id'),
-                'barang_master_id' => $b->barang_master_id,
-                'barang_master_spesifikasi_id' => $b->barang_master_spesifikasi_id,
-                'jumbo' => $b->jumbo,
-                'ex_lump' => $b->ex_lump,
-                'lump' => $b->lump,
-                'special' => $b->special,
-                'claw' => $b->claw,
-                'mh' => $b->mh,
-                'cf' => $b->cf,
+                'barang_master_id' => $b['barang_master_id'] ?? null,
+                'barang_master_spesifikasi_id' => $b['barang_master_spesifikasi_id'] ?? null,
+                // 'tanggal_masuk' => $b['tanggal_masuk'] ?? null,
+                // 'qty_sebelum_kopek' => $b['qty_sebelum_kopek'] ?? 0,
+                'rasio' => $b['rasio'] ?? 0,
+                'jumbo' => $b['spek']['JB'] ?? 0,
+                'ex_lump' => $b['spek']['SP LUMP'] ?? 0,
+                'lump' => $b['spek']['BF'] ?? 0,
+                'special' => $b['spek']['SPL'] ?? 0,
+                'claw' => $b['spek']['CLAW'] ?? 0,
+                'mh' => $b['spek']['MH'] ?? 0,
+                'cf' => $b['spek']['CF'] ?? 0,
             ]);
         }
 
+        // Simpan data perolehan gaji
         foreach ($listPerolehanGaji as $b) {
             $this->biayaKepitingGajiModel->insert([
                 'biaya_kepiting_id' => $id,
-                'jumbo' => $b->jumbo,
-                'ex_lump' => $b->ex_lump,
-                'lump' => $b->lump,
-                'special' => $b->special,
-                'claw' => $b->claw,
-                'mh' => $b->mh,
-                'cf' => $b->cf,
-                'jenis' => $b->description
+                'jenis' => $b['description'] ?? $b['value'] ?? 'unknown',
+                'jumbo' => $b['jumbo'] ?? 0,
+                'ex_lump' => $b['ex_lump'] ?? 0,
+                'lump' => $b['lump'] ?? 0,
+                'special' => $b['special'] ?? 0,
+                'claw' => $b['claw'] ?? 0,
+                'mh' => $b['mh'] ?? 0,
+                'cf' => $b['cf'] ?? 0,
             ]);
         }
 
-        foreach ($listBonus as $b) {
-            if ($b->kg_bonus) {
-                $this->biayaKepitingBonusModel->insert([
-                    'biaya_kepiting_id' => $id,
-                    'jasa_vendor_in_id' => $this->request->getVar('jasa_vendor_in_id'),
-                    'barang_master_id' => $b->barang_master_id,
-                    'barang_master_spesifikasi_id' => $b->barang_master_spesifikasi_id,
-                    'kg_bonus' => $b->kg_bonus,
-                    'bonus_nominal' => $b->bonus_nominal
-                ]);
+        // Simpan data bonus (jika ada)
+        if (!empty($listBonus)) {
+            foreach ($listBonus as $b) {
+                if (!empty($b['kg_bonus']) && $b['kg_bonus'] > 0) {
+                    $this->biayaKepitingBonusModel->insert([
+                        'biaya_kepiting_id' => $id,
+                        'jasa_vendor_in_id' => $this->request->getVar('jasa_vendor_in_id'),
+                        'barang_master_id' => $b['barang_master_id'] ?? null,
+                        'barang_master_spesifikasi_id' => $b['barang_master_spesifikasi_id'] ?? null,
+                        // 'tanggal_masuk' => $b['tanggal_masuk'] ?? null,
+                        // 'nama_barang' => $b['nama_barang'] ?? null,
+                        // 'spesifikasi' => $b['spesifikasi'] ?? null,
+                        'kg_bonus' => $b['kg_bonus'] ?? 0,
+                        'bonus_nominal' => $b['bonus_nominal'] ?? 0,
+                    ]);
+                }
             }
         }
 
-        return response()->setJSON([
+        return $this->response->setJSON([
             'message' => "Biaya kepiting berhasil disimpan",
-            'token' => csrf_token(),
+            'token' => csrf_hash(),
             'id' => encrypt($id),
             'status' => true
         ]);
