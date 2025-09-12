@@ -554,6 +554,8 @@
             let discPercent = discUnit == 'percent' ? Math.min(Math.max(destroyFormatRupiah(obj.disc) || 0, 0), 100) : destroyFormatRupiah(obj.disc); // Validasi diskon antara 0-100%
             let taxAmt = 0;
 
+
+
             discTotal += discUnit == 'percent' ? (discPercent / 100) * itemAmt : discPercent; // Hitung total diskon
 
             if (taxStatus) {
@@ -563,9 +565,11 @@
             }
 
             if (taxStatus && includeTax) {
-                tax = itemAmt * (taxes / 100);
-                itemSubTotal += itemAmt + tax;
-                taxTotalHtml += tax; // Pajak dihitung dari selisih
+                tax = 1 + (taxes / 100);
+                itemSubafterTax = itemAmt / tax;
+                taxAfterDpp = itemAmt - itemSubafterTax;
+                itemSubTotal = Math.round(itemSubafterTax);
+                taxTotalHtml = Math.round(taxAfterDpp);
             } else {
                 itemSubTotal += itemAmt;
                 taxTotalHtml += taxAmt;
@@ -575,7 +579,7 @@
         // Pastikan total tidak negatif
         itemSubTotal = Math.max(0, itemSubTotal);
         taxTotalHtml = Math.max(0, taxTotalHtml);
-        grandTotal = taxStatus && includeTax ? itemSubTotal - (taxStatus ? taxTotalHtml : 0) : itemSubTotal + (taxStatus ? taxTotalHtml : 0);
+        grandTotal = itemSubTotal + (taxStatus ? taxTotalHtml : 0);
 
         // Update tampilan HTML
         $('#itemSubTotal').html(greatFormatRupiah(itemSubTotal));
