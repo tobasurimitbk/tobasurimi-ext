@@ -175,20 +175,19 @@ class JasaVendorInKepitingKukus extends BaseController
         }
 
         $selectQryJasaVendorDetail = "
-            SUM(jasa_vendor_in_detail.qty_bersih) as qty_bersih,
-            SUM(jasa_vendor_in_detail.qty_kotor) as qty_kotor,
+            SUM(jasa_vendor_in_kepiting_kukus_detail.qty_bersih) as qty_bersih,
+            SUM(jasa_vendor_in_kepiting_kukus_detail.qty_kotor) as qty_kotor,
             satuans.kode_satuan,
             barang_master.barang_name,
             barang_master_spesifikasi.spesifikasi
         ";
 
         $jasaVendorInKepitingKukusDetail = $this->jasaVendorInKepitingKukusDetailModel->select($selectQryJasaVendorDetail)
-            ->join('stock', 'stock.id = jasa_vendor_in_detail.stock_in_id')
-            ->join('barang_master', 'barang_master.id = stock.barang1_id')
-            ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = stock.barang2_id')
+            ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = jasa_vendor_in_kepiting_kukus_detail.spesifikasi_in_id')
+            ->join('barang_master', 'barang_master.id = barang_master_spesifikasi.barang_master_id')
             ->join('satuans', 'satuans.id = barang_master_spesifikasi.satuan_1')
-            ->where('jasa_vendor_in_id', $id)
-            ->groupBy('jasa_vendor_in_detail.stock_in_id')
+            ->where('jasa_vendor_in_kepiting_kukus_id', $id)
+            ->groupBy('jasa_vendor_in_kepiting_kukus_detail.id')
             ->findAll();
 
         $data = [

@@ -117,7 +117,7 @@
                     <?php 
                     $totalKotor = 0;
                     $totalBersih = 0;
-                    foreach ($jasaVendorInDetail as $j) : 
+                    foreach ($jasaVendorInKepitingKukusDetail as $j) : 
                         $totalKotor += $j['qty_kotor'];
                         $totalBersih += $j['qty_bersih'];
                     ?>
