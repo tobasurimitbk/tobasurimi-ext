@@ -113,218 +113,218 @@
     let sort = "proforma_invoice.createdAt";
     let sortType = "desc";
 
-    // const table = $('.dataTable').DataTable({
-    //     processing: true,
-    //     serverSide: true,
-    //     ordering: true,
-    //     order: [
-    //         [1, 'asc']
-    //     ],
-    //     fixedHeader: true,
-    //     lengthMenu: [
-    //         [25],
-    //         [25],
-    //     ],
-    //     pageLength: 25,
-    //     ajax: {
-    //         url: "<?= base_url("invoice-packing-bc/all-invoice"); ?>",
-    //         dataSrc: "data",
-    //         data: function(data) {
-    //             data.sales_order_export_id = "<?= $dataSalesOrderExport->sales_order_export_id ?>";
-    //             data.search = $(".search").val();
-    //             data.dateStart = $(".dateStart").val();
-    //             data.dateEnd = $(".dateEnd").val();
-    //             data.status_posting = $(".status_posting").val();
-    //             data.sort = sort;
-    //             data.sortType = sortType;
-    //         }
-    //     },
-    //     initComplete: function(settings, json) {
-    //         $('.dataTables_length').empty();
-    //         $('.dataTables_length').html("<div><label class='text-center ml-2 mt-2'>Show <b class='entries-label'>25</b> Entries</label></div>");
-    //         $('.dataTable').wrap("<div style='overflow:auto; width:100%;position:relative;'></div>");
-    //     },
-    //     display: "stripe",
-    //     searching: false,
-    //     columns: [{
-    //             data: "no",
-    //             className: "text-left",
-    //         }, {
-    //             data: "no_container",
-    //             className: "text-left"
-    //         }, {
-    //             data: "no_seal",
-    //             className: "text-left"
-    //         }, {
-    //             data: "vessels_name",
-    //             className: "text-left"
-    //         }, {
-    //             data: "departure_date",
-    //             className: "text-left",
-    //         }, {
-    //             data: "total_berat_bersih",
-    //             className: "text-left",
-    //             render: function(data) {
-    //                 return greatFormatRupiah(data);
-    //             }
-    //         }, {
-    //             data: "total_berat_kotor",
-    //             className: "text-left",
-    //             render: function(data) {
-    //                 return greatFormatRupiah(data);
-    //             }
-    //         }, {
-    //             data: "total_nilai_invoice",
-    //             className: "text-left",
-    //             render: function(data) {
-    //                 return greatFormatRupiah(data);
-    //             }
-    //         },
-    //         {
-    //             data: "valas_name",
-    //             className: "text-left",
-    //         },
-    //         {
-    //             data: "status_posting",
-    //             className: "text-center",
-    //             searchable: false,
-    //             width: "5%",
-    //             render: function(data, type, row) {
-    //                 let htmlRes = '';
+    const table = $('.dataTable').DataTable({
+        processing: true,
+        serverSide: true,
+        ordering: true,
+        order: [
+            [1, 'asc']
+        ],
+        fixedHeader: true,
+        lengthMenu: [
+            [25],
+            [25],
+        ],
+        pageLength: 25,
+        ajax: {
+            url: "<?= base_url("invoice-packing-bc/all-invoice"); ?>",
+            dataSrc: "data",
+            data: function(data) {
+                data.sales_order_export_id = "<?= $dataSalesOrderExport->sales_order_export_id ?>";
+                data.search = $(".search").val();
+                data.dateStart = $(".dateStart").val();
+                data.dateEnd = $(".dateEnd").val();
+                data.status_posting = $(".status_posting").val();
+                data.sort = sort;
+                data.sortType = sortType;
+            }
+        },
+        initComplete: function(settings, json) {
+            $('.dataTables_length').empty();
+            $('.dataTables_length').html("<div><label class='text-center ml-2 mt-2'>Show <b class='entries-label'>25</b> Entries</label></div>");
+            $('.dataTable').wrap("<div style='overflow:auto; width:100%;position:relative;'></div>");
+        },
+        display: "stripe",
+        searching: false,
+        columns: [{
+                data: "no",
+                className: "text-left",
+            }, {
+                data: "no_container",
+                className: "text-left"
+            }, {
+                data: "no_seal",
+                className: "text-left"
+            }, {
+                data: "vessels_name",
+                className: "text-left"
+            }, {
+                data: "departure_date",
+                className: "text-left",
+            }, {
+                data: "total_berat_bersih",
+                className: "text-left",
+                render: function(data) {
+                    return greatFormatRupiah(data);
+                }
+            }, {
+                data: "total_berat_kotor",
+                className: "text-left",
+                render: function(data) {
+                    return greatFormatRupiah(data);
+                }
+            }, {
+                data: "total_nilai_invoice",
+                className: "text-left",
+                render: function(data) {
+                    return greatFormatRupiah(data);
+                }
+            },
+            {
+                data: "valas_name",
+                className: "text-left",
+            },
+            {
+                data: "status_posting",
+                className: "text-center",
+                searchable: false,
+                width: "5%",
+                render: function(data, type, row) {
+                    let htmlRes = '';
 
-    //                 if (row.status_posting == 1) {
-    //                     htmlRes += `
-    //                         <div class="text-success">
-    //                            <i class="fa-solid fa-check"></i>
-    //                         </div>`
-    //                 } else {
-    //                     htmlRes += `
-    //                         <div class="text-danger">
-    //                            <i class="fa-solid fa-x"></i>
-    //                         </div>`
-    //                 }
+                    if (row.status_posting == 1) {
+                        htmlRes += `
+                            <div class="text-success">
+                               <i class="fa-solid fa-check"></i>
+                            </div>`
+                    } else {
+                        htmlRes += `
+                            <div class="text-danger">
+                               <i class="fa-solid fa-x"></i>
+                            </div>`
+                    }
 
-    //                 return htmlRes;
-    //             }
-    //         },
-    //         // {
-    //         //     data: "status_bayar",
-    //         //     className: "text-center",
-    //         //     searchable: false,
-    //         //     width: "5%",
-    //         //     render: function(data, type, row) {
-    //         //         let htmlRes = '';
+                    return htmlRes;
+                }
+            },
+            // {
+            //     data: "status_bayar",
+            //     className: "text-center",
+            //     searchable: false,
+            //     width: "5%",
+            //     render: function(data, type, row) {
+            //         let htmlRes = '';
 
-    //         //         if (row.status_bayar == 1) {
-    //         //             htmlRes += `
-    //         //                 <div class="text-success">
-    //         //                    <i class="fa-solid fa-check"></i>
-    //         //                 </div>`
-    //         //         } else {
-    //         //             htmlRes += `
-    //         //                 <div class="text-danger">
-    //         //                    <i class="fa-solid fa-x"></i>
-    //         //                 </div>`
-    //         //         }
+            //         if (row.status_bayar == 1) {
+            //             htmlRes += `
+            //                 <div class="text-success">
+            //                    <i class="fa-solid fa-check"></i>
+            //                 </div>`
+            //         } else {
+            //             htmlRes += `
+            //                 <div class="text-danger">
+            //                    <i class="fa-solid fa-x"></i>
+            //                 </div>`
+            //         }
 
-    //         //         return htmlRes;
-    //         //     }
-    //         // },
-    //         {
-    //             data: "id",
-    //             className: "text-center actions",
-    //             searchable: false,
-    //             sortable: false,
-    //             render: function(data, type, row) {
-    //                 let id = row.id;
-    //                 let status_posting = row.status_posting;
-    //                 let res = '';
+            //         return htmlRes;
+            //     }
+            // },
+            {
+                data: "id",
+                className: "text-center actions",
+                searchable: false,
+                sortable: false,
+                render: function(data, type, row) {
+                    let id = row.id;
+                    let status_posting = row.status_posting;
+                    let res = '';
 
-    //                 if (status_posting == "0") {
-    //                     res += `
-    //                         <?php if (can('Invoice Exim', 'CIPL BC', 'p')) : ?>
-    //                             <button data-toggle="tooltip" title="Print" class="btn btn-warning btn-print" onclick="print('<?= base_url("invoice-packing-bc/print/"); ?>${id}')" style="box-shadow: none !important;">
-    //                                 <i class="fa fa-print fa-sm" aria-hidden="true"></i>
-    //                             </button>
-    //                         <?php endif; ?>
-    //                         <?php if (can('Invoice Exim', 'CIPL BC', 'a')) : ?>
-    //                             <button data-toggle="tooltip" title="Posting" onclick="posting('${id}')" class="btn btn-success posting-spp">
-    //                                 <i class="fa fa-paper-plane fa-sm" aria-hidden="true"></i>
-    //                             </button>
-    //                         <?php endif; ?>
-    //                         <?php if (can('Invoice Exim', 'CIPL BC', 'd')) : ?>
-    //                             <button data-toggle="tooltip" title="Delete" onclick="remove('${id}')" class="btn btn-danger delete-parent">
-    //                                 <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
-    //                             </button>
-    //                         <?php endif; ?>
-    //                             <?php if (can('Invoice Exim', 'CIPL BC', 'c')) : ?>
-    //                                 <button data-toggle="tooltip" title="Duplicate" onclick="duplicate('${id}')" class="btn duplicate-btn text-white" style="background-color:#B8522A">
-    //                                     <i class="fa fa-copy fa-sm" aria-hidden="true"></i>
-    //                                 </button>
-    //                             <?php endif; ?>
-    //                     `;
-    //                 }
+                    if (status_posting == "0") {
+                        res += `
+                            <?php if (can('Invoice Exim', 'CIPL BC', 'p')) : ?>
+                                <button data-toggle="tooltip" title="Print" class="btn btn-warning btn-print" onclick="print('<?= base_url("invoice-packing-bc/print/"); ?>${id}')" style="box-shadow: none !important;">
+                                    <i class="fa fa-print fa-sm" aria-hidden="true"></i>
+                                </button>
+                            <?php endif; ?>
+                            <?php if (can('Invoice Exim', 'CIPL BC', 'a')) : ?>
+                                <button data-toggle="tooltip" title="Posting" onclick="posting('${id}')" class="btn btn-success posting-spp">
+                                    <i class="fa fa-paper-plane fa-sm" aria-hidden="true"></i>
+                                </button>
+                            <?php endif; ?>
+                            <?php if (can('Invoice Exim', 'CIPL BC', 'd')) : ?>
+                                <button data-toggle="tooltip" title="Delete" onclick="remove('${id}')" class="btn btn-danger delete-parent">
+                                    <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
+                                </button>
+                            <?php endif; ?>
+                                <?php if (can('Invoice Exim', 'CIPL BC', 'c')) : ?>
+                                    <button data-toggle="tooltip" title="Duplicate" onclick="duplicate('${id}')" class="btn duplicate-btn text-white" style="background-color:#B8522A">
+                                        <i class="fa fa-copy fa-sm" aria-hidden="true"></i>
+                                    </button>
+                                <?php endif; ?>
+                        `;
+                    }
 
-    //                 if (status_posting == "1") {
-    //                     res += `
-    //                     <?php if (can('Invoice Exim', 'CIPL BC', 'p')) : ?>
-    //                         <button data-toggle="tooltip" title="Print" class="btn btn-warning btn-print" onclick="print('<?= base_url("invoice-packing-bc/print/"); ?>${id}')" style="box-shadow: none !important;">
-    //                             <i class="fa fa-print fa-sm" aria-hidden="true"></i>
-    //                         </button>
-    //                     <?php endif; ?>
-    //                     `;
+                    if (status_posting == "1") {
+                        res += `
+                        <?php if (can('Invoice Exim', 'CIPL BC', 'p')) : ?>
+                            <button data-toggle="tooltip" title="Print" class="btn btn-warning btn-print" onclick="print('<?= base_url("invoice-packing-bc/print/"); ?>${id}')" style="box-shadow: none !important;">
+                                <i class="fa fa-print fa-sm" aria-hidden="true"></i>
+                            </button>
+                        <?php endif; ?>
+                        `;
 
-    //                     res += `
-    //                         <?php if (can('Invoice Exim', 'CIPL BC', 'ua')) : ?>
-    //                             <button data-toggle="tooltip" title="Un-Posting" onclick="unposting('${id}')" class="btn btn-danger posting-spp">
-    //                                 <i class="fa-solid fa-ban"></i>    
-    //                             </button>
-    //                         <?php endif; ?>
-    //                         `;
+                        res += `
+                            <?php if (can('Invoice Exim', 'CIPL BC', 'ua')) : ?>
+                                <button data-toggle="tooltip" title="Un-Posting" onclick="unposting('${id}')" class="btn btn-danger posting-spp">
+                                    <i class="fa-solid fa-ban"></i>    
+                                </button>
+                            <?php endif; ?>
+                            `;
 
-    //                     <?php if (can('Invoice Exim', 'CIPL BC', 'c')) : ?>
-    //                         res += `
-    //                             <button data-toggle="tooltip" title="Duplicate" onclick="duplicate('${id}')" class="btn duplicate-btn text-white" style="background-color:#B8522A">
-    //                                 <i class="fa fa-copy fa-sm" aria-hidden="true"></i>
-    //                             </button>
-    //                         `;
-    //                     <?php endif; ?>
+                        <?php if (can('Invoice Exim', 'CIPL BC', 'c')) : ?>
+                            res += `
+                                <button data-toggle="tooltip" title="Duplicate" onclick="duplicate('${id}')" class="btn duplicate-btn text-white" style="background-color:#B8522A">
+                                    <i class="fa fa-copy fa-sm" aria-hidden="true"></i>
+                                </button>
+                            `;
+                        <?php endif; ?>
 
 
-    //                 }
+                    }
 
-    //                 return `
-    //                     <div class="mt-0">
-    //                      <?php if (can('Invoice Exim', 'CIPL BC', 'u')) : ?>
-    //                         <a href="javascript:void(0)" onclick="edit('${id}')" data-toggle="tooltip" title="Edit" class="btn btn-primary">
-    //                             <i class="fas fa-edit"></i>
-    //                         </a>
-    //                     <?php endif; ?>
-    //                         ${res}
-    //                     </div>
-    //                 `;
-    //             }
-    //         }
-    //     ],
-    //     "drawCallback": function(settings) {
-    //         var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-toggle="tooltip"]'))
-    //         var tooltipList = tooltipTriggerList.map(function(tooltipTriggerEl) {
-    //             return new bootstrap.Tooltip(tooltipTriggerEl)
-    //         });
-    //     },
-    //     columnDefs: [{
-    //         defaultContent: "-",
-    //         targets: "_all"
-    //     }],
-    //     language: {
-    //         emptyTable: "Tidak ada data",
-    //         lengthMenu: "Show _MENU_ entries",
-    //         paginate: {
-    //             previous: '<i class="fa fa-angle-left"></i>',
-    //             next: '<i class="fa fa-angle-right"></i>'
-    //         }
-    //     }
-    // });
+                    return `
+                        <div class="mt-0">
+                         <?php if (can('Invoice Exim', 'CIPL BC', 'u')) : ?>
+                            <a href="javascript:void(0)" onclick="edit('${id}')" data-toggle="tooltip" title="Edit" class="btn btn-primary">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                        <?php endif; ?>
+                            ${res}
+                        </div>
+                    `;
+                }
+            }
+        ],
+        "drawCallback": function(settings) {
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-toggle="tooltip"]'))
+            var tooltipList = tooltipTriggerList.map(function(tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl)
+            });
+        },
+        columnDefs: [{
+            defaultContent: "-",
+            targets: "_all"
+        }],
+        language: {
+            emptyTable: "Tidak ada data",
+            lengthMenu: "Show _MENU_ entries",
+            paginate: {
+                previous: '<i class="fa fa-angle-left"></i>',
+                next: '<i class="fa fa-angle-right"></i>'
+            }
+        }
+    });
 
     $(".dateStart,.dateEnd").datepicker({
         todayHighlight: true,

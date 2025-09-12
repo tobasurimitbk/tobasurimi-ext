@@ -383,12 +383,29 @@
         </tr>
     </table>
 
+    <?php
+    $kodeSatuan = "";
+    foreach ($dataListBarang as $d) {
+        $kodeSatuan = $d['kode_satuan'];
+    }
+    ?>
+
     <table style="width: 100%; border-collapse: collapse; margin-top: 4px; font-size: 12px; ">
         <thead>
             <tr style="background-color: #f8f9fa; border-bottom: 2px solid #7a7a78;">
                 <th style="padding: 6px; text-align: left; font-weight: bold; border: 1px solid #7a7a78; width: 4%; height:2.5%;">NO</th>
                 <th style="padding: 6px; text-align: left; font-weight: bold; border: 1px solid #7a7a78;">
                     DESCRIPTION AND QUANTITY OF PRODUCT / GOODS
+                </th>
+                <th style="padding: 6px; text-align: center; font-weight: bold; border: 1px solid #7a7a78;">
+                    QUANTITY <br> (<?= $kodeSatuan ?>)
+                </th>
+                <th style="padding: 6px; text-align: center; font-weight: bold; border: 1px solid #7a7a78;">
+                    UNIT PRICE
+                </th>
+                <th style="padding: 6px; text-align: center; font-weight: bold; border: 1px solid #7a7a78;">
+                    AMOUNT <br>
+                    <?= $dataSalesOrderExport->tipe_harga ?>
                 </th>
             </tr>
         </thead>
@@ -397,111 +414,46 @@
             <?php
             $no = 1;
             $totalQty = 0;
+            $totalTotalHarga = 0;
             foreach ($dataListBarang as $key => $detail):
+                $totalQty += $detail['qty'];
+                $totalTotalHarga += $detail['total_harga_barang'];
             ?>
                 <tr style="border-bottom: 1px solid #eee;">
                     <td style="padding: 6px; border: 1px solid #7a7a78; vertical-align: top;"><?= $no++ ?></td>
                     <td style="padding: 6px; border: 1px solid #7a7a78; vertical-align: top;">
                         <?= $detail['nama_barang'] ?> <br>
                         <?= $detail['catatan'] ?>
-                        <div>
-                            <?php if (!empty($detail['size_breakdown'])): ?>
-                                <?php
-                                // Identify which columns have data
-                                $columns_to_show = [];
-                                $all_columns = [
-                                    'size' => ['label' => 'SIZE', 'width' => '8%'],
-                                    'grade' => ['label' => 'GRADE', 'width' => '8%'],
-                                ];
-
-                                // Check which columns have data
-                                foreach ($all_columns as $col => $col_data) {
-                                    foreach ($detail['size_breakdown'] as $breakdown) {
-                                        if (!empty($breakdown[$col])) {
-                                            $columns_to_show[$col] = $col_data;
-                                            break;
-                                        }
-                                    }
-                                }
-
-                                // Ini untuk mengetahui Qty Satuan apa yang dipakek (ambil paling utama)
-                                $satuanQty = "";
-                                foreach ($detail['size_breakdown'] as $breakdown):
-                                    $satuanQty =  $breakdown['satuan_size_code'];
-                                    $totalQty += $breakdown['qty'];
-                                endforeach;
-                                ?>
-
-                                <div style="margin-top: 6px;">
-                                    <div style="font-size: 11px; font-weight: bold;">DETAIL GRADE / SIZE:</div>
-                                    <table style="width: 100%; border-collapse: collapse; margin-top: 4px; font-size: 11px;">
-                                        <thead>
-                                            <tr style="background-color: #f3f4f6;">
-                                                <?php foreach ($columns_to_show as $col => $col_data): ?>
-                                                    <th style="padding: 3px; border: 1px solid #7a7a78; width: <?= $col_data['width'] ?>"><?= $col_data['label'] ?></th>
-                                                <?php endforeach; ?>
-
-                                                <th style=" padding: 3px; border: 1px solid #7a7a78; width: 4.5%; text-align: center;">QTY (<?= $satuanQty ?>)</th>
-                                                <th style="padding: 3px; border: 1px solid #7a7a78; width: 4.5%; text-align: center;">UNIT PRICE (<?= $dataInvoice['valas_name'] . "/" . $satuanQty ?>)</th>
-                                                <th style="padding: 3px; border: 1px solid #7a7a78; width: 4.5%; text-align: center;">TOTAL AMOUNT (<?= $dataSalesOrderExport->tipe_harga ?>)</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <?php
-                                            $breakdown_qty = 0;
-                                            $breakdown_total = 0;
-                                            $breakdown_unit_price_total = 0;
-
-                                            foreach ($detail['size_breakdown'] as $breakdown):
-                                                $breakdown_qty += $breakdown['qty'];
-                                                $breakdown_total += $breakdown['total'];
-                                                $breakdown_unit_price_total += $breakdown['harga'];
-
-                                            ?>
-                                                <tr>
-                                                    <?php foreach ($columns_to_show as $col => $col_data): ?>
-                                                        <?php if ($col != 'persen' && $col != 'cased'): ?>
-                                                            <td style="padding: 3px; border: 1px solid #7a7a78;"><?= $breakdown[$col] ?></td>
-                                                        <?php endif; ?>
-                                                    <?php endforeach; ?>
-
-                                                    <td style="padding: 3px; border: 1px solid #7a7a78; text-align: right;"><?= number_format($breakdown['qty'], 2)  ?></td>
-                                                    <td style="padding: 3px; border: 1px solid #7a7a78; text-align: right;"><?= number_format($breakdown['harga'], 2) ?></td>
-                                                    <td style="padding: 3px; border: 1px solid #7a7a78; text-align: right;"><?= number_format($breakdown['total'], 2) ?></td>
-                                                </tr>
-                                            <?php endforeach; ?>
-                                        </tbody>
-                                        <?php
-                                        // Hitung jumlah kolom utama (misalnya dari thead)
-                                        $base_columns = count($columns_to_show);
-
-                                        ?>
-
-                                        <tfoot>
-                                            <tr style="background-color: #e9ecef;">
-                                                <td colspan="<?= $base_columns ?>" style="padding: 3px; border: 1px solid #7a7a78; text-align: right; font-weight: bold;">
-                                                    TOTAL
-                                                </td>
-
-                                                <td style="padding: 3px; border: 1px solid #7a7a78; text-align: right; font-weight: bold;">
-                                                    <?= number_format($breakdown_qty, 2)  ?>
-                                                </td>
-                                                <td style="padding: 3px; border: 1px solid #7a7a78; text-align: right; font-weight: bold;">-</td>
-                                                <td style="padding: 3px; border: 1px solid #7a7a78; text-align: right; font-weight: bold;">
-                                                    <?= number_format($breakdown_total, 2) ?>
-                                                </td>
-                                            </tr>
-                                        </tfoot>
-
-                                    </table>
-                                </div>
-                            <?php endif; ?>
-
-                        </div>
                     </td>
-
+                    <td style="padding: 6px; border: 1px solid #7a7a78; vertical-align: top;text-align:right;">
+                        <?= number_format($detail['qty'], 2) ?>
+                    </td>
+                    <td style="padding: 6px; border: 1px solid #7a7a78; vertical-align: top;text-align:right;">
+                        <?= number_format($detail['harga_satuan_barang'], 2) ?>
+                    </td>
+                    <td style="padding: 6px; border: 1px solid #7a7a78; vertical-align: top;text-align:right;">
+                        <span style="float:left;">
+                            <?= $dataInvoice['valas_name'] ?>
+                        </span>
+                        <?= number_format($detail['total_harga_barang'], 2) ?>
+                    </td>
                 </tr>
             <?php endforeach ?>
+            <tr style="border-bottom: 1px solid #eee;">
+                <td colspan="2" style="padding: 6px; border: 1px solid #7a7a78; vertical-align: top;"></td>
+                <td style="text-align: right; font-weight:bold;padding: 6px; border: 1px solid #7a7a78;">
+                    <?= number_format($totalQty, 2) ?>
+                </td>
+                <td style="text-align: right; font-weight:bold;padding: 6px; border: 1px solid #7a7a78;">
+                </td>
+                <td style="text-align: right; font-weight:bold;padding: 6px; border: 1px solid #7a7a78;">
+                    <span style="float:left;">
+                        <?= $dataInvoice['valas_name'] ?>
+                    </span>
+                    <?= number_format($totalTotalHarga, 2) ?>
+
+                </td>
+            </tr>
 
             <?php foreach ($dataListBiayaTambahan as $d): ?>
                 <?php
@@ -511,97 +463,90 @@
                     $color = "black";
                 }
                 ?>
-                <tr style="font-weight: bold; background-color: #e9ecef; font-size: 11px;">
-                    <td style="padding: 6px; border: 1px solid #7a7a78;"></td>
+                <tr style="font-weight: bold; background-color: #e9ecef;">
+                    <td style="text-align: right; font-weight:bold;padding: 6px; border: 1px solid #7a7a78;"></td>
+                    <td colspan="3" style="text-align: left; font-weight:bold;padding: 6px; border: 1px solid #7a7a78;"><?= $d['biaya_tambahan'] ?></td>
                     <td style="padding: 6px; border: 1px solid #7a7a78; text-align: right; ">
-
-                        <span style="float: left;"><?= $d['biaya_tambahan'] ?></span>
-                        (<?= $dataInvoice['valas_name'] ?>)<span style="color:<?= $color ?>">
+                        <span style="float: left;">
+                            <?= $dataInvoice['valas_name'] ?>
+                        </span>
+                        <span style="color:<?= $color ?>">
                             <?= number_format($d['nilai_biaya_tambahan'], 2) ?>
                         </span>
                     </td>
                 </tr>
             <?php endforeach; ?>
 
-            <tr style="font-weight: bold; background-color: #e9ecef; font-size: 11px;">
+            <tr style="font-weight: bold; background-color: #e9ecef; ">
                 <td style="padding: 6px; border: 1px solid #7a7a78;"></td>
+                <td colspan="3" style="text-align: right; font-weight:bold;padding: 6px; border: 1px solid #7a7a78;">
+                    GRAND TOTAL
+                </td>
                 <td style="padding: 6px; border: 1px solid #7a7a78; text-align: right; ">
                     <span style="float: left;">
-                        BALANCE AMOUNT TO BE PAID
+                        <?= $dataInvoice['valas_name'] ?>
                     </span>
-                    (<?= $dataInvoice['valas_name'] ?>) <?= number_format($dataInvoice['total_nilai_invoice'], 2) ?>
+                    <?= number_format($dataInvoice['total_nilai_invoice'], 2) ?>
                     </span>
                 </td>
             </tr>
-            <tr style="font-weight: bold; background-color: #e9ecef; font-size: 11px;">
+            <tr style="font-weight: bold; background-color: #e9ecef; ">
                 <td style="padding: 6px; border: 1px solid #7a7a78;"></td>
-                <td style="padding: 6px; border: 1px solid #7a7a78; text-align: right; ">
+                <td style="padding: 6px; border: 1px solid #7a7a78; text-align: right; " colspan="4">
                     <table>
                         <tr>
                             <td>
                                 <b>AMOUNT IN WORLD :</b><br>
                                 <b><?= strtoupper(terbilangInggris($dataInvoice['total_nilai_invoice'])) ?></b>
                             </td>
-                            <?php if (!empty($dataInvoice['payment_description'])): ?>
+                            <!-- <?php if (!empty($dataInvoice['payment_description'])): ?>
                                 <td>
                                     <b>
                                         <?= $dataInvoice['payment_description'] ?>
                                     </b>
                                 </td>
-                            <?php endif; ?>
+                            <?php endif; ?> -->
                         </tr>
                     </table>
                 </td>
             </tr>
-            <tr style="font-weight: bold; background-color: #e9ecef; font-size: 11px;">
+            <tr style="font-weight: bold; background-color: #e9ecef; ">
                 <td style="padding: 6px; border: 1px solid #7a7a78;"></td>
-                <td style="padding: 6px; border: 1px solid #7a7a78; text-align: right; ">
-                    <table style="width: 100%;">
-                        <tr>
+                <td style="padding: 6px; border: 1px solid #7a7a78; text-align: right; " colspan="4">
+                    <table>
+                        <tr style="font-weight: bold;">
                             <td>
-                                <table>
-                                    <tr style="font-weight: bold;">
-                                        <td>
-                                            TOTAL
-                                        </td>
-                                        <td>:</td>
-                                        <td>
-                                            <?= number_format($totalQty, 2) . " " . $satuanQty ?>
-                                        </td>
-                                    </tr>
-                                    <tr style="font-weight: bold;">
-                                        <td>
-                                            NETTO WEIGHT
-                                        </td>
-                                        <td>:</td>
-                                        <td>
-                                            <?= number_format($dataInvoice['total_berat_bersih'], 2) ?>
-                                        </td>
-                                    </tr>
-                                    <tr style="font-weight: bold;">
-                                        <td>
-                                            GROSS WEIGHT
-                                        </td>
-                                        <td>:</td>
-                                        <td>
-                                            <?= number_format($dataInvoice['total_berat_kotor'], 2) ?>
-                                        </td>
-                                    </tr>
-                                </table>
-
+                                TOTAL
                             </td>
-                            <td style="text-align: center; background-color:yellow">
-                                <b>
-                                    <?= $dataSalesOrderExport->no_invoice ?> (<?= number_format($dataInvoice['total_nilai_invoice'], 2) ?>)
-                                </b>
+                            <td>:</td>
+                            <td>
+                                <?= number_format($totalQty, 2) . " " . $kodeSatuan ?>
+                            </td>
+                        </tr>
+                        <tr style="font-weight: bold;">
+                            <td>
+                                NETTO WEIGHT
+                            </td>
+                            <td>:</td>
+                            <td>
+                                <?= number_format($dataInvoice['total_berat_bersih'], 2) ?>
+                            </td>
+                        </tr>
+                        <tr style="font-weight: bold;">
+                            <td>
+                                GROSS WEIGHT
+                            </td>
+                            <td>:</td>
+                            <td>
+                                <?= number_format($dataInvoice['total_berat_kotor'], 2) ?>
                             </td>
                         </tr>
                     </table>
                 </td>
             </tr>
-            <tr style="font-weight: bold; background-color: #e9ecef; font-size: 11px;">
+            <tr style="font-weight: bold; background-color: #e9ecef; ">
                 <td style="padding: 6px; border: 1px solid #7a7a78;"></td>
-                <td style="padding: 6px; border: 1px solid #7a7a78; text-align: right; ">
+                <td style="padding: 6px; border: 1px solid #7a7a78; text-align: right; " colspan="4">
                     <table style="width: 100%;">
                         <tr>
                             <td>
@@ -939,20 +884,18 @@
             $no = 1;
             foreach ($dataListPacking as $key => $detail):
             ?>
-                <tr style="border-bottom: 1px solid #eee;">
+                <tr style="border-bottom: 1px solid #7a7a78;">
                     <td style="padding: 6px; border: 1px solid #7a7a78; vertical-align: top;"><?= $no++ ?></td>
                     <td style="padding: 6px; border: 1px solid #7a7a78; vertical-align: top;">
-                        <?= $detail['nama_barang_packing'] ?> <br>
+                        <?= $detail['nama_barang'] ?> <br>
                         HS CODE : <?= $detail['hs_code_name'] ?> <br>
-                        <?= $detail['keterangan_packing'] ?>
+                        <?= $detail['catatan'] ?>
                         <div>
                             <?php if (!empty($detail['size_breakdown'])): ?>
                                 <?php
                                 // Identify which columns have data
                                 $columns_to_show = [];
                                 $all_columns = [
-                                    'size' => ['label' => 'SIZE', 'width' => '8%'], // tidak pakai qty
-                                    'grade' => ['label' => 'GRADE', 'width' => '8%'], // tidak pakai qty
                                     'can' => ['label' => 'QTY (CAN)', 'width' => '7%'],
                                     'case' => ['label' => 'QTY (CARTONS)', 'width' => '7%'],
                                     'kg' => ['label' => 'QTY (KG)', 'width' => '7%'],
@@ -1000,24 +943,16 @@
                                 $show_drammed_column = isset($columns_to_show['drammed']);
 
                                 // Ini untuk mengetahui Qty Satuan apa yang dipakek (ambil paling utama)
-                                $satuanQty = "";
-                                foreach ($detail['size_breakdown'] as $breakdown):
-                                    $satuanQty =  $breakdown['satuan_size_code'];
-                                endforeach;
+                                $kodeSatuan =  $detail['kode_satuan'];
 
                                 ?>
 
                                 <div style="margin-top: 6px;">
-                                    <div style="font-size: 11px; font-weight: bold;">DETAIL PACKING:</div>
-                                    <table style="width: 100%; border-collapse: collapse; margin-top: 4px; font-size: 11px;">
+                                    <div style=" font-weight: bold;">DETAIL PACKING:</div>
+                                    <table style="width: 100%; border-collapse: collapse; margin-top: 4px; ">
                                         <thead>
                                             <tr style="background-color: #f3f4f6;">
-                                                <?php foreach ($columns_to_show as $col => $col_data): ?>
-                                                    <?php if (in_array($col, ['grade', 'size'])): ?>
-                                                        <th style="padding: 3px; border: 1px solid #7a7a78; width: <?= $col_data['width'] ?>"><?= $col_data['label'] ?></th>
-                                                    <?php endif; ?>
-                                                <?php endforeach; ?>
-
+                                                <th style="padding: 3px; border: 1px solid #7a7a78; width: 4.5%;text-align: center;"></th>
                                                 <?php if ($show_can_column): ?>
                                                     <th style="padding: 3px; border: 1px solid #7a7a78; width: 4.5%;text-align: center;">QTY (CAN)</th>
                                                 <?php endif; ?>
@@ -1130,11 +1065,8 @@
                                                 }
                                             ?>
                                                 <tr>
-                                                    <?php foreach ($columns_to_show as $col => $col_data): ?>
-                                                        <?php if (in_array($col, ['size', 'grade'])): ?>
-                                                            <td style="padding: 3px; border: 1px solid #7a7a78;"><?= $breakdown[$col] ?></td>
-                                                        <?php endif; ?>
-                                                    <?php endforeach; ?>
+                                                    <td style="padding: 3px; border: 1px solid #7a7a78; text-align: right;">
+                                                    </td>
 
                                                     <?php if ($show_can_column): ?>
                                                         <td style="padding: 3px; border: 1px solid #7a7a78; text-align: right;">
