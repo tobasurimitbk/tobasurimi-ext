@@ -57,4 +57,26 @@ class MaterialRequestPenolongDetailsModel extends Model
 
         return $dataQry;
     }
+
+    public function getMaterialRequestNotApprove($stockId, $bcId, $noAju, $stockDate, $stockDokumen)
+    {
+        $selectQry = '
+            SUM(material_request_penolong_details.qty) as qty
+        ';
+
+        $dataQry = $this->asArray()
+            ->select($selectQry)
+            ->join('material_requests_penolong', 'material_request_penolong_details.material_request_id = material_requests_penolong.id', 'left')
+            ->where('material_request_penolong_details.stock_id', $stockId)
+            ->where('material_request_penolong_details.bc_id', $bcId)
+            ->where('material_request_penolong_details.no_aju', $noAju)
+            ->where('material_request_penolong_details.stock_date', $stockDate)
+            ->where('material_request_penolong_details.stock_dokumen', $stockDokumen)
+            ->where('material_request_penolong_details.deletedAt', null)
+            ->where('material_requests_penolong.is_approve', null)
+            ->where('material_requests_penolong.deletedAt', null)
+            ->first();
+
+        return $dataQry;
+    }
 }

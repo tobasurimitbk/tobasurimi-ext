@@ -151,7 +151,13 @@ class MaterialRequestPenolong extends BaseController
         if (!empty($id)) {
             $dataMaterialRequests = $this->materialRequestModel->asObject()->find($id);
             $dataMaterialRequestswithwo = $this->materialRequestModel->getMaterialWithWorkOrder($id);
-            $dataMaterialRequestDetails = $this->materialRequestDetailsModel->asObject()->select('material_request_penolong_details.*, barang_master.kode_barang, satuans.kode_satuan, warehouses.warehouse_name as warehouse_text, divisis.divisi as divisi_text')
+            $dataMaterialRequestDetails = $this->materialRequestDetailsModel->asObject()
+                ->select('material_request_penolong_details.*, 
+                        barang_master.kode_barang, 
+                        satuans.kode_satuan, 
+                        warehouses.warehouse_name as warehouse_text, 
+                        divisis.divisi as divisi_text
+                ')
                 ->join('barang_master', 'barang_master.id = material_request_penolong_details.barang1_id', 'left')
                 ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = material_request_penolong_details.barang2_id', 'left')
                 ->join('satuans', 'satuans.id = barang_master_spesifikasi.satuan_1', 'left')
@@ -174,6 +180,12 @@ class MaterialRequestPenolong extends BaseController
                 } elseif ($value->barang_type == "bahan_modal") {
                     $value->barang_type_text = "Bahan Modal";
                 }
+                $value->stok_total = $this->stockDetail2Model->getStockListDetail(
+                    $value->stock_id,
+                    $value->bc_id,
+                    $value->no_aju,
+                    $value->stock_dokumen
+                )['stok_total'];
             }
             $data["dataMaterialRequests"] = $dataMaterialRequests;
             $data["dataMaterialRequestDetails"] = $dataMaterialRequestDetails;
@@ -632,5 +644,74 @@ class MaterialRequestPenolong extends BaseController
         $no = $this->materialRequestModel->get_no(date('d'), date('m'), date('Y'), $last_day, $this->this_company_id);
 
         return json_encode($no);
+    }
+
+    public function getListStockByStockID()
+    {
+        if (!empty($this->request->getVar('stock_id'))) {
+            $isAdjusment = !empty($this->request->getVar('isAdjusment')) ? true : false;
+
+            $dataResult = $this->stockDetail2Model->getStockListWithBCDoc(
+                $this->request->getVar('stock_id'),
+                $isAdjusment
+            );
+
+            $stock = $this->stockModel->find($this->request->getVar('stock_id'));
+
+            if ($stock['kemasan_id'] == 0) {
+                $barangMaster = $this->barangMasterModel->find($stock['barang1_id']);
+                $barangMasterSpesifikasi = $this->barangMasterSpesifikasiModel->find($stock['barang2_id']);
+                $satuan = $this->satuanModel->find($barangMasterSpesifikasi['satuan_1']);
+                $barangName = $barangMaster['barang_name'] . "-" . $barangMasterSpesifikasi['spesifikasi'];
+            } else {
+                $kemasan = $this->kemasanModel->find($stock['kemasan_id']);
+                $satuan = $this->satuanModel->find($kemasan['satuan_id']);
+                $barangName = $kemasan['name'];
+            }
+
+            $resultArr = array();
+
+            for ($i = 0; $i < count($dataResult); $i++) {
+                $bcType = $this->metaDataModel->find($dataResult[$i]['bc_id']);
+                $noDaftar = $this->stockDetail2Model->getNomorDaftar($dataResult[$i]['no_aju'], $dataResult[$i]['bc_id']);
+
+                $dataResult[$i]['stock_dokumen'] = $dataResult[$i]['stock_dokumen'] == null ? "-" : $dataResult[$i]['stock_dokumen'];
+                $dataResult[$i]['no_aju'] =  $dataResult[$i]['no_aju'] == "-" ? "-" : $dataResult[$i]['no_aju'];
+                $dataResult[$i]['bc_type'] = $bcType == null ? "NON PABEAN" : $bcType['value'];
+                $dataResult[$i]['satuan'] = $satuan['kode_satuan'];
+                $dataResult[$i]['barang'] = strtoupper($barangName);
+                $dataResult[$i]['stock_date'] = date('d/m/Y', strtotime($dataResult[$i]['stock_date']));
+                $dataResult[$i]['stock_id'] = $dataResult[$i]['stock_id'];
+                $dataResult[$i]['type_barang'] = $stock['tipe_barang'];
+                $dataResult[$i]['type_barang_text'] = strtoupper(str_replace('_', ' ', $stock['tipe_barang']));
+                $dataResult[$i]['stok_total'] = floatval($dataResult[$i]['stok_total']);
+                $dataResult[$i]['no_daftar'] = $noDaftar;
+
+                $dataMaterialRequestNotApprove = $this->materialRequestDetailsModel->getMaterialRequestNotApprove(
+                    $dataResult[$i]['stock_id'],
+                    $dataResult[$i]['bc_id'],
+                    $dataResult[$i]['no_aju'],
+                    date('Y-m-d', strtotime(str_replace('/', '-', $dataResult[$i]['stock_date']))),
+                    $dataResult[$i]['stock_dokumen']
+                );
+
+                if ($dataMaterialRequestNotApprove) {
+                    $dataResult[$i]['is_requested'] = true;
+                    $dataResult[$i]['stok_total'] = $dataResult[$i]['stok_total'] - $dataMaterialRequestNotApprove['qty'];
+                } else {
+                    $dataResult[$i]['is_requested'] = false;
+                }
+
+                if ($dataResult[$i]['stok_total'] > 0) {
+                    array_push($resultArr, $dataResult[$i]);
+                }
+            }
+
+            return response()->setJSON([
+                'data' => $resultArr,
+                'token' => csrf_hash(),
+                'status' => true
+            ]);
+        }
     }
 }

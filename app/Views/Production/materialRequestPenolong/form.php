@@ -320,7 +320,7 @@
                 stock_date: '<?= date('d/m/Y', strtotime($materialRequestDetails->stock_date)) ?>',
                 stock_dokumen: '<?= $materialRequestDetails->stock_dokumen ?>',
                 stock_id: '<?= $materialRequestDetails->stock_id ?>',
-                stok_total: '<?= $materialRequestDetails->qty ?>',
+                stok_total: '<?= $materialRequestDetails->stok_total ?>',
                 supplier_name: '-',
                 type_barang: '<?= $materialRequestDetails->barang_type ?>',
                 type_barang_text: '<?= $materialRequestDetails->barang_type_text ?>',
@@ -864,7 +864,7 @@
     function getListDokumenPabean() {
         // GET LIST STOCK PER DOKUMEN PABEAN
         $.ajax({
-            url: `<?= base_url('mutasi/list-stock-dokumen-bc'); ?>`,
+            url: `<?= base_url('material-request-penolong/list-stock-dokumen-bc'); ?>`,
             method: "GET",
             beforeSend: function() {
                 setLoading();
@@ -1206,7 +1206,7 @@
             newRow.append($('<td style="text-align: center;">').text(v.stock_date));
             newRow.append($('<td style="text-align: center;">').text(v.barang));
             newRow.append($('<td style="text-align: center;">').text(v.satuan));
-            newRow.append($('<td style="text-align: center;">').text(v.stok_total));
+            newRow.append($('<td style="text-align: center;">').text(parseFloat(v.stok_total)));
             newRow.append($('<td style="text-align: center;">').html(
                 `
                 <input <?= (isset($dataMaterialRequests) && $dataMaterialRequests->is_posted == 1) ? "readonly" : ""; ?> class="form-control qty-bahan-request" oninput="preventNegativeInput(this)" autocomplete="one-time-code" data-id="${v.id}" data-stok_total="${v.stok_total}" data-index="${i}" class="form-control" type="text" value="${v.qty2}">

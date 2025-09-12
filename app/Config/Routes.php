@@ -947,6 +947,7 @@ $routes->post('/material-request-penolong/save', 'Production\MaterialRequestPeno
 $routes->post('/material-request-penolong/update', 'Production\MaterialRequestPenolong::update', ['filter' => 'Auth']);
 $routes->post('/material-request-penolong/update-status', 'Production\MaterialRequestPenolong::updateStatusPostedMaterialRequest', ['filter' => 'Auth']);
 $routes->get('/material-request-penolong/list-barang-stock-init', 'Production\MaterialRequestPenolong::getListBarangIsInit', ['filter' => 'Auth']);
+$routes->get('/material-request-penolong/list-stock-dokumen-bc', 'Production\MaterialRequestPenolong::getListStockByStockID', ['filter' => 'Auth']);
 
 // Material Request Kimia
 $routes->get('/material-request-kimia', 'Production\MaterialRequestKimia::index', ['filter' => 'Auth']);
