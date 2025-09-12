@@ -67,7 +67,7 @@
                 <div class="col-md-3">
                     <div class="input-group">
                         <div class="form-floating" style="height: 50px;">
-                            <input placeholder="" class="form-control dateStart" id="dateStart" name="dateStart" aria-label="Floating label select example" />
+                            <input placeholder="" value="01/<?= date('m/Y') ?>" class="form-control dateStart" id="dateStart" name="dateStart" aria-label="Floating label select example" />
                             <label style="z-index: 1;" style="z-index: 1;">Tanggal LPB Awal</label>
                         </div>
                         <div class="input-group-append" style="height:50px;">
@@ -80,7 +80,7 @@
                 <div class="col-md-3">
                     <div class="input-group">
                         <div class="form-floating" style="height: 50px;">
-                            <input placeholder="" class="form-control dateEnd" id="dateEnd" name="dateEnd" aria-label="Floating label select example" />
+                            <input placeholder="" value="31/<?= date('m/Y') ?>" class="form-control dateEnd" id="dateEnd" name="dateEnd" aria-label="Floating label select example" />
                             <label style="z-index: 1;" style="z-index: 1;">Tanggal LPB Akhir</label>
                         </div>
                         <div class="input-group-append" style="height:50px;">
