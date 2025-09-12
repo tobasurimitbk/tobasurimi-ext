@@ -324,24 +324,18 @@
     $('#vendor_barang_id_select').hide();
 
     <?php if (!empty($jasaVendorOut)) : ?>
+        var option = new Option(
+            "<?= $jasaVendorOut['barang_name']?>", // text yg ditampil
+            "<?= $jasaVendorOut['barang_out_id'] ?>",                      // value yg dipost
+            true,  // defaultSelected
+            true   // selected
+        );
+        $(".barang_id").append(option).trigger("change");
+
+
         <?php foreach ($jasaVendorOutDetail as $m) : ?>
-            // // bikin option preselect
-            // var option = new Option(
-            //     "<?= $m['barang'] ?> - <?= $m['spesifikasi'] ?>", 
-            //     "<?= $m['spesifikasi_id'] ?>",
-            //     true, 
-            //     true
-            // );
-
-            // // kasih data-* biar ga undefined
-            // $(option).attr({
-            //     "data-master_barang": "<?= $m['barang'] ?>",
-            //     "data-spesifikasi": "<?= $m['spesifikasi'] ?>",
-            //     "data-satuan": "<?= $m['satuan'] ?>",
-            //     "data-qty": "<?= floatval($m['qty']) ?>"
-            // });
-
-            // $(".spesifikasi_id").append(option).trigger("change.select2");
+            // bikin option preselect
+          
 
             // push ke list selected
             listStockSelected.push({
@@ -445,12 +439,10 @@
         }
     });
 
-    $(".spesifikasi_id").select2({
+    $("#spesifikasi_id").select2({
         placeholder: "Pilih Spesifikasi Barang",
         theme: "bootstrap-5",
         multiple: true,
-        minimumInputLength: 3,
-        dropdownParent: $('.detail-form'), // sama juga
         ajax: {
             delay: 300,
             transport: function(params, success, failure) {

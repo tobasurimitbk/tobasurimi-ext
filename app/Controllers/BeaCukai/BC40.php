@@ -1597,18 +1597,18 @@ class BC40 extends BaseController
         $bc40First = $this->bc40Model->where('bc_purchase_order_id', $bcPurchaseOrderID)->first();
         $bcPurchaseOrder = $this->bcPurchaseOrderModel->where('id', $bcPurchaseOrderID)->first();
 
-        $bc40 = $this->bc40Model
-            ->where('no_aju', $noAju)
-            ->whereNotIn('bc_purchase_order_id', [$bcPurchaseOrderID])
-            ->first();
+        // $bc40 = $this->bc40Model
+        //     ->where('no_aju', $noAju)
+        //     ->whereNotIn('bc_purchase_order_id', [$bcPurchaseOrderID])
+        //     ->first();
 
-        if ($bc40 != null) {
-            return response()->setJSON([
-                'token' => csrf_hash(),
-                'message' => "Nomor aju sudah ada",
-                'status' => false,
-            ]);
-        }
+        // if ($bc40 != null) {
+        //     return response()->setJSON([
+        //         'token' => csrf_hash(),
+        //         'message' => "Nomor aju sudah ada",
+        //         'status' => false,
+        //     ]);
+        // }
 
         if ($bc40First == null) {
             $this->bc40Model->insert([

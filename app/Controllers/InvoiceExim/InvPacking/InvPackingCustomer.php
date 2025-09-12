@@ -14,9 +14,6 @@ use App\Models\InvPackingCustomerModel;
 use App\Models\InvPackingCustomerPackModel;
 use App\Models\InvPackingCustomerPackSizeModel;
 use App\Models\MetadataModel;
-use App\Models\ProformaInvoiceBarangModel;
-use App\Models\ProformaInvoiceModel;
-use App\Models\ProformaInvoiceTermModel;
 use App\Models\SalesOrderExportModel;
 use App\Models\SatuansModel;
 use Dompdf\Dompdf;
@@ -30,9 +27,6 @@ class InvPackingCustomer extends BaseController
     protected $divisiModel;
     protected $bankModel;
     protected $satuanModel;
-    protected $proformaInvoiceModel;
-    protected $proformaInvoiceTermModel;
-    protected $proformaInvoiceBarangModel;
     protected $companyModel;
     protected $hsCodeModel;
     protected $invPackingCustomerModel;
@@ -51,9 +45,6 @@ class InvPackingCustomer extends BaseController
         $this->divisiModel = new DivisisModel();
         $this->bankModel = new BanksModel();
         $this->satuanModel = new SatuansModel();
-        $this->proformaInvoiceModel = new ProformaInvoiceModel();
-        $this->proformaInvoiceTermModel = new ProformaInvoiceTermModel();
-        $this->proformaInvoiceBarangModel = new ProformaInvoiceBarangModel();
         $this->companyModel = new CompaniesModel();
         $this->hsCodeModel = new HsCodesModel();
         $this->invPackingCustomerModel = new InvPackingCustomerModel();
@@ -393,6 +384,7 @@ class InvPackingCustomer extends BaseController
                 'no_seal' => $this->request->getVar('no_seal'),
                 'country_of_origin' => $this->request->getVar('country_of_origin'),
                 'penanda_tangan' => $this->request->getVar('penanda_tangan'),
+                'payment_description' => $this->request->getVar('payment_description'),
                 'measurement' => $this->request->getVar('measurement'),
                 'total_nilai_invoice' => $this->request->getVar('total_nilai_invoice'),
                 'total_berat_bersih' => $this->request->getVar('total_berat_bersih'),
@@ -447,6 +439,7 @@ class InvPackingCustomer extends BaseController
                 'no_seal' => $this->request->getVar('no_seal'),
                 'country_of_origin' => $this->request->getVar('country_of_origin'),
                 'penanda_tangan' => $this->request->getVar('penanda_tangan'),
+                'payment_description' => $this->request->getVar('payment_description'),
                 'measurement' => $this->request->getVar('measurement'),
                 'total_nilai_invoice' => $this->request->getVar('total_nilai_invoice'),
                 'total_berat_bersih' => $this->request->getVar('total_berat_bersih'),

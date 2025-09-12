@@ -10,14 +10,44 @@
 <!-- Begin Page Content -->
 <section class="section">
     <div class="section-header">
-        <h1 class="title-name">Duplikasi CIPL</h1>
+        <h1 class="title-name"><?= !empty($dataInvoice) ? "Update CIPL BC" : "Tambah CIPL BC" ?></h1>
         <div class="col-button-tambah-spp">
             <a class="btn btn-hide-form btn-discard float-right" href="<?= base_url("invoice-packing-customer/detail/" . encrypt($dataSalesOrderExport->sales_order_export_id)); ?>">
                 Kembali
             </a>
-            <button class="btn btn-show-form btn-save float-right btn-submit-parent">
-                Duplikasi
-            </button>
+            <?php if (!empty($dataInvoice)) { ?>
+                <?php if (can('Invoice Exim', 'CIPL BC', 'p')): ?>
+                    <button target="_blank" class="btn btn-warning btn-print float-right" onclick="print('<?= base_url('invoice-packing-customer/print/') . encrypt($dataInvoice['id']) ?>')">
+                        Print
+                    </button>
+                <?php endif; ?>
+                <?php if ($dataInvoice['status_posting'] == 0) { ?>
+                    <?php if (can('Invoice Exim', 'CIPL BC', 'a')) : ?>
+                        <button class="btn btn-success posting-spp posting-so float-right" onclick="posting('<?= encrypt($dataInvoice['id']) ?>')">
+                            Posting
+                        </button>
+                    <?php endif; ?>
+                <?php } ?>
+                <?php if ($dataInvoice['status_posting'] == 0) { ?>
+                    <?php if (can('Invoice Exim', 'CIPL BC', 'u')): ?>
+                        <button class="btn btn-show-form btn-save float-right btn-submit-parent">
+                            Update
+                        </button>
+                    <?php endif; ?>
+                <?php } ?>
+                <?php if ($dataInvoice['status_posting'] == 1 && $dataInvoice['status_bayar'] == 0) { ?>
+                    <?php if (can('Invoice Exim', 'CIPL BC', 'ua')) : ?>
+                        <button class="btn btn-success posting-spp posting-so float-right" onclick="unposting('<?= encrypt($dataInvoice['id']) ?>')">
+                            UnPosting
+                        </button>
+                    <?php endif; ?>
+                <?php } ?>
+
+            <?php } else { ?>
+                <button class="btn btn-show-form btn-save float-right btn-submit-parent">
+                    Simpan
+                </button>
+            <?php } ?>
         </div>
     </div>
     <div class="card">
@@ -40,7 +70,7 @@
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3">
-                            <input value="<?= !empty($dataInvoice) ? date('d/m/Y', strtotime($dataInvoice['tanggal_invoice'])) : date('d/m/Y', strtotime($dataSalesOrderExport->tanggal_invoice))  ?>" autocomplete="one-time-code" name="tanggal_invoice" type="text" class="form-control tanggal_invoice" id="tanggal_invoice">
+                            <input <?= !empty($dataInvoice) ? ($dataInvoice['status_posting'] == 1 ? 'readonly' : '') : '' ?> value="<?= !empty($dataInvoice) ? date('d/m/Y', strtotime($dataInvoice['tanggal_invoice'])) : date('d/m/Y', strtotime($dataSalesOrderExport->tanggal_invoice))  ?>" autocomplete="one-time-code" name="tanggal_invoice" type="text" class="form-control tanggal_invoice" id="tanggal_invoice">
                             <label for="floatingInput">Tanggal Invoice</label>
                         </div>
                     </div>
@@ -52,19 +82,19 @@
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3">
-                            <input value="<?= !empty($dataInvoice) ? $dataInvoice['nama_customer'] : $dataSalesOrderExport->customer_name ?>" autocomplete="one-time-code" name="nama_customer" type="text" class="form-control nama_customer">
+                            <input <?= !empty($dataInvoice) ? ($dataInvoice['status_posting'] == 1 ? 'readonly' : '') : '' ?> value="<?= !empty($dataInvoice) ? $dataInvoice['nama_customer'] : $dataSalesOrderExport->customer_name ?>" autocomplete="one-time-code" name="nama_customer" type="text" class="form-control nama_customer">
                             <label for="floatingInput">Buyer / Customer</label>
                         </div>
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3">
-                            <input value="<?= !empty($dataInvoice) ? $dataInvoice['loading_port'] : strip_tags($dataSalesOrderExport->loading_port) ?>" autocomplete="one-time-code" name="loading_port" type="text" class="form-control loading_port">
+                            <input <?= !empty($dataInvoice) ? ($dataInvoice['status_posting'] == 1 ? 'readonly' : '') : '' ?> value="<?= !empty($dataInvoice) ? $dataInvoice['loading_port'] : strip_tags($dataSalesOrderExport->loading_port) ?>" autocomplete="one-time-code" name="loading_port" type="text" class="form-control loading_port">
                             <label for="floatingInput">Port Of Loading</label>
                         </div>
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3">
-                            <input value="<?= !empty($dataInvoice) ? $dataInvoice['dicharge_port'] :  strip_tags($dataSalesOrderExport->dicharge_port) ?>" autocomplete="one-time-code" name="dicharge_port" type="text" class="form-control dicharge_port">
+                            <input <?= !empty($dataInvoice) ? ($dataInvoice['status_posting'] == 1 ? 'readonly' : '') : '' ?> value="<?= !empty($dataInvoice) ? $dataInvoice['dicharge_port'] :  strip_tags($dataSalesOrderExport->dicharge_port) ?>" autocomplete="one-time-code" name="dicharge_port" type="text" class="form-control dicharge_port">
                             <label for="floatingInput">Port Of Discharge</label>
                         </div>
                     </div>
@@ -85,7 +115,7 @@
                         <div class="form-floating mb-3" style="height: 50px;">
                             <div class="input-group input-group-password">
                                 <div class="form-floating mb-3" style="height: 50px;">
-                                    <input autocomplete="one-time-code" class="form-control input-picker departure_date" id="departure_date" name="departure_date" placeholder="Tanggal PI" value="<?= !empty($dataInvoice) ? date('d/m/Y', strtotime($dataInvoice['departure_date'])) : date('d/m/Y')  ?>">
+                                    <input <?= !empty($dataInvoice) ? ($dataInvoice['status_posting'] == 1 ? 'readonly' : '') : '' ?> autocomplete="one-time-code" class="form-control input-picker departure_date" id="departure_date" name="departure_date" placeholder="Tanggal PI" value="<?= !empty($dataInvoice) ? date('d/m/Y', strtotime($dataInvoice['departure_date'])) : date('d/m/Y')  ?>">
                                     <label for="floatingInput">Departure Date</label>
                                 </div>
                                 <div class="input-group-prepend group-prepend-password align-items-center">
@@ -96,14 +126,14 @@
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3">
-                            <input value="<?= !empty($dataInvoice) ? $dataInvoice['vessels_name'] : '' ?>" autocomplete="one-time-code" id="vessels_name" name="vessels_name" placeholder="Vessels Name" type="text" class="form-control">
+                            <input <?= !empty($dataInvoice) ? ($dataInvoice['status_posting'] == 1 ? 'readonly' : '') : '' ?> value="<?= !empty($dataInvoice) ? $dataInvoice['vessels_name'] : '' ?>" autocomplete="one-time-code" id="vessels_name" name="vessels_name" placeholder="Vessels Name" type="text" class="form-control">
                             <label for="floatingInput">Vessel's Name</label>
                         </div>
                     </div>
 
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <select class="form-select valas_id" name="valas_id" id="valas_id">
+                            <select <?= !empty($dataInvoice) ? ($dataInvoice['status_posting'] == 1 ? 'disabled' : '') : '' ?> class="form-select valas_id" name="valas_id" id="valas_id">
                                 <option value=""></option>
                                 <?php foreach ($dataValuta as $d): ?>
                                     <option <?= empty($dataInvoice) ? ($dataSalesOrderExport->valas_id == $d['id'] ? 'selected' : '') : ($dataInvoice['valas_id'] == $d['id'] ? 'selected' : '') ?> value="<?= $d['id'] ?>"><?= $d['value'] . " - " . $d['description'] ?></option>
@@ -114,62 +144,62 @@
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3">
-                            <textarea class="full-textarea form-control payment_term" id="payment_term" name="payment_term" placeholder="Payment Term"><?= !empty($dataInvoice) ? $dataInvoice['payment_term'] : strip_tags($dataSalesOrderExport->payment_term) ?></textarea>
+                            <textarea <?= !empty($dataInvoice) ? ($dataInvoice['status_posting'] == 1 ? 'readonly' : '') : '' ?> class="full-textarea form-control payment_term" id="payment_term" name="payment_term" placeholder="Payment Term"><?= !empty($dataInvoice) ? $dataInvoice['payment_term'] : strip_tags($dataSalesOrderExport->payment_term) ?></textarea>
                             <label for="floatingInput">Payment Term</label>
                         </div>
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3">
-                            <textarea class="full-textarea form-control alamat" id="alamat" name="alamat" placeholder="Alamat Customer"><?= !empty($dataInvoice) ? $dataInvoice['alamat'] : $dataSalesOrderExport->address ?></textarea>
+                            <textarea <?= !empty($dataInvoice) ? ($dataInvoice['status_posting'] == 1 ? 'readonly' : '') : '' ?> class="full-textarea form-control alamat" id="alamat" name="alamat" placeholder="Alamat Customer"><?= !empty($dataInvoice) ? $dataInvoice['alamat'] : $dataSalesOrderExport->address ?></textarea>
                             <label for="floatingInput">Alamat Customer</label>
                         </div>
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3">
-                            <textarea class="full-textarea form-control notify_party" id="notify_party" name="notify_party" placeholder="Notify Party"><?= !empty($dataInvoice) ? $dataInvoice['notify_party'] : strip_tags($dataSalesOrderExport->notify_party) ?></textarea>
+                            <textarea <?= !empty($dataInvoice) ? ($dataInvoice['status_posting'] == 1 ? 'readonly' : '') : '' ?> class="full-textarea form-control notify_party" id="notify_party" name="notify_party" placeholder="Notify Party"><?= !empty($dataInvoice) ? $dataInvoice['notify_party'] : strip_tags($dataSalesOrderExport->notify_party) ?></textarea>
                             <label for="floatingInput">Notify Party</label>
                         </div>
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3">
-                            <textarea class="full-textarea form-control notify_party2" id="notify_party2" name="notify_party2" placeholder="Notify Party 2"><?= !empty($dataInvoice) ? $dataInvoice['notify_party2'] : '' ?></textarea>
+                            <textarea <?= !empty($dataInvoice) ? ($dataInvoice['status_posting'] == 1 ? 'readonly' : '') : '' ?> class="full-textarea form-control notify_party2" id="notify_party2" name="notify_party2" placeholder="Notify Party 2"><?= !empty($dataInvoice) ? $dataInvoice['notify_party2'] : '' ?></textarea>
                             <label for="floatingInput">Notify Party 2 (Opsional)</label>
                         </div>
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3">
-                            <textarea class="full-textarea form-control payment_description" id="payment_description" name="payment_description" placeholder="Payment Description (Opsional)"><?= !empty($dataInvoice) ? $dataInvoice['payment_description'] : "PLEASE FILL THE FOLLOWING CODES IN THE FIELD 70 ON SWIFT MT103" ?></textarea>
+                            <textarea <?= !empty($dataInvoice) ? ($dataInvoice['status_posting'] == 1 ? 'readonly' : '') : '' ?> class="full-textarea form-control payment_description" id="payment_description" name="payment_description" placeholder="Payment Description (Opsional)"><?= !empty($dataInvoice) ? $dataInvoice['payment_description'] : "PLEASE FILL THE FOLLOWING CODES IN THE FIELD 70 ON SWIFT MT103" ?></textarea>
                             <label for="floatingInput">Payment Description (Opsional)</label>
                         </div>
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3">
-                            <input value="<?= !empty($dataInvoice) ? $dataInvoice['no_container'] : $dataSalesOrderExport->container ?>" autocomplete="one-time-code" type="text" class="form-control no_container" id="no_container" name="no_container" placeholder="No Container">
+                            <input <?= !empty($dataInvoice) ? ($dataInvoice['status_posting'] == 1 ? 'readonly' : '') : '' ?> value="<?= !empty($dataInvoice) ? $dataInvoice['no_container'] : $dataSalesOrderExport->container ?>" autocomplete="one-time-code" type="text" class="form-control no_container" id="no_container" name="no_container" placeholder="No Container">
                             <label for="floatingInput">No Container</label>
                         </div>
                     </div>
 
                     <div class="col-md-4">
                         <div class="form-floating mb-3">
-                            <input value="<?= !empty($dataInvoice) ? $dataInvoice['no_seal'] : '' ?>" autocomplete="one-time-code" type="text" class="form-control no_seal" id="no_seal" name="no_seal" placeholder="No Seal">
+                            <input <?= !empty($dataInvoice) ? ($dataInvoice['status_posting'] == 1 ? 'readonly' : '') : '' ?> value="<?= !empty($dataInvoice) ? $dataInvoice['no_seal'] : '' ?>" autocomplete="one-time-code" type="text" class="form-control no_seal" id="no_seal" name="no_seal" placeholder="No Seal">
                             <label for="floatingInput">No Seal</label>
                         </div>
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3">
-                            <input value="<?= !empty($dataInvoice) ? $dataInvoice['country_of_origin'] : "INDONESIA" ?>" autocomplete="one-time-code" placeholder="Country Of Origin" type="text" class="form-control country_of_origin" id="country_of_origin" name="country_of_origin">
+                            <input <?= !empty($dataInvoice) ? ($dataInvoice['status_posting'] == 1 ? 'readonly' : '') : '' ?> value="<?= !empty($dataInvoice) ? $dataInvoice['country_of_origin'] : "INDONESIA" ?>" autocomplete="one-time-code" placeholder="Country Of Origin" type="text" class="form-control country_of_origin" id="country_of_origin" name="country_of_origin">
                             <label for="floatingInput">Country Of Origin</label>
                         </div>
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3">
-                            <input value="<?= !empty($dataInvoice) ? $dataInvoice['penanda_tangan'] : '' ?>" autocomplete=" one-time-code" type="text" placeholder="Penanda Tangan" class="form-control penanda_tangan" id="penanda_tangan" name="penanda_tangan">
+                            <input <?= !empty($dataInvoice) ? ($dataInvoice['status_posting'] == 1 ? 'readonly' : '') : '' ?> value="<?= !empty($dataInvoice) ? $dataInvoice['penanda_tangan'] : '' ?>" autocomplete=" one-time-code" type="text" placeholder="Penanda Tangan" class="form-control penanda_tangan" id="penanda_tangan" name="penanda_tangan">
                             <label for="floatingInput">Penanda Tangan</label>
                         </div>
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3">
-                            <input value="<?= !empty($dataInvoice) ? $dataInvoice['measurement'] : '' ?>" autocomplete="one-time-code" type="text" class="form-control measurement" id="measurement" placeholder="Measurement (Opsional)" name="measurement">
+                            <input <?= !empty($dataInvoice) ? ($dataInvoice['status_posting'] == 1 ? 'readonly' : '') : '' ?> value="<?= !empty($dataInvoice) ? $dataInvoice['measurement'] : '' ?>" autocomplete="one-time-code" type="text" class="form-control measurement" id="measurement" placeholder="Measurement (Opsional)" name="measurement">
                             <label for="floatingInput">Measurement (Opsional)</label>
                         </div>
                     </div>
@@ -205,7 +235,7 @@
                             <label class="form-label font-weight-bold lable-title">- List Barang</label>
                         </div>
                         <div class="col-md-6">
-                            <button class="btn btn-show-detail btn-add btn-block float-right" id="btnAddBarang" type="button" style="width: 90% !important;">
+                            <button <?= !empty($dataInvoice) ? ($dataInvoice['status_posting'] == 1 ? 'disabled' : '') : '' ?> class="btn btn-show-detail btn-add btn-block float-right" id="btnAddBarang" type="button" style="width: 90% !important;">
                                 <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
                             </button>
                         </div>
@@ -219,7 +249,10 @@
                                 <tr>
                                     <th style="width: 10px;">No</th>
                                     <th>Barang</th>
-                                    <th>Catatan / Note</th>
+                                    <th>HS Code</th>
+                                    <th>Qty</th>
+                                    <th>Harga Satuan</th>
+                                    <th>Total Harga</th>
                                     <th style="width: 100px; text-align:center;">Action</th>
                                 </tr>
                             </thead>
@@ -228,7 +261,7 @@
                             </tbody>
                             <tfoot class="foot-barang" id="foot-barang">
                                 <tr>
-                                    <td colspan="4">List Barang Kosong</td>
+                                    <td colspan="7">List Barang Kosong</td>
                                 </tr>
                             </tfoot>
                         </table>
@@ -241,7 +274,7 @@
                             <label class="form-label font-weight-bold modal-sub-title">- List Biaya Tambahan</label>
                         </div>
                         <div class="col-md-6">
-                            <button class="btn btn-show-detail btn-add btn-block float-right" id="btnBiayaTambahan" type="button" style="width: 90% !important;">
+                            <button <?= !empty($dataInvoice) ? ($dataInvoice['status_posting'] == 1 ? 'disabled' : '') : '' ?> class="btn btn-show-detail btn-add btn-block float-right" id="btnBiayaTambahan" type="button" style="width: 90% !important;">
                                 <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
                             </button>
                         </div>
@@ -283,7 +316,7 @@
                             <label class="form-label font-weight-bold modal-sub-title"></label>
                         </div>
                         <div class="col-md-6">
-                            <button class="btn btn-show-detail btn-add btn-block float-right" id="btnRefreshPacking" type="button" style="width: 90% !important;">
+                            <button <?= !empty($dataInvoice) ? ($dataInvoice['status_posting'] == 1 ? 'disabled' : '') : '' ?> class="btn btn-show-detail btn-add btn-block float-right" id="btnRefreshPacking" type="button" style="width: 90% !important;">
                                 <i class="fa-solid fa-arrows-rotate mr-2"></i>Refresh
                             </button>
                         </div>
@@ -338,59 +371,41 @@
                             </div>
                         </div>
                         <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <select class="form-select hs_code_barang" name="hs_code_barang" id="hs_code_barang">
+                                    <option value=""></option>
+                                    <?php foreach ($dataHsCode as $d) : ?>
+                                        <option data-hs_code_name="<?= $d['code'] . " - " . $d['uraian_barang'] ?>" value="<?= $d['id'] ?>"><?= $d['code'] . " - " . $d['uraian_barang'] ?></option>
+                                    <?php endforeach; ?>
+                                </select>
+                                <label for="floatingInput" style="z-index: 1;">Kode HS</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input autocomplete="one-time-code" type="text" class="form-control qty_barang" id="qty_barang" name="qty_barang" placeholder="Qty Barang" onkeyup="this.value = greatFormatRupiah(this.value)">
+                                <label for="floatingInput">Qty</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input autocomplete="one-time-code" type="text" class="form-control harga_satuan_barang" id="harga_satuan_barang" name="harga_satuan_barang" placeholder="Harga Satuan Barang" onkeyup="this.value = greatFormatRupiah(this.value)">
+                                <label for="floatingInput">Harga Satuan</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input autocomplete="one-time-code" type="text" class="form-control total_harga_barang" id="total_harga_barang" name="total_harga_barang" placeholder="Total Harga Barang" onkeyup="this.value = greatFormatRupiah(this.value)">
+                                <label for="floatingInput">Total Harga</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
                             <div class="form-floating">
                                 <textarea autocomplete="one-time-code" <?= !empty($dataInvoice) ? ($dataInvoice['status_posting']  ? 'readonly=true' : '') : ''; ?> class="full-textarea form-control catatan" id="catatan" name="catatan" placeholder="Catatan"></textarea>
                                 <label for="floatingInput">Catatan (Opsional)</label>
                             </div>
                         </div>
-
-                        <div class="col-subtitle-modal">
-                            <div class="row mt-3 justify-content-end">
-                                <div class="col-md-6">
-                                    <label class="form-label font-weight-bold modal-sub-title"></label>
-                                </div>
-                                <div class="col-md-3">
-                                    <button class="btn btn-success btn-block float-right" type="button" id="btnAddSizeBreakdownModal">
-                                        <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i> Tambah Size / Grade
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
                     </div>
-                    <div class="row">
-                        <div style="max-height: 400px; overflow-y: auto;">
-                            <div class="table-responsive">
-                                <table class="table table-bordered nowrap table-hover-tobasurimi dataTable" id="productSizeBreakdown" width="100%" cellspacing="0">
-                                    <thead class="thead-dark">
-                                        <tr>
-                                            <th>No</th>
-                                            <th>Size</th>
-                                            <th>Grade</th>
-                                            <th>Satuan</th>
-                                            <th>Qty</th>
-                                            <th>Harga Satuan</th>
-                                            <th>Total Harga</th>
-                                            <th>Action</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody class="body-barang-size-breakdown">
-                                        <!-- isi data -->
-                                    </tbody>
-                                    <tfoot class="tfoot-detail-table-size-breakdown">
-                                        <tr>
-                                            <td colspan="3"></td>
-                                            <td><b>TOTAL</b></td>
-                                            <td><b>0.00</b></td>
-                                            <td><b></b></td>
-                                            <td><b>0.00</b></td>
-                                            <td></td>
-                                        </tr>
-                                    </tfoot>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-discard mr-2" id="btnHideBarang">Kembali</button>
@@ -401,74 +416,6 @@
     </div>
 </div>
 
-<div class="modal add-modal" id="addSizeBreakdownModal" tabindex="-1">
-    <div class="modal-dialog" style="min-width: 900px">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title "><label class="title-size-breakdown"></label> Size & Grade</h5>
-            </div>
-            <form class="create-form-size-breakdown" role="form" method="POST">
-                <div class="modal-body">
-                    <input type="hidden" name="id_detail_breakdown" id="id_detail_breakdown">
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" type="text" class="form-control grade" name="grade" id="grade" placeholder="Grade (Opsional)">
-                                <label for="floatingInput">Grade</label>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" type="text" class="form-control size" name="size" id="size" placeholder="Size (Opsional)">
-                                <label for="floatingInput">Size (Opsional)</label>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row mt-2">
-                        <div class="col mb-3">
-                            <h6 class="<?= session()->get('theme') == "dark" ? "text-white" : "text-dark" ?>">Detail Harga</h6>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" type="text" class="form-control qty" name="qty" id="qty" placeholder="Qty">
-                                <label for="floatingInput">Qty</label>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <select class="form-select satuan_size_id" name="satuan_size_id" id="satuan_size_id">
-                                    <option value=""></option>
-                                    <?php foreach ($dataSatuan as $d) : ?>
-                                        <option value="<?= $d['id'] ?>"><?= $d['kode_satuan'] ?></option>
-                                    <?php endforeach; ?>
-                                </select>
-                                <label for="floatingInput" style="z-index: 1;">Satuan</label>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <input onkeyup="this.value = greatFormatRupiah(this.value)" autocomplete="one-time-code" type="text" class="form-control harga" name="harga" id="harga" placeholder="Harga Satuan">
-                                <label for="floatingInput">Harga Satuan</label>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" type="text" readonly="true" class="form-control total" name="total" id="total" placeholder="Total">
-                                <label for="floatingInput">Total Harga</label>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-discard mr-2" id="btnHideSizeBreakdownModal">Kembali</button>
-                    <button type="submit" class="btn btn-submit-form" id="btnSubmitSizeBreakDown">Simpan</button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
 
 <div class="modal detail-modal" id="biayaTambahanModal" tabindex="1">
     <div class="modal-dialog" style="min-width: 900px;">
@@ -1073,6 +1020,12 @@
             placeholder: "Pilih HS Code",
             theme: "bootstrap-5",
             dropdownParent: $('#packingModal')
+        })
+
+        $('#hs_code_barang').select2({
+            placeholder: "Pilih HS Code",
+            theme: "bootstrap-5",
+            dropdownParent: $('#barangModal')
         })
 
         //CSS SELECT2 FLOATING LABEL
@@ -2212,7 +2165,7 @@
                 if ($("#form-parent").valid()) {
                     Swal.fire({
                         icon: 'question',
-                        title: 'Duplikasi Data ?',
+                        title: id ? 'Update Data ?' : 'Simpan Data ?',
                         confirmButtonColor: '#4e73df',
                         cancelButtonColor: '#d33',
                         showCancelButton: true,
@@ -2223,7 +2176,7 @@
                         if (result.isConfirmed) {
                             const csrf = $(`[name="${csrfToken}"]`);
                             let id = $('#id').val();
-                            let url = "<?= base_url('invoice-packing-customer/create') ?>";
+                            let url = id == '' ? "<?= base_url('invoice-packing-customer/create') ?>" : "<?= base_url('invoice-packing-customer/update') ?>";
                             let data = new FormData(document.querySelector("#form-parent"));
                             let totalNilaiInvoice = destroyFormatRupiah($('#total_nilai_invoice').val());
                             let totalBeratBersih = destroyFormatRupiah($('#total_berat_bersih').val());
@@ -2839,7 +2792,7 @@
         if (listBarang.length === 0) {
             const row = `
             <tr>
-                <td colspan="4">List Barang Kosong</td>
+                <td colspan="7">List Barang Kosong</td>
             </tr>`;
             tfoot.append(row);
             return;
@@ -2850,6 +2803,7 @@
             const newRow = $('<tr style="color:whitesmoke;">');
             newRow.append(`<td style="text-align:center;">${no++}</td>`);
             newRow.append(`<td>${item.nama_barang}</td>`);
+            newRow.append(`<td>${item.hs_code}</td>`);
             newRow.append(`<td>${item.catatan}</td>`);
 
             const actionButton = `

@@ -747,4 +747,109 @@ class AMPurchaseOrderDetailModel extends Model
 
         return "PEMB. " . implode('; ', $output) . "; " . $namaSupplier . "; " . $noPo; // Jika ada banyak barang, pisahkan dengan titik koma
     }
+
+    public function getListHistoryHargaByBarang($condition, $addCondition, $limit = 10, $offset = 0)
+    {
+        $availableSort = [
+            'am_purchase_orders.purchase_request_id' => 'am_purchase_orders.purchase_request_id',
+            'am_purchase_orders.po_no' => 'am_purchase_orders.po_no',
+            'am_purchase_orders.divisi_id' => 'penerimaan_barang.divisi_id',
+            'am_purchase_order_details.total'    => 'am_purchase_order_details.total',
+            'am_purchase_order_details.qty'    => 'am_purchase_order_details.qty',
+            'am_purchase_order_details.price'    => 'am_purchase_order_details.price',
+            'am_purchase_order_details.unit' => 'am_purchase_order_details.unit',
+            'am_purchase_order_details.note' => 'am_purchase_order_details.note',
+            'suppliers.name'  => 'suppliers.name',
+            'barang_master_spesifikasi.spesifikasi' => 'barang_master_spesifikasi.spesifikasi',
+        ];
+
+        $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
+
+        $sort = $availableSort[$addCondition['sort'] ?? 'createdAt'] ?? 'am_purchase_order_details.createdAt';
+        $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'DESC';
+
+        $selectQry = "
+            CONCAT(barang_master.barang_name, ' - ', barang_master_spesifikasi.spesifikasi) as nama_barang, 
+            am_purchase_orders.po_no,
+            am_purchase_orders.po_date,
+            am_purchase_order_details.id,
+            am_purchase_order_details.note,
+            suppliers.name as nama_supplier,
+            am_purchase_order_details.price as harga, 
+            am_purchase_order_details.qty,
+            am_purchase_order_details.total as sub_total, 
+            am_purchase_order_details.spesifikasi_id,
+            divisis.divisi,
+            satuans.kode_satuan,
+            purchase_requests.spp_no
+        ";
+
+        $dataPO = $this->asArray()
+            ->select($selectQry)
+            ->where($condition)
+            ->join('am_purchase_orders', 'am_purchase_orders.id  = am_purchase_order_details.am_purchase_order_id', 'left')
+            ->join('purchase_requests', 'purchase_requests.id = am_purchase_orders.purchase_request_id', 'left')
+            ->join('barang_master', 'barang_master.id = am_purchase_order_details.barang_id', 'left')
+            ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = am_purchase_order_details.spesifikasi_id', 'left')
+            ->join('suppliers', 'suppliers.id = am_purchase_orders.supplier_id', 'left')
+            ->join('divisis', 'divisis.id = am_purchase_orders.division_id', 'left')
+            ->join('satuans', 'satuans.id = am_purchase_order_details.unit', 'left')
+            ->orderBy($sort, $sortType);
+
+        $totalData = $dataPO->countAllResults(false);
+
+        if ($addCondition['search']) {
+            $dataPO->groupStart();
+        }
+
+        if ($addCondition['start_date'] && $addCondition['end_date']) {
+            $startDate = date('Y-m-d', strtotime($addCondition['start_date']));
+            $endDate = date('Y-m-d', strtotime($addCondition['end_date']));
+
+            $dataPO->where('am_purchase_orders.po_date >=', $startDate)
+                ->where('am_purchase_orders.po_date <=', $endDate);
+        }
+
+        if ($addCondition['search']) {
+            $dataPO->groupStart();
+            $dataPO->like('purchase_requests.spp_no', $addCondition['search'])
+                ->orLike('suppliers.name', $addCondition['search'])
+                ->orLike("CONCAT(barang_master.barang_name, ' ', barang_master_spesifikasi.spesifikasi)", $addCondition['search'])
+                ->orLike('am_purchase_order_details.note', $addCondition['search'])
+                ->orLike('divisis.divisi', $addCondition['search'])
+                ->orLike('satuans.kode_satuan', $addCondition['search']);
+            $dataPO->groupEnd();
+        }
+
+        if ($addCondition['search']) {
+            $dataPO->groupEnd();
+        }
+
+        $totalFilteredData = $dataPO->countAllResults(false);
+        $data = $dataPO->findAll($limit, $offset);
+
+        return [
+            'data'              => $data,
+            'totalData'         => $totalData,
+            'totalFilteredData' => $totalFilteredData,
+            'sort'  => $sort,
+            'sortType'  => $sortType
+        ];
+    }
+
+
+    public function historiHargaPOBahanPenolongFirst(
+        $spesifikasiId,
+        $companyId
+    ) {
+        $dataLPB = $this->asArray()
+            ->select('am_purchase_order_details.*,supplier_id')
+            ->join('am_purchase_orders', 'am_purchase_orders.id = am_purchase_order_details.am_purchase_order_id', 'left')
+            ->where('am_purchase_orders.company_id', $companyId)
+            ->where('am_purchase_order_details.spesifikasi_id', $spesifikasiId)
+            ->orderBy('am_purchase_orders.po_date', "desc")
+            ->first();
+
+        return $dataLPB;
+    }
 }

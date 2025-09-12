@@ -392,9 +392,9 @@ class BiayaKepitingModel extends Model
             if ($id != null) {
                 $biayaKepitingDetail = $biayaKepitingDetailModel
                     ->where('biaya_kepiting_id', $id)
-                    ->where('jasa_vendor_in_id', $jasaVendorInID)
-                    ->where('barang_master_id', $jasaVendorOutDetail[$i]['barang_master_id'])
-                    ->where('barang_master_spesifikasi_id', $jasaVendorOutDetail[$i]['barang_master_spesifikasi_id'])
+                    // ->where('jasa_vendor_in_id', $jasaVendorInID)
+                    // ->where('barang_master_id', $jasaVendorOutDetail[$i]['barang_master_id'])
+                    // ->where('barang_master_spesifikasi_id', $jasaVendorOutDetail[$i]['barang_master_spesifikasi_id'])
                     ->first();
 
                 $jasaVendorOutDetail[$i]['jumbo'] = $biayaKepitingDetail['jumbo'];

@@ -15,7 +15,8 @@
         }
 
         @page {
-            size: 8.27in 5.50in landscape;
+            /* size: 8.27in 5.50in landscape; */
+            size: 8.27in 6in landscape;
             margin: 25px;
             /* Margin diperkecil */
             padding: 25px;
@@ -379,7 +380,7 @@
                 ?>
                 <?php foreach ($dataBarang as $detail): ?>
                     <tr>
-                        <td style="border-left: 1px solid black; border-right: 1px solid black;font-size:13px;"><?= $detail['peti'] ?></td>
+                        <td style="border-left: 1px solid black; border-right: 1px solid black;font-size:13px;height:4%;"><?= $detail['peti'] ?></td>
                         <td style="border-left: 1px solid black; border-right: 1px solid black;font-size:13px;"><?= $detail['divisi'] ?></td>
                         <td style="border-left: 1px solid black; border-right: 1px solid black;font-size:13px;"><?= $detail['note'] ?></td>
                         <td class="txt-right" style="border-left: 1px solid black; border-right: 1px solid black;font-size:13px;"><?= $detail['qty'] ?></td>
@@ -485,22 +486,22 @@
                 </tr>
             </table>
 
-            <table class="mt-1" style="width: 30%;border: 0;border-bottom: 3px solid;border-style: double;">
-                <tr style="font-size:14px;">
-                    <td>Bruto</td>
-                    <td>Rp.</td>
-                    <td class="txt-right"><?= number_format($dataPO->dpp_umum, 2) ?></td>
+            <table class="mt-1" style="width: 30%;border: 0;border-bottom: 3px solid;border-style: double; margin-top:35px;">
+                <tr style="font-size:15px;">
+                    <td style="height:5%;">Bruto</td>
+                    <td style="height:5%;">Rp.</td>
+                    <td class="txt-right" style="height:2.5%;"><?= number_format($dataPO->dpp_umum, 2) ?></td>
                 </tr>
-                <tr style="font-size:14px;">
-                    <td>PPh</td>
-                    <td>Rp.</td>
-                    <td class="txt-right"><?= number_format($dataPO->pph_umum, 2) ?></td>
+                <tr style="font-size:15px;">
+                    <td style="height:5%;">PPh</td>
+                    <td style="height:5%;">Rp.</td>
+                    <td class="txt-right" style="height:2.5%;"><?= number_format($dataPO->pph_umum, 2) ?></td>
 
                 </tr>
-                <tr style="font-size:14px;">
-                    <td>Dibayarkan</td>
-                    <td>Rp.</td>
-                    <td class="txt-right"><?= number_format($dataPO->nilai_total_umum, 2) ?></td>
+                <tr style="font-size:15px;">
+                    <td style="height:5%;">Dibayarkan</td>
+                    <td style="height:5%;">Rp.</td>
+                    <td class="txt-right" style="height:2.5%;"><?= number_format($dataPO->nilai_total_umum, 2) ?></td>
                 </tr>
             </table>
 
@@ -562,21 +563,21 @@
                 </tr>
             </table>
 
-            <table class="mt-05" style="width: 30%;border: 0;border-bottom: 3px solid;border-style: double;">
-                <tr style="font-size:14px;">
-                    <td>Bruto</td>
-                    <td>Rp.</td>
-                    <td class="txt-right"><?= number_format($dataPO->dpp_harian, 2) ?></td>
+            <table class="mt-05" style="width: 30%;border: 0;border-bottom: 3px solid;border-style: double;margin-top:35px;">
+                <tr style="font-size:15px;">
+                    <td style="height:5%;">Bruto</td>
+                    <td style="height:5%;">Rp.</td>
+                    <td class="txt-right" style="height:2.5%;"><?= number_format($dataPO->dpp_harian, 2) ?></td>
                 </tr>
-                <tr class="table-bordered" style="font-size:14px;">
-                    <td>PPh</td>
-                    <td>Rp.</td>
-                    <td class="txt-right"><?= number_format($dataPO->pph_harian, 2) ?></td>
+                <tr class="table-bordered" style="font-size:15px;">
+                    <td style="height:5%;">PPh</td>
+                    <td style="height:5%;">Rp.</td>
+                    <td class="txt-right" style="height:2.5%;"><?= number_format($dataPO->pph_harian, 2) ?></td>
                 </tr>
-                <tr style="font-size:14px;">
-                    <td>Dibayarkan</td>
-                    <td>Rp.</td>
-                    <td class="txt-right"><?= number_format($dataPO->nilai_total_harian, 2) ?></td>
+                <tr style="font-size:15px;">
+                    <td style="height:5%;">Dibayarkan</td>
+                    <td style="height:5%;">Rp.</td>
+                    <td class="txt-right" style="height:2.5%;"><?= number_format($dataPO->nilai_total_harian, 2) ?></td>
                 </tr>
             </table>
 

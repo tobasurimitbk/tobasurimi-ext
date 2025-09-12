@@ -8,6 +8,7 @@ use App\Models\AccountBarangModel;
 use App\Models\AMPurchaseOrderModel;
 use App\Models\AMPurchaseOrderDetailModel;
 use App\Models\BarangMasterModel;
+use App\Models\BarangMasterSpesifikasiModel;
 use App\Models\SupplierModel;
 use App\Models\SppModel;
 use App\Models\MetadataModel;
@@ -19,6 +20,7 @@ use App\Models\SatuansModel;
 use App\Models\SppDetailModel;
 use App\Models\TaxModel;
 use Dompdf\Dompdf;
+use Exception;
 
 class POLokalBahanPenolong extends BaseController
 {
@@ -42,7 +44,7 @@ class POLokalBahanPenolong extends BaseController
     protected $sppDetailModel;
     protected $accountBarangModel;
     protected $penerimaanBarangDetailModel;
-
+    protected $barangMasterSpesifikasiModel;
     protected $jurnalController;
 
     public function __construct()
@@ -68,6 +70,7 @@ class POLokalBahanPenolong extends BaseController
         $this->sppDetailModel = new SppDetailModel();
         $this->accountBarangModel = new AccountBarangModel();
         $this->penerimaanBarangDetailModel = new PenerimaanBarangDetailModel();
+        $this->barangMasterSpesifikasiModel = new BarangMasterSpesifikasiModel();
     }
 
     public function poLokalBahanPenolong()
@@ -147,7 +150,6 @@ class POLokalBahanPenolong extends BaseController
             "createdBy" => session()->get("login")->user_id,
         ];
 
-
         // insert new po
         $poID = $this->aMPurchaseOrderModel->insert($dataAmPurchaseOrderData);
         $aMPurchaseOrderDetailData = json_decode($this->request->getVar('listBarang'));
@@ -160,6 +162,13 @@ class POLokalBahanPenolong extends BaseController
         }
 
         foreach ($aMPurchaseOrderDetailData as $d) {
+            // UPDATE HARGA
+            $this->barangMasterSpesifikasiModel
+                ->update($d->spesifikasi_id, [
+                    'harga_terakhir' => $d->harga_satuan,
+                    'supplier_terakhir' => $dataAmPurchaseOrderData['supplier_id']
+                ]);
+
             $this->aMPurchaseOrderDetailModel->insert([
                 'am_purchase_order_id' => $poID,
                 'barang_id' => $d->barang_id,
@@ -177,7 +186,6 @@ class POLokalBahanPenolong extends BaseController
             ]);
             $this->accountBarangModel->insertAccountBarang($this->this_company_id, $this->request->getVar('divisionID'), $d->barang_id, $d->spesifikasi_id, trim($d->keterangan));
         }
-
 
         // $this->jurnalController->insertDataPembelian($poID);
 
@@ -497,6 +505,34 @@ class POLokalBahanPenolong extends BaseController
             }
         }
 
+        // UPDATE HARGA
+        $purchaseOrderDetail = $this->aMPurchaseOrderDetailModel
+            ->where('am_purchase_order_id', $id)
+            ->where('deletedAt', null)
+            ->findAll();
+
+        foreach ($purchaseOrderDetail as $p) {
+            $hargaTerakhir = $this->aMPurchaseOrderDetailModel
+                ->historiHargaPOBahanPenolongFirst(
+                    $p['spesifikasi_id'],
+                    $this->this_company_id
+                );
+
+            if ($hargaTerakhir) {
+                $this->barangMasterSpesifikasiModel
+                    ->update($p['spesifikasi_id'], [
+                        'harga_terakhir' => $hargaTerakhir['price'],
+                        'supplier_terakhir' => $hargaTerakhir['supplier_id']
+                    ]);
+            } else {
+                $this->barangMasterSpesifikasiModel
+                    ->update($p['spesifikasi_id'], [
+                        'harga_terakhir' => null,
+                        'supplier_terakhir' => null
+                    ]);
+            }
+        }
+
         // Auto Update Harga di LPB
         $penerimaanBarang = $this->penerimaanBarangModel
             ->where('penerimaan_barang.deletedAt', null)
@@ -592,31 +628,75 @@ class POLokalBahanPenolong extends BaseController
 
     public function deletePOLokalBahanPenolong()
     {
-        $id = decrypt($this->request->getVar("id"));
 
-        $firstData = $this->aMPurchaseOrderModel->find($id);
-        $checkLpb = $this->penerimaanBarangModel->where('tipe_bahan', "PENOLONG")->where('status_penerimaan', "LOKAL")->where('company_id', $this->this_company_id)->like('multiple_po_id', $firstData['id'])->first();
+        $db = \Config\Database::connect();
+        try {
+            $db->transBegin();
+            $id = decrypt($this->request->getVar("id"));
 
-        if ($checkLpb != null) {
+            $firstData = $this->aMPurchaseOrderModel->find($id);
+            $checkLpb = $this->penerimaanBarangModel->where('tipe_bahan', "PENOLONG")->where('status_penerimaan', "LOKAL")->where('company_id', $this->this_company_id)->like('multiple_po_id', $firstData['id'])->first();
+
+            if ($checkLpb != null) {
+                return response()->setJSON([
+                    'message' => "Gagal Hapus, PO Sudah Dibuatkan LPB dengan Nomor : " . $checkLpb['no_penerimaan_barang'],
+                    'status' => false,
+                    'token' => csrf_hash()
+                ]);
+            }
+
+            $this->sppModel->update($firstData['purchase_request_id'], [
+                'request_status' => 'waiting'
+            ]);
+
+            $this->aMPurchaseOrderModel->delete($id);
+
+            // UPDATE HARGA
+            $purchaseOrderDetail = $this->aMPurchaseOrderDetailModel
+                ->where('am_purchase_order_id', $id)
+                ->where('deletedAt', null)
+                ->findAll();
+
+            foreach ($purchaseOrderDetail as $p) {
+                $this->aMPurchaseOrderDetailModel->delete($p['id']);
+
+                $hargaTerakhir = $this->aMPurchaseOrderDetailModel
+                    ->historiHargaPOBahanPenolongFirst(
+                        $p['spesifikasi_id'],
+                        $this->this_company_id
+                    );
+
+                if ($hargaTerakhir) {
+                    $this->barangMasterSpesifikasiModel
+                        ->update($p['spesifikasi_id'], [
+                            'harga_terakhir' => $hargaTerakhir['price'],
+                            'supplier_terakhir' => $hargaTerakhir['supplier_id']
+                        ]);
+                } else {
+                    $this->barangMasterSpesifikasiModel
+                        ->update($p['spesifikasi_id'], [
+                            'harga_terakhir' => null,
+                            'supplier_terakhir' => null
+                        ]);
+                }
+            }
+
+            $db->transCommit();
+
             return response()->setJSON([
-                'message' => "Gagal Hapus, PO Sudah Dibuatkan LPB dengan Nomor : " . $checkLpb['no_penerimaan_barang'],
+                'message' => "PO berhasil dihapus",
+                'status' => true,
+                'token' => csrf_hash()
+            ]);
+            $db->transCommit();
+        } catch (Exception $e) {
+            $db->transRollback();
+            return response()->setJSON([
                 'status' => false,
+                'message' => $e->getMessage(),
                 'token' => csrf_hash()
             ]);
         }
-
-        $this->sppModel->update($firstData['purchase_request_id'], [
-            'request_status' => 'waiting'
-        ]);
-
-        $this->aMPurchaseOrderModel->delete($id);
-        $this->aMPurchaseOrderDetailModel->where('am_purchase_order_id', $id)->delete();
-
-        return response()->setJSON([
-            'message' => "PO berhasil dihapus",
-            'status' => true,
-            'token' => csrf_hash()
-        ]);
     }
 
     public function print($id = null)

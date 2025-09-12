@@ -1066,6 +1066,109 @@ class Penomoran_ extends BaseController
         echo "DONE";
         die;
     }
+
+    public function repairFormatNomorLpb()
+    {
+        $penerimaanBarangModel = new PenerimaanBarangModel();
+
+        $tanggalAwal = "2025-09-01";
+        $tanggalAkhir = "2025-09-31";
+
+        // ambil data urut
+        $penerimaanBarang = $penerimaanBarangModel
+            ->where('tanggal >=', $tanggalAwal)
+            ->where('tanggal <=', $tanggalAkhir)
+            ->where('deletedAt', null)
+            ->orderBy('tanggal', 'asc')
+            ->orderBy('id', 'asc')
+            ->findAll();
+
+        // reset dulu
+        $penerimaanBarangModel
+            ->where('tanggal >=', $tanggalAwal)
+            ->where('tanggal <=', $tanggalAkhir)
+            ->where('deletedAt', null)
+            ->set('no_penerimaan_barang', null)
+            ->update();
+
+        // counter per group
+        $counter = [];
+
+        foreach ($penerimaanBarang as $p) {
+            $key = $p['company_id'] . '-' . $p['status_penerimaan'] . '-' . $p['tipe_bahan'] . '-' . date('Ym', strtotime($p['tanggal']));
+
+            if (!isset($counter[$key])) {
+                $counter[$key] = 1;
+            }
+
+            // generate prefix/template
+            $noPenerimaan = $penerimaanBarangModel->get_no(
+                $p['tanggal'],
+                $p['company_id'],
+                $p['status_penerimaan'],
+                $p['tipe_bahan'],
+            );
+
+            // update
+            $penerimaanBarangModel->update($p['id'], [
+                'no_penerimaan_barang' => $noPenerimaan
+            ]);
+
+            $counter[$key]++; // increment
+        }
+
+        dd("OK");
+    }
+
+    public function repairKomponenHargaPoLokalBahanBaku()
+    {
+        $db = \Config\Database::connect();
+        $db->transStart();
+
+        $poBahanBaku = $db->query("
+            SELECT * 
+            FROM rm_purchase_orders 
+            WHERE company_id = 16 
+            and po_date >= '2025-09-01' 
+            AND po_date <= '2025-12-31' 
+            AND deletedAt IS NULL 
+            ORDER BY id ASC
+        ");
+
+        try {
+            $rmPurchaseOrderModel = new RMPurchaseOrderModel();
+            $i = 1;
+            foreach ($poBahanBaku->getResult() as $p) {
+                $totalFinal = $rmPurchaseOrderModel->generateKomponenHarga($p->id);
+
+                $rmPurchaseOrderModel->update($p->id, [
+                    'total_before_pph'  => $totalFinal['nilai_before_pph'],
+                    'total_after_pph' => $totalFinal['nilai_after_pph'],
+                    'dpp_umum' => $totalFinal['dpp_umum'],
+                    'dpp_harian' => $totalFinal['dpp_harian'],
+                    'dpp_bulanan' => $totalFinal['dpp_bulanan'],
+                    'dpp_tambahan' => $totalFinal['dpp_tambahan'],
+                    'pph_umum' => $totalFinal['pph_umum'],
+                    'pph_harian' => $totalFinal['pph_harian'],
+                    'pph_bulanan' => $totalFinal['pph_bulanan'],
+                    'pph_tambahan' => $totalFinal['pph_tambahan'],
+                    'nilai_total_umum' => $totalFinal['nilai_total_umum'],
+                    'nilai_total_harian' => $totalFinal['nilai_total_harian'],
+                    'nilai_total_bulanan' => $totalFinal['nilai_total_bulanan'],
+                    'nilai_total_tambahan' => $totalFinal['nilai_total_tambahan'],
+                    'nilai_total_qty' => $totalFinal['nilai_total_qty']
+                ]);
+
+                $i++;
+            }
+
+            $db->transCommit();
+            echo "<br>" . "Total Update PO : " . $i;
+        } catch (Exception $e) {
+            $db->transRollback();
+            echo "Error " . $e->getMessage();
+        }
+    }
 }
 
 

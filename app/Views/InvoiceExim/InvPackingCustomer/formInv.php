@@ -168,6 +168,12 @@
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3">
+                            <textarea <?= !empty($dataInvoice) ? ($dataInvoice['status_posting'] == 1 ? 'readonly' : '') : '' ?> class="full-textarea form-control payment_description" id="payment_description" name="payment_description" placeholder="Payment Description (Opsional)"><?= !empty($dataInvoice) ? $dataInvoice['payment_description'] : "PLEASE FILL THE FOLLOWING CODES IN THE FIELD 70 ON SWIFT MT103" ?></textarea>
+                            <label for="floatingInput">Payment Description (Opsional)</label>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-floating mb-3">
                             <input <?= !empty($dataInvoice) ? ($dataInvoice['status_posting'] == 1 ? 'readonly' : '') : '' ?> value="<?= !empty($dataInvoice) ? $dataInvoice['no_container'] : $dataSalesOrderExport->container ?>" autocomplete="one-time-code" type="text" class="form-control no_container" id="no_container" name="no_container" placeholder="No Container">
                             <label for="floatingInput">No Container</label>
                         </div>
@@ -793,9 +799,16 @@
                                 </div>
                             </div>
                             <div class="col-md-6">
-                                <div class="form-floating mb-3" style="height: 50px;">
-                                    <input readonly autocomplete="one-time-code" type="text" class="form-control berat_kotor" oninput="this.value = greatFormatRupiah(this.value)" name="berat_kotor" id="berat_kotor" placeholder="Berat Kotor (Opsional)">
-                                    <label for="floatingInput">Berat Kotor (Kg)</label>
+                                <div class="input-group input-group-password">
+                                    <div class="form-floating mb-3" style="height: 50px;">
+                                        <input readonly autocomplete="one-time-code" type="text" class="form-control berat_kotor" oninput="this.value = greatFormatRupiah(this.value)" name="berat_kotor" id="berat_kotor" placeholder="Berat Kotor (Opsional)">
+                                        <label for="floatingInput">Berat Kotor (Kg)</label>
+                                    </div>
+                                    <div class="input-group-append" style="height:50px;">
+                                        <button class="btn btn-primary btn-add-barang" data-toggle="modal" type="button" id="formulaBeratKotorBtn">
+                                            <i class="fa-solid fa-square-root-variable"></i>
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
 
@@ -833,13 +846,16 @@
                                     <label for="floatingInput">Qty Case / Carton</label>
                                 </div>
                                 <div class="input-group-prepend">
-                                    <span class="input-group-text" id="basic-addon1">
-                                        *
-                                    </span>
+                                    <select name="formula_operator_hitung_can" class="form-control" id="formula_operator_hitung_can" style="height: 50px;">
+                                        <option value="tambah">+</option>
+                                        <option value="kurang">-</option>
+                                        <option value="bagi"> / </option>
+                                        <option value="kali" selected>*</option>
+                                    </select>
                                 </div>
                                 <div class="form-floating mb-3" style="height: 50px;">
                                     <input autocomplete="one-time-code" type="text" oninput="this.value = greatFormatRupiah(this.value)" class="form-control formula_bilangan_case_hitung_can" id="formula_bilangan_case_hitung_can" name="formula_bilangan_case_hitung_can" placeholder="Nilai Bilangan / Kemasan">
-                                    <label for="floatingInput">Qty / Case</label>
+                                    <label for="floatingInput">Qty Per Case</label>
                                 </div>
                                 <div class="input-group-prepend">
                                     <span class="input-group-text" id="basic-addon1">
@@ -880,9 +896,12 @@
                                     <label for="floatingInput">Qty Can</label>
                                 </div>
                                 <div class="input-group-prepend">
-                                    <span class="input-group-text" id="basic-addon1">
-                                        /
-                                    </span>
+                                    <select name="formula_operator_hitung_case" class="form-control" id="formula_operator_hitung_case" style="height: 50px;">
+                                        <option value="tambah">+</option>
+                                        <option value="kurang">-</option>
+                                        <option value="bagi" selected> / </option>
+                                        <option value="kali">*</option>
+                                    </select>
                                 </div>
                                 <div class="form-floating mb-3" style="height: 50px;">
                                     <input autocomplete="one-time-code" type="text" oninput="this.value = greatFormatRupiah(this.value)" class="form-control formula_bilangan_can_hitung_case" id="formula_bilangan_can_hitung_case" name="formula_bilangan_can_hitung_case" placeholder="Nilai Bilangan / Kemasan">
@@ -952,6 +971,77 @@
                 <div class="modal-footer">
                     <button type="button" class="btn btn-discard mr-2" id="btnHideFormulaVgm">Kembali</button>
                     <button type="button" class="btn btn-submit-form" id="btnSubmitFormulaVGm">Simpan</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="modal detail-modal" id="formulaBeratKotorModal" tabindex="1">
+    <div class="modal-dialog" style="min-width: 1200px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title title-secondary">Formula Hitung Berat Kotor</h5>
+            </div>
+            <form class="create-form-formula-berat-kotor" role="form" method="POST">
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <div class="input-group-prepend">
+                                        <select name="formula_pilih_jumlah_case_can_hitung_berat_kotor" class="form-control" id="formula_pilih_jumlah_case_can_hitung_berat_kotor" style="height: 50px;">
+                                            <option value="">Pilih</option>
+                                            <option value="case">CASE</option>
+                                            <option value="can">CAN</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-floating mb-3" style="height: 50px;">
+                                    <input readonly autocomplete="one-time-code" type="text" oninput="this.value = greatFormatRupiah(this.value)" class="form-control formula_jumlah_case_can_hitung_berat_kotor" id="formula_jumlah_case_can_hitung_berat_kotor" name="formula_jumlah_case_can_hitung_berat_kotor" placeholder="Jumlah Case Can">
+                                    <label for="floatingInput">Jumlah Case / Can</label>
+                                </div>
+                                <div class="input-group-prepend">
+                                    <select name="formula_operator1_hitung_berat_kotor" class="form-control" id="formula_operator1_hitung_berat_kotor" style="height: 50px;">
+                                        <option value="tambah">+</option>
+                                        <option value="kurang">-</option>
+                                        <option value="bagi"> / </option>
+                                        <option value="kali" selected>*</option>
+                                    </select>
+                                </div>
+                                <div class="form-floating mb-3" style="height: 50px;">
+                                    <input readonly autocomplete="one-time-code" type="text" oninput="this.value = greatFormatRupiah(this.value)" class="form-control formula_packing_hitung_berat_kotor" id="formula_packing_hitung_berat_kotor" name="formula_packing_hitung_berat_kotor" placeholder="Total Packing">
+                                    <label for="floatingInput">Total Packing</label>
+                                </div>
+                                <div class="input-group-prepend">
+                                    <select name="formula_operator2_hitung_berat_kotor" class="form-control" id="formula_operator2_hitung_berat_kotor" style="height: 50px;">
+                                        <option value="tambah" selected>+</option>
+                                        <option value="kurang">-</option>
+                                        <option value="bagi"> / </option>
+                                        <option value="kali">*</option>
+                                    </select>
+                                </div>
+                                <div class="form-floating mb-3" style="height: 50px;">
+                                    <input readonly autocomplete="one-time-code" type="text" oninput="this.value = greatFormatRupiah(this.value)" class="form-control formula_berat_bersih_hitung_berat_kotor" id="formula_berat_bersih_hitung_berat_kotor" name="formula_berat_bersih_hitung_berat_kotor" placeholder="Berat Bersih">
+                                    <label for="floatingInput">Berat Bersih</label>
+                                </div>
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text" id="basic-addon1">
+                                        =
+                                    </span>
+                                </div>
+                                <div class="form-floating mb-3" style="height: 50px;">
+                                    <input readonly autocomplete="one-time-code" type="text" oninput="this.value = greatFormatRupiah(this.value)" class="form-control formula_hasil_berat_kotor" id="formula_hasil_berat_kotor" name="formula_hasil_berat_kotor" placeholder="Qty Berat Kotor">
+                                    <label for="floatingInput">Berat Kotor</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-discard mr-2" id="btnHideFormulaBeratKotor">Kembali</button>
+                    <button type="button" class="btn btn-submit-form" id="btnSubmitFormulaBeratKotor">Simpan</button>
                 </div>
             </form>
         </div>
@@ -1069,7 +1159,7 @@
             if (casePackingVal == "") {
                 Swal.fire({
                     icon: 'error',
-                    title: "Isikan terlebih dahulu Qty Can",
+                    title: "Isikan terlebih dahulu Qty Carton",
                     confirmButtonColor: '#4e73df',
                 })
             } else {
@@ -1104,6 +1194,35 @@
             $('#formulaCtModal').modal('show');
         });
 
+        $('#formulaBeratKotorBtn').click(function(e) {
+            e.preventDefault();
+            resetFormFormulaBeratKotor();
+            //--------------------------------------------            $('#formula_jumlah_case_can_hitung_berat_kotor').val();
+            var packing = $('#packing').val();
+            var beratbersih = $('#berat_bersih').val();
+
+            if (packing == '') {
+                Swal.fire({
+                    icon: 'error',
+                    title: "Isikan packing terlebih dahulu",
+                    confirmButtonColor: '#4e73df',
+                });
+                return;
+            } else if (beratbersih == '') {
+                Swal.fire({
+                    icon: 'error',
+                    title: "Isikan berat bersih terlebih dahulu",
+                    confirmButtonColor: '#4e73df',
+                });
+                return;
+            } else {
+                $('#formula_packing_hitung_berat_kotor').val(greatFormatRupiah(packing));
+                $('#formula_berat_bersih_hitung_berat_kotor').val(greatFormatRupiah(beratbersih));
+                $('#formulaBeratKotorModal').modal('show');
+            }
+
+        });
+
         $('#btnHideFormulaVgm').click(function(e) {
             e.preventDefault();
             $('#formulaVgm').modal('hide');
@@ -1119,21 +1238,60 @@
             $('#formulaCtModal').modal('hide');
         });
 
+
         $('#formula_bilangan_can_hitung_case').keyup(function(e) {
             e.preventDefault();
+            hitungCase();
+        });
+
+        $('#formula_operator_hitung_case').change(function(e) {
+            e.preventDefault();
+            hitungCase();
+        });
+
+        function hitungCase() {
             var formulaQtyCan = destroyFormatRupiah($('#formula_qty_can_hitung_case').val());
             var formulaBilanganCan = destroyFormatRupiah($('#formula_bilangan_can_hitung_case').val());
-            var hasilQtyCase = formulaQtyCan / formulaBilanganCan;
-            $('#hasil_qty_case_hitung_case').val(greatFormatRupiah(hasilQtyCase));
-        });
+            var formulaOperatorHitungCase = $('#formula_operator_hitung_case').val();
+            var hasilQtyCase = 0;
+            if (formulaOperatorHitungCase == "tambah") {
+                hasilQtyCase = formulaQtyCan + formulaBilanganCan;
+            } else if (formulaOperatorHitungCase == "kurang") {
+                hasilQtyCase = formulaQtyCan - formulaBilanganCan;
+            } else if (formulaOperatorHitungCase == "bagi") {
+                hasilQtyCase = formulaQtyCan / formulaBilanganCan;
+            } else if (formulaOperatorHitungCase == "kali") {
+                hasilQtyCase = formulaQtyCan * formulaBilanganCan;
+            }
+            $('#hasil_qty_case_hitung_case').val(greatFormatRupiah(hasilQtyCase.toFixed(2)));
+        }
 
         $('#formula_bilangan_case_hitung_can').keyup(function(e) {
             e.preventDefault();
+            hitungCan();
+        });
+
+        $('#formula_operator_hitung_can').change(function(e) {
+            e.preventDefault();
+            hitungCan();
+        });
+
+        function hitungCan() {
             var formulaQtyCase = destroyFormatRupiah($('#formula_qty_case_hitung_can').val());
             var formulaBilanganCase = destroyFormatRupiah($('#formula_bilangan_case_hitung_can').val());
-            var formulaQtyCan = formulaQtyCase * formulaBilanganCase;
-            $('#hasil_qty_can_hitung_can').val(greatFormatRupiah(formulaQtyCan));
-        });
+            var formulaOperatorHitungCan = $('#formula_operator_hitung_can').val();
+            var hasilQtyCan = 0;
+            if (formulaOperatorHitungCan == 'tambah') {
+                hasilQtyCan = formulaQtyCase + formulaBilanganCase;
+            } else if (formulaOperatorHitungCan == "kurang") {
+                hasilQtyCan = formulaQtyCase - formulaBilanganCase;
+            } else if (formulaOperatorHitungCan == "bagi") {
+                hasilQtyCan = formulaQtyCase / formulaBilanganCase;
+            } else if (formulaOperatorHitungCan == "kali") {
+                hasilQtyCan = formulaQtyCase * formulaBilanganCase;
+            }
+            $('#hasil_qty_can_hitung_can').val(greatFormatRupiah(hasilQtyCan.toFixed(2)));
+        }
 
         $('#formula_bilangan_hitung_vgm').keyup(function(e) {
             e.preventDefault();
@@ -1610,6 +1768,49 @@
             },
         });
 
+        // FORMULA BERAT KOTOR
+        var validatorBeratKotor = $(".create-form-formula-berat-kotor").validate({
+            rules: {
+                formula_hasil_berat_kotor: {
+                    required: true
+                },
+            },
+            messages: {
+                formula_hasil_berat_kotor: {
+                    required: "Hasil berat kotor"
+                },
+            },
+            errorElement: 'span',
+            errorClass: 'text-danger',
+            errorPlacement: function(error, element) {
+                var elem = $(element);
+                if (elem.hasClass("select2-hidden-accessible")) {
+                    element = $("#select2-" + elem.attr("id") + "-container").parent();
+                    error.insertAfter(element);
+                } else {
+                    error.insertAfter(element);
+                }
+            },
+            highlight: function(element) {
+                $(element).closest('.form-group').addClass('has-error');
+                $(element).addClass('select-class');
+
+            },
+            unhighlight: function(element) {
+                $(element).closest('.form-group').removeClass('has-error');
+                $(element).removeClass('select-class');
+            },
+        });
+
+        $('#btnSubmitFormulaBeratKotor').click(function(e) {
+            e.preventDefault();
+            if ($('.create-form-formula-berat-kotor').valid()) {
+                var hasilBeratKotor = destroyFormatRupiah($('#formula_hasil_berat_kotor').val());
+                $('#berat_kotor').val(greatFormatRupiah(hasilBeratKotor));
+                $('#formulaBeratKotorModal').modal('hide');
+            }
+        });
+
         $('#btnSubmitFormulaVGm').click(function(e) {
             e.preventDefault();
             if ($('.create-form-formula-vgm').valid()) {
@@ -1617,7 +1818,6 @@
                 $('#vgm').val(greatFormatRupiah(hasilVgm));
                 $('#formulaVgm').modal('hide');
             }
-
         });
 
 
@@ -1799,7 +1999,12 @@
         $('#btnHidePackingBreakdown').click(function(e) {
             e.preventDefault();
             $('#addPackingBreakdownModal').modal('hide');
-        })
+        });
+
+        $('#btnHideFormulaBeratKotor').click(function(e) {
+            e.preventDefault();
+            $('#formulaBeratKotorModal').modal('hide');
+        });
 
         $('#qty_barang,#harga_satuan').keyup(function(e) {
             e.preventDefault();
@@ -1810,14 +2015,55 @@
             $('#total_harga').val(greatFormatRupiah(totalHarga.toFixed(2)));
         });
 
-        $('#packing,#qty_packing,#berat_bersih').keyup(function(e) {
+        $('#formula_pilih_jumlah_case_can_hitung_berat_kotor,#formula_operator1_hitung_berat_kotor,#formula_operator2_hitung_berat_kotor').change(function(e) {
             e.preventDefault();
-            var packing = destroyFormatRupiah($('#packing').val());
-            var qtyPacking = destroyFormatRupiah($('#qty_packing').val());
-            var beratBersih = destroyFormatRupiah($('#berat_bersih').val());
-            var beratKotor = (packing * qtyPacking) + beratBersih;
-            $('#berat_kotor').val(greatFormatRupiah(beratKotor));
-        })
+            var pilihJumlahCanCase = $('#formula_pilih_jumlah_case_can_hitung_berat_kotor').val();
+            var caseCan = 0;
+            if (pilihJumlahCanCase == "can") {
+                caseCan = destroyFormatRupiah($('#can_packing').val());
+            } else {
+                caseCan = destroyFormatRupiah($('#case_packing').val());
+            }
+
+            $('#formula_jumlah_case_can_hitung_berat_kotor').val(greatFormatRupiah(caseCan));
+
+            var packing = destroyFormatRupiah($('#formula_packing_hitung_berat_kotor').val());
+            var beratBersih = destroyFormatRupiah($('#formula_berat_bersih_hitung_berat_kotor').val());
+
+            var operator1 = $('#formula_operator1_hitung_berat_kotor').val();
+            var operator2 = $('#formula_operator2_hitung_berat_kotor').val();
+
+            var casCanPackingHasil = 0;
+            if (operator1 == 'tambah') {
+                casCanPackingHasil = caseCan + packing;
+            } else if (operator1 == 'kurang') {
+                casCanPackingHasil = caseCan - packing;
+            } else if (operator1 == 'bagi') {
+                casCanPackingHasil = caseCan / packing;
+            } else if (operator1 == 'kali') {
+                casCanPackingHasil = caseCan * packing;
+            }
+
+            var beratKotor = 0;
+            if (operator2 == 'tambah') {
+                beratKotor = casCanPackingHasil + beratBersih;
+            } else if (operator2 == 'kurang') {
+                beratKotor = casCanPackingHasil - beratBersih
+            }
+
+            $('#formula_hasil_berat_kotor').val(greatFormatRupiah(beratKotor));
+        });
+
+
+
+        // $('#packing,#qty_packing,#berat_bersih').keyup(function(e) {
+        //     e.preventDefault();
+        //     var packing = destroyFormatRupiah($('#packing').val());
+        //     var qtyPacking = destroyFormatRupiah($('#qty_packing').val());
+        //     var beratBersih = destroyFormatRupiah($('#berat_bersih').val());
+        //     var beratKotor = (packing * qtyPacking) + beratBersih;
+        //     $('#berat_kotor').val(greatFormatRupiah(beratKotor));
+        // })
 
         $('#btnHideBiayaTambahan').click(function() {
             $('#biayaTambahanModal').modal('hide');
@@ -2304,7 +2550,7 @@
         $('#grade_packing').val(item.grade);
         $('#size_packing').val(item.size);
         $('#can_packing').val(greatFormatRupiah(item.can));
-        $('#case_packing').val(greatFormatRupiah(item.qty));
+        $('#case_packing').val(greatFormatRupiah(item.case));
         $('#kg_packing').val(greatFormatRupiah(item.kg));
         $('#lb_packing').val(greatFormatRupiah(item.lb));
         $('#inner_box_packing').val(greatFormatRupiah(item.inner_box));
@@ -2988,12 +3234,22 @@
         listBarang.forEach(item => {
             var result_breakdown = [];
             $.each(item.size_breakdown, function(j, s) {
+                // id 19 = case /carton
+                // id 68 = can
+                var cased = null;
+                var can = null;
+                if (s.satuan_size_id == 19) {
+                    cased = s.qty;
+                } else if (s.satuan_size_id == 68) {
+                    can = s.qty;
+                }
+
                 result_breakdown.push({
                     id_detail_breakdown_packing: getID(),
                     size: s.size,
                     grade: s.grade,
                     packing: null,
-                    can: null,
+                    can: can,
                     kg: null,
                     lb: null,
                     inner_box: null,
@@ -3001,6 +3257,7 @@
                     bag: null,
                     palet: null,
                     persen: null,
+                    case: cased,
                     qty: s.qty,
                     harga: s.harga,
                     total: s.total,
@@ -3084,6 +3341,13 @@
         $('#formula_berat_kotor_hitung_vgm').val(null);
         $('#formula_bilangan_hitung_vgm').val(null);
         $('#hasil_vgm').val(null);
+    }
+
+    function resetFormFormulaBeratKotor() {
+        $('#formula_jumlah_case_can_hitung_berat_kotor').val(null).change();
+        $('#formula_packing_hitung_berat_kotor').val(null);
+        $('#formula_berat_bersih_hitung_berat_kotor').val(null);
+        $('#formula_hasil_berat_kotor').val(null);
     }
 </script>
 <?= $this->endSection(); ?>

@@ -209,7 +209,7 @@
     </div>
 </div>
 <div class="modal fade" id="historiModal" tabindex="-1" role="dialog" aria-labelledby="historiModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-xl" role="document">
+    <div class="modal-dialog modal-xl" role="document" style="min-width: 1600px">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="historiModalLabel">Histori Purchase Order</h5>
@@ -242,7 +242,8 @@
                         <tr>
                             <th scope="col">No</th>
                             <th scope="col" onclick="changeShortPoLokal('am_purchase_orders.purchase_request_id')" class="sort">No SPP</th>
-                            <th scope="col" onclick="changeShortPoLokal('penerimaan_barang.no_penerimaan_barang')" class="sort">No LPB</th>
+                            <th scope="col" onclick="changeShortPoLokal('am_purchase_orders.po_no')">No PO</th>
+                            <th scope="col">No LPB</th>
                             <th scope="col" onclick="changeShortPoLokal('am_purchase_orders.po_date')" class="sort">Tgl PO</th>
                             <th scope="col" onclick="changeShortPoLokal('suppliers.name')" class="sort">Supplier</th>
                             <th scope="col" onclick="changeShortPoLokal('barang_master_spesifikasi.spesifikasi')" class="sort">Barang</th>
@@ -465,8 +466,12 @@
                 data: "spp_no",
                 className: "text-center"
             }, {
-                data: "no_penerimaan_barang",
+                data: "po_no",
                 className: "text-center"
+            }, {
+                data: "no_penerimaan_barang",
+                className: "text-center",
+                sortable: false
             }, {
                 data: "po_date",
                 className: "text-center"
