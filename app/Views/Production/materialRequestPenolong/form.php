@@ -768,7 +768,7 @@
                                                 confirmButtonText: 'Ok'
                                             }).then((result) => {
                                                 if (result.isConfirmed) {
-                                                    window.location.href = "<?= base_url('material-request-penolong/details/') ?>" + response.id
+                                                    window.location.href = "<?= base_url('material-request-penolong') ?>"
                                                 }
                                             });
                                         },

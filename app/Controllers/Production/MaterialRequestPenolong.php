@@ -185,7 +185,7 @@ class MaterialRequestPenolong extends BaseController
                     $value->bc_id,
                     $value->no_aju,
                     $value->stock_dokumen
-                )['stok_total'];
+                )['stok_total'] - $value->qty2;
             }
             $data["dataMaterialRequests"] = $dataMaterialRequests;
             $data["dataMaterialRequestDetails"] = $dataMaterialRequestDetails;
@@ -230,7 +230,7 @@ class MaterialRequestPenolong extends BaseController
                 "no"                    => $no++,
                 "id"                    => encrypt($data->id),
                 "req_no"                 => $data->req_no,
-                "nama_barang"           => "",
+                "nama_barang"           => $data->nama_barang,
                 "wo_no"           => "",
                 "is_posted"           => $data->is_posted,
                 "request_status"           => "",
@@ -697,7 +697,7 @@ class MaterialRequestPenolong extends BaseController
 
                 if ($dataMaterialRequestNotApprove) {
                     $dataResult[$i]['is_requested'] = true;
-                    $dataResult[$i]['stok_total'] = $dataResult[$i]['stok_total'] - $dataMaterialRequestNotApprove['qty'];
+                    $dataResult[$i]['stok_total'] = $dataResult[$i]['stok_total'] - $dataMaterialRequestNotApprove['qty2'];
                 } else {
                     $dataResult[$i]['is_requested'] = false;
                 }

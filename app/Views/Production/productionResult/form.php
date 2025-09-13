@@ -102,7 +102,7 @@
                             <?php if (isset($data)) : ?>
                                 <input autocomplete="one-time-code" type="text" class="form-control wo_no" name="wo_no" id="wo_no" placeholder="Kode Produksi" readonly>
                             <?php endif; ?>
-                            <label for="floatingInput">Kode Produksi</label>
+                            <label for="floatingInput">Kode Work Order</label>
                         </div>
                     </div>
                     <div class="col-md-6">
@@ -1083,12 +1083,12 @@
 
         $(".kode_produksi").on('change', function() {
             let selectedValues = $(this).val();
-            
+
             if (selectedValues && selectedValues.length > 0) {
                 // For multiple selection, you might need to decide how to handle the data
                 // Here I'm just taking the first selected item's data as an example
                 let firstSelectedOption = $(this).find('option:selected').first();
-                
+
                 let nama_barang = firstSelectedOption.data("nama-barang") || "";
                 let standart_production = firstSelectedOption.data("standart-production") || "";
                 let warehouse_id = firstSelectedOption.data("warehouse") || "";
@@ -1098,13 +1098,13 @@
                 $(".standart_production").val(standart_production);
                 $(".warehouse_id_order").val(warehouse_id).change();
                 $(".department_id_order").val(divisi_id).change();
-                
+
                 setLoading();
-                
+
                 // For multiple values, you might need to adjust your AJAX calls
                 // Here's an example using the first selected value
-                let firstKodeProduksi = selectedValues[0];
-                
+                let firstKodeProduksi = selectedValues;
+
                 $.ajax({
                     url: `<?= base_url('production-result/material-request'); ?>`,
                     method: "GET",
@@ -1137,12 +1137,13 @@
                         }
                     },
                 });
-                
+                console.log(selectedValues);
+
                 $.ajax({
                     url: `<?= base_url('production-result/list-work-order'); ?>`,
                     method: "GET",
                     data: {
-                        kode_produksi: selectedValues, // Kirim array ID
+                        kode_produksi: selectedValues.join(',')
                     },
                     dataType: "json",
                     success: function(res) {
@@ -1183,7 +1184,7 @@
                             data-divisi_id="${item.divisi_id}" 
                             data-note="${item.note}" 
                             data-qty="${0}" 
-                            data-qty2="${0}" 
+                            data-qty2="${1}" 
                             data-qty_isi="${0}" 
                             data-type_barang="${item.type_barang}" 
                             data-type_barang_text="${item.type_barang_text}" 
@@ -1194,7 +1195,7 @@
                         stopLoading();
                     }
                 });
-                
+
             } else {
                 $(".barang_jadi").val("");
                 $(".standart_production").val("");
@@ -1548,7 +1549,7 @@
                 row += '<td>' + item.barang_name + '</td>';
                 row += '<td>' + item.kode_satuan + '</td>';
                 row += '<td>' + `
-                    <input  style="height:40px" class="form-control qty-barang-jadi" oninput="preventNegativeInput(this)" autocomplete="one-time-code" type="text" data-index="${index}" value="${item.qty}" <?= isset($data) && $data->is_posted == 1 ? "readonly" : ""; ?>>
+                    <input  style="height:40px" class="form-control qty-barang-jadi" autocomplete="one-time-code" type="text" data-index="${index}" value="${item.qty}" <?= isset($data) && $data->is_posted == 1 ? "readonly" : ""; ?>>
                 ` + '</td>';
                 row += '<td>' + `
                     <input  style="height:40px" class="form-control berat-barang-jadi" oninput="preventNegativeInput(this)" autocomplete="one-time-code" type="text" data-index="${index}" value="${item.qty2}" <?= isset($data) && $data->is_posted == 1 ? "readonly" : ""; ?>>
