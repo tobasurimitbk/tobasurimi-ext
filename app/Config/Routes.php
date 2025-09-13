@@ -878,7 +878,17 @@ $routes->get('/invoice-packing-customer/print/(:segment)', 'InvoiceExim\InvPacki
 $routes->get('/invoice-packing-bc', 'InvoiceExim\InvPackingBC\InvPackingBC::index', ['filter' => 'Auth']);
 $routes->get('/invoice-packing-bc/all-order-form', 'InvoiceExim\InvPackingBC\InvPackingBC::allOrderForm', ['filter' => 'Auth']);
 $routes->get('/invoice-packing-bc/detail/(:segment)', 'InvoiceExim\InvPackingBC\InvPackingBC::indexInvPackingBC/$1', ['filter' => 'Auth']);
-$routes->get('/invoice-packing-bc/create/(:segment)', 'InvoiceExim\InvPackingBC\InvPackingBC::createPackingCustomer/$1', ['filter' => 'Auth']);
+$routes->get('/invoice-packing-bc/create/(:segment)', 'InvoiceExim\InvPackingBC\InvPackingBC::createPackingBC/$1', ['filter' => 'Auth']);
+$routes->get('/invoice-packing-bc/all-invoice', 'InvoiceExim\InvPackingBC\InvPackingBC::allInvoice', ['filter' => 'Auth']);
+$routes->post('/invoice-packing-bc/create', 'InvoiceExim\InvPackingBC\InvPackingBC::store', ['filter' => 'Auth']);
+$routes->post('/invoice-packing-bc/delete', 'InvoiceExim\InvPackingBC\InvPackingBC::destroy', ['filter' => 'Auth']);
+$routes->post('/invoice-packing-bc/posting', 'InvoiceExim\InvPackingBC\InvPackingBC::posting', ['filter' => 'Auth']);
+$routes->post('/invoice-packing-bc/unposting', 'InvoiceExim\InvPackingBC\InvPackingBC::unposting', ['filter' => 'Auth']);
+$routes->post('/invoice-packing-bc/update', 'InvoiceExim\InvPackingBC\InvPackingBC::update', ['filter' => 'Auth']);
+$routes->get('/invoice-packing-bc/all-invoice', 'InvoiceExim\InvPackingBC\InvPackingBC::allInvoice', ['filter' => 'Auth']);
+$routes->get('/invoice-packing-bc/id/(:segment)', 'InvoiceExim\InvPackingBC\InvPackingBC::updatePackingBC/$1', ['filter' => 'Auth']);
+$routes->get('/invoice-packing-bc/duplicate/(:segment)', 'InvoiceExim\InvPackingBC\InvPackingBC::duplicatePackingBC/$1', ['filter' => 'Auth']);
+$routes->get('/invoice-packing-bc/print/(:segment)', 'InvoiceExim\InvPackingBC\InvPackingBC::printPackingBC/$1', ['filter' => 'Auth']);
 // $routes->get('/pi-peb/get', 'BiayaExim\PIPeb\PIPeb::getPiPeb', ['filter' => 'Auth']);
 // $routes->post('/pi-peb/update', 'BiayaExim\PIPeb\PIPeb::updatePiPeb', ['filter' => 'Auth']);
 

@@ -266,10 +266,14 @@ class BiayaKepitingModel extends Model
                 jasa_vendor_out_kepiting_kukus_detail.keterangan,
                 suppliers.name AS supplier_name,
                 MIN(jasa_vendor_out_kepiting_kukus.tanggal) AS tanggal_keluar,
-                SUM(jasa_vendor_out_kepiting_kukus_detail.qty) AS qty_kopek
+                SUM(jasa_vendor_out_kepiting_kukus_detail.qty) AS qty_kopek,
+                barang_master.id as barang_master_id,
+                barang_master_spesifikasi.id as spesifikasi_id
             ')
             ->join('jasa_vendor_out_kepiting_kukus', 'jasa_vendor_out_kepiting_kukus.id = jasa_vendor_out_kepiting_kukus_detail.jasa_vendor_out_kepiting_kukus_id')
             ->join('suppliers', 'suppliers.id = jasa_vendor_out_kepiting_kukus_detail.supplier_id', 'left')
+            ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = jasa_vendor_out_kepiting_kukus_detail.spesifikasi_id', 'left')
+            ->join('barang_master', 'barang_master.id = barang_master_spesifikasi.barang_master_id', 'left')
             ->join('jasa_vendor_in_kepiting_kukus_detail', 'jasa_vendor_in_kepiting_kukus_detail.jasa_vendor_out_kepiting_kukus_detail_id = jasa_vendor_out_kepiting_kukus_detail.id', 'inner')
             ->where('jasa_vendor_in_kepiting_kukus_detail.jasa_vendor_in_kepiting_kukus_id', $jasaVendorInID)
             ->where('jasa_vendor_out_kepiting_kukus_detail.deletedAt', null)
@@ -295,6 +299,8 @@ class BiayaKepitingModel extends Model
 
             $grouped[$groupKey] = [
                 'supplier'       => $outRow['supplier_name'],
+                'supplier_id'    => $outRow['supplier_id'],
+                'barang_master_id' => $outRow['barang_master_id'],
                 'keterangan'     => $outRow['keterangan'],
                 'qty_sebelum_kopek' => $outRow['qty_kopek'] ?? 0,
                 'tanggal_masuk'  => date('d/m/Y', strtotime($jasaVendorIn['tanggal'])),
@@ -450,7 +456,65 @@ class BiayaKepitingModel extends Model
 
 
         return $result;
+    }   
+
+
+   public function dropdownBarangKepitingKukusPrint($jasaVendorInID, $id = null)
+    {
+        $biayaKepitingDetailModel = new BiayaKepitingDetailModel();
+        $jasaVendorInModel = new JasaVendorInModel();
+
+        // cari data jasa vendor in buat tanggal masuk
+        $jasaVendorIn = $jasaVendorInModel->find($jasaVendorInID);
+        $tanggalMasuk = $jasaVendorIn ? date('d/m/Y', strtotime($jasaVendorIn['tanggal'])) : '-';
+
+        // ambil semua detail kepiting berdasarkan jasa_vendor_in_id
+        $biayaKepiting = $biayaKepitingDetailModel
+            ->select("
+                biaya_kepiting_detail.*,
+                barang_master.id AS barang_master_id,
+                barang_master.barang_name,
+                suppliers.name as supplier_name
+            ")
+            ->join('barang_master', 'barang_master.id = biaya_kepiting_detail.barang_master_id', 'left')
+            ->join('suppliers', 'suppliers.id = biaya_kepiting_detail.supplier_id', 'left')
+            ->where('biaya_kepiting_detail.jasa_vendor_in_id', $jasaVendorInID)
+            ->where('biaya_kepiting_detail.deletedAt', null)
+            ->findAll();
+
+        $result = [];
+
+        foreach ($biayaKepiting as $item) {
+            $key = $tanggalMasuk . '|' . ($item['supplier_name'] ?? '-');
+
+            if (!isset($result[$key])) {
+                $result[$key] = [
+                    'tanggal_masuk' => $tanggalMasuk,
+                    'supplier_name' => $item['supplier_name'] ?? '-',
+                    'jumbo' => 0,
+                    'ex_lump' => 0,
+                    'lump' => 0,
+                    'special' => 0,
+                    'claw' => 0,
+                    'mh' => 0,
+                    'cf' => 0,
+                    'qty_kopek' => 0,
+                ];
+            }
+
+            $result[$key]['jumbo']   += (float)$item['jumbo'];
+            $result[$key]['ex_lump'] += (float)$item['ex_lump'];
+            $result[$key]['lump']    += (float)$item['lump'];
+            $result[$key]['special'] += (float)$item['special'];
+            $result[$key]['claw']    += (float)$item['claw'];
+            $result[$key]['mh']      += (float)$item['mh'];
+            $result[$key]['cf']      += (float)$item['cf'];
+            $result[$key]['qty_kopek'] += (float)$item['qty_kopek'];
+        }
+        
+        return array_values($result);
     }
+
 
     public function dropdownPerolehanGaji($id = null)
     {

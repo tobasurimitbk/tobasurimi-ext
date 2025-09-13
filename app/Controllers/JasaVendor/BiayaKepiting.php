@@ -330,8 +330,10 @@ class BiayaKepiting extends BaseController
                 'jasa_vendor_in_id' => $this->request->getVar('jasa_vendor_in_id'),
                 'barang_master_id' => $b['barang_master_id'] ?? null,
                 'barang_master_spesifikasi_id' => $b['barang_master_spesifikasi_id'] ?? null,
+                'supplier_id' => $b['supplier_id'] ?? null,
+                'keterangan' => $b['keterangan'] ?? null,
                 // 'tanggal_masuk' => $b['tanggal_masuk'] ?? null,
-                // 'qty_sebelum_kopek' => $b['qty_sebelum_kopek'] ?? 0,
+                'qty_kopek' => $b['qty_sebelum_kopek'] ?? 0,
                 'rasio' => $b['rasio'] ?? 0,
                 'jumbo' => $b['spek']['JB'] ?? 0,
                 'ex_lump' => $b['spek']['SP LUMP'] ?? 0,
@@ -564,7 +566,7 @@ class BiayaKepiting extends BaseController
             'tanggal' => date('Y-m-d'),
             'biayaKepiting' => $this->biayaKepitingModel->find($id),
             'biayaKepitingBonus' => $this->biayaKepitingBonusModel->dropdownBarang($biayaKepiting['jasa_vendor_in_id'], $id),
-            'biayaKepitingDetail' => $this->biayaKepitingModel->dropdownBarangPrint($biayaKepiting['jasa_vendor_in_id'], $id),
+            'biayaKepitingDetail' => $this->biayaKepitingModel->dropdownBarangKepitingKukusPrint($biayaKepiting['jasa_vendor_in_id'], $id),
             'dataPerolehanGaji' => $this->biayaKepitingModel->dropdownPerolehanGaji($id)
         ];
 
