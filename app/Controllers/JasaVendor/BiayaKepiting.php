@@ -14,6 +14,11 @@ use App\Models\MetadataModel;
 use App\Models\VendorModel;
 use App\Models\WarehousesModel;
 use App\Models\BarangMasterSpesifikasiModel;
+use App\Models\JasaVendorInKepitingKukusDetailModel;
+use App\Models\JasaVendorInKepitingKukusModel;
+use App\Models\JasaVendorOutKepitingKukusDetailModel;
+use App\Models\JasaVendorOutKepitingKukusModel;
+
 use Dompdf\Dompdf;
 
 class BiayaKepiting extends BaseController
@@ -28,6 +33,10 @@ class BiayaKepiting extends BaseController
     protected $biayaKepitingGajiModel;
     protected $jasaVendorInModel;
     protected $jasaVendorInDetailModel;
+    protected $jasaVendorInKepitingKukusModel;
+    protected $jasaVendorInKepitingKukusDetailModel;
+    protected $jasaVendorOutKepitingKukusModel;
+    protected $jasaVendorOutKepitingKukusDetailModel;
     protected $vendorModel;
     protected $metaDataModel;
     protected $biayaKepitingBonusModel;
@@ -45,6 +54,10 @@ class BiayaKepiting extends BaseController
         $this->biayaKepitingGajiModel = new BiayaKepitingGajiModel();
         $this->jasaVendorInModel = new JasaVendorInModel();
         $this->jasaVendorInDetailModel = new JasaVendorInDetailModel();
+        $this->jasaVendorInKepitingKukusDetailModel = new JasaVendorInKepitingKukusDetailModel();
+        $this->jasaVendorInKepitingKukusModel = new JasaVendorInKepitingKukusModel();
+        $this->jasaVendorOutKepitingKukusDetailModel = new JasaVendorOutKepitingKukusDetailModel();
+        $this->jasaVendorOutKepitingKukusModel = new JasaVendorOutKepitingKukusModel();
         $this->vendorModel = new VendorModel();
         $this->metaDataModel = new MetadataModel();
         $this->biayaKepitingBonusModel = new BiayaKepitingBonusModel();
@@ -263,7 +276,7 @@ class BiayaKepiting extends BaseController
         $listPerolehanGaji = json_decode($this->request->getPost('listPerolehanGaji'), true);
         $listBonus = json_decode($this->request->getPost('listBonus'), true);
         
-        $jasaVendorIn = $this->jasaVendorInModel->find($this->request->getVar('jasa_vendor_in_id'));
+        $jasaVendorIn = $this->jasaVendorInKepitingKukusModel->find($this->request->getVar('jasa_vendor_in_id'));
         $biayaKepiting = $this->biayaKepitingModel->where('company_id', $this->this_company_id)
             ->where('no_pembayaran', $this->request->getVar('no_pembayaran'))
             ->first();
@@ -284,14 +297,6 @@ class BiayaKepiting extends BaseController
             ]);
         }
 
-        // Validasi bonus - ubah menjadi tidak wajib (opsional)
-        // if (count($listBonus) == 0) {
-        //     return $this->response->setJSON([
-        //         'message' => "Bonus tidak boleh kosong",
-        //         'status' => false,
-        //         'token' => csrf_hash()
-        //     ]);
-        // }
 
         // Format tanggal
         $tanggal = $this->request->getVar("tanggal");
@@ -389,143 +394,144 @@ class BiayaKepiting extends BaseController
 
     public function updateAction()
     {
-        $listBarang = json_decode($_POST['listBarang']);
-        $listPerolehanGaji = json_decode($_POST['listPerolehanGaji']);
-        $listBonus = json_decode($_POST['listBonus']);
+        $listBarang = json_decode($this->request->getPost('listBarang'), true);
+        $listPerolehanGaji = json_decode($this->request->getPost('listPerolehanGaji'), true);
+        $listBonus = json_decode($this->request->getPost('listBonus'), true);
         $id = decrypt($this->request->getVar('id'));
 
-        if (count($listBarang) == 0) {
-            return response()->setJSON([
+        if (empty($listBarang)) {
+            return $this->response->setJSON([
                 'message' => "Barang tidak boleh kosong",
                 'status' => false,
                 'token' => csrf_hash()
             ]);
         }
 
-        if (count($listBonus) == 0) {
-            return response()->setJSON([
+        if (empty($listBonus)) {
+            return $this->response->setJSON([
                 'message' => "Bonus tidak boleh kosong",
                 'status' => false,
                 'token' => csrf_hash()
             ]);
         }
 
+        // update header
         $this->biayaKepitingModel->update($id, [
             'keterangan' => $this->request->getVar('keterangan'),
             'status_posting' => '0'
         ]);
 
-        // get all id detail
         $id_detail_all = [];
         $id_detail_all_bonus = [];
 
+        // === UPDATE/INSERT DETAIL BARANG ===
         foreach ($listBarang as $b) {
             $check = $this->biayaKepitingDetailModel
                 ->where('biaya_kepiting_id', $id)
-                ->where('barang_master_id', $b->barang_master_id)
-                ->where('barang_master_spesifikasi_id', $b->barang_master_spesifikasi_id)
+                ->where('barang_master_id', $b['barang_master_id'])
+                ->where('barang_master_spesifikasi_id', $b['barang_master_spesifikasi_id'])
                 ->first();
 
-            if ($check != null) {
+            if ($check) {
                 $this->biayaKepitingDetailModel->update($check['id'], [
-                    'biaya_kepiting_id' => $id,
-                    'barang_master_id' => $b->barang_master_id,
-                    'barang_master_spesifikasi_id' => $b->barang_master_spesifikasi_id,
-                    'jumbo' => $b->jumbo,
-                    'ex_lump' => $b->ex_lump,
-                    'lump' => $b->lump,
-                    'special' => $b->special,
-                    'claw' => $b->claw,
-                    'mh' => $b->mh,
-                    'cf' => $b->cf,
+                    'jumbo' => $b['jumbo'],
+                    'ex_lump' => $b['ex_lump'],
+                    'lump' => $b['lump'],
+                    'special' => $b['special'],
+                    'claw' => $b['claw'],
+                    'mh' => $b['mh'],
+                    'cf' => $b['cf'],
                 ]);
-                array_push($id_detail_all, $check['id']);
+                $id_detail_all[] = $check['id'];
             } else {
-                // DELETE
-                $this->biayaKepitingDetailModel
-                    ->where('biaya_kepiting_id', $id)
-                    ->where('barang_master_id', $b->barang_master_id)
-                    ->where('barang_master_spesifikasi_id', $b->barang_master_spesifikasi_id)
-                    ->delete();
-                // INSERT
-                $id_detail_new =  $this->biayaKepitingDetailModel->insert([
+                $id_detail_new = $this->biayaKepitingDetailModel->insert([
                     'biaya_kepiting_id' => $id,
-                    'barang_master_id' => $b->barang_master_id,
                     'jasa_vendor_in_id' => $this->request->getVar('jasa_vendor_in_id'),
-                    'barang_master_spesifikasi_id' => $b->barang_master_spesifikasi_id,
-                    'jumbo' => $b->jumbo,
-                    'ex_lump' => $b->ex_lump,
-                    'lump' => $b->lump,
-                    'special' => $b->special,
-                    'claw' => $b->claw,
-                    'mh' => $b->mh,
-                    'cf' => $b->cf,
+                    'barang_master_id' => $b['barang_master_id'],
+                    'barang_master_spesifikasi_id' => $b['barang_master_spesifikasi_id'],
+                    'jumbo' => $b['jumbo'],
+                    'ex_lump' => $b['ex_lump'],
+                    'lump' => $b['lump'],
+                    'special' => $b['special'],
+                    'claw' => $b['claw'],
+                    'mh' => $b['mh'],
+                    'cf' => $b['cf'],
                 ]);
-                array_push($id_detail_all,  $id_detail_new);
+                $id_detail_all[] = $id_detail_new;
             }
         }
 
+        // === UPDATE/INSERT BONUS ===
         foreach ($listBonus as $b) {
             $check = $this->biayaKepitingBonusModel
                 ->where('biaya_kepiting_id', $id)
-                ->where('barang_master_id', $b->barang_master_id)
-                ->where('barang_master_spesifikasi_id', $b->barang_master_spesifikasi_id)
+                ->where('barang_master_id', $b['barang_master_id'])
+                ->where('barang_master_spesifikasi_id', $b['barang_master_spesifikasi_id'])
                 ->first();
 
-            if ($check != null) {
+            if ($check) {
                 $this->biayaKepitingBonusModel->update($check['id'], [
-                    'biaya_kepiting_id' => $id,
-                    'barang_master_id' => $b->barang_master_id,
-                    'barang_master_spesifikasi_id' => $b->barang_master_spesifikasi_id,
-                    'kg_bonus' => $b->kg_bonus,
-                    'bonus_nominal' => $b->bonus_nominal
+                    'kg_bonus' => $b['kg_bonus'],
+                    'bonus_nominal' => $b['bonus_nominal']
                 ]);
-                array_push($id_detail_all_bonus, $check['id']);
+                $id_detail_all_bonus[] = $check['id'];
             } else {
-                // DELETE
-                $this->biayaKepitingBonusModel
-                    ->where('biaya_kepiting_id', $id)
-                    ->where('barang_master_id', $b->barang_master_id)
-                    ->where('barang_master_spesifikasi_id', $b->barang_master_spesifikasi_id)
-                    ->delete();
-                // INSERT
-                $id_detail_new =  $this->biayaKepitingBonusModel->insert([
+                $id_detail_new = $this->biayaKepitingBonusModel->insert([
                     'jasa_vendor_in_id' => $this->request->getVar('jasa_vendor_in_id'),
                     'biaya_kepiting_id' => $id,
-                    'barang_master_id' => $b->barang_master_id,
-                    'barang_master_spesifikasi_id' => $b->barang_master_spesifikasi_id,
-                    'kg_bonus' => $b->kg_bonus,
-                    'bonus_nominal' => $b->bonus_nominal
+                    'barang_master_id' => $b['barang_master_id'],
+                    'barang_master_spesifikasi_id' => $b['barang_master_spesifikasi_id'],
+                    'kg_bonus' => $b['kg_bonus'],
+                    'bonus_nominal' => $b['bonus_nominal']
                 ]);
-                array_push($id_detail_all_bonus,  $id_detail_new);
+                $id_detail_all_bonus[] = $id_detail_new;
             }
         }
 
-        $this->biayaKepitingBonusModel->where('biaya_kepiting_id', $id)->whereNotIn('id', $id_detail_all_bonus)->delete();
+        // DELETE yang tidak ada di list terbaru
         $this->biayaKepitingDetailModel->where('biaya_kepiting_id', $id)->whereNotIn('id', $id_detail_all)->delete();
+        $this->biayaKepitingBonusModel->where('biaya_kepiting_id', $id)->whereNotIn('id', $id_detail_all_bonus)->delete();
 
+        // === UPDATE GAJI ===
         foreach ($listPerolehanGaji as $b) {
-            $check = $this->biayaKepitingGajiModel->where('biaya_kepiting_id', $id)->where('jenis', $b->description)->first();
-            $this->biayaKepitingGajiModel->update($check['id'], [
-                'biaya_kepiting_id' => $id,
-                'jumbo' => $b->jumbo,
-                'ex_lump' => $b->ex_lump,
-                'lump' => $b->lump,
-                'special' => $b->special,
-                'claw' => $b->claw,
-                'mh' => $b->mh,
-                'cf' => $b->cf,
-                'jenis' => $b->description
-            ]);
+            $check = $this->biayaKepitingGajiModel
+                ->where('biaya_kepiting_id', $id)
+                ->where('jenis', $b['description'])
+                ->first();
+
+            if ($check) {
+                $this->biayaKepitingGajiModel->update($check['id'], [
+                    'jumbo' => $b['jumbo'],
+                    'ex_lump' => $b['ex_lump'],
+                    'lump' => $b['lump'],
+                    'special' => $b['special'],
+                    'claw' => $b['claw'],
+                    'mh' => $b['mh'],
+                    'cf' => $b['cf'],
+                ]);
+            } else {
+                $this->biayaKepitingGajiModel->insert([
+                    'biaya_kepiting_id' => $id,
+                    'jenis' => $b['description'],
+                    'jumbo' => $b['jumbo'],
+                    'ex_lump' => $b['ex_lump'],
+                    'lump' => $b['lump'],
+                    'special' => $b['special'],
+                    'claw' => $b['claw'],
+                    'mh' => $b['mh'],
+                    'cf' => $b['cf'],
+                ]);
+            }
         }
 
-        return response()->setJSON([
+        return $this->response->setJSON([
             'message' => "Biaya kepiting berhasil diupdate",
-            'token' => csrf_token(),
+            'token' => csrf_hash(),
             'id' => encrypt($id),
             'status' => true
         ]);
     }
+
 
     public function delete()
     {
@@ -639,7 +645,7 @@ class BiayaKepiting extends BaseController
             $dataBonus = $this->biayaKepitingBonusModel->dropdownBarang($jasaVendorInID);
         } else {
             $id = decrypt($id);
-            $data = $this->biayaKepitingModel->dropdownBarang($jasaVendorInID, $id);
+            $data = $this->biayaKepitingModel->dropdownBarangKepitingKukus($jasaVendorInID, $id);
             $dataPerolehanGaji = $this->biayaKepitingModel->dropdownPerolehanGaji($id);
             $dataBonus = $this->biayaKepitingBonusModel->dropdownBarang($jasaVendorInID, $id);
         }
