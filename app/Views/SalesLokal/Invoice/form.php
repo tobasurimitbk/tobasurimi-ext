@@ -568,8 +568,8 @@
                 tax = 1 + (taxes / 100);
                 itemSubafterTax = itemAmt / tax;
                 taxAfterDpp = itemAmt - itemSubafterTax;
-                itemSubTotal = Math.round(itemSubafterTax);
-                taxTotalHtml = Math.round(taxAfterDpp);
+                itemSubTotal += Math.round(itemSubafterTax);
+                taxTotalHtml += Math.round(taxAfterDpp);
             } else {
                 itemSubTotal += itemAmt;
                 taxTotalHtml += taxAmt;

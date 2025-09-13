@@ -73,6 +73,7 @@ class MaterialRequestsPenolongModel extends Model
             material_request_penolong_details.satuan,
             material_request_penolong_details.kimia,
             SUM(material_request_penolong_details.qty) as total,
+            GROUP_CONCAT(DISTINCT barang_master.barang_name SEPARATOR ', ') AS nama_barang,
         ";
 
         $materialRequestsDataQry = $this->asObject()

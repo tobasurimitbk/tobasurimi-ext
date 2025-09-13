@@ -219,12 +219,12 @@ class Invoice extends BaseController
                     'required' => 'Tanggal Faktur tidak boleh kosong',
                 ]
             ],
-            "doc_type" => [
-                "rules" => "required|in_list[pesanan,pengiriman,penjualan]",
-                'errors' => [
-                    'required' => 'Jenis dokumen tidak boleh kosong',
-                ]
-            ],
+            // "doc_type" => [
+            //     "rules" => "required|in_list[pesanan,pengiriman,penjualan]",
+            //     'errors' => [
+            //         'required' => 'Jenis dokumen tidak boleh kosong',
+            //     ]
+            // ],
             "terms" => [
                 "rules" => "permit_empty",
                 'errors' => [

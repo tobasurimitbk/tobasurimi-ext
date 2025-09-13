@@ -664,43 +664,60 @@ class ProductionResult extends BaseController
 
     public function getListWorkOrderByID()
     {
-        $kodeProduksi = $this->request->getVar('kode_produksi');
-        
-        if (!empty($kodeProduksi)) {
-            // Jika multiple ID, konversi ke array
-            $woIds = is_array($kodeProduksi) ? $kodeProduksi : [$kodeProduksi];
-            
-            // Modifikasi query untuk menangani multiple ID
+        $kodeProduksi = $this->request->getGet('kode_produksi'); // "11,40"
+
+        if ($kodeProduksi) {
+            // pisahkan string jadi array angka
+            $woIds = array_map('intval', explode(',', $kodeProduksi));
+
             $dataResult = $this->workOrderDetailsModel
-                ->select('work_order_details.*, barang.nama_barang, barang.spesifikasi, barang.kode_barang, satuan.unit')
-                ->join('barang', 'barang.id = work_order_details.barang1_id', 'left')
-                ->join('satuan', 'satuan.id = barang.satuan_id', 'left')
-                ->whereIn('work_order_details.work_order_id', $woIds) // Gunakan whereIn untuk multiple ID
+                ->select('work_order_details.*, 
+                    barang_master.barang_name, 
+                    barang_master_spesifikasi.spesifikasi, 
+                    barang_master.kode_barang, 
+                    barang_master.type_barang, 
+                    satuans.kode_satuan, 
+                    satuans.nama_satuan
+                ')
+                ->join('barang_master', 'barang_master.id = work_order_details.barang1_id', 'left')
+                ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.barang_master_id = work_order_details.barang1_id', 'left')
+                ->join('satuans', 'satuans.id = barang_master_spesifikasi.satuan_1', 'left')
+                ->whereIn('work_order_details.work_order_id', $woIds)
                 ->where('work_order_details.deletedAt', null)
+                ->groupBy('barang_master_spesifikasi.id')
                 ->findAll();
-                
-            foreach ($dataResult as $key => &$value) {
-                if ($value['type_barang'] == "bahan_baku") {
-                    $value['type_barang_text'] = "BAHAN BAKU";
-                } elseif ($value['type_barang'] == "bahan_penolong") {
-                    $value['type_barang_text'] = "BAHAN PENOLONG";
-                } elseif ($value['type_barang'] == "bahan_jadi") {
-                    $value['type_barang_text'] = "BARANG JADI";
-                } elseif ($value['type_barang'] == "bahan_scrap") {
-                    $value['type_barang_text'] = "BARANG SCRAP";
-                } elseif ($value['type_barang'] == "bahan_modal") {
-                    $value['type_barang_text'] = "BARANG MODAL";
-                } elseif ($value['type_barang'] == "bahan_setengah_jadi") {
-                    $value['type_barang_text'] = "BAHAN SETENGAH JADI";
+
+            foreach ($dataResult as &$value) {
+                switch ($value['type_barang']) {
+                    case "bahan_baku":
+                        $value['type_barang_text'] = "BAHAN BAKU";
+                        break;
+                    case "bahan_penolong":
+                        $value['type_barang_text'] = "BAHAN PENOLONG";
+                        break;
+                    case "bahan_jadi":
+                        $value['type_barang_text'] = "BARANG JADI";
+                        break;
+                    case "bahan_scrap":
+                        $value['type_barang_text'] = "BARANG SCRAP";
+                        break;
+                    case "bahan_modal":
+                        $value['type_barang_text'] = "BARANG MODAL";
+                        break;
+                    case "bahan_setengah_jadi":
+                        $value['type_barang_text'] = "BAHAN SETENGAH JADI";
+                        break;
                 }
             }
-            
-            return response()->setJSON([
-                'data' => $dataResult,
-                'token' => csrf_hash(),
-                'status' => true
+
+            return $this->response->setJSON([
+                'status' => true,
+                'data'   => $dataResult,
+                'token'  => csrf_hash()
             ]);
         }
+
+        return $this->response->setJSON(['status' => false, 'data' => []]);
     }
 
     public function getListMaterialRequestByID()
@@ -733,23 +750,24 @@ class ProductionResult extends BaseController
     public function getListMaterialRequestByWOID()
     {
         $kodeProduksi = $this->request->getVar('kode_produksi');
-        
+
         // Jika multiple ID, konversi ke array
         $woIds = is_array($kodeProduksi) ? $kodeProduksi : [$kodeProduksi];
-        
+
         $dataMaterialRequest = $this->materialRequestModel->asObject()
             ->select('material_requests.*, GROUP_CONCAT(material_request_details.nama_barang SEPARATOR \', \') AS nama_barang, users.name AS user_name')
             ->join('material_request_details', 'material_request_details.material_request_id = material_requests.id', 'left')
             ->join('users', 'users.id = material_requests.createdBy', 'left')
             ->where('company_id', $this->this_company_id)
             ->where('material_requests.is_posted', 1)
+            ->where('material_requests.is_approve', 1)
             ->where('material_requests.deletedAt', null)
             ->where('material_request_details.deletedAt', null)
             ->where('material_request_details.qty_now >', 0)
             ->whereIn('material_requests.work_order_id', $woIds) // Gunakan whereIn untuk multiple ID
             ->groupBy('material_request_details.material_request_id')
             ->find();
-            
+
         if ($dataMaterialRequest) {
             return response()->setJSON([
                 'data' => $dataMaterialRequest,
@@ -763,7 +781,7 @@ class ProductionResult extends BaseController
             ]);
         }
     }
-    
+
     public function updateStatusPostedProductionResult()
     {
         try {
