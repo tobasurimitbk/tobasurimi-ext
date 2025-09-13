@@ -1669,7 +1669,7 @@ function sendDataToServer(data) {
                     confirmButtonText: 'OK'
                 }).then(() => {
                     // Redirect atau lakukan sesuatu setelah sukses
-                    window.location.href = '/biaya-kepiting/edit/' + response.id;
+                    window.location.href = '/biaya-kepiting/';
                 });
             } else {
                 // Gagal
