@@ -886,6 +886,9 @@
                 var newRow = $('<tr style="color:whitesmoke;">');
                 newRow.append($('<td style="text-align: center;">').html(`${no++}`));
                 newRow.append($('<td style="text-align: center;">').text(v.tanggal_masuk));
+                newRow.attr('data-keterangan', v.keterangan);
+                newRow.attr('data-supplier_id', v.supplier_id);
+                newRow.attr('data-master_barang_id', v.master_barang_id);
                 newRow.append($('<td style="text-align: center;">').text(v.supplier + ' - ' + v.keterangan));
                 newRow.append($('<td>').text(parseFloat(v.qty_sebelum_kopek).toFixed(2)));
                 newRow.append($('<td>').text(rasio + ' %'));
@@ -1497,6 +1500,9 @@ function collectBarangData() {
         const barangData = {
             tanggal_masuk: row.find('td:eq(1)').text(),
             supplier_keterangan: row.find('td:eq(2)').text(),
+            supplier_id: row.data('supplier_id'),
+            keterangan: row.data('keterangan'),
+            master_barang_id: row.data('master_barang_id'),
             qty_sebelum_kopek: parseFloat(row.find('td:eq(3)').text()) || 0,
             rasio: parseFloat(row.find('td:eq(4)').text()) || 0,
             spek: {}
