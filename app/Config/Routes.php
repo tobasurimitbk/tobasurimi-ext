@@ -737,7 +737,15 @@ $routes->get('/report-ekspor/contract', 'SalesInternasional\ReportEkspor::indexB
 $routes->get('/report-ekspor/contract-all', 'SalesInternasional\ReportEkspor::allByContract', ['filter' => 'Auth']);
 $routes->get('/report-ekspor/contract-export', 'SalesInternasional\ReportEkspor::exportExcelByContract', ['filter' => 'Auth']);
 
-
+// Sample Ekspor
+$routes->get('/sample-ekspor', 'SalesInternasional\Sample::index', ['filter' => 'Auth']);
+$routes->get('/sample-ekspor/create', 'SalesInternasional\Sample::createView', ['filter' => 'Auth']);
+$routes->post('/sample-ekspor/create', 'SalesInternasional\Sample::store', ['filter' => 'Auth']);
+$routes->get('/sample-ekspor/all', 'SalesInternasional\Sample::all', ['filter' => 'Auth']);
+$routes->post('/sample-ekspor/update', 'SalesInternasional\Sample::update', ['filter' => 'Auth']);
+$routes->post('/sample-ekspor/delete', 'SalesInternasional\Sample::delete', ['filter' => 'Auth']);
+$routes->get('/sample-ekspor/id/(:segment)', 'SalesInternasional\Sample::updateView/$1', ['filter' => 'Auth']);
+$routes->get('/sample-ekspor/print/(:segment)', 'SalesInternasional\Sample::print/$1', ['filter' => 'Auth']);
 
 // Customer Lokal
 $routes->get('/customer-lokal', 'SalesLokal\Customer::index', ['filter' => 'Auth']);
