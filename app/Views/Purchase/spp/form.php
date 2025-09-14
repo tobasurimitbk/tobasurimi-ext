@@ -2255,7 +2255,7 @@
                 'nama_satuan': "<?= $d->kode_satuan ?>",
                 'satuan_id': "<?= $d->unit ?>",
                 'qty': "<?= $d->qty ?>",
-                'keterangan': "<?= str_replace('"', '\"', $d->note)  ?>"
+                'keterangan': "<?= trim(str_replace('"', '\"', $d->note))  ?>"
             });
         <?php endforeach; ?>
         drawTableDetail();

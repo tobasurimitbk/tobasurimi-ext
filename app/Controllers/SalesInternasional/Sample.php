@@ -4,6 +4,7 @@ namespace App\Controllers\SalesInternasional;
 
 use App\Controllers\BaseController;
 use App\Models\BarangMasterSalesModel;
+use App\Models\CompaniesModel;
 use App\Models\DivisisModel;
 use App\Models\SampleDetailModel;
 use App\Models\SampleModel;
@@ -21,6 +22,7 @@ class Sample extends BaseController
     protected $barangMasterSalesModel;
     protected $sampleModel;
     protected $sampleDetailModel;
+    protected $companyModel;
     protected $dompdf;
 
     public function __construct()
@@ -33,6 +35,7 @@ class Sample extends BaseController
         $this->barangMasterSalesModel = new BarangMasterSalesModel();
         $this->sampleModel = new SampleModel();
         $this->sampleDetailModel = new SampleDetailModel();
+        $this->companyModel = new CompaniesModel();
         $this->dompdf = new Dompdf();
     }
 
@@ -159,13 +162,17 @@ class Sample extends BaseController
     public function print($id)
     {
         $id = decrypt($id);
-        $dataSample = $this->sampleModel->where('id', $id)->first();
+        $dataSample = $this->sampleModel
+            ->select('sample.*,divisis.divisi')
+            ->join('divisis', 'divisis.id = sample.divisi_id', 'left')
+            ->where('sample.id', $id)
+            ->first();
+
         if ($dataSample == null) {
             return redirect()->to('sample-ekspor');
         }
 
         $dataSatuan = $this->satuanModel->findAll();
-        $dataDivisi = $this->divisiModel->getDivisiAccess();
         $dataBarang = $this->barangMasterSalesModel
             ->where('company_id', $this->this_company_id)
             ->where('type_barang_sales', "EKSPOR")
@@ -173,13 +180,14 @@ class Sample extends BaseController
             ->orderBy('barang_name', "asc")
             ->findAll();
         $dataBarangList = $this->sampleDetailModel->getSampleDetail($id);
+        $company = $this->companyModel->where('id', $this->this_company_id)->first();
 
         $data = [
             'dataSample' => $dataSample,
             'dataBarangList' => $dataBarangList,
             'dataSatuan' => $dataSatuan,
-            "dataDivisi" => $dataDivisi,
-            'dataBarang' => $dataBarang
+            'dataBarang' => $dataBarang,
+            "company" => $company
         ];
 
         $this->dompdf->loadHtml(view('SalesInternasional/Sample/print', $data));

@@ -57,7 +57,7 @@
                         <div class="form-floating mb-3" style="height: 50px;">
                             <div class="input-group input-group-password">
                                 <div class="form-floating mb-3" style="height: 50px;">
-                                    <input autocomplete="one-time-code" type="text" value="<?= !empty($dataSample) ? $dataSample['no_sample'] : 'AUTO GENERATE' ?>" class="form-control no_sample" id="no_sample" name="no_sample" placeholder="Sales Order No" required readonly>
+                                    <input <?= !empty($dataSample) ? '' : 'readonly' ?> autocomplete="one-time-code" type="text" value="<?= !empty($dataSample) ? $dataSample['no_sample'] : 'AUTO GENERATE' ?>" class="form-control no_sample" id="no_sample" name="no_sample" placeholder="Sales Order No" required>
                                     <label for="floatingInput">Sample No</label>
                                 </div>
                                 <div style="<?= !empty($dataSample) ? "display: none" : ""; ?>" class="input-generate input-group-prepend group-prepend-password align-items-center">
@@ -723,8 +723,8 @@
                 newRow.append($('<td>').text(item.via));
                 newRow.append($('<td>').text(item.qty));
                 newRow.append($('<td>').text(item.kode_satuan));
-                newRow.append($('<td>').text(item.berat_kotor));
-                newRow.append($('<td>').text(item.berat_bersih));
+                newRow.append($('<td>').text(greatFormatRupiah(item.berat_kotor)));
+                newRow.append($('<td>').text(greatFormatRupiah(item.berat_bersih)));
 
                 newRow.append($('<td>').html(`
                         <button type="button" class="btn btn-warning posting-spp mr-1" onclick="detailRowBarang('${item.id_barang}')">
