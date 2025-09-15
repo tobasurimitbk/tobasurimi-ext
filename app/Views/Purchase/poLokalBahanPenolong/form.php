@@ -355,8 +355,8 @@
                                 <th style="text-align: center;">Kode</th>
                                 <th style="text-align: center;">Barang</th>
                                 <th style="text-align: center;">Satuan</th>
-                                <th style="text-align: center;">Harga Satuan</th>
                                 <th style="text-align: center;">Qty</th>
+                                <th style="text-align: center;">Harga Satuan</th>
                                 <th style="text-align: center;">Diskon (%)</th>
                                 <th style="text-align: center;">Tambahan</th>
                                 <th style="text-align: center;">Total</th>
@@ -1009,8 +1009,8 @@
             newRow.append($('<td>').text(v.kode_barang));
             newRow.append($('<td>').text(v.nama_barang));
             newRow.append($('<td>').text(v.nama_satuan));
-            newRow.append($('<td>').text(greatFormatRupiah(v.harga_satuan)));
             newRow.append($('<td>').text(parseFloat(v.qty)));
+            newRow.append($('<td>').text(greatFormatRupiah(v.harga_satuan)));
             newRow.append($('<td>').text(v.diskon));
             newRow.append($('<td>').text(greatFormatRupiah(v.biaya_tambahan)));
             newRow.append($('<td>').text(greatFormatRupiah(v.total)));

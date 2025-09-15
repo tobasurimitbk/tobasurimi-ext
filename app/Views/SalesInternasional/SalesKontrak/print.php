@@ -463,30 +463,30 @@
                             <table style="margin-left: -3px;">
                                 <?php if (!empty($detail['species'])): ?>
                                     <tr>
-                                        <td style="display: inline-block; font-weight: bold; ">SPECIES</td>
-                                        <td>:</td>
-                                        <td><?= trim($detail['species']) ?></td>
+                                        <td style="font-weight: bold; vertical-align: top;">SPECIES</td>
+                                        <td style="vertical-align: top;">:</td>
+                                        <td style="vertical-align: top;"><?= trim($detail['species']) ?></td>
                                     </tr>
                                 <?php endif; ?>
                                 <?php if (!empty($detail['specs'])): ?>
                                     <tr>
-                                        <td style="display: inline-block; font-weight: bold;">SPECS</td>
-                                        <td>:</td>
-                                        <td><?= trim($detail['specs']) ?></td>
+                                        <td style="font-weight: bold; vertical-align: top;">SPECS</td>
+                                        <td style="vertical-align: top;">:</td>
+                                        <td style="vertical-align: top;"><?= trim($detail['specs']) ?></td>
                                     </tr>
                                 <?php endif; ?>
                                 <?php if (!empty($detail['brand'])): ?>
                                     <tr>
-                                        <td style="display: inline-block; font-weight: bold;">BRAND</td>
-                                        <td>:</td>
-                                        <td><?= trim($detail['brand']) ?></td>
+                                        <td style="font-weight: bold;vertical-align: top;">BRAND</td>
+                                        <td style="vertical-align: top;">:</td>
+                                        <td style="vertical-align: top;"><?= trim($detail['brand']) ?></td>
                                     </tr>
                                 <?php endif; ?>
                                 <?php if (!empty($detail['kemasan'])): ?>
                                     <tr>
-                                        <td style="display: inline-block; font-weight: bold;">PACKING</td>
-                                        <td>:</td>
-                                        <td><?= trim($detail['kemasan']) ?></td>
+                                        <td style="font-weight: bold;vertical-align: top;">PACKING</td>
+                                        <td style="vertical-align: top;">:</td>
+                                        <td style="vertical-align: top;"><?= trim($detail['kemasan']) ?></td>
                                     </tr>
                                 <?php endif; ?>
 
