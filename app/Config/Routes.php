@@ -707,6 +707,7 @@ $routes->post('/order-form-internasional/update-status', 'SalesInternasional\Ord
 $routes->get('/order-form-internasional/generate-no-order-form', 'SalesInternasional\OrderForm::generateNomorSalesOrderInternasional', ['filter' => 'Auth']);
 // $routes->post('/order-form-internasional/update-remark', 'SalesInternasional\OrderForm::updateRemark', ['filter' => 'Auth']);
 $routes->post('/order-form-internasional/delete', 'SalesInternasional\OrderForm::destroy', ['filter' => 'Auth']);
+$routes->get('/order-form-internasional/duplicate/(:segment)', 'SalesInternasional\OrderForm::duplicateOrderForm/$1', ['filter' => 'Auth']);
 
 // Master Barang Internasional
 $routes->get('/master-barang-internasional', 'SalesInternasional\Barang::bahanJadiView', ['filter' => 'Auth']);

@@ -503,6 +503,64 @@ class OrderForm extends BaseController
         return view('SalesInternasional/OrderForm/form', $data);
     }
 
+    public function duplicateOrderForm($id)
+    {
+        $id = decrypt($id);
+        $dataSatuan = $this->satuanModel->findAll();
+        $dataSalesExport = $this->salesOrderExportModel
+            ->asObject()
+            ->select('
+                sales_order_export.*, 
+                sales_contract.sales_contract_no,
+                sales_contract.due_date,
+                sales_contract.shipment_date,
+                customers.name AS customer_name,
+                CONCAT(metadata.value, " - ", metadata.description) AS currencyName,
+                sales_contract.dicharge_port,
+                sales_contract.customer_po_no,
+                divisis.divisi
+            ')
+            ->join('sales_contract', 'sales_contract.id = sales_order_export.sales_contract_id', 'left')
+            ->join('customers', 'customers.id = sales_contract.customer_id', 'left')
+            ->join('metadata', 'metadata.id = sales_contract.currency', 'left')
+            ->join('divisis', 'divisis.id = sales_order_export.divisi_id', 'left')
+            ->where('sales_order_export.sales_order_export_id', $id)
+            ->orderBy('sales_order_export.createdAt', "DESC")
+            ->first();
+        $dataSalesExportDetail =  $this->salesOrderExportModel
+            ->getDetailSalesKontrakInOrderForm(
+                $dataSalesExport->sales_contract_id,
+                $id
+            );
+
+        $dataSalesExportSpecs = $this->salesOrderExportModel->getSalesOrderSpecs($id);
+        $dataSalesKontrak = $this->salesKontrakModel->getSalesKontrakList();
+
+
+        $dataSalesExportAdditional = $this->salesOrderExportAdditionalModel
+            ->where('sales_order_export_id', $id)
+            ->findAll();
+
+        $dataAJU = $this->metaDataModel->getBCUsed('so_internasional');
+        $dataDivisi = $this->divisiModel->getDivisiAccess();
+        $dataCompany = $this->companyModel->whereIn('id', [1, 2])->findAll();
+
+        $data = [
+            "id" => encrypt($id),
+            'dataSatuan' => $dataSatuan,
+            'dataSalesExport' => $dataSalesExport,
+            "dataAJU" => $dataAJU,
+            "dataDivisi" => $dataDivisi,
+            "dataSalesExportDetail" => $dataSalesExportDetail,
+            "dataSalesExportSpecs" => $dataSalesExportSpecs,
+            "dataSalesKontrak" => $dataSalesKontrak,
+            "dataSalesExportAdditional" => $dataSalesExportAdditional,
+            "dataCompany" => $dataCompany
+        ];
+
+        return view('SalesInternasional/OrderForm/form_duplicate', $data);
+    }
+
     public function update()
     {
         $id = decrypt($this->request->getPost("id"));

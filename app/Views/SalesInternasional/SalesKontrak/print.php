@@ -127,12 +127,14 @@
             <?php if ($company['id'] != 15): ?>
                 <td>
                     <?php if ($company['id'] == 2): ?>
+                        <!-- KIM 2 -->
                         <div style="text-align: right; margin-left:-20px; margin-right:40px; ">
                             <img src="<?= $company['logo'] ?>" style="width: 140px; height:100px; text-align:right; margin-top:-5px" alt="">
                         </div>
                     <?php else : ?>
+                        <!-- KIM 1 -->
                         <div style="text-align: right; margin-left:-20px; margin-right:40px; ">
-                            <img src="<?= $company['logo'] ?>" style="width: 190px; text-align:right; margin-top:-5px" alt="">
+                            <img src="<?= $company['logo'] ?>" style="width: 190px; height:140px; text-align:right; margin-top:-5px" alt="">
                         </div>
                     <?php endif; ?>
                 </td>
