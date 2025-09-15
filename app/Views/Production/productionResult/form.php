@@ -1612,7 +1612,7 @@
             list_items_barang_digunakan.map((item, index) => {
                 var qty = item.qty2 ? item.qty2 : item.qty;
                 totalQtyDigunakan += parseFloat(qty || 0);
-                totalQtyRequest += parseFloat(item.qty || 0);
+                totalQtyRequest += parseFloat((item.qty_now ?? item.qty) || 0);
 
                 row += '<tr style="color:whitesmoke;">';
                 row += '<td>' + no + '</td>';
