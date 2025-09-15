@@ -125,23 +125,29 @@ class Divisi extends BaseController
             ];
 
             if ($this->validate($rules)) {
+                $typeDivisi = $this->request->getVar('type_divisi');
+                $komponenGaji = $this->request->getPost('komponenGaji');
+                $divisi = strtoupper($this->request->getVar('divisi'));
+                $jamKerjaId = $this->request->getPost('jam_kerja_id');
 
-                $first = $this->DivisisModel->where('company_id', $this->this_company_id)->where('divisi', strtoupper($this->request->getVar('divisi')))->first();
+                $first = $this->DivisisModel
+                    ->where('company_id', $this->this_company_id)
+                    ->where('divisi', $divisi)
+                    ->first();
+
                 if ($first != null) {
                     return response()->setJSON([
                         'status' => false,
                         'token' => csrf_hash(),
-                        'message' => "Departemen " . strtoupper($this->request->getVar('divisi')) . " sudah ada"
+                        'message' => "Departemen " . $divisi . " sudah ada"
                     ]);
                 }
 
-                $komponenGaji = $this->request->getPost('komponenGaji');
-
-                if (empty($komponenGaji)) {
+                if (empty($komponenGaji) && $typeDivisi != "UMUM") {
                     return response()->setJSON([
                         "status"    => false,
                         "token" => csrf_hash(),
-                        "message"   => "Checklist minimal satu komponen gaji !",
+                        "message"   => "Checklist minimal satu komponen gaji untuk departemen personalia atau gabungan !",
                     ]);
                 }
 
@@ -158,42 +164,41 @@ class Divisi extends BaseController
 
                 $divisiInserted = $this->DivisisModel->insert([
                     "company_id" => $this->this_company_id,
-                    "divisi" => strtoupper($this->request->getVar("divisi")),
-                    "jam_kerja_id" => $this->request->getPost('jam_kerja_id'),
-                    "type_divisi"   => $this->request->getVar("type_divisi")
+                    "divisi" => $divisi,
+                    "jam_kerja_id" => $jamKerjaId,
+                    "type_divisi"   => $typeDivisi
                 ]);
 
                 foreach ($komponenGaji as $k) {
                     if (in_array($k, array_keys($_POST))) {
-                        $angka = preg_replace("/[^0-9,]/", "", $this->request->getVar($k));
-                        $angka = str_replace(",", ".", $angka);
-                        $angkaDesimal = number_format((float) $angka, 3, '.', '');
+                        $angka = $this->request->getVar($k);
 
                         $this->gajiDivisiModel->insert([
                             "tunjangan_id" => $k,
                             "division_id" => $divisiInserted,
                             "company_id" => $this->this_company_id,
-                            "nominal" => $angkaDesimal
+                            "nominal" => $angka
                         ]);
                     }
                 }
 
-                return \response()->setJSON([
+                return response()->setJSON([
                     "status"    => true,
                     "message"   => "Data Berhasil disimpan",
                     'token' => csrf_hash()
                 ]);
             } else {
-                return \response()->setJSON([
+                return response()->setJSON([
                     "status"    => \false,
                     "message"   => "Terjadi kesalahan saat validasi data",
                     'token' => csrf_hash()
                 ]);
             }
         } catch (\Exception $e) {
-            return \response()->setJSON([
+            return response()->setJSON([
                 "status"    => \false,
                 "message"   => $e->getMessage(),
+                'token' => csrf_hash()
             ]);
         }
     }
@@ -213,22 +218,31 @@ class Divisi extends BaseController
             if ($this->validate($rules)) {
 
                 $id = decrypt($this->request->getPost("id"));
+                $typeDivisi = $this->request->getVar('type_divisi');
+                $komponenGaji = $this->request->getPost('komponenGaji');
+                $divisi = strtoupper($this->request->getVar('divisi'));
+                $jamKerjaId = $this->request->getPost('jam_kerja_id');
+                $komponenGaji = $this->request->getPost('komponenGaji');
 
-                $first = $this->DivisisModel->where('company_id', $this->this_company_id)->where('divisi', strtoupper($this->request->getVar('divisi')))->where('id !=', $id)->first();
+                $first = $this->DivisisModel
+                    ->where('company_id', $this->this_company_id)
+                    ->where('divisi', $divisi)
+                    ->where('id !=', $id)
+                    ->first();
+
                 if ($first != null) {
                     return response()->setJSON([
                         'status' => false,
                         'token' => csrf_hash(),
-                        'message' => "Departemen " . strtoupper($this->request->getVar('divisi')) . " sudah digunakan"
+                        'message' => "Departemen " . $divisi . " sudah digunakan"
                     ]);
                 }
 
-                $komponenGaji = $this->request->getPost('komponenGaji');
-
-                if (empty($komponenGaji)) {
-                    return \response()->setJSON([
+                if (empty($komponenGaji) && $typeDivisi != "UMUM") {
+                    return response()->setJSON([
                         "status"    => \false,
-                        "message"   => "Checklist minimal satu komponen gaji",
+                        "token" => csrf_hash(),
+                        "message"   => "Checklist minimal satu komponen gaji untuk departemen personalia atau gabungan !",
                     ]);
                 }
 
@@ -245,42 +259,40 @@ class Divisi extends BaseController
 
                 $this->DivisisModel->update($id, [
                     "company_id" => $this->this_company_id,
-                    "divisi" => strtoupper($this->request->getVar("divisi")),
-                    "jam_kerja_id" => $this->request->getPost('jam_kerja_id'),
-                    "type_divisi"   => $this->request->getVar("type_divisi")
+                    "divisi" => $divisi,
+                    "jam_kerja_id" => $jamKerjaId,
+                    "type_divisi"   => $typeDivisi
                 ]);
 
                 $this->gajiDivisiModel->where('division_id', $id)->delete();
 
                 foreach ($komponenGaji as $k) {
                     if (in_array($k, array_keys($_POST))) {
-                        $angka = preg_replace("/[^0-9,]/", "", $this->request->getVar($k));
-                        $angka = str_replace(",", ".", $angka);
-                        $angkaDesimal = number_format((float) $angka, 3, '.', '');
+                        $angka = $this->request->getVar($k);
 
                         $this->gajiDivisiModel->insert([
                             "tunjangan_id" => $k,
                             "division_id" => $id,
                             "company_id" => $this->this_company_id,
-                            "nominal" => $angkaDesimal
+                            "nominal" => $angka
                         ]);
                     }
                 }
 
-                return \response()->setJSON([
+                return response()->setJSON([
                     "status"    => true,
                     "message"   => "Data Berhasil diupdate",
                     'token' => csrf_hash()
                 ]);
             } else {
-                return \response()->setJSON([
+                return response()->setJSON([
                     "status"    => \false,
                     "message"   => "Terjadi kesalahan saat validasi data",
                     'token' => csrf_hash()
                 ]);
             }
         } catch (\Exception $e) {
-            return \response()->setJSON([
+            return response()->setJSON([
                 "status"    => \false,
                 "message"   => $e->getMessage(),
             ]);
@@ -292,7 +304,7 @@ class Divisi extends BaseController
         $id = decrypt($id);
         $data = $this->DivisisModel->get_by_id($id);
 
-        return \response()->setJSON([
+        return response()->setJSON([
             'status' => true,
             'data' => (\count($data) == 0) ? null : (object)$this->DivisisModel->get_by_id($id)[0],
             'komponenGaji' => $this->DivisisModel->getTunjanganByDivisi($id),
@@ -303,45 +315,22 @@ class Divisi extends BaseController
     {
         try {
             $id = decrypt($this->request->getPost("id"));
+            $this->DivisisModel->delete($id);
+            $this->gajiDivisiModel->where('division_id', $id)->delete(null, false);
 
-            if (!empty($id)) {
-                $values = [
-                    "deletedAt" => date("Y-m-d H:i:s")
-                ];
-                if ($this->DivisisModel->update($id, $values)) {
-                    $data = [
-                        "status"            => true,
-                        "message"   => "Data Berhasil dihapus",
-                        'token' => csrf_hash()
-                    ];
-
-                    echo json_encode($data);
-                } else {
-                    $message = 'Data Gagal Dihapus';
-                    $data = [
-                        "status"            => false,
-                        "message"    => $message,
-                        'token' => csrf_hash()
-                    ];
-                    echo json_encode($data);
-                }
-            } else {
-                $data = [
-                    "status"            => false,
-                    "message"    => "Data Gagal Dihapus",
-                    'token' => csrf_hash()
-                ];
-                echo json_encode($data);
-            }
+            return response()->setJSON([
+                "status"  => true,
+                "message" => "Data Berhasil dihapus",
+                'token' => csrf_hash()
+            ]);
         } catch (\Exception $e) {
-            $data = [
+
+            return response()->setJSON([
                 "status"            => false,
                 "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
                 'token' => csrf_hash()
-            ];
-            echo json_encode($data);
+            ]);
         }
-        return;
     }
 
     public function dropdownDivisi()

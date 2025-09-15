@@ -14,18 +14,18 @@
                 Kembali
             </a>
             <?php if (empty($jamKerja)) : ?>
-                <?php if (can('Master Data', 'Jam Kerja', 'c')) : ?>
+                <?php if (can('Personalia', 'Jam Kerja', 'c')) : ?>
                     <button class="btn btn-show-form btn-save float-right btn-submit">
                         Simpan
                     </button>
                 <?php endif; ?>
             <?php else : ?>
-                <?php if (can('Master Data', 'Jam Kerja', 'd')) : ?>
+                <?php if (can('Personalia', 'Jam Kerja', 'd')) : ?>
                     <button class="btn btn-hapus delete-parent float-right" onclick="deleteAction()">
                         Hapus
                     </button>
                 <?php endif; ?>
-                <?php if (can('Master Data', 'Jam Kerja', 'u')) : ?>
+                <?php if (can('Personalia', 'Jam Kerja', 'u')) : ?>
                     <button class="btn btn-show-form btn-save float-right btn-submit">
                         Simpan
                     </button>
@@ -118,8 +118,8 @@
                                     <td><b><?= $v['value'] ?></b></td>
                                     <td style="height: 70px;">
                                         <div class="form-floating" style="height: 50px;width:auto;">
-                                            <input type="text" value="<?= ($jamKerjaDetail != null) ? $jamKerjaDetail['jam_masuk'] : '' ?>" class="form-control time" name="<?= $v['value'] ?>_mulaiMasuk" maxlength="30">
-                                            <label for="mulaiMasuk">Mulai Masuk</label>
+                                            <input type="text" value="<?= ($jamKerjaDetail != null) ? $jamKerjaDetail['jam_masuk'] : '' ?>" class="form-control time" name="<?= $v['value'] ?>_mulaiMasuk" placeholder="Pilih Jam Mulai Masuk" maxlength="30">
+                                            <label for="mulaiMasuk">Pilih Jam Mulai Masuk</label>
                                         </div>
                                     </td>
                                     <!-- <td>
@@ -136,8 +136,8 @@
                                     </td> -->
                                     <td>
                                         <div class="form-floating" style="height: 50px;">
-                                            <input type="text" class="form-control time" value="<?= ($jamKerjaDetail != null) ? $jamKerjaDetail['jam_pulang'] : '' ?>" name="<?= $v['value'] ?>_mulaiPulang" maxlength="30">
-                                            <label for="checkout">Mulai Pulang</label>
+                                            <input type="text" class="form-control time" value="<?= ($jamKerjaDetail != null) ? $jamKerjaDetail['jam_pulang'] : '' ?>" name="<?= $v['value'] ?>_mulaiPulang" placeholder="Pilih Jam Mulai Pulang" maxlength="30">
+                                            <label for="checkout">Pilih Jam Mulai Pulang</label>
                                         </div>
                                     </td>
                                 </tr>

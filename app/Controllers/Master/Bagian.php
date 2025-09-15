@@ -89,20 +89,29 @@ class Bagian extends BaseController
     {
         $bagianModel = new BagianModel();
 
-        $check = $bagianModel->where('nama_bagian', $this->request->getVar('namaBagian'))->where('division_id', $this->request->getVar('divisionID'))->where('deletedAt', null)->first();
+        $kodeBagian =  $this->request->getVar('kodeBagian');
+        $divisionId = $this->request->getVar('divisionID');
+        $namaBagian = $this->request->getVar('namaBagian');
+
+        $check = $bagianModel
+            ->where('kode_bagian', $kodeBagian)
+            ->where('division_id', $divisionId)
+            ->where('deletedAt', null)
+            ->first();
+
         if ($check != null) {
             return response()->setJSON([
                 'status' => false,
-                'message' => "Nama bagian " . $check['nama_bagian'] . " sudah ada",
+                'message' => "Kode bagian " . $kodeBagian . " sudah ada",
                 'token' => csrf_hash()
             ]);
         }
 
         $bagianModel->insert([
             'company_id' => $this->this_company_id,
-            'division_id' => $this->request->getVar('divisionID'),
-            'kode_bagian' => $this->request->getVar('kodeBagian'),
-            'nama_bagian' => strtoupper($this->request->getVar('namaBagian')),
+            'division_id' => $divisionId,
+            'kode_bagian' => $kodeBagian,
+            'nama_bagian' => $namaBagian,
         ]);
 
         return response()->setJSON([
@@ -127,9 +136,11 @@ class Bagian extends BaseController
     {
         $bagianModel = new BagianModel();
 
+        $kodeBagian =  $this->request->getVar('kodeBagian');
+        $namaBagian = $this->request->getVar('namaBagian');
+
         $check = $bagianModel
-            ->where('nama_bagian', $this->request->getVar('namaBagian'))
-            ->where('division_id', $this->request->getVar('divisionID'))
+            ->where('kode_bagian', $kodeBagian)
             ->where('id !=', $id)
             ->where('deletedAt', null)
             ->first();
@@ -137,13 +148,14 @@ class Bagian extends BaseController
         if ($check != null) {
             return response()->setJSON([
                 'status' => false,
-                'message' => "Nama bagian " . $check['nama_bagian'] . " sudah ada",
+                'message' => "Kode bagian " . $kodeBagian . " sudah ada",
                 'token' => csrf_hash()
             ]);
         }
 
         $bagianModel->update($id, [
-            'nama_bagian' => strtoupper($this->request->getVar('namaBagian')),
+            'kode_bagian' => $kodeBagian,
+            'nama_bagian' => $namaBagian,
         ]);
 
         return response()->setJSON([

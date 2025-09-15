@@ -4,6 +4,7 @@ namespace App\Controllers\Warehouse;
 
 use App\Controllers\BaseController;
 use App\Models\AMPurchaseOrderDetailModel;
+use App\Models\BarangMasterSpesifikasiModel;
 use App\Models\BC40Model;
 use App\Models\BCPurchaseOrderModel;
 use App\Models\CountryModel;
@@ -1168,6 +1169,51 @@ class Penomoran_ extends BaseController
             $db->transRollback();
             echo "Error " . $e->getMessage();
         }
+    }
+
+    public function repairHargaTerakhirMasterBarang()
+    {
+
+        $companyId = 16;
+        $barangMasterSpesifikasiModel = new BarangMasterSpesifikasiModel();
+        $amPurchaseOrderDetailModel = new AMPurchaseOrderDetailModel();
+        $selectQry = "am_purchase_order_details.*";
+        $poDetail = $amPurchaseOrderDetailModel
+            ->select($selectQry)
+            ->join('am_purchase_orders', 'am_purchase_orders.id = am_purchase_order_details.am_purchase_order_id', 'left')
+            ->where('am_purchase_orders.company_id', $companyId)
+            ->where('am_purchase_orders.deletedAt', null)
+            ->where('am_purchase_order_details.deletedAt', null)
+            ->where('po_date >=', "2025-09-01")
+            ->orderBy('po_date', "desc")
+            ->groupBy('am_purchase_order_details.spesifikasi_id')
+            ->findAll();
+
+        $updatedData = [];
+        foreach ($poDetail as $b) {
+            $hargaTerakhir = $amPurchaseOrderDetailModel->historiHargaPOBahanPenolongFirst(
+                $b['spesifikasi_id'],
+                $companyId
+            );
+
+
+            if ($hargaTerakhir) {
+                $updatedData[] = [
+                    'id' => $hargaTerakhir['spesifikasi_id'],
+                    'supplier_terakhir' => $hargaTerakhir['supplier_id'],
+                    'harga_terakhir' => $hargaTerakhir['price']
+                ];
+            }
+        }
+
+        if (!empty($updatedData)) {
+            $barangMasterSpesifikasiModel->updateBatch($updatedData, 'id');
+        }
+
+        echo json_encode($updatedData, JSON_PRETTY_PRINT);
+        die;
+        echo "OOK";
+        die;
     }
 }
 

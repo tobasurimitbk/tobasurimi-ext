@@ -83,9 +83,11 @@
 <section class="section">
     <div class="section-header">
         <h1>Komponen Gaji</h1>
-        <button class="btn btn-show-form btn-add float-right" id="createModal" data-btn="create-modal">
-            <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
-        </button>
+        <?php if (can('Personalia', 'Komponen Gaji', 'c')): ?>
+            <button class="btn btn-show-form btn-add float-right" id="createModal" data-btn="create-modal">
+                <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
+            </button>
+        <?php endif; ?>
     </div>
     <div class="card">
         <div class="card-body">
@@ -95,7 +97,7 @@
                 </div>
             <?php endif; ?>
             <div class="row justify-content-end mb-3">
-                <div class="col-md-2">
+                <div class="col-md-3">
                     <input autocomplete="one-time-code" class="form-control search form-out-search" placeholder="Search" value="" />
                 </div>
             </div>
@@ -107,6 +109,7 @@
                                 <th style="width: 10px;">No</th>
                                 <th onclick="changeSort('name')" class="sort">Komponen Gaji</th>
                                 <th onclick="changeSort('tipe')" class="sort">Status</th>
+                                <th style="width: 100px;">Action</th>
                             </tr>
                         </thead>
                         <tbody class="body-table" id="body-table" style="cursor: pointer;">
@@ -163,7 +166,7 @@
             },
             {
                 data: "name",
-                className: "text-center"
+                className: "text-left"
             },
             {
                 data: "tipe",
@@ -185,12 +188,43 @@
 
                     return htmlRes;
                 }
+            },
+            {
+                data: "id",
+                className: "text-center actions",
+                searchable: false,
+                sortable: false,
+                render: function(data, type, row) {
+                    let id = row.id;
+                    let res = '';
+
+                    res += `
+                    <?php if (can('Personalia', 'Komponen Gaji', 'u')): ?>
+                        <a href="javascript:void(0)" onclick="edit('${id}')" data-toggle="tooltip" title="Edit" class="btn btn-primary">
+                            <i class="fas fa-edit"></i>
+                        </a>
+                    <?php endif ?>
+                    <?php if (can('Personalia', 'Komponen Gaji', 'd')): ?>
+                        <button data-toggle="tooltip" title="Hapus" onclick="remove('${id}')" class="btn btn-danger delete-parent">
+                            <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
+                        </button>
+                    <?php endif ?>
+                    `;
+
+                    return res;
+                }
             }
         ],
         columnDefs: [{
             defaultContent: "-",
             targets: "_all"
         }],
+        "drawCallback": function(settings) {
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-toggle="tooltip"]'))
+            var tooltipList = tooltipTriggerList.map(function(tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl)
+            });
+        },
         language: {
             emptyTable: "Tidak Ada Data",
             lengthMenu: "Show _MENU_ entries",
@@ -201,258 +235,207 @@
         }
     });
 
-    $(document).ready(function() {
-
-        var validator = $(".create-form").validate({
-            rules: {
-                nama: {
-                    required: true
-                }
+    var validator = $(".create-form").validate({
+        rules: {
+            nama: {
+                required: true
+            }
+        },
+        messages: {
+            nama: {
+                required: "Nama wajib diisi"
             },
-            messages: {
-                nama: {
-                    required: "Nama wajib diisi"
-                },
-                tipe: {
-                    required: "Pilih status terlebih dahulu"
-                }
+            tipe: {
+                required: "Pilih status terlebih dahulu"
+            }
+        },
+        errorElement: 'span',
+        errorClass: 'text-danger',
+        errorPlacement: function(error, element) {
+            var elem = $(element);
+            if (elem.hasClass("select2-hidden-accessible")) {
+                element = $("#select2-" + elem.attr("id") + "-container").parent();
+                error.insertAfter(element);
+            } else {
+                error.insertAfter(element);
+            }
+        },
+        highlight: function(element) {
+            $(element).closest('.form-group').addClass('has-error');
+            $(element).addClass('select-class');
+
+        },
+        unhighlight: function(element) {
+            $(element).closest('.form-group').removeClass('has-error');
+            $(element).removeClass('select-class');
+        },
+    });
+
+    $(".btn-show-form").click(function() {
+        $(".id").val("");
+        $(".title-name").text("Tambah");
+        validator.resetForm();
+        validator.reset();
+        $(".create-form")[0].reset()
+        $(".delete-btn").css('display', 'none');
+        $(".add-modal").modal("show")
+    })
+
+    $(".btn-hide-form").click(function() {
+        $(".add-modal").modal("hide")
+    })
+
+    $(".dataTable_info").addClass("pt-0");
+
+    function edit(id) {
+        $(".create-form")[0].reset()
+        $(".title-name").text("Update");
+
+        validator.resetForm();
+        validator.reset();
+
+        $.ajax({
+            url: "<?= base_url("tunjangan/id"); ?>" + "/" + id,
+            method: "GET",
+            dataType: "json",
+            beforeSend: function() {
+                setLoading();
             },
-            errorElement: 'span',
-            errorClass: 'text-danger',
-            errorPlacement: function(error, element) {
-                var elem = $(element);
-                if (elem.hasClass("select2-hidden-accessible")) {
-                    element = $("#select2-" + elem.attr("id") + "-container").parent();
-                    error.insertAfter(element);
-                } else {
-                    error.insertAfter(element);
-                }
+            complete: function() {
+                stopLoading();
             },
-            highlight: function(element) {
-                $(element).closest('.form-group').addClass('has-error');
-                $(element).addClass('select-class');
+            success: function(res) {
+                if (res.status) {
+                    $(".id").val(id);
+                    $("#nama").val(res.data.name);
+                    $("select[name='tipe']").val(res.data.tipe);
 
-            },
-            unhighlight: function(element) {
-                $(element).closest('.form-group').removeClass('has-error');
-                $(element).removeClass('select-class');
-            },
-        });
-
-        $(".btn-show-form").click(function() {
-            $(".id").val("");
-            $(".title-name").text("Tambah");
-            validator.resetForm();
-            validator.reset();
-            $(".create-form")[0].reset()
-            $(".delete-btn").css('display', 'none');
-            $(".add-modal").modal("show")
-        })
-
-        $(".btn-hide-form").click(function() {
-            $(".add-modal").modal("hide")
-        })
-
-        $(".dataTable_info").addClass("pt-0");
-
-        $('#dataTable tbody').on('click', 'tr td:not(.actions):not(.dataTables_empty)', function() {
-            const data = table.row(this).data();
-            $(".create-form")[0].reset()
-            $(".delete-btn").css('display', '');
-            let id = data.id;
-            $(".title-name").text("Update");
-
-            validator.resetForm();
-            validator.reset();
-
-            $.ajax({
-                url: "<?= base_url("tunjangan/id"); ?>" + "/" + id,
-                method: "GET",
-                dataType: "json",
-                success: function(res) {
-                    if (res.status) {
-                        $(".id").val(id);
-                        $("#nama").val(res.data.name);
-                        $("select[name='tipe']").val(res.data.tipe);
-
-                        if (res.data.is_gaji_harian) {
-                            $("#isGajiPokokPerHari").prop('checked', true);
-                        } else {
-                            $("#isGajiPokokPerHari").prop('checked', false);
-                        }
-
-                        if (res.data.is_cadangan) {
-                            $("#isCadangan").prop('checked', true);
-                        } else {
-                            $("#isCadangan").prop('checked', false);
-                        }
-
-                        if (res.data.tipe == "PLUS") {
-                            $('#isGajiPokokPerHariForm').show();
-                            $('#isCadanganForm').show();
-                        } else {
-                            $('#isGajiPokokPerHariForm').hide();
-                            $('#isCadanganForm').hide();
-                        }
-
-                        $(".add-modal").modal("show")
+                    if (res.data.is_gaji_harian) {
+                        $("#isGajiPokokPerHari").prop('checked', true);
                     } else {
-                        Swal.fire({
-                            icon: 'error',
-                            title: res.message,
-                            confirmButtonColor: '#4e73df',
-                        })
+                        $("#isGajiPokokPerHari").prop('checked', false);
                     }
+
+                    if (res.data.is_cadangan) {
+                        $("#isCadangan").prop('checked', true);
+                    } else {
+                        $("#isCadangan").prop('checked', false);
+                    }
+
+                    if (res.data.tipe == "PLUS") {
+                        $('#isGajiPokokPerHariForm').show();
+                        $('#isCadanganForm').show();
+                    } else {
+                        $('#isGajiPokokPerHariForm').hide();
+                        $('#isCadanganForm').hide();
+                    }
+
+                    $(".add-modal").modal("show")
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: res.message,
+                        confirmButtonColor: '#4e73df',
+                    })
                 }
-            })
+            }
         })
+    }
 
-        $(".search").keyup(function() {
-            table.ajax.reload();
-        })
-
-        $(".btn-submit-form").click(function() {
-            if ($(".create-form").valid()) {
-                Swal.fire({
-                    icon: 'question',
-                    title: 'Simpan Data?',
-                    confirmButtonColor: '#4e73df',
-                    cancelButtonColor: '#d33',
-                    showCancelButton: true,
-                    reverseButtons: true,
-                    confirmButtonText: 'Simpan',
-                    cancelButtonText: 'Kembali',
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        const csrf = $(`[name="${csrfToken}"]`);
-                        setLoading()
-                        let data = new FormData(document.querySelector(".create-form"));
-
-                        let id = $(".id").val();
-                        // UPDATE
-                        if (id) {
-                            $.ajax({
-                                url: "<?= base_url("tunjangan/update"); ?>",
-                                data: data,
-                                beforeSend: function(xhr) {
-                                    xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                                },
-                                method: "POST",
-                                dataType: "json",
-                                processData: false,
-                                contentType: false,
-                                success: function(response) {
-                                    csrf.val(response.token);
-                                    if (response.status) {
-                                        stopLoading()
-                                        Swal.fire({
-                                                icon: 'success',
-                                                title: response.message,
-                                                confirmButtonColor: '#4e73df',
-                                            })
-                                            .then(() => {
-                                                table.ajax.reload()
-                                                $(".add-modal").modal("hide")
-                                            })
-                                    } else {
-                                        Swal.fire({
-                                            icon: 'error',
-                                            title: response.message,
-                                            confirmButtonColor: '#4e73df',
-                                        })
-                                        stopLoading()
-                                    }
-                                },
-                                onError: function(response) {
-                                    csrf.val(response.token);
-                                    Swal.fire({
-                                        icon: 'error',
-                                        title: 'Data Gagal Disimpan, coba Lagi',
-                                        confirmButtonColor: '#4e73df',
-                                    })
-                                    stopLoading()
-                                }
-                            });
+    function remove(id) {
+        Swal.fire({
+            icon: 'question',
+            title: 'Hapus Data?',
+            confirmButtonColor: '#4e73df',
+            cancelButtonColor: '#d33',
+            showCancelButton: true,
+            reverseButtons: true,
+            confirmButtonText: 'Hapus',
+            cancelButtonText: 'Kembali',
+        }).then((result) => {
+            if (result.isConfirmed) {
+                const csrf = $(`[name="${csrfToken}"]`);
+                setLoading()
+                $.ajax({
+                    url: "<?= base_url("tunjangan/delete"); ?>",
+                    data: {
+                        id: id
+                    },
+                    beforeSend: function(xhr) {
+                        setLoading();
+                        xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                    },
+                    complete: function() {
+                        stopLoading();
+                    },
+                    method: "POST",
+                    dataType: "json",
+                    success: function(response) {
+                        csrf.val(response.token);
+                        if (response.status) {
+                            Swal.fire({
+                                    icon: 'success',
+                                    title: response.message,
+                                    confirmButtonColor: '#4e73df',
+                                })
+                                .then(() => {
+                                    table.ajax.reload()
+                                    $(".add-modal").modal("hide")
+                                })
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: response.message,
+                                confirmButtonColor: '#4e73df',
+                            })
                         }
-                        // CREATE
-                        else {
-                            $.ajax({
-                                url: "<?= base_url("tunjangan/save"); ?>",
-                                data: data,
-                                beforeSend: function(xhr) {
-                                    xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                                },
-                                method: "POST",
-                                dataType: "json",
-                                processData: false,
-                                contentType: false,
-                                success: function(response) {
-                                    csrf.val(response.token);
-                                    if (response.status) {
-                                        stopLoading()
-                                        Swal.fire({
-                                                icon: 'success',
-                                                title: response.message,
-                                                confirmButtonColor: '#4e73df',
-                                            })
-                                            .then(() => {
-                                                table.ajax.reload()
-                                                $(".add-modal").modal("hide")
-                                            })
-                                    } else {
-                                        Swal.fire({
-                                            icon: 'error',
-                                            title: response.message,
-                                            confirmButtonColor: '#4e73df',
-                                        })
-                                        stopLoading()
-                                    }
-                                },
-                                onError: function(response) {
-                                    csrf.val(response.token);
-                                    Swal.fire({
-                                        icon: 'error',
-                                        title: 'Data Gagal Disimpan, coba Lagi',
-                                        confirmButtonColor: '#4e73df',
-                                    })
-                                    stopLoading()
-                                }
-                            });
-                        }
-                    }
-                })
+                    },
+                });
             }
         })
 
-        $(".delete-btn").click(function() {
+    }
+
+    $(".search").keyup(function() {
+        table.ajax.reload();
+    })
+
+    $(".btn-submit-form").click(function() {
+        if ($(".create-form").valid()) {
             Swal.fire({
                 icon: 'question',
-                title: 'Hapus Data?',
+                title: 'Simpan Data?',
                 confirmButtonColor: '#4e73df',
                 cancelButtonColor: '#d33',
                 showCancelButton: true,
                 reverseButtons: true,
-                confirmButtonText: 'Hapus',
+                confirmButtonText: 'Simpan',
                 cancelButtonText: 'Kembali',
             }).then((result) => {
                 if (result.isConfirmed) {
                     const csrf = $(`[name="${csrfToken}"]`);
-                    let id = $(".id").val();
                     setLoading()
+                    let data = new FormData(document.querySelector(".create-form"));
+                    let id = $(".id").val();
+                    let url = id != '' ? "<?= base_url("tunjangan/update"); ?>" : "<?= base_url('tunjangan/save') ?>"
+
                     $.ajax({
-                        url: "<?= base_url("tunjangan/delete"); ?>",
-                        data: {
-                            id: id
-                        },
+                        url: url,
+                        data: data,
                         beforeSend: function(xhr) {
+                            setLoading();
                             xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                        },
+                        complete: function() {
+                            stopLoading();
                         },
                         method: "POST",
                         dataType: "json",
+                        processData: false,
+                        contentType: false,
                         success: function(response) {
                             csrf.val(response.token);
                             if (response.status) {
-                                stopLoading()
                                 Swal.fire({
                                         icon: 'success',
                                         title: response.message,
@@ -468,23 +451,13 @@
                                     title: response.message,
                                     confirmButtonColor: '#4e73df',
                                 })
-                                stopLoading()
                             }
                         },
-                        onError: function(response) {
-                            csrf.val(response.token);
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Data Gagal Disimpan, coba Lagi',
-                                confirmButtonColor: '#4e73df',
-                            })
-                            stopLoading()
-                        }
                     });
                 }
             })
-        })
-    })
+        }
+    });
 
     const changeSort = function(val) {
         if (sort !== val) {

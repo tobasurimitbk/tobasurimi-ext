@@ -40,7 +40,6 @@
             <div class="modal-footer">
                 <button type="button" class="btn btn-hide-form btn-discard mr-2">Kembali</button>
                 <button type="submit" class="btn btn-submit-form">Simpan</button>
-                <button type="button" class="btn btn-discard delete-btn">Hapus</button>
             </div>
         </div>
     </div>
@@ -71,18 +70,25 @@
                         <label for="floatingInput" style="z-index: 1;">Pilih Tahun </label>
                     </div>
                 </div>
+                <div class="col-md-3 mb-3">
+                    <div class="form-floating" style="height: 50px;">
+                        <input placeholder="" class="form-control search" id="search" name="search" aria-label="Floating label select example" />
+                        <label style="z-index: 1;" style="z-index: 1;">Cari Data</label>
+                    </div>
+                </div>
             </div>
             <div class="row">
                 <div class="table-responsive">
                     <table class="table table-bordered nowrap table-hover-tobasurimi dataTable" id="dataTable" width="100%" cellspacing="0">
                         <thead class="thead-dark">
                             <tr>
-                                <th>No.</th>
+                                <th>No</th>
                                 <th onclick="changeSort('date')" class="sort">Tanggal</th>
                                 <th onclick="changeSort('name')" class="sort">Nama</th>
+                                <th style="width: 100px;">Action</th>
                             </tr>
                         </thead>
-                        <tbody class="body-table" id="body-table" style="cursor: pointer;">
+                        <tbody class="body-table" id="body-table">
 
                         </tbody>
                     </table>
@@ -94,8 +100,8 @@
 
 <script>
     const csrfToken = '<?= csrf_token() ?>';
-    let sort = "nomor";
-    let sortType = "desc";
+    let sort = "date";
+    let sortType = "asc";
 
     const table = $('.dataTable').DataTable({
 
@@ -116,6 +122,7 @@
             dataSrc: "data",
             data: function(data) {
                 data.year = $(".year").val();
+                data.search = $(".search").val();
                 data.sort = sort;
                 data.sortType = sortType;
             }
@@ -133,21 +140,52 @@
                 data: "no",
                 className: "text-center",
                 sortable: false,
-                width: "5%"
+                width: "3%"
             }, {
                 data: "date",
-                className: "text-center",
+                className: "text-left",
                 width: "10%"
             },
             {
                 data: "name",
-                className: "text-center"
+                className: "text-lefts"
+            },
+            {
+                data: "id",
+                className: "text-center actions",
+                searchable: false,
+                sortable: false,
+                render: function(data, type, row) {
+                    let id = row.id;
+                    let res = '';
+
+                    res += `
+                    <?php if (can('Personalia', 'Hari Besar', 'u')): ?>
+                        <a href="javascript:void(0)" onclick="edit('${id}')" data-toggle="tooltip" title="Edit" class="btn btn-primary">
+                            <i class="fas fa-edit"></i>
+                        </a>
+                    <?php endif ?>
+                    <?php if (can('Personalia', 'Hari Besar', 'd')): ?>
+                        <button data-toggle="tooltip" title="Hapus" onclick="remove('${id}')" class="btn btn-danger delete-parent">
+                            <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
+                        </button>
+                    <?php endif ?>
+                    `;
+
+                    return res;
+                }
             }
         ],
         columnDefs: [{
             defaultContent: "-",
             targets: "_all"
         }],
+        "drawCallback": function(settings) {
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-toggle="tooltip"]'))
+            var tooltipList = tooltipTriggerList.map(function(tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl)
+            });
+        },
         language: {
             emptyTable: "Tidak Ada Data",
             lengthMenu: "Show _MENU_ entries",
@@ -158,244 +196,193 @@
         }
     });
 
-    $(document).ready(function() {
-        $(".date_create").datepicker({
-            todayHighlight: true,
-            format: "dd/mm/yyyy",
-            orientation: "bottom auto",
-            autoclose: true
-        })
+    $(".date_create").datepicker({
+        todayHighlight: true,
+        format: "dd/mm/yyyy",
+        orientation: "bottom auto",
+        autoclose: true
+    });
 
+    var validator = $(".create-form").validate({
+        rules: {
+            date_create: {
+                required: true
+            },
+            nama: {
+                required: true
+            }
+        },
+        messages: {
+            date_create: {
+                required: "Tanggal wajib diisi"
+            },
+            nama: {
+                required: "Nama wajib diisi"
+            }
+        },
+        errorElement: 'span',
+        errorClass: 'text-danger',
+        errorPlacement: function(error, element) {
+            var elem = $(element);
+            if (elem.hasClass("select2-hidden-accessible")) {
+                element = $("#select2-" + elem.attr("id") + "-container").parent();
+                error.insertAfter(element);
+            } else {
+                error.insertAfter(element);
+            }
+        },
+        highlight: function(element) {
+            $(element).closest('.form-group').addClass('has-error');
+            $(element).addClass('select-class');
 
-        var validator = $(".create-form").validate({
-            rules: {
-                date_create: {
-                    required: true
-                },
-                nama: {
-                    required: true
-                }
+        },
+        unhighlight: function(element) {
+            $(element).closest('.form-group').removeClass('has-error');
+            $(element).removeClass('select-class');
+        },
+    });
+
+    $(".btn-show-form").click(function() {
+        $(".id").val("");
+        $(".title-name").text("Tambah");
+        validator.resetForm();
+        validator.reset();
+        $(".create-form")[0].reset()
+        $(".delete-btn").css('display', 'none');
+        $(".add-modal").modal("show")
+    })
+
+    $(".btn-hide-form").click(function() {
+        $(".add-modal").modal("hide")
+    })
+
+    $(".dataTable_info").addClass("pt-0");
+
+    function edit(id) {
+        $(".create-form")[0].reset()
+        $(".title-name").text("Update");
+
+        validator.resetForm();
+        validator.reset();
+
+        $.ajax({
+            url: "<?= base_url("big-days/id"); ?>" + "/" + id,
+            method: "GET",
+            beforeSend: function() {
+                setLoading();
             },
-            messages: {
-                date_create: {
-                    required: "Tanggal wajib diisi"
-                },
-                nama: {
-                    required: "Nama wajib diisi"
-                }
+            complete: function() {
+                stopLoading()
             },
-            errorElement: 'span',
-            errorClass: 'text-danger',
-            errorPlacement: function(error, element) {
-                var elem = $(element);
-                if (elem.hasClass("select2-hidden-accessible")) {
-                    element = $("#select2-" + elem.attr("id") + "-container").parent();
-                    error.insertAfter(element);
+            dataType: "json",
+            success: function(res) {
+                if (res.status) {
+                    $(".id").val(id);
+                    $("#nama").val(res.data.name);
+                    $(".date_create").val(res.data.date);
+
+                    $(".add-modal").modal("show")
                 } else {
-                    error.insertAfter(element);
+                    Swal.fire({
+                        icon: 'error',
+                        title: res.message,
+                        confirmButtonColor: '#4e73df',
+                    })
                 }
-            },
-            highlight: function(element) {
-                $(element).closest('.form-group').addClass('has-error');
-                $(element).addClass('select-class');
-
-            },
-            unhighlight: function(element) {
-                $(element).closest('.form-group').removeClass('has-error');
-                $(element).removeClass('select-class');
-            },
-        });
-
-        $(".btn-show-form").click(function() {
-            $(".id").val("");
-            $(".title-name").text("Tambah");
-            validator.resetForm();
-            validator.reset();
-            $(".create-form")[0].reset()
-            $(".delete-btn").css('display', 'none');
-            $(".add-modal").modal("show")
-        })
-
-        $(".btn-hide-form").click(function() {
-            $(".add-modal").modal("hide")
-        })
-
-        $(".dataTable_info").addClass("pt-0");
-
-        $('#dataTable tbody').on('click', 'tr td:not(.actions):not(.dataTables_empty)', function() {
-            const data = table.row(this).data();
-            $(".create-form")[0].reset()
-            $(".delete-btn").css('display', '');
-            let id = data.id;
-            $(".title-name").text("Update");
-
-            validator.resetForm();
-            validator.reset();
-
-            $.ajax({
-                url: "<?= base_url("big-days/id"); ?>" + "/" + id,
-                method: "GET",
-                dataType: "json",
-                success: function(res) {
-                    if (res.status) {
-                        $(".id").val(id);
-                        $("#nama").val(res.data.name);
-                        $(".date_create").val(res.data.date);
-
-                        $(".add-modal").modal("show")
-                    } else {
-                        Swal.fire({
-                            icon: 'error',
-                            title: res.message,
-                            confirmButtonColor: '#4e73df',
-                        })
-                    }
-                }
-            })
-        })
-
-        $(".search").keyup(function() {
-            table.ajax.reload();
-        })
-
-        $(".btn-submit-form").click(function() {
-            if ($(".create-form").valid()) {
-                Swal.fire({
-                    icon: 'question',
-                    title: 'Simpan Data?',
-                    confirmButtonColor: '#4e73df',
-                    cancelButtonColor: '#d33',
-                    showCancelButton: true,
-                    reverseButtons: true,
-                    confirmButtonText: 'Simpan',
-                    cancelButtonText: 'Kembali',
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        const csrf = $(`[name="${csrfToken}"]`);
-                        setLoading()
-                        let data = new FormData(document.querySelector(".create-form"));
-
-                        let id = $(".id").val();
-                        // UPDATE
-                        if (id) {
-                            $.ajax({
-                                url: "<?= base_url("big-days/update"); ?>",
-                                data: data,
-                                beforeSend: function(xhr) {
-                                    xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                                },
-                                method: "POST",
-                                dataType: "json",
-                                processData: false,
-                                contentType: false,
-                                success: function(response) {
-                                    csrf.val(response.token);
-                                    if (response.status) {
-                                        stopLoading()
-                                        Swal.fire({
-                                                icon: 'success',
-                                                title: response.message,
-                                                confirmButtonColor: '#4e73df',
-                                            })
-                                            .then(() => {
-                                                table.ajax.reload()
-                                                $(".add-modal").modal("hide")
-                                            })
-                                    } else {
-                                        Swal.fire({
-                                            icon: 'error',
-                                            title: response.message,
-                                            confirmButtonColor: '#4e73df',
-                                        })
-                                        stopLoading()
-                                    }
-                                },
-                                onError: function(response) {
-                                    csrf.val(response.token);
-                                    Swal.fire({
-                                        icon: 'error',
-                                        title: 'Data Gagal Disimpan, coba Lagi',
-                                        confirmButtonColor: '#4e73df',
-                                    })
-                                    stopLoading()
-                                }
-                            });
-                        }
-                        // CREATE
-                        else {
-                            $.ajax({
-                                url: "<?= base_url("big-days/save"); ?>",
-                                data: data,
-                                beforeSend: function(xhr) {
-                                    xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                                },
-                                method: "POST",
-                                dataType: "json",
-                                processData: false,
-                                contentType: false,
-                                success: function(response) {
-                                    csrf.val(response.token);
-                                    if (response.status) {
-                                        stopLoading()
-                                        Swal.fire({
-                                                icon: 'success',
-                                                title: response.message,
-                                                confirmButtonColor: '#4e73df',
-                                            })
-                                            .then(() => {
-                                                table.ajax.reload()
-                                                $(".add-modal").modal("hide")
-                                            })
-                                    } else {
-                                        Swal.fire({
-                                            icon: 'error',
-                                            title: response.message,
-                                            confirmButtonColor: '#4e73df',
-                                        })
-                                        stopLoading()
-                                    }
-                                },
-                                onError: function(response) {
-                                    csrf.val(response.token);
-                                    Swal.fire({
-                                        icon: 'error',
-                                        title: 'Data Gagal Disimpan, coba Lagi',
-                                        confirmButtonColor: '#4e73df',
-                                    })
-                                    stopLoading()
-                                }
-                            });
-                        }
-                    }
-                })
             }
         })
+    }
 
-        $(".delete-btn").click(function() {
+
+    $(".search").keyup(function() {
+        table.ajax.reload();
+    });
+
+    function remove(id) {
+        Swal.fire({
+            icon: 'question',
+            title: 'Hapus Data?',
+            confirmButtonColor: '#4e73df',
+            cancelButtonColor: '#d33',
+            showCancelButton: true,
+            reverseButtons: true,
+            confirmButtonText: 'Hapus',
+            cancelButtonText: 'Kembali',
+        }).then((result) => {
+            if (result.isConfirmed) {
+                const csrf = $(`[name="${csrfToken}"]`);
+                $.ajax({
+                    url: "<?= base_url("big-days/delete"); ?>",
+                    data: {
+                        id: id
+                    },
+                    beforeSend: function(xhr) {
+                        setLoading();
+                        xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                    },
+                    complete: function() {
+                        stopLoading();
+                    },
+                    method: "POST",
+                    dataType: "json",
+                    success: function(response) {
+                        csrf.val(response.token);
+                        if (response.status) {
+                            Swal.fire({
+                                    icon: 'success',
+                                    title: response.message,
+                                    confirmButtonColor: '#4e73df',
+                                })
+                                .then(() => {
+                                    table.ajax.reload()
+                                    $(".add-modal").modal("hide")
+                                })
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: response.message,
+                                confirmButtonColor: '#4e73df',
+                            })
+                        }
+                    },
+
+                });
+            }
+        })
+    }
+
+    $(".btn-submit-form").click(function() {
+        if ($(".create-form").valid()) {
             Swal.fire({
                 icon: 'question',
-                title: 'Hapus Data?',
+                title: 'Simpan Data?',
                 confirmButtonColor: '#4e73df',
                 cancelButtonColor: '#d33',
                 showCancelButton: true,
                 reverseButtons: true,
-                confirmButtonText: 'Hapus',
+                confirmButtonText: 'Simpan',
                 cancelButtonText: 'Kembali',
             }).then((result) => {
                 if (result.isConfirmed) {
                     const csrf = $(`[name="${csrfToken}"]`);
+                    let data = new FormData(document.querySelector(".create-form"));
                     let id = $(".id").val();
-                    setLoading()
+                    let url = id != '' ? "<?= base_url("big-days/update"); ?>" : "<?= base_url('big-days/save') ?>"
+
                     $.ajax({
-                        url: "<?= base_url("big-days/delete"); ?>",
-                        data: {
-                            id: id
-                        },
+                        url: url,
+                        data: data,
                         beforeSend: function(xhr) {
+                            setLoading();
                             xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                        },
+                        complete: function() {
+                            stopLoading();
                         },
                         method: "POST",
                         dataType: "json",
+                        processData: false,
+                        contentType: false,
                         success: function(response) {
                             csrf.val(response.token);
                             if (response.status) {
@@ -415,22 +402,12 @@
                                     title: response.message,
                                     confirmButtonColor: '#4e73df',
                                 })
-                                stopLoading()
                             }
-                        },
-                        onError: function(response) {
-                            csrf.val(response.token);
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Data Gagal Disimpan, coba Lagi',
-                                confirmButtonColor: '#4e73df',
-                            })
-                            stopLoading()
                         }
                     });
                 }
             })
-        })
+        }
     });
 
     $('#year').select2({
@@ -439,6 +416,11 @@
     }).change(function() {
         table.ajax.reload();
     });
+
+    $(".search").keyup(function(e) {
+        e.preventDefault();
+        table.ajax.reload();
+    })
 
 
     $('.form-select')
