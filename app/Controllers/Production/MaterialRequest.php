@@ -224,6 +224,28 @@ class MaterialRequest extends BaseController
                 }
             }
 
+            foreach ($dataMaterialRequestDetailsBahanBaku as $key => &$value) {
+                $dataMaterialRequestNotApprove = $this->materialRequestDetailsModel->getMaterialRequestNotApprove(
+                    $value['stock_id'],
+                    $value['bc_id'],
+                    $value['no_aju'],
+                    date('Y-m-d', strtotime(str_replace('/', '-', $value['stock_date']))),
+                    $value['stock_dokumen']
+                );
+
+                if ($dataMaterialRequestNotApprove) {
+                    $value['is_requested'] = true;
+                    $value['stok_total'] = $this->stockDetail2Model->getStockListDetail(
+                        $value['stock_id'],
+                        $value['bc_id'],
+                        $value['no_aju'],
+                        $value['stock_dokumen']
+                    )['stok_total'] - $dataMaterialRequestNotApprove['qty'];
+                } else {
+                    $value['is_requested'] = false;
+                }
+            }
+
             $data["dataMaterialRequests"] = $dataMaterialRequests;
             $data["dataMaterialRequestDetails"] = $dataMaterialRequestDetails;
             $data["dataMaterialRequestDetailsBahanBaku"] = $dataMaterialRequestDetailsBahanBaku;
