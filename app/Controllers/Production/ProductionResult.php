@@ -150,7 +150,11 @@ class ProductionResult extends BaseController
 
         $idMaterialRequest = json_decode($productionResData->material_request_id);
 
-        $productionResDetSelectBJ = "production_result_details.*, barang_master.barang_name AS barang_name, CONCAT(barang_master.barang_name, ' - ', barang_master_spesifikasi.spesifikasi) AS nama_barang, barang_master.kode_barang AS kode_barang, satuans.kode_satuan";
+        $productionResDetSelectBJ = "production_result_details.*, 
+        barang_master.barang_name AS barang_name, 
+        CONCAT(barang_master.barang_name, ' - ', barang_master_spesifikasi.spesifikasi) AS nama_barang, 
+        barang_master.kode_barang AS kode_barang, 
+        satuans.kode_satuan";
         $productionResDetDataBJ = $this->productionResultDetailModel->asObject()
             ->select($productionResDetSelectBJ)
             ->join('barang_master', 'barang_master.id = production_result_details.barang1_id', 'left')
@@ -202,7 +206,14 @@ class ProductionResult extends BaseController
                 $value->type_barang_text = "BAHAN SETENGAH JADI";
             }
         }
-        $productionResDetSelectBD = "production_result_details.*, barang_master.barang_name AS barang_name, CONCAT(barang_master.barang_name, ' ', barang_master_spesifikasi.spesifikasi) AS nama_barang, barang_master.kode_barang AS kode_barang, satuans.kode_satuan, warehouses.warehouse_name, divisis.divisi";
+        $productionResDetSelectBD = "production_result_details.*, 
+        barang_master.barang_name AS barang_name, 
+        CONCAT(barang_master.barang_name, ' ', barang_master_spesifikasi.spesifikasi) AS nama_barang, 
+        barang_master.kode_barang AS kode_barang, 
+        satuans.kode_satuan, 
+        warehouses.warehouse_name, 
+        divisis.divisi,
+        material_request_details.qty_now";
         $productionResDetDataBD = $this->productionResultDetailModel->asObject()
             ->select($productionResDetSelectBD)
             ->join('barang_master', 'barang_master.id = production_result_details.barang1_id', 'left')
@@ -210,6 +221,7 @@ class ProductionResult extends BaseController
             ->join('divisis', 'divisis.id = production_result_details.divisi_id', 'left')
             ->join('warehouses', 'warehouses.id = production_result_details.warehouse_id', 'left')
             ->join('satuans', 'satuans.id = barang_master_spesifikasi.satuan_1', 'left')
+            ->join('material_request_details', 'material_request_details.id = production_result_details.material_request_detail_id', 'left')
             ->where('production_result_details.production_result_id', $id)
             ->where('production_result_details.type', 'DIGUNAKAN')
             ->findAll();
@@ -280,13 +292,15 @@ class ProductionResult extends BaseController
             ->join('work_order_details', 'work_order_details.work_order_id = work_orders.id', 'left')
             ->where('company_id', $this->this_company_id)
             ->where('work_orders.deletedAt', null)
-            ->where('work_orders.id', $productionResData->work_order_id)
+            // ->where('work_orders.id', $productionResData->work_order_id)
             ->where('work_order_details.deletedAt', null)
             ->groupBy('work_order_details.work_order_id')
             ->find();
 
         $dataMaterialRequest = $this->materialRequestModel->asObject()
-            ->select('material_requests.*, GROUP_CONCAT(material_request_details.nama_barang SEPARATOR \', \') AS nama_barang, users.name AS user_name')
+            ->select('material_requests.*, 
+            GROUP_CONCAT(material_request_details.nama_barang SEPARATOR \', \') AS nama_barang, 
+            users.name AS user_name')
             ->join('material_request_details', 'material_request_details.material_request_id = material_requests.id', 'left')
             ->join('users', 'users.id = material_requests.createdBy', 'left')
             ->where('company_id', $this->this_company_id)
@@ -324,6 +338,8 @@ class ProductionResult extends BaseController
             'dataMaterialRequestNo' => $combinedReqNos,
             'dataMaterialRequestDate' => $combinedRequestDates,
         ];
+        // var_dump($data['dataResultBarangJadi']);
+        // exit;
         return view('Production/productionResult/form', $data);
     }
 
@@ -381,11 +397,13 @@ class ProductionResult extends BaseController
     public function saveProductionResult()
     {
         try {
+            $workOrderIds = $this->request->getVar("kode_produksi");
+
             $datas = [
                 "company_id" => $this->this_company_id,
                 "pr_no" => $this->request->getVar("res_no") == "AUTO GENERATE" ? $this->generatePRNo() : $this->request->getVar("res_no"),
                 "material_request_id" => json_encode($this->request->getPost("kode_request")),
-                "work_order_id" => $this->request->getVar("kode_produksi"),
+                "work_order_id" => is_array($workOrderIds) ? implode(',', $workOrderIds) : $workOrderIds,
                 "receive_date" => $this->request->getVar("date_production") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("date_production")))) : date("Y-m-d"),
             ];
 
@@ -673,12 +691,16 @@ class ProductionResult extends BaseController
             $dataResult = $this->workOrderDetailsModel
                 ->select('work_order_details.*, 
                     barang_master.barang_name, 
-                    barang_master_spesifikasi.spesifikasi, 
+                    barang_master_spesifikasi.spesifikasi,
+                    barang_master_spesifikasi.id as barang2_id,
                     barang_master.kode_barang, 
                     barang_master.type_barang, 
                     satuans.kode_satuan, 
-                    satuans.nama_satuan
+                    satuans.nama_satuan,
+                    work_orders.warehouse_id,
+                    work_orders.divisi_id
                 ')
+                ->join('work_orders', 'work_orders.id = work_order_details.work_order_id', 'left')
                 ->join('barang_master', 'barang_master.id = work_order_details.barang1_id', 'left')
                 ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.barang_master_id = work_order_details.barang1_id', 'left')
                 ->join('satuans', 'satuans.id = barang_master_spesifikasi.satuan_1', 'left')

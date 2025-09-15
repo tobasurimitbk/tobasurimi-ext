@@ -908,32 +908,44 @@
                 if (list_items[i].id_detail == id_detail) {
                     console.log(list_items);
 
-                    // $.ajax({
-                    //     url: `<?= base_url("po-lokal-bahan-baku/get-supplier-harga-detail"); ?>`,
-                    //     method: "GET",
-                    //     // beforeSend: function() {
-                    //     //     setLoading();
-                    //     // },
-                    //     // complete: function() {
-                    //     //     stopLoading();
-                    //     // },
-                    //     data: {
-                    //         supplier_harga_id: list_items[i].supplier_harga_id,
-                    //     },
-                    //     dataType: "json",
-                    //     success: function(res) {
-                    //         $(".harga").val(res.data.harga);
-                    //         $(".daily_price").val(res.data.daily_price);
-                    //         $(".monthly_price").val(res.data.monthly_price).keyup();
-                    //     }
-                    // })
+                    $.ajax({
+                        url: `<?= base_url("po-lokal-bahan-baku/get-supplier-harga-detail"); ?>`,
+                        method: "GET",
+                        // beforeSend: function() {
+                        //     setLoading();
+                        // },
+                        // complete: function() {
+                        //     stopLoading();
+                        // },
+                        data: {
+                            supplier_harga_id: list_items[i].supplier_harga_id,
+                        },
+                        dataType: "json",
+                        success: function(res) {
+                            if (res.data.harga == 0) {
+                                $(".harga").val(list_items[i].harga).keyup();
+                            } else {
+                                $(".harga").val(greatFormatRupiah(res.data.harga));
+                            }
+
+                            if (res.data.daily_price == 0) {
+                                $(".daily_price").val(list_items[i].daily_price).keyup();
+                            } else {
+                                $(".daily_price").val(greatFormatRupiah(res.data.daily_price));
+                            }
+
+                            if (res.data.monthly_price == 0) {
+                                $(".monthly_price").val(list_items[i].monthly_price).keyup();
+                            } else {
+                                $(".monthly_price").val(greatFormatRupiah(res.data.monthly_price)).keyup();
+
+                            }
+                        }
+                    })
 
 
                     $(".id_detail").val(list_items[i].id_detail);
                     $(".spesifikasi").val(list_items[i].supplier_harga_id).change();
-                    $(".harga").val(list_items[i].harga).keyup();
-                    $(".daily_price").val(list_items[i].daily_price).keyup();
-                    $(".monthly_price").val(list_items[i].monthly_price).keyup();
                     $(".qty").val(list_items[i].qty).keyup();
                     $(".peti").val(list_items[i].peti);
                     $(".quality").val(list_items[i].quality).change();

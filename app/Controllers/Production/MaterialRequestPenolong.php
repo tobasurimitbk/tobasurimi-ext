@@ -180,12 +180,25 @@ class MaterialRequestPenolong extends BaseController
                 } elseif ($value->barang_type == "bahan_modal") {
                     $value->barang_type_text = "Bahan Modal";
                 }
-                $value->stok_total = $this->stockDetail2Model->getStockListDetail(
+                $dataMaterialRequestNotApprove = $this->materialRequestDetailsModel->getMaterialRequestNotApprove(
                     $value->stock_id,
                     $value->bc_id,
                     $value->no_aju,
+                    date('Y-m-d', strtotime(str_replace('/', '-', $value->stock_date))),
                     $value->stock_dokumen
-                )['stok_total'] - $value->qty2;
+                );
+
+                if ($dataMaterialRequestNotApprove) {
+                    $value->is_requested = true;
+                    $value->stok_total = $this->stockDetail2Model->getStockListDetail(
+                        $value->stock_id,
+                        $value->bc_id,
+                        $value->no_aju,
+                        $value->stock_dokumen
+                    )['stok_total'] - $dataMaterialRequestNotApprove['qty2'];
+                } else {
+                    $value->is_requested = false;
+                }
             }
             $data["dataMaterialRequests"] = $dataMaterialRequests;
             $data["dataMaterialRequestDetails"] = $dataMaterialRequestDetails;

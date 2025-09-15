@@ -412,11 +412,11 @@
     <table style="width: 100%; border-collapse: collapse; margin-top: 4px; font-size: 11px;">
         <thead>
             <tr style="background-color: #f8f9fa; border-bottom: 2px solid #dee2e6;">
-                <th style="padding: 6px; text-align: left; font-weight: bold; border: 1px solid #ddd; width: 4%; height:2%;">NO</th>
+                <th style="padding: 6px; text-align: left; font-weight: bold; border: 1px solid #ddd; width: 4%;">NO</th>
                 <th style="padding: 6px; text-align: left; font-weight: bold; border: 1px solid #ddd;">
                     PRODUCT
                     <span style="float: right;">
-                        TOTAL (<?= $salesKontrak['mata_uang'] ?>) <br>
+                        <!-- TOTAL (<?= $salesKontrak['mata_uang'] ?>) <br> -->
                         <?= $salesKontrak['tipe_harga'] . " " . ($salesKontrak['tipe_harga'] == "FOB" ? $salesKontrak['loading_port'] : $salesKontrak['dicharge_port']) ?>
                     </span>
                 </th>
@@ -460,33 +460,33 @@
                     <td style="padding: 6px; border: 1px solid #ddd; vertical-align: top;">
                         <div style="font-weight: bold; font-size: 11px;"><?= $detail["nama_barang"]; ?></div>
                         <div style="font-size: 11px; margin-top: 4px; line-height: 1.4;">
-                            <table>
+                            <table style="margin-left: -3px;">
                                 <?php if (!empty($detail['species'])): ?>
                                     <tr>
-                                        <td style="display: inline-block; font-weight: bold; ">SPECIES</td>
-                                        <td>:</td>
-                                        <td><?= trim($detail['species']) ?></td>
+                                        <td style="font-weight: bold; vertical-align: top;">SPECIES</td>
+                                        <td style="vertical-align: top;">:</td>
+                                        <td style="vertical-align: top;"><?= trim($detail['species']) ?></td>
                                     </tr>
                                 <?php endif; ?>
                                 <?php if (!empty($detail['specs'])): ?>
                                     <tr>
-                                        <td style="display: inline-block; font-weight: bold;">SPECS</td>
-                                        <td>:</td>
-                                        <td><?= trim($detail['specs']) ?></td>
+                                        <td style="font-weight: bold; vertical-align: top;">SPECS</td>
+                                        <td style="vertical-align: top;">:</td>
+                                        <td style="vertical-align: top;"><?= trim($detail['specs']) ?></td>
                                     </tr>
                                 <?php endif; ?>
                                 <?php if (!empty($detail['brand'])): ?>
                                     <tr>
-                                        <td style="display: inline-block; font-weight: bold;">BRAND</td>
-                                        <td>:</td>
-                                        <td><?= trim($detail['brand']) ?></td>
+                                        <td style="font-weight: bold;vertical-align: top;">BRAND</td>
+                                        <td style="vertical-align: top;">:</td>
+                                        <td style="vertical-align: top;"><?= trim($detail['brand']) ?></td>
                                     </tr>
                                 <?php endif; ?>
                                 <?php if (!empty($detail['kemasan'])): ?>
                                     <tr>
-                                        <td style="display: inline-block; font-weight: bold;">PACKING</td>
-                                        <td>:</td>
-                                        <td><?= trim($detail['kemasan']) ?></td>
+                                        <td style="font-weight: bold;vertical-align: top;">PACKING</td>
+                                        <td style="vertical-align: top;">:</td>
+                                        <td style="vertical-align: top;"><?= trim($detail['kemasan']) ?></td>
                                     </tr>
                                 <?php endif; ?>
 
