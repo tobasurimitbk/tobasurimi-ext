@@ -227,7 +227,7 @@ function terbilang($x)
 
 function terbilangInggris($x)
 {
-   // Remove commas from number
+   // Remove commas
    $x = str_replace(',', '', $x);
 
    $ones = [
@@ -274,20 +274,18 @@ function terbilangInggris($x)
       "Trillion"
    ];
 
-   // Handle decimals
+   // handle decimals (cents)
    if (strpos($x, '.') !== false) {
       $parts = explode('.', $x);
-      $words = trim(terbilangInggris($parts[0]));
+      $whole = (int)$parts[0];
+      $decimal = str_pad(substr($parts[1], 0, 2), 2, "0"); // ambil 2 digit saja
+      $words = trim(terbilangInggris($whole));
 
-      if ((int)$parts[1] > 0) {
-         $words .= " Point";
-         $digits = str_split($parts[1]);
-         foreach ($digits as $digit) {
-            $words .= " " . $ones[$digit];
-         }
+      if ((int)$decimal > 0) {
+         $words .= " " . trim(terbilangInggris((int)$decimal)) . " Cents";
       }
 
-      return trim($words);
+      return strtoupper(trim($words));
    }
 
    $x = (int)$x;
