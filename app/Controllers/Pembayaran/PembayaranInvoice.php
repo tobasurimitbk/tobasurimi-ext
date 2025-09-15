@@ -429,7 +429,6 @@ class PembayaranInvoice extends BaseController
 
     public function generateNoPembayaranInvoice()
     {
-
         $paymentNo = "BNL/";
         $month = date('m');
         $year = date('y');
@@ -441,13 +440,15 @@ class PembayaranInvoice extends BaseController
             ->orderBy('createdAt', 'DESC')
             ->first();
 
-        $paymentNo = "{$numberTemplate}001";
+        // default mulai dari 0001
+        $paymentNo = "{$numberTemplate}0001";
 
         if (!empty($lastData)) {
             $exploded = explode('/', $lastData->no_pembayaran);
             $lastIncrement = (int)$exploded[3] + 1;
 
-            $paddedNumber = str_pad($lastIncrement, 3, 0, STR_PAD_LEFT);
+            // ubah jadi 4 digit
+            $paddedNumber = str_pad($lastIncrement, 4, 0, STR_PAD_LEFT);
             $paymentNo = $numberTemplate . $paddedNumber;
         }
 
@@ -455,9 +456,9 @@ class PembayaranInvoice extends BaseController
             'paymentNo' => $paymentNo,
             'token' => csrf_hash(),
             'success' => true,
-
         ]);
     }
+
     public function getAllPembayaranInvoice()
     {
 
