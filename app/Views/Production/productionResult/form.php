@@ -15,17 +15,6 @@
                 Kembali
             </a>
             <?php if (isset($data)) { ?>
-                <!-- <button class="btn btn-success mr-1" onclick="posting('<?= !empty($data) ? encrypt($data->id) : ''; ?>', 1)">
-                    Posting
-                </button>
-                <button class="btn btn-show-form btn-save btn-submit-form mr-1" type="button">
-                    Simpan
-                </button> -->
-                <?php if (can('Produksi', 'Hasil Produksi', 'p')) : ?>
-                    <button class="btn btn-warning btn-print float-right" onclick="print('<?= base_url("production-result/print/"); ?><?= !empty($data) ? encrypt($data->id) : ''; ?>')">
-                        Print
-                    </button>
-                <?php endif; ?>
                 <?php if ($data->is_posted != 1) { ?>
                     <?php if (can('Produksi', 'Hasil Produksi', 'a')) : ?>
                         <button class="btn btn-success mr-1" onclick="posting('<?= !empty($data) ? encrypt($data->id) : ''; ?>', 1)">
@@ -41,7 +30,6 @@
                         Simpan
                     </button>
                 <?php } ?>
-
             <?php } else if (!isset($data)) { ?>
                 <button class="btn btn-show-form btn-save btn-submit-form mr-1" type="button">
                     Simpan
@@ -89,19 +77,24 @@
                 <div class="row">
                     <div class="col-md-6">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <?php if (!isset($data)) : ?>
-                                <select class="form-select kode_produksi" name="kode_produksi[]" id="kode_produksi" aria-label="Floating label select example" multiple="multiple">
-                                    <option value=""></option>
-                                    <?php if (isset($dataWorkOrder)) : ?>
-                                        <?php foreach ($dataWorkOrder ?? [] as $dataWO) : ?>
-                                            <option value="<?= $dataWO->id ?>" data-nama-barang="<?= $dataWO->nama_barang ?>" data-standart-production="<?= $dataWO->standart_production ?>" data-warehouse="<?= $dataWO->warehouse_id ?>" data-divisi="<?= $dataWO->divisi_id ?>"><?= $dataWO->wo_no ?> - <?= $dataWO->nama_barang ?></option>
-                                        <?php endforeach; ?>
-                                    <?php endif; ?>
-                                </select>
-                            <?php endif; ?>
-                            <?php if (isset($data)) : ?>
-                                <input autocomplete="one-time-code" type="text" class="form-control wo_no" name="wo_no" id="wo_no" placeholder="Kode Produksi" readonly>
-                            <?php endif; ?>
+                            <select class="form-select kode_produksi" name="kode_produksi[]" id="kode_produksi" multiple>
+                                <option value=""></option>
+                                <?php
+                                $selectedIds = isset($data) ? explode(',', $data->work_order_id) : [];
+                                ?>
+                                <?php if (isset($dataWorkOrder)) : ?>
+                                    <?php foreach ($dataWorkOrder ?? [] as $dataWO) : ?>
+                                        <option value="<?= $dataWO->id ?>"
+                                            data-nama-barang="<?= $dataWO->nama_barang ?>"
+                                            data-standart-production="<?= $dataWO->standart_production ?>"
+                                            data-warehouse="<?= $dataWO->warehouse_id ?>"
+                                            data-divisi="<?= $dataWO->divisi_id ?>"
+                                            <?= in_array($dataWO->id, $selectedIds) ? 'selected' : '' ?>>
+                                            <?= $dataWO->wo_no ?> - <?= $dataWO->nama_barang ?>
+                                        </option>
+                                    <?php endforeach; ?>
+                                <?php endif; ?>
+                            </select>
                             <label for="floatingInput">Kode Work Order</label>
                         </div>
                     </div>
@@ -111,12 +104,6 @@
                             <label for="floatingInput">Barang Jadi</label>
                         </div>
                     </div>
-                    <!-- <div class="col-md-4">
-                        <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" type="text" class="form-control standart_production" name="standart_production" id="standart_production" placeholder="Jumlah Standart Produksi" readonly>
-                            <label for="floatingInput">Jumlah Standart Produksi</label>
-                        </div>
-                    </div> -->
                 </div>
                 <div class="row">
                     <div class="col-md-6">
@@ -152,7 +139,7 @@
                         <nav>
                             <div class="nav nav-tabs" id="nav-tab" role="tablist">
                                 <button class="nav-link active" id="nav-home-tab" data-bs-toggle="tab" data-bs-target="#nav-barang-jadi" type="button" role="tab" aria-controls="nav-barang-jadi" aria-selected="true">Barang Jadi</button>
-                                <button class="nav-link" id="nav-scrap-tab" data-bs-toggle="tab" data-bs-target="#nav-barang-material-request" type="button" role="tab" aria-controls="nav-barang-material-request" aria-selected="false">Barang Material Request</button>
+                                <button class="nav-link" id="nav-material-tab" data-bs-toggle="tab" data-bs-target="#nav-barang-material-request" type="button" role="tab" aria-controls="nav-barang-material-request" aria-selected="false">Barang Material Request</button>
                                 <button class="nav-link" id="nav-scrap-tab" data-bs-toggle="tab" data-bs-target="#nav-scrap" type="button" role="tab" aria-controls="nav-scrap" aria-selected="false">Scrap</button>
                                 <button class="nav-link" id="nav-filling-tab" data-bs-toggle="tab" data-bs-target="#nav-filling" type="button" role="tab" aria-controls="nav-filling" aria-selected="false">Sisa Produksi</button>
                                 <!-- <button class="nav-link" id="nav-barang-jadi-tab" data-bs-toggle="tab" data-bs-target="#nav-barang-jadi" type="button" role="tab" aria-controls="nav-barang-setengah-jadi" aria-selected="false">Barang Setengah Jadi</button> -->
@@ -346,14 +333,9 @@
                                 <div class="row">
                                     <div class="col-md-4">
                                         <div class="form-floating mb-3" style="height: 50px;">
-                                            <?php if (!isset($data)) : ?>
-                                                <select class="form-select kode_request" name="kode_request[]" id="kode_request[]" multiple>
-                                                    <option value=""></option>
-                                                </select>
-                                            <?php endif; ?>
-                                            <?php if (isset($data)) : ?>
-                                                <input autocomplete="one-time-code" type="text" class="form-control req_no" name="req_no" id="req_no" placeholder="Kode Produksi" readonly>
-                                            <?php endif; ?>
+                                            <select class="form-select kode_request" name="kode_request[]" id="kode_request[]" multiple>
+                                                <option value=""></option>
+                                            </select>
                                             <label for="floatingInput">Kode Request</label>
                                         </div>
                                     </div>
@@ -467,24 +449,18 @@
 
     $(document).ready(function() {
         <?php if (isset($data)) : ?>
-            // $(".kode_produksi").val('<?= $data->work_order_id ?>').change();
-            $(".wo_no").val('<?= $dataWorkOrder[0]->wo_no ?>').change();
-            $(".barang_jadi").val('<?= $dataWorkOrder[0]->nama_barang ?>');
-            $(".standart_production").val('<?= $dataWorkOrder[0]->standart_production ?>');
-            $(".department_id_order").val('<?= $dataWorkOrder[0]->divisi_id ?>');
-            $(".warehouse_id_order").val('<?= $dataWorkOrder[0]->warehouse_id ?>');
-            $(".req_no").val('<?= $dataMaterialRequestNo ?>');
-            $("#date_request").val('<?= $dataMaterialRequestDate ?>');
-            // list_items_barang_jadi = [];
-            // list_items_barang_digunakan = [];
-            // list_items_barang_scrap = [];
-            // list_items_barang_filling = [];
+            setTimeout(function() {
+                $("#kode_produksi").trigger("change");
+            }, 300);
+
+            const materialRequestIds = <?= json_encode(json_decode($data->material_request_id, true)) ?>;
+
             <?php foreach ($dataResultBarangJadi as $key => $bj) : ?>
                 list_items_barang_jadi.push({
                     'production_result_detail_id': '<?= $bj->id; ?>',
                     'barang1_id': '<?= $bj->barang1_id; ?>',
                     'barang2_id': '<?= $bj->barang2_id; ?>',
-                    'barang_name': "<?= str_replace('"', '\"', $bj->nama_barang) ?>",
+                    'barang_name': "<?= str_replace('"', '\"', $bj->barang_name) ?>",
                     'kode_barang': '<?= $bj->kode_barang; ?>',
                     'kode_satuan': '<?= $bj->kode_satuan; ?>',
                     'nama_barang': "<?= str_replace('"', '\"', $bj->nama_barang) ?>",
@@ -528,6 +504,7 @@
                     'satuan': '<?= $bd->kode_satuan; ?>',
                     'nama_barang': '<?= str_replace('"', '\"', $bd->nama_barang); ?>',
                     'qty': '<?= floatval($bd->qty); ?>',
+                    'qty_now': '<?= floatval($bd->qty_now); ?>',
                     'ref_no': '<?= $bd->no_ref; ?>',
                     'no_aju': '<?= $bd->no_aju; ?>',
                     'type_barang': '<?= $bd->barang_type; ?>',
@@ -751,7 +728,8 @@
         // SO
         $('.kode_request').select2({
             placeholder: "",
-            theme: "bootstrap-5"
+            theme: "bootstrap-5",
+            multiple: true,
         })
 
         //CSS SELECT2 FLOATING LABEL
@@ -1120,6 +1098,11 @@
                             res.data.forEach(function(item) {
                                 $('.kode_request').append(`<option value="${item.id}" data-tanggal-request="${item.request_date}" data-user-request="${item.user_name}" data-warehouse-request="${item.warehouse_id}" data-divisi-request="${item.divisi_id}">${item.req_no}</option>`);
                             });
+                            <?php if (isset($data)) : ?>
+                                if (Array.isArray(materialRequestIds) && materialRequestIds.length > 0) {
+                                    $('.kode_request').val(materialRequestIds).trigger('change');
+                                }
+                            <?php endif; ?>
                         } else {
                             stopLoading();
                             Swal.fire({
@@ -1137,7 +1120,7 @@
                         }
                     },
                 });
-                console.log(selectedValues);
+                // console.log(selectedValues);
 
                 $.ajax({
                     url: `<?= base_url('production-result/list-work-order'); ?>`,
@@ -1248,49 +1231,50 @@
 
                         $(".kode_barang_filling").empty();
                         $(".kode_barang_filling").append(`<option data-divisi_id="" data-warehouse_id="" data-barang_name_master="" data-barang_id="" data-nama="" data-satuan_id="" data-satuan="" value=""></option>`);
-                        res.data.forEach(function(item) {
-                            // console.log(item);
-                            if (item.ref_no == "NON PABEAN") {
-                                var new_ref_no = item.ref_no;
-                            } else {
-                                var ref_no = item.ref_no + "/" + item.no_aju + "/" + item.stock_date;
+                        <?php if (!isset($data)) : ?>
+                            res.data.forEach(function(item) {
+                                // console.log(item);
+                                if (item.ref_no == "NON PABEAN") {
+                                    var new_ref_no = item.ref_no;
+                                } else {
+                                    var ref_no = item.ref_no + "/" + item.no_aju + "/" + item.stock_date;
 
-                                // Pisahkan string berdasarkan tanda slash '/'
-                                var parts = ref_no.split('/');
-                                var partsAju = parts[1].split('-');
-                                var partsDate = parts[2].replace(/-/g, '');
+                                    // Pisahkan string berdasarkan tanda slash '/'
+                                    var parts = ref_no.split('/');
+                                    var partsAju = parts[1].split('-');
+                                    var partsDate = parts[2].replace(/-/g, '');
 
-                                // // Dapatkan bagian yang Anda inginkan (bagian ke-1 dan ke-4)
-                                var new_ref_no = parts[0] + '/' + partsAju[3] + '/' + partsDate;
-                            }
-                            list_items_barang_digunakan.push({
-                                'barang_detail_id': getID(),
-                                'material_request_detail_id': item.id,
-                                'material_request_id': item.material_request_id,
-                                'bc_id': item.bc_id,
-                                'stock_id': item.stock_tujuan_id,
-                                'stock_date': item.stock_date,
-                                'stock_dokumen': item.stock_dokumen,
-                                'barang1_id': item.barang1_id,
-                                'barang2_id': item.barang2_id,
-                                'kode_barang': item.kode_barang,
-                                'satuan': item.satuan,
-                                'nama_barang': item.nama_barang,
-                                'note': item.note,
-                                'qty': item.qty_now,
-                                'ref_no': new_ref_no,
-                                'no_aju': item.no_aju,
-                                'type_barang': item.type_barang,
-                                'type_barang_text': item.type_barang_text,
-                                'unit': item.unit,
-                                'warehouse_id': item.warehouse_tujuan_id,
-                                'divisi_id': item.divisi_tujuan_id,
-                                'kondisi_barang': item.kondisi_barang,
-                                'harga_umum': item.harga_umum,
-                                'harga_harian': item.harga_harian,
-                                'harga_bulanan': item.harga_bulanan,
-                            });
-                            $(".kode_barang_filling").append(`<option 
+                                    // // Dapatkan bagian yang Anda inginkan (bagian ke-1 dan ke-4)
+                                    var new_ref_no = parts[0] + '/' + partsAju[3] + '/' + partsDate;
+                                }
+                                list_items_barang_digunakan.push({
+                                    'barang_detail_id': getID(),
+                                    'material_request_detail_id': item.id,
+                                    'material_request_id': item.material_request_id,
+                                    'bc_id': item.bc_id,
+                                    'stock_id': item.stock_tujuan_id,
+                                    'stock_date': item.stock_date,
+                                    'stock_dokumen': item.stock_dokumen,
+                                    'barang1_id': item.barang1_id,
+                                    'barang2_id': item.barang2_id,
+                                    'kode_barang': item.kode_barang,
+                                    'satuan': item.satuan,
+                                    'nama_barang': item.nama_barang,
+                                    'note': item.note,
+                                    'qty': item.qty_now,
+                                    'ref_no': new_ref_no,
+                                    'no_aju': item.no_aju,
+                                    'type_barang': item.type_barang,
+                                    'type_barang_text': item.type_barang_text,
+                                    'unit': item.unit,
+                                    'warehouse_id': item.warehouse_tujuan_id,
+                                    'divisi_id': item.divisi_tujuan_id,
+                                    'kondisi_barang': item.kondisi_barang,
+                                    'harga_umum': item.harga_umum,
+                                    'harga_harian': item.harga_harian,
+                                    'harga_bulanan': item.harga_bulanan,
+                                });
+                                $(".kode_barang_filling").append(`<option 
                             data-material_request_detail_id="${item.id}" 
                             data-material_request_id="${item.material_request_id}" 
                             data-bc_id="${item.bc_id}" 
@@ -1315,9 +1299,10 @@
                             data-harga_harian="${item.harga_harian}" 
                             data-harga_bulanan="${item.harga_bulanan}" 
                             value="${item.kode_barang}">(${item.kode_barang}) ${item.nama_barang}</option>`);
-                        });
-                        $(".kode_barang_filling").val("").change();
-                        drawTableBarangDigunakan();
+                            });
+                            $(".kode_barang_filling").val("").change();
+                            drawTableBarangDigunakan();
+                        <?php endif; ?>
                         stopLoading()
                     }
                 });
@@ -1639,7 +1624,7 @@
                 row += '<td>' + item.type_barang_text + '</td>';
                 row += '<td>' + item.nama_barang + '</td>';
                 row += '<td>' + item.satuan + '</td>';
-                row += '<td>' + greatFormatRupiah(item.qty) + '</td>';
+                row += '<td>' + greatFormatRupiah(item.qty_now ?? item.qty) + '</td>';
                 row += '<td>' + `
                 <input class="form-control qty-barang-digunakan" <?= isset($data) ? ($data->is_posted ? 'readonly' : '') : '' ?>   style="height:40px" oninput="preventNegativeInput(this)" autocomplete="one-time-code" class="form-control" type="text" data-index="${index}" value="${qty}">` +
                     '</td>';
