@@ -243,6 +243,7 @@ class JasaVendorOut extends BaseController
                         'bc_out_id'         => $b->bc_id,
                         'no_aju_out'        => $b->no_aju,
                         'stock_dokumen'     => $b->stock_dokumen,
+                        'keterangan'        => $b->keterangan,
                         'qty'               => $qty_bersih,
                         'qty_kotor'         => $qty_kotor,
                     ]);
@@ -263,6 +264,7 @@ class JasaVendorOut extends BaseController
                         'bc_out_id'     => !empty($b->bc_id) ? $b->bc_id : 0,
                         'no_aju_out'    => !empty($b->no_aju) ? $b->no_aju : '-',
                         'stock_dokumen' => !empty($b->stock_dokumen) ? $b->stock_dokumen : '-',
+                        'keterangan'    => $b->keterangan,
                         'qty'               => $qty_bersih,
                         'qty_kotor'         => $qty_kotor,
                     ]);
@@ -338,6 +340,7 @@ class JasaVendorOut extends BaseController
                         'bc_out_id'          => $b->bc_id,
                         'no_aju_out'         => $b->no_aju,
                         'stock_dokumen'      => $b->stock_dokumen,
+                        'keterangan'         => $b->keterangan,
                         'qty'                => $qty_bersih,
                         'qty_kotor'          => $qty_kotor,
                     ]);
@@ -368,6 +371,7 @@ class JasaVendorOut extends BaseController
                         'bc_out_id'          => !empty($b->bc_id) ? $b->bc_id : 0,
                         'no_aju_out'         => !empty($b->no_aju) ? $b->no_aju : '-',
                         'stock_dokumen'      => !empty($b->stock_dokumen) ? $b->stock_dokumen : '-',
+                        'keterangan'         => $b->keterangan,
                         'qty'                => $qty_bersih,
                         'qty_kotor'          => $qty_kotor,
                     ]);

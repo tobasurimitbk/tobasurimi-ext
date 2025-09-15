@@ -63,6 +63,16 @@ class JasaVendorIn extends BaseController
         return view('jasaVendor/in/index', $data);
     }
 
+
+    public function indexKepiting()
+    {
+        $data = [
+            'dataDivisi' => $this->divisiModel->getDivisiAccess()
+        ];
+
+        return view('jasaVendor/in/index_kepiting', $data);
+    }
+
     public function all()
     {
         $payload = [
@@ -107,6 +117,100 @@ class JasaVendorIn extends BaseController
                 ->where('jasa_vendor_in_id', $data->id)
                 ->where('deletedAt', null)
                 ->findAll();
+
+
+            $barangMasterModel = new BarangMasterModel();
+            $barangMasterSpesifikasiModel = new BarangMasterSpesifikasiModel();
+            
+            $barangName = null;
+            $processedMasterIds = []; // Array untuk melacak master_id yang sudah diproses
+
+            foreach($jasaVendorInDetail as $jvi) {
+                $barangMasterSpesifikasi = $barangMasterSpesifikasiModel->find($jvi['spesifikasi_in_id']);
+                $currentMasterId = $barangMasterSpesifikasi['barang_master_id'];
+                
+                // Cek jika master_id belum diproses
+                if (!in_array($currentMasterId, $processedMasterIds)) {
+                    $barangMaster = $barangMasterModel->find($currentMasterId);
+                    
+                    if ($barangName === null) {
+                        $barangName = $barangMaster['barang_name'];
+                    } else {
+                        $barangName .= ', ' . $barangMaster['barang_name'];
+                    }
+                    
+                    $processedMasterIds[] = $currentMasterId; // Tandai sebagai sudah diproses
+                }
+            }
+
+            array_push($dataResult, [
+                "no"                    => $no++,
+                "id"                    => encrypt($data->id),
+                "no_penerimaan_surat_jalan"        => $data->no_penerimaan_surat_jalan,
+                "no_surat_jalan"        => str_replace(['"', ']', '['], "",  $data->multiple_jasa_vendor_out_no),
+                "no_surat_jalan_vendor" => $data->no_surat_jalan_vendor == "" ? "-" : $data->no_surat_jalan_vendor,
+                "tanggal"               => date('d/m/Y', strtotime($data->tanggal)),
+                "divisi"                => $data->divisi,
+                "barang"                => $barangName ?? 'Tidak ada barang',
+                "warehouse_name"        => $data->warehouse_name,
+                "total_item"            => count($jasaVendorInDetail),
+                "vendor_name"           => $data->vendor_name,
+                "status_posting"        => $data->status_posting,
+                "status_bayar"          => $data->status_bayar
+            ]);
+        }
+
+        $data = [
+            "draw"              => intval($this->request->getVar("draw")),
+            "recordsTotal"      => $dataQry['totalData'],
+            "recordsFiltered"   => $dataQry['totalFilteredData'],
+            "data"              => $dataResult,
+            "payload"           => $payload
+        ];
+
+        return response()->setJSON($data);
+    }
+
+
+    public function allKepiting()
+    {
+        $payload = [
+            "pageSize"      => $this->request->getVar("length"),
+            "currentPage"   => ($this->request->getVar("start") / $this->request->getVar("length")) + 1,
+            "search" => $this->request->getVar("search"),
+            "sort" => $this->request->getVar("sort"),
+            "sorttype" => $this->request->getVar("sortType"),
+        ];
+
+        $addCondition = [
+            "sort"   => $this->request->getVar("sort"),
+            "sortType"  => $this->request->getVar("sortType"),
+            // "divisi_id" => $this->request->getVar("divisi_id"),
+            "warehouse_id" => $this->request->getVar('warehouse_id'),
+            "status" => $this->request->getVar("status"),
+            "start_date" => $this->request->getVar('start_date'),
+            "end_date" => $this->request->getVar('end_date'),
+            "no_penerimaan_surat_jalan" => $this->request->getVar("no_penerimaan_surat_jalan"),
+        ];
+
+        $limit = $this->request->getVar("length");
+        $offset = $this->request->getVar("start");
+        $divisiArr = array();
+        $dataResult = array();
+
+        $condition = [
+            'jasa_vendor_in.company_id' => $this->this_company_id,
+            'jasa_vendor_in.deletedAt' => null,
+        ];
+
+        foreach ($this->divisiModel->getDivisiAccess() as $d) {
+            array_push($divisiArr, $d['id']);
+        }
+
+        $dataQry = $this->jasaVendorInModel->getListKepiting($condition, $divisiArr,  $addCondition, $limit, $offset);
+        $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
+
+        foreach ($dataQry['data'] as $data) {
 
             $jasaVendorInDetail = $this->jasaVendorInDetailModel
                 ->where('jasa_vendor_in_id', $data->id)
@@ -190,6 +294,34 @@ class JasaVendorIn extends BaseController
         ];
 
         return view('jasaVendor/in/form', $data);
+    }
+
+
+    public function createKepiting()
+    {
+        $data = [
+            'tanggal' => date('Y-m-d'),
+            'vendor' => $this->vendorModel->where('deletedAt', null)->where('company_id', $this->this_company_id)->orderBy('name', "ASC")->findAll(),
+        ];
+        return view('jasaVendor/in/form_kepiting', $data);
+    }
+
+    public function detailKepiting($id)
+    {
+        $id = decrypt($id);
+        $jasaVendorIn = $this->jasaVendorInModel->find($id);
+        if ($jasaVendorIn == null) {
+            return redirect()->to('jasa-vendor-in');
+        }
+
+        $data = [
+            'jasaVendorIn' => $jasaVendorIn,
+            'vendor' => $this->vendorModel->where('deletedAt', null)->where('company_id', $this->this_company_id)->orderBy('name', "ASC")->findAll(),
+            'divisi' => $this->divisiModel->where('id', $jasaVendorIn['divisi_id'])->findAll(),
+            'warehouse' => $this->warehouseModel->where('id', $jasaVendorIn['warehouse_id'])->findAll()
+        ];
+
+        return view('jasaVendor/in/form_kepiting', $data);
     }
 
     public function print($id)
@@ -388,7 +520,163 @@ class JasaVendorIn extends BaseController
         ]);
     }
 
+    public function createKepitingAction()
+    {
+        $barangs = json_decode($_POST['listBarang']);
+        $jasaVendorOutNo = $this->jasaVendorInModel->getJasaVendorOutNo(
+            $this->request->getVar('multiple_jasa_vendor_out_id')
+        );
 
+        if (count($barangs) == 0) {
+            return response()->setJSON([
+                'status' => false,
+                'message' => "Barang tidak boleh kosong",
+                'token' => csrf_hash()
+            ]);
+        }
+
+        $check = $this->jasaVendorInModel->where('company_id', $this->this_company_id)->where('no_penerimaan_surat_jalan', $this->request->getVar('no_penerimaan_surat_jalan'))->first();
+
+        if ($check != null) {
+            return response()->setJSON([
+                'status' => false,
+                'message' => "Nomor penerimaan surat jalan sudah ada",
+                'token' => csrf_hash()
+            ]);
+        }
+
+        $id = $this->jasaVendorInModel->insert([
+            'company_id' => $this->this_company_id,
+            'divisi_id' => $this->request->getVar('divisi_id'),
+            'warehouse_id' => $this->request->getVar('warehouse_id'),
+            'vendor_id' => $this->request->getVar('vendor_id'),
+            "tanggal" => $this->request->getVar("tanggal") ? date_format(date_create_from_format("d/m/Y", $this->request->getVar("tanggal")), "Y-m-d") : "",
+            "no_surat_jalan_vendor" => $this->request->getVar('no_surat_jalan_vendor'),
+            'status_closed_jasa_vendor_out' => $this->request->getVar('status_closed_jasa_vendor_out'),
+            'no_penerimaan_surat_jalan' => $this->request->getVar('no_penerimaan_surat_jalan'),
+            'multiple_jasa_vendor_out_id' =>  str_replace(['\\"', '\\', '"'], '', json_encode($this->request->getVar('multiple_jasa_vendor_out_id'))),
+            'multiple_jasa_vendor_out_no' =>  str_replace(['\\"', '\\'], '', json_encode($jasaVendorOutNo)),
+            'keterangan' => $this->request->getVar('keterangan')
+        ]);
+
+        $statusClosedJasaVendorOut = $this->request->getVar('status_closed_jasa_vendor_out');
+        $jasaVendorOutIdArr = $this->request->getVar('multiple_jasa_vendor_out_id');
+
+        foreach ($jasaVendorOutIdArr as $j) {
+            $this->jasaVendorOutModel->update($j, [
+                'status_closed' => $statusClosedJasaVendorOut
+            ]);
+        }
+
+        foreach ($barangs as $b) {
+            // LIST BARANG MASUK
+            foreach ($b->list_barang_masuk as $c) {
+
+                $stockInId = $this->stockModel->initStockBarang(
+                        $this->this_company_id,
+                        $this->request->getVar('divisi_id'),
+                        $this->request->getVar('warehouse_id'),
+                        "bahan_baku",
+                        $c->spesifikasi_in_id
+                    );
+                    
+                $this->jasaVendorInDetailModel->insert([
+                        'jasa_vendor_in_id' => $id,
+                        'jasa_vendor_out_id' => $b->jasa_vendor_out_id,
+                        'jasa_vendor_out_detail_id' => $b->jasa_vendor_out_detail_id,
+                        'spesifikasi_in_id' => $c->spesifikasi_in_id,
+                        'stock_in_id' => $stockInId,
+                        'bc_in_id' => $b->bc_id,
+                        'no_aju_in' => $b->no_aju,
+                        'stock_dokumen' => $b->stock_dokumen,
+                        'qty_kotor' => $c->qty_kotor,
+                        'qty_bersih' => $c->qty_bersih
+                    ]);
+            }
+        }
+
+        return response()->setJSON([
+            'message' => "Jasa Vendor Barang Masuk Berhasil Disimpan",
+            'token' => csrf_hash(),
+            'status' => true,
+            'id' => encrypt($id)
+        ]);
+    }
+    
+    public function updateKepitingAction()
+    {
+        $barangs = json_decode($_POST['listBarang']);
+        $jasaVendorOutNo = $this->jasaVendorInModel->getJasaVendorOutNo(
+            $this->request->getVar('multiple_jasa_vendor_out_id')
+        );
+        if (count($barangs) == 0) {
+            return response()->setJSON([
+                'status' => false,
+                'message' => "Barang tidak boleh kosong",
+                'token' => csrf_hash()
+            ]);
+        }
+
+        $id = decrypt($this->request->getVar('id'));
+
+        $this->jasaVendorInModel->update($id, [
+            'company_id' => $this->this_company_id,
+            'divisi_id' => $this->request->getVar('divisi_id'),
+            'warehouse_id' => $this->request->getVar('warehouse_id'),
+            'status_closed_jasa_vendor_out' => $this->request->getVar('status_closed_jasa_vendor_out'),
+            "no_surat_jalan_vendor" => $this->request->getVar('no_surat_jalan_vendor'),
+            'multiple_jasa_vendor_out_id' =>  str_replace(['\\"', '\\', '"'], '', json_encode($this->request->getVar('multiple_jasa_vendor_out_id'))),
+            'multiple_jasa_vendor_out_no' =>  str_replace(['\\"', '\\'], '', json_encode($jasaVendorOutNo)),
+            'keterangan' => $this->request->getVar('keterangan')
+        ]);
+
+
+        $statusClosedJasaVendorOut = $this->request->getVar('status_closed_jasa_vendor_out');
+        $jasaVendorOutIdArr = $this->request->getVar('multiple_jasa_vendor_out_id');
+
+        foreach ($jasaVendorOutIdArr as $j) {
+            $this->jasaVendorOutModel->update($j, [
+                'status_closed' => $statusClosedJasaVendorOut
+            ]);
+        }
+
+        // Delete first and insert again
+        $this->jasaVendorInModel->where('jasa_vendor_in_id', $id)->delete();
+
+        foreach ($barangs as $b) {
+            // LIST BARANG MASUK
+            foreach ($b->list_barang_masuk as $c) {
+                if ($c->qty_kotor != 0) {
+                    $stockInId = $this->stockModel->initStockBarang(
+                        $this->this_company_id,
+                        $this->request->getVar('divisi_id'),
+                        $this->request->getVar('warehouse_id'),
+                        "bahan_baku",
+                        $c->spesifikasi_in_id
+                    );
+                    
+                    $this->jasaVendorInDetailModel->insert([
+                            'jasa_vendor_in_id' => $id,
+                            'jasa_vendor_out_id' => $b->jasa_vendor_out_id,
+                            'jasa_vendor_out_detail_id' => $b->jasa_vendor_out_detail_id,
+                            'spesifikasi_in_id' => $c->spesifikasi_in_id,
+                            'stock_in_id' => $stockInId,
+                            'bc_in_id' => $b->bc_id,
+                            'no_aju_in' => $b->no_aju,
+                            'stock_dokumen' => $b->stock_dokumen,
+                            'qty_kotor' => $c->qty_kotor,
+                            'qty_bersih' => $c->qty_bersih
+                    ]);
+                }
+            }
+        }
+
+        return response()->setJSON([
+            'message' => "Jasa Vendor Barang Masuk Berhasil Diupdate",
+            'token' => csrf_hash(),
+            'status' => true
+        ]);
+    }
 
     public function createActionNew()
     {
@@ -812,6 +1100,33 @@ class JasaVendorIn extends BaseController
         } else {
             $id = ($id == false) ? null : $id;
             $data = $this->jasaVendorInModel->listBarang(
+                $jasaVendorOutID,
+                $id
+            );
+            return response()->setJSON([
+                'data' => $data,
+                'status' => true,
+                'token' => csrf_hash()
+            ]);
+        }
+    }
+
+    public function dropdownListBarangKeluarKepiting()
+    {
+        $id = decrypt($this->request->getVar('id'));
+        $jasaVendorOutID = json_decode($this->request->getVar('multiple_jasa_vendor_out_id'));
+        if (count($jasaVendorOutID) == 0) {
+            return response()->setJSON([
+                'data' => [
+                    'dataDetail' => [],
+                    'dataGroup' => []
+                ],
+                'status' => true,
+                'token' => csrf_hash()
+            ]);
+        } else {
+            $id = ($id == false) ? null : $id;
+            $data = $this->jasaVendorInModel->listBarangKepiting(
                 $jasaVendorOutID,
                 $id
             );

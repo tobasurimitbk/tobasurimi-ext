@@ -1173,6 +1173,7 @@ $routes->post('/jasa-vendor-out/close',  'JasaVendor\JasaVendorOut::close', ['fi
 $routes->get('/jasa-vendor-out/id/(:segment)',  'JasaVendor\JasaVendorOut::detail/$1', ['filter' => 'Auth']);
 $routes->get('/jasa-vendor-out/get-jasa-vendor-out-no',  'JasaVendor\JasaVendorOut::getJasaVendorOutNo', ['filter' => 'Auth']);
 $routes->get('/jasa-vendor-out/print/(:segment)', 'JasaVendor\JasaVendorOut::print/$1', ['filter' => 'Auth']);
+
 // JASA VENDOR IN
 $routes->get('/jasa-vendor-in', 'JasaVendor\JasaVendorIn::index', ['filter' => 'Auth']);
 $routes->get('/jasa-vendor-in/create', 'JasaVendor\JasaVendorIn::create', ['filter' => 'Auth']);
@@ -1191,6 +1192,26 @@ $routes->get('/jasa-vendor-in/id/(:segment)',  'JasaVendor\JasaVendorIn::detail/
 $routes->get('/jasa-vendor-in/print/(:segment)',  'JasaVendor\JasaVendorIn::print/$1', ['filter' => 'Auth']);
 $routes->get('/jasa-vendor-in/all',  'JasaVendor\JasaVendorIn::all', ['filter' => 'Auth']);
 $routes->post('/jasa-vendor-in/unposting', 'JasaVendor\JasaVendorIn::unPosting', ['filter' => 'Auth']);
+
+
+// JASA VENDOR IN KEPITING
+$routes->get('/jasa-vendor-in-kepiting', 'JasaVendor\JasaVendorIn::indexKepiting', ['filter' => 'Auth']);
+$routes->get('/jasa-vendor-in-kepiting/create', 'JasaVendor\JasaVendorIn::createKepiting', ['filter' => 'Auth']);
+$routes->get('/jasa-vendor-in-kepiting/divisi', 'JasaVendor\JasaVendorIn::dropdownDivisi', ['filter' => 'Auth']);
+$routes->get('/jasa-vendor-in-kepiting/warehouse', 'JasaVendor\JasaVendorIn::dropdownWarehouse', ['filter' => 'Auth']);
+$routes->get('/jasa-vendor-in-kepiting/list-jasa-vendor-out', 'JasaVendor\JasaVendorIn::dropdownNoJasaVendorOut', ['filter' => 'Auth']);
+$routes->get('/jasa-vendor-in-kepiting/list-barang', 'JasaVendor\JasaVendorIn::dropdownListBarangKeluarKepiting', ['filter' => 'Auth']);
+$routes->get('/jasa-vendor-in-kepiting/list-barang-masuk', 'JasaVendor\JasaVendorIn::dropdownListBarangMasuk', ['filter' => 'Auth']);
+$routes->get('/jasa-vendor-in-kepiting/get-jasa-vendor-in-no',  'JasaVendor\JasaVendorIn::getJasaVendorInNo', ['filter' => 'Auth']);
+$routes->post('/jasa-vendor-in-kepiting/save',  'JasaVendor\JasaVendorIn::createKepitingAction', ['filter' => 'Auth']);
+$routes->post('/jasa-vendor-in-kepiting/update',  'JasaVendor\JasaVendorIn::updateKepitingAction', ['filter' => 'Auth']);
+$routes->post('/jasa-vendor-in-kepiting/delete',  'JasaVendor\JasaVendorIn::delete', ['filter' => 'Auth']);
+$routes->post('/jasa-vendor-in-kepiting/posting',  'JasaVendor\JasaVendorIn::posting', ['filter' => 'Auth']);
+$routes->post('/jasa-vendor-in-kepiting/posting-bayar',  'JasaVendor\JasaVendorIn::postingBayar', ['filter' => 'Auth']);
+$routes->get('/jasa-vendor-in-kepiting/id/(:segment)',  'JasaVendor\JasaVendorIn::detailKepiting/$1', ['filter' => 'Auth']);
+$routes->get('/jasa-vendor-in-kepiting/print/(:segment)',  'JasaVendor\JasaVendorIn::print/$1', ['filter' => 'Auth']);
+$routes->get('/jasa-vendor-in-kepiting/all',  'JasaVendor\JasaVendorIn::allKepiting', ['filter' => 'Auth']);
+$routes->post('/jasa-vendor-in-kepiting/unposting', 'JasaVendor\JasaVendorIn::unPosting', ['filter' => 'Auth']);
 
 // JASA VENDOR OUT - KEPITING KUKUS
 $routes->get('/jasa-vendor-out-kepiting-kukus/get-jasa-vendor-out-no',  'JasaVendor\JasaVendorOutKepitingKukus::getJasaVendorOutNo', ['filter' => 'Auth']);
