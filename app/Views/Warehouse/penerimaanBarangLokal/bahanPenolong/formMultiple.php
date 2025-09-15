@@ -738,12 +738,16 @@
                     item = listData.result[i];
                     var jml_diterima_total_now = Number(item.jml_diterima_total - jml_diterima_lpb_last);
                     var sisa_total_now = Math.floor(Number(item.sisa_total + jml_diterima_lpb_last) * 1000) / 1000;
-                    var sub_total = Math.floor(Number(jml_diterima_lpb) * Number(item.harga) * 1000) / 1000;
+                    // var sub_total = Math.floor(Number(jml_diterima_lpb) * Number(item.harga) * 1000) / 1000;
+                    // $('.sub_total').val('' +
+                    //     greatFormatRupiah(Math.round(sub_total)));
+                    // $('.jml_diterima_total').val(greatFormatRupiah(jml_diterima_total_now));
+                    // $('.sisa_total').val(greatFormatRupiah(sisa_total_now));
+                    var sub_total = (Number(jml_diterima_lpb) * Number(item.harga));
                     $('.sub_total').val('' +
-                        greatFormatRupiah(Math.round(sub_total)));
+                        greatFormatRupiah((sub_total.toFixed(2))));
                     $('.jml_diterima_total').val(greatFormatRupiah(jml_diterima_total_now));
                     $('.sisa_total').val(greatFormatRupiah(sisa_total_now));
-
                     break;
                 }
             }
@@ -755,10 +759,15 @@
                     item = listData.result[i];
                     var jml_diterima_total_now = (Number(item.jml_diterima_total) + Number(jml_diterima_lpb) - jml_diterima_lpb_last);
                     var sisa_total_now = Math.floor((item.jml_order - jml_diterima_total_now) * 1000) / 1000;
-                    var sub_total = Math.floor((Number(jml_diterima_lpb) * Number(item.harga)) * 1000) / 1000;
+                    // var sub_total = Math.floor((Number(jml_diterima_lpb) * Number(item.harga)) * 1000) / 1000;
+                    // $('.sub_total').val('' +
+                    //     greatFormatRupiah(Math.round(sub_total)));
+                    // $('.jml_diterima_total').val(greatFormatRupiah(jml_diterima_total_now));
+                    // $('.sisa_total').val(greatFormatRupiah(sisa_total_now));
 
+                    var sub_total = (Number(jml_diterima_lpb) * Number(item.harga));
                     $('.sub_total').val('' +
-                        greatFormatRupiah(Math.round(sub_total)));
+                        greatFormatRupiah(sub_total.toFixed(2)));
                     $('.jml_diterima_total').val(greatFormatRupiah(jml_diterima_total_now));
                     $('.sisa_total').val(greatFormatRupiah(sisa_total_now));
                     break;
@@ -824,8 +833,8 @@
                 );
                 newRow.append($('<td>').text(parseFloat(v.jml_diterima_total)));
                 newRow.append($('<td>').text(parseFloat(v.sisa_total)));
-                newRow.append($('<td>').text(greatFormatRupiah(v.harga)));
-                newRow.append($('<td>').text(greatFormatRupiah(v.sub_total)));
+                newRow.append($('<td>').text(greatFormatRupiah(v.harga.toFixed(2))));
+                newRow.append($('<td>').text(greatFormatRupiah(v.sub_total.toFixed(2))));
                 newRow.append($('<td>').text(v.keterangan));
                 newRow.append($('<td>').html(
                     <?php if (!empty($dataPenerimaanBarang)) : ?> <?php if ($dataPenerimaanBarang['status_post'] === "FINISH") : ?> `-`
@@ -867,8 +876,8 @@
             newRow.append($('<td style="text-align:left;">' + Math.floor(jmlDiterimaLpbKonversi * 1000) / 1000 + '</td>'));
             newRow.append($('<td style="text-align:left;"><b>' + Math.floor(jmlDiterimaTotal * 1000) / 1000 + '</b></td>'));
             newRow.append($('<td style="text-align:left;"><b>' + Math.floor(sisaTotal * 1000) / 1000 + '</b></td>'));
-            newRow.append($('<td style="text-align:left;"><b>' + greatFormatRupiah(parseFloat(hargaTotal) || 0) + '</b></td>'));
-            newRow.append($('<td style="text-align:left;"><b>' + greatFormatRupiah(parseFloat(subTotal) || 0) + '</b></td>'));
+            newRow.append($('<td style="text-align:left;"><b>' + greatFormatRupiah(parseFloat(hargaTotal).toFixed(2) || 0) + '</b></td>'));
+            newRow.append($('<td style="text-align:left;"><b>' + greatFormatRupiah(parseFloat(subTotal).toFixed(2) || 0) + '</b></td>'));
             newRow.append($('<td></td>'));
             newRow.append($('<td></td>'));
             table.find('tfoot').append(newRow);

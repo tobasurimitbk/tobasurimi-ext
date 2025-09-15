@@ -255,12 +255,22 @@
                                 <i class="fa fa-trash"></i>
                             </button>
                             <?php endif; ?>
+                            <?php if (can('Penjualan Ekspor', 'Order Form', 'c')) : ?>
+                            <button data-toggle="tooltip" title="Duplicate" onclick="duplicate('${id}')" class="btn duplicate-btn text-white" style="background-color:#B8522A">
+                                <i class="fa fa-copy fa-sm" aria-hidden="true"></i>
+                            </button>
+                            <?php endif; ?>
                         `
                     } else {
                         return `
                             <?php if (can('Penjualan Ekspor', 'Order Form', 'p')): ?>
                             <button data-toggle="tooltip" title="Print" class="btn btn-warning btn-print" onclick="print('${id}')" style="box-shadow: none !important;">
                                 <i class="fa fa-print fa-sm" aria-hidden="true"></i>
+                            </button>
+                            <?php endif; ?>
+                            <?php if (can('Penjualan Ekspor', 'Order Form', 'c')) : ?>
+                            <button data-toggle="tooltip" title="Duplicate" onclick="duplicate('${id}')" class="btn duplicate-btn text-white" style="background-color:#B8522A">
+                                <i class="fa fa-copy fa-sm" aria-hidden="true"></i>
                             </button>
                             <?php endif; ?>
                         `
@@ -278,12 +288,22 @@
                                 <i class="fa fa-print fa-sm" aria-hidden="true"></i>
                             </button>
                             <?php endif; ?>
+                            <?php if (can('Penjualan Ekspor', 'Order Form', 'c')) : ?>
+                            <button data-toggle="tooltip" title="Duplicate" onclick="duplicate('${id}')" class="btn duplicate-btn text-white" style="background-color:#B8522A">
+                            <i class="fa fa-copy fa-sm" aria-hidden="true"></i>
+                            </button>
+                            <?php endif; ?>
                         `
                     } else {
                         return `
                             <?php if (can('Penjualan Ekspor', 'Order Form', 'p')): ?>
                             <button data-toggle="tooltip" title="Print" class="btn btn-warning btn-print" onclick="print('${id}')" style="box-shadow: none !important;">
                                 <i class="fa fa-print fa-sm" aria-hidden="true"></i>
+                            </button>
+                            <?php endif; ?>
+                            <?php if (can('Penjualan Ekspor', 'Order Form', 'c')) : ?>
+                            <button data-toggle="tooltip" title="Duplicate" onclick="duplicate('${id}')" class="btn duplicate-btn text-white" style="background-color:#B8522A">
+                            <i class="fa fa-copy fa-sm" aria-hidden="true"></i>
                             </button>
                             <?php endif; ?>
                         `
@@ -560,6 +580,23 @@
 
 
         }
+    }
+
+    function duplicate(id) {
+        Swal.fire({
+            title: 'Duplicate Order Form ?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, duplicate!',
+            cancelButtonText: 'Batal'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // Redirect ke route yang ditentukan
+                window.location.href = `/order-form-internasional/duplicate/${id}`;
+            }
+        });
     }
 
 

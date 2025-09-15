@@ -1281,9 +1281,9 @@
             const totalRow = $(`
                 <tr class="grand-total-row" style="background-color: #d1ecf1; font-weight: bold;">
                     <td colspan="9" style="text-align: right;">GRAND TOTAL</td>
-                    <td style="text-align: right;">${greatFormatRupiah(totalQtyRebus)}.000</td>
+                    <td style="text-align: right;">${greatFormatRupiah(totalQtyRebus)}</td>
                     <td colspan="1"></td>
-                    <td colspan="2" style="text-align: right;">${greatFormatRupiah(totalQtyHasilRebus)}.000</td>
+                    <td colspan="2" style="text-align: right;">${greatFormatRupiah(totalQtyHasilRebus)}</td>
                     <td colspan="2"></td>
                 </tr>
             `);

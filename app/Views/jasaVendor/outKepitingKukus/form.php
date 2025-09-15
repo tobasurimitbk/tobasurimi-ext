@@ -500,7 +500,7 @@
         let keterangan = $("#keterangan_detail").val();
         let detailId = $("#id_detail").val(); // kalau kosong berarti data baru
 
-        if (!spesifikasi || !supplierId || !keterangan) {
+        if (!spesifikasi || !keterangan) {
             Swal.fire({
                 icon: 'error',
                 title: 'Spesifikasi, Keterangan, dan Supplier yang akan dikirimkan ke vendor tidak boleh kosong !',

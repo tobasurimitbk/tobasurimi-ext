@@ -53,17 +53,6 @@
 
             <?php endif; ?>
 
-            <?php if (!empty($dataPOLokal)) : ?>
-                <?php if ($dataPOLokal->is_posted === "0") : ?>
-                    <button class="btn btn-show-form btn-save float-right btn-submit-parent">
-                        Simpan
-                    </button>
-                <?php endif; ?>
-            <?php else : ?>
-                <button class="btn btn-show-form btn-save float-right btn-submit-parent">
-                    Simpan
-                </button>
-            <?php endif; ?>
         </div>
     </div>
     <div class="card">
@@ -431,6 +420,23 @@
                             </tr>
                         </tfoot>
                     </table>
+                </div>
+            </div>
+            <br>
+
+            <div class="section section-header" style="box-shadow:none; border:none;">
+                <div class="col-button-tambah-spp">
+                    <?php if (!empty($dataPOLokal)) : ?>
+                        <?php if ($dataPOLokal->is_posted === "0") : ?>
+                            <button class="btn btn-show-form btn-save float-right btn-submit-parent" style="width: 180px; height:40px; font-size:14px;">
+                                <i class="fa-solid fa-floppy-disk fa-lg mr-2"></i> Update PO
+                            </button>
+                        <?php endif; ?>
+                    <?php else : ?>
+                        <button class="btn btn-show-form btn-save float-right btn-submit-parent" style="width: 180px; height:40px; font-size:14px;">
+                            <i class="fa-solid fa-floppy-disk fa-lg mr-2"></i> Simpan PO
+                        </button>
+                    <?php endif; ?>
                 </div>
             </div>
         </div>
@@ -902,32 +908,32 @@
                 if (list_items[i].id_detail == id_detail) {
                     console.log(list_items);
 
-                    $.ajax({
-                        url: `<?= base_url("po-lokal-bahan-baku/get-supplier-harga-detail"); ?>`,
-                        method: "GET",
-                        // beforeSend: function() {
-                        //     setLoading();
-                        // },
-                        // complete: function() {
-                        //     stopLoading();
-                        // },
-                        data: {
-                            supplier_harga_id: list_items[i].supplier_harga_id,
-                        },
-                        dataType: "json",
-                        success: function(res) {
-                            $(".harga").val(res.data.harga);
-                            $(".daily_price").val(res.data.daily_price);
-                            $(".monthly_price").val(res.data.monthly_price).keyup();
-                        }
-                    })
+                    // $.ajax({
+                    //     url: `<?= base_url("po-lokal-bahan-baku/get-supplier-harga-detail"); ?>`,
+                    //     method: "GET",
+                    //     // beforeSend: function() {
+                    //     //     setLoading();
+                    //     // },
+                    //     // complete: function() {
+                    //     //     stopLoading();
+                    //     // },
+                    //     data: {
+                    //         supplier_harga_id: list_items[i].supplier_harga_id,
+                    //     },
+                    //     dataType: "json",
+                    //     success: function(res) {
+                    //         $(".harga").val(res.data.harga);
+                    //         $(".daily_price").val(res.data.daily_price);
+                    //         $(".monthly_price").val(res.data.monthly_price).keyup();
+                    //     }
+                    // })
 
 
                     $(".id_detail").val(list_items[i].id_detail);
                     $(".spesifikasi").val(list_items[i].supplier_harga_id).change();
-                    // $(".harga").val(list_items[i].harga);
-                    // $(".daily_price").val(list_items[i].daily_price);
-                    // $(".monthly_price").val(list_items[i].monthly_price).keyup();
+                    $(".harga").val(list_items[i].harga).keyup();
+                    $(".daily_price").val(list_items[i].daily_price).keyup();
+                    $(".monthly_price").val(list_items[i].monthly_price).keyup();
                     $(".qty").val(list_items[i].qty).keyup();
                     $(".peti").val(list_items[i].peti);
                     $(".quality").val(list_items[i].quality).change();
