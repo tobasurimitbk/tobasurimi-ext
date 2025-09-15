@@ -103,6 +103,10 @@
         * {
             font-family: 'DejaVu Serif' !important;
         }
+
+        p {
+            margin-top: -1.5px !important;
+        }
     </style>
 
     <?php if ($displayPrice == "false"): ?>
@@ -124,7 +128,7 @@
 <body>
     <?php if (!empty($dataSO) && !empty($dataSODetail)) { ?>
 
-        <div class="header" style="margin-top: -30px;">
+        <div class="header" style="margin-top: -50px;">
             <div class="txt-center">
                 <h3>
                     <span style="margin-top: -20px;">
@@ -135,7 +139,7 @@
                 </h3>
             </div>
 
-            <table style="width: 100%;">
+            <table style="width: 100%; margin-top:-10px;">
                 <tr>
                     <td>
                         <table class="label">
@@ -209,7 +213,7 @@
                         <th style="padding: 6px; text-align: left; font-weight: bold; border: 1px solid #ddd; width: 4%; height:2.5%;">NO</th>
                         <th style="padding: 6px; text-align: left; font-weight: bold; border: 1px solid #ddd;">
                             DESCRIPTION OF GOODS
-                            <span style="float: right;">
+                            <span style="float: right; text-align:right;">
                                 PRICE (<?= $dataSO->mata_uang ?>) <br>
                                 <?= $dataSO->tipe_harga . " " . ($dataSO->tipe_harga == "FOB" ? $dataSO->loading_port : $dataSO->dicharge_port) ?>
                             </span>
@@ -265,34 +269,34 @@
                                         </span>
                                     <?php endif; ?>
                                 </div><br>
-                                <div style="font-size: 12px; margin-top: 4px; ">
-                                    <table>
+                                <div style="font-size: 12px; margin-top: 4px; line-height: 1.4;">
+                                    <table style="margin-left: -3px;">
                                         <?php if (!empty($detail['species'])): ?>
-                                            <tr style="vertical-align: top;">
-                                                <td style="display: inline-block; font-weight: bold; ">SPECIES</td>
-                                                <td>:</td>
-                                                <td><?= trim($detail['species']) ?></td>
+                                            <tr>
+                                                <td style="font-weight: bold; vertical-align:top;">SPECIES</td>
+                                                <td style="vertical-align: top;">:</td>
+                                                <td style="vertical-align: top;"><?= trim($detail['species']) ?></td>
                                             </tr>
                                         <?php endif; ?>
                                         <?php if (!empty($detail['specs'])): ?>
-                                            <tr style="vertical-align: top;">
-                                                <td style="display: inline-block; font-weight: bold;">SPECS</td>
-                                                <td>:</td>
-                                                <td><?= trim($detail['specs']) ?></td>
+                                            <tr>
+                                                <td style="font-weight: bold;vertical-align: top;">SPECS</td>
+                                                <td style="vertical-align: top;">:</td>
+                                                <td style="vertical-align: top;"><?= trim($detail['specs']) ?></td>
                                             </tr>
                                         <?php endif; ?>
                                         <?php if (!empty($detail['brand'])): ?>
-                                            <tr style="vertical-align: top;">
-                                                <td style="display: inline-block; font-weight: bold;">BRAND</td>
-                                                <td>:</td>
-                                                <td><?= trim($detail['brand']) ?></td>
+                                            <tr>
+                                                <td style="font-weight: bold;">BRAND</td>
+                                                <td style="vertical-align: top;">:</td>
+                                                <td style="vertical-align: top;"><?= trim($detail['brand']) ?></td>
                                             </tr>
                                         <?php endif; ?>
                                         <?php if (!empty($detail['packing'])): ?>
-                                            <tr style="vertical-align: top;">
-                                                <td style="display: inline-block; font-weight: bold;">PACKING</td>
-                                                <td>:</td>
-                                                <td><?= trim($detail['packing']) ?></td>
+                                            <tr>
+                                                <td style="font-weight: bold;">PACKING</td>
+                                                <td style="vertical-align: top;">:</td>
+                                                <td style="vertical-align: top;"><?= trim($detail['packing']) ?></td>
                                             </tr>
                                         <?php endif; ?>
 
@@ -304,21 +308,21 @@
                                     // Identify which columns have data
                                     $columns_to_show = [];
                                     $all_columns = [
-                                        'size' => ['label' => 'Size', 'width' => '8%'],
-                                        'grade' => ['label' => 'Grade', 'width' => '8%'],
-                                        'packing' => ['label' => 'Packing', 'width' => '8%'],
-                                        'can' => ['label' => 'Can', 'width' => '7%'],
-                                        'cased' => ['label' => 'Case', 'width' => '4%'],
-                                        'case' => ['label' => 'Case', 'width' => '4%'],
-                                        'kg' => ['label' => 'Kg', 'width' => '7%'],
-                                        'lb' => ['label' => 'LB', 'width' => '7%'],
-                                        'inner_box' => ['label' => 'Inner', 'width' => '8%'],
-                                        'pc' => ['label' => 'PC', 'width' => '7%'],
-                                        'bag' => ['label' => 'Bag', 'width' => '7%'],
-                                        'cup' => ['label' => 'Cup', 'width' => '6%'],
-                                        'persen' => ['label' => '%', 'width' => '6%'],
-                                        'remark' => ['label' => 'Remarks', 'width' => '10%'],
-                                        'palet' => ['label' => 'Pallet', 'width' => '10%']
+                                        'size' => ['label' => 'SIZE', 'width' => '8%'],
+                                        'grade' => ['label' => 'GRADE', 'width' => '8%'],
+                                        'packing' => ['label' => 'PACKING', 'width' => '8%'],
+                                        'can' => ['label' => 'QTY (CAN)', 'width' => '7%'],
+                                        'cased' => ['label' => 'QTY (CASE)', 'width' => '7%'],
+                                        'case' => ['label' => 'QTY (CASE)', 'width' => '7%'],
+                                        'kg' => ['label' => 'QTY (KG)', 'width' => '7%'],
+                                        'lb' => ['label' => 'QTY (LB)', 'width' => '7%'],
+                                        'inner_box' => ['label' => 'INNER', 'width' => '8%'],
+                                        'pc' => ['label' => 'QTY (PC)', 'width' => '7%'],
+                                        'bag' => ['label' => 'QTY (BAG)', 'width' => '7%'],
+                                        'cup' => ['label' => 'QTY (CUP)', 'width' => '6%'],
+                                        'persen' => ['label' => '%', 'width' => '2%'],
+                                        'remark' => ['label' => 'REMARK', 'width' => '10%'],
+                                        'palet' => ['label' => 'PALLET', 'width' => '10%']
 
                                     ];
 
@@ -334,11 +338,17 @@
 
                                     // Check if percentage column exists and should be shown
                                     $show_persen_column = isset($columns_to_show['persen']);
+
+                                    // Ini untuk mengetahui Qty Satuan apa yang dipakek (ambil paling utama)
+                                    $satuanQty = "";
+                                    foreach ($detail['size_breakdown'] as $breakdown):
+                                        $satuanQty =  $breakdown['satuan_size_code'];
+                                    endforeach;
                                     ?>
 
                                     <div style="margin-top: 6px;">
-                                        <div style="font-size: 12px; font-weight: bold;">SIZE BREAKDOWN:</div>
-                                        <table style="width: 100%; border-collapse: collapse; margin-top: 4px; font-size: 12px;">
+                                        <div style="font-size: 12px; font-weight: bold;">SIZE & BREAKDOWN:</div>
+                                        <table style="width: 100%; border-collapse: collapse; margin-top: 4px; font-size: 11px;">
                                             <thead>
                                                 <tr style="background-color: #f3f4f6;">
                                                     <?php foreach ($columns_to_show as $col => $col_data): ?>
@@ -348,12 +358,12 @@
                                                     <?php endforeach; ?>
 
                                                     <?php if ($show_persen_column): ?>
-                                                        <th style="padding: 3px; border: 1px solid #ddd; width: 5%;text-align: right;">%</th>
+                                                        <th style="padding: 3px; border: 1px solid #ddd; width: 4.5%;text-align: right;">%</th>
                                                     <?php endif; ?>
 
-                                                    <th style=" padding: 3px; border: 1px solid #ddd; width: 8%; text-align: right;">Qty</th>
-                                                    <th style="padding: 3px; border: 1px solid #ddd; width: 6%; text-align: right;" class="price">Unit Price</th>
-                                                    <th style="padding: 3px; border: 1px solid #ddd; width: 6%; text-align: right;" class="price">Total Amount</th>
+                                                    <th style=" padding: 3px; border: 1px solid #ddd; width: 4.5%; text-align: center;">QTY (<?= $satuanQty ?>)</th>
+                                                    <th style="padding: 3px; border: 1px solid #ddd; width: 6%; text-align: center;" class="price">UNIT PRICE <br>(<?= $dataSO->mata_uang . "/" . $satuanQty ?>)</th>
+                                                    <th style="padding: 3px; border: 1px solid #ddd; width: 8%; text-align: center;" class="price">TOTAL AMOUNT (<?= $dataSO->mata_uang ?>)</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
@@ -389,7 +399,7 @@
                                                             </td>
                                                         <?php endif; ?>
 
-                                                        <td style="padding: 3px; border: 1px solid #ddd; text-align: right;"><?= number_format($breakdown['qty_input'], 2) . " " . $breakdown['satuan_size_code'] ?></td>
+                                                        <td style="padding: 3px; border: 1px solid #ddd; text-align: right;"><?= number_format($breakdown['qty_input'], 2) ?></td>
                                                         <td style="padding: 3px; border: 1px solid #ddd; text-align: right;" class="price"><?= number_format($breakdown['harga'], 2) ?></td>
                                                         <td style="padding: 3px; border: 1px solid #ddd; text-align: right;" class="price"><?= number_format($breakdown['total_input'], 2) ?></td>
                                                     </tr>
@@ -405,7 +415,7 @@
                                                         </td>
                                                     <?php endif; ?>
 
-                                                    <td style="padding: 3px; border: 1px solid #ddd; text-align: right; font-weight: bold;"><?= number_format($breakdown_qty, 2) . " " . $breakdown['satuan_size_code'] ?></td>
+                                                    <td style="padding: 3px; border: 1px solid #ddd; text-align: right; font-weight: bold;"><?= number_format($breakdown_qty, 2)  ?></td>
                                                     <?php if ($displayPrice == "true"): ?>
                                                         <td style="padding: 3px; border: 1px solid #ddd; text-align: right; font-weight: bold;"></td>
                                                         <td style="padding: 3px; border: 1px solid #ddd; text-align: right; font-weight: bold;" class="price"><?= number_format($breakdown_total, 2) ?></td>
@@ -601,7 +611,7 @@
                                                             foreach ($groupBySatuan as $satuan => $data):
                                                                 $grand_total_qty += $data['qty_input'];
                                                             ?>
-                                                                <td style="padding: 5px; border: 1px solid #ddd; text-align: right; width:100px;">
+                                                                <td style="padding: 5px; border: 1px solid #ddd; text-align: right; width:120px;">
                                                                     <?= number_format($data['qty_input'], 2) ?> <?= $satuan ?>
                                                                 </td>
                                                             <?php endforeach; ?>
@@ -679,7 +689,6 @@
                                 <b>
                                     - DOCUMENT REQUIRED
                                 </b>
-                                <br>
                                 <?= $dataSO->document_required ?>
                             <?php endif; ?>
                             <?php if ($dataSO->payment_term != ""): ?>
