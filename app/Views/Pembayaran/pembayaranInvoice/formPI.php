@@ -63,7 +63,7 @@
             </div>
             <form class="create-form form-add-spp" role="form" method="POST" enctype="multipart/form-data">
                 <input autocomplete="one-time-code" type="hidden" class="id" name="id" id="id" value="<?= !empty($detail) ? encrypt($detail['id']) : ""; ?>">
-                <input autocomplete="one-time-code" type="hidden" class="tipe_invoice" name="tipe_invoice" id="tipe_invoice" value="<?= !empty($detail) ? encrypt($detail['type_invoice']) : "EKSPOR"; ?>">
+                <input autocomplete="one-time-code" type="hidden" class="tipe_invoice" name="tipe_invoice" id="tipe_invoice" value="<?= !empty($detail) ? encrypt($detail['type_invoice']) : "PROFORMA INVOICE"; ?>">
 
                 <input type="hidden" name="tanda_terima_faktur_id" class="tanda_terima_faktur_id" value="">
                 <?= csrf_field() ?>
@@ -108,7 +108,7 @@
                     </div>
                 </div>
                 <div class="row">
-                    <!-- <div class="col-md-4">
+                    <div class="col-md-4">
                         <div class="form-floating form-pembayaran-po mb-3" style="height: 50px;">
                             <select class="form-select divisi_id" id="divisi_id" name="divisi_id" aria-label="Floating label select example">
                                 <option value=""></option>
@@ -120,7 +120,7 @@
                             </select>
                             <label for="floatingInput" style="z-index: 1;">Departemen</label>
                         </div>
-                    </div> -->
+                    </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <input readonly name="customer" id="customer" autocomplete="one-time-code" value="<?= !empty($detail) ? $detail['customer_name'] : "" ?>" type="text" class="form-control customer" placeholder="Customer">
@@ -711,7 +711,7 @@
     function getValas() {
         var dokumen_id = $("#no_dokumen").val();
         $.ajax({
-            url: "<?= base_url("pembayaran-invoice/get-valas-sales-ekspor"); ?>",
+            url: "<?= base_url("pembayaran-invoice/get-valas-sales-ekspor-pi"); ?>",
             method: "GET",
             dataSrc: "data",
             data: {

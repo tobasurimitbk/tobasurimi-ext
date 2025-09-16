@@ -476,6 +476,7 @@ class JasaVendorInModel extends Model
         $supplierModel = new SupplierModel();
         $rmPurchaseOrderModel = new RMPurchaseOrderModel();
         $jasaVendorInModel = new JasaVendorInModel();
+        
 
         $jasaVendorOutData = $jasaVendorOutDetailModel->whereIn('jasa_vendor_out_id', $jasaVendorOutArr)->where('deletedAt', null)->findAll();
         $result = array();
@@ -596,6 +597,10 @@ class JasaVendorInModel extends Model
                             }
                         }
                     }
+
+                    var_dump($result);
+                    die;
+
                 }
             }
         }
@@ -639,7 +644,7 @@ class JasaVendorInModel extends Model
 
         foreach ($resultGroup as $groupKey => $items) {
             // split key ke supplier_id dan keterangan
-            list($supplierId, $keterangan) = explode('|', $groupKey);
+            list($supplierId, $keterangan, $stock_dokumen) = explode('|', $groupKey);
 
             // SUM QTY
             $qtyTotal = 0;
@@ -655,7 +660,7 @@ class JasaVendorInModel extends Model
                 "keterangan" => $keterangan,
                 "barang1_id" => $items[0]['barang1_id'],
                 "tipe_barang" => $items[0]['tipe_barang'],
-                "stock_dokumen" => $items[0]['stock_dokumen'],
+                "stock_dokumen" => $stock_dokumen,
                 "kode_barang_out" => $items[0]['kode_barang_out'],
                 "barang_out" => count($barangArr) == 0 ? "-" : $barangArr[0],
                 "qty_out" => $qtyTotal,

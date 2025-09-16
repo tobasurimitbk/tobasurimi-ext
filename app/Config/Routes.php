@@ -541,6 +541,7 @@ $routes->get('/pembayaran-invoice/get-dokumen-list', 'Pembayaran\PembayaranInvoi
 $routes->get('/pembayaran-invoice/get-dokumen-invoice-lokal/(:segment)', 'Pembayaran\PembayaranInvoice::getDataDokumenInvoiceLokal/$1', ['filter' => 'Auth']);
 $routes->get('/pembayaran-invoice/get-dokumen-invoice-return/(:segment)', 'Pembayaran\PembayaranInvoice::getDataDokumenInvoiceReturn/$1', ['filter' => 'Auth']);
 $routes->get('pembayaran-invoice/get-valas-sales-ekspor', 'Pembayaran\PembayaranInvoice::getValas', ['filter' => 'Auth']);
+$routes->get('pembayaran-invoice/get-valas-sales-ekspor-pi', 'Pembayaran\PembayaranInvoice::getValasPI', ['filter' => 'Auth']);
 $routes->get('/pembayaran-invoice/get-barang-sales-lokal', 'Pembayaran\PembayaranInvoice::getBarangSalesLokal', ['filter' => 'Auth']);
 $routes->get('/pembayaran-invoice/get-barang-sales-ekspor', 'Pembayaran\PembayaranInvoice::getBarangSalesEkspor', ['filter' => 'Auth']);
 $routes->get('/pembayaran-invoice/get-barang-sales-lain', 'Pembayaran\PembayaranInvoice::getBarangSalesLain', ['filter' => 'Auth']);
