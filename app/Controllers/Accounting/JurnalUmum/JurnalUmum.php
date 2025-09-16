@@ -1690,7 +1690,7 @@ class JurnalUmum extends BaseController
                         if (
                             $detail->barang_id == $accBarang->barang_master_id &&
                             $dataPB->company_id == $accBarang->company_id &&
-                            $detail->spesifikasi_id == $accBarang->spesifikasi_id &&
+                            $detail->spesifikasi_id == $accBarang->barang_master_spesifikasi_id &&
                             $dataPB->divisi_id == $accBarang->divisi_id &&
                             $accBarang->ap_id
                         ) {
