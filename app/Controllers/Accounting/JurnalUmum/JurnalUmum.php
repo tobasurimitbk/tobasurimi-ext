@@ -1285,7 +1285,7 @@ class JurnalUmum extends BaseController
                                         $dataPOBBDetail[0]->barang1_id == $value->barang_master_id &&
                                         $dataBB->company_id == $value->company_id &&
                                         $dataBB->divisi_id == $value->divisi_id &&
-                                        $dataBB->spesifikasi_id == $value->spesifikasi_id &&
+                                        $dataPOBBDetail[0]->barang2_id == $value->barang_master_spesifikasi_id &&
                                         $value->ap_id != null &&
                                         $value->ar_id != null
                                     ) {
