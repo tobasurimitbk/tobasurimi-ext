@@ -217,12 +217,13 @@
                             <thead>
                                 <tr>
                                     <th style="text-align: center;" colspan="7">Daftar Barang Keluar</th>
-                                    <th style="text-align: center;" colspan="3">Input Barang Masuk</th>
+                                    <th style="text-align: center;" colspan="4">Input Barang Masuk</th>
                                 </tr>
                                 <tr>
                                     <th style="text-align: center; width:10px;" scope="col">No</th>
                                     <th style="text-align: center;" scope="col">Supplier</th>
                                     <th style="text-align: center;" scope="col">Keterangan</th>
+                                    <th style="text-align: center;" scope="col">No Dokumen</th>
                                     <th style="text-align: center;" scope="col">Tipe Barang</th>
                                     <th style="text-align: center;" scope="col">Kode</th>
                                     <th style="text-align: center;" scope="col">Barang-Spesifikasi</th>
@@ -261,6 +262,7 @@
                     <?= csrf_field() ?>
                     <input type="hidden" name="barang1_id" id="barang1_id" class="barang1_id">
                     <input type="hidden" name="supplier_id" id="supplier_id" class="supplier_id">
+                    <input type="hidden" name="stock_dokumen" id="stock_dokumen" class="stock_dokumen">
                     <input type="hidden" name="keterangan" id="keterangan" class="keterangan">
                     <div class="row">
                         <div class="col-md-6">
@@ -572,7 +574,7 @@
                    $.each(listBarangGroup, function(i, gb) {
                         // Find the first matching detail based on barang1_id and supplier_id
                         let detailMatch = listBarang.find(dd => 
-                            dd.barang1_id == gb.barang1_id && dd.supplier_id == gb.supplier_id
+                            dd.supplier_id == gb.supplier_id && dd.keterangan == gb.keterangan && dd.stock_dokumen == gb.stock_dokumen
                         );
 
                         if (detailMatch) {
@@ -711,6 +713,7 @@
         if ($('.create-form-barang-masuk').valid()) {
             var barang1_id = $('#barang1_id').val();
             var supplier_id = $('#supplier_id').val();
+            var stock_dokumen = $('#stock_dokumen').val();
             var keterangan = $('#keterangan').val();
             var spesifikasi_in_id = $('#spesifikasi_in_id option:selected').data('spesifikasi_id');
             var kode_barang_in = $('#spesifikasi_in_id option:selected').data('kode_barang');
@@ -721,7 +724,7 @@
 
             // FIND BARANG FIRST
             $.each(listBarangGroup, function(i, v) {
-                if (v.supplier_id == supplier_id && (v.keterangan || '') == (keterangan || '')) {
+                if (v.supplier_id == supplier_id && (v.keterangan || '') == (keterangan || '') && (v.stock_dokumen || '') == (stock_dokumen || '')) {
                     index = i;
                     barangFirst = v;
                 }
@@ -746,6 +749,7 @@
                     barang1_id: barangFirst.barang1_id,
                     supplier_id: supplier_id,
                     keterangan: keterangan,
+                    stock_dokumen: stock_dokumen,
                     spesifikasi_in_id: spesifikasi_in_id,
                     kode_barang_in: kode_barang_in,
                     barang_name_in: barang_name_in,
@@ -763,7 +767,7 @@
             // }
 
             // DRAW BARANG MASUK
-            drawTable2(supplier_id, keterangan, listBarangGroup)
+            drawTable2(supplier_id, keterangan, listBarangGroup, stock_dokumen)
 
         }
     });
@@ -772,13 +776,14 @@
         var barang1_id = $('#barang1_id').val();
         var supplier_id = $('#supplier_id').val();
         var keterangan = $('#keterangan').val();
+        var stock_dokumen = $('#stock_dokumen').val();
         var index = null;
         var barangError = null;
         var isValidKotor = true;
         var isValidBersih = true;
 
         $.each(listBarangGroup, function(i, v) {
-            if (v.supplier_id == supplier_id && (v.keterangan || '') == (keterangan || '')) {
+            if (v.supplier_id == supplier_id && (v.keterangan || '') == (keterangan || '') && (v.stock_dokumen || '') == (stock_dokumen || '')) {
                 index = i;
             }
         });
@@ -836,14 +841,14 @@
 
     });
 
-     function displayDetailModal(supplier_id, keterangan) {
+     function displayDetailModal(supplier_id, keterangan, stock_dokumen) {
         // RESET VALIDATOR
         validatorBarangMasuk.resetForm();
         validatorBarangMasuk.reset();
 
         var barangFirst = null;
         $.each(listBarangGroup, function(i, v) {
-            if (v.supplier_id == supplier_id && (v.keterangan || '') == (keterangan || '')) {
+            if (v.supplier_id == supplier_id && (v.keterangan || '') == (keterangan || '') && (v.stock_dokumen || '') == (stock_dokumen || '')) {
                 barangFirst = v;
             }
         });
@@ -854,6 +859,7 @@
         $('#barang1_id').val(barangFirst.barang_master_out_id);
         $('#supplier_id').val(barangFirst.supplier_id);
         $('#keterangan').val(barangFirst.keterangan);
+        $('#stock_dokumen').val(barangFirst.stock_dokumen);
         $('#barang_keluar_name').val(barangFirst.barang_out);
         $('#satuan_barang_keluar').val(barangFirst.satuan_out);
         $('#qty_barang_keluar').val(parseFloat(barangFirst.qty_out).toFixed(2));
@@ -884,7 +890,7 @@
                     })
                     $("#spesifikasi_in_id").val(null);
 
-                    drawTable2(supplier_id, keterangan, listBarangGroup);
+                    drawTable2(supplier_id, keterangan, listBarangGroup, stock_dokumen);
                 }
             });
         } else {
@@ -974,7 +980,7 @@
         }
     }
 
-      function drawTable2(supplier_id, keterangan, listBarangGroup) {
+      function drawTable2(supplier_id, keterangan, listBarangGroup, stock_dokumen) {
         var listBarangFirst = null;
         var totalQtyKotor = 0;
         var totalQtyBersih = 0;
@@ -984,7 +990,7 @@
 
 
         $.each(listBarangGroup, function(i, v) {
-            if (v.supplier_id == supplier_id &&(v.keterangan || '') == (keterangan || '')) {
+            if (v.supplier_id == supplier_id && (v.keterangan || '') == (keterangan || '') && (v.stock_dokumen || '') == (stock_dokumen || '')) {
                 listBarangFirst = v;
             }
         });
@@ -1037,7 +1043,7 @@
                 // totalQtyBersih += destroyFormatRupiah(v.qty_bersih);
             });
             var newRow1 = $('<<tr style="color:whitesmoke; background-color:#f2c996;">>');
-            newRow1.append($('<td colspan="6" style="text-align:right"><b>GRAND TOTAL</b></td>'));
+            newRow1.append($('<td colspan="5" style="text-align:right"><b>GRAND TOTAL</b></td>'));
             newRow1.append($('<td class="total-qty-kotor">').text(greatFormatQty(totalQtyKotor)));
             // newRow1.append($('<td class="total-qty-bersih">').text(greatFormatQty(totalQtyBersih)));
             // newRow1.append($('<td>'));
@@ -1064,6 +1070,7 @@
                 newRow.append($('<td>').text(no++));
                 newRow.append($('<td>').text(v.supplier_name));
                 newRow.append($('<td>').text(v.keterangan));
+                newRow.append($('<td>').text(v.stock_dokumen));
                 newRow.append($('<td>').text(v.tipe_barang));
                 newRow.append($('<td>').text(v.kode_barang_out));
                 newRow.append($('<td>').text(v.barang_out));
@@ -1072,7 +1079,7 @@
                 newRow.append($('<td>').text(v.list_barang_masuk.length + " Barang"));
                 newRow.append($('<td style="text-align: center;">').html(
                     `
-                    <button type="button" class="btn btn-primary" onclick="displayDetailModal(${v.supplier_id}, '${v.keterangan}')" data-toggle="tooltip"><i class="fas fa-pencil-alt"></i></button>
+                    <button type="button" class="btn btn-primary" onclick="displayDetailModal(${v.supplier_id}, '${v.keterangan}', '${v.stock_dokumen}')" data-toggle="tooltip"><i class="fas fa-pencil-alt"></i></button>
                 `
                 ));
 

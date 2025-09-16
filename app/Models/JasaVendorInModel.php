@@ -628,7 +628,7 @@ class JasaVendorInModel extends Model
         $resultGroup = [];
 
         foreach ($result as $item) {
-            $groupKey = $item['supplier_id'] . '|' . $item['keterangan']; // ⬅️ kombinasi supplier + keterangan
+            $groupKey = $item['supplier_id'] . '|' . $item['keterangan'] . '|' . $item['stock_dokumen']; // ⬅️ kombinasi supplier + keterangan
             if (!isset($resultGroup[$groupKey])) {
                 $resultGroup[$groupKey] = [];
             }
@@ -655,6 +655,7 @@ class JasaVendorInModel extends Model
                 "keterangan" => $keterangan,
                 "barang1_id" => $items[0]['barang1_id'],
                 "tipe_barang" => $items[0]['tipe_barang'],
+                "stock_dokumen" => $items[0]['stock_dokumen'],
                 "kode_barang_out" => $items[0]['kode_barang_out'],
                 "barang_out" => count($barangArr) == 0 ? "-" : $barangArr[0],
                 "qty_out" => $qtyTotal,
