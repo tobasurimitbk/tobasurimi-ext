@@ -74,6 +74,10 @@ class BigDaysModel extends Model
                 ->groupEnd();
         }
 
+        if ($addCondition['search']) {
+            $DataQry->like('name', $addCondition['search']);
+        }
+
         $totalFilteredData = $DataQry->countAllResults(false);
         $data = $DataQry->findAll($limit, $offset);
 

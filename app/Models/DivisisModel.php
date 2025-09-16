@@ -150,7 +150,7 @@ class DivisisModel extends Model
         foreach ($data as $d) {
             $res[] = [
                 'id' => $d->id,
-                'nominal' => $d->nominal == null ? "" : str_replace('.', ',', $d->nominal),
+                'nominal' => (float)$d->nominal,
                 'name' => $d->name,
                 'is_cadangan' => $d->is_cadangan,
                 'is_gaji_harian' => $d->is_gaji_harian,

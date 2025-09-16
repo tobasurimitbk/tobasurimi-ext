@@ -5,7 +5,7 @@
 <section class="section">
     <div class="section-header">
         <h1>Jam Kerja</h1>
-        <?php if (can('Master Data', 'Jam Kerja', 'c')) : ?>
+        <?php if (can('Personalia', 'Jam Kerja', 'c')) : ?>
             <a class="btn btn-show-form btn-add float-right" href="<?= base_url("jam-kerja/create"); ?>">
                 <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
             </a>
@@ -15,10 +15,25 @@
 
     <div class="card">
         <div class="card-body">
-            <div class="row justify-content-end row-col-spp">
+            <div class="row justify-content-end">
                 <div class="col-md-3">
-                    <input autocomplete="one-time-code" class="form-control search form-out-search mb-3" placeholder="Cari Data" value="" />
+                    <div class="form-floating mb-3">
+                        <select class="form-select divisi_id" name="divisi_id" id="divisi_id">
+                            <option value=""></option>
+                            <?php foreach ($divisis as $divisi) : ?>
+                                <option value="<?= $divisi['id']; ?>"><?= $divisi['divisi']; ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                        <label for="floatingInput">Filter Departemen</label>
+                    </div>
                 </div>
+                <div class="col-md-3 mb-3">
+                    <div class="form-floating" style="height: 50px;">
+                        <input placeholder="" class="form-control search" id="search" name="search" aria-label="Floating label select example" />
+                        <label style="z-index: 1;" style="z-index: 1;">Cari Data</label>
+                    </div>
+                </div>
+
             </div>
             <div class="row">
                 <div class="table-responsive">
@@ -28,10 +43,12 @@
                                 <th style="width: 10px;" class="sort">No</th>
                                 <th onclick="changeSort('divisi_id')" class="sort">Departemen</th>
                                 <th onclick="changeSort('jenis')" class="sort">Jenis Jam Kerja</th>
+                                <th onclick="changeSort('shift')" class="sort">Shift</th>
+                                <th onclick="changeSort('jam_terlambat')" class="sort">Jam Masuk</th>
                                 <th style="width: 100px;">Action</th>
                             </tr>
                         </thead>
-                        <tbody class="body-table" id="body-table" style="cursor: pointer;">
+                        <tbody class="body-table" id="body-table">
 
                         </tbody>
                     </table>
@@ -50,15 +67,38 @@
     var row = 0;
 
     $(document).ready(function() {
-
         $(".search").keyup(function() {
             table.ajax.reload();
-        })
+        });
 
-        $('#dataTable tbody').on('click', 'tr td:not(.actions):not(.dataTables_empty)', function() {
-            const data = table.row(this).data();
-            location.replace(`<?= base_url("jam-kerja/id"); ?>/${data.id}`);
-        })
+        $('.divisi_id').select2({
+            placeholder: "Filter Departemen",
+            theme: "bootstrap-5",
+            allowClear: true
+        }).change(function(e) {
+            e.preventDefault();
+            table.ajax.reload();
+        });
+
+        $('.divisi_id')
+            .parent('div')
+            .children('span')
+            .children('span')
+            .children('span')
+            .css('height', ' calc(3.5rem + 2px)');
+
+        $('.divisi_id')
+            .parent('div')
+            .children('span')
+            .children('span')
+            .children('span')
+            .children('span')
+            .css('margin-top', '22px').css('margin-left', '-7px');
+
+        $('.divisi_id')
+            .parent('div')
+            .find('label')
+            .css('z-index', '1');
     });
 
     const table = $('.dataTable').DataTable({
@@ -80,6 +120,7 @@
             dataSrc: "data",
             data: function(data) {
                 data.search = $(".search").val();
+                data.divisi_id = $(".divisi_id option:selected").val();
                 data.sort = sort;
                 data.sortType = sortType;
             }
@@ -100,10 +141,16 @@
             orderable: false,
         }, {
             data: "divisi",
-            className: "text-center"
+            className: "text-left"
         }, {
             data: "jenis",
-            className: "text-center"
+            className: "text-left"
+        }, {
+            data: "shift",
+            className: "text-left"
+        }, {
+            data: "jam_terlambat",
+            className: "text-left"
         }, {
             data: "id",
             className: "text-center actions",
@@ -111,16 +158,34 @@
             sortable: false,
             render: function(data, type, row) {
                 let id = row.id;
-                <?php if (can('Master Data', 'Jam Kerja', 'd')) : ?>
-                    return `<button type="button" onclick="handleDelete('${id}')" class="btn btn-discard delete-btn btn-trash"><i class="fa fa-trash"></i></button>
-                `
-                <?php endif; ?>
+                let res = '';
+
+                res += `
+                    <?php if (can('Personalia', 'Jam Kerja', 'u')): ?>
+                        <a href="javascript:void(0)" onclick="edit('${id}')" data-toggle="tooltip" title="Edit" class="btn btn-primary">
+                            <i class="fas fa-edit"></i>
+                        </a>
+                    <?php endif ?>
+                    <?php if (can('Personalia', 'Jam Kerja', 'd')): ?>
+                        <button data-toggle="tooltip" title="Hapus" onclick="remove('${id}')" class="btn btn-danger delete-parent">
+                            <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
+                        </button>
+                    <?php endif ?>
+                    `;
+
+                return res;
             }
         }],
         columnDefs: [{
             defaultContent: "-",
             targets: "_all"
         }],
+        "drawCallback": function(settings) {
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-toggle="tooltip"]'))
+            var tooltipList = tooltipTriggerList.map(function(tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl)
+            });
+        },
         language: {
             emptyTable: "Tidak Ada Data",
             lengthMenu: "Show _MENU_ entries",
@@ -131,7 +196,11 @@
         }
     });
 
-    function handleDelete(id) {
+    function edit(id) {
+        location.replace(`<?= base_url("jam-kerja/id"); ?>/${id}`);
+    }
+
+    function remove(id) {
         Swal.fire({
             icon: 'question',
             title: 'Hapus Jam Kerja?',
@@ -152,7 +221,11 @@
                         jamKerjaID: id
                     },
                     beforeSend: function(xhr) {
+                        setLoading();
                         xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                    },
+                    complete: function() {
+                        stopLoading();
                     },
                     method: "POST",
                     dataType: "json",
@@ -174,22 +247,11 @@
                                 title: response.message,
                                 confirmButtonColor: '#4e73df',
                             })
-                            stopLoading();
                         }
                     },
-                    onError: function(response) {
-                        csrf.val(response.token);
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Data Gagal Dihapus, coba Lagi',
-                            confirmButtonColor: '#4e73df',
-                        })
-                        stopLoading();
-                    }
                 });
             }
         });
-        stopLoading();
     }
 
     const changeSort = function(val) {

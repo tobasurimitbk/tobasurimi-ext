@@ -1173,6 +1173,7 @@ $routes->post('/jasa-vendor-out/close',  'JasaVendor\JasaVendorOut::close', ['fi
 $routes->get('/jasa-vendor-out/id/(:segment)',  'JasaVendor\JasaVendorOut::detail/$1', ['filter' => 'Auth']);
 $routes->get('/jasa-vendor-out/get-jasa-vendor-out-no',  'JasaVendor\JasaVendorOut::getJasaVendorOutNo', ['filter' => 'Auth']);
 $routes->get('/jasa-vendor-out/print/(:segment)', 'JasaVendor\JasaVendorOut::print/$1', ['filter' => 'Auth']);
+
 // JASA VENDOR IN
 $routes->get('/jasa-vendor-in', 'JasaVendor\JasaVendorIn::index', ['filter' => 'Auth']);
 $routes->get('/jasa-vendor-in/create', 'JasaVendor\JasaVendorIn::create', ['filter' => 'Auth']);
@@ -1191,6 +1192,26 @@ $routes->get('/jasa-vendor-in/id/(:segment)',  'JasaVendor\JasaVendorIn::detail/
 $routes->get('/jasa-vendor-in/print/(:segment)',  'JasaVendor\JasaVendorIn::print/$1', ['filter' => 'Auth']);
 $routes->get('/jasa-vendor-in/all',  'JasaVendor\JasaVendorIn::all', ['filter' => 'Auth']);
 $routes->post('/jasa-vendor-in/unposting', 'JasaVendor\JasaVendorIn::unPosting', ['filter' => 'Auth']);
+
+
+// JASA VENDOR IN KEPITING
+$routes->get('/jasa-vendor-in-kepiting', 'JasaVendor\JasaVendorIn::indexKepiting', ['filter' => 'Auth']);
+$routes->get('/jasa-vendor-in-kepiting/create', 'JasaVendor\JasaVendorIn::createKepiting', ['filter' => 'Auth']);
+$routes->get('/jasa-vendor-in-kepiting/divisi', 'JasaVendor\JasaVendorIn::dropdownDivisi', ['filter' => 'Auth']);
+$routes->get('/jasa-vendor-in-kepiting/warehouse', 'JasaVendor\JasaVendorIn::dropdownWarehouse', ['filter' => 'Auth']);
+$routes->get('/jasa-vendor-in-kepiting/list-jasa-vendor-out', 'JasaVendor\JasaVendorIn::dropdownNoJasaVendorOut', ['filter' => 'Auth']);
+$routes->get('/jasa-vendor-in-kepiting/list-barang', 'JasaVendor\JasaVendorIn::dropdownListBarangKeluarKepiting', ['filter' => 'Auth']);
+$routes->get('/jasa-vendor-in-kepiting/list-barang-masuk', 'JasaVendor\JasaVendorIn::dropdownListBarangMasuk', ['filter' => 'Auth']);
+$routes->get('/jasa-vendor-in-kepiting/get-jasa-vendor-in-no',  'JasaVendor\JasaVendorIn::getJasaVendorInNo', ['filter' => 'Auth']);
+$routes->post('/jasa-vendor-in-kepiting/save',  'JasaVendor\JasaVendorIn::createKepitingAction', ['filter' => 'Auth']);
+$routes->post('/jasa-vendor-in-kepiting/update',  'JasaVendor\JasaVendorIn::updateKepitingAction', ['filter' => 'Auth']);
+$routes->post('/jasa-vendor-in-kepiting/delete',  'JasaVendor\JasaVendorIn::delete', ['filter' => 'Auth']);
+$routes->post('/jasa-vendor-in-kepiting/posting',  'JasaVendor\JasaVendorIn::posting', ['filter' => 'Auth']);
+$routes->post('/jasa-vendor-in-kepiting/posting-bayar',  'JasaVendor\JasaVendorIn::postingBayar', ['filter' => 'Auth']);
+$routes->get('/jasa-vendor-in-kepiting/id/(:segment)',  'JasaVendor\JasaVendorIn::detailKepiting/$1', ['filter' => 'Auth']);
+$routes->get('/jasa-vendor-in-kepiting/print/(:segment)',  'JasaVendor\JasaVendorIn::print/$1', ['filter' => 'Auth']);
+$routes->get('/jasa-vendor-in-kepiting/all',  'JasaVendor\JasaVendorIn::allKepiting', ['filter' => 'Auth']);
+$routes->post('/jasa-vendor-in-kepiting/unposting', 'JasaVendor\JasaVendorIn::unPosting', ['filter' => 'Auth']);
 
 // JASA VENDOR OUT - KEPITING KUKUS
 $routes->get('/jasa-vendor-out-kepiting-kukus/get-jasa-vendor-out-no',  'JasaVendor\JasaVendorOutKepitingKukus::getJasaVendorOutNo', ['filter' => 'Auth']);
@@ -1667,6 +1688,7 @@ $routes->group('bea-cukai-bc-40', ['filter' => 'Auth'], function ($routes) {
     $routes->post('id/barang-pungutan-delete', 'BeaCukai\BC40::deletePungutanAction');
     $routes->get('id/barang-dokumen-all', 'BeaCukai\BC40::allDokumenBarang');
     $routes->post('id/barang-dokumen-create', 'BeaCukai\BC40::createBarangDokumenAction');
+    $routes->post('id/barang-dokumen-create-all', 'BeaCukai\BC40::createBarangDokumenAllAction');
     $routes->post('id/barang-dokumen-delete', 'BeaCukai\BC40::deleteBarangDokumenAction');
     $routes->post('id/barang', 'BeaCukai\BC40::createBarangDetailAction');
     // PUNGUTAN
@@ -2026,6 +2048,8 @@ $routes->post('/attendances-unit/save', 'Master\AttendancesUnit::saveData', ['fi
 $routes->post('/attendances-unit/update', 'Master\AttendancesUnit::updateData', ['filter' => 'Auth']);
 $routes->post('/attendances-unit/delete', 'Master\AttendancesUnit::deleteData', ['filter' => 'Auth']);
 $routes->post('/attendances-unit/copy-to-finger', 'Master\AttendancesUnit::CopyToFinger', ['filter' => 'Auth']);
+$routes->post('/attendances-unit/ping', 'Master\AttendancesUnit::pingFinger', ['filter' => 'Auth']);
+
 // Tunjangan
 $routes->get('/tunjangan', 'Master\Tunjangan::ListTunjangan', ['filter' => 'Auth']);
 $routes->get('/tunjangan/all', 'Master\Tunjangan::allTunjangan', ['filter' => 'Auth']);

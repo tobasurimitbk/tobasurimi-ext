@@ -24,7 +24,6 @@
             <div class="modal-footer">
                 <button type="button" class="btn btn-hide-form btn-discard mr-2">Kembali</button>
                 <button type="submit" class="btn btn-submit-form">Simpan</button>
-                <button type="button" class="btn btn-discard delete-btn">Hapus</button>
             </div>
         </div>
     </div>
@@ -41,7 +40,7 @@
     <div class="card">
         <div class="card-body">
             <div class="row justify-content-end mb-3">
-                <div class="col-md-2">
+                <div class="col-md-3">
                     <input autocomplete="one-time-code" class="form-control search form-out-search" placeholder="Search" value="" />
                 </div>
             </div>
@@ -50,11 +49,12 @@
                     <table class="table table-bordered nowrap table-hover-tobasurimi dataTable" id="dataTable" width="100%" cellspacing="0">
                         <thead class="thead-dark">
                             <tr>
-                                <th>No.</th>
+                                <th style="width: 10px;">No</th>
                                 <th onclick="changeSort('jabatan_name')" class="sort">Jabatan</th>
+                                <th style="width: 100px;">Action</th>
                             </tr>
                         </thead>
-                        <tbody class="body-table" id="body-table" style="cursor: pointer;">
+                        <tbody class="body-table" id="body-table">
 
                         </tbody>
                     </table>
@@ -67,7 +67,7 @@
 <script>
     const csrfToken = '<?= csrf_token() ?>';
     let sort = "jabatan_name";
-    let sortType = "desc";
+    let sortType = "asc";
 
     const table = $('.dataTable').DataTable({
 
@@ -105,15 +105,45 @@
             data: "no",
             className: "text-center",
             sortable: false,
-            width: "5%"
+            width: "3%"
         }, {
             data: "jabatan_name",
-            className: "text-center"
+            className: "text-left"
+        }, {
+            data: "id",
+            className: "text-center actions",
+            searchable: false,
+            sortable: false,
+            render: function(data, type, row) {
+                let id = row.id;
+                let res = '';
+
+                res += `
+                    <?php if (can('Personalia', 'Jabatan', 'u')): ?>
+                        <a href="javascript:void(0)" onclick="edit('${id}')" data-toggle="tooltip" title="Edit" class="btn btn-primary">
+                            <i class="fas fa-edit"></i>
+                        </a>
+                    <?php endif ?>
+                    <?php if (can('Personalia', 'Jabatan', 'd')): ?>
+                        <button data-toggle="tooltip" title="Hapus" onclick="remove('${id}')" class="btn btn-danger delete-parent">
+                            <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
+                        </button>
+                    <?php endif ?>
+                    `;
+
+                return res;
+            }
         }],
         columnDefs: [{
             defaultContent: "-",
             targets: "_all"
         }],
+        "drawCallback": function(settings) {
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-toggle="tooltip"]'))
+            var tooltipList = tooltipTriggerList.map(function(tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl)
+            });
+        },
         language: {
             emptyTable: "Tidak Ada Data",
             lengthMenu: "Show _MENU_ entries",
@@ -124,242 +154,133 @@
         }
     });
 
-    $(document).ready(function() {
 
-        var validator = $(".create-form").validate({
-            rules: {
-                jabatan_name: {
-                    required: true
-                }
-            },
-            messages: {
-                jabatan_name: {
-                    required: "Jabatan wajib diisi"
-                }
-            },
-            errorElement: 'span',
-            errorClass: 'text-danger',
-            errorPlacement: function(error, element) {
-                var elem = $(element);
-                if (elem.hasClass("select2-hidden-accessible")) {
-                    element = $("#select2-" + elem.attr("id") + "-container").parent();
-                    error.insertAfter(element);
+    var validator = $(".create-form").validate({
+        rules: {
+            jabatan_name: {
+                required: true
+            }
+        },
+        messages: {
+            jabatan_name: {
+                required: "Jabatan wajib diisi"
+            }
+        },
+        errorElement: 'span',
+        errorClass: 'text-danger',
+        errorPlacement: function(error, element) {
+            var elem = $(element);
+            if (elem.hasClass("select2-hidden-accessible")) {
+                element = $("#select2-" + elem.attr("id") + "-container").parent();
+                error.insertAfter(element);
+            } else {
+                error.insertAfter(element);
+            }
+        },
+        highlight: function(element) {
+            $(element).closest('.form-group').addClass('has-error');
+            $(element).addClass('select-class');
+
+        },
+        unhighlight: function(element) {
+            $(element).closest('.form-group').removeClass('has-error');
+            $(element).removeClass('select-class');
+        },
+    });
+
+    $(".btn-show-form").click(function() {
+        $(".id").val("");
+        $(".title-name").text("Tambah");
+        validator.resetForm();
+        validator.reset();
+        $(".create-form")[0].reset()
+        $(".delete-btn").css('display', 'none');
+        $(".add-modal").modal("show")
+    })
+
+    $(".btn-hide-form").click(function() {
+        $(".add-modal").modal("hide")
+    })
+
+    $(".dataTable_info").addClass("pt-0");
+
+    function edit(id) {
+        $(".create-form")[0].reset()
+        $(".delete-btn").css('display', '');
+        $(".title-name").text("Update");
+
+        validator.resetForm();
+        validator.reset();
+
+        $.ajax({
+            url: "<?= base_url("jabatan/id"); ?>" + "/" + id,
+            method: "GET",
+            dataType: "json",
+            success: function(res) {
+                if (res.status) {
+                    $(".id").val(id);
+                    $(".jabatan_name").val(res.data.jabatan_name);
+
+                    $(".add-modal").modal("show")
                 } else {
-                    error.insertAfter(element);
+                    Swal.fire({
+                        icon: 'error',
+                        title: res.message,
+                        confirmButtonColor: '#4e73df',
+                    })
                 }
-            },
-            highlight: function(element) {
-                $(element).closest('.form-group').addClass('has-error');
-                $(element).addClass('select-class');
-
-            },
-            unhighlight: function(element) {
-                $(element).closest('.form-group').removeClass('has-error');
-                $(element).removeClass('select-class');
-            },
-        });
-
-        $(".btn-show-form").click(function() {
-            $(".id").val("");
-            $(".title-name").text("Tambah");
-            validator.resetForm();
-            validator.reset();
-            $(".create-form")[0].reset()
-            $(".delete-btn").css('display', 'none');
-            $(".add-modal").modal("show")
-        })
-
-        $(".btn-hide-form").click(function() {
-            $(".add-modal").modal("hide")
-        })
-
-        $(".dataTable_info").addClass("pt-0");
-
-        $('#dataTable tbody').on('click', 'tr td:not(.actions):not(.dataTables_empty)', function() {
-            const data = table.row(this).data();
-            $(".create-form")[0].reset()
-            $(".delete-btn").css('display', '');
-            let id = data.id;
-            $(".title-name").text("Update");
-
-            validator.resetForm();
-            validator.reset();
-
-            $.ajax({
-                url: "<?= base_url("jabatan/id"); ?>" + "/" + id,
-                method: "GET",
-                dataType: "json",
-                success: function(res) {
-                    if (res.status) {
-                        $(".id").val(id);
-                        $(".jabatan_name").val(res.data.jabatan_name);
-
-                        $(".add-modal").modal("show")
-                    } else {
-                        Swal.fire({
-                            icon: 'error',
-                            title: res.message,
-                            confirmButtonColor: '#4e73df',
-                        })
-                    }
-                }
-            })
-        })
-
-        $('.create-form').on('keyup keypress', function(e) {
-            var keyCode = e.keyCode || e.which;
-            if (keyCode === 13) {
-                e.preventDefault();
-                $(".btn-submit-form").trigger('click');
-            }
-        });
-
-        $(".search").keyup(function() {
-            table.ajax.reload();
-        })
-
-        $(".btn-submit-form").click(function() {
-            if ($(".create-form").valid()) {
-                Swal.fire({
-                    icon: 'question',
-                    title: 'Simpan Data?',
-                    confirmButtonColor: '#4e73df',
-                    cancelButtonColor: '#d33',
-                    showCancelButton: true,
-                    reverseButtons: true,
-                    confirmButtonText: 'Simpan',
-                    cancelButtonText: 'Kembali',
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        const csrf = $(`[name="${csrfToken}"]`);
-                        setLoading()
-                        let data = new FormData(document.querySelector(".create-form"));
-
-                        let id = $(".id").val();
-                        // UPDATE
-                        if (id) {
-                            $.ajax({
-                                url: "<?= base_url("jabatan/update"); ?>",
-                                data: data,
-                                beforeSend: function(xhr) {
-                                    xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                                },
-                                method: "POST",
-                                dataType: "json",
-                                processData: false,
-                                contentType: false,
-                                success: function(response) {
-                                    csrf.val(response.token);
-                                    if (response.status) {
-                                        stopLoading()
-                                        Swal.fire({
-                                                icon: 'success',
-                                                title: response.message,
-                                                confirmButtonColor: '#4e73df',
-                                            })
-                                            .then(() => {
-                                                table.ajax.reload()
-                                                $(".add-modal").modal("hide")
-                                            })
-                                    } else {
-                                        Swal.fire({
-                                            icon: 'error',
-                                            title: response.message,
-                                            confirmButtonColor: '#4e73df',
-                                        })
-                                        stopLoading()
-                                    }
-                                },
-                                onError: function(response) {
-                                    csrf.val(response.token);
-                                    Swal.fire({
-                                        icon: 'error',
-                                        title: 'Data Gagal Disimpan, coba Lagi',
-                                        confirmButtonColor: '#4e73df',
-                                    })
-                                    stopLoading()
-                                }
-                            });
-                        }
-                        // CREATE
-                        else {
-                            $.ajax({
-                                url: "<?= base_url("jabatan/save"); ?>",
-                                data: data,
-                                beforeSend: function(xhr) {
-                                    xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                                },
-                                method: "POST",
-                                dataType: "json",
-                                processData: false,
-                                contentType: false,
-                                success: function(response) {
-                                    csrf.val(response.token);
-                                    if (response.status) {
-                                        stopLoading()
-                                        Swal.fire({
-                                                icon: 'success',
-                                                title: response.message,
-                                                confirmButtonColor: '#4e73df',
-                                            })
-                                            .then(() => {
-                                                table.ajax.reload()
-                                                $(".add-modal").modal("hide")
-                                            })
-                                    } else {
-                                        Swal.fire({
-                                            icon: 'error',
-                                            title: response.message,
-                                            confirmButtonColor: '#4e73df',
-                                        })
-                                        stopLoading()
-                                    }
-                                },
-                                onError: function(response) {
-                                    csrf.val(response.token);
-                                    Swal.fire({
-                                        icon: 'error',
-                                        title: 'Data Gagal Disimpan, coba Lagi',
-                                        confirmButtonColor: '#4e73df',
-                                    })
-                                    stopLoading()
-                                }
-                            });
-                        }
-                    }
-                })
             }
         })
+    }
 
-        $(".delete-btn").click(function() {
+    $('.create-form').on('keyup keypress', function(e) {
+        var keyCode = e.keyCode || e.which;
+        if (keyCode === 13) {
+            e.preventDefault();
+            $(".btn-submit-form").trigger('click');
+        }
+    });
+
+    $(".search").keyup(function() {
+        table.ajax.reload();
+    })
+
+
+    $(".btn-submit-form").click(function() {
+        if ($(".create-form").valid()) {
             Swal.fire({
                 icon: 'question',
-                title: 'Hapus Data?',
+                title: 'Simpan Data?',
                 confirmButtonColor: '#4e73df',
                 cancelButtonColor: '#d33',
                 showCancelButton: true,
                 reverseButtons: true,
-                confirmButtonText: 'Hapus',
+                confirmButtonText: 'Simpan',
                 cancelButtonText: 'Kembali',
             }).then((result) => {
                 if (result.isConfirmed) {
                     const csrf = $(`[name="${csrfToken}"]`);
                     let id = $(".id").val();
-                    setLoading()
+                    let data = new FormData(document.querySelector(".create-form"));
+                    let url = id != '' ? "<?= base_url('jabatan/update') ?>" : "<?= base_url('jabatan/save') ?>";
+
                     $.ajax({
-                        url: "<?= base_url("jabatan/delete"); ?>",
-                        data: {
-                            id: id
-                        },
+                        url: url,
+                        data: data,
                         beforeSend: function(xhr) {
+                            setLoading();
                             xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                        },
+                        complete: function() {
+                            stopLoading()
                         },
                         method: "POST",
                         dataType: "json",
+                        processData: false,
+                        contentType: false,
                         success: function(response) {
                             csrf.val(response.token);
                             if (response.status) {
-                                stopLoading()
                                 Swal.fire({
                                         icon: 'success',
                                         title: response.message,
@@ -375,23 +296,60 @@
                                     title: response.message,
                                     confirmButtonColor: '#4e73df',
                                 })
-                                stopLoading()
                             }
                         },
-                        onError: function(response) {
-                            csrf.val(response.token);
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Data Gagal Disimpan, coba Lagi',
-                                confirmButtonColor: '#4e73df',
-                            })
-                            stopLoading()
-                        }
                     });
+
                 }
             })
-        })
+        }
     })
+
+    function remove(id) {
+        Swal.fire({
+            icon: 'question',
+            title: 'Hapus Data?',
+            confirmButtonColor: '#4e73df',
+            cancelButtonColor: '#d33',
+            showCancelButton: true,
+            reverseButtons: true,
+            confirmButtonText: 'Hapus',
+            cancelButtonText: 'Kembali',
+        }).then((result) => {
+            if (result.isConfirmed) {
+                const csrf = $(`[name="${csrfToken}"]`);
+                $.ajax({
+                    url: "<?= base_url("jabatan/delete"); ?>",
+                    data: {
+                        id: id
+                    },
+                    beforeSend: function(xhr) {
+                        setLoading();
+                        xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                    },
+                    complete: function() {
+                        stopLoading();
+                    },
+                    method: "POST",
+                    dataType: "json",
+                    success: function(response) {
+                        csrf.val(response.token);
+                        if (response.status) {
+                            Swal.fire({
+                                    icon: 'success',
+                                    title: response.message,
+                                    confirmButtonColor: '#4e73df',
+                                })
+                                .then(() => {
+                                    table.ajax.reload()
+                                    $(".add-modal").modal("hide")
+                                })
+                        }
+                    },
+                });
+            }
+        })
+    }
 
     const changeSort = function(val) {
         if (sort !== val) {

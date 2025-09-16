@@ -39,11 +39,11 @@
                     <div class="table-responsive mb-4" id="form_komponen_gaji">
                         <table class="table table-bordered nowrap table-hover-tobasurimi dataTable" width="100%" cellspacing="0">
                             <thead class="thead-dark">
-                                <tr style="text-align: center;">
+                                <tr style="text-align: left;">
                                     <th scope="col" style="width: 10px;"><input type="checkbox" id="parent"></th>
                                     <th style="width: 10px;">No</th>
                                     <th>Nama Komponen Gaji</th>
-                                    <th>Nominal Awal</th>
+                                    <th>Nominal Awal (Default)</th>
                                 </tr>
                             </thead>
                             <tbody class="body-table" id="body-table">
@@ -55,13 +55,13 @@
                                     <?php if ($t['is_cadangan']) : ?>
                                         <input type="hidden" name="komponenGaji[]" value="<?= $t['id'] ?>">
                                     <?php endif; ?>
-                                    <tr style="text-align: center;">
+                                    <tr style="text-align: left;">
                                         <td data-id="<?= $t['id'] ?>"><input name="komponenGaji[]" <?= $t['is_gaji_harian'] || $t['is_cadangan']  ? 'checked disabled' : '' ?> class="child" type="checkbox" value="<?= $t['id'] ?>"></td>
                                         <td><?= $no++; ?></td>
                                         <td style="font-weight: bold;" class="<?= ($t['tipe'] == "PLUS") ? "text-success" : "text-danger" ?>"><?= ($t['tipe'] == "PLUS") ? "(+) " . $t['name'] : "(-) " . $t['name']; ?></td>
                                         <td>
                                             <div class="form-floating" style="height: 50px;">
-                                                <input required onkeyup="this.value = this.value.replace(/[^0-9,]/g, '');" onchange="this.value = formatRupiah(this.value);" autocomplete="one-time-code" type="text" data-id="<?= $t['id'] ?>" name="<?= $t['id'] ?>" class="form-control target input-picker" value="Rp. 0,00">
+                                                <input required onkeyup="this.value = greatFormatRupiah(this.value)" autocomplete="one-time-code" type="text" data-id="<?= $t['id'] ?>" name="<?= $t['id'] ?>" class="form-control target komponen-gaji" value="">
                                                 <label for="floatingInput"><?= ($t['tipe'] == "PLUS") ? "(+) " . $t['name'] : "(-) " . $t['name']; ?></label>
                                             </div>
                                         </td>
@@ -75,9 +75,7 @@
             <div class="modal-footer">
                 <button type="button" class="btn btn-hide-form btn-discard mr-2">Kembali</button>
                 <button type="button" class="btn btn-submit-form">Simpan</button>
-                <?php if (can('Master Data', 'Departemen', 'd')): ?>
-                    <button type="button" class="btn btn-discard delete-btn">Hapus</button>
-                <?php endif; ?>
+
             </div>
         </div>
     </div>
@@ -121,8 +119,8 @@
                 <?php endif; ?>
             </ul>
             <div class="row justify-content-end mb-3 mt-3">
-                <div class="col-md-2">
-                    <input autocomplete="one-time-code" class="form-control search form-out-search" placeholder="Search" value="" />
+                <div class="col-md-3">
+                    <input autocomplete="one-time-code" class="form-control search form-out-search" placeholder="Cari Data" value="" />
                 </div>
             </div>
             <div class="row">
@@ -138,7 +136,7 @@
                                 <th class="sort" style="width: 100px;">Action</th>
                             </tr>
                         </thead>
-                        <tbody class="body-table" id="body-table" style="cursor: pointer;">
+                        <tbody class="body-table" id="body-table">
 
                         </tbody>
                     </table>
@@ -169,7 +167,7 @@
 <script>
     const csrfToken = '<?= csrf_token() ?>';
     let sort = "divisi";
-    let sortType = "desc";
+    let sortType = "asc";
 
     const table = $('.dataTableDivisi').DataTable({
 
@@ -211,7 +209,7 @@
                 width: "2%"
             }, {
                 data: "divisi",
-                className: "text-center"
+                className: "text-left"
             },
             // {
             //     data: "komponenGaji",
@@ -249,11 +247,28 @@
                 sortable: false,
                 render: function(data, type, row) {
                     let id = row.id;
-                    return `
-                        <a class="btn btn-warning" href="<?= base_url(); ?>divisi/bagian/${id}" style="box-shadow: none !important;">
-                            Set Bagian
-                        </a>
-                    `
+                    let res = '';
+
+                    res += `
+                        <?php if (can('Master Data', 'Departemen', 'u')): ?>
+                            <a href="javascript:void(0)" onclick="edit('${id}')" data-toggle="tooltip" title="Edit" class="btn btn-primary">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                        <?php endif ?>
+                        <?php if (can('Master Data', 'Departemen', 'd')): ?>
+                            <button data-toggle="tooltip" title="Delete" onclick="remove('${id}')" class="btn btn-danger delete-parent">
+                                <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
+                            </button>
+                        <?php endif ?>
+                            <a href="<?= base_url(); ?>divisi/bagian/${id}"  data-toggle="tooltip" title="Set Bagian" class="btn btn-info">
+                                <i class="fa-solid fa-up-right-from-square"></i>
+                            </a>
+
+                    `;
+
+                    return res;
+
+
                 }
             }
         ],
@@ -261,6 +276,12 @@
             defaultContent: "-",
             targets: "_all"
         }],
+        "drawCallback": function(settings) {
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-toggle="tooltip"]'))
+            var tooltipList = tooltipTriggerList.map(function(tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl)
+            });
+        },
         language: {
             emptyTable: "Tidak Ada Data",
             lengthMenu: "Show _MENU_ entries",
@@ -285,281 +306,119 @@
     });
 
 
-    $(document).ready(function() {
 
-        var validator = $(".create-form").validate({
-            rules: {
-                divisi: {
-                    required: true
-                },
-                type_divisi: {
-                    required: true
-                }
+    var validator = $(".create-form").validate({
+        rules: {
+            divisi: {
+                required: true
             },
-            messages: {
-                divisi: {
-                    required: "Departemen wajib diisi"
-                },
-                type_divisi: {
-                    required: "Tipe Departemen Wajib Diisi"
-                }
+            type_divisi: {
+                required: true
+            }
+        },
+        messages: {
+            divisi: {
+                required: "Departemen wajib diisi"
             },
-            errorElement: 'span',
-            errorClass: 'text-danger',
-            errorPlacement: function(error, element) {
-                var elem = $(element);
-                if (elem.hasClass("select2-hidden-accessible")) {
-                    element = $("#select2-" + elem.attr("id") + "-container").parent();
-                    error.insertAfter(element);
-                } else {
-                    error.insertAfter(element);
-                }
-            },
-            highlight: function(element) {
-                $(element).closest('.form-group').addClass('has-error');
-                $(element).addClass('select-class');
-
-            },
-            unhighlight: function(element) {
-                $(element).closest('.form-group').removeClass('has-error');
-                $(element).removeClass('select-class');
-            },
-        });
-
-        $(".btn-show-form").click(function() {
-            $(".id").val("");
-            validator.resetForm();
-            validator.reset();
-            $(".title-name").text("Tambah");
-            $(".divisi").val('').change();
-            $(".type_divisi").val('').change();
-            $(".create-form")[0].reset()
-            $(".delete-btn").css('display', 'none');
-            $(".add-modal").modal("show")
-        })
-
-        $(".btn-hide-form").click(function() {
-            $(".add-modal").modal("hide")
-        })
-
-        $(".dataTable_info").addClass("pt-0");
-
-        $('#dataTable tbody').on('click', 'tr td:not(.actions):not(.dataTables_empty)', function() {
-            var isAccessUpdate = "<?= can('Master Data', 'Departemen', 'u') ?>";
-            if (isAccessUpdate) {
-                const data = table.row(this).data();
-                $('.logo').rules('remove', 'required');
-                $(".create-form")[0].reset()
-                $(".delete-btn").css('display', '');
-                let id = data.id;
-                $(".title-name").text("Update");
-
-                $.ajax({
-                    url: "<?= base_url("divisi/id"); ?>" + "/" + id,
-                    method: "GET",
-                    dataType: "json",
-                    success: function(res) {
-                        if (res.status) {
-                            $(".id").val(id);
-                            $(".divisi").val(res.data.divisi);
-                            $("select[name='jam_kerja_id']").val(res.data.jam_kerja_id);
-                            $(".type_divisi").val(res.data.type_divisi).change();
-                            validator.resetForm();
-                            validator.reset();
-
-                            $("input[name='komponenGaji[]']").each(function() {
-                                let komponenId = $(this).val();
-                                let isSelected = res.komponenGaji.some(function(komponen) {
-                                    return komponen.id === komponenId;
-                                });
-                                if (isSelected) {
-                                    $(this).prop('checked', true);
-                                }
-                            });
-
-                            $.each(res.komponenGaji, function(i, v) {
-                                $("input[name=" + v.id + "]").val(formatRupiah(v.nominal || '0'));
-                            });
-
-                            $(".add-modal").modal("show")
-                        } else {
-                            Swal.fire({
-                                icon: 'error',
-                                title: res.message,
-                                confirmButtonColor: '#4e73df',
-                            })
-                        }
-                    }
-                })
+            type_divisi: {
+                required: "Tipe Departemen Wajib Diisi"
+            }
+        },
+        errorElement: 'span',
+        errorClass: 'text-danger',
+        errorPlacement: function(error, element) {
+            var elem = $(element);
+            if (elem.hasClass("select2-hidden-accessible")) {
+                element = $("#select2-" + elem.attr("id") + "-container").parent();
+                error.insertAfter(element);
             } else {
-                Swal.fire({
-                    icon: 'error',
-                    title: "Anda tidak punya hak akses update",
-                    confirmButtonColor: '#4e73df',
-                })
+                error.insertAfter(element);
             }
+        },
+        highlight: function(element) {
+            $(element).closest('.form-group').addClass('has-error');
+            $(element).addClass('select-class');
 
+        },
+        unhighlight: function(element) {
+            $(element).closest('.form-group').removeClass('has-error');
+            $(element).removeClass('select-class');
+        },
+    });
 
-        })
+    $(".btn-show-form").click(function() {
+        $(".id").val("");
+        validator.resetForm();
+        validator.reset();
+        $(".title-name").text("Tambah");
+        $(".divisi").val('').change();
+        $(".type_divisi").val('').change();
+        $(".create-form")[0].reset()
+        $(".delete-btn").css('display', 'none');
+        $(".add-modal").modal("show")
+    })
 
-        $(".search").keyup(function() {
-            table.ajax.reload();
-        })
+    $(".btn-hide-form").click(function() {
+        $(".add-modal").modal("hide")
+    })
 
-        $(".btn-submit-form").click(function() {
+    $(".dataTable_info").addClass("pt-0");
+
+    $(".search").keyup(function() {
+        table.ajax.reload();
+    })
+
+    $(".btn-submit-form").click(function() {
+        proses_form();
+    })
+
+    $(".divisi").keyup(function(event) {
+        if (event.keyCode === 13) {
+
             proses_form();
-        })
-
-        $(".divisi").keyup(function(event) {
-            if (event.keyCode === 13) {
-
-                proses_form();
-                return false;
-            }
-        })
-
-        function proses_form() {
-            if ($(".create-form").valid()) {
-                Swal.fire({
-                    icon: 'question',
-                    title: 'Simpan Data?',
-                    confirmButtonColor: '#4e73df',
-                    cancelButtonColor: '#d33',
-                    showCancelButton: true,
-                    reverseButtons: true,
-                    confirmButtonText: 'Simpan',
-                    cancelButtonText: 'Kembali',
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        const csrf = $(`[name="${csrfToken}"]`);
-                        setLoading()
-                        let data = new FormData(document.querySelector(".create-form"));
-
-                        let id = $(".id").val();
-                        // UPDATE
-                        if (id) {
-                            $.ajax({
-                                url: "<?= base_url("divisi/update"); ?>",
-                                data: data,
-                                beforeSend: function(xhr) {
-                                    xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                                },
-                                method: "POST",
-                                dataType: "json",
-                                processData: false,
-                                contentType: false,
-                                success: function(response) {
-                                    csrf.val(response.token);
-                                    if (response.status) {
-                                        stopLoading()
-                                        Swal.fire({
-                                                icon: 'success',
-                                                title: response.message,
-                                                confirmButtonColor: '#4e73df',
-                                            })
-                                            .then(() => {
-                                                table.ajax.reload()
-                                                $(".add-modal").modal("hide")
-                                            })
-                                    } else {
-                                        Swal.fire({
-                                            icon: 'error',
-                                            title: response.message,
-                                            confirmButtonColor: '#4e73df',
-                                        })
-                                        stopLoading()
-                                    }
-                                },
-                                onError: function(response) {
-                                    csrf.val(response.token);
-                                    Swal.fire({
-                                        icon: 'error',
-                                        title: 'Data Gagal Disimpan, coba Lagi',
-                                        confirmButtonColor: '#4e73df',
-                                    })
-                                    stopLoading()
-                                }
-                            });
-                        }
-                        // CREATE
-                        else {
-                            $.ajax({
-                                url: "<?= base_url("divisi/save"); ?>",
-                                data: data,
-                                beforeSend: function(xhr) {
-                                    xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                                },
-                                method: "POST",
-                                dataType: "json",
-                                processData: false,
-                                contentType: false,
-                                success: function(response) {
-                                    csrf.val(response.token);
-                                    if (response.status) {
-                                        stopLoading()
-                                        Swal.fire({
-                                                icon: 'success',
-                                                title: response.message,
-                                                confirmButtonColor: '#4e73df',
-                                            })
-                                            .then(() => {
-                                                table.ajax.reload()
-                                                $(".add-modal").modal("hide")
-                                            })
-                                    } else {
-                                        Swal.fire({
-                                            icon: 'error',
-                                            title: response.message,
-                                            confirmButtonColor: '#4e73df',
-                                        })
-                                        stopLoading()
-                                    }
-                                },
-                                onError: function(response) {
-                                    csrf.val(response.token);
-                                    Swal.fire({
-                                        icon: 'error',
-                                        title: 'Data Gagal Disimpan, coba Lagi',
-                                        confirmButtonColor: '#4e73df',
-                                    })
-                                    stopLoading()
-                                }
-                            });
-                        }
-                    }
-                })
-            }
+            return false;
         }
+    })
 
-        $(".delete-btn").click(function() {
+    function proses_form() {
+        if ($(".create-form").valid()) {
             Swal.fire({
                 icon: 'question',
-                title: 'Hapus Data?',
+                title: 'Simpan Data?',
                 confirmButtonColor: '#4e73df',
                 cancelButtonColor: '#d33',
                 showCancelButton: true,
                 reverseButtons: true,
-                confirmButtonText: 'Hapus',
+                confirmButtonText: 'Simpan',
                 cancelButtonText: 'Kembali',
             }).then((result) => {
                 if (result.isConfirmed) {
+                    $(".komponen-gaji").each(function() {
+                        $(this).val(destroyFormatRupiah($(this).val()));
+                    });
+
                     const csrf = $(`[name="${csrfToken}"]`);
+                    let data = new FormData(document.querySelector(".create-form"));
                     let id = $(".id").val();
-                    setLoading()
+                    let url = id == '' ? '<?= base_url('divisi/save') ?>' : '<?= base_url('divisi/update') ?>'
+
                     $.ajax({
-                        url: "<?= base_url("divisi/delete"); ?>",
-                        data: {
-                            id: id
-                        },
+                        url: url,
+                        data: data,
                         beforeSend: function(xhr) {
+                            setLoading();
                             xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                        },
+                        complete: function() {
+                            stopLoading()
                         },
                         method: "POST",
                         dataType: "json",
+                        processData: false,
+                        contentType: false,
                         success: function(response) {
                             csrf.val(response.token);
                             if (response.status) {
-                                stopLoading()
                                 Swal.fire({
                                         icon: 'success',
                                         title: response.message,
@@ -575,7 +434,6 @@
                                     title: response.message,
                                     confirmButtonColor: '#4e73df',
                                 })
-                                stopLoading()
                             }
                         },
                         onError: function(response) {
@@ -585,13 +443,123 @@
                                 title: 'Data Gagal Disimpan, coba Lagi',
                                 confirmButtonColor: '#4e73df',
                             })
-                            stopLoading()
                         }
                     });
+
+
                 }
             })
+        }
+    }
+
+    function edit(id) {
+        $(".create-form")[0].reset()
+        $(".title-name").text("Update");
+
+        $.ajax({
+            url: "<?= base_url("divisi/id"); ?>" + "/" + id,
+            method: "GET",
+            dataType: "json",
+            beforeSend: function() {
+                setLoading();
+            },
+            complete: function() {
+                stopLoading();
+            },
+            success: function(res) {
+                if (res.status) {
+                    $(".id").val(id);
+                    $(".divisi").val(res.data.divisi);
+                    $("select[name='jam_kerja_id']").val(res.data.jam_kerja_id);
+                    $(".type_divisi").val(res.data.type_divisi).change();
+                    validator.resetForm();
+                    validator.reset();
+
+                    $("input[name='komponenGaji[]']").each(function() {
+                        let komponenId = $(this).val();
+                        let isSelected = res.komponenGaji.some(function(komponen) {
+                            return komponen.id === komponenId;
+                        });
+                        if (isSelected) {
+                            $(this).prop('checked', true);
+                        }
+                    });
+
+                    $.each(res.komponenGaji, function(i, v) {
+                        $("input[name=" + v.id + "]").val(greatFormatRupiah(v.nominal));
+                    });
+
+                    $(".add-modal").modal("show")
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: res.message,
+                        confirmButtonColor: '#4e73df',
+                    })
+                }
+            }
         })
-    })
+    }
+
+    function remove(id) {
+        Swal.fire({
+            icon: 'question',
+            title: 'Hapus Data?',
+            confirmButtonColor: '#4e73df',
+            cancelButtonColor: '#d33',
+            showCancelButton: true,
+            reverseButtons: true,
+            confirmButtonText: 'Hapus',
+            cancelButtonText: 'Kembali',
+        }).then((result) => {
+            if (result.isConfirmed) {
+                const csrf = $(`[name="${csrfToken}"]`);
+                $.ajax({
+                    url: "<?= base_url("divisi/delete"); ?>",
+                    data: {
+                        id: id
+                    },
+                    beforeSend: function(xhr) {
+                        setLoading();
+                        xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                    },
+                    complete: function() {
+                        stopLoading();
+                    },
+                    method: "POST",
+                    dataType: "json",
+                    success: function(response) {
+                        csrf.val(response.token);
+                        if (response.status) {
+                            Swal.fire({
+                                    icon: 'success',
+                                    title: response.message,
+                                    confirmButtonColor: '#4e73df',
+                                })
+                                .then(() => {
+                                    table.ajax.reload()
+                                    $(".add-modal").modal("hide")
+                                })
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: response.message,
+                                confirmButtonColor: '#4e73df',
+                            })
+                        }
+                    },
+                    onError: function(response) {
+                        csrf.val(response.token);
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Data Gagal Disimpan, coba Lagi',
+                            confirmButtonColor: '#4e73df',
+                        })
+                    }
+                });
+            }
+        })
+    }
 
     const changeSort = function(val) {
         if (sort !== val) {
@@ -613,17 +581,6 @@
             $('#parent').prop('checked', false);
         }
     });
-
-    function formatRupiah(angka) {
-        angka = angka.replace(/\./g, ',');
-        angka = angka.replace(/[^\d,]/g, '');
-        var parts = angka.split(',');
-        var ribuan = parts[0];
-        var desimal = parts[1] || '00';
-        var reverse = ribuan.toString().split('').reverse().join('');
-        var ribuanFormatted = reverse.match(/\d{1,3}/g).join('.').split('').reverse().join('');
-        return 'Rp. ' + ribuanFormatted + ',' + desimal;
-    }
 
     function ubahTypeDivisiTab(type_divisi) {
         divisi_type = type_divisi;

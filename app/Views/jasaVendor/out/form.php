@@ -292,10 +292,18 @@
                                     </tr>
                                 </tfoot>
                             </table>
-                            <div class="col-md-4 mb-3 form-fifo">
-                                <div class="form-floating" style="height: 50px;">
-                                    <input placeholder="Qty" oninput="preventNegativeInput(this)" class="form-control qty_keluar_fifo" id="qty_keluar_fifo" name="qty_keluar_fifo" />
-                                    <label for="floatingInput" style="z-index: 1;">Qty Dikeluarkan</label>
+                            <div class="row">
+                                <div class="col-md-4 mb-3 form-fifo">
+                                    <div class="form-floating" style="height: 50px;">
+                                        <input placeholder="Qty" oninput="preventNegativeInput(this)" class="form-control qty_keluar_fifo" id="qty_keluar_fifo" name="qty_keluar_fifo" />
+                                        <label for="floatingInput" style="z-index: 1;">Qty Dikeluarkan</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <div class="form-floating" style="height: 50px;">
+                                        <input placeholder="keterangan" class="form-control keterangan_detail" id="keterangan_detail" name="keterangan_detail" />
+                                        <label for="floatingInput" style="z-index: 1;">Keterangan</label>
+                                    </div>
                                 </div>
                             </div>
                             <button type="button" class="btn btn-primary" id="select-item-btn">Pilih</button>
@@ -318,6 +326,7 @@
                                     <th style="text-align: center;">Asal Barang</th>
                                     <th style="text-align: center;">No PO</th>
                                     <th style="text-align: center;">Supplier / Vendor</th>
+                                    <th style="text-align: center;">Keterangan</th>
                                     <!-- <th style="text-align: center;">Dokumen Pabean</th> -->
                                     <th style="text-align: center;">Tgl PO / Tgl Vendor Masuk</th>
                                     <th style="text-align: center;">Barang - Spesifikasi</th>
@@ -644,6 +653,7 @@
    // Ubah fungsi insertListPabean menjadi:
     function insertListPabean() {
         var checkedCheckboxes = $(".child:checked");
+        var keteranganDetail = $('#keterangan_detail').val();
         var dataIds = checkedCheckboxes.map(function() {
             return Number($(this).data("id")); // Konversi ke number
         }).get();
@@ -659,6 +669,7 @@
                 
                 if (!isIDSelected) {
                     listStockAsal[i].stok_total = parseFloat(listStockAsal[i].stok_total);
+                    listStockAsal[i].keterangan = keteranganDetail;
                     listStockAsal[i].qty = 0; // Ganti dari 0 ke 1 atau nilai default lain
                     listStockSelected.push(listStockAsal[i]);
                 }
@@ -669,6 +680,7 @@
 
     function insertListFifo() {
         var dataIds = getIDListDataSelected();
+        var keteranganDetail = $('#keterangan_detail').val();
         var qtyKeluarFifo = parseFloat($('#qty_keluar_fifo').val());
         var stockOutID = $(".spesifikasi_id option:selected").data('stock_id');
 
@@ -717,6 +729,7 @@
 
         if (exactMatch) {
             exactMatch.qty = parseFloat(exactMatch.stok_total);
+            exactMatch.keterangan = keteranganDetail; // ⬅️ masukin di sini
             listStockSelected.push(exactMatch);
             qtyKeluarFifo = 0;
         } else {
@@ -728,6 +741,7 @@
 
             if (sufficientItem) {
                 sufficientItem.qty = qtyKeluarFifo;
+                sufficientItem.keterangan = keteranganDetail;
                 listStockSelected.push(sufficientItem);
                 qtyKeluarFifo = 0;
             } else {
@@ -746,6 +760,7 @@
                         
                         const newItem = {...item}; // Create a copy
                         newItem.qty = parseFloat(takenQty.toFixed(4));
+                        newItem.keterangan = keteranganDetail;
                         listStockSelected.push(newItem);
                         
                         qtyKeluarFifo -= takenQty;
@@ -1127,6 +1142,7 @@
     }
 
     function drawTableSelectedItem(data) {
+        console.log(data)
         var typePengambilanStok = $('#type_pengambilan_stock option:selected').val();
         const table = $('#selectedItemTable');
         var no = 1;
@@ -1155,6 +1171,7 @@
                 newRow.append($('<td style="text-align: center;">').text(v.sumber));
                 newRow.append($('<td style="text-align: center;">').text(v.stock_dokumen));
                 newRow.append($('<td style="text-align: center;">').text(v.supplier_name));
+                newRow.append($('<td style="text-align: center;">').text(v.keterangan));
                 // newRow.append($('<td style="text-align: center;">').text(v.bc_type + '/' + v.no_aju));
                 newRow.append($('<td style="text-align: center;">').text(v.stock_date));
                 newRow.append($('<td style="text-align: center;">').text(v.barang));
@@ -1181,7 +1198,7 @@
             });
 
             var newRow = $('<tr class="grand-total" style="color:whitesmoke; background-color:#f2c996;">');
-            newRow.append($('<td style="text-align: right;" colspan="8">').html("<b>GRAND TOTAL</b>"));
+            newRow.append($('<td style="text-align: right;" colspan="9">').html("<b>GRAND TOTAL</b>"));
             newRow.append($('<td class="total-cell">').text(greatFormatQty(totalQtyKeluar)));
             newRow.append($('<td>').text(''));
             table.find('tbody').append(newRow);
