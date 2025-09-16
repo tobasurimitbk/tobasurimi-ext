@@ -21,7 +21,7 @@
 
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input name="nominalPinjaman" onkeyup="this.value = this.value.replace(/[^0-9,]/g, '');" onchange="this.value = formatRupiah(this.value);" autocomplete="one-time-code" type="text" id="nominalPinjaman" class="form-control target input-picker" value="">
+                                <input name="nominalPinjaman" onkeyup="this.value = greatFormatRupiah(this.value);" autocomplete="one-time-code" type="text" id="nominalPinjaman" class="form-control target input-picker" placeholder="Nominal Pinjaman" value="">
                                 <label for="nominalPinjaman" id="nominalGajiModal">Nominal Pinjaman</label>
                             </div>
                         </div>
@@ -31,7 +31,6 @@
             <div class="modal-footer">
                 <button type="button" class="btn btn-hide-form btn-discard mr-2">Kembali</button>
                 <button type="submit" class="btn btn-submit-form">Simpan</button>
-                <button type="button" class="btn btn-discard delete-btn">Hapus</button>
             </div>
         </div>
     </div>
@@ -47,7 +46,7 @@
     <div class="card">
         <div class="card-body">
             <div class="row justify-content-end mb-3">
-                <div class="col-md-2">
+                <div class="col-md-3">
                     <input autocomplete="one-time-code" class="form-control search form-out-search" placeholder="Search" value="" />
                 </div>
             </div>
@@ -56,12 +55,13 @@
                     <table class="table table-bordered nowrap table-hover-tobasurimi dataTable" id="dataTable" width="100%" cellspacing="0">
                         <thead class="thead-dark">
                             <tr>
-                                <th>No.</th>
-                                <th onclick="changeSort('golongan.golongan_name')" class="sort">Nama Golongan</th>
+                                <th style="width: 10px;">No</th>
+                                <th onclick="changeSort('golongan.golongan_name')" class="sort">Golongan</th>
                                 <th onclick="changeSort('golongan.nominal_pinjaman')" class="sort">Nominal Pinjaman</th>
+                                <th style="width: 100px;">Action</th>
                             </tr>
                         </thead>
-                        <tbody class="body-table" id="body-table" style="cursor: pointer;">
+                        <tbody class="body-table" id="body-table">
 
                         </tbody>
                     </table>
@@ -73,7 +73,7 @@
 
 <script>
     const csrfToken = '<?= csrf_token() ?>';
-    let sort = "parent_barang";
+    let sort = "golongan_name";
     let sortType = "desc";
 
     $('.btn-hide-form').click(function() {
@@ -120,23 +120,53 @@
                 data: "no",
                 className: "text-center",
                 sortable: false,
-                width: "5%"
+                width: "3%"
             }, {
                 data: "golonganName",
-                className: "text-center",
-                width: "10%"
+                className: "text-left",
             },
             {
                 data: "nominalPinjaman",
-                className: "text-center"
+                className: "text-left",
+            },
+            {
+                data: "id",
+                className: "text-center actions",
+                searchable: false,
+                sortable: false,
+                render: function(data, type, row) {
+                    let id = row.id;
+                    let res = '';
+
+                    res += `
+                    <?php if (can('Personalia', 'Golongan', 'u')): ?>
+                        <a href="javascript:void(0)" onclick="edit('${id}')" data-toggle="tooltip" title="Edit" class="btn btn-primary">
+                            <i class="fas fa-edit"></i>
+                        </a>
+                    <?php endif ?>
+                    <?php if (can('Personalia', 'Golongan', 'd')): ?>
+                        <button data-toggle="tooltip" title="Hapus" onclick="remove('${id}')" class="btn btn-danger delete-parent">
+                            <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
+                        </button>
+                    <?php endif ?>
+                    `;
+
+                    return res;
+                }
             }
         ],
         columnDefs: [{
             defaultContent: "-",
             targets: "_all"
         }],
+        "drawCallback": function(settings) {
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-toggle="tooltip"]'))
+            var tooltipList = tooltipTriggerList.map(function(tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl)
+            });
+        },
         language: {
-            emptyTable: "Tidak Ada Data Golongan",
+            emptyTable: "Tidak Ada Data",
             lengthMenu: "Show _MENU_ entries",
             paginate: {
                 previous: '<i class="fa fa-angle-left"></i>',
@@ -199,134 +229,85 @@
             }).then((result) => {
                 if (result.isConfirmed) {
                     const csrf = $(`[name="${csrfToken}"]`);
-                    setLoading()
                     let data = new FormData(document.querySelector(".create-form"));
                     let id = $(".id").val();
-                    if (id) {
-                        $.ajax({
-                            url: "<?= base_url("golongan/update"); ?>",
-                            data: data,
-                            beforeSend: function(xhr) {
-                                xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                            },
-                            method: "POST",
-                            dataType: "json",
-                            processData: false,
-                            contentType: false,
-                            success: function(response) {
-                                csrf.val(response.token);
-                                if (response.status) {
-                                    stopLoading()
-                                    Swal.fire({
-                                            icon: 'success',
-                                            title: response.message,
-                                            confirmButtonColor: '#4e73df',
-                                        })
-                                        .then(() => {
-                                            table.ajax.reload()
-                                            $(".add-modal").modal("hide")
-                                        })
-                                } else {
-                                    Swal.fire({
-                                        icon: 'error',
+                    let url = id == '' ? '<?= base_url('golongan/create') ?>' : '<?= base_url('golongan/update') ?>';
+
+                    var nominalPinjaman = destroyFormatRupiah($('#nominalPinjaman').val());
+                    data.set('nominalPinjaman', nominalPinjaman);
+
+                    $.ajax({
+                        url: url,
+                        data: data,
+                        beforeSend: function(xhr) {
+                            xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                            setLoading()
+                        },
+                        complete: function() {
+                            stopLoading();
+                        },
+                        method: "POST",
+                        dataType: "json",
+                        processData: false,
+                        contentType: false,
+                        success: function(response) {
+                            csrf.val(response.token);
+                            if (response.status) {
+                                Swal.fire({
+                                        icon: 'success',
                                         title: response.message,
                                         confirmButtonColor: '#4e73df',
                                     })
-                                    stopLoading()
-
-                                }
-                            },
-                            onError: function(response) {
-                                csrf.val(response.token);
-                                Swal.fire({
-                                    icon: 'error',
-                                    title: 'Data Gagal Disimpan, coba Lagi',
-                                    confirmButtonColor: '#4e73df',
-                                })
-                                stopLoading()
-                            }
-                        });
-                    } else {
-                        $.ajax({
-                            url: "<?= base_url("golongan/create"); ?>",
-                            data: data,
-                            beforeSend: function(xhr) {
-                                xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                            },
-                            method: "POST",
-                            dataType: "json",
-                            processData: false,
-                            contentType: false,
-                            success: function(response) {
-                                csrf.val(response.token);
-                                if (response.status) {
-                                    stopLoading()
-                                    Swal.fire({
-                                            icon: 'success',
-                                            title: response.message,
-                                            confirmButtonColor: '#4e73df',
-                                        })
-                                        .then(() => {
-                                            table.ajax.reload()
-                                            $(".add-modal").modal("hide")
-                                        })
-
-                                } else {
-                                    Swal.fire({
-                                        icon: 'error',
-                                        title: response.message,
-                                        confirmButtonColor: '#4e73df',
+                                    .then(() => {
+                                        table.ajax.reload()
+                                        $(".add-modal").modal("hide")
                                     })
-                                    stopLoading()
-                                }
-                            },
-                            onError: function(response) {
-                                csrf.val(response.token);
+                            } else {
                                 Swal.fire({
                                     icon: 'error',
-                                    title: 'Data Gagal Disimpan, coba Lagi',
+                                    title: response.message,
                                     confirmButtonColor: '#4e73df',
                                 })
-                                stopLoading()
+
                             }
-                        });
-                    }
+                        },
+                    });
                 }
             })
         }
     });
 
-    $('#dataTable tbody').on('click', 'tr td:not(.actions):not(.dataTables_empty)', function() {
-        const data = table.row(this).data();
+    function edit(id) {
         $(".create-form")[0].reset()
         $(".delete-btn").show();
         $(".title-name").text("Update");
-        let id = data.id;
 
         validator.resetForm();
         validator.reset();
 
         $.ajax({
             url: "<?= base_url("golongan/id"); ?>" + "/" + id,
+            beforeSend: function() {
+                setLoading();
+            },
+            complete: function() {
+                stopLoading();
+            },
             method: "GET",
             dataType: "json",
             success: function(res) {
                 if (res.status) {
                     $(".id").val(id);
                     $("#golonganName").val(res.data.golongan_name);
-                    $("#nominalPinjaman").val(formatRupiah(res.data.nominal_pinjaman));
+                    $("#nominalPinjaman").val(greatFormatRupiah(res.data.nominal_pinjaman));
 
                     $(".add-modal").modal("show")
                 }
             }
         })
-    })
+    }
 
-    $(".search").keyup(function() {
-        table.ajax.reload();
-    })
-
-    $(".delete-btn").click(function() {
+    function remove(id) {
         Swal.fire({
             icon: 'question',
             title: 'Hapus Data?',
@@ -339,14 +320,17 @@
         }).then((result) => {
             if (result.isConfirmed) {
                 const csrf = $(`[name="${csrfToken}"]`);
-                let id = $(".id").val();
                 $.ajax({
                     url: "<?= base_url("golongan/delete"); ?>",
                     data: {
                         id: id
                     },
                     beforeSend: function(xhr) {
+                        setLoading();
                         xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                    },
+                    complete: function() {
+                        stopLoading();
                     },
                     method: "POST",
                     dataType: "json",
@@ -368,7 +352,11 @@
                 });
             }
         })
-    })
+    }
+
+    $(".search").keyup(function() {
+        table.ajax.reload();
+    });
 
     function changeSort(val) {
         if (sort !== val) {
@@ -379,21 +367,5 @@
         }
     }
 </script>
-<script>
-    function formatRupiah(angka) {
-        if (angka === null) {
-            angka = 0;
-        }
 
-        angka = angka.toString();
-        angka = angka.replace(/\./g, ',');
-        angka = angka.replace(/[^\d,]/g, '');
-        var parts = angka.split(',');
-        var ribuan = parts[0];
-        var desimal = parts[1] || '00';
-        var reverse = ribuan.toString().split('').reverse().join('');
-        var ribuanFormatted = reverse.match(/\d{1,3}/g).join('.').split('').reverse().join('');
-        return 'Rp. ' + ribuanFormatted + ',' + desimal;
-    }
-</script>
 <?= $this->endSection(); ?>

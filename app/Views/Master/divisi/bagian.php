@@ -16,8 +16,8 @@
             <table width="100%" class="mb-4">
                 <tbody>
                     <tr style="color: black;">
-                        <td width="150px">Departemen</td>
-                        <td width="5px">:</td>
+                        <td width="100px">Departemen</td>
+                        <td width="15px">:</td>
                         <td><?= $divisi['divisi'] ?></td>
                     </tr>
                     <tr style="color: black; height: 20px;">
@@ -44,7 +44,7 @@
                     </div>
                     <div class="col-md-6">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" type="text" class="form-control" name="nama_bagian" id="nama_bagian">
+                            <input autocomplete="one-time-code" type="text" class="form-control" name="nama_bagian" id="nama_bagian" placeholder="Nama Bagian">
                             <label for="floatingInput">Nama Bagian</label>
                         </div>
                     </div>
@@ -54,7 +54,7 @@
             <div class="col-subtitle-modal">
                 <div class="row ">
                     <div class="col-md-6">
-
+                        <label class="form-label font-weight-bold modal-sub-title">List Bagian</label>
                     </div>
                     <div class="col-md-6">
                         <button class="btn btn-add btn-block float-right" onclick="submitForm()" id="btn-submit-bagian">
@@ -68,8 +68,8 @@
             </div>
             <div>
                 <div class="row justify-content-end mb-3">
-                    <div class="col-md-2">
-                        <input autocomplete="one-time-code" class="form-control search form-out-search" placeholder="Cari Kode / Nama Bagian" value="" />
+                    <div class="col-md-3">
+                        <input autocomplete="one-time-code" class="form-control search form-out-search" placeholder="Cari Data" value="" />
                     </div>
                 </div>
                 <div class="table-responsive">
@@ -77,8 +77,8 @@
                         <thead class="thead-dark">
                             <tr>
                                 <th width="10px">No</th>
-                                <th>Kode Bagian</th>
-                                <th>Nama Bagian</th>
+                                <th onclick="changeSort('kode_bagian')">Kode</th>
+                                <th onclick="changeSort('nama_bagian')">Bagian</th>
                                 <th>Action</th>
                             </tr>
                         </thead>
@@ -93,11 +93,10 @@
 
 <script>
     const csrfToken = '<?= csrf_token() ?>';
-    let sort = "divisi";
-    let sortType = "desc";
+    let sort = "kode_bagian";
+    let sortType = "asc";
 
     const table = $('.dataTable').DataTable({
-
         processing: true,
         serverSide: true,
         ordering: true,
@@ -136,10 +135,10 @@
                 width: "3%"
             }, {
                 data: "kode_bagian",
-                className: "text-center"
+                className: "text-left"
             }, {
                 data: "nama_bagian",
-                className: "text-center"
+                className: "text-left"
             },
             {
                 data: "id",
@@ -150,10 +149,10 @@
                 render: function(data, type, row) {
                     let id = row.id;
                     return `
-                        <button onclick="updateForm(${id})"  class="btn btn-warning posting-spp">
+                        <button onclick="updateForm(${id})" data-toggle="tooltip" title="Edit"  class="btn btn-warning posting-spp">
                             <i class="fa fa-pencil fa-sm" aria-hidden="true"></i>
                         </button>
-                        <button onclick="deleteForm(${id})" class="btn btn-danger">
+                        <button onclick="deleteForm(${id})" data-toggle="tooltip" title="Hapus" class="btn btn-danger">
                             <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
                         </button>
                     `
@@ -165,13 +164,19 @@
             targets: "_all"
         }],
         language: {
-            emptyTable: "<?= "Tidak ada bagian Departemen " . $divisi['divisi'] ?>",
+            emptyTable: "Tidak ada data",
             lengthMenu: "Show _MENU_ entries",
             paginate: {
                 previous: '<i class="fa fa-angle-left"></i>',
                 next: '<i class="fa fa-angle-right"></i>'
             }
-        }
+        },
+        "drawCallback": function(settings) {
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-toggle="tooltip"]'))
+            var tooltipList = tooltipTriggerList.map(function(tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl)
+            });
+        },
     });
 
     $(".search").keyup(function() {
@@ -270,6 +275,7 @@
                     let csrf = $(`[name="${csrfToken}"]`);
                     let namaBagian = $('input[name="nama_bagian"]').val();
                     let kodeBagian = $('input[name="kode_bagian"]').val();
+                    let url = id == '' ? "<?= base_url('divisi/bagian/save') ?>" : "<?= base_url("divisi/bagian/update"); ?>" + "/" + id;
 
                     var formData = new FormData();
                     formData.append('id', id);
@@ -277,76 +283,44 @@
                     formData.append('kodeBagian', kodeBagian);
                     formData.append('divisionID', "<?= $divisi['id'] ?>");
 
-                    if (id) {
-                        $.ajax({
-                            url: "<?= base_url("divisi/bagian/update"); ?>" + "/" + id,
-                            data: formData,
-                            beforeSend: function(xhr) {
-                                xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                            },
-                            method: "POST",
-                            dataType: "json",
-                            processData: false,
-                            contentType: false,
-                            success: function(response) {
-                                csrf.val(response.token);
-                                if (response.status) {
-                                    Swal.fire({
-                                            icon: 'success',
-                                            title: response.message,
-                                            confirmButtonColor: '#4e73df',
-                                        })
-                                        .then(() => {
-                                            table.ajax.reload();
-                                        });
-
-                                    resetForm();
-
-                                } else {
-                                    Swal.fire({
-                                        icon: 'error',
-                                        title: 'Data Gagal Disimpan, coba Lagi',
-                                        confirmButtonColor: '#4e73df',
-                                    })
-                                }
-
-                            }
-                        });
-                    } else {
-                        $.ajax({
-                            url: "<?= base_url("divisi/bagian/save"); ?>",
-                            data: formData,
-                            beforeSend: function(xhr) {
-                                xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                            },
-                            method: "POST",
-                            dataType: "json",
-                            processData: false,
-                            contentType: false,
-                            success: function(response) {
-                                csrf.val(response.token);
-                                if (response.status) {
-                                    Swal.fire({
-                                            icon: 'success',
-                                            title: response.message,
-                                            confirmButtonColor: '#4e73df',
-                                        })
-                                        .then(() => {
-                                            table.ajax.reload();
-                                            resetForm();
-                                        })
-                                } else {
-                                    Swal.fire({
-                                        icon: 'error',
+                    $.ajax({
+                        url: url,
+                        data: formData,
+                        beforeSend: function(xhr) {
+                            setLoading();
+                            xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                        },
+                        complete: function() {
+                            stopLoading();
+                        },
+                        method: "POST",
+                        dataType: "json",
+                        processData: false,
+                        contentType: false,
+                        success: function(response) {
+                            csrf.val(response.token);
+                            if (response.status) {
+                                Swal.fire({
+                                        icon: 'success',
                                         title: response.message,
                                         confirmButtonColor: '#4e73df',
-                                    }).then(() => {
-
+                                    })
+                                    .then(() => {
+                                        table.ajax.reload();
                                     });
-                                }
+
+                                resetForm();
+
+                            } else {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: response.message,
+                                    confirmButtonColor: '#4e73df',
+                                })
                             }
-                        });
-                    }
+
+                        }
+                    });
                 }
             })
 
@@ -367,7 +341,11 @@
             url: "<?= base_url("divisi/bagian/id"); ?>" + "/" + id,
             data: null,
             beforeSend: function(xhr) {
+                setLoading();
                 xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+            },
+            complete: function() {
+                stopLoading();
             },
             method: "GET",
             dataType: "json",
@@ -379,14 +357,14 @@
                     resetForm();
                     $('input[name="nama_bagian"]').val(response.data.nama_bagian);
                     $('input[name="kode_bagian"]').val(response.data.kode_bagian);
-                    $("input[name='kode_bagian']").attr("readonly", true);
+                    $("input[name='kode_bagian']").attr("readonly", false);
                     $('input[name="id"]').val(response.data.id);
                     $("#generate_new_code").attr('checked', true).hide();
 
                 } else {
                     Swal.fire({
                         icon: 'error',
-                        title: 'Data Gagal Diambil, coba Lagi',
+                        title: response.message,
                         confirmButtonColor: '#4e73df',
                     })
                 }
@@ -406,43 +384,50 @@
             confirmButtonText: 'Simpan',
             cancelButtonText: 'Kembali',
         }).then((result) => {
-            let csrf = $(`[name="${csrfToken}"]`);
-            var formData = new FormData();
-            formData.append('id', id);
+            if (result.isConfirmed) {
+                let csrf = $(`[name="${csrfToken}"]`);
+                var formData = new FormData();
+                formData.append('id', id);
 
-            $.ajax({
-                url: "<?= base_url("divisi/bagian/delete"); ?>" + "/" + id,
-                data: formData,
-                beforeSend: function(xhr) {
-                    xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                },
-                method: "POST",
-                dataType: "json",
-                processData: false,
-                contentType: false,
-                success: function(response) {
-                    csrf.val(response.token);
-                    if (response.status) {
-                        Swal.fire({
-                                icon: 'success',
+                $.ajax({
+                    url: "<?= base_url("divisi/bagian/delete"); ?>" + "/" + id,
+                    data: formData,
+                    beforeSend: function(xhr) {
+                        setLoading();
+                        xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                    },
+                    complete: function() {
+                        stopLoading();
+                    },
+                    method: "POST",
+                    dataType: "json",
+                    processData: false,
+                    contentType: false,
+                    success: function(response) {
+                        csrf.val(response.token);
+                        if (response.status) {
+                            Swal.fire({
+                                    icon: 'success',
+                                    title: response.message,
+                                    confirmButtonColor: '#4e73df',
+                                })
+                                .then(() => {
+                                    table.ajax.reload();
+                                    resetForm();
+                                })
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
                                 title: response.message,
                                 confirmButtonColor: '#4e73df',
-                            })
-                            .then(() => {
-                                table.ajax.reload();
-                                resetForm();
-                            })
-                    } else {
-                        Swal.fire({
-                            icon: 'error',
-                            title: response.message,
-                            confirmButtonColor: '#4e73df',
-                        }).then(() => {
+                            }).then(() => {
 
-                        });
+                            });
+                        }
                     }
-                }
-            });
+                });
+            }
+
         });
 
     }

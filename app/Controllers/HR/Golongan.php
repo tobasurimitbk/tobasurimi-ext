@@ -53,7 +53,7 @@ class Golongan extends BaseController
                 "no"                    => $no++,
                 "id"                    => $data->id,
                 "golonganName"          => $data->golongan_name,
-                "nominalPinjaman"       => "Rp " . number_format($data->nominal_pinjaman, 2, ',', '.'),
+                "nominalPinjaman"       => number_format($data->nominal_pinjaman, 2)
             ]);
         }
 
@@ -115,15 +115,10 @@ class Golongan extends BaseController
             return json_encode($data);
         }
 
-
-        $nominalPinjaman = preg_replace("/[^0-9,]/", "", $this->request->getVar('nominalPinjaman'));
-        $nominalPinjaman = str_replace(",", ".", $nominalPinjaman);
-        $angkaDesimalNominal = number_format((float) $nominalPinjaman, 3, '.', '');
-
         $golonganModel->insert([
             'company_id' => $this->this_company_id,
             'golongan_name' => $this->request->getVar('golonganName'),
-            'nominal_pinjaman' => $angkaDesimalNominal,
+            'nominal_pinjaman' => $this->request->getVar('nominalPinjaman'),
         ]);
 
         return response()->setJSON([
@@ -197,14 +192,10 @@ class Golongan extends BaseController
             return json_encode($data);
         }
 
-        $nominalPinjaman = preg_replace("/[^0-9,]/", "", $this->request->getVar('nominalPinjaman'));
-        $nominalPinjaman = str_replace(",", ".", $nominalPinjaman);
-        $angkaDesimalNominal = number_format((float) $nominalPinjaman, 3, '.', '');
-
         $golonganModel->update($this->request->getVar('id'), [
             'company_id' => $this->this_company_id,
             'golongan_name' => $this->request->getVar('golonganName'),
-            'nominal_pinjaman' => $angkaDesimalNominal,
+            'nominal_pinjaman' => $this->request->getVar('nominalPinjaman'),
         ]);
 
         return response()->setJSON([

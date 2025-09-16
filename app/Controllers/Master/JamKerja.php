@@ -12,17 +12,23 @@ class JamKerja extends BaseController
 {
     protected $token;
     protected $this_company_id;
+    protected $divisiModel;
 
     public function __construct()
     {
         $this->token = session()->get("login")->token;
         $this->this_company_id = session()->get("login")->this_company_id;
+        $this->divisiModel = new DivisisModel();
     }
 
 
     public function index()
     {
-        return view('Master/jamKerja/index');
+        $data = [
+            'divisis' => $this->divisiModel->getDivisiAccess()
+        ];
+
+        return view('Master/jamKerja/index', $data);
     }
 
     public function all()
@@ -37,6 +43,7 @@ class JamKerja extends BaseController
 
         $addCondition = [
             "search"        => $this->request->getGet("search"),
+            "divisi_id"     => $this->request->getGet('divisi_id'),
             "sort"          => $this->request->getGet("sort"),
             "sortType"      => $this->request->getGet("sortType")
         ];
@@ -59,8 +66,10 @@ class JamKerja extends BaseController
             array_push($dataJamKerja, [
                 "no" => $no++,
                 "id" => encrypt($j->id),
-                "jenis" => $j->jenis . " - " . $j->shift,
-                "divisi" => $j->divisi
+                "jenis" => $j->jenis,
+                "shift" => $j->shift,
+                "divisi" => $j->divisi,
+                "jam_terlambat" => $j->jam_terlambat
             ]);
         }
 

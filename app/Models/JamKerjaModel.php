@@ -50,6 +50,8 @@ class JamKerjaModel extends Model
             'id'    => 'jam_kerja.id',
             'divisi_id' => 'jam_kerja.divisi_id',
             'jenis'    => 'jam_kerja.jenis',
+            'shift' => 'jam_kerja.shift',
+            'jam_terlambat' => 'jam_kerja.jam_terlambat'
         ];
 
         $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
@@ -65,16 +67,15 @@ class JamKerjaModel extends Model
 
         $totalData = $dataQry->countAllResults(false);
 
+        if ($addCondition['divisi_id']) {
+            $dataQry->where('divisi_id', $addCondition['divisi_id']);
+        }
+
         if ($addCondition['search']) {
             $dataQry->groupStart();
-        }
-
-        if ($addCondition['search']) {
             $dataQry->like('jam_kerja.jenis', $addCondition['search'])
+                ->orLike('jam_kerja.shift', $addCondition['shift'])
                 ->orLike('divisis.divisi', $addCondition['search']);
-        }
-
-        if ($addCondition['search']) {
             $dataQry->groupEnd();
         }
 
