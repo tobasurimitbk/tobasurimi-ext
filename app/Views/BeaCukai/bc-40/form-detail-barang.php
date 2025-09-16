@@ -243,9 +243,19 @@
 
                 <div class="row">
                     <div class="col-sm-6 mt-1">
-                        <label class="form-label font-weight-bold lable-title mb-3">
-                            Dokumen (Checklist yang digunakan)
-                        </label>
+                        <div class="row">
+                            <div class="col-sm">
+                                <label class="form-label font-weight-bold lable-title mb-3" style="margin-top: 10px;">
+                                    Dokumen (Checklist yang digunakan)
+                                </label>
+                            </div>
+                            <div class="col-sm">
+                                <button onclick="pilihSemua()" style="border-color: #269dffff !important; background-color: #269dffff !important; margin-right: 10px !important;" type="button" class="btn btn-add btn-block float-right">
+                                    <i class="fa-solid fa-check-double"></i> Pilih Semua
+                                </button>
+                            </div>
+                        </div>
+
                         <div class="table-responsive mt-3">
                             <table class="table table-bordered nowrap table-hover-tobasurimi dataTable table-list-informasi-dokumen" width="100%" cellspacing="0">
                                 <thead class="thead-dark">
@@ -1020,6 +1030,43 @@
             },
         });
 
+    }
+
+    function pilihSemua() {
+        var formData = new FormData();
+        formData.append("penerimaan_barang_id", "<?= encrypt($barangDetail['penerimaan_barang_id']) ?>");
+        formData.append("barang1_id", "<?= encrypt($barangDetail['barang1_id']) ?>");
+        formData.append("bc_purchase_order_id", "<?= encrypt($bcPo['id']) ?>");
+
+        $.ajax({
+            url: "<?= base_url("bea-cukai-bc-40/id/barang-dokumen-create-all"); ?>",
+            beforeSend: function(xhr) {
+                xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                setLoading();
+            },
+            complete: function() {
+                stopLoading();
+            },
+            data: formData,
+            method: "POST",
+            dataType: "json",
+            processData: false,
+            contentType: false,
+            success: function(response) {
+                if (response.status) {
+                    csrf.val(response.token);
+                    Swal.fire({
+                        icon: 'success',
+                        title: response.message,
+                        confirmButtonColor: '#4e73df',
+                        confirmButtonText: 'Ok'
+                    }).then((result) => {
+                        csrf.val(response.token);
+                        tableListInformasiDokumen.ajax.reload();
+                    });
+                }
+            },
+        });
     }
 </script>
 

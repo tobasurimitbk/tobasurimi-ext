@@ -1472,6 +1472,36 @@ class BC40 extends BaseController
         ]);
     }
 
+    public function createBarangDokumenAllAction()
+    {
+        $bcPurchaseOrderID = decrypt($this->request->getVar('bc_purchase_order_id'));
+        $barang1ID = decrypt($this->request->getVar('barang1_id'));
+        $penerimaanBarangID = decrypt($this->request->getVar('penerimaan_barang_id'));
+
+        $this->bcBarangDokumenModel->where('bc_purchase_order_id', $bcPurchaseOrderID)->delete(null, false);
+        $bcDokumen = $this->bcDokumenModel
+            ->where('bc_purchase_order_id', $bcPurchaseOrderID)
+            ->where('deletedAt', null)
+            ->findAll();
+
+        foreach ($bcDokumen as $b) {
+            $this->bcBarangDokumenModel->insert([
+                'barang1_id' => $barang1ID,
+                'penerimaan_barang_id' => $penerimaanBarangID,
+                'bc_purchase_order_id' => $bcPurchaseOrderID,
+                'bc_dokumen_id' => $b['id'],
+                'bc_type' => 40,
+                'seri_dokumen' => $b['seri_dokumen']
+            ]);
+        }
+
+        return response()->setJSON([
+            'message' => "Dokumen berhasil ditambahkan semua",
+            'status' => true,
+            'token' => csrf_hash()
+        ]);
+    }
+
     public function createPungutanView($bcPurchaseOrderID)
     {
         $bcPurchaseOrderID = decrypt($bcPurchaseOrderID);

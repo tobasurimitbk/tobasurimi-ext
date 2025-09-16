@@ -1688,6 +1688,7 @@ $routes->group('bea-cukai-bc-40', ['filter' => 'Auth'], function ($routes) {
     $routes->post('id/barang-pungutan-delete', 'BeaCukai\BC40::deletePungutanAction');
     $routes->get('id/barang-dokumen-all', 'BeaCukai\BC40::allDokumenBarang');
     $routes->post('id/barang-dokumen-create', 'BeaCukai\BC40::createBarangDokumenAction');
+    $routes->post('id/barang-dokumen-create-all', 'BeaCukai\BC40::createBarangDokumenAllAction');
     $routes->post('id/barang-dokumen-delete', 'BeaCukai\BC40::deleteBarangDokumenAction');
     $routes->post('id/barang', 'BeaCukai\BC40::createBarangDetailAction');
     // PUNGUTAN
@@ -2047,6 +2048,8 @@ $routes->post('/attendances-unit/save', 'Master\AttendancesUnit::saveData', ['fi
 $routes->post('/attendances-unit/update', 'Master\AttendancesUnit::updateData', ['filter' => 'Auth']);
 $routes->post('/attendances-unit/delete', 'Master\AttendancesUnit::deleteData', ['filter' => 'Auth']);
 $routes->post('/attendances-unit/copy-to-finger', 'Master\AttendancesUnit::CopyToFinger', ['filter' => 'Auth']);
+$routes->post('/attendances-unit/ping', 'Master\AttendancesUnit::pingFinger', ['filter' => 'Auth']);
+
 // Tunjangan
 $routes->get('/tunjangan', 'Master\Tunjangan::ListTunjangan', ['filter' => 'Auth']);
 $routes->get('/tunjangan/all', 'Master\Tunjangan::allTunjangan', ['filter' => 'Auth']);
