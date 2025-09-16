@@ -486,7 +486,7 @@ class PembayaranInvoice extends BaseController
         $typeInvoice = [];
         $type = $this->request->getGet('type_invoice');
         if ($type == "ALL") {
-            $typeInvoice = ['EKSPOR', 'LOKAL', 'LAIN-LAIN', 'RETURN'];
+            $typeInvoice = ['EKSPOR', 'LOKAL', 'LAIN-LAIN', 'RETURN', 'PROFORMA INVOICE'];
         } else {
             $typeInvoice = [$type];
         }
@@ -543,6 +543,15 @@ class PembayaranInvoice extends BaseController
                     ->join('sales_contract', 'sales_contract.id = sales_order_export.sales_contract_id')
                     ->join('customers', 'customers.id = sales_contract.customer_id')
                     ->where('sales_order_export_id', $p['invoice_id'])
+                    ->first();
+                $nomor_invoice = $salesOrderExportData['sales_order_export_no'];
+                $customer_name = $salesOrderExportData['name'];
+            } elseif ($p['type_invoice'] == "PROFORMA INVOICE") {
+                $salesOrderExportData = $this->proformaInvoiceModel
+                    ->join('sales_order_export', 'sales_order_export.sales_contract_id = proforma_invoice.sales_order_export_id')
+                    ->join('sales_contract', 'sales_contract.id = sales_order_export.sales_contract_id')
+                    ->join('customers', 'customers.id = sales_contract.customer_id')
+                    ->where('proforma_invoice.id', $p['invoice_id'])
                     ->first();
                 $nomor_invoice = $salesOrderExportData['sales_order_export_no'];
                 $customer_name = $salesOrderExportData['name'];
@@ -1193,12 +1202,22 @@ class PembayaranInvoice extends BaseController
                     'token' => csrf_hash()
                 ]);
             } elseif ($tipe_invoice == "EKSPOR") {
+
+                $currency = $this->salesOrderExportModel
+                    ->select('currency')
+                    ->join('sales_contract', 'sales_contract.id = sales_order_export.sales_contract_id')
+                    ->where('sales_order_export.id', decrypt($this->request->getVar('no_dokumen')))
+                    ->first();
+                
+                $valas = $this->metaDataModel->where('id', $currency)->where('deletedAt', null)->first();
+
                 $id = $this->pembayaranInvoiceModel->insert([
                     'company_id' => $this->this_company_id,
                     'user_id' => $this->user_id,
                     'payment_method' => $this->request->getVar('payment_methods'),
                     'invoice_id' => decrypt($this->request->getVar('no_dokumen')),
-                    'valas_id' => $this->request->getVar('valas'),
+                    'divisi_id' => $this->request->getVar('divisi_id'),
+                    'valas_id' => $valas['id'],
                     'no_pembayaran' => $this->request->getVar('no_bukti_pembayaran'),
                     'keterangan' =>  $this->request->getVar('keterangan'),
                     'type_invoice' => "EKSPOR",
@@ -1284,6 +1303,70 @@ class PembayaranInvoice extends BaseController
                     'id' => encrypt($id),
                     'status' => true,
                     'message' => "Pembayaran Invoice Retur berhasil disimpan",
+                    'token' => csrf_hash()
+                ]);
+            } elseif ($tipe_invoice == "PROFORMA INVOICE") {
+                $customer = $this->proformaInvoiceModel
+                    ->select('customers.*')
+                    ->join('sales_order_export', 'sales_order_export.sales_contract_id = proforma_invoice.sales_order_export_id')
+                    ->join('sales_contract', 'sales_contract.id = sales_order_export.sales_contract_id')
+                    ->join('customers', 'customers.id = sales_contract.customer_id')
+                    ->where('proforma_invoice.id', decrypt($this->request->getVar('no_dokumen')))
+                    ->first();
+
+                $currency = $this->proformaInvoiceModel
+                    ->select('currency')
+                    ->join('sales_order_export', 'sales_order_export.sales_contract_id = proforma_invoice.sales_order_export_id')
+                    ->join('sales_contract', 'sales_contract.id = sales_order_export.sales_contract_id')
+                    ->where('proforma_invoice.id', decrypt($this->request->getVar('no_dokumen')))
+                    ->first();
+                
+                $valas = $this->metaDataModel->where('id', $currency)->where('deletedAt', null)->first();
+
+
+                $id = $this->pembayaranInvoiceModel->insert([
+                    'company_id' => $this->this_company_id,
+                    'user_id' => $this->user_id,
+                    'payment_method' => $this->request->getVar('payment_methods'),
+                    'divisi_id' => $this->request->getVar('divisi_id'),
+                    'invoice_id' => decrypt($this->request->getVar('no_dokumen')),
+                    'customer_id' => $customer['id'],
+                    'valas_id' => $valas['id'],
+                    'no_pembayaran' => $this->request->getVar('no_bukti_pembayaran'),
+                    'keterangan' =>  $this->request->getVar('keterangan'),
+                    'type_invoice' => "PROFORMA INVOICE",
+                    'tanggal' => date('Y-m-d', strtotime(str_replace('/', '-', $this->request->getVar('payment_date')))),
+                    'total_invoice' => $this->request->getVar('total_amount_invoice'),
+                    'potongan' => $this->request->getVar('potongan') ? $this->request->getVar('potongan'): 0,
+                    'total_bayar' => $this->request->getVar('total_bayar'),
+                    'akun_kas' => $this->request->getVar('akun_kas'),
+                    'akun_selisih' => $this->request->getVar('akun_selisih'),
+                    'status_posting' => '0'
+                ]);
+
+                // $salesOrderExportData = $this->salesOrderExportModel
+                //     ->select('
+                //         sales_order_export_id,
+                //         commision,
+                //         palet_fumigation,
+                //         palet_fumigation_price,
+                //         freight,
+                //         additional,
+                //         additional_2,
+                //         rebate_price,
+                //         royalty_price,
+                //         can_deduction_price,
+                //         estimated_freight_price,
+                //         others_type,
+                //         others_price,
+                //     ')
+                //     ->where('sales_order_export_id', $id)
+                //     ->first();
+
+                return response()->setJSON([
+                    'id' => encrypt($id),
+                    'status' => true,
+                    'message' => "Pembayaran Proforma Invoice berhasil disimpan",
                     'token' => csrf_hash()
                 ]);
             }
@@ -1502,6 +1585,23 @@ class PembayaranInvoice extends BaseController
     }
 
 
+    public function getValasPI()
+    {
+        $id = decrypt($this->request->getVar('id'));
+        $selectQry = "currency";
+        $currency = $this->proformaInvoiceModel
+                ->select($selectQry)
+                ->join('sales_order_export', 'sales_order_export.sales_contract_id = proforma_invoice.sales_order_export_id')
+                ->join('sales_contract', 'sales_contract.id = sales_order_export.sales_contract_id')
+                ->where('proforma_invoice.id', $id)
+                ->first();
+
+        $valas = $this->metaDataModel->where('id', $currency)->where('deletedAt', null)->first();
+
+        return json_encode($valas['value']);
+    }
+
+
     public function getById($id)
     {
         $id = decrypt($id);
@@ -1616,6 +1716,15 @@ class PembayaranInvoice extends BaseController
                 ->join('sales_contract', 'sales_contract.id = sales_order_export.sales_contract_id')
                 ->join('customers', 'customers.id = sales_contract.customer_id')
                 ->where('sales_order_export_id', $invoice_id)
+                ->first();
+            $customer = $salesOrderExportData['name'];
+        } elseif ($tipe_invoice == "PROFORMA INVOICE") {
+            $salesOrderExportData = $this->proformaInvoiceModel
+                ->select('customers.*')
+                ->join('sales_order_export', 'sales_order_export.sales_contract_id = proforma_invoice.sales_order_export_id')
+                ->join('sales_contract', 'sales_contract.id = sales_order_export.sales_contract_id')
+                ->join('customers', 'customers.id = sales_contract.customer_id')
+                ->where('proforma_invoice.id', $invoice_id)
                 ->first();
             $customer = $salesOrderExportData['name'];
         } elseif ($tipe_invoice == "LAIN-LAIN") {
