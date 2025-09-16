@@ -1285,6 +1285,7 @@ class JurnalUmum extends BaseController
                                         $dataPOBBDetail[0]->barang1_id == $value->barang_master_id &&
                                         $dataBB->company_id == $value->company_id &&
                                         $dataBB->divisi_id == $value->divisi_id &&
+                                        $dataBB->spesifikasi_id == $value->spesifikasi_id &&
                                         $value->ap_id != null &&
                                         $value->ar_id != null
                                     ) {
@@ -1475,7 +1476,7 @@ class JurnalUmum extends BaseController
                                     //     $barangAR = $value->ar_id;
                                     //     $barangAPFound = true;
                                     // }
-                                    if ($dataBBDetail->barang_id == $value->barang_master_id && $dataBB->company_id == $value->company_id && $dataBB->division_id == $value->divisi_id && $value->ap_id != null && $value->ar_id != null) {
+                                    if ($dataBBDetail->barang_id == $value->barang_master_id && $dataBB->company_id == $value->company_id && $dataBBDetail->spesifikasi_id == $value->barang_master_spesifikasi_id && $dataBB->division_id == $value->divisi_id && $value->ap_id != null && $value->ar_id != null) {
                                         $barangAP = $value->ap_id;
                                         $barangAR = $value->ar_id;
                                         $barangAPFound = true;
@@ -1689,6 +1690,7 @@ class JurnalUmum extends BaseController
                         if (
                             $detail->barang_id == $accBarang->barang_master_id &&
                             $dataPB->company_id == $accBarang->company_id &&
+                            $detail->spesifikasi_id == $accBarang->spesifikasi_id &&
                             $dataPB->divisi_id == $accBarang->divisi_id &&
                             $accBarang->ap_id
                         ) {
@@ -1698,7 +1700,7 @@ class JurnalUmum extends BaseController
                     }
 
                     if (!$barangAP) {
-                        $errors[] = "Barang {$detail->nama_barang} tidak memiliki akun COA";
+                        $errors[] = "Barang {$detail->nama_barang} {$detail->nama_spesifikasi} tidak memiliki akun COA";
                     } else {
                         $jumlah = $detail->sub_total;
                         $totalDebit += $jumlah;
