@@ -81,7 +81,8 @@ class AccountBarangModel extends Model
                   account_barang.pemakaian_id,
                   account_barang.kategori_id,
                   account_barang.keterangan,
-                  divisis.divisi";
+                  divisis.divisi,
+                  barang_master_spesifikasi.spesifikasi";
 
         $barangDataQry = $this->asArray()
             ->select($selectQry)
@@ -89,7 +90,7 @@ class AccountBarangModel extends Model
             ->where('account_barang.deleted_at', null)
             ->join('barang_master', 'barang_master.id = account_barang.barang_master_id', 'left')
             ->join('divisis', 'divisis.id = account_barang.divisi_id', 'left')
-            // ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = account_barang.barang_master_spesifikasi_id', 'left')
+            ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = account_barang.barang_master_spesifikasi_id', 'left')
             // ->groupBy('account_barang.id') // Pastikan hasil spesifik untuk setiap account_barang
             ->orderBy($sort, $sortType);
 
@@ -157,14 +158,13 @@ class AccountBarangModel extends Model
         }
     }
 
-    public function checkAccountBarang($company_id, $divisi_id, $barang_id)
+    public function checkAccountBarang($company_id, $divisi_id, $barang_id, $spesifikasi_id)
     {
         $accountBarang = $this->asArray()
             ->where('company_id', $company_id)
             ->where('divisi_id', $divisi_id)
             ->where('barang_master_id', $barang_id)
-            // ->where('barang_master_spesifikasi_id', $spesifikasi_id)
-            // ->where('keterangan', $keterangan)
+            ->where('barang_master_spesifikasi_id', $spesifikasi_id)
             ->where('deleted_at', null)
             ->first();
 
@@ -175,15 +175,16 @@ class AccountBarangModel extends Model
         }
     }
 
-    public function insertAccountBarang($company_id, $divisi_id, $barang_id)
+    public function insertAccountBarang($company_id, $divisi_id, $barang_id, $spesifikasi_id)
     {
-        if ($this->checkAccountBarang($company_id, $divisi_id, $barang_id)) {
+        if ($this->checkAccountBarang($company_id, $divisi_id, $barang_id, $spesifikasi_id)) {
         } else {
             // BELUM ADA
             $accountBarang = $this->insert([
                 'company_id' => $company_id,
                 'divisi_id' => $divisi_id,
                 'barang_master_id' => $barang_id,
+                'barang_master_spesifikasi_id' => $spesifikasi_id
             ]);
             return $accountBarang;
         }

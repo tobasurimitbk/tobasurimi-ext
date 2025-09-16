@@ -390,7 +390,7 @@ class POLokalBahanBaku extends BaseController
                 'daily_price' => $r->daily_price,
                 'monthly_price' => $r->monthly_price
             ]);
-            $this->accountBarangModel->insertAccountBarang($this->this_company_id, $this->request->getVar('divisi_id'), $this->request->getVar("barang_id"));
+            $this->accountBarangModel->insertAccountBarang($this->this_company_id, $this->request->getVar('divisi_id'), $this->request->getVar("barang_id"), $r->spesifikasi_id);
         }
 
         $detailPurchase = $this->RMPurchaseOrderDetailModel->where('rm_purchase_order_id', $id)->where('deletedAt', null)->findAll();
@@ -541,7 +541,7 @@ class POLokalBahanBaku extends BaseController
 
                 array_push($id_detail_all, $id_detail_new);
             }
-            $this->accountBarangModel->insertAccountBarang($this->this_company_id, $this->request->getVar('divisi_id'), $this->request->getVar("barang_id"));
+            $this->accountBarangModel->insertAccountBarang($this->this_company_id, $this->request->getVar('divisi_id'), $this->request->getVar("barang_id"), $r->spesifikasi_id);
         }
 
         $this->RMPurchaseOrderDetailModel

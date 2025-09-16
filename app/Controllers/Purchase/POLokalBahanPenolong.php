@@ -184,7 +184,7 @@ class POLokalBahanPenolong extends BaseController
                 'total' => repairDouble($d->total),
                 'remaining_qty' => $d->qty
             ]);
-            $this->accountBarangModel->insertAccountBarang($this->this_company_id, $this->request->getVar('divisionID'), $d->barang_id);
+            $this->accountBarangModel->insertAccountBarang($this->this_company_id, $this->request->getVar('divisionID'), $d->barang_id, $d->spesifikasi_id);
         }
 
         // $this->jurnalController->insertDataPembelian($poID);
@@ -451,7 +451,7 @@ class POLokalBahanPenolong extends BaseController
                 ->where('am_purchase_order_details.am_purchase_order_id', $id)
                 ->where('spesifikasi_id', $d->spesifikasi_id)
                 ->where('barang_id', $d->barang_id)
-                ->where('note', trim($d->keterangan))
+                // ->where('note', trim($d->keterangan))
                 ->first();
 
             if ($check != null) {
@@ -473,7 +473,7 @@ class POLokalBahanPenolong extends BaseController
                 ]);
                 array_push($id_detail_all, $check['id']);
 
-                $this->accountBarangModel->insertAccountBarang($this->this_company_id, $this->request->getVar('divisionID'), $d->barang_id);
+                $this->accountBarangModel->insertAccountBarang($this->this_company_id, $this->request->getVar('divisionID'), $d->barang_id, $d->spesifikasi_id);
             } else {
                 // NEW BARANG
                 // DELETE
@@ -501,7 +501,7 @@ class POLokalBahanPenolong extends BaseController
                 ]);
                 array_push($id_detail_all, $id_detail_new);
 
-                $this->accountBarangModel->insertAccountBarang($this->this_company_id, $this->request->getVar('divisionID'), $d->barang_id);
+                $this->accountBarangModel->insertAccountBarang($this->this_company_id, $this->request->getVar('divisionID'), $d->barang_id, $d->spesifikasi_id);
             }
         }
 
