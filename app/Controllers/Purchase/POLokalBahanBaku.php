@@ -390,7 +390,7 @@ class POLokalBahanBaku extends BaseController
                 'daily_price' => $r->daily_price,
                 'monthly_price' => $r->monthly_price
             ]);
-            $this->accountBarangModel->insertAccountBarang($this->this_company_id, $this->request->getVar('divisi_id'), $this->request->getVar("barang_id"), $r->spesifikasi_id, $r->keterangan);
+            $this->accountBarangModel->insertAccountBarang($this->this_company_id, $this->request->getVar('divisi_id'), $this->request->getVar("barang_id"));
         }
 
         $detailPurchase = $this->RMPurchaseOrderDetailModel->where('rm_purchase_order_id', $id)->where('deletedAt', null)->findAll();
@@ -541,7 +541,7 @@ class POLokalBahanBaku extends BaseController
 
                 array_push($id_detail_all, $id_detail_new);
             }
-            $this->accountBarangModel->insertAccountBarang($this->this_company_id, $this->request->getVar('divisi_id'), $this->request->getVar("barang_id"), $r->spesifikasi_id, $r->keterangan ?? null);
+            $this->accountBarangModel->insertAccountBarang($this->this_company_id, $this->request->getVar('divisi_id'), $this->request->getVar("barang_id"));
         }
 
         $this->RMPurchaseOrderDetailModel
@@ -681,7 +681,8 @@ class POLokalBahanBaku extends BaseController
                 // } else {
                 if ($payload['is_posted']) {
                     // Cek apakah PO sudah diposting
-                    $unPostingCheck = $this->penerimaanBarangModel->where('tipe_bahan', "BAKU")->where('status_penerimaan', "LOKAL")->like('multiple_po_id', $id)->first();
+                    $unPostingCheck = $this->penerimaanBarangModel->where('tipe_bahan', "BAKU")->where('status_penerimaan', "LOKAL")->where('deletedAt', null)->like('multiple_po_id', $id)->first();
+
                     if ($unPostingCheck) {
                         return response()->setJSON([
                             "status"    => false,
@@ -701,10 +702,10 @@ class POLokalBahanBaku extends BaseController
                             $result = $this->jurnalController->insertDataPembelian($id, "BAHAN BAKU", "LOKAL", "pembelian", $penerimaanBarangId);
 
                             if ($result) {
-                                $this->penerimaanBarangModel->delete($penerimaanBarangId);
-                                $this->penerimaanBarangDetailModel->where('penerimaan_barang_id', $penerimaanBarangId)->delete();
                                 $responseBody = json_decode($result->getBody(), true);
                                 if ($responseBody && isset($responseBody['status'])) {
+                                    $this->penerimaanBarangModel->delete($penerimaanBarangId);
+                                    $this->penerimaanBarangDetailModel->where('penerimaan_barang_id', $penerimaanBarangId)->delete();
                                     $data = [
                                         "status"    => false,
                                         "message"   => $responseBody['message'],

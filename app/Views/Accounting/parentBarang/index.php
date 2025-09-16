@@ -65,7 +65,6 @@
                             <tr>
                                 <th>No.</th>
                                 <th>Barang</th>
-                                <th>Keterangan</th>
                                 <th>Departemen</th>
                                 <?php if ($type == "bahan_jadi" || $type == "bahan_setengah_jadi") : ?>
                                     <th>Akun Persediaan</th>
@@ -245,10 +244,6 @@
                 width: "5%"
             }, {
                 data: "parent_name",
-                className: "text-left",
-                sortable: false,
-            }, {
-                data: "keterangan",
                 className: "text-left",
                 sortable: false,
             }, {
