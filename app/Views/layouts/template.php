@@ -46,8 +46,6 @@
 
     <link rel="stylesheet" type="text/css" href="<?= base_url() ?>assets/css/bootstrap-datetimepicker.min.css?v=<?= time(); ?>">
     <link rel="stylesheet" type="text/css" href="<?= base_url() ?>assets/css/bootstrap-datetimepicker-standalone.css?v=<?= time(); ?>">
-
-
 </head>
 <?php $session = session(); ?>
 
@@ -227,7 +225,9 @@
             </div>
 
             <!-- Footer -->
-            <?= $this->include('layouts/footer'); ?>
+            <?php if ($session->get('toggle') != "sidebar-mini"): ?>
+                <?= $this->include('layouts/footer'); ?>
+            <?php endif; ?>
         </div>
         <!-- {% endif %} -->
     </div>

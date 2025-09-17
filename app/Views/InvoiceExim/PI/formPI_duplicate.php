@@ -932,10 +932,18 @@
         } else {
             listPaymentTerm.map(item => {
                 var bgcolor = 'whitesmoke';
+                <?php if (session()->get('theme') == 'dark'): ?>
+                    if (item.is_penagihan) {
+                        bgcolor = '#d76a6aff';
+                    } else {
+                        bgcolor = '#343A40';
 
-                if (item.is_penagihan) {
-                    bgcolor = '#ebe520ff';
-                }
+                    }
+                <?php else: ?>
+                    if (item.is_penagihan) {
+                        bgcolor = '#ebe520ff';
+                    }
+                <?php endif; ?>
                 var newRow = $('<tr style="background-color:' + bgcolor + ';color:whitesmoke;">');
                 newRow.append($('<td style="text-align:center;">').text(no++));
                 newRow.append($('<td>').text(item.payment_term));

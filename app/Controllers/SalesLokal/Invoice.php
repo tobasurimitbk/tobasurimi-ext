@@ -100,9 +100,10 @@ class Invoice extends BaseController
 
     public function all()
     {
-        $pageSize = $this->request->getGet("length");
-        $currentPage = ($this->request->getGet("start") / $this->request->getGet("length")) + 1;
-        $offset = $currentPage - 1;
+        $pageSize = (int)$this->request->getGet('length');
+        $start    = (int)$this->request->getGet('start');
+        $currentPage = $pageSize ? (int)($start / $pageSize) + 1 : 1;
+        $offset   = $start;   // gunakan ini!
 
         $payload = [
             "pageSize"      => $pageSize,
@@ -136,6 +137,7 @@ class Invoice extends BaseController
             "dateStart"     => $this->request->getGet("dateStart") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getGet("dateStart")))) : "",
             "dateEnd"       => $this->request->getGet("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getGet("dateEnd")))) : "",
         ];
+
         $dataSalesOrderInvoice = $this->SalesOrderInvoiceModel
             ->getAllSalesOrderInvoiceLokal($condition, $addCondition, $pageSize, $offset);
 
@@ -1287,32 +1289,39 @@ class Invoice extends BaseController
 
     public function getNomorFaktur()
     {
-        $code = "LKL/INV";
-        $currentYear = date('y'); // 2 digit
-        $currentMonth = date('n'); // 1-12 tanpa nol depan
+        $code   = "LKL/INV";
+        $year   = date('y'); // 2 digit
+        $month  = date('n'); // 1–12 tanpa nol depan
         $romawi = ['', 'I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI', 'XII'];
-        $numberTemplate = $code . "/" . $currentYear . "/" . $romawi[$currentMonth] . "/";
+        $template = "{$code}/{$year}/{$romawi[$month]}/";
 
-        // Ambil faktur terakhir
-        $lastData = $this->SalesOrderInvoiceModel->asObject()
+        // Ambil record terakhir berdasarkan createdAt DESC
+        $last = $this->SalesOrderInvoiceModel
+            ->select('no_faktur')
             ->orderBy('createdAt', 'DESC')
             ->first();
 
-        if ($lastData && !empty($lastData->no_faktur)) {
-            $parts = explode('/', $lastData->no_faktur);
-            $lastNumber = isset($parts[4]) && is_numeric($parts[4]) ? intval($parts[4]) : 0;
+        if ($last && !empty($last->no_faktur)) {
+            // Pisahkan nomor terakhir
+            $parts = explode('/', $last->no_faktur);
+            // Ambil index terakhir sebagai nomor (pastikan numerik)
+            $lastNumber = is_numeric(end($parts)) ? (int)end($parts) : 0;
+
             $nextNumber = $lastNumber + 1;
+            // Format tetap 3 digit (001, 002, ...)
+            $newNumber  = str_pad($nextNumber, 3, '0', STR_PAD_LEFT);
+
+            // Pakai prefix dari faktur terakhir (bukan template baru)
+            $prefix = implode('/', array_slice($parts, 0, -1));
+            $invNumber = "{$prefix}/{$newNumber}";
         } else {
-            $nextNumber = 1;
+            // Tidak ada data, gunakan template default
+            $invNumber = $template . '001';
         }
 
-        // Format 3 digit
-        $paddedNumber = str_pad($nextNumber, 3, '0', STR_PAD_LEFT);
-        $invNumber = $numberTemplate . $paddedNumber;
-
-        return response()->setJSON([
-            'data' => $invNumber,
-            'token' => csrf_hash(),
+        return $this->response->setJSON([
+            'data'   => $invNumber,
+            'token'  => csrf_hash(),
             'status' => true
         ]);
     }

@@ -18,7 +18,7 @@ helper(['custom_helper']);
 
         <div class="sidebar-brand sidebar-brand-sm">
 
-            <img src="<?= base_url("assets/img/favicon.png"); ?>" width="35" height="35">
+            <img src="<?= base_url("assets/img/favicon.png"); ?>" width="35" height="60">
         </div>
 
         <ul class="sidebar-menu">

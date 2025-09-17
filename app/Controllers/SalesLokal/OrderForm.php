@@ -664,8 +664,7 @@ class OrderForm extends BaseController
                 }
             }
 
-            $this->SalesOrderModel->update(
-                $id,
+            $values =
                 [
                     "no_sales_order"        => strtoupper($postData['no_sales_order']),
                     "id_customer"           => $postData['id_customer'],
@@ -683,7 +682,23 @@ class OrderForm extends BaseController
                     'no_po'                 => $this->request->getVar('no_po'),
                     'estimated_freight'     => $this->request->getVar('estimated_freight'),
                     "payment_terms"         => $postData['termin'],
-                ]
+                ];
+
+            $checkSO = $this->SalesOrderModel->where('UPPER(no_sales_order)', strtoupper($this->request->getVar('no_sales_order')))->findAll();
+            if ($checkSO) {
+                $data = [
+                    "status"    => false,
+                    "message"   => "No Sales Order Sudah Digunakan",
+                    "payload"   => $values,
+                    'token'     => csrf_hash(),
+                ];
+                echo json_encode($data);
+                return;
+            }
+
+            $this->SalesOrderModel->update(
+                $id,
+                $values
             );
 
             $this->SalesOrderModel->db->transComplete();
@@ -1039,36 +1054,37 @@ class OrderForm extends BaseController
 
     public function generateNomorSalesOrder()
     {
-        $code = "TSI";
-        $currentYear = date('y'); // 2 digit
-        $currentMonth = date('n'); // 1-12
+        $code   = "TSI";
+        $year   = date('y'); // 2 digit
+        $month  = date('n'); // 1–12
         $romawi = ['', 'I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI', 'XII'];
-        $numberTemplate = $code . "/" . $romawi[$currentMonth] . "/" . $currentYear . "/";
+        $template = "{$code}/{$romawi[$month]}/{$year}/";
 
-        // Ambil data terakhir
-        $listData = $this->SalesOrderModel->asObject()
+        // Ambil sales order terakhir
+        $last = $this->SalesOrderModel
+            ->select('no_sales_order')
             ->orderBy('createdAt', 'DESC')
             ->first();
 
-        if ($listData && !empty($listData->no_sales_order)) {
-            // pecah nomor terakhir
-            $parts = explode('/', $listData->no_sales_order);
-
-            // ambil bagian terakhir sebagai nomor urut
-            $lastNumber = isset($parts[3]) && is_numeric($parts[3]) ? intval($parts[3]) : 0;
+        if ($last && !empty($last->no_sales_order)) {
+            // Pecah nomor terakhir
+            $parts = explode('/', $last->no_sales_order);
+            // Ambil elemen terakhir sebagai nomor urut
+            $lastNumber = is_numeric(end($parts)) ? (int)end($parts) : 0;
             $nextNumber = $lastNumber + 1;
+
+            // Prefix diambil dari nomor terakhir supaya format tetap sama
+            $prefix = implode('/', array_slice($parts, 0, -1));
+            $newNumber = str_pad($nextNumber, 3, '0', STR_PAD_LEFT);
+            $salesOrderNumber = "{$prefix}/{$newNumber}";
         } else {
-            // kalau kosong mulai dari 1
-            $nextNumber = 1;
+            // Jika belum ada data, pakai template default
+            $salesOrderNumber = $template . '001';
         }
 
-        // format nomor urut 3 digit
-        $paddedNumber = str_pad($nextNumber, 3, '0', STR_PAD_LEFT);
-        $invNumber = $numberTemplate . $paddedNumber;
-
-        return response()->setJSON([
-            'data' => $invNumber,
-            'token' => csrf_hash(),
+        return $this->response->setJSON([
+            'data'   => $salesOrderNumber,
+            'token'  => csrf_hash(),
             'status' => true
         ]);
     }

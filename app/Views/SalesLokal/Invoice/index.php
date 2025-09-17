@@ -92,7 +92,7 @@
                         <thead class="thead-dark">
                             <tr>
                                 <th onclick="changeSort('no')" class="sort">No.</th>
-                                <th onclick="changeSort('kode_pelanggan')" class="sort">Nomor Invoice</th>
+                                <th onclick="changeSort('no_faktur')" class="sort">Nomor Invoice</th>
                                 <th onclick="changeSort('tanggal_faktur')" class="sort">Tanggal Invoice</th>
                                 <th onclick="changeSort('nama_pelanggan')" class="sort">Nama Customer</th>
                                 <th onclick="changeSort('nama_sales')" class="sort">Nama Sales</th>
@@ -120,7 +120,7 @@
 <script>
     const csrfToken = '<?= csrf_token() ?>';
 
-    let sort = "";
+    let sort = "no_faktur";
     let sortType = "desc";
     let trigger = true;
 
