@@ -745,32 +745,37 @@ class SuratJalan extends BaseController
 
     public function generateNomorSuratJalan()
     {
-        $code = "TSI/SJ";
-        $currentYear = date('y'); // 2 digit tahun
-        $currentMonth = date('n'); // 1-12
+        $code   = "TSI/SJ";
+        $year   = date('y'); // 2 digit tahun
+        $month  = date('n'); // 1–12 tanpa nol depan
         $romawi = ['', 'I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI', 'XII'];
-        $numberTemplate = $code . "/" . $romawi[$currentMonth] . "/" . $currentYear . "/";
+        $template = "{$code}/{$romawi[$month]}/{$year}/";
 
-        // Ambil data terakhir sesuai bulan & tahun
-        $lastData = $this->SuratJalanModel->asObject()
+        // Ambil record terakhir
+        $last = $this->SuratJalanModel
+            ->select('no_surat_jalan')
             ->orderBy('createdAt', 'DESC')
             ->first();
 
-        if ($lastData && !empty($lastData->no_surat_jalan)) {
-            $parts = explode('/', $lastData->no_surat_jalan);
-            $lastNumber = isset($parts[4]) && is_numeric($parts[4]) ? intval($parts[4]) : 0;
+        if ($last && !empty($last->no_surat_jalan)) {
+            // Pecah nomor terakhir
+            $parts = explode('/', $last->no_surat_jalan);
+            // Ambil elemen terakhir sebagai nomor urut
+            $lastNumber = is_numeric(end($parts)) ? (int)end($parts) : 0;
             $nextNumber = $lastNumber + 1;
+
+            // Gunakan prefix lama supaya format tetap konsisten
+            $prefix = implode('/', array_slice($parts, 0, -1));
+            $newNumber = str_pad($nextNumber, 3, '0', STR_PAD_LEFT);
+            $suratJalanNumber = "{$prefix}/{$newNumber}";
         } else {
-            $nextNumber = 1;
+            // Jika belum ada data sama sekali
+            $suratJalanNumber = $template . '001';
         }
 
-        // Format jadi 3 digit
-        $paddedNumber = str_pad($nextNumber, 3, '0', STR_PAD_LEFT);
-        $invNumber = $numberTemplate . $paddedNumber;
-
-        return response()->setJSON([
-            'data' => $invNumber,
-            'token' => csrf_hash(),
+        return $this->response->setJSON([
+            'data'   => $suratJalanNumber,
+            'token'  => csrf_hash(),
             'status' => true
         ]);
     }

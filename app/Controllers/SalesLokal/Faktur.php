@@ -1059,32 +1059,37 @@ class Faktur extends BaseController
 
     public function generateNomorSalesOrder()
     {
-        $code = "TSI";
-        $currentYear = date('y'); // 2 digit
-        $currentMonth = date('n'); // 1-12
+        $code   = "TSI";
+        $year   = date('y'); // 2 digit
+        $month  = date('n'); // 1–12
         $romawi = ['', 'I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI', 'XII'];
-        $numberTemplate = $code . "/" . $romawi[$currentMonth] . "/" . $currentYear . "/";
+        $template = "{$code}/{$romawi[$month]}/{$year}/";
 
-        // Ambil data terakhir
-        $lastData = $this->SalesFakturModel->asObject()
+        // Ambil sales order terakhir
+        $last = $this->SalesOrderModel
+            ->select('no_sales_order')
             ->orderBy('createdAt', 'DESC')
             ->first();
 
-        if ($lastData && !empty($lastData->no_sales_order)) {
-            $parts = explode('/', $lastData->no_sales_order);
-            $lastNumber = isset($parts[3]) && is_numeric($parts[3]) ? intval($parts[3]) : 0;
+        if ($last && !empty($last->no_sales_order)) {
+            // Pecah nomor terakhir
+            $parts = explode('/', $last->no_sales_order);
+            // Ambil elemen terakhir sebagai nomor urut
+            $lastNumber = is_numeric(end($parts)) ? (int)end($parts) : 0;
             $nextNumber = $lastNumber + 1;
+
+            // Prefix diambil dari nomor terakhir supaya format tetap sama
+            $prefix = implode('/', array_slice($parts, 0, -1));
+            $newNumber = str_pad($nextNumber, 3, '0', STR_PAD_LEFT);
+            $salesOrderNumber = "{$prefix}/{$newNumber}";
         } else {
-            $nextNumber = 1;
+            // Jika belum ada data, pakai template default
+            $salesOrderNumber = $template . '001';
         }
 
-        // Format jadi 3 digit
-        $paddedNumber = str_pad($nextNumber, 3, '0', STR_PAD_LEFT);
-        $invNumber = $numberTemplate . $paddedNumber;
-
-        return response()->setJSON([
-            'data' => $invNumber,
-            'token' => csrf_hash(),
+        return $this->response->setJSON([
+            'data'   => $salesOrderNumber,
+            'token'  => csrf_hash(),
             'status' => true
         ]);
     }
