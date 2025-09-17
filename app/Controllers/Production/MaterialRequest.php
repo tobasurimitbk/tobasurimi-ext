@@ -235,7 +235,7 @@ class MaterialRequest extends BaseController
 
                 if ($dataMaterialRequestNotApprove) {
                     $value['is_requested'] = true;
-                    $value['stok_total'] = $this->stockDetail2Model->getStockListDetail(
+                    $value['realStok'] = $this->stockDetail2Model->getStockListDetail(
                         $value['stock_id'],
                         $value['bc_id'],
                         $value['no_aju'],
@@ -704,6 +704,7 @@ class MaterialRequest extends BaseController
             }
 
             $dataMaterial = [
+                'work_order_id' => implode(",", $this->request->getVar("kode_produksi")),
                 "production_date" => $this->request->getVar("date_production") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("date_production")))) : "",
                 "request_date" => $this->request->getVar("date_request") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("date_request")))) : "",
                 "req_no" => $no,
@@ -913,8 +914,6 @@ class MaterialRequest extends BaseController
         return;
     }
 
-
-
     public function updateNew()
     {
         try {
@@ -940,6 +939,7 @@ class MaterialRequest extends BaseController
 
             // Update main material request data
             $dataMaterial = [
+                'work_order_id' => implode(",", $this->request->getVar("kode_produksi")),
                 "production_date" => $this->request->getVar("date_production") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("date_production")))) : "",
                 "request_date" => $this->request->getVar("date_request") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("date_request")))) : "",
                 "req_no" => $no,

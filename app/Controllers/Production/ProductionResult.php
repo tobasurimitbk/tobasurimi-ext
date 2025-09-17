@@ -773,11 +773,16 @@ class ProductionResult extends BaseController
     {
         $kodeProduksi = $this->request->getVar('kode_produksi');
 
-        // Jika multiple ID, konversi ke array
+        // Pastikan jadi array
         $woIds = is_array($kodeProduksi) ? $kodeProduksi : [$kodeProduksi];
 
-        $dataMaterialRequest = $this->materialRequestModel->asObject()
-            ->select('material_requests.*, GROUP_CONCAT(material_request_details.nama_barang SEPARATOR \', \') AS nama_barang, users.name AS user_name')
+        // Builder utama
+        $builder = $this->materialRequestModel->asObject()
+            ->select("
+            material_requests.*,
+            GROUP_CONCAT(material_request_details.nama_barang SEPARATOR ', ') AS nama_barang,
+            users.name AS user_name
+        ")
             ->join('material_request_details', 'material_request_details.material_request_id = material_requests.id', 'left')
             ->join('users', 'users.id = material_requests.createdBy', 'left')
             ->where('company_id', $this->this_company_id)
@@ -786,23 +791,25 @@ class ProductionResult extends BaseController
             ->where('material_requests.deletedAt', null)
             ->where('material_request_details.deletedAt', null)
             ->where('material_request_details.qty_now >', 0)
-            ->whereIn('material_requests.work_order_id', $woIds) // Gunakan whereIn untuk multiple ID
+            ->groupStart();
+
+        // Tambahkan kondisi OR untuk setiap work_order_id
+        foreach ($woIds as $id) {
+            $builder->orWhere("FIND_IN_SET(" . (int)$id . ", material_requests.work_order_id) >", 0);
+        }
+
+        $dataMaterialRequest = $builder
+            ->groupEnd()
             ->groupBy('material_request_details.material_request_id')
             ->find();
 
-        if ($dataMaterialRequest) {
-            return response()->setJSON([
-                'data' => $dataMaterialRequest,
-                'token' => csrf_hash(),
-                'status' => true
-            ]);
-        } else {
-            return response()->setJSON([
-                'token' => csrf_hash(),
-                'status' => false
-            ]);
-        }
+        return $this->response->setJSON([
+            'data'   => $dataMaterialRequest ?: [],
+            'token'  => csrf_hash(),
+            'status' => (bool) $dataMaterialRequest
+        ]);
     }
+
 
     public function updateStatusPostedProductionResult()
     {
