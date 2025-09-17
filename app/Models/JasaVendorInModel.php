@@ -598,9 +598,6 @@ class JasaVendorInModel extends Model
                         }
                     }
 
-                    var_dump($result);
-                    die;
-
                 }
             }
         }
@@ -610,9 +607,13 @@ class JasaVendorInModel extends Model
         foreach ($result as $r) {
             foreach ($r['list_barang_masuk'] as $k) {
                 $barang1Id = $k['barang1_id'];
+                $stockDokumen = $r['stock_dokumen']; // Tambahkan stock_dokumen sebagai grouping key
                 $stockInId = $k['stock_in_id'];
-                if (!isset($listBarangMasukGrouped[$barang1Id][$stockInId])) {
-                    $listBarangMasukGrouped[$barang1Id][$stockInId] = [
+                
+                $groupKey = $barang1Id . '|' . $stockDokumen . '|' . $stockInId;
+                
+                if (!isset($listBarangMasukGrouped[$groupKey])) {
+                    $listBarangMasukGrouped[$groupKey] = [
                         'barang_name_in' => $k['barang_name_in'],
                         'jasa_vendor_out_detail_id' => $k['jasa_vendor_out_detail_id'],
                         'kode_barang_in' => $k['kode_barang_in'],
@@ -625,15 +626,15 @@ class JasaVendorInModel extends Model
                         'qty_bersih' => 0
                     ];
                 }
-                $listBarangMasukGrouped[$barang1Id][$stockInId]['qty_kotor'] += $k['qty_kotor'];
-                $listBarangMasukGrouped[$barang1Id][$stockInId]['qty_bersih'] += $k['qty_bersih'];
+                $listBarangMasukGrouped[$groupKey]['qty_kotor'] += (float)$k['qty_kotor'];
+                $listBarangMasukGrouped[$groupKey]['qty_bersih'] += (float)$k['qty_bersih'];
             }
         }
 
         $resultGroup = [];
 
         foreach ($result as $item) {
-            $groupKey = $item['supplier_id'] . '|' . $item['keterangan'] . '|' . $item['stock_dokumen']; // ⬅️ kombinasi supplier + keterangan
+            $groupKey = $item['supplier_id'] . '|' . $item['keterangan'] . '|' . $item['stock_dokumen'];
             if (!isset($resultGroup[$groupKey])) {
                 $resultGroup[$groupKey] = [];
             }
@@ -643,13 +644,12 @@ class JasaVendorInModel extends Model
         $dataGroup = [];
 
         foreach ($resultGroup as $groupKey => $items) {
-            // split key ke supplier_id dan keterangan
             list($supplierId, $keterangan, $stock_dokumen) = explode('|', $groupKey);
 
             // SUM QTY
             $qtyTotal = 0;
             foreach ($items as $i) {
-                $qtyTotal += $i['qty_out'];
+                $qtyTotal += (float)$i['qty_out'];
             }
 
             $barangArr = explode("-", $items[0]['barang_out']);
@@ -667,14 +667,19 @@ class JasaVendorInModel extends Model
                 "satuan_out" => $items[0]['satuan_out'],
                 "list_barang_masuk" => [],
             ];
-            $dataGroup[] = $groupData;
-
-            if (isset($listBarangMasukGrouped[$items[0]['barang1_id']])) {
-                foreach ($listBarangMasukGrouped[$items[0]['barang1_id']] as $listBarangMasuk) {
-                    $dataGroup[count($dataGroup) - 1]['list_barang_masuk'][] = $listBarangMasuk;
+            
+            // Ambil list_barang_masuk yang sesuai dengan stock_dokumen group ini
+            $barang1Id = $items[0]['barang1_id'];
+            foreach ($listBarangMasukGrouped as $key => $listBarang) {
+                list($bId, $doc, $stockInId) = explode('|', $key);
+                if ($bId == $barang1Id && $doc == $stock_dokumen) {
+                    $groupData['list_barang_masuk'][] = $listBarang;
                 }
             }
+            
+            $dataGroup[] = $groupData;
         }
+
 
         return [
             'dataDetail' => $result,
