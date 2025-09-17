@@ -169,9 +169,13 @@
                     </div>
 
                     <div class="col-md-4">
-                        <div class="form-floating mb-3">
-                            <input value="<?= !empty($dataPI) ? $dataPI['packing'] : '' ?>" <?= !empty($dataPI) ? ($dataPI['status_posting'] == 1 ? 'readonly' : '') : '' ?> autocomplete="one-time-code" type="text" class="form-control packing" id="packing" name="packing">
+                        <!-- <div class="form-floating mb-3">
+                            <input value="" <?= !empty($dataPI) ? ($dataPI['status_posting'] == 1 ? 'readonly' : '') : '' ?> autocomplete="one-time-code" type="text" class="form-control packing" id="packing" name="packing">
                             <label for="floatingInput">Packing</label>
+                        </div> -->
+                        <div class="form-floating mb-3">
+                            <textarea <?= !empty($dataPI) ? ($dataPI['status_posting'] == 1 ? 'readonly' : '') : '' ?> class="full-textarea form-control packing" id="packing" name="packing" placeholder="Keterangan / Packing"><?= !empty($dataPI) ? $dataPI['packing'] : '' ?></textarea>
+                            <label for="floatingInput">Keterangan / Packing</label>
                         </div>
                     </div>
                     <div class="col-md-4">
@@ -966,10 +970,19 @@
         } else {
             listPaymentTerm.map(item => {
                 var bgcolor = 'whitesmoke';
+                <?php if (session()->get('theme') == 'dark'): ?>
+                    if (item.is_penagihan) {
+                        bgcolor = '#d76a6aff';
+                    } else {
+                        bgcolor = '#343A40';
 
-                if (item.is_penagihan) {
-                    bgcolor = '#ebe520ff';
-                }
+                    }
+                <?php else: ?>
+                    if (item.is_penagihan) {
+                        bgcolor = '#ebe520ff';
+                    }
+                <?php endif; ?>
+
                 var newRow = $('<tr style="background-color:' + bgcolor + ';color:whitesmoke;">');
                 newRow.append($('<td style="text-align:center;">').text(no++));
                 newRow.append($('<td>').text(item.payment_term));

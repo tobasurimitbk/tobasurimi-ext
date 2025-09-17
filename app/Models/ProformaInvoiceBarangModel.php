@@ -49,6 +49,7 @@ class ProformaInvoiceBarangModel extends Model
         $dataQry = $this->select($selectQry)
             ->join('satuans', 'satuans.id = proforma_invoice_barang.satuan_id', 'left')
             ->where('proforma_invoice_barang.deletedAt', null)
+            ->where('proforma_invoice_id', $PIId)
             ->findAll();
 
         return $dataQry;

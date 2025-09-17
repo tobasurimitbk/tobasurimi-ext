@@ -403,7 +403,7 @@
             <tr style="border-bottom: 1px solid #eee;">
                 <td style="padding: 6px; border: 1px solid #ddd; vertical-align: top;"></td>
                 <td style="padding: 6px; border: 1px solid #ddd; vertical-align: top;" colspan="4">
-                    PACKING : <?= $dataPI['packing'] ?>
+                    <?= $dataPI['packing'] ?>
                 </td>
             </tr>
             <tr style="border-bottom: 1px solid #eee;">
