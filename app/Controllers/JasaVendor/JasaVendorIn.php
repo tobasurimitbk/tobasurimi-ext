@@ -646,7 +646,6 @@ class JasaVendorIn extends BaseController
         foreach ($barangs as $b) {
             // LIST BARANG MASUK
             foreach ($b->list_barang_masuk as $c) {
-                if ($c->qty_kotor != 0) {
                     $stockInId = $this->stockModel->initStockBarang(
                         $this->this_company_id,
                         $this->request->getVar('divisi_id'),
@@ -667,7 +666,6 @@ class JasaVendorIn extends BaseController
                             'qty_kotor' => $c->qty_kotor,
                             'qty_bersih' => $c->qty_bersih
                     ]);
-                }
             }
         }
 
