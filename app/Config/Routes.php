@@ -2350,7 +2350,7 @@ $routes->get('/laporan-accounting/costing/printPDF/(:segment)/(:segment)/(:segme
 $routes->get('/laporan-accounting/costing/printExcel/(:segment)/(:segment)/(:segment)/(:segment)', 'Laporan\Accounting\RekapKopek::exportExcel/$1/$2/$3/$4', ['filter' => 'Auth']);
 
 $routes->get('/laporan-accounting/jasa-vendor', 'Laporan\Accounting\JasaVendor::index', ['filter' => 'Auth']);
-$routes->post('/laporan-accounting/jasa-vendor', 'Laporan\Accounting\JasaVendor::getVendorData', ['filter' => 'Auth']);
+$routes->post('/laporan-accounting/jasa-/all', 'Laporan\Accounting\JasaVendor::getVendorData', ['filter' => 'Auth']);
 $routes->get('/laporan-accounting/jasa-vendor/printPDF/(:segment)/(:segment)', 'Laporan\Accounting\JasaVendor::exportPDF/$1/$2', ['filter' => 'Auth']);
 $routes->get('/laporan-accounting/jasa-vendor/printExcel/(:segment)/(:segment)', 'Laporan\Accounting\JasaVendor::exportExcel/$1/$2', ['filter' => 'Auth']);
 
