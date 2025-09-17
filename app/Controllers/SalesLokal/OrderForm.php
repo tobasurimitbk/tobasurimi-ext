@@ -664,8 +664,7 @@ class OrderForm extends BaseController
                 }
             }
 
-            $this->SalesOrderModel->update(
-                $id,
+            $values =
                 [
                     "no_sales_order"        => strtoupper($postData['no_sales_order']),
                     "id_customer"           => $postData['id_customer'],
@@ -683,7 +682,23 @@ class OrderForm extends BaseController
                     'no_po'                 => $this->request->getVar('no_po'),
                     'estimated_freight'     => $this->request->getVar('estimated_freight'),
                     "payment_terms"         => $postData['termin'],
-                ]
+                ];
+
+            $checkSO = $this->SalesOrderModel->where('UPPER(no_sales_order)', strtoupper($this->request->getVar('no_sales_order')))->findAll();
+            if ($checkSO) {
+                $data = [
+                    "status"    => false,
+                    "message"   => "No Sales Order Sudah Digunakan",
+                    "payload"   => $values,
+                    'token'     => csrf_hash(),
+                ];
+                echo json_encode($data);
+                return;
+            }
+
+            $this->SalesOrderModel->update(
+                $id,
+                $values
             );
 
             $this->SalesOrderModel->db->transComplete();

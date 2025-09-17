@@ -100,9 +100,10 @@ class Invoice extends BaseController
 
     public function all()
     {
-        $pageSize = $this->request->getGet("length");
-        $currentPage = ($this->request->getGet("start") / $this->request->getGet("length")) + 1;
-        $offset = $currentPage - 1;
+        $pageSize = (int)$this->request->getGet('length');
+        $start    = (int)$this->request->getGet('start');
+        $currentPage = $pageSize ? (int)($start / $pageSize) + 1 : 1;
+        $offset   = $start;   // gunakan ini!
 
         $payload = [
             "pageSize"      => $pageSize,
@@ -137,13 +138,8 @@ class Invoice extends BaseController
             "dateEnd"       => $this->request->getGet("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getGet("dateEnd")))) : "",
         ];
 
-        // var_dump($condition, $addCondition, $pageSize, $offset);
-        // exit;
         $dataSalesOrderInvoice = $this->SalesOrderInvoiceModel
             ->getAllSalesOrderInvoiceLokal($condition, $addCondition, $pageSize, $offset);
-
-        // var_dump($dataSalesOrderInvoice['data']);
-        // exit;
 
         $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
         $dataAllSalesOrderInvoice = [];

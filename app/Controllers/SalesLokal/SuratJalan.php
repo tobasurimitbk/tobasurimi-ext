@@ -437,9 +437,18 @@ class SuratJalan extends BaseController
                 ? $this->request->getPost('company_id')
                 : $this->this_company_id,
         ];
-        // var_dump($values);
-        // die;
         try {
+            $checkSJ = $this->SuratJalanModel->where('deletedAt', NULL)->where('UPPER(no_surat_jalan)', strtoupper($this->request->getVar('no_surat_jalan')))->findAll();
+            if ($checkSJ) {
+                $data = [
+                    "status"    => false,
+                    "message"   => "No Surat Jalan Sudah Digunakan",
+                    "payload"   => $values,
+                    'token'     => csrf_hash(),
+                ];
+                echo json_encode($data);
+                return;
+            }
 
             // Create a new validation instance
             $dataSuratJalan =  $this->SuratJalanModel->update($id, $values);
