@@ -836,6 +836,9 @@ class JasaVendorOut extends BaseController
                     $condition
                 );
 
+                // var_dump($dataResult);
+                // die;
+
                 $resultArr = [];
                 foreach ($dataResult as $item) {
                     if (floatval($item['stok_total']) <= 0) continue;

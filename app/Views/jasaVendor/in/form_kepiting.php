@@ -1037,7 +1037,7 @@
 
                 newRow.append($('<td style="text-align: center;">').html(
                     `
-                    <button <?= !empty($jasaVendorIn) ? (($jasaVendorIn['status_posting'] == "1") ? 'disabled' : '') : '' ?> type="button" class="btn btn-danger" onclick="deleteDetail(${supplier_id}, '${keterangan}', '${v.spesifikasi_in_id}')" ><i class="fa fa-trash fa-sm" aria-hidden="true"></i></button>
+                    <button <?= !empty($jasaVendorIn) ? (($jasaVendorIn['status_posting'] == "1") ? 'disabled' : '') : '' ?> type="button" class="btn btn-danger" onclick="deleteDetail(${supplier_id}, '${keterangan}', '${v.spesifikasi_in_id}', '${v.stock_dokumen}')" ><i class="fa fa-trash fa-sm" aria-hidden="true"></i></button>
                 `
                 ));
                 table.find('tbody').append(newRow);
@@ -1090,12 +1090,12 @@
         }
     }
 
-    function deleteDetail(barang1_id, spesifikasi_in_id) {
+    function deleteDetail(supplier_id, keterangan, spesifikasi_in_id, stock_dokumen) {
         var index = null;
         var indexToRemove = -1;
 
         for (let i = 0; i < listBarangGroup.length; i++) {
-            if (listBarangGroup[i].barang1_id == barang1_id) {
+            if (listBarangGroup[i].stock_dokumen == stock_dokumen) {
                 index = i;
                 break;
             }
@@ -1110,7 +1110,7 @@
 
         if (indexToRemove !== -1) {
             listBarangGroup[index].list_barang_masuk.splice(indexToRemove, 1);
-            drawTable2(listBarangGroup);
+            drawTable2(supplier_id, keterangan, listBarangGroup, stock_dokumen);
         }
     }
 
