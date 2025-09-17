@@ -557,6 +557,7 @@ class SPP extends BaseController
                 'nama' => $item['barang_name'],
                 'satuan_id' => $item['satuan_1'],
                 'kode_barang' => $item['kode_barang'],
+                'barang_id' => encrypt($item['barang_id']),
                 'satuan' => $item['nama_satuan']
             ];
         }
@@ -587,7 +588,7 @@ class SPP extends BaseController
                 'satuan_3' => $item['satuan_3'],
                 'barang_name_master' => $item['barang_name_master'],
                 'barang_spesifikasi_id' => $item['barang_master_spesifikasi_id'],
-                'barang_id' => $item['id'],
+                'barang_id' => encrypt($item['barang_id']),
                 'nama' => $item['barang_name'],
                 'satuan_id' => $item['satuan_1'],
                 'kode_barang' => $item['kode_barang'],

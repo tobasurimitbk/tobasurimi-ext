@@ -1679,7 +1679,6 @@ class JurnalUmum extends BaseController
                             $detail->barang_id == $accBarang->barang_master_id &&
                             $dataPB->company_id == $accBarang->company_id &&
                             $detail->spesifikasi_id == $accBarang->barang_master_spesifikasi_id &&
-                            strtolower($detail->note) == strtolower($accBarang->keterangan) &&
                             $dataPB->divisi_id == $accBarang->divisi_id &&
                             $accBarang->ap_id
                         ) {
@@ -1753,7 +1752,6 @@ class JurnalUmum extends BaseController
                     ]]);
                 }
             }
-
             $db->transCommit();
         } catch (Exception $e) {
             $db->transRollback();
@@ -2381,7 +2379,7 @@ class JurnalUmum extends BaseController
             // Cari transaksi berdasarkan module dan payID
             $transaction = null;
             $paymentNo = '';
-            
+
             switch ($module) {
                 case "LOKAL BB":
                     $payment = $this->localPOPaymentModel->asObject()->find($payID);
@@ -2389,21 +2387,21 @@ class JurnalUmum extends BaseController
                         $paymentNo = $payment->payment_no;
                     }
                     break;
-                    
+
                 case "LOKAL BP":
                     $payment = $this->localPoPaymentBpModel->where('id', $payID)->first();
                     if ($payment) {
                         $paymentNo = $payment['payment_no'];
                     }
                     break;
-                    
+
                 case "IMPORT":
                     $payment = $this->importPOPaymentModel->asObject()->where('deletedAt', null)->where('id', $payID)->first();
                     if ($payment) {
                         $paymentNo = $payment->payment_no;
                     }
                     break;
-                    
+
                 case "LAIN-LAIN":
                     $payment = $this->otherPaymentModel->asObject()->where('deletedAt', null)->where('id', $payID)->first();
                     if ($payment) {
@@ -2411,35 +2409,34 @@ class JurnalUmum extends BaseController
                     }
                     break;
             }
-            
+
             if (empty($paymentNo)) {
                 throw new Exception("Data pembayaran tidak ditemukan");
             }
-            
+
             // 1. Cari transaksi jurnal berdasarkan no_transaksi
             $transaksiJurnal = $this->transaksiJurnalModel
                 ->where('no_transaksi', $paymentNo)
                 ->first();
-            
+
             if (!$transaksiJurnal) {
                 throw new Exception("Transaksi jurnal tidak ditemukan");
             }
-            
+
             // 2. Hapus jurnal umum terkait
             $this->jurnalUmumModel
                 ->where('id_transaksi', $transaksiJurnal['id'])
                 ->delete();
-            
+
             // 3. Hapus transaksi jurnal
             $this->transaksiJurnalModel
                 ->where('id', $transaksiJurnal['id'])
                 ->delete();
-            
+
             return [
                 'status' => true,
                 'message' => 'Data jurnal berhasil diunpost'
             ];
-            
         } catch (Exception $e) {
             return [
                 'status' => false,
@@ -2503,21 +2500,21 @@ class JurnalUmum extends BaseController
             $tanggal = "";
             $totalPanjar = 0;
             $totalPinjaman = 0;
-            
+
             foreach ($allDetails as $detail) {
                 if (!isset($detail['payment_date'])) {
                     throw new \Exception("Payment date is missing in one of the details");
                 }
-                
+
                 $tanggal = $detail['payment_date'];
-                
+
                 if (isset($detail['total_panjar'])) {
                     if (!is_numeric($detail['total_panjar'])) {
                         throw new \Exception("Invalid panjar amount");
                     }
                     $totalPanjar += $detail['total_panjar'];
                 }
-                
+
                 if (isset($detail['total_pinjaman'])) {
                     if (!is_numeric($detail['total_pinjaman'])) {
                         throw new \Exception("Invalid pinjaman amount");
@@ -2534,7 +2531,7 @@ class JurnalUmum extends BaseController
             // Generate journal number and determine transaction type
             $no_transaksi_jurnal = $transaction->no_transaction;
             $jenisTransaksi = '';
-            
+
             if ($totalPanjar > 0 && $totalPinjaman > 0) {
                 $jenisTransaksi = 'PANJAR & PINJAMAN';
             } elseif ($totalPanjar > 0) {
@@ -2565,21 +2562,21 @@ class JurnalUmum extends BaseController
             // Insert journal header and get ID
             $id_transaksi_jurnal = $this->transaksiJurnalModel
                 ->insertTransaksiJurnal($jurnalHeader);
-                
+
             $jurnalEntries = [];
-            
+
             // Process each detail with validation
             foreach ($allDetails as $detail) {
                 if (!isset($detail['akun_kas']) || empty($detail['akun_kas'])) {
                     throw new \Exception("Cash account is missing in one of the details");
                 }
-                
+
                 if (!isset($detail['akun_selisih']) || empty($detail['akun_selisih'])) {
                     throw new \Exception("Difference account is missing in one of the details");
                 }
-                
+
                 $nominal = isset($detail['total_pinjaman']) ? $detail['total_pinjaman'] : $detail['total_panjar'];
-                
+
                 if (!is_numeric($nominal) || $nominal <= 0) {
                     throw new \Exception("Invalid amount in one of the details");
                 }
@@ -2629,7 +2626,6 @@ class JurnalUmum extends BaseController
                 'status' => true,
                 'message' => 'Journal entries created successfully'
             ];
-
         } catch (Exception $e) {
             return [
                 'status' => false,
@@ -2681,7 +2677,6 @@ class JurnalUmum extends BaseController
                 'status' => true,
                 'message' => 'Journal transaction successfully unposted'
             ];
-
         } catch (\Exception $e) {
             return [
                 'status' => false,
@@ -2978,7 +2973,6 @@ class JurnalUmum extends BaseController
                 'status' => true,
                 'message' => 'Data jurnal panjar berhasil diunpost'
             ];
-
         } catch (Exception $e) {
             return [
                 'status' => false,
@@ -3114,7 +3108,6 @@ class JurnalUmum extends BaseController
                 'status' => true,
                 'message' => 'Data jurnal pinjaman berhasil diunpost'
             ];
-
         } catch (Exception $e) {
             return [
                 'status' => false,

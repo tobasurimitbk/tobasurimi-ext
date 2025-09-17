@@ -195,6 +195,12 @@ class MaterialRequestPenolong extends BaseController
                         $value->bc_id,
                         $value->no_aju,
                         $value->stock_dokumen
+                    )['stok_total'];
+                    $value->realStok = $this->stockDetail2Model->getStockListDetail(
+                        $value->stock_id,
+                        $value->bc_id,
+                        $value->no_aju,
+                        $value->stock_dokumen
                     )['stok_total'] - $dataMaterialRequestNotApprove['qty2'];
                 } else {
                     $value->is_requested = false;

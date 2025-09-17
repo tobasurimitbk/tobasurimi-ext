@@ -637,6 +637,7 @@
                                                 'stock_dokumen' => $materialRequestDetails['stock_dokumen'],
                                                 'stock_id' => $materialRequestDetails['stock_id'],
                                                 'stok_total' => floatval($materialRequestDetails['stok_total']),
+                                                'realStok' => floatval($materialRequestDetails['realStok']),
                                                 'supplier_name' => $materialRequestDetails['supplier_name'],
                                                 'type_barang' => $materialRequestDetails['type_barang'],
                                                 'type_barang_text' => $materialRequestDetails['type_barang_text'],
@@ -690,6 +691,7 @@
                 listStockSelectedBahan.push(<?= json_encode($item) ?>);
             <?php endif; ?>
         <?php endforeach; ?>
+        console.log(listStockSelectedBahanBaku);
 
         drawTableSelectedItemBahanBaku(listStockSelectedBahanBaku);
         drawTableSelectedItemBahan(listStockSelectedBahan);
@@ -1929,7 +1931,7 @@
             newRow.append($('<td style="text-align: center;">').text(v.stock_date));
             newRow.append($('<td style="text-align: center;">').text(v.barang));
             newRow.append($('<td style="text-align: center;">').text(v.satuan));
-            newRow.append($('<td style="text-align: center;">').text(v.stok_total));
+            newRow.append($('<td style="text-align: center;">').text(v.realStok ?? v.stok_total));
             newRow.append($('<td style="text-align: center;">').html(`
                 <input <?= (isset($dataMaterialRequests) && $dataMaterialRequests->is_posted == 1) ? "readonly" : ""; ?> 
                     class="form-control qty-baku-request" 

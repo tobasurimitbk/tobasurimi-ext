@@ -622,7 +622,7 @@
                     })
                 };
             },
-            cache: true
+            cache: false
         },
         minimumInputLength: 1
     });
@@ -991,11 +991,12 @@
                         data-satuan_3="${item.satuan_3}" 
                         data-barang_name_master="${item.barang_name_master}" 
                         data-barang_spesifikasi_id="${item.barang_spesifikasi_id}" 
-                        data-barang_id="${item.id}" 
+                        data-barang_id="${item.barang_id}" 
                         data-nama="${item.nama}" 
                         data-satuan_id="${item.satuan_1}" 
                         data-satuan="${item.nama_satuan}" 
-                        value="${item.kode_barang}">
+                        data-kode_barang="${item.kode_barang}" 
+                        value="${item.barang_spesifikasi_id}">
                         ${item.kode_barang} - ${item.nama}
                         </option>`);
                     }
@@ -1020,7 +1021,7 @@
 
     const submitDetailForm = function() {
         let barang_detail_id = $(".barang_detail_id").val();
-        let barang_id = $(".barang_id").val()
+        let barang_id = $(".kode_barang option:selected").data('barang_id');
         let barang_spesifikasi_id = $(".barang_spesifikasi_id").val();
         let kode_barang = $(".kode_barang option:selected").data('kode_barang');
         let nama_barang = $(".nama_barang").val()
@@ -1034,6 +1035,8 @@
 
         let validate_same = false;
         let validate_bahan_baku = false;
+
+        console.log(barang_id);
 
         if (barang_detail_id === '') {
             list_items.map(item => {

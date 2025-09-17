@@ -369,7 +369,8 @@ class BarangMasterModel extends Model
                     barang_master_spesifikasi.spesifikasi,
                     barang_master_spesifikasi.satuan_1,
                     barang_master_spesifikasi.satuan_2,
-                    barang_master_spesifikasi.satuan_3";
+                    barang_master_spesifikasi.satuan_3,,
+                    barang_master_spesifikasi.barang_master_id AS barang_id";
 
         $dataQry = $this->select($selectQry)
             ->join('parent_barang', 'barang_master.parent_type_id = parent_barang.id', 'left')
@@ -392,10 +393,8 @@ class BarangMasterModel extends Model
             $dataBarang = $dataQry->findAll(100);
         }
 
-
-
         for ($i = 0; $i < count($dataBarang); $i++) {
-            $dataBarang[$i]['id'] = encrypt($dataBarang[$i]['id']);
+            $dataBarang[$i]['id'] = encrypt($dataBarang[$i]['barang_master_spesifikasi_id']);
             $dataBarang[$i]['parent_type_id'] = encrypt($dataBarang[$i]['parent_type_id']);
             $dataBarang[$i]['barang_master_spesifikasi_id'] = encrypt($dataBarang[$i]['barang_master_spesifikasi_id']);
             $dataBarang[$i]['barang_name'] = trim(
