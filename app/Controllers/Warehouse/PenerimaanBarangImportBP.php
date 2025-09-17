@@ -5,6 +5,7 @@ namespace App\Controllers\Warehouse;
 use App\Controllers\Accounting\JurnalUmum\JurnalUmum;
 
 use App\Controllers\BaseController;
+use App\Models\AccountBarangModel;
 use App\Models\PenerimaanBarangModel;
 use App\Models\AMPurchaseOrderModel;
 use App\Models\AMPurchaseOrderDetailModel;
@@ -65,6 +66,7 @@ class PenerimaanBarangImportBP extends BaseController
     protected $pengembalianBarangModel;
     protected $transaksiJurnalModel;
     protected $jurnalUmumModel;
+    protected $accountBarangModel;
 
     public function __construct()
     {
@@ -97,6 +99,7 @@ class PenerimaanBarangImportBP extends BaseController
         $this->pengembalianBarangModel = new PengembalianBarangModel();
         $this->transaksiJurnalModel = new TransaksiJurnalModel();
         $this->jurnalUmumModel = new JurnalUmumModel();
+        $this->accountBarangModel = new AccountBarangModel();
     }
 
     public function index()
@@ -442,6 +445,8 @@ class PenerimaanBarangImportBP extends BaseController
                 ->set('remaining_qty', $b->sisa_total)
                 ->set('qty_diterima', $b->jml_diterima_total)
                 ->update();
+
+            $this->accountBarangModel->insertAccountBarang($this->this_company_id, $this->request->getVar('divisi_id'), $barang['id'], $poDetail['spesifikasi_id']);
         }
 
         return response()->setJSON([
@@ -578,6 +583,7 @@ class PenerimaanBarangImportBP extends BaseController
                     ->set('remaining_qty', $b->sisa_total)
                     ->set('qty_diterima', $b->jml_diterima_total)
                     ->update();
+                $this->accountBarangModel->insertAccountBarang($this->this_company_id, $this->request->getVar('divisi_id'), $barang['id'], $poDetail['spesifikasi_id']);
             } else {
                 $last = $this->amPurchaseOrderDetailModel
                     ->where('id',  $b->am_purchase_order_details_id)
