@@ -1018,7 +1018,7 @@
                         autocomplete="one-time-code" 
                         data-spesifikasi_in_id="${v.spesifikasi_in_id}" 
                         type="text" 
-                        value="${v.qty_kotor == '' || v.qty_kotor == 0 ? '' : v.qty_kotor}">
+                        value="${greatFormatQty(v.qty_kotor) == '' || greatFormatQty(v.qty_kotor) == 0 ? '' : greatFormatQty(v.qty_kotor)}">
                     `
                 ));
 
@@ -1031,7 +1031,7 @@
                         autocomplete="one-time-code" 
                         data-spesifikasi_in_id="${v.spesifikasi_in_id}" 
                         type="text" 
-                        value="${v.qty_bersih == '' || v.qty_bersih == 0 ? '' : v.qty_bersih.toFixed(2)}">
+                        value="${greatFormatQty(v.qty_bersih) == '' || greatFormatQty(v.qty_bersih) == 0 ? '' : greatFormatQty(v.qty_bersih)}">
                     `
                 ));
 
