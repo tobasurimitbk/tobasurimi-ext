@@ -149,6 +149,9 @@
         $.ajax({
             url: "<?= base_url("/dashboard/toggle"); ?>",
             method: "GET",
+            success: function() {
+                location.reload();
+            }
         });
 
     });
