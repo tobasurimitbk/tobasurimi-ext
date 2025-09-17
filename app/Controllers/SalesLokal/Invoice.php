@@ -136,8 +136,14 @@ class Invoice extends BaseController
             "dateStart"     => $this->request->getGet("dateStart") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getGet("dateStart")))) : "",
             "dateEnd"       => $this->request->getGet("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getGet("dateEnd")))) : "",
         ];
+
+        // var_dump($condition, $addCondition, $pageSize, $offset);
+        // exit;
         $dataSalesOrderInvoice = $this->SalesOrderInvoiceModel
             ->getAllSalesOrderInvoiceLokal($condition, $addCondition, $pageSize, $offset);
+
+        // var_dump($dataSalesOrderInvoice['data']);
+        // exit;
 
         $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
         $dataAllSalesOrderInvoice = [];
