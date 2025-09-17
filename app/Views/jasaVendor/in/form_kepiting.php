@@ -574,7 +574,7 @@
                    $.each(listBarangGroup, function(i, gb) {
                         // Find the first matching detail based on barang1_id and supplier_id
                         let detailMatch = listBarang.find(dd => 
-                            dd.supplier_id == gb.supplier_id && dd.keterangan == gb.keterangan && dd.stock_dokumen == gb.stock_dokumen
+                            dd.stock_dokumen == gb.stock_dokumen
                         );
 
                         if (detailMatch) {
@@ -724,7 +724,7 @@
 
             // FIND BARANG FIRST
             $.each(listBarangGroup, function(i, v) {
-                if (v.supplier_id == supplier_id && (v.keterangan || '') == (keterangan || '') && (v.stock_dokumen || '') == (stock_dokumen || '')) {
+                if (v.stock_dokumen == stock_dokumen) {
                     index = i;
                     barangFirst = v;
                 }
@@ -783,7 +783,7 @@
         var isValidBersih = true;
 
         $.each(listBarangGroup, function(i, v) {
-            if (v.supplier_id == supplier_id && (v.keterangan || '') == (keterangan || '') && (v.stock_dokumen || '') == (stock_dokumen || '')) {
+            if (v.stock_dokumen == stock_dokumen) {
                 index = i;
             }
         });
@@ -846,9 +846,11 @@
         validatorBarangMasuk.resetForm();
         validatorBarangMasuk.reset();
 
+        // console.log(stock_dokumen)
+
         var barangFirst = null;
         $.each(listBarangGroup, function(i, v) {
-            if (v.supplier_id == supplier_id && (v.keterangan || '') == (keterangan || '') && (v.stock_dokumen || '') == (stock_dokumen || '')) {
+            if (v.stock_dokumen == stock_dokumen) {
                 barangFirst = v;
             }
         });
@@ -856,7 +858,7 @@
         // console.log("barang first", barangFirst);
         // return;
 
-        $('#barang1_id').val(barangFirst.barang_master_out_id);
+        $('#barang1_id').val(barangFirst.barang1_id);
         $('#supplier_id').val(barangFirst.supplier_id);
         $('#keterangan').val(barangFirst.keterangan);
         $('#stock_dokumen').val(barangFirst.stock_dokumen);
@@ -874,7 +876,7 @@
                     stopLoading();
                 },
                 data: {
-                    barang1_id: barangFirst.barang_master_out_id,
+                    barang1_id: barangFirst.barang1_id,
                     type_barang: "bahan_baku",
                 },
                 dataType: "json",
@@ -990,7 +992,7 @@
 
 
         $.each(listBarangGroup, function(i, v) {
-            if (v.supplier_id == supplier_id && (v.keterangan || '') == (keterangan || '') && (v.stock_dokumen || '') == (stock_dokumen || '')) {
+            if (v.stock_dokumen == stock_dokumen) {
                 listBarangFirst = v;
             }
         });
@@ -1016,7 +1018,7 @@
                         autocomplete="one-time-code" 
                         data-spesifikasi_in_id="${v.spesifikasi_in_id}" 
                         type="text" 
-                        value="${v.qty_kotor == '' || v.qty_kotor == 0 ? '' : v.qty_kotor}">
+                        value="${greatFormatQty(v.qty_kotor) == '' || greatFormatQty(v.qty_kotor) == 0 ? '' : greatFormatQty(v.qty_kotor)}">
                     `
                 ));
 
@@ -1029,7 +1031,7 @@
                         autocomplete="one-time-code" 
                         data-spesifikasi_in_id="${v.spesifikasi_in_id}" 
                         type="text" 
-                        value="${v.qty_bersih == '' || v.qty_bersih == 0 ? '' : v.qty_bersih.toFixed(2)}">
+                        value="${greatFormatQty(v.qty_bersih) == '' || greatFormatQty(v.qty_bersih) == 0 ? '' : greatFormatQty(v.qty_bersih)}">
                     `
                 ));
 

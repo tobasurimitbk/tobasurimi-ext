@@ -1051,10 +1051,10 @@
                 // totalQtyBersih += destroyFormatRupiah(v.qty_bersih);
             });
             var newRow1 = $('<<tr style="color:whitesmoke; background-color:#f2c996;">>');
-            newRow1.append($('<td colspan="5" style="text-align:right"><b>GRAND TOTAL</b></td>'));
+            newRow1.append($('<td colspan="4" style="text-align:right"><b>GRAND TOTAL</b></td>'));
             newRow1.append($('<td class="total-qty-kotor">').text(greatFormatQty(totalQtyKotor)));
             // newRow1.append($('<td class="total-qty-bersih">').text(greatFormatQty(totalQtyBersih)));
-            // newRow1.append($('<td>'));
+            newRow1.append($('<td>'));
             table.find('tbody').append(newRow1);
 
 

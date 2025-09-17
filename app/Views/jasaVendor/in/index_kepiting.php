@@ -255,10 +255,8 @@
             }
         ],
         "drawCallback": function(settings) {
-            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-toggle="tooltip"]'))
-            var tooltipList = tooltipTriggerList.map(function(tooltipTriggerEl) {
-                return new bootstrap.Tooltip(tooltipTriggerEl)
-            });
+            // Gunakan jQuery untuk inisialisasi tooltip
+            $('[data-toggle="tooltip"]').tooltip();
         },
         columnDefs: [{
             defaultContent: "-",

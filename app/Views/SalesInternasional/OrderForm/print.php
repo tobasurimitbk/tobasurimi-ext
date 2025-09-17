@@ -210,11 +210,11 @@
             <table style="width: 100%; border-collapse: collapse; margin-top: 4px; font-size: 12px;">
                 <thead>
                     <tr style="background-color: #f8f9fa; border-bottom: 2px solid #dee2e6;">
-                        <th style="padding: 6px; text-align: left; font-weight: bold; border: 1px solid #ddd; width: 4%; height:2.5%;">NO</th>
+                        <th style="padding: 6px; text-align: left; font-weight: bold; border: 1px solid #ddd; width: 4%;">NO</th>
                         <th style="padding: 6px; text-align: left; font-weight: bold; border: 1px solid #ddd;">
                             DESCRIPTION OF GOODS
                             <span style="float: right; text-align:right;">
-                                PRICE (<?= $dataSO->mata_uang ?>) <br>
+                                <!-- PRICE (<?= $dataSO->mata_uang ?>) <br> -->
                                 <?= $dataSO->tipe_harga . " " . ($dataSO->tipe_harga == "FOB" ? $dataSO->loading_port : $dataSO->dicharge_port) ?>
                             </span>
                         </th>
@@ -361,8 +361,8 @@
                                                         <th style="padding: 3px; border: 1px solid #ddd; width: 4.5%;text-align: right;">%</th>
                                                     <?php endif; ?>
 
-                                                    <th style=" padding: 3px; border: 1px solid #ddd; width: 4.5%; text-align: center;">QTY (<?= $satuanQty ?>)</th>
-                                                    <th style="padding: 3px; border: 1px solid #ddd; width: 6%; text-align: center;" class="price">UNIT PRICE <br>(<?= $dataSO->mata_uang . "/" . $satuanQty ?>)</th>
+                                                    <th style="padding: 3px; border: 1px solid #ddd; width: 4.5%; text-align: center;">QTY (<?= $satuanQty ?>)</th>
+                                                    <th style="padding: 3px; border: 1px solid #ddd; width: 8%; text-align: center;" class="price">UNIT PRICE (<?= $dataSO->mata_uang . "/" . $satuanQty ?>)</th>
                                                     <th style="padding: 3px; border: 1px solid #ddd; width: 8%; text-align: center;" class="price">TOTAL AMOUNT (<?= $dataSO->mata_uang ?>)</th>
                                                 </tr>
                                             </thead>
