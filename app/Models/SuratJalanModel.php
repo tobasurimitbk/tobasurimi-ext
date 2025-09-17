@@ -81,7 +81,11 @@ class SuratJalanModel extends Model
         SUM(sales_order.total_harga) as total_harga, 
         SUM(sales_order.estimated_freight) as estimated_freight, 
         sales_order.tipe_sales_order,
-        employees.name AS customerSales
+        employees.name AS customerSales,
+        CAST(SUBSTRING_INDEX(SUBSTRING_INDEX(surat_jalan_so.no_surat_jalan, '/', -3), '/', 1) AS UNSIGNED) AS tahun_so,
+        FIELD(SUBSTRING_INDEX(SUBSTRING_INDEX(surat_jalan_so.no_surat_jalan, '/', -2), '/', 1),
+            'I','II','III','IV','V','VI','VII','VIII','IX','X','XI','XII') AS bulan_so,
+        CAST(SUBSTRING_INDEX(surat_jalan_so.no_surat_jalan, '/', -1) AS UNSIGNED) AS nomor_so
         ";
 
         $SuratJalan = $this->asObject()
@@ -90,8 +94,7 @@ class SuratJalanModel extends Model
             ->join('sales_order', 'sales_order.surat_jalan_so_id = surat_jalan_so.id')
             ->join('employees', 'employees.id = sales_order.sales_id', 'left')
             ->where($condition)
-            ->groupBy('surat_jalan_so.no_surat_jalan')
-            ->orderBy($sort, $sortType);
+            ->groupBy('surat_jalan_so.no_surat_jalan');
 
         $totalData = $SuratJalan->countAllResults(false);
 
@@ -125,6 +128,15 @@ class SuratJalanModel extends Model
         }
 
         $totalFilteredData = $SuratJalan->countAllResults(false);
+
+        // Sorting
+        if (($addCondition['sort'] ?? '') === 'no_surat_jalan') {
+            $SuratJalan->orderBy("tahun_so", $sortType)
+                ->orderBy("bulan_so", $sortType)
+                ->orderBy("nomor_so", $sortType);
+        } else {
+            $SuratJalan->orderBy($sort, $sortType);
+        }
 
         if ($limit !== null && $offset !== null) {
             $data = $SuratJalan->findAll((int)$limit, (int)$offset);
