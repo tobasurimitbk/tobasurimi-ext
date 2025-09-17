@@ -846,7 +846,7 @@
         validatorBarangMasuk.resetForm();
         validatorBarangMasuk.reset();
 
-        console.log(stock_dokumen)
+        // console.log(stock_dokumen)
 
         var barangFirst = null;
         $.each(listBarangGroup, function(i, v) {
@@ -855,8 +855,8 @@
             }
         });
 
-        console.log("barang first", barangFirst);
-        return;
+        // console.log("barang first", barangFirst);
+        // return;
 
         $('#barang1_id').val(barangFirst.barang1_id);
         $('#supplier_id').val(barangFirst.supplier_id);
