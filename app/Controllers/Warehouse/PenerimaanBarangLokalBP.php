@@ -4,6 +4,7 @@ namespace App\Controllers\Warehouse;
 
 use App\Controllers\Accounting\JurnalUmum\JurnalUmum;
 use App\Controllers\BaseController;
+use App\Models\AccountBarangModel;
 use App\Models\PenerimaanBarangModel;
 use App\Models\AMPurchaseOrderModel;
 use App\Models\AMPurchaseOrderDetailModel;
@@ -63,6 +64,7 @@ class PenerimaanBarangLokalBP extends BaseController
     protected $transaksiJurnalModel;
     protected $jurnalUmumModel;
     protected $usersModel;
+    protected $accountBarangModel;
 
     public function __construct()
     {
@@ -94,6 +96,7 @@ class PenerimaanBarangLokalBP extends BaseController
         $this->transaksiJurnalModel = new TransaksiJurnalModel();
         $this->jurnalUmumModel = new JurnalUmumModel();
         $this->usersModel = new UserModel();
+        $this->accountBarangModel = new AccountBarangModel();
     }
 
     public function index()
@@ -477,6 +480,7 @@ class PenerimaanBarangLokalBP extends BaseController
                     ->set('qty_diterima', $b->jml_diterima_total)
                     ->update();
             }
+            $this->accountBarangModel->insertAccountBarang($this->this_company_id, $this->request->getVar('divisi_id'), $barang['id'], $poDetail['spesifikasi_id']);
         }
 
         return response()->setJSON([
@@ -626,6 +630,7 @@ class PenerimaanBarangLokalBP extends BaseController
                         ->update();
                     // \var_dump($id);
                     // die;
+                    $this->accountBarangModel->insertAccountBarang($this->this_company_id, $this->request->getVar('divisi_id'), $barang['id'], $poDetail['spesifikasi_id']);
                 } else {
                     // Update
                     $this->penerimaanBarangDetailModel->update($penerimaanBarangDetailFirst['id'], [
@@ -649,6 +654,8 @@ class PenerimaanBarangLokalBP extends BaseController
                         ->set('remaining_qty', $b->sisa_total)
                         ->set('qty_diterima', $b->jml_diterima_total)
                         ->update();
+
+                    $this->accountBarangModel->insertAccountBarang($this->this_company_id, $this->request->getVar('divisi_id'), $barang['id'], $poDetail['spesifikasi_id']);
                 }
             } else {
                 $last = $this->amPurchaseOrderDetailModel
