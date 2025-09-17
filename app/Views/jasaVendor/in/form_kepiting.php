@@ -238,7 +238,7 @@
                             </tbody>
                             <tfoot class="foot-detail-table" id="foot-detail-table">
                                 <tr>
-                                    <td colspan="8" style="text-align: center;">
+                                    <td colspan="11" style="text-align: center;">
                                         Tidak Ada Barang
                                     </td>
                                 </tr>
@@ -1040,7 +1040,7 @@
                 ));
                 table.find('tbody').append(newRow);
                 totalQtyKotor += destroyFormatRupiah(v.qty_kotor);
-                // totalQtyBersih += destroyFormatRupiah(v.qty_bersih);
+                totalQtyBersih += destroyFormatRupiah(v.qty_bersih);
             });
             var newRow1 = $('<<tr style="color:whitesmoke; background-color:#f2c996;">>');
             newRow1.append($('<td colspan="4" style="text-align:right"><b>GRAND TOTAL</b></td>'));

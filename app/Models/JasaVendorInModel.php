@@ -598,42 +598,39 @@ class JasaVendorInModel extends Model
                         }
                     }
 
-                    var_dump($result);
-                    die;
-
                 }
             }
         }
 
-
         $listBarangMasukGrouped = [];
         foreach ($result as $r) {
             foreach ($r['list_barang_masuk'] as $k) {
-                $barang1Id = $k['barang1_id'];
-                $stockInId = $k['stock_in_id'];
-                if (!isset($listBarangMasukGrouped[$barang1Id][$stockInId])) {
-                    $listBarangMasukGrouped[$barang1Id][$stockInId] = [
-                        'barang_name_in' => $k['barang_name_in'],
-                        'jasa_vendor_out_detail_id' => $k['jasa_vendor_out_detail_id'],
-                        'kode_barang_in' => $k['kode_barang_in'],
-                        'kode_satuan_in' => $k['kode_satuan_in'],
-                        'stock_dokumen' => $k['stock_dokumen'],
-                        'stock_in_id' => $k['stock_in_id'],
-                        'stock_out_id' => $k['stock_out_id'],
-                        'spesifikasi_in_id' => $k['spesifikasi_in_id'],
-                        'qty_kotor' => 0,
-                        'qty_bersih' => 0
-                    ];
+                $stockDokumen = $r['stock_dokumen']; // hanya stock_dokumen yg dipakai group key
+
+                if (!isset($listBarangMasukGrouped[$stockDokumen])) {
+                    $listBarangMasukGrouped[$stockDokumen] = [];
                 }
-                $listBarangMasukGrouped[$barang1Id][$stockInId]['qty_kotor'] += $k['qty_kotor'];
-                $listBarangMasukGrouped[$barang1Id][$stockInId]['qty_bersih'] += $k['qty_bersih'];
+
+                $listBarangMasukGrouped[$stockDokumen][] = [
+                    'barang_name_in'          => $k['barang_name_in'],
+                    'jasa_vendor_out_detail_id' => $k['jasa_vendor_out_detail_id'],
+                    'kode_barang_in'          => $k['kode_barang_in'],
+                    'kode_satuan_in'          => $k['kode_satuan_in'],
+                    'stock_dokumen'           => $stockDokumen,
+                    'stock_in_id'             => $k['stock_in_id'],
+                    'stock_out_id'            => $k['stock_out_id'],
+                    'spesifikasi_in_id'       => $k['spesifikasi_in_id'],
+                    'qty_kotor'               => (float)$k['qty_kotor'],
+                    'qty_bersih'              => (float)$k['qty_bersih']
+                ];
             }
         }
 
         $resultGroup = [];
 
+        // 👉 grouping HANYA berdasarkan stock_dokumen
         foreach ($result as $item) {
-            $groupKey = $item['supplier_id'] . '|' . $item['keterangan'] . '|' . $item['stock_dokumen']; // ⬅️ kombinasi supplier + keterangan
+            $groupKey = $item['stock_dokumen'];
             if (!isset($resultGroup[$groupKey])) {
                 $resultGroup[$groupKey] = [];
             }
@@ -642,38 +639,35 @@ class JasaVendorInModel extends Model
 
         $dataGroup = [];
 
-        foreach ($resultGroup as $groupKey => $items) {
-            // split key ke supplier_id dan keterangan
-            list($supplierId, $keterangan, $stock_dokumen) = explode('|', $groupKey);
-
+        foreach ($resultGroup as $stock_dokumen => $items) {
             // SUM QTY
             $qtyTotal = 0;
             foreach ($items as $i) {
-                $qtyTotal += $i['qty_out'];
+                $qtyTotal += (float)$i['qty_out'];
             }
 
             $barangArr = explode("-", $items[0]['barang_out']);
 
             $groupData = [
-                "supplier_id" => $supplierId,
-                "supplier_name" => $items[0]['supplier_name'],
-                "keterangan" => $keterangan,
-                "barang1_id" => $items[0]['barang1_id'],
-                "tipe_barang" => $items[0]['tipe_barang'],
-                "stock_dokumen" => $stock_dokumen,
+                "supplier_id"     => $items[0]['supplier_id'],
+                "supplier_name"   => $items[0]['supplier_name'],
+                "keterangan"      => $items[0]['keterangan'],
+                "barang1_id"      => $items[0]['barang1_id'],
+                "tipe_barang"     => $items[0]['tipe_barang'],
+                "stock_dokumen"   => $stock_dokumen,
                 "kode_barang_out" => $items[0]['kode_barang_out'],
-                "barang_out" => count($barangArr) == 0 ? "-" : $barangArr[0],
-                "qty_out" => $qtyTotal,
-                "satuan_out" => $items[0]['satuan_out'],
+                "barang_out"      => count($barangArr) == 0 ? "-" : $barangArr[0],
+                "qty_out"         => $qtyTotal,
+                "satuan_out"      => $items[0]['satuan_out'],
                 "list_barang_masuk" => [],
             ];
-            $dataGroup[] = $groupData;
-
-            if (isset($listBarangMasukGrouped[$items[0]['barang1_id']])) {
-                foreach ($listBarangMasukGrouped[$items[0]['barang1_id']] as $listBarangMasuk) {
-                    $dataGroup[count($dataGroup) - 1]['list_barang_masuk'][] = $listBarangMasuk;
-                }
+            
+            // Ambil list_barang_masuk sesuai stock_dokumen ini
+            if (isset($listBarangMasukGrouped[$stock_dokumen])) {
+                $groupData['list_barang_masuk'] = $listBarangMasukGrouped[$stock_dokumen];
             }
+            
+            $dataGroup[] = $groupData;
         }
 
         return [
