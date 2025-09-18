@@ -7,7 +7,7 @@
             <div class="form-floating mb-3" style="height: 50px;">
                 <div class="input-group input-group-password">
                     <div class="form-floating mb-3" style="height: 50px;">
-                        <input readonly autocomplete="one-time-code" <?= !empty($dataPenerimaanBarang) ? ($dataPenerimaanBarang['status_post'] === "FINISH" ? 'disabled=true' : '') : ''; ?> value="<?= !empty($dataPenerimaanBarang) ? $dataPenerimaanBarang['no_penerimaan_barang'] : "AUTO GENERATE"; ?>" type="text" class="form-control no_penerimaan_barang" id="no_penerimaan_barang" name="no_penerimaan_barang" placeholder="No. Penerimaan">
+                        <input readonly autocomplete="one-time-code" <?= !empty($dataPenerimaanBarang) ? ($dataPenerimaanBarang['status_post'] === "FINISH" ? 'disabled=true' : '') : ''; ?> value="<?= !empty($dataPenerimaanBarang) ? $dataPenerimaanBarang['no_penerimaan_barang'] : ""; ?>" type="text" class="form-control no_penerimaan_barang" id="no_penerimaan_barang" name="no_penerimaan_barang" placeholder="No. Penerimaan">
                         <label for="floatingInput">No. Penerimaan</label>
                     </div>
                     <div style="<?= !empty($dataPenerimaanBarang) ? "display: none" : ""; ?>" class="input-generate input-group-prepend group-prepend-password align-items-center">
@@ -105,7 +105,7 @@
         <div class="col-md-4">
             <div class="input-group input-group-password">
                 <div class="form-floating mb-3" style="height: 50px;">
-                    <input <?= !empty($dataPenerimaanBarang) ? ($dataPenerimaanBarang['status_post'] === "FINISH" ? 'disabled=true' : '') : ''; ?> autocomplete="one-time-code" value="<?= !empty($dataPenerimaanBarang) ?  date('d/m/Y', strtotime($dataPenerimaanBarang['tanggal'])) : ""; ?>" onchange="changeStatus()" type="text" class="form-control tanggal_penerimaan_lpb" name="tanggal_penerimaan_lpb" id="tanggal_penerimaan_lpb" placeholder="Tanggal Barang Diterima">
+                    <input <?= !empty($dataPenerimaanBarang) ? ($dataPenerimaanBarang['status_post'] === "FINISH" ? 'disabled=true' : '') : ''; ?> autocomplete="one-time-code" value="<?= !empty($dataPenerimaanBarang) ?  date('d/m/Y', strtotime($dataPenerimaanBarang['tanggal'])) : date('d/m/Y'); ?>" onchange="changeStatus()" type="text" class="form-control tanggal_penerimaan_lpb" name="tanggal_penerimaan_lpb" id="tanggal_penerimaan_lpb" placeholder="Tanggal Barang Diterima">
                     <label for="floatingInput">Tanggal Barang Diterima</label>
                 </div>
                 <div class="input-group-prepend group-prepend-password align-items-center">
@@ -206,6 +206,14 @@
         </table>
     </div>
 </div>
+
+<?php if (empty($dataPenerimaanBarang)): ?>
+    <script>
+        $(document).ready(function() {
+            changeStatus();
+        });
+    </script>
+<?php endif; ?>
 
 <!-- Untuk Placeholder Aja Soalnya ini Ngeload Html dari Ajax -->
 <script>
@@ -947,8 +955,27 @@
     function changeStatus() {
         let value = document.getElementById('auto_generate').checked ? true : false;
         if (value) {
-            $(".no_penerimaan_barang").attr("readonly", true);
-            $(".no_penerimaan_barang").val("AUTO GENERATE");
+            $.ajax({
+                url: `<?= base_url("/penerimaan-barang-lokal-bp/generate-lpb-no"); ?>`,
+                method: "GET",
+                dataType: "json",
+                data: {
+                    tanggal: $('#tanggal_penerimaan_lpb').val()
+                },
+                success: function(res) {
+                    if (res.status) {
+                        $(".no_penerimaan_barang").val(res.data);
+                        $(".no_penerimaan_barang").attr("readonly", true);
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: res.message,
+                            confirmButtonColor: '#4e73df',
+                        })
+
+                    }
+                }
+            })
         } else {
             $(".no_penerimaan_barang").attr("readonly", false);
             $(".no_penerimaan_barang").val("");

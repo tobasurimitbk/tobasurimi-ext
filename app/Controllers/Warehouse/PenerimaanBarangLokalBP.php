@@ -406,7 +406,8 @@ class PenerimaanBarangLokalBP extends BaseController
 
         $noPenerimaanBarang = $this->request->getVar('no_penerimaan_barang');
         $tanggal = $this->request->getVar("tanggal_penerimaan_lpb") ? date_format(date_create_from_format("d/m/Y", $this->request->getVar("tanggal_penerimaan_lpb")), "Y-m-d") : "";
-        if ($noPenerimaanBarang == "AUTO GENERATE") {
+        $checkNoLpb = $this->checkLpbNo($noPenerimaanBarang);
+        if (!$checkNoLpb) {
             $noPenerimaanBarang = $this->penerimaanBarangModel->get_no(
                 $tanggal,
                 $this->this_company_id,
@@ -1106,43 +1107,37 @@ class PenerimaanBarangLokalBP extends BaseController
         return response()->setJSON($this->amPurchaseOrderDetailModel->getListLPBBahanPenolong($amPurchaseOrderID, "LOKAL", "PENOLONG", $isInitEdit, $penerimaanBarangID));
     }
 
-    public function generatePONo()
+    public function generateLPBNo()
     {
-        $warehouseID = $this->request->getVar('warehouseID');
-        $tanggal = date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("tanggal"))));
-        $statusPenerimaan = $this->request->getVar('status_penerimaan');
-        $tipeBahan = $this->request->getVar('tipe_bahan');
-        $prefix = $this->request->getVar('prefix');
-
-        $tanggalExplode = explode('-', $tanggal);
-        $year = $tanggalExplode[0];
-        $month = $tanggalExplode[1];
-
-        if (empty($warehouseID) || empty($this->request->getVar('tanggal'))) {
-            $no = $this->penerimaanBarangModel->get_no(
-                date('m'),
-                date('y'),
-                "",
-                $statusPenerimaan,
-                $tipeBahan,
-                $prefix
+        try {
+            $tanggalReq = $this->request->getVar('tanggal');
+            if (empty($tanggalReq)) {
+                return response()->setJSON([
+                    'status' => true,
+                    'token' => csrf_hash(),
+                    'data' => "LPB/" . date('m') . "" . date('y')
+                ]);
+            }
+            $tanggal = $this->request->getVar("tanggal") ? date_format(date_create_from_format("d/m/Y", $tanggalReq), "Y-m-d") : "";
+            $noPenerimaanBarang = $this->penerimaanBarangModel->get_no(
+                $tanggal,
+                $this->this_company_id,
+                "LOKAL",
+                "PENOLONG"
             );
-        } else {
-            $warehouse = $this->warehouseModel->where('id', $warehouseID)->first();
-            $divisi = $this->divisiModel->where('id', $warehouse['divisi_id'])->first();
-            $no = $this->penerimaanBarangModel->get_no(
-                $month,
-                $year,
-                $divisi['divisi'],
-                $statusPenerimaan,
-                $tipeBahan,
-                $prefix
-            );
+
+            return response()->setJSON([
+                'status' => true,
+                'data' => $noPenerimaanBarang,
+                'token' => csrf_hash()
+            ]);
+        } catch (Exception $e) {
+            return response()->setJSON([
+                'status' => false,
+                'message' => $e->getMessage(),
+                'token' => csrf_hash()
+            ]);
         }
-        return response()->setJSON([
-            'status' => true,
-            'data' => $no
-        ]);
     }
 
     public function dropdownDivisiPOLokalBP()
@@ -1264,5 +1259,16 @@ class PenerimaanBarangLokalBP extends BaseController
             'status' => true,
             'data' => $suplierData
         ]);
+    }
+
+    private function checkLpbNo($noLpb)
+    {
+        $penerimaanBarang = $this->penerimaanBarangModel
+            ->where('no_penerimaan_barang', $noLpb)
+            ->where('company_id', $this->this_company_id)
+            ->where('deletedAt', null)
+            ->first();
+
+        return $penerimaanBarang == null ? true : false;
     }
 }
