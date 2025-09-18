@@ -68,10 +68,10 @@ class AMPurchaseOrderDetailModel extends Model
         $selectQry = "am_purchase_order_details.*,
             am_purchase_orders.po_no,
             am_purchase_orders.status_penerimaan,
-            (am_purchase_order_details.qty * am_purchase_order_details.price) AS totalPriceWithoutAdditional,
             (am_purchase_order_details.qty * am_purchase_order_details.price + am_purchase_order_details.additional_cost) AS totalPrice,
             am_purchase_order_details.price AS price,
             am_purchase_order_details.additional_cost AS additional_cost,
+            am_purchase_order_details.total AS totalPriceWithoutAdditional,
             barang_master.barang_name as nama_barang, 
             barang_master_spesifikasi.spesifikasi,
             am_purchase_order_details.note AS spp_note,
@@ -272,7 +272,8 @@ class AMPurchaseOrderDetailModel extends Model
                         'nilai_konversi' => $nilaiKonversi,
                         'jml_diterima_lpb_konversi' => ($inLPB * $nilaiKonversi),
                         'purchase_request_id' => $b['purchase_request_id'],
-                        'status_penerimaan' => $b['status_penerimaan']
+                        'status_penerimaan' => $b['status_penerimaan'],
+                        'sub_total_po' => (float)$b['total']
                     ];
 
                     $jmlOrderTotal += $b['qty'];
@@ -314,7 +315,8 @@ class AMPurchaseOrderDetailModel extends Model
                         'nilai_konversi' => $nilaiKonversi,
                         'jml_diterima_lpb_konversi' => ($inLPB * $nilaiKonversi),
                         'purchase_request_id' => $b['purchase_request_id'],
-                        'status_penerimaan' => $b['status_penerimaan']
+                        'status_penerimaan' => $b['status_penerimaan'],
+                        'sub_total_po' => (float)$b['total']
                     ];
 
                     $jmlOrderTotal += $b['qty'];
@@ -354,7 +356,8 @@ class AMPurchaseOrderDetailModel extends Model
                         'nilai_konversi' => $nilaiKonversi,
                         'jml_diterima_lpb_konversi' => ($inLPB * $nilaiKonversi),
                         'purchase_request_id' => $b['purchase_request_id'],
-                        'status_penerimaan' => $b['status_penerimaan']
+                        'status_penerimaan' => $b['status_penerimaan'],
+                        'sub_total_po' => (float)$b['total']
                     ];
 
                     $jmlOrderTotal += $b['qty'];

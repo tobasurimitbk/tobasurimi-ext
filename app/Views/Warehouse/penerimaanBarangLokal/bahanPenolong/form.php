@@ -85,6 +85,7 @@
                     <input autocomplete="one-time-code" type="hidden" class="am_purchase_order_id" name="am_purchase_order_id" id="am_purchase_order_id" />
                     <input autocomplete="one-time-code" type="hidden" class="am_purchase_order_details_id" name="am_purchase_order_details_id" id="am_purchase_order_details_id" />
                     <input autocomplete="one-time-code" type="hidden" class="jml_diterima_lpb_last" name="jml_diterima_lpb_last" id="jml_diterima_lpb_last" />
+                    <input type="hidden" class="sub_total_po" id="sub_total_po" name="sub_total_po">
                     <div class="row">
                         <div class="col mb-3">
                             <h5 class="title-tambah-barang">Data Barang</h5>

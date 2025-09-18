@@ -1358,7 +1358,8 @@
                 qty: "<?= $l['qty'] ?>",
                 diskon: "<?= $l['diskon'] ?>",
                 biaya_tambahan: "<?= $l['biaya_tambahan'] ?>",
-                total: ("<?= round(($l['harga_satuan'] * $l['qty']) - (($l['diskon'] / 100) * ($l['harga_satuan'] * $l['qty']))) + $l['biaya_tambahan'] ?>"),
+                // total: ("<?= round(($l['harga_satuan'] * $l['qty']) - (($l['diskon'] / 100) * ($l['harga_satuan'] * $l['qty']))) + $l['biaya_tambahan'] ?>"),
+                total: <?= (float)$l['total'] ?>,
                 keterangan: "<?= $l['keterangan'] ?>",
                 ppn: "<?= $l['ppn'] ?>",
                 pph: "<?= $l['pph'] ?>"

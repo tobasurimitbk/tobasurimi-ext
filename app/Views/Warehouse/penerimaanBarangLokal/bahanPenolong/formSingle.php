@@ -728,6 +728,8 @@
 
     $('.jml_diterima_lpb').keyup(function() {
         var item = null;
+        var jml_order = destroyFormatRupiah($('.jml_order').val());
+        var sub_total_po = destroyFormatRupiah($('.sub_total_po').val());
         var jml_diterima_lpb = Number(destroyFormatRupiah($(this).val())) || 0;
         var jml_diterima_lpb_last = Number($('.jml_diterima_lpb_last').val()) || 0;
         if (jml_diterima_lpb == 0) {
@@ -741,7 +743,14 @@
                     //     greatFormatRupiah(Math.round(sub_total)));
                     // $('.jml_diterima_total').val(greatFormatRupiah(jml_diterima_total_now));
                     // $('.sisa_total').val(greatFormatRupiah(sisa_total_now));
-                    var sub_total = (Number(jml_diterima_lpb) * Number(item.harga));
+
+                    if (jml_diterima_lpb == jml_order) {
+                        // Total
+                        var sub_total = sub_total_po;
+                    } else {
+                        // Parsial
+                        var sub_total = (Number(jml_diterima_lpb) * Number(item.harga));
+                    }
                     $('.sub_total').val('' +
                         greatFormatRupiah((sub_total.toFixed(2))));
                     $('.jml_diterima_total').val(greatFormatRupiah(jml_diterima_total_now));
@@ -759,12 +768,15 @@
                     var jml_diterima_total_now = (Number(item.jml_diterima_total) + Number(jml_diterima_lpb) - jml_diterima_lpb_last);
                     var sisa_total_now = Math.floor((item.jml_order - jml_diterima_total_now) * 1000) / 1000;
 
-                    // var sub_total = Math.floor((Number(jml_diterima_lpb) * Number(item.harga)) * 1000) / 1000;
-                    // $('.sub_total').val('' +
-                    //     greatFormatRupiah(Math.round(sub_total)));
-                    // $('.jml_diterima_total').val(greatFormatRupiah(jml_diterima_total_now));
-                    // $('.sisa_total').val(greatFormatRupiah(sisa_total_now));
-                    var sub_total = (Number(jml_diterima_lpb) * Number(item.harga));
+                    if (jml_diterima_lpb == jml_order) {
+                        // Total
+                        var sub_total = sub_total_po;
+
+                    } else {
+                        // Parsial
+                        var sub_total = (Number(jml_diterima_lpb) * Number(item.harga));
+                    }
+
                     $('.sub_total').val('' +
                         greatFormatRupiah(sub_total.toFixed(2)));
                     $('.jml_diterima_total').val(greatFormatRupiah(jml_diterima_total_now));
@@ -909,6 +921,7 @@
         $('.harga_satuan').val("" + greatFormatRupiah(Number(item.harga) || 0));
         $('.sub_total').val("" + greatFormatRupiah(Number(item.sub_total) || 0));
         $('.jml_diterima_lpb_last').val(item.jml_diterima_lpb);
+        $('.sub_total_po').val(item.sub_total_po);
     }
 
     function deleteDetail(am_purchase_order_id, am_purchase_order_details_id) {
