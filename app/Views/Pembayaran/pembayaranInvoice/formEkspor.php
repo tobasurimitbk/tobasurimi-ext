@@ -99,7 +99,7 @@
                                 <option value=""></option>
                                 <?php if (!empty($dokumenList)): ?>
                                     <?php foreach ($dokumenList as $l): ?>
-                                        <option <?= (!empty($detail)) ?  (($detail['invoice_id']) == $l['sales_order_export_id'] ? "selected" : "") : '' ?> value="<?= encrypt($l['sales_order_export_id']); ?>"><?= $l['sales_order_export_no']; ?></option>
+                                        <option <?= (!empty($detail)) ?  (($detail['invoice_id']) == $l['sales_order_export_id'] ? "selected" : "") : '' ?> value="<?= encrypt($l['sales_order_export_id']); ?>"><?= $l['no_invoice']; ?></option>
                                     <?php endforeach; ?>
                                 <?php endif; ?>
                             </select>
