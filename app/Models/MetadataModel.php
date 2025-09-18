@@ -136,7 +136,14 @@ class MetadataModel extends Model
     {
         $data = [];
         foreach (
-            $this->asArray()->where('name', "Kode Satuan BC")->like('value', '%' . $search . '%')->orderBy('value', "ASC")->limit(10)->get()
+            $this->asArray()->where('name', "Kode Satuan BC")
+                ->groupStart()
+                ->like('value', '%' . $search . '%')
+                ->orLike('description', '%' . $search . '%')
+                ->groupEnd()
+                ->orderBy('value', "ASC")
+                ->limit(100)
+                ->get()
                 ->getResultArray() as $d
         ) {
             $data[] = [
@@ -144,6 +151,7 @@ class MetadataModel extends Model
                 'text' => '' . $d['value'] . ' - ' . strtoupper($d['description'])
             ];
         }
+
         return $data;
     }
 
