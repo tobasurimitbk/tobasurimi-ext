@@ -42,15 +42,16 @@ class BiayaKepitingBonusModel extends Model
 
     public function dropdownBarang($jasaVendorInID, $id = null)
     {
-        $jasaVendorInDetailModel = new JasaVendorInDetailModel();
+        $jasaVendorInDetailModel = new JasaVendorInKepitingKukusDetailModel();
         // CREATE
         $selectQryJasaVendorDetail = "
             barang_master.id AS barang_master_id,
             barang_master_spesifikasi.id AS barang_master_spesifikasi_id,
-            jasa_vendor_in.tanggal AS tanggal_masuk,
-            jasa_vendor_out.tanggal AS tanggal_keluar,
-            SUM(jasa_vendor_in_detail.qty_bersih) as qty_bersih,
-            SUM(jasa_vendor_out_detail.qty) as qty_kopek,
+            jasa_vendor_in_kepiting_kukus.tanggal AS tanggal_masuk,
+            jasa_vendor_out_kepiting_kukus.tanggal AS tanggal_keluar,
+            jasa_vendor_out_kepiting_kukus.jenis_barang,
+            SUM(jasa_vendor_in_kepiting_kukus_detail.qty_bersih) as qty_bersih,
+            SUM(jasa_vendor_out_kepiting_kukus_detail.qty) as qty_kopek,
             barang_master.barang_name,
             barang_master_spesifikasi.spesifikasi,
             CONCAT(barang_master.barang_name, ' - ', barang_master_spesifikasi.spesifikasi) AS nama_barang
@@ -58,14 +59,13 @@ class BiayaKepitingBonusModel extends Model
 
         $jasaVendorInDetail = $jasaVendorInDetailModel
             ->select($selectQryJasaVendorDetail)
-            ->join('jasa_vendor_out_detail', 'jasa_vendor_out_detail.id = jasa_vendor_in_detail.jasa_vendor_out_detail_id')
-            ->join('jasa_vendor_in', 'jasa_vendor_in.id = jasa_vendor_in_detail.jasa_vendor_in_id')
-            ->join('jasa_vendor_out', 'jasa_vendor_out.id = jasa_vendor_out_detail.jasa_vendor_out_id')
-            ->join('stock', 'stock.id = jasa_vendor_in_detail.stock_in_id')
-            ->join('barang_master', 'barang_master.id = stock.barang1_id')
-            ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = stock.barang2_id')
-            ->where('jasa_vendor_in_id', $jasaVendorInID)
-            ->groupBy('jasa_vendor_in_detail.stock_in_id')
+            ->join('jasa_vendor_out_kepiting_kukus_detail', 'jasa_vendor_out_kepiting_kukus_detail.id = jasa_vendor_in_kepiting_kukus_detail.jasa_vendor_out_kepiting_kukus_detail_id')
+            ->join('jasa_vendor_in_kepiting_kukus', 'jasa_vendor_in_kepiting_kukus.id = jasa_vendor_in_kepiting_kukus_detail.jasa_vendor_in_kepiting_kukus_id')
+            ->join('jasa_vendor_out_kepiting_kukus', 'jasa_vendor_out_kepiting_kukus.id = jasa_vendor_out_kepiting_kukus_detail.jasa_vendor_out_kepiting_kukus_id')
+            ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = jasa_vendor_in_kepiting_kukus_detail.spesifikasi_in_id')
+            ->join('barang_master', 'barang_master.id = barang_master_spesifikasi.barang_master_id')
+            ->where('jasa_vendor_in_kepiting_kukus_id', $jasaVendorInID)
+            ->groupBy('jasa_vendor_in_kepiting_kukus_detail.id')
             ->findAll();
 
         for ($i = 0; $i < count($jasaVendorInDetail); $i++) {

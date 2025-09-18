@@ -563,6 +563,8 @@ class BiayaKepiting extends BaseController
     public function print($id)
     {
         $id = decrypt($id);
+        // var_dump($id);
+        // die;
         $biayaKepiting = $this->biayaKepitingModel->find($id);
         if ($biayaKepiting == null) {
             return redirect()->to('biaya-kepiting');
@@ -570,7 +572,13 @@ class BiayaKepiting extends BaseController
 
         $data = [
             'tanggal' => date('Y-m-d'),
-            'biayaKepiting' => $this->biayaKepitingModel->find($id),
+            'biayaKepiting' => $this->biayaKepitingModel
+                                    ->select('biaya_kepiting.*, jasa_vendor_out_kepiting_kukus.jenis_barang')
+                                    ->join('jasa_vendor_in_kepiting_kukus', 'jasa_vendor_in_kepiting_kukus.id = biaya_kepiting.jasa_vendor_in_id', 'left')
+                                    ->join('jasa_vendor_in_kepiting_kukus_detail', 'jasa_vendor_in_kepiting_kukus_detail.jasa_vendor_in_kepiting_kukus_id = jasa_vendor_in_kepiting_kukus.id', 'left')
+                                    ->join('jasa_vendor_out_kepiting_kukus', 'jasa_vendor_out_kepiting_kukus.id = jasa_vendor_in_kepiting_kukus_detail.jasa_vendor_out_kepiting_kukus_id', 'left')
+                                    ->where('biaya_kepiting.id', $id)
+                                    ->first(),
             'biayaKepitingBonus' => $this->biayaKepitingBonusModel->dropdownBarang($biayaKepiting['jasa_vendor_in_id'], $id),
             'biayaKepitingDetail' => $this->biayaKepitingModel->dropdownBarangKepitingKukusPrint($biayaKepiting['jasa_vendor_in_id'], $id),
             'dataPerolehanGaji' => $this->biayaKepitingModel->dropdownPerolehanGaji($id)
