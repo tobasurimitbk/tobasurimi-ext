@@ -198,14 +198,26 @@ class BukuBesar extends BaseController
         if (!empty($accountId)) {
             foreach ($accountId as $a) {
                 if ($jenisAccount == "sub_account") {
+                    // Tentukan company scope
+                    $companyScope = ($this->this_company_id == 1 || $this->this_company_id == 2) 
+                        ? [1, 2] 
+                        : [$this->this_company_id];
+
+                    // Ambil sub account sesuai no_sub & company scope
                     $subAccount = $this->Sub_AkunsModel
-                                    ->where('sub_akuns.id', $a)
+                                    ->where('sub_akuns.no_sub', $a)
                                     ->where('sub_akuns.deletedAt', null)
+                                    ->whereIn('sub_akuns.company_id', $companyScope)
                                     ->join('companies', 'companies.id = sub_akuns.company_id', 'left')
                                     ->select('sub_akuns.*, companies.company')
                                     ->first();
-                    [$resultJurnalUmum, $saldoLama] = $fetchJurnalData([$a]);
-                    
+
+                    if (!$subAccount) {
+                        continue; // kalau ga ketemu skip
+                    }
+
+                    [$resultJurnalUmum, $saldoLama] = $fetchJurnalData([$subAccount['id']]);
+
                     $key = $subAccount['nama_sub'];
                     if (!isset($result[$key])) {
                         $result[$key] = [
@@ -225,18 +237,24 @@ class BukuBesar extends BaseController
                         });
                     }
                 } else {
+                    // bagian header account tetap sama (gunakan id)
                     $headerAccount = $this->HeaderAkunsModel
-                                    ->where('header_akuns.id', $a)
-                                    ->where('header_akuns.deletedAt', null)
-                                    ->join('companies', 'companies.id = header_akuns.company_id', 'left')
-                                    ->select('header_akuns.*, companies.company')
-                                    ->first();
+                                        ->where('header_akuns.id', $a)
+                                        ->where('header_akuns.deletedAt', null)
+                                        ->join('companies', 'companies.id = header_akuns.company_id', 'left')
+                                        ->select('header_akuns.*, companies.company')
+                                        ->first();
                     if ($headerAccount === null) {
-                        continue; // Lewati iterasi ini jika tidak ada data
+                        continue;
                     }
-                    $subAccountIds = $this->Sub_AkunsModel->where('header_id', $headerAccount['id'])->findColumn('id');
+
+                    $subAccountIds = $this->Sub_AkunsModel
+                                        ->where('header_id', $headerAccount['id'])
+                                        ->findColumn('id');
+
                     [$resultJurnalUmum, $saldoLama] = $fetchJurnalData($subAccountIds);
                     $key = $headerAccount['nama_header'];
+
                     if (!isset($result[$key])) {
                         $result[$key] = [
                             'id' => $headerAccount['id'],
@@ -249,57 +267,6 @@ class BukuBesar extends BaseController
                     } else {
                         $result[$key]['saldo_lama'] += $saldoLama;
                         $result[$key]['result'] = array_merge($result[$key]['result'], $resultJurnalUmum);
-                        // Urutkan ASC berdasarkan no_transaksi
-                        usort($result[$key]['result'], function($a, $b) {
-                            return strcmp($a['no_transaksi'], $b['no_transaksi']);
-                        });
-                    }
-                }
-            }
-        } elseif (!empty($rangeAccountStartId) && !empty($rangeAccountFinishId)) {
-            $model = $jenisAccount == "sub_account" ? $this->Sub_AkunsModel : $this->HeaderAkunsModel;
-            $accounts = $model->where('id >=', $rangeAccountStartId)
-                ->where('sub_akuns.id <=', $rangeAccountFinishId)
-                ->join('companies', 'companies.id = sub_akuns.company_id', 'left')
-                ->select('sub_akuns.*, companies.company')
-                ->findAll();
-            foreach ($accounts as $account) {
-                if ($jenisAccount == "sub_account") {
-                    [$resultJurnalUmum, $saldoLama] = $fetchJurnalData([$account['id']]);
-                    $key = $subAccount['nama_sub'];
-                    if (!isset($result[$key])) {
-                        $result[$key] = [
-                            'id' => $subAccount['id'],
-                            'number' => $subAccount['no_sub'],
-                            'company' => $subAccount['company'],
-                            'name' => $subAccount['nama_sub'],
-                            'saldo_lama' => $saldoLama,
-                            'result' => $resultJurnalUmum,
-                        ];
-                    } else {
-                        $result[$key]['saldo_lama'] += $saldoLama;
-                        $result[$key]['result'] = array_merge($result[$key]['result'], $resultJurnalUmum);
-                        // Urutkan ASC berdasarkan no_transaksi
-                        usort($result[$key]['result'], function($a, $b) {
-                            return strcmp($a['no_transaksi'], $b['no_transaksi']);
-                        });
-                    }
-                } else {
-                    $subAccountIds = $this->Sub_AkunsModel->where('header_id', $account['id'])->findColumn('id');
-                    [$resultJurnalUmum, $saldoLama] = $fetchJurnalData($subAccountIds);
-                    $key = $headerAccount['nama_header'];
-                    if (!isset($result[$key])) {
-                        $result[$key] = [
-                            'id' => $headerAccount['id'],
-                            'number' => $headerAccount['no_header'],
-                            'company' => $headerAccount['company'],
-                            'name' => $headerAccount['nama_header'],
-                            'saldo_lama' => $saldoLama,
-                            'result' => $resultJurnalUmum,
-                        ];
-                    } else {
-                        $result[$key]['saldo_lama'] += $saldoLama;
-                        $result[$key]['result'] = array_merge($result[$key]['result'], $resultJurnalUmum);// Urutkan ASC berdasarkan no_transaksi
                         usort($result[$key]['result'], function($a, $b) {
                             return strcmp($a['no_transaksi'], $b['no_transaksi']);
                         });
@@ -307,6 +274,7 @@ class BukuBesar extends BaseController
                 }
             }
         }
+
 
         return $result;
     }
