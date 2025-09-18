@@ -4,6 +4,10 @@
     .form-add-spp .form-floating .form-floating-custom .select2 .selection .select2-selection {
         height: 150px !important;
     }
+
+    .form-add-spp .form-floating .form-floating-custom .select2 .selection .select2-selection__rendered {
+        height: 120px !important;
+    }
 </style>
 <!-- Begin Page Content -->
 <section class="section">
