@@ -1301,9 +1301,9 @@ class Invoice extends BaseController
             ->orderBy('createdAt', 'DESC')
             ->first();
 
-        if ($last && !empty($last->no_faktur)) {
+        if ($last && !empty($last['no_faktur'])) {
             // Pisahkan nomor terakhir
-            $parts = explode('/', $last->no_faktur);
+            $parts = explode('/', $last['no_faktur']);
             // Ambil index terakhir sebagai nomor (pastikan numerik)
             $lastNumber = is_numeric(end($parts)) ? (int)end($parts) : 0;
 

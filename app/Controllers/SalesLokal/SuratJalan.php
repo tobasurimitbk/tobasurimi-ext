@@ -757,9 +757,9 @@ class SuratJalan extends BaseController
             ->orderBy('createdAt', 'DESC')
             ->first();
 
-        if ($last && !empty($last->no_surat_jalan)) {
+        if ($last && !empty($last['no_surat_jalan'])) {
             // Pecah nomor terakhir
-            $parts = explode('/', $last->no_surat_jalan);
+            $parts = explode('/', $last['no_surat_jalan']);
             // Ambil elemen terakhir sebagai nomor urut
             $lastNumber = is_numeric(end($parts)) ? (int)end($parts) : 0;
             $nextNumber = $lastNumber + 1;

@@ -1066,9 +1066,10 @@ class OrderForm extends BaseController
             ->orderBy('createdAt', 'DESC')
             ->first();
 
-        if ($last && !empty($last->no_sales_order)) {
+
+        if ($last && !empty($last['no_sales_order'])) {
             // Pecah nomor terakhir
-            $parts = explode('/', $last->no_sales_order);
+            $parts = explode('/', $last['no_sales_order']);
             // Ambil elemen terakhir sebagai nomor urut
             $lastNumber = is_numeric(end($parts)) ? (int)end($parts) : 0;
             $nextNumber = $lastNumber + 1;
