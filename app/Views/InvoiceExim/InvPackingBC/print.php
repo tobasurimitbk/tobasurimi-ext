@@ -132,12 +132,14 @@
             <?php if ($company['id'] != 15): ?>
                 <td>
                     <?php if ($company['id'] == 2): ?>
+                        <!-- KIM 2 -->
                         <div style="text-align: right; margin-left:-20px; margin-right:40px; ">
                             <img src="<?= $company['logo'] ?>" style="width: 140px; height:100px; text-align:right; margin-top:-5px" alt="">
                         </div>
                     <?php else : ?>
+                        <!-- KIM 1 -->
                         <div style="text-align: right; margin-left:-20px; margin-right:40px; ">
-                            <img src="<?= $company['logo'] ?>" style="width: 190px; text-align:right; margin-top:-5px" alt="">
+                            <img src="<?= $company['logo'] ?>" style="width: 190px; height:140px; text-align:right; margin-top:-5px" alt="">
                         </div>
                     <?php endif; ?>
                 </td>
@@ -176,10 +178,10 @@
                             </b>
 
                         </h1>
-                        <table style="width: 100%; margin-top:-15px; margin-left:-30px; font-size:12px;">
+                        <table style="width: 110%; margin-top:-15px; margin-left:-30px; font-size:12px;">
 
                             <tr style="vertical-align: top;">
-                                <td style="width: 50px;">Office</td>
+                                <td style="width: 10px;">Office</td>
                                 <td>:</td>
                                 <td>
                                     <?= $company['office_kop'] ?>
@@ -199,7 +201,7 @@
                     <h1 style="margin-top: -10px;">
                         <b><?= strtoupper($company['holding_company']) ?></b>
                     </h1>
-                    <table style="width: 100%; margin-top: -15px; font-size: 13px;">
+                    <table style="width: 100%; margin-top: -15px; font-size: 12px;">
                         <tr>
                             <td style="text-align: center;">
                                 <?= $company['factory'] ?>
@@ -608,12 +610,14 @@
             <?php if ($company['id'] != 15): ?>
                 <td>
                     <?php if ($company['id'] == 2): ?>
+                        <!-- KIM 2 -->
                         <div style="text-align: right; margin-left:-20px; margin-right:40px; ">
                             <img src="<?= $company['logo'] ?>" style="width: 140px; height:100px; text-align:right; margin-top:-5px" alt="">
                         </div>
                     <?php else : ?>
+                        <!-- KIM 1 -->
                         <div style="text-align: right; margin-left:-20px; margin-right:40px; ">
-                            <img src="<?= $company['logo'] ?>" style="width: 190px; text-align:right; margin-top:-5px" alt="">
+                            <img src="<?= $company['logo'] ?>" style="width: 190px; height:140px; text-align:right; margin-top:-5px" alt="">
                         </div>
                     <?php endif; ?>
                 </td>
@@ -652,10 +656,10 @@
                             </b>
 
                         </h1>
-                        <table style="width: 100%; margin-top:-15px; margin-left:-30px; font-size:12px;">
+                        <table style="width: 110%; margin-top:-15px; margin-left:-30px; font-size:12px;">
 
                             <tr style="vertical-align: top;">
-                                <td style="width: 50px;">Office</td>
+                                <td style="width: 10px;">Office</td>
                                 <td>:</td>
                                 <td>
                                     <?= $company['office_kop'] ?>
@@ -675,7 +679,7 @@
                     <h1 style="margin-top: -10px;">
                         <b><?= strtoupper($company['holding_company']) ?></b>
                     </h1>
-                    <table style="width: 100%; margin-top: -15px; font-size: 13px;">
+                    <table style="width: 100%; margin-top: -15px; font-size: 12px;">
                         <tr>
                             <td style="text-align: center;">
                                 <?= $company['factory'] ?>

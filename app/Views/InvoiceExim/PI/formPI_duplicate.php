@@ -58,7 +58,7 @@
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3">
-                            <input value="<?= !empty($dataPI) ? $dataPI['alamat_customer'] :  $dataSalesOrderExport->address ?>" autocomplete="one-time-code" type="text" name="alamat_customer" id="alamat_customer" class="form-control alamat_customer">
+                            <input value="<?= !empty($dataPI) ? $dataPI['alamat_customer'] :  $dataSalesOrderExport->address ?>" autocomplete="one-time-code" type="text" name="alamat_customer" id="alamat_customer" class="form-control alamat_customer" placeholder="Alamat Customer">
                             <label for="floatingInput">Alamat Customer</label>
                         </div>
                     </div>
@@ -81,7 +81,7 @@
                         <div class="form-floating mb-3" style="height: 50px;">
                             <div class="input-group input-group-password">
                                 <div class="form-floating mb-3" style="height: 50px;">
-                                    <input readonly autocomplete="one-time-code" type="text" value="AUTO GENERATE" class="form-control no_invoice_pi" id="no_invoice_pi" name="no_invoice_pi" placeholder="No Invoice PI" required>
+                                    <input autocomplete="one-time-code" type="text" value="AUTO GENERATE" readonly class="form-control no_invoice_pi" id="no_invoice_pi" name="no_invoice_pi" placeholder="No Invoice PI" required>
                                     <label for="floatingInput">No PI</label>
                                 </div>
                                 <div class="input-generate input-group-prepend group-prepend-password align-items-center">
@@ -139,9 +139,13 @@
                     </div>
 
                     <div class="col-md-4">
-                        <div class="form-floating mb-3">
-                            <input value="<?= !empty($dataPI) ? $dataPI['packing'] : '' ?>" autocomplete="one-time-code" type="text" class="form-control packing" id="packing" name="packing">
+                        <!-- <div class="form-floating mb-3">
+                            <input value=""  autocomplete="one-time-code" type="text" class="form-control packing" id="packing" name="packing">
                             <label for="floatingInput">Packing</label>
+                        </div> -->
+                        <div class="form-floating mb-3">
+                            <textarea class="full-textarea form-control packing" id="packing" name="packing" placeholder="Keterangan / Packing"><?= !empty($dataPI) ? $dataPI['packing'] : '' ?></textarea>
+                            <label for="floatingInput">Keterangan / Packing</label>
                         </div>
                     </div>
                     <div class="col-md-4">
@@ -191,6 +195,42 @@
                             <tfoot class="foot-barang" id="foot-barang">
                                 <tr>
                                     <td colspan="7">List Barang Kosong</td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="col-subtitle-modal mt-5">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <label class="form-label font-weight-bold modal-sub-title">List Biaya Tambahan</label>
+                        </div>
+                        <div class="col-md-6">
+                            <button class="btn btn-show-detail btn-add btn-block float-right" id="btnBiayaTambahan" type="button" style="width: 90% !important;">
+                                <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row mb-5">
+                    <div class="table-responsive">
+                        <table class="table table-bordered nowrap table-hover-tobasurimi dataTable" id="biayaTambahanTable" width="100%" cellspacing="0">
+                            <thead class="thead-dark">
+                                <tr>
+                                    <th style="width: 10px;">No</th>
+                                    <th>Biaya Tambahan</th>
+                                    <th style="width: 120px;">Total Biaya</th>
+                                    <th style="width: 100px;">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody class="body-biaya-tambahan" id="body-biaya-tambahan">
+
+                            </tbody>
+                            <tfoot class="foot-biaya-tambahan" id="foot-biaya-tambahan">
+                                <tr>
+                                    <td colspan="4">List Biaya Tambahan Kosong</td>
                                 </tr>
                             </tfoot>
                         </table>
@@ -348,10 +388,53 @@
     </div>
 </div>
 
+<div class="modal detail-modal" id="biayaTambahanModal" tabindex="1">
+    <div class="modal-dialog" style="min-width: 900px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title title-secondary"><label id="label-detail-biaya-tambahan"></label> Biaya Tambahan</h5>
+            </div>
+            <form class="create-form-biaya-tambahan" role="form" method="POST">
+                <input type="hidden" name="id_biaya_tambahan" id="id_biaya_tambahan">
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input autocomplete="one-time-code" type="text" class="form-control biaya_tambahan" id="biaya_tambahan" name="biaya_tambahan" placeholder="Deskripsi Biaya Tambahan">
+                                <label for="floatingInput">Deskripsi</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <select name="tipe_biaya_tambahan" id="tipe_biaya_tambahan" class="form-control tipe_biaya_tambahan">
+                                        <option value="PLUS">PLUS (+)</option>
+                                        <option value="MINUS">MINUS (-)</option>
+                                    </select>
+                                </div>
+                                <div class="form-floating mb-3" style="height: 50px;">
+                                    <input autocomplete="one-time-code" type="text" oninput="this.value = greatFormatRupiah(this.value)" class="form-control nilai_biaya_tambahan" id="nilai_biaya_tambahan" name="nilai_biaya_tambahan" placeholder="Nilai Biaya Tambahan">
+                                    <label for="floatingInput">Nilai</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-discard mr-2" id="btnHideBiayaTambahan">Kembali</button>
+                    <button type="button" class="btn btn-submit-form" id="btnSubmitBiayaTambahan">Simpan</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
 <script>
     const csrfToken = '<?= csrf_token() ?>';
     var listBarang = [];
     var listPaymentTerm = [];
+    var listBiayaTambahan = [];
 
     $(document).ready(function() {
         <?php if (!empty($dataPI)) { ?>
@@ -376,8 +459,18 @@
                     presentase: <?= $d['presentase'] ?>
                 });
             <?php endforeach ?>
+
+            <?php foreach ($dataPIBiaya as $d): ?>
+                listBiayaTambahan.push({
+                    id_biaya_tambahan: "<?= $d['id'] ?>",
+                    biaya_tambahan: "<?= $d['biaya_tambahan'] ?>",
+                    tipe_biaya_tambahan: "<?= $d['tipe_biaya_tambahan'] ?>",
+                    nilai_biaya_tambahan: <?= floatval($d['nilai_biaya_tambahan']) ?>
+                });
+            <?php endforeach; ?>
             drawTableBarang(listBarang);
             drawTablePaymentTerm(listPaymentTerm);
+            drawTableBiayaTambahan(listBiayaTambahan);
 
         <?php } else { ?>
 
@@ -605,6 +698,45 @@
             },
         });
 
+        var validatorBiayaTambahan = $(".create-form-biaya-tambahan").validate({
+            rules: {
+                biaya_tambahan: {
+                    required: true
+                },
+                nilai_biaya_tambahan: {
+                    required: true
+                },
+            },
+            messages: {
+                biaya_tambahan: {
+                    required: "Deskripsi wajib diisi"
+                },
+                nilai_biaya_tambahan: {
+                    required: "Biaya tambahan wajib diisi"
+                },
+            },
+            errorElement: 'span',
+            errorClass: 'text-danger',
+            errorPlacement: function(error, element) {
+                var elem = $(element);
+                if (elem.hasClass("select2-hidden-accessible")) {
+                    element = $("#select2-" + elem.attr("id") + "-container").parent();
+                    error.insertAfter(element);
+                } else {
+                    error.insertAfter(element);
+                }
+            },
+            highlight: function(element) {
+                $(element).closest('.form-group').addClass('has-error');
+                $(element).addClass('select-class');
+
+            },
+            unhighlight: function(element) {
+                $(element).closest('.form-group').removeClass('has-error');
+                $(element).removeClass('select-class');
+            },
+        });
+
 
         $('#btnAddPaymentTerm').click(function(e) {
             e.preventDefault();
@@ -618,6 +750,49 @@
                 $("#label-payment-term").text("Tambah ");
                 $('#paymentTermModal').modal('show');
                 resetFormPaymentTerm();
+            }
+        });
+
+        $('#btnBiayaTambahan').click(function() {
+            resetFormBiayaTambahan();
+            $('#label-detail-biaya-tambahan').text('Tambah ');
+            $('#biayaTambahanModal').modal('show');
+        });
+
+        $('#btnSubmitBiayaTambahan').click(function(e) {
+            e.preventDefault();
+            if ($('.create-form-biaya-tambahan').valid()) {
+                var idBiayaTambahan = $('#id_biaya_tambahan').val();
+                var biayaTambahan = $('#biaya_tambahan').val();
+                var tipeBiayaTambahan = $('#tipe_biaya_tambahan').val();
+                var nilaiBiayaTambahan = destroyFormatRupiah($('#nilai_biaya_tambahan').val());
+
+                if (idBiayaTambahan) {
+                    // UPDATE
+                    var index = null;
+                    for (var i = 0; i < listBiayaTambahan.length; i++) {
+                        if (listBiayaTambahan[i].id_biaya_tambahan == idBiayaTambahan) {
+                            index = i;
+                            break;
+                        }
+                    }
+
+                    listBiayaTambahan[index].biaya_tambahan = biayaTambahan;
+                    listBiayaTambahan[index].tipe_biaya_tambahan = tipeBiayaTambahan;
+                    listBiayaTambahan[index].nilai_biaya_tambahan = nilaiBiayaTambahan;
+                } else {
+                    // CREATE
+                    idBiayaTambahan = getID();
+                    listBiayaTambahan.push({
+                        id_biaya_tambahan: idBiayaTambahan,
+                        biaya_tambahan: biayaTambahan,
+                        tipe_biaya_tambahan: tipeBiayaTambahan,
+                        nilai_biaya_tambahan: nilaiBiayaTambahan
+                    });
+                }
+
+                $('#biayaTambahanModal').modal('hide');
+                drawTableBiayaTambahan(listBiayaTambahan);
             }
         });
 
@@ -688,6 +863,9 @@
             }
         });
 
+        $('#btnHideBiayaTambahan').click(function() {
+            $('#biayaTambahanModal').modal('hide');
+        });
 
         $('#btnHidePaymentTerm').click(function(e) {
             e.preventDefault();
@@ -752,7 +930,6 @@
                 }
 
                 drawTablePaymentTerm(listPaymentTerm);
-                console.log(paymentTerm);
                 $('#paymentTermModal').modal('hide');
 
             }
@@ -779,10 +956,11 @@
                     confirmButtonColor: '#4e73df',
                 })
             } else {
+                var id = $('#id').val();
                 if ($("#form-parent").valid()) {
                     Swal.fire({
                         icon: 'question',
-                        title: 'Duplikasi Data ?',
+                        title: id ? 'Update Data ?' : 'Simpan Data ?',
                         confirmButtonColor: '#4e73df',
                         cancelButtonColor: '#d33',
                         showCancelButton: true,
@@ -792,6 +970,7 @@
                     }).then((result) => {
                         if (result.isConfirmed) {
                             const csrf = $(`[name="${csrfToken}"]`);
+                            let id = $('#id').val();
                             let url = "<?= base_url('proforma-invoice/create') ?>";
                             let data = new FormData(document.querySelector("#form-parent"));
                             let totalPI = destroyFormatRupiah($('#total_pi').val());
@@ -799,6 +978,7 @@
                             data.append("total_pi", totalPI);
                             data.append("listBarang", JSON.stringify(listBarang));
                             data.append("listPaymentTerm", JSON.stringify(listPaymentTerm));
+                            data.append("listBiayaTambahan", JSON.stringify(listBiayaTambahan));
 
                             $.ajax({
                                 url: url,
@@ -888,13 +1068,12 @@
                     <td class="text-right">${greatFormatRupiah(item.harga_satuan)}</td>
                     <td class="text-right">${greatFormatRupiah(item.total_harga)}</td>
                     <td class="text-center">
-                    
-                            <button type="button" class="btn btn-warning posting-spp mr-1" onclick="detailRowBarang('${item.id_barang}')">
-                                <i class="fa fa-pencil fa-sm"></i>
-                            </button>
-                            <button type="button" class="btn btn-danger" onclick="deleteRowBarang('${item.id_barang}')">
-                                <i class="fa fa-trash fa-sm"></i>
-                            </button>
+                        <button type="button" class="btn btn-warning posting-spp mr-1" onclick="detailRowBarang('${item.id_barang}')">
+                            <i class="fa fa-pencil fa-sm"></i>
+                        </button>
+                        <button type="button" class="btn btn-danger" onclick="deleteRowBarang('${item.id_barang}')">
+                            <i class="fa fa-trash fa-sm"></i>
+                        </button>
                     </td>
                 </tr>
             `);
@@ -944,24 +1123,94 @@
                         bgcolor = '#ebe520ff';
                     }
                 <?php endif; ?>
+
                 var newRow = $('<tr style="background-color:' + bgcolor + ';color:whitesmoke;">');
                 newRow.append($('<td style="text-align:center;">').text(no++));
                 newRow.append($('<td>').text(item.payment_term));
                 newRow.append($('<td class="text-right">').text(greatFormatRupiah(item.nilai_payment_term)));
                 newRow.append($('<td class="text-right">').html(
                     `
-                        <button type="button" class="btn btn-warning posting-spp mr-1" onclick="detailRowPaymentTerm('${item.id_payment_term}')">
-                                <i class="fa fa-pencil fa-sm" aria-hidden="true"></i>
-                            </button><button type="button" class="btn btn-danger" onclick="deleteRowPaymentTerm('${item.id_payment_term}')">
-                                <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
-                            </button>
-                    `
+                    <button type="button" class="btn btn-warning posting-spp mr-1" onclick="detailRowPaymentTerm('${item.id_payment_term}')">
+                        <i class="fa fa-pencil fa-sm" aria-hidden="true"></i>
+                    </button><button type="button" class="btn btn-danger" onclick="deleteRowPaymentTerm('${item.id_payment_term}')">
+                        <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
+                    </button>
+                   `
                 ));
 
                 table.find('tbody').append(newRow);
             });
         }
         recalculatePIPayed(listPaymentTerm);
+    }
+
+    function drawTableBiayaTambahan(listBiayaTambahan) {
+        $('#body-biaya-tambahan').empty();
+        $('#foot-biaya-tambahan').empty();
+        var row = '';
+        var no = 1;
+        const table = $('#biayaTambahanTable');
+        if (listBiayaTambahan.length === 0) {
+            row += `
+                    <tr>
+                        <td colspan="4">List Additional Empty</td>
+                    </tr>
+                `;
+            $('#foot-biaya-tambahan').append(row);
+        } else {
+            listBiayaTambahan.map(item => {
+                var iconOperator = item.tipe_biaya_tambahan == "PLUS" ? "(+)" : "(-)";
+                var newRow = $('<tr style="color:whitesmoke;">');
+                newRow.append($('<td style="text-align:center;">').text(no++));
+                newRow.append($('<td>').text(item.biaya_tambahan));
+                newRow.append($('<td>').text(iconOperator + " " + greatFormatRupiah(item.nilai_biaya_tambahan)));
+                newRow.append($('<td>').html(
+                    `
+                      <button type="button" class="btn btn-warning posting-spp mr-1" onclick="detailRowBiayaTambahan('${item.id_biaya_tambahan}')">
+                                <i class="fa fa-pencil fa-sm" aria-hidden="true"></i>
+                            </button><button type="button" class="btn btn-danger" onclick="deleteRowBiayaTambahan('${item.id_biaya_tambahan}')">
+                                <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
+                            </button>
+                   `
+                ));
+
+                table.find('tbody').append(newRow);
+            });
+        }
+
+    }
+
+
+    function detailRowBiayaTambahan(id_biaya_tambahan) {
+        var item = null;
+        for (var i = 0; i < listBiayaTambahan.length; i++) {
+            if (listBiayaTambahan[i].id_biaya_tambahan == id_biaya_tambahan) {
+                item = listBiayaTambahan[i];
+                break;
+            }
+        }
+
+        $('#id_biaya_tambahan').val(item.id_biaya_tambahan);
+        $('#biaya_tambahan').val(item.biaya_tambahan);
+        $('#tipe_biaya_tambahan').val(item.tipe_biaya_tambahan);
+        $('#nilai_biaya_tambahan').val(greatFormatRupiah(item.nilai_biaya_tambahan));
+
+        $('#label-detail-biaya-tambahan').text("Update ");
+        $('#biayaTambahanModal').modal('show');
+    }
+
+    function deleteRowBiayaTambahan(id_biaya_tambahan) {
+        var indexToRemove = -1;
+        for (var i = 0; i < listBiayaTambahan.length; i++) {
+            if (listBiayaTambahan[i].id_biaya_tambahan == id_biaya_tambahan) {
+                indexToRemove = i;
+                break;
+            }
+        }
+        if (indexToRemove !== -1) {
+            listBiayaTambahan.splice(indexToRemove, 1);
+        }
+        drawTableBiayaTambahan(listBiayaTambahan);
     }
 
 
@@ -1161,6 +1410,13 @@
             }
         })
 
+    }
+
+    function resetFormBiayaTambahan() {
+        $('#id_biaya_tambahan').val(null);
+        $('#biaya_tambahan').val(null);
+        $('#tipe_biaya_tambahan').val("PLUS").change();
+        $('#nilai_biaya_tambahan').val(null);
     }
 </script>
 <?= $this->endSection(); ?>

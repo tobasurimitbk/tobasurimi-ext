@@ -106,7 +106,45 @@
         </div>
     </div>
 </section>
-
+<?php if (in_array(session()->get('login')->this_company_id, [1, 2])): ?>
+    <div class="modal kopsurat-modal" tabindex="1">
+        <div class="modal-dialog" style="min-width: 900px;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title title-secondary">Pilih Kop Surat</h5>
+                </div>
+                <form class="form-kop-surat">
+                    <input type="hidden" name="id" id="id">
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-floating mb-3" style="height: 50px;">
+                                    <select
+                                        class="form-select company_id"
+                                        aria-label="Floating label select example"
+                                        name="company_id"
+                                        id="company_id">
+                                        <option value=""></option>
+                                        <?php foreach ($dataCompany as $d) : ?>
+                                            <option value="<?= $d['id'] ?>" <?= $d['id'] == session()->get('login')->this_company_id ? 'selected' : '' ?>>
+                                                <?= $d['company'] ?>
+                                            </option>
+                                        <?php endforeach; ?>
+                                    </select>
+                                    <label for="floatingInput" style="z-index: 1;">Pilih Kop Surat Printout</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-hide-detail btn-discard mr-3" id="btn-hide-kopsurat">Back</button>
+                        <button type="button" onclick="print2()" class="btn btn-submit-form">Print</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+<?php endif; ?>
 
 <script>
     const csrfToken = '<?= csrf_token() ?>';
@@ -243,7 +281,7 @@
                     if (status_posting == "0") {
                         res += `
                             <?php if (can('Invoice Exim', 'CIPL BC', 'p')) : ?>
-                                <button data-toggle="tooltip" title="Print" class="btn btn-warning btn-print" onclick="print('<?= base_url("invoice-packing-bc/print/"); ?>${id}')" style="box-shadow: none !important;">
+                                <button data-toggle="tooltip" title="Print" class="btn btn-warning btn-print" onclick="print('${id}')" style="box-shadow: none !important;">
                                     <i class="fa fa-print fa-sm" aria-hidden="true"></i>
                                 </button>
                             <?php endif; ?>
@@ -268,7 +306,7 @@
                     if (status_posting == "1") {
                         res += `
                         <?php if (can('Invoice Exim', 'CIPL BC', 'p')) : ?>
-                            <button data-toggle="tooltip" title="Print" class="btn btn-warning btn-print" onclick="print('<?= base_url("invoice-packing-bc/print/"); ?>${id}')" style="box-shadow: none !important;">
+                            <button data-toggle="tooltip" title="Print" class="btn btn-warning btn-print" onclick="print('${id}')" style="box-shadow: none !important;">
                                 <i class="fa fa-print fa-sm" aria-hidden="true"></i>
                             </button>
                         <?php endif; ?>
@@ -350,10 +388,64 @@
 
     $(".search").keyup(function() {
         table.ajax.reload();
-    })
+    });
 
-    function print(url) {
-        window.open(url, '_blank');
+    $('.company_id').select2({
+        placeholder: "Pilih Kop Surat",
+        theme: "bootstrap-5",
+        dropdownParent: $('.kopsurat-modal')
+    }).change(function() {});
+
+    $('.company_id')
+        .parent('div')
+        .children('span')
+        .children('span')
+        .children('span')
+        .css('height', ' calc(3.5rem + 2px)');
+
+    $('.company_id')
+        .parent('div')
+        .children('span')
+        .children('span')
+        .children('span')
+        .children('span')
+        .css('margin-top', '22px').css('margin-left', '-7px');
+
+    $('.company_id')
+        .parent('div')
+        .find('label')
+        .css('z-index', '1');
+
+    $('#btn-hide-kopsurat').click(function(e) {
+        e.preventDefault();
+        $('.kopsurat-modal').modal('hide');
+    });
+
+    function print(id) {
+        $('#id').val(id);
+        <?php if (in_array(session()->get('login')->this_company_id, [1, 2])): ?>
+            $('.kopsurat-modal').modal('show');
+        <?php else: ?>
+            var companyId = "<?= session()->get('login')->this_company_id; ?>";
+            var url = "<?= base_url('invoice-packing-bc/print/') ?>" + id + '?company_id=' + companyId;
+            window.open(url, "_blank");
+        <?php endif; ?>
+    }
+
+    function print2() {
+        var id = $('#id').val();
+        var companyId = $('#company_id').val();
+        if (companyId == '') {
+            Swal.fire({
+                icon: 'error',
+                title: "Pilih kop surat perusahaan",
+                confirmButtonColor: '#4e73df',
+            });
+            return;
+        } else {
+            var url = "<?= base_url('invoice-packing-bc/print/') ?>" + id + '?company_id=' + companyId;
+            window.open(url, "_blank");
+        }
     }
 
     function edit(id) {

@@ -3,11 +3,13 @@
 namespace App\Controllers\Master;
 
 use App\Controllers\BaseController;
+use App\Models\AttendancesUnitModel;
 use App\Models\BagianModel;
 use App\Models\CitiesModel;
 use App\Models\DivisisModel;
 use App\Models\ProvincesModel;
 use App\Models\EmployeesModel;
+use App\Models\EmployeesUnitsModel;
 use App\Models\GajiConjunctionModel;
 use App\Models\GajiDivisiModel;
 use App\Models\GolonganModel;
@@ -35,6 +37,8 @@ class Employee extends BaseController
     protected $BagianModel;
     protected $CitiesModel;
     protected $PayrollModel;
+    protected $AttendanceUnitModel;
+    protected $EmployeesUnitsModel;
 
     public function __construct()
     {
@@ -53,16 +57,21 @@ class Employee extends BaseController
         $this->BagianModel = new BagianModel();
         $this->CitiesModel = new CitiesModel();
         $this->PayrollModel = new PayrollsModel();
+        $this->AttendanceUnitModel = new AttendancesUnitModel();
+        $this->EmployeesUnitsModel = new EmployeesUnitsModel();
     }
 
     public function employee()
     {
         //Get Provinces
-        $dataProvinces = $this->ProvincesModel->search_list(array(), 'province_name');
+        $dataAttendanceUnit = $this->AttendanceUnitModel->where('company_id', $this->this_company_id)->findAll();
+        $divisi = $this->DivisionModel->where('deletedAt', null)->where('company_id', $this->this_company_id)->findAll();
+        $tipeEmployee = $this->GolonganModel->where('company_id', $this->this_company_id)->where('deletedAt', null)->findall();
+
         $data = [
-            "dataProvinces" => $dataProvinces,
-            'divisi' => $this->DivisionModel->where('deletedAt', null)->where('company_id', $this->this_company_id)->findAll(),
-            "tipeEmployee" => $this->GolonganModel->where('company_id', $this->this_company_id)->where('deletedAt', null)->findall()
+            "tipeEmployee" => $tipeEmployee,
+            "dataAttendanceUnit" => $dataAttendanceUnit,
+            "divisi" => $divisi,
         ];
 
         return view('Master/employee/index', $data);
@@ -301,14 +310,11 @@ class Employee extends BaseController
                 $res = [];
                 foreach ($gajiDivisi as $g) {
                     if (in_array($g, \array_keys($_POST))) {
-                        $angka = preg_replace("/[^0-9,]/", "", $this->request->getVar($g));
-                        $angka = str_replace(",", ".", $angka);
-                        $angkaDesimal = number_format((float) $angka, 3, '.', '');
-
+                        $angka = $this->request->getVar($g);
                         $res[] = [
                             'employee_id' => $insert,
                             'tunjangan_id' => $g,
-                            'nominal' => $angkaDesimal
+                            'nominal' => $angka
                         ];
                     }
                 }
@@ -316,21 +322,21 @@ class Employee extends BaseController
                 $this->GajiConjunctionModel->insertBatch($res);
 
                 if ($insert) {
-                    return \response()->setJSON([
+                    return response()->setJSON([
                         "status" => true,
                         "message" => "Data Employee Baru Berhasil disimpan",
                         "id" => encrypt($insert),
                         'token' => csrf_hash()
                     ]);
                 } else {
-                    return \response()->setJSON([
+                    return response()->setJSON([
                         "status" => false,
                         "message" => "Data Employee Baru gagal disimpan",
                         'token' => csrf_hash()
                     ]);
                 }
             } else {
-                return \response()->setJSON([
+                return response()->setJSON([
                     "status" => false,
                     "message" => "Format gambar harus bertipe png, jpg, jpeg",
                     'token' => csrf_hash()
@@ -338,7 +344,7 @@ class Employee extends BaseController
             }
         } catch (Exception $e) {
 
-            return \response()->setJSON([
+            return response()->setJSON([
                 'message' => "Terjadi kesalahan saat input data employee baru (Code: 500)",
                 'status' => false
             ]);
@@ -412,43 +418,41 @@ class Employee extends BaseController
                     $res = [];
                     foreach ($gajiDivisi as $g) {
                         if (in_array($g, \array_keys($_POST))) {
-                            $angka = preg_replace("/[^0-9,]/", "", $this->request->getVar($g));
-                            $angka = str_replace(",", ".", $angka);
-                            $angkaDesimal = number_format((float) $angka, 3, '.', '');
+                            $angka = $this->request->getVar($g);
 
                             $res[] = [
                                 'employee_id' => $id,
                                 'tunjangan_id' => $g,
-                                'nominal' => $angkaDesimal
+                                'nominal' => $angka
                             ];
                         }
                     }
 
                     $this->GajiConjunctionModel->insertBatch($res);
 
-                    return \response()->setJSON([
+                    return response()->setJSON([
                         "status"    => true,
                         "message"   => "Data Employee Berhasil Diupdate",
                         'token' => csrf_hash()
                     ]);
                 } else {
-                    return \response()->setJSON([
-                        "status" => \false,
+                    return response()->setJSON([
+                        "status" => false,
                         "message" => "Data Employee gagal diubah",
                         'token' => csrf_hash()
                     ]);
                 }
             } else {
-                return \response()->setJSON([
-                    "status" => \false,
+                return response()->setJSON([
+                    "status" => false,
                     "message" => "Format gambar harus bertipe png, jpg, jpeg",
                     'token' => csrf_hash()
                 ]);
             }
         } catch (Exception $e) {
-            return \response()->setJSON([
+            return response()->setJSON([
                 'message' => "Terjadi kesalahan saat input data employee baru (Code: 500)",
-                'status' => \false
+                'status' => false
             ]);
         }
     }
@@ -604,5 +608,156 @@ class Employee extends BaseController
             'divisi' => $this->DivisionModel->where('id', $divisionID)->first(),
             'divisionIID' => $divisionID
         ]);
+    }
+
+    public function dropdownEmployeeNotSyncByFinger()
+    {
+        $attendanceUnitId = $this->request->getVar('attendance_unit_id');
+        $employeeUnitAll = $this->EmployeesUnitsModel->where('attendances_unit_id', $attendanceUnitId)->where('deletedAt', null)->findAll();
+
+        // Get Employee Id Yang Sudah Terdaftar
+        $employeeIdArr = array();
+        foreach ($employeeUnitAll as $e) {
+            array_push($employeeIdArr, $e['employee_id']);
+        }
+
+        // Get All Excepct
+        $dataEmployee = $this->EmployeesModel->where('company_id', $this->this_company_id);
+        if (count($employeeIdArr) != 0) {
+            $dataEmployee->whereNotIn('id', $employeeIdArr);
+        }
+        $dataEmployeeList = $dataEmployee->orderBy('name', "asc")->findAll();
+
+        $dataResult = array();
+        foreach ($dataEmployeeList as $d) {
+            array_push($dataResult, [
+                'id' => $d['id'],
+                'name' => $d['name']
+            ]);
+        }
+
+        return response()->setJSON([
+            'status' => true,
+            'data' => $dataResult
+        ]);
+    }
+
+    public function syncEmployeeFinger()
+    {
+        try {
+            $attendanceUnitId = $this->request->getVar('attendances_unit_id');
+            $employeeUnitArr = [];
+            $employeeFingerArr = [];
+
+            $employeeIds = json_decode($this->request->getVar('employee_id'));
+
+            if (empty($employeeIds)) {
+                return response()->setJSON([
+                    'message' => "Tidak ada data karyawan",
+                    'status' => false,
+                    'token' => csrf_hash()
+                ]);
+            }
+
+            foreach ($employeeIds as $e) {
+                $employeeUnitArr[] = [
+                    'employee_id' => $e,
+                    'attendances_unit_id' => $attendanceUnitId
+                ];
+
+                $employeeFingerArr[] = [
+                    'id' => $e,
+                    'attendance_sync' => 1
+                ];
+            }
+
+            $this->EmployeesModel->updateBatch($employeeFingerArr, 'id');
+            $this->EmployeesUnitsModel->insertBatch($employeeUnitArr);
+
+            return response()->setJSON([
+                'message' => "Berhasil sinkronisasi data",
+                'status' => true,
+                'token' => csrf_hash()
+            ]);
+        } catch (Exception $e) {
+            return response()->setJSON([
+                'message' => $e->getMessage(),
+                'status' => false,
+                'token' => csrf_hash()
+            ]);
+        }
+    }
+
+    public function getListStatusFinger()
+    {
+        try {
+            $employeeId = decrypt($this->request->getVar('employee_id'));
+            $attendanceUnit = $this->AttendanceUnitModel->where('company_id', $this->this_company_id)->where('deletedAt', null)->findAll();
+            $resultData = array();
+
+            foreach ($attendanceUnit as $a) {
+                $employeeUnit = $this->EmployeesUnitsModel
+                    ->where('employee_id', $employeeId)
+                    ->where('attendances_unit_id', $a['id'])
+                    ->first();
+
+                array_push($resultData, [
+                    'id' => $a['id'],
+                    'employee_id' => $employeeId,
+                    'name' => $a['name'],
+                    'ip' => $a['ip'],
+                    'status' => $employeeUnit == null ? false : true,
+                ]);
+            }
+
+            $employee = $this->EmployeesModel->where('id', $employeeId)->first();
+
+            return response()->setJSON([
+                'status' => true,
+                'data' => [
+                    'finger' => $resultData,
+                    'employee' => $employee
+                ],
+                'token' => csrf_hash()
+            ]);
+        } catch (Exception $e) {
+            return response()->setJSON([
+                'message' => $e->getMessage(),
+                'status' => false,
+                'token' => csrf_hash()
+            ]);
+        }
+    }
+
+    public function deleteFinger()
+    {
+        try {
+            $attendanceUnitId = $this->request->getVar('attendance_unit_id');
+            $employeeId = $this->request->getVar('employee_id');
+
+            $this->EmployeesUnitsModel->where('employee_id', $employeeId)->where('attendances_unit_id', $attendanceUnitId)->delete(null, true);
+            $employeeUnit = $this->EmployeesUnitsModel
+                ->where('employee_id', $employeeId)
+                ->findAll();
+
+            if (count($employeeUnit) == 0) {
+                // UPDATE ATTENDANCE SYNC
+                $this->EmployeesModel->update($employeeId, ['attendance_sync' => 0]);
+            }
+
+            // TODO REMOVE DI FINGER
+
+            return response()->setJSON([
+                'status' => true,
+                'message' => "Finger & Karyawan berhasil dihapus",
+                'token' => csrf_hash()
+            ]);
+        } catch (Exception $e) {
+            return response()->setJSON([
+                'message' => $e->getMessage(),
+                'status' => false,
+                'token' => csrf_hash()
+            ]);
+        }
     }
 }
