@@ -93,6 +93,7 @@ class TandaTerimaFakturDetailModel extends Model
                 'kode_satuan' => $d['unit'],
                 'supplier_name' => $dataTandaTerimaFaktur == null ? '' : $dataTandaTerimaFaktur['supplier_name'],
                 'harga' => $d['price_single'],
+                'harga_total' => $d['price'],
                 'divisi_id' =>  $dataTandaTerimaFaktur == null ? '' : $dataTandaTerimaFaktur['divisi_id'],
                 'supplier_id' =>  $dataTandaTerimaFaktur == null ? '' : $dataTandaTerimaFaktur['supplier_id'],
             ];
