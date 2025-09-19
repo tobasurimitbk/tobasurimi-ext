@@ -70,7 +70,7 @@
                                     <td style="text-align: center;"><?= $l['po_no'] ?></td> -->
                                     <td style="text-align: center;"><?= $l['kode_barang'] ?></td>
                                     <td style="text-align: center;"><?= $l['barang_name'] ?></td>
-                                    <td style="text-align: center;"><?= number_format($l['qty_po'], 2) ?></td>
+                                    <td style="text-align: center;"><?= $bcPo['po_type'] == "LOKAL PENOLONG" ? "" : number_format($l['qty_po'], 2) ?></td>
                                     <td style="text-align: center;"><?= number_format($l['qty_lpb'], 2) ?></td>
                                     <td style="text-align: center;" id="harga"><?= number_format($l['harga'], 2) ?></td>
                                     <td style="text-align: center;" class="body-table-info-status-barang-root-view" data-id="<?= encrypt($l['penerimaan_barang_id']) ?>">
