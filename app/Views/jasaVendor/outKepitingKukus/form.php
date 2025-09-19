@@ -172,7 +172,17 @@
                             <label for="floatingInput" style="z-index: 1;">Warehouse</label>
                         </div>
                     </div>
-                    <div class="col-md-3">
+                    <div class="col-md-4">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <select class="form-select jenis_barang" id="jenis_barang" name="jenis_barang">
+                                <option value="kukus">KEPITING KUKUS</option>
+                                <option value="buang_batok">BUANG BATOK</option>
+                                <option value="utuh">KEPITING UTUH</option>
+                            </select>
+                            <label for="floatingInput" style="z-index: 1;">Pilih Jenis Barang</label>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <select class="form-select barang_id" id="barang_id" name="barang_id">
                                 <option value=""></option>
@@ -387,6 +397,12 @@
     }).change(function() {
         changeStatus();
     });
+
+    $('#jenis_barang').select2({
+        placeholder: "Pilih Jenis Barang",
+        theme: "bootstrap-5",
+        allowClear: true
+    })
 
     $('#divisi_id').select2({
         placeholder: "Pilih Departemen",

@@ -127,12 +127,14 @@
             <?php if ($company['id'] != 15): ?>
                 <td>
                     <?php if ($company['id'] == 2): ?>
+                        <!-- KIM 2 -->
                         <div style="text-align: right; margin-left:-20px; margin-right:40px; ">
                             <img src="<?= $company['logo'] ?>" style="width: 140px; height:100px; text-align:right; margin-top:-5px" alt="">
                         </div>
                     <?php else : ?>
+                        <!-- KIM 1 -->
                         <div style="text-align: right; margin-left:-20px; margin-right:40px; ">
-                            <img src="<?= $company['logo'] ?>" style="width: 190px; text-align:right; margin-top:-5px" alt="">
+                            <img src="<?= $company['logo'] ?>" style="width: 190px; height:140px; text-align:right; margin-top:-5px" alt="">
                         </div>
                     <?php endif; ?>
                 </td>
@@ -171,10 +173,10 @@
                             </b>
 
                         </h1>
-                        <table style="width: 100%; margin-top:-15px; margin-left:-30px; font-size:12px;">
+                        <table style="width: 110%; margin-top:-15px; margin-left:-30px; font-size:12px;">
 
                             <tr style="vertical-align: top;">
-                                <td style="width: 50px;">Office</td>
+                                <td style="width: 10px;">Office</td>
                                 <td>:</td>
                                 <td>
                                     <?= $company['office_kop'] ?>
@@ -194,7 +196,7 @@
                     <h1 style="margin-top: -10px;">
                         <b><?= strtoupper($company['holding_company']) ?></b>
                     </h1>
-                    <table style="width: 100%; margin-top: -15px; font-size: 13px;">
+                    <table style="width: 100%; margin-top: -15px; font-size: 12px;">
                         <tr>
                             <td style="text-align: center;">
                                 <?= $company['factory'] ?>
@@ -447,7 +449,7 @@
                 <td style="padding: 6px; border: 1px solid #ddd; vertical-align: top;"></td>
                 <td style="padding: 6px; border: 1px solid #ddd; vertical-align: top;">
                     <b>
-                        TOTAL
+                        GRAND TOTAL
                     </b>
                 </td>
                 <td style="padding: 6px; border: 1px solid #ddd; vertical-align: top;"><b><?= number_format($totalQty, 2) ?></b></td>
@@ -461,10 +463,25 @@
                             <?= number_format($totalTotalHarga, 2) ?>
                         </span>
                     </b>
-
-
                 </td>
             </tr>
+            <?php foreach ($dataPIBiaya as $d): ?>
+                <tr style="border-bottom: 1px solid #eee;">
+                    <td style="padding: 6px; border: 1px solid #ddd; vertical-align: top;"></td>
+                    <td style="padding: 6px; border: 1px solid #ddd; vertical-align: top;" colspan="3">
+                        <b>
+                            <?= $d['biaya_tambahan'] ?>
+                        </b>
+                    </td>
+                    <td style="padding: 6px; border: 1px solid #ddd; vertical-align: top;">
+                        <b>
+                            <span class="text-align:right;" style="<?= $d['tipe_biaya_tambahan'] == "MINUS" ? 'color:red' : '' ?>">
+                                <?= number_format($d['nilai_biaya_tambahan'], 2) ?>
+                            </span>
+                        </b>
+                    </td>
+                </tr>
+            <?php endforeach; ?>
             <?php foreach ($dataPIPaymentTerm as $d): ?>
                 <?php
                 if ($d['is_penagihan']) {

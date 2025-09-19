@@ -88,7 +88,7 @@
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3">
-                            <input value="<?= !empty($dataPI) ? $dataPI['alamat_customer'] :  $dataSalesOrderExport->address ?>" autocomplete="one-time-code" type="text" name="alamat_customer" id="alamat_customer" class="form-control alamat_customer">
+                            <input <?= !empty($dataPI) ? ($dataPI['status_posting'] == 1 ? 'readonly' : '') : '' ?> value="<?= !empty($dataPI) ? $dataPI['alamat_customer'] :  $dataSalesOrderExport->address ?>" autocomplete="one-time-code" type="text" name="alamat_customer" id="alamat_customer" class="form-control alamat_customer" placeholder="Alamat Customer">
                             <label for="floatingInput">Alamat Customer</label>
                         </div>
                     </div>
@@ -180,7 +180,7 @@
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3">
-                            <input value="<?= !empty($dataPI) ? $dataPI['penanda_tangan'] : '' ?>" <?= !empty($dataPI) ? ($dataPI['status_posting'] == 1 ? 'readonly' : '') : '' ?> autocomplete="one-time-code" type="text" class="form-control penanda_tangan" id="penanda_tangan" name="penanda_tangan">
+                            <input value="<?= !empty($dataPI) ? $dataPI['penanda_tangan'] : '' ?>" <?= !empty($dataPI) ? ($dataPI['status_posting'] == 1 ? 'readonly' : '') : '' ?> autocomplete="one-time-code" type="text" class="form-control penanda_tangan" id="penanda_tangan" name="penanda_tangan" placeholder="Penanda Tangan">
                             <label for="floatingInput">Penanda Tangan</label>
                         </div>
                     </div>
@@ -225,6 +225,42 @@
                             <tfoot class="foot-barang" id="foot-barang">
                                 <tr>
                                     <td colspan="7">List Barang Kosong</td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="col-subtitle-modal mt-5">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <label class="form-label font-weight-bold modal-sub-title">List Biaya Tambahan</label>
+                        </div>
+                        <div class="col-md-6">
+                            <button <?= !empty($dataPI) ? ($dataPI['status_posting'] == 1 ? 'disabled' : '') : '' ?> class="btn btn-show-detail btn-add btn-block float-right" id="btnBiayaTambahan" type="button" style="width: 90% !important;">
+                                <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row mb-5">
+                    <div class="table-responsive">
+                        <table class="table table-bordered nowrap table-hover-tobasurimi dataTable" id="biayaTambahanTable" width="100%" cellspacing="0">
+                            <thead class="thead-dark">
+                                <tr>
+                                    <th style="width: 10px;">No</th>
+                                    <th>Biaya Tambahan</th>
+                                    <th style="width: 120px;">Total Biaya</th>
+                                    <th style="width: 100px;">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody class="body-biaya-tambahan" id="body-biaya-tambahan">
+
+                            </tbody>
+                            <tfoot class="foot-biaya-tambahan" id="foot-biaya-tambahan">
+                                <tr>
+                                    <td colspan="4">List Biaya Tambahan Kosong</td>
                                 </tr>
                             </tfoot>
                         </table>
@@ -382,10 +418,91 @@
     </div>
 </div>
 
+<div class="modal detail-modal" id="biayaTambahanModal" tabindex="1">
+    <div class="modal-dialog" style="min-width: 900px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title title-secondary"><label id="label-detail-biaya-tambahan"></label> Biaya Tambahan</h5>
+            </div>
+            <form class="create-form-biaya-tambahan" role="form" method="POST">
+                <input type="hidden" name="id_biaya_tambahan" id="id_biaya_tambahan">
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input autocomplete="one-time-code" type="text" class="form-control biaya_tambahan" id="biaya_tambahan" name="biaya_tambahan" placeholder="Deskripsi Biaya Tambahan">
+                                <label for="floatingInput">Deskripsi</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <select name="tipe_biaya_tambahan" id="tipe_biaya_tambahan" class="form-control tipe_biaya_tambahan">
+                                        <option value="PLUS">PLUS (+)</option>
+                                        <option value="MINUS">MINUS (-)</option>
+                                    </select>
+                                </div>
+                                <div class="form-floating mb-3" style="height: 50px;">
+                                    <input autocomplete="one-time-code" type="text" oninput="this.value = greatFormatRupiah(this.value)" class="form-control nilai_biaya_tambahan" id="nilai_biaya_tambahan" name="nilai_biaya_tambahan" placeholder="Nilai Biaya Tambahan">
+                                    <label for="floatingInput">Nilai</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-discard mr-2" id="btnHideBiayaTambahan">Kembali</button>
+                    <button type="button" class="btn btn-submit-form" id="btnSubmitBiayaTambahan">Simpan</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<?php if (in_array(session()->get('login')->this_company_id, [1, 2]) && !empty($dataPI)): ?>
+    <div class="modal kopsurat-modal" tabindex="1">
+        <div class="modal-dialog" style="min-width: 900px;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title title-secondary">Pilih Kop Surat</h5>
+                </div>
+                <form class="form-kop-surat">
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-floating mb-3" style="height: 50px;">
+                                    <select
+                                        class="form-select company_id"
+                                        aria-label="Floating label select example"
+                                        name="company_id"
+                                        id="company_id">
+                                        <option value=""></option>
+                                        <?php foreach ($dataCompany as $d) : ?>
+                                            <option value="<?= $d['id'] ?>" <?= $d['id'] == session()->get('login')->this_company_id ? 'selected' : '' ?>>
+                                                <?= $d['company'] ?>
+                                            </option>
+                                        <?php endforeach; ?>
+                                    </select>
+                                    <label for="floatingInput" style="z-index: 1;">Pilih Kop Surat Printout</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-hide-detail btn-discard mr-3" id="btn-hide-kopsurat">Back</button>
+                        <button type="button" onclick="print2()" class="btn btn-submit-form">Print</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+<?php endif; ?>
+
 <script>
     const csrfToken = '<?= csrf_token() ?>';
     var listBarang = [];
     var listPaymentTerm = [];
+    var listBiayaTambahan = [];
 
     $(document).ready(function() {
         <?php if (!empty($dataPI)) { ?>
@@ -410,8 +527,18 @@
                     presentase: <?= $d['presentase'] ?>
                 });
             <?php endforeach ?>
+
+            <?php foreach ($dataPIBiaya as $d): ?>
+                listBiayaTambahan.push({
+                    id_biaya_tambahan: "<?= $d['id'] ?>",
+                    biaya_tambahan: "<?= $d['biaya_tambahan'] ?>",
+                    tipe_biaya_tambahan: "<?= $d['tipe_biaya_tambahan'] ?>",
+                    nilai_biaya_tambahan: <?= floatval($d['nilai_biaya_tambahan']) ?>
+                });
+            <?php endforeach; ?>
             drawTableBarang(listBarang);
             drawTablePaymentTerm(listPaymentTerm);
+            drawTableBiayaTambahan(listBiayaTambahan);
 
         <?php } else { ?>
 
@@ -441,15 +568,26 @@
             dropdownParent: $('#barangModal')
         }).change(function() {});
 
+        $('.company_id').select2({
+            placeholder: "Pilih Kop Surat",
+            theme: "bootstrap-5",
+            dropdownParent: $('.kopsurat-modal')
+        }).change(function() {});
+
+        $('#btn-hide-kopsurat').click(function(e) {
+            e.preventDefault();
+            $('.kopsurat-modal').modal('hide');
+        });
+
         //CSS SELECT2 FLOATING LABEL
-        $('.bank_id, .tax_id, .customer_id,.barang_id,.valas_id,.satuan_id')
+        $('.bank_id, .tax_id, .customer_id,.barang_id,.valas_id,.satuan_id,.company_id')
             .parent('div')
             .children('span')
             .children('span')
             .children('span')
             .css('height', ' calc(3.5rem + 2px)');
 
-        $('.bank_id, .tax_id, .customer_id,.barang_id,.valas_id,.satuan_id')
+        $('.bank_id, .tax_id, .customer_id,.barang_id,.valas_id,.satuan_id,.company_id')
             .parent('div')
             .children('span')
             .children('span')
@@ -457,7 +595,7 @@
             .children('span')
             .css('margin-top', '22px').css('margin-left', '-7px');
 
-        $('.bank_id, .tax_id, .customer_id,.barang_id,.valas_id,.satuan_id')
+        $('.bank_id, .tax_id, .customer_id,.barang_id,.valas_id,.satuan_id,.company_id')
             .parent('div')
             .find('label')
             .css('z-index', '1');
@@ -639,6 +777,45 @@
             },
         });
 
+        var validatorBiayaTambahan = $(".create-form-biaya-tambahan").validate({
+            rules: {
+                biaya_tambahan: {
+                    required: true
+                },
+                nilai_biaya_tambahan: {
+                    required: true
+                },
+            },
+            messages: {
+                biaya_tambahan: {
+                    required: "Deskripsi wajib diisi"
+                },
+                nilai_biaya_tambahan: {
+                    required: "Biaya tambahan wajib diisi"
+                },
+            },
+            errorElement: 'span',
+            errorClass: 'text-danger',
+            errorPlacement: function(error, element) {
+                var elem = $(element);
+                if (elem.hasClass("select2-hidden-accessible")) {
+                    element = $("#select2-" + elem.attr("id") + "-container").parent();
+                    error.insertAfter(element);
+                } else {
+                    error.insertAfter(element);
+                }
+            },
+            highlight: function(element) {
+                $(element).closest('.form-group').addClass('has-error');
+                $(element).addClass('select-class');
+
+            },
+            unhighlight: function(element) {
+                $(element).closest('.form-group').removeClass('has-error');
+                $(element).removeClass('select-class');
+            },
+        });
+
 
         $('#btnAddPaymentTerm').click(function(e) {
             e.preventDefault();
@@ -652,6 +829,49 @@
                 $("#label-payment-term").text("Tambah ");
                 $('#paymentTermModal').modal('show');
                 resetFormPaymentTerm();
+            }
+        });
+
+        $('#btnBiayaTambahan').click(function() {
+            resetFormBiayaTambahan();
+            $('#label-detail-biaya-tambahan').text('Tambah ');
+            $('#biayaTambahanModal').modal('show');
+        });
+
+        $('#btnSubmitBiayaTambahan').click(function(e) {
+            e.preventDefault();
+            if ($('.create-form-biaya-tambahan').valid()) {
+                var idBiayaTambahan = $('#id_biaya_tambahan').val();
+                var biayaTambahan = $('#biaya_tambahan').val();
+                var tipeBiayaTambahan = $('#tipe_biaya_tambahan').val();
+                var nilaiBiayaTambahan = destroyFormatRupiah($('#nilai_biaya_tambahan').val());
+
+                if (idBiayaTambahan) {
+                    // UPDATE
+                    var index = null;
+                    for (var i = 0; i < listBiayaTambahan.length; i++) {
+                        if (listBiayaTambahan[i].id_biaya_tambahan == idBiayaTambahan) {
+                            index = i;
+                            break;
+                        }
+                    }
+
+                    listBiayaTambahan[index].biaya_tambahan = biayaTambahan;
+                    listBiayaTambahan[index].tipe_biaya_tambahan = tipeBiayaTambahan;
+                    listBiayaTambahan[index].nilai_biaya_tambahan = nilaiBiayaTambahan;
+                } else {
+                    // CREATE
+                    idBiayaTambahan = getID();
+                    listBiayaTambahan.push({
+                        id_biaya_tambahan: idBiayaTambahan,
+                        biaya_tambahan: biayaTambahan,
+                        tipe_biaya_tambahan: tipeBiayaTambahan,
+                        nilai_biaya_tambahan: nilaiBiayaTambahan
+                    });
+                }
+
+                $('#biayaTambahanModal').modal('hide');
+                drawTableBiayaTambahan(listBiayaTambahan);
             }
         });
 
@@ -722,6 +942,9 @@
             }
         });
 
+        $('#btnHideBiayaTambahan').click(function() {
+            $('#biayaTambahanModal').modal('hide');
+        });
 
         $('#btnHidePaymentTerm').click(function(e) {
             e.preventDefault();
@@ -834,6 +1057,7 @@
                             data.append("total_pi", totalPI);
                             data.append("listBarang", JSON.stringify(listBarang));
                             data.append("listPaymentTerm", JSON.stringify(listPaymentTerm));
+                            data.append("listBiayaTambahan", JSON.stringify(listBiayaTambahan));
 
                             $.ajax({
                                 url: url,
@@ -1015,6 +1239,86 @@
         recalculatePIPayed(listPaymentTerm);
     }
 
+    function drawTableBiayaTambahan(listBiayaTambahan) {
+        $('#body-biaya-tambahan').empty();
+        $('#foot-biaya-tambahan').empty();
+        var row = '';
+        var no = 1;
+        const table = $('#biayaTambahanTable');
+        if (listBiayaTambahan.length === 0) {
+            row += `
+                    <tr>
+                        <td colspan="4">List Additional Empty</td>
+                    </tr>
+                `;
+            $('#foot-biaya-tambahan').append(row);
+        } else {
+            listBiayaTambahan.map(item => {
+                var iconOperator = item.tipe_biaya_tambahan == "PLUS" ? "(+)" : "(-)";
+                var newRow = $('<tr style="color:whitesmoke;">');
+                newRow.append($('<td style="text-align:center;">').text(no++));
+                newRow.append($('<td>').text(item.biaya_tambahan));
+                newRow.append($('<td>').text(iconOperator + " " + greatFormatRupiah(item.nilai_biaya_tambahan)));
+                newRow.append($('<td>').html(
+                    <?php if (!empty($dataPI)) : ?> <?php if ($dataPI['status_posting'] == 1) : ?> `-`
+                        <?php else : ?> `
+                        <button type="button" class="btn btn-warning posting-spp mr-1" onclick="detailRowBiayaTambahan('${item.id_biaya_tambahan}')">
+                                <i class="fa fa-pencil fa-sm" aria-hidden="true"></i>
+                            </button><button type="button" class="btn btn-danger" onclick="deleteRowBiayaTambahan('${item.id_biaya_tambahan}')">
+                                <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
+                            </button>
+                    `
+                        <?php endif; ?>
+
+                    <?php else : ?> `
+                        <button type="button" class="btn btn-warning posting-spp mr-1" onclick="detailRowBiayaTambahan('${item.id_biaya_tambahan}')">
+                                <i class="fa fa-pencil fa-sm" aria-hidden="true"></i>
+                            </button><button type="button" class="btn btn-danger" onclick="deleteRowBiayaTambahan('${item.id_biaya_tambahan}')">
+                                <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
+                            </button>
+                    `
+                    <?php endif; ?>
+                ));
+
+                table.find('tbody').append(newRow);
+            });
+        }
+
+    }
+
+
+    function detailRowBiayaTambahan(id_biaya_tambahan) {
+        var item = null;
+        for (var i = 0; i < listBiayaTambahan.length; i++) {
+            if (listBiayaTambahan[i].id_biaya_tambahan == id_biaya_tambahan) {
+                item = listBiayaTambahan[i];
+                break;
+            }
+        }
+
+        $('#id_biaya_tambahan').val(item.id_biaya_tambahan);
+        $('#biaya_tambahan').val(item.biaya_tambahan);
+        $('#tipe_biaya_tambahan').val(item.tipe_biaya_tambahan);
+        $('#nilai_biaya_tambahan').val(greatFormatRupiah(item.nilai_biaya_tambahan));
+
+        $('#label-detail-biaya-tambahan').text("Update ");
+        $('#biayaTambahanModal').modal('show');
+    }
+
+    function deleteRowBiayaTambahan(id_biaya_tambahan) {
+        var indexToRemove = -1;
+        for (var i = 0; i < listBiayaTambahan.length; i++) {
+            if (listBiayaTambahan[i].id_biaya_tambahan == id_biaya_tambahan) {
+                indexToRemove = i;
+                break;
+            }
+        }
+        if (indexToRemove !== -1) {
+            listBiayaTambahan.splice(indexToRemove, 1);
+        }
+        drawTableBiayaTambahan(listBiayaTambahan);
+    }
+
 
     function detailRowBarang(id_barang) {
         var item = null;
@@ -1119,10 +1423,6 @@
         $('#total_pi').val(greatFormatRupiah(totalPaymentTerm));
     }
 
-    const print = function(id) {
-        window.open("<?= base_url('proforma-invoice/print') ?>" + '/' + id, "_blank");
-    }
-
     function posting() {
         Swal.fire({
             icon: 'question',
@@ -1212,6 +1512,41 @@
             }
         })
 
+    }
+
+
+    function print(id) {
+        $('#id').val(id);
+        <?php if (in_array(session()->get('login')->this_company_id, [1, 2])): ?>
+            $('.kopsurat-modal').modal('show');
+        <?php else: ?>
+            var companyId = "<?= session()->get('login')->this_company_id; ?>";
+            var url = "<?= base_url('proforma-invoice/print/') ?>" + id + '?company_id=' + companyId;
+            window.open(url, "_blank");
+        <?php endif; ?>
+    }
+
+    function print2() {
+        var id = $('#id').val();
+        var companyId = $('#company_id').val();
+        if (companyId == '') {
+            Swal.fire({
+                icon: 'error',
+                title: "Pilih kop surat perusahaan",
+                confirmButtonColor: '#4e73df',
+            });
+            return;
+        } else {
+            var url = "<?= base_url('proforma-invoice/print/') ?>" + id + '?company_id=' + companyId;
+            window.open(url, "_blank");
+        }
+    }
+
+    function resetFormBiayaTambahan() {
+        $('#id_biaya_tambahan').val(null);
+        $('#biaya_tambahan').val(null);
+        $('#tipe_biaya_tambahan').val("PLUS").change();
+        $('#nilai_biaya_tambahan').val(null);
     }
 </script>
 <?= $this->endSection(); ?>

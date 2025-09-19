@@ -104,8 +104,8 @@ class EmployeesModel extends Model
         $employeeQry = $this->asObject()
             ->select($selectQry)
             ->where($condition)
-            ->join('divisis', 'divisis.id = employees.division_id')
-            ->join('bagian', 'bagian.id = employees.bagian_id')
+            ->join('divisis', 'divisis.id = employees.division_id', 'left')
+            ->join('bagian', 'bagian.id = employees.bagian_id', 'left')
             ->orderBy($sort, $sortType);
 
         $totalData = $employeeQry->countAllResults(false);

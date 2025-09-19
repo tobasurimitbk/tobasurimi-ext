@@ -192,6 +192,7 @@ class InvPackingCustomer extends BaseController
     {
         $id = decrypt($id);
         $dataSalesOrderExport = $this->salesOrderExportModel->getById($id);
+        $dataCompany = $this->companyModel->whereIn('id', [1, 2])->findAll();
         if ($dataSalesOrderExport == null) {
             return redirect()->to('invoice-packing-customer');
         }
@@ -199,7 +200,8 @@ class InvPackingCustomer extends BaseController
         // dd($dataSalesOrderExport);
 
         $data = [
-            'dataSalesOrderExport' => $dataSalesOrderExport
+            'dataSalesOrderExport' => $dataSalesOrderExport,
+            'dataCompany' => $dataCompany
         ];
 
         return view('InvoiceExim/InvPackingCustomer/indexInv', $data);
@@ -251,6 +253,7 @@ class InvPackingCustomer extends BaseController
         $dataListBiayaTambahan = $this->invPackingCustomerBiayaModel->getByInvId(
             $id
         );
+        $dataCompany = $this->companyModel->whereIn('id', [1, 2])->findAll();
 
         $data = [
             'dataSalesOrderExport' => $dataSalesOrderExport,
@@ -261,7 +264,8 @@ class InvPackingCustomer extends BaseController
             'dataInvoice' => $dataInvoice,
             'dataListBarang' => $dataListBarang,
             'dataListPacking' => $dataListPacking,
-            'dataListBiayaTambahan' => $dataListBiayaTambahan
+            'dataListBiayaTambahan' => $dataListBiayaTambahan,
+            'dataCompany' => $dataCompany
         ];
 
         return view('InvoiceExim/InvPackingCustomer/formInv', $data);
@@ -307,6 +311,10 @@ class InvPackingCustomer extends BaseController
     public function printPackingCustomer($id)
     {
         $id = decrypt($id);
+        $companyId = $this->request->getVar('company_id');
+        if (empty($companyId)) {
+            $companyId = $this->this_company_id;
+        }
         $dataInvoice = $this->invPackingCustomerModel
             ->select('inv_packing_customer.*,metadata.value as valas_name')
             ->join('metadata', 'metadata.id = inv_packing_customer.valas_id', 'left')
@@ -330,7 +338,7 @@ class InvPackingCustomer extends BaseController
         $dataListBiayaTambahan = $this->invPackingCustomerBiayaModel->getByInvId(
             $id
         );
-        $company = $this->companyModel->where('id', $dataInvoice['company_id'])->first();
+        $company = $this->companyModel->where('id', $companyId)->first();
 
         $data = [
             'dataSalesOrderExport' => $dataSalesOrderExport,

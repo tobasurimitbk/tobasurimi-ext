@@ -8,6 +8,7 @@ use App\Models\CompaniesModel;
 use App\Models\DivisisModel;
 use App\Models\MetadataModel;
 use App\Models\ProformaInvoiceBarangModel;
+use App\Models\ProformaInvoiceBiayaModel;
 use App\Models\ProformaInvoiceModel;
 use App\Models\ProformaInvoiceTermModel;
 use App\Models\SalesOrderExportModel;
@@ -26,6 +27,7 @@ class PI extends BaseController
     protected $proformaInvoiceModel;
     protected $proformaInvoiceTermModel;
     protected $proformaInvoiceBarangModel;
+    protected $proformaInvoiceBiayaModel;
     protected $companyModel;
     protected $dompdf;
 
@@ -41,6 +43,7 @@ class PI extends BaseController
         $this->proformaInvoiceTermModel = new ProformaInvoiceTermModel();
         $this->proformaInvoiceBarangModel = new ProformaInvoiceBarangModel();
         $this->companyModel = new CompaniesModel();
+        $this->proformaInvoiceBiayaModel = new ProformaInvoiceBiayaModel();
         $this->dompdf = new Dompdf();
     }
 
@@ -193,6 +196,7 @@ class PI extends BaseController
     {
         $id = \decrypt($id);
         $dataSalesOrderExport = $this->salesOrderExportModel->getById($id);
+        $dataCompany = $this->companyModel->whereIn('id', [1, 2])->findAll();
         if ($dataSalesOrderExport == null) {
             return \redirect()->to('proforma-invoice');
         }
@@ -200,7 +204,8 @@ class PI extends BaseController
         // dd($dataSalesOrderExport);
 
         $data = [
-            'dataSalesOrderExport' => $dataSalesOrderExport
+            'dataSalesOrderExport' => $dataSalesOrderExport,
+            'dataCompany' => $dataCompany
         ];
 
         return view('InvoiceExim/PI/indexPI', $data);
@@ -243,6 +248,7 @@ class PI extends BaseController
         $dataSatuan = $this->satuanModel->findAll();
         $dataPIBarang = $this->proformaInvoiceBarangModel->getBarang($id);
         $dataPIPaymentTerm = $this->proformaInvoiceTermModel->where('proforma_invoice_id', $id)->where('deletedAt', null)->findAll();
+        $dataPIBiaya = $this->proformaInvoiceBiayaModel->where('proforma_invoice_id', $id)->where('deletedAt', null)->findAll();
 
         $data = [
             'dataSalesOrderExport' => $dataSalesOrderExport,
@@ -251,7 +257,8 @@ class PI extends BaseController
             'dataSatuan' => $dataSatuan,
             'dataPI' => $dataPI,
             'dataPIBarang' => $dataPIBarang,
-            'dataPIPaymentTerm' => $dataPIPaymentTerm
+            'dataPIPaymentTerm' => $dataPIPaymentTerm,
+            'dataPIBiaya' => $dataPIBiaya
         ];
 
         return view('InvoiceExim/PI/formPI_duplicate', $data);
@@ -273,6 +280,8 @@ class PI extends BaseController
         $dataSatuan = $this->satuanModel->findAll();
         $dataPIBarang = $this->proformaInvoiceBarangModel->getBarang($id);
         $dataPIPaymentTerm = $this->proformaInvoiceTermModel->where('proforma_invoice_id', $id)->where('deletedAt', null)->findAll();
+        $dataPIBiaya = $this->proformaInvoiceBiayaModel->where('proforma_invoice_id', $id)->where('deletedAt', null)->findAll();
+        $dataCompany = $this->companyModel->whereIn('id', [1, 2])->findAll();
 
         $data = [
             'dataSalesOrderExport' => $dataSalesOrderExport,
@@ -281,7 +290,9 @@ class PI extends BaseController
             'dataSatuan' => $dataSatuan,
             'dataPI' => $dataPI,
             'dataPIBarang' => $dataPIBarang,
-            'dataPIPaymentTerm' => $dataPIPaymentTerm
+            'dataPIPaymentTerm' => $dataPIPaymentTerm,
+            'dataPIBiaya' => $dataPIBiaya,
+            'dataCompany' => $dataCompany
         ];
 
         return view('InvoiceExim/PI/formPI', $data);
@@ -352,6 +363,15 @@ class PI extends BaseController
                 ]);
             }
 
+            foreach (json_decode($_POST['listBiayaTambahan']) as $l) {
+                $this->proformaInvoiceBiayaModel->insert([
+                    'proforma_invoice_id' => $id,
+                    'biaya_tambahan' => $l->biaya_tambahan,
+                    'tipe_biaya_tambahan' => $l->tipe_biaya_tambahan,
+                    'nilai_biaya_tambahan' => $l->nilai_biaya_tambahan
+                ]);
+            }
+
             return \response()->setJSON([
                 'status' => true,
                 'message' => "PI berhasil dibuat",
@@ -402,6 +422,7 @@ class PI extends BaseController
 
             $id_proforma_invoice_payment_term = [];
             $id_proforma_invoice_barang = [];
+            $id_proforma_invoice_biaya = [];
 
             foreach (\json_decode($_POST['listPaymentTerm']) as $l) {
                 $check = $this->proformaInvoiceTermModel
@@ -456,8 +477,33 @@ class PI extends BaseController
                 }
             }
 
+            foreach (json_decode($_POST['listBiayaTambahan']) as $l) {
+                $check = $this->proformaInvoiceBiayaModel
+                    ->where('id', $l->id_biaya_tambahan)
+                    ->first();
+
+                if ($check != null) {
+                    $this->proformaInvoiceBiayaModel->update($check['id'], [
+                        'biaya_tambahan' => $l->biaya_tambahan,
+                        'tipe_biaya_tambahan' => $l->tipe_biaya_tambahan,
+                        'nilai_biaya_tambahan' => $l->nilai_biaya_tambahan
+                    ]);
+
+                    array_push($id_proforma_invoice_biaya, $check['id']);
+                } else {
+                    $id_new = $this->proformaInvoiceBiayaModel->insert([
+                        'proforma_invoice_id' => $id,
+                        'biaya_tambahan' => $l->biaya_tambahan,
+                        'tipe_biaya_tambahan' => $l->tipe_biaya_tambahan,
+                        'nilai_biaya_tambahan' => $l->nilai_biaya_tambahan
+                    ]);
+                    array_push($id_proforma_invoice_biaya, $id_new);
+                }
+            }
+
             $this->proformaInvoiceBarangModel->whereNotIn('id', $id_proforma_invoice_barang)->where('proforma_invoice_id', $id)->delete();
             $this->proformaInvoiceTermModel->whereNotIn('id', $id_proforma_invoice_payment_term)->where('proforma_invoice_id', $id)->delete();
+            $this->proformaInvoiceBiayaModel->whereNotIn('id', $id_proforma_invoice_biaya)->where('proforma_invoice_id', $id)->delete();
 
             return \response()->setJSON([
                 'status' => true,
@@ -514,6 +560,11 @@ class PI extends BaseController
     public function printPI($id)
     {
         $id = \decrypt($id);
+        $companyId = $this->request->getVar('company_id');
+        if (empty($companyId)) {
+            $companyId = $this->this_company_id;
+        }
+
         $selectQry = "
             proforma_invoice.*,
             metadata.value as valas_name,
@@ -531,14 +582,16 @@ class PI extends BaseController
         $dataSalesOrderExport = $this->salesOrderExportModel->getById($dataPI['sales_order_export_id']);
         $dataPIBarang = $this->proformaInvoiceBarangModel->getBarang($id);
         $dataPIPaymentTerm = $this->proformaInvoiceTermModel->where('proforma_invoice_id', $id)->where('deletedAt', null)->findAll();
-        $company = $this->companyModel->where('id', $dataPI['company_id'])->first();
+        $dataPIBiaya = $this->proformaInvoiceBiayaModel->where('proforma_invoice_id', $id)->where('deletedAt', null)->findAll();
+        $company = $this->companyModel->where('id', $companyId)->first();
 
         $data = [
             'dataSalesOrderExport' => $dataSalesOrderExport,
             'dataPI' => $dataPI,
             'dataPIBarang' => $dataPIBarang,
             'dataPIPaymentTerm' => $dataPIPaymentTerm,
-            'company' => $company
+            'company' => $company,
+            'dataPIBiaya' => $dataPIBiaya
         ];
 
         $this->dompdf->loadHtml(view('InvoiceExim/PI/print', $data));

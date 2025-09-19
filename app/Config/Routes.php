@@ -88,9 +88,11 @@ $routes->post('/employee/update', 'Master\Employee::updateEmployee', ['filter' =
 $routes->post('/employee/delete', 'Master\Employee::deleteEmployee', ['filter' => 'Auth']);
 $routes->post('/employee/getKomponenGaji', 'Master\Employee::getKomponenGaji', ['filter' => 'Auth']);
 $routes->post('/employee/get-bagian', 'Master\Bagian::getBagianByDivision', ['filter' => 'Auth']);
-
+$routes->get('/employee/get-employee-not-sync-finger', 'Master\Employee::dropdownEmployeeNotSyncByFinger', ['filter' => 'Auth']);
+$routes->post('/employee/sync-employee-finger', 'Master\Employee::syncEmployeeFinger', ['filter' => 'Auth']);
+$routes->post('/employee/delete-employee-in-finger', 'Master\Employee::deleteFinger', ['filter' => 'Auth']);
 $routes->get('/employee/create', 'Master\Employee::createView', ['filter' => 'Auth']);
-
+$routes->get('/employee/get-employee-sync-finger', 'Master\Employee::getListStatusFinger', ['filter' => 'Auth']);
 // CUSTOMER
 $routes->get('/customer', 'Master\Customer::customer', ['filter' => 'Auth']);
 $routes->get('/customer/all', 'Master\Customer::allCustomer', ['filter' => 'Auth']);
@@ -1426,7 +1428,7 @@ $routes->get('/penerimaan-barang-lokal-bp', 'Warehouse\PenerimaanBarangLokalBP::
 $routes->get('/penerimaan-barang-lokal-bp/all', 'Warehouse\PenerimaanBarangLokalBP::all', ['filter' => 'Auth']);
 $routes->get('/penerimaan-barang-lokal-bp/create', 'Warehouse\PenerimaanBarangLokalBP::create', ['filter' => 'Auth']);
 $routes->post('/penerimaan-barang-lokal-bp/insert', 'Warehouse\PenerimaanBarangLokalBP::createAction', ['filter' => 'Auth']);
-$routes->get('/penerimaan-barang-lokal-bp/generate-po-no', 'Warehouse\PenerimaanBarangLokalBP::generatePONo', ['filter' => 'Auth']);
+$routes->get('/penerimaan-barang-lokal-bp/generate-lpb-no', 'Warehouse\PenerimaanBarangLokalBP::generateLPBNo', ['filter' => 'Auth']);
 $routes->get('/penerimaan-barang-lokal-bp/get-po', 'Purchase\POLokalBahanPenolong::dropdownPOBySpp', ['filter' => 'Auth']);
 $routes->get('/penerimaan-barang-lokal-bp/get-spp', 'Purchase\POLokalBahanPenolong::dropdownSPPBahanPenolong', ['filter' => 'Auth']);
 $routes->get('/penerimaan-barang-lokal-bp/list-barang', 'Warehouse\PenerimaanBarangLokalBP::listBarangLPB', ['filter' => 'Auth']);

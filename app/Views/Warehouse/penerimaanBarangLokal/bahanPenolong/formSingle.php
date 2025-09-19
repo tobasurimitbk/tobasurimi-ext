@@ -7,7 +7,7 @@
             <div class="form-floating mb-3" style="height: 50px;">
                 <div class="input-group input-group-password">
                     <div class="form-floating mb-3" style="height: 50px;">
-                        <input readonly autocomplete="one-time-code" <?= !empty($dataPenerimaanBarang) ? ($dataPenerimaanBarang['status_post'] === "FINISH" ? 'disabled=true' : '') : ''; ?> value="<?= !empty($dataPenerimaanBarang) ? $dataPenerimaanBarang['no_penerimaan_barang'] : "AUTO GENERATE" ?>" type="text" class="form-control no_penerimaan_barang" id="no_penerimaan_barang" name="no_penerimaan_barang" placeholder="No. Penerimaan">
+                        <input readonly autocomplete="one-time-code" <?= !empty($dataPenerimaanBarang) ? ($dataPenerimaanBarang['status_post'] === "FINISH" ? 'disabled=true' : '') : ''; ?> value="<?= !empty($dataPenerimaanBarang) ? $dataPenerimaanBarang['no_penerimaan_barang'] : "" ?>" type="text" class="form-control no_penerimaan_barang" id="no_penerimaan_barang" name="no_penerimaan_barang" placeholder="No. Penerimaan">
                         <label for="floatingInput">No. Penerimaan</label>
                     </div>
                     <div style="<?= !empty($dataPenerimaanBarang) ? "display: none" : ""; ?>" class="input-generate input-group-prepend group-prepend-password align-items-center">
@@ -116,7 +116,7 @@
         <div class="col-md-4">
             <div class="input-group input-group-password">
                 <div class="form-floating mb-3" style="height: 50px;">
-                    <input <?= !empty($dataPenerimaanBarang) ? ($dataPenerimaanBarang['status_post'] === "FINISH" ? 'disabled=true' : '') : ''; ?> autocomplete="one-time-code" value="<?= !empty($dataPenerimaanBarang) ?  date('d/m/Y', strtotime($dataPenerimaanBarang['tanggal'])) : ""; ?>" onchange="changeStatus()" type="text" class="form-control tanggal_penerimaan_lpb" name="tanggal_penerimaan_lpb" id="tanggal_penerimaan_lpb" placeholder="Tanggal Barang Diterima">
+                    <input <?= !empty($dataPenerimaanBarang) ? ($dataPenerimaanBarang['status_post'] === "FINISH" ? 'disabled=true' : '') : ''; ?> autocomplete="one-time-code" value="<?= !empty($dataPenerimaanBarang) ?  date('d/m/Y', strtotime($dataPenerimaanBarang['tanggal'])) : date('d/m/Y'); ?>" onchange="changeStatus()" type="text" class="form-control tanggal_penerimaan_lpb" name="tanggal_penerimaan_lpb" id="tanggal_penerimaan_lpb" placeholder="Tanggal Barang Diterima">
                     <label for="floatingInput">Tanggal Barang Diterima</label>
                 </div>
                 <div class="input-group-prepend group-prepend-password align-items-center">
@@ -219,7 +219,13 @@
     </div>
 </div>
 
-
+<?php if (empty($dataPenerimaanBarang)): ?>
+    <script>
+        $(document).ready(function() {
+            changeStatus();
+        });
+    </script>
+<?php endif; ?>
 
 <!-- Untuk Placeholder Aja Soalnya ini Ngeload Html dari Ajax -->
 <script>
@@ -728,6 +734,8 @@
 
     $('.jml_diterima_lpb').keyup(function() {
         var item = null;
+        var jml_order = destroyFormatRupiah($('.jml_order').val());
+        var sub_total_po = destroyFormatRupiah($('.sub_total_po').val());
         var jml_diterima_lpb = Number(destroyFormatRupiah($(this).val())) || 0;
         var jml_diterima_lpb_last = Number($('.jml_diterima_lpb_last').val()) || 0;
         if (jml_diterima_lpb == 0) {
@@ -741,7 +749,14 @@
                     //     greatFormatRupiah(Math.round(sub_total)));
                     // $('.jml_diterima_total').val(greatFormatRupiah(jml_diterima_total_now));
                     // $('.sisa_total').val(greatFormatRupiah(sisa_total_now));
-                    var sub_total = (Number(jml_diterima_lpb) * Number(item.harga));
+
+                    if (jml_diterima_lpb == jml_order) {
+                        // Total
+                        var sub_total = sub_total_po;
+                    } else {
+                        // Parsial
+                        var sub_total = (Number(jml_diterima_lpb) * Number(item.harga));
+                    }
                     $('.sub_total').val('' +
                         greatFormatRupiah((sub_total.toFixed(2))));
                     $('.jml_diterima_total').val(greatFormatRupiah(jml_diterima_total_now));
@@ -759,12 +774,15 @@
                     var jml_diterima_total_now = (Number(item.jml_diterima_total) + Number(jml_diterima_lpb) - jml_diterima_lpb_last);
                     var sisa_total_now = Math.floor((item.jml_order - jml_diterima_total_now) * 1000) / 1000;
 
-                    // var sub_total = Math.floor((Number(jml_diterima_lpb) * Number(item.harga)) * 1000) / 1000;
-                    // $('.sub_total').val('' +
-                    //     greatFormatRupiah(Math.round(sub_total)));
-                    // $('.jml_diterima_total').val(greatFormatRupiah(jml_diterima_total_now));
-                    // $('.sisa_total').val(greatFormatRupiah(sisa_total_now));
-                    var sub_total = (Number(jml_diterima_lpb) * Number(item.harga));
+                    if (jml_diterima_lpb == jml_order) {
+                        // Total
+                        var sub_total = sub_total_po;
+
+                    } else {
+                        // Parsial
+                        var sub_total = (Number(jml_diterima_lpb) * Number(item.harga));
+                    }
+
                     $('.sub_total').val('' +
                         greatFormatRupiah(sub_total.toFixed(2)));
                     $('.jml_diterima_total').val(greatFormatRupiah(jml_diterima_total_now));
@@ -824,13 +842,13 @@
                 newRow.append($('<td>').text(v.spp_no));
                 // newRow.append($('<td>').text(v.po_no));
                 newRow.append($('<td>').text(v.satuan));
-                newRow.append($('<td>').text(parseFloat(v.jml_order)));
-                newRow.append($('<td>').text(parseFloat(v.jml_diterima_lpb)));
+                newRow.append($('<td>').text(greatFormatRupiah(parseFloat(v.jml_order))));
+                newRow.append($('<td>').text(greatFormatRupiah(parseFloat(v.jml_diterima_lpb))));
                 newRow.append(
-                    $('<td>').text(parseFloat(v.jml_diterima_lpb_konversi) + " (" + v.satuan_konversi + ")")
+                    $('<td>').text(greatFormatRupiah(parseFloat(v.jml_diterima_lpb_konversi)) + " (" + v.satuan_konversi + ")")
                 );
-                newRow.append($('<td>').text(parseFloat(v.jml_diterima_total)));
-                newRow.append($('<td>').text(parseFloat(v.sisa_total)));
+                newRow.append($('<td>').text(greatFormatRupiah(parseFloat(v.jml_diterima_total))));
+                newRow.append($('<td>').text(greatFormatRupiah(parseFloat(v.sisa_total))));
                 newRow.append($('<td>').text(greatFormatRupiah(v.harga.toFixed(2))));
                 newRow.append($('<td>').text(greatFormatRupiah(v.sub_total.toFixed(2))));
                 newRow.append($('<td>').text(v.keterangan));
@@ -869,11 +887,11 @@
             newRow.append($('<td></td>'));
             newRow.append($('<td></td>'));
             newRow.append($('<td style="text-align:right;" colspan="3"><b>GRAND TOTAL</b></td>'));
-            newRow.append($('<td style="text-align:left;"><b>' + Math.floor(jmlOrderTotal * 1000) / 1000 + '</b></td>'));
-            newRow.append($('<td style="text-align:left;"><b>' + Math.floor(jmlDiterimaLPBTotal * 1000) / 1000 + '</b></td>'));
-            newRow.append($('<td style="text-align:left;">' + Math.floor(jmlDiterimaLpbKonversi * 1000) / 1000 + '</td>'));
-            newRow.append($('<td style="text-align:left;"><b>' + Math.floor(jmlDiterimaTotal * 1000) / 1000 + '</b></td>'));
-            newRow.append($('<td style="text-align:left;"><b>' + Math.floor(sisaTotal * 1000) / 1000 + '</b></td>'));
+            newRow.append($('<td style="text-align:left;"><b>' + greatFormatRupiah(Math.floor(jmlOrderTotal * 1000) / 1000) + '</b></td>'));
+            newRow.append($('<td style="text-align:left;"><b>' + greatFormatRupiah(Math.floor(jmlDiterimaLPBTotal * 1000) / 1000) + '</b></td>'));
+            newRow.append($('<td style="text-align:left;">' + greatFormatRupiah(Math.floor(jmlDiterimaLpbKonversi * 1000) / 1000) + '</td>'));
+            newRow.append($('<td style="text-align:left;"><b>' + greatFormatRupiah(Math.floor(jmlDiterimaTotal * 1000) / 1000) + '</b></td>'));
+            newRow.append($('<td style="text-align:left;"><b>' + greatFormatRupiah(Math.floor(sisaTotal * 1000) / 1000) + '</b></td>'));
             newRow.append($('<td style="text-align:left;"><b>' + greatFormatRupiah(parseFloat(hargaTotal).toFixed(2) || 0) + '</b></td>'));
             newRow.append($('<td style="text-align:left;"><b>' + greatFormatRupiah(parseFloat(subTotal).toFixed(2) || 0) + '</b></td>'));
             newRow.append($('<td></td>'));
@@ -900,15 +918,16 @@
         $('.kode_barang').val(item.kode_barang);
         $('.nama_barang').val(item.nama_barang);
         $('.satuan_order').val(item.satuan);
-        $('.jml_order').val(item.jml_order);
+        $('.jml_order').val(greatFormatRupiah(item.jml_order));
         $('.keterangan').val(item.keterangan);
-        $('.jml_diterima_lpb').val(item.jml_diterima_lpb == 0 ? '' : item.jml_diterima_lpb);
-        $('.jml_diterima_total').val(parseFloat(item.jml_diterima_total));
-        $('.sisa_total').val(parseFloat(item.sisa_total));
+        $('.jml_diterima_lpb').val(item.jml_diterima_lpb == 0 ? '' : greatFormatRupiah(item.jml_diterima_lpb));
+        $('.jml_diterima_total').val(greatFormatRupiah(parseFloat(item.jml_diterima_total)));
+        $('.sisa_total').val(greatFormatRupiah(parseFloat(item.sisa_total)));
         $('.nama_barang_dokumen').val(item.nama_barang_master);
         $('.harga_satuan').val("" + greatFormatRupiah(Number(item.harga) || 0));
         $('.sub_total').val("" + greatFormatRupiah(Number(item.sub_total) || 0));
         $('.jml_diterima_lpb_last').val(item.jml_diterima_lpb);
+        $('.sub_total_po').val(item.sub_total_po);
     }
 
     function deleteDetail(am_purchase_order_id, am_purchase_order_details_id) {
@@ -928,8 +947,27 @@
     function changeStatus() {
         let value = document.getElementById('auto_generate').checked ? true : false;
         if (value) {
-            $(".no_penerimaan_barang").attr("readonly", true);
-            $(".no_penerimaan_barang").val("AUTO GENERATE");
+            $.ajax({
+                url: `<?= base_url("/penerimaan-barang-lokal-bp/generate-lpb-no"); ?>`,
+                method: "GET",
+                dataType: "json",
+                data: {
+                    tanggal: $('#tanggal_penerimaan_lpb').val()
+                },
+                success: function(res) {
+                    if (res.status) {
+                        $(".no_penerimaan_barang").val(res.data);
+                        $(".no_penerimaan_barang").attr("readonly", true);
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: res.message,
+                            confirmButtonColor: '#4e73df',
+                        })
+
+                    }
+                }
+            })
         } else {
             $(".no_penerimaan_barang").attr("readonly", false);
             $(".no_penerimaan_barang").val("");

@@ -325,11 +325,10 @@
                                 $('<input>').attr({
                                     'type': 'text',
                                     'name': data.id,
-                                    'class': 'form-control',
+                                    'class': 'form-control komponen-gaji',
                                     'value': (data.nominal == null) ?
-                                        "Rp. 0,00" : formatRupiah(data.nominal),
-                                    'onkeyup': "this.value = this.value.replace(/[^0-9,]/g, '');",
-                                    'onChange': 'this.value = formatRupiah(this.value);'
+                                        "0,00" : greatFormatRupiah(data.nominal),
+                                    'onkeyup': "this.value = greatFormatRupiah(this.value)",
                                 })
                             ).append(
                                 $('<label>').attr('for', 'floatingInput').text(data.name)
@@ -353,22 +352,6 @@
 <script>
     const csrfToken = '<?= csrf_token() ?>';
     const csrf = $(`[name="${csrfToken}"]`);
-
-    // $(".nik").mask("AAAAAAAAAAAAAAAA", {
-    //     translation: {
-    //         // "A": {
-    //         //     pattern: /[0-9]/,
-    //         // }
-    //     }
-    // });
-
-    // $(".nip").mask("AAAAAAAAAAAAAAAAAA", {
-    //     translation: {
-    //         // "A": {
-    //         //     pattern: /[0-9]/,
-    //         // }
-    //     }
-    // });
 
     $('#gender').select2({
         placeholder: "Pilih Jenis Kelamin",
@@ -606,82 +589,68 @@
                 cancelButtonText: 'Kembali',
             }).then((result) => {
                 if (result.isConfirmed) {
+                    $(".komponen-gaji").each(function() {
+                        $(this).val(destroyFormatRupiah($(this).val()));
+                    });
+
                     const csrf = $(`[name="${csrfToken}"]`);
                     let data = new FormData(document.querySelector("#create-form"));
                     let id = $(".id").val();
+                    let url = id == '' ? '<?= base_url("employee/save") ?>' : '<?= base_url("employee/update"); ?>';
 
-                    // UPDATE
-                    if (id) {
-                        $.ajax({
-                            url: "<?= base_url("employee/update"); ?>",
-                            data: data,
-                            beforeSend: function(xhr) {
-                                xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                                setLoading();
-                            },
-                            complete: function() {
-                                stopLoading();
-                            },
-                            method: "POST",
-                            dataType: "json",
-                            processData: false,
-                            contentType: false,
-                            success: function(response) {
-                                csrf.val(response.token);
-                                if (response.status) {
-                                    stopLoading()
-                                    Swal.fire({
-                                            icon: 'success',
-                                            title: response.message,
-                                            confirmButtonColor: '#4e73df',
-                                        })
-                                        .then(() => {
-                                            location.reload();
-                                        })
-                                } else {
-                                    Swal.fire({
-                                        icon: 'error',
+                    $.ajax({
+                        url: url,
+                        data: data,
+                        beforeSend: function(xhr) {
+                            xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                            setLoading();
+                        },
+                        complete: function() {
+                            stopLoading();
+                        },
+                        method: "POST",
+                        dataType: "json",
+                        processData: false,
+                        contentType: false,
+                        success: function(response) {
+                            csrf.val(response.token);
+                            if (response.status) {
+                                Swal.fire({
+                                        icon: 'success',
                                         title: response.message,
                                         confirmButtonColor: '#4e73df',
                                     })
-                                }
-                            },
-                        });
-                    }
-                    // CREATE
-                    else {
-                        $.ajax({
-                            url: "<?= base_url("employee/save"); ?>",
-                            data: data,
-                            beforeSend: function(xhr) {
-                                xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                                setLoading();
-                            },
-                            complete: function() {
-                                stopLoading();
-                            },
-                            method: "POST",
-                            dataType: "json",
-                            processData: false,
-                            contentType: false,
-                            success: function(response) {
-                                csrf.val(response.token);
-                                if (response.status) {
-                                    stopLoading()
-                                    Swal.fire({
-                                            icon: 'success',
-                                            title: response.message,
-                                            confirmButtonColor: '#4e73df',
-                                        })
-                                        .then(() => {
-                                            window.location.replace("<?= base_url('employee/id/') ?>" + response.id)
-
-                                        })
-                                }
-
-                            },
-                        });
-                    }
+                                    .then(() => {
+                                        if (id == '') {
+                                            Swal.fire({
+                                                icon: 'question',
+                                                title: 'Input Karyawan Lagi ?',
+                                                confirmButtonColor: '#4e73df',
+                                                cancelButtonColor: '#d33',
+                                                showCancelButton: true,
+                                                reverseButtons: true,
+                                                confirmButtonText: 'Ya',
+                                                cancelButtonText: 'Tidak',
+                                            }).then((result) => {
+                                                if (result.isConfirmed) {
+                                                    window.location.href = "<?= base_url('employee/create') ?>";
+                                                } else {
+                                                    window.location.href = "<?= base_url('employee') ?>";
+                                                }
+                                            })
+                                        } else {
+                                            window.location.href = "<?= base_url('employee') ?>";
+                                        }
+                                    })
+                            } else {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: response.message,
+                                    confirmButtonColor: '#4e73df',
+                                })
+                            }
+                        },
+                    });
                 }
             })
         }
@@ -779,11 +748,10 @@
                                 $('<input>').attr({
                                     'type': 'text',
                                     'name': data.id,
-                                    'class': 'form-control',
+                                    'class': 'form-control komponen-gaji',
                                     'value': (data.nominal == null) ?
-                                        "Rp. 0,00" : formatRupiah(data.nominal),
-                                    'onkeyup': "this.value = this.value.replace(/[^0-9,]/g, '');",
-                                    'onChange': 'this.value = formatRupiah(this.value);'
+                                        "0,00" : greatFormatRupiah(data.nominal),
+                                    'onkeyup': 'this.value = greatFormatRupiah(this.value);'
                                 })
                             ).append(
                                 $('<label>').attr('for', 'floatingInput').text(data.name)
@@ -804,24 +772,12 @@
         });
     }
 
-    function formatRupiah(angka) {
-        angka = angka.replace(/\./g, ',');
-        angka = angka.replace(/[^\d,]/g, '');
-        var parts = angka.split(',');
-        var ribuan = parts[0];
-        var desimal = parts[1] || '00';
-        var reverse = ribuan.toString().split('').reverse().join('');
-        var ribuanFormatted = reverse.match(/\d{1,3}/g).join('.').split('').reverse().join('');
-        return 'Rp. ' + ribuanFormatted + ',' + desimal;
-    }
-
     function previewPhoto() {
         let file = document.getElementById("employeeImg").files[0];
         document.getElementById("preview_photo").src = window.URL.createObjectURL(file);
     }
 
     var tabelRiwayatPayroll = $('#tabel-riwayat-payroll').DataTable({
-
         lengthChange: true,
         info: false,
         paging: true,

@@ -1722,6 +1722,13 @@ class RMPurchaseOrderModel extends Model
             $nilaiAfterPph = $nilaiBeforePph;
         }
 
+        if ($pphMode == "None") {
+            $nilaiTotalUmum = $dppUmum;
+            $nilaiTotalHarian = $dppHarian;
+            $nilaiTotalBulanan = $dppBulanan;
+            $nilaiTotalTambahan = $dppTambahan;
+        }
+
         return [
             'nilai_before_pph' => $nilaiBeforePph,
             'nilai_after_pph' => $nilaiAfterPph,

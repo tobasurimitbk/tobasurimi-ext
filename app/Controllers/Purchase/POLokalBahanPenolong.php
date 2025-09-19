@@ -181,7 +181,7 @@ class POLokalBahanPenolong extends BaseController
                 'additional_cost' => $d->biaya_tambahan,
                 'ppn' => $d->ppn,
                 'pph' => $d->pph,
-                'total' => repairDouble($d->total),
+                'total' => $d->total,
                 'remaining_qty' => $d->qty
             ]);
             $this->accountBarangModel->insertAccountBarang($this->this_company_id, $this->request->getVar('divisionID'), $d->barang_id, $d->spesifikasi_id);
@@ -302,6 +302,7 @@ class POLokalBahanPenolong extends BaseController
             am_purchase_order_details.disc AS diskon,
             am_purchase_order_details.price AS harga_satuan,
             am_purchase_order_details.note AS keterangan,
+            am_purchase_order_details.total,
             barang_master.kode_barang,
             barang_master.barang_name AS nama_barang,
             barang_master_spesifikasi.spesifikasi AS spesifikasi_name,
@@ -732,11 +733,11 @@ class POLokalBahanPenolong extends BaseController
                     $keterangan[] = $value->note;
                 }
 
-                $dataBPLokal->totalTambahan = number_format(formatter(round($totalTambahan), "STR_TO_FLOAT"), 2, '.', ',');
-                $dataBPLokal->totalPrice = number_format(formatter(round($totalPrice), "STR_TO_FLOAT"), 2, '.', ',');
-                $dataBPLokal->totalDisc = number_format(formatter(round($totalDisc), "STR_TO_FLOAT"), 2, '.', ',');
+                $dataBPLokal->totalTambahan = number_format(formatter(($totalTambahan), "STR_TO_FLOAT"), 2, '.', ',');
+                $dataBPLokal->totalPrice = number_format(formatter(($totalPrice), "STR_TO_FLOAT"), 2, '.', ',');
+                $dataBPLokal->totalDisc = number_format(formatter(($totalDisc), "STR_TO_FLOAT"), 2, '.', ',');
                 $dataBPLokal->totalPpn = number_format(formatter(round($totalPpn), "STR_TO_FLOAT"), 2, '.', ',');
-                $dataBPLokal->totalPo = number_format(formatter(round($totalTambahan + $totalPrice - $totalDisc + $totalPpn), "STR_TO_FLOAT"), 2, '.', ',');
+                $dataBPLokal->totalPo = number_format(formatter(($totalTambahan + $totalPrice - $totalDisc + round($totalPpn)), "STR_TO_FLOAT"), 2, '.', ',');
                 $dataBPLokal->keterangan = implode(",", array_unique($keterangan));
                 $dataBPLokal->jatuhTempoHari = \totalDayInRange($dataBPLokal->po_date, $dataBPLokal->payment_date);
                 $data["dataPOLokal"] = $dataBPLokal;
@@ -929,11 +930,11 @@ class POLokalBahanPenolong extends BaseController
                     'nama_barang' => $s['barang_name'] . " " . $s['spesifikasi'],
                     'satuan_id' => $s['unit'],
                     'nama_satuan' => $s['kode_satuan'],
-                    'harga_satuan' => round($hargaTerakhir['hargaTerakhirNumber'], 2),
-                    'qty' => $totalQtySisa,
+                    'harga_satuan' => (float)$hargaTerakhir['hargaTerakhirNumber'],
+                    'qty' => (float)$totalQtySisa,
                     'diskon' => 0,
                     'biaya_tambahan' => 0,
-                    'total' => (round($hargaTerakhir['hargaTerakhirNumber'], 2) * $totalQtySisa),
+                    'total' => (float)$hargaTerakhir['hargaTerakhirNumber'] * $totalQtySisa,
                     'keterangan' => $s['note'],
                     'ppn' => '',
                     'pph' => ''
