@@ -97,7 +97,7 @@
                                 <td></td>
                                 <td style="text-align: right;">Total</td>
                                 <!-- <td style="text-align: center;"><?= $qtyPoTotal ?></td> -->
-                                <td style="text-align: center;"><?= $qtyLpbTotal ?></td>
+                                <td style="text-align: center;"><?= number_format($qtyLpbTotal, 2) ?></td>
                                 <td style="text-align: center;"><?= number_format($hargaTotal, 2) ?></td>
                                 <td></td>
                             </tr>
