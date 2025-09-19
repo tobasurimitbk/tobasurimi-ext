@@ -1111,7 +1111,7 @@
             newRow.append($('<td>').text(v.kode_barang));
             newRow.append($('<td>').text(v.nama_barang));
             newRow.append($('<td>').text(v.note));
-            newRow.append($('<td>').text(greatFormatRupiah(v.harga_satuan.toFixed(4))));
+            newRow.append($('<td>').text(greatFormatRupiah(v.harga_satuan.toFixed(2))));
             newRow.append($('<td>').text(greatFormatRupiah(v.qty)));
             newRow.append($('<td>').text(v.nama_satuan));
             newRow.append($('<td>').text(greatFormatRupiah(v.biaya_tambahan)));
@@ -1158,7 +1158,7 @@
         table.find('tfoot').empty();
         var newRow = $('<tr>');
         newRow.append($('<td style="text-align:right;" colspan="4"><b>TOTAL</b></td>'));
-        newRow.append($('<td style="text-align:left;"><b>' + greatFormatRupiah(totalHargaSatuan.toFixed(4)) + '</b></td>'));
+        newRow.append($('<td style="text-align:left;"><b>' + greatFormatRupiah(totalHargaSatuan.toFixed(2)) + '</b></td>'));
         newRow.append($('<td style="text-align:left;"><b>' + greatFormatRupiah(totalQty.toFixed(2)) + '</b></td>'));
         newRow.append($('<td style="text-align:left;"></td>'));
         newRow.append($('<td style="text-align:left;"><b>' + greatFormatRupiah(totalTambahan.toFixed(2)) + '</b></td>'));
