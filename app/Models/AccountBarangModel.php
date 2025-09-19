@@ -104,12 +104,6 @@ class AccountBarangModel extends Model
             $barangDataQry->where('divisis.id', $addCondition['filter_divisi']);
         }
 
-        if ($addCondition['search'] && $addCondition['search'] != "") {
-            $barangDataQry->like('barang_master.barang_name', $addCondition['search'])
-                ->orLike('barang_master.kode_barang', $addCondition['search'])
-                ->orLike('account_barang.keterangan', $addCondition['search']);
-        }
-
         if ($addCondition['filter_coa'] && $addCondition['filter_coa'] == "belum") {
             $barangDataQry->where('account_barang.ap_id', null)
                 ->where('account_barang.ar_id', null);
@@ -120,9 +114,11 @@ class AccountBarangModel extends Model
                 ->where('account_barang.ar_id IS NOT NULL', null, false);
         }
 
-        // if ($addCondition['search'] && $addCondition['search'] != "") {
-        //     $barangDataQry->orLike('barang_master.kode_barang', $addCondition['search']);
-        // }
+        if ($addCondition['search'] && $addCondition['search'] != "") {
+            $barangDataQry->like('barang_master.barang_name', $addCondition['search'])
+                ->orLike('barang_master.kode_barang', $addCondition['search'])
+                ->orLike('barang_master_spesifikasi.spesifikasi', $addCondition['search']);
+        }
 
         if ($addCondition['search'] || $addCondition['filter_divisi'] || $addCondition['filter_coa']) {
             $barangDataQry->groupEnd();
