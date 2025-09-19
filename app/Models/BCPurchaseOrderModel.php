@@ -349,13 +349,13 @@ class BCPurchaseOrderModel extends Model
             // PO LOKAL BAHAN PENOLONG
             $po = $penerimaanBarangModel
                 ->select('
-                penerimaan_barang.tanggal AS lpb_date,
-                penerimaan_barang.no_penerimaan_barang,
+                GROUP_CONCAT(DISTINCT penerimaan_barang.tanggal ORDER BY penerimaan_barang.tanggal ASC SEPARATOR ", ") AS lpb_date,
+                GROUP_CONCAT(DISTINCT penerimaan_barang.no_penerimaan_barang ORDER BY penerimaan_barang.tanggal ASC SEPARATOR ", ") AS no_penerimaan_barang,
                 penerimaan_barang_detail.penerimaan_barang_id,
                 penerimaan_barang_detail.purchase_order_id,
                 penerimaan_barang_detail.id AS penerimaan_barang_detail_id,
                 SUM(penerimaan_barang_detail.jml_masuk) AS qty_lpb,
-                SUM(penerimaan_barang_detail.qty) AS qty_po,
+                penerimaan_barang_detail.qty AS qty_po,
                 SUM(penerimaan_barang_detail.jml_masuk_konversi) AS qty_lpb_konversi,
                 SUM(penerimaan_barang_detail.sub_total) AS sub_total,
                 penerimaan_barang_detail.barang_id,
@@ -375,8 +375,7 @@ class BCPurchaseOrderModel extends Model
                 ->where('penerimaan_barang_detail.deletedAt', null)
                 ->whereIn('penerimaan_barang_id', $bcPenerimaanBarangIDArr)
                 ->whereIn('penerimaan_barang_detail.purchase_order_id', $bcPurchaseOrderIDArr)
-                ->groupBy('barang_id')
-                ->groupBy('penerimaan_barang_id')
+                ->groupBy('penerimaan_barang_detail.barang_id')
                 ->findAll();
         } elseif ($first['po_type'] == "IMPORT BAKU") {
             // PO IMPORT BAHAN BAKU
@@ -489,14 +488,13 @@ class BCPurchaseOrderModel extends Model
         $bcPurchaseOrderModel = new BCPurchaseOrderModel();
 
         $first = $this->find($bcPurchaseOrderID);
+        $bcPurchaseOrder = $bcPurchaseOrderModel
+            ->where('id', $bcPurchaseOrderID)
+            ->first();
+        $penerimaanBarangIdArr = \json_decode($bcPurchaseOrder['multiple_lpb_id']);
 
         if ($first['po_type'] == "LOKAL BAKU") {
             // PO LOKAL BAHAN BAKU
-            $bcPurchaseOrder = $bcPurchaseOrderModel
-                ->where('id', $bcPurchaseOrderID)
-                ->first();
-            $penerimaanBarangIdArr = \json_decode($bcPurchaseOrder['multiple_lpb_id']);
-
             $po = $penerimaanBarangModel
                 ->select('
                     kemasan.name AS kemasan_name,
@@ -568,9 +566,9 @@ class BCPurchaseOrderModel extends Model
                 ->select('
                 kemasan.name AS kemasan_name,
                 penerimaan_barang.kemasan_id,
-                penerimaan_barang.jumlah_kemasan,
-                penerimaan_barang.tanggal AS lpb_date,
-                penerimaan_barang.no_penerimaan_barang,
+                SUM(penerimaan_barang.jumlah_kemasan) AS jumlah_kemasan,
+                GROUP_CONCAT(DISTINCT penerimaan_barang.tanggal ORDER BY penerimaan_barang.tanggal ASC SEPARATOR ", ") AS lpb_date,
+                GROUP_CONCAT(DISTINCT penerimaan_barang.no_penerimaan_barang ORDER BY penerimaan_barang.tanggal ASC SEPARATOR ", ") AS no_penerimaan_barang,
                 penerimaan_barang_detail.penerimaan_barang_id,
                 penerimaan_barang_detail.purchase_order_id,
                 penerimaan_barang_detail.id AS penerimaan_barang_detail_id,
@@ -578,8 +576,8 @@ class BCPurchaseOrderModel extends Model
                 SUM(penerimaan_barang_detail.qty) AS qty_po,
                 SUM(penerimaan_barang_detail.sub_total) AS sub_total,
                 penerimaan_barang_detail.barang_id,
-                am_purchase_orders.po_no,
-                am_purchase_orders.po_date,
+                GROUP_CONCAT(DISTINCT am_purchase_orders.po_no ORDER BY am_purchase_orders.po_date ASC SEPARATOR ", ") AS po_no,
+                GROUP_CONCAT(DISTINCT am_purchase_orders.po_date ORDER BY am_purchase_orders.po_date ASC SEPARATOR ", ") AS po_date,
                 barang_master.barang_name,
                 barang_master.kode_barang
             ')
@@ -593,10 +591,9 @@ class BCPurchaseOrderModel extends Model
                 ->where('penerimaan_barang.bc_type', '53')
                 ->where('penerimaan_barang.deletedAt', null)
                 ->where('penerimaan_barang_detail.deletedAt', null)
-                ->where('penerimaan_barang_detail.penerimaan_barang_id', $penerimaanBarangID)
+                ->whereIn('penerimaan_barang_detail.penerimaan_barang_id', $penerimaanBarangIdArr)
                 ->where('penerimaan_barang_detail.barang_id', $barang1ID)
                 ->groupBy('barang_id')
-                ->groupBy('penerimaan_barang_id')
                 ->first();
 
             // CARI BIAYA TAMBAHAN 
