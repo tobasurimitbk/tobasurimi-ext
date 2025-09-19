@@ -257,8 +257,8 @@ class TandaTerimaSupBB extends BaseController
         $dataListPenerimaanBarang = json_decode($_POST['listPenerimaanBarang']);
 
         $this->tandaTerimaFakturModel->update($id, [
-            'supplier_id' => $dataListPenerimaanBarang[0]->supplier_id,
-            'divisi_id' => $dataListPenerimaanBarang[0]->divisi_id,
+            'supplier_id' => $this->request->getVar('supplier_id'),
+            'divisi_id' => $this->request->getVar('divisi_id'),
             'faktur_no' => $this->request->getVar('no_tanda_terima_faktur'),
             'faktur_keluar_no' => $this->request->getVar('no_tanda_keluar_faktur'),
             'jatuh_tempo' => $this->request->getVar("jatuh_tempo") ? date_format(date_create_from_format("d/m/Y", $this->request->getVar("jatuh_tempo")), "Y-m-d") : "",
