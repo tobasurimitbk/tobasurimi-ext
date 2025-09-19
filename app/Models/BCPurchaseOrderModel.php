@@ -355,7 +355,7 @@ class BCPurchaseOrderModel extends Model
                 penerimaan_barang_detail.purchase_order_id,
                 penerimaan_barang_detail.id AS penerimaan_barang_detail_id,
                 SUM(penerimaan_barang_detail.jml_masuk) AS qty_lpb,
-                SUM(penerimaan_barang_detail.qty) AS qty_po,
+                penerimaan_barang_detail.qty AS qty_po,
                 SUM(penerimaan_barang_detail.jml_masuk_konversi) AS qty_lpb_konversi,
                 SUM(penerimaan_barang_detail.sub_total) AS sub_total,
                 penerimaan_barang_detail.barang_id,
