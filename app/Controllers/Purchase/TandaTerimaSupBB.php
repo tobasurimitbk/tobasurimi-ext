@@ -376,7 +376,7 @@ class TandaTerimaSupBB extends BaseController
         foreach ($dataDet as $det) {
             $noList[] = "$det->lpb_no";
             $itemsList[] = "$det->qty $det->unit $det->item_name";
-            $itemTotal += $det->qty * $det->price_single;
+            $itemTotal += $det->price;
         }
 
         // foreach ($taxData as $tax) {
