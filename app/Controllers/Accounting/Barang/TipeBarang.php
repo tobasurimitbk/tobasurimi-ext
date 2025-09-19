@@ -201,159 +201,35 @@ class TipeBarang extends BaseController
         return response()->setJSON($data);
     }
 
+    public function deleteTipeBarang()
+    {
+        $id = $this->request->getVar('id');
+        if (is_numeric($id)) {
+            $id = $id;
+        } else {
+            $id = decrypt($id);
+        }
 
-    // public function allTipeBarang()
-    // {
-    //     $payload = [
-    //         "pageSize" => $this->request->getGet("length"),
-    //         "currentPage" => ($this->request->getGet("start") / $this->request->getGet("length")) + 1,
-    //         "search" => $this->request->getGet("search"),
-    //         "sort" => $this->request->getGet("sort"),
-    //         "sortType" => $this->request->getGet("sortType"),
-    //     ];
+        $firstData = $this->accountBarangModel->find($id);
 
-    //     $condition = [
-    //         "type_barang" => $this->request->getGet('parent_type'),
-    //         'barang_master.company_id' => $this->this_company_id,
-    //         'divisis.company_id' => $this->this_company_id,
-    //         "barang_master.deletedAt" => NULL,
-    //         'divisis.deletedAt' => null
-    //     ];
+        if (empty($id)) {
+            $data = [
+                "status"     => false,
+                "message"    => "Data Gagal Dihapus",
+                'token'      => csrf_hash()
+            ];
+            echo json_encode($data);
+            return;
+        }
 
-    //     $addCondition = [
-    //         "search"        => $this->request->getGet("search"),
-    //         "filter_coa"        => $this->request->getGet("filter_coa"),
-    //         'filter_divisi' => $this->request->getGet('filter_divisi'),
-    //         "sort"          => $this->request->getGet("sort"),
-    //         "sortType"      => $this->request->getGet("sortType")
-    //     ];
+        $this->accountBarangModel->delete($id);
 
-    //     $divisiAccess = $this->divisiModel->getDivisiAccess();
-    //     $divisiAccessArr = [];
-
-    //     foreach ($divisiAccess as $d) {
-    //         array_push($divisiAccessArr, $d['id']);
-    //     }
-
-    //     $dataNamaAP = "";
-    //     $dataNamaAR = "";
-    //     $dataNamaPemakaian = "";
-
-    //     $limit = $this->request->getGet("length");
-    //     $offset = $this->request->getGet("start");
-
-    //     $res = $this->barangMasterModel->getListForAccount($condition, $divisiAccessArr, $addCondition, $limit, $offset);
-
-    //     $rdata = [];
-
-    //     $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
-
-    //     foreach ($res['data'] as $data) {
-    //         // var_dump($res);
-    //         // exit;
-    //         $dataNamaAP = "-";
-    //         $dataNamaAR = "-";
-    //         $dataNamaPemakaian = "-";
-
-    //         $dataAccountBarang = $this->barangMasterModel
-    //             ->select('barang_master.*,account_barang.divisi_id,account_barang.ar_id,account_barang.ap_id,account_barang.pemakaian_id')
-    //             ->join('account_barang', 'barang_master.id = account_barang.barang_master_id', 'left')
-    //             ->where('barang_master.id', $data['id'])
-    //             ->where('divisi_id', $data['divisi_id'])
-    //             ->where('barang_master.company_id', $this->this_company_id)
-    //             ->where('account_barang.deleted_at', null)
-    //             ->where('barang_master.deletedAt', null)
-    //             ->first();
-
-    //         // var_dump($dataAccountBarang);
-    //         // exit;
-
-    //         if ($dataAccountBarang != null) {
-    //             $dataAR = $this->Sub_AkunsModel->where('id', $dataAccountBarang['ar_id'])->first();
-    //             $dataAP = $this->Sub_AkunsModel->where('id', $dataAccountBarang['ap_id'])->first();
-    //             $dataPemakaian = $this->Sub_AkunsModel->where('id', $dataAccountBarang['pemakaian_id'])->first();
-
-    //             if ($dataAR != null) {
-    //                 $dataNamaAR = $dataAR['no_sub'];
-    //             } else {
-    //                 $dataNamaAR = "-";
-    //             }
-
-    //             if ($dataAP != null) {
-    //                 $dataNamaAP = $dataAP['no_sub'];
-    //             } else {
-    //                 $dataNamaAP = "-";
-    //             }
-
-    //             if ($dataPemakaian != null) {
-    //                 $dataNamaPemakaian = $dataPemakaian['no_sub'];
-    //             } else {
-    //                 $dataNamaPemakaian = "-";
-    //             }
-    //         }
-
-    //         if ($addCondition['filter_coa'] == "belum") {
-    //             if ($dataNamaAP == "-" || $dataAP == "-") {
-    //                 array_push($rdata, [
-    //                     "no"                    => $no++,
-    //                     "id"                    => $data['id'],
-    //                     "divisi_id"             => $data['divisi_id'],
-    //                     "parent_name"           => str_replace(' ', '', $data['kode_barang']) . "  " . $data['barang_name'],
-    //                     "divisi"                => strtoupper($data['divisi']),
-    //                     "ap_id"                 => $dataAccountBarang['ap_id'],
-    //                     "ar_id"                 => $dataAccountBarang['ar_id'],
-    //                     "pemakaian_id"          => $dataAccountBarang['pemakaian_id'],
-    //                     "ap_no"                 => $dataNamaAP,
-    //                     "ar_no"                 => $dataNamaAR,
-    //                     "pemakaian_no"          => $dataNamaPemakaian,
-    //                 ]);
-    //             }
-    //         } elseif ($addCondition['filter_coa'] == "sudah") {
-    //             if ($dataNamaAP != "-" && $dataAP != "-") {
-    //                 array_push($rdata, [
-    //                     "no"                    => $no++,
-    //                     "id"                    => $data['id'],
-    //                     "divisi_id"             => $data['divisi_id'],
-    //                     "parent_name"           => str_replace(' ', '', $data['kode_barang']) . "  " . $data['barang_name'],
-    //                     "divisi"                => strtoupper($data['divisi']),
-    //                     "ap_id"                 => $dataAccountBarang['ap_id'],
-    //                     "ar_id"                 => $dataAccountBarang['ar_id'],
-    //                     "pemakaian_id"          => $dataAccountBarang['pemakaian_id'],
-    //                     "ap_no"                 => $dataNamaAP,
-    //                     "ar_no"                 => $dataNamaAR,
-    //                     "pemakaian_no"          => $dataNamaPemakaian,
-    //                 ]);
-    //             }
-    //         } else {
-    //             array_push($rdata, [
-    //                 "no"                    => $no++,
-    //                 "id"                    => $data['id'],
-    //                 "divisi_id"             => $data['divisi_id'],
-    //                 "parent_name"           => str_replace(' ', '', $data['kode_barang']) . "  " . $data['barang_name'],
-    //                 "divisi"                => strtoupper($data['divisi']),
-    //                 "ap_id"                 => isset($dataAccountBarang['ap_id']) ? $dataAccountBarang['ap_id'] : "-",
-    //                 "ar_id"                 => isset($dataAccountBarang['ar_id']) ? $dataAccountBarang['ar_id'] : "-",
-    //                 "pemakaian_id"          => isset($dataAccountBarang['pemakaian_id']) ? $dataAccountBarang['pemakaian_id'] : "-",
-    //                 "ap_no"                 => $dataNamaAP,
-    //                 "ar_no"                 => $dataNamaAR,
-    //                 "pemakaian_no"          => $dataNamaPemakaian,
-    //             ]);
-    //         }
-
-    //         // if ($searchBarangId == false && $searchDivisiId !== true) {
-
-    //         // }
-    //     }
-
-    //     $data = [
-    //         "draw"              => intval($this->request->getGet("draw")),
-    //         "recordsTotal"      => $res['totalData'],
-    //         "recordsFiltered"   => $res['totalFilteredData'],
-    //         "data"              => $rdata,
-    //         "payload"           => $payload,
-    //         "test" => $_GET
-    //     ];
-
-    //     return response()->setJSON($data);
-    // }
+        $data = [
+            "status"    => true,
+            "message"   => "Data Berhasil dihapus",
+            'token'     => csrf_hash()
+        ];
+        echo json_encode($data);
+        return;
+    }
 }
