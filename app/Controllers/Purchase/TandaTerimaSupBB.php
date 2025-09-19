@@ -209,7 +209,7 @@ class TandaTerimaSupBB extends BaseController
                 'unit' => $l->kode_satuan,
                 'qty' => $l->qty_akan_diterima,
                 'po_no' => $l->po_no,
-                'price' => ($l->qty_akan_diterima * $l->harga),
+                'price' => $l->harga_total,
                 'price_single' => $l->harga
             ]);
         }
@@ -287,7 +287,7 @@ class TandaTerimaSupBB extends BaseController
                 'unit' => $l->kode_satuan,
                 'qty' => $l->qty_akan_diterima,
                 'po_no' => $l->po_no,
-                'price' => ($l->qty_akan_diterima * $l->harga),
+                'price' => $l->harga_total,
                 'price_single' => $l->harga
             ]);
         }
