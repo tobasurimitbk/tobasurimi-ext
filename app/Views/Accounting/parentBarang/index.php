@@ -72,6 +72,7 @@
                                     <th>Akun Pembelian</th>
                                 <?php endif; ?>
                                 <th>Akun Penjualan</th>
+                                <th>Action</th>
                             </tr>
                         </thead>
                         <tbody class="body-table" id="body-table" style="cursor: pointer;">
@@ -199,12 +200,14 @@
 </div>
 
 <script>
+    const csrfToken = '<?= csrf_token() ?>';
     let sort = "barang_master.id";
     let sortType = "ASC";
+    let table = "";
 
     $(document).ready(function() {
         const csrfToken = '<?= csrf_token() ?>';
-        const table = $('.dataTable-barang').DataTable({
+        table = $('.dataTable-barang').DataTable({
 
             processing: true,
             serverSide: true,
@@ -238,27 +241,47 @@
             display: "stripe",
             searching: false,
             columns: [{
-                data: "no",
-                className: "text-center",
-                sortable: false,
-                width: "5%"
-            }, {
-                data: "parent_name",
-                className: "text-left",
-                sortable: false,
-            }, {
-                data: "divisi",
-                className: "text-left",
-                sortable: false,
-            }, {
-                data: "ap_no",
-                className: "text-center",
-                sortable: false,
-            }, {
-                data: "ar_no",
-                className: "text-center",
-                sortable: false,
-            }, ],
+                    data: "no",
+                    className: "text-center",
+                    sortable: false,
+                    width: "5%"
+                }, {
+                    data: "parent_name",
+                    className: "text-left",
+                    sortable: false,
+                }, {
+                    data: "divisi",
+                    className: "text-left",
+                    sortable: false,
+                }, {
+                    data: "ap_no",
+                    className: "text-center",
+                    sortable: false,
+                }, {
+                    data: "ar_no",
+                    className: "text-center",
+                    sortable: false,
+                },
+                {
+                    data: "id",
+                    className: "text-center actions",
+                    searchable: false,
+                    sortable: false,
+                    render: function(data, type, row) {
+                        let id = row.id;
+
+                        return `
+                        <div class="mt-0">
+                        <?php if (can('Accounting', 'Akun Barang', 'd')) : ?>
+                            <button  data-toggle="tooltip" title="Hapus" onclick="remove('${id}')" class="btn btn-danger delete-parent">
+                                <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
+                            </button>
+                        <?php endif; ?>
+                        </div>
+                    `;
+                    }
+                }
+            ],
             columnDefs: [{
                 defaultContent: "-",
                 targets: "_all"
@@ -478,6 +501,65 @@
         } else {
             sortType = sortType === "asc" ? "desc" : "asc";
         }
+    }
+
+    const remove = function(id) {
+        Swal.fire({
+            icon: 'question',
+            title: 'Yakin akan di hapus?',
+            confirmButtonColor: '#4e73df',
+            cancelButtonColor: '#d33',
+            showCancelButton: true,
+            reverseButtons: true,
+            confirmButtonText: 'Hapus',
+            cancelButtonText: 'Kembali',
+        }).then((result) => {
+            if (result.isConfirmed) {
+                let csrf = $(`[name="${csrfToken}"]`);
+                $.ajax({
+                    url: "<?= base_url("tipe-barang/delete"); ?>",
+                    data: {
+                        id: id
+                    },
+                    beforeSend: function(xhr) {
+                        xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                        setLoading();
+                    },
+                    complete: function() {
+                        stopLoading();
+                    },
+                    method: "POST",
+                    dataType: "json",
+                    success: function(response) {
+                        csrf.val(response.token);
+                        if (response.status) {
+                            Swal.fire({
+                                    icon: 'success',
+                                    title: response.message,
+                                    confirmButtonColor: '#4e73df',
+                                })
+                                .then(() => {
+                                    table.ajax.reload()
+                                })
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: response.message,
+                                confirmButtonColor: '#4e73df',
+                            })
+                        }
+                    },
+                    onError: function(response) {
+                        csrf.val(response.token);
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Data Gagal Dihapus, coba Lagi',
+                            confirmButtonColor: '#4e73df',
+                        })
+                    }
+                });
+            }
+        })
     }
 
     // Akun AR

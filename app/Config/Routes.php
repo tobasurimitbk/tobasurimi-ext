@@ -917,6 +917,7 @@ $routes->post('/production-result/create', 'Production\ProductionResult::savePro
 $routes->post('/production-result/update', 'Production\ProductionResult::updateProductionResult', ['filter' => 'Auth']);
 $routes->get('/production-result/list-work-order', 'Production\ProductionResult::getListWorkOrderByID', ['filter' => 'Auth']);
 $routes->get('/production-result/list-material-request', 'Production\ProductionResult::getListMaterialRequestByID', ['filter' => 'Auth']);
+$routes->get('/production-result/list-material-request-penolong', 'Production\ProductionResult::getListMaterialRequestPenolongByID', ['filter' => 'Auth']);
 $routes->get('/production-result/material-request', 'Production\ProductionResult::getListMaterialRequestByWOID', ['filter' => 'Auth']);
 $routes->post('/production-result/update-status', 'Production\ProductionResult::updateStatusPostedProductionResult', ['filter' => 'Auth']);
 $routes->post('/production-result/delete', 'Production\ProductionResult::deletePR', ['filter' => 'Auth']);
