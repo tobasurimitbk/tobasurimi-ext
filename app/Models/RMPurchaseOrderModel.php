@@ -206,6 +206,30 @@ class RMPurchaseOrderModel extends Model
     }
 
 
+    public function getPOList($divisi_id, $warehouse_id, $supplier_id)
+    {
+        $selectQry = "rm_purchase_orders.id, rm_purchase_orders.po_no";
+        $bbLokalDataQry = $this->asObject()
+            ->select($selectQry)
+            ->where('rm_purchase_orders.supplier_id', $supplier_id)
+            ->where('rm_purchase_orders.divisi_id', $divisi_id)
+            ->where('rm_purchase_orders.warehouse_id', $warehouse_id)
+            ->where('rm_purchase_orders.deletedAt', NULL)
+            ->where('rm_purchase_orders.is_posted', 1)
+            ->join('suppliers', 'rm_purchase_orders.supplier_id = suppliers.id', 'left')
+            ->join('companies', 'rm_purchase_orders.company_id = companies.id', 'left')
+            ->join('rm_purchase_order_details', 'rm_purchase_orders.id = rm_purchase_order_details.rm_purchase_order_id', 'left')
+            ->join('divisis', 'divisis.id = rm_purchase_orders.divisi_id', 'left')
+            ->groupBy('rm_purchase_orders.id');
+
+        $data = $bbLokalDataQry->findAll();
+
+        return [
+            'data'              => $data,
+        ];
+    }
+
+
     public function getListLaporanPurchaseOrder($condition = [], $addCondition = [], $limit = 10, $offset = 0)
     {
         $availableSort = [
