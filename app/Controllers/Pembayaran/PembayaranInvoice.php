@@ -548,7 +548,7 @@ class PembayaranInvoice extends BaseController
                 $customer_name = $salesOrderExportData['name'];
             } elseif ($p['type_invoice'] == "PROFORMA INVOICE") {
                 $salesOrderExportData = $this->proformaInvoiceModel
-                    ->join('sales_order_export', 'sales_order_export.sales_contract_id = proforma_invoice.sales_order_export_id')
+                    ->join('sales_order_export', 'sales_order_export.sales_order_export_id = proforma_invoice.sales_order_export_id')
                     ->join('sales_contract', 'sales_contract.id = sales_order_export.sales_contract_id')
                     ->join('customers', 'customers.id = sales_contract.customer_id')
                     ->where('proforma_invoice.id', $p['invoice_id'])
