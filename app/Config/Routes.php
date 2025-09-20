@@ -1527,6 +1527,19 @@ $routes->post('/penerimaan-barang-import/delete', 'Warehouse\PenerimaanBarangImp
 $routes->get('/penerimaan-barang-import/receivedItemsBySupplier/(:num)', 'Warehouse\PenerimaanBarangImport::getReceivedItemsBySupplier/$1', ['filter' => 'Auth']);
 $routes->get('/penerimaan-barang-import/generate', 'Warehouse\PenerimaanBarangImport::generatePenerimaanBarang', ['filter' => 'Auth']);
 
+
+$routes->get('/update-stock-bahan-baku', 'Warehouse\UpdateStockBahanBaku::UpdateStockBahanBaku', ['filter' => 'Auth']);
+$routes->get('/update-stock-bahan-baku/all', 'Warehouse\UpdateStockBahanBaku::allUpdateStockBahanBaku', ['filter' => 'Auth']);
+$routes->get('/update-stock-bahan-baku/create', 'Warehouse\UpdateStockBahanBaku::createUpdateStockBahanBaku', ['filter' => 'Auth']);
+$routes->get('/update-stock-bahan-baku/list-po', 'Warehouse\UpdateStockBahanBaku::getListPO', ['filter' => 'Auth']);
+$routes->get('/update-stock-bahan-baku/list-barang-po', 'Warehouse\UpdateStockBahanBaku::getListStockByPO', ['filter' => 'Auth']);
+$routes->get('/update-stock-bahan-baku/id/(:segment)', 'Warehouse\UpdateStockBahanBaku::getByIdUpdateStockBahanBaku/$1', ['filter' => 'Auth']);
+$routes->get('/update-stock-bahan-baku/print/(:segment)', 'Warehouse\UpdateStockBahanBaku::print/$1', ['filter' => 'Auth']);
+$routes->post('/update-stock-bahan-baku/save', 'Warehouse\UpdateStockBahanBaku::saveUpdateStockBahanBaku', ['filter' => 'Auth']);
+$routes->post('/update-stock-bahan-baku/update', 'Warehouse\UpdateStockBahanBaku::updateUpdateStockBahanBaku', ['filter' => 'Auth']);
+
+
+
 // ROUTE BEA CUKAI REVAMP
 // SETTING AKUN BEA CUKAI
 $routes->get('setting-akun-bc', 'BeaCukai\SettingBeaCukai::index', ['filter' => 'Auth']);
