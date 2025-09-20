@@ -2032,10 +2032,12 @@ $routes->get('/employee/get-jam-kerja-detail', 'HR\EmployeeJamKerja::getDetailJa
 $routes->post('/employee/update-jam-kerja', 'HR\EmployeeJamKerja::createOrUpdate', ['filter' => 'Auth']);
 
 // Attendance
-$routes->get('/log-attendance', 'HR\Attendance::LogAttendance', ['filter' => 'Auth']);
-$routes->post('/log-attendance/detail', 'HR\Attendance::getLogAttendanceDetail', ['filter' => 'Auth']);
-$routes->get('/log-attendance/print/id/(:segment)', 'HR\Attendance::exportPDFLogPresensi/$1', ['filter' => 'Auth']);
-$routes->get('/log-attendance/excel/id/(:segment)', 'HR\Attendance::exportExcelLogPresensi/$1', ['filter' => 'Auth']);
+$routes->get('/log-attendance', 'HR\Attendance::indexLog', ['filter' => 'Auth']);
+$routes->get('/log-attendance/all', 'HR\Attendance::allLog', ['filter' => 'Auth']);
+$routes->get('/log-attendance/all-total', 'HR\Attendance::allLogTotal', ['filter' => 'Auth']);
+$routes->get('/log-attendance/detail', 'HR\Attendance::getLogAttendanceDetail', ['filter' => 'Auth']);
+// $routes->get('/log-attendance/print/id/(:segment)', 'HR\Attendance::exportPDFLogPresensi/$1', ['filter' => 'Auth']);
+$routes->get('/log-attendance/export', 'HR\Attendance::exportExcelLogPresensi', ['filter' => 'Auth']);
 
 // Generate Attendance
 $routes->get('/list-attendance', 'HR\Attendance::generateAttendanceView', ['filter' => 'Auth']);

@@ -425,4 +425,69 @@ class EmployeesModel extends Model
 
         return $query->getResultArray();
     }
+
+
+    public function getEmployeeListAttendances($condition, $addCondition, $limit = 10, $offset = 0)
+    {
+        $map = [
+            'no'     => 'id',
+            'nip'   => 'nip',
+            'name'   => 'name',
+            'divisi' => 'division_id',
+            'bagian' => 'bagian_id',
+        ];
+
+        $sort     = 'nip';
+        $sortType = 'ASC';
+
+        if (isset($addCondition['order']) && isset($addCondition['columns'])) {
+            $order = $addCondition['order'];
+            $columns = $addCondition['columns'];
+
+            if ($order) {
+                $col = $columns[$order['column']]['data'] ?? '';
+                $dir = strtolower($order['dir'] ?? 'asc');
+
+                $sort     = $map[$col] ?? $sort;
+                $sortType = in_array($dir, ['asc', 'desc']) ? strtoupper($dir) : $sortType;
+            }
+        }
+
+        $selectQry = "employees.*,
+        divisis.divisi as divisi,
+        bagian.nama_bagian as bagian
+        ";
+
+        $dataQry = $this->asArray()
+            ->select($selectQry)
+            ->join('divisis', 'divisis.id = employees.division_id', 'left')
+            ->join('bagian', 'bagian.id = employees.bagian_id', 'left')
+            ->where($condition);
+
+        $totalData = $dataQry->countAllResults(false);
+
+        if (!empty($addCondition['divisi_id'])) {
+            $dataQry->where('employees.division_id', $addCondition['divisi_id']);
+        }
+
+        if (!empty($addCondition['tipe'])) {
+            $dataQry->where('employees.tipe', $addCondition['tipe']);
+        }
+
+        if (!empty($addCondition['employee_id'])) {
+            $dataQry->where('employees.id', $addCondition['employee_id']);
+        }
+
+        $totalFilteredData = $dataQry->countAllResults(false);
+
+        $data = $dataQry->orderBy($sort, $sortType)->findAll($limit, $offset);
+
+        return [
+            'data'              => $data,
+            'totalData'         => $totalData,
+            'totalFilteredData' => $totalFilteredData,
+            'sort'              => $sort,
+            'sortType'          => $sortType
+        ];
+    }
 }
