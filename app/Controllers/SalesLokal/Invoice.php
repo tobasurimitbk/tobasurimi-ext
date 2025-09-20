@@ -569,15 +569,18 @@ class Invoice extends BaseController
                 return;
             }
 
-            $checkINV = $this->SalesOrderInvoiceModel->where('UPPER(no_faktur)', strtoupper($postData['no_faktur']))->findAll();
+            $checkINV = $this->SalesOrderInvoiceModel->where('UPPER(no_faktur)', strtoupper($postData['no_faktur']))->first();
+
             if ($checkINV) {
-                $data = [
-                    "status"    => false,
-                    "message"   => "No Faktur Sudah Digunakan",
-                    'token'     => csrf_hash(),
-                ];
-                echo json_encode($data);
-                return;
+                if ($checkINV['id'] != $soInvData->id) {
+                    $data = [
+                        "status"    => false,
+                        "message"   => "No Faktur Sudah Digunakan",
+                        'token'     => csrf_hash(),
+                    ];
+                    echo json_encode($data);
+                    return;
+                }
             }
             $noFaktur = $postData['no_faktur'];
 
@@ -608,8 +611,6 @@ class Invoice extends BaseController
 
             $this->SalesOrderInvoiceModel->db->transComplete();
 
-
-
             //jika document tidak berubah
             if ($soInvData->document_no == $postData['noDocument']) {
                 // Periksa apakah $postItemsData tidak kosong sebelum melakukan iterasi
@@ -633,18 +634,13 @@ class Invoice extends BaseController
                     }
                 }
             } else {
-
                 // jika ada perubahan
                 $this->SalesOrderInvoiceDetailModel->where('id_sales_order_invoice', $payload['id'])->delete();
                 //setelah hapus kembalikan kondisi sales_order_invoice_id pada sales order detail semula mejadi null
                 foreach (json_decode($soInvData->document_id) as $id) {
-
-
                     if ($soInvData->document_type === 'pesanan') {
-
                         $this->SalesOrderModel->where('id', $id)->set(['sales_order_invoice_id' => NULL])->update();
                     } else {
-
                         $this->SuratJalanModel->where('id', $id)->set(['sales_order_invoice_id' => NULL])->update();
                     }
                 }
@@ -666,8 +662,6 @@ class Invoice extends BaseController
                 }
 
                 foreach ($postData['doc_id'] as $id) {
-
-
                     if ($soInvData->document_type === 'pesanan') {
                         $this->SalesOrderModel->where('id', $id)->set(['sales_order_invoice_id' => $payload['id']])->update();
                     } else {

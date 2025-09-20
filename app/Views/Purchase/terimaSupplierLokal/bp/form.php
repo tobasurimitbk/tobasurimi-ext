@@ -634,6 +634,11 @@
 
                     if (!isNaN(targetValue) && targetValue > 0) {
                         var sisaDiterima = Math.min(v.qty_akan_diterima, targetValue); // Hitung sisa yang diterima
+                        if (v.qty_lpb == sisaDiterima) {
+                            var hargaTotal = v.harga_total;
+                        } else {
+                            var hargaTotal = sisaDiterima * v.harga;
+                        }
 
                         // Kurangi qty_akan_diterima
                         v.qty_akan_diterima -= sisaDiterima;
@@ -651,6 +656,7 @@
                             qty_akan_diterima: sisaDiterima,
                             kode_satuan: v.kode_satuan,
                             harga: v.harga,
+                            harga_total: hargaTotal,
                             divisi_id: v.divisi_id,
                             supplier_id: v.supplier_id,
                             supplier_name: v.supplier_name,
@@ -981,8 +987,10 @@
             }
         }
 
+        var harga = itemSelected.harga;
         var qtySisa = Number(itemSelected.qty_lpb) - Number(itemSelected.qty_telah_diterima);
         var cekQtySisa = qtySisa - qtyAkanDiterima; // jika hasilnya minus maka invalid
+        var hargaTotal = qtyAkanDiterima * harga;
 
         if (qtyAkanDiterima <= 0 || qtyAkanDiterima == '') {
             Swal.fire({
@@ -1002,6 +1010,7 @@
             });
             return;
         } else {
+            list_penerimaan_selected[indexSelected].harga_total = hargaTotal;
             list_penerimaan_selected[indexSelected].qty_akan_diterima = qtyAkanDiterima;
             drawTableSelected(list_penerimaan_selected);
             $('.detail-barang-modal').modal('hide');
@@ -1016,7 +1025,8 @@
         var total_pph_21 = 0;
 
         $.each(list_penerimaan_selected, function(i, v) {
-            harga += (Number(v.qty_akan_diterima) * Number(destroyFormatRupiah(v.harga)));
+            // harga += (Number(v.qty_akan_diterima) * Number(destroyFormatRupiah(v.harga)));
+            harga += Number(v.harga_total);
         });
         $.each(list_pajak, function(i, v) {
             if (v.tax_type == 'PPN Masukan 11%') {
@@ -1057,7 +1067,7 @@
         $('#no_penerimaan_barang').val(itemSelected.no_penerimaan_barang);
         $('#qty_akan_diterima').val(itemSelected.qty_akan_diterima);
         $('#kode_satuan').val(itemSelected.kode_satuan);
-        $('#total_harga').val(greatFormatRupiah(hargaTotal));
+        $('#total_harga').val(itemSelected.harga_total);
         $('#total_harga').attr('harga_satuan', itemSelected.harga); // Harga Satuan
         $('.detail-barang-modal').modal('show');
     }
@@ -1121,6 +1131,7 @@
                         qty_akan_diterima: removedItem.qty_akan_diterima,
                         kode_satuan: removedItem.kode_satuan,
                         harga: removedItem.harga,
+                        harga_total: removedItem.harga_total,
                         divisi_id: removedItem.divisi_id,
                         supplier_id: removedItem.supplier_id,
                         supplier_name: removedItem.supplier_name,
@@ -1289,7 +1300,7 @@
         const tbody = table.find('tbody');
         var no = 1;
         $.each(data, function(i, v) {
-            var harga = Math.round(Number(v.qty_akan_diterima) * Number(v.harga));
+            // var harga = Math.round(Number(v.qty_akan_diterima) * Number(v.harga));
             var newRow = $('<tr>');
             newRow.append($('<td style="text-align: center;">').text(no++));
             newRow.append($('<td style="text-align: center;">').text(v.po_no));
@@ -1299,7 +1310,7 @@
             newRow.append($('<td style="text-align: center;">').text(v.nama_barang_dok));
             newRow.append($('<td style="text-align: center;">').text(v.qty_akan_diterima));
             newRow.append($('<td style="text-align: center;">').text(v.kode_satuan));
-            newRow.append($('<td style="text-align: center;">').text(greatFormatRupiah(harga)));
+            newRow.append($('<td style="text-align: center;">').text(greatFormatRupiah(v.harga_total)));
             <?php if ($isUsed) : ?>
                 newRow.append($('<td style="text-align: center;">').html(
                     `
@@ -1570,7 +1581,8 @@
                     kode_satuan: "<?= $d['kode_satuan'] ?>",
                     supplier_name: "<?= $d['supplier_name'] ?>",
                     supplier_id: "<?= $d['supplier_id'] ?>",
-                    harga: "<?= $d['harga'] ?>"
+                    harga: "<?= $d['harga'] ?>",
+                    harga_total: "<?= $d['harga_total'] ?>"
                 });
             <?php endforeach; ?>
         }
@@ -1591,7 +1603,8 @@
                 qty_akan_diterima: "<?= $d['qty_akan_diterima'] ?>",
                 kode_satuan: "<?= $d['kode_satuan'] ?>",
                 supplier_id: "<?= $d['supplier_id'] ?>",
-                harga: "<?= $d['harga'] ?>"
+                harga: "<?= $d['harga'] ?>",
+                harga_total: "<?= $d['harga_total'] ?>"
             });
         <?php endforeach; ?>
         drawTableDaftarPenerimaanBarang(list_penerimaan_barang);

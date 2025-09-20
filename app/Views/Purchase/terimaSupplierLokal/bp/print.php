@@ -98,7 +98,7 @@
     </style>
 </head>
 
-<body style="border: 0px solid;font-size: 11px;">
+<body style="border: 0px solid;font-size: 11px; margin-left:-20px; margin-right:-20px;">
 
     <div style="margin: 25px; padding: 25px" class="<?= $totalDikembalikan != 0 ? 'pagebreak' : '' ?>">
         <table class="w-100">

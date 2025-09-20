@@ -209,7 +209,7 @@ class TandaTerimaSupBB extends BaseController
                 'unit' => $l->kode_satuan,
                 'qty' => $l->qty_akan_diterima,
                 'po_no' => $l->po_no,
-                'price' => ($l->qty_akan_diterima * $l->harga),
+                'price' => $l->harga_total,
                 'price_single' => $l->harga
             ]);
         }
@@ -257,8 +257,8 @@ class TandaTerimaSupBB extends BaseController
         $dataListPenerimaanBarang = json_decode($_POST['listPenerimaanBarang']);
 
         $this->tandaTerimaFakturModel->update($id, [
-            'supplier_id' => $dataListPenerimaanBarang[0]->supplier_id,
-            'divisi_id' => $dataListPenerimaanBarang[0]->divisi_id,
+            'supplier_id' => $this->request->getVar('supplier_id'),
+            'divisi_id' => $this->request->getVar('divisi_id'),
             'faktur_no' => $this->request->getVar('no_tanda_terima_faktur'),
             'faktur_keluar_no' => $this->request->getVar('no_tanda_keluar_faktur'),
             'jatuh_tempo' => $this->request->getVar("jatuh_tempo") ? date_format(date_create_from_format("d/m/Y", $this->request->getVar("jatuh_tempo")), "Y-m-d") : "",
@@ -287,7 +287,7 @@ class TandaTerimaSupBB extends BaseController
                 'unit' => $l->kode_satuan,
                 'qty' => $l->qty_akan_diterima,
                 'po_no' => $l->po_no,
-                'price' => ($l->qty_akan_diterima * $l->harga),
+                'price' => $l->harga_total,
                 'price_single' => $l->harga
             ]);
         }
@@ -376,7 +376,7 @@ class TandaTerimaSupBB extends BaseController
         foreach ($dataDet as $det) {
             $noList[] = "$det->lpb_no";
             $itemsList[] = "$det->qty $det->unit $det->item_name";
-            $itemTotal += $det->qty * $det->price_single;
+            $itemTotal += $det->price;
         }
 
         // foreach ($taxData as $tax) {
