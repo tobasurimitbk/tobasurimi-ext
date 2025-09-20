@@ -203,38 +203,42 @@ class BukuBesar extends BaseController
                         ? [1, 2] 
                         : [$this->this_company_id];
 
-                    // Ambil sub account sesuai no_sub & company scope
-                    $subAccount = $this->Sub_AkunsModel
-                                    ->where('sub_akuns.no_sub', $a)
-                                    ->where('sub_akuns.deletedAt', null)
-                                    ->whereIn('sub_akuns.company_id', $companyScope)
-                                    ->join('companies', 'companies.id = sub_akuns.company_id', 'left')
-                                    ->select('sub_akuns.*, companies.company')
-                                    ->first();
+                    // Ambil semua sub akun dengan no_sub sesuai dan dalam company scope
+                    $subAccounts = $this->Sub_AkunsModel
+                                        ->where('sub_akuns.no_sub', $a)
+                                        ->where('sub_akuns.deletedAt', null)
+                                        ->whereIn('sub_akuns.company_id', $companyScope)
+                                        ->join('companies', 'companies.id = sub_akuns.company_id', 'left')
+                                        ->select('sub_akuns.*, companies.company')
+                                        ->findAll();
 
-                    if (!$subAccount) {
-                        continue; // kalau ga ketemu skip
+                    if (empty($subAccounts)) {
+                        continue;
                     }
 
-                    [$resultJurnalUmum, $saldoLama] = $fetchJurnalData([$subAccount['id']]);
+                    // Ambil semua id untuk query jurnal
+                    $subAccountIds = array_column($subAccounts, 'id');
 
-                    $key = $subAccount['nama_sub'];
-                    if (!isset($result[$key])) {
-                        $result[$key] = [
-                            'id' => $subAccount['id'],
-                            'number' => $subAccount['no_sub'],
-                            'company' => $subAccount['company'],
-                            'name' => $subAccount['nama_sub'],
-                            'saldo_lama' => $saldoLama,
-                            'result' => $resultJurnalUmum,
-                        ];
-                    } else {
-                        $result[$key]['saldo_lama'] += $saldoLama;
-                        $result[$key]['result'] = array_merge($result[$key]['result'], $resultJurnalUmum);
-                        // Urutkan ASC berdasarkan no_transaksi
-                        usort($result[$key]['result'], function($a, $b) {
-                            return strcmp($a['no_transaksi'], $b['no_transaksi']);
-                        });
+                    [$resultJurnalUmum, $saldoLama] = $fetchJurnalData($subAccountIds);
+
+                    foreach ($subAccounts as $subAccount) {
+                        $key = $subAccount['nama_sub'];
+                        if (!isset($result[$key])) {
+                            $result[$key] = [
+                                'id' => $subAccount['id'],
+                                'number' => $subAccount['no_sub'],
+                                'company' => $subAccount['company'],
+                                'name' => $subAccount['nama_sub'],
+                                'saldo_lama' => $saldoLama,
+                                'result' => $resultJurnalUmum,
+                            ];
+                        } else {
+                            $result[$key]['saldo_lama'] += $saldoLama;
+                            $result[$key]['result'] = array_merge($result[$key]['result'], $resultJurnalUmum);
+                            usort($result[$key]['result'], function($a, $b) {
+                                return strcmp($a['no_transaksi'], $b['no_transaksi']);
+                            });
+                        }
                     }
                 } else {
                     // bagian header account tetap sama (gunakan id)
