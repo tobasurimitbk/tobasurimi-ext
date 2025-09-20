@@ -1651,6 +1651,19 @@ class PembayaranInvoice extends BaseController
                 "detail" => $this->pembayaranInvoiceModel->getPembayaranInvoiceDetail($id),
             ];
             return view('Pembayaran/pembayaranInvoice/formEkspor', $data);
+        } elseif ($tipe_invoice == "PROFORMA INVOICE") {
+            $salesOrderExportData = $this->proformaInvoiceModel->where('deletedAt', null)->where('company_id', $this->this_company_id)->findAll();
+            foreach ($salesOrderExportData as $s) {
+                array_push($dokumenList, $s);
+            }
+            $data = [
+                "customers" => $customers,
+                "divisi" => $divisi,
+                "subsAkuns" => $subAkunsModel,
+                "dokumenList" => $dokumenList,
+                "detail" => $this->pembayaranInvoiceModel->getPembayaranInvoiceDetail($id),
+            ];
+            return view('Pembayaran/pembayaranInvoice/formPI', $data);
         } elseif ($tipe_invoice == "LAIN-LAIN") {
 
             $salesOrderLainData = $this->salesOrderLainModel->where('deletedAt', null)->where('company_id', $this->this_company_id)->findAll();
