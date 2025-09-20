@@ -358,7 +358,7 @@
 
     $.ajax({
         url: "<?= base_url('log-attendance/all') ?>",
-        type: "GET",
+        type: "POST",
         data: {
             month: $('#month').val(),
             year: $('#year').val(),
@@ -381,9 +381,10 @@
                 ordering: true,
                 paging: true,
                 autoWidth: true,
+                pageLength: 25, // 🔹 default 25 baris per halaman
                 ajax: {
                     url: "<?= base_url('log-attendance/all') ?>",
-                    type: "GET",
+                    type: "POST",
                     data: function(d) {
                         d.month = $('#month').val();
                         d.year = $('#year').val();
@@ -473,9 +474,10 @@
         ordering: true,
         paging: true,
         autoWidth: true,
+        pageLength: 25, // 🔹 default 25 baris per halaman
         ajax: {
             url: "<?= base_url('log-attendance/all-total') ?>",
-            type: "GET",
+            type: "POST",
             data: function(d) {
                 d.month = $('#month').val();
                 d.year = $('#year').val();

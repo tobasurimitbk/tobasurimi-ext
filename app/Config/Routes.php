@@ -2033,8 +2033,8 @@ $routes->post('/employee/update-jam-kerja', 'HR\EmployeeJamKerja::createOrUpdate
 
 // Attendance
 $routes->get('/log-attendance', 'HR\Attendance::indexLog', ['filter' => 'Auth']);
-$routes->get('/log-attendance/all', 'HR\Attendance::allLog', ['filter' => 'Auth']);
-$routes->get('/log-attendance/all-total', 'HR\Attendance::allLogTotal', ['filter' => 'Auth']);
+$routes->post('/log-attendance/all', 'HR\Attendance::allLog', ['filter' => 'Auth']);
+$routes->post('/log-attendance/all-total', 'HR\Attendance::allLogTotal', ['filter' => 'Auth']);
 $routes->get('/log-attendance/detail', 'HR\Attendance::getLogAttendanceDetail', ['filter' => 'Auth']);
 // $routes->get('/log-attendance/print/id/(:segment)', 'HR\Attendance::exportPDFLogPresensi/$1', ['filter' => 'Auth']);
 $routes->get('/log-attendance/export', 'HR\Attendance::exportExcelLogPresensi', ['filter' => 'Auth']);

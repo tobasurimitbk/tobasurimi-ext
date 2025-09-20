@@ -86,12 +86,12 @@ class Attendance extends BaseController
         $year = $monthSplit[0];
         $month = $monthSplit[1];
 
-        $length = empty($this->request->getGet("length")) ? 25 : $this->request->getGet("length");
-        $limit = empty($this->request->getVar('length')) ? 25 : $this->request->getGet("length");
-        $offset = empty($this->request->getVar('start')) ? 0 : $this->request->getGet("start");
+        $length = empty($this->request->getVar("length")) ? 25 : $this->request->getVar("length");
+        $limit = empty($this->request->getVar('length')) ? 25 : $this->request->getVar("length");
+        $offset = empty($this->request->getVar('start')) ? 0 : $this->request->getVar("start");
         $payload = [
-            "pageSize"      => $this->request->getGet("length"),
-            "currentPage"   => ($this->request->getGet("start") / $length) + 1,
+            "pageSize"      => $this->request->getVar("length"),
+            "currentPage"   => ($this->request->getVar("start") / $length) + 1,
 
         ];
 
@@ -245,7 +245,7 @@ class Attendance extends BaseController
 
 
         $data = [
-            "draw"            => intval($this->request->getGet("draw")),
+            "draw"            => intval($this->request->getVar("draw")),
             "recordsTotal"    => $employees['totalData'],
             "recordsFiltered" => $employees['totalFilteredData'],
             "columns"         => $columns,
@@ -263,7 +263,7 @@ class Attendance extends BaseController
         [$year, $month] = explode('-', $monthReq);
 
         // DataTable pagination
-        $length  = $this->request->getGet("length") ?: 25;
+        $length  = $this->request->getVar("length") ?: 25;
         $offset  = $this->request->getVar('start') ?: 0;
         $payload = [
             "pageSize"    => $length,
@@ -406,7 +406,7 @@ class Attendance extends BaseController
 
         // tinggal return untuk datatable
         return $this->response->setJSON([
-            "draw"            => intval($this->request->getGet("draw")),
+            "draw"            => intval($this->request->getVar("draw")),
             "recordsTotal"    => $employees['totalData'],
             "recordsFiltered" => $employees['totalFilteredData'],
             "data"            => $resultData,
@@ -453,12 +453,12 @@ class Attendance extends BaseController
 
         $dataEmployeePager = $EmployeesModel->getEmployeesWithPagination(
             $this->this_company_id,
-            $this->request->getGet('employeesID'),
-            $this->request->getGet('divisiID'),
-            $this->request->getGet('golongan')
+            $this->request->getVar('employeesID'),
+            $this->request->getVar('divisiID'),
+            $this->request->getVar('golongan')
         );
         $pager = \Config\Services::pager();
-        $employeeDetailFilter = $EmployeesModel->where('id', $this->request->getGet('employeesID'))->first();
+        $employeeDetailFilter = $EmployeesModel->where('id', $this->request->getVar('employeesID'))->first();
 
         // Data Send To View
         $data = [
@@ -1076,8 +1076,8 @@ class Attendance extends BaseController
 
     public function exportPDFPresensi($yearMonth)
     {
-        $divisiID = $this->request->getGet('divisiID');
-        $golongan = $this->request->getGet('golongan');
+        $divisiID = $this->request->getVar('divisiID');
+        $golongan = $this->request->getVar('golongan');
 
         $dompdf = new Dompdf();
 
@@ -1149,8 +1149,8 @@ class Attendance extends BaseController
 
     public function exportExcelPresensi($yearMonth)
     {
-        $divisiID = $this->request->getGet('divisiID');
-        $golongan = $this->request->getGet('golongan');
+        $divisiID = $this->request->getVar('divisiID');
+        $golongan = $this->request->getVar('golongan');
 
         $employeesModel = new EmployeesModel();
         $metaDataModel = new MetadataModel();
