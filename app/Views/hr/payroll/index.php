@@ -2,7 +2,7 @@
 <?= $this->Section('content'); ?>
 
 <div class="modal fade" id="generateModal" tabindex="-1">
-    <div class="modal-dialog">
+    <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title"><label class="title-name"></label> Generate Payroll</h5>
@@ -22,14 +22,21 @@
                         <form id="formGenerateGlobal" role="form" method="POST">
                             <div class="row mb-2">
                                 <div class="col-md-12">
-                                    <div class="form-floating mt-1">
-                                        <input value="<?= $year . '-' . $month ?>" readonly autocomplete="one-time-code" name="monthYearGlobal" type="month" required class="form-control target">
-                                        <label>Periode Absensi</label>
+                                    <div class="input-group mb-3 mt-3">
+                                        <div class="form-floating">
+                                            <input value="" placeholder="Pilih Periode Absensi" name="monthYearGlobal" id="monthYearGlobal" type="text" required class="form-control target">
+                                            <label>Periode Absensi</label>
+                                        </div>
+                                        <div class="input-group-append" style="height:50px;">
+                                            <button disabled class="btn btn-secondary" type="button">
+                                                <i class="fas fa-calendar-alt"></i>
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
                                 <div class="col-md-12">
-                                    <div class="form-floating mt-3">
-                                        <select class="form-select" id="divisionGlobalID" name="divisionGlobalID" aria-label="Floating label select example">
+                                    <div class="form-floating">
+                                        <select class="form-select" id="divisionGlobalID" name="divisionGlobalID">
                                             <option value="">
                                                 Cari Departemen
                                             </option>
@@ -46,15 +53,29 @@
                                     </div>
                                 </div>
                                 <div class="col-md-6">
-                                    <div class="form-floating mt-3">
-                                        <input value="<?= $startDate ?>" autocomplete="one-time-code" name="startDateGlobal" type="text" required class="form-control target input-picker startDate">
-                                        <label for="floatingInput">Mulai</label>
+                                    <div class="input-group mb-3 mt-3">
+                                        <div class="form-floating">
+                                            <input name="startDateGlobal" type="text" required class="form-control target input-picker startDate" placeholder="Tanggal Mulai Absensi">
+                                            <label for="floatingInput">Tanggal Mulai Absensi</label>
+                                        </div>
+                                        <div class="input-group-append" style="height:50px;">
+                                            <button disabled class="btn btn-secondary" type="button">
+                                                <i class="fas fa-calendar-alt"></i>
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
-                                    <div class="form-floating mt-3">
-                                        <input value="<?= $endDate ?>" autocomplete="one-time-code" name="finishDateGlobal" type="text" required class="form-control target input-picker endDate">
-                                        <label for="floatingInput">Selesai </label>
+                                    <div class="input-group mb-3 mt-3">
+                                        <div class="form-floating">
+                                            <input name="finishDateGlobal" type="text" required class="form-control target input-picker endDate" placeholder="Tanggal Selesai Absensi">
+                                            <label for="floatingInput">Tanggal Selesai Absensi</label>
+                                        </div>
+                                        <div class="input-group-append" style="height:50px;">
+                                            <button disabled class="btn btn-secondary" type="button">
+                                                <i class="fas fa-calendar-alt"></i>
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -67,14 +88,21 @@
                     <div class="tab-pane fade" id="single" role="tabpanel" aria-labelledby="profile-tab">
                         <form id="formGeneratePersonal">
                             <div class="row mb-2">
-                                <div class="col-md-12 mt-3">
-                                    <div class="form-floating mt-1">
-                                        <input value="<?= $year . '-' . $month ?>" readonly autocomplete="one-time-code" name="monthYearPersonal" type="month" required class="form-control target">
-                                        <label>Periode Absensi</label>
+                                <div class="col-md-12">
+                                    <div class="input-group mb-2 mt-2">
+                                        <div class="form-floating">
+                                            <input placeholder="Periode Absensi" value="" name="monthYearPersonal" id="monthYearPersonal" type="text" required class="form-control target">
+                                            <label>Periode Absensi</label>
+                                        </div>
+                                        <div class="input-group-append" style="height:50px;">
+                                            <button disabled class="btn btn-secondary" type="button">
+                                                <i class="fas fa-calendar-alt"></i>
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
-                                <div class="col-md-12 mt-3">
-                                    <div class="form-floating">
+                                <div class="col-md-12">
+                                    <div class="form-floating mb-2 mt-2">
                                         <select class="form-select" id="divisionID" name="filterDivisiID" aria-label="Floating label select example">
                                             <option value="">
                                                 Cari Departemen
@@ -88,8 +116,8 @@
                                         <label for="floatingInput">Cari Departemen</label>
                                     </div>
                                 </div>
-                                <div class="col-md-12 mt-3">
-                                    <div class="form-floating">
+                                <div class="col-md-12">
+                                    <div class="form-floating mb-2 mt-2">
                                         <select class="form-select" id="employeeID" name="filterEmployeeID" aria-label="Floating label select example">
                                             <option value="">
                                                 Cari Berdasarkan Nama Karyawan
@@ -99,15 +127,29 @@
                                     </div>
                                 </div>
                                 <div class="col-md-6">
-                                    <div class="form-floating mt-3">
-                                        <input value="<?= $startDate ?>" autocomplete="one-time-code" name="startDatePersonal" type="text" required class="form-control target input-picker startDate">
-                                        <label for="floatingInput">Mulai</label>
+                                    <div class="input-group mb-2 mt-2">
+                                        <div class="form-floating">
+                                            <input name="startDatePersonal" type="text" required class="form-control target input-picker startDate" placeholder="Tanggal Mulai Absensi">
+                                            <label for="floatingInput">Tanggal Mulai Absensi</label>
+                                        </div>
+                                        <div class="input-group-append" style="height:50px;">
+                                            <button disabled class="btn btn-secondary" type="button">
+                                                <i class="fas fa-calendar-alt"></i>
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
-                                    <div class="form-floating mt-3">
-                                        <input value="<?= $endDate ?>" autocomplete="one-time-code" name="finishDatePersonal" type="text" required class="form-control target input-picker endDate">
-                                        <label for="floatingInput">Selesai</label>
+                                    <div class="input-group mb-2 mt-2">
+                                        <div class="form-floating">
+                                            <input name="finishDatePersonal" type="text" required class="form-control target input-picker endDate" placeholder="Tanggal Selesai Absensi">
+                                            <label for="floatingInput">Tanggal Selesai Absensi</label>
+                                        </div>
+                                        <div class="input-group-append" style="height:50px;">
+                                            <button disabled class="btn btn-secondary" type="button">
+                                                <i class="fas fa-calendar-alt"></i>
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -127,21 +169,21 @@
 <!-- Begin Page Content -->
 <section class="section">
     <div class="section-header">
-        <h1>Payroll</h1>
+        <h1>List Payroll</h1>
         <div class="col-button-tambah-spp">
             <?= csrf_field() ?>
             <a id="generate" class="btn btn-hide-form btn-discard float-right" data-bs-toggle="modal" data-bs-target="#generateModal" href="#" style="margin-right: 10px;">
-                Generate
+                <i class="fa-solid fa-clock-rotate-left"></i> Generate
             </a>
-            <?php if ($isGenerate) : ?>
+            <?php if (can('Personalia', 'Payroll', 'p')): ?>
                 <button class="btn btn-warning btn-dropdown-export dropdown-toggle float-right" type="button" id="dropdownMenuButtonExport" data-bs-toggle="dropdown" aria-expanded="false">
-                    <i class="fa-solid fa-print"></i> Print
+                    <i class="fa fa-download"></i> Export
                 </button>
                 <ul class="dropdown-menu list-dropdown-company" aria-labelledby="dropdownMenuButtonExport">
-                    <li><button class="dropdown-item" onclick="printWithDivision('<?= base_url('payroll/print/division/' . $year . '-' . $month) ?>')">Daftar Upah</button></li>
-                    <li><button class="dropdown-item" onclick="printWithDivision('<?= base_url('payroll/print/detail/' . $year . '-' . $month) ?>')">Slip Gaji</button></li>
-                    <li><button class="dropdown-item" onclick="printWithDivision('<?= base_url('payroll/print/summary/' . $year . '-' . $month) ?>')">Summary</button></li>
-                    <li><button class="dropdown-item" onclick="printWithDivision('<?= base_url('payroll/print/potongan/' . $year . '-' . $month) ?>')">Daftar Potongan</button></li>
+                    <li><button class="dropdown-item" onclick="printWithDivision('<?= base_url('payroll/print/division/') ?>')">Daftar Upah</button></li>
+                    <li><button class="dropdown-item" onclick="printWithDivision('<?= base_url('payroll/print/detail/') ?>')">Slip Gaji</button></li>
+                    <li><button class="dropdown-item" onclick="printWithDivision('<?= base_url('payroll/print/summary/') ?>')">Summary</button></li>
+                    <li><button class="dropdown-item" onclick="printWithDivision('<?= base_url('payroll/print/potongan/') ?>')">Daftar Potongan</button></li>
                 </ul>
             <?php endif; ?>
         </div>
@@ -149,52 +191,20 @@
 
     <div class="card">
         <div class="card-body">
-
-            <div class="row justify-content-end row-col-page-list-attendance">
-                <div class="col-6 mb-0">
-                    <form action="<?= base_url('payroll') ?>" class="kt-form kt-form--fit kt-margin-b-20" method="GET">
-                        <select name="month" required id="month">
-                            <?php for ($i = 1; $i <= 12; $i++) : ?>
-                                <?php
-                                $temp = (strlen($i) == 1) ? ("0" . $i) : $i;
-                                $checked = ($month == $temp) ? "selected" : "";
-                                ?>
-                                <option value="<?= $temp; ?>" <?= $checked; ?>>
-                                    <?= $temp; ?>
-                                </option>
-                            <?php endfor ?>
-                        </select>
-                        <select name="year" required id="year">
-                            <?php
-                            for ($i = date("Y") - 2; $i <= date("Y") + 2; $i++) :
-                                $checked = ($year == $i) ? "selected" : "";
-                            ?>
-                                <option value="<?= $i; ?>" <?= $checked; ?>><?= $i; ?></option>
-                            <?php endfor ?>
-                        </select>
-                        <button type="submit" class="btn btn-primary btn-brand--icon" id="kt_search" onclick="printReport();">
-                            <span>
-                                <i class="la la-print"></i>
-                                <span>Cari</span>
-                            </span>
-                        </button>
-                    </form>
-                </div>
-                <div class="col-6 mb-0">
-                    <div class="clearfix" id="loadingSpinner">
-                        <div class="spinner-border text-primary float-right" role="status">
-                            <span class="sr-only">Loading...</span>
+            <div class="row justify-content-start mb-3">
+                <div class="col-sm-3">
+                    <div class="input-group">
+                        <div class="form-floating" style="height: 50px;">
+                            <input placeholder="" value="<?= date('Y-m') ?>" class="form-control month" id="month" name="month" />
+                            <label style="z-index: 1;" style="z-index: 1;">Pilih Bulan</label>
+                        </div>
+                        <div class="input-group-append" style="height:50px;">
+                            <button disabled class="btn btn-secondary" type="button">
+                                <i class="fas fa-calendar-alt"></i>
+                            </button>
                         </div>
                     </div>
                 </div>
-            </div>
-
-        </div>
-    </div>
-
-    <div class="card">
-        <div class="card-body">
-            <div class="row justify-content-start mb-3">
                 <div class="col-sm-3">
                     <div class="form-floating mt-1">
                         <select class="form-select" name="filterDivisiID" id="filterDivisiID" aria-label="Floating label select example">
@@ -216,8 +226,6 @@
                             <option value="">
                                 Cari Bagian
                             </option>
-
-
                         </select>
                         <label for="floatingInput">Cari Bagian</label>
                     </div>
@@ -254,16 +262,16 @@
                         <thead class="thead-dark">
                             <tr>
                                 <th>No</th>
-                                <th onclick="changeSort('employees.name')" class="sort">Nama Lengkap</th>
-                                <th onclick="changeSort('divisis.divisi')" class="sort">Departemen</th>
+                                <th onclick="changeSort('employees.name')" class="sort">Karyawan</th>
+                                <th onclick="changeSort('divisis.divisi')" class="sort">Dept</th>
                                 <th onclick="changeSort('employees.nip')" class="sort">Bagian</th>
                                 <th>Mulai</th>
                                 <th>Selesai</th>
                                 <th>Hari Kerja</th>
                                 <th>Gaji Bersih</th>
-                                <th>Total Gaji & Lembur</th>
+                                <th>Total Lembur</th>
                                 <th>Total Pengurangan Gaji</th>
-                                <th>Gaji Diterima</th>
+                                <th>Gaji Diterima (THP)</th>
                                 <th>Action</th>
                             </tr>
                         </thead>
@@ -304,8 +312,7 @@
                 data.employee_id = $("#filterEmployeeID").val();
                 data.bagian_id = $("#filterBagianID").val();
                 data.golongan = $("select[name='filterGolongan']").val();
-                data.year = "<?= $year ?>";
-                data.month = "<?= $month; ?>";
+                data.month = $('#month').val();
                 data.sort = sort;
                 data.sortType = sortType;
             }
@@ -358,7 +365,7 @@
                 }
             },
             {
-                data: "totalGajiLembur",
+                data: "totalLembur",
                 className: "text-center",
                 render: function(data, type, row) {
                     return greatFormatRupiah(data); // Format kolom totalGajiLembur
@@ -418,13 +425,7 @@
         }
     }
 
-    $("#filterDivisiID").change(function() {
-        table.ajax.reload();
-    });
-    $("#filterEmployeeID").change(function() {
-        table.ajax.reload();
-    });
-    $("#filterBagianID").change(function() {
+    $("#filterDivisiID,#filterEmployeeID,#filterBagianID,#month").change(function() {
         table.ajax.reload();
     });
 
@@ -432,6 +433,15 @@
     $('#generate').click(function(e) {
         e.preventDefault();
         $('#generateModal').modal('show');
+    });
+
+    $("#month,#monthYearGlobal,#monthYearPersonal").datepicker({
+        format: "yyyy-mm",
+        startView: "months", // langsung tampilin bulan
+        minViewMode: "months", // cuma bisa pilih bulan
+        autoclose: true,
+        todayHighlight: true,
+        orientation: "bottom auto"
     });
 
     $("select[name='filterGolongan']").select2({

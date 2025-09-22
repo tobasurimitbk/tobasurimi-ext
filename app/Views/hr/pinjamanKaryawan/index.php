@@ -4,70 +4,36 @@
 <!-- Begin Page Content -->
 <section class="section">
     <div class="section-header">
-        <h1>Pinjaman Karyawan</h1>
+        <h1>List Pinjaman Karyawan</h1>
         <div class="col-button-tambah-spp">
-            <?php if (count($pinjamanCheck) == 0) : ?>
-                <a class="btn btn-hide-form btn-discard float-right" data-bs-toggle="modal" data-bs-target="#generateModal" href="#">
-                    Generate
-                </a>
-            <?php endif; ?>
-            <?php if (count($pinjamanCheck) != 0) : ?>
-                <button onclick="printPinjaman('<?= base_url('pinjaman-karyawan/print/' . $year . '-' . $month) ?>')" class="btn btn-warning btn-print float-right">
-                    Print
+            <a class="btn btn-hide-form btn-discard float-right" data-bs-toggle="modal" data-bs-target="#generateModal" href="#">
+                <i class="fa-solid fa-clock-rotate-left"></i> Generate
+            </a>
+            <?php if (can('Personalia', 'Pinjaman Karyawan', 'p')): ?>
+                <button class="btn btn-warning btn-print float-right" onclick="exportPinjaman()">
+                    <i class="fa fa-download"></i> Export
                 </button>
-                <!-- <button class="btn btn-show-form btn-save float-right btn-submit">
-                    Simpan
-                </button> -->
             <?php endif; ?>
         </div>
     </div>
 
     <div class="card">
         <div class="card-body">
-            <div class="row justify-content-end row-col-page-list-attendance mb-3">
-                <div class="col-6 mb-0">
-                    <form action="<?= base_url('pinjaman-karyawan') ?>" class="kt-form kt-form--fit kt-margin-b-20" method="GET">
-                        <select name="month" required id="month">
-                            <?php for ($i = 1; $i <= 12; $i++) : ?>
-                                <?php
-                                $temp = (strlen($i) == 1) ? ("0" . $i) : $i;
-                                $checked = ($month == $temp) ? "selected" : "";
-                                ?>
-                                <option value="<?= $temp; ?>" <?= $checked; ?>>
-                                    <?= $temp; ?>
-                                </option>
-                            <?php endfor ?>
-                        </select>
-                        <select name="year" required id="year">
-                            <?php
-                            for ($i = date("Y") - 2; $i <= date("Y") + 2; $i++) :
-                                $checked = ($year == $i) ? "selected" : "";
-                            ?>
-                                <option value="<?= $i; ?>" <?= $checked; ?>><?= $i; ?></option>
-                            <?php endfor ?>
-                        </select>
-                        <button type="submit" class="btn btn-primary btn-brand--icon" id="kt_search" onclick="printReport();">
-                            <span>
-                                <i class="la la-print"></i>
-                                <span>Cari</span>
-                            </span>
-                        </button>
-                    </form>
-                </div>
-                <div class="col-6 mb-0">
-                    <div class="clearfix" id="loadingSpinner">
-                        <div class="spinner-border text-primary float-right" role="status">
-                            <span class="sr-only">Loading...</span>
+            <div class="row justify-content-start mb-3">
+                <div class="col-sm-3">
+                    <div class="input-group">
+                        <div class="form-floating" style="height: 50px;">
+                            <input placeholder="" value="<?= date('Y-m') ?>" class="form-control month" id="month" name="month" />
+                            <label style="z-index: 1;" style="z-index: 1;">Pilih Bulan</label>
+                        </div>
+                        <div class="input-group-append" style="height:50px;">
+                            <button disabled class="btn btn-secondary" type="button">
+                                <i class="fas fa-calendar-alt"></i>
+                            </button>
                         </div>
                     </div>
                 </div>
-            </div>
-        </div>
-    </div>
-    <div class="card">
-        <div class="card-body">
-            <div class="row justify-content-start mb-3">
-                <div class="col-md-4">
+                <div class="col-sm-3">
                     <div class="form-floating">
                         <select class="form-select" name="filterDivisiID" aria-label="Floating label select example">
                             <option value="">
@@ -82,7 +48,7 @@
                         <label for="floatingInput">Cari Departemen</label>
                     </div>
                 </div>
-                <div class="col-md-4">
+                <div class="col-sm-3">
                     <div class="form-floating">
                         <select class="form-select" name="filterGolongan" aria-label="Floating label select example">
                             <option value="">
@@ -97,7 +63,7 @@
                         <label for="floatingInput">Cari Tipe / Golongan</label>
                     </div>
                 </div>
-                <div class="col-md-4">
+                <div class="col-sm-3">
                     <div class="form-floating">
                         <select class="form-select" name="filterEmployeeID" aria-label="Floating label select example">
                             <option value="">
@@ -113,16 +79,16 @@
                     <table class="table table-bordered nowrap table-hover-tobasurimi dataTable" id="dataTable" width="100%" cellspacing="0">
                         <thead class="thead-dark">
                             <tr>
-                                <!-- <th scope="col" style="width: 10px;"><input type="checkbox" id="parent"></th> -->
-                                <th>No</th>
+                                <th style="width: 10px;">No</th>
                                 <th onclick="changeSort('employees.name')" class="sort">Nama Karyawan</th>
                                 <th onclick="changeSort('employees.tipe')" class="sort">Tipe/Gol</th>
-                                <th onclick="changeSort('employees.division_id')" class="sort">Departemen</th>
-                                <th onclick="changeSort('pinjaman_karyawan.start_date')">Detail Absen</th>
+                                <th onclick="changeSort('employees.division_id')" class="sort">Dept</th>
+                                <th onclick="changeSort('pinjaman_karyawan.start_date')">Range Absen</th>
                                 <th onclick="changeSort('pinjaman_karyawan.hadir')">Hadir</th>
                                 <th onclick="changeSort('pinjaman_karyawan.tidak_hadir')">Tidak Hadir</th>
                                 <th>Nominal</th>
                                 <th>Status Pinjaman</th>
+                                <th>Action</th>
                             </tr>
                         </thead>
                         <tbody class="body-table" id="body-table">
@@ -134,35 +100,54 @@
     </div>
 </section>
 <div class="modal fade" id="generateModal">
-    <div class="modal-dialog">
+    <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title"><label class="title-name"></label> Generate Pinjaman Karyawan</h5>
             </div>
             <form id="formGeneratePinjaman" class="create-form" role="form" method="POST">
                 <div class="modal-body">
-                    <div class="alert bg-info text-white" style="font-weight: bold; margin-top:-10px;">
-                        Pinjaman digenerate tanggal 12 setiap bulan
-                    </div>
                     <?= csrf_field() ?>
                     <div class="row mb-2">
                         <div class="col-md-12">
-                            <div class="form-floating mt-1">
-                                <input value="<?= $year . '-' . $month ?>" autocomplete="one-time-code" readonly name="monthYear" type="month" required class="form-control target input-picker">
-                                <label>Periode Pinjaman</label>
+                            <div class="input-group mb-3">
+                                <div class="form-floating">
+                                    <input value="" name="monthYear" id="monthYear" type="text" required class="form-control target input-picker" placeholder="Periode Pinjaman">
+                                    <label>Periode Pinjaman</label>
+                                </div>
+                                <div class="input-group-append" style="height:50px;">
+                                    <button disabled class="btn btn-secondary" type="button">
+                                        <i class="fas fa-calendar-alt"></i>
+                                    </button>
+                                </div>
                             </div>
                         </div>
                         <div class="col-md-6">
-                            <div class="form-floating mt-3">
-                                <input value="<?= "$start[value]/$month/$year" ?>" readonly autocomplete="one-time-code" name="startDate" type="text" required class="form-control target input-picker">
-                                <label for="floatingInput">Tanggal Mulai</label>
+                            <div class="input-group mb-3">
+                                <div class="form-floating">
+                                    <input value="" name="startDate" id="startDate" type="text" required class="form-control target input-picker" placeholder="Tanggal Mulai Log Absensi">
+                                    <label for="floatingInput">Tanggal Mulai Log Absensi</label>
+                                </div>
+                                <div class="input-group-append" style="height:50px;">
+                                    <button disabled class="btn btn-secondary" type="button">
+                                        <i class="fas fa-calendar-alt"></i>
+                                    </button>
+                                </div>
                             </div>
                         </div>
                         <div class="col-md-6">
-                            <div class="form-floating mt-3">
-                                <input value="<?= "$finish[value]/$month/$year" ?>" readonly autocomplete="one-time-code" name="finishDate" type="text" required class="form-control target input-picker">
-                                <label for="floatingInput">Tanggal Selesai</label>
+                            <div class="input-group mb-3">
+                                <div class="form-floating">
+                                    <input value="" name="finishDate" id="finishDate" type="text" required class="form-control target input-picker" placeholder="Tanggal Selesai Log Absensi">
+                                    <label for="floatingInput">Tanggal Selesai Log Absensi</label>
+                                </div>
+                                <div class="input-group-append" style="height:50px;">
+                                    <button disabled class="btn btn-secondary" type="button">
+                                        <i class="fas fa-calendar-alt"></i>
+                                    </button>
+                                </div>
                             </div>
+
                         </div>
                     </div>
                 </div>
@@ -175,48 +160,66 @@
     </div>
 </div>
 <div class="modal fade" id="generateSingleModal">
-    <div class="modal-dialog">
+    <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title"><label class="title-name"></label> Generate Ulang Pinjaman</h5>
+                <h5 class="modal-title"><label class="title-name"></label> Generate Ulang Pinjaman Per Karyawan</h5>
             </div>
             <form id="formGeneratePinjamanSingle" role="form" method="POST">
                 <div class="modal-body">
-                    <div class="alert bg-info text-white" style="font-weight: bold; margin-top:-10px;">
-                        Jika ada update data pada log absensi, anda dapat melakukan generate ulang pinjaman per pegawai
-                    </div>
                     <?= csrf_field() ?>
                     <input type="hidden" name="employeeID" id="employeeID">
                     <input type="hidden" name="id" id="id">
                     <div class="row mb-2">
                         <div class="col-md-6">
-                            <div class="form-floating mt-1">
-                                <input value="" autocomplete="one-time-code" name="monthYear" id="employeeName" readonly type="text" required class="form-control target input-picker">
-                                <label>Periode Pinjaman</label>
+                            <div class="form-floating">
+                                <input readonly value="" name="monthYear" id="employeeName" type="text" required class="form-control target input-picker">
+                                <label>Karyawan</label>
                             </div>
                         </div>
                         <div class="col-md-6">
-                            <div class="form-floating mt-1">
-                                <input value="" readonly autocomplete="one-time-code" id="tipeGol" type="text" required class="form-control target input-picker">
+                            <div class="form-floating ">
+                                <input value="" readonly id="tipeGol" type="text" required class="form-control target input-picker">
                                 <label>Tipe/Gol</label>
                             </div>
                         </div>
-                        <div class="col-md-12">
-                            <div class="form-floating mt-3">
-                                <input value="" autocomplete="one-time-code" readonly name="monthYear" id="monthYear" type="month" required class="form-control target input-picker">
-                                <label>Periode Pinjaman</label>
+                        <div class="col-md-12 mt-3">
+                            <div class="input-group mb-3">
+                                <div class="form-floating">
+                                    <input value="" name="monthYear" id="monthYear" type="text" required class="form-control target input-picker" placeholder="Periode Pinjaman">
+                                    <label>Periode Pinjaman</label>
+                                </div>
+                                <div class="input-group-append" style="height:50px;">
+                                    <button disabled class="btn btn-secondary" type="button">
+                                        <i class="fas fa-calendar-alt"></i>
+                                    </button>
+                                </div>
                             </div>
                         </div>
                         <div class="col-md-6">
-                            <div class="form-floating mt-3">
-                                <input value="" readonly autocomplete="one-time-code" name="startDate" type="text" id="startDate" required class="form-control target input-picker">
-                                <label for="floatingInput">Tanggal Mulai</label>
+                            <div class="input-group mb-3">
+                                <div class="form-floating">
+                                    <input value="" name="startDate" type="text" id="startDate" required class="form-control target input-picker" placeholder="Tanggal Mulai Log Absensi">
+                                    <label for="floatingInput">Tanggal Mulai Log Absensi</label>
+                                </div>
+                                <div class="input-group-append" style="height:50px;">
+                                    <button disabled class="btn btn-secondary" type="button">
+                                        <i class="fas fa-calendar-alt"></i>
+                                    </button>
+                                </div>
                             </div>
                         </div>
                         <div class="col-md-6">
-                            <div class="form-floating mt-3">
-                                <input value="" readonly autocomplete="one-time-code" name="finishDate" type="text" id="finishDate" required class="form-control target input-picker">
-                                <label for="floatingInput">Tanggal Selesai</label>
+                            <div class="input-group mb-3">
+                                <div class="form-floating">
+                                    <input value="" name="finishDate" type="text" id="finishDate" required class="form-control target input-picker" placeholder="Tanggal Selesai Log Absensi">
+                                    <label for="floatingInput">Tanggal Selesai Log Absensi</label>
+                                </div>
+                                <div class="input-group-append" style="height:50px;">
+                                    <button disabled class="btn btn-secondary" type="button">
+                                        <i class="fas fa-calendar-alt"></i>
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -229,54 +232,11 @@
         </div>
     </div>
 </div>
-<div class="modal fade" id="updateStatusPinjamanModal">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Update Status Pinjaman</h5>
-            </div>
-            <form role="form" id="formChangeStatusPinjaman" method="POST">
-                <div class="modal-body">
-                    <div class="row mb-2">
-                        <div class="col-md-12" style="margin-top: -20px;">
-                            <div class="alert bg-info">
-                                Status pinjaman yang <b>Diambil</b>, akan masuk kedalam komponen potongan di payroll. <br>
-                                <small id="totalDataSelected" class="card-text mt-2" style="font-size: 13px; font-weight:bold;">
-                                </small>
-                            </div>
-                            <div class="form-floating" style="margin-top: -5px;">
-                                <select required class="form-select" name="statusPinjaman" aria-label="Floating label select example">
-                                    <option value="">
-                                        Pilih Status Pinjaman
-                                    </option>
-                                    <option value="1">Sudah Diambil</option>
-                                    <option value="0">Tidak Diambil</option>
-                                </select>
-                                <label for="floatingInput">Pilih Status Pinjaman</label>
-                            </div>
-
-                        </div>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-hide-form btn-discard mr-3" data-bs-dismiss="modal">Kembali</button>
-                    <button type="button" class="btn btn-submit-form" id="updateStatusPinjaman">Simpan</button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
 <script>
-    let sort = "nomor";
+    let sort = "pinjaman_karyawan.id";
     let sortType = "desc";
     const csrfToken = '<?= csrf_token() ?>';
-    $('#loadingSpinner').hide();
-    // $("input[name='startDate'], input[name='finishDate']").datepicker({
-    //     todayHighlight: true,
-    //     format: "dd/mm/yyyy",
-    //     orientation: "bottom auto",
-    //     autoclose: true
-    // });
+
     const table = $('.dataTable').DataTable({
 
         processing: true,
@@ -298,8 +258,7 @@
                 data.divisi_id = $("select[name='filterDivisiID']").val();
                 data.employee_id = $("select[name='filterEmployeeID']").val();
                 data.tipe = $("select[name='filterGolongan']").val();
-                data.year = "<?= $year ?>";
-                data.month = "<?= $month; ?>";
+                data.month = $('#month').val();
                 data.sort = sort;
                 data.sortType = sortType;
             }
@@ -314,51 +273,30 @@
         display: "stripe",
         searching: false,
         columns: [
-            // {
-            //     data: "id",
-            //     className: "text-center",
-            //     sortable: false,
-            //     width: "5%",
-            //     searchable: false,
-            //     render: function(data, type, row) {
-            //         let id = row.id;
-            //         let is_boleh_minjam = row.isBolehMinjam;
-            //         let employeeName = row.name;
-            //         let status_pinjaman = row.statusPinjaman;
-            //         if (status_pinjaman == 1) {
-            //             return '-';
-            //         } else {
-            //             return `
-            //             <input name="id_pinjaman[]" data-employee_name="${employeeName}" class="child id_pinjaman" type="checkbox" value="${id}" ${is_boleh_minjam == 0 ? 'disabled' : ''}>
-            //             `
-            //         }
-
-            //     }
-            // },
 
             {
                 data: "no",
-                className: "text-center",
+                className: "text-left",
                 sortable: false,
-                width: "5%"
+                width: "3%"
             },
             {
                 data: "name",
-                className: "text-center"
+                className: "text-left"
             },
             {
                 data: "tipeGol",
-                className: "text-center",
+                className: "text-left",
                 width: "10%"
             },
             {
                 data: "divisi",
-                className: "text-center"
+                className: "text-left"
             },
             {
                 data: "mulaiAbsen",
-                className: "text-center",
-                className: "text-center",
+                className: "text-left",
+                className: "text-left",
                 searchable: false,
                 sortable: false,
                 render: function(data, type, row) {
@@ -369,15 +307,15 @@
             },
             {
                 data: "hadir",
-                className: "text-center"
+                className: "text-left"
             },
             {
                 data: "tidakHadir",
-                className: "text-center"
+                className: "text-left"
             },
             {
                 data: "nominalPinjaman",
-                className: "text-center",
+                className: "text-left",
                 searchable: false,
                 sortable: false,
                 render: function(data, type, row) {
@@ -391,7 +329,7 @@
 
             {
                 data: "statusPinjaman",
-                className: "text-center",
+                className: "text-left",
                 searchable: false,
                 sortable: false,
                 render: function(data, type, row) {
@@ -422,35 +360,35 @@
                 }
             },
 
-            //     {
-            //         data: "id",
-            //         className: "text-center actions",
-            //         searchable: false,
-            //         sortable: false,
-            //         render: function(data, type, row) {
-            //             let employeeID = row.employeeID;
-            //             let employeeName = row.name;
-            //             let yearMonth = row.monthYear;
-            //             let startDate = row.mulaiAbsen;
-            //             let finishDate = row.selesaiAbsen;
-            //             let tipeGol = row.tipeGol;
-            //             let status_pinjaman = row.statusPinjaman;
-            //             let id = row.id;
+            {
+                data: "id",
+                className: "text-center actions",
+                searchable: false,
+                sortable: false,
+                render: function(data, type, row) {
+                    let employeeID = row.employeeID;
+                    let employeeName = row.name;
+                    let yearMonth = row.monthYear;
+                    let startDate = row.mulaiAbsen;
+                    let finishDate = row.selesaiAbsen;
+                    let tipeGol = row.tipeGol;
+                    let status_pinjaman = row.statusPinjaman;
+                    let id = row.id;
 
-            //             if (status_pinjaman == 1) {
-            //                 return '-';
-            //             } else {
-            //                 return `
-            //     <div class="mt-0">
-            //         <button onclick="generateSingle(${employeeID}, '${employeeName}', '${yearMonth}', '${startDate}', '${finishDate}', '${tipeGol}', ${id})" class="btn btn-success posting-spp">
-            //             <i class="fa-solid fa-sm fa-repeat"></i>
-            //         </button>
-            //     </div>
-            // `
-            //             }
+                    if (status_pinjaman == 1) {
+                        return '-';
+                    } else {
+                        return `
+                <div class="mt-0">
+                    <button data-toggle="tooltip" title="Generate Ulang" onclick="generateSingle(${employeeID}, '${employeeName}', '${yearMonth}', '${startDate}', '${finishDate}', '${tipeGol}', ${id})" class="btn btn-success posting-spp">
+                        <i class="fa-solid fa-rotate-right"></i>
+                    </button>
+                </div>
+            `
+                    }
 
-            //         }
-            //     }
+                }
+            }
 
 
         ],
@@ -458,8 +396,14 @@
             defaultContent: "-",
             targets: "_all"
         }],
+        "drawCallback": function(settings) {
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-toggle="tooltip"]'))
+            var tooltipList = tooltipTriggerList.map(function(tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl)
+            });
+        },
         language: {
-            emptyTable: "Data pinjaman bulan <?= $month ?> tahun <?= $year ?> belum digenerate", // Change this line
+            emptyTable: "Tidak ada data pinjaman", // Change this line
             lengthMenu: "Show _MENU_ entries",
             paginate: {
                 previous: '<i class="fa fa-angle-left"></i>',
@@ -493,6 +437,22 @@
         placeholder: "Cari Tipe/Golongan Pegawai",
         theme: "bootstrap-5",
         allowClear: true,
+    });
+
+    $("#startDate,#finishDate").datepicker({
+        todayHighlight: true,
+        format: "dd/mm/yyyy",
+        orientation: "bottom auto",
+        autoclose: true
+    });
+
+    $("#monthYear,#month").datepicker({
+        format: "yyyy-mm",
+        startView: "months", // langsung tampilin bulan
+        minViewMode: "months", // cuma bisa pilih bulan
+        autoclose: true,
+        todayHighlight: true,
+        orientation: "bottom auto"
     });
 
     $('.form-select')
@@ -612,309 +572,175 @@
                 $(element).removeClass('select-class');
             },
         });
+        var validatorGenerateSingle = $("#formGeneratePinjamanSingle").validate({
+            rules: {
+                monthYear: {
+                    required: true
+                },
+                startDate: {
+                    required: true
+                },
+                finishDate: {
+                    required: true
+                }
+            },
+            messages: {
+                monthYear: {
+                    required: "Pilih periode pinjaman"
+                },
+                startDate: {
+                    required: "Tanggal Mulai Wajib Diisi"
+                },
+                finishDate: {
+                    required: "Tanggal Selesai Wajib Diisi"
+                },
+            },
+            errorElement: 'span',
+            errorClass: 'text-danger',
+            errorPlacement: function(error, element) {
+                var elem = $(element);
+                if (elem.hasClass("select2-hidden-accessible")) {
+                    element = $("#select2-" + elem.attr("id") + "-container").parent();
+                    error.insertAfter(element);
+                } else {
+                    error.insertAfter(element);
+                }
+            },
+            highlight: function(element) {
+                $(element).closest('.form-group').addClass('has-error');
+                $(element).addClass('select-class');
+
+            },
+            unhighlight: function(element) {
+                $(element).closest('.form-group').removeClass('has-error');
+                $(element).removeClass('select-class');
+            },
+        });
         // generate pinjaman action
         $('#generateGlobal').click(function(e) {
             e.preventDefault();
             if ($("#formGeneratePinjaman").valid()) {
-                Swal.fire({
-                    icon: 'question',
-                    title: 'Generate Pinjaman Karyawan?',
-                    confirmButtonColor: '#4e73df',
-                    cancelButtonColor: '#d33',
-                    showCancelButton: true,
-                    reverseButtons: true,
-                    confirmButtonText: 'Simpan',
-                    cancelButtonText: 'Kembali',
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        let csrf = $(`[name="${csrfToken}"]`);
-                        let data = new FormData(document.getElementById("formGeneratePinjaman"));
-                        $.ajax({
-                            url: "<?= base_url("pinjaman-karyawan/generate-all"); ?>",
-                            data: data,
-                            beforeSend: function(xhr) {
-                                xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                                $('#loadingSpinner').show();
-                            },
-                            method: "POST",
-                            dataType: "json",
-                            processData: false,
-                            contentType: false,
-                            success: function(response) {
-                                csrf.val(response.token);
-                                if (response.status) {
-                                    Swal.fire({
-                                            icon: 'success',
-                                            title: response.message,
-                                            confirmButtonColor: '#4e73df',
-                                        })
-                                        .then(() => {
-                                            table.ajax.reload();
-                                            $("#generateModal").modal("hide");
-                                        })
-                                } else {
-                                    Swal.fire({
-                                        icon: 'error',
-                                        title: response.message,
-                                        confirmButtonColor: '#4e73df',
-                                    }).then(() => {});
-                                }
-                                $('#loadingSpinner').hide();
-                                $('#formGeneratePinjaman')[0].reset();
-                                $("#generateModal").modal("hide");
-                                location.reload();
-                            },
-                            onError: function(response) {
-                                csrf.val(response.token);
-                                Swal.fire({
-                                    icon: 'error',
-                                    title: 'Data Gagal Disimpan, coba Lagi',
+                let csrf = $(`[name="${csrfToken}"]`);
+                let data = new FormData(document.getElementById("formGeneratePinjaman"));
+                $.ajax({
+                    url: "<?= base_url("pinjaman-karyawan/generate-all"); ?>",
+                    data: data,
+                    beforeSend: function(xhr) {
+                        xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                        setLoading();
+                    },
+                    complete: function() {
+                        stopLoading();
+                    },
+                    method: "POST",
+                    dataType: "json",
+                    processData: false,
+                    contentType: false,
+                    success: function(response) {
+                        csrf.val(response.token);
+                        if (response.status) {
+                            Swal.fire({
+                                    icon: 'success',
+                                    title: response.message,
                                     confirmButtonColor: '#4e73df',
-                                });
-                                $('#loadingSpinner').hide();
-                                $('#formGeneratePinjaman')[0].reset();
-                            }
-                        });
-                    }
+                                })
+                                .then(() => {
+                                    table.ajax.reload();
+                                    $("#generateModal").modal("hide");
+                                })
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: response.message,
+                                confirmButtonColor: '#4e73df',
+                            }).then(() => {});
+                        }
+                        $('#formGeneratePinjaman')[0].reset();
+                        $("#generateModal").modal("hide");
+                        table.ajax.reload();
+                    },
+
                 });
             }
         });
         // generate single pinjaman
         $('#generateUlang').click(function(e) {
             e.preventDefault();
-            Swal.fire({
-                icon: 'question',
-                title: 'Generate Ulang Pinjaman Karyawan?',
-                confirmButtonColor: '#4e73df',
-                cancelButtonColor: '#d33',
-                showCancelButton: true,
-                reverseButtons: true,
-                confirmButtonText: 'Simpan',
-                cancelButtonText: 'Kembali',
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    let csrf = $(`[name="${csrfToken}"]`);
-                    let data = new FormData(document.getElementById("formGeneratePinjamanSingle"));
-                    $.ajax({
-                        url: "<?= base_url("pinjaman-karyawan/generate-single"); ?>",
-                        data: data,
-                        beforeSend: function(xhr) {
-                            xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                            $('#loadingSpinner').show();
-                        },
-                        method: "POST",
-                        dataType: "json",
-                        processData: false,
-                        contentType: false,
-                        success: function(response) {
-                            csrf.val(response.token);
-                            if (response.status) {
-                                Swal.fire({
-                                        icon: 'success',
-                                        title: response.message,
-                                        confirmButtonColor: '#4e73df',
-                                    })
-                                    .then(() => {
-                                        table.ajax.reload();
-                                        $("#generateSingleModal").modal("hide");
-                                    });
-                                $('#formGeneratePinjamanSingle')[0].reset();
-                            } else {
-                                Swal.fire({
-                                    icon: 'error',
+            if ($('#formGeneratePinjamanSingle').valid()) {
+                let csrf = $(`[name="${csrfToken}"]`);
+                let data = new FormData(document.getElementById("formGeneratePinjamanSingle"));
+                $.ajax({
+                    url: "<?= base_url("pinjaman-karyawan/generate-single"); ?>",
+                    data: data,
+                    beforeSend: function(xhr) {
+                        xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                        setLoading();
+                    },
+                    complete: function() {
+                        stopLoading();
+                    },
+                    method: "POST",
+                    dataType: "json",
+                    processData: false,
+                    contentType: false,
+                    success: function(response) {
+                        csrf.val(response.token);
+                        if (response.status) {
+                            Swal.fire({
+                                    icon: 'success',
                                     title: response.message,
                                     confirmButtonColor: '#4e73df',
-                                }).then(() => {});
-                            }
-                            $('#loadingSpinner').hide();
-
-                        },
-                        onError: function(response) {
-                            csrf.val(response.token);
+                                })
+                                .then(() => {
+                                    table.ajax.reload();
+                                    $("#generateSingleModal").modal("hide");
+                                });
+                            $('#formGeneratePinjamanSingle')[0].reset();
+                        } else {
                             Swal.fire({
                                 icon: 'error',
-                                title: 'Data Gagal Disimpan, coba Lagi',
+                                title: response.message,
                                 confirmButtonColor: '#4e73df',
-                            });
-                            $('#loadingSpinner').hide();
+                            }).then(() => {});
                         }
-                    });
+                    },
 
-                }
-            })
-        });
-
-        $('#parent').click(function() {
-            $('.child:not(:disabled)').prop('checked', this.checked);
-        });
-
-        $('.child').click(function() {
-            if ($('.child:checked').length == $('.child').length) {
-                $('#parent').prop('checked', true);
-            } else {
-                $('#parent').prop('checked', false);
-            }
-        });
-
-        let checkedValues = [];
-        $('.btn-submit').on('click', function() {
-            $('input[name="id_pinjaman[]"]:checked').each(function() {
-                checkedValues.push($(this).val());
-            });
-            if (checkedValues.length == 0) {
-                Swal.fire({
-                    icon: 'error',
-                    title: "Checklist minimal satu data karyawan",
-                    confirmButtonColor: '#4e73df',
-                }).then(() => {});
-            } else {
-                $('#totalDataSelected').text("Total data selected : " + checkedValues.length + " karyawan");
-
-                $('#updateStatusPinjamanModal').modal('show');
-            }
-
-        });
-
-        $('#updateStatusPinjaman').click(function(e) {
-            e.preventDefault();
-            var statusPinjaman = $("select[name='statusPinjaman']").val();
-
-            if (statusPinjaman == '') {
-                Swal.fire({
-                    icon: 'error',
-                    title: "Pilih Status Pinjaman Dahulu",
-                    confirmButtonColor: '#4e73df',
-                }).then(() => {});
-            } else {
-                Swal.fire({
-                    icon: 'question',
-                    title: 'Ubah status pinjaman karyawan ?',
-                    confirmButtonColor: '#4e73df',
-                    cancelButtonColor: '#d33',
-                    showCancelButton: true,
-                    reverseButtons: true,
-                    confirmButtonText: 'Simpan',
-                    cancelButtonText: 'Kembali',
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        let csrf = $(`[name="${csrfToken}"]`);
-                        let formData = new FormData();
-                        formData.append('pinjamanID', checkedValues);
-                        formData.append('statusPinjaman', statusPinjaman);
-
-                        $.ajax({
-                            url: "<?= base_url("pinjaman-karyawan/change-status"); ?>",
-                            data: formData,
-                            beforeSend: function(xhr) {
-                                xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                                $('#loadingSpinner').show();
-                            },
-                            method: "POST",
-                            dataType: "json",
-                            processData: false,
-                            contentType: false,
-                            success: function(response) {
-                                csrf.val(response.token);
-                                if (response.status) {
-                                    Swal.fire({
-                                            icon: 'success',
-                                            title: response.message,
-                                            confirmButtonColor: '#4e73df',
-                                        })
-                                        .then(() => {
-                                            table.ajax.reload();
-                                            $("#updateStatusPinjamanModal").modal("hide");
-                                        });
-                                } else {
-                                    Swal.fire({
-                                        icon: 'error',
-                                        title: response.message,
-                                        confirmButtonColor: '#4e73df',
-                                    }).then(() => {});
-                                }
-                                $('#loadingSpinner').hide();
-                                $('#formChangeStatusPinjaman')[0].reset();
-                                $("#updateStatusPinjamanModal").modal("hide");
-                                checkedValues = [];
-                                $('input[name="id_pinjaman[]"]:checked').prop('checked', false);
-
-                            },
-                            onError: function(response) {
-                                csrf.val(response.token);
-                                Swal.fire({
-                                    icon: 'error',
-                                    title: 'Data Gagal Disimpan, coba Lagi',
-                                    confirmButtonColor: '#4e73df',
-                                });
-                                $('#loadingSpinner').hide();
-                                $('#formChangeStatusPinjaman')[0].reset();
-                                checkedValues = [];
-                                $('input[name="id_pinjaman[]"]:checked').prop('checked', false);
-                            }
-                        });
-                    }
                 });
             }
+
         });
+
     });
 
-    const changeNominalPinjaman = function(element) {
-        let nominal = $(element).val();
-        let id = $(element).data('id');
-        let csrf = $(`[name="${csrfToken}"]`);
-
-        var formData = new FormData();
-        formData.append('id', id);
-        formData.append('nominal', nominal);
-
-        $.ajax({
-            url: "<?= base_url("pinjaman-karyawan/update-nominal"); ?>",
-            data: formData,
-            method: "POST",
-            dataType: "json",
-            beforeSend: function(xhr) {
-                xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                $('#loadingSpinner').show();
-            },
-            processData: false,
-            contentType: false,
-            success: function(response) {
-                $('#loadingSpinner').hide();
-                csrf.val(response.token)
-                Swal.fire({
-                    icon: 'success',
-                    title: response.message,
-                    confirmButtonColor: '#4e73df',
-                });
-
-            },
-            onError: function(response) {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Terjadi kesalahan pada sistem',
-                    confirmButtonColor: '#4e73df',
-                });
-                $('#loadingSpinner').hide();
-            }
-        });
-    }
-    $("select[name='filterEmployeeID'], select[name='filterGolongan'], select[name='filterDivisiID']").change(function() {
+    $("select[name='filterEmployeeID'], select[name='filterGolongan'], select[name='filterDivisiID'],#month").change(function() {
         table.ajax.reload();
     });
-</script>
-<script>
-    const printPinjaman = function(url) {
+
+    function exportPinjaman() {
         var divisionID = $("select[name='filterDivisiID']").val();
+        var yearMonth = $('#month').val();
         if (divisionID == "") {
             Swal.fire({
                 icon: 'error',
                 title: 'Pilih Departemen',
                 confirmButtonColor: '#4e73df',
             });
+            return;
+        } else if (yearMonth == '') {
+            Swal.fire({
+                icon: 'error',
+                title: 'Pilih Periode',
+                confirmButtonColor: '#4e73df',
+            });
+            return;
         } else {
-            window.open(url + '/' + divisionID, "_blank");
+            var url = "<?= base_url('pinjaman-karyawan/print') ?>" + "?divisi_id=" + divisionID + '&year_month=' + yearMonth;
+            window.open(url, "_blank");
         }
     }
+</script>
+<script>
+
 </script>
 
 <?= $this->endSection(); ?>

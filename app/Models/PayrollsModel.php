@@ -91,14 +91,16 @@ class PayrollsModel extends Model
             employees.nip AS employeesNIP,
             divisis.divisi AS divisiName,
             divisis.id AS divisiID,
-            employees.bagian_id AS bagianID
+            employees.bagian_id AS bagianID,
+            bagian.nama_bagian
             "; // Corrected column names and aliases
 
         $dataQry = $this->asObject()
             ->select($selectQry)
             ->where($condition)
-            ->join('employees', 'employees.id = payrolls.employee_id', 'INNER')
-            ->join('divisis', 'divisis.id = employees.division_id', 'LEFT') // Corrected the join condition
+            ->join('employees', 'employees.id = payrolls.employee_id', 'left')
+            ->join('divisis', 'divisis.id = employees.division_id', 'left')
+            ->join('bagian', 'bagian.id = employees.bagian_id', 'left')
             ->orderBy($sort, $sortType);
 
         $totalData = $dataQry->countAllResults(false);
@@ -758,9 +760,7 @@ class PayrollsModel extends Model
         }
     }
 
-    static function getRekapGajiKaryawanPerHari($employeeID)
-    {
-    }
+    static function getRekapGajiKaryawanPerHari($employeeID) {}
 
     static function convertionIDRMoneyTotal($nilai)
     {

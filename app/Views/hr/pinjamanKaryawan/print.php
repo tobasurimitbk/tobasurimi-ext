@@ -102,13 +102,13 @@
                         <td><?= $p['employee_id'] ?></td>
                         <td><?= $p['name'] ?></td>
                         <td><?= $p['hadir'] ?></td>
-                        <td><?= number_format($p['nominal'] == null ? 0 : $p['nominal'], 2, ',', '.') ?></td>
+                        <td><?= number_format($p['nominal'] == null ? 0 : $p['nominal'], 2) ?></td>
                         <td style="padding: 30px;"></td>
                     </tr>
                 <?php endforeach; ?>
                 <tr>
                     <td colspan="4" align="right" style="text-align: right;">Total</td>
-                    <td>Rp <?= number_format($total, 2, ',', '.')  ?></td>
+                    <td>Rp <?= number_format($total, 2)  ?></td>
                     <td></td>
                 </tr>
             <?php endif; ?>

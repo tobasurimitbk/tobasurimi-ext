@@ -57,8 +57,11 @@ class FormLemburModel extends Model
         $availableSort = [
             'employees.nip' => 'employees.nip',
             'employees.name' => 'employees.name',
-            'divisis.divisi' => 'divisis.divisi',
+            'employees.division_id' => 'employees.division_id',
+            'employees.bagian_id' => 'employees.bagian_id',
             'form_lembur.periode' => 'form_lembur.periode',
+            'form_lembur.jam_mulai_lembur' => 'form_lembur.jam_mulai_lembur',
+            'form_lembur.jam_selesai_lembur' => 'form_lembur.jam_selesai_lembur',
             'form_lembur.total_jam_lembur' => 'form_lembur.total_jam_lembur',
             'form_lembur.total_uang_lembur' => 'form_lembur.total_uang_lembur',
         ];
@@ -71,16 +74,18 @@ class FormLemburModel extends Model
 
         $selectQry = "
             form_lembur.*,
-            employees.name AS employeesName,
-            employees.nip AS employeesNIP,
-            divisis.divisi AS divisiName
+            employees.name,
+            employees.nip,
+            divisis.divisi,
+            bagian.nama_bagian
         ";
 
         $dataQry = $this->asObject()
             ->select($selectQry)
             ->where($condition)
-            ->join('employees', 'employees.id = form_lembur.employee_id', 'INNER')
-            ->join('divisis', 'divisis.id = employees.division_id', 'LEFT')
+            ->join('employees', 'employees.id = form_lembur.employee_id', 'left')
+            ->join('divisis', 'divisis.id = employees.division_id', 'left')
+            ->join('bagian', 'bagian.id = employees.bagian_id', 'left')
             ->orderBy($sort, $sortType);
 
         $totalData = $dataQry->countAllResults(false);
@@ -91,7 +96,8 @@ class FormLemburModel extends Model
 
         if ($addCondition['search']) {
             $dataQry->like('employees.nip', $addCondition['search'])
-                ->orLike('employees.name', $addCondition['search']);
+                ->orLike('employees.name', $addCondition['search'])
+                ->orLike('bagian.nama_bagian', $addCondition['search']);
         }
 
         if ($addCondition['search']) {

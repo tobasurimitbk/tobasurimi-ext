@@ -4,6 +4,7 @@ namespace App\Controllers\HR;
 
 use App\Controllers\BaseController;
 use App\Models\AttendancesLogModel;
+use App\Models\AttendancesModel;
 use App\Models\BigDaysModel;
 use App\Models\DivisisModel;
 use App\Models\EmployeeJamKerjaModel;
@@ -18,42 +19,57 @@ class FormLembur extends BaseController
 {
     protected $token;
     protected $this_company_id;
+    protected $DivisiModel;
+    protected $EmployeeModel;
+    protected $FormLemburModel;
+    protected $JamKerjaModel;
+    protected $GajiConjunctionModel;
+    protected $AttendancesLogModel;
+    protected $BigdaysModel;
+    protected $EmployeeJamKerjaModel;
 
     public function __construct()
     {
         $this->token = session()->get("login")->token;
         $this->this_company_id = session()->get("login")->this_company_id;
+        $this->DivisiModel = new DivisisModel();
+        $this->EmployeeModel = new EmployeesModel();
+        $this->FormLemburModel = new FormLemburModel();
+        $this->JamKerjaModel = new JamKerjaModel();
+        $this->GajiConjunctionModel = new GajiConjunctionModel();
+        $this->AttendancesLogModel = new AttendancesLogModel();
+        $this->BigdaysModel = new BigDaysModel();
+        $this->EmployeeJamKerjaModel = new EmployeeJamKerjaModel();
     }
 
     public function index()
     {
-        return view('hr/lembur/index', [
-            'year' => date("Y"),
-            'month' => date("m")
-        ]);
+        return view('hr/lembur/index');
     }
 
     public function createView()
     {
-        $DivisiModel = new DivisisModel();
-
+        $divisi = $this->DivisiModel->get_by_company_id($this->this_company_id);
         $data = [
-            "divisi" => $DivisiModel->get_by_company_id($this->this_company_id),
+            "divisi" => $divisi,
             'lemburDetail' => null
         ];
 
-        return \view('hr/lembur/form', $data);
+        return view('hr/lembur/form', $data);
     }
 
     public function getEmployeeByDivision()
     {
-        $EmployeesModel = new EmployeesModel();
-        return \response()->setJSON([
-            'data' => $EmployeesModel->where('deletedAt', null)
-                ->where('division_id', $this->request->getVar('divisionID'))
-                ->orderBy('name', "ASC")
-                ->findAll(),
-            'token' => \csrf_hash(),
+        $divisiId = $this->request->getVar('divisionID');
+        $employee = $this->EmployeeModel->where('deletedAt', null)
+            ->where('division_id', $divisiId)
+            ->orderBy('name', "ASC")
+            ->findAll();
+
+        return response()->setJSON([
+            'data' => $employee,
+            'status' => true,
+            'token' => csrf_hash(),
         ]);
     }
 
@@ -71,17 +87,15 @@ class FormLembur extends BaseController
             'lemburDetail' => $formLemburModel->where('id', $id)->first()
         ];
 
-        return \view('hr/lembur/form', $data);
+        return view('hr/lembur/form', $data);
     }
 
     public function delete()
     {
-        $id = \decrypt($this->request->getPost("id"));
+        $id = decrypt($this->request->getPost("id"));
+        $this->FormLemburModel->delete($id);
 
-        $formLemburModel = new FormLemburModel();
-        $formLemburModel->where('id', $id)->delete();
-
-        return \response()->setJSON([
+        return response()->setJSON([
             'status' => true,
             'message' => "Form data lembur berhasil dihapus"
         ]);
@@ -96,10 +110,10 @@ class FormLembur extends BaseController
             "sortType"      => $this->request->getGet("sortType"),
         ];
 
-        $monthYear = explode('-', $this->request->getVar('yearMonth'));
+        $monthYear = explode('-', $this->request->getVar('month'));
         $condition = [
             "form_lembur.company_id" => $this->this_company_id,
-            "employees.deletedAt" => null,
+            "form_lembur.deletedAt" => null,
             'MONTH(form_lembur.periode)' => $monthYear[1],
             'YEAR(form_lembur.periode)' => $monthYear[0]
         ];
@@ -111,15 +125,13 @@ class FormLembur extends BaseController
         $limit = $this->request->getGet("length");
         $offset = $this->request->getGet("start");
 
-        $modelFormLembur = new FormLemburModel();
 
-        $result = $modelFormLembur->getList($condition, $addCondition, $limit, $offset);
+        $result = $this->FormLemburModel->getList($condition, $addCondition, $limit, $offset);
         $dataFormLembur = [];
 
         $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
 
         foreach ($result['data'] as $p) {
-            $tanggalObj = DateTime::createFromFormat('Y-m-d', $p->periode);
             $splitJamMenit = explode('.', $p->total_jam_lembur);
 
             if (count($splitJamMenit) == 2) {
@@ -137,12 +149,15 @@ class FormLembur extends BaseController
             array_push($dataFormLembur, [
                 "no" => $no++,
                 "id" => encrypt($p->id),
-                "nip" => $p->employeesNIP,
-                "name" => $p->employeesName,
-                "divisi" => $p->divisiName,
-                "periode" => $tanggalObj->format('d/m/Y'),
-                "jam_lembur" => $jam . " Jam " . $menit . " Menit",
-                "uang_lembur" => "" . number_format($p->total_uang_lembur, 0, ',', '.')
+                "nip" => $p->nip,
+                "name" => $p->name,
+                "divisi" => $p->divisi,
+                "nama_bagian" => $p->nama_bagian,
+                "periode" => date('d/m/Y', strtotime($p->periode)),
+                "jam_mulai_lembur" => $p->jam_mulai_lembur,
+                "jam_selesai_lembur" => $p->jam_selesai_lembur,
+                "total_jam_lembur" => $jam . " Jam " . $menit . " Menit",
+                "total_uang_lembur" => number_format($p->total_uang_lembur, 2)
             ]);
         }
         $data = [
@@ -153,8 +168,7 @@ class FormLembur extends BaseController
             "payload"           => $payload
         ];
 
-        echo json_encode($data);
-        return;
+        return response()->setJSON($data);
     }
 
     public function generateLemburPay()
@@ -165,11 +179,11 @@ class FormLembur extends BaseController
         $jamSelesaiLembur = $this->request->getVar('jamSelesaiLembur');
         $gajiPokokPerHari = $this->request->getVar('gajiPokokPerHari');
 
-        $modelJamKerja = new JamKerjaModel();
-        $modelGaji = new GajiConjunctionModel();
-        $modelLogAttendance = new AttendancesLogModel();
-        $modelBigDays = new BigDaysModel();
-        $employeeJamKerjaModel = new EmployeeJamKerjaModel();
+        // $modelJamKerja = new JamKerjaModel();
+        // $modelGaji = new GajiConjunctionModel();
+        // $modelLogAttendance = new AttendancesLogModel();
+        // $modelBigDays = new BigDaysModel();
+        // $employeeJamKerjaModel = new EmployeeJamKerjaModel();
 
         // declare Variable
         $checkOutLog = ""; // di set sebagai selesai lembur
@@ -184,7 +198,7 @@ class FormLembur extends BaseController
 
         // Check
         if (empty($employeeID) || empty($tanggal)) {
-            return \response()->setJSON([
+            return response()->setJSON([
                 'message' => "Inputan Nama Karyawan dan Tanggal lembur wajib diisi !",
                 'status' => false,
                 'code' => 422
@@ -197,7 +211,7 @@ class FormLembur extends BaseController
         $selectQry = "DATE_FORMAT(MIN(date_create), '%H:%i:%s') AS checkin,
         DATE_FORMAT(MAX(date_create), '%H:%i:%s') AS checkout";
 
-        $logAttendance = $modelLogAttendance
+        $logAttendance = $this->AttendancesLogModel
             ->select($selectQry)
             ->where('company_id', $this->this_company_id)
             ->where('employees_id', $employeeID)
@@ -207,8 +221,8 @@ class FormLembur extends BaseController
             ->get()
             ->getResult();
 
-        if (\count($logAttendance) == 0) {
-            return \response()->setJSON([
+        if (count($logAttendance) == 0) {
+            return response()->setJSON([
                 'message' => "Karyawan belum melakukan presensi fingerprint pada tanggal $tanggal",
                 'status' => false,
                 'code' => 400
@@ -217,18 +231,17 @@ class FormLembur extends BaseController
         // asign to max date create
         if ($logAttendance[0]->checkout != $logAttendance[0]->checkin) {
             // ada in and out
-            $checkOutLog = \date('H:i', \strtotime($logAttendance[0]->checkout));
+            $checkOutLog = date('H:i', \strtotime($logAttendance[0]->checkout));
         } else {
             // in
-            $checkOutLog = \date('H:i', \strtotime($logAttendance[0]->checkin));
+            $checkOutLog = date('H:i', \strtotime($logAttendance[0]->checkin));
         }
 
-
         // cek hari besar
-        $hariBesar = $modelBigDays->where('date', $tanggal)->where('company_id', $this->this_company_id)->first();
+        $hariBesar = $this->BigdaysModel->where('date', $tanggal)->where('company_id', $this->this_company_id)->first();
         // jika hari besar yha libur gak ada lembur
         if ($hariBesar != null) {
-            return \response()->setJSON([
+            return response()->setJSON([
                 'message' => "$tanggal adalah hari besar " . $hariBesar['name'] . ". jadi ga bisa ambil lembur di hari tersebut",
                 'status' => false,
                 'code' => 400
@@ -238,7 +251,7 @@ class FormLembur extends BaseController
         // check apakah sudah presensi pulang di log
         if ($logAttendance[0]->checkout == $logAttendance[0]->checkin) {
             // belum ada presensi pulang di log
-            return \response()->setJSON([
+            return response()->setJSON([
                 'message' => "Karyawan belum melakukan presensi pulang pada tanggal $tanggal",
                 'status' => false,
                 'code' => 400
@@ -253,23 +266,32 @@ class FormLembur extends BaseController
         // get jam kerja
         $hariInIndonesia = static::getDayIndonesia(date('l', strtotime($tanggal)));
         // GET JAM KERJA USED
-        $jamKerja = $employeeJamKerjaModel->getJamKerjaUsedByEmployeeId($tanggal, $employeeID);
+        $jamKerja = $this->EmployeeJamKerjaModel->getJamKerjaUsedByEmployeeId($tanggal, $employeeID);
 
-        $jamKerjaDetail = $modelJamKerja
+        $jamKerjaDetail = $this->JamKerjaModel
             ->select('jam_kerja_detail.*')
             ->join('jam_kerja_detail', 'jam_kerja.id = jam_kerja_detail.jam_kerja_id')
             ->where('jam_kerja.company_id', $this->this_company_id)
             ->where('jam_kerja.id', $jamKerja['id'])
             ->where('jam_kerja_detail.hari', $hariInIndonesia)
+            ->where('jam_kerja_detail.deletedAt', null)
             ->first();
 
         // cek jam kerja detail apakah kosong
         if ($jamKerjaDetail == null) {
-            return \response()->setJSON([
+            return response()->setJSON([
                 'message' => "Terjadi kesalahan, jam kerja belum diset untuk divisi ini",
-                'status' => \false,
+                'status' => false,
                 'code' => 400
             ]);
+        }
+
+        // Default Jam Istirahat
+        if ($jamKerjaDetail['jam_istirahat_mulai'] == null) {
+            $jamKerjaDetail['jam_istirahat_mulai'] = "12:01";
+        }
+        if ($jamKerjaDetail['jam_istirahat_selesai'] == null) {
+            $jamKerjaDetail['jam_istirahat_selesai'] = "13:00";
         }
 
         // cari selisih waktu jam masuk dan checkout (bersih) => jam masuk -> checkout
@@ -293,7 +315,7 @@ class FormLembur extends BaseController
         }
 
         // gaji
-        $gaji = $modelGaji->select("tunjangan.name, gaji_conjunction.nominal, tunjangan.is_gaji_harian")
+        $gaji = $this->GajiConjunctionModel->select("tunjangan.name, gaji_conjunction.nominal, tunjangan.is_gaji_harian")
             ->join('tunjangan', 'tunjangan.id = gaji_conjunction.tunjangan_id')
             ->where('gaji_conjunction.employee_id', $employeeID)
             ->where('tunjangan.tipe', "PLUS")
@@ -316,7 +338,7 @@ class FormLembur extends BaseController
         $totalJamLembur = (float)$waktuSelisihPulangLembur['jam'] . "." . $waktuSelisihPulangLembur['menit'];
 
         if ($totalJamLembur <= 0.9) {
-            return \response()->setJSON([
+            return response()->setJSON([
                 'message' => "Minimal pegawai dapat mengambil lembur adalah satu jam. Tanggal " . date('d/m/Y', strtotime($tanggal)) . " hanya menghasilkan total jam lembur sebesar " . $waktuSelisihPulangLembur['menit'] . " Menit. Pegawai Checkout Jam " . $checkOutLog . " dan Waktu Pulang di Jam Kerja Adalah Jam " . $jamKerjaDetail['jam_pulang'] . ". Sehingga tidak memenuhi persyaratan :)",
                 'status' => \false,
                 'code' => 400
@@ -344,7 +366,7 @@ class FormLembur extends BaseController
         }
 
         if ($totalLemburJamPertama <= 0) {
-            return \response()->setJSON([
+            return response()->setJSON([
                 'message' => "Tidak memenuhi syarat melakukan lembur karena pegawai checkout sebelum jam pulang, silahkan cek menu log absensi",
                 'status' => \false,
                 'code' => 400
@@ -381,44 +403,52 @@ class FormLembur extends BaseController
             'status' => true,
         ];
 
-        echo \json_encode($result);
+        return response()->setJSON($result);
     }
 
     public function create()
     {
-        $modelFormLembur = new FormLemburModel();
-        $modelEmployee = new EmployeesModel();
         $periode = $this->request->getVar('tanggalLembur');
         $tanggalObj = DateTime::createFromFormat('d/m/Y', $periode);
+        $employeeId =  $this->request->getVar('employeeID');
+        $totalJamLembur = (float)$this->request->getVar('totalJamLembur');
+        $totalUangLembur = (float)$this->request->getVar('totalUangLembur');
+        $kurangiJamIstirahat = $this->request->getVar('kurangiJamIstirahat');
+        $jamMulaiLembur = $this->request->getVar('jamMulaiLembur');
+        $jamSelesaiLembur = $this->request->getVar('jamSelesaiLembur');
+        $gajiPokokPerHari = (float)$this->request->getVar('gajiPokokPerHari');
 
-        $check = $modelFormLembur->where('employee_id', $this->request->getVar('employeeID'))
+        $check = $this->FormLemburModel
+            ->where('employee_id', $employeeId)
             ->where('periode', $tanggalObj->format('Y-m-d'))
             ->first();
 
         if ($check != null) {
-            return \response()->setJSON([
+            return response()->setJSON([
                 'message' => "Karyawan sudah mengambil lembur tanggal " . $this->request->getVar('tanggalLembur'),
-                'status' => \false
+                'status' => \false,
+                'token' => csrf_hash()
             ]);
         }
 
-        $employee = $modelEmployee->where('id', $this->request->getVar('employeeID'))->first();
+        $employee = $this->EmployeeModel->where('id', $employeeId)->first();
 
-        $modelFormLembur->insert([
+        $this->FormLemburModel->insert([
             'company_id' => $this->this_company_id,
             'division_id' => $employee['division_id'],
-            'employee_id' => $this->request->getVar('employeeID'),
+            'employee_id' => $employeeId,
             'periode' => $tanggalObj->format('Y-m-d'),
-            'total_jam_lembur' => (float)$this->request->getVar('totalJamLembur'),
-            'total_uang_lembur' => $this->request->getVar('totalUangLembur'),
-            'kurangi_jam_istirahat' => $this->request->getVar('kurangiJamIstirahat'),
-            'jam_mulai_lembur' => $this->request->getVar('jamMulaiLembur'),
-            'jam_selesai_lembur' => $this->request->getVar('jamSelesaiLembur'),
-            'gaji_pokok_per_hari' => $this->request->getVar('gajiPokokPerHari')
+            'total_jam_lembur' => $totalJamLembur,
+            'total_uang_lembur' => $totalUangLembur,
+            'kurangi_jam_istirahat' => $kurangiJamIstirahat,
+            'jam_mulai_lembur' => $jamMulaiLembur,
+            'jam_selesai_lembur' => $jamSelesaiLembur,
+            'gaji_pokok_per_hari' => $gajiPokokPerHari
         ]);
 
-        return \response()->setJSON([
+        return response()->setJSON([
             'message' => "Form lembur berhasil disimpan",
+            'token' => csrf_hash(),
             'status' => \true
         ]);
     }

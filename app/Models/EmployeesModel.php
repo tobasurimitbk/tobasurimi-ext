@@ -215,9 +215,9 @@ class EmployeesModel extends Model
         $arrCondition = [
             'employees.deletedAt' => null,
             'employees.company_id' => $company_id,
-            'divisis.deletedAt' => null,
-            'bagian.deletedAt' => null,
-            'employees.status' => "Aktif"
+            // 'divisis.deletedAt' => null,
+            // 'bagian.deletedAt' => null,
+            // 'employees.status' => "Aktif"
         ];
 
         $builder = $this->db->table('employees')
