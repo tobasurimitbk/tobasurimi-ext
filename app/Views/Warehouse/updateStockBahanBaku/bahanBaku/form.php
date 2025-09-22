@@ -51,6 +51,32 @@
                         </div>
                     </div>
 
+                    <!-- TANGGAL AWAL               -->
+                    <div class="col-md-4">
+                        <div class="input-group input-group-password">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input autocomplete="one-time-code" type="text" class="form-control tanggal_po_awal" name="tanggal_po_awal" id="tanggal_po_awal" placeholder="Tanggal Awal">
+                                <label for="floatingInput">Tanggal Awal</label>
+                            </div>
+                            <div class="input-group-prepend group-prepend-password align-items-center">
+                                <i style="cursor: pointer; z-index: 99; margin-bottom: 10px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-po-date"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                     <!-- TANGGAL AKHIR              -->
+                    <div class="col-md-4">
+                        <div class="input-group input-group-password">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input autocomplete="one-time-code" type="text" class="form-control tanggal_po_akhir" name="tanggal_po_akhir" id="tanggal_po_akhir" placeholder="Tanggal Awal">
+                                <label for="floatingInput">Tanggal Akhir</label>
+                            </div>
+                            <div class="input-group-prepend group-prepend-password align-items-center">
+                                <i style="cursor: pointer; z-index: 99; margin-bottom: 10px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-po-date"></i>
+                            </div>
+                        </div>
+                    </div>
+
                     <!-- SUPPLIER -->
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
@@ -66,22 +92,36 @@
                             <label for="floatingInput" style="z-index: 1;">Supplier</label>
                         </div>
                     </div>
+                </div>
 
-                    <!-- NO PO -->
-                    <div class="col-md-4">
-                        <div class="form-floating mb-3" style="height: 50px;">
-                            <select class="form-select no_po" id="no_po" name="no_po" aria-label="Floating label select example">
-                                <option value=""></option>
-                                <?php if (!empty($po)) : ?>
-                                    <option value="<?= $po['id'] ?>" selected>
-                                        <?= $po['po_no'] ?>
-                                    </option>
-                                <?php endif; ?>
-                            </select>
-                            <label for="floatingInput" style="z-index: 1;">No PO</label>
+                 <div class="row mt-3">
+                    <div class="col mb-0">
+                        <label class="form-label font-weight-bold lable-title">Pilih Inventori Barang Yang Akan Di Update Stock</label>
+                    </div>
+                    <div class="col-md-12 col-table-button-tts" style="margin-top: -10px;">
+                        <div class="table-responsive">
+                            <table class="table table-bordered nowrap table-hover-tobasurimi table-form-tts" id="dataTable" width="100%" cellspacing="0">
+                                <thead class="thead-dark">
+                                    <tr>
+                                        <th style="text-align: center;">#</th>
+                                        <th style="text-align: center;">Asal Barang</th>
+                                        <th style="text-align: center;">No PO</th>
+                                        <th style="text-align: center;">Supplier</th>
+                                        <th style="text-align: center;">Dokumen Pabean</th>
+                                        <th style="text-align: center;">Tgl PO</th>
+                                        <th style="text-align: center;">Barang - Spesifikasi</th>
+                                        <th style="text-align: center;">Satuan</th>
+                                        <th style="text-align: center;">Qty</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="body-table">
+                                </tbody>
+                            </table>
+                            <button type="button" class="btn btn-primary" id="select-item-btn">Pilih</button>
                         </div>
                     </div>
                 </div>
+
             </form>
 
 
@@ -105,9 +145,8 @@
                                     <th style="text-align: center;">Barang - Spesifikasi</th>
                                     <th style="text-align: center;">Satuan</th>
                                     <th style="text-align: center;">Qty PO</th>
-                                    <th style="text-align: center;">Qty LPB</th>
-                                    <th style="text-align: center;">Qty Bersih</th>
-                                    <th style="text-align: center;">Qty Kotor</th>
+                                    <th style="text-align: center;">Qty Kotor (selisih)</th>
+                                    <th style="text-align: center;">Qty Di Terima</th>
                                     <th style="text-align: center;">Action</th>
                                 </tr>
                             </thead>
@@ -136,7 +175,7 @@
     var listStockAsal = [];
     var listStockSelected = [];
 
-    $(".tanggal,.tanggal_selesai").datepicker({
+    $("#tanggal_po_awal, #tanggal_po_akhir").datepicker({
         todayHighlight: true,
         format: "dd/mm/yyyy",
         orientation: "bottom auto",
@@ -287,13 +326,13 @@
         getListWarehouse();
     });
 
-    $('#no_po').select2({
-        placeholder: "Pilih No Po",
-        theme: "bootstrap-5",
-        allowClear: false
-    }).change(function() {
-       getListBarangPo()
-    });
+    // $('#no_po').select2({
+    //     placeholder: "Pilih No Po",
+    //     theme: "bootstrap-5",
+    //     allowClear: false
+    // }).change(function() {
+    //    getListBarangPo()
+    // });
 
     $('#spesifikasi_rebus_id').select2({
         placeholder: "Pilih Barang - Spesifikasi (Udang / Kepiting Kulit)",
@@ -322,7 +361,10 @@
     }).change(function() {
         // LIST DOKUMEN PABEAN
         // getListDokumenPabean();
-        getListPo()
+        getListBarangPo();
+        <?php if ($po) : ?>
+             getListBarangPoAlreadyHaveKotor();
+        <?php endif; ?>
     });
 
 
@@ -410,16 +452,7 @@
             return $(this).data("id");
         }).get();
         var id_selected = getIDListDataSelected();
-        var barangIn = $('#spesifikasi_hasil_rebus_id option:selected');
 
-        if (barangIn.data('barang_id') == "" || barangIn.data('barang_id') == undefined) {
-            Swal.fire({
-                icon: 'error',
-                title: 'Hasil Barang Rebus Wajib Dipilih !',
-                confirmButtonColor: '#4e73df',
-                confirmButtonText: 'Ok'
-            });
-        } else {
             $.each(listStockAsal, function(i, v) {
                 var currentID = Number(v.id);
 
@@ -431,19 +464,11 @@
                     if (!isIDSelected) {
                         listStockAsal[i].stok_total = parseFloat(listStockAsal[i].stok_total);
                         listStockAsal[i].qty = 0;
-                        listStockAsal[i].output = {
-                            barang: barangIn.data('barang'),
-                            barang_id: barangIn.data('barang_id'),
-                            kode_satuan: barangIn.data('kode_satuan'),
-                            stock_id: barangIn.data('stock_id'),
-                            qty: 0
-                        }
                         listStockSelected.push(listStockAsal[i]);
                     }
                 }
             });
             drawTableSelectedItem(listStockSelected);
-        }
     }
 
     function insertListFifo() {
@@ -564,16 +589,16 @@
                     dataErrorHasilRebus = null;
                     
                     // Reset semua class error terlebih dahulu
-                    $('.qty-kotor').removeClass('is-invalid');
+                    $('.qty-diterima').removeClass('is-invalid');
                     
                     // Validasi per item
                     $.each(listStockSelected, function(i, v) {
-                        var qty_kotor = $('input.qty-kotor[data-id="' + v.id + '"]');
+                        var qty_diterima = $('input.qty-diterima[data-id="' + v.id + '"]');
 
-                        var input_user_kotor = destroyFormatRupiah(qty_kotor.val()) || 0;
+                        var input_user_diterima = destroyFormatRupiah(qty_diterima.val()) || 0;
 
                         // Always set the qty value regardless of validation
-                        listStockSelected[i].qty_kotor = input_user_kotor;
+                        listStockSelected[i].qty_diterima = input_user_diterima;
                     });
 
 
@@ -848,7 +873,40 @@
                 stopLoading();
             },
             data: {
-                no_po: $("#no_po option:selected").text(),
+                divisi_id: $("#divisi_id option:selected").val(),
+                supplier_id: $("#supplier_id option:selected").val(),
+                warehouse_id: $("#warehouse_id option:selected").val(),
+                tanggal_po_awal: $("#tanggal_po_awal").val(),
+                tanggal_po_akhir: $("#tanggal_po_akhir").val(),
+            },
+            dataType: "json",
+            success: function(res) {
+                // LIST STOK PER BC
+                listStockAsal = [];
+                listStockAsal = res.data;
+                drawTableAsalBarang(res.data);
+            }
+        });
+    }
+
+
+    function getListBarangPoAlreadyHaveKotor() {
+        // GET LIST STOCK PER DOKUMEN PABEAN
+        $.ajax({
+            url: `<?= base_url('update-stock-bahan-baku/list-barang-po-kotor'); ?>`,
+            method: "GET",
+            beforeSend: function() {
+                setLoading();
+            },
+            complete: function() {
+                stopLoading();
+            },
+            data: {
+                divisi_id: $("#divisi_id option:selected").val(),
+                supplier_id: $("#supplier_id option:selected").val(),
+                warehouse_id: $("#warehouse_id option:selected").val(),
+                tanggal_po_awal: $("#tanggal_po_awal").val(),
+                tanggal_po_akhir: $("#tanggal_po_akhir").val(),
             },
             dataType: "json",
             success: function(res) {
@@ -856,6 +914,7 @@
                 listStockSelected = [];
                 listStockSelected = res.data;
                 drawTableSelectedItem(res.data);
+               
             }
         });
     }
@@ -896,12 +955,7 @@
 
         $.each(data, function(i, v) {
             var newRow = $('<tr>');
-            if (typePengambilanStok == "FIFO" || parseFloat(v.stok_total) == 0) {
-                newRow.append($('<td style="text-align: center;">').html(
-                    `
-                `
-                ));
-            } else {
+           
                 newRow.append($('<td style="text-align: center;">').html(
                     `
                     <div class="form-check">
@@ -909,7 +963,6 @@
                     </div>
                 `
                 ));
-            }
 
             newRow.append($('<td style="text-align:center;">').text(v.sumber));
             newRow.append($('<td style="text-align:center;">').text(v.stock_dokumen));
@@ -919,7 +972,7 @@
             newRow.append($('<td style="text-align:center;">').text(v.stock_date));
             newRow.append($('<td style="text-align:center;">').text(v.barang));
             newRow.append($('<td style="text-align:center;">').text(v.satuan));
-            newRow.append($('<td style="text-align:center;">').text(greatFormatRupiah(v.stok_total)));
+            newRow.append($('<td style="text-align:center;">').text(greatFormatRupiah(v.total_penerimaan)));
             table.find('tbody').append(newRow);
         });
 
@@ -1000,15 +1053,14 @@
                         <td>${item.barang || '-'}</td>
                         <td>${item.satuan || '-'}</td>
                         <td style="text-align: right;">${greatFormatRupiah(item.total_penerimaan)}</td>
-                        <td style="text-align: right;">${greatFormatRupiah(item.total_penerimaan)}</td>
-                        <td style="text-align: right;">${greatFormatRupiah(item.stok_total)}</td>
+                        <td style="text-align: right;">${greatFormatRupiah(item.stok_total_kotor)}</td>
                         <td>
                             <input type="text" step="0.001" min="0" 
-                                class="form-control qty-kotor" 
-                                name="qty_kotor" 
+                                class="form-control qty-diterima" 
+                                name="qty_diterima" 
                                 data-id="${item.id}"
                                 data-index="${i}"
-                                value="${greatFormatRupiah(item.stok_total_kotor) || 0}" />
+                                value="${greatFormatRupiah(item.stok_total_diterima) || 0}" />
                         </td>
                         <td><button type="button" class="btn btn-danger btn-sm btn-remove-row">Hapus</button></td>
                     </tr>
@@ -1048,7 +1100,7 @@
             // Buat hanya satu grand total row di bagian paling bawah
             const totalRow = $(`
                 <tr class="grand-total-row" style="background-color: #d1ecf1; font-weight: bold;">
-                    <td colspan="9" style="text-align: right;">GRAND TOTAL</td>
+                    <td colspan="8" style="text-align: right;">GRAND TOTAL</td>
                     <td style="text-align: right;">${greatFormatRupiah(totalQtyRebus)}</td>
                     <td style="text-align: right;">${greatFormatRupiah(totalQtyHasilRebus)}</td>
                     <td></td>

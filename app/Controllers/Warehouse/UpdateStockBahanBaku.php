@@ -24,6 +24,7 @@ use App\Models\KemasanModel;
 use App\Models\TaxModel;
 use App\Models\DivisisModel;
 use App\Models\RMPurchaseOrderModel;
+use DateTime;
 use Dompdf\Dompdf;
 
 class UpdateStockBahanBaku extends BaseController
@@ -140,27 +141,51 @@ class UpdateStockBahanBaku extends BaseController
 
     public function getListStockByPO()
     {
-        $po = $this->request->getVar('no_po');
+        $tanggal_po_awal   = $this->request->getVar('tanggal_po_awal');
+        $tanggal_po_akhir  = $this->request->getVar('tanggal_po_akhir');
+        $supplier_id       = $this->request->getVar('supplier_id');
+        $warehouse_id      = $this->request->getVar('warehouse_id');
+        $divisi_id         = $this->request->getVar('divisi_id');
+
         $poModel = new RMPurchaseOrderModel();
 
-        if (!empty($this->request->getVar('no_po'))) {
+        // siapkan condition kosong dulu
+        $condition = [
+            'stock_details.sumber' => 'LPB',
+            'stock_details.deletedAt' => NULL,
+            'stock_details2.deletedAt' => NULL
+        ];
 
+        // filter tanggal kalau ada
+        if (!empty($tanggal_po_awal) && !empty($tanggal_po_akhir)) {
+            $condition['DATE(stock_details.stock_date) >='] = DateTime::createFromFormat('d/m/Y', $tanggal_po_awal)->format('Y-m-d');
+            $condition['DATE(stock_details.stock_date) <='] = DateTime::createFromFormat('d/m/Y', $tanggal_po_akhir)->format('Y-m-d');
+        }
 
-            $condition = [
-                'stock_details2.no_po' => $this->request->getVar('no_po'),
-                'stock_details.sumber' => "LPB"
-            ];
+        // filter warehouse
+        if (!empty($warehouse_id)) {
+            $condition['stock.warehouse_id'] = $warehouse_id;
+        }
 
-            $dataResult = $this->stockDetail2Model->getStockListWithAddConditionByPONew(
-                $condition
-            );
+        // filter divisi
+        if (!empty($divisi_id)) {
+            $condition['stock.divisi_id'] = $divisi_id;
+        }
+
+        if (!empty($supplier_id)) {
+            $condition['stock_details2.supplier_id'] = $supplier_id;
+            $dataResult = $this->stockDetail2Model
+                ->getStockListWithAddConditionByPONew($condition);
+        } else {
+            $dataResult = [];
+        }
          
           
-            $resultArr = array();
+        $resultArr = array();
 
            
-                // Khsus Dari Supplier
-                for ($i = 0; $i < count($dataResult); $i++) {
+        // Khsus Dari Supplier
+        for ($i = 0; $i < count($dataResult); $i++) {
                     $bcType = $this->metadataModel->find($dataResult[$i]['bc_id']);
 
                     $rmPurchaseOrder = $poModel->where('po_no', $dataResult[$i]['stock_dokumen'])
@@ -178,20 +203,103 @@ class UpdateStockBahanBaku extends BaseController
                     $dataResult[$i]['type_barang_text'] = strtoupper(str_replace('_', ' ', $dataResult[$i]['tipe_barang']));
                     $dataResult[$i]['stok_total'] = floatval($dataResult[$i]['stok_total']);
                     $dataResult[$i]['stok_total_kotor'] = floatval($dataResult[$i]['stok_total_kotor']);
+                    $dataResult[$i]['stok_total_diterima'] = floatval($dataResult[$i]['stok_total_diterima']);
                     $dataResult[$i]['total_penerimaan'] = floatval($dataResult[$i]['total_penerimaan']);
 
                     if ($dataResult[$i]['stok_total'] > 0) {
                         array_push($resultArr, $dataResult[$i]);
                     }
-                }
+        }
             
 
-            return response()->setJSON([
+        return response()->setJSON([
                 'data' => $resultArr,
                 'token' => csrf_hash(),
                 'status' => true
-            ]);
+        ]);
+        
+    }
+
+
+    public function getListStockByPOKotor()
+    {
+        $tanggal_po_awal   = $this->request->getVar('tanggal_po_awal');
+        $tanggal_po_akhir  = $this->request->getVar('tanggal_po_akhir');
+        $supplier_id       = $this->request->getVar('supplier_id');
+        $warehouse_id      = $this->request->getVar('warehouse_id');
+        $divisi_id         = $this->request->getVar('divisi_id');
+
+        $poModel = new RMPurchaseOrderModel();
+
+        // siapkan condition kosong dulu
+        $condition = [
+            'stock_details.sumber' => 'LPB',
+            'stock_details.deletedAt' => NULL,
+            'stock_details2.deletedAt' => NULL
+        ];
+
+        // filter tanggal kalau ada
+        if (!empty($tanggal_po_awal) && !empty($tanggal_po_akhir)) {
+            $condition['DATE(stock_details.stock_date) >='] = DateTime::createFromFormat('d/m/Y', $tanggal_po_awal)->format('Y-m-d');
+            $condition['DATE(stock_details.stock_date) <='] = DateTime::createFromFormat('d/m/Y', $tanggal_po_akhir)->format('Y-m-d');
         }
+
+        // filter warehouse
+        if (!empty($warehouse_id)) {
+            $condition['stock.warehouse_id'] = $warehouse_id;
+        }
+
+        // filter divisi
+        if (!empty($divisi_id)) {
+            $condition['stock.divisi_id'] = $divisi_id;
+        }
+
+        if (!empty($supplier_id)) {
+            $condition['stock_details2.supplier_id'] = $supplier_id;
+            $dataResult = $this->stockDetail2Model
+                ->getStockListWithAddConditionByPOKotorNew($condition);
+        } else {
+            $dataResult = [];
+        }
+         
+          
+        $resultArr = array();
+
+           
+        // Khsus Dari Supplier
+        for ($i = 0; $i < count($dataResult); $i++) {
+                    $bcType = $this->metadataModel->find($dataResult[$i]['bc_id']);
+
+                    $rmPurchaseOrder = $poModel->where('po_no', $dataResult[$i]['stock_dokumen'])
+                        // ->where('company_id', $dataResult['company_id'])
+                        ->first();
+
+                    $dataResult[$i]['stock_dokumen'] = $dataResult[$i]['stock_dokumen'] == null ? "-" : $dataResult[$i]['stock_dokumen'];
+                    $dataResult[$i]['no_aju'] =  $dataResult[$i]['no_aju'] == "-" ? "-" : $dataResult[$i]['no_aju'];
+                    $dataResult[$i]['bc_type'] = $bcType == null ? "NON PABEAN" : $bcType['value'];
+                    $dataResult[$i]['satuan'] = $dataResult[$i]['kode_satuan'];
+                    $dataResult[$i]['barang'] = strtoupper($dataResult[$i]['barang']);
+                    $dataResult[$i]['stock_date'] = $rmPurchaseOrder == null ? "-" : date('d/m/Y', strtotime($rmPurchaseOrder['po_date']));
+                    $dataResult[$i]['stock_id'] = $dataResult[$i]['stock_id'];
+                    $dataResult[$i]['type_barang'] = $dataResult[$i]['tipe_barang'];
+                    $dataResult[$i]['type_barang_text'] = strtoupper(str_replace('_', ' ', $dataResult[$i]['tipe_barang']));
+                    $dataResult[$i]['stok_total'] = floatval($dataResult[$i]['stok_total']);
+                    $dataResult[$i]['stok_total_kotor'] = floatval($dataResult[$i]['stok_total_kotor']);
+                    $dataResult[$i]['stok_total_diterima'] = floatval($dataResult[$i]['stok_total_diterima']);
+                    $dataResult[$i]['total_penerimaan'] = floatval($dataResult[$i]['total_penerimaan']);
+
+                    if ($dataResult[$i]['stok_total'] > 0) {
+                        array_push($resultArr, $dataResult[$i]);
+                    }
+        }
+            
+
+        return response()->setJSON([
+                'data' => $resultArr,
+                'token' => csrf_hash(),
+                'status' => true
+        ]);
+        
     }
 
     public function allupdateStockBahanBaku()
@@ -269,12 +377,13 @@ class UpdateStockBahanBaku extends BaseController
 
     public function saveupdateStockBahanBaku()
     {
-
         $stockDetail = json_decode($this->request->getVar('listBarang'));
         foreach ($stockDetail as $p) {
+            $selisih = $p->qty_diterima - $p->total_penerimaan ;
             $stockRebusDetail = $this->stockDetail2Model
                 ->where('id', $p->id)
-                ->set('qty_kotor', $p->qty_kotor)
+                ->set('qty_diterima', $p->qty_diterima)
+                ->set('qty_kotor', $selisih)
                 ->update();
         }
 
@@ -289,9 +398,11 @@ class UpdateStockBahanBaku extends BaseController
     {
         $stockDetail = json_decode($this->request->getVar('listBarang'));
         foreach ($stockDetail as $p) {
+            $selisih = $p->qty_diterima - $p->total_penerimaan ;
             $stockRebusDetail = $this->stockDetail2Model
                 ->where('id', $p->id)
-                ->set('qty_kotor', $p->qty_kotor)
+                ->set('qty_diterima', $p->qty_diterima)
+                ->set('qty_kotor', $selisih)
                 ->update();
         }
 
