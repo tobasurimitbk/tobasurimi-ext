@@ -125,111 +125,93 @@
             <?php if (count($jurnalUmum) > 0): ?>
                 <div class="row">
                     <?php foreach ($jurnalUmum as $j): ?>
-                        <div class="alert alert-secondary alert-dismissible fade show mt-3 text-black" role="alert">
-                            <b><?= $j['number'] ?> - <?= $j['name'] ?></b>
-                        </div>
-                        <div class="table-responsive">
-                            <table class="table table-hover" id="myTable" width="100%" cellspacing="0">
-                                <thead>
-                                    <tr>
-                                        <th>Tanggal</th>
-                                        <th>Company</th>
-                                        <th>Jenis Transaksi</th>
-                                        <th>Supplier</th>
-                                        <th>No Transaksi</th>
-                                        <th>Desc</th>
-                                        <th>Currency</th>
-                                        <th>Exchange Rate</th>
-                                        <th>Debit</th>
-                                        <th>Kredit</th>
-                                        <th>Balance</th>
-                                    </tr>
-                                </thead>
-
-                                <tbody>
-                                    <tr>
-                                        <td colspan="10">Saldo Awal : </td>
-                                        <td><?= toRupiah($j['saldo_lama']) ?></td>
-                                    </tr>
-                                    <?php
-                                    $sisaSaldo = $j['saldo_lama'];
-                                    $totalKredit = 0;
-                                    $totalDebit = 0;
-
-                                    ?>
-                                    <?php foreach ($j['result'] as $r): ?>
-                                        <?php
-                                        $sisaSaldo += ($r['debit'] * $r['kurs']) - ($r['kredit'] * $r['kurs']);
-                                        $totalDebit += $r['debit'] * $r['kurs'];
-                                        $totalKredit += $r['kredit'] * $r['kurs'];
-                                        ?>
+                        <?php if (!empty($j['result'])): ?>  <!-- ✅ cek dulu result -->
+                            <div class="alert alert-secondary alert-dismissible fade show mt-3 text-black" role="alert">
+                                <b><?= $j['number'] ?> - <?= $j['name'] ?></b>
+                            </div>
+                            <div class="table-responsive">
+                                <table class="table table-hover" id="myTable" width="100%" cellspacing="0">
+                                    <thead>
                                         <tr>
-                                            <td><?= date('d/m/Y', strtotime($r['tanggal_jurnal'])) ?></td>
-                                            <td><?= $r['company'] ?></td>
-                                            <td><?= $r['jenis_transaksi'] ?></td>
-                                            <td><?= $r['supplier_name'] ?></td>
-                                            <td><?= $r['no_transaksi'] ?></td>
-                                            <td><?= $r['keterangan'] ?></td>
-                                           <td>
-                                                <?php 
-                                                $amount = (float)$r['kurs'] != 1 ? ((float)$r['kredit'] != 0 ? $r['kredit'] : $r['debit']) : 0;
-                                                echo toRupiah($amount) . " <b>{$r['valas']}</b>";
-                                                ?>
-                                            </td>
-                                            <td><?= $r['kurs'] == "1" ? "" : toRupiah($r['kurs']) ?></td>
-                                            <td><?= toRupiah($r['debit'] * $r['kurs']) ?></td>
-                                            <td><?= toRupiah($r['kredit']) ?></td>
-                                            <td><?= toRupiah($sisaSaldo) ?></td>
+                                            <th>Tanggal</th>
+                                            <th>Company</th>
+                                            <th>Jenis Transaksi</th>
+                                            <th>Supplier</th>
+                                            <th>No Transaksi</th>
+                                            <th>Desc</th>
+                                            <th>Currency</th>
+                                            <th>Exchange Rate</th>
+                                            <th>Debit</th>
+                                            <th>Kredit</th>
+                                            <th>Balance</th>
                                         </tr>
-                                    <?php endforeach; ?>
-                                    <?php
-                                    // var_dump(toRupiah($sisaSaldo), toRupiah($totalDebit), toRupiah($totalKredit));
-                                    // die;
-                                    ?>
-                                    <tr>
-                                        <td colspan="8" style="text-align: center;font-weight:bold;">
-                                            <b>Sub Total</b>
-                                        </td>
-                                        <td>
-                                            <b>
-                                                <?= toRupiah($totalDebit) ?>
-                                            </b>
-                                        </td>
-                                        <td>
-                                            <b>
-                                                <?= toRupiah($totalKredit) ?>
-                                            </b>
-                                        </td>
-                                        <td></td>
-                                    </tr>
-                                    <tr>
-                                        <td colspan="8" style="text-align: center;">
-                                            <b>Total</b>
-                                        </td>
-                                        <td></td>
-                                        <td></td>
-                                        <td>
-                                            <b>
-                                                <?= toRupiah($sisaSaldo) ?>
-                                            </b>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        <?php endforeach; ?>
-                        </div>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td colspan="10">Saldo Awal :</td>
+                                            <td><?= toRupiah($j['saldo_lama']) ?></td>
+                                        </tr>
+                                        <?php
+                                        $sisaSaldo = $j['saldo_lama'];
+                                        $totalKredit = 0;
+                                        $totalDebit = 0;
+                                        ?>
+                                        <?php foreach ($j['result'] as $r): ?>
+                                            <?php
+                                            $sisaSaldo += ($r['debit'] * $r['kurs']) - ($r['kredit'] * $r['kurs']);
+                                            $totalDebit += $r['debit'] * $r['kurs'];
+                                            $totalKredit += $r['kredit'] * $r['kurs'];
+                                            ?>
+                                            <tr>
+                                                <td><?= date('d/m/Y', strtotime($r['tanggal_jurnal'])) ?></td>
+                                                <td><?= $r['company'] ?></td>
+                                                <td><?= $r['jenis_transaksi'] ?></td>
+                                                <td><?= $r['supplier_name'] ?></td>
+                                                <td><?= $r['no_transaksi'] ?></td>
+                                                <td><?= $r['keterangan'] ?></td>
+                                                <td>
+                                                    <?php 
+                                                    $amount = (float)$r['kurs'] != 1 ? ((float)$r['kredit'] != 0 ? $r['kredit'] : $r['debit']) : 0;
+                                                    echo toRupiah($amount) . " <b>{$r['valas']}</b>";
+                                                    ?>
+                                                </td>
+                                                <td><?= $r['kurs'] == "1" ? "" : toRupiah($r['kurs']) ?></td>
+                                                <td><?= toRupiah($r['debit'] * $r['kurs']) ?></td>
+                                                <td><?= toRupiah($r['kredit']) ?></td>
+                                                <td><?= toRupiah($sisaSaldo) ?></td>
+                                            </tr>
+                                        <?php endforeach; ?>
+                                        <tr>
+                                            <td colspan="8" style="text-align: center;font-weight:bold;">
+                                                <b>Sub Total</b>
+                                            </td>
+                                            <td><b><?= toRupiah($totalDebit) ?></b></td>
+                                            <td><b><?= toRupiah($totalKredit) ?></b></td>
+                                            <td></td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="8" style="text-align: center;">
+                                                <b>Total</b>
+                                            </td>
+                                            <td></td>
+                                            <td></td>
+                                            <td><b><?= toRupiah($sisaSaldo) ?></b></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        <?php endif; ?>
+                    <?php endforeach; ?>
                 </div>
-
             <?php else: ?>
-
-                <div class="alert alert-secondary alert-dismissible fade show mt-3 text-black" role="alert">
-                    Silahkan Pilih Akun yang Akan Dieksekusi
+            <div class="alert alert-secondary alert-dismissible fade show mt-3 text-black" role="alert">
+                            Silahkan Pilih Akun yang Akan Dieksekusi
 
                     <button type="button" class="close" data-dismiss="alert" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
-            <?php endif; ?>
+            <?php endif; ?>         
         </div>
     </div>
 </section>
