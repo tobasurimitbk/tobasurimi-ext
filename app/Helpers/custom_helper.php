@@ -598,3 +598,21 @@ function custom_round($value)
       return $value;
    }
 }
+
+function icmpPing($ip, $timeout = 5)
+{
+   // Deteksi OS
+   if (stripos(PHP_OS, 'WIN') === 0) {
+      // Windows
+      // -n 1 = sekali ping, -w timeout(ms)
+      $command = sprintf('ping -n 1 -w %d %s 2>&1', $timeout * 1000, escapeshellarg($ip));
+   } else {
+      // Linux / macOS
+      // -c 1 = sekali ping, -W timeout(s)
+      $command = sprintf('ping -c 1 -W %d %s 2>&1', $timeout, escapeshellarg($ip));
+   }
+
+   exec($command, $output, $resultCode);
+
+   return $resultCode === 0;
+}

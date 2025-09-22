@@ -53,7 +53,7 @@ class EmployeeJamKerjaModel extends Model
             ->first();
         if ($jamKerjaEmployee != null) {
             // JAM KERJA DI SET PERHARI
-            $jamKerja = $jamKerjaModel->find($jamKerjaEmployee['jam_kerja_id']);
+            $jamKerja = $jamKerjaModel->where('id', $jamKerjaEmployee['jam_kerja_id'])->first();
         } else {
             // JAM KERJA DEFAULT (AMBIL DARI DIVISI)
             $result = $employeeModel->select('divisis.jam_kerja_id')
@@ -61,7 +61,7 @@ class EmployeeJamKerjaModel extends Model
                 ->where('employees.id', $employeeId)
                 ->first();
 
-            $jamKerja = $jamKerjaModel->find($result['jam_kerja_id']);
+            $jamKerja = $jamKerjaModel->where('id', $result['jam_kerja_id'])->first();
         }
 
         return $jamKerja;

@@ -93,30 +93,6 @@
     </div>
 </div>
 
-<div class="modal copy-modal" tabindex="-1">
-    <div class="modal-dialog" style="min-width: 900px;">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title"><label class="title-name"></label> Copy Data Finger</h5>
-            </div>
-            <div class="modal-body">
-                <form class="create-form" role="form" method="POST" enctype="multipart/form-data">
-                    <input autocomplete="one-time-code" type="hidden" class="id" name="id" id="id" />
-                    <?= csrf_field() ?>
-                    <div class="row">
-                        <div class="col-md-12">
-                            Apakah anda yakin untuk mengcopy dari master ke unit yang lain?
-                        </div>
-                    </div>
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-hide-copy btn-discard mr-2">Kembali</button>
-                <button type="button" class="btn btn-submit-form btn-process-form">Process</button>
-            </div>
-        </div>
-    </div>
-</div>
 
 <!-- Begin Page Content -->
 <section class="section">
@@ -232,6 +208,9 @@
                     <?php endif ?>
                      <a href="javascript:void(0)" onclick="pingModal('${ip}')" data-toggle="tooltip" title="Ping Finger" class="btn btn-info">
                            <i class="fa-solid fa-wifi"></i>
+                        </a>
+                         <a href="javascript:void(0)" onclick="resetFinger('${id}')" data-toggle="tooltip" title="Reset Finger" class="btn btn-warning">
+                            <i class="fa-solid fa-rotate"></i>
                         </a>
                     `;
 
@@ -470,7 +449,6 @@
                         $('#alertFailed').html('<i class="fa-solid fa-fingerprint fa-lg mr-1"></i> ' + response.data.message);
                     }
                 }
-                console.log(response);
                 // if (response.status) {
                 //     Swal.fire({
                 //             icon: 'success',
@@ -501,41 +479,59 @@
         $('.ping-modal').modal('hide');
     })
 
-    $(".btn-process-form").click(function() {
-        const csrf = $(`[name="${csrfToken}"]`);
-        $.ajax({
-            url: "<?= base_url("attendances-unit/copy-to-finger"); ?>",
-            beforeSend: function(xhr) {
-                xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-            },
-            method: "POST",
-            dataType: "json",
-            processData: false,
-            contentType: false,
-            success: function(response) {
-                csrf.val(response.token);
-                console.log(response);
-                if (response.status) {
-                    stopLoading()
-                    Swal.fire({
-                            icon: 'success',
-                            title: response.message,
-                            confirmButtonColor: '#4e73df',
-                        })
-                        .then(() => {
-                            $(".copy-modal").modal("hide")
-                        })
-                } else {
-                    Swal.fire({
-                        icon: 'error',
-                        title: response.message,
-                        confirmButtonColor: '#4e73df',
-                    })
-                    stopLoading()
-                }
+    function resetFinger(id) {
+        Swal.fire({
+            icon: 'question',
+            title: 'Reset Log Absensi Mesin Finger ?',
+            confirmButtonColor: '#4e73df',
+            cancelButtonColor: '#d33',
+            showCancelButton: true,
+            reverseButtons: true,
+            confirmButtonText: 'Ya, Reset',
+            cancelButtonText: 'Kembali',
+        }).then((result) => {
+            if (result.isConfirmed) {
+                const csrf = $(`[name="${csrfToken}"]`);
+                const formData = new FormData();
+                formData.set('id', id);
+
+                $.ajax({
+                    url: "<?= base_url("attendances-unit/reset-data-finger"); ?>",
+                    beforeSend: function(xhr) {
+                        xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                        setLoading();
+                    },
+                    complete: function() {
+                        stopLoading();
+                    },
+                    data: formData,
+                    method: "POST",
+                    dataType: "json",
+                    processData: false,
+                    contentType: false,
+                    success: function(response) {
+                        csrf.val(response.token);
+                        if (response.status) {
+                            Swal.fire({
+                                    icon: 'success',
+                                    title: response.message,
+                                    confirmButtonColor: '#4e73df',
+                                })
+                                .then(() => {
+                                    $(".copy-modal").modal("hide")
+                                })
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: response.message,
+                                confirmButtonColor: '#4e73df',
+                            })
+                        }
+                    }
+                });
             }
-        });
-    });
+        })
+    }
 
     $("#btnSubmitForm").click(function() {
         if ($(".create-form").valid()) {

@@ -1528,6 +1528,20 @@ $routes->post('/penerimaan-barang-import/delete', 'Warehouse\PenerimaanBarangImp
 $routes->get('/penerimaan-barang-import/receivedItemsBySupplier/(:num)', 'Warehouse\PenerimaanBarangImport::getReceivedItemsBySupplier/$1', ['filter' => 'Auth']);
 $routes->get('/penerimaan-barang-import/generate', 'Warehouse\PenerimaanBarangImport::generatePenerimaanBarang', ['filter' => 'Auth']);
 
+
+$routes->get('/update-stock-bahan-baku', 'Warehouse\UpdateStockBahanBaku::UpdateStockBahanBaku', ['filter' => 'Auth']);
+$routes->get('/update-stock-bahan-baku/all', 'Warehouse\UpdateStockBahanBaku::allUpdateStockBahanBaku', ['filter' => 'Auth']);
+$routes->get('/update-stock-bahan-baku/create', 'Warehouse\UpdateStockBahanBaku::createUpdateStockBahanBaku', ['filter' => 'Auth']);
+$routes->get('/update-stock-bahan-baku/list-po', 'Warehouse\UpdateStockBahanBaku::getListPO', ['filter' => 'Auth']);
+$routes->get('/update-stock-bahan-baku/list-barang-po', 'Warehouse\UpdateStockBahanBaku::getListStockByPO', ['filter' => 'Auth']);
+$routes->get('/update-stock-bahan-baku/list-barang-po-kotor', 'Warehouse\UpdateStockBahanBaku::getListStockByPOKotor', ['filter' => 'Auth']);
+$routes->get('/update-stock-bahan-baku/id/(:segment)', 'Warehouse\UpdateStockBahanBaku::getByIdUpdateStockBahanBaku/$1', ['filter' => 'Auth']);
+$routes->get('/update-stock-bahan-baku/print/(:segment)', 'Warehouse\UpdateStockBahanBaku::print/$1', ['filter' => 'Auth']);
+$routes->post('/update-stock-bahan-baku/save', 'Warehouse\UpdateStockBahanBaku::saveUpdateStockBahanBaku', ['filter' => 'Auth']);
+$routes->post('/update-stock-bahan-baku/update', 'Warehouse\UpdateStockBahanBaku::updateUpdateStockBahanBaku', ['filter' => 'Auth']);
+
+
+
 // ROUTE BEA CUKAI REVAMP
 // SETTING AKUN BEA CUKAI
 $routes->get('setting-akun-bc', 'BeaCukai\SettingBeaCukai::index', ['filter' => 'Auth']);
@@ -2020,10 +2034,12 @@ $routes->get('/employee/get-jam-kerja-detail', 'HR\EmployeeJamKerja::getDetailJa
 $routes->post('/employee/update-jam-kerja', 'HR\EmployeeJamKerja::createOrUpdate', ['filter' => 'Auth']);
 
 // Attendance
-$routes->get('/log-attendance', 'HR\Attendance::LogAttendance', ['filter' => 'Auth']);
-$routes->post('/log-attendance/detail', 'HR\Attendance::getLogAttendanceDetail', ['filter' => 'Auth']);
-$routes->get('/log-attendance/print/id/(:segment)', 'HR\Attendance::exportPDFLogPresensi/$1', ['filter' => 'Auth']);
-$routes->get('/log-attendance/excel/id/(:segment)', 'HR\Attendance::exportExcelLogPresensi/$1', ['filter' => 'Auth']);
+$routes->get('/log-attendance', 'HR\Attendance::indexLog', ['filter' => 'Auth']);
+$routes->post('/log-attendance/all', 'HR\Attendance::allLog', ['filter' => 'Auth']);
+$routes->post('/log-attendance/all-total', 'HR\Attendance::allLogTotal', ['filter' => 'Auth']);
+$routes->get('/log-attendance/detail', 'HR\Attendance::getLogAttendanceDetail', ['filter' => 'Auth']);
+// $routes->get('/log-attendance/print/id/(:segment)', 'HR\Attendance::exportPDFLogPresensi/$1', ['filter' => 'Auth']);
+$routes->get('/log-attendance/export', 'HR\Attendance::exportExcelLogPresensi', ['filter' => 'Auth']);
 
 // Generate Attendance
 $routes->get('/list-attendance', 'HR\Attendance::generateAttendanceView', ['filter' => 'Auth']);
@@ -2054,7 +2070,7 @@ $routes->post('/attendances-unit/update', 'Master\AttendancesUnit::updateData', 
 $routes->post('/attendances-unit/delete', 'Master\AttendancesUnit::deleteData', ['filter' => 'Auth']);
 $routes->post('/attendances-unit/copy-to-finger', 'Master\AttendancesUnit::CopyToFinger', ['filter' => 'Auth']);
 $routes->post('/attendances-unit/ping', 'Master\AttendancesUnit::pingFinger', ['filter' => 'Auth']);
-
+$routes->post('/attendances-unit/reset-data-finger', 'Master\AttendancesUnit::resetDataFinger', ['filter' => 'Auth']);
 // Tunjangan
 $routes->get('/tunjangan', 'Master\Tunjangan::ListTunjangan', ['filter' => 'Auth']);
 $routes->get('/tunjangan/all', 'Master\Tunjangan::allTunjangan', ['filter' => 'Auth']);
@@ -2101,9 +2117,14 @@ $routes->post('/form-perijinan/delete', 'HR\Perijinan::delete', ['filter' => 'Au
 $routes->post('/form-perijinan/employees', 'HR\Perijinan::getEmployeeByDivision', ['filter' => 'Auth']);
 
 // jam kerja
-$routes->get('/jam-kerja', 'Master\JamKerja::index', ['filter' => 'Auth']);
+$routes->get('/jam-kerja', 'Master\JamKerja::indexDivisi', ['filter' => 'Auth']);
+$routes->get('/jam-kerja/all-divisi', 'Master\JamKerja::allDivisi', ['filter' => 'Auth']);
+$routes->get('/jam-kerja/dropdown-jamkerja', 'Master\JamKerja::dropdownJamKerja', ['filter' => 'Auth']);
+$routes->post('/jam-kerja/update-jamkerja-default', 'Master\JamKerja::updateJamKerjaDefault', ['filter' => 'Auth']);
+$routes->get('/jam-kerja/divisi/(:segment)', 'Master\JamKerja::index/$1', ['filter' => 'Auth']);
+
 $routes->get('/jam-kerja/all', 'Master\JamKerja::all', ['filter' => 'Auth']);
-$routes->get('/jam-kerja/create', 'Master\JamKerja::createView', ['filter' => 'Auth']);
+$routes->get('/jam-kerja/create/divisi/(:segment)', 'Master\JamKerja::createView/$1', ['filter' => 'Auth']);
 $routes->post('/jam-kerja/create', 'Master\JamKerja::create', ['filter' => 'Auth']);
 $routes->post('/jam-kerja/delete', 'Master\JamKerja::delete', ['filter' => 'Auth']);
 $routes->post('/jam-kerja/update', 'Master\JamKerja::update', ['filter' => 'Auth']);
@@ -2167,8 +2188,8 @@ $routes->get('/company-access/all', 'Setting\CompanyAccess::allCompanyAccess', [
 $routes->get('/get-employee-by-company/(:segment)', 'HR\Attendance::get_employee_by_company/$1', ['filter' => 'Auth']);
 
 // attendance
-$routes->get('/api/employees-sync-attendances', 'API\Employees::sync_employee_to_master', ['filter' => 'Auth']);
-$routes->cli('/api/employees-sync-attendances', 'API\Employees::sync_employee_to_master');
+// $routes->get('/api/employees-sync-attendances', 'API\Employees::sync_employee_to_master', ['filter' => 'Auth']);
+// $routes->cli('/api/employees-sync-attendances', 'API\Employees::sync_employee_to_master');
 $routes->cli('/api/sync-attendances', 'API\Attendances::sync_attendance');
 $routes->get('/api/sync-attendances', 'API\Attendances::sync_attendance');
 //$routes->get('/api/employees-sync-attendances', 'API\Employees::sync_employee_to_master', ['filter' => 'Auth']);

@@ -1106,6 +1106,14 @@ class LocalPOPaymentModel extends Model
                     rm_purchase_orders.po_no AS no_po,
                     rm_purchase_orders.total_after_pph,
                     rm_purchase_orders.total_before_pph,
+                    rm_purchase_orders.nilai_total_bulanan as total_bulanan,
+                    rm_purchase_orders.nilai_total_harian as total_harian,
+                    rm_purchase_orders.nilai_total_tambahan as total_tambahan,
+                    rm_purchase_orders.nilai_total_umum as total_umum,
+                    rm_purchase_orders.pph_bulanan as total_pph_bulanan,
+                    rm_purchase_orders.pph_harian as total_pph_harian,
+                    rm_purchase_orders.pph_umum as total_pph_umum,
+                    rm_purchase_orders.pph_tambahan as total_pph_tambahan,
                     rm_purchase_orders.id AS rm_purchase_order_id,
                     rm_purchase_orders.total AS total_tagihan_number,
                     barang_master.barang_name AS barang,
@@ -1157,15 +1165,18 @@ class LocalPOPaymentModel extends Model
             // Hitung total tagihan
             $remainingTotal = floatval($totalPaid - ($totalPanjar + $totalPinjaman));
 
+            $pph = $p['total_pph_harian'] + $p['total_pph_umum'] + $p['total_pph_tambahan'];
+            $totalBiaya = $p['total_harian'] + $p['total_umum'] + $p['total_tambahan'];
+            
             // Format tanggal & update data PO
             $p['tanggal_PO'] = date('d/m/Y', strtotime($p['tanggal_PO']));
-            $p['total_tagihan'] = number_format($p['total_after_pph'], 2, '.', '');
-            $p['total_tagihan_number'] = number_format($p['total_after_pph'], 2, '.', '');
-            $p['total_tagihan_pph'] = number_format($p['total_before_pph'] - $p['total_after_pph'], 2, '.', '');
+            $p['total_tagihan'] = number_format($totalBiaya, 2, '.', '');
+            $p['total_tagihan_number'] = number_format($totalBiaya, 2, '.', '');
+            $p['total_tagihan_pph'] = number_format($pph, 2, '.', '');
             $p['total_paid'] = number_format($totalPaid, 2, '.', '');
-            $p['total_paid_pph'] = number_format($totalPaidPPH, 2, '.', '');
-            $p['sisa_tagihan'] = number_format($p['total_after_pph'] - $totalPaid, 2, '.', '');
-            $p['sisa_tagihan_pph'] = number_format($p['total_tagihan_pph'] - $totalPaidPPH, 2, '.', '');
+            $p['total_paid_pph'] = number_format($pph, 2, '.', '');
+            $p['sisa_tagihan'] = number_format($totalBiaya, 2, '.', '');
+            $p['sisa_tagihan_pph'] = number_format($pph, 2, '.', '');
             $p['total_qty_diterima'] = number_format($p['total_qty_diterima'], 2, '.', '');
         }
 
@@ -1367,13 +1378,14 @@ class LocalPOPaymentModel extends Model
         // Get bank code
         $kodeBank = '';
         if (!empty($bank_id) && strtoupper($paymentMethod) !== 'CASH') {
-            $bankData = $banksModel->select('name')->where('id', $bank_id)->first();
+            $bankData = $banksModel->select('kode_bank')->where('id', $bank_id)->first();
             if ($bankData) {
-                $name = strtoupper($bankData['name']);
-                if (strpos($name, 'BRI') !== false) $kodeBank = 'BRI';
-                elseif (strpos($name, 'MANDIRI') !== false) $kodeBank = 'MND';
-                elseif (strpos($name, 'BNI') !== false) $kodeBank = 'KBA';
-                elseif (strpos($name, 'BCA') !== false) $kodeBank = 'BCI';
+                $kode = strtoupper($bankData['kode_bank']);
+                if (strpos($kode, 'BBRI') !== false) $kodeBank = 'BRI';
+                elseif (strpos($kode, 'BMRIIDJA') !== false) $kodeBank = 'MND';
+                elseif (strpos($kode, 'BBNI') !== false) $kodeBank = 'KBA';
+                elseif (strpos($kode, 'BBCA') !== false) $kodeBank = 'BCI';
+                elseif (strpos($kode, 'BBNL') !== false) $kodeBank = 'BNL';
             }
         }
 

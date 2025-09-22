@@ -39,6 +39,7 @@ class Employee extends BaseController
     protected $PayrollModel;
     protected $AttendanceUnitModel;
     protected $EmployeesUnitsModel;
+    protected $attendanceUnit;
 
     public function __construct()
     {
@@ -59,6 +60,7 @@ class Employee extends BaseController
         $this->PayrollModel = new PayrollsModel();
         $this->AttendanceUnitModel = new AttendancesUnitModel();
         $this->EmployeesUnitsModel = new EmployeesUnitsModel();
+        $this->attendanceUnit = new AttendancesUnit();
     }
 
     public function employee()
@@ -500,13 +502,13 @@ class Employee extends BaseController
     {
         try {
             $id = decrypt($this->request->getPost("id"));
-            $UserModel = new UserModel();
+            // $UserModel = new UserModel();
 
             if (!empty($id)) {
                 $values = [
                     "deletedAt" => date("Y-m-d H:i:s")
                 ];
-                $UserModel->where('employee_id', $id)->delete();
+                // $UserModel->where('employee_id', $id)->delete();
                 if ($this->EmployeesModel->update($id, $values)) {
                     $this->GajiConjunctionModel->where('employee_id', $id)->delete();
                     $data = [
@@ -648,8 +650,10 @@ class Employee extends BaseController
             $attendanceUnitId = $this->request->getVar('attendances_unit_id');
             $employeeUnitArr = [];
             $employeeFingerArr = [];
+            $employeeData = [];
 
             $employeeIds = json_decode($this->request->getVar('employee_id'));
+            $attendanceUnit = $this->AttendanceUnitModel->where('id', $attendanceUnitId)->where('deletedAt', null)->first();
 
             if (empty($employeeIds)) {
                 return response()->setJSON([
@@ -659,16 +663,47 @@ class Employee extends BaseController
                 ]);
             }
 
-            foreach ($employeeIds as $e) {
-                $employeeUnitArr[] = [
-                    'employee_id' => $e,
-                    'attendances_unit_id' => $attendanceUnitId
-                ];
+            // TEST FINGER
+            $timeout  = 2;
+            $timeout = max(1, min(5, $timeout));
+            $isAlive = icmpPing($attendanceUnit['ip'], $timeout);
 
-                $employeeFingerArr[] = [
-                    'id' => $e,
-                    'attendance_sync' => 1
-                ];
+            if (!$isAlive) {
+                return response()->setJSON([
+                    'message' => "Mesin finger tidak terhubung",
+                    'status' => false,
+                    'token' => csrf_hash()
+                ]);
+            }
+
+            foreach ($employeeIds as $e) {
+                $employee = $this->EmployeesModel->where('id', $e)->where('deletedAt', null)->first();
+
+                if ($employee != null) {
+                    $employeeUnitArr[] = [
+                        'employee_id' => $e,
+                        'attendances_unit_id' => $attendanceUnitId,
+                    ];
+
+                    $employeeFingerArr[] = [
+                        'id' => $e,
+                        'attendance_sync' => 1
+                    ];
+
+                    array_push($employeeData, [
+                        'id' => $employee['id'],
+                        'name' => $employee['name']
+                    ]);
+                }
+            }
+
+            foreach ($employeeData as $e) {
+                $this->attendanceUnit->insert_finger_user(
+                    $e['id'],
+                    $attendanceUnit['ip'],
+                    $attendanceUnit['unit_key'],
+                    $e['name']
+                );
             }
 
             $this->EmployeesModel->updateBatch($employeeFingerArr, 'id');
@@ -734,6 +769,27 @@ class Employee extends BaseController
         try {
             $attendanceUnitId = $this->request->getVar('attendance_unit_id');
             $employeeId = $this->request->getVar('employee_id');
+            $attendanceUnit = $this->AttendanceUnitModel->where('id', $attendanceUnitId)->where('deletedAt', null)->first();
+
+            // TODO REMOVE DI FINGER
+            // TEST FINGER
+            $timeout  = 2;
+            $timeout = max(1, min(5, $timeout));
+            $isAlive = icmpPing($attendanceUnit['ip'], $timeout);
+
+            if (!$isAlive) {
+                return response()->setJSON([
+                    'message' => "Mesin finger tidak terhubung",
+                    'status' => false,
+                    'token' => csrf_hash()
+                ]);
+            }
+
+            $this->attendanceUnit->delete_finger_user(
+                $employeeId,
+                $attendanceUnit['ip'],
+                $attendanceUnit['unit_key'],
+            );
 
             $this->EmployeesUnitsModel->where('employee_id', $employeeId)->where('attendances_unit_id', $attendanceUnitId)->delete(null, true);
             $employeeUnit = $this->EmployeesUnitsModel
@@ -745,7 +801,6 @@ class Employee extends BaseController
                 $this->EmployeesModel->update($employeeId, ['attendance_sync' => 0]);
             }
 
-            // TODO REMOVE DI FINGER
 
             return response()->setJSON([
                 'status' => true,

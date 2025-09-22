@@ -13,16 +13,8 @@ class FormPerijinanModel extends Model
     protected $insertID         = 0;
     protected $returnType       = 'array';
     protected $useSoftDeletes   = true;
-    protected $protectFields    = true;
-    protected $allowedFields    = [
-        'company_id',
-        'employee_id',
-        'periode',
-        'status',
-        'reason',
-        'kode',
-        'is_approval'
-    ];
+    protected $protectFields    = false;
+    protected $allowedFields    = [];
 
     // Dates
     protected $useTimestamps = false;
@@ -51,10 +43,11 @@ class FormPerijinanModel extends Model
     public function getPerijinanList($condition, $addCondition, $limit = 10, $offset = 0)
     {
         $availableSort = [
-            'employees.name' => 'employees.name',
             'employees.nip' => 'employees.nip',
+            'employees.name' => 'employees.name',
             'employees.division_id' => 'employees.division_id',
             'form_perijinan.status' => 'form_perijinan.status',
+            'form_perijinan.reason' => 'form_perijinan.reason',
             'form_perijinan.is_approval' => 'form_perijinan.is_approval'
         ];
 
@@ -64,9 +57,9 @@ class FormPerijinanModel extends Model
         $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'DESC';
 
         $formPerijinanQry = $this->asObject()
-            ->select("DISTINCT (form_perijinan.kode), employees.*, divisis.divisi, form_perijinan.status, form_perijinan.is_approval")
-            ->join('employees', 'employees.id = form_perijinan.employee_id')
-            ->join('divisis', 'divisis.id = employees.division_id', 'LEFT')
+            ->select("DISTINCT (form_perijinan.kode), employees.*, divisis.divisi, form_perijinan.status, form_perijinan.is_approval, form_perijinan.reason")
+            ->join('employees', 'employees.id = form_perijinan.employee_id', 'left')
+            ->join('divisis', 'divisis.id = employees.division_id', 'left')
             ->where($condition)
             ->orderBy($sort, $sortType);
 
@@ -79,7 +72,8 @@ class FormPerijinanModel extends Model
         if ($addCondition['search']) {
             $formPerijinanQry
                 ->like('employees.nip', $addCondition['search'])
-                ->orLike('employees.name', $addCondition['search']);
+                ->orLike('employees.name', $addCondition['search'])
+                ->orLike('divisis.divisi', $addCondition['search']);
         }
 
         if ($addCondition['search']) {

@@ -8,6 +8,7 @@ use Config\Services;
 use App\Models\FormPerijinanModel;
 use App\Models\EmployeesModel;
 use App\Models\MetadataModel;
+use Exception;
 
 class Perijinan extends BaseController
 {
@@ -16,12 +17,19 @@ class Perijinan extends BaseController
     protected $encrypter;
     protected $FormPerijinanModel;
     protected $EmployeesModel;
+    protected $DivisiModel;
+    protected $MetadataModel;
+    protected $EmployeeModel;
 
     public function __construct()
     {
         $this->token = session()->get("login")->token;
         $this->this_company_id = session()->get("login")->this_company_id;
         $this->encrypter = Services::encrypter();
+        $this->DivisiModel = new DivisisModel();
+        $this->MetadataModel = new MetadataModel();
+        $this->EmployeeModel = new EmployeesModel();
+        $this->FormPerijinanModel = new FormPerijinanModel();
     }
 
     public function perijinan()
@@ -34,15 +42,12 @@ class Perijinan extends BaseController
 
     public function createView()
     {
-        $DivisiModel = new DivisisModel();
-        $metaDataModel = new MetadataModel();
-
         $data = [
-            "status" => $metaDataModel->where('name', "Status Perizinan")
+            "status" => $this->MetadataModel->where('name', "Status Perizinan")
                 ->whereNotIn('value', ['HADIR_H', 'LIBUR_L', 'ALPHA_A'])
                 ->orderBy('name', "ASC")
                 ->findAll(),
-            "divisi" => $DivisiModel->get_by_company_id($this->this_company_id),
+            "divisi" => $this->DivisiModel->get_by_company_id($this->this_company_id),
         ];
 
         return view('hr/perijinan/form', $data);
@@ -50,10 +55,11 @@ class Perijinan extends BaseController
 
     public function getEmployeeByDivision()
     {
-        $EmployeesModel = new EmployeesModel();
-        return \response()->setJSON([
-            'data' => $EmployeesModel->where('deletedAt', null)
-                ->where('division_id', $this->request->getVar('divisionID'))
+        $divisiId = $this->request->getVar('divisionID');
+
+        return response()->setJSON([
+            'data' => $this->EmployeeModel->where('deletedAt', null)
+                ->where('division_id', $divisiId)
                 ->orderBy('name', "ASC")
                 ->findAll(),
             'token' => \csrf_hash(),
@@ -62,23 +68,21 @@ class Perijinan extends BaseController
 
     public function getById($id)
     {
-        $FormPerijinanModel = new FormPerijinanModel();
-        $DivisiModel = new DivisisModel();
-        $metaDataModel = new MetadataModel();
-
-        $formPerijinanDate = $FormPerijinanModel
+        $formPerijinanDate = $this->FormPerijinanModel
             ->selectMax('periode', 'max_tanggal')
             ->selectMin('periode', 'min_tanggal')
             ->where('kode', $id)
             ->first();
 
         $data = [
-            "status" => $metaDataModel->where('name', "Status Perizinan")
+            "status" => $this->MetadataModel
+                ->where('name', "Status Perizinan")
                 ->whereNotIn('value', ['HADIR_H', 'LIBUR_L', 'ALPHA_A'])
                 ->orderBy('name', "ASC")
                 ->findAll(),
-            "divisi" => $DivisiModel->get_by_company_id($this->this_company_id),
-            "formPerijinan" => $FormPerijinanModel->select('form_perijinan.*, employees.division_id, employees.name')->where('kode', $id)
+            "divisi" => $this->DivisiModel->get_by_company_id($this->this_company_id),
+            "formPerijinan" => $this->FormPerijinanModel
+                ->select('form_perijinan.*, employees.division_id, employees.name')->where('kode', $id)
                 ->join('employees', 'employees.id = form_perijinan.employee_id')
                 ->first(),
             "mulai" => $formPerijinanDate['min_tanggal'],
@@ -97,10 +101,7 @@ class Perijinan extends BaseController
             "sortType" => $this->request->getGet("sortType"),
         ];
 
-        $FormPerijinanModel = new FormPerijinanModel();
-        $metaDataModel = new MetadataModel();
-
-        $monthYear = explode('-', $this->request->getVar('yearMonth'));
+        $monthYear = explode('-', $this->request->getVar('month'));
 
         $condition = [
             'employees.deletedAt' => null,
@@ -121,29 +122,37 @@ class Perijinan extends BaseController
         $offset = $this->request->getGet("start");
         $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
 
-        $FormData = $FormPerijinanModel->getPerijinanList($condition, $addCondition, $limit, $offset);
+        $FormData = $this->FormPerijinanModel->getPerijinanList(
+            $condition,
+            $addCondition,
+            $limit,
+            $offset
+        );
 
         foreach ($FormData['data'] as $data) {
-            $formPerijinan = $FormPerijinanModel
+            $formPerijinan = $this->FormPerijinanModel
                 ->selectMax('periode', 'max_tanggal')
                 ->selectMin('periode', 'min_tanggal')
                 ->where('kode', $data->kode)
                 ->first();
 
-            $metaDataDetail = $metaDataModel->where('name', "Status Perizinan")->where('value', $data->status)->first();
+            $startDate = date_format(date_create($formPerijinan['min_tanggal']), "d/m/Y");
+            $endDate = date_format(date_create($formPerijinan['max_tanggal']), "d-m-Y");
+            $periode = $startDate . " S.D " . $endDate;
+
+            $status = explode('_', $data->status)[0];
 
             array_push($dataEmployee, [
                 "no" => $no++,
                 "id" =>  $data->id,
                 "kode" => $data->kode,
-                "employeeName" => $data->name,
-                "employeeNip" => $data->nip,
-                "divisionName" => $data->divisi,
-                "mulai" => date_format(date_create($formPerijinan['min_tanggal']), "d-m-Y"),
-                "selesai" => date_format(date_create($formPerijinan['max_tanggal']), "d-m-Y"),
-                "keterangan" => $data->status,
-                "approval" => ($data->is_approval) ? "Approved" : "Not Approved",
-                "statusName" => \explode("_", $metaDataDetail['value'])[0]
+                "name" => $data->name,
+                "nip" => $data->nip,
+                "divisi" => $data->divisi,
+                "periode" => $periode,
+                "status" => $status,
+                "is_approval" => (float)$data->is_approval,
+                "reason" => $data->reason
             ]);
         }
 
@@ -152,117 +161,155 @@ class Perijinan extends BaseController
             "recordsTotal"    => $FormData['totalData'],
             "recordsFiltered" => $FormData['totalFilteredData'],
             "data" => $dataEmployee,
-            "payload" => $payload
         ];
 
-        echo json_encode($data);
-        return;
+        return response()->setJSON($data);
     }
 
     public function save()
     {
-        helper('text');
+        $db = \Config\Database::connect();
+        try {
+            $db->transBegin();
 
-        // declare model
-        $FormPerijinanModel = new FormPerijinanModel();
-        $kode = random_string(20);
+            helper('text');
+            $kode = random_string(20);
 
-        $tglAkhir = strtotime($this->request->getVar('end_date'));
-        $tglAwal = strtotime($this->request->getVar('start_date'));
+            $employeeId = $this->request->getPost("employee_id");
+            $status = $this->request->getPost('status');
+            $reason = $this->request->getPost('reason');
+            $isApproval = $this->request->getPost('is_approval');
+            $tglAwalFormated = $this->request->getVar("start_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getVar("start_date")))) : "";
+            $tglAkhirFormated = $this->request->getVar("end_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getVar("end_date")))) : "";
 
-        if ($tglAkhir < $tglAwal) {
-            return \response()->setJSON([
-                'message' => "Tanggal mulai dan tanggal selesai tidak valid",
+            $tglAwal = strtotime($tglAwalFormated);
+            $tglAkhir = strtotime($tglAkhirFormated);
+
+            if ($tglAkhir < $tglAwal) {
+                return response()->setJSON([
+                    'message' => "Tanggal mulai dan tanggal selesai tidak valid",
+                    'token' => csrf_hash(),
+                    'status' => false,
+                ]);
+            }
+
+            // Hapus data sebelumnya jika ada
+            // Data range
+            $this->FormPerijinanModel
+                ->where('employee_id', $employeeId)
+                ->where('periode >=', $tglAwal)
+                ->where('periode <=', $tglAkhir)
+                ->delete();
+
+            $insertData = array();
+
+            for ($currentDate = $tglAwal; $currentDate <= $tglAkhir; $currentDate += 86400) {
+                $currentDateFormatted = date('Y-m-d', $currentDate);
+
+                array_push($insertData, [
+                    "company_id" => $this->this_company_id,
+                    "employee_id" => $employeeId,
+                    "periode" => $currentDateFormatted,
+                    "status" => $status,
+                    "reason" => $reason,
+                    "kode" => $kode,
+                    "is_approval" => $isApproval == "on" ? '1' : '0',
+                ]);
+            }
+            $this->FormPerijinanModel->insertBatch($insertData);
+            $db->transCommit();
+
+            return response()->setJSON([
+                'message' => "Form Perijinan berhasil disimpan",
+                'status' => true
+            ]);
+        } catch (Exception $e) {
+            $db->transRollback();
+            return response()->setJSON([
+                'message' => $e->getMessage(),
                 'token' => csrf_hash(),
-                'status' => false,
+                'status' => false
             ]);
         }
-
-        for ($currentDate = $tglAwal; $currentDate <= $tglAkhir; $currentDate += 86400) {
-            $currentDateFormatted = date('Y-m-d', $currentDate);
-            $insertData['periode'] = $currentDateFormatted;
-            // delete if sudah ada (menghindari duplikasi)
-            $FormPerijinanModel->where('periode', $currentDateFormatted)
-                ->where('employee_id', $this->request->getPost("employee_id"))
-                ->delete();
-            // insert data
-            $insertData = [
-                "company_id" => $this->this_company_id,
-                "employee_id" => $this->request->getPost("employee_id"),
-                "start_date" => $this->request->getPost("start_date"),
-                "end_date" => $this->request->getPost("end_date"),
-                "status" => $this->request->getPost("status"),
-                "reason" => $this->request->getPost("reason"),
-                "is_approval" => $this->request->getPost('is_approval') == "on" ? '1' : '0',
-                "kode" => $kode,
-                "periode" => $currentDateFormatted
-            ];
-            // insert again
-            $FormPerijinanModel->insert($insertData);
-        }
-
-        return \response()->setJSON([
-            'message' => "Form Perijinan berhasil disimpan",
-            'status' => true
-        ]);
     }
 
     public function update()
     {
-        helper('text');
+        $db = \Config\Database::connect();
 
-        // declare model
-        $FormPerijinanModel = new FormPerijinanModel();
-        $kode = random_string(20);
+        try {
+            $db->transBegin();
 
-        $tglAkhir = strtotime($this->request->getVar('end_date'));
-        $tglAwal = strtotime($this->request->getVar('start_date'));
+            helper('text');
+            $kode = random_string(20);
 
-        // deleted first
-        $FormPerijinanModel->where('kode', $this->request->getVar('kode'))->delete();
+            $employeeId = $this->request->getPost("employee_id");
+            $status = $this->request->getPost('status');
+            $reason = $this->request->getPost('reason');
+            $isApproval = $this->request->getPost('is_approval');
+            $tglAwalFormated = $this->request->getVar("start_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getVar("start_date")))) : "";
+            $tglAkhirFormated = $this->request->getVar("end_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getVar("end_date")))) : "";
 
-        // insert again
-        for ($currentDate = $tglAwal; $currentDate <= $tglAkhir; $currentDate += 86400) {
-            $currentDateFormatted = date('Y-m-d', $currentDate);
-            $insertData['periode'] = $currentDateFormatted;
-            // delete if sudah ada (menghindari duplikasi)
-            $FormPerijinanModel->where('periode', $currentDateFormatted)
-                ->where('employee_id', $this->request->getPost("employee_id"))
+            $tglAwal = strtotime($tglAwalFormated);
+            $tglAkhir = strtotime($tglAkhirFormated);
+
+            // deleted first
+            $this->FormPerijinanModel->where('kode', $this->request->getVar('kode'))->delete();
+            // Data range hindari duplikasi
+            $this->FormPerijinanModel
+                ->where('employee_id', $employeeId)
+                ->where('periode >=', $tglAwal)
+                ->where('periode <=', $tglAkhir)
                 ->delete();
-            // insert data
-            $insertData = [
-                "company_id" => $this->this_company_id,
-                "employee_id" => $this->request->getPost("employee_id"),
-                "start_date" => $this->request->getPost("start_date"),
-                "end_date" => $this->request->getPost("end_date"),
-                "status" => $this->request->getPost("status"),
-                "reason" => $this->request->getPost("reason"),
-                "is_approval" => $this->request->getPost('is_approval') == "on" ? '1' : '0',
-                "kode" => $kode,
-                "periode" => $currentDateFormatted
-            ];
-            // insert again
-            $FormPerijinanModel->insert($insertData);
-        }
 
-        return \response()->setJSON([
-            'message' => "Form Perijinan berhasil diupdate",
-            'kode' => $kode,
-            'status' => true
-        ]);
+            $insertData = array();
+            // insert again
+            for ($currentDate = $tglAwal; $currentDate <= $tglAkhir; $currentDate += 86400) {
+                $currentDateFormatted = date('Y-m-d', $currentDate);
+
+                array_push($insertData, [
+                    "company_id" => $this->this_company_id,
+                    "employee_id" => $employeeId,
+                    "status" => $status,
+                    "reason" => $reason,
+                    "is_approval" => $isApproval == "on" ? '1' : '0',
+                    "kode" => $kode,
+                    "periode" => $currentDateFormatted
+                ]);
+            }
+            $this->FormPerijinanModel->insertBatch($insertData);
+            $db->transCommit();
+
+            return response()->setJSON([
+                'message' => "Form Perijinan berhasil diupdate",
+                'kode' => $kode,
+                'status' => true
+            ]);
+        } catch (Exception $e) {
+            $db->transRollback();
+            return response()->setJSON([
+                'message' => $e->getMessage(),
+                'token' => csrf_hash(),
+                'status' => false
+            ]);
+        }
     }
 
     public function delete()
     {
-        $kode = $this->request->getPost("kode");
-
-        $FormPerijinanModel = new FormPerijinanModel();
-
-        $FormPerijinanModel->where('kode', $kode)->delete();
-
-        return \response()->setJSON([
-            'status' => true,
-            'message' => "Form perizinan berhasil dihapus"
-        ]);
+        try {
+            $kode = $this->request->getPost("kode");
+            $this->FormPerijinanModel->where('kode', $kode)->delete();
+            return response()->setJSON([
+                'status' => true,
+                'message' => "Form perizinan berhasil dihapus"
+            ]);
+        } catch (Exception $e) {
+            return response()->setJSON([
+                'message' => $e->getMessage(),
+                'token' => csrf_hash(),
+                'status' => false
+            ]);
+        }
     }
 }

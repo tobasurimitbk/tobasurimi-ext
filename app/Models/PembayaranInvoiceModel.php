@@ -146,6 +146,7 @@ class PembayaranInvoiceModel extends Model
         $salesOrderExportModel = new SalesOrderExportModel();
         $salesOrderLainModel = new SalesOrderLainModel();
         $salesOrderReturnModel = new SalesOrderReturnModel();
+        $proformaInvoiceModel = new ProformaInvoiceModel();
 
         $customer_name = "";
 
@@ -179,6 +180,15 @@ class PembayaranInvoiceModel extends Model
                 ->join('sales_contract', 'sales_contract.id = sales_order_export.sales_contract_id')
                 ->join('customers', 'customers.id = sales_contract.customer_id')
                 ->where('sales_order_export_id', $detail['invoice_id'])
+                ->first();
+            $detail['customer_name'] = $namaCustomer['name'];
+        } elseif ($detail['type_invoice'] == "PROFORMA INVOICE") {
+            $namaCustomer =  $proformaInvoiceModel
+                ->select('customers.*')
+                ->join('sales_order_export', 'sales_order_export.sales_contract_id = proforma_invoice.sales_order_export_id')
+                ->join('sales_contract', 'sales_contract.id = sales_order_export.sales_contract_id')
+                ->join('customers', 'customers.id = sales_contract.customer_id')
+                ->where('proforma_invoice.id', $detail['invoice_id'])
                 ->first();
             $detail['customer_name'] = $namaCustomer['name'];
         } elseif ($detail['type_invoice'] == "LAIN-LAIN") {

@@ -38,7 +38,9 @@ class Filters extends BaseConfig
                     'api/contact/save',
                     'save-attendance',
                     'check-pin-employee',
-                    'api/contact/delete'
+                    'api/contact/delete',
+                    'log-attendance/all-total',
+                    'log-attendance/all'
                 ]
             ]
         ],

@@ -5,57 +5,35 @@
 <section class="section">
     <div class="section-header">
         <h1>Form Perijinan</h1>
-        <a class="btn btn-show-form btn-add float-right" href="<?= base_url("form-perijinan/create"); ?>">
-            <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
-        </a>
+        <?php if (can('Personalia', 'Form Perijinan', 'c')): ?>
+            <a class="btn btn-show-form btn-add float-right" href="<?= base_url("form-perijinan/create"); ?>">
+                <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
+            </a>
+        <?php endif; ?>
     </div>
     <div class="card">
         <div class="card-body">
-            <div class="row justify-content-end row-col-page-list-attendance">
-                <div class="col-6 mb-2">
-                    <form id="search_form" name="search_form" class="kt-form kt-form--fit kt-margin-b-20">
-                        <select name="month" id="month">
-                            <?php
-                            for ($i = 1; $i <= 12; $i++) {
-                                $temp = (strlen($i) == 1) ? ("0" . $i) : $i;
-                                $checked = ($month == $temp) ? "selected" : "";
-                            ?>
-                                <option value="<?php echo $temp; ?>" <?php echo $checked; ?>><?php echo $temp; ?></option>
-                            <?php
-                            }
-                            ?>
-                        </select>
-                        <select name="year" id="year">
-                            <?php
-                            for ($i = date("Y") - 2; $i <= date("Y") + 2; $i++) {
-                                $checked = ($year == $i) ? "selected" : "";
-                            ?>
-                                <option value="<?php echo $i; ?>" <?php echo $checked; ?>><?php echo $i; ?></option>
-                            <?php
-                            }
-                            ?>
-                        </select>
-                        <button type="button" class="btn btn-primary btn-brand--icon" id="filterYearMonth">
-                            <span>
-                                <i class="la la-print"></i>
-                                <span>Cari</span>
-                            </span>
-                        </button>
-
-                    </form>
-                </div>
-                <div class="col-6 mb-2">
-                    <div class="kt-separator kt-separator--border-dashed kt-separator--space-md"></div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="card">
-        <div class="card-body">
-            <div class="row justify-content-end row-col-spp">
+            <div class="row justify-content-end">
                 <?= csrf_field() ?>
+                <div class="col-sm-3">
+                    <div class="input-group">
+                        <div class="form-floating" style="height: 50px;">
+                            <input placeholder="" value="<?= date('Y-m') ?>" class="form-control month" id="month" name="month" />
+                            <label style="z-index: 1;" style="z-index: 1;">Pilih Bulan</label>
+                        </div>
+                        <div class="input-group-append" style="height:50px;">
+                            <button disabled class="btn btn-secondary" type="button">
+                                <i class="fas fa-calendar-alt"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
                 <div class="col-md-3 mb-3">
-                    <input autocomplete="one-time-code" class="form-control search form-out-search" placeholder="Cari NIP / Nama Karyawan" value="" />
+                    <div class="form-floating">
+                        <input autocomplete="one-time-code" class="form-control search" id="search" placeholder="Cari Data" value="" />
+                        <label for="floatingInput">Cari Data</label>
+                    </div>
+
                 </div>
             </div>
             <div class="row">
@@ -63,17 +41,18 @@
                     <table class="table table-bordered nowrap table-hover-tobasurimi dataTable" id="dataTable" width="100%" cellspacing="0">
                         <thead class="thead-dark">
                             <tr>
-                                <th>No.</th>
+                                <th>No</th>
                                 <th onclick="changeSort('employees.nip')" class="sort">NIP</th>
-                                <th onclick="changeSort('employees.name')" class="sort">Nama Karyawan</th>
-                                <th onclick="changeSort('employees.division_id')" class="sort">Departemen</th>
-                                <th>Mulai</th>
-                                <th>Selesai</th>
-                                <th onclick="changeSort('form_perijinan.status')" class="sort">Keterangan</th>
-                                <th onclick="changeSort('form_perijinan.is_approval')" class="sort">Status Approval</th>
+                                <th onclick="changeSort('employees.name')" class="sort">Karyawan</th>
+                                <th onclick="changeSort('employees.division_id')" class="sort">Dept</th>
+                                <th>Periode Ijin</th>
+                                <th onclick="changeSort('form_perijinan.status')" class="sort">Status</th>
+                                <th onclick="changeSort('form_perijinan.reason')" class="sort">Keterangan</th>
+                                <th onclick="changeSort('form_perijinan.is_approval')" style="width: 70px;" class="sort">Approval</th>
+                                <th class="sort">Action</th>
                             </tr>
                         </thead>
-                        <tbody class="body-table" id="body-table" style="cursor: pointer;">
+                        <tbody class="body-table" id="body-table">
                         </tbody>
                     </table>
                 </div>
@@ -84,16 +63,10 @@
 
 <script>
     const csrfToken = '<?= csrf_token() ?>';
-    let sort = "periode";
+    let sort = "id";
     let sortType = "desc";
-    let trigger = true;
-    let year = new Date().getFullYear();
-
-    var row = 0;
-
 
     const table = $('.dataTable').DataTable({
-
         processing: true,
         serverSide: true,
         ordering: true,
@@ -110,8 +83,8 @@
             url: "<?= base_url("form-perijinan/all"); ?>",
             dataSrc: "data",
             data: function(data) {
-                data.search = $(".search").val();
-                data.yearMonth = $('#year').val() + "-" + $('#month').val();
+                data.search = $("#search").val();
+                data.month = $('#month').val();
                 data.sort = sort;
                 data.sortType = sortType;
             }
@@ -129,33 +102,87 @@
             data: "no",
             className: "text-center",
             sortable: false,
-            width: "5%"
+            width: "3%"
         }, {
-            data: "employeeNip",
-            className: "text-center"
+            data: "nip",
+            className: "text-left"
         }, {
-            data: "employeeName",
-            className: "text-center"
+            data: "name",
+            className: "text-left"
         }, {
-            data: "divisionName",
-            className: "text-center"
+            data: "divisi",
+            className: "text-left"
         }, {
-            data: "mulai",
-            className: "text-center"
+            data: "periode",
+            className: "text-left",
+            sortable: false,
+            render: function(data) {
+                return "<span class='badge badge-primary'>" + data + "</span>";
+            }
         }, {
-            data: "selesai",
-            className: "text-center"
+            data: "status",
+            className: "text-left"
         }, {
-            data: "statusName",
-            className: "text-center"
+            data: "reason",
+            className: "text-left"
         }, {
-            data: "approval",
-            className: "text-center"
-        }, ],
+            data: "is_approval",
+            className: "text-center",
+            render: function(data, type, row) {
+                let is_approval = row.is_approval;
+                let htmlRes = '';
+
+                if (row.is_approval == 1) {
+                    htmlRes += `
+                            <div class="text-success">
+                               <i class="fa-solid fa-check"></i>
+                            </div>`
+                } else {
+                    htmlRes += `
+                            <div class="text-danger">
+                               <i class="fa-solid fa-x"></i>
+                            </div>`
+                }
+
+                return htmlRes;
+
+            }
+        }, {
+            data: "id",
+            className: "text-center actions",
+            searchable: false,
+            sortable: false,
+            render: function(data, type, row) {
+                let kode = row.kode;
+                let htmlRes = '';
+
+                htmlRes += `
+                    <?php if (can('Personalia', 'Form Perijinan', 'u')): ?>
+                        <a href="javascript:void(0)" onclick="edit('${kode}')" data-toggle="tooltip" title="Edit" class="btn btn-primary">
+                            <i class="fas fa-edit"></i>
+                        </a>
+                    <?php endif ?>
+                    <?php if (can('Personalia', 'Form Perijinan', 'd')): ?>
+                        <button data-toggle="tooltip" title="Hapus" onclick="remove('${kode}')" class="btn btn-danger delete-parent">
+                            <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
+                        </button>
+                    <?php endif ?>
+                 
+                    `;
+
+                return htmlRes;
+            }
+        }],
         columnDefs: [{
             defaultContent: "-",
             targets: "_all"
         }],
+        "drawCallback": function(settings) {
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-toggle="tooltip"]'))
+            var tooltipList = tooltipTriggerList.map(function(tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl)
+            });
+        },
         language: {
             emptyTable: "Tidak Ada Data Perijinan",
             lengthMenu: "Show _MENU_ entries",
@@ -166,24 +193,85 @@
         }
     });
 
-
-    $(document).ready(function() {
-
-        $(".dataTable_info").addClass("pt-0");
-
-        $(".search").keyup(function() {
-            table.ajax.reload();
-        })
-
-        $('#filterYearMonth').click(function() {
-            table.ajax.reload();
-        })
-
-        $('#dataTable tbody').on('click', 'tr td:not(.actions):not(.dataTables_empty)', function() {
-            const data = table.row(this).data();
-            location.replace(`<?= base_url("form-perijinan/id"); ?>/${data.kode}`);
-        })
+    $(".month").datepicker({
+        format: "yyyy-mm",
+        startView: "months", // langsung tampilin bulan
+        minViewMode: "months", // cuma bisa pilih bulan
+        autoclose: true,
+        todayHighlight: true,
+        orientation: "bottom auto"
     });
+
+    $('#month').change(function(e) {
+        e.preventDefault();
+        table.ajax.reload();
+    });
+
+    $('#search').keyup(function(e) {
+        e.preventDefault();
+        table.ajax.reload();
+    });
+
+    $(".dataTable_info").addClass("pt-0");
+
+    function edit(kode) {
+        location.replace(`<?= base_url("form-perijinan/id"); ?>/${kode}`);
+    }
+
+    function remove(kode) {
+        Swal.fire({
+            icon: 'question',
+            title: 'Hapus Ijin ?',
+            confirmButtonColor: '#4e73df',
+            cancelButtonColor: '#d33',
+            showCancelButton: true,
+            reverseButtons: true,
+            confirmButtonText: 'Ya, Hapus',
+            cancelButtonText: 'Kembali',
+        }).then((result) => {
+            if (result.isConfirmed) {
+                const csrf = $(`[name="${csrfToken}"]`);
+                const formData = new FormData();
+                formData.set('kode', kode);
+
+                $.ajax({
+                    url: "<?= base_url("form-perijinan/delete"); ?>",
+                    beforeSend: function(xhr) {
+                        xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                        setLoading();
+                    },
+                    complete: function() {
+                        stopLoading();
+                    },
+                    data: formData,
+                    method: "POST",
+                    dataType: "json",
+                    processData: false,
+                    contentType: false,
+                    success: function(response) {
+                        csrf.val(response.token);
+                        if (response.status) {
+                            Swal.fire({
+                                    icon: 'success',
+                                    title: response.message,
+                                    confirmButtonColor: '#4e73df',
+                                })
+                                .then(() => {
+                                    table.ajax.reload();
+                                })
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: response.message,
+                                confirmButtonColor: '#4e73df',
+                            })
+                        }
+                    }
+                });
+            }
+        })
+    }
+
     const changeSort = function(val) {
         if (sort !== val) {
             sortType = "asc";

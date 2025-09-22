@@ -146,4 +146,34 @@ class Employees extends BaseController
         // echo "<B>Result:</B><BR>";
         // echo $buffer;
     }
+
+    public function clear_data_finger($ip, $unit_key)
+    {
+        // buka koneksi ke mesin fingerprint
+        $Connect = @fsockopen($ip, "80", $errno, $errstr, 3);
+
+        if ($Connect) {
+            // request SOAP untuk clear log
+            $soap_request = "
+                <ClearLogData>
+                    <ArgComKey xsi:type=\"xsd:integer\">" . $unit_key . "</ArgComKey>
+                </ClearLogData>";
+
+            $newLine = "\r\n";
+            fputs($Connect, "POST /iWsService HTTP/1.0" . $newLine);
+            fputs($Connect, "Content-Type: text/xml" . $newLine);
+            fputs($Connect, "Content-Length: " . strlen($soap_request) . $newLine . $newLine);
+            fputs($Connect, $soap_request . $newLine);
+
+            $buffer = "";
+            while ($Response = fgets($Connect, 4096)) {
+                $buffer .= $Response;
+            }
+            fclose($Connect);
+
+            return true;
+        } else {
+            return false; // koneksi gagal
+        }
+    }
 }

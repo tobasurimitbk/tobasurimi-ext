@@ -548,7 +548,7 @@ class PembayaranInvoice extends BaseController
                 $customer_name = $salesOrderExportData['name'];
             } elseif ($p['type_invoice'] == "PROFORMA INVOICE") {
                 $salesOrderExportData = $this->proformaInvoiceModel
-                    ->join('sales_order_export', 'sales_order_export.sales_contract_id = proforma_invoice.sales_order_export_id')
+                    ->join('sales_order_export', 'sales_order_export.sales_order_export_id = proforma_invoice.sales_order_export_id')
                     ->join('sales_contract', 'sales_contract.id = sales_order_export.sales_contract_id')
                     ->join('customers', 'customers.id = sales_contract.customer_id')
                     ->where('proforma_invoice.id', $p['invoice_id'])
@@ -1651,6 +1651,19 @@ class PembayaranInvoice extends BaseController
                 "detail" => $this->pembayaranInvoiceModel->getPembayaranInvoiceDetail($id),
             ];
             return view('Pembayaran/pembayaranInvoice/formEkspor', $data);
+        } elseif ($tipe_invoice == "PROFORMA INVOICE") {
+            $salesOrderExportData = $this->proformaInvoiceModel->where('deletedAt', null)->where('company_id', $this->this_company_id)->findAll();
+            foreach ($salesOrderExportData as $s) {
+                array_push($dokumenList, $s);
+            }
+            $data = [
+                "customers" => $customers,
+                "divisi" => $divisi,
+                "subsAkuns" => $subAkunsModel,
+                "dokumenList" => $dokumenList,
+                "detail" => $this->pembayaranInvoiceModel->getPembayaranInvoiceDetail($id),
+            ];
+            return view('Pembayaran/pembayaranInvoice/formPI', $data);
         } elseif ($tipe_invoice == "LAIN-LAIN") {
 
             $salesOrderLainData = $this->salesOrderLainModel->where('deletedAt', null)->where('company_id', $this->this_company_id)->findAll();
@@ -1721,7 +1734,7 @@ class PembayaranInvoice extends BaseController
         } elseif ($tipe_invoice == "PROFORMA INVOICE") {
             $salesOrderExportData = $this->proformaInvoiceModel
                 ->select('customers.*')
-                ->join('sales_order_export', 'sales_order_export.sales_contract_id = proforma_invoice.sales_order_export_id')
+                ->join('sales_order_export', 'sales_order_export.sales_order_export_id = proforma_invoice.sales_order_export_id')
                 ->join('sales_contract', 'sales_contract.id = sales_order_export.sales_contract_id')
                 ->join('customers', 'customers.id = sales_contract.customer_id')
                 ->where('proforma_invoice.id', $invoice_id)

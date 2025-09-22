@@ -203,16 +203,16 @@ class PanjarPinjamanTransactionModel extends Model
         // Get bank code
         $kodeBank = '';
         if (!empty($bank_id) && strtoupper($paymentMethod) !== 'CASH') {
-            $bankData = $banksModel->select('name')->where('id', $bank_id)->first();
+            $bankData = $banksModel->select('kode_bank')->where('id', $bank_id)->first();
             if ($bankData) {
-                $name = strtoupper($bankData['name']);
-                if (strpos($name, 'BRI') !== false) $kodeBank = 'BRI';
-                elseif (strpos($name, 'MANDIRI') !== false) $kodeBank = 'MND';
-                elseif (strpos($name, 'BNI') !== false) $kodeBank = 'KBA';
-                elseif (strpos($name, 'BCA') !== false) $kodeBank = 'BCI';
+                $kode = strtoupper($bankData['kode_bank']);
+                if (strpos($kode, 'BBRI') !== false) $kodeBank = 'BRI';
+                elseif (strpos($kode, 'BMRIIDJA') !== false) $kodeBank = 'MND';
+                elseif (strpos($kode, 'BBNI') !== false) $kodeBank = 'KBA';
+                elseif (strpos($kode, 'BBCA') !== false) $kodeBank = 'BCI';
+                elseif (strpos($kode, 'BBNL') !== false) $kodeBank = 'BNL';
             }
         }
-
         // Get divisi code
         $kodeDivisi = '';
         $divisiKey = '';

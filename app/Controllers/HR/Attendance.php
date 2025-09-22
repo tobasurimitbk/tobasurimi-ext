@@ -3,7 +3,6 @@
 namespace App\Controllers\HR;
 
 use App\Controllers\BaseController;
-use App\Controllers\Master\BigDays;
 use App\Models\AttendancesLogModel;
 use App\Models\AttendancesModel;
 use App\Models\BigDaysModel;
@@ -13,18 +12,18 @@ use App\Models\EmployeeJamKerjaModel;
 use App\Models\EmployeesModel;
 use App\Models\FormPerijinanModel;
 use App\Models\GolonganModel;
-use App\Models\JamKerjaModel;
 use App\Models\MetadataModel;
 use CodeIgniter\I18n\Time;
 use DateTime;
 use Dompdf\Dompdf;
 use Locale;
-use PDO;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
-use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
-use PhpOffice\PhpSpreadsheet\Style\Fill;
 use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
 use PhpOffice\PhpSpreadsheet\Style\Color;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+use PhpOffice\PhpSpreadsheet\Style\Fill;
+use PhpOffice\PhpSpreadsheet\Style\Alignment;
+use PhpOffice\PhpSpreadsheet\Style\Border;
 
 class Attendance extends BaseController
 {
@@ -33,85 +32,385 @@ class Attendance extends BaseController
     protected $AttendancesLogModel;
     protected $EmployeesModel;
     protected $FormPerijinanModel;
+    protected $DivisiModel;
+    protected $MetadataModel;
+    protected $GolonganModel;
+    protected $BigDaysModel;
+    protected $EmployeeJamKerjaModel;
 
     public function __construct()
     {
         $this->token = session()->get("login")->token;
         $this->this_company_id = session()->get("login")->this_company_id;
+        $this->AttendancesLogModel = new AttendancesLogModel();
+        $this->DivisiModel = new DivisisModel();
+        $this->MetadataModel = new MetadataModel();
+        $this->GolonganModel = new GolonganModel();
+        $this->EmployeesModel = new EmployeesModel();
+        $this->FormPerijinanModel = new FormPerijinanModel();
+        $this->BigDaysModel = new BigDaysModel();
+        $this->EmployeeJamKerjaModel = new EmployeeJamKerjaModel();
     }
 
-    public function LogAttendance()
+    public function indexLog()
     {
-        // declare model
-        $AttendancesLogModel = new AttendancesLogModel();
-        $EmployeesModel = new EmployeesModel();
-        $FormPerijinanModel = new FormPerijinanModel();
-        $DivisiModel = new DivisisModel();
-        $metaDataModel = new MetadataModel();
-        $golonganModel = new GolonganModel();
+        $dataDivisi = $this->DivisiModel->getDivisiAccess();
+        $dataStatusPerizinanAll = $this->MetadataModel
+            ->where('name', "Status Perizinan")
+            ->whereNotIn('value', ['LIBUR_L'])
+            ->orderBy('name', "ASC")
+            ->findAll();
+        $dataGolongan = $this->GolonganModel
+            ->where('company_id', $this->this_company_id)
+            ->where('deletedAt', null)
+            ->findAll();
 
-        // get data $_GET
-        $year = ($this->request->getVar("year") == "") ? date("Y") : $this->request->getVar("year");
-        $month = ($this->request->getVar("month") == "") ? date("m") : $this->request->getVar("month");
-
-        // get data from model
-        $dataEmployeePager = $EmployeesModel->getEmployeesWithPagination(
-            $this->this_company_id,
-            $this->request->getGet('employeesID'),
-            $this->request->getGet('divisiID'),
-            $this->request->getGet('golongan')
-        );
-        $pager = \Config\Services::pager();
-        $employeeDetailFilter = $EmployeesModel->where('id', $this->request->getGet('employeesID'))->first();
-
-        // declare variable for store data
-        $dataResult = array();
-
-        // set data attendance
-        foreach ($dataEmployeePager['data'] as $value) {
-            // get log attendance by employee and $year-$month
-            $dataLog = $AttendancesLogModel->getLogAmt($value["id"], $year, $month);
-            // store data
-            $dataResult[] = [
-                "employeeID" => $value['id'],
-                "divisi" => $value['divisi'],
-                "namaBagian" => $value['nama_bagian'],
-                "employeeName" => $value['name'],
-                "list_attendance" => $dataLog,
-                'statusAttendances' => [
-                    'CT' => $FormPerijinanModel->getTotalPerijinanByStatus($value['id'], "CUTI TAHUNAN_CT", $year, $month),
-                    'CHD' => $FormPerijinanModel->getTotalPerijinanByStatus($value['id'], "CUTI HAID_CHD", $year, $month),
-                    'CHL' => $FormPerijinanModel->getTotalPerijinanByStatus($value['id'], "CUTI HAMIL_CHL", $year, $month),
-                    'CM' => $FormPerijinanModel->getTotalPerijinanByStatus($value['id'], "CUTI MELAHIRKAN_CM", $year, $month),
-                    'I' => $FormPerijinanModel->getTotalPerijinanByStatus($value['id'], "IJIN_I", $year, $month),
-                    'S' => $FormPerijinanModel->getTotalPerijinanByStatus($value['id'], "SAKIT_S", $year, $month),
-                    'RL' => $FormPerijinanModel->getTotalPerijinanByStatus($value['id'], "RL_RL", $year, $month),
-                ]
-            ];
-        }
-
-        // final data
         $data = [
-            'year' => $year,
-            'month' => $month,
-            'divisi' => $DivisiModel->get_by_company_id($this->this_company_id),
-            'res_user'  => $dataResult,
-            'employeesData' => $dataEmployeePager['data'],
-            'pager' => $dataEmployeePager['pager'],
-            'employeeDetailFilter' => $employeeDetailFilter,
-            'pager' => $dataEmployeePager['pager'],
-            'statusPerizinan' => $metaDataModel->where('name', "Status Perizinan")
-                ->whereNotIn('value', ['HADIR_H', 'LIBUR_L', 'ALPHA_A'])
-                ->orderBy('name', "ASC")
-                ->findAll(),
-            'statusPerizinanAll' => $metaDataModel->where('name', "Status Perizinan")
-                ->whereNotIn('value', ['LIBUR_L'])
-                ->orderBy('name', "ASC")
-                ->findAll(),
-            'golongan' => $golonganModel->where('company_id', $this->this_company_id)->where('deletedAt', null)->findAll(),
+            'divisi' => $dataDivisi,
+            'statusPerizinanAll' => $dataStatusPerizinanAll,
+            'golongan' => $dataGolongan
 
         ];
         return view('hr/attendance/log-attendance', $data);
+    }
+
+
+    public function allLog()
+    {
+        $monthReq = $this->request->getVar('month');
+        if (empty($monthReq)) {
+            $monthReq = date('Y-m');
+        }
+
+        $monthSplit = explode('-', $monthReq);
+        $year = $monthSplit[0];
+        $month = $monthSplit[1];
+
+        $length = empty($this->request->getVar("length")) ? 25 : $this->request->getVar("length");
+        $limit = empty($this->request->getVar('length')) ? 25 : $this->request->getVar("length");
+        $offset = empty($this->request->getVar('start')) ? 0 : $this->request->getVar("start");
+        $payload = [
+            "pageSize"      => $this->request->getVar("length"),
+            "currentPage"   => ($this->request->getVar("start") / $length) + 1,
+
+        ];
+
+        $condition = [
+            "employees.company_id" => $this->this_company_id,
+            "employees.deletedAt"  => null,
+        ];
+
+        $addCondition = [
+            "order"        => $this->request->getVar('order')[0] ?? null,
+            "columns"    => $this->request->getVar('columns') ?? [],
+            "divisi_id"   => $this->request->getVar('divisi_id'),
+            "tipe"        => $this->request->getVar('tipe'),
+            "employee_id" => $this->request->getVar("employee_id")
+        ];
+
+        // ambil list karyawan (sudah paginate)
+        $employees    = $this->EmployeesModel->getEmployeeListAttendances($condition, $addCondition, $limit, $offset);
+        $employeeData = $employees['data'];
+        $employeeIds  = array_column($employeeData, 'id');
+
+
+        // ambil log absensi
+        if (count($employeeIds) != 0) {
+            $logData = $this->AttendancesLogModel->getLogAmts($employeeIds, $year, $month);
+        } else {
+            $logData = [];
+        }
+        // mapping log -> fix: pakai $mapLog bukan $mapsLog
+        $mapLog = [];
+        foreach ($logData as $l) {
+            $mapLog[$l['employees_id']][$l['periode']] = [
+                'in'  => $l['check_in'],
+                'out' => $l['check_out'],
+                'status' => $l['status']
+            ];
+        }
+
+        $bigDays = $this->BigDaysModel->where('company_id', $this->this_company_id)->where('deletedAt', null)->findAll();
+        $tanggalBigDays = array_column($bigDays, 'date');
+        $totalDaysInMonth = cal_days_in_month(CAL_GREGORIAN, $month, $year);
+        $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
+
+        $resultData = [];
+        foreach ($employeeData as $e) {
+            $row = [];
+            $row['no']     = $no++;
+            $row['id']     = $e['id'];
+            $row['nip']    = $e['nip'];
+            $row['name']   = $e['name'];
+            $row['divisi'] = $e['divisi'];
+            $row['bagian'] = $e['bagian'];
+
+            for ($d = 1; $d <= $totalDaysInMonth; $d++) {
+                $tanggal = sprintf("%04d-%02d-%02d", $year, $month, $d);
+                $dayName = date('D', strtotime($tanggal));
+
+                $statusLibur = false;
+                if (in_array($tanggal, $tanggalBigDays)) {
+                    $statusLibur = true;
+                }
+
+                if (isset($mapLog[$e['id']][$tanggal])) {
+                    $in  = $mapLog[$e['id']][$tanggal]['in'];
+                    $out = $mapLog[$e['id']][$tanggal]['out'];
+                    $statusIzin =  $mapLog[$e['id']][$tanggal]['status'];
+                } else {
+                    $in  = '';
+                    $out = '';
+                    $statusIzin = '';
+                }
+
+
+                // isi data
+                $row['day_' . $d . '_in']  = $in;
+                $row['day_' . $d . '_out'] = $out;
+                $row['day_' . $d . '_date'] = $tanggal;
+
+
+                // Kalau Libur
+                if (($dayName === 'Sun' || $statusLibur) && empty($in)) {
+                    $row['day_' . $d . '_in_class']  = 'bg-libur';
+                    $row['day_' . $d . '_out_class'] = 'bg-libur';
+                }
+
+                // Kalau Alpha Masuk
+                if (empty($in) && $dayName != 'Sun' && !$statusLibur) {
+                    $row['day_' . $d . '_in_class']  = 'bg-alpha';
+                }
+
+                // Kalau Alpha Pulang
+                if (empty($in) && $dayName != 'Sun' && !$statusLibur) {
+                    $row['day_' . $d . '_out_class'] = 'bg-alpha';
+                }
+
+                if (!empty($statusIzin)) {
+                    $mapping = [
+                        'CUTI TAHUNAN_CT' => 'bg-cuti-tahunan',
+                        'CUTI HAID_CHD' => 'bg-cuti-haid',
+                        'CUTI HAMIL_CHL' => 'bg-cuti-hamil',
+                        'CUTI MELAHIRKAN_CM' => 'bg-cuti-melahirkan',
+                        'IJIN_I' => 'bg-ijin',
+                        'SAKIT_S' => 'bg-sakit',
+                        'RL_RL' => 'bg-rl',
+                    ];
+
+                    $row['day_' . $d . '_in_class']  = $mapping[$statusIzin];
+                    $row['day_' . $d . '_out_class']  = $mapping[$statusIzin];
+                    $row['day_' . $d . '_in']  = explode('_', $statusIzin)[1];
+                    $row['day_' . $d . '_out']  = explode('_', $statusIzin)[1];
+                }
+
+                // Kalau memang hadir
+                if (!empty($in)) {
+                    $row['day_' . $d . '_in_class']  = 'bg-hadir';
+                }
+
+                if (!empty($out)) {
+                    $row['day_' . $d . '_out_class']  = 'bg-hadir';
+                }
+            }
+
+            $resultData[] = $row;
+        }
+
+        // Kolom tabel
+        $columns = [];
+        $columns[] = ["data" => "no", "title" => "No", "className" => "text-center", "sortable" => true];
+        $columns[] = ["data" => "nip", "title" => "Nip", "sortable" => true];
+        $columns[] = ["data" => "name", "title" => "Karyawan", "sortable" => true];
+        $columns[] = ["data" => "divisi", "title" => "Dept", "sortable" => true];
+        $columns[] = ["data" => "bagian", "title" => "Bagian", "sortable" => true];
+
+        for ($d = 1; $d <= $totalDaysInMonth; $d++) {
+            $dateStr = sprintf('%04d-%02d-%02d', $year, $month, $d);
+            $dayName = date('D', strtotime($dateStr));
+
+            $columns[] = [
+                "data"      => "day_" . $d . "_in",
+                "title"     => "IN <br>" . $d,
+                "className" => "text-center", // cukup ini saja
+                "sortable"  => false
+            ];
+            $columns[] = [
+                "data"      => "day_" . $d . "_out",
+                "title"     => "OUT <br>" . $d,
+                "className" => "text-center", // cukup ini saja
+                "sortable"  => false
+            ];
+        }
+
+
+        $data = [
+            "draw"            => intval($this->request->getVar("draw")),
+            "recordsTotal"    => $employees['totalData'],
+            "recordsFiltered" => $employees['totalFilteredData'],
+            "columns"         => $columns,
+            "data"            => $resultData,
+            "payload"         => $payload
+        ];
+
+        return $this->response->setJSON($data);
+    }
+
+    public function allLogTotal()
+    {
+        // Ambil parameter bulan (default bulan sekarang)
+        $monthReq = $this->request->getVar('month') ?: date('Y-m');
+        [$year, $month] = explode('-', $monthReq);
+
+        // DataTable pagination
+        $length  = $this->request->getVar("length") ?: 25;
+        $offset  = $this->request->getVar('start') ?: 0;
+        $payload = [
+            "pageSize"    => $length,
+            "currentPage" => ($offset / $length) + 1,
+        ];
+
+        // Filter default
+        $condition = [
+            "employees.company_id" => $this->this_company_id,
+            "employees.deletedAt"  => null,
+        ];
+
+        // Filter tambahan
+        $addCondition = [
+            "order"       => $this->request->getVar('order')[0] ?? null,
+            "columns"     => $this->request->getVar('columns') ?? [],
+            "divisi_id"   => $this->request->getVar('divisi_id'),
+            "tipe"        => $this->request->getVar('tipe'),
+            "employee_id" => $this->request->getVar("employee_id"),
+        ];
+
+        // Ambil list karyawan (sudah dipaginate)
+        $employees    = $this->EmployeesModel->getEmployeeListAttendances($condition, $addCondition, $length, $offset);
+        $employeeData = $employees['data'];
+        $employeeIds  = array_column($employeeData, 'id');
+
+        // Ambil log absensi per karyawan
+        $logData = !empty($employeeIds)
+            ? $this->AttendancesLogModel->getLogAmts($employeeIds, $year, $month)
+            : [];
+
+        // Map log absensi -> per karyawan + tanggal
+        $mapLog = [];
+        foreach ($logData as $l) {
+            $mapLog[$l['employees_id']][$l['periode']] = [
+                'in'     => $l['check_in'],
+                'out'    => $l['check_out'],
+                'status' => $l['status'],
+            ];
+        }
+
+        // Ambil tanggal hari besar (libur)
+        $bigDays       = $this->BigDaysModel->where('company_id', $this->this_company_id)->where('deletedAt', null)->findAll();
+        $tanggalBigDay = array_column($bigDays, 'date');
+
+        // Total hari dalam bulan
+        $totalDaysInMonth = cal_days_in_month(CAL_GREGORIAN, $month, $year);
+
+        $no         = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
+        $resultData = [];
+
+        foreach ($employeeData as $e) {
+            $row = [
+                'no'     => $no++,
+                'id'     => $e['id'],
+                'nip'    => $e['nip'],
+                'name'   => $e['name'],
+                'divisi' => $e['divisi'],
+                'bagian' => $e['bagian'],
+            ];
+
+            // Inisialisasi counter
+            $totalCutiTahunan    = 0;
+            $totalCutiHaid       = 0;
+            $totalCutiHamil      = 0;
+            $totalCutiMelahirkan = 0;
+            $totalIjin           = 0;
+            $totalSakit          = 0;
+            $totalRl             = 0;
+            $totalHadir          = 0;
+            $totalAlpha          = 0;
+            $totalLibur          = 0;
+
+            // Loop setiap tanggal dalam bulan
+            for ($d = 1; $d <= $totalDaysInMonth; $d++) {
+                $tanggal   = sprintf("%04d-%02d-%02d", $year, $month, $d);
+                $dayName   = date('D', strtotime($tanggal));
+                $statusLibur = in_array($tanggal, $tanggalBigDay);
+
+                // Ambil log per tanggal
+                $in        = $mapLog[$e['id']][$tanggal]['in']     ?? '';
+                $out       = $mapLog[$e['id']][$tanggal]['out']    ?? '';
+                $statusIzin = $mapLog[$e['id']][$tanggal]['status'] ?? '';
+
+                // Jika libur (Minggu / hari besar) dan tidak ada absen
+                if (($dayName === 'Sun' || $statusLibur) && empty($in)) {
+                    $totalLibur++;
+                }
+
+                // Jika alpha (tidak hadir, bukan Minggu/hari besar)
+                if (empty($in) && empty($out) && $dayName !== 'Sun' && !$statusLibur) {
+                    $totalAlpha++;
+                }
+
+                // Hitung status izin
+                switch ($statusIzin) {
+                    case 'CUTI TAHUNAN_CT':
+                        $totalCutiTahunan++;
+                        break;
+                    case 'CUTI HAID_CHD':
+                        $totalCutiHaid++;
+                        break;
+                    case 'CUTI HAMIL_CHL':
+                        $totalCutiHamil++;
+                        break;
+                    case 'CUTI MELAHIRKAN_CM':
+                        $totalCutiMelahirkan++;
+                        break;
+                    case 'IJIN_I':
+                        $totalIjin++;
+                        break;
+                    case 'SAKIT_S':
+                        $totalSakit++;
+                        break;
+                    case 'RL_RL':
+                        $totalRl++;
+                        break;
+                }
+
+                // Jika hadir (ada in/out)
+                if (!empty($in) || !empty($out)) {
+                    $totalHadir++;
+                }
+            }
+
+            // Simpan hasil per karyawan
+            $row['total_cuti_tahunan']    = $totalCutiTahunan;
+            $row['total_cuti_haid']       = $totalCutiHaid;
+            $row['total_cuti_hamil']      = $totalCutiHamil;
+            $row['total_cuti_melahirkan'] = $totalCutiMelahirkan;
+            $row['total_ijin']            = $totalIjin;
+            $row['total_sakit']           = $totalSakit;
+            $row['total_rl']              = $totalRl;
+            $row['total_hadir']           = $totalHadir;
+            $row['total_alpha']           = $totalAlpha;
+            $row['total_libur']           = $totalLibur;
+
+            $resultData[] = $row;
+        }
+
+        // tinggal return untuk datatable
+        return $this->response->setJSON([
+            "draw"            => intval($this->request->getVar("draw")),
+            "recordsTotal"    => $employees['totalData'],
+            "recordsFiltered" => $employees['totalFilteredData'],
+            "data"            => $resultData,
+        ]);
     }
 
     public function generateAttendanceView()
@@ -154,12 +453,12 @@ class Attendance extends BaseController
 
         $dataEmployeePager = $EmployeesModel->getEmployeesWithPagination(
             $this->this_company_id,
-            $this->request->getGet('employeesID'),
-            $this->request->getGet('divisiID'),
-            $this->request->getGet('golongan')
+            $this->request->getVar('employeesID'),
+            $this->request->getVar('divisiID'),
+            $this->request->getVar('golongan')
         );
         $pager = \Config\Services::pager();
-        $employeeDetailFilter = $EmployeesModel->where('id', $this->request->getGet('employeesID'))->first();
+        $employeeDetailFilter = $EmployeesModel->where('id', $this->request->getVar('employeesID'))->first();
 
         // Data Send To View
         $data = [
@@ -384,7 +683,6 @@ class Attendance extends BaseController
     public function getEmployeesLike()
     {
         $employeesName = $this->request->getVar('employeesName');
-        $divisionID = $this->request->getVar('divisiID');
 
         $employessModel = new EmployeesModel();
 
@@ -394,15 +692,12 @@ class Attendance extends BaseController
             //'users.id' => null
         ];
 
-        if ($divisionID != "") {
-            $arrCondition['division_id'] = $divisionID;
-        }
-
         $result = $employessModel->select("employees.name, employees.id")
             ->join('users', 'users.employee_id = employees.id', 'left')
-            ->groupStart()
             ->where($arrCondition)
+            ->groupStart()
             ->like('employees.name', $employeesName)
+            ->orLike('employees.nip', $employeesName)
             ->groupEnd()
             ->findAll();
 
@@ -413,17 +708,10 @@ class Attendance extends BaseController
 
     public function getLogAttendanceDetail()
     {
-        // model declare
-        $AttendancesLogModel = new AttendancesLogModel();
-        $FormPerijinanModel = new FormPerijinanModel();
-        $hariLiburModel = new BigDaysModel();
-        $EmployeesModel = new EmployeesModel();
-        $employeeJamKerjaModel = new EmployeeJamKerjaModel();
-
         Locale::setDefault('id_ID');
 
         $tanggal = $this->request->getVar('tanggal');
-        $employeeID = $this->request->getVar('employeeID');
+        $employeeID = $this->request->getVar('employee_id');
         $time = Time::createFromFormat('Y-m-d', $tanggal);
 
         $result = [
@@ -432,21 +720,25 @@ class Attendance extends BaseController
             'checkIn' => "-",
             'checkOut' => "-",
             'status' => "-",
-            'employee' => $EmployeesModel->where('id', $employeeID)->first(),
+            'employee' => $this->EmployeesModel->where('id', $employeeID)->first(),
             'jamTerlambat' => "-"
         ];
 
-        $formPerizinan = $FormPerijinanModel->where('periode', $tanggal)
+        $formPerizinan = $this->FormPerijinanModel->where('periode', $tanggal)
             ->where('employee_id', $employeeID)
             ->first();
-        $hariLibur = $hariLiburModel->where('date', $tanggal)
+        $hariLibur = $this->BigDaysModel->where('date', $tanggal)
             ->first();
 
-        $selectQry = "DATE_FORMAT(MIN(date_create), '%H:%i:%s') AS checkin,
-        DATE_FORMAT(MAX(date_create), '%H:%i:%s') AS checkout";
+        $selectQry = "
+        DATE_FORMAT(MIN(date_create), '%H:%i:%s') AS checkin,
+        DATE_FORMAT(MAX(date_create), '%H:%i:%s') AS checkout,
+        attendances_unit.name as nama_unit
+        ";
 
-        $logAttandance = $AttendancesLogModel
+        $logAttandance = $this->AttendancesLogModel
             ->select($selectQry)
+            ->join('attendances_unit', 'attendances_unit.id = attendances_log.attendances_unit_id', 'left')
             ->where('employees_id', $employeeID)
             ->where("DATE_FORMAT(date_create, '%Y-%m-%d')",  $tanggal)
             ->groupBy('DATE_FORMAT(date_create, \'%Y-%m-%d\')')
@@ -497,428 +789,295 @@ class Attendance extends BaseController
         }
 
         // GET JAM KERJA USED
-        $jamKerja = $employeeJamKerjaModel->getJamKerjaUsedByEmployeeId($tanggal, $employeeID);
+        $jamKerja = $this->EmployeeJamKerjaModel->getJamKerjaUsedByEmployeeId($tanggal, $employeeID);
         // APPEND TO RESULT
         $result['jamKerja'] = $jamKerja;
+        $result['namaUnit'] = count($logAttandance) == 0 ? "" : $logAttandance[0]->nama_unit;
 
-        return \response()->setJSON([
+        return response()->setJSON([
             'status' => true,
             'data' => $result,
-            'token' => \csrf_hash(),
+            'token' => csrf_hash(),
         ]);
     }
 
-    public function exportPDFLogPresensi($yearMonth)
+    public function exportExcelLogPresensi()
     {
-        $divisiID = $this->request->getGet('divisiID');
-        $golongan = $this->request->getGet('golongan');
+        $monthReq = $this->request->getVar('month') ?: date('Y-m');
+        [$year, $month] = explode('-', $monthReq);
 
-        $employeesModel = new EmployeesModel();
-        $divisiModel = new DivisisModel();
-        $companyModel = new CompaniesModel();
-        $metaDataModel = new MetadataModel();
-        $AttendancesLogModel = new AttendancesLogModel();
-        $FormPerijinanModel = new FormPerijinanModel();
-        $divisiModel = new DivisisModel();
-        $golonganModel = new GolonganModel();
+        $monthName = strtoupper(date('F Y', strtotime("$year-$month-01"))); // contoh: SEPTEMBER 2025
 
-        $dompdf = new Dompdf();
+        // ambil data employees
+        $condition = [
+            "employees.company_id" => $this->this_company_id,
+            "employees.deletedAt"  => null,
+        ];
+        $addCondition = [
+            "divisi_id"   => $this->request->getVar('divisi_id'),
+            "tipe"        => $this->request->getVar('tipe'),
+            "employee_id" => $this->request->getVar("employee_id"),
+        ];
+        $employees    = $this->EmployeesModel->getEmployeeListAttendances($condition, $addCondition, 0, 10000000);
+        $employeeData = $employees['data'];
+        $employeeIds  = array_column($employeeData, 'id');
 
-        if (!empty($divisiID) || !empty($golongan)) {
-            $employeeData = $employeesModel->getEmployeesByDivisionID(
-                $this->this_company_id,
-                $divisiID,
-                $golongan
-            );
-        } else {
-            $employeeData = $employeesModel->getEmployees($this->this_company_id);
-        }
+        // log attendance
+        $logData = !empty($employeeIds)
+            ? $this->AttendancesLogModel->getLogAmts($employeeIds, $year, $month)
+            : [];
 
-        $splitYearMonth = \explode("-", $yearMonth);
-
-        // declare variable for store data
-        $dataResult = array();
-
-        // set data attendance
-        foreach ($employeeData as $value) {
-            // get log attendance by employee and $year-$month
-            $dataLog = $AttendancesLogModel->getLogAmt($value["id"], $splitYearMonth[0], $splitYearMonth[1]);
-            // store data
-            $dataResult[] = [
-                "employeeID" => $value['id'],
-                "employeeName" => $value['name'],
-                "list_attendance" => $dataLog,
-                "namaBagian" => $value['nama_bagian'],
-                "divisi" => $divisiModel->where('id', $value['division_id'])->first()['divisi'],
-                'statusAttendances' => [
-                    'CT' => $FormPerijinanModel->getTotalPerijinanByStatus($value['id'], "CUTI TAHUNAN_CT", $splitYearMonth[0], $splitYearMonth[1]),
-                    'CHD' => $FormPerijinanModel->getTotalPerijinanByStatus($value['id'], "CUTI HAID_CHD", $splitYearMonth[0], $splitYearMonth[1]),
-                    'CHL' => $FormPerijinanModel->getTotalPerijinanByStatus($value['id'], "CUTI HAMIL_CHL", $splitYearMonth[0], $splitYearMonth[1]),
-                    'CM' => $FormPerijinanModel->getTotalPerijinanByStatus($value['id'], "CUTI MELAHIRKAN_CM", $splitYearMonth[0], $splitYearMonth[1]),
-                    'I' => $FormPerijinanModel->getTotalPerijinanByStatus($value['id'], "IJIN_I", $splitYearMonth[0], $splitYearMonth[1]),
-                    'S' => $FormPerijinanModel->getTotalPerijinanByStatus($value['id'], "SAKIT_S", $splitYearMonth[0], $splitYearMonth[1]),
-                    'RL' => $FormPerijinanModel->getTotalPerijinanByStatus($value['id'], "RL_RL", $splitYearMonth[0], $splitYearMonth[1]),
-                ]
+        $mapLog = [];
+        foreach ($logData as $l) {
+            $mapLog[$l['employees_id']][$l['periode']] = [
+                'in'     => $l['check_in'],
+                'out'    => $l['check_out'],
+                'status' => $l['status'],
             ];
         }
 
-        $data = [
-            'res_user'  => $dataResult,
-            'yearMonth' => $yearMonth,
-            'divisi' => $divisiModel->where('id', $divisiID)->first(),
-            'golongan' => $golonganModel->where('golongan_name', $golongan)->first(),
-            'company' => $companyModel->where('id', $this->this_company_id)->first(),
-            'month' => $splitYearMonth[1],
-            'year' => $splitYearMonth[0],
-            'statusPerizinan' => $metaDataModel->where('name', "Status Perizinan")
-                ->whereNotIn('value', ['HADIR_H', 'LIBUR_L', 'ALPHA_A'])
-                ->orderBy('name', "ASC")
-                ->findAll(),
-            'statusPerizinanAll' => $metaDataModel->where('name', "Status Perizinan")
-                ->whereNotIn('value', ['LIBUR_L'])
-                ->orderBy('name', "ASC")
-                ->findAll(),
-        ];
-
-        $dompdf->loadHtml(view('hr/attendance/print-log', $data));
-        $dompdf->setPaper('legal', 'landscape');
-        $dompdf->render();
-        $dompdf->stream("Log Absensi $yearMonth", array("Attachment" => false));
-
-        exit(0);
-    }
-
-    public function exportExcelLogPresensi($yearMonth)
-    {
-        $divisiID = $this->request->getGet('divisiID');
-        $golongan = $this->request->getGet('golongan');
-
-        $employeesModel = new EmployeesModel();
-        $divisiModel = new DivisisModel();
-        $companyModel = new CompaniesModel();
-        $metaDataModel = new MetadataModel();
-        $AttendancesLogModel = new AttendancesLogModel();
-        $FormPerijinanModel = new FormPerijinanModel();
-        $divisiModel = new DivisisModel();
-        $golonganModel = new GolonganModel();
-        $formPerizinanModel = new FormPerijinanModel();
-        $bigDaysModel = new BigDaysModel();
-
-
-
-        if (!empty($divisiID) || !empty($golongan)) {
-            $employeeData = $employeesModel->getEmployeesByDivisionID(
-                $this->this_company_id,
-                $divisiID,
-                $golongan
-            );
-        } else {
-            $employeeData = $employeesModel->getEmployees($this->this_company_id);
-        }
-
-        $splitYearMonth = \explode("-", $yearMonth);
-
-        // declare variable for store data
-        $dataResult = array();
-
-        // set data attendance
-        foreach ($employeeData as $value) {
-            // get log attendance by employee and $year-$month
-            $dataLog = $AttendancesLogModel->getLogAmt($value["id"], $splitYearMonth[0], $splitYearMonth[1]);
-            // store data
-            $dataResult[] = [
-                "employeeID" => $value['id'],
-                "employeeName" => $value['name'],
-                "namaBagian" => $value["nama_bagian"],
-                "divisi" => $divisiModel->where('id', $value['division_id'])->first()['divisi'],
-                "list_attendance" => $dataLog,
-                "divisi" => $divisiModel->where('id', $value['division_id'])->first()['divisi'],
-                'statusAttendances' => [
-                    'CT' => $FormPerijinanModel->getTotalPerijinanByStatus($value['id'], "CUTI TAHUNAN_CT", $splitYearMonth[0], $splitYearMonth[1]),
-                    'CHD' => $FormPerijinanModel->getTotalPerijinanByStatus($value['id'], "CUTI HAID_CHD", $splitYearMonth[0], $splitYearMonth[1]),
-                    'CHL' => $FormPerijinanModel->getTotalPerijinanByStatus($value['id'], "CUTI HAMIL_CHL", $splitYearMonth[0], $splitYearMonth[1]),
-                    'CM' => $FormPerijinanModel->getTotalPerijinanByStatus($value['id'], "CUTI MELAHIRKAN_CM", $splitYearMonth[0], $splitYearMonth[1]),
-                    'I' => $FormPerijinanModel->getTotalPerijinanByStatus($value['id'], "IJIN_I", $splitYearMonth[0], $splitYearMonth[1]),
-                    'S' => $FormPerijinanModel->getTotalPerijinanByStatus($value['id'], "SAKIT_S", $splitYearMonth[0], $splitYearMonth[1]),
-                    'RL' => $FormPerijinanModel->getTotalPerijinanByStatus($value['id'], "RL_RL", $splitYearMonth[0], $splitYearMonth[1]),
-                ]
-            ];
-        }
-
-        $data = [
-            'res_user'  => $dataResult,
-            'yearMonth' => $yearMonth,
-            'divisi' => $divisiModel->where('id', $divisiID)->first(),
-            'golongan' => $golonganModel->where('golongan_name', $golongan)->first(),
-            'company' => $companyModel->where('id', $this->this_company_id)->first(),
-            'month' => $splitYearMonth[1],
-            'year' => $splitYearMonth[0],
-            'statusPerizinan' => $metaDataModel->where('name', "Status Perizinan")
-                ->whereNotIn('value', ['HADIR_H', 'LIBUR_L', 'ALPHA_A'])
-                ->orderBy('name', "ASC")
-                ->findAll(),
-            'statusPerizinanAll' => $metaDataModel->where('name', "Status Perizinan")
-                ->whereNotIn('value', ['LIBUR_L'])
-                ->orderBy('name', "ASC")
-                ->findAll(),
-        ];
-        $statusPerizinan = $metaDataModel->where('name', "Status Perizinan")
-            ->whereNotIn('value', ['HADIR_H', 'LIBUR_L', 'ALPHA_A'])
-            ->orderBy('name', "ASC")
+        $bigDays = $this->BigDaysModel
+            ->where('company_id', $this->this_company_id)
+            ->where('deletedAt', null)
             ->findAll();
+        $tanggalBigDay = array_column($bigDays, 'date');
+        $totalDaysInMonth = cal_days_in_month(CAL_GREGORIAN, $month, $year);
 
+        // ==============
+        // BUAT EXCEL
+        // ==============
         $spreadsheet = new Spreadsheet();
-        $sheet = $spreadsheet->getActiveSheet();
-        $headerStyleArray = [
-            'font' => [
-                'bold' => true,
-            ],
-            'alignment' => [
-                'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER,
-                'vertical' => \PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER,
-            ],
-        ];
 
-        $dataStyleArray = [
-            'alignment' => [
-                'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER,
-                'vertical' => \PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER,
-            ],
-        ];
+        // ================= Sheet 1 : Detil =================
+        $sheet1 = $spreadsheet->getActiveSheet();
+        $sheet1->setTitle("Detail Presensi");
 
-        $spreadsheet->setActiveSheetIndex(0)
-            ->setCellValue('A1', 'No.')
-            ->setCellValue('B1', 'Karyawan')
-            ->setCellValue('C1', 'Department')
-            ->setCellValue('D1', 'Bagian');
+        // Judul
+        $sheet1->mergeCells('A1:Z1');
+        $sheet1->setCellValue('A1', "DETIL PRESENSI BULAN $monthName");
+        $sheet1->getStyle('A1')->applyFromArray([
+            'font' => ['bold' => true, 'size' => 14],
+            'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER]
+        ]);
 
-        $month = $splitYearMonth[1];
-        $year = $splitYearMonth[0];
-        $last_date = date("t", strtotime($yearMonth . "-01"));
-        for ($i = 1; $i <= $last_date; $i++) {
-            $temp = mktime(0, 0, 0, $month, $i, $year);
-            $no = (strlen($i) == 1) ? ("0" . $i) : $i;
-            $column = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex(4 + $i);
-            $spreadsheet->setActiveSheetIndex(0)->setCellValue($column . '1', $i);
+        // Header mulai baris ke-3
+        $headers = ['No', 'NIP', 'Nama', 'Divisi', 'Bagian'];
+        $colIndex = 1;
+        $rowHeader = 3;
+        foreach ($headers as $h) {
+            $sheet1->setCellValueByColumnAndRow($colIndex++, $rowHeader, $h);
+        }
+        for ($d = 1; $d <= $totalDaysInMonth; $d++) {
+            $sheet1->setCellValueByColumnAndRow($colIndex++, $rowHeader, "IN $d");
+            $sheet1->setCellValueByColumnAndRow($colIndex++, $rowHeader, "OUT $d");
         }
 
-        $row = 2;
-        $nomor = 1;
-        for ($i = 0; $i < count($dataResult); $i++) {
-            $hadir = 0;
-            $alpha = 0;
-            $libur = 0;
-            $spreadsheet->setActiveSheetIndex(0)
-                ->setCellValue('A' . $row, $nomor++)
-                ->setCellValue('B' . $row, $dataResult[$i]['employeeName'])
-                ->setCellValue('C' . $row, $dataResult[$i]['divisi'])
-                ->setCellValue('D' . $row, $dataResult[$i]['namaBagian']);
-            for ($j = 1; $j <= $last_date; $j++) {
-                $columnBody = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex(4 + $j);
-                $no = (strlen($j) == 1) ? ("0" . $j) : $j;
-                $jam_masuk = "";
-                $jam_keluar = "";
-                $check = 0;
-                $dateFormat = ($year . "-" . $month . "-" . $no);
-                $perizinanCheck = $formPerizinanModel
-                    ->where('employee_id', $dataResult[$i]['employeeID'])
-                    ->where('periode', ($year . "-" . $month . "-" . $no))
-                    ->first();
+        // Style header
+        $lastCol = $colIndex - 1;
+        $sheet1->getStyle("A{$rowHeader}:" . $sheet1->getCellByColumnAndRow($lastCol, $rowHeader)->getCoordinate())
+            ->applyFromArray([
+                'font' => ['bold' => true],
+                'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER],
+                'fill' => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['rgb' => 'DDDDDD']],
+                'borders' => ['allBorders' => ['borderStyle' => Border::BORDER_THIN]],
+            ]);
 
-                $hariBesarCheck = $bigDaysModel
-                    ->where('date', $dateFormat)
-                    ->first();
+        // Isi data
+        $rowIndex = $rowHeader + 1;
+        $no = 1;
+        foreach ($employeeData as $e) {
+            $colIndex = 1;
+            $sheet1->setCellValueByColumnAndRow($colIndex++, $rowIndex, $no++);
+            $sheet1->setCellValueByColumnAndRow($colIndex++, $rowIndex, $e['nip']);
+            $sheet1->setCellValueByColumnAndRow($colIndex++, $rowIndex, $e['name']);
+            $sheet1->setCellValueByColumnAndRow($colIndex++, $rowIndex, $e['divisi']);
+            $sheet1->setCellValueByColumnAndRow($colIndex++, $rowIndex, $e['bagian']);
 
-                foreach ($dataResult[$i]["list_attendance"] as $val) {
+            for ($d = 1; $d <= $totalDaysInMonth; $d++) {
+                $tanggal = sprintf("%04d-%02d-%02d", $year, $month, $d);
+                $dayLog  = $mapLog[$e['id']][$tanggal] ?? null;
 
-                    if ($val->periode == ($year . "-" . $month . "-" . $no)) {
-                        $jam_masuk = $val->checkin;
-                        $jam_keluar = $val->checkout;
-                        if ($val->checkin != '')
-                            $check = 1;
-                        break;
-                    }
+                $in  = $dayLog['in'] ?? '';
+                $out = $dayLog['out'] ?? '';
+                $status = $dayLog['status'] ?? '';
+
+                if ($status) {
+                    $val = explode("_", $status)[1];
+                    $in = $out = $val;
                 }
-                if ($hariBesarCheck != null) {
-                    $spreadsheet->setActiveSheetIndex(0)
-                        ->setCellValue($columnBody . $row, 'L');
-                    $spreadsheet->getActiveSheet()->getStyle($columnBody . $row)
-                        ->getFill()->setFillType(Fill::FILL_SOLID)
-                        ->getStartColor()->setARGB('845EC2');
-                } elseif ($perizinanCheck != null) {
-                    $statusKode = explode("_", $perizinanCheck['status'])[1];
-                    if ($perizinanCheck['status']  == "CUTI TAHUNAN_CT") {
-                        $spreadsheet->setActiveSheetIndex(0)
-                            ->setCellValue($columnBody . $row, $statusKode);
-                        $spreadsheet->getActiveSheet()->getStyle($columnBody . $row)
-                            ->getFill()->setFillType(Fill::FILL_SOLID)
-                            ->getStartColor()->setARGB('ffc107');
-                    } elseif ($perizinanCheck['status'] == "CUTI HAID_CHD") {
-                        $spreadsheet->setActiveSheetIndex(0)
-                            ->setCellValue($columnBody . $row, $statusKode);
-                        $spreadsheet->getActiveSheet()->getStyle($columnBody . $row)
-                            ->getFill()->setFillType(Fill::FILL_SOLID)
-                            ->getStartColor()->setARGB('242120');
-                    } elseif ($perizinanCheck['status'] == "CUTI HAMIL_CHL") {
-                        $spreadsheet->setActiveSheetIndex(0)
-                            ->setCellValue($columnBody . $row, $statusKode);
-                        $spreadsheet->getActiveSheet()->getStyle($columnBody . $row)
-                            ->getFill()->setFillType(Fill::FILL_SOLID)
-                            ->getStartColor()->setARGB('C34A36');
-                    } elseif ($perizinanCheck['status'] == "CUTI MELAHIRKAN_CM") {
-                        $spreadsheet->setActiveSheetIndex(0)
-                            ->setCellValue($columnBody . $row, $statusKode);
-                        $spreadsheet->getActiveSheet()->getStyle($columnBody . $row)
-                            ->getFill()->setFillType(Fill::FILL_SOLID)
-                            ->getStartColor()->setARGB('4B4453');
-                    } elseif ($perizinanCheck['status'] == "IJIN_I") {
-                        $spreadsheet->setActiveSheetIndex(0)
-                            ->setCellValue($columnBody . $row, $statusKode);
-                        $spreadsheet->getActiveSheet()->getStyle($columnBody . $row)
-                            ->getFill()->setFillType(Fill::FILL_SOLID)
-                            ->getStartColor()->setARGB('17a2b8');
-                    } elseif ($perizinanCheck['status'] == "SAKIT_S") {
-                        $spreadsheet->setActiveSheetIndex(0)
-                            ->setCellValue($columnBody . $row, $statusKode);
-                        $spreadsheet->getActiveSheet()->getStyle($columnBody . $row)
-                            ->getFill()->setFillType(Fill::FILL_SOLID)
-                            ->getStartColor()->setARGB('28a745');
-                    } elseif ($perizinanCheck['status'] == "RL_RL") {
-                        $spreadsheet->setActiveSheetIndex(0)
-                            ->setCellValue($columnBody . $row, $statusKode);
-                        $spreadsheet->getActiveSheet()->getStyle($columnBody . $row)
-                            ->getFill()->setFillType(Fill::FILL_SOLID)
-                            ->getStartColor()->setARGB('ff7b00');
-                    }
-                } else {
-                    if ($check == 1) {
-                        $hadir++;
-                        $spreadsheet->setActiveSheetIndex(0)
-                            ->setCellValue($columnBody . $row, 'H');
-                        $spreadsheet->getActiveSheet()->getStyle($columnBody . $row)
-                            ->getFill()->setFillType(Fill::FILL_SOLID)
-                            ->getStartColor()->setARGB('304de2');
-                    } else {
-                        $temp = mktime(0, 0, 0, $month, $j, $year);
-                        if (date("N", $temp) == 7) {
-                            $libur++;
-                            $spreadsheet->setActiveSheetIndex(0)
-                                ->setCellValue($columnBody . $row, 'L');
-                            $spreadsheet->getActiveSheet()->getStyle($columnBody . $row)
-                                ->getFill()->setFillType(Fill::FILL_SOLID)
-                                ->getStartColor()->setARGB('845EC2');
-                        } else {
-                            $alpha++;
-                            $spreadsheet->setActiveSheetIndex(0)
-                                ->setCellValue($columnBody . $row, 'A');
-                            $spreadsheet->getActiveSheet()->getStyle($columnBody . $row)
-                                ->getFill()->setFillType(Fill::FILL_SOLID)
-                                ->getStartColor()->setARGB('e7323a');
-                        }
-                    }
-                }
+
+                $sheet1->setCellValueByColumnAndRow($colIndex++, $rowIndex, $in);
+                $sheet1->setCellValueByColumnAndRow($colIndex++, $rowIndex, $out);
             }
+            $rowIndex++;
+        }
 
-            $row++;
-            $kehadiran[] = [
-                'id' => $dataResult[$i]['employeeID'],
-                'hadir' => $hadir,
-                'libur' => $libur,
-                'alpha' => $alpha
+        // Autosize kolom
+        foreach (range('A', $sheet1->getCellByColumnAndRow($lastCol, 1)->getColumn()) as $col) {
+            $sheet1->getColumnDimension($col)->setAutoSize(true);
+        }
+
+        // Border isi
+        $sheet1->getStyle("A" . ($rowHeader) . ":" . $sheet1->getCellByColumnAndRow($lastCol, $rowIndex - 1)->getCoordinate())
+            ->applyFromArray([
+                'borders' => ['allBorders' => ['borderStyle' => Border::BORDER_THIN]],
+            ]);
+
+        // ================= Sheet 2 : Rekap =================
+        $sheet2 = $spreadsheet->createSheet();
+        $sheet2->setTitle("Rekap Total");
+
+        $sheet2->mergeCells('A1:O1');
+        $sheet2->setCellValue('A1', "REKAPAN TOTAL PRESENSI BULAN $monthName");
+        $sheet2->getStyle('A1')->applyFromArray([
+            'font' => ['bold' => true, 'size' => 14],
+            'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER]
+        ]);
+
+        // Header
+        $headers2 = [
+            'No',
+            'NIP',
+            'Nama',
+            'Divisi',
+            'Bagian',
+            'Cuti Tahunan',
+            'Cuti Haid',
+            'Cuti Hamil',
+            'Cuti Melahirkan',
+            'Ijin',
+            'Sakit',
+            'RL',
+            'Hadir',
+            'Alpha',
+            'Libur'
+        ];
+        $colIndex = 1;
+        $rowHeader2 = 3;
+        foreach ($headers2 as $h) {
+            $sheet2->setCellValueByColumnAndRow($colIndex++, $rowHeader2, $h);
+        }
+
+        $lastCol2 = $colIndex - 1;
+        $sheet2->getStyle("A{$rowHeader2}:" . $sheet2->getCellByColumnAndRow($lastCol2, $rowHeader2)->getCoordinate())
+            ->applyFromArray([
+                'font' => ['bold' => true],
+                'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER],
+                'fill' => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['rgb' => 'DDDDDD']],
+                'borders' => ['allBorders' => ['borderStyle' => Border::BORDER_THIN]],
+            ]);
+
+        // Isi data rekap
+        $rowIndex = $rowHeader2 + 1;
+        $no = 1;
+        foreach ($employeeData as $e) {
+            $colIndex = 1;
+            $sheet2->setCellValueByColumnAndRow($colIndex++, $rowIndex, $no++);
+            $sheet2->setCellValueByColumnAndRow($colIndex++, $rowIndex, $e['nip']);
+            $sheet2->setCellValueByColumnAndRow($colIndex++, $rowIndex, $e['name']);
+            $sheet2->setCellValueByColumnAndRow($colIndex++, $rowIndex, $e['divisi']);
+            $sheet2->setCellValueByColumnAndRow($colIndex++, $rowIndex, $e['bagian']);
+
+            // hitung rekap
+            $total = [
+                'ct' => 0,
+                'chd' => 0,
+                'chl' => 0,
+                'cm' => 0,
+                'ijin' => 0,
+                'sakit' => 0,
+                'rl' => 0,
+                'hadir' => 0,
+                'alpha' => 0,
+                'libur' => 0
             ];
-        }
 
+            for ($d = 1; $d <= $totalDaysInMonth; $d++) {
+                $tanggal = sprintf("%04d-%02d-%02d", $year, $month, $d);
+                $dayName = date('D', strtotime($tanggal));
+                $log     = $mapLog[$e['id']][$tanggal] ?? null;
+                $in      = $log['in'] ?? '';
+                $out     = $log['out'] ?? '';
+                $status  = $log['status'] ?? '';
 
-        foreach (range('A', 'D') as $columnID) {
-            $sheet->getColumnDimension($columnID)->setAutoSize(true);
-        }
+                if (($dayName === 'Sun' || in_array($tanggal, $tanggalBigDay)) && empty($in)) {
+                    $total['libur']++;
+                } elseif (empty($in) && empty($out) && $dayName !== 'Sun') {
+                    $total['alpha']++;
+                }
 
-        function getColumnLetters($start, $end)
-        {
-            $letters = [];
-            $start = strtoupper($start);
-            $end = strtoupper($end);
-            $startIndex = Coordinate::columnIndexFromString($start);
-            $endIndex = Coordinate::columnIndexFromString($end);
+                switch ($status) {
+                    case 'CUTI TAHUNAN_CT':
+                        $total['ct']++;
+                        break;
+                    case 'CUTI HAID_CHD':
+                        $total['chd']++;
+                        break;
+                    case 'CUTI HAMIL_CHL':
+                        $total['chl']++;
+                        break;
+                    case 'CUTI MELAHIRKAN_CM':
+                        $total['cm']++;
+                        break;
+                    case 'IJIN_I':
+                        $total['ijin']++;
+                        break;
+                    case 'SAKIT_S':
+                        $total['sakit']++;
+                        break;
+                    case 'RL_RL':
+                        $total['rl']++;
+                        break;
+                }
 
-            for ($i = $startIndex; $i <= $endIndex; $i++) {
-                $letters[] = Coordinate::stringFromColumnIndex($i);
+                if (!empty($in) || !empty($out)) {
+                    $total['hadir']++;
+                }
             }
 
-            return $letters;
+            $sheet2->setCellValueByColumnAndRow($colIndex++, $rowIndex, $total['ct']);
+            $sheet2->setCellValueByColumnAndRow($colIndex++, $rowIndex, $total['chd']);
+            $sheet2->setCellValueByColumnAndRow($colIndex++, $rowIndex, $total['chl']);
+            $sheet2->setCellValueByColumnAndRow($colIndex++, $rowIndex, $total['cm']);
+            $sheet2->setCellValueByColumnAndRow($colIndex++, $rowIndex, $total['ijin']);
+            $sheet2->setCellValueByColumnAndRow($colIndex++, $rowIndex, $total['sakit']);
+            $sheet2->setCellValueByColumnAndRow($colIndex++, $rowIndex, $total['rl']);
+            $sheet2->setCellValueByColumnAndRow($colIndex++, $rowIndex, $total['hadir']);
+            $sheet2->setCellValueByColumnAndRow($colIndex++, $rowIndex, $total['alpha']);
+            $sheet2->setCellValueByColumnAndRow($colIndex++, $rowIndex, $total['libur']);
+
+            $rowIndex++;
         }
-        $colNumber = getColumnLetters('E', $columnBody);
 
-        foreach ($colNumber as $col) {
-            $sheet->getColumnDimension($col)->setWidth(5);
+        // Autosize kolom
+        foreach (range('A', $sheet2->getCellByColumnAndRow($lastCol2, 1)->getColumn()) as $col) {
+            $sheet2->getColumnDimension($col)->setAutoSize(true);
         }
-        $spreadsheet->createSheet();
 
-        $sheet2 = $spreadsheet->setActiveSheetIndex(1);
+        // Border isi
+        $sheet2->getStyle("A" . ($rowHeader2) . ":" . $sheet2->getCellByColumnAndRow($lastCol2, $rowIndex - 1)->getCoordinate())
+            ->applyFromArray([
+                'borders' => ['allBorders' => ['borderStyle' => Border::BORDER_THIN]],
+            ]);
 
-        $sheet2->setCellValue('A1', 'No.')
-            ->setCellValue('B1', 'Karyawan')
-            ->setCellValue('C1', 'Department')
-            ->setCellValue('D1', 'Bagian')
-            ->setCellValue('E1', 'CT')
-            ->setCellValue('F1', 'CHD')
-            ->setCellValue('G1', 'CHL')
-            ->setCellValue('H1', 'CM')
-            ->setCellValue('I1', 'I')
-            ->setCellValue('J1', 'S')
-            ->setCellValue('K1', 'RL')
-            ->setCellValue('L1', 'L')
-            ->setCellValue('M1', 'A')
-            ->setCellValue('N1', 'H');
-        $nomorRekapDataKehadiran = 1;
-        $rowRekapDataKehadiran = 2;
-
-        for ($i = 0; $i < count($dataResult); $i++) {
-            $sheet2
-                ->setCellValue('A' . $rowRekapDataKehadiran, $nomorRekapDataKehadiran++)
-                ->setCellValue('B' . $rowRekapDataKehadiran, $dataResult[$i]['employeeName'])
-                ->setCellValue('C' . $rowRekapDataKehadiran, $dataResult[$i]['divisi'])
-                ->setCellValue('D' . $rowRekapDataKehadiran, $dataResult[$i]['namaBagian']);
-            $columnIndex = 5;
-            foreach ($statusPerizinan as $s) {
-
-                $sheet2->setCellValue(chr($columnIndex + 64) . $rowRekapDataKehadiran, $dataResult[$i]['statusAttendances'][explode("_", $s['value'])[1]]);
-                $columnIndex++;
-            }
-            if ($kehadiran[$i]['id'] == $dataResult[$i]['employeeID']) {
-                $sheet2->setCellValue('L' . $rowRekapDataKehadiran, $kehadiran[$i]['libur'])
-                    ->setCellValue('M' . $rowRekapDataKehadiran, $kehadiran[$i]['alpha'])
-                    ->setCellValue('N' . $rowRekapDataKehadiran, $kehadiran[$i]['hadir']);
-            }
-
-            $rowRekapDataKehadiran++;
-        }
-        foreach (range('B', 'D') as $columnID) {
-            $sheet2->getColumnDimension($columnID)->setAutoSize(true);
-        }
-        foreach (range('E', 'N') as $col) {
-            $sheet2->getColumnDimension($col)->setWidth(5);
-        }
-        $sheet2->setCellValue('A' . $rowRekapDataKehadiran + 1, 'Keterangan: Cuti tahunan (CT), Cuti haid (CHD), Cuti hamil (CHL), Cuti melahirkan (CM), Ijin (I), Sakit (S), Rl (RL), Hadir (H), Alpha (A), Libur (L) ');
-        $sheet2->getColumnDimension('A')->setWidth(4);
-
-        $sheet->setTitle('Absen Log');
-        $sheet2->setTitle('Rekap Absen');
+        // ================= Download =================
+        $filename = "Log_Presensi_{$monthReq}.xlsx";
         $writer = new Xlsx($spreadsheet);
-        $filename = "LogAbsensi_" . $yearMonth;
 
         header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-        header('Content-Disposition: attachment;filename=' . $filename . '.xlsx');
+        header("Content-Disposition: attachment;filename=\"{$filename}\"");
         header('Cache-Control: max-age=0');
 
         $writer->save('php://output');
-        die;
+        exit();
     }
+
+
 
     public function exportPDFPresensi($yearMonth)
     {
-        $divisiID = $this->request->getGet('divisiID');
-        $golongan = $this->request->getGet('golongan');
+        $divisiID = $this->request->getVar('divisiID');
+        $golongan = $this->request->getVar('golongan');
 
         $dompdf = new Dompdf();
 
@@ -990,8 +1149,8 @@ class Attendance extends BaseController
 
     public function exportExcelPresensi($yearMonth)
     {
-        $divisiID = $this->request->getGet('divisiID');
-        $golongan = $this->request->getGet('golongan');
+        $divisiID = $this->request->getVar('divisiID');
+        $golongan = $this->request->getVar('golongan');
 
         $employeesModel = new EmployeesModel();
         $metaDataModel = new MetadataModel();
@@ -1227,7 +1386,7 @@ class Attendance extends BaseController
         }
 
 
-        $sheet2->setCellValue('A' . $row2 + 2, 'Keteranagan: ' . $keteranganStr);
+        $sheet2->setCellValue('A' . ($row2 + 2), 'Keteranagan: ' . $keteranganStr);
 
         $writer = new Xlsx($spreadsheet);
         $filename = " AbsensiFinal_" . $yearMonth;
@@ -1290,8 +1449,10 @@ class Attendance extends BaseController
         $jamKerjaDetail = $employeeJamKerjaModel->getJamKerjaUsedByEmployeeId($date, $employeeID);
 
         if ($jamKerjaDetail !== null && $checkIN != null) {
+
             $checkInTimestamp = strtotime($checkIN);
             $jamTerlambatTimestamp = strtotime($jamKerjaDetail['jam_terlambat']);
+
 
             if ($checkInTimestamp > $jamTerlambatTimestamp) {
                 $result  = "Terlambat";
@@ -1341,7 +1502,8 @@ class Attendance extends BaseController
         }
 
         return [
-            $startMonth, $endMonth
+            $startMonth,
+            $endMonth
         ];
     }
 }
