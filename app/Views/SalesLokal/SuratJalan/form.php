@@ -335,6 +335,8 @@
     var totalPriceEdit = 0;
     let no = 0;
 
+    let table;
+
     $(document).ready(function() {
         <?php if (empty($termin)) : ?>
             getTerminList(this.value);
@@ -342,8 +344,6 @@
         <?php if (empty($data)) : ?>
             $('#auto_generate').prop('checked', true).change();
         <?php endif; ?>
-        // Deklarasikan variabel table di level yang lebih tinggi
-        let table;
 
         // Fungsi untuk menghitung total
         function calculateTotals() {
@@ -422,8 +422,8 @@
                         let disableButton = "";
                         return `
                             <div class="">
-                                <button type="button" data-no="${row.no}" data-id="${row.id}" class="edit-table-detail" ${disableButton}><i class="fa fa-edit" aria-hidden="true"></i></button>
-                                <button type="button" data-no="${row.no}" data-id="${row.id}" class="delete-button" ${disableButton}><i class="fa fa-trash" aria-hidden="true"></i></button>
+                                <button type="button" data-no="${row.no}" data-id="${row.id}" data-id_detail="${row.id_detail}" class="edit-table-detail" ${disableButton}><i class="fa fa-edit" aria-hidden="true"></i></button>
+                                <button type="button" data-no="${row.no}" data-id="${row.id}" data-id_detail="${row.id_detail}" class="delete-button" ${disableButton}><i class="fa fa-trash" aria-hidden="true"></i></button>
                             </div>
                         `;
                     }
@@ -450,76 +450,72 @@
             let rowData = table.row($(this).parents('tr')).data();
             let dataNo = $(this).data('no');
             let dataId = $(this).data('id');
+            let dataIdDetail = $(this).data('id_detail');
             const csrf = $(`[name="${csrfToken}"]`);
 
-            // console.log(dataId);
-
-
             if (dataId.length === 7 && /[a-zA-Z]/.test(dataId)) {
-                // Hapus item dari array JavaScript dan gambar ulang tabel
-                // console.log(list_items);
-                // console.log(table);
-                let indexToRemove = list_items.findIndex(item => item.no === dataNo);
+                let indexToRemove = list_items.findIndex(item => String(item.id) === String(dataId));
                 if (indexToRemove !== -1) {
                     list_items.splice(indexToRemove, 1);
-
                 }
                 table.clear().rows.add(list_items).draw();
-                // console.log(list_items);
             } else {
-                Swal.fire({
-                    icon: 'question',
-                    title: 'Yakin akan di hapus?',
-                    confirmButtonColor: '#4e73df',
-                    cancelButtonColor: '#d33',
-                    showCancelButton: true,
-                    reverseButtons: true,
-                    confirmButtonText: 'Hapus',
-                    cancelButtonText: 'Kembali',
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        $.ajax({
-                            url: "<?= base_url("order-form-lokal/delete-detail"); ?>",
-                            data: {
-                                id: dataId,
-                            },
-                            beforeSend: function(xhr) {
-                                xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                                setLoading();
-                            },
-                            complete: function() {
-                                stopLoading();
-                            },
-                            method: "POST",
-                            dataType: "json",
-                            success: function(response) {
-                                csrf.val(response.token);
-                                if (response.status) {
-                                    Swal.fire({
-                                            icon: 'success',
+                if (dataIdDetail) {
+                    Swal.fire({
+                        icon: 'question',
+                        title: 'Yakin akan di hapus?',
+                        confirmButtonColor: '#4e73df',
+                        cancelButtonColor: '#d33',
+                        showCancelButton: true,
+                        reverseButtons: true,
+                        confirmButtonText: 'Hapus',
+                        cancelButtonText: 'Kembali',
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            $.ajax({
+                                url: "<?= base_url("surat-jalan/delete-detail"); ?>",
+                                data: {
+                                    id: dataIdDetail,
+                                },
+                                beforeSend: function(xhr) {
+                                    xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                                    setLoading();
+                                },
+                                complete: function() {
+                                    stopLoading();
+                                },
+                                method: "POST",
+                                dataType: "json",
+                                success: function(response) {
+                                    csrf.val(response.token);
+                                    if (response.status) {
+                                        Swal.fire({
+                                                icon: 'success',
+                                                title: response.message,
+                                                confirmButtonColor: '#4e73df',
+                                            })
+                                            .then(() => {
+                                                let indexToRemove = list_items.findIndex(item => String(item.id) === String(dataId));
+                                                if (indexToRemove !== -1) {
+                                                    list_items.splice(indexToRemove, 1);
+                                                }
+                                                table.clear().rows.add(list_items).draw();
+                                                calculateTotals();
+                                            })
+                                    } else {
+                                        Swal.fire({
+                                            icon: 'error',
                                             title: response.message,
-                                            confirmButtonColor: '#4e73df',
-                                        })
-                                        .then(() => {
-                                            // Update the list_items array
-                                            list_items = list_items.filter(item => item.id !== dataId);
-                                            // Redraw the table with the updated list_items
-                                            table.clear().rows.add(list_items).draw();
-                                            reCountTotal();
-                                        })
-                                } else {
-                                    Swal.fire({
-                                        icon: 'error',
-                                        title: response.message,
-                                        confirmButtonColor: '#e74a3b',
-                                    });
-                                }
-                            },
-                        });
-                    }
-                })
+                                            confirmButtonColor: '#e74a3b',
+                                        });
+                                    }
+                                },
+                            });
+                        }
+                    })
+                }
             }
-            reCountTotal();
+            calculateTotals();
         });
 
         // getBarang();
@@ -734,11 +730,17 @@
                             const disc = parseFloat(row.disc)
                             const discUnit = row.discUnit
                             console.log(row);
+                            row.id_sales_order_detail = row.id_sales_order_detail;
+                            row.id_sales_order = row.id_sales_order;
+                            row.id = generateRandomId();
+                            row.tipe_input = 'order_form';
                             // row.amount = discUnit == 'percent' ? (amount * (100 - disc)) / 100 : amount - disc
                         })
                         table.clear();
 
-                        table.rows.add(res).draw(false);
+                        list_items = res;
+
+                        table.rows.add(list_items).draw(false);
                         calculateTotals();
                     } else {
                         table.clear().draw(false);
@@ -842,9 +844,6 @@
             const discAmt = discountUnit == "percent" ? amount * (discountPercentage / 100) : discountPercentage;
             const discountedAmt = amount - discAmt;
 
-            // console.log(list_items);
-
-
             const currentItemList = table.rows().data().toArray();
             let validate_same = currentItemList.findIndex((obj) => obj.id_barang == id_barang && obj.warehouse_id == warehouseId);
 
@@ -858,12 +857,7 @@
             } else {
                 // update detail
                 if (row_detail != 0) {
-                    // console.log("Editing row with ID:", row_detail);
-
-                    // 1. Cari index di list_items
                     const itemIndex = list_items.findIndex(item => item.id == row_detail);
-                    // console.log("Found in list_items at index:", itemIndex);
-
                     if (itemIndex !== -1) {
                         // Hitung nilai diskon dan amount baru
                         const discAmt = discountUnit == "percent" ?
@@ -880,7 +874,7 @@
                             harga_barang: harga,
                             qty: qty,
                             amount: amount,
-                            discountedAmt: discountedAmt,
+                            total_harga_barang: discountedAmt,
                             keterangan: keterangan,
                             statusppn: statusppn,
                             tax: tax,
@@ -964,7 +958,7 @@
                             harga_barang: harga,
                             qty: qty,
                             amount: amount,
-                            discountedAmt: discountedAmt,
+                            total_harga_barang: discountedAmt,
                             keterangan: keterangan,
                             statusppn: statusppn,
                             tax: tax,
@@ -980,6 +974,7 @@
                             discAmt: discAmt,
                             discUnit: discountUnit,
                             isDeleted: false,
+                            tipe_input: 'surat_jalan',
 
                             barangTotal: amount,
                         });
@@ -1005,7 +1000,8 @@
                             dept: dept,
                             warehouse_id: warehouseId,
                             warehouse_name: warhouseName,
-                            isDeleted: false
+                            isDeleted: false,
+                            tipe_input: 'surat_jalan',
                         }).draw(false);
 
                         total_harga_barang = total_harga_barang + harga;
@@ -1047,10 +1043,14 @@
         });
 
         <?php if (!empty($data)) : ?>
-            const itemList = <?= json_encode($data->itemList); ?>;
-            console.log(itemList);
+            <?php if (!empty($dataDetail)) : ?>
+                list_items = <?= json_encode($dataDetail); ?>;
+            <?php else : ?>
+                list_items = <?= json_encode($data->itemList); ?>;
+            <?php endif; ?>
+            console.log(list_items);
 
-            table.rows.add(itemList).draw(false);
+            table.rows.add(list_items).draw(false);
             calculateTotals();
         <?php endif; ?>
 
@@ -1087,12 +1087,6 @@
             id_customer: {
                 required: true
             },
-            id_po: {
-                required: true
-            },
-            'id_so[]': {
-                required: true
-            },
             no_surat_jalan: {
                 required: true
             },
@@ -1103,12 +1097,6 @@
         messages: {
             id_customer: {
                 required: "Customer wajib diisi"
-            },
-            id_po: {
-                required: "PO wajib diisi"
-            },
-            'id_so[]': {
-                required: "No Order wajib diisi"
             },
             no_surat_jalan: {
                 required: "No Surat jalan wajib diisi"
@@ -1245,7 +1233,14 @@
     });
 
     $(".btn-submit").click(function() {
+        console.log(list_items);
+
         if ($(".create-form").valid()) {
+            const csrf = $(`[name="${csrfToken}"]`);
+            let data = new FormData(document.querySelector(".create-form"));
+            let id = $(".id").val();
+            data.append('list_items', JSON.stringify(list_items));
+
             Swal.fire({
                 icon: 'question',
                 title: 'Simpan Data?',
@@ -1257,14 +1252,7 @@
                 cancelButtonText: 'Kembali',
             }).then((result) => {
                 if (result.isConfirmed) {
-                    const csrf = $(`[name="${csrfToken}"]`);
                     setLoading()
-                    let data = new FormData(document.querySelector(".create-form"));
-
-                    let id = $(".id").val();
-
-                    console.log(data.entries());
-                    console.log(id)
 
                     if (id) {
                         $.ajax({

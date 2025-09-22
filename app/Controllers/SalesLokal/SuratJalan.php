@@ -13,6 +13,7 @@ use App\Models\SalesOrderDetailModel;
 use App\Models\CustomerModel;
 use App\Models\AllNoModel;
 use App\Models\SuratJalanModel;
+use App\Models\SuratJalanDetailModel;
 use App\Models\EmployeesModel;
 use App\Models\MetadataModel;
 use App\Models\SalesOrderInvoiceDetailModel;
@@ -34,6 +35,7 @@ class SuratJalan extends BaseController
     private $SalesOrderInvoiceDetailModel;
     private $encrypter;
     private $SuratJalanModel;
+    private $SuratJalanDetailModel;
     private $EmployeesModel;
     private $AllNoModel;
     private $metaDataModel;
@@ -53,6 +55,7 @@ class SuratJalan extends BaseController
         $this->SalesOrderInvoiceDetailModel = new SalesOrderInvoiceDetailModel();
         $this->AllNoModel = new AllNoModel();
         $this->SuratJalanModel = new SuratJalanModel();
+        $this->SuratJalanDetailModel = new SuratJalanDetailModel();
         $this->EmployeesModel = new EmployeesModel();
         $this->metaDataModel = new MetadataModel();
     }
@@ -119,7 +122,6 @@ class SuratJalan extends BaseController
             "dateEnd"       => $this->request->getGet("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getGet("dateEnd")))) : "",
         ];
 
-
         $dataSuratJalan = $this->SuratJalanModel
             ->getAllSuratJalan($condition, $addCondition, $pageSize, $offset);
 
@@ -144,18 +146,18 @@ class SuratJalan extends BaseController
             //     }
             // }
             array_push($dataAllSuratJalan, [
-                "no"            => $no++,
-                "id"            => encrypt($data->id),
-                "no_surat_jalan"      => $data->no_surat_jalan,
-                "tipe_sales_order"      => $data->tipe_sales_order,
-                "no_so"      => implode(', ', $dataNo),
-                "kode_pelanggan"        => $data->kode_pelanggan,
-                "nama_pelanggan" => $data->nama_pelanggan,
-                "customerSales" => $data->customerSales ?? "-",
-                "shipping_date"         => date("d-m-Y", strtotime($data->shipping_date)),
+                "no"                => $no++,
+                "id"                => encrypt($data->id),
+                "no_surat_jalan"    => $data->no_surat_jalan,
+                "tipe_sales_order"  => $data->tipe_sales_order ?? 'LOKAL',
+                "no_so"             => implode(', ', $dataNo),
+                "kode_pelanggan"    => $data->kode_pelanggan,
+                "nama_pelanggan"    => $data->nama_pelanggan,
+                "customerSales"     => $data->customerSales ?? "-",
+                "shipping_date"     => date("d-m-Y", strtotime($data->shipping_date)),
                 "sales_order_invoice_id" => $data->sales_order_invoice_id,
                 "print" => $data->counter_print,
-                "total_harga" => ($data->estimated_freight + $data->total_harga),
+                "total_harga" => $data->sum_amount_sj_detail ?? ($data->estimated_freight + $data->total_harga),
                 "posting" => $data->posting,
             ]);
         }
@@ -181,12 +183,6 @@ class SuratJalan extends BaseController
                 "rules" => "required",
                 'errors' => [
                     'required' => 'Customer tidak boleh kosong',
-                ]
-            ],
-            "id_so.*" => [
-                "rules" => "required|numeric",
-                "errors" => [
-                    "required" => 'Sales Order tidak boleh kosong!'
                 ]
             ],
             "shipping_date" => [
@@ -223,35 +219,27 @@ class SuratJalan extends BaseController
 
         $idArray = array();
         $noArray = array();
+        if ($dataSo) {
+            foreach ($dataSo as $soId) {
+                $soData = $this->SalesOrderModel->asObject()->find($soId);
 
-        foreach ($dataSo as $soId) {
-            $soData = $this->SalesOrderModel->asObject()->find($soId);
+                if (empty($soData)) {
+                    $data = [
+                        "status"    => false,
+                        "message"   => "Sales Order tidak ditemukan!",
+                        'token'     => csrf_hash(),
+                    ];
+                    echo json_encode($data);
+                    return;
+                }
 
-            if (empty($soData)) {
-                $data = [
-                    "status"    => false,
-                    "message"   => "Sales Order tidak ditemukan!",
-                    'token'     => csrf_hash(),
-                ];
-                echo json_encode($data);
-                return;
+                $idArray[] = $soId;
+                $noArray[] = $soData->no_sales_order;
             }
-
-            $idArray[] = $soId;
-            $noArray[] = $soData->no_sales_order;
         }
-
-
-        // $code = "SJ";
-        // $currentYear = date('Y');
-        // $currentMonth = date('m');
-        // $monthName = date("F", mktime(0, 0, 0, $currentMonth, 10));
-        // $number = $this->SuratJalanModel->getNumber($currentMonth . "/" . $currentYear);
-        // $noSuratJalan = "TSI/" . $code . "/" . $currentMonth . "/" . $currentYear . "/" . $number;
-
-        $shippingDate = $this->request->getPost('shipping_date');
-
         try {
+            $shippingDate = $this->request->getPost('shipping_date');
+            $listItems = json_decode($this->request->getPost('list_items'), true);
 
             // start transaction
             $this->SuratJalanModel->db->transException(true)->transStart();
@@ -260,17 +248,16 @@ class SuratJalan extends BaseController
                 "id_customer"       => $this->request->getPost('id_customer'),
                 "shipping_date"     =>  $shippingDate ? date("Y-m-d", strtotime(str_replace("/", "-", $shippingDate))) : "",
                 "no_surat_jalan"    => strtoupper($this->request->getVar('no_surat_jalan')),
-                "no_po"             => $this->request->getPost('no_po'),
+                "no_po"             => $this->request->getPost('no_po') ?? null,
                 "note"              => $this->request->getPost('note'),
                 "terms"             => $this->request->getPost('termin'),
-                'multiple_id_so'    => json_encode($idArray),
-                'multiple_no_so'    => json_encode($noArray),
+                'multiple_id_so'    => json_encode($idArray) ?? null,
+                'multiple_no_so'    => json_encode($noArray) ?? null,
                 "id_company"        => ($this->this_company_id != 16)
                     ? $this->request->getPost('company_id')
                     : $this->this_company_id,
             ];
-            // var_dump($values);
-            // die;
+
             $checkSJ = $this->SuratJalanModel->where('deletedAt', NULL)->where('UPPER(no_surat_jalan)', strtoupper($this->request->getVar('no_surat_jalan')))->findAll();
             if ($checkSJ) {
                 $data = [
@@ -284,9 +271,30 @@ class SuratJalan extends BaseController
             }
             $dataSuratJalan =  $this->SuratJalanModel->insert($values);
 
-            $this->SalesOrderModel->whereIn('id', $idArray)
-                ->set(['surat_jalan_so_id' => $dataSuratJalan])
-                ->update();
+            if ($idArray != []) {
+                $this->SalesOrderModel->whereIn('id', $idArray)
+                    ->set(['surat_jalan_so_id' => $dataSuratJalan])
+                    ->update();
+            }
+
+            foreach ($listItems as $key => $value) {
+                $valueBarang = [
+                    "id_surat_jalan"        => $dataSuratJalan,
+                    "id_barang"             => $value['id_barang'],
+                    "id_sales_order"        => $value['id_sales_order'] ?? null,
+                    "id_sales_order_detail" => $value['id_sales_order_detail'] ?? null,
+                    "qty"                   => number_format($value['qty'], 2, '.', ''),
+                    "qty_sekarang"          => number_format($value['qty'], 2, '.', ''),
+                    "harga_barang"          => number_format($value['harga_barang'], 2, '.', ''),
+                    "amount"                => number_format($value['total_harga_barang'], 2, '.', ''),
+                    "keterangan"            => $value['keterangan'],
+                    "discount_percentage"   => number_format($value['disc'], 2, '.', ''),
+                    "tipe_input"            => $value['tipe_input'],
+                    "status_ppn"            => $value['statusppn'],
+                    "discount_unit"         => $value['discUnit'],
+                ];
+                $this->SuratJalanDetailModel->save($valueBarang);
+            }
 
             // finish transaction
             $this->SuratJalanModel->db->transComplete();
@@ -305,7 +313,7 @@ class SuratJalan extends BaseController
             $data = [
                 "status"    => false,
                 "message"   => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
-                "payload"   => $values,
+                "payload"   => [],
                 'token'     => csrf_hash(),
             ];
             echo json_encode($data);
@@ -317,6 +325,7 @@ class SuratJalan extends BaseController
     {
         $id = decrypt($id);
         $dataSuratJalan = $this->SuratJalanModel->getSuratJalanById(($id));
+        $dataSuratJalanDetail = $this->SuratJalanDetailModel->getItemListByIds($id);
 
         if (empty($dataSuratJalan)) {
             return view('errors/html/error_404', ['message' => 'Not Found']);
@@ -358,22 +367,17 @@ class SuratJalan extends BaseController
         $data = [
             "data" => $dataSuratJalan,
             "dataCustomers" => $customers,
+            "dataDetail" => $dataSuratJalanDetail,
             "id_user" => $dataSuratJalan->id_user,
             "dataSo" => $dataSo,
             "getJenisPenjualan" => $getJenisPenjualan,
             "termin" => $dataTermin,
         ];
-        // var_dump($dataSuratJalan->multiple_id_so);
-        // // exit;
-        // var_dump($dataSo);
-        // exit;
-        //echo json_encode($data);
         return view('SalesLokal/SuratJalan/form', $data);
     }
 
     public function update()
     {
-
         $payload = $this->request->getVar();
 
         $data = [
@@ -423,6 +427,7 @@ class SuratJalan extends BaseController
         }
 
         $shippingDate = $this->request->getPost('shipping_date');
+        $listItems = json_decode($this->request->getPost('list_items'), true);
 
         $values = [
             "id_customer"       => $this->request->getPost('id_customer'),
@@ -437,22 +442,64 @@ class SuratJalan extends BaseController
                 ? $this->request->getPost('company_id')
                 : $this->this_company_id,
         ];
+
         try {
-            $checkSJ = $this->SuratJalanModel->where('deletedAt', NULL)->where('UPPER(no_surat_jalan)', strtoupper($this->request->getVar('no_surat_jalan')))->findAll();
+            $dataSJ = $this->SuratJalanModel->find($id);
+            $checkSJ = $this->SuratJalanModel->where('deletedAt', NULL)->where('UPPER(no_surat_jalan)', strtoupper($this->request->getVar('no_surat_jalan')))->first();
             if ($checkSJ) {
-                $data = [
-                    "status"    => false,
-                    "message"   => "No Surat Jalan Sudah Digunakan",
-                    "payload"   => $values,
-                    'token'     => csrf_hash(),
-                ];
-                echo json_encode($data);
-                return;
+                if ($checkSJ['id'] != $dataSJ['id']) {
+                    $data = [
+                        "status"    => false,
+                        "message"   => "No Surat Jalan Sudah Digunakan",
+                        "payload"   => $values,
+                        'token'     => csrf_hash(),
+                    ];
+                    echo json_encode($data);
+                    return;
+                }
             }
 
             // Create a new validation instance
             $dataSuratJalan =  $this->SuratJalanModel->update($id, $values);
 
+            foreach ($listItems as $key => $value) {
+                // var_dump($value);
+                if (isset($value['id_detail_sj'])) {
+                    $valueBarang = [
+                        "id_barang"             => $value['id_barang'],
+                        "id_sales_order"        => $value['id_sales_order'],
+                        "id_sales_order_detail" => $value['id_sales_order_detail'],
+                        "qty"                   => number_format($value['qty'], 2, '.', ''),
+                        "qty_sekarang"          => number_format($value['qty'], 2, '.', ''),
+                        "harga_barang"          => number_format($value['harga_barang'], 2, '.', ''),
+                        "amount"                => number_format($value['total_harga_barang'], 2, '.', ''),
+                        "keterangan"            => $value['keterangan'],
+                        "discount_percentage"   => number_format($value['disc'], 2, '.', ''),
+                        "tipe_input"            => $value['tipe_input'],
+                        "status_ppn"            => $value['statusppn'],
+                        "discount_unit"         => $value['discUnit'],
+                    ];
+                    $this->SuratJalanDetailModel->update($value['id_detail_sj'], $valueBarang);
+                } else {
+                    $valueBarang = [
+                        "id_surat_jalan"        => $id,
+                        "id_barang"             => $value['id_barang'],
+                        "id_sales_order"        => $value['id_sales_order'],
+                        "id_sales_order_detail" => $value['id_sales_order_detail'],
+                        "qty"                   => number_format($value['qty'], 2, '.', ''),
+                        "qty_sekarang"          => number_format($value['qty'], 2, '.', ''),
+                        "harga_barang"          => number_format($value['harga_barang'], 2, '.', ''),
+                        "amount"                => number_format($value['total_harga_barang'], 2, '.', ''),
+                        "keterangan"            => $value['keterangan'],
+                        "discount_percentage"   => number_format($value['disc'], 2, '.', ''),
+                        "tipe_input"            => $value['tipe_input'],
+                        "status_ppn"            => $value['statusppn'],
+                        "discount_unit"         => $value['discUnit'],
+                    ];
+                    $this->SuratJalanDetailModel->save($valueBarang);
+                }
+            }
+            // exit;
             $data = [
                 "id" => $dataSuratJalan,
                 "status"            => true,
@@ -477,11 +524,7 @@ class SuratJalan extends BaseController
 
     public function delete()
     {
-
         $id = decrypt($this->request->getPost("id"));
-        //echo json_encode($id);
-
-
         try {
             if (!empty($id)) {
 
@@ -489,8 +532,6 @@ class SuratJalan extends BaseController
                     ->where('id', $id)
                     ->where('sales_order_invoice_id !=', null)
                     ->first();
-
-
 
                 if ($checkSJ) {
                     $data = [
@@ -502,7 +543,6 @@ class SuratJalan extends BaseController
                     return;
                 }
 
-
                 $sJData = $this->SuratJalanModel->asObject()
                     ->find($id);
                 foreach (json_decode($sJData->multiple_id_so) as $id_doc) {
@@ -510,8 +550,55 @@ class SuratJalan extends BaseController
                     $this->SalesOrderModel->where('id', $id_doc)->set(['surat_jalan_so_id' => NULL])->update();
                 }
 
-
                 $this->SuratJalanModel->delete($id);
+                $data = [
+                    "status"            => true,
+                    "message"    => "Data success Dihapus",
+                    'token' => csrf_hash()
+                ];
+                echo json_encode($data);
+            } else {
+                $data = [
+                    "status"            => false,
+                    "message"    => "Data Gagal Dihapus",
+                    'token' => csrf_hash()
+                ];
+                echo json_encode($data);
+            }
+        } catch (\Exception $e) {
+            $data = [
+                "status"            => false,
+                "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
+                'token' => csrf_hash()
+            ];
+            echo json_encode($data);
+        }
+        return;
+    }
+
+    public function deleteDetail()
+    {
+        $id = $this->request->getPost("id");
+        try {
+            $dataSuratJalanDetail = $this->SuratJalanDetailModel->find($id);
+            if (!empty($id)) {
+
+                $checkSJ = $this->SuratJalanModel
+                    ->where('id', $dataSuratJalanDetail['id_surat_jalan'])
+                    ->where('sales_order_invoice_id !=', null)
+                    ->first();
+
+                if ($checkSJ) {
+                    $data = [
+                        "status"     => false,
+                        "message"    => "Data Surat Jalan sudah digunakan tidak dapat dihapus",
+                        'token' => csrf_hash()
+                    ];
+                    echo json_encode($data);
+                    return;
+                }
+
+                $this->SuratJalanDetailModel->delete($id);
                 $data = [
                     "status"            => true,
                     "message"    => "Data success Dihapus",
@@ -568,6 +655,7 @@ class SuratJalan extends BaseController
         echo json_encode($data);
         return;
     }
+
     public function dropDownSuratJalan($id_customer)
     {
         $data = $this->SuratJalanModel
@@ -614,134 +702,86 @@ class SuratJalan extends BaseController
     {
         $id = decrypt($id);
         $domPdf = new Dompdf();
-
         $fileName = 'Order Form';
 
+        // Ambil data perusahaan
         $companyData = $this->companyModel->asObject()
             ->find($this->this_company_id);
 
+        // Data Surat Jalan + Customer
         $sjData = $this->SuratJalanModel->asObject()
-            ->select('surat_jalan_so.*, DATE_FORMAT(surat_jalan_so.shipping_date, "%d %b %Y") AS shipping_date')
-            // ->join()
+            ->select('surat_jalan_so.*,
+                  customers.kode AS customerCode,
+                  customers.phone AS phone,
+                  customers.name AS customerName,
+                  customers.address AS customerAddress,
+                  metadata.value AS termin,
+                  DATE_FORMAT(surat_jalan_so.shipping_date, "%d %b %Y") AS shipping_date')
+            ->join('customers', 'customers.id = surat_jalan_so.id_customer', 'left')
+            ->join('metadata', 'metadata.id = customers.termin', 'left')
             ->find($id);
 
-        $this->SuratJalanModel->update($id, ['counter_print' => (int) $sjData->counter_print + 1]);
+        if (!$sjData) {
+            throw new \RuntimeException("Surat Jalan dengan ID {$id} tidak ditemukan.");
+        }
 
-        $soIds = json_decode($sjData->multiple_id_so);
+        // Detail Surat Jalan
+        $dataSuratJalanDetail = $this->SuratJalanDetailModel->getItemListByIds($id);
 
-        $soSelectQry = "sales_order.*,
-                        DATE_FORMAT(sales_order.order_date, '%d %b %Y') AS order_date, 
-                        DATE_FORMAT(sales_order.shipping_date, '%d %b %Y') AS shipping_date, 
-                        customers.kode AS customerCode, 
-                        customers.phone AS phone, 
-                        customers.name AS customerName, 
-                        customers.address AS customerAddress,
-                        metadata.value AS termin,
-                        barang_master_sales.barang_name AS namaBarang, 
-                        barang_master_sales.kode_barang AS kodeBarang, 
-                        sales_order_detail.qty AS qty, 
-                        satuans.kode_satuan AS kodeSatuan,
-                        sales_order_detail.discount_percentage AS disc_pct,
-                        sales_order_detail.amount AS amt";
-        $salesOrderData = $this->SalesOrderModel->asObject()
-            ->select($soSelectQry)
-            ->join('customers', 'customers.id = sales_order.id_customer', 'left')
-            ->join('metadata', 'metadata.id = customers.termin', 'left')
-            ->join('sales_order_detail', 'sales_order_detail.id_sales_order = sales_order.id', 'left')
-            ->join('barang_master_sales', 'barang_master_sales.id = sales_order_detail.id_barang', 'left')
-            ->join('satuans', 'satuans.id = barang_master_sales.satuan_id', 'left')
-            ->whereIn('sales_order.id', $soIds)
-            ->where('tipe_input', "order_form")
-            ->findAll();
+        // Update counter_print
+        $this->SuratJalanModel->update($id, [
+            'counter_print' => (int)($sjData->counter_print ?? 0) + 1
+        ]);
 
-        /* $soDetQry = "barangs.nama_barang AS namaBarang, 
-                     barangs.kode_barang AS kodeBarang, 
-                     sales_order_detail.qty AS qty, 
-                     satuans.kode_satuan AS kodeSatuan,
-                     sales_order_detail.discount_percentage AS disc_pct,
-                     sales_order_detail.amount AS amt";
-        $soDet = $this->SalesOrderDetailModel->asObject()
-            ->select($soDetQry)
-            ->join('barangs', 'barangs.id = sales_order_detail.id_barang')
-            ->join('satuans', 'satuans.id = barangs.satuan_id')
-            ->whereIn('id_sales_order', $soIds)
-            ->findAll(); */
-        // dd($soDet);
+        // Ambil Sales Order terkait (untuk info header dan fallback)
+        $soIds = json_decode($sjData->multiple_id_so, true) ?: [];
+        $soIds = array_values(array_filter($soIds, fn($v) => $v !== null && $v !== ''));
+
+        $salesOrderData = [];
+        if (!empty($soIds)) {
+            $soSelectQry = "sales_order.*,
+            DATE_FORMAT(sales_order.order_date, '%d %b %Y') AS order_date, 
+            DATE_FORMAT(sales_order.shipping_date, '%d %b %Y') AS shipping_date, 
+            customers.kode AS customerCode, 
+            customers.phone AS phone, 
+            customers.name AS customerName, 
+            customers.address AS customerAddress,
+            metadata.value AS termin,
+            barang_master_sales.barang_name AS namaBarang, 
+            barang_master_sales.kode_barang AS kodeBarang, 
+            sales_order_detail.qty AS qty, 
+            satuans.kode_satuan AS kodeSatuan,
+            sales_order_detail.discount_percentage AS disc_pct,
+            sales_order_detail.amount AS amt";
+
+            $salesOrderData = $this->SalesOrderModel->asObject()
+                ->select($soSelectQry)
+                ->join('customers', 'customers.id = sales_order.id_customer', 'left')
+                ->join('metadata', 'metadata.id = customers.termin', 'left')
+                ->join('sales_order_detail', 'sales_order_detail.id_sales_order = sales_order.id', 'left')
+                ->join('barang_master_sales', 'barang_master_sales.id = sales_order_detail.id_barang', 'left')
+                ->join('satuans', 'satuans.id = barang_master_sales.satuan_id', 'left')
+                ->whereIn('sales_order.id', $soIds)
+                ->where('tipe_input', "order_form")
+                ->findAll();
+        }
 
         $data = [
             'companyName'   => $companyData->company,
             'sjData'        => $sjData,
             'soData'        => $salesOrderData,
-            // 'soDet'         => $soDet
+            'sjDetailData'  => $dataSuratJalanDetail
         ];
 
         // return view('SalesLokal/SuratJalan/print', $data);
 
-        // load HTML content
+        // --- jika mau PDF, pindahkan return view dan pakai Dompdf ---
         $domPdf->loadHtml(view('SalesLokal/SuratJalan/print', $data));
-
-        // (optional) setup the paper size and orientation
         $domPdf->setPaper('A4', 'landscape');
-        // $domPdf->setPaper([0, 0, 792.96, 528]);
-
-
-        // render html as PDF
         $domPdf->render();
-
-        // output the generated pdf
-        $domPdf->stream($fileName, array("Attachment" => false));
-
+        $domPdf->stream($fileName, ["Attachment" => false]);
         exit();
     }
-
-    // public function generateNomorSuratJalan()
-    // {
-    //     $code = "TSI/SJ";
-    //     $currentYear = date('y'); // 2 digit tahun
-    //     $currentMonth = date('n'); // 1-12
-    //     $romawi = ['', 'I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI', 'XII'];
-    //     $numberTemplate = $code . "/" . $romawi[$currentMonth] . "/" . $currentYear . "/";
-
-    //     $listData = $this->SuratJalanModel->asObject()
-    //         ->like('no_surat_jalan', $numberTemplate)
-    //         ->orderBy('no_surat_jalan', 'ASC') // penting buat gap-check
-    //         ->findAll();
-
-    //     $existingNumbers = [];
-
-    //     foreach ($listData as $data) {
-    //         $parts = explode('/', $data->no_surat_jalan);
-    //         if (isset($parts[4]) && is_numeric($parts[4])) {
-    //             $existingNumbers[] = intval($parts[4]);
-    //         }
-    //     }
-
-    //     sort($existingNumbers);
-
-    //     $nextNumber = 1;
-    //     $foundGap = false;
-
-    //     foreach ($existingNumbers as $num) {
-    //         if ($num != $nextNumber) {
-    //             $foundGap = true;
-    //             break;
-    //         }
-    //         $nextNumber++;
-    //     }
-
-    //     if (!$foundGap) {
-    //         $nextNumber = empty($existingNumbers) ? 1 : end($existingNumbers) + 1;
-    //     }
-
-    //     $paddedNumber = str_pad($nextNumber, 3, '0', STR_PAD_LEFT);
-    //     $invNumber = $numberTemplate . $paddedNumber;
-
-    //     return response()->setJSON([
-    //         'data' => $invNumber,
-    //         'token' => csrf_hash(),
-    //         'status' => true
-    //     ]);
-    // }
 
     public function generateNomorSuratJalan()
     {

@@ -10,7 +10,9 @@ use App\Models\AccountBarangModel;
 use App\Models\BarangMasterModel;
 use App\Models\DivisisModel;
 use App\Models\MaterialRequestDetailsModel;
+use App\Models\MaterialRequestPenolongDetailsModel;
 use App\Models\MaterialRequestsModel;
+use App\Models\MaterialRequestsPenolongModel;
 use App\Models\MetadataModel;
 use App\Models\ProductionResultModel;
 use App\Models\ProductionResultDetailModel;
@@ -41,6 +43,8 @@ class ProductionResult extends BaseController
     private $divisiModel;
     private $materialRequestModel;
     private $materialRequestDetailModel;
+    private $materialRequestsPenolongModel;
+    private $materialRequestPenolongDetailsModel;
     protected $stockModel;
     protected $stockDetailModel;
     protected $stockDetail2Model;
@@ -61,6 +65,8 @@ class ProductionResult extends BaseController
         $this->divisiModel = new DivisisModel();
         $this->materialRequestModel = new MaterialRequestsModel();
         $this->materialRequestDetailModel = new MaterialRequestDetailsModel();
+        $this->materialRequestsPenolongModel = new MaterialRequestsPenolongModel();
+        $this->materialRequestPenolongDetailsModel = new MaterialRequestPenolongDetailsModel();
         $this->stockModel = new StockModel();
         $this->stockDetailModel = new StockDetailModel();
         $this->stockDetail2Model = new StockDetail2Model();
@@ -407,11 +413,13 @@ class ProductionResult extends BaseController
                 "receive_date" => $this->request->getVar("date_production") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("date_production")))) : date("Y-m-d"),
             ];
 
-
             $barangJadi = json_decode($this->request->getVar("jadi"));
             $barangDigunakan = json_decode($this->request->getVar("digunakan"));
+            $barangDigunakanPenolong = json_decode($this->request->getVar("digunakan_penolong"));
             $barangScrap = json_decode($this->request->getVar("scrap"));
             $barangFilling = json_decode($this->request->getVar("filling"));
+            var_dump($barangDigunakanPenolong);
+            exit;
             $productionResID = $this->productionResultModel->insert($datas);
 
             $productionResData = $this->productionResultModel->find($productionResID);
@@ -769,6 +777,33 @@ class ProductionResult extends BaseController
         }
     }
 
+    public function getListMaterialRequestPenolongByID()
+    {
+        if (!empty($this->request->getVar('kode_request'))) {
+            $dataResult = $this->materialRequestPenolongDetailsModel->getMaterialRequestDetailByMaterialRequestID(
+                $this->request->getVar('kode_request')
+            );
+            foreach ($dataResult as $key => &$value) {
+                if ($value['type_barang'] == "bahan_baku") {
+                    $value['type_barang_text'] = "BAHAN BAKU";
+                } elseif ($value['type_barang'] == "bahan_penolong") {
+                    $value['type_barang_text'] = "BAHAN PENOLONG";
+                } elseif ($value['type_barang'] == "bahan_jadi") {
+                    $value['type_barang_text'] = "BARANG JADI";
+                } elseif ($value['type_barang'] == "bahan_scrap") {
+                    $value['type_barang_text'] = "BARANG SCRAP";
+                } elseif ($value['type_barang'] == "bahan_modal") {
+                    $value['type_barang_text'] = "BARANG MODAL";
+                }
+            }
+            return response()->setJSON([
+                'data' => $dataResult,
+                'token' => csrf_hash(),
+                'status' => true
+            ]);
+        }
+    }
+
     public function getListMaterialRequestByWOID()
     {
         $kodeProduksi = $this->request->getVar('kode_produksi');
@@ -803,8 +838,36 @@ class ProductionResult extends BaseController
             ->groupBy('material_request_details.material_request_id')
             ->find();
 
+        // Builder penolong
+        $builderPenolong = $this->materialRequestsPenolongModel->asObject()
+            ->select("
+            material_requests_penolong.*,
+            GROUP_CONCAT(material_request_penolong_details.nama_barang SEPARATOR ', ') AS nama_barang,
+            users.name AS user_name
+        ")
+            ->join('material_request_penolong_details', 'material_request_penolong_details.material_request_id = material_requests_penolong.id', 'left')
+            ->join('users', 'users.id = material_requests_penolong.createdBy', 'left')
+            ->where('company_id', $this->this_company_id)
+            ->where('material_requests_penolong.is_posted', 1)
+            ->where('material_requests_penolong.is_approve', 1)
+            ->where('material_requests_penolong.deletedAt', null)
+            ->where('material_request_penolong_details.deletedAt', null)
+            ->where('material_request_penolong_details.qty2 >', 0)
+            ->groupStart();
+
+        // Tambahkan kondisi OR untuk setiap work_order_id
+        foreach ($woIds as $id) {
+            $builderPenolong->orWhere("FIND_IN_SET(" . (int)$id . ", material_requests_penolong.work_order_id) >", 0);
+        }
+
+        $dataMaterialRequestPenolong = $builderPenolong
+            ->groupEnd()
+            ->groupBy('material_request_penolong_details.material_request_id')
+            ->find();
+
         return $this->response->setJSON([
             'data'   => $dataMaterialRequest ?: [],
+            'dataPenolong'   => $dataMaterialRequestPenolong ?: [],
             'token'  => csrf_hash(),
             'status' => (bool) $dataMaterialRequest
         ]);

@@ -43,15 +43,17 @@ class MaterialRequestPenolongDetailsModel extends Model
     public function getMaterialRequestDetailByMaterialRequestID($mrID)
     {
         $selectQry = '
-            material_request_penolong_details.*,        
+            material_request_penolong_details.*,
             barang_master.kode_barang,        
             barang_master.barang_name,        
-            barang_master.type_barang      
+            barang_master.type_barang,
+            satuans.id AS satuan_id,
         ';
 
         $dataQry = $this->asArray()
             ->select($selectQry)
             ->join('barang_master', 'barang_master.id = material_request_penolong_details.barang1_id')
+            ->join('satuans', 'satuans.kode_satuan = material_request_penolong_details.satuan', 'left')
             ->where('material_request_penolong_details.material_request_id', $mrID)
             ->findAll();
 

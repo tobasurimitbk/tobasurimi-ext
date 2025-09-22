@@ -17,7 +17,9 @@ class SalesOrderDetailModel extends Model
     protected $protectedField = true;
 
     protected $allowedFields = [
+        'id_surat_jalan',
         'id_sales_order',
+        'id_sales_order_detail',
         'id_barang',
         'qty',
         'qty_sekarang',
@@ -59,29 +61,40 @@ class SalesOrderDetailModel extends Model
 
     public function getItemListByIds($ids): array
     {
+        // pastikan selalu array
         if (!is_array($ids)) $ids = [$ids];
-        
+
+        // jika array kosong, langsung kembalikan array kosong
+        if (empty($ids)) {
+            return [];
+        }
+
         $selectQry = "sales_order_detail.id AS id,
-                      sales_order_detail.id_barang AS id_barang,
-                      barang_master_sales.kode_barang AS kode_barang,
-                      barang_master_sales.barang_name AS nama_barang,
-                      sales_order_detail.qty AS qty,
-                      sales_order_detail.qty_sekarang AS qty_sekarang,
-                      satuans.kode_satuan AS satuan,
-                      sales_order_detail.discount_percentage AS disc,
-                      sales_order_detail.discount_unit AS discUnit,
-                      sales_order_detail.tax AS tax,
-                      sales_order_detail.amount AS amount,
-                      sales_order_detail.id_sales_order,
-                      sales_order_detail.harga_barang AS harga_barang,
-                      sales_order.id_company";
+                  sales_order_detail.id AS id_sales_order_detail,
+                  sales_order_detail.id_sales_order AS id_sales_order,
+                  sales_order_detail.id_barang AS id_barang,
+                  barang_master_sales.kode_barang AS kode_barang,
+                  barang_master_sales.barang_name AS nama_barang,
+                  sales_order_detail.qty AS qty,
+                  sales_order_detail.qty_sekarang AS qty_sekarang,
+                  satuans.kode_satuan AS satuan,
+                  sales_order_detail.discount_percentage AS disc,
+                  sales_order_detail.discount_percentage AS discAmt,
+                  sales_order_detail.discount_unit AS discUnit,
+                  sales_order_detail.tax AS tax,
+                  sales_order_detail.amount AS amount,
+                  sales_order_detail.id_sales_order,
+                  sales_order_detail.harga_barang AS harga_barang,
+                  sales_order_detail.status_ppn AS statusppn,
+                  sales_order_detail.keterangan AS keterangan,
+                  sales_order_detail.tipe_input AS tipe_input,
+                  sales_order.id_company";
 
         $datas = $this->asObject()
             ->select($selectQry)
             ->join('barang_master_sales', 'barang_master_sales.id = sales_order_detail.id_barang AND barang_master_sales.deletedAt IS NULL')
             ->join('satuans', 'satuans.id = barang_master_sales.satuan_id', 'LEFT')
             ->join('sales_order', 'sales_order.id = sales_order_detail.id_sales_order', 'LEFT')
-            // ->where('qty_sekarang !=', 0)
             ->where('tipe_input', 'order_form')
             ->whereIn('id_sales_order', $ids)
             ->orderBy('sales_order_detail.id_sales_order', 'ASC')
@@ -89,13 +102,12 @@ class SalesOrderDetailModel extends Model
             ->findAll();
 
         foreach ($datas as &$data) {
-            $amount = ($data->amount);
-            $totalPrice = (($amount) * (100 - $data->disc)) / 100;
-            $data->total_harga_barang = $amount;
+            $amount = $data->amount;
+            $data->total_harga_barang = $amount; // atau totalPrice jika mau hitung diskon
         }
+
         return $datas;
     }
-
 
     public function getItemListPostingByIds($ids): array
     {

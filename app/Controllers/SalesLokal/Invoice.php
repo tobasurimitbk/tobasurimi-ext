@@ -11,6 +11,7 @@ use App\Models\SalesOrderInvoiceModel;
 use App\Models\SalesOrderModel;
 use App\Models\SalesOrderDetailModel;
 use App\Models\SuratJalanModel;
+use App\Models\SuratJalanDetailModel;
 use App\Models\TaxModel;
 use App\Models\AllNoModel;
 use App\Models\BarangMasterSalesModel;
@@ -39,6 +40,7 @@ class Invoice extends BaseController
     protected $SalesOrderModel;
     protected $SalesOrderDetailModel;
     protected $SuratJalanModel;
+    protected $SuratJalanDetailModel;
     protected $SalesOrderInvoiceDetailModel;
     protected $taxModel;
     protected $pembayaranInvoiceModel;
@@ -62,6 +64,7 @@ class Invoice extends BaseController
         $this->SalesOrderModel = new SalesOrderModel();
         $this->SalesOrderDetailModel = new SalesOrderDetailModel();
         $this->SuratJalanModel = new SuratJalanModel();
+        $this->SuratJalanDetailModel = new SuratJalanDetailModel();
         $this->SalesOrderInvoiceDetailModel = new SalesOrderInvoiceDetailModel();
         $this->taxModel = new TaxModel();
         $this->pembayaranInvoiceModel = new PembayaranInvoiceModel();
@@ -258,6 +261,8 @@ class Invoice extends BaseController
             $documentData = null;
 
             $checkINV = $this->SalesOrderInvoiceModel->where('UPPER(no_faktur)', strtoupper($postData['no_faktur']))->findAll();
+            // var_dump($postItemsData);
+            // exit;
             if ($checkINV) {
                 $data = [
                     "status"    => false,
@@ -305,7 +310,8 @@ class Invoice extends BaseController
                 if ($value['qty_input'] != 0) {
                     $valuesDetail = [
                         "id_sales_order_invoice"        => $dataSalesOrderInvoice,
-                        "id_sales_order"                => $value['id_sales_order'],
+                        "id_sales_order"                => $value['id_sales_order'] ?? null,
+                        "id_surat_jalan"                => $value['id_sj'] ?? null,
                         "id_barang_invoice"             => $value['id_barang'],
                         "qty_invoice"                   => $value['qty_input'],
                         "keterangan_invoice"            => "-",
@@ -436,7 +442,7 @@ class Invoice extends BaseController
                     // var_dump($value);
                     // var_dump($valueDetail);
 
-                    if ($value->id_sales_order == $valueDetail['id_sales_order'] && $value->id_barang == $valueDetail['id_barang_invoice']) {
+                    if (isset($valueDetail['id_sales_order']) ? ($value->id_sales_order == $valueDetail['id_sales_order'] && $value->id_barang == $valueDetail['id_barang_invoice']) : ($value->id_sj == $valueDetail['id_surat_jalan'] && $value->id_barang == $valueDetail['id_barang_invoice'])) {
 
                         // Check if deletedAt is not empty
                         if (!empty($valueDetail['deletedAt'])) {
@@ -464,7 +470,7 @@ class Invoice extends BaseController
                 // var_dump($value);
                 foreach ($dataSalesInvoiceOrderDetail as $valueDetail) {
 
-                    if ($value->id_sales_order == $valueDetail['id_sales_order'] && $value->id_barang == $valueDetail['id_barang_invoice']) {
+                    if (isset($valueDetail['id_sales_order']) ? ($value->id_sales_order == $valueDetail['id_sales_order'] && $value->id_barang == $valueDetail['id_barang_invoice']) : ($value->id_sj == $valueDetail['id_surat_jalan'] && $value->id_barang == $valueDetail['id_barang_invoice'])) {
 
                         // Check if deletedAt is not empty
                         if (!empty($valueDetail['deletedAt'])) {
@@ -620,7 +626,8 @@ class Invoice extends BaseController
                             $valuesDetail = [
                                 "id_barang_invoice"             => $value['id_barang'],
                                 "qty_invoice"                   => $value['qty_input'],
-                                "id_sales_order"                => $value['id_sales_order'],
+                                "id_sales_order"                => $value['id_sales_order'] ?? null,
+                                "id_surat_jalan"                => $value['id_sj'] ?? null,
                                 "keterangan_invoice"            => "-",
                                 "discount_percentage_invoice"   => $value['disc'],
                                 "harga_barang_invoice"          => str_replace(',', '', $value['harga_barang']),
@@ -650,7 +657,8 @@ class Invoice extends BaseController
                             "id_sales_order_invoice"        => $payload['id'],
                             "id_barang_invoice"             => $value['id_barang'],
                             "qty_invoice"                   => $value['qty_input'],
-                            "id_sales_order"                => $value['id_sales_order'],
+                            "id_sales_order"                => $value['id_sales_order'] ?? null,
+                            "id_surat_jalan"                => $value['id_sj'] ?? null,
                             "keterangan_invoice"            => "-",
                             "discount_percentage_invoice"   => $value['disc'],
                             "harga_barang_invoice"          => str_replace(',', '', $value['harga_barang']),
@@ -886,9 +894,10 @@ class Invoice extends BaseController
                 ->where('sales_order.surat_jalan_so_id', NULL)
                 ->where('sales_order_detail.qty_sekarang !=', 0)
                 // ->where('sales_order.id_company', $this->this_company_id)
-                ->groupBy('sales_order.no_sales_order');
+                ->groupBy('sales_order.no_sales_order')
+                ->findAll();
         } else { // pengiriman
-            $documentList = $this->SuratJalanModel->asObject()
+            $documentList1 = $this->SuratJalanModel->asObject()
                 ->select('surat_jalan_so.id, 
                 surat_jalan_so.no_surat_jalan AS doc_no, 
                 surat_jalan_so.id_company,
@@ -904,22 +913,38 @@ class Invoice extends BaseController
                 ->where('sales_order.id_customer', $customer_id)
                 ->where('sales_order_detail.qty_sekarang !=', 0)
                 // ->where('sales_order.id_company', $this->this_company_id)
-                ->groupBy('surat_jalan_so.no_surat_jalan');
+                ->groupBy('surat_jalan_so.no_surat_jalan')
+                ->findAll();
+            $documentList2 = $this->SuratJalanModel->asObject()
+                ->select('surat_jalan_so.id, 
+                surat_jalan_so.no_surat_jalan AS doc_no, 
+                surat_jalan_so.id_company,
+                surat_jalan_so.no_po,
+                surat_jalan_so.note as keterangan,
+                surat_jalan_so.terms as termin,
+                sales_order.jenis_penjualan as jenis_penjualan,
+                employees.name as salesName
+                ')
+                ->join('surat_jalan_so_detail', 'surat_jalan_so_detail.id_surat_jalan = surat_jalan_so.id', 'left')
+                ->join('sales_order', 'sales_order.surat_jalan_so_id = surat_jalan_so_detail.id_sales_order', 'left')
+                ->join('employees', 'employees.id = sales_order.sales_id', 'left')
+                ->where('surat_jalan_so.id_customer', $customer_id)
+                ->where('surat_jalan_so_detail.qty !=', 0)
+                // ->where('sales_order.id_company', $this->this_company_id)
+                ->groupBy('surat_jalan_so.no_surat_jalan')
+                ->findAll();
+
+            // Gabungkan & hilangkan duplikat berdasarkan id
+            $merged = [];
+            foreach (array_merge($documentList1, $documentList2) as $row) {
+                $merged[$row->id] = $row; // gunakan id sebagai key agar otomatis unik
+            }
+
+            $documentList = array_values($merged);
         }
 
-        // $documentList->where('sales_order_invoice_id', null);
 
-        if (!empty($documentId)) {
-            $documentList->groupStart();
-            $documentList->whereIn('id', $documentId);
-            $documentList->groupEnd();
-        }
-
-        // var_dump($documentList->findAll());
-        // die();
-
-
-        return $documentList->findAll();
+        return $documentList;
     }
 
     private function  getDocDataaaa(string $docType, $docId): object
@@ -1013,9 +1038,23 @@ class Invoice extends BaseController
             $customerAddress = $soData->customerAddress ?? "-";
         }
 
-        $itemList = $this->SalesOrderDetailModel->getItemListByIds($soId);
 
-        $itemListPosting = $this->SalesOrderDetailModel->getItemListPostingByIds($soId);
+        if ($docType == 'pengiriman') {
+            if (!is_array($docId)) $docId = [$docId];
+            $checkSuratJalanDetail = $this->SuratJalanDetailModel->whereIn('id_surat_jalan', $docId)->first();
+
+            if ($checkSuratJalanDetail) {
+                $itemList = $this->SuratJalanDetailModel->getItemListByIds($docId);
+                $itemListPosting = $this->SuratJalanDetailModel->getItemListPostingByIds($docId);
+            } else {
+                $itemList = $this->SalesOrderDetailModel->getItemListByIds($soId);
+                $itemListPosting = $this->SalesOrderDetailModel->getItemListPostingByIds($soId);
+            }
+        } else {
+            $itemList = $this->SalesOrderDetailModel->getItemListByIds($soId);
+            $itemListPosting = $this->SalesOrderDetailModel->getItemListPostingByIds($soId);
+        }
+
         $itemTax = $this->taxModel->where('id', '4')->asObject()->findAll();
 
         $dpp = 0;

@@ -413,8 +413,6 @@ class OrderForm extends BaseController
                     "tipe_input"            => "order_form",
                     "status_ppn"            => $row->statusppn,
                     "discount_unit"            => $row->discUnit,
-                    // "dept"                  => $row->dept,
-                    // "id_warehouse"          => $row->warehouse_id,
                 ];
                 $this->SalesOrderDetailModel->save($valueBarang);
             }
@@ -656,9 +654,6 @@ class OrderForm extends BaseController
                         "discount_percentage"   => $row->disc,
                         "tipe_input"            => "order_form",
                         "status_ppn"            => $row->statusppn,
-
-                        // "dept"                  => $row->dept,
-                        // "id_warehouse"          => $row->warehouse_id,
                     ];
                     $this->SalesOrderDetailModel->update($row->id, $valueBarang);
                 }
@@ -684,16 +679,20 @@ class OrderForm extends BaseController
                     "payment_terms"         => $postData['termin'],
                 ];
 
+            $dataSO = $this->SalesOrderModel->find($id);
+
             $checkSO = $this->SalesOrderModel->where('UPPER(no_sales_order)', strtoupper($this->request->getVar('no_sales_order')))->findAll();
             if ($checkSO) {
-                $data = [
-                    "status"    => false,
-                    "message"   => "No Sales Order Sudah Digunakan",
-                    "payload"   => $values,
-                    'token'     => csrf_hash(),
-                ];
-                echo json_encode($data);
-                return;
+                if ($checkSO['id'] != $dataSO['id']) {
+                    $data = [
+                        "status"    => false,
+                        "message"   => "No Sales Order Sudah Digunakan",
+                        "payload"   => $values,
+                        'token'     => csrf_hash(),
+                    ];
+                    echo json_encode($data);
+                    return;
+                }
             }
 
             $this->SalesOrderModel->update(

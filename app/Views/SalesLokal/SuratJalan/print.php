@@ -4,11 +4,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Surat Jalan</title>
     <style>
         body {
             font-size: 12px;
-            font-family: 'Courier New', monospace; /* Font monospace */
+            font-family: 'Courier New', monospace;
         }
 
         @page {
@@ -43,16 +43,13 @@
             top: -10px;
             background: white;
             left: 15px;
-            padding-left: 3px;
-            padding-right: 5px;
+            padding: 0 5px;
         }
 
         .item-table {
             border: 1px solid;
             width: 100%;
-
-            margin-top: 2px;
-            margin-bottom: 2px;
+            margin: 2px 0;
             border-collapse: collapse;
         }
 
@@ -89,63 +86,65 @@
 </head>
 
 <body>
+    <?php
+    // pastikan variabel tidak kosong
+    $hasSO = !empty($soData);
+    $firstSO = $hasSO ? $soData[0] : $sjData;
+    ?>
     <table class="w-100">
         <tr>
-            <td style="width: 70%;padding-right: 100px">
-                <div class="company-name"><?= $companyName ?></div>
+            <td style="width:70%;padding-right:100px">
+                <div class="company-name"><?= $companyName ?? '' ?></div>
                 <div>
                     <table class="w-100">
                         <tr>
-                            <td style="width: 1px;vertical-align: top">Customer: </td>
-                            <td style="border: 1px solid;border-radius: 7px;padding: 5px">
-                                <div><?= $soData[0]->customerName ?> - <?= @$soData[0]->phone ?></div>
-                                <div><?= $soData[0]->customerAddress ?></div>
+                            <td style="width:1px;vertical-align:top">Customer: </td>
+                            <td style="border:1px solid;border-radius:7px;padding:5px">
+                                <div>
+                                    <?= $firstSO->customerName ?? '-' ?>
+                                    <?= !empty($firstSO->phone) ? ' - ' . $firstSO->phone : '' ?>
+                                </div>
+                                <div><?= $firstSO->customerAddress ?? '-' ?></div>
                             </td>
                         </tr>
                     </table>
                 </div>
             </td>
-            <td align="right" style="text-align: right;">
-                <div class="txt-bold txt-center" style="font-size: 25px;margin-bottom:3px;">SURAT JALAN</div>
-                <table class="w-100" style="border: 1px solid;border-radius: 7px;margin-left: auto;margin-right: 0">
+            <td align="right">
+                <div class="txt-bold txt-center" style="font-size:25px;margin-bottom:3px;">SURAT JALAN</div>
+                <table class="w-100" style="border:1px solid;border-radius:7px;margin-left:auto;">
                     <tr>
-                        <td style="border-right: 1px solid;border-right-style: dashed;width: 50%;">
+                        <td style="border-right:1px dashed;width:50%;">
                             <div>Tgl</div>
-                            <div class="txt-center"><?= $sjData->shipping_date ?></div>
+                            <div class="txt-center"><?= $sjData->shipping_date ?? '' ?></div>
                         </td>
                         <td>
                             <div>No. Surat</div>
-                            <div class="txt-center"><?= $sjData->no_surat_jalan ?></div>
+                            <div class="txt-center"><?= $sjData->no_surat_jalan ?? '' ?></div>
                         </td>
                     </tr>
                     <tr>
-                        <td style="border: 1px solid;border-style: dashed dashed hidden hidden">
+                        <td style="border-right:1px dashed;border-top:1px dashed;width:50%;">
                             <div>No. Order</div>
                             <div class="txt-center">
                                 <?php
-                                // Array untuk menyimpan no_sales_order yang unik
                                 $uniqueSalesOrders = [];
-
-                                // Iterasi data sales order
-                                foreach ($soData as $so) {
-                                    // Jika no_sales_order belum ada dalam array, tambahkan
-                                    if (!in_array($so->no_sales_order, $uniqueSalesOrders)) {
-                                        $uniqueSalesOrders[] = $so->no_sales_order;
+                                if ($hasSO) {
+                                    foreach ($soData as $so) {
+                                        if (!in_array($so->no_sales_order, $uniqueSalesOrders)) {
+                                            $uniqueSalesOrders[] = $so->no_sales_order;
+                                        }
                                     }
                                 }
-
-                                // Tampilkan no_sales_order yang berbeda
-                                if (count($uniqueSalesOrders) > 1) {
-                                    echo implode(', ', $uniqueSalesOrders);
-                                } else {
-                                    echo $uniqueSalesOrders[0];
-                                }
+                                echo !empty($uniqueSalesOrders)
+                                    ? implode(', ', $uniqueSalesOrders)
+                                    : '-';
                                 ?>
                             </div>
                         </td>
-                        <td style="border-top: 1px solid;border-top-style: dashed">
+                        <td style="border-top:1px dashed">
                             <div>PO. No.</div>
-                            <div class="txt-center"><?= $sjData->no_po ?>&nbsp;</div>
+                            <div class="txt-center"><?= $sjData->no_po ?? '' ?>&nbsp;</div>
                         </td>
                     </tr>
                 </table>
@@ -156,7 +155,7 @@
     <table class="item-table">
         <tr>
             <th>No</th>
-            <th style="height: 1px;">Item Description</th>
+            <th>Item Description</th>
             <th>No. OF</th>
             <th>Qty</th>
             <th>Satuan</th>
@@ -166,26 +165,53 @@
         </tr>
         <?php
         $rowNumber = 1;
-        $totalInv = 0;
-        foreach ($soData as $detail) :
-            $totalWithoutDisc = $detail->amt / ((100 - $detail->disc_pct) / 100);
-            $totalInv += $detail->amt;
+        $totalInv  = 0;
+
+        if ($sjDetailData) {
+            foreach ($sjDetailData as $detail) :
+                $disc = $detail->disc ?? 0;
+                $amt  = $detail->amount ?? 0;
+                $qty  = $detail->qty ?? 0;
+                $totalWithoutDisc = $disc < 100 ? ($amt / ((100 - $disc) / 100)) : $amt;
+                $totalInv += $amt;
         ?>
-            <tr>
-                <td class="txt-center" style="height: 1px;"><?= $rowNumber; ?></td>
-                <td><?= $detail->namaBarang ?></td>
-                <td><?= $detail->no_sales_order ?></td>
-                <td class="txt-center"><?= $detail->qty ?></td>
-                <td class="txt-center"><?= $detail->kodeSatuan ?></td>
-                <td class="txt-center"><?= number_format($totalWithoutDisc / $detail->qty) ?></td>
-                <td class="txt-center"><?= $detail->disc_pct ?></td>
-                <td class="txt-right"><?= number_format($detail->amt) ?></td>
-            </tr>
-        <?php
-            $rowNumber++;
-        endforeach;
-        ?>
-        <?php for ($i = 0; $i < (8 - count($soData)); $i++) : ?>
+                <tr>
+                    <td class="txt-center"><?= $rowNumber++; ?></td>
+                    <td><?= $detail->nama_barang ?? '-' ?></td>
+                    <td><?= $detail->no_sales_order ?? '-' ?></td>
+                    <td class="txt-center"><?= $qty ?></td>
+                    <td class="txt-center"><?= $detail->satuan ?? '-' ?></td>
+                    <td class="txt-center"><?= number_format($qty ? $totalWithoutDisc / $qty : 0) ?></td>
+                    <td class="txt-center"><?= $disc ?></td>
+                    <td class="txt-right"><?= number_format($amt) ?></td>
+                </tr>
+            <?php
+            endforeach;
+        } else {
+            foreach ($soData as $detail) :
+                $disc = $detail->disc_pct ?? 0;
+                $amt  = $detail->amt ?? 0;
+                $qty  = $detail->qty ?? 0;
+                $totalWithoutDisc = $disc < 100 ? ($amt / ((100 - $disc) / 100)) : $amt;
+                $totalInv += $amt;
+            ?>
+                <tr>
+                    <td class="txt-center"><?= $rowNumber++; ?></td>
+                    <td><?= $detail->namaBarang ?? '-' ?></td>
+                    <td><?= $detail->no_sales_order ?? '-' ?></td>
+                    <td class="txt-center"><?= $qty ?></td>
+                    <td class="txt-center"><?= $detail->kodeSatuan ?? '-' ?></td>
+                    <td class="txt-center"><?= number_format($qty ? $totalWithoutDisc / $qty : 0) ?></td>
+                    <td class="txt-center"><?= $disc ?></td>
+                    <td class="txt-right"><?= number_format($amt) ?></td>
+                </tr>
+            <?php
+            endforeach;
+        }
+
+        // tambahkan baris kosong agar selalu 8 baris
+        $emptyRows = max(0, 8 - ($rowNumber - 1));
+        for ($i = 0; $i < $emptyRows; $i++): ?>
             <tr>
                 <td>&nbsp;</td>
                 <td>&nbsp;</td>
@@ -199,53 +225,51 @@
         <?php endfor; ?>
     </table>
 
-    <table class="w-100" style="border-spacing: 3px 0;">
+    <table class="w-100 biaya-table">
+        <colgroup>
+            <col style="width:10%">
+            <col style="width:55%">
+            <col style="width:10%">
+            <col style="width:25%">
+        </colgroup>
         <tr>
             <td colspan="2"></td>
-            <td>
-                <div class="txt-right" style="border: 1px solid; padding: 3px;">Biaya Lain-lain: </div>
-            </td>
-            <td>
-                <div class="txt-right" style="border: 1px solid; padding: 3px;">0</div>
-            </td>
+            <td class="txt-right">Biaya Lain:</td>
+            <td class="txt-right" style="width:20%; border:1px solid; padding: 5px;">&nbsp;</td>
         </tr>
         <tr>
-            <td style="width: 1px;">Terbilang</td>
-            <td style="width: 55%;">
-                <div style="border: 1px solid; padding: 3px;"><?= terbilang($totalInv) ?></div>
+            <td style="width:1px;">Terbilang</td>
+            <td style="border:1px solid;width: 400px;">
+                <div><?= terbilang($totalInv) ?></div>
             </td>
-            <td>
-                <div class="txt-right" style="border: 1px solid; padding: 3px;">Total Faktur: </div>
-            </td>
-            <td>
-                <div class="txt-right" style="border: 1px solid; padding: 3px;"><?= number_format($totalInv) ?></div>
-            </td>
+            <td class="txt-right">Total Faktur:</td>
+            <td class="txt-right" style="border:1px solid;"><?= number_format($totalInv) ?></td>
         </tr>
     </table>
 
     <table class="w-100">
         <tr>
-            <td style="width: 375px;">
+            <td style="width:375px;">
                 <div>Catatan: </div>
                 <div>Surat Jalan ini tidak berfungsi sebagai Penagihan</div>
                 <div>Barang yang sudah diterima tidak dapat dikembalikan</div>
                 <div>Kecuali memenuhi ketentuan perjanjian BS Exp Date</div>
             </td>
-            <td style="padding-left: 50px">
+            <td style="padding-left:50px">
                 <div class="description-container">
                     <label class="description-label">Description: </label>
-                    <?= $sjData->note ?>
+                    <?= $sjData->note ?? '' ?>
                 </div>
             </td>
         </tr>
     </table>
 
     <table class="signature-table" width="100%">
-        <tr style="vertical-align: top;">
-            <td style="height: 55px;border-bottom: 1px solid;width: 90px">Disiapkan</td>
-            <td style="height: 55px;border-bottom: 1px solid;width: 90px">Disetujui Oleh</td>
-            <td style="height: 55px;border-bottom: 1px solid;width: 90px">Diantar Oleh</td>
-            <td style="height: 55px;border-bottom: 1px solid;width: 90px">Diterima Oleh</td>
+        <tr style="vertical-align:top;">
+            <td style="height:55px;border-bottom:1px solid;width:90px">Disiapkan</td>
+            <td style="height:55px;border-bottom:1px solid;width:90px">Disetujui Oleh</td>
+            <td style="height:55px;border-bottom:1px solid;width:90px">Diantar Oleh</td>
+            <td style="height:55px;border-bottom:1px solid;width:90px">Diterima Oleh</td>
         </tr>
         <tr>
             <td>Date: </td>
@@ -254,7 +278,6 @@
             <td>Date: </td>
         </tr>
     </table>
-
 </body>
 
 </html>

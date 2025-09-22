@@ -613,6 +613,7 @@ $routes->get('/surat-jalan/all', 'SalesLokal\SuratJalan::all', ['filter' => 'Aut
 $routes->post('/surat-jalan/save', 'SalesLokal\SuratJalan::save', ['filter' => 'Auth']);
 $routes->post('/surat-jalan/update', 'SalesLokal\SuratJalan::update', ['filter' => 'Auth']);
 $routes->post('/surat-jalan/delete', 'SalesLokal\SuratJalan::delete', ['filter' => 'Auth']);
+$routes->post('/surat-jalan/delete-detail', 'SalesLokal\SuratJalan::deleteDetail', ['filter' => 'Auth']);
 $routes->post('/surat-jalan/posting', 'SalesLokal\SuratJalan::posting', ['filter' => 'Auth']);
 $routes->get('/surat-jalan/print/(:segment)', 'SalesLokal\SuratJalan::printSJ/$1', ['filter' => 'Auth']);
 $routes->post('/surat-jalan/generate-no-surat-jalan', 'SalesLokal\SuratJalan::generateNomorSuratJalan', ['filter' => 'Auth']);

@@ -80,6 +80,7 @@ class SuratJalanModel extends Model
         customers.kode as kode_pelanggan, 
         SUM(sales_order.total_harga) as total_harga, 
         SUM(sales_order.estimated_freight) as estimated_freight, 
+        SUM(surat_jalan_so_detail.amount) as sum_amount_sj_detail, 
         sales_order.tipe_sales_order,
         employees.name AS customerSales,
         CAST(SUBSTRING_INDEX(SUBSTRING_INDEX(surat_jalan_so.no_surat_jalan, '/', -3), '/', 1) AS UNSIGNED) AS tahun_so,
@@ -91,7 +92,8 @@ class SuratJalanModel extends Model
         $SuratJalan = $this->asObject()
             ->select($selectQry)
             ->join('customers', 'customers.id = surat_jalan_so.id_customer')
-            ->join('sales_order', 'sales_order.surat_jalan_so_id = surat_jalan_so.id')
+            ->join('sales_order', 'sales_order.surat_jalan_so_id = surat_jalan_so.id', 'left')
+            ->join('surat_jalan_so_detail', 'surat_jalan_so_detail.id_surat_jalan = surat_jalan_so.id AND surat_jalan_so_detail.deletedAt IS NULL', 'left')
             ->join('employees', 'employees.id = sales_order.sales_id', 'left')
             ->where($condition)
             ->groupBy('surat_jalan_so.no_surat_jalan');
