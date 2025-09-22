@@ -252,4 +252,57 @@ class DivisisModel extends Model
                 ->findAll();
         }
     }
+
+    public function getDivisiJamKerja($condition, $addCondition, $limit = 10, $offset = 0)
+    {
+        $availableSort = [
+            'divisis.id' => 'divisis.id',
+            'divisis.jam_kerja_id' => 'divisis.jam_kerja_id',
+            'jam_kerja.jenis' => 'jam_kerja.jenis',
+        ];
+
+        $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
+
+        $sort = $availableSort[$addCondition['sort'] ?? 'divisis.divisi'] ?? 'divisis.divisi';
+        $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'DESC';
+
+        $dataQry = $this->asObject()->select("
+                DISTINCT(divisis.id),
+                divisis.divisi,
+                divisis.jam_kerja_id,
+                COUNT(jam_kerja.id) AS total_jam_kerja,
+                jam_kerja.jenis,
+                jam_kerja.shift,
+                CONCAT(jam_kerja.jenis, ' ', jam_kerja.shift) AS jenis_shift
+            ")
+            ->join('jam_kerja', 'jam_kerja.id = divisis.jam_kerja_id', 'left')
+            ->whereIn('divisis.type_divisi', ["GABUNGAN", "PERSONALIA"])
+            ->where($condition)
+            ->groupBy('divisis.id')
+            ->orderBy($sort, $sortType);
+
+        $totalData = $dataQry->countAllResults(false);
+
+        if ($addCondition['search']) {
+            $dataQry->groupStart();
+        }
+
+        if ($addCondition['search']) {
+            $dataQry->like("CONCAT(jam_kerja.jenis, ' ', jam_kerja.shift)", $addCondition['search'])
+                ->orLike('divisis.divisi', $addCondition['search']);
+        }
+
+        if ($addCondition['search']) {
+            $dataQry->groupEnd();
+        }
+
+        $totalFilteredData = $dataQry->countAllResults(false);
+        $data = $dataQry->findAll($limit, $offset);
+
+        return [
+            'data'              => $data,
+            'totalData'         => $totalData,
+            'totalFilteredData' => $totalFilteredData
+        ];
+    }
 }

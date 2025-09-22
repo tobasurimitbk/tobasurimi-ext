@@ -2068,7 +2068,7 @@ $routes->post('/attendances-unit/update', 'Master\AttendancesUnit::updateData', 
 $routes->post('/attendances-unit/delete', 'Master\AttendancesUnit::deleteData', ['filter' => 'Auth']);
 $routes->post('/attendances-unit/copy-to-finger', 'Master\AttendancesUnit::CopyToFinger', ['filter' => 'Auth']);
 $routes->post('/attendances-unit/ping', 'Master\AttendancesUnit::pingFinger', ['filter' => 'Auth']);
-
+$routes->post('/attendances-unit/reset-data-finger', 'Master\AttendancesUnit::resetDataFinger', ['filter' => 'Auth']);
 // Tunjangan
 $routes->get('/tunjangan', 'Master\Tunjangan::ListTunjangan', ['filter' => 'Auth']);
 $routes->get('/tunjangan/all', 'Master\Tunjangan::allTunjangan', ['filter' => 'Auth']);
@@ -2115,9 +2115,14 @@ $routes->post('/form-perijinan/delete', 'HR\Perijinan::delete', ['filter' => 'Au
 $routes->post('/form-perijinan/employees', 'HR\Perijinan::getEmployeeByDivision', ['filter' => 'Auth']);
 
 // jam kerja
-$routes->get('/jam-kerja', 'Master\JamKerja::index', ['filter' => 'Auth']);
+$routes->get('/jam-kerja', 'Master\JamKerja::indexDivisi', ['filter' => 'Auth']);
+$routes->get('/jam-kerja/all-divisi', 'Master\JamKerja::allDivisi', ['filter' => 'Auth']);
+$routes->get('/jam-kerja/dropdown-jamkerja', 'Master\JamKerja::dropdownJamKerja', ['filter' => 'Auth']);
+$routes->post('/jam-kerja/update-jamkerja-default', 'Master\JamKerja::updateJamKerjaDefault', ['filter' => 'Auth']);
+$routes->get('/jam-kerja/divisi/(:segment)', 'Master\JamKerja::index/$1', ['filter' => 'Auth']);
+
 $routes->get('/jam-kerja/all', 'Master\JamKerja::all', ['filter' => 'Auth']);
-$routes->get('/jam-kerja/create', 'Master\JamKerja::createView', ['filter' => 'Auth']);
+$routes->get('/jam-kerja/create/divisi/(:segment)', 'Master\JamKerja::createView/$1', ['filter' => 'Auth']);
 $routes->post('/jam-kerja/create', 'Master\JamKerja::create', ['filter' => 'Auth']);
 $routes->post('/jam-kerja/delete', 'Master\JamKerja::delete', ['filter' => 'Auth']);
 $routes->post('/jam-kerja/update', 'Master\JamKerja::update', ['filter' => 'Auth']);
@@ -2181,8 +2186,8 @@ $routes->get('/company-access/all', 'Setting\CompanyAccess::allCompanyAccess', [
 $routes->get('/get-employee-by-company/(:segment)', 'HR\Attendance::get_employee_by_company/$1', ['filter' => 'Auth']);
 
 // attendance
-$routes->get('/api/employees-sync-attendances', 'API\Employees::sync_employee_to_master', ['filter' => 'Auth']);
-$routes->cli('/api/employees-sync-attendances', 'API\Employees::sync_employee_to_master');
+// $routes->get('/api/employees-sync-attendances', 'API\Employees::sync_employee_to_master', ['filter' => 'Auth']);
+// $routes->cli('/api/employees-sync-attendances', 'API\Employees::sync_employee_to_master');
 $routes->cli('/api/sync-attendances', 'API\Attendances::sync_attendance');
 $routes->get('/api/sync-attendances', 'API\Attendances::sync_attendance');
 //$routes->get('/api/employees-sync-attendances', 'API\Employees::sync_employee_to_master', ['filter' => 'Auth']);

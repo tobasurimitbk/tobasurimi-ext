@@ -224,7 +224,7 @@
                 <td class="txt-center" style="width: 15% !important;">DITERIMA OLEH</td>
             </tr>
             <tr>
-                <td style="height: 50px;"></td>
+                <td style="height: 65px;"></td>
                 <td></td>
                 <td></td>
                 <td></td>
@@ -243,7 +243,7 @@
     </div>
 
     <?php if ($totalDikembalikan != 0) { ?>
-        <div style="background-color: #ffe4e1; padding: 1rem; border: 1px solid #ffb6c1; height: 93.2%">
+        <div style="background-color: #ffe4e1; padding: 1rem; border: 1px solid #ffb6c1; height: 93.2%; margin-left:-20px; margin-right:-20px;">
             <div style="padding: 25px; margin: 25px;">
                 <table class="w-100">
                     <tr>
@@ -351,7 +351,7 @@
                         <td class="txt-center" style="width: 15% !important;">DITERIMA OLEH</td>
                     </tr>
                     <tr>
-                        <td style="height: 50px;"></td>
+                        <td style="height: 65px;"></td>
                         <td></td>
                         <td></td>
                         <td></td>

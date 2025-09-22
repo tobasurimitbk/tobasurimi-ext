@@ -19,7 +19,6 @@
         font-size: 14px;
         font-weight: 600;
         line-height: 1.4;
-        background: #f9f9f9;
         /* biar beda dikit */
     }
 
@@ -38,7 +37,6 @@
         position: sticky;
         left: 0;
         z-index: 3;
-        background: #fff;
         min-width: 45px !important;
     }
 
@@ -49,7 +47,6 @@
         left: 50px;
         /* geser setelah kolom No */
         z-index: 3;
-        background: #fff;
         min-width: 120px !important;
     }
 
@@ -60,7 +57,6 @@
         left: 170px;
         /* 50 (No) + 120 (NIP) */
         z-index: 3;
-        background: #fff;
         min-width: 200px !important;
         white-space: nowrap;
     }
@@ -72,7 +68,6 @@
         left: 370px;
         /* 50 + 120 + 200 */
         z-index: 3;
-        background: #fff;
         min-width: 120px !important;
     }
 
@@ -83,7 +78,6 @@
         left: 490px;
         /* 50 + 120 + 200 + 120 */
         z-index: 3;
-        background: #fff;
         min-width: 150px !important;
     }
 
@@ -203,7 +197,7 @@
                 </div>
 
                 <div class="card-text mt-4">
-                    <b class="text-black">Keterangan</b>
+                    <b class="">Keterangan</b>
                 </div>
 
                 <div class="row mt-3">
@@ -214,7 +208,7 @@
                                     <div class="p-3" style="width: 5px; height:5px; background-color:<?= $s['description'] ?>"></div>
                                 </div>
                                 <div class="col-sm-9">
-                                    <div class="card-text mt-1 text-black">
+                                    <div class="card-text mt-1">
                                         <?= explode("_", $s['value'])[0] ?> (<?= explode("_", $s['value'])[1]; ?>)
                                     </div>
                                 </div>
@@ -229,7 +223,7 @@
                                 </div>
                             </div>
                             <div class="col-sm-9">
-                                <div class="card-text mt-1 text-black">
+                                <div class="card-text mt-1">
                                     LIBUR (L)
                                 </div>
                             </div>

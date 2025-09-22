@@ -2614,7 +2614,8 @@ class BC40 extends BaseController
                 kemasan.name AS nama_kemasan,
                 SUM(pbd.qty) AS qty_po,
                 SUM(pbd.jml_masuk) AS qty_lpb,
-                pod.total_before_pph AS sub_total
+                pod.total_before_pph AS sub_total,
+                pb.updatedAt
             FROM penerimaan_barang pb
             LEFT JOIN penerimaan_barang_detail pbd ON pbd.penerimaan_barang_id = pb.id
             LEFT JOIN rm_purchase_orders pod ON pod.id = pbd.purchase_order_id
@@ -2656,7 +2657,8 @@ class BC40 extends BaseController
                 kemasan.name AS nama_kemasan,
                 SUM(pbd.qty) AS qty_po,
                 SUM(pbd.jml_masuk) AS qty_lpb,
-                SUM(pbd.sub_total) AS sub_total
+                SUM(pbd.sub_total) AS sub_total,
+                pb.updatedAt
             FROM penerimaan_barang pb
             LEFT JOIN penerimaan_barang_detail pbd ON pbd.penerimaan_barang_id = pb.id
             LEFT JOIN am_purchase_orders pod ON pod.id = pbd.purchase_order_id
@@ -2709,6 +2711,7 @@ class BC40 extends BaseController
                 'kemasan' => $row['nama_kemasan'],
                 'qty_kemasan' => number_format($row['jumlah_kemasan'], 2) . " " . $row['kode_satuan_kemasan'],
                 'sub_total' => number_format($row['sub_total'], 2),
+                'updated_at' => date('d/m/Y H:i:s', strtotime($row['updatedAt']))
             ];
         }
 
@@ -2787,7 +2790,8 @@ class BC40 extends BaseController
                 kemasan.name AS nama_kemasan,
                 SUM(pbd.qty) AS qty_po,
                 SUM(pbd.jml_masuk) AS qty_lpb,
-                pod.total_before_pph AS sub_total
+                pod.total_before_pph AS sub_total,
+                pb.updatedAt
             FROM penerimaan_barang pb
             LEFT JOIN penerimaan_barang_detail pbd ON pbd.penerimaan_barang_id = pb.id
             LEFT JOIN rm_purchase_orders pod ON pod.id = pbd.purchase_order_id
@@ -2829,7 +2833,8 @@ class BC40 extends BaseController
                 kemasan.name AS nama_kemasan,
                 SUM(pbd.qty) AS qty_po,
                 SUM(pbd.jml_masuk) AS qty_lpb,
-                SUM(pbd.sub_total) AS sub_total
+                SUM(pbd.sub_total) AS sub_total,
+                pb.updatedAt
             FROM penerimaan_barang pb
             LEFT JOIN penerimaan_barang_detail pbd ON pbd.penerimaan_barang_id = pb.id
             LEFT JOIN am_purchase_orders pod ON pod.id = pbd.purchase_order_id
@@ -2882,6 +2887,7 @@ class BC40 extends BaseController
                 'qty_kemasan' => floatval($row['jumlah_kemasan']),
                 'satuan_kemasan' => $row['kode_satuan_kemasan'],
                 'sub_total' => floatval($row['sub_total']),
+                'updated_at' => date('d/m/Y H:i:s', strtotime($row['updatedAt']))
             ];
         }
 
@@ -2908,13 +2914,14 @@ class BC40 extends BaseController
             'Kemasan',
             'Qty Kemasan',
             'Satuan Kemasan',
-            'Sub Total'
+            'Sub Total',
+            'Tgl Posting PO'
         ];
 
         $sheet->fromArray($headers, NULL, 'A1');
 
         // Bold header
-        $sheet->getStyle('A1:R1')->applyFromArray([
+        $sheet->getStyle('A1:S1')->applyFromArray([
             'font' => ['bold' => true],
         ]);
 
@@ -2939,7 +2946,8 @@ class BC40 extends BaseController
                 ->setCellValue('O' . $rowNum, $f['kemasan'])
                 ->setCellValue('P' . $rowNum, $f['qty_kemasan'])
                 ->setCellValue('Q' . $rowNum, $f['satuan_kemasan'])
-                ->setCellValue('R' . $rowNum, $f['sub_total']);
+                ->setCellValue('R' . $rowNum, $f['sub_total'])
+                ->setCellValue('S' . $rowNum, $f['updated_at']);
             $rowNum++;
         }
 
@@ -2948,13 +2956,13 @@ class BC40 extends BaseController
         $sheet->setCellValue('R' . $rowNum, $totalSubTotal);
 
         // Bold Grand Total row
-        $sheet->getStyle("Q$rowNum:R$rowNum")->applyFromArray([
+        $sheet->getStyle("Q$rowNum:S$rowNum")->applyFromArray([
             'font' => ['bold' => true]
         ]);
 
         // Border untuk semua
         $lastRow = $rowNum;
-        $sheet->getStyle("A1:R$lastRow")->applyFromArray([
+        $sheet->getStyle("A1:S$lastRow")->applyFromArray([
             'borders' => [
                 'allBorders' => [
                     'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
@@ -2964,7 +2972,7 @@ class BC40 extends BaseController
         ]);
 
         // Auto size
-        foreach (range('A', 'R') as $col) {
+        foreach (range('A', 'S') as $col) {
             $sheet->getColumnDimension($col)->setAutoSize(true);
         }
 
@@ -2977,7 +2985,7 @@ class BC40 extends BaseController
 
 
         // Border
-        $sheet->getStyle("A1:R$lastRow")->applyFromArray([
+        $sheet->getStyle("A1:S$lastRow")->applyFromArray([
             'borders' => [
                 'allBorders' => [
                     'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,

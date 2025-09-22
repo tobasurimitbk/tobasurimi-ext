@@ -379,6 +379,8 @@ class TandaTerimaSupBB extends BaseController
             $itemTotal += $det->price;
         }
 
+        $noList = array_unique($noList);
+
         // foreach ($taxData as $tax) {
         //     $taxList[] = "{$tax->tax_type}: {$tax->tax_inv_no}";
         //     if ($tax->tax_type == "PPh Pasal 23") {

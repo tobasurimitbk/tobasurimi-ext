@@ -30,26 +30,28 @@ class Attendances extends BaseController
         $res_company = $this->CompaniesModel->search_list(array('deletedAt' => NULL));
         for ($k = 0; $k < count($res_company); $k++) {
             $res_unit = $this->AttendancesUnitModel->getByCompany_id($res_company[$k]["id"]);
-
             for ($i = 0; $i < count($res_unit); $i++) {
-                $this->attendances_id = $res_unit[0]["id"];
-                $this->ip = $res_unit[0]["ip"];
-                $this->unit_key = $res_unit[0]["unit_key"];
-
-                $res = $this->get_data_finger();
-
-                for ($j = 0; $j < count($res); $j++) {
-                    $res_log = $this->AttendancesLogModel->get_by_company_employee_unit_date($res_company[$k]["id"], $res[$j]["id"], $res_unit[$i]["id"], $res[$j]["date"]);
-
-                    if (count($res_log) == 0) {
-                        $values = array(
-                            "company_id"    => $res_company[$k]["id"],
-                            "employees_id"  => $res[$j]["id"],
-                            "attendances_unit_id"   => $res_unit[$i]["id"],
-                            "date_create"   => $res[$j]["date"]
-                        );
-                        $this->AttendancesLogModel->insert($values);
+                $this->attendances_id = $res_unit[$i]["id"];
+                $this->ip = $res_unit[$i]["ip"];
+                $this->unit_key = $res_unit[$i]["unit_key"];
+                if (icmpPing($this->ip, 1)) {
+                    // Ping Berhasil
+                    $res = $this->get_data_finger();
+                    for ($j = 0; $j < count($res); $j++) {
+                        $res_log = $this->AttendancesLogModel->get_by_company_employee_unit_date($res_company[$k]["id"], $res[$j]["id"], $res_unit[$i]["id"], $res[$j]["date"]);
+                        if (count($res_log) == 0) {
+                            $values = array(
+                                "company_id"    => $res_company[$k]["id"],
+                                "employees_id"  => $res[$j]["id"],
+                                "attendances_unit_id"   => $res_unit[$i]["id"],
+                                "date_create"   => $res[$j]["date"]
+                            );
+                            $this->AttendancesLogModel->insert($values);
+                        }
                     }
+                } else {
+                    //
+                    echo "Ping Gagal IP : " . $this->ip;
                 }
             }
         }

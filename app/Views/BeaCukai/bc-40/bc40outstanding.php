@@ -80,6 +80,7 @@
                         <thead class="thead-dark">
                             <tr style="text-align: center;">
                                 <th style="text-align:left;">No</th>
+                                <th style="text-align:left;">Tgl Posting PO</th>
                                 <th style="text-align:left;">Tipe Bahan</th>
                                 <th style="text-align:left;">Departemen</th>
                                 <th style="text-align:left;">Supplier</th>
@@ -133,6 +134,9 @@
         columns: [{
                 data: 'no',
                 width: "5%"
+            },
+            {
+                data: 'updated_at'
             },
             {
                 data: 'tipe_bahan'

@@ -10,7 +10,7 @@
     <div class="section-header">
         <h1 class="title-name"><?= !empty($jamKerja) ? "Update" : "Tambah"; ?> Jam Kerja</h1>
         <div class="col-button-tambah-spp">
-            <a class="btn btn-hide-form btn-discard float-right" href="<?= base_url("jam-kerja"); ?>">
+            <a class="btn btn-hide-form btn-discard float-right" href="<?= base_url("jam-kerja/divisi/" . encrypt($divisi[0]['id'])); ?>">
                 Kembali
             </a>
             <?php if (empty($jamKerja)) : ?>
@@ -45,10 +45,10 @@
                 <div class="row mb-3">
                     <div class="col-sm-3">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <select class="form-select divisiId" id="divisiId" name="divisiId">
+                            <select disabled class="form-select divisiId" id="divisiId" name="divisiId">
                                 <option value=""></option>
                                 <?php foreach ($divisi as $d) : ?>
-                                    <option <?= $jamKerja != null ? ($jamKerja['divisi_id'] == $d['id'] ? 'selected' : '') : '' ?> value="<?= $d['id'] ?>">
+                                    <option selected <?= $jamKerja != null ? ($jamKerja['divisi_id'] == $d['id'] ? 'selected' : '') : '' ?> value="<?= $d['id'] ?>">
                                         <?= $d['divisi']; ?>
                                     </option>
                                 <?php endforeach; ?>
@@ -79,7 +79,7 @@
                             <label for="floatingInput">Batas Jam Keterlambatan Absen Masuk</label>
                         </div>
                     </div>
-                    <div class="col-sm-12">
+                    <!-- <div class="col-sm-12">
                         <div class="form">
                             <label class="mt-2 text-dark">
                                 <b>Jam Kerja Default,</b> (Jika Aktif Maka Akan Menjadi Jam Kerja Default di Departemen yang Sudah Dipilih)
@@ -91,7 +91,7 @@
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    </div> -->
                 </div>
                 <div class="overflow-auto">
                     <table class="table table-bordered">
@@ -240,7 +240,7 @@
     $('#divisiId').select2({
         placeholder: "Pilih Departemen",
         theme: "bootstrap-5",
-        allowClear: true
+        allowClear: false
     }).change(function() {});
 
     $('#shift').select2({
@@ -281,93 +281,51 @@
 
                 if (result.isConfirmed) {
                     const csrf = $(`[name="${csrfToken}"]`);
+                    let divisiId = $('#divisiId option:selected').val();
                     let data = new FormData(document.querySelector("#formPost"));
                     let id = $("input[name='jamKerjaID']").val();
+                    let url = id == '' ? '<?= base_url("jam-kerja/create"); ?>' : '<?= base_url("jam-kerja/update"); ?>';
+                    data.set('divisiId', divisiId);
 
-                    if (id) {
-                        //UPDATE
-                        $.ajax({
-                            url: "<?= base_url("jam-kerja/update"); ?>",
-                            data: data,
-                            beforeSend: function(xhr) {
-                                xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                                setLoading()
-                            },
-                            complete: function() {
-                                stopLoading();
-                            },
-                            method: "POST",
-                            dataType: "json",
-                            processData: false,
-                            contentType: false,
-                            success: function(response) {
-                                if (response.status) {
-                                    Swal.fire({
-                                            icon: 'success',
-                                            title: response.message,
-                                            confirmButtonColor: '#4e73df',
-                                        })
-                                        .then(() => {
-                                            window.location.href = "<?= base_url("jam-kerja"); ?>";
-                                        });
-                                } else {
-                                    Swal.fire({
-                                        icon: 'error',
+                    $.ajax({
+                        url: url,
+                        data: data,
+                        beforeSend: function(xhr) {
+                            xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                            setLoading()
+                        },
+                        complete: function() {
+                            stopLoading();
+                        },
+                        method: "POST",
+                        dataType: "json",
+                        processData: false,
+                        contentType: false,
+                        success: function(response) {
+                            if (response.status) {
+                                Swal.fire({
+                                        icon: 'success',
                                         title: response.message,
                                         confirmButtonColor: '#4e73df',
+                                    })
+                                    .then(() => {
+                                        window.location.href = "<?= base_url("jam-kerja/divisi/" . encrypt($divisi[0]['id'])); ?>";
                                     });
-                                }
+                            } else {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: response.message,
+                                    confirmButtonColor: '#4e73df',
+                                });
+                            }
 
-                            },
+                        },
 
-                        });
-                    } else {
-                        // INSERT
-                        $.ajax({
-                            url: "<?= base_url("jam-kerja/create"); ?>",
-                            data: data,
-                            beforeSend: function(xhr) {
-                                xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                                setLoading()
-                            },
-                            complete: function() {
-                                stopLoading();
-                            },
-                            method: "POST",
-                            dataType: "json",
-                            processData: false,
-                            contentType: false,
-                            success: function(response) {
-                                if (response.status) {
-                                    Swal.fire({
-                                            icon: 'success',
-                                            title: response.message,
-                                            confirmButtonColor: '#4e73df',
-                                        })
-                                        .then(() => {
-                                            window.location.href = "<?= base_url("jam-kerja"); ?>";
-                                        });
-                                } else {
-                                    Swal.fire({
-                                        icon: 'error',
-                                        title: response.message,
-                                        confirmButtonColor: '#4e73df',
-                                    });
-                                }
-
-                            },
-
-                        });
-                    }
-
-
+                    });
                 }
 
             })
-            stopLoading();
-        } else {
-            stopLoading();
-        }
+        } else {}
     });
 
     $(function() {

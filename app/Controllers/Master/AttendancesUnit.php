@@ -2,10 +2,12 @@
 
 namespace App\Controllers\Master;
 
+use App\Controllers\API\Employees;
 use App\Controllers\BaseController;
 use App\Models\AttendancesUnitModel;
 use App\Models\EmployeesModel;
 use App\Models\EmployeesFingerModel;
+use Exception;
 
 class AttendancesUnit extends BaseController
 {
@@ -15,6 +17,7 @@ class AttendancesUnit extends BaseController
     protected $EmployeesModel;
     protected $EmployeesFingerModel;
     protected $maxTimeOut = 5; // Maksimal timeout 5 detik
+    protected $EmployeesController;
 
     public function __construct()
     {
@@ -23,6 +26,7 @@ class AttendancesUnit extends BaseController
         $this->AttendancesUnitModel = new AttendancesUnitModel();
         $this->EmployeesModel = new EmployeesModel();
         $this->EmployeesFingerModel = new EmployeesFingerModel();
+        $this->EmployeesController = new Employees();
     }
 
     public function ListData()
@@ -380,6 +384,44 @@ class AttendancesUnit extends BaseController
                 'message'  => $isAlive ? 'Fingerprint Terhubung dengan Aplikasi' : 'Fingerprint Gagal terhubung dengan Aplikasi'
             ]
         ]);
+    }
+
+    public function resetDataFinger()
+    {
+        try {
+            $id = $this->request->getVar('id');
+            $attendanceUnit = $this->AttendancesUnitModel->where('id', $id)->first();
+            $ip = $attendanceUnit['ip'];
+            $unitKey = $attendanceUnit['unit_key'];
+            $isAlive = icmpPing($ip, 2);
+
+            if (!$isAlive) {
+                return response()->setJSON([
+                    'status' => false,
+                    'message' => "Mesin finger tidak terhubung",
+                    'token' => csrf_hash()
+                ]);
+            }
+
+            $res = $this->EmployeesController->clear_data_finger($ip, $unitKey);
+            if ($res == true) {
+                $message = "Log absensi di mesin finger berhasil dihapus";
+            } else {
+                $message = "Gagal hapus Log absensi mesin finger";
+            }
+
+            return response()->setJSON([
+                'status' => $res,
+                'message' => $message,
+                'token' => csrf_hash()
+            ]);
+        } catch (Exception $e) {
+            return response()->setJSON([
+                'status' => false,
+                'message' => $e->getMessage(),
+                'token' => csrf_hash()
+            ]);
+        }
     }
 
     public function dropdownData()

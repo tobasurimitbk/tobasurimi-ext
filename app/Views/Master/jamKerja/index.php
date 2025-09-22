@@ -4,12 +4,18 @@
 <!-- Begin Page Content -->
 <section class="section">
     <div class="section-header">
-        <h1>Jam Kerja</h1>
-        <?php if (can('Personalia', 'Jam Kerja', 'c')) : ?>
-            <a class="btn btn-show-form btn-add float-right" href="<?= base_url("jam-kerja/create"); ?>">
-                <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
+        <h1 class="title-name">Jam Kerja</h1>
+        <div class="col-button-tambah-spp">
+
+            <a class="btn btn-hide-form btn-discard float-right" href="<?= base_url("jam-kerja"); ?>">
+                Kembali
             </a>
-        <?php endif; ?>
+            <?php if (can('Personalia', 'Jam Kerja', 'c')) : ?>
+                <a class="btn btn-show-form btn-save float-right btn-submit" href="<?= base_url("jam-kerja/create/divisi/" . encrypt($divisis[0]['id'])); ?>">
+                    <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
+                </a>
+            <?php endif; ?>
+        </div>
     </div>
     <?= csrf_field() ?>
 
@@ -18,10 +24,10 @@
             <div class="row justify-content-end">
                 <div class="col-md-3">
                     <div class="form-floating mb-3">
-                        <select class="form-select divisi_id" name="divisi_id" id="divisi_id">
+                        <select disabled class="form-select divisi_id" name="divisi_id" id="divisi_id">
                             <option value=""></option>
                             <?php foreach ($divisis as $divisi) : ?>
-                                <option value="<?= $divisi['id']; ?>"><?= $divisi['divisi']; ?></option>
+                                <option selected value="<?= $divisi['id']; ?>"><?= $divisi['divisi']; ?></option>
                             <?php endforeach; ?>
                         </select>
                         <label for="floatingInput">Filter Departemen</label>
@@ -41,7 +47,6 @@
                         <thead class="thead-dark">
                             <tr>
                                 <th style="width: 10px;" class="sort">No</th>
-                                <th onclick="changeSort('divisi_id')" class="sort">Departemen</th>
                                 <th onclick="changeSort('jenis')" class="sort">Jenis Jam Kerja</th>
                                 <th onclick="changeSort('shift')" class="sort">Shift</th>
                                 <th onclick="changeSort('jam_terlambat')" class="sort">Jam Masuk</th>
@@ -74,7 +79,7 @@
         $('.divisi_id').select2({
             placeholder: "Filter Departemen",
             theme: "bootstrap-5",
-            allowClear: true
+            allowClear: false
         }).change(function(e) {
             e.preventDefault();
             table.ajax.reload();
@@ -139,9 +144,6 @@
             className: "text-center",
             sortable: false,
             orderable: false,
-        }, {
-            data: "divisi",
-            className: "text-left"
         }, {
             data: "jenis",
             className: "text-left"

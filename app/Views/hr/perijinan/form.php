@@ -10,19 +10,27 @@
 <!-- Begin Page Content -->
 <section class="section">
     <div class="section-header">
-        <h1 class="title-name"><?= !empty($data) ? "Ubah" : "Tambah"; ?> Form Perizinan</h1>
+        <h1 class="title-name"><?= !empty($data) ? "Update" : "Tambah"; ?> Form Perizinan</h1>
         <div class="col-button-tambah-spp">
             <a class="btn btn-hide-form btn-discard float-right" href="<?= base_url("form-perijinan"); ?>">
                 Kembali
             </a>
             <?php if (!empty($formPerijinan)) : ?>
-                <a href="#" class="btn btn-hapus delete-parent float-right delete-perizinan" data-kode="<?= $formPerijinan['kode'] ?>">
-                    Hapus
-                </a>
+                <?php if (can('Personalia', 'Form Perijinan', 'd')): ?>
+                    <a href="#" class="btn btn-hapus delete-parent float-right delete-perizinan" data-kode="<?= $formPerijinan['kode'] ?>">
+                        Hapus
+                    </a>
+                <?php endif; ?>
+                <?php if (can('Personalia', 'Form Perijinan', 'u')): ?>
+                    <button class="btn btn-show-form btn-save float-right btn-submit">
+                        Update
+                    </button>
+                <?php endif; ?>
+            <?php else: ?>
+                <button class="btn btn-show-form btn-save float-right btn-submit">
+                    Simpan
+                </button>
             <?php endif; ?>
-            <button class="btn btn-show-form btn-save float-right btn-submit">
-                Simpan
-            </button>
         </div>
     </div>
     <div class="card">
@@ -64,14 +72,14 @@
 
                     <div class="col-md-3">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input value="<?= (!empty($formPerijinan)) ? $mulai : "" ?>" autocomplete="one-time-code" type="date" class="form-control start_date" id="start_date" name="start_date" <?= !empty($data) ? 'disabled=true' :  ''; ?> placeholder="Tanggal mulai">
+                            <input value="<?= (!empty($formPerijinan)) ? date('d/m/Y', strtotime($mulai)) : "" ?>" autocomplete="one-time-code" type="text" class="form-control start_date" id="start_date" name="start_date" <?= !empty($data) ? 'disabled=true' :  ''; ?> placeholder="Tanggal mulai">
                             <label for="floatingInput">Tanggal mulai</label>
                         </div>
                     </div>
 
                     <div class="col-md-3">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input value="<?= (!empty($formPerijinan)) ? $selesai : "" ?>" autocomplete="one-time-code" type="date" class="form-control end_date" id="end_date" name="end_date" <?= !empty($data) ? 'disabled=true' : ''; ?> placeholder="Tanggal akhir">
+                            <input value="<?= (!empty($formPerijinan)) ? date('d/m/Y', strtotime($selesai)) : "" ?>" autocomplete="one-time-code" type="text" class="form-control end_date" id="end_date" name="end_date" <?= !empty($data) ? 'disabled=true' : ''; ?> placeholder="Tanggal akhir">
                             <label for="floatingInput">Tanggal akhir</label>
                         </div>
                     </div>
@@ -93,7 +101,7 @@
                     <div class="col-md-6">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <textarea autocomplete="one-time-code" class="form-control reason text-area-all" id="reason" name="reason" placeholder="Keterangan"><?= (!empty($formPerijinan) ? $formPerijinan['reason'] : "") ?></textarea>
-                            <label for="floatingInput">Keterangan</label>
+                            <label for="floatingInput">Keterangan (Opsional)</label>
                         </div>
                     </div>
                     <?php if (!empty($formPerijinan)) : ?>
@@ -120,80 +128,42 @@
 <script>
     const csrfToken = '<?= csrf_token() ?>';
 
-    $(document).ready(function() {
-        // EMPLOYEE
-        $('.employee_id').select2({
-            placeholder: "Pilih Karyawan",
-            theme: "bootstrap-5",
-        })
+    // EMPLOYEE
+    $('.employee_id').select2({
+        placeholder: "Pilih Karyawan",
+        theme: "bootstrap-5",
+    });
 
-        //CSS SELECT2 FLOATING LABEL
-        $('.employee_id')
-            .parent('div')
-            .children('span')
-            .children('span')
-            .children('span')
-            .css('height', ' calc(3.5rem + 2px)');
+    // STATUS
+    $('.status').select2({
+        placeholder: "Pilih Status Perizinan",
+        theme: "bootstrap-5"
+    });
 
-        $('.employee_id')
-            .parent('div')
-            .children('span')
-            .children('span')
-            .children('span')
-            .children('span')
-            .css('margin-top', '22px').css('margin-left', '-7px');
+    $('.division_id').select2({
+        placeholder: "Pilih Departemen",
+        theme: "bootstrap-5"
+    });
 
-        $('.employee_id')
-            .parent('div')
-            .find('label')
-            .css('z-index', '1');
+    $('.division_id,.status,.employee_id')
+        .parent('div')
+        .children('span')
+        .children('span')
+        .children('span')
+        .children('span')
+        .css('margin-top', '22px').css('margin-left', '-7px');
 
-        // STATUS
-        $('.status').select2({
-            placeholder: "Pilih Status Perizinan",
-            theme: "bootstrap-5"
-        })
+    $('.division_id,.status,.employee_id')
+        .parent('div')
+        .find('label')
+        .css('z-index', '1');
 
-        //CSS SELECT2 FLOATING LABEL
-        $('.status')
-            .parent('div')
-            .children('span')
-            .children('span')
-            .children('span')
-            .css('height', ' calc(3.5rem + 2px)');
-
-        $('.status')
-            .parent('div')
-            .children('span')
-            .children('span')
-            .children('span')
-            .children('span')
-            .css('margin-top', '22px').css('margin-left', '-7px');
-
-        $('.status')
-            .parent('div')
-            .find('label')
-            .css('z-index', '1');
-
-        $('.division_id').select2({
-            placeholder: "Pilih Departemen",
-            theme: "bootstrap-5"
-        });
-
-        $('.division_id')
-            .parent('div')
-            .children('span')
-            .children('span')
-            .children('span')
-            .children('span')
-            .css('margin-top', '22px').css('margin-left', '-7px');
-
-        $('.division_id')
-            .parent('div')
-            .find('label')
-            .css('z-index', '1');
-    })
-
+    $("#start_date,#end_date").datepicker({
+        todayHighlight: true,
+        format: "dd/mm/yyyy",
+        orientation: "bottom auto",
+        autoclose: true
+    });
     var validator = $(".create-form").validate({
         rules: {
             division_id: {
@@ -265,99 +235,44 @@
             }).then((result) => {
                 if (result.isConfirmed) {
                     const csrf = $(`[name="${csrfToken}"]`);
-                    setLoading()
                     let data = new FormData(document.querySelector(".create-form"));
-
                     let kode = $(".kode").val();
-
-                    // UPDATE
-                    if (kode) {
-                        $.ajax({
-                            url: "<?= base_url("form-perijinan/update"); ?>",
-                            data: data,
-                            beforeSend: function(xhr) {
-                                xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                            },
-                            method: "POST",
-                            dataType: "json",
-                            processData: false,
-                            contentType: false,
-                            success: function(response) {
-                                csrf.val(response.token);
-                                if (response.status) {
-                                    stopLoading()
-                                    Swal.fire({
-                                            icon: 'success',
-                                            title: response.message,
-                                            confirmButtonColor: '#4e73df',
-                                        })
-                                        .then(() => {
-                                            location.replace(`<?= base_url("form-perijinan/id"); ?>/${response.kode}`);
-                                        })
-                                } else {
-                                    Swal.fire({
-                                        icon: 'error',
+                    let url = kode == '' ? "<?= base_url("form-perijinan/save"); ?>" : "<?= base_url("form-perijinan/update"); ?>";
+                    $.ajax({
+                        url: url,
+                        data: data,
+                        beforeSend: function(xhr) {
+                            setLoading();
+                            xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                        },
+                        complete: function() {
+                            stopLoading();
+                        },
+                        method: "POST",
+                        dataType: "json",
+                        processData: false,
+                        contentType: false,
+                        success: function(response) {
+                            csrf.val(response.token);
+                            if (response.status) {
+                                stopLoading()
+                                Swal.fire({
+                                        icon: 'success',
                                         title: response.message,
                                         confirmButtonColor: '#4e73df',
                                     })
-                                    stopLoading()
-                                }
-                            },
-                            onError: function(response) {
-                                csrf.val(response.token);
-                                Swal.fire({
-                                    icon: 'error',
-                                    title: 'Data Gagal Disimpan, coba Lagi',
-                                    confirmButtonColor: '#4e73df',
-                                })
-                                stopLoading()
-                            }
-                        });
-                    }
-                    // CREATE
-                    else {
-                        $.ajax({
-                            url: "<?= base_url("form-perijinan/save"); ?>",
-                            data: data,
-                            beforeSend: function(xhr) {
-                                xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                            },
-                            method: "POST",
-                            dataType: "json",
-                            processData: false,
-                            contentType: false,
-                            success: function(response) {
-                                csrf.val(response.token);
-                                if (response.status) {
-                                    stopLoading()
-                                    Swal.fire({
-                                            icon: 'success',
-                                            title: response.message,
-                                            confirmButtonColor: '#4e73df',
-                                        })
-                                        .then(() => {
-                                            window.location.href = "<?= base_url("form-perijinan"); ?>";
-                                        })
-                                } else {
-                                    Swal.fire({
-                                        icon: 'error',
-                                        title: response.message,
-                                        confirmButtonColor: '#4e73df',
+                                    .then(() => {
+                                        window.location.href = "<?= base_url("form-perijinan"); ?>";
                                     })
-                                    stopLoading()
-                                }
-                            },
-                            onError: function(response) {
-                                csrf.val(response.token);
+                            } else {
                                 Swal.fire({
                                     icon: 'error',
-                                    title: 'Data Gagal Disimpan, coba Lagi',
+                                    title: response.message,
                                     confirmButtonColor: '#4e73df',
                                 })
-                                stopLoading()
                             }
-                        });
-                    }
+                        },
+                    });
                 }
             })
         }
@@ -374,56 +289,51 @@
             confirmButtonText: 'Hapus',
             cancelButtonText: 'Kembali',
         }).then((result) => {
-            setLoading()
-            // csrf
-            const csrfToken = '<?= csrf_token() ?>';
-            const csrf = $(`[name="${csrfToken}"]`);
-            var kode = $(this).data('kode');
+            if (result.isConfirmed) {
+                // csrf
+                const csrfToken = '<?= csrf_token() ?>';
+                const csrf = $(`[name="${csrfToken}"]`);
+                var kode = $(this).data('kode');
 
-            var formData = new FormData();
-            formData.append('kode', kode);
+                var formData = new FormData();
+                formData.append('kode', kode);
 
-            $.ajax({
-                url: "<?= base_url("form-perijinan/delete"); ?>",
-                data: formData,
-                beforeSend: function(xhr) {
-                    xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                },
-                method: "POST",
-                dataType: "json",
-                processData: false,
-                contentType: false,
-                success: function(response) {
-                    csrf.val(response.token);
-                    if (response.status) {
-                        stopLoading()
-                        Swal.fire({
-                                icon: 'success',
+                $.ajax({
+                    url: "<?= base_url("form-perijinan/delete"); ?>",
+                    data: formData,
+                    beforeSend: function(xhr) {
+                        setLoading();
+                        xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                    },
+                    complete: function() {
+                        stopLoading();
+                    },
+                    method: "POST",
+                    dataType: "json",
+                    processData: false,
+                    contentType: false,
+                    success: function(response) {
+                        csrf.val(response.token);
+                        if (response.status) {
+                            Swal.fire({
+                                    icon: 'success',
+                                    title: response.message,
+                                    confirmButtonColor: '#4e73df',
+                                })
+                                .then(() => {
+                                    window.location.href = "<?= base_url("form-perijinan"); ?>";
+                                });
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
                                 title: response.message,
                                 confirmButtonColor: '#4e73df',
                             })
-                            .then(() => {
-                                window.location.href = "<?= base_url("form-perijinan"); ?>";
-                            });
-                    } else {
-                        Swal.fire({
-                            icon: 'error',
-                            title: response.message,
-                            confirmButtonColor: '#4e73df',
-                        })
-                        stopLoading()
+                        }
                     }
-                },
-                onError: function(response) {
-                    csrf.val(response.token);
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Perizinan gagal dihapus, coba Lagi',
-                        confirmButtonColor: '#4e73df',
-                    })
-                    stopLoading()
-                }
-            });
+                });
+            }
+
 
         });
     });
@@ -439,7 +349,11 @@
             url: "<?= base_url("form-perijinan/employees"); ?>",
             data: formData,
             beforeSend: function(xhr) {
+                setLoading();
                 xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+            },
+            complete: function() {
+                stopLoading();
             },
             method: "POST",
             dataType: "json",
@@ -459,7 +373,6 @@
             },
             onError: function(response) {
                 csrf.val(response.token);
-
             }
         });
 
