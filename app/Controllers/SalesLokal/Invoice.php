@@ -874,75 +874,100 @@ class Invoice extends BaseController
 
     private function getDocNumberList(string $documentType, $customer_id): array
     {
-        $documentList = [];
-        // exit;
+        $usedDocs = $this->SalesOrderInvoiceModel
+            ->select('document_id')
+            ->where('id_customer', $customer_id)
+            ->findAll();
 
+        $usedIds = [];
+        foreach ($usedDocs as $u) {
+
+            if (!empty($u['document_id'])) {
+                // pastikan ke array numerik
+                $ids = is_array($u['document_id'])
+                    ? $u['document_id']
+                    : json_decode($u['document_id'], true);
+                if (is_array($ids)) {
+                    $usedIds = array_merge($usedIds, $ids);
+                }
+            }
+        }
+        $usedIds = array_unique($usedIds);
+
+        // ---------- ambil dokumen ----------
         if ($documentType === 'pesanan') {
             $documentList = $this->SalesOrderModel->asObject()
-                ->select('sales_order.id, 
-                sales_order.no_sales_order AS doc_no, 
-                sales_order.id_company, 
+                ->select('
+                sales_order.id,
+                sales_order.no_sales_order AS doc_no,
+                sales_order.id_company,
                 sales_order.no_po,
                 sales_order.keterangan,
-                sales_order.payment_terms as termin,
-                sales_order.jenis_penjualan as jenis_penjualan,
-                employees.name as salesName
-                ')
+                sales_order.payment_terms AS termin,
+                sales_order.jenis_penjualan AS jenis_penjualan,
+                employees.name AS salesName
+            ')
                 ->join('sales_order_detail', 'sales_order_detail.id_sales_order = sales_order.id')
                 ->join('employees', 'employees.id = sales_order.sales_id', 'left')
                 ->where('sales_order.id_customer', $customer_id)
-                ->where('sales_order.surat_jalan_so_id', NULL)
+                ->where('sales_order.surat_jalan_so_id', null)
                 ->where('sales_order_detail.qty_sekarang !=', 0)
-                // ->where('sales_order.id_company', $this->this_company_id)
                 ->groupBy('sales_order.no_sales_order')
                 ->findAll();
         } else { // pengiriman
             $documentList1 = $this->SuratJalanModel->asObject()
-                ->select('surat_jalan_so.id, 
-                surat_jalan_so.no_surat_jalan AS doc_no, 
+                ->select('
+                surat_jalan_so.id,
+                surat_jalan_so.no_surat_jalan AS doc_no,
                 surat_jalan_so.id_company,
                 surat_jalan_so.no_po,
-                surat_jalan_so.note as keterangan,
-                surat_jalan_so.terms as termin,
-                sales_order.jenis_penjualan as jenis_penjualan,
-                employees.name as salesName
-                ')
+                surat_jalan_so.note AS keterangan,
+                surat_jalan_so.terms AS termin,
+                sales_order.jenis_penjualan AS jenis_penjualan,
+                employees.name AS salesName
+            ')
                 ->join('sales_order', 'sales_order.surat_jalan_so_id = surat_jalan_so.id', 'left')
                 ->join('sales_order_detail', 'sales_order_detail.id_sales_order = sales_order.id')
                 ->join('employees', 'employees.id = sales_order.sales_id', 'left')
                 ->where('sales_order.id_customer', $customer_id)
                 ->where('sales_order_detail.qty_sekarang !=', 0)
-                // ->where('sales_order.id_company', $this->this_company_id)
                 ->groupBy('surat_jalan_so.no_surat_jalan')
                 ->findAll();
+
             $documentList2 = $this->SuratJalanModel->asObject()
-                ->select('surat_jalan_so.id, 
-                surat_jalan_so.no_surat_jalan AS doc_no, 
+                ->select('
+                surat_jalan_so.id,
+                surat_jalan_so.no_surat_jalan AS doc_no,
                 surat_jalan_so.id_company,
                 surat_jalan_so.no_po,
-                surat_jalan_so.note as keterangan,
-                surat_jalan_so.terms as termin,
-                sales_order.jenis_penjualan as jenis_penjualan,
-                employees.name as salesName
-                ')
+                surat_jalan_so.note AS keterangan,
+                surat_jalan_so.terms AS termin,
+                sales_order.jenis_penjualan AS jenis_penjualan,
+                employees.name AS salesName
+            ')
                 ->join('surat_jalan_so_detail', 'surat_jalan_so_detail.id_surat_jalan = surat_jalan_so.id', 'left')
                 ->join('sales_order', 'sales_order.surat_jalan_so_id = surat_jalan_so_detail.id_sales_order', 'left')
                 ->join('employees', 'employees.id = sales_order.sales_id', 'left')
                 ->where('surat_jalan_so.id_customer', $customer_id)
                 ->where('surat_jalan_so_detail.qty !=', 0)
-                // ->where('sales_order.id_company', $this->this_company_id)
                 ->groupBy('surat_jalan_so.no_surat_jalan')
                 ->findAll();
 
-            // Gabungkan & hilangkan duplikat berdasarkan id
+            // Gabung dan hilangkan duplikat
             $merged = [];
             foreach (array_merge($documentList1, $documentList2) as $row) {
-                $merged[$row->id] = $row; // gunakan id sebagai key agar otomatis unik
+                $merged[$row->id] = $row;
             }
-
             $documentList = array_values($merged);
         }
 
+        // ---------- filter agar id yg sudah dipakai invoice tidak muncul ----------
+        if (!empty($usedIds)) {
+            $documentList = array_values(array_filter(
+                $documentList,
+                fn($d) => !in_array($d->id, $usedIds)
+            ));
+        }
 
         return $documentList;
     }
