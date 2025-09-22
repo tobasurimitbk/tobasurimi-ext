@@ -242,22 +242,20 @@ class BukuBesar extends BaseController
                         [$resultJurnalUmum, $saldoLama] = $fetchJurnalData([$subId]);
 
                         // Gunakan key komposit supaya akun serupa di company berbeda tidak tercampur
-                        $key = ($subAccount['company'] ?? 'company') . '|' . ($subAccount['nama_sub'] ?? '') . '|' . ($subAccount['no_sub'] ?? '');
-
+                        $key = $subAccount['no_sub'] ?? '';
                         if (!isset($result[$key])) {
                             $result[$key] = [
                                 'id' => $subAccount['id'],
                                 'number' => $subAccount['no_sub'],
-                                'company' => $subAccount['company'] ?? null,
                                 'name' => $subAccount['nama_sub'],
                                 'saldo_lama' => $saldoLama,
                                 'result' => $resultJurnalUmum,
                             ];
                         } else {
-                            // tambahkan saldo dan merge hasil jurnal unik
                             $result[$key]['saldo_lama'] += $saldoLama;
                             $result[$key]['result'] = $mergeUniqueJurnal($result[$key]['result'], $resultJurnalUmum);
                         }
+
                     }
                 } else {
                     // Header account
@@ -286,13 +284,11 @@ class BukuBesar extends BaseController
                     // Ambil jurnal sekaligus untuk semua subAccount di header ini (agregat per header)
                     [$resultJurnalUmum, $saldoLama] = $fetchJurnalData($subAccountIds);
 
-                    $key = ($headerAccount['company'] ?? 'company') . '|' . ($headerAccount['nama_header'] ?? '') . '|' . ($headerAccount['no_header'] ?? '');
-
+                    $key = $headerAccount['no_header'] ?? '';
                     if (!isset($result[$key])) {
                         $result[$key] = [
                             'id' => $headerAccount['id'],
                             'number' => $headerAccount['no_header'],
-                            'company' => $headerAccount['company'] ?? null,
                             'name' => $headerAccount['nama_header'],
                             'saldo_lama' => $saldoLama,
                             'result' => $resultJurnalUmum,
@@ -305,8 +301,6 @@ class BukuBesar extends BaseController
             }
         }
 
-        // var_dump($result);
-        // die;
         return $result;
     }
 

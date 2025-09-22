@@ -3477,6 +3477,97 @@ class JurnalUmum extends BaseController
         }
     }
 
+
+    public function insertDataPembayaranInvoiceInternasional($pembayaranInvoiceId)
+    {
+        $pembayaranInvoice = $this->pembayaranInvoiceModel->where('id', $pembayaranInvoiceId)->first();
+        if ($pembayaranInvoice == null) {
+            return false;
+        }
+
+        $metaDataTypeTransaksi = $this->MetadataModel
+            ->where('name', 'tipe_transaksi')
+            ->where('value', 'PEMBAYARAN')
+            ->first();
+
+        $metaDataValuta = $this->MetadataModel->where('id', $pembayaranInvoice['valas_id'])->first();
+
+        try {
+            $db = Database::connect();
+            $db->transBegin();
+
+            // Data header transaksi jurnal
+            $resultTransaksiJurnal = array(
+                'no_transaksi'      => $pembayaranInvoice['no_pembayaran'],
+                'tanggal_transaksi' => $pembayaranInvoice['tanggal'],
+                'total_debit'       => $pembayaranInvoice['total_bayar'],
+                'total_kredit'      => $pembayaranInvoice['total_bayar'],
+                'metode_input'      => 'system',
+                'type_transaksi'    => $metaDataTypeTransaksi['id'],
+                'valas'             => $metaDataValuta['value'],
+                'uraian_transaksi'  => $pembayaranInvoice['pembayaran_dari']
+            );
+
+            $id_transaksi_jurnal = $this->transaksiJurnalModel->insertTransaksiJurnal($resultTransaksiJurnal);
+
+            $result = array();
+
+            // --- Debit : AKUN KAS ---
+            if ($pembayaranInvoice['akun_kas'] != null) {
+                $result[] = array(
+                    'id_transaksi'    => $id_transaksi_jurnal,
+                    'company_id'      => $this->this_company_id,
+                    'divisi_id'       => $pembayaranInvoice['divisi_id'],
+                    'id_coa'          => $pembayaranInvoice['akun_kas'],
+                    'tanggal_jurnal'  => $resultTransaksiJurnal['tanggal_transaksi'],
+                    'debit'           => $pembayaranInvoice['total_bayar'],
+                    'kredit'          => 0,
+                    'valas'           => $metaDataValuta['id'],
+                    'kurs'            => $pembayaranInvoice['kurs_sekarang'],
+                    'keterangan'      => $pembayaranInvoice['keterangan'],
+                    'id_inputer'      => session()->get("login")->user_id
+                );
+            }
+
+            // --- Kredit : AKUN SELISIH (jika ada) ---
+            if ($pembayaranInvoice['akun_selisih'] != null) {
+                $result[] = array(
+                    'id_transaksi'    => $id_transaksi_jurnal,
+                    'company_id'      => $this->this_company_id,
+                    'divisi_id'       => $pembayaranInvoice['divisi_id'],
+                    'id_coa'          => $pembayaranInvoice['akun_selisih'],
+                    'tanggal_jurnal'  => $resultTransaksiJurnal['tanggal_transaksi'],
+                    'debit'           => 0,
+                    'kredit'          => $pembayaranInvoice['total_bayar'],
+                    'valas'           => $metaDataValuta['id'],
+                    'kurs'            => $pembayaranInvoice['kurs_sekarang'],
+                    'keterangan'      => $pembayaranInvoice['keterangan'],
+                    'id_inputer'      => session()->get("login")->user_id
+                );
+            }
+
+            // Update total di Jurnal
+            $this->transaksiJurnalModel->update($id_transaksi_jurnal, [
+                'total_debit'  => $pembayaranInvoice['total_bayar'],
+                'total_kredit' => $pembayaranInvoice['total_bayar'],
+            ]);
+
+            if (count($result) > 0) {
+                $this->jurnalUmumModel->insertJurnalBatch($result);
+                $db->transCommit();
+                return true;
+            } else {
+                $db->transRollback();
+                return false;
+            }
+        } catch (Exception $e) {
+            $db->transRollback();
+            \var_dump($e->getMessage(), $e->getLine());
+            return false;
+        }
+    }
+
+
     public function fix()
     {
         $data = $this->transaksiJurnalModel->select('
