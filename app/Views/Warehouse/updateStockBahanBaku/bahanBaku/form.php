@@ -362,7 +362,7 @@
         // LIST DOKUMEN PABEAN
         // getListDokumenPabean();
         getListBarangPo();
-        <?php if ($po) : ?>
+        <?php if (!empty($po)) : ?>
              getListBarangPoAlreadyHaveKotor();
         <?php endif; ?>
     });
