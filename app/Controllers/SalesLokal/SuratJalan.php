@@ -626,30 +626,58 @@ class SuratJalan extends BaseController
 
     public function dropDownSalesOrder($idCustomer)
     {
+        // --- ambil data customer + termin + sales name ---
         $customerData = $this->CustomerModel->asObject()
             ->select('customers.*, employees.name as salesName, metadata.value AS customerTermin')
             ->join('employees', 'employees.id = customers.sales_id', 'left')
             ->join('metadata', 'metadata.id = customers.termin', 'left')
             ->find($idCustomer);
 
+        // --- ambil semua multiple_id_so dari surat_jalan_so untuk customer ini ---
+        $sjData = $this->SuratJalanModel->asObject()
+            ->select('surat_jalan_so.multiple_id_so')
+            ->where('id_customer', $idCustomer)
+            ->findAll();
+
+        // kumpulkan id sales_order yang sudah ada di multiple_id_so
+        $usedSoIds = [];
+        foreach ($sjData as $row) {
+            if (!empty($row->multiple_id_so)) {
+                // multiple_id_so disimpan sebagai JSON string, mis: ["2","5"]
+                $ids = json_decode($row->multiple_id_so, true);
+                if (is_array($ids)) {
+                    $usedSoIds = array_merge($usedSoIds, $ids);
+                }
+            }
+        }
+        $usedSoIds = array_unique($usedSoIds);
+
+        // --- kondisi dasar Sales Order ---
         $condition = [
-            'id_customer'               => $idCustomer,
-            'tipe_sales_order'          => 'LOKAL',
-            // "sales_order.id_company"    => $this->this_company_id,
-            // 'posting'         => 1,
-            'surat_jalan_so_id'         => null,
-            'sales_order_invoice_id'    => null
+            'id_customer'            => $idCustomer,
+            'tipe_sales_order'       => 'LOKAL',
+            'surat_jalan_so_id'      => null,
+            'sales_order_invoice_id' => null,
+            // 'sales_order.id_company' => $this->this_company_id,
+            // 'posting'               => 1,
         ];
-        $soList = $this->SalesOrderModel->asObject()
+
+        // --- query Sales Order yang belum dipakai & tidak ada di multiple_id_so ---
+        $soQuery = $this->SalesOrderModel->asObject()
             ->where($condition)
             ->select('sales_order.*, metadata.value AS customerTermin, CONCAT(employees.nip , " - ", employees.name) AS salesName')
             ->join('metadata', 'metadata.id = sales_order.payment_terms', 'left')
-            ->join('employees', 'employees.id = sales_order.sales_id', 'left')
-            ->findAll();
+            ->join('employees', 'employees.id = sales_order.sales_id', 'left');
+
+        if (!empty($usedSoIds)) {
+            $soQuery->whereNotIn('sales_order.id', $usedSoIds);
+        }
+
+        $soList = $soQuery->findAll();
 
         $data = [
-            'customerData'  => $customerData,
-            'soList'        => $soList
+            'customerData' => $customerData,
+            'soList'       => $soList,
         ];
 
         echo json_encode($data);
