@@ -137,6 +137,7 @@ class Invoice extends BaseController
             "sortType"      => $this->request->getGet("sortType"),
             "filter_jenis_dokumen"        => $this->request->getGet("filter_jenis_dokumen"),
             "filter_customer"        => $this->request->getGet("filter_customer"),
+            "filter_paid"        => $this->request->getGet("filter_paid"),
             "dateStart"     => $this->request->getGet("dateStart") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getGet("dateStart")))) : "",
             "dateEnd"       => $this->request->getGet("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getGet("dateEnd")))) : "",
         ];
@@ -158,15 +159,9 @@ class Invoice extends BaseController
             $pembayaranInvoice = $this->pembayaranInvoiceModel->where('invoice_id', $data->id)->where('status_posting', "1")->findAll();
             $statusPembayaranInvoice = "";
 
-            // if ($pembayaranInvoice) {
-            //     $statusPembayaranInvoice = "LUNAS";
-            // } else {
-            //     $statusPembayaranInvoice = "BELUM LUNAS";
-            // }
-
-            if ($data->status_pelunasan = "UNPAID") {
+            if ($data->status_pelunasan == "UNPAID") {
                 $statusPembayaranInvoice = "BELUM LUNAS";
-            } else {
+            } elseif ($data->status_pelunasan == "PAID") {
                 $statusPembayaranInvoice = "LUNAS";
             }
 

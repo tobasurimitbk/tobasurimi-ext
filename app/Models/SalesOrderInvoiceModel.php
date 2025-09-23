@@ -147,6 +147,14 @@ class SalesOrderInvoiceModel extends Model
             $salesOrderInvoiceLokal->where('sales_order_invoice.document_type', 'pesanan');
         }
 
+        if ($addCondition['filter_paid'] == "unpaid") {
+            $salesOrderInvoiceLokal->where('sales_order_invoice.status_pelunasan', 'UNPAID');
+        }
+
+        if ($addCondition['filter_paid'] == "paid") {
+            $salesOrderInvoiceLokal->where('sales_order_invoice.status_pelunasan', 'PAID');
+        }
+
         if ($addCondition['dateStart']) {
             $salesOrderInvoiceLokal->where('sales_order_invoice.tanggal_faktur >=',  $addCondition['dateStart']);
         }
