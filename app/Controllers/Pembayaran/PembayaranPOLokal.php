@@ -496,6 +496,7 @@ class PembayaranPOLokal extends BaseController
                     'tipe' => "BB",
                     "local_po_payment_id"          => $id,
                     "rm_purchase_order_id"         => $l['rm_purchase_order_id'],
+                    "rm_purchase_order_details_id" => $l['rm_purchase_order_detail_id'],
                     "total"                        => number_format($l['total_paid'], 2, '.', ''),
                     "total_pay_pph"                => number_format($l['total_paid_pph'], 2, '.', '')
                 ]);
@@ -1160,6 +1161,9 @@ class PembayaranPOLokal extends BaseController
             "panjar" => $dataPembayaranPanjar,
         ];
 
+    //    var_dump($data['detail']['pembayaranDetail']['bulan']);
+    //    die;
+
         return view('Pembayaran/pembayaranPOLokal/formBahanBaku', $data);
     }
     // PRINT PEMBAYARAN PO BP
@@ -1392,30 +1396,33 @@ class PembayaranPOLokal extends BaseController
         $supplierID = $this->request->getVar('supplierID');
         $poID = json_decode($this->request->getVar('poID'));
         $month = $this->request->getVar('bulan');
-
+        $tipeBayar = $this->request->getVar('tipeBayar');
 
         $localPOPaymentModel = new LocalPOPaymentModel();
 
 
         if (!empty($poID)) {
             // HARIAN
+            $data = $localPOPaymentModel->getListHarianPONotPaid($poID, $supplierID);
+            foreach ($data as &$row) {
+                $row['group_key'] = $row['rm_purchase_order_id']; // Harian group by PO
+            }
             return response()->setJson([
                 'token' => csrf_hash(),
-                'data' => $localPOPaymentModel->getListHarianPONotPaid(
-                    $poID,
-                    $supplierID
-                ),
+                'data' => $data,
             ]);
         } else {
-            // BULANAN (KWITANSI TB)
+            // BULANAN
+            $data = $localPOPaymentModel->getListBulananPONotPaidByLPBNew($supplierID, $month);
+            foreach ($data as &$row) {
+                $row['group_key'] = $row['rm_purchase_order_detail_id']; // Bulanan group by detail
+            }
             return response()->setJson([
                 'token' => csrf_hash(),
-                'data' => $localPOPaymentModel->getListBulananPONotPaidByLPB(
-                    $supplierID,
-                    $month
-                )
+                'data' => $data,
             ]);
         }
+
     }
 
     public function getListBarangLPBPaidBB()
