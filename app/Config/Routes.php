@@ -2091,10 +2091,10 @@ $routes->post('/payroll/update/nominal-keterlambatan-presensi', 'HR\Payroll::upd
 $routes->post('/payroll/update/nominal-gaji-cadangan', 'HR\Payroll::updateNominalGajiPerHariAndCadangan', ['filter' => 'Auth']);
 $routes->post('/payroll/employees', 'HR\Payroll::getEmployeeByDivision', ['filter' => 'Auth']);
 $routes->get('/payroll/print/single/(:segment)', 'HR\Payroll::exportPdfPayrollSingle/$1', ['filter' => 'Auth']);
-$routes->get('/payroll/print/division/(:segment)/(:segment)', 'HR\Payroll::exportPdfPayrollDivision/$1/$2', ['filter' => 'Auth']);
-$routes->get('/payroll/print/detail/(:segment)/(:segment)', 'HR\Payroll::exportPdfPayrollDivisionDetail/$1/$2', ['filter' => 'Auth']);
-$routes->get('/payroll/print/summary/(:segment)/(:segment)', 'HR\Payroll::exportPdfSummary/$1/$2', ['filter' => 'Auth']);
-$routes->get('/payroll/print/potongan/(:segment)/(:segment)', 'HR\Payroll::exportPdfPotongan/$1/$2', ['filter' => 'Auth']);
+$routes->get('/payroll/print/division', 'HR\Payroll::exportPdfPayrollDivision', ['filter' => 'Auth']);
+$routes->get('/payroll/print/detail', 'HR\Payroll::exportPdfPayrollDivisionDetail', ['filter' => 'Auth']);
+$routes->get('/payroll/print/summary', 'HR\Payroll::exportPdfSummary', ['filter' => 'Auth']);
+$routes->get('/payroll/print/potongan', 'HR\Payroll::exportPdfPotongan', ['filter' => 'Auth']);
 
 // pinjaman karyawan
 $routes->get('/pinjaman-karyawan', 'HR\PinjamanKaryawan::index', ['filter' => 'Auth']);

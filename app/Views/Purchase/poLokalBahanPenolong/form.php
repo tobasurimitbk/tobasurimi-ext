@@ -1282,7 +1282,7 @@
                             nama_barang: v.nama_barang,
                             satuan_id: v.satuan_id,
                             nama_satuan: v.nama_satuan,
-                            qty: destroyFormatRupiah(parseFloat(v.qty).toFixed(2)),
+                            qty: destroyFormatRupiah(parseFloat(v.qty)),
                             diskon: destroyFormatRupiah(parseFloat(v.diskon).toFixed(2)),
                             harga_satuan: destroyFormatRupiah(parseFloat(v.harga_satuan).toFixed(2)),
                             biaya_tambahan: destroyFormatRupiah(parseFloat(v.biaya_tambahan).toFixed(2)),

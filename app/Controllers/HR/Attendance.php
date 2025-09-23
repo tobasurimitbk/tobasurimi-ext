@@ -937,6 +937,16 @@ class Attendance extends BaseController
         $attendanceDetail = $this->AttendanceModel->where('periode', $tanggal)
             ->where('employee_id', $employeeID)
             ->first();
+
+        if ($attendanceDetail == null) {
+            return response()->setJSON([
+                'message' => "Data absensi belum digenerate / tidak ada, silahkan generate data personal karyawan tersebut",
+                'status' => false,
+                'token' => csrf_hash()
+            ]);
+        }
+
+
         $employee = $this->EmployeesModel->where('id', $employeeID)->first();
 
         $resultData = [

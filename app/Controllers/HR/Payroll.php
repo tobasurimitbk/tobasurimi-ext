@@ -109,10 +109,10 @@ class Payroll extends BaseController
                 "no" => $no++,
                 "id" => encrypt($p->id),
                 "employee_id" => $p->employee_id,
-                "nip" => $p->employeesNIP,
+                "nip" => $p->nip,
                 "namaBagian" => $p->nama_bagian,
-                "name"  => $p->employeesName,
-                "divisi" => $p->divisiName,
+                "name"  => $p->name,
+                "divisi" => $p->divisi,
                 "hariKerja" => $p->hadir_final . " Hari",
                 "startDate" => date('d/m/Y', strtotime($p->start_date)),
                 "endDate" => date('d/m/Y', strtotime($p->end_date)),
@@ -542,9 +542,11 @@ class Payroll extends BaseController
         exit(0);
     }
 
-    public function exportPdfPayrollDivision($yearMonth, $divisionID)
+    public function exportPdfPayrollDivision()
     {
         $dompdf = new Dompdf();
+        $yearMonth = $this->request->getVar('month');
+        $divisionID = $this->request->getVar('divisi_id');
 
         // set variable
         $divisi = $this->divisiModel->where('id', $divisionID)->first();
@@ -581,9 +583,11 @@ class Payroll extends BaseController
         exit(0);
     }
 
-    public function exportPdfPayrollDivisionDetail($yearMonth, $divisionID)
+    public function exportPdfPayrollDivisionDetail()
     {
         $dompdf = new Dompdf();
+        $yearMonth = $this->request->getVar('month');
+        $divisionID = $this->request->getVar('divisi_id');
 
         $data = [
             'payrollData' => $this->payrollModel->getPayrollDetail($yearMonth, $divisionID, $this->this_company_id)
@@ -597,9 +601,12 @@ class Payroll extends BaseController
         exit(0);
     }
 
-    public function exportPdfSummary($yearMonth, $divisionID)
+    public function exportPdfSummary()
     {
         $dompdf = new Dompdf();
+        $yearMonth = $this->request->getVar('month');
+        $divisionID = $this->request->getVar('divisi_id');
+
         $year = explode("-", $yearMonth)[0];
         $month = explode("-", $yearMonth)[1];
 
@@ -625,9 +632,11 @@ class Payroll extends BaseController
         exit(0);
     }
 
-    public function exportPdfPotongan($yearMonth, $divisionID)
+    public function exportPdfPotongan()
     {
         $dompdf = new Dompdf();
+        $yearMonth = $this->request->getVar('month');
+        $divisionID = $this->request->getVar('divisi_id');
 
         $year = explode("-", $yearMonth)[0];
         $month = explode("-", $yearMonth)[1];

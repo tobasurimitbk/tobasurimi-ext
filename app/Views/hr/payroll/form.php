@@ -10,9 +10,11 @@
             use Carbon\Carbon;
 
             $splitMonthYear = explode("-", $payrollDetail['year_month']); ?>
-            <a class="btn btn-warning btn-print float-right" target="_blank" href="<?= base_url("payroll/print/single/" . encrypt($payrollDetail['id'])); ?>">
-                <i class="fa-solid fa-print"></i> Print
-            </a>
+            <?php if (can('Personalia', 'Payroll', 'p')): ?>
+                <a class="btn btn-warning btn-print float-right" target="_blank" href="<?= base_url("payroll/print/single/" . encrypt($payrollDetail['id'])); ?>">
+                    <i class="fa fa-download"></i> Print
+                </a>
+            <?php endif; ?>
             <a class="btn btn-hide-form btn-discard float-right" href="<?= base_url("payroll?year=" . $splitMonthYear[0] . "&month=" . $splitMonthYear[1]); ?>">
                 Kembali
             </a>

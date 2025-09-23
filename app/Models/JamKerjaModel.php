@@ -74,7 +74,7 @@ class JamKerjaModel extends Model
         if ($addCondition['search']) {
             $dataQry->groupStart();
             $dataQry->like('jam_kerja.jenis', $addCondition['search'])
-                ->orLike('jam_kerja.shift', $addCondition['shift'])
+                ->orLike('jam_kerja.shift', $addCondition['search'])
                 ->orLike('divisis.divisi', $addCondition['search']);
             $dataQry->groupEnd();
         }

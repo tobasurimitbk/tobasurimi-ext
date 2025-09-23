@@ -76,7 +76,14 @@ class PayrollsModel extends Model
         $availableSort = [
             'employees.nip'    => 'employees.nip',
             'employees.name'   => 'employees.name',
-            'divisis.divisi' => 'divisis.divisi',
+            'employees.divisi_id' => 'employees.divisi_id',
+            'employees.bagian_id' => 'employees.bagian_id',
+            'payrolls.start_date' => 'payrolls.start_date',
+            'payrolls.hadir_final' => 'payrolls.hadir_final',
+            'payrolls.nominal_uang_gaji' => 'payrolls.nominal_uang_gaji',
+            'payrolls.nominal_uang_lembur' => 'payrolls.nominal_uang_lembur',
+            'payrolls.nominal_pengurangan_gaji' => 'payrolls.nominal_pengurangan_gaji',
+            'payrolls.nominal_gaji_diterima' => 'payrolls.nominal_gaji_diterima'
         ];
 
         $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
@@ -87,11 +94,9 @@ class PayrollsModel extends Model
 
         $selectQry = "
             payrolls.*,
-            employees.name AS employeesName,
-            employees.nip AS employeesNIP,
-            divisis.divisi AS divisiName,
-            divisis.id AS divisiID,
-            employees.bagian_id AS bagianID,
+            employees.name,
+            employees.nip,
+            divisis.divisi,
             bagian.nama_bagian
             "; // Corrected column names and aliases
 
