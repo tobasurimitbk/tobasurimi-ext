@@ -97,7 +97,7 @@
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <select <?= !empty($poDetail) ? ($poDetail['is_posted'] ? 'disabled' : '') : '' ?> class="form-select division_id" id="division_id" name="division_id" aria-label="Floating label select example">
+                            <select <?= !empty($poDetail) ? ($poDetail['is_posted'] ? 'disabled' : '') : '' ?> class="form-select division_id" id="division_id" name="division_id">
                                 <option value=""></option>
                                 <?php foreach ($divisi as $d) : ?>
                                     <option <?= !empty($poDetail) ? ($poDetail['division_id'] == $d['id'] ? 'selected' : '') : '' ?> value="<?= $d['id'] ?>">
@@ -112,7 +112,7 @@
                 <div class="row">
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <select <?= !empty($poDetail) ? ($poDetail['is_posted'] ? 'disabled' : '') : '' ?> class="form-select supplier_id" id="supplier_id" name="supplier_id" aria-label="Floating label select example">
+                            <select <?= !empty($poDetail) ? ($poDetail['is_posted'] ? 'disabled' : '') : '' ?> class="form-select supplier_id" id="supplier_id" name="supplier_id">
                                 <option value=""></option>
                                 <?php foreach ($supplier as $s) : ?>
                                     <option value="<?= $s['id'] ?>">
@@ -125,7 +125,7 @@
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <select <?= !empty($poDetail) ? ($poDetail['is_posted'] ? 'disabled' : '') : '' ?> class="form-select spp_id" id="spp_id" name="spp_id" aria-label="Floating label select example">
+                            <select <?= !empty($poDetail) ? ($poDetail['is_posted'] ? 'disabled' : '') : '' ?> class="form-select spp_id" id="spp_id" name="spp_id">
                                 <option value=""></option>
                                 <?php if (!empty($dataListSPP)) : ?>
                                     <?php foreach ($dataListSPP as $d) : ?>
@@ -153,25 +153,19 @@
                 </div>
                 <div class="row">
                     <div class="col-md-4">
-                        <div class="form-floating" style="height: 50px;">
-                            <select <?= !empty($poDetail) ? ($poDetail['is_posted'] ? 'disabled' : '') : '' ?> class="form-select status_closed_spp" name="status_closed_spp" id="status_closed_spp">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <select <?= !empty($poDetail) ? ($poDetail['is_posted'] ? 'disabled' : '') : '' ?> class="form-select note" id="note" name="note">
                                 <option value=""></option>
-                                <option <?= !empty($poDetail) ? ($poDetail['status_closed_spp'] == "0" ? 'selected' : '') : '' ?> value="0">OPEN SPP</option>
-                                <option <?= !empty($poDetail) ? ($poDetail['status_closed_spp'] == "1" ? 'selected' : '') : '' ?> value="1">CLOSE SPP</option>
+                                <?php foreach ($status as $s) : ?>
+                                    <option <?= !empty($poDetail) ? ($poDetail['note'] == $s ? 'selected' : '') : '' ?> value="<?= $s ?>"><?= $s ?></option>
+                                <?php endforeach; ?>
                             </select>
-                            <label for="floatingInput" style="z-index: 1;">Tutup SPP</label>
-                        </div>
-                        <small class="mb-3 mt-1"><i>Status Open Berarti SPP Masih Bisa Digunakan Kembali, Status Close Berarti SPP Tidak Dapat Digunakan Kembali</i></small>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="form-floating mb-3" style="height: 50px;">
-                            <input <?= !empty($poDetail) ? ($poDetail['is_posted'] ? 'disabled' : '') : '' ?> autocomplete="one-time-code" value="<?= !empty($poDetail) ? $poDetail['note'] : '' ?>" type="text" class="form-control note" id="note" name="note" placeholder="Catatan (Opsional)">
-                            <label for="floatingInput">Catatan (Opsional)</label>
+                            <label for="floatingInput" style="z-index: 1;">Pilih Catatan (Opsional)</label>
                         </div>
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <select <?= !empty($poDetail) ? ($poDetail['is_posted'] ? 'disabled' : '') : '' ?> class="form-select ppn" name="ppn" id="ppn" aria-label="Floating label select example">
+                            <select <?= !empty($poDetail) ? ($poDetail['is_posted'] ? 'disabled' : '') : '' ?> class="form-select ppn" name="ppn" id="ppn">
                                 <option value=""></option>
                                 <?php foreach ($ppn as $p) : ?>
                                     <?php if (in_array($p['id'], [4, 8, 12, 16])): ?>
@@ -197,7 +191,7 @@
                 <div class="row">
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <select disabled class="form-select barang_id" id="barang_id" name="barang_id" aria-label="Floating label select example">
+                            <select disabled class="form-select barang_id" id="barang_id" name="barang_id">
                                 <option data-barang_id="" data-parent_name="" data-spesifikasi_id="" data-spesifikasi_name="" data-satuan_id="" data-nama_barang="" data-kode_barang="" value=""></option>
                                 <?php foreach ($barang as $s) : ?>
                                     <option
@@ -236,7 +230,7 @@
                 <div class="row">
                     <div class="col-md-4">
                         <div class="form-floating" style="height: 50px;">
-                            <select class="form-select satuan_id" name="satuan_id" id="satuan_id" aria-label="Floating label select example">
+                            <select class="form-select satuan_id" name="satuan_id" id="satuan_id">
                                 <option value=""></option>
                                 <?php foreach ($satuan as $s) : ?>
                                     <option
@@ -318,7 +312,7 @@
 
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <select class="form-select pph" name="pph" id="pph" aria-label="Floating label select example">
+                            <select class="form-select pph" name="pph" id="pph">
                                 <option value=""></option>
                                 <?php foreach ($pph as $p) : ?>
                                     <option value="<?= $p['id'] ?>">
@@ -409,6 +403,14 @@
 
     $('#division_id').select2({
         placeholder: "Pilih Departemen",
+        theme: "bootstrap-5",
+        allowClear: true
+    }).change(function() {
+
+    });
+
+    $('#note').select2({
+        placeholder: "Pilih Keterangan",
         theme: "bootstrap-5",
         allowClear: true
     }).change(function() {

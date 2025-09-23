@@ -502,4 +502,34 @@ class PenerimaanBarangDetailModel extends Model
 
         return $penerimaanBarang;
     }
+
+
+    public function checkAkunCoaLpb($penerimaanBarangId, $divisiId)
+    {
+        $accountBarangModel = new AccountBarangModel();
+
+        $penerimaanBarangDetail =  $this->asArray()
+            ->where('deletedAt', null)
+            ->where('penerimaan_barang_id', $penerimaanBarangId)
+            ->findAll();
+
+        $checkAccount = true;
+        foreach ($penerimaanBarangDetail as $d) {
+            $accountBarang = $accountBarangModel
+                ->where('divisi_id', $divisiId)
+                ->where('barang_master_id', $d['barang_id'])
+                ->where('barang_master_spesifikasi_id', $d['spesifikasi_id'])
+                ->first();
+
+            if ($accountBarang == null) {
+                $checkAccount = false;
+            } else {
+                if ($accountBarang['ap_id'] == null && $accountBarang['ar_id'] == null) {
+                    $checkAccount = false;
+                }
+            }
+        }
+
+        return $checkAccount;
+    }
 }

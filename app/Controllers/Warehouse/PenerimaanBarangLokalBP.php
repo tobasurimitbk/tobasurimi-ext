@@ -70,7 +70,6 @@ class PenerimaanBarangLokalBP extends BaseController
     {
         $this->this_user_id = session()->get("login")->user_id;
         $this->this_company_id = session()->get("login")->this_company_id;
-        $this->penerimaanBarangModel = new PenerimaanBarangModel();
         $this->amPurchaseOrderModel = new AMPurchaseOrderModel();
         $this->amPurchaseOrderDetailModel = new AMPurchaseOrderDetailModel();
         $this->barangMasterModel = new BarangMasterModel();
@@ -151,17 +150,13 @@ class PenerimaanBarangLokalBP extends BaseController
 
         $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
 
+        $penerimaanBarangIds = array_column($penerimaanBarangData['data'], 'id');
+        $akunCoaMap = [];
+        if (count($penerimaanBarangIds) != 0) {
+            $akunCoaMap = $this->getAkunCoaMap($penerimaanBarangIds);
+        }
 
         foreach ($penerimaanBarangData['data'] as $data) {
-            $multiSpp = $this->amPurchaseOrderModel->getSPP(json_decode($data->multiple_po_id));
-            $bc_purchase_order_detail_list = $this->bcPurchaseOrder->like('multiple_lpb_id', $data->id)->where('deletedAt', null)->findAll();
-            $pengembalianBarang = $this->pengembalianBarangModel->where('penerimaan_barang_id', $data->id)->first();
-
-            $sppNo = "";
-            foreach ($multiSpp as $s) {
-                $sppNo .= $s['spp_no'] . ", ";
-            }
-
             array_push($dataPenerimaanBarang, [
                 "no"                    => $no++,
                 "id"                    => encrypt($data->id),
@@ -172,12 +167,12 @@ class PenerimaanBarangLokalBP extends BaseController
                 "createdAt"             => $data->tanggal ? date("d/m/Y", strtotime($data->tanggal)) : "",
                 "supplier_name"         => $data->supplier_name,
                 "itemCount"             => $data->itemCount,
-                "spp_no"                => $sppNo,
+                "spp_no"                => str_replace(',', ', ', str_replace(['[', ']', '"', "\\"], '', $data->multiple_spp_no)),
                 "multiple_po_no"        => str_replace(',', ', ', str_replace(['[', ']', '"', "\\"], '', $data->multiple_po_no)),
                 "status_post"           => $data->status_post,
                 "bc_type"               => $data->bc_type,
-                "in_bc"                 => $bc_purchase_order_detail_list != null ? 'in' : 'out',
-                "retur_status"          => ($pengembalianBarang != null) ? ($pengembalianBarang['status_post'] == "WAITING" ? 0 : 1) : null,
+                "in_bc"                 => $data->bc_purchase_order_id != null ? 'in' : 'out',
+                "akun_coa"              => $akunCoaMap[$data->id] ?? false,
                 "bc_type_name"          => $data->bc_type_name == null ? "NON PABEAN" : $data->bc_type_name
             ]);
         }
@@ -224,15 +219,14 @@ class PenerimaanBarangLokalBP extends BaseController
 
         $no = 1;
 
-        foreach ($penerimaanBarangData['data'] as $data) {
-            $multiSpp = $this->amPurchaseOrderModel->getSPP(json_decode($data->multiple_po_id));
-            $bc_purchase_order_detail_list = $this->bcPurchaseOrder->like('multiple_lpb_id', $data->id)->where('deletedAt', null)->findAll();
-            $pengembalianBarang = $this->pengembalianBarangModel->where('penerimaan_barang_id', $data->id)->first();
+        $penerimaanBarangIds = array_column($penerimaanBarangData['data'], 'id');
+        $akunCoaMap = [];
+        if (count($penerimaanBarangIds) != 0) {
+            $akunCoaMap = $this->getAkunCoaMap($penerimaanBarangIds);
+        }
 
-            $sppNo = "";
-            foreach ($multiSpp as $s) {
-                $sppNo .= $s['spp_no'] . ", ";
-            }
+        foreach ($penerimaanBarangData['data'] as $data) {
+
 
             array_push($dataPenerimaanBarang, [
                 "no"                    => $no++,
@@ -244,12 +238,12 @@ class PenerimaanBarangLokalBP extends BaseController
                 "createdAt"             => $data->tanggal ? date("d/m/Y", strtotime($data->tanggal)) : "",
                 "supplier_name"         => $data->supplier_name,
                 "itemCount"             => $data->itemCount,
-                "spp_no"                => $sppNo,
+                "spp_no"                => str_replace(',', ', ', str_replace(['[', ']', '"', "\\"], '', $data->multiple_spp_no)),
                 "multiple_po_no"        => str_replace(',', ', ', str_replace(['[', ']', '"', "\\"], '', $data->multiple_po_no)),
                 "status_post"           => $data->status_post,
                 "bc_type"               => $data->bc_type,
-                "in_bc"                 => $bc_purchase_order_detail_list != null ? 'in' : 'out',
-                "retur_status"          => ($pengembalianBarang != null) ? ($pengembalianBarang['status_post'] == "WAITING" ? 0 : 1) : null,
+                "in_bc"                 => $data->bc_purchase_order_id != null ? 'in' : 'out',
+                "akun_coa"              => $akunCoaMap[$data->id] ?? false,
                 "bc_type_name"          => $data->bc_type_name == null ? "NON PABEAN" : $data->bc_type_name
             ]);
         }
@@ -295,18 +289,11 @@ class PenerimaanBarangLokalBP extends BaseController
         $no = 1;
 
         foreach ($penerimaanBarangData['data'] as $data) {
-            $multiSpp = $this->amPurchaseOrderModel->getSPP(json_decode($data->multiple_po_id));
-
-            $sppNo = "";
-            foreach ($multiSpp as $s) {
-                $sppNo .= $s['spp_no'] . ", ";
-            }
-
             array_push($dataPenerimaanBarang, [
                 "NO"                    => $no++,
                 "DEPARTEMEN"            => $data->divisi,
                 "NO PENERIMAAN"         => $data->no_penerimaan_barang,
-                "NO SPP"                => $sppNo,
+                "NO SPP"                => str_replace(',', ', ', str_replace(['[', ']', '"', "\\"], '', $data->multiple_spp_no)),
                 "GUDANG"                => $data->warehouse_name,
                 "TANGGAL"               => $data->tanggal ? date("d/m/Y", strtotime($data->tanggal)) : "",
                 "SUPPLIER"              => $data->supplier_name,
@@ -388,108 +375,124 @@ class PenerimaanBarangLokalBP extends BaseController
 
     public function createAction()
     {
-        $barangs = $this->request->getVar('barangs');
+        $db = \Config\Database::connect();
+        try {
+            $db->transBegin();
 
-        // Cek Kekosongan
-        $jml_diterima_lpb = 0;
-        foreach (json_decode($barangs) as $b) {
-            $jml_diterima_lpb += $b->jml_diterima_lpb;
-        }
+            $barangs = $this->request->getVar('barangs');
 
-        if ($jml_diterima_lpb == 0) {
-            return response()->setJSON([
-                'token' => csrf_hash(),
-                'message' => "Isikan minimal satu item barang yang akan diterima",
-                'status' => false
-            ]);
-        }
-
-        $noPenerimaanBarang = $this->request->getVar('no_penerimaan_barang');
-        $tanggal = $this->request->getVar("tanggal_penerimaan_lpb") ? date_format(date_create_from_format("d/m/Y", $this->request->getVar("tanggal_penerimaan_lpb")), "Y-m-d") : "";
-        $checkNoLpb = $this->checkLpbNo($noPenerimaanBarang);
-        if (!$checkNoLpb) {
-            $noPenerimaanBarang = $this->penerimaanBarangModel->get_no(
-                $tanggal,
-                $this->this_company_id,
-                "LOKAL",
-                "PENOLONG"
-            );
-        }
-
-        $first = $this->penerimaanBarangModel->where('company_id', $this->this_company_id)
-            ->where('no_penerimaan_barang', $this->request->getVar('no_penerimaan_barang'))
-            ->where('status_penerimaan', "LOKAL")
-            ->where('tipe_bahan', "PENOLONG")
-            ->first();
-
-        if ($first != null) {
-            return response()->setJSON([
-                'token' => csrf_hash(),
-                'message' => "No Penerimaan Barang Sudah Ada",
-                'status' => false
-            ]);
-        }
-
-        $penerimaanBarangID = $this->penerimaanBarangModel->insert([
-            'company_id' => $this->this_company_id,
-            'bc_type' => $this->request->getVar('aju_document_type'),
-            'supplier_id' => $this->request->getVar('supplier_id'),
-            'divisi_id' => $this->request->getVar('divisi_id'),
-            'kemasan_id' => $this->request->getVar('kemasan_id'),
-            'warehouse_id' => $this->request->getVar('warehouse_id'),
-            'no_penerimaan_barang' => $noPenerimaanBarang,
-            "ongkos_kirim" => $this->request->getVar('ongkos_kirim'),
-            'acceptance_type' => $this->request->getVar('acceptance_type'),
-            'multiple_po_id' => str_replace(['\\"', '\\', '"'], '', json_encode($this->request->getVar('multiple_po_id'))),
-            'multiple_po_no' => $this->request->getVar('multiple_po_no'),
-            'kemasan' => $this->request->getVar('kemasan'),
-            'jumlah_kemasan' => $this->request->getVar('jumlah_kemasan'),
-            'no_surat_jalan' => $this->request->getVar('no_surat_jalan'),
-            'no_invoice' => $this->request->getVar('no_invoice'),
-            "tipe_bahan" => "PENOLONG",
-            "status_post" => "WAITING",
-            "status_penerimaan" => "LOKAL",
-            "tanggal" => $tanggal,
-        ]);
-
-        foreach (json_decode($barangs) as $b) {
-            $poDetail = $this->amPurchaseOrderDetailModel->where('id', $b->am_purchase_order_details_id)->first();
-            $barang = null;
-            if ($poDetail != null) {
-                $barang = $this->barangMasterModel->where('id', $poDetail['barang_id'])->first();
+            // Cek Kekosongan
+            $jml_diterima_lpb = 0;
+            foreach (json_decode($barangs) as $b) {
+                $jml_diterima_lpb += $b->jml_diterima_lpb;
             }
-            if ($b->jml_diterima_lpb != 0) {
-                $this->penerimaanBarangDetailModel->insert([
-                    'purchase_order_id' => $b->am_purchase_order_id,
-                    'purchase_order_details_id' => $b->am_purchase_order_details_id,
-                    'penerimaan_barang_id' => $penerimaanBarangID,
-                    'barang_id' => $barang == null ? 0 : $barang['id'],
-                    'spesifikasi_id' => $poDetail == null ? 0 : $poDetail['spesifikasi_id'],
-                    'unit' => $poDetail == null ? 0 : $poDetail['unit'],
-                    'harga' => $b->harga,
-                    'sub_total' => $b->sub_total,
-                    'qty' => $b->jml_order,
-                    'nama_barang_dok' => $barang == null ? 0 : $barang['barang_name'],
-                    'jml_masuk' => $b->jml_diterima_lpb,
-                    'jml_masuk_konversi' => $b->jml_diterima_lpb_konversi,
-                    'unit_konversi' => $b->satuan_konversi_id,
-                    'keterangan' => $b->keterangan
+
+            if ($jml_diterima_lpb == 0) {
+                return response()->setJSON([
+                    'token' => csrf_hash(),
+                    'message' => "Isikan minimal satu item barang yang akan diterima",
+                    'status' => false
                 ]);
-                // update remeaning di detail po
-                $this->amPurchaseOrderDetailModel->where('id', $b->am_purchase_order_details_id)->where('am_purchase_order_id', $b->am_purchase_order_id)
-                    ->set('remaining_qty', $b->sisa_total)
-                    ->set('qty_diterima', $b->jml_diterima_total)
-                    ->update();
             }
-            $this->accountBarangModel->insertAccountBarang($this->this_company_id, $this->request->getVar('divisi_id'), $barang['id'], $poDetail['spesifikasi_id']);
-        }
 
-        return response()->setJSON([
-            'message' => "Penerimaan barang Lokal BP berhasil disimpan",
-            'token' => csrf_hash(),
-            'status' => true,
-            'id' => encrypt($penerimaanBarangID)
-        ]);
+            $noPenerimaanBarang = $this->request->getVar('no_penerimaan_barang');
+            $tanggal = $this->request->getVar("tanggal_penerimaan_lpb") ? date_format(date_create_from_format("d/m/Y", $this->request->getVar("tanggal_penerimaan_lpb")), "Y-m-d") : "";
+            $checkNoLpb = $this->checkLpbNo($noPenerimaanBarang);
+            if (!$checkNoLpb) {
+                $noPenerimaanBarang = $this->penerimaanBarangModel->get_no(
+                    $tanggal,
+                    $this->this_company_id,
+                    "LOKAL",
+                    "PENOLONG"
+                );
+            }
+
+            $first = $this->penerimaanBarangModel->where('company_id', $this->this_company_id)
+                ->where('no_penerimaan_barang', $this->request->getVar('no_penerimaan_barang'))
+                ->where('status_penerimaan', "LOKAL")
+                ->where('tipe_bahan', "PENOLONG")
+                ->first();
+
+            if ($first != null) {
+                return response()->setJSON([
+                    'token' => csrf_hash(),
+                    'message' => "No Penerimaan Barang Sudah Ada",
+                    'status' => false
+                ]);
+            }
+
+            $penerimaanBarangID = $this->penerimaanBarangModel->insert([
+                'company_id' => $this->this_company_id,
+                'bc_type' => $this->request->getVar('aju_document_type'),
+                'supplier_id' => $this->request->getVar('supplier_id'),
+                'divisi_id' => $this->request->getVar('divisi_id'),
+                'kemasan_id' => $this->request->getVar('kemasan_id'),
+                'warehouse_id' => $this->request->getVar('warehouse_id'),
+                'no_penerimaan_barang' => $noPenerimaanBarang,
+                "ongkos_kirim" => $this->request->getVar('ongkos_kirim'),
+                'acceptance_type' => $this->request->getVar('acceptance_type'),
+                'multiple_po_id' => str_replace(['\\"', '\\', '"'], '', json_encode($this->request->getVar('multiple_po_id'))),
+                'multiple_po_no' => $this->request->getVar('multiple_po_no'),
+                'kemasan' => $this->request->getVar('kemasan'),
+                'jumlah_kemasan' => $this->request->getVar('jumlah_kemasan'),
+                'no_surat_jalan' => $this->request->getVar('no_surat_jalan'),
+                'no_invoice' => $this->request->getVar('no_invoice'),
+                "tipe_bahan" => "PENOLONG",
+                "status_post" => "WAITING",
+                "status_penerimaan" => "LOKAL",
+                "tanggal" => $tanggal,
+            ]);
+
+            foreach (json_decode($barangs) as $b) {
+                $poDetail = $this->amPurchaseOrderDetailModel->where('id', $b->am_purchase_order_details_id)->first();
+                $barang = null;
+                if ($poDetail != null) {
+                    $barang = $this->barangMasterModel->where('id', $poDetail['barang_id'])->first();
+                }
+                if ($b->jml_diterima_lpb != 0) {
+                    $this->penerimaanBarangDetailModel->insert([
+                        'purchase_order_id' => $b->am_purchase_order_id,
+                        'purchase_order_details_id' => $b->am_purchase_order_details_id,
+                        'penerimaan_barang_id' => $penerimaanBarangID,
+                        'barang_id' => $barang == null ? 0 : $barang['id'],
+                        'spesifikasi_id' => $poDetail == null ? 0 : $poDetail['spesifikasi_id'],
+                        'unit' => $poDetail == null ? 0 : $poDetail['unit'],
+                        'harga' => $b->harga,
+                        'sub_total' => $b->sub_total,
+                        'qty' => $b->jml_order,
+                        'nama_barang_dok' => $barang == null ? 0 : $barang['barang_name'],
+                        'jml_masuk' => $b->jml_diterima_lpb,
+                        'jml_masuk_konversi' => $b->jml_diterima_lpb_konversi,
+                        'unit_konversi' => $b->satuan_konversi_id,
+                        'keterangan' => $b->keterangan
+                    ]);
+                    // update remeaning di detail po
+                    $this->amPurchaseOrderDetailModel->where('id', $b->am_purchase_order_details_id)->where('am_purchase_order_id', $b->am_purchase_order_id)
+                        ->set('remaining_qty', $b->sisa_total)
+                        ->set('qty_diterima', $b->jml_diterima_total)
+                        ->update();
+                }
+                $this->accountBarangModel->insertAccountBarang($this->this_company_id, $this->request->getVar('divisi_id'), $barang['id'], $poDetail['spesifikasi_id']);
+            }
+
+            // Update Multiple Spp Id
+            $this->updateMultipleSppColumn($penerimaanBarangID);
+            $db->transCommit();
+
+            return response()->setJSON([
+                'message' => "Penerimaan barang Lokal BP berhasil disimpan",
+                'token' => csrf_hash(),
+                'status' => true,
+                'id' => encrypt($penerimaanBarangID)
+            ]);
+        } catch (Exception $e) {
+            $db->transRollback();
+            return response()->setJSON([
+                'status' => false,
+                'message' => $e->getMessage(),
+                'token' => csrf_hash()
+            ]);
+        }
     }
 
     public function update($id)
@@ -533,208 +536,223 @@ class PenerimaanBarangLokalBP extends BaseController
 
     public function updateAction()
     {
-        $id = decrypt($this->request->getVar('id'));
-        $barangs = $this->request->getVar('barangs');
+        $db = \Config\Database::connect();
+        try {
+            $db->transBegin();
 
-        if (count(json_decode($barangs)) == 0) {
-            return response()->setJSON([
-                'message' => "Gagal Update: List barang tidak ditemukan",
-                'token' => csrf_hash(),
-                'status' => false
-            ]);
-        }
+            $id = decrypt($this->request->getVar('id'));
+            $barangs = $this->request->getVar('barangs');
 
-        $noPenerimaanBarang = $this->request->getVar('no_penerimaan_barang');
-        $first = $this->penerimaanBarangModel->where('company_id', $this->this_company_id)
-            ->where('no_penerimaan_barang', $this->request->getVar('no_penerimaan_barang'))
-            ->where('status_penerimaan', "LOKAL")
-            ->where('tipe_bahan', "PENOLONG")
-            ->where('id !=', $id)
-            ->first();
-
-        if ($first != null) {
-            return response()->setJSON([
-                'token' => csrf_hash(),
-                'message' => "No Penerimaan Barang Sudah Ada",
-                'status' => false
-            ]);
-        }
-
-        $this->penerimaanBarangModel->update($id, [
-            'company_id' => $this->this_company_id,
-            'bc_type' => $this->request->getVar('aju_document_type'),
-            'supplier_id' => $this->request->getVar('supplier_id'),
-            'divisi_id' => $this->request->getVar('divisi_id'),
-            'kemasan_id' => $this->request->getVar('kemasan_id'),
-            "ongkos_kirim" => $this->request->getVar('ongkos_kirim'),
-            'warehouse_id' => $this->request->getVar('warehouse_id'),
-            'no_penerimaan_barang' => $noPenerimaanBarang,
-            'acceptance_type' => $this->request->getVar('acceptance_type'),
-            'multiple_po_id' => str_replace(['\\"', '\\', '"'], '', json_encode($this->request->getVar('multiple_po_id'))),
-            'multiple_po_no' => $this->request->getVar('multiple_po_no'),
-            'no_surat_jalan' => $this->request->getVar('no_surat_jalan'),
-            'no_invoice' => $this->request->getVar('no_invoice'),
-            'kemasan' => $this->request->getVar('kemasan'),
-            'jumlah_kemasan' => $this->request->getVar('jumlah_kemasan'),
-            'no_surat_jalan' => $this->request->getVar('no_surat_jalan'),
-            "tanggal" => $this->request->getVar("tanggal_penerimaan_lpb") ? date_format(date_create_from_format("d/m/Y", $this->request->getVar("tanggal_penerimaan_lpb")), "Y-m-d") : "",
-        ]);
-
-        // delete first in penerimaan_barang_detail
-        // $this->penerimaanBarangDetailModel->where('penerimaan_barang_id', $id)->delete();
-        $penerimaanBarangDetailId = array();
-        foreach (json_decode($barangs) as $b) {
-
-            $poDetail = $this->amPurchaseOrderDetailModel->where('id', $b->am_purchase_order_details_id)->first();
-            $barang = null;
-            if ($poDetail != null) {
-                $barang = $this->barangMasterModel->where('id', $poDetail['barang_id'])->first();
+            if (count(json_decode($barangs)) == 0) {
+                return response()->setJSON([
+                    'message' => "Gagal Update: List barang tidak ditemukan",
+                    'token' => csrf_hash(),
+                    'status' => false
+                ]);
             }
 
-            if ($b->jml_diterima_lpb != 0) {
-                $penerimaanBarangDetailFirst = $this->penerimaanBarangDetailModel
-                    ->select('penerimaan_barang_detail.*')
-                    ->join('penerimaan_barang', 'penerimaan_barang.id = penerimaan_barang_detail.penerimaan_barang_id', 'left')
-                    ->where('penerimaan_barang_id', $id)
-                    ->where('purchase_order_id', $b->am_purchase_order_id)
-                    ->where('purchase_order_details_id', $b->am_purchase_order_details_id)
-                    ->where('status_penerimaan', "LOKAL")
-                    ->where('tipe_bahan', "PENOLONG")
-                    ->first();
+            $noPenerimaanBarang = $this->request->getVar('no_penerimaan_barang');
+            $first = $this->penerimaanBarangModel->where('company_id', $this->this_company_id)
+                ->where('no_penerimaan_barang', $this->request->getVar('no_penerimaan_barang'))
+                ->where('status_penerimaan', "LOKAL")
+                ->where('tipe_bahan', "PENOLONG")
+                ->where('id !=', $id)
+                ->first();
 
-                if ($penerimaanBarangDetailFirst == null) {
-                    // \var_dump($b);
-                    // die;
-                    // Insert
-                    $id =  $this->penerimaanBarangDetailModel->insert([
-                        'purchase_order_id' => $b->am_purchase_order_id,
-                        'purchase_order_details_id' => $b->am_purchase_order_details_id,
-                        'penerimaan_barang_id' => $id,
-                        'barang_id' => $barang == null ? 0 : $barang['id'],
-                        'spesifikasi_id' => $poDetail == null ? 0 : $poDetail['spesifikasi_id'],
-                        'unit' => $poDetail == null ? 0 : $poDetail['unit'],
-                        'harga' => $b->harga,
-                        'sub_total' => $b->sub_total,
-                        'qty' => $b->jml_order,
-                        'nama_barang_dok' => $barang == null ? 0 : $barang['barang_name'],
-                        'jml_masuk' => $b->jml_diterima_lpb,
-                        'jml_masuk_konversi' => $b->jml_diterima_lpb_konversi,
-                        'unit_konversi' => $b->satuan_konversi_id,
-                        'keterangan' => $b->keterangan
-                    ]);
+            if ($first != null) {
+                return response()->setJSON([
+                    'token' => csrf_hash(),
+                    'message' => "No Penerimaan Barang Sudah Ada",
+                    'status' => false
+                ]);
+            }
 
-                    // update remeaning di detail po
-                    $this->amPurchaseOrderDetailModel->where('id', $b->am_purchase_order_details_id)
-                        ->where('am_purchase_order_id', $b->am_purchase_order_id)
-                        ->set('remaining_qty', $b->sisa_total)
-                        ->set('qty_diterima', $b->jml_diterima_total)
-                        ->update();
-                    // \var_dump($id);
-                    // die;
-                    $this->accountBarangModel->insertAccountBarang($this->this_company_id, $this->request->getVar('divisi_id'), $barang['id'], $poDetail['spesifikasi_id']);
-                } else {
-                    // Update
-                    $this->penerimaanBarangDetailModel->update($penerimaanBarangDetailFirst['id'], [
-                        'purchase_order_id' => $b->am_purchase_order_id,
-                        'purchase_order_details_id' => $b->am_purchase_order_details_id,
-                        'penerimaan_barang_id' => $id,
-                        'barang_id' => $barang == null ? 0 : $barang['id'],
-                        'spesifikasi_id' => $poDetail == null ? 0 : $poDetail['spesifikasi_id'],
-                        'unit' => $poDetail == null ? 0 : $poDetail['unit'],
-                        'harga' => $b->harga,
-                        'sub_total' => $b->sub_total,
-                        'qty' => $b->jml_order,
-                        'nama_barang_dok' => $barang == null ? 0 : $barang['barang_name'],
-                        'jml_masuk' => $b->jml_diterima_lpb,
-                        'jml_masuk_konversi' => $b->jml_diterima_lpb_konversi,
-                        'unit_konversi' => $b->satuan_konversi_id,
-                        'keterangan' => $b->keterangan
-                    ]);
-                    // update remeaning di detail po
-                    $this->amPurchaseOrderDetailModel->where('id', $b->am_purchase_order_details_id)->where('am_purchase_order_id', $b->am_purchase_order_id)
-                        ->set('remaining_qty', $b->sisa_total)
-                        ->set('qty_diterima', $b->jml_diterima_total)
-                        ->update();
+            $this->penerimaanBarangModel->update($id, [
+                'company_id' => $this->this_company_id,
+                'bc_type' => $this->request->getVar('aju_document_type'),
+                'supplier_id' => $this->request->getVar('supplier_id'),
+                'divisi_id' => $this->request->getVar('divisi_id'),
+                'kemasan_id' => $this->request->getVar('kemasan_id'),
+                "ongkos_kirim" => $this->request->getVar('ongkos_kirim'),
+                'warehouse_id' => $this->request->getVar('warehouse_id'),
+                'no_penerimaan_barang' => $noPenerimaanBarang,
+                'acceptance_type' => $this->request->getVar('acceptance_type'),
+                'multiple_po_id' => str_replace(['\\"', '\\', '"'], '', json_encode($this->request->getVar('multiple_po_id'))),
+                'multiple_po_no' => $this->request->getVar('multiple_po_no'),
+                'no_surat_jalan' => $this->request->getVar('no_surat_jalan'),
+                'no_invoice' => $this->request->getVar('no_invoice'),
+                'kemasan' => $this->request->getVar('kemasan'),
+                'jumlah_kemasan' => $this->request->getVar('jumlah_kemasan'),
+                'no_surat_jalan' => $this->request->getVar('no_surat_jalan'),
+                "tanggal" => $this->request->getVar("tanggal_penerimaan_lpb") ? date_format(date_create_from_format("d/m/Y", $this->request->getVar("tanggal_penerimaan_lpb")), "Y-m-d") : "",
+            ]);
 
-                    $this->accountBarangModel->insertAccountBarang($this->this_company_id, $this->request->getVar('divisi_id'), $barang['id'], $poDetail['spesifikasi_id']);
+            // delete first in penerimaan_barang_detail
+            // $this->penerimaanBarangDetailModel->where('penerimaan_barang_id', $id)->delete();
+            $penerimaanBarangDetailId = array();
+            foreach (json_decode($barangs) as $b) {
+
+                $poDetail = $this->amPurchaseOrderDetailModel->where('id', $b->am_purchase_order_details_id)->first();
+                $barang = null;
+                if ($poDetail != null) {
+                    $barang = $this->barangMasterModel->where('id', $poDetail['barang_id'])->first();
                 }
-            } else {
+
+                if ($b->jml_diterima_lpb != 0) {
+                    $penerimaanBarangDetailFirst = $this->penerimaanBarangDetailModel
+                        ->select('penerimaan_barang_detail.*')
+                        ->join('penerimaan_barang', 'penerimaan_barang.id = penerimaan_barang_detail.penerimaan_barang_id', 'left')
+                        ->where('penerimaan_barang_id', $id)
+                        ->where('purchase_order_id', $b->am_purchase_order_id)
+                        ->where('purchase_order_details_id', $b->am_purchase_order_details_id)
+                        ->where('status_penerimaan', "LOKAL")
+                        ->where('tipe_bahan', "PENOLONG")
+                        ->first();
+
+                    if ($penerimaanBarangDetailFirst == null) {
+                        // \var_dump($b);
+                        // die;
+                        // Insert
+                        $id =  $this->penerimaanBarangDetailModel->insert([
+                            'purchase_order_id' => $b->am_purchase_order_id,
+                            'purchase_order_details_id' => $b->am_purchase_order_details_id,
+                            'penerimaan_barang_id' => $id,
+                            'barang_id' => $barang == null ? 0 : $barang['id'],
+                            'spesifikasi_id' => $poDetail == null ? 0 : $poDetail['spesifikasi_id'],
+                            'unit' => $poDetail == null ? 0 : $poDetail['unit'],
+                            'harga' => $b->harga,
+                            'sub_total' => $b->sub_total,
+                            'qty' => $b->jml_order,
+                            'nama_barang_dok' => $barang == null ? 0 : $barang['barang_name'],
+                            'jml_masuk' => $b->jml_diterima_lpb,
+                            'jml_masuk_konversi' => $b->jml_diterima_lpb_konversi,
+                            'unit_konversi' => $b->satuan_konversi_id,
+                            'keterangan' => $b->keterangan
+                        ]);
+
+                        // update remeaning di detail po
+                        $this->amPurchaseOrderDetailModel->where('id', $b->am_purchase_order_details_id)
+                            ->where('am_purchase_order_id', $b->am_purchase_order_id)
+                            ->set('remaining_qty', $b->sisa_total)
+                            ->set('qty_diterima', $b->jml_diterima_total)
+                            ->update();
+                        // \var_dump($id);
+                        // die;
+                        $this->accountBarangModel->insertAccountBarang($this->this_company_id, $this->request->getVar('divisi_id'), $barang['id'], $poDetail['spesifikasi_id']);
+                    } else {
+                        // Update
+                        $this->penerimaanBarangDetailModel->update($penerimaanBarangDetailFirst['id'], [
+                            'purchase_order_id' => $b->am_purchase_order_id,
+                            'purchase_order_details_id' => $b->am_purchase_order_details_id,
+                            'penerimaan_barang_id' => $id,
+                            'barang_id' => $barang == null ? 0 : $barang['id'],
+                            'spesifikasi_id' => $poDetail == null ? 0 : $poDetail['spesifikasi_id'],
+                            'unit' => $poDetail == null ? 0 : $poDetail['unit'],
+                            'harga' => $b->harga,
+                            'sub_total' => $b->sub_total,
+                            'qty' => $b->jml_order,
+                            'nama_barang_dok' => $barang == null ? 0 : $barang['barang_name'],
+                            'jml_masuk' => $b->jml_diterima_lpb,
+                            'jml_masuk_konversi' => $b->jml_diterima_lpb_konversi,
+                            'unit_konversi' => $b->satuan_konversi_id,
+                            'keterangan' => $b->keterangan
+                        ]);
+                        // update remeaning di detail po
+                        $this->amPurchaseOrderDetailModel->where('id', $b->am_purchase_order_details_id)->where('am_purchase_order_id', $b->am_purchase_order_id)
+                            ->set('remaining_qty', $b->sisa_total)
+                            ->set('qty_diterima', $b->jml_diterima_total)
+                            ->update();
+
+                        $this->accountBarangModel->insertAccountBarang($this->this_company_id, $this->request->getVar('divisi_id'), $barang['id'], $poDetail['spesifikasi_id']);
+                    }
+                } else {
+                    $last = $this->amPurchaseOrderDetailModel
+                        ->where('id',  $b->am_purchase_order_details_id)
+                        ->where('am_purchase_order_id', $b->am_purchase_order_id)
+                        ->first();
+
+                    $this->amPurchaseOrderDetailModel
+                        ->where('id', $b->am_purchase_order_details_id)
+                        ->where('am_purchase_order_id', $b->am_purchase_order_id)
+                        ->set('remaining_qty', $last['remaining_qty'] +  $b->jml_diterima_lpb)
+                        ->set('qty_diterima', $last['qty_diterima'] - $b->jml_diterima_lpb)
+                        ->update();
+
+                    $this->penerimaanBarangDetailModel
+                        ->where('penerimaan_barang_id', $id)
+                        ->where('purchase_order_id', $b->am_purchase_order_id)
+                        ->where('purchase_order_details_id', $b->am_purchase_order_details_id)
+                        ->delete();
+                }
+
+                array_push($penerimaanBarangDetailId, $b->penerimaan_barang_detail_id);
+            }
+
+            // REMOVE BARANG
+            $penerimaanBarangDetailRemovedList = $this->penerimaanBarangDetailModel
+                ->whereNotIn('id', $penerimaanBarangDetailId)
+                ->where('penerimaan_barang_id', $id)
+                ->where('deletedAt', null)
+                ->findAll();
+
+            foreach ($penerimaanBarangDetailRemovedList as $p) {
                 $last = $this->amPurchaseOrderDetailModel
-                    ->where('id',  $b->am_purchase_order_details_id)
-                    ->where('am_purchase_order_id', $b->am_purchase_order_id)
+                    ->where('id',  $p['purchase_order_details_id'])
+                    ->where('am_purchase_order_id', $p['purchase_order_id'])
                     ->first();
 
                 $this->amPurchaseOrderDetailModel
-                    ->where('id', $b->am_purchase_order_details_id)
-                    ->where('am_purchase_order_id', $b->am_purchase_order_id)
-                    ->set('remaining_qty', $last['remaining_qty'] +  $b->jml_diterima_lpb)
-                    ->set('qty_diterima', $last['qty_diterima'] - $b->jml_diterima_lpb)
+                    ->where('id', $p['purchase_order_details_id'])
+                    ->where('am_purchase_order_id', $p['purchase_order_id'])
+                    ->set('remaining_qty', $last['remaining_qty'] +  $p['jml_masuk_konversi'])
+                    ->set('qty_diterima', $last['qty_diterima'] - $p['jml_masuk_konversi'])
                     ->update();
 
                 $this->penerimaanBarangDetailModel
-                    ->where('penerimaan_barang_id', $id)
-                    ->where('purchase_order_id', $b->am_purchase_order_id)
-                    ->where('purchase_order_details_id', $b->am_purchase_order_details_id)
-                    ->delete();
+                    ->delete($p['id']);
             }
 
-            array_push($penerimaanBarangDetailId, $b->penerimaan_barang_detail_id);
-        }
+            $multiplePoIdArr = [];
+            $multiplePoNoArr = [];
 
-        // REMOVE BARANG
-        $penerimaanBarangDetailRemovedList = $this->penerimaanBarangDetailModel
-            ->whereNotIn('id', $penerimaanBarangDetailId)
-            ->where('penerimaan_barang_id', $id)
-            ->where('deletedAt', null)
-            ->findAll();
+            $penerimaanBarangDetails = $this->penerimaanBarangDetailModel
+                ->where('penerimaan_barang_id', $id)
+                ->findAll();
 
-        foreach ($penerimaanBarangDetailRemovedList as $p) {
-            $last = $this->amPurchaseOrderDetailModel
-                ->where('id',  $p['purchase_order_details_id'])
-                ->where('am_purchase_order_id', $p['purchase_order_id'])
-                ->first();
-
-            $this->amPurchaseOrderDetailModel
-                ->where('id', $p['purchase_order_details_id'])
-                ->where('am_purchase_order_id', $p['purchase_order_id'])
-                ->set('remaining_qty', $last['remaining_qty'] +  $p['jml_masuk_konversi'])
-                ->set('qty_diterima', $last['qty_diterima'] - $p['jml_masuk_konversi'])
-                ->update();
-
-            $this->penerimaanBarangDetailModel
-                ->delete($p['id']);
-        }
-
-        $multiplePoIdArr = [];
-        $multiplePoNoArr = [];
-
-        $penerimaanBarangDetails = $this->penerimaanBarangDetailModel
-            ->where('penerimaan_barang_id', $id)
-            ->findAll();
-
-        foreach ($penerimaanBarangDetails as $detail) {
-            $amPurchaseOrder = $this->amPurchaseOrderModel->where('id', $detail['purchase_order_id'])->first();
-            if ($amPurchaseOrder) {
-                $multiplePoIdArr[] = (int) $amPurchaseOrder['id']; // ← penting: cast ke int
-                $multiplePoNoArr[] = $amPurchaseOrder['po_no'];
+            foreach ($penerimaanBarangDetails as $detail) {
+                $amPurchaseOrder = $this->amPurchaseOrderModel->where('id', $detail['purchase_order_id'])->first();
+                if ($amPurchaseOrder) {
+                    $multiplePoIdArr[] = (int) $amPurchaseOrder['id']; // ← penting: cast ke int
+                    $multiplePoNoArr[] = $amPurchaseOrder['po_no'];
+                }
             }
+
+            // Hapus duplikat
+            $multiplePoIdArr = array_unique($multiplePoIdArr);
+            $multiplePoNoArr = array_unique($multiplePoNoArr);
+
+            // Simpan
+            $this->penerimaanBarangModel->update($id, [
+                'multiple_po_id' => json_encode(array_values($multiplePoIdArr), JSON_UNESCAPED_SLASHES),
+                'multiple_po_no' => json_encode(array_values($multiplePoNoArr), JSON_UNESCAPED_SLASHES)
+            ]);
+
+            $this->updateMultipleSppColumn($id);
+            $db->transCommit();
+
+            return response()->setJSON([
+                'message' => "Berhasil update penerimaan barang lokal BP",
+                'token' => csrf_hash(),
+                'status' => true
+            ]);
+        } catch (Exception $e) {
+            $db->transRollback();
+            return response()->setJSON([
+                'status' => false,
+                'message' => $e->getMessage(),
+                'token' => csrf_hash()
+            ]);
         }
-
-        // Hapus duplikat
-        $multiplePoIdArr = array_unique($multiplePoIdArr);
-        $multiplePoNoArr = array_unique($multiplePoNoArr);
-
-        // Simpan
-        $this->penerimaanBarangModel->update($id, [
-            'multiple_po_id' => json_encode(array_values($multiplePoIdArr), JSON_UNESCAPED_SLASHES),
-            'multiple_po_no' => json_encode(array_values($multiplePoNoArr), JSON_UNESCAPED_SLASHES)
-        ]);
-
-        return response()->setJSON([
-            'message' => "Berhasil update penerimaan barang lokal BP",
-            'token' => csrf_hash(),
-            'status' => true
-        ]);
     }
 
     public function print($id)
@@ -1270,5 +1288,54 @@ class PenerimaanBarangLokalBP extends BaseController
             ->first();
 
         return $penerimaanBarang == null ? true : false;
+    }
+
+    private function updateMultipleSppColumn($id)
+    {
+        $penerimaanBarang = $this->penerimaanBarangModel->where('id', $id)->first();
+        $multiplePoId = json_decode($penerimaanBarang['multiple_po_id']);
+
+        $sppList = $this->amPurchaseOrderModel->getSPP(
+            $multiplePoId
+        );
+
+        $multipleSppId = str_replace(['\\"', '\\', '"'], '', json_encode(array_column($sppList, 'id')));
+        $multipleSppNo = str_replace(['\\"', '\\'], '', json_encode(array_column($sppList, 'spp_no')));
+
+        $this->penerimaanBarangModel->update($id, [
+            'multiple_spp_id' => $multipleSppId,
+            'multiple_spp_no' => $multipleSppNo
+        ]);
+    }
+
+    private function getAkunCoaMap($penerimaanBarangIds)
+    {
+        $details = $this->penerimaanBarangDetailModel
+            ->select('penerimaan_barang_detail.penerimaan_barang_id, 
+              penerimaan_barang_detail.barang_id, 
+              penerimaan_barang_detail.spesifikasi_id,
+              account_barang.ap_id,
+              account_barang.ar_id')
+            ->join('penerimaan_barang', 'penerimaan_barang.id = penerimaan_barang_detail.penerimaan_barang_id', 'left')
+            ->join('account_barang', 'account_barang.barang_master_id = penerimaan_barang_detail.barang_id 
+                             AND account_barang.barang_master_spesifikasi_id = penerimaan_barang_detail.spesifikasi_id
+                             AND account_barang.divisi_id = penerimaan_barang.divisi_id', 'left')
+            ->whereIn('penerimaan_barang_detail.penerimaan_barang_id', $penerimaanBarangIds)
+            ->where('penerimaan_barang_detail.deletedAt', null)
+            ->findAll();
+
+        $akunCoaMap = [];
+        foreach ($details as $d) {
+            $pid = $d['penerimaan_barang_id'];
+            if (!isset($akunCoaMap[$pid])) {
+                $akunCoaMap[$pid] = true; // default true
+            }
+
+            if ($d['ap_id'] === null && $d['ar_id'] === null) {
+                $akunCoaMap[$pid] = false;
+            }
+        }
+
+        return $akunCoaMap;
     }
 }

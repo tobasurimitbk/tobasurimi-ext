@@ -159,7 +159,8 @@ class AMPurchaseOrderModel extends Model
             'divisis'          => 'am_purchase_orders.total',
             'createdAt'        => 'am_purchase_orders.createdAt',
             'updatedAt'        => 'am_purchase_orders.updatedAt',
-            'statusPenerimaan' => 'am_purchase_orders.status_penerimaan'
+            'statusPenerimaan' => 'am_purchase_orders.status_penerimaan',
+            'note'             => 'am_purchase_orders.note'
         ];
         $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
 
@@ -199,6 +200,7 @@ class AMPurchaseOrderModel extends Model
                 ->orLike('purchase_requests.spp_no', $addCondition['search'])
                 ->orLike('suppliers.name', $addCondition['search'])
                 ->orLike('divisis.divisi', $addCondition['search'])
+                ->orLike('am_purchase_orders.note', $addCondition['search'])
                 ->groupEnd(); // Tutup grouping pencarian
         }
 

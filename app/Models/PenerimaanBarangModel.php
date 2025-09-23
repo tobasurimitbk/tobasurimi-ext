@@ -27,6 +27,8 @@ class PenerimaanBarangModel extends Model
         'acceptance_type',
         'multiple_po_id',
         'multiple_po_no',
+        'multiple_spp_id',
+        'multiple_spp_no',
         'status_penerimaan',
         'status_post',
         'tipe_bahan',
@@ -82,7 +84,18 @@ class PenerimaanBarangModel extends Model
         $sort = $availableSort[$addCondition['sort'] ?? 'createdAt'] ?? 'penerimaan_barang.createdAt';
         $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'DESC';
 
-        $selectQry = "penerimaan_barang.*, 
+        $selectQry = "
+        DISTINCT(penerimaan_barang.id), 
+        penerimaan_barang.no_penerimaan_barang,
+        penerimaan_barang.multiple_po_id,
+        penerimaan_barang.tipe_bahan,
+        penerimaan_barang.tanggal,
+        penerimaan_barang.multiple_po_no,
+        penerimaan_barang.multiple_spp_no,
+        penerimaan_barang.status_post,
+        penerimaan_barang.bc_type,
+        penerimaan_barang.divisi_id,
+        bc_purchase_order_lpb.bc_purchase_order_id,
         warehouses.warehouse_name, suppliers.name as supplier_name, 
         COUNT(penerimaan_barang_detail.id) AS itemCount, 
         divisis.divisi,
@@ -95,7 +108,9 @@ class PenerimaanBarangModel extends Model
             ->join('divisis', 'divisis.id = penerimaan_barang.divisi_id', 'left')
             ->join('metadata', 'metadata.id = penerimaan_barang.bc_type', 'left')
             ->join('barang_master', 'barang_master.id = penerimaan_barang_detail.barang_id', 'left')
-            ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = penerimaan_barang_detail.spesifikasi_id', 'left');
+            ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = penerimaan_barang_detail.spesifikasi_id', 'left')
+            ->join('bc_purchase_order_lpb', 'bc_purchase_order_lpb.penerimaan_barang_id = penerimaan_barang.id', 'left')
+            ->groupBy('penerimaan_barang.id');
 
 
         if (in_array($condition['penerimaan_barang.status_penerimaan'], ['LOKAL', 'IMPORT']) && $condition['tipe_bahan'] == "PENOLONG") {

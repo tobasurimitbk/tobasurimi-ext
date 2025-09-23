@@ -92,7 +92,8 @@ class POLokalBahanPenolong extends BaseController
             ]),
             "satuan" => $this->satuanModel->getSatuanAll(),
             "ppn" => $this->taxModel->getTaxByType("ppn"),
-            "pph" => $this->taxModel->getTaxByType("pph")
+            "pph" => $this->taxModel->getTaxByType("pph"),
+            "status" => ["KONTAN", "KREDIT"]
         ];
 
         return view('Purchase/poLokalBahanPenolong/form', $data);
@@ -263,6 +264,7 @@ class POLokalBahanPenolong extends BaseController
                 "total"         => number_format($data->total, 2),
                 "is_posted"     => $data->is_posted,
                 "itemCount"     => $data->itemCount,
+                "note" => $data->note,
                 "status_penerimaan" => $data->status_penerimaan === "0" ? "OPEN" : "CLOSED",
                 "un_posting" => $unPostingCheck == null ? 0 : 1,
             ]);
@@ -351,6 +353,7 @@ class POLokalBahanPenolong extends BaseController
             "poDetail" => $poDetail,
             "unPosting" => $unPostingCheck == null ? 0 : 1,
             "listBarang" => $listBarang,
+            "status" => ["KONTAN", "KREDIT"],
             'checkLpb' => $checkLpb // Cek apakah PO sudah dibuat LPB atau belum, jika sudah hanya diizinkan update harga aja jika belum bisa update qty
 
         ];
