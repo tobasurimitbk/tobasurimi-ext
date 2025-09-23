@@ -284,7 +284,7 @@ class Barang extends BaseController
                 }
 
                 // hapus akun barang lama untuk spesifikasi ini
-                $accountBarangModel->where('barang_master_spesifikasi_id', $spesifikasiID)->delete();
+                // $accountBarangModel->where('barang_master_spesifikasi_id', $spesifikasiID)->delete();
 
 
                 if ($this->request->getVar('type') == 'bahan_baku') {
@@ -1333,8 +1333,8 @@ class Barang extends BaseController
         $barangId = $this->request->getVar('barang_id');
         $items = $this->request->getVar('items');
 
-        var_dump($items);
-        die;
+        // var_dump($items);
+        // die;
 
         // Decode items dari string JSON ke array
         $akunBarang = json_decode($items);
@@ -1349,7 +1349,7 @@ class Barang extends BaseController
         }
 
         // Cek apakah barang ada
-        $barang = $barangModel->find($barangId);
+        $barang = $this->barangModel->find($barangId);
         if (!$barang) {
             return $this->response->setJSON([
                 'status' => false,
@@ -1363,7 +1363,7 @@ class Barang extends BaseController
         $db->transStart();
 
         // Hapus akun barang yang lama (jika ada)
-        $barangAkunModel->where('barang_id', $barangId)->delete();
+        // $this->bara->where('barang_id', $barangId)->delete();
 
         // Simpan setiap akun barang
         foreach ($akunBarang as $item) {
@@ -1376,7 +1376,7 @@ class Barang extends BaseController
                 'kategori_barang_id' => $item->kategori,
                 'created_at' => date('Y-m-d H:i:s')
             ];
-            $barangAkunModel->insert($data);
+            $this->accountBarangModel->insert($data);
         }
 
         $db->transComplete();
