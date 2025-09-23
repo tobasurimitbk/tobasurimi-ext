@@ -40,7 +40,9 @@ class Filters extends BaseConfig
                     'check-pin-employee',
                     'api/contact/delete',
                     'log-attendance/all-total',
-                    'log-attendance/all'
+                    'log-attendance/all',
+                    'list-attendance/all',
+                    'list-attendance/all-total'
                 ]
             ]
         ],

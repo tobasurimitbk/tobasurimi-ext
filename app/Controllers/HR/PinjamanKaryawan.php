@@ -17,34 +17,34 @@ use Exception;
 class PinjamanKaryawan extends BaseController
 {
     protected $this_company_id, $userID;
+    protected $divisiModel;
+    protected $pinjamanKaryawanModel;
+    protected $golonganModel;
+    protected $metadataModel;
+    protected $formPerijinanModel;
+    protected $employeeModel;
+    protected $bigDaysModel;
+    protected $attendancesLogModel;
 
     public function __construct()
     {
         $this->this_company_id = session()->get("login")->this_company_id;
         $this->userID = session()->get('login')->user_id;
+        $this->divisiModel = new DivisisModel();
+        $this->pinjamanKaryawanModel = new PinjamanKaryawanModel();
+        $this->golonganModel = new GolonganModel();
+        $this->metadataModel = new MetadataModel();
+        $this->formPerijinanModel = new FormPerijinanModel();
+        $this->employeeModel = new EmployeesModel();
+        $this->bigDaysModel = new BigDaysModel();
+        $this->attendancesLogModel = new AttendancesLogModel();
     }
 
-    public function pinjamanKaryawan()
+    public function index()
     {
-        $year = ($this->request->getVar("year") == "") ? date("Y") : $this->request->getVar("year");
-        $month = ($this->request->getVar("month") == "") ? date("m") : $this->request->getVar("month");
-
-        $divisiModel = new DivisisModel();
-        $pinjamanKaryawanModel = new PinjamanKaryawanModel();
-        $golonganModel = new GolonganModel();
-        $metaDataModel = new MetadataModel();
-
-        $start = $metaDataModel->where('name', 'Cut Off Pinjaman Start')->first();
-        $finish = $metaDataModel->where('name', 'Cut Off Pinjaman Finish')->first();
-
         $data = [
-            'year' => $year,
-            'month' => $month,
-            'divisi' => $divisiModel->get_by_company_id($this->this_company_id),
-            'golongan' => $golonganModel->where('company_id', $this->this_company_id)->where('deletedAt', null)->findAll(),
-            'pinjamanCheck' => $pinjamanKaryawanModel->where('month_year', $year . "-" . $month)->where('company_id', $this->this_company_id)->findAll(),
-            'start' => $start,
-            'finish' => $finish
+            'divisi' => $this->divisiModel->get_by_company_id($this->this_company_id),
+            'golongan' => $this->golonganModel->where('company_id', $this->this_company_id)->where('deletedAt', null)->findAll(),
         ];
 
         return view('hr/pinjamanKaryawan/index', $data);
@@ -52,264 +52,303 @@ class PinjamanKaryawan extends BaseController
 
     public function generateAllPinjaman()
     {
-        $yearMonth = $this->request->getVar('monthYear');
-        $startDate = date('Y-m-d', strtotime(str_replace('/', '-', $this->request->getVar('startDate'))));
-        $endDate = date('Y-m-d', strtotime(str_replace('/', '-', $this->request->getVar('finishDate'))));
+        $db = \Config\Database::connect();
 
-        // init model
-        $pinjamanKaryawanModel = new PinjamanKaryawanModel();
-        $formPerijinanModel = new FormPerijinanModel();
-        $employeesModel = new EmployeesModel();
-        $hariLiburModel = new BigDaysModel();
-        $attendancesLogModel = new AttendancesLogModel();
+        try {
+            $db->transBegin();
 
-        // date start end validation
-        if (strtotime($startDate) > strtotime($endDate)) {
-            $data = [
-                "status" => false,
-                "message" => "Tanggal mulai absen dan tanggal selesai absen tidak sesuai",
-                'token' => csrf_hash()
-            ];
-            return response()->setJSON($data);
-        }
+            $yearMonth  = $this->request->getVar('monthYear');
+            $startDate  = date('Y-m-d', strtotime(str_replace('/', '-', $this->request->getVar('startDate'))));
+            $endDate    = date('Y-m-d', strtotime(str_replace('/', '-', $this->request->getVar('finishDate'))));
 
-        // check range $startDate dan $endDate harus <= 15 hari
-        $startDateTimestamp = strtotime($startDate);
-        $endDateTimestamp = strtotime($endDate);
-        $selisihHari = ($endDateTimestamp - $startDateTimestamp) / (60 * 60 * 24);
-
-        if ($selisihHari > 15) {
-            // pinjaman yang diberikan harus dibawah 15 hari kerja
-            $data = [
-                "status" => false,
-                "message" => "Periode tidak boleh melebihi 15 hari kerja. karena pinjaman itu diberikan maksimal 15 hari kerja sesuai dengan periode pinjaman (Total hari kerja berdasarkan range yang anda masukkan sebanyak $selisihHari hari)",
-                'token' => csrf_hash()
-            ];
-            return response()->setJSON($data);
-        }
-
-        // remove all if exist and insert again
-        $pinjamanKaryawanModel
-            ->where('company_id', $this->this_company_id)
-            ->where('month_year', $yearMonth)
-            ->delete();
-
-        // init date untuk menyimpan range hari
-        $dateList = [];
-        while ($startDateTimestamp <= $endDateTimestamp) {
-            $currentDate = date('Y-m-d', $startDateTimestamp);
-            $dateList[] = $currentDate;
-            $startDateTimestamp += 86400;
-        }
-
-        $employeeData = $employeesModel->getEmployees($this->this_company_id);
-        $golonganModel = new GolonganModel();
-
-        foreach ($employeeData as $e) {
-            $hadir = 0;
-            $tidakHadir = 0;
-            foreach ($dateList as $dates) {
-                $formPerizinan = $formPerijinanModel->where('periode', $dates)
-                    ->where('employee_id', $e['id'])
-                    ->first();
-
-                $hariLibur = $hariLiburModel->where('date', $dates)->first();
-                $selectQry = "DATE_FORMAT(MIN(date_create), '%H:%i:%s') AS checkin,
-                    DATE_FORMAT(MAX(date_create), '%H:%i:%s') AS checkout";
-
-                $logAttandance = $attendancesLogModel
-                    ->select($selectQry)
-                    ->where('employees_id', $e['id'])
-                    ->where("DATE_FORMAT(date_create, '%Y-%m-%d')",  $dates)
-                    ->groupBy('DATE_FORMAT(date_create, \'%Y-%m-%d\')')
-                    ->limit(2)
-                    ->get()
-                    ->getResult();
-
-                // ALPHA, CUTI HAID, CUTI HAMIL, CUTI MELAHIRKAN, LIBUR
-                if ($hariLibur != null || date('l', strtotime($dates)) == "Sunday" && $formPerizinan == null && \count($logAttandance) == 0) {
-                    // ada hari libur
-                    $tidakHadir++;
-                } elseif ($formPerizinan != null) {
-                    // ada perizinan 
-                    if (in_array($formPerizinan['status'], ["ALPHA_A", "CUTI HAID_CHD", "CUTI HAMIL_CHL", "CUTI MELAHIRKAN_CM", "LIBUR_L"])) {
-                        $tidakHadir++;
-                    } else {
-                        $hadir++;
-                    }
-                } else {
-                    if (count($logAttandance) == 0) {
-                        // alpha
-                        $tidakHadir++;
-                    } else {
-                        // data absen ada di log
-                        $hadir++;
-                    }
-                }
+            // Validasi tanggal
+            if (strtotime($startDate) > strtotime($endDate)) {
+                return response()->setJSON([
+                    "status" => false,
+                    "message" => "Tanggal mulai absen dan tanggal selesai absen tidak sesuai",
+                    'token' => csrf_hash()
+                ]);
             }
 
-            $golonganDetail = $golonganModel->where('company_id', $this->this_company_id)->where('golongan_name', $e['tipe'])->first();
-            $nominalPinjaman = $golonganDetail == null ? 0 : $golonganDetail['nominal_pinjaman'];
+            $selisihHari = (strtotime($endDate) - strtotime($startDate)) / 86400;
+            if ($selisihHari > 15) {
+                return response()->setJSON([
+                    "status" => false,
+                    "message" => "Periode tidak boleh melebihi 15 hari kerja. (Range: $selisihHari hari)",
+                    'token' => csrf_hash()
+                ]);
+            }
 
-            $pinjamanKaryawanModel->insert([
-                'company_id' => $this->this_company_id,
-                'employee_id' => $e['id'],
-                'division_id' => $e['division_id'],
-                'month_year' => $yearMonth,
-                'start_date' => $startDate,
-                'end_date' => $endDate,
-                'tidak_hadir' => $tidakHadir,
-                'hadir' => $hadir,
-                'is_boleh_minjam' => ($tidakHadir <= 6) ? '1' : '0',
-                'status_pinjaman' => ($tidakHadir <= 6) ? '1' : '0',
-                'nominal' => ($tidakHadir <= 6) ? $nominalPinjaman : null
+            // hapus data lama
+            $this->pinjamanKaryawanModel
+                ->where('company_id', $this->this_company_id)
+                ->where('month_year', $yearMonth)
+                ->delete();
+
+            // list tanggal
+            $dateList = [];
+            $tmp = strtotime($startDate);
+            while ($tmp <= strtotime($endDate)) {
+                $dateList[] = date('Y-m-d', $tmp);
+                $tmp += 86400;
+            }
+
+            // preload semua employee
+            $employeeData = $this->employeeModel->getEmployees($this->this_company_id);
+            $employeeIds  = array_column($employeeData, 'id');
+
+            // ✅ preload izin sekali saja
+            $izinData = $this->formPerijinanModel
+                ->whereIn('employee_id', $employeeIds)
+                ->whereIn('periode', $dateList)
+                ->findAll();
+            $izinMap = [];
+            foreach ($izinData as $i) {
+                $izinMap[$i['employee_id'] . '_' . $i['periode']] = $i;
+            }
+
+            // ✅ preload hari libur
+            $liburData = $this->bigDaysModel->whereIn('date', $dateList)->findAll();
+            $liburMap = array_column($liburData, null, 'date'); // key = tanggal
+
+            // ✅ preload attendance log
+            $logs = $this->attendancesLogModel
+                ->select("employees_id, DATE(date_create) as tgl,
+                  DATE_FORMAT(MIN(date_create), '%H:%i:%s') as checkin,
+                  DATE_FORMAT(MAX(date_create), '%H:%i:%s') as checkout")
+                ->whereIn('employees_id', $employeeIds)
+                ->where("DATE(date_create) >=", $startDate)
+                ->where("DATE(date_create) <=", $endDate)
+                ->groupBy("employees_id, DATE(date_create)")
+                ->findAll();
+
+            $logMap = [];
+            foreach ($logs as $l) {
+                $logMap[$l['employees_id'] . '_' . $l['tgl']] = $l;
+            }
+
+            // ✅ preload golongan
+            $golonganData = (new GolonganModel())
+                ->where('company_id', $this->this_company_id)
+                ->findAll();
+            $golonganMap = [];
+            foreach ($golonganData as $g) {
+                $golonganMap[$g['golongan_name']] = $g['nominal_pinjaman'];
+            }
+
+            // siapkan batch insert
+            $insertData = [];
+
+            foreach ($employeeData as $e) {
+                $hadir = 0;
+                $tidakHadir = 0;
+
+                foreach ($dateList as $tgl) {
+                    $izin    = $izinMap[$e['id'] . '_' . $tgl] ?? null;
+                    $libur   = $liburMap[$tgl] ?? null;
+                    $logAbsen = $logMap[$e['id'] . '_' . $tgl] ?? null;
+
+                    if (($libur != null || date('l', strtotime($tgl)) == "Sunday") && $izin == null && $logAbsen == null) {
+                        $tidakHadir++;
+                    } elseif ($izin != null) {
+                        if (in_array($izin['status'], ["ALPHA_A", "CUTI HAID_CHD", "CUTI HAMIL_CHL", "CUTI MELAHIRKAN_CM", "LIBUR_L"])) {
+                            $tidakHadir++;
+                        } else {
+                            $hadir++;
+                        }
+                    } else {
+                        if ($logAbsen == null) {
+                            $tidakHadir++;
+                        } else {
+                            $hadir++;
+                        }
+                    }
+                }
+
+                $nominalPinjaman = $golonganMap[$e['tipe']] ?? 0;
+
+                $insertData[] = [
+                    'company_id'      => $this->this_company_id,
+                    'employee_id'     => $e['id'],
+                    'division_id'     => $e['division_id'],
+                    'month_year'      => $yearMonth,
+                    'start_date'      => $startDate,
+                    'end_date'        => $endDate,
+                    'tidak_hadir'     => $tidakHadir,
+                    'hadir'           => $hadir,
+                    'is_boleh_minjam' => ($tidakHadir <= 6) ? '1' : '0',
+                    'status_pinjaman' => ($tidakHadir <= 6) ? '1' : '0',
+                    'nominal'         => ($tidakHadir <= 6) ? $nominalPinjaman : null,
+                ];
+            }
+
+            // ✅ batch insert sekali jalan
+            $this->pinjamanKaryawanModel->insertBatch($insertData, 200);
+
+            $db->transCommit();
+
+            return response()->setJSON([
+                'status' => true,
+                'message' => 'Generate Data Karyawan yang Berhak Meminjam Berhasil',
+                'token' => csrf_hash()
+            ]);
+        } catch (Exception $e) {
+            $db->transRollback();
+            return response()->setJSON([
+                'status' => false,
+                'token' => csrf_hash(),
+                'message' => $e->getMessage()
             ]);
         }
-
-        return \response()->setJSON([
-            'status' => true,
-            'message' => 'Generate Data Karyawan yang Berhak Meminjam Berhasil',
-            'token' => csrf_hash()
-        ]);
     }
+
 
     public function generateSinglePinjaman()
     {
-        $yearMonth = $this->request->getVar('monthYear');
-        $startDate = date('Y-m-d', strtotime(str_replace('/', '-', $this->request->getVar('startDate'))));
-        $endDate = date('Y-m-d', strtotime(str_replace('/', '-', $this->request->getVar('finishDate'))));
-        $employeeID = $this->request->getVar('employeeID');
-        $id = $this->request->getVar('id');
+        $db = \Config\Database::connect();
+        try {
+            $db->transBegin();
+            $yearMonth  = $this->request->getVar('monthYear');
+            $startDate  = date('Y-m-d', strtotime(str_replace('/', '-', $this->request->getVar('startDate'))));
+            $endDate    = date('Y-m-d', strtotime(str_replace('/', '-', $this->request->getVar('finishDate'))));
+            $employeeID = $this->request->getVar('employeeID');
+            $id         = $this->request->getVar('id');
 
-        // init model
-        $pinjamanKaryawanModel = new PinjamanKaryawanModel();
-        $formPerijinanModel = new FormPerijinanModel();
-        $employeesModel = new EmployeesModel();
-        $hariLiburModel = new BigDaysModel();
-        $attendancesLogModel = new AttendancesLogModel();
-        $golonganModel = new GolonganModel();
+            // validasi tanggal
+            if (strtotime($startDate) > strtotime($endDate)) {
+                return response()->setJSON([
+                    "status"  => false,
+                    "message" => "Tanggal mulai absen dan tanggal selesai absen tidak sesuai",
+                    'token'   => csrf_hash()
+                ]);
+            }
 
-        // date start end validation
-        if (strtotime($startDate) > strtotime($endDate)) {
-            $data = [
-                "status" => false,
-                "message" => "Tanggal mulai absen dan tanggal selesai absen tidak sesuai",
-                'token' => csrf_hash()
-            ];
-            return response()->setJSON($data);
-        }
+            $startDateTimestamp = strtotime($startDate);
+            $endDateTimestamp   = strtotime($endDate);
+            $selisihHari        = ($endDateTimestamp - $startDateTimestamp) / (60 * 60 * 24);
 
-        // check range $startDate dan $endDate harus <= 15 hari
-        $startDateTimestamp = strtotime($startDate);
-        $endDateTimestamp = strtotime($endDate);
-        $selisihHari = ($endDateTimestamp - $startDateTimestamp) / (60 * 60 * 24);
+            if ($selisihHari > 15) {
+                return response()->setJSON([
+                    "status"  => false,
+                    "message" => "Periode tidak boleh melebihi 15 hari kerja. Pinjaman maksimal 15 hari kerja. (Total $selisihHari hari)",
+                    'token'   => csrf_hash()
+                ]);
+            }
 
-        if ($selisihHari > 15) {
-            // pinjaman yang diberikan harus dibawah 15 hari kerja
-            $data = [
-                "status" => false,
-                "message" => "Periode tidak boleh melebihi 15 hari kerja. karena pinjaman itu diberikan maksimal 15 hari kerja sesuai dengan periode pinjaman (Total hari kerja berdasarkan range yang anda masukkan sebanyak $selisihHari hari)",
-                'token' => csrf_hash()
-            ];
-            return response()->setJSON($data);
-        }
+            // hapus data lama
+            $this->pinjamanKaryawanModel->delete($id);
 
-        // remove all if exist and insert again
-        $pinjamanKaryawanModel->delete($id);
+            // generate range tanggal
+            $dateList = [];
+            while ($startDateTimestamp <= $endDateTimestamp) {
+                $dateList[] = date('Y-m-d', $startDateTimestamp);
+                $startDateTimestamp += 86400;
+            }
 
-        // init date untuk menyimpan range hari
-        $dateList = [];
-        while ($startDateTimestamp <= $endDateTimestamp) {
-            $currentDate = date('Y-m-d', $startDateTimestamp);
-            $dateList[] = $currentDate;
-            $startDateTimestamp += 86400;
-        }
+            // ambil data karyawan
+            $employee = $this->employeeModel
+                ->where('id', $employeeID)
+                ->where('deletedAt', null)
+                ->where('status', "Aktif")
+                ->first();
 
-        $employeeData = $employeesModel->where('id', $employeeID)->where('deletedAt', null)->where('status', "Aktif")->findAll();
+            if (!$employee) {
+                return response()->setJSON([
+                    "status"  => false,
+                    "message" => "Karyawan tidak ditemukan",
+                    'token'   => csrf_hash()
+                ]);
+            }
 
-        foreach ($employeeData as $e) {
+            // preload izin, hari libur, dan attendance log supaya ga query berulang
+            $izinList = $this->formPerijinanModel
+                ->where('employee_id', $employee['id'])
+                ->whereIn('periode', $dateList)
+                ->findAll();
+            $izinMap = [];
+            foreach ($izinList as $izin) {
+                $izinMap[$izin['periode']] = $izin;
+            }
+
+            $hariLiburList = $this->bigDaysModel
+                ->whereIn('date', $dateList)
+                ->findAll();
+            $hariLiburMap = array_column($hariLiburList, null, 'date');
+
+            $attLogs = $this->attendancesLogModel
+                ->select("DATE(date_create) as tanggal,
+                  DATE_FORMAT(MIN(date_create), '%H:%i:%s') as checkin,
+                  DATE_FORMAT(MAX(date_create), '%H:%i:%s') as checkout")
+                ->where('employees_id', $employee['id'])
+                ->whereIn("DATE(date_create)", $dateList)
+                ->groupBy('DATE(date_create)')
+                ->findAll();
+            $logMap = [];
+            foreach ($attLogs as $log) {
+                $logMap[$log['tanggal']] = $log;
+            }
+
             $hadir = 0;
             $tidakHadir = 0;
+
             foreach ($dateList as $dates) {
-                $formPerizinan = $formPerijinanModel->where('periode', $dates)
-                    ->where('employee_id', $e['id'])
-                    ->first();
+                $izin = $izinMap[$dates] ?? null;
+                $hariLibur = $hariLiburMap[$dates] ?? null;
+                $log = $logMap[$dates] ?? null;
 
-                $hariLibur = $hariLiburModel->where('date', $dates)->first();
-                $selectQry = "DATE_FORMAT(MIN(date_create), '%H:%i:%s') AS checkin,
-                    DATE_FORMAT(MAX(date_create), '%H:%i:%s') AS checkout";
-
-                $logAttandance = $attendancesLogModel
-                    ->select($selectQry)
-                    ->where('employees_id', $e['id'])
-                    ->where("DATE_FORMAT(date_create, '%Y-%m-%d')",  $dates)
-                    ->groupBy('DATE_FORMAT(date_create, \'%Y-%m-%d\')')
-                    ->limit(2)
-                    ->get()
-                    ->getResult();
-
-                if ($hariLibur != null || date('l', strtotime($dates)) == "Sunday" && $formPerizinan == null && \count($logAttandance) == 0) {
-                    // ada hari libur
+                if ($hariLibur != null || (date('l', strtotime($dates)) == "Sunday" && !$izin && !$log)) {
                     $tidakHadir++;
-                } elseif ($formPerizinan != null) {
-                    // ada perizinan 
-                    $tidakHadir++;
-                } elseif ($formPerizinan == null) {
-                    if (count($logAttandance) == 0) {
-                        // alpha
+                } elseif ($izin != null) {
+                    if (in_array($izin['status'], ["ALPHA_A", "CUTI HAID_CHD", "CUTI HAMIL_CHL", "CUTI MELAHIRKAN_CM", "LIBUR_L"])) {
                         $tidakHadir++;
                     } else {
-                        // data absen ada di log
                         $hadir++;
                     }
+                } elseif (!$izin && !$log) {
+                    $tidakHadir++;
+                } else {
+                    $hadir++;
                 }
             }
 
-            $golonganDetail = $golonganModel->where('golongan_name', $e['tipe'])->first();
-            $nominalPinjaman = $golonganDetail == null ? 0 : $golonganDetail['nominal_pinjaman'];
+            // ambil golongan sekali aja
+            $golonganDetail = $this->golonganModel
+                ->where('golongan_name', $employee['tipe'])
+                ->first();
 
-            $pinjamanKaryawanModel->insert([
-                'company_id' => $this->this_company_id,
-                'employee_id' => $e['id'],
-                'division_id' => $e['division_id'],
-                'month_year' => $yearMonth,
-                'start_date' => $startDate,
-                'end_date' => $endDate,
-                'tidak_hadir' => $tidakHadir,
-                'hadir' => $hadir,
+            $nominalPinjaman = $golonganDetail ? $golonganDetail['nominal_pinjaman'] : 0;
+
+            $this->pinjamanKaryawanModel->insert([
+                'company_id'      => $this->this_company_id,
+                'employee_id'     => $employee['id'],
+                'division_id'     => $employee['division_id'],
+                'month_year'      => $yearMonth,
+                'start_date'      => $startDate,
+                'end_date'        => $endDate,
+                'tidak_hadir'     => $tidakHadir,
+                'hadir'           => $hadir,
                 'is_boleh_minjam' => ($tidakHadir <= 6) ? '1' : '0',
                 'status_pinjaman' => ($tidakHadir <= 6) ? '1' : '0',
-                'nominal' => ($tidakHadir <= 6) ? $nominalPinjaman : null
+                'nominal'         => ($tidakHadir <= 6) ? $nominalPinjaman : null
+            ]);
+
+            $db->transCommit();
+
+            return response()->setJSON([
+                'status'  => true,
+                'message' => 'Generate Single Data Karyawan yang Berhak Meminjam Berhasil',
+                'token'   => csrf_hash()
+            ]);
+        } catch (Exception $e) {
+            $db->transRollback();
+            return response()->setJSON([
+                'status' => false,
+                'token' => csrf_hash(),
+                'message' => $e->getMessage()
             ]);
         }
-
-        return \response()->setJSON([
-            'status' => true,
-            'message' => 'Generate Single Data Karyawan yang Berhak Meminjam Berhasil',
-            'token' => csrf_hash()
-        ]);
     }
 
-    public function updateNominalPinjaman()
-    {
-        $id = $this->request->getVar('id');
-
-        $angka = preg_replace("/[^0-9,]/", "", $this->request->getVar('nominal'));
-        $angka = str_replace(",", ".", $angka);
-        $angkaDesimal = number_format((float) $angka, 3, '.', '');
-
-        $pinjamanKaryawanModel = new PinjamanKaryawanModel();
-
-        $pinjamanKaryawanModel->where('id', $id)->update($id, [
-            'nominal' => $angkaDesimal
-        ]);
-
-        return response()->setJSON([
-            'token' => csrf_hash(),
-            'status' => true,
-            'message' => "Nominal pinjaman berhasil diperbaruhi"
-        ]);
-    }
 
     public function all()
     {
@@ -327,24 +366,22 @@ class PinjamanKaryawan extends BaseController
 
         // Bulan, Tahun
         $month = $this->request->getGet('month');
-        $year = $this->request->getGet('year');
 
         $condition = [
-            'employees.company_id' => $this->this_company_id,
             "employees.deletedAt" => null,
             "employees.company_id" => $this->this_company_id,
-            "employees.id != " => $this->userID,
-            "pinjaman_karyawan.month_year" => $year . "-" . $month,
+            "pinjaman_karyawan.month_year" => $month,
         ];
 
         $addCondition = [
             "divisi_id"          => $this->request->getGet("divisi_id"),
             "employee_id"        => $this->request->getGet("employee_id"),
-            "employees.tipe"     => $this->request->getGet("tipe")
+            "employees.tipe"     => $this->request->getGet("tipe"),
+            "sort" => $this->request->getGet('sort'),
+            "sortType" => $this->request->getGet('sortType')
         ];
 
-        $pinjamanKaryawanModel = new PinjamanKaryawanModel();
-        $pinjamanKaryawanData = $pinjamanKaryawanModel->getList($condition, $addCondition, $limit, $offset);
+        $pinjamanKaryawanData = $this->pinjamanKaryawanModel->getList($condition, $addCondition, $limit, $offset);
         $dataPinjaman = [];
 
         $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
@@ -362,7 +399,7 @@ class PinjamanKaryawan extends BaseController
                 "tidakHadir" => $p->tidak_hadir . " Kali",
                 "statusPinjaman" => $p->status_pinjaman,
                 "isBolehMinjam" => $p->is_boleh_minjam,
-                "nominalPinjaman" => "Rp " . number_format($p->nominal, 2, ',', '.'),
+                "nominalPinjaman" => number_format($p->nominal, 2),
                 // helper
                 "monthYear" => $p->month_year,
                 "employeeID" => $p->employee_id,
@@ -381,47 +418,19 @@ class PinjamanKaryawan extends BaseController
         return response()->setJSON($data);
     }
 
-    public function changeStatusPinjaman()
+    public function exportPDF()
     {
-        try {
-            $id = $this->request->getVar('pinjamanID');
-            $statusPinjaman = $this->request->getVar('statusPinjaman');
+        $yearMonth = $this->request->getVar('year_month');
+        $divisiId = $this->request->getVar('divisi_id');
 
-            $pinjamanKaryawanModel = new PinjamanKaryawanModel();
-
-            foreach (explode(',', $id) as $rId) {
-                $pinjamanKaryawanModel->update($rId, [
-                    'status_pinjaman' => $statusPinjaman
-                ]);
-            }
-
-            return response()->setJSON([
-                'token'  => csrf_hash(),
-                'status' => true,
-                'message' => "Status pinjaman karyawan berhasil diperbaruhi"
-            ]);
-        } catch (Exception $e) {
-            return response()->setJSON([
-                'token'  => csrf_hash(),
-                'status' => false,
-                'message' => "Error in " . $e->getMessage()
-            ]);
-        }
-    }
-
-    public function exportPDF($yearMonth, $divisionID)
-    {
-        $divisiModel = new DivisisModel();
-        $pinjamanKaryawanModel = new PinjamanKaryawanModel();
         $selectQry = "pinjaman_karyawan.*,employees.name";
 
         $data = [
-            'divisi' => $divisiModel->where('id', $divisionID)->first(),
-            'pinjaman' => $pinjamanKaryawanModel->select($selectQry)
+            'divisi' => $this->divisiModel->where('id', $divisiId)->first(),
+            'pinjaman' => $this->pinjamanKaryawanModel->select($selectQry)
                 ->join('employees', 'employees.id = pinjaman_karyawan.employee_id', 'left')
                 ->where('pinjaman_karyawan.month_year', $yearMonth)
-                ->where('pinjaman_karyawan.division_id', $divisionID)
-                //->where('pinjaman_karyawan.status_pinjaman', '1')
+                ->where('pinjaman_karyawan.division_id', $divisiId)
                 ->where('pinjaman_karyawan.is_boleh_minjam', '1')
                 ->findAll(),
             'yearMonth' => $yearMonth

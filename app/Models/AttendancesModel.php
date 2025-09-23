@@ -123,183 +123,323 @@ class AttendancesModel extends Model
         return $resultTotal;
     }
 
+    // public function generate($employeeData, $startDate, $endDate, $year, $month, $companyID)
+    // {
+    //     $AttendanceModel = new AttendancesModel();
+    //     $FormPerijinanModel = new FormPerijinanModel();
+    //     $hariLiburModel = new BigDaysModel();
+    //     $AttendancesLogModel = new AttendancesLogModel();
+
+    //     try {
+    //         $startDateTimestamp = strtotime($startDate);
+    //         $endDateTimestamp = strtotime($endDate);
+
+    //         $allDates = array();
+    //         while ($startDateTimestamp <= $endDateTimestamp) {
+    //             $currentDate = date('Y-m-d', $startDateTimestamp);
+    //             $allDates[] = $currentDate;
+    //             $startDateTimestamp += 86400;
+    //         }
+
+    //         // loop employee
+    //         foreach ($employeeData as $e) {
+    //             // loop date
+    //             foreach ($allDates as $dates) {
+    //                 // chek apakah data izin
+    //                 $formPerizinan = $FormPerijinanModel->where('periode', $dates)
+    //                     ->where('employee_id', $e['id'])
+    //                     ->where('deletedAt', null)
+    //                     ->first();
+    //                 // check adakah data 
+    //                 $hariLibur = $hariLiburModel->where('date', $dates)->first();
+    //                 $selectQry = "DATE_FORMAT(MIN(date_create), '%H:%i:%s') AS checkin,
+    //                     DATE_FORMAT(MAX(date_create), '%H:%i:%s') AS checkout";
+
+    //                 $logAttandance = $AttendancesLogModel
+    //                     ->select($selectQry)
+    //                     ->where('employees_id', $e['id'])
+    //                     ->where("DATE_FORMAT(date_create, '%Y-%m-%d')",  $dates)
+    //                     ->groupBy('DATE_FORMAT(date_create, \'%Y-%m-%d\')')
+    //                     ->limit(2)
+    //                     ->get()
+    //                     ->getResult();
+
+    //                 if ($hariLibur != null || date('l', strtotime($dates)) == "Sunday" && $formPerizinan == null && \count($logAttandance) == 0) {
+    //                     // ada hari libur
+    //                     $AttendanceModel->insert([
+    //                         'company_id' => $companyID,
+    //                         'division_id' => $e['division_id'],
+    //                         'employee_id' => $e['id'],
+    //                         'periode' => $dates,
+    //                         'status' => "LIBUR_L",
+    //                         'reason' => '',
+    //                         'year_month' => $year . "-" . $month
+    //                     ]);
+    //                 } elseif ($formPerizinan != null) {
+    //                     // ada perizinan 
+    //                     $AttendanceModel->insert([
+    //                         'company_id' => $companyID,
+    //                         'division_id' => $e['division_id'],
+    //                         'employee_id' => $e['id'],
+    //                         'periode' => $dates,
+    //                         'status' => $formPerizinan['status'],
+    //                         'reason' => $formPerizinan['reason'],
+    //                         'year_month' => $year . "-" . $month,
+    //                         'isApproved' => $formPerizinan['is_approval']
+    //                     ]);
+    //                 } elseif ($formPerizinan == null) {
+    //                     // tidak ada data perizinan jadi
+    //                     // get attendance by date and employee by log
+
+    //                     if (\count($logAttandance) == 0) {
+    //                         // rekap absen tidak ditemukan
+    //                         // set jadi ALPHA
+    //                         $AttendanceModel->insert([
+    //                             'company_id' => $companyID,
+    //                             'division_id' => $e['division_id'],
+    //                             'employee_id' => $e['id'],
+    //                             'periode' => $dates,
+    //                             'status' => 'ALPHA_A',
+    //                             'year_month' => $year . "-" . $month
+    //                         ]);
+    //                     } else {
+    //                         // data absen ada di log
+    //                         if ($logAttandance[0]->checkout != $logAttandance[0]->checkin) {
+    //                             // ada attandance (in dan out)
+    //                             // create in
+    //                             $AttendanceModel->insert([
+    //                                 'company_id' => $companyID,
+    //                                 'division_id' => $e['division_id'],
+    //                                 'employee_id' => $e['id'],
+    //                                 'periode' => $dates,
+    //                                 'checkin' => \date('H:i:s', \strtotime($logAttandance[0]->checkin)), // in
+    //                                 'checkout' => \date('H:i:s', \strtotime($logAttandance[0]->checkout)), // out
+    //                                 'status' => 'HADIR_H',
+    //                                 'year_month' => $year . "-" . $month
+    //                             ]);
+    //                         } else {
+    //                             // ada attandance only(in)
+    //                             $AttendanceModel->insert([
+    //                                 'company_id' => $companyID,
+    //                                 'division_id' => $e['division_id'],
+    //                                 'employee_id' => $e['id'],
+    //                                 'periode' => $dates,
+    //                                 'checkin' => \date('H:i:s', \strtotime($logAttandance[0]->checkin)), // in
+    //                                 'checkout' => \date('H:i:s', \strtotime($logAttandance[0]->checkout)), // out
+    //                                 'status' => 'HADIR_H',
+    //                                 'year_month' => $year . "-" . $month
+    //                             ]);
+    //                         }
+    //                     }
+    //                 }
+    //             }
+    //         }
+    //         return [
+    //             'status' => true,
+    //             'message' => ''
+    //         ];
+    //     } catch (Exception $e) {
+    //         return [
+    //             'status' => false,
+    //             'message' => $e->getMessage()
+    //         ];
+    //     }
+    // }
+
     public function generate($employeeData, $startDate, $endDate, $year, $month, $companyID)
     {
-        $AttendanceModel = new AttendancesModel();
-        $FormPerijinanModel = new FormPerijinanModel();
-        $hariLiburModel = new BigDaysModel();
+        $AttendanceModel     = new AttendancesModel();
+        $FormPerijinanModel  = new FormPerijinanModel();
+        $hariLiburModel      = new BigDaysModel();
         $AttendancesLogModel = new AttendancesLogModel();
 
         try {
+            // --- 1. siapkan range tanggal
+            $allDates = [];
             $startDateTimestamp = strtotime($startDate);
-            $endDateTimestamp = strtotime($endDate);
+            $endDateTimestamp   = strtotime($endDate);
 
-            $allDates = array();
             while ($startDateTimestamp <= $endDateTimestamp) {
-                $currentDate = date('Y-m-d', $startDateTimestamp);
-                $allDates[] = $currentDate;
+                $allDates[] = date('Y-m-d', $startDateTimestamp);
                 $startDateTimestamp += 86400;
             }
 
-            // loop employee
+            $employeeIds = array_column($employeeData, 'id');
+
+            // --- 2. load semua perizinan (sekali query)
+            $formPerizinanAll = $FormPerijinanModel
+                ->whereIn('employee_id', $employeeIds)
+                ->where('deletedAt', null)
+                ->where('periode >=', $startDate)
+                ->where('periode <=', $endDate)
+                ->findAll();
+
+            $mapPerizinan = [];
+            foreach ($formPerizinanAll as $izin) {
+                $mapPerizinan[$izin['employee_id']][$izin['periode']] = $izin;
+            }
+
+            // --- 3. load semua hari libur (sekali query)
+            $hariLiburAll = $hariLiburModel
+                ->where('date >=', $startDate)
+                ->where('date <=', $endDate)
+                ->findAll();
+
+            $setHariLibur = array_column($hariLiburAll, 'date');
+            $setHariLibur = array_flip($setHariLibur); // untuk cepat cek isset()
+
+            // --- 4. load semua log attendance (sekali query)
+            $logs = $AttendancesLogModel
+                ->select("
+                employees_id,
+                DATE(date_create) as tgl,
+                DATE_FORMAT(MIN(date_create), '%H:%i:%s') AS checkin,
+                DATE_FORMAT(MAX(date_create), '%H:%i:%s') AS checkout
+            ")
+                ->whereIn('employees_id', $employeeIds)
+                ->where('date_create >=', $startDate . ' 00:00:00')
+                ->where('date_create <=', $endDate . ' 23:59:59')
+                ->groupBy('employees_id, DATE(date_create)')
+                ->findAll();
+
+            $mapLog = [];
+            foreach ($logs as $l) {
+                $mapLog[$l['employees_id']][$l['tgl']] = [
+                    'checkin'  => $l['checkin'],
+                    'checkout' => $l['checkout']
+                ];
+            }
+
+
+
+            // --- 5. loop employee × tanggal (tanpa query)
+            $batchInsert = [];
+
             foreach ($employeeData as $e) {
-                // loop date
                 foreach ($allDates as $dates) {
-                    // chek apakah data izin
-                    $formPerizinan = $FormPerijinanModel->where('periode', $dates)
-                        ->where('employee_id', $e['id'])
-                        ->where('deletedAt', null)
-                        ->first();
-                    // check adakah data 
-                    $hariLibur = $hariLiburModel->where('date', $dates)->first();
-                    $selectQry = "DATE_FORMAT(MIN(date_create), '%H:%i:%s') AS checkin,
-                        DATE_FORMAT(MAX(date_create), '%H:%i:%s') AS checkout";
+                    $izin  = $mapPerizinan[$e['id']][$dates] ?? null;
+                    $log   = $mapLog[$e['id']][$dates] ?? null;
+                    $libur = isset($setHariLibur[$dates]) || date('w', strtotime($dates)) == 0;
 
-                    $logAttandance = $AttendancesLogModel
-                        ->select($selectQry)
-                        ->where('employees_id', $e['id'])
-                        ->where("DATE_FORMAT(date_create, '%Y-%m-%d')",  $dates)
-                        ->groupBy('DATE_FORMAT(date_create, \'%Y-%m-%d\')')
-                        ->limit(2)
-                        ->get()
-                        ->getResult();
+                    if ($libur && !$izin && !$log) {
+                        $status = "LIBUR_L";
+                        $reason = "";
+                        $checkin = $checkout = null;
+                    } elseif ($izin) {
 
-                    if ($hariLibur != null || date('l', strtotime($dates)) == "Sunday" && $formPerizinan == null && \count($logAttandance) == 0) {
-                        // ada hari libur
-                        $AttendanceModel->insert([
-                            'company_id' => $companyID,
-                            'division_id' => $e['division_id'],
-                            'employee_id' => $e['id'],
-                            'periode' => $dates,
-                            'status' => "LIBUR_L",
-                            'reason' => '',
-                            'year_month' => $year . "-" . $month
-                        ]);
-                    } elseif ($formPerizinan != null) {
-                        // ada perizinan 
-                        $AttendanceModel->insert([
-                            'company_id' => $companyID,
-                            'division_id' => $e['division_id'],
-                            'employee_id' => $e['id'],
-                            'periode' => $dates,
-                            'status' => $formPerizinan['status'],
-                            'reason' => $formPerizinan['reason'],
-                            'year_month' => $year . "-" . $month,
-                            'isApproved' => $formPerizinan['is_approval']
-                        ]);
-                    } elseif ($formPerizinan == null) {
-                        // tidak ada data perizinan jadi
-                        // get attendance by date and employee by log
-
-                        if (\count($logAttandance) == 0) {
-                            // rekap absen tidak ditemukan
-                            // set jadi ALPHA
-                            $AttendanceModel->insert([
-                                'company_id' => $companyID,
-                                'division_id' => $e['division_id'],
-                                'employee_id' => $e['id'],
-                                'periode' => $dates,
-                                'status' => 'ALPHA_A',
-                                'year_month' => $year . "-" . $month
-                            ]);
-                        } else {
-                            // data absen ada di log
-                            if ($logAttandance[0]->checkout != $logAttandance[0]->checkin) {
-                                // ada attandance (in dan out)
-                                // create in
-                                $AttendanceModel->insert([
-                                    'company_id' => $companyID,
-                                    'division_id' => $e['division_id'],
-                                    'employee_id' => $e['id'],
-                                    'periode' => $dates,
-                                    'checkin' => \date('H:i:s', \strtotime($logAttandance[0]->checkin)), // in
-                                    'checkout' => \date('H:i:s', \strtotime($logAttandance[0]->checkout)), // out
-                                    'status' => 'HADIR_H',
-                                    'year_month' => $year . "-" . $month
-                                ]);
-                            } else {
-                                // ada attandance only(in)
-                                $AttendanceModel->insert([
-                                    'company_id' => $companyID,
-                                    'division_id' => $e['division_id'],
-                                    'employee_id' => $e['id'],
-                                    'periode' => $dates,
-                                    'checkin' => \date('H:i:s', \strtotime($logAttandance[0]->checkin)), // in
-                                    'checkout' => \date('H:i:s', \strtotime($logAttandance[0]->checkout)), // out
-                                    'status' => 'HADIR_H',
-                                    'year_month' => $year . "-" . $month
-                                ]);
-                            }
-                        }
+                        $status  = $izin['status'];
+                        $reason  = $izin['reason'];
+                        $checkin = $checkout = null;
+                    } elseif (!$log) {
+                        $status = "ALPHA_A";
+                        $reason = "";
+                        $checkin = $checkout = null;
+                    } else {
+                        $status  = "HADIR_H";
+                        $reason  = "";
+                        $checkin = $log['checkin'];
+                        $checkout = $log['checkout'];
                     }
+
+                    $batchInsert[] = [
+                        'company_id'  => $companyID,
+                        'division_id' => $e['division_id'],
+                        'employee_id' => $e['id'],
+                        'periode'     => $dates,
+                        'checkin'     => $checkin,
+                        'checkout'    => $checkout,
+                        'status'      => $status,
+                        'reason'      => $reason,
+                        'year_month'  => $year . "-" . $month,
+                        'isApproved'  => $izin['is_approval'] ?? 1
+                    ];
                 }
             }
-            return [
-                'status' => true,
-                'message' => ''
-            ];
-        } catch (Exception $e) {
-            return [
-                'status' => false,
-                'message' => $e->getMessage()
-            ];
+
+            // --- 6. insert batch biar cepat
+            if ($batchInsert) {
+                $AttendanceModel->insertBatch($batchInsert, 500);
+            }
+
+            return ['status' => true, 'message' => ''];
+        } catch (\Exception $e) {
+            return ['status' => false, 'message' => $e->getMessage()];
         }
     }
 
-    public function detectIfGenerate($yearMonth, $employeeID)
-    {
-        $res = $this->asArray()->where('employee_id', $employeeID)->where('year_month', $yearMonth)->findAll();
-        return (count($res) == 0) ? false : true;
-    }
 
-    public function triwulanPDF($yearMonth, $divisionID, $companyID)
+    public function getTriwulan($yearMonth, $divisionID, $companyID)
     {
         $res = [];
         $employeeModel = new EmployeesModel();
+
         $arrCondition = [
             'employees.deletedAt' => null,
             'employees.company_id' => $companyID,
-            'divisis.id' => $divisionID,
-            'divisis.deletedAt' => null,
-            'employees.status' => "Aktif",
-            'employees.gender' => "Wanita"
+            'employees.division_id' => $divisionID,
         ];
 
-        $employeeData = $employeeModel->select('*')
-            ->select("employees.*, divisis.divisi, bagian.nama_bagian")
-            ->join('divisis', 'employees.division_id = divisis.id')
-            ->join('bagian', 'employees.bagian_id = bagian.id')
-            ->groupStart()->where($arrCondition)->groupEnd()
+        // Ambil semua employee
+        $employeeData = $employeeModel->select("employees.*, divisis.divisi, bagian.nama_bagian")
+            ->join('divisis', 'employees.division_id = divisis.id', 'left')
+            ->join('bagian', 'employees.bagian_id = bagian.id', 'left')
+            ->where($arrCondition)
             ->get()
             ->getResultArray();
 
+        if (!$employeeData) {
+            return ['res' => []];
+        }
+
+        $employeeIDs = array_column($employeeData, 'id');
+
+        // ✅ Ambil semua attendance sekaligus
+        $AttendanceModel = new AttendancesModel();
+        $attendanceData = $AttendanceModel
+            ->select('employee_id, year_month, status, COUNT(DISTINCT DATE(periode)) as count')
+            ->whereIn('employee_id', $employeeIDs)
+            ->whereIn('year_month', $yearMonth)
+            ->where('deletedAt', null)
+            ->groupBy('employee_id, year_month, status')
+            ->get()
+            ->getResultArray();
+
+        // Buat index agar lookup cepat
+        $attendanceIndex = [];
+        foreach ($attendanceData as $row) {
+            $attendanceIndex[$row['employee_id']][$row['year_month']][$row['status']] = $row['count'];
+        }
+
+        // Mulai proses tiap employee
         foreach ($employeeData as $ed) {
             $totalAPH = 0;
             $maxCupon = 15;
             $totalCutiHaid = 0;
             $kehadiran = [];
+
             foreach ($yearMonth as $ym) {
+                $A = static::sumStatus($attendanceIndex, $ed['id'], $ym, ['ALPHA_A', 'LIBUR_L']);
+                $P = static::sumStatus($attendanceIndex, $ed['id'], $ym, ['CUTI TAHUNAN_CT', 'CUTI HAID_CHD', 'CUTI HAMIL_CHL', 'CUTI MELAHIRKAN_CM', 'IJIN_I', 'SAKIT_S']);
+                $H = static::sumStatus($attendanceIndex, $ed['id'], $ym, ['RL_RL', 'HADIR_H']);
+
                 $kehadiran[] = [
                     'yearMonth' => $ym,
-                    'A' => static::hitungKehadiranSebulan($ym, $ed['id'], ['ALPHA_A', 'LIBUR_L']),
-                    'P' => static::hitungKehadiranSebulan($ym, $ed['id'], ['CUTI TAHUNAN_CT', 'CUTI HAID_CHD', 'CUTI HAMIL_CHL', 'CUTI MELAHIRKAN_CM', 'IJIN_I', 'SAKIT_S']),
-                    'H' => static::hitungKehadiranSebulan($ym, $ed['id'], ['RL_RL', 'HADIR_H'])
+                    'A' => $A,
+                    'P' => $P,
+                    'H' => $H,
                 ];
 
-                $totalCutiHaid += static::hitungKehadiranSebulan($ym, $ed['id'], ['CUTI HAID_CHD']);
+                $totalCutiHaid += static::sumStatus($attendanceIndex, $ed['id'], $ym, ['CUTI HAID_CHD']);
+                $totalAPH += $P; // sesuai kode lama
             }
 
-            foreach ($kehadiran as $k) {
-                // $totalAPH += ($k['A'] + $k['P'] + $k['H']);
-                $totalAPH += ($k['P']);
-            }
-
+            // Hitung max coupon
             if ($totalCutiHaid == 1) {
-                $maxCupon = $maxCupon - 8;
+                $maxCupon -= 8;
             } elseif ($totalCutiHaid == 2) {
-                $maxCupon = $maxCupon - 10;
+                $maxCupon -= 10;
             } elseif ($totalCutiHaid == 3) {
-                $maxCupon = $maxCupon - 12;
+                $maxCupon -= 12;
             } elseif ($totalCutiHaid >= 4) {
                 $maxCupon = 0;
             }
@@ -307,38 +447,43 @@ class AttendancesModel extends Model
             $res[] = [
                 'id' => $ed['id'],
                 'name' => $ed['name'],
+                'nip' => $ed['nip'],
                 'kehadiran' => $kehadiran,
                 'totalAPH' => $totalAPH,
                 'totalKupon' => $maxCupon
             ];
         }
 
-        return [
-            'res' => $res
-        ];
+        return ['res' => $res];
+    }
+
+    // Helper untuk lookup data attendance
+    static function sumStatus($attendanceIndex, $employeeID, $yearMonth, $statuses)
+    {
+        $count = 0;
+        foreach ($statuses as $s) {
+            if (isset($attendanceIndex[$employeeID][$yearMonth][$s])) {
+                $count += $attendanceIndex[$employeeID][$yearMonth][$s];
+            }
+        }
+        return $count;
     }
 
 
-    static function hitungKehadiranSebulan($yearMonth, $employeeID, $status)
+    public function getAttendanceAmt($employeeIds, $year, $month)
     {
-        $AttendanceModel = new AttendancesModel();
-        $res = $AttendanceModel
-            ->select('status, COUNT(DISTINCT DATE(periode)) as count')
-            ->where('employee_id', $employeeID)
-            ->where('year_month', $yearMonth)
-            ->whereIn('status', $status)
+        $yearMonth = $year . "-" . $month;
+        $selectQry = "attendances.*";
+        $dataQry = $this->asArray()
+            ->select($selectQry)
+            ->whereIn('employee_id', $employeeIds)
             ->where('deletedAt', null)
-            ->groupBy('status')
-            ->get()
-            ->getResultArray();
+            ->where("DATE_FORMAT(periode, '%Y-%m')", $yearMonth)
+            ->groupBy('periode')
+            ->groupBy('employee_id')
+            ->orderBy('periode')
+            ->findAll();
 
-        $resultCount = 0;
-
-        foreach ($res as $row) {
-            $count = $row['count'];
-            $resultCount += $count;
-        }
-
-        return $resultCount;
+        return $dataQry;
     }
 }

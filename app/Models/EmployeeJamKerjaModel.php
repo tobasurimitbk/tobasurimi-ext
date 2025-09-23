@@ -48,9 +48,11 @@ class EmployeeJamKerjaModel extends Model
         $jamKerja = null;
 
         // DAPATKAN JAM KERJA YANG DIGUNAKAN OLEH KARYAWAN
-        $jamKerjaEmployee = $this->where('employee_id', $employeeId)
+        $jamKerjaEmployee = $this
+            ->where('employee_id', $employeeId)
             ->where('tanggal', $date)
             ->first();
+
         if ($jamKerjaEmployee != null) {
             // JAM KERJA DI SET PERHARI
             $jamKerja = $jamKerjaModel->where('id', $jamKerjaEmployee['jam_kerja_id'])->first();

@@ -4,7 +4,7 @@
 <!-- Begin Page Content -->
 <section class="section">
     <div class="section-header">
-        <h1>Form Lembur</h1>
+        <h1>List Form Lembur</h1>
         <?php if (can('Personalia', 'Form Lembur', 'c')) : ?>
             <a class="btn btn-show-form btn-add float-right" href="<?= base_url("lembur/create"); ?>">
                 <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
@@ -14,50 +14,22 @@
     <?= csrf_field() ?>
     <div class="card">
         <div class="card-body">
-            <div class="row justify-content-end row-col-page-list-attendance">
-                <div class="col-6 mb-2">
-                    <form id="search_form" name="search_form" class="kt-form kt-form--fit kt-margin-b-20">
-                        <select name="month" id="month">
-                            <?php
-                            for ($i = 1; $i <= 12; $i++) {
-                                $temp = (strlen($i) == 1) ? ("0" . $i) : $i;
-                                $checked = ($month == $temp) ? "selected" : "";
-                            ?>
-                                <option value="<?php echo $temp; ?>" <?php echo $checked; ?>><?php echo $temp; ?></option>
-                            <?php
-                            }
-                            ?>
-                        </select>
-                        <select name="year" id="year">
-                            <?php
-                            for ($i = date("Y") - 2; $i <= date("Y") + 2; $i++) {
-                                $checked = ($year == $i) ? "selected" : "";
-                            ?>
-                                <option value="<?php echo $i; ?>" <?php echo $checked; ?>><?php echo $i; ?></option>
-                            <?php
-                            }
-                            ?>
-                        </select>
-                        <button type="button" class="btn btn-primary btn-brand--icon" id="filterYearMonth">
-                            <span>
-                                <i class="la la-print"></i>
-                                <span>Cari</span>
-                            </span>
-                        </button>
-
-                    </form>
+            <div class="row justify-content-end">
+                <div class="col-sm-3">
+                    <div class="input-group">
+                        <div class="form-floating" style="height: 50px;">
+                            <input placeholder="" value="<?= date('Y-m') ?>" class="form-control month" id="month" name="month" />
+                            <label style="z-index: 1;" style="z-index: 1;">Pilih Bulan</label>
+                        </div>
+                        <div class="input-group-append" style="height:50px;">
+                            <button disabled class="btn btn-secondary" type="button">
+                                <i class="fas fa-calendar-alt"></i>
+                            </button>
+                        </div>
+                    </div>
                 </div>
-                <div class="col-6 mb-2">
-                    <div class="kt-separator kt-separator--border-dashed kt-separator--space-md"></div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="card">
-        <div class="card-body">
-            <div class="row justify-content-end row-col-spp">
                 <div class="col-md-3">
-                    <input autocomplete="one-time-code" class="form-control search form-out-search fos-jk mb-3" placeholder="Cari NIP / Nama Karyawan" id="filterSearch" value="" />
+                    <input autocomplete="one-time-code" class="form-control search form-out-search fos-jk mb-3" placeholder="Cari Data" id="search" value="" />
                 </div>
             </div>
             <div class="row">
@@ -67,14 +39,18 @@
                             <tr>
                                 <th style="width: 10px;" class="sort">No</th>
                                 <th onclick="changeSort('employees.nip')" class="sort">NIP</th>
-                                <th onclick="changeSort('employees.name')" class="sort">Nama Karyawan</th>
-                                <th onclick="changeSort('divisis.divisi')" class="sort">Departemen</th>
+                                <th onclick="changeSort('employees.name')" class="sort">Karyawan</th>
+                                <th onclick="changeSort('employees.division_id')" class="sort">Dept</th>
+                                <th onclick="changeSort('employees.bagian_id')" class="sort">Bagian</th>
                                 <th onclick="changeSort('form_lembur.periode')" class="sort">Tgl Lembur</th>
-                                <th onclick="changeSort('form_lembur.total_jam_lembur')" class="sort">Jam Lembur</th>
-                                <th onclick="changeSort('form_lembur.total_uang_lembur')" class="sort">Uang Lembur</th>
+                                <th onclick="changeSort('form_lembur.jam_mulai_lembur')" class="sort">Mulai Lembur</th>
+                                <th onclick="changeSort('form_lembur.jam_selesai_lembur')" class="sort">Selesai Lembur</th>
+                                <th onclick="changeSort('form_lembur.total_jam_lembur')" class="sort">Total Jam Lembur</th>
+                                <th onclick="changeSort('form_lembur.total_uang_lembur')" class="sort">Nominal Lembur</th>
+                                <th class="sort">Action</th>
                             </tr>
                         </thead>
-                        <tbody class="body-table" id="body-table" style="cursor: pointer;">
+                        <tbody class="body-table" id="body-table">
                         </tbody>
                     </table>
                 </div>
@@ -85,11 +61,10 @@
 
 <script>
     const csrfToken = '<?= csrf_token() ?>';
-    let sort = "nomor";
+    let sort = "form_lembur.id";
     let sortType = "desc";
 
     const table = $('.dataTable').DataTable({
-
         processing: true,
         serverSide: true,
         ordering: true,
@@ -106,8 +81,8 @@
             url: "<?= base_url("lembur/all"); ?>",
             dataSrc: "data",
             data: function(data) {
-                data.search = $('#filterSearch').val();
-                data.yearMonth = $('#year').val() + "-" + $('#month').val();
+                data.search = $('#search').val();
+                data.month = $('#month').val();
                 data.sort = sort;
                 data.sortType = sortType;
             }
@@ -125,37 +100,82 @@
                 data: "no",
                 className: "text-center",
                 sortable: false,
-                width: "5%"
+                width: "3%"
             }, {
                 data: "nip",
-                className: "text-center",
+                className: "text-left",
                 width: "10%"
             },
             {
                 data: "name",
-                className: "text-center"
+                className: "text-left"
             },
             {
                 data: "divisi",
-                className: "text-center"
+                className: "text-left"
+            },
+            {
+                data: "nama_bagian",
+                className: "text-left"
             },
             {
                 data: "periode",
-                className: "text-center"
+                className: "text-left"
             },
             {
-                data: "jam_lembur",
-                className: "text-center"
+                data: "jam_mulai_lembur",
+                className: "text-left"
             },
             {
-                data: "uang_lembur",
-                className: "text-center"
+                data: "jam_selesai_lembur",
+                className: "text-left"
+            },
+            {
+                data: "total_jam_lembur",
+                className: "text-left"
+            },
+            {
+                data: "total_uang_lembur",
+                className: "text-left"
+            },
+            {
+                data: "id",
+                className: "text-center actions",
+                searchable: false,
+                sortable: false,
+                width: "10%",
+                render: function(data, type, row) {
+                    let id = row.id;
+                    let res = '';
+
+                    res += `
+                  <?php if (can('Personalia', 'Form Lembur', 'u')): ?>
+                        <a href="javascript:void(0)" onclick="edit('${id}')" data-toggle="tooltip" title="Edit" class="btn btn-primary">
+                            <i class="fas fa-edit"></i>
+                        </a>
+                    <?php endif ?>
+                  <?php if (can('Personalia', 'Form Lembur', 'd')): ?>
+                        <button data-toggle="tooltip" title="Hapus" onclick="remove('${id}')" class="btn btn-danger delete-parent">
+                            <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
+                        </button>
+                    <?php endif ?>
+                 
+                `;
+
+                    return res;
+                }
             }
         ],
         columnDefs: [{
             defaultContent: "-",
             targets: "_all"
         }],
+        "drawCallback": function(settings) {
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-toggle="tooltip"]'))
+            var tooltipList = tooltipTriggerList.map(function(tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl)
+            });
+        },
         language: {
             emptyTable: "Data Form Lembur tidak ada", // Change this line
             lengthMenu: "Show _MENU_ entries",
@@ -180,13 +200,73 @@
         }
     }
 
-    $("#filterSearch").keyup(function() {
+    $(".month").datepicker({
+        format: "yyyy-mm",
+        startView: "months", // langsung tampilin bulan
+        minViewMode: "months", // cuma bisa pilih bulan
+        autoclose: true,
+        todayHighlight: true,
+        orientation: "bottom auto"
+    });
+
+    $("#search").keyup(function() {
         table.ajax.reload();
     });
 
-    $('#filterYearMonth').click(function() {
+    $('#month').change(function() {
         table.ajax.reload();
     });
+
+    function edit(id) {
+        location.replace(`<?= base_url("lembur/id"); ?>/${id}`);
+    }
+
+    function remove(id) {
+        Swal.fire({
+            icon: 'question',
+            title: 'Hapus Lembur?',
+            confirmButtonColor: '#4e73df',
+            cancelButtonColor: '#d33',
+            showCancelButton: true,
+            reverseButtons: true,
+            confirmButtonText: 'Ya, Hapus',
+            cancelButtonText: 'Kembali',
+        }).then((result) => {
+            if (result.isConfirmed) {
+                const csrf = $(`[name="${csrfToken}"]`);
+                $.ajax({
+                    url: "<?= base_url("lembur/delete"); ?>",
+                    data: {
+                        id: id
+                    },
+                    beforeSend: function(xhr) {
+                        setLoading();
+                        xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                    },
+                    complete: function() {
+                        stopLoading()
+                    },
+                    method: "POST",
+                    dataType: "json",
+                    success: function(response) {
+                        csrf.val(response.token);
+                        if (response.status) {
+                            Swal.fire({
+                                    icon: 'success',
+                                    title: response.message,
+                                    confirmButtonColor: '#4e73df',
+                                })
+                                .then(() => {
+                                    table.ajax.reload()
+                                })
+                        }
+                    },
+
+                });
+            }
+        });
+
+    }
 </script>
 
 <?= $this->endSection(); ?>

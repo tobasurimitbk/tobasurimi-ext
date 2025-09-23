@@ -71,6 +71,7 @@ class PinjamanKaryawanModel extends Model
         $sort = $availableSort[$addCondition['sort'] ?? 'createdAt'] ?? 'employees.name';
         $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'DESC';
 
+
         $selectQry = "pinjaman_karyawan.*,
                     employees.nip, employees.name AS employeeName, employees.division_id, 
                     employees.tipe,

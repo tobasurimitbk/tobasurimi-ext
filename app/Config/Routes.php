@@ -2038,20 +2038,20 @@ $routes->get('/log-attendance', 'HR\Attendance::indexLog', ['filter' => 'Auth'])
 $routes->post('/log-attendance/all', 'HR\Attendance::allLog', ['filter' => 'Auth']);
 $routes->post('/log-attendance/all-total', 'HR\Attendance::allLogTotal', ['filter' => 'Auth']);
 $routes->get('/log-attendance/detail', 'HR\Attendance::getLogAttendanceDetail', ['filter' => 'Auth']);
-// $routes->get('/log-attendance/print/id/(:segment)', 'HR\Attendance::exportPDFLogPresensi/$1', ['filter' => 'Auth']);
 $routes->get('/log-attendance/export', 'HR\Attendance::exportExcelLogPresensi', ['filter' => 'Auth']);
+$routes->get('/log-attendance/like-employees', 'HR\Attendance::getEmployeesLike', ['filter' => 'Auth']);
 
 // Generate Attendance
-$routes->get('/list-attendance', 'HR\Attendance::generateAttendanceView', ['filter' => 'Auth']);
-$routes->post('/generate-attendance/global', 'HR\Attendance::generateAttendanceGlobalAction', ['filter' => 'Auth']);
-$routes->post('/generate-attendance/personal', 'HR\Attendance::generateAttendancePersonalAction', ['filter' => 'Auth']);
-$routes->post('/get-attendance', 'HR\Attendance::getDetailAttendance', ['filter' => 'Auth']);
-$routes->post('/update-attendance', 'HR\Attendance::updateAttendance', ['filter' => 'Auth']);
-$routes->post('/posting-unposting-attendance', 'HR\Attendance::updatePostAttendance', ['filter' => 'Auth']);
-$routes->get('/attendance/like-employees', 'HR\Attendance::getEmployeesLike', ['filter' => 'Auth']);
-$routes->get('/list-attendance/print/id/(:segment)', 'HR\Attendance::exportPDFPresensi/$1', ['filter' => 'Auth']);
-$routes->get('/list-attendance/excel/id/(:segment)', 'HR\Attendance::exportExcelPresensi/$1', ['filter' => 'Auth']);
-$routes->get('/list-attendance/triwulan/id/(:segment)/(:segment)/(:segment)', 'HR\Attendance::exportTriwulanAbsensi/$1/$2/$3', ['filter' => 'Auth']);
+$routes->get('/list-attendance', 'HR\Attendance::indexAttendance', ['filter' => 'Auth']);
+$routes->post('/list-attendance/all', 'HR\Attendance::allAttendance', ['filter' => 'Auth']);
+$routes->post('/list-attendance/all-total', 'HR\Attendance::allAttendanceTotal', ['filter' => 'Auth']);
+$routes->get('/list-attendance/like-employees', 'HR\Attendance::getEmployeesLike', ['filter' => 'Auth']);
+$routes->post('/list-attendance/generate-global', 'HR\Attendance::generateAttendanceGlobalAction', ['filter' => 'Auth']);
+$routes->post('/list-attendance/generate-personal', 'HR\Attendance::generateAttendancePersonalAction', ['filter' => 'Auth']);
+$routes->post('/list-attendance/get-attendance', 'HR\Attendance::getDetailAttendance', ['filter' => 'Auth']);
+$routes->post('/list-attendance/update-attendance', 'HR\Attendance::updateAttendance', ['filter' => 'Auth']);
+$routes->get('/list-attendance/export-bulanan', 'HR\Attendance::exportExcelPresensi', ['filter' => 'Auth']);
+$routes->get('/list-attendance/export-triwulan', 'HR\Attendance::exportTriwulanPresensi', ['filter' => 'Auth']);
 
 // Big Day
 $routes->get('/big-days', 'Master\BigDays::ListBigDay', ['filter' => 'Auth']);
@@ -2080,8 +2080,8 @@ $routes->post('/tunjangan/update', 'Master\Tunjangan::updateTunjangan', ['filter
 $routes->post('/tunjangan/delete', 'Master\Tunjangan::deleteTunjangan', ['filter' => 'Auth']);
 
 // payroll
-$routes->get('/payroll', 'HR\Payroll::payroll', ['filter' => 'Auth']);
-$routes->get('/payroll/all', 'HR\Payroll::getAllPayRoll', ['filter' => 'Auth']);
+$routes->get('/payroll', 'HR\Payroll::index', ['filter' => 'Auth']);
+$routes->get('/payroll/all', 'HR\Payroll::all', ['filter' => 'Auth']);
 $routes->get('/payroll/getBagian', 'HR\Payroll::getBagian', ['filter' => 'Auth']);
 $routes->post('/payroll/generate-global', 'HR\Payroll::generateGlobalPayroll', ['filter' => 'Auth']);
 $routes->post('/payroll/generate-single', 'HR\Payroll::generateSinglePayroll', ['filter' => 'Auth']);
@@ -2097,14 +2097,12 @@ $routes->get('/payroll/print/summary/(:segment)/(:segment)', 'HR\Payroll::export
 $routes->get('/payroll/print/potongan/(:segment)/(:segment)', 'HR\Payroll::exportPdfPotongan/$1/$2', ['filter' => 'Auth']);
 
 // pinjaman karyawan
-$routes->get('/pinjaman-karyawan', 'HR\PinjamanKaryawan::pinjamanKaryawan', ['filter' => 'Auth']);
+$routes->get('/pinjaman-karyawan', 'HR\PinjamanKaryawan::index', ['filter' => 'Auth']);
 $routes->get('/pinjaman-karyawan/all', 'HR\PinjamanKaryawan::all', ['filter' => 'Auth']);
 $routes->post('/pinjaman-karyawan/generate-all', 'HR\PinjamanKaryawan::generateAllPinjaman', ['filter' => 'Auth']);
 $routes->post('/pinjaman-karyawan/employees', 'HR\Payroll::getEmployeeByDivision', ['filter' => 'Auth']);
 $routes->post('/pinjaman-karyawan/generate-single', 'HR\PinjamanKaryawan::generateSinglePinjaman', ['filter' => 'Auth']);
-$routes->post('/pinjaman-karyawan/update-nominal', 'HR\PinjamanKaryawan::updateNominalPinjaman', ['filter' => 'Auth']);
-$routes->post('/pinjaman-karyawan/change-status', 'HR\PinjamanKaryawan::changeStatusPinjaman', ['filter' => 'Auth']);
-$routes->get('/pinjaman-karyawan/print/(:segment)/(:segment)', 'HR\PinjamanKaryawan::exportPDF/$1/$2', ['filter' => 'Auth']);
+$routes->get('/pinjaman-karyawan/print', 'HR\PinjamanKaryawan::exportPDF', ['filter' => 'Auth']);
 
 // Perijinan
 $routes->get('/form-perijinan', 'HR\Perijinan::perijinan', ['filter' => 'Auth']);

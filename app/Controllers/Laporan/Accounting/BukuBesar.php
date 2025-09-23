@@ -127,29 +127,52 @@ class BukuBesar extends BaseController
         $jenisAccount = $this->request->getPost('jenis_account');
         $supplierId = $this->request->getPost('supplier_id');
 
-
         $result = [];
 
+        // company scope / company filter (sesuai logika awal)
         if ($this->this_company_id == 1 || $this->this_company_id == 2) {
             $companyId = [1, 2];
+            $companyScope = [1, 2];
         } else if ($this->this_company_id == 15) {
             $companyId = [15];
+            $companyScope = [15];
         } else {
             $companyId = [16];
+            $companyScope = [16];
         }
 
+        // Kondisi dasar untuk query jurnal
         $condition = [];
         if ($this->this_role_id != '7') {
             $condition['jurnal_umum.id_transaksi !='] = '1404';
             $condition['transaksi_jurnal.type_transaksi !='] = '1404';
         }
-
         if (!empty($supplierId)) {
             $condition['jurnal_umum.supplier_id'] = $supplierId;
         }
 
-        // Fungsi umum untuk mendapatkan saldo lama dan data jurnal
-        $fetchJurnalData = function ($coaIds) use ($dateStart, $dateEnd, $divisiId, $companyId, $condition) {
+        // Helper: merge array hasil jurnal unik berdasarkan jurnal_umum.id, lalu sort by no_transaksi
+        $mergeUniqueJurnal = function (array $existing, array $additional) {
+            $map = [];
+            foreach ($existing as $r) {
+                if (isset($r['id'])) $map[$r['id']] = $r;
+            }
+            foreach ($additional as $r) {
+                if (isset($r['id']) && !isset($map[$r['id']])) $map[$r['id']] = $r;
+            }
+            $out = array_values($map);
+            usort($out, function ($a, $b) {
+                return strcmp($a['no_transaksi'] ?? '', $b['no_transaksi'] ?? '');
+            });
+            return $out;
+        };
+
+        // Fungsi umum untuk mendapatkan saldo lama dan data jurnal untuk daftar id_coa tertentu
+        $fetchJurnalData = function (array $coaIds) use ($dateStart, $dateEnd, $divisiId, $companyId, $condition) {
+            if (empty($coaIds)) {
+                return [[], 0];
+            }
+
             // Query dasar
             $dataJurnalUmum = $this->jurnalUmumModel
                 ->select('
@@ -185,24 +208,21 @@ class BukuBesar extends BaseController
                 $dataJurnalUmum->where('divisi_id', $divisiId);
             }
 
+            $resultJurnalUmum = $dataJurnalUmum->whereIn('id_coa', $coaIds)->findAll() ?: [];
 
-            $resultJurnalUmum = $dataJurnalUmum->whereIn('id_coa', $coaIds)->findAll();
+            // Hitung saldo lama (fungsi model tetap dipanggil dengan array id_coa)
             $saldoLama = $this->jurnalUmumModel->getTotalSaldoLama([
                 'tanggal_awal' => $dateStart,
                 'id_coa' => $coaIds
             ]);
+
             return [$resultJurnalUmum, $saldoLama];
         };
 
-        // Proses berdasarkan account ID atau range account
+        // Proses berdasarkan account ID (sub_account atau header)
         if (!empty($accountId)) {
             foreach ($accountId as $a) {
                 if ($jenisAccount == "sub_account") {
-                    // Tentukan company scope
-                    $companyScope = ($this->this_company_id == 1 || $this->this_company_id == 2) 
-                        ? [1, 2] 
-                        : [$this->this_company_id];
-
                     // Ambil semua sub akun dengan no_sub sesuai dan dalam company scope
                     $subAccounts = $this->Sub_AkunsModel
                                         ->where('sub_akuns.no_sub', $a)
@@ -216,32 +236,29 @@ class BukuBesar extends BaseController
                         continue;
                     }
 
-                    // Ambil semua id untuk query jurnal
-                    $subAccountIds = array_column($subAccounts, 'id');
-
-                    [$resultJurnalUmum, $saldoLama] = $fetchJurnalData($subAccountIds);
-
+                    // IMPORTANT: ambil jurnal per sub-account (jangan reuse jurnal gabungan untuk semua sub account)
                     foreach ($subAccounts as $subAccount) {
-                        $key = $subAccount['nama_sub'];
+                        $subId = $subAccount['id'];
+                        [$resultJurnalUmum, $saldoLama] = $fetchJurnalData([$subId]);
+
+                        // Gunakan key komposit supaya akun serupa di company berbeda tidak tercampur
+                        $key = $subAccount['no_sub'] ?? '';
                         if (!isset($result[$key])) {
                             $result[$key] = [
                                 'id' => $subAccount['id'],
                                 'number' => $subAccount['no_sub'],
-                                'company' => $subAccount['company'],
                                 'name' => $subAccount['nama_sub'],
                                 'saldo_lama' => $saldoLama,
                                 'result' => $resultJurnalUmum,
                             ];
                         } else {
                             $result[$key]['saldo_lama'] += $saldoLama;
-                            $result[$key]['result'] = array_merge($result[$key]['result'], $resultJurnalUmum);
-                            usort($result[$key]['result'], function($a, $b) {
-                                return strcmp($a['no_transaksi'], $b['no_transaksi']);
-                            });
+                            $result[$key]['result'] = $mergeUniqueJurnal($result[$key]['result'], $resultJurnalUmum);
                         }
+
                     }
                 } else {
-                    // bagian header account tetap sama (gunakan id)
+                    // Header account
                     $headerAccount = $this->HeaderAkunsModel
                                         ->where('header_akuns.id', $a)
                                         ->where('header_akuns.deletedAt', null)
@@ -252,33 +269,37 @@ class BukuBesar extends BaseController
                         continue;
                     }
 
+                    // Ambil sub account id yang terkait dengan header ini tetapi **hanya dalam company scope**
                     $subAccountIds = $this->Sub_AkunsModel
                                         ->where('header_id', $headerAccount['id'])
-                                        ->findColumn('id');
+                                        ->where('sub_akuns.deletedAt', null)
+                                        ->whereIn('sub_akuns.company_id', $companyScope)
+                                        ->findColumn('id') ?: [];
 
+                    if (empty($subAccountIds)) {
+                        // tidak ada sub account untuk header tersebut dalam company scope
+                        continue;
+                    }
+
+                    // Ambil jurnal sekaligus untuk semua subAccount di header ini (agregat per header)
                     [$resultJurnalUmum, $saldoLama] = $fetchJurnalData($subAccountIds);
-                    $key = $headerAccount['nama_header'];
 
+                    $key = $headerAccount['no_header'] ?? '';
                     if (!isset($result[$key])) {
                         $result[$key] = [
                             'id' => $headerAccount['id'],
                             'number' => $headerAccount['no_header'],
-                            'company' => $headerAccount['company'],
                             'name' => $headerAccount['nama_header'],
                             'saldo_lama' => $saldoLama,
                             'result' => $resultJurnalUmum,
                         ];
                     } else {
                         $result[$key]['saldo_lama'] += $saldoLama;
-                        $result[$key]['result'] = array_merge($result[$key]['result'], $resultJurnalUmum);
-                        usort($result[$key]['result'], function($a, $b) {
-                            return strcmp($a['no_transaksi'], $b['no_transaksi']);
-                        });
+                        $result[$key]['result'] = $mergeUniqueJurnal($result[$key]['result'], $resultJurnalUmum);
                     }
                 }
             }
         }
-
 
         return $result;
     }

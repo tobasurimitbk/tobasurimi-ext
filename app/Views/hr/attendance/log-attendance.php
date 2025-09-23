@@ -38,6 +38,7 @@
         left: 0;
         z-index: 3;
         min-width: 45px !important;
+        background-color: <?= session()->get('theme') == 'dark' ? '#464D55;' : 'white;' ?>;
     }
 
     /* Kolom NIP */
@@ -47,6 +48,7 @@
         left: 50px;
         /* geser setelah kolom No */
         z-index: 3;
+        background-color: <?= session()->get('theme') == 'dark' ? '#464D55;' : 'white;' ?>;
         min-width: 120px !important;
     }
 
@@ -57,6 +59,7 @@
         left: 170px;
         /* 50 (No) + 120 (NIP) */
         z-index: 3;
+        background-color: <?= session()->get('theme') == 'dark' ? '#464D55;' : 'white;' ?>;
         min-width: 200px !important;
         white-space: nowrap;
     }
@@ -68,6 +71,7 @@
         left: 370px;
         /* 50 + 120 + 200 */
         z-index: 3;
+        background-color: <?= session()->get('theme') == 'dark' ? '#464D55;' : 'white;' ?>;
         min-width: 120px !important;
     }
 
@@ -78,6 +82,7 @@
         left: 490px;
         /* 50 + 120 + 200 + 120 */
         z-index: 3;
+        background-color: <?= session()->get('theme') == 'dark' ? '#464D55;' : 'white;' ?>;
         min-width: 150px !important;
     }
 
@@ -609,7 +614,7 @@
         allowClear: true,
         minimumInputLength: 2,
         ajax: {
-            url: "<?= base_url('attendance/like-employees') ?>",
+            url: "<?= base_url('log-attendance/like-employees') ?>",
             dataType: 'json',
             delay: 250,
             data: function(params) {

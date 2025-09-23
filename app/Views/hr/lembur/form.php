@@ -3,7 +3,7 @@
 
 <section class="section">
     <div class="section-header">
-        <h1 class="title-name"><?= (!empty($lemburDetail)) ? "Detail" : "Simpan" ?> Lembur</h1>
+        <h1 class="title-name"><?= (!empty($lemburDetail)) ? "Update" : "Tambah" ?> Lembur</h1>
         <div class="col-button-tambah-spp">
             <a class="btn btn-hide-form btn-discard float-right" href="<?= base_url("lembur"); ?>">
                 Kembali
@@ -78,9 +78,16 @@
                 </label>
                 <div class="row mt-2">
                     <div class="col-sm-6 mt-1">
-                        <div class="form-floating mb-3" style="height: 50px;">
-                            <input value="<?= (!empty($lemburDetail)) ? date('d/m/Y', strtotime($lemburDetail['periode']))  : "" ?>" autocomplete="one-time-code" name="tanggalLembur" type="text" required class="form-control target input-picker">
-                            <label for="floatingInput">Tanggal Lembur</label>
+                        <div class="input-group">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input value="<?= (!empty($lemburDetail)) ? date('d/m/Y', strtotime($lemburDetail['periode']))  : "" ?>" autocomplete="one-time-code" name="tanggalLembur" type="text" required class="form-control target input-picker" placeholder="Tanggal Lembur">
+                                <label for="floatingInput">Tanggal Lembur</label>
+                            </div>
+                            <div class="input-group-append" style="height:50px;">
+                                <button disabled class="btn btn-secondary" type="button">
+                                    <i class="fas fa-calendar-alt"></i>
+                                </button>
+                            </div>
                         </div>
                     </div>
                     <div class="col-sm-3 mt-1">
@@ -105,9 +112,16 @@
                         </div>
                     </div>
                     <div class="col-sm-3 mt-1">
-                        <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" type="text" required name="jamSelesaiLembur" id="jamSelesaiLembur" class="form-control target input-picker" value="<?= !empty($lemburDetail) ? $lemburDetail['jam_selesai_lembur'] : "" ?>">
-                            <label for="floatingInput">Jam Selesai Lembur</label>
+                        <div class="input-group">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input placeholder="Jam Selesai Lembur" autocomplete="one-time-code" type="text" required name="jamSelesaiLembur" id="jamSelesaiLembur" class="form-control target input-picker" value="<?= !empty($lemburDetail) ? $lemburDetail['jam_selesai_lembur'] : "" ?>">
+                                <label for="floatingInput">Jam Selesai Lembur</label>
+                            </div>
+                            <div class="input-group-append" style="height:50px;">
+                                <button disabled class="btn btn-secondary" type="button">
+                                    <i class="fa-solid fa-stopwatch"></i>
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -216,6 +230,7 @@
     });
 
     $("input[name='tanggalLembur'], select[name='kurangiJamIstirahat'], select[name='employeeID']").change(function() {
+        $('#jamSelesaiLembur').val(null);
         generateLembur();
     });
 
@@ -506,7 +521,6 @@
                             contentType: false,
                             success: function(response) {
                                 if (response.status) {
-                                    stopLoading()
                                     Swal.fire({
                                             icon: 'success',
                                             title: response.message,
@@ -521,18 +535,9 @@
                                         title: response.message,
                                         confirmButtonColor: '#4e73df',
                                     })
-                                    stopLoading()
                                 }
                             },
-                            onError: function(response) {
-                                csrf.val(response.token);
-                                Swal.fire({
-                                    icon: 'error',
-                                    title: 'Data Gagal Disimpan, coba Lagi',
-                                    confirmButtonColor: '#4e73df',
-                                })
-                                stopLoading()
-                            }
+
                         });
                     } else {
                         Swal.fire({
@@ -634,7 +639,11 @@
                     url: "<?= base_url("lembur/delete"); ?>",
                     data: formData,
                     beforeSend: function(xhr) {
+                        setLoading();
                         xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                    },
+                    complete: function() {
+                        stopLoading();
                     },
                     method: "POST",
                     dataType: "json",
@@ -643,7 +652,6 @@
                     success: function(response) {
                         csrf.val(response.token);
                         if (response.status) {
-                            stopLoading()
                             Swal.fire({
                                     icon: 'success',
                                     title: response.message,
@@ -658,18 +666,9 @@
                                 title: response.message,
                                 confirmButtonColor: '#4e73df',
                             })
-                            stopLoading()
                         }
                     },
-                    onError: function(response) {
-                        csrf.val(response.token);
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Lembur gagal dihapus, coba Lagi',
-                            confirmButtonColor: '#4e73df',
-                        })
-                        stopLoading()
-                    }
+
                 });
 
             });
