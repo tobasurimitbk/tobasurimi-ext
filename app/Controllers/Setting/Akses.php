@@ -93,11 +93,21 @@ class Akses extends BaseController
 
     public function saveAkses()
     {
+        ini_set('max_input_vars', 10);
         try {
             $role_id = formatter($this->request->getPost("role_id"), "STR_TO_INT");
             $company_id = formatter($this->request->getPost("company_id"), "STR_TO_INT");
 
             $result = array();
+
+            // var_dump($_POST);
+            // die;
+
+            $listMenu = (array)json_decode($_POST['listMenu']);
+            // var_dump(json_decode($_POST['listParent']));
+
+            // dd(count($this->request->getPost()), $this->request->getPost());
+            // die;
 
             //Get Access List
             $res_access_list = $this->MenuUrlsModel->get_menu_url(null);
@@ -109,31 +119,31 @@ class Akses extends BaseController
                     if ($res_access_child) {
                         foreach ($res_access_child as $child) {
                             $access = array();
-                            if ($this->request->getPost("create_" . $child["id"]) !== null) {
+                            if (in_array("create_" . $child["id"], $listMenu)) {
                                 array_push($access, 'c');
                             }
-                            if ($this->request->getPost("read_" . $child["id"]) !== null) {
+                            if (in_array("read_" . $child["id"], $listMenu)) {
                                 array_push($access, 'r');
                             }
-                            if ($this->request->getPost("update_" . $child["id"]) !== null) {
+                            if (in_array("update_" . $child["id"], $listMenu)) {
                                 array_push($access, 'u');
                             }
-                            if ($this->request->getPost("delete_" . $child["id"]) !== null) {
+                            if (in_array("delete_" . $child["id"], $listMenu)) {
                                 array_push($access, 'd');
                             }
-                            if ($this->request->getPost("print_" . $child["id"]) !== null) {
+                            if (in_array("print_" . $child["id"], $listMenu)) {
                                 array_push($access, 'p');
                             }
-                            if ($this->request->getPost("approve_" . $child["id"]) !== null) {
+                            if (in_array("approve_" . $child["id"], $listMenu)) {
                                 array_push($access, 'a');
                             }
-                            if ($this->request->getPost("unposting_" . $child["id"]) !== null) {
+                            if (in_array("unposting_" . $child["id"], $listMenu)) {
                                 array_push($access, 'ua');
                             }
                             array_push(
                                 $result,
                                 [
-                                    "parent_id" => $this->request->getPost("parent_" . $child["id"]),
+                                    "parent_id" => $parent["id"],
                                     "menu_url_id" => $child["id"],
                                     "action" => $access
                                 ]
@@ -142,15 +152,16 @@ class Akses extends BaseController
                     }
                 }
 
-                $payloadFinal = [];
-
                 // $data = [
                 //     "status"            => false,
-                //     "message"    => json_encode($payload),
-                //     "payload"   => json_encode($payload),
+                //     "message"    => json_encode($result),
                 //     'token' => csrf_hash()
                 // ];
                 // echo json_encode($data);
+                // die;
+
+                $payloadFinal = [];
+
 
                 foreach ($result as $item) {
                     $payloadLoop = [
