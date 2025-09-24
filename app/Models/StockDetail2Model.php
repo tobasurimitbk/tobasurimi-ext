@@ -763,7 +763,8 @@ class StockDetail2Model extends Model
             ->select($select, false) // <-- penting: jangan di-escape
             ->join('stock_details', 'stock_details.id = stock_details2.stock_detail_id')
             ->join('suppliers', 'suppliers.id = stock_details2.supplier_id', 'left')
-            ->join('(
+            ->join(
+                '(
                 SELECT 
                     penerimaan_barang.no_penerimaan_barang, 
                     SUM(penerimaan_barang_detail.qty) AS total_penerimaan
@@ -772,9 +773,10 @@ class StockDetail2Model extends Model
                     ON penerimaan_barang_detail.penerimaan_barang_id = penerimaan_barang.id
                 ' . $spesifikasiFilter . '
                 GROUP BY penerimaan_barang.no_penerimaan_barang
-            ) AS total_penerimaan_subquery', 
-            'total_penerimaan_subquery.no_penerimaan_barang = stock_details.no_dokumen', 
-            'left')
+            ) AS total_penerimaan_subquery',
+                'total_penerimaan_subquery.no_penerimaan_barang = stock_details.no_dokumen',
+                'left'
+            )
             ->where('stock_details2.stock_id', $stockID)
             ->where($condition)
             ->groupBy('stock_details2.stock_dokumen, stock_details2.bc_id, stock_details2.no_aju')
@@ -871,7 +873,8 @@ class StockDetail2Model extends Model
             ->join('barang_master', 'barang_master.id = stock.barang1_id', 'left')
             ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = stock.barang2_id', 'left')
             ->join('satuans', 'satuans.id = barang_master_spesifikasi.satuan_1', 'left')
-            ->join('(
+            ->join(
+                '(
                 SELECT 
                     pb.no_penerimaan_barang, 
                     pbd.spesifikasi_id,
@@ -880,10 +883,11 @@ class StockDetail2Model extends Model
                 LEFT JOIN penerimaan_barang_detail pbd 
                     ON pbd.penerimaan_barang_id = pb.id
                 GROUP BY pb.no_penerimaan_barang, pbd.spesifikasi_id
-            ) AS total_penerimaan_subquery', 
-            'total_penerimaan_subquery.no_penerimaan_barang = stock_details.no_dokumen 
-            AND total_penerimaan_subquery.spesifikasi_id = stock.barang2_id', 
-            'left')
+            ) AS total_penerimaan_subquery',
+                'total_penerimaan_subquery.no_penerimaan_barang = stock_details.no_dokumen 
+            AND total_penerimaan_subquery.spesifikasi_id = stock.barang2_id',
+                'left'
+            )
             // ->where('stock_details2.stock_id', $stockID)
             ->where($condition)
             ->where('stock_details2.qty_diterima', NULL)
@@ -927,7 +931,8 @@ class StockDetail2Model extends Model
             ->join('barang_master', 'barang_master.id = stock.barang1_id', 'left')
             ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = stock.barang2_id', 'left')
             ->join('satuans', 'satuans.id = barang_master_spesifikasi.satuan_1', 'left')
-            ->join('(
+            ->join(
+                '(
                 SELECT 
                     pb.no_penerimaan_barang, 
                     pbd.spesifikasi_id,
@@ -936,10 +941,11 @@ class StockDetail2Model extends Model
                 LEFT JOIN penerimaan_barang_detail pbd 
                     ON pbd.penerimaan_barang_id = pb.id
                 GROUP BY pb.no_penerimaan_barang, pbd.spesifikasi_id
-            ) AS total_penerimaan_subquery', 
-            'total_penerimaan_subquery.no_penerimaan_barang = stock_details.no_dokumen 
-            AND total_penerimaan_subquery.spesifikasi_id = stock.barang2_id', 
-            'left')
+            ) AS total_penerimaan_subquery',
+                'total_penerimaan_subquery.no_penerimaan_barang = stock_details.no_dokumen 
+            AND total_penerimaan_subquery.spesifikasi_id = stock.barang2_id',
+                'left'
+            )
             // ->where('stock_details2.stock_id', $stockID)
             ->where($condition)
             ->where('stock_details2.qty_diterima >', 0)
@@ -984,7 +990,7 @@ class StockDetail2Model extends Model
                 $builder->where($field, $value);
             }
         }
-        
+
         return $builder
             ->groupBy('stock_details2.id, stock_details2.stock_dokumen, stock_details2.bc_id, stock_details2.no_aju')
             ->having('stok_total >', 0)
@@ -1062,21 +1068,21 @@ class StockDetail2Model extends Model
                 SELECT value FROM metadata WHERE id = stock_details2.bc_id
             ) AS bc_type,
             (
-                SELECT no_daftar FROM bc_23 
+                SELECT GROUP_CONCAT(no_daftar) FROM bc_23 
                 JOIN bc_purchase_order ON bc_purchase_order.id = bc_23.bc_purchase_order_id
                 WHERE bc_23.no_aju = stock_details2.no_aju AND stock_details2.bc_id = 48
             ) AS no_daftar_bc23,
             (
-                SELECT no_daftar FROM bc_27
+                SELECT GROUP_CONCAT(no_daftar) FROM bc_27
                 WHERE bc_27.no_aju = stock_details2.no_aju AND stock_details2.bc_id = 52
             ) AS no_daftar_bc27,
             (
-                SELECT no_daftar FROM bc_40 
+                SELECT GROUP_CONCAT(no_daftar) FROM bc_40 
                 JOIN bc_purchase_order ON bc_purchase_order.id = bc_40.bc_purchase_order_id
                 WHERE bc_40.no_aju = stock_details2.no_aju AND stock_details2.bc_id = 53
             ) AS no_daftar_bc40,
             (
-                SELECT no_daftar FROM ppbkb
+                SELECT GROUP_CONCAT(no_daftar) FROM ppbkb
                 WHERE ppbkb.no_ppbkb = stock_details2.no_aju AND stock_details2.bc_id = 1426
             ) AS no_daftar_ppbkb,
             (
@@ -1142,21 +1148,21 @@ class StockDetail2Model extends Model
                 SELECT value FROM metadata WHERE id = stock_details2.bc_id
             ) AS bc_type,
             (
-                SELECT no_daftar FROM bc_23 
+                SELECT GROUP_CONCAT(no_daftar) FROM bc_23 
                 JOIN bc_purchase_order ON bc_purchase_order.id = bc_23.bc_purchase_order_id
                 WHERE bc_23.no_aju = stock_details2.no_aju AND stock_details2.bc_id = 48
             ) AS no_daftar_bc23,
             (
-                SELECT no_daftar FROM bc_27
+                SELECT GROUP_CONCAT(no_daftar) FROM bc_27
                 WHERE bc_27.no_aju = stock_details2.no_aju AND stock_details2.bc_id = 52
             ) AS no_daftar_bc27,
             (
-                SELECT no_daftar FROM bc_40 
+                SELECT GROUP_CONCAT(no_daftar) FROM bc_40 
                 JOIN bc_purchase_order ON bc_purchase_order.id = bc_40.bc_purchase_order_id
                 WHERE bc_40.no_aju = stock_details2.no_aju AND stock_details2.bc_id = 53
             ) AS no_daftar_bc40,
             (
-                SELECT no_daftar FROM ppbkb
+                SELECT GROUP_CONCAT(no_daftar) FROM ppbkb
                 WHERE ppbkb.no_ppbkb = stock_details2.no_aju AND stock_details2.bc_id = 1426
             ) AS no_daftar_ppbkb,
             (
