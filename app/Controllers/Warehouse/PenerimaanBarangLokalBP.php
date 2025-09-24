@@ -1322,6 +1322,7 @@ class PenerimaanBarangLokalBP extends BaseController
                              AND account_barang.divisi_id = penerimaan_barang.divisi_id', 'left')
             ->whereIn('penerimaan_barang_detail.penerimaan_barang_id', $penerimaanBarangIds)
             ->where('penerimaan_barang_detail.deletedAt', null)
+            ->where('account_barang.deleted_at', null)
             ->findAll();
 
         $akunCoaMap = [];
