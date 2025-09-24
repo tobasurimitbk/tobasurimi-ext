@@ -11,11 +11,11 @@
             font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
         }
 
-        @page {
+        /* @page {
             size: 8.27in 5.50in landscape;
             margin: 0px;
             padding: 0px;
-        }
+        } */
 
         .align-items-center {
             align-items: center;
@@ -98,9 +98,9 @@
     </style>
 </head>
 
-<body style="border: 0px solid;font-size: 11px; margin-left:-20px; margin-right:-20px;">
+<body style="border: 0px solid;font-size: 11px;">
 
-    <div style="margin: 25px; padding: 25px" class="<?= $totalDikembalikan != 0 ? 'pagebreak' : '' ?>">
+    <div style="margin-top:-10px;">
         <table class="w-100">
             <tr>
                 <td>
@@ -243,8 +243,10 @@
     </div>
 
     <?php if ($totalDikembalikan != 0) { ?>
-        <div style="background-color: #ffe4e1; padding: 1rem; border: 1px solid #ffb6c1; height: 93.2%; margin-left:-20px; margin-right:-20px;">
-            <div style="padding: 25px; margin: 25px;">
+        <div style="margin-left: -45px;background-color: #d4a49fff; margin-right:-45px;">
+            <div style="margin-top:40px; margin-left:45px; margin-right:45px;">
+                <hr style="border: 1px dashed #000;">
+                <br>
                 <table class="w-100">
                     <tr>
                         <td>

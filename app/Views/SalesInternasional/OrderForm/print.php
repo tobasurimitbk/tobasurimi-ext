@@ -107,6 +107,10 @@
         p {
             margin-top: -1.5px !important;
         }
+
+        ul {
+            margin-top: -1.5px !important;
+        }
     </style>
 
     <?php if ($displayPrice == "false"): ?>

@@ -780,44 +780,54 @@
                 processData: false,
                 contentType: false,
                 success: function(response) {
-                    var attendance = response.data.attendance;
-                    var employee = response.data.employee;
-
-                    $('#reason').val(null);
-                    $('#attendenceID').val(attendance.id);
-                    $('#employeeName').val(employee.name);
-                    $('#tanggal').val(response.data.tanggal);
-                    $('#statusKehadiran').val(attendance.status).change();
-                    $('#keterangan').val(response.data.keterangan);
-                    $('#jamTerlambat').val(response.data.jamTerlambat);
-                    $('#isApproved').val(attendance.isApproved).change();
-
-                    if (attendance.status == 'HADIR_H') {
-                        // hadir
-                        $('#reasonForm').hide();
-                        $('#formInOut').show();
-                        $('#approvalForm').hide();
-                        // set form
-                        $('#checkout').val(attendance.checkout);
-                        $('#checkin').val(attendance.checkin);
-                    } else if (attendance.status == "ALPHA_A" || attendance.status == "LIBUR_L" || attendance.status == "RL_RL") {
-                        $('#approvalForm').hide();
+                    if (response.status == false) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: response.message,
+                            confirmButtonColor: '#4e73df',
+                        });
+                        return;
                     } else {
-                        // ada perizinan
-                        $('#reasonForm').show();
-                        $('#formInOut').hide();
-                        $('#approvalForm').show();
-                        $('#reason').val(attendance.reason);
+                        var attendance = response.data.attendance;
+                        var employee = response.data.employee;
+
+                        $('#reason').val(null);
+                        $('#attendenceID').val(attendance.id);
+                        $('#employeeName').val(employee.name);
+                        $('#tanggal').val(response.data.tanggal);
+                        $('#statusKehadiran').val(attendance.status).change();
+                        $('#keterangan').val(response.data.keterangan);
+                        $('#jamTerlambat').val(response.data.jamTerlambat);
+                        $('#isApproved').val(attendance.isApproved).change();
+
+                        if (attendance.status == 'HADIR_H') {
+                            // hadir
+                            $('#reasonForm').hide();
+                            $('#formInOut').show();
+                            $('#approvalForm').hide();
+                            // set form
+                            $('#checkout').val(attendance.checkout);
+                            $('#checkin').val(attendance.checkin);
+                        } else if (attendance.status == "ALPHA_A" || attendance.status == "LIBUR_L" || attendance.status == "RL_RL") {
+                            $('#approvalForm').hide();
+                        } else {
+                            // ada perizinan
+                            $('#reasonForm').show();
+                            $('#formInOut').hide();
+                            $('#approvalForm').show();
+                            $('#reason').val(attendance.reason);
+                        }
+
+                        $('#jamKerjaName').val(response.data.jamKerja.jenis);
+
+                        // ASSIGN ATTR
+                        $('#jamKerjaDetail').data('jam_kerja_id', response.data.jamKerja.id);
+                        $('#jamKerjaDetail').data('jenis', response.data.jamKerja.jenis);
+                        $('#jamKerjaDetail').data('jam_terlambat', response.data.jamKerja.jam_terlambat);
+
+                        $('#updateModal').modal('show');
                     }
 
-                    $('#jamKerjaName').val(response.data.jamKerja.jenis);
-
-                    // ASSIGN ATTR
-                    $('#jamKerjaDetail').data('jam_kerja_id', response.data.jamKerja.id);
-                    $('#jamKerjaDetail').data('jenis', response.data.jamKerja.jenis);
-                    $('#jamKerjaDetail').data('jam_terlambat', response.data.jamKerja.jam_terlambat);
-
-                    $('#updateModal').modal('show');
                 }
             });
 

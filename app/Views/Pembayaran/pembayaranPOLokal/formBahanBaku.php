@@ -144,17 +144,30 @@
                     </div>
                     <div class="col-md-4">
                         <div class="bulanan-form">
-                            <?php if (!empty($detail)) : ?>
-                                <div class="form-floating form-pembayaran-po mb-3" style="height: 50px;">
-                                    <input <?= !empty($detail) ? ($detail['pembayaranDetail']['status_posting'] == 1 ? 'disabled' : '') : "" ?> value="<?= !empty($detail['pembayaranDetail']['bulan']) ? $detail['pembayaranDetail']['bulan'] : '' ?>" type="month" name="bulan" id="bulan" class="form-control">
-                                    <label for="floatingInput" style="z-index: 1;">Pilih Bulan</label>
-                                </div>
-                            <?php else : ?>
-                                <div class="form-floating form-pembayaran-po mb-3" style="height: 50px;">
-                                    <input <?= !empty($detail) ? ($detail['pembayaranDetail']['status_posting'] == 1 ? 'disabled' : '') : "" ?> value="<?= !empty($detail['pembayaranDetail']['bulan']) ? $detail['pembayaranDetail']['bulan'] : '' ?>" type="month" name="bulan" id="bulan" class="form-control">
-                                    <label for="floatingInput" style="z-index: 1;">Pilih Bulan</label>
-                                </div>
-                            <?php endif; ?>
+                           <div class="bulanan-form">
+                                <?php if (!empty($detail)) : ?>
+                                    <div class="form-floating form-pembayaran-po mb-3" style="height: 50px;">
+                                        <input 
+                                            <?= $detail['pembayaranDetail']['status_posting'] == 1 ? 'disabled' : '' ?>  
+                                            value="<?= !empty($detail['pembayaranDetail']['bulan']) ? date('Y-m', strtotime($detail['pembayaranDetail']['bulan'])) : '' ?>" 
+                                            type="month" 
+                                            name="bulan" 
+                                            id="bulan" 
+                                            class="form-control">
+                                        <label for="bulan" style="z-index: 1;">Pilih Bulan</label>
+                                    </div>
+                                <?php else : ?>
+                                    <div class="form-floating form-pembayaran-po mb-3" style="height: 50px;">
+                                        <input 
+                                            value="" 
+                                            type="month" 
+                                            name="bulan" 
+                                            id="bulan" 
+                                            class="form-control">
+                                        <label for="bulan" style="z-index: 1;">Pilih Bulan</label>
+                                    </div>
+                                <?php endif; ?>
+                            </div>
 
                         </div>
                         <div class="harian-form">
@@ -517,7 +530,6 @@
         <script>
             $('.bulanan-form').show();
             $('.harian-form').hide();
-            $('#bulan').val('');
             $('#jenis_dokumen').val("KWITANSI TB");
         </script>
     <?php else : ?>
@@ -786,6 +798,7 @@
 
                     listPembayaran = [];
                     listPembayaran = response.data;
+                    drawTable(listPembayaran)
 
                     csrf.val(response.token);
                     $('#nominal_pembayaran').val(response.data.sisaNumber);
@@ -793,6 +806,13 @@
             });
         }
     });
+
+    <?php if (!empty($detail['pembayaranDetail']) && $detail['pembayaranDetail']['type_bayar'] == "Bulanan") : ?>
+       
+            $('#bulan')
+                .val("<?= !empty($detail['pembayaranDetail']['bulan']) ? date('Y-m', strtotime($detail['pembayaranDetail']['bulan'])) : '' ?>")
+                .trigger('change');
+    <?php endif; ?>
 
     $('#po').change(function() {
         const csrfToken = '<?= csrf_token() ?>';
@@ -878,14 +898,14 @@
 
 
         $.each(listPembayaran, function(i, v) {
-            var element = $('input[data-id="' + v.rm_purchase_order_id + '"].total_po_dibayar');
+            var element = $('input[data-id="' + v.group_key + '"].total_po_dibayar');
             var input_user = destroyFormatRupiahPayment(element.val());
 
             listPembayaran[i].total_paid = parseFloat(input_user) || 0;
         });
 
         $.each(listPembayaran, function(i, v) {
-            var element = $('input[data-id="' + v.rm_purchase_order_id + '"].total_pph_po_dibayar');
+            var element = $('input[data-id="' + v.group_key + '"].total_pph_po_dibayar');
             var input_user = destroyFormatRupiahPayment(element.val());
 
             listPembayaran[i].total_paid_pph = parseFloat(input_user) || 0;
@@ -1354,7 +1374,7 @@
 
             newRow.append($('<td style="text-align:center;">').html(
                 `
-                        <input  oninput="this.value = greatFormatRupiahPayment(this.value)"  oninput="limitInputBayar(this, ${v.total_tagihan})" autocomplete="one-time-code" data-id="${v.rm_purchase_order_id}"  class="form-control total_po_dibayar" type="text" value="${greatFormatRupiahPayment(v.total_tagihan)}" name = "total_po_dibayar" style="height:40px">
+                        <input  oninput="this.value = greatFormatRupiahPayment(this.value)"  oninput="limitInputBayar(this, ${v.total_tagihan})" autocomplete="one-time-code" data-id="${v.group_key}" class="form-control total_po_dibayar" type="text" value="${greatFormatRupiahPayment(v.total_tagihan)}" name = "total_po_dibayar" style="height:40px">
                                 `
             ));
 
@@ -1478,12 +1498,12 @@
 
             newRow.append($('<td style="text-align:center;">').html(
                 `
-                        <input <?= !empty($detail) ? ($detail['pembayaranDetail']['status_posting'] == 1 ? 'disabled' : '') : ""  ?>  onchange="this.value = greatFormatRupiahPayment(this.value)"  oninput="limitInputBayar(this, ${v.total_tagihan_pph})" autocomplete="one-time-code" data-id="${v.rm_purchase_order_id}"  class="form-control total_pph_po_dibayar" type="text" value="${greatFormatRupiahPayment(v.sisa_tagihan_pph)}" name = "total_pph_po_dibayar" style="height:40px">
+                        <input <?= !empty($detail) ? ($detail['pembayaranDetail']['status_posting'] == 1 ? 'disabled' : '') : ""  ?>  onchange="this.value = greatFormatRupiahPayment(this.value)"  oninput="limitInputBayar(this, ${v.total_tagihan_pph})" autocomplete="one-time-code" data-id="${v.group_key}" class="form-control total_pph_po_dibayar" type="text" value="${greatFormatRupiahPayment(v.sisa_tagihan_pph)}" name = "total_pph_po_dibayar" style="height:40px">
                                 `
             ));
             newRow.append($('<td style="text-align:center;">').html(
                 `
-                        <input <?= !empty($detail) ? ($detail['pembayaranDetail']['status_posting'] == 1 ? 'disabled' : '') : ""  ?>  onchange="this.value = greatFormatRupiahPayment(this.value)"  oninput="limitInputBayar(this, ${v.total_tagihan})" autocomplete="one-time-code" data-id="${v.rm_purchase_order_id}"  class="form-control total_po_dibayar" type="text" value="${greatFormatRupiahPayment(v.sisa_tagihan)}" name = "total_po_dibayar" style="height:40px">
+                        <input <?= !empty($detail) ? ($detail['pembayaranDetail']['status_posting'] == 1 ? 'disabled' : '') : ""  ?>  onchange="this.value = greatFormatRupiahPayment(this.value)"  oninput="limitInputBayar(this, ${v.total_tagihan})" autocomplete="one-time-code" data-id="${v.group_key}" class="form-control total_po_dibayar" type="text" value="${greatFormatRupiahPayment(v.sisa_tagihan)}" name = "total_po_dibayar" style="height:40px">
                                 `
             ));
 

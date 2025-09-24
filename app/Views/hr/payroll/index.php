@@ -180,10 +180,10 @@
                     <i class="fa fa-download"></i> Export
                 </button>
                 <ul class="dropdown-menu list-dropdown-company" aria-labelledby="dropdownMenuButtonExport">
-                    <li><button class="dropdown-item" onclick="printWithDivision('<?= base_url('payroll/print/division/') ?>')">Daftar Upah</button></li>
-                    <li><button class="dropdown-item" onclick="printWithDivision('<?= base_url('payroll/print/detail/') ?>')">Slip Gaji</button></li>
-                    <li><button class="dropdown-item" onclick="printWithDivision('<?= base_url('payroll/print/summary/') ?>')">Summary</button></li>
-                    <li><button class="dropdown-item" onclick="printWithDivision('<?= base_url('payroll/print/potongan/') ?>')">Daftar Potongan</button></li>
+                    <li><button class="dropdown-item" onclick="printWithDivision('<?= base_url('payroll/print/division') ?>')">Daftar Upah</button></li>
+                    <li><button class="dropdown-item" onclick="printWithDivision('<?= base_url('payroll/print/detail') ?>')">Slip Gaji</button></li>
+                    <li><button class="dropdown-item" onclick="printWithDivision('<?= base_url('payroll/print/summary') ?>')">Summary</button></li>
+                    <li><button class="dropdown-item" onclick="printWithDivision('<?= base_url('payroll/print/potongan') ?>')">Daftar Potongan</button></li>
                 </ul>
             <?php endif; ?>
         </div>
@@ -262,20 +262,21 @@
                         <thead class="thead-dark">
                             <tr>
                                 <th>No</th>
+                                <th onclick="changeSort('employees.nip')" class="sort">Nip</th>
                                 <th onclick="changeSort('employees.name')" class="sort">Karyawan</th>
                                 <th onclick="changeSort('divisis.divisi')" class="sort">Dept</th>
-                                <th onclick="changeSort('employees.nip')" class="sort">Bagian</th>
-                                <th>Mulai</th>
-                                <th>Selesai</th>
-                                <th>Hari Kerja</th>
-                                <th>Gaji Bersih</th>
-                                <th>Total Lembur</th>
-                                <th>Total Pengurangan Gaji</th>
-                                <th>Gaji Diterima (THP)</th>
+                                <th onclick="changeSort('employees.bagian_id')" class="sort">Bagian</th>
+                                <th onclick="changeSort('payrolls.start_date')">Mulai</th>
+                                <th onclick="changeSort('payrolls.end_date')">Selesai</th>
+                                <th onclick="changeSort('payrolls.hadir_final')">Hari Kerja</th>
+                                <th onclick="changeSort('payrolls.nominal_uang_gaji')">Gaji Bersih</th>
+                                <th onclick="changeSort('payrolls.nominal_uang_lembur')">Total Lembur</th>
+                                <th onclick="changeSort('payrolls.nominal_pengurangan_gaji')">Total Pengurangan Gaji</th>
+                                <th onclick="changeSort('payrolls.nominal_gaji_diterima')">Gaji Diterima (THP)</th>
                                 <th>Action</th>
                             </tr>
                         </thead>
-                        <tbody class="body-table" id="body-table" style="cursor: pointer;">
+                        <tbody class="body-table" id="body-table">
                         </tbody>
                     </table>
                 </div>
@@ -288,7 +289,6 @@
     const csrfToken = '<?= csrf_token() ?>';
     let sort = "nomor";
     let sortType = "desc";
-    $('#loadingSpinner').hide();
 
     const table = $('.dataTable').DataTable({
 
@@ -330,57 +330,61 @@
                 data: "no",
                 className: "text-center",
                 sortable: false,
-                width: "5%"
+                width: "3%"
+            },
+            {
+                data: "nip",
+                className: "text-left"
             },
             {
                 data: "name",
-                className: "text-center"
+                className: "text-left"
             },
             {
                 data: "divisi",
-                className: "text-center"
+                className: "text-left"
             },
             {
                 data: "namaBagian",
-                className: "text-center",
+                className: "text-left",
                 width: "10%"
             },
             {
                 data: "startDate",
-                className: "text-center"
+                className: "text-left"
             },
             {
                 data: "endDate",
-                className: "text-center"
+                className: "text-left"
             },
             {
                 data: "hariKerja",
-                className: "text-center"
+                className: "text-left"
             },
             {
                 data: "upahBersih",
-                className: "text-center",
+                className: "text-left",
                 render: function(data, type, row) {
                     return greatFormatRupiah(data); // Format kolom upahBersih
                 }
             },
             {
                 data: "totalLembur",
-                className: "text-center",
+                className: "text-left",
                 render: function(data, type, row) {
                     return greatFormatRupiah(data); // Format kolom totalGajiLembur
                 }
             },
             {
                 data: "totalPenguranganGaji",
-                className: "text-center",
+                className: "text-left",
                 render: function(data, type, row) {
                     return greatFormatRupiah(data); // Format kolom totalPenguranganGaji
                 }
             },
             {
                 data: "sisaGaji",
-                className: "text-center",
+                className: "text-left",
                 render: function(data, type, row) {
                     return greatFormatRupiah(data); // Format kolom sisaGaji
                 }
@@ -393,13 +397,22 @@
                 render: function(data, type, row) {
                     let employee_id = row.employee_id;
                     let id = row.id;
-                    return `
-                        <div class="mt-0">
-                            <button class="btn btn-warning btn-print" onclick="print('<?= base_url("payroll/print/single/"); ?>${id}')" style="box-shadow: none !important;">
+                    let res = '';
+
+                    res += `
+                        <?php if (can('Personalia', 'Payroll', 'u')): ?>
+                            <a href="javascript:void(0)" onclick="edit('${id}')" data-toggle="tooltip" title="Edit" class="btn btn-primary">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                        <?php endif ?>
+                        <?php if (can('Personalia', 'Payroll', 'p')): ?>
+                            <button data-toggle="tooltip" title="Print" class="btn btn-warning btn-print" onclick="print('<?= base_url("payroll/print/single/"); ?>${id}')" style="box-shadow: none !important;">
                                 <i class="fa fa-print fa-sm" aria-hidden="true"></i>
                             </button>
-                        </div>
-                    `
+                        <?php endif ?>
+                    `;
+
+                    return res;
                 }
             }
         ],
@@ -449,6 +462,20 @@
         theme: "bootstrap-5",
         allowClear: true,
     });
+
+    $("#employeeID").select2({
+        placeholder: "Cari Berdasarkan Nama Karyawan",
+        theme: "bootstrap-5",
+        allowClear: true,
+        dropdownParent: $('#generateModal')
+    });
+    $("#divisionID").select2({
+        placeholder: "Cari Berdasarkan Departemen",
+        theme: "bootstrap-5",
+        allowClear: true,
+        dropdownParent: $('#generateModal')
+    });
+
     $("select[name='filterGolongan']").change(function() {
         table.ajax.reload();
     });
@@ -551,16 +578,9 @@
                             }
                             $('#loadingSpinner').hide();
                             $('#generateModal').modal('hide');
-                            location.reload();
+                            table.ajax.reload();
                         },
-                        onError: function(response) {
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Terjadi kesalahan pada sistem',
-                                confirmButtonColor: '#4e73df',
-                            });
-                            $('#loadingSpinner').hide();
-                        }
+
                     });
                 }
 
@@ -634,8 +654,6 @@
                         dataType: "json",
                         beforeSend: function(xhr) {
                             xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                            // show loading
-                            $('#loadingSpinner').show();
                             setLoading();
                         },
                         complete: function() {
@@ -663,14 +681,7 @@
                             $('#loadingSpinner').hide();
                             $('#generateModal').modal('hide');
                         },
-                        onError: function(response) {
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Terjadi kesalahan pada sistem',
-                                confirmButtonColor: '#4e73df',
-                            });
-                            $('#loadingSpinner').hide();
-                        }
+
                     });
                 }
 
@@ -678,17 +689,12 @@
         }
     });
 
-    // Get and Show
-    $('#dataTable tbody').on('click', 'tr td:not(.actions):not(.dataTables_empty)', function() {
-        const data = table.row(this).data();
-        location.replace(`<?= base_url("payroll/id"); ?>/${data.id}`);
-    });
-    // function helper
-    function formatRupiah(angka) {
-        var reverse = angka.toString().split('').reverse().join('');
-        var ribuan = reverse.match(/\d{1,3}/g);
-        var formatted = ribuan.join('.').split('').reverse().join('');
-        return 'Rp. ' + formatted;
+    function edit(id) {
+        location.replace(`<?= base_url("payroll/id"); ?>/${id}`);
+    }
+
+    function print(url) {
+        window.open(url, "_blank");
     }
 
     // select2 divisi
@@ -763,12 +769,6 @@
         $.ajax({
             url: `<?= base_url('/payroll/getBagian'); ?>`,
             method: "GET",
-            beforeSend: function() {
-                setLoading();
-            },
-            complete: function() {
-                stopLoading();
-            },
             data: {
                 divisi: divisi,
             },
@@ -827,19 +827,25 @@
 
     const printWithDivision = function(url) {
         var divisionID = $("#filterDivisiID").val();
-        if (divisionID == "") {
+        var month = $('#month').val();
+        if (month == "") {
+            Swal.fire({
+                icon: 'error',
+                title: 'Pilih Bulan',
+                confirmButtonColor: '#4e73df',
+            });
+            return;
+        } else if (divisionID == "") {
             Swal.fire({
                 icon: 'error',
                 title: 'Pilih Departemen',
                 confirmButtonColor: '#4e73df',
             });
+            return;
         } else {
-            window.open(url + '/' + divisionID, "_blank");
+            var newUrl = url + '?divisi_id=' + divisionID + '&month=' + month;
+            window.open(newUrl, "_blank");
         }
-    }
-
-    const print = function(url) {
-        window.open(url, "_blank");
     }
 </script>
 

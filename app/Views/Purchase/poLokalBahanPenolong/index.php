@@ -50,19 +50,19 @@
                     <table class="table table-bordered nowrap table-hover-tobasurimi dataTable" id="dataTable" width="100%" cellspacing="0">
                         <thead class="thead-dark">
                             <tr>
-                                <th>No.</th>
-                                <th>Tanggal Dibuat</th>
+                                <th>No</th>
+                                <th>Tanggal</th>
                                 <th onclick="changeSort('divisiName')" class="sort">Departemen</th>
                                 <th onclick="changeSort('poNo')" class="sort">No. PO</th>
                                 <th onclick="changeSort('sppNo')" class="sort">No. SPP</th>
                                 <th onclick="changeSort('supplierName')" class="sort">Supplier</th>
                                 <th onclick="changeSort('total')" class="sort">Total</th>
                                 <th>Order</th>
-                                <th onclick="changeSort('statusPenerimaan')" class="sort">Status</th>
+                                <th onclick="changeSort('note')" class="sort">Keterangan</th>
                                 <th>Action</th>
                             </tr>
                         </thead>
-                        <tbody class="body-table" id="body-table" style="cursor: pointer;">
+                        <tbody class="body-table" id="body-table">
 
                         </tbody>
                     </table>
@@ -171,25 +171,25 @@
             },
             {
                 data: "po_date",
-                className: "text-center",
+                className: "text-left",
                 sortable: false,
                 orderable: false,
             },
             {
                 data: "divisiName",
-                className: "text-center"
+                className: "text-left"
             },
             {
                 data: "po_no",
-                className: "text-center"
+                className: "text-left"
             },
             {
                 data: "spp_no",
-                className: "text-center"
+                className: "text-left"
             },
             {
                 data: "supplierName",
-                className: "text-center"
+                className: "text-left"
             },
             {
                 data: "total",
@@ -206,7 +206,7 @@
                 sortable: false,
             },
             {
-                data: "status_penerimaan",
+                data: "note",
                 className: "text-center"
             },
             {
@@ -225,6 +225,11 @@
                     if (status !== "1") {
                         return `
                         <div class="mt-0">
+                        <?php if (can('Pembelian', 'PO Lokal BP', 'u')): ?>
+                            <a href="<?= base_url("po-lokal-bahan-penolong/id"); ?>/${id}" data-toggle="tooltip" title="Edit" class="btn btn-primary">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                        <?php endif ?>
                         <?php if (can('Pembelian', 'PO Lokal BP', 'p')) : ?>
                             <button data-toggle="tooltip" title="Print" class="btn btn-warning btn-print" onclick="print('<?= base_url("po-lokal-bahan-penolong/print/"); ?>${id}')" style="box-shadow: none !important;">
                                 <i class="fa fa-print fa-sm" aria-hidden="true"></i>
@@ -256,6 +261,11 @@
 
                             return `
                             <div class="mt-0">
+                            <?php if (can('Pembelian', 'PO Lokal BP', 'u')): ?>
+                                <a href="<?= base_url("po-lokal-bahan-penolong/id"); ?>/${id}" data-toggle="tooltip" title="Edit" class="btn btn-primary">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                            <?php endif ?>
                             <?php if (can('Pembelian', 'PO Lokal BP', 'ua')) : ?>
                                 ${un_posting_row}
                             <?php endif; ?>
@@ -278,6 +288,11 @@
                         } else {
                             return `
                             <div class="mt-0">
+                            <?php if (can('Pembelian', 'PO Lokal BP', 'u')): ?>
+                                <a href="<?= base_url("po-lokal-bahan-penolong/id"); ?>/${id}" data-toggle="tooltip" title="Edit" class="btn btn-primary">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                            <?php endif ?>
                             <button  data-toggle="tooltip" title="Histori LPB" onclick="displayHistory('${id}')" class="btn btn-success posting-spp">
                                 <i class="fa-solid fa-clock-rotate-left"></i>
                             </button>
@@ -373,10 +388,10 @@
             }
         });
 
-        $('#dataTable tbody').on('click', 'tr td:not(.actions):not(.dataTables_empty)', function() {
-            const data = table.row(this).data();
-            location.replace(`<?= base_url("po-lokal-bahan-penolong/id"); ?>/${data.id}`);
-        })
+        // $('#dataTable tbody').on('click', 'tr td:not(.actions):not(.dataTables_empty)', function() {
+        //     const data = table.row(this).data();
+        //     location.replace(`<?= base_url("po-lokal-bahan-penolong/id"); ?>/${data.id}`);
+        // })
     })
 
     const posting = function(id, status) {

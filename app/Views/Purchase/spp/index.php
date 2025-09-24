@@ -84,13 +84,13 @@
                                 <th onclick="changeSort('sppType')" class="sort">Tipe SPP</th>
                                 <th onclick="changeSort('sppNo')" class="sort">No. SPP</th>
                                 <th onclick="changeSort('divisi')" class="sort">Departemen</th>
-                                <th>Jumlah Order</th>
+                                <th>Jml Order</th>
                                 <th onclick="changeSort('requestDate')" class="sort">Tanggal Order</th>
                                 <th onclick="changeSort('is_posted')">Status</th>
                                 <th>Action</th>
                             </tr>
                         </thead>
-                        <tbody class="body-table" id="body-table" style="cursor: pointer;">
+                        <tbody class="body-table" id="body-table">
 
                         </tbody>
                     </table>
@@ -156,29 +156,29 @@
             },
             {
                 data: "spp_types",
-                className: "text-center"
+                className: "text-left"
             },
             {
                 data: "spp_no",
-                className: "text-center"
+                className: "text-left"
             },
             {
                 data: "divisiName",
-                className: "text-center"
+                className: "text-left"
             },
             {
                 data: "itemCount",
-                className: "text-center",
+                className: "text-left",
                 searchable: false,
                 sortable: false,
             },
             {
                 data: "request_date",
-                className: "text-center",
+                className: "text-left",
             },
             {
                 data: "status",
-                className: "text-center",
+                className: "text-left",
             },
             {
                 data: "id",
@@ -195,6 +195,11 @@
                     if (is_posted === "0") {
                         return `
                             <div class="mt-0">
+                                <?php if (can('Pembelian', 'SPP', 'u')): ?>
+                                    <a href="<?= base_url("spp/id"); ?>/${id}" data-toggle="tooltip" title="Edit" class="btn btn-primary">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                <?php endif ?>
                                 <?php if (can('Pembelian', 'SPP', 'p')) : ?>
                                     <button data-toggle="tooltip" title="Print" class="btn btn-warning btn-print" onclick="print('<?= base_url("spp/print/"); ?>${id}')" style="box-shadow: none !important;">
                                         <i class="fa fa-print fa-sm" aria-hidden="true"></i>
@@ -217,17 +222,12 @@
                     }
                     if (is_posted === "1") {
                         var res = '';
-
-                        if (status == "OPEN") {
-                            res += `
-                                <?php if (can('Pembelian', 'SPP', 'ua')) : ?>
-                                    <button data-toggle="tooltip" title="Un-Posting" onclick="updateStatus('${id}', 0)" class="btn btn-danger posting-spp">
-                                        <i class="fa-solid fa-ban"></i>    
-                                    </button>
-                                <?php endif; ?>
-                            `;
-                        }
                         res += `
+                          <?php if (can('Pembelian', 'SPP', 'u')): ?>
+                                    <a href="<?= base_url("spp/id"); ?>/${id}" data-toggle="tooltip" title="Edit" class="btn btn-primary">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                            <?php endif ?>
                             <?php if (can('Pembelian', 'SPP', 'p')) : ?>
                                 <button data-toggle="tooltip" title="Print" class="btn btn-warning btn-print" onclick="print('<?= base_url("spp/print/"); ?>${id}')" style="box-shadow: none !important;">
                                     <i class="fa fa-print fa-sm" aria-hidden="true"></i>
@@ -240,6 +240,16 @@
                                 <?php if (can('Pembelian', 'SPP', 'a')) : ?>
                                     <button data-toggle="tooltip" title="Close SPP" onclick="closeSPP('${id}')" class="btn btn-danger posting-spp">
                                         <i class="fa fa-xmark fa-sm" aria-hidden="true"></i>
+                                    </button>
+                                <?php endif; ?>
+                            `;
+                        }
+
+                        if (status == "OPEN") {
+                            res += `
+                                <?php if (can('Pembelian', 'SPP', 'ua')) : ?>
+                                    <button data-toggle="tooltip" title="Un-Posting" onclick="updateStatus('${id}', 0)" class="btn btn-danger posting-spp">
+                                        <i class="fa-solid fa-ban"></i>    
                                     </button>
                                 <?php endif; ?>
                             `;
@@ -323,11 +333,13 @@
             }
         });
 
-        $('#dataTable tbody').on('click', 'tr td:not(.actions):not(.dataTables_empty)', function() {
-            const data = table.row(this).data();
-            location.replace(`<?= base_url("spp/id"); ?>/${data.id}`);
-        })
-    })
+        // $('#dataTable tbody').on('click', 'tr td:not(.actions):not(.dataTables_empty)', function() {
+        //     const data = table.row(this).data();
+        //     location.replace(`<?= base_url("spp/id"); ?>/${data.id}`);
+        // })
+    });
+
+
 
     const updateStatus = function(id, status) {
         Swal.fire({
