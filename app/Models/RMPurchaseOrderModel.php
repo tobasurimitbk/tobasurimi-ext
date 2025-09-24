@@ -314,6 +314,7 @@ class RMPurchaseOrderModel extends Model
                 ->like('rm_purchase_orders.po_no', $addCondition['search'])
                 ->orLike('suppliers.name', $addCondition['search'])
                 ->orLike('divisis.divisi', $addCondition['search'])
+                ->orLike('barang_master.kode_barang', $addCondition['search'])
                 ->orLike('barang_master.barang_name', $addCondition['search'])
                 ->orLike('barang_master_spesifikasi.spesifikasi', $addCondition['search'])
                 ->groupEnd();
@@ -363,6 +364,7 @@ class RMPurchaseOrderModel extends Model
                 ->like('rm_purchase_orders.po_no', $addCondition['search'])
                 ->orLike('suppliers.name', $addCondition['search'])
                 ->orLike('divisis.divisi', $addCondition['search'])
+                ->orLike('barang_master.kode_barang', $addCondition['search'])
                 ->orLike('barang_master.barang_name', $addCondition['search'])
                 ->orLike('barang_master_spesifikasi.spesifikasi', $addCondition['search'])
                 ->groupEnd();

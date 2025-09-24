@@ -295,7 +295,7 @@ class LaporanWarehousePembelian extends BaseController
                 $data['supplier_name'],
                 $data['kode_barang'],
                 $data['barang_name'],
-                $data['spesifikasi'],  
+                $data['spesifikasi'],
                 $data['kode_satuan'],
                 $data['uraian'],
                 (float) $data['qty_order'],
