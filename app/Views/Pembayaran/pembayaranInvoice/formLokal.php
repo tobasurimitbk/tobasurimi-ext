@@ -142,6 +142,18 @@
                     </div>
 
                     <div class="col-md-4">
+                        <div class="form-floating form-pembayaran-po mb-3" style="height: 50px;">
+                            <select class="form-select" <?= !empty($detail) ? ($detail['status_posting'] == 1 ? 'disabled' : '') : ""; ?> name="bank_id" id="bank_id">
+                                <option disabled selected value=""></option>
+                                <?php foreach ($bankList as $b) : ?>
+                                    <option <?= !empty($detail) ? ($detail['bank_id'] == $b->id ? 'selected' : '') : '' ?> value="<?= $b->id ?>"><?= strtoupper($b->kode_bank) ?></option>
+                                <?php endforeach ?>
+                            </select>
+                            <label for="floatingInput" style="z-index: 1;">Kode Bank (Opsional)</label>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <input <?= !empty($detail) ? ($detail['status_posting'] == 1 ? 'disabled' : '') : ""  ?> name="pembayaran_dari" id="pembayaran_dari" autocomplete="one-time-code" value="<?= !empty($detail) ? $detail['pembayaran_dari'] : '' ?>" type="text" class="form-control" placeholder="Pembayaran Dari">
                             <label for="floatingInput">Pembayaran Dari</label>
@@ -356,6 +368,14 @@
             format: "dd/mm/yyyy",
             orientation: "bottom auto",
             autoclose: true
+        }).change(function() {
+            let value = document.getElementById('auto_generate').checked ? true : false;
+            if (value) {
+                generatePaymentNumber();
+            } else {
+                $(".no_bukti_pembayaran").attr("readonly", false);
+                $(".no_bukti_pembayaran").val("");
+            }
         });
 
         $('#jenis_dokumen').select2({
@@ -381,6 +401,19 @@
             theme: "bootstrap-5"
         });
 
+        $('#bank_id').select2({
+            placeholder: "Pilih kode bank",
+            theme: "bootstrap-5"
+        }).change(function() {
+            let value = document.getElementById('auto_generate').checked ? true : false;
+            if (value) {
+                generatePaymentNumber();
+            } else {
+                $(".no_bukti_pembayaran").attr("readonly", false);
+                $(".no_bukti_pembayaran").val("");
+            }
+        });
+
         // Trigger event change jika sudah ada nilai default
         const selectedCustomerId = "<?= !empty($detail) ? encrypt($detail['customer_id']) : ''; ?>";
         if (selectedCustomerId) {
@@ -391,6 +424,14 @@
         $('#divisi_id').select2({
             placeholder: "Pilih Departemen",
             theme: "bootstrap-5"
+        }).change(function() {
+            let value = document.getElementById('auto_generate').checked ? true : false;
+            if (value) {
+                generatePaymentNumber();
+            } else {
+                $(".no_bukti_pembayaran").attr("readonly", false);
+                $(".no_bukti_pembayaran").val("");
+            }
         });
 
         $('#no_dokumen').select2({
@@ -409,6 +450,21 @@
             placeholder: "Pilih Metode Pembayaran",
             theme: "bootstrap-5",
             allowClear: true
+        }).change(function() {
+            let paymentMethod = $(this).val();
+            if (paymentMethod === "BANK") {
+                $('#bank_id').prop('disabled', false);
+            } else {
+                $('#bank_id').val(null).trigger('change');
+                $('#bank_id').prop('disabled', true);
+                let value = document.getElementById('auto_generate').checked ? true : false;
+                if (value) {
+                    generatePaymentNumber();
+                } else {
+                    $(".no_bukti_pembayaran").attr("readonly", false);
+                    $(".no_bukti_pembayaran").val("");
+                }
+            }
         });
 
 
@@ -666,32 +722,8 @@
 
     function changeStatus() {
         let value = document.getElementById('auto_generate').checked ? true : false;
-        const csrfToken = '<?= csrf_token() ?>';
-        const csrf = $(`[name="${csrfToken}"]`);
-
         if (value) {
-            $(".no_bukti_pembayaran").attr("readonly", true);
-            $.ajax({
-                url: "<?= base_url("pembayaran-invoice/generate-no-pembayaran"); ?>",
-                method: "POST",
-                dataType: "json",
-                beforeSend: function(xhr) {
-                    xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                },
-                processData: false,
-                contentType: false,
-                success: function(response) {
-                    csrf.val(response.token);
-                    $(".no_bukti_pembayaran").val(response.paymentNo);
-                },
-                onError: function(response) {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Terjadi kesalahan pada sistem',
-                        confirmButtonColor: '#4e73df',
-                    });
-                }
-            });
+            generatePaymentNumber();
         } else {
             $(".no_bukti_pembayaran").attr("readonly", false);
             $(".no_bukti_pembayaran").val("");
@@ -720,6 +752,57 @@
             input.value = maxAmount;
         }
     }
+
+
+    function generatePaymentNumber() {
+            // Get selected divisi and bank values
+            let jenisPembayaran = $("#jenis_pembayaran option:selected").text();
+            let divisiId = $("#divisi_id option:selected").text();
+            let bankId = $("#bank_id option:selected").val();
+            let paymentMethod = $("#payment_method option:selected").val();
+            let tanggalPembayaran = $("#payment_date").val();
+
+            // Only generate if this is a new record (empty detail)
+                const csrfToken = '<?= csrf_token() ?>';
+                const csrf = $(`[name="${csrfToken}"]`);
+
+                // Build URL with query parameters
+                let url = "<?= base_url('pembayaran-po-lokal-bb/generate-no-pembayaran'); ?>";
+                url += `?jenisPembayaran=${encodeURIComponent(jenisPembayaran)}&paymentMethod=${encodeURIComponent(paymentMethod)}&divisiId=${encodeURIComponent(divisiId)}&bankId=${encodeURIComponent(bankId)}&tanggalPembayaran=${encodeURIComponent(tanggalPembayaran)}`;
+
+                // Additional data if needed
+                var formData = new FormData();
+                formData.append("type", "Bahan Penolong");
+                formData.append("payment_date", $("#payment_date").val());
+
+                $(".no_bukti_pembayaran").attr("readonly", true);
+
+                $.ajax({
+                    url: url,
+                    method: "GET",
+                    data: formData,
+                    dataType: "json",
+                    beforeSend: function(xhr) {
+                        xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                    },
+                    processData: false,
+                    contentType: false,
+                    success: function(response) {
+                        csrf.val(response.token);
+                        $(".no_bukti_pembayaran").val(response.paymentNo);
+                    },
+                    error: function(xhr, status, error) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Terjadi kesalahan pada sistem',
+                            text: 'Gagal menghasilkan nomor pembayaran otomatis',
+                            confirmButtonColor: '#4e73df',
+                        });
+                        $(".no_bukti_pembayaran").attr("readonly", false);
+                    }
+                });
+    }
+
 
 
     function getNoDokumen() {
