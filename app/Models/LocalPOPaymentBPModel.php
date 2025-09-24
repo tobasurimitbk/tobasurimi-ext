@@ -352,7 +352,8 @@ class LocalPOPaymentBPModel extends Model
             'other_payment' => ['no_pembayaran', 'tanggal'],
             'local_po_payments' => ['payment_no', 'payment_date'],
             'local_po_payment_bp' => ['payment_no', 'payment_date'],
-            'panjar_pinjaman_transaction' => ['no_transaction', 'tanggal']
+            'panjar_pinjaman_transaction' => ['no_transaction', 'tanggal'],
+            'pembayaran_invoice' => ['no_pembayaran', 'tanggal']
         ];
 
         $maxNumber = 0;
