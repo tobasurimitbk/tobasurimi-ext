@@ -235,12 +235,15 @@ class MaterialRequest extends BaseController
 
                 if ($dataMaterialRequestNotApprove) {
                     $value['is_requested'] = true;
-                    $value['realStok'] = $this->stockDetail2Model->getStockListDetail(
-                        $value['stock_id'],
-                        $value['bc_id'],
-                        $value['no_aju'],
-                        $value['stock_dokumen']
-                    )['stok_total'] - $dataMaterialRequestNotApprove['qty'];
+                    $value['realStok'] = max(
+                        0,
+                        $this->stockDetail2Model->getStockListDetail(
+                            $value['stock_id'],
+                            $value['bc_id'],
+                            $value['no_aju'],
+                            $value['stock_dokumen']
+                        )['stok_total'] - $dataMaterialRequestNotApprove['qty']
+                    );
                 } else {
                     $value['is_requested'] = false;
                 }
