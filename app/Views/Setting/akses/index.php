@@ -266,7 +266,18 @@
         }).then((result) => {
             if (result.isConfirmed) {
                 const csrf = $(`[name="${csrfToken}"]`);
-                let data = new FormData(document.querySelector(".create-form"));
+                let data = new FormData();
+                let dataCreateForm = new FormData(document.querySelector(".create-form"));
+                let listMenu = [];
+
+                dataCreateForm.forEach((value, key) => {
+                    listMenu.push(key)
+                });
+
+                data.set("company_id", $('#company_id').val());
+                data.set("role_id", $('#role_id').val());
+                data.set("listMenu", JSON.stringify(listMenu));
+
                 $.ajax({
                     url: "<?= base_url("akses/save"); ?>",
                     data: data,

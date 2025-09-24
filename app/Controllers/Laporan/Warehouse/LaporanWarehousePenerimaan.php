@@ -365,7 +365,7 @@ class LaporanWarehousePenerimaan extends BaseController
                         ->setFormatCode(NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1);
                 }
 
-                 if ($key === "total_harga") {
+                if ($key === "total_harga") {
                     $sheet->getStyle($col . $row)
                         ->getNumberFormat()
                         ->setFormatCode(NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1);

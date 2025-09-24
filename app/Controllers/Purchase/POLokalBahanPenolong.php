@@ -155,12 +155,12 @@ class POLokalBahanPenolong extends BaseController
         $poID = $this->aMPurchaseOrderModel->insert($dataAmPurchaseOrderData);
         $aMPurchaseOrderDetailData = json_decode($this->request->getVar('listBarang'));
 
-        if ($dataAmPurchaseOrderData['status_closed_spp']) {
-            // CLOSE SPP
-            $this->sppModel->update($dataAmPurchaseOrderData['purchase_request_id'], [
-                'request_status' => 'finished'
-            ]);
-        }
+        // if ($dataAmPurchaseOrderData['status_closed_spp']) {
+        //     // CLOSE SPP
+        //     $this->sppModel->update($dataAmPurchaseOrderData['purchase_request_id'], [
+        //         'request_status' => 'finished'
+        //     ]);
+        // }
 
         foreach ($aMPurchaseOrderDetailData as $d) {
             // UPDATE HARGA
@@ -415,12 +415,12 @@ class POLokalBahanPenolong extends BaseController
 
         $this->aMPurchaseOrderModel->update($id, $dataAmPurchaseOrderData);
 
-        if ($dataAmPurchaseOrderData['status_closed_spp']) {
-            // CLOSE SPP
-            $this->sppModel->update($dataAmPurchaseOrderData['purchase_request_id'], [
-                'request_status' => 'finished'
-            ]);
-        }
+        // if ($dataAmPurchaseOrderData['status_closed_spp']) {
+        //     // CLOSE SPP
+        //     $this->sppModel->update($dataAmPurchaseOrderData['purchase_request_id'], [
+        //         'request_status' => 'finished'
+        //     ]);
+        // }
 
         // insert again
         $aMPurchaseOrderDetailData = json_decode($this->request->getVar('listBarang'));

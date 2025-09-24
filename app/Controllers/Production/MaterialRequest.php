@@ -235,12 +235,20 @@ class MaterialRequest extends BaseController
 
                 if ($dataMaterialRequestNotApprove) {
                     $value['is_requested'] = true;
-                    $value['realStok'] = $this->stockDetail2Model->getStockListDetail(
+                    $stokTotal = $this->stockDetail2Model->getStockListDetail(
                         $value['stock_id'],
                         $value['bc_id'],
                         $value['no_aju'],
                         $value['stock_dokumen']
-                    )['stok_total'] - $dataMaterialRequestNotApprove['qty'];
+                    )['stok_total'];
+
+                    $selisih = $stokTotal - $dataMaterialRequestNotApprove['qty'];
+
+                    // hasil string, contoh "6.60"
+                    $value['realStok'] = sprintf(
+                        '%.2f',
+                        floor(max(0, $selisih) * 100) / 100
+                    );
                 } else {
                     $value['is_requested'] = false;
                 }
@@ -1616,7 +1624,15 @@ class MaterialRequest extends BaseController
 
                 if ($dataMaterialRequestNotApprove) {
                     $dataResult[$i]['is_requested'] = true;
-                    $dataResult[$i]['stok_total'] = $dataResult[$i]['stok_total'] - $dataMaterialRequestNotApprove['qty'];
+                    $dataResult[$i]['stok_total'] = sprintf(
+                        '%.2f',
+                        floor(
+                            max(
+                                0,
+                                $dataResult[$i]['stok_total'] - $dataMaterialRequestNotApprove['qty']
+                            ) * 100
+                        ) / 100
+                    );
                 } else {
                     $dataResult[$i]['is_requested'] = false;
                 }
