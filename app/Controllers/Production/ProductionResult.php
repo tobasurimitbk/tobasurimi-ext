@@ -415,11 +415,11 @@ class ProductionResult extends BaseController
 
             $barangJadi = json_decode($this->request->getVar("jadi"));
             $barangDigunakan = json_decode($this->request->getVar("digunakan"));
-            $barangDigunakanPenolong = json_decode($this->request->getVar("digunakan_penolong"));
+            // $barangDigunakanPenolong = json_decode($this->request->getVar("digunakan_penolong"));
             $barangScrap = json_decode($this->request->getVar("scrap"));
             $barangFilling = json_decode($this->request->getVar("filling"));
-            var_dump($barangDigunakanPenolong);
-            exit;
+            // var_dump($barangDigunakanPenolong);
+            // exit;
             $productionResID = $this->productionResultModel->insert($datas);
 
             $productionResData = $this->productionResultModel->find($productionResID);
