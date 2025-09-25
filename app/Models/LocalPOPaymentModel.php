@@ -1265,6 +1265,7 @@ class LocalPOPaymentModel extends Model
                     rm_purchase_orders.pph_umum as total_pph_umum,
                     rm_purchase_orders.pph_tambahan as total_pph_tambahan,
                     rm_purchase_orders.id AS rm_purchase_order_id,
+                    rm_purchase_order_details.id AS rm_purchase_order_detail_id,
                     rm_purchase_orders.total AS total_tagihan_number,
                     barang_master.barang_name AS barang,
                     COALESCE(SUM(rm_purchase_order_details.qty_diterima), 0) AS total_qty_diterima")
