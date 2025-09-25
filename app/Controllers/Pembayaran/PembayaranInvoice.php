@@ -10,6 +10,7 @@ use App\Models\EmployeesModel;
 use App\Models\DivisisModel;
 use App\Models\GolonganModel;
 use App\Models\BagianModel;
+use App\Models\BanksModel;
 use App\Models\SupplierModel;
 use App\Models\Sub_AkunsModel;
 use App\Models\PembayaranInvoiceModel;
@@ -54,6 +55,7 @@ class PembayaranInvoice extends BaseController
     protected $pembayaranInvoiceDetailModel;
     protected $metaDataModel;
     protected $jurnalController;
+    protected $banksModel;
 
 
     public function __construct()
@@ -81,6 +83,7 @@ class PembayaranInvoice extends BaseController
         $this->salesOrderReturnDetailModel = new SalesOrderReturnDetailModel();
         $this->metaDataModel = new MetadataModel();
         $this->jurnalController = new JurnalUmum();
+        $this->banksModel = new BanksModel();
     }
 
     public function index()
@@ -324,6 +327,12 @@ class PembayaranInvoice extends BaseController
             ->groupBy('customers.id')
             ->findAll();
 
+        $bankList = $this->banksModel->asObject()
+            ->where('company_id', $this->this_company_id)
+            ->orderBy('name', "ASC")
+            ->findAll();
+        
+
         $divisi = $this->divisiModel->getDivisiAccess();
         $salesOrderLokalInvoiceData = $this->salesOrderInvoiceModel->where('deletedAt', null)->where('id_company', $this->this_company_id)->findAll();
         foreach ($salesOrderLokalInvoiceData as $s) {
@@ -347,6 +356,7 @@ class PembayaranInvoice extends BaseController
             "divisi" => $divisi,
             "subsAkuns" => $subAkunsModel,
             "dokumenList" => $dokumenList,
+            "bankList" => $bankList,
         ];
         return view('Pembayaran/pembayaranInvoice/formLokal', $data);
     }
@@ -1089,8 +1099,6 @@ class PembayaranInvoice extends BaseController
 
     public function saveLokalInvoice()
     {
-
-
         try {
             $check = $this->pembayaranInvoiceModel->where('company_id', $this->this_company_id)->where('no_pembayaran', $this->request->getVar('no_bukti_pembayaran'))->first();
             if ($check != null) {
@@ -1149,7 +1157,7 @@ class PembayaranInvoice extends BaseController
                     'akun_kas' => $this->request->getVar('akun_kas'),
                     'akun_selisih' => $this->request->getVar('akun_selisih'),
                     'status_posting' => '0',
-                    'pembayaran_dari' => $this->request->getVar('pembayaran_dari'),
+                    'bank_id' => $this->request->getVar('bank_id'),
                     'jenis_data' => $isImport
                 ]);
 
@@ -1445,6 +1453,7 @@ class PembayaranInvoice extends BaseController
                 'status_posting' => '0',
                 'payment_method' => $this->request->getVar('payment_methods'),
                 'jenis_data' => $isImport,
+                'bank_id' => $this->request->getVar('bank_id'),
                 'pembayaran_dari' => $this->request->getVar('pembayaran_dari'),
             ]);
 
@@ -1629,11 +1638,18 @@ class PembayaranInvoice extends BaseController
                 $s['document_no'] = str_replace(['[', ']', '"'], '', $s['document_no']);
                 array_push($dokumenList, $s);
             }
+
+            $bankList = $this->banksModel->asObject()
+                ->where('company_id', $this->this_company_id)
+                ->orderBy('name', "ASC")
+                ->findAll();
+
             $data = [
                 "customers" => $customers_lokal,
                 "divisi" => $divisi,
                 "subsAkuns" => $subAkunsModel,
                 "dokumenList" => $dokumenList,
+                "bankList" => $bankList,
                 "detail" => $this->pembayaranInvoiceModel->getPembayaranInvoiceDetail($id),
             ];
 
@@ -1773,7 +1789,7 @@ class PembayaranInvoice extends BaseController
     {
 
         $id = decrypt($this->request->getVar('id'));
-        $result = $this->jurnalController->insertDataPembayaranInvoice($id);
+        $result = $this->jurnalController->insertDataPembayaranInvoiceInternasional($id);
 
         if ($result) {
             $this->pembayaranInvoiceModel->update($id, ['status_posting' => 1]);
