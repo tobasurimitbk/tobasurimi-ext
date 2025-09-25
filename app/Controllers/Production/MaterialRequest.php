@@ -242,7 +242,7 @@ class MaterialRequest extends BaseController
                         $value['stock_dokumen']
                     )['stok_total'];
 
-                    $selisih = $stokTotal - $dataMaterialRequestNotApprove['qty'];
+                    $selisih = $stokTotal - (float) $dataMaterialRequestNotApprove['qty'];
 
                     // hasil string, contoh "6.60"
                     $value['realStok'] = sprintf(
@@ -1629,7 +1629,7 @@ class MaterialRequest extends BaseController
                         floor(
                             max(
                                 0,
-                                $dataResult[$i]['stok_total'] - $dataMaterialRequestNotApprove['qty']
+                                $dataResult[$i]['stok_total'] - (float) $dataMaterialRequestNotApprove['qty']
                             ) * 100
                         ) / 100
                     );
