@@ -14,6 +14,8 @@ use App\Models\FormPerijinanModel;
 use App\Models\GolonganModel;
 use App\Models\MetadataModel;
 use CodeIgniter\I18n\Time;
+use DateInterval;
+use DatePeriod;
 use DateTime;
 use Exception;
 use Locale;
@@ -1133,7 +1135,7 @@ class Attendance extends BaseController
         ]);
     }
 
-    public function exportExcelLogPresensi()
+    public function exportExcelLogPresensiBulanan()
     {
         $monthReq = $this->request->getVar('month') ?: date('Y-m');
         [$year, $month] = explode('-', $monthReq);
@@ -1197,25 +1199,38 @@ class Attendance extends BaseController
         $colIndex = 1;
         $rowHeader = 3;
         foreach ($headers as $h) {
+            $sheet1->mergeCellsByColumnAndRow($colIndex, $rowHeader, $colIndex, $rowHeader + 1);
             $sheet1->setCellValueByColumnAndRow($colIndex++, $rowHeader, $h);
         }
+
+        // Header tanggal
         for ($d = 1; $d <= $totalDaysInMonth; $d++) {
-            $sheet1->setCellValueByColumnAndRow($colIndex++, $rowHeader, "IN $d");
-            $sheet1->setCellValueByColumnAndRow($colIndex++, $rowHeader, "OUT $d");
+            $startCol = $colIndex;
+            $sheet1->mergeCellsByColumnAndRow($startCol, $rowHeader, $startCol + 1, $rowHeader);
+            $sheet1->setCellValueByColumnAndRow($startCol, $rowHeader, $d);
+
+            $sheet1->setCellValueByColumnAndRow($startCol, $rowHeader + 1, "IN");
+            $sheet1->setCellValueByColumnAndRow($startCol + 1, $rowHeader + 1, "OUT");
+
+            $colIndex += 2;
         }
 
-        // Style header
         $lastCol = $colIndex - 1;
-        $sheet1->getStyle("A{$rowHeader}:" . $sheet1->getCellByColumnAndRow($lastCol, $rowHeader)->getCoordinate())
+
+        // Style header (2 baris)
+        $sheet1->getStyle("A{$rowHeader}:" . $sheet1->getCellByColumnAndRow($lastCol, $rowHeader + 1)->getCoordinate())
             ->applyFromArray([
                 'font' => ['bold' => true],
-                'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER],
+                'alignment' => [
+                    'horizontal' => Alignment::HORIZONTAL_CENTER,
+                    'vertical'   => Alignment::VERTICAL_CENTER
+                ],
                 'fill' => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['rgb' => 'DDDDDD']],
                 'borders' => ['allBorders' => ['borderStyle' => Border::BORDER_THIN]],
             ]);
 
-        // Isi data
-        $rowIndex = $rowHeader + 1;
+        // Isi data mulai baris ke-5
+        $rowIndex = $rowHeader + 2;
         $no = 1;
         foreach ($employeeData as $e) {
             $colIndex = 1;
@@ -1255,6 +1270,11 @@ class Attendance extends BaseController
                 'borders' => ['allBorders' => ['borderStyle' => Border::BORDER_THIN]],
             ]);
 
+        // Auto width untuk kolom No, NIP, Nama, Divisi, Bagian
+        foreach (range('A', 'E') as $col) {
+            $sheet1->getColumnDimension($col)->setAutoSize(true);
+        }
+
         // ================= Sheet 2 : Rekap =================
         $sheet2 = $spreadsheet->createSheet();
         $sheet2->setTitle("Rekap Total");
@@ -1266,7 +1286,7 @@ class Attendance extends BaseController
             'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER]
         ]);
 
-        // Header
+        // Header rekap
         $headers2 = [
             'No',
             'NIP',
@@ -1310,19 +1330,7 @@ class Attendance extends BaseController
             $sheet2->setCellValueByColumnAndRow($colIndex++, $rowIndex, $e['divisi']);
             $sheet2->setCellValueByColumnAndRow($colIndex++, $rowIndex, $e['bagian']);
 
-            // hitung rekap
-            $total = [
-                'ct' => 0,
-                'chd' => 0,
-                'chl' => 0,
-                'cm' => 0,
-                'ijin' => 0,
-                'sakit' => 0,
-                'rl' => 0,
-                'hadir' => 0,
-                'alpha' => 0,
-                'libur' => 0
-            ];
+            $total = ['ct' => 0, 'chd' => 0, 'chl' => 0, 'cm' => 0, 'ijin' => 0, 'sakit' => 0, 'rl' => 0, 'hadir' => 0, 'alpha' => 0, 'libur' => 0];
 
             for ($d = 1; $d <= $totalDaysInMonth; $d++) {
                 $tanggal = sprintf("%04d-%02d-%02d", $year, $month, $d);
@@ -1381,7 +1389,7 @@ class Attendance extends BaseController
             $rowIndex++;
         }
 
-        // Autosize kolom
+        // Autosize kolom rekap
         foreach (range('A', $sheet2->getCellByColumnAndRow($lastCol2, 1)->getColumn()) as $col) {
             $sheet2->getColumnDimension($col)->setAutoSize(true);
         }
@@ -1400,6 +1408,168 @@ class Attendance extends BaseController
         header("Content-Disposition: attachment;filename=\"{$filename}\"");
         header('Cache-Control: max-age=0');
 
+        $writer->save('php://output');
+        exit();
+    }
+
+    public function exportExcelLogPresensiHarian()
+    {
+        $startDate =  date('Y-m-d', strtotime(str_replace('/', '-', $this->request->getVar('start_date'))));
+        $endDate   = date('Y-m-d', strtotime(str_replace('/', '-', $this->request->getVar('end_date'))));
+
+        // ambil data employees
+        $condition = [
+            "employees.company_id" => $this->this_company_id,
+            "employees.deletedAt"  => null,
+        ];
+        $addCondition = [
+            "divisi_id"   => $this->request->getVar('divisi_id'),
+            "tipe"        => $this->request->getVar('tipe'),
+            "employee_id" => $this->request->getVar("employee_id"),
+        ];
+        $employees    = $this->EmployeesModel->getEmployeeListAttendances($condition, $addCondition, 0, 10000000);
+        $employeeData = $employees['data'];
+        $employeeIds  = array_column($employeeData, 'id');
+
+        // log attendance
+        $logData = !empty($employeeIds)
+            ? $this->AttendancesLogModel->getLogByDateRangeAmts(
+                $employeeIds,
+                $startDate,
+                $endDate
+            )
+            : [];
+
+        // mapping data presensi
+        $mapLog = [];
+        foreach ($logData as $l) {
+            if (!empty($l['check_in']) && !empty($l['check_out'])) {
+                $status = "H";
+            } else {
+                $status = $l['status'] != null ? explode("_", $l['status'])[1] : "";
+            }
+            $mapLog[$l['employees_id']][$l['periode']] = [
+                'in'     => $l['check_in'],
+                'out'    => $l['check_out'],
+                'status' => $status,
+            ];
+        }
+
+        // ambil big days
+        $bigDays = $this->BigDaysModel
+            ->where('company_id', $this->this_company_id)
+            ->where('deletedAt', null)
+            ->findAll();
+        $tanggalBigDay = array_column($bigDays, 'date');
+
+        // Buat spreadsheet
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+        $sheet->setTitle("Presensi Harian");
+
+        // date range
+        $period = new DatePeriod(
+            new DateTime($startDate),
+            new DateInterval('P1D'),
+            (new DateTime($endDate))->modify('+1 day')
+        );
+
+        $row = 1;
+        foreach ($period as $date) {
+            $tgl = $date->format('Y-m-d');
+            $dayName = date('D', strtotime($tgl));
+
+            // Header per tanggal
+            $sheet->mergeCells("A{$row}:H{$row}");
+            $sheet->setCellValue("A{$row}", "Tanggal: {$tgl}");
+            $sheet->getStyle("A{$row}")->applyFromArray([
+                'font' => ['bold' => true, 'size' => 12],
+                'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER],
+                'fill' => [
+                    'fillType' => Fill::FILL_SOLID,
+                    'startColor' => ['rgb' => 'DDDDDD']
+                ]
+            ]);
+            $row++;
+
+            // Header kolom
+            $headers = ['No', 'NIP', 'Nama', 'Divisi', 'Bagian', 'IN', 'OUT', 'Status'];
+            $col = 'A';
+            foreach ($headers as $h) {
+                $sheet->setCellValue("{$col}{$row}", $h);
+                $sheet->getStyle("{$col}{$row}")->applyFromArray([
+                    'font' => ['bold' => true],
+                    'alignment' => [
+                        'horizontal' => Alignment::HORIZONTAL_CENTER,
+                        'vertical' => Alignment::VERTICAL_CENTER
+                    ],
+                    'borders' => ['allBorders' => ['borderStyle' => Border::BORDER_THIN]]
+                ]);
+                $col++;
+            }
+            $row++;
+
+            // isi data per karyawan
+            $no = 1;
+            foreach ($employeeData as $emp) {
+                $nip    = $emp['nip'] ?? '';
+                $nama   = $emp['name'] ?? '';
+                $divisi = $emp['divisi'] ?? '';
+                $bagian = $emp['bagian'] ?? '';
+
+                $in     = $mapLog[$emp['id']][$tgl]['in'] ?? '';
+                $out    = $mapLog[$emp['id']][$tgl]['out'] ?? '';
+                $status = $mapLog[$emp['id']][$tgl]['status'] ?? '';
+
+                // cek jika tanggal masuk big day
+                if (in_array($tgl, $tanggalBigDay)) {
+                    $status = "L";
+                }
+
+                if ($in == '' && $out == '' && $dayName == 'Sun' && $status == '') {
+                    $status = "L";
+                }
+
+                if ($in == '' && $out == '' && $status == '') {
+                    $status = "A";
+                }
+
+                if ($in != '' && $out != '') {
+                    $status = '';
+                }
+
+                $sheet->setCellValue("A{$row}", $no++);
+                $sheet->setCellValue("B{$row}", $nip);
+                $sheet->setCellValue("C{$row}", $nama);
+                $sheet->setCellValue("D{$row}", $divisi);
+                $sheet->setCellValue("E{$row}", $bagian);
+                $sheet->setCellValue("F{$row}", $in);
+                $sheet->setCellValue("G{$row}", $out);
+                $sheet->setCellValue("H{$row}", $status);
+
+                // border untuk isi
+                $sheet->getStyle("A{$row}:H{$row}")->applyFromArray([
+                    'borders' => ['allBorders' => ['borderStyle' => Border::BORDER_THIN]]
+                ]);
+                $row++;
+            }
+
+            // kasih spasi 2 baris antar tanggal
+            $row += 2;
+        }
+
+        // auto size kolom
+        foreach (range('A', 'H') as $col) {
+            $sheet->getColumnDimension($col)->setAutoSize(true);
+        }
+
+        // output excel
+        $filename = "Presensi_Harian_{$startDate}_sd_{$endDate}.xlsx";
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header("Content-Disposition: attachment;filename=\"{$filename}\"");
+        header('Cache-Control: max-age=0');
+
+        $writer = new Xlsx($spreadsheet);
         $writer->save('php://output');
         exit();
     }
@@ -1463,29 +1633,42 @@ class Attendance extends BaseController
         ]);
 
         // Header mulai baris ke-3
-        $headers = ['No', 'NIP', 'Nama', 'Dept', 'Bagian'];
+        $headers = ['No', 'NIP', 'Nama', 'Divisi', 'Bagian'];
         $colIndex = 1;
         $rowHeader = 3;
         foreach ($headers as $h) {
+            $sheet1->mergeCellsByColumnAndRow($colIndex, $rowHeader, $colIndex, $rowHeader + 1);
             $sheet1->setCellValueByColumnAndRow($colIndex++, $rowHeader, $h);
         }
+
+        // Header tanggal
         for ($d = 1; $d <= $totalDaysInMonth; $d++) {
-            $sheet1->setCellValueByColumnAndRow($colIndex++, $rowHeader, "IN $d");
-            $sheet1->setCellValueByColumnAndRow($colIndex++, $rowHeader, "OUT $d");
+            $startCol = $colIndex;
+            $sheet1->mergeCellsByColumnAndRow($startCol, $rowHeader, $startCol + 1, $rowHeader);
+            $sheet1->setCellValueByColumnAndRow($startCol, $rowHeader, $d);
+
+            $sheet1->setCellValueByColumnAndRow($startCol, $rowHeader + 1, "IN");
+            $sheet1->setCellValueByColumnAndRow($startCol + 1, $rowHeader + 1, "OUT");
+
+            $colIndex += 2;
         }
 
-        // Style header
         $lastCol = $colIndex - 1;
-        $sheet1->getStyle("A{$rowHeader}:" . $sheet1->getCellByColumnAndRow($lastCol, $rowHeader)->getCoordinate())
+
+        // Style header (2 baris)
+        $sheet1->getStyle("A{$rowHeader}:" . $sheet1->getCellByColumnAndRow($lastCol, $rowHeader + 1)->getCoordinate())
             ->applyFromArray([
                 'font' => ['bold' => true],
-                'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER],
+                'alignment' => [
+                    'horizontal' => Alignment::HORIZONTAL_CENTER,
+                    'vertical'   => Alignment::VERTICAL_CENTER
+                ],
                 'fill' => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['rgb' => 'DDDDDD']],
                 'borders' => ['allBorders' => ['borderStyle' => Border::BORDER_THIN]],
             ]);
 
-        // Isi data
-        $rowIndex = $rowHeader + 1;
+        // Isi data mulai baris ke-5
+        $rowIndex = $rowHeader + 2;
         $no = 1;
         foreach ($employeeData as $e) {
             $colIndex = 1;
@@ -1513,7 +1696,6 @@ class Attendance extends BaseController
             }
             $rowIndex++;
         }
-
         // Autosize kolom
         foreach (range('A', $sheet1->getCellByColumnAndRow($lastCol, 1)->getColumn()) as $col) {
             $sheet1->getColumnDimension($col)->setAutoSize(true);
@@ -1524,6 +1706,11 @@ class Attendance extends BaseController
             ->applyFromArray([
                 'borders' => ['allBorders' => ['borderStyle' => Border::BORDER_THIN]],
             ]);
+
+        // Auto width untuk kolom No, NIP, Nama, Divisi, Bagian
+        foreach (range('A', 'E') as $col) {
+            $sheet1->getColumnDimension($col)->setAutoSize(true);
+        }
 
         // ================= Sheet 2 : Rekap =================
         $sheet2 = $spreadsheet->createSheet();

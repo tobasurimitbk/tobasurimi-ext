@@ -49,7 +49,7 @@
                                 <th style="width: 10px;" class="sort">No</th>
                                 <th onclick="changeSort('jenis')" class="sort">Jenis Jam Kerja</th>
                                 <th onclick="changeSort('shift')" class="sort">Shift</th>
-                                <th onclick="changeSort('jam_terlambat')" class="sort">Jam Masuk</th>
+                                <th onclick="changeSort('jam_terlambat')" class="sort">Jam Keterlambatan Masuk</th>
                                 <th style="width: 100px;">Action</th>
                             </tr>
                         </thead>

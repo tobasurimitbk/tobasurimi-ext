@@ -137,4 +137,48 @@ class AttendancesLogModel extends Model
 
         return $this->db->query($sql, [$year . '-' . $month, $year . '-' . $month])->getResultArray();
     }
+
+    public function getLogByDateRangeAmts($employeeIds, $startDate, $endDate)
+    {
+        // pastikan array -> string biar bisa dipakai di IN()
+        $employeeIds = implode(',', $employeeIds);
+
+        $sql = "
+        SELECT 
+            attendances_log.employees_id,
+            DATE(attendances_log.date_create) AS periode,
+            DATE_FORMAT(MIN(attendances_log.date_create), '%H:%i:%s') AS check_in,
+            DATE_FORMAT(MAX(attendances_log.date_create), '%H:%i:%s') AS check_out,
+            employees.name,
+            form_perijinan.status
+        FROM attendances_log
+        JOIN employees ON attendances_log.employees_id = employees.id
+        LEFT JOIN form_perijinan 
+            ON form_perijinan.employee_id = employees.id
+            AND form_perijinan.periode = DATE(attendances_log.date_create)
+            AND form_perijinan.deletedAt IS NULL
+        WHERE DATE(attendances_log.date_create) BETWEEN ? AND ?
+        AND attendances_log.employees_id IN ($employeeIds)
+        GROUP BY attendances_log.employees_id, DATE(attendances_log.date_create)
+
+        UNION
+
+        SELECT 
+            form_perijinan.employee_id AS employees_id,
+            form_perijinan.periode,
+            NULL AS check_in,
+            NULL AS check_out,
+            employees.name,
+            form_perijinan.status
+        FROM form_perijinan
+        JOIN employees ON form_perijinan.employee_id = employees.id
+        WHERE form_perijinan.periode BETWEEN ? AND ?
+        AND form_perijinan.employee_id IN ($employeeIds)
+        AND form_perijinan.deletedAt IS NULL
+
+        ORDER BY employees_id, periode
+        ";
+
+        return $this->db->query($sql, [$startDate, $endDate, $startDate, $endDate])->getResultArray();
+    }
 }

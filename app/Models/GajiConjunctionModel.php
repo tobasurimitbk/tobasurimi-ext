@@ -70,4 +70,38 @@ class GajiConjunctionModel extends Model
 
         return ($res == null) ? 0 : $res['nominal'];
     }
+
+    public function updateBulkGajiHarian($divisiId)
+    {
+        $gajiDivisiModel = new GajiDivisiModel();
+        $gajiDivisi = $gajiDivisiModel
+            ->select('gaji_divisi.*')
+            ->join('tunjangan', 'tunjangan.id = gaji_divisi.tunjangan_id', 'left')
+            ->where('tunjangan.is_gaji_harian', 1)
+            ->where('gaji_divisi.division_id', $divisiId)
+            ->where('gaji_divisi.deletedAt', null)
+            ->first();
+
+        if ($gajiDivisi != null) {
+            $gajiConjunctionList =  $this
+                ->select('gaji_conjunction.*')
+                ->join('employees', 'employees.id = gaji_conjunction.employee_id', 'left')
+                ->where('gaji_conjunction.deletedAt', null)
+                ->where('employees.division_id', $divisiId)
+                ->where('gaji_conjunction.tunjangan_id', $gajiDivisi['tunjangan_id'])
+                ->findAll();
+
+            $updatedData = array();
+            foreach ($gajiConjunctionList as $g) {
+                array_push($updatedData, [
+                    'nominal' => $gajiDivisi['nominal'],
+                    'id' => $g['id']
+                ]);
+            }
+
+            if (count($updatedData) != 0) {
+                $this->updateBatch($updatedData, 'id');
+            }
+        }
+    }
 }
