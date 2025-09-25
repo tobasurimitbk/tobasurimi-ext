@@ -160,7 +160,7 @@
 
                 <div class="col-sm-4 mt-1">
                     <div class="form-floating mb-3" style="height: 50px;">
-                        <input readonly autocomplete="one-time-code" type="text" required name="totalUangLembur" id="totalUangLembur" class="form-control target input-picker" value="<?= "Rp " . number_format($payrollDetail['nominal_uang_lembur'],  2, ',', '.') ?>">
+                        <input readonly autocomplete="one-time-code" type="text" required name="totalUangLembur" id="totalUangLembur" class="form-control target input-picker" value="<?= " " . number_format($payrollDetail['nominal_uang_lembur'],  2, ',', '.') ?>">
                         <label for="floatingInput">Total Uang Lembur Dalam Sebulan</label>
                     </div>
                 </div>
@@ -168,13 +168,13 @@
             <div class="row">
                 <div class="col-sm-4 mt-1">
                     <div class="form-floating mb-3" style="height: 50px;">
-                        <input disabled autocomplete="one-time-code" onkeyup="this.value = greatFormatRupiah(this.value);" type="text" id="gajiPerHari" class="form-control target input-picker" value="<?= "Rp " . number_format($payrollDetail['nominal_gaji_harian'], 2, ',', '.') ?>">
+                        <input disabled autocomplete="one-time-code" onkeyup="this.value = greatFormatRupiah(this.value);" type="text" id="gajiPerHari" class="form-control target input-picker" value="<?= " " . number_format($payrollDetail['nominal_gaji_harian'], 2, ',', '.') ?>">
                         <label for="floatingInput">Gaji (Per Hari)</label>
                     </div>
                 </div>
                 <div class="col-sm-4 mt-1">
                     <div class="form-floating mb-3" style="height: 50px;">
-                        <input disabled autocomplete="one-time-code" onkeyup="this.value = greatFormatRupiah(this.value);" type="text" id="cadanganPerHari" class="form-control target input-picker" value="<?= "Rp " . number_format($payrollDetail['nominal_cadangan'], 2, ',', '.') ?>">
+                        <input disabled autocomplete="one-time-code" onkeyup="this.value = greatFormatRupiah(this.value);" type="text" id="cadanganPerHari" class="form-control target input-picker" value="<?= " " . number_format($payrollDetail['nominal_cadangan'], 2, ',', '.') ?>">
                         <label for="floatingInput">Cadangan (Per Hari)</label>
                     </div>
                 </div>
@@ -217,18 +217,18 @@
                                         <th class="sort">Nominal</th>
                                     </tr>
                                 </thead>
-                                <tbody class="body-table" id="body-table">
+                                <tbody class="body-table" id="body-table" style="cursor: pointer;">
                                     <?php $no = 1; ?>
                                     <?php foreach ($perhitunganGaji as  $p) : ?>
-                                        <tr class="perhitunganGajis" data-id="<?= $p['id'] ?>" data-komponen_gaji="<?= $p['name'] ?>" data-nominal="<?= $p['nominal'] ?>" data-tipe="<?= $p['tipe'] == "PLUS" ? "+" : "-"  ?>">
+                                        <tr style="cursor: pointer;" class="perhitunganGaji" data-id="<?= $p['id'] ?>" data-komponen_gaji="<?= $p['name'] ?>" data-nominal="<?= $p['nominal'] ?>" data-tipe="<?= $p['tipe'] == "PLUS" ? "+" : "-"  ?>">
                                             <td><?= $no++; ?></td>
                                             <td><b> <?= $p['name'] ?></b></td>
-                                            <td style="color: <?= $p['tipe'] == "PLUS" ? "green" : "red"  ?>; font-weight:bold;"><b> <?= $p['tipe'] == "PLUS" ? "(+)" : "(-)"  ?> <?= "Rp " . number_format($p['nominal'],  2, ',', '.') ?></b></td>
+                                            <td style="color: <?= $p['tipe'] == "PLUS" ? "green" : "red"  ?>; font-weight:bold;"><b> <?= $p['tipe'] == "PLUS" ? "(+)" : "(-)"  ?> <?= " " . number_format($p['nominal'],  2, ',', '.') ?></b></td>
                                         </tr>
                                     <?php endforeach ?>
                                     <tr class="bg-secondary">
                                         <td colspan="2" align="right"><b>Tunjangan Diterima</b></td>
-                                        <td><b><?= "Rp " . number_format($totalPerhitunganGaji,  2, ',', '.') ?></b></td>
+                                        <td><b><?= " " . number_format($totalPerhitunganGaji,  2, ',', '.') ?></b></td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -251,17 +251,17 @@
                                     <td colspan="5" class="text-center">Karyawan tidak pernah datang terlambat </td>
                                 <?php else : ?>
                                     <?php foreach ($rekapKeterlambatanPresensi as  $r) : ?>
-                                        <tr class="rekapKeterlambatanPresensiTable" data-id="<?= $r['id'] ?>" data-tanggal="<?= date('d/m/Y', strtotime($r['periode'])) ?>" data-checkin="<?= $r['checkin'] ?>" data-total_jam_keterlambatan="<?= $r['total_jam_keterlambatan'] ?>" data-nominal="<?= $r['nominal_pengurangan'] ?>">
+                                        <tr style="cursor: pointer;" class="rekapKeterlambatanPresensiTable" data-id="<?= $r['id'] ?>" data-tanggal="<?= date('d/m/Y', strtotime($r['periode'])) ?>" data-checkin="<?= $r['checkin'] ?>" data-total_jam_keterlambatan="<?= $r['total_jam_keterlambatan'] ?>" data-nominal="<?= $r['nominal_pengurangan'] ?>">
                                             <td><?= $no++; ?></td>
                                             <td><?= date('d/m/Y', strtotime($r['periode'])) ?></td>
                                             <td><?= $r['checkin'] ?></td>
                                             <td><?= $r['total_jam_keterlambatan'] ?></td>
-                                            <td class="text-danger" style="font-weight:bold;"><b>(-) <?= "Rp " . number_format($r['nominal_pengurangan'],  2, ',', '.') ?></b></td>
+                                            <td class="text-danger" style="font-weight:bold;"><b>(-) <?= " " . number_format($r['nominal_pengurangan'],  2, ',', '.') ?></b></td>
                                         </tr>
                                     <?php endforeach ?>
                                     <tr class="bg-secondary">
                                         <td colspan="4" align="right"><b>Denda Keterlambatan Presensi</b></td>
-                                        <td><b class="text-danger"> (-) <?= "Rp " . number_format($totalNominalKeterlambatanPresensi,  2, ',', '.') ?></b></td>
+                                        <td><b class="text-danger"> (-) <?= " " . number_format($totalNominalKeterlambatanPresensi,  2, ',', '.') ?></b></td>
                                     </tr>
                                 <?php endif; ?>
                             </tbody>
@@ -291,12 +291,12 @@
                                             <td><?= $r['total_jam_lembur'] ?> Jam</td>
                                             <td><?= $r['jam_mulai_lembur'] ?></td>
                                             <td><?= $r['jam_selesai_lembur'] ?></td>
-                                            <td style="font-weight:bold;" class="text-success"><b>(+) <?= "Rp " . number_format($r['total_uang_lembur'],  2, ',', '.') ?></b></td>
+                                            <td style="font-weight:bold;" class="text-success"><b>(+) <?= " " . number_format($r['total_uang_lembur'],  2, ',', '.') ?></b></td>
                                         </tr>
                                     <?php endforeach ?>
                                     <tr class="bg-secondary">
                                         <td colspan="5" align="right"><b>Total Uang Lembur Selama Sebulan</b></td>
-                                        <td><b class="text-success">(+) <?= "Rp " . number_format($payrollDetail['nominal_uang_lembur'],  2, ',', '.') ?></b></td>
+                                        <td><b class="text-success">(+) <?= " " . number_format($payrollDetail['nominal_uang_lembur'],  2, ',', '.') ?></b></td>
                                     </tr>
                                 <?php endif; ?>
                             </tbody>
@@ -322,12 +322,12 @@
                                             <td><?= $no++; ?></td>
                                             <td><?= explode("_", $r['status'])[0] ?></td>
                                             <td><?= date('d/m/Y', strtotime($r['periode'])) ?></td>
-                                            <td style="font-weight:bold;" class="text-danger"><b>(-) <?= "Rp " . number_format($r['nominal_pengurangan'],  2, ',', '.') ?></b></td>
+                                            <td style="font-weight:bold;" class="text-danger"><b>(-) <?= " " . number_format($r['nominal_pengurangan'],  2, ',', '.') ?></b></td>
                                         </tr>
                                     <?php endforeach ?>
                                     <tr class="bg-secondary">
                                         <td colspan="3" align="right"><b>Pengurangan Gaji Harian</b></td>
-                                        <td><b class="text-danger">(-) <?= "Rp " . number_format($totalNominalRekapPerizinanNotApproved,  2, ',', '.') ?></b></td>
+                                        <td><b class="text-danger">(-) <?= " " . number_format($totalNominalRekapPerizinanNotApproved,  2, ',', '.') ?></b></td>
                                     </tr>
                                 <?php endif; ?>
                             </tbody>
@@ -352,11 +352,11 @@
                                     <tr>
                                         <td><?= $no++; ?></td>
                                         <td style="text-align: center;"><?= date('d/m/Y', strtotime($rekapPinjaman['updatedAt'])) ?></td>
-                                        <td style="font-weight:bold;" class="text-danger"><b>(-) <?= "Rp " . number_format($rekapPinjaman['nominal'],  2, ',', '.') ?></b></td>
+                                        <td style="font-weight:bold;" class="text-danger"><b>(-) <?= " " . number_format($rekapPinjaman['nominal'],  2, ',', '.') ?></b></td>
                                     </tr>
                                     <tr class="bg-secondary">
                                         <td colspan="2" align="right"><b>Total Pinjaman Karyawan</b></td>
-                                        <td><b class="text-danger">(-) <?= "Rp " . number_format($totalPinjaman,  2, ',', '.') ?></b></td>
+                                        <td><b class="text-danger">(-) <?= " " . number_format($totalPinjaman,  2, ',', '.') ?></b></td>
                                     </tr>
                                 <?php endif; ?>
                             </tbody>
@@ -390,13 +390,13 @@
                                         <td><?= $r['jam_istirahat_selesai'] ?? "-" ?></td>
                                         <td><?= $r['jam_pulang'] ?? "-"     ?></td>
                                         <td><?= number_format($r['total_jam'], 2) ?></td>
-                                        <td style="font-weight: bold;">Rp. <?= number_format($r['nominal_diterima'], 2) ?></td>
+                                        <td style="font-weight: bold;"><?= number_format($r['nominal_diterima'], 2) ?></td>
                                     </tr>
                                 <?php endforeach; ?>
                                 <tr>
                                     <td colspan="8" style="text-align:right;"><b>Total Gaji Berdasarkan Jam Kerja</b></td>
                                     <td style=" text-align:center;">
-                                        <b>Rp. <?= number_format($payrollDetail['nominal_uang_gaji'], 2) ?></b>
+                                        <b><?= number_format($payrollDetail['nominal_uang_gaji'], 2) ?></b>
                                     </td>
                                 </tr>
                             </tbody>
@@ -414,23 +414,23 @@
                         <td style="width: 10px;">1</td>
                         <td>Total Gaji & Lembur</td>
                         <td>=</td>
-                        <td align="right"><b id="gajiLemburTabel"><?= "Rp " . number_format($payrollDetail['nominal_uang_gaji'] + $payrollDetail['nominal_uang_lembur'], 2, ',', '.') ?></b></td>
+                        <td align="right"><b id="gajiLemburTabel"><?= " " . number_format($payrollDetail['nominal_uang_gaji'] + $payrollDetail['nominal_uang_lembur'], 2, ',', '.') ?></b></td>
                     </tr>
                     <tr>
                         <td style="width: 10px;">2</td>
                         <td>Penambahan Gaji</td>
                         <td>=</td>
-                        <td align="right"><b id="penambahanGajiTabel" class="text-success">(+) <?= "Rp " . number_format($payrollDetail['nominal_penambahan_gaji'], 2, ',', '.') ?></b></td>
+                        <td align="right"><b id="penambahanGajiTabel" class="text-success">(+) <?= " " . number_format($payrollDetail['nominal_penambahan_gaji'], 2, ',', '.') ?></b></td>
                     </tr>
                     <tr>
                         <td style="width: 10px;">3</td>
                         <td>Pengurangan Gaji</td>
                         <td>=</td>
-                        <td align="right"><b id="penguranganGajiTabel" class="text-danger">(-) <?= "Rp " . number_format($payrollDetail['nominal_pengurangan_gaji'], 2, ',', '.') ?></b></td>
+                        <td align="right"><b id="penguranganGajiTabel" class="text-danger">(-) <?= " " . number_format($payrollDetail['nominal_pengurangan_gaji'], 2, ',', '.') ?></b></td>
                     </tr>
                     <tr>
                         <td colspan="3" align="right"><b>Total Uang Diterima</b></td>
-                        <td align="right"><b id="gajiDiterimaTabel"><?= "Rp " . number_format($payrollDetail['nominal_gaji_diterima'], 2, ',', '.') ?></b></td>
+                        <td align="right"><b id="gajiDiterimaTabel"><?= " " . number_format($payrollDetail['nominal_gaji_diterima'], 2, ',', '.') ?></b></td>
                     </tr>
                 </tbody>
             </table>
@@ -441,7 +441,7 @@
 </section>
 
 <div class="modal fade" id="perhitunganGajiModal" tabindex="-1">
-    <div class="modal-dialog">
+    <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title"><label class="title-name">Update Nominal Komponen Gaji</label></h5>
@@ -477,7 +477,7 @@
 </div>
 
 <div class="modal fade" id="rekapKeterlambatanPresensiModal" tabindex="-1">
-    <div class="modal-dialog">
+    <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title"><label class="title-name">Update Nominal Denda Keterlambatan Presensi</label></h5>
@@ -552,7 +552,7 @@
         },
         errorElement: 'span',
         errorClass: 'text-danger',
-        errorPlacement: function(error, element) {
+        errolacement: function(error, element) {
             var elem = $(element);
             if (elem.hasClass("select2-hidden-accessible")) {
                 element = $("#select2-" + elem.attr("id") + "-container").parent();
@@ -574,49 +574,42 @@
     $('#submitFormUpdateKomponenGaji').click(function(e) {
         e.preventDefault();
         if ($("#formUpdateKomponenGaji").valid()) {
-            Swal.fire({
-                icon: 'question',
-                title: 'Simpan Data?',
-                confirmButtonColor: '#4e73df',
-                cancelButtonColor: '#d33',
-                showCancelButton: true,
-                reverseButtons: true,
-                confirmButtonText: 'Simpan',
-                cancelButtonText: 'Kembali',
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    const csrf = $(`[name="${csrfToken}"]`);
-                    let data = new FormData(document.querySelector("#formUpdateKomponenGaji"));
-                    $.ajax({
-                        url: "<?= base_url("payroll/update/nominal-komponen-gaji"); ?>",
-                        data: data,
-                        beforeSend: function(xhr) {
-                            xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                        },
-                        method: "POST",
-                        dataType: "json",
-                        processData: false,
-                        contentType: false,
-                        success: function(response) {
-                            Swal.fire({
-                                icon: 'success',
-                                title: response.message,
-                                confirmButtonColor: '#4e73df',
-                            }).then((result) => {
-                                location.replace(`<?= base_url("payroll/id"); ?>/${response.id}?location=${response.location}`);
-                            });
-                        },
-                        onError: function(response) {
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Data Gagal Disimpan, coba Lagi',
-                                confirmButtonColor: '#4e73df',
-                            });
-                        }
-                    });
+            const csrf = $(`[name="${csrfToken}"]`);
+            let data = new FormData(document.querySelector("#formUpdateKomponenGaji"));
+            let nominal = destroyFormatRupiah($('#nominalKomponenGaji').val());
+            data.set('nominal', nominal);
 
+            $.ajax({
+                url: "<?= base_url("payroll/update/nominal-komponen-gaji"); ?>",
+                data: data,
+                beforeSend: function(xhr) {
+                    setLoading();
+                    xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                },
+                complete: function() {
+                    stopLoading();
+                },
+                method: "POST",
+                dataType: "json",
+                processData: false,
+                contentType: false,
+                success: function(response) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: response.message,
+                        confirmButtonColor: '#4e73df',
+                    }).then((result) => {
+                        location.replace(`<?= base_url("payroll/id"); ?>/${response.id}?location=${response.location}`);
+                    });
+                },
+                onError: function(response) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Data Gagal Disimpan, coba Lagi',
+                        confirmButtonColor: '#4e73df',
+                    });
                 }
-            })
+            });
         }
     });
 </script>
@@ -650,7 +643,7 @@
         },
         errorElement: 'span',
         errorClass: 'text-danger',
-        errorPlacement: function(error, element) {
+        errolacement: function(error, element) {
             var elem = $(element);
             if (elem.hasClass("select2-hidden-accessible")) {
                 element = $("#select2-" + elem.attr("id") + "-container").parent();
@@ -672,53 +665,42 @@
     $('#submitFormKeterlambatanPresensi').click(function(e) {
         e.preventDefault();
         if ($("#formUpdateKeterlambatanPresensi").valid()) {
-            Swal.fire({
-                icon: 'question',
-                title: 'Simpan Data?',
-                confirmButtonColor: '#4e73df',
-                cancelButtonColor: '#d33',
-                showCancelButton: true,
-                reverseButtons: true,
-                confirmButtonText: 'Simpan',
-                cancelButtonText: 'Kembali',
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    const csrf = $(`[name="${csrfToken}"]`);
-                    let data = new FormData(document.querySelector("#formUpdateKeterlambatanPresensi"));
-                    $.ajax({
-                        url: "<?= base_url("payroll/update/nominal-keterlambatan-presensi"); ?>",
-                        data: data,
-                        beforeSend: function(xhr) {
-                            setLoading();
-                            xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                        },
-                        complete: function() {
-                            stopLoading();
-                        },
-                        method: "POST",
-                        dataType: "json",
-                        processData: false,
-                        contentType: false,
-                        success: function(response) {
-                            Swal.fire({
-                                icon: 'success',
-                                title: response.message,
-                                confirmButtonColor: '#4e73df',
-                            }).then((result) => {
-                                location.replace(`<?= base_url("payroll/id"); ?>/${response.id}?location=${response.location}`);
-                            });
-                        },
-                        onError: function(response) {
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Data Gagal Disimpan, coba Lagi',
-                                confirmButtonColor: '#4e73df',
-                            });
-                        }
-                    });
+            const csrf = $(`[name="${csrfToken}"]`);
+            let data = new FormData(document.querySelector("#formUpdateKeterlambatanPresensi"));
+            let nominal = destroyFormatRupiah($('#nominalDendaKeterlambatan').val());
+            data.set('nominal', nominal);
 
+            $.ajax({
+                url: "<?= base_url("payroll/update/nominal-keterlambatan-presensi"); ?>",
+                data: data,
+                beforeSend: function(xhr) {
+                    setLoading();
+                    xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                },
+                complete: function() {
+                    stopLoading();
+                },
+                method: "POST",
+                dataType: "json",
+                processData: false,
+                contentType: false,
+                success: function(response) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: response.message,
+                        confirmButtonColor: '#4e73df',
+                    }).then((result) => {
+                        location.replace(`<?= base_url("payroll/id"); ?>/${response.id}?location=${response.location}`);
+                    });
+                },
+                onError: function(response) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Data Gagal Disimpan, coba Lagi',
+                        confirmButtonColor: '#4e73df',
+                    });
                 }
-            })
+            });
         }
     });
 </script>
