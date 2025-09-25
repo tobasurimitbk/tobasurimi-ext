@@ -560,6 +560,7 @@ class MaterialRequestDetailsModel extends Model
             ->where('material_request_details.stock_date', $stockDate)
             ->where('material_request_details.stock_dokumen', $stockDokumen)
             ->where('material_request_details.deletedAt', null)
+            ->where('material_requests.deletedAt', null)
             ->where('material_requests.is_approve', null)
             ->where('material_requests.deletedAt', null)
             ->first();
