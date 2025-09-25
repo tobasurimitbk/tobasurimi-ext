@@ -146,7 +146,7 @@ class PenerimaanBarangLokalBB extends BaseController
                 "no_penerimaan_barang"  => $data->no_penerimaan_barang,
                 "warehouse_name"        => $data->warehouse_name,
                 "tipe_bahan"            => $data->tipe_bahan,
-                "createdAt"             => $data->createdAt ? date("d/m/Y", strtotime($data->tanggal)) : "",
+                "createdAt"             => $data->tanggal ? date("d/m/Y", strtotime($data->tanggal)) : "",
                 "supplier_name"         => $data->supplier_name,
                 "itemCount"             => $data->itemCount,
                 "multiple_po_no"        => str_replace(',', ', ', str_replace(['[', ']', '"', "\\"], '', $data->multiple_po_no)),
