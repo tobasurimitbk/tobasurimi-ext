@@ -2007,7 +2007,7 @@
         // console.log(listStockSelectedBahanBaku);
 
         $.each(listStockSelectedBahanBaku, function(i, v) {
-            totalQtyAwal += parseFloat(listStockSelectedBahanBaku[i].stok_total) || 0;
+            totalQtyAwal += parseFloat(listStockSelectedBahanBaku[i].realStok ?? listStockSelectedBahanBaku[i].stok_total) || 0;
             totalQty += parseFloat(listStockSelectedBahanBaku[i].qty2) || 0;
         });
         $('.nilai-total-bahan-baku-request').text(greatFormatRupiah(totalQty.toFixed(2)));
