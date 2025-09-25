@@ -854,7 +854,7 @@ class StockDetail2Model extends Model
             MIN(stock_details2.stock_id) AS stock_id,
             stock_details2.stock_dokumen,
             MIN(stock_details2.supplier_id) AS supplier_id,
-            MIN(stock_details.stock_date) AS stock_date,
+            MIN(rm_purchase_orders.po_date) AS stock_date,
             MIN(stock_details.sumber) AS sumber,
             SUM(CASE WHEN stock_details.status = 'In' THEN stock_details2.qty ELSE 0 END)
             - SUM(CASE WHEN stock_details.status = 'Out' THEN stock_details2.qty ELSE 0 END) AS stok_total,
@@ -870,6 +870,7 @@ class StockDetail2Model extends Model
             ->join('stock_details', 'stock_details.id = stock_details2.stock_detail_id')
             ->join('stock', 'stock.id = stock_details.stock_id', 'left')
             ->join('suppliers', 'suppliers.id = stock_details2.supplier_id', 'left')
+            ->join('rm_purchase_orders', 'rm_purchase_orders.po_no = stock_details2.no_po')
             ->join('barang_master', 'barang_master.id = stock.barang1_id', 'left')
             ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = stock.barang2_id', 'left')
             ->join('satuans', 'satuans.id = barang_master_spesifikasi.satuan_1', 'left')
@@ -1014,8 +1015,8 @@ class StockDetail2Model extends Model
                 stock_details.sumber,
                 CONCAT(barang_master.barang_name, " ", barang_master_spesifikasi.spesifikasi) AS barang,
                 satuans.kode_satuan,
-                SUM(CASE WHEN LOWER(stock_details.status) = "in" THEN stock_details2.qty ELSE 0 END)
-                - SUM(CASE WHEN LOWER(stock_details.status) = "out" THEN stock_details2.qty ELSE 0 END) AS stok_total
+                SUM(CASE WHEN LOWER(stock_details.status) = "in" THEN stock_details2.qty_diterima ELSE 0 END)
+                - SUM(CASE WHEN LOWER(stock_details.status) = "out" THEN stock_details2.qty_diterima ELSE 0 END) AS stok_total
 
             ')
             ->join('stock_details', 'stock_details.id = stock_details2.stock_detail_id')

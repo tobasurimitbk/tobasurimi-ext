@@ -92,6 +92,17 @@
                             <label for="floatingInput" style="z-index: 1;">Supplier</label>
                         </div>
                     </div>
+
+                    <!-- SPESIFIKASI BARANG -->
+                    <div class="col-md-4">
+                        <div class="form-spp form-floating mb-3">
+                                <select class="form-select spesifikasi_id" id="spesifikasi_id" name="spesifikasi_id[]">
+                                <option value=""></option>
+                                </select>
+                                <label for="spesifikasi_id">Pilih Spesifikasi Barang</label>
+                        </div>
+                    </div>
+
                 </div>
 
                  <div class="row mt-3">
@@ -174,6 +185,7 @@
 
     var listStockAsal = [];
     var listStockSelected = [];
+    let abortController = null;
 
     $("#tanggal_po_awal, #tanggal_po_akhir").datepicker({
         todayHighlight: true,
@@ -326,6 +338,49 @@
         getListWarehouse();
     });
 
+    $("#spesifikasi_id").select2({
+        placeholder: "Pilih Spesifikasi Barang",
+        theme: "bootstrap-5",
+        multiple: true,
+        ajax: {
+            delay: 300,
+            transport: function(params, success, failure) {
+                if (abortController) {
+                    abortController.abort();
+                }
+                abortController = new AbortController();
+
+                fetch("<?= base_url('update-stock-bahan-baku/search-barang'); ?>?" + new URLSearchParams({
+                    barang_id: $('#barang_id option:selected').val(),
+                    q: params.data.term
+                }), {
+                    signal: abortController.signal
+                })
+                .then(res => res.json())
+                .then(success)
+                .catch(err => {
+                    if (err.name !== "AbortError") failure(err);
+                });
+            },
+            processResults: function(data) {
+                return {
+                    results: data.data.map(item => ({
+                        id: item.spesifikasi_id,
+                        text: `${item.master_barang} - ${item.spesifikasi}`,
+                        master_barang: item.master_barang,
+                        spesifikasi: item.spesifikasi,
+                        satuan: item.kode_satuan,
+                    }))
+                };
+            }
+        }
+    }).change(function() {
+        getListBarangPo();
+        <?php if (!empty($po)) : ?>
+             getListBarangPoAlreadyHaveKotor();
+        <?php endif; ?>
+    });
+
     // $('#no_po').select2({
     //     placeholder: "Pilih No Po",
     //     theme: "bootstrap-5",
@@ -333,25 +388,6 @@
     // }).change(function() {
     //    getListBarangPo()
     // });
-
-    $('#spesifikasi_rebus_id').select2({
-        placeholder: "Pilih Barang - Spesifikasi (Udang / Kepiting Kulit)",
-        theme: "bootstrap-5",
-        allowClear: true
-    }).change(function() {
-        // LIST DOKUMEN PABEAN
-        getListDokumenPabean();
-        getListBarangHasilRebus();
-    });
-
-
-    $('#spesifikasi_hasil_rebus_id').select2({
-        placeholder: "Pilih Barang - Spesifikasi (Udang / Kepiting Rebus)",
-        theme: "bootstrap-5",
-        allowClear: true
-    }).change(function() {
-
-    });
 
 
     $('#supplier_id').select2({
@@ -1073,7 +1109,7 @@
         updateTotalRow();
 
         // --- Logic Ubah Qty Rebus Manual ---
-        $tbody.on('input', '.qty-rebus-input, .qty-kotor, .total-hasil-input', function() {
+        $tbody.on('input', '.qty-rebus-input, .qty-diterima, .total-hasil-input', function() {
             updateTotalRow();
         });
 
@@ -1089,7 +1125,7 @@
             });
 
             // Hitung total hasil rebus dari input qty hasil rebus per item
-            $('.qty-kotor').each(function () {
+            $('.qty-diterima').each(function () {
                 const val = destroyFormatRupiah($(this).val());
                 if (!isNaN(val)) totalQtyHasilRebus += val;
             });

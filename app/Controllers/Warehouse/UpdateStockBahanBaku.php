@@ -158,8 +158,8 @@ class UpdateStockBahanBaku extends BaseController
 
         // filter tanggal kalau ada
         if (!empty($tanggal_po_awal) && !empty($tanggal_po_akhir)) {
-            $condition['DATE(stock_details.stock_date) >='] = DateTime::createFromFormat('d/m/Y', $tanggal_po_awal)->format('Y-m-d');
-            $condition['DATE(stock_details.stock_date) <='] = DateTime::createFromFormat('d/m/Y', $tanggal_po_akhir)->format('Y-m-d');
+            $condition['DATE(rm_purchase_orders.po_date) >='] = DateTime::createFromFormat('d/m/Y', $tanggal_po_awal)->format('Y-m-d');
+            $condition['DATE(rm_purchase_orders.po_date) <='] = DateTime::createFromFormat('d/m/Y', $tanggal_po_akhir)->format('Y-m-d');
         }
 
         // filter warehouse
@@ -798,65 +798,32 @@ class UpdateStockBahanBaku extends BaseController
         return;
     }
 
-    /* public function getReceivedItemsBySupplier($supplierId)
+    public function searchBarang()
     {
-        $payload = [
-            "pageSize"      => $this->request->getGet("length"),
-            "currentPage"   => ($this->request->getGet("start") / $this->request->getGet("length")) + 1,
-            "search"        => $this->request->getGet("search"),
-            "sort"          => $this->request->getGet("sort"),
-            "sortType"      => $this->request->getGet("sortType"),
-            "idCompany"     => $this->this_company_id,
-            "kategori"      => "LOKAL",
-            "type"          => "BAHAN BAKU"
-        ];
+        $term = $this->request->getGet('q');
+        $barang = $this->request->getGet('barang_id');
 
-        $condition = [
-            // "suppliers.company_id"  => $this->this_company_id,
-            "penerimaan_barang.status_penerimaan"       => "IMPORT",
-            "penerimaan_barang.tipe_bahan"              => "BAKU",
-            // "penerimaan_barang_detail.summarized_qty <" => 'penerimaan_barang_detail.qty'
+        $builder = $this->barangMasterSpesifikasiModel
+            ->select('barang_master_spesifikasi.id as spesifikasi_id, barang_master.barang_name as master_barang, barang_master_spesifikasi.spesifikasi as spesifikasi, satuans.kode_satuan')
+            ->join('barang_master', 'barang_master.id = barang_master_spesifikasi.barang_master_id')
+            ->join('satuans', 'satuans.id = barang_master_spesifikasi.satuan_1')
+            ->where('barang_master_spesifikasi.deletedAt', null)
+            ->where('barang_master.deletedAt', null)
+            // ->where('barang_master.id', $barang)
+            ->where('barang_master.company_id', $this->this_company_id)
+            ->where('barang_master.type_barang', 'bahan_baku')
+            ->groupStart()
+                ->like('barang_master_spesifikasi.spesifikasi', "%{$term}%")
+            ->groupEnd();
 
-            // "search"                                => $this->request->getGet("search"),
-            // "sort"                                  => $this->request->getGet("sort"),
-            // "sortType"                              => $this->request->getGet("sortType")
-        ];
-        $limit = $this->request->getGet("length");
-        $offset = $this->request->getGet("start");
+        $data = $builder->get()->getResultArray();
 
-        $itemData = $this->penerimaanBarangModel
-            ->getReceivedItemsBySupplier($supplierId, $condition, $limit, $offset);
-
-        $receivedData = [];
-
-        foreach ($itemData['data'] as $data) {
-            array_push($receivedData, [
-                "id"                    => $data->id,
-                "no_po"                 => "jugijagiju",
-                "lpb_date"              => $data->lpb_date,
-                "no_lpb"                => $data->no_lpb,
-                "item_name"             => $data->item_name,
-                "lpb_qty"               => $data->lpb_qty,
-                "price"                 => floatval($data->price),
-                "return_qty"            => 0, 
-                "received_qty"          => 0,
-                "qty_will_be_received"  => $data->lpb_qty,
-                "unit"                  => $data->unit
-            ]);
-        }
-
-        $data = [
-            "draw"              => intval($this->request->getGet("draw")),
-            "recordsTotal"      => $itemData['totalData'],
-            "recordsFiltered"   => $itemData['totalFilteredData'],
-            "data"              => $receivedData,
-            // "response" => $response,
-            // "payload"           => $payload
-        ];
-
-        echo json_encode($data);
-        return;
-    } */
+        return $this->response->setJSON([
+            'data'   => $data,
+            'status' => true,
+            'token'  => csrf_hash()
+        ]);
+    }
 
     public function generatePenerimaanBarang()
     {
