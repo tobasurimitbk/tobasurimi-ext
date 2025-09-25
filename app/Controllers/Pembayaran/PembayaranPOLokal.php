@@ -1348,9 +1348,12 @@ class PembayaranPOLokal extends BaseController
         $poSelected = $this->request->getVar("selectedPo");
         $supplierID = $this->request->getVar('supplierID');
         $divisiID = $this->request->getVar('divisiID');
+        $tipe_pembayaran = $this->request->getVar('tipe_pembayaran');
         $localPOPaymentModel = new LocalPOPaymentModel();
-        if (!empty($supplierID) && !empty($divisiID)) {
+        if ($tipe_pembayaran == 'HARIAN' && !empty($supplierID) && !empty($divisiID)) {
             $res = $localPOPaymentModel->getListPONotPaid($poSelected, $supplierID, $divisiID, $this->this_company_id);
+        } elseif ($tipe_pembayaran == 'BULANAN_PER_PO' && !empty($supplierID)) {
+            $res = $localPOPaymentModel->getListPONotPaidTB($poSelected, $supplierID, $divisiID, $this->this_company_id);
         } else {
             $res = [];
         }
@@ -1395,18 +1398,39 @@ class PembayaranPOLokal extends BaseController
     {
         $supplierID = $this->request->getVar('supplierID');
         $poID = json_decode($this->request->getVar('poID'));
-        $month = $this->request->getVar('bulan');
+        $monthInput = $this->request->getVar('bulan'); // contoh: 09/2025
         $tipeBayar = $this->request->getVar('tipeBayar');
+        $month = null;
+
+        if (!empty($monthInput)) {
+            // ubah dari mm/yyyy → yyyy-mm
+            $parts = explode('/', $monthInput);
+            if (count($parts) === 2) {
+                $month = $parts[1] . '-' . $parts[0]; // hasil: 2025-09
+            }
+        }
+    
 
         $localPOPaymentModel = new LocalPOPaymentModel();
 
 
-        if (!empty($poID)) {
+        if ($tipeBayar == 'HARIAN' && !empty($poID)) {
             // HARIAN
             $data = $localPOPaymentModel->getListHarianPONotPaid($poID, $supplierID);
             foreach ($data as &$row) {
                 $row['group_key'] = $row['rm_purchase_order_id']; // Harian group by PO
             }
+            return response()->setJson([
+                'token' => csrf_hash(),
+                'data' => $data,
+            ]);
+        } elseif ($tipeBayar == 'BULANAN_PER_PO' && !empty($supplierID)) {
+            // BULANAN PER PO
+            $data = $localPOPaymentModel->getListBulananPONotPaidTB($poID, $supplierID);
+            foreach ($data as &$row) {
+                $row['group_key'] = $row['rm_purchase_order_id']; // Bulanan per PO group by PO
+            }
+
             return response()->setJson([
                 'token' => csrf_hash(),
                 'data' => $data,

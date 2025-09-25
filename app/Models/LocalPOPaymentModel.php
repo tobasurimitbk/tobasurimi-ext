@@ -1333,6 +1333,88 @@ class LocalPOPaymentModel extends Model
         return $purchaseOrders;
     }
 
+    public function getListBulananPONotPaidTB($poIdArr, $supplierID)
+    {
+        $purchaseOrderModel = new RMPurchaseOrderModel();
+        $localPOPaymentDetailModel = new LocalPOPaymentDetailModel();
+
+        // Ambil data PO khusus bulanan
+        $purchaseOrders = $purchaseOrderModel
+            ->select("rm_purchase_orders.po_date AS tanggal_PO,
+                    rm_purchase_orders.po_no AS no_po,
+                    rm_purchase_orders.total_after_pph,
+                    rm_purchase_orders.total_before_pph,
+                    rm_purchase_orders.nilai_total_bulanan as total_bulanan,
+                    rm_purchase_orders.pph_bulanan as total_pph_bulanan,
+                    rm_purchase_orders.id AS rm_purchase_order_id,
+                    rm_purchase_order_details.id AS rm_purchase_order_detail_id,
+                    barang_master.barang_name AS barang,
+                    COALESCE(SUM(rm_purchase_order_details.qty_diterima), 0) AS total_qty_diterima")
+            ->join('barang_master', 'barang_master.id = rm_purchase_orders.barang_id', 'left')
+            ->join('rm_purchase_order_details', 'rm_purchase_order_details.rm_purchase_order_id = rm_purchase_orders.id', 'left')
+            ->whereIn('rm_purchase_orders.id', $poIdArr)
+            ->where([
+                'rm_purchase_orders.supplier_id' => $supplierID,
+                'rm_purchase_orders.deletedAt' => null
+            ])
+            ->groupBy('rm_purchase_orders.id')
+            ->findAll();
+
+        // Ambil semua pembayaran terkait PO bulanan
+        $payments = $localPOPaymentDetailModel
+            ->select('local_po_payment_details.id, 
+                    local_po_payment_details.local_po_payment_id as po_payment_id, 
+                    local_po_payment_details.rm_purchase_order_id, 
+                    local_po_payment_details.total as total_paid, 
+                    local_po_payment_details.total_pay_pph as total_paid_pph, 
+                    local_po_payment_panjar.bayar_panjar as total_panjar,  
+                    local_po_payment_pinjaman.bayar_pinjaman as total_pinjaman')
+            ->whereIn('rm_purchase_order_id', $poIdArr)
+            ->groupBy('rm_purchase_order_id')
+            ->join("local_po_payment_panjar", 'local_po_payment_panjar.local_po_payment_id = local_po_payment_details.local_po_payment_id', 'left')
+            ->join("local_po_payment_pinjaman", 'local_po_payment_pinjaman.local_po_payment_id = local_po_payment_details.local_po_payment_id', 'left')
+            ->findAll();
+
+        // Map pembayaran berdasarkan rm_purchase_order_id
+        $paymentsMap = [];
+        foreach ($payments as $pay) {
+            $paymentsMap[$pay['rm_purchase_order_id']] = [
+                'total_paid'    => (float) ($pay['total_paid'] ?? 0),
+                'total_paid_pph'=> (float) ($pay['total_paid_pph'] ?? 0),
+                'total_panjar'  => (float) ($pay['total_panjar'] ?? 0),
+                'total_pinjaman'=> (float) ($pay['total_pinjaman'] ?? 0)
+            ];
+        }
+
+        foreach ($purchaseOrders as &$p) {
+            // Ambil pembayaran
+            $totalPaid    = floatval($paymentsMap[$p['rm_purchase_order_id']]['total_paid'] ?? 0);
+            $totalPaidPPH = floatval($paymentsMap[$p['rm_purchase_order_id']]['total_paid_pph'] ?? 0);
+            $totalPanjar  = floatval($paymentsMap[$p['rm_purchase_order_id']]['total_panjar'] ?? 0);
+            $totalPinjaman= floatval($paymentsMap[$p['rm_purchase_order_id']]['total_pinjaman'] ?? 0);
+
+            // Kalkulasi bulanan
+            $totalBiaya = $p['total_bulanan'];
+            $pph        = $p['total_pph_bulanan'];
+
+            $remainingTotal = $totalPaid - ($totalPanjar + $totalPinjaman);
+            $sisaTagihan    = $totalBiaya - $remainingTotal;
+
+            // Format data
+            $p['tanggal_PO'] = date('d/m/Y', strtotime($p['tanggal_PO']));
+            $p['total_tagihan']        = number_format($totalBiaya, 2, '.', '');
+            $p['total_tagihan_number'] = number_format($totalBiaya, 2, '.', '');
+            $p['total_tagihan_pph']    = number_format($pph, 2, '.', '');
+            $p['total_paid']           = number_format($totalPaid, 2, '.', '');
+            $p['total_paid_pph']       = number_format($totalPaidPPH, 2, '.', '');
+            $p['sisa_tagihan']         = number_format($sisaTagihan, 2, '.', '');
+            $p['sisa_tagihan_pph']     = number_format($pph - $totalPaidPPH, 2, '.', '');
+            $p['total_qty_diterima']   = number_format($p['total_qty_diterima'], 2, '.', '');
+        }
+
+        return $purchaseOrders;
+    }
+
 
     public function getListLPBNotPaid($lpbSelected, $supplierID, $divisiID, $companyID)
     {
@@ -1492,21 +1574,17 @@ class LocalPOPaymentModel extends Model
             'status_penerimaan' => '1',
             'is_posted' => 1,
             'supplier_id' => $supplierID,
-            'divisi_id' => $divisiID,
             'company_id'  => $companyID,
             'nilai_total_bulanan >'  => 0,
         ];
 
-        var_dump($conditionPO); // Debug: Tampilkan kondisi)
-        // die(); // Hentikan eksekusi setelah debug
+       
 
         // Ambil semua data PO sesuai kondisi
         $poList = $rmPurchaseOrderModel
             ->select('id as poID, company_id, po_no, nilai_total_bulanan as total_harga_po')
             ->where($conditionPO)
             ->findAll();
-        var_dump($poList); // Debug: Tampilkan isi $poList
-        die(); // Hentikan eksekusi setelah debug
 
         // Ambil data pembayaran yang sudah ada
         $poPayed = static::summaryArrPOIsPayed($supplierID, $divisiID, "Bahan Baku");

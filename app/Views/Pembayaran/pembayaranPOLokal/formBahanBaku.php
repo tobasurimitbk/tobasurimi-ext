@@ -138,6 +138,7 @@
                                 <option selected value="<?= !empty($detail['pembayaranDetail']['type_bayar']) ? $detail['pembayaranDetail']['type_bayar'] : '';  ?>"></option>
                                 <option value="BULANAN">BULANAN</option>
                                 <option value="HARIAN">HARIAN</option>
+                                <option value="BULANAN_PER_PO">BULANAN PER PO</option>
                             </select>
                             <label for="floatingInput" style="z-index: 1;">Tipe Bayar</label>
                         </div>
@@ -150,20 +151,18 @@
                                         <input 
                                             <?= $detail['pembayaranDetail']['status_posting'] == 1 ? 'disabled' : '' ?>  
                                             value="<?= !empty($detail['pembayaranDetail']['bulan']) ? date('Y-m', strtotime($detail['pembayaranDetail']['bulan'])) : '' ?>" 
-                                            type="month" 
                                             name="bulan" 
                                             id="bulan" 
-                                            class="form-control">
+                                            class="form-control input-picker">
                                         <label for="bulan" style="z-index: 1;">Pilih Bulan</label>
                                     </div>
                                 <?php else : ?>
                                     <div class="form-floating form-pembayaran-po mb-3" style="height: 50px;">
                                         <input 
                                             value="" 
-                                            type="month" 
                                             name="bulan" 
                                             id="bulan" 
-                                            class="form-control">
+                                            class="form-control input-picker">
                                         <label for="bulan" style="z-index: 1;">Pilih Bulan</label>
                                     </div>
                                 <?php endif; ?>
@@ -716,6 +715,14 @@
         autoclose: true
     });
 
+    $("#bulan").datepicker({
+        format: "mm/yyyy",        // format output
+        startView: "months",      // mulai dari tampilan bulan
+        minViewMode: "months",    // biar cuma bisa pilih bulan
+        autoclose: true,
+        orientation: "bottom auto"
+    });
+
     $('#payment_date').change(function() {
         generatePaymentNumber();
     });
@@ -779,6 +786,7 @@
         var supplierID = $('#supplier_id').val();
         var formData = new FormData();
         formData.append("supplierID", $('#supplier_id').val());
+        formData.append("divisiID", $('#divisi_id').val());
         formData.append("bulan", $(this).val());
         formData.append("tipeBayar", $('#tipe_pembayaran').val());
 
@@ -808,10 +816,13 @@
     });
 
     <?php if (!empty($detail['pembayaranDetail']) && $detail['pembayaranDetail']['type_bayar'] == "Bulanan") : ?>
-       
-            $('#bulan')
-                .val("<?= !empty($detail['pembayaranDetail']['bulan']) ? date('Y-m', strtotime($detail['pembayaranDetail']['bulan'])) : '' ?>")
-                .trigger('change');
+        
+                <?php if (!empty($detail['pembayaranDetail']) && $detail['pembayaranDetail']['type_bayar'] == "Bulanan") : ?>
+                $('#bulan')
+                    .datepicker('update', "<?= !empty($detail['pembayaranDetail']['bulan']) ? date('m/Y', strtotime($detail['pembayaranDetail']['bulan'])) : '' ?>")
+                    .trigger('change');
+    <?php endif; ?>
+
     <?php endif; ?>
 
     $('#po').change(function() {
@@ -1143,7 +1154,12 @@
             $('.harian-form').hide();
             $('#bulan').val('');
             $('#jenis_dokumen').val("KWITANSI TB");
-        } else {
+        if (tipeBayar == "BULANAN_PER_PO") {
+            $('.harian-form').show();
+            $('.bulanan-form').hide();
+            $('#jenis_dokumen').val("LPB");
+            generateLPBNoPerBulan();
+        }} else {
             $('.harian-form').show();
             $('.bulanan-form').hide();
             $('#jenis_dokumen').val("LPB");
@@ -1276,6 +1292,50 @@
         var formData = new FormData();
         formData.append("supplierID", $('#supplier_id').val());
         formData.append("divisiID", $('#divisi_id').val());
+        formData.append("tipe_pembayaran", $('#tipe_pembayaran option:selected').val());
+
+        // Ambil data multiple_po_id dari BE untuk auto-select
+        let selectedPo = <?= json_encode($detail['pembayaranDetail']['multiple_po_id'] ?? []) ?>;
+        formData.append("selectedPo", JSON.stringify(selectedPo));
+
+        $.ajax({
+            url: "<?= base_url('pembayaran-po-lokal-bb/get-po-not-paid'); ?>",
+            data: formData,
+            method: "POST",
+            dataType: "json",
+            beforeSend: function(xhr) {
+                xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+            },
+            processData: false,
+            contentType: false,
+            success: function(response) {
+
+                csrf.val(response.token);
+
+                // Kosongkan dan tambahkan opsi default
+                $("#po").empty().append(`<option value=""></option>`);
+
+                // Iterasi data PO yang belum dibayar
+                response.data.forEach(function(item) {
+                    let itemPoID = Number(item.poID); // Pastikan item.poID jadi angka
+                    let isSelected = selectedPo.includes(itemPoID) ? "selected" : "";
+                    $("#po").append(`<option value="${itemPoID}" ${isSelected}>${item.po_no}</option>`);
+                });
+
+                // Refresh select2 jika dipakai
+                $("#po").trigger("change");
+            }
+        });
+    }
+
+
+    function generateLPBNoPerBulan() {
+        const csrfToken = '<?= csrf_token() ?>';
+        const csrf = $(`[name="${csrfToken}"]`);
+        var formData = new FormData();
+        formData.append("supplierID", $('#supplier_id').val());
+        formData.append("divisiID", $('#divisi_id').val());
+        formData.append("tipe_pembayaran", $('#tipe_pembayaran option:selected').val());
 
         // Ambil data multiple_po_id dari BE untuk auto-select
         let selectedPo = <?= json_encode($detail['pembayaranDetail']['multiple_po_id'] ?? []) ?>;
