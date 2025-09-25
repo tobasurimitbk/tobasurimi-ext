@@ -309,26 +309,26 @@
                                     <th style="width: 10px;" class="sort">No</th>
                                     <th class="sort">Jenis Perizinan</th>
                                     <th class="sort">Tanggal</th>
-                                    <th class="sort">Nominal</th>
+                                    <!-- <th class="sort">Nominal</th> -->
                                 </tr>
                             </thead>
                             <tbody class="body-table" id="body-table">
                                 <?php $no = 1; ?>
                                 <?php if (count($rekapPerizinanNotApproved) == 0) : ?>
-                                    <td colspan=" 4" class="text-center">Tidak ada perizinan yang tidak disetujui</td>
+                                    <td colspan=" 3" class="text-center">Tidak ada perizinan yang tidak disetujui</td>
                                 <?php else : ?>
                                     <?php foreach ($rekapPerizinanNotApproved as  $r) : ?>
                                         <tr class="rekapPerizinanTidakDisetujuiTabel" data-id="<?= $r['id'] ?>" data-tanggal="<?= date('d/m/Y', strtotime($r['periode'])) ?>" data-jenis="<?= $r['status'] ?>" data-nominal="<?= $r['nominal_pengurangan'] ?>">
                                             <td><?= $no++; ?></td>
                                             <td><?= explode("_", $r['status'])[0] ?></td>
                                             <td><?= date('d/m/Y', strtotime($r['periode'])) ?></td>
-                                            <td style="font-weight:bold;" class="text-danger"><b>(-) <?= " " . number_format($r['nominal_pengurangan'],  2, ',', '.') ?></b></td>
+                                            <!-- <td style="font-weight:bold;" class="text-danger"><b>(-) <?= " " . number_format($r['nominal_pengurangan'],  2, ',', '.') ?></b></td> -->
                                         </tr>
                                     <?php endforeach ?>
-                                    <tr class="bg-secondary">
-                                        <td colspan="3" align="right"><b>Pengurangan Gaji Harian</b></td>
+                                    <!-- <tr class="bg-secondary">
+                                        <td colspan="2" align="right"><b>Pengurangan Gaji Harian</b></td>
                                         <td><b class="text-danger">(-) <?= " " . number_format($totalNominalRekapPerizinanNotApproved,  2, ',', '.') ?></b></td>
-                                    </tr>
+                                    </tr> -->
                                 <?php endif; ?>
                             </tbody>
                         </table>
