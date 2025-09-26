@@ -7,7 +7,7 @@
             <div class="form-floating mb-3" style="height: 50px;">
                 <div class="input-group input-group-password">
                     <div class="form-floating mb-3" style="height: 50px;">
-                        <input readonly autocomplete="one-time-code" <?= !empty($dataPenerimaanBarang) ? ($dataPenerimaanBarang['status_post'] === "FINISH" ? 'disabled=true' : '') : ''; ?> value="<?= !empty($dataPenerimaanBarang) ? $dataPenerimaanBarang['no_penerimaan_barang'] : ""; ?>" type="text" class="form-control no_penerimaan_barang" id="no_penerimaan_barang" name="no_penerimaan_barang" placeholder="No. Penerimaan">
+                        <input autocomplete="one-time-code" <?= !empty($dataPenerimaanBarang) ? ($dataPenerimaanBarang['status_post'] === "FINISH" ? 'readonly=true' : '') : ''; ?> value="<?= !empty($dataPenerimaanBarang) ? $dataPenerimaanBarang['no_penerimaan_barang'] : ""; ?>" type="text" class="form-control no_penerimaan_barang" id="no_penerimaan_barang" name="no_penerimaan_barang" placeholder="No. Penerimaan">
                         <label for="floatingInput">No. Penerimaan</label>
                     </div>
                     <div style="<?= !empty($dataPenerimaanBarang) ? "display: none" : ""; ?>" class="input-generate input-group-prepend group-prepend-password align-items-center">
@@ -163,48 +163,64 @@
     </div>
 </div>
 <div class="row">
-    <div class="table-responsive">
-        <table class="table table-bordered nowrap table-hover-tobasurimi dataTable" id="dataTable" width="100%" cellspacing="0">
-            <thead class="thead-dark">
-                <tr>
-                    <th style="text-align: center;">No</th>
-                    <th style="text-align: center;">Kode Barang</th>
-                    <th style="text-align: center;">Nama Barang</th>
-                    <th style="text-align: center;">No SPP</th>
-                    <!-- <th style="text-align: center;">No PO</th> -->
-                    <th style="text-align: center;">Satuan</th>
-                    <th style="text-align: center;">Jml. Order</th>
-                    <th style="text-align: center;">Jml. Diterima LPB ini</th>
-                    <th style="text-align: center;">Jml. Diterima LPB ini (Konversi)</th>
-                    <th style="text-align: center;">Jml. Diterima Total</th>
-                    <th style="text-align: center;">Sisa Total</th>
-                    <th class="label-harga" style="text-align: center;">Harga</th>
-                    <th style="text-align: center;">Sub Total</th>
-                    <th style="text-align: center;">Keterangan</th>
-                    <th style="text-align:center;">Action</th>
-                </tr>
-            </thead>
-            <tbody class="body-detail-table" id="body-detail-table">
+    <div class="col-sm-12">
+        <div class="row justify-content-end">
+            <div class="col-sm-4">
+                <div class="form-floating mb-3" style="height: 50px;">
+                    <select class="form-select filter_spp" id="filter_spp" name="filter_spp" aria-label="Floating label select example">
+                        <option value=""></option>
 
-            </tbody>
-            <tfoot class="foot-detail-table" id="foot-detail-table">
-                <tr>
-                    <td></td>
-                    <td></td>
-                    <td colspan="3" style="text-align: right;">GRAND TOTAL</td>
-                    <td style="text-align: center;"><b>0</b></td>
-                    <td style="text-align: center;"><b>0</b></td>
-                    <td style="text-align: center;"><b>0</b></td>
-                    <td style="text-align: center;"><b>0</b></td>
-                    <td style="text-align: center;"><b>0</b></td>
-                    <td style="text-align: center;"><b>0.00</b></td>
-                    <td style="text-align: center;"><b>0.00</b></td>
-                    <td style="text-align: center;"><b></b></td>
-                    <td style="text-align: center;"></td>
-                </tr>
-            </tfoot>
-        </table>
+                    </select>
+                    <label for="floatingInput">Pilih Filter No SPP</label>
+                </div>
+            </div>
+        </div>
     </div>
+    <div class="col-sm-12">
+        <div class="table-responsive">
+            <table class="table table-bordered nowrap table-hover-tobasurimi dataTable" id="dataTable" width="100%" cellspacing="0">
+                <thead class="thead-dark">
+                    <tr>
+                        <th style="text-align: center;">No</th>
+                        <th style="text-align: center;">Kode Barang</th>
+                        <th style="text-align: center;">Nama Barang</th>
+                        <th style="text-align: center;">No SPP</th>
+                        <!-- <th style="text-align: center;">No PO</th> -->
+                        <th style="text-align: center;">Satuan</th>
+                        <th style="text-align: center;">Jml. Order</th>
+                        <th style="text-align: center;">Jml. Diterima LPB ini</th>
+                        <th style="text-align: center;">Jml. Diterima LPB ini (Konversi)</th>
+                        <th style="text-align: center;">Jml. Diterima Total</th>
+                        <th style="text-align: center;">Sisa Total</th>
+                        <th class="label-harga" style="text-align: center;">Harga</th>
+                        <th style="text-align: center;">Sub Total</th>
+                        <th style="text-align: center;">Keterangan</th>
+                        <th style="text-align:center;">Action</th>
+                    </tr>
+                </thead>
+                <tbody class="body-detail-table" id="body-detail-table">
+
+                </tbody>
+                <tfoot class="foot-detail-table" id="foot-detail-table">
+                    <tr>
+                        <td></td>
+                        <td></td>
+                        <td colspan="3" style="text-align: right;">GRAND TOTAL</td>
+                        <td style="text-align: center;"><b>0</b></td>
+                        <td style="text-align: center;"><b>0</b></td>
+                        <td style="text-align: center;"><b>0</b></td>
+                        <td style="text-align: center;"><b>0</b></td>
+                        <td style="text-align: center;"><b>0</b></td>
+                        <td style="text-align: center;"><b>0.00</b></td>
+                        <td style="text-align: center;"><b>0.00</b></td>
+                        <td style="text-align: center;"><b></b></td>
+                        <td style="text-align: center;"></td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+    </div>
+
 </div>
 
 <?php if (empty($dataPenerimaanBarang)): ?>
@@ -234,6 +250,7 @@
 <script>
     var listData = []; // UNTUK FRONT END
     var listDataServer = []; // YANG DIKIRIM KE PHP
+    var listFilterSPP = [];
 
     $(".tanggal_penerimaan_lpb").datepicker({
         todayHighlight: true,
@@ -265,6 +282,7 @@
                 // ISI DATA
                 listData = res;
                 listDataServer = res;
+                addValueFilterSpp(listData);
                 drawTable(listData);
             }
         })
@@ -384,8 +402,8 @@
     //     allowClear: true
     // });
 
-    $('.kemasan_id').select2({
-        placeholder: "Pilih Jenis Kemasan",
+    $('.filter_spp').select2({
+        placeholder: "Pilih No Spp",
         theme: "bootstrap-5",
         allowClear: true
     }).change(function() {
@@ -437,14 +455,35 @@
         }
     });
 
-    $('.supplier_id, .warehouse_id, .aju_document_type, .multiple_po_id, .divisi_id, .kemasan_id, .multiple_spp_id')
+    $('.filter_spp').on('change', function() {
+        var filter_spp = $('#filter_spp option:selected').val();
+
+        if (filter_spp == "") {
+            drawTable(listData);
+        } else {
+            var filtered_data = [];
+            var copyListData = JSON.parse(JSON.stringify(listData));
+
+            for (let i = 0; i < copyListData.result.length; i++) {
+                if (copyListData.result[i].spp_no == filter_spp) {
+                    filtered_data.push(copyListData.result[i]);
+                }
+            }
+            copyListData.result = filtered_data;
+            drawTable(copyListData);
+
+        }
+    });
+
+
+    $('.filter_spp,.supplier_id, .warehouse_id, .aju_document_type, .multiple_po_id, .divisi_id, .kemasan_id, .multiple_spp_id')
         .parent('div')
         .children('span')
         .children('span')
         .children('span')
         .css('height', ' calc(3.5rem + 2px)');
 
-    $('.supplier_id, .warehouse_id, .aju_document_type, .multiple_po_id, .divisi_id, .kemasan_id, .multiple_spp_id')
+    $('.filter_spp,.supplier_id, .warehouse_id, .aju_document_type, .multiple_po_id, .divisi_id, .kemasan_id, .multiple_spp_id')
         .parent('div')
         .children('span')
         .children('span')
@@ -452,7 +491,7 @@
         .children('span')
         .css('margin-top', '22px').css('margin-left', '-7px');
 
-    $('.supplier_id, .warehouse_id, .aju_document_type, .multiple_po_id, .divisi_id, .kemasan_id, .multiple_spp_id')
+    $('.filter_spp,.supplier_id, .warehouse_id, .aju_document_type, .multiple_po_id, .divisi_id, .kemasan_id, .multiple_spp_id')
         .parent('div')
         .find('label')
         .css('z-index', '1');
@@ -727,7 +766,8 @@
                     listData.result[i].sisa_total = Number(destroyFormatRupiah($('.sisa_total').val()));
                     listData.result[i].sub_total = Number(destroyFormatRupiah($('.sub_total').val()));
                     listData.result[i].jml_diterima_lpb_konversi = Number(jml_diterima_lpb * nilai_konversi);
-                    drawTable(listData);
+                    // drawTable(listData);
+                    $('.filter_spp').change(); // draw
                     $('.detail-modal').modal('hide');
                     break;
                 }
@@ -949,7 +989,9 @@
             listData.result.splice(indexToRemove, 1);
         }
         removeSppList(listData);
+        addValueFilterSpp(listData);
         drawTable(listData);
+
     }
 
     function changeStatus() {
@@ -992,6 +1034,27 @@
 
         sppIdListUnique = [...new Set(listData.result.map(item => item.purchase_request_id))];
         $('.multiple_spp_id').val(sppIdListUnique).trigger('change.select2');
+
+    }
+
+    function addValueFilterSpp(listData) {
+        var sppNoList = [];
+        var listDataResult = listData.result;
+        for (let i = 0; i < listDataResult.length; i++) {
+            sppNoList.push(listDataResult[i].spp_no);
+        }
+        addFilterSpp(sppNoList);
+    }
+
+    function addFilterSpp(listFilterSPP) {
+        // Hapus Duplikat
+        listFilterSPP = [...new Set(listFilterSPP)];
+        $("#filter_spp").empty()
+        $("#filter_spp").append(`<option value=""></option>`)
+        listFilterSPP.forEach(function(item) {
+            $("#filter_spp").append(`<option selected value="${item}">${item}</option>`)
+        })
+        $("#filter_spp").val(null).change();
     }
 </script>
 
@@ -1116,5 +1179,16 @@
                 }
             })
         });
+    </script>
+
+<?php endif; ?>
+<?php if (!empty($dataPenerimaanBarang)): ?>
+    <?php foreach ($dataSPPSelected as $d): ?>
+        <script>
+            listFilterSPP.push("<?= $d['spp_no'] ?>")
+        </script>
+    <?php endforeach; ?>
+    <script>
+        addFilterSpp(listFilterSPP);
     </script>
 <?php endif; ?>
