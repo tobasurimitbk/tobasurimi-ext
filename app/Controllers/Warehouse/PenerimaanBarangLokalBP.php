@@ -1308,7 +1308,7 @@ class PenerimaanBarangLokalBP extends BaseController
         ]);
     }
 
-    private function getAkunCoaMap($penerimaanBarangIds)
+    public function getAkunCoaMap($penerimaanBarangIds)
     {
         $details = $this->penerimaanBarangDetailModel
             ->select('penerimaan_barang_detail.penerimaan_barang_id, 

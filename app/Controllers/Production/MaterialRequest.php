@@ -244,11 +244,7 @@ class MaterialRequest extends BaseController
 
                     $selisih = $stokTotal - (float) $dataMaterialRequestNotApprove['qty'];
 
-                    // hasil string, contoh "6.60"
-                    $value['realStok'] = sprintf(
-                        '%.2f',
-                        floor(max(0, $selisih) * 100) / 100
-                    );
+                    $value['realStok'] = max(0, $selisih);
                 } else {
                     $value['is_requested'] = false;
                 }
@@ -1624,15 +1620,7 @@ class MaterialRequest extends BaseController
 
                 if ($dataMaterialRequestNotApprove) {
                     $dataResult[$i]['is_requested'] = true;
-                    $dataResult[$i]['stok_total'] = sprintf(
-                        '%.2f',
-                        floor(
-                            max(
-                                0,
-                                $dataResult[$i]['stok_total'] - (float) $dataMaterialRequestNotApprove['qty']
-                            ) * 100
-                        ) / 100
-                    );
+                    $dataResult[$i]['stok_total'] = max(0, $dataResult[$i]['stok_total'] - (float) $dataMaterialRequestNotApprove['qty']);
                 } else {
                     $dataResult[$i]['is_requested'] = false;
                 }

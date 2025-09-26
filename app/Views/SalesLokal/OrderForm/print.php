@@ -8,7 +8,7 @@
     <style>
         body {
             font-size: 12px;
-            font-family: 'Lucida Console', monospace;
+            font-family: 'Times New Roman', Times, serif;
             font-weight: 700;
         }
 

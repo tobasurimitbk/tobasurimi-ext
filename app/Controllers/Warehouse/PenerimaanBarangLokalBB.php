@@ -58,6 +58,7 @@ class PenerimaanBarangLokalBB extends BaseController
     protected $pengembalianBarangModel;
     protected $transaksiJurnalModel;
     protected $jurnalUmumModel;
+    protected $penerimaanBarangLokalBp;
 
     public function __construct()
     {
@@ -86,6 +87,7 @@ class PenerimaanBarangLokalBB extends BaseController
         $this->dompdf = new Dompdf();
         $this->transaksiJurnalModel = new TransaksiJurnalModel();
         $this->jurnalUmumModel = new JurnalUmumModel();
+        $this->penerimaanBarangLokalBp = new PenerimaanBarangLokalBP();
     }
 
     public function index()
@@ -133,7 +135,11 @@ class PenerimaanBarangLokalBB extends BaseController
         $dataPenerimaanBarang = [];
 
         $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
-
+        $penerimaanBarangIds = array_column($penerimaanBarangData['data'], 'id');
+        $akunCoaMap = [];
+        if (count($penerimaanBarangIds) != 0) {
+            $akunCoaMap = $this->penerimaanBarangLokalBp->getAkunCoaMap($penerimaanBarangIds);
+        }
 
         foreach ($penerimaanBarangData['data'] as $data) {
             array_push($dataPenerimaanBarang, [
@@ -150,6 +156,7 @@ class PenerimaanBarangLokalBB extends BaseController
                 "status_post"           => $data->status_post,
                 "bc_type"               => $data->bc_type,
                 "in_bc"                 => $data->bc_purchase_order_id != null ? 'in' : 'out',
+                "akun_coa"              => $akunCoaMap[$data->id] ?? false,
                 "bc_type_name"          => $data->bc_type_name == null ? "NON PABEAN" : $data->bc_type_name
             ]);
         }
