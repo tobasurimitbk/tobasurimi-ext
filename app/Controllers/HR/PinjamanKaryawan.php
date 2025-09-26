@@ -57,9 +57,16 @@ class PinjamanKaryawan extends BaseController
         try {
             $db->transBegin();
 
+            $divisiId = $this->request->getVar('divisiId_generate');
+            $tipe = $this->request->getVar('golongan_generate');
             $yearMonth  = $this->request->getVar('monthYear');
             $startDate  = date('Y-m-d', strtotime(str_replace('/', '-', $this->request->getVar('startDate'))));
             $endDate    = date('Y-m-d', strtotime(str_replace('/', '-', $this->request->getVar('finishDate'))));
+
+            $addCondition = [
+                'divisi_id' => $divisiId,
+                'tipe' => $tipe,
+            ];
 
             // Validasi tanggal
             if (strtotime($startDate) > strtotime($endDate)) {
@@ -79,12 +86,6 @@ class PinjamanKaryawan extends BaseController
                 ]);
             }
 
-            // hapus data lama
-            $this->pinjamanKaryawanModel
-                ->where('company_id', $this->this_company_id)
-                ->where('month_year', $yearMonth)
-                ->delete();
-
             // list tanggal
             $dateList = [];
             $tmp = strtotime($startDate);
@@ -94,8 +95,26 @@ class PinjamanKaryawan extends BaseController
             }
 
             // preload semua employee
-            $employeeData = $this->employeeModel->getEmployees($this->this_company_id);
+            $employeeData = $this->employeeModel->getEmployeesPinjaman(
+                $addCondition,
+                $this->this_company_id
+            );
             $employeeIds  = array_column($employeeData, 'id');
+
+            if (count($employeeIds) == 0) {
+                return response()->setJSON([
+                    "status" => false,
+                    "message" => "Data karyawan tidak ditemukan",
+                    'token' => csrf_hash()
+                ]);
+            }
+
+            // hapus data lama
+            $this->pinjamanKaryawanModel
+                ->where('company_id', $this->this_company_id)
+                ->where('month_year', $yearMonth)
+                ->whereIn('employee_id', $employeeIds)
+                ->delete();
 
             // ✅ preload izin sekali saja
             $izinData = $this->formPerijinanModel
@@ -177,7 +196,8 @@ class PinjamanKaryawan extends BaseController
                     'tidak_hadir'     => $tidakHadir,
                     'hadir'           => $hadir,
                     'is_boleh_minjam' => ($tidakHadir <= 6) ? '1' : '0',
-                    'status_pinjaman' => ($tidakHadir <= 6) ? '1' : '0',
+                    'status_pinjaman' => ($tidakHadir <= 6 && $e['tipe'] == "HARIAN TETAP") ? '1' : '0',
+                    'is_ambil'        => ($tidakHadir <= 6 && $e['tipe'] == "HARIAN TETAP") ? '1' : '0',
                     'nominal'         => ($tidakHadir <= 6) ? $nominalPinjaman : null,
                 ];
             }
@@ -208,7 +228,7 @@ class PinjamanKaryawan extends BaseController
         $db = \Config\Database::connect();
         try {
             $db->transBegin();
-            $yearMonth  = $this->request->getVar('monthYear');
+            $yearMonth  = $this->request->getVar('monthYearSingle');
             $startDate  = date('Y-m-d', strtotime(str_replace('/', '-', $this->request->getVar('startDate'))));
             $endDate    = date('Y-m-d', strtotime(str_replace('/', '-', $this->request->getVar('finishDate'))));
             $employeeID = $this->request->getVar('employeeID');
@@ -399,6 +419,7 @@ class PinjamanKaryawan extends BaseController
                 "tidakHadir" => $p->tidak_hadir . " Kali",
                 "statusPinjaman" => $p->status_pinjaman,
                 "isBolehMinjam" => $p->is_boleh_minjam,
+                "isAmbil" => $p->is_ambil,
                 "nominalPinjaman" => number_format($p->nominal, 2),
                 // helper
                 "monthYear" => $p->month_year,
@@ -416,6 +437,26 @@ class PinjamanKaryawan extends BaseController
         ];
 
         return response()->setJSON($data);
+    }
+
+    public function updateStatus()
+    {
+        try {
+            $id = $this->request->getVar('id');
+            $statusPinjaman = $this->request->getVar('status_pinjaman');
+            $this->pinjamanKaryawanModel->update($id, ['status_pinjaman' => $statusPinjaman, 'is_ambil' => $statusPinjaman]);
+            return response()->setJSON([
+                'token' => csrf_hash(),
+                'message' => "Data berhasil diupdate",
+                'status' => true
+            ]);
+        } catch (Exception $e) {
+            return response()->setJSON([
+                'token' => csrf_hash(),
+                'message' => $e->getMessage(),
+                'status' => false
+            ]);
+        }
     }
 
     public function exportPDF()

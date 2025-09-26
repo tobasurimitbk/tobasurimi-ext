@@ -5,6 +5,7 @@ namespace App\Controllers\Master;
 use App\Controllers\BaseController;
 use App\Models\BagianModel;
 use App\Models\DivisisModel;
+use App\Models\GajiConjunctionModel;
 use App\Models\GajiDivisiModel;
 use App\Models\JamKerjaModel;
 use App\Models\TunjanganModel;
@@ -16,6 +17,7 @@ class Divisi extends BaseController
     protected $DivisisModel;
     protected $gajiDivisiModel;
     protected $tunjanganModel;
+    protected $gajiConjunctionModel;
 
     public function __construct()
     {
@@ -24,6 +26,7 @@ class Divisi extends BaseController
         $this->DivisisModel = new DivisisModel();
         $this->gajiDivisiModel = new GajiDivisiModel();
         $this->tunjanganModel = new TunjanganModel();
+        $this->gajiConjunctionModel = new GajiConjunctionModel();
     }
 
     public function divisi()
@@ -114,87 +117,78 @@ class Divisi extends BaseController
 
     public function saveDivisi()
     {
+        $db = \Config\Database::connect();
         try {
-            $rules = [
-                "divisi" => [
-                    "rules" => "required"
-                ],
-                "type_divisi" => [
-                    "rules" => "required"
-                ]
-            ];
+            $db->transBegin();
 
-            if ($this->validate($rules)) {
-                $typeDivisi = $this->request->getVar('type_divisi');
-                $komponenGaji = $this->request->getPost('komponenGaji');
-                $divisi = strtoupper($this->request->getVar('divisi'));
-                $jamKerjaId = $this->request->getPost('jam_kerja_id');
+            $typeDivisi = $this->request->getVar('type_divisi');
+            $komponenGaji = $this->request->getPost('komponenGaji');
+            $divisi = strtoupper($this->request->getVar('divisi'));
+            $jamKerjaId = $this->request->getPost('jam_kerja_id');
 
-                $first = $this->DivisisModel
-                    ->where('company_id', $this->this_company_id)
-                    ->where('divisi', $divisi)
-                    ->first();
+            $first = $this->DivisisModel
+                ->where('company_id', $this->this_company_id)
+                ->where('divisi', $divisi)
+                ->first();
 
-                if ($first != null) {
-                    return response()->setJSON([
-                        'status' => false,
-                        'token' => csrf_hash(),
-                        'message' => "Departemen " . $divisi . " sudah ada"
-                    ]);
-                }
-
-                if (empty($komponenGaji) && $typeDivisi != "UMUM") {
-                    return response()->setJSON([
-                        "status"    => false,
-                        "token" => csrf_hash(),
-                        "message"   => "Checklist minimal satu komponen gaji untuk departemen personalia atau gabungan !",
-                    ]);
-                }
-
-                $isGajiPokok = $this->tunjanganModel->where('company_id', $this->this_company_id)->where('is_gaji_harian', '1')->first();
-                $isCadangan = $this->tunjanganModel->where('company_id', $this->this_company_id)->where('is_cadangan', '1')->first();
-
-                if ($isGajiPokok == null || $isCadangan == null) {
-                    return response()->setJSON([
-                        "status"    => false,
-                        "token" => csrf_hash(),
-                        "message"   => "Komponen Gaji Pokok dan Komponen Tunjangan Wajib Ada !",
-                    ]);
-                }
-
-                $divisiInserted = $this->DivisisModel->insert([
-                    "company_id" => $this->this_company_id,
-                    "divisi" => $divisi,
-                    "jam_kerja_id" => $jamKerjaId,
-                    "type_divisi"   => $typeDivisi
-                ]);
-
-                foreach ($komponenGaji as $k) {
-                    if (in_array($k, array_keys($_POST))) {
-                        $angka = $this->request->getVar($k);
-
-                        $this->gajiDivisiModel->insert([
-                            "tunjangan_id" => $k,
-                            "division_id" => $divisiInserted,
-                            "company_id" => $this->this_company_id,
-                            "nominal" => $angka
-                        ]);
-                    }
-                }
-
+            if ($first != null) {
                 return response()->setJSON([
-                    "status"    => true,
-                    "message"   => "Data Berhasil disimpan",
-                    'token' => csrf_hash()
-                ]);
-            } else {
-                return response()->setJSON([
-                    "status"    => \false,
-                    "message"   => "Terjadi kesalahan saat validasi data",
-                    'token' => csrf_hash()
+                    'status' => false,
+                    'token' => csrf_hash(),
+                    'message' => "Departemen " . $divisi . " sudah ada"
                 ]);
             }
+
+            if (empty($komponenGaji) && $typeDivisi != "UMUM") {
+                return response()->setJSON([
+                    "status"    => false,
+                    "token" => csrf_hash(),
+                    "message"   => "Checklist minimal satu komponen gaji untuk departemen personalia atau gabungan !",
+                ]);
+            }
+
+            $isGajiPokok = $this->tunjanganModel->where('company_id', $this->this_company_id)->where('is_gaji_harian', '1')->first();
+            $isCadangan = $this->tunjanganModel->where('company_id', $this->this_company_id)->where('is_cadangan', '1')->first();
+
+            if ($isGajiPokok == null || $isCadangan == null) {
+                return response()->setJSON([
+                    "status"    => false,
+                    "token" => csrf_hash(),
+                    "message"   => "Komponen Gaji Pokok dan Komponen Tunjangan Wajib Ada !",
+                ]);
+            }
+
+            $divisiInserted = $this->DivisisModel->insert([
+                "company_id" => $this->this_company_id,
+                "divisi" => $divisi,
+                "jam_kerja_id" => $jamKerjaId,
+                "type_divisi"   => $typeDivisi
+            ]);
+
+            foreach ($komponenGaji as $k) {
+                if (in_array($k, array_keys($_POST))) {
+                    $angka = $this->request->getVar($k);
+
+                    $this->gajiDivisiModel->insert([
+                        "tunjangan_id" => $k,
+                        "division_id" => $divisiInserted,
+                        "company_id" => $this->this_company_id,
+                        "nominal" => $angka
+                    ]);
+                }
+            }
+
+            // Update Gaji Harian Bulk
+            $this->gajiConjunctionModel->updateBulkGajiHarian($divisiInserted);
+            $db->transCommit();
+
+            return response()->setJSON([
+                "status"    => true,
+                "message"   => "Data Berhasil disimpan",
+                'token' => csrf_hash()
+            ]);
         } catch (\Exception $e) {
+            $db->transRollback();
             return response()->setJSON([
                 "status"    => \false,
                 "message"   => $e->getMessage(),
@@ -205,96 +199,87 @@ class Divisi extends BaseController
 
     public function updateDivisi()
     {
+        $db = \Config\Database::connect();
         try {
-            $rules = [
-                "divisi" => [
-                    "rules" => "required"
-                ],
-                "type_divisi" => [
-                    "rules" => "required"
-                ]
-            ];
+            $db->transBegin();
 
-            if ($this->validate($rules)) {
+            $id = decrypt($this->request->getPost("id"));
+            $typeDivisi = $this->request->getVar('type_divisi');
+            $komponenGaji = $this->request->getPost('komponenGaji');
+            $divisi = strtoupper($this->request->getVar('divisi'));
+            $jamKerjaId = $this->request->getPost('jam_kerja_id');
+            $komponenGaji = $this->request->getPost('komponenGaji');
 
-                $id = decrypt($this->request->getPost("id"));
-                $typeDivisi = $this->request->getVar('type_divisi');
-                $komponenGaji = $this->request->getPost('komponenGaji');
-                $divisi = strtoupper($this->request->getVar('divisi'));
-                $jamKerjaId = $this->request->getPost('jam_kerja_id');
-                $komponenGaji = $this->request->getPost('komponenGaji');
+            $first = $this->DivisisModel
+                ->where('company_id', $this->this_company_id)
+                ->where('divisi', $divisi)
+                ->where('id !=', $id)
+                ->first();
 
-                $first = $this->DivisisModel
-                    ->where('company_id', $this->this_company_id)
-                    ->where('divisi', $divisi)
-                    ->where('id !=', $id)
-                    ->first();
-
-                if ($first != null) {
-                    return response()->setJSON([
-                        'status' => false,
-                        'token' => csrf_hash(),
-                        'message' => "Departemen " . $divisi . " sudah digunakan"
-                    ]);
-                }
-
-                if (empty($komponenGaji) && $typeDivisi != "UMUM") {
-                    return response()->setJSON([
-                        "status"    => \false,
-                        "token" => csrf_hash(),
-                        "message"   => "Checklist minimal satu komponen gaji untuk departemen personalia atau gabungan !",
-                    ]);
-                }
-
-                $isGajiPokok = $this->tunjanganModel->where('company_id', $this->this_company_id)->where('is_gaji_harian', '1')->first();
-                $isCadangan = $this->tunjanganModel->where('company_id', $this->this_company_id)->where('is_cadangan', '1')->first();
-
-                if ($isGajiPokok == null || $isCadangan == null) {
-                    return response()->setJSON([
-                        "status"    => false,
-                        "token" => csrf_hash(),
-                        "message"   => "Komponen Gaji Pokok dan Komponen Tunjangan Wajib Ada !",
-                    ]);
-                }
-
-                $this->DivisisModel->update($id, [
-                    "company_id" => $this->this_company_id,
-                    "divisi" => $divisi,
-                    "jam_kerja_id" => $jamKerjaId,
-                    "type_divisi"   => $typeDivisi
-                ]);
-
-                $this->gajiDivisiModel->where('division_id', $id)->delete();
-
-                foreach ($komponenGaji as $k) {
-                    if (in_array($k, array_keys($_POST))) {
-                        $angka = $this->request->getVar($k);
-
-                        $this->gajiDivisiModel->insert([
-                            "tunjangan_id" => $k,
-                            "division_id" => $id,
-                            "company_id" => $this->this_company_id,
-                            "nominal" => $angka
-                        ]);
-                    }
-                }
-
+            if ($first != null) {
                 return response()->setJSON([
-                    "status"    => true,
-                    "message"   => "Data Berhasil diupdate",
-                    'token' => csrf_hash()
-                ]);
-            } else {
-                return response()->setJSON([
-                    "status"    => \false,
-                    "message"   => "Terjadi kesalahan saat validasi data",
-                    'token' => csrf_hash()
+                    'status' => false,
+                    'token' => csrf_hash(),
+                    'message' => "Departemen " . $divisi . " sudah digunakan"
                 ]);
             }
+
+            if (empty($komponenGaji) && $typeDivisi != "UMUM") {
+                return response()->setJSON([
+                    "status"    => \false,
+                    "token" => csrf_hash(),
+                    "message"   => "Checklist minimal satu komponen gaji untuk departemen personalia atau gabungan !",
+                ]);
+            }
+
+            $isGajiPokok = $this->tunjanganModel->where('company_id', $this->this_company_id)->where('is_gaji_harian', '1')->first();
+            $isCadangan = $this->tunjanganModel->where('company_id', $this->this_company_id)->where('is_cadangan', '1')->first();
+
+            if ($isGajiPokok == null || $isCadangan == null) {
+                return response()->setJSON([
+                    "status"    => false,
+                    "token" => csrf_hash(),
+                    "message"   => "Komponen Gaji Pokok dan Komponen Tunjangan Wajib Ada !",
+                ]);
+            }
+
+            $this->DivisisModel->update($id, [
+                "company_id" => $this->this_company_id,
+                "divisi" => $divisi,
+                "jam_kerja_id" => $jamKerjaId,
+                "type_divisi"   => $typeDivisi
+            ]);
+
+            $this->gajiDivisiModel->where('division_id', $id)->delete();
+
+            foreach ($komponenGaji as $k) {
+                if (in_array($k, array_keys($_POST))) {
+                    $angka = $this->request->getVar($k);
+
+                    $this->gajiDivisiModel->insert([
+                        "tunjangan_id" => $k,
+                        "division_id" => $id,
+                        "company_id" => $this->this_company_id,
+                        "nominal" => $angka
+                    ]);
+                }
+            }
+
+            // Update Gaji Harian Bulk
+            $this->gajiConjunctionModel->updateBulkGajiHarian($id);
+            $db->transCommit();
+
+            return response()->setJSON([
+                "status"    => true,
+                "message"   => "Data Berhasil diupdate",
+                'token' => csrf_hash()
+            ]);
         } catch (\Exception $e) {
+            $db->transRollback();
             return response()->setJSON([
                 "status"    => \false,
                 "message"   => $e->getMessage(),
+                'token' => csrf_hash()
             ]);
         }
     }

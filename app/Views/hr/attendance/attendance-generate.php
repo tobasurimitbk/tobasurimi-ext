@@ -1472,6 +1472,9 @@
 
     function exportExcelBulan() {
         var month = $('#month').val();
+        var divisiId = $('#divisi_id').val();
+        var tipe = $('#tipe').val();
+
         if (month == '') {
             Swal.fire({
                 icon: 'error',
@@ -1481,7 +1484,7 @@
             return;
         }
 
-        var url = "<?= base_url('list-attendance/export-bulanan') ?>?month=" + month;
+        var url = "<?= base_url('list-attendance/export-bulanan') ?>?month=" + month + "&divisi_id=" + divisiId + "&tipe=" + tipe;
         window.location.href = url;
     }
 </script>

@@ -439,7 +439,7 @@ class Payroll extends BaseController
         return response()->setJSON([
             'message' => "Nominal komponen tunjangan berhasil diperbaruhi",
             'location' => "nilaiKomponenGaji",
-            'id' => $payrollID
+            'id' => encrypt($payrollID)
         ]);
     }
 

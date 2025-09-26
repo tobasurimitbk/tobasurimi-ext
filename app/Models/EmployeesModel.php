@@ -222,13 +222,42 @@ class EmployeesModel extends Model
 
         $builder = $this->db->table('employees')
             ->select("employees.*, bagian.nama_bagian")
-            ->join('divisis', 'divisis.id = employees.division_id')
-            ->join('bagian', 'employees.bagian_id = bagian.id');
+            ->join('divisis', 'divisis.id = employees.division_id', 'left')
+            ->join('bagian', 'employees.bagian_id = bagian.id', 'left');
         $builder->groupStart()->where($arrCondition)->groupEnd();
         $query = $builder->get();
 
         return $query->getResultArray();
     }
+
+    public function getEmployeesPinjaman($addCondition, $companyId)
+    {
+        $condition = [
+            'employees.deletedAt'  => null,
+            'employees.company_id' => $companyId,
+        ];
+
+        $builder = $this->db->table('employees')
+            ->select("employees.*, bagian.nama_bagian")
+            ->join('divisis', 'divisis.id = employees.division_id', 'left')
+            ->join('bagian', 'employees.bagian_id = bagian.id', 'left')
+            ->where($condition);
+
+        if (isset($addCondition['divisi_id']) && $addCondition['divisi_id'] !== '') {
+            $builder->groupStart();
+            $builder->where('employees.division_id', $addCondition['divisi_id']);
+            $builder->groupEnd();
+        }
+
+        if (isset($addCondition['tipe']) && $addCondition['tipe'] !== '') {
+            $builder->groupStart();
+            $builder->where('employees.tipe', $addCondition['tipe']);
+            $builder->groupEnd();
+        }
+
+        return $builder->get()->getResultArray();
+    }
+
 
     public function getEmployeesUserDelete($company_id)
     {

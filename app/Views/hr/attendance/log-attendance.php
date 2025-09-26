@@ -100,9 +100,15 @@
     <div class="section-header">
         <h1>Log Absensi (Mesin Finger)</h1>
         <div class="col-button-tambah-spp">
-            <a class="btn btn-warning btn-print float-right" href="#" id="btnExport" onclick="exportExcel()">
-                <i class="fa fa-download"></i> Export
-            </a>
+            <?php if (can('Personalia', 'Log Absensi', 'p')): ?>
+                <button class="btn btn-warning btn-dropdown-export dropdown-toggle float-right" type="button" id="dropdownMenuButtonExport" data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="fa fa-download"></i> Export
+                </button>
+                <ul class="dropdown-menu list-dropdown-company" aria-labelledby="dropdownMenuButtonExport">
+                    <li><a class="dropdown-item" href="#" onclick="exportExcelBulanan()">Lap. Bulanan</a></li>
+                    <li><a class="dropdown-item" id="btnShowExportHarianModal" href="#" onclick="exportExcelHarian()">Lap. Harian</a></li>
+                </ul>
+            <?php endif; ?>
         </div>
 
     </div>
@@ -352,6 +358,52 @@
         </div>
     </div>
 </div>
+<div class="modal" id="lapHarianModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Laporan Harian Log Presensi</h5>
+            </div>
+            <form id="lapLogAbsensiForm" role="form" method="POST">
+                <div class="modal-body">
+                    <div class="row mb-2">
+                        <div class="col-md-6">
+                            <div class="input-group">
+                                <div class="form-floating mb-2" style="height: 50px;">
+                                    <input type="text" id="start_date" name="start_date" class="form-control start_date" placeholder="Tanggal Mulai Log Absensi">
+                                    <label for="start_date">Tanggal Mulai Log Absensi</label>
+                                </div>
+                                <div class="input-group-append" style="height:50px;">
+                                    <button disabled class="btn btn-secondary" type="button">
+                                        <i class="fas fa-calendar-alt"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="input-group">
+                                <div class="form-floating mb-2" style="height: 50px;">
+                                    <input type="text" id="end_date" name="end_date" class="form-control end_date" placeholder="Tanggal Selesai Log Absensi">
+                                    <label for="end_date">Tanggal Selesai Log Absensi</label>
+                                </div>
+                                <div class="input-group-append" style="height:50px;">
+                                    <button disabled class="btn btn-secondary" type="button">
+                                        <i class="fas fa-calendar-alt"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-hide-form btn-discard mr-3" id="btnHideExportHarianModal">Kembali</button>
+                    <button type="button" class="btn btn-submit-form" id="btnExportLapHarian">Export</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
 <script>
     let attendanceTable;
 
@@ -657,6 +709,22 @@
         orientation: "bottom auto"
     });
 
+    $("#start_date").datepicker({
+        placeholder: "Pilih Tanggal Mulai Log Absensi",
+        todayHighlight: true,
+        format: "dd/mm/yyyy",
+        orientation: "bottom auto",
+        autoclose: true
+    });
+
+    $("#end_date").datepicker({
+        placeholder: " Tanggal Selesai Log Absensi",
+        todayHighlight: true,
+        format: "dd/mm/yyyy",
+        orientation: "bottom auto",
+        autoclose: true
+    });
+
     $('#month,#divisi_id,#tipe,#employee_id').change(function(e) {
         e.preventDefault();
         if (attendanceTable) {
@@ -664,6 +732,45 @@
             attendanceTotalTable.ajax.reload();
         }
     })
+
+    var validatorLapAbsensi = $("#lapLogAbsensiForm").validate({
+        rules: {
+            start_date: {
+                required: true
+            },
+            end_date: {
+                required: true
+            },
+        },
+        messages: {
+            start_date: {
+                required: "Tgl selesai wajib diisi"
+            },
+            end_date: {
+                required: "Tgl mulai wajib diisi"
+            },
+        },
+        errorElement: 'span',
+        errorClass: 'text-danger',
+        errorPlacement: function(error, element) {
+            var elem = $(element);
+            if (elem.hasClass("select2-hidden-accessible")) {
+                element = $("#select2-" + elem.attr("id") + "-container").parent();
+                error.insertAfter(element);
+            } else {
+                error.insertAfter(element);
+            }
+        },
+        highlight: function(element) {
+            $(element).closest('.form-group').addClass('has-error');
+            $(element).addClass('select-class');
+
+        },
+        unhighlight: function(element) {
+            $(element).closest('.form-group').removeClass('has-error');
+            $(element).removeClass('select-class');
+        },
+    });
 
     $('.form-select')
         .parent('div')
@@ -710,6 +817,30 @@
 
     $('.btn-discard-2').click(function() {
         $('#detail2Modal').modal('hide');
+    });
+
+    $('#btnHideExportHarianModal').click(function(e) {
+        e.preventDefault();
+        $('#lapHarianModal').hide();
+    });
+
+    $('#btnShowExportHarianModal').click(function(e) {
+        e.preventDefault();
+        $('#start_date,#end_date').val(null);
+        $('#lapHarianModal').modal('show');
+    });
+
+    $('#btnExportLapHarian').click(function(e) {
+        e.preventDefault();
+        if ($('#lapLogAbsensiForm').valid()) {
+            var startDate = $('#start_date').val();
+            var endDate = $('#end_date').val();
+            var divisiId = $('#divisi_id').val();
+            var tipe = $('#tipe').val();
+
+            var url = "<?= base_url('log-attendance/export-harian') ?>" + "?start_date=" + startDate + "&end_date=" + endDate + "&divisi_id=" + divisiId + "&tipe=" + tipe;
+            window.location.href = url;
+        }
     });
 
     function getListDetailJamKerja(jamKerjaId) {
@@ -759,8 +890,11 @@
 
     }
 
-    function exportExcel() {
+    function exportExcelBulanan() {
         var month = $('#month').val();
+        var divisiId = $('#divisi_id').val();
+        var tipe = $('#tipe').val();
+
         if (month == '') {
             Swal.fire({
                 icon: 'error',
@@ -770,7 +904,7 @@
             return;
         }
 
-        var url = "<?= base_url('log-attendance/export') ?>?month=" + month;
+        var url = "<?= base_url('log-attendance/export-bulanan') ?>?month=" + month + "&divisi_id=" + divisiId + "&tipe=" + tipe;
         window.location.href = url;
     }
 </script>

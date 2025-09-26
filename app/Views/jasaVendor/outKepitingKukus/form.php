@@ -898,7 +898,8 @@
         id = Number(id);
 
         // Filter list, sisakan item yang ID-nya beda
-        listStockSelected = listStockSelected.filter(item => Number(item.id) !== id);
+        listStockSelected = listStockSelected.filter(item => Number(item.detail_id) !== id);
+          console.log('delete', id, listStockSelected);
 
         // Gambar ulang tabel
         drawTableSelectedItem(listStockSelected);

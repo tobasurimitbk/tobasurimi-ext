@@ -4,6 +4,7 @@ namespace App\Controllers\Warehouse;
 
 use App\Controllers\BaseController;
 use App\Models\AMPurchaseOrderDetailModel;
+use App\Models\AMPurchaseOrderModel;
 use App\Models\BarangMasterSpesifikasiModel;
 use App\Models\BC40Model;
 use App\Models\BCPurchaseOrderModel;
@@ -19,6 +20,7 @@ use App\Models\RMPurchaseOrderDetailModel;
 use App\Models\RMPurchaseOrderModel;
 use App\Models\SalesOrderExportModel;
 use App\Models\SalesOrderInvoiceModel;
+use App\Models\SppModel;
 use App\Models\StockDetail2Model;
 use App\Models\StockDetailModel;
 use App\Models\SupplierModel;
@@ -1214,6 +1216,57 @@ class Penomoran_ extends BaseController
         die;
         echo "OOK";
         die;
+    }
+
+    public function generateMultipleSppIdLpb()
+    {
+        $db = \Config\Database::connect();
+        try {
+            $db->transBegin();
+            $companyId = 1;
+            $penerimaanBarangModel = new PenerimaanBarangModel();
+            $amPurchaseOrderModel = new AMPurchaseOrderModel();
+
+            $startDate = "2025-09-01";
+            $endDate = "2025-09-30";
+
+            $penerimaanBarangList = $penerimaanBarangModel
+                ->where('status_penerimaan', "LOKAL")
+                ->where('tipe_bahan', "PENOLONG")
+                ->where('deletedAt', null)
+                ->where('tanggal >= ', $startDate)
+                ->where('tanggal <=', $endDate)
+                ->where('company_id', $companyId)
+                ->findAll();
+
+            $penerimaanBarangUpdateList = [];
+            foreach ($penerimaanBarangList as $p) {
+                $multiplePoId = json_decode($p['multiple_po_id']);
+
+                if (count($multiplePoId) != 0) {
+                    $sppList = $amPurchaseOrderModel->getSPP(
+                        $multiplePoId
+                    );
+
+                    $multipleSppId = str_replace(['\\"', '\\', '"'], '', json_encode(array_column($sppList, 'id')));
+                    $multipleSppNo = str_replace(['\\"', '\\'], '', json_encode(array_column($sppList, 'spp_no')));
+
+                    array_push($penerimaanBarangUpdateList, [
+                        'id' => $p['id'],
+                        'multiple_spp_id' => $multipleSppId,
+                        'multiple_spp_no' => $multipleSppNo
+                    ]);
+                }
+            }
+            if (count($penerimaanBarangUpdateList) != 0) {
+                $penerimaanBarangModel->updateBatch($penerimaanBarangUpdateList, 'id');
+            }
+            $db->transCommit();
+            echo "DOne";
+        } catch (Exception $e) {
+            $db->transRollback();
+            var_dump($e->getMessage());
+        }
     }
 }
 

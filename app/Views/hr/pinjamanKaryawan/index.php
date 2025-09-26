@@ -6,7 +6,7 @@
     <div class="section-header">
         <h1>List Pinjaman Karyawan</h1>
         <div class="col-button-tambah-spp">
-            <a class="btn btn-hide-form btn-discard float-right" data-bs-toggle="modal" data-bs-target="#generateModal" href="#">
+            <a class="btn btn-hide-form btn-discard float-right" data-bs-toggle="modal" id="generateModalBtn" data-bs-target="#generateModal" href="#">
                 <i class="fa-solid fa-clock-rotate-left"></i> Generate
             </a>
             <?php if (can('Personalia', 'Pinjaman Karyawan', 'p')): ?>
@@ -35,10 +35,8 @@
                 </div>
                 <div class="col-sm-3">
                     <div class="form-floating">
-                        <select class="form-select" name="filterDivisiID" aria-label="Floating label select example">
-                            <option value="">
-                                Cari Departemen
-                            </option>
+                        <select class="form-select" name="filterDivisiID">
+                            <option value="" selected></option>
                             <?php foreach ($divisi as $d) : ?>
                                 <option value="<?= $d['id'] ?>">
                                     <?= $d['divisi']; ?>
@@ -50,10 +48,8 @@
                 </div>
                 <div class="col-sm-3">
                     <div class="form-floating">
-                        <select class="form-select" name="filterGolongan" aria-label="Floating label select example">
-                            <option value="">
-                                Cari Tipe / Golongan
-                            </option>
+                        <select class="form-select" name="filterGolongan">
+                            <option value="" selected></option>
                             <?php foreach ($golongan as $g) : ?>
                                 <option value="<?= $g['golongan_name'] ?>">
                                     <?= $g['golongan_name']; ?>
@@ -65,10 +61,7 @@
                 </div>
                 <div class="col-sm-3">
                     <div class="form-floating">
-                        <select class="form-select" name="filterEmployeeID" aria-label="Floating label select example">
-                            <option value="">
-                                Cari Berdasarkan Nama Karyawan
-                            </option>
+                        <select class="form-select" name="filterEmployeeID">
                         </select>
                         <label for="floatingInput">Cari Berdasarkan Nama Karyawan</label>
                     </div>
@@ -112,7 +105,7 @@
                         <div class="col-md-12">
                             <div class="input-group mb-3">
                                 <div class="form-floating">
-                                    <input value="" name="monthYear" id="monthYear" type="text" required class="form-control target input-picker" placeholder="Periode Pinjaman">
+                                    <input name="monthYear" id="monthYear" type="text" required class="form-control target input-picker" placeholder="Periode Pinjaman">
                                     <label>Periode Pinjaman</label>
                                 </div>
                                 <div class="input-group-append" style="height:50px;">
@@ -122,10 +115,36 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-md-6">
-                            <div class="input-group mb-3">
+                        <div class="col-md-6 mb-3">
+                            <div class="form-floating">
+                                <select class="form-select" name="divisiId_generate" id="divisiId_generate">
+                                    <option value="" selected></option>
+                                    <?php foreach ($divisi as $d) : ?>
+                                        <option value="<?= $d['id'] ?>">
+                                            <?= $d['divisi']; ?>
+                                        </option>
+                                    <?php endforeach; ?>
+                                </select>
+                                <label for="floatingInput">Pilih Departemen (Opsional)</label>
+                            </div>
+                        </div>
+                        <div class="col-sm-6 mb-3">
+                            <div class="form-floating">
+                                <select class="form-select" name="golongan_generate" id="golongan_generate">
+                                    <option value="" selected></option>
+                                    <?php foreach ($golongan as $g) : ?>
+                                        <option value="<?= $g['golongan_name'] ?>">
+                                            <?= $g['golongan_name']; ?>
+                                        </option>
+                                    <?php endforeach; ?>
+                                </select>
+                                <label for="floatingInput">Cari Tipe / Golongan</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="input-group">
                                 <div class="form-floating">
-                                    <input value="" name="startDate" id="startDate" type="text" required class="form-control target input-picker" placeholder="Tanggal Mulai Log Absensi">
+                                    <input name="startDate" id="startDate" type="text" required class="form-control target input-picker" placeholder="Tanggal Mulai Log Absensi">
                                     <label for="floatingInput">Tanggal Mulai Log Absensi</label>
                                 </div>
                                 <div class="input-group-append" style="height:50px;">
@@ -135,10 +154,10 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-md-6">
-                            <div class="input-group mb-3">
+                        <div class="col-md-6 mb-3">
+                            <div class="input-group">
                                 <div class="form-floating">
-                                    <input value="" name="finishDate" id="finishDate" type="text" required class="form-control target input-picker" placeholder="Tanggal Selesai Log Absensi">
+                                    <input name="finishDate" id="finishDate" type="text" required class="form-control target input-picker" placeholder="Tanggal Selesai Log Absensi">
                                     <label for="floatingInput">Tanggal Selesai Log Absensi</label>
                                 </div>
                                 <div class="input-group-append" style="height:50px;">
@@ -173,20 +192,20 @@
                     <div class="row mb-2">
                         <div class="col-md-6">
                             <div class="form-floating">
-                                <input readonly value="" name="monthYear" id="employeeName" type="text" required class="form-control target input-picker">
+                                <input readonly id="employeeName" type="text" required class="form-control target input-picker">
                                 <label>Karyawan</label>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating ">
-                                <input value="" readonly id="tipeGol" type="text" required class="form-control target input-picker">
+                                <input readonly id="tipeGol" type="text" required class="form-control target input-picker">
                                 <label>Tipe/Gol</label>
                             </div>
                         </div>
                         <div class="col-md-12 mt-3">
                             <div class="input-group mb-3">
                                 <div class="form-floating">
-                                    <input value="" name="monthYear" id="monthYear" type="text" required class="form-control target input-picker" placeholder="Periode Pinjaman">
+                                    <input name="monthYearSingle" id="monthYearSingle" type="text" required class="form-control target input-picker" placeholder="Periode Pinjaman">
                                     <label>Periode Pinjaman</label>
                                 </div>
                                 <div class="input-group-append" style="height:50px;">
@@ -199,7 +218,7 @@
                         <div class="col-md-6">
                             <div class="input-group mb-3">
                                 <div class="form-floating">
-                                    <input value="" name="startDate" type="text" id="startDate" required class="form-control target input-picker" placeholder="Tanggal Mulai Log Absensi">
+                                    <input name="startDate" type="text" id="startDate" required class="form-control target input-picker" placeholder="Tanggal Mulai Log Absensi">
                                     <label for="floatingInput">Tanggal Mulai Log Absensi</label>
                                 </div>
                                 <div class="input-group-append" style="height:50px;">
@@ -212,7 +231,7 @@
                         <div class="col-md-6">
                             <div class="input-group mb-3">
                                 <div class="form-floating">
-                                    <input value="" name="finishDate" type="text" id="finishDate" required class="form-control target input-picker" placeholder="Tanggal Selesai Log Absensi">
+                                    <input name="finishDate" type="text" id="finishDate" required class="form-control target input-picker" placeholder="Tanggal Selesai Log Absensi">
                                     <label for="floatingInput">Tanggal Selesai Log Absensi</label>
                                 </div>
                                 <div class="input-group-append" style="height:50px;">
@@ -227,6 +246,63 @@
                 <div class="modal-footer">
                     <button type="button" class="btn btn-hide-form btn-discard mr-3" data-bs-dismiss="modal">Kembali</button>
                     <button type="submit" class="btn btn-submit-form" id="generateUlang">Generate Ulang</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="updateStatusPinjamanModal">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Update Status Pinjaman</h5>
+            </div>
+            <form id="formUpdateStatusPinjaman" role="form" method="POST">
+                <div class="modal-body">
+                    <?= csrf_field() ?>
+                    <div class="row mb-2">
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input readonly id="employeeName_statusPinjaman" type="text" required class="form-control target input-picker">
+                                <label>Karyawan</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating ">
+                                <input readonly id="tipeGol_statusPinjaman" type="text" required class="form-control target input-picker">
+                                <label>Tipe/Gol</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mt-3">
+                            <div class="input-group mb-3">
+                                <div class="form-floating">
+                                    <input readonly name="monthYear_StatusPinjaman" id="monthYear_StatusPinjaman" type="text" required class="form-control target input-picker" placeholder="Periode Pinjaman">
+                                    <label>Periode Pinjaman</label>
+                                </div>
+                                <div class="input-group-append" style="height:50px;">
+                                    <button disabled class="btn btn-secondary" type="button">
+                                        <i class="fas fa-calendar-alt"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mt-3">
+                            <div class="form-floating mb-3">
+                                <select class="form-select" name="statusPinjaman" id="statusPinjaman">
+                                    <option value="" selected></option>
+                                    <option value="1">DIAMBIL</option>
+                                    <option value="0">TIDAK DIAMBIL</option>
+                                </select>
+                                <label for="floatingInput">Status Pinjaman</label>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-hide-form btn-discard mr-3" id="btnHideStatusPinjaman" data-bs-dismiss="modal">Kembali</button>
+                    <button type="submit" class="btn btn-submit-form" id="btnUpdateStatusPinjaman">Update Status</button>
                 </div>
             </form>
         </div>
@@ -320,9 +396,6 @@
                 sortable: false,
                 render: function(data, type, row) {
                     let nominalPinjaman = row.nominalPinjaman;
-                    let is_boleh_minjam = row.isBolehMinjam;
-                    let status_pinjaman = row.statusPinjaman;
-                    let id = row.id;
                     return greatFormatRupiah(nominalPinjaman);
                 }
             },
@@ -334,7 +407,7 @@
                 sortable: false,
                 render: function(data, type, row) {
                     let is_boleh_minjam = row.isBolehMinjam;
-                    let status_pinjaman = row.statusPinjaman;
+                    let is_ambil = row.isAmbil;
                     let htmlRes = '';
 
                     if (is_boleh_minjam == 0) {
@@ -343,7 +416,7 @@
                                 Tidak Diizinkan
                             </div>`
                     } else {
-                        if (status_pinjaman == 0) {
+                        if (is_ambil == 0) {
                             htmlRes += `
                             <div class="text-warning">
                                 Tidak Diambil
@@ -364,7 +437,7 @@
                 data: "id",
                 className: "text-center actions",
                 searchable: false,
-                sortable: false,
+                orderable: false, // di DataTables namanya 'orderable', bukan 'sortable'
                 render: function(data, type, row) {
                     let employeeID = row.employeeID;
                     let employeeName = row.name;
@@ -372,24 +445,35 @@
                     let startDate = row.mulaiAbsen;
                     let finishDate = row.selesaiAbsen;
                     let tipeGol = row.tipeGol;
-                    let status_pinjaman = row.statusPinjaman;
+                    let is_boleh_minjam = row.isBolehMinjam;
                     let id = row.id;
 
-                    if (status_pinjaman == 1) {
-                        return '-';
-                    } else {
-                        return `
-                <div class="mt-0">
-                    <button data-toggle="tooltip" title="Generate Ulang" onclick="generateSingle(${employeeID}, '${employeeName}', '${yearMonth}', '${startDate}', '${finishDate}', '${tipeGol}', ${id})" class="btn btn-success posting-spp">
-                        <i class="fa-solid fa-rotate-right"></i>
-                    </button>
-                </div>
-            `
-                    }
+                    // escape nama biar aman saat ada tanda kutip
+                    let safeEmployeeName = employeeName.replace(/'/g, "\\'");
 
+                    let generateBtn = `
+                        <button data-toggle="tooltip" title="Generate Ulang"
+                            onclick="generateSingle(${employeeID}, '${safeEmployeeName}', '${yearMonth}', '${startDate}', '${finishDate}', '${tipeGol}', ${data})"
+                            class="btn btn-success posting-spp">
+                            <i class="fa-solid fa-rotate-right"></i>
+                        </button>
+                    `;
+
+                    let updateBtn = `
+                        <button data-toggle="tooltip" title="Update Status"
+                            onclick="updateStatusPinjaman('${safeEmployeeName}', '${yearMonth}', '${tipeGol}', '${id}')"
+                            class="btn btn-primary posting-spp">
+                            <i class="fa-solid fa-pen-to-square"></i>
+                        </button>
+                    `;
+
+                    if (is_boleh_minjam == 1) {
+                        return `<div class="mt-0">${generateBtn} ${updateBtn}</div>`;
+                    } else {
+                        return `<div class="mt-0">${generateBtn}</div>`;
+                    }
                 }
             }
-
 
         ],
         columnDefs: [{
@@ -439,6 +523,27 @@
         allowClear: true,
     });
 
+    $("#statusPinjaman").select2({
+        placeholder: "Pilih Status Pinjaman",
+        theme: "bootstrap-5",
+        allowClear: false,
+        dropdownParent: $('#updateStatusPinjamanModal')
+    });
+
+    $("#divisiId_generate").select2({
+        placeholder: "Pilih Departemen (Opsional)",
+        theme: "bootstrap-5",
+        allowClear: true,
+        dropdownParent: $('#generateModal')
+    });
+
+    $("#golongan_generate").select2({
+        placeholder: "Pilih Golongan (Opsional)",
+        theme: "bootstrap-5",
+        allowClear: true,
+        dropdownParent: $('#generateModal')
+    });
+
     $("#startDate,#finishDate").datepicker({
         todayHighlight: true,
         format: "dd/mm/yyyy",
@@ -446,7 +551,7 @@
         autoclose: true
     });
 
-    $("#monthYear,#month").datepicker({
+    $("#monthYear,#month,#monthYearSingle").datepicker({
         format: "yyyy-mm",
         startView: "months", // langsung tampilin bulan
         minViewMode: "months", // cuma bisa pilih bulan
@@ -527,6 +632,16 @@
         $('#generateSingleModal').modal('show');
     }
 
+    const updateStatusPinjaman = function(employeeName, yearMonth, tipeGol, id) {
+        $('#tipeGol_statusPinjaman').val(tipeGol);
+        $('#employeeName_statusPinjaman').val(employeeName);
+        $('#monthYear_StatusPinjaman').val(yearMonth);
+        $('#id').val(id);
+        $('#statusPinjaman').val(null).change();
+        $('#updateStatusPinjamanModal').modal('show');
+    }
+
+
     $(document).ready(function() {
         var validatorGeneratePinjaman = $(".create-form").validate({
             rules: {
@@ -574,7 +689,7 @@
         });
         var validatorGenerateSingle = $("#formGeneratePinjamanSingle").validate({
             rules: {
-                monthYear: {
+                monthYearSingle: {
                     required: true
                 },
                 startDate: {
@@ -585,7 +700,7 @@
                 }
             },
             messages: {
-                monthYear: {
+                monthYearSingle: {
                     required: "Pilih periode pinjaman"
                 },
                 startDate: {
@@ -616,6 +731,51 @@
                 $(element).removeClass('select-class');
             },
         });
+
+        var validatorUpdateStatusPinjaman = $("#formUpdateStatusPinjaman").validate({
+            rules: {
+                statusPinjaman: {
+                    required: true
+                },
+            },
+            messages: {
+                statusPinjaman: {
+                    required: "Pilih Status Pinjaman"
+                },
+            },
+            errorElement: 'span',
+            errorClass: 'text-danger',
+            errorPlacement: function(error, element) {
+                var elem = $(element);
+                if (elem.hasClass("select2-hidden-accessible")) {
+                    element = $("#select2-" + elem.attr("id") + "-container").parent();
+                    error.insertAfter(element);
+                } else {
+                    error.insertAfter(element);
+                }
+            },
+            highlight: function(element) {
+                $(element).closest('.form-group').addClass('has-error');
+                $(element).addClass('select-class');
+
+            },
+            unhighlight: function(element) {
+                $(element).closest('.form-group').removeClass('has-error');
+                $(element).removeClass('select-class');
+            },
+        });
+
+        $('#btnHideStatusPinjaman').click(function(e) {
+            e.preventDefault();
+            $('#updateStatusPinjamanModal').modal('hide');
+        });
+
+        $('#generateModalBtn').click(function(e) {
+            e.preventDefault();
+            $('#divisiId_generate').val(null).change();
+            $('#golongan_generate').val(null).change();
+        })
+
         // generate pinjaman action
         $('#generateGlobal').click(function(e) {
             e.preventDefault();
@@ -646,6 +806,7 @@
                                 })
                                 .then(() => {
                                     table.ajax.reload();
+                                    $('#formGeneratePinjaman')[0].reset();
                                     $("#generateModal").modal("hide");
                                 })
                         } else {
@@ -655,9 +816,6 @@
                                 confirmButtonColor: '#4e73df',
                             }).then(() => {});
                         }
-                        $('#formGeneratePinjaman')[0].reset();
-                        $("#generateModal").modal("hide");
-                        table.ajax.reload();
                     },
 
                 });
@@ -711,6 +869,56 @@
         });
 
     });
+
+
+    $('#btnUpdateStatusPinjaman').click(function(e) {
+        e.preventDefault();
+        if ($('#formUpdateStatusPinjaman').valid()) {
+            var csrf = $(`[name="${csrfToken}"]`);
+            var formData = new FormData();
+            var id = $('#id').val();
+            var statusPinjaman = $('#statusPinjaman option:selected').val();
+            formData.append("id", id);
+            formData.append("status_pinjaman", statusPinjaman);
+            $.ajax({
+                url: "<?= base_url("pinjaman-karyawan/update-status"); ?>",
+                data: formData,
+                beforeSend: function(xhr) {
+                    xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                    setLoading();
+                },
+                complete: function() {
+                    stopLoading();
+                },
+                method: "POST",
+                dataType: "json",
+                processData: false,
+                contentType: false,
+                success: function(response) {
+                    csrf.val(response.token);
+                    if (response.status) {
+                        Swal.fire({
+                                icon: 'success',
+                                title: response.message,
+                                confirmButtonColor: '#4e73df',
+                            })
+                            .then(() => {
+                                table.ajax.reload();
+                                $("#updateStatusPinjamanModal").modal("hide");
+                            });
+                        $('#formUpdateStatusPinjaman')[0].reset();
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: response.message,
+                            confirmButtonColor: '#4e73df',
+                        }).then(() => {});
+                    }
+                },
+
+            });
+        }
+    })
 
     $("select[name='filterEmployeeID'], select[name='filterGolongan'], select[name='filterDivisiID'],#month").change(function() {
         table.ajax.reload();

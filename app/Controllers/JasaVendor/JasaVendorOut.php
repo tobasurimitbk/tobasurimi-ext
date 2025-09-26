@@ -158,7 +158,6 @@ class JasaVendorOut extends BaseController
             'vendor' => $this->vendorModel->where('deletedAt', null)->where('company_id', $this->this_company_id)->orderBy('name', "ASC")->findAll(),
             'divisi' => $this->divisiModel->getDivisiAccess(),
             'supplier' => $this->supplierModel->getSupplierJasVend()
-
         ];
         return view('jasaVendor/out/form', $data);
     }

@@ -1111,8 +1111,8 @@ class BC40 extends BaseController
 
         $lpb = $this->penerimaanBarangModel->getById($penerimaanBarangID);
         $bcPoFirst = $this->bcPurchaseOrderModel->find($bcPurchaseOrderID);
-        $bc40DokumenBarang = $this->bcBarangModel->where('bc_purchase_order_id', $bcPurchaseOrderID)->where('penerimaan_barang_id', $penerimaanBarangID)->where('barang1_id', $barang1ID)->first();
-        $seriBarang = $this->bcBarangModel->where('bc_purchase_order_id', $bcPurchaseOrderID)->orderBy('createdAt', "DESC")->first();
+        $bc40DokumenBarang = $this->bcBarangModel->where('bc_purchase_order_id', $bcPurchaseOrderID)->where('penerimaan_barang_id', $penerimaanBarangID)->where('barang1_id', $barang1ID)->where('deletedAt', null)->first();
+        $seriBarang = $this->bcBarangModel->where('bc_purchase_order_id', $bcPurchaseOrderID)->orderBy('createdAt', "DESC")->where('deletedAt', null)->first();
 
         $kodeSatuanBarang = null;
 
@@ -1135,6 +1135,9 @@ class BC40 extends BaseController
         if ($bc40DokumenBarang != null) {
             $kodeSatuanBarang = $this->metaDataModel->where('name', "Kode Satuan BC")->where('value', $bc40DokumenBarang['kode_satuan_barang'])->first();
         }
+
+        // MAtching
+        $barangDetail['penerimaan_barang_id'] = $penerimaanBarangID;
 
         $data = [
             'kodeFasilitasTarif' => $this->metaDataModel->where('name', "Kode Fasilitas Tarif BC")->whereIn('description', ['TIDAK DIPUNGUT', 'DIBEBASKAN', 'DITANGGUHKAN', 'SUDAH DILUNASI'])->findAll(),

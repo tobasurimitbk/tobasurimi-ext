@@ -1535,6 +1535,7 @@ $routes->get('/update-stock-bahan-baku/create', 'Warehouse\UpdateStockBahanBaku:
 $routes->get('/update-stock-bahan-baku/list-po', 'Warehouse\UpdateStockBahanBaku::getListPO', ['filter' => 'Auth']);
 $routes->get('/update-stock-bahan-baku/list-barang-po', 'Warehouse\UpdateStockBahanBaku::getListStockByPO', ['filter' => 'Auth']);
 $routes->get('/update-stock-bahan-baku/list-barang-po-kotor', 'Warehouse\UpdateStockBahanBaku::getListStockByPOKotor', ['filter' => 'Auth']);
+$routes->get('/update-stock-bahan-baku/search-barang', 'Warehouse\UpdateStockBahanBaku::searchBarang', ['filter' => 'Auth']);
 $routes->get('/update-stock-bahan-baku/id/(:segment)', 'Warehouse\UpdateStockBahanBaku::getByIdUpdateStockBahanBaku/$1', ['filter' => 'Auth']);
 $routes->get('/update-stock-bahan-baku/print/(:segment)', 'Warehouse\UpdateStockBahanBaku::print/$1', ['filter' => 'Auth']);
 $routes->post('/update-stock-bahan-baku/save', 'Warehouse\UpdateStockBahanBaku::saveUpdateStockBahanBaku', ['filter' => 'Auth']);
@@ -2038,7 +2039,8 @@ $routes->get('/log-attendance', 'HR\Attendance::indexLog', ['filter' => 'Auth'])
 $routes->post('/log-attendance/all', 'HR\Attendance::allLog', ['filter' => 'Auth']);
 $routes->post('/log-attendance/all-total', 'HR\Attendance::allLogTotal', ['filter' => 'Auth']);
 $routes->get('/log-attendance/detail', 'HR\Attendance::getLogAttendanceDetail', ['filter' => 'Auth']);
-$routes->get('/log-attendance/export', 'HR\Attendance::exportExcelLogPresensi', ['filter' => 'Auth']);
+$routes->get('/log-attendance/export-bulanan', 'HR\Attendance::exportExcelLogPresensiBulanan', ['filter' => 'Auth']);
+$routes->get('/log-attendance/export-harian', 'HR\Attendance::exportExcelLogPresensiHarian', ['filter' => 'Auth']);
 $routes->get('/log-attendance/like-employees', 'HR\Attendance::getEmployeesLike', ['filter' => 'Auth']);
 
 // Generate Attendance
@@ -2103,6 +2105,7 @@ $routes->post('/pinjaman-karyawan/generate-all', 'HR\PinjamanKaryawan::generateA
 $routes->post('/pinjaman-karyawan/employees', 'HR\Payroll::getEmployeeByDivision', ['filter' => 'Auth']);
 $routes->post('/pinjaman-karyawan/generate-single', 'HR\PinjamanKaryawan::generateSinglePinjaman', ['filter' => 'Auth']);
 $routes->get('/pinjaman-karyawan/print', 'HR\PinjamanKaryawan::exportPDF', ['filter' => 'Auth']);
+$routes->post('/pinjaman-karyawan/update-status', 'HR\PinjamanKaryawan::updateStatus', ['filter' => 'Auth']);
 
 // Perijinan
 $routes->get('/form-perijinan', 'HR\Perijinan::perijinan', ['filter' => 'Auth']);

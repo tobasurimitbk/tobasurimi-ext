@@ -16,6 +16,8 @@ use App\Models\JasaVendorInModel;
 use App\Models\JasaVendorOutModel;
 use App\Models\ProsesRebusModel;
 use App\Models\BarangMasterModel;
+use App\Models\BarangMasterSpesifikasiModel;
+
 use Dompdf\Dompdf;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
@@ -38,6 +40,7 @@ class JasaVendor extends BaseController
     protected $jasaVendorOutModel;
     protected $prosesRebusModel;
     protected $barangModel;
+    protected $barangSpesifikasiModel;
 
     public function __construct()
     {
@@ -56,17 +59,18 @@ class JasaVendor extends BaseController
         $this->jasaVendorOutModel = new JasaVendorOutModel();
         $this->prosesRebusModel = new ProsesRebusModel();
         $this->barangModel = new BarangMasterModel();
+        $this->barangSpesifikasiModel = new BarangMasterSpesifikasiModel();
     }
 
     public function index()
     {
         $data = [
-            'dataBarang' => $this->barangModel->getListBarangmaster("BAHAN_BAKU", $this->this_company_id),
+            'dataBarang' => $this->barangSpesifikasiModel->getListBarangSpesifikasi("BAHAN_BAKU", $this->this_company_id),
         ];
         return view('Laporan/LaporanJasaVendor/index', $data);
     }
 
-    public function getVendorData()
+    public function all()
     {
         $rawFilter = $this->request->getGet("filter") == "all" ? "" : $this->request->getGet("filter");
 
@@ -88,9 +92,9 @@ class JasaVendor extends BaseController
         ];
 
         $condition = [
-            // "deletedAt" => NULL,
-            // "companyId" => $this->this_company_id,
-            // "master_barang.id" => $this->request->getGet("list_barang"),
+            "deletedAt" => NULL,
+            "companyId" => $this->this_company_id,
+            "master_barang_spesifikasi.id" => $this->request->getGet("list_barang"),
         ];
 
         $addCondition = [
@@ -103,15 +107,15 @@ class JasaVendor extends BaseController
             "dateEnd"       => $this->request->getGet("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getGet("dateEnd")))) : "",
         ];
 
-        if ($this->this_company_id != "16" && $this->this_company_id != "15") {
-            $addCondition['companyId'] = [1, 2];
-        } else if ($this->this_company_id == "15") {
-            $addCondition['companyId'] = [15];
-        } else if ($this->this_company_id == "16") {
-            $addCondition['companyId'] = [16];
-        } else {
-            $addCondition['companyId'] = [];
-        }
+        // if ($this->this_company_id != "16" && $this->this_company_id != "15") {
+        //     $addCondition['companyId'] = [1, 2];
+        // } else if ($this->this_company_id == "15") {
+        //     $addCondition['companyId'] = [15];
+        // } else if ($this->this_company_id == "16") {
+        //     $addCondition['companyId'] = [16];
+        // } else {
+        //     $addCondition['companyId'] = [];
+        // }
 
         $limit = $this->request->getGet("length");
         $offset = $this->request->getGet("start");
