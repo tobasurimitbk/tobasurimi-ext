@@ -328,44 +328,50 @@ class AMPurchaseOrderDetailModel extends Model
                 } else if ($isInitEdit == 0) {
                     // TAMPILKAN JIKA DI CHANGE ULANG SPP NYA
                     // TAMPILKAN YANG MASIH ADA SISA AJA
-                    $res[] = [
-                        'penerimaan_barang_detail_id' => isset($firstLPB['penerimaan_barang_detail_id']) ? $firstLPB['penerimaan_barang_detail_id'] : "",
-                        'pengembalian_barang_detail_id' => isset($firstLPB['pengembalian_barang_detail_id']) ? $firstLPB['pengembalian_barang_detail_id'] : "",
-                        'jumlah_return' => isset($firstLPB['jumlah_return']) ? $firstLPB['jumlah_return'] : "",
-                        'keterangan_return' => isset($firstLPB['keterangan_return']) ? $firstLPB['keterangan_return'] : "",
-                        'am_purchase_order_details_id' => $b['id'],
-                        'am_purchase_order_id' => $b['am_purchase_order_id'],
-                        'kode_barang' => $b['kode_barang'],
-                        'nama_barang' => $b['nama_barang'] . ' - ' . $b['spesifikasi'] . '',
-                        'spesifikasi_name' => $b['spesifikasi'],
-                        'nama_barang_master' => $b['nama_barang'],
-                        'po_no' => $b['po_no'],
-                        'spp_no' => $b['spp_no'],
-                        'satuan' => $b['kode_satuan'],
-                        'jml_order' => $b['qty'],
-                        'jml_diterima_lpb' => $inLPB,
-                        'jml_diterima_total' => $jmlMasukAll,
-                        'sisa_total' => round($sisaDiterima, 4),
-                        'harga' => $harga,
-                        'sub_total' => isset($firstLPB) ? (float)$firstLPB['sub_total'] : round($inLPB * $harga),
-                        'keterangan' => $b['note'],
-                        // TAMBAHAN
-                        'satuan_id' => $b['unit'],
-                        'satuan_konversi_id' => $satuanKonversiId,
-                        'satuan_konversi' => $kodeSatuanKonversi,
-                        'nilai_konversi' => $nilaiKonversi,
-                        'jml_diterima_lpb_konversi' => ($inLPB * $nilaiKonversi),
-                        'purchase_request_id' => $b['purchase_request_id'],
-                        'status_penerimaan' => $b['status_penerimaan'],
-                        'sub_total_po' => (float)$b['total']
-                    ];
+                    // TAMPILKAN YANG MASIH ADA SISA SAJA
+                    if ($inLPB == 0 && ($jmlMasukAll == $b['qty'])) {
+                        // SUDAH PENUH DITERIMA DI LPB LAIN
+                        // GK USAH MUNCUL
+                    } else {
+                        $res[] = [
+                            'penerimaan_barang_detail_id' => isset($firstLPB['penerimaan_barang_detail_id']) ? $firstLPB['penerimaan_barang_detail_id'] : "",
+                            'pengembalian_barang_detail_id' => isset($firstLPB['pengembalian_barang_detail_id']) ? $firstLPB['pengembalian_barang_detail_id'] : "",
+                            'jumlah_return' => isset($firstLPB['jumlah_return']) ? $firstLPB['jumlah_return'] : "",
+                            'keterangan_return' => isset($firstLPB['keterangan_return']) ? $firstLPB['keterangan_return'] : "",
+                            'am_purchase_order_details_id' => $b['id'],
+                            'am_purchase_order_id' => $b['am_purchase_order_id'],
+                            'kode_barang' => $b['kode_barang'],
+                            'nama_barang' => $b['nama_barang'] . ' - ' . $b['spesifikasi'] . '',
+                            'spesifikasi_name' => $b['spesifikasi'],
+                            'nama_barang_master' => $b['nama_barang'],
+                            'po_no' => $b['po_no'],
+                            'spp_no' => $b['spp_no'],
+                            'satuan' => $b['kode_satuan'],
+                            'jml_order' => $b['qty'],
+                            'jml_diterima_lpb' => $inLPB,
+                            'jml_diterima_total' => $jmlMasukAll,
+                            'sisa_total' => round($sisaDiterima, 4),
+                            'harga' => $harga,
+                            'sub_total' => isset($firstLPB) ? (float)$firstLPB['sub_total'] : round($inLPB * $harga),
+                            'keterangan' => $b['note'],
+                            // TAMBAHAN
+                            'satuan_id' => $b['unit'],
+                            'satuan_konversi_id' => $satuanKonversiId,
+                            'satuan_konversi' => $kodeSatuanKonversi,
+                            'nilai_konversi' => $nilaiKonversi,
+                            'jml_diterima_lpb_konversi' => ($inLPB * $nilaiKonversi),
+                            'purchase_request_id' => $b['purchase_request_id'],
+                            'status_penerimaan' => $b['status_penerimaan'],
+                            'sub_total_po' => (float)$b['total']
+                        ];
 
-                    $jmlOrderTotal += $b['qty'];
-                    $jmlDiterimaInTotal += $inLPB;
-                    $jmlDiterimaTotal +=   $jmlMasukAll;
-                    $sisaDiterimaTotal += $sisaDiterima;
-                    $hargaPerBarangTotal += $harga;
-                    $subTotal += ($inLPB * $harga);
+                        $jmlOrderTotal += $b['qty'];
+                        $jmlDiterimaInTotal += $inLPB;
+                        $jmlDiterimaTotal +=   $jmlMasukAll;
+                        $sisaDiterimaTotal += $sisaDiterima;
+                        $hargaPerBarangTotal += $harga;
+                        $subTotal += ($inLPB * $harga);
+                    }
                 }
             }
         }
