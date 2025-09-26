@@ -260,6 +260,12 @@
         $.ajax({
             url: `<?= base_url("penerimaan-barang-lokal-bp/list-barang"); ?>`,
             method: "GET",
+            beforeSend: function() {
+                setLoading()
+            },
+            complete: function() {
+                stopLoading()
+            },
             data: {
                 am_purchase_order_id: JSON.stringify(arr),
                 penerimaan_barang_id: $('.id').val()
