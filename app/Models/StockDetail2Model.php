@@ -754,8 +754,8 @@ class StockDetail2Model extends Model
             MIN(stock_details2.supplier_id) AS supplier_id,
             MIN(stock_details.stock_date) AS stock_date,
             MIN(stock_details.sumber) AS sumber,
-            SUM(CASE WHEN stock_details.status = 'In' THEN stock_details2.qty ELSE 0 END)
-            - SUM(CASE WHEN stock_details.status = 'Out' THEN stock_details2.qty ELSE 0 END) AS stok_total,
+            SUM(CASE WHEN stock_details.status = 'In' THEN stock_details2.qty_diterima ELSE 0 END)
+            - SUM(CASE WHEN stock_details.status = 'Out' THEN stock_details2.qty_diterima ELSE 0 END) AS stok_total,
             COALESCE(total_penerimaan_subquery.total_penerimaan, 0) AS total_penerimaan
         ";
 
