@@ -1533,7 +1533,7 @@ $routes->get('/update-stock-bahan-baku', 'Warehouse\UpdateStockBahanBaku::Update
 $routes->get('/update-stock-bahan-baku/all', 'Warehouse\UpdateStockBahanBaku::allUpdateStockBahanBaku', ['filter' => 'Auth']);
 $routes->get('/update-stock-bahan-baku/create', 'Warehouse\UpdateStockBahanBaku::createUpdateStockBahanBaku', ['filter' => 'Auth']);
 $routes->get('/update-stock-bahan-baku/list-po', 'Warehouse\UpdateStockBahanBaku::getListPO', ['filter' => 'Auth']);
-$routes->get('/update-stock-bahan-baku/list-barang-po', 'Warehouse\UpdateStockBahanBaku::getListStockByPO', ['filter' => 'Auth']);
+$routes->get('/update-stock-bahan-baku/list-barang-po', 'Warehouse\UpdateStockBahanBaku::getListStock', ['filter' => 'Auth']);
 $routes->get('/update-stock-bahan-baku/list-barang-po-kotor', 'Warehouse\UpdateStockBahanBaku::getListStockByPOKotor', ['filter' => 'Auth']);
 $routes->get('/update-stock-bahan-baku/search-barang', 'Warehouse\UpdateStockBahanBaku::searchBarang', ['filter' => 'Auth']);
 $routes->get('/update-stock-bahan-baku/id/(:segment)', 'Warehouse\UpdateStockBahanBaku::getByIdUpdateStockBahanBaku/$1', ['filter' => 'Auth']);
