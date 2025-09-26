@@ -57,11 +57,10 @@
                             <tr>
                                 <th>No.</th>
                                 <th onclick="changeSort('divisi')" class="sort">Departemen</th>
-                                <th onclick="changeSort('no_penerimaan_barang')" class="sort">No. Penerimaan</th>
-                                <th>No. PO</th>
                                 <th onclick="changeSort('warehouse_name')" class="sort">Gudang</th>
                                 <th onclick="changeSort('createdAt')">Tanggal</th>
                                 <th onclick="changeSort('supplier_name')" class="sort">Supplier</th>
+                                <th >Action</th>
                             </tr>
                         </thead>
                         <tbody class="body-table" id="body-table" style="cursor: pointer;">
@@ -129,16 +128,6 @@
                 className: "text-center"
             },
             {
-                data: "no_penerimaan_barang",
-                className: "text-center"
-            },
-            {
-                data: "multiple_po_no",
-                className: "text-center",
-                searchable: false,
-                sortable: false
-            },
-            {
                 data: "warehouse_name",
                 className: "text-center"
             },
@@ -150,6 +139,32 @@
                 data: "supplier_name",
                 className: "text-center"
             },
+            {
+                data: "id",
+                className: "text-center actions",
+                searchable: false,
+                sortable: false,
+                render: function(data, type, row) {
+                    let id = row.id;
+                    let status = row.status_posting
+                    // console.log(status);
+                    if (status != 1) {
+                        return `
+                                <div class="mt-0">
+                                    <button type="button" onclick="handleDelete('${id}')" class="btn btn-discard delete-btn btn-trash">
+                                        <i class="fa fa-trash"></i>
+                                    </button>
+                                    <button class="btn btn-warning" onclick="handlePrint('${id}')">
+                                        <i class="fa fa-print fa-sm" aria-hidden="true"></i>
+                                    </button>
+                                    <button type="button" class="btn btn-success" onclick="posting('${id}', 1)">
+                                        <i class="fa fa-paper-plane" aria-hidden="true"></i>
+                                    </button>
+                                </div>
+                            `
+                    }
+                }
+            }
         ],
         "drawCallback": function(settings) {
             var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-toggle="tooltip"]'))
