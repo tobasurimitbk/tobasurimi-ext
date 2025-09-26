@@ -496,7 +496,7 @@
                     ?>
 
 
-                    <?php if ($displayPrice == "true" && $totalSalesKontrakdetail > 1): ?>
+                    <?php if ($displayPrice == "true" && $totalSalesKontrakdetail > 1 && $total_adjustments > 0): ?>
                         <tr style="font-weight: bold; background-color: #e9ecef; font-size: 12px;">
                             <td style="padding: 6px; border: 1px solid #ddd;"></td>
                             <td style="padding: 6px; border: 1px solid #ddd; text-align: right;">
