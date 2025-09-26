@@ -73,11 +73,12 @@
                                 <th onclick="changeSort('createdAt')">Tanggal</th>
                                 <th onclick="changeSort('supplier_name')" class="sort">Supplier</th>
                                 <th onclick="changeSort('metadata.value')" class="sort">Dokumen</th>
-                                <th>Jumlah Item</th>
-                                <th>Actions</th>
+                                <th>Jml Item</th>
+                                <th>COA</th>
+                                <th>Action</th>
                             </tr>
                         </thead>
-                        <tbody class="body-table" id="body-table" style="cursor: pointer;">
+                        <tbody class="body-table" id="body-table">
 
                         </tbody>
                     </table>
@@ -154,39 +155,64 @@
             },
             {
                 data: "divisi",
-                className: "text-center"
+                className: "text-left"
             },
             {
                 data: "no_penerimaan_barang",
-                className: "text-center"
+                className: "text-left"
             },
             {
                 data: "multiple_po_no",
-                className: "text-center",
+                className: "text-left",
                 searchable: false,
                 sortable: false
             },
             {
                 data: "warehouse_name",
-                className: "text-center"
+                className: "text-left"
             },
             {
                 data: "createdAt",
-                className: "text-center"
+                className: "text-left"
             },
             {
                 data: "supplier_name",
-                className: "text-center"
+                className: "text-left"
             },
             {
                 data: "bc_type_name",
-                className: "text-center"
+                className: "text-left"
             },
             {
                 data: "itemCount",
                 className: "text-center",
                 searchable: false,
                 sortable: false
+            },
+            {
+                data: "akun_coa",
+                className: "text-center",
+                searchable: false,
+                sortable: false,
+                render: function(data, type, row) {
+                    let akun_coa = row.akun_coa;
+                    let htmlRes = '';
+
+                    if (row.akun_coa == true) {
+                        htmlRes += `
+                            <div class="text-success">
+                               <i class="fa-solid fa-check"></i>
+                            </div>`
+                    } else {
+                        htmlRes += `
+                            <div class="text-danger">
+                               <i class="fa-solid fa-x"></i>
+                            </div>`
+                    }
+
+                    return htmlRes;
+
+                }
             },
             {
                 data: "id",
@@ -206,6 +232,11 @@
                     if (status == "WAITING") {
                         return `
                         <div class="mt-0">
+                            <?php if (can('Warehouse', 'P. Barang Lokal BB', 'u')): ?>
+                                <a href="<?= base_url("penerimaan-barang-lokal-bb/id"); ?>/${id}" data-toggle="tooltip" title="Edit" class="btn btn-primary">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                            <?php endif ?>
                             <?php if (can('Warehouse', 'P. Barang Lokal BB', 'p')) : ?>
                                 <button data-toggle="tooltip" title="Print" class="btn btn-warning btn-print" onclick="print('<?= base_url("penerimaan-barang-lokal-bb/print/"); ?>${id}')" style="box-shadow: none !important;">
                                     <i class="fa fa-print fa-sm" aria-hidden="true"></i>
@@ -230,6 +261,11 @@
 
                         string = `
                         <div class="mt-0" >
+                          <?php if (can('Warehouse', 'P. Barang Lokal BB', 'u')): ?>
+                                <a href="<?= base_url("penerimaan-barang-lokal-bb/id"); ?>/${id}" data-toggle="tooltip" title="Edit" class="btn btn-primary">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                            <?php endif ?>
                             <?php if (can('Warehouse', 'P. Barang Lokal BB', 'p')) : ?>
                                 <button data-toggle="tooltip" title="Print" class="btn btn-warning btn-print" onclick="print('<?= base_url("penerimaan-barang-lokal-bb/print/"); ?>${id}')" style="box-shadow: none !important;">
                                     <i class="fa fa-print fa-sm" aria-hidden="true"></i>
@@ -314,16 +350,16 @@
             }
         });
 
-        $('#dataTable tbody').on('click', 'tr td:not(.actions):not(.dataTables_empty)', function() {
-            const data = table.row(this).data();
-            location.replace(`<?= base_url("penerimaan-barang-lokal-bb/id"); ?>/${data.id}`);
-        })
+        // $('#dataTable tbody').on('click', 'tr td:not(.actions):not(.dataTables_empty)', function() {
+        //     const data = table.row(this).data();
+        //     location.replace(`<?= base_url("penerimaan-barang-lokal-bb/id"); ?>/${data.id}`);
+        // })
 
-        $('#dataTable tbody').on('click', '.return-out', function() {
-            // Use the closest 'tr' element to get the data
-            const data = table.row($(this).closest('tr')).data();
-            location.replace(`<?= base_url("penerimaan-barang-lokal-bb/return-barang/id"); ?>/${data.id}`);
-        });
+        // $('#dataTable tbody').on('click', '.return-out', function() {
+        //     // Use the closest 'tr' element to get the data
+        //     const data = table.row($(this).closest('tr')).data();
+        //     location.replace(`<?= base_url("penerimaan-barang-lokal-bb/return-barang/id"); ?>/${data.id}`);
+        // });
     })
 
     const posting = function(id) {

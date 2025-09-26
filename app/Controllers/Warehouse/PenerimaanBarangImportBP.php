@@ -67,6 +67,7 @@ class PenerimaanBarangImportBP extends BaseController
     protected $transaksiJurnalModel;
     protected $jurnalUmumModel;
     protected $accountBarangModel;
+    protected $penerimaanBarangLokalBp;
 
     public function __construct()
     {
@@ -100,6 +101,7 @@ class PenerimaanBarangImportBP extends BaseController
         $this->transaksiJurnalModel = new TransaksiJurnalModel();
         $this->jurnalUmumModel = new JurnalUmumModel();
         $this->accountBarangModel = new AccountBarangModel();
+        $this->penerimaanBarangLokalBp = new PenerimaanBarangLokalBP();
     }
 
     public function index()
@@ -148,10 +150,13 @@ class PenerimaanBarangImportBP extends BaseController
 
         $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
 
+        $penerimaanBarangIds = array_column($penerimaanBarangData['data'], 'id');
+        $akunCoaMap = [];
+        if (count($penerimaanBarangIds) != 0) {
+            $akunCoaMap = $this->penerimaanBarangLokalBp->getAkunCoaMap($penerimaanBarangIds);
+        }
 
         foreach ($penerimaanBarangData['data'] as $data) {
-            $bc_purchase_order_detail_list = $this->bcPurchaseOrder->like('multiple_lpb_id', $data->id)->where('deletedAt', null)->findAll();
-            $pengembalianBarang = $this->pengembalianBarangModel->where('penerimaan_barang_id', $data->id)->first();
 
             array_push($dataPenerimaanBarang, [
                 "no"                    => $no++,
@@ -166,8 +171,9 @@ class PenerimaanBarangImportBP extends BaseController
                 "multiple_po_no"        => str_replace(',', ', ', str_replace(['[', ']', '"', "\\"], '', $data->multiple_po_no)),
                 "status_post"           => $data->status_post,
                 "bc_type"               => $data->bc_type,
-                "in_bc"                 => $bc_purchase_order_detail_list != null ? 'in' : 'out',
-                "retur_status"          => ($pengembalianBarang != null) ? ($pengembalianBarang['status_post'] == "WAITING" ? 0 : 1) : null,
+                "in_bc"                 => $data->bc_purchase_order_id != null ? 'in' : 'out',
+                "akun_coa"              => $akunCoaMap[$data->id] ?? false,
+                "bc_type_name"          => $data->bc_type_name == null ? "NON PABEAN" : $data->bc_type_name
             ]);
         }
 
@@ -221,7 +227,7 @@ class PenerimaanBarangImportBP extends BaseController
                 "no_penerimaan_barang"  => $data->no_penerimaan_barang,
                 "warehouse_name"        => $data->warehouse_name,
                 "tipe_bahan"            => $data->tipe_bahan,
-                "createdAt"             => $data->createdAt ? date("d/m/Y", strtotime($data->tanggal)) : "",
+                "createdAt"             => $data->tanggal ? date("d/m/Y", strtotime($data->tanggal)) : "",
                 "supplier_name"         => $data->supplier_name,
                 "itemCount"             => $data->itemCount,
                 "multiple_po_no"        => str_replace(',', ', ', str_replace(['[', ']', '"', "\\"], '', $data->multiple_po_no)),
@@ -249,9 +255,7 @@ class PenerimaanBarangImportBP extends BaseController
             "penerimaan_barang.status_penerimaan" => "IMPORT",
             "penerimaan_barang.deletedAt" => null,
             "penerimaan_barang_detail.deletedAt" => null,
-            "tipe_bahan" => "PENOLONG",
-            "note" => strtolower($this->request->getVar('note')),
-            "nama_barang" => strtolower($this->request->getVar('nama_barang'))
+            "tipe_bahan" => "PENOLONG"
         ];
 
         $addCondition = [
@@ -261,6 +265,8 @@ class PenerimaanBarangImportBP extends BaseController
             "status" => $this->request->getVar("status"),
             "startdate" => $this->request->getVar("dateStart") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateStart")))) : "",
             "lastdate" => $this->request->getVar("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateEnd")))) : "",
+            "note" => strtolower($this->request->getVar('note')),
+            "nama_barang" => strtolower($this->request->getVar('nama_barang'))
         ];
 
         $penerimaanBarangData = $this->penerimaanBarangModel->getPenerimaanBarangList($condition, $addCondition, 100000000, 0);
@@ -272,13 +278,13 @@ class PenerimaanBarangImportBP extends BaseController
         foreach ($penerimaanBarangData['data'] as $data) {
             array_push($dataPenerimaanBarang, [
                 "NO"                    => $no++,
-                "DEPARTEMEN"            => $data->divisi,
-                "NO PENERIMAAN BARANG"  => $data->no_penerimaan_barang,
-                "NO PO"                 => str_replace(',', ', ', str_replace(['[', ']', '"', "\\"], '', $data->multiple_po_no)),
-                "GUDANG"                => $data->warehouse_name,
-                "TANGGAL"               => $data->createdAt ? date("d/m/Y", strtotime($data->tanggal)) : "",
-                "SUPPLIER"              => $data->supplier_name,
-                "JUMLAH ITEM"           => $data->itemCount,
+                "DEPARTEMEN"                => $data->divisi,
+                "NO LPB"  => $data->no_penerimaan_barang,
+                "WAREHOUSE"        => $data->warehouse_name,
+                "TANGGAL"             => $data->tanggal ? date("d/m/Y", strtotime($data->tanggal)) : "",
+                "SUPPLIER"         => $data->supplier_name,
+                "TOTAL BARANG"             => $data->itemCount,
+                "NO PO"        => str_replace(',', ', ', str_replace(['[', ']', '"', "\\"], '', $data->multiple_po_no)),
             ]);
         }
 
@@ -583,7 +589,7 @@ class PenerimaanBarangImportBP extends BaseController
                     ->set('remaining_qty', $b->sisa_total)
                     ->set('qty_diterima', $b->jml_diterima_total)
                     ->update();
-                $this->accountBarangModel->insertAccountBarang($this->this_company_id, $this->request->getVar('divisi_id'), $barang['id'], $poDetail['spesifikasi_id']);
+                $this->accountBarangModel->insertAccountBarang($this->this_company_id, $this->request->getVar('divisi_id'), $barang == null ? 0 : $barang['id'], $poDetail == null ? 0 : $poDetail['spesifikasi_id']);
             } else {
                 $last = $this->amPurchaseOrderDetailModel
                     ->where('id',  $b->am_purchase_order_details_id)
