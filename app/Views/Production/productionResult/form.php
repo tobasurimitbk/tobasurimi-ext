@@ -1187,7 +1187,7 @@
                                                     confirmButtonColor: '#4e73df',
                                                 })
                                                 .then(() => {
-                                                    window.location.href = "<?= base_url("production-result/details/"); ?>" + response.id;
+                                                    window.location.href = "<?= base_url("production-result"); ?>";
                                                 })
                                             stopLoading()
                                         } else {
@@ -1230,7 +1230,7 @@
                                                     confirmButtonColor: '#4e73df',
                                                 })
                                                 .then(() => {
-                                                    window.location.href = "<?= base_url("production-result/details/"); ?>" + response.id;
+                                                    window.location.href = "<?= base_url("production-result"); ?>";
                                                 })
                                         } else {
                                             stopLoading()
