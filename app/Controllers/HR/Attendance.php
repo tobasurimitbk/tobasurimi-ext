@@ -62,8 +62,10 @@ class Attendance extends BaseController
         $dataStatusPerizinanAll = $this->MetadataModel
             ->where('name', "Status Perizinan")
             ->whereNotIn('value', ['LIBUR_L'])
+            ->orderBy("FIELD(value, 'HADIR_H') DESC", '', false) // biar HADIR_H duluan
             ->orderBy('name', "ASC")
             ->findAll();
+
         $dataGolongan = $this->GolonganModel
             ->where('company_id', $this->this_company_id)
             ->where('deletedAt', null)
@@ -423,8 +425,10 @@ class Attendance extends BaseController
         $dataStatusPerizinanAll = $this->MetadataModel
             ->where('name', "Status Perizinan")
             ->whereNotIn('value', ['LIBUR_L'])
+            ->orderBy("FIELD(value, 'HADIR_H') DESC", '', false) // biar HADIR_H duluan
             ->orderBy('name', "ASC")
             ->findAll();
+
         $dataGolongan = $this->GolonganModel
             ->where('company_id', $this->this_company_id)
             ->where('deletedAt', null)
@@ -1293,6 +1297,7 @@ class Attendance extends BaseController
             'Nama',
             'Divisi',
             'Bagian',
+            'Hadir',
             'Cuti Tahunan',
             'Cuti Haid',
             'Cuti Hamil',
@@ -1300,7 +1305,6 @@ class Attendance extends BaseController
             'Ijin',
             'Sakit',
             'RL',
-            'Hadir',
             'Alpha',
             'Libur'
         ];
@@ -1375,6 +1379,7 @@ class Attendance extends BaseController
                 }
             }
 
+            $sheet2->setCellValueByColumnAndRow($colIndex++, $rowIndex, $total['hadir']);
             $sheet2->setCellValueByColumnAndRow($colIndex++, $rowIndex, $total['ct']);
             $sheet2->setCellValueByColumnAndRow($colIndex++, $rowIndex, $total['chd']);
             $sheet2->setCellValueByColumnAndRow($colIndex++, $rowIndex, $total['chl']);
@@ -1382,7 +1387,6 @@ class Attendance extends BaseController
             $sheet2->setCellValueByColumnAndRow($colIndex++, $rowIndex, $total['ijin']);
             $sheet2->setCellValueByColumnAndRow($colIndex++, $rowIndex, $total['sakit']);
             $sheet2->setCellValueByColumnAndRow($colIndex++, $rowIndex, $total['rl']);
-            $sheet2->setCellValueByColumnAndRow($colIndex++, $rowIndex, $total['hadir']);
             $sheet2->setCellValueByColumnAndRow($colIndex++, $rowIndex, $total['alpha']);
             $sheet2->setCellValueByColumnAndRow($colIndex++, $rowIndex, $total['libur']);
 
@@ -1414,7 +1418,7 @@ class Attendance extends BaseController
 
     public function exportExcelLogPresensiHarian()
     {
-        $startDate =  date('Y-m-d', strtotime(str_replace('/', '-', $this->request->getVar('start_date'))));
+        $startDate = date('Y-m-d', strtotime(str_replace('/', '-', $this->request->getVar('start_date'))));
         $endDate   = date('Y-m-d', strtotime(str_replace('/', '-', $this->request->getVar('end_date'))));
 
         // ambil data employees
@@ -1475,6 +1479,10 @@ class Attendance extends BaseController
         );
 
         $row = 1;
+
+        // array rekap total per karyawan
+        $rekapKaryawan = [];
+
         foreach ($period as $date) {
             $tgl = $date->format('Y-m-d');
             $dayName = date('D', strtotime($tgl));
@@ -1535,7 +1543,7 @@ class Attendance extends BaseController
                 }
 
                 if ($in != '' && $out != '') {
-                    $status = '';
+                    $status = "H";
                 }
 
                 $sheet->setCellValue("A{$row}", $no++);
@@ -1552,14 +1560,107 @@ class Attendance extends BaseController
                     'borders' => ['allBorders' => ['borderStyle' => Border::BORDER_THIN]]
                 ]);
                 $row++;
+
+                // Hitung total status per karyawan
+                if (!isset($rekapKaryawan[$emp['id']])) {
+                    $rekapKaryawan[$emp['id']] = [
+                        'nama'           => $nama,
+                        'hadir'          => 0,
+                        'alpa'           => 0,
+                        'libur'          => 0,
+                        'cuti_tahunan'   => 0,
+                        'cuti_haid'      => 0,
+                        'cuti_hamil'     => 0,
+                        'cuti_melahirkan' => 0,
+                        'ijin'           => 0,
+                        'sakit'          => 0,
+                        'rl'             => 0,
+                    ];
+                }
+
+                switch ($status) {
+                    case 'H':
+                        $rekapKaryawan[$emp['id']]['hadir']++;
+                        break;
+                    case 'A':
+                        $rekapKaryawan[$emp['id']]['alpa']++;
+                        break;
+                    case 'L':
+                        $rekapKaryawan[$emp['id']]['libur']++;
+                        break;
+                    case 'CT':
+                        $rekapKaryawan[$emp['id']]['cuti_tahunan']++;
+                        break;
+                    case 'CHD':
+                        $rekapKaryawan[$emp['id']]['cuti_haid']++;
+                        break;
+                    case 'CHL':
+                        $rekapKaryawan[$emp['id']]['cuti_hamil']++;
+                        break;
+                    case 'CM':
+                        $rekapKaryawan[$emp['id']]['cuti_melahirkan']++;
+                        break;
+                    case 'I':
+                        $rekapKaryawan[$emp['id']]['ijin']++;
+                        break;
+                    case 'S':
+                        $rekapKaryawan[$emp['id']]['sakit']++;
+                        break;
+                    case 'RL':
+                        $rekapKaryawan[$emp['id']]['rl']++;
+                        break;
+                }
             }
 
             // kasih spasi 2 baris antar tanggal
             $row += 2;
         }
 
+        // === REKAP TOTAL DI BAWAH ===
+        $sheet->mergeCells("A{$row}:K{$row}");
+        $sheet->setCellValue("A{$row}", "REKAP KEHADIRAN");
+        $sheet->getStyle("A{$row}")->applyFromArray([
+            'font' => ['bold' => true, 'size' => 12],
+            'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER],
+        ]);
+        $row++;
+
+        // Header rekap
+        $rekapHeaders = ['Nama', 'Hadir', 'Alpa', 'Libur', 'Cuti Tahunan', 'Cuti Haid', 'Cuti Hamil', 'Cuti Melahirkan', 'Ijin', 'Sakit', 'RL'];
+        $col = 'A';
+        foreach ($rekapHeaders as $h) {
+            $sheet->setCellValue("{$col}{$row}", $h);
+            $sheet->getStyle("{$col}{$row}")->applyFromArray([
+                'font' => ['bold' => true],
+                'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER],
+                'borders' => ['allBorders' => ['borderStyle' => Border::BORDER_THIN]]
+            ]);
+            $col++;
+        }
+        $row++;
+
+        // Isi data rekap
+        foreach ($rekapKaryawan as $r) {
+            $sheet->setCellValue("A{$row}", $r['nama']);
+            $sheet->setCellValue("B{$row}", $r['hadir']);
+            $sheet->setCellValue("C{$row}", $r['alpa']);
+            $sheet->setCellValue("D{$row}", $r['libur']);
+            $sheet->setCellValue("E{$row}", $r['cuti_tahunan']);
+            $sheet->setCellValue("F{$row}", $r['cuti_haid']);
+            $sheet->setCellValue("G{$row}", $r['cuti_hamil']);
+            $sheet->setCellValue("H{$row}", $r['cuti_melahirkan']);
+            $sheet->setCellValue("I{$row}", $r['ijin']);
+            $sheet->setCellValue("J{$row}", $r['sakit']);
+            $sheet->setCellValue("K{$row}", $r['rl']);
+
+            $sheet->getStyle("A{$row}:K{$row}")->applyFromArray([
+                'borders' => ['allBorders' => ['borderStyle' => Border::BORDER_THIN]]
+            ]);
+            $row++;
+        }
+
         // auto size kolom
-        foreach (range('A', 'H') as $col) {
+        foreach (range('A', 'K') as $col) {
             $sheet->getColumnDimension($col)->setAutoSize(true);
         }
 
@@ -1730,6 +1831,7 @@ class Attendance extends BaseController
             'Nama',
             'Divisi',
             'Bagian',
+            'Hadir',
             'Cuti Tahunan',
             'Cuti Haid',
             'Cuti Hamil',
@@ -1737,7 +1839,6 @@ class Attendance extends BaseController
             'Ijin',
             'Sakit',
             'RL',
-            'Hadir',
             'Alpha',
             'Libur'
         ];
@@ -1824,6 +1925,7 @@ class Attendance extends BaseController
                 }
             }
 
+            $sheet2->setCellValueByColumnAndRow($colIndex++, $rowIndex, $total['hadir']);
             $sheet2->setCellValueByColumnAndRow($colIndex++, $rowIndex, $total['ct']);
             $sheet2->setCellValueByColumnAndRow($colIndex++, $rowIndex, $total['chd']);
             $sheet2->setCellValueByColumnAndRow($colIndex++, $rowIndex, $total['chl']);
@@ -1831,7 +1933,6 @@ class Attendance extends BaseController
             $sheet2->setCellValueByColumnAndRow($colIndex++, $rowIndex, $total['ijin']);
             $sheet2->setCellValueByColumnAndRow($colIndex++, $rowIndex, $total['sakit']);
             $sheet2->setCellValueByColumnAndRow($colIndex++, $rowIndex, $total['rl']);
-            $sheet2->setCellValueByColumnAndRow($colIndex++, $rowIndex, $total['hadir']);
             $sheet2->setCellValueByColumnAndRow($colIndex++, $rowIndex, $total['alpha']);
             $sheet2->setCellValueByColumnAndRow($colIndex++, $rowIndex, $total['libur']);
 

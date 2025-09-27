@@ -85,7 +85,7 @@
         </div>
         <div class="col-md-4">
             <div class="form-floating mb-3" style="height: 50px;">
-                <select <?= !empty($dataPenerimaanBarang) ? ($dataPenerimaanBarang['status_post'] === "FINISH" ? 'disabled=true' : 'disabled=true') : ''; ?> class="form-select warehouse_id" id="warehouse_id" name="warehouse_id" aria-label="Floating label select example">
+                <select <?= !empty($dataPenerimaanBarang) ? ($dataPenerimaanBarang['status_post'] === "FINISH" ? 'disabled=true' : '') : ''; ?> class="form-select warehouse_id" id="warehouse_id" name="warehouse_id" aria-label="Floating label select example">
                     <option value=""></option>
                     <?php if (!empty($dataPenerimaanBarang)) : ?>
                         <?php foreach ($dataWarehouse as $warehouse) : ?>
@@ -296,7 +296,7 @@
         theme: "bootstrap-5",
         allowClear: true
     }).change(function() {
-        changeStatus();
+        // changeStatus();
     });
 
 

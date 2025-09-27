@@ -103,7 +103,7 @@
                                 </div>
                                 <div class="col-md-12">
                                     <div class="form-floating mb-2 mt-2">
-                                        <select class="form-select" id="divisionID" name="filterDivisiID" aria-label="Floating label select example">
+                                        <select class="form-select" id="divisionID" name="divisionID">
                                             <option value="">
                                                 Cari Departemen
                                             </option>
@@ -118,7 +118,7 @@
                                 </div>
                                 <div class="col-md-12">
                                     <div class="form-floating mb-2 mt-2">
-                                        <select class="form-select" id="employeeID" name="filterEmployeeID" aria-label="Floating label select example">
+                                        <select class="form-select" id="employeeID">
                                             <option value="">
                                                 Cari Berdasarkan Nama Karyawan
                                             </option>
@@ -207,7 +207,7 @@
                 </div>
                 <div class="col-sm-3">
                     <div class="form-floating mt-1">
-                        <select class="form-select" name="filterDivisiID" id="filterDivisiID" aria-label="Floating label select example">
+                        <select class="form-select" name="filterDivisiID" id="filterDivisiID">
                             <option value="">
                                 Cari Departemen
                             </option>
@@ -222,7 +222,7 @@
                 </div>
                 <div class="col-sm-3">
                     <div class="form-floating mt-1">
-                        <select class="form-select" name="filterBagianID" id="filterBagianID" aria-label="Floating label select example">
+                        <select class="form-select" name="filterBagianID" id="filterBagianID">
                             <option value="">
                                 Cari Bagian
                             </option>
@@ -232,7 +232,7 @@
                 </div>
                 <div class="col-sm-3">
                     <div class="form-floating">
-                        <select class="form-select" name="filterGolongan" aria-label="Floating label select example">
+                        <select class="form-select" name="filterGolongan">
                             <option value="">
                                 Cari Tipe / Golongan
                             </option>
@@ -247,7 +247,7 @@
                 </div>
                 <div class="col-sm-3">
                     <div class="form-floating mt-1">
-                        <select class="form-select" name="filterEmployeeID" id="filterEmployeeID" aria-label="Floating label select example">
+                        <select class="form-select" name="filterEmployeeID" id="filterEmployeeID">
                             <option value="">
                                 Cari Berdasarkan Nama Karyawan
                             </option>
@@ -716,14 +716,14 @@
         allowClear: true,
     })
 
-    $("select[name='filterEmployeeID']").select2({
+    $("#filterEmployeeID").select2({
         placeholder: "Cari Berdasarkan Karyawan",
         theme: "bootstrap-5",
         allowClear: true,
 
     });
 
-    $("select[name='filterDivisiID']").on('change', function(e) {
+    $("#divisionID").on('change', function(e) {
         e.preventDefault();
         const csrf = $(`[name="${csrfToken}"]`);
         var divisionID = $(this).val();
@@ -743,7 +743,7 @@
             contentType: false,
             success: function(response) {
                 csrf.val(response.token);
-                var employeeSelect = $("select[name='filterEmployeeID']");
+                var employeeSelect = $("#employeeID");
                 employeeSelect.empty();
                 employeeSelect.append($("<option></option>")
                     .attr("value", "")
@@ -763,6 +763,48 @@
         });
 
     });
+
+    $("#filterDivisiID").on('change', function(e) {
+        e.preventDefault();
+        const csrf = $(`[name="${csrfToken}"]`);
+        var divisionID = $(this).val();
+
+        var formData = new FormData();
+        formData.append('divisionID', divisionID);
+
+        $.ajax({
+            url: "<?= base_url("payroll/employees"); ?>",
+            data: formData,
+            beforeSend: function(xhr) {
+                xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+            },
+            method: "POST",
+            dataType: "json",
+            processData: false,
+            contentType: false,
+            success: function(response) {
+                csrf.val(response.token);
+                var employeeSelect = $("#filterEmployeeID");
+                employeeSelect.empty();
+                employeeSelect.append($("<option></option>")
+                    .attr("value", "")
+                    .text("Cari Berdasarkan Nama Karyawan"));
+                $.each(response.data, function(index, data) {
+                    var option = $("<option></option>")
+                        .attr("value", data.id)
+                        .text(data.name);
+                    employeeSelect.append(option);
+                });
+
+            },
+            onError: function(response) {
+                csrf.val(response.token);
+
+            }
+        });
+
+    });
+
 
     $('#filterDivisiID').change(function() {
         var divisi = $('#filterDivisiID option:selected').val();

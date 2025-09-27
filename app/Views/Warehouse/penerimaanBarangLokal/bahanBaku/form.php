@@ -422,7 +422,7 @@
         theme: "bootstrap-5",
         allowClear: true
     }).change(function() {
-        changeStatus();
+        // changeStatus();
     });
 
     $('.divisi_id').select2({
