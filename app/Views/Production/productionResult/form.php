@@ -757,10 +757,17 @@
         });
 
         // KODE BARANG
-        $('.kode_barang, .kode_barang_scrap, .kode_barang_filling, .kode_barang_add').select2({
+        $('.kode_barang, .kode_barang_scrap, .kode_barang_filling').select2({
             placeholder: "Pilih Kode Barang",
             theme: "bootstrap-5",
             allowClear: true
+        })
+
+        $('.kode_barang_add').select2({
+            placeholder: "Pilih Kode Barang",
+            theme: "bootstrap-5",
+            allowClear: true,
+            dropdownParent: $('#add_barang_produksi')
         })
 
         //CSS SELECT2 FLOATING LABEL
