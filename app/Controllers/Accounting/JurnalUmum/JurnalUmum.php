@@ -1953,6 +1953,8 @@ class JurnalUmum extends BaseController
 
                 $totalNominal = 0;
                 $dataPOdesc = [];
+                $firstDesc = true; // ✅ penanda hanya ambil sekali
+
                 foreach ($PoIdsArray as $poId) {
                     $dataPO = $this->localPOPaymentModel->asObject()
                         ->select('local_po_payments.*, local_po_payment_details.*, suppliers.name as supplier_name')
@@ -1969,10 +1971,11 @@ class JurnalUmum extends BaseController
                         $totalNominal += $value->total; 
                     }
 
-                    // Deskripsi cukup sekali per PO
-                    if (!empty($dataPO)) {
+                    // ✅ Deskripsi cukup sekali aja (pas loop pertama yg ada datanya)
+                    if ($firstDesc && !empty($dataPO)) {
                         $cleanedPO = str_replace(['[', ']', '"', "\\"], '', $dataPO[0]->multiple_po_no);
                         $dataPOdesc[] = $dataPO[0]->supplier_name . ' - ' . $cleanedPO;
+                        $firstDesc = false; // setelah sekali, nggak ambil lagi
                     }
                 }
 
