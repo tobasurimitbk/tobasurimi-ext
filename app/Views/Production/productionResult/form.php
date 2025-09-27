@@ -1107,7 +1107,7 @@
 
             var jumlahQtyBeratJadi = parseFloat(valueQtyBarangJadi) * parseFloat(valueBeratBarangJadi);
 
-            $('.qty_kg_barang_add').val(jumlahQtyBeratJadi);
+            $('.qty_kg_barang_add').val(jumlahQtyBeratJadi.toFixed(2));
         });
 
         $(".btn-save").click(function() {
@@ -1854,21 +1854,24 @@
         // Menangani perubahan input Qty Hasil dan Berat Isi
         $('.qty-barang-jadi, .berat-barang-jadi').on('input change', function() {
             var index = $(this).data('index');
-            var valueQtyBarangJadi = $('input.qty-barang-jadi[data-index="' + index + '"]').val();
-            var valueBeratBarangJadi = $('input.berat-barang-jadi[data-index="' + index + '"]').val();
+            var valueQtyBarangJadi = parseFloat($('input.qty-barang-jadi[data-index="' + index + '"]').val()) || 0;
+            var valueBeratBarangJadi = parseFloat($('input.berat-barang-jadi[data-index="' + index + '"]').val()) || 0;
 
             console.log(index, valueQtyBarangJadi, valueBeratBarangJadi);
 
+            // Hitung total dan batasi 2 angka desimal
+            var jumlahQtyBeratJadi = valueQtyBarangJadi * valueBeratBarangJadi;
+            var fixedJumlah = jumlahQtyBeratJadi.toFixed(2); // misal 2 angka desimal
 
-            var jumlahQtyBeratJadi = parseFloat(valueQtyBarangJadi) * parseFloat(valueBeratBarangJadi);
-            $('input.qty-berat-barang-jadi[data-index="' + index + '"]').val(jumlahQtyBeratJadi.toFixed(2));
+            // Tampilkan hasil yang sudah dibulatkan
+            $('input.qty-berat-barang-jadi[data-index="' + index + '"]').val(fixedJumlah);
 
-            // Simpan nilai baru
+            // Simpan nilai baru ke array
             list_items_barang_jadi[index].qty = valueQtyBarangJadi;
             list_items_barang_jadi[index].qty2 = valueBeratBarangJadi;
-            list_items_barang_jadi[index].qty_isi = jumlahQtyBeratJadi.toFixed(2);
+            list_items_barang_jadi[index].qty_isi = parseFloat(fixedJumlah); // simpan sebagai number, bukan string
 
-            // Render ulang untuk memperbarui footer
+            // Render ulang tabel
             drawTableBarangJadi();
         });
     };
