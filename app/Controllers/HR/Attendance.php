@@ -1640,27 +1640,29 @@ class Attendance extends BaseController
         $row++;
 
         // Isi data rekap
+        $no = 1;
         foreach ($rekapKaryawan as $r) {
-            $sheet->setCellValue("A{$row}", $r['nama']);
-            $sheet->setCellValue("B{$row}", $r['hadir']);
-            $sheet->setCellValue("C{$row}", $r['alpa']);
-            $sheet->setCellValue("D{$row}", $r['libur']);
-            $sheet->setCellValue("E{$row}", $r['cuti_tahunan']);
-            $sheet->setCellValue("F{$row}", $r['cuti_haid']);
-            $sheet->setCellValue("G{$row}", $r['cuti_hamil']);
-            $sheet->setCellValue("H{$row}", $r['cuti_melahirkan']);
-            $sheet->setCellValue("I{$row}", $r['ijin']);
-            $sheet->setCellValue("J{$row}", $r['sakit']);
-            $sheet->setCellValue("K{$row}", $r['rl']);
+            $sheet->setCellValue("A{$row}", $no++);
+            $sheet->setCellValue("B{$row}", $r['nama']);
+            $sheet->setCellValue("C{$row}", $r['hadir']);
+            $sheet->setCellValue("D{$row}", $r['alpa']);
+            $sheet->setCellValue("E{$row}", $r['libur']);
+            $sheet->setCellValue("F{$row}", $r['cuti_tahunan']);
+            $sheet->setCellValue("G{$row}", $r['cuti_haid']);
+            $sheet->setCellValue("H{$row}", $r['cuti_hamil']);
+            $sheet->setCellValue("I{$row}", $r['cuti_melahirkan']);
+            $sheet->setCellValue("J{$row}", $r['ijin']);
+            $sheet->setCellValue("K{$row}", $r['sakit']);
+            $sheet->setCellValue("L{$row}", $r['rl']);
 
-            $sheet->getStyle("A{$row}:K{$row}")->applyFromArray([
+            $sheet->getStyle("A{$row}:L{$row}")->applyFromArray([
                 'borders' => ['allBorders' => ['borderStyle' => Border::BORDER_THIN]]
             ]);
             $row++;
         }
 
         // auto size kolom
-        foreach (range('A', 'K') as $col) {
+        foreach (range('A', 'L') as $col) {
             $sheet->getColumnDimension($col)->setAutoSize(true);
         }
 
