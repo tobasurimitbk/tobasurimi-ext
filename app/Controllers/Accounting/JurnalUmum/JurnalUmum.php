@@ -1964,10 +1964,15 @@ class JurnalUmum extends BaseController
                         ->where('local_po_payment_details.rm_purchase_order_id', $poId)
                         ->findAll();
 
+                    // Hitung total semua PO dari detail
                     foreach ($dataPO as $value) {
-                        $totalNominal += $value->total; // total semua PO
-                        $cleanedPO = str_replace(['[', ']', '"', "\\"], '', $value->multiple_po_no);
-                        $dataPOdesc[] = $value->supplier_name . ' - ' . $cleanedPO;
+                        $totalNominal += $value->total; 
+                    }
+
+                    // Deskripsi cukup sekali per PO
+                    if (!empty($dataPO)) {
+                        $cleanedPO = str_replace(['[', ']', '"', "\\"], '', $dataPO[0]->multiple_po_no);
+                        $dataPOdesc[] = $dataPO[0]->supplier_name . ' - ' . $cleanedPO;
                     }
                 }
 
