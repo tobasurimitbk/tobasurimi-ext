@@ -392,12 +392,14 @@ class OrderForm extends BaseController
             $dataSalesOrder =  $this->SalesOrderModel->insert($values);
 
             $totalQty = 0;
+            $totalSO = 0;
             foreach ($items as $row) {
 
                 // $this->BarangModel->builder()->decrement('stok', $row->qty);
                 // $this->stockDetailModel->addOrReduceStock($row->id_barang, $row->warehouse_id, 'New', $row->qty, 'Out', '');
 
                 $totalQty = $totalQty + $row->qty;
+                $totalSO = $totalSO + $row->discountedAmt;
                 // var_dump($row->amount);
                 // var_dump($amountValue);
                 // exit;
@@ -417,7 +419,7 @@ class OrderForm extends BaseController
                 $this->SalesOrderDetailModel->save($valueBarang);
             }
 
-            $this->SalesOrderModel->update($dataSalesOrder, ['qty_barang' => $totalQty]);
+            $this->SalesOrderModel->update($dataSalesOrder, ['qty_barang' => $totalQty, 'total_harga' => $totalSO]);
 
             $this->SalesOrderModel->db->transComplete();
 
@@ -622,7 +624,7 @@ class OrderForm extends BaseController
                 $totalQty = $totalQty + $row->qty;
 
                 $amountValue = $row->amount ? (float) str_replace(",", "", $row->amount) : 0;
-                $total_harga +=  $amountValue - ($amountValue * ($row->disc / 100));
+                $total_harga +=  $amountValue;
                 if (!isset($row->id_detail)) {
                     $valueBarang = [
                         "id_sales_order"        => $id,
