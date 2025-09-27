@@ -754,8 +754,8 @@ class StockDetail2Model extends Model
             MIN(stock_details2.supplier_id) AS supplier_id,
             MIN(stock_details.stock_date) AS stock_date,
             MIN(stock_details.sumber) AS sumber,
-            SUM(CASE WHEN stock_details.status = 'In' THEN stock_details2.qty ELSE 0 END)
-            - SUM(CASE WHEN stock_details.status = 'Out' THEN stock_details2.qty ELSE 0 END) AS stok_total,
+            SUM(CASE WHEN stock_details.status = 'In' THEN stock_details2.qty_diterima ELSE 0 END)
+            - SUM(CASE WHEN stock_details.status = 'Out' THEN stock_details2.qty_diterima ELSE 0 END) AS stok_total,
             COALESCE(total_penerimaan_subquery.total_penerimaan, 0) AS total_penerimaan
         ";
 
@@ -838,39 +838,41 @@ class StockDetail2Model extends Model
             ->getResultArray();
     }
 
-
-    public function getStockListWithAddConditionByPONew($condition)
+    public function getStockListWithAddConditionForUpdateStock($condition, $spesifikasiId)
     {
+        // var_dump($condition, $spesifikasiId);
+        // die;
+        $builder = $this->asArray()
+            ->select('
+                stock_details2.id AS id,
+                stock.barang2_id as spesifikasi_id,
+                suppliers.name AS supplier_name,
+                stock_details2.stock_id,
+                stock_details2.stock_dokumen,
+                stock_details2.bc_id,
+                stock_details2.no_aju,
+                stock_details2.supplier_id,
+                stock_details.stock_date,
+                stock_details.sumber,
+                rm_purchase_orders.po_date,
+                rm_purchase_orders.id as rm_purchase_order_id,
+                rm_purchase_order_details.id as rm_purchase_order_detail_id,
+                CONCAT(barang_master.barang_name, " ", barang_master_spesifikasi.spesifikasi) AS barang,
+                satuans.kode_satuan,
+                SUM(CASE WHEN stock_details.status = "In" THEN stock_details2.qty ELSE 0 END)
+                 - SUM(CASE WHEN stock_details.status = "Out" THEN stock_details2.qty ELSE 0 END) AS stok_total,
+                 SUM(CASE WHEN stock_details.status = "In" THEN stock_details2.qty_kotor ELSE 0 END)
+                 - SUM(CASE WHEN stock_details.status = "Out" THEN stock_details2.qty_kotor ELSE 0 END) AS stok_total_kotor,
+                 SUM(CASE WHEN stock_details.status = "In" THEN stock_details2.qty_diterima ELSE 0 END)
+                 - SUM(CASE WHEN stock_details.status = "Out" THEN stock_details2.qty_diterima ELSE 0 END) AS stok_total_diterima,
+                COALESCE(total_penerimaan_subquery.total_penerimaan, 0) AS total_penerimaan
 
-        $select = "
-            CONCAT(barang_master.barang_name, '', barang_master_spesifikasi.spesifikasi) AS barang,
-            MIN(suppliers.name) AS supplier_name,
-            MIN(stock_details2.id) AS id,
-            stock_details2.bc_id,
-            stock_details2.no_aju,
-            stock.tipe_barang,
-            stock.company_id,
-            satuans.kode_satuan,
-            MIN(stock_details2.stock_id) AS stock_id,
-            stock_details2.stock_dokumen,
-            MIN(stock_details2.supplier_id) AS supplier_id,
-            MIN(rm_purchase_orders.po_date) AS stock_date,
-            MIN(stock_details.sumber) AS sumber,
-            SUM(CASE WHEN stock_details.status = 'In' THEN stock_details2.qty ELSE 0 END)
-            - SUM(CASE WHEN stock_details.status = 'Out' THEN stock_details2.qty ELSE 0 END) AS stok_total,
-            SUM(CASE WHEN stock_details.status = 'In' THEN stock_details2.qty_kotor ELSE 0 END)
-            - SUM(CASE WHEN stock_details.status = 'Out' THEN stock_details2.qty_kotor ELSE 0 END) AS stok_total_kotor,
-            SUM(CASE WHEN stock_details.status = 'In' THEN stock_details2.qty_diterima ELSE 0 END)
-            - SUM(CASE WHEN stock_details.status = 'Out' THEN stock_details2.qty_diterima ELSE 0 END) AS stok_total_diterima,
-            COALESCE(total_penerimaan_subquery.total_penerimaan, 0) AS total_penerimaan
-        ";
-
-        return $this->asArray()
-            ->select($select, false) // <-- penting: jangan di-escape
-            ->join('stock_details', 'stock_details.id = stock_details2.stock_detail_id')
+            ')
+            ->join('stock_details', 'stock_details.id = stock_details2.stock_detail_id', 'left')
             ->join('stock', 'stock.id = stock_details.stock_id', 'left')
             ->join('suppliers', 'suppliers.id = stock_details2.supplier_id', 'left')
-            ->join('rm_purchase_orders', 'rm_purchase_orders.po_no = stock_details2.no_po')
+            ->join('rm_purchase_orders', 'rm_purchase_orders.po_no = stock_details2.no_po', 'left')
+            ->join('rm_purchase_order_details', 'rm_purchase_order_details.rm_purchase_order_id = rm_purchase_orders.id', 'left')
             ->join('barang_master', 'barang_master.id = stock.barang1_id', 'left')
             ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = stock.barang2_id', 'left')
             ->join('satuans', 'satuans.id = barang_master_spesifikasi.satuan_1', 'left')
@@ -888,13 +890,25 @@ class StockDetail2Model extends Model
                 'total_penerimaan_subquery.no_penerimaan_barang = stock_details.no_dokumen 
             AND total_penerimaan_subquery.spesifikasi_id = stock.barang2_id',
                 'left'
-            )
-            // ->where('stock_details2.stock_id', $stockID)
-            ->where($condition)
-            ->where('stock_details2.qty_diterima', NULL)
-            ->groupBy('stock_details2.stock_id')
-            ->having('stok_total >', 0)
-            ->orderBy('MIN(stock_details.createdAt)', 'ASC', false) // jangan di-escape
+             );
+
+        // Kondisi dinamis
+        foreach ($condition as $field => $value) {
+            if (is_array($value)) {
+                $builder->whereIn($field, $value);
+            } else {
+                $builder->where($field, $value);
+            }
+        }
+
+        return $builder
+            ->groupBy('
+                stock_details2.stock_dokumen,
+                stock.id
+            ')
+            ->whereIn('stock.barang2_id', $spesifikasiId)
+            ->having('stok_total_diterima =', NULL)
+            ->orderBy('stock_details.createdAt', 'ASC')
             ->findAll();
     }
 
@@ -903,18 +917,18 @@ class StockDetail2Model extends Model
 
         $select = "
             CONCAT(barang_master.barang_name, '', barang_master_spesifikasi.spesifikasi) AS barang,
-            MIN(suppliers.name) AS supplier_name,
-            MIN(stock_details2.id) AS id,
+            suppliers.name AS supplier_name,
+            stock_details2.id AS id,
             stock_details2.bc_id,
             stock_details2.no_aju,
             stock.tipe_barang,
             stock.company_id,
             satuans.kode_satuan,
-            MIN(stock_details2.stock_id) AS stock_id,
+            stock_details2.stock_id AS stock_id,
             stock_details2.stock_dokumen,
-            MIN(stock_details2.supplier_id) AS supplier_id,
-            MIN(stock_details.stock_date) AS stock_date,
-            MIN(stock_details.sumber) AS sumber,
+            stock_details2.supplier_id AS supplier_id,
+            rm_purchase_orders.po_date AS stock_date,
+            stock_details.sumber AS sumber,
             SUM(CASE WHEN stock_details.status = 'In' THEN stock_details2.qty ELSE 0 END)
             - SUM(CASE WHEN stock_details.status = 'Out' THEN stock_details2.qty ELSE 0 END) AS stok_total,
             SUM(CASE WHEN stock_details.status = 'In' THEN stock_details2.qty_kotor ELSE 0 END)
@@ -926,9 +940,10 @@ class StockDetail2Model extends Model
 
         return $this->asArray()
             ->select($select, false) // <-- penting: jangan di-escape
-            ->join('stock_details', 'stock_details.id = stock_details2.stock_detail_id')
+            ->join('stock_details', 'stock_details.id = stock_details2.stock_detail_id', 'left')
             ->join('stock', 'stock.id = stock_details.stock_id', 'left')
             ->join('suppliers', 'suppliers.id = stock_details2.supplier_id', 'left')
+            ->join('rm_purchase_orders', 'rm_purchase_orders.po_no = stock_details2.no_po', 'left')
             ->join('barang_master', 'barang_master.id = stock.barang1_id', 'left')
             ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = stock.barang2_id', 'left')
             ->join('satuans', 'satuans.id = barang_master_spesifikasi.satuan_1', 'left')
@@ -951,7 +966,6 @@ class StockDetail2Model extends Model
             ->where($condition)
             ->where('stock_details2.qty_diterima >', 0)
             ->groupBy('stock_details2.stock_id')
-            ->having('stok_total >', 0)
             ->orderBy('MIN(stock_details.createdAt)', 'ASC', false) // jangan di-escape
             ->findAll();
     }
@@ -1019,7 +1033,7 @@ class StockDetail2Model extends Model
                 - SUM(CASE WHEN LOWER(stock_details.status) = "out" THEN stock_details2.qty_diterima ELSE 0 END) AS stok_total
 
             ')
-            ->join('stock_details', 'stock_details.id = stock_details2.stock_detail_id')
+            ->join('stock_details', 'stock_details.id = stock_details2.stock_detail_id', 'left')
             ->join('stock', 'stock.id = stock_details.stock_id', 'left')
             ->join('suppliers', 'suppliers.id = stock_details2.supplier_id', 'left')
             ->join('barang_master', 'barang_master.id = stock.barang1_id', 'left')
