@@ -545,7 +545,7 @@
                     'production_result_detail_id': '<?= $bj->id; ?>',
                     'barang1_id': '<?= $bj->barang1_id; ?>',
                     'barang2_id': '<?= $bj->barang2_id; ?>',
-                    'barang_name': "<?= str_replace('"', '\"', $bj->barang_name) ?>",
+                    'barang_name': "<?= str_replace('"', '\"', $bj->nama_barang) ?>",
                     'kode_barang': '<?= $bj->kode_barang; ?>',
                     'kode_satuan': '<?= $bj->kode_satuan; ?>',
                     'nama_barang': "<?= str_replace('"', '\"', $bj->nama_barang) ?>",
@@ -1033,68 +1033,6 @@
         });
 
         $(".btn-add-barang").click(function() {
-            // let detail_work_order = $(".kode_barang_add option:selected").data("detail_work_order") ? $(".kode_barang_add option:selected").data("detail_work_order") : "";
-            // let barang1_id = $(".kode_barang_add option:selected").data("barang1_id") ? $(".kode_barang_add option:selected").data("barang1_id") : "";
-            // let barang2_id = $(".kode_barang_add option:selected").data("barang2_id") ? $(".kode_barang_add option:selected").data("barang2_id") : "";
-            // let barang_name = $(".kode_barang_add option:selected").data("barang_name") ? $(".kode_barang_add option:selected").data("barang_name") : "";
-
-            // let kode_barang = $(".kode_barang_add option:selected").data("kode_barang") ? $(".kode_barang_add option:selected").data("kode_barang") : "";
-            // let kode_satuan = $(".kode_barang_add option:selected").data("kode_satuan") ? $(".kode_barang_add option:selected").data("kode_satuan") : "";
-            // let nama_barang = $(".kode_barang_add option:selected").data("nama_barang") ? $(".kode_barang_add option:selected").data("nama_barang") : "";
-            // let warehouse_id = $(".kode_barang_add option:selected").data("warehouse_id") ? $(".kode_barang_add option:selected").data("warehouse_id") : "";
-
-            // let divisi_id = $(".kode_barang_add option:selected").data("divisi_id") ? $(".kode_barang_add option:selected").data("divisi_id") : "";
-            // let note = $(".kode_barang_add option:selected").data("note") ? $(".kode_barang_add option:selected").data("note") : "";
-            // let qty_jadi = $(".qty_barang_add").val() ?? "";
-            // let berat_isi_jadi = $(".kg_barang_add").val() ?? "";
-
-            // let qty_isi_jadi = $(".qty_kg_barang_add").val() ?? "";
-            // let type_barang = $(".kode_barang_add option:selected").data("type_barang") ? $(".kode_barang_add option:selected").data("type_barang") : "";
-            // let type_barang_text = $(".kode_barang_add option:selected").data("type_barang_text") ? $(".kode_barang_add option:selected").data("type_barang_text") : "";
-            // let unit = $(".kode_barang_add option:selected").data("unit") ? $(".kode_barang_add option:selected").data("unit") : "";
-
-            // // Check if the item with the same barang1_id and barang2_id already exists
-            // let exists = list_items_barang_jadi.some(item => item.barang1_id === barang1_id && item.barang2_id === barang2_id);
-
-            // if (exists) {
-            //     Swal.fire({
-            //         icon: 'error',
-            //         title: 'Barang sudah ada',
-            //         confirmButtonColor: '#4e73df',
-            //         confirmButtonText: 'Ok'
-            //     });
-            // } else {
-            //     list_items_barang_jadi.push({
-            //         'barang_detail_id': getID(),
-            //         'detail_work_order': detail_work_order,
-            //         'barang1_id': barang1_id,
-            //         'barang2_id': barang2_id,
-            //         'barang_name': barang_name,
-            //         'kode_barang': kode_barang,
-            //         'kode_satuan': kode_satuan,
-            //         'nama_barang': nama_barang,
-            //         'warehouse_id': warehouse_id,
-            //         'divisi_id': divisi_id,
-            //         'note': note,
-            //         'qty': qty_jadi,
-            //         'qty2': berat_isi_jadi,
-            //         'qty_isi': qty_isi_jadi,
-            //         'qty_jadi': qty_jadi,
-            //         'berat_isi_jadi': berat_isi_jadi,
-            //         'qty_isi_jadi': qty_isi_jadi,
-            //         'type_barang': type_barang,
-            //         'type_barang_text': type_barang_text,
-            //         'unit': unit,
-            //     });
-            //     drawTableBarangJadi();
-
-            //     $(".kode_barang_add").val("").change();
-            //     $(".satuan_barang_add").val("");
-            //     $(".qty_barang_add").val("");
-            //     $(".kg_barang_add").val("");
-            //     $(".qty_kg_barang_add").val("");
-            //     $('#add_barang_produksi').modal('hide');
-            // }
             tempBarangList.forEach(t => {
                 list_items_barang_jadi.push({
                     barang_detail_id: getID(),
