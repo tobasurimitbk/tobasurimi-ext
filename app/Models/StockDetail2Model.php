@@ -890,7 +890,7 @@ class StockDetail2Model extends Model
                 'total_penerimaan_subquery.no_penerimaan_barang = stock_details.no_dokumen 
             AND total_penerimaan_subquery.spesifikasi_id = stock.barang2_id',
                 'left'
-             );
+            );
 
         // Kondisi dinamis
         foreach ($condition as $field => $value) {
@@ -1125,6 +1125,9 @@ class StockDetail2Model extends Model
             ->join('jasa_vendor_in', 'jasa_vendor_in.no_penerimaan_surat_jalan = stock_details2.no_dokumen', 'left')
             ->join('vendors', 'vendors.id = jasa_vendor_in.vendor_id', 'left')
             ->where($condition)
+            ->where('stock.deletedAt', null)
+            ->where('stock_details.deletedAt', null)
+            ->where('stock_details2.deletedAt', null)
             ->groupBy([
                 'stock_details2.stock_dokumen',
                 'stock_details2.bc_id',
@@ -1204,6 +1207,9 @@ class StockDetail2Model extends Model
             ->join('satuans', 'satuans.id = barang_master_spesifikasi.satuan_1', 'left')
             ->join('rm_purchase_orders', 'rm_purchase_orders.po_no = stock_details2.no_po', 'left')
             ->where($condition)
+            ->where('stock.deletedAt', null)
+            ->where('stock_details.deletedAt', null)
+            ->where('stock_details2.deletedAt', null)
             ->groupBy([
                 'stock_details2.stock_dokumen',
                 'stock_details2.bc_id',
