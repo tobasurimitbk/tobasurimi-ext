@@ -45,7 +45,7 @@
                             <tr>
                                 <th>No.</th>
                                 <th onclick="changeSort('wo_no')" class="sort">Kode Hasil Produksi</th>
-                                <th onclick="changeSort('kode_barang')" class="sort">Kode Produksi</th>
+                                <th onclick="changeSort('kode_barang')" class="sort">Kode Work Order</th>
                                 <th onclick="changeSort('tanggal_hasil_barang')" class="sort">Tanggal Hasil Produksi</th>
                                 <th onclick="changeSort('kode_barang')" class="sort">Kode Barang</th>
                                 <th onclick="changeSort('nama_barang')" class="sort">Nama Barang</th>

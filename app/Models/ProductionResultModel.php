@@ -44,63 +44,91 @@ class ProductionResultModel extends Model
     {
         $availableSort = [
             'productionCode' => 'production_results.pr_no',
-            'workOrderCode' => 'suppliers.kode',
-            'barangCode'    => 'barangs.kode_barang',
-            'barangName'    => 'barangs.nama_barang',
-            'warehouseName' => 'warehouses.warehouse_name',
-            'createdAt'     => 'production_results.createdAt'
+            'workOrderCode'  => 'work_orders.wo_no',
+            'barangCode'     => 'barang_master.kode_barang',
+            'barangName'     => 'barangName', // alias GROUP_CONCAT
+            'warehouseName'  => 'warehouses.warehouse_name',
+            'createdAt'      => 'production_results.createdAt'
         ];
         $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
 
-        $sort = $availableSort[$addCondition['sort'] ?? 'createdAt'] ?? 'production_results.createdAt';
+        $sort     = $availableSort[$addCondition['sort'] ?? 'createdAt'] ?? 'production_results.createdAt';
         $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'DESC';
 
-        $selectQry = "production_results.*, 
-                      DATE_FORMAT(production_results.receive_date, '%d/%m/%Y') AS receives_date,
-                      work_orders.wo_no AS wo_no,
-                      barang_master.kode_barang AS barangCode,
-                      work_order_details.nama_barang AS barangName
-                      ";
-        $productionResDataQry = $this->asObject()
+        // SELECT dengan GROUP_CONCAT agar nama barang 1 row
+        $selectQry = "
+        production_results.*,
+        DATE_FORMAT(production_results.receive_date, '%d/%m/%Y') AS receives_date,
+        work_orders.wo_no AS wo_no,
+        barang_master.kode_barang AS barangCode,
+        GROUP_CONCAT(DISTINCT work_order_details.nama_barang ORDER BY work_order_details.nama_barang SEPARATOR ', ') AS barangName
+    ";
+
+        $builder = $this->asObject()
             ->select($selectQry)
             ->where($condition)
-            ->join('work_orders', 'work_orders.id = production_results.work_order_id', 'left')
-            ->join('work_order_details', 'work_order_details.work_order_id = production_results.work_order_id', 'left')
-            ->join('barang_master', 'barang_master.id = work_order_details.barang1_id', 'left')
-            // ->groupBy('production_results.work_order_id')
+            // === JOIN pakai FIND_IN_SET karena work_order_id bisa '33,34' ===
+            ->join(
+                'work_orders',
+                'FIND_IN_SET(work_orders.id, production_results.work_order_id)',
+                'left'
+            )
+            ->join(
+                'work_order_details',
+                'FIND_IN_SET(work_order_details.work_order_id, production_results.work_order_id)',
+                'left'
+            )
+            ->join(
+                'barang_master',
+                'barang_master.id = work_order_details.barang1_id',
+                'left'
+            )
+            ->groupBy('production_results.id')
             ->orderBy($sort, $sortType);
 
-        $totalData = $productionResDataQry->countAllResults(false);
+        // Hitung total semua data sebelum filter tambahan
+        $totalData = $builder->countAllResults(false);
 
-        if ($addCondition['search'] || $addCondition['dateStart'] || $addCondition['dateEnd'] || $addCondition['month']) {
-            $productionResDataQry->groupStart();
+        // ===== Filter pencarian & tanggal =====
+        if (
+            !empty($addCondition['search']) ||
+            !empty($addCondition['dateStart']) ||
+            !empty($addCondition['dateEnd']) ||
+            !empty($addCondition['month'])
+        ) {
+            $builder->groupStart();
         }
 
-        if ($addCondition['search']) {
-            $productionResDataQry
-                ->like('production_results.pr_no', $addCondition['search'], 'after')
+        if (!empty($addCondition['search'])) {
+            $builder->like('production_results.pr_no', $addCondition['search'], 'after')
                 ->orLike('work_orders.wo_no', $addCondition['search'], 'after')
-                ->orLike('barang_master.barang_name', $addCondition['search'], 'after');
+                ->orLike('work_order_details.nama_barang', $addCondition['search'], 'after');
         }
 
-        if ($addCondition['dateStart']) {
-            $productionResDataQry->where('production_results.receive_date >=', $addCondition['dateStart']);
+        if (!empty($addCondition['dateStart'])) {
+            $builder->where('production_results.receive_date >=', $addCondition['dateStart']);
         }
 
-        if ($addCondition['month']) {
-            $productionResDataQry->where('MONTH(production_results.receive_date)', $addCondition['month']);
+        if (!empty($addCondition['month'])) {
+            $builder->where('MONTH(production_results.receive_date)', $addCondition['month']);
         }
 
-        if ($addCondition['dateEnd']) {
-            $productionResDataQry->where('production_results.receive_date <=', $addCondition['dateEnd']);
+        if (!empty($addCondition['dateEnd'])) {
+            $builder->where('production_results.receive_date <=', $addCondition['dateEnd']);
         }
 
-        if ($addCondition['search'] || $addCondition['dateStart'] || $addCondition['dateEnd'] || $addCondition['month']) {
-            $productionResDataQry->groupEnd();
+        if (
+            !empty($addCondition['search']) ||
+            !empty($addCondition['dateStart']) ||
+            !empty($addCondition['dateEnd']) ||
+            !empty($addCondition['month'])
+        ) {
+            $builder->groupEnd();
         }
 
-        $totalFilteredData = $productionResDataQry->countAllResults(false);
-        $data = $productionResDataQry->findAll($limit, $offset);
+        $totalFilteredData = $builder->countAllResults(false);
+        $data = $builder->findAll($limit, $offset);
+
         return [
             'data'              => $data,
             'totalData'         => $totalData,
