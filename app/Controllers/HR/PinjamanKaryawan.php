@@ -473,6 +473,7 @@ class PinjamanKaryawan extends BaseController
                 ->where('pinjaman_karyawan.month_year', $yearMonth)
                 ->where('pinjaman_karyawan.division_id', $divisiId)
                 ->where('pinjaman_karyawan.is_boleh_minjam', '1')
+                ->where('pinjaman_karyawan.is_ambil', '1')
                 ->findAll(),
             'yearMonth' => $yearMonth
         ];

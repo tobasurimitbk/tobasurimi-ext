@@ -474,7 +474,24 @@
                             </div>
                         </div>
                     </div>
+                    <div class="text-end">
+                        <button type="button" class="btn btn-show-form btn-add" id="btn-tambah-sementara">
+                            <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah ke List
+                        </button>
+                    </div>
                 </form>
+                <table class="table table-sm table-bordered mt-3" id="tbl-temp-barang">
+                    <thead>
+                        <tr>
+                            <th>Kode</th>
+                            <th>Nama</th>
+                            <th>Qty</th>
+                            <th>Berat Isi</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-hide-form btn-discard btn-discard-add-barang mr-2">Kembali</button>
@@ -492,6 +509,28 @@
     let list_items_barang_digunakan_penolong = [];
     let list_items_barang_scrap = [];
     let list_items_barang_filling = [];
+    let tempBarangList = [];
+
+    function drawTempTable() {
+        let tbody = $("#tbl-temp-barang tbody");
+        tbody.empty();
+
+        tempBarangList.forEach(item => {
+            tbody.append(`
+          <tr data-uid="${item.uid}">
+            <td>${item.kode_barang}</td>
+            <td>${item.barang_name}</td>
+            <td>${item.qty}</td>
+            <td>${item.berat_isi_jadi}</td>
+            <td>
+              <button class="btn btn-sm btn-primary btn-edit-temp">Edit</button>
+              <button class="btn btn-sm btn-danger btn-del-temp">Hapus</button>
+            </td>
+          </tr>
+        `);
+        });
+    }
+
 
     $(document).ready(function() {
         <?php if (isset($data)) : ?>
@@ -630,7 +669,7 @@
                             data-type_barang_text="${item.type_barang_text}" 
                             data-unit="${item.unit}" 
                             
-                            value="${item.kode_barang}">(${item.kode_barang}) ${item.barang_name + " - " + item.spesifikasi}</option>`);
+                            value="${item.barang2_id}">(${item.kode_barang}) ${item.barang_name + " - " + item.spesifikasi}</option>`);
                     });
                     $(".kode_barang_add").val("").change();
                     // drawTableBarangJadi();
@@ -892,7 +931,8 @@
             $('#add_barang_produksi').modal('hide');
         });
 
-        $(".btn-add-barang").click(function() {
+        $("#btn-tambah-sementara").click(function() {
+            let uid = "tmp-" + Date.now();
             let detail_work_order = $(".kode_barang_add option:selected").data("detail_work_order") ? $(".kode_barang_add option:selected").data("detail_work_order") : "";
             let barang1_id = $(".kode_barang_add option:selected").data("barang1_id") ? $(".kode_barang_add option:selected").data("barang1_id") : "";
             let barang2_id = $(".kode_barang_add option:selected").data("barang2_id") ? $(".kode_barang_add option:selected").data("barang2_id") : "";
@@ -913,8 +953,19 @@
             let type_barang_text = $(".kode_barang_add option:selected").data("type_barang_text") ? $(".kode_barang_add option:selected").data("type_barang_text") : "";
             let unit = $(".kode_barang_add option:selected").data("unit") ? $(".kode_barang_add option:selected").data("unit") : "";
 
+            if (qty_jadi <= 0) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Qty tidak valid',
+                    text: 'Qty harus lebih besar dari 0',
+                    confirmButtonColor: '#4e73df',
+                    confirmButtonText: 'Ok'
+                });
+                return; // hentikan proses
+            }
+
             // Check if the item with the same barang1_id and barang2_id already exists
-            let exists = list_items_barang_jadi.some(item => item.barang1_id === barang1_id && item.barang2_id === barang2_id);
+            let exists = tempBarangList.some(item => item.barang1_id === barang1_id && item.barang2_id === barang2_id);
 
             if (exists) {
                 Swal.fire({
@@ -924,8 +975,8 @@
                     confirmButtonText: 'Ok'
                 });
             } else {
-                list_items_barang_jadi.push({
-                    'barang_detail_id': getID(),
+                tempBarangList.push({
+                    'uid': uid,
                     'detail_work_order': detail_work_order,
                     'barang1_id': barang1_id,
                     'barang2_id': barang2_id,
@@ -946,15 +997,107 @@
                     'type_barang_text': type_barang_text,
                     'unit': unit,
                 });
-                drawTableBarangJadi();
+                drawTempTable();
 
                 $(".kode_barang_add").val("").change();
                 $(".satuan_barang_add").val("");
                 $(".qty_barang_add").val("");
                 $(".kg_barang_add").val("");
                 $(".qty_kg_barang_add").val("");
-                $('#add_barang_produksi').modal('hide');
             }
+        });
+
+        $(document).on("click", ".btn-del-temp", function() {
+            let uid = $(this).closest("tr").data("uid");
+            tempBarangList = tempBarangList.filter(item => item.uid !== uid);
+            drawTempTable();
+        });
+
+        $(document).on("click", ".btn-edit-temp", function() {
+            let uid = $(this).closest("tr").data("uid");
+            let item = tempBarangList.find(i => i.uid === uid);
+            if (item) {
+                $(".kode_barang_add").val(item.barang2_id).change();
+                $(".qty_barang_add").val(item.qty).change();
+                $(".kg_barang_add").val(item.berat_isi_jadi);
+                tempBarangList = tempBarangList.filter(i => i.uid !== uid);
+                drawTempTable();
+            }
+        });
+
+        $(".btn-add-barang").click(function() {
+            // let detail_work_order = $(".kode_barang_add option:selected").data("detail_work_order") ? $(".kode_barang_add option:selected").data("detail_work_order") : "";
+            // let barang1_id = $(".kode_barang_add option:selected").data("barang1_id") ? $(".kode_barang_add option:selected").data("barang1_id") : "";
+            // let barang2_id = $(".kode_barang_add option:selected").data("barang2_id") ? $(".kode_barang_add option:selected").data("barang2_id") : "";
+            // let barang_name = $(".kode_barang_add option:selected").data("barang_name") ? $(".kode_barang_add option:selected").data("barang_name") : "";
+
+            // let kode_barang = $(".kode_barang_add option:selected").data("kode_barang") ? $(".kode_barang_add option:selected").data("kode_barang") : "";
+            // let kode_satuan = $(".kode_barang_add option:selected").data("kode_satuan") ? $(".kode_barang_add option:selected").data("kode_satuan") : "";
+            // let nama_barang = $(".kode_barang_add option:selected").data("nama_barang") ? $(".kode_barang_add option:selected").data("nama_barang") : "";
+            // let warehouse_id = $(".kode_barang_add option:selected").data("warehouse_id") ? $(".kode_barang_add option:selected").data("warehouse_id") : "";
+
+            // let divisi_id = $(".kode_barang_add option:selected").data("divisi_id") ? $(".kode_barang_add option:selected").data("divisi_id") : "";
+            // let note = $(".kode_barang_add option:selected").data("note") ? $(".kode_barang_add option:selected").data("note") : "";
+            // let qty_jadi = $(".qty_barang_add").val() ?? "";
+            // let berat_isi_jadi = $(".kg_barang_add").val() ?? "";
+
+            // let qty_isi_jadi = $(".qty_kg_barang_add").val() ?? "";
+            // let type_barang = $(".kode_barang_add option:selected").data("type_barang") ? $(".kode_barang_add option:selected").data("type_barang") : "";
+            // let type_barang_text = $(".kode_barang_add option:selected").data("type_barang_text") ? $(".kode_barang_add option:selected").data("type_barang_text") : "";
+            // let unit = $(".kode_barang_add option:selected").data("unit") ? $(".kode_barang_add option:selected").data("unit") : "";
+
+            // // Check if the item with the same barang1_id and barang2_id already exists
+            // let exists = list_items_barang_jadi.some(item => item.barang1_id === barang1_id && item.barang2_id === barang2_id);
+
+            // if (exists) {
+            //     Swal.fire({
+            //         icon: 'error',
+            //         title: 'Barang sudah ada',
+            //         confirmButtonColor: '#4e73df',
+            //         confirmButtonText: 'Ok'
+            //     });
+            // } else {
+            //     list_items_barang_jadi.push({
+            //         'barang_detail_id': getID(),
+            //         'detail_work_order': detail_work_order,
+            //         'barang1_id': barang1_id,
+            //         'barang2_id': barang2_id,
+            //         'barang_name': barang_name,
+            //         'kode_barang': kode_barang,
+            //         'kode_satuan': kode_satuan,
+            //         'nama_barang': nama_barang,
+            //         'warehouse_id': warehouse_id,
+            //         'divisi_id': divisi_id,
+            //         'note': note,
+            //         'qty': qty_jadi,
+            //         'qty2': berat_isi_jadi,
+            //         'qty_isi': qty_isi_jadi,
+            //         'qty_jadi': qty_jadi,
+            //         'berat_isi_jadi': berat_isi_jadi,
+            //         'qty_isi_jadi': qty_isi_jadi,
+            //         'type_barang': type_barang,
+            //         'type_barang_text': type_barang_text,
+            //         'unit': unit,
+            //     });
+            //     drawTableBarangJadi();
+
+            //     $(".kode_barang_add").val("").change();
+            //     $(".satuan_barang_add").val("");
+            //     $(".qty_barang_add").val("");
+            //     $(".kg_barang_add").val("");
+            //     $(".qty_kg_barang_add").val("");
+            //     $('#add_barang_produksi').modal('hide');
+            // }
+            tempBarangList.forEach(t => {
+                list_items_barang_jadi.push({
+                    barang_detail_id: getID(),
+                    ...t // spread: semua field di t ikut dimasukkan
+                });
+            });
+            drawTableBarangJadi(); // fungsi tabel utama
+            tempBarangList = []; // reset
+            $("#tbl-temp-barang tbody").empty();
+            $('#add_barang_produksi').modal('hide');
         });
 
         $('.qty_barang_add, .kg_barang_add').on('input change', function() {
@@ -1228,12 +1371,12 @@
                             data-divisi_id="${item.divisi_id}" 
                             data-note="${item.note}" 
                             data-qty="${0}" 
-                            data-qty2="${1}" 
+                            data-qty2="${0}" 
                             data-qty_isi="${0}" 
                             data-type_barang="${item.type_barang}" 
                             data-type_barang_text="${item.type_barang_text}" 
                             data-unit="${item.unit}" 
-                            value="${item.kode_barang}">(${item.kode_barang}) ${item.barang_name + " - " + item.spesifikasi}</option>`);
+                            value="${item.barang2_id}">(${item.kode_barang}) ${item.barang_name + " - " + item.spesifikasi}</option>`);
                         });
                         $(".kode_barang_add").val("").change();
                         stopLoading();
@@ -1714,13 +1857,16 @@
             var valueQtyBarangJadi = $('input.qty-barang-jadi[data-index="' + index + '"]').val();
             var valueBeratBarangJadi = $('input.berat-barang-jadi[data-index="' + index + '"]').val();
 
+            console.log(index, valueQtyBarangJadi, valueBeratBarangJadi);
+
+
             var jumlahQtyBeratJadi = parseFloat(valueQtyBarangJadi) * parseFloat(valueBeratBarangJadi);
             $('input.qty-berat-barang-jadi[data-index="' + index + '"]').val(jumlahQtyBeratJadi);
 
             // Simpan nilai baru
-            list_items_barang_jadi[index].qty_jadi = valueQtyBarangJadi;
-            list_items_barang_jadi[index].berat_isi_jadi = valueBeratBarangJadi;
-            list_items_barang_jadi[index].qty_isi_jadi = jumlahQtyBeratJadi.toFixed(2);
+            list_items_barang_jadi[index].qty = valueQtyBarangJadi;
+            list_items_barang_jadi[index].qty2 = valueBeratBarangJadi;
+            list_items_barang_jadi[index].qty_isi = jumlahQtyBeratJadi.toFixed(2);
 
             // Render ulang untuk memperbarui footer
             drawTableBarangJadi();

@@ -87,7 +87,7 @@
                 <td>Upah Pokok<br>(Rp)</td>
                 <td>Tunj+Cad<br>(Rp)</td>
                 <td>Lembur<br>(Rp)</td>
-                <td>Tunj.Ns/Mbl/Srg<br>(Rp)</td>
+                <!-- <td>Tunj.Ns/Mbl/Srg<br>(Rp)</td> -->
                 <td>Total Upah<br>(Rp)</td>
                 <td>Potongan <br>(Rp)</td>
                 <td>Upah Bersih <br>(Rp)</td>
@@ -103,7 +103,7 @@
                     <td><?= number_format($d['payrollTotal'][0]['upahBersih'], 2, ',', '.')  ?></td>
                     <td><?= number_format(($d['payrollTotal'][0]['tunjangan'] + $d['payrollTotal'][0]['cadangan']), 2, ',', '.')  ?></td>
                     <td><?= number_format(($d['payrollTotal'][0]['lembur']), 2, ',', '.')  ?></td>
-                    <td><?= number_format(0, 2, ',', '.')  ?></td>
+                    <!-- <td><?= number_format(0, 2, ',', '.')  ?></td> -->
                     <td><?= number_format(($d['payrollTotal'][0]['upahBersih'] + $d['payrollTotal'][0]['tunjangan'] + $d['payrollTotal'][0]['cadangan']), 2, ',', '.')  ?></td>
                     <td><?= number_format($d['payrollTotal'][0]['potongan'], 2, ',', '.')  ?></td>
                     <td><?= number_format(($d['payrollTotal'][0]['upahBersih'] + $d['payrollTotal'][0]['tunjangan'] + $d['payrollTotal'][0]['cadangan'] - $d['payrollTotal'][0]['potongan']), 2, ',', '.')  ?></td>
@@ -117,7 +117,7 @@
                 <td><?= number_format($data['upahPokokTotal'], 2, ',', '.')  ?></td>
                 <td><?= number_format($data['tunjanganPlusCadangan'], 2, ',', '.')  ?></td>
                 <td><?= number_format($data['lemburTotal'], 2, ',', '.')  ?></td>
-                <td><?= number_format(0, 2, ',', '.') ?></td>
+                <!-- <td><?= number_format(0, 2, ',', '.') ?></td> -->
                 <td><?= number_format($data['totalUpah'], 2, ',', '.') ?></td>
                 <td><?= number_format($data['potongan'], 2, ',', '.')  ?></td>
                 <td><?= number_format($data['upahBersih'], 2, ',', '.') ?></td>

@@ -103,7 +103,7 @@
                 <?php
                 $gajiConjunctionModel = new \App\Models\GajiConjunctionModel();
                 $uangMakanNominal = $gajiConjunctionModel->getNominalByKomponenName(
-                    "Uang Makan",
+                    "UANG MAKAN",
                     $p['employee_id']
                 );
                 $tunjanganKesejahteraanNominal = $gajiConjunctionModel->getNominalByKomponenName(
@@ -115,7 +115,7 @@
                 ?>
                 <tr align="center">
                     <td><?= $p['no'] ?></td>
-                    <td><?= $p['id'] ?></td>
+                    <td><?= $p['nip'] ?></td>
                     <td><?= $p['name'] ?></td>
                     <td><?= $p['hariKerja'] ?></td>
                     <td><?= $p['jumlahUpah'] ?></td>
