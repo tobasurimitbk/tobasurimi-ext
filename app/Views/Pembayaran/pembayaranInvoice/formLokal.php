@@ -222,6 +222,7 @@
     const csrfToken = '<?= csrf_token() ?>';
     var dataList = [];
     var totalPembayaran = 0;
+    var sisaPayForKeteranganCondition = 0;
 
     $(document).ready(function() {
 
@@ -941,6 +942,7 @@
     }
 
     function drawTable(dataList, totalPembayaran, totalSudahDiBayar) {
+
         const table = $('#dataTable');
         table.find('tbody').empty();
 
@@ -1003,6 +1005,7 @@
         total_invoice = isNaN(total_invoice) ? 0 : total_invoice;
         limit_bayar = isNaN(limit_bayar) ? 0 : limit_bayar;
         totalSudahDiBayar = isNaN(totalSudahDiBayar) ? 0 : totalSudahDiBayar;
+        sisaPayForKeteranganCondition = total_amount - total_invoice;
 
         // Tambahkan baris untuk Total Pembayaran, Total Sudah Dibayar, dan Sisa Pembayaran
         table.find('tbody').append(`
@@ -1028,7 +1031,7 @@
                     <input 
                         autocomplete="one-time-code" 
                         data-id="" 
-                        onkeyup="this.value = greatFormatRupiah(this.value)"
+                        onkeyup="this.value = greatFormatRupiah(this.value); updateKeterangan();" 
                         class="form-control total-bayar trigger-input" 
                         type="text" 
                         value="" 
@@ -1045,6 +1048,8 @@
             let numberValue = parseInt(cleanValue) || 0; // Konversi ke angka, default 0
 
             let sisaPembayaran = total_amount - total_invoice; // Hitung sisa pembayaran
+
+            sisaPembayaran;
 
             // Validasi nilai input
             if (numberValue > sisaPembayaran) {
@@ -1103,21 +1108,30 @@
     };
 
     function updateKeterangan() {
-        // Ambil elemen <select> dan <textarea>
         const noDokumenElement = document.getElementById('no_dokumen');
-        const noBuktiPembayaranElement = document.getElementById('no_bukti_pembayaran');
         const customerElement = document.getElementById('customer');
         const textareaElement = document.getElementById('keterangan');
+        const totalBayarElement = $('input[name="total_bayar"]').val();
 
-        // Ambil teks dari elemen no_bukti_pembayaran
-        const noBuktiPembayaranText = noBuktiPembayaranElement.value.trim();
+        // Ambil nilai bayar (hilangkan format rupiah biar bisa dibandingkan angka)
 
-        // Ambil semua opsi yang dipilih dari elemen <select>
-        const selectedNoDokumen = Array.from(noDokumenElement.selectedOptions).map(option => `${option.text}`);
+        let totalBayar = destroyFormatRupiah(totalBayarElement) || 0;
+
+        // Ambil customer & dokumen
+        const selectedNoDokumen = Array.from(noDokumenElement.selectedOptions).map(option => option.text);
         const selectedCustomer = Array.from(customerElement.selectedOptions).map(option => option.text);
 
-        // Gabungkan nilai opsi yang dipilih ke dalam textarea
-        const combinedText = `${selectedCustomer[0]}; TERIMA A/ INVOICE ${selectedNoDokumen.join('; ')}`;
+        // Tentukan prefix berdasarkan kondisi
+        console.log(totalBayar, sisaPayForKeteranganCondition);
+        let prefix = "";
+        if (totalBayar == sisaPayForKeteranganCondition) {
+            prefix = "TERIMA PELUNASAN A/ INVOICE";
+        } else {
+            prefix = "TERIMA DP A/ INVOICE";
+        }
+
+        // Gabungkan
+        const combinedText = `${selectedCustomer[0]}; ${prefix} ${selectedNoDokumen.join('; ')}`;
         textareaElement.value = combinedText;
     }
 
