@@ -589,6 +589,8 @@ class PembayaranPOLokal extends BaseController
                 'amount_pajak'      => $this->request->getVar('total_pembayaran_pph'),
                 'keterangan'        => $this->request->getVar('keterangan'),
                 'akun_pajak'        =>  $akunPajakId['akun_kredit'],
+                'akun_kas'          => $this->request->getVar('akun_kas'),
+                'akun_selisih'      => $this->request->getVar('akun_selisih'),
             ]);
 
             // Hapus detail pembayaran lama sebelum insert baru
