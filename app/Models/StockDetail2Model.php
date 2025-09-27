@@ -1110,7 +1110,9 @@ class StockDetail2Model extends Model
                     sd2.stock_id = stock_details2.stock_id AND
                     sd2.bc_id = stock_details2.bc_id AND
                     sd2.no_aju = stock_details2.no_aju AND
-                    sd2.stock_dokumen = stock_details2.stock_dokumen
+                    sd2.stock_dokumen = stock_details2.stock_dokumen AND
+                    sd2.deletedAt IS NULL AND
+                    stock_details2.deletedAt IS NULL
             ) AS stok_total
         ';
 
@@ -1193,7 +1195,9 @@ class StockDetail2Model extends Model
                     sd2.stock_id = stock_details2.stock_id AND
                     sd2.bc_id = stock_details2.bc_id AND
                     sd2.no_aju = stock_details2.no_aju AND
-                    sd2.stock_dokumen = stock_details2.stock_dokumen
+                    sd2.stock_dokumen = stock_details2.stock_dokumen AND
+                    sd2.deletedAt IS NULL AND
+                    stock_details2.deletedAt IS NULL
             ) AS stok_total
         ';
 
