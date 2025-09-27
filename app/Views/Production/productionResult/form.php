@@ -1788,7 +1788,7 @@
                 <tr style="font-weight: bold;">
                     <td colspan="5"></td>
                     <td>${greatFormatRupiah(totalQtyHasil.toFixed(2))}</td>
-                    <td>${greatFormatRupiah(totalBeratIsi.toFixed(2))}</td>
+                    <td>${greatFormatRupiah(totalBeratIsi.toFixed(3))}</td>
                     <td>${greatFormatRupiah(totalQtyKg.toFixed(2))}</td>
                     <td></td>
                 </tr>
