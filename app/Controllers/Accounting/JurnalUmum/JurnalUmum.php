@@ -1948,12 +1948,14 @@ class JurnalUmum extends BaseController
                 $id_transaksi_jurnal = $this->transaksiJurnalModel->insertTransaksiJurnal($resultTransaksiJurnal);
 
                 //untuk insert ke jurnal umum
-                $multiplePoIds = str_replace(['[', ']'], '', $POlocal->multiple_po_id); // Remove brackets
-                $PoIdsArray = explode(',', $multiplePoIds); // Split the string into an array by comma
+                $multiplePoIds = str_replace(['[', ']'], '', $POlocal->multiple_po_id);
+                $PoIdsArray = explode(',', $multiplePoIds);
+
+                $totalNominal = 0;
+                $dataPOdesc = [];
+                $firstDesc = true; // ✅ penanda hanya ambil sekali
 
                 foreach ($PoIdsArray as $poId) {
-
-                    $sumValue = 0;
                     $dataPO = $this->localPOPaymentModel->asObject()
                         ->select('local_po_payments.*, local_po_payment_details.*, suppliers.name as supplier_name')
                         ->join('local_po_payment_details', 'local_po_payment_details.local_po_payment_id = local_po_payments.id', 'left')
@@ -1962,81 +1964,142 @@ class JurnalUmum extends BaseController
                         ->where('local_po_payments.deletedAt', null)
                         ->where('local_po_payment_details.deletedAt', null)
                         ->where('local_po_payment_details.rm_purchase_order_id', $poId)
-                        ->groupBy('local_po_payment_details.local_po_payment_id')
                         ->findAll();
 
+                    // Hitung total semua PO dari detail
                     foreach ($dataPO as $value) {
+                        $totalNominal += $value->total; 
+                    }
 
-                        $cleanedPO = str_replace(['[', ']', '"', "\\"], '', $value->multiple_po_no);
-                        $dataPO = $value->supplier_name . ' - ' . $cleanedPO;
-
-                        $sumValue = $value->total;
-                        $result[] = array(
-                            'id_transaksi'      => $id_transaksi_jurnal,
-                            'id_coa'            => $POlocal->akun_kas == 0 || $POlocal->akun_kas == NULL ? $UtangAR : $POlocal->akun_kas,
-                            'company_id'        => $POlocal->company_id,
-                            'divisi_id'         => $divisi,
-                            'supplier_id'       => $POlocal->supplier_id,
-                            'tanggal_jurnal'    => date('Y-m-d', strtotime(str_replace('/', '-', $POlocal->payment_date))),
-                            'debit'             => ($sumValue),
-                            'kredit'            => 0,
-                            'valas'             => '30',
-                            'kurs'              => 1,
-                            'keterangan'        => $POlocal->keterangan,
-                            'id_inputer'        => session()->get("login")->user_id
-                        );
-                        $result[] = array(
-                            'id_transaksi'      => $id_transaksi_jurnal,
-                            'id_coa'            => $POlocal->akun_selisih,
-                            'company_id'        => $POlocal->company_id,
-                            'divisi_id'         => $divisi,
-                            'supplier_id'       => $POlocal->supplier_id,
-                            'tanggal_jurnal'    => date('Y-m-d', strtotime(str_replace('/', '-', $POlocal->payment_date))),
-                            'debit'             => 0,
-                            'kredit'            => ($sumValue),
-                            'valas'             => '30',
-                            'kurs'              => 1,
-                            'keterangan'        => $POlocal->keterangan,
-                            'id_inputer'        => session()->get("login")->user_id
-                        );
-
-                        if ($value->total_pay_pph) {
-
-                            $cleanedPO = str_replace(['[', ']', '"', "\\"], '', $value->multiple_po_no);
-                            $dataPO = $value->supplier_name . ' - ' . $cleanedPO;
-
-                            $sumValue = $value->total_pay_pph;
-                            $result[] = array(
-                                'id_transaksi'      => $id_transaksi_jurnal,
-                                'id_coa'            => $POlocal->akun_pajak,
-                                'company_id'        => $POlocal->company_id,
-                                'divisi_id'         => $divisi,
-                                'supplier_id'       => $POlocal->supplier_id,
-                                'tanggal_jurnal'    => date('Y-m-d', strtotime(str_replace('/', '-', $POlocal->payment_date))),
-                                'debit'             => ($sumValue),
-                                'kredit'            => 0,
-                                'valas'             => '30',
-                                'kurs'              => 1,
-                                'keterangan'        => "PAJAK " . $POlocal->keterangan,
-                                'id_inputer'        => session()->get("login")->user_id
-                            );
-                            $result[] = array(
-                                'id_transaksi'      => $id_transaksi_jurnal,
-                                'id_coa'            => $POlocal->akun_pajak,
-                                'company_id'        => $POlocal->company_id,
-                                'divisi_id'         => $divisi,
-                                'supplier_id'       => $POlocal->supplier_id,
-                                'tanggal_jurnal'    => date('Y-m-d', strtotime(str_replace('/', '-', $POlocal->payment_date))),
-                                'debit'             => 0,
-                                'kredit'            => ($sumValue),
-                                'valas'             => '30',
-                                'kurs'              => 1,
-                                'keterangan'        => "PAJAK " . $POlocal->keterangan,
-                                'id_inputer'        => session()->get("login")->user_id
-                            );
-                        }
+                    // ✅ Deskripsi cukup sekali aja (pas loop pertama yg ada datanya)
+                    if ($firstDesc && !empty($dataPO)) {
+                        $cleanedPO = str_replace(['[', ']', '"', "\\"], '', $dataPO[0]->multiple_po_no);
+                        $dataPOdesc[] = $dataPO[0]->supplier_name . ' - ' . $cleanedPO;
+                        $firstDesc = false; // setelah sekali, nggak ambil lagi
                     }
                 }
+
+                // foreach ($PoIdsArray as $poId) {
+
+                //     $sumValue = 0;
+                //     $dataPO = $this->localPOPaymentModel->asObject()
+                //         ->select('local_po_payments.*, local_po_payment_details.*, suppliers.name as supplier_name')
+                //         ->join('local_po_payment_details', 'local_po_payment_details.local_po_payment_id = local_po_payments.id', 'left')
+                //         ->join('suppliers', 'suppliers.id = local_po_payments.supplier_id', 'left')
+                //         ->where('local_po_payments.id', $payID)
+                //         ->where('local_po_payments.deletedAt', null)
+                //         ->where('local_po_payment_details.deletedAt', null)
+                //         ->where('local_po_payment_details.rm_purchase_order_id', $poId)
+                //         ->groupBy('local_po_payment_details.local_po_payment_id')
+                //         ->findAll();
+
+                //     foreach ($dataPO as $value) {
+
+                //         $cleanedPO = str_replace(['[', ']', '"', "\\"], '', $value->multiple_po_no);
+                //         $dataPO = $value->supplier_name . ' - ' . $cleanedPO;
+
+                //         $sumValue = $value->total;
+                //         $result[] = array(
+                //             'id_transaksi'      => $id_transaksi_jurnal,
+                //             'id_coa'            => $POlocal->akun_kas == 0 || $POlocal->akun_kas == NULL ? $UtangAR : $POlocal->akun_kas,
+                //             'company_id'        => $POlocal->company_id,
+                //             'divisi_id'         => $divisi,
+                //             'supplier_id'       => $POlocal->supplier_id,
+                //             'tanggal_jurnal'    => date('Y-m-d', strtotime(str_replace('/', '-', $POlocal->payment_date))),
+                //             'debit'             => ($sumValue),
+                //             'kredit'            => 0,
+                //             'valas'             => '30',
+                //             'kurs'              => 1,
+                //             'keterangan'        => $POlocal->keterangan,
+                //             'id_inputer'        => session()->get("login")->user_id
+                //         );
+                //         $result[] = array(
+                //             'id_transaksi'      => $id_transaksi_jurnal,
+                //             'id_coa'            => $POlocal->akun_selisih,
+                //             'company_id'        => $POlocal->company_id,
+                //             'divisi_id'         => $divisi,
+                //             'supplier_id'       => $POlocal->supplier_id,
+                //             'tanggal_jurnal'    => date('Y-m-d', strtotime(str_replace('/', '-', $POlocal->payment_date))),
+                //             'debit'             => 0,
+                //             'kredit'            => ($sumValue),
+                //             'valas'             => '30',
+                //             'kurs'              => 1,
+                //             'keterangan'        => $POlocal->keterangan,
+                //             'id_inputer'        => session()->get("login")->user_id
+                //         );
+
+                //         if ($value->total_pay_pph) {
+
+                //             $cleanedPO = str_replace(['[', ']', '"', "\\"], '', $value->multiple_po_no);
+                //             $dataPO = $value->supplier_name . ' - ' . $cleanedPO;
+
+                //             $sumValue = $value->total_pay_pph;
+                //             $result[] = array(
+                //                 'id_transaksi'      => $id_transaksi_jurnal,
+                //                 'id_coa'            => $POlocal->akun_pajak,
+                //                 'company_id'        => $POlocal->company_id,
+                //                 'divisi_id'         => $divisi,
+                //                 'supplier_id'       => $POlocal->supplier_id,
+                //                 'tanggal_jurnal'    => date('Y-m-d', strtotime(str_replace('/', '-', $POlocal->payment_date))),
+                //                 'debit'             => ($sumValue),
+                //                 'kredit'            => 0,
+                //                 'valas'             => '30',
+                //                 'kurs'              => 1,
+                //                 'keterangan'        => "PAJAK " . $POlocal->keterangan,
+                //                 'id_inputer'        => session()->get("login")->user_id
+                //             );
+                //             $result[] = array(
+                //                 'id_transaksi'      => $id_transaksi_jurnal,
+                //                 'id_coa'            => $POlocal->akun_pajak,
+                //                 'company_id'        => $POlocal->company_id,
+                //                 'divisi_id'         => $divisi,
+                //                 'supplier_id'       => $POlocal->supplier_id,
+                //                 'tanggal_jurnal'    => date('Y-m-d', strtotime(str_replace('/', '-', $POlocal->payment_date))),
+                //                 'debit'             => 0,
+                //                 'kredit'            => ($sumValue),
+                //                 'valas'             => '30',
+                //                 'kurs'              => 1,
+                //                 'keterangan'        => "PAJAK " . $POlocal->keterangan,
+                //                 'id_inputer'        => session()->get("login")->user_id
+                //             );
+                //         }
+                //     }
+                // }
+
+                $result = [];
+
+                // Debit
+                $result[] = [
+                    'id_transaksi'      => $id_transaksi_jurnal,
+                    'id_coa'            => $POlocal->akun_kas == 0 || $POlocal->akun_kas == NULL ? $UtangAR : $POlocal->akun_kas,
+                    'company_id'        => $POlocal->company_id,
+                    'divisi_id'         => $divisi,
+                    'supplier_id'       => $POlocal->supplier_id,
+                    'tanggal_jurnal'    => date('Y-m-d', strtotime(str_replace('/', '-', $POlocal->payment_date))),
+                    'debit'             => $totalNominal,
+                    'kredit'            => 0,
+                    'valas'             => '30',
+                    'kurs'              => 1,
+                    'keterangan'        => implode(', ', $dataPOdesc), // semua PO disatukan
+                    'id_inputer'        => session()->get("login")->user_id
+                ];
+
+                // Kredit
+                $result[] = [
+                    'id_transaksi'      => $id_transaksi_jurnal,
+                    'id_coa'            => $POlocal->akun_selisih,
+                    'company_id'        => $POlocal->company_id,
+                    'divisi_id'         => $divisi,
+                    'supplier_id'       => $POlocal->supplier_id,
+                    'tanggal_jurnal'    => date('Y-m-d', strtotime(str_replace('/', '-', $POlocal->payment_date))),
+                    'debit'             => 0,
+                    'kredit'            => $totalNominal,
+                    'valas'             => '30',
+                    'kurs'              => 1,
+                    'keterangan'        => implode(', ', $dataPOdesc),
+                    'id_inputer'        => session()->get("login")->user_id
+                ];
+
                 return $this->jurnalUmumModel->insertJurnalBatch($result);
             }
         } elseif ($module == "LOKAL BP") {
