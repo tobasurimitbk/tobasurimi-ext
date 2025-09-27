@@ -3366,7 +3366,7 @@ class JurnalUmum extends BaseController
                 'total_debit' => $pembayaranInvoice['total_bayar'],
                 'total_kredit' =>  $pembayaranInvoice['total_bayar'],
                 'metode_input' => 'system',
-                'type_transaksi' => $metaDataTypeTransaksi['id'],
+                'type_transaksi' => 1407,
                 'valas' => $metaDataValuta['value'],
                 'uraian_transaksi' => $pembayaranInvoice['pembayaran_dari']
             );
@@ -3503,7 +3503,7 @@ class JurnalUmum extends BaseController
                 'total_debit'       => $pembayaranInvoice['total_bayar'],
                 'total_kredit'      => $pembayaranInvoice['total_bayar'],
                 'metode_input'      => 'system',
-                'type_transaksi'    => $metaDataTypeTransaksi['id'],
+                'type_transaksi'    => 1407,
                 'valas'             => $metaDataValuta['value'],
                 'uraian_transaksi'  => $pembayaranInvoice['pembayaran_dari']
             );
