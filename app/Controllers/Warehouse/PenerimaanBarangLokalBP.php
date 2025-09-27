@@ -613,7 +613,7 @@ class PenerimaanBarangLokalBP extends BaseController
                         // \var_dump($b);
                         // die;
                         // Insert
-                        $id =  $this->penerimaanBarangDetailModel->insert([
+                        $id_new_detail = $this->penerimaanBarangDetailModel->insert([
                             'purchase_order_id' => $b->am_purchase_order_id,
                             'purchase_order_details_id' => $b->am_purchase_order_details_id,
                             'penerimaan_barang_id' => $id,
@@ -638,6 +638,7 @@ class PenerimaanBarangLokalBP extends BaseController
                             ->update();
                         // \var_dump($id);
                         // die;
+                        array_push($penerimaanBarangDetailId, $id_new_detail);
                         $this->accountBarangModel->insertAccountBarang($this->this_company_id, $this->request->getVar('divisi_id'), $barang['id'], $poDetail['spesifikasi_id']);
                     } else {
                         // Update
@@ -664,6 +665,7 @@ class PenerimaanBarangLokalBP extends BaseController
                             ->update();
 
                         $this->accountBarangModel->insertAccountBarang($this->this_company_id, $this->request->getVar('divisi_id'), $barang['id'], $poDetail['spesifikasi_id']);
+                        array_push($penerimaanBarangDetailId, $penerimaanBarangDetailFirst['id']);
                     }
                 } else {
                     $last = $this->amPurchaseOrderDetailModel
@@ -684,8 +686,6 @@ class PenerimaanBarangLokalBP extends BaseController
                         ->where('purchase_order_details_id', $b->am_purchase_order_details_id)
                         ->delete();
                 }
-
-                array_push($penerimaanBarangDetailId, $b->penerimaan_barang_detail_id);
             }
 
             // REMOVE BARANG
@@ -719,6 +719,7 @@ class PenerimaanBarangLokalBP extends BaseController
                 ->where('penerimaan_barang_id', $id)
                 ->findAll();
 
+
             foreach ($penerimaanBarangDetails as $detail) {
                 $amPurchaseOrder = $this->amPurchaseOrderModel->where('id', $detail['purchase_order_id'])->first();
                 if ($amPurchaseOrder) {
@@ -749,7 +750,7 @@ class PenerimaanBarangLokalBP extends BaseController
             $db->transRollback();
             return response()->setJSON([
                 'status' => false,
-                'message' => $e->getMessage(),
+                'message' => $e->getMessage() . " " . $e->getLine() . " " . $e->getFile(),
                 'token' => csrf_hash()
             ]);
         }
@@ -1258,7 +1259,7 @@ class PenerimaanBarangLokalBP extends BaseController
     public function dropdownSupplierBySPP()
     {
         $sppId = $this->request->getVar('spp_id');
-        $poList = $this->amPurchaseOrderModel->where('purchase_request_id', $sppId)->where('is_posted', 1)->where('status_penerimaan', 0)->where('deletedAt', null)->findAll();
+        $poList = $this->amPurchaseOrderModel->where('po_type', "Lokal")->where('purchase_request_id', $sppId)->where('is_posted', 1)->where('status_penerimaan', 0)->where('deletedAt', null)->findAll();
         $supplierId = [];
 
         foreach ($poList as $p) {

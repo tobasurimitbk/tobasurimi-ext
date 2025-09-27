@@ -1873,4 +1873,63 @@ class RMPurchaseOrderModel extends Model
             'sortType'  => $sortType
         ];
     }
+
+    public function getStockListWithAddConditionForUpdateStock($condition, $spesifikasiId)
+    {
+        $select = "
+            CONCAT(barang_master.barang_name, '', barang_master_spesifikasi.spesifikasi) AS barang,
+            suppliers.name AS supplier_name,
+            stock_details2.id AS id,
+            stock_details2.bc_id,
+            stock_details2.no_aju,
+            rm_purchase_orders.po_no AS no_po,
+            stock.tipe_barang,
+            stock.company_id,
+            satuans.kode_satuan,
+            stock_details2.stock_id AS stock_id,
+            stock_details2.stock_dokumen,
+            stock_details2.supplier_id AS supplier_id,
+            rm_purchase_orders.po_date AS stock_date,
+            stock_details.sumber AS sumber,
+            SUM(CASE WHEN stock_details.status = 'In' THEN stock_details2.qty ELSE 0 END)
+                - SUM(CASE WHEN stock_details.status = 'Out' THEN stock_details2.qty ELSE 0 END) AS stok_total,
+            SUM(CASE WHEN stock_details.status = 'In' THEN stock_details2.qty_kotor ELSE 0 END)
+                - SUM(CASE WHEN stock_details.status = 'Out' THEN stock_details2.qty_kotor ELSE 0 END) AS stok_total_kotor,
+            SUM(CASE WHEN stock_details.status = 'In' THEN stock_details2.qty_diterima ELSE 0 END)
+                - SUM(CASE WHEN stock_details.status = 'Out' THEN stock_details2.qty_diterima ELSE 0 END) AS stok_total_diterima,
+            COALESCE(total_penerimaan_subquery.total_penerimaan, 0) AS total_penerimaan
+        ";
+
+        return $this->asArray()
+            ->select($select, false)
+            ->join('rm_purchase_order_details', 'rm_purchase_order_details.rm_purchase_order_id = rm_purchase_orders.id', 'left')
+            ->join('barang_master', 'barang_master.id = rm_purchase_order_details.barang1_id', 'left')
+            ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = rm_purchase_order_details.barang2_id', 'left')
+            ->join('satuans', 'satuans.id = barang_master_spesifikasi.satuan_1', 'left')
+            ->join('stock_details2', 'stock_details2.no_po = rm_purchase_orders.po_no', 'left')
+            ->join('stock_details', 'stock_details.id = stock_details2.stock_detail_id', 'left')
+            ->join('stock', 'stock.id = stock_details.stock_id', 'left')
+            ->join('suppliers', 'suppliers.id = stock_details2.supplier_id', 'left')
+            ->join(
+                '(
+                    SELECT 
+                        pb.no_penerimaan_barang, 
+                        pbd.spesifikasi_id,
+                        SUM(pbd.qty) AS total_penerimaan
+                    FROM penerimaan_barang pb
+                    LEFT JOIN penerimaan_barang_detail pbd 
+                        ON pbd.penerimaan_barang_id = pb.id
+                    GROUP BY pb.no_penerimaan_barang, pbd.spesifikasi_id
+                ) AS total_penerimaan_subquery',
+                'total_penerimaan_subquery.no_penerimaan_barang = stock_details.no_dokumen 
+                AND total_penerimaan_subquery.spesifikasi_id = rm_purchase_order_details.barang2_id',
+                'left'
+            )
+            ->where($condition)
+            // ->whereIn('rm_purchase_order_details.barang2_id', $spesifikasiId)
+            // ->groupBy('stock_details2.stock_id')
+            ->orderBy('rm_purchase_orders.po_date', 'ASC', false)
+            ->findAll();
+    }
+
 }

@@ -260,18 +260,18 @@
                                     <?php endif; ?>
                                     <?php if (!in_array($pg['name'], ["Potongan Iuran Koperasi", "Potongan Pinjaman Koperasi", "Potongan Bon Koperasi"])) : ?>
                                         <tr>
-                                            <td><?= $pg['name'] ?></td>
+                                            <td><?= ucfirst(strtolower($pg['name'])) ?></td>
                                             <td>:</td>
                                             <td><?= "Rp " . number_format($pg['nominal'], 2, ',', '.') ?></td>
                                         </tr>
                                     <?php endif; ?>
                                 <?php endif; ?>
                             <?php endforeach; ?>
-                            <tr>
+                            <!-- <tr>
                                 <td>Potongan Iuran/Pinjaman/Bon Koperasi</td>
                                 <td>:</td>
                                 <td> <?= "Rp " . number_format($potIuranPinjamanBon, 2, ',', '.') ?></td>
-                            </tr>
+                            </tr> -->
                             <tr>
                                 <td>Potongan Lain-Lain</td>
                                 <td>:</td>
@@ -299,18 +299,18 @@
                                     <?php endif; ?>
                                     <?php if (!in_array($pg['name'], ["Potongan Iuran Koperasi", "Potongan Pinjaman Koperasi", "Potongan Bon Koperasi"])) : ?>
                                         <tr>
-                                            <td><?= $pg['name'] ?></td>
+                                            <td><?= ucfirst(strtolower($pg['name'])) ?></td>
                                             <td>:</td>
                                             <td><?= "Rp " . number_format($pg['nominal'], 2, ',', '.') ?></td>
                                         </tr>
                                     <?php endif; ?>
                                 <?php endif; ?>
                             <?php endforeach; ?>
-                            <tr>
+                            <!-- <tr>
                                 <td>Potongan Iuran/Pinjaman/Bon Koperasi</td>
                                 <td>:</td>
                                 <td> <?= "Rp " . number_format($potIuranPinjamanBon, 2, ',', '.') ?></td>
-                            </tr>
+                            </tr> -->
                             <tr>
                                 <td>Potongan Lain-Lain</td>
                                 <td>:</td>
@@ -602,18 +602,18 @@
                                         <?php endif; ?>
                                         <?php if (!in_array($pg['name'], ["Potongan Iuran Koperasi", "Potongan Pinjaman Koperasi", "Potongan Bon Koperasi"])) : ?>
                                             <tr>
-                                                <td><?= $pg['name'] ?></td>
+                                                <td><?= ucfirst(strtolower($pg['name'])) ?></td>
                                                 <td>:</td>
                                                 <td><?= "Rp " . number_format($pg['nominal'], 2, ',', '.') ?></td>
                                             </tr>
                                         <?php endif; ?>
                                     <?php endif; ?>
                                 <?php endforeach; ?>
-                                <tr>
+                                <!-- <tr>
                                     <td>Potongan Iuran/Pinjaman/Bon Koperasi</td>
                                     <td>:</td>
                                     <td> <?= "Rp " . number_format($potIuranPinjamanBon, 2, ',', '.') ?></td>
-                                </tr>
+                                </tr> -->
                                 <tr>
                                     <td>Potongan Lain-Lain</td>
                                     <td>:</td>
@@ -641,18 +641,18 @@
                                         <?php endif; ?>
                                         <?php if (!in_array($pg['name'], ["Potongan Iuran Koperasi", "Potongan Pinjaman Koperasi", "Potongan Bon Koperasi"])) : ?>
                                             <tr>
-                                                <td><?= $pg['name'] ?></td>
+                                                <td><?= ucfirst(strtolower($pg['name'])) ?></td>
                                                 <td>:</td>
                                                 <td><?= "Rp " . number_format($pg['nominal'], 2, ',', '.') ?></td>
                                             </tr>
                                         <?php endif; ?>
                                     <?php endif; ?>
                                 <?php endforeach; ?>
-                                <tr>
+                                <!-- <tr>
                                     <td>Potongan Iuran/Pinjaman/Bon Koperasi</td>
                                     <td>:</td>
                                     <td> <?= "Rp " . number_format($potIuranPinjamanBon, 2, ',', '.') ?></td>
-                                </tr>
+                                </tr> -->
                                 <tr>
                                     <td>Potongan Lain-Lain</td>
                                     <td>:</td>

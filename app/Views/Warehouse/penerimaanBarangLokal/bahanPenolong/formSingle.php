@@ -7,7 +7,7 @@
             <div class="form-floating mb-3" style="height: 50px;">
                 <div class="input-group input-group-password">
                     <div class="form-floating mb-3" style="height: 50px;">
-                        <input readonly autocomplete="one-time-code" <?= !empty($dataPenerimaanBarang) ? ($dataPenerimaanBarang['status_post'] === "FINISH" ? 'disabled=true' : '') : ''; ?> value="<?= !empty($dataPenerimaanBarang) ? $dataPenerimaanBarang['no_penerimaan_barang'] : "" ?>" type="text" class="form-control no_penerimaan_barang" id="no_penerimaan_barang" name="no_penerimaan_barang" placeholder="No. Penerimaan">
+                        <input autocomplete="one-time-code" <?= !empty($dataPenerimaanBarang) ? ($dataPenerimaanBarang['status_post'] === "FINISH" ? 'disabled=true' : '') : ''; ?> value="<?= !empty($dataPenerimaanBarang) ? $dataPenerimaanBarang['no_penerimaan_barang'] : "" ?>" type="text" class="form-control no_penerimaan_barang" id="no_penerimaan_barang" name="no_penerimaan_barang" placeholder="No. Penerimaan">
                         <label for="floatingInput">No. Penerimaan</label>
                     </div>
                     <div style="<?= !empty($dataPenerimaanBarang) ? "display: none" : ""; ?>" class="input-generate input-group-prepend group-prepend-password align-items-center">
@@ -22,10 +22,10 @@
                     <option value=""></option>
                     <?php if (!empty($dataPenerimaanBarang)) : ?>
                         <?php foreach ($dataSPPSelected as $d) : ?>
-                            <option selected value="<?= $d["id"]; ?>"><?= strtoupper($d["spp_no"]); ?></option>
+                            <option data-divisi_id="<?= $dataPenerimaanBarang['divisi_id'] ?>" selected value="<?= $d["id"]; ?>"><?= strtoupper($d["spp_no"]); ?></option>
                         <?php endforeach; ?>
                         <?php foreach ($dataSPP as $d) : ?>
-                            <option value="<?= $d["id"]; ?>"><?= strtoupper($d["spp_no"]); ?></option>
+                            <option data-divisi_id="<?= $d['divisi_id'] ?>" value="<?= $d["id"]; ?>"><?= strtoupper($d["spp_no"]); ?></option>
                         <?php endforeach; ?>
                     <?php else: ?>
                         <option value="">Pilih Nomor SPP</option>
@@ -39,7 +39,7 @@
         </div>
         <div class="col-md-4">
             <div class="form-floating mb-3" style="height: 50px;">
-                <select <?= !empty($dataPenerimaanBarang) ? ($dataPenerimaanBarang['status_post'] === "FINISH" ? 'disabled=true' : '') : ''; ?> class="form-select supplier_id" id="supplier_id" name="supplier_id" aria-label="Floating label select example">
+                <select <?= !empty($dataPenerimaanBarang) ? ($dataPenerimaanBarang['status_post'] === "FINISH" ? 'disabled=true' : 'disabled=true') : ''; ?> class="form-select supplier_id" id="supplier_id" name="supplier_id" aria-label="Floating label select example">
                     <option value=""></option>
                     <?php if (!empty($dataPenerimaanBarang)): ?>
                         <?php foreach ($dataSupplier as $supplier) : ?>
@@ -55,7 +55,7 @@
     <div class="row">
         <div class="col-md-4">
             <div class="form-floating" style="height: 50px;">
-                <select disabled <?= !empty($dataPenerimaanBarang) ? ($dataPenerimaanBarang['status_post'] === "FINISH" ? 'disabled=true' : '') : ''; ?> class="form-select divisi_id" id="divisi_id" name="divisi_id" aria-label="Floating label select example">
+                <select disabled <?= !empty($dataPenerimaanBarang) ? ($dataPenerimaanBarang['status_post'] === "FINISH" ? 'disabled=true' : 'disabled=true') : ''; ?> class="form-select divisi_id" id="divisi_id" name="divisi_id" aria-label="Floating label select example">
                     <option value=""></option>
                     <?php if (!empty($dataPenerimaanBarang)) : ?>
                         <?php foreach ($dataDivisi as $divisi) : ?>
@@ -73,7 +73,7 @@
         </div>
         <div class="col-md-4" style="display: none;">
             <div class="form-floating mb-3" style="height: 50px;">
-                <select <?= !empty($dataPenerimaanBarang) ? ($dataPenerimaanBarang['status_post'] === "FINISH" ? 'disabled=true' : '') : ''; ?> multiple class="form-select multiple_po_id" name="multiple_po_id[]" id="multiple_po_id[]">
+                <select <?= !empty($dataPenerimaanBarang) ? ($dataPenerimaanBarang['status_post'] === "FINISH" ? 'disabled=true' : 'disabled=true') : ''; ?> multiple class="form-select multiple_po_id" name="multiple_po_id[]" id="multiple_po_id[]">
                     <option value=""></option>
                     <?php if (!empty($dataPenerimaanBarang)) : ?>
                         <?php foreach (json_decode(($dataPenerimaanBarang['multiple_po_id'])) as $i => $id) : ?>
@@ -260,6 +260,12 @@
         $.ajax({
             url: `<?= base_url("penerimaan-barang-lokal-bp/list-barang"); ?>`,
             method: "GET",
+            beforeSend: function() {
+                setLoading()
+            },
+            complete: function() {
+                stopLoading()
+            },
             data: {
                 am_purchase_order_id: JSON.stringify(arr),
                 penerimaan_barang_id: $('.id').val()
@@ -290,7 +296,7 @@
         theme: "bootstrap-5",
         allowClear: true
     }).change(function() {
-        changeStatus();
+        // changeStatus();
     });
 
 
@@ -360,29 +366,33 @@
     }).change(function() {
         let arr = $('.multiple_spp_id').val();
         // GET SIPPLIER
-        $.ajax({
-            url: `<?= base_url('penerimaan-barang-lokal-bp/get-supplier-by-spp'); ?>`,
-            method: "GET",
-            beforeSend: function() {
-                setLoading();
-            },
-            complete: function() {
-                stopLoading();
-            },
-            data: {
-                spp_id: arr
-            },
-            dataType: "json",
-            success: function(res) {
-                $(".supplier_id").empty()
-                $(".supplier_id").append(`<option value=""></option>`)
-                res.data.forEach(function(item) {
-                    $(".supplier_id").append(`<option selected value="${item.id}">${item.name}</option>`)
-                })
-                $(".supplier_id").change();
+        <?php if (empty($dataPenerimaanBarang)): ?>
+            $.ajax({
+                url: `<?= base_url('penerimaan-barang-lokal-bp/get-supplier-by-spp'); ?>`,
+                method: "GET",
+                beforeSend: function() {
+                    setLoading();
+                },
+                complete: function() {
+                    stopLoading();
+                },
+                data: {
+                    spp_id: arr
+                },
+                dataType: "json",
+                success: function(res) {
+                    $(".supplier_id").empty()
+                    $(".supplier_id").append(`<option value=""></option>`)
+                    res.data.forEach(function(item) {
+                        $(".supplier_id").append(`<option selected value="${item.id}">${item.name}</option>`)
+                    })
+                    $(".supplier_id").change();
 
-            }
-        });
+                }
+            });
+        <?php else: ?>
+            $('.multiple_po_id').change();
+        <?php endif; ?>
 
     });
 
@@ -596,6 +606,8 @@
                         const csrf = $(`[name="${csrfToken}"]`);
                         var id = $('#id').val();
                         var divisiId = $('#divisi_id').val();
+                        var warehouseId = $('#warehouse_id').val();
+                        var supplierId = $('#supplier_id').val();
                         var po_no = $('.multiple_po_id').select2('data').map(function(elem) {
                             return elem.text;
                         });
@@ -606,6 +618,9 @@
                         formData.append("multiple_po_id", JSON.stringify($('.multiple_po_id').val()));
                         formData.append("multiple_po_no", JSON.stringify(po_no));
                         formData.append("divisi_id", divisiId);
+                        formData.append("supplier_id", supplierId);
+                        formData.append("warehouse_id", warehouseId);
+
                         formData.append("barangs", JSON.stringify(listData.result));
                         formData.set("ongkos_kirim", ongkosKirim);
 

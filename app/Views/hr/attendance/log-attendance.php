@@ -554,6 +554,10 @@
                 data: "bagian",
                 className: "text-left",
             }, {
+                data: "total_hadir",
+                className: "text-left",
+                sortable: false,
+            }, {
                 data: "total_cuti_tahunan",
                 className: "text-left",
                 sortable: false,
@@ -579,10 +583,6 @@
                 sortable: false,
             }, {
                 data: "total_rl",
-                className: "text-left",
-                sortable: false,
-            }, {
-                data: "total_hadir",
                 className: "text-left",
                 sortable: false,
             },
@@ -821,7 +821,7 @@
 
     $('#btnHideExportHarianModal').click(function(e) {
         e.preventDefault();
-        $('#lapHarianModal').hide();
+        $('#lapHarianModal').modal('hide');
     });
 
     $('#btnShowExportHarianModal').click(function(e) {

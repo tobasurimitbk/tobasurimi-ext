@@ -3,7 +3,7 @@
 
 <section class="section">
     <div class="section-header">
-        <h1><?= empty($po) ? "Tambah Update Data Stock Pembelian" : "Update Update Data Stock Pembelian" ?></h1>
+        <h1><?= empty($updateStockData) ? "Tambah Update Data Stock Pembelian" : "Update Update Data Stock Pembelian" ?></h1>
         <div class="col-button-tambah-spp">
             <a class="btn btn-hide-form btn-discard float-right" href="<?= base_url("update-stock-bahan-baku"); ?>">
                 Kembali
@@ -21,7 +21,7 @@
                 </div>
             </div>
             <form class="create-form form-add-spp" role="form" method="POST" enctype="multipart/form-data">
-                <input type="hidden" name="id" id="id" value="<?= !empty($po) ? encrypt($po['id']) : '' ?>" class="id">
+                <input type="hidden" name="id" id="id" value="<?= !empty($updateStockData) ? encrypt($updateStockData['id']) : '' ?>" class="id">
                 <?= csrf_field() ?>
                 <div class="row">
 
@@ -31,7 +31,7 @@
                             <select class="form-select divisi_id" id="divisi_id" name="divisi_id" aria-label="Floating label select example">
                                 <option value=""></option>
                                 <?php foreach ($divisi as $d) : ?>
-                                    <option <?= !empty($po) && $po['divisi_id'] == $d['id'] ? 'selected' : '' ?>
+                                    <option <?= !empty($updateStockData) && $updateStockData['divisi_id'] == $d['id'] ? 'selected' : '' ?>
                                             value="<?= $d['id'] ?>">
                                         <?= $d['divisi']; ?>
                                     </option>
@@ -83,7 +83,7 @@
                             <select class="form-select supplier_id" id="supplier_id" name="supplier_id" aria-label="Floating label select example">
                                 <option value=""></option>
                                 <?php foreach ($supplier as $s): ?>
-                                    <option <?= !empty($po) && $po['supplier_id'] == $s['id'] ? 'selected' : '' ?>
+                                    <option <?= !empty($updateStockData) && $updateStockData['supplier_id'] == $s['id'] ? 'selected' : '' ?>
                                             value="<?= $s['id'] ?>">
                                         <?= $s['name'] ?>
                                     </option>
@@ -93,11 +93,20 @@
                         </div>
                     </div>
 
+                    <!-- MASTER BARANG -->
+                    <div class="col-md-4">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <select class="form-select barang_id" id="barang_id" name="barang_id">
+                                <option value=""></option>
+                            </select>
+                            <label for="floatingInput" style="z-index: 1;">Pilih Barang</label>
+                        </div>
+                    </div>
+
                     <!-- SPESIFIKASI BARANG -->
                     <div class="col-md-4">
                         <div class="form-spp form-floating mb-3">
                                 <select class="form-select spesifikasi_id" id="spesifikasi_id" name="spesifikasi_id[]">
-                                <option value=""></option>
                                 </select>
                                 <label for="spesifikasi_id">Pilih Spesifikasi Barang</label>
                         </div>
@@ -194,26 +203,51 @@
         autoclose: true
     })
 
-    <?php if (empty($po)): ?>
-        $('.tanggal').change(function() {
-            changeStatus();
-        })
-    <?php endif; ?>
-
-
-    $(document).ready(function() {
-
-        // init select2
-        $('#warehouse_id').select2({
-            placeholder: "Pilih Warehouse",
-            theme: "bootstrap-5",
-            allowClear: true
-        }).change(function() {
-            // drawTableSelectedItem(listStockSelected);
-            getListPo();
+    $(document).ready(function () {
+        // init datepicker
+        $("#tanggal_po_awal, #tanggal_po_akhir").datepicker({
+            todayHighlight: true,
+            format: "dd/mm/yyyy",
+            orientation: "bottom auto",
+            autoclose: true
         });
 
-        $('#divisi_id').select2({
+        <?php if (!empty($updateStockData)) : ?>
+            // convert YYYY-MM-DD -> DD/MM/YYYY
+            function formatDate(dateString) {
+                if (!dateString) return "";
+                const parts = dateString.split("-");
+                return parts.length === 3 ? `${parts[2]}/${parts[1]}/${parts[0]}` : "";
+            }
+
+            // set value ke datepicker
+            $("#tanggal_po_awal").datepicker("setDate", formatDate("<?= $updateStockData['tanggal_awal'] ?>"));
+            $("#tanggal_po_akhir").datepicker("setDate", formatDate("<?= $updateStockData['tanggal_akhir'] ?>"));
+
+            // trigger change supaya kalau ada listener ikut ke-execute
+            $("#tanggal_po_awal").trigger("change");
+            $("#tanggal_po_akhir").trigger("change");
+
+            // select2 reload
+            $('#divisi_id').trigger('change');     
+            $('#warehouse_id').trigger('change');  
+            $('#supplier_id').trigger('change');   
+
+            var barangId = "<?= $updateStockData['master_barang_id'] ?>";
+            var barangText = "<?= $updateStockData['barang_name'] ?? '' ?>"; // pastikan kirim nama barang dari controller
+
+            if (barangId && barangText) {
+                // bikin option baru untuk select2
+                var option = new Option(barangText, barangId, true, true);
+                $('#barang_id').append(option).trigger('change');
+            }
+
+            getListBarangPoAlreadyHaveKotor();
+        <?php endif; ?>
+    });
+
+
+    $('#divisi_id').select2({
             placeholder: "Pilih Departemen",
             theme: "bootstrap-5",
             allowClear: true
@@ -221,33 +255,6 @@
             // GET WAREHOUSES
             getListWarehouse();
         });
-
-        $('#supplier_id').select2({
-            placeholder: "Pilih Supplier",
-            theme: "bootstrap-5",
-            allowClear: true
-        })
-
-        // $('#no_po').select2({
-        //     placeholder: "Pilih No Po",
-        //     theme: "bootstrap-5",
-        //     allowClear: false
-        // }).change(function() {
-        //     getListBarangPo();
-        // });
-
-
-        // kalau edit mode, trigger change supaya ajax ke-load
-        <?php if (!empty($po)) : ?>
-            $('#divisi_id').trigger('change');     // biar getListWarehouse() ke-load
-            $('#warehouse_id').trigger('change');  // kalau perlu refresh warehouse
-            $('#supplier_id').trigger('change');   // sync supplier
-            // $('#no_po').trigger('change');         // biar getListBarangPo() jalan
-        <?php endif; ?>
-
-    });
-
-
 
     var dataTable = $('#dataTable').DataTable({
 
@@ -273,69 +280,46 @@
         }
     });
 
-    <?php if (!empty($po)) : ?>
-        // GET LIST BARANG 
-        $.ajax({
-            url: `<?= base_url('proses-rebus/list-barang-stock-init'); ?>`,
-            method: "GET",
-            data: {
-                type_barang: $(".type_barang option:selected").val(),
-                divisi_id: $(".divisi_id option:selected").val(),
-                warehouse_id: $(".warehouse_id option:selected").val()
-            },
-            dataType: "json",
-            success: function(res) {
-                $(".spesifikasi_rebus_id").empty()
-                $(".spesifikasi_rebus_id").append(`<option value=""></option>`)
-                res.data.forEach(function(item) {
-                    $(".spesifikasi_rebus_id").append(`<option data-stock_id="${item.stock_id}" data-kode_barang="${item.kode_barang}" data-barang="${item.barang}" data-kode_satuan="${item.kode_satuan}" value="${item.spesifikasi_rebus_id}">(${item.kode_barang}) ${item.barang}</option>`)
-                })
-                $(".spesifikasi_rebus_id").val();
-            }
-        });
-        <?php if ($po) : ?>
-            $('.detail-form-layout').hide()
-        <?php endif; ?>
-    <?php endif; ?>
-
-
-    $('#type_pengambilan_stock').select2({
-        placeholder: "Pilih Tipe Ambil Stok",
-        theme: "bootstrap-5",
-    }).change(function() {
-        // FIFO
-        if ($(this).val() == "FIFO") {
-            $('.form-fifo').show();
-        } else {
-            $('.form-fifo').hide();
-        }
-        // RESET
-        $('#spesifikasi_rebus_id').val(null).change();
-        $('#spesifikasi_hasil_rebus_id').val(null).change();
-        $('#qty_rebus_fifo').val(null);
-        $('#qty_hasil_rebus_fifo').val(null);
-        listStockAsal = [];
-        listStockSelected = [];
-        drawTableAsalBarang(listStockAsal);
-        drawTableSelectedItem(listStockSelected);
-    });
 
     $('#warehouse_id').select2({
         placeholder: "Pilih Warehouse",
         theme: "bootstrap-5",
         allowClear: true
-    }).change(function() {
-        // drawTableSelectedItem(listStockSelected);
-        // getPoList()
-    });
+    })
 
-    $('#divisi_id').select2({
-        placeholder: "Pilih Departemen",
+    $("#barang_id").select2({
+        placeholder: "Pilih Barang",
         theme: "bootstrap-5",
-        allowClear: true
-    }).change(function() {
-        // GET WAREHOUSES
-        getListWarehouse();
+        minimumInputLength: 3,
+        width: '100%',
+        ajax: {
+            delay: 300,
+            transport: function(params, success, failure) {
+                if (abortController) {
+                    abortController.abort();
+                }
+                abortController = new AbortController();
+
+                fetch("<?= base_url('jasa-vendor-out-kepiting-kukus/search-master-barang'); ?>?" + new URLSearchParams({
+                    q: params.data.term
+                }), {
+                    signal: abortController.signal
+                })
+                .then(res => res.json())
+                .then(success)
+                .catch(err => {
+                    if (err.name !== "AbortError") failure(err);
+                });
+            },
+            processResults: function(data) {
+                return {
+                    results: data.data.map(item => ({
+                        id: item.id,
+                        text: `${item.master_barang}`
+                    }))
+                };
+            }
+        }
     });
 
     $("#spesifikasi_id").select2({
@@ -350,7 +334,7 @@
                 }
                 abortController = new AbortController();
 
-                fetch("<?= base_url('update-stock-bahan-baku/search-barang'); ?>?" + new URLSearchParams({
+                fetch("<?= base_url('jasa-vendor-out-kepiting-kukus/search-barang'); ?>?" + new URLSearchParams({
                     barang_id: $('#barang_id option:selected').val(),
                     q: params.data.term
                 }), {
@@ -376,31 +360,12 @@
         }
     }).change(function() {
         getListBarangPo();
-        <?php if (!empty($po)) : ?>
-             getListBarangPoAlreadyHaveKotor();
-        <?php endif; ?>
     });
-
-    // $('#no_po').select2({
-    //     placeholder: "Pilih No Po",
-    //     theme: "bootstrap-5",
-    //     allowClear: false
-    // }).change(function() {
-    //    getListBarangPo()
-    // });
-
 
     $('#supplier_id').select2({
         placeholder: "Pilih Supplier",
         theme: "bootstrap-5",
         allowClear: true
-    }).change(function() {
-        // LIST DOKUMEN PABEAN
-        // getListDokumenPabean();
-        getListBarangPo();
-        <?php if (!empty($po)) : ?>
-             getListBarangPoAlreadyHaveKotor();
-        <?php endif; ?>
     });
 
 
@@ -798,8 +763,8 @@
                     $(".warehouse_id").append(`<option value="${item.id}">${item.warehouse_name}</option>`)
                 })
 
-                <?php if (!empty($po)) : ?>
-                    $(".warehouse_id").val("<?= $po['warehouse_id'] ?>").trigger('change');
+                <?php if (!empty($updateStockData)) : ?>
+                    $(".warehouse_id").val("<?= $updateStockData['warehouse_id'] ?>").trigger('change');
                 <?php endif; ?>
                 $(".warehouse_id").val();
             }
@@ -887,9 +852,9 @@
                         $select.append(`<option value="${item.id}">${item.po_no}</option>`);
                     });
 
-                    <?php if (!empty($po)) : ?>
+                    <?php if (!empty($updateStockData)) : ?>
                         // terakhir banget: pilih no_po, lalu trigger change
-                        $("#no_po").val("<?= $po['id'] ?>").trigger('change');
+                        $("#no_po").val("<?= $updateStockData['id'] ?>").trigger('change');
                     <?php endif; ?>
                 }
             }
@@ -912,6 +877,8 @@
                 divisi_id: $("#divisi_id option:selected").val(),
                 supplier_id: $("#supplier_id option:selected").val(),
                 warehouse_id: $("#warehouse_id option:selected").val(),
+                barang_id: $("#barang_id option:selected").val(),
+                spesifikasi_id: $("#spesifikasi_id").val(),
                 tanggal_po_awal: $("#tanggal_po_awal").val(),
                 tanggal_po_akhir: $("#tanggal_po_akhir").val(),
             },
@@ -938,6 +905,7 @@
                 stopLoading();
             },
             data: {
+                id: $("#id").val(),
                 divisi_id: $("#divisi_id option:selected").val(),
                 supplier_id: $("#supplier_id option:selected").val(),
                 warehouse_id: $("#warehouse_id option:selected").val(),
@@ -1088,7 +1056,7 @@
                         <td>${item.stock_date || '-'}</td>
                         <td>${item.barang || '-'}</td>
                         <td>${item.satuan || '-'}</td>
-                        <td style="text-align: right;">${greatFormatRupiah(item.total_penerimaan)}</td>
+                        <td style="text-align: right;">${greatFormatRupiah(item.stok_total)}</td>
                         <td style="text-align: right;">${greatFormatRupiah(item.stok_total_kotor)}</td>
                         <td>
                             <input type="text" step="0.001" min="0" 
