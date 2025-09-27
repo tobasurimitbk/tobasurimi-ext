@@ -1789,7 +1789,13 @@ class PembayaranInvoice extends BaseController
     {
 
         $id = decrypt($this->request->getVar('id'));
-        $result = $this->jurnalController->insertDataPembayaranInvoiceInternasional($id);
+        $data = $this->pembayaranInvoiceModel->where('id', $id)->first();
+
+        if ($data['type_invoice'] == "PROFORMA INVOICE") {
+            $result = $this->jurnalController->insertDataPembayaranInvoiceInternasional($id);
+        } else {
+            $result = $this->jurnalController->insertDataPembayaranInvoice($id);
+        }
 
         if ($result) {
             $this->pembayaranInvoiceModel->update($id, ['status_posting' => 1]);
