@@ -1861,7 +1861,7 @@
 
 
             var jumlahQtyBeratJadi = parseFloat(valueQtyBarangJadi) * parseFloat(valueBeratBarangJadi);
-            $('input.qty-berat-barang-jadi[data-index="' + index + '"]').val(jumlahQtyBeratJadi);
+            $('input.qty-berat-barang-jadi[data-index="' + index + '"]').val(jumlahQtyBeratJadi.toFixed(2));
 
             // Simpan nilai baru
             list_items_barang_jadi[index].qty = valueQtyBarangJadi;
