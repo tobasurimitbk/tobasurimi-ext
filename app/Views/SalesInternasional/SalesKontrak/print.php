@@ -309,6 +309,7 @@
                 <?php endif; ?>
 
                 <?php $no = 1; ?>
+                <br>
                 <?php foreach ($revisionList as $r): ?>
                     <label class="label-header">REV: <?= $no ?>: <?= date('d/m/Y', strtotime($r['date_revision'])) ?></label> <br>
                     <?php $no++ ?>
