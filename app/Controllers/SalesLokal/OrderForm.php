@@ -681,7 +681,7 @@ class OrderForm extends BaseController
 
             $dataSO = $this->SalesOrderModel->find($id);
 
-            $checkSO = $this->SalesOrderModel->where('UPPER(no_sales_order)', strtoupper($this->request->getVar('no_sales_order')))->findAll();
+            $checkSO = $this->SalesOrderModel->where('UPPER(no_sales_order)', strtoupper($this->request->getVar('no_sales_order')))->first();
             if ($checkSO) {
                 if ($checkSO['id'] != $dataSO['id']) {
                     $data = [
