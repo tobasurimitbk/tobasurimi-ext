@@ -1175,7 +1175,7 @@
                                             confirmButtonText: 'Ok'
                                         }).then((result) => {
                                             if (result.isConfirmed) {
-                                                location.reload();
+                                                window.location.href = "<?= base_url("material-request"); ?>"
                                             }
                                         });
                                     },
@@ -1204,7 +1204,7 @@
                                             confirmButtonText: 'Ok'
                                         }).then((result) => {
                                             if (result.isConfirmed) {
-                                                window.location.href = "<?= base_url('material-request') ?>"
+                                                window.location.href = "<?= base_url("material-request"); ?>"
                                             }
                                         });
                                     },
