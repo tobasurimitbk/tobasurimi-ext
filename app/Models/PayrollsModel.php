@@ -507,19 +507,17 @@ class PayrollsModel extends Model
 
         $res = [];
         $potonganRes = [
+            'totPotBonKoperasi' => 0,
+            'totPotBpjs' => 0,
+            'totPotDenda' => 0,
             'totPotIuranKoperasi' => 0,
+            'totPotKantin' => 0,
+            'totPerlengkapanKerja' => 0,
+            'totPotPinjaman' => 0,
+            'totPotSpm' => 0,
             'totPotStm' => 0,
             'totPotAstek' => 0,
-            'totPotSpm' => 0,
-            'totPerlengkapanKerja' => 0,
-            // 'totPotTutupMulut' => 0,
-            // 'totPotBajuSeragam' => 0,
-            // 'totPotSepatuCelanaTopi' => 0,
-            'totPotDenda' => 0,
-            // 'totPotKartu' => 0,
-            'totPotBonKoperasi' => 0,
-            // 'totPotPinjKoperasi' => 0,
-            'totPotPinjaman' => 0,
+            'totPotUangMakan' => 0,
             'totPotongan' => 0
         ];
 
@@ -534,55 +532,50 @@ class PayrollsModel extends Model
 
             $detail = array();
             $potonganSingle = [
+                'totPotBonKoperasi' => 0,
+                'totPotBpjs' => 0,
+                'totPotDenda' => 0,
                 'totPotIuranKoperasi' => 0,
+                'totPotKantin' => 0,
+                'totPerlengkapanKerja' => 0,
+                'totPotPinjaman' => 0,
+                'totPotSpm' => 0,
                 'totPotStm' => 0,
                 'totPotAstek' => 0,
-                'totPotSpm' => 0,
-                'totPerlengkapanKerja' => 0,
-                // 'totPotTutupMulut' => 0,
-                // 'totPotBajuSeragam' => 0,
-                // 'totPotSepatuCelanaTopi' => 0,
-                'totPotDenda' => 0,
-                // 'totPotKartu' => 0,
-                'totPotBonKoperasi' => 0,
-                // 'totPotPinjKoperasi' => 0,
-                'totPotPinjaman' => 0,
+                'totPotUangMakan' => 0,
                 'totPotongan' => 0
             ];
             foreach ($employeePayroll as $ep) {
                 $detail[] = static::getPotonganByEmployeeID($ep['employeeID'], $yearMonth);
             }
             foreach ($detail as $dp) {
+                $potonganSingle['totPotBonKoperasi'] += $dp['potBonKoperasi'];
+                $potonganSingle['totPotBpjs'] += $dp['potBpjs'];
+                $potonganSingle['totPotDenda'] += $dp['potDenda'];
                 $potonganSingle['totPotIuranKoperasi'] += $dp['potIuranKoperasi'];
+                $potonganSingle['totPotKantin'] += $dp['potKantin'];
+                $potonganSingle['totPerlengkapanKerja'] += $dp['potPerlengkapanKerja'];
+                $potonganSingle['totPotPinjaman'] += $dp['potPinjaman'];
+                $potonganSingle['totPotSpm'] += $dp['potSpm'];
                 $potonganSingle['totPotStm'] += $dp['potStm'];
                 $potonganSingle['totPotAstek'] += $dp['potAstek'];
-                $potonganSingle['totPotSpm'] += $dp['potSpm'];
-                $potonganSingle['totPerlengkapanKerja'] += $dp['potPerlengkapanKerja'];
-                // $potonganSingle['totPotTutupMulut'] += $dp['potTutupMulut'];
-                // $potonganSingle['totPotBajuSeragam'] += $dp['potBajuSeragam'];
-                // $potonganSingle['totPotSepatuCelanaTopi'] += $dp['potSepatuCelanaTopi'];
-                $potonganSingle['totPotDenda'] += $dp['potDenda'];
-                // $potonganSingle['totPotKartu'] += $dp['potKartu'];
-                $potonganSingle['totPotBonKoperasi'] += $dp['potBonKoperasi'];
-                // $potonganSingle['totPotPinjKoperasi'] += $dp['potPinjamanKoperasi'];
-                $potonganSingle['totPotPinjaman'] += $dp['potPinjaman'];
+                $potonganSingle['totPotUangMakan'] += $dp['potUangMakan'];
                 $potonganSingle['totPotongan'] += $dp['totPotongan'];
             }
 
+            $potonganRes['totPotBonKoperasi'] += $potonganSingle['totPotBonKoperasi'];
+            $potonganRes['totPotBpjs'] += $potonganSingle['totPotBpjs'];
+            $potonganRes['totPotDenda'] += $potonganSingle['totPotDenda'];
             $potonganRes['totPotIuranKoperasi'] += $potonganSingle['totPotIuranKoperasi'];
+            $potonganRes['totPotKantin'] += $potonganSingle['totPotKantin'];
+            $potonganRes['totPerlengkapanKerja'] += $potonganSingle['totPerlengkapanKerja'];
+            $potonganRes['totPotPinjaman'] += $potonganSingle['totPotPinjaman'];
+            $potonganRes['totPotSpm'] += $potonganSingle['totPotSpm'];
             $potonganRes['totPotStm'] += $potonganSingle['totPotStm'];
             $potonganRes['totPotAstek'] += $potonganSingle['totPotAstek'];
-            $potonganRes['totPotSpm'] += $potonganSingle['totPotSpm'];
-            $potonganRes['totPerlengkapanKerja'] += $potonganSingle['totPerlengkapanKerja'];
-            // $potonganRes['totPotTutupMulut'] += $potonganSingle['totPotTutupMulut'];
-            // $potonganRes['totPotBajuSeragam'] += $potonganSingle['totPotBajuSeragam'];
-            // $potonganRes['totPotSepatuCelanaTopi'] += $potonganSingle['totPotSepatuCelanaTopi'];
-            $potonganRes['totPotDenda'] += $potonganSingle['totPotDenda'];
-            // $potonganRes['totPotKartu'] += $potonganSingle['totPotKartu'];
-            $potonganRes['totPotBonKoperasi'] += $potonganSingle['totPotBonKoperasi'];
-            // $potonganRes['totPotPinjKoperasi'] += $potonganSingle['totPotPinjKoperasi'];
-            $potonganRes['totPotPinjaman'] += $potonganSingle['totPotPinjaman'];
+            $potonganRes['totPotUangMakan'] += $potonganSingle['totPotUangMakan'];
             $potonganRes['totPotongan'] += $potonganSingle['totPotongan'];
+
             $res[] = [
                 'bagian' => $b['nama_bagian'],
                 'detail' => $detail,
@@ -683,30 +676,37 @@ class PayrollsModel extends Model
 
         $res = [
             'employee' => $employeePayroll,
+            'potBonKoperasi' => ($employeePayroll == null) ? 0 :  static::getPotonganLikeStr('BON KOPERASI', $employeePayroll['id']),
+            'potBpjs' => ($employeePayroll == null) ? 0 : static::getPotonganLikeStr('BPJS', $employeePayroll['id']),
+            'potDenda' => ($employeePayroll == null) ? 0 : static::getPotonganLikeStr('DENDA', $employeePayroll['id']),
             'potIuranKoperasi' => ($employeePayroll == null) ? 0 : static::getPotonganLikeStr("IURAN KOPERASI", $employeePayroll['id']),
+            'potKantin' => ($employeePayroll == null) ? 0 : static::getPotonganLikeStr("KANTIN", $employeePayroll['id']),
+            'potPerlengkapanKerja' => ($employeePayroll == null) ? 0 :  static::getPotonganLikeStr('PERLENGKAPAN KERJA', $employeePayroll['id']),
+            'potPinjaman' => ($employeePayroll == null) ? 0 : $employeePayroll['nominal_pinjaman_karyawan'],
+            'potSpm' => ($employeePayroll == null) ? 0 :  static::getPotonganLikeStr('SPM', $employeePayroll['id']),
             'potStm' => ($employeePayroll == null) ? 0 :  static::getPotonganLikeStr('STM', $employeePayroll['id']),
             'potAstek' => ($employeePayroll == null) ? 0 :  static::getPotonganLikeStr('ASTEK', $employeePayroll['id']),
-            'potSpm' => ($employeePayroll == null) ? 0 :  static::getPotonganLikeStr('SPM', $employeePayroll['id']),
-            'potPerlengkapanKerja' => ($employeePayroll == null) ? 0 :  static::getPotonganLikeStr('PERLENGKAPAN KERJA', $employeePayroll['id']),
+            'potUangMakan' => ($employeePayroll == null) ? 0 :  static::getPotonganLikeStr('UANG MAKAN', $employeePayroll['id']),
             // 'potTutupMulut' => ($employeePayroll == null) ? 0 : static::getPotonganLikeStr('TUTUP MULUT', $employeePayroll['id']),
             // 'potBajuSeragam' => ($employeePayroll == null) ? 0 : static::getPotonganLikeStr('Potongan Baju Seragam', $employeePayroll['id']),
             // 'potSepatuCelanaTopi' => ($employeePayroll == null) ? 0 : static::getPotonganLikeStr('Potongan Sepatu Celana Topi', $employeePayroll['id']),
-            'potDenda' => ($employeePayroll == null) ? 0 : ($employeePayroll['nominal_pengurangan_gaji'] - $employeePayroll['nominal_pinjaman_karyawan']),
+            // 'potDenda' => ($employeePayroll == null) ? 0 : ($employeePayroll['nominal_pengurangan_gaji'] - $employeePayroll['nominal_pinjaman_karyawan']),
             // 'potKartu' => ($employeePayroll == null) ? 0 :  static::getPotonganLikeStr('Potongan Kartu', $employeePayroll['id']),
-            'potBonKoperasi' => ($employeePayroll == null) ? 0 :  static::getPotonganLikeStr('BON KOPERASI', $employeePayroll['id']),
             // 'potPinjamanKoperasi' => ($employeePayroll == null) ? 0 :  static::getPotonganLikeStr('Potongan Pinjaman Koperasi', $employeePayroll['id']),
-            'potPinjaman' => ($employeePayroll == null) ? 0 : $employeePayroll['nominal_pinjaman_karyawan'],
             'totPotongan' => 0
         ];
 
-        $res['totPotongan'] = $res['potIuranKoperasi'] +
+        $res['totPotongan'] = $res['potBonKoperasi'] +
+            $res['potBpjs'] +
+            $res['potDenda'] +
+            $res['potIuranKoperasi'] +
+            $res['potKantin'] +
+            $res['potPerlengkapanKerja'] +
+            $res['potPinjaman'] +
+            $res['potSpm'] +
             $res['potStm'] +
             $res['potAstek'] +
-            $res['potSpm'] +
-            $res['potPerlengkapanKerja'] +
-            $res['potDenda'] +
-            $res['potBonKoperasi'] +
-            $res['potPinjaman'];
+            $res['potUangMakan'];
         return $res;
     }
 
