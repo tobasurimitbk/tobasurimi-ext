@@ -76,6 +76,7 @@
                                 <th onclick="changeSort('employees.name')" class="sort">Nama Karyawan</th>
                                 <th onclick="changeSort('employees.tipe')" class="sort">Tipe/Gol</th>
                                 <th onclick="changeSort('employees.division_id')" class="sort">Dept</th>
+                                <th onclick="changeSort('pinjaman_karyawan.tanggal_ambil')" class="sort">Tanggal Ambil</th>
                                 <th onclick="changeSort('pinjaman_karyawan.start_date')">Range Absen</th>
                                 <th onclick="changeSort('pinjaman_karyawan.hadir')">Hadir</th>
                                 <th onclick="changeSort('pinjaman_karyawan.tidak_hadir')">Tidak Hadir</th>
@@ -102,11 +103,24 @@
                 <div class="modal-body">
                     <?= csrf_field() ?>
                     <div class="row mb-2">
-                        <div class="col-md-12">
+                        <div class="col-md-6">
                             <div class="input-group mb-3">
                                 <div class="form-floating">
                                     <input name="monthYear" id="monthYear" type="text" required class="form-control target input-picker" placeholder="Periode Pinjaman">
                                     <label>Periode Pinjaman</label>
+                                </div>
+                                <div class="input-group-append" style="height:50px;">
+                                    <button disabled class="btn btn-secondary" type="button">
+                                        <i class="fas fa-calendar-alt"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="input-group">
+                                <div class="form-floating">
+                                    <input name="tanggalAmbil_Global" id="tanggalAmbil_Global" type="text" required class="form-control target input-picker" placeholder="Tanggal Ambil Pinjaman">
+                                    <label for="floatingInput">Tanggal Ambil Pinjaman</label>
                                 </div>
                                 <div class="input-group-append" style="height:50px;">
                                     <button disabled class="btn btn-secondary" type="button">
@@ -202,11 +216,24 @@
                                 <label>Tipe/Gol</label>
                             </div>
                         </div>
-                        <div class="col-md-12 mt-3">
+                        <div class="col-md-6 mt-3">
                             <div class="input-group mb-3">
                                 <div class="form-floating">
                                     <input name="monthYearSingle" id="monthYearSingle" type="text" required class="form-control target input-picker" placeholder="Periode Pinjaman">
                                     <label>Periode Pinjaman</label>
+                                </div>
+                                <div class="input-group-append" style="height:50px;">
+                                    <button disabled class="btn btn-secondary" type="button">
+                                        <i class="fas fa-calendar-alt"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mt-3">
+                            <div class="input-group mb-3">
+                                <div class="form-floating">
+                                    <input name="tanggalAmbil_Personal" id="tanggalAmbil_Personal" type="text" required class="form-control target input-picker" placeholder="Tanggal Ambil Pinjaman">
+                                    <label for="floatingInput">Tanggal Ambil Pinjaman</label>
                                 </div>
                                 <div class="input-group-append" style="height:50px;">
                                     <button disabled class="btn btn-secondary" type="button">
@@ -367,6 +394,10 @@
             },
             {
                 data: "divisi",
+                className: "text-left"
+            },
+            {
+                data: "tanggal_ambil",
                 className: "text-left"
             },
             {
@@ -544,7 +575,7 @@
         dropdownParent: $('#generateModal')
     });
 
-    $("#startDate,#finishDate").datepicker({
+    $("#startDate,#finishDate,#tanggalAmbil_Global,#tanggalAmbil_Personal").datepicker({
         todayHighlight: true,
         format: "dd/mm/yyyy",
         orientation: "bottom auto",
@@ -653,6 +684,9 @@
                 },
                 finishDate: {
                     required: true
+                },
+                tanggalAmbil_Global: {
+                    required: true
                 }
             },
             messages: {
@@ -665,6 +699,9 @@
                 finishDate: {
                     required: "Tanggal Selesai Wajib Diisi"
                 },
+                tanggalAmbil_Global: {
+                    required: "Tanggal Ambil Wajib Diisi"
+                }
             },
             errorElement: 'span',
             errorClass: 'text-danger',
@@ -697,6 +734,9 @@
                 },
                 finishDate: {
                     required: true
+                },
+                tanggalAmbil_Personal: {
+                    required: true
                 }
             },
             messages: {
@@ -709,6 +749,9 @@
                 finishDate: {
                     required: "Tanggal Selesai Wajib Diisi"
                 },
+                tanggalAmbil_Personal: {
+                    required: "Tanggal Ambil Wajib Diisi"
+                }
             },
             errorElement: 'span',
             errorClass: 'text-danger',

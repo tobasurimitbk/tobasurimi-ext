@@ -27,6 +27,7 @@ class PinjamanKaryawanModel extends Model
         'status_pinjaman',
         'nominal',
         'is_ambil',
+        'tanggal_ambil',
         'deletedAt'
     ];
 
@@ -63,7 +64,9 @@ class PinjamanKaryawanModel extends Model
             'pinjaman_karyawan.start_date' => 'pinjaman_karyawan.start_date',
             'pinjaman_karyawan.end_date' => 'pinjaman_karyawan.end_date',
             'pinjaman_karyawan.hadir' => 'pinjaman_karyawan.hadir',
-            'pinjaman_karyawan.tidak_hadir' => 'pinjaman_karyawan.tidak_hadir'
+            'pinjaman_karyawan.tidak_hadir' => 'pinjaman_karyawan.tidak_hadir',
+            'pinjaman_karyawan.tanggal_ambil' => 'pinjaman_karyawan.tanggal_ambil'
+
         ];
 
         $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];

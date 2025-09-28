@@ -351,7 +351,7 @@
                                     <?php $totalPinjaman = $rekapPinjaman['nominal']; ?>
                                     <tr>
                                         <td><?= $no++; ?></td>
-                                        <td style="text-align: center;"><?= date('d/m/Y', strtotime($rekapPinjaman['updatedAt'])) ?></td>
+                                        <td style="text-align: center;"><?= date('d/m/Y', strtotime($rekapPinjaman['tanggal_ambil'])) ?></td>
                                         <td style="font-weight:bold;" class="text-danger"><b>(-) <?= " " . number_format($rekapPinjaman['nominal'],  2, ',', '.') ?></b></td>
                                     </tr>
                                     <tr class="bg-secondary">

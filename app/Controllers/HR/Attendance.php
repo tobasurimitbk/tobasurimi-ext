@@ -13,6 +13,7 @@ use App\Models\EmployeesModel;
 use App\Models\FormPerijinanModel;
 use App\Models\GolonganModel;
 use App\Models\MetadataModel;
+use App\Models\UangMakanHarianModel;
 use CodeIgniter\I18n\Time;
 use DateInterval;
 use DatePeriod;
@@ -39,6 +40,7 @@ class Attendance extends BaseController
     protected $EmployeeJamKerjaModel;
     protected $AttendanceModel;
     protected $CompanyModel;
+    protected $UangMakanHarianModel;
 
     public function __construct()
     {
@@ -54,6 +56,7 @@ class Attendance extends BaseController
         $this->EmployeeJamKerjaModel = new EmployeeJamKerjaModel();
         $this->AttendanceModel = new AttendancesModel();
         $this->CompanyModel = new CompaniesModel();
+        $this->UangMakanHarianModel = new UangMakanHarianModel();
     }
 
     public function indexLog()
@@ -1059,7 +1062,8 @@ class Attendance extends BaseController
             'checkOut' => "-",
             'status' => "-",
             'employee' => $this->EmployeesModel->where('id', $employeeID)->first(),
-            'jamTerlambat' => "-"
+            'jamTerlambat' => "-",
+            'uangMakanHarian' => null
         ];
 
         $formPerizinan = $this->FormPerijinanModel->where('periode', $tanggal)
@@ -1067,6 +1071,8 @@ class Attendance extends BaseController
             ->first();
         $hariLibur = $this->BigDaysModel->where('date', $tanggal)
             ->first();
+
+        $uangMakanHarian = $this->UangMakanHarianModel->where('tanggal', $tanggal)->where('employee_id', $employeeID)->first();
 
         $selectQry = "
         DATE_FORMAT(MIN(date_create), '%H:%i:%s') AS checkin,
@@ -1131,6 +1137,7 @@ class Attendance extends BaseController
         // APPEND TO RESULT
         $result['jamKerja'] = $jamKerja;
         $result['namaUnit'] = count($logAttandance) == 0 ? "" : $logAttandance[0]->nama_unit;
+        $result['uangMakanHarian'] = $uangMakanHarian;
 
         return response()->setJSON([
             'status' => true,
@@ -1459,6 +1466,20 @@ class Attendance extends BaseController
             ];
         }
 
+        // mapping data uang harian
+        $uangMakanData = !empty($employeeIds) ? $this->UangMakanHarianModel->getUangMakanHarianByDateRangeAmt(
+            $employeeIds,
+            $startDate,
+            $endDate
+        ) : [];
+        $mapUangMakanHarian = [];
+        foreach ($uangMakanData as $u) {
+            $mapUangMakanHarian[$u['employee_id']][$u['tanggal']] = [
+                'nominal' => $u['nominal']
+            ];
+        }
+
+
         // ambil big days
         $bigDays = $this->BigDaysModel
             ->where('company_id', $this->this_company_id)
@@ -1501,7 +1522,7 @@ class Attendance extends BaseController
             $row++;
 
             // Header kolom
-            $headers = ['No', 'NIP', 'Nama', 'Divisi', 'Bagian', 'IN', 'OUT', 'Status'];
+            $headers = ['No', 'NIP', 'Nama', 'Divisi', 'Bagian', 'IN', 'OUT', 'Status', 'Uang Makan'];
             $col = 'A';
             foreach ($headers as $h) {
                 $sheet->setCellValue("{$col}{$row}", $h);
@@ -1528,6 +1549,9 @@ class Attendance extends BaseController
                 $in     = $mapLog[$emp['id']][$tgl]['in'] ?? '';
                 $out    = $mapLog[$emp['id']][$tgl]['out'] ?? '';
                 $status = $mapLog[$emp['id']][$tgl]['status'] ?? '';
+                $uangMakan = $mapUangMakanHarian[$emp['id']][$tgl]['nominal'] ?? 0;
+
+
 
                 // cek jika tanggal masuk big day
                 if (in_array($tgl, $tanggalBigDay)) {
@@ -1554,11 +1578,22 @@ class Attendance extends BaseController
                 $sheet->setCellValue("F{$row}", $in);
                 $sheet->setCellValue("G{$row}", $out);
                 $sheet->setCellValue("H{$row}", $status);
+                $sheet->setCellValue("I{$row}", $uangMakan);
 
                 // border untuk isi
-                $sheet->getStyle("A{$row}:H{$row}")->applyFromArray([
+                $sheet->getStyle("A{$row}:I{$row}")->applyFromArray([
                     'borders' => ['allBorders' => ['borderStyle' => Border::BORDER_THIN]]
                 ]);
+
+                $sheet->setCellValue("I{$row}", $uangMakan);
+                $sheet->getStyle("I{$row}")
+                    ->getNumberFormat()
+                    ->setFormatCode('#,##0');
+
+                $sheet->getStyle("I{$row}")
+                    ->getAlignment()
+                    ->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_RIGHT);
+
                 $row++;
 
                 // Hitung total status per karyawan
@@ -1616,6 +1651,7 @@ class Attendance extends BaseController
             $row += 2;
         }
 
+
         // === REKAP TOTAL DI BAWAH ===
         $sheet->mergeCells("A{$row}:K{$row}");
         $sheet->setCellValue("A{$row}", "REKAP KEHADIRAN");
@@ -1626,7 +1662,7 @@ class Attendance extends BaseController
         $row++;
 
         // Header rekap
-        $rekapHeaders = ['Nama', 'Hadir', 'Alpa', 'Libur', 'Cuti Tahunan', 'Cuti Haid', 'Cuti Hamil', 'Cuti Melahirkan', 'Ijin', 'Sakit', 'RL'];
+        $rekapHeaders = ['No', 'Nama', 'Hadir', 'Alpa', 'Libur', 'Cuti Tahunan', 'Cuti Haid', 'Cuti Hamil', 'Cuti Melahirkan', 'Ijin', 'Sakit', 'RL'];
         $col = 'A';
         foreach ($rekapHeaders as $h) {
             $sheet->setCellValue("{$col}{$row}", $h);
@@ -2097,6 +2133,44 @@ class Attendance extends BaseController
         $writer = new Xlsx($spreadsheet);
         $writer->save('php://output');
         exit();
+    }
+
+    public function updateUangMakanHarian()
+    {
+        try {
+            $tanggal = date('Y-m-d', strtotime(str_replace('/', '-', $this->request->getVar('tanggal'))));
+            $employeeId = $this->request->getVar('employee_id');
+            $nominal = $this->request->getVar('nominal');
+
+            $uangMakanHarian = $this->UangMakanHarianModel
+                ->where('employee_id', $employeeId)
+                ->where('tanggal', $tanggal)
+                ->first();
+
+            if ($uangMakanHarian == null) {
+                $this->UangMakanHarianModel->insert([
+                    'employee_id'  => $employeeId,
+                    'tanggal' => $tanggal,
+                    'nominal' => $nominal,
+                ]);
+            } else {
+                $this->UangMakanHarianModel->update($uangMakanHarian['id'], [
+                    'nominal' => $nominal
+                ]);
+            }
+
+            return response()->setJSON([
+                'status' => true,
+                'message' => "Uang makan harian berhasil disimpan",
+                'token' => csrf_hash()
+            ]);
+        } catch (Exception $e) {
+            return response()->setJSON([
+                'status' => false,
+                'token' => csrf_hash(),
+                'message' => $e->getMessage()
+            ]);
+        }
     }
 
     // Helper: ambil data presensi per bulan
