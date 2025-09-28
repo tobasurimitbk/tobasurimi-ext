@@ -43,7 +43,7 @@
                                         <select class="form-select list_barang" name="list_barang" id="list_barang">
                                             <option value=""></option>
                                             <?php foreach ($dataBarang as $db) : ?>
-                                                <option value="<?= $db['id'] ?>"><?= $db['barang'] ?></option>
+                                                <option value="<?= $db['id'] ?>"><?= $db['barang'] ?> - <?= $db['spesifikasi'] ?></option>
                                             <?php endforeach; ?>
                                         </select>
                                         <label for="floatingInput">List Barang</label>

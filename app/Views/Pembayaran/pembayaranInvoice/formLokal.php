@@ -1122,14 +1122,14 @@
         const selectedCustomer = Array.from(customerElement.selectedOptions).map(option => option.text);
 
         // Tentukan prefix berdasarkan kondisi
-        console.log(totalBayar, sisaPayForKeteranganCondition);
         let prefix = "";
         if (totalBayar == sisaPayForKeteranganCondition) {
             prefix = "TERIMA PELUNASAN A/ INVOICE";
-        } else {
+        } else if (totalBayar < sisaPayForKeteranganCondition) {
             prefix = "TERIMA DP A/ INVOICE";
+        } else {
+            prefix = "TERIMA A/ INVOICE";
         }
-
         // Gabungkan
         const combinedText = `${selectedCustomer[0]}; ${prefix} ${selectedNoDokumen.join('; ')}`;
         textareaElement.value = combinedText;

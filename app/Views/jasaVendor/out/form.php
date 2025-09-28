@@ -205,7 +205,7 @@
 
                         <div class="col-md-2">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <select class="form-select type_barang" disabled id="type_barang" name="type_barang">
+                                <select class="form-select type_barang" id="type_barang" name="type_barang">
                                     <option value=""></option>
                                     <?php foreach ($tipeBarang as $t) : ?>
                                         <?php if ($t['description'] == "bahan_baku") : ?>
@@ -224,6 +224,7 @@
                                     <option value=""></option>
                                     <option value="SUPPLIER" selected>SUPPLIER</option>
                                     <option value="VENDOR">VENDOR</option>
+                                    <option value="PRODUKSI">PRODUKSI</option>
                                 </select>
                                 <label for="floatingInput" style="z-index: 1;">Asal Barang</label>
                             </div>
@@ -494,6 +495,9 @@
         theme: "bootstrap-5",
     }).change(function() {
         getDropdownAsalBarang();
+        // listStockAsal = [];
+        // drawTableAsalBarang(listStockAsal);
+        // getListDokumenPabean();
     });
 
     $('#vendor_barang_id').select2({

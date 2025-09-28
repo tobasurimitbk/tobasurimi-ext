@@ -71,4 +71,24 @@ class BarangMasterSpesifikasiModel extends Model
 
         return $data;
     }
+
+    public function getListBarangSpesifikasi($typeBarang)
+    {
+        $selectQry = "
+            barang_master_spesifikasi.id,
+            barang_master.kode_barang,
+            barang_master.barang_name as barang,
+            barang_master_spesifikasi.spesifikasi
+        ";
+
+        $dataResult1 = $this->asArray()->select($selectQry)
+            ->join('barang_master', 'barang_master.id = barang_master_spesifikasi.barang_master_id')
+            ->where('barang_master.deletedAt', null)
+            ->where('barang_master.type_barang', $typeBarang)
+            ->where('barang_master.company_id', session()->get("login")->this_company_id)
+            ->orderBy('barang_master.kode_barang', "ASC")
+            ->findAll();
+
+        return $dataResult1;
+    }
 }
