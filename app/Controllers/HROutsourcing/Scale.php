@@ -62,7 +62,7 @@ class Scale extends BaseController
             // Enkripsi ID + amanin untuk URL
             $spesifikasiModel = new BarangMasterSpesifikasiModel();
 
-            $data = $spesifikasiId->select('spesifikasi')->where('id', decrypt($spesifikasiId))->first();            
+            $data = $spesifikasiModel->select('spesifikasi')->where('id', decrypt($spesifikasiId))->first();            
 
 
             return $this->response->setJSON([
