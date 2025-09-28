@@ -2617,7 +2617,7 @@ $routes->post('/hr-outsourcing-sallary-payment/delete/(:segment)', 'HROutsourcin
 //HR Ousourcing Scale 
 $routes->get('/hr-outsourcing-scale', 'HROutsourcing\Scale::generateQrBarangView', ['filter' => 'Auth']);
 $routes->post('/hr-outsourcing-scale', 'HROutsourcing\Scale::generateQrBarang', ['filter' => 'Auth']);
-$routes->post('/hr-outsourcing-scale/id/(:segment)', 'HROutsourcing\Scale::getBarangByIdQr/$1', ['filter' => 'Auth']);
+$routes->get('/hr-outsourcing-scale/id/(:segment)', 'HROutsourcing\Scale::getBarangByIdQr/$1');
 
 /*
  * --------------------------------------------------------------------

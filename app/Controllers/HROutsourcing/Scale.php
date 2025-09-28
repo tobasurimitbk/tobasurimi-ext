@@ -57,23 +57,33 @@ class Scale extends BaseController
 
     public function getBarangByIdQr($spesifikasiId)
     {
-
         try {
-            // Enkripsi ID + amanin untuk URL
             $spesifikasiModel = new BarangMasterSpesifikasiModel();
 
-            $data = $spesifikasiModel->select('spesifikasi')->where('id', decrypt($spesifikasiId))->first();            
+            $data = $spesifikasiModel
+                ->select("CONCAT(barang_master.barang_name, ' ', barang_master_spesifikasi.spesifikasi) AS nama_barang")
+                ->join('barang_master', 'barang_master.id = barang_master_spesifikasi.barang_master_id')
+                ->where('barang_master_spesifikasi.id', decrypt($spesifikasiId))
+                ->first(); 
 
-
-            return $this->response->setJSON([
-                'status' => 'ok',
-                'data'   => $data['spesifikasi']
-            ]);
+            return $this->response
+                ->setHeader('Access-Control-Allow-Origin', '*')
+                ->setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
+                ->setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization')
+                ->setJSON([
+                    'status' => 'ok',
+                    'nama_barang'   => $data['nama_barang'] ?? null
+                ]);
         } catch (Exception $e) {
-            return $this->response->setJSON([
-                'status' => 'error',
-                'message' => $e->getMessage()
-            ]);
+            return $this->response
+                ->setHeader('Access-Control-Allow-Origin', '*')
+                ->setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
+                ->setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization')
+                ->setJSON([
+                    'status' => 'error',
+                    'message' => $e->getMessage()
+                ]);
         }
     }
+
 }
