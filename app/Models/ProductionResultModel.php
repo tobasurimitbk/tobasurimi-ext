@@ -59,15 +59,14 @@ class ProductionResultModel extends Model
         $selectQry = "
         production_results.*,
         DATE_FORMAT(production_results.receive_date, '%d/%m/%Y') AS receives_date,
-        work_orders.wo_no AS wo_no,
         barang_master.kode_barang AS barangCode,
+        GROUP_CONCAT(DISTINCT work_orders.wo_no ORDER BY work_orders.wo_no SEPARATOR ', ') AS wo_no,
         GROUP_CONCAT(DISTINCT work_order_details.nama_barang ORDER BY work_order_details.nama_barang SEPARATOR ', ') AS barangName
     ";
 
         $builder = $this->asObject()
             ->select($selectQry)
             ->where($condition)
-            // === JOIN pakai FIND_IN_SET karena work_order_id bisa '33,34' ===
             ->join(
                 'work_orders',
                 'FIND_IN_SET(work_orders.id, production_results.work_order_id)',

@@ -60,9 +60,9 @@ class MaterialRequestsModel extends Model
     public function getMaterialRequestList($condition, $addCondition, $limit = 10, $offset = 0)
     {
         $availableSort = [
-            'req_no'             => 'material_requests.req_no',
-            'wo_no'       => 'work_orders.wo_no',
-            'nama_barang'       => 'material_request_details.nama_barang',
+            'req_no'        => 'material_requests.req_no',
+            'wo_no'         => 'work_orders.wo_no',
+            'barangName'    => 'work_order_details.nama_barang',
         ];
         $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
 
@@ -73,15 +73,29 @@ class MaterialRequestsModel extends Model
             material_request_details.satuan,
             material_request_details.kimia,
             SUM(material_request_details.qty) as total,
+            GROUP_CONCAT(DISTINCT work_orders.wo_no ORDER BY work_orders.wo_no SEPARATOR ', ') AS wo_no,
+            GROUP_CONCAT(DISTINCT work_order_details.nama_barang ORDER BY work_order_details.nama_barang SEPARATOR ', ') AS barangName
         ";
 
         $materialRequestsDataQry = $this->asObject()
             ->select($selectQry)
             ->where($condition)
             ->join('material_request_details', 'material_request_details.material_request_id = material_requests.id')
-            // ->join('work_orders', 'work_orders.id = material_requests.work_order_id')
-            // ->join('barang_master', 'barang_master.id = material_request_details.barang1_id')
-            // ->join('parent_barang', 'parent_barang.id = barang_master.parent_type_id')
+            ->join(
+                'work_orders',
+                'FIND_IN_SET(work_orders.id, material_requests.work_order_id)',
+                'left'
+            )
+            ->join(
+                'work_order_details',
+                'FIND_IN_SET(work_order_details.work_order_id, material_requests.work_order_id)',
+                'left'
+            )
+            ->join(
+                'barang_master',
+                'barang_master.id = work_order_details.barang1_id',
+                'left'
+            )
             ->where('material_requests.deletedAt', null)
             ->where('material_request_details.deletedAt', null)
             ->groupBy('material_request_details.material_request_id')

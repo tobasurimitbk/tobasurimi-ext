@@ -24,8 +24,9 @@
                         <thead class="thead-dark">
                             <tr>
                                 <th>No.</th>
-                                <th onclick="changeSort('req_no')" class="sort">Kode Request</th>
-                                <!-- <th onclick="changeSort('nama_barang')" class="sort">Nama Barang</th> -->
+                                <th onclick="changeSort('req_no')" class="sort">Kode Material Request</th>
+                                <th onclick="changeSort('wo_no')" class="sort">Kode Work Order</th>
+                                <th onclick="changeSort('barangName')" class="sort">Nama Barang Work Order</th>
                                 <th onclick="changeSort('request_date')" class="sort">Tanggal Permintaan</th>
                                 <th onclick="changeSort('production_date')" class="sort">Tanggal Produksi</th>
                                 <th>Action</th>
@@ -96,10 +97,14 @@
                 data: "req_no",
                 className: "text-center"
             },
-            // {
-            //     data: "nama_barang",
-            //     className: "text-center"
-            // },
+            {
+                data: "wo_no",
+                className: "text-center"
+            },
+            {
+                data: "barangName",
+                className: "text-center"
+            },
             {
                 data: "request_date",
                 className: "text-center"
@@ -120,6 +125,9 @@
                     if (status != 1) {
                         return `
                                 <div class="mt-0">
+                                    <a href="javascript:void(0)" onclick="edit('${id}')" data-toggle="tooltip" title="Edit" class="btn btn-primary">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
                                     <button type="button" onclick="handleDelete('${id}')" class="btn btn-discard delete-btn btn-trash">
                                         <i class="fa fa-trash"></i>
                                     </button>
@@ -131,27 +139,18 @@
                                     </button>
                                 </div>
                             `
+                    } else {
+                        return `
+                                <div class="mt-0">
+                                    <a href="javascript:void(0)" onclick="edit('${id}')" data-toggle="tooltip" title="Edit" class="btn btn-primary">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <button class="btn btn-warning" onclick="handlePrint('${id}')">
+                                        <i class="fa fa-print fa-sm" aria-hidden="true"></i>
+                                    </button>
+                                </div>
+                            `
                     }
-
-                    // else {
-                    //     if (request_status == "waiting") {
-                    //         return `
-                    //                 <div class="mt-0">
-                    //                     <button class="btn btn-warning">
-                    //                         <i class="fa fa-print fa-sm" aria-hidden="true"></i>
-                    //                     </button>
-                    //                 </div>
-                    //             `
-                    //     } else {
-                    //         return `
-                    //                 <div class="mt-0">
-                    //                     <button class="btn btn-warning">
-                    //                         <i class="fa fa-print fa-sm" aria-hidden="true"></i>
-                    //                     </button>
-                    //                 </div>
-                    //             `
-                    //     }
-                    // }
                 }
             }
         ],
@@ -176,16 +175,6 @@
         $(".search").keyup(function() {
             table.ajax.reload();
         })
-
-        $('#dataTable tbody').on('click', 'tr td:not(.actions):not(.dataTables_empty)', function() {
-            // Get the data associated with the clicked row
-            const data = table.row(this).data();
-
-            // Redirect to the detail page using the data ID
-            if (data) {
-                location.replace(`<?= base_url("material-request/details"); ?>/${data.id}`);
-            }
-        });
     })
 
     const posting = function(id, status_posting) {
@@ -305,6 +294,11 @@
                 });
             }
         })
+    }
+
+    // Simpan state sebelum navigasi
+    function edit(id) {
+        location.replace(`<?= base_url("material-request/details"); ?>/${id}`);
     }
 
     // delete

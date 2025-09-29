@@ -871,7 +871,9 @@
     $('#divisi_asal_bahan_baku_id').select2({
         placeholder: "Pilih Departemen Asal",
         theme: "bootstrap-5",
-    }).change(function() {
+    }).on('change', function() {
+        console.log('change divisi asal');
+
         // GET BARANG
         getListBarangBahanBaku();
         // GET WAREHOUSE
@@ -881,11 +883,10 @@
     $('#divisi_tujuan_bahan_baku_id').select2({
         placeholder: "Pilih Departemen Tujuan",
         theme: "bootstrap-5",
-    }).change(function() {
+    }).on('change', function() {
         // GET WAREHOUSE
         getListWarehouseTujuanBahanBaku();
     });
-
 
     $('#warehouse_asal_bahan_baku_id').select2({
         placeholder: "Pilih Warehouse Asal",
@@ -901,6 +902,11 @@
     }).change(function() {
 
     });
+
+    <?php if (!empty($dataMaterialRequestDetails)): ?>
+        $('#divisi_asal_bahan_baku_id').val('<?= $dataMaterialRequestDetails[0]->divisi_id ?>').trigger('change');
+        $('#divisi_tujuan_bahan_baku_id').val('<?= $dataMaterialRequestDetails[0]->divisi_tujuan_id ?>').trigger('change');
+    <?php endif; ?>
 
     $('#type_pengambilan_stock_bahan_baku').select2({
         placeholder: "Pilih Tipe Ambil Stok",
@@ -2645,32 +2651,39 @@
     }
 
     function getListBarangBahanBaku() {
-        // GET LIST BARANG
-        $.ajax({
-            url: `<?= base_url('material-request/list-barang-stock-init-bahan-baku'); ?>`,
-            method: "GET",
-            beforeSend: function() {
-                setLoading();
-            },
-            complete: function() {
-                stopLoading();
-            },
-            data: {
-                type_barang: $(".type_barang option:selected").val(),
-                divisi_id: $(".divisi_asal_bahan_baku_id option:selected").val(),
-                warehouse_id: $(".warehouse_asal_bahan_baku_id option:selected").val(),
-                asal_barang: $(".type_asal_barang option:selected").val()
-            },
-            dataType: "json",
-            success: function(res) {
-                $(".spesifikasi_id").empty()
-                $(".spesifikasi_id").append(`<option value=""></option>`)
-                res.data.forEach(function(item) {
-                    $(".spesifikasi_id").append(`<option data-barang_master_id="${item.id}" data-stock_id="${item.stock_id}" data-kode_barang="${item.kode_barang}" data-barang="${item.barang}" data-kode_satuan="${item.kode_satuan}" value="${item.spesifikasi_id}">(${item.kode_barang}) ${item.barang}</option>`)
-                })
-                $(".spesifikasi_id").val();
-            }
-        });
+        let type_barang = $(".type_barang option:selected").val();
+        let divisi_id = $(".divisi_asal_bahan_baku_id option:selected").val();
+        let warehouse_id = $(".warehouse_asal_bahan_baku_id option:selected").val();
+        let asal_barang = $(".type_asal_barang option:selected").val();
+
+        if (type_barang && divisi_id && warehouse_id && asal_barang) {
+            // GET LIST BARANG
+            $.ajax({
+                url: `<?= base_url('material-request/list-barang-stock-init-bahan-baku'); ?>`,
+                method: "GET",
+                beforeSend: function() {
+                    setLoading();
+                },
+                complete: function() {
+                    stopLoading();
+                },
+                data: {
+                    type_barang: type_barang,
+                    divisi_id: divisi_id,
+                    warehouse_id: warehouse_id,
+                    asal_barang: asal_barang
+                },
+                dataType: "json",
+                success: function(res) {
+                    $(".spesifikasi_id").empty()
+                    $(".spesifikasi_id").append(`<option value=""></option>`)
+                    res.data.forEach(function(item) {
+                        $(".spesifikasi_id").append(`<option data-barang_master_id="${item.id}" data-stock_id="${item.stock_id}" data-kode_barang="${item.kode_barang}" data-barang="${item.barang}" data-kode_satuan="${item.kode_satuan}" value="${item.spesifikasi_id}">(${item.kode_barang}) ${item.barang}</option>`)
+                    })
+                    $(".spesifikasi_id").val();
+                }
+            });
+        }
     }
 
     function getListWarehouseAsalBahanBaku() {
@@ -2678,10 +2691,10 @@
             url: `<?= base_url('material-request/warehouse'); ?>`,
             method: "GET",
             beforeSend: function() {
-                setLoading();
+                // setLoading();
             },
             complete: function() {
-                stopLoading();
+                // stopLoading();
             },
             data: {
                 divisi_id: $(".divisi_asal_bahan_baku_id option:selected").val(),
@@ -2693,7 +2706,14 @@
                 res.data.forEach(function(item) {
                     $(".warehouse_asal_bahan_baku_id").append(`<option value="${item.id}">${item.warehouse_name}</option>`)
                 })
-                $(".warehouse_asal_bahan_baku_id").val();
+
+                let selectedId = '<?= $dataMaterialRequestDetails[0]->warehouse_id ?? '' ?>';
+
+                if (selectedId) {
+                    $(".warehouse_asal_bahan_baku_id").val(selectedId).change();
+                } else {
+                    $(".warehouse_asal_bahan_baku_id").val();
+                }
             }
         });
     }
@@ -2703,10 +2723,10 @@
             url: `<?= base_url('material-request/warehouse'); ?>`,
             method: "GET",
             beforeSend: function() {
-                setLoading();
+                // setLoading();
             },
             complete: function() {
-                stopLoading();
+                // stopLoading();
             },
             data: {
                 divisi_id: $(".divisi_tujuan_bahan_baku_id option:selected").val(),
@@ -2718,7 +2738,14 @@
                 res.data.forEach(function(item) {
                     $(".warehouse_tujuan_bahan_baku_id").append(`<option value="${item.id}">${item.warehouse_name}</option>`)
                 })
-                $(".warehouse_tujuan_bahan_baku_id").val();
+
+                let selectedId = '<?= $dataMaterialRequestDetails[0]->warehouse_tujuan_id ?? '' ?>';
+
+                if (selectedId) {
+                    $(".warehouse_tujuan_bahan_baku_id").val(selectedId).change();
+                } else {
+                    $(".warehouse_tujuan_bahan_baku_id").val();
+                }
             }
         });
     }
