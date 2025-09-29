@@ -54,7 +54,7 @@
                     <a class="nav-link" href="<?= base_url('pembayaran-invoice/create-lain') ?>">Pembayaran Invoice Lain Lain</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="<?= base_url('pembayaran-invoice/create-return') ?>">Return</a>
+                    <a class="nav-link" href="<?= base_url('pembayaran-invoice/create-return') ?>">Pembayaran Return</a>
                 </li>
             </ul>
 
@@ -1128,8 +1128,6 @@
         // Tentukan prefix berdasarkan kondisi
         let prefix = "";
         sisa = sisaPayForKeteranganCondition - totalBayar
-
-        console.log(sisaPayForKeteranganCondition, totalBayar, totalTagihan);
 
         if (totalBayar === totalTagihan) {
             prefix = "TERIMA A/ INVOICE";
