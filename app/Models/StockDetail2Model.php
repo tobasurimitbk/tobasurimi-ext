@@ -1669,18 +1669,18 @@ class StockDetail2Model extends Model
             // BC 2.3
             $bcDetail = $bc23Model->select('no_daftar, bc_purchase_order.createdAt as tanggal_dokumen')
                 ->join('bc_purchase_order', 'bc_purchase_order.id = bc_23.bc_purchase_order_id', 'left')
-                ->where('no_aju', $noAju)
+                ->where('bc_23.no_aju', $noAju)
                 ->first();
             $noDaftar = $bcDetail != null ? $bcDetail['no_daftar'] : "-";
         } elseif ($bcId == 52) {
             // BC 2.7
-            $bcDetail = $bc27Model->where('no_aju', $noAju)->first();
+            $bcDetail = $bc27Model->where('bc_27.no_aju', $noAju)->first();
             $noDaftar = $bcDetail != null ? $bcDetail['no_daftar'] : "-";
         } elseif ($bcId == 53) {
             // BC 4.0
             $bcDetail = $bc40Model->select('no_daftar, bc_purchase_order.createdAt as tanggal_dokumen')
                 ->join('bc_purchase_order', 'bc_purchase_order.id = bc_40.bc_purchase_order_id', 'left')
-                ->where('no_aju', $noAju)
+                ->where('bc_40.no_aju', $noAju)
                 ->first();
             $noDaftar = $bcDetail != null ? $bcDetail['no_daftar'] : "-";
         } elseif ($bcId == 1426) {

@@ -180,6 +180,7 @@ class MaterialRequest extends BaseController
         if (!empty($id)) {
             $dataMaterialRequests = $this->materialRequestModel->asObject()->find($id);
             $dataMaterialRequestDetailsBahanBaku = $this->materialRequestDetailsModel->getMaterialRequestBahanBakuDetailNew($id);
+
             $dataMaterialRequestDetails = $this->materialRequestDetailsModel->asObject()
                 ->select(
                     '
