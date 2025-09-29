@@ -183,9 +183,15 @@
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <textarea <?= !empty($detail) ? ($detail['status_posting'] == 1 ? 'disabled' : '') : ""  ?> autocomplete="one-time-code" class="form-control keterangan" id="keterangan" name="keterangan" style="height: 90px;"> </textarea>
-                            <label for="floatingInput">Keterangan</label>
+                            <textarea <?= !empty($detail) ? ($detail['status_posting'] == 1 ? 'disabled' : '') : "" ?> 
+                                    autocomplete="one-time-code" 
+                                    class="form-control keterangan" 
+                                    id="keterangan" 
+                                    name="keterangan" 
+                                    style="height: 90px;"><?= !empty($detail) ? $detail['keterangan'] : '' ?></textarea>
+                            <label for="keterangan">Keterangan</label>
                         </div>
+
                     </div>
                 </div>
                 <hr>
@@ -338,7 +344,6 @@
             table.find('tbody').empty();
             let customerId = $(this).val();
             getDataDokumenInvoice(customerId);
-            updateKeterangan();
         });
 
         //CSS SELECT2 FLOATING LABEL
@@ -443,7 +448,6 @@
             const table = $('#dataTable');
             table.find('tbody').empty();
             getDataSalesLokal();
-            updateKeterangan();
         });
 
 
@@ -1031,7 +1035,7 @@
                     <input 
                         autocomplete="one-time-code" 
                         data-id="" 
-                        onkeyup="this.value = greatFormatRupiah(this.value); updateKeterangan();" 
+                        onkeyup="this.value = greatFormatRupiah(this.value); updateKeterangan(${total_amount}, ${total_invoice});" 
                         class="form-control total-bayar trigger-input" 
                         type="text" 
                         value="" 
@@ -1107,7 +1111,7 @@
         return randomString;
     };
 
-    function updateKeterangan() {
+    function updateKeterangan(totalTagihan, totalPembayaran){
         const noDokumenElement = document.getElementById('no_dokumen');
         const customerElement = document.getElementById('customer');
         const textareaElement = document.getElementById('keterangan');
@@ -1123,12 +1127,18 @@
 
         // Tentukan prefix berdasarkan kondisi
         let prefix = "";
-        if (totalBayar == sisaPayForKeteranganCondition) {
-            prefix = "TERIMA PELUNASAN A/ INVOICE";
-        } else if (totalBayar < sisaPayForKeteranganCondition) {
-            prefix = "TERIMA DP A/ INVOICE";
-        } else {
+        sisa = sisaPayForKeteranganCondition - totalBayar
+
+        console.log(sisaPayForKeteranganCondition, totalBayar, totalTagihan);
+
+        if (totalBayar === totalTagihan) {
             prefix = "TERIMA A/ INVOICE";
+        } else if (sisa > 0 && sisaPayForKeteranganCondition < totalTagihan) {
+            prefix = "TERIMA DP A/ INVOICE";
+        } else if (sisa == 0 && sisaPayForKeteranganCondition < totalTagihan) {
+            prefix = "TERIMA PELUNASAN A/ INVOICE";
+        } else {
+            prefix = ""
         }
         // Gabungkan
         const combinedText = `${selectedCustomer[0]}; ${prefix} ${selectedNoDokumen.join('; ')}`;
