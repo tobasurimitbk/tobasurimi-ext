@@ -3,6 +3,7 @@
 namespace App\Controllers\BeaCukai;
 
 use App\Controllers\BaseController;
+use App\Controllers\Warehouse\PenerimaanBarangLokalBP;
 use App\Helpers\BeaCukaiApi;
 use App\Models\AMPurchaseOrderDetailModel;
 use App\Models\AMPurchaseOrderModel;
@@ -83,6 +84,7 @@ class BC23 extends BaseController
     protected $dompdf;
     protected $bc40Controller;
     protected $divisiModel;
+    protected $penerimaanBarangLokalBp;
 
     public function __construct()
     {
@@ -117,6 +119,7 @@ class BC23 extends BaseController
         $this->dompdf = new Dompdf();
         $this->bc40Controller = new BC40();
         $this->divisiModel = new DivisisModel();
+        $this->penerimaanBarangLokalBp = new PenerimaanBarangLokalBP();
 
         $this->this_user_id = session()->get("login")->user_id;
         $this->this_company_id = session()->get("login")->this_company_id;
@@ -2031,7 +2034,6 @@ class BC23 extends BaseController
         $bc40 = $this->bc23Model->where('bc_purchase_order_id', $bcPurchaseOrderID)->first();
 
         if ($bc40 == null) {
-            $last_day = date("Y-m-t", strtotime(date('Y') . "-" . date('m') . "-" . date('d')));
             // insert
             $this->bc23Model->insert([
                 'bc_purchase_order_id' => $bcPurchaseOrderID,
@@ -2050,7 +2052,10 @@ class BC23 extends BaseController
         }
 
         $this->bcPurchaseOrderModel->update($bcPurchaseOrderID, [
-            'status_posting' => '1'
+            'status_posting' => '1',
+            'no_aju' => $bc40['no_aju'],
+            'bc_id' => 48,
+            'bc_type' => "BC 2.3"
         ]);
 
         return response()->setJSON([
@@ -2286,7 +2291,7 @@ class BC23 extends BaseController
         $this->dompdf->stream("BC 2.3 Purchase Order", array("Attachment" => false));
     }
 
-    private function insertInventori($bcPurchaseOrderID)
+    private function insertInventoriRevamp($bcPurchaseOrderID)
     {
         try {
             $bcPo = $this->bcPurchaseOrderModel->find($bcPurchaseOrderID);
@@ -2445,6 +2450,25 @@ class BC23 extends BaseController
             return false;
         }
     }
+
+    private function insertInventori($bcPurchaseOrderID)
+    {
+        try {
+            $bcPo = $this->bcPurchaseOrderModel->find($bcPurchaseOrderID);
+            $lpbIdArr = array_unique(json_decode($bcPo['multiple_lpb_id']));
+
+            foreach ($lpbIdArr as $lpbId) {
+                $this->penerimaanBarangLokalBp->insert_stock_pembelian_revamp(
+                    $lpbId
+                );
+            }
+            return true;
+        } catch (Exception $e) {
+            var_dump($e->getMessage(), $e->getTrace());
+            return false;
+        }
+    }
+
 
     public function viewOutstanding()
     {

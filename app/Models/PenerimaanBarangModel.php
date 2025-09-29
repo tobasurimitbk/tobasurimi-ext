@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Controllers\Warehouse\PenerimaanBarangLokalBP;
 use CodeIgniter\Model;
 use Doctrine\Instantiator\Exception\InvalidArgumentException;
 
@@ -624,7 +625,7 @@ class PenerimaanBarangModel extends Model
         return $receiveDataQry;
     }
 
-    public function generateLpbBB($poID, $warehouseID, $dokumenBC, $tanggalPenerimaanLPB)
+    public function generateLpbBBBackup($poID, $warehouseID, $dokumenBC, $tanggalPenerimaanLPB)
     {
         $penerimaanBarangModel = new PenerimaanBarangModel();
         $penerimaanBarangDetailModel = new PenerimaanBarangDetailModel();
@@ -634,6 +635,7 @@ class PenerimaanBarangModel extends Model
         $stockModel = new StockModel();
         $stockDetail2Model = new StockDetail2Model();
         $barangMasterModel = new BarangMasterModel();
+        $penerimaaanBarangLokalBp = new PenerimaanBarangLokalBP();
 
         $rmDetail =  $rmPurchaseOrder->where('id', $poID)->first();
         $rmBarangDetail = $rmPurchaseOrderDetailModel->where('rm_purchase_order_id', $poID)->findAll();
@@ -786,6 +788,18 @@ class PenerimaanBarangModel extends Model
 
         // NON PABEAN LANGSUNG INPUTKAN STOK NYA
         if ($penerimaanBarang['bc_type'] == 0 && $rmDetail['status_external'] == "no") {
+
+            $res = $penerimaaanBarangLokalBp->insert_stock_pembelian_revamp(
+                $penerimaanBarang['id']
+            );
+            if (!$res) {
+                return response()->setJSON([
+                    'status' => false,
+                    'message' => "Gagal Posting : Terjadi kesalahan saat menambah stok",
+                    'token' => csrf_hash()
+                ]);
+            }
+
             // STOK BARANG DIINPUT
             // KHUSUS INTERNAL
             foreach ($penerimaanBarangList as $p) {
@@ -867,6 +881,128 @@ class PenerimaanBarangModel extends Model
                 $penerimaanBarang['no_penerimaan_barang'],
                 $penerimaanBarang['supplier_id'],
             );
+        }
+
+        $this->autoClosePO($lpbID);
+
+        return $lpbID;
+    }
+
+    public function generateLpbBB($poID, $warehouseID, $dokumenBC, $tanggalPenerimaanLPB)
+    {
+        $penerimaanBarangModel = new PenerimaanBarangModel();
+        $penerimaanBarangDetailModel = new PenerimaanBarangDetailModel();
+        $rmPurchaseOrder = new RMPurchaseOrderModel();
+        $rmPurchaseOrderDetailModel = new RMPurchaseOrderDetailModel();
+        $barangMasterModel = new BarangMasterModel();
+        $penerimaaanBarangLokalBp = new PenerimaanBarangLokalBP();
+        $warehouseModel = new WarehousesModel();
+
+        $rmDetail =  $rmPurchaseOrder->where('id', $poID)->first();
+        $rmBarangDetail = $rmPurchaseOrderDetailModel->where('rm_purchase_order_id', $poID)->findAll();
+
+
+        // no lpb
+        $warehouse = $warehouseModel->where('id', $warehouseID)->first();
+        $no = $penerimaanBarangModel->get_no(
+            $rmDetail['po_date'],
+            $rmDetail['company_id'],
+            "LOKAL",
+            "BAKU",
+        );
+
+
+        $payloadPenerimaanBarang = [
+            "company_id" => $rmDetail['company_id'],
+            "no_penerimaan_barang" => $no,
+            "supplier_id" => $rmDetail['supplier_id'],
+            "warehouse_id" => $warehouseID,
+            "divisi_id" => $warehouse['divisi_id'],
+            "acceptance_type" => "SINGLE ORDER",
+            "multiple_po_id" => '[' . $rmDetail['id'] . ']',
+            "multiple_po_no" => '["' . $rmDetail['po_no'] . '"]',
+            "kemasan_id" => $rmDetail['kemasan_id'],
+            "kemasan" => $rmDetail['kemasan_tambahan'],
+            "jumlah_kemasan" => $rmDetail['jumlah_kemasan'],
+            "tipe_bahan" => "BAKU",
+            "bc_type" => $dokumenBC,
+            "status_post" => "FINISH",
+            "status_penerimaan" => "LOKAL",
+            "tanggal" => $tanggalPenerimaanLPB
+        ];
+
+        $lpbID = $penerimaanBarangModel->insert($payloadPenerimaanBarang);
+
+        foreach ($rmBarangDetail as $r) {
+            $selectQry = "
+                barang_master.id as bahan_baku_id, 
+                barang_master.barang_name,
+                barang_master_spesifikasi.spesifikasi,
+                barang_master_spesifikasi.satuan_1,
+                barang_master_spesifikasi.satuan_2,
+                barang_master_spesifikasi.satuan_3,
+                barang_master_spesifikasi.konversi_satuan_2,
+                barang_master_spesifikasi.konversi_satuan_3,
+            ";
+
+            $barang = $barangMasterModel->select($selectQry)
+                ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.barang_master_id = barang_master.id', 'left')
+                ->where('barang_master.id', $r['barang1_id'])
+                ->where('barang_master_spesifikasi.id', $r['barang2_id'])
+                ->first();
+
+            $nilaiKonversi = 1;
+            $satuanKonversiId = $barang == null ? null : $barang['satuan_1'];
+            if ($r['satuan_id'] == $barang['satuan_1']) {
+                $nilaiKonversi = 1;
+            } elseif ($r['satuan_id'] == $barang['satuan_2']) {
+                $nilaiKonversi = $barang['konversi_satuan_2'];
+            } elseif ($r['satuan_id'] == $barang['satuan_3']) {
+                $nilaiKonversi = $barang['konversi_satuan_3'];
+            }
+
+            $penerimaanBarangDetailModel->insert([
+                'purchase_order_id' => $r['rm_purchase_order_id'],
+                'purchase_order_details_id' => $r['id'],
+                'penerimaan_barang_id' => $lpbID,
+                'spesifikasi_id' => $r['barang2_id'],
+                'harga' => $r['general_price'],
+                'harga_harian' => $r['daily_price'],
+                'harga_bulanan' => $r['monthly_price'],
+                'sub_total' => ($r['general_price'] +  $r['daily_price'] + $r['monthly_price']) * $r['qty'],
+                'keterangan' => $r['note'],
+                'barang_id' => $barang['bahan_baku_id'],
+                'qty' => $r['qty'],
+                'unit' => $r['satuan_id'],
+                'nama_barang_dok' => $barang['barang_name'] . " (" . $barang['spesifikasi'] . ")",
+                'jml_masuk' => $r['qty'],
+                'jml_masuk_konversi' => ($r['qty'] * $nilaiKonversi),
+                'unit_konversi' => $satuanKonversiId,
+                // 'packaging' => "-",
+                // 'packaging_qty' => $r['qty']
+            ]);
+
+            // UPDATE QTY DITERIMA
+            $rmPurchaseOrderDetailModel->update($r['id'], [
+                'qty_diterima' => $r['qty'],
+                'remaining_qty' => 0
+            ]);
+        }
+
+        // TAMBAJKAN STOK DISINI
+        $penerimaanBarang = $penerimaanBarangModel->where('id', $lpbID)->first();
+        if ($penerimaanBarang['bc_type'] == 0 && $rmDetail['status_external'] == "no") {
+
+            $res = $penerimaaanBarangLokalBp->insert_stock_pembelian_revamp(
+                $penerimaanBarang['id']
+            );
+            if (!$res) {
+                return response()->setJSON([
+                    'status' => false,
+                    'message' => "Gagal Posting : Terjadi kesalahan saat menambah stok",
+                    'token' => csrf_hash()
+                ]);
+            }
         }
 
         $this->autoClosePO($lpbID);
