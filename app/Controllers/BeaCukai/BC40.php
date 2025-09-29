@@ -3,6 +3,7 @@
 namespace App\Controllers\BeaCukai;
 
 use App\Controllers\BaseController;
+use App\Controllers\Warehouse\PenerimaanBarangLokalBP;
 use App\Helpers\BeaCukaiApi;
 use App\Models\AMPurchaseOrderDetailModel;
 use App\Models\AMPurchaseOrderModel;
@@ -83,6 +84,7 @@ class BC40 extends BaseController
     protected $dompdf;
     protected $divisiModel;
     protected $bcPurchaseOrderLPBModel;
+    protected $penerimaanBarangLokalBp;
 
 
     public function __construct()
@@ -117,6 +119,7 @@ class BC40 extends BaseController
         $this->dompdf = new Dompdf();
         $this->divisiModel = new DivisisModel();
         $this->bcPurchaseOrderLPBModel = new BCPurchaseOrderLPBModel();
+        $this->penerimaanBarangLokalBp = new PenerimaanBarangLokalBP();
 
         $this->this_user_id = session()->get("login")->user_id;
         $this->this_company_id = session()->get("login")->this_company_id;
@@ -1628,7 +1631,6 @@ class BC40 extends BaseController
         $noAju = $this->request->getVar('no_pengajuan');
 
         $bc40First = $this->bc40Model->where('bc_purchase_order_id', $bcPurchaseOrderID)->first();
-        $bcPurchaseOrder = $this->bcPurchaseOrderModel->where('id', $bcPurchaseOrderID)->first();
 
         // $bc40 = $this->bc40Model
         //     ->where('no_aju', $noAju)
@@ -1759,7 +1761,6 @@ class BC40 extends BaseController
         $bc40 = $this->bc40Model->where('bc_purchase_order_id', $bcPurchaseOrderID)->first();
 
         if ($bc40 == null) {
-            $last_day = date("Y-m-t", strtotime(date('Y') . "-" . date('m') . "-" . date('d')));
             // insert
             $this->bc40Model->insert([
                 'bc_purchase_order_id' => $bcPurchaseOrderID,
@@ -1787,7 +1788,10 @@ class BC40 extends BaseController
         }
 
         $this->bcPurchaseOrderModel->update($bcPurchaseOrderID, [
-            'status_posting' => '1'
+            'status_posting' => '1',
+            'no_aju' => $bc40['no_aju'],
+            'bc_id' => 53,
+            'bc_type' => "BC 4.0"
         ]);
 
         return response()->setJSON([
@@ -2370,7 +2374,7 @@ class BC40 extends BaseController
         return $result;
     }
 
-    private function insertInventori($bcPurchaseOrderID)
+    private function insertInventoriBackup($bcPurchaseOrderID)
     {
         try {
             $bcPo = $this->bcPurchaseOrderModel->find($bcPurchaseOrderID);
@@ -2539,6 +2543,40 @@ class BC40 extends BaseController
             return false;
         }
     }
+
+    private function insertInventori($bcPurchaseOrderID)
+    {
+        try {
+            $bcPo = $this->bcPurchaseOrderModel->find($bcPurchaseOrderID);
+            $poIdArr = array_unique(json_decode($bcPo['multiple_po_id']));
+            $lpbIdArr = array_unique(json_decode($bcPo['multiple_lpb_id']));
+            $typeBahan = $bcPo['po_type'] == "LOKAL BAKU" ? "bahan_baku" : "bahan_penolong";
+
+            foreach ($lpbIdArr as $index => $lpbId) {
+                $statusInputStock = true;
+
+                if ($typeBahan == "bahan_baku") {
+                    $rmPurchaseOrder = $this->rmPurchaseOrderModel->where('id', $poIdArr[$index])->first();
+                    if ($rmPurchaseOrder['status_external'] == "yes") {
+                        // JIKA STATUS EKSTERNAL YES GA USAH INSERT KE INVENTORI
+                        $statusInputStock = false;
+                    }
+                }
+
+                if ($statusInputStock) {
+                    $this->penerimaanBarangLokalBp->insert_stock_pembelian_revamp(
+                        $lpbId
+                    );
+                }
+            }
+
+            return true;
+        } catch (Exception $e) {
+            var_dump($e->getMessage());
+            return false;
+        }
+    }
+
     public function viewOutstanding()
     {
         $data = [
@@ -3011,7 +3049,7 @@ class BC40 extends BaseController
         exit;
     }
 
-    public function unPosting()
+    public function unPostingBackup()
     {
         try {
             $db = Database::connect();
@@ -3073,6 +3111,58 @@ class BC40 extends BaseController
         }
     }
 
+    public function unPosting()
+    {
+        try {
+            $db = Database::connect();
+            $db->transBegin();
+
+            // BC PURCHASE ORDER ID
+            $id = decrypt($this->request->getVar('id'));
+            $bcPurchaseOrder = $this->bcPurchaseOrderModel->where('id', $id)->first();
+            $lpbIdArr = json_decode($bcPurchaseOrder['multiple_lpb_id']);
+            $penerimaanBarang = $this->penerimaanBarangModel->whereIn('id', $lpbIdArr)->where('company_id', $this->this_company_id)->where('deletedAt', null)->findAll();
+
+            $cekStockLpbUsed = true;
+            foreach ($penerimaanBarang as $p) {
+                $cekStockLpbUsed = $this->penerimaanBarangLokalBp->unposting_stock_pembelian_revamp(
+                    $p['id']
+                );
+
+                if (!$cekStockLpbUsed) {
+                    break;
+                }
+            }
+
+            if (!$cekStockLpbUsed) {
+                return response()->setJSON([
+                    'status' => false,
+                    'message' => "Gagal UnPosting : Stock sudah digunakan",
+                    'token' => csrf_hash()
+                ]);
+            }
+
+            $this->bcPurchaseOrderModel->update($bcPurchaseOrder['id'], [
+                'status_posting' => '0'
+            ]);
+
+            $db->transCommit();
+            return response()->setJSON([
+                'status' => true,
+                'message' => "Dokumen berhasil di unpost ",
+                'token' => csrf_hash()
+            ]);
+        } catch (Exception $e) {
+            $db->transRollback();
+            return response()->setJSON([
+                'status' => false,
+                'message' => "Gagal Posting : Terjadi kesalahan saat unposting lpb",
+                'error' => $e->getTrace(),
+                'token' => csrf_hash()
+            ]);
+        }
+    }
+
     public function dropdownSupplier()
     {
         $poType = $this->request->getVar('po_type');
@@ -3106,7 +3196,6 @@ class BC40 extends BaseController
         $noDaftar = $this->request->getVar('no_daftar');
         $tanggalDokumen = $this->request->getVar("tanggal_dokumen") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("tanggal_dokumen")))) : "";
         // Get
-        $bc40 = $this->bc40Model->where('bc_purchase_order_id', $bcPurchaseOrderID)->first();
 
         // Periksa Nomor Aju
         $bc40First = $this->bc40Model
@@ -3122,34 +3211,23 @@ class BC40 extends BaseController
                 'status' => true,
             ]);
         } else {
-            $updateBulkNoAju = $this->stockModel->updateNoAju(
-                $noAjuNew,
-                $bc40['no_aju'],
-                $tanggalDokumen
-            );
+            $this->bcPurchaseOrderModel->update($bcPurchaseOrderID, [
+                'createdAt' => $tanggalDokumen,
+                'no_daftar' => $noDaftar,
+                'no_aju' => $noAjuNew,
+                'bc_id' => 53,
+                'bc_type' => "BC 4.0"
+            ]);
 
-            if ($updateBulkNoAju) {
-                $this->bcPurchaseOrderModel->update($bcPurchaseOrderID, [
-                    'createdAt' => $tanggalDokumen,
-                    'no_daftar' => $noDaftar,
-                ]);
+            $this->bc40Model->where('bc_purchase_order_id', $bcPurchaseOrderID)
+                ->set('no_aju', $noAjuNew)
+                ->update();
 
-                $this->bc40Model->where('bc_purchase_order_id', $bcPurchaseOrderID)
-                    ->set('no_aju', $noAjuNew)
-                    ->update();
-
-                return response()->setJSON([
-                    'token' => csrf_token(),
-                    'message' => "No Aju & No Daftar Berhasil Diupdate",
-                    'status' => true,
-                ]);
-            } else {
-                return response()->setJSON([
-                    'token' => csrf_token(),
-                    'message' => "Terjadi Kesalahan Saat Mengubah Nomor Aju & No Daftar",
-                    'status' => false,
-                ]);
-            }
+            return response()->setJSON([
+                'token' => csrf_token(),
+                'message' => "No Aju & No Daftar Berhasil Diupdate",
+                'status' => true,
+            ]);
         }
     }
 

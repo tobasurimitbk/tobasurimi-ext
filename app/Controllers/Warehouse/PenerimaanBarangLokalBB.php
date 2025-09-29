@@ -651,7 +651,7 @@ class PenerimaanBarangLokalBB extends BaseController
         ]);
     }
 
-    public function posting()
+    public function postingBackup()
     {
         $id = decrypt($this->request->getVar('id'));
 
@@ -680,6 +680,16 @@ class PenerimaanBarangLokalBB extends BaseController
             // MASUKKAN STOK BARANG DAN KEMASAN JIKA NON PABEAN 
             // (JIKA ADA BC MASUK KE INVENTORI DI MODUL BEA CUKAI)
             if ($penerimaanBarang['bc_type'] == 0) {
+
+                $res = $this->penerimaanBarangLokalBp->insert_stock_pembelian_revamp($id);
+                if (!$res) {
+                    return response()->setJSON([
+                        'status' => false,
+                        'message' => "Gagal Posting : Terjadi kesalahan saat menambah stok",
+                        'token' => csrf_hash()
+                    ]);
+                }
+
                 // CHECK STOK APAKAH SUDAH DIINISASI
                 foreach ($penerimaanBarangList as $p) {
 
@@ -832,13 +842,87 @@ class PenerimaanBarangLokalBB extends BaseController
         ]);
     }
 
-    public function unposting()
+    public function posting()
+    {
+        $id = decrypt($this->request->getVar('id'));
+
+        try {
+            $penerimaanBarang = $this->penerimaanBarangModel->where('id', $id)->first();
+
+            $multiple_po_id = json_decode($penerimaanBarang['multiple_po_id']);
+            foreach ($multiple_po_id as $key => $value) {
+                $result = $this->jurnalUmumController->insertDataPembelian($value, "BAHAN " . $penerimaanBarang['tipe_bahan'], $penerimaanBarang['status_penerimaan'], "pembelian", $id);
+                if ($result) {
+                    $responseBody = json_decode($result->getBody(), true);
+                    if ($responseBody && isset($responseBody['status'])) {
+                        $data = [
+                            "status"    => false,
+                            "message"   => $responseBody['message'],
+                            "payload"   => "",
+                            'token'     => csrf_hash()
+                        ];
+                        // echo json_encode($data);
+                        return json_encode($data);
+                    }
+                }
+            }
+
+            // MASUKKAN STOK BARANG DAN KEMASAN JIKA NON PABEAN 
+            // (JIKA ADA BC MASUK KE INVENTORI DI MODUL BEA CUKAI)
+            if ($penerimaanBarang['bc_type'] == 0) {
+                $res = $this->penerimaanBarangLokalBp->insert_stock_pembelian_revamp($id);
+                if (!$res) {
+                    return response()->setJSON([
+                        'status' => false,
+                        'message' => "Gagal Posting : Terjadi kesalahan saat menambah stok",
+                        'token' => csrf_hash()
+                    ]);
+                }
+            }
+
+
+            $this->penerimaanBarangModel
+                ->where(['id' => $id])
+                ->set(['status_post' => 'FINISH'])
+                ->update();
+
+            $this->penerimaanBarangModel->autoClosePO($id);
+
+            return response()->setJSON([
+                'status' => true,
+                'message' => "LPB berhasil diposting",
+                'token' => csrf_hash()
+            ]);
+        } catch (Exception $e) {
+            return response()->setJSON([
+                'status' => false,
+                'message' => "Gagal Posting : Terjadi kesalahan saat menambah stok",
+                'error' => $e->getTrace(),
+                'token' => csrf_hash()
+            ]);
+        }
+    }
+
+    public function unpostingBackup()
     {
         try {
             $db = Database::connect();
             $db->transBegin();
 
             $id = decrypt($this->request->getVar('id'));
+
+            // Unpost
+            $res = $this->penerimaanBarangLokalBp->unposting_stock_pembelian_revamp(
+                $id
+            );
+
+            if (!$res) {
+                return response()->setJSON([
+                    'status' => false,
+                    'message' => "Gagal UnPosting : Stock Barang Sudah Digunakan",
+                    'token' => csrf_hash()
+                ]);
+            }
 
             $penerimaanBarang = $this->penerimaanBarangModel->where('id', $id)->first();
             $penerimaanBarangList = $this->penerimaanBarangDetailModel
@@ -917,6 +1001,66 @@ class PenerimaanBarangLokalBB extends BaseController
                 $this->stockModel->unPostingStockLPB(
                     $penerimaanBarang['id']
                 );
+            }
+
+            $this->penerimaanBarangModel
+                ->where(['id' => $id])
+                ->set(['status_post' => 'WAITING'])
+                ->update();
+            $db->transCommit();
+
+            return response()->setJSON([
+                'status' => true,
+                'message' => "LPB berhasil diunpost ",
+                'token' => csrf_hash()
+            ]);
+        } catch (Exception $e) {
+            $db->transRollback();
+            return response()->setJSON([
+                'status' => false,
+                'message' => "Gagal Posting : Terjadi kesalahan saat unposting lpb",
+                'error' => $e->getTrace(),
+                'token' => csrf_hash()
+            ]);
+        }
+    }
+
+    public function unposting()
+    {
+        try {
+            $db = Database::connect();
+            $db->transBegin();
+
+            $id = decrypt($this->request->getVar('id'));
+
+            $penerimaanBarang = $this->penerimaanBarangModel->where('id', $id)->first();
+
+            // Hapus Di Jurnal
+            $transaksiJurnal = $this->transaksiJurnalModel->where('penerimaan_barang_id', $id)->first();
+            if ($transaksiJurnal) {
+                $this->transaksiJurnalModel->where('penerimaan_barang_id', $id)->delete();
+                $this->jurnalUmumModel->where('id_transaksi', $transaksiJurnal['id']);
+            } else {
+                return response()->setJSON([
+                    'status' => false,
+                    'message' => "Gagal UnPosting : Jurnal Pembelian Tidak Ditemukan",
+                    'token' => csrf_hash()
+                ]);
+            }
+
+            if ($penerimaanBarang['bc_type'] == 0) {
+                // Unpost
+                $res = $this->penerimaanBarangLokalBp->unposting_stock_pembelian_revamp(
+                    $id
+                );
+
+                if (!$res) {
+                    return response()->setJSON([
+                        'status' => false,
+                        'message' => "Gagal UnPosting : Stock Barang Sudah Digunakan",
+                        'token' => csrf_hash()
+                    ]);
+                }
             }
 
             $this->penerimaanBarangModel
