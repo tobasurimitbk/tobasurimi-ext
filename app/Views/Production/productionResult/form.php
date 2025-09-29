@@ -148,10 +148,10 @@
                         </nav>
                         <div class="tab-content mt-3" id="nav-tabContent">
                             <div class="tab-pane fade show active" id="nav-barang-jadi" role="tabpanel" aria-labelledby="nav-barang-jadi">
-                                <?php if (!isset($data)) : ?>
+                                <?php if (!isset($data) || (isset($data) && $data->is_posted != 1)) : ?>
                                     <button type="button" class="btn btn-primary btn-add-barang-jadi" style="float: right;">Tambah Barang Jadi</button>
-                                    <br> <br>
                                 <?php endif; ?>
+                                <br> <br>
                                 <div class="row">
                                     <div class="col-md-12">
                                         <div class="table-responsive">
@@ -1034,16 +1034,34 @@
 
         $(".btn-add-barang").click(function() {
             tempBarangList.forEach(t => {
-                list_items_barang_jadi.push({
-                    barang_detail_id: getID(),
-                    ...t // spread: semua field di t ikut dimasukkan
-                });
+                // cek apakah sudah ada item dengan barang1_id & barang2_id yang sama
+                const sudahAda = list_items_barang_jadi.some(item =>
+                    item.barang1_id == t.barang1_id &&
+                    item.barang2_id == t.barang2_id
+                );
+
+                if (!sudahAda) {
+                    // hanya push bila kombinasi belum ada
+                    list_items_barang_jadi.push({
+                        barang_detail_id: getID(),
+                        ...t
+                    });
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: `Baran ${t.barang_name} sudah ada`,
+                        confirmButtonColor: '#4e73df',
+                        confirmButtonText: 'Ok'
+                    });
+                }
             });
-            drawTableBarangJadi(); // fungsi tabel utama
-            tempBarangList = []; // reset
+
+            drawTableBarangJadi();
+            tempBarangList = [];
             $("#tbl-temp-barang tbody").empty();
             $('#add_barang_produksi').modal('hide');
         });
+
 
         $('.qty_barang_add, .kg_barang_add').on('input change', function() {
             var valueQtyBarangJadi = $('.qty_barang_add').val();
@@ -1224,7 +1242,8 @@
                     url: `<?= base_url('production-result/material-request'); ?>`,
                     method: "GET",
                     data: {
-                        kode_produksi: selectedValues, // Kirim array ID
+                        kode_produksi: selectedValues,
+                        is_edit: <?= isset($data) ? 'true' : 'false' ?>,
                     },
                     dataType: "json",
                     success: function(res) {
@@ -1279,9 +1298,11 @@
                     },
                     dataType: "json",
                     success: function(res) {
-                        list_items_barang_jadi = [];
-                        list_items_barang_scrap = [];
-                        list_items_barang_digunakan = [];
+                        <?php if (!isset($data)) : ?>
+                            list_items_barang_jadi = [];
+                            list_items_barang_scrap = [];
+                            list_items_barang_digunakan = [];
+                        <?php endif; ?>
                         $(".kode_barang_add").empty();
                         $(".kode_barang_add").append(`<option 
                         data-detail_work_order="" 
@@ -1376,7 +1397,9 @@
                     },
                     dataType: "json",
                     success: function(res) {
-                        list_items_barang_digunakan = [];
+                        <?php if (!isset($data)) : ?>
+                            list_items_barang_digunakan = [];
+                        <?php endif; ?>
 
                         $(".kode_barang_filling").empty();
                         $(".kode_barang_filling").append(`<option data-divisi_id="" data-warehouse_id="" data-barang_name_master="" data-barang_id="" data-nama="" data-satuan_id="" data-satuan="" value=""></option>`);
@@ -1802,8 +1825,6 @@
             var valueQtyBarangJadi = parseFloat($('input.qty-barang-jadi[data-index="' + index + '"]').val()) || 0;
             var valueBeratBarangJadi = parseFloat($('input.berat-barang-jadi[data-index="' + index + '"]').val()) || 0;
 
-            console.log(index, valueQtyBarangJadi, valueBeratBarangJadi);
-
             // Hitung total dan batasi 2 angka desimal
             var jumlahQtyBeratJadi = valueQtyBarangJadi * valueBeratBarangJadi;
             var fixedJumlah = jumlahQtyBeratJadi.toFixed(2); // misal 2 angka desimal
@@ -1891,9 +1912,6 @@
         var no = 1;
         var totalQtyDigunakan = 0; // Total qty digunakan
         var totalQtyRequest = 0; // Total qty permintaan
-
-        console.log(list_items_barang_digunakan_penolong);
-
 
         if (list_items_barang_digunakan_penolong.length === 0) {
             row += `

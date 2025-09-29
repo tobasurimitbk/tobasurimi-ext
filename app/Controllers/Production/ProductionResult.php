@@ -418,15 +418,11 @@ class ProductionResult extends BaseController
             // $barangDigunakanPenolong = json_decode($this->request->getVar("digunakan_penolong"));
             $barangScrap = json_decode($this->request->getVar("scrap"));
             $barangFilling = json_decode($this->request->getVar("filling"));
-            // var_dump($barangDigunakanPenolong);
-            // exit;
+
             $productionResID = $this->productionResultModel->insert($datas);
 
             $productionResData = $this->productionResultModel->find($productionResID);
 
-            // $this->workOrdersModel->update($this->request->getVar("kode_produksi"), [
-            //     'request_status' => 'finished'
-            // ]);
             foreach ($barangJadi as $bj) {
                 $qty = isset($bj->qty_jadi) ? (float) $bj->qty_jadi : (float) $bj->qty;
                 if ($qty && $qty != 0) {
@@ -577,12 +573,24 @@ class ProductionResult extends BaseController
     {
         try {
             $productionResID = $this->request->getVar("id");
+            $workOrderIds = $this->request->getVar("kode_produksi");
+
+            $datas = [
+                "company_id" => $this->this_company_id,
+                "pr_no" => $this->request->getVar("res_no") == "AUTO GENERATE" ? $this->generatePRNo() : $this->request->getVar("res_no"),
+                "material_request_id" => json_encode($this->request->getPost("kode_request")),
+                "work_order_id" => is_array($workOrderIds) ? implode(',', $workOrderIds) : $workOrderIds,
+                "receive_date" => $this->request->getVar("date_production") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("date_production")))) : date("Y-m-d"),
+            ];
+
             $barangJadi = json_decode($this->request->getVar("jadi"));
             $barangDigunakan = json_decode($this->request->getVar("digunakan"));
             $barangScrap = json_decode($this->request->getVar("scrap"));
             $barangFilling = json_decode($this->request->getVar("filling"));
 
             $productionResData = $this->productionResultModel->find($productionResID);
+
+            $this->productionResultModel->update($productionResID, $datas);
 
             foreach ($barangJadi as $bj) {
                 $qty = isset($bj->qty_jadi) ? (float) $bj->qty_jadi : (float) $bj->qty;
@@ -617,7 +625,6 @@ class ProductionResult extends BaseController
                     $this->productionResultDetailModel->insert($datasbj);
                 }
             }
-            // exit;
 
             foreach ($barangDigunakan as $bd) {
                 $qty = (float) $bd->qty;
@@ -807,6 +814,7 @@ class ProductionResult extends BaseController
     public function getListMaterialRequestByWOID()
     {
         $kodeProduksi = $this->request->getVar('kode_produksi');
+        $isEdit = $this->request->getVar('is_edit');
 
         // Pastikan jadi array
         $woIds = is_array($kodeProduksi) ? $kodeProduksi : [$kodeProduksi];
@@ -824,9 +832,11 @@ class ProductionResult extends BaseController
             ->where('material_requests.is_posted', 1)
             ->where('material_requests.is_approve', 1)
             ->where('material_requests.deletedAt', null)
-            ->where('material_request_details.deletedAt', null)
-            ->where('material_request_details.qty_now >', 0)
-            ->groupStart();
+            ->where('material_request_details.deletedAt', null);
+        if (!$isEdit) {
+            $builder->where('material_request_details.qty_now >', 0);
+        }
+        $builder->groupStart();
 
         // Tambahkan kondisi OR untuk setiap work_order_id
         foreach ($woIds as $id) {
@@ -836,7 +846,7 @@ class ProductionResult extends BaseController
         $dataMaterialRequest = $builder
             ->groupEnd()
             ->groupBy('material_request_details.material_request_id')
-            ->find();
+            ->findall();
 
         // Builder penolong
         $builderPenolong = $this->materialRequestsPenolongModel->asObject()
