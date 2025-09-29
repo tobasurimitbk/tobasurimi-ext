@@ -968,8 +968,8 @@
                 `
                 ));
 
-            newRow.append($('<td style="text-align:center;">').text(v.sumber));
-            newRow.append($('<td style="text-align:center;">').text(v.stock_dokumen));
+            newRow.append($('<td style="text-align:center;">').text(v.reference_type));
+            newRow.append($('<td style="text-align:center;">').text(v.po_no));
             newRow.append($('<td style="text-align:center;">').text(v.supplier_name));
             newRow.append($('<td style="text-align:center;">').text(v.bc_type));
             // newRow.append($('<td style="text-align:center;">').text(v.no_aju));
@@ -1050,8 +1050,8 @@
                 const tr = $(`
                     <tr class="data-row" data-group="${stockID}" data-index="${i}">
                         <td style="text-align: center;">${rowIndex++}</td>
-                        <td>${item.sumber || '-'}</td>
-                        <td>${item.stock_dokumen || '-'}</td>
+                        <td>${item.reference_type || '-'}</td>
+                        <td>${item.po_no || '-'}</td>
                         <td>${item.supplier_name || '-'}</td>
                         <td>${item.stock_date || '-'}</td>
                         <td>${item.barang || '-'}</td>

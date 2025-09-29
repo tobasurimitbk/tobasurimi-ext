@@ -14,6 +14,7 @@ use App\Models\ProsesRebusModel;
 use App\Models\StockDetail2Model;
 use App\Models\StockDetailModel;
 use App\Models\StockModel;
+use App\Models\StockRevampModel;
 use App\Models\SupplierModel;
 use App\Models\WarehousesModel;
 
@@ -1052,7 +1053,8 @@ class ProsesRebus extends BaseController
 
     public function dropdownListBarangIsInit()
     {
-        $data = $this->stockModel->getBarangRebusAndStock(
+        $stockRevampModel = new StockRevampModel();
+        $data =   $data = $stockRevampModel->getBarangRebusAndStock(
             $this->request->getVar('type_barang'),
             $this->request->getVar('divisi_id'),
             $this->request->getVar('warehouse_id')

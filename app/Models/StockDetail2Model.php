@@ -840,8 +840,6 @@ class StockDetail2Model extends Model
 
     public function getStockListWithAddConditionForUpdateStock($condition, $spesifikasiId)
     {
-        // var_dump($condition, $spesifikasiId);
-        // die;
         $builder = $this->asArray()
             ->select('
                 stock_details2.id AS id,

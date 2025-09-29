@@ -400,13 +400,10 @@ class PembayaranInvoice extends BaseController
         $customer_id_decrypt = decrypt($customer_id);
         $pembayaran_invoice_id_decrypt = $this->request->getVar('pembayaran_invoice_id') ? decrypt($this->request->getVar('pembayaran_invoice_id')) : null;
 
-        $this->salesOrderReturnModel
-            ->select('sales_order_return.no_return, sales_order_return.id') // Pilih kolom yang dibutuhkan
-            ->join('sales_order_invoice', 'sales_order_invoice.id = sales_order_return.id_invoice', 'inner') // Relasi ke invoice
-            ->join('pembayaran_invoice_detail', 'pembayaran_invoice_detail.sales_order_invoice_id = sales_order_return.id', 'left') // Relasi ke pembayaran_invoice_detail
-            ->where('sales_order_return.id_company', $this->this_company_id) // Perusahaan yang relevan
-            ->where('sales_order_invoice.id_customer', $customer_id_decrypt) // Filter berdasarkan customer
-            ->where('sales_order_return.deletedAt', null); // Hanya return yang aktif
+        $this->salesOrderInvoiceModel
+            ->join('pembayaran_invoice_detail', 'pembayaran_invoice_detail.sales_order_invoice_id = sales_order_invoice.id', 'left') // Relasi ke pembayaran_invoice_detail
+            ->where('sales_order_invoice.id_company', $this->this_company_id) // Perusahaan yang relevan
+            ->where('sales_order_invoice.id_customer', $customer_id_decrypt); // Filter berdasarkan customer
 
         // Jika dalam mode edit
         if ($pembayaran_invoice_id_decrypt) {

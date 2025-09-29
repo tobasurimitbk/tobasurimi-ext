@@ -662,8 +662,8 @@ class StockModel extends Model
     public function getBarangRebusAndStock($type_barang, $divisi_id, $warehouse_id)
     {
         $selectQry = "
-        stock.id AS stock_id,
-        stock.barang2_id AS spesifikasi_id,
+        stock_revamp.id AS stock_id,
+        stock_revamp.spesifikasi_id AS spesifikasi_id,
         CONCAT(UPPER(barang_master.barang_name), '-', UPPER(barang_master_spesifikasi.spesifikasi)) AS barang,
         barang_master.kode_barang,
         barang_master.id,
@@ -671,35 +671,18 @@ class StockModel extends Model
     ";
 
         $dataResult1 = $this->asArray()->select($selectQry)
-            ->join('barang_master', 'barang_master.id = stock.barang1_id')
-            ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = stock.barang2_id')
+            ->join('barang_master', 'barang_master.id = stock_revamp.barang1_id')
+            ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = stock_revamp.spesifikasi_id')
             ->join('satuans', 'satuans.id = barang_master_spesifikasi.satuan_1', 'left')
-            ->where('stock.deletedAt', null)
+            ->where('stock_revamp.deletedAt', null)
             ->where('barang_master_spesifikasi.deletedAt', null)
             ->where('barang_master.deletedAt', null)
-            ->where('stock.tipe_barang', $type_barang)
-            ->where('stock.divisi_id', $divisi_id)
-            ->where('stock.warehouse_id', $warehouse_id)
+            ->where('stock_revamp.tipe_barang', $type_barang)
+            ->where('stock_revamp.divisi_id', $divisi_id)
+            ->where('stock_revamp.warehouse_id', $warehouse_id)
             // ->like('barang_master.barang_name', '%' . "UDANG" . '%')
             ->orderBy('barang_master.kode_barang', "ASC")
             ->findAll();
-
-        // $dataResult2 = $this->asArray()->select($selectQry)
-        //     ->join('barang_master', 'barang_master.id = stock.barang1_id')
-        //     ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = stock.barang2_id')
-        //     ->join('satuans', 'satuans.id = barang_master_spesifikasi.satuan_1', 'left')
-        //     ->where('stock.deletedAt', null)
-        //     ->where('barang_master_spesifikasi.deletedAt', null)
-        //     ->where('barang_master.deletedAt', null)
-        //     ->where('stock.tipe_barang', $type_barang)
-        //     ->where('stock.divisi_id', $divisi_id)
-        //     ->where('stock.warehouse_id', $warehouse_id)
-        //     // ->like('barang_master.barang_name', '%' . "KEPITING" . '%')
-        //     ->orderBy('barang_master.kode_barang', "ASC")
-        //     ->findAll();
-
-        // $dataResult = array_merge($dataResult1, $dataResult2);
-
         return $dataResult1;
     }
 
