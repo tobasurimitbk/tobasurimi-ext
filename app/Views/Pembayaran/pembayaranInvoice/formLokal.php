@@ -1131,9 +1131,9 @@
 
         if (totalBayar === totalTagihan) {
             prefix = "TERIMA A/ INVOICE";
-        } else if (sisa > 0 && sisaPayForKeteranganCondition < totalTagihan) {
+        } else if (sisa > 0 && totalBayar < totalTagihan) {
             prefix = "TERIMA DP A/ INVOICE";
-        } else if (sisa == 0 && sisaPayForKeteranganCondition < totalTagihan) {
+        } else if (sisa == 0 && totalBayar < totalTagihan) {
             prefix = "TERIMA PELUNASAN A/ INVOICE";
         } else {
             prefix = ""
