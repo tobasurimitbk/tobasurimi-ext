@@ -371,24 +371,18 @@ class PembayaranInvoice extends BaseController
             $customer_id_decrypt = decrypt($customer_id);
             $pembayaran_invoice_id_decrypt = $this->request->getVar('pembayaran_invoice_id') ? decrypt($this->request->getVar('pembayaran_invoice_id')) : null;
             $query = $this->salesOrderInvoiceModel
-                ->select('sales_order_invoice.no_faktur, sales_order_invoice.id') // Pilih kolom yang dibutuhkan
-                ->join('pembayaran_invoice_detail', 'pembayaran_invoice_detail.sales_order_invoice_id = sales_order_invoice.id', 'left') // Relasi ke pembayaran_invoice_detail
+                ->select('sales_order_invoice.no_faktur, sales_order_invoice.id')
+                ->join('pembayaran_invoice_detail', 'pembayaran_invoice_detail.sales_order_invoice_id = sales_order_invoice.id AND pembayaran_invoice_detail.deletedAt IS NULL', 'left')
                 ->where('sales_order_invoice.id_customer', $customer_id_decrypt)
                 ->where('sales_order_invoice.deletedAt', null);
-                
 
-            // Jika dalam mode edit
             if ($pembayaran_invoice_id_decrypt) {
-                // Tampilkan semua data, termasuk yang terkait dengan 
-              
-                   
-                $query->where('pembayaran_invoice_detail.type_invoice', 'LOKAL')
-                    ->where('pembayaran_invoice_detail.deletedAt', null)
-                    ->where('pembayaran_invoice_detail.pembayaran_invoice_id', $pembayaran_invoice_id_decrypt);
+                // Mode edit: ambil semua invoice yang terkait dengan pembayaran ini
+                $query->where('pembayaran_invoice_detail.pembayaran_invoice_id', $pembayaran_invoice_id_decrypt)
+                    ->where('pembayaran_invoice_detail.type_invoice', 'LOKAL');
             } else {
-                // Non-edit mode: hanya data yang belum dibayar
-                $query->where('pembayaran_invoice_detail.deletedAt', null)
-                    ->where('pembayaran_invoice_detail.id', null);
+                // Mode non-edit: ambil yang belum dibayar sama sekali
+                $query->where('pembayaran_invoice_detail.id', null);
             }
         }
 
@@ -1777,6 +1771,10 @@ class PembayaranInvoice extends BaseController
     public function deletePembayaranInvoice()
     {
         $id = decrypt($this->request->getVar('id'));
+        // Hapus dulu detail
+        $this->pembayaranInvoiceDetailModel->where('pembayaran_invoice_id', $id)->delete();
+
+        // Baru hapus header
         $this->pembayaranInvoiceModel->where('id', $id)->delete();
 
         return response()->setJSON([

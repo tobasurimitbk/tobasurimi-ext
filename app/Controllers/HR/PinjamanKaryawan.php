@@ -62,6 +62,7 @@ class PinjamanKaryawan extends BaseController
             $yearMonth  = $this->request->getVar('monthYear');
             $startDate  = date('Y-m-d', strtotime(str_replace('/', '-', $this->request->getVar('startDate'))));
             $endDate    = date('Y-m-d', strtotime(str_replace('/', '-', $this->request->getVar('finishDate'))));
+            $tanggalAmbil    = date('Y-m-d', strtotime(str_replace('/', '-', $this->request->getVar('tanggalAmbil_Global'))));
 
             $addCondition = [
                 'divisi_id' => $divisiId,
@@ -199,6 +200,7 @@ class PinjamanKaryawan extends BaseController
                     'status_pinjaman' => ($tidakHadir <= 6 && $e['tipe'] == "HARIAN TETAP") ? '1' : '0',
                     'is_ambil'        => ($tidakHadir <= 6 && $e['tipe'] == "HARIAN TETAP") ? '1' : '0',
                     'nominal'         => ($tidakHadir <= 6) ? $nominalPinjaman : null,
+                    'tanggal_ambil'   => $tanggalAmbil
                 ];
             }
 
@@ -231,6 +233,7 @@ class PinjamanKaryawan extends BaseController
             $yearMonth  = $this->request->getVar('monthYearSingle');
             $startDate  = date('Y-m-d', strtotime(str_replace('/', '-', $this->request->getVar('startDate'))));
             $endDate    = date('Y-m-d', strtotime(str_replace('/', '-', $this->request->getVar('finishDate'))));
+            $tanggalAmbil    = date('Y-m-d', strtotime(str_replace('/', '-', $this->request->getVar('tanggalAmbil_Personal'))));
             $employeeID = $this->request->getVar('employeeID');
             $id         = $this->request->getVar('id');
 
@@ -269,7 +272,7 @@ class PinjamanKaryawan extends BaseController
             $employee = $this->employeeModel
                 ->where('id', $employeeID)
                 ->where('deletedAt', null)
-                ->where('status', "Aktif")
+                // ->where('status', "Aktif")
                 ->first();
 
             if (!$employee) {
@@ -349,7 +352,8 @@ class PinjamanKaryawan extends BaseController
                 'hadir'           => $hadir,
                 'is_boleh_minjam' => ($tidakHadir <= 6) ? '1' : '0',
                 'status_pinjaman' => ($tidakHadir <= 6) ? '1' : '0',
-                'nominal'         => ($tidakHadir <= 6) ? $nominalPinjaman : null
+                'nominal'         => ($tidakHadir <= 6) ? $nominalPinjaman : null,
+                'tanggal_ambil'   => $tanggalAmbil
             ]);
 
             $db->transCommit();
@@ -425,6 +429,7 @@ class PinjamanKaryawan extends BaseController
                 "monthYear" => $p->month_year,
                 "employeeID" => $p->employee_id,
                 "tipeGol" => $p->tipe == null ? "-" : $p->tipe,
+                "tanggal_ambil" => $p->tanggal_ambil == null ? "" : date('d/m/Y', strtotime($p->tanggal_ambil)),
             ]);
         }
 

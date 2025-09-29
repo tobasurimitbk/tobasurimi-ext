@@ -38,6 +38,8 @@ $routes->get('/logout', 'Setting\Auth::doLogout');
 
 $routes->get('/change-company', 'Setting\User::changeCompany');
 
+$routes->get('/get-spesifikasi-by-qr', 'Setting\Auth::login');
+
 // 403 ROUTE
 $routes->get('/403', function () {
     return view('errors/html/error_403');
@@ -2042,6 +2044,7 @@ $routes->get('/log-attendance/detail', 'HR\Attendance::getLogAttendanceDetail', 
 $routes->get('/log-attendance/export-bulanan', 'HR\Attendance::exportExcelLogPresensiBulanan', ['filter' => 'Auth']);
 $routes->get('/log-attendance/export-harian', 'HR\Attendance::exportExcelLogPresensiHarian', ['filter' => 'Auth']);
 $routes->get('/log-attendance/like-employees', 'HR\Attendance::getEmployeesLike', ['filter' => 'Auth']);
+$routes->post('/log-attendance/update-uangmakan', 'HR\Attendance::updateUangMakanHarian', ['filter' => 'Auth']);
 
 // Generate Attendance
 $routes->get('/list-attendance', 'HR\Attendance::indexAttendance', ['filter' => 'Auth']);
@@ -2609,6 +2612,12 @@ $routes->post('/hr-outsourcing-sallary-payment/getHrEmployeeOutSourcing', 'HROut
 $routes->post('/hr-outsourcing-sallary-payment/store', 'HROutsourcing\SallaryPayment::store', ['filter' => 'Auth']);
 $routes->post('/hr-outsourcing-sallary-payment/update/(:segment)', 'HROutsourcing\SallaryPayment::update/$1', ['filter' => 'Auth']);
 $routes->post('/hr-outsourcing-sallary-payment/delete/(:segment)', 'HROutsourcing\SallaryPayment::destroy/$1', ['filter' => 'Auth']);
+
+
+//HR Ousourcing Scale 
+$routes->get('/hr-outsourcing-scale', 'HROutsourcing\Scale::generateQrBarangView', ['filter' => 'Auth']);
+$routes->post('/hr-outsourcing-scale', 'HROutsourcing\Scale::generateQrBarang', ['filter' => 'Auth']);
+$routes->get('/hr-outsourcing-scale/id/(:segment)', 'HROutsourcing\Scale::getBarangByIdQr/$1');
 
 /*
  * --------------------------------------------------------------------

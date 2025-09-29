@@ -110,6 +110,77 @@ class ProsesRebusModel extends Model
         ];
     }
 
+
+    public function getListReport($condition, $conditionArr, $addCondition, $limit = 10, $offset = 0)
+    {
+        $availableSort = [
+            'no_rebus' => 'no_rebus',
+            'proses_rebus.createdAt' => 'proses_rebus.tanggal',
+            'proses_rebus.divisi_id' => 'proses_rebus.divisi_id',
+            'proses_rebus.warehouse_id' => 'proses_rebus.warehouse_id',
+        ];
+        $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
+
+        $sort = $availableSort[$addCondition['sort'] ?? 'updatedAt'] ?? 'proses_rebus.createdAt';
+        $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'DESC';
+
+        $selectQry = "proses_rebus.*,
+        divisis.divisi,
+        warehouses.warehouse_name,
+        ";
+
+        $dataQry = $this->asObject()
+            ->select($selectQry)
+            ->join('divisis', 'divisis.id = proses_rebus.divisi_id', 'left')
+            ->join('warehouses', 'warehouses.id = proses_rebus.warehouse_id', 'left')
+            ->where($condition)
+            ->whereIn('proses_rebus.divisi_id', $conditionArr)
+            ->orderBy($sort, $sortType);
+
+        $totalData = $dataQry->countAllResults(false);
+
+        if ($addCondition['divisi_id'] || $addCondition['warehouse_id'] || $addCondition['status'] || $addCondition['no_rebus'] || $addCondition['start_date'] || $addCondition['end_date']) {
+            $dataQry->groupStart();
+        }
+
+        if ($addCondition['divisi_id']) {
+            $dataQry->where('proses_rebus.divisi_id', $addCondition['divisi_id']);
+        }
+
+        if ($addCondition['warehouse_id']) {
+            $dataQry->like('proses_rebus.warehouse_id', $addCondition['warehouse_id']);
+        }
+
+        if ($addCondition['no_rebus']) {
+            $dataQry->like('proses_rebus.no_rebus', $addCondition['no_rebus']);
+        }
+
+        if ($addCondition['status'] || $addCondition['status'] == '0') {
+            $dataQry->where('status_posting', $addCondition['status']);
+        }
+
+        if ($addCondition['start_date']) {
+            $dataQry->where('tanggal >=', $addCondition['start_date']);
+        }
+
+        if ($addCondition['end_date']) {
+            $dataQry->where('tanggal <=', $addCondition['end_date']);
+        }
+
+        if ($addCondition['divisi_id'] || $addCondition['warehouse_id'] || $addCondition['status'] || $addCondition['no_rebus'] || $addCondition['start_date'] || $addCondition['end_date']) {
+            $dataQry->groupEnd();
+        }
+
+        $totalFilteredData = $dataQry->countAllResults(false);
+        $data = $dataQry->findAll($limit, $offset);
+
+        return [
+            'data'              => $data,
+            'totalData'         => $totalData,
+            'totalFilteredData' => $totalFilteredData,
+        ];
+    }
+
     public function get_no($bln, $thn, $divisi)
     {
         $lastStr = convertBulanToAngkaRomawi($bln) . '/' . $thn;

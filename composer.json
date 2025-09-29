@@ -8,6 +8,7 @@
     "php": "^7.4 || ^8.0",
     "codeigniter4/framework": "^4.0",
     "dompdf/dompdf": "^2.0",
+    "endroid/qr-code": "^3.9",
     "nesbot/carbon": "^2.72",
     "phpoffice/phpspreadsheet": "^1.29",
     "twbs/bootstrap": "5.3.0-alpha1"

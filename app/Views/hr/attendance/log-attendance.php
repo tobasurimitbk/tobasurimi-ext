@@ -251,9 +251,11 @@
             <div class="modal-header">
                 <h5 class="modal-title"><label class="title-name"></label> Detail Log Attendance</h5>
             </div>
-            <form id="updateAttendanceForm" role="form" method="POST">
+            <form id="updateUangMakanForm" role="form" method="POST">
                 <div class="modal-body">
                     <?= csrf_field() ?>
+                    <input type="hidden" name="tanggal_uang_makan" id="tanggal_uang_makan">
+                    <input type="hidden" name="employee_id_uang_makan" id="employee_id_uang_makan">
                     <div class="form-floating mb-2" style="height: 50px;">
                         <input type="text" class="form-control" id="namaUnit" disabled>
                         <label for="namaUnit">Nama Fingerprint</label>
@@ -288,6 +290,11 @@
                     </div>
 
                     <div class="form-floating mb-2" style="height: 50px;">
+                        <input placeholder="Nominal Uang Makan (Opsional)" type="text" name="nominal" class="form-control" id="nominal" oninput="this.value = greatFormatRupiah(this.value)">
+                        <label for="status">Nominal Uang Makan (Opsional)</label>
+                    </div>
+
+                    <div class="form-floating mb-2" style="height: 50px;">
                         <input type="text" name="jamTerlambat" class="form-control" id="jamTerlambat" disabled>
                         <label for="jamTerlambat">Jam Terlambat</label>
                     </div>
@@ -306,9 +313,11 @@
                             </div>
                         </div>
                     </div>
+
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-hide-form btn-discard btn-discard-1 mr-3">Close</button>
+                    <button type="button" class="btn btn-submit-form" id="btnUpdateUangMakan">Update Uang Makan</button>
                 </div>
             </form>
         </div>
@@ -406,6 +415,7 @@
 
 <script>
     let attendanceTable;
+    let csrfToken = '<?= csrf_token() ?>';
 
     $.ajax({
         url: "<?= base_url('log-attendance/all') ?>",
@@ -618,6 +628,11 @@
             let tanggal = rowData[baseName + '_date'];
             let employeeId = rowData.id;
 
+            // Set tanggal
+            $('#tanggal_uang_makan').val(tanggal);
+            $('#employee_id_uang_makan').val(employeeId);
+            $('#nominal').val(null).keyup();
+
             $.ajax({
                 url: "<?= base_url("log-attendance/detail"); ?>",
                 data: {
@@ -642,6 +657,9 @@
                     $('#checkOut').val(data.checkOut);
                     $('#jamTerlambat').val(data.jamTerlambat);
                     $('#namaUnit').val(data.namaUnit);
+                    if (data.uangMakanHarian != null) {
+                        $('#nominal').val(greatFormatRupiah(data.uangMakanHarian.nominal)).keyup();
+                    }
 
                     // ASSIGN ATTR
                     if (data.jamKerja != null) {
@@ -732,6 +750,39 @@
             attendanceTotalTable.ajax.reload();
         }
     })
+
+    var validatorUangMakan = $("#updateUangMakanForm").validate({
+        rules: {
+            nominal: {
+                required: true
+            },
+        },
+        messages: {
+            nominal: {
+                required: "Nominal Uang Makan Wajib Diisi"
+            },
+        },
+        errorElement: 'span',
+        errorClass: 'text-danger',
+        errorPlacement: function(error, element) {
+            var elem = $(element);
+            if (elem.hasClass("select2-hidden-accessible")) {
+                element = $("#select2-" + elem.attr("id") + "-container").parent();
+                error.insertAfter(element);
+            } else {
+                error.insertAfter(element);
+            }
+        },
+        highlight: function(element) {
+            $(element).closest('.form-group').addClass('has-error');
+            $(element).addClass('select-class');
+
+        },
+        unhighlight: function(element) {
+            $(element).closest('.form-group').removeClass('has-error');
+            $(element).removeClass('select-class');
+        },
+    });
 
     var validatorLapAbsensi = $("#lapLogAbsensiForm").validate({
         rules: {
@@ -842,6 +893,59 @@
             window.location.href = url;
         }
     });
+
+    $('#btnUpdateUangMakan').click(function(e) {
+        e.preventDefault();
+        if ($('#updateUangMakanForm').valid()) {
+            var csrf = $(`[name="${csrfToken}"]`);
+            var tanggal = $('#tanggal_uang_makan').val();
+            var employeeId = $('#employee_id_uang_makan').val();
+            var nominal = destroyFormatRupiah($('#nominal').val());
+            var formData = new FormData();
+            formData.set('tanggal', tanggal);
+            formData.set('employee_id', employeeId);
+            formData.set('nominal', nominal);
+
+            $.ajax({
+                url: "<?= base_url("log-attendance/update-uangmakan"); ?>",
+                data: formData,
+                beforeSend: function(xhr) {
+                    setLoading();
+                    xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                },
+                complete: function() {
+                    stopLoading();
+                },
+                method: "POST",
+                dataType: "json",
+                processData: false,
+                contentType: false,
+                success: function(response) {
+                    csrf.val(response.token);
+                    if (response.status) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: response.message,
+                            confirmButtonColor: '#4e73df',
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                $('#detailModal').modal('hide');
+                            }
+                        });
+                        return;
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: response.message,
+                            confirmButtonColor: '#4e73df',
+                        });
+                        return;
+                    }
+
+                }
+            });
+        }
+    })
 
     function getListDetailJamKerja(jamKerjaId) {
         $.ajax({
