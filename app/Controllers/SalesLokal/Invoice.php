@@ -614,10 +614,18 @@ class Invoice extends BaseController
             }
             $noFaktur = $postData['no_faktur'];
 
+            $totalInvoice = 0;
+            foreach ($postItemsData as $value) {
+                if ($value['qty_input'] != 0) {
+                    $amount = str_replace(',', '', $value['amount']);
+                    $totalInvoice += (int) $amount;
+                }
+            }
+
             $values = [
                 "id_user"           => $this->userId,
                 // "document_type"     => $postData['doc_type'],
-                "document_id"       => str_replace(['\\"', '\\', '"'], '', json_encode($postData['doc_id'])),
+                "document_id"       => isset($postData['doc_id']) ? str_replace(['\\"', '\\', '"'], '', json_encode($postData['doc_id'])) : "",
                 "id_customer"       => $postData['id_customer'],
                 "document_no"       => $postData['noDocument'],
                 "no_faktur"         => $noFaktur,
@@ -628,7 +636,7 @@ class Invoice extends BaseController
                 "jenis_penjualan"   => $postData['jenis_penjualan'],
                 "dpp"               => str_replace('.', '', $postData['dpp']),
                 "ppn"               => str_replace('.', '', $postData['ppn']),
-                "total_invoice"     => str_replace('.', '', $postData['total_invoice']),
+                "total_invoice"     => $totalInvoice,
                 "termasuk_pa"       => $this->request->getPost('include_tax') ? 'true' : 'false',
                 "status_tax"        => $this->request->getPost('tax_status') ? 'true' : 'false',
                 "id_company"        => ($this->this_company_id != 16)
@@ -1522,6 +1530,7 @@ class Invoice extends BaseController
             "sortType"              => $this->request->getGet("sortType"),
             "filter_jenis_dokumen" => $this->request->getGet("filter_jenis_dokumen"),
             "filter_customer"       => $this->request->getGet("filter_customer"),
+            "filter_paid"       => $this->request->getGet("filter_paid"),
             "dateStart"             => $this->request->getGet("dateStart") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getGet("dateStart")))) : "",
             "dateEnd"               => $this->request->getGet("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getGet("dateEnd")))) : "",
         ];
