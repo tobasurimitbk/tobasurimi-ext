@@ -111,6 +111,139 @@ class PayrollGajiHarianModel extends Model
         return $totalNominalGajiDiterima;
     }
 
+    public function generateAmt(
+        $mapEmployeePayroll,
+        $mapGajiHarian,
+        $mapGajiCadangan,
+        $companyId,
+        $employeeIds,
+        $yearMonth,
+        $startDate,
+        $endDate
+    ) {
+        // models
+        $AttendancesModel = new AttendancesModel();
+        $employeeJamKerjaModel = new EmployeeJamKerjaModel();
+
+        // Ambil semua jam kerja detail untuk semua employee dalam range SEKALI (anti N+1)
+        // diasumsikan method ini mengembalikan struktur: [employee_id => [tanggal => jamKerjaDetail]]
+        $jamKerjaDetailMap = $employeeJamKerjaModel->getJamKerjaDetailByEmployeeIdAmt(
+            $startDate,
+            $endDate,
+            $employeeIds
+        );
+        // Ambil semua attendance untuk employeeIds di range SEKALI
+        $attendancesInRange = $AttendancesModel
+            ->asArray()
+            ->whereIn('employee_id', $employeeIds)
+            ->where('periode >=', $startDate)
+            ->where('periode <=', $endDate)
+            ->findAll();
+
+        $insertRows = [];
+        $totalNominalGajiDiterimaPerPayroll = []; // if you want to accumulate per payroll_id
+
+        foreach ($attendancesInRange as $p) {
+            $employeeID = $p['employee_id'];
+            $tanggal = $p['periode'];
+
+            // cari payroll id untuk employee ini
+            $payrollID = $mapEmployeePayroll[$employeeID] ?? null;
+            if ($payrollID === null && $p['status'] == "ALPHA_A") {
+                // skip kalau payroll tidak ditemukan (safety)
+                continue;
+            }
+
+            // ambil jamKerjaDetail dari map (fallback null)
+            $jamKerjaDetail = $jamKerjaDetailMap[$employeeID][$tanggal] ?? null;
+
+            // hitung total jam kerja — sesuaikan static::totalJamKerja() dengan input yang diperlukan
+            // aku asumsikan fungsi bisa menerima jamKerjaDetail atau attendance id; jika beda, sesuaikan.
+            $totalJamKerja = 0;
+            if ($jamKerjaDetail) {
+                // kalau totalJamKerja menerima hela jamKerjaDetail row
+                $totalJamKerja = static::totalJamKerjaAmt($jamKerjaDetail, $p['checkin'] ?? null, $p['checkout'] ?? null);
+            } else {
+                // fallback: coba hitung dari checkin/checkout (kalau tersedia)
+                if (!empty($p['checkin']) && !empty($p['checkout'])) {
+                    $in = new \DateTime($p['checkin']);
+                    $out = new \DateTime($p['checkout']);
+                    $diff = $out->diff($in);
+                    $totalJamKerja = $diff->h + ($diff->i / 60);
+                }
+            }
+
+            // nominal gaji harian & cadangan per employee (fallback 0)
+            $nominalGajiHarian = $mapGajiHarian[$employeeID] ?? 0;
+            $nominalGajiCadangan = $mapGajiCadangan[$employeeID] ?? 0;
+
+            // rumus yang kamu pakai: ((gajiHarian + gajiCadangan) / 7) * totalJamKerja
+            $nominalDiterima = (($nominalGajiHarian + $nominalGajiCadangan) / 7) * $totalJamKerja;
+
+            $insertRows[] = [
+                'company_id' => $companyId,
+                'payroll_id' => $payrollID,
+                'employee_id' => $employeeID,
+                'jam_kerja_id' => $jamKerjaDetail['jam_kerja_id'] ?? null,
+                'tanggal' => $tanggal,
+                'year_month' => $yearMonth,
+                'jam_masuk' => $p['checkin'] ?? null,
+                'jam_istirahat_mulai' => $jamKerjaDetail['jam_istirahat_mulai'] ?? null,
+                'jam_istirahat_selesai' => $jamKerjaDetail['jam_istirahat_selesai'] ?? null,
+                'jam_pulang' => $p['checkout'] ?? null,
+                'total_jam' => $totalJamKerja,
+                'nominal_gaji_harian' => $nominalGajiHarian,
+                'nominal_cadangan' => $nominalGajiCadangan,
+                'nominal_diterima' => $nominalDiterima
+            ];
+
+            // accumulate per payroll id (opsional, buat update summary nanti)
+            if (!isset($totalNominalGajiDiterimaPerPayroll[$employeeID])) {
+                $totalNominalGajiDiterimaPerPayroll[$employeeID] = 0;
+            }
+            $totalNominalGajiDiterimaPerPayroll[$employeeID] += $nominalDiterima;
+        }
+
+        // return data yang akan di-insert ke payroll_gaji (caller akan insertBatch)
+        // jika kamu mau langsung insert di sini: $this->insertBatch($insertRows);
+        return [
+            'rows' => $insertRows,
+            'totals_per_payroll' => $totalNominalGajiDiterimaPerPayroll
+        ];
+    }
+
+    static function totalJamKerjaAmt($jamKerjaDetail, $checkin, $checkout)
+    {
+        if (empty($checkin) || empty($checkout)) return 0;
+
+        $checkInTime = strtotime($checkin);
+        $checkOutTime = strtotime($checkout);
+
+        // fallback jika checkout lebih dari jam pulang
+        $jamPulang = strtotime($jamKerjaDetail['jam_pulang'] ?? $checkout);
+        if ($checkOutTime > $jamPulang) {
+            $checkOutTime = $jamPulang;
+        }
+
+        $totalWorkSeconds = $checkOutTime - $checkInTime;
+        if ($totalWorkSeconds <= 0) return 0;
+
+        // hitung durasi istirahat
+        $istirahatMulai = strtotime($jamKerjaDetail['jam_istirahat_mulai'] ?? $checkInTime);
+        $istirahatSelesai = strtotime($jamKerjaDetail['jam_istirahat_selesai'] ?? $checkInTime);
+
+        // hanya kurangi istirahat jika checkin < jam istirahat < checkout
+        if ($checkInTime < $istirahatSelesai && $checkOutTime > $istirahatMulai) {
+            $istirahatStart = max($checkInTime, $istirahatMulai);
+            $istirahatEnd = min($checkOutTime, $istirahatSelesai);
+            $istirahatSeconds = max(0, $istirahatEnd - $istirahatStart);
+            $totalWorkSeconds -= $istirahatSeconds;
+        }
+
+        return round($totalWorkSeconds / 3600, 2); // jam dengan 2 desimal
+    }
+
+
     static function totalJamKerja($attendanceId)
     {
         $attendancesModel = new AttendancesModel();

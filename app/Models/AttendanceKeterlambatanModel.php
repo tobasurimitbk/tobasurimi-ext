@@ -91,6 +91,59 @@ class AttendanceKeterlambatanModel extends Model
         }
     }
 
+    public function generateAmt(
+        $companyId,
+        $startDate,
+        $endDate,
+        $yearMonth,
+        $employeeIds,
+        $mapEmployeePayroll
+    ) {
+        // declare model
+        $AttendancesModel = new AttendancesModel();
+
+        // delete first
+        $this->db->table('attendances_keterlambatan')
+            ->whereIn('employee_id', $employeeIds)
+            ->where('year_month', $yearMonth)
+            ->delete();
+
+        $attendancesInMonth = $AttendancesModel
+            ->whereIn('employee_id', $employeeIds)
+            ->where('year_month', $yearMonth)
+            ->groupStart()
+            ->where('periode >=', $startDate)
+            ->where('periode <=', $endDate)
+            ->groupEnd()
+            ->findAll();
+
+
+        $dataKeterlambatan = array();
+        foreach ($attendancesInMonth as $p) {
+            if ($p['status'] == "HADIR_H") {
+                $keterlambatanCheck = static::ketelambatanCheck(
+                    $p['periode'],
+                    $p['employee_id'],
+                    $p['checkin']
+                );
+
+                if ($keterlambatanCheck[0]) {
+                    array_push($dataKeterlambatan, [
+                        'company_id' => $companyId,
+                        'employee_id' => $p['employee_id'],
+                        'attendances_id' => $p['id'],
+                        'payroll_id' => $mapEmployeePayroll[$p['employee_id']],
+                        'periode' => $p['periode'],
+                        'total_jam_keterlambatan' => $keterlambatanCheck[1],
+                        'nominal_pengurangan' => 0
+                    ]);
+                }
+            }
+        }
+
+        return $dataKeterlambatan;
+    }
+
     static function ketelambatanCheck($tanggal, $employeeID, $checkIN)
     {
         $employeeJamKerjaModel = new EmployeeJamKerjaModel();

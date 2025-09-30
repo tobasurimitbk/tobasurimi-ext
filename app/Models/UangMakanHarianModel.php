@@ -54,4 +54,19 @@ class UangMakanHarianModel extends Model
 
         return $uangMakanHarianAll;
     }
+
+    public function generateUangMakanAmt(
+        $employeeIds,
+        $startDate,
+        $endDate
+    ) {
+        $uangMakanQry = $this->asArray()
+            ->select('SUM(nominal) AS total_nominal, employee_id')
+            ->where('tanggal >=', $startDate)
+            ->where('tanggal <=', $endDate)
+            ->whereIn('employee_id', $employeeIds)
+            ->groupBy('uang_makan_harian.employee_id')
+            ->findAll();
+        return $uangMakanQry;
+    }
 }

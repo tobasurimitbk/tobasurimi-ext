@@ -115,6 +115,87 @@ class FormPerizinanNotApprovedModel extends Model
         return $res;
     }
 
+    public function generateAmt(
+        $mapStatusAttendance,
+        $mapEmployeePayroll,
+        $mapGajiHarian,
+        $mapGajiCadangan,
+        $employeeIds,
+        $companyId,
+        $yearMonth,
+        $startDate,
+        $endDate
+    ) {
+        $attendancesModel = new AttendancesModel();
+
+        // Hapus data lama dulu
+        $this->db->table('form_perizinan_not_approved')
+            ->whereIn('employee_id', $employeeIds)
+            ->where('year_month', $yearMonth)
+            ->delete();
+
+        // Ambil absensi dalam range
+        $attendancesInMonth = $attendancesModel
+            ->whereIn('employee_id', $employeeIds)
+            ->where('year_month', $yearMonth)
+            ->groupStart()
+            ->where('periode >=', $startDate)
+            ->where('periode <=', $endDate)
+            ->groupEnd()
+            ->findAll();
+
+        $dataResult = [];       // untuk insert batch ke form_perizinan_not_approved
+        $dataResultTotal = [];  // kumpulan total per employee
+
+        // Init data total per employee
+        foreach ($employeeIds as $eid) {
+            $dataResultTotal[$eid] = [
+                'id' => $mapEmployeePayroll[$eid] ?? null,
+                'employee_id' => $eid,
+                'total_perizinan_not_approved' => 0,
+                'total_perizinan_approved' => 0,
+                'hadir_final' => $mapStatusAttendance[$eid]["HADIR_H"] ?? 0
+            ];
+        }
+
+        foreach ($attendancesInMonth as $p) {
+            $eid = $p['employee_id'];
+
+            // Not approved → simpan ke table form_perizinan_not_approved
+            if ($p['status'] !== "HADIR_H" && !$p['isApproved']) {
+                $dataResult[] = [
+                    'company_id' => $companyId,
+                    'employee_id' => $eid,
+                    'attendances_id' => $p['id'],
+                    'payroll_id' => $mapEmployeePayroll[$eid] ?? null,
+                    'periode' => $p['periode'],
+                    'year_month' => $yearMonth,
+                    'nominal_pengurangan' => ($mapGajiHarian[$eid] ?? 0) + ($mapGajiCadangan[$eid] ?? 0)
+                ];
+                $dataResultTotal[$eid]['total_perizinan_not_approved']++;
+            }
+
+            // Approved → hitung total approved
+            if ($p['isApproved'] && $p['status'] !== "ALPHA_A" && $p['status'] !== "LIBUR_L" && $p['status'] !== "HADIR_H") {
+                $dataResultTotal[$eid]['total_perizinan_approved']++;
+                // Hadir_final hanya tambah jika bukan hari Minggu
+                // if ($dayOfWeek != 0) {
+                //     $dataResultTotal[$eid]['hadir_final']++;
+                // }
+            }
+        }
+
+        // Tambahkan total_perizinan_approved ke hadir_final
+        foreach ($employeeIds as $eid) {
+            $dataResultTotal[$eid]['hadir_final'] += $dataResultTotal[$eid]['total_perizinan_approved'];
+        }
+
+        return [
+            'dataFormPerizinan' => $dataResult,                // insert batch
+            'dataFormPerizinanTotal' => array_values($dataResultTotal) // kumpulan per employee
+        ];
+    }
+
     public function rekap($payrollID)
     {
         return $this->asArray()->select('form_perizinan_not_approved.*, attendances.status')

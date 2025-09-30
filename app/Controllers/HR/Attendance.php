@@ -741,7 +741,7 @@ class Attendance extends BaseController
                 }
 
                 // Jika alpha (tidak hadir, bukan Minggu/hari besar)
-                if (empty($in) && empty($out) && $dayName !== 'Sun' && !$statusLibur) {
+                if (empty($in) && empty($out) && $dayName !== 'Sun' && !$statusLibur && $statusIzin == 'ALPHA_A') {
                     $totalAlpha++;
                 }
 
@@ -1951,7 +1951,7 @@ class Attendance extends BaseController
 
                 if (($dayName === 'Sun' || in_array($tanggal, $tanggalBigDay)) && empty($in)) {
                     $total['libur']++;
-                } elseif (empty($in) && empty($out) && $dayName !== 'Sun') {
+                } elseif (empty($in) && empty($out) && $dayName !== 'Sun' && $status == "ALPHA_A") {
                     $total['alpha']++;
                 }
 

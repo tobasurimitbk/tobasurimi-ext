@@ -17,7 +17,9 @@ use App\Models\PayrollGajiConjunctionModel;
 use App\Models\PayrollGajiHarianModel;
 use App\Models\PayrollsModel;
 use App\Models\PinjamanKaryawanModel;
+use App\Models\UangMakanHarianModel;
 use Dompdf\Dompdf;
+use Exception;
 
 class Payroll extends BaseController
 {
@@ -38,6 +40,7 @@ class Payroll extends BaseController
     protected $payrollGajiHarianModel;
     protected $companyModel;
     protected $gajiDivisiModel;
+    protected $uangMakanHarianModel;
 
     public function __construct()
     {
@@ -59,6 +62,7 @@ class Payroll extends BaseController
         $this->payrollGajiHarianModel = new PayrollGajiHarianModel();
         $this->companyModel = new CompaniesModel();
         $this->gajiDivisiModel = new GajiDivisiModel();
+        $this->uangMakanHarianModel = new UangMakanHarianModel();
     }
 
     public function index()
@@ -396,6 +400,570 @@ class Payroll extends BaseController
             'status' => true
         ]);
     }
+
+    public function generateSinglePayrollRevamp()
+    {
+        $db = \Config\Database::connect();
+        $db->transBegin();
+
+        try {
+            $yearMonth = $this->request->getVar('yearMonth');
+            $employeeID = $this->request->getVar("employeeID");
+            $startDate = date('Y-m-d', strtotime(str_replace('/', '-', $this->request->getVar('startDate'))));
+            $endDate = date('Y-m-d', strtotime(str_replace('/', '-', $this->request->getVar('finishDate'))));
+
+
+            // Cek absensi
+            $dataAbsensiGeneratedQry = $this->attendanceModel->where('year_month', $yearMonth);
+            $dataAbsensiGeneratedQry->where('company_id', $this->this_company_id);
+            $totalAbsensi = $dataAbsensiGeneratedQry->where('employee_id', $employeeID)->countAllResults();
+
+            if ($totalAbsensi == 0) {
+                return response()->setJSON([
+                    'message' => "Data absensi bulan " . $yearMonth . " tidak ada",
+                    'status'  => false,
+                    'token'   => csrf_hash()
+                ]);
+            }
+
+            // Ambil employee + hapus payroll lama
+            // delete first
+            $this->payrollModel->where('company_id', $this->this_company_id)
+                ->where('employee_id', $employeeID)
+                ->delete();
+
+            $employeeIds = [$employeeID];
+
+            if (count($employeeIds) == 0) {
+                $db->transRollback();
+                return response()->setJSON([
+                    'message' => "Data karyawan tidak ditemukan",
+                    'status'  => false,
+                    'token'   => csrf_hash()
+                ]);
+            }
+
+            // Mapping divisi
+            $divisiList = $this->employeeModel->getDivisiByEmployeeAmt($employeeIds);
+            $mapDivisi  = [];
+            foreach ($divisiList as $d) {
+                $mapDivisi[$d['id']] = $d['division_id'];
+            }
+
+            // Status attendance
+            $statusAttendance = $this->attendanceModel->getStatusAttendancesInRangeAmt(
+                $startDate,
+                $endDate,
+                $employeeIds
+            );
+
+            $mapStatusAttendance = [];
+            foreach ($statusAttendance as $s) {
+                $empId = $s['employee_id'];
+                if (!isset($mapStatusAttendance[$empId])) {
+                    $mapStatusAttendance[$empId] = [
+                        'CUTI TAHUNAN_CT'   => 0,
+                        'CUTI HAID_CHD'     => 0,
+                        'CUTI HAMIL_CHL'    => 0,
+                        'CUTI MELAHIRKAN_CM' => 0,
+                        'IJIN_I'            => 0,
+                        'SAKIT_S'           => 0,
+                        'RL_RL'             => 0,
+                        'HADIR_H'           => 0,
+                        'LIBUR_L'           => 0,
+                        'ALPHA_A'           => 0,
+                    ];
+                }
+                $mapStatusAttendance[$empId][$s['status']] = $s['total'];
+            }
+
+            // Insert payroll batch awal
+            $dataPayroll = [];
+            foreach ($employeeIds as $e) {
+                $att = $mapStatusAttendance[$e] ?? [];
+
+                $dataPayroll[] = [
+                    "company_id"                   => $this->this_company_id,
+                    "employee_id"                  => $e,
+                    "division_id"                  => $mapDivisi[$e],
+                    "year_month"                   => $yearMonth,
+                    "cuti_tahunan"                 => $att["CUTI TAHUNAN_CT"] ?? 0,
+                    "cuti_haid"                    => $att["CUTI HAID_CHD"] ?? 0,
+                    "cuti_hamil"                   => $att["CUTI HAMIL_CHL"] ?? 0,
+                    "cuti_melahirkan"              => $att["CUTI MELAHIRKAN_CM"] ?? 0,
+                    "izin"                         => $att["IJIN_I"] ?? 0,
+                    "sakit"                        => $att["SAKIT_S"] ?? 0,
+                    "rl"                           => $att["RL_RL"] ?? 0,
+                    "hadir"                        => $att["HADIR_H"] ?? 0,
+                    "libur"                        => $att["LIBUR_L"] ?? 0,
+                    "alpha"                        => $att["ALPHA_A"] ?? 0,
+                    "hadir_final"                  => 0,
+                    "total_perizinan_not_approved" => 0,
+                    "total_perizinan_approved"     => 0,
+                    "nominal_cadangan"             => 0,
+                    "nominal_gaji_harian"          => 0,
+                    "nominal_pinjaman_karyawan"    => 0,
+                    "nominal_uang_gaji"            => 0,
+                    "nominal_uang_lembur"          => 0,
+                    "nominal_pengurangan_gaji"     => 0,
+                    "nominal_gaji_diterima"        => 0,
+                    "nominal_penambahan_gaji"      => 0,
+                    "start_date"                   => $startDate,
+                    "end_date"                     => $endDate
+                ];
+            }
+
+            $this->payrollModel->insertBatch($dataPayroll);
+
+            // Ambil payroll id hasil insert
+            $emmployeePayroll = $this->payrollModel
+                ->select('id, employee_id')
+                ->where('company_id', $this->this_company_id)
+                ->where('year_month', $yearMonth)
+                ->whereIn('employee_id', $employeeIds)
+                ->findAll();
+
+            $mapEmployeePayroll = [];
+            $payrollIds = [];
+            foreach ($emmployeePayroll as $e) {
+                $mapEmployeePayroll[$e['employee_id']] = $e['id'];
+                $payrollIds[] = $e['id'];
+            }
+
+
+
+            //--------------------------------------
+            // Generate Keterlambatan
+            //---------------------------------------
+            $dataAttendanceKeterlambatan = $this->attendanceKeterlambatanModel->generateAmt(
+                $this->this_company_id,
+                $startDate,
+                $endDate,
+                $yearMonth,
+                $employeeIds,
+                $mapEmployeePayroll
+            );
+            if (count($dataAttendanceKeterlambatan) != 0) {
+                $this->attendanceKeterlambatanModel->insertBatch($dataAttendanceKeterlambatan);
+            }
+
+            //--------------------------------------
+            // Gaji Conjunction
+            //---------------------------------------
+            $uangMakanHarian = $this->uangMakanHarianModel->generateUangMakanAmt(
+                $employeeIds,
+                $startDate,
+                $endDate
+            );
+            $mapUangMakanHarian = [];
+            foreach ($uangMakanHarian as $u) {
+                $mapUangMakanHarian[$u['employee_id']] = $u['total_nominal'];
+            }
+
+            $dataPayrollGajiConjunction = $this->payrollGajiModel->generateAmt(
+                $mapEmployeePayroll,
+                $mapUangMakanHarian,
+                $employeeIds,
+                $this->this_company_id,
+                $yearMonth
+            );
+            $this->payrollGajiModel->insertBatch($dataPayrollGajiConjunction);
+
+            //--------------------------------------
+            // Perizinan Not Approved
+            //---------------------------------------
+            $gajiHarian = $this->payrollGajiModel->getGajiHarianGajiCadanganAmt($payrollIds);
+
+            $mapGajiHarian = [];
+            foreach ($gajiHarian['gajiHarian'] as $g) {
+                $mapGajiHarian[$g['employee_id']] = $g['nominal'];
+            }
+
+            $mapGajiCadangan = [];
+            foreach ($gajiHarian['gajiCadangan'] as $g) {
+                $mapGajiCadangan[$g['employee_id']] = $g['nominal'];
+            }
+
+            $dataFormPerizinanNotApproved = $this->formPerizinanNotApprovedModel->generateAmt(
+                $mapStatusAttendance,
+                $mapEmployeePayroll,
+                $mapGajiHarian,
+                $mapGajiCadangan,
+                $employeeIds,
+                $this->this_company_id,
+                $yearMonth,
+                $startDate,
+                $endDate
+            );
+            $this->formPerizinanNotApprovedModel->insertBatch($dataFormPerizinanNotApproved['dataFormPerizinan']);
+            $this->payrollModel->updateBatch($dataFormPerizinanNotApproved['dataFormPerizinanTotal'], 'id');
+
+            //-----------------------------------------
+            // Payroll Gaji Harian
+            //-----------------------------------------
+            $dataPayrollGajiHarian = $this->payrollGajiHarianModel->generateAmt(
+                $mapEmployeePayroll,
+                $mapGajiHarian,
+                $mapGajiCadangan,
+                $this->this_company_id,
+                $employeeIds,
+                $yearMonth,
+                $startDate,
+                $endDate
+            );
+            $this->payrollGajiHarianModel->insertBatch($dataPayrollGajiHarian['rows']);
+            $mapTotalGajiHarian = $dataPayrollGajiHarian['totals_per_payroll'];
+
+            //--------------------------------------
+            // Lembur
+            //---------------------------------------
+            $formLembur = $this->formLemburModel->getFormLemburAmt(
+                $employeeIds,
+                $startDate,
+                $endDate
+            );
+            $mapFormLembur = [];
+            foreach ($formLembur as $f) {
+                $mapFormLembur[$f['employee_id']] = $f['total'];
+            }
+
+            //--------------------------------------
+            // Pinjaman Karyawan
+            //---------------------------------------
+            $pinjamanKaryawan = $this->pinjamanKaryawanModel->getPinjamanKaryawanDiambilAmt(
+                $employeeIds,
+                $yearMonth
+            );
+            $mapPinjaman = [];
+            foreach ($pinjamanKaryawan as $p) {
+                $mapPinjaman[$p['employee_id']] = $p['nominal'];
+            }
+
+            //--------------------------------------
+            // Generate Payroll Final
+            //---------------------------------------
+            $dataPayrollLast = $this->payrollModel->generateAmt(
+                $mapFormLembur,
+                $mapEmployeePayroll,
+                $mapGajiHarian,
+                $mapGajiCadangan,
+                $mapPinjaman,
+                $mapTotalGajiHarian,
+                $employeeIds,
+                $yearMonth,
+                $payrollIds,
+                $startDate,
+                $endDate
+            );
+
+            $this->payrollModel->updateBatch($dataPayrollLast, 'id');
+
+            // Commit transaksi
+            $db->transCommit();
+
+            return response()->setJSON([
+                'token'   => csrf_hash(),
+                'message' => "Generate payroll sukses",
+                'status'  => true
+            ]);
+        } catch (Exception $e) {
+            $db->transRollback();
+
+            return response()->setJSON([
+                'message' => $e->getMessage() . " at " . $e->getFile() . " in line " . $e->getLine(),
+                'status'  => false,
+                'token'   => csrf_hash()
+            ]);
+        }
+    }
+
+    public function generateGlobalPayrollRevamp()
+    {
+        $db = \Config\Database::connect();
+        $db->transBegin();
+
+        try {
+            $yearMonth       = $this->request->getVar('yearMonth');
+            $startDate       = date('Y-m-d', strtotime(str_replace('/', '-', $this->request->getVar('startDate'))));
+            $endDate         = date('Y-m-d', strtotime(str_replace('/', '-', $this->request->getVar('finishDate'))));
+            $divisionGlobalID = $this->request->getVar('divisionGlobalID');
+
+            // Cek absensi
+            $dataAbsensiGeneratedQry = $this->attendanceModel->where('year_month', $yearMonth);
+            $dataAbsensiGeneratedQry->where('company_id', $this->this_company_id);
+            if ($divisionGlobalID != 'ALL') {
+                $dataAbsensiGeneratedQry->where('division_id', $divisionGlobalID);
+            }
+
+            $totalAbsensi = $dataAbsensiGeneratedQry->countAllResults();
+
+            if ($totalAbsensi == 0) {
+                return response()->setJSON([
+                    'message' => "Data absensi bulan " . $yearMonth . " tidak ada",
+                    'status'  => false,
+                    'token'   => csrf_hash()
+                ]);
+            }
+
+            // Ambil employee + hapus payroll lama
+            if ($divisionGlobalID == "ALL") {
+                $employeeData = $this->employeeModel->getEmployees($this->this_company_id);
+
+                $this->payrollModel->where('company_id', $this->this_company_id)
+                    ->where('year_month', $yearMonth)
+                    ->delete();
+            } else {
+                $employeeData = $this->employeeModel->getEmployeesByDivisionID(
+                    $this->this_company_id,
+                    $divisionGlobalID
+                );
+
+                $this->payrollModel->where('company_id', $this->this_company_id)
+                    ->where('year_month', $yearMonth)
+                    ->where('division_id', $divisionGlobalID)
+                    ->delete();
+            }
+
+            $employeeIds = array_column($employeeData, 'id');
+            if (count($employeeIds) == 0) {
+                $db->transRollback();
+                return response()->setJSON([
+                    'message' => "Data karyawan tidak ditemukan",
+                    'status'  => false,
+                    'token'   => csrf_hash()
+                ]);
+            }
+
+            // Mapping divisi
+            $divisiList = $this->employeeModel->getDivisiByEmployeeAmt($employeeIds);
+            $mapDivisi  = [];
+            foreach ($divisiList as $d) {
+                $mapDivisi[$d['id']] = $d['division_id'];
+            }
+
+            // Status attendance
+            $statusAttendance = $this->attendanceModel->getStatusAttendancesInRangeAmt(
+                $startDate,
+                $endDate,
+                $employeeIds
+            );
+
+            $mapStatusAttendance = [];
+            foreach ($statusAttendance as $s) {
+                $empId = $s['employee_id'];
+                if (!isset($mapStatusAttendance[$empId])) {
+                    $mapStatusAttendance[$empId] = [
+                        'CUTI TAHUNAN_CT'   => 0,
+                        'CUTI HAID_CHD'     => 0,
+                        'CUTI HAMIL_CHL'    => 0,
+                        'CUTI MELAHIRKAN_CM' => 0,
+                        'IJIN_I'            => 0,
+                        'SAKIT_S'           => 0,
+                        'RL_RL'             => 0,
+                        'HADIR_H'           => 0,
+                        'LIBUR_L'           => 0,
+                        'ALPHA_A'           => 0,
+                    ];
+                }
+                $mapStatusAttendance[$empId][$s['status']] = $s['total'];
+            }
+
+            // Insert payroll batch awal
+            $dataPayroll = [];
+            foreach ($employeeIds as $e) {
+                $att = $mapStatusAttendance[$e] ?? [];
+
+                $dataPayroll[] = [
+                    "company_id"                   => $this->this_company_id,
+                    "employee_id"                  => $e,
+                    "division_id"                  => $mapDivisi[$e],
+                    "year_month"                   => $yearMonth,
+                    "cuti_tahunan"                 => $att["CUTI TAHUNAN_CT"] ?? 0,
+                    "cuti_haid"                    => $att["CUTI HAID_CHD"] ?? 0,
+                    "cuti_hamil"                   => $att["CUTI HAMIL_CHL"] ?? 0,
+                    "cuti_melahirkan"              => $att["CUTI MELAHIRKAN_CM"] ?? 0,
+                    "izin"                         => $att["IJIN_I"] ?? 0,
+                    "sakit"                        => $att["SAKIT_S"] ?? 0,
+                    "rl"                           => $att["RL_RL"] ?? 0,
+                    "hadir"                        => $att["HADIR_H"] ?? 0,
+                    "libur"                        => $att["LIBUR_L"] ?? 0,
+                    "alpha"                        => $att["ALPHA_A"] ?? 0,
+                    "hadir_final"                  => 0,
+                    "total_perizinan_not_approved" => 0,
+                    "total_perizinan_approved"     => 0,
+                    "nominal_cadangan"             => 0,
+                    "nominal_gaji_harian"          => 0,
+                    "nominal_pinjaman_karyawan"    => 0,
+                    "nominal_uang_gaji"            => 0,
+                    "nominal_uang_lembur"          => 0,
+                    "nominal_pengurangan_gaji"     => 0,
+                    "nominal_gaji_diterima"        => 0,
+                    "nominal_penambahan_gaji"      => 0,
+                    "start_date"                   => $startDate,
+                    "end_date"                     => $endDate
+                ];
+            }
+
+            $this->payrollModel->insertBatch($dataPayroll);
+
+            // Ambil payroll id hasil insert
+            $emmployeePayroll = $this->payrollModel
+                ->select('id, employee_id')
+                ->where('company_id', $this->this_company_id)
+                ->where('year_month', $yearMonth)
+                ->whereIn('employee_id', $employeeIds)
+                ->findAll();
+
+            $mapEmployeePayroll = [];
+            $payrollIds = [];
+            foreach ($emmployeePayroll as $e) {
+                $mapEmployeePayroll[$e['employee_id']] = $e['id'];
+                $payrollIds[] = $e['id'];
+            }
+
+            //--------------------------------------
+            // Generate Keterlambatan
+            //---------------------------------------
+            $dataAttendanceKeterlambatan = $this->attendanceKeterlambatanModel->generateAmt(
+                $this->this_company_id,
+                $startDate,
+                $endDate,
+                $yearMonth,
+                $employeeIds,
+                $mapEmployeePayroll
+            );
+            $this->attendanceKeterlambatanModel->insertBatch($dataAttendanceKeterlambatan);
+
+            //--------------------------------------
+            // Gaji Conjunction
+            //---------------------------------------
+            $uangMakanHarian = $this->uangMakanHarianModel->generateUangMakanAmt(
+                $employeeIds,
+                $startDate,
+                $endDate
+            );
+            $mapUangMakanHarian = [];
+            foreach ($uangMakanHarian as $u) {
+                $mapUangMakanHarian[$u['employee_id']] = $u['total_nominal'];
+            }
+
+            $dataPayrollGajiConjunction = $this->payrollGajiModel->generateAmt(
+                $mapEmployeePayroll,
+                $mapUangMakanHarian,
+                $employeeIds,
+                $this->this_company_id,
+                $yearMonth
+            );
+            $this->payrollGajiModel->insertBatch($dataPayrollGajiConjunction);
+
+            //--------------------------------------
+            // Perizinan Not Approved
+            //---------------------------------------
+            $gajiHarian = $this->payrollGajiModel->getGajiHarianGajiCadanganAmt($payrollIds);
+
+            $mapGajiHarian = [];
+            foreach ($gajiHarian['gajiHarian'] as $g) {
+                $mapGajiHarian[$g['employee_id']] = $g['nominal'];
+            }
+
+            $mapGajiCadangan = [];
+            foreach ($gajiHarian['gajiCadangan'] as $g) {
+                $mapGajiCadangan[$g['employee_id']] = $g['nominal'];
+            }
+
+            $dataFormPerizinanNotApproved = $this->formPerizinanNotApprovedModel->generateAmt(
+                $mapStatusAttendance,
+                $mapEmployeePayroll,
+                $mapGajiHarian,
+                $mapGajiCadangan,
+                $employeeIds,
+                $this->this_company_id,
+                $yearMonth,
+                $startDate,
+                $endDate
+            );
+            $this->formPerizinanNotApprovedModel->insertBatch($dataFormPerizinanNotApproved['dataFormPerizinan']);
+            $this->payrollModel->updateBatch($dataFormPerizinanNotApproved['dataFormPerizinanTotal'], 'id');
+
+            //-----------------------------------------
+            // Payroll Gaji Harian
+            //-----------------------------------------
+            $dataPayrollGajiHarian = $this->payrollGajiHarianModel->generateAmt(
+                $mapEmployeePayroll,
+                $mapGajiHarian,
+                $mapGajiCadangan,
+                $this->this_company_id,
+                $employeeIds,
+                $yearMonth,
+                $startDate,
+                $endDate
+            );
+            $this->payrollGajiHarianModel->insertBatch($dataPayrollGajiHarian['rows']);
+            $mapTotalGajiHarian = $dataPayrollGajiHarian['totals_per_payroll'];
+
+            //--------------------------------------
+            // Lembur
+            //---------------------------------------
+            $formLembur = $this->formLemburModel->getFormLemburAmt(
+                $employeeIds,
+                $startDate,
+                $endDate
+            );
+            $mapFormLembur = [];
+            foreach ($formLembur as $f) {
+                $mapFormLembur[$f['employee_id']] = $f['total'];
+            }
+
+            //--------------------------------------
+            // Pinjaman Karyawan
+            //---------------------------------------
+            $pinjamanKaryawan = $this->pinjamanKaryawanModel->getPinjamanKaryawanDiambilAmt(
+                $employeeIds,
+                $yearMonth
+            );
+            $mapPinjaman = [];
+            foreach ($pinjamanKaryawan as $p) {
+                $mapPinjaman[$p['employee_id']] = $p['nominal'];
+            }
+
+            //--------------------------------------
+            // Generate Payroll Final
+            //---------------------------------------
+            $dataPayrollLast = $this->payrollModel->generateAmt(
+                $mapFormLembur,
+                $mapEmployeePayroll,
+                $mapGajiHarian,
+                $mapGajiCadangan,
+                $mapPinjaman,
+                $mapTotalGajiHarian,
+                $employeeIds,
+                $yearMonth,
+                $payrollIds,
+                $startDate,
+                $endDate
+            );
+
+            $this->payrollModel->updateBatch($dataPayrollLast, 'id');
+
+            // Commit transaksi
+            $db->transCommit();
+
+            return response()->setJSON([
+                'token'   => csrf_hash(),
+                'message' => "Generate payroll sukses",
+                'status'  => true
+            ]);
+        } catch (Exception $e) {
+            $db->transRollback();
+
+            return response()->setJSON([
+                'message' => $e->getMessage() . " at " . $e->getFile() . " in line " . $e->getLine(),
+                'status'  => false,
+                'token'   => csrf_hash()
+            ]);
+        }
+    }
+
 
     public function detailPayrollView($id)
     {

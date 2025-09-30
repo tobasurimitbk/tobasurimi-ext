@@ -255,6 +255,112 @@ class PayrollsModel extends Model
 
         return $result;
     }
+    public function generateAmt(
+        $mapFormLembur,
+        $mapEmployeePayroll,
+        $mapGajiHarian,
+        $mapGajiCadangan,
+        $mapPinjaman,
+        $mapTotalGajiHarian,
+        $employeeIds,
+        $yearMonth,
+        $payrollIDs,
+        $startDate,
+        $endDate
+    ) {
+        $formLemburModel = new FormLemburModel();
+        $payrollGajiModel = new PayrollGajiConjunctionModel();
+        $attendanceTerlambatModel = new AttendanceKeterlambatanModel();
+
+        // ✅ sekali update lembur
+        $formLemburModel
+            ->whereIn('employee_id', $employeeIds)
+            ->where('periode >=', $startDate)
+            ->where('periode <=', $endDate)
+            ->set('is_payroll', '1')
+            ->update();
+
+        // ✅ sekali query keterlambatan
+        $attLambat = $attendanceTerlambatModel
+            ->select("payroll_id, SUM(nominal_pengurangan) AS total")
+            ->whereIn('payroll_id', $payrollIDs)
+            ->groupBy('payroll_id')
+            ->findAll();
+
+        $mapTerlambat = [];
+        foreach ($attLambat as $row) {
+            $mapTerlambat[$row['payroll_id']] = (float) $row['total'];
+        }
+
+        // ✅ sekali query tunjangan MINUS
+        $gajiMinus = $payrollGajiModel
+            ->select("payroll_gaji_conjunction.payroll_id, SUM(payroll_gaji_conjunction.nominal) AS total")
+            ->join('tunjangan', 'tunjangan.id = payroll_gaji_conjunction.tunjangan_id')
+            ->where('tunjangan.tipe', 'MINUS')
+            ->where('tunjangan.is_cadangan !=', '1')
+            ->where('tunjangan.is_gaji_harian !=', '1')
+            ->whereIn('payroll_gaji_conjunction.payroll_id', $payrollIDs)
+            ->groupBy('payroll_gaji_conjunction.payroll_id')
+            ->findAll();
+
+        $mapGajiMinus = [];
+        foreach ($gajiMinus as $row) {
+            $mapGajiMinus[$row['payroll_id']] = (float) $row['total'];
+        }
+
+        // ✅ sekali query tunjangan PLUS
+        $gajiPlus = $payrollGajiModel
+            ->select("payroll_gaji_conjunction.payroll_id, SUM(payroll_gaji_conjunction.nominal) AS total")
+            ->join('tunjangan', 'tunjangan.id = payroll_gaji_conjunction.tunjangan_id')
+            ->where('tunjangan.tipe', 'PLUS')
+            ->where('tunjangan.is_cadangan !=', '1')
+            ->where('tunjangan.is_gaji_harian !=', '1')
+            ->whereIn('payroll_gaji_conjunction.payroll_id', $payrollIDs)
+            ->groupBy('payroll_gaji_conjunction.payroll_id')
+            ->findAll();
+
+        $mapGajiPlus = [];
+        foreach ($gajiPlus as $row) {
+            $mapGajiPlus[$row['payroll_id']] = (float) $row['total'];
+        }
+
+        // ✅ build hasil batch
+        $dataResult = [];
+        foreach ($employeeIds as $e) {
+            $payrollId = $mapEmployeePayroll[$e] ?? null;
+            if (!$payrollId) {
+                continue;
+            }
+
+            $gajiLembur       = $mapFormLembur[$e] ?? 0;
+            $gajiHarian       = $mapGajiHarian[$e] ?? 0;
+            $gajiCadangan     = $mapGajiCadangan[$e] ?? 0;
+            $pinjamanKaryawan = $mapPinjaman[$e] ?? 0;
+            $totalGajiHarian  = $mapTotalGajiHarian[$e] ?? 0;
+
+            $totalMinus = ($mapTerlambat[$payrollId] ?? 0)
+                + ($mapGajiMinus[$payrollId] ?? 0)
+                + $pinjamanKaryawan;
+
+            $totalPlus  = ($mapGajiPlus[$payrollId] ?? 0);
+
+            $dataResult[] = [
+                'id'                       => $payrollId,
+                'nominal_cadangan'         => $gajiCadangan,
+                'nominal_gaji_harian'      => $gajiHarian,
+                'nominal_pinjaman_karyawan' => $pinjamanKaryawan,
+                'nominal_uang_gaji'        => $totalGajiHarian,
+                'nominal_uang_lembur'      => $gajiLembur,
+                'nominal_pengurangan_gaji' => $totalMinus,
+                'nominal_penambahan_gaji'  => $totalPlus,
+                'nominal_gaji_diterima'    => ($totalGajiHarian + $totalPlus) - $totalMinus,
+            ];
+        }
+
+        return $dataResult; // tinggal updateBatch($dataResult, 'id')
+    }
+
+
 
     public function detailPayroll($payrollID)
     {
@@ -660,6 +766,12 @@ class PayrollsModel extends Model
             'unit' => $companyModel->where('id', $companyID)->first(),
             'divisi' => $divisiModel->where('id', $divisionID)->first(),
         ];
+    }
+
+    public function getEmployeeIdByPayrollAmt($payrollIds)
+    {
+        $dataQry = $this->asArray()->whereIn('id', $payrollIds)->where('deletedAt', null)->findAll();
+        return $dataQry;
     }
 
     static function getPotonganByEmployeeID($employeeID, $yearMonth)
