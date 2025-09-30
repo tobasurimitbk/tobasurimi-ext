@@ -433,15 +433,46 @@ class UpdateStockBahanBaku extends BaseController
                 ->findAll();
 
             $qty_diterima_total = 0;
+
+            // ambil parent_id dari salah satu detail
+            $parentId = !empty($stockDetail[0]['stock_id']) ? $stockDetail[0]['stock_id'] : null;
+
             foreach ($stockDetail as $p) {
-                $qty_diterima_total += $p['qty_Diterima'];
+                // ambil qty lama detail
+                $oldDetail = $this->stockRevampDetailModel
+                    ->select('qty_diterima')
+                    ->where('id', $p['stock_detail_id'])
+                    ->first();
+
+                $oldQty = $oldDetail ? (int)$oldDetail['qty_diterima'] : 0;
+                $newQty = (int)$p['qty_diterima'];
+
+                // hitung selisih
+                $selisih = $newQty - $oldQty;
+                $qty_diterima_total += $selisih;
+
+                // update detail
                 $this->stockRevampDetailModel
                     ->where('id', $p['stock_detail_id'])
-                    ->set([
-                        'qty_diterima' => $p['qty_diterima'],
-                    ])
+                    ->set(['qty_diterima' => $newQty])
                     ->update();
             }
+
+            // update parent (tambah qty_diterima dengan total selisih)
+            if ($parentId) {
+                $this->stockRevampModel
+                    ->where('id', $parentId)
+                    ->set('qty_diterima', 'qty_diterima + ' . $qty_diterima_total, false)
+                    ->update();
+            }
+
+
+            // update parent -> tambahkan selisih total ke qty_diterima lama
+            $this->stockRevampModel
+                ->where('id', $id) // ganti $parentId sesuai id parent
+                ->set('qty_diterima', 'qty_diterima + ' . $qty_diterima_total, false) 
+                ->update();
+
 
             $this->stockRevampModel
                     ->where('id', $p['stock_detail_id'])
