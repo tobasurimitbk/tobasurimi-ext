@@ -596,6 +596,7 @@ $routes->get('/invoice-penjualan-lokal/all', 'SalesLokal\Invoice::all', ['filter
 $routes->post('/invoice-penjualan-lokal/save', 'SalesLokal\Invoice::save', ['filter' => 'Auth']);
 $routes->post('/invoice-penjualan-lokal/update', 'SalesLokal\Invoice::update', ['filter' => 'Auth']);
 $routes->post('/invoice-penjualan-lokal/delete', 'SalesLokal\Invoice::delete', ['filter' => 'Auth']);
+$routes->post('/invoice-penjualan-lokal/delete-detail', 'SalesLokal\Invoice::deleteDetail', ['filter' => 'Auth']);
 $routes->post('/invoice-penjualan-lokal/posting',  'SalesLokal\Invoice::posting', ['filter' => 'Auth']);
 $routes->get('/invoice-penjualan-lokal/getDocNumber/(:segment)/(:segment)', 'SalesLokal\Invoice::getDocNumber/$1/$2', ['filter' => 'Auth']);
 $routes->get('/invoice-penjualan-lokal/getDocumentData/(:alpha)/(:num)', 'SalesLokal\Invoice::getDocData/$1/$2', ['filter' => 'Auth']);

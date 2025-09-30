@@ -313,7 +313,7 @@ class Invoice extends BaseController
                         "discount_percentage_invoice"   => $value['disc'],
                         "discount_unit_invoice"         => $value['discUnit'],
                         "harga_barang_invoice"          => str_replace(',', '', $value['harga_barang']),
-                        "tax_invoice"                   => str_replace(',', '', $value['tax']),
+                        "tax_invoice"                   => str_replace(',', '', $value['tax'] ?? $value['taxAmt']),
                         "amount_invoice"                => str_replace(',', '', $value['amount']),
                     ];
                     $this->SalesOrderInvoiceDetailModel->insert($valuesDetail);
@@ -401,7 +401,26 @@ class Invoice extends BaseController
         //Get data sales order
         $dataSalesInvoiceOrder = $this->SalesOrderInvoiceModel->getSalesOrderInvoiceLokalById(($id));
         // dd($dataSalesInvoiceOrder);
-        $dataSalesInvoiceOrderDetail = $this->SalesOrderInvoiceDetailModel->withDeleted()->where('id_sales_order_invoice', $id)->findAll();
+        $dataSalesInvoiceOrderDetail = $this->SalesOrderInvoiceDetailModel
+            ->select('sales_order_invoice_detail.*, 
+                  sales_order_invoice_detail.id as id_detail_invoice, 
+                  sales_order_invoice_detail.id_barang_invoice as id_barang,
+                  barang_master_sales.barang_name as nama_barang,
+                  barang_master_sales.kode_barang,
+                  sales_order_invoice_detail.qty_invoice as qty,
+                  sales_order_invoice_detail.qty_invoice as qty_sekarang,
+                  satuans.kode_satuan as satuan,
+                  sales_order_invoice_detail.keterangan_invoice as keterangan,
+                  sales_order_invoice_detail.discount_percentage_invoice as disc,
+                  sales_order_invoice_detail.discount_percentage_invoice as discAmt,
+                  sales_order_invoice_detail.discount_unit_invoice as discUnit,
+                  sales_order_invoice_detail.harga_barang_invoice as harga_barang,
+                  sales_order_invoice_detail.tax_invoice as tax,
+                  sales_order_invoice_detail.amount_invoice as amount,')
+            ->join('barang_master_sales', 'barang_master_sales.id = sales_order_invoice_detail.id_barang_invoice', 'left')
+            ->join('satuans', 'satuans.id = barang_master_sales.satuan_id', 'left')
+            ->where('id_sales_order_invoice', $id)
+            ->findAll();
 
         $taxData = $this->taxModel->getTaxByType('ppn');
         if (empty($dataSalesInvoiceOrder)) {
@@ -416,12 +435,12 @@ class Invoice extends BaseController
             ->findAll();
 
         if ($dataSalesInvoiceOrder->document_type != "penjualan") {
-            $documentIds = json_decode($dataSalesInvoiceOrder->document_id, true);
-            $documentResults = []; // Array kosong untuk menyimpan hasil query
+            $documentIds = json_decode($dataSalesInvoiceOrder->document_id, true) ?? [];
+            $documentResults = [];
 
             foreach ($documentIds as $docId) {
                 $documentGetData = $this->getDocDataaaa($dataSalesInvoiceOrder->document_type, (int) $docId);
-                $documentResults[] = $documentGetData; // Simpan hasil ke dalam array
+                $documentResults[] = $documentGetData;
             }
             $documentData = $documentResults;
         } else {
@@ -433,9 +452,13 @@ class Invoice extends BaseController
 
         foreach ($documentData as $doc) {
             foreach ($doc->itemList as $key => &$value) {
-                foreach ($dataSalesInvoiceOrderDetail as $valueDetail) {
+                foreach ($dataSalesInvoiceOrderDetail as &$valueDetail) {
                     // var_dump($value);
                     // var_dump($valueDetail);
+
+                    $valueDetail['qty_input'] = number_format(floatval($valueDetail['qty']), 2);
+                    $valueDetail['harga_barang'] = number_format(floatval($valueDetail['harga_barang']), 0);
+                    $valueDetail['amount'] = number_format(floatval($valueDetail['amount']), 0);
 
                     if (isset($valueDetail['id_sales_order']) ? ($value->id_sales_order == $valueDetail['id_sales_order'] && $value->id_barang == $valueDetail['id_barang_invoice']) : ($value->id_sj == $valueDetail['id_surat_jalan'] && $value->id_barang == $valueDetail['id_barang_invoice'])) {
 
@@ -491,10 +514,16 @@ class Invoice extends BaseController
         // $customers = $this->CustomerModel->asObject()->select(['id', 'name'])->where('company_id', $this->this_company_id)->findAll();
         $customers = $this->CustomerModel->getCustomerLokal($this->userId, $this->is_admin);
 
+        // echo "<pre>";
+        // var_dump($documentData);
+        // var_dump($dataSalesInvoiceOrderDetail);
+        // echo "</pre>";
+        // exit;
 
         $data = [
             "noFaktur"      => $noFaktur,
             "data"          => $dataSalesInvoiceOrder,
+            "dataDetail"    => $dataSalesInvoiceOrderDetail,
             "dataCustomers" => $customers,
             "documentList"  => $documentList,
             "documentData"  => $documentData,
@@ -747,6 +776,53 @@ class Invoice extends BaseController
             echo json_encode($data);
         }
         return;
+    }
+
+    public function deleteDetail()
+    {
+        $id = ($this->request->getVar('id'));
+
+        $getBarangSalesOrderDetail = $this->SalesOrderInvoiceDetailModel
+            ->select('id_sales_order_invoice, id_barang_invoice')
+            ->where('id', $id)
+            ->first();
+
+        if ($getBarangSalesOrderDetail['id_barang_invoice'] == "85") {
+            return response()->setJSON([
+                'message' => "Kemasan Default Tidak Boleh Dihapus",
+                'token' => csrf_hash(),
+                'status' => false
+            ]);
+        }
+
+        $this->SalesOrderInvoiceDetailModel->delete($id);
+
+        $getAllBarangSalesOrderDetail = $this->SalesOrderInvoiceDetailModel
+            ->select('qty_invoice, harga_barang_invoice, discount_percentage_invoice, amount_invoice, discount_unit_invoice')
+            ->where('id_sales_order_invoice', $getBarangSalesOrderDetail['id_sales_order_invoice'])
+            ->where('id_barang_invoice !=', 85)->findAll();
+
+        $totalQty = 0;
+        $total_harga = 0;
+        foreach ($getAllBarangSalesOrderDetail as $row) {
+            $totalQty = $totalQty + $row['qty_invoice'];
+            $amountValue = $row['amount_invoice'] ? (float) str_replace(",", "", $row['amount_invoice']) : 0;
+            $total_harga +=  $row['discount_unit_invoice'] == "percent" ? ($amountValue - ($amountValue * ($row['discount_percentage_invoice'] / 100))) : ($amountValue - $row['discount_percentage_invoice']);
+        }
+        //qty barang ditambah jumlah kemasan
+        $this->SalesOrderInvoiceModel
+            ->update(
+                $getBarangSalesOrderDetail['id_sales_order_invoice'],
+                [
+                    'total_invoice' => $total_harga
+                ]
+            );
+
+        return response()->setJSON([
+            'message' => "Detail Barang Berhasil Dihapus",
+            'token' => csrf_hash(),
+            'status' => true
+        ]);
     }
 
     public function getDocNumber($documentType, $id_customer)

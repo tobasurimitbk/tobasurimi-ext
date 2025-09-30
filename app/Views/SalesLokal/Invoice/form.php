@@ -612,17 +612,72 @@
             let rowData = table.row($(this).parents('tr')).data();
             let dataNo = $(this).data('no');
             let dataId = $(this).data('id');
+            // console.log(list_items, dataNo, dataId);
+
             const csrf = $(`[name="${csrfToken}"]`);
+            if (!dataId) {
+                let indexToRemove = list_items.findIndex(item => item.no === dataNo);
+                if (indexToRemove !== -1) {
+                    list_items.splice(indexToRemove, 1);
 
-            let indexToRemove = list_items.findIndex(item => item.no === dataNo);
-            if (indexToRemove !== -1) {
-                list_items.splice(indexToRemove, 1);
-
+                }
+                table.clear().rows.add(list_items).draw();
+            } else {
+                Swal.fire({
+                    icon: 'question',
+                    title: 'Yakin akan di hapus?',
+                    confirmButtonColor: '#4e73df',
+                    cancelButtonColor: '#d33',
+                    showCancelButton: true,
+                    reverseButtons: true,
+                    confirmButtonText: 'Hapus',
+                    cancelButtonText: 'Kembali',
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $.ajax({
+                            url: "<?= base_url("invoice-penjualan-lokal/delete-detail"); ?>",
+                            data: {
+                                id: dataId,
+                            },
+                            beforeSend: function(xhr) {
+                                xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                                setLoading();
+                            },
+                            complete: function() {
+                                stopLoading();
+                            },
+                            method: "POST",
+                            dataType: "json",
+                            success: function(response) {
+                                csrf.val(response.token);
+                                if (response.status) {
+                                    Swal.fire({
+                                            icon: 'success',
+                                            title: response.message,
+                                            confirmButtonColor: '#4e73df',
+                                        })
+                                        .then(() => {
+                                            // Update the list_items array
+                                            list_items = list_items.filter(item => item.id != dataId);
+                                            // Redraw the table with the updated list_items
+                                            table.clear().rows.add(list_items).draw();
+                                            reCountTotal();
+                                        })
+                                } else {
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: response.message,
+                                        confirmButtonColor: '#e74a3b',
+                                    });
+                                }
+                            },
+                        });
+                    }
+                })
             }
-            table.clear().rows.add(list_items).draw();
-
             reCountTotal();
         });
+
 
         $(".btn-show-modal").click(function() {
             $(".title-detail-name").text("Tambah");
@@ -1086,7 +1141,7 @@
                 list_items = [];
                 clearField();
             } else {
-                $(".btn-show-modal").css('display', 'none');
+                $(".btn-show-modal").css('display', '');
                 $("#doc_id").removeAttr('disabled');
                 if (docType && idCustomer) {
                     clearField();
@@ -1232,21 +1287,16 @@
             }
         }
 
-        <?php if (!empty($documentData)) : ?>
+        <?php if (!empty($dataDetail)) : ?>
 
             var itemList = [];
 
-            <?php foreach ($documentData as $doc) : ?>
+            <?php foreach ($dataDetail as $doc) : ?>
                 var tempItems = [];
-                <?php if ($data->status_posting == "0") : ?>
-                    tempItems = <?= json_encode($doc->itemList) ?>;
-                <?php else : ?>
-                    tempItems = <?= json_encode($doc->itemListPosting) ?>;
-                <?php endif; ?>
+                tempItems = <?= json_encode($doc) ?>;
 
                 itemList = itemList.concat(tempItems); // Gabungkan item dari setiap dokumen
-            <?php endforeach; ?>
-            table.rows.add(itemList).draw(false);
+            <?php endforeach; ?> table.rows.add(itemList).draw(false);
             itemList.forEach(function(item) {
                 list_items.push(item);
             });
