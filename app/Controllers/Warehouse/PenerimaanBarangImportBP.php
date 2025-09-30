@@ -127,7 +127,7 @@ class PenerimaanBarangImportBP extends BaseController
             "penerimaan_barang.company_id" => $this->this_company_id,
             "penerimaan_barang.status_penerimaan" => "IMPORT",
             "penerimaan_barang.deletedAt" => null,
-            "penerimaan_barang_detail.deletedAt" => null,
+            //"penerimaan_barang_detail.deletedAt" => null,
             "tipe_bahan" => "PENOLONG"
         ];
 
@@ -198,7 +198,7 @@ class PenerimaanBarangImportBP extends BaseController
             "penerimaan_barang.company_id" => $this->this_company_id,
             "penerimaan_barang.status_penerimaan" => "IMPORT",
             "penerimaan_barang.deletedAt" => null,
-            "penerimaan_barang_detail.deletedAt" => null,
+            //"penerimaan_barang_detail.deletedAt" => null,
             "tipe_bahan" => "PENOLONG"
         ];
 
@@ -254,7 +254,7 @@ class PenerimaanBarangImportBP extends BaseController
             "penerimaan_barang.company_id" => $this->this_company_id,
             "penerimaan_barang.status_penerimaan" => "IMPORT",
             "penerimaan_barang.deletedAt" => null,
-            "penerimaan_barang_detail.deletedAt" => null,
+            //"penerimaan_barang_detail.deletedAt" => null,
             "tipe_bahan" => "PENOLONG"
         ];
 

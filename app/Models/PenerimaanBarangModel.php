@@ -71,6 +71,112 @@ class PenerimaanBarangModel extends Model
     public function getPenerimaanBarangList($condition, $addCondition, $limit = 10, $offset = 0)
     {
         $availableSort = [
+            'no_penerimaan_barang' => 'penerimaan_barang.no_penerimaan_barang',
+            'warehouse_name'       => 'warehouses.warehouse_name',
+            'tipe_bahan'           => 'penerimaan_barang.tipe_bahan',
+            'supplier_name'        => 'suppliers.name',
+            'createdAt'            => 'penerimaan_barang.createdAt',
+            'updatedAt'            => 'penerimaan_barang.updatedAt',
+            'divisi'               => 'divisis.divisi',
+            'metadata.value'       => 'metadata.value'
+        ];
+        $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
+
+        $sort     = $availableSort[$addCondition['sort'] ?? 'createdAt'] ?? 'penerimaan_barang.createdAt';
+        $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'DESC';
+
+        // --- Build base query (tanpa COUNT dulu) ---
+        $baseQuery = $this->db->table('penerimaan_barang')
+            ->select('penerimaan_barang.*,
+                    suppliers.name AS supplier_name,
+                    warehouses.warehouse_name,
+                    divisis.divisi,
+                    metadata.value AS bc_type_name,
+                    bc_purchase_order_lpb.bc_purchase_order_id
+                  ')
+            ->join('suppliers', 'suppliers.id = penerimaan_barang.supplier_id', 'left')
+            ->join('warehouses', 'warehouses.id = penerimaan_barang.warehouse_id', 'left')
+            ->join('divisis', 'divisis.id = penerimaan_barang.divisi_id', 'left')
+            ->join('metadata', 'metadata.id = penerimaan_barang.bc_type', 'left')
+            ->join('bc_purchase_order_lpb', 'bc_purchase_order_lpb.penerimaan_barang_id = penerimaan_barang.id', 'left')
+            ->where($condition)
+            ->groupBy('penerimaan_barang.id');
+
+        // --- Filter search ---
+        if (!empty($addCondition['search'])) {
+            $baseQuery->groupStart()
+                ->like('penerimaan_barang.no_penerimaan_barang', $addCondition['search'])
+                ->orLike('suppliers.name', $addCondition['search'])
+                ->orLike('warehouses.warehouse_name', $addCondition['search'])
+                ->orLike('divisis.divisi', $addCondition['search'])
+                ->orLike('penerimaan_barang.multiple_po_no', $addCondition['search'])
+                ->orLike('penerimaan_barang.multiple_spp_no', $addCondition['search'])
+                ->orLike('metadata.value', $addCondition['search'])
+                ->groupEnd();
+        }
+
+        if (!empty($addCondition['status'])) {
+            $baseQuery->where('penerimaan_barang.status_post', $addCondition['status']);
+        }
+
+        if (!empty($addCondition['startdate'])) {
+            $baseQuery->where('penerimaan_barang.tanggal >=', $addCondition['startdate']);
+        }
+        if (!empty($addCondition['lastdate'])) {
+            $baseQuery->where('penerimaan_barang.tanggal <=', $addCondition['lastdate']);
+        }
+
+        // --- Hitung totalFilteredData dengan query clone (tanpa limit) ---
+        $totalFilteredData = clone $baseQuery;
+        $totalFilteredData = $totalFilteredData->countAllResults(false);
+
+        // --- Hitung totalData (tanpa filter search/status/date) ---
+        $totalDataQuery = $this->db->table('penerimaan_barang')
+            ->where($condition);
+        $totalData = $totalDataQuery->countAllResults();
+
+        // --- Ambil data utama dengan limit/offset ---
+        $dataList = $baseQuery
+            ->orderBy($sort, $sortType)
+            ->limit($limit, $offset)
+            ->get()
+            ->getResultObject();
+
+        // --- Ambil itemCount sekaligus untuk semua ID di page ini ---
+        $penerimaanBarangIds = array_column($dataList, 'id');
+        $itemCounts = [];
+        if (!empty($penerimaanBarangIds)) {
+            $itemCountQuery = $this->db->table('penerimaan_barang_detail')
+                ->select('penerimaan_barang_id, COUNT(*) AS item_count')
+                ->whereIn('penerimaan_barang_id', $penerimaanBarangIds)
+                ->where('deletedAt IS NULL', null, false)
+                ->groupBy('penerimaan_barang_id')
+                ->get()
+                ->getResultObject();
+
+            foreach ($itemCountQuery as $row) {
+                $itemCounts[$row->penerimaan_barang_id] = $row->item_count;
+            }
+        }
+
+        // --- Merge itemCount ke data utama ---
+        foreach ($dataList as $key => $row) {
+            $row->itemCount = $itemCounts[$row->id] ?? 0;
+            $dataList[$key] = $row;
+        }
+
+        return [
+            'data'              => $dataList,
+            'totalData'         => $totalData,
+            'totalFilteredData' => $totalFilteredData,
+            'sort'              => $sort,
+            'sortType'          => $sortType
+        ];
+    }
+
+    public function getPenerimaanBarangListBackup($condition, $addCondition, $limit = 10, $offset = 0)
+    {
+        $availableSort = [
             'no_penerimaan_barang'      => 'penerimaan_barang.no_penerimaan_barang',
             'warehouse_name'            => 'warehouses.warehouse_name',
             'tipe_bahan'                => 'penerimaan_barang.tipe_bahan',
@@ -494,7 +600,7 @@ class PenerimaanBarangModel extends Model
 
         // Hitung tanggal akhir bulan
         $lastDayOfMonth = date('Y-m-t', strtotime($tanggal));
-        $startDayOfMonth = date('Y-m') . "-01";
+        $startDayOfMonth = date('Y-m', strtotime($lastDayOfMonth)) . "-01";
 
         // Query cari nomor terakhir
         $builder = $this->db->table('penerimaan_barang');
