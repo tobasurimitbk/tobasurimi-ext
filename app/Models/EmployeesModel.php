@@ -90,7 +90,8 @@ class EmployeesModel extends Model
             'employees.tipe' => 'employees.tipe',
             'employees.dob' => 'employees.dob',
             'employees.gender' => 'employees.gender',
-            'employees.status' => 'employees.status'
+            'employees.status' => 'employees.status',
+            'employees.attendance_sync' => 'employees.attendance_sync'
         ];
         $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
 
