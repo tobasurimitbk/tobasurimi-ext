@@ -56,10 +56,23 @@ class PayrollGajiConjunctionModel extends Model
             ->delete();
 
         $gajiConjunctionModel = new GajiConjunctionModel();
-        $gajiList = $gajiConjunctionModel->where('employee_id', $employeeID)
+        $gajiList = $gajiConjunctionModel
+            ->select('gaji_conjunction.*,tunjangan.name AS tunjangan_name')
+            ->join('tunjangan', 'tunjangan.id = gaji_conjunction.tunjangan_id', 'left')
+            ->where('employee_id', $employeeID)
             ->findAll();
 
         foreach ($gajiList as $g) {
+
+            if ($g['tunjangan_name'] == "UANG MAKAN") {
+                $nominal = $this->generateUangMakan(
+                    $payrollID,
+                    $employeeID
+                );
+            } else {
+                $nominal = $g['nominal'];
+            }
+
             $this->db->table('payroll_gaji_conjunction')
                 ->insert([
                     'company_id' => $companyID,
@@ -67,9 +80,104 @@ class PayrollGajiConjunctionModel extends Model
                     'payroll_id' => $payrollID,
                     'tunjangan_id' => $g['tunjangan_id'],
                     'year_month' => $yearMonth,
-                    'nominal' => $g['nominal']
+                    'nominal' => $nominal
                 ]);
         }
+    }
+
+    public function generateAmt(
+        $mapEmployeePayroll,
+        $mapUangMakanHarian,
+        $employeeIds,
+        $companyId,
+        $yearMonth
+    ) {
+        // delete first
+        $this->db->table('payroll_gaji_conjunction')
+            ->whereIn('employee_id', $employeeIds)
+            ->where('year_month', $yearMonth)
+            ->delete();
+
+        $gajiConjunctionModel = new GajiConjunctionModel();
+        $gajiList = $gajiConjunctionModel
+            ->select('gaji_conjunction.*,tunjangan.name AS tunjangan_name')
+            ->join('tunjangan', 'tunjangan.id = gaji_conjunction.tunjangan_id', 'left')
+            ->whereIn('employee_id', $employeeIds)
+            ->findAll();
+
+        $dataList = array();
+        foreach ($gajiList as $g) {
+            if ($g['tunjangan_name'] == "UANG MAKAN") {
+                if (empty($mapUangMakanHarian[$g['employee_id']])) {
+                    $nominal = $g['nominal'];
+                } else {
+                    $nominal = $mapUangMakanHarian[$g['employee_id']] ?? 0;
+                }
+            } else {
+                $nominal = $g['nominal'];
+            }
+            array_push($dataList, [
+                'company_id' => $companyId,
+                'employee_id' => $g['employee_id'],
+                'payroll_id' => $mapEmployeePayroll[$g['employee_id']],
+                'tunjangan_id' => $g['tunjangan_id'],
+                'year_month' => $yearMonth,
+                'nominal' => $nominal
+            ]);
+        }
+
+        return $dataList;
+    }
+
+    public function getGajiHarianGajiCadanganAmt($payrollIds)
+    {
+        // get gaji harian first
+        $gajiHarian = $this->asArray()
+            ->select('payroll_gaji_conjunction.nominal,payroll_gaji_conjunction.employee_id,payroll_gaji_conjunction.payroll_id')
+            ->join('tunjangan', 'tunjangan.id = payroll_gaji_conjunction.tunjangan_id')
+            ->where('tunjangan.is_gaji_harian', '1')
+            ->whereIn('payroll_gaji_conjunction.payroll_id', $payrollIds)
+            ->where('deletedAt', null)
+            ->findAll();
+
+        // get nominal uang cadangan
+        $gajiCadangan = $this->asArray()
+            ->select('payroll_gaji_conjunction.nominal,payroll_gaji_conjunction.employee_id,payroll_gaji_conjunction.payroll_id')
+            ->join('tunjangan', 'tunjangan.id = payroll_gaji_conjunction.tunjangan_id')
+            ->where('tunjangan.is_cadangan', '1')
+            ->whereIn('payroll_gaji_conjunction.payroll_id', $payrollIds)
+            ->where('deletedAt', null)
+            ->findAll();
+
+        return [
+            'gajiHarian' => $gajiHarian,
+            'gajiCadangan' => $gajiCadangan
+        ];
+    }
+
+
+    public function generateUangMakan($payrollID, $employeeID)
+    {
+        $payrollModel = new PayrollsModel();
+        $uangMakanHarianModel = new UangMakanHarianModel();
+
+        $payroll = $payrollModel->where('id', $payrollID)->first();
+
+        $startDate = $payroll['start_date'];
+        $endDate = $payroll['end_date'];
+
+        $totalUangMakan = $uangMakanHarianModel
+            ->select('SUM(nominal) AS total_nominal')
+            ->where('tanggal >=', $startDate)
+            ->where('tanggal <=', $endDate)
+            ->where('employee_id', $employeeID)
+            ->first();
+
+        if ($totalUangMakan) {
+            return $totalUangMakan['total_nominal'];
+        }
+
+        return 0;
     }
 
     public function getPerhitunganKomponenGajiPayroll($payrollID)

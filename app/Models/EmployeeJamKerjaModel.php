@@ -111,6 +111,104 @@ class EmployeeJamKerjaModel extends Model
         return $jamKerjaDetail;
     }
 
+    public function getJamKerjaDetailByEmployeeIdAmt(
+        $startDate,
+        $endDate,
+        $employeeIds
+    ) {
+        $employeesModel = new EmployeesModel();
+        $metaDataModel  = new MetadataModel();
+        $jamKerjaModel  = new JamKerjaModel();
+
+        // Ambil default jam kerja ID per employee
+        $employeesJamKerjaDefault = $employeesModel
+            ->asArray()
+            ->select("employees.id as employee_id, divisis.jam_kerja_id")
+            ->join('divisis', 'divisis.id = employees.division_id', 'left')
+            ->whereIn('employees.id', $employeeIds)
+            ->findAll();
+
+        $jamKerjaDefaultMap = [];
+        foreach ($employeesJamKerjaDefault as $row) {
+            $jamKerjaDefaultMap[$row['employee_id']] = $row['jam_kerja_id'];
+        }
+
+        // Hitung semua hari dalam range
+        $dateRange = new \DatePeriod(
+            new \DateTime($startDate),
+            new \DateInterval('P1D'),
+            (new \DateTime($endDate))->modify('+1 day')
+        );
+
+        // Ambil mapping hari (1=senin, dst) → nama hari
+        $hariMeta = $metaDataModel
+            ->asArray()
+            ->where('deletedAt', null)
+            ->where('name', 'hari')
+            ->findAll();
+        $hariMap = array_column($hariMeta, 'value', 'description');
+        // contoh: [1 => 'Senin', 2 => 'Selasa', ...]
+
+        // 1. Ambil semua jam kerja employee dalam range
+        $jamKerjaEmployee = $this->asArray()
+            ->select("employee_id, tanggal, jam_kerja_id")
+            ->whereIn('employee_id', $employeeIds)
+            ->where('tanggal >=', $startDate)
+            ->where('tanggal <=', $endDate)
+            ->findAll();
+
+        // Buat map cepat [employee_id][tanggal] => jam_kerja_id
+        $jamKerjaEmployeeMap = [];
+        foreach ($jamKerjaEmployee as $row) {
+            $jamKerjaEmployeeMap[$row['employee_id']][$row['tanggal']] = $row['jam_kerja_id'];
+        }
+
+        // 2. Ambil semua jam_kerja_detail yang relevan (biar ga query per employee)
+        $allJamKerjaIds = array_unique(array_merge(
+            array_values($jamKerjaDefaultMap),
+            array_column($jamKerjaEmployee, 'jam_kerja_id')
+        ));
+
+        $jamKerjaDetails = $jamKerjaModel
+            ->asArray()
+            ->select("jam_kerja.id as jam_kerja_id, jam_kerja.jenis, jam_kerja_detail.*")
+            ->join('jam_kerja_detail', 'jam_kerja_detail.jam_kerja_id = jam_kerja.id', 'left')
+            ->whereIn('jam_kerja.id', $allJamKerjaIds)
+            ->where('jam_kerja_detail.deletedAt', null)
+            ->findAll();
+
+        // Buat map [jam_kerja_id][hari] => detail
+        $jamKerjaDetailMap = [];
+        foreach ($jamKerjaDetails as $row) {
+            $jamKerjaDetailMap[$row['jam_kerja_id']][$row['hari']] = $row;
+        }
+
+        // 3. Satukan hasil per employee + tanggal
+        $result = [];
+
+        foreach ($employeeIds as $empId) {
+            foreach ($dateRange as $date) {
+                $tanggal  = $date->format('Y-m-d');
+                $hariIdx  = $date->format('N'); // 1=Senin dst
+                $hariName = $hariMap[$hariIdx] ?? null;
+
+                // tentukan jam_kerja_id → cek per employee/tanggal, kalau gak ada fallback ke default
+                $jamKerjaId = $jamKerjaEmployeeMap[$empId][$tanggal]
+                    ?? $jamKerjaDefaultMap[$empId]
+                    ?? null;
+
+                if ($jamKerjaId && isset($jamKerjaDetailMap[$jamKerjaId][$hariName])) {
+                    $result[$empId][$tanggal] = $jamKerjaDetailMap[$jamKerjaId][$hariName];
+                } else {
+                    $result[$empId][$tanggal] = null;
+                }
+            }
+        }
+
+        return $result;
+    }
+
+
     public function getDetailJamKerjaByEmployee($employeeId, $yearMonth)
     {
         $employeesModel = new EmployeesModel();

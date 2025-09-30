@@ -123,6 +123,21 @@ class AttendancesModel extends Model
         return $resultTotal;
     }
 
+    public function getStatusAttendancesInRangeAmt($startDate, $endDate, $employeeIds)
+    {
+        $query = $this->asArray()
+            ->select("COUNT(DISTINCT DATE(periode)) as total, status, employee_id")
+            ->whereIn('employee_id', $employeeIds)
+            ->where('deletedAt', null)
+            ->groupStart()
+            ->where('periode >=', $startDate)
+            ->where('periode <=', $endDate)
+            ->groupEnd()
+            ->groupBy(['employee_id', 'status']);
+
+        return $query->findAll();
+    }
+
     // public function generate($employeeData, $startDate, $endDate, $year, $month, $companyID)
     // {
     //     $AttendanceModel = new AttendancesModel();
@@ -377,6 +392,7 @@ class AttendancesModel extends Model
             'employees.deletedAt' => null,
             'employees.company_id' => $companyID,
             'employees.division_id' => $divisionID,
+            'employees.gender' => "Wanita"
         ];
 
         // Ambil semua employee

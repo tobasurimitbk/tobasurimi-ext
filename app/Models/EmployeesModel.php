@@ -90,7 +90,8 @@ class EmployeesModel extends Model
             'employees.tipe' => 'employees.tipe',
             'employees.dob' => 'employees.dob',
             'employees.gender' => 'employees.gender',
-            'employees.status' => 'employees.status'
+            'employees.status' => 'employees.status',
+            'employees.attendance_sync' => 'employees.attendance_sync'
         ];
         $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
 
@@ -299,8 +300,8 @@ class EmployeesModel extends Model
         $arrCondition = [
             'employees.deletedAt' => null,
             'employees.company_id' => $company_id,
-            'divisis.deletedAt' => null,
-            'employees.status' => "Aktif"
+            // 'divisis.deletedAt' => null,
+            // 'employees.status' => "Aktif"
         ];
 
         if ($golongan != null && !empty($golongan)) {
@@ -313,8 +314,8 @@ class EmployeesModel extends Model
 
         $builder = $this->db->table('employees')
             ->select("employees.*, divisis.divisi, bagian.nama_bagian")
-            ->join('divisis', 'employees.division_id = divisis.id')
-            ->join('bagian', 'employees.bagian_id = bagian.id');
+            ->join('divisis', 'employees.division_id = divisis.id', 'left')
+            ->join('bagian', 'employees.bagian_id = bagian.id', 'left');
         $builder->groupStart()->where($arrCondition)->groupEnd();
         $query = $builder->get();
 
@@ -518,5 +519,12 @@ class EmployeesModel extends Model
             'sort'              => $sort,
             'sortType'          => $sortType
         ];
+    }
+
+
+    public function getDivisiByEmployeeAmt($employeeIds)
+    {
+        $queryResult = $this->asArray()->whereIn('id', $employeeIds)->where('deletedAt', null)->findAll();
+        return $queryResult;
     }
 }

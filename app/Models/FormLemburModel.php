@@ -147,4 +147,22 @@ class FormLemburModel extends Model
             'jamKedua' => number_format((($lemburJamKedua / 60) * 100), 2)
         ];
     }
+
+    public function getFormLemburAmt(
+        $employeeIds,
+        $startDate,
+        $endDate
+    ) {
+        $uangLemburQry = $this->asArray()
+            ->select("SUM(total_uang_lembur) as total, form_lembur.employee_id")
+            ->whereIn('employee_id', $employeeIds)
+            ->groupStart()
+            ->where('periode >=', $startDate)
+            ->where('periode <=', $endDate)
+            ->groupEnd()
+            ->where('deletedAt', null)
+            ->findAll();
+
+        return $uangLemburQry;
+    }
 }

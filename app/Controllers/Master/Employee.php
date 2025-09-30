@@ -145,8 +145,8 @@ class Employee extends BaseController
         $condition = [
             "employees.company_id"  => $this->this_company_id,
             "employees.deletedAt" => null,
-            "divisis.deletedAt" => null,
-            "bagian.deletedAt" => null
+            // "divisis.deletedAt" => null,
+            // "bagian.deletedAt" => null
         ];
 
         $addCondition = [
@@ -704,10 +704,18 @@ class Employee extends BaseController
                     $attendanceUnit['unit_key'],
                     $e['name']
                 );
+
+                $this->EmployeesModel->update($e['id'], [
+                    'attendance_sync' => 1,
+                ]);
+                $this->EmployeesUnitsModel->insert([
+                    'employee_id' => $e['id'],
+                    'attendances_unit_id' => $attendanceUnitId
+                ]);
             }
 
-            $this->EmployeesModel->updateBatch($employeeFingerArr, 'id');
-            $this->EmployeesUnitsModel->insertBatch($employeeUnitArr);
+            // $this->EmployeesModel->updateBatch($employeeFingerArr, 'id');
+            // $this->EmployeesUnitsModel->insertBatch($employeeUnitArr);
 
             return response()->setJSON([
                 'message' => "Berhasil sinkronisasi data",

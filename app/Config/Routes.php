@@ -38,14 +38,16 @@ $routes->get('/logout', 'Setting\Auth::doLogout');
 
 $routes->get('/change-company', 'Setting\User::changeCompany');
 
-$routes->get('/get-spesifikasi-by-qr', 'Setting\Auth::login');
-
 // 403 ROUTE
 $routes->get('/403', function () {
     return view('errors/html/error_403');
 });
 
-$routes->get('/generate-invoice-peb', 'Warehouse\Penomoran_::autoGenerateNoInvoiceTglInvoice');
+// $routes->get('/generate-bcpo', 'Warehouse\Penomoran_::generateNoAjuBcPurcaseOrder');
+// $routes->get('/generate-stock-revamp-nonpabean', 'Warehouse\Penomoran_::generateStokRevampNonPabean');
+// $routes->get('/generate-stock-revamp-pabean', 'Warehouse\Penomoran_::generateStokRevampPabean');
+// $routes->get('/generate-stock-detail-id-lpb-non-pabean', 'Warehouse\Penomoran_::generateStockDetailIdPenerimaanBarangDetailNonPabean');
+// $routes->get('/generate-stock-detail-id-lpb-pabean', 'Warehouse\Penomoran_::generateStockDetailIdPenerimaanBarangDetailPabean');
 
 // $routes->get('/delete-transaksi-jurnal', 'Accounting\TutupBuku\TutupBukuController::deleteTransaksiJurnalLama');
 // $routes->get('/update-transaksi-jurnal', 'Accounting\TutupBuku\TutupBukuController::updateTransaksiJurnalBahanBaku');
@@ -2088,8 +2090,8 @@ $routes->post('/tunjangan/delete', 'Master\Tunjangan::deleteTunjangan', ['filter
 $routes->get('/payroll', 'HR\Payroll::index', ['filter' => 'Auth']);
 $routes->get('/payroll/all', 'HR\Payroll::all', ['filter' => 'Auth']);
 $routes->get('/payroll/getBagian', 'HR\Payroll::getBagian', ['filter' => 'Auth']);
-$routes->post('/payroll/generate-global', 'HR\Payroll::generateGlobalPayroll', ['filter' => 'Auth']);
-$routes->post('/payroll/generate-single', 'HR\Payroll::generateSinglePayroll', ['filter' => 'Auth']);
+$routes->post('/payroll/generate-global', 'HR\Payroll::generateGlobalPayrollRevamp', ['filter' => 'Auth']);
+$routes->post('/payroll/generate-single', 'HR\Payroll::generateSinglePayrollRevamp', ['filter' => 'Auth']);
 $routes->get('/payroll/id/(:segment)', 'HR\Payroll::detailPayrollView/$1', ['filter' => 'Auth']);
 $routes->post('/payroll/update/nominal-komponen-gaji', 'HR\Payroll::updateNominalKomponenGaji', ['filter' => 'Auth']);
 $routes->post('/payroll/update/nominal-keterlambatan-presensi', 'HR\Payroll::updateNominalKeterlambatanPresensi', ['filter' => 'Auth']);
@@ -2612,12 +2614,6 @@ $routes->post('/hr-outsourcing-sallary-payment/getHrEmployeeOutSourcing', 'HROut
 $routes->post('/hr-outsourcing-sallary-payment/store', 'HROutsourcing\SallaryPayment::store', ['filter' => 'Auth']);
 $routes->post('/hr-outsourcing-sallary-payment/update/(:segment)', 'HROutsourcing\SallaryPayment::update/$1', ['filter' => 'Auth']);
 $routes->post('/hr-outsourcing-sallary-payment/delete/(:segment)', 'HROutsourcing\SallaryPayment::destroy/$1', ['filter' => 'Auth']);
-
-
-//HR Ousourcing Scale 
-$routes->get('/hr-outsourcing-scale', 'HROutsourcing\Scale::generateQrBarangView', ['filter' => 'Auth']);
-$routes->post('/hr-outsourcing-scale', 'HROutsourcing\Scale::generateQrBarang', ['filter' => 'Auth']);
-$routes->get('/hr-outsourcing-scale/id/(:segment)', 'HROutsourcing\Scale::getBarangByIdQr/$1');
 
 /*
  * --------------------------------------------------------------------

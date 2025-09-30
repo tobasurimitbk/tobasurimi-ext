@@ -107,7 +107,7 @@ class StockRevampDetailModel extends Model
                 satuans.kode_satuan,
                 stock_revamp_detail.qty_bersih AS total_penerimaan,
                 stock_revamp_detail.qty_bersih as stok_total,
-                stock_revamp_detail.qty_diterima as stok_total_diterima,
+                update_stock_purchase_detail.qty_diterima as stok_total_diterima,
             ')
             ->join('update_stock_purchase_detail', 'update_stock_purchase_detail.stock_detail_id = stock_revamp_detail.id')
             ->join('stock_revamp', 'stock_revamp.id = stock_revamp_detail.stock_id', 'left')
