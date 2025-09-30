@@ -297,7 +297,10 @@ class UpdateStockBahanBaku extends BaseController
                     $dataResult[$i]['stock_date'] = $dataResult == null ? "-" : date('d/m/Y', strtotime($dataResult[$i]['po_date']));
                     $dataResult[$i]['stock_id'] = $dataResult[$i]['stock_id'];
                     $dataResult[$i]['stok_total'] = floatval($dataResult[$i]['stok_total']);
-                    $dataResult[$i]['stok_total_kotor'] = floatval($dataResult[$i]['stok_total_diterima'] -$dataResult[$i]['stok_total']);
+                    $dataResult[$i]['stok_total_kotor'] = $dataResult[$i]['stok_total_kotor'] = number_format(
+                                                            $dataResult[$i]['stok_total_diterima'] - $dataResult[$i]['stok_total'], 
+                                                            2, '.', ''
+                                                        );
                     $dataResult[$i]['stok_total_diterima'] = floatval($dataResult[$i]['stok_total_diterima']);
                     $dataResult[$i]['total_penerimaan'] = floatval($dataResult[$i]['total_penerimaan']);
 
@@ -386,7 +389,6 @@ class UpdateStockBahanBaku extends BaseController
             ->where('update_stock_purchase_id', $id)
             ->delete();
 
-        // ✅ Insert detail baru
         foreach ($stockDetail as $p) {
             $selisih = $p->qty_diterima - $p->total_penerimaan;
 
