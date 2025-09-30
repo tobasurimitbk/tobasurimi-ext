@@ -213,14 +213,14 @@ class POLokalBahanPenolong extends BaseController
                 'po_type' => "Lokal",
                 'am_purchase_orders.deletedAt' => null,
                 'am_purchase_orders.company_id' => $this->this_company_id,
-                'am_purchase_order_details.deletedAt' => null,
+                // 'am_purchase_order_details.deletedAt' => null,
             ];
         } elseif ($this->is_admin == '0') {
             $condition = [
                 'po_type' => "Lokal",
                 'am_purchase_orders.deletedAt' => null,
                 'am_purchase_orders.company_id' => $this->this_company_id,
-                'am_purchase_order_details.deletedAt' => null,
+                // 'am_purchase_order_details.deletedAt' => null,
                 'purchase_requests.user_id' => $this->this_user_id
             ];
         }
@@ -250,7 +250,7 @@ class POLokalBahanPenolong extends BaseController
         $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
 
         foreach ($poData['data'] as $data) {
-            $unPostingCheck = $this->penerimaanBarangModel->where('tipe_bahan', "PENOLONG")->where('status_penerimaan', "LOKAL")->where('status_post', "FINISH")->where('company_id', $this->this_company_id)->like('multiple_po_id', $data->id)->first();
+            // $unPostingCheck = $this->penerimaanBarangModel->where('tipe_bahan', "PENOLONG")->where('status_penerimaan', "LOKAL")->where('status_post', "FINISH")->where('company_id', $this->this_company_id)->like('multiple_po_id', $data->id)->first();
 
             array_push($dataPOLokal, [
                 "no"            => $no++,
@@ -266,7 +266,7 @@ class POLokalBahanPenolong extends BaseController
                 "itemCount"     => $data->itemCount,
                 "note" => $data->note,
                 "status_penerimaan" => $data->status_penerimaan === "0" ? "OPEN" : "CLOSED",
-                "un_posting" => $unPostingCheck == null ? 0 : 1,
+                // "un_posting" => $unPostingCheck == null ? 0 : 1,
             ]);
         }
 

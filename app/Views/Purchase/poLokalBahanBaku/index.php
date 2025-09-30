@@ -276,13 +276,13 @@
                         // jika belum close po
                         if (status_penerimaan !== "CLOSED") {
                             var un_posting_row = '';
-                            if (!un_posting) {
-                                un_posting_row += `
+                            // if (!un_posting) {
+                            un_posting_row += `
                                 <button  data-toggle="tooltip" title="Un-Posting" onclick="posting('${id}', 0)" class="btn btn-danger posting-spp">
                                     <i class="fa-solid fa-ban"></i>    
                                 </button>
                                 `;
-                            }
+                            // }
                             return `
                             <div class="mt-0">
                             <?php if (can('Pembelian', 'PO Lokal BB', 'ua')) : ?>

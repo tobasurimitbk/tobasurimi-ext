@@ -219,7 +219,7 @@
                     let status = row.is_posted
                     let status_penerimaan = row.status_penerimaan
                     let purchase_request_id = row.purchase_request_id
-                    let un_posting = row.un_posting;
+                    // let un_posting = row.un_posting;
 
                     // jika belum posting
                     if (status !== "1") {
@@ -251,13 +251,13 @@
                         // jika belum close po
                         if (status_penerimaan !== "CLOSED") {
                             var un_posting_row = '';
-                            if (!un_posting) {
-                                un_posting_row += `
+                            // if (!un_posting) {
+                            un_posting_row += `
                                 <button  data-toggle="tooltip" title="Un-Posting" onclick="posting('${id}', 0)" class="btn btn-danger posting-spp">
                                     <i class="fa-solid fa-ban"></i>    
                                 </button>
                                 `
-                            }
+                            // }
 
                             return `
                             <div class="mt-0">
