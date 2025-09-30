@@ -432,7 +432,9 @@ class UpdateStockBahanBaku extends BaseController
                 ->where('update_stock_purchase_id', $id)
                 ->findAll();
 
+            $qty_diterima_total = 0;
             foreach ($stockDetail as $p) {
+                $qty_diterima_total += $p['qty_Diterima'];
                 $this->stockRevampDetailModel
                     ->where('id', $p['stock_detail_id'])
                     ->set([
@@ -440,6 +442,13 @@ class UpdateStockBahanBaku extends BaseController
                     ])
                     ->update();
             }
+
+            $this->stockRevampModel
+                    ->where('id', $p['stock_detail_id'])
+                    ->set([
+                        'qty_diterima' => $qty_diterima_total,
+                    ])
+                    ->update();
 
             // Update status posting
             $this->updateStockPurchase
