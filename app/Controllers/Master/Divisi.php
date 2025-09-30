@@ -207,7 +207,7 @@ class Divisi extends BaseController
             $typeDivisi = $this->request->getVar('type_divisi');
             $komponenGaji = $this->request->getPost('komponenGaji');
             $divisi = strtoupper($this->request->getVar('divisi'));
-            $jamKerjaId = $this->request->getPost('jam_kerja_id');
+            //$jamKerjaId = $this->request->getPost('jam_kerja_id');
             $komponenGaji = $this->request->getPost('komponenGaji');
 
             $first = $this->DivisisModel
@@ -246,7 +246,7 @@ class Divisi extends BaseController
             $this->DivisisModel->update($id, [
                 "company_id" => $this->this_company_id,
                 "divisi" => $divisi,
-                "jam_kerja_id" => $jamKerjaId,
+                // "jam_kerja_id" => $jamKerjaId,
                 "type_divisi"   => $typeDivisi
             ]);
 

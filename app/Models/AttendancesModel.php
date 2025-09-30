@@ -377,6 +377,7 @@ class AttendancesModel extends Model
             'employees.deletedAt' => null,
             'employees.company_id' => $companyID,
             'employees.division_id' => $divisionID,
+            'employees.gender' => "Wanita"
         ];
 
         // Ambil semua employee

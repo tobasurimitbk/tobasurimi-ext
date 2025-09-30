@@ -56,10 +56,23 @@ class PayrollGajiConjunctionModel extends Model
             ->delete();
 
         $gajiConjunctionModel = new GajiConjunctionModel();
-        $gajiList = $gajiConjunctionModel->where('employee_id', $employeeID)
+        $gajiList = $gajiConjunctionModel
+            ->select('gaji_conjunction.*,tunjangan.name AS tunjangan_name')
+            ->join('tunjangan', 'tunjangan.id = gaji_conjunction.tunjangan_id', 'left')
+            ->where('employee_id', $employeeID)
             ->findAll();
 
         foreach ($gajiList as $g) {
+
+            if ($g['tunjangan_name'] == "UANG MAKAN") {
+                $nominal = $this->generateUangMakan(
+                    $payrollID,
+                    $employeeID
+                );
+            } else {
+                $nominal = $g['nominal'];
+            }
+
             $this->db->table('payroll_gaji_conjunction')
                 ->insert([
                     'company_id' => $companyID,
@@ -67,9 +80,33 @@ class PayrollGajiConjunctionModel extends Model
                     'payroll_id' => $payrollID,
                     'tunjangan_id' => $g['tunjangan_id'],
                     'year_month' => $yearMonth,
-                    'nominal' => $g['nominal']
+                    'nominal' => $nominal
                 ]);
         }
+    }
+
+    public function generateUangMakan($payrollID, $employeeID)
+    {
+        $payrollModel = new PayrollsModel();
+        $uangMakanHarianModel = new UangMakanHarianModel();
+
+        $payroll = $payrollModel->where('id', $payrollID)->first();
+
+        $startDate = $payroll['start_date'];
+        $endDate = $payroll['end_date'];
+
+        $totalUangMakan = $uangMakanHarianModel
+            ->select('SUM(nominal) AS total_nominal')
+            ->where('tanggal >=', $startDate)
+            ->where('tanggal <=', $endDate)
+            ->where('employee_id', $employeeID)
+            ->first();
+
+        if ($totalUangMakan) {
+            return $totalUangMakan['total_nominal'];
+        }
+
+        return 0;
     }
 
     public function getPerhitunganKomponenGajiPayroll($payrollID)

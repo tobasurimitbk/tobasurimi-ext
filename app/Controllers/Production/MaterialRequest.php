@@ -180,7 +180,6 @@ class MaterialRequest extends BaseController
         if (!empty($id)) {
             $dataMaterialRequests = $this->materialRequestModel->asObject()->find($id);
             $dataMaterialRequestDetailsBahanBaku = $this->materialRequestDetailsModel->getMaterialRequestBahanBakuDetailNew($id);
-
             $dataMaterialRequestDetails = $this->materialRequestDetailsModel->asObject()
                 ->select(
                     '
@@ -294,11 +293,12 @@ class MaterialRequest extends BaseController
             array_push($dataMaterialRequest, [
                 "no"                    => $no++,
                 "id"                    => encrypt($data->id),
-                "req_no"                 => $data->req_no,
-                // "nama_barang"           => $data->nama_barang,
-                "is_posted"           => $data->is_posted,
-                "request_date"           => date('d/m/Y', strtotime($data->request_date)),
-                "production_date"           => date('d/m/Y', strtotime($data->production_date)),
+                "req_no"                => $data->req_no,
+                "wo_no"                 => $data->wo_no,
+                "barangName"            => $data->barangName,
+                "is_posted"             => $data->is_posted,
+                "request_date"          => date('d/m/Y', strtotime($data->request_date)),
+                "production_date"       => date('d/m/Y', strtotime($data->production_date)),
             ]);
         }
 

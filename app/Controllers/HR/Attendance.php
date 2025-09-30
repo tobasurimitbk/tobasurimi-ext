@@ -1522,7 +1522,7 @@ class Attendance extends BaseController
             $row++;
 
             // Header kolom
-            $headers = ['No', 'NIP', 'Nama', 'Divisi', 'Bagian', 'IN', 'OUT', 'Status', 'Uang Makan'];
+            $headers = ['No', 'Nip', 'Nama', 'Divisi', 'Bagian', 'IN', 'OUT', 'Status', 'Uang Makan', 'Terlambat (Menit)'];
             $col = 'A';
             foreach ($headers as $h) {
                 $sheet->setCellValue("{$col}{$row}", $h);
@@ -1550,8 +1550,7 @@ class Attendance extends BaseController
                 $out    = $mapLog[$emp['id']][$tgl]['out'] ?? '';
                 $status = $mapLog[$emp['id']][$tgl]['status'] ?? '';
                 $uangMakan = $mapUangMakanHarian[$emp['id']][$tgl]['nominal'] ?? 0;
-
-
+                $keterlambatanMenit = "";
 
                 // cek jika tanggal masuk big day
                 if (in_array($tgl, $tanggalBigDay)) {
@@ -1570,6 +1569,25 @@ class Attendance extends BaseController
                     $status = "H";
                 }
 
+                if ($in != '') {
+                    $keterlambatanCheck = static::keterlambatanCheck(
+                        $tgl,
+                        $in,
+                        $emp['id']
+                    );
+
+                    $jamTerlambat = $keterlambatanCheck[1];
+                    $inTime = new DateTime($in);
+                    $lateTime = new DateTime($jamTerlambat);
+
+                    $diff = $lateTime->diff($inTime);
+                    $keterlambatanMenit = ($diff->h * 60) + $diff->i;
+
+                    if ($inTime < $lateTime) {
+                        $keterlambatanMenit = "";
+                    }
+                }
+
                 $sheet->setCellValue("A{$row}", $no++);
                 $sheet->setCellValue("B{$row}", $nip);
                 $sheet->setCellValue("C{$row}", $nama);
@@ -1579,9 +1597,10 @@ class Attendance extends BaseController
                 $sheet->setCellValue("G{$row}", $out);
                 $sheet->setCellValue("H{$row}", $status);
                 $sheet->setCellValue("I{$row}", $uangMakan);
+                $sheet->setCellValue("J{$row}", !empty($keterlambatanMenit) ? $keterlambatanMenit : '');
 
                 // border untuk isi
-                $sheet->getStyle("A{$row}:I{$row}")->applyFromArray([
+                $sheet->getStyle("A{$row}:J{$row}")->applyFromArray([
                     'borders' => ['allBorders' => ['borderStyle' => Border::BORDER_THIN]]
                 ]);
 
@@ -1599,6 +1618,7 @@ class Attendance extends BaseController
                 // Hitung total status per karyawan
                 if (!isset($rekapKaryawan[$emp['id']])) {
                     $rekapKaryawan[$emp['id']] = [
+                        'nip'            => $nip,
                         'nama'           => $nama,
                         'hadir'          => 0,
                         'alpa'           => 0,
@@ -1662,7 +1682,7 @@ class Attendance extends BaseController
         $row++;
 
         // Header rekap
-        $rekapHeaders = ['No', 'Nama', 'Hadir', 'Alpa', 'Libur', 'Cuti Tahunan', 'Cuti Haid', 'Cuti Hamil', 'Cuti Melahirkan', 'Ijin', 'Sakit', 'RL'];
+        $rekapHeaders = ['No', 'Nip', 'Nama', 'Hadir', 'Alpa', 'Libur', 'Cuti Tahunan', 'Cuti Haid', 'Cuti Hamil', 'Cuti Melahirkan', 'Ijin', 'Sakit', 'RL'];
         $col = 'A';
         foreach ($rekapHeaders as $h) {
             $sheet->setCellValue("{$col}{$row}", $h);
@@ -1679,26 +1699,27 @@ class Attendance extends BaseController
         $no = 1;
         foreach ($rekapKaryawan as $r) {
             $sheet->setCellValue("A{$row}", $no++);
-            $sheet->setCellValue("B{$row}", $r['nama']);
-            $sheet->setCellValue("C{$row}", $r['hadir']);
-            $sheet->setCellValue("D{$row}", $r['alpa']);
-            $sheet->setCellValue("E{$row}", $r['libur']);
-            $sheet->setCellValue("F{$row}", $r['cuti_tahunan']);
-            $sheet->setCellValue("G{$row}", $r['cuti_haid']);
-            $sheet->setCellValue("H{$row}", $r['cuti_hamil']);
-            $sheet->setCellValue("I{$row}", $r['cuti_melahirkan']);
-            $sheet->setCellValue("J{$row}", $r['ijin']);
-            $sheet->setCellValue("K{$row}", $r['sakit']);
-            $sheet->setCellValue("L{$row}", $r['rl']);
+            $sheet->setCellValue("B{$row}", $r['nip']);
+            $sheet->setCellValue("C{$row}", $r['nama']);
+            $sheet->setCellValue("D{$row}", $r['hadir']);
+            $sheet->setCellValue("E{$row}", $r['alpa']);
+            $sheet->setCellValue("F{$row}", $r['libur']);
+            $sheet->setCellValue("G{$row}", $r['cuti_tahunan']);
+            $sheet->setCellValue("H{$row}", $r['cuti_haid']);
+            $sheet->setCellValue("I{$row}", $r['cuti_hamil']);
+            $sheet->setCellValue("J{$row}", $r['cuti_melahirkan']);
+            $sheet->setCellValue("K{$row}", $r['ijin']);
+            $sheet->setCellValue("L{$row}", $r['sakit']);
+            $sheet->setCellValue("M{$row}", $r['rl']);
 
-            $sheet->getStyle("A{$row}:L{$row}")->applyFromArray([
+            $sheet->getStyle("A{$row}:M{$row}")->applyFromArray([
                 'borders' => ['allBorders' => ['borderStyle' => Border::BORDER_THIN]]
             ]);
             $row++;
         }
 
         // auto size kolom
-        foreach (range('A', 'L') as $col) {
+        foreach (range('A', 'M') as $col) {
             $sheet->getColumnDimension($col)->setAutoSize(true);
         }
 
