@@ -235,7 +235,7 @@ class MaterialRequest extends BaseController
 
                 if ($dataMaterialRequestNotApprove) {
                     $value['is_requested'] = true;
-                    $stokTotal = $this->stockDetail2Model->getStockListDetail(
+                    $stokTotal = (float) $this->stockDetail2Model->getStockListDetail(
                         $value['stock_id'],
                         $value['bc_id'],
                         $value['no_aju'],
@@ -244,7 +244,7 @@ class MaterialRequest extends BaseController
 
                     $selisih = $stokTotal - (float) $dataMaterialRequestNotApprove['qty'];
 
-                    $value['realStok'] = max(0, $selisih);
+                    $value['realStok'] = floor(max(0, $selisih) * 100) / 100;
                 } else {
                     $value['is_requested'] = false;
                 }
@@ -1621,7 +1621,7 @@ class MaterialRequest extends BaseController
 
                 if ($dataMaterialRequestNotApprove) {
                     $dataResult[$i]['is_requested'] = true;
-                    $dataResult[$i]['stok_total'] = max(0, $dataResult[$i]['stok_total'] - (float) $dataMaterialRequestNotApprove['qty']);
+                    $dataResult[$i]['stok_total'] = floor(max(0, (float)$dataResult[$i]['stok_total'] - (float)$dataMaterialRequestNotApprove['qty']) * 100) / 100;
                 } else {
                     $dataResult[$i]['is_requested'] = false;
                 }
