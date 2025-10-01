@@ -409,21 +409,23 @@ class SuratJalan extends BaseController
         $idArray = array();
         $noArray = array();
 
-        foreach ($dataSo as $soId) {
-            $soData = $this->SalesOrderModel->asObject()->find($soId);
+        if ($dataSo) {
+            foreach ($dataSo as $soId) {
+                $soData = $this->SalesOrderModel->asObject()->find($soId);
 
-            if (empty($soData)) {
-                $data = [
-                    "status"    => false,
-                    "message"   => "Sales Order tidak ditemukan!",
-                    'token'     => csrf_hash(),
-                ];
-                echo json_encode($data);
-                return;
+                if (empty($soData)) {
+                    $data = [
+                        "status"    => false,
+                        "message"   => "Sales Order tidak ditemukan!",
+                        'token'     => csrf_hash(),
+                    ];
+                    echo json_encode($data);
+                    return;
+                }
+
+                $idArray[] = $soId;
+                $noArray[] = $soData->no_sales_order;
             }
-
-            $idArray[] = $soId;
-            $noArray[] = $soData->no_sales_order;
         }
 
         $shippingDate = $this->request->getPost('shipping_date');
