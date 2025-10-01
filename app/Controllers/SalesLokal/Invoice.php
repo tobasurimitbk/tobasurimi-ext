@@ -1002,7 +1002,7 @@ class Invoice extends BaseController
                     surat_jalan_so.no_po,
                     surat_jalan_so.note AS keterangan,
                     COALESCE(surat_jalan_so.terms, customers.termin) AS termin,
-                    sales_order.jenis_penjualan AS jenis_penjualan,
+                    COALESCE(sales_order.jenis_penjualan, customers.jenis_penjualan) AS jenis_penjualan,
                     employees.name AS salesName
                 ')
                 ->join('sales_order', 'sales_order.surat_jalan_so_id = surat_jalan_so.id', 'left')
@@ -1022,7 +1022,7 @@ class Invoice extends BaseController
                     surat_jalan_so.no_po,
                     surat_jalan_so.note AS keterangan,
                     COALESCE(surat_jalan_so.terms, customers.termin) AS termin,
-                    sales_order.jenis_penjualan AS jenis_penjualan,
+                    COALESCE(sales_order.jenis_penjualan, customers.jenis_penjualan) AS jenis_penjualan,
                     employees.name AS salesName
                 ')
                 ->join('surat_jalan_so_detail', 'surat_jalan_so_detail.id_surat_jalan = surat_jalan_so.id', 'left')
