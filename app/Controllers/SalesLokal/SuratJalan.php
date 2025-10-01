@@ -467,8 +467,8 @@ class SuratJalan extends BaseController
                 if (isset($value['id_detail_sj'])) {
                     $valueBarang = [
                         "id_barang"             => $value['id_barang'],
-                        "id_sales_order"        => $value['id_sales_order'],
-                        "id_sales_order_detail" => $value['id_sales_order_detail'],
+                        "id_sales_order"        => $value['id_sales_order'] ?? null,
+                        "id_sales_order_detail" => $value['id_sales_order_detail'] ?? null,
                         "qty"                   => number_format($value['qty'], 2, '.', ''),
                         "qty_sekarang"          => number_format($value['qty'], 2, '.', ''),
                         "harga_barang"          => number_format($value['harga_barang'], 2, '.', ''),
@@ -484,8 +484,8 @@ class SuratJalan extends BaseController
                     $valueBarang = [
                         "id_surat_jalan"        => $id,
                         "id_barang"             => $value['id_barang'],
-                        "id_sales_order"        => $value['id_sales_order'],
-                        "id_sales_order_detail" => $value['id_sales_order_detail'],
+                        "id_sales_order"        => $value['id_sales_order'] ?? null,
+                        "id_sales_order_detail" => $value['id_sales_order_detail'] ?? null,
                         "qty"                   => number_format($value['qty'], 2, '.', ''),
                         "qty_sekarang"          => number_format($value['qty'], 2, '.', ''),
                         "harga_barang"          => number_format($value['harga_barang'], 2, '.', ''),
@@ -643,7 +643,6 @@ class SuratJalan extends BaseController
         $usedSoIds = [];
         foreach ($sjData as $row) {
             if (!empty($row->multiple_id_so)) {
-                // multiple_id_so disimpan sebagai JSON string, mis: ["2","5"]
                 $ids = json_decode($row->multiple_id_so, true);
                 if (is_array($ids)) {
                     $usedSoIds = array_merge($usedSoIds, $ids);
@@ -658,26 +657,42 @@ class SuratJalan extends BaseController
             'tipe_sales_order'       => 'LOKAL',
             'surat_jalan_so_id'      => null,
             'sales_order_invoice_id' => null,
-            // 'sales_order.id_company' => $this->this_company_id,
-            // 'posting'               => 1,
         ];
 
-        // --- query Sales Order yang belum dipakai & tidak ada di multiple_id_so ---
+        // --- ambil semua SO ---
         $soQuery = $this->SalesOrderModel->asObject()
             ->where($condition)
             ->select('sales_order.*, metadata.value AS customerTermin, CONCAT(employees.nip , " - ", employees.name) AS salesName')
             ->join('metadata', 'metadata.id = sales_order.payment_terms', 'left')
             ->join('employees', 'employees.id = sales_order.sales_id', 'left');
 
-        if (!empty($usedSoIds)) {
-            $soQuery->whereNotIn('sales_order.id', $usedSoIds);
-        }
-
         $soList = $soQuery->findAll();
+
+        // --- filter ulang sesuai qty_sekarang ---
+        $finalSoList = [];
+        foreach ($soList as $so) {
+            // ambil detail SO
+            $detail = $this->SalesOrderDetailModel
+                ->where('id_sales_order', $so->id)
+                ->findAll();
+
+            $hasQty = false;
+            foreach ($detail as $d) {
+                if ($d['qty_sekarang'] > 0) {
+                    $hasQty = true;
+                    break;
+                }
+            }
+
+            // hanya tampil kalau masih ada qty_sekarang > 0
+            if ($hasQty) {
+                $finalSoList[] = $so;
+            }
+        }
 
         $data = [
             'customerData' => $customerData,
-            'soList'       => $soList,
+            'soList'       => $finalSoList,
         ];
 
         echo json_encode($data);
