@@ -996,17 +996,18 @@ class Invoice extends BaseController
         } else { // pengiriman
             $documentList1 = $this->SuratJalanModel->asObject()
                 ->select('
-                surat_jalan_so.id,
-                surat_jalan_so.no_surat_jalan AS doc_no,
-                surat_jalan_so.id_company,
-                surat_jalan_so.no_po,
-                surat_jalan_so.note AS keterangan,
-                surat_jalan_so.terms AS termin,
-                sales_order.jenis_penjualan AS jenis_penjualan,
-                employees.name AS salesName
-            ')
+                    surat_jalan_so.id,
+                    surat_jalan_so.no_surat_jalan AS doc_no,
+                    surat_jalan_so.id_company,
+                    surat_jalan_so.no_po,
+                    surat_jalan_so.note AS keterangan,
+                    COALESCE(surat_jalan_so.terms, customers.termin) AS termin,
+                    sales_order.jenis_penjualan AS jenis_penjualan,
+                    employees.name AS salesName
+                ')
                 ->join('sales_order', 'sales_order.surat_jalan_so_id = surat_jalan_so.id', 'left')
                 ->join('sales_order_detail', 'sales_order_detail.id_sales_order = sales_order.id')
+                ->join('customers', 'customers.id = sales_order.id_customer', 'left')
                 ->join('employees', 'employees.id = sales_order.sales_id', 'left')
                 ->where('sales_order.id_customer', $customer_id)
                 ->where('sales_order_detail.qty_sekarang !=', 0)
@@ -1015,17 +1016,18 @@ class Invoice extends BaseController
 
             $documentList2 = $this->SuratJalanModel->asObject()
                 ->select('
-                surat_jalan_so.id,
-                surat_jalan_so.no_surat_jalan AS doc_no,
-                surat_jalan_so.id_company,
-                surat_jalan_so.no_po,
-                surat_jalan_so.note AS keterangan,
-                surat_jalan_so.terms AS termin,
-                sales_order.jenis_penjualan AS jenis_penjualan,
-                employees.name AS salesName
-            ')
+                    surat_jalan_so.id,
+                    surat_jalan_so.no_surat_jalan AS doc_no,
+                    surat_jalan_so.id_company,
+                    surat_jalan_so.no_po,
+                    surat_jalan_so.note AS keterangan,
+                    COALESCE(surat_jalan_so.terms, customers.termin) AS termin,
+                    sales_order.jenis_penjualan AS jenis_penjualan,
+                    employees.name AS salesName
+                ')
                 ->join('surat_jalan_so_detail', 'surat_jalan_so_detail.id_surat_jalan = surat_jalan_so.id', 'left')
                 ->join('sales_order', 'sales_order.surat_jalan_so_id = surat_jalan_so_detail.id_sales_order', 'left')
+                ->join('customers', 'customers.id = surat_jalan_so.id_customer', 'left')
                 ->join('employees', 'employees.id = sales_order.sales_id', 'left')
                 ->where('surat_jalan_so.id_customer', $customer_id)
                 ->where('surat_jalan_so_detail.qty !=', 0)
