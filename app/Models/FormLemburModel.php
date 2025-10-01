@@ -90,8 +90,16 @@ class FormLemburModel extends Model
 
         $totalData = $dataQry->countAllResults(false);
 
-        if ($addCondition['search']) {
+        if ($addCondition['search'] || $addCondition['divisi_id'] || $addCondition['tipe']) {
             $dataQry->groupStart();
+        }
+
+        if ($addCondition['divisi_id']) {
+            $dataQry->where('employees.division_id', $addCondition['divisi_id']);
+        }
+
+        if ($addCondition['tipe']) {
+            $dataQry->where('employees.tipe', $addCondition['tipe']);
         }
 
         if ($addCondition['search']) {
@@ -100,7 +108,7 @@ class FormLemburModel extends Model
                 ->orLike('bagian.nama_bagian', $addCondition['search']);
         }
 
-        if ($addCondition['search']) {
+        if ($addCondition['search'] || $addCondition['divisi_id'] || $addCondition['tipe']) {
             $dataQry->groupEnd();
         }
 
@@ -155,6 +163,24 @@ class FormLemburModel extends Model
     ) {
         $uangLemburQry = $this->asArray()
             ->select("SUM(total_uang_lembur) as total, form_lembur.employee_id")
+            ->whereIn('employee_id', $employeeIds)
+            ->groupStart()
+            ->where('periode >=', $startDate)
+            ->where('periode <=', $endDate)
+            ->groupEnd()
+            ->where('deletedAt', null)
+            ->findAll();
+
+        return $uangLemburQry;
+    }
+
+    public function getFormLemburRangeAmt(
+        $employeeIds,
+        $startDate,
+        $endDate
+    ) {
+        $uangLemburQry = $this->asArray()
+            ->select("total_uang_lembur as total, form_lembur.*")
             ->whereIn('employee_id', $employeeIds)
             ->groupStart()
             ->where('periode >=', $startDate)

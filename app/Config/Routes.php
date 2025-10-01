@@ -2147,6 +2147,7 @@ $routes->post('/lembur/create', 'HR\FormLembur::create', ['filter' => 'Auth']);
 $routes->post('/lembur/delete', 'HR\FormLembur::delete', ['filter' => 'Auth']);
 $routes->get('/lembur/id/(:segment)', 'HR\FormLembur::getById/$1', ['filter' => 'Auth']);
 $routes->post('/lembur/employees', 'HR\FormLembur::getEmployeeByDivision', ['filter' => 'Auth']);
+$routes->get('/lembur/export-excel', 'HR\FormLembur::exportBulananLembur', ['filter' => 'Auth']);
 
 // SETTINGS
 // USER
