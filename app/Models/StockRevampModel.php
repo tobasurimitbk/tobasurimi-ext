@@ -158,7 +158,7 @@ class StockRevampModel extends Model
             log_message('error', 'Insert Stock Failed: ' . $e->getMessage());
             return false;
         }
-    }   
+    } 
 
     public function outStockRevamp(BaseConnection $db, array $data)
     {
@@ -166,91 +166,179 @@ class StockRevampModel extends Model
 
         try {
             // ==============================
-            // 1. Cek stock_revamp (master stok)
+            // 1. Ambil data detail dulu
             // ==============================
-            $builder = $db->table('stock_revamp');
-            $exist = $builder->where([
-                'company_id'      => $data['company_id'],
-                'barang_master_id' => $data['barang_master_id'],
-                'spesifikasi_id'  => $data['spesifikasi_id'],
-                'unit_id'         => $data['unit_id'],
-                'divisi_id'       => $data['divisi_id'],
-                'warehouse_id'    => $data['warehouse_id'],
-                'deletedAt'       => null,
-            ])->get()->getRow();
+            $stockDetail = $db->table('stock_revamp_detail')
+                ->where('id', $data['stock_detail_rebus_id'])
+                ->get()
+                ->getRowArray();
 
-            if (!$exist) {
-                throw new \Exception('Stock not found!');
+            if (!$stockDetail) {
+                throw new \Exception("Stock detail tidak ditemukan");
             }
 
-            // cek stok cukup
-            if ($exist->qty_bersih < $data['qty_bersih']) {
-                throw new \Exception('Stok tidak cukup!');
+            // ==============================
+            // 2. Hitung qty detail baru (dikurangi)
+            // ==============================
+            $newQtyDetail = $stockDetail['qty_diterima'] - $data['qty_digunakan'];
+            if ($newQtyDetail < 0) {
+                throw new \Exception("Qty detail tidak mencukupi");
             }
 
-            // update stok
-            $builder->where('id', $exist->id)->update([
-                'qty_bersih'   => $exist->qty_bersih - $data['qty_bersih'],
-                'qty_diterima' => $exist->qty_diterima - $data['qty_diterima'],
-                'updatedAt'    => date('Y-m-d H:i:s'),
-            ]);
-            $stockId = $exist->id;
+            $db->table('stock_revamp_detail')
+                ->where('id', $data['stock_detail_rebus_id'])
+                ->update([
+                    'qty_diterima' => $newQtyDetail,
+                ]);
 
             // ==============================
-            // 2. Insert ke stock_revamp_detail (OUT)
+            // 3. Ambil data parent stock_revamp
             // ==============================
-            $db->table('stock_revamp_detail')->insert([
-                'stock_id'       => $stockId,
-                'bc_id'          => $data['bc_id'] ?? null,
-                'type_bc'        => $data['type_bc'] ?? null,
-                'reference_id'   => $data['reference_id'] ?? null,
-                'po_type'        => $data['po_type'] ?? null,
-                'po_id'          => $data['po_id'] ?? null,
-                'reference_type' => $data['reference_type'] ?? null,
-                'qty_bersih'     => $data['qty_bersih'],
-                'qty_diterima'   => $data['qty_diterima'],
-                'createdAt'      => date('Y-m-d H:i:s'),
-                'updatedAt'      => date('Y-m-d H:i:s'),
-            ]);
-            $stockDetailId = $db->insertID();
+            $stock = $db->table('stock_revamp')
+                ->where('id', $stockDetail['stock_id'])
+                ->get()
+                ->getRowArray();
+
+            if (!$stock) {
+                throw new \Exception("Stock parent tidak ditemukan");
+            }
 
             // ==============================
-            // 3. Insert ke stock_revamp_log (OUT)
+            // 4. Hitung qty parent baru (dikurangi)
+            // ==============================
+            $newQtyParent = $stock['qty_diterima'] - $data['qty_digunakan'];
+            if ($newQtyParent < 0) {
+                throw new \Exception("Qty parent tidak mencukupi");
+            }
+
+            $db->table('stock_revamp')
+                ->where('id', $stockDetail['stock_id'])
+                ->update([
+                    'qty_diterima' => $newQtyParent,
+                ]);
+
+            // ==============================
+            // 5. Insert ke log
             // ==============================
             $db->table('stock_revamp_log')->insert([
-                'stock_detail_id' => $stockDetailId,
-                'status'          => $data['status'] ?? 'OUT',
-                'qty_diterima'    => $data['qty_diterima'],
-                'qty_bersih'      => $data['qty_bersih'],
+                'stock_detail_id' => $stockDetail['id'],
+                'status'          => 'OUT',
+                'qty_diterima'    => $data['qty_digunakan'], // jumlah yang dipakai
+                'qty_bersih'      => $data['qty_digunakan'], // kalau perlu ikut dikurangi, sesuaikan
                 'createdAt'       => date('Y-m-d H:i:s'),
                 'updatedAt'       => date('Y-m-d H:i:s'),
             ]);
 
-            // ==============================
-            // 4. Insert ke stock_revamp_history (kalau ada asal)
-            // ==============================
-            if (!empty($data['stock_detail_asal'])) {
-                $db->table('stock_revamp_history')->insert([
-                    'stock_detail_asal'    => $data['stock_detail_asal'], 
-                    'stock_detail_akhir'   => $stockDetailId,
-                    'qty_bersih_asal'      => $exist->qty_bersih + $data['qty_bersih'], // stok sebelum dikurangi
-                    'qty_diterima_asal'    => $exist->qty_diterima + $data['qty_diterima'],
-                    'qty_bersih_akhir'     => $exist->qty_bersih,
-                    'qty_diterima_akhir'   => $exist->qty_diterima,
-                    'createdAt'            => date('Y-m-d H:i:s'),
-                    'updatedAt'            => date('Y-m-d H:i:s'),
-                ]);
-            }
-
             $db->transCommit();
-            return $stockDetailId;
 
+            return $stockDetail['id'];
         } catch (\Throwable $e) {
             $db->transRollback();
             log_message('error', 'Out Stock Failed: ' . $e->getMessage());
             return false;
         }
     }
+
+
+    public function unpostStockRevamp(BaseConnection $db, array $data)
+    {
+        $db->transBegin();
+
+        try {
+            $asalId   = $data['stock_detail_asal'];
+            $akhirId  = $data['stock_detail_akhir'];
+            $qtyAsal  = $data['qty_diterima_asal'];
+            $qtyAkhir = $data['qty_diterima_akhir'];
+
+            // ==============================
+            // 1. Ambil stock detail asal
+            // ==============================
+            $detailAsal = $db->table('stock_revamp_detail')
+                ->where('id', $asalId)
+                ->get()
+                ->getRowArray();
+
+            if (!$detailAsal) {
+                throw new \Exception("Stock detail asal tidak ditemukan");
+            }
+
+            // 2. Ambil stock detail akhir
+            $detailAkhir = $db->table('stock_revamp_detail')
+                ->where('id', $akhirId)
+                ->get()
+                ->getRowArray();
+
+            if (!$detailAkhir) {
+                throw new \Exception("Stock detail akhir tidak ditemukan");
+            }
+
+            // ==============================
+            // 3. Validasi qty
+            // ==============================
+            if ((int)$detailAsal['qty_diterima'] !== (int)$qtyAsal) {
+                throw new \Exception("Qty asal tidak sesuai, unpost dibatalkan");
+            }
+
+            if ((int)$detailAkhir['qty_diterima'] !== (int)$qtyAkhir) {
+                throw new \Exception("Qty akhir tidak sesuai, unpost dibatalkan");
+            }
+
+            // ==============================
+            // 4. Rollback ke parent
+            // ==============================
+            $parentAsal = $db->table('stock_revamp')
+                ->where('id', $detailAsal['stock_id'])
+                ->get()
+                ->getRowArray();
+
+            $parentAkhir = $db->table('stock_revamp')
+                ->where('id', $detailAkhir['stock_id'])
+                ->get()
+                ->getRowArray();
+
+            if (!$parentAsal || !$parentAkhir) {
+                throw new \Exception("Parent stock tidak ditemukan");
+            }
+
+            // Kembalikan qty ke parent asal
+            $db->table('stock_revamp')
+                ->where('id', $parentAsal['id'])
+                ->update([
+                    'qty_diterima' => $parentAsal['qty_diterima'] + $qtyAsal
+                ]);
+
+            // Kurangi qty dari parent akhir
+            $db->table('stock_revamp')
+                ->where('id', $parentAkhir['id'])
+                ->update([
+                    'qty_diterima' => $parentAkhir['qty_diterima'] + $qtyAkhir
+                ]);
+
+            // ==============================
+            // 5. Update detail akhir (qty dikurangi)
+            // ==============================
+            $db->table('stock_revamp_detail')
+                ->where('id', $akhirId)
+                ->update([
+                    'qty_diterima' => $detailAkhir['qty_diterima'] + $qtyAkhir
+                ]);
+
+            // ==============================
+            // 6. Hapus detail asal
+            // ==============================
+            $db->table('stock_revamp_detail')->where('id', $asalId)->delete();
+
+            $db->transCommit();
+            return true;
+
+        } catch (\Throwable $e) {
+            $db->transRollback();
+            log_message('error', 'Unpost Stock Failed: ' . $e->getMessage());
+            return false;
+        }
+    }
+
+
 
     public function getBarangRebusAndStock($type_barang, $divisi_id, $warehouse_id)
     {
@@ -277,6 +365,80 @@ class StockRevampModel extends Model
             ->orderBy('barang_master.kode_barang', "ASC")
             ->findAll();
         return $dataResult1;
+    }
+
+
+    public function getListMasterBarang($company_id, $type_barang)
+    {
+        $kemasanModel = new KemasanModel();
+        $barangMasterModel = new BarangMasterModel();
+        $result = [];
+
+        if ($type_barang == "kemasan") {
+            $condition = [
+                'kemasan.deletedAt' => null,
+                'kemasan.company_id' => $company_id,
+            ];
+
+            $qryKemasanRes = $kemasanModel
+                ->select('kemasan.*, satuans.kode_satuan, satuans.nama_satuan, satuans.kode_satuan')
+                ->join('satuans', 'satuans.id = kemasan.satuan_id', 'left')
+                ->where($condition)
+                ->findAll();
+
+            foreach ($qryKemasanRes as $k) {
+
+                $result[] = [
+                    'barang_id'  => 0,
+                    'spesifikasi_id' => $k['id'], // spesifikasi_id = kemasan_id (jika kemasan)
+                    'type_barang' => $type_barang,
+                    'barang' => strtoupper($k['name']),
+                    'spesifikasi_name' => strtoupper($k['name']),
+                    'kode_barang' => $k['kode'],
+                    'nama_satuan' => $k['nama_satuan'],
+                    'kode_satuan' => $k['kode_satuan']
+                ];
+            }
+        } else {
+            $condition = [
+                'barang_master.company_id' => $company_id,
+                'barang_master.type_barang' => $type_barang,
+                'barang_master.deletedAt' => null,
+                'barang_master_spesifikasi.deletedAt' => null
+            ];
+
+            $selectQryBarang = "
+                barang_master.id,
+                barang_master.barang_name,
+                barang_master.kode_barang,
+                barang_master_spesifikasi.id AS spesifikasi_id,
+                barang_master_spesifikasi.spesifikasi,
+                satuans.nama_satuan,
+                satuans.kode_satuan
+            ";
+
+            $qryBarangMaster = $barangMasterModel
+                ->select($selectQryBarang)
+                ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.barang_master_id = barang_master.id', 'left')
+                ->join('satuans', 'satuans.id = barang_master_spesifikasi.satuan_1', 'left')
+                ->where($condition)
+                ->findAll();
+
+            foreach ($qryBarangMaster as $b) {
+                $result[] = [
+                    'barang_id'  => $b['id'],
+                    'spesifikasi_id' => $b['spesifikasi_id'], // spesifikasi_id = kemasan_id (jika kemasan)
+                    'type_barang' => $type_barang,
+                    'barang' => strtoupper($b['barang_name'] . "-" . $b['spesifikasi']),
+                    'spesifikasi_name' => strtoupper($b['spesifikasi']),
+                    'kode_barang' => $b['kode_barang'],
+                    'nama_satuan' => $b['nama_satuan'],
+                    'kode_satuan' => $b['kode_satuan']
+                ];
+            }
+        }
+
+        return $result;
     }
 
 }

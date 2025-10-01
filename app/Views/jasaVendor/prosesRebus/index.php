@@ -167,7 +167,7 @@
                 className: "text-center"
             },
             {
-                data: "barang_hasi_rebus",
+                data: "barang_hasil_rebus",
                 className: "text-center"
             },
             {

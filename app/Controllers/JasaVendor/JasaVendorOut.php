@@ -703,7 +703,6 @@ class JasaVendorOut extends BaseController
 
             if (!empty($supplierId)) {
                 // Khsus Dari Supplier
-                // Khsus Dari Supplier
                 for ($i = 0; $i < count($dataResult); $i++) {
                             $bcType = $metaDataModel->find($dataResult[$i]['bc_id']);
                             $dataResult[$i]['po_no'] = $dataResult[$i]['po_no'];
