@@ -14,6 +14,7 @@ use App\Models\ProsesRebusModel;
 use App\Models\StockDetail2Model;
 use App\Models\StockDetailModel;
 use App\Models\StockModel;
+use App\Models\StockRevampDetailModel;
 use App\Models\StockRevampModel;
 use App\Models\SupplierModel;
 use App\Models\WarehousesModel;
@@ -32,6 +33,8 @@ class ProsesRebus extends BaseController
     protected $jasaVendorOutDetailModel;
     protected $warehouseModel;
     protected $supplierModel;
+    protected $stockRevampModel;
+    protected $stockRevampDetailModel;
 
     public function __construct()
     {
@@ -47,6 +50,8 @@ class ProsesRebus extends BaseController
         $this->jasaVendorOutDetailModel = new JasaVendorOutDetailModel();
         $this->warehouseModel = new WarehousesModel();
         $this->supplierModel = new SupplierModel();
+        $this->stockRevampModel = new StockRevampModel();
+        $this->stockRevampDetailModel = new StockRevampDetailModel();
     }
 
     public function index()
@@ -103,32 +108,14 @@ class ProsesRebus extends BaseController
                 ->findAll();
 
             if ($prosesRebusDetail[0]) {
-                $stockDetail = $this->stockDetail2Model->getStockListDetail(
-                    $prosesRebusDetail[0]['stock_rebus_id'],
-                    $prosesRebusDetail[0]['bc_rebus_id'],
-                    $prosesRebusDetail[0]['no_aju_rebus'],
-                    $prosesRebusDetail[0]['stock_dokumen']
-                );
-
-                $barangDiRebus = $stockDetail['barang_master'];
-
-                if ($prosesRebusDetail[0]['stock_hasil_rebus_id']) {
-                    $stockDetailKeluar = $this->stockDetail2Model->getStockListDetailForRebusAllNew(
-                        $prosesRebusDetail[0]['stock_hasil_rebus_id'],
-                    );
-
-                    $barangHasilRebus = $stockDetailKeluar['barang_master'] ?? null;
-                } else {
-                    $barangMasterModel = new BarangMasterModel();
-                    $barangMasterSpesifikasiModel = new BarangMasterSpesifikasiModel();
-
-                   
-                    $barangMasterSpesifikasi = $barangMasterSpesifikasiModel->find($prosesRebusDetail[0]['barang_out_id']);
-                    $barangMaster = $barangMasterModel->find($barangMasterSpesifikasi['barang_master_id']);
-
-                    $barangHasilRebus =  $barangMaster['barang_name'] ?? null;          // amanin kalau null
-                   
-                }
+                $barangDiRebus = $this->stockRevampModel->select('barang_master.barang_name')
+                                                        ->where('stock_revamp.id', $prosesRebusDetail[0]['stock_rebus_id'])
+                                                        ->join('barang_master', 'barang_master.id = stock_revamp.barang_master_id', 'left')
+                                                        ->first();
+                $barangHasilRebus = $this->stockRevampModel->select('barang_master.barang_name')
+                                                        ->where('stock_revamp.spesifikasi_id', $prosesRebusDetail[0]['barang_out_spesifikasi_id'])
+                                                        ->join('barang_master', 'barang_master.id = stock_revamp.barang_master_id', 'left')
+                                                        ->first();
             }
             $jasaVendorOutDetail = $this->jasaVendorOutDetailModel->where('deletedAt', null)->like('stock_dokumen', $data->no_rebus)->first();
 
@@ -139,8 +126,8 @@ class ProsesRebus extends BaseController
                 'status_used'           => $jasaVendorOutDetail == null ? 0 : 1,
                 "tanggal"               => date('d/m/Y', strtotime($data->tanggal)),
                 "divisi"                => $data->divisi,
-                "barang_rebus"          => $barangDiRebus,
-                "barang_hasi_rebus"     => $barangHasilRebus,
+                "barang_rebus"          => $barangDiRebus['barang_name'],
+                "barang_hasil_rebus"    => $barangHasilRebus['barang_name'],
                 "warehouse_name"        => $data->warehouse_name,
                 "total_item"            => count($prosesRebusDetail),
                 "status_posting"        => $data->status_posting
@@ -189,7 +176,6 @@ class ProsesRebus extends BaseController
             'supplier' => $this->supplierModel->getSupplierByType("BAHAN BAKU")
         ];
 
-
         return view('jasaVendor/prosesRebus/form', $data);
     }
 
@@ -232,31 +218,17 @@ class ProsesRebus extends BaseController
 
         foreach ($barangs as $b) {
             // Get current stock quantity
-            $stockDetail = $this->stockDetail2Model->getStockListDetail(
-                $b->stock_id,
-                $b->bc_id,
-                $b->no_aju,
-                $b->stock_dokumen
-            );
             
-            $qty_stok_sistem = $stockDetail['stok_total'] ?? 0;
-            $qty_input_user = $b->qty;
-            
-            // Hitung qty bersih dan kotor
-            $qty_bersih = min($qty_input_user, $qty_stok_sistem); // Ambil yang terkecil
-            $qty_kotor = max($qty_input_user - $qty_stok_sistem, 0); // Selisihnya (kalau ada)
-
             $this->prosesRebusDetailModel->insert([
                 'proses_rebus_id' => $id,
                 'stock_rebus_id' => $b->stock_id,
+                'stock_detail_rebus_id' => $b->id,
                 'bc_rebus_id' => $b->bc_id,
-                'no_aju_rebus' => $b->no_aju,
-                'qty_rebus' => $qty_bersih, // <-- INI YANG DIUBAH, pakai qty bersih
-                'stock_hasil_rebus_id' => $b->output->stock_id,
-                'barang_out_id' => $b->output->barang_id,
-                'stock_dokumen' => $b->stock_dokumen,
+                'qty_rebus' => $b->qty,
+                'unit_out_id' => $b->stock_id,
+                'barang_out_spesifikasi_id' => $b->spesifikasi_id,
                 'qty_hasil_rebus' => $b->output->qty,
-                'qty_kotor' => $qty_kotor
+                'qty_kotor' => $b->qty
             ]);
         }
 
@@ -288,40 +260,22 @@ class ProsesRebus extends BaseController
             'company_id' => $this->this_company_id,
             'divisi_id' => $this->request->getVar('divisi_id'),
             'warehouse_id' => $this->request->getVar('warehouse_id'),
+            'tipe_pengambilan_stock' => $this->request->getVar('type_pengambilan_stock'),
+            'no_rebus' => $this->request->getVar('no_rebus'),
             "tanggal" => $this->request->getVar("tanggal") ? date_format(date_create_from_format("d/m/Y", $this->request->getVar("tanggal")), "Y-m-d") : "",
             "tanggal_selesai" => $this->request->getVar("tanggal_selesai") ? date_format(date_create_from_format("d/m/Y", $this->request->getVar("tanggal_selesai")), "Y-m-d") : "",
             'keterangan' => $this->request->getVar('keterangan'),
-            'tipe_pengambilan_stock' => $this->request->getVar('type_pengambilan_stock'),
             'type_barang' => "bahan_baku",
-            'status_posting' => '0' // Reset posting status when updated
+            'status_posting' => '0'
         ]);
 
         $id_detail_all = [];
 
         foreach ($barangs as $b) {
-            // Get current stock quantity
-            $stockDetail = $this->stockDetail2Model->getStockListDetail(
-                $b->stock_id,
-                $b->bc_id,
-                $b->no_aju,
-                $b->stock_dokumen
-            );
-            
-            $qty_stok_sistem = $stockDetail['qty'] ?? 0;
-            $qty_input_user = $b->qty;
-            
-            // Calculate clean and excess quantities
-            $qty_bersih = min($qty_input_user, $qty_stok_sistem);
-            $qty_kotor = max($qty_input_user - $qty_stok_sistem, 0);
 
             // Check if record exists
             $check = $this->prosesRebusDetailModel
                 ->where('proses_rebus_id', $id)
-                ->where('stock_rebus_id', $b->stock_id)
-                ->where('bc_rebus_id', $b->bc_id)
-                ->where('no_aju_rebus', $b->no_aju)
-                ->where('stock_hasil_rebus_id', $b->output->stock_id)
-                ->where('stock_dokumen', $b->stock_dokumen)
                 ->first();
 
             if ($check != null) {
@@ -329,39 +283,31 @@ class ProsesRebus extends BaseController
                 $this->prosesRebusDetailModel->update($check['id'], [
                     'proses_rebus_id' => $id,
                     'stock_rebus_id' => $b->stock_id,
+                    'stock_detail_rebus_id' => $b->id,
                     'bc_rebus_id' => $b->bc_id,
-                    'no_aju_rebus' => $b->no_aju,
-                    'qty_rebus' => $qty_bersih, // Use calculated clean quantity
-                    'stock_hasil_rebus_id' => $b->output->stock_id,
-                    'barang_out_id' => $b->output->barang_id,
-                    'stock_dokumen' => $b->stock_dokumen,
+                    'qty_rebus' => $b->qty,
+                    'barang_out_spesifikasi_id' => $b->spesifikasi_id,
                     'qty_hasil_rebus' => $b->output->qty,
-                    'qty_kotor' => $qty_kotor // Store excess quantity
+                    'qty_kotor' => $b->qty,
+                    'unit_out_id' => $b->stock_id
                 ]);
                 array_push($id_detail_all, $check['id']);
             } else {
                 // For new records, delete any existing conflicting records first
                 $this->prosesRebusDetailModel
                     ->where('proses_rebus_id', $id)
-                    ->where('stock_rebus_id', $b->stock_id)
-                    ->where('bc_rebus_id', $b->bc_id)
-                    ->where('no_aju_rebus', $b->no_aju)
-                    ->where('stock_hasil_rebus_id', $b->output->stock_id)
-                    ->where('stock_dokumen', $b->stock_dokumen)
                     ->delete();
 
                 // INSERT new record with calculated quantities
                 $id_detail_new = $this->prosesRebusDetailModel->insert([
                     'proses_rebus_id' => $id,
                     'stock_rebus_id' => $b->stock_id,
+                    'stock_detail_rebus_id' => $b->id,
                     'bc_rebus_id' => $b->bc_id,
-                    'no_aju_rebus' => $b->no_aju,
-                    'qty_rebus' => $qty_bersih, // Use calculated clean quantity
-                    'stock_hasil_rebus_id' => $b->output->stock_id,
-                    'barang_out_id' => $b->output->barang_id,
-                    'stock_dokumen' => $b->stock_dokumen,
+                    'qty_rebus' => $b->qty,
+                    'barang_out_spesifikasi_id' => $b->spesifikasi_id,
                     'qty_hasil_rebus' => $b->output->qty,
-                    'qty_kotor' => $qty_kotor // Store excess quantity
+                    'qty_kotor' => $b->qty
                 ]);
                 array_push($id_detail_all, $id_detail_new);
             }
@@ -419,7 +365,6 @@ class ProsesRebus extends BaseController
                 'bc_rebus_id' => $b->bc_id,
                 'no_aju_rebus' => $b->no_aju,
                 'qty_rebus' => $b->qty,
-                'stock_hasil_rebus_id' => $b->output->stock_id,
                 'stock_dokumen' => $b->stock_dokumen,
                 'qty_hasil_rebus' => $b->output->qty,
             ]);
@@ -468,7 +413,6 @@ class ProsesRebus extends BaseController
                 ->where('stock_rebus_id', $b->stock_id)
                 ->where('bc_rebus_id', $b->bc_id)
                 ->where('no_aju_rebus', $b->no_aju)
-                ->where('stock_hasil_rebus_id',  $b->output->stock_id)
                 ->where('stock_dokumen', $b->stock_dokumen)
                 ->first();
 
@@ -479,7 +423,6 @@ class ProsesRebus extends BaseController
                     'bc_rebus_id' => $b->bc_id,
                     'no_aju_rebus' => $b->no_aju,
                     'qty_rebus' => $b->qty,
-                    'stock_hasil_rebus_id' => $b->output->stock_id,
                     'stock_dokumen' => $b->stock_dokumen,
                     'qty_hasil_rebus' => $b->output->qty,
                 ]);
@@ -492,7 +435,6 @@ class ProsesRebus extends BaseController
                     ->where('stock_rebus_id', $b->stock_id)
                     ->where('bc_rebus_id', $b->bc_id)
                     ->where('no_aju_rebus', $b->no_aju)
-                    ->where('stock_hasil_rebus_id',  $b->output->stock_id)
                     ->where('stock_dokumen', $b->stock_dokumen)
                     ->delete();
 
@@ -503,7 +445,6 @@ class ProsesRebus extends BaseController
                     'bc_rebus_id' => $b->bc_id,
                     'no_aju_rebus' => $b->no_aju,
                     'qty_rebus' => $b->qty,
-                    'stock_hasil_rebus_id' => $b->output->stock_id,
                     'stock_dokumen' => $b->stock_dokumen,
                     'qty_hasil_rebus' => $b->output->qty,
                 ]);
@@ -534,127 +475,125 @@ class ProsesRebus extends BaseController
 
     public function posting()
     {
-        $id = decrypt($this->request->getVar('id'));
+        $db = \Config\Database::connect();
+        $db->transBegin();
 
-        $barangMasterModel = new BarangMasterModel();
-        $barangMasterSpesifikasiModel = new BarangMasterSpesifikasiModel();
+        try {
+            $id = decrypt($this->request->getVar('id'));
+            $barangMasterSpesifikasiModel = new BarangMasterSpesifikasiModel();
 
-        $prosesRebus = $this->prosesRebusModel->find($id);
-        $prosesRebusDetail = $this->prosesRebusDetailModel->where('proses_rebus_id', $id)->findAll();
+            $prosoesRebus = $this->prosesRebusModel->where('id', $id)
+                        ->first();
+            $prosesRebusDetail = $this->prosesRebusDetailModel
+                ->where('proses_rebus_id', $id)
+                ->findAll();
 
-        foreach ($prosesRebusDetail as $p) {
-            // BARANG OUT DARI INVENTORI
-            $stockRebus = $this->stockModel->find($p['stock_rebus_id']);
-            $stockHasilRebus = $this->stockModel->find($p['stock_hasil_rebus_id']);
+            foreach ($prosesRebusDetail as $p) {
 
-            if ($stockHasilRebus) {
-                // Kalau stok hasil rebus ada, langsung pakai datanya
-                $barang1Id = $stockHasilRebus['barang1_id'];
-                $barang2Id = $stockHasilRebus['barang2_id'];
-            } else {
-                // Kalau stok hasil rebus tidak ada, fallback dari barang_out_id
-                $barangMasterSpesifikasi = $barangMasterSpesifikasiModel->find($p['barang_out_id']);
-                $barangMaster = $barangMasterModel->find($barangMasterSpesifikasi['barang_master_id']);
+                 // pastikan $p array, bukan object
+                $spesifikasiData = $barangMasterSpesifikasiModel
+                    ->where('id', $p['barang_out_spesifikasi_id'])
+                    ->first();
 
-                $barang1Id = $barangMaster['id'] ?? null;               // amanin kalau null
-                $barang2Id = $barangMasterSpesifikasi['id'] ?? null;    // amanin kalau null
+                $data = [
+                    "company_id"       => $this->this_company_id,
+                    "spesifikasi_id"   => $spesifikasiData["id"],
+                    "barang_master_id" => $spesifikasiData["barang_master_id"],
+                    "unit_id"          => $p["unit_out_id"],
+                    "stock_detail_id"  => $p["stock_detail_rebus_id"],
+                    "divisi_id"        => $prosoesRebus["divisi_id"],
+                    "warehouse_id"     => $prosoesRebus["warehouse_id"],
+                    "qty_diterima"     => $p["qty_hasil_rebus"],
+                    "qty_bersih"       => $p["qty_hasil_rebus"],
+                    "qty_digunakan"    => $p["qty_rebus"],
+                    'reference_id'     => $p['proses_rebus_id'],
+                    'reference_type'   => "PROSES REBUS",
+                    'status'           => "IN"
+                ];
+
+                $this->stockRevampModel->outStockRevamp($db, $data);
+
+                if (!$spesifikasiData) {
+                    throw new \Exception("Spesifikasi tidak ditemukan untuk detail ID {$p['id']}");
+                }
+
+                $stockDetail = $this->stockRevampModel->insertStockRevamp($db, $data);
+
+                $this->prosesRebusDetailModel->update($p['id'], [
+                    'stock_detail_hasil_rebus_id' => $stockDetail,
+                ]);
             }
-           
-            // BARANG LAMA
-            $stockRebusDetail = $this->stockDetail2Model->getStockListDetail(
-                $p['stock_rebus_id'],
-                $p['bc_rebus_id'],
-                $p['no_aju_rebus'],
-                $p['stock_dokumen']
-            );
 
-            $stok = $this->stockModel->insertStok(
-                $prosesRebus['company_id'],
-                $prosesRebus['warehouse_id'],
-                $prosesRebus['divisi_id'],
-                "bahan_baku",
-                $stockRebus['barang1_id'],
-                $stockRebus['barang2_id'],
-                ($p['qty_rebus'] * -1),
-            );
+            // update status proses rebus
+            $this->prosesRebusModel->update($id, [
+                'status_posting' => '1'
+            ]);
 
-            // DETAIL
-            $stokDetail = $this->stockDetailModel->insertStokDetail(
-                $stok,
-                $p['qty_rebus'],
-                "Out",
-                date('Y-m-d'),
-                $this->this_user_id,
-                "REBUS",
-                $prosesRebus['no_rebus'],
-                $prosesRebus['keterangan']
-            );
+            // commit transaksi
+            $db->transCommit();
 
-            // SUB DETAIL
-            $this->stockDetail2Model->insertStokDetail2(
-                $p['bc_rebus_id'],
-                $p['stock_rebus_id'],
-                $stokDetail,
-                $p['qty_rebus'],
-                $p['no_aju_rebus'],
-                $prosesRebus['no_rebus'],
-                $p['stock_dokumen'],
-                $stockRebusDetail['supplier_id'],
-                $stockRebusDetail['harga_umum'],
-                $stockRebusDetail['harga_harian'],
-                $stockRebusDetail['harga_bulanan'],
-                $stockRebusDetail['no_po']
+            return $this->response->setJSON([
+                'message' => "Proses rebus berhasil diposting",
+                'status'  => true,
+                'token'   => csrf_hash()
+            ]);
+        } catch (\Throwable $th) {
+            $db->transRollback();
 
-            );
-
-            // -----
-            // BARANG IN KE INVENTORI
-            $stok = $this->stockModel->insertStok(
-                $prosesRebus['company_id'],
-                $prosesRebus['warehouse_id'],
-                $prosesRebus['divisi_id'],
-                "bahan_baku",
-                $barang1Id,
-                $barang2Id,
-                $p['qty_hasil_rebus']
-            );
-
-
-            // DETAIL
-            $stokDetail = $this->stockDetailModel->insertStokDetail(
-                $stok,
-                $p['qty_hasil_rebus'],
-                "In",
-                date('Y-m-d'),
-                $this->this_user_id,
-                "REBUS",
-                $prosesRebus['no_rebus'],
-                $prosesRebus['keterangan']
-            );
-
-            // SUB DETAIL
-            $this->stockDetail2Model->insertStokDetail2(
-                $p['bc_rebus_id'],
-                $stok,
-                $stokDetail,
-                $p['qty_hasil_rebus'],
-                $p['no_aju_rebus'],
-                $prosesRebus['no_rebus'],
-                $prosesRebus['no_rebus'] . " ( " . $p['stock_dokumen'] . " )",
-                $stockRebusDetail['supplier_id'],
-                $stockRebusDetail['harga_umum'],
-                $stockRebusDetail['harga_harian'],
-                $stockRebusDetail['harga_bulanan'],
-                $stockRebusDetail['no_po']
-            );
+            return $this->response->setJSON([
+                'message' => "Gagal posting proses rebus: " . $th->getMessage(),
+                'status'  => false,
+                'token'   => csrf_hash()
+            ]);
         }
+    }
 
-        $this->prosesRebusModel->update($id, ['status_posting' => '1']);
-        return response()->setJSON([
-            'message' => "Proses rebus berhasil diposting",
-            'status' => true,
-            'token' => csrf_hash()
-        ]);
+
+    public function unposting()
+    {
+        $db = \Config\Database::connect();
+        $db->transBegin();
+
+        try {
+            $id = decrypt($this->request->getVar('id'));
+            $prosesRebusDetail = $this->prosesRebusDetailModel
+                ->where('proses_rebus_id', $id)
+                ->findAll();
+
+            foreach ($prosesRebusDetail as $p) {
+
+                    $data = [
+                        "stock_detail_asal"     => $p["stock_detail_rebus_id"],
+                        "stock_detail_akhir"    => $p["stock_detail_hasil_rebus_id"], // jangan lupa ini bro
+                        "qty_diterima_asal"     => $p["qty_rebus"],
+                        "qty_diterima_akhir"    => $p["qty_hasil_rebus"],
+                    ];
+
+                    $this->stockRevampModel->unpostStockRevamp($db, $data);
+            }
+
+            // update status proses rebus
+            $this->prosesRebusModel->update($id, [
+                'status_posting' => '0'
+            ]);
+
+            // commit transaksi
+            $db->transCommit();
+
+            return $this->response->setJSON([
+                'message' => "Proses rebus berhasil diposting",
+                'status'  => true,
+                'token'   => csrf_hash()
+            ]);
+        } catch (\Throwable $th) {
+            $db->transRollback();
+
+            return $this->response->setJSON([
+                'message' => "Gagal posting proses rebus: " . $th->getMessage(),
+                'status'  => false,
+                'token'   => csrf_hash()
+            ]);
+        }
     }
 
 
@@ -776,122 +715,6 @@ class ProsesRebus extends BaseController
         $this->prosesRebusModel->update($id, ['status_posting' => '1']);
         return response()->setJSON([
             'message' => "Proses rebus berhasil diposting",
-            'status' => true,
-            'token' => csrf_hash()
-        ]);
-    }
-
-
-    public function unPosting()
-    {
-        $id = decrypt($this->request->getVar('id'));
-
-        $prosesRebus = $this->prosesRebusModel->find($id);
-        $prosesRebusDetail = $this->prosesRebusDetailModel->where('proses_rebus_id', $id)->findAll();
-
-        foreach ($prosesRebusDetail as $p) {
-            // BARANG OUT DARI INVENTORI
-            $stockRebus = $this->stockModel->find($p['stock_rebus_id']);
-            $stockHasilRebus = $this->stockModel->find($p['stock_hasil_rebus_id']);
-
-            // BARANG IN YANG DIREBUS
-            $stockRebusDetail = $this->stockDetail2Model->getStockListDetail(
-                $p['stock_rebus_id'],
-                $p['bc_rebus_id'],
-                $p['no_aju_rebus'],
-                $p['stock_dokumen']
-            );
-
-            $stok = $this->stockModel->insertStok(
-                $prosesRebus['company_id'],
-                $prosesRebus['warehouse_id'],
-                $prosesRebus['divisi_id'],
-                "bahan_baku",
-                $stockRebus['barang1_id'],
-                $stockRebus['barang2_id'],
-                ($p['qty_rebus']),
-            );
-
-            // DETAIL
-            $stokDetail = $this->stockDetailModel->insertStokDetail(
-                $stok,
-                $p['qty_rebus'],
-                "In",
-                date('Y-m-d'),
-                $this->this_user_id,
-                "REBUS",
-                $prosesRebus['no_rebus'],
-                $prosesRebus['keterangan']
-            );
-
-            // SUB DETAIL
-            $this->stockDetail2Model->insertStokDetail2(
-                $p['bc_rebus_id'],
-                $p['stock_rebus_id'],
-                $stokDetail,
-                $p['qty_rebus'],
-                $p['no_aju_rebus'],
-                $prosesRebus['no_rebus'],
-                $p['stock_dokumen'],
-                $stockRebusDetail['supplier_id'],
-                $stockRebusDetail['harga_umum'],
-                $stockRebusDetail['harga_harian'],
-                $stockRebusDetail['harga_bulanan'],
-                $stockRebusDetail['no_po']
-            );
-
-            // -----
-            // BARANG OUT HASIL REBUS
-            $stok = $this->stockModel->insertStok(
-                $prosesRebus['company_id'],
-                $prosesRebus['warehouse_id'],
-                $prosesRebus['divisi_id'],
-                "bahan_baku",
-                $stockHasilRebus['barang1_id'],
-                $stockHasilRebus['barang2_id'],
-                $p['qty_hasil_rebus']
-            );
-
-            $stockRebusDetail = $this->stockDetail2Model->getStockListDetail(
-                $p['stock_rebus_id'],
-                $p['bc_rebus_id'],
-                $p['no_aju_rebus'],
-                $p['stock_dokumen']
-            );
-
-            // DETAIL
-            $stokDetail = $this->stockDetailModel->insertStokDetail(
-                $stok,
-                $p['qty_hasil_rebus'],
-                "Out",
-                date('Y-m-d'),
-                $this->this_user_id,
-                "REBUS",
-                $prosesRebus['no_rebus'],
-                $prosesRebus['keterangan']
-            );
-
-            // SUB DETAIL
-            $this->stockDetail2Model->insertStokDetail2(
-                $p['bc_rebus_id'],
-                $p['stock_hasil_rebus_id'],
-                $stokDetail,
-                $p['qty_hasil_rebus'],
-                $p['no_aju_rebus'],
-                $prosesRebus['no_rebus'],
-                $prosesRebus['no_rebus'] . " ( " . $p['stock_dokumen'] . " )",
-                $stockRebusDetail['supplier_id'],
-                $stockRebusDetail['harga_umum'],
-                $stockRebusDetail['harga_harian'],
-                $stockRebusDetail['harga_bulanan'],
-                $stockRebusDetail['no_po']
-            );
-        }
-
-        $this->prosesRebusModel->update($id, ['status_posting' => '0']);
-
-        return response()->setJSON([
-            'message' => "Proses rebus berhasil diunposting",
             'status' => true,
             'token' => csrf_hash()
         ]);

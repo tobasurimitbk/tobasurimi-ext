@@ -260,7 +260,7 @@
 
                                     <th style="text-align: center;">Barang - Spesifikasi</th>
                                     <th style="text-align: center;">Qty PO</th>
-                                    <th style="text-align: center;">Qty LPB</th>
+                                    <th style="text-align: center;">Qty Kotor</th>
                                     <th style="text-align: center;">Sisa Qty</th>
                                     <th style="text-align: center; min-width: 100px;">Qty Rebus</th>
                                     <th style="text-align: center;">Satuan Rebus</th>
@@ -368,20 +368,17 @@
             listStockSelected.push({
                 id: "<?= $m['id'] ?>",
                 bc_id: "<?= $m['bc_id'] ?>",
-                stock_dokumen: "<?= $m['stock_dokumen'] ?>",
-                sumber: "<?= $m['sumber'] ?>",
+                reference_type: "<?= $m['reference_type'] ?>",
                 supplier_name: "<?= $m['supplier_name'] ?>",
                 stock_detail_id: "<?= $m['stock_detail_id'] ?>",
-                no_aju: "<?= $m['no_aju'] ?>",
                 stock_id: "<?= $m['stock_id'] ?>",
                 stok_total: "<?= $m['stok_total'] ?>",
                 qty_kotor: "<?= $m['qty_kotor'] ?>",
                 bc_type: "<?= $m['bc_type'] ?>",
                 satuan: "<?= $m['satuan'] ?>",
                 barang: "<?= $m['barang'] ?>",
-                type_barang: "<?= $m['type_barang'] ?>",
-                type_barang_text: "<?= $m['type_barang_text'] ?>",
                 stock_date: "<?= $m['stock_date'] ?>",
+                po_no: "<?= $m['po_no'] ?>",
                 qty: "<?= !empty($m['qty_kotor']) ? ($m['qty'] + $m['qty_kotor']) : $m['qty'] ?>",
                 total_penerimaan: "<?= $m['total_penerimaan'] ?>",
                 output: {
@@ -1077,7 +1074,7 @@
             newRow.append($('<td style="text-align:center;">').text(v.stock_date));
             newRow.append($('<td style="text-align:center;">').text(v.barang));
             newRow.append($('<td style="text-align:center;">').text(v.satuan));
-            newRow.append($('<td style="text-align:center;">').text(greatFormatRupiah(v.stok_total)));
+            newRow.append($('<td style="text-align:center;">').text(greatFormatRupiah(v.stok_total_diterima)));
             table.find('tbody').append(newRow);
         });
 
@@ -1176,8 +1173,8 @@
                         <td>${item.stock_date || '-'}</td>
                         <td>${item.barang || '-'}</td>
                         <td style="text-align: right;">${greatFormatRupiah(item.total_penerimaan)}</td>
-                        <td style="text-align: right;">${greatFormatRupiah(item.total_penerimaan)}</td>
-                        <td style="text-align: right;">${greatFormatRupiah(item.stok_total)}</td>
+                        <td style="text-align: right;">${greatFormatRupiah(item.stock_total_kotor)}</td>
+                        <td style="text-align: right;">${greatFormatRupiah(item.stok_total_diterima)}</td>
                         <td>
                             <input type="text" step="0.001" min="0" 
                                 class="form-control qty-rebus-input" 
