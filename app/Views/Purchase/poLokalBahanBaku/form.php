@@ -1100,7 +1100,7 @@
                                                     })
                                                     .then(() => {
                                                         window.open('<?= base_url("po-lokal-bahan-baku/print") ?>/' + response.id, "_blank")
-                                                        window.location.href = "<?= base_url("po-lokal-bahan-baku"); ?>/";
+                                                        window.location.href = "<?= base_url("po-lokal-bahan-baku"); ?>";
                                                     })
                                             } else {
                                                 Swal.fire({
