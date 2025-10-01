@@ -2891,7 +2891,8 @@
         } else if (company_id == "") {
             alert("Please select company head")
         } else {
-            var url = "/order-form-internasional/print/" + id + '?display_price=' + display_price + '&company_id=' + company_id
+            var url = "<?= base_url('/order-form-internasional/print') ?>" +
+                "/" + id + '?display_price=' + display_price + '&company_id=' + company_id
             window.open(url, "_blank");
         }
     }

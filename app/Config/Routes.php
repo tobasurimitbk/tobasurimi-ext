@@ -878,6 +878,7 @@ $routes->get('/proforma-invoice/all-pi', 'InvoiceExim\PI\PI::allPI', ['filter' =
 $routes->get('/proforma-invoice/duplicate/(:segment)', 'InvoiceExim\PI\PI::duplicatePI/$1', ['filter' => 'Auth']);
 $routes->get('/proforma-invoice/id/(:segment)', 'InvoiceExim\PI\PI::editPI/$1', ['filter' => 'Auth']);
 $routes->get('/proforma-invoice/print/(:segment)', 'InvoiceExim\PI\PI::printPI/$1', ['filter' => 'Auth']);
+$routes->post('/proforma-invoice/update-no-invoice', 'InvoiceExim\PI\PI::updateNoInvoice', ['filter' => 'Auth']);
 // INVOICE PACKING CUSTOMER
 $routes->get('/invoice-packing-customer', 'InvoiceExim\InvPacking\InvPackingCustomer::index', ['filter' => 'Auth']);
 $routes->get('/invoice-packing-customer/all-order-form', 'InvoiceExim\InvPacking\InvPackingCustomer::allOrderForm', ['filter' => 'Auth']);

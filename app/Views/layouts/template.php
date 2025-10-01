@@ -322,7 +322,7 @@
         $(document).ready(function() {
             $('.tiny').tinymce({
                 height: 300,
-                api_key: 'jk81l3s5gba8kom2elvg577vkhjm14rsyqdlnxiu4mrmuxpf',
+                api_key: 'gopdbcsquhz14wdhhreby3cvqmdc2xqeb4j495wjbyz80xk1',
                 entity_encoding: 'raw'
             });
         });
