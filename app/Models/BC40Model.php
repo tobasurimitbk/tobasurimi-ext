@@ -102,7 +102,7 @@ class BC40Model extends Model
         if ($addCondition['searchData']) {
             $bcDataQry->like('suppliers.name', $addCondition['searchData'])
                 ->orLike('multiple_lpb_no', $addCondition['searchData'])
-                ->orLike('no_aju', $addCondition['searchData'])
+                ->orLike('bc_40.no_aju', $addCondition['searchData'])
                 ->orLike('bc_purchase_order.no_daftar', $addCondition['searchData']);
         }
 
