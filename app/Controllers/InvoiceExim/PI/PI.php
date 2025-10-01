@@ -641,4 +641,40 @@ class PI extends BaseController
 
         return false;
     }
+
+    public function updateNoInvoice()
+    {
+        try {
+            $id = decrypt($this->request->getVar('id'));
+            $tanggalInvoice = $this->request->getVar("tanggal_invoice") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("tanggal_invoice")))) : "";
+            $noInvoice = $this->request->getVar('no_invoice');
+
+            $check = $this->salesOrderExportModel
+                ->where('no_invoice', $noInvoice)
+                ->where('sales_order_export_id !=', $id)
+                ->first();
+
+            if ($check != null) {
+                return response()->setJSON([
+                    'token' => csrf_hash(),
+                    'message' => "No invoice sudah digunakan",
+                    'status' => false
+                ]);
+            }
+
+            $this->salesOrderExportModel->update($id, ['no_invoice' => $noInvoice, 'tanggal_invoice' => $tanggalInvoice]);
+
+            return response()->setJSON([
+                'token' => csrf_hash(),
+                'message' => "Nomor invoice berhasil diupdate",
+                'status' => true
+            ]);
+        } catch (Exception $e) {
+            return response()->setJSON([
+                'token' => csrf_hash(),
+                'message' => $e->getMessage(),
+                'status' => false
+            ]);
+        }
+    }
 }
