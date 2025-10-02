@@ -260,6 +260,7 @@
 
                                     <th style="text-align: center;">Barang - Spesifikasi</th>
                                     <th style="text-align: center;">Qty PO</th>
+                                    <th style="text-align: center;">Qty Kotor</th>
                                     <th style="text-align: center;">Sisa Qty</th>
                                     <th style="text-align: center; min-width: 100px;">Qty Rebus</th>
                                     <th style="text-align: center;">Satuan Rebus</th>
@@ -1174,7 +1175,8 @@
                         <td>${item.stock_date || '-'}</td>
                         <td>${item.barang || '-'}</td>
                         <td style="text-align: right;">${greatFormatRupiah(item.stock_total)}</td>
-                        <td style="text-align: right;">${greatFormatQty(item.stok_total_diterima)}</td>
+                        <td style="text-align: right;">${greatFormatRupiah(item.stock_total_kotor)}</td>
+                        <td style="text-align: right;">${greatFormatRupiah(item.stok_total_diterima)}</td>
                         <td>
                             <input type="text" step="0.001" min="0" 
                                 class="form-control qty-rebus-input" 
