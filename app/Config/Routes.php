@@ -1167,7 +1167,7 @@ $routes->post('/proses-rebus/update',  'JasaVendor\ProsesRebus::updateActionNew'
 $routes->post('/proses-rebus/delete',  'JasaVendor\ProsesRebus::delete', ['filter' => 'Auth']);
 $routes->post('/proses-rebus/posting',  'JasaVendor\ProsesRebus::posting', ['filter' => 'Auth']);
 $routes->get('/proses-rebus/get-no',  'JasaVendor\ProsesRebus::getProsesRebusNo', ['filter' => 'Auth']);
-$routes->post('/proses-rebus/unposting',  'JasaVendor\ProsesRebus::unPosting', ['filter' => 'Auth']);
+$routes->post('/proses-rebus/unposting',  'JasaVendor\ProsesRebus::unposting', ['filter' => 'Auth']);
 
 // JASA VENDOR OUT
 $routes->get('/jasa-vendor-out',  'JasaVendor\JasaVendorOut::index', ['filter' => 'Auth']);
@@ -2148,6 +2148,7 @@ $routes->post('/lembur/create', 'HR\FormLembur::create', ['filter' => 'Auth']);
 $routes->post('/lembur/delete', 'HR\FormLembur::delete', ['filter' => 'Auth']);
 $routes->get('/lembur/id/(:segment)', 'HR\FormLembur::getById/$1', ['filter' => 'Auth']);
 $routes->post('/lembur/employees', 'HR\FormLembur::getEmployeeByDivision', ['filter' => 'Auth']);
+$routes->get('/lembur/export-excel', 'HR\FormLembur::exportBulananLembur', ['filter' => 'Auth']);
 
 // SETTINGS
 // USER
@@ -2617,6 +2618,13 @@ $routes->post('/hr-outsourcing-sallary-payment/getHrEmployeeOutSourcing', 'HROut
 $routes->post('/hr-outsourcing-sallary-payment/store', 'HROutsourcing\SallaryPayment::store', ['filter' => 'Auth']);
 $routes->post('/hr-outsourcing-sallary-payment/update/(:segment)', 'HROutsourcing\SallaryPayment::update/$1', ['filter' => 'Auth']);
 $routes->post('/hr-outsourcing-sallary-payment/delete/(:segment)', 'HROutsourcing\SallaryPayment::destroy/$1', ['filter' => 'Auth']);
+
+//HR Ousourcing Scale 
+$routes->get('/hr-outsourcing-scale', 'HROutsourcing\Scale::generateQrBarangView', ['filter' => 'Auth']);
+$routes->post('/hr-outsourcing-scale', 'HROutsourcing\Scale::generateQrBarang', ['filter' => 'Auth']);
+$routes->get('/hr-outsourcing-scale/id/(:segment)', 'HROutsourcing\Scale::getBarangByIdQr/$1');
+
+$routes->get('/get-spesifikasi-by-qr', 'Setting\Auth::login');
 
 /*
  * --------------------------------------------------------------------

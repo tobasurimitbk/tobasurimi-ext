@@ -10,6 +10,7 @@ use App\Models\CompaniesModel;
 use App\Models\DivisisModel;
 use App\Models\EmployeeJamKerjaModel;
 use App\Models\EmployeesModel;
+use App\Models\FormLemburModel;
 use App\Models\FormPerijinanModel;
 use App\Models\GolonganModel;
 use App\Models\MetadataModel;
@@ -41,6 +42,8 @@ class Attendance extends BaseController
     protected $AttendanceModel;
     protected $CompanyModel;
     protected $UangMakanHarianModel;
+    protected $formLemburModel;
+    protected $formLembur;
 
     public function __construct()
     {
@@ -57,6 +60,8 @@ class Attendance extends BaseController
         $this->AttendanceModel = new AttendancesModel();
         $this->CompanyModel = new CompaniesModel();
         $this->UangMakanHarianModel = new UangMakanHarianModel();
+        $this->formLemburModel = new FormLemburModel();
+        $this->formLembur = new FormLembur();
     }
 
     public function indexLog()
@@ -1522,7 +1527,7 @@ class Attendance extends BaseController
             $row++;
 
             // Header kolom
-            $headers = ['No', 'Nip', 'Nama', 'Divisi', 'Bagian', 'IN', 'OUT', 'Status', 'Uang Makan', 'Terlambat (Menit)'];
+            $headers = ['No', 'Nip', 'Nama', 'Divisi', 'Bagian', 'IN', 'OUT', 'Status', 'Uang Makan', 'Terlambat (Menit)', 'Total Lembur'];
             $col = 'A';
             foreach ($headers as $h) {
                 $sheet->setCellValue("{$col}{$row}", $h);
@@ -1551,6 +1556,15 @@ class Attendance extends BaseController
                 $status = $mapLog[$emp['id']][$tgl]['status'] ?? '';
                 $uangMakan = $mapUangMakanHarian[$emp['id']][$tgl]['nominal'] ?? 0;
                 $keterlambatanMenit = "";
+                $formLembur = $this->formLemburModel->where('employee_id', $emp['id'])->where('periode', $tgl)->where('deletedAt', null)->first();
+                $totalJamLembur = null;
+                if ($formLembur != null) {
+                    $waktuSelisihPulangLembur = $this->formLembur::selisihWaktu(
+                        $formLembur['jam_mulai_lembur'],
+                        $formLembur['jam_selesai_lembur']
+                    );
+                    $totalJamLembur = (float)$waktuSelisihPulangLembur['jam'] . " Jam, " . $waktuSelisihPulangLembur['menit'] . " Menit";
+                }
 
                 // cek jika tanggal masuk big day
                 if (in_array($tgl, $tanggalBigDay)) {
@@ -1598,9 +1612,10 @@ class Attendance extends BaseController
                 $sheet->setCellValue("H{$row}", $status);
                 $sheet->setCellValue("I{$row}", $uangMakan);
                 $sheet->setCellValue("J{$row}", !empty($keterlambatanMenit) ? $keterlambatanMenit : '');
+                $sheet->setCellValue("K{$row}", !empty($totalJamLembur) ? $totalJamLembur : '');
 
                 // border untuk isi
-                $sheet->getStyle("A{$row}:J{$row}")->applyFromArray([
+                $sheet->getStyle("A{$row}:K{$row}")->applyFromArray([
                     'borders' => ['allBorders' => ['borderStyle' => Border::BORDER_THIN]]
                 ]);
 

@@ -5,6 +5,11 @@
 <section class="section">
     <div class="section-header">
         <h1>List Form Lembur</h1>
+        <?php if (can('Personalia', 'Form Lembur', 'p')) : ?>
+            <button class="btn btn-discard btn-dropdown-export float-right" type="button" onclick="exportFormLembur()">
+                <i class="fa fa-download"></i> Export
+            </button>
+        <?php endif; ?>
         <?php if (can('Personalia', 'Form Lembur', 'c')) : ?>
             <a class="btn btn-show-form btn-add float-right" href="<?= base_url("lembur/create"); ?>">
                 <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
@@ -26,6 +31,36 @@
                                 <i class="fas fa-calendar-alt"></i>
                             </button>
                         </div>
+                    </div>
+                </div>
+                <div class="col-sm-3">
+                    <div class="form-floating">
+                        <select class="form-select" name="divisi_id" id="divisi_id">
+                            <option value="">
+                                Cari Departemen
+                            </option>
+                            <?php foreach ($divisi as $d) : ?>
+                                <option value="<?= $d['id'] ?>">
+                                    <?= $d['divisi']; ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                        <label for="floatingInput">Cari Departemen</label>
+                    </div>
+                </div>
+                <div class="col-sm-3">
+                    <div class="form-floating">
+                        <select class="form-select" name="tipe" id="tipe">
+                            <option value="">
+                                Cari Tipe / Golongan
+                            </option>
+                            <?php foreach ($golongan as $g) : ?>
+                                <option value="<?= $g['golongan_name'] ?>">
+                                    <?= $g['golongan_name']; ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                        <label for="floatingInput">Cari Tipe / Golongan</label>
                     </div>
                 </div>
                 <div class="col-md-3">
@@ -83,6 +118,8 @@
             data: function(data) {
                 data.search = $('#search').val();
                 data.month = $('#month').val();
+                data.tipe = $('#tipe').val();
+                data.divisi_id = $('#divisi_id').val();
                 data.sort = sort;
                 data.sortType = sortType;
             }
@@ -217,6 +254,43 @@
         table.ajax.reload();
     });
 
+    $('#divisi_id,#tipe').change(function(e) {
+        e.preventDefault();
+        table.ajax.reload();
+    });
+
+    $("#divisi_id").select2({
+        placeholder: "Cari Departemen",
+        theme: "bootstrap-5",
+        allowClear: true,
+    });
+
+    $("#tipe").select2({
+        placeholder: "Cari Tipe / Golongan",
+        theme: "bootstrap-5",
+        allowClear: true,
+    });
+
+    $('.form-select')
+        .parent('div')
+        .children('span')
+        .children('span')
+        .children('span')
+        .css('height', ' calc(3.5rem + 2px)');
+
+    $('.form-select')
+        .parent('div')
+        .children('span')
+        .children('span')
+        .children('span')
+        .children('span')
+        .css('margin-top', '22px').css('margin-left', '-7px');
+
+    $('.form-select')
+        .parent('div')
+        .find('label')
+        .css('z-index', '1');
+
     function edit(id) {
         location.replace(`<?= base_url("lembur/id"); ?>/${id}`);
     }
@@ -266,6 +340,28 @@
             }
         });
 
+    }
+
+    function exportFormLembur() {
+        var month = $('#month').val();
+        var divisiId = $('#divisi_id').val();
+
+        if (month == '') {
+            Swal.fire({
+                icon: 'error',
+                title: "Pilih periode terlebih dahulu",
+                confirmButtonColor: '#4e73df',
+            })
+        } else if (divisiId == '') {
+            Swal.fire({
+                icon: 'error',
+                title: "Pilih departemen terlebih dahulu",
+                confirmButtonColor: '#4e73df',
+            })
+        } else {
+            var url = "<?= base_url('lembur/export-excel') ?>" + "?month=" + month + '&divisi_id=' + divisiId;
+            window.location.href = url;
+        }
     }
 </script>
 

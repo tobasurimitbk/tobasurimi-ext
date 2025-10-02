@@ -4,16 +4,20 @@ namespace App\Controllers\HR;
 
 use App\Controllers\BaseController;
 use App\Models\AttendancesLogModel;
-use App\Models\AttendancesModel;
 use App\Models\BigDaysModel;
 use App\Models\DivisisModel;
 use App\Models\EmployeeJamKerjaModel;
 use App\Models\EmployeesModel;
 use App\Models\FormLemburModel;
 use App\Models\GajiConjunctionModel;
+use App\Models\GolonganModel;
 use App\Models\JamKerjaModel;
-use DateInterval;
 use DateTime;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Style\Alignment;
+use PhpOffice\PhpSpreadsheet\Style\Border;
+use PhpOffice\PhpSpreadsheet\Style\Fill;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
 class FormLembur extends BaseController
 {
@@ -27,6 +31,7 @@ class FormLembur extends BaseController
     protected $AttendancesLogModel;
     protected $BigdaysModel;
     protected $EmployeeJamKerjaModel;
+    protected $GolonganModel;
 
     public function __construct()
     {
@@ -40,11 +45,23 @@ class FormLembur extends BaseController
         $this->AttendancesLogModel = new AttendancesLogModel();
         $this->BigdaysModel = new BigDaysModel();
         $this->EmployeeJamKerjaModel = new EmployeeJamKerjaModel();
+        $this->GolonganModel = new GolonganModel();
     }
 
     public function index()
     {
-        return view('hr/lembur/index');
+        $dataGolongan = $this->GolonganModel
+            ->where('company_id', $this->this_company_id)
+            ->where('deletedAt', null)
+            ->findAll();
+        $dataDivisi = $this->DivisiModel->getDivisiAccess();
+        $data = [
+            'divisi' => $dataDivisi,
+            'golongan' => $dataGolongan
+
+        ];
+
+        return view('hr/lembur/index', $data);
     }
 
     public function createView()
@@ -120,6 +137,8 @@ class FormLembur extends BaseController
 
         $addCondition = [
             "search"           => $this->request->getGet("search"),
+            "tipe" => $this->request->getGet('tipe'),
+            "divisi_id" => $this->request->getGet('divisi_id')
         ];
 
         $limit = $this->request->getGet("length");
@@ -452,6 +471,174 @@ class FormLembur extends BaseController
             'status' => \true
         ]);
     }
+
+    public function exportBulananLembur()
+    {
+        // ================= Input & Periode =================
+        $monthReq = $this->request->getVar('month') ?: date('Y-m');
+        [$year, $month] = explode('-', $monthReq);
+
+        $monthName = strtoupper(date('F Y', strtotime("$year-$month-01"))); // contoh: SEPTEMBER 2025
+        $startDate = date('Y-m-01', strtotime($monthReq));
+        $endDate   = date('Y-m-t', strtotime($monthReq));
+        $totalDaysInMonth = date('t', strtotime($monthReq)); // lebih aman daripada cal_days_in_month
+
+        // ================= Data Employee =================
+        $condition = [
+            "employees.company_id" => $this->this_company_id,
+            "employees.deletedAt"  => null,
+        ];
+        $addCondition = [
+            "divisi_id"   => $this->request->getVar('divisi_id'),
+            "tipe"        => $this->request->getVar('tipe'),
+            "employee_id" => $this->request->getVar("employee_id"),
+        ];
+
+        $employees    = $this->EmployeeModel->getEmployeeListAttendances($condition, $addCondition, 0, 10000000);
+        $employeeData = $employees['data'];
+        $employeeIds  = array_column($employeeData, 'id');
+
+        // ================= Data Lembur =================
+        $lembur = !empty($employeeIds)
+            ? $this->FormLemburModel->getFormLemburRangeAmt($employeeIds, $startDate, $endDate)
+            : [];
+
+        $mapLog = [];
+        foreach ($lembur as $l) {
+            $selisih = static::selisihWaktu($l['jam_mulai_lembur'], $l['jam_selesai_lembur']);
+            $durasi  = (float) $selisih['jam'] . " Jam, " . $selisih['menit'] . " Menit";
+
+            $mapLog[$l['employee_id']][$l['periode']] = [
+                'in'                => $l['jam_mulai_lembur'],
+                'out'               => $l['jam_selesai_lembur'],
+                'durasi_lembur'     => $durasi,
+                'total_uang_lembur' => $l['total']
+            ];
+        }
+
+        // ================== Excel ==================
+        $spreadsheet = new Spreadsheet();
+        $sheet1 = $spreadsheet->getActiveSheet();
+        $sheet1->setTitle("Detail Lembur Bulanan");
+
+        // Judul
+        $sheet1->mergeCells('A1:Z1');
+        $sheet1->setCellValue('A1', "DETIL LEMBUR BULAN $monthName");
+        $sheet1->getStyle('A1')->applyFromArray([
+            'font'      => ['bold' => true, 'size' => 14],
+            'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER],
+        ]);
+
+        // ================= Header =================
+        $headers   = ['No', 'NIP', 'Nama', 'Divisi', 'Bagian'];
+        $rowHeader = 3;
+        $colIndex  = 1;
+
+        // Header utama
+        foreach ($headers as $h) {
+            $sheet1->mergeCellsByColumnAndRow($colIndex, $rowHeader, $colIndex, $rowHeader + 1);
+            $sheet1->setCellValueByColumnAndRow($colIndex++, $rowHeader, $h);
+        }
+
+        // Header tanggal
+        for ($d = 1; $d <= $totalDaysInMonth; $d++) {
+            $startCol = $colIndex;
+
+            $sheet1->mergeCellsByColumnAndRow($startCol, $rowHeader, $startCol + 3, $rowHeader);
+            $sheet1->setCellValueByColumnAndRow($startCol, $rowHeader, $d);
+
+            $sheet1->setCellValueByColumnAndRow($startCol,     $rowHeader + 1, "IN");
+            $sheet1->setCellValueByColumnAndRow($startCol + 1, $rowHeader + 1, "OUT");
+            $sheet1->setCellValueByColumnAndRow($startCol + 2, $rowHeader + 1, "Durasi");
+            $sheet1->setCellValueByColumnAndRow($startCol + 3, $rowHeader + 1, "Uang");
+
+            $colIndex += 4;
+        }
+
+        $lastCol = $colIndex - 1;
+
+        // Style header
+        $sheet1->getStyle("A{$rowHeader}:" . $sheet1->getCellByColumnAndRow($lastCol, $rowHeader + 1)->getCoordinate())
+            ->applyFromArray([
+                'font' => ['bold' => true],
+                'alignment' => [
+                    'horizontal' => Alignment::HORIZONTAL_CENTER,
+                    'vertical'   => Alignment::VERTICAL_CENTER
+                ],
+                'fill' => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['rgb' => 'DDDDDD']],
+                'borders' => ['allBorders' => ['borderStyle' => Border::BORDER_THIN]],
+            ]);
+
+        // ================= Isi Data =================
+        $rowIndex = $rowHeader + 2;
+        $no = 1;
+        foreach ($employeeData as $e) {
+            $colIndex = 1;
+
+            // Info karyawan
+            $sheet1->setCellValueByColumnAndRow($colIndex++, $rowIndex, $no++);
+            $sheet1->setCellValueByColumnAndRow($colIndex++, $rowIndex, $e['nip']);
+            $sheet1->setCellValueByColumnAndRow($colIndex++, $rowIndex, $e['name']);
+            $sheet1->setCellValueByColumnAndRow($colIndex++, $rowIndex, $e['divisi']);
+            $sheet1->setCellValueByColumnAndRow($colIndex++, $rowIndex, $e['bagian']);
+
+            // Data harian
+            for ($d = 1; $d <= $totalDaysInMonth; $d++) {
+                $tanggal = sprintf("%04d-%02d-%02d", $year, $month, $d);
+                $dayLog  = $mapLog[$e['id']][$tanggal] ?? null;
+
+                $in     = $dayLog['in'] ?? '';
+                $out    = $dayLog['out'] ?? '';
+                $durasi = $dayLog['durasi_lembur'] ?? '';
+                $uang   = $dayLog['total_uang_lembur'] ?? null; // biar null kalau kosong
+
+                $sheet1->setCellValueByColumnAndRow($colIndex++, $rowIndex, $in);
+                $sheet1->setCellValueByColumnAndRow($colIndex++, $rowIndex, $out);
+                $sheet1->setCellValueByColumnAndRow($colIndex++, $rowIndex, $durasi);
+
+                // uang (rata kanan + format ribuan)
+                $cell = $sheet1->getCellByColumnAndRow($colIndex, $rowIndex);
+                if ($uang !== null && $uang !== '') {
+                    $cell->setValueExplicit((float) $uang, \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_NUMERIC);
+                    $sheet1->getStyleByColumnAndRow($colIndex, $rowIndex)
+                        ->getNumberFormat()
+                        ->setFormatCode('#,##0');
+                    $sheet1->getStyleByColumnAndRow($colIndex, $rowIndex)
+                        ->getAlignment()
+                        ->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_RIGHT);
+                }
+                $colIndex++;
+            }
+
+            $rowIndex++;
+        }
+
+        // ================= Style & Border =================
+        foreach (range('A', $sheet1->getCellByColumnAndRow($lastCol, 1)->getColumn()) as $col) {
+            $sheet1->getColumnDimension($col)->setAutoSize(true);
+        }
+        // force kalkulasi ulang lebar
+        $sheet1->calculateColumnWidths();
+
+        $sheet1->getStyle("A{$rowHeader}:" . $sheet1->getCellByColumnAndRow($lastCol, $rowIndex - 1)->getCoordinate())
+            ->applyFromArray([
+                'borders' => ['allBorders' => ['borderStyle' => Border::BORDER_THIN]],
+            ]);
+
+        // ================= Download =================
+        $filename = "Laporan_Lembur_Bulan_{$monthReq}.xlsx";
+        $writer   = new Xlsx($spreadsheet);
+
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header("Content-Disposition: attachment;filename=\"{$filename}\"");
+        header('Cache-Control: max-age=0');
+
+        $writer->save('php://output');
+        exit();
+    }
+
+
+
 
     // helper
     static function selisihWaktu($start, $finish)

@@ -222,7 +222,7 @@
         function loadSelectedOptions(selectElement, selectedIds) {
             if (selectedIds && selectedIds.length > 0) {
                 $.ajax({
-                    url: '/laporan-accounting/bukubesar/get-sub-akun',
+                    url: '<?= base_url("laporan-accounting/bukubesar/get-sub-akun"); ?>',
                     data: { 
                         ids: selectedIds,
                         jenis_account: $('#jenis_account').val()
@@ -250,7 +250,7 @@
                 allowClear: true,
                 theme: "bootstrap-5",
                 ajax: {
-                    url: '/laporan-accounting/bukubesar/get-sub-akun',
+                    url: '<?= base_url("laporan-accounting/bukubesar/get-sub-akun"); ?>',
                     dataType: 'json',
                     delay: 250,
                     data: function(params) {
