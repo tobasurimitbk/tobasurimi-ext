@@ -58,14 +58,14 @@ class SuratJalanModel extends Model
     public function getAllSuratJalan($condition, $addCondition, $limit = 10, $offset = 0)
     {
         $availableSort = [
-            'no_surat_jalan'          => 'surat_jalan_so.no_surat_jalan',
-            'tipe_sales_order'          => 'sales_order.tipe_sales_order',
+            'no_surat_jalan'   => 'surat_jalan_so.no_surat_jalan',
+            'tipe_sales_order' => 'sales_order.tipe_sales_order',
             'no_so'            => 'surat_jalan_so.multiple_no_so',
-            'kode_pelanggan'             => 'customers.kode',
-            'nama_pelanggan'             => 'customers.name',
-            'shipping_date'      => 'surat_jalan_so.shipping_date',
-            'createdAt'         => 'surat_jalan_so.createdAt',
-            'updatedAt'         => 'surat_jalan_so.updatedAt',
+            'kode_pelanggan'   => 'customers.kode',
+            'nama_pelanggan'   => 'customers.name',
+            'shipping_date'    => 'surat_jalan_so.shipping_date',
+            'createdAt'        => 'surat_jalan_so.createdAt',
+            'updatedAt'        => 'surat_jalan_so.updatedAt',
         ];
         $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
 
@@ -83,11 +83,15 @@ class SuratJalanModel extends Model
         SUM(surat_jalan_so_detail.amount) as sum_amount_sj_detail, 
         sales_order.tipe_sales_order,
         employees.name AS customerSales,
-        CAST(SUBSTRING_INDEX(SUBSTRING_INDEX(surat_jalan_so.no_surat_jalan, '/', -3), '/', 1) AS UNSIGNED) AS tahun_so,
-        FIELD(SUBSTRING_INDEX(SUBSTRING_INDEX(surat_jalan_so.no_surat_jalan, '/', -2), '/', 1),
-            'I','II','III','IV','V','VI','VII','VIII','IX','X','XI','XII') AS bulan_so,
+        CAST(SUBSTRING_INDEX(SUBSTRING_INDEX(surat_jalan_so.no_surat_jalan, '/', -2), '/', 1) AS UNSIGNED) AS tahun_so,
+        CAST(
+            FIELD(
+                SUBSTRING_INDEX(SUBSTRING_INDEX(surat_jalan_so.no_surat_jalan, '/', -3), '/', 1),
+                'I','II','III','IV','V','VI','VII','VIII','IX','X','XI','XII'
+            ) AS UNSIGNED
+        ) AS bulan_so,
         CAST(SUBSTRING_INDEX(surat_jalan_so.no_surat_jalan, '/', -1) AS UNSIGNED) AS nomor_so
-        ";
+    ";
 
         $SuratJalan = $this->asObject()
             ->select($selectQry)
@@ -104,23 +108,19 @@ class SuratJalanModel extends Model
             $SuratJalan->groupStart();
         }
         if ($addCondition['search']) {
-            $SuratJalan
-                ->like('no_surat_jalan', $addCondition['search']);
+            $SuratJalan->like('no_surat_jalan', $addCondition['search']);
         }
-
         if ($addCondition['filter_customer']) {
             $SuratJalan->where('surat_jalan_so.id_customer', $addCondition['filter_customer']);
         }
-
         if ($addCondition['filter_invoice'] == "belum") {
             $SuratJalan->where('surat_jalan_so.sales_order_invoice_id', NULL);
         }
-
         if ($addCondition['filter_invoice'] == "sudah") {
             $SuratJalan->where('surat_jalan_so.sales_order_invoice_id !=', NULL);
         }
         if ($addCondition['dateStart']) {
-            $SuratJalan->where('surat_jalan_so.shipping_date >=',  $addCondition['dateStart']);
+            $SuratJalan->where('surat_jalan_so.shipping_date >=', $addCondition['dateStart']);
         }
         if ($addCondition['dateEnd']) {
             $SuratJalan->where('surat_jalan_so.shipping_date <=', $addCondition['dateEnd']);
