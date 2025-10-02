@@ -358,20 +358,24 @@
         Swal.fire({
             icon: 'question',
             title: 'Posting Jasa Vendor Barang Keluar ?',
+            html: `
+                <div style="text-align: left; font-size: 14px; color: #6c757d;">
+                    <p>Anda akan memposting data jasa vendor barang keluar.</p>
+                    <p><strong>Note:</strong> Pastikan stok tersedia sebelum posting.</p>
+                </div>
+            `,
             confirmButtonColor: '#4e73df',
             cancelButtonColor: '#d33',
             showCancelButton: true,
             reverseButtons: true,
-            confirmButtonText: 'Simpan',
-            cancelButtonText: 'Kembali',
+            confirmButtonText: 'Ya, Posting',
+            cancelButtonText: 'Batal',
         }).then((result) => {
             if (result.isConfirmed) {
                 const csrf = $(`[name="${csrfToken}"]`);
                 $.ajax({
                     url: "<?= base_url("jasa-vendor-out/posting"); ?>",
-                    data: {
-                        id: id
-                    },
+                    data: { id: id },
                     beforeSend: function(xhr) {
                         setLoading();
                         xhr.setRequestHeader('X-CSRF-Token', csrf.val());
@@ -386,22 +390,65 @@
                         if (response.status) {
                             Swal.fire({
                                 icon: 'success',
-                                title: response.message,
+                                title: 'Berhasil!',
+                                text: response.message,
                                 confirmButtonColor: '#4e73df',
-                            }).then((result) => {
-                                table.ajax.reload()
+                                timer: 2000,
+                                showConfirmButton: true
+                            }).then(() => {
+                                table.ajax.reload();
                             });
                         } else {
+                            // Handle error response
+                            let errorMessage = response.message;
+                            
+                            // Format khusus untuk error stok tidak cukup
+                            if (errorMessage.includes('tidak mencukupi')) {
+                                errorMessage = `
+                                    <div style="text-align: left;">
+                                        <h6 style="color: #d33; margin-bottom: 10px;">❌ Stok Tidak Mencukupi</h6>
+                                        <div style="background: #f8f9fa; padding: 10px; border-radius: 5px; border-left: 4px solid #d33;">
+                                            ${errorMessage}
+                                        </div>
+                                        <p style="margin-top: 10px; font-size: 12px; color: #6c757d;">
+                                            <strong>Saran:</strong> Periksa ketersediaan stok sebelum posting.
+                                        </p>
+                                    </div>
+                                `;
+                            }
+                            
                             Swal.fire({
                                 icon: 'error',
-                                title: response.message,
-                                confirmButtonColor: '#4e73df',
-                            })
+                                title: 'Gagal Posting',
+                                html: errorMessage,
+                                confirmButtonColor: '#d33',
+                                confirmButtonText: 'Tutup'
+                            });
                         }
                     },
+                    error: function(xhr, status, error) {
+                        let errorMsg = 'Terjadi kesalahan koneksi. Silakan coba lagi.';
+                        
+                        if (xhr.responseJSON && xhr.responseJSON.message) {
+                            errorMsg = xhr.responseJSON.message;
+                        } else if (xhr.status === 0) {
+                            errorMsg = 'Tidak dapat terhubung ke server. Periksa koneksi internet Anda.';
+                        } else if (xhr.status === 500) {
+                            errorMsg = 'Terjadi kesalahan server. Silakan hubungi administrator.';
+                        }
+                        
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Koneksi Error',
+                            text: errorMsg,
+                            confirmButtonColor: '#d33'
+                        });
+                        
+                        console.error('AJAX Error:', error);
+                    }
                 });
             }
-        })
+        });
     }
 
     const unPosting = function(id) {

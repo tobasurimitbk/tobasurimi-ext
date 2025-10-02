@@ -260,7 +260,6 @@
 
                                     <th style="text-align: center;">Barang - Spesifikasi</th>
                                     <th style="text-align: center;">Qty PO</th>
-                                    <th style="text-align: center;">Qty Kotor</th>
                                     <th style="text-align: center;">Sisa Qty</th>
                                     <th style="text-align: center; min-width: 100px;">Qty Rebus</th>
                                     <th style="text-align: center;">Satuan Rebus</th>
@@ -372,18 +371,20 @@
                 supplier_name: "<?= $m['supplier_name'] ?>",
                 stock_detail_id: "<?= $m['stock_detail_id'] ?>",
                 stock_id: "<?= $m['stock_id'] ?>",
-                stok_total: "<?= $m['stok_total'] ?>",
+                stok_total: "<?= $m['stock_total'] ?>",
                 qty_kotor: "<?= $m['qty_kotor'] ?>",
                 bc_type: "<?= $m['bc_type'] ?>",
                 satuan: "<?= $m['satuan'] ?>",
                 barang: "<?= $m['barang'] ?>",
                 stock_date: "<?= $m['stock_date'] ?>",
                 po_no: "<?= $m['po_no'] ?>",
-                qty: "<?= !empty($m['qty_kotor']) ? ($m['qty'] + $m['qty_kotor']) : $m['qty'] ?>",
+                po_id: "<?= $m['po_id'] ?>",
+                qty: "<?= $m['qty'] ?>",
                 total_penerimaan: "<?= $m['total_penerimaan'] ?>",
                 output: {
                     barang: "<?= $m['output']['barang'] ?>",
                     barang_id: "<?= $m['output']['barang_id'] ?>",
+                    spesifikasi_id: "<?= $m['output']['spesifikasi_id'] ?>",
                     kode_satuan: "<?= $m['output']['kode_satuan'] ?>",
                     stock_id: "<?= $m['output']['stock_id'] ?>",
                     qty: "<?= $m['output']['qty'] ?>"
@@ -1172,15 +1173,14 @@
                         <td>${item.supplier_name || '-'}</td>
                         <td>${item.stock_date || '-'}</td>
                         <td>${item.barang || '-'}</td>
-                        <td style="text-align: right;">${greatFormatRupiah(item.total_penerimaan)}</td>
-                        <td style="text-align: right;">${greatFormatRupiah(item.stock_total_kotor)}</td>
-                        <td style="text-align: right;">${greatFormatRupiah(item.stok_total_diterima)}</td>
+                        <td style="text-align: right;">${greatFormatRupiah(item.stock_total)}</td>
+                        <td style="text-align: right;">${greatFormatQty(item.stok_total_diterima)}</td>
                         <td>
                             <input type="text" step="0.001" min="0" 
                                 class="form-control qty-rebus-input" 
                                 value="${item.qty || 0}" 
                                 onkeyup="this.value = greatFormatRupiah(this.value)"
-                                data-stok_total="${parseFloat(item.stok_total)}"
+                                data-stok_total="${parseFloat(item.stok_total_diterima)}"
                                 data-index="${i}" data-id="${item.id}" />
                         </td>
                         <td>${item.satuan || '-'}</td>

@@ -223,6 +223,7 @@ class ProsesRebus extends BaseController
                 'proses_rebus_id' => $id,
                 'stock_rebus_id' => $b->stock_id,
                 'stock_detail_rebus_id' => $b->id,
+                'po_id' => $b->rm_purchase_order_id,
                 'bc_rebus_id' => $b->bc_id,
                 'qty_rebus' => $b->qty,
                 'unit_out_id' => $b->stock_id,
@@ -261,7 +262,6 @@ class ProsesRebus extends BaseController
             'divisi_id' => $this->request->getVar('divisi_id'),
             'warehouse_id' => $this->request->getVar('warehouse_id'),
             'tipe_pengambilan_stock' => $this->request->getVar('type_pengambilan_stock'),
-            'no_rebus' => $this->request->getVar('no_rebus'),
             "tanggal" => $this->request->getVar("tanggal") ? date_format(date_create_from_format("d/m/Y", $this->request->getVar("tanggal")), "Y-m-d") : "",
             "tanggal_selesai" => $this->request->getVar("tanggal_selesai") ? date_format(date_create_from_format("d/m/Y", $this->request->getVar("tanggal_selesai")), "Y-m-d") : "",
             'keterangan' => $this->request->getVar('keterangan'),
@@ -269,53 +269,24 @@ class ProsesRebus extends BaseController
             'status_posting' => '0'
         ]);
 
-        $id_detail_all = [];
+         // Delete any detail records not included in the update
+        $this->prosesRebusDetailModel->where('proses_rebus_id', $id)->delete();
 
         foreach ($barangs as $b) {
-
-            // Check if record exists
-            $check = $this->prosesRebusDetailModel
-                ->where('proses_rebus_id', $id)
-                ->first();
-
-            if ($check != null) {
-                // UPDATE existing record with calculated quantities
-                $this->prosesRebusDetailModel->update($check['id'], [
+                // INSERT new record with calculated quantities
+                $this->prosesRebusDetailModel->insert([
                     'proses_rebus_id' => $id,
                     'stock_rebus_id' => $b->stock_id,
                     'stock_detail_rebus_id' => $b->id,
                     'bc_rebus_id' => $b->bc_id,
+                    'po_id' => $b->po_id,
                     'qty_rebus' => $b->qty,
-                    'barang_out_spesifikasi_id' => $b->spesifikasi_id,
+                    'barang_out_spesifikasi_id' => $b->output->spesifikasi_id,
                     'qty_hasil_rebus' => $b->output->qty,
                     'qty_kotor' => $b->qty,
-                    'unit_out_id' => $b->stock_id
                 ]);
-                array_push($id_detail_all, $check['id']);
-            } else {
-                // For new records, delete any existing conflicting records first
-                $this->prosesRebusDetailModel
-                    ->where('proses_rebus_id', $id)
-                    ->delete();
-
-                // INSERT new record with calculated quantities
-                $id_detail_new = $this->prosesRebusDetailModel->insert([
-                    'proses_rebus_id' => $id,
-                    'stock_rebus_id' => $b->stock_id,
-                    'stock_detail_rebus_id' => $b->id,
-                    'bc_rebus_id' => $b->bc_id,
-                    'qty_rebus' => $b->qty,
-                    'barang_out_spesifikasi_id' => $b->spesifikasi_id,
-                    'qty_hasil_rebus' => $b->output->qty,
-                    'qty_kotor' => $b->qty
-                ]);
-                array_push($id_detail_all, $id_detail_new);
-            }
         }
-
-        // Delete any detail records not included in the update
-        $this->prosesRebusDetailModel->where('proses_rebus_id', $id)->whereNotIn('id', $id_detail_all)->delete();
-
+        
         return response()->setJSON([
             'message' => "Proses Rebus Berhasil Diupdate",
             'token' => csrf_hash(),
@@ -495,6 +466,8 @@ class ProsesRebus extends BaseController
                     ->where('id', $p['barang_out_spesifikasi_id'])
                     ->first();
 
+                $typeBc = $this->metaDataModel->where('id', $p['bc_rebus_id'])->first();
+
                 $data = [
                     "company_id"       => $this->this_company_id,
                     "spesifikasi_id"   => $spesifikasiData["id"],
@@ -503,10 +476,14 @@ class ProsesRebus extends BaseController
                     "stock_detail_id"  => $p["stock_detail_rebus_id"],
                     "divisi_id"        => $prosoesRebus["divisi_id"],
                     "warehouse_id"     => $prosoesRebus["warehouse_id"],
+                    "po_id"            => $p["po_id"],
+                    'bc_id'            => $p['bc_rebus_id'],
+                    'type_bc'          => $typeBc == null ? "NON PABEAN" : $typeBc['value'],
                     "qty_diterima"     => $p["qty_hasil_rebus"],
                     "qty_bersih"       => $p["qty_hasil_rebus"],
                     "qty_digunakan"    => $p["qty_rebus"],
-                    'reference_id'     => $p['proses_rebus_id'],
+                    'reference_id'     => $id,
+                    'po_type'          => "LOKAL BAKU",
                     'reference_type'   => "PROSES REBUS",
                     'status'           => "IN"
                 ];
@@ -556,20 +533,31 @@ class ProsesRebus extends BaseController
 
         try {
             $id = decrypt($this->request->getVar('id'));
+            
+            // Validasi apakah data exists
+            $prosesRebus = $this->prosesRebusModel->find($id);
+            if (!$prosesRebus) {
+                throw new \Exception("Data proses rebus tidak ditemukan");
+            }
+
             $prosesRebusDetail = $this->prosesRebusDetailModel
                 ->where('proses_rebus_id', $id)
                 ->findAll();
 
+            if (empty($prosesRebusDetail)) {
+                throw new \Exception("Detail proses rebus tidak ditemukan");
+            }
+
             foreach ($prosesRebusDetail as $p) {
+                $data = [
+                    "stock_detail_asal"     => $p["stock_detail_rebus_id"],
+                    "stock_detail_akhir"    => $p["stock_detail_hasil_rebus_id"],
+                    "qty_diterima_asal"     => $p["qty_rebus"],
+                    "qty_diterima_akhir"    => $p["qty_hasil_rebus"],
+                ];
 
-                    $data = [
-                        "stock_detail_asal"     => $p["stock_detail_rebus_id"],
-                        "stock_detail_akhir"    => $p["stock_detail_hasil_rebus_id"], // jangan lupa ini bro
-                        "qty_diterima_asal"     => $p["qty_rebus"],
-                        "qty_diterima_akhir"    => $p["qty_hasil_rebus"],
-                    ];
-
-                    $this->stockRevampModel->unpostStockRevamp($db, $data);
+                // Panggil model - jika gagal akan throw exception
+                $this->stockRevampModel->unpostStockRevamp($db, $data);
             }
 
             // update status proses rebus
@@ -581,15 +569,25 @@ class ProsesRebus extends BaseController
             $db->transCommit();
 
             return $this->response->setJSON([
-                'message' => "Proses rebus berhasil diposting",
+                'message' => "Proses rebus berhasil di-unpost",
                 'status'  => true,
                 'token'   => csrf_hash()
             ]);
+
+        } catch (\Exception $e) {
+            $db->transRollback();
+
+            return $this->response->setJSON([
+                'message' => "Gagal unpost proses rebus: " . $e->getMessage(),
+                'status'  => false,
+                'token'   => csrf_hash()
+            ]);
+            
         } catch (\Throwable $th) {
             $db->transRollback();
 
             return $this->response->setJSON([
-                'message' => "Gagal posting proses rebus: " . $th->getMessage(),
+                'message' => "Terjadi kesalahan sistem: " . $th->getMessage(),
                 'status'  => false,
                 'token'   => csrf_hash()
             ]);

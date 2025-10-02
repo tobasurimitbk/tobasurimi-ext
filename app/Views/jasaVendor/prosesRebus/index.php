@@ -340,7 +340,7 @@
                     url: "<?= base_url("proses-rebus/unposting"); ?>",
                     data: {
                         id: id,
-                        status: status
+                        // status: status // HAPUS INI - variabel status tidak ada
                     },
                     beforeSend: function(xhr) {
                         xhr.setRequestHeader('X-CSRF-Token', csrf.val());
@@ -355,15 +355,41 @@
                         csrf.val(response.token);
                         if (response.status) {
                             Swal.fire({
-                                    icon: 'success',
-                                    title: response.message,
-                                    confirmButtonColor: '#4e73df',
-                                })
-                                .then(() => {
-                                    table.ajax.reload()
-                                })
+                                icon: 'success',
+                                title: response.message,
+                                confirmButtonColor: '#4e73df',
+                            }).then(() => {
+                                table.ajax.reload()
+                            })
+                        } else {
+                            // TAMPILKAN ERROR MESSAGE
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Gagal Unposting',
+                                html: `
+                                    <div style="text-align: left;">
+                                        <p><strong>Error Details:</strong></p>
+                                        <p style="color: #d33; background: #f8f9fa; padding: 10px; border-radius: 5px; border-left: 4px solid #d33;">
+                                            ${response.message}
+                                        </p>
+                                        <small style="color: #6c757d;">Silakan periksa data dan coba lagi.</small>
+                                    </div>
+                                `,
+                                confirmButtonColor: '#d33',
+                                confirmButtonText: 'Tutup'
+                            });
                         }
                     },
+                    error: function(xhr, status, error) {
+                        // Handle AJAX error
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Koneksi Error',
+                            text: 'Terjadi kesalahan pada koneksi. Silakan coba lagi.',
+                            confirmButtonColor: '#d33'
+                        });
+                        console.error('AJAX Error:', error);
+                    }
                 });
             }
         })
