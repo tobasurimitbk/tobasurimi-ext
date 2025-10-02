@@ -51,6 +51,7 @@ class POLokalBahanBaku extends BaseController
     protected $kemasanModel;
     protected $accountBarangModel;
     protected $supplierHargaModel;
+    protected $amPurchaseOrderDetailModel;
 
     protected $this_user_id;
     protected $is_admin;
@@ -1188,16 +1189,23 @@ class POLokalBahanBaku extends BaseController
     {
         $id = $this->request->getVar('divisi_id');
         $spp_type = $this->request->getVar('spp_type');
-        $condition = [
-            'purchase_requests.deletedAt' => null,
-            'purchase_requests.divisi_id' => $id,
-            'purchase_requests.is_posted' => '1',
-            'purchase_requests.request_status' => 'waiting',
-            // 'purchase_requests.user_id' => $this->this_user_id,
-            // 'purchase_requests.spp_type' => $spp_type
-        ];
-        $data = $this->sppModel->where($condition)->like('purchase_requests.spp_type', $spp_type)->findAll();
 
+        if ($spp_type == "Lokal BP") {
+            $data = $this->sppModel->getSppNotUsedForPOBp(
+                $id,
+                $this->this_company_id
+            );
+        } else {
+            $condition = [
+                'purchase_requests.deletedAt' => null,
+                'purchase_requests.divisi_id' => $id,
+                'purchase_requests.is_posted' => '1',
+                // 'purchase_requests.request_status' => 'waiting',
+                // 'purchase_requests.user_id' => $this->this_user_id,
+                // 'purchase_requests.spp_type' => $spp_type
+            ];
+            $data = $this->sppModel->where($condition)->like('purchase_requests.spp_type', $spp_type)->findAll();
+        }
         return response()->setJSON([
             'token' => csrf_hash(),
             'data' => $data,

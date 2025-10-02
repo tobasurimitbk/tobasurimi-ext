@@ -269,4 +269,99 @@ class SppModel extends Model
 
         return $dataSpp;
     }
+    public function getSppNotUsedForPOBp($divisiId, $companyId)
+    {
+        $amPurchaseOrderDetailModel = new AMPurchaseOrderDetailModel();
+        $sppDetailModel = new SppDetailModel();
+
+        $selectQrySppDetail = "
+            purchase_requests.id,
+            purchase_requests.spp_no,
+            purchase_request_details.qty,
+            purchase_request_details.barang1_id,
+            purchase_request_details.barang2_id
+        ";
+
+        $sppDetail = $sppDetailModel
+            ->select($selectQrySppDetail)
+            ->join('purchase_requests', 'purchase_requests.id = purchase_request_details.purchase_request_id', 'left')
+            ->where('purchase_request_details.deletedAt', null)
+            ->where('purchase_requests.deletedAt', null)
+            ->where('purchase_requests.is_posted', 1)
+            ->where('purchase_requests.company_id', $companyId)
+            ->where('purchase_requests.spp_type', "Lokal BP")
+            ->where('purchase_requests.divisi_id', $divisiId)
+            ->findAll();
+
+        $mapSppDetail = [];
+        foreach ($sppDetail as $s) {
+            $barangId = $s['barang1_id'];
+            $spesifikasiId = $s['barang2_id'];
+            $purchaseRequestId = $s['id'];
+
+            $mapSppDetail[$barangId][$spesifikasiId][$purchaseRequestId] = [
+                'qty' => $s['qty'],
+                'id'  => $s['id'],
+            ];
+        }
+
+        $selectQryPoDetail = "
+            SUM(am_purchase_order_details.qty) as total_qty,
+            am_purchase_order_details.barang_id,
+            am_purchase_order_details.spesifikasi_id,
+            am_purchase_orders.purchase_request_id
+        ";
+
+        $poDetail = $amPurchaseOrderDetailModel
+            ->select($selectQryPoDetail)
+            ->join('am_purchase_orders', 'am_purchase_orders.id = am_purchase_order_details.am_purchase_order_id', 'left')
+            ->where('am_purchase_orders.po_type', "Lokal")
+            ->where('am_purchase_orders.company_id', $companyId)
+            ->where('am_purchase_orders.deletedAt', null)
+            ->where('am_purchase_order_details.deletedAt', null)
+            ->groupBy('am_purchase_order_details.barang_id, am_purchase_order_details.spesifikasi_id, am_purchase_orders.purchase_request_id')
+            ->findAll();
+
+        $sppIdNotUsedFull = [];
+
+        // --- Step 1: Cek SPP yang sudah ada di PO ---
+        foreach ($poDetail as $p) {
+            $barangId = $p['barang_id'];
+            $spesifikasiId = $p['spesifikasi_id'];
+            $purchaseRequestId = $p['purchase_request_id'];
+
+            if (isset($mapSppDetail[$barangId][$spesifikasiId][$purchaseRequestId])) {
+                $mapSppSelected = $mapSppDetail[$barangId][$spesifikasiId][$purchaseRequestId];
+
+                // Kalau qty SPP masih lebih besar dari total qty PO → masih ada sisa
+                if ($mapSppSelected['qty'] > $p['total_qty']) {
+                    $sppIdNotUsedFull[] = $mapSppSelected['id'];
+                }
+
+                // Kalau qty sudah habis → jangan dimasukkan
+                unset($mapSppDetail[$barangId][$spesifikasiId][$purchaseRequestId]);
+            }
+        }
+
+        // --- Step 2: Tambahkan SPP yang belum pernah ada di PO sama sekali ---
+        foreach ($mapSppDetail as $barangArr) {
+            foreach ($barangArr as $spesifikasiArr) {
+                foreach ($spesifikasiArr as $spp) {
+                    $sppIdNotUsedFull[] = $spp['id'];
+                }
+            }
+        }
+
+        // --- Step 3: Ambil data final ---
+        if (!empty($sppIdNotUsedFull)) {
+            $dataFinal = $this->asArray()
+                ->whereIn('id', $sppIdNotUsedFull)
+                ->where('deletedAt', null)
+                ->findAll();
+        } else {
+            $dataFinal = [];
+        }
+
+        return $dataFinal;
+    }
 }
