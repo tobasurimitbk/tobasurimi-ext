@@ -275,12 +275,13 @@ class SppModel extends Model
         $sppDetailModel = new SppDetailModel();
 
         $selectQrySppDetail = "
-            purchase_requests.id,
-            purchase_requests.spp_no,
-            purchase_request_details.qty,
-            purchase_request_details.barang1_id,
-            purchase_request_details.barang2_id
-        ";
+        purchase_requests.id,
+        purchase_requests.spp_no,
+        purchase_request_details.note,
+        purchase_request_details.qty,
+        purchase_request_details.barang1_id,
+        purchase_request_details.barang2_id
+    ";
 
         $sppDetail = $sppDetailModel
             ->select($selectQrySppDetail)
@@ -298,19 +299,21 @@ class SppModel extends Model
             $barangId = $s['barang1_id'];
             $spesifikasiId = $s['barang2_id'];
             $purchaseRequestId = $s['id'];
+            $note = trim($s['note']);
 
-            $mapSppDetail[$barangId][$spesifikasiId][$purchaseRequestId] = [
+            $mapSppDetail[$barangId][$spesifikasiId][$purchaseRequestId][$note] = [
                 'qty' => $s['qty'],
                 'id'  => $s['id'],
             ];
         }
 
         $selectQryPoDetail = "
-            SUM(am_purchase_order_details.qty) as total_qty,
-            am_purchase_order_details.barang_id,
-            am_purchase_order_details.spesifikasi_id,
-            am_purchase_orders.purchase_request_id
-        ";
+        SUM(am_purchase_order_details.qty) as total_qty,
+        am_purchase_order_details.barang_id,
+        am_purchase_order_details.spesifikasi_id,
+        am_purchase_order_details.note,
+        am_purchase_orders.purchase_request_id
+    ";
 
         $poDetail = $amPurchaseOrderDetailModel
             ->select($selectQryPoDetail)
@@ -319,7 +322,7 @@ class SppModel extends Model
             ->where('am_purchase_orders.company_id', $companyId)
             ->where('am_purchase_orders.deletedAt', null)
             ->where('am_purchase_order_details.deletedAt', null)
-            ->groupBy('am_purchase_order_details.barang_id, am_purchase_order_details.spesifikasi_id, am_purchase_orders.purchase_request_id')
+            ->groupBy('am_purchase_order_details.barang_id, am_purchase_order_details.spesifikasi_id, am_purchase_orders.purchase_request_id, am_purchase_order_details.note')
             ->findAll();
 
         $sppIdNotUsedFull = [];
@@ -329,9 +332,10 @@ class SppModel extends Model
             $barangId = $p['barang_id'];
             $spesifikasiId = $p['spesifikasi_id'];
             $purchaseRequestId = $p['purchase_request_id'];
+            $note = trim($p['note']);
 
-            if (isset($mapSppDetail[$barangId][$spesifikasiId][$purchaseRequestId])) {
-                $mapSppSelected = $mapSppDetail[$barangId][$spesifikasiId][$purchaseRequestId];
+            if (isset($mapSppDetail[$barangId][$spesifikasiId][$purchaseRequestId][$note])) {
+                $mapSppSelected = $mapSppDetail[$barangId][$spesifikasiId][$purchaseRequestId][$note];
 
                 // Kalau qty SPP masih lebih besar dari total qty PO → masih ada sisa
                 if ($mapSppSelected['qty'] > $p['total_qty']) {
@@ -339,15 +343,17 @@ class SppModel extends Model
                 }
 
                 // Kalau qty sudah habis → jangan dimasukkan
-                unset($mapSppDetail[$barangId][$spesifikasiId][$purchaseRequestId]);
+                unset($mapSppDetail[$barangId][$spesifikasiId][$purchaseRequestId][$note]);
             }
         }
 
         // --- Step 2: Tambahkan SPP yang belum pernah ada di PO sama sekali ---
         foreach ($mapSppDetail as $barangArr) {
             foreach ($barangArr as $spesifikasiArr) {
-                foreach ($spesifikasiArr as $spp) {
-                    $sppIdNotUsedFull[] = $spp['id'];
+                foreach ($spesifikasiArr as $requestArr) {
+                    foreach ($requestArr as $spp) {
+                        $sppIdNotUsedFull[] = $spp['id'];
+                    }
                 }
             }
         }
