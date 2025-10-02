@@ -180,9 +180,10 @@ class ProsesRebusDetailModel extends Model
             $stockList['barang'] = $dataBarangIn['barang_name'] . ' - ' . strtoupper($barangMasterSpesifikasiIn['spesifikasi']);
             $stockList['stock_id'] = $stockList['stock_id'];
             $stockList['po_no'] =  $rmPurchaseOrder['po_no'];
+            $stockList['po_id'] =  $rmPurchaseOrder['id'];
             $stockList['stock_detail_id'] = $stockList['id'];
             $stockList['reference_type'] = $stockList['reference_type'];
-            $stockList['stok_total'] = $stockList['qty_bersih'];
+            $stockList['stock_total'] = $m['qty_rebus'];
             $stockList['qty_kotor'] = $m['qty_kotor'];
             $stockList['stock_date'] = $rmPurchaseOrder == null ? "" : date('d/m/Y', strtotime($rmPurchaseOrder['po_date']));
             $stockList['supplier_name'] = $supplier != null ? strtoupper($supplier['name']) : "-";
@@ -190,6 +191,7 @@ class ProsesRebusDetailModel extends Model
             $stockList['output'] = [
                 'barang' => $barangNameOutput,
                 'barang_id' => $barangIdOutput,
+                'spesifikasi_id' => $m['barang_out_spesifikasi_id'],
                 'kode_satuan' => $satuanOutputName,
                 'satuan_id' => $satuanOutput['id'],
                 'stock_id' => !empty($stockOutput['id']) ? $stockOutput['id'] : 0,

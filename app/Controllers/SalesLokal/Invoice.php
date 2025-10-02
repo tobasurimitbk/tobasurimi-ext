@@ -313,7 +313,7 @@ class Invoice extends BaseController
                         "discount_percentage_invoice"   => $value['disc'],
                         "discount_unit_invoice"         => $value['discUnit'],
                         "harga_barang_invoice"          => str_replace(',', '', $value['harga_barang']),
-                        "tax_invoice"                   => str_replace(',', '', $value['tax'] ?? $value['taxAmt']),
+                        "tax_invoice"                   => str_replace(',', '', ($value['tax'] ?? ($value['taxAmt'] ?? 0))),
                         "amount_invoice"                => str_replace(',', '', $value['amount']),
                     ];
                     $this->SalesOrderInvoiceDetailModel->insert($valuesDetail);
@@ -460,22 +460,22 @@ class Invoice extends BaseController
                     $valueDetail['harga_barang'] = number_format(floatval($valueDetail['harga_barang']), 0);
                     $valueDetail['amount'] = number_format(floatval($valueDetail['amount']), 0);
 
-                    if (isset($valueDetail['id_sales_order']) ? ($value->id_sales_order == $valueDetail['id_sales_order'] && $value->id_barang == $valueDetail['id_barang_invoice']) : ($value->id_sj == $valueDetail['id_surat_jalan'] && $value->id_barang == $valueDetail['id_barang_invoice'])) {
+                    // if (isset($valueDetail['id_sales_order']) ? ($value->id_sales_order == $valueDetail['id_sales_order'] && $value->id_barang == $valueDetail['id_barang_invoice']) : ($value->id_sj == $valueDetail['id_surat_jalan'] && $value->id_barang == $valueDetail['id_barang_invoice'])) {
 
-                        // Check if deletedAt is not empty
-                        if (!empty($valueDetail['deletedAt'])) {
-                            unset($documentData->itemList[$key]);
-                            break; // Break out of the inner loop since the item has been removed
-                        }
+                    //     // Check if deletedAt is not empty
+                    //     if (!empty($valueDetail['deletedAt'])) {
+                    //         unset($documentData->itemList[$key]);
+                    //         break; // Break out of the inner loop since the item has been removed
+                    //     }
 
-                        $value->id_detail_invoice = $valueDetail['id'];
-                        $value->qty_input = number_format(floatval($valueDetail['qty_invoice']), 2);
-                        $value->harga_barang = number_format(floatval($valueDetail['harga_barang_invoice']), 0);
-                        $value->amount = number_format(floatval($valueDetail['amount_invoice']), 0);
-                        // } else {
-                        //     unset($documentData->itemList[$key]);
-                        //     break; // Break out of the inner loop since the item has been removed
-                    }
+                    //     $value->id_detail_invoice = $valueDetail['id'];
+                    //     $value->qty_input = number_format(floatval($valueDetail['qty_invoice']), 2);
+                    //     $value->harga_barang = number_format(floatval($valueDetail['harga_barang_invoice']), 0);
+                    //     $value->amount = number_format(floatval($valueDetail['amount_invoice']), 0);
+                    //     // } else {
+                    //     //     unset($documentData->itemList[$key]);
+                    //     //     break; // Break out of the inner loop since the item has been removed
+                    // }
                 }
             }
         }
@@ -488,22 +488,22 @@ class Invoice extends BaseController
                 // var_dump($value);
                 foreach ($dataSalesInvoiceOrderDetail as $valueDetail) {
 
-                    if (isset($valueDetail['id_sales_order']) ? ($value->id_sales_order == $valueDetail['id_sales_order'] && $value->id_barang == $valueDetail['id_barang_invoice']) : ($value->id_sj == $valueDetail['id_surat_jalan'] && $value->id_barang == $valueDetail['id_barang_invoice'])) {
+                    // if (isset($valueDetail['id_sales_order']) ? ($value->id_sales_order == $valueDetail['id_sales_order'] && $value->id_barang == $valueDetail['id_barang_invoice']) : ($value->id_sj == $valueDetail['id_surat_jalan'] && $value->id_barang == $valueDetail['id_barang_invoice'])) {
 
-                        // Check if deletedAt is not empty
-                        if (!empty($valueDetail['deletedAt'])) {
-                            unset($documentData->itemListPosting[$key]);
-                            break; // Break out of the inner loop since the item has been removed
-                        }
+                    //     // Check if deletedAt is not empty
+                    //     if (!empty($valueDetail['deletedAt'])) {
+                    //         unset($documentData->itemListPosting[$key]);
+                    //         break; // Break out of the inner loop since the item has been removed
+                    //     }
 
-                        $value->id_detail_invoice = $valueDetail['id'];
-                        $value->qty_input = number_format(floatval($valueDetail['qty_invoice']), 2);
-                        $value->harga_barang = number_format(floatval($valueDetail['harga_barang_invoice']), 0);
-                        $value->amount = number_format(floatval($valueDetail['amount_invoice']), 0);
-                        // } else {
-                        //     unset($documentData->itemListPosting[$key]);
-                        //     break; // Break out of the inner loop since the item has been removed
-                    }
+                    //     $value->id_detail_invoice = $valueDetail['id'];
+                    //     $value->qty_input = number_format(floatval($valueDetail['qty_invoice']), 2);
+                    //     $value->harga_barang = number_format(floatval($valueDetail['harga_barang_invoice']), 0);
+                    //     $value->amount = number_format(floatval($valueDetail['amount_invoice']), 0);
+                    //     // } else {
+                    //     //     unset($documentData->itemListPosting[$key]);
+                    //     //     break; // Break out of the inner loop since the item has been removed
+                    // }
                 }
             }
         }
@@ -514,8 +514,15 @@ class Invoice extends BaseController
         // $customers = $this->CustomerModel->asObject()->select(['id', 'name'])->where('company_id', $this->this_company_id)->findAll();
         $customers = $this->CustomerModel->getCustomerLokal($this->userId, $this->is_admin);
 
+        foreach ($dataSalesInvoiceOrderDetail as &$valueDetail) {
+            $valueDetail['id_detail_invoice'] = $valueDetail['id'];
+            $valueDetail['qty_input'] = number_format(floatval($valueDetail['qty_invoice']), 2);
+            $valueDetail['harga_barang'] = floatval($valueDetail['harga_barang_invoice']);
+            $valueDetail['amount'] = floatval($valueDetail['amount_invoice']);
+        }
+
         // echo "<pre>";
-        // var_dump($documentData);
+        // // var_dump($documentData);
         // var_dump($dataSalesInvoiceOrderDetail);
         // echo "</pre>";
         // exit;

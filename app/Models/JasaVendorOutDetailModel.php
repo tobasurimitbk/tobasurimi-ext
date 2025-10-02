@@ -361,6 +361,85 @@ class JasaVendorOutDetailModel extends Model
         return $result;
     }
 
+    // public function getJasaVendorOutDetailNew($jasaVendorOutID)
+    // {
+        
+    //     $barangMasterModel = new BarangMasterModel();
+    //     $barangMasterSpesifikasiModel = new BarangMasterSpesifikasiModel();
+    //     $satuanModel = new SatuansModel();
+    //     $rmPurchaseOrderModel = new RMPurchaseOrderModel();
+    //     $metaDataModel = new MetadataModel();
+    //     $supplierModel = new SupplierModel();
+    //     $rmPurchaseOrderModel = new RMPurchaseOrderModel();
+    //     $stockRevampModel = new StockRevampModel();
+    //     $stockRevampDetailModel = new StockRevampDetailModel();
+    //     $result = [];
+
+    //     $jasaVendorOutDetail = $this->asArray()
+    //         ->where('jasa_vendor_out_id', $jasaVendorOutID)
+    //         ->findAll();
+
+
+
+    //     foreach ($jasaVendorOutDetail as $m) {
+    //         $stockList = $stockRevampDetailModel->where('id', $m['stock_out_detail_id'])->first();
+    //         $stock = $stockRevampModel->find($m['stock_oit_id']);
+    //         $stockOutput = $stockRevampModel->select('stock_revamp.id')
+    //                                                     ->where('stock_revamp.spesifikasi_id', $m['barang_out_spesifikasi_id'])
+    //                                                     ->first();
+
+    //             $dataBarangIn = $stockRevampModel->select('stock_revamp.spesifikasi_id, barang_master.barang_name')
+    //                                                     ->where('stock_revamp.id', $m['stock_rebus_id'])
+    //                                                     ->join('barang_master', 'barang_master.id = stock_revamp.barang_master_id', 'left')
+    //                                                     ->first();          
+    //             $barangMasterSpesifikasiIn = $barangMasterSpesifikasiModel->find($dataBarangIn['spesifikasi_id']);
+    //             $satuanIn = $barangMasterSpesifikasiIn != null ? $satuanModel->find($barangMasterSpesifikasiIn['satuan_1']) : null;
+    //             $barangMasterSpesifikasi = $barangMasterSpesifikasiModel->find($m['barang_out_spesifikasi_id']);
+    //             $barangMaster = $barangMasterModel->find($barangMasterSpesifikasi['barang_master_id']);
+    //             $barangNameOutput = $barangMaster != null && $barangMasterSpesifikasi != null ? $barangMaster['barang_name'] . "-" . $barangMasterSpesifikasi['spesifikasi'] : '';
+    //             $barangIdOutput = $barangMasterSpesifikasi['id'];
+    //             $satuanOutput = $barangMasterSpesifikasi != null ? $satuanModel->find($barangMasterSpesifikasi['satuan_1']) : null;
+    //             $satuanOutputName = $satuanOutput == null ? "-" : $satuanOutput['kode_satuan'];
+        
+    //         // $resultNoJasaVendorIn = strstr($m['stock_dokumen'] ?? '', '(', true);
+    //         // $noJasaVendorIn = trim($resultNoJasaVendorIn ?: '');
+    //         // $supplierName = $stockList['supplier_name'] ?? '';
+    //         // $stockDate = $rmPurchaseOrder
+    //         //     ? date('d/m/Y', strtotime($rmPurchaseOrder['po_date']))
+    //         //     : '';
+
+    //         // $jasaVendorIn = $jasaVendorInModel
+    //         //     ->select('jasa_vendor_in.*, vendors.name as nama_vendor')
+    //         //     ->join('vendors', 'vendors.id = jasa_vendor_in.vendor_id', 'left')
+    //         //     ->where('no_penerimaan_surat_jalan', $noJasaVendorIn)
+    //         //     ->where('jasa_vendor_in.company_id', session()->get("login")->this_company_id)
+    //         //     ->first();
+
+    //         $stockList['qty'] = $m['qty'] ?? 0;
+    //         $stockList['qty_kotor'] = $m['qty_kotor'] ?? 0;
+    //         $bcType = isset($stockList['bc_id']) ? $metaDataModel->find($stockList['bc_id']) : null;
+    //         $stockList['no_aju'] = isset($stockList['no_aju']) && $stockList['no_aju'] !== "-" ? $stockList['no_aju'] : "-";
+    //         $stockList['bc_type'] = $bcType['value'] ?? "NON PABEAN";
+    //         $stockList['satuan'] = $satuan['kode_satuan'] ?? '';
+    //         $stockList['barang'] = strtoupper($barangNameOutput);
+    //         $stockList['stock_id'] = $stockList['stock_id'] ?? null;
+    //         $stockList['type_barang'] = $stock['tipe_barang'] ?? '';
+    //         $stockList['type_barang_text'] = isset($stock['tipe_barang']) ? strtoupper(str_replace('_', ' ', $stock['tipe_barang'])) : '';
+    //         $stockList['stok_total'] = $stockList['stok_total'] ?? 0;
+    //         $stockList['stock_date'] = 
+    //         $stockList['supplier_name'] = $jasaVendorIn
+    //             ? $supplierName . ' / ' . ($jasaVendorIn['nama_vendor'] ?? '')
+    //             : $supplierName;
+
+    //         // id langsung encrypt tanpa grouping
+    //         $stockList['id'] = $stockList['id'];
+
+    //         $result[] = $stockList;
+    //     }
+
+    //     return $result;
+    // }
+
     public function getJasaVendorOutDetailForIndex($jasaVendorOutID)
     {
         $stockDetail2Model = new StockDetail2Model();
@@ -455,6 +534,42 @@ class JasaVendorOutDetailModel extends Model
             $stockList['id'] = encrypt($stockList['stock_id']);
 
             $result[] = $stockList;
+        }
+
+        return $result;
+    }
+
+    public function getJasaVendorOutDetailForIndexNew($jasaVendorOutID)
+    {
+        $stockRevampModel = new StockRevampModel();
+        $stockRevampDetailModel = new StockRevampDetailModel();
+        $barangMasterModel = new BarangMasterModel();
+        $barangMasterSpesifikasiModel = new BarangMasterSpesifikasiModel();
+
+        $result = [];
+
+        $jasaVendorOutDetail = $this->asArray()
+            ->where('jasa_vendor_out_id', $jasaVendorOutID)
+            ->where('deletedAt', null)
+            ->findAll();
+
+        foreach ($jasaVendorOutDetail as $m) {
+
+            $stockList = $stockRevampDetailModel->select('stock_id')->where('id', $m['stock_out_detail_id'])->where('deletedAt', null)->first();
+
+            if (!$stockList) continue;
+
+            $stock = $stockRevampModel->select('barang_master_id, spesifikasi_id')->where('id', $stockList['stock_id'])->first();
+
+            if ($stock) {
+                    $barangMaster = $barangMasterModel->find($stock['barang_master_id'] ?? null);
+                    $barangMasterSpesifikasi = $barangMasterSpesifikasiModel->find($stock['spesifikasi_id'] ?? null);
+                    $barangName = ($barangMaster && $barangMasterSpesifikasi)
+                        ? $barangMaster['barang_name'] : '';
+            }
+
+            $stockList['barang'] = strtoupper($barangName);
+            $result[] = $stockList['barang'];
         }
 
         return $result;
