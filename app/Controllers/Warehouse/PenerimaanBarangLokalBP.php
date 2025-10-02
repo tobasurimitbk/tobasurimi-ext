@@ -654,7 +654,7 @@ class PenerimaanBarangLokalBP extends BaseController
                         $this->penerimaanBarangDetailModel->update($penerimaanBarangDetailFirst['id'], [
                             'purchase_order_id' => $b->am_purchase_order_id,
                             'purchase_order_details_id' => $b->am_purchase_order_details_id,
-                            'penerimaan_barang_id' => $id,
+                            // 'penerimaan_barang_id' => $id,
                             'barang_id' => $barang == null ? 0 : $barang['id'],
                             'spesifikasi_id' => $poDetail == null ? 0 : $poDetail['spesifikasi_id'],
                             'unit' => $poDetail == null ? 0 : $poDetail['unit'],
