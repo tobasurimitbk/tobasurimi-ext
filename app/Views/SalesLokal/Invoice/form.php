@@ -544,7 +544,7 @@
         let taxTotalHtml = 0;
         let grandTotal = 0;
 
-        console.log(list_items);
+        // console.log(list_items);
 
 
         list_items.forEach((obj) => {
@@ -814,7 +814,7 @@
             const currentItemList = table.rows().data().toArray();
             let validate_same = currentItemList.findIndex((obj) => obj.id_barang == id_barang && obj.warehouse_id == warehouseId);
 
-            console.log(row_detail);
+            // console.log(row_detail);
 
             if (validate_same >= 0 && row_detail == 0) {
                 Swal.fire({
@@ -1152,6 +1152,8 @@
                         success: function(res) {
                             $("#doc_id").empty();
                             res.data.forEach(function(item) {
+                                console.log(item);
+
                                 $("#doc_id").append(`<option value="${item.id}" data-company="${item.id_company}" data-keterangan="${item.keterangan}" data-no_po="${item.no_po}" data-termin="${item.termin}" data-jenis_penjualan="${item.jenis_penjualan}" data-sales="${item.salesName}">${item.doc_no}</option>`);
                             });
                             $("#doc_id").trigger('change');
