@@ -260,7 +260,6 @@
 
                                     <th style="text-align: center;">Barang - Spesifikasi</th>
                                     <th style="text-align: center;">Qty PO</th>
-                                    <th style="text-align: center;">Qty Kotor</th>
                                     <th style="text-align: center;">Sisa Qty</th>
                                     <th style="text-align: center; min-width: 100px;">Qty Rebus</th>
                                     <th style="text-align: center;">Satuan Rebus</th>
@@ -372,8 +371,9 @@
                 supplier_name: "<?= $m['supplier_name'] ?>",
                 stock_detail_id: "<?= $m['stock_detail_id'] ?>",
                 stock_id: "<?= $m['stock_id'] ?>",
-                stok_total: "<?= $m['stock_total'] ?>",
-                qty_kotor: "<?= $m['qty_kotor'] ?>",
+                stok_total_bersih: "<?= $m['qty_bersih'] ?>",
+                stok_total_diterima: "<?= $m['qty_diterima'] ?>",
+                stok_total_kotor: "<?= $m['qty_kotor'] ?>",
                 bc_type: "<?= $m['bc_type'] ?>",
                 satuan: "<?= $m['satuan'] ?>",
                 barang: "<?= $m['barang'] ?>",
@@ -600,6 +600,7 @@
                             barang: barangIn.data('barang'),
                             barang_id: barangIn.data('barang_id'),
                             kode_satuan: barangIn.data('kode_satuan'),
+                            satuan_id: barangIn.data('satuan_id'),
                             stock_id: barangIn.data('stock_id'),
                             qty: 0
                         }
@@ -685,6 +686,7 @@
                             barang_id: barangIn.data('barang_id'),
                             kode_satuan: barangIn.data('kode_satuan'),
                             stock_id: barangIn.data('stock_id'),
+                            satuan_id: barangIn.data('satuan_id'),
                             qty: qtyHasilBagi
                         };
                     }
@@ -1125,7 +1127,6 @@
 
         // Group by stock_id hasil rebus
         const grouped = {};
-        console.log(data)
         data.forEach(item => {
             const key = item.output?.stock_id || 'undefined';
             if (!grouped[key]) grouped[key] = [];
@@ -1174,9 +1175,8 @@
                         <td>${item.supplier_name || '-'}</td>
                         <td>${item.stock_date || '-'}</td>
                         <td>${item.barang || '-'}</td>
-                        <td style="text-align: right;">${greatFormatRupiah(item.stock_total)}</td>
-                        <td style="text-align: right;">${greatFormatRupiah(item.stock_total_kotor)}</td>
-                        <td style="text-align: right;">${greatFormatRupiah(item.stok_total_diterima)}</td>
+                        <td style="text-align: right;">${parseFloat(item.stok_total_bersih)}</td>
+                        <td style="text-align: right;">${parseFloat(item.stok_total_diterima)}</td>
                         <td>
                             <input type="text" step="0.001" min="0" 
                                 class="form-control qty-rebus-input" 

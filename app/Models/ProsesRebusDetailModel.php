@@ -172,7 +172,6 @@ class ProsesRebusDetailModel extends Model
                         ->first();
 
             // === Susun hasil ===
-            $stockList['qty'] = $m['qty_rebus'];
             $bcType = $metaDataModel->find($stockList['bc_id']);
             $stockList['bc_type'] = $bcType == null ? "NON PABEAN" : $bcType['value'];
             $stockList['satuan'] = $satuanIn['kode_satuan'];
@@ -183,8 +182,10 @@ class ProsesRebusDetailModel extends Model
             $stockList['po_id'] =  $rmPurchaseOrder['id'];
             $stockList['stock_detail_id'] = $stockList['id'];
             $stockList['reference_type'] = $stockList['reference_type'];
-            $stockList['stock_total'] = $m['qty_rebus'];
-            $stockList['qty_kotor'] = $m['qty_kotor'];
+            $stockList['qty']         = round((float)$m['qty_rebus'], 2);
+            $stockList['qty_bersih']  = round((float)$stockList['qty_bersih'], 2);
+            $stockList['stock_total'] = round((float)$stockList['qty_diterima'], 2);
+            $stockList['qty_kotor']   = round((float)$stockList['qty_diterima'] - (float)$stockList['qty_bersih'], 2);
             $stockList['stock_date'] = $rmPurchaseOrder == null ? "" : date('d/m/Y', strtotime($rmPurchaseOrder['po_date']));
             $stockList['supplier_name'] = $supplier != null ? strtoupper($supplier['name']) : "-";
             $stockList['total_penerimaan'] = $stockList['qty_bersih'] ?? 0;
@@ -195,7 +196,7 @@ class ProsesRebusDetailModel extends Model
                 'kode_satuan' => $satuanOutputName,
                 'satuan_id' => $satuanOutput['id'],
                 'stock_id' => !empty($stockOutput['id']) ? $stockOutput['id'] : 0,
-                'qty' => $m['qty_hasil_rebus']
+                'qty' => round((float)$m['qty_rebus'], 2)
             ];
 
             array_push($result, $stockList);

@@ -247,7 +247,7 @@ class StockModel extends Model
             ];
 
             $qryKemasanRes = $kemasanModel
-                ->select('kemasan.*, satuans.kode_satuan, satuans.nama_satuan, satuans.kode_satuan')
+                ->select('kemasan.*, satuans.kode_satuan, satuans.nama_satuan, satuans.kode_satuan, satuans.id as satuan_id')
                 ->join('satuans', 'satuans.id = kemasan.satuan_id', 'left')
                 ->where($condition)
                 ->findAll();
@@ -262,7 +262,8 @@ class StockModel extends Model
                     'spesifikasi_name' => strtoupper($k['name']),
                     'kode_barang' => $k['kode'],
                     'nama_satuan' => $k['nama_satuan'],
-                    'kode_satuan' => $k['kode_satuan']
+                    'kode_satuan' => $k['kode_satuan'],
+                    'satuan_id' => $k['satuan_id']
                 ];
             }
         } else {
@@ -280,7 +281,8 @@ class StockModel extends Model
                 barang_master_spesifikasi.id AS spesifikasi_id,
                 barang_master_spesifikasi.spesifikasi,
                 satuans.nama_satuan,
-                satuans.kode_satuan
+                satuans.kode_satuan,
+                satuans.id as satuan_id
             ";
 
             $qryBarangMaster = $barangMasterModel
@@ -299,7 +301,8 @@ class StockModel extends Model
                     'spesifikasi_name' => strtoupper($b['spesifikasi']),
                     'kode_barang' => $b['kode_barang'],
                     'nama_satuan' => $b['nama_satuan'],
-                    'kode_satuan' => $b['kode_satuan']
+                    'kode_satuan' => $b['kode_satuan'],
+                    'satuan_id' => $b['satuan_id']
                 ];
             }
         }

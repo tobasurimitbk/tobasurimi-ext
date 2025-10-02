@@ -179,7 +179,7 @@ class JasaVendorOut extends BaseController
             'divisi' => $this->divisiModel->getDivisiAccess(),
             'jasaVendorOut' => $jasaVendorOut,
             'warehouse' => $this->warehouseModel->where('deletedAt', null)->where('divisi_id', $jasaVendorOut['divisi_id'])->orderBy('warehouse_name', "ASC")->findAll(),
-            'jasaVendorOutDetail' => $this->jasaVendorOutDetailModel->getJasaVendorOutDetail2New($id),
+            'jasaVendorOutDetail' => $this->jasaVendorOutDetailModel->getJasaVendorOutDetailNew($id),
             'supplier' => $this->supplierModel->getSupplierByType("BAHAN BAKU")
 
         ];
@@ -695,10 +695,11 @@ class JasaVendorOut extends BaseController
                             $dataResult[$i]['barang'] = strtoupper($dataResult[$i]['barang']);
                             $dataResult[$i]['stock_date'] = $dataResult == null ? "-" : date('d/m/Y', strtotime($dataResult[$i]['po_date']));
                             $dataResult[$i]['stock_id'] = $dataResult[$i]['stock_id'];
-                            $dataResult[$i]['stok_total'] = floatval($dataResult[$i]['stok_total']);
-                            $dataResult[$i]['stok_total_kotor'] = floatval($dataResult[$i]['stok_total_diterima'] -$dataResult[$i]['stok_total']);
-                            $dataResult[$i]['stok_total_diterima'] = floatval($dataResult[$i]['stok_total_diterima']);
-                            $dataResult[$i]['total_penerimaan'] = floatval($dataResult[$i]['total_penerimaan']);
+                            $dataResult[$i]['stok_total_bersih']          = round((float)$dataResult[$i]['stok_total_bersih'], 2);
+                            $dataResult[$i]['stok_total_diterima'] = round((float)$dataResult[$i]['stok_total_diterima'], 2);
+                            $dataResult[$i]['total_penerimaan']    = round((float)$dataResult[$i]['total_penerimaan'], 2);
+                            $dataResult[$i]['stok_total_kotor']    = round((float)$dataResult[$i]['stok_total_diterima'] - (float)$dataResult[$i]['stok_total_bersih'], 2);
+
 
                             array_push($resultArr, $dataResult[$i]);
                             
