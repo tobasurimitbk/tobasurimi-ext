@@ -196,7 +196,7 @@ class ProsesRebusDetailModel extends Model
                 'kode_satuan' => $satuanOutputName,
                 'satuan_id' => $satuanOutput['id'],
                 'stock_id' => !empty($stockOutput['id']) ? $stockOutput['id'] : 0,
-                'qty' => round((float)$m['qty_rebus'], 2)
+                'qty' => round((float)$m['qty_hasil_rebus'], 2)
             ];
 
             array_push($result, $stockList);
