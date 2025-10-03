@@ -182,11 +182,11 @@ class StockRevampModel extends Model
             $newQtyDetail       = $stockDetail['qty_diterima'] - $data['qty_digunakan'];
             $newQtyDetailBersih = $stockDetail['qty_bersih'] - $data['qty_digunakan'];
 
-            if ($newQtyDetail < 0 || $newQtyDetailBersih < 0) {
-                throw new \Exception("Qty detail tidak mencukupi. 
-                    Stok tersedia: {$stockDetail['qty_diterima']}/{$stockDetail['qty_bersih']}, 
-                    Qty diminta: {$data['qty_digunakan']}");
-            }
+            // if ($newQtyDetail < 0 || $newQtyDetailBersih < 0) {
+            //     throw new \Exception("Qty detail tidak mencukupi. 
+            //         Stok tersedia: {$stockDetail['qty_diterima']}/{$stockDetail['qty_bersih']}, 
+            //         Qty diminta: {$data['qty_digunakan']}");
+            // }
 
             $db->table('stock_revamp_detail')
                 ->where('id', $data['stock_detail_id'])
@@ -213,11 +213,11 @@ class StockRevampModel extends Model
             $newQtyParent       = $stock['qty_diterima'] - $data['qty_digunakan'];
             $newQtyParentBersih = $stock['qty_bersih'] - $data['qty_digunakan'];
 
-            if ($newQtyParent < 0 || $newQtyParentBersih < 0) {
-                throw new \Exception("Qty parent tidak mencukupi. 
-                    Stok tersedia: {$stock['qty_diterima']}/{$stock['qty_bersih']}, 
-                    Qty diminta: {$data['qty_digunakan']}");
-            }
+            // if ($newQtyParent < 0 || $newQtyParentBersih < 0) {
+            //     throw new \Exception("Qty parent tidak mencukupi. 
+            //         Stok tersedia: {$stock['qty_diterima']}/{$stock['qty_bersih']}, 
+            //         Qty diminta: {$data['qty_digunakan']}");
+            // }
 
             $db->table('stock_revamp')
                 ->where('id', $stockDetail['stock_id'])
