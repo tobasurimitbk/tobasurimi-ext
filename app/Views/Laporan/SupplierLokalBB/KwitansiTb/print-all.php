@@ -175,29 +175,37 @@
                     <div class="d-flex content-between" style="margin-top: 0px;">
                         <table style="width: 100%;">
                             <tr>
-                                <td style="font-size:14px;">
-                                    <?= $d["company"]["holding_company"] ?> (<?= $d["company"]["company"] ?>)
-
+                                <td>
+                                    <div style="font-size: 15px; font-weight:bold;">
+                                        <u>
+                                            <?= $d["company"]["holding_company"] ?> (<?= $d["company"]["company"] ?>)
+                                        </u>
+                                    </div>
                                 </td>
                                 <td style="text-align: right;">
-                                    <u>Tanggal: <?= date(
+                                    Tanggal: <?= date(
                                                     "d-m-Y",
                                                     strtotime($d["tanggal"])
-                                                ) ?></u>
+                                                ) ?>
                                 </td>
                             </tr>
-                            <tr>
-                                <td></td>
-                                <td style="text-align: right;">
-                                    KWITANSI BULANAN <br>
-                                    No. Nota : <?= $d["noKwitansi"] ?>
-                                </td>
-                            </tr>
+
                         </table>
 
                     </div>
 
-                    <table class="w-100 mt-2">
+                    <center style="margin-top: 20px;">
+                        <div style="font-size: 15px; font-weight:bold;">
+                            <u>
+                                KWITANSI BULANAN
+                            </u>
+                        </div>
+                        <div style="font-size: 13px;">
+                            No. Nota : <?= $d["noKwitansi"] ?>
+                        </div>
+                    </center>
+
+                    <table class="w-100 mt-2" style="margin-top: 20px;">
                         <tr>
                             <td style="vertical-align: top; width: 40%;">SUDAH TERIMA DARI <br> (RECEIVED FROM)</td>
                             <td style="vertical-align: top;">: </td>
