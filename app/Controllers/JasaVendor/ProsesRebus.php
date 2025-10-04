@@ -476,7 +476,7 @@ class ProsesRebus extends BaseController
                     "spesifikasi_id"   => $spesifikasiData["id"],
                     "barang_master_id" => $spesifikasiData["barang_master_id"],
                     "unit_id"          => $p["unit_out_id"],
-                    "stock_detail_id"  => $p["stock_detail_rebus_id"],
+                    "stock_detail_asal"=> $p["stock_detail_rebus_id"],
                     "divisi_id"        => $prosoesRebus["divisi_id"],
                     "warehouse_id"     => $prosoesRebus["warehouse_id"],
                     "po_id"            => $p["po_id"],
