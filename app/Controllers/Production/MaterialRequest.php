@@ -1628,7 +1628,7 @@ class MaterialRequest extends BaseController
                 }
                 // var_dump($dataResult[$i]['barang'] . "/" . $dataResult[$i]['stock_id'] . "/" . $dataResult[$i]['no_aju'] . "/" . $dataResult[$i]['stok_total']);
 
-                if ($dataResult[$i]['stok_total'] > 0) {
+                if ($dataResult[$i]['stok_total'] > 0.01) {
                     array_push($resultArr, $dataResult[$i]);
                 }
             }
