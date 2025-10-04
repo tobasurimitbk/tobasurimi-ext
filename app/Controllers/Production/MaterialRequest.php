@@ -1619,14 +1619,16 @@ class MaterialRequest extends BaseController
                     $dataResult[$i]['stock_dokumen']
                 );
 
+                
                 if ($dataMaterialRequestNotApprove) {
                     $dataResult[$i]['is_requested'] = true;
-                    $dataResult[$i]['stok_total'] = floor(max(0, (float)$dataResult[$i]['stok_total'] - (float)$dataMaterialRequestNotApprove['qty']) * 100) / 100;
+                    $dataResult[$i]['stok_total'] = round((float)$dataResult[$i]['stok_total'] - (float)$dataMaterialRequestNotApprove['qty'], 2);
                 } else {
                     $dataResult[$i]['is_requested'] = false;
                 }
+                // var_dump($dataResult[$i]['barang'] . "/" . $dataResult[$i]['stock_id'] . "/" . $dataResult[$i]['no_aju'] . "/" . $dataResult[$i]['stok_total']);
 
-                if ($dataResult[$i]['stok_total'] > 0) {
+                if ($dataResult[$i]['stok_total'] > 0.01) {
                     array_push($resultArr, $dataResult[$i]);
                 }
             }
