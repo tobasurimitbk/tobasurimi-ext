@@ -14,7 +14,8 @@
         }
 
         @page {
-            size: 8.27in 5.50in landscape;
+            /* size: 8.27in 5.50in landscape; */
+            size: 8.27in 6in landscape;
             margin: 25px;
             /* Margin diperkecil */
             padding: 25px;
@@ -163,23 +164,28 @@
             <table style="width: 100%;">
                 <tr>
                     <td style="font-size:14px;">
-                        <?= $company['holding_company'] ?> (<?= $company['company'] ?>) <br>
+                        <div style="font-size: 15px; font-weight:bold;">
+                            <u>
+                                <?= $company['holding_company'] ?> (<?= $company['company'] ?>) <br>
+                            </u>
+                        </div>
+                    </td>
+                    <td style="text-align: right;">
+                        Tanggal: <?= date('d-m-Y', strtotime($tanggal))  ?>
+                    </td>
+                </tr>
 
-                    </td>
-                    <td style="text-align: right;">
-                        <u>
-                            Tanggal: <?= date('d-m-Y', strtotime($tanggal))  ?>
-                        </u>
-                    </td>
-                </tr>
-                <tr>
-                    <td></td>
-                    <td style="text-align: right;">
-                        Kwitansi Bulanan <br>
-                        No. Nota : <?= $noKwitansi ?>
-                    </td>
-                </tr>
             </table>
+            <center style="margin-top: 20px;">
+                <div style="font-size: 15px; font-weight:bold;">
+                    <u>
+                        KWITANSI BULANAN
+                    </u>
+                </div>
+                <div style="font-size: 13px;">
+                    No : <?= $noKwitansi ?>
+                </div>
+            </center>
             <div class="w-50 d-flex content-between" style="margin-top: -40px;">
                 <div style="width: 60%;padding: 0.5rem;">
                 </div>
@@ -188,8 +194,8 @@
 
             <table class="w-100 mt-2">
                 <tr>
-                    <td style="vertical-align: top; width: 40%;">SUDAH TERIMA DARI <br> (RECEIVED FROM)</td>
-                    <td style="vertical-align: top;">: </td>
+                    <td style="vertical-align: top; width: 20%;">SUDAH TERIMA DARI <br> (RECEIVED FROM)</td>
+                    <td style="vertical-align: top; width:2%">: </td>
                     <td style="vertical-align: top; width: 55%;"><?= $company['holding_company'] ?> (<?= strtoupper($company['company']) ?>)</td>
                 </tr>
                 <tr>
@@ -204,25 +210,25 @@
                 </tr>
             </table>
 
-            <table class="mt-1" style="width: 30%;border: 0;border-bottom: 3px solid;border-style: double;">
+            <table class="mt-1" style="width: 30%;border: 0;border-bottom: 3px solid;border-style: double; margin-top:35px;">
                 <tr style="font-size:14px;">
-                    <td>Bruto</td>
-                    <td>Rp.</td>
-                    <td class="txt-right"><?= number_format($kwitansi['harga_bulanan'], 2, '.', ',') ?></td>
+                    <td style="height:5%;">Bruto</td>
+                    <td style="height:5%;">Rp.</td>
+                    <td class="txt-right" style="height:2.5%;"><?= number_format($kwitansi['harga_bulanan'], 2, '.', ',') ?></td>
                 </tr>
                 <tr style="font-size:14px;">
-                    <td>PPh</td>
-                    <td>Rp.</td>
-                    <td class="txt-right"><?= number_format($kwitansi['pph'], 2, '.', ',') ?></td>
+                    <td style="height:5%;">PPh</td>
+                    <td style="height:5%;">Rp.</td>
+                    <td class="txt-right" style="height:2.5%;"><?= number_format($kwitansi['pph'], 2, '.', ',') ?></td>
                 </tr>
                 <tr style="font-size:14px;">
-                    <td>Dibayarkan</td>
-                    <td>Rp.</td>
-                    <td class="txt-right"><?= number_format($kwitansi['harga_bulanan_pph'], 2, '.', ',') ?></td>
+                    <td style="height:5%;">Dibayarkan</td>
+                    <td style="height:5%;">Rp.</td>
+                    <td class="txt-right" style="height:2.5%;"><?= number_format($kwitansi['harga_bulanan_pph'], 2, '.', ',') ?></td>
                 </tr>
             </table>
 
-            <div class="w-100" style="margin-top: -20px;text-align:center;">
+            <div class="w-100" style="margin-top: 50px;text-align:center;">
                 <div style="text-align: right;">
                     <div>Medan, <?= date('d-m-Y', strtotime($tanggal))  ?></div>
                     <div>yang Menerima</div><br><br>
@@ -234,38 +240,43 @@
                 <table style="width: 100%;">
                     <tr>
                         <td style="font-size:14px;">
-                            <?= $company['holding_company'] ?> (<?= $company['company'] ?>) <br>
+                            <div style="font-size: 15px; font-weight:bold;">
+                                <u>
+                                    <?= $company['holding_company'] ?> (<?= $company['company'] ?>) <br>
+                                </u>
+                            </div>
+                        </td>
+                        <td style="text-align: right;">
+                            Tanggal: <?= date('d-m-Y', strtotime($tanggal))  ?>
+                        </td>
+                    </tr>
 
-                        </td>
-                        <td style="text-align: right;">
-                            <u>
-                                Tanggal: <?= date('d-m-Y', strtotime($tanggal))  ?>
-                            </u>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td></td>
-                        <td style="text-align: right;">
-                            Kwitansi Bulanan <br>
-                            No. Nota : <?= $noKwitansi ?>
-                        </td>
-                    </tr>
                 </table>
+                <center style="margin-top: 20px;">
+                    <div style="font-size: 15px; font-weight:bold;">
+                        <u>
+                            KWITANSI BULANAN
+                        </u>
+                    </div>
+                    <div style="font-size: 13px;">
+                        No : <?= $noKwitansi ?>
+                    </div>
+                </center>
                 <div class="w-50 d-flex content-between" style="margin-top: -40px;">
                     <div style="width: 60%;padding: 0.5rem;">
                     </div>
-
                 </div>
+
                 <table class="w-100 mt-2">
                     <tr>
-                        <td style="vertical-align: top; width: 40%;">SUDAH TERIMA DARI <br> (RECEIVED FROM)</td>
-                        <td style="vertical-align: top;">: </td>
+                        <td style="vertical-align: top; width: 20%;">SUDAH TERIMA DARI <br> (RECEIVED FROM)</td>
+                        <td style="vertical-align: top; width:2%">: </td>
                         <td style="vertical-align: top; width: 55%;"><?= $company['holding_company'] ?> (<?= strtoupper($company['company']) ?>)</td>
                     </tr>
                     <tr>
                         <td style="vertical-align: top;">BANYAKNYA UANG <br> (AMOUNT)</td>
                         <td style="vertical-align: top;">: </td>
-                        <td style="vertical-align: top;"><?= strtoupper(terbilang(formatter(($kwitansi['harga_bulanan_pph']), "STR_TO_FLOAT"))) ?></td>
+                        <td style="vertical-align: top;"><?= strtoupper(terbilang(formatter(($kwitansi['harga_bulanan_pph']), "STR_TO_FLOAT"))) ?> RUPIAH</td>
                     </tr>
                     <tr>
                         <td style="vertical-align: top;">UNTUK PEMBAYARAN <br> (FOR PAYMENT)</td>
@@ -274,25 +285,25 @@
                     </tr>
                 </table>
 
-                <table class="mt-1" style="width: 30%;border: 0;border-bottom: 3px solid;border-style: double;">
+                <table class="mt-1" style="width: 30%;border: 0;border-bottom: 3px solid;border-style: double; margin-top:35px;">
                     <tr style="font-size:14px;">
-                        <td>Bruto</td>
-                        <td>Rp.</td>
-                        <td class="txt-right"><?= number_format(formatter($kwitansi['harga_bulanan'], "STR_TO_FLOAT"), 2, '.', ',') ?></td>
+                        <td style="height:5%;">Bruto</td>
+                        <td style="height:5%;">Rp.</td>
+                        <td class="txt-right" style="height:2.5%;"><?= number_format($kwitansi['harga_bulanan'], 2, '.', ',') ?></td>
                     </tr>
                     <tr style="font-size:14px;">
-                        <td>PPh</td>
-                        <td>Rp.</td>
-                        <td class="txt-right"><?= number_format($kwitansi['pph'], 2, '.', ',') ?></td>
+                        <td style="height:5%;">PPh</td>
+                        <td style="height:5%;">Rp.</td>
+                        <td class="txt-right" style="height:2.5%;"><?= number_format($kwitansi['pph'], 2, '.', ',') ?></td>
                     </tr>
                     <tr style="font-size:14px;">
-                        <td>Dibayarkan</td>
-                        <td>Rp.</td>
-                        <td class="txt-right"><?= number_format($kwitansi['harga_bulanan_pph'], 2, '.', ',') ?></td>
+                        <td style="height:5%;">Dibayarkan</td>
+                        <td style="height:5%;">Rp.</td>
+                        <td class="txt-right" style="height:2.5%;"><?= number_format($kwitansi['harga_bulanan_pph'], 2, '.', ',') ?></td>
                     </tr>
                 </table>
 
-                <div class="w-100" style="margin-top: -20px;text-align:center;">
+                <div class="w-100" style="margin-top: 50px;text-align:center;">
                     <div style="text-align: right;">
                         <div>Medan, <?= date('d-m-Y', strtotime($tanggal))  ?></div>
                         <div>yang Menerima</div><br><br>

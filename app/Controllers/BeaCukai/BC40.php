@@ -1768,6 +1768,7 @@ class BC40 extends BaseController
             ]);
         }
 
+        $bc40 = $this->bc40Model->where('bc_purchase_order_id', $bcPurchaseOrderID)->first();
         $bcPurchaseOrder = $this->bcPurchaseOrderModel->where('id', $bcPurchaseOrderID)->first();
         if ($bcPurchaseOrder['no_daftar'] == null) {
             return response()->setJSON([
