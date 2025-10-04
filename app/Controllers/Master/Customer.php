@@ -223,6 +223,21 @@ class Customer extends BaseController
                         );
                     }
                 }
+                if ($this->request->getPost("tipe_customer") == "LOKAL") {
+                    $existingCustomer = $this->CustomerModel->where('kode', $kode)
+                        ->where('tipe_customer', 'LOKAL')
+                        ->where('deletedAt', null)
+                        ->first();
+                    if ($existingCustomer) {
+                        $data = [
+                            "status"    => false,
+                            "message"   => "Kode customer sudah ada, silakan generate ulang.",
+                            'token'     => csrf_hash()
+                        ];
+                        echo json_encode($data);
+                        return;
+                    }
+                }
                 $values = [
                     "company_id" => $this->this_company_id,
                     "user_id" => $this->this_user_id,
