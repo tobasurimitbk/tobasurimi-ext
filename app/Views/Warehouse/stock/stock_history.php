@@ -10,10 +10,10 @@
             <div class="row mb-4">
                 <div class="col-sm-4 mt-2">
                     <div class="form-floating">
-                        <select class="form-select divisi_id" id="divisi_id" name="divisi_id" aria-label="Floating label select example">
+                        <select class="form-select divisi_id" id="divisi_id" name="divisi_id">
                             <option value=""></option>
                             <?php foreach ($dataDivisi as $divisi) : ?>
-                                <option value="<?= $divisi["id"]; ?>" <?= !empty($dataPenerimaanBarang) ? ($dataPenerimaanBarang['divisi_id'] === $divisi["id"] ? "selected" : "") : ""; ?>><?= strtoupper($divisi["divisi"]); ?></option>
+                                <option value="<?= $divisi["id"]; ?>"><?= strtoupper($divisi["divisi"]); ?></option>
                             <?php endforeach; ?>
                         </select>
                         <label style="z-index: 1;">Departemen</label>
@@ -21,22 +21,16 @@
                 </div>
                 <div class="col-sm-4 mt-2">
                     <div class="form-floating">
-                        <select class="form-select warehouse_id" id="warehouse_id" name="warehouse_id" aria-label="Floating label select example">
+                        <select class="form-select warehouse_id" id="warehouse_id" name="warehouse_id">
 
                         </select>
                         <label style="z-index: 1;">Warehouse</label>
                     </div>
                 </div>
-                <div class="col-sm-4 mt-2">
-                    <div class="form-floating" style="height: 50px;">
-                        <input placeholder="" class="form-control search" id="search" name="search" aria-label="Floating label select example" />
-                        <label style="z-index: 1;" style="z-index: 1;">Cari Data </label>
-                    </div>
-                </div>
                 <div class="col-md-4 mt-2">
                     <div class="input-group">
                         <div class="form-floating" style="height: 50px;">
-                            <input placeholder="" class="form-control dateStart" id="dateStart" name="dateStart" aria-label="Floating label select example" />
+                            <input placeholder="" class="form-control dateStart" id="dateStart" name="dateStart" />
                             <label style="z-index: 1;" style="z-index: 1;">Tanggal Awal</label>
                         </div>
                         <div class="input-group-append" style="height:50px;">
@@ -49,7 +43,7 @@
                 <div class="col-md-4 mt-2">
                     <div class="input-group">
                         <div class="form-floating" style="height: 50px;">
-                            <input placeholder="" class="form-control dateEnd" id="dateEnd" name="dateEnd" aria-label="Floating label select example" />
+                            <input placeholder="" class="form-control dateEnd" id="dateEnd" name="dateEnd" />
                             <label style="z-index: 1;" style="z-index: 1;">Tanggal Akhir</label>
                         </div>
                         <div class="input-group-append" style="height:50px;">
@@ -59,25 +53,42 @@
                         </div>
                     </div>
                 </div>
+                <div class="col-sm-4 mt-2">
+                    <div class="form-floating">
+                        <select class="form-select sumber_barang" id="sumber_barang" name="sumber_barang">
+                            <option value=""></option>
+                            <?php foreach ($sumberBarang as $s) : ?>
+                                <option <?= $s == "PO LOKAL BAKU" ? "selected" : "" ?> value="<?= $s; ?>"><?= $s; ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                        <label style="z-index: 1;">Sumber Barang</label>
+                    </div>
+                </div>
+                <div class="col-sm-4 mt-2">
+                    <div class="form-floating" style="height: 50px;">
+                        <input placeholder="" class="form-control search" id="search" name="search" />
+                        <label style="z-index: 1;" style="z-index: 1;">Cari Data </label>
+                    </div>
+                </div>
             </div>
             <div class="table-responsive">
                 <table class="table table-bordered nowrap table-hover-tobasurimi dataTable" id="dataTable" width="100%" cellspacing="0">
                     <thead class="thead-dark">
                         <tr>
                             <th>No</th>
-                            <th>Tipe Barang</th>
-                            <th onclick="changeSort('stock_details2.supplier_id')">Supplier</th>
-                            <th>Kode Barang</th>
-                            <th onclick="changeSort('barang_master.barang_name')">Barang</th>
-                            <th onclick="changeSort('divisis.divisi')">Departemen</th>
-                            <th onclick="changeSort('warehouses.warehouse_name')">Warehouse</th>
-                            <th onclick="changeSort('stock_details2.bc_id')">Dokumen Pabean</th>
-                            <th onclick="changeSort('stock_details2.bc_id')">Dokumen Referensi</th>
-                            <th onclick="changeSort('stock_details.sumber')">Sumber</th>
-                            <th onclick="changeSort('stock_details.no_dokumen')">Referensi</th>
-                            <th onclick="changeSort('stock_details.keterangan')">Keterangan</th>
-                            <th onclick="changeSort('stock_details2.tanggal')">Tanggal</th>
-                            <th onclick="changeSort('stock_details2.qty')">Qty</th>
+                            <th onclick="changeSort('supplier_id')">Supplier / Vendor</th>
+                            <th onclick="changeSort('kode_barang')">Kode Barang</th>
+                            <th onclick="changeSort('barang_name')">Barang</th>
+                            <th onclick="changeSort('spesifikasi')">Spesifikasi</th>
+                            <th onclick="changeSort('divisi_id')">Dept</th>
+                            <th onclick="changeSort('warehouse_id')">Warehouse</th>
+                            <th onclick="changeSort('type_bc')">Doc</th>
+                            <th onclick="changeSort('po_id')">No Po</th>
+                            <th onclick="changeSort('reference_id')">Ref No</th>
+                            <th onclick="changeSort('tanggal_po')">Tgl Po</th>
+                            <th onclick="changeSort('createdAt')">Tgl Log</th>
+                            <th onclick="changeSort('qty_diterima')">Qty</th>
+                            <th onclick="changeSort('unit_id')">Unit</th>
                         </tr>
                     </thead>
                     <tbody class="body-table" id="body-table">
@@ -96,7 +107,6 @@
     let sortType = "desc";
 
     const table = $('.dataTable').DataTable({
-
         processing: true,
         serverSide: true,
         ordering: true,
@@ -118,6 +128,7 @@
                 data.warehouse_id = $("#warehouse_id option:selected").val();
                 data.dateStart = $('#dateStart').val();
                 data.dateEnd = $('#dateEnd').val();
+                data.sumber_barang = $('#sumber_barang option:selected').val();
                 data.sort = sort;
                 data.sortType = sortType;
             },
@@ -131,68 +142,73 @@
         searching: false,
         columns: [{
                 data: "no",
-                className: "text-center",
-                orderable: false
-            },
-            {
-                data: "parent_type",
-                className: "text-center",
+                className: "text-left",
                 orderable: false
             },
             {
                 data: "supplier_name",
-                className: "text-center",
+                className: "text-left",
             },
             {
                 data: "kode_barang",
-                className: "text-center",
-                orderable: false
+                className: "text-left",
             },
             {
-                data: "barang",
-                className: "text-center",
-                orderable: false
+                data: "barang_name",
+                className: "text-left",
+            },
+            {
+                data: "spesifikasi",
+                className: "text-left",
             },
             {
                 data: "divisi",
-                className: "text-center",
-                orderable: false
+                className: "text-left",
+            },
+            {
+                data: "warehouse_name",
+                className: "text-left",
+            },
+            {
+                data: "type_bc",
+                className: "text-left"
+            },
+            {
+                data: "po_no",
+                className: "text-left",
+            },
+            {
+                data: "ref_no",
+                className: "text-left",
+            },
+            {
+                data: "tanggal_po",
+                className: "text-left",
+            },
+            {
+                data: "createdAt",
+                className: "text-left",
+            },
+            {
+                data: "qty",
+                className: "text-left",
+                render: function(data, type, row) {
+                    let status = row.status;
+                    let qty = row.qty;
+                    let simbol = "";
 
-            },
-            {
-                data: "warehouse",
-                className: "text-center",
-                orderable: false
-            },
-            {
-                data: "dokumen_pabean",
-                className: "text-center"
-            },
-            {
-                data: "dokumen_referensi",
-                className: "text-center",
-                orderable: false
-            },
-            {
-                data: "sumber",
-                className: "text-center",
-            },
+                    if (status == "IN") {
+                        simbol = "(+)";
+                    } else {
+                        simbol = "(-)";
+                    }
 
-            {
-                data: "dokumen",
-                className: "text-center",
+                    return simbol + " " + greatFormatRupiah(data);
+                }
             },
             {
-                data: "keterangan",
-                className: "text-center",
-            },
-            {
-                data: "tanggal",
-                className: "text-center",
-            },
-            {
-                data: "stok",
-                className: "text-center",
+                data: "kode_satuan",
+                className: "text-left",
             },
         ],
         "drawCallback": function(settings) {
@@ -268,14 +284,14 @@
         table.ajax.reload();
     });
 
-    $('#status_stok').select2({
-        placeholder: "Pilih Status Stok",
+    $('#sumber_barang').select2({
+        placeholder: "Pilih Sumber Barang",
         theme: "bootstrap-5",
     }).change(function() {
         table.ajax.reload();
     });
 
-    $('.search').change(function() {
+    $('.search').keyup(function() {
         table.ajax.reload();
     });
 
@@ -283,7 +299,7 @@
         table.ajax.reload();
     });
 
-    $("#parent_type,#divisi_id,#warehouse_id,#parent_name,#status_stok")
+    $("#parent_type,#divisi_id,#warehouse_id,#sumber_barang")
         .parent('div')
         .children('span')
         .children('span')
