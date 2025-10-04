@@ -344,6 +344,46 @@ class Customer extends BaseController
 
                 $id = decrypt($this->request->getPost("id"));
 
+                $kode = $this->request->getPost("kode");
+                if (empty($kode)) {
+                    $bln = date('m');
+                    $thn2 = date('y');
+                    $tipeCustomer = $this->request->getPost("tipe_customer");
+
+                    if ($tipeCustomer == "LOKAL") {
+                        // KODE CUSTOMER LOKAL
+                        $kode = $this->CustomerModel->get_kode(
+                            $bln,
+                            $thn2,
+                            "LOKAL"
+                        );
+                    } else {
+                        // KODE CUSTOMER IMPORT
+                        $kode = $this->CustomerModel->get_kode(
+                            $bln,
+                            $thn2,
+                            "INTERNASIONAL"
+                        );
+                    }
+                }
+
+                if ($this->request->getPost("tipe_customer") == "LOKAL") {
+                    $existingCustomer = $this->CustomerModel->where('kode', $kode)
+                        ->where('tipe_customer', 'LOKAL')
+                        ->where('deletedAt', null)
+                        ->first();
+                    $userNow = $this->CustomerModel->find($id);
+                    if ($existingCustomer && $userNow && $existingCustomer['id'] != $userNow['id']) {
+                        $data = [
+                            "status"    => false,
+                            "message"   => "Kode customer sudah ada, silakan generate ulang.",
+                            'token'     => csrf_hash()
+                        ];
+                        echo json_encode($data);
+                        return;
+                    }
+                }
+
                 $values = [
                     "company_id" => $this->this_company_id,
                     // "user_id" => $this->this_user_id,
