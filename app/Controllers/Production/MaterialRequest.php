@@ -244,7 +244,7 @@ class MaterialRequest extends BaseController
 
                     $selisih = $stokTotal - (float) $dataMaterialRequestNotApprove['qty'];
 
-                    $value['realStok'] = floor(max(0, $selisih) * 100) / 100;
+                    $value['realStok'] = round(max(0, $selisih), 2);
                 } else {
                     $value['is_requested'] = false;
                 }
@@ -1622,13 +1622,13 @@ class MaterialRequest extends BaseController
                 
                 if ($dataMaterialRequestNotApprove) {
                     $dataResult[$i]['is_requested'] = true;
-                    $dataResult[$i]['stok_total'] = round((float)$dataResult[$i]['stok_total'] - (float)$dataMaterialRequestNotApprove['qty'], 2);
+                    $dataResult[$i]['stok_total'] = round(max(0, (float)$dataResult[$i]['stok_total'] - (float)$dataMaterialRequestNotApprove['qty']), 2);
                 } else {
                     $dataResult[$i]['is_requested'] = false;
                 }
                 // var_dump($dataResult[$i]['barang'] . "/" . $dataResult[$i]['stock_id'] . "/" . $dataResult[$i]['no_aju'] . "/" . $dataResult[$i]['stok_total']);
 
-                if ($dataResult[$i]['stok_total'] > 0.01) {
+                if ($dataResult[$i]['stok_total'] > 0) {
                     array_push($resultArr, $dataResult[$i]);
                 }
             }
