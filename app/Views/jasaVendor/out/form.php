@@ -467,7 +467,7 @@
                 type_barang: "<?= $m['type_barang'] ?>",
                 type_barang_text: "<?= $m['type_barang_text'] ?>",
                 stock_date: "<?= $m['stock_date'] ?>",
-                qty: "<?= floatval($m['qty']) + (!empty($m['qty_kotor']) ? floatval($m['qty_kotor']) : 0) ?>",
+                qty: "<?= floatval($m['qty']) ?>",
             });
         <?php endforeach; ?>
         drawTableSelectedItem(listStockSelected);

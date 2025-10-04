@@ -446,8 +446,8 @@ class UpdateStockBahanBaku extends BaseController
                     ->where('id', $p['stock_detail_id'])
                     ->first();
 
-                $oldQty = $oldDetail ? (int)$oldDetail['qty_diterima'] : 0;
-                $newQty = (int)$p['qty_diterima'];
+                $oldQty = $oldDetail ? $oldDetail['qty_diterima'] : 0;
+                $newQty = $p['qty_diterima'];
 
                 // hitung selisih
                 $selisih = $newQty - $oldQty;

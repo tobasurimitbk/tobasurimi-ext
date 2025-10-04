@@ -1768,6 +1768,7 @@ class BC40 extends BaseController
             ]);
         }
 
+        $bc40 = $this->bc40Model->where('bc_purchase_order_id', $bcPurchaseOrderID)->first();
         $bcPurchaseOrder = $this->bcPurchaseOrderModel->where('id', $bcPurchaseOrderID)->first();
         if ($bcPurchaseOrder['no_daftar'] == null) {
             return response()->setJSON([
@@ -2585,17 +2586,21 @@ class BC40 extends BaseController
 
         return view('BeaCukai/bc-40/bc40outstanding', $data);
     }
+
     public function allOutstandingServerSide()
     {
         $draw = $this->request->getGet('draw');
-        $start = $this->request->getGet('start');
-        $length = $this->request->getGet('length');
+        $start = (int)$this->request->getGet('start');
+        $length = (int)$this->request->getGet('length');
         $searchValue = $this->request->getGet('search');
         $dateStart = $this->request->getVar("dateStart") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateStart")))) : "";
         $dateEnd =  $this->request->getVar("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateEnd")))) : "";
         $tipeBahan = $this->request->getGet('tipe_bahan');
         $divisiId = $this->request->getGet('divisi_id');
 
+        $db = \Config\Database::connect();
+
+        // --- Cari LPB yang sudah dipakai ---
         $lpbUsed = $this->bcPurchaseOrderModel
             ->where('company_id', $this->this_company_id)
             ->where('deletedAt', null)
@@ -2609,129 +2614,164 @@ class BC40 extends BaseController
             }
         }
 
-        $db = \Config\Database::connect();
-
+        // --- Build Filter ---
         $where = [];
         if (!empty($dateStart) && !empty($dateEnd)) {
-            $where[] = "lpb_date BETWEEN '$dateStart' AND '$dateEnd'";
+            $where[] = "pb.tanggal BETWEEN '$dateStart' AND '$dateEnd'";
         }
         if (!empty($tipeBahan)) {
-            $where[] = "tipe_bahan = '$tipeBahan'";
+            $where[] = "pb.tipe_bahan = '$tipeBahan'";
         }
         if (!empty($divisiId)) {
-            $where[] = "divisis_id = '$divisiId'";
+            $where[] = "pb.divisi_id = '$divisiId'";
         }
         if (!empty($searchValue)) {
             $search = $db->escapeLikeString($searchValue);
-            $where[] = "(supplier LIKE '%$search%' OR barang_name LIKE '%$search%' OR no_penerimaan_barang LIKE '%$search%' OR po_no LIKE '%$search%')";
+            $where[] = "(s.name LIKE '%$search%' 
+                     OR bm.barang_name LIKE '%$search%' 
+                     OR pb.no_penerimaan_barang LIKE '%$search%' 
+                     OR pod.po_no LIKE '%$search%')";
         }
+        $filterCondition = !empty($where) ? " AND " . implode(" AND ", $where) : "";
+
+        // --- LPB sudah dipakai ---
+        $lpbUsedSubquery = "";
         if (!empty($lpbUsedArr)) {
             $ids = implode(',', array_map('intval', $lpbUsedArr));
-            $where[] = "id NOT IN ($ids)";
+            $lpbUsedSubquery = " AND pb.id NOT IN ($ids)";
         }
 
-        $filterCondition = !empty($where) ? "WHERE " . implode(" AND ", $where) : "";
-
-        // UNION query
-        $mainQuery = "
-        SELECT * FROM (
-            SELECT 
-                pb.id,
-                pb.tanggal AS lpb_date,
-                pb.no_penerimaan_barang,
-                pb.status_penerimaan,
-                pb.tipe_bahan,
-                pb.jumlah_kemasan,
-                divisis.id AS divisis_id,
-                divisis.divisi,
-                pod.po_no,
-                pod.po_date,
-                bm.barang_name,
-                bm.kode_barang,
-                s.name AS supplier,
-                satuan_lpb.kode_satuan AS kode_satuan_lpb,
-                satuan_po.kode_satuan AS kode_satuan_po,
-                satuan_kemasan.kode_satuan AS kode_satuan_kemasan,
-                kemasan.name AS nama_kemasan,
-                SUM(pbd.qty) AS qty_po,
-                SUM(pbd.jml_masuk) AS qty_lpb,
-                pod.total_before_pph AS sub_total,
-                pb.updatedAt
-            FROM penerimaan_barang pb
-            LEFT JOIN penerimaan_barang_detail pbd ON pbd.penerimaan_barang_id = pb.id
-            LEFT JOIN rm_purchase_orders pod ON pod.id = pbd.purchase_order_id
-            LEFT JOIN barang_master bm ON bm.id = pbd.barang_id
-            LEFT JOIN suppliers s ON s.id = pb.supplier_id
-            LEFT JOIN satuans satuan_lpb ON satuan_lpb.id = pbd.unit_konversi
-            LEFT JOIN satuans satuan_po ON satuan_po.id = pbd.unit
-            LEFT JOIN kemasan ON kemasan.id = pb.kemasan_id
-            LEFT JOIN satuans satuan_kemasan ON satuan_kemasan.id = kemasan.satuan_id
-            LEFT JOIN divisis ON divisis.id = pb.divisi_id
-            WHERE pb.tipe_bahan = 'BAKU'
-                AND pb.deletedAt IS NULL
-                AND pbd.deletedAt IS NULL
+        // --- Base Query (dua UNION) ---
+        $baseQuery = "
+            (
+                SELECT 
+                    pb.id,
+                    pb.tanggal AS lpb_date,
+                    pb.no_penerimaan_barang,
+                    pb.status_penerimaan,
+                    pb.tipe_bahan,
+                    pb.jumlah_kemasan,
+                    divisis.divisi,
+                    pod.po_no,
+                    pod.po_date,
+                    bm.barang_name,
+                    bm.kode_barang,
+                    s.name AS supplier,
+                    satuan_lpb.kode_satuan AS kode_satuan_lpb,
+                    satuan_po.kode_satuan AS kode_satuan_po,
+                    satuan_kemasan.kode_satuan AS kode_satuan_kemasan,
+                    kemasan.name AS nama_kemasan,
+                    SUM(pbd.qty) AS qty_po,
+                    SUM(pbd.jml_masuk) AS qty_lpb,
+                    pod.total_before_pph AS sub_total,
+                    pb.updatedAt
+                FROM penerimaan_barang pb
+                JOIN penerimaan_barang_detail pbd 
+                    ON pbd.penerimaan_barang_id = pb.id 
+                    AND pbd.deletedAt IS NULL
+                LEFT JOIN rm_purchase_orders pod ON pod.id = pbd.purchase_order_id
+                LEFT JOIN barang_master bm ON bm.id = pbd.barang_id
+                LEFT JOIN suppliers s ON s.id = pb.supplier_id
+                LEFT JOIN satuans satuan_lpb ON satuan_lpb.id = pbd.unit_konversi
+                LEFT JOIN satuans satuan_po ON satuan_po.id = pbd.unit
+                LEFT JOIN kemasan ON kemasan.id = pb.kemasan_id
+                LEFT JOIN satuans satuan_kemasan ON satuan_kemasan.id = kemasan.satuan_id
+                LEFT JOIN divisis ON divisis.id = pb.divisi_id
+                WHERE pb.deletedAt IS NULL
                 AND pb.status_penerimaan = 'LOKAL'
                 AND pb.status_post = 'FINISH'
                 AND pb.bc_type = '53'
                 AND pb.company_id = '{$this->this_company_id}'
-            GROUP BY pb.id, pbd.barang_id
-
+                AND pb.tipe_bahan = 'BAKU'
+                $filterCondition
+                $lpbUsedSubquery
+                GROUP BY pb.id, pbd.barang_id
+            )
             UNION ALL
-
-            SELECT 
-                pb.id,
-                pb.tanggal AS lpb_date,
-                pb.no_penerimaan_barang,
-                pb.status_penerimaan,
-                pb.tipe_bahan,
-                pb.jumlah_kemasan,
-                divisis.id as divisis_id,
-                divisis.divisi,
-                pod.po_no,
-                pod.po_date,
-                bm.barang_name,
-                bm.kode_barang,
-                s.name AS supplier,
-                satuan_lpb.kode_satuan AS kode_satuan_lpb,
-                satuan_po.kode_satuan AS kode_satuan_po,
-                satuan_kemasan.kode_satuan AS kode_satuan_kemasan,
-                kemasan.name AS nama_kemasan,
-                SUM(pbd.qty) AS qty_po,
-                SUM(pbd.jml_masuk) AS qty_lpb,
-                SUM(pbd.sub_total) AS sub_total,
-                pb.updatedAt
-            FROM penerimaan_barang pb
-            LEFT JOIN penerimaan_barang_detail pbd ON pbd.penerimaan_barang_id = pb.id
-            LEFT JOIN am_purchase_orders pod ON pod.id = pbd.purchase_order_id
-            LEFT JOIN barang_master bm ON bm.id = pbd.barang_id
-            LEFT JOIN suppliers s ON s.id = pb.supplier_id
-            LEFT JOIN satuans satuan_lpb ON satuan_lpb.id = pbd.unit_konversi
-            LEFT JOIN satuans satuan_po ON satuan_po.id = pbd.unit
-            LEFT JOIN kemasan ON kemasan.id = pb.kemasan_id
-            LEFT JOIN satuans satuan_kemasan ON satuan_kemasan.id = kemasan.satuan_id
-            LEFT JOIN divisis ON divisis.id = pb.divisi_id
-            WHERE pb.tipe_bahan = 'PENOLONG'
-                AND pb.deletedAt IS NULL
-                AND pbd.deletedAt IS NULL
+            (
+                SELECT 
+                    pb.id,
+                    pb.tanggal AS lpb_date,
+                    pb.no_penerimaan_barang,
+                    pb.status_penerimaan,
+                    pb.tipe_bahan,
+                    pb.jumlah_kemasan,
+                    divisis.divisi,
+                    pod.po_no,
+                    pod.po_date,
+                    bm.barang_name,
+                    bm.kode_barang,
+                    s.name AS supplier,
+                    satuan_lpb.kode_satuan AS kode_satuan_lpb,
+                    satuan_po.kode_satuan AS kode_satuan_po,
+                    satuan_kemasan.kode_satuan AS kode_satuan_kemasan,
+                    kemasan.name AS nama_kemasan,
+                    SUM(pbd.qty) AS qty_po,
+                    SUM(pbd.jml_masuk) AS qty_lpb,
+                    SUM(pbd.sub_total) AS sub_total,
+                    pb.updatedAt
+                FROM penerimaan_barang pb
+                JOIN penerimaan_barang_detail pbd 
+                    ON pbd.penerimaan_barang_id = pb.id 
+                    AND pbd.deletedAt IS NULL
+                LEFT JOIN am_purchase_orders pod ON pod.id = pbd.purchase_order_id
+                LEFT JOIN barang_master bm ON bm.id = pbd.barang_id
+                LEFT JOIN suppliers s ON s.id = pb.supplier_id
+                LEFT JOIN satuans satuan_lpb ON satuan_lpb.id = pbd.unit_konversi
+                LEFT JOIN satuans satuan_po ON satuan_po.id = pbd.unit
+                LEFT JOIN kemasan ON kemasan.id = pb.kemasan_id
+                LEFT JOIN satuans satuan_kemasan ON satuan_kemasan.id = kemasan.satuan_id
+                LEFT JOIN divisis ON divisis.id = pb.divisi_id
+                WHERE pb.deletedAt IS NULL
                 AND pb.status_penerimaan = 'LOKAL'
                 AND pb.status_post = 'FINISH'
                 AND pb.bc_type = '53'
                 AND pb.company_id = '{$this->this_company_id}'
-            GROUP BY pb.id, pbd.barang_id
-        ) AS dropdown
-        $filterCondition
-    ";
+                AND pb.tipe_bahan = 'PENOLONG'
+                $filterCondition
+                $lpbUsedSubquery
+                GROUP BY pb.id, pbd.barang_id
+            )
+            ";
 
-        // Get total filtered records
-        $countQuery = $db->query($mainQuery);
-        $totalFiltered = count($countQuery->getResultArray());
+        // --- Ambil order dari DataTables ---
+        $orderColumnIndex = $this->request->getGet('order')[0]['column'] ?? null;
+        $orderDir = $this->request->getGet('order')[0]['dir'] ?? 'asc';
+
+        // Mapping index kolom DataTables ke nama kolom SQL
+        $columns = [
+            'lpb_date',
+            'no_penerimaan_barang',
+            'supplier',
+            'po_no',
+            'po_date',
+            'barang_name',
+            'kode_barang',
+            'qty_po',
+            'qty_lpb',
+            'sub_total',
+            'updatedAt'
+        ];
+
+        $orderBy = "";
+        if ($orderColumnIndex !== null && isset($columns[$orderColumnIndex])) {
+            $col = $columns[$orderColumnIndex];
+            $dir = strtoupper($orderDir) === 'DESC' ? 'DESC' : 'ASC';
+            $orderBy = " ORDER BY $col $dir ";
+        }
+
+        // --- Hitung total records (tanpa LIMIT) ---
+        $countQuery = "SELECT COUNT(*) as cnt FROM ($baseQuery) as x";
+        $totalFiltered = $db->query($countQuery)->getRow()->cnt;
         $totalRecords = $totalFiltered;
 
-        // Add pagination
-        $mainQuery .= " LIMIT $length OFFSET $start";
 
+
+        // --- Data dengan pagination ---
+        $mainQuery = $baseQuery . " $orderBy LIMIT $length OFFSET $start";
         $data = $db->query($mainQuery)->getResultArray();
 
+        // --- Formatting untuk DataTables ---
         $formatted = [];
         $no = $start + 1;
 
@@ -2764,6 +2804,7 @@ class BC40 extends BaseController
         ]);
     }
 
+
     public function allOutstandingExcel()
     {
         $dateStart = $this->request->getVar("dateStart") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateStart")))) : "";
@@ -2771,10 +2812,12 @@ class BC40 extends BaseController
         $tipeBahan = $this->request->getGet('tipe_bahan');
         $divisiId = $this->request->getGet('divisi_id');
 
+        $db = \Config\Database::connect();
+
+        // --- Cari LPB yang sudah dipakai ---
         $lpbUsed = $this->bcPurchaseOrderModel
             ->where('company_id', $this->this_company_id)
             ->where('deletedAt', null)
-            ->whereIn('po_type', ["LOKAL BAKU", "LOKAL PENOLONG"])
             ->findAll();
 
         $lpbUsedArr = [];
@@ -2785,120 +2828,127 @@ class BC40 extends BaseController
             }
         }
 
-        $db = \Config\Database::connect();
-
+        // --- Build Filter ---
         $where = [];
         if (!empty($dateStart) && !empty($dateEnd)) {
-            $where[] = "lpb_date BETWEEN '$dateStart' AND '$dateEnd'";
+            $where[] = "pb.tanggal BETWEEN '$dateStart' AND '$dateEnd'";
         }
         if (!empty($tipeBahan)) {
-            $where[] = "tipe_bahan = '$tipeBahan'";
+            $where[] = "pb.tipe_bahan = '$tipeBahan'";
         }
         if (!empty($divisiId)) {
-            $where[] = "divisis_id = '$divisiId'";
+            $where[] = "pb.divisi_id = '$divisiId'";
         }
         if (!empty($searchValue)) {
             $search = $db->escapeLikeString($searchValue);
-            $where[] = "(supplier LIKE '%$search%' OR barang_name LIKE '%$search%' OR no_penerimaan_barang LIKE '%$search%' OR po_no LIKE '%$search%')";
+            $where[] = "(s.name LIKE '%$search%' 
+                     OR bm.barang_name LIKE '%$search%' 
+                     OR pb.no_penerimaan_barang LIKE '%$search%' 
+                     OR pod.po_no LIKE '%$search%')";
         }
+        $filterCondition = !empty($where) ? " AND " . implode(" AND ", $where) : "";
+
+        // --- LPB sudah dipakai ---
+        $lpbUsedSubquery = "";
         if (!empty($lpbUsedArr)) {
             $ids = implode(',', array_map('intval', $lpbUsedArr));
-            $where[] = "id NOT IN ($ids)";
+            $lpbUsedSubquery = " AND pb.id NOT IN ($ids)";
         }
 
-        $filterCondition = !empty($where) ? "WHERE " . implode(" AND ", $where) : "";
-
-        // UNION query
-        $mainQuery = "
-        SELECT * FROM (
-            SELECT 
-                pb.id,
-                pb.tanggal AS lpb_date,
-                pb.no_penerimaan_barang,
-                pb.status_penerimaan,
-                pb.tipe_bahan,
-                pb.jumlah_kemasan,
-                divisis.id AS divisis_id,
-                divisis.divisi,
-                pod.po_no,
-                pod.po_date,
-                bm.barang_name,
-                bm.kode_barang,
-                s.name AS supplier,
-                satuan_lpb.kode_satuan AS kode_satuan_lpb,
-                satuan_po.kode_satuan AS kode_satuan_po,
-                satuan_kemasan.kode_satuan AS kode_satuan_kemasan,
-                kemasan.name AS nama_kemasan,
-                SUM(pbd.qty) AS qty_po,
-                SUM(pbd.jml_masuk) AS qty_lpb,
-                pod.total_before_pph AS sub_total,
-                pb.updatedAt
-            FROM penerimaan_barang pb
-            LEFT JOIN penerimaan_barang_detail pbd ON pbd.penerimaan_barang_id = pb.id
-            LEFT JOIN rm_purchase_orders pod ON pod.id = pbd.purchase_order_id
-            LEFT JOIN barang_master bm ON bm.id = pbd.barang_id
-            LEFT JOIN suppliers s ON s.id = pb.supplier_id
-            LEFT JOIN satuans satuan_lpb ON satuan_lpb.id = pbd.unit_konversi
-            LEFT JOIN satuans satuan_po ON satuan_po.id = pbd.unit
-            LEFT JOIN kemasan ON kemasan.id = pb.kemasan_id
-            LEFT JOIN satuans satuan_kemasan ON satuan_kemasan.id = kemasan.satuan_id
-            LEFT JOIN divisis ON divisis.id = pb.divisi_id
-            WHERE pb.tipe_bahan = 'BAKU'
-                AND pb.deletedAt IS NULL
-                AND pbd.deletedAt IS NULL
+        // --- Base Query (dua UNION) ---
+        $baseQuery = "
+            (
+                SELECT 
+                    pb.id,
+                    pb.tanggal AS lpb_date,
+                    pb.no_penerimaan_barang,
+                    pb.status_penerimaan,
+                    pb.tipe_bahan,
+                    pb.jumlah_kemasan,
+                    divisis.divisi,
+                    pod.po_no,
+                    pod.po_date,
+                    bm.barang_name,
+                    bm.kode_barang,
+                    s.name AS supplier,
+                    satuan_lpb.kode_satuan AS kode_satuan_lpb,
+                    satuan_po.kode_satuan AS kode_satuan_po,
+                    satuan_kemasan.kode_satuan AS kode_satuan_kemasan,
+                    kemasan.name AS nama_kemasan,
+                    SUM(pbd.qty) AS qty_po,
+                    SUM(pbd.jml_masuk) AS qty_lpb,
+                    pod.total_before_pph AS sub_total,
+                    pb.updatedAt
+                FROM penerimaan_barang pb
+                JOIN penerimaan_barang_detail pbd 
+                    ON pbd.penerimaan_barang_id = pb.id 
+                    AND pbd.deletedAt IS NULL
+                LEFT JOIN rm_purchase_orders pod ON pod.id = pbd.purchase_order_id
+                LEFT JOIN barang_master bm ON bm.id = pbd.barang_id
+                LEFT JOIN suppliers s ON s.id = pb.supplier_id
+                LEFT JOIN satuans satuan_lpb ON satuan_lpb.id = pbd.unit_konversi
+                LEFT JOIN satuans satuan_po ON satuan_po.id = pbd.unit
+                LEFT JOIN kemasan ON kemasan.id = pb.kemasan_id
+                LEFT JOIN satuans satuan_kemasan ON satuan_kemasan.id = kemasan.satuan_id
+                LEFT JOIN divisis ON divisis.id = pb.divisi_id
+                WHERE pb.deletedAt IS NULL
                 AND pb.status_penerimaan = 'LOKAL'
                 AND pb.status_post = 'FINISH'
                 AND pb.bc_type = '53'
                 AND pb.company_id = '{$this->this_company_id}'
-            GROUP BY pb.id, pbd.barang_id
-
+                AND pb.tipe_bahan = 'BAKU'
+                $filterCondition
+                $lpbUsedSubquery
+                GROUP BY pb.id, pbd.barang_id
+            )
             UNION ALL
-
-            SELECT 
-                pb.id,
-                pb.tanggal AS lpb_date,
-                pb.no_penerimaan_barang,
-                pb.status_penerimaan,
-                pb.tipe_bahan,
-                pb.jumlah_kemasan,
-                divisis.id as divisis_id,
-                divisis.divisi,
-                pod.po_no,
-                pod.po_date,
-                bm.barang_name,
-                bm.kode_barang,
-                s.name AS supplier,
-                satuan_lpb.kode_satuan AS kode_satuan_lpb,
-                satuan_po.kode_satuan AS kode_satuan_po,
-                satuan_kemasan.kode_satuan AS kode_satuan_kemasan,
-                kemasan.name AS nama_kemasan,
-                SUM(pbd.qty) AS qty_po,
-                SUM(pbd.jml_masuk) AS qty_lpb,
-                SUM(pbd.sub_total) AS sub_total,
-                pb.updatedAt
-            FROM penerimaan_barang pb
-            LEFT JOIN penerimaan_barang_detail pbd ON pbd.penerimaan_barang_id = pb.id
-            LEFT JOIN am_purchase_orders pod ON pod.id = pbd.purchase_order_id
-            LEFT JOIN barang_master bm ON bm.id = pbd.barang_id
-            LEFT JOIN suppliers s ON s.id = pb.supplier_id
-            LEFT JOIN satuans satuan_lpb ON satuan_lpb.id = pbd.unit_konversi
-            LEFT JOIN satuans satuan_po ON satuan_po.id = pbd.unit
-            LEFT JOIN kemasan ON kemasan.id = pb.kemasan_id
-            LEFT JOIN satuans satuan_kemasan ON satuan_kemasan.id = kemasan.satuan_id
-            LEFT JOIN divisis ON divisis.id = pb.divisi_id
-            WHERE pb.tipe_bahan = 'PENOLONG'
-                AND pb.deletedAt IS NULL
-                AND pbd.deletedAt IS NULL
+            (
+                SELECT 
+                    pb.id,
+                    pb.tanggal AS lpb_date,
+                    pb.no_penerimaan_barang,
+                    pb.status_penerimaan,
+                    pb.tipe_bahan,
+                    pb.jumlah_kemasan,
+                    divisis.divisi,
+                    pod.po_no,
+                    pod.po_date,
+                    bm.barang_name,
+                    bm.kode_barang,
+                    s.name AS supplier,
+                    satuan_lpb.kode_satuan AS kode_satuan_lpb,
+                    satuan_po.kode_satuan AS kode_satuan_po,
+                    satuan_kemasan.kode_satuan AS kode_satuan_kemasan,
+                    kemasan.name AS nama_kemasan,
+                    SUM(pbd.qty) AS qty_po,
+                    SUM(pbd.jml_masuk) AS qty_lpb,
+                    SUM(pbd.sub_total) AS sub_total,
+                    pb.updatedAt
+                FROM penerimaan_barang pb
+                JOIN penerimaan_barang_detail pbd 
+                    ON pbd.penerimaan_barang_id = pb.id 
+                    AND pbd.deletedAt IS NULL
+                LEFT JOIN am_purchase_orders pod ON pod.id = pbd.purchase_order_id
+                LEFT JOIN barang_master bm ON bm.id = pbd.barang_id
+                LEFT JOIN suppliers s ON s.id = pb.supplier_id
+                LEFT JOIN satuans satuan_lpb ON satuan_lpb.id = pbd.unit_konversi
+                LEFT JOIN satuans satuan_po ON satuan_po.id = pbd.unit
+                LEFT JOIN kemasan ON kemasan.id = pb.kemasan_id
+                LEFT JOIN satuans satuan_kemasan ON satuan_kemasan.id = kemasan.satuan_id
+                LEFT JOIN divisis ON divisis.id = pb.divisi_id
+                WHERE pb.deletedAt IS NULL
                 AND pb.status_penerimaan = 'LOKAL'
                 AND pb.status_post = 'FINISH'
                 AND pb.bc_type = '53'
                 AND pb.company_id = '{$this->this_company_id}'
-            GROUP BY pb.id, pbd.barang_id
-        ) AS dropdown
-        $filterCondition
-    ";
+                AND pb.tipe_bahan = 'PENOLONG'
+                $filterCondition
+                $lpbUsedSubquery
+                GROUP BY pb.id, pbd.barang_id
+            )
+            ";
 
-        $data = $db->query($mainQuery)->getResultArray();
+        $data = $db->query($baseQuery)->getResultArray();
 
         $formatted = [];
         $no = 1;

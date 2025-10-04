@@ -64,6 +64,7 @@ class ProsesRebus extends BaseController
 
     public function all()
     {
+        $barangMasterSpesifikasiModel = new BarangMasterSpesifikasiModel();
         $payload = [
             "pageSize"      => $this->request->getVar("length"),
             "currentPage"   => ($this->request->getVar("start") / $this->request->getVar("length")) + 1,
@@ -112,9 +113,10 @@ class ProsesRebus extends BaseController
                                                         ->where('stock_revamp.id', $prosesRebusDetail[0]['stock_rebus_id'])
                                                         ->join('barang_master', 'barang_master.id = stock_revamp.barang_master_id', 'left')
                                                         ->first();
-                $barangHasilRebus = $this->stockRevampModel->select('barang_master.barang_name')
-                                                        ->where('stock_revamp.spesifikasi_id', $prosesRebusDetail[0]['barang_out_spesifikasi_id'])
-                                                        ->join('barang_master', 'barang_master.id = stock_revamp.barang_master_id', 'left')
+            
+                $barangHasilRebus = $barangMasterSpesifikasiModel->select('barang_master.barang_name')
+                                                        ->where('barang_master_spesifikasi.id', $prosesRebusDetail[0]['barang_out_spesifikasi_id'])
+                                                        ->join('barang_master', 'barang_master.id = barang_master_spesifikasi.barang_master_id', 'left')
                                                         ->first();
             }
             $jasaVendorOutDetail = $this->jasaVendorOutDetailModel->where('deletedAt', null)->like('stock_dokumen', $data->no_rebus)->first();
@@ -182,6 +184,7 @@ class ProsesRebus extends BaseController
     public function createActionNew()
     {
         $barangs = json_decode($_POST['listBarang']);
+
         if (count($barangs) == 0) {
             return response()->setJSON([
                 'status' => false,
@@ -226,8 +229,8 @@ class ProsesRebus extends BaseController
                 'po_id' => $b->rm_purchase_order_id,
                 'bc_rebus_id' => $b->bc_id,
                 'qty_rebus' => $b->qty,
-                'unit_out_id' => $b->stock_id,
-                'barang_out_spesifikasi_id' => $b->spesifikasi_id,
+                'unit_out_id' => $b->satuan_id,
+                'barang_out_spesifikasi_id' => $b->output->barang_id,
                 'qty_hasil_rebus' => $b->output->qty,
                 'qty_kotor' => $b->qty
             ]);
@@ -281,7 +284,7 @@ class ProsesRebus extends BaseController
                     'bc_rebus_id' => $b->bc_id,
                     'po_id' => $b->po_id,
                     'qty_rebus' => $b->qty,
-                    'barang_out_spesifikasi_id' => $b->output->spesifikasi_id,
+                    'barang_out_spesifikasi_id' => $b->output->barang_id,
                     'qty_hasil_rebus' => $b->output->qty,
                     'qty_kotor' => $b->qty,
                 ]);

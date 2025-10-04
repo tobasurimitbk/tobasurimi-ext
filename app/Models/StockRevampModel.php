@@ -163,7 +163,6 @@ class StockRevampModel extends Model
     public function outStockRevamp(BaseConnection $db, array $data)
     {
         // HAPUS transBegin() dari model, karena sudah dihandle controller
-        
         try {
             // ==============================
             // 1. Ambil data detail dulu
@@ -180,15 +179,20 @@ class StockRevampModel extends Model
             // ==============================
             // 2. Hitung qty detail baru (dikurangi)
             // ==============================
-            $newQtyDetail = $stockDetail['qty_diterima'] - $data['qty_digunakan'];
-            if ($newQtyDetail < 0) {
-                throw new \Exception("Qty detail tidak mencukupi. Stok tersedia: {$stockDetail['qty_diterima']}, Qty diminta: {$data['qty_digunakan']}");
-            }
+            $newQtyDetail       = $stockDetail['qty_diterima'] - $data['qty_digunakan'];
+            $newQtyDetailBersih = $stockDetail['qty_bersih'] - $data['qty_digunakan'];
+
+            // if ($newQtyDetail < 0 || $newQtyDetailBersih < 0) {
+            //     throw new \Exception("Qty detail tidak mencukupi. 
+            //         Stok tersedia: {$stockDetail['qty_diterima']}/{$stockDetail['qty_bersih']}, 
+            //         Qty diminta: {$data['qty_digunakan']}");
+            // }
 
             $db->table('stock_revamp_detail')
                 ->where('id', $data['stock_detail_id'])
                 ->update([
                     'qty_diterima' => $newQtyDetail,
+                    'qty_bersih'   => $newQtyDetailBersih,
                 ]);
 
             // ==============================
@@ -206,15 +210,20 @@ class StockRevampModel extends Model
             // ==============================
             // 4. Hitung qty parent baru (dikurangi)
             // ==============================
-            $newQtyParent = $stock['qty_diterima'] - $data['qty_digunakan'];
-            if ($newQtyParent < 0) {
-                throw new \Exception("Qty parent tidak mencukupi. Stok tersedia: {$stock['qty_diterima']}, Qty diminta: {$data['qty_digunakan']}");
-            }
+            $newQtyParent       = $stock['qty_diterima'] - $data['qty_digunakan'];
+            $newQtyParentBersih = $stock['qty_bersih'] - $data['qty_digunakan'];
+
+            // if ($newQtyParent < 0 || $newQtyParentBersih < 0) {
+            //     throw new \Exception("Qty parent tidak mencukupi. 
+            //         Stok tersedia: {$stock['qty_diterima']}/{$stock['qty_bersih']}, 
+            //         Qty diminta: {$data['qty_digunakan']}");
+            // }
 
             $db->table('stock_revamp')
                 ->where('id', $stockDetail['stock_id'])
                 ->update([
                     'qty_diterima' => $newQtyParent,
+                    'qty_bersih'   => $newQtyParentBersih,
                 ]);
 
             // ==============================
@@ -230,13 +239,14 @@ class StockRevampModel extends Model
             ]);
 
             return $stockDetail['id'];
-            
+
         } catch (\Throwable $e) {
             // HAPUS transRollback() dari model
             log_message('error', 'Out Stock Failed: ' . $e->getMessage());
             throw $e; // Lempar exception ke controller
         }
     }
+
 
     public function unpostStockRevamp(BaseConnection $db, array $data)
     {

@@ -2041,6 +2041,7 @@ class BC23 extends BaseController
             ]);
         }
 
+        $bc40 = $this->bc23Model->where('bc_purchase_order_id', $bcPurchaseOrderID)->first();
         $status = $this->insertInventori($bcPurchaseOrderID);
 
         if (!$status) {
