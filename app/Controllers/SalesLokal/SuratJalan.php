@@ -86,9 +86,10 @@ class SuratJalan extends BaseController
 
     public function all()
     {
-        $pageSize = $this->request->getGet("length");
-        $currentPage = ($this->request->getGet("start") / $this->request->getGet("length")) + 1;
-        $offset = $currentPage - 1;
+        $pageSize = (int) $this->request->getGet("length");
+        $start = (int) $this->request->getGet("start");
+        $offset = $start; // DataTables sudah kirim offset dalam bentuk jumlah data
+        $currentPage = ($start / $pageSize) + 1;
 
         $payload = [
             "pageSize" => $pageSize,
