@@ -479,6 +479,7 @@ class ProsesRebus extends BaseController
                     "stock_detail_asal"=> $p["stock_detail_rebus_id"],
                     "divisi_id"        => $prosoesRebus["divisi_id"],
                     "warehouse_id"     => $prosoesRebus["warehouse_id"],
+                    "no_dokumen"       => $prosoesRebus["no_rebus"],
                     "po_id"            => $p["po_id"],
                     'bc_id'            => $p['bc_rebus_id'],
                     'type_bc'          => $typeBc == null ? "NON PABEAN" : $typeBc['value'],
@@ -557,6 +558,7 @@ class ProsesRebus extends BaseController
                     "stock_detail_akhir"    => $p["stock_detail_hasil_rebus_id"],
                     "qty_diterima_asal"     => $p["qty_rebus"],
                     "qty_diterima_akhir"    => $p["qty_hasil_rebus"],
+                    "no_dokumen"            => $p["no_rebus"],
                 ];
 
                 // Panggil model - jika gagal akan throw exception
