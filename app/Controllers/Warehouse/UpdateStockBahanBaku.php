@@ -27,6 +27,8 @@ use App\Models\TaxModel;
 use App\Models\DivisisModel;
 use App\Models\RMPurchaseOrderModel;
 use App\Models\StockRevampDetailModel;
+use App\Models\StockRevampHistoryModel;
+use App\Models\StockRevampLogModel;
 use App\Models\StockRevampModel;
 use DateTime;
 use Dompdf\Dompdf;
@@ -60,6 +62,8 @@ class UpdateStockBahanBaku extends BaseController
     protected $rmPurchaseOrder;
     protected $stockRevampModel;
     protected $stockRevampDetailModel;
+    protected $stockRevampHistoryModel;
+    protected $stockRevampLogModel;
 
     protected $dompdf;
 
@@ -92,6 +96,8 @@ class UpdateStockBahanBaku extends BaseController
         $this->updateStockPurchaseDetail = new UpdateStockPurchaseDetail();
         $this->stockRevampDetailModel = new StockRevampDetailModel();
         $this->stockRevampModel = new StockRevampModel();
+        $this->stockRevampLogModel = new StockRevampLogModel();
+        $this->stockRevampHistoryModel = new StockRevampHistoryModel();
 
         $this->dompdf = new Dompdf();
     }
@@ -426,7 +432,6 @@ class UpdateStockBahanBaku extends BaseController
             ]);
         }
 
-
         try {
             // Ambil detail
             $stockDetail = $this->updateStockPurchaseDetail
@@ -458,6 +463,14 @@ class UpdateStockBahanBaku extends BaseController
                     ->where('id', $p['stock_detail_id'])
                     ->set(['qty_diterima' => $newQty])
                     ->update();
+
+                // insert ke log kalau ada perubahan qty
+               
+                    $this->stockRevampLogModel->insert([
+                        'stock_detail_id' => $p['stock_detail_id'],
+                        'status'          => 'IN',
+                        'qty_diterima'    => $selisih,
+                    ]);
             }
 
             // update parent (tambah qty_diterima dengan total selisih)
@@ -468,26 +481,9 @@ class UpdateStockBahanBaku extends BaseController
                     ->update();
             }
 
-
-            // update parent -> tambahkan selisih total ke qty_diterima lama
-            $this->stockRevampModel
-                ->where('id', $id) // ganti $parentId sesuai id parent
-                ->set('qty_diterima', 'qty_diterima + ' . $qty_diterima_total, false) 
-                ->update();
-
-
-            $this->stockRevampModel
-                    ->where('id', $p['stock_detail_id'])
-                    ->set([
-                        'qty_diterima' => $qty_diterima_total,
-                    ])
-                    ->update();
-
             // Update status posting
             $this->updateStockPurchase
                 ->update($id, ['status_posting' => "1"]);
-
-            // Commit transaksi
 
             return $this->response->setJSON([
                 'message' => "Posting Stock Kotor berhasil",
@@ -495,8 +491,6 @@ class UpdateStockBahanBaku extends BaseController
                 'token'   => csrf_hash()
             ]);
         } catch (\Throwable $th) {
-            // Rollback kalau error
-
             return $this->response->setJSON([
                 'message' => "Gagal posting: " . $th->getMessage(),
                 'status'  => false,
@@ -504,6 +498,7 @@ class UpdateStockBahanBaku extends BaseController
             ]);
         }
     }
+
 
     
 

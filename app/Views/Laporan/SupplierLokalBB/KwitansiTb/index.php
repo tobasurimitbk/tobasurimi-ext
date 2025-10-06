@@ -9,16 +9,15 @@
             <a class="btn btn-hide-form btn-discard float-right" href="<?= base_url("laporan-supplier-lokal-bb"); ?>">
                 Kembali
             </a>
-            <form id="form-export-pdf" method="GET" action="<?= base_url('laporan-supplier-lokal-bb/print-all-kwitansi-tb'); ?>" target="_blank">
-                <input type="hidden" name="month" id="export_month">
-                <input type="hidden" name="year" id="export_year">
-                <input type="hidden" name="tb_search" id="export_tb_search">
-                <input type="hidden" name="search" id="export_search">
-
-                <button type="submit" class="btn btn-warning btn-print" id="btn-print-all">
-                    Export
+            <?php if (can('Laporan', 'Supplier Lokal BB', 'p')) : ?>
+                <button class="btn btn-discard btn-dropdown-export dropdown-toggle float-right" type="button" id="dropdownMenuButtonExport" data-bs-toggle="dropdown" aria-expanded="false" style="background-color: #FFA426 !important;color: white !important;border: 0px solid !important;">
+                    Print All
                 </button>
-            </form>
+                <ul class="dropdown-menu list-dropdown-company" aria-labelledby="dropdownMenuButtonExport">
+                    <li><button class="dropdown-item" id="btn-print-f4">Print TB F4</button></li>
+                    <li><button class="dropdown-item" id="btn-print-continous">Print TB Continous</button></li>
+                </ul>
+            <?php endif; ?>
         </div>
     </div>
     <div class="card">
@@ -245,13 +244,36 @@
         window.open("<?= base_url('/') ?>" + res, "_blank");
     }
 
-    $('#btn-print-all').on('click', function(e) {
+    $('#btn-print-f4').on('click', function(e) {
         e.preventDefault();
-        $('#export_month').val($('#month').val());
-        $('#export_year').val($('#year').val());
-        $('#export_tb_search').val($('#tb_search').val());
-        $('#export_search').val($('.search').val());
-        $('#form-export-pdf').submit();
+        var month = $('#month').val();
+        var year = $('#year').val();
+        if (month == "") {
+            alert("Pilih bulan");
+            return;
+        } else if (year == "") {
+            alert("Pilih tahun");
+            return;
+        } else {
+            var url = "<?= base_url('laporan-supplier-lokal-bb/print-all-kwitansi-tb') ?>?month=" + month + "&year=" + year + "&kertas=f4";
+            window.open(url);
+        }
+    });
+
+    $('#btn-print-continous').on('click', function(e) {
+        e.preventDefault();
+        var month = $('#month').val();
+        var year = $('#year').val();
+        if (month == "") {
+            alert("Pilih bulan");
+            return;
+        } else if (year == "") {
+            alert("Pilih tahun");
+            return;
+        } else {
+            var url = "<?= base_url('laporan-supplier-lokal-bb/print-all-kwitansi-tb') ?>?month=" + month + "&year=" + year + "&kertas=continous";
+            window.open(url);
+        }
     });
 
     const changeSort = function(val) {

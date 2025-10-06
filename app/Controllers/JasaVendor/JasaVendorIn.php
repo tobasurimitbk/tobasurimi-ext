@@ -761,20 +761,12 @@ class JasaVendorIn extends BaseController
 
         // Step 2: Insert hasil grouping
         foreach ($groupedBarang as $gb) {
-            $stockInId = $this->stockModel->initStockBarang(
-                $this->this_company_id,
-                $this->request->getVar('divisi_id'),
-                $this->request->getVar('warehouse_id'),
-                "bahan_baku",
-                $gb['spesifikasi_in_id']
-            );
 
             $this->jasaVendorInDetailModel->insert([
                 'jasa_vendor_in_id' => $id,
                 'jasa_vendor_out_id' => $gb['jasa_vendor_out_id'],
                 'jasa_vendor_out_detail_id' => $gb['jasa_vendor_out_detail_id'],
                 'spesifikasi_in_id' => $gb['spesifikasi_in_id'],
-                'stock_in_id' => $stockInId,
                 'bc_in_id' => $gb['bc_in_id'],
                 'no_aju_in' => $gb['no_aju_in'],
                 'stock_dokumen' => $gb['stock_dokumen'],
@@ -868,20 +860,11 @@ class JasaVendorIn extends BaseController
 
         // Step 2: Insert hasil grouping
         foreach ($groupedBarang as $gb) {
-            $stockInId = $this->stockModel->initStockBarang(
-                $this->this_company_id,
-                $this->request->getVar('divisi_id'),
-                $this->request->getVar('warehouse_id'),
-                "bahan_baku",
-                $gb['spesifikasi_in_id']
-            );
-
             $this->jasaVendorInDetailModel->insert([
                 'jasa_vendor_in_id' => $id,
                 'jasa_vendor_out_id' => $gb['jasa_vendor_out_id'],
                 'jasa_vendor_out_detail_id' => $gb['jasa_vendor_out_detail_id'],
                 'spesifikasi_in_id' => $gb['spesifikasi_in_id'],
-                'stock_in_id' => $stockInId,
                 'bc_in_id' => $gb['bc_in_id'],
                 'no_aju_in' => $gb['no_aju_in'],
                 'stock_dokumen' => $gb['stock_dokumen'],

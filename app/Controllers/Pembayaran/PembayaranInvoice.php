@@ -371,19 +371,23 @@ class PembayaranInvoice extends BaseController
             $customer_id_decrypt = decrypt($customer_id);
             $pembayaran_invoice_id_decrypt = $this->request->getVar('pembayaran_invoice_id') ? decrypt($this->request->getVar('pembayaran_invoice_id')) : null;
             $query = $this->salesOrderInvoiceModel
-                ->select('sales_order_invoice.no_faktur, sales_order_invoice.id')
+                ->select('sales_order_invoice.no_faktur, sales_order_invoice.id, sales_order_invoice.total_invoice, 
+                        COALESCE(SUM(pembayaran_invoice_detail.harga_total),0) as total_bayar')
                 ->join('pembayaran_invoice_detail', 'pembayaran_invoice_detail.sales_order_invoice_id = sales_order_invoice.id AND pembayaran_invoice_detail.deletedAt IS NULL', 'left')
                 ->where('sales_order_invoice.id_customer', $customer_id_decrypt)
-                ->where('sales_order_invoice.deletedAt', null);
+                ->where('pembayaran_invoice_detail.deletedAt', null)
+                ->where('sales_order_invoice.deletedAt', null)
+                ->groupBy('sales_order_invoice.id');
 
             if ($pembayaran_invoice_id_decrypt) {
-                // Mode edit: ambil semua invoice yang terkait dengan pembayaran ini
+                // mode edit → tetep ambil invoice terkait pembayaran ini
                 $query->where('pembayaran_invoice_detail.pembayaran_invoice_id', $pembayaran_invoice_id_decrypt)
                     ->where('pembayaran_invoice_detail.type_invoice', 'LOKAL');
             } else {
-                // Mode non-edit: ambil yang belum dibayar sama sekali
-                $query->where('pembayaran_invoice_detail.id', null);
+                // mode non-edit → invoice yang belum lunas
+                $query->having('total_bayar < sales_order_invoice.total_invoice');
             }
+
         }
 
         $salesOrderLokalInvoiceData = $query->findAll();
