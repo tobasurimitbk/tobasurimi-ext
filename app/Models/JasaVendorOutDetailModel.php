@@ -423,6 +423,8 @@ class JasaVendorOutDetailModel extends Model
                 ->where('no_penerimaan_surat_jalan', $noJasaVendorIn)
                 ->where('jasa_vendor_in.company_id', session()->get("login")->this_company_id)
                 ->first();
+
+                
                
                     if ($stockList['reference_type'] == "PROSES REBUS") {
                         $doc = $prosesRebusModel
@@ -431,9 +433,9 @@ class JasaVendorOutDetailModel extends Model
                             ->first();
                         $stock_dokumen = $doc ? $doc['no_rebus'] : null;
                     } else {
-                        $doc = $rmPurchaseOrder
+                        $doc = $rmPurchaseOrderModel
                             ->select("po_no")
-                            ->where("id", $stockList['reference_id'])
+                            ->where("id", $stockList['po_id'])
                             ->first();
                         $stock_dokumen = $doc ? $doc['po_no'] : null;
                     }
