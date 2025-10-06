@@ -278,7 +278,7 @@
             var json = api.ajax.json();
 
             const colMap = {
-                5: 'qtyAll',
+                5: 'qtyPO',
                 6: 'dppUmum',
                 7: 'pphUmum',
                 8: 'totalUmum',
