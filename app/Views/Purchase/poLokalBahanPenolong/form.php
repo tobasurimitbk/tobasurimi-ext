@@ -490,44 +490,44 @@
     });
 
     // HARGA SATUAN DAN QTY CHANE
-    $('#harga_satuan,#qty,#biaya_tambahan,#diskon').keyup(function() {
+    $('#harga_satuan,#qty,#diskon').keyup(function() {
         var hargaSatuan = parseFloat(destroyFormatRupiah($('#harga_satuan').val())) || 0;
         var qty = parseFloat($('#qty').val()) || 1;
-        var biayaTambahan = parseFloat(destroyFormatRupiah($('#biaya_tambahan').val())) || 0;
+        // var biayaTambahan = parseFloat(destroyFormatRupiah($('#biaya_tambahan').val())) || 0;
         var diskon = parseFloat($('#diskon').val()) || 0;
         var diskonHarga = (diskon / 100) * (hargaSatuan * qty);
         var additionalCostType = $('#additional_cost_type option:selected').val();
 
-        if (additionalCostType == '') {
-            biayaTambahan = 0;
-        } else if (additionalCostType == "MINUS") {
-            biayaTambahan = biayaTambahan * -1;
-        }
+        // if (additionalCostType == '') {
+        //     biayaTambahan = 0;
+        // } else if (additionalCostType == "MINUS") {
+        //     biayaTambahan = biayaTambahan * -1;
+        // }
 
-        var total = (((hargaSatuan * qty) - diskonHarga) + biayaTambahan);
+        var total = (((hargaSatuan * qty) - diskonHarga));
         $('#total').val(total == 0 ? '' : greatFormatRupiah(total.toFixed(2)));
     });
 
-    $('#additional_cost_type').change(function() {
-        var additionalCostType = $('#additional_cost_type option:selected').val();
-        var biayaTambahan = parseFloat(destroyFormatRupiah($('#biaya_tambahan').val())) || 0;
-        if (additionalCostType == '') {
-            $('#biaya_tambahan').val('');
-            $('#biaya_tambahan').keyup();
-        } else {
-            if (additionalCostType == "MINUS") {
-                biayaTambahan = biayaTambahan * -1;
-            }
-            // Hitung Total
-            var hargaSatuan = parseFloat(destroyFormatRupiah($('#harga_satuan').val())) || 0;
-            var qty = parseFloat($('#qty').val()) || 1;
-            var diskon = parseFloat($('#diskon').val()) || 0;
-            var diskonHarga = (diskon / 100) * (hargaSatuan * qty);
+    // $('#additional_cost_type').change(function() {
+    //     var additionalCostType = $('#additional_cost_type option:selected').val();
+    //     var biayaTambahan = parseFloat(destroyFormatRupiah($('#biaya_tambahan').val())) || 0;
+    //     if (additionalCostType == '') {
+    //         $('#biaya_tambahan').val('');
+    //         $('#biaya_tambahan').keyup();
+    //     } else {
+    //         if (additionalCostType == "MINUS") {
+    //             biayaTambahan = biayaTambahan * -1;
+    //         }
+    //         // Hitung Total
+    //         var hargaSatuan = parseFloat(destroyFormatRupiah($('#harga_satuan').val())) || 0;
+    //         var qty = parseFloat($('#qty').val()) || 1;
+    //         var diskon = parseFloat($('#diskon').val()) || 0;
+    //         var diskonHarga = (diskon / 100) * (hargaSatuan * qty);
 
-            var total = (((hargaSatuan * qty) - diskonHarga) + biayaTambahan);
-            $('#total').val(total == 0 ? '' : greatFormatRupiah(total.toFixed(2)));
-        }
-    });
+    //         var total = (((hargaSatuan * qty) - diskonHarga) + biayaTambahan);
+    //         $('#total').val(total == 0 ? '' : greatFormatRupiah(total.toFixed(2)));
+    //     }
+    // });
 
     // CHANGE TOTAL
     $('#total').keyup(function() {
