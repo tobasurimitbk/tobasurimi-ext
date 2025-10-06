@@ -289,6 +289,7 @@ class KwitansiTb extends BaseController
     {
         $month = $this->request->getGet('month');
         $year = $this->request->getGet('year');
+        $kertas = $this->request->getGet('kertas');
 
         $condition = [
             'MONTH(rm_purchase_orders.po_date)' => $month,
@@ -368,12 +369,18 @@ class KwitansiTb extends BaseController
             return redirect()->back()->with('error', 'Tidak ada data untuk dicetak.');
         }
 
+        if ($kertas == "f4") {
+            $urlView = "Laporan/SupplierLokalBB/KwitansiTb/print-all-f4";
+        } else {
+            $urlView = "Laporan/SupplierLokalBB/KwitansiTb/print-all-continous";
+        }
+
         $options = new Options();
         $options->set('isHtml5ParserEnabled', true);
         $options->set('isRemoteEnabled', true);
 
         $dompdf = new Dompdf($options);
-        $dompdf->loadHtml(view('Laporan/SupplierLokalBB/KwitansiTb/print-all', ['dataResult' => $dataResult]));
+        $dompdf->loadHtml(view($urlView, ['dataResult' => $dataResult]));
         $dompdf->setPaper('F4', 'portrait');
         $dompdf->render();
         $dompdf->stream("Kwitansi_TB_Bulanan_$month-$year.pdf", ["Attachment" => false]);

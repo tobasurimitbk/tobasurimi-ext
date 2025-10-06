@@ -171,7 +171,7 @@ class StokHistori extends BaseController
                 "stock_revamp_detail.reference_type" => "PROSES REBUS",
             ];
 
-            $dataQry = $this->stockRevampLogModel->getListLogPoLokalBp(
+            $dataQry = $this->stockRevampLogModel->getListLogProsesRebus(
                 $condition,
                 $addCondition,
                 $limit,

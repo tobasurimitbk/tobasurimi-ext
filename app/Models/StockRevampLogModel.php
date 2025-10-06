@@ -341,7 +341,6 @@ class StockRevampLogModel extends Model
         // SELECT utama
         $selectQry = "
             stock_revamp_log.*,
-            suppliers.name AS supplier_name,
             barang_master.kode_barang,
             barang_master.barang_name,
             barang_master_spesifikasi.spesifikasi,
