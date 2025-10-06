@@ -600,8 +600,6 @@ class LaporanSupplierLokalBB extends BaseController
     {
         $condition = [
             'rm_purchase_orders.deletedAt' => null,
-            // 'rm_purchase_orders.is_posted' => '1',
-            // 'rm_purchase_orders.status_penerimaan' => '1',
             'rm_purchase_order_details.deletedAt' => null,
             'rm_purchase_orders.company_id' => $this->this_company_id,
             'rm_purchase_orders.status_external' => 'no',
@@ -627,7 +625,7 @@ class LaporanSupplierLokalBB extends BaseController
             'warehouseName' => 'warehouses.warehouse_name',
         ];
 
-        // Ambil semua data (tanpa paging)
+        // === Ambil semua data tanpa paging ===
         $allData = $this->RMPurchaseOrderModel->getPoBBLokalForSupplierPerPO(
             $availableSort,
             $condition,
@@ -636,171 +634,167 @@ class LaporanSupplierLokalBB extends BaseController
             null
         )['data'];
 
-        // Group data berdasarkan barangName
-        $groupedData = [];
+        // === Susun nested: Divisi -> Gudang -> Barang ===
+        $nestedData = [];
         foreach ($allData as $row) {
-            $barangName = $row->barangName ?? 'UNKNOWN';
-            if (!isset($groupedData[$barangName])) {
-                $groupedData[$barangName] = [
-                    'data' => [],
-                    'summary' => [
-                        'totalQtyPO' => 0,
-                        'dppUmum' => 0,
-                        'pphUmum' => 0,
-                        'totalUmum' => 0,
-                        'dppHarian' => 0,
-                        'pphHarian' => 0,
-                        'totalHarian' => 0,
-                        'dppBulanan' => 0,
-                        'pphBulanan' => 0,
-                        'totalBulanan' => 0,
-                        'dppTambahan' => 0,
-                        'pphTambahan' => 0,
-                        'totalTambahan' => 0,
-                        'totalRow' => 0,
-                    ]
+            $divisi = $row->divisiName ?? "LAINNYA";
+            $gudang = $row->warehouseName ?? "LAINNYA";
+            $barang = $row->barangName ?? "LAINNYA";
+
+            $totalRow = floatval($row->nilai_total_umum ?? 0)
+                + floatval($row->nilai_total_harian ?? 0)
+                + floatval($row->nilai_total_bulanan ?? 0)
+                + floatval($row->nilai_total_tambahan ?? 0);
+
+            $nestedData[$divisi][$gudang][$barang]['data'][] = [
+                'supplierName' => $row->supplierName,
+                'poNum'        => $row->poNum,
+                'poDate'       => $row->poDate,
+                'qtyPO'        => floatval($row->qtyPO),
+                'satuanName'   => $row->satuanName,
+                'nilai_total_bulanan' => floatval($row->nilai_total_bulanan),
+                'totalRow'     => $totalRow,
+            ];
+
+            if (!isset($nestedData[$divisi][$gudang][$barang]['summary'])) {
+                $nestedData[$divisi][$gudang][$barang]['summary'] = [
+                    'totalQtyPO'   => 0,
+                    'totalBulanan' => 0,
+                    'totalRow'     => 0,
                 ];
             }
 
-            // Hitung totalRow per baris
-            $row->totalRow =
-                floatval($row->nilai_total_umum ?? 0) +
-                floatval($row->nilai_total_harian ?? 0) +
-                floatval($row->nilai_total_bulanan ?? 0) +
-                floatval($row->nilai_total_tambahan ?? 0);
-
-            $groupedData[$barangName]['data'][] = $row;
-
-            // Update summary
-            $groupedData[$barangName]['summary']['totalQtyPO']   += floatval($row->qtyPO ?? 0);
-            $groupedData[$barangName]['summary']['dppUmum']      += floatval($row->dpp_umum ?? 0);
-            $groupedData[$barangName]['summary']['pphUmum']      += floatval($row->pph_umum ?? 0);
-            $groupedData[$barangName]['summary']['totalUmum']    += floatval($row->nilai_total_umum ?? 0);
-            $groupedData[$barangName]['summary']['dppHarian']    += floatval($row->dpp_harian ?? 0);
-            $groupedData[$barangName]['summary']['pphHarian']    += floatval($row->pph_harian ?? 0);
-            $groupedData[$barangName]['summary']['totalHarian']  += floatval($row->nilai_total_harian ?? 0);
-            $groupedData[$barangName]['summary']['dppBulanan']   += floatval($row->dpp_bulanan ?? 0);
-            $groupedData[$barangName]['summary']['pphBulanan']   += floatval($row->pph_bulanan ?? 0);
-            $groupedData[$barangName]['summary']['totalBulanan'] += floatval($row->nilai_total_bulanan ?? 0);
-            $groupedData[$barangName]['summary']['dppTambahan']  += floatval($row->dpp_tambahan ?? 0);
-            $groupedData[$barangName]['summary']['pphTambahan']  += floatval($row->pph_tambahan ?? 0);
-            $groupedData[$barangName]['summary']['totalTambahan'] += floatval($row->nilai_total_tambahan ?? 0);
-            $groupedData[$barangName]['summary']['totalRow']     += $row->totalRow;
+            $nestedData[$divisi][$gudang][$barang]['summary']['totalQtyPO']   += floatval($row->qtyPO);
+            $nestedData[$divisi][$gudang][$barang]['summary']['totalBulanan'] += floatval($row->nilai_total_bulanan);
+            $nestedData[$divisi][$gudang][$barang]['summary']['totalRow']     += $totalRow;
         }
 
-        // Inisialisasi Excel
+        // === Inisialisasi Excel ===
         $spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
         $sheet->setTitle('Pendapatan Supplier');
 
         $rowNum = 1;
         $sheet->setCellValue("A{$rowNum}", "Laporan Pendapatan Supplier Lokal BB");
-        $sheet->mergeCells("A{$rowNum}:V{$rowNum}");
-        $sheet->getStyle("A{$rowNum}")->getFont()->setBold(true)->setSize(14);
-        $rowNum += 2;
+        $sheet->mergeCells("A{$rowNum}:H{$rowNum}");
+        $sheet->getStyle("A{$rowNum}")
+            ->getFont()
+            ->setBold(true)
+            ->setSize(14);
+        $sheet->getStyle("A{$rowNum}")
+            ->getAlignment()
+            ->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
 
-        // Header multi-row
-        $sheet->setCellValue("A{$rowNum}", "No")->mergeCells("A{$rowNum}:A" . ($rowNum + 1));
-        $sheet->setCellValue("B{$rowNum}", "Supplier")->mergeCells("B{$rowNum}:B" . ($rowNum + 1));
-        $sheet->setCellValue("C{$rowNum}", "No PO")->mergeCells("C{$rowNum}:C" . ($rowNum + 1));
-        $sheet->setCellValue("D{$rowNum}", "Tgl PO")->mergeCells("D{$rowNum}:D" . ($rowNum + 1));
-        $sheet->setCellValue("E{$rowNum}", "Department")->mergeCells("E{$rowNum}:E" . ($rowNum + 1));
-        $sheet->setCellValue("F{$rowNum}", "Gudang")->mergeCells("F{$rowNum}:F" . ($rowNum + 1));
-        $sheet->setCellValue("G{$rowNum}", "Qty")->mergeCells("G{$rowNum}:G" . ($rowNum + 1));
-        $sheet->setCellValue("H{$rowNum}", "Satuan")->mergeCells("H{$rowNum}:H" . ($rowNum + 1));
-        $sheet->setCellValue("I{$rowNum}", "Unit")->mergeCells("I{$rowNum}:I" . ($rowNum + 1));
-
-        $sheet->setCellValue("J{$rowNum}", "Tambahan Bulanan");
-
-        $sheet->setCellValue("J" . ($rowNum + 1), "Total");
-        $sheet->setCellValue("K{$rowNum}", "Total")->mergeCells("K{$rowNum}:K" . ($rowNum + 1));
-
-        $sheet->getStyle("A{$rowNum}:K" . ($rowNum + 1))
-            ->getFont()->setBold(true);
-        $sheet->getStyle("A{$rowNum}:K" . ($rowNum + 1))
-            ->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER)
-            ->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER);
+        $rowNum = 2;
+        $sheet->setCellValue("A{$rowNum}", "Tanggal: " . ($addCondition['dateStart'] ? date('d/m/Y', strtotime($addCondition['dateStart'])) : 'ALL') . " s/d " . ($addCondition['dateEnd'] ? date('d/m/Y', strtotime($addCondition['dateEnd'])) : 'ALL'));
+        $sheet->mergeCells("A{$rowNum}:H{$rowNum}");
+        $sheet->getStyle("A{$rowNum}")
+            ->getFont()
+            ->setBold(true)
+            ->setSize(12);
+        $sheet->getStyle("A{$rowNum}")
+            ->getAlignment()
+            ->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
 
         $rowNum += 2;
 
-        $cols = range('A', 'K');
         $grandTotals = [
             'qty' => 0,
-            'dppUmum' => 0,
-            'pphUmum' => 0,
-            'totalUmum' => 0,
-            'dppHarian' => 0,
-            'pphHarian' => 0,
-            'totalHarian' => 0,
-            'dppBulanan' => 0,
-            'pphBulanan' => 0,
             'totalBulanan' => 0,
-            'dppTambahan' => 0,
-            'pphTambahan' => 0,
-            'totalTambahan' => 0,
-            'totalRow' => 0
+            'totalRow' => 0,
         ];
 
-        // Loop group per barang
-        foreach ($groupedData as $barangName => $group) {
-            $sheet->setCellValue("A{$rowNum}", "Bahan Baku: " . $barangName);
-            $sheet->mergeCells("A{$rowNum}:K{$rowNum}");
-            $sheet->getStyle("A{$rowNum}")->getFont()->setBold(true);
-            $rowNum++;
+        foreach ($nestedData as $divisiName => $gudangList) {
 
-            $no = 1;
-            foreach ($group['data'] as $row) {
-                $idx = 0;
-                $sheet->setCellValue($cols[$idx++] . $rowNum, $no++);
-                $sheet->setCellValue($cols[$idx++] . $rowNum, $row->supplierName);
-                $sheet->setCellValue($cols[$idx++] . $rowNum, $row->poNum);
-                $sheet->setCellValue($cols[$idx++] . $rowNum, $row->poDate);
-                $sheet->setCellValue($cols[$idx++] . $rowNum, $row->divisiName);
-                $sheet->setCellValue($cols[$idx++] . $rowNum, $row->warehouseName);
-                $sheet->setCellValue($cols[$idx++] . $rowNum, $row->qtyPO);
-                $sheet->setCellValue($cols[$idx++] . $rowNum, $row->satuanName);
-                $sheet->setCellValue($cols[$idx++] . $rowNum, $row->companyName);
-                $sheet->setCellValue($cols[$idx++] . $rowNum, $row->nilai_total_bulanan);
-                $sheet->setCellValue($cols[$idx++] . $rowNum, $row->totalRow);
-                $rowNum++;
+            $deptTotals = ['qty' => 0, 'totalBulanan' => 0, 'totalRow' => 0];
+
+            foreach ($gudangList as $warehouseName => $barangList) {
+
+                $whTotals = ['qty' => 0, 'totalBulanan' => 0, 'totalRow' => 0];
+
+                foreach ($barangList as $barangName => $group) {
+
+                    // === 3 Baris Judul (selalu muncul di setiap bahan baku) ===
+                    $sheet->setCellValue("A{$rowNum}", "Department : {$divisiName}");
+                    $sheet->mergeCells("A{$rowNum}:H{$rowNum}");
+                    $sheet->getStyle("A{$rowNum}")->getFont()->setBold(true);
+                    $rowNum++;
+
+                    $sheet->setCellValue("A{$rowNum}", "Gudang     : {$warehouseName}");
+                    $sheet->mergeCells("A{$rowNum}:H{$rowNum}");
+                    $sheet->getStyle("A{$rowNum}")->getFont()->setBold(true);
+                    $rowNum++;
+
+                    $sheet->setCellValue("A{$rowNum}", "Bahan Baku : {$barangName}");
+                    $sheet->mergeCells("A{$rowNum}:H{$rowNum}");
+                    $sheet->getStyle("A{$rowNum}")->getFont()->setBold(true);
+                    $rowNum++;
+
+                    // === Header tabel ===
+                    $headers = ['No', 'Supplier', 'Nomor PO', 'Tanggal PO', 'Qty', 'Satuan', 'Harga Bulanan', 'Total'];
+                    $col = 'A';
+                    foreach ($headers as $header) {
+                        $sheet->setCellValue("{$col}{$rowNum}", $header);
+                        $col++;
+                    }
+                    $sheet->getStyle("A{$rowNum}:H{$rowNum}")->getFont()->setBold(true);
+                    $sheet->getStyle("A{$rowNum}:H{$rowNum}")
+                        ->getAlignment()
+                        ->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+                    $rowNum++;
+
+                    // === Isi data ===
+                    $no = 1;
+                    foreach ($group['data'] as $row) {
+                        $sheet->setCellValue("A{$rowNum}", $no++);
+                        $sheet->setCellValue("B{$rowNum}", $row['supplierName']);
+                        $sheet->setCellValue("C{$rowNum}", $row['poNum']);
+                        $sheet->setCellValue("D{$rowNum}", $row['poDate']);
+                        $sheet->setCellValue("E{$rowNum}", $row['qtyPO']);
+                        $sheet->setCellValue("F{$rowNum}", $row['satuanName']);
+                        $sheet->setCellValue("G{$rowNum}", $row['nilai_total_bulanan']);
+                        $sheet->setCellValue("H{$rowNum}", $row['totalRow']);
+                        $rowNum++;
+                    }
+
+                    // === Subtotal per bahan baku ===
+                    $sheet->setCellValue("A{$rowNum}", "Total {$barangName}");
+                    $sheet->mergeCells("A{$rowNum}:D{$rowNum}");
+                    $sheet->getStyle("A{$rowNum}:H{$rowNum}")->getFont()->setBold(true);
+                    $sheet->setCellValue("E{$rowNum}", $group['summary']['totalQtyPO']);
+                    $sheet->setCellValue("G{$rowNum}", $group['summary']['totalBulanan']);
+                    $sheet->setCellValue("H{$rowNum}", $group['summary']['totalRow']);
+                    $rowNum += 2;
+
+                    // Tambah ke total gudang
+                    $whTotals['qty'] += $group['summary']['totalQtyPO'];
+                    $whTotals['totalBulanan'] += $group['summary']['totalBulanan'];
+                    $whTotals['totalRow'] += $group['summary']['totalRow'];
+                }
+
+                // Tambah ke total department
+                $deptTotals['qty'] += $whTotals['qty'];
+                $deptTotals['totalBulanan'] += $whTotals['totalBulanan'];
+                $deptTotals['totalRow'] += $whTotals['totalRow'];
             }
-
-            // Subtotal
-            $sheet->setCellValue("A{$rowNum}", "TOTAL " . strtoupper($barangName));
-            $sheet->mergeCells("A{$rowNum}:F{$rowNum}");
-            $sheet->getStyle("A{$rowNum}:V{$rowNum}")->getFont()->setBold(true);
-
-            $idx = 6; // start di kolom G
-            $sheet->setCellValue($cols[$idx++] . $rowNum, $group['summary']['totalQtyPO']);
-            $idx++; // skip Satuan
-            $idx++; // skip Unit
-            $sheet->setCellValue($cols[$idx++] . $rowNum, $group['summary']['totalBulanan']);
-            $sheet->setCellValue($cols[$idx++] . $rowNum, $group['summary']['totalRow']);
-            $rowNum++;
 
             // Tambah ke grand total
-            foreach ($grandTotals as $k => &$v) {
-                if ($k == 'qty') {
-                    $v += $group['summary']['totalQtyPO'];
-                } else {
-                    $v += $group['summary'][$k] ?? 0;
-                }
-            }
+            $grandTotals['qty'] += $deptTotals['qty'];
+            $grandTotals['totalBulanan'] += $deptTotals['totalBulanan'];
+            $grandTotals['totalRow'] += $deptTotals['totalRow'];
         }
 
-        // Grand Total
-        $sheet->setCellValue("A{$rowNum}", "GRAND TOTAL");
-        $sheet->mergeCells("A{$rowNum}:F{$rowNum}");
-        $sheet->getStyle("A{$rowNum}:V{$rowNum}")->getFont()->setBold(true);
+        // === Format angka & lebar kolom ===
+        $sheet->getStyle("E2:E{$rowNum}")
+            ->getNumberFormat()->setFormatCode('#,##0.00');
+        $sheet->getStyle("G2:H{$rowNum}")
+            ->getNumberFormat()->setFormatCode('#,##0.00');
 
-        $idx = 6; // start di G
-        $sheet->setCellValue($cols[$idx++] . $rowNum, $grandTotals['qty']);
-        $idx++; // skip Satuan
-        $idx++; // skip Unit
-        $sheet->setCellValue($cols[$idx++] . $rowNum, $grandTotals['totalBulanan']);
-        $sheet->setCellValue($cols[$idx++] . $rowNum, $grandTotals['totalRow']);
+        foreach (range('A', 'H') as $col) {
+            $sheet->getColumnDimension($col)->setAutoSize(true);
+        }
 
-        // Output Excel
+        // === Output Excel ===
         $writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet);
         $filename = "Laporan_Pendapatan_Supplier_Lokal_BB.xlsx";
         header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
@@ -895,7 +889,7 @@ class LaporanSupplierLokalBB extends BaseController
         ];
 
         $domPdf = new Dompdf();
-        $domPdf->loadHtml(view('Laporan/SupplierLokalBB/PendapatanSupplier/print', $data));
+        $domPdf->loadHtml(view('Laporan/SupplierLokalBB/PendapatanSupplierPembelian/print', $data));
         $domPdf->setPaper('a4', 'landscape');
         $domPdf->render();
         $domPdf->stream('Pendapatan Supplier', array("Attachment" => false));
