@@ -199,10 +199,10 @@
                         <th rowspan="2" class="col-qty">Qty</th>
                         <th rowspan="2" class="col-satuan">Satuan</th>
                         <th rowspan="2" class="col-unit">Unit</th>
-                        <th colspan="3" class="col-group">Umum</th>
-                        <th colspan="3" class="col-group">Harian</th>
-                        <th colspan="3" class="col-group">Bulanan</th>
-                        <th colspan="3" class="col-group">Tambahan</th>
+                        <th colspan="3" class="col-group">Tambahan Umum</th>
+                        <th colspan="3" class="col-group">Tambahan Harian</th>
+                        <th colspan="3" class="col-group">Tambahan Bulanan</th>
+                        <th colspan="3" class="col-group">Tambahan Langsung</th>
                         <th rowspan="2" class="col-group">Total</th>
                     </tr>
                     <tr>
