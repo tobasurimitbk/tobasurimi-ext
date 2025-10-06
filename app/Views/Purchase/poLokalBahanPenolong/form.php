@@ -504,7 +504,7 @@
         //     biayaTambahan = biayaTambahan * -1;
         // }
 
-        var total = (((hargaSatuan * qty) - diskonHarga) + biayaTambahan);
+        var total = (((hargaSatuan * qty) - diskonHarga));
         $('#total').val(total == 0 ? '' : greatFormatRupiah(total.toFixed(2)));
     });
 
