@@ -80,8 +80,7 @@ class StockRevampDetailModel extends Model
 
         return $builder
             ->groupBy('
-                stock_revamp_detail.po_id,
-                stock_revamp.id
+                stock_revamp_detail.id,
             ')
             ->whereIn('stock_revamp.spesifikasi_id', $spesifikasiId)
             ->orderBy('stock_revamp_detail.createdAt', 'ASC')
@@ -120,8 +119,7 @@ class StockRevampDetailModel extends Model
 
         return $builder
             ->groupBy('
-                stock_revamp_detail.po_id,
-                stock_revamp.id
+                stock_revamp_detail.id,
             ')
             ->where('update_stock_purchase_detail.update_stock_purchase_id', $id)
             ->orderBy('stock_revamp_detail.createdAt', 'ASC')
@@ -169,8 +167,7 @@ class StockRevampDetailModel extends Model
 
         return $builder
             ->groupBy('
-                stock_revamp_detail.po_id,
-                stock_revamp.id
+                stock_revamp_detail.id,
             ')
              ->where('stock_revamp_detail.reference_type !=', "PROSES REBUS")
             ->where('stock_revamp.spesifikasi_id', $spesifikasiId)
@@ -220,8 +217,7 @@ class StockRevampDetailModel extends Model
 
         return $builder
             ->groupBy('
-                stock_revamp_detail.po_id,
-                stock_revamp.id
+                stock_revamp_detail.id,
             ')
             ->where('stock_revamp.stock_detail_id', $stock_detail_id)
             ->orderBy('stock_revamp_detail.createdAt', 'ASC')
@@ -272,8 +268,7 @@ class StockRevampDetailModel extends Model
 
         return $builder
             ->groupBy('
-                stock_revamp_detail.po_id,
-                stock_revamp.id
+                stock_revamp_detail.id,
             ')
             ->orderBy('stock_revamp_detail.createdAt', 'ASC')
             ->findAll();
