@@ -1180,7 +1180,7 @@ $routes->post('/jasa-vendor-out/save',  'JasaVendor\JasaVendorOut::createAction'
 $routes->post('/jasa-vendor-out/update',  'JasaVendor\JasaVendorOut::updateActionNew', ['filter' => 'Auth']);
 $routes->post('/jasa-vendor-out/delete',  'JasaVendor\JasaVendorOut::delete', ['filter' => 'Auth']);
 $routes->post('/jasa-vendor-out/posting',  'JasaVendor\JasaVendorOut::posting', ['filter' => 'Auth']);
-$routes->post('/jasa-vendor-out/unposting',  'JasaVendor\JasaVendorOut::unPosting', ['filter' => 'Auth']);
+$routes->post('/jasa-vendor-out/unposting',  'JasaVendor\JasaVendorOut::unposting', ['filter' => 'Auth']);
 $routes->post('/jasa-vendor-out/close',  'JasaVendor\JasaVendorOut::close', ['filter' => 'Auth']);
 $routes->get('/jasa-vendor-out/id/(:segment)',  'JasaVendor\JasaVendorOut::detail/$1', ['filter' => 'Auth']);
 $routes->get('/jasa-vendor-out/get-jasa-vendor-out-no',  'JasaVendor\JasaVendorOut::getJasaVendorOutNo', ['filter' => 'Auth']);

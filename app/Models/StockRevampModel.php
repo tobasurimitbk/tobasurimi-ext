@@ -347,6 +347,85 @@ class StockRevampModel extends Model
     }
 
 
+    public function unpostStockKeluar(BaseConnection $db, array $data)
+    {
+        try {
+            $asalId  = $data['stock_detail_asal'];
+            $qtyAsal = $data['qty_diterima_asal'];
+
+            // ==============================
+            // 1. Ambil stock detail asal
+            // ==============================
+            $detailAsal = $db->table('stock_revamp_detail')
+                ->where('id', $asalId)
+                ->get()
+                ->getRowArray();
+
+            if (!$detailAsal) {
+                throw new \Exception("Stock detail asal tidak ditemukan");
+            }
+
+            // ==============================
+            // 2. Validasi qty
+            // ==============================
+            if ((int)$detailAsal['qty_diterima'] != (int)$qtyAsal) {
+                throw new \Exception("Qty asal tidak sesuai. Database: {$detailAsal['qty_diterima']}, Request: {$qtyAsal}. Unpost dibatalkan");
+            }
+
+
+            // ==============================
+            // 3. Ambil parent stock
+            // ==============================
+            $parentAsal = $db->table('stock_revamp')
+                ->where('id', $detailAsal['stock_id'])
+                ->get()
+                ->getRowArray();
+
+            if (!$parentAsal) {
+                throw new \Exception("Parent stock tidak ditemukan");
+            }
+
+            // ==============================
+            // 4. Kembalikan qty ke parent & detail asal
+            // ==============================
+            $db->table('stock_revamp')
+                ->where('id', $parentAsal['id'])
+                ->update([
+                    'qty_diterima' => $parentAsal['qty_diterima'] + $qtyAsal,
+                    'qty_bersih'   => $parentAsal['qty_bersih'] + $qtyAsal,
+                ]);
+
+            $db->table('stock_revamp_detail')
+                ->where('id', $asalId)
+                ->update([
+                    'qty_diterima' => $detailAsal['qty_diterima'] + $qtyAsal,
+                    'qty_bersih'   => $detailAsal['qty_bersih'] + $qtyAsal,
+                ]);
+
+            // ==============================
+            // 5. Insert log UNPOST
+            // ==============================
+            $db->table('stock_revamp_log')->insert([
+                'stock_detail_id' => $asalId,
+                'status'          => 'UNPOST',
+                'keterangan'      => $data['keterangan'] ?? 'UNPOST STOCK KELUAR',
+                'no_dokumen'      => $data['no_dokumen'] ?? null,
+                'qty_diterima'    => $qtyAsal,
+                'qty_bersih'      => $qtyAsal,
+                'createdAt'       => date('Y-m-d H:i:s'),
+                'updatedAt'       => date('Y-m-d H:i:s'),
+            ]);
+
+            return true;
+
+        } catch (\Throwable $e) {
+            log_message('error', 'Unpost Stock Keluar Failed: ' . $e->getMessage());
+            throw $e; // Lempar ke controller
+        }
+    }
+
+
+
     public function getBarangRebusAndStock($type_barang, $divisi_id, $warehouse_id)
     {
         $selectQry = "
