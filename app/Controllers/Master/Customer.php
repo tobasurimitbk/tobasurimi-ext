@@ -224,10 +224,14 @@ class Customer extends BaseController
                     }
                 }
                 if ($this->request->getPost("tipe_customer") == "LOKAL") {
-                    $existingCustomer = $this->CustomerModel->where('kode', $kode)
+                    $lastNumber = substr($kode, -4);
+
+                    $existingCustomer = $this->CustomerModel
+                        ->where("RIGHT(kode, 4)", $lastNumber)
                         ->where('tipe_customer', 'LOKAL')
                         ->where('deletedAt', null)
                         ->first();
+
                     if ($existingCustomer) {
                         $data = [
                             "status"    => false,
