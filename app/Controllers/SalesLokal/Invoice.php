@@ -679,6 +679,14 @@ class Invoice extends BaseController
                         }
                     }
                 }
+
+                foreach ($postData['doc_id'] as $id) {
+                    if ($soInvData->document_type === 'pesanan') {
+                        $this->SalesOrderModel->where('id', $id)->set(['sales_order_invoice_id' => $payload['id']])->update();
+                    } else {
+                        $this->SuratJalanModel->where('id', $id)->set(['sales_order_invoice_id' => $payload['id']])->update();
+                    }
+                }
             } else {
                 // jika ada perubahan
                 $this->SalesOrderInvoiceDetailModel->where('id_sales_order_invoice', $payload['id'])->delete();
