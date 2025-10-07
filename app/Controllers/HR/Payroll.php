@@ -198,6 +198,7 @@ class Payroll extends BaseController
                     "hadir" => $status['HADIR_H'],
                     "libur" => $status['LIBUR_L'],
                     "alpha" => $status['ALPHA_A'],
+                    "dinas" => $status['DINAS_D'],
                     "hadir_final" => 0,
                     "total_perizinan_not_approved" => 0,
                     "total_perizinan_approved" => 0,
@@ -326,6 +327,7 @@ class Payroll extends BaseController
             "hadir" => $status['HADIR_H'],
             "libur" => $status['LIBUR_L'],
             "alpha" => $status['ALPHA_A'],
+            "dinas" => $status['DINAS_D'],
             "hadir_final" => 0,
             "total_perizinan_not_approved" => 0,
             "total_perizinan_approved" => 0,
@@ -472,6 +474,7 @@ class Payroll extends BaseController
                         'HADIR_H'           => 0,
                         'LIBUR_L'           => 0,
                         'ALPHA_A'           => 0,
+                        'DINAS_D'           => 0
                     ];
                 }
                 $mapStatusAttendance[$empId][$s['status']] = $s['total'];
@@ -497,6 +500,7 @@ class Payroll extends BaseController
                     "hadir"                        => $att["HADIR_H"] ?? 0,
                     "libur"                        => $att["LIBUR_L"] ?? 0,
                     "alpha"                        => $att["ALPHA_A"] ?? 0,
+                    "dinas"                        => $att["DINAS_D"] ?? 0,
                     "hadir_final"                  => 0,
                     "total_perizinan_not_approved" => 0,
                     "total_perizinan_approved"     => 0,
@@ -567,7 +571,9 @@ class Payroll extends BaseController
                 $this->this_company_id,
                 $yearMonth
             );
-            $this->payrollGajiModel->insertBatch($dataPayrollGajiConjunction);
+            if (count($dataPayrollGajiConjunction) != 0) {
+                $this->payrollGajiModel->insertBatch($dataPayrollGajiConjunction);
+            }
 
             //--------------------------------------
             // Perizinan Not Approved
@@ -595,8 +601,14 @@ class Payroll extends BaseController
                 $startDate,
                 $endDate
             );
-            $this->formPerizinanNotApprovedModel->insertBatch($dataFormPerizinanNotApproved['dataFormPerizinan']);
-            $this->payrollModel->updateBatch($dataFormPerizinanNotApproved['dataFormPerizinanTotal'], 'id');
+            if (count($dataFormPerizinanNotApproved['dataFormPerizinan']) != 0) {
+                $this->formPerizinanNotApprovedModel->insertBatch($dataFormPerizinanNotApproved['dataFormPerizinan']);
+            }
+
+            if (count($dataFormPerizinanNotApproved['dataFormPerizinanTotal']) != 0) {
+                $this->payrollModel->updateBatch($dataFormPerizinanNotApproved['dataFormPerizinanTotal'], 'id');
+            }
+
 
             //-----------------------------------------
             // Payroll Gaji Harian
@@ -611,7 +623,9 @@ class Payroll extends BaseController
                 $startDate,
                 $endDate
             );
-            $this->payrollGajiHarianModel->insertBatch($dataPayrollGajiHarian['rows']);
+            if (count($dataPayrollGajiHarian['rows']) != 0) {
+                $this->payrollGajiHarianModel->insertBatch($dataPayrollGajiHarian['rows']);
+            }
             $mapTotalGajiHarian = $dataPayrollGajiHarian['totals_per_payroll'];
 
             //--------------------------------------
@@ -656,7 +670,10 @@ class Payroll extends BaseController
                 $endDate
             );
 
-            $this->payrollModel->updateBatch($dataPayrollLast, 'id');
+            if (count($dataPayrollLast) != 0) {
+                $this->payrollModel->updateBatch($dataPayrollLast, 'id');
+            }
+
 
             // Commit transaksi
             $db->transCommit();
@@ -763,6 +780,7 @@ class Payroll extends BaseController
                         'HADIR_H'           => 0,
                         'LIBUR_L'           => 0,
                         'ALPHA_A'           => 0,
+                        'DINAS_D'           => 0,
                     ];
                 }
                 $mapStatusAttendance[$empId][$s['status']] = $s['total'];
@@ -788,6 +806,7 @@ class Payroll extends BaseController
                     "hadir"                        => $att["HADIR_H"] ?? 0,
                     "libur"                        => $att["LIBUR_L"] ?? 0,
                     "alpha"                        => $att["ALPHA_A"] ?? 0,
+                    "dinas"                        => $att["DINAS_D"] ?? 0,
                     "hadir_final"                  => 0,
                     "total_perizinan_not_approved" => 0,
                     "total_perizinan_approved"     => 0,
@@ -832,7 +851,9 @@ class Payroll extends BaseController
                 $employeeIds,
                 $mapEmployeePayroll
             );
-            $this->attendanceKeterlambatanModel->insertBatch($dataAttendanceKeterlambatan);
+            if (count($dataAttendanceKeterlambatan) != 0) {
+                $this->attendanceKeterlambatanModel->insertBatch($dataAttendanceKeterlambatan);
+            }
 
             //--------------------------------------
             // Gaji Conjunction
@@ -854,7 +875,10 @@ class Payroll extends BaseController
                 $this->this_company_id,
                 $yearMonth
             );
-            $this->payrollGajiModel->insertBatch($dataPayrollGajiConjunction);
+
+            if (count($dataPayrollGajiConjunction) != 0) {
+                $this->payrollGajiModel->insertBatch($dataPayrollGajiConjunction);
+            }
 
             //--------------------------------------
             // Perizinan Not Approved
@@ -882,8 +906,15 @@ class Payroll extends BaseController
                 $startDate,
                 $endDate
             );
-            $this->formPerizinanNotApprovedModel->insertBatch($dataFormPerizinanNotApproved['dataFormPerizinan']);
-            $this->payrollModel->updateBatch($dataFormPerizinanNotApproved['dataFormPerizinanTotal'], 'id');
+
+            if (count($dataFormPerizinanNotApproved['dataFormPerizinan']) != 0) {
+                $this->formPerizinanNotApprovedModel->insertBatch($dataFormPerizinanNotApproved['dataFormPerizinan']);
+            }
+
+            if (count($dataFormPerizinanNotApproved['dataFormPerizinanTotal']) != 0) {
+
+                $this->payrollModel->updateBatch($dataFormPerizinanNotApproved['dataFormPerizinanTotal'], 'id');
+            }
 
             //-----------------------------------------
             // Payroll Gaji Harian
@@ -898,7 +929,9 @@ class Payroll extends BaseController
                 $startDate,
                 $endDate
             );
-            $this->payrollGajiHarianModel->insertBatch($dataPayrollGajiHarian['rows']);
+            if (count($dataPayrollGajiHarian['rows']) != 0) {
+                $this->payrollGajiHarianModel->insertBatch($dataPayrollGajiHarian['rows']);
+            }
             $mapTotalGajiHarian = $dataPayrollGajiHarian['totals_per_payroll'];
 
             //--------------------------------------
@@ -943,7 +976,9 @@ class Payroll extends BaseController
                 $endDate
             );
 
-            $this->payrollModel->updateBatch($dataPayrollLast, 'id');
+            if (count($dataPayrollLast) != 0) {
+                $this->payrollModel->updateBatch($dataPayrollLast, 'id');
+            }
 
             // Commit transaksi
             $db->transCommit();

@@ -15,6 +15,7 @@ use App\Models\SuratJalanDetailModel;
 use App\Models\TaxModel;
 use App\Models\AllNoModel;
 use App\Models\BarangMasterSalesModel;
+use App\Models\EmployeesModel;
 use App\Models\PembayaranInvoiceModel;
 use App\Models\SalesOrderInvoiceDetailModel;
 use App\Models\SalesOrderPaymentDetailModel;
@@ -46,6 +47,7 @@ class Invoice extends BaseController
     protected $pembayaranInvoiceModel;
     protected $BarangMasterSalesModel;
     protected $stockModel;
+    protected $employeeModel;
 
     public function __construct()
     {
@@ -70,6 +72,7 @@ class Invoice extends BaseController
         $this->pembayaranInvoiceModel = new PembayaranInvoiceModel();
         $this->BarangMasterSalesModel = new BarangMasterSalesModel();
         $this->stockModel = new StockModel();
+        $this->employeeModel = new EmployeesModel();
     }
 
     public function index()
@@ -88,8 +91,13 @@ class Invoice extends BaseController
         $tipeShipping = $this->MetadataModel->asObject()->select(['id', 'value'])->where('name', 'tipe_shipping_via')->findAll();
         // $noFaktur = $this->getNomorFaktur();
         $taxData = $this->taxModel->getTaxByType('ppn');
+        $condition = [
+            'jabatan_name' => "MARKETING LOKAL"
+        ];
+
+        $sales = $this->employeeModel->getEmployeesComplete($condition);
         $data = [
-            // "noFaktur" => $noFaktur,
+            "sales" => $sales,
             "dataCustomers" => $customers,
             "id_user" => session()->get('login')->user_id,
             "seller_name" => session()->get('login')->name,
@@ -679,6 +687,14 @@ class Invoice extends BaseController
                         }
                     }
                 }
+
+                foreach ($postData['doc_id'] as $id) {
+                    if ($soInvData->document_type === 'pesanan') {
+                        $this->SalesOrderModel->where('id', $id)->set(['sales_order_invoice_id' => $payload['id']])->update();
+                    } else {
+                        $this->SuratJalanModel->where('id', $id)->set(['sales_order_invoice_id' => $payload['id']])->update();
+                    }
+                }
             } else {
                 // jika ada perubahan
                 $this->SalesOrderInvoiceDetailModel->where('id_sales_order_invoice', $payload['id'])->delete();
@@ -991,6 +1007,7 @@ class Invoice extends BaseController
                 sales_order.keterangan,
                 sales_order.payment_terms AS termin,
                 sales_order.jenis_penjualan AS jenis_penjualan,
+                sales_order.sales_id,
                 employees.name AS salesName
             ')
                 ->join('sales_order_detail', 'sales_order_detail.id_sales_order = sales_order.id')
@@ -1010,6 +1027,7 @@ class Invoice extends BaseController
                     surat_jalan_so.note AS keterangan,
                     COALESCE(surat_jalan_so.terms, customers.termin) AS termin,
                     COALESCE(sales_order.jenis_penjualan, customers.jenis_penjualan) AS jenis_penjualan,
+                    sales_order.sales_id,
                     employees.name AS salesName
                 ')
                 ->join('sales_order', 'sales_order.surat_jalan_so_id = surat_jalan_so.id', 'left')
@@ -1030,6 +1048,7 @@ class Invoice extends BaseController
                     surat_jalan_so.note AS keterangan,
                     COALESCE(surat_jalan_so.terms, customers.termin) AS termin,
                     COALESCE(sales_order.jenis_penjualan, customers.jenis_penjualan) AS jenis_penjualan,
+                    sales_order.sales_id,
                     employees.name AS salesName
                 ')
                 ->join('surat_jalan_so_detail', 'surat_jalan_so_detail.id_surat_jalan = surat_jalan_so.id', 'left')
@@ -1041,11 +1060,22 @@ class Invoice extends BaseController
                 ->groupBy('surat_jalan_so.no_surat_jalan')
                 ->findAll();
 
-            // Gabung dan hilangkan duplikat
             $merged = [];
+
             foreach (array_merge($documentList1, $documentList2) as $row) {
-                $merged[$row->id] = $row;
+                if (!isset($merged[$row->id])) {
+                    // Jika belum ada, langsung simpan
+                    $merged[$row->id] = $row;
+                } else {
+                    // Jika sudah ada dari list1, jangan timpa field yang sudah terisi
+                    foreach ($row as $key => $value) {
+                        if (empty($merged[$row->id]->{$key}) && !empty($value)) {
+                            $merged[$row->id]->{$key} = $value;
+                        }
+                    }
+                }
             }
+
             $documentList = array_values($merged);
         }
 

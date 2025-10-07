@@ -176,7 +176,7 @@ class FormPerizinanNotApprovedModel extends Model
             }
 
             // Approved → hitung total approved
-            if ($p['isApproved'] && $p['status'] !== "ALPHA_A" && $p['status'] !== "LIBUR_L" && $p['status'] !== "HADIR_H") {
+            if ($p['isApproved'] == 1 && $p['status'] !== "ALPHA_A" && $p['status'] !== "LIBUR_L" && $p['status'] !== "HADIR_H") {
                 $dataResultTotal[$eid]['total_perizinan_approved']++;
                 // Hadir_final hanya tambah jika bukan hari Minggu
                 // if ($dayOfWeek != 0) {
