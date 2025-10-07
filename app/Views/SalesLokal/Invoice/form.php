@@ -103,19 +103,21 @@
                             <select class="form-select doc_id" multiple name="doc_id[]" id="doc_id">
                                 <option value=""></option>
                                 <?php if (!empty($data)) : ?>
-                                    <?php if (!empty($selectedDocIds)) : ?>
-                                        <?php foreach ($selectedDocIds as $i => $id) : ?>
-                                            <option selected value="<?= $id ?>"><?= $selectedDocNos[$i] ?></option>
-                                        <?php endforeach; ?>
-
-                                        <?php foreach ($documentList as $row) : ?>
-                                            <?php if (!in_array($row->id, $selectedDocIds)) : ?>
-                                                <option value="<?= $row->id ?>"><?= $row->doc_no ?></option>
-                                            <?php endif; ?>
+                                    <?php if (!empty($documentList)) : ?>
+                                        <?php foreach ($documentList as $row): ?>
+                                            <?php $isSelected = in_array($row->id, $selectedDocIds ?? []); ?>
+                                            <option value="<?= $row->id ?>"
+                                                <?= $isSelected ? 'selected' : '' ?>
+                                                data-company="<?= $row->id_company ?>"
+                                                data-keterangan="<?= htmlspecialchars($row->keterangan ?? '', ENT_QUOTES, 'UTF-8') ?>"
+                                                data-no_po="<?= htmlspecialchars($row->no_po ?? '', ENT_QUOTES, 'UTF-8') ?>"
+                                                data-termin="<?= $row->termin ?>"
+                                                data-jenis_penjualan="<?= $row->jenis_penjualan ?>"
+                                                data-sales="<?= htmlspecialchars($row->salesName ?? '', ENT_QUOTES, 'UTF-8') ?>">
+                                                <?= $row->doc_no ?>
+                                            </option>
                                         <?php endforeach; ?>
                                     <?php endif; ?>
-
-
                                 <?php endif; ?>
                             </select>
                         </div>
@@ -430,6 +432,31 @@
     var priceEdit = 0;
     var totalPriceEdit = 0;
     let no = 0;
+
+    <?php if (!empty($data)) : ?>
+        let customerAddress = $('.id_customer option:selected').data('address');
+        $('#customerAddress').val(customerAddress);
+        let company = $('.doc_id').find("option:selected").data("company");
+        let customerTermin = $('.doc_id').find("option:selected").data('termin');
+        let jenisPenjualan = $('.doc_id').find("option:selected").data('jenis_penjualan');
+        let customerSales = $('.doc_id').find("option:selected").data('sales');
+
+        if (company) {
+            $('#company_ids').val(company).change();
+        }
+
+        if (customerTermin) {
+            $('#termin').val(customerTermin).change();
+        }
+
+        if (jenisPenjualan) {
+            $('#jenis_penjualan').val(jenisPenjualan).change();
+        }
+
+        if (customerSales) {
+            $('#salesName').val(customerSales);
+        }
+    <?php endif; ?>
 
     // Format the date to your desired representation
     // var formattedDate = currentDate.toLocaleString().slice(0, 9); // You can use other formatting methods if needed
