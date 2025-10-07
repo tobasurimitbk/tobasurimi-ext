@@ -636,6 +636,9 @@
                             return renderCell(data, '#304de2');
                         }
 
+                        if (colClass.includes('bg-dinas')) {
+                            return renderCell(data, '#ad53a9');
+                        }
 
                         function renderCell(data, bgColor) {
                             return `<div style="
@@ -731,6 +734,11 @@
             },
             {
                 data: "total_alpha",
+                className: "text-left",
+                sortable: false,
+            },
+            {
+                data: "total_dinas",
                 className: "text-left",
                 sortable: false,
             },

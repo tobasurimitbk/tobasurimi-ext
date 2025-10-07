@@ -30,6 +30,7 @@ class PayrollsModel extends Model
         'hadir',
         'libur',
         'alpha',
+        'dinas',
         'hadir_final',
         'total_perizinan_not_approved',
         'total_perizinan_approved',

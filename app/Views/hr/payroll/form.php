@@ -153,12 +153,18 @@
                 </div>
                 <div class="col-sm-2 mt-1">
                     <div class="form-floating mb-3" style="height: 50px;">
+                        <input readonly autocomplete="one-time-code" type="text" required name="totalDinas" id="totalDinas" class="form-control target input-picker" value="<?= $payrollDetail['dinas'] ?? 0 ?> Kali">
+                        <label for="floatingInput">Dinas</label>
+                    </div>
+                </div>
+                <div class="col-sm-2 mt-1">
+                    <div class="form-floating mb-3" style="height: 50px;">
                         <input readonly autocomplete="one-time-code" type="text" required name="totalHadir" id="totalHadir" class="form-control target input-picker" value="<?= $payrollDetail['hadir'] ?? 0 ?> Kali">
                         <label for="floatingInput">Hadir</label>
                     </div>
                 </div>
 
-                <div class="col-sm-4 mt-1">
+                <div class="col-sm-2 mt-1">
                     <div class="form-floating mb-3" style="height: 50px;">
                         <input readonly autocomplete="one-time-code" type="text" required name="totalUangLembur" id="totalUangLembur" class="form-control target input-picker" value="<?= " " . number_format($payrollDetail['nominal_uang_lembur'],  2, ',', '.') ?>">
                         <label for="floatingInput">Total Uang Lembur Dalam Sebulan</label>

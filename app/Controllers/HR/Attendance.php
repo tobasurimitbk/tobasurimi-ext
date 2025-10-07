@@ -210,6 +210,7 @@ class Attendance extends BaseController
                         'IJIN_I' => 'bg-ijin',
                         'SAKIT_S' => 'bg-sakit',
                         'RL_RL' => 'bg-rl',
+                        'DINAS_D' => 'bg-dinas'
                     ];
 
                     $row['day_' . $d . '_in_class']  = $mapping[$statusIzin];
@@ -350,6 +351,7 @@ class Attendance extends BaseController
             $totalHadir          = 0;
             $totalAlpha          = 0;
             $totalLibur          = 0;
+            $totalDinas          = 0;
 
             // Loop setiap tanggal dalam bulan
             for ($d = 1; $d <= $totalDaysInMonth; $d++) {
@@ -395,6 +397,9 @@ class Attendance extends BaseController
                     case 'RL_RL':
                         $totalRl++;
                         break;
+                    case 'DINAS_D':
+                        $totalDinas++;
+                        break;
                 }
 
                 // Jika hadir (ada in/out)
@@ -414,6 +419,7 @@ class Attendance extends BaseController
             $row['total_hadir']           = $totalHadir;
             $row['total_alpha']           = $totalAlpha;
             $row['total_libur']           = $totalLibur;
+            $row['total_dinas']           = $totalDinas;
 
             $resultData[] = $row;
         }
@@ -577,7 +583,8 @@ class Attendance extends BaseController
                         'SAKIT_S' => 'bg-sakit',
                         'RL_RL' => 'bg-rl',
                         'ALPHA_A' => 'bg-alpha',
-                        'LIBUR_L' => 'bg-libur'
+                        'LIBUR_L' => 'bg-libur',
+                        'DINAS_D' => 'bg-dinas'
                     ];
 
                     $row['day_' . $d . '_in_class']  = $mapping[$statusIzin];
@@ -728,6 +735,7 @@ class Attendance extends BaseController
             $totalHadir          = 0;
             $totalAlpha          = 0;
             $totalLibur          = 0;
+            $totalDinas          = 0;
 
             // Loop setiap tanggal dalam bulan
             for ($d = 1; $d <= $totalDaysInMonth; $d++) {
@@ -773,6 +781,9 @@ class Attendance extends BaseController
                     case 'RL_RL':
                         $totalRl++;
                         break;
+                    case 'DINAS_D':
+                        $totalDinas++;
+                        break;
                 }
 
                 // Jika hadir (ada in/out)
@@ -792,6 +803,7 @@ class Attendance extends BaseController
             $row['total_hadir']           = $totalHadir;
             $row['total_alpha']           = $totalAlpha;
             $row['total_libur']           = $totalLibur;
+            $row['total_dinas']           = $totalDinas;
 
             $resultData[] = $row;
         }
@@ -1318,7 +1330,8 @@ class Attendance extends BaseController
             'Sakit',
             'RL',
             'Alpha',
-            'Libur'
+            'Libur',
+            'Dinas'
         ];
         $colIndex = 1;
         $rowHeader2 = 3;
@@ -1346,7 +1359,7 @@ class Attendance extends BaseController
             $sheet2->setCellValueByColumnAndRow($colIndex++, $rowIndex, $e['divisi']);
             $sheet2->setCellValueByColumnAndRow($colIndex++, $rowIndex, $e['bagian']);
 
-            $total = ['ct' => 0, 'chd' => 0, 'chl' => 0, 'cm' => 0, 'ijin' => 0, 'sakit' => 0, 'rl' => 0, 'hadir' => 0, 'alpha' => 0, 'libur' => 0];
+            $total = ['ct' => 0, 'chd' => 0, 'chl' => 0, 'cm' => 0, 'ijin' => 0, 'sakit' => 0, 'rl' => 0, 'hadir' => 0, 'alpha' => 0, 'libur' => 0, 'dinas' => 0];
 
             for ($d = 1; $d <= $totalDaysInMonth; $d++) {
                 $tanggal = sprintf("%04d-%02d-%02d", $year, $month, $d);
@@ -1384,6 +1397,9 @@ class Attendance extends BaseController
                     case 'RL_RL':
                         $total['rl']++;
                         break;
+                    case 'DINAS_D':
+                        $total['dinas']++;
+                        break;
                 }
 
                 if (!empty($in) || !empty($out)) {
@@ -1401,6 +1417,7 @@ class Attendance extends BaseController
             $sheet2->setCellValueByColumnAndRow($colIndex++, $rowIndex, $total['rl']);
             $sheet2->setCellValueByColumnAndRow($colIndex++, $rowIndex, $total['alpha']);
             $sheet2->setCellValueByColumnAndRow($colIndex++, $rowIndex, $total['libur']);
+            $sheet2->setCellValueByColumnAndRow($colIndex++, $rowIndex, $total['dinas']);
 
             $rowIndex++;
         }
@@ -1645,6 +1662,7 @@ class Attendance extends BaseController
                         'ijin'           => 0,
                         'sakit'          => 0,
                         'rl'             => 0,
+                        'dinas'          => 0
                     ];
                 }
 
@@ -1679,6 +1697,9 @@ class Attendance extends BaseController
                     case 'RL':
                         $rekapKaryawan[$emp['id']]['rl']++;
                         break;
+                    case 'D':
+                        $rekapKaryawan[$emp['id']]['dinas']++;
+                        break;
                 }
             }
 
@@ -1697,7 +1718,7 @@ class Attendance extends BaseController
         $row++;
 
         // Header rekap
-        $rekapHeaders = ['No', 'Nip', 'Nama', 'Hadir', 'Alpa', 'Libur', 'Cuti Tahunan', 'Cuti Haid', 'Cuti Hamil', 'Cuti Melahirkan', 'Ijin', 'Sakit', 'RL'];
+        $rekapHeaders = ['No', 'Nip', 'Nama', 'Hadir', 'Alpa', 'Libur', 'Cuti Tahunan', 'Cuti Haid', 'Cuti Hamil', 'Cuti Melahirkan', 'Ijin', 'Sakit', 'RL', 'Dinas'];
         $col = 'A';
         foreach ($rekapHeaders as $h) {
             $sheet->setCellValue("{$col}{$row}", $h);
@@ -1726,15 +1747,16 @@ class Attendance extends BaseController
             $sheet->setCellValue("K{$row}", $r['ijin']);
             $sheet->setCellValue("L{$row}", $r['sakit']);
             $sheet->setCellValue("M{$row}", $r['rl']);
+            $sheet->setCellValue("N{$row}", $r['dinas']);
 
-            $sheet->getStyle("A{$row}:M{$row}")->applyFromArray([
+            $sheet->getStyle("A{$row}:N{$row}")->applyFromArray([
                 'borders' => ['allBorders' => ['borderStyle' => Border::BORDER_THIN]]
             ]);
             $row++;
         }
 
         // auto size kolom
-        foreach (range('A', 'M') as $col) {
+        foreach (range('A', 'N') as $col) {
             $sheet->getColumnDimension($col)->setAutoSize(true);
         }
 
@@ -1914,7 +1936,8 @@ class Attendance extends BaseController
             'Sakit',
             'RL',
             'Alpha',
-            'Libur'
+            'Libur',
+            'Dinas'
         ];
         $colIndex = 1;
         $rowHeader2 = 3;
@@ -1953,7 +1976,8 @@ class Attendance extends BaseController
                 'rl' => 0,
                 'hadir' => 0,
                 'alpha' => 0,
-                'libur' => 0
+                'libur' => 0,
+                'dinas' => 0
             ];
 
             for ($d = 1; $d <= $totalDaysInMonth; $d++) {
@@ -1992,6 +2016,9 @@ class Attendance extends BaseController
                     case 'RL_RL':
                         $total['rl']++;
                         break;
+                    case 'DINAS_D':
+                        $total['dinas']++;
+                        break;
                 }
 
                 if (!empty($in) || !empty($out)) {
@@ -2009,6 +2036,7 @@ class Attendance extends BaseController
             $sheet2->setCellValueByColumnAndRow($colIndex++, $rowIndex, $total['rl']);
             $sheet2->setCellValueByColumnAndRow($colIndex++, $rowIndex, $total['alpha']);
             $sheet2->setCellValueByColumnAndRow($colIndex++, $rowIndex, $total['libur']);
+            $sheet2->setCellValueByColumnAndRow($colIndex++, $rowIndex, $total['dinas']);
 
             $rowIndex++;
         }

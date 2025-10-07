@@ -485,7 +485,7 @@ class JasaVendorOut extends BaseController
             $id = decrypt($this->request->getVar('id'));
 
             // Validasi data exists
-            $jasaVendorOut = $this->jasaVendorOutModel->find($id);
+            $jasaVendorOut = $this->jasaVendorOutModel->where('id', $id)->where('deletedAt', NULL)->first();
             if (!$jasaVendorOut) {
                 throw new \Exception("Data jasa vendor tidak ditemukan");
             }
@@ -500,6 +500,9 @@ class JasaVendorOut extends BaseController
                 ->where('deletedAt', null)
                 ->findAll();
 
+                var_dump($jasaVendorOutDetail);
+                die;
+
             if (empty($jasaVendorOutDetail)) {
                 throw new \Exception("Detail jasa vendor tidak ditemukan");
             }
@@ -508,6 +511,7 @@ class JasaVendorOut extends BaseController
                 $data = [
                     "stock_detail_id" => $j['stock_out_detail_id'],
                     "qty_digunakan" => $j['qty'],
+                    "no_dokumen" => $jasaVendorOut['no_surat_jalan']
                 ];
 
                 // Panggil model - jika gagal akan throw exception
@@ -550,24 +554,75 @@ class JasaVendorOut extends BaseController
         }
     }
 
-    public function unPosting()
+    public function unposting()
     {
-        $id = decrypt($this->request->getVar('id'));
+        $db = \Config\Database::connect();
+        $db->transBegin();
+        $stockRevampModel = new StockRevampModel();
 
-        $result =  $this->stockModel->unPostingStockJasaVendorOut($id);
-        if ($result) {
-            $this->jasaVendorOutModel->update($id, ['status_posting' => '0']);
-            return response()->setJSON([
-                'status' => true,
-                'message' => "Jasa vendor pengeluaran barang berhasil di Unposting",
-                'token' => csrf_hash(),
+        try {
+            $id = decrypt($this->request->getVar('id'));
+            
+            // Validasi apakah data exists
+            $jasaVendorOut = $this->jasaVendorOutModel
+                ->where('id', $id)
+                ->first();
+            if (!$jasaVendorOut) {
+                throw new \Exception("Data Jasa Vendor Out tidak ditemukan");
+            }
+
+
+            $jasaVendorOutDetail = $this->jasaVendorOutDetailModel
+                ->where('jasa_vendor_out_id', $id)
+                ->findAll();
+
+            if (empty($jasaVendorOutDetail)) {
+                throw new \Exception("Detail Jasa Vendor Out tidak ditemukan");
+            }
+
+            foreach ($jasaVendorOutDetail as $j) {
+                $data = [
+                    "stock_detail_asal"     => $j["stock_out_detail_id"],    
+                    "qty_diterima_asal"     => $j["qty"],
+                    "no_dokumen"            => $jasaVendorOut["no_surat_jalan"],
+                ];
+
+                // Panggil model - jika gagal akan throw exception
+                $stockRevampModel->unpostStockKeluar($db, $data);
+            }
+
+            // update status Jasa Vendor Out
+            $this->jasaVendorOutModel->update($id, [
+                'status_posting' => '0'
+            ]);
+
+            // commit transaksi
+            $db->transCommit();
+
+            return $this->response->setJSON([
+                'message' => "Jasa Vendor Out berhasil di-unpost",
+                'status'  => true,
+                'token'   => csrf_hash()
+            ]);
+
+        } catch (\Exception $e) {
+            $db->transRollback();
+
+            return $this->response->setJSON([
+                'message' => "Gagal unpost Jasa Vendor Out: " . $e->getMessage(),
+                'status'  => false,
+                'token'   => csrf_hash()
+            ]);
+            
+        } catch (\Throwable $th) {
+            $db->transRollback();
+
+            return $this->response->setJSON([
+                'message' => "Terjadi kesalahan sistem: " . $th->getMessage(),
+                'status'  => false,
+                'token'   => csrf_hash()
             ]);
         }
-        return response()->setJSON([
-            'status' => false,
-            'message' => "terjadi kesalahan saat unposting stok",
-            'token' => csrf_hash(),
-        ]);
     }
 
     public function close()

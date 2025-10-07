@@ -171,7 +171,7 @@ class PinjamanKaryawan extends BaseController
                     if (($libur != null || date('l', strtotime($tgl)) == "Sunday") && $izin == null && $logAbsen == null) {
                         $tidakHadir++;
                     } elseif ($izin != null) {
-                        if (in_array($izin['status'], ["ALPHA_A", "CUTI HAID_CHD", "CUTI HAMIL_CHL", "CUTI MELAHIRKAN_CM", "LIBUR_L"])) {
+                        if (in_array($izin['status'], ["ALPHA_A", "CUTI HAID_CHD", "CUTI HAMIL_CHL", "CUTI MELAHIRKAN_CM", "LIBUR_L", "DINAS_D"])) {
                             $tidakHadir++;
                         } else {
                             $hadir++;
@@ -322,7 +322,7 @@ class PinjamanKaryawan extends BaseController
                 if ($hariLibur != null || (date('l', strtotime($dates)) == "Sunday" && !$izin && !$log)) {
                     $tidakHadir++;
                 } elseif ($izin != null) {
-                    if (in_array($izin['status'], ["ALPHA_A", "CUTI HAID_CHD", "CUTI HAMIL_CHL", "CUTI MELAHIRKAN_CM", "LIBUR_L"])) {
+                    if (in_array($izin['status'], ["ALPHA_A", "CUTI HAID_CHD", "CUTI HAMIL_CHL", "CUTI MELAHIRKAN_CM", "LIBUR_L", "DINAS_D"])) {
                         $tidakHadir++;
                     } else {
                         $hadir++;
