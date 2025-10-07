@@ -206,6 +206,8 @@
                                     <th style="text-align: center;">Qty</th>
                                     <th style="text-align: center;">Harga Satuan</th>
                                     <th style="text-align: center;">Sub Total</th>
+                                    <th style="text-align: center;">Total Sudah Bayar</th>
+                                    <th style="text-align: center;">Total Sisa Bayar</th>
                                 </tr>
                             </thead>
                             <tbody class="body-detail-table" id="body-detail-table" style="cursor: pointer;">
@@ -496,16 +498,24 @@
                     }).then((result) => {
                         if (result.isConfirmed) {
                             const formData = new FormData(document.querySelector(".create-form"));
-                            formData.append('total_amount_invoice', destroyFormatRupiah($(".total_amount_invoice").text()));
-                            formData.append('total_bayar', destroyFormatRupiah($(".total-bayar").val()));
-                            const cleanListBarang = dataList.map((item, index) => ({
-                                ...item,
-                                harga_barang_invoice: destroyFormatRupiah(item.harga_barang_invoice),
-                                amount_invoice: destroyFormatRupiah(item.amount_invoice),
-                                qty_invoice: destroyFormatRupiah(item.qty_invoice),
-                                keterangan_pajak: $(`#keterangan_pajak_${index}`).val(), // Ambil dari input
-                                nominal_pajak: $(`#nominal_pajak_${index}`).val() // Ambil dari input
-                            }));
+
+                            // Bangun ulang list_barang dan ambil input total per index
+                            const cleanListBarang = dataList.map((item, index) => {
+                                const totalBayarInput = $(`#sisa_bayar_${index}`);
+                                const totalTagihanInput = $(`#total_amount_invoice_${index}`);
+
+                                return {
+                                    ...item,
+                                    total_amount_invoice: destroyFormatRupiah(totalTagihanInput.val() || item.amount_invoice || 0),
+                                    total_bayar: destroyFormatRupiah(totalBayarInput.val() || 0),
+                                    harga_barang_invoice: destroyFormatRupiah(item.harga_barang_invoice),
+                                    qty_invoice: destroyFormatRupiah(item.qty_invoice),
+                                    keterangan_pajak: $(`#keterangan_pajak_${index}`).val() || '',
+                                    nominal_pajak: destroyFormatRupiah($(`#nominal_pajak_${index}`).val() || 0),
+                                };
+                            });
+
+                            // Masukkan ke FormData
                             formData.append('list_barang', JSON.stringify(cleanListBarang));
                             $.ajax({
 
@@ -570,16 +580,24 @@
                     }).then((result) => {
                         if (result.isConfirmed) {
                             const formData = new FormData(document.querySelector(".create-form"));
-                            formData.append('total_amount_invoice', destroyFormatRupiah($(".total_amount_invoice").text()));
-                            formData.append('total_bayar', destroyFormatRupiah($(".total-bayar").val()));
-                            const cleanListBarang = dataList.map((item, index) => ({
-                                ...item,
-                                harga_barang_invoice: destroyFormatRupiah(item.harga_barang_invoice),
-                                amount_invoice: destroyFormatRupiah(item.amount_invoice),
-                                qty_invoice: destroyFormatRupiah(item.qty_invoice),
-                                keterangan_pajak: $(`#keterangan_pajak_${index}`).val(), // Ambil dari input
-                                nominal_pajak: $(`#nominal_pajak_${index}`).val() // Ambil dari input
-                            }));
+
+                            // Bangun ulang list_barang dan ambil input total per index
+                            const cleanListBarang = dataList.map((item, index) => {
+                                const totalBayarInput = $(`#sisa_bayar_${index}`);
+                                const totalTagihanInput = $(`#total_amount_invoice_${index}`);
+
+                                return {
+                                    ...item,
+                                    total_amount_invoice: destroyFormatRupiah(totalTagihanInput.val() || item.amount_invoice || 0),
+                                    total_bayar: destroyFormatRupiah(totalBayarInput.val() || 0),
+                                    harga_barang_invoice: destroyFormatRupiah(item.harga_barang_invoice),
+                                    qty_invoice: destroyFormatRupiah(item.qty_invoice),
+                                    keterangan_pajak: $(`#keterangan_pajak_${index}`).val() || '',
+                                    nominal_pajak: destroyFormatRupiah($(`#nominal_pajak_${index}`).val() || 0),
+                                };
+                            });
+
+                            // Masukkan ke FormData
                             formData.append('list_barang', JSON.stringify(cleanListBarang));
                             $.ajax({
                                 url: "<?= base_url("pembayaran-invoice/save"); ?>",
@@ -919,6 +937,8 @@
                                 qty_invoice: data.qty_invoice,
                                 harga_barang_invoice: data.harga_barang_invoice,
                                 amount_invoice: data.amount_invoice,
+                                harga_dibayar: destroyFormatRupiah(data.harga_dibayar || 0),
+                                sisa_bayar: destroyFormatRupiah(data.sisa_bayar || (data.amount_invoice - (data.harga_dibayar || 0))),
                                 kode_barang: data.kode_barang,
                                 barang_name: data.barang_name,
                                 sales_order_invoice_id: data.sales_order_invoice_id,
@@ -945,127 +965,165 @@
         });
     }
 
-    function drawTable(dataList, totalPembayaran, totalSudahDiBayar) {
-
+    
+    function drawTable(dataList, totalPembayaran = 0, totalSudahDiBayar = 0) {
         const table = $('#dataTable');
         table.find('tbody').empty();
 
-        let total_amount = 0;
+        let globalIndex = 0;
 
-        // Mengelompokkan data berdasarkan kombinasi no_faktur dan barang_name
-        let groupedData = dataList.reduce((acc, item) => {
-            let key = `${item.no_faktur}-${item.barang_name}`;
-            if (!acc[key]) {
-                acc[key] = [];
-            }
+        // Group data berdasarkan faktur dan nama barang
+        const groupedData = dataList.reduce((acc, item) => {
+            const key = `${item.no_faktur}-${item.barang_name}`;
+            if (!acc[key]) acc[key] = [];
             acc[key].push(item);
             return acc;
         }, {});
 
-        // Loop untuk menambahkan baris ke tabel
         Object.keys(groupedData).forEach(key => {
-            let group = groupedData[key];
+            const group = groupedData[key];
             let isFirstRow = true;
 
-            group.forEach((item, index) => {
-                let newRow = $('<tr style="color:whitesmoke;">');
+            group.forEach(item => {
+                const total = destroyFormatRupiah(item.amount_invoice || 0);
+                const dp = destroyFormatRupiah(item.total_bayar_detail || item.harga_dibayar || 0);
+                const sisa = destroyFormatRupiah(item.sisa_bayar || (total - dp));
 
+                const newRow = $('<tr style="color:whitesmoke;">');
+
+                // Kolom no faktur (merge rowspan)
                 if (isFirstRow) {
                     newRow.append(
-                        $('<td rowspan="' + group.length + '" style="text-align:center;">').text(item.no_faktur)
+                        $('<td>', {
+                            rowspan: group.length,
+                            style: 'text-align:center;'
+                        }).text(item.no_faktur)
                     );
                     isFirstRow = false;
                 }
 
-                // Check if document_type exists
-                if (item.document_type) {
-                    newRow.append(
-                        $('<td colspan="4" style="text-align:center;">').text('DATA IMPORT')
-                    );
-                    newRow.append($('<td style="text-align:center;">').text(greatFormatRupiah(item.amount_invoice)));
-                } else {
-                    newRow.append($('<td style="text-align:center;">').text(item.kode_barang));
-                    newRow.append($('<td style="text-align:center;">').text(item.barang_name));
-                    newRow.append($('<td style="text-align:center;">').text(item.qty_invoice));
-                    newRow.append($('<td style="text-align:center;">').text(greatFormatRupiah(item.harga_barang_invoice)));
-                    newRow.append($('<td style="text-align:center;">').text(greatFormatRupiah(item.amount_invoice)));
-                }
+                newRow.append($('<td style="text-align:center;">').text(item.kode_barang));
+                newRow.append($('<td style="text-align:center;">').text(item.barang_name));
+                newRow.append($('<td style="text-align:center;">').text(item.qty_invoice));
+                newRow.append($('<td style="text-align:center;">').text(greatFormatRupiah(item.harga_barang_invoice)));
 
-                // Tambahkan baris ke tabel
+                // Total tagihan (readonly)
+                newRow.append(
+                    $('<td style="text-align:center;">').append(
+                        $('<input>', {
+                            type: 'text',
+                            name: 'total_amount_invoice[]',
+                            id: 'total_amount_invoice_' + globalIndex,
+                            class: 'form-control text-end total-amount-invoice',
+                            readonly: true,
+                            value: greatFormatRupiah(total)
+                        })
+                    )
+                );
+
+                // Total dibayar sebelumnya (readonly)
+                newRow.append(
+                    $('<td style="text-align:center;">').append(
+                        $('<input>', {
+                            type: 'text',
+                            name: 'total_bayar[]',
+                            id: 'total_bayar_' + globalIndex,
+                            class: 'form-control text-end total-bayar',
+                            readonly: true,
+                            value: greatFormatRupiah(dp)
+                        })
+                    )
+                );
+
+                // Sisa bayar sekarang (editable)
+                const sisaInput = $('<input>', {
+                    type: 'text',
+                    name: 'sisa_bayar[]',
+                    id: 'sisa_bayar_' + globalIndex,
+                    class: 'form-control text-end sisa-bayar',
+                    value: greatFormatRupiah(sisa)
+                });
+
+                sisaInput.on('keyup', function () {
+                    this.value = greatFormatRupiah(this.value);
+                    updateTotalSummary();
+                });
+
+                newRow.append($('<td style="text-align:center;">').append(sisaInput));
+
                 table.find('tbody').append(newRow);
-
-                // Update total amounts (include all rows, including DATA IMPORT)
-                total_amount += parseFloat(item.amount_invoice);
+                globalIndex++;
             });
         });
 
-        // Menambahkan baris total pembayaran dan potongan
-        addSummaryRows(table, total_amount, totalPembayaran, totalSudahDiBayar);
+        addSummaryRows(table);
+        updateTotalSummary();
     }
 
-    function addSummaryRows(table, total_amount, total_invoice, limit_bayar, totalSudahDiBayar) {
-        // Pastikan semua parameter memiliki nilai default 0 jika undefined, null, atau NaN
-        total_amount = isNaN(total_amount) ? 0 : total_amount;
-        total_invoice = isNaN(total_invoice) ? 0 : total_invoice;
-        limit_bayar = isNaN(limit_bayar) ? 0 : limit_bayar;
-        totalSudahDiBayar = isNaN(totalSudahDiBayar) ? 0 : totalSudahDiBayar;
-        sisaPayForKeteranganCondition = total_amount - total_invoice;
-
-        // Tambahkan baris untuk Total Pembayaran, Total Sudah Dibayar, dan Sisa Pembayaran
+    // Tambahkan summary total di bawah
+    function addSummaryRows(table) {
         table.find('tbody').append(`
             <tr style="color:whitesmoke;">
-                <td colspan="5" style="text-align: right;">Total Pembayaran</td>
-                <td style="text-align:center;">${greatFormatRupiah(total_amount)}</td>
+                <td colspan="7" style="text-align: right;">Total Tagihan</td>
+                <td class="total_tagihan text-center"></td>
             </tr>
             <tr style="color:whitesmoke;">
-                <td colspan="5" style="text-align: right;">Total Sudah Dibayar</td>
-                <td class="total_dibayar" style="text-align:center;">${greatFormatRupiah(total_invoice)}</td>
+                <td colspan="7" style="text-align: right;">Total Sudah Dibayar (DP)</td>
+                <td class="total_dibayar text-center"></td>
             </tr>
             <tr style="color:whitesmoke;">
-                <td colspan="5" style="text-align: right;">Sisa Pembayaran</td>
-                <td class="total_amount_invoice" style="text-align:center;">${greatFormatRupiah(total_amount - total_invoice)}</td>
+                <td colspan="7" style="text-align: right;">Total Pembayaran Sekarang</td>
+                <td class="sisa_total text-center"></td>
             </tr>
         `);
+    }
 
-        // Tambahkan baris untuk input Total Bayar
-        table.find('tbody').append(`
-            <tr style="color:whitesmoke;">
-                <td colspan="5" style="text-align: right;">Anda Membayar Sebesar</td>
-                <td style="text-align:center;">
-                    <input 
-                        autocomplete="one-time-code" 
-                        data-id="" 
-                        onkeyup="this.value = greatFormatRupiah(this.value); updateKeterangan(${total_amount}, ${total_invoice});" 
-                        class="form-control total-bayar trigger-input" 
-                        type="text" 
-                        value="" 
-                        name="total_bayar"
-                        placeholder="Masukkan jumlah pembayaran">
-                </td>
-            </tr>
-        `);
+    // Hitung ulang summary bawah
+    function updateTotalSummary() {
+        let totalTagihan = 0;
+        let totalDP = 0;
+        let totalSisaBayar = 0;
 
-        // Tambahkan event listener untuk validasi input
-        table.find('input.total-bayar').on('change', function() {
-            let rawValue = $(this).val(); // Ambil nilai input
-            let cleanValue = rawValue.replace(/[^0-9]/g, ''); // Hapus karakter non-digit
-            let numberValue = parseInt(cleanValue) || 0; // Konversi ke angka, default 0
-
-            let sisaPembayaran = total_amount - total_invoice; // Hitung sisa pembayaran
-
-            sisaPembayaran;
-
-            // Validasi nilai input
-            if (numberValue > sisaPembayaran) {
-                numberValue = sisaPembayaran; // Tidak boleh lebih besar dari sisa pembayaran
-            } else if (numberValue < 0) {
-                numberValue = 0; // Tidak boleh kurang dari 0
-            }
-
-            // Tampilkan nilai yang sudah divalidasi dalam format Rupiah
-            $(this).val(greatFormatRupiah(numberValue));
+        $('.total-amount-invoice').each(function () {
+            totalTagihan += destroyFormatRupiah($(this).val() || 0);
         });
+
+        $('.total-bayar').each(function () {
+            totalDP += destroyFormatRupiah($(this).val() || 0);
+        });
+
+        $('.sisa-bayar').each(function () {
+            totalSisaBayar += destroyFormatRupiah($(this).val() || 0);
+        });
+
+        $('.total_tagihan').text(greatFormatRupiah(totalTagihan));
+        $('.total_dibayar').text(greatFormatRupiah(totalDP));
+        $('.sisa_total').text(greatFormatRupiah(totalSisaBayar));
     }
+
+
+    // 🔥 Fungsi baru buat hitung ulang total
+    // function updateTotal(table, totalPembayaran, totalSudahDiBayar) {
+    //     let totalInput = 0;
+
+    //     // Loop semua input total_bayar
+    //     table.find('input.total-bayar').each(function() {
+    //         let rawValue = $(this).val().replace(/[^0-9]/g, '');
+    //         let val = parseFloat(rawValue) || 0;
+    //         totalInput += val;
+    //     });
+
+    //     // Update tampilan total
+    //     table.find('.total_pembayaran').text(greatFormatRupiah(totalInput));
+
+    //     // Hitung sisa pembayaran
+    //     let sisa = totalInput - totalPembayaran;
+    //     table.find('.sisa_pembayaran').text(greatFormatRupiah(sisa));
+
+    //     // Optional: validasi batas maksimal
+    //     if (totalInput < 0) totalInput = 0;
+    // }
+
 
     function deleteBarang(id) {
         var indexToRemove = -1;
@@ -1111,37 +1169,47 @@
         return randomString;
     };
 
-    function updateKeterangan(totalTagihan, totalPembayaran){
+    function updateKeterangan(totalTagihan, totalPembayaran) {
         const noDokumenElement = document.getElementById('no_dokumen');
         const customerElement = document.getElementById('customer');
         const textareaElement = document.getElementById('keterangan');
-        const totalBayarElement = $('input[name="total_bayar"]').val();
 
-        // Ambil nilai bayar (hilangkan format rupiah biar bisa dibandingkan angka)
+        // Ambil semua input total_bayar[] dan hitung totalnya
+        let totalBayar = 0;
+        $('input[name="total_bayar[]"]').each(function() {
+            const val = $(this).val() || '0';
+            totalBayar += destroyFormatRupiah(val);
+        });
 
-        let totalBayar = destroyFormatRupiah(totalBayarElement) || 0;
+        // Nilai fallback untuk variabel undefined
+        totalTagihan = isNaN(totalTagihan) ? 0 : totalTagihan;
+        totalPembayaran = isNaN(totalPembayaran) ? 0 : totalPembayaran;
 
-        // Ambil customer & dokumen
-        const selectedNoDokumen = Array.from(noDokumenElement.selectedOptions).map(option => option.text);
-        const selectedCustomer = Array.from(customerElement.selectedOptions).map(option => option.text);
+        // Hitung sisa pembayaran
+        const sisa = totalTagihan - totalBayar;
 
-        // Tentukan prefix berdasarkan kondisi
+        // Ambil customer & dokumen terpilih
+        const selectedNoDokumen = Array.from(noDokumenElement.selectedOptions).map(option => option.text.trim());
+        const selectedCustomer = Array.from(customerElement.selectedOptions).map(option => option.text.trim());
+
+        // Tentukan prefix berdasarkan kondisi logis
         let prefix = "";
-        sisa = sisaPayForKeteranganCondition - totalBayar
 
-        if (totalBayar === totalTagihan) {
-            prefix = "TERIMA A/ INVOICE";
-        } else if (sisa > 0 && totalBayar < totalTagihan) {
-            prefix = "TERIMA DP A/ INVOICE";
-        } else if (sisa == 0 && totalBayar < totalTagihan) {
-            prefix = "TERIMA PELUNASAN A/ INVOICE";
+        if (totalBayar >= totalTagihan && totalTagihan > 0) {
+            prefix = "TERIMA A/ INVOICE"; // Lunas
+        } else if (totalBayar > 0 && totalBayar < totalTagihan && sisa > 0) {
+            prefix = "TERIMA DP A/ INVOICE"; // Masih ada sisa
+        } else if (sisa === 0 && totalBayar < totalTagihan) {
+            prefix = "TERIMA PELUNASAN A/ INVOICE"; // Pelunasan
         } else {
-            prefix = ""
+            prefix = ""; // Default kosong
         }
-        // Gabungkan
-        const combinedText = `${selectedCustomer[0]}; ${prefix} ${selectedNoDokumen.join('; ')}`;
-        textareaElement.value = combinedText;
+
+        // Gabungkan hasil akhir ke textarea
+        const combinedText = `${selectedCustomer[0] || ''}; ${prefix} ${selectedNoDokumen.join('; ')}`;
+        textareaElement.value = combinedText.trim();
     }
+
 
 
 
