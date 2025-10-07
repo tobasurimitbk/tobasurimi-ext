@@ -1113,7 +1113,6 @@
             });
         } else {
             $(".kode").attr("readonly", false);
-            $(".kode").val(""); // Kosongin input biar bisa manual
         }
     }
 
