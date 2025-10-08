@@ -169,53 +169,67 @@ class CustomerModel extends Model
         $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'DESC';
 
         $selectQry = "customers.*, 
-                    employees.name as namaSales,
-                    metadata.value AS currencyName,
-                    country.country_name AS countryName,
-                    companies.company as companyName";
+                employees.name as namaSales,
+                metadata.value AS currencyName,
+                country.country_name AS countryName,
+                companies.company as companyName";
 
-        $customerDataQry = $this->asObject()
+        // ===== BASE QUERY (untuk totalData) =====
+        $baseQuery = $this->asObject()
             ->select($selectQry)
-            ->where($condition)
             ->join('metadata', 'customers.currency = metadata.id', 'left')
             ->join('country', 'country.id = customers.country_id', 'left')
             ->join('employees', 'employees.id = customers.sales_id', 'LEFT')
-            ->join('companies', 'companies.id = customers.company_id', 'left');
+            ->join('companies', 'companies.id = customers.company_id', 'left')
+            ->where($condition);
 
         if ($condition['tipe_customer'] == "LOKAL") {
-            // LOKAL
             if (session()->get("login")->this_company_id == 16) {
-                // OCS PUNYA COUNTER LOKAL SENDIRI
+                $baseQuery->where('customers.company_id', 16);
+            } else {
+                $baseQuery->whereIn('customers.company_id', [1, 2, 15]);
+            }
+            // $baseQuery->where('customers.address !=', '')
+            //     ->where('customers.address IS NOT NULL');
+        }
+
+        // total data tanpa filter
+        $totalData = $baseQuery->countAllResults();
+
+        // ===== FILTER QUERY (untuk totalFiltered + data) =====
+        $customerDataQry = $this->asObject()
+            ->select($selectQry)
+            ->join('metadata', 'customers.currency = metadata.id', 'left')
+            ->join('country', 'country.id = customers.country_id', 'left')
+            ->join('employees', 'employees.id = customers.sales_id', 'LEFT')
+            ->join('companies', 'companies.id = customers.company_id', 'left')
+            ->where($condition);
+
+        if ($condition['tipe_customer'] == "LOKAL") {
+            if (session()->get("login")->this_company_id == 16) {
                 $customerDataQry->where('customers.company_id', 16);
             } else {
-                // KIM 1, KIM 2, GLOBAL CUSTOMER LOKAL NYA DIGABUNG
                 $customerDataQry->whereIn('customers.company_id', [1, 2, 15]);
             }
+            // $customerDataQry->where('customers.address !=', '')
+            //     ->where('customers.address IS NOT NULL');
         }
 
-        if ($condition['tipe_customer'] == "LOKAL") {
-            $customerDataQry->where('customers.address !=', '')
-                ->where('customers.address IS NOT NULL');
-        }
-
-        $totalData = $customerDataQry->countAllResults(false);
-
-        if (isset($addCondition['search']) && !empty($addCondition['search'])) {
+        if (!empty($addCondition['search'])) {
             $customerDataQry->groupStart()
                 ->like('customers.name', $addCondition['search'])
                 ->orLike('customers.kode', $addCondition['search'])
                 ->groupEnd();
         }
 
+        // hitung data setelah filter
         $totalFilteredData = $customerDataQry->countAllResults(false);
 
-        if ($limit && $offset) {
-            $data = $customerDataQry->orderBy($sort, $sortType)
-                ->findAll($limit, $offset);
-        } else {
-            $data = $customerDataQry->orderBy($sort, $sortType)
-                ->findAll();
-        }
+        // ORDER dan LIMIT
+        $customerDataQry->orderBy($sort, $sortType);
+        $customerDataQry->limit($limit, $offset);
+
+        $data = $customerDataQry->get()->getResult();
 
         return [
             'data'              => $data,
