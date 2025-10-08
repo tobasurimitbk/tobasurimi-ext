@@ -160,6 +160,90 @@ class StockRevampModel extends Model
         }
     } 
 
+    public function insertStockRevampJasaVendorIn(BaseConnection $db, array $data)
+    {
+        $db->transBegin();
+
+        try {
+            // ==============================
+            // 1. Cek stock_revamp (master stok)
+            // ==============================
+            $builder = $db->table('stock_revamp');
+            $exist = $builder->where([
+                'company_id'      => $data['company_id'],
+                'barang_master_id' => $data['barang_master_id'],
+                'spesifikasi_id'  => $data['spesifikasi_id'],
+                'unit_id'         => $data['unit_id'],
+                'divisi_id'       => $data['divisi_id'],
+                'warehouse_id'    => $data['warehouse_id'],
+                'deletedAt'       => null,
+            ])->get()->getRow();
+
+            if ($exist) {
+                // update stok
+                $builder->where('id', $exist->id)->update([
+                    'qty_bersih'   => $exist->qty_bersih + $data['qty_bersih'],
+                    'qty_diterima' => $exist->qty_diterima + $data['qty_diterima'],
+                    'updatedAt'    => date('Y-m-d H:i:s'),
+                ]);
+                $stockId = $exist->id;
+            } else {
+                // insert stok baru
+                $builder->insert([
+                    'company_id'      => $data['company_id'],
+                    'barang_master_id' => $data['barang_master_id'],
+                    'spesifikasi_id'  => $data['spesifikasi_id'],
+                    'unit_id'         => $data['unit_id'],
+                    'divisi_id'       => $data['divisi_id'],
+                    'warehouse_id'    => $data['warehouse_id'],
+                    'qty_bersih'      => $data['qty_bersih'],
+                    'qty_diterima'    => $data['qty_diterima'],
+                    'createdAt'       => date('Y-m-d H:i:s'),
+                    'updatedAt'       => date('Y-m-d H:i:s'),
+                ]);
+                $stockId = $db->insertID();
+            }
+
+            // ==============================
+            // 2. Insert ke stock_revamp_detail
+            // ==============================
+            $db->table('stock_revamp_detail')->insert([
+                'stock_id'       => $stockId,
+                'bc_id'          => $data['bc_id'] ?? null,
+                'type_bc'        => $data['type_bc'] ?? null,
+                'reference_id'   => $data['reference_id'] ?? null,
+                'po_type'        => $data['po_type'] ?? null,
+                'po_id'          => $data['po_id'] ?? null,
+                'reference_type' => $data['reference_type'] ?? null,
+                'qty_bersih'     => $data['qty_bersih'],
+                'qty_diterima'   => $data['qty_diterima'],
+                'createdAt'      => date('Y-m-d H:i:s'),
+                'updatedAt'      => date('Y-m-d H:i:s'),
+            ]);
+            $stockDetailId = $db->insertID();
+
+            // ==============================
+            // 3. Insert ke stock_revamp_log
+            // ==============================
+            $db->table('stock_revamp_log')->insert([
+                'stock_detail_id' => $stockDetailId,
+                'status'         => $data['status'] ?? 'IN',
+                'qty_diterima'   => $data['qty_diterima'],
+                'qty_bersih'     => $data['qty_bersih'],
+                'createdAt'      => date('Y-m-d H:i:s'),
+                'updatedAt'      => date('Y-m-d H:i:s'),
+            ]);
+
+            $db->transCommit();
+
+            return $stockDetailId;
+        } catch (\Throwable $e) {
+            $db->transRollback();
+            log_message('error', 'Insert Stock Failed: ' . $e->getMessage());
+            return false;
+        }
+    } 
+
     public function outStockRevamp(BaseConnection $db, array $data)
     {
         // HAPUS transBegin() dari model, karena sudah dihandle controller
@@ -250,18 +334,13 @@ class StockRevampModel extends Model
 
     public function unpostStockRevamp(BaseConnection $db, array $data)
     {
-        // HAPUS transBegin() dan transRollback/Commit dari model
-        // Karena transaksi sudah dihandle oleh controller
-
         try {
             $asalId   = $data['stock_detail_asal'];
             $akhirId  = $data['stock_detail_akhir'];
             $qtyAsal  = $data['qty_diterima_asal'];
             $qtyAkhir = $data['qty_diterima_akhir'];
 
-            // ==============================
             // 1. Ambil stock detail asal
-            // ==============================
             $detailAsal = $db->table('stock_revamp_detail')
                 ->where('id', $asalId)
                 ->get()
@@ -281,20 +360,12 @@ class StockRevampModel extends Model
                 throw new \Exception("Stock detail akhir tidak ditemukan");
             }
 
-            // ==============================
-            // 3. Validasi qty - PERBAIKAN: Gunakan != bukan !==
-            // ==============================
-            if ((int)$detailAsal['qty_diterima'] != (int)$qtyAsal) {
-                throw new \Exception("Qty asal tidak sesuai. Database: {$detailAsal['qty_diterima']}, Request: {$qtyAsal}. Unpost dibatalkan");
-            }
-
+            // 3. Validasi qty
             if ((int)$detailAkhir['qty_diterima'] != (int)$qtyAkhir) {
                 throw new \Exception("Qty akhir tidak sesuai. Database: {$detailAkhir['qty_diterima']}, Request: {$qtyAkhir}. Unpost dibatalkan");
             }
 
-            // ==============================
             // 4. Rollback ke parent
-            // ==============================
             $parentAsal = $db->table('stock_revamp')
                 ->where('id', $detailAsal['stock_id'])
                 ->get()
@@ -320,31 +391,46 @@ class StockRevampModel extends Model
             $db->table('stock_revamp')
                 ->where('id', $parentAkhir['id'])
                 ->update([
-                    'qty_diterima' => $parentAkhir['qty_diterima'] - $qtyAkhir // PERBAIKAN: seharusnya dikurangi
+                    'qty_diterima' => $parentAkhir['qty_diterima'] - $qtyAkhir
                 ]);
 
-            // ==============================
             // 5. Update detail asal (kembalikan qty)
-            // ==============================
             $db->table('stock_revamp_detail')
                 ->where('id', $asalId)
                 ->update([
                     'qty_diterima' => $detailAsal['qty_diterima'] + $qtyAsal
                 ]);
 
-            // ==============================
-            // 6. Hapus detail akhir
-            // ==============================
-            $db->table('stock_revamp_detail')->where('id', $akhirId)->delete();
+            // 6. Kembalikan detail akhir (bukan hapus)
+            $db->table('stock_revamp_detail')
+                ->where('id', $akhirId)
+                ->update([
+                    'qty_diterima' => 0,
+                    'status'       => 'UNPOSTED',
+                    'updatedAt'    => date('Y-m-d H:i:s'),
+                ]);
+
+            // 7. Catat log OUT (kembalinya qty)
+            $db->table('stock_revamp_log')->insert([
+                'stock_detail_id' => $akhirId,
+                'status'          => 'OUT', // karena barang keluar dari hasil revamp
+                'qty_diterima'    => $qtyAkhir,
+                'qty_bersih'      => $data['qty_bersih'] ?? 0,
+                'keterangan'      => $data['keterangan'],
+                'no_dokumen'      => $data['no_dokumen'],
+                'createdAt'       => date('Y-m-d H:i:s'),
+                'updatedAt'       => date('Y-m-d H:i:s'),
+            ]);
 
             return true;
 
         } catch (\Throwable $e) {
-            // HAPUS transRollback() di model
             log_message('error', 'Unpost Stock Failed: ' . $e->getMessage());
-            throw $e; // Lempar exception ke controller
+            throw $e;
         }
     }
+
+
 
 
     public function unpostStockKeluar(BaseConnection $db, array $data)
