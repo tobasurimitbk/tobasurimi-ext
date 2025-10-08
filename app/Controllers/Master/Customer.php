@@ -78,9 +78,7 @@ class Customer extends BaseController
     public function generateNo()
     {
         $bln = date('m');
-        // $thn = date('Y'); // Tahun awal, full (contoh: 2025)
-        $thn2 = date('y'); // Untuk disisipkan dalam kode, biasanya tahun full
-        // $last_year = $thn . "-12-31"; // Batas akhir tahun ini
+        $thn2 = date('y');
 
         $no = $this->CustomerModel->get_kode(
             $bln,
