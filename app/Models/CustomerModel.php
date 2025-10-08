@@ -436,70 +436,48 @@ class CustomerModel extends Model
 
     public function get_kode($bln, $thn2, $tipe_customer)
     {
-        $lastStr = $thn2;
+        // Bentuk prefix sesuai tipe
+        $prefix = ($tipe_customer == "LOKAL") ? "CS" : "IN";
+
+        // Bentuk pola pencarian yang spesifik untuk bulan & tahun
+        $kodePrefix = $prefix . '/' . $bln . '/' . $thn2;
 
         $builder = $this->db->table('customers');
         $builder->select('kode');
-        $builder->orderBy('kode', 'asc');
         $builder->where('tipe_customer', $tipe_customer);
         $builder->where('deletedAt', null);
+        $builder->like('kode', $kodePrefix, 'after'); // hanya ambil yang prefix-nya cocok
 
         if ($tipe_customer == "LOKAL") {
-            // LOKAL
             if (session()->get("login")->this_company_id == 16) {
-                // OCS PUNYA COUNTER NOMOR SENDIRI
                 $builder->where('company_id', 16);
             } else {
-                // KIM 1, KIM 2, GLOBAL COUNTER NYA DIGABUNG
                 $builder->whereIn('company_id', [1, 2, 15]);
             }
         } else {
-            // INTERNASIONAL (JADI SATU)
             $builder->whereIn('company_id', [1, 2, 15, 16]);
         }
 
-        $builder->groupStart()->like('kode', $lastStr)->groupEnd();
-
+        // ambil kode terbesar
+        $builder->orderBy('kode', 'desc');
+        $builder->limit(1);
         $query = $builder->get();
+        $row = $query->getRowArray();
 
-        if ($tipe_customer == "LOKAL") {
-            // TIPE CUSTOMER LOKAL
-            $kodePrefix = 'CS/' . $bln . '/' . $thn2;
+        // Jika belum ada data di bulan/tahun ini
+        if (!$row) {
+            $lastKode = 1;
         } else {
-            // TIPE CUSTOMER EKSPOR
-            $kodePrefix = 'IN/' . $bln . '/' . $thn2;
+            // contoh kode: CS/10/25/0117
+            $parts = explode('/', $row['kode']);
+            $lastNumber = intval(end($parts)); // ambil angka terakhir (0117 → 117)
+            $lastKode = $lastNumber + 1;
         }
 
-        $existingNumbers = [];
-
-        // Ambil semua nomor urut yang sudah ada
-        if (!empty($query->getResultArray())) {
-            foreach ($query->getResultArray() as $string) {
-                $explode = explode('/', $string['kode']);
-                if (isset($explode[3]) && is_numeric($explode[3])) {
-                    $existingNumbers[] = intval($explode[3]);
-                }
-            }
-        }
-
-        // Sort dan cari celah nomor
-        $lastKode = 1;
-        sort($existingNumbers);
-        $foundGap = false;
-
-        foreach ($existingNumbers as $number) {
-            if ($number != $lastKode) {
-                $foundGap = true;
-                break;
-            }
-            $lastKode++;
-        }
-
-        if (!$foundGap) {
-            $lastKode = empty($existingNumbers) ? 1 : end($existingNumbers) + 1;
-        }
-
+        // Format ke 4 digit
         $formattedKode = sprintf("%04d", $lastKode);
+
+        // Gabungkan kembali
         $generatedNo = $kodePrefix . '/' . $formattedKode;
 
         return $generatedNo;
