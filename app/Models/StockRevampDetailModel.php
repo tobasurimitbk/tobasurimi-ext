@@ -169,7 +169,7 @@ class StockRevampDetailModel extends Model
             ->groupBy('
                 stock_revamp_detail.id,
             ')
-             ->where('stock_revamp_detail.reference_type !=', "PROSES REBUS")
+            ->where('stock_revamp_detail.reference_type !=', "PROSES REBUS")
             ->where('stock_revamp.spesifikasi_id', $spesifikasiId)
             ->orderBy('stock_revamp_detail.createdAt', 'ASC')
             ->findAll();
@@ -319,5 +319,529 @@ class StockRevampDetailModel extends Model
             ->first();
 
         return $dataQry;
+    }
+
+    public function getListStockDetailByPoLokalBb($condition = [], $addCondition = [], $limit = 10, $offset = 0)
+    {
+        $availableSort = [
+            'supplier_id'   => 'rm_purchase_orders.supplier_id',
+            'kode_barang'   => 'barang_master.kode_barang',
+            'barang_name'   => 'barang_master.barang_name',
+            'spesifikasi'   => 'barang_master_spesifikasi.spesifikasi',
+            'type_bc'       => 'stock_revamp_detail.type_bc',
+            'po_id'         => 'stock_revamp_detail.po_id',
+            'reference_id'  => 'stock_revamp_detail.reference_id',
+            'tanggal_po'    => 'rm_purchase_orders.po_date',
+            'no_daftar'     => 'bc_purchase_order.no_daftar',
+            'no_aju'        => 'bc_purchase_order.no_aju',
+            'qty_diterima'  => 'stock_revamp_detail.qty_diterima',
+            'unit_id'       => 'stock_revamp.unit_id'
+        ];
+
+        $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
+
+        $sort = $availableSort[$addCondition['sort'] ?? 'stock_revamp_detail.id'] ?? 'stock_revamp_detail.id';
+        $sortType = $availableSortType[strtolower($addCondition['sortType'] ?? 'desc')] ?? 'DESC';
+
+        $selectQry = "
+            stock_revamp_detail.*,
+            suppliers.name AS supplier_name,
+            barang_master.kode_barang,
+            barang_master.barang_name,
+            barang_master_spesifikasi.spesifikasi,
+            rm_purchase_orders.po_no,
+            rm_purchase_orders.po_date,
+            penerimaan_barang.no_penerimaan_barang AS ref_no,
+            bc_purchase_order.no_aju,
+            bc_purchase_order.no_daftar,
+            satuans.kode_satuan
+        ";
+
+        $builder = $this->asArray()
+            ->select($selectQry)
+            ->join('stock_revamp', 'stock_revamp.id = stock_revamp_detail.stock_id', 'left')
+            ->join('barang_master', 'stock_revamp.barang_master_id = barang_master.id', 'left')
+            ->join('barang_master_spesifikasi', 'stock_revamp.spesifikasi_id = barang_master_spesifikasi.id', 'left')
+            ->join('satuans', 'satuans.id = stock_revamp.unit_id', 'left')
+            ->join('rm_purchase_orders', 'rm_purchase_orders.id = stock_revamp_detail.po_id', 'left')
+            ->join('penerimaan_barang', 'penerimaan_barang.id = stock_revamp_detail.reference_id', 'left')
+            ->join('bc_purchase_order_lpb', 'bc_purchase_order_lpb.penerimaan_barang_id = penerimaan_barang.id', 'left')
+            ->join('bc_purchase_order', 'bc_purchase_order.id = bc_purchase_order_lpb.bc_purchase_order_id', 'left')
+            ->join('suppliers', 'suppliers.id = rm_purchase_orders.supplier_id', 'left')
+            ->where($condition)
+            ->orderBy($sort, $sortType);
+
+        $totalData = $builder->countAllResults(false);
+
+        if (!empty($addCondition['search'])) {
+            $builder->groupStart()
+                ->like("CONCAT(barang_master.barang_name, ' ', barang_master_spesifikasi.spesifikasi)", $addCondition['search'])
+                ->orLike('barang_master.kode_barang', $addCondition['search'])
+                ->orLike('rm_purchase_orders.po_no', $addCondition['search'])
+                ->orLike('penerimaan_barang.no_penerimaan_barang', $addCondition['search'])
+                ->orLike('bc_purchase_order.no_aju', $addCondition['search'])
+                ->orLike('bc_purchase_order.no_daftar', $addCondition['search'])
+                ->orLike('suppliers.name', $addCondition['search'])
+                ->groupEnd();
+        }
+
+        $countBuilder = clone $builder;
+        $totalFilteredData = $countBuilder->countAllResults(false);
+        $data = $builder->findAll($limit, $offset);
+
+        return [
+            'data'              => $data,
+            'totalData'         => $totalData,
+            'totalFilteredData' => $totalFilteredData,
+        ];
+    }
+
+    public function getListStockDetailByPoBp($condition = [], $addCondition = [], $limit = 10, $offset = 0)
+    {
+        $availableSort = [
+            'supplier_id'   => 'am_purchase_orders.supplier_id',
+            'kode_barang'   => 'barang_master.kode_barang',
+            'barang_name'   => 'barang_master.barang_name',
+            'spesifikasi'   => 'barang_master_spesifikasi.spesifikasi',
+            'type_bc'       => 'stock_revamp_detail.type_bc',
+            'po_id'         => 'stock_revamp_detail.po_id',
+            'reference_id'  => 'stock_revamp_detail.reference_id',
+            'tanggal_po'    => 'am_purchase_orders.po_date',
+            'no_daftar'     => 'bc_purchase_order.no_daftar',
+            'no_aju'        => 'bc_purchase_order.no_aju',
+            'qty_diterima'  => 'stock_revamp_detail.qty_diterima',
+            'unit_id'       => 'stock_revamp.unit_id'
+        ];
+
+        $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
+
+        $sort = $availableSort[$addCondition['sort'] ?? 'stock_revamp_detail.id'] ?? 'stock_revamp_detail.id';
+        $sortType = $availableSortType[strtolower($addCondition['sortType'] ?? 'desc')] ?? 'DESC';
+
+        $selectQry = "
+            stock_revamp_detail.*,
+            suppliers.name AS supplier_name,
+            barang_master.kode_barang,
+            barang_master.barang_name,
+            barang_master_spesifikasi.spesifikasi,
+            am_purchase_orders.po_no,
+            am_purchase_orders.po_date,
+            penerimaan_barang.no_penerimaan_barang AS ref_no,
+            bc_purchase_order.no_aju,
+            bc_purchase_order.no_daftar,
+            satuans.kode_satuan
+        ";
+
+        $builder = $this->asArray()
+            ->select($selectQry)
+            ->join('stock_revamp', 'stock_revamp.id = stock_revamp_detail.stock_id', 'left')
+            ->join('barang_master', 'stock_revamp.barang_master_id = barang_master.id', 'left')
+            ->join('barang_master_spesifikasi', 'stock_revamp.spesifikasi_id = barang_master_spesifikasi.id', 'left')
+            ->join('satuans', 'satuans.id = stock_revamp.unit_id', 'left')
+            ->join('am_purchase_orders', 'am_purchase_orders.id = stock_revamp_detail.po_id', 'left')
+            ->join('penerimaan_barang', 'penerimaan_barang.id = stock_revamp_detail.reference_id', 'left')
+            ->join('bc_purchase_order_lpb', 'bc_purchase_order_lpb.penerimaan_barang_id = penerimaan_barang.id', 'left')
+            ->join('bc_purchase_order', 'bc_purchase_order.id = bc_purchase_order_lpb.bc_purchase_order_id', 'left')
+            ->join('suppliers', 'suppliers.id = am_purchase_orders.supplier_id', 'left')
+            ->where($condition)
+            ->orderBy($sort, $sortType);
+
+        $totalData = $builder->countAllResults(false);
+
+        if (!empty($addCondition['search'])) {
+            $builder->groupStart()
+                ->like("CONCAT(barang_master.barang_name, ' ', barang_master_spesifikasi.spesifikasi)", $addCondition['search'])
+                ->orLike('barang_master.kode_barang', $addCondition['search'])
+                ->orLike('am_purchase_orders.po_no', $addCondition['search'])
+                ->orLike('penerimaan_barang.no_penerimaan_barang', $addCondition['search'])
+                ->orLike('bc_purchase_order.no_aju', $addCondition['search'])
+                ->orLike('bc_purchase_order.no_daftar', $addCondition['search'])
+                ->orLike('suppliers.name', $addCondition['search'])
+                ->groupEnd();
+        }
+
+        $countBuilder = clone $builder;
+        $totalFilteredData = $countBuilder->countAllResults(false);
+        $data = $builder->findAll($limit, $offset);
+
+        return [
+            'data'              => $data,
+            'totalData'         => $totalData,
+            'totalFilteredData' => $totalFilteredData,
+        ];
+    }
+
+    public function getListStockDetailByPoImportBb($condition = [], $addCondition = [], $limit = 10, $offset = 0)
+    {
+        $availableSort = [
+            'supplier_id'   => 'am_purchase_orders.supplier_id',
+            'kode_barang'   => 'barang_master.kode_barang',
+            'barang_name'   => 'barang_master.barang_name',
+            'spesifikasi'   => 'barang_master_spesifikasi.spesifikasi',
+            'type_bc'       => 'stock_revamp_detail.type_bc',
+            'po_id'         => 'stock_revamp_detail.po_id',
+            'reference_id'  => 'stock_revamp_detail.reference_id',
+            'tanggal_po'    => 'rm_import_pos.po_date',
+            'no_daftar'     => 'bc_purchase_order.no_daftar',
+            'no_aju'        => 'bc_purchase_order.no_aju',
+            'qty_diterima'  => 'stock_revamp_detail.qty_diterima',
+            'unit_id'       => 'stock_revamp.unit_id'
+        ];
+
+        $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
+
+        $sort = $availableSort[$addCondition['sort'] ?? 'stock_revamp_detail.id'] ?? 'stock_revamp_detail.id';
+        $sortType = $availableSortType[strtolower($addCondition['sortType'] ?? 'desc')] ?? 'DESC';
+
+        $selectQry = "
+            stock_revamp_detail.*,
+            suppliers.name AS supplier_name,
+            barang_master.kode_barang,
+            barang_master.barang_name,
+            barang_master_spesifikasi.spesifikasi,
+            rm_import_pos.po_no,
+            rm_import_pos.po_date,
+            penerimaan_barang.no_penerimaan_barang AS ref_no,
+            bc_purchase_order.no_aju,
+            bc_purchase_order.no_daftar,
+            satuans.kode_satuan
+        ";
+
+        $builder = $this->asArray()
+            ->select($selectQry)
+            ->join('stock_revamp', 'stock_revamp.id = stock_revamp_detail.stock_id', 'left')
+            ->join('barang_master', 'stock_revamp.barang_master_id = barang_master.id', 'left')
+            ->join('barang_master_spesifikasi', 'stock_revamp.spesifikasi_id = barang_master_spesifikasi.id', 'left')
+            ->join('satuans', 'satuans.id = stock_revamp.unit_id', 'left')
+            ->join('rm_import_pos', 'rm_import_pos.id = stock_revamp_detail.po_id', 'left')
+            ->join('penerimaan_barang', 'penerimaan_barang.id = stock_revamp_detail.reference_id', 'left')
+            ->join('bc_purchase_order_lpb', 'bc_purchase_order_lpb.penerimaan_barang_id = penerimaan_barang.id', 'left')
+            ->join('bc_purchase_order', 'bc_purchase_order.id = bc_purchase_order_lpb.bc_purchase_order_id', 'left')
+            ->join('suppliers', 'suppliers.id = rm_import_pos.supplier_id', 'left')
+            ->where($condition)
+            ->orderBy($sort, $sortType);
+
+        $totalData = $builder->countAllResults(false);
+
+        if (!empty($addCondition['search'])) {
+            $builder->groupStart()
+                ->like("CONCAT(barang_master.barang_name, ' ', barang_master_spesifikasi.spesifikasi)", $addCondition['search'])
+                ->orLike('barang_master.kode_barang', $addCondition['search'])
+                ->orLike('rm_import_pos.po_no', $addCondition['search'])
+                ->orLike('penerimaan_barang.no_penerimaan_barang', $addCondition['search'])
+                ->orLike('bc_purchase_order.no_aju', $addCondition['search'])
+                ->orLike('bc_purchase_order.no_daftar', $addCondition['search'])
+                ->orLike('suppliers.name', $addCondition['search'])
+                ->groupEnd();
+        }
+
+        $countBuilder = clone $builder;
+        $totalFilteredData = $countBuilder->countAllResults(false);
+        $data = $builder->findAll($limit, $offset);
+
+        return [
+            'data'              => $data,
+            'totalData'         => $totalData,
+            'totalFilteredData' => $totalFilteredData,
+        ];
+    }
+
+    public function getListStockDetailByProsesRebus($condition = [], $addCondition = [], $limit = 10, $offset = 0)
+    {
+        $availableSort = [
+            'supplier_id'   => 'rm_purchase_orders.supplier_id',
+            'kode_barang'   => 'barang_master.kode_barang',
+            'barang_name'   => 'barang_master.barang_name',
+            'spesifikasi'   => 'barang_master_spesifikasi.spesifikasi',
+            'type_bc'       => 'stock_revamp_detail.type_bc',
+            'po_id'         => 'stock_revamp_detail.po_id',
+            'reference_id'  => 'stock_revamp_detail.reference_id',
+            'tanggal_po'    => 'rm_purchase_orders.po_date',
+            'qty_diterima'  => 'stock_revamp_detail.qty_diterima',
+            'unit_id'       => 'stock_revamp.unit_id'
+        ];
+
+        $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
+
+        $sort = $availableSort[$addCondition['sort'] ?? 'stock_revamp_detail.id'] ?? 'stock_revamp_detail.id';
+        $sortType = $availableSortType[strtolower($addCondition['sortType'] ?? 'desc')] ?? 'DESC';
+
+        $selectQry = "
+            stock_revamp_detail.*,
+            suppliers.name AS supplier_name,
+            barang_master.kode_barang,
+            barang_master.barang_name,
+            barang_master_spesifikasi.spesifikasi,
+            rm_purchase_orders.po_no,
+            rm_purchase_orders.po_date,
+            proses_rebus.no_rebus AS ref_no,
+            satuans.kode_satuan
+        ";
+
+        $builder = $this->asArray()
+            ->select($selectQry)
+            ->join('stock_revamp', 'stock_revamp.id = stock_revamp_detail.stock_id', 'left')
+            ->join('barang_master', 'stock_revamp.barang_master_id = barang_master.id', 'left')
+            ->join('barang_master_spesifikasi', 'stock_revamp.spesifikasi_id = barang_master_spesifikasi.id', 'left')
+            ->join('satuans', 'satuans.id = stock_revamp.unit_id', 'left')
+            ->join('rm_purchase_orders', 'rm_purchase_orders.id = stock_revamp_detail.po_id', 'left')
+            ->join('proses_rebus', 'proses_rebus.id = stock_revamp_detail.reference_id', 'left')
+            ->join('suppliers', 'suppliers.id = rm_purchase_orders.supplier_id', 'left')
+            ->where($condition)
+            ->orderBy($sort, $sortType);
+
+        $totalData = $builder->countAllResults(false);
+
+        if (!empty($addCondition['search'])) {
+            $builder->groupStart()
+                ->like("CONCAT(barang_master.barang_name, ' ', barang_master_spesifikasi.spesifikasi)", $addCondition['search'])
+                ->orLike('barang_master.kode_barang', $addCondition['search'])
+                ->orLike('rm_purchase_orders.po_no', $addCondition['search'])
+                ->orLike('proses_rebus.no_rebus', $addCondition['search'])
+                ->orLike('suppliers.name', $addCondition['search'])
+                ->groupEnd();
+        }
+
+        $countBuilder = clone $builder;
+        $totalFilteredData = $countBuilder->countAllResults(false);
+        $data = $builder->findAll($limit, $offset);
+
+        return [
+            'data'              => $data,
+            'totalData'         => $totalData,
+            'totalFilteredData' => $totalFilteredData,
+        ];
+    }
+
+    public function getListStockDetailByJasaVendor($condition = [], $addCondition = [], $limit = 10, $offset = 0)
+    {
+        $availableSort = [
+            'supplier_id'   => 'jasa_vendor_in.vendor_id',
+            'kode_barang'   => 'barang_master.kode_barang',
+            'barang_name'   => 'barang_master.barang_name',
+            'spesifikasi'   => 'barang_master_spesifikasi.spesifikasi',
+            'type_bc'       => 'stock_revamp_detail.type_bc',
+            'po_id'         => 'stock_revamp_detail.po_id',
+            'reference_id'  => 'stock_revamp_detail.reference_id',
+            'qty_diterima'  => 'stock_revamp_detail.qty_diterima',
+            'unit_id'       => 'stock_revamp.unit_id'
+        ];
+
+        $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
+
+        $sort = $availableSort[$addCondition['sort'] ?? 'stock_revamp_detail.id'] ?? 'stock_revamp_detail.id';
+        $sortType = $availableSortType[strtolower($addCondition['sortType'] ?? 'desc')] ?? 'DESC';
+
+        $selectQry = "
+            stock_revamp_detail.*,
+            vendors.name AS supplier_name,
+            barang_master.kode_barang,
+            barang_master.barang_name,
+            barang_master_spesifikasi.spesifikasi,
+            jasa_vendor_in.no_penerimaan_surat_jalan AS ref_no,
+            satuans.kode_satuan
+        ";
+
+        $builder = $this->asArray()
+            ->select($selectQry)
+            ->join('stock_revamp', 'stock_revamp.id = stock_revamp_detail.stock_id', 'left')
+            ->join('barang_master', 'stock_revamp.barang_master_id = barang_master.id', 'left')
+            ->join('barang_master_spesifikasi', 'stock_revamp.spesifikasi_id = barang_master_spesifikasi.id', 'left')
+            ->join('satuans', 'satuans.id = stock_revamp.unit_id', 'left')
+            ->join('jasa_vendor_in', 'jasa_vendor_in.id = stock_revamp_detail.reference_id', 'left')
+            ->join('vendors', 'vendors.id = jasa_vendor_in.vendor_id', 'left')
+            ->where($condition)
+            ->orderBy($sort, $sortType);
+
+        $totalData = $builder->countAllResults(false);
+
+        if (!empty($addCondition['search'])) {
+            $builder->groupStart()
+                ->like('jasa_vendor_in.no_penerimaan_surat_jalan', $addCondition['search'])
+                ->orLike('barang_master.kode_barang', $addCondition['search'])
+                ->orLike('vendors.name', $addCondition['search'])
+                ->groupEnd();
+        }
+
+        $countBuilder = clone $builder;
+        $totalFilteredData = $countBuilder->countAllResults(false);
+        $data = $builder->findAll($limit, $offset);
+
+        return [
+            'data'              => $data,
+            'totalData'         => $totalData,
+            'totalFilteredData' => $totalFilteredData,
+        ];
+    }
+
+    public function getListStockDetailByHasilProduksi($condition = [], $addCondition = [], $limit = 10, $offset = 0)
+    {
+        $availableSort = [
+            'kode_barang'   => 'barang_master.kode_barang',
+            'barang_name'   => 'barang_master.barang_name',
+            'spesifikasi'   => 'barang_master_spesifikasi.spesifikasi',
+            'type_bc'       => 'stock_revamp_detail.type_bc',
+            'reference_id'  => 'stock_revamp_detail.reference_id',
+            'qty_diterima'  => 'stock_revamp_detail.qty_diterima',
+            'unit_id'       => 'stock_revamp.unit_id'
+        ];
+
+        $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
+
+        $sort = $availableSort[$addCondition['sort'] ?? 'stock_revamp_detail.id'] ?? 'stock_revamp_detail.id';
+        $sortType = $availableSortType[strtolower($addCondition['sortType'] ?? 'desc')] ?? 'DESC';
+
+        $selectQry = "
+            stock_revamp_detail.*,
+            barang_master.kode_barang,
+            barang_master.barang_name,
+            barang_master_spesifikasi.spesifikasi,
+            production_results.pr_no AS ref_no,
+            satuans.kode_satuan
+        ";
+
+        $builder = $this->asArray()
+            ->select($selectQry)
+            ->join('stock_revamp', 'stock_revamp.id = stock_revamp_detail.stock_id', 'left')
+            ->join('barang_master', 'stock_revamp.barang_master_id = barang_master.id', 'left')
+            ->join('barang_master_spesifikasi', 'stock_revamp.spesifikasi_id = barang_master_spesifikasi.id', 'left')
+            ->join('satuans', 'satuans.id = stock_revamp.unit_id', 'left')
+            ->join('production_results', 'production_results.id = stock_revamp_detail.reference_id', 'left')
+            ->where($condition)
+            ->orderBy($sort, $sortType);
+
+        $totalData = $builder->countAllResults(false);
+
+        if (!empty($addCondition['search'])) {
+            $builder->groupStart()
+                ->like('production_results.pr_no', $addCondition['search'])
+                ->orLike('barang_master.kode_barang', $addCondition['search'])
+                ->orLike('vendors.name', $addCondition['search'])
+                ->groupEnd();
+        }
+
+        $countBuilder = clone $builder;
+        $totalFilteredData = $countBuilder->countAllResults(false);
+        $data = $builder->findAll($limit, $offset);
+
+        return [
+            'data'              => $data,
+            'totalData'         => $totalData,
+            'totalFilteredData' => $totalFilteredData,
+        ];
+    }
+
+    public function getListStockDetailByMaterialRequestBaku($condition = [], $addCondition = [], $limit = 10, $offset = 0)
+    {
+        $availableSort = [
+            'kode_barang'   => 'barang_master.kode_barang',
+            'barang_name'   => 'barang_master.barang_name',
+            'spesifikasi'   => 'barang_master_spesifikasi.spesifikasi',
+            'type_bc'       => 'stock_revamp_detail.type_bc',
+            'reference_id'  => 'stock_revamp_detail.reference_id',
+            'qty_diterima'  => 'stock_revamp_detail.qty_diterima',
+            'unit_id'       => 'stock_revamp.unit_id'
+        ];
+
+        $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
+
+        $sort = $availableSort[$addCondition['sort'] ?? 'stock_revamp_detail.id'] ?? 'stock_revamp_detail.id';
+        $sortType = $availableSortType[strtolower($addCondition['sortType'] ?? 'desc')] ?? 'DESC';
+
+        $selectQry = "
+            stock_revamp_detail.*,
+            barang_master.kode_barang,
+            barang_master.barang_name,
+            barang_master_spesifikasi.spesifikasi,
+            material_requests.req_no AS ref_no,
+            satuans.kode_satuan
+        ";
+
+        $builder = $this->asArray()
+            ->select($selectQry)
+            ->join('stock_revamp', 'stock_revamp.id = stock_revamp_detail.stock_id', 'left')
+            ->join('barang_master', 'stock_revamp.barang_master_id = barang_master.id', 'left')
+            ->join('barang_master_spesifikasi', 'stock_revamp.spesifikasi_id = barang_master_spesifikasi.id', 'left')
+            ->join('satuans', 'satuans.id = stock_revamp.unit_id', 'left')
+            ->join('material_requests', 'material_requests.id = stock_revamp_detail.reference_id', 'left')
+            ->where($condition)
+            ->orderBy($sort, $sortType);
+
+        $totalData = $builder->countAllResults(false);
+
+        if (!empty($addCondition['search'])) {
+            $builder->groupStart()
+                ->like('material_requests.req_no', $addCondition['search'])
+                ->orLike('barang_master.kode_barang', $addCondition['search'])
+                ->orLike('vendors.name', $addCondition['search'])
+                ->groupEnd();
+        }
+
+        $countBuilder = clone $builder;
+        $totalFilteredData = $countBuilder->countAllResults(false);
+        $data = $builder->findAll($limit, $offset);
+
+        return [
+            'data'              => $data,
+            'totalData'         => $totalData,
+            'totalFilteredData' => $totalFilteredData,
+        ];
+    }
+
+    public function getListStockDetailByMaterialRequestPenolong($condition = [], $addCondition = [], $limit = 10, $offset = 0)
+    {
+        $availableSort = [
+            'kode_barang'   => 'barang_master.kode_barang',
+            'barang_name'   => 'barang_master.barang_name',
+            'spesifikasi'   => 'barang_master_spesifikasi.spesifikasi',
+            'type_bc'       => 'stock_revamp_detail.type_bc',
+            'reference_id'  => 'stock_revamp_detail.reference_id',
+            'qty_diterima'  => 'stock_revamp_detail.qty_diterima',
+            'unit_id'       => 'stock_revamp.unit_id'
+        ];
+
+        $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
+
+        $sort = $availableSort[$addCondition['sort'] ?? 'stock_revamp_detail.id'] ?? 'stock_revamp_detail.id';
+        $sortType = $availableSortType[strtolower($addCondition['sortType'] ?? 'desc')] ?? 'DESC';
+
+        $selectQry = "
+            stock_revamp_detail.*,
+            barang_master.kode_barang,
+            barang_master.barang_name,
+            barang_master_spesifikasi.spesifikasi,
+            material_requests_penolong.req_no AS ref_no,
+            satuans.kode_satuan
+        ";
+
+        $builder = $this->asArray()
+            ->select($selectQry)
+            ->join('stock_revamp', 'stock_revamp.id = stock_revamp_detail.stock_id', 'left')
+            ->join('barang_master', 'stock_revamp.barang_master_id = barang_master.id', 'left')
+            ->join('barang_master_spesifikasi', 'stock_revamp.spesifikasi_id = barang_master_spesifikasi.id', 'left')
+            ->join('satuans', 'satuans.id = stock_revamp.unit_id', 'left')
+            ->join('material_requests_penolong', 'material_requests_penolong.id = stock_revamp_detail.reference_id', 'left')
+            ->where($condition)
+            ->orderBy($sort, $sortType);
+
+        $totalData = $builder->countAllResults(false);
+
+        if (!empty($addCondition['search'])) {
+            $builder->groupStart()
+                ->like('material_requests_penolong.req_no', $addCondition['search'])
+                ->orLike('barang_master.kode_barang', $addCondition['search'])
+                ->orLike('vendors.name', $addCondition['search'])
+                ->groupEnd();
+        }
+
+        $countBuilder = clone $builder;
+        $totalFilteredData = $countBuilder->countAllResults(false);
+        $data = $builder->findAll($limit, $offset);
+
+        return [
+            'data'              => $data,
+            'totalData'         => $totalData,
+            'totalFilteredData' => $totalFilteredData,
+        ];
     }
 }

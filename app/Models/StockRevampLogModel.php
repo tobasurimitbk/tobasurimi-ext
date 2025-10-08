@@ -319,6 +319,7 @@ class StockRevampLogModel extends Model
     public function getListLogProsesRebus($condition = [], $addCondition = [], $limit = 10, $offset = 0)
     {
         $availableSort = [
+            'supplier_id'   => 'rm_purchase_orders.supplier_id',
             'kode_barang'   => 'barang_master.kode_barang',
             'barang_name'   => 'barang_master.barang_name',
             'spesifikasi'   => 'barang_master_spesifikasi.spesifikasi',
@@ -341,11 +342,14 @@ class StockRevampLogModel extends Model
         // SELECT utama
         $selectQry = "
             stock_revamp_log.*,
+            suppliers.name AS supplier_name,
             barang_master.kode_barang,
             barang_master.barang_name,
             barang_master_spesifikasi.spesifikasi,
             divisis.divisi,
             warehouses.warehouse_name,
+            rm_purchase_orders.po_no,
+            rm_purchase_orders.po_date AS tanggal_po,
             stock_revamp_detail.type_bc,
             proses_rebus.no_rebus AS ref_no,
             satuans.kode_satuan
@@ -361,6 +365,8 @@ class StockRevampLogModel extends Model
             ->join('satuans', 'satuans.id = stock_revamp.unit_id', 'left')
             ->join('warehouses', 'warehouses.id = stock_revamp.warehouse_id', 'left')
             ->join('proses_rebus', 'proses_rebus.id = stock_revamp_detail.reference_id', 'left')
+            ->join('rm_purchase_orders', 'rm_purchase_orders.id = stock_revamp_detail.po_id', 'left')
+            ->join('suppliers', 'suppliers.id = rm_purchase_orders.supplier_id', 'left')
             ->where($condition)
             ->orderBy($sort, $sortType);
 
@@ -381,6 +387,8 @@ class StockRevampLogModel extends Model
         if (!empty($addCondition['search'])) {
             $builder->groupStart()
                 ->like('proses_rebus.no_rebus', $addCondition['search'])
+                ->orLike('rm_purchase_orders.po_no', $addCondition['search'])
+                ->orLike('suppliers.name', $addCondition['search'])
                 ->orLike('divisis.divisi', $addCondition['search'])
                 ->orLike('barang_master.kode_barang', $addCondition['search'])
                 ->orLike('barang_master.barang_name', $addCondition['search'])

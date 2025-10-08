@@ -23,6 +23,8 @@ use App\Models\SatuansModel;
 use App\Models\StockDetail2Model;
 use App\Models\StockDetailModel;
 use App\Models\StockModel;
+use App\Models\StockRevampDetailModel;
+use App\Models\StockRevampModel;
 use App\Models\SupplierModel;
 use App\Models\WarehousesModel;
 use Exception;
@@ -58,6 +60,8 @@ class StokList extends BaseController
     protected $bc30Model;
     protected $bc25Model;
     protected $bc41Model;
+    protected $stockRevampModel;
+    protected $stockRevampDetailModel;
 
     public function __construct()
     {
@@ -87,12 +91,25 @@ class StokList extends BaseController
         $this->bc30Model = new BC30Model();
         $this->bc25Model = new BC25Model();
         $this->bc41Model = new BC41Model();
+        $this->stockRevampModel = new StockRevampModel();
+        $this->stockRevampDetailModel = new StockRevampDetailModel();
     }
 
     public function index()
     {
+        $tipeBarang = $this->metaDataModel->where('deletedAt', null)
+            ->where('description !=', "kemasan")
+            ->where('name', "Kategori Barang")
+            ->findAll();
+        $kategoriBarang = $this->parentBarangModel
+            ->where('company_id', $this->this_company_id)
+            ->where('deletedAt', null)
+            ->where('parent_type', "bahan_baku")
+            ->findAll();
+
         $data = [
-            'tipeBarang' => $this->metaDataModel->where('deletedAt', null)->where('name', "Kategori Barang")->findAll(),
+            'kategoriBarang' => $kategoriBarang,
+            'tipeBarang' => $tipeBarang,
             'dataDivisi' => $this->divisiModel->getDivisiAccess()
         ];
         return view('Warehouse/stock/stock_list', $data);
@@ -116,147 +133,40 @@ class StokList extends BaseController
             "parent_name" => $this->request->getVar("parent_name"),
             "divisi_id" => $this->request->getVar("divisi_id"),
             "warehouse_id" => $this->request->getVar("warehouse_id"),
-            "status_stok" => $this->request->getVar("status_stok"),
-            "kode" =>  $this->request->getVar("search"),
-            "kode_barang" =>  $this->request->getVar("search"),
         ];
 
         $limit = $this->request->getVar("length");
         $offset = $this->request->getVar("start");
 
-        if ($addCondition['parent_type'] != "kemasan") {
+        $condition = [
+            'stock_revamp.deletedAt' => null,
+            'stock_revamp.company_id' => $this->this_company_id,
+            'barang_master.type_barang' => $this->request->getVar('parent_type')
+        ];
 
-            $condition = [
-                "barang_master.company_id" => $this->this_company_id,
-                "barang_master.deletedAt" => null,
-                "barang_master_spesifikasi.deletedAt" => null,
-                "stock.company_id" => $this->this_company_id,
-                "stock.deletedAt" => null,
-            ];
+        $dataQry = $this->stockRevampModel->getListStock(
+            $condition,
+            $addCondition,
+            $limit,
+            $offset
+        );
 
-            $dataQry = $this->stockModel->getStockListBarang($condition, $addCondition, $limit, $offset);
-            $dataResult = [];
-            $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
-            // var_dump($condition);
-            // var_dump($addCondition);
-            // var_dump($dataQry['data']);
-            // exit;
+        $dataResult = [];
+        $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
 
-            foreach ($dataQry['data'] as $data) {
-                $satuan1 = $this->satuanModel->find($data->satuan_1);
-                $satuan2 = $this->satuanModel->find($data->satuan_2);
-                $satuan3 = $this->satuanModel->find($data->satuan_3);
-                $data->qty = $this->stockModel->detailStock($data->id)['stok']['stokSekarang'];
-                if ($addCondition['status_stok'] == "ALL") {
-                    array_push($dataResult, [
-                        "no"                    => $no++,
-                        "id"                    => encrypt($data->id),
-                        "parent_type"           => strtoupper(str_replace("_", " ", strtoupper($data->parent_type))),
-                        "parent_name"           => strtoupper($data->parent_name),
-                        "kode_barang"           => strtoupper($data->kode_barang),
-                        "barang"                => strtoupper($data->barang_name . "-" . $data->spesifikasi),
-                        "divisi"                => strtoupper($data->divisi),
-                        "warehouse"             => strtoupper($data->warehouse),
-                        "stok_1"                => $satuan1 == null ? '-' : floatval($data->qty) . " " . $satuan1['kode_satuan'],
-                        "stok_2"                => $satuan2 == null ? '-' : (sprintf("%.2f", floatval($data->qty) / $data->konversi_satuan_2)) . " " . $satuan2['kode_satuan'],
-                        "stok_3"                => $satuan3 == null ? '-' : (sprintf("%.2f", floatval($data->qty) / $data->konversi_satuan_3)) . " " . $satuan3['kode_satuan'],
-                    ]);
-                } else {
-                    if ($addCondition['status_stok'] == 1) {
-                        if ($data->qty > 0) {
-                            array_push($dataResult, [
-                                "no"                    => $no++,
-                                "id"                    => encrypt($data->id),
-                                "parent_type"           => strtoupper(str_replace("_", " ", strtoupper($data->parent_type))),
-                                "parent_name"           => strtoupper($data->parent_name),
-                                "kode_barang"           => strtoupper($data->kode_barang),
-                                "barang"                => strtoupper($data->barang_name . "-" . $data->spesifikasi),
-                                "divisi"                => strtoupper($data->divisi),
-                                "warehouse"             => strtoupper($data->warehouse),
-                                "stok_1"                => $satuan1 == null ? '-' : floatval($data->qty) . " " . $satuan1['kode_satuan'],
-                                "stok_2"                => $satuan2 == null ? '-' : (sprintf("%.2f", floatval($data->qty) / $data->konversi_satuan_2)) . " " . $satuan2['kode_satuan'],
-                                "stok_3"                => $satuan3 == null ? '-' : (sprintf("%.2f", floatval($data->qty) / $data->konversi_satuan_3)) . " " . $satuan3['kode_satuan'],
-                            ]);
-                        }
-                    } else {
-                        if ($data->qty == 0) {
-                            array_push($dataResult, [
-                                "no"                    => $no++,
-                                "id"                    => encrypt($data->id),
-                                "parent_type"           => strtoupper(str_replace("_", " ", strtoupper($data->parent_type))),
-                                "parent_name"           => strtoupper($data->parent_name),
-                                "kode_barang"           => strtoupper($data->kode_barang),
-                                "barang"                => strtoupper($data->barang_name . "-" . $data->spesifikasi),
-                                "divisi"                => strtoupper($data->divisi),
-                                "warehouse"             => strtoupper($data->warehouse),
-                                "stok_1"                => $satuan1 == null ? '-' : floatval($data->qty) . " " . $satuan1['kode_satuan'],
-                                "stok_2"                => $satuan2 == null ? '-' : (sprintf("%.2f", floatval($data->qty) / $data->konversi_satuan_2)) . " " . $satuan2['kode_satuan'],
-                                "stok_3"                => $satuan3 == null ? '-' : (sprintf("%.2f", floatval($data->qty) / $data->konversi_satuan_3)) . " " . $satuan3['kode_satuan'],
-                            ]);
-                        }
-                    }
-                }
-            }
-        } else {
-            $condition = [
-                "kemasan.company_id" => $this->this_company_id,
-                "kemasan.deletedAt" => null,
-                "stock.company_id" => $this->this_company_id,
-                "stock.deletedAt" => null,
-            ];
-
-            $dataQry = $this->stockModel->getStockListKemasan($condition, $addCondition, $limit, $offset);
-            $dataResult = [];
-            $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
-
-            foreach ($dataQry['data'] as $data) {
-                $satuan1 = $this->satuanModel->find($data->satuan_id);
-                $data->qty = $this->stockModel->detailStock($data->id)['stok']['stokSekarang'];
-
-                if ($addCondition['status_stok'] == "ALL") {
-                    array_push($dataResult, [
-                        "no"                    => $no++,
-                        "id"                    => encrypt($data->id),
-                        "parent_type"           => strtoupper(str_replace("_", " ", strtoupper($data->parent_type))),
-                        "parent_name"           => strtoupper($data->parent_name),
-                        "kode_barang"           => strtoupper($data->kode),
-                        "barang"                => strtoupper($data->name),
-                        "divisi"                => strtoupper($data->divisi),
-                        "warehouse"             => strtoupper($data->warehouse),
-                        "stok_1"                => floatval($data->qty) . " " . $satuan1['kode_satuan'],
-                    ]);
-                } else {
-                    if ($addCondition['status_stok'] == 1) {
-                        if ($data->qty > 0) {
-                            array_push($dataResult, [
-                                "no"                    => $no++,
-                                "id"                    => encrypt($data->id),
-                                "parent_type"           => strtoupper(str_replace("_", " ", strtoupper($data->parent_type))),
-                                "parent_name"           => strtoupper($data->parent_name),
-                                "kode_barang"           => strtoupper($data->kode),
-                                "barang"                => strtoupper($data->name),
-                                "divisi"                => strtoupper($data->divisi),
-                                "warehouse"             => strtoupper($data->warehouse),
-                                "stok_1"                => floatval($data->qty) . " " .  $satuan1['kode_satuan'],
-                            ]);
-                        }
-                    } else {
-                        if ($data->qty == 0) {
-                            array_push($dataResult, [
-                                "no"                    => $no++,
-                                "id"                    => encrypt($data->id),
-                                "parent_type"           => strtoupper(str_replace("_", " ", strtoupper($data->parent_type))),
-                                "parent_name"           => strtoupper($data->parent_name),
-                                "kode_barang"           => strtoupper($data->kode),
-                                "barang"                => strtoupper($data->name),
-                                "divisi"                => strtoupper($data->divisi),
-                                "warehouse"             => strtoupper($data->warehouse),
-                                "stok_1"                => floatval($data->qty) . " " .  $satuan1['kode_satuan'],
-                            ]);
-                        }
-                    }
-                }
-            }
+        foreach ($dataQry['data'] as $d) {
+            array_push($dataResult, [
+                'no' => $no++,
+                'id' => encrypt($d['id']),
+                'parent_name' => $d['parent_name'],
+                'kode_barang' => $d['kode_barang'],
+                'barang_name' => $d['barang_name'],
+                'spesifikasi' => $d['spesifikasi'],
+                'divisi' => $d['divisi'],
+                'warehouse_name' => $d['warehouse_name'],
+                'qty_diterima' => (float)$d['qty_diterima'],
+                'kode_satuan' => $d['kode_satuan']
+            ]);
         }
 
         $data = [
@@ -689,128 +599,24 @@ class StokList extends BaseController
     public function detail($id)
     {
         $id = decrypt($id);
+        $stock =  $this->stockRevampModel->getStockIdentity($id);
 
-        if ($this->stockModel->where('company_id', $this->this_company_id)->find($id) == null) {
+        if ($stock == null) {
             return redirect()->to('stock-list');
         }
 
-        $conditionPerDokumen = [
-            "stock_details2.stock_id" => $id,
-            "stock_details2.deletedAt" => null,
-            "stock_details.deletedAt" => null,
-        ];
-
-        $conditionInisiasi = [
-            "stock_details2.stock_id" => $id,
-            "stock_details.sumber" => "INISIASI",
-            "stock_details2.deletedAt" => null,
-            "stock_details.deletedAt" => null,
-        ];
-
-        $conditionInisiasi = [
-            "stock_details2.stock_id" => $id,
-            "stock_details.sumber" => "INISIASI",
-            "stock_details2.deletedAt" => null,
-            "stock_details.deletedAt" => null,
-        ];
-
-        $conditionPemasukkanBarang = [
-            "stock_details2.stock_id" => $id,
-            "stock_details.sumber" => "LPB",
-            "stock_details2.deletedAt" => null,
-            "stock_details.deletedAt" => null,
-        ];
-
-        $conditionAdjusment = [
-            "stock_details2.stock_id" => $id,
-            "stock_details.sumber" => "ADJUSMENT",
-            "stock_details2.deletedAt" => null,
-            "stock_details.deletedAt" => null,
-        ];
-
-        $conditionMutasi = [
-            "stock_details2.stock_id" => $id,
-            "stock_details.sumber" => "MUTASI",
-            "stock_details2.deletedAt" => null,
-            "stock_details.deletedAt" => null,
-        ];
-
-        $conditionJasaVendor = [
-            "stock_details2.stock_id" => $id,
-            "stock_details.sumber" => "JASA VENDOR",
-            "stock_details2.deletedAt" => null,
-            "stock_details.deletedAt" => null,
-        ];
-
-        $conditionProduksiOut = [
-            "stock_details2.stock_id" => $id,
-            "stock_details.sumber" => "PRODUKSI",
-            "stock_details2.deletedAt" => null,
-            "stock_details.status" => "Out",
-            "stock_details.deletedAt" => null,
-        ];
-
-        $conditionProduksiIn = [
-            "stock_details2.stock_id" => $id,
-            "stock_details.sumber" => "PRODUKSI",
-            "stock_details2.deletedAt" => null,
-            "stock_details.status" => "In",
-            "stock_details.deletedAt" => null,
-        ];
-
-        $conditionRebus = [
-            "stock_details2.stock_id" => $id,
-            "stock_details.sumber" => "REBUS",
-            "stock_details2.deletedAt" => null,
-            "stock_details.deletedAt" => null,
-        ];
-
-        $conditionPenjualan = [
-            "stock_details2.stock_id" => $id,
-            "stock_details.sumber" => "PENJUALAN",
-            "stock_details2.deletedAt" => null,
-            "stock_details.deletedAt" => null,
-        ];
-
-        $totalStokPerDokumen = $this->stockDetail2Model->getTotalStockLog($conditionPerDokumen);
-        $totalStokInit = $this->stockDetail2Model->getTotalStockLog($conditionInisiasi);
-        $totalStokPemasukkanBarang = $this->stockDetail2Model->getTotalStockLog($conditionPemasukkanBarang);
-        $totalStokAdjusment = $this->stockDetail2Model->getTotalStockLog($conditionAdjusment);
-        $totalStokMutasi = $this->stockDetail2Model->getTotalStockLog($conditionMutasi);
-        $totalStokJasaVendor = $this->stockDetail2Model->getTotalStockLog($conditionJasaVendor);
-        $totalStokProduksiOut = $this->stockDetail2Model->getTotalStockLog($conditionProduksiOut);
-        $totalStokProduksiIn = $this->stockDetail2Model->getTotalStockLog($conditionProduksiIn);
-        $totalStokRebus = $this->stockDetail2Model->getTotalStockLog($conditionRebus);
-        $totalStokPenjualan = $this->stockDetail2Model->getTotalStockLog($conditionPenjualan);
-
-        $stok =  $this->stockModel->find($id);
+        $sumberBarang = $this->metaDataModel->where('name', "sumber_barang")->first();
+        $sumberBarangArr = explode(',', $sumberBarang['value']);
 
         $data = [
-            'jenisDokAju' => $this->metaDataModel->getByName("jenis_dok_aju"),
-            'tipeAdjusment' => $this->metaDataModel->where('deletedAt', null)->where('name', "Tipe Adjusment")->findAll(),
-            'stok' => $stok,
-            'supplierName' => $this->supplierModel->where('deletedAt', null)->where('company_id', $this->this_company_id)->findAll(),
-            'detail' => $this->stockModel->detailStock($id),
-            'total' => [
-                'totalPerDokumen' => floatval($totalStokPerDokumen),
-                'totalPerInit' => floatval($totalStokInit),
-                'totalPerPemasukkan' => floatval($totalStokPemasukkanBarang),
-                'totalPerAdjusment' => floatval($totalStokAdjusment),
-                'totalMutasi' => floatval($totalStokMutasi),
-                'totalJasaVendor' => floatval($totalStokJasaVendor),
-                'totalProduksiIn' => floatval($totalStokProduksiIn),
-                'totalProduksiOut' => floatval($totalStokProduksiOut),
-                'totalRebus' => floatval($totalStokRebus),
-                'totalPenjualan' => floatval($totalStokPenjualan)
-            ],
-            'divisi' => $this->divisiModel->find($stok['divisi_id']),
-            'warehouse' => $this->warehouseModel->find($stok['warehouse_id'])
+            'stock' => $stock,
+            'sumberBarang' => $sumberBarangArr
         ];
 
         return view('Warehouse/stock/stock_list_detail', $data);
     }
 
-    public function allStokPerDokumen()
+    public function allStockDetail()
     {
         $payload = [
             "pageSize"      => $this->request->getVar("length"),
@@ -822,70 +628,114 @@ class StokList extends BaseController
         $addCondition = [
             "sort"   => $this->request->getVar("sort"),
             "sortType"  => $this->request->getVar("sortType"),
-            "bc_id" => $this->request->getVar("bc_id"),
-            "no_aju" => $this->request->getVar("no_aju"),
-            "divisi_id" => $this->request->getVar("divisi_id"),
-            "warehouse_id" => $this->request->getVar('warehouse_id'),
-            "dateStart"     => $this->request->getVar("dateStart") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateStart")))) : "",
-            "dateEnd"       => $this->request->getVar("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateEnd")))) : "",
+            "search" => $this->request->getVar('search'),
+            "sumber_barang" => $this->request->getVar('sumber_barang')
         ];
+
+        $id = decrypt($this->request->getVar('id'));
 
         $limit = $this->request->getVar("length");
         $offset = $this->request->getVar("start");
 
-        $stok_id = decrypt($this->request->getVar('stok_id'));
-        $stok = $this->stockModel->find($stok_id);
+        if ($addCondition['sumber_barang'] == "PO LOKAL BAKU") {
+            $condition = [
+                "stock_revamp_detail.stock_id" => $id,
+                "stock_revamp_detail.deletedAt" => null,
+                "stock_revamp.deletedAt" => null,
+                "stock_revamp_detail.reference_type" => "LPB",
+                "stock_revamp_detail.po_type" => "LOKAL BAKU"
+            ];
+            $dataQry = $this->stockRevampDetailModel->getListStockDetailByPoLokalBb($condition, $addCondition, $limit, $offset);
+        } elseif ($addCondition['sumber_barang'] == "PO LOKAL PENOLONG") {
+            $condition = [
+                "stock_revamp_detail.stock_id" => $id,
+                "stock_revamp_detail.deletedAt" => null,
+                "stock_revamp.deletedAt" => null,
+                "stock_revamp_detail.reference_type" => "LPB",
+                "stock_revamp_detail.po_type" => "LOKAL PENOLONG"
+            ];
+            $dataQry = $this->stockRevampDetailModel->getListStockDetailByPoBp($condition, $addCondition, $limit, $offset);
+        } elseif ($addCondition['sumber_barang'] == "PO IMPORT BAKU") {
+            $condition = [
+                "stock_revamp_detail.stock_id" => $id,
+                "stock_revamp_detail.deletedAt" => null,
+                "stock_revamp.deletedAt" => null,
+                "stock_revamp_detail.reference_type" => "LPB",
+                "stock_revamp_detail.po_type" => "IMPORT BAKU"
+            ];
+            $dataQry = $this->stockRevampDetailModel->getListStockDetailByPoImportBb($condition, $addCondition, $limit, $offset);
+        } elseif ($addCondition['sumber_barang'] == "PO IMPORT PENOLONG") {
+            $condition = [
+                "stock_revamp_detail.stock_id" => $id,
+                "stock_revamp_detail.deletedAt" => null,
+                "stock_revamp.deletedAt" => null,
+                "stock_revamp_detail.reference_type" => "LPB",
+                "stock_revamp_detail.po_type" => "IMPORT PENOLONG"
+            ];
+            $dataQry = $this->stockRevampDetailModel->getListStockDetailByPoBp($condition, $addCondition, $limit, $offset);
+        } elseif ($addCondition['sumber_barang'] == "PROSES REBUS") {
+            $condition = [
+                "stock_revamp_detail.stock_id" => $id,
+                "stock_revamp_detail.deletedAt" => null,
+                "stock_revamp.deletedAt" => null,
+                "stock_revamp_detail.reference_type" => "PROSES REBUS",
+            ];
+            $dataQry = $this->stockRevampDetailModel->getListStockDetailByProsesRebus($condition, $addCondition, $limit, $offset);
+        } elseif ($addCondition['sumber_barang'] == "JASA VENDOR") {
+            $condition = [
+                "stock_revamp_detail.stock_id" => $id,
+                "stock_revamp_detail.deletedAt" => null,
+                "stock_revamp.deletedAt" => null,
+                "stock_revamp_detail.reference_type" => "JASA VENDOR",
+            ];
+            $dataQry = $this->stockRevampDetailModel->getListStockDetailByJasaVendor($condition, $addCondition, $limit, $offset);
+        } elseif ($addCondition['sumber_barang'] == "HASIL PRODUKSI") {
+            $condition = [
+                "stock_revamp_detail.stock_id" => $id,
+                "stock_revamp_detail.deletedAt" => null,
+                "stock_revamp.deletedAt" => null,
+                "stock_revamp_detail.reference_type" => "HASIL PRODUKSI",
+            ];
+            $dataQry = $this->stockRevampDetailModel->getListStockDetailByHasilProduksi($condition, $addCondition, $limit, $offset);
+        } elseif ($addCondition['sumber_barang'] == "MATERIAL REQUEST BAKU") {
+            $condition = [
+                "stock_revamp_detail.stock_id" => $id,
+                "stock_revamp_detail.deletedAt" => null,
+                "stock_revamp.deletedAt" => null,
+                "stock_revamp_detail.reference_type" => "MATERIAL REQUEST BAKU",
+            ];
+            $dataQry = $this->stockRevampDetailModel->getListStockDetailByMaterialRequestBaku($condition, $addCondition, $limit, $offset);
+        } elseif ($addCondition['sumber_barang'] == "MATERIAL REQUEST PENOLONG") {
+            $condition = [
+                "stock_revamp_detail.stock_id" => $id,
+                "stock_revamp_detail.deletedAt" => null,
+                "stock_revamp.deletedAt" => null,
+                "stock_revamp_detail.reference_type" => "MATERIAL REQUEST PENOLONG",
+            ];
+            $dataQry = $this->stockRevampDetailModel->getListStockDetailByMaterialRequestPenolong($condition, $addCondition, $limit, $offset);
+        }
 
-        $condition = [
-            "stock_details2.stock_id" => $stok_id,
-            "stock_details2.deletedAt" => null,
-            "stock_details.deletedAt" => null,
-        ];
 
-        $dataQry = $this->stockDetail2Model->getListStokPerDokumen($condition, $addCondition, $limit, $offset);
         $dataResult = [];
         $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
 
-        if ($stok['kemasan_id'] == 0) {
-            // BARANG
-            $barang = $this->barangMasterSpesifikasiModel->find($stok['barang2_id']);
-        } else {
-            // KEMASAN
-            $barang = $this->kemasanModel->find($stok['kemasan_id']);
-        }
-
         foreach ($dataQry['data'] as $data) {
-            $dokumenBC = $this->metaDataModel->find($data->bc_id);
-            if ($stok['kemasan_id'] == 0) {
-                // BARANG
-                $satuan_1 = $this->satuanModel->find($barang['satuan_1']);
-                $satuan_2 = $this->satuanModel->find($barang['satuan_2']);
-                $satuan_3 = $this->satuanModel->find($barang['satuan_3']);
-                $barangMaster = $this->barangMasterModel->find($stok['barang1_id']);
-                $barangMasterSpesifikasi = $this->barangMasterSpesifikasiModel->find($stok['barang2_id']);
-
-                array_push($dataResult, [
-                    "no" => $no++,
-                    "bc_type" => $dokumenBC == null ? "NON PABEAN" : $dokumenBC['value'],
-                    "barang" => strtoupper($barangMaster['barang_name'] . " - " . $barangMasterSpesifikasi['spesifikasi']),
-                    "no_aju" => $data->no_aju,
-                    "stok_1" => floatval($data->stok_total) . " " . $satuan_1['kode_satuan'],
-                    "stok_2" => $satuan_2 == null ? "-" : (sprintf("%.2f", floatval($data->stok_total) / $barang['konversi_satuan_2'])) . " " . $satuan_2['kode_satuan'],
-                    "stok_3" => $satuan_3 == null ? "-" : (sprintf("%.2f", floatval($data->stok_total) / $barang['konversi_satuan_3'])) . " " . $satuan_3['kode_satuan'],
-                ]);
-            } else {
-                // KEMASAN
-                $satuan_1 = $this->satuanModel->find($barang['satuan_id']);
-
-                array_push($dataResult, [
-                    "no" => $no++,
-                    "bc_type" => $dokumenBC == null ? "NON PABEAN" : $dokumenBC['value'],
-                    "no_aju" => $data->no_aju,
-                    "stok_1" => floatval($data->stok_total) . " " . $satuan_1['kode_satuan'],
-                    "stok_2" => '-',
-                    "stok_3" => '-',
-                ]);
-            }
+            array_push($dataResult, [
+                'id' => $data['id'],
+                'no' => $no++,
+                'supplier_name' => $data['supplier_name'],
+                'kode_barang' => $data['kode_barang'],
+                'barang_name' => $data['barang_name'],
+                'spesifikasi' => $data['spesifikasi'],
+                'type_bc' => $data['type_bc'],
+                'po_no' => $data['po_no'] ?? "",
+                'ref_no' => $data['ref_no'],
+                'po_date' => !empty($data['po_date']) ? "" : date('d/m/Y', strtotime($data['po_date'])),
+                'no_daftar' =>  $data['no_daftar'] ?? "",
+                'no_aju' => $data['no_aju'] ?? "",
+                'qty_diterima' => $data['qty_diterima'],
+                'kode_satuan' => $data['kode_satuan']
+            ]);
         }
 
         $data = [
@@ -2102,516 +1952,95 @@ class StokList extends BaseController
         return response()->setJSON($data);
     }
 
+
     public function exportExcel()
     {
+        $parentType = $this->request->getVar('parent_type');
+        $parentName = $this->request->getVar('parent_name');
+        $divisiId = $this->request->getVar('divisi_id');
+        $warehouseId = $this->request->getVar('warehouse_id');
+        $warehouseId = $warehouseId == "null" ? "" : $warehouseId;
 
-        $filename = "EXPORT_STOCK_LIST";
+        $limit = 100000000;
+        $offset = 0;
 
+        $condition = [
+            'stock_revamp.deletedAt' => null,
+            'stock_revamp.company_id' => $this->this_company_id,
+            'barang_master.type_barang' => $parentType,
+        ];
 
-        $search        = $this->request->getVar("search");
-        $parent_type      = $this->request->getVar("parent_type");
-        $parent_name      = $this->request->getVar("parent_name");
-        $divisi_id      = $this->request->getVar("divisi_id");
-        $warehouse_id      = $this->request->getVar("warehouse_id");
-        $status_stok      = $this->request->getVar("status_stok");
-        $sort        = $this->request->getVar("sort");
-        $sortType      = $this->request->getVar("sortType");
+        $addCondition = [
+            "search" => "",
+            "parent_type_id" => $parentName,
+            "divisi_id" => $divisiId,
+            "warehouse_id" => $warehouseId,
+        ];
 
-        if ($warehouse_id  == "null") {
-            $warehouse_id = "";
+        $dataQry = $this->stockRevampModel->getListStock(
+            $condition,
+            $addCondition,
+            $limit,
+            $offset
+        );
+
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+
+        // Header kolom
+        $sheet->setCellValue('A1', 'No');
+        $sheet->setCellValue('B1', 'Kategori Barang');
+        $sheet->setCellValue('C1', 'Kode Barang');
+        $sheet->setCellValue('D1', 'Barang');
+        $sheet->setCellValue('E1', 'Spesifikasi');
+        $sheet->setCellValue('F1', 'Divisi');
+        $sheet->setCellValue('G1', 'Warehouse');
+        $sheet->setCellValue('H1', 'Qty');
+        $sheet->setCellValue('I1', 'Unit');
+
+        $row = 2;
+        $no = 1;
+
+        foreach ($dataQry['data'] as $d) {
+            $sheet->setCellValue('A' . $row, $no++);
+            $sheet->setCellValue('B' . $row, $d['parent_name']);
+            $sheet->setCellValue('C' . $row, $d['kode_barang']);
+            $sheet->setCellValue('D' . $row, $d['barang_name']);
+            $sheet->setCellValue('E' . $row, $d['spesifikasi']);
+            $sheet->setCellValue('F' . $row, $d['divisi']);
+            $sheet->setCellValue('G' . $row, $d['warehouse_name']);
+            $sheet->setCellValue('H' . $row, (float)$d['qty_diterima']);
+            $sheet->setCellValue('I' . $row, $d['kode_satuan']);
+            $row++;
         }
 
-
-
-        // if ($status_stok  == "ALL") {
-        //     $status_stok = "";
-        // }
-
-
-
-
-        if ($parent_type != "kemasan") {
-            $condition = [
-                "barang_master.company_id" => $this->this_company_id,
-                "barang_master.deletedAt" => NULL,
-                "barang_master_spesifikasi.deletedAt" => NULL,
-                "stock.company_id" => $this->this_company_id,
-                "stock.deletedAt" => NULL,
-                "stock_details2.deletedAt" => null,
-                "stock_details.deletedAt" => null,
-            ];
-
-            $availableSort = [
-                'parent_barang.parent_type' => 'parent_barang.parent_type',
-                'parent_barang.parent_name' => 'parent_barang.parent_name',
-                'barang_master.kode_barang' => 'barang_master.kode_barang',
-                'barang_master.barang_name' => 'barang_master.barang_name',
-                'divisis.divisi' => 'divisis.divisi',
-                'warehouses.warehouse_name' => 'warehouses.warehouse_name',
-                'stock.qty' => 'stock.qty'
-            ];
-
-            $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
-
-            $sort = $availableSort[$sort ?? 'createdAt'] ?? 'parent_barang.parent_type';
-            $sortType = $availableSortType[$sortType ?? 'desc'] ?? 'DESC';
-
-            $selectQry = '
-                stock.id,
-                stock_details.qty,
-                parent_barang.parent_type,
-                parent_barang.parent_name,
-                barang_master.kode_barang,
-                barang_master.barang_name,
-                divisis.divisi,
-                warehouses.warehouse_name AS warehouse,
-                barang_master_spesifikasi.spesifikasi,
-                barang_master_spesifikasi.satuan_1,
-                barang_master_spesifikasi.satuan_2,
-                barang_master_spesifikasi.satuan_3,
-                barang_master_spesifikasi.konversi_satuan_2,
-                barang_master_spesifikasi.konversi_satuan_3,
-                stock_details2.bc_id,
-                stock_details2.stock_detail_id,
-                stock_details2.no_aju,
-                stock_details.stock_date,
-                (SUM(CASE WHEN stock_details.status = "In" 
-                THEN stock_details2.qty ELSE 0 END) - 
-                SUM(CASE WHEN stock_details.status = "Out" 
-                THEN stock_details2.qty ELSE 0 END)) 
-                AS stok_total,
-            ';
-            $stockListQry = $this->stockDetail2Model->select($selectQry)
-                ->join('stock', 'stock.id = stock_details2.stock_id')
-                ->join('stock_details', 'stock_details.id = stock_details2.stock_detail_id')
-                ->join('barang_master', 'barang_master.id = stock.barang1_id')
-                ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = stock.barang2_id')
-                ->join('warehouses', 'warehouses.id = stock.warehouse_id')
-                ->join('divisis', 'divisis.id = stock.divisi_id')
-                ->join('parent_barang', 'parent_barang.id = barang_master.parent_type_id')
-                ->where($condition)
-                ->groupBy('stock_details2.bc_id')
-                ->groupBy('stock_details2.stock_id')
-                ->groupBy('stock_details2.no_aju')
-                ->orderBy($sort, $sortType)
-                ->orderBy('stock_details2.stock_id', 'ASC')
-                ->orderBy('stock_details2.bc_id', 'DESC');
-
-            if ($parent_type || $parent_name || $divisi_id || $warehouse_id || $search) {
-                $stockListQry->groupStart();
-            }
-
-            if ($parent_type) {
-                $stockListQry->where('parent_barang.parent_type', $parent_type);
-            }
-
-            if ($parent_name) {
-                $stockListQry->where('parent_barang.id', $parent_name);
-            }
-
-
-            if ($divisi_id) {
-
-                $stockListQry->where('stock.divisi_id', $divisi_id);
-            }
-
-            if ($warehouse_id) {
-                $stockListQry->where('stock.warehouse_id', $warehouse_id);
-            }
-
-
-            if ($search) {
-                $stockListQry->like("CONCAT(barang_master.barang_name, ' ', barang_master_spesifikasi.spesifikasi)", $search)
-                    ->orLike('barang_master.kode_barang', $search);
-            }
-
-            if ($parent_type || $parent_name || $divisi_id || $warehouse_id || $search) {
-                $stockListQry->groupEnd();
-            }
-
-
-            $getAllStockListData = $stockListQry->findAll();
-
-            $spreadsheet = new Spreadsheet();
-            $sheet = $spreadsheet->getActiveSheet();
-
-            $sheet->getStyle('A1:J1')->applyFromArray([
-                'font' => [
-                    'bold' => true,
-                ],
-            ]);
-
-
-            if (empty($getAllStockListData)) {
-                $sheet->setCellValue('A1', 'Tidak Ada Data Satuan');
-            } else {
-                $sheet->setCellValue('A1', 'NO');
-                $sheet->setCellValue('B1', 'TIPE BARANG');
-                $sheet->setCellValue('C1', 'KATEGORI');
-                $sheet->setCellValue('D1', 'KODE');
-                $sheet->setCellValue('E1', 'BARANG');
-                $sheet->setCellValue('F1', 'DEPARTEMEN');
-                $sheet->setCellValue('G1', 'WAREHOUSE');
-                $sheet->setCellValue('H1', 'BC');
-                $sheet->setCellValue('I1', 'NO AJU');
-                $sheet->setCellValue('J1', 'QTY SATUAN 1');
-                $sheet->setCellValue('K1', 'QTY SATUAN 2');
-                $sheet->setCellValue('L1', 'QTY SATUAN 3');
-
-
-                $sheet->getStyle('A1:L1')->applyFromArray([
-                    'font' => [
-                        'bold' => true,
-                    ],
-                ]);
-
-
-
-                $no = 1;
-                $numRow = 2;
-
-                foreach ($getAllStockListData as $row) :
-                    $dokumenBC = $this->metaDataModel->find($row['bc_id']);
-                    $satuan1 = $this->satuanModel->find($row['satuan_1']);
-                    $satuan2 = $this->satuanModel->find($row['satuan_2']);
-                    $satuan3 = $this->satuanModel->find($row['satuan_3']);
-
-
-                    if ($status_stok == "1") {
-                        if ($row['stok_total'] > 0) {
-                            $sheet->setCellValue('A' . $numRow, $no);
-                            $sheet->setCellValue('B' . $numRow, $row['parent_type']);
-                            $sheet->setCellValue('C' . $numRow, $row['parent_name']);
-                            $sheet->setCellValue('D' . $numRow, $row['kode_barang']);
-                            $sheet->setCellValue('E' . $numRow, $row['barang_name'] . '-' . $row['spesifikasi']);
-                            $sheet->setCellValue('F' . $numRow, $row['divisi']);
-                            $sheet->setCellValue('G' . $numRow, $row['warehouse']);
-                            $sheet->setCellValue('H' . $numRow, $dokumenBC == null ? "NON PABEAN" : $dokumenBC['value']);
-                            $sheet->setCellValue('I' . $numRow, $row['no_aju']);
-                            $sheet->setCellValue('J' . $numRow, $satuan1 == null ? '-' : ($row['stok_total']) . " " . $satuan1['kode_satuan']);
-                            $sheet->setCellValue('K' . $numRow, $satuan2 == null ? '-' : ($row['stok_total']) . " " . $satuan2['kode_satuan']);
-                            $sheet->setCellValue('L' . $numRow, $satuan3 == null ? '-' : ($row['stok_total']) . " " . $satuan3['kode_satuan']);
-
-
-                            // Auto size columns A-J
-                            $sheet->getColumnDimension('A')->setAutoSize(true);
-                            $sheet->getColumnDimension('B')->setAutoSize(true);
-                            $sheet->getColumnDimension('C')->setAutoSize(true);
-                            $sheet->getColumnDimension('D')->setAutoSize(true);
-                            $sheet->getColumnDimension('E')->setAutoSize(true);
-                            $sheet->getColumnDimension('F')->setAutoSize(true);
-                            $sheet->getColumnDimension('G')->setAutoSize(true);
-                            $sheet->getColumnDimension('H')->setAutoSize(true);
-                            $sheet->getColumnDimension('I')->setAutoSize(true);
-                            $sheet->getColumnDimension('J')->setAutoSize(true);
-                            $sheet->getColumnDimension('K')->setAutoSize(true);
-                            $sheet->getColumnDimension('L')->setAutoSize(true);
-
-
-                            $no++;
-                            $numRow++;
-                        }
-                    } elseif ($status_stok == "0") {
-                        if ($row['stok_total'] == 0) {
-                            $sheet->setCellValue('A' . $numRow, $no);
-                            $sheet->setCellValue('B' . $numRow, $row['parent_type']);
-                            $sheet->setCellValue('C' . $numRow, $row['parent_name']);
-                            $sheet->setCellValue('D' . $numRow, $row['kode_barang']);
-                            $sheet->setCellValue('E' . $numRow, $row['barang_name'] . '-' . $row['spesifikasi']);
-                            $sheet->setCellValue('F' . $numRow, $row['divisi']);
-                            $sheet->setCellValue('G' . $numRow, $row['warehouse']);
-                            $sheet->setCellValue('H' . $numRow, $dokumenBC == null ? "NON PABEAN" : $dokumenBC['value']);
-                            $sheet->setCellValue('I' . $numRow, $row['no_aju']);
-                            $sheet->setCellValue('J' . $numRow, $satuan1 == null ? '-' : ($row['stok_total']) . " " . $satuan1['kode_satuan']);
-                            $sheet->setCellValue('K' . $numRow, $satuan2 == null ? '-' : ($row['stok_total']) . " " . $satuan2['kode_satuan']);
-                            $sheet->setCellValue('L' . $numRow, $satuan3 == null ? '-' : ($row['stok_total']) . " " . $satuan3['kode_satuan']);
-
-
-                            // Auto size columns A-J
-                            $sheet->getColumnDimension('A')->setAutoSize(true);
-                            $sheet->getColumnDimension('B')->setAutoSize(true);
-                            $sheet->getColumnDimension('C')->setAutoSize(true);
-                            $sheet->getColumnDimension('D')->setAutoSize(true);
-                            $sheet->getColumnDimension('E')->setAutoSize(true);
-                            $sheet->getColumnDimension('F')->setAutoSize(true);
-                            $sheet->getColumnDimension('G')->setAutoSize(true);
-                            $sheet->getColumnDimension('H')->setAutoSize(true);
-                            $sheet->getColumnDimension('I')->setAutoSize(true);
-                            $sheet->getColumnDimension('J')->setAutoSize(true);
-                            $sheet->getColumnDimension('K')->setAutoSize(true);
-                            $sheet->getColumnDimension('L')->setAutoSize(true);
-
-
-                            $no++;
-                            $numRow++;
-                        }
-                    } else {
-                        $sheet->setCellValue('A' . $numRow, $no);
-                        $sheet->setCellValue('B' . $numRow, $row['parent_type']);
-                        $sheet->setCellValue('C' . $numRow, $row['parent_name']);
-                        $sheet->setCellValue('D' . $numRow, $row['kode_barang']);
-                        $sheet->setCellValue('E' . $numRow, $row['barang_name'] . '-' . $row['spesifikasi']);
-                        $sheet->setCellValue('F' . $numRow, $row['divisi']);
-                        $sheet->setCellValue('G' . $numRow, $row['warehouse']);
-                        $sheet->setCellValue('H' . $numRow, $dokumenBC == null ? "NON PABEAN" : $dokumenBC['value']);
-                        $sheet->setCellValue('I' . $numRow, $row['no_aju']);
-                        $sheet->setCellValue('J' . $numRow, $satuan1 == null ? '-' : ($row['stok_total']) . " " . $satuan1['kode_satuan']);
-                        $sheet->setCellValue('K' . $numRow, $satuan2 == null ? '-' : ($row['stok_total']) . " " . $satuan2['kode_satuan']);
-                        $sheet->setCellValue('L' . $numRow, $satuan3 == null ? '-' : ($row['stok_total']) . " " . $satuan3['kode_satuan']);
-
-
-                        // Auto size columns A-J
-                        $sheet->getColumnDimension('A')->setAutoSize(true);
-                        $sheet->getColumnDimension('B')->setAutoSize(true);
-                        $sheet->getColumnDimension('C')->setAutoSize(true);
-                        $sheet->getColumnDimension('D')->setAutoSize(true);
-                        $sheet->getColumnDimension('E')->setAutoSize(true);
-                        $sheet->getColumnDimension('F')->setAutoSize(true);
-                        $sheet->getColumnDimension('G')->setAutoSize(true);
-                        $sheet->getColumnDimension('H')->setAutoSize(true);
-                        $sheet->getColumnDimension('I')->setAutoSize(true);
-                        $sheet->getColumnDimension('J')->setAutoSize(true);
-                        $sheet->getColumnDimension('K')->setAutoSize(true);
-                        $sheet->getColumnDimension('L')->setAutoSize(true);
-
-
-                        $no++;
-                        $numRow++;
-                    }
-                endforeach;
-
-
-                $sheet->getStyle('A1:' . $sheet->getHighestDataColumn() . $sheet->getHighestDataRow())
-                    ->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
-            }
-        } else {
-            $condition = [
-                "kemasan.company_id" => $this->this_company_id,
-                "kemasan.deletedAt" => NULL,
-                "stock.company_id" => $this->this_company_id,
-                "stock.deletedAt" => NULL,
-            ];
-
-            $availableSort = [
-                'parent_barang.parent_type' => 'parent_barang.parent_type',
-                'parent_barang.parent_name' => 'parent_barang.parent_name',
-                'barang_master.kode_barang' => 'kemasan.kode',
-                'barang_master.barang_name' => 'kemasan.name',
-                'divisis.divisi' => 'divisis.divisi',
-                'warehouses.warehouse_name' => 'warehouses.warehouse_name',
-                'stock.qty' => 'stock.qty'
-            ];
-
-            $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
-
-            $sort = $availableSort[$sort ?? 'createdAt'] ?? 'parent_barang.parent_type';
-            $sortType = $availableSortType[$sortType ?? 'desc'] ?? 'DESC';
-
-            $selectQry = '
-            stock.id,
-            stock.qty,
-            stock.createdAt,
-            parent_barang.parent_type,
-            parent_barang.parent_name,
-            parent_barang.createdAt,
-            kemasan.kode,
-            kemasan.name,
-            kemasan.satuan_id,
-            divisis.divisi,
-            warehouses.warehouse_name AS warehouse,
-        ';
-            $stockListQry = $this->stockModel->select($selectQry)
-                ->join('kemasan', 'kemasan.id = stock.kemasan_id')
-                ->join('warehouses', 'warehouses.id = stock.warehouse_id')
-                ->join('divisis', 'divisis.id = stock.divisi_id')
-                ->join('parent_barang', 'parent_barang.id = kemasan.parent_type_id')
-                ->where($condition)
-                ->orderBy($sort, $sortType);
-
-            if (
-                $parent_type || $parent_name || $divisi_id || $warehouse_id || $search
-            ) {
-                $stockListQry->groupStart();
-            }
-
-            if ($parent_type) {
-                $stockListQry->where('parent_barang.parent_type', $parent_type);
-            }
-
-            if ($parent_name) {
-                $stockListQry->where('parent_barang.id', $parent_name);
-            }
-
-            if ($divisi_id) {
-                $stockListQry->where('stock.divisi_id', $divisi_id);
-            }
-
-            if ($warehouse_id) {
-                $stockListQry->where('stock.warehouse_id', $warehouse_id);
-            }
-
-
-
-            if ($search) {
-                $stockListQry->where('kemasan.kode', $search);
-                $stockListQry->orLike('kemasan.name', $search);
-            }
-
-
-
-            if (
-                $parent_type || $parent_name || $divisi_id || $warehouse_id || $search
-            ) {
-                $stockListQry->groupEnd();
-            }
-
-            $getAllStockListData = $stockListQry->findAll();
-
-            $spreadsheet = new Spreadsheet();
-            $sheet = $spreadsheet->getActiveSheet();
-
-            $sheet->getStyle('A1:H1')->applyFromArray([
-                'font' => [
-                    'bold' => true,
-                ],
-            ]);
-
-
-            if (empty($getAllStockListData)) {
-                $sheet->setCellValue('A1', 'Tidak Ada Data Satuan');
-            } else {
-                $sheet->setCellValue('A1', 'NO');
-                $sheet->setCellValue('B1', 'TIPE BARANG');
-                $sheet->setCellValue('C1', 'KATEGORI');
-                $sheet->setCellValue('D1', 'KODE');
-                $sheet->setCellValue('E1', 'BARANG');
-                $sheet->setCellValue('F1', 'DEPARTEMEN');
-                $sheet->setCellValue('G1', 'WAREHOUSE');
-                $sheet->setCellValue('H1', 'QTY SATUAN 1');
-
-
-                $sheet->getStyle('A1:H1')->applyFromArray([
-                    'font' => [
-                        'bold' => true,
-                    ],
-                ]);
-
-
-
-                $no = 1;
-                $numRow = 2;
-
-                foreach ($getAllStockListData as $row) :
-
-
-                    $satuan1 = $this->satuanModel->find($row['satuan_id']);
-                    $row['qty'] = $this->stockModel->detailStock($row['id'])['stok']['stokSekarang'];
-
-                    if ($status_stok == "1") {
-                        if ($row['qty'] > 0) {
-                            $sheet->setCellValue('A' . $numRow, $no);
-                            $sheet->setCellValue('B' . $numRow, strtoupper(str_replace("_", " ", strtoupper($row['parent_type']))));
-                            $sheet->setCellValue('C' . $numRow, $row['parent_name']);
-                            $sheet->setCellValue('D' . $numRow, $row['kode']);
-                            $sheet->setCellValue('E' . $numRow, $row['name']);
-                            $sheet->setCellValue('F' . $numRow, $row['divisi']);
-                            $sheet->setCellValue('G' . $numRow, $row['warehouse']);
-                            $sheet->setCellValue('H' . $numRow, $satuan1 == null ? '-' : ($row['qty']) . " " . $satuan1['kode_satuan']);
-
-                            // Auto size columns A-H
-                            $sheet->getColumnDimension('A')->setAutoSize(true);
-                            $sheet->getColumnDimension('B')->setAutoSize(true);
-                            $sheet->getColumnDimension('C')->setAutoSize(true);
-                            $sheet->getColumnDimension('D')->setAutoSize(true);
-                            $sheet->getColumnDimension('E')->setAutoSize(true);
-                            $sheet->getColumnDimension('F')->setAutoSize(true);
-                            $sheet->getColumnDimension('G')->setAutoSize(true);
-                            $sheet->getColumnDimension('H')->setAutoSize(true);
-
-
-
-                            $no++;
-                            $numRow++;
-                        }
-                    } elseif ($status_stok == "0") {
-                        if ($row['qty'] == 0) {
-                            $sheet->setCellValue('A' . $numRow, $no);
-                            $sheet->setCellValue('B' . $numRow, strtoupper(str_replace("_", " ", strtoupper($row['parent_type']))));
-                            $sheet->setCellValue('C' . $numRow, $row['parent_name']);
-                            $sheet->setCellValue('D' . $numRow, $row['kode']);
-                            $sheet->setCellValue('E' . $numRow, $row['name']);
-                            $sheet->setCellValue('F' . $numRow, $row['divisi']);
-                            $sheet->setCellValue('G' . $numRow, $row['warehouse']);
-                            $sheet->setCellValue('H' . $numRow, $satuan1 == null ? '-' : ($row['qty']) . " " . $satuan1['kode_satuan']);
-
-                            // Auto size columns A-H
-                            $sheet->getColumnDimension('A')->setAutoSize(true);
-                            $sheet->getColumnDimension('B')->setAutoSize(true);
-                            $sheet->getColumnDimension('C')->setAutoSize(true);
-                            $sheet->getColumnDimension('D')->setAutoSize(true);
-                            $sheet->getColumnDimension('E')->setAutoSize(true);
-                            $sheet->getColumnDimension('F')->setAutoSize(true);
-                            $sheet->getColumnDimension('G')->setAutoSize(true);
-                            $sheet->getColumnDimension('H')->setAutoSize(true);
-
-
-
-                            $no++;
-                            $numRow++;
-                        }
-                    } else {
-
-                        $sheet->setCellValue('A' . $numRow, $no);
-                        $sheet->setCellValue('B' . $numRow, strtoupper(str_replace("_", " ", strtoupper($row['parent_type']))));
-                        $sheet->setCellValue('C' . $numRow, $row['parent_name']);
-                        $sheet->setCellValue('D' . $numRow, $row['kode']);
-                        $sheet->setCellValue('E' . $numRow, $row['name']);
-                        $sheet->setCellValue('F' . $numRow, $row['divisi']);
-                        $sheet->setCellValue('G' . $numRow, $row['warehouse']);
-                        $sheet->setCellValue('H' . $numRow, $satuan1 == null ? '-' : ($row['qty']) . " " . $satuan1['kode_satuan']);
-
-                        // Auto size columns A-H
-                        $sheet->getColumnDimension('A')->setAutoSize(true);
-                        $sheet->getColumnDimension('B')->setAutoSize(true);
-                        $sheet->getColumnDimension('C')->setAutoSize(true);
-                        $sheet->getColumnDimension('D')->setAutoSize(true);
-                        $sheet->getColumnDimension('E')->setAutoSize(true);
-                        $sheet->getColumnDimension('F')->setAutoSize(true);
-                        $sheet->getColumnDimension('G')->setAutoSize(true);
-                        $sheet->getColumnDimension('H')->setAutoSize(true);
-
-
-
-                        $no++;
-                        $numRow++;
-                    }
-
-                endforeach;
-
-
-                $sheet->getStyle('A1:' . $sheet->getHighestDataColumn() . $sheet->getHighestDataRow())
-                    ->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
-            }
+        // Format kolom Qty (rata kanan + format ribuan)
+        $lastRow = $row - 1;
+        $sheet->getStyle('H2:H' . $lastRow)
+            ->getNumberFormat()
+            ->setFormatCode('#,##0.00'); // tampil seperti 25,000.23
+
+        $sheet->getStyle('H2:H' . $lastRow)
+            ->getAlignment()
+            ->setHorizontal(Alignment::HORIZONTAL_RIGHT);
+
+        // Auto width untuk semua kolom
+        foreach (range('A', 'I') as $col) {
+            $sheet->getColumnDimension($col)->setAutoSize(true);
         }
 
+        // Bold header + rata tengah
+        $sheet->getStyle('A1:I1')->getFont()->setBold(true);
+        $sheet->getStyle('A1:I1')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_LEFT);
 
-
-
-
-
-
-
-        ob_start();
+        // Output
         $writer = new Xlsx($spreadsheet);
-        $writer->save('php://output');
-        $excelOutput = ob_get_clean();
+        $filename = 'Laporan_Stock_' . date('Ymd_His') . '.xlsx';
 
         header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-        header('Content-Disposition: attachment;filename="' . $filename . '.xlsx"');
+        header('Content-Disposition: attachment; filename="' . $filename . '"');
         header('Cache-Control: max-age=0');
-        header('Content-Length: ' . strlen($excelOutput));
-
-        echo $excelOutput;
+        $writer->save('php://output');
         exit();
     }
 }

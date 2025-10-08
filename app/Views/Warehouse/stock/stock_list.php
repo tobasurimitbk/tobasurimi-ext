@@ -4,20 +4,19 @@
 <section class="section">
     <div class="section-header">
         <h1>Stock List</h1>
-        <?php if (can('Inventori', 'Stok List', 'p')) : ?>
-            <button class="btn btn-discard btn-dropdown-export dropdown-toggle float-right" type="button" id="dropdownMenuButtonExport" data-bs-toggle="dropdown" aria-expanded="false" style="margin-right: 30px;">
-                Import / Export
-            </button>
-            <ul class="dropdown-menu list-dropdown-company" aria-labelledby="dropdownMenuButtonExport">
-                <li><button class="dropdown-item btn-upload-excel">Import Excel</button></li>
-                <li><button class="dropdown-item" onclick="excel('<?= base_url("stock-list/export-excel"); ?>')">Export Excel</button></li>
-            </ul>
-        <?php endif; ?>
-        <?php if (can("Inventori", "Stok List", "c")) : ?>
-            <a href="<?= base_url('stock-list/create') ?>" type="button" class="btn btn-show-form btn-add btn-add-barang float-right">
-                <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Inisiasi Stok
-            </a>
-        <?php endif; ?>
+        <div class="col-button-tambah-spp">
+
+            <?php if (can('Inventori', 'Stok List', 'p')) : ?>
+                <button class="btn btn-discard btn-dropdown-export dropdown-toggle float-right" type="button" id="dropdownMenuButtonExport" data-bs-toggle="dropdown" aria-expanded="false" style="background-color: #FFA426 !important;color: white !important;border: 0px solid !important;">
+                    Import / Export
+                </button>
+                <ul class="dropdown-menu list-dropdown-company" aria-labelledby="dropdownMenuButtonExport">
+                    <!-- <li><button class="dropdown-item btn-upload-excel">Import Excel</button></li> -->
+                    <li><button class="dropdown-item" onclick="exportExcel()">Export Excel</button></li>
+                </ul>
+            <?php endif; ?>
+        </div>
+
     </div>
     <div class="card">
         <?= csrf_field() ?>
@@ -28,7 +27,7 @@
                         <select class="form-select" name="parent_type" id="parent_type" aria-label="Floating label select example">
                             <option value=""></option>
                             <?php foreach ($tipeBarang as $t) : ?>
-                                <option value="<?= $t['description'] ?>">
+                                <option <?= $t['description'] == "bahan_baku" ? 'selected' : '' ?> value="<?= $t['description'] ?>">
                                     <?= strtoupper($t['value']); ?>
                                 </option>
                             <?php endforeach; ?>
@@ -40,6 +39,9 @@
                     <div class="form-floating">
                         <select class="form-select parent_name" id="parent_name" name="parent_name" aria-label="Floating label select example">
                             <option value=""></option>
+                            <?php foreach ($kategoriBarang as $k): ?>
+                                <option value="<?= $k['id'] ?>"><?= $k['parent_name'] ?></option>
+                            <?php endforeach; ?>
                         </select>
                         <label style="z-index: 1;">Kategori Barang</label>
                     </div>
@@ -64,19 +66,9 @@
                     </div>
                 </div>
                 <div class="col-sm-4 mt-2">
-                    <div class="form-floating">
-                        <select class="form-select status_stok" id="status_stok" name="status_stok" aria-label="Floating label select example">
-                            <option value="ALL">SEMUA</option>
-                            <option value="1">ADA</option>
-                            <option value="0">HABIS</option>
-                        </select>
-                        <label style="z-index: 1;">Status Stok</label>
-                    </div>
-                </div>
-                <div class="col-sm-4 mt-2">
                     <div class="form-floating" style="height: 50px;">
                         <input placeholder="" class="form-control search" id="search" name="search" aria-label="Floating label select example" />
-                        <label style="z-index: 1;" style="z-index: 1;">Cari Kode / Nama Barang </label>
+                        <label style="z-index: 1;" style="z-index: 1;">Cari Data </label>
                     </div>
                 </div>
             </div>
@@ -85,15 +77,14 @@
                     <thead class="thead-dark">
                         <tr>
                             <th>No</th>
-                            <th onclick="changeSort('parent_barang.parent_type')">Tipe Barang</th>
                             <th onclick="changeSort('parent_barang.parent_name')">Kategori</th>
                             <th onclick="changeSort('barang_master.kode_barang')">Kode</th>
                             <th onclick="changeSort('barang_master.barang_name')">Barang</th>
-                            <th onclick="changeSort('divisis.divisi')">Departemen</th>
+                            <th onclick="changeSort('barang_master.barang_name')">Spesifikasi</th>
+                            <th onclick="changeSort('divisis.divisi')">Dept</th>
                             <th onclick="changeSort('warehouses.warehouse_name')">Warehouse</th>
-                            <th onclick="changeSort('stock.qty')">Qty Satuan 1</th>
-                            <th>Qty Satuan 2</th>
-                            <th>Qty Satuan 3</th>
+                            <th onclick="changeSort('stock_revamp.qty_diterima')">Qty</th>
+                            <th onclick="changeSort('stock_revamp.unit_id')">Unit</th>
                             <th>Action</th>
                         </tr>
                     </thead>
@@ -131,7 +122,7 @@
 
 
 <script>
-    let sort = "createdAt";
+    let sort = "stock_revamp.barang_master_id";
     let sortType = "desc";
 
 
@@ -139,7 +130,6 @@
     const csrf = $(`[name="${csrfToken}"]`);
 
     const table = $('.dataTable').DataTable({
-
         processing: true,
         serverSide: true,
         ordering: true,
@@ -161,7 +151,6 @@
                 data.parent_name = $("#parent_name option:selected").val();
                 data.divisi_id = $("#divisi_id option:selected").val();
                 data.warehouse_id = $("#warehouse_id option:selected").val();
-                data.status_stok = $("#status_stok option:selected").val();
                 data.sort = sort;
                 data.sortType = sortType;
             },
@@ -176,49 +165,43 @@
         searching: false,
         columns: [{
                 data: "no",
-                className: "text-center",
+                className: "text-left",
                 orderable: false
             },
             {
-                data: "parent_type",
-                className: "text-center"
-            },
-            {
                 data: "parent_name",
-                className: "text-center"
+                className: "text-left"
             },
             {
                 data: "kode_barang",
-                className: "text-center"
+                className: "text-left"
             },
             {
-                data: "barang",
-                className: "text-center"
+                data: "barang_name",
+                className: "text-left"
+            },
+            {
+                data: "spesifikasi",
+                className: "text-left",
             },
             {
                 data: "divisi",
-                className: "text-center",
-
+                className: "text-left"
             },
             {
-                data: "warehouse",
-                className: "text-center"
+                data: "warehouse_name",
+                className: "text-left"
             },
             {
-                data: "stok_1",
-                className: "text-center"
+                data: "qty_diterima",
+                className: "text-left",
+                render: function(data) {
+                    return greatFormatRupiah(data);
+                }
             },
             {
-                data: "stok_2",
-                className: "text-center",
-                searchable: false,
-                sortable: false
-            },
-            {
-                data: "stok_3",
-                className: "text-center",
-                searchable: false,
-                sortable: false
+                data: "kode_satuan",
+                className: "text-left"
             },
             {
                 data: "id",
@@ -260,18 +243,12 @@
     $('#parent_type').select2({
         placeholder: "Pilih Tipe Barang",
         theme: "bootstrap-5",
-        allowClear: true
+        allowClear: false
     }).change(function() {
         // GET KATEGORI BARANG
         $.ajax({
             url: `<?= base_url('stock-list/kategori-barang'); ?>`,
             method: "GET",
-            beforeSend: function() {
-                setLoading();
-            },
-            complete: function() {
-                stopLoading();
-            },
             data: {
                 parent_type: $(this).val(),
             },
@@ -306,12 +283,6 @@
         $.ajax({
             url: `<?= base_url('stock-list/warehouse'); ?>`,
             method: "GET",
-            beforeSend: function() {
-                setLoading();
-            },
-            complete: function() {
-                stopLoading();
-            },
             data: {
                 divisi_id: $(".divisi_id option:selected").val(),
             },
@@ -332,13 +303,6 @@
         placeholder: "Pilih Warehouse",
         theme: "bootstrap-5",
         allowClear: true
-    }).change(function() {
-        table.ajax.reload();
-    });
-
-    $('#status_stok').select2({
-        placeholder: "Pilih Status Stok",
-        theme: "bootstrap-5",
     }).change(function() {
         table.ajax.reload();
     });
@@ -458,15 +422,13 @@
     }
 
     //export excel
-    const excel = function(url) {
-        let search = $(".search").val();
-        let parent_type = $("#parent_type option:selected").val();
-        let parent_name = $("#parent_name option:selected").val();
-        let divisi_id = $("#divisi_id option:selected").val();
-        let warehouse_id = $("#warehouse_id").val();
-        let status_stok = $("#status_stok option:selected").val();
+    function exportExcel() {
+        var parent_type = $("#parent_type option:selected").val();
+        var parent_name = $("#parent_name option:selected").val();
+        var divisi_id = $("#divisi_id option:selected").val();
+        var warehouse_id = $("#warehouse_id").val();
 
-        window.open(url + `?search=${search}&parent_type=${parent_type}&parent_name=${parent_name}&divisi_id=${divisi_id}&warehouse_id=${warehouse_id}&status_stok=${status_stok}&sort=${sort}&sortType=${sortType}`, "_blank");
+        window.location.href = "<?= base_url('stock-list/export-excel') ?>" + `?parent_type=${parent_type}&parent_name=${parent_name}&divisi_id=${divisi_id}&warehouse_id=${warehouse_id}`
     }
 </script>
 

@@ -158,7 +158,7 @@ class StockRevampModel extends Model
             log_message('error', 'Insert Stock Failed: ' . $e->getMessage());
             return false;
         }
-    } 
+    }
 
     public function insertStockRevampJasaVendorIn(BaseConnection $db, array $data)
     {
@@ -242,7 +242,7 @@ class StockRevampModel extends Model
             log_message('error', 'Insert Stock Failed: ' . $e->getMessage());
             return false;
         }
-    } 
+    }
 
     public function outStockRevamp(BaseConnection $db, array $data)
     {
@@ -323,7 +323,6 @@ class StockRevampModel extends Model
             ]);
 
             return $stockDetail['id'];
-
         } catch (\Throwable $e) {
             // HAPUS transRollback() dari model
             log_message('error', 'Out Stock Failed: ' . $e->getMessage());
@@ -423,7 +422,6 @@ class StockRevampModel extends Model
             ]);
 
             return true;
-
         } catch (\Throwable $e) {
             log_message('error', 'Unpost Stock Failed: ' . $e->getMessage());
             throw $e;
@@ -503,7 +501,6 @@ class StockRevampModel extends Model
             ]);
 
             return true;
-
         } catch (\Throwable $e) {
             log_message('error', 'Unpost Stock Keluar Failed: ' . $e->getMessage());
             throw $e; // Lempar ke controller
@@ -613,4 +610,105 @@ class StockRevampModel extends Model
         return $result;
     }
 
+    public function getListStock($condition = [], $addCondition = [], $limit = 10, $offset = 0)
+    {
+        $availableSort = [
+            'parent_type_id'    => 'barang_master.parent_type_id',
+            'kode_barang'       => 'barang_master.kode_barang',
+            'barang_name'       => 'barang_master.barang_name',
+            'spesifikasi'       => 'barang_master_spesifikasi.spesifikasi',
+            'divisi_id'         => 'divisis.divisi',
+            'warehouse_id'      => 'warehouses.warehouse_name',
+            'qty_diterima'      => 'stock_revamp.qty_diterima',
+            'unit_id'           => 'stock_revamp.unit_id',
+        ];
+
+        $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
+
+        $sort = $availableSort[$addCondition['sort'] ?? 'stock_revamp.barang_master_id'] ?? 'stock_revamp.barang_master_id';
+        $sortType = $availableSortType[strtolower($addCondition['sortType'] ?? 'desc')] ?? 'DESC';
+
+        $selectQry = "
+            stock_revamp.*,
+            parent_barang.parent_name,
+            barang_master.kode_barang,
+            barang_master.barang_name,
+            barang_master_spesifikasi.spesifikasi,
+            divisis.divisi,
+            warehouses.warehouse_name,
+            satuans.kode_satuan
+        ";
+
+        $builder = $this->asArray()
+            ->select($selectQry)
+            ->join('barang_master', 'stock_revamp.barang_master_id = barang_master.id', 'left')
+            ->join('barang_master_spesifikasi', 'stock_revamp.spesifikasi_id = barang_master_spesifikasi.id', 'left')
+            ->join('parent_barang', 'parent_barang.id = barang_master.parent_type_id', 'left')
+            ->join('divisis', 'divisis.id = stock_revamp.divisi_id', 'left')
+            ->join('satuans', 'satuans.id = stock_revamp.unit_id', 'left')
+            ->join('warehouses', 'warehouses.id = stock_revamp.warehouse_id', 'left')
+            ->where($condition)
+            ->orderBy($sort, $sortType);
+
+        $totalData = $builder->countAllResults(false);
+
+        if (!empty($addCondition['type_barang'])) {
+            $builder->where('barang_master.type_barang', $addCondition['type_barang']);
+        }
+        if (!empty($addCondition['parent_type_id'])) {
+            $builder->where('barang_master.parent_type_id', $addCondition['parent_type_id']);
+        }
+        if (!empty($addCondition['divisi_id'])) {
+            $builder->where('stock_revamp.divisi_id', $addCondition['divisi_id']);
+        }
+        if (!empty($addCondition['warehouse_id'])) {
+            $builder->where('stock_revamp.warehouse_id', $addCondition['warehouse_id']);
+        }
+        if (!empty($addCondition['search'])) {
+            $builder->groupStart()
+                ->like("CONCAT(barang_master.barang_name, ' ', barang_master_spesifikasi.spesifikasi)", $addCondition['search'])
+                ->orLike('barang_master.kode_barang', $addCondition['search'])
+                ->orLike('divisis.divisi', $addCondition['search'])
+                ->orLike('warehouses.warehouse_name', $addCondition['search'])
+                ->groupEnd();
+        }
+
+        $countBuilder = clone $builder;
+        $totalFilteredData = $countBuilder->countAllResults(false);
+        $data = $builder->findAll($limit, $offset);
+
+        return [
+            'data'              => $data,
+            'totalData'         => $totalData,
+            'totalFilteredData' => $totalFilteredData,
+        ];
+    }
+
+    public function getStockIdentity($id)
+    {
+        $selectQry = "
+            stock_revamp.*,
+            barang_master.kode_barang,
+            barang_master.barang_name,
+            barang_master_spesifikasi.spesifikasi,
+            barang_master.type_barang,
+            parent_barang.parent_name,
+            satuans.kode_satuan,
+            warehouses.warehouse_name,
+            divisis.divisi
+        ";
+
+        $dataResult = $this->asArray()
+            ->select($selectQry)
+            ->join('barang_master', 'barang_master.id = stock_revamp.barang_master_id', 'left')
+            ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = stock_revamp.spesifikasi_id', 'left')
+            ->join('parent_barang', 'parent_barang.id = barang_master.parent_type_id', 'left')
+            ->join('satuans', 'satuans.id = stock_revamp.unit_id', 'left')
+            ->join('warehouses', 'warehouses.id = stock_revamp.warehouse_id', 'left')
+            ->join('divisis', 'divisis.id = stock_revamp.divisi_id', 'left')
+            ->where('stock_revamp.id', $id)
+            ->first();
+
+        return $dataResult;
+    }
 }
