@@ -436,6 +436,28 @@ class Invoice extends BaseController
         }
 
         $documentList = $this->getDocNumberList($dataSalesInvoiceOrder->document_type, $dataSalesInvoiceOrder->id_customer);
+        $selectedDocIds = json_decode($dataSalesInvoiceOrder->document_id, true) ?? [];
+
+        $selectedDocs = [];
+        if (!empty($selectedDocIds)) {
+            $selectedDocs = $this->SuratJalanModel->asObject()
+                ->select('
+                    surat_jalan_so.id,
+                    surat_jalan_so.no_surat_jalan AS doc_no,
+                    surat_jalan_so.id_company,
+                    surat_jalan_so.no_po,
+                    surat_jalan_so.note AS keterangan,
+                    COALESCE(surat_jalan_so.terms, customers.termin) AS termin,
+                    COALESCE(sales_order.jenis_penjualan, customers.jenis_penjualan) AS jenis_penjualan,
+                    sales_order.sales_id,
+                    employees.name AS salesName
+                ')
+                ->join('sales_order', 'sales_order.surat_jalan_so_id = surat_jalan_so.id', 'left')
+                ->join('customers', 'customers.id = sales_order.id_customer', 'left')
+                ->join('employees', 'employees.id = sales_order.sales_id', 'left')
+                ->whereIn('surat_jalan_so.id', $selectedDocIds)
+                ->findAll();
+        }
 
         $tipeShipping = $this->MetadataModel->asObject()
             ->select(['id', 'value'])
@@ -516,10 +538,8 @@ class Invoice extends BaseController
             }
         }
 
-
         $noFaktur = $this->SalesOrderInvoiceModel->generateNoFaktur();
 
-        // $customers = $this->CustomerModel->asObject()->select(['id', 'name'])->where('company_id', $this->this_company_id)->findAll();
         $customers = $this->CustomerModel->getCustomerLokal($this->userId, $this->is_admin);
 
         foreach ($dataSalesInvoiceOrderDetail as &$valueDetail) {
@@ -529,11 +549,13 @@ class Invoice extends BaseController
             $valueDetail['amount'] = floatval($valueDetail['amount_invoice']);
         }
 
-        // echo "<pre>";
-        // // var_dump($documentData);
-        // var_dump($dataSalesInvoiceOrderDetail);
-        // echo "</pre>";
-        // exit;
+        // Gabungkan dan hilangkan duplikat berdasarkan ID
+        $docsById = [];
+        foreach (array_merge($documentList, $selectedDocs) as $doc) {
+            $docsById[$doc->id] = $doc;
+        }
+        $documentList = array_values($docsById);
+
 
         $data = [
             "noFaktur"      => $noFaktur,
@@ -547,7 +569,7 @@ class Invoice extends BaseController
             "seller_name"   => $dataSalesInvoiceOrder->seller_name,
             "via"           => $tipeShipping,
             'invoice_id' => $invoice_id,
-            "taxData"       => $taxData
+            "taxData"       => $taxData,
             // 'dataSo'        => $dataSo
 
         ];

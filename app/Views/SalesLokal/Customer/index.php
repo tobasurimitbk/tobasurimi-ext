@@ -250,7 +250,7 @@
     let sort = "kode";
     let sortType = "desc";
 
-    const dataTableLokal = $('#dataTableLokal').DataTable({
+    let dataTableLokal = $('#dataTableLokal').DataTable({
 
         processing: true,
         serverSide: true,
@@ -510,7 +510,6 @@
         }).then((result) => {
             if (result.isConfirmed) {
                 const csrf = $(`[name="${csrfToken}"]`);
-                let id = $(".id").val();
                 setLoading()
                 $.ajax({
                     url: "<?= base_url("customer-lokal/delete"); ?>",
@@ -1107,13 +1106,11 @@
                         });
                         $(".kode").attr("readonly", false);
                         $("#auto_generate").prop("checked", false);
-                        $(".kode").val("");
                     }
                 }
             });
         } else {
             $(".kode").attr("readonly", false);
-            $(".kode").val(""); // Kosongin input biar bisa manual
         }
     }
 
