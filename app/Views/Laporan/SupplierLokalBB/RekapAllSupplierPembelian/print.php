@@ -134,7 +134,7 @@
         <?php else : ?>
             ALL
         <?php endif; ?>
-        <br>Bahan Baku: <?= $bahanBaku; ?>
+        <br>Bahan Baku: <?= $bahanBaku ?? "All"; ?>
     </div>
 
     <div class="table-container">
@@ -167,15 +167,17 @@
                         ];
                         ?>
 
-                        <?php foreach ($groups as $group) : ?>
+                        <?php
+                        $no = 1;
+                        foreach ($groups as $group) : ?>
                             <tr>
-                                <td class="col-no"><?= $group['no']; ?></td>
+                                <td class="col-no"><?= $no++; ?></td>
                                 <td class="col-supplier text-left"><?= $group['supplierName']; ?></td>
                                 <td class="col-divisi text-left"><?= $group['divisiName']; ?></td>
                                 <td class="col-barang text-left"><?= $group['barangName']; ?></td>
                                 <td class="col-spek text-left"><?= $group['spekName']; ?></td>
                                 <td class="col-satuan"><?= $group['satuanName']; ?></td>
-                                <td class="col-qty"><?= number_format($group['qtyPO'], 0); ?></td>
+                                <td class="col-qty"><?= number_format($group['qtyPO'], 2); ?></td>
 
                                 <td class="col-amount text-right"><?= number_format($group['totalBulanan'], 2); ?></td>
 
@@ -192,7 +194,7 @@
                         <!-- Sub Total per Bahan Baku -->
                         <tr class="total-row">
                             <td class="text-right" colspan="6">TOTAL <?= $barangName; ?></td>
-                            <td class="col-qty"><?= number_format($subTotal['qtyPO'], 0); ?></td>
+                            <td class="col-qty"><?= number_format($subTotal['qtyPO'], 2); ?></td>
 
                             <td class="col-amount text-right"><?= number_format($subTotal['totalBulanan'], 2); ?></td>
 

@@ -129,20 +129,20 @@
                         <tfoot>
                             <tr>
                                 <th colspan="5">TOTAL</th>
-                                <th class="text-center">-</th> <!-- Satuan -->
-                                <th class="text-center">0</th> <!-- DPP Harian -->
-                                <th class="text-center">0</th> <!-- PPh Harian -->
-                                <th class="text-center">0</th> <!-- Dibayarkan Harian -->
-                                <th class="text-center">0</th> <!-- DPP Tambahan Harian -->
-                                <th class="text-center">0</th> <!-- PPh Tambahan Harian -->
-                                <th class="text-center">0</th> <!-- Dibayarkan Tambahan Harian -->
-                                <th class="text-center">0</th> <!-- DPP Tambahan Bulanan -->
-                                <th class="text-center">0</th> <!-- PPh Tambahan Bulanan -->
-                                <th class="text-center">0</th> <!-- Dibayarkan Tambahan Bulanan -->
-                                <th class="text-center">0</th> <!-- DPP Subsidi -->
-                                <th class="text-center">0</th> <!-- PPh Subsidi -->
-                                <th class="text-center">0</th> <!-- Dibayarkan Subsidi -->
-                                <th class="text-center">0</th> <!-- Grand Total -->
+                                <th id="ft-qtyall" class="text-center">0</th>
+                                <th id="ft-dppUmum" class="text-center">0</th>
+                                <th id="ft-pphUmum" class="text-center">0</th>
+                                <th id="ft-totalUmum" class="text-center">0</th>
+                                <th id="ft-dppHarian" class="text-center">0</th>
+                                <th id="ft-pphHarian" class="text-center">0</th>
+                                <th id="ft-totalHarian" class="text-center">0</th>
+                                <th id="ft-dppBulanan" class="text-center">0</th>
+                                <th id="ft-pphBulanan" class="text-center">0</th>
+                                <th id="ft-totalBulanan" class="text-center">0</th>
+                                <th id="ft-subsidi" class="text-center">0</th>
+                                <th id="ft-pphSubsidi" class="text-center">0</th>
+                                <th id="ft-totalSubsidi" class="text-center">0</th>
+                                <th id="ft-totalRow" class="text-center">0</th>
                             </tr>
                         </tfoot>
                     </table>
@@ -273,41 +273,35 @@
             defaultContent: "-",
             targets: "_all"
         }],
-        footerCallback: function(row, data, start, end, display) {
-            var api = this.api();
-            var json = api.ajax.json();
-
-            const colMap = {
-                5: 'qtyPO',
-                6: 'dppUmum',
-                7: 'pphUmum',
-                8: 'totalUmum',
-                9: 'dppHarian',
-                10: 'pphHarian',
-                11: 'totalHarian',
-                12: 'dppBulanan',
-                13: 'pphBulanan',
-                14: 'totalBulanan',
-                15: 'dppSubsidi',
-                16: 'pphSubsidi',
-                17: 'totalSubsidi',
-                18: 'totalRow'
-            };
-
-            for (const [colIndex, key] of Object.entries(colMap)) {
-                if (json.totalFooter && json.totalFooter[key]) {
-                    $(api.column(colIndex).footer()).html(greatFormatRupiah(json.totalFooter[key]));
-                } else {
-                    $(api.column(colIndex).footer()).html('-');
-                }
-            }
-        },
         language: {
             emptyTable: "Tidak Ada Data",
             lengthMenu: "Show _MENU_ entries",
             paginate: {
                 previous: '<i class="fa fa-angle-left"></i>',
                 next: '<i class="fa fa-angle-right"></i>'
+            }
+        },
+        drawCallback: function(settings) {
+            const json = settings.json;
+            if (json && json.footerTotals) {
+                $('#ft-qtyall').html(json.footerTotals.qtyPO);
+                $('#ft-dppUmum').html(json.footerTotals.dppUmum);
+                $('#ft-pphUmum').html(json.footerTotals.pphUmum);
+                $('#ft-totalUmum').html(json.footerTotals.totalUmum);
+
+                $('#ft-dppHarian').html(json.footerTotals.dppHarian);
+                $('#ft-pphHarian').html(json.footerTotals.pphHarian);
+                $('#ft-totalHarian').html(json.footerTotals.totalHarian);
+
+                $('#ft-dppBulanan').html(json.footerTotals.dppBulanan);
+                $('#ft-pphBulanan').html(json.footerTotals.pphBulanan);
+                $('#ft-totalBulanan').html(json.footerTotals.totalBulanan);
+
+                $('#ft-subsidi').html(json.footerTotals.dppSubsidi);
+                $('#ft-pphSubsidi').html(json.footerTotals.pphSubsidi);
+                $('#ft-totalSubsidi').html(json.footerTotals.totalSubsidi);
+
+                $('#ft-totalRow').html(json.footerTotals.totalRow);
             }
         }
     });

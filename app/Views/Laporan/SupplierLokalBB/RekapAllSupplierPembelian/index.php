@@ -115,9 +115,9 @@
                         <tfoot>
                             <tr>
                                 <th colspan="5">TOTAL</th>
-                                <th class="text-center">0</th> <!-- QTY -->
-                                <th class="text-center">0</th> <!-- DPP Harian -->
-                                <th class="text-center">0</th> <!-- Grand Total -->
+                                <th id="ft-qtyall" class="text-center">0</th>
+                                <th id="ft-totalBulanan" class="text-center">0</th>
+                                <th id="ft-totalRow" class="text-center">0</th>
                             </tr>
                         </tfoot>
                     </table>
@@ -204,30 +204,22 @@
             defaultContent: "-",
             targets: "_all"
         }],
-        footerCallback: function(row, data, start, end, display) {
-            var api = this.api();
-            var json = api.ajax.json();
-
-            const colMap = {
-                5: 'qtyPO',
-                6: 'totalBulanan',
-                7: 'totalRow',
-            };
-
-            for (const [colIndex, key] of Object.entries(colMap)) {
-                if (json.totalFooter && json.totalFooter[key]) {
-                    $(api.column(colIndex).footer()).html(greatFormatRupiah(json.totalFooter[key]));
-                } else {
-                    $(api.column(colIndex).footer()).html('-');
-                }
-            }
-        },
         language: {
             emptyTable: "Tidak Ada Data",
             lengthMenu: "Show _MENU_ entries",
             paginate: {
                 previous: '<i class="fa fa-angle-left"></i>',
                 next: '<i class="fa fa-angle-right"></i>'
+            }
+        },
+        drawCallback: function(settings) {
+            const json = settings.json;
+            if (json && json.footerTotals) {
+                $('#ft-qtyall').html(json.footerTotals.qtyPO);
+
+                $('#ft-totalBulanan').html(json.footerTotals.totalBulanan);
+
+                $('#ft-totalRow').html(json.footerTotals.totalRow);
             }
         }
     });

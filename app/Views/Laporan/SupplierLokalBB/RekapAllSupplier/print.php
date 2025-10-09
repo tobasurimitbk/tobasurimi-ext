@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -22,10 +23,6 @@
             font-size: 12pt;
         }
 
-        .info {
-            margin-bottom: 5px;
-        }
-
         .table-container {
             width: 100%;
             overflow-x: auto;
@@ -35,10 +32,11 @@
             width: 100%;
             border-collapse: collapse;
             table-layout: fixed;
-            page-break-inside: avoid;
+            /* page-break-inside: avoid; */
         }
 
-        th, td {
+        th,
+        td {
             border: 1px solid #000;
             padding: 3px;
             text-align: center;
@@ -76,36 +74,63 @@
         }
 
         /* Column widths */
-        .col-no { width: 3%; }
-        .col-supplier { width: 12%; }
-        .col-divisi { width: 8%; }
-        .col-barang { width: 10%; }
-        .col-spek { width: 8%; }
-        .col-satuan { width: 5%; }
-        .col-qty { width: 4%; }
-        .col-amount { width: 5%; }
-        .col-total { width: 6%; }
+        .col-no {
+            width: 3%;
+        }
+
+        .col-supplier {
+            width: 12%;
+        }
+
+        .col-divisi {
+            width: 8%;
+        }
+
+        .col-barang {
+            width: 10%;
+        }
+
+        .col-spek {
+            width: 8%;
+        }
+
+        .col-satuan {
+            width: 5%;
+        }
+
+        .col-qty {
+            width: 4%;
+        }
+
+        .col-amount {
+            width: 5%;
+        }
+
+        .col-total {
+            width: 6%;
+        }
 
         /* Prevent page breaks inside groups */
         .group-container {
-            page-break-inside: avoid;
+            /* page-break-inside: avoid; */
             margin-bottom: 10px;
         }
     </style>
 </head>
+
 <body>
     <div class="header">
         <h2><?= $header; ?></h2>
     </div>
 
     <div class="info">
-        Tanggal: 
+        Tanggal:
         <?php if (!empty($tanggalAwal) && !empty($tanggalAkhir)) : ?>
             <?= $tanggalAwal; ?> s/d <?= $tanggalAkhir; ?>
         <?php else : ?>
             ALL
         <?php endif; ?>
-        <br>Bahan Baku: <?= $bahanBaku; ?>
+        <br>Bahan Baku: <?= $bahanBaku ?? "All"; ?>
     </div>
 
     <div class="table-container">
@@ -170,15 +195,17 @@
                         ];
                         ?>
 
-                        <?php foreach ($groups as $group) : ?>
+                        <?php
+                        $no = 1;
+                        foreach ($groups as $group) : ?>
                             <tr>
-                                <td class="col-no"><?= $group['no']; ?></td>
+                                <td class="col-no"><?= $no++; ?></td>
                                 <td class="col-supplier text-left"><?= $group['supplierName']; ?></td>
                                 <td class="col-divisi text-left"><?= $group['divisiName']; ?></td>
                                 <td class="col-barang text-left"><?= $group['barangName']; ?></td>
                                 <td class="col-spek text-left"><?= $group['spekName']; ?></td>
                                 <td class="col-satuan"><?= $group['satuanName']; ?></td>
-                                <td class="col-qty"><?= number_format($group['qtyPO'], 0); ?></td>
+                                <td class="col-qty"><?= number_format($group['qtyPO'], 2); ?></td>
 
                                 <!-- Harian -->
                                 <td class="col-amount text-right"><?= number_format($group['dppUmum'], 2); ?></td>
@@ -224,7 +251,7 @@
                         <!-- Sub Total per Bahan Baku -->
                         <tr class="total-row">
                             <td class="text-right" colspan="6">TOTAL <?= $barangName; ?></td>
-                            <td class="col-qty"><?= number_format($subTotal['qtyPO'], 0); ?></td>
+                            <td class="col-qty"><?= number_format($subTotal['qtyPO'], 2); ?></td>
 
                             <td class="col-amount text-right"><?= number_format($subTotal['dppUmum'], 2); ?></td>
                             <td class="col-amount text-right"><?= number_format($subTotal['pphUmum'], 2); ?></td>
@@ -250,4 +277,5 @@
         <?php endforeach; ?>
     </div>
 </body>
+
 </html>
