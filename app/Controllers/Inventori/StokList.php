@@ -730,7 +730,7 @@ class StokList extends BaseController
                 'type_bc' => $data['type_bc'],
                 'po_no' => $data['po_no'] ?? "",
                 'ref_no' => $data['ref_no'],
-                'po_date' => !empty($data['po_date']) ? "" : date('d/m/Y', strtotime($data['po_date'])),
+                'po_date' => empty($data['po_date']) ? "" : date('d/m/Y', strtotime($data['po_date'])),
                 'no_daftar' =>  $data['no_daftar'] ?? "",
                 'no_aju' => $data['no_aju'] ?? "",
                 'qty_diterima' => $data['qty_diterima'],
