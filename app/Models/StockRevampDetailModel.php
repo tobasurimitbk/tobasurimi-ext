@@ -270,7 +270,7 @@ class StockRevampDetailModel extends Model
             ->groupBy('
                 stock_revamp_detail.id,
             ')
-            ->orderBy('stock_revamp_detail.createdAt', 'ASC')
+            ->orderBy('rm_purchase_orders.po_date', 'ASC')
             ->findAll();
     }
 
