@@ -2624,14 +2624,45 @@ class BC23 extends BaseController
         $filterCondition
     ";
 
+        // --- Ambil order dari DataTables ---
+        $orderColumnIndex = $this->request->getGet('order')[0]['column'] ?? null;
+        $orderDir = $this->request->getGet('order')[0]['dir'] ?? 'asc';
+
+        // Mapping index kolom DataTables ke nama kolom SQL
+        $columns = [
+            'id',
+            'updatedAt',
+            'tipe_bahan',
+            'divisi',
+            'supplier',
+            'po_date',
+            'lpb_date',
+            'no_penerimaan_barang',
+            'po_no',
+            'kode_barang',
+            'barang_name',
+            'qty_po',
+            'qty_lpb',
+            'nama_kemasan',
+            'jumlah_kemasan',
+            'sub_total',
+        ];
+
+        $orderBy = "";
+        if ($orderColumnIndex !== null && isset($columns[$orderColumnIndex])) {
+            $col = $columns[$orderColumnIndex];
+            $dir = strtoupper($orderDir) === 'DESC' ? 'DESC' : 'ASC';
+            $orderBy = " ORDER BY $col $dir ";
+        }
+
         // Hitung total filtered
         $countQuery = $db->query("SELECT COUNT(*) AS total FROM ($mainQuery) AS count_table");
         $totalFiltered = $countQuery->getRow()->total;
         $totalRecords = $totalFiltered;
 
         // Tambahkan LIMIT OFFSET
-        $mainQuery .= " LIMIT $length OFFSET $start";
-        $data = $db->query($mainQuery)->getResultArray();
+        $baseQuery = $mainQuery . " $orderBy LIMIT $length OFFSET $start";
+        $data = $db->query($baseQuery)->getResultArray();
 
         // Format response
         $formatted = [];

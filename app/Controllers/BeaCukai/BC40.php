@@ -2740,17 +2740,22 @@ class BC40 extends BaseController
 
         // Mapping index kolom DataTables ke nama kolom SQL
         $columns = [
+            'id',
+            'updatedAt',
+            'tipe_bahan',
+            'divisi',
+            'supplier',
+            'po_date',
             'lpb_date',
             'no_penerimaan_barang',
-            'supplier',
             'po_no',
-            'po_date',
-            'barang_name',
             'kode_barang',
+            'barang_name',
             'qty_po',
             'qty_lpb',
+            'nama_kemasan',
+            'jumlah_kemasan',
             'sub_total',
-            'updatedAt'
         ];
 
         $orderBy = "";
