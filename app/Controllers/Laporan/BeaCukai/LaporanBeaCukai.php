@@ -14,6 +14,7 @@ use App\Models\BC30Model;
 use App\Models\BC40Model;
 use App\Models\BC41Model;
 use App\Models\BCBarangTarifModel;
+use App\Models\BCPurchaseOrderModel;
 use App\Models\CompaniesModel;
 use App\Models\DivisisModel;
 use App\Models\JasaVendorInModel;
@@ -37,6 +38,10 @@ use Dompdf\Dompdf;
 use Exception;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+use PhpOffice\PhpSpreadsheet\Style\Alignment;
+use PhpOffice\PhpSpreadsheet\Style\Border;
+use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
+use PhpOffice\PhpSpreadsheet\Style\Font;
 
 // META DATA -> jenis_dok_aju
 // BC 2.5 -> 49
@@ -77,6 +82,7 @@ class LaporanBeaCukai extends BaseController
     protected $productionResultModel;
     protected $productionResultDetailModel;
     protected $companiesModel;
+    protected $bcPurchaseOrderModel;
 
     public function __construct()
     {
@@ -111,6 +117,7 @@ class LaporanBeaCukai extends BaseController
         $this->productionResultModel = new ProductionResultModel();
         $this->productionResultDetailModel = new ProductionResultDetailModel();
         $this->companiesModel = new CompaniesModel();
+        $this->bcPurchaseOrderModel = new BCPurchaseOrderModel();
     }
 
     public function index()
@@ -121,11 +128,9 @@ class LaporanBeaCukai extends BaseController
     public function laporanPemasukanBarang()
     {
         $data = [
-            'tipeBarang' => $this->metadataModel->where('deletedAt', null)->where('name', "Kategori Barang")->findAll(),
             'dataDivisi' => $this->divisiModel->getDivisiAccess(),
-            'dataSupplier' => $this->supplierModel->where('company_id', $this->this_company_id)->findAll(),
             'dataDokumen' => $this->metadataModel->where('name', 'jenis_dok_aju')->whereIn('value', ['BC 2.3', 'BC 2.7', 'BC 4.0', 'PPB-KB'])->findAll(),
-            'dataPemasukan' => ["LPB", "JASA VENDOR", "MUTASI", "REBUS", "ADJUSMENT"],
+            'dataPemasukan' => ["LOKAL BAKU", "LOKAL PENOLONG", "IMPORT BAKU", "IMPORT PENOLONG"],
             'dataDivisi' => $this->divisiModel->getDivisiAccess()
         ];
 
@@ -180,143 +185,203 @@ class LaporanBeaCukai extends BaseController
         $domPdf->stream($fileName, array("Attachment" => false));
     }
 
-    public function exportExcelLaporanMasukBarang()
-    {
-        $payload = [
-            "pageSize" => 10000000,
-            "currentPage" => 1,
-            "sort" => $this->request->getVar("sort"),
-            "sortType" => $this->request->getVar("sortType"),
-        ];
 
-        $addCondition = [
-            "tipe_barang"   => $this->request->getVar('tipe_barang') != 'null' ? $this->request->getVar('tipe_barang') : "",
-            "date_start"    => $this->request->getVar("date_start") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("date_start")))) : "",
-            "date_end"      => $this->request->getVar("date_end") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("date_end")))) : "",
-            "supplier_id"   => $this->request->getVar("supplier_id") != 'null' ? $this->request->getVar("supplier_id") : "",
-            "bc_id"         => $this->request->getVar("bc_id") != 'null' ? $this->request->getVar("bc_id") : "",
-            "sumber"        => $this->request->getVar("sumber") != 'null' ? [$this->request->getVar("sumber")] : ["LPB", "JASA VENDOR", "MUTASI", "REBUS"],
-            "divisi_id"     => $this->request->getVar("divisi_id") != 'null' ? $this->request->getVar("divisi_id") : "",
-            "warehouse_id"  => $this->request->getVar("warehouse_id") != 'null' ? $this->request->getVar("warehouse_id") : "",
-            "nama_barang"   => $this->request->getVar("nama_barang") != 'null' ? $this->request->getVar("nama_barang") : "",
-            "no_aju"        => $this->request->getVar("no_aju") != 'null' ? $this->request->getVar("no_aju") : "",
-            "no_daftar"     => $this->request->getVar("no_daftar") != 'null' ? $this->request->getVar("no_daftar") : "",
-            "sort"          => $this->request->getVar("sort"),
-            "sortType"      => $this->request->getVar("sortType")
-        ];
+
+    public function exportExcelPemasukkan()
+    {
+        $start = 0;
+        $length = 100000000000000;
+        $orderDir = $this->request->getGet('order')[0]['dir'] ?? 'asc';
+        $orderColumnIndex = $this->request->getGet('order')[0]['column'] ?? null;
+
+        $dateStart = $this->request->getVar("dateStart")
+            ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateStart"))))
+            : null;
+
+        $dateEnd = $this->request->getVar("dateEnd")
+            ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateEnd"))))
+            : null;
+
+        $dateStartLpb = $this->request->getVar("dateStartLpb")
+            ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateStartLpb"))))
+            : null;
+
+        $dateEndLpb = $this->request->getVar("dateEndLpb")
+            ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateEndLpb"))))
+            : null;
+
+        $bcId = $this->request->getGet('bc_id');
+        $sumber = $this->request->getGet('sumber');
+        $divisiId = $this->request->getGet('divisi_id');
+        $warehouseId = $this->request->getGet('warehouse_id');
+        $search = $this->request->getGet('search') ?? '';
 
         $condition = [
-            "stock_details2.deletedAt" => null,
-            "stock_details.deletedAt" => null,
-            "stock.deletedAt" => null,
-            "stock_details.status" => "In",
-            "stock.company_id" => $this->this_company_id
+            'company_id'   => $this->this_company_id,
+            'dateStart'    => $dateStart,
+            'dateEnd'      => $dateEnd,
+            'dateStartLpb' => $dateStartLpb,
+            'dateEndLpb'   => $dateEndLpb,
+            'bc_id'        => $bcId,
+            'sumber'       => $sumber,
+            'divisi_id'    => $divisiId,
+            'warehouse_id' => $warehouseId,
+            'search'       => $search,
         ];
 
-        $dataBarang = $this->stockDetail2Model->getListStokMasukKeluar($condition, $addCondition, 10000000, 0);
+        // ambil data
+        $dataPemasukkan = $this->bcPurchaseOrderModel->getListLapPemasukanBarang(
+            $condition,
+            $orderColumnIndex,
+            $orderDir,
+            $length,
+            $start
+        );
 
-        $jsonData = $this->getListMasukBarang($dataBarang, $payload, $addCondition);
+        // ambil nama perusahaan
+        $company = $this->companiesModel
+            ->select('holding_company, company')
+            ->where('id', $this->this_company_id)
+            ->first();
 
+        $dataResult = [];
+        $no = $start + 1;
+
+        if (!empty($dataPemasukkan['data'])) {
+            foreach ($dataPemasukkan['data'] as $d) {
+                $dataResult[] = [
+                    'no' => $no++,
+                    'jenis_doc' => $d['jenis_doc'] ?? 'NON PABEAN',
+                    'no_aju' => $d['no_aju'] ?? '',
+                    'no_daftar' => $d['no_daftar'] ?? '',
+                    'tanggal_daftar' => !empty($d['tanggal_daftar']) ? date('d/m/Y', strtotime($d['tanggal_daftar'])) : "",
+                    'no_penerimaan_barang' => $d['no_penerimaan_barang'] ?? '',
+                    'tanggal_lpb' => !empty($d['tanggal_lpb']) ? date('d/m/Y', strtotime($d['tanggal_lpb'])) : "",
+                    'no_order' => $d['no_order'] ?? '',
+                    'divisi' => $d['divisi'] ?? '',
+                    'warehouse_name' => $d['warehouse_name'] ?? '',
+                    'supplier_name' => $d['supplier_name'] ?? '',
+                    'kode_barang' => $d['kode_barang'] ?? '',
+                    'barang_name' => $d['barang_name'] ?? '',
+                    'spesifikasi' => $d['spesifikasi'] ?? '',
+                    'qty_order' => (float)$d['qty_order'] ?? 0,
+                    'qty_diterima' => (float)$d['qty_diterima'] ?? 0,
+                    'kode_satuan' => $d['kode_satuan'] ?? '',
+                    'valas' => $d['valas'] ?? '',
+                    'total_harga' => (float)$d['total_harga'] ?? 0,
+                    'keterangan' => $d['keterangan'] ?? '',
+                ];
+            }
+        }
+
+        // --- Excel ---
         $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
+        $sheet->setTitle('Laporan Pemasukan Barang');
 
-        $headerStyleArray = [
-            'font' => [
-                'bold' => true,
-            ],
-            'alignment' => [
-                'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER,
-                'vertical' => \PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER,
-            ],
+        // 🧾 HEADER JUDUL ATAS
+        $periodeText = (!empty($dateStartLpb) && !empty($dateEndLpb))
+            ? 'Periode ' . date('d/m/Y', strtotime($dateStartLpb)) . ' s.d ' . date('d/m/Y', strtotime($dateEndLpb))
+            : '';
+
+        $companyName = ($company['holding_company'] ?? '') . ' - ' . ($company['company'] ?? '');
+
+        // Merge cell dan set text center
+        $sheet->mergeCells('A1:T1');
+        $sheet->mergeCells('A2:T2');
+        $sheet->mergeCells('A3:T3');
+
+        $sheet->setCellValue('A1', 'Laporan Pemasukkan Barang');
+        $sheet->setCellValue('A2', $periodeText);
+        $sheet->setCellValue('A3', $companyName);
+
+        $sheet->getStyle('A1:A3')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+        $sheet->getStyle('A1:A3')->getFont()->setBold(true)->setSize(12);
+
+        // 🧱 HEADER KOLOM
+        $headers = [
+            'No',
+            'Jenis Doc',
+            'Nomor Aju',
+            'No Daftar',
+            'Tgl Daftar',
+            'No Lpb',
+            'Tgl Lpb',
+            'No Order',
+            'Dept',
+            'Warehouse',
+            'Supplier',
+            'Kode Barang',
+            'Barang',
+            'Spesifikasi',
+            'Jml Order',
+            'Jml Diterima',
+            'Satuan',
+            'Valas',
+            'Harga Barang / Jasa',
+            'Keterangan'
         ];
 
-        $dataStyleArray = [
-            'alignment' => [
-                'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER,
-                'vertical' => \PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER,
-            ],
-        ];
-        $column = 2;
+        $sheet->fromArray($headers, null, 'A5');
+        $sheet->getStyle('A5:T5')->getFont()->setBold(true);
+        $sheet->getStyle('A5:T5')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
 
-        $spreadsheet->setActiveSheetIndex(0)
-            ->setCellValue('B1', 'Tipe Barang')
-            ->setCellValue('C1', 'Jenis Dokumen')
-            ->setCellValue('D1', 'Nomor Aju')
-            ->setCellValue('E1', 'No Daftar')
-            ->setCellValue('F1', 'Tgl Daftar')
-            ->setCellValue('G1', 'No Penerimaan')
-            ->setCellValue('H1', 'Tgl Penerimaan')
-            ->setCellValue('I1', 'Surat Jalan')
-            ->setCellValue('J1', 'Jenis Order')
-            ->setCellValue('K1', 'No Order')
-            ->setCellValue('L1', 'No Invoice')
-            ->setCellValue('M1', 'Departemen')
-            ->setCellValue('N1', 'Warehouse')
-            ->setCellValue('O1', 'Supplier / Pengirim')
-            ->setCellValue('P1', 'Kode Barang')
-            ->setCellValue('Q1', 'Barang')
-            ->setCellValue('R1', 'Spesifikasi')
-            ->setCellValue('S1', 'Jumlah Barang')
-            ->setCellValue('T1', 'Satuan')
-            ->setCellValue('U1', 'Valas')
-            ->setCellValue('V1', 'Harga Barang / Jasa')
-            ->setCellValue('W1', 'Nilai Penyerahan')
-            ->setCellValue('X1', 'Jumlah Penerimaan')
-            ->setCellValue('Y1', 'Selisih')
-            ->setCellValue('Z1', 'Keterangan');
-
-
-        $sheet->getStyle('A1:Z1')->applyFromArray($headerStyleArray);
-
-        // Fill data
-        $column = 2; // Start from the second row
-        foreach ($jsonData['data'] as $row) {
-            $sheet->setCellValue('A' . $column, $row['no'])
-                ->setCellValue('B' . $column, $row['tipeBarang'])
-                ->setCellValue('C' . $column, $row['jenisDokumen'])
-                ->setCellValue('D' . $column, $row['noAju'])
-                ->setCellValue('E' . $column, $row['noDaftar'])
-                ->setCellValue('F' . $column, $row['tglDaftar'])
-                ->setCellValue('G' . $column, $row['noPenerimaan'])
-                ->setCellValue('H' . $column, $row['tglPenerimaan'])
-                ->setCellValue('I' . $column, $row['suratJalan'])
-                ->setCellValue('J' . $column, $row['jenisSumber'])
-                ->setCellValue('K' . $column, $row['noOrder'])
-                ->setCellValue('L' . $column, $row['noInvoice'])
-                ->setCellValue('M' . $column, $row['divisi'])
-                ->setCellValue('N' . $column, $row['warehouse'])
-                ->setCellValue('O' . $column, $row['pengirim'])
-                ->setCellValue('P' . $column, $row['kodeBarang'])
-                ->setCellValue('Q' . $column, $row['barang'])
-                ->setCellValue('R' . $column, $row['spesifikasi'])
-                ->setCellValue('S' . $column, $row['jumlahBarang'])
-                ->setCellValue('T' . $column, $row['satuanName'])
-                ->setCellValue('U' . $column, $row['valas'])
-                ->setCellValue('V' . $column, $row['hargaBarang'])
-                ->setCellValue('W' . $column, $row['nilaiPenyerahan'])
-                ->setCellValue('X' . $column, $row['jumlahPenerimaan'])
-                ->setCellValue('Y' . $column, $row['selisih'])
-                ->setCellValue('Z' . $column, $row['keterangan']);
-
-            $sheet->getStyle('A' . $column . ':Z' . $column)->applyFromArray($dataStyleArray);
-            $column++;
+        // 📦 DATA
+        $row = 6;
+        foreach ($dataResult as $item) {
+            $sheet->setCellValue("A{$row}", $item['no']);
+            $sheet->setCellValue("B{$row}", $item['jenis_doc']);
+            $sheet->setCellValue("C{$row}", $item['no_aju']);
+            $sheet->setCellValue("D{$row}", $item['no_daftar']);
+            $sheet->setCellValue("E{$row}", $item['tanggal_daftar']);
+            $sheet->setCellValue("F{$row}", $item['no_penerimaan_barang']);
+            $sheet->setCellValue("G{$row}", $item['tanggal_lpb']);
+            $sheet->setCellValue("H{$row}", $item['no_order']);
+            $sheet->setCellValue("I{$row}", $item['divisi']);
+            $sheet->setCellValue("J{$row}", $item['warehouse_name']);
+            $sheet->setCellValue("K{$row}", $item['supplier_name']);
+            $sheet->setCellValue("L{$row}", $item['kode_barang']);
+            $sheet->setCellValue("M{$row}", $item['barang_name']);
+            $sheet->setCellValue("N{$row}", $item['spesifikasi']);
+            $sheet->setCellValue("O{$row}", $item['qty_order']);
+            $sheet->setCellValue("P{$row}", $item['qty_diterima']);
+            $sheet->setCellValue("Q{$row}", $item['kode_satuan']);
+            $sheet->setCellValue("R{$row}", $item['valas']);
+            $sheet->setCellValue("S{$row}", $item['total_harga']);
+            $sheet->setCellValue("T{$row}", $item['keterangan']);
+            $row++;
         }
 
-        $writer = new Xlsx($spreadsheet);
-        foreach (range('A', 'Z') as $columnID) {
-            $sheet->getColumnDimension($columnID)->setAutoSize(true);
+        // 🎨 STYLE
+        $sheet->getStyle("O6:P{$row}")
+            ->getAlignment()->setHorizontal(Alignment::HORIZONTAL_RIGHT);
+        $sheet->getStyle("S6:S{$row}")
+            ->getAlignment()->setHorizontal(Alignment::HORIZONTAL_RIGHT);
+
+        $sheet->getStyle("O6:P{$row}")
+            ->getNumberFormat()->setFormatCode(NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1);
+        $sheet->getStyle("S6:S{$row}")
+            ->getNumberFormat()->setFormatCode(NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1);
+
+        $sheet->getStyle("A5:T" . ($row - 1))
+            ->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_THIN);
+
+        foreach (range('A', 'T') as $col) {
+            $sheet->getColumnDimension($col)->setAutoSize(true);
         }
 
+        // 💾 OUTPUT
+        $filename = 'Laporan_Pemasukan_Barang_' . date('Ymd_His') . '.xlsx';
         $writer = new Xlsx($spreadsheet);
-        $filename = 'Laporan_Penerimaan_Barang';
 
         header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-        header('Content-Disposition: attachment;filename=' . $filename . '.xlsx');
+        header("Content-Disposition: attachment; filename=\"{$filename}\"");
         header('Cache-Control: max-age=0');
-
         $writer->save('php://output');
-        die;
+        exit;
     }
+
+
 
     public function allMasukBarang()
     {
@@ -363,51 +428,79 @@ class LaporanBeaCukai extends BaseController
         return response()->setJSON($jsonData);
     }
 
-    public function ajaxAllMasukBarang()
+    public function allPemasukkan()
     {
-        $payload = [
-            "pageSize" => 1,
-            "currentPage" => 1000000000,
-            "search" => $this->request->getVar("search"),
-            "sort" => $this->request->getVar("sort"),
-            "sortType" => $this->request->getVar("sortType"),
-            "date_start" => $this->request->getVar("date_start") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getVar("date_start")))) : "",
-            "date_end" => $this->request->getVar("date_end") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getVar("date_end")))) : "",
-        ];
+        $draw = $this->request->getGet('draw');
+        $start = (int)$this->request->getGet('start');
+        $length = (int)$this->request->getGet('length');
+        $orderDir = $this->request->getGet('order')[0]['dir'] ?? 'asc';
+        $orderColumnIndex = $this->request->getGet('order')[0]['column'] ?? null;
 
-        $addCondition = [
-            "tipe_barang"   => $this->request->getVar('tipe_barang'),
-            "date_start"    => $this->request->getVar("date_start") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("date_start")))) : "",
-            "date_end"      => $this->request->getVar("date_end") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("date_end")))) : "",
-            "supplier_id"   => $this->request->getVar("supplier_id"),
-            "bc_id"         => $this->request->getVar("bc_id"),
-            "sumber"        => $this->request->getVar("sumber") ? [$this->request->getVar("sumber")] : ["LPB", "JASA VENDOR", "MUTASI", "REBUS"],
-            "divisi_id"     => $this->request->getVar("divisi_id"),
-            "warehouse_id"  => $this->request->getVar("warehouse_id"),
-            "nama_barang"   => $this->request->getVar("nama_barang"),
-            "no_aju"        => $this->request->getVar("no_aju"),
-            "no_daftar"     => $this->request->getVar("no_daftar"),
-            "status"        => $this->request->getVar("status"),
-            "sort"          => $this->request->getVar("sort"),
-            "sortType"      => $this->request->getVar("sortType")
-        ];
+        $dateStart = $this->request->getVar("dateStart")
+            ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateStart"))))
+            : null;
+
+        $dateEnd = $this->request->getVar("dateEnd")
+            ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateEnd"))))
+            : null;
+
+        $dateStartLpb = $this->request->getVar("dateStartLpb")
+            ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateStartLpb"))))
+            : null;
+
+        $dateEndLpb = $this->request->getVar("dateEndLpb")
+            ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateEndLpb"))))
+            : null;
+
+        $bcId = $this->request->getGet('bc_id');
+        $sumber = $this->request->getGet('sumber');
+        $divisiId = $this->request->getGet('divisi_id');
+        $warehouseId = $this->request->getGet('warehouse_id');
+        $search = $this->request->getGet('search') ?? '';
 
         $condition = [
-            "stock_details2.deletedAt" => null,
-            "stock_details.deletedAt" => null,
-            "stock.deletedAt" => null,
-            "stock.company_id" => $this->this_company_id,
-            "stock_details.status" => "In"
+            'company_id'   => $this->this_company_id,
+            'dateStart'    => $dateStart,
+            'dateEnd'      => $dateEnd,
+            'dateStartLpb' => $dateStartLpb,
+            'dateEndLpb'   => $dateEndLpb,
+            'bc_id'        => $bcId,
+            'sumber'       => $sumber,
+            'divisi_id'    => $divisiId,
+            'warehouse_id' => $warehouseId,
+            'search'       => $search,
         ];
 
+        $dataPemasukkan = $this->bcPurchaseOrderModel->getListLapPemasukanBarang(
+            $condition,
+            $orderColumnIndex,
+            $orderDir,
+            $length,
+            $start
+        );
 
-        $dataBarang = $this->stockDetail2Model->getListStokMasukKeluar($condition, $addCondition, 1000000000, 0);
-        $jsonData = $this->getListMasukBarang($dataBarang, $payload, $addCondition);
+        $dataResult = [];
+        $no = $start + 1;
 
-        return response()->setJSON([
-            'data' => $jsonData
+        if (!empty($dataPemasukkan['data'])) {
+            foreach ($dataPemasukkan['data'] as $d) {
+                $d['no'] = $no++;
+                $d['tanggal_daftar'] = !empty($d['tanggal_daftar']) ? date('d/m/Y', strtotime($d['tanggal_daftar'])) : "";
+                $d['tanggal_lpb'] = !empty($d['tanggal_lpb']) ? date('d/m/Y', strtotime($d['tanggal_lpb'])) : "";
+                $d['jenis_doc'] = !empty($d['jenis_doc']) ? $d['jenis_doc'] : "NON PABEAN";
+
+                $dataResult[] = $d;
+            }
+        }
+
+        return $this->response->setJSON([
+            'draw' => intval($draw),
+            'recordsTotal' => intval($dataPemasukkan['totalData'] ?? 0),
+            'recordsFiltered' => intval($dataPemasukkan['totalFilteredData'] ?? 0),
+            'data' => $dataResult,
         ]);
     }
+
 
     private function getListMasukBarang($dataBarang, $payload, $addCondition)
     {

@@ -595,7 +595,8 @@
         }).then((result) => {
             if (result.isConfirmed) {
                 // Redirect ke route yang ditentukan
-                window.location.href = `/order-form-internasional/duplicate/${id}`;
+                var url = "<?= base_url('/order-form-internasional/duplicate') ?>/" + id
+                window.location.href = url;
             }
         });
     }
