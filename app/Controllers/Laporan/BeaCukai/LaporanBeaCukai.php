@@ -41,6 +41,7 @@ use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use PhpOffice\PhpSpreadsheet\Style\Alignment;
 use PhpOffice\PhpSpreadsheet\Style\Border;
 use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
+use PhpOffice\PhpSpreadsheet\Style\Font;
 
 // META DATA -> jenis_dok_aju
 // BC 2.5 -> 49
@@ -184,12 +185,14 @@ class LaporanBeaCukai extends BaseController
         $domPdf->stream($fileName, array("Attachment" => false));
     }
 
+
+
     public function exportExcelPemasukkan()
     {
         $start = 0;
         $length = 100000000000000;
-        $orderDir =  'asc';
-        $orderColumnIndex = 10; // kolom supplier
+        $orderDir = $this->request->getGet('order')[0]['dir'] ?? 'asc';
+        $orderColumnIndex = $this->request->getGet('order')[0]['column'] ?? null;
 
         $dateStart = $this->request->getVar("dateStart")
             ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateStart"))))
@@ -226,6 +229,7 @@ class LaporanBeaCukai extends BaseController
             'search'       => $search,
         ];
 
+        // ambil data
         $dataPemasukkan = $this->bcPurchaseOrderModel->getListLapPemasukanBarang(
             $condition,
             $orderColumnIndex,
@@ -233,6 +237,12 @@ class LaporanBeaCukai extends BaseController
             $length,
             $start
         );
+
+        // ambil nama perusahaan
+        $company = $this->companiesModel
+            ->select('holding_company, company')
+            ->where('id', $this->this_company_id)
+            ->first();
 
         $dataResult = [];
         $no = $start + 1;
@@ -264,12 +274,31 @@ class LaporanBeaCukai extends BaseController
             }
         }
 
-        // --- Mulai bikin Excel ---
+        // --- Excel ---
         $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
         $sheet->setTitle('Laporan Pemasukan Barang');
 
-        // Header kolom
+        // 🧾 HEADER JUDUL ATAS
+        $periodeText = (!empty($dateStartLpb) && !empty($dateEndLpb))
+            ? 'Periode ' . date('d/m/Y', strtotime($dateStartLpb)) . ' s.d ' . date('d/m/Y', strtotime($dateEndLpb))
+            : '';
+
+        $companyName = ($company['holding_company'] ?? '') . ' - ' . ($company['company'] ?? '');
+
+        // Merge cell dan set text center
+        $sheet->mergeCells('A1:T1');
+        $sheet->mergeCells('A2:T2');
+        $sheet->mergeCells('A3:T3');
+
+        $sheet->setCellValue('A1', 'Laporan Pemasukkan Barang');
+        $sheet->setCellValue('A2', $periodeText);
+        $sheet->setCellValue('A3', $companyName);
+
+        $sheet->getStyle('A1:A3')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+        $sheet->getStyle('A1:A3')->getFont()->setBold(true)->setSize(12);
+
+        // 🧱 HEADER KOLOM
         $headers = [
             'No',
             'Jenis Doc',
@@ -293,13 +322,12 @@ class LaporanBeaCukai extends BaseController
             'Keterangan'
         ];
 
-        // Tulis header
-        $sheet->fromArray($headers, null, 'A1');
-        $sheet->getStyle('A1:T1')->getFont()->setBold(true);
-        $sheet->getStyle('A1:T1')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+        $sheet->fromArray($headers, null, 'A5');
+        $sheet->getStyle('A5:T5')->getFont()->setBold(true);
+        $sheet->getStyle('A5:T5')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
 
-        // Tulis data
-        $row = 2;
+        // 📦 DATA
+        $row = 6;
         foreach ($dataResult as $item) {
             $sheet->setCellValue("A{$row}", $item['no']);
             $sheet->setCellValue("B{$row}", $item['jenis_doc']);
@@ -324,34 +352,35 @@ class LaporanBeaCukai extends BaseController
             $row++;
         }
 
-        // Style kolom numerik rata kanan & format angka
-        $sheet->getStyle("O2:P{$row}")
+        // 🎨 STYLE
+        $sheet->getStyle("O6:P{$row}")
             ->getAlignment()->setHorizontal(Alignment::HORIZONTAL_RIGHT);
-        $sheet->getStyle("S2:S{$row}")
+        $sheet->getStyle("S6:S{$row}")
             ->getAlignment()->setHorizontal(Alignment::HORIZONTAL_RIGHT);
-        $sheet->getStyle("O2:P{$row}")
+
+        $sheet->getStyle("O6:P{$row}")
             ->getNumberFormat()->setFormatCode(NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1);
-        $sheet->getStyle("S2:S{$row}")
+        $sheet->getStyle("S6:S{$row}")
             ->getNumberFormat()->setFormatCode(NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1);
 
-        // Border dan autosize
-        $sheet->getStyle("A1:T" . ($row - 1))
+        $sheet->getStyle("A5:T" . ($row - 1))
             ->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_THIN);
+
         foreach (range('A', 'T') as $col) {
             $sheet->getColumnDimension($col)->setAutoSize(true);
         }
 
-        // Output file
+        // 💾 OUTPUT
         $filename = 'Laporan_Pemasukan_Barang_' . date('Ymd_His') . '.xlsx';
         $writer = new Xlsx($spreadsheet);
 
-        // Output ke browser
         header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
         header("Content-Disposition: attachment; filename=\"{$filename}\"");
         header('Cache-Control: max-age=0');
         $writer->save('php://output');
         exit;
     }
+
 
 
     public function allMasukBarang()
