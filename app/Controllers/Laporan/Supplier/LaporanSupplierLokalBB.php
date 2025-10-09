@@ -1507,7 +1507,7 @@ class LaporanSupplierLokalBB extends BaseController
             $found = false;
             foreach ($grouped[$barang] as &$entry) {
                 // 💡 tambahkan spekName dalam kondisi pengecekan
-                if ($entry['supplierName'] === $supplier && $entry['spekName'] === $spek) {
+                if ($entry['supplierName'] === $supplier) {
                     $entry['qtyPO']        += floatval($row->qtyPO ?? 0);
                     $entry['dppUmum']      += floatval($row->dpp_umum ?? 0);
                     $entry['pphUmum']      += floatval($row->pph_umum ?? 0);
@@ -1639,8 +1639,7 @@ class LaporanSupplierLokalBB extends BaseController
             foreach ($grouped[$barang] as &$item) {
                 if (
                     $item['Supplier'] === $supplier &&
-                    $item['Divisi'] === $divisi &&
-                    $item['Spek'] === $spek
+                    $item['Divisi'] === $divisi
                 ) {
                     $item['Qty']           += floatval($row->qtyPO ?? 0);
                     $item['DPP Harian']    += floatval($row->dpp_umum ?? 0);
@@ -1706,13 +1705,13 @@ class LaporanSupplierLokalBB extends BaseController
 
         // Header laporan
         $sheet->setCellValue("A{$row}", "Laporan Rekap All Supplier");
-        $sheet->mergeCells("A{$row}:I{$row}");
+        $sheet->mergeCells("A{$row}:H{$row}");
         $sheet->getStyle("A{$row}")->getFont()->setBold(true)->setSize(14);
         $sheet->getStyle("A{$row}")->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
         $row++;
 
         $sheet->setCellValue("A{$row}", "Tanggal: " . ($addCondition["dateStart"] ?? '') . " s/d " . ($addCondition["dateEnd"] ?? ''));
-        $sheet->mergeCells("A{$row}:I{$row}");
+        $sheet->mergeCells("A{$row}:H{$row}");
         $sheet->getStyle("A{$row}")->getFont()->setBold(true)->setSize(12);
         $sheet->getStyle("A{$row}")->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
         $row++;
@@ -1721,7 +1720,7 @@ class LaporanSupplierLokalBB extends BaseController
         foreach ($grouped as $barangName => $rows) {
             // Judul bahan baku
             $sheet->setCellValue("A{$row}", "Bahan Baku: " . strtoupper($barangName));
-            $sheet->mergeCells("A{$row}:I{$row}");
+            $sheet->mergeCells("A{$row}:H{$row}");
             $sheet->getStyle("A{$row}")->getFont()->setBold(true)->getColor()->setARGB('FFFFFFFF');
             $sheet->getStyle("A{$row}")->getFill()->setFillType('solid')->getStartColor()->setARGB('FF666666');
             $row++;
@@ -1731,27 +1730,26 @@ class LaporanSupplierLokalBB extends BaseController
             $sheet->setCellValue("B{$row}", "Supplier");
             $sheet->setCellValue("C{$row}", "Divisi");
             $sheet->setCellValue("D{$row}", "Barang");
-            $sheet->setCellValue("E{$row}", "Spek");
-            $sheet->setCellValue("F{$row}", "Satuan");
-            $sheet->setCellValue("G{$row}", "Qty");
+            $sheet->setCellValue("E{$row}", "Satuan");
+            $sheet->setCellValue("F{$row}", "Qty");
 
-            $sheet->setCellValue("H{$row}", "Tambahan Bulanan");
-            $sheet->setCellValue("I{$row}", "TOTAL");
-            $sheet->mergeCells("I{$row}:I" . ($row + 1));
+            $sheet->setCellValue("G{$row}", "Tambahan Bulanan");
+            $sheet->setCellValue("H{$row}", "TOTAL");
+            $sheet->mergeCells("H{$row}:H" . ($row + 1));
 
             // Subheader
             $row2 = $row + 1;
-            $sheet->setCellValue("H{$row2}", "Total");
+            $sheet->setCellValue("G{$row2}", "Total");
 
-            foreach (range('A', 'G') as $col) {
+            foreach (range('A', 'F') as $col) {
                 $sheet->mergeCells("{$col}{$row}:{$col}{$row2}");
             }
 
-            $sheet->getStyle("A{$row}:I{$row2}")->getFont()->setBold(true);
-            $sheet->getStyle("A{$row}:I{$row2}")
+            $sheet->getStyle("A{$row}:H{$row2}")->getFont()->setBold(true);
+            $sheet->getStyle("A{$row}:H{$row2}")
                 ->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER)
                 ->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER);
-            $sheet->getStyle("A{$row}:I{$row2}")
+            $sheet->getStyle("A{$row}:H{$row2}")
                 ->getBorders()->getAllBorders()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN);
 
             $row = $row2 + 1;
@@ -1765,12 +1763,11 @@ class LaporanSupplierLokalBB extends BaseController
                 $sheet->setCellValue("B{$row}", $r['Supplier']);
                 $sheet->setCellValue("C{$row}", $r['Divisi']);
                 $sheet->setCellValue("D{$row}", $r['Barang']);
-                $sheet->setCellValue("E{$row}", $r['Spek']);
-                $sheet->setCellValue("F{$row}", $r['Satuan']);
-                $sheet->setCellValue("G{$row}", $r['Qty']);
-                $sheet->setCellValue("H{$row}", $r['Total Bulanan']);
-                $sheet->setCellValue("I{$row}", $r['Total']);
-                $sheet->getStyle("A{$row}:I{$row}")
+                $sheet->setCellValue("E{$row}", $r['Satuan']);
+                $sheet->setCellValue("F{$row}", $r['Qty']);
+                $sheet->setCellValue("G{$row}", $r['Total Bulanan']);
+                $sheet->setCellValue("H{$row}", $r['Total']);
+                $sheet->getStyle("A{$row}:H{$row}")
                     ->getBorders()->getAllBorders()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN);
 
                 foreach ($totals as $k => &$v) $v += $r[$k];
@@ -1779,12 +1776,12 @@ class LaporanSupplierLokalBB extends BaseController
 
             // === Subtotal per barang ===
             $sheet->setCellValue("A{$row}", "TOTAL " . strtoupper($barangName));
-            $sheet->mergeCells("A{$row}:F{$row}");
-            $sheet->getStyle("A{$row}:I{$row}")->getFont()->setBold(true);
-            $sheet->getStyle("A{$row}:I{$row}")
+            $sheet->mergeCells("A{$row}:E{$row}");
+            $sheet->getStyle("A{$row}:H{$row}")->getFont()->setBold(true);
+            $sheet->getStyle("A{$row}:H{$row}")
                 ->getBorders()->getAllBorders()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN);
 
-            $col = 'G';
+            $col = 'F';
             foreach ($totals as $val) {
                 $sheet->setCellValue($col++ . $row, $val);
             }
@@ -1792,11 +1789,11 @@ class LaporanSupplierLokalBB extends BaseController
         }
 
         // Format dan output
-        foreach (range('A', 'I') as $col) {
+        foreach (range('A', 'H') as $col) {
             $sheet->getColumnDimension($col)->setAutoSize(true);
         }
 
-        $sheet->getStyle("G1:I{$row}")
+        $sheet->getStyle("G1:H{$row}")
             ->getNumberFormat()
             ->setFormatCode(\PhpOffice\PhpSpreadsheet\Style\NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1);
 
