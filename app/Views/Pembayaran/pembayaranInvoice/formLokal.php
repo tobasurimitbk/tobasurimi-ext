@@ -971,6 +971,8 @@
         table.find('tbody').empty();
 
         let globalIndex = 0;
+        let totaTagihan = 0;
+
 
         // Group data berdasarkan faktur dan nama barang
         const groupedData = dataList.reduce((acc, item) => {
@@ -979,6 +981,17 @@
             acc[key].push(item);
             return acc;
         }, {});
+
+
+        Object.keys(groupedData).forEach(key => {
+            const group = groupedData[key];
+            let isFirstRow = true;
+
+            group.forEach(item => {
+                const total = destroyFormatRupiah(item.amount_invoice || 0);
+                totaTagihan = total;
+            })
+        })
 
         Object.keys(groupedData).forEach(key => {
             const group = groupedData[key];
@@ -1041,7 +1054,8 @@
                     name: 'sisa_bayar[]',
                     id: 'sisa_bayar_' + globalIndex,
                     class: 'form-control text-end sisa-bayar',
-                    value: greatFormatRupiah(sisa)
+                    value: greatFormatRupiah(sisa),
+                    onkeyup: "updateKeterangan('" + totaTagihan + "')" // ✅ panggil fungsi updateKeterangan 
                 });
 
                 sisaInput.on('keyup', function () {
@@ -1169,14 +1183,15 @@
         return randomString;
     };
 
-    function updateKeterangan(totalTagihan, totalPembayaran) {
+    function updateKeterangan(totalTagihan) {
+        console.log(totalTagihan);
         const noDokumenElement = document.getElementById('no_dokumen');
         const customerElement = document.getElementById('customer');
         const textareaElement = document.getElementById('keterangan');
 
         // Ambil semua input total_bayar[] dan hitung totalnya
         let totalBayar = 0;
-        $('input[name="total_bayar[]"]').each(function() {
+        $('input[name="sisa_bayar[]"]').each(function() {
             const val = $(this).val() || '0';
             totalBayar += destroyFormatRupiah(val);
         });

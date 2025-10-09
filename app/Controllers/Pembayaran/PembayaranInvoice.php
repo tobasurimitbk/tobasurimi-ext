@@ -396,6 +396,7 @@ class PembayaranInvoice extends BaseController
             ->join('pembayaran_invoice_detail', 'pembayaran_invoice_detail.sales_order_invoice_detail_id = sales_order_invoice_detail.id AND pembayaran_invoice_detail.deletedAt IS NULL', 'left')
             ->where('sales_order_invoice.id_customer', $customer_id_decrypt)
             ->where('sales_order_invoice.deletedAt', null)
+            ->where('sales_order_invoice.status_posting', "1")
             ->groupBy('sales_order_invoice.id, sales_order_invoice.no_faktur, sales_order_invoice.total_invoice');
 
         // 🧠 Logic pengecekan lunas
@@ -455,7 +456,7 @@ class PembayaranInvoice extends BaseController
     }
 
 
-    public function generateNoPembayaranInvoice()
+    public function generateNoPembayaran()
     {
         $paymentNo = "BNL/";
         $month = date('m');
@@ -479,6 +480,35 @@ class PembayaranInvoice extends BaseController
             $paddedNumber = str_pad($lastIncrement, 4, 0, STR_PAD_LEFT);
             $paymentNo = $numberTemplate . $paddedNumber;
         }
+
+        return response()->setJSON([
+            'paymentNo' => $paymentNo,
+            'token' => csrf_hash(),
+            'success' => true,
+        ]);
+    }
+
+
+    public function generateNoPembayaranInvoice()
+    {
+        $pembayaranInvoiceModel = new PembayaranInvoiceModel();
+        $jenis = $this->request->getGet('jenisPembayaran');
+        $metodePembayaran = $this->request->getGet('paymentMethod');
+        $divisi = str_replace(' ', '', trim($this->request->getGet('divisiId')));
+        $bank = str_replace(' ', '', trim($this->request->getGet('bankId')));
+        $tanggalPembayaran = $this->request->getGet('tanggalPembayaran');
+
+        $paymentNo = $pembayaranInvoiceModel->get_new_no(
+            $jenis,
+            $divisi,
+            $metodePembayaran,
+            $bank,
+            date('m'),
+            date('Y'),
+            getLastDay(),
+            $this->this_company_id,
+            $tanggalPembayaran,
+        );
 
         return response()->setJSON([
             'paymentNo' => $paymentNo,
@@ -647,6 +677,9 @@ class PembayaranInvoice extends BaseController
     {
         $dataSalesOrderInvoice = $this->salesOrderInvoiceModel
             ->getAllSalesOrderInvoiceLokalForPembayaran($this->this_company_id);
+        
+        // var_dump($dataSalesOrderInvoice);
+        // die;
 
         $dataAllSalesOrderInvoice = [];
 
@@ -949,6 +982,9 @@ class PembayaranInvoice extends BaseController
                     ->join('pembayaran_invoice_detail', 'pembayaran_invoice_detail.sales_order_invoice_detail_id = sales_order_invoice_detail.id AND pembayaran_invoice_detail.deletedAt IS NULL', 'left')
                     ->whereIn('sales_order_invoice_detail.id_sales_order_invoice', $idArray)
                     ->where('sales_order_invoice_detail.deletedAt', null)
+                    ->where('sales_order_invoice.deletedAt', null)
+                    ->where('pembayaran_invoice_detail.deletedAt', null)
+                    ->where('sales_order_invoice.status_posting', "1")
                     ->groupBy('
                         sales_order_invoice_detail.id,
                         sales_order_invoice_detail.id_sales_order_invoice,
@@ -1277,7 +1313,12 @@ class PembayaranInvoice extends BaseController
     public function saveLokalInvoice()
     {
         try {
-            $check = $this->pembayaranInvoiceModel->where('company_id', $this->this_company_id)->where('no_pembayaran', $this->request->getVar('no_bukti_pembayaran'))->first();
+            $check = $this->pembayaranInvoiceModel
+                            ->where('company_id', $this->this_company_id)
+                            ->where('no_pembayaran', $this->request->getVar('no_bukti_pembayaran'))
+                            ->where('deletedAt', null)
+                            ->first();
+
             if ($check != null) {
                 return response()->setJSON([
                     'token' => csrf_hash(),
