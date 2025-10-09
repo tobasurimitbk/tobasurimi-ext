@@ -194,17 +194,6 @@
                         return `
                         <div class="mt-0">
                         <?php if (can('Jasa Vendor', 'Barang Masuk', 'a')) : ?>
-                            ${status_bayar == "0" ? `
-                                <button data-toggle="tooltip" title="Posting" onclick="postingBayar('${id}')" class="btn btn-primary posting-spp">
-                                    <i class="fa fa-paper-plane fa-sm" aria-hidden="true"></i> Bayar
-                                </button>
-                            ` : `
-                                <button data-toggle="tooltip" title="Sudah Bayar" class="btn btn-secondary" disabled>
-                                    <i class="fa fa-check fa-sm"></i> Sudah Bayar
-                                </button>
-                            `}
-                        <?php endif; ?>
-                        <?php if (can('Jasa Vendor', 'Barang Masuk', 'a')) : ?>
                             <button data-toggle="tooltip" title="Posting" onclick="posting('${id}')" class="btn btn-success posting-spp">
                                 <i class="fa fa-paper-plane fa-sm" aria-hidden="true"></i>
                             </button>
@@ -226,15 +215,6 @@
 
                         return `
                             <div class="mt-0">
-                                ${status_bayar == "0" ? `
-                                    <button data-toggle="tooltip" title="Posting" onclick="postingBayar('${id}')" class="btn btn-primary posting-spp">
-                                        <i class="fa fa-paper-plane fa-sm" aria-hidden="true"></i> Bayar
-                                    </button>
-                                ` : `
-                                    <button data-toggle="tooltip" title="Sudah Bayar" class="btn btn-secondary" disabled>
-                                        <i class="fa fa-check fa-sm"></i> Sudah Bayar
-                                    </button>
-                                `}
                                 <?php if (can('Jasa Vendor', 'Barang Masuk', 'p')) : ?>
                                     <button data-toggle="tooltip" title="Print" class="btn btn-warning btn-print" onclick="print('<?= base_url("jasa-vendor-in-kepiting/print/"); ?>${id}')" style="box-shadow: none !important;">
                                         <i class="fa fa-print fa-sm" aria-hidden="true"></i>

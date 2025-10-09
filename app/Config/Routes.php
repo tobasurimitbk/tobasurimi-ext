@@ -548,7 +548,7 @@ $routes->get('/pembayaran-invoice/get-dokumen-invoice-lokal/(:segment)', 'Pembay
 $routes->get('/pembayaran-invoice/get-dokumen-invoice-return/(:segment)', 'Pembayaran\PembayaranInvoice::getDataDokumenInvoiceReturn/$1', ['filter' => 'Auth']);
 $routes->get('pembayaran-invoice/get-valas-sales-ekspor', 'Pembayaran\PembayaranInvoice::getValas', ['filter' => 'Auth']);
 $routes->get('pembayaran-invoice/get-valas-sales-ekspor-pi', 'Pembayaran\PembayaranInvoice::getValasPI', ['filter' => 'Auth']);
-$routes->get('/pembayaran-invoice/get-barang-sales-lokal', 'Pembayaran\PembayaranInvoice::getBarangSalesLokal', ['filter' => 'Auth']);
+$routes->get('/pembayaran-invoice/get-barang-sales-lokal', 'Pembayaran\PembayaranInvoice::getBarangSalesLokalNew', ['filter' => 'Auth']);
 $routes->get('/pembayaran-invoice/get-barang-sales-ekspor', 'Pembayaran\PembayaranInvoice::getBarangSalesEkspor', ['filter' => 'Auth']);
 $routes->get('/pembayaran-invoice/get-barang-sales-lain', 'Pembayaran\PembayaranInvoice::getBarangSalesLain', ['filter' => 'Auth']);
 $routes->get('/pembayaran-invoice/get-barang-sales-return', 'Pembayaran\PembayaranInvoice::getBarangSalesReturn', ['filter' => 'Auth']);
@@ -605,6 +605,7 @@ $routes->get('/invoice-penjualan-lokal/print/(:segment)', 'SalesLokal\Invoice::p
 $routes->get('/invoice-penjualan-lokal/get-nomor-faktur', 'SalesLokal\Invoice::getNomorFaktur', ['filter' => 'Auth']);
 $routes->get('/invoice-penjualan-lokal/barangAll', 'SalesLokal\Invoice::getAllBarang', ['filter' => 'Auth']);
 $routes->get('/invoice-penjualan-lokal/export-excel', 'SalesLokal\Invoice::exportExcel', ['filter' => 'Auth']);
+$routes->get('/invoice-penjualan-lokal/importLucy', 'SalesLokal\Invoice::importStatic', ['filter' => 'Auth']);
 // $routes->post('/invoice-penjualan-lokal/print',  'SalesLokal\Invoice::printInvoice', ['filter' => 'Auth']);
 
 // Surat Jalan
@@ -1347,7 +1348,7 @@ $routes->get('/stock-list/all', 'Inventori\StokList::all', ['filter' => 'Auth'])
 $routes->get('/stock-list/kategori-barang', 'Warehouse\ParentBarang::dropdownKategoriBarang', ['filter' => 'Auth']);
 $routes->get('/stock-list/warehouse', 'Purchase\POLokalBahanBaku::dropdownWarehouse', ['filter' => 'Auth']);
 $routes->get('/stock-list/id/(:segment)', 'Inventori\StokList::detail/$1', ['filter' => 'Auth']);
-$routes->get('/stock-list/stock-dokumen-bc', 'Inventori\StokList::allStokPerDokumen', ['filter' => 'Auth']);
+$routes->get('/stock-list/all-stock-detail', 'Inventori\StokList::allStockDetail', ['filter' => 'Auth']);
 $routes->get('/stock-list/stock-dokumen-supplier', 'Inventori\StokList::allStokPerSupplier', ['filter' => 'Auth']);
 $routes->get('/stock-list/stock-filtered', 'Inventori\StokList::allStokFiltered', ['filter' => 'Auth']);
 $routes->get('/stock-list/stock-log-pemasukkan-barang-lpb', 'Inventori\StokList::allStokLogPemasukkanBarang', ['filter' => 'Auth']);

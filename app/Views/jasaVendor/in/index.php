@@ -195,9 +195,7 @@
                         <div class="mt-0">
                         <?php if (can('Jasa Vendor', 'Barang Masuk', 'a')) : ?>
                             ${status_bayar == "0" ? `
-                                <button data-toggle="tooltip" title="Posting" onclick="postingBayar('${id}')" class="btn btn-primary posting-spp">
-                                    <i class="fa fa-paper-plane fa-sm" aria-hidden="true"></i> Bayar
-                                </button>
+                            
                             ` : `
                                 <button data-toggle="tooltip" title="Sudah Bayar" class="btn btn-secondary" disabled>
                                     <i class="fa fa-check fa-sm"></i> Sudah Bayar
@@ -227,9 +225,6 @@
                         return `
                             <div class="mt-0">
                                 ${status_bayar == "0" ? `
-                                    <button data-toggle="tooltip" title="Posting" onclick="postingBayar('${id}')" class="btn btn-primary posting-spp">
-                                        <i class="fa fa-paper-plane fa-sm" aria-hidden="true"></i> Bayar
-                                    </button>
                                 ` : `
                                     <button data-toggle="tooltip" title="Sudah Bayar" class="btn btn-secondary" disabled>
                                         <i class="fa fa-check fa-sm"></i> Sudah Bayar

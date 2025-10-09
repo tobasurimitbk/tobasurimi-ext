@@ -405,20 +405,26 @@ class JasaVendorInModel extends Model
         $supplierModel = new SupplierModel();
         $rmPurchaseOrderModel = new RMPurchaseOrderModel();
         $jasaVendorInModel = new JasaVendorInModel();
+        $stockRevampModel = new StockRevampModel();
+        $stockRevampDetailModel = new StockRevampDetailModel();
+        $barangMasterModel = new BarangMasterModel();
         
 
         $jasaVendorOutData = $jasaVendorOutDetailModel->whereIn('jasa_vendor_out_id', $jasaVendorOutArr)->where('deletedAt', null)->findAll();
         $result = array();
 
         foreach ($jasaVendorOutData as $j) {
-            $stockDetail = $stockDetail2Model->find($j['stock_out_id']);
-            $stockBarangOut = $stockModel->find($stockDetail['stock_id']);
+            $stockListOutDetail = $stockRevampDetailModel->where('id', $j['stock_out_detail_id'])->first();
+            $stockBarangOut = $stockRevampModel->where('id', $stockListOutDetail['stock_id'])->first();
 
-            $stockListOutDetail = $stockDetail2Model->getStockListDetailNew(
-                $j['stock_out_id']
-            );
 
-            $barangOut = self::getDetailBarang($stockBarangOut);
+
+            $barangOut = $barangMasterModel->select("CONCAT(barang_master.barang_name, '-', barang_master_spesifikasi.spesifikasi) AS barang, satuans.kode_satuan, barang_master.kode_barang, barang_master_spesifikasi.barang_master_id AS barang1_id")
+                        ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.barang_master_id = barang_master.id', 'left')
+                        ->join('satuans', 'satuans.id = barang_master_spesifikasi.satuan_1', 'left')
+                        ->where('barang_master_spesifikasi.id', $stockBarangOut['spesifikasi_id'])
+                        ->where('barang_master_spesifikasi.barang_master_id', $stockBarangOut['barang_master_id'])
+                        ->first();
 
             if ($stockListOutDetail) {
                 $bc = $metaDataModel->find($j['bc_out_id']);
@@ -427,24 +433,18 @@ class JasaVendorInModel extends Model
                     ->where('jasa_vendor_out_id', $j['jasa_vendor_out_id'])
                     ->where('jasa_vendor_out_detail_id', $j['id'])
                     ->findAll();
-
-
-                $noLpb = $stockListOutDetail != null ? $stockListOutDetail['no_dokumen_1'] : '';
-
-                $supplier = $supplierModel->select('suppliers.*')
-                    ->join('penerimaan_barang', 'penerimaan_barang.supplier_id = suppliers.id')
-                    ->where('penerimaan_barang.no_penerimaan_barang', $noLpb)
-                    ->first();
                 
-                $rmPurchaseOrder = $rmPurchaseOrderModel->where('po_no', $j['stock_dokumen'])
-                    ->where('company_id', $stockListOutDetail['company_id'])
+                $rmPurchaseOrder = $rmPurchaseOrderModel->where('id', $stockListOutDetail['po_id'])
+                    ->first();
+
+                $supplier = $supplierModel->where('id', $rmPurchaseOrder['supplier_id'])
                     ->first();
 
 
                 $resultNoJasaVendorIn = strstr($j['stock_dokumen'], '(', true);
                 $noJasaVendorIn = trim($resultNoJasaVendorIn);
-                $supplierName = $stockListOutDetail['supplier_name'];
-                $supplierId = $stockListOutDetail['supplier_id'];
+                $supplierName = $supplier['name'];
+                $supplierId = $supplier['id'];
                 $stockDate = $rmPurchaseOrder == null ? "" :  date('d/m/Y', strtotime($rmPurchaseOrder['po_date']));
 
                 $jasaVendorIn = $jasaVendorInModel
@@ -454,14 +454,11 @@ class JasaVendorInModel extends Model
                     ->where('jasa_vendor_in.company_id',  session()->get("login")->this_company_id)
                     ->first();
 
-
-
-
                 if ($jasaVendorInID == null) {
                     $result[] = [
                         'jasa_vendor_out_detail_id' => $j['id'],
                         'jasa_vendor_out_id' => $j['jasa_vendor_out_id'],
-                        'barang1_id' => $stockListOutDetail != null ? $stockListOutDetail['barang1_id'] : 0,
+                        'barang1_id' => $stockBarangOut != null ? $stockBarangOut['barang_master_id'] : 0,
                         'stock_out_id' => $j['stock_out_id'],
                         'stock_date' =>  $jasaVendorIn == null ? $stockDate :  date('d/m/Y', strtotime($jasaVendorIn['tanggal'])),
                         'tipe_barang' => "BAHAN BAKU",
@@ -476,7 +473,7 @@ class JasaVendorInModel extends Model
                         'qty_out' => $j['qty'],
                         'keterangan' => !empty($j['keterangan']) ? $j['keterangan'] : '-', // ⬅️ handle kosong
                         'stock_dokumen' => $j['stock_dokumen'],
-                        'sumber' => $stockListOutDetail == null ?: $stockListOutDetail['sumber'],
+                        'sumber' => $stockListOutDetail == null ?: $stockListOutDetail['reference_type'],
                         'list_barang_masuk' => []
                     ];
                 } else {
@@ -484,7 +481,7 @@ class JasaVendorInModel extends Model
                     $result[] = [
                         'jasa_vendor_out_detail_id' => $j['id'],
                         'jasa_vendor_out_id' => $j['jasa_vendor_out_id'],
-                        'barang1_id' => $stockListOutDetail != null ? $stockListOutDetail['barang1_id'] : 0,
+                        'barang1_id' => $stockBarangOut != null ? $stockBarangOut['barang_master_id'] : 0,
                         'stock_out_id' => $j['stock_out_id'],
                         'stock_date' =>  $jasaVendorIn == null ? $stockDate :  date('d/m/Y', strtotime($jasaVendorIn['tanggal'])),
                         'tipe_barang' => "BAHAN BAKU",
@@ -499,7 +496,7 @@ class JasaVendorInModel extends Model
                         'qty_out' => $j['qty'],
                         'keterangan' => !empty($j['keterangan']) ? $j['keterangan'] : '-', // ⬅️ handle kosong
                         'stock_dokumen' => $j['stock_dokumen'],
-                        'sumber' => $stockListOutDetail == null ?: $stockListOutDetail['sumber'],
+                        'sumber' => $stockListOutDetail == null ?: $stockListOutDetail['reference_type'],
                         'list_barang_masuk' => []
                     ];
 
@@ -510,7 +507,7 @@ class JasaVendorInModel extends Model
                                     $stockBarangIn = $stockModel->find($k['stock_in_id']);
                                     $barangIn = self::getDetailBarang($stockBarangIn);
                                     array_push($result[$i]['list_barang_masuk'], [
-                                        'barang1_id' => $stockListOutDetail != null ? $stockListOutDetail['barang1_id'] : 0, // YANG OUT
+                                        'barang1_id' => $stockBarangOut != null ? $stockBarangOut['barang_master_id'] : 0, // YANG OUT
                                         'barang_name_in' => $barangIn != null ? strtoupper($barangIn['barang']) : '-',
                                         'jasa_vendor_out_detail_id' => $k['jasa_vendor_out_detail_id'],
                                         'kode_barang_in' => $barangIn != null ? strtoupper($barangIn['kode_barang']) : '-',

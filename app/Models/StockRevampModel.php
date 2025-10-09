@@ -158,7 +158,90 @@ class StockRevampModel extends Model
             log_message('error', 'Insert Stock Failed: ' . $e->getMessage());
             return false;
         }
-    } 
+    }
+
+    public function insertStockRevampJasaVendorIn(BaseConnection $db, array $data)
+    {
+        $db->transBegin();
+
+        try {
+            // ==============================
+            // 1. Cek stock_revamp (master stok)
+            // ==============================
+            $builder = $db->table('stock_revamp');
+            $exist = $builder->where([
+                'company_id'      => $data['company_id'],
+                'barang_master_id' => $data['barang_master_id'],
+                'spesifikasi_id'  => $data['spesifikasi_id'],
+                'unit_id'         => $data['unit_id'],
+                'divisi_id'       => $data['divisi_id'],
+                'warehouse_id'    => $data['warehouse_id'],
+                'deletedAt'       => null,
+            ])->get()->getRow();
+
+            if ($exist) {
+                // update stok
+                $builder->where('id', $exist->id)->update([
+                    'qty_bersih'   => $exist->qty_bersih + $data['qty_bersih'],
+                    'qty_diterima' => $exist->qty_diterima + $data['qty_diterima'],
+                    'updatedAt'    => date('Y-m-d H:i:s'),
+                ]);
+                $stockId = $exist->id;
+            } else {
+                // insert stok baru
+                $builder->insert([
+                    'company_id'      => $data['company_id'],
+                    'barang_master_id' => $data['barang_master_id'],
+                    'spesifikasi_id'  => $data['spesifikasi_id'],
+                    'unit_id'         => $data['unit_id'],
+                    'divisi_id'       => $data['divisi_id'],
+                    'warehouse_id'    => $data['warehouse_id'],
+                    'qty_bersih'      => $data['qty_bersih'],
+                    'qty_diterima'    => $data['qty_diterima'],
+                    'createdAt'       => date('Y-m-d H:i:s'),
+                    'updatedAt'       => date('Y-m-d H:i:s'),
+                ]);
+                $stockId = $db->insertID();
+            }
+
+            // ==============================
+            // 2. Insert ke stock_revamp_detail
+            // ==============================
+            $db->table('stock_revamp_detail')->insert([
+                'stock_id'       => $stockId,
+                'bc_id'          => $data['bc_id'] ?? null,
+                'type_bc'        => $data['type_bc'] ?? null,
+                'reference_id'   => $data['reference_id'] ?? null,
+                'po_type'        => $data['po_type'] ?? null,
+                'reference_type' => $data['reference_type'] ?? null,
+                'qty_bersih'     => $data['qty_bersih'],
+                'qty_diterima'   => $data['qty_diterima'],
+                'createdAt'      => date('Y-m-d H:i:s'),
+                'updatedAt'      => date('Y-m-d H:i:s'),
+            ]);
+            $stockDetailId = $db->insertID();
+
+            // ==============================
+            // 3. Insert ke stock_revamp_log
+            // ==============================
+            $db->table('stock_revamp_log')->insert([
+                'stock_detail_id' => $stockDetailId,
+                'status'         => 'IN',
+                'qty_diterima'   => $data['qty_diterima'],
+                'qty_bersih'     => $data['qty_bersih'],
+                'createdAt'      => date('Y-m-d H:i:s'),
+                'updatedAt'      => date('Y-m-d H:i:s'),
+            ]);
+
+            $db->transCommit();
+
+            return $stockDetailId;
+        } catch (\Throwable $e) {
+            $db->transRollback();
+            log_message('error', 'Insert Stock Failed: ' . $e->getMessage());
+            return false;
+        }
+    }
 
     public function outStockRevamp(BaseConnection $db, array $data)
     {
@@ -181,12 +264,6 @@ class StockRevampModel extends Model
             // ==============================
             $newQtyDetail       = $stockDetail['qty_diterima'] - $data['qty_digunakan'];
             $newQtyDetailBersih = $stockDetail['qty_bersih'] - $data['qty_digunakan'];
-
-            // if ($newQtyDetail < 0 || $newQtyDetailBersih < 0) {
-            //     throw new \Exception("Qty detail tidak mencukupi. 
-            //         Stok tersedia: {$stockDetail['qty_diterima']}/{$stockDetail['qty_bersih']}, 
-            //         Qty diminta: {$data['qty_digunakan']}");
-            // }
 
             $db->table('stock_revamp_detail')
                 ->where('id', $data['stock_detail_id'])
@@ -213,18 +290,23 @@ class StockRevampModel extends Model
             $newQtyParent       = $stock['qty_diterima'] - $data['qty_digunakan'];
             $newQtyParentBersih = $stock['qty_bersih'] - $data['qty_digunakan'];
 
-            // if ($newQtyParent < 0 || $newQtyParentBersih < 0) {
-            //     throw new \Exception("Qty parent tidak mencukupi. 
-            //         Stok tersedia: {$stock['qty_diterima']}/{$stock['qty_bersih']}, 
-            //         Qty diminta: {$data['qty_digunakan']}");
-            // }
-
             $db->table('stock_revamp')
                 ->where('id', $stockDetail['stock_id'])
                 ->update([
                     'qty_diterima' => $newQtyParent,
                     'qty_bersih'   => $newQtyParentBersih,
                 ]);
+
+            $db->table('stock_revamp_history')->insert([
+                            'stock_detail_asal'    => $data['stock_detail_id'],
+                            'stock_detail_akhir'   => $data['stock_detail_id'],
+                            'qty_bersih_asal'      => $data['qty_digunakan'],
+                            'qty_diterima_asal'    => $data['qty_digunakan'],
+                            'qty_bersih_akhir'     => $data['qty_digunakan'], // hasil rumus
+                            'qty_diterima_akhir'   => $data['qty_digunakan'], // bisa disamakan kalau proporsional
+                            'createdAt'            => date('Y-m-d H:i:s'),
+                            'updatedAt'            => date('Y-m-d H:i:s'),
+                        ]);
 
             // ==============================
             // 5. Insert ke log
@@ -239,7 +321,6 @@ class StockRevampModel extends Model
             ]);
 
             return $stockDetail['id'];
-
         } catch (\Throwable $e) {
             // HAPUS transRollback() dari model
             log_message('error', 'Out Stock Failed: ' . $e->getMessage());
@@ -250,18 +331,13 @@ class StockRevampModel extends Model
 
     public function unpostStockRevamp(BaseConnection $db, array $data)
     {
-        // HAPUS transBegin() dan transRollback/Commit dari model
-        // Karena transaksi sudah dihandle oleh controller
-
         try {
             $asalId   = $data['stock_detail_asal'];
             $akhirId  = $data['stock_detail_akhir'];
             $qtyAsal  = $data['qty_diterima_asal'];
             $qtyAkhir = $data['qty_diterima_akhir'];
 
-            // ==============================
             // 1. Ambil stock detail asal
-            // ==============================
             $detailAsal = $db->table('stock_revamp_detail')
                 ->where('id', $asalId)
                 ->get()
@@ -281,20 +357,12 @@ class StockRevampModel extends Model
                 throw new \Exception("Stock detail akhir tidak ditemukan");
             }
 
-            // ==============================
-            // 3. Validasi qty - PERBAIKAN: Gunakan != bukan !==
-            // ==============================
-            if ((int)$detailAsal['qty_diterima'] != (int)$qtyAsal) {
-                throw new \Exception("Qty asal tidak sesuai. Database: {$detailAsal['qty_diterima']}, Request: {$qtyAsal}. Unpost dibatalkan");
-            }
-
+            // 3. Validasi qty
             if ((int)$detailAkhir['qty_diterima'] != (int)$qtyAkhir) {
                 throw new \Exception("Qty akhir tidak sesuai. Database: {$detailAkhir['qty_diterima']}, Request: {$qtyAkhir}. Unpost dibatalkan");
             }
 
-            // ==============================
             // 4. Rollback ke parent
-            // ==============================
             $parentAsal = $db->table('stock_revamp')
                 ->where('id', $detailAsal['stock_id'])
                 ->get()
@@ -320,31 +388,45 @@ class StockRevampModel extends Model
             $db->table('stock_revamp')
                 ->where('id', $parentAkhir['id'])
                 ->update([
-                    'qty_diterima' => $parentAkhir['qty_diterima'] - $qtyAkhir // PERBAIKAN: seharusnya dikurangi
+                    'qty_diterima' => $parentAkhir['qty_diterima'] - $qtyAkhir
                 ]);
 
-            // ==============================
             // 5. Update detail asal (kembalikan qty)
-            // ==============================
             $db->table('stock_revamp_detail')
                 ->where('id', $asalId)
                 ->update([
                     'qty_diterima' => $detailAsal['qty_diterima'] + $qtyAsal
                 ]);
 
-            // ==============================
-            // 6. Hapus detail akhir
-            // ==============================
-            $db->table('stock_revamp_detail')->where('id', $akhirId)->delete();
+            // 6. Kembalikan detail akhir (bukan hapus)
+            $db->table('stock_revamp_detail')
+                ->where('id', $akhirId)
+                ->update([
+                    'qty_diterima' => 0,
+                    'status'       => 'UNPOSTED',
+                    'updatedAt'    => date('Y-m-d H:i:s'),
+                ]);
+
+            // 7. Catat log OUT (kembalinya qty)
+            $db->table('stock_revamp_log')->insert([
+                'stock_detail_id' => $akhirId,
+                'status'          => 'OUT', // karena barang keluar dari hasil revamp
+                'qty_diterima'    => $qtyAkhir,
+                'qty_bersih'      => $data['qty_bersih'] ?? 0,
+                'keterangan'      => $data['keterangan'],
+                'no_dokumen'      => $data['no_dokumen'],
+                'createdAt'       => date('Y-m-d H:i:s'),
+                'updatedAt'       => date('Y-m-d H:i:s'),
+            ]);
 
             return true;
-
         } catch (\Throwable $e) {
-            // HAPUS transRollback() di model
             log_message('error', 'Unpost Stock Failed: ' . $e->getMessage());
-            throw $e; // Lempar exception ke controller
+            throw $e;
         }
     }
+
+
 
 
     public function unpostStockKeluar(BaseConnection $db, array $data)
@@ -360,18 +442,6 @@ class StockRevampModel extends Model
                 ->where('id', $asalId)
                 ->get()
                 ->getRowArray();
-
-            if (!$detailAsal) {
-                throw new \Exception("Stock detail asal tidak ditemukan");
-            }
-
-            // ==============================
-            // 2. Validasi qty
-            // ==============================
-            if ((int)$detailAsal['qty_diterima'] != (int)$qtyAsal) {
-                throw new \Exception("Qty asal tidak sesuai. Database: {$detailAsal['qty_diterima']}, Request: {$qtyAsal}. Unpost dibatalkan");
-            }
-
 
             // ==============================
             // 3. Ambil parent stock
@@ -395,6 +465,12 @@ class StockRevampModel extends Model
                     'qty_bersih'   => $parentAsal['qty_bersih'] + $qtyAsal,
                 ]);
 
+            
+            // 🔹 Hapus history lama berdasarkan stock_detail_asal
+            $db->table('stock_revamp_history')
+                ->where('stock_detail_asal', $asalId)
+                ->delete();
+
             $db->table('stock_revamp_detail')
                 ->where('id', $asalId)
                 ->update([
@@ -407,7 +483,7 @@ class StockRevampModel extends Model
             // ==============================
             $db->table('stock_revamp_log')->insert([
                 'stock_detail_id' => $asalId,
-                'status'          => 'UNPOST',
+                'status'          => 'IN',
                 'keterangan'      => $data['keterangan'] ?? 'UNPOST STOCK KELUAR',
                 'no_dokumen'      => $data['no_dokumen'] ?? null,
                 'qty_diterima'    => $qtyAsal,
@@ -417,7 +493,6 @@ class StockRevampModel extends Model
             ]);
 
             return true;
-
         } catch (\Throwable $e) {
             log_message('error', 'Unpost Stock Keluar Failed: ' . $e->getMessage());
             throw $e; // Lempar ke controller
@@ -527,4 +602,105 @@ class StockRevampModel extends Model
         return $result;
     }
 
+    public function getListStock($condition = [], $addCondition = [], $limit = 10, $offset = 0)
+    {
+        $availableSort = [
+            'parent_type_id'    => 'barang_master.parent_type_id',
+            'kode_barang'       => 'barang_master.kode_barang',
+            'barang_name'       => 'barang_master.barang_name',
+            'spesifikasi'       => 'barang_master_spesifikasi.spesifikasi',
+            'divisi_id'         => 'divisis.divisi',
+            'warehouse_id'      => 'warehouses.warehouse_name',
+            'qty_diterima'      => 'stock_revamp.qty_diterima',
+            'unit_id'           => 'stock_revamp.unit_id',
+        ];
+
+        $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
+
+        $sort = $availableSort[$addCondition['sort'] ?? 'stock_revamp.barang_master_id'] ?? 'stock_revamp.barang_master_id';
+        $sortType = $availableSortType[strtolower($addCondition['sortType'] ?? 'desc')] ?? 'DESC';
+
+        $selectQry = "
+            stock_revamp.*,
+            parent_barang.parent_name,
+            barang_master.kode_barang,
+            barang_master.barang_name,
+            barang_master_spesifikasi.spesifikasi,
+            divisis.divisi,
+            warehouses.warehouse_name,
+            satuans.kode_satuan
+        ";
+
+        $builder = $this->asArray()
+            ->select($selectQry)
+            ->join('barang_master', 'stock_revamp.barang_master_id = barang_master.id', 'left')
+            ->join('barang_master_spesifikasi', 'stock_revamp.spesifikasi_id = barang_master_spesifikasi.id', 'left')
+            ->join('parent_barang', 'parent_barang.id = barang_master.parent_type_id', 'left')
+            ->join('divisis', 'divisis.id = stock_revamp.divisi_id', 'left')
+            ->join('satuans', 'satuans.id = stock_revamp.unit_id', 'left')
+            ->join('warehouses', 'warehouses.id = stock_revamp.warehouse_id', 'left')
+            ->where($condition)
+            ->orderBy($sort, $sortType);
+
+        $totalData = $builder->countAllResults(false);
+
+        if (!empty($addCondition['type_barang'])) {
+            $builder->where('barang_master.type_barang', $addCondition['type_barang']);
+        }
+        if (!empty($addCondition['parent_type_id'])) {
+            $builder->where('barang_master.parent_type_id', $addCondition['parent_type_id']);
+        }
+        if (!empty($addCondition['divisi_id'])) {
+            $builder->where('stock_revamp.divisi_id', $addCondition['divisi_id']);
+        }
+        if (!empty($addCondition['warehouse_id'])) {
+            $builder->where('stock_revamp.warehouse_id', $addCondition['warehouse_id']);
+        }
+        if (!empty($addCondition['search'])) {
+            $builder->groupStart()
+                ->like("CONCAT(barang_master.barang_name, ' ', barang_master_spesifikasi.spesifikasi)", $addCondition['search'])
+                ->orLike('barang_master.kode_barang', $addCondition['search'])
+                ->orLike('divisis.divisi', $addCondition['search'])
+                ->orLike('warehouses.warehouse_name', $addCondition['search'])
+                ->groupEnd();
+        }
+
+        $countBuilder = clone $builder;
+        $totalFilteredData = $countBuilder->countAllResults(false);
+        $data = $builder->findAll($limit, $offset);
+
+        return [
+            'data'              => $data,
+            'totalData'         => $totalData,
+            'totalFilteredData' => $totalFilteredData,
+        ];
+    }
+
+    public function getStockIdentity($id)
+    {
+        $selectQry = "
+            stock_revamp.*,
+            barang_master.kode_barang,
+            barang_master.barang_name,
+            barang_master_spesifikasi.spesifikasi,
+            barang_master.type_barang,
+            parent_barang.parent_name,
+            satuans.kode_satuan,
+            warehouses.warehouse_name,
+            divisis.divisi
+        ";
+
+        $dataResult = $this->asArray()
+            ->select($selectQry)
+            ->join('barang_master', 'barang_master.id = stock_revamp.barang_master_id', 'left')
+            ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = stock_revamp.spesifikasi_id', 'left')
+            ->join('parent_barang', 'parent_barang.id = barang_master.parent_type_id', 'left')
+            ->join('satuans', 'satuans.id = stock_revamp.unit_id', 'left')
+            ->join('warehouses', 'warehouses.id = stock_revamp.warehouse_id', 'left')
+            ->join('divisis', 'divisis.id = stock_revamp.divisi_id', 'left')
+            ->where('stock_revamp.id', $id)
+            ->first();
+
+        return $dataResult;
+    }
 }

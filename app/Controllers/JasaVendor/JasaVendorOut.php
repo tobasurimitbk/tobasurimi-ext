@@ -227,7 +227,7 @@ class JasaVendorOut extends BaseController
                     } else {
                         $doc = $this->rmPurchaseOrderModel
                             ->select("po_no")
-                            ->where("id", $b->reference_id)
+                            ->where("id", $b->po_id)
                             ->first();
                         $stock_dokumen = $doc ? $doc['po_no'] : null;
                     }
@@ -499,9 +499,6 @@ class JasaVendorOut extends BaseController
                 ->where('jasa_vendor_out_id', $id)
                 ->where('deletedAt', null)
                 ->findAll();
-
-                var_dump($jasaVendorOutDetail);
-                die;
 
             if (empty($jasaVendorOutDetail)) {
                 throw new \Exception("Detail jasa vendor tidak ditemukan");

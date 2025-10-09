@@ -322,7 +322,7 @@ class PembayaranInvoice extends BaseController
             ->join('sales_order_invoice', 'sales_order_invoice.id_customer = customers.id', 'left') // Perbaiki kondisi join
             ->where('sales_order_invoice.deletedAt', null)
             ->where('sales_order_invoice.status_pelunasan', 'UNPAID')
-            ->where('customers.company_id', $this->this_company_id)
+            // ->where('customers.company_id', $this->this_company_id)
             ->where('customers.deletedAt', null)
             ->groupBy('customers.id')
             ->findAll();
@@ -739,20 +739,197 @@ class PembayaranInvoice extends BaseController
         ]);
     }
 
-    public function getBarangSalesLokal()
-    {
-        $idArray = json_decode($this->request->getVar('id'), true);
-        $pembayaranInvoiceId = decrypt($this->request->getVar('pembayaran_invoice_id'));
+    // public function getBarangSalesLokal()
+    // {
+    //     $idArray = json_decode($this->request->getVar('id'), true);
+    //     $pembayaranInvoiceId = decrypt($this->request->getVar('pembayaran_invoice_id'));
 
-        $dataBarang = [];
-        $isImport = false;
-        $totalPembayaran = 0;
+    //     $dataBarang = [];
+    //     $isImport = false;
+    //     $totalPembayaran = 0;
 
-        $idArray = array_map('intval', $idArray);
+    //     $idArray = array_map('intval', $idArray);
 
-        if (!empty($idArray)) {
+    //     if (!empty($idArray)) {
 
-            // Jika tidak ada pembayaran_invoice_id → ambil dari invoice detail biasa
+    //         // Jika tidak ada pembayaran_invoice_id → ambil dari invoice detail biasa
+    //         if (empty($pembayaranInvoiceId)) {
+    //             $salesOrderInvoiceDetailData = $this->salesOrderInvoiceDetailModel
+    //                 ->select('
+    //                     sales_order_invoice.no_faktur,
+    //                     sales_order_invoice_detail.id AS sales_order_invoice_detail_id,
+    //                     sales_order_invoice_detail.id_sales_order_invoice AS sales_order_invoice_id,
+    //                     sales_order_invoice_detail.qty_invoice,
+    //                     sales_order_invoice_detail.harga_barang_invoice,
+    //                     sales_order_invoice_detail.amount_invoice,
+    //                     barang_master_sales.kode_barang,
+    //                     barang_master_sales.barang_name,
+    //                     pembayaran_invoice_detail.harga_dibayar,
+    //                     COALESCE(SUM(pembayaran_invoice_detail.harga_dibayar), 0) AS total_bayar_detail,
+    //                     (sales_order_invoice_detail.amount_invoice - COALESCE(SUM(pembayaran_invoice_detail.harga_dibayar), 0)) AS sisa_bayar
+    //                 ')
+    //                 ->join('barang_master_sales', 'sales_order_invoice_detail.id_barang_invoice = barang_master_sales.id', 'left')
+    //                 ->join('sales_order_invoice', 'sales_order_invoice_detail.id_sales_order_invoice = sales_order_invoice.id', 'left')
+    //                 ->join('pembayaran_invoice_detail', 'pembayaran_invoice_detail.sales_order_invoice_detail_id = sales_order_invoice_detail.id AND pembayaran_invoice_detail.deletedAt IS NULL', 'left')
+    //                 ->whereIn('sales_order_invoice_detail.id_sales_order_invoice', $idArray)
+    //                 ->where('sales_order_invoice_detail.deletedAt', null)
+    //                 ->groupBy('
+    //                     sales_order_invoice_detail.id,
+    //                     sales_order_invoice_detail.id_sales_order_invoice,
+    //                     sales_order_invoice.no_faktur,
+    //                     barang_master_sales.kode_barang,
+    //                     barang_master_sales.barang_name
+    //                 ')
+    //                 ->having('sisa_bayar >', 0)
+    //                 ->findAll();
+
+    //             foreach ($salesOrderInvoiceDetailData as $s) {
+    //                 $dataBarang[] = [
+    //                     'sales_order_invoice_detail_id' => $s['sales_order_invoice_detail_id'],
+    //                     'sales_order_invoice_id'        => $s['sales_order_invoice_id'],
+    //                     'no_faktur'                     => $s['no_faktur'],
+    //                     'qty_invoice'                   => $s['qty_invoice'],
+    //                     'harga_barang_invoice'          => $s['harga_barang_invoice'],
+    //                     'amount_invoice'                => $s['amount_invoice'],
+    //                     'kode_barang'                   => $s['kode_barang'],
+    //                     'barang_name'                   => $s['barang_name'],
+    //                     'harga_dibayar'                  => $s['harga_dibayar'],
+    //                     'sisa_bayar'                    => $s['sisa_bayar'],
+    //                 ];
+    //             }
+    //         }
+
+    //         // Jika ada pembayaran_invoice_id → ambil dari detail pembayaran
+    //         if (!empty($pembayaranInvoiceId)) {
+    //             $pembayaranInvoiceDetail = $this->pembayaranInvoiceDetailModel
+    //                 ->join('sub_akuns AS akun_kas', 'pembayaran_invoice_detail.akun_kredit = akun_kas.id', 'left')
+    //                 ->join('sub_akuns AS akun_selisih', 'pembayaran_invoice_detail.akun_debit = akun_selisih.id', 'left')
+    //                 ->join('sales_order_invoice_detail', 'pembayaran_invoice_detail.sales_order_invoice_detail_id = sales_order_invoice_detail.id', 'left')
+    //                 ->join('sales_order_invoice', 'pembayaran_invoice_detail.sales_order_invoice_id = sales_order_invoice.id', 'left')
+    //                 ->join('barang_master_sales', 'sales_order_invoice_detail.id_barang_invoice = barang_master_sales.id', 'left')
+    //                 ->select('
+    //                     barang_master_sales.barang_name,
+    //                     barang_master_sales.kode_barang,
+    //                     sales_order_invoice.no_faktur,
+    //                     sales_order_invoice_detail.id AS sales_order_invoice_detail_id,
+    //                     sales_order_invoice_detail.id_sales_order_invoice AS sales_order_invoice_id,
+    //                     akun_kas.id AS id_akun_kas,
+    //                     akun_selisih.id AS id_akun_selisih,
+    //                     akun_kas.nama_sub AS nama_sub_kas,
+    //                     akun_kas.no_sub AS no_sub_kas,
+    //                     akun_selisih.nama_sub AS nama_sub_selisih,
+    //                     akun_selisih.no_sub AS no_sub_selisih,
+    //                     pembayaran_invoice_detail.harga_total,
+    //                     pembayaran_invoice_detail.harga_dibayar,
+    //                     pembayaran_invoice_detail.keterangan,
+    //                     pembayaran_invoice_detail.keterangan_pajak,
+    //                     pembayaran_invoice_detail.nominal_pajak
+    //                 ')
+    //                 ->where('pembayaran_invoice_id', $pembayaranInvoiceId)
+    //                 ->findAll();
+
+    //             foreach ($pembayaranInvoiceDetail as $p) {
+    //                 $dataBarang[] = [
+    //                     "sales_order_invoice_detail_id" => $p['sales_order_invoice_detail_id'],
+    //                     "sales_order_invoice_id" => $p['sales_order_invoice_id'],
+    //                     "no_faktur" => $p['no_faktur'],
+    //                     "qty_invoice" => $p['qty'] ?? null,
+    //                     "harga_barang_invoice" => $p['harga_satuan'] ?? null,
+    //                     "amount_invoice" => $p['harga_total'],
+    //                     "harga_dibayar" => $p['harga_dibayar'], // <== nilai parsial yang dibayar
+    //                     "kode_barang" => $p['kode_barang'],
+    //                     "barang_name" => $p['barang_name'],
+    //                     "keterangan" => $p['keterangan'],
+    //                     "keterangan_pajak" => $p['keterangan_pajak'],
+    //                     "nominal_pajak" => $p['nominal_pajak'],
+    //                     "id_akun_kredit" => $p['id_akun_kas'],
+    //                     "id_akun_debit" => $p['id_akun_selisih'],
+    //                     "akun_kredit" => $p['no_sub_kas'] . ' - ' . $p['nama_sub_kas'],
+    //                     "akun_debit" => $p['no_sub_selisih'] . ' - ' . $p['nama_sub_selisih'],
+    //                 ];
+    //             }
+
+    //             $pembayaranInvoiceData = $this->pembayaranInvoiceModel
+    //                 ->select('total_bayar, jenis_data')
+    //                 ->where('id', $pembayaranInvoiceId)
+    //                 ->first();
+
+    //             if (($pembayaranInvoiceData['jenis_data'] ?? '') === 'import') {
+    //                 $isImport = true;
+    //             }
+    //         }
+
+    //     }
+
+    //     return $this->response->setJSON([
+    //         'data' => $dataBarang,
+    //         'totalPembayaran' => $pembayaranInvoiceData['total_bayar'] ?? 0,
+    //         'status' => true,
+    //         'isImport' => $isImport,
+    //     ]);
+    // }
+
+
+    public function getBarangSalesLokalNew()
+{
+    $idArray = json_decode($this->request->getVar('id'), true);
+    $pembayaranInvoiceId = decrypt($this->request->getVar('pembayaran_invoice_id'));
+
+    $dataBarang = [];
+    $isImport = false;
+    $totalPembayaran = 0;
+
+    $idArray = array_map('intval', $idArray);
+
+    if (!empty($idArray)) {
+
+        // ambil dulu tipe dokumennya
+        $firstInvoice = $this->salesOrderInvoiceModel
+            ->select('document_type')
+            ->where('id', $idArray[0])
+            ->first();
+
+        $documentType = $firstInvoice['document_type'] ?? 'lokal';
+
+        // =============================================
+        // 🔹 CASE 1: DOCUMENT TYPE = IMPORT
+        // =============================================
+        if ($documentType === 'import') {
+            $isImport = true;
+
+            // ambil langsung dari sales_order_invoice
+            $salesOrderInvoiceData = $this->salesOrderInvoiceModel
+                ->select('
+                    sales_order_invoice.id,
+                    sales_order_invoice.no_faktur,
+                    sales_order_invoice.tanggal_faktur,
+                    sales_order_invoice.total_invoice,
+                    customers.name AS customer_name
+                ')
+                ->join('customers', 'customers.id = sales_order_invoice.id_customer', 'left')
+                ->whereIn('sales_order_invoice.id', $idArray)
+                ->where('sales_order_invoice.deletedAt', null)
+                ->findAll();
+
+            foreach ($salesOrderInvoiceData as $inv) {
+                $dataBarang[] = [
+                    'sales_order_invoice_detail_id' => null,
+                    'sales_order_invoice_id'        => $inv['id'],
+                    'no_faktur'                     => $inv['no_faktur'],
+                    'kode_barang'                   => null,
+                    'barang_name'                   => '[IMPORT] ' . $inv['customer_name'],
+                    'qty_invoice'                   => 1,
+                    'harga_barang_invoice'          => $inv['total_invoice'],
+                    'amount_invoice'                => $inv['total_invoice'],
+                    'sisa_bayar'                    => $inv['total_invoice'],
+                ];
+            }
+        }
+
+        // =============================================
+        // 🔹 CASE 2: DOCUMENT TYPE = LOKAL
+        // =============================================
+        else {
             if (empty($pembayaranInvoiceId)) {
                 $salesOrderInvoiceDetailData = $this->salesOrderInvoiceDetailModel
                     ->select('
@@ -764,7 +941,6 @@ class PembayaranInvoice extends BaseController
                         sales_order_invoice_detail.amount_invoice,
                         barang_master_sales.kode_barang,
                         barang_master_sales.barang_name,
-                        pembayaran_invoice_detail.harga_dibayar,
                         COALESCE(SUM(pembayaran_invoice_detail.harga_dibayar), 0) AS total_bayar_detail,
                         (sales_order_invoice_detail.amount_invoice - COALESCE(SUM(pembayaran_invoice_detail.harga_dibayar), 0)) AS sisa_bayar
                     ')
@@ -788,86 +964,29 @@ class PembayaranInvoice extends BaseController
                         'sales_order_invoice_detail_id' => $s['sales_order_invoice_detail_id'],
                         'sales_order_invoice_id'        => $s['sales_order_invoice_id'],
                         'no_faktur'                     => $s['no_faktur'],
+                        'kode_barang'                   => $s['kode_barang'],
+                        'barang_name'                   => $s['barang_name'],
                         'qty_invoice'                   => $s['qty_invoice'],
                         'harga_barang_invoice'          => $s['harga_barang_invoice'],
                         'amount_invoice'                => $s['amount_invoice'],
-                        'kode_barang'                   => $s['kode_barang'],
-                        'barang_name'                   => $s['barang_name'],
-                        'harga_dibayar'                  => $s['harga_dibayar'],
                         'sisa_bayar'                    => $s['sisa_bayar'],
                     ];
                 }
             }
-
-            // Jika ada pembayaran_invoice_id → ambil dari detail pembayaran
-            if (!empty($pembayaranInvoiceId)) {
-                $pembayaranInvoiceDetail = $this->pembayaranInvoiceDetailModel
-                    ->join('sub_akuns AS akun_kas', 'pembayaran_invoice_detail.akun_kredit = akun_kas.id', 'left')
-                    ->join('sub_akuns AS akun_selisih', 'pembayaran_invoice_detail.akun_debit = akun_selisih.id', 'left')
-                    ->join('sales_order_invoice_detail', 'pembayaran_invoice_detail.sales_order_invoice_detail_id = sales_order_invoice_detail.id', 'left')
-                    ->join('sales_order_invoice', 'pembayaran_invoice_detail.sales_order_invoice_id = sales_order_invoice.id', 'left')
-                    ->join('barang_master_sales', 'sales_order_invoice_detail.id_barang_invoice = barang_master_sales.id', 'left')
-                    ->select('
-                        barang_master_sales.barang_name,
-                        barang_master_sales.kode_barang,
-                        sales_order_invoice.no_faktur,
-                        sales_order_invoice_detail.id AS sales_order_invoice_detail_id,
-                        sales_order_invoice_detail.id_sales_order_invoice AS sales_order_invoice_id,
-                        akun_kas.id AS id_akun_kas,
-                        akun_selisih.id AS id_akun_selisih,
-                        akun_kas.nama_sub AS nama_sub_kas,
-                        akun_kas.no_sub AS no_sub_kas,
-                        akun_selisih.nama_sub AS nama_sub_selisih,
-                        akun_selisih.no_sub AS no_sub_selisih,
-                        pembayaran_invoice_detail.harga_total,
-                        pembayaran_invoice_detail.harga_dibayar,
-                        pembayaran_invoice_detail.keterangan,
-                        pembayaran_invoice_detail.keterangan_pajak,
-                        pembayaran_invoice_detail.nominal_pajak
-                    ')
-                    ->where('pembayaran_invoice_id', $pembayaranInvoiceId)
-                    ->findAll();
-
-                foreach ($pembayaranInvoiceDetail as $p) {
-                    $dataBarang[] = [
-                        "sales_order_invoice_detail_id" => $p['sales_order_invoice_detail_id'],
-                        "sales_order_invoice_id" => $p['sales_order_invoice_id'],
-                        "no_faktur" => $p['no_faktur'],
-                        "qty_invoice" => $p['qty'] ?? null,
-                        "harga_barang_invoice" => $p['harga_satuan'] ?? null,
-                        "amount_invoice" => $p['harga_total'],
-                        "harga_dibayar" => $p['harga_dibayar'], // <== nilai parsial yang dibayar
-                        "kode_barang" => $p['kode_barang'],
-                        "barang_name" => $p['barang_name'],
-                        "keterangan" => $p['keterangan'],
-                        "keterangan_pajak" => $p['keterangan_pajak'],
-                        "nominal_pajak" => $p['nominal_pajak'],
-                        "id_akun_kredit" => $p['id_akun_kas'],
-                        "id_akun_debit" => $p['id_akun_selisih'],
-                        "akun_kredit" => $p['no_sub_kas'] . ' - ' . $p['nama_sub_kas'],
-                        "akun_debit" => $p['no_sub_selisih'] . ' - ' . $p['nama_sub_selisih'],
-                    ];
-                }
-
-                $pembayaranInvoiceData = $this->pembayaranInvoiceModel
-                    ->select('total_bayar, jenis_data')
-                    ->where('id', $pembayaranInvoiceId)
-                    ->first();
-
-                if (($pembayaranInvoiceData['jenis_data'] ?? '') === 'import') {
-                    $isImport = true;
-                }
-            }
-
         }
-
-        return $this->response->setJSON([
-            'data' => $dataBarang,
-            'totalPembayaran' => $pembayaranInvoiceData['total_bayar'] ?? 0,
-            'status' => true,
-            'isImport' => $isImport,
-        ]);
     }
+
+    return $this->response->setJSON([
+        'data' => $dataBarang,
+        'totalPembayaran' => $totalPembayaran,
+        'status' => true,
+        'isImport' => $isImport,
+    ]);
+}
+
+
+
+
 
     public function getBarangSalesProformaInvoice()
     {
