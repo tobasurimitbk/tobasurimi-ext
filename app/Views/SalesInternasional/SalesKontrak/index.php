@@ -481,7 +481,8 @@
         }).then((result) => {
             if (result.isConfirmed) {
                 // Redirect ke route yang ditentukan
-                window.location.href = `/sales-kontrak/duplicate/${id}`;
+                var url = "<?= base_url('/sales-kontrak/duplicate') ?>/" + id;
+                window.location.href = url;
             }
         });
     }
