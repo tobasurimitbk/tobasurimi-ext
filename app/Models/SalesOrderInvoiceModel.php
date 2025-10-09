@@ -300,7 +300,8 @@ class SalesOrderInvoiceModel extends Model
             ->join('sales_order', 'sales_order.id = sales_order_invoice.document_id AND sales_order_invoice.document_type = "pesanan"', 'LEFT')
             ->join('surat_jalan_so', 'surat_jalan_so.id = sales_order_invoice.document_id AND sales_order_invoice.document_type = "pengiriman"', 'LEFT')
             ->where('sales_order_invoice.status_pelunasan', "UNPAID")
-            ->where('customers.company_id', $company_id)
+            ->where('sales_order_invoice.id_company', $company_id)
+            // ->where('customers.company_id', $company_id)
             ->where('sales_order_invoice.status_posting', 1);
 
         $totalData = $salesOrderInvoiceLokal->countAllResults(false);

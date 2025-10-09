@@ -14,6 +14,8 @@ use App\Models\MetadataModel;
 use App\Models\StockDetail2Model;
 use App\Models\StockDetailModel;
 use App\Models\StockModel;
+use App\Models\StockRevampDetailModel;
+use App\Models\StockRevampModel;
 use App\Models\VendorModel;
 use App\Models\WarehousesModel;
 use Dompdf\Dompdf;
@@ -906,76 +908,132 @@ class JasaVendorIn extends BaseController
 
     public function posting()
     {
-        $id = decrypt($this->request->getVar('id'));
+        $db = \Config\Database::connect();
+        $db->transBegin();
 
-        // BARANG IN KE INVENTORI DARI VENDOR
-        // INSERT INVENTORI (+)
-        $jasaVendorIn = $this->jasaVendorInModel->find($id);
-        $jasaVendorInDetail = $this->jasaVendorInDetailModel->where('jasa_vendor_in_id', $id)->findAll();
+        $stockRevampModel = new StockRevampModel();
+        $stockRevampDetailModel = new StockRevampDetailModel();
 
-        foreach ($jasaVendorInDetail as $j) {
-            $stock = $this->stockModel->find($j['stock_in_id']);
-            $qty = $j['qty_bersih'];
+        try {
+            $id = decrypt($this->request->getVar('id'));
 
-            $stok = $this->stockModel->insertStok(
-                $jasaVendorIn['company_id'],
-                $jasaVendorIn['warehouse_id'],
-                $jasaVendorIn['divisi_id'],
-                "bahan_baku",
-                $stock['barang1_id'],
-                $stock['barang2_id'],
-                $qty
-            );
+            // BARANG IN KE INVENTORI DARI VENDOR
+            $jasaVendorIn = $this->jasaVendorInModel->find($id);
+            $jasaVendorInDetail = $this->jasaVendorInDetailModel->where('deletedAt', null)->where('jasa_vendor_in_id', $id)->findAll();
 
-            $jasaVendorOut = $this->jasaVendorOutModel->find($j['jasa_vendor_out_id']);
-            $jasaVendorOutDetail = $this->jasaVendorOutDetailModel->find($j['jasa_vendor_out_detail_id']);
+            $ids = $jasaVendorIn['multiple_jasa_vendor_out_id'];
 
-            // $stockOldDetail = $this->stockDetail2Model->getStockListDetail(
-            //     $jasaVendorOutDetail['stock_out_id'],
-            //     $jasaVendorOutDetail['bc_out_id'],
-            //     $jasaVendorOutDetail['no_aju_out'],
-            //     $jasaVendorOutDetail['stock_dokumen']
-            // );
+            // cek dulu kalau ternyata string JSON
+            if (is_string($ids)) {
+                $ids = json_decode($ids, true); 
+            }
 
-            $stockOldDetail = $this->stockDetail2Model->getStockListDetailNew(
-                $jasaVendorOutDetail['stock_out_id'],
-            );
+            // pastikan hasil decode array
+            if (!is_array($ids)) {
+                $ids = [$ids]; // fallback: bikin array tunggal
+            }
 
-            // DETAIL
-            $stokDetail = $this->stockDetailModel->insertStokDetail(
-                $stok,
-                $qty,
-                "In",
-                $jasaVendorIn['tanggal'],
-                $this->this_user_id,
-                "JASA VENDOR",
-                $jasaVendorOut['no_surat_jalan'],
-                $jasaVendorIn['keterangan']
-            );
+            $barangMasterSpesifikasiModel = new BarangMasterSpesifikasiModel();
 
-            // SUB DETAIL
-            $this->stockDetail2Model->insertStokDetail2(
-                $j['bc_in_id'],
-                $j['stock_in_id'],
-                $stokDetail,
-                $qty,
-                $j['no_aju_in'],
-                $jasaVendorIn['no_penerimaan_surat_jalan'],
-                $jasaVendorIn['no_penerimaan_surat_jalan'] . " (" . $stockOldDetail['no_po'] . ")",
-                $stockOldDetail['supplier_id'],
-                $stockOldDetail['harga_umum'],
-                $stockOldDetail['harga_harian'],
-                $stockOldDetail['harga_bulanan'],
-                $stockOldDetail['no_po']
-            );
+            foreach ($jasaVendorInDetail as $p) {
+                // ambil data spesifikasi & type bc
+                $spesifikasiData = $barangMasterSpesifikasiModel
+                    ->where('id', $p['spesifikasi_in_id'])
+                    ->where('deletedAt', NULL)
+                    ->first();
+
+                $typeBc = $this->metaDataModel
+                    ->where('deletedAt', NULL)
+                    ->where('id', $p['bc_in_id'])
+                    ->first();
+
+                // hitung total masuk (qty diterima di vendor in)
+                $totalMasuk = $p['qty_bersih']; // atau qty_bersih tergantung definisi
+
+
+                // buat record stock in
+                $data = [
+                    "company_id"       => $this->this_company_id,
+                    "spesifikasi_id"   => $spesifikasiData["id"],
+                    "barang_master_id" => $spesifikasiData["barang_master_id"],
+                    "unit_id"          => $spesifikasiData["satuan_1"],
+                    "divisi_id"        => $jasaVendorIn["divisi_id"],
+                    "warehouse_id"     => $jasaVendorIn["warehouse_id"],
+                    "no_dokumen"       => $jasaVendorIn["no_penerimaan_surat_jalan"],
+                    "bc_id"            => $p['bc_in_id'],
+                    "type_bc"          => $typeBc == null ? "NON PABEAN" : $typeBc['value'],
+                    "qty_diterima"     => $totalMasuk,
+                    "qty_bersih"       => $p["qty_bersih"],
+                    "reference_id"     => $id,
+                    "po_type"          => "LOKAL BAKU",
+                    "reference_type"   => "JASA VENDOR",
+                    "status"           => "IN"
+                ];
+
+                $stockDetailId = $stockRevampModel->insertStockRevampJasaVendorIn($db, $data);
+
+
+                // ambil semua jasa vendor out terkait
+                $jasaVendorOut = $this->jasaVendorOutModel
+                    ->where('deletedAt', null)
+                    ->whereIn('id', $ids)
+                    ->findAll();
+
+                foreach ($jasaVendorOut as $j) {
+                    $details = $this->jasaVendorOutDetailModel
+                        ->select('id, stock_out_detail_id, qty')
+                        ->where('jasa_vendor_out_id', $j['id'])
+                        ->where('deletedAt', null)
+                        ->findAll();
+
+                     
+
+                    foreach ($details as $d) {
+                        // 🔹 Hitung qty_masuk_i sesuai rumus:
+                        // qty_masuk_i = qty_keluar_i * (total_masuk / total_keluar)
+                        $qtyMasukI = 0;
+                        if ($d['qty'] > 0) {
+                            $qtyMasukI = $d['qty'] * ($totalMasuk / $d['qty']);
+                        }
+
+                        $db->table('stock_revamp_history')->insert([
+                            'stock_detail_asal'    => $d['stock_out_detail_id'],
+                            'stock_detail_akhir'   => $stockDetailId,
+                            'qty_bersih_asal'      => $d['qty'],
+                            'qty_diterima_asal'    => $d['qty'],
+                            'qty_bersih_akhir'     => $qtyMasukI, // hasil rumus
+                            'qty_diterima_akhir'   => $qtyMasukI, // bisa disamakan kalau proporsional
+                            'createdAt'            => date('Y-m-d H:i:s'),
+                            'updatedAt'            => date('Y-m-d H:i:s'),
+                        ]);
+                    }
+                }
+            }
+
+
+
+            // update status Jasa Vendor
+            $this->jasaVendorInModel->update($id, [
+                'status_posting' => '1'
+            ]);
+
+            // commit transaksi
+            $db->transCommit();
+
+            return $this->response->setJSON([
+                'message' => "Jasa Vendor berhasil diposting",
+                'status'  => true,
+                'token'   => csrf_hash()
+            ]);
+        } catch (\Throwable $th) {
+            $db->transRollback();
+
+            return $this->response->setJSON([
+                'message' => "Gagal posting Jasa Vendor: " . $th->getMessage(),
+                'status'  => false,
+                'token'   => csrf_hash()
+            ]);
         }
-
-        $this->jasaVendorInModel->update($id, ['status_posting' => '1']);
-        return response()->setJSON([
-            'message' => "Jasa Vendor Barang Masuk berhasil diposting",
-            'status' => true,
-            'token' => csrf_hash()
-        ]);
     }
 
     public function unPosting()

@@ -213,7 +213,6 @@ class StockRevampModel extends Model
                 'type_bc'        => $data['type_bc'] ?? null,
                 'reference_id'   => $data['reference_id'] ?? null,
                 'po_type'        => $data['po_type'] ?? null,
-                'po_id'          => $data['po_id'] ?? null,
                 'reference_type' => $data['reference_type'] ?? null,
                 'qty_bersih'     => $data['qty_bersih'],
                 'qty_diterima'   => $data['qty_diterima'],
@@ -227,7 +226,7 @@ class StockRevampModel extends Model
             // ==============================
             $db->table('stock_revamp_log')->insert([
                 'stock_detail_id' => $stockDetailId,
-                'status'         => $data['status'] ?? 'IN',
+                'status'         => 'IN',
                 'qty_diterima'   => $data['qty_diterima'],
                 'qty_bersih'     => $data['qty_bersih'],
                 'createdAt'      => date('Y-m-d H:i:s'),
@@ -266,12 +265,6 @@ class StockRevampModel extends Model
             $newQtyDetail       = $stockDetail['qty_diterima'] - $data['qty_digunakan'];
             $newQtyDetailBersih = $stockDetail['qty_bersih'] - $data['qty_digunakan'];
 
-            // if ($newQtyDetail < 0 || $newQtyDetailBersih < 0) {
-            //     throw new \Exception("Qty detail tidak mencukupi. 
-            //         Stok tersedia: {$stockDetail['qty_diterima']}/{$stockDetail['qty_bersih']}, 
-            //         Qty diminta: {$data['qty_digunakan']}");
-            // }
-
             $db->table('stock_revamp_detail')
                 ->where('id', $data['stock_detail_id'])
                 ->update([
@@ -297,18 +290,23 @@ class StockRevampModel extends Model
             $newQtyParent       = $stock['qty_diterima'] - $data['qty_digunakan'];
             $newQtyParentBersih = $stock['qty_bersih'] - $data['qty_digunakan'];
 
-            // if ($newQtyParent < 0 || $newQtyParentBersih < 0) {
-            //     throw new \Exception("Qty parent tidak mencukupi. 
-            //         Stok tersedia: {$stock['qty_diterima']}/{$stock['qty_bersih']}, 
-            //         Qty diminta: {$data['qty_digunakan']}");
-            // }
-
             $db->table('stock_revamp')
                 ->where('id', $stockDetail['stock_id'])
                 ->update([
                     'qty_diterima' => $newQtyParent,
                     'qty_bersih'   => $newQtyParentBersih,
                 ]);
+
+            $db->table('stock_revamp_history')->insert([
+                            'stock_detail_asal'    => $data['stock_detail_id'],
+                            'stock_detail_akhir'   => $data['stock_detail_id'],
+                            'qty_bersih_asal'      => $data['qty_digunakan'],
+                            'qty_diterima_asal'    => $data['qty_digunakan'],
+                            'qty_bersih_akhir'     => $data['qty_digunakan'], // hasil rumus
+                            'qty_diterima_akhir'   => $data['qty_digunakan'], // bisa disamakan kalau proporsional
+                            'createdAt'            => date('Y-m-d H:i:s'),
+                            'updatedAt'            => date('Y-m-d H:i:s'),
+                        ]);
 
             // ==============================
             // 5. Insert ke log
@@ -445,18 +443,6 @@ class StockRevampModel extends Model
                 ->get()
                 ->getRowArray();
 
-            if (!$detailAsal) {
-                throw new \Exception("Stock detail asal tidak ditemukan");
-            }
-
-            // ==============================
-            // 2. Validasi qty
-            // ==============================
-            if ((int)$detailAsal['qty_diterima'] != (int)$qtyAsal) {
-                throw new \Exception("Qty asal tidak sesuai. Database: {$detailAsal['qty_diterima']}, Request: {$qtyAsal}. Unpost dibatalkan");
-            }
-
-
             // ==============================
             // 3. Ambil parent stock
             // ==============================
@@ -479,6 +465,12 @@ class StockRevampModel extends Model
                     'qty_bersih'   => $parentAsal['qty_bersih'] + $qtyAsal,
                 ]);
 
+            
+            // 🔹 Hapus history lama berdasarkan stock_detail_asal
+            $db->table('stock_revamp_history')
+                ->where('stock_detail_asal', $asalId)
+                ->delete();
+
             $db->table('stock_revamp_detail')
                 ->where('id', $asalId)
                 ->update([
@@ -491,7 +483,7 @@ class StockRevampModel extends Model
             // ==============================
             $db->table('stock_revamp_log')->insert([
                 'stock_detail_id' => $asalId,
-                'status'          => 'UNPOST',
+                'status'          => 'IN',
                 'keterangan'      => $data['keterangan'] ?? 'UNPOST STOCK KELUAR',
                 'no_dokumen'      => $data['no_dokumen'] ?? null,
                 'qty_diterima'    => $qtyAsal,
