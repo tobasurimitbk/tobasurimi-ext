@@ -148,7 +148,6 @@
                             <th class="col-supplier" rowspan="2">Supplier</th>
                             <th class="col-divisi" rowspan="2">Divisi</th>
                             <th class="col-barang" rowspan="2">Barang</th>
-                            <th class="col-spek" rowspan="2">Spek</th>
                             <th class="col-satuan" rowspan="2">Satuan</th>
                             <th class="col-qty" rowspan="2">QTY</th>
                             <th class="col-amount">Tambahan Bulanan</th>
@@ -175,7 +174,6 @@
                                 <td class="col-supplier text-left"><?= $group['supplierName']; ?></td>
                                 <td class="col-divisi text-left"><?= $group['divisiName']; ?></td>
                                 <td class="col-barang text-left"><?= $group['barangName']; ?></td>
-                                <td class="col-spek text-left"><?= $group['spekName']; ?></td>
                                 <td class="col-satuan"><?= $group['satuanName']; ?></td>
                                 <td class="col-qty"><?= number_format($group['qtyPO'], 2); ?></td>
 
@@ -193,7 +191,7 @@
 
                         <!-- Sub Total per Bahan Baku -->
                         <tr class="total-row">
-                            <td class="text-right" colspan="6">TOTAL <?= $barangName; ?></td>
+                            <td class="text-right" colspan="5">TOTAL <?= $barangName; ?></td>
                             <td class="col-qty"><?= number_format($subTotal['qtyPO'], 2); ?></td>
 
                             <td class="col-amount text-right"><?= number_format($subTotal['totalBulanan'], 2); ?></td>
