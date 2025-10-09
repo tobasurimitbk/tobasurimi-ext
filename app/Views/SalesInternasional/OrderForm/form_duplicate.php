@@ -1976,12 +1976,21 @@
                 listDataSalesKontrak = res.data;
                 drawTable(listDataSalesKontrak);
                 // DRAW SENSITECH INFORMATION
-                $('#consigne').val(listDataSalesKontrak.salesContract.customer_name);
-                $('#destination').val(listDataSalesKontrak.salesContract.dicharge_port);
-                // $('#deadline').val(listDataSalesKontrak.salesContract.shipment_date);
-                $('#po_no').val(listDataSalesKontrak.salesContract.po_no);
-                $('#document_required').val(listDataSalesKontrak.salesContract.documents_required);
-                $('#payment_term').val(listDataSalesKontrak.salesContract.payment_term);
+                if (listDataSalesKontrak.salesContract.customer_name != '') {
+                    $('#consigne').val(listDataSalesKontrak.salesContract.customer_name);
+                }
+                if (listDataSalesKontrak.salesContract.dicharge_port != '') {
+                    $('#destination').val(listDataSalesKontrak.salesContract.dicharge_port);
+                }
+                if (listDataSalesKontrak.salesContract.po_no != '') {
+                    $('#po_no').val(listDataSalesKontrak.salesContract.po_no);
+                }
+                if (listDataSalesKontrak.salesContract.documents_required != '') {
+                    $('#document_required').val(listDataSalesKontrak.salesContract.documents_required);
+                }
+                if (listDataSalesKontrak.salesContract.payment_term != '') {
+                    $('#payment_term').val(listDataSalesKontrak.salesContract.payment_term);
+                }
             },
             error: function(xhr, status, error) {}
         });
