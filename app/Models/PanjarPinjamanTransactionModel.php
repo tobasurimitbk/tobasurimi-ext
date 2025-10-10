@@ -133,12 +133,13 @@ class PanjarPinjamanTransactionModel extends Model
         ];
     }
 
-    public function getPanjarPinjamanSupplierbyID($id)
+    public function getPanjarPinjamanSupplierbyID($id, $company_id)
     {
         $selectQry = "panjar_pinjaman_transaction.*,suppliers.name as supplier_name, suppliers.type as supplier_type";
         $panjarPinjamanSupplierData = $this->asObject()
             ->select($selectQry)
             ->join('suppliers', 'panjar_pinjaman_transaction.supplier_id = suppliers.id', 'left')
+            ->where('suppliers.company_id', $company_id)
             ->find($id);
         return $panjarPinjamanSupplierData;
     }
