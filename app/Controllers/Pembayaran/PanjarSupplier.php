@@ -199,14 +199,11 @@ class PanjarSupplier extends BaseController
             // Commit transaction if all successful
             $this->panjarPinjamanTransactionModel->db->transCommit();
 
-            $data = [
-                "status" => true,
-                "message" => "Data Berhasil disimpan",
-                "payload" => json_encode(['parent' => $parentData, 'details' => $details]),
+            return $this->response->setJSON([
+                'status' => true,
+                'message' => "Data berhasil disimpan",
                 'token' => csrf_hash()
-            ];
-            echo json_encode($data);
-            return;
+            ]);
         } catch (\Exception $e) {
             if (isset($this->panjarPinjamanTransactionModel->db) && $this->panjarPinjamanTransactionModel->db->transStatus() !== false) {
                 $this->panjarPinjamanTransactionModel->db->transRollback();
@@ -382,13 +379,11 @@ class PanjarSupplier extends BaseController
             // Commit transaction if all successful
             $this->panjarPinjamanTransactionModel->db->transCommit();
 
-            $data = [
-                "status" => true,
-                "message" => "Data Berhasil diupdate",
-                "payload" => json_encode(['parent' => $parentData, 'details' => $details]),
+            return $this->response->setJSON([
+                'status' => true,
+                'message' => "Data berhasil disimpan",
                 'token' => csrf_hash()
-            ];
-            return $this->response->setJSON($data);
+            ]);
         } catch (\Exception $e) {
             if (isset($this->panjarPinjamanTransactionModel->db) && $this->panjarPinjamanTransactionModel->db->transStatus() !== false) {
                 $this->panjarPinjamanTransactionModel->db->transRollback();

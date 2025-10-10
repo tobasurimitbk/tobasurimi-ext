@@ -1326,7 +1326,7 @@ class LocalPOPaymentModel extends Model
             $p['total_tagihan_pph'] = number_format($pph, 2, '.', '');
             $p['total_paid'] = number_format($totalPaid, 2, '.', '');
             $p['total_paid_pph'] = number_format($pph, 2, '.', '');
-            $p['sisa_tagihan'] = number_format($totalBiaya, 2, '.', '');
+            $p['sisa_tagihan'] = number_format($totalBiaya - $totalPaid, 2, '.', '');
             $p['sisa_tagihan_pph'] = number_format($pph, 2, '.', '');
             $p['total_qty_diterima'] = number_format($p['total_qty_diterima'], 2, '.', '');
         }

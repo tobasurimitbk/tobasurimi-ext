@@ -1370,37 +1370,7 @@
             }
         });
     }
-
-
-    // function changeStatus() {
-    //     let value = document.getElementById('auto_generate').checked ? true : false;
-    //     let bankId = $("#bank_id option:selected").text();
-    //     let divisiId = $("#divisi_id option:selected").text();
-
-    //     if (value) {
-    //         let url = "<?= base_url('pembayaran-po-lokal-bb/generate-no-pembayaran'); ?>";
-    //         url += `?divisiId=${encodeURIComponent(divisiId)}&bankId=${encodeURIComponent(bankId)}`;
-
-    //         $.ajax({
-    //             url: url,
-    //             method: "GET",
-    //             dataType: "json",
-    //             success: function(response) {
-    //                 console.log("Nomor pembayaran berhasil di-generate:", response);
-    //                 // Misalnya ingin menampilkan hasil ke input field
-    //                 $("#no_bukti_pembayaran").val(response.paymentNo);
-    //                 $("#no_bukti_pembayaran").attr('readonly', true);
-    //             },
-    //             error: function(xhr, status, error) {
-    //                 console.error("Terjadi kesalahan:", error);
-    //                 $("#no_bukti_pembayaran").attr('readonly', false);
-    //             }
-    //         });
-    //     } else {
-    //         $("#no_bukti_pembayaran").val("");
-    //         $("#no_bukti_pembayaran").attr('readonly', false);
-    //     }
-    // }
+    
 
     function drawPaidTable(data) {
         var no = 1;
