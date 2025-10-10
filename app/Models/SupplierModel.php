@@ -428,6 +428,7 @@ class SupplierModel extends Model
             'YEAR(rm_purchase_orders.po_date)' => $year,
             'rm_purchase_orders.supplier_id' => $supplierID,
             'rm_purchase_orders.deletedAt' => null,
+            'rm_purchase_orders.nilai_total_bulanan !=' => 0
         ];
 
         $selectQry = "

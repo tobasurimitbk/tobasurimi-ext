@@ -72,7 +72,6 @@
         .section-title {
             font-weight: bold;
             margin: 5px 0;
-            background-color: #e0e0e0;
             padding: 3px;
             font-size: 9pt;
         }

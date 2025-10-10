@@ -186,50 +186,26 @@ class LaporanBeaCukai extends BaseController
     }
 
 
-
     public function exportExcelPemasukkan()
     {
         $start = 0;
         $length = 100000000000000;
-        $orderDir = $this->request->getGet('order')[0]['dir'] ?? 'asc';
-        $orderColumnIndex = $this->request->getGet('order')[0]['column'] ?? null;
+        $orderDir = 'desc';
+        $orderColumnIndex = 2;
 
-        $dateStart = $this->request->getVar("dateStart")
-            ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateStart"))))
-            : null;
-
-        $dateEnd = $this->request->getVar("dateEnd")
-            ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateEnd"))))
-            : null;
-
-        $dateStartLpb = $this->request->getVar("dateStartLpb")
-            ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateStartLpb"))))
-            : null;
-
-        $dateEndLpb = $this->request->getVar("dateEndLpb")
-            ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateEndLpb"))))
-            : null;
-
-        $bcId = $this->request->getGet('bc_id');
-        $sumber = $this->request->getGet('sumber');
-        $divisiId = $this->request->getGet('divisi_id');
-        $warehouseId = $this->request->getGet('warehouse_id');
-        $search = $this->request->getGet('search') ?? '';
-
+        // --- Ambil filter & condition ---
         $condition = [
             'company_id'   => $this->this_company_id,
-            'dateStart'    => $dateStart,
-            'dateEnd'      => $dateEnd,
-            'dateStartLpb' => $dateStartLpb,
-            'dateEndLpb'   => $dateEndLpb,
-            'bc_id'        => $bcId,
-            'sumber'       => $sumber,
-            'divisi_id'    => $divisiId,
-            'warehouse_id' => $warehouseId,
-            'search'       => $search,
+            'dateStart'    => $this->request->getVar("dateStart") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateStart")))) : null,
+            'dateEnd'      => $this->request->getVar("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateEnd")))) : null,
+            'bc_id'        => $this->request->getGet('bc_id'),
+            'sumber'       => $this->request->getGet('sumber'),
+            'divisi_id'    => $this->request->getGet('divisi_id'),
+            'warehouse_id' => $this->request->getGet('warehouse_id'),
+            'search'       => $this->request->getGet('search') ?? '',
         ];
 
-        // ambil data
+        // --- Ambil data ---
         $dataPemasukkan = $this->bcPurchaseOrderModel->getListLapPemasukanBarang(
             $condition,
             $orderColumnIndex,
@@ -238,39 +214,26 @@ class LaporanBeaCukai extends BaseController
             $start
         );
 
-        // ambil nama perusahaan
+        // --- Ambil nama perusahaan ---
         $company = $this->companiesModel
             ->select('holding_company, company')
             ->where('id', $this->this_company_id)
             ->first();
 
-        $dataResult = [];
-        $no = $start + 1;
+        // --- Mapping total per no_aju ---
+        $mapNoAju = [];
+        $mapTotal = [];
+        $no = 1;
 
         if (!empty($dataPemasukkan['data'])) {
             foreach ($dataPemasukkan['data'] as $d) {
-                $dataResult[] = [
-                    'no' => $no++,
-                    'jenis_doc' => $d['jenis_doc'] ?? 'NON PABEAN',
-                    'no_aju' => $d['no_aju'] ?? '',
-                    'no_daftar' => $d['no_daftar'] ?? '',
-                    'tanggal_daftar' => !empty($d['tanggal_daftar']) ? date('d/m/Y', strtotime($d['tanggal_daftar'])) : "",
-                    'no_penerimaan_barang' => $d['no_penerimaan_barang'] ?? '',
-                    'tanggal_lpb' => !empty($d['tanggal_lpb']) ? date('d/m/Y', strtotime($d['tanggal_lpb'])) : "",
-                    'no_order' => $d['no_order'] ?? '',
-                    'divisi' => $d['divisi'] ?? '',
-                    'warehouse_name' => $d['warehouse_name'] ?? '',
-                    'supplier_name' => $d['supplier_name'] ?? '',
-                    'kode_barang' => $d['kode_barang'] ?? '',
-                    'barang_name' => $d['barang_name'] ?? '',
-                    'spesifikasi' => $d['spesifikasi'] ?? '',
-                    'qty_order' => (float)$d['qty_order'] ?? 0,
-                    'qty_diterima' => (float)$d['qty_diterima'] ?? 0,
-                    'kode_satuan' => $d['kode_satuan'] ?? '',
-                    'valas' => $d['valas'] ?? '',
-                    'total_harga' => (float)$d['total_harga'] ?? 0,
-                    'keterangan' => $d['keterangan'] ?? '',
-                ];
+                $noAju = $d['no_aju'];
+                if (!isset($mapNoAju[$noAju])) $mapNoAju[$noAju] = $no++;
+                if (!isset($mapTotal[$noAju])) $mapTotal[$noAju] = ['qty_order' => 0, 'qty_diterima' => 0, 'total_harga' => 0];
+
+                $mapTotal[$noAju]['qty_order'] += (float)($d['qty_order'] ?? 0);
+                $mapTotal[$noAju]['qty_diterima'] += (float)($d['qty_diterima'] ?? 0);
+                $mapTotal[$noAju]['total_harga'] += (float)($d['total_harga'] ?? 0);
             }
         }
 
@@ -279,18 +242,15 @@ class LaporanBeaCukai extends BaseController
         $sheet = $spreadsheet->getActiveSheet();
         $sheet->setTitle('Laporan Pemasukan Barang');
 
-        // 🧾 HEADER JUDUL ATAS
-        $periodeText = (!empty($dateStartLpb) && !empty($dateEndLpb))
-            ? 'Periode ' . date('d/m/Y', strtotime($dateStartLpb)) . ' s.d ' . date('d/m/Y', strtotime($dateEndLpb))
+        // --- HEADER ---
+        $periodeText = (!empty($condition['dateStart']) && !empty($condition['dateEnd']))
+            ? 'Periode ' . date('d/m/Y', strtotime($condition['dateStart'])) . ' s.d ' . date('d/m/Y', strtotime($condition['dateEnd']))
             : '';
-
         $companyName = ($company['holding_company'] ?? '') . ' - ' . ($company['company'] ?? '');
 
-        // Merge cell dan set text center
         $sheet->mergeCells('A1:T1');
         $sheet->mergeCells('A2:T2');
         $sheet->mergeCells('A3:T3');
-
         $sheet->setCellValue('A1', 'Laporan Pemasukkan Barang');
         $sheet->setCellValue('A2', $periodeText);
         $sheet->setCellValue('A3', $companyName);
@@ -298,7 +258,7 @@ class LaporanBeaCukai extends BaseController
         $sheet->getStyle('A1:A3')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
         $sheet->getStyle('A1:A3')->getFont()->setBold(true)->setSize(12);
 
-        // 🧱 HEADER KOLOM
+        // --- HEADER KOLOM ---
         $headers = [
             'No',
             'Jenis Doc',
@@ -321,65 +281,95 @@ class LaporanBeaCukai extends BaseController
             'Harga Barang / Jasa',
             'Keterangan'
         ];
-
         $sheet->fromArray($headers, null, 'A5');
         $sheet->getStyle('A5:T5')->getFont()->setBold(true);
         $sheet->getStyle('A5:T5')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
 
-        // 📦 DATA
+        // --- DATA + TOTAL per no_aju ---
         $row = 6;
-        foreach ($dataResult as $item) {
-            $sheet->setCellValue("A{$row}", $item['no']);
-            $sheet->setCellValue("B{$row}", $item['jenis_doc']);
-            $sheet->setCellValue("C{$row}", $item['no_aju']);
-            $sheet->setCellValue("D{$row}", $item['no_daftar']);
-            $sheet->setCellValue("E{$row}", $item['tanggal_daftar']);
-            $sheet->setCellValue("F{$row}", $item['no_penerimaan_barang']);
-            $sheet->setCellValue("G{$row}", $item['tanggal_lpb']);
-            $sheet->setCellValue("H{$row}", $item['no_order']);
-            $sheet->setCellValue("I{$row}", $item['divisi']);
-            $sheet->setCellValue("J{$row}", $item['warehouse_name']);
-            $sheet->setCellValue("K{$row}", $item['supplier_name']);
-            $sheet->setCellValue("L{$row}", $item['kode_barang']);
-            $sheet->setCellValue("M{$row}", $item['barang_name']);
-            $sheet->setCellValue("N{$row}", $item['spesifikasi']);
-            $sheet->setCellValue("O{$row}", $item['qty_order']);
-            $sheet->setCellValue("P{$row}", $item['qty_diterima']);
-            $sheet->setCellValue("Q{$row}", $item['kode_satuan']);
-            $sheet->setCellValue("R{$row}", $item['valas']);
-            $sheet->setCellValue("S{$row}", $item['total_harga']);
-            $sheet->setCellValue("T{$row}", $item['keterangan']);
-            $row++;
+        $lastNoAju = null;
+        if (!empty($dataPemasukkan['data'])) {
+            foreach ($dataPemasukkan['data'] as $index => $d) {
+                $noAju = $d['no_aju'];
+                $displayNo = ($lastNoAju !== $noAju) ? $mapNoAju[$noAju] : '';
+
+                $sheet->setCellValue("A{$row}", $displayNo);
+                $sheet->setCellValue("B{$row}", $d['jenis_doc'] ?? 'NON PABEAN');
+                $sheet->setCellValue("C{$row}", $noAju);
+                $sheet->setCellValue("D{$row}", $d['no_daftar'] ?? '');
+                $sheet->setCellValue("E{$row}", !empty($d['tanggal_daftar']) ? date('d/m/Y', strtotime($d['tanggal_daftar'])) : '');
+                $sheet->setCellValue("F{$row}", $d['no_penerimaan_barang'] ?? '');
+                $sheet->setCellValue("G{$row}", !empty($d['tanggal_lpb']) ? date('d/m/Y', strtotime($d['tanggal_lpb'])) : '');
+                $sheet->setCellValue("H{$row}", $d['no_order'] ?? '');
+                $sheet->setCellValue("I{$row}", $d['divisi'] ?? '');
+                $sheet->setCellValue("J{$row}", $d['warehouse_name'] ?? '');
+                $sheet->setCellValue("K{$row}", $d['supplier_name'] ?? '');
+                $sheet->setCellValue("L{$row}", $d['kode_barang'] ?? '');
+                $sheet->setCellValue("M{$row}", $d['barang_name'] ?? '');
+                $sheet->setCellValue("N{$row}", $d['spesifikasi'] ?? '');
+                $sheet->setCellValue("O{$row}", (float)$d['qty_order']);
+                $sheet->setCellValue("P{$row}", (float)$d['qty_diterima']);
+                $sheet->setCellValue("Q{$row}", $d['kode_satuan'] ?? '');
+                $sheet->setCellValue("R{$row}", $d['valas'] ?? '');
+                $sheet->setCellValue("S{$row}", (float)$d['total_harga']);
+                $sheet->setCellValue("T{$row}", $d['keterangan'] ?? '');
+
+                $sheet->getStyle("S{$row}")
+                    ->getNumberFormat()
+                    ->setFormatCode(NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1);
+                $sheet->getStyle("S{$row}")
+                    ->getAlignment()
+                    ->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_RIGHT);
+
+                $row++;
+
+
+                // Tambahkan TOTAL jika row berikutnya beda no_aju atau akhir data
+                $nextNoAju = $dataPemasukkan['data'][$index + 1]['no_aju'] ?? null;
+                if ($nextNoAju !== $noAju) {
+                    // Merge kolom N (Spesifikasi) + O (Jml Order) untuk TOTAL
+                    $sheet->mergeCells("N{$row}:O{$row}");
+                    $sheet->setCellValue("N{$row}", 'TOTAL');
+
+                    // Isi total qty_diterima dan total_harga
+                    $sheet->setCellValue("P{$row}", $mapTotal[$noAju]['qty_diterima']);
+                    $sheet->setCellValue("S{$row}", $mapTotal[$noAju]['total_harga']);
+
+                    // Format angka 2,000.00 tanpa Rp
+                    $sheet->getStyle("P{$row}:S{$row}")
+                        ->getNumberFormat()
+                        ->setFormatCode(NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1);
+
+                    // Bold + rata kanan
+                    $sheet->getStyle("N{$row}:S{$row}")->getFont()->setBold(true);
+                    $sheet->getStyle("N{$row}:S{$row}")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_RIGHT);
+
+                    $row++;
+                }
+
+
+                $lastNoAju = $noAju;
+            }
         }
 
-        // 🎨 STYLE
-        $sheet->getStyle("O6:P{$row}")
-            ->getAlignment()->setHorizontal(Alignment::HORIZONTAL_RIGHT);
-        $sheet->getStyle("S6:S{$row}")
-            ->getAlignment()->setHorizontal(Alignment::HORIZONTAL_RIGHT);
-
-        $sheet->getStyle("O6:P{$row}")
-            ->getNumberFormat()->setFormatCode(NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1);
-        $sheet->getStyle("S6:S{$row}")
-            ->getNumberFormat()->setFormatCode(NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1);
-
+        // --- BORDERS & AUTO SIZE ---
         $sheet->getStyle("A5:T" . ($row - 1))
             ->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_THIN);
-
         foreach (range('A', 'T') as $col) {
             $sheet->getColumnDimension($col)->setAutoSize(true);
         }
 
-        // 💾 OUTPUT
+        // --- OUTPUT ---
         $filename = 'Laporan_Pemasukan_Barang_' . date('Ymd_His') . '.xlsx';
         $writer = new Xlsx($spreadsheet);
-
         header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
         header("Content-Disposition: attachment; filename=\"{$filename}\"");
         header('Cache-Control: max-age=0');
         $writer->save('php://output');
         exit;
     }
+
+
 
 
 
@@ -444,14 +434,6 @@ class LaporanBeaCukai extends BaseController
             ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateEnd"))))
             : null;
 
-        $dateStartLpb = $this->request->getVar("dateStartLpb")
-            ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateStartLpb"))))
-            : null;
-
-        $dateEndLpb = $this->request->getVar("dateEndLpb")
-            ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateEndLpb"))))
-            : null;
-
         $bcId = $this->request->getGet('bc_id');
         $sumber = $this->request->getGet('sumber');
         $divisiId = $this->request->getGet('divisi_id');
@@ -462,8 +444,6 @@ class LaporanBeaCukai extends BaseController
             'company_id'   => $this->this_company_id,
             'dateStart'    => $dateStart,
             'dateEnd'      => $dateEnd,
-            'dateStartLpb' => $dateStartLpb,
-            'dateEndLpb'   => $dateEndLpb,
             'bc_id'        => $bcId,
             'sumber'       => $sumber,
             'divisi_id'    => $divisiId,
@@ -471,6 +451,43 @@ class LaporanBeaCukai extends BaseController
             'search'       => $search,
         ];
 
+        // ambil semua data buat total
+        $allData = $this->bcPurchaseOrderModel->getListLapPemasukanBarang(
+            $condition,
+            $orderColumnIndex,
+            $orderDir,
+            100000000000000,
+            0
+        );
+
+        $mapNoAju = [];
+        $mapTotal = [];
+        $no = 1;
+
+        if (!empty($allData['data'])) {
+            foreach ($allData['data'] as $d) {
+                $noAju = $d['no_aju'];
+
+                // nomor unik per no_aju
+                if (!isset($mapNoAju[$noAju])) {
+                    $mapNoAju[$noAju] = $no++;
+                }
+
+                // inisialisasi total per no_aju
+                if (!isset($mapTotal[$noAju])) {
+                    $mapTotal[$noAju] = [
+                        'total_qty_diterima' => 0,
+                        'total_harga' => 0,
+                    ];
+                }
+
+                // akumulasi total
+                $mapTotal[$noAju]['total_qty_diterima'] += (float) ($d['qty_diterima'] ?? 0);
+                $mapTotal[$noAju]['total_harga'] += (float) ($d['total_harga'] ?? 0);
+            }
+        }
+
+        // ambil data sesuai pagination
         $dataPemasukkan = $this->bcPurchaseOrderModel->getListLapPemasukanBarang(
             $condition,
             $orderColumnIndex,
@@ -480,18 +497,61 @@ class LaporanBeaCukai extends BaseController
         );
 
         $dataResult = [];
-        $no = $start + 1;
+        $lastNoAju = null;
 
         if (!empty($dataPemasukkan['data'])) {
-            foreach ($dataPemasukkan['data'] as $d) {
-                $d['no'] = $no++;
-                $d['tanggal_daftar'] = !empty($d['tanggal_daftar']) ? date('d/m/Y', strtotime($d['tanggal_daftar'])) : "";
-                $d['tanggal_lpb'] = !empty($d['tanggal_lpb']) ? date('d/m/Y', strtotime($d['tanggal_lpb'])) : "";
+            foreach ($dataPemasukkan['data'] as $index => $d) {
+                $noAju = $d['no_aju'];
+
+                // tampilkan nomor hanya di baris pertama grup
+                if ($lastNoAju !== $noAju) {
+                    $d['no'] = $mapNoAju[$noAju] ?? '';
+                } else {
+                    $d['no'] = '';
+                }
+
+                // format tanggal
+                $d['tanggal_daftar'] = !empty($d['tanggal_daftar'])
+                    ? date('d/m/Y', strtotime($d['tanggal_daftar'])) : "";
+                $d['tanggal_lpb'] = !empty($d['tanggal_lpb'])
+                    ? date('d/m/Y', strtotime($d['tanggal_lpb'])) : "";
                 $d['jenis_doc'] = !empty($d['jenis_doc']) ? $d['jenis_doc'] : "NON PABEAN";
 
+
                 $dataResult[] = $d;
+
+                // kalau next no_aju beda, tambahkan baris total
+                $nextNoAju = $dataPemasukkan['data'][$index + 1]['no_aju'] ?? null;
+                if ($nextNoAju !== $noAju) {
+                    $dataResult[] = [
+                        "no" => "",
+                        "jenis_doc" => "",
+                        "no_aju" => "",
+                        "no_daftar" => "",
+                        "tanggal_daftar" => "",
+                        "no_penerimaan_barang" => "",
+                        "tanggal_lpb" => "",
+                        "no_order" => "",
+                        "divisi" => "",
+                        "warehouse_name" => "",
+                        "supplier_name" => "",
+                        "kode_barang" => "",
+                        "barang_name" => "",
+                        "spesifikasi" => "TOTAL",
+                        "qty_order" => "",
+                        "qty_diterima" => (float)$mapTotal[$noAju]['total_qty_diterima'],
+                        "kode_satuan" => "",
+                        "valas" => "",
+                        "total_harga" => (float)$mapTotal[$noAju]['total_harga'],
+                        "keterangan" => "",
+                        "is_total_row" => true
+                    ];
+                }
+
+                $lastNoAju = $noAju;
             }
         }
+
 
         return $this->response->setJSON([
             'draw' => intval($draw),
