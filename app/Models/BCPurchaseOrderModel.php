@@ -1184,9 +1184,7 @@ class BCPurchaseOrderModel extends Model
 
         if ($condition['bc_id'] != "") {
             $where[] = "penerimaan_barang.bc_type = '$condition[bc_id]'";
-            if ($condition['bc_id'] != "0") {
-                $where[] = "bc_purchase_order.no_daftar IS NOT NULL AND bc_purchase_order.no_aju IS NOT NULL";
-            }
+            $where[] = "bc_purchase_order.no_daftar IS NOT NULL AND bc_purchase_order.no_aju IS NOT NULL";
         }
 
         if (!empty($condition['company_id'])) {
@@ -1297,6 +1295,7 @@ class BCPurchaseOrderModel extends Model
             AND penerimaan_barang.status_post = 'FINISH'
             AND penerimaan_barang.status_penerimaan='LOKAL'
             AND penerimaan_barang.tipe_bahan='BAKU'
+            AND bc_purchase_order.status_posting='1'
             $filterCondition
             GROUP BY penerimaan_barang.id, penerimaan_barang_detail.barang_id
         )
@@ -1341,6 +1340,7 @@ class BCPurchaseOrderModel extends Model
             AND penerimaan_barang.status_post = 'FINISH'       
             AND penerimaan_barang.tipe_bahan='PENOLONG'
             AND penerimaan_barang.status_penerimaan='LOKAL'  
+            AND bc_purchase_order.status_posting='1'
             $filterCondition
             GROUP BY penerimaan_barang_detail.id
         )
@@ -1384,7 +1384,8 @@ class BCPurchaseOrderModel extends Model
             AND penerimaan_barang_detail.deletedAt IS NULL
             AND penerimaan_barang.status_post = 'FINISH'    
             AND penerimaan_barang.tipe_bahan='PENOLONG'
-            AND penerimaan_barang.status_penerimaan='IMPORT'       
+            AND penerimaan_barang.status_penerimaan='IMPORT'     
+            AND bc_purchase_order.status_posting='1'  
             $filterCondition
             GROUP BY penerimaan_barang_detail.id
         )
@@ -1428,7 +1429,8 @@ class BCPurchaseOrderModel extends Model
             AND penerimaan_barang_detail.deletedAt IS NULL
             AND penerimaan_barang.status_post = 'FINISH'   
             AND penerimaan_barang.status_penerimaan='BAKU'
-            AND penerimaan_barang.tipe_bahan='IMPORT'      
+            AND penerimaan_barang.tipe_bahan='IMPORT'
+            AND bc_purchase_order.status_posting='1'      
             $filterCondition
             GROUP BY penerimaan_barang_detail.id
         )
