@@ -29,6 +29,7 @@
         table {
             width: 100%;
             border-collapse: collapse;
+            margin-left: -35px;
         }
 
         th,
@@ -93,7 +94,7 @@
             <tr>
                 <th rowspan="2">NO.</th>
                 <th rowspan="2">BARANG</th>
-                <th rowspan="2">SPESIFIKASI</th>
+                <th rowspan="2">SPEK</th>
                 <th rowspan="2">DEPARTEMEN</th>
                 <th rowspan="2">QTY</th>
                 <th rowspan="2">SATUAN</th>
