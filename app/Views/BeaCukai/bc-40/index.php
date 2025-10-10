@@ -111,13 +111,13 @@
                                 <th onclick="changeSort('bc_purchase_order.po_type')" style="text-align: center;">Jenis PO</th>
                                 <!-- <th onclick="changeSort('bc_purchase_order.multiple_lpb_id')" class="sort" style="text-align: center;">No LPB</th>
                                 <th onclick="changeSort('bc_purchase_order.multiple_po_id')" class="sort" style="text-align: center;">No PO</th> -->
-                                <th style="text-align: center;">Total Barang</th>
-                                <th style="text-align: center;">Posting</th>
-                                <th style="text-align: center;">Doc Ceisa</th>
+                                <th>Total Barang</th>
+                                <th>Posting</th>
+                                <th>Doc Ceisa (Host to Host)</th>
                                 <th style="text-align: center;">Action</th>
                             </tr>
                         </thead>
-                        <tbody class="body-table" id="body-table" style="cursor: pointer;">
+                        <tbody class="body-table" id="body-table">
 
                         </tbody>
                     </table>
@@ -280,7 +280,7 @@
             },
             {
                 data: "status",
-                className: "text-center",
+                className: "text-left",
                 searchable: false,
                 sortable: false,
                 render: function(data, type, row) {
@@ -299,7 +299,7 @@
                     } else if (row.status == "SUDAH KIRIM") {
                         htmlRes += `
                         <div class="text-success">
-                            SUDAH KIRIM
+                            TERKIRIM
                         </div>`
                     } else if (row.status == "SIAP KIRIM") {
                         htmlRes += `
@@ -317,12 +317,17 @@
                 searchable: false,
                 sortable: false,
                 render: function(data, type, row) {
+                    let id = row.id;
                     let htmlRes = '';
                     htmlRes += `
+                            <a href="<?= base_url("bea-cukai-bc-40/po"); ?>/${id}" data-toggle="tooltip" title="Edit" class="btn btn-primary">
+                                <i class="fas fa-edit"></i>
+                            </a>
                             <a href="javascript:void(0)" onclick="detailBarang('${row.id}')" data-toggle="tooltip" title="Detail Barang" class="btn btn-warning posting-spp actions">
                                 <i class="fas fa-eye"></i>
                             </a>
                         `;
+
                     if (row.status_posting === "0") {
                         if (row.no_aju != null) {
                             // htmlRes += `
@@ -397,10 +402,10 @@
         }
     });
 
-    $('#dataTable tbody').on('click', 'tr td:not(.actions):not(.dataTables_empty)', function() {
-        const data = table.row(this).data();
-        location.replace(`<?= base_url("bea-cukai-bc-40/po/"); ?>${data.id}`);
-    });
+    // $('#dataTable tbody').on('click', 'tr td:not(.actions):not(.dataTables_empty)', function() {
+    //     const data = table.row(this).data();
+    //     location.replace(`<?= base_url("bea-cukai-bc-40/po/"); ?>${data.id}`);
+    // });
 
 
     $('.mulaiTanggalBC40, .selesaiTanggalBC40').change(function() {

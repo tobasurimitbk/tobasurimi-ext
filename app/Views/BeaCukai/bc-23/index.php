@@ -109,11 +109,11 @@
                                 <th onclick="changeSort('bc_purchase_order.po_type')">Jenis PO</th>
                                 <th>Total Barang</th>
                                 <th>Posting</th>
-                                <th>Doc Ceisa</th>
+                                <th>Doc Ceisa (Host to Host)</th>
                                 <th>Action</th>
                             </tr>
                         </thead>
-                        <tbody class="body-table" id="body-table" style="cursor: pointer;">
+                        <tbody class="body-table" id="body-table">
 
                         </tbody>
                     </table>
@@ -277,7 +277,7 @@
             },
             {
                 data: "status",
-                className: "text-center",
+                className: "text-left",
                 searchable: false,
                 sortable: false,
                 render: function(data, type, row) {
@@ -314,8 +314,12 @@
                 searchable: false,
                 sortable: false,
                 render: function(data, type, row) {
+                    let id = row.id;
                     let htmlRes = '';
                     htmlRes += `
+                            <a href="<?= base_url("bea-cukai-bc-23/po"); ?>/${id}" data-toggle="tooltip" title="Edit" class="btn btn-primary">
+                                <i class="fas fa-edit"></i>
+                            </a>
                             <a href="javascript:void(0)" onclick="detailBarang('${row.id}')" data-toggle="tooltip" title="Detail Barang" class="btn btn-warning posting-spp actions">
                                 <i class="fas fa-eye"></i>
                             </a>
@@ -373,6 +377,12 @@
 
 
         ],
+        "drawCallback": function(settings) {
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-toggle="tooltip"]'))
+            var tooltipList = tooltipTriggerList.map(function(tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl)
+            });
+        },
         columnDefs: [{
             defaultContent: "-",
             targets: "_all"
@@ -387,10 +397,10 @@
         }
     });
 
-    $('#dataTable tbody').on('click', 'tr td:not(.actions):not(.dataTables_empty)', function() {
-        const data = table.row(this).data();
-        location.replace(`<?= base_url("bea-cukai-bc-23/po"); ?>/${data.id}`);
-    });
+    // $('#dataTable tbody').on('click', 'tr td:not(.actions):not(.dataTables_empty)', function() {
+    //     const data = table.row(this).data();
+    //     location.replace(`<?= base_url("bea-cukai-bc-23/po"); ?>/${data.id}`);
+    // });
 
     $('.mulaiTanggalBC23, .selesaiTanggalBC23').change(function() {
         table.ajax.reload();

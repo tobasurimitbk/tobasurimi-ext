@@ -17,6 +17,7 @@ use App\Models\BCKemasanModel;
 use App\Models\BCKontainerModel;
 use App\Models\BC23Model;
 use App\Models\BCPengangkutModel;
+use App\Models\BCPurchaseOrderLPBModel;
 use App\Models\BCPurchaseOrderModel;
 use App\Models\CeisaSettingModel;
 use App\Models\CountryModel;
@@ -85,6 +86,7 @@ class BC23 extends BaseController
     protected $bc40Controller;
     protected $divisiModel;
     protected $penerimaanBarangLokalBp;
+    protected $bcPurchaseOrderLPBModel;
 
     public function __construct()
     {
@@ -120,6 +122,7 @@ class BC23 extends BaseController
         $this->bc40Controller = new BC40();
         $this->divisiModel = new DivisisModel();
         $this->penerimaanBarangLokalBp = new PenerimaanBarangLokalBP();
+        $this->bcPurchaseOrderLPBModel = new BCPurchaseOrderLPBModel();
 
         $this->this_user_id = session()->get("login")->user_id;
         $this->this_company_id = session()->get("login")->this_company_id;
@@ -1958,8 +1961,8 @@ class BC23 extends BaseController
         $this->bcDokumenModel->where('bc_purchase_order_id', $bcPurchaseOrderID)->delete();
         $this->bcBarangDokumenModel->where('bc_purchase_order_id', $bcPurchaseOrderID)->delete();
         $this->bcBarangTarifModel->where('bc_purchase_order_id', $bcPurchaseOrderID)->delete();
-
         $this->bcPurchaseOrderModel->delete($bcPurchaseOrderID);
+        $this->bcPurchaseOrderLPBModel->where('bc_purchase_order_id', $bcPurchaseOrderID)->delete(null, true);
 
         return response()->setJSON([
             'message' => "Dokumen BC 23 Berhasil dihapus",
@@ -2631,7 +2634,6 @@ class BC23 extends BaseController
         // Mapping index kolom DataTables ke nama kolom SQL
         $columns = [
             'id',
-            'updatedAt',
             'tipe_bahan',
             'divisi',
             'supplier',

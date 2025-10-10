@@ -46,8 +46,7 @@ class BC23Model extends Model
             'bc_23.createdAt'                        => 'bc_23.createdAt',
             'bc_23.no_aju'                           => 'bc_23.no_aju',
             'bc_purchase_order.po_type'              => 'bc_purchase_order.po_type',
-            'bc_purchase_order.multiple_lpb_no'      => 'bc_purchase_order.multiple_lpb_no',
-            'bc_purchase_order.multiple_po_no'       => 'bc_purchase_order.multiple_po_no',
+            'bc_purchase_order.supplier_id'              => 'bc_purchase_order.supplier_id',
         ];
         $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
 
