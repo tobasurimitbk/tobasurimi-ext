@@ -25,6 +25,7 @@ use Config\Services;
 use Dompdf\Dompdf;
 use ErrorException;
 use Exception;
+use PhpOffice\PhpSpreadsheet\IOFactory;
 
 class Invoice extends BaseController
 {
@@ -436,28 +437,6 @@ class Invoice extends BaseController
         }
 
         $documentList = $this->getDocNumberList($dataSalesInvoiceOrder->document_type, $dataSalesInvoiceOrder->id_customer);
-        $selectedDocIds = json_decode($dataSalesInvoiceOrder->document_id, true) ?? [];
-
-        $selectedDocs = [];
-        if (!empty($selectedDocIds)) {
-            $selectedDocs = $this->SuratJalanModel->asObject()
-                ->select('
-                    surat_jalan_so.id,
-                    surat_jalan_so.no_surat_jalan AS doc_no,
-                    surat_jalan_so.id_company,
-                    surat_jalan_so.no_po,
-                    surat_jalan_so.note AS keterangan,
-                    COALESCE(surat_jalan_so.terms, customers.termin) AS termin,
-                    COALESCE(sales_order.jenis_penjualan, customers.jenis_penjualan) AS jenis_penjualan,
-                    sales_order.sales_id,
-                    employees.name AS salesName
-                ')
-                ->join('sales_order', 'sales_order.surat_jalan_so_id = surat_jalan_so.id', 'left')
-                ->join('customers', 'customers.id = sales_order.id_customer', 'left')
-                ->join('employees', 'employees.id = sales_order.sales_id', 'left')
-                ->whereIn('surat_jalan_so.id', $selectedDocIds)
-                ->findAll();
-        }
 
         $tipeShipping = $this->MetadataModel->asObject()
             ->select(['id', 'value'])
@@ -538,8 +517,10 @@ class Invoice extends BaseController
             }
         }
 
+
         $noFaktur = $this->SalesOrderInvoiceModel->generateNoFaktur();
 
+        // $customers = $this->CustomerModel->asObject()->select(['id', 'name'])->where('company_id', $this->this_company_id)->findAll();
         $customers = $this->CustomerModel->getCustomerLokal($this->userId, $this->is_admin);
 
         foreach ($dataSalesInvoiceOrderDetail as &$valueDetail) {
@@ -549,13 +530,11 @@ class Invoice extends BaseController
             $valueDetail['amount'] = floatval($valueDetail['amount_invoice']);
         }
 
-        // Gabungkan dan hilangkan duplikat berdasarkan ID
-        $docsById = [];
-        foreach (array_merge($documentList, $selectedDocs) as $doc) {
-            $docsById[$doc->id] = $doc;
-        }
-        $documentList = array_values($docsById);
-
+        // echo "<pre>";
+        // // var_dump($documentData);
+        // var_dump($dataSalesInvoiceOrderDetail);
+        // echo "</pre>";
+        // exit;
 
         $data = [
             "noFaktur"      => $noFaktur,
@@ -569,7 +548,7 @@ class Invoice extends BaseController
             "seller_name"   => $dataSalesInvoiceOrder->seller_name,
             "via"           => $tipeShipping,
             'invoice_id' => $invoice_id,
-            "taxData"       => $taxData,
+            "taxData"       => $taxData
             // 'dataSo'        => $dataSo
 
         ];
@@ -1663,4 +1642,176 @@ class Invoice extends BaseController
         $writer->save('php://output');
         exit;
     }
+
+    public function importStatic()
+    {
+        ini_set('max_execution_time', 300); 
+        // $filePath = '/Users/' . getenv('USER') . '/Downloads/INVOICE CLEAN FINAL.xlsx';
+        $filePath = '';
+        if (!file_exists($filePath)) {
+            return $this->response->setJSON(['error' => 'File tidak ditemukan di folder Downloads.']);
+        }
+
+        $spreadsheet = IOFactory::load($filePath);
+        $sheet = $spreadsheet->getActiveSheet()->toArray();
+
+        // 🔹 ambil semua customer & metadata
+        $customers = $this->CustomerModel
+            ->select('id, name')
+            ->where('deletedAt', null)
+            ->findAll();
+
+        $customerMap = [];
+        foreach ($customers as $c) {
+            $normalized = strtolower(preg_replace('/\s+/', '', $c['name']));
+            $customerMap[$normalized] = $c['id'];
+        }
+
+        $inserted = 0;
+        $skipped = 0;
+        $failed = [];
+
+        foreach ($sheet as $i => $row) {
+            if ($i < 2) continue; // skip header
+            $rowNumber = $i + 1;
+
+            if (empty($row[0]) || empty($row[1]) || empty($row[3])) {
+                $failed[] = [
+                    'row' => $rowNumber,
+                    'reason' => 'Data wajib (tanggal faktur / no faktur / nama customer) kosong',
+                    'raw' => $row
+                ];
+                continue;
+            }
+
+            try {
+                $tanggalFaktur = date('Y-m-d', strtotime($row[0]));
+                $noFaktur = trim($row[1]);
+
+                // 🔹 handle tanggal jatuh tempo (bisa kosong)
+                $tanggalJthTempo = null;
+                if (!empty($row[2])) {
+                    $time = strtotime($row[2]);
+                    if ($time) {
+                        $tanggalJthTempo = date('Y-m-d', $time);
+                    } else {
+                        $failed[] = [
+                            'row' => $rowNumber,
+                            'no_faktur' => $noFaktur,
+                            'reason' => 'Format tanggal jatuh tempo tidak valid',
+                            'raw' => $row[2]
+                        ];
+                        continue;
+                    }
+                }
+
+                // 🔹 normalize nama customer
+                $customerExcel = trim($row[3]);
+                $normalized = strtolower(preg_replace('/\s+/', '', $customerExcel));
+
+                // 🔹 cari ID customer
+                $customerId = $customerMap[$normalized] ?? null;
+                if (!$customerId) {
+                    $failed[] = [
+                        'row' => $rowNumber,
+                        'no_faktur' => $noFaktur,
+                        'customer_excel' => $customerExcel,
+                        'reason' => 'Customer tidak ditemukan di tabel customers'
+                    ];
+                    continue;
+                }
+
+                // 🔹 bersihkan total invoice
+                $rawTotal = preg_replace('/[^\d.-]/', '', $row[4]); // hapus semua selain angka & titik
+                $totalInvoice = is_numeric($rawTotal) ? (float)$rawTotal : 0;
+
+                if ($totalInvoice <= 0) {
+                    $failed[] = [
+                        'row' => $rowNumber,
+                        'no_faktur' => $noFaktur,
+                        'reason' => 'Total invoice tidak valid (0 atau bukan angka)',
+                        'raw' => $row[4]
+                    ];
+                    continue;
+                }
+
+                // 🔹 cek duplikat faktur
+                $exists = $this->SalesOrderInvoiceModel
+                    ->where('no_faktur', $noFaktur)
+                    ->where('deletedAt', null)
+                    ->first();
+
+                if ($exists) {
+                    $skipped++;
+                    $failed[] = [
+                        'row' => $rowNumber,
+                        'no_faktur' => $noFaktur,
+                        'reason' => 'No faktur sudah ada di database (duplikat)',
+                    ];
+                    continue;
+                }
+
+                // 🔹 kalkulasi termin
+                $termId = 1446; // default COD
+                if ($tanggalJthTempo) {
+                    $daysDiff = (strtotime($tanggalJthTempo) - strtotime($tanggalFaktur)) / 86400;
+                    $term = $this->MetadataModel
+                        ->where('name', 'Termin')
+                        ->where('value', $daysDiff)
+                        ->where('deletedAt', null)
+                        ->first();
+
+                    if ($term) {
+                        $termId = $term['id'];
+                    } else {
+                        // fallback ke COD (1446)
+                        $failed[] = [
+                            'row' => $rowNumber,
+                            'no_faktur' => $noFaktur,
+                            'reason' => "Tidak ditemukan metadata termin untuk selisih $daysDiff hari → fallback ke COD (1446)"
+                        ];
+                    }
+                } else {
+                    $failed[] = [
+                        'row' => $rowNumber,
+                        'no_faktur' => $noFaktur,
+                        'reason' => "Tanggal jatuh tempo kosong → fallback ke COD (1446)"
+                    ];
+                }
+
+                // 🔹 insert data
+                $this->SalesOrderInvoiceModel->insert([
+                    'tanggal_faktur' => $tanggalFaktur,
+                    'no_faktur' => $noFaktur,
+                    'tanggal_jatuh_tempo' => $tanggalJthTempo,
+                    'id_customer' => $customerId,
+                    'total_invoice' => $totalInvoice,
+                    'document_type' => 'import',
+                    'status_pelunasan' => 'UNPAID',
+                    'status_posting' => '1',
+                    'terms' => $termId,
+                    'id_company' => 2,
+                    'createdAt' => date('Y-m-d H:i:s'),
+                ]);
+
+                $inserted++;
+            } catch (\Throwable $th) {
+                $failed[] = [
+                    'row' => $rowNumber,
+                    'no_faktur' => $row[1] ?? '(unknown)',
+                    'reason' => 'Exception: ' . $th->getMessage()
+                ];
+            }
+        }
+
+        return $this->response->setJSON([
+            'status' => 'done',
+            'inserted' => $inserted,
+            'skipped' => $skipped,
+            'failed_count' => count($failed),
+            'failed_details' => $failed,
+        ]);
+    }
+
+   
 }

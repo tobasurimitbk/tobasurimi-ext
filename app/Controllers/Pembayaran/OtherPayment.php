@@ -20,6 +20,7 @@ class OtherPayment extends BaseController
     protected $metaDataModel;
     protected $subAkunsModel;
     protected $jurnalController;
+    protected $banksModel;
 
     public function __construct()
     {

@@ -25,6 +25,8 @@ class PanjarSupplier extends BaseController
     protected $jurnalController;
     protected $supplierModel;
     protected $sub_AkunsModel;
+    protected $banksModel;
+    protected $divisiModel;
 
     protected $localPOPaymentPanjarModel;
     public function __construct()
@@ -459,9 +461,9 @@ class PanjarSupplier extends BaseController
                 echo json_encode($data);
                 return;
             }
-            $this->panjarPinjamanTransactionModel->delete($id);
             $this->panjarSupplierModel->where('transaction_id', $id)->delete();
             $this->pinjamanSupplierModel->where('transaction_id', $id)->delete();
+            $this->panjarPinjamanTransactionModel->delete($id);
             $data = [
                 "status"    => true,
                 "message"   => "Data Berhasil dihapus",
@@ -712,6 +714,9 @@ class PanjarSupplier extends BaseController
         // Get main transaction data
         $transaction = $this->panjarPinjamanTransactionModel->getPanjarPinjamanSupplierbyID($id);
 
+        // var_dump($transaction);
+        // die;
+
         if (!$transaction) {
             return $this->response->setJSON([
                 "status" => false,
@@ -722,12 +727,17 @@ class PanjarSupplier extends BaseController
         // Get all panjar details for this transaction
         $panjarDetails = $this->panjarSupplierModel
             ->where('transaction_id', $id)
+            ->where('deletedAt', null)
             ->findAll();
 
         // Get all pinjaman details for this transaction
         $pinjamanDetails = $this->pinjamanSupplierModel
             ->where('transaction_id', $id)
+            ->where('deletedAt', null)
             ->findAll();
+
+        // var_dump($panjarDetails, $pinjamanDetails);
+        // die;
 
         // Get account information from sub_akuns table
         $accountIds = [];
@@ -745,6 +755,7 @@ class PanjarSupplier extends BaseController
         if (!empty($uniqueAccountIds)) {
             $accounts = $this->sub_AkunsModel
                 ->whereIn('id', $uniqueAccountIds)
+                ->where('deletedAt', null)
                 ->findAll();
             $accounts = array_combine(
                 array_column($accounts, 'id'),
@@ -805,7 +816,7 @@ class PanjarSupplier extends BaseController
         }, 0);
 
         // Get supplier data
-        $supplier = $this->supplierModel->find($transaction->supplier_id);
+        $supplier = $this->supplierModel->where('id', $transaction->supplier_id)->first();
 
         // Prepare response data
         $response = [

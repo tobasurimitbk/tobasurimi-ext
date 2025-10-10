@@ -1082,7 +1082,7 @@
                 <td class="total_tagihan text-center"></td>
             </tr>
             <tr style="color:whitesmoke;">
-                <td colspan="7" style="text-align: right;">Total Sudah Dibayar (DP)</td>
+                <td colspan="7" style="text-align: right;">Total Sudah Dibayar</td>
                 <td class="total_dibayar text-center"></td>
             </tr>
             <tr style="color:whitesmoke;">
