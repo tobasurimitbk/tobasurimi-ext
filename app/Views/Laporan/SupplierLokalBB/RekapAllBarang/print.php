@@ -29,7 +29,7 @@
         table {
             width: 100%;
             border-collapse: collapse;
-            margin-left: -35px;
+            /* margin-left: -35px; */
         }
 
         th,

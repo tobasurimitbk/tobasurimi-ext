@@ -1824,13 +1824,9 @@ class LaporanSupplierLokalBB extends BaseController
         $currentPage = ($this->request->getGet("start") / $pageSize) + 1;
 
         $condition = [
-            'rm_purchase_orders.is_posted' => '1',
-            'penerimaan_barang.status_post' => 'FINISH',
-            'penerimaan_barang.status_penerimaan' => 'LOKAL',
-            'penerimaan_barang.tipe_bahan' => 'BAKU',
-            'rm_purchase_orders.company_id' => $this->this_company_id,
             'rm_purchase_orders.deletedAt' => null,
             'rm_purchase_order_details.deletedAt' => null,
+            'rm_purchase_orders.company_id' => $this->this_company_id,
             'rm_purchase_orders.status_external' => 'no',
         ];
 
@@ -2005,13 +2001,9 @@ class LaporanSupplierLokalBB extends BaseController
     public function exportExcelLaporanRekapAllBarang()
     {
         $condition = [
-            'rm_purchase_orders.is_posted' => '1',
-            'penerimaan_barang.status_post' => 'FINISH',
-            'penerimaan_barang.status_penerimaan' => 'LOKAL',
-            'penerimaan_barang.tipe_bahan' => 'BAKU',
-            'rm_purchase_orders.company_id' => $this->this_company_id,
             'rm_purchase_orders.deletedAt' => null,
             'rm_purchase_order_details.deletedAt' => null,
+            'rm_purchase_orders.company_id' => $this->this_company_id,
             'rm_purchase_orders.status_external' => 'no',
         ];
 
@@ -2290,21 +2282,17 @@ class LaporanSupplierLokalBB extends BaseController
     public function exportPDFLaporanRekapAllBarang()
     {
         $condition = [
-            'rm_purchase_orders.is_posted' => '1',
-            'penerimaan_barang.status_post' => 'FINISH',
-            'penerimaan_barang.status_penerimaan' => 'LOKAL',
-            'penerimaan_barang.tipe_bahan' => 'BAKU',
-            'rm_purchase_orders.company_id' => $this->this_company_id,
             'rm_purchase_orders.deletedAt' => null,
             'rm_purchase_order_details.deletedAt' => null,
+            'rm_purchase_orders.company_id' => $this->this_company_id,
             'rm_purchase_orders.status_external' => 'no',
         ];
 
         $addCondition = [
-            "dateStart"    => $this->request->getGet("dateStart") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getGet("dateStart")))) : "",
-            "dateEnd"      => $this->request->getGet("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getGet("dateEnd")))) : "",
-            "divisiId"     => $this->request->getGet("filter_divisi"),
-            "barangId"     => $this->request->getGet("filter_barang"),
+            "dateStart" => $this->request->getGet("dateStart") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getGet("dateStart")))) : "",
+            "dateEnd"   => $this->request->getGet("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getGet("dateEnd")))) : "",
+            "divisiId"  => $this->request->getGet("filter_divisi"),
+            "barangId"  => $this->request->getGet("filter_barang"),
         ];
 
         $availableSort = [
