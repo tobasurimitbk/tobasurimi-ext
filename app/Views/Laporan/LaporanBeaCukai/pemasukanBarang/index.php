@@ -22,7 +22,7 @@
                 <div class="col-md-2">
                     <div class="input-group">
                         <div class="form-floating" style="height: 50px;">
-                            <input value="" placeholder="" class="form-control dateStart" id="dateStart" name="dateStart" />
+                            <input value="01/<?= date('m/Y') ?>" placeholder="" class="form-control dateStart" id="dateStart" name="dateStart" />
                             <label style="z-index: 1;" style="z-index: 1;">Tgl Awal Dokumen</label>
                         </div>
                         <div class="input-group-append" style="height:50px;">
@@ -35,7 +35,7 @@
                 <div class="col-md-2">
                     <div class="input-group">
                         <div class="form-floating" style="height: 50px;">
-                            <input value="" placeholder="" class="form-control dateEnd" id="dateEnd" name="dateEnd" />
+                            <input value="<?= date('d/m/Y') ?>" placeholder="" class="form-control dateEnd" id="dateEnd" name="dateEnd" />
                             <label style="z-index: 1;" style="z-index: 1;">Tgl Akhir Dokumen</label>
                         </div>
                         <div class="input-group-append" style="height:50px;">
@@ -49,7 +49,6 @@
                     <div class="form-floating mb-3">
                         <select class="form-select bc_id" name="bc_id" id="bc_id">
                             <option disabled selected value=""></option>
-                            <option value="0">NON PABEAN</option>
                             <?php foreach ($dataDokumen as $d) : ?>
                                 <option value="<?= $d['id'] ?>">
                                     <?= $d['value']; ?>
@@ -91,32 +90,6 @@
                             <option disabled selected value=""></option>
                         </select>
                         <label style="z-index: 1;">Pilih Warehouse</label>
-                    </div>
-                </div>
-                <div class="col-md-2">
-                    <div class="input-group">
-                        <div class="form-floating" style="height: 50px;">
-                            <input value="01/<?= date('m/Y') ?>" placeholder="" class="form-control dateStartLpb" id="dateStartLpb" name="dateStartLpb" />
-                            <label style="z-index: 1;" style="z-index: 1;">Tgl LPB Awal</label>
-                        </div>
-                        <div class="input-group-append" style="height:50px;">
-                            <button disabled class="btn btn-secondary" type="button">
-                                <i class="fas fa-calendar-alt"></i>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-2">
-                    <div class="input-group">
-                        <div class="form-floating" style="height: 50px;">
-                            <input value="<?= date('d/m/Y') ?>" placeholder="" class="form-control dateEndLpb" id="dateEndLpb" name="dateEndLpb" />
-                            <label style="z-index: 1;" style="z-index: 1;">Tgl LPB Akhir</label>
-                        </div>
-                        <div class="input-group-append" style="height:50px;">
-                            <button disabled class="btn btn-secondary" type="button">
-                                <i class="fas fa-calendar-alt"></i>
-                            </button>
-                        </div>
                     </div>
                 </div>
                 <div class="col-md-4">
@@ -189,8 +162,6 @@
             data: function(d) {
                 d.dateStart = $('#dateStart').val();
                 d.dateEnd = $('#dateEnd').val();
-                d.dateStartLpb = $('#dateStartLpb').val();
-                d.dateEndLpb = $('#dateEndLpb').val();
                 d.bc_id = $('#bc_id').val();
                 d.sumber = $('#sumber').val();
                 d.divisi_id = $('#divisi_id').val();
@@ -198,6 +169,9 @@
                 d.search = $('#search').val();
             }
         },
+        order: [
+            [2, 'desc']
+        ],
         columns: [{
                 data: 'no',
                 orderable: false
@@ -239,20 +213,27 @@
                 data: 'barang_name'
             },
             {
-                data: 'spesifikasi'
-            },
+                data: 'spesifikasi',
+                className: 'total-col'
+            }, // tambahkan class untuk bold
             {
                 data: 'qty_order',
-                className: 'text-end',
+                className: 'text-end total-col', // bold juga kalau perlu
                 render: function(data) {
-                    return greatFormatRupiah(parseFloat(data).toFixed(2));
+                    if (data != "") {
+                        return greatFormatRupiah(parseFloat(data).toFixed(2));
+                    }
+                    return "";
                 }
             },
             {
                 data: 'qty_diterima',
-                className: 'text-end',
+                className: 'text-end total-col',
                 render: function(data) {
-                    return greatFormatRupiah(parseFloat(data).toFixed(2));
+                    if (data != "") {
+                        return greatFormatRupiah(parseFloat(data || 0).toFixed(2));
+                    }
+                    return "";
                 }
             },
             {
@@ -263,20 +244,39 @@
             },
             {
                 data: 'total_harga',
-                className: 'text-end',
+                className: 'text-end total-col',
                 render: function(data) {
-                    return greatFormatRupiah(data);
+                    if (data != "") {
+                        return greatFormatRupiah(parseFloat(data).toFixed(2) || 0);
+                    }
+                    return "";
                 }
             },
             {
                 data: 'keterangan'
             }
         ],
-        // scrollX: true,
-        "initComplete": function(settings, json) {
-            $('.dataTables_length').empty();
-            $('.dataTables_length').html("<div><label class='text-center ml-2 mt-2'>Show <b class='entries-label'>25</b> Entries</label></div>");
-            $('.dataTable').wrap("<div style='overflow:auto; width:100%;position:relative;'></div>");
+        createdRow: function(row, data) {
+            if (data.is_total_row) {
+                $(row).addClass('table-secondary'); // background
+
+                // gabungkan kolom spesifikasi + qty_order
+                $('td:eq(13)', row)
+                    .attr('colspan', 2)
+                    .attr('style', 'font-weight:700 !important; text-align:right;')
+                    .text('TOTAL');
+
+                // hapus kolom qty_order yang digabung
+                $('td:eq(14)', row).remove();
+
+                // bold + right untuk qty_diterima (sekarang index 14)
+                $('td:eq(14)', row)
+                    .attr('style', 'font-weight:700 !important; text-align:right;');
+
+                // bold + right untuk total_harga (sekarang index 17)
+                $('td:eq(17)', row)
+                    .attr('style', 'font-weight:700 !important; text-align:right;');
+            }
         },
         //responsive: true,
         display: "stripe",
@@ -295,7 +295,7 @@
         }
     });
 
-    $(".dateStart,.dateEnd,.dateStartLpb,.dateEndLpb").datepicker({
+    $(".dateStart,.dateEnd").datepicker({
         todayHighlight: true,
         format: "dd/mm/yyyy",
         orientation: "bottom auto",
@@ -379,19 +379,17 @@
         var sumber = $('#sumber option:selected').val();
         var divisiId = $('#divisi_id option:selected').val();
         var warehouseId = $('#warehouse_id option:selected').val();
-        var dateStartLpb = $('#dateStartLpb').val();
-        var dateEndLpb = $('#dateEndLpb').val();
 
-        if (dateStartLpb == '' || dateEndLpb == '') {
+        if (dateStart == '' || dateEnd == '') {
             Swal.fire({
                 icon: 'error',
-                title: 'Pilih tanggal mulai & tanggal selesai LPB',
+                title: 'Pilih tanggal mulai & tanggal selesai',
                 confirmButtonColor: '#4e73df',
             });
 
             return;
         } else {
-            var url = "<?= base_url('laporan-bea-cukai/all-masuk/excel') ?>" + '?dateStart=' + dateStart + '&dateEnd=' + dateEnd + '&bc_id=' + bcId + '&sumber=' + sumber + '&divisi_id=' + divisiId + '&warehouse_id=' + warehouseId + '&dateStartLpb=' + dateStartLpb + '&dateEndLpb=' + dateEndLpb;
+            var url = "<?= base_url('laporan-bea-cukai/all-masuk/excel') ?>" + '?dateStart=' + dateStart + '&dateEnd=' + dateEnd + '&bc_id=' + bcId + '&sumber=' + sumber + '&divisi_id=' + divisiId + '&warehouse_id=' + warehouseId;
             window.location.href = url;
         }
     })
