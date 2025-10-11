@@ -47,13 +47,13 @@ class BC40Model extends Model
             'bc_40.createdAt'                        => 'bc_40.createdAt',
             'bc_40.no_aju'                           => 'bc_40.no_aju',
             'bc_purchase_order.po_type'              => 'bc_purchase_order.po_type',
-            'bc_purchase_order.multiple_lpb_no'      => 'bc_purchase_order.multiple_lpb_no',
-            'bc_purchase_order.multiple_po_no'       => 'bc_purchase_order.multiple_po_no',
+            'bc_purchase_order.supplier_id'      => 'bc_purchase_order.supplier_id',
         ];
         $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
 
         $sort = $availableSort[$addCondition['sort'] ?? 'createdAt'] ?? 'bc_purchase_order.createdAt';
         $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'DESC';
+
 
         $selectQry = "bc_40.*,
             bc_purchase_order.multiple_po_no,

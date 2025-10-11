@@ -2512,11 +2512,6 @@ class JurnalUmum extends BaseController
     public function insertDataPanjarPinjamanTransaction($payID)
     {
         try {
-            // Get division from employee
-            $divisi = $this->EmployeeModel->select('division_id')
-                ->asObject()
-                ->where('id', session()->get("login")->employee_id)
-                ->first();
 
             // Get parent transaction data
             $transaction = $this->panjarPinjamanTransactionModel
@@ -2530,10 +2525,14 @@ class JurnalUmum extends BaseController
             // Get all transaction details
             $panjarDetails = $this->PanjarSupplierModel
                 ->where('transaction_id', $payID)
+                ->where('deletedAt', null)
+                ->where('company_id', $this->this_company_id)
                 ->findAll();
 
             $pinjamanDetails = $this->PinjamanSupplierModel
                 ->where('transaction_id', $payID)
+                ->where('deletedAt', null)
+                ->where('company_id', $this->this_company_id)
                 ->findAll();
 
             // Validate at least one detail exists
@@ -2649,7 +2648,7 @@ class JurnalUmum extends BaseController
                     'id_transaksi' => $id_transaksi_jurnal,
                     'id_coa' => $detail['akun_kas'],
                     'company_id' => $transaction->company_id,
-                    'divisi_id' => $divisi->division_id,
+                    'divisi_id' => $transaction->divisi_id,
                     'tanggal_jurnal' => $transaction->tanggal,
                     'debit' => $nominal,
                     'kredit' => 0,
@@ -2665,7 +2664,7 @@ class JurnalUmum extends BaseController
                     'id_transaksi' => $id_transaksi_jurnal,
                     'id_coa' => $detail['akun_selisih'],
                     'company_id' => $transaction->company_id,
-                    'divisi_id' => $divisi->division_id,
+                    'divisi_id' => $transaction->divisi_id,
                     'tanggal_jurnal' => $transaction->tanggal,
                     'debit' => 0,
                     'kredit' => $nominal,

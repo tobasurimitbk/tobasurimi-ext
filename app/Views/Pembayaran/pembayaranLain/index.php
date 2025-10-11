@@ -8,8 +8,8 @@
                 <h5 class="modal-title"><label class="title-name"></label></h5>
             </div>
             <div class="modal-body">
-                <?= csrf_field() ?>
                 <form class="create-form" role="form" method="POST">
+                    <?= csrf_field() ?>
                     <!-- Parent Form (Header) -->
                     <div class="card mb-4">
                         <div class="card-header bg-light">
@@ -258,7 +258,6 @@
             </a>
         <?php endif; ?>
     </div>
-    <?= csrf_field() ?>
     <div class="card">
         <div class="card-body">
             <div class="row justify-content-end row-col-spp">
@@ -1228,7 +1227,6 @@
                     cancelButtonText: 'Kembali',
                 }).then((result) => {
                     if (result.isConfirmed) {
-                        const csrf = $('meta[name="csrf-token"]').attr('content');
                         let id = $('#id').val();
                         const jenisPembayaran = $('#jenis_pembayaran option:selected').val();
 
@@ -1268,10 +1266,8 @@
                             url: url,
                             data: JSON.stringify(requestData),
                             contentType: "application/json",
-                            headers: {
-                                "X-CSRF-TOKEN": csrf
-                            },
-                            beforeSend: function() {
+                            beforeSend: function(xhr) {
+                                xhr.setRequestHeader('X-CSRF-Token', csrf.val());
                                 setLoading();
                             },
                             complete: function() {
@@ -1280,6 +1276,7 @@
                             method: method,
                             dataType: "json",
                             success: function(response) {
+                                csrf.val(response.token); 
                                 if (response.status) {
                                     Swal.fire({
                                         icon: 'success',
@@ -1290,21 +1287,15 @@
                                         $(".add-modal").modal("hide");
                                         resetForm();
                                         details = []; // Clear details array
-                                        location.reload();
-                                    });
-                                } else if (response.reload) {
-                                    Swal.fire({
-                                        icon: 'error',
-                                        title: response.message,
-                                        confirmButtonColor: '#4e73df',
-                                    }).then(() => {
-                                        location.reload();
+                                        
                                     });
                                 } else {
                                     Swal.fire({
                                         icon: 'error',
                                         title: response.message,
                                         confirmButtonColor: '#4e73df',
+                                    }).then(() => {
+                                        table.ajax.reload()
                                     });
                                 }
                             },
@@ -1333,8 +1324,6 @@
 
 
     const remove = function(id) {
-        const csrfToken = '<?= csrf_token() ?>';
-        const csrf = $(`[name="${csrfToken}"]`);
         Swal.fire({
             icon: 'question',
             title: 'Hapus Pembayaran Ini ?',
@@ -1363,6 +1352,7 @@
                     processData: false,
                     contentType: false,
                     success: function(response) {
+                        csrf.val(response.token); 
                         if (response.status) {
                             Swal.fire({
                                 icon: 'success',
@@ -1450,7 +1440,6 @@
             cancelButtonText: 'Kembali',
         }).then((result) => {
             if (result.isConfirmed) {
-                const csrf = $(`[name="${csrfToken}"]`);
                 $.ajax({
                     url: "<?= base_url("pembayaran-lain/posting"); ?>",
                     data: {
@@ -1475,8 +1464,8 @@
                                 text: response.message,
                                 confirmButtonColor: '#4e73df',
                             }).then(() => {
-                                // table.ajax.reload();
-                                location.reload();
+                                table.ajax.reload();
+                                // 
                             });
                         }
                     },
@@ -1576,9 +1565,6 @@
         let divisiId = $("#divisi_id option:selected").text();
         let bankId = $("#bank_id option:selected").val();
         let tanggalPembayaran = $("#tanggal_pembayaran").val();
-        
-        const csrfToken = '<?= csrf_token() ?>';
-        const csrf = $(`[name="${csrfToken}"]`);
         
         let url = "<?= base_url('pembayaran-lain/generate-no-pembayaran'); ?>";
         url += `?jenisPembayaran=${encodeURIComponent(jenisPembayaran)}&divisiId=${encodeURIComponent(divisiId)}&metodePembayaran=${encodeURIComponent(metodePembayaran)}&bankId=${encodeURIComponent(bankId)}&tanggalPembayaran=${encodeURIComponent(tanggalPembayaran)}`;

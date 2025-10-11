@@ -98,16 +98,19 @@
                             <input type="text" name="search" id="search" class="form-control search" placeholder="Cari Data">
                             <label style="z-index: 1;">Cari Data</label>
                         </div>
-                        <div class="input-group-append" style="height:50px;">
-                            <button class="btn btn-secondary" onclick="handleFilter()" type="button">
-                                <i class="fas fa-search"></i>
-                            </button>
-                        </div>
                     </div>
+                </div>
+                <div class="col-md-4">
+                    <button type="button" class="btn btn-lg" style="height: 45px; background-color:#B8522A; color:whitesmoke;" onclick="handleFilter()">
+                        <span style="font-size: 15px;">
+                            <i class="fas fa-search"></i> Filter
+                        </span>
+                    </button>
+
                 </div>
             </div>
 
-            <div class="row">
+            <div class="row mt-3">
                 <div class="table-responsive">
                     <table class="table table-bordered nowrap table-hover-tobasurimi dataTable" id="dataTable" width="100%" cellspacing="0">
                         <thead class="thead-dark">
@@ -258,7 +261,7 @@
         ],
         createdRow: function(row, data) {
             if (data.is_total_row) {
-                $(row).addClass('table-secondary'); // background
+                $(row).addClass('table-active'); // background
 
                 // gabungkan kolom spesifikasi + qty_order
                 $('td:eq(13)', row)
@@ -350,12 +353,6 @@
         $.ajax({
             url: `<?= base_url('proses-rebus/warehouse'); ?>`,
             method: "GET",
-            beforeSend: function() {
-                setLoading();
-            },
-            complete: function() {
-                stopLoading();
-            },
             data: {
                 divisi_id: $("#divisi_id option:selected").val(),
             },

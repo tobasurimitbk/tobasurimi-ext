@@ -344,9 +344,9 @@
                     </td>
                     <td>
                         <table style="width: 100%;">
-                            <tr>
-                                <td style="text-align: right; width:130px;">Tanggal</td>
-                                <td style="text-align: right; width:50px;">: <?= date('d-M-Y', strtotime($dataPO->po_date)); ?></td>
+                            <tr style="text-align: right;">
+                                <td style="text-align: right; width:110px;"></td>
+                                <td style="text-align: right; width:110px;">Tanggal : <?= date('d-M-Y', strtotime($dataPO->po_date)); ?></td>
                             </tr>
                             <tr>
                                 <td>&nbsp;</td>
@@ -631,8 +631,8 @@
                     <td>
                         <table style="width: 100%;">
                             <tr>
-                                <td style="text-align: right; width:130px;">Tanggal</td>
-                                <td style="text-align: right; width:50px;">: <?= date('d-M-Y', strtotime($dataPO->po_date)); ?></td>
+                                <td style="text-align: right; width:110px;"></td>
+                                <td style="text-align: right; width:110px;">Tanggal : <?= date('d-M-Y', strtotime($dataPO->po_date)); ?></td>
                             </tr>
                             <tr>
                                 <td>&nbsp;</td>

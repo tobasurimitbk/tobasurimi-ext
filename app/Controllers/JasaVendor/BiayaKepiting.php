@@ -145,12 +145,7 @@ class BiayaKepiting extends BaseController
 
     public function create()
     {
-        $data = [
-            'tanggal' => date('Y-m-d'),
-            'jasaVendorIn' => $this->biayaKepitingModel->dropdownJasaVendorKepitingKukusIn(),
-        ];
-
-        return view('jasaVendor/biayaKepiting/form', $data);
+        return view('jasaVendor/biayaKepiting/form');
     }
 
     public function detail($id)
@@ -646,20 +641,22 @@ class BiayaKepiting extends BaseController
     {
         $jasaVendorInID = $this->request->getVar('jasa_vendor_in_id');
         $id = $this->request->getVar('id');
-        if (empty($id)) {
-            // $data = $this->biayaKepitingModel->dropdownBarang($jasaVendorInID);
+
+        // Pastikan $id bisa handle multiple atau single value
+        if (!empty($id)) {
+            $data = $this->biayaKepitingModel->dropdownBarangKepitingKukus($jasaVendorInID, $$id);
+            $dataPerolehanGaji = $this->biayaKepitingModel->dropdownPerolehanGaji($id);
+            $dataBonus = $this->biayaKepitingBonusModel->dropdownBarang($jasaVendorInID, $$id);
+        } else {
+            // Kalau belum ada ID dikirim
             $data = $this->biayaKepitingModel->dropdownBarangKepitingKukus($jasaVendorInID);
             $dataPerolehanGaji = $this->biayaKepitingModel->dropdownPerolehanGaji();
             $dataBonus = $this->biayaKepitingBonusModel->dropdownBarang($jasaVendorInID);
-        } else {
-            $id = decrypt($id);
-            $data = $this->biayaKepitingModel->dropdownBarangKepitingKukus($jasaVendorInID, $id);
-            $dataPerolehanGaji = $this->biayaKepitingModel->dropdownPerolehanGaji($id);
-            $dataBonus = $this->biayaKepitingBonusModel->dropdownBarang($jasaVendorInID, $id);
         }
 
+        // Ambil data vendor terkait
         $dataVendorIn = $this->jasaVendorInModel->where('id', $jasaVendorInID)->first();
-        $dataVendor =  $this->vendorModel->where('id', $dataVendorIn['vendor_id'])->first();
+        $dataVendor = $this->vendorModel->where('id', $dataVendorIn['vendor_id'])->first();
 
         return response()->setJSON([
             'data' => $data,

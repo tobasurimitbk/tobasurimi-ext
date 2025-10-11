@@ -183,25 +183,11 @@ class PinjamanSupplier extends BaseController
 
             $insert = $this->pinjamanSupplierModel->insert($insertData);
 
-            if (!$insert) {
-                $data = [
-                    "status" => false,
-                    "message" => 'Data Gagal Disimpan!',
-                    "payload" => json_encode($insertData),
-                    'token' => csrf_hash()
-                ];
-                echo json_encode($data);
-                return;
-            }
-
-            $data = [
-                "status" => true,
-                "message" => "Data Berhasil disimpan",
-                "payload" => json_encode($insertData),
+            return $this->response->setJSON([
+                'status' => true,
+                'message' => "Data berhasil disimpan",
                 'token' => csrf_hash()
-            ];
-            echo json_encode($data);
-            return;
+            ]);
         } catch (\Exception $e) {
             $data = [
                 "status" => false,
@@ -246,9 +232,9 @@ class PinjamanSupplier extends BaseController
 
             $check = $this->pinjamanSupplierModel
                             ->where('company_id', $this->this_company_id)
-                            ->where('no_pinjaman', $this->request
+                            ->where('no_pinjaman', $this->request)
                             ->where('id !=', $id)
-                            ->getPost("no_pinjaman"))
+                            ->getPost("no_pinjaman")
                             ->first();
             if ($check != null) {
                 return response()->setJSON([

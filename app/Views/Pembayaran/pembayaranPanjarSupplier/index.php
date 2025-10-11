@@ -231,7 +231,6 @@
         <div class="card-body">
             <div class="row justify-content-end row-col-spp">
                 <div class="col mb-4">
-                    <?= csrf_field() ?>
                     <div class="input-group input-group-password">
                         <input autocomplete="one-time-code" class="form-control input-picker dateStart" id="dateStart" name="dateStart" placeholder="Tanggal Awal">
                         <div class="input-group-prepend group-prepend-password align-items-center">
@@ -344,6 +343,8 @@
 
 <script>
     const csrfToken = '<?= csrf_token() ?>';
+    const csrf = $(`[name="${csrfToken}"]`);
+
     let sort = "no_panjar";
     let sortType = "desc";
     let trigger = true;
@@ -570,7 +571,6 @@
             cancelButtonText: 'Kembali',
         }).then((result) => {
             if (result.isConfirmed) {
-                const csrf = $(`[name="${csrfToken}"]`);
                 $.ajax({
                     url: "<?= base_url("panjar-supplier/delete"); ?>",
                     data: {
@@ -615,7 +615,6 @@
             cancelButtonText: 'Kembali',
         }).then((result) => {
             if (result.isConfirmed) {
-                const csrf = $(`[name="${csrfToken}"]`);
                 let id = $(".id").val();
                 setLoading()
                 $.ajax({
@@ -625,6 +624,10 @@
                     },
                     beforeSend: function(xhr) {
                         xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                        setLoading();
+                    },
+                    complete: function() {
+                        stopLoading();
                     },
                     method: "POST",
                     dataType: "json",
@@ -681,47 +684,6 @@
         // Hide modal
         $('.add-modal').modal('hide');
     });
-
-    // $('#add_modal').on('hide.bs.modal', function(e) {
-
-    //     // 1. Reset form utama
-    //     isEditMode = false;
-    //     initialValues = {};
-    //     // $('.create-form')[0].reset();
-        
-    //     // // 2. Reset select2
-    //     // $('.form-select').val('').trigger('change');
-        
-    //     // 3. Clear detail table
-    //     $('#detail-table tbody').empty();
-        
-    //     // 4. Reset array details
-    //     details = [];
-        
-    //     // 5. Reset editing state
-    //     editingIndex = -1;
-        
-    //     // 6. Reset tombol
-    //     $('.btn-add-detail').show();
-    //     $('.btn-update-detail').hide();
-        
-    //     // 7. Reset validasi
-    //     $('.is-invalid').removeClass('is-invalid');
-    //     $('.has-error').removeClass('has-error');
-    //     $('.text-danger').remove();
-        
-    //     // 8. Reset field khusus
-    //     $('#auto_generate').show();
-    //     $('#no_transaksi').val('').prop('disabled', false);
-        
-    //     // 9. Reset title dan tombol delete
-    //     $(".title-name").text("Tambah Data Panjar & Pinjaman");
-    //     $(".delete-btn").hide();
-        
-    //     // 10. Reset ID jika ada
-    //     $("#id").val('');
-        
-    // });
 
     // Fungsi reset tambahan yang bisa dipanggil manual
     function resetAllForm() {
@@ -884,9 +846,6 @@
         let paymentMethod = $("#payment_method option:selected").text();
         let bankId = $("#bank_id option:selected").val();
         let tanggalPembayaran = $("#tanggal_pembayaran").val();
-        
-        const csrfToken = '<?= csrf_token() ?>';
-        const csrf = $(`[name="${csrfToken}"]`);
         
         let url = "<?= base_url('panjar-supplier/generate-no-panjar'); ?>";
         url += `?jenisPembayaran=${encodeURIComponent(jenisPembayaran)}&divisiId=${encodeURIComponent(divisiId)}&paymentMethod=${encodeURIComponent(paymentMethod)}&bankId=${encodeURIComponent(bankId)}&tanggalPembayaran=${encodeURIComponent(tanggalPembayaran)}`;
@@ -1339,9 +1298,7 @@
                     cancelButtonText: 'Kembali',
                 }).then((result) => {
                     if (result.isConfirmed) {
-                        const csrf = $('meta[name="csrf-token"]').attr('content');
                         let data = new FormData();
-
                         // Add main form data
                         data.append('no_transaksi', $('#no_transaksi').val());
                         data.append('payment_method', $('#payment_method option:selected').val());
@@ -1377,15 +1334,16 @@
                             dataType: "json",
                             processData: false,
                             contentType: false,
-                            headers: {
-                                "X-CSRF-TOKEN": csrf
+                            beforeSend: function(xhr) {
+                                xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                                setLoading();
                             },
-                            beforeSend: function() {
-                                startLoading();
+                            complete: function() {
+                                stopLoading();
                             },
                             success: function(response) {
+                                csrf.val(response.token);
                                 if (response.status) {
-                                    stopLoading();
                                     Swal.fire({
                                         icon: 'success',
                                         title: response.message,
@@ -1399,12 +1357,13 @@
                                         icon: 'error',
                                         title: response.message,
                                         confirmButtonColor: '#4e73df',
+                                    }).then(() => {
+                                        $(".add-modal").modal("hide");
+                                        table.ajax.reload();
                                     });
-                                    stopLoading();
                                 }
                             },
                             error: function(response) {
-                                stopLoading();
                                 if (response.responseJSON) {
                                     Swal.fire({
                                         icon: 'error',
@@ -1424,15 +1383,6 @@
                 });
             }
         });
-
-        // Helper functions
-        function startLoading() {
-            $('.btn-submit-form').prop('disabled', true).html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Memproses...');
-        }
-
-        function stopLoading() {
-            $('.btn-submit-form').prop('disabled', false).html('Simpan Semua');
-        }
     });
 
 
@@ -1508,7 +1458,6 @@
             cancelButtonText: 'Kembali',
         }).then((result) => {
             if (result.isConfirmed) {
-                const csrf = $(`[name="${csrfToken}"]`);
                 $.ajax({
                     url: "<?= base_url("panjar-supplier/update-status"); ?>",
                     data: {
@@ -1525,7 +1474,6 @@
                     method: "POST",
                     dataType: "json",
                     success: function(response) {
-                        console.log("Response:", response); // Debugging
                         csrf.val(response.token);
                         if (response.status) {
                             Swal.fire({

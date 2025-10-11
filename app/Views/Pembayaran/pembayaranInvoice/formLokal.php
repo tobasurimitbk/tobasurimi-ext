@@ -779,7 +779,7 @@
 
     function generatePaymentNumber() {
             // Get selected divisi and bank values
-            let jenisPembayaran = $("#jenis_pembayaran option:selected").text();
+            let jenisPembayaran = "MERAH";
             let divisiId = $("#divisi_id option:selected").text();
             let bankId = $("#bank_id option:selected").val();
             let paymentMethod = $("#payment_method option:selected").val();

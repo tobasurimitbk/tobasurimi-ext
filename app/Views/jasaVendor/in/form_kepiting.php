@@ -210,6 +210,17 @@
                     <label class="form-label font-weight-bold lable-title">Form Input Daftar Barang Masuk Dari Vendor</label>
                 </div>
 
+                <div class="col-md-12 mt-3 mx-4">
+                    <div class="form-check form-switch d-inline-flex align-items-center gap-2">
+                        <label class="form-check-label fw-semibold" for="flexSwitchCheckPosting">
+                            Jadikan 1 Baris
+                        </label>
+                        <input class="form-check-input" type="checkbox" id="flexSwitchCheckPosting" name="one_raw" value="1"   <?= !empty($jasaVendorIn) ? ($jasaVendorIn['status_posting'] ? 'disabled' : '') : '' ?>
+                        <?= !empty($jasaVendorIn) && $jasaVendorIn['one_raw'] ? 'checked' : '' ?> >
+                    </div>
+                </div>
+
+
                 <div class="col-md-12 col-table-button-tts">
                     <div class="table-responsive">
 
@@ -351,6 +362,7 @@
 
     var listBarang = [];
     var listBarangGroup = [];
+    let listBarangGroupOriginal = [];   
 
     <?php if (!empty($jasaVendorIn)) : ?>
         let arr = $('.multiple_jasa_vendor_out_id').val();
@@ -448,6 +460,24 @@
             }
         })
     });
+
+    $('#flexSwitchCheckPosting').on('change', function() {
+        const isGrouped = $(this).is(':checked');
+
+        if (isGrouped) {
+            // simpan backup sebelum diubah
+            listBarangGroupOriginal = JSON.parse(JSON.stringify(listBarangGroup));
+
+            // ubah jadi grouped
+            listBarangGroup = groupBySupplier(listBarangGroupOriginal);
+            drawTable3(listBarangGroup);
+        } else {
+            // restore data asli
+            listBarangGroup = JSON.parse(JSON.stringify(listBarangGroupOriginal));
+            drawTable3(listBarangGroup);
+        }
+    });
+
 
     // VALIDATOR
     var validator = $(".create-form").validate({
@@ -602,6 +632,10 @@
                         if (result.isConfirmed) {
                             let id = $('#id').val();
                             let data = new FormData(document.querySelector(".create-form"));
+
+                            let oneRaw = $('#flexSwitchCheckPosting').is(':checked') ? 1 : 0;
+                            data.append('one_raw', oneRaw);
+
                             data.append('listBarang', JSON.stringify(listBarangGroup));
 
                             if (id) {
@@ -730,21 +764,6 @@
                 }
             });
 
-            // EACH 
-            // var isAdd = false;
-
-            // $.each(barangFirst.list_barang_masuk, function(i, v) {
-            //     if (
-            //         v.supplier_id == supplier_id &&
-            //         (v.keterangan || '') == (keterangan || ''
-            //         ) &&
-            //         v.spesifikasi_in_id == spesifikasi_in_id
-            //     ) {
-            //         isAdd = true;
-            //     }
-            // });
-
-            // if (!isAdd) {
                 listBarangGroup[index].list_barang_masuk.push({
                     barang1_id: barangFirst.barang1_id,
                     supplier_id: supplier_id,
@@ -757,14 +776,6 @@
                     qty_kotor: 0,
                     qty_bersih: 0
                 });
-            // } else {
-            //     Swal.fire({
-            //         icon: 'error',
-            //         title: 'Barang masuk sudah ada !',
-            //         confirmButtonColor: '#4e73df',
-            //         confirmButtonText: 'Ok'
-            //     });
-            // }
 
             // DRAW BARANG MASUK
             drawTable2(supplier_id, keterangan, listBarangGroup, stock_dokumen)
@@ -1088,6 +1099,47 @@
                 table.find('tbody').append(newRow);
             });
         }
+    }
+
+     // fungsi grouping by supplier
+    function groupBySupplier(list) {
+        const grouped = {};
+
+        list.forEach(v => {
+            const supplierId = v.supplier_id;
+
+            if (!grouped[supplierId]) {
+                grouped[supplierId] = {
+                    jasa_vendor_out_id: v.jasa_vendor_out_id,
+                    jasa_vendor_out_detail_id: v.jasa_vendor_out_detail_id,
+                    stock_out_id: v.stock_out_id,
+                    bc_id: v.bc_id,
+                    no_aju: v.no_aju,
+                    barang1_id: v.barang1_id,
+                    supplier_id: supplierId,
+                    supplier_name: v.supplier_name,
+                    keterangan: v.keterangan,
+                    stock_dokumen: "ON GROUP",
+                    tipe_barang: v.tipe_barang,
+                    kode_barang_out: v.kode_barang_out,
+                    barang_out: v.barang_out,
+                    satuan_out: v.satuan_out,
+                    qty_out: 0,
+                    list_barang_masuk: [],
+                };
+            }
+
+            // 🔸 total qty per supplier
+            grouped[supplierId].qty_out += parseFloat(v.qty_out);
+
+            // 🔸 gabungkan list barang masuk
+            if (Array.isArray(v.list_barang_masuk)) {
+                grouped[supplierId].list_barang_masuk = grouped[supplierId].list_barang_masuk.concat(v.list_barang_masuk);
+            }
+        });
+
+        // ubah jadi array biar bisa di-loop di drawTable3
+        return Object.values(grouped);
     }
 
     function deleteDetail(supplier_id, keterangan, spesifikasi_in_id, stock_dokumen) {

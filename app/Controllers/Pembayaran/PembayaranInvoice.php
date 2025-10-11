@@ -1544,7 +1544,8 @@ class PembayaranInvoice extends BaseController
                 'akun_selisih'     => $this->request->getVar('akun_selisih'),
                 'status_posting'   => '0',
                 'bank_id'          => $this->request->getVar('bank_id'),
-                'jenis_data'       => $isImport
+                'jenis_data'       => $isImport,
+                'pembayaran_dari' => $this->request->getVar('pembayaran_dari'),
             ]);
 
             // --- Buat map untuk tracking total per invoice ---

@@ -1678,6 +1678,7 @@ class BC40 extends BaseController
         $this->bcBarangDokumenModel->where('bc_purchase_order_id', $bcPurchaseOrderID)->delete();
         $this->bcBarangTarifModel->where('bc_purchase_order_id', $bcPurchaseOrderID)->delete();
         $this->bcPurchaseOrderModel->delete($bcPurchaseOrderID);
+        $this->bcPurchaseOrderLPBModel->where('bc_purchase_order_id', $bcPurchaseOrderID)->delete(null, true);
 
         return response()->setJSON([
             'message' => "Dokumen BC 4.0 Berhasil dihapus",
