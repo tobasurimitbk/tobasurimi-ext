@@ -256,7 +256,7 @@
             },
 
             {
-                data: "subsidi",
+                data: "dppSubsidi",
                 className: "text-center",
             },
             {
@@ -303,7 +303,7 @@
                 $('.total-pph-bulanan').html(total.pphBulanan);
                 $('.total-total-bulanan').html(total.totalBulanan);
 
-                $('.total-dpp-subsidi').html(total.subsidi);
+                $('.total-dpp-subsidi').html(total.dppSubsidi);
                 $('.total-pph-subsidi').html(total.pphSubsidi);
                 $('.total-total-subsidi').html(total.totalSubsidi);
 
