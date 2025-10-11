@@ -440,8 +440,8 @@ class JasaVendorOutDetailModel extends Model
                         $stock_dokumen = $doc ? $doc['po_no'] : null;
                     }
 
-            $stockList['qty'] = $m['qty'] ?? 0;
-            $stockList['qty_kotor'] = $m['qty_kotor'] ?? 0;
+            $stockList['qty'] = $stockList['qty_diterima'] ?? 0;
+            $stockList['qty_kotor'] = $stockList['qty_diterima'] ?? 0;
             $bcType = isset($stockList['bc_id']) ? $metaDataModel->find($stockList['bc_id']) : null;
             $stockList['no_aju'] = isset($stockList['no_aju']) && $stockList['no_aju'] !== "-" ? $stockList['no_aju'] : "-";
             $stockList['bc_type'] = $bcType['value'] ?? "NON PABEAN";
@@ -464,9 +464,6 @@ class JasaVendorOutDetailModel extends Model
 
             $result[] = $stockList;
         }
-
-        // var_dump($result);
-        // die;
 
         return $result;
     }

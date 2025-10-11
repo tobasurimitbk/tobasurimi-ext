@@ -537,7 +537,10 @@ class JasaVendorIn extends BaseController
             ]);
         }
 
-        $check = $this->jasaVendorInModel->where('company_id', $this->this_company_id)->where('no_penerimaan_surat_jalan', $this->request->getVar('no_penerimaan_surat_jalan'))->first();
+        $check = $this->jasaVendorInModel
+            ->where('company_id', $this->this_company_id)
+            ->where('no_penerimaan_surat_jalan', $this->request->getVar('no_penerimaan_surat_jalan'))
+            ->first();
 
         if ($check != null) {
             return response()->setJSON([
@@ -547,20 +550,25 @@ class JasaVendorIn extends BaseController
             ]);
         }
 
+        // Insert data utama jasa_vendor_in
         $id = $this->jasaVendorInModel->insert([
             'company_id' => $this->this_company_id,
             'divisi_id' => $this->request->getVar('divisi_id'),
             'warehouse_id' => $this->request->getVar('warehouse_id'),
             'vendor_id' => $this->request->getVar('vendor_id'),
-            "tanggal" => $this->request->getVar("tanggal") ? date_format(date_create_from_format("d/m/Y", $this->request->getVar("tanggal")), "Y-m-d") : "",
+            'one_raw' => $this->request->getVar('one_raw'),
+            "tanggal" => $this->request->getVar("tanggal")
+                ? date_format(date_create_from_format("d/m/Y", $this->request->getVar("tanggal")), "Y-m-d")
+                : "",
             "no_surat_jalan_vendor" => $this->request->getVar('no_surat_jalan_vendor'),
             'status_closed_jasa_vendor_out' => $this->request->getVar('status_closed_jasa_vendor_out'),
             'no_penerimaan_surat_jalan' => $this->request->getVar('no_penerimaan_surat_jalan'),
-            'multiple_jasa_vendor_out_id' =>  str_replace(['\\"', '\\', '"'], '', json_encode($this->request->getVar('multiple_jasa_vendor_out_id'))),
-            'multiple_jasa_vendor_out_no' =>  str_replace(['\\"', '\\'], '', json_encode($jasaVendorOutNo)),
+            'multiple_jasa_vendor_out_id' => str_replace(['\\"', '\\', '"'], '', json_encode($this->request->getVar('multiple_jasa_vendor_out_id'))),
+            'multiple_jasa_vendor_out_no' => str_replace(['\\"', '\\'], '', json_encode($jasaVendorOutNo)),
             'keterangan' => $this->request->getVar('keterangan')
         ]);
 
+        // Update status jasa_vendor_out
         $statusClosedJasaVendorOut = $this->request->getVar('status_closed_jasa_vendor_out');
         $jasaVendorOutIdArr = $this->request->getVar('multiple_jasa_vendor_out_id');
 
@@ -570,31 +578,48 @@ class JasaVendorIn extends BaseController
             ]);
         }
 
-        foreach ($barangs as $b) {
-            // LIST BARANG MASUK
-            foreach ($b->list_barang_masuk as $c) {
+        // Step 1: Gabungkan semua list_barang_masuk (global grouping)
+        $groupedBarang = [];
 
-                $stockInId = $this->stockModel->initStockBarang(
-                        $this->this_company_id,
-                        $this->request->getVar('divisi_id'),
-                        $this->request->getVar('warehouse_id'),
-                        "bahan_baku",
-                        $c->spesifikasi_in_id
-                    );
-                    
-                $this->jasaVendorInDetailModel->insert([
-                        'jasa_vendor_in_id' => $id,
-                        'jasa_vendor_out_id' => $b->jasa_vendor_out_id,
-                        'jasa_vendor_out_detail_id' => $b->jasa_vendor_out_detail_id,
-                        'spesifikasi_in_id' => $c->spesifikasi_in_id,
-                        'stock_in_id' => $stockInId,
-                        'bc_in_id' => $b->bc_id,
-                        'no_aju_in' => $b->no_aju,
-                        'stock_dokumen' => $b->stock_dokumen,
-                        'qty_kotor' => $c->qty_kotor,
-                        'qty_bersih' => $c->qty_bersih
-                    ]);
+        foreach ($barangs as $b) {
+            foreach ($b->list_barang_masuk as $c) {
+               
+                    // Group berdasarkan spesifikasi + dokumen
+                    $key = $c->spesifikasi_in_id . '_' . $b->stock_dokumen;
+
+                    if (!isset($groupedBarang[$key])) {
+                        $groupedBarang[$key] = [
+                            'jasa_vendor_out_id' => $b->jasa_vendor_out_id ?? null,
+                            'jasa_vendor_out_detail_id' => $b->jasa_vendor_out_detail_id ?? null, // ambil dari data pertama yang ketemu
+                            'spesifikasi_in_id' => $c->spesifikasi_in_id,
+                            'bc_in_id' => $b->bc_id ?? null,
+                            'no_aju_in' => $b->no_aju ?? null,
+                            'stock_dokumen' => $b->stock_dokumen,
+                            'qty_kotor' => 0,
+                            'qty_bersih' => 0
+                        ];
+                    }
+
+                    $groupedBarang[$key]['qty_kotor'] += $c->qty_kotor;
+                    $groupedBarang[$key]['qty_bersih'] += $c->qty_bersih;
+
             }
+        }
+
+        // Step 2: Insert hasil grouping
+        foreach ($groupedBarang as $gb) {
+
+            $this->jasaVendorInDetailModel->insert([
+                'jasa_vendor_in_id' => $id,
+                'jasa_vendor_out_id' => $gb['jasa_vendor_out_id'],
+                'jasa_vendor_out_detail_id' => $gb['jasa_vendor_out_detail_id'],
+                'spesifikasi_in_id' => $gb['spesifikasi_in_id'],
+                'bc_in_id' => $gb['bc_in_id'],
+                'no_aju_in' => $gb['no_aju_in'],
+                'stock_dokumen' => $gb['stock_dokumen'],
+                'qty_kotor' => $gb['qty_kotor'],
+                'qty_bersih' => $gb['qty_bersih']
+            ]);
         }
 
         return response()->setJSON([
@@ -611,6 +636,7 @@ class JasaVendorIn extends BaseController
         $jasaVendorOutNo = $this->jasaVendorInModel->getJasaVendorOutNo(
             $this->request->getVar('multiple_jasa_vendor_out_id')
         );
+
         if (count($barangs) == 0) {
             return response()->setJSON([
                 'status' => false,
@@ -621,18 +647,23 @@ class JasaVendorIn extends BaseController
 
         $id = decrypt($this->request->getVar('id'));
 
+        // Update data utama jasa_vendor_in
         $this->jasaVendorInModel->update($id, [
             'company_id' => $this->this_company_id,
             'divisi_id' => $this->request->getVar('divisi_id'),
             'warehouse_id' => $this->request->getVar('warehouse_id'),
-            'status_closed_jasa_vendor_out' => $this->request->getVar('status_closed_jasa_vendor_out'),
+            'vendor_id' => $this->request->getVar('vendor_id'),
+            "tanggal" => $this->request->getVar("tanggal")
+                ? date_format(date_create_from_format("d/m/Y", $this->request->getVar("tanggal")), "Y-m-d")
+                : "",
             "no_surat_jalan_vendor" => $this->request->getVar('no_surat_jalan_vendor'),
-            'multiple_jasa_vendor_out_id' =>  str_replace(['\\"', '\\', '"'], '', json_encode($this->request->getVar('multiple_jasa_vendor_out_id'))),
-            'multiple_jasa_vendor_out_no' =>  str_replace(['\\"', '\\'], '', json_encode($jasaVendorOutNo)),
+            'status_closed_jasa_vendor_out' => $this->request->getVar('status_closed_jasa_vendor_out'),
+            'multiple_jasa_vendor_out_id' => str_replace(['\\"', '\\', '"'], '', json_encode($this->request->getVar('multiple_jasa_vendor_out_id'))),
+            'multiple_jasa_vendor_out_no' => str_replace(['\\"', '\\'], '', json_encode($jasaVendorOutNo)),
             'keterangan' => $this->request->getVar('keterangan')
         ]);
 
-
+        // Update status jasa_vendor_out
         $statusClosedJasaVendorOut = $this->request->getVar('status_closed_jasa_vendor_out');
         $jasaVendorOutIdArr = $this->request->getVar('multiple_jasa_vendor_out_id');
 
@@ -642,33 +673,50 @@ class JasaVendorIn extends BaseController
             ]);
         }
 
-        // Delete first and insert again
+        // Delete detail lama
         $this->jasaVendorInDetailModel->where('jasa_vendor_in_id', $id)->delete();
 
+        // Step 1: Gabungkan semua list_barang_masuk (global grouping)
+        $groupedBarang = [];
+
         foreach ($barangs as $b) {
-            // LIST BARANG MASUK
             foreach ($b->list_barang_masuk as $c) {
-                    $stockInId = $this->stockModel->initStockBarang(
-                        $this->this_company_id,
-                        $this->request->getVar('divisi_id'),
-                        $this->request->getVar('warehouse_id'),
-                        "bahan_baku",
-                        $c->spesifikasi_in_id
-                    );
+               
+                    // Group berdasarkan spesifikasi + dokumen
+                    $key = $c->spesifikasi_in_id . '_' . $b->stock_dokumen;
                     
-                    $this->jasaVendorInDetailModel->insert([
-                            'jasa_vendor_in_id' => $id,
-                            'jasa_vendor_out_id' => $b->jasa_vendor_out_id,
-                            'jasa_vendor_out_detail_id' => $b->jasa_vendor_out_detail_id,
+                    if (!isset($groupedBarang[$key])) {
+                        $groupedBarang[$key] = [
+                            'jasa_vendor_out_id' => $b->jasa_vendor_out_id ?? null,
+                            'jasa_vendor_out_detail_id' => $b->jasa_vendor_out_detail_id ?? null, // ambil dari data pertama yang ketemu
                             'spesifikasi_in_id' => $c->spesifikasi_in_id,
-                            'stock_in_id' => $stockInId,
-                            'bc_in_id' => $b->bc_id,
-                            'no_aju_in' => $b->no_aju,
+                            'bc_in_id' => $b->bc_id ?? null,
+                            'no_aju_in' => $b->no_aju ?? null,
                             'stock_dokumen' => $b->stock_dokumen,
-                            'qty_kotor' => $c->qty_kotor,
-                            'qty_bersih' => $c->qty_bersih
-                    ]);
+                            'qty_kotor' => 0,
+                            'qty_bersih' => 0
+                        ];
+                    }
+
+                    $groupedBarang[$key]['qty_kotor'] += $c->qty_kotor;
+                    $groupedBarang[$key]['qty_bersih'] += $c->qty_bersih;
+                
             }
+        }
+
+        // Step 2: Insert hasil grouping
+        foreach ($groupedBarang as $gb) {
+            $this->jasaVendorInDetailModel->insert([
+                'jasa_vendor_in_id' => $id,
+                'jasa_vendor_out_id' => $gb['jasa_vendor_out_id'],
+                'jasa_vendor_out_detail_id' => $gb['jasa_vendor_out_detail_id'],
+                'spesifikasi_in_id' => $gb['spesifikasi_in_id'],
+                'bc_in_id' => $gb['bc_in_id'],
+                'no_aju_in' => $gb['no_aju_in'],
+                'stock_dokumen' => $gb['stock_dokumen'],
+                'qty_kotor' => $gb['qty_kotor'],
+                'qty_bersih' => $gb['qty_bersih']
+            ]);
         }
 
         return response()->setJSON([
@@ -972,6 +1020,12 @@ class JasaVendorIn extends BaseController
 
                 $stockDetailId = $stockRevampModel->insertStockRevampJasaVendorIn($db, $data);
 
+                // 🔹 Update kolom stock_detail_in_id di jasa_vendor_in_detail
+                $this->jasaVendorInDetailModel
+                    ->where('id', $p['id'])
+                    ->where('deletedAt', null)
+                    ->set('stock_detail_in_id', $stockDetailId)
+                    ->update();
 
                 // ambil semua jasa vendor out terkait
                 $jasaVendorOut = $this->jasaVendorOutModel
@@ -1036,39 +1090,65 @@ class JasaVendorIn extends BaseController
         }
     }
 
-    public function unPosting()
+    public function unposting()
     {
+        $db = \Config\Database::connect();
+        $db->transBegin();
+        $stockRevampModel = new StockRevampModel();
+
         try {
             $id = decrypt($this->request->getVar('id'));
-            $cekStockJasaVendorInUsed = $this->stockModel->checkStockJasaVendorInUsed(
-                $id
-            );
+            
+            $jasaVendorIn = $this->jasaVendorInModel->find($id);
+            $jasaVendorInDetail = $this->jasaVendorInDetailModel->where('deletedAt', null)->where('jasa_vendor_in_id', $id)->findAll();
 
-            if ($cekStockJasaVendorInUsed != null) {
-                return response()->setJSON([
-                    'status' => false,
-                    'message' => "Gagal UnPosting : " . $cekStockJasaVendorInUsed,
-                    'token' => csrf_hash()
-                ]);
+
+            if (empty($jasaVendorInDetail)) {
+                throw new \Exception("Detail Jasa Vendor In tidak ditemukan");
             }
 
-            $this->stockModel->unPostingStockJasaVendorIn($id);
+            foreach ($jasaVendorInDetail as $j) {
+                $data = [
+                    "stock_detail_akhir"     => $j["stock_detail_in_id"],    
+                    "qty_diterima_akhir"     => $j["qty_bersih"],
+                    "no_dokumen"            => $jasaVendorIn["no_penerimaan_surat_jalan"],
+                    "keterangan"            => "UNPOST JASA VENDOR MASUK"
+                ];
 
+                // Panggil model - jika gagal akan throw exception
+                $stockRevampModel->unpostStockMasuk($db, $data);
+            }
+
+            // update status Jasa Vendor In
             $this->jasaVendorInModel->update($id, [
                 'status_posting' => '0'
             ]);
 
-            return response()->setJSON([
-                'status' => true,
-                'message' => "Barang Masuk Berhasil Di Unposting",
-                'token' => csrf_hash()
+            // commit transaksi
+            $db->transCommit();
+
+            return $this->response->setJSON([
+                'message' => "Jasa Vendor In berhasil di-unpost",
+                'status'  => true,
+                'token'   => csrf_hash()
             ]);
-        } catch (Exception $e) {
-            return response()->setJSON([
-                'status' => false,
-                'message' => "Gagal Posting : Terjadi kesalahan saat unposting barang masuk",
-                'error' => $e->getTrace(),
-                'token' => csrf_hash()
+
+        } catch (\Exception $e) {
+            $db->transRollback();
+
+            return $this->response->setJSON([
+                'message' => "Gagal unpost Jasa Vendor In: " . $e->getMessage(),
+                'status'  => false,
+                'token'   => csrf_hash()
+            ]);
+            
+        } catch (\Throwable $th) {
+            $db->transRollback();
+
+            return $this->response->setJSON([
+                'message' => "Terjadi kesalahan sistem: " . $th->getMessage(),
+                'status'  => false,
+                'token'   => csrf_hash()
             ]);
         }
     }

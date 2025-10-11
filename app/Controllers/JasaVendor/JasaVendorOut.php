@@ -582,6 +582,7 @@ class JasaVendorOut extends BaseController
                     "stock_detail_asal"     => $j["stock_out_detail_id"],    
                     "qty_diterima_asal"     => $j["qty"],
                     "no_dokumen"            => $jasaVendorOut["no_surat_jalan"],
+                    "keterangan"            => "UNPOST JASA VENDOR KELUAR",
                 ];
 
                 // Panggil model - jika gagal akan throw exception
@@ -816,9 +817,26 @@ class JasaVendorOut extends BaseController
                     'stock_revamp.barang_master_id' => $barangMasterId,
                 ];
                 $dataResult = $stockRevampDetailModel->getStockListWithAddConditionForJasaVendorOut($condition);
+
                 
                 $resultArr = [];
+                $stock_dokumen = "";
                 foreach ($dataResult as $item) {
+
+                     if ($item['reference_type'] == "PROSES REBUS") {
+                        $doc = $this->prosesRebusModel
+                            ->select("no_rebus")
+                            ->where("id", $item['reference_id'])
+                            ->first();
+                        $stock_dokumen = $doc ? $doc['no_rebus'] : null;
+                    } else {
+                        $doc = $this->rmPurchaseOrderModel
+                            ->select("po_no")
+                            ->where("id", $item['po_id'])
+                            ->first();
+                        $stock_dokumen = $doc ? $doc['po_no'] : null;
+                    }
+
                     
                     $resultArr[] = [
                         'id' => $item['id'],
@@ -826,7 +844,7 @@ class JasaVendorOut extends BaseController
                         'bc_id' => $item['bc_id'],
                         'supplier_name' => $item['supplier_name'],
                         'bc_type' => $item['type_bc'],
-                        'stock_dokumen' => $item['po_no'] ?? '-',
+                        'stock_dokumen' => $stock_dokumen ?? '-',
                         'stock_date' => $item['po_date'],
                         'barang' => $item['barang'],
                         'reference_id' => $item['reference_id'],

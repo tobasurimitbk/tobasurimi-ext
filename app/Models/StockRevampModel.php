@@ -427,7 +427,8 @@ class StockRevampModel extends Model
     }
 
 
-
+    //            CAUTIONNN!!!!
+    // 2 FUNGSI DI BAWAH INI KHUSUS JASA VENDOR
 
     public function unpostStockKeluar(BaseConnection $db, array $data)
     {
@@ -499,6 +500,95 @@ class StockRevampModel extends Model
         }
     }
 
+    public function unpostStockMasuk(BaseConnection $db, array $data)
+    {
+        try {
+            $akhirId = $data['stock_detail_akhir']; // id stock detail IN yang mau di-unpost
+            $qtyIn   = $data['qty_diterima_akhir'] ?? 0;
+            $keterangan = $data['keterangan'] ?? 'UNPOST STOCK IN';
+            $noDokumen  = $data['no_dokumen'] ?? null;
+
+            // ==============================
+            // 1. Ambil stock detail akhir
+            // ==============================
+            $detailAkhir = $db->table('stock_revamp_detail')
+                ->where('id', $akhirId)
+                ->get()
+                ->getRowArray();
+
+            if (!$detailAkhir) {
+                throw new \Exception("Stock detail IN tidak ditemukan");
+            }
+
+            // ==============================
+            // 2. Ambil parent stock
+            // ==============================
+            $parentAkhir = $db->table('stock_revamp')
+                ->where('id', $detailAkhir['stock_id'])
+                ->get()
+                ->getRowArray();
+
+            if (!$parentAkhir) {
+                throw new \Exception("Parent stock IN tidak ditemukan");
+            }
+
+            // ==============================
+            // 3. Kurangi qty di detail dan parent
+            // ==============================
+            $newQtyDetail = max(0, $detailAkhir['qty_diterima'] - $qtyIn);
+            $newQtyBersih = max(0, $detailAkhir['qty_bersih'] - $qtyIn);
+
+            $db->table('stock_revamp_detail')
+                ->where('id', $akhirId)
+                ->update([
+                    'qty_diterima' => $newQtyDetail,
+                    'qty_bersih'   => $newQtyBersih,
+                    'updatedAt'    => date('Y-m-d H:i:s'),
+                ]);
+
+            $newQtyParentDiterima = max(0, $parentAkhir['qty_diterima'] - $qtyIn);
+            $newQtyParentBersih   = max(0, $parentAkhir['qty_bersih'] - $qtyIn);
+
+            $db->table('stock_revamp')
+                ->where('id', $parentAkhir['id'])
+                ->update([
+                    'qty_diterima' => $newQtyParentDiterima,
+                    'qty_bersih'   => $newQtyParentBersih,
+                    'updatedAt'    => date('Y-m-d H:i:s'),
+                ]);
+
+            // ==============================
+            // 4. Hapus history terkait detail IN ini
+            // ==============================
+            $db->table('stock_revamp_history')
+                ->where('stock_detail_akhir', $akhirId)
+                ->delete();
+
+            // ==============================
+            // 5. Insert log UNPOST (status OUT)
+            // ==============================
+            $db->table('stock_revamp_log')->insert([
+                'stock_detail_id' => $akhirId,
+                'status'          => 'OUT',
+                'keterangan'      => $keterangan,
+                'no_dokumen'      => $noDokumen,
+                'qty_diterima'    => $qtyIn,
+                'qty_bersih'      => $qtyIn,
+                'createdAt'       => date('Y-m-d H:i:s'),
+                'updatedAt'       => date('Y-m-d H:i:s'),
+            ]);
+
+            return true;
+
+        } catch (\Throwable $e) {
+            log_message('error', 'Unpost Stock IN Failed: ' . $e->getMessage());
+            throw $e;
+        }
+    }
+
+
+
+    // END OF 2 FUNGSI KHUSUS JASA VENDOR
 
 
     public function getBarangRebusAndStock($type_barang, $divisi_id, $warehouse_id)
