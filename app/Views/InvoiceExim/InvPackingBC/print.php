@@ -531,7 +531,7 @@
                             </td>
                             <td>:</td>
                             <td>
-                                <?= number_format($dataInvoice['total_berat_bersih'], 2) ?>
+                                <?= number_format($dataInvoice['total_berat_bersih'], 2) ?> Kg
                             </td>
                         </tr>
                         <tr style="font-weight: bold;">
@@ -540,7 +540,7 @@
                             </td>
                             <td>:</td>
                             <td>
-                                <?= number_format($dataInvoice['total_berat_kotor'], 2) ?>
+                                <?= number_format($dataInvoice['total_berat_kotor'], 2) ?> Kg
                             </td>
                         </tr>
                     </table>
