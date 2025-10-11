@@ -649,7 +649,13 @@ class Invoice extends BaseController
                 // "document_type"     => $postData['doc_type'],
                 "document_id"       => isset($postData['doc_id']) ? str_replace(['\\"', '\\', '"'], '', json_encode($postData['doc_id'])) : "",
                 "id_customer"       => $postData['id_customer'],
-                "document_no"       => $postData['noDocument'],
+                "document_no" => json_encode(
+                    array_map(
+                        fn($d) => trim(preg_replace('/\s+/', '', $d)),
+                        json_decode($postData['noDocument'], true) ?? []
+                    ),
+                    JSON_UNESCAPED_SLASHES
+                ),
                 "no_faktur"         => $noFaktur,
                 "tanggal_faktur"    => date('Y-m-d', strtotime(str_replace('/', '-', $postData['tanggal_faktur']))),
                 "terms"             => $postData['termin'] ?? '',
