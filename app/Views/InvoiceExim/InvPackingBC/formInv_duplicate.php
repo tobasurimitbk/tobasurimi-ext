@@ -598,7 +598,7 @@
                         <div class="col-md-6">
                             <div class="input-group input-group-password">
                                 <div class="form-floating mb-3" style="height: 50px;">
-                                    <input readonly autocomplete="one-time-code" type="text" class="form-control berat_kotor" oninput="this.value = greatFormatRupiah(this.value)" name="berat_kotor" id="berat_kotor" placeholder="Berat Kotor (Opsional)">
+                                    <input autocomplete="one-time-code" type="text" class="form-control berat_kotor" oninput="this.value = greatFormatRupiah(this.value)" name="berat_kotor" id="berat_kotor" placeholder="Berat Kotor (Opsional)">
                                     <label for="floatingInput">Berat Kotor (Kg)</label>
                                 </div>
                                 <div class="input-group-append" style="height:50px;">
