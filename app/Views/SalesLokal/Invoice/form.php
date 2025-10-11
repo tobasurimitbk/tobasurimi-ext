@@ -49,7 +49,7 @@
                     <div class="col-md-4">
                         <div class="input-group input-group-password">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input autocomplete="one-time-code" type="text" class="form-control no_faktur" id="no_faktur" name="no_faktur" value="<?= !empty($data) ? $data->no_faktur : ""; ?>" placeholder="Auto Generate">
+                                <input autocomplete="one-time-code" type="text" class="form-control no_faktur" id="no_faktur" name="no_faktur" value="<?= !empty($data) ? $data->no_faktur : ""; ?>" placeholder="Auto Generate" <?= (!empty($data) && $data->status_posting == 1) ? 'disabled' : '' ?>>
                                 <label for="floatingInput">No Faktur</label>
                             </div>
                             <div style="<?= !empty($data) ? "display: none" : ""; ?>" class="input-generate input-group-prepend group-prepend-password align-items-center">
@@ -59,14 +59,14 @@
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" type="text" class="form-control tanggal_faktur" id="tanggal_faktur" name="tanggal_faktur" value="<?= $data->tanggal_faktur ?? ""; ?>" placeholder="Tanggal Faktur"></input>
+                            <input autocomplete="one-time-code" type="text" class="form-control tanggal_faktur" id="tanggal_faktur" name="tanggal_faktur" value="<?= $data->tanggal_faktur ?? ""; ?>" placeholder="Tanggal Faktur" <?= (!empty($data) && $data->status_posting == 1) ? 'disabled' : '' ?>></input>
                             <label for="floatingInput">Tanggal Faktur</label>
                         </div>
                     </div>
 
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <select class="form-select" name="doc_type" id="doc_type">
+                            <select class="form-select" name="doc_type" id="doc_type" <?= (!empty($data) && $data->status_posting == 1) ? 'disabled' : '' ?>>
                                 <option value=""></option>
                                 <option value="pesanan" <?= !empty($data) ? ($data->document_type == 'pesanan' ? 'selected' : "") : ""; ?>>Pesanan</option>
                                 <option value="pengiriman" <?= !empty($data) ? ($data->document_type == 'pengiriman' ? 'selected' : "") : ""; ?>>Pengiriman</option>
@@ -79,9 +79,7 @@
                 <div class="row">
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-
-
-                            <select class="form-select id_customer" name="id_customer" id="id_customer">
+                            <select class="form-select id_customer" name="id_customer" id="id_customer" <?= (!empty($data) && $data->status_posting == 1) ? 'disabled' : '' ?>>
                                 <option value=""></option>
                                 <?php
                                 if (!empty($dataCustomers)) {
@@ -105,7 +103,7 @@
                     ?>
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <select class="form-select doc_id" multiple name="doc_id[]" id="doc_id">
+                            <select class="form-select doc_id" multiple name="doc_id[]" id="doc_id" <?= (!empty($data) && $data->status_posting == 1) ? 'disabled' : '' ?>>
                                 <option value=""></option>
                                 <?php if (!empty($data)) : ?>
                                     <?php if (!empty($documentList)) : ?>
@@ -140,7 +138,7 @@
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
 
-                            <select class="form-select termin" id="termin" name="termin">
+                            <select class="form-select termin" id="termin" name="termin" <?= (!empty($data) && $data->status_posting == 1) ? 'disabled' : '' ?>>
                                 <?php if ($termin != "") : ?>
                                     <option value=""></option>
                                     <?php foreach ($termin as $row) : ?>
@@ -155,7 +153,7 @@
 
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <select class="form-select jenis_penjualan" name="jenis_penjualan" id="jenis_penjualan">
+                            <select class="form-select jenis_penjualan" name="jenis_penjualan" id="jenis_penjualan" <?= (!empty($data) && $data->status_posting == 1) ? 'disabled' : '' ?>>
                                 <option value=""></option>
                                 <option value="1" <?= !empty($data) ? ($data->jenis_penjualan == 1 ? "selected" : "") : ""; ?>>By Sales</option>
                                 <option value="2" <?= !empty($data) ? ($data->jenis_penjualan == 2 ? "selected" : "") : ""; ?>>By Office</option>
@@ -182,13 +180,13 @@
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" class=" form-control" id="no_po" name="no_po" placeholder="Nomor PO" value="<?= $data->no_po ?? ''; ?>">
+                            <input autocomplete="one-time-code" class=" form-control" id="no_po" name="no_po" placeholder="Nomor PO" value="<?= $data->no_po ?? ''; ?>" <?= (!empty($data) && $data->status_posting == 1) ? 'disabled' : '' ?>>
                             <label for="floatingInput">No. PO</label>
                         </div>
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <select class="form-select ship_via" name="ship_via" id="ship_via">
+                            <select class="form-select ship_via" name="ship_via" id="ship_via" <?= (!empty($data) && $data->status_posting == 1) ? 'disabled' : '' ?>>
                                 <option value=""></option>
                                 <?php foreach ($via as $payload) : ?>
                                     <option value="<?= $payload->id; ?>" <?= !empty($data->ship_via_id) ? ($payload->id === $data->ship_via_id ? "selected" : "") : ""; ?>><?= $payload->value; ?></option>
@@ -204,7 +202,7 @@
 
                     <div class="col-md-4">
                         <div class="form-floating ff-ket mb-3" style="height: 70px;">
-                            <textarea autocomplete="one-time-code" style="height: 100%;" class="form-control Keterangan text-area-all" id="keterangan" name="keterangan" placeholder="Keterangan"><?= $data->keterangan ?? ""; ?></textarea>
+                            <textarea autocomplete="one-time-code" style="height: 100%;" class="form-control Keterangan text-area-all" id="keterangan" name="keterangan" placeholder="Keterangan" <?= (!empty($data) && $data->status_posting == 1) ? 'disabled' : '' ?>><?= $data->keterangan ?? ""; ?></textarea>
                             <label for="floatingInput">Keterangan</label>
                         </div>
                     </div>
@@ -213,7 +211,7 @@
                             <?php if (session()->get("login")->this_company_id != 16) { ?>
                                 <div class="col-md-2">
                                     <div class="form-floating mb-3" style="height: 50px;">
-                                        <select class="form-select company_ids" name="company_ids" id="company_ids">
+                                        <select class="form-select company_ids" name="company_ids" id="company_ids" <?= (!empty($data) && $data->status_posting == 1) ? 'disabled' : '' ?>>
                                             <option <?= !empty($data) ? ($data->id_company == "1" ? "selected" : "") : "selected"; ?> value="1">KIM 1</option>
                                             <option <?= !empty($data) ? ($data->id_company == "2" ? "selected" : "") : ""; ?> value="2">KIM 2</option>
                                             <option <?= !empty($data) ? ($data->id_company == "15" ? "selected" : "") : ""; ?> value="15">GLOBAL</option>
@@ -227,7 +225,7 @@
                                     <label for="floatingInput">Pajak</label>
                                     <div class="switch-form-pinjaman-karyawan">
                                         <label class="switch">
-                                            <input autocomplete="one-time-code" class="tax_status" name="tax_status" id="tax_status" type="checkbox" <?= !empty($data->status_tax) ? (($data->status_tax == 'true') ? 'checked' : '') : ''; ?>>
+                                            <input autocomplete="one-time-code" class="tax_status" name="tax_status" id="tax_status" type="checkbox" <?= !empty($data->status_tax) ? (($data->status_tax == 'true') ? 'checked' : '') : ''; ?> <?= (!empty($data) && $data->status_posting == 1) ? 'disabled' : '' ?>>
                                             <span class="slider round"></span>
                                         </label>
                                     </div>
@@ -235,7 +233,7 @@
                             </div>
                             <div class="col-md-4 col-taxes" style="display: none;">
                                 <div class="form-floating mb-3" style="height: 50px;">
-                                    <select class="form-select taxes" name="taxes" id="taxes">
+                                    <select class="form-select taxes" name="taxes" id="taxes" <?= (!empty($data) && $data->status_posting == 1) ? 'disabled' : '' ?>>
                                         <option value=""></option>
                                         <?php foreach ($taxData as $value) : ?>
                                             <option value="<?= $value['id']; ?>" data-tax_value="<?= $value['tax_value']; ?>" <?= !empty($data->tax_id) ? ($value['id'] === $data->tax_id ? "selected" : "") : ($value['tax_value'] == 11 ? "selected" : ""); ?>><?= $value['name']; ?>(<?= $value['tax_value']; ?>)</option>
@@ -249,7 +247,7 @@
                                     <label for="floatingInput">Include Pajak</label>
                                     <div class="switch-form-pinjaman-karyawan">
                                         <label class="switch">
-                                            <input autocomplete="one-time-code" class="include_tax" name="include_tax" id="include_tax" type="checkbox" <?= !empty($data->termasuk_pa) ? (($data->termasuk_pa == 'true') ? 'checked' : '') : ''; ?>>
+                                            <input autocomplete="one-time-code" class="include_tax" name="include_tax" id="include_tax" type="checkbox" <?= !empty($data->termasuk_pa) ? (($data->termasuk_pa == 'true') ? 'checked' : '') : ''; ?> <?= (!empty($data) && $data->status_posting == 1) ? 'disabled' : '' ?>>
                                             <span class="slider round"></span>
                                         </label>
                                     </div>
@@ -541,9 +539,10 @@
                 className: "text-center actions",
                 render: function(data, type, row) {
                     let id = row.id;
+                    let disabled = `<?= (!empty($data) && $data->status_posting == 1) ? 'disabled' : '' ?>`;
                     return `
                     <div class="">
-                        <button data-no="${row.no}" data-id="${row.id}" class="delete-button"><i class="fa fa-trash" aria-hidden="true"></i></button>
+                        <button data-no="${row.no}" data-id="${row.id}" class="delete-button" ${disabled}><i class="fa fa-trash" aria-hidden="true"></i></button>
                     </div>
                 `;
 
