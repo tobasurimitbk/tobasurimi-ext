@@ -328,7 +328,7 @@ class BCPurchaseOrderModel extends Model
                 ->where('penerimaan_barang_detail.deletedAt', null)
                 ->whereIn('penerimaan_barang_id', $bcPenerimaanBarangIDArr)
                 ->whereIn('penerimaan_barang_detail.purchase_order_id', $bcPurchaseOrderIDArr)
-                ->orderBy('penerimaan_barang.id', 'asc')
+                ->orderBy('penerimaan_barang_detail.penerimaan_barang_id', 'asc')
                 ->groupBy('penerimaan_barang_detail.barang_id')
                 ->findAll();
 
@@ -376,7 +376,7 @@ class BCPurchaseOrderModel extends Model
                 ->where('penerimaan_barang_detail.deletedAt', null)
                 ->whereIn('penerimaan_barang_id', $bcPenerimaanBarangIDArr)
                 ->whereIn('penerimaan_barang_detail.purchase_order_id', $bcPurchaseOrderIDArr)
-                ->orderBy('penerimaan_barang.id', 'asc')
+                ->orderBy('penerimaan_barang_detail.penerimaan_barang_id', 'asc')
                 ->groupBy('penerimaan_barang_detail.barang_id')
                 ->findAll();
         } elseif ($first['po_type'] == "IMPORT BAKU") {
@@ -413,7 +413,7 @@ class BCPurchaseOrderModel extends Model
                 ->where('penerimaan_barang_detail.deletedAt', null)
                 ->whereIn('penerimaan_barang_id', $bcPenerimaanBarangIDArr)
                 ->whereIn('penerimaan_barang_detail.purchase_order_id', $bcPurchaseOrderIDArr)
-                ->orderBy('penerimaan_barang.id', 'asc')
+                ->orderBy('penerimaan_barang_detail.penerimaan_barang_id', 'asc')
                 ->groupBy('barang_id')
                 ->groupBy('penerimaan_barang_id')
                 ->findAll();
@@ -451,7 +451,7 @@ class BCPurchaseOrderModel extends Model
                 ->where('penerimaan_barang_detail.deletedAt', null)
                 ->whereIn('penerimaan_barang_id', $bcPenerimaanBarangIDArr)
                 ->whereIn('penerimaan_barang_detail.purchase_order_id', $bcPurchaseOrderIDArr)
-                ->orderBy('penerimaan_barang.id', 'asc')
+                ->orderBy('penerimaan_barang_detail.penerimaan_barang_id', 'asc')
                 ->groupBy('barang_id')
                 ->groupBy('penerimaan_barang_id')
                 ->findAll();
