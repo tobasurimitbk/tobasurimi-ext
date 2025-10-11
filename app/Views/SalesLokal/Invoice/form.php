@@ -43,8 +43,8 @@
     <div class="card">
         <div class="card-body">
             <form class="create-form form-add-spp" role="form" method="POST" enctype="multipart/form-data">
-                <input autocomplete="one-time-code" type="text" class="id" name="id" id="id" value="<?= !empty($data) ? encrypt($data->id) : ""; ?>" />
-                <input autocomplete="one-time-code" type="text" class="tipe_invoice" name="tipe_invoice" id="tipe_invoice" value="LOKAL" />
+                <input autocomplete="one-time-code" type="hidden" class="id" name="id" id="id" value="<?= !empty($data) ? encrypt($data->id) : ""; ?>" />
+                <input autocomplete="one-time-code" type="hidden" class="tipe_invoice" name="tipe_invoice" id="tipe_invoice" value="LOKAL" />
                 <?= csrf_field() ?>
                 <div class="row">
                     <div class="col-md-4">
