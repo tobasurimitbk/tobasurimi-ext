@@ -304,7 +304,7 @@ class BCPurchaseOrderModel extends Model
                 ->select('
                     GROUP_CONCAT(DISTINCT penerimaan_barang.tanggal ORDER BY penerimaan_barang.tanggal ASC SEPARATOR ", ") AS lpb_date,
                     GROUP_CONCAT(DISTINCT penerimaan_barang.no_penerimaan_barang ORDER BY penerimaan_barang.tanggal ASC SEPARATOR ", ") AS no_penerimaan_barang,
-                    penerimaan_barang_detail.penerimaan_barang_id,
+                    MIN(penerimaan_barang_detail.penerimaan_barang_id) AS penerimaan_barang_id,
                     penerimaan_barang_detail.barang_id,
                     penerimaan_barang_detail.purchase_order_id,
                     GROUP_CONCAT(DISTINCT penerimaan_barang_detail.purchase_order_id) AS purchase_order_ids,
@@ -328,7 +328,7 @@ class BCPurchaseOrderModel extends Model
                 ->where('penerimaan_barang_detail.deletedAt', null)
                 ->whereIn('penerimaan_barang_id', $bcPenerimaanBarangIDArr)
                 ->whereIn('penerimaan_barang_detail.purchase_order_id', $bcPurchaseOrderIDArr)
-                ->orderBy('penerimaan_barang_detail.penerimaan_barang_id', 'asc')
+                ->orderBy('penerimaan_barang_detail.id', 'asc')
                 ->groupBy('penerimaan_barang_detail.barang_id')
                 ->findAll();
 
@@ -352,7 +352,7 @@ class BCPurchaseOrderModel extends Model
                 ->select('
                 GROUP_CONCAT(DISTINCT penerimaan_barang.tanggal ORDER BY penerimaan_barang.tanggal ASC SEPARATOR ", ") AS lpb_date,
                 GROUP_CONCAT(DISTINCT penerimaan_barang.no_penerimaan_barang ORDER BY penerimaan_barang.tanggal ASC SEPARATOR ", ") AS no_penerimaan_barang,
-                penerimaan_barang_detail.penerimaan_barang_id,
+                MIN(penerimaan_barang_detail.penerimaan_barang_id) AS penerimaan_barang_id,
                 penerimaan_barang_detail.purchase_order_id,
                 penerimaan_barang_detail.id AS penerimaan_barang_detail_id,
                 SUM(penerimaan_barang_detail.jml_masuk) AS qty_lpb,
@@ -376,7 +376,7 @@ class BCPurchaseOrderModel extends Model
                 ->where('penerimaan_barang_detail.deletedAt', null)
                 ->whereIn('penerimaan_barang_id', $bcPenerimaanBarangIDArr)
                 ->whereIn('penerimaan_barang_detail.purchase_order_id', $bcPurchaseOrderIDArr)
-                ->orderBy('penerimaan_barang_detail.penerimaan_barang_id', 'asc')
+                ->orderBy('penerimaan_barang_detail.id', 'asc')
                 ->groupBy('penerimaan_barang_detail.barang_id')
                 ->findAll();
         } elseif ($first['po_type'] == "IMPORT BAKU") {
@@ -385,7 +385,7 @@ class BCPurchaseOrderModel extends Model
                 ->select('
                 penerimaan_barang.tanggal AS lpb_date,
                 penerimaan_barang.no_penerimaan_barang,
-                penerimaan_barang_detail.penerimaan_barang_id,
+                MIN(penerimaan_barang_detail.penerimaan_barang_id) AS penerimaan_barang_id,
                 penerimaan_barang_detail.purchase_order_id,
                 penerimaan_barang_detail.id AS penerimaan_barang_detail_id,
                 SUM(penerimaan_barang_detail.jml_masuk) AS qty_lpb,
@@ -413,7 +413,7 @@ class BCPurchaseOrderModel extends Model
                 ->where('penerimaan_barang_detail.deletedAt', null)
                 ->whereIn('penerimaan_barang_id', $bcPenerimaanBarangIDArr)
                 ->whereIn('penerimaan_barang_detail.purchase_order_id', $bcPurchaseOrderIDArr)
-                ->orderBy('penerimaan_barang_detail.penerimaan_barang_id', 'asc')
+                ->orderBy('penerimaan_barang_detail.id', 'asc')
                 ->groupBy('barang_id')
                 ->groupBy('penerimaan_barang_id')
                 ->findAll();
@@ -423,7 +423,7 @@ class BCPurchaseOrderModel extends Model
                 ->select('
                 penerimaan_barang.tanggal AS lpb_date,
                 penerimaan_barang.no_penerimaan_barang,
-                penerimaan_barang_detail.penerimaan_barang_id,
+                MIN(penerimaan_barang_detail.penerimaan_barang_id) AS penerimaan_barang_id,
                 penerimaan_barang_detail.purchase_order_id,
                 penerimaan_barang_detail.id AS penerimaan_barang_detail_id,
                 SUM(penerimaan_barang_detail.jml_masuk) AS qty_lpb,
@@ -451,7 +451,7 @@ class BCPurchaseOrderModel extends Model
                 ->where('penerimaan_barang_detail.deletedAt', null)
                 ->whereIn('penerimaan_barang_id', $bcPenerimaanBarangIDArr)
                 ->whereIn('penerimaan_barang_detail.purchase_order_id', $bcPurchaseOrderIDArr)
-                ->orderBy('penerimaan_barang_detail.penerimaan_barang_id', 'asc')
+                ->orderBy('penerimaan_barang_detail.id', 'asc')
                 ->groupBy('barang_id')
                 ->groupBy('penerimaan_barang_id')
                 ->findAll();
