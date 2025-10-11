@@ -18,9 +18,15 @@
 
             <?php if (!empty($documentData)) : ?>
                 <?php if ($data->status_posting == "0") : ?>
-
                     <button class="btn btn-success posting-spp float-right posting-invoice">
                         Posting
+                    </button>
+                    <button class="btn btn-show-form btn-save float-right btn-submit">
+                        Simpan
+                    </button>
+                <?php else: ?>
+                    <button class="btn btn-success posting-spp float-right unposting-invoice">
+                        UnPosting
                     </button>
                     <button class="btn btn-show-form btn-save float-right btn-submit">
                         Simpan
@@ -37,8 +43,8 @@
     <div class="card">
         <div class="card-body">
             <form class="create-form form-add-spp" role="form" method="POST" enctype="multipart/form-data">
-                <input autocomplete="one-time-code" type="hidden" class="id" name="id" id="id" value="<?= !empty($data) ? $data->id : ""; ?>" />
-                <input autocomplete="one-time-code" type="hidden" class="tipe_invoice" name="tipe_invoice" id="tipe_invoice" value="LOKAL" />
+                <input autocomplete="one-time-code" type="text" class="id" name="id" id="id" value="<?= !empty($data) ? encrypt($data->id) : ""; ?>" />
+                <input autocomplete="one-time-code" type="text" class="tipe_invoice" name="tipe_invoice" id="tipe_invoice" value="LOKAL" />
                 <?= csrf_field() ?>
                 <div class="row">
                     <div class="col-md-4">
@@ -1788,22 +1794,9 @@
     }
 
     $(".posting-invoice").click(function() {
-        var noDocument = $('#doc_id option:selected').text()
-
+        const csrf = $(`[name="${csrfToken}"]`);
+        let id = $(".id").val();
         if ($(".create-form").valid()) {
-            $.each(list_items, function(i, v) {
-                var element = $('input[data-id="' + v.id + '"].input-qty');
-                var input_user = parseFloat(element.val());
-                var stok_max = parseFloat(v.qty_sekarang);
-
-                if (input_user > stok_max || isNaN(input_user) || input_user == undefined || input_user == 0) {
-                    dataError = list_items[i];
-                    isValid = false;
-                } else {
-                    list_items[i].qty_sekarang = stok_max;
-                    list_items[i].qty_input = input_user;
-                }
-            });
             Swal.fire({
                 icon: 'question',
                 title: 'Posting Invoice?',
@@ -1815,44 +1808,20 @@
                 cancelButtonText: 'Kembali',
             }).then((result) => {
                 if (result.isConfirmed) {
-                    const csrf = $(`[name="${csrfToken}"]`);
                     setLoading()
-                    var noDocument = $('#doc_id').select2('data').map(function(elem) {
-                        return elem.text;
-                    });
-                    let data = new FormData(document.querySelector(".create-form"));
-                    data.append("noDocument", JSON.stringify(noDocument))
-                    data.append("items", JSON.stringify(list_items));
-
-                    const ppn = $('#taxTotal').html();
-                    const dpp = $('#itemSubTotal').html()
-                    const totalInvoice = $('#grandTotal').html();
-                    const noSuratJalan = $('.id_surat_jalan').find(":selected").text()
-                    const idCustomer = $('.id_customer').find(":selected").val()
-                    let id = $(".id").val();
-
-
-                    data.append("total_invoice", totalInvoice)
-                    data.append("ppn", ppn)
-                    data.append("dpp", dpp)
-                    data.append("no_surat_jalan", noSuratJalan)
-                    data.append("id_customer", idCustomer)
-                    if (!id) {
-                        // data.append("tanggal_faktur", tanggalFaktur)
-                    }
 
                     // UPDATE
                     if (id) {
                         $.ajax({
                             url: "<?= base_url("invoice-penjualan-lokal/posting"); ?>",
-                            data: data,
+                            data: {
+                                id: id,
+                            },
                             beforeSend: function(xhr) {
                                 xhr.setRequestHeader('X-CSRF-Token', csrf.val());
                             },
                             method: "POST",
                             dataType: "json",
-                            processData: false,
-                            contentType: false,
                             success: function(response) {
                                 csrf.val(response.token);
                                 if (response.status) {
@@ -1890,6 +1859,73 @@
         }
     });
 
+    $(".unposting-invoice").click(function() {
+        const csrf = $(`[name="${csrfToken}"]`);
+        let id = $(".id").val();
+        console.log(id);
+
+        if ($(".create-form").valid()) {
+            Swal.fire({
+                icon: 'question',
+                title: 'UnPosting Invoice?',
+                confirmButtonColor: '#4e73df',
+                cancelButtonColor: '#d33',
+                showCancelButton: true,
+                reverseButtons: true,
+                confirmButtonText: 'Simpan',
+                cancelButtonText: 'Kembali',
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    setLoading()
+
+                    // UPDATE
+                    if (id) {
+                        $.ajax({
+                            url: "<?= base_url("invoice-penjualan-lokal/unposting"); ?>",
+                            data: {
+                                id: id,
+                            },
+                            beforeSend: function(xhr) {
+                                xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                            },
+                            method: "POST",
+                            dataType: "json",
+                            success: function(response) {
+                                csrf.val(response.token);
+                                if (response.status) {
+                                    stopLoading()
+                                    Swal.fire({
+                                            icon: 'success',
+                                            title: response.message,
+                                            confirmButtonColor: '#4e73df',
+                                        })
+                                        .then(() => {
+                                            window.location.href = "<?= base_url("invoice-penjualan-lokal"); ?>";
+                                        })
+                                } else {
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: response.message,
+                                        confirmButtonColor: '#4e73df',
+                                    })
+                                    stopLoading()
+                                }
+                            },
+                            onError: function(response) {
+                                csrf.val(response.token);
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Data Gagal Disimpan, coba Lagi',
+                                    confirmButtonColor: '#4e73df',
+                                })
+                                stopLoading()
+                            }
+                        });
+                    }
+                }
+            })
+        }
+    });
 
     function changeStatus() {
         let value = document.getElementById('auto_generate').checked ? true : false;

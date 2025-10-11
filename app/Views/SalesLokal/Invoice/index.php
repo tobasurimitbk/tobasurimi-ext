@@ -378,6 +378,7 @@
                     render: function(data, type, row) {
                         let id = row.id;
                         let status = row.status
+                        let status_pembayaran = row.status_pembayaran
                         let btn_print = '';
                         let btn_delete = '';
 
@@ -398,14 +399,32 @@
                         <?php if (can('Penjualan Lokal', 'Faktur Penjualan', 'u')) : ?>
                             btn_edit = `
                             <a href="javascript:void(0)" onclick="edit('${id}')" data-toggle="tooltip" title="Edit" class="btn btn-primary">
-                                <i class="fas fa-edit"></i>
+                            <i class="fas fa-edit"></i>
                             </a>`;
                         <?php endif; ?>
 
+                        <?php if (can('Penjualan Lokal', 'Faktur Penjualan', 'p')) : ?>
+                            btn_posting = `
+                                <button data-toggle="tooltip" title="Posting" onclick="posting('${id}', '0')" class="btn btn-danger unposting-btn">
+                                    <i class="fa fa-paper-plane"></i>
+                                </button>`;
+                        <?php endif; ?>
+
+                        <?php if (can('Penjualan Lokal', 'Faktur Penjualan', 'ua')) : ?>
+                            btn_unposting = `
+                                <button data-toggle="tooltip" title="Unposting" onclick="unposting('${id}', '0')" class="btn btn-danger unposting-btn">
+                                    <i class="fa fa-undo"></i>
+                                </button>`;
+                        <?php endif; ?>
+
                         if (status == "WAITING") {
-                            return `${btn_edit}${btn_print}${btn_delete}`;
+                            return `${btn_edit}${btn_print}${btn_delete}${btn_posting}`;
                         } else {
-                            return `${btn_edit}${btn_print}`;
+                            if (status_pembayaran == "LUNAS") {
+                                return `${btn_edit}${btn_print}`;
+                            } else {
+                                return `${btn_edit}${btn_print}${btn_unposting}`;
+                            }
                         }
                     }
                 }
@@ -530,7 +549,60 @@
             if (result.isConfirmed) {
                 const csrf = $(`[name="${csrfToken}"]`);
                 $.ajax({
-                    url: "<?= base_url("penerimaan-barang-lokal-bb/posting"); ?>",
+                    url: "<?= base_url("invoice-penjualan-lokal/posting"); ?>",
+                    data: {
+                        id: id,
+                    },
+                    beforeSend: function(xhr) {
+                        xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                        setLoading();
+                    },
+                    complete: function() {
+                        stopLoading();
+                    },
+                    method: "POST",
+                    dataType: "json",
+                    success: function(response) {
+                        csrf.val(response.token);
+                        if (response.status) {
+                            Swal.fire({
+                                    icon: 'success',
+                                    title: response.message,
+                                    confirmButtonColor: '#4e73df',
+                                })
+                                .then(() => {
+                                    table.ajax.reload()
+                                })
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: response.message,
+                                confirmButtonColor: '#4e73df',
+                            })
+
+                        }
+                    },
+
+                });
+            }
+        })
+    }
+
+    const unposting = function(id) {
+        Swal.fire({
+            icon: 'question',
+            title: 'Yakin akan di unposting?',
+            confirmButtonColor: '#4e73df',
+            cancelButtonColor: '#d33',
+            showCancelButton: true,
+            reverseButtons: true,
+            confirmButtonText: 'UnPosting',
+            cancelButtonText: 'Kembali',
+        }).then((result) => {
+            if (result.isConfirmed) {
+                const csrf = $(`[name="${csrfToken}"]`);
+                $.ajax({
+                    url: "<?= base_url("invoice-penjualan-lokal/unposting"); ?>",
                     data: {
                         id: id,
                     },

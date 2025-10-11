@@ -599,7 +599,7 @@ class Invoice extends BaseController
             $postItemsData = json_decode($this->request->getPost('items'), true);
 
             $soInvData = $this->SalesOrderInvoiceModel->asObject()
-                ->find($payload['id']);
+                ->find(decrypt($payload['id']));
 
             if (empty($soInvData)) {
                 $data = [
@@ -667,7 +667,7 @@ class Invoice extends BaseController
 
             ];
 
-            $dataSalesOrderInvoice =  $this->SalesOrderInvoiceModel->update($payload['id'], $values);
+            $dataSalesOrderInvoice =  $this->SalesOrderInvoiceModel->update(decrypt($payload['id']), $values);
 
             $this->SalesOrderInvoiceModel->db->transComplete();
 
@@ -697,14 +697,14 @@ class Invoice extends BaseController
 
                 foreach ($postData['doc_id'] as $id) {
                     if ($soInvData->document_type === 'pesanan') {
-                        $this->SalesOrderModel->where('id', $id)->set(['sales_order_invoice_id' => $payload['id']])->update();
+                        $this->SalesOrderModel->where('id', $id)->set(['sales_order_invoice_id' => decrypt($payload['id'])])->update();
                     } else {
-                        $this->SuratJalanModel->where('id', $id)->set(['sales_order_invoice_id' => $payload['id']])->update();
+                        $this->SuratJalanModel->where('id', $id)->set(['sales_order_invoice_id' => decrypt($payload['id'])])->update();
                     }
                 }
             } else {
                 // jika ada perubahan
-                $this->SalesOrderInvoiceDetailModel->where('id_sales_order_invoice', $payload['id'])->delete();
+                $this->SalesOrderInvoiceDetailModel->where('id_sales_order_invoice', decrypt($payload['id']))->delete();
                 //setelah hapus kembalikan kondisi sales_order_invoice_id pada sales order detail semula mejadi null
                 foreach (json_decode($soInvData->document_id) as $id) {
                     if ($soInvData->document_type === 'pesanan') {
@@ -716,7 +716,7 @@ class Invoice extends BaseController
                 foreach ($postItemsData as $value) {
                     if ($value['qty_input'] != 0) {
                         $valuesDetail = [
-                            "id_sales_order_invoice"        => $payload['id'],
+                            "id_sales_order_invoice"        => decrypt($payload['id']),
                             "id_barang_invoice"             => $value['id_barang'],
                             "qty_invoice"                   => $value['qty_input'],
                             "id_sales_order"                => $value['id_sales_order'] ?? null,
@@ -733,15 +733,15 @@ class Invoice extends BaseController
 
                 foreach ($postData['doc_id'] as $id) {
                     if ($soInvData->document_type === 'pesanan') {
-                        $this->SalesOrderModel->where('id', $id)->set(['sales_order_invoice_id' => $payload['id']])->update();
+                        $this->SalesOrderModel->where('id', $id)->set(['sales_order_invoice_id' => decrypt($payload['id'])])->update();
                     } else {
-                        $this->SuratJalanModel->where('id', $id)->set(['sales_order_invoice_id' => $payload['id']])->update();
+                        $this->SuratJalanModel->where('id', $id)->set(['sales_order_invoice_id' => decrypt($payload['id'])])->update();
                     }
                 }
             }
 
             $data = [
-                "id"        => $payload['id'],
+                "id"        => decrypt($payload['id']),
                 "status"    => true,
                 "message"   => "Data Berhasil disimpan",
                 "payload"   => $dataSalesOrderInvoice,
@@ -766,8 +766,6 @@ class Invoice extends BaseController
         try {
 
             $id = decrypt($this->request->getPost("id"));
-
-
 
             if (!empty($id)) {
                 $soInvData = $this->SalesOrderInvoiceModel->asObject()
@@ -1285,166 +1283,26 @@ class Invoice extends BaseController
 
     public function posting()
     {
-
-        $payload =  $this->request->getVar();
-
-        //echo json_encode($payload);
-        //return;
-
-        $validate = $this->validate([
-            "no_faktur" => [
-                "rules" => "required",
-                'errors' => [
-                    'required' => 'Nomor Faktur tidak boleh kosong',
-                ]
-            ],
-            "tanggal_faktur" => [
-                "rules" => "required|valid_date[d/m/Y]",
-                'errors' => [
-                    'required' => 'Tanggal Faktur tidak boleh kosong',
-                ]
-            ],
-            "terms" => [
-                "rules" => "permit_empty",
-                'errors' => [
-                    // 'required' => 'Term tidak boleh kosong',
-                ]
-            ]
-        ]);
-
-        if (!$validate) {
-            $errorList = $this->validator->getErrors();
-            throw new ErrorException($errorList[array_keys($errorList)[0]]);
-        }
-
         $postData = $this->request->getPost();
-        $postItemsData = json_decode($this->request->getPost('items'), true);
 
-
-        $soInvData = $this->SalesOrderInvoiceModel->asObject()
-            ->find($payload['id']);
-
-        if (empty($soInvData)) {
-            $data = [
-                "status"    => false,
-                "message"   => 'Dokumen tidak ditemukan',
-                'token'     => csrf_hash(),
-            ];
-            echo json_encode($data);
-            return;
-        }
-
-        if (empty($postItemsData)) {
-            $data = [
-                "status"    => false,
-                "message"   => 'Item tidak boleh kosong',
-                'token'     => csrf_hash(),
-            ];
-            echo json_encode($data);
-            return;
-        }
-
-        $values = [
-            "id_user"           => $this->userId,
-            "document_id"       => str_replace(['\\"', '\\', '"'], '', json_encode($postData['doc_id'])),
-            "id_customer"       => $postData['id_customer'],
-            "document_no"       => $postData['noDocument'],
-            "tanggal_faktur"    => date('Y-m-d', strtotime(str_replace('/', '-', $postData['tanggal_faktur']))),
-            "terms"             => $postData['termin'] ?? '',
-            "ship_via_id"       => $postData['ship_via'],
-            "keterangan"        => $postData['keterangan'],
-            "dpp"               => str_replace(',', '', $postData['dpp']),
-            "ppn"               => str_replace(',', '', $postData['ppn']),
-            "total_invoice"     => str_replace(',', '', $postData['total_invoice']),
-            "termasuk_pa"       => $this->request->getPost('include_tax') ? 'true' : 'false',
-            "status_tax"        => $this->request->getPost('tax_status') ? 'true' : 'false',
-
-        ];
-
-        $dataSalesOrderInvoice =  $this->SalesOrderInvoiceModel->update($payload['id'], $values);
-
-        $this->SalesOrderInvoiceModel->db->transComplete();
-
-        //jika document tidak berubah
-        if ($soInvData->document_no == $postData['noDocument']) {
-            // Periksa apakah $postItemsData tidak kosong sebelum melakukan iterasi
-            foreach ($postItemsData as $value) {
-                if (isset($value['id_detail_invoice'])) {
-                    $valuesDetail = [
-                        "id_barang_invoice"             => $value['id_barang'],
-                        "qty_invoice_awal"                   => $value['qty'],
-                        "qty_invoice_sisa"                   => $value['qty_sekarang'] - $value['qty_input'],
-                        "qty_invoice"                   => $value['qty_input'],
-                        "keterangan_invoice"            => "-",
-                        "discount_percentage_invoice"   => $value['disc'],
-                        "harga_barang_invoice"          => str_replace(',', '', $value['harga_barang']),
-                        "tax_invoice"                   => str_replace(',', '', $value['tax']),
-                        "amount_invoice"                => str_replace(',', '', $value['amount']),
-                    ];
-                    $this->SalesOrderInvoiceDetailModel->update($value['id_detail_invoice'], $valuesDetail);
-                }
-            }
-        } else {
-            // jika ada perubahan
-            $this->SalesOrderInvoiceDetailModel->where('id_sales_order_invoice', $payload['id'])->delete();
-            //setelah hapus kembalikan kondisi sales_order_invoice_id pada sales order detail semula mejadi null
-            foreach (json_decode($soInvData->document_id) as $id) {
-                if ($soInvData->document_type === 'pesanan') {
-                    $this->SalesOrderModel->where('id', $id)->set(['sales_order_invoice_id' => NULL])->update();
-                } else {
-                    $this->SuratJalanModel->where('id', $id)->set(['sales_order_invoice_id' => NULL])->update();
-                }
-            }
-            foreach ($postItemsData as $value) {
-
-                $valuesDetail = [
-                    "id_sales_order_invoice"        => $payload['id'],
-                    "id_barang_invoice"             => $value['id_barang'],
-                    "qty_invoice"                   => $value['qty_input'],
-                    "keterangan_invoice"            => "-",
-                    "discount_percentage_invoice"   => $value['disc'],
-                    "harga_barang_invoice"          => str_replace(',', '', $value['harga_barang']),
-                    "tax_invoice"                   => str_replace(',', '', $value['tax']),
-                    "amount_invoice"                => str_replace(',', '', $value['amount']),
-                ];
-                $this->SalesOrderInvoiceDetailModel->insert($valuesDetail);
-            }
-
-            //input baru
-
-            foreach ($postData['doc_id'] as $id) {
-
-
-                if ($soInvData->document_type === 'pesanan') {
-                    $this->SalesOrderModel->where('id', $id)->set(['sales_order_invoice_id' => $payload['id']])->update();
-                } else {
-                    $this->SuratJalanModel->where('id', $id)->set(['sales_order_invoice_id' => $payload['id']])->update();
-                }
-            }
-        }
-        // Periksa apakah $postItemsData tidak kosong sebelum melakukan iterasi
-        if (!empty($postItemsData)) {
-            foreach ($postItemsData as $value) {
-                // Pastikan data detail ditemukan sebelum mengurangi qty_sekarang
-                $newQtySekarang = (float)$value['qty_sekarang'] - (float)$value['qty_input'];
-
-                $data = ['qty_sekarang' => number_format($newQtySekarang, 2, '.', '')];
-                $this->SalesOrderDetailModel->update($value['id'], $data);
-            }
-        } else {
-            $data = [
-                "status"    => false,
-                "message"   => 'List Item Tidak Boleh Kosong',
-                'token'     => csrf_hash(),
-            ];
-            echo json_encode($data);
-            return;
-        }
-        $this->SalesOrderInvoiceModel->update($postData['id'], ['status_posting' => '1']);
+        $this->SalesOrderInvoiceModel->update(decrypt($postData['id']), ['status_posting' => '1']);
 
         return response()->setJSON([
             'status' => true,
             'message' => "Invoice Berhasil Diposting",
+            'token' => csrf_hash(),
+        ]);
+    }
+
+    public function unposting()
+    {
+        $postData = $this->request->getPost();
+
+        $this->SalesOrderInvoiceModel->update(decrypt($postData['id']), ['status_posting' => '0']);
+
+        return response()->setJSON([
+            'status' => true,
+            'message' => "Invoice Berhasil Diunposting",
             'token' => csrf_hash(),
         ]);
     }
