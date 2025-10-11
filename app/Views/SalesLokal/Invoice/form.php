@@ -25,12 +25,11 @@
                         Simpan
                     </button>
                 <?php else: ?>
-                    <button class="btn btn-success posting-spp float-right unposting-invoice">
-                        UnPosting
-                    </button>
-                    <button class="btn btn-show-form btn-save float-right btn-submit">
-                        Simpan
-                    </button>
+                    <?php if ($data->status_pelunasan == "UNPAID") : ?>
+                        <button class="btn btn-success posting-spp float-right unposting-invoice">
+                            UnPosting
+                        </button>
+                    <?php endif; ?>
                 <?php endif; ?>
             <?php else : ?>
                 <button class="btn btn-show-form btn-save float-right btn-submit">
