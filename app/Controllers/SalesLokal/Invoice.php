@@ -436,7 +436,13 @@ class Invoice extends BaseController
             return view('errors/html/error_404', ['message' => 'Not Found']);
         }
 
-        $documentList = $this->getDocNumberList($dataSalesInvoiceOrder->document_type, $dataSalesInvoiceOrder->id_customer);
+        $currentDocumentIds = json_decode($dataSalesInvoiceOrder->document_id, true) ?? [];
+        $documentList = $this->getDocNumberList(
+            $dataSalesInvoiceOrder->document_type,
+            $dataSalesInvoiceOrder->id_customer,
+            'edit',
+            $currentDocumentIds
+        );
 
         $tipeShipping = $this->MetadataModel->asObject()
             ->select(['id', 'value'])
@@ -864,6 +870,13 @@ class Invoice extends BaseController
         echo json_encode(['data' => $documentList]);
     }
 
+    public function getDocNumberEdit($documentType, $id_customer)
+    {
+        $documentList = $this->getDocNumberList($documentType, $id_customer, 'edit');
+
+        echo json_encode(['data' => $documentList]);
+    }
+
     public function getDocData($docType, $docId)
     {
 
@@ -975,7 +988,7 @@ class Invoice extends BaseController
         exit();
     }
 
-    private function getDocNumberList(string $documentType, $customer_id): array
+    private function getDocNumberList(string $documentType, $customer_id, $condition = null, array $currentDocumentIds = []): array
     {
         $usedDocs = $this->SalesOrderInvoiceModel
             ->select('document_id')
@@ -983,19 +996,25 @@ class Invoice extends BaseController
             ->findAll();
 
         $usedIds = [];
-        foreach ($usedDocs as $u) {
 
+        foreach ($usedDocs as $u) {
             if (!empty($u['document_id'])) {
-                // pastikan ke array numerik
                 $ids = is_array($u['document_id'])
                     ? $u['document_id']
                     : json_decode($u['document_id'], true);
+
                 if (is_array($ids)) {
                     $usedIds = array_merge($usedIds, $ids);
                 }
             }
         }
+
         $usedIds = array_unique($usedIds);
+
+        // jika edit, keluarkan document_id milik invoice saat ini dari daftar yang di-exclude
+        if ($condition === 'edit' && !empty($currentDocumentIds)) {
+            $usedIds = array_values(array_diff($usedIds, $currentDocumentIds));
+        }
 
         // ---------- ambil dokumen ----------
         if ($documentType === 'pesanan') {
@@ -1018,6 +1037,14 @@ class Invoice extends BaseController
                 ->where('sales_order_detail.qty_sekarang !=', 0)
                 ->groupBy('sales_order.no_sales_order')
                 ->findAll();
+
+            // ---------- filter agar id yg sudah dipakai invoice tidak muncul ----------
+            if (!empty($usedIds)) {
+                $documentList = array_values(array_filter(
+                    $documentList,
+                    fn($d) => !in_array($d->id, $usedIds)
+                ));
+            }
         } else { // pengiriman
             $documentList1 = $this->SuratJalanModel->asObject()
                 ->select('
@@ -1078,14 +1105,14 @@ class Invoice extends BaseController
             }
 
             $documentList = array_values($merged);
-        }
 
-        // ---------- filter agar id yg sudah dipakai invoice tidak muncul ----------
-        if (!empty($usedIds)) {
-            $documentList = array_values(array_filter(
-                $documentList,
-                fn($d) => !in_array($d->id, $usedIds)
-            ));
+            // ---------- filter agar id yg sudah dipakai invoice tidak muncul ----------
+            if (!empty($usedIds)) {
+                $documentList = array_values(array_filter(
+                    $documentList,
+                    fn($d) => !in_array($d->id, $usedIds)
+                ));
+            }
         }
 
         return $documentList;
@@ -1645,7 +1672,7 @@ class Invoice extends BaseController
 
     public function importStatic()
     {
-        ini_set('max_execution_time', 300); 
+        ini_set('max_execution_time', 300);
         // $filePath = '/Users/' . getenv('USER') . '/Downloads/INVOICE CLEAN FINAL.xlsx';
         $filePath = '';
         if (!file_exists($filePath)) {
@@ -1812,6 +1839,4 @@ class Invoice extends BaseController
             'failed_details' => $failed,
         ]);
     }
-
-   
 }
