@@ -832,7 +832,7 @@ class JasaVendorOut extends BaseController
                     } else {
                         $doc = $this->rmPurchaseOrderModel
                             ->select("po_no")
-                            ->where("id", $item['po_id'])
+                            ->where("id", $item['rm_purchase_order_id'])
                             ->first();
                         $stock_dokumen = $doc ? $doc['po_no'] : null;
                     }
