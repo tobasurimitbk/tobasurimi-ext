@@ -395,7 +395,7 @@ class JasaVendorInModel extends Model
     }
 
 
-   public function listBarangKepiting($jasaVendorOutArr, $jasaVendorInID)
+    public function listBarangKepiting($jasaVendorOutArr, $jasaVendorInID)
     {
         $jasaVendorOutDetailModel = new JasaVendorOutDetailModel();
         $jasaVendorInDetailModel = new JasaVendorInDetailModel();
@@ -428,10 +428,8 @@ class JasaVendorInModel extends Model
                 $bc = $metaDataModel->find($j['bc_out_id']);
                 $jasaVendorInDetail = $jasaVendorInDetailModel
                     ->where('jasa_vendor_in_id', $jasaVendorInID)
-                    ->where('jasa_vendor_out_id', $j['jasa_vendor_out_id'])
-                    ->where('jasa_vendor_out_detail_id', $j['id'])
+                    ->where('deletedAt', NULL)
                     ->findAll();
-
                 
                 $rmPurchaseOrder = $rmPurchaseOrderModel->where('id', $stockListOutDetail['po_id'])
                     ->first();
@@ -449,7 +447,9 @@ class JasaVendorInModel extends Model
                     ->select('jasa_vendor_in.*,vendors.name as nama_vendor')
                     ->join('vendors', 'vendors.id = jasa_vendor_in.vendor_id', 'left')
                     ->where('jasa_vendor_in.id',  $jasaVendorInID)
+                    ->where('jasa_vendor_in.deletedAt', NULL)
                     ->first();
+
                 $isOneRaw = !empty($jasaVendorIn) && isset($jasaVendorIn['one_raw']) && $jasaVendorIn['one_raw'] == 1;
 
                 if ($jasaVendorInID == null) {
@@ -503,9 +503,37 @@ class JasaVendorInModel extends Model
                         for ($i = 0; $i < count($result); $i++) {
                             foreach ($jasaVendorInDetail as $k) {
                                 if ($result[$i]['jasa_vendor_out_detail_id'] == $k['jasa_vendor_out_detail_id']) {
-                                    $stockBarangIn = $stockModel->find($k['stock_in_id']);
-                                    $barangIn = self::getDetailBarang($stockBarangIn);
+                                     $barangIn = $barangMasterModel
+                                        ->select("CONCAT(barang_master.barang_name, '-', barang_master_spesifikasi.spesifikasi) AS barang, satuans.kode_satuan, barang_master.kode_barang, barang_master_spesifikasi.barang_master_id AS barang1_id")
+                                        ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.barang_master_id = barang_master.id', 'left')
+                                        ->join('satuans', 'satuans.id = barang_master_spesifikasi.satuan_1', 'left')
+                                        ->where('barang_master_spesifikasi.id', $k['spesifikasi_in_id'])
+                                        ->first();
                                     array_push($result[$i]['list_barang_masuk'], [
+                                        'id' => $k['id'],
+                                        'jasa_vendor_in_id' => $k['jasa_vendor_in_id'],
+                                        'barang1_id' => $stockBarangOut != null ? $stockBarangOut['barang_master_id'] : 0,
+                                        'barang_name_in' => $barangIn != null ? strtoupper($barangIn['barang']) : '-',
+                                        'jasa_vendor_out_detail_id' => $k['jasa_vendor_out_detail_id'],
+                                        'kode_barang_in' => $barangIn != null ? strtoupper($barangIn['kode_barang']) : '-',
+                                        'kode_satuan_in' => $barangIn != null ? $barangIn['kode_satuan'] : '-',
+                                        'stock_dokumen' => $k['stock_dokumen'],
+                                        'qty_bersih' => $k['qty_bersih'],
+                                        'qty_kotor' => $k['qty_kotor'],
+                                        'stock_in_id' => $k['stock_in_id'],
+                                        'stock_out_id' => $result[$i]['stock_out_id'],
+                                        'spesifikasi_in_id' => $k['spesifikasi_in_id'],
+                                    ]);
+                                } else {
+                                    $barangIn = $barangMasterModel
+                                        ->select("CONCAT(barang_master.barang_name, '-', barang_master_spesifikasi.spesifikasi) AS barang, satuans.kode_satuan, barang_master.kode_barang, barang_master_spesifikasi.barang_master_id AS barang1_id")
+                                        ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.barang_master_id = barang_master.id', 'left')
+                                        ->join('satuans', 'satuans.id = barang_master_spesifikasi.satuan_1', 'left')
+                                        ->where('barang_master_spesifikasi.id', $k['spesifikasi_in_id'])
+                                        ->first();
+                                    array_push($result[$i]['list_barang_masuk'], [
+                                        'id' => $k['id'],
+                                        'jasa_vendor_in_id' => $k['jasa_vendor_in_id'],
                                         'barang1_id' => $stockBarangOut != null ? $stockBarangOut['barang_master_id'] : 0,
                                         'barang_name_in' => $barangIn != null ? strtoupper($barangIn['barang']) : '-',
                                         'jasa_vendor_out_detail_id' => $k['jasa_vendor_out_detail_id'],
@@ -547,8 +575,6 @@ class JasaVendorInModel extends Model
                         'qty_kotor' => (float)$k['qty_kotor'],
                         'qty_bersih' => (float)$k['qty_bersih']
                     ];
-                    var_dump($listBarangMasukGrouped);
-                    die;
                 } else {
                     // Untuk non one_raw, gunakan group key seperti semula
                     $groupKey = $barang1Id . '|' . $stockDokumen . '|' . $stockInId;
@@ -596,59 +622,95 @@ class JasaVendorInModel extends Model
 
         $dataGroup = [];
 
-        foreach ($resultGroup as $groupKey => $items) {
-            // Split group key berdasarkan kondisi one_raw
-            if ($items[0]['is_one_raw']) {
-                list($supplierId, $keterangan) = explode('|', $groupKey);
-                $stock_dokumen = 'ONE_RAW_GROUP'; // Placeholder untuk one_raw group
-            } else {
-                list($supplierId, $keterangan, $stock_dokumen) = explode('|', $groupKey);
+        if (!empty($result) && $result[0]['is_one_raw']) {
+            // 🔹 Kondisi ONE RAW
+            $allListBarangMasuk = [];
+            $seenIds = []; // 🔹 penanda ID yang sudah dimasukkan
+
+            foreach ($result as $r) {
+                foreach ($r['list_barang_masuk'] as $k) {
+
+                    // 🔸 Skip kalau sudah pernah masuk (hindari duplikat)
+                    if (isset($k['id']) && in_array($k['id'], $seenIds)) {
+                        continue;
+                    }
+
+                    // 🔹 Masukkan ID baru ke daftar yang sudah diproses
+                    if (isset($k['id'])) {
+                        $seenIds[] = $k['id'];
+                    }
+
+                    $barang1Id = $k['barang1_id'];
+                    $stockInId = $k['stock_in_id'];
+
+                    $barangName = $k['barang_name_in'];
+                    $kodeBarang = $k['kode_barang_in'];
+                    $kodeSatuan = $k['kode_satuan_in'];
+
+                    $allListBarangMasuk[] = [
+                        'barang1_id' => $barang1Id,
+                        'barang_name_in' => $barangName,
+                        'kode_barang_in' => $kodeBarang,
+                        'kode_satuan_in' => $kodeSatuan,
+                        'stock_dokumen' => $k['stock_dokumen'],
+                        'qty_kotor' => (float)$k['qty_kotor'],
+                        'qty_bersih' => (float)$k['qty_bersih'],
+                        'stock_in_id' => $stockInId,
+                        'stock_out_id' => $k['stock_out_id'],
+                        'spesifikasi_in_id' => $k['spesifikasi_in_id']
+                    ];
+                }
             }
 
-            // SUM QTY
-            $qtyTotal = 0;
-            foreach ($items as $i) {
-                $qtyTotal += (float)$i['qty_out'];
-            }
+            // Hitung total qty_out semua item (karena cuma satu group)
+            $qtyTotal = array_sum(array_map(fn($i) => (float)$i['qty_out'], $result));
 
-            $barangArr = explode("-", $items[0]['barang_out']);
+            $first = $result[0];
+            $barangArr = explode("-", $first['barang_out']);
 
-            $groupData = [
-                "supplier_id" => $supplierId,
-                "supplier_name" => $items[0]['supplier_name'],
-                "keterangan" => $keterangan,
-                "barang1_id" => $items[0]['barang1_id'],
-                "tipe_barang" => $items[0]['tipe_barang'],
-                "stock_dokumen" => $stock_dokumen,
-                "kode_barang_out" => $items[0]['kode_barang_out'],
+            $dataGroup[] = [
+                "supplier_id" => $first['supplier_id'],
+                "supplier_name" => $first['supplier_name'],
+                "keterangan" => $first['keterangan'],
+                "barang1_id" => $first['barang1_id'],
+                "tipe_barang" => $first['tipe_barang'],
+                "stock_dokumen" => "ONE_RAW_GROUP",
+                "kode_barang_out" => $first['kode_barang_out'],
                 "barang_out" => count($barangArr) == 0 ? "-" : $barangArr[0],
                 "qty_out" => $qtyTotal,
-                "satuan_out" => $items[0]['satuan_out'],
-                "list_barang_masuk" => [],
-                "is_one_raw" => $items[0]['is_one_raw'] // Tambahkan flag one_raw
+                "satuan_out" => $first['satuan_out'],
+                "list_barang_masuk" => $allListBarangMasuk,
+                "is_one_raw" => true
             ];
-            
-            // Untuk one_raw = 1, gabungkan semua list_barang_masuk dari semua item dalam group
-            if ($items[0]['is_one_raw']) {
-                $allListBarangMasuk = [];
-                foreach ($items as $item) {
-                    $barang1Id = $item['barang1_id'];
-                    
-                    var_dump($listBarangMasukGrouped);
-                    die;
-                    foreach ($listBarangMasukGrouped as $key) {
-                        var_dump($key);
-                        die;
-                        list($bId, $doc, $stockInId) = explode('|', $key);
-                        
-                                   // Langsung append tanpa pengecekan duplikat
-                            $allListBarangMasuk[] = $listBarang;
-                        
-                    }
+
+        } else {
+            // 🔹 Kondisi NORMAL (non one_raw)
+            foreach ($resultGroup as $groupKey => $items) {
+                list($supplierId, $keterangan, $stock_dokumen) = explode('|', $groupKey);
+                
+                $qtyTotal = 0;
+                foreach ($items as $i) {
+                    $qtyTotal += (float)$i['qty_out'];
                 }
-                $groupData['list_barang_masuk'] = $allListBarangMasuk;
-            } else {
-                // Logic original untuk non one_raw
+
+                $barangArr = explode("-", $items[0]['barang_out']);
+
+                $groupData = [
+                    "supplier_id" => $supplierId,
+                    "supplier_name" => $items[0]['supplier_name'],
+                    "keterangan" => $keterangan,
+                    "barang1_id" => $items[0]['barang1_id'],
+                    "tipe_barang" => $items[0]['tipe_barang'],
+                    "stock_dokumen" => $stock_dokumen,
+                    "kode_barang_out" => $items[0]['kode_barang_out'],
+                    "barang_out" => count($barangArr) == 0 ? "-" : $barangArr[0],
+                    "qty_out" => $qtyTotal,
+                    "satuan_out" => $items[0]['satuan_out'],
+                    "list_barang_masuk" => [],
+                    "is_one_raw" => false
+                ];
+
+                // isi list_barang_masuk untuk non-one_raw
                 $barang1Id = $items[0]['barang1_id'];
                 foreach ($listBarangMasukGrouped as $key => $listBarang) {
                     list($bId, $doc, $stockInId) = explode('|', $key);
@@ -656,15 +718,16 @@ class JasaVendorInModel extends Model
                         $groupData['list_barang_masuk'][] = $listBarang;
                     }
                 }
+
+                $dataGroup[] = $groupData;
             }
-            
-            $dataGroup[] = $groupData;
         }
 
         return [
             'dataDetail' => $result,
             'dataGroup' => $dataGroup
         ];
+
     }
 
     static function getDetailBarang($stock)
