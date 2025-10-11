@@ -400,6 +400,12 @@ class PembayaranPOLokal extends BaseController
             }
 
 
+            $potongan = $this->request->getVar('potongan');
+            $potongan = is_numeric($potongan) ? $potongan : 0;
+            $totalFinalBayar = $total_pembayaran - $potongan;
+
+
+
             if ($bulan = $this->request->getVar("bulan")) {
                 $bulan = date("F Y", strtotime($bulan));
             } else {
@@ -428,8 +434,8 @@ class PembayaranPOLokal extends BaseController
                 'multiple_po_id'    => $resPoID,
                 'pembayaran_oleh'   => $this->request->getVar('pembayaran_oleh'),
                 'potongan_harga'    => $this->request->getVar('potongan'),
-                'amount'            => $this->request->getVar('total_pembayaran'),
-                'amount_pajak'            => $this->request->getVar('total_pembayaran_pph'),
+                'amount'            => $totalFinalBayar,
+                'amount_pajak'      => $this->request->getVar('total_pembayaran_pph'),
                 'status_posting'    => '0',
                 'keterangan'        => $this->request->getVar('keterangan'),
                 'akun_kas'          => $this->request->getVar('akun_kas'),
@@ -570,6 +576,11 @@ class PembayaranPOLokal extends BaseController
             $taxModel = new TaxModel();
             $akunPajakId = $taxModel->where('name', 'PPH PASAL 22')->first();
 
+
+            $potongan = $this->request->getVar('potongan');
+            $potongan = is_numeric($potongan) ? $potongan : 0;
+            $totalFinalBayar = $total_pembayaran - $potongan;
+
             $localPOPaymentModel->update($id, [
                 'divisi_id'         => $this->request->getVar('divisi_id'),
                 'supplier_id'       => $this->request->getVar('supplier_id'),
@@ -585,7 +596,7 @@ class PembayaranPOLokal extends BaseController
                 'multiple_po_id'    => $resPoID,
                 'pembayaran_oleh'   => $this->request->getVar('pembayaran_oleh'),
                 'potongan_harga'    => $this->request->getVar('potongan'),
-                'amount'            => $total_pembayaran,
+                'amount'            => $totalFinalBayar,
                 'amount_pajak'      => $this->request->getVar('total_pembayaran_pph'),
                 'keterangan'        => $this->request->getVar('keterangan'),
                 'akun_pajak'        =>  $akunPajakId['akun_kredit'],

@@ -428,7 +428,8 @@ class SupplierModel extends Model
             'YEAR(rm_purchase_orders.po_date)' => $year,
             'rm_purchase_orders.supplier_id' => $supplierID,
             'rm_purchase_orders.deletedAt' => null,
-            'rm_purchase_orders.nilai_total_bulanan !=' => 0
+            'rm_purchase_order_details.deletedAt' => null,
+            'rm_purchase_order_details.monthly_price !=' => 0
         ];
 
         $selectQry = "
@@ -438,10 +439,10 @@ class SupplierModel extends Model
         rm_purchase_orders.cong_batasan,
         rm_purchase_orders.cong_sebenarnya,
         rm_purchase_orders.subsidi_langsung,
-        SUM(rm_purchase_orders.nilai_total_qty) as qty_total,
-        SUM(rm_purchase_orders.nilai_total_bulanan) as total_bulanan,
-        SUM(rm_purchase_orders.pph_bulanan) as total_pph_bulanan,
-        SUM(rm_purchase_orders.dpp_bulanan) as total_dpp_bulanan,
+        SUM(rm_purchase_order_details.qty) as qty_total,
+        rm_purchase_orders.nilai_total_bulanan as total_bulanan,
+        rm_purchase_orders.pph_bulanan as total_pph_bulanan,
+        rm_purchase_orders.dpp_bulanan as total_dpp_bulanan,
         barang_master.barang_name
     ";
 
@@ -449,7 +450,9 @@ class SupplierModel extends Model
             ->asObject()
             ->select($selectQry)
             ->join('barang_master', 'barang_master.id = rm_purchase_orders.barang_id', 'left')
+            ->join('rm_purchase_order_details', 'rm_purchase_order_details.rm_purchase_order_id = rm_purchase_orders.id', 'left')
             ->where($condition)
+            ->groupBy('rm_purchase_order_details.rm_purchase_order_id')
             ->findAll();
 
         $finalRes = [];
