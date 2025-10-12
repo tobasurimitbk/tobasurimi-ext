@@ -1674,6 +1674,10 @@ $routes->group('bea-cukai-bc-40', ['filter' => 'Auth'], function ($routes) {
     $routes->post('posting', 'BeaCukai\BC40::posting');
     $routes->post('unposting', 'BeaCukai\BC40::unPosting');
     $routes->get('detail-barang/(:segment)', 'BeaCukai\BC40::detailBarang/$1');
+    // SORTCUT PUNGUTAN
+    $routes->get('pungutan-per-barang-all', 'BeaCukai\BC40::pungutanPerBarangAll');
+    $routes->get('pungutan-hasil-all', 'BeaCukai\BC40::pungutanHasilAll');
+
 
     // OUTSTANDING
     // $routes->get('bc-40-outstanding-all', 'BeaCukai\BC40::allOutstanding');
