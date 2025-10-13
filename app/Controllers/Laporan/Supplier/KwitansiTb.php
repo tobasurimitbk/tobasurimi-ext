@@ -369,11 +369,13 @@ class KwitansiTb extends BaseController
             return redirect()->back()->with('error', 'Tidak ada data untuk dicetak.');
         }
 
-        if ($kertas == "f4") {
-            $urlView = "Laporan/SupplierLokalBB/KwitansiTb/print-all-f4";
+        if ($kertas == "kasir") {
+            $urlView = "Laporan/SupplierLokalBB/KwitansiTb/print-all-kasir";
         } else {
             $urlView = "Laporan/SupplierLokalBB/KwitansiTb/print-all-continous";
         }
+
+        // dd($dataResult);
 
         $options = new Options();
         $options->set('isHtml5ParserEnabled', true);
