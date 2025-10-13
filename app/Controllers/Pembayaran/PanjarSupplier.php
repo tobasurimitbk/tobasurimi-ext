@@ -50,7 +50,7 @@ class PanjarSupplier extends BaseController
         $data = [
             'bankList' => $this->banksModel->where('company_id', $this->this_company_id)
                             ->orderBy('name', "ASC")
-                            ->orderBy('deletedAt', null)
+                            ->where('deletedAt', null)
                             ->findAll(),
             'divisi' => $this->divisiModel->getDivisiAccess()
         ];
