@@ -319,7 +319,7 @@
                     <tr>
                         <td style="width: 140px;">CONSIGNEE</td>
                         <td>:</td>
-                        <td style="width: 180px;"><?= $dataSalesOrderExport->customer_name ?></td>
+                        <td style="width: 180px;"><?= $dataInvoice['nama_customer'] ?></td>
                     </tr>
                     <tr>
                         <td>ADDRESS</td>
@@ -800,7 +800,7 @@
                     <tr>
                         <td style="width: 140px;">CONSIGNEE</td>
                         <td>:</td>
-                        <td style="width: 180px;"><?= $dataSalesOrderExport->customer_name ?></td>
+                        <td style="width: 180px;"><?= $dataInvoice['nama_customer'] ?></td>
                     </tr>
                     <tr>
                         <td>ADDRESS</td>
