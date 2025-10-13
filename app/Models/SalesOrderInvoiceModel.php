@@ -75,13 +75,14 @@ class SalesOrderInvoiceModel extends Model
     {
         $availableSort = [
             'no_faktur'          => 'sales_order_invoice.no_faktur',
-            'nama_pelanggan'            => 'customers.name',
-            'kode_pelanggan'             => 'customers.kode',
-            'no_faktur'             => 'sales_order_invoice.no_faktur',
+            'company_name'       => 'companies.company',
+            'nama_pelanggan'     => 'customers.name',
+            'kode_pelanggan'     => 'customers.kode',
+            'no_faktur'          => 'sales_order_invoice.no_faktur',
             'total_invoice'      => 'sales_order_invoice.total_invoice',
-            'keterangan'      => 'sales_order_invoice.keterangan',
-            'createdAt'         => 'sales_order_invoice.createdAt',
-            'updatedAt'         => 'sales_order_invoice.updatedAt',
+            'keterangan'         => 'sales_order_invoice.keterangan',
+            'createdAt'          => 'sales_order_invoice.createdAt',
+            'updatedAt'          => 'sales_order_invoice.updatedAt',
         ];
         $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
 
@@ -98,10 +99,21 @@ class SalesOrderInvoiceModel extends Model
         sales_order_invoice.counter_print,
         sales_order_invoice.status_pelunasan,
         sales_order_invoice.document_no AS doc_no,
+        CASE
+            WHEN sales_order_invoice.document_type = 'pesanan' THEN sales_order.no_sales_order
+            WHEN sales_order_invoice.document_type = 'pengiriman' THEN surat_jalan_so.multiple_no_so
+            ELSE sales_order_invoice.document_no
+        END AS no_sales_order,
+        CASE
+            WHEN sales_order_invoice.document_type = 'pesanan' THEN '-'
+            WHEN sales_order_invoice.document_type = 'pengiriman' THEN surat_jalan_so.no_surat_jalan
+            ELSE sales_order_invoice.document_no
+        END AS no_surat_jalan,
         sales_order_invoice.document_type AS doc_type,
         DATE_FORMAT(sales_order_invoice.tanggal_faktur, '%d/%m/%Y') AS tanggal_faktur,
         customers.name AS nama_pelanggan,
         customers.kode AS kode_pelanggan,
+        companies.company AS company_name,
         CONCAT(employees.nip , ' - ', employees.name) AS salesName,
         IFNULL(sales_order.no_sales_order, surat_jalan_so.no_surat_jalan) AS document_no,
         SUM(barang_master_sales.harga_pokok) AS sum_harga_pokok,
@@ -121,9 +133,9 @@ class SalesOrderInvoiceModel extends Model
             ->join('surat_jalan_so', 'surat_jalan_so.id = sales_order_invoice.document_id AND sales_order_invoice.document_type = "pengiriman"', 'LEFT')
             ->join('sales_order_invoice_detail', 'sales_order_invoice_detail.id_sales_order_invoice = sales_order_invoice.id', 'LEFT')
             ->join('barang_master_sales', 'barang_master_sales.id = sales_order_invoice_detail.id_barang_invoice', 'LEFT')
+            ->join('companies', 'companies.id = sales_order_invoice.id_company', 'left')
             ->where($condition)
             ->groupBy('sales_order_invoice.id');
-
         $totalData = $salesOrderInvoiceLokal->countAllResults(false);
 
         if ($addCondition['search'] || $addCondition['dateStart'] || $addCondition['dateEnd'] || $addCondition['filter_jenis_dokumen'] || $addCondition['filter_customer']) {
@@ -132,7 +144,10 @@ class SalesOrderInvoiceModel extends Model
 
         if ($addCondition['search']) {
             $salesOrderInvoiceLokal
-                ->like('no_faktur', $addCondition['search']);
+                ->like('no_faktur', $addCondition['search'])
+                ->orLike('customers.name', $addCondition['search'])
+                ->orLike('customers.kode', $addCondition['search'])
+                ->orLike('companies.company', $addCondition['search']);
         }
 
         if ($addCondition['filter_customer']) {
@@ -184,6 +199,19 @@ class SalesOrderInvoiceModel extends Model
         } else {
             $data = $salesOrderInvoiceLokal->findAll();
         }
+
+        // foreach ($data as &$row) {
+        //     if (isset($row->no_sales_order)) {
+        //         $decoded = json_decode($row->no_sales_order, true);
+        //         if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
+        //             // Gabungkan jadi string dipisah koma
+        //             $row->no_sales_order = implode(', ', $decoded);
+        //         } else {
+        //             // Kalau bukan JSON valid, tetap pakai value aslinya (trim biar bersih)
+        //             $row->no_sales_order = trim($row->no_sales_order);
+        //         }
+        //     }
+        // }
 
         return [
             'data'              => $data,
