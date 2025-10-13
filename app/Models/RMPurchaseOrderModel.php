@@ -968,6 +968,132 @@ class RMPurchaseOrderModel extends Model
             'totalFilteredData' => $totalFilteredData
         ];
     }
+
+    public function getPoBBLokalForSupplierNew($availableSort, $condition, $addCondition, $limit = 10, $offset = 0)
+    {
+
+        $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
+
+        if (!empty($addCondition['sort'])) {
+            if ($addCondition['sort'] == "rm_purchase_orders.po_date" || $addCondition['sort'] == "poDate") {
+                $sort = 'rm_purchase_orders.po_date, rm_purchase_orders.po_no';
+                $sortType = 'ASC';
+            } else {
+                $sort = $availableSort[$addCondition['sort'] ?? 'updatedAt'] ?? 'rm_purchase_orders.updatedAt';
+                $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'DESC';
+            }
+            if ($addCondition['sort'] == "rm_purchase_orders.po_date, divisis.id") {
+                $sort = 'divisis.id, rm_purchase_orders.po_date, rm_purchase_orders.po_no';
+                $sortType = 'ASC';
+            } else {
+                $sort = $availableSort[$addCondition['sort'] ?? 'updatedAt'] ?? 'rm_purchase_orders.updatedAt';
+                $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'DESC';
+            }
+        } else {
+            $sort = $availableSort[$addCondition['sort'] ?? 'updatedAt'] ?? 'rm_purchase_orders.updatedAt';
+            $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'DESC';
+        }
+
+        $selectQry = "
+        suppliers.no_npwp AS supplierNpwp,
+        suppliers.name AS supplierName, 
+        rm_purchase_orders.id AS po_id, 
+        rm_purchase_orders.po_no AS poNum, 
+        rm_purchase_orders.po_date AS poDate, 
+        rm_purchase_orders.barang_id,
+        rm_purchase_orders.supplier_id,
+        barang_master.barang_name AS barangName, 
+        warehouses.warehouse_name AS warehouseName, 
+        satuans.kode_satuan AS satuanName, 
+        companies.company AS companyName, 
+        rm_purchase_orders.pph AS poPPH,
+        supplier_harga.spesifikasi AS spekName,
+        divisis.divisi AS divisiName,
+        divisis.id AS divisi_id,
+        rm_purchase_orders.dpp_harian AS dpp_harian, 
+        rm_purchase_orders.pph_harian AS pph_harian, 
+        rm_purchase_orders.nilai_total_harian AS nilai_total_harian, 
+        rm_purchase_orders.dpp_bulanan AS dpp_bulanan, 
+        rm_purchase_orders.pph_bulanan AS pph_bulanan, 
+        rm_purchase_orders.nilai_total_bulanan AS nilai_total_bulanan, 
+        rm_purchase_orders.dpp_umum AS dpp_umum, 
+        rm_purchase_orders.pph_umum AS pph_umum, 
+        rm_purchase_orders.nilai_total_umum AS nilai_total_umum, 
+        rm_purchase_orders.dpp_tambahan AS dpp_tambahan, 
+        rm_purchase_orders.pph_tambahan AS pph_tambahan, 
+        rm_purchase_orders.nilai_total_tambahan AS nilai_total_tambahan, 
+        rm_purchase_orders.nilai_total_qty AS qtyPO, 
+        ";
+
+        $poBBLokalData = $this->asObject()
+            ->select($selectQry)
+            ->join('suppliers', 'suppliers.id = rm_purchase_orders.supplier_id', 'left')
+            ->join('companies', 'companies.id = rm_purchase_orders.company_id', 'left')
+            ->join('users', 'rm_purchase_orders.createdBy = users.id', 'left')
+            ->join('barang_master', 'rm_purchase_orders.barang_id = barang_master.id', 'left')
+            ->join('rm_purchase_order_details', 'rm_purchase_order_details.rm_purchase_order_id = rm_purchase_orders.id', 'left')
+            ->join('penerimaan_barang_detail', 'penerimaan_barang_detail.purchase_order_details_id = rm_purchase_order_details.id AND penerimaan_barang_detail.purchase_order_id = rm_purchase_orders.id', 'left')
+            ->join('satuans', 'satuans.id = rm_purchase_order_details.satuan_id', 'left')
+            ->join('penerimaan_barang', 'penerimaan_barang_detail.penerimaan_barang_id = penerimaan_barang.id', 'left')
+            ->join('warehouses', 'penerimaan_barang.warehouse_id = warehouses.id', 'left')
+            ->join('supplier_harga', 'supplier_harga.id = rm_purchase_order_details.supplier_harga_id', 'left')
+            ->join('divisis', 'divisis.id = rm_purchase_orders.divisi_id', 'left')
+            ->where($condition)
+            // ->groupBy('supplier_harga.spesifikasi_id, rm_purchase_orders.id')
+            ->orderBy($sort, $sortType);
+
+
+        $totalData = $poBBLokalData->countAllResults(false);
+
+        if (!empty($addCondition['dateStart']) || !empty($addCondition['dateEnd']) || !empty($addCondition['supplierId']) || !empty($addCondition['barangId']) || !empty($addCondition['warehouseId']) || !empty($addCondition['poNo']) || !empty($addCondition['divisiId'])) {
+            $poBBLokalData->groupStart();
+        }
+
+        if (!empty($addCondition['supplierId'])) {
+            $poBBLokalData->where('rm_purchase_orders.supplier_id', $addCondition['supplierId']);
+        }
+
+        if (!empty($addCondition['barangId'])) {
+            $poBBLokalData->where('rm_purchase_orders.barang_id', $addCondition['barangId']);
+        }
+
+        if (!empty($addCondition['warehouseId'])) {
+            $poBBLokalData->where('penerimaan_barang.warehouse_id', $addCondition['warehouseId']);
+        }
+
+        if (!empty($addCondition['divisiId'])) {
+            $poBBLokalData->where('penerimaan_barang.divisi_id', $addCondition['divisiId']);
+        }
+
+        if (!empty($addCondition['poNo'])) {
+            $poBBLokalData->where('rm_purchase_orders.po_no', $addCondition['poNo']);
+        }
+
+        if (!empty($addCondition['dateStart'])) {
+            $poBBLokalData->where('rm_purchase_orders.po_date >=', $addCondition['dateStart']);
+        }
+
+        if (!empty($addCondition['dateEnd'])) {
+            $poBBLokalData->where('rm_purchase_orders.po_date <=', $addCondition['dateEnd']);
+        }
+
+        if (!empty($addCondition['dateStart']) || !empty($addCondition['dateEnd']) || !empty($addCondition['supplierId']) || !empty($addCondition['barangId']) || !empty($addCondition['warehouseId']) || !empty($addCondition['poNo']) || !empty($addCondition['divisiId'])) {
+            $poBBLokalData->groupEnd();
+        }
+
+        $totalFilteredData = $poBBLokalData->countAllResults(false);
+        if ($limit == null && $offset == null) {
+            $data = $poBBLokalData->findAll();
+        } else {
+            $data = $poBBLokalData->findAll($limit, $offset);
+        }
+
+        return [
+            'data'              => $data,
+            'totalData'         => $totalData,
+            'totalFilteredData' => $totalFilteredData
+        ];
+    }
     // pendapatan supplier
 
     public function getPoBBLokalForAllSupplierReport($startDate, $finishDate)
@@ -1931,5 +2057,4 @@ class RMPurchaseOrderModel extends Model
             ->orderBy('rm_purchase_orders.po_date', 'ASC', false)
             ->findAll();
     }
-
 }
