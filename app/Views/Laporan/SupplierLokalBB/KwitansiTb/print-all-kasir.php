@@ -236,7 +236,7 @@
                             <td>TGL</td>
                             <td>TGL</td>
                             <td>TGL</td>
-                            <td class="txt-center"></td>
+                            <td class="txt-center"><?= $d['kwintansi']['supplier']['name'] ?></td>
                         </tr>
                     </table>
                 </div>
