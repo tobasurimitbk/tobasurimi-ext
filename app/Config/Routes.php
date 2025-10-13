@@ -1181,7 +1181,7 @@ $routes->get('/jasa-vendor-out/list-barang-stock-init', 'JasaVendor\JasaVendorOu
 $routes->get('/jasa-vendor-out/list-stock-dokumen-bc', 'JasaVendor\JasaVendorOut::getListStockJasaVendorOut', ['filter' => 'Auth']);
 $routes->get('/jasa-vendor-out/all', 'JasaVendor\JasaVendorOut::all', ['filter' => 'Auth']);
 $routes->post('/jasa-vendor-out/save',  'JasaVendor\JasaVendorOut::createAction', ['filter' => 'Auth']);
-$routes->post('/jasa-vendor-out/update',  'JasaVendor\JasaVendorOut::updateActionNew', ['filter' => 'Auth']);
+$routes->post('/jasa-vendor-out/update',  'JasaVendor\JasaVendorOut::updateAction', ['filter' => 'Auth']);
 $routes->post('/jasa-vendor-out/delete',  'JasaVendor\JasaVendorOut::delete', ['filter' => 'Auth']);
 $routes->post('/jasa-vendor-out/posting',  'JasaVendor\JasaVendorOut::posting', ['filter' => 'Auth']);
 $routes->post('/jasa-vendor-out/unposting',  'JasaVendor\JasaVendorOut::unposting', ['filter' => 'Auth']);
