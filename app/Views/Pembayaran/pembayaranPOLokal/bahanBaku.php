@@ -58,7 +58,7 @@
                                 <th>No. Pembayaran</th>
                                 <th>Tipe Bayar</th>
                                 <th>Supplier</th>
-                                <th>PO Number</th>
+                                <!-- <th>PO Number</th> -->
                                 <th>Tanggal Pembayaran</th>
                                 <th>Metode Pembayaran</th>
                                 <th>Total Bayar</th>
@@ -135,10 +135,10 @@
                 data: "supplier",
                 className: "text-center"
             },
-            {
-                data: "po_number",
-                className: "text-center"
-            },
+            // {
+            //     data: "po_number",
+            //     className: "text-center"
+            // },
             {
                 data: "payment_date",
                 className: "text-center"
