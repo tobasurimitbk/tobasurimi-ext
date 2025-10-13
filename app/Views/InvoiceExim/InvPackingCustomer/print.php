@@ -406,7 +406,8 @@
                     <td style="padding: 6px; border: 1px solid #7a7a78; vertical-align: top;"><?= $no++ ?></td>
                     <td style="padding: 6px; border: 1px solid #7a7a78; vertical-align: top;">
                         <?= $detail['nama_barang'] ?> <br>
-                        <?= $detail['catatan'] ?>
+                        HS CODE : <?= $detail['hs_code_name'] ?> <br>
+                        <?= nl2br(htmlspecialchars($detail['catatan'])) ?>
                         <div>
                             <?php if (!empty($detail['size_breakdown'])): ?>
                                 <?php
@@ -949,7 +950,7 @@
                     <td style="padding: 6px; border: 1px solid #7a7a78; vertical-align: top;">
                         <?= $detail['nama_barang_packing'] ?> <br>
                         HS CODE : <?= $detail['hs_code_name'] ?> <br>
-                        <?= $detail['keterangan_packing'] ?>
+                        <?= nl2br(htmlspecialchars($detail['keterangan_packing'])) ?>
                         <div>
                             <?php if (!empty($detail['size_breakdown'])): ?>
                                 <?php
