@@ -594,7 +594,7 @@
                     }).length > 0;
 
                     if (!isIDSelected) {
-                        listStockAsal[i].stok_total = parseFloat(listStockAsal[i].stok_total);
+                        listStockAsal[i].stok_total = destroyFormatRupiah(listStockAsal[i].stok_total);
                         listStockAsal[i].qty = 0;
                         listStockAsal[i].output = {
                             barang: barangIn.data('barang'),
@@ -1140,11 +1140,14 @@
             const groupName = group[0].output?.barang || 'Tidak Diketahui';
             const satuan = group[0].output?.kode_satuan || '-';
 
-            // Hitung total hasil rebus per group
             let totalHasilGroup = 0;
             group.forEach(item => {
-                totalHasilGroup += parseFloat(item.output?.qty || 0);
+                totalHasilGroup += destroyFormatRupiah(item.output?.qty || 0);
             });
+
+            // Bulatkan ke 2 desimal
+            totalHasilGroup = parseFloat(totalHasilGroup.toFixed(2));
+
 
             // --- Tambah input total hasil rebus per group (diletakkan sebelum baris data) ---
             const groupRow = $(`
@@ -1273,6 +1276,10 @@
                 if (!isNaN(val)) totalQtyHasilRebus += val;
             });
 
+            // Bulatkan ke 2 desimal
+            totalQtyRebus = parseFloat(totalQtyRebus.toFixed(2));
+            totalQtyHasilRebus = parseFloat(totalQtyHasilRebus.toFixed(2));
+
             // Hapus semua total row yang sudah ada
             $('.grand-total-row').remove();
 
@@ -1288,10 +1295,10 @@
             `);
 
             $tbody.append(totalRow);
-            
-            // Panggil validasi setelah update total
+
             // validateRebusInputs();
         }
+
 
         // Fungsi validasi
         // function validateRebusInputs() {
