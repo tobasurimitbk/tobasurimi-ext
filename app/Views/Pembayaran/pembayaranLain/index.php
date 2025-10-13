@@ -20,9 +20,14 @@
                                 <input type="text" style="display: none;" class="form-control hidden" name="id" id="id">
 
                                 <div class="col-md-6">
-                                    <div class="form-floating mb-3" style="height: 50px;">
-                                        <input autocomplete="one-time-code" type="text" class="form-control no_pembayaran" name="no_pembayaran" id="no_pembayaran" placeholder="No Pembayaran" readonly>
-                                        <label for="floatingInput">No Pembayaran</label>
+                                    <div class="input-group input-group-password">
+                                        <div class="form-floating mb-3" style="height: 50px;">
+                                            <input autocomplete="one-time-code" type="text" class="form-control no_pembayaran" name="no_pembayaran" id="no_pembayaran" placeholder="No Pembayaran" readonly>
+                                            <label for="floatingInput">No Pembayaran</label>
+                                        </div>
+                                        <div class="input-generate input-group-prepend group-prepend-password align-items-center">
+                                            <input autocomplete="one-time-code" style="z-index: 99;  margin-left: -30px; <?= !empty($detail) ? 'display:none;' : '' ?>" class="auto_generate" id="auto_generate" name="auto_generate" type="checkbox" onchange="changeStatus()" checked>
+                                        </div>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
@@ -1533,17 +1538,32 @@
         $('#tanggal, #keterangan, #kurs, #jumlah, #jumlah_idr').val('');
         $('#akun_kas, #valas').val('').trigger('change');
     }
+    
+    function changeStatus() {
+        let isChecked = document.getElementById('auto_generate').checked;
+
+        if (isChecked) {
+            // Mode auto generate aktif → generate nomor otomatis
+            $(".no_pembayaran").attr("readonly", true);
+            generatePaymentNumber(true);
+        } else {
+            // Mode manual → hapus nomor dan aktifkan input manual
+            $(".no_pembayaran").attr("readonly", false);
+            $(".no_pembayaran").val("");
+            console.log("Auto generate dimatikan — user bisa isi manual");
+        }
+    }
 
     function generatePaymentNumber(forceGenerate = false) {
-        // Debugging: Log status generate
-        console.log(`Generate called - Edit mode: ${isEditMode}, Force: ${forceGenerate}`);
-        
-        // Jika di mode edit dan bukan force generate, skip
-        if (isEditMode && !forceGenerate) {
-            console.log('Skipped generate in edit mode');
+        // Kalau checkbox auto_generate TIDAK dicentang, jangan jalanin fungsi ini
+        if (!document.getElementById('auto_generate').checked) {
+            console.log("Auto generate OFF — fungsi generatePaymentNumber() dilewati");
             return;
         }
-        
+
+        // Debugging
+        console.log(`Generate called - Force: ${forceGenerate}`);
+
         // Get current values
         let currentValues = {
             divisi_id: $("#divisi_id").val(),
@@ -1552,25 +1572,19 @@
             jenis_pembayaran: $("#jenis_pembayaran").val(),
             tanggal_pembayaran: $("#tanggal_pembayaran").val(),
         };
-        
-        // Jika nilai sama dengan initial values, skip
-        if (isEditMode && JSON.stringify(currentValues) === JSON.stringify(initialValues)) {
-            console.log('Skipped generate - values unchanged');
-            return;
-        }
-        
-        // Proses generate nomor
+
+        // Jalankan AJAX generate nomor
         let jenisPembayaran = $("#jenis_pembayaran option:selected").text();
         let metodePembayaran = $("#metode_pembayaran option:selected").val();
         let divisiId = $("#divisi_id option:selected").text();
         let bankId = $("#bank_id option:selected").val();
         let tanggalPembayaran = $("#tanggal_pembayaran").val();
-        
+
         let url = "<?= base_url('pembayaran-lain/generate-no-pembayaran'); ?>";
         url += `?jenisPembayaran=${encodeURIComponent(jenisPembayaran)}&divisiId=${encodeURIComponent(divisiId)}&metodePembayaran=${encodeURIComponent(metodePembayaran)}&bankId=${encodeURIComponent(bankId)}&tanggalPembayaran=${encodeURIComponent(tanggalPembayaran)}`;
-        
+
         $(".no_pembayaran").attr("readonly", true);
-        
+
         $.ajax({
             url: url,
             method: "GET",
