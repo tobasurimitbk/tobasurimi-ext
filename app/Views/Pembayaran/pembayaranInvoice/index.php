@@ -214,7 +214,14 @@
                             <?php endif; ?>
                         `;
                     } else {
+                        form += `
+                            <?php if (can('Pembayaran', 'Pembayaran Invoice', 'a')) : ?>
+                                <button data-toggle="tooltip" title="Unposting" onclick="unposting('${id}', 1)" class="btn btn-warning unposting-spp">
+                                    <i class="fa fa-undo fa-sm" aria-hidden="true"></i>
+                                </button>
+                            <?php endif; ?>
 
+                        `;
                     }
 
                     form += ` </div>`;
@@ -316,6 +323,51 @@
                 const csrf = $(`[name="${csrfToken}"]`);
                 $.ajax({
                     url: "<?= base_url("pembayaran-invoice/posting"); ?>",
+                    data: {
+                        id: id,
+                    },
+                    beforeSend: function(xhr) {
+                        xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                        setLoading();
+                    },
+                    complete: function() {
+                        stopLoading();
+                    },
+                    method: "POST",
+                    dataType: "json",
+                    success: function(response) {
+                        csrf.val(response.token);
+                        if (response.status) {
+                            Swal.fire({
+                                    icon: 'success',
+                                    title: response.message,
+                                    confirmButtonColor: '#4e73df',
+                                })
+                                .then(() => {
+                                    table.ajax.reload()
+                                })
+                        }
+                    },
+                });
+            }
+        })
+    }
+
+    const unposting = function(id) {
+        Swal.fire({
+            icon: 'question',
+            title: 'Batalkan Posting Pembayaran ?',
+            confirmButtonColor: '#4e73df',
+            cancelButtonColor: '#d33',
+            showCancelButton: true,
+            reverseButtons: true,
+            confirmButtonText: 'Ok',
+            cancelButtonText: 'Kembali',
+        }).then((result) => {
+            if (result.isConfirmed) {
+                const csrf = $(`[name="${csrfToken}"]`);
+                $.ajax({
+                    url: "<?= base_url("pembayaran-invoice/unposting"); ?>",
                     data: {
                         id: id,
                     },

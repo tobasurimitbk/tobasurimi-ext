@@ -3539,6 +3539,52 @@ class JurnalUmum extends BaseController
         }
     }
 
+    public function unpostDataPembayaranInvoice($pembayaranInvoiceId)
+    {
+        $pembayaranInvoice = $this->pembayaranInvoiceModel->where('id', $pembayaranInvoiceId)->first();
+        if ($pembayaranInvoice == null) {
+            return false;
+        }
+
+        try {
+            $db = Database::connect();
+            $db->transBegin();
+
+            // Ambil data transaksi jurnal berdasarkan no_pembayaran
+            $transaksiJurnal = $this->transaksiJurnalModel
+                ->where('no_transaksi', $pembayaranInvoice['no_pembayaran'])
+                ->first();
+
+            if ($transaksiJurnal) {
+                $idTransaksiJurnal = $transaksiJurnal['id'];
+
+                // Hapus jurnal umum terkait transaksi ini
+                $this->jurnalUmumModel
+                    ->where('id_transaksi', $idTransaksiJurnal)
+                    ->delete();
+
+                // Hapus transaksi jurnalnya
+                $this->transaksiJurnalModel
+                    ->where('id', $idTransaksiJurnal)
+                    ->delete();
+            }
+
+            // Update status posting pembayaran_invoice jadi 0 (belum posting)
+            $this->pembayaranInvoiceModel
+                ->where('id', $pembayaranInvoiceId)
+                ->set(['status_posting' => 0])
+                ->update();
+
+            $db->transCommit();
+            return true;
+        } catch (Exception $e) {
+            $db->transRollback();
+            \var_dump('Error unpost:', $e->getMessage(), 'Line:', $e->getLine());
+            return false;
+        }
+    }
+
+
 
     public function insertDataPembayaranInvoiceInternasional($pembayaranInvoiceId)
     {
