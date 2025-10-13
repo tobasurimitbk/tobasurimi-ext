@@ -104,8 +104,8 @@ class StockRevampDetailModel extends Model
                 rm_purchase_order_details.id as rm_purchase_order_detail_id,
                 CONCAT(barang_master.barang_name, " ", barang_master_spesifikasi.spesifikasi) AS barang,
                 satuans.kode_satuan,
-                stock_revamp_detail.qty_bersih AS total_penerimaan,
-                stock_revamp_detail.qty_bersih as stok_total,
+                update_stock_purchase_detail.qty_po AS total_penerimaan,
+                update_stock_purchase_detail.qty_po as stok_total,
                 update_stock_purchase_detail.qty_diterima as stok_total_diterima,
             ')
             ->join('update_stock_purchase_detail', 'update_stock_purchase_detail.stock_detail_id = stock_revamp_detail.id')
