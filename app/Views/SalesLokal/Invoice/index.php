@@ -104,11 +104,13 @@
                                 <th onclick="changeSort('no')" class="sort">No.</th>
                                 <th onclick="changeSort('no_faktur')" class="sort">Nomor Invoice</th>
                                 <th onclick="changeSort('tanggal_faktur')" class="sort">Tanggal Invoice</th>
+                                <th onclick="changeSort('company_name')" class="sort">Company</th>
                                 <th onclick="changeSort('nama_pelanggan')" class="sort">Nama Customer</th>
                                 <th onclick="changeSort('nama_sales')" class="sort">Nama Sales</th>
                                 <th onclick="changeSort('tipe_invoice')" class="sort">Jenis Invoice</th>
                                 <th onclick="changeSort('document_type')" class="sort">Jenis Dokumen</th>
-                                <th onclick="changeSort('document_no')" class="sort">No Dokumen</th>
+                                <th onclick="changeSort('no_sales_order')" class="sort">No Order Form</th>
+                                <th onclick="changeSort('no_surat_jalan')" class="sort">No Surat Jalan</th>
                                 <th onclick="changeSort('total_invoice')" class="sort">Total Invoice</th>
                                 <th onclick="changeSort('status')" class="sort">Status Pembayaran</th>
                                 <th onclick="changeSort('status')" class="sort">Status</th>
@@ -325,6 +327,10 @@
                 },
                 {
                     data: "tanggal_faktur",
+                    className: "text-center"
+                },
+                {
+                    data: "company_name",
                     className: "text-center"
                 },
                 {

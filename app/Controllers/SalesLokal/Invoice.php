@@ -194,6 +194,9 @@ class Invoice extends BaseController
                 "status"            => ($data->status_posting == 0) ? 'WAITING' : 'POSTING',
                 "counter_print"     => $data->counter_print,
                 "status_pembayaran"     => $statusPembayaranInvoice,
+                "company_name" => $data->company_name,
+                "no_sales_order" => $data->no_sales_order,
+                "no_surat_jalan" => $data->no_surat_jalan,
             ]);
         }
 

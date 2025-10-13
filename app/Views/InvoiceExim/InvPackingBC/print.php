@@ -425,7 +425,8 @@
                     <td style="padding: 6px; border: 1px solid #7a7a78; vertical-align: top;"><?= $no++ ?></td>
                     <td style="padding: 6px; border: 1px solid #7a7a78; vertical-align: top;">
                         <?= $detail['nama_barang'] ?> <br>
-                        <?= $detail['catatan'] ?>
+                        HS CODE : <?= $detail['hs_code_name'] ?> <br>
+                        <?= nl2br(htmlspecialchars($detail['catatan'])) ?>
                     </td>
                     <td style="padding: 6px; border: 1px solid #7a7a78; vertical-align: top;text-align:right;">
                         <?= number_format($detail['qty'], 2) ?>
@@ -516,22 +517,24 @@
                 <td style="padding: 6px; border: 1px solid #7a7a78;"></td>
                 <td style="padding: 6px; border: 1px solid #7a7a78; text-align: right; " colspan="4">
                     <table>
-                        <tr style="font-weight: bold;">
-                            <td>
-                                TOTAL
-                            </td>
-                            <td>:</td>
-                            <td>
-                                <?= number_format($totalQty, 2) . " " . $kodeSatuan ?>
-                            </td>
-                        </tr>
+                        <?php if ($kodeSatuan != "KG"): ?>
+                            <tr style="font-weight: bold;">
+                                <td>
+                                    TOTAL
+                                </td>
+                                <td>:</td>
+                                <td>
+                                    <?= number_format($totalQty, 2) . " " . $kodeSatuan ?>
+                                </td>
+                            </tr>
+                        <?php endif; ?>
                         <tr style="font-weight: bold;">
                             <td>
                                 NETTO WEIGHT
                             </td>
                             <td>:</td>
                             <td>
-                                <?= number_format($dataInvoice['total_berat_bersih'], 2) ?> Kg
+                                <?= number_format($dataInvoice['total_berat_bersih'], 2) ?> KG
                             </td>
                         </tr>
                         <tr style="font-weight: bold;">
@@ -540,7 +543,7 @@
                             </td>
                             <td>:</td>
                             <td>
-                                <?= number_format($dataInvoice['total_berat_kotor'], 2) ?> Kg
+                                <?= number_format($dataInvoice['total_berat_kotor'], 2) ?> KG
                             </td>
                         </tr>
                     </table>
@@ -807,12 +810,12 @@
                     <tr>
                         <td>PORT OF LOADING</td>
                         <td>:</td>
-                        <td><?= strip_tags($dataSalesOrderExport->loading_port) ?></td>
+                        <td><?= strip_tags($dataInvoice['loading_port']) ?></td>
                     </tr>
                     <tr>
                         <td>PORT OF DISCHARGE</td>
                         <td>:</td>
-                        <td><?= strip_tags($dataSalesOrderExport->dicharge_port) ?></td>
+                        <td><?= strip_tags($dataInvoice['dicharge_port']) ?></td>
                     </tr>
                     <tr>
                         <td>CONTRACT</td>
@@ -893,7 +896,7 @@
                     <td style="padding: 6px; border: 1px solid #7a7a78; vertical-align: top;">
                         <?= $detail['nama_barang'] ?> <br>
                         HS CODE : <?= $detail['hs_code_name'] ?> <br>
-                        <?= $detail['catatan'] ?>
+                        <?= nl2br(htmlspecialchars($detail['catatan'])) ?>
                         <div>
                             <?php if (!empty($detail['size_breakdown'])): ?>
                                 <?php

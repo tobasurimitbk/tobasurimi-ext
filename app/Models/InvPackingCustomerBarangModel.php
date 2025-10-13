@@ -43,6 +43,7 @@ class InvPackingCustomerBarangModel extends Model
     public function getByInvId($id)
     {
         $invPackingCustomerBarangSizeModel = new InvPackingCustomerBarangSizeModel();
+        $invPackingCustomerPackModel = new InvPackingCustomerPackModel();
 
         $resultFinal = [];
         $invPCBarang = $this->where('inv_packing_customer_id', $id)->findAll();
@@ -55,10 +56,19 @@ class InvPackingCustomerBarangModel extends Model
                 ->where('inv_packing_customer_barang_size.deletedAt', null)
                 ->findAll();
 
+            // Cari Hs Code By Nama Barang :)
+            $invPCPack = $invPackingCustomerPackModel
+                ->select('inv_packing_customer_pack.*,hs_codes.code,hs_codes.uraian_barang')
+                ->join('hs_codes', 'hs_codes.id = inv_packing_customer_pack.hs_code_id', 'left')
+                ->where('inv_packing_customer_id', $id)
+                ->where('inv_packing_customer_pack.nama_barang_packing', trim($i['nama_barang']))
+                ->first();
+
             $resultBarang = [
                 'id_barang' => $i['id'],
                 'nama_barang' => $i['nama_barang'],
                 'catatan' => $i['catatan'],
+                'hs_code_name' => $invPCPack == null ? "" : $invPCPack['code'] . " - " . $invPCPack['uraian_barang'],
                 'size_breakdown' => []
             ];
 

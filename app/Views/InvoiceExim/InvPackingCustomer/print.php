@@ -406,7 +406,8 @@
                     <td style="padding: 6px; border: 1px solid #7a7a78; vertical-align: top;"><?= $no++ ?></td>
                     <td style="padding: 6px; border: 1px solid #7a7a78; vertical-align: top;">
                         <?= $detail['nama_barang'] ?> <br>
-                        <?= $detail['catatan'] ?>
+                        HS CODE : <?= $detail['hs_code_name'] ?> <br>
+                        <?= nl2br(htmlspecialchars($detail['catatan'])) ?>
                         <div>
                             <?php if (!empty($detail['size_breakdown'])): ?>
                                 <?php
@@ -563,22 +564,24 @@
                         <tr>
                             <td>
                                 <table>
-                                    <tr style="font-weight: bold;">
-                                        <td>
-                                            TOTAL
-                                        </td>
-                                        <td>:</td>
-                                        <td>
-                                            <?= number_format($totalQty, 2) . " " . $satuanQty ?>
-                                        </td>
-                                    </tr>
+                                    <?php if ($satuanQty != "KG"): ?>
+                                        <tr style="font-weight: bold;">
+                                            <td>
+                                                TOTAL
+                                            </td>
+                                            <td>:</td>
+                                            <td>
+                                                <?= number_format($totalQty, 2) . " " . $satuanQty ?>
+                                            </td>
+                                        </tr>
+                                    <?php endif; ?>
                                     <tr style="font-weight: bold;">
                                         <td>
                                             NETTO WEIGHT
                                         </td>
                                         <td>:</td>
                                         <td>
-                                            <?= number_format($dataInvoice['total_berat_bersih'], 2) ?> Kg
+                                            <?= number_format($dataInvoice['total_berat_bersih'], 2) ?> KG
                                         </td>
                                     </tr>
                                     <tr style="font-weight: bold;">
@@ -587,7 +590,7 @@
                                         </td>
                                         <td>:</td>
                                         <td>
-                                            <?= number_format($dataInvoice['total_berat_kotor'], 2) ?> Kg
+                                            <?= number_format($dataInvoice['total_berat_kotor'], 2) ?> KG
                                         </td>
                                     </tr>
                                 </table>
@@ -861,12 +864,12 @@
                     <tr>
                         <td>PORT OF LOADING</td>
                         <td>:</td>
-                        <td><?= strip_tags($dataSalesOrderExport->loading_port) ?></td>
+                        <td><?= strip_tags($dataInvoice['loading_port']) ?></td>
                     </tr>
                     <tr>
                         <td>PORT OF DISCHARGE</td>
                         <td>:</td>
-                        <td><?= strip_tags($dataSalesOrderExport->dicharge_port) ?></td>
+                        <td><?= strip_tags($dataInvoice['dicharge_port']) ?></td>
                     </tr>
                     <tr>
                         <td>CONTRACT</td>
@@ -947,7 +950,7 @@
                     <td style="padding: 6px; border: 1px solid #7a7a78; vertical-align: top;">
                         <?= $detail['nama_barang_packing'] ?> <br>
                         HS CODE : <?= $detail['hs_code_name'] ?> <br>
-                        <?= $detail['keterangan_packing'] ?>
+                        <?= nl2br(htmlspecialchars($detail['keterangan_packing'])) ?>
                         <div>
                             <?php if (!empty($detail['size_breakdown'])): ?>
                                 <?php
