@@ -343,6 +343,7 @@ class PembayaranInvoice extends BaseController
 
         $bankList = $this->banksModel->asObject()
             ->where('company_id', $this->this_company_id)
+            ->where('deletedAt', null)
             ->orderBy('name', "ASC")
             ->findAll();
         
@@ -2049,6 +2050,7 @@ class PembayaranInvoice extends BaseController
 
             $bankList = $this->banksModel->asObject()
                 ->where('company_id', $this->this_company_id)
+                ->where('deletedAt', null)
                 ->orderBy('name', "ASC")
                 ->findAll();
 
@@ -2281,6 +2283,29 @@ class PembayaranInvoice extends BaseController
             'token' => csrf_hash(),
             'status' => $result,
             'message' => $result ? "Pembayaran berhasil diposting" : "Terjadi Kesalahan Saat Input Data Transaksi Ke Jurnal Umum"
+        ]);
+    }
+
+
+    public function unposting()
+    {
+        $id = decrypt($this->request->getVar('id'));
+        $data = $this->pembayaranInvoiceModel->where('id', $id)->first();
+
+        if ($data['type_invoice'] == "PROFORMA INVOICE") {
+            $result = $this->jurnalController->unpostDataPembayaranInvoice($id);
+        } else {
+            $result = $this->jurnalController->unpostDataPembayaranInvoice($id);
+        }
+
+        if ($result) {
+            $this->pembayaranInvoiceModel->update($id, ['status_posting' => 0]);
+        }
+
+        return response()->setJSON([
+            'token' => csrf_hash(),
+            'status' => $result,
+            'message' => $result ? "Pembayaran berhasil di unposting" : "Terjadi Kesalahan Saat Input Data Transaksi Ke Jurnal Umum"
         ]);
     }
 }
