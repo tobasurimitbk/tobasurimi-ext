@@ -561,7 +561,7 @@
             let id = $('.id').val();
             if (id == "") {
                 $("input[name='kode_barang']").attr("readonly", false);
-                $("input[name='kode_barang']").val("");
+                // $("input[name='kode_barang']").val("");
             }
         }
     }
