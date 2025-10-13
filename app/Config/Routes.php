@@ -944,6 +944,7 @@ $routes->post('/work-order/save', 'Production\WorkOrder::create', ['filter' => '
 $routes->post('/work-order/update', 'Production\WorkOrder::update', ['filter' => 'Auth']);
 $routes->post('/work-order/delete', 'Production\WorkOrder::deleteWO', ['filter' => 'Auth']);
 $routes->post('/work-order/delete-detail', 'Production\WorkOrder::deleteWODetail', ['filter' => 'Auth']);
+$routes->get('/work-order/dropdown/divisi/(:segment)', 'Production\WorkOrder::dropdownWarehouseByDivisiId/$1', ['filter' => 'Auth']);
 
 // Request Stock
 $routes->get('/request-stock', 'Production\RequestStock::index', ['filter' => 'Auth']);

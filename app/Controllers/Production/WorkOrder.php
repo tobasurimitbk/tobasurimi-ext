@@ -330,4 +330,16 @@ class WorkOrder extends BaseController
 
         return json_encode($no);
     }
+
+    public function dropdownWarehouseByDivisiId($divisiID)
+    {
+        $dataWarehouse = $this->warehousesModel->get_by_divisi_id($this->this_company_id, $divisiID);
+
+        $data = [
+            "data" => $dataWarehouse
+        ];
+
+        echo json_encode($data);
+        return;
+    }
 }
