@@ -516,22 +516,24 @@
                 <td style="padding: 6px; border: 1px solid #7a7a78;"></td>
                 <td style="padding: 6px; border: 1px solid #7a7a78; text-align: right; " colspan="4">
                     <table>
-                        <tr style="font-weight: bold;">
-                            <td>
-                                TOTAL
-                            </td>
-                            <td>:</td>
-                            <td>
-                                <?= number_format($totalQty, 2) . " " . $kodeSatuan ?>
-                            </td>
-                        </tr>
+                        <?php if ($kodeSatuan != "KG"): ?>
+                            <tr style="font-weight: bold;">
+                                <td>
+                                    TOTAL
+                                </td>
+                                <td>:</td>
+                                <td>
+                                    <?= number_format($totalQty, 2) . " " . $kodeSatuan ?>
+                                </td>
+                            </tr>
+                        <?php endif; ?>
                         <tr style="font-weight: bold;">
                             <td>
                                 NETTO WEIGHT
                             </td>
                             <td>:</td>
                             <td>
-                                <?= number_format($dataInvoice['total_berat_bersih'], 2) ?> Kg
+                                <?= number_format($dataInvoice['total_berat_bersih'], 2) ?> KG
                             </td>
                         </tr>
                         <tr style="font-weight: bold;">
@@ -540,7 +542,7 @@
                             </td>
                             <td>:</td>
                             <td>
-                                <?= number_format($dataInvoice['total_berat_kotor'], 2) ?> Kg
+                                <?= number_format($dataInvoice['total_berat_kotor'], 2) ?> KG
                             </td>
                         </tr>
                     </table>
@@ -807,12 +809,12 @@
                     <tr>
                         <td>PORT OF LOADING</td>
                         <td>:</td>
-                        <td><?= strip_tags($dataSalesOrderExport->loading_port) ?></td>
+                        <td><?= strip_tags($dataInvoice['loading_port']) ?></td>
                     </tr>
                     <tr>
                         <td>PORT OF DISCHARGE</td>
                         <td>:</td>
-                        <td><?= strip_tags($dataSalesOrderExport->dicharge_port) ?></td>
+                        <td><?= strip_tags($dataInvoice['dicharge_port']) ?></td>
                     </tr>
                     <tr>
                         <td>CONTRACT</td>
