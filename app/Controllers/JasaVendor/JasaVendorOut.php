@@ -814,7 +814,7 @@ class JasaVendorOut extends BaseController
                 $condition = [
                     'rm_purchase_orders.supplier_id' => $supplierId,
                     'stock_revamp.barang_master_id' => $barangMasterId,
-                    'stock_revamp_detail.qty_diterima <' => 0
+                    'stock_revamp_detail.qty_diterima >' => 0,
                 ];
                 $dataResult = $stockRevampDetailModel->getStockListWithAddConditionForJasaVendorOut($condition);
 
@@ -859,6 +859,7 @@ class JasaVendorOut extends BaseController
                 // Untuk Dari Jasa Vendor
                 $condition = [
                     'stock_revamp_detail.reference_type' => "JASA VENDOR",
+                    'stock_revamp_detail.qty_diterima <' => 0,
                 ];
 
                 $dataResult = $stockRevampDetailModel->getStockListWithAddConditionForJasaVendorOut($condition);
