@@ -1626,7 +1626,7 @@ class RMPurchaseOrderModel extends Model
         ];
     }
 
-    public function generateKomponenHarga($id)
+    public function generateKomponenHargaBackup($id)
     {
         $rmPurchaseOrderDetailModel = new RMPurchaseOrderDetailModel();
 
@@ -1771,6 +1771,202 @@ class RMPurchaseOrderModel extends Model
             'nilai_total_bulanan' => $nilaiTotalBulanan,
             'nilai_total_tambahan' => $nilaiTotalTambahan,
             'nilai_total_qty' => $totalQty
+        ];
+    }
+
+    public function generateKomponenHarga($id)
+    {
+        $rmPurchaseOrderDetailModel = new RMPurchaseOrderDetailModel();
+
+        // Get PO First
+        $selectQry = "rm_purchase_orders.id,
+            rm_purchase_orders.po_date,
+            rm_purchase_orders.po_no,
+            rm_purchase_orders.pph,
+            rm_purchase_orders.cong_batasan,
+            rm_purchase_orders.cong_sebenarnya,
+            rm_purchase_orders.subsidi_langsung,
+            rm_purchase_orders.is_posted,
+            rm_purchase_orders.status_penerimaan,
+            suppliers.name AS supplierName,
+            suppliers.no_npwp as supplierNPWP";
+
+        $dataPo = $this->asObject()
+            ->select($selectQry)
+            ->join('suppliers', 'rm_purchase_orders.supplier_id = suppliers.id', 'left')
+            ->where('rm_purchase_orders.id', $id)
+            ->first();
+
+        $hasNpwp = !empty($dataPo->supplierNpwp);
+        $pphMode = $dataPo->pph;
+
+        if ($dataPo->po_date <= '2025-06-30') {
+            // Dibawah bulan 7
+            $nilaiPph = $hasNpwp ? 0.9975 : 0.995;
+            $nilaiPph2 = $hasNpwp ? 0.0025 : 0.005;
+        } else {
+            // Diatas bulan 7
+            $nilaiPph = 0.9975;
+            $nilaiPph2 = 0.0025;
+        }
+
+        // Get PO Lokal Detail
+        $detailPurchaseOrder = $rmPurchaseOrderDetailModel
+            ->where('rm_purchase_order_id', $dataPo->id)
+            ->where('deletedAt', null)
+            ->findAll();
+
+        $totalQty = 0;
+        $dppUmum = 0;
+        $dppHarian = 0;
+        $dppBulanan = 0;
+        $dppTambahan = 0;
+        $pphUmum = 0;
+        $pphHarian = 0;
+        $pphBulanan = 0;
+        $pphTambahan = 0;
+        $nilaiTotalBulanan = 0;
+        $nilaiTotalUmum = 0;
+        $nilaiTotalHarian = 0;
+        $nilaiTotalTambahan = 0;
+        //---------------------------------------
+        $rmPurchaseOrderDetailNilai = array();
+
+        foreach ($detailPurchaseOrder as $detailPo) {
+            $dppUmumDetail = 0;
+            $pphUmumDetail = 0;
+            $nilaiTotalUmumDetail = 0;
+            $dppHarianDetail = 0;
+            $pphHarianDetail = 0;
+            $nilaiTotalHarianDetail = 0;
+            $dppBulananDetail = 0;
+            $pphBulananDetail = 0;
+            $nilaiTotalBulananDetail = 0;
+
+
+            if ($pphMode == "None" || $pphMode == "Supplier") {
+                // Jika Ditanggung Supplier dan Tidak DItanggung
+                $dppUmumDetail = custom_round((float)($detailPo['general_price'] * $detailPo['qty']));
+                $pphUmumDetail = custom_round($dppUmumDetail * $nilaiPph2);
+                $nilaiTotalUmumDetail = $dppUmumDetail - $pphUmumDetail;
+
+                $dppHarianDetail = custom_round((float)($detailPo['daily_price'] * $detailPo['qty']));
+                $pphHarianDetail = custom_round($dppHarianDetail * $nilaiPph2);
+                $nilaiTotalHarianDetail = $dppHarianDetail - $pphHarianDetail;
+
+                $dppBulananDetail = custom_round((float)($detailPo['monthly_price'] * $detailPo['qty']));
+                $pphBulananDetail = custom_round($dppBulananDetail * $nilaiPph2);
+                $nilaiTotalBulananDetail = $dppBulananDetail - $pphBulananDetail;
+            } else {
+                // DItanggung Company
+                $dppUmumDetail = custom_round((float)(($detailPo['general_price'] / $nilaiPph) * $detailPo['qty']));
+                $pphUmumDetail = custom_round($dppUmumDetail * $nilaiPph2);
+                $nilaiTotalUmumDetail = $dppUmumDetail - $pphUmumDetail;
+
+                $dppHarianDetail = custom_round((float)(($detailPo['daily_price'] / $nilaiPph) * $detailPo['qty']));
+                $pphHarianDetail = custom_round($dppHarianDetail * $nilaiPph2);
+                $nilaiTotalHarianDetail = $dppHarianDetail - $pphHarianDetail;
+
+                $dppBulananDetail = custom_round((float)(($detailPo['monthly_price'] / $nilaiPph) * $detailPo['qty']));
+                $pphBulananDetail = custom_round($dppBulananDetail * $nilaiPph2);
+                $nilaiTotalBulananDetail = $dppBulananDetail - $pphBulananDetail;
+            }
+
+            array_push($rmPurchaseOrderDetailNilai, [
+                'id' => $detailPo['id'],
+                'dpp_umum' => $dppUmumDetail,
+                'pph_umum' => $pphUmumDetail,
+                'nilai_total_umum' => $nilaiTotalUmumDetail,
+                'dpp_harian' => $dppHarianDetail,
+                'pph_harian' => $pphHarianDetail,
+                'nilai_total_harian' => $nilaiTotalHarianDetail,
+                'dpp_bulanan' => $dppBulananDetail,
+                'pph_bulanan' => $pphBulananDetail,
+                'nilai_total_bulanan' => $nilaiTotalBulananDetail
+            ]);
+
+            // $dppUmum += $dppUmumDetail;
+            // $dppHarian += $dppHarianDetail;
+            // $dppBulanan += $dppBulananDetail;
+            $totalQty += $detailPo['qty'];
+        }
+
+        // Hitung Pph harga biasa
+        if ($pphMode == "Supplier" || $pphMode == "Company") {
+
+            foreach ($rmPurchaseOrderDetailNilai as $r) {
+                $dppUmum += $r['dpp_umum'];
+                $pphUmum += $r['pph_umum'];
+                $nilaiTotalUmum += $r['nilai_total_umum'];
+                //----------------------------------------------------
+                $dppHarian += $r['dpp_harian'];
+                $pphHarian += $r['pph_harian'];
+                $nilaiTotalHarian += $r['nilai_total_harian'];
+                //-----------------------------------------------------
+                $dppBulanan += $r['dpp_bulanan'];
+                $pphBulanan += $r['pph_bulanan'];
+                $nilaiTotalBulanan += $r['nilai_total_bulanan'];
+            }
+        } else {
+            // PPH KOSONG
+            foreach ($rmPurchaseOrderDetailNilai as $r) {
+                $dppUmum += $r['dpp_umum'];
+                $dppHarian += $r['dpp_harian'];
+                $dppBulanan += $r['dpp_bulanan'];
+            }
+        }
+
+        // Hitung pph dari tambahan langsung
+        if ($pphMode == 'Company') {
+            // Kalau Ditaggung Company di Up kan dulu pph nya
+            $nilaiDppTambahan = custom_round($dataPo->cong_batasan - $dataPo->cong_sebenarnya + $dataPo->subsidi_langsung);
+
+            $dppTambahan = (float)custom_round($nilaiDppTambahan / $nilaiPph);
+            $pphTambahan = (float)(custom_round($dppTambahan * $nilaiPph2));
+
+            $nilaiTotalTambahan = (float) (custom_round($dppTambahan - $pphTambahan));
+        } else {
+
+            $dppTambahan = (float)custom_round(($dataPo->cong_batasan - $dataPo->cong_sebenarnya + $dataPo->subsidi_langsung) * $totalQty);
+            $pphTambahan = $pphMode == "None" ? 0 : (float)(custom_round($dppTambahan * $nilaiPph2));
+            $nilaiTotalTambahan = (float) (custom_round($dppTambahan - $pphTambahan));
+        }
+
+        // var_dump($dppHarian - $pphHarian);
+        // die;
+
+        $nilaiBeforePph = $dppHarian + $dppUmum + $dppBulanan + abs($dppTambahan);
+        $nilaiAfterPph = $nilaiTotalHarian + $nilaiTotalUmum + $nilaiTotalBulanan + abs($nilaiTotalTambahan);
+
+        // JIka pph tidak ditanggung siapa siapa
+        if ($nilaiAfterPph == 0 || $dataPo->pph == "None") {
+            $nilaiAfterPph = $nilaiBeforePph;
+        }
+
+        if ($pphMode == "None") {
+            $nilaiTotalUmum = $dppUmum;
+            $nilaiTotalHarian = $dppHarian;
+            $nilaiTotalBulanan = $dppBulanan;
+            $nilaiTotalTambahan = $dppTambahan;
+        }
+
+        return [
+            'nilai_before_pph' => $nilaiBeforePph,
+            'nilai_after_pph' => $nilaiAfterPph,
+            'dpp_umum' => $dppUmum,
+            'dpp_harian' => $dppHarian,
+            'dpp_bulanan' => $dppBulanan,
+            'dpp_tambahan' => $dppTambahan,
+            'pph_umum' => $pphUmum,
+            'pph_harian' => $pphHarian,
+            'pph_bulanan' => $pphBulanan,
+            'pph_tambahan' => $pphTambahan,
+            'nilai_total_umum' => $nilaiTotalUmum,
+            'nilai_total_harian' => $nilaiTotalHarian,
+            'nilai_total_bulanan' => $nilaiTotalBulanan,
+            'nilai_total_tambahan' => $nilaiTotalTambahan,
+            'nilai_total_qty' => $totalQty,
+            'rm_purchase_order_detail_nilai' => $rmPurchaseOrderDetailNilai
         ];
     }
 
@@ -1931,5 +2127,4 @@ class RMPurchaseOrderModel extends Model
             ->orderBy('rm_purchase_orders.po_date', 'ASC', false)
             ->findAll();
     }
-
 }

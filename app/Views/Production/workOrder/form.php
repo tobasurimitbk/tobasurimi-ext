@@ -576,7 +576,7 @@
         $('#department_id').on('change', function() {
             var departmentId = $(this).val();
             $.ajax({
-                url: `<?= base_url("warehouse/dropdown/divisi/"); ?>${departmentId}`,
+                url: `<?= base_url("work-order/dropdown/divisi/"); ?>${departmentId}`,
                 method: "GET",
                 dataType: "json",
                 success: function(res) {

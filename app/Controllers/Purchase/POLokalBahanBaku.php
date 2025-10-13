@@ -401,6 +401,7 @@ class POLokalBahanBaku extends BaseController
         }
 
         $totalFinal = $this->RMPurchaseOrderModel->generateKomponenHarga($id);
+        $this->RMPurchaseOrderDetailModel->updateBatch($totalFinal['rm_purchase_order_detail_nilai'], 'id');
 
         $this->RMPurchaseOrderModel->update($id, [
             'total' => $totalHarga  + $this->request->getVar("subsidi_langsung"),
@@ -552,6 +553,7 @@ class POLokalBahanBaku extends BaseController
 
         $totalFinal = $this->RMPurchaseOrderModel->generateKomponenHarga($id);
 
+        $this->RMPurchaseOrderDetailModel->updateBatch($totalFinal['rm_purchase_order_detail_nilai'], 'id');
 
         $this->RMPurchaseOrderModel->update($id, [
             'total' => $totalHarga  + $this->request->getVar("subsidi_langsung"),
