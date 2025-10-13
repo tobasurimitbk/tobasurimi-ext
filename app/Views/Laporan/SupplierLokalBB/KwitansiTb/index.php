@@ -14,8 +14,9 @@
                     Print All
                 </button>
                 <ul class="dropdown-menu list-dropdown-company" aria-labelledby="dropdownMenuButtonExport">
-                    <li><button class="dropdown-item" id="btn-print-f4">Print TB F4</button></li>
-                    <li><button class="dropdown-item" id="btn-print-continous">Print TB Continous</button></li>
+                    <!-- <li><button class="dropdown-item" id="btn-print-f4">Print TB F4 (U. Supplier)</button></li> -->
+                    <li><button class="dropdown-item" id="btn-print-continous">Print TB (U. Supplier)</button></li>
+                    <li><button class="dropdown-item" id="btn-print-kasir">Print TB (U. Kasir)</button></li>
                 </ul>
             <?php endif; ?>
         </div>
@@ -244,21 +245,21 @@
         window.open("<?= base_url('/') ?>" + res, "_blank");
     }
 
-    $('#btn-print-f4').on('click', function(e) {
-        e.preventDefault();
-        var month = $('#month').val();
-        var year = $('#year').val();
-        if (month == "") {
-            alert("Pilih bulan");
-            return;
-        } else if (year == "") {
-            alert("Pilih tahun");
-            return;
-        } else {
-            var url = "<?= base_url('laporan-supplier-lokal-bb/print-all-kwitansi-tb') ?>?month=" + month + "&year=" + year + "&kertas=f4";
-            window.open(url);
-        }
-    });
+    // $('#btn-print-f4').on('click', function(e) {
+    //     e.preventDefault();
+    //     var month = $('#month').val();
+    //     var year = $('#year').val();
+    //     if (month == "") {
+    //         alert("Pilih bulan");
+    //         return;
+    //     } else if (year == "") {
+    //         alert("Pilih tahun");
+    //         return;
+    //     } else {
+    //         var url = "<?= base_url('laporan-supplier-lokal-bb/print-all-kwitansi-tb') ?>?month=" + month + "&year=" + year + "&kertas=f4";
+    //         window.open(url);
+    //     }
+    // });
 
     $('#btn-print-continous').on('click', function(e) {
         e.preventDefault();
@@ -272,6 +273,22 @@
             return;
         } else {
             var url = "<?= base_url('laporan-supplier-lokal-bb/print-all-kwitansi-tb') ?>?month=" + month + "&year=" + year + "&kertas=continous";
+            window.open(url);
+        }
+    });
+
+    $('#btn-print-kasir').on('click', function(e) {
+        e.preventDefault();
+        var month = $('#month').val();
+        var year = $('#year').val();
+        if (month == "") {
+            alert("Pilih bulan");
+            return;
+        } else if (year == "") {
+            alert("Pilih tahun");
+            return;
+        } else {
+            var url = "<?= base_url('laporan-supplier-lokal-bb/print-all-kwitansi-tb') ?>?month=" + month + "&year=" + year + "&kertas=kasir";
             window.open(url);
         }
     });
