@@ -598,7 +598,9 @@ $routes->post('/invoice-penjualan-lokal/update', 'SalesLokal\Invoice::update', [
 $routes->post('/invoice-penjualan-lokal/delete', 'SalesLokal\Invoice::delete', ['filter' => 'Auth']);
 $routes->post('/invoice-penjualan-lokal/delete-detail', 'SalesLokal\Invoice::deleteDetail', ['filter' => 'Auth']);
 $routes->post('/invoice-penjualan-lokal/posting',  'SalesLokal\Invoice::posting', ['filter' => 'Auth']);
+$routes->post('/invoice-penjualan-lokal/unposting',  'SalesLokal\Invoice::unposting', ['filter' => 'Auth']);
 $routes->get('/invoice-penjualan-lokal/getDocNumber/(:segment)/(:segment)', 'SalesLokal\Invoice::getDocNumber/$1/$2', ['filter' => 'Auth']);
+$routes->get('/invoice-penjualan-lokal/getDocNumberEdit/(:segment)/(:segment)', 'SalesLokal\Invoice::getDocNumberEdit/$1/$2', ['filter' => 'Auth']);
 $routes->get('/invoice-penjualan-lokal/getDocumentData/(:alpha)/(:num)', 'SalesLokal\Invoice::getDocData/$1/$2', ['filter' => 'Auth']);
 $routes->get('/invoice-penjualan-lokal/getItemList/(:num)', 'SalesLokal\Invoice::getItemList/$1', ['filter' => 'Auth']);
 $routes->get('/invoice-penjualan-lokal/print/(:segment)', 'SalesLokal\Invoice::printInvoice/$1', ['filter' => 'Auth']);
@@ -2310,6 +2312,30 @@ $routes->post('/rasio/update', 'Accounting\Rasio\RasioController::updateRasio', 
 $routes->post('/rasio/delete', 'Accounting\Rasio\RasioController::deleteRasio', ['filter' => 'Auth']);
 $routes->post('/rasio/get', 'Accounting\Rasio\RasioController::get', ['filter' => 'Auth']);
 $routes->get('/rasio/load_content', 'Accounting\Rasio\RasioController::load_content', ['filter' => 'Auth']);
+
+$routes->get('/ratio-gurita', 'Accounting\Rasio\RasioGuritaController::index', ['filter' => 'Auth']);
+$routes->get('/ratio-gurita/create', 'Accounting\Rasio\RasioGuritaController::createRasio', ['filter' => 'Auth']);
+$routes->get('/ratio-gurita/get-barang-digunakan', 'Accounting\Rasio\RasioGuritaController::getRasioBarangDigunakan', ['filter' => 'Auth']);
+$routes->get('/ratio-gurita/get-barang-digunakan-jadi', 'Accounting\Rasio\RasioGuritaController::getRasioBarangDigunakanJadi', ['filter' => 'Auth']);
+$routes->get('/ratio-gurita/get-saldo-akhir', 'Accounting\Rasio\RasioGuritaController::getSaldoAkhir', ['filter' => 'Auth']);
+$routes->get('/ratio-gurita/get-saldo-awal', 'Accounting\Rasio\RasioGuritaController::getSaldoAwal', ['filter' => 'Auth']);
+$routes->get('/ratio-gurita/get-saldo-adjusment', 'Accounting\Rasio\RasioGuritaController::getSaldoAdjusment', ['filter' => 'Auth']);
+$routes->get('/ratio-gurita/get-saldo-jual', 'Accounting\Rasio\RasioGuritaController::getSaldoJual', ['filter' => 'Auth']);
+$routes->get('/ratio-gurita/get-saldo-trimming', 'Accounting\Rasio\RasioGuritaController::getSaldoTrimming', ['filter' => 'Auth']);
+$routes->get('/ratio-gurita/get-barang-jadi', 'Accounting\Rasio\RasioGuritaController::getRasioBarangJadi', ['filter' => 'Auth']);
+
+$routes->get('/ratio-gurita/get-material-i', 'Accounting\Rasio\RasioGuritaController::getRawMaterialI', ['filter' => 'Auth']);
+
+$routes->get('/ratio-gurita/get-barang-digunakan-penolong', 'Accounting\Rasio\RasioGuritaController::getRasioBarangDigunakanPenolong', ['filter' => 'Auth']);
+$routes->get('/ratio-gurita/get-jurnal', 'Accounting\Rasio\RasioGuritaController::getDataJurnal', ['filter' => 'Auth']);
+$routes->get('/ratio-gurita/get-cost', 'Accounting\Rasio\RasioGuritaController::getCost', ['filter' => 'Auth']);
+$routes->get('/ratio-gurita/all', 'Accounting\Rasio\RasioGuritaController::allRasio', ['filter' => 'Auth']);
+$routes->get('/ratio-gurita/id/(:segment)', 'Accounting\Rasio\RasioGuritaController::getById/$1', ['filter' => 'Auth']);
+$routes->post('/ratio-gurita/save', 'Accounting\Rasio\RasioGuritaController::saveRasio', ['filter' => 'Auth']);
+$routes->post('/ratio-gurita/update', 'Accounting\Rasio\RasioGuritaController::updateRasio', ['filter' => 'Auth']);
+$routes->post('/ratio-gurita/delete', 'Accounting\Rasio\RasioGuritaController::deleteRasio', ['filter' => 'Auth']);
+$routes->post('/ratio-gurita/get', 'Accounting\Rasio\RasioGuritaController::get', ['filter' => 'Auth']);
+$routes->get('/ratio-gurita/load_content', 'Accounting\Rasio\RasioGuritaController::load_content', ['filter' => 'Auth']);
 
 // Tutup Buku
 $routes->get('/tutup-buku', 'Accounting\TutupBuku\TutupBukuController::index', ['filter' => 'Auth']);
