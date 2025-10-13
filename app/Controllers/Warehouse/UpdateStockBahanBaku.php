@@ -422,7 +422,7 @@ class UpdateStockBahanBaku extends BaseController
     {
         $id = decrypt($this->request->getVar('id'));
 
-        // Cek data utama
+        // 🔹 Cek data utama
         $purchase = $this->updateStockPurchase->find($id);
         if (!$purchase) {
             return $this->response->setJSON([
@@ -433,55 +433,59 @@ class UpdateStockBahanBaku extends BaseController
         }
 
         try {
-            // Ambil detail
+            // 🔹 Ambil detail
             $stockDetail = $this->updateStockPurchaseDetail
                 ->where('deletedAt', null)
                 ->where('update_stock_purchase_id', $id)
                 ->findAll();
 
-            $qty_diterima_total = 0;
-
-            // ambil parent_id dari salah satu detail
-            $parentId = !empty($stockDetail[0]['stock_id']) ? $stockDetail[0]['stock_id'] : null;
+            if (empty($stockDetail)) {
+                return $this->response->setJSON([
+                    'message' => "Detail tidak ditemukan",
+                    'status'  => false,
+                    'token'   => csrf_hash()
+                ]);
+            }
 
             foreach ($stockDetail as $p) {
-                // ambil qty lama detail
+                $stockDetailId = $p['stock_detail_id'];
+                $parentId      = $p['stock_id'] ?? null;
+
+                // 🔹 Ambil qty lama detail
                 $oldDetail = $this->stockRevampDetailModel
                     ->select('qty_diterima')
-                    ->where('id', $p['stock_detail_id'])
+                    ->where('id', $stockDetailId)
                     ->first();
 
-                $oldQty = $oldDetail ? $oldDetail['qty_diterima'] : 0;
-                $newQty = $p['qty_diterima'];
-
-                // hitung selisih
+                $oldQty = $oldDetail ? (float)$oldDetail['qty_diterima'] : 0;
+                $newQty = (float)$p['qty_diterima'];
                 $selisih = $newQty - $oldQty;
-                $qty_diterima_total += $selisih;
 
-                // update detail
+                // 🔹 Update detail
                 $this->stockRevampDetailModel
-                    ->where('id', $p['stock_detail_id'])
+                    ->where('id', $stockDetailId)
                     ->set(['qty_diterima' => $newQty])
                     ->update();
 
-                // insert ke log kalau ada perubahan qty
-               
+                // 🔹 Insert ke log kalau ada perubahan qty
+                if ($selisih != 0) {
                     $this->stockRevampLogModel->insert([
-                        'stock_detail_id' => $p['stock_detail_id'],
+                        'stock_detail_id' => $stockDetailId,
                         'status'          => 'IN',
                         'qty_diterima'    => $selisih,
                     ]);
+                }
+
+                // 🔹 Update parent (tambah qty_diterima dengan selisih)
+                if ($parentId) {
+                    $this->stockRevampModel
+                        ->where('id', $parentId)
+                        ->set('qty_diterima', 'qty_diterima + ' . $selisih, false)
+                        ->update();
+                }
             }
 
-            // update parent (tambah qty_diterima dengan total selisih)
-            if ($parentId) {
-                $this->stockRevampModel
-                    ->where('id', $parentId)
-                    ->set('qty_diterima', 'qty_diterima + ' . $qty_diterima_total, false)
-                    ->update();
-            }
-
-            // Update status posting
+            // 🔹 Update status posting
             $this->updateStockPurchase
                 ->update($id, ['status_posting' => "1"]);
 
@@ -498,6 +502,7 @@ class UpdateStockBahanBaku extends BaseController
             ]);
         }
     }
+
 
 
     

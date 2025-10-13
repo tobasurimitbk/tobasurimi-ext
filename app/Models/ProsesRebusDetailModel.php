@@ -137,7 +137,10 @@ class ProsesRebusDetailModel extends Model
         $stockRevampDetailModel = new StockRevampDetailModel();
 
         $result = array();
-        $prosesRebusDetail = $this->asArray()->where('proses_rebus_id', $prosesRebusID)->findAll();
+        $prosesRebusDetail = $this->asArray()->where('proses_rebus_id', $prosesRebusID)->where('deletedAt', null)->findAll();
+
+        // var_dump($prosesRebusDetail);
+        // die;
 
         foreach ($prosesRebusDetail as $m) {
             $stockList = $stockRevampDetailModel->where('id', $m['stock_detail_rebus_id'])->first();

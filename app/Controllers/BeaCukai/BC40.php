@@ -318,9 +318,75 @@ class BC40 extends BaseController
             'bcPo' => $bcPo,
             'bc40' => $bc40,
             'daftarPoUsed' => $this->bcPurchaseOrderModel->findDetailBarangWithSpek($bcPurchaseOrderID),
+            'kodeFasilitasTarif' => $this->metaDataModel->where('name', "Kode Fasilitas Tarif BC")->whereIn('description', ['TIDAK DIPUNGUT', 'DIBEBASKAN', 'DITANGGUHKAN', 'SUDAH DILUNASI'])->findAll(),
+            'kodeJenisTarif' => $this->metaDataModel->where('name', "Kode Jenis Tarif BC")->whereIn('description', ['ADVALORUM'])->findAll(),
+            'kodeJenisPungutan' => $this->metaDataModel->where('name', "Kode Jenis Pungutan BC")->whereIn('value', ['PPN'])->findAll(),
         ];
 
         return view('BeaCukai/bc-40/form-po-list', $data);
+    }
+
+    public function pungutanPerBarangAll()
+    {
+        $bcPurchaseOrderID = decrypt($this->request->getVar('bc_purchase_order_id'));
+        $lpbDetail = $this->bcPurchaseOrderModel->findDetailBarang($bcPurchaseOrderID);
+        $dataResult = array();
+
+        $no = 1;
+        $seriBarang = 1;
+        foreach ($lpbDetail as $l) {
+            $bcBarangTarif = $this->bcBarangTarifModel
+                ->where('bc_purchase_order_id', $bcPurchaseOrderID)
+                ->where('penerimaan_barang_id', $l['penerimaan_barang_id'])
+                ->where('barang1_id', $l['barang1_id'])
+                ->first();
+
+            $bcBarang = $this->bcBarangModel
+                ->where('bc_purchase_order_id', $bcPurchaseOrderID)
+                ->where('penerimaan_barang_id', $l['penerimaan_barang_id'])
+                ->where('barang1_id', $l['barang1_id'])
+                ->first();
+
+            array_push($dataResult, [
+                'no' => $no++,
+                'seri_barang' => $seriBarang++,
+                'bc_purchase_order_id' => encrypt($bcPurchaseOrderID),
+                'penerimaan_barang_id' => encrypt($l['penerimaan_barang_id']),
+                'barang1_id' => encrypt($l['barang1_id']),
+                'kode_barang' => $l['kode_barang'],
+                'barang_name' => str_replace(['"', "'"], [''], $l['barang_name']),
+                'qty_po' => number_format($l['qty_po'], 2),
+                'qty_lpb' => number_format($l['qty_lpb'], 2),
+                'harga' => number_format($l['harga'], 2),
+                'status' => $bcBarangTarif == null ? 0 : 1,
+                'kode_satuan_barang_id' => $bcBarang == null ? "" : encrypt($bcBarang['kode_satuan_barang']),
+                'kode_satuan_barang' => $bcBarang == null ? "" : $bcBarang['kode_satuan_barang'],
+            ]);
+        }
+
+        $data = [
+            "draw"              => intval($this->request->getGet("draw")),
+            'recordsTotal' => count($dataResult),
+            'recordsFiltered' => 25,
+            'data' => $dataResult,
+        ];
+
+        return response()->setJSON($data);
+    }
+
+    public function pungutanHasilAll()
+    {
+        $bcPurchaseOrderID = decrypt($this->request->getVar('bc_purchase_order_id'));
+        $dataResult = $this->getPungutanData($bcPurchaseOrderID);
+
+        $data = [
+            "draw"              => intval($this->request->getGet("draw")),
+            'recordsTotal' => count($dataResult),
+            'recordsFiltered' => 25,
+            'data' => $dataResult,
+        ];
+
+        return response()->setJSON($data);
     }
 
     public function detailBarang($bcPurchaseOrderID)
@@ -1306,71 +1372,100 @@ class BC40 extends BaseController
 
     public function createPungutanAction()
     {
-        $bcPurchaseOrderID = decrypt($this->request->getVar('bc_purchase_order_id'));
-        $penerimaanBarangID = decrypt($this->request->getVar('penerimaan_barang_id'));
-        $barang1ID = decrypt($this->request->getVar('barang1_id'));
+        $db = \Config\Database::connect();
+        $db->transBegin();
+        try {
+            $bcPurchaseOrderID = decrypt($this->request->getVar('bc_purchase_order_id'));
+            $penerimaanBarangID = decrypt($this->request->getVar('penerimaan_barang_id'));
+            $barang1ID = decrypt($this->request->getVar('barang1_id'));
+            $kodeSatuanBarang = decrypt($this->request->getVar('kode_satuan_barang'));
+            $seriBarang = $this->request->getVar('seri_barang');
+            $harga = $this->request->getVar('harga');
 
-        $bc40Barang = $this->bcBarangModel
-            ->where('bc_purchase_order_id', $bcPurchaseOrderID)
-            ->where('penerimaan_barang_id', $penerimaanBarangID)
-            ->where('barang1_id', $barang1ID)
-            ->first();
-
-        if ($bc40Barang == null) {
-            return response()->setJSON([
-                'message' => "Isi dokumen barang detail terlebih dahulu sebelum mengisi pungutan & dokumen barang",
-                'status' => false,
-                'token' => csrf_hash()
-            ]);
-        }
-
-        $pungutan = $this->bcBarangTarifModel
-            ->where('bc_purchase_order_id', $bcPurchaseOrderID)
-            ->where('penerimaan_barang_id', $penerimaanBarangID)
-            ->where('barang1_id', $barang1ID)
-            ->where('kode_jenis_pungutan', decrypt($this->request->getVar('barang_detail_kode_jenis_pungutan')))
-            ->first();
-
-        if ($pungutan != null) {
-            $kodeJenisPungutan = $this->metaDataModel
-                ->where('name', "Kode Jenis Pungutan BC")
-                ->where('value', $pungutan['kode_jenis_pungutan'])
+            $bc40Barang = $this->bcBarangModel
+                ->where('bc_purchase_order_id', $bcPurchaseOrderID)
+                ->where('penerimaan_barang_id', $penerimaanBarangID)
+                ->where('barang1_id', $barang1ID)
                 ->first();
 
+            if ($bc40Barang == null) {
+                if (!$kodeSatuanBarang) {
+                    return response()->setJSON([
+                        'message' => "Isi dokumen barang detail terlebih dahulu sebelum mengisi pungutan & dokumen barang",
+                        'status' => false,
+                        'token' => csrf_hash()
+                    ]);
+                } else {
+                    $bc40BarangId = $this->bcBarangModel->insert([
+                        'bc_purchase_order_id' => $bcPurchaseOrderID,
+                        'penerimaan_barang_id' => $penerimaanBarangID,
+                        'barang1_id'  => $barang1ID,
+                        'bc_type' => 40,
+                        'seri_barang' => $seriBarang,
+                        'kode_satuan_barang' => $kodeSatuanBarang,
+                        'harga_ekspor' => $harga
+                    ]);
+
+                    $bc40Barang = $this->bcBarangModel->where('id', $bc40BarangId)->first();
+                }
+            }
+
+            $pungutan = $this->bcBarangTarifModel
+                ->where('bc_purchase_order_id', $bcPurchaseOrderID)
+                ->where('penerimaan_barang_id', $penerimaanBarangID)
+                ->where('barang1_id', $barang1ID)
+                ->where('kode_jenis_pungutan', decrypt($this->request->getVar('barang_detail_kode_jenis_pungutan')))
+                ->first();
+
+            if ($pungutan != null) {
+                $kodeJenisPungutan = $this->metaDataModel
+                    ->where('name', "Kode Jenis Pungutan BC")
+                    ->where('value', $pungutan['kode_jenis_pungutan'])
+                    ->first();
+
+                return response()->setJSON([
+                    'message' => "Jenis pungutan " . $kodeJenisPungutan['description'] . " sudah ada",
+                    'status' => false,
+                    'token' => csrf_hash()
+                ]);
+            }
+
+            $nilaiTarif =  ($this->request->getVar('barang_detail_nilai_tarif'));
+            $tarifFasilitas = ($this->request->getVar('barang_detail_tarif_fasilitas'));
+            $tarifFasilitas = ($tarifFasilitas == 0) ? 1 : $tarifFasilitas;
+
+            $nilaiBayar = ($bc40Barang['harga_ekspor'] * (($nilaiTarif / 100) / ($tarifFasilitas / 100)));
+
+
+            $this->bcBarangTarifModel->insert([
+                'bc_purchase_order_id' => $bcPurchaseOrderID,
+                'penerimaan_barang_id' => $penerimaanBarangID,
+                'barang1_id' => $barang1ID,
+                'bc_type' => 40,
+                'kode_jenis_pungutan' => decrypt($this->request->getVar('barang_detail_kode_jenis_pungutan')),
+                'kode_jenis_tarif' => decrypt($this->request->getVar('barang_detail_kode_jenis_tarif')),
+                'tarif_bea_masuk' => ($this->request->getVar('barang_detail_nilai_tarif')),
+                'kode_fasilitas_tarif' => decrypt($this->request->getVar('barang_detail_kode_fasilitas_tarif')),
+                'tarif_fasilitas' => ($this->request->getVar('barang_detail_tarif_fasilitas')),
+                'seri_barang' => $bc40Barang['seri_barang'],
+                'kode_satuan_barang' => $bc40Barang['kode_satuan_barang'],
+                'nilai_bayar' => $nilaiBayar
+            ]);
+
+            $db->transCommit();
             return response()->setJSON([
-                'message' => "Jenis pungutan " . $kodeJenisPungutan['description'] . " sudah ada",
+                'message' => "Pungutan berhasil ditambahkan",
+                'status' => true,
+                'token' => csrf_hash()
+            ]);
+        } catch (Exception $e) {
+            $db->transRollback();
+            return response()->setJSON([
+                'message' => $e->getMessage(),
                 'status' => false,
                 'token' => csrf_hash()
             ]);
         }
-
-        $nilaiTarif =  ($this->request->getVar('barang_detail_nilai_tarif'));
-        $tarifFasilitas = ($this->request->getVar('barang_detail_tarif_fasilitas'));
-        $tarifFasilitas = ($tarifFasilitas == 0) ? 1 : $tarifFasilitas;
-
-        $nilaiBayar = ($bc40Barang['harga_ekspor'] * (($nilaiTarif / 100) / ($tarifFasilitas / 100)));
-
-
-        $this->bcBarangTarifModel->insert([
-            'bc_purchase_order_id' => $bcPurchaseOrderID,
-            'penerimaan_barang_id' => $penerimaanBarangID,
-            'barang1_id' => $barang1ID,
-            'bc_type' => 40,
-            'kode_jenis_pungutan' => decrypt($this->request->getVar('barang_detail_kode_jenis_pungutan')),
-            'kode_jenis_tarif' => decrypt($this->request->getVar('barang_detail_kode_jenis_tarif')),
-            'tarif_bea_masuk' => ($this->request->getVar('barang_detail_nilai_tarif')),
-            'kode_fasilitas_tarif' => decrypt($this->request->getVar('barang_detail_kode_fasilitas_tarif')),
-            'tarif_fasilitas' => ($this->request->getVar('barang_detail_tarif_fasilitas')),
-            'seri_barang' => $bc40Barang['seri_barang'],
-            'kode_satuan_barang' => $bc40Barang['kode_satuan_barang'],
-            'nilai_bayar' => $nilaiBayar
-        ]);
-
-        return response()->setJSON([
-            'message' => "Pungutan berhasil ditambahkan",
-            'status' => true,
-            'token' => csrf_hash()
-        ]);
     }
 
     public function deletePungutanAction()
@@ -1520,6 +1615,21 @@ class BC40 extends BaseController
 
         $this->setFlashDataNavigatorSession($bcPurchaseOrderID);
 
+        $barangTarif = $this->bcBarangTarifModel
+            ->where('bc_purchase_order_id', $bcPurchaseOrderID)
+            ->findAll();
+        $pungutanList = $this->getPungutanData($bcPurchaseOrderID);
+        $data = [
+            'bcPo' => $bcPo,
+            'pungutanList' => $pungutanList,
+            'barangTarif' => $barangTarif
+        ];
+
+        return view('BeaCukai/bc-40/form-pungutan', $data);
+    }
+
+    private function getPungutanData($bcPurchaseOrderID)
+    {
         $kodeJenisPungutan = $this
             ->metaDataModel
             ->where('name', "Kode Jenis Pungutan BC")
@@ -1546,25 +1656,21 @@ class BC40 extends BaseController
             }
         }
 
+        $no = 1;
         foreach ($kodeJenisPungutan as $k) {
             if ($k['value'] == "PPN") {
                 $pungutanList[] = [
+                    'no' => $no++,
                     'pungutan' => $k['value'],
-                    'tidak_dipungut' => $ppnTidakDipungut,
-                    'dibebaskan' => $ppnDibebaskan,
-                    'ditangguhkan' => $ppnDitangguhkan
+                    'tidak_dipungut' => (float)$ppnTidakDipungut,
+                    'dibebaskan' => (float)$ppnDibebaskan,
+                    'ditangguhkan' => (float)$ppnDitangguhkan
 
                 ];
             }
         }
 
-        $data = [
-            'bcPo' => $bcPo,
-            'pungutanList' => $pungutanList,
-            'barangTarif' => $barangTarif
-        ];
-
-        return view('BeaCukai/bc-40/form-pungutan', $data);
+        return $pungutanList;
     }
 
     public function createPernyataanView($bcPurchaseOrderID)

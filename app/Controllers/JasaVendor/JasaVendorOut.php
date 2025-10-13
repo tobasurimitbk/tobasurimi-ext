@@ -183,7 +183,6 @@ class JasaVendorOut extends BaseController
             'supplier' => $this->supplierModel->getSupplierByType("BAHAN BAKU")
 
         ];
-
         return view('jasaVendor/out/form', $data);
     }
 
@@ -815,6 +814,7 @@ class JasaVendorOut extends BaseController
                 $condition = [
                     'rm_purchase_orders.supplier_id' => $supplierId,
                     'stock_revamp.barang_master_id' => $barangMasterId,
+                    'stock_revamp_detail.qty_diterima <' => 0
                 ];
                 $dataResult = $stockRevampDetailModel->getStockListWithAddConditionForJasaVendorOut($condition);
 

@@ -330,12 +330,12 @@
                     <tr>
                         <td>PORT OF LOADING</td>
                         <td>:</td>
-                        <td><?= strip_tags($dataSalesOrderExport->loading_port) ?></td>
+                        <td><?= strip_tags($dataInvoice['loading_port']) ?></td>
                     </tr>
                     <tr>
                         <td>PORT OF DISCHARGE</td>
                         <td>:</td>
-                        <td><?= strip_tags($dataSalesOrderExport->dicharge_port) ?></td>
+                        <td><?= strip_tags($dataInvoice['dicharge_port']) ?></td>
                     </tr>
                     <tr>
                         <td>CONTRACT</td>
