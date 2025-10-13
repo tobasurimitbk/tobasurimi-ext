@@ -144,10 +144,7 @@ class SalesOrderInvoiceModel extends Model
 
         if ($addCondition['search']) {
             $salesOrderInvoiceLokal
-                ->like('no_faktur', $addCondition['search'])
-                ->orLike('customers.name', $addCondition['search'])
-                ->orLike('customers.kode', $addCondition['search'])
-                ->orLike('companies.company', $addCondition['search']);
+                ->like('no_faktur', $addCondition['search']);
         }
 
         if ($addCondition['filter_customer']) {
