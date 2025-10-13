@@ -343,6 +343,7 @@ class PembayaranInvoice extends BaseController
 
         $bankList = $this->banksModel->asObject()
             ->where('company_id', $this->this_company_id)
+            ->where('deletedAt', null)
             ->orderBy('name', "ASC")
             ->findAll();
         
@@ -2049,6 +2050,7 @@ class PembayaranInvoice extends BaseController
 
             $bankList = $this->banksModel->asObject()
                 ->where('company_id', $this->this_company_id)
+                ->where('deletedAt', null)
                 ->orderBy('name', "ASC")
                 ->findAll();
 

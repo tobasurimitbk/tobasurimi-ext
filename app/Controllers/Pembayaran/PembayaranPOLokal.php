@@ -75,6 +75,7 @@ class PembayaranPOLokal extends BaseController
 
         $bankList = $this->banksModel->asObject()
             ->where('company_id', $this->this_company_id)
+            ->where('deletedAt', null)
             ->orderBy('name', "ASC")
             ->findAll();
 
@@ -858,6 +859,7 @@ class PembayaranPOLokal extends BaseController
 
         $bankList = $this->banksModel->asObject()
             ->where('company_id', $this->this_company_id)
+            ->where('deletedAt', null)
             ->orderBy('name', "ASC")
             ->findAll();
 
@@ -1143,6 +1145,7 @@ class PembayaranPOLokal extends BaseController
             ->findAll();
         $bankList = $this->banksModel->asObject()
             ->where('company_id', $this->this_company_id)
+            ->where('deletedAt', null)
             ->orderBy('name', "ASC")
             ->findAll();
 
@@ -1288,6 +1291,7 @@ class PembayaranPOLokal extends BaseController
 
         $bankList = $this->banksModel->asObject()
             ->where('company_id', $this->this_company_id)
+            ->where('deletedAt', null)
             ->orderBy('name', "ASC")
             ->findAll();
 
