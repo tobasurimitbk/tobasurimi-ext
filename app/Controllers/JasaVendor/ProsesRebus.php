@@ -460,6 +460,7 @@ class ProsesRebus extends BaseController
                         ->first();
             $prosesRebusDetail = $this->prosesRebusDetailModel
                 ->where('proses_rebus_id', $id)
+                ->where('deletedAt', null)
                 ->findAll();
 
             foreach ($prosesRebusDetail as $p) {
@@ -546,6 +547,7 @@ class ProsesRebus extends BaseController
 
             $prosesRebusDetail = $this->prosesRebusDetailModel
                 ->where('proses_rebus_id', $id)
+                ->where('deletedAt', null)
                 ->findAll();
 
             if (empty($prosesRebusDetail)) {

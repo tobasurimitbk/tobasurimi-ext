@@ -183,7 +183,6 @@ class JasaVendorOut extends BaseController
             'supplier' => $this->supplierModel->getSupplierByType("BAHAN BAKU")
 
         ];
-
         return view('jasaVendor/out/form', $data);
     }
 
