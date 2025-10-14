@@ -1762,25 +1762,6 @@ class PembayaranInvoice extends BaseController
                     'status_posting' => '0'
                 ]);
 
-                // $salesOrderExportData = $this->salesOrderExportModel
-                //     ->select('
-                //         sales_order_export_id,
-                //         commision,
-                //         palet_fumigation,
-                //         palet_fumigation_price,
-                //         freight,
-                //         additional,
-                //         additional_2,
-                //         rebate_price,
-                //         royalty_price,
-                //         can_deduction_price,
-                //         estimated_freight_price,
-                //         others_type,
-                //         others_price,
-                //     ')
-                //     ->where('sales_order_export_id', $id)
-                //     ->first();
-
                 return response()->setJSON([
                     'id' => encrypt($id),
                     'status' => true,
@@ -1799,8 +1780,6 @@ class PembayaranInvoice extends BaseController
 
     public function updateInvoice()
     {
-        // var_dump($this->request->getVar("keterangan"));
-        // die;
         $no_dokumen_req = $this->request->getVar("no_dokumen");
 
         // Validasi bahwa data adalah array
@@ -1818,28 +1797,31 @@ class PembayaranInvoice extends BaseController
 
         try {
             $id = decrypt($this->request->getVar('id'));
-            // if ($this->request->getVar('total_bayar') == null || repairDouble($this->request->getVar('total_bayar'))  <= 0) {
-            //     return response()->setJSON([
-            //         'token' => csrf_hash(),
-            //         'message' => "Pembayaran Tidak Boleh Kosong",
-            //         'status' => false
-            //     ]);
-            // }   
-
-            // Ambil nilai total bayar sebelumnya
+        
             $lastPay = $this->pembayaranInvoiceModel
                 ->where('id', $id)
+                ->where('deletedAt', null)
                 ->select('total_bayar')
                 ->first();
 
-            // Pastikan nilai $lastPay['total_bayar'] valid
-            $previousTotalBayar = $lastPay['total_bayar'] ?? 0; // Default ke 0 jika null atau tidak ditemukan
+            
+            // --- Hitung total keseluruhan (karena dari frontend dikirim array) ---
+            $totalAmountInvoiceArr = $this->request->getVar('total_amount_invoice');
+            $sisaBayarArr         = $this->request->getVar('sisa_bayar');
 
-            // Ambil nilai pembayaran baru dari request
-            $newPayment = repairDouble($this->request->getVar('total_bayar'));
+            // Pastikan selalu array
+            $totalAmountInvoiceArr = is_array($totalAmountInvoiceArr) ? $totalAmountInvoiceArr : [$totalAmountInvoiceArr];
+            $sisaBayarArr         = is_array($sisaBayarArr) ? $sisaBayarArr : [$sisaBayarArr];
 
-            // Hitung total pembayaran kumulatif
-            $updatedTotalBayar = $previousTotalBayar + $newPayment;
+            // Hitung total keseluruhan tanpa fungsi tambahan
+            $totalAmountInvoice = array_sum(array_map(function ($v) {
+                return (float) preg_replace('/[^\d.]/', '', str_replace(',', '', $v));
+            }, $totalAmountInvoiceArr));
+
+            $sisaBayar = array_sum(array_map(function ($v) {
+                return (float) preg_replace('/[^\d.]/', '', str_replace(',', '', $v));
+            }, $sisaBayarArr));
+
 
             $listBarang = json_decode($_POST['list_barang']);
 
@@ -1857,7 +1839,7 @@ class PembayaranInvoice extends BaseController
                 'keterangan' =>  $this->request->getVar('keterangan'),
                 'tanggal' => date('Y-m-d', strtotime(str_replace('/', '-', $this->request->getVar('payment_date')))),
                 'potongan' => $this->request->getVar('potongan') ? repairDouble($this->request->getVar('potongan')) : 0,
-                'total_bayar' =>  $updatedTotalBayar,
+                'total_bayar' =>  $totalAmountInvoice,
                 'akun_kas' => $this->request->getVar('akun_kas'),
                 'akun_selisih' => $this->request->getVar('akun_selisih'),
                 'status_posting' => '0',

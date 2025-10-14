@@ -227,8 +227,8 @@
                             </div>
                             <div class="col-md-2">
                                 <div class="form-floating mb-3" style="height: 50px;">
-                                    <input autocomplete="one-time-code" readonly type="text" class="form-control total_pph_21" id="total_pph_21" name="total_pph_21" value="0" />
-                                    <label for="floatingInput">Total Potongan PPH Pasal 21</label>
+                                    <input autocomplete="one-time-code" readonly type="text" class="form-control total_pph" id="total_pph" name="total_pph" value="0" />
+                                    <label for="floatingInput">Total Potongan PPH</label>
                                 </div>
                             </div>
                             <div class="col-md-2">
@@ -1022,7 +1022,7 @@
         var tambahan = Number(destroyFormatRupiah($('.tambahan').val()) || 0);
         var harga = 0;
         var total_ppn_11 = 0;
-        var total_pph_21 = 0;
+        var total_pph = 0;
 
         $.each(list_penerimaan_selected, function(i, v) {
             // harga += (Number(v.qty_akan_diterima) * Number(destroyFormatRupiah(v.harga)));
@@ -1034,8 +1034,8 @@
                 harga += Number(destroyFormatRupiah(v.tax_amt));
             }
 
-            if (v.tax_type == 'PPh Pasal 21') {
-                total_pph_21 += destroyFormatRupiah(v.tax_amt);
+            if (v.tax_type == 'PPh Pasal 21' || v.tax_type == 'PPh Pasal 23' || v.tax_type == 'PPh Pasal 4 (2)') {
+                total_pph += destroyFormatRupiah(v.tax_amt);
                 harga -= destroyFormatRupiah(v.tax_amt);
             }
         })
@@ -1043,7 +1043,7 @@
         $('.nominal_faktur').val(greatFormatRupiah(harga));
         $('.total_tambahan_potongan').val(greatFormatRupiah(total));
         $('.total_ppn_11').val(greatFormatRupiah(total_ppn_11));
-        $('.total_pph_21').val(greatFormatRupiah(total_pph_21));
+        $('.total_pph').val(greatFormatRupiah(total_pph));
     }
 
     // UPDATE

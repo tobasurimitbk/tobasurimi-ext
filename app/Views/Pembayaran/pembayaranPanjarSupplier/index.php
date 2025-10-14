@@ -145,6 +145,7 @@
                                         <select class="form-select jenis_transaksi" name="jenis_transaksi" id="jenis_transaksi">
                                             <option value=""></option>
                                             <option value="PANJAR">PANJAR</option>
+                                            <option value="PANJAR_BB">PANJAR BB</option>
                                             <option value="PANJAR_TB">PANJAR TB</option>
                                             <option value="PINJAMAN">PINJAMAN</option>
                                         </select>

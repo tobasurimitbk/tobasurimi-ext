@@ -210,7 +210,7 @@
 
                     <div style="margin-top: 0.5rem;margin-bottom: 0.5rem">
                         <span>TERBILANG:</span>
-                        <span style="text-transform: uppercase;"><u><?= strtoupper(terbilang($d['kwintansi']['harga_bulanan_pph'])) ?></u></span>
+                        <span style="text-transform: uppercase;"><u><?= strtoupper(terbilang($d['kwintansi']['harga_bulanan_pph'])) ?> RUPIAH</u></span>
                     </div>
 
                     <table class="w-100 sign-table border-collapse">
@@ -236,7 +236,7 @@
                             <td>TGL</td>
                             <td>TGL</td>
                             <td>TGL</td>
-                            <td class="txt-center"></td>
+                            <td class="txt-center"><?= $d['kwintansi']['supplier']['name'] ?></td>
                         </tr>
                     </table>
                 </div>
