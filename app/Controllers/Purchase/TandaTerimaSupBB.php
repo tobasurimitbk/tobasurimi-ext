@@ -129,8 +129,8 @@ class TandaTerimaSupBB extends BaseController
     {
         $data = [
             'dataSupplier' => $this->supplierModel->getSupplierByType("BAHAN PENOLONG"),
-            'noTandaTerima' => $this->tandaTerimaFakturModel->getNo(),
-            'noTandaKeluar' => $this->tandaTerimaFakturModel->getNoKeluar(),
+            'noTandaTerima' => "",
+            'noTandaKeluar' => "",
             'divisi' => $this->divisiModel->getDivisiAccess(),
             'isUsed' => false
         ];
@@ -470,80 +470,147 @@ class TandaTerimaSupBB extends BaseController
     {
         $tandaTerimaFakturModel = new TandaTerimaFakturModel();
         $tanggalTerima = $this->request->getVar('tanggal_terima');
+
+        // Jika tanggal kosong, langsung return
         if (empty($tanggalTerima)) {
-            return response()->setJSON([
+            return $this->response->setJSON([
                 'data' => '',
                 'status' => true
             ]);
         }
-        $tanggalTerimaExplode = explode('/', $tanggalTerima);
 
-        $month = $tanggalTerimaExplode[1];
-        $year = substr($tanggalTerimaExplode[2], -2);
-        $romanMonth = romanMonthNumber($month);
-        $numberTemplate = "/TT/$romanMonth/$year";
+        // Pastikan format tanggal valid (misal: dd/mm/yyyy)
+        $tanggalParts = explode('/', $tanggalTerima);
+        if (count($tanggalParts) !== 3) {
+            return $this->response->setJSON([
+                'data' => '',
+                'status' => false,
+                'message' => 'Format tanggal tidak valid. Gunakan dd/mm/yyyy.'
+            ]);
+        }
 
-        $lastData = $tandaTerimaFakturModel->asObject()
-            ->where('company_id', $this->this_company_id)
+        $day = $tanggalParts[0];
+        $month = $tanggalParts[1];
+        $year = $tanggalParts[2];
+
+        $romanMonth = romanMonthNumber((int)$month);
+        $companyId = $this->this_company_id;
+
+        // Tentukan template berdasarkan company
+        switch ($companyId) {
+            case 1: // KIM 1 (FRZ)
+                $numberTemplate = "/F/TT/$romanMonth/" . substr($year, -2);
+                break;
+            case 2: // KIM 2
+                $numberTemplate = "/TT/$romanMonth/" . substr($year, -2);
+                break;
+            case 15: // GLOBAL
+                $numberTemplate = "/G/TT/$romanMonth/" . substr($year, -2);
+                break;
+            default: // OCS atau lainnya
+                $numberTemplate = "/TT/$romanMonth/" . substr($year, -2);
+                break;
+        }
+
+        // Cari nomor terakhir berdasarkan template
+        $lastData = $tandaTerimaFakturModel
+            ->select('faktur_no')
+            ->where('company_id', $companyId)
             ->like('faktur_no', $numberTemplate, 'before')
             ->orderBy('createdAt', 'DESC')
             ->first();
 
+        // Nomor awal default
         $invNumber = '001' . $numberTemplate;
 
-        if (!empty($lastData)) {
-            $asd = explode('/', $lastData->faktur_no);
-            $lastIncrement = intval($asd[0]) + 1;
-            $paddedNumber = str_pad($lastIncrement, 3, 0, STR_PAD_LEFT);
+        if ($lastData && !empty($lastData['faktur_no'])) {
+            // Ambil angka urutan terakhir
+            $parts = explode('/', $lastData['faktur_no']);
+            $lastIncrement = isset($parts[0]) ? (int)$parts[0] : 0;
+            $newIncrement = $lastIncrement + 1;
+            $paddedNumber = str_pad($newIncrement, 3, '0', STR_PAD_LEFT);
 
             $invNumber = $paddedNumber . $numberTemplate;
         }
 
-        return response()->setJSON([
+        return $this->response->setJSON([
             'data' => $invNumber,
             'status' => true
         ]);
     }
+
 
     public function generateTandaKeluarFakturNumber()
     {
         $tandaTerimaFakturModel = new TandaTerimaFakturModel();
-
         $tanggalTerima = $this->request->getVar('tanggal_terima');
+
+        // Cek tanggal kosong
         if (empty($tanggalTerima)) {
-            return response()->setJSON([
+            return $this->response->setJSON([
                 'data' => '',
                 'status' => true
             ]);
         }
-        $tanggalTerimaExplode = explode('/', $tanggalTerima);
 
-        $month = $tanggalTerimaExplode[1];
-        $year = substr($tanggalTerimaExplode[2], -2);
+        // Validasi format tanggal
+        $tanggalParts = explode('/', $tanggalTerima);
+        if (count($tanggalParts) !== 3) {
+            return $this->response->setJSON([
+                'data' => '',
+                'status' => false,
+                'message' => 'Format tanggal tidak valid. Gunakan format dd/mm/yyyy.'
+            ]);
+        }
+
+        $month = (int)$tanggalParts[1];
+        $yearFull = $tanggalParts[2];
+        $yearShort = substr($yearFull, -2);
         $romanMonth = romanMonthNumber($month);
-        $numberTemplate = "/TT/$romanMonth/$year";
+        $companyId = $this->this_company_id;
 
-        $lastData = $tandaTerimaFakturModel->asObject()
-            ->where('company_id', $this->this_company_id)
+        // Tentukan template berdasarkan company
+        switch ($companyId) {
+            case 1: // KIM 1 (FRZ)
+                $numberTemplate = "/F/TT/$romanMonth/$yearShort";
+                break;
+            case 2: // KIM 2
+                $numberTemplate = "/TT/$romanMonth/$yearShort";
+                break;
+            case 15: // GLOBAL
+                $numberTemplate = "/G/TT/$romanMonth/$yearShort";
+                break;
+            default: // OCS atau lainnya
+                $numberTemplate = "/TT/$romanMonth/$yearShort";
+                break;
+        }
+
+        // Ambil data terakhir berdasarkan pola faktur_keluar_no
+        $lastData = $tandaTerimaFakturModel
+            ->select('faktur_keluar_no')
+            ->where('company_id', $companyId)
             ->like('faktur_keluar_no', $numberTemplate, 'before')
             ->orderBy('createdAt', 'DESC')
             ->first();
 
+        // Nomor default
         $invNumber = '001' . $numberTemplate;
 
-        if (!empty($lastData)) {
-            $asd = explode('/', $lastData->faktur_no);
-            $lastIncrement = intval($asd[0]) + 1;
-            $paddedNumber = str_pad($lastIncrement, 3, 0, STR_PAD_LEFT);
+        if (!empty($lastData) && !empty($lastData['faktur_keluar_no'])) {
+            $parts = explode('/', $lastData['faktur_keluar_no']);
+            $lastIncrement = isset($parts[0]) ? (int)$parts[0] : 0;
+            $newIncrement = $lastIncrement + 1;
+            $paddedNumber = str_pad($newIncrement, 3, '0', STR_PAD_LEFT);
 
             $invNumber = $paddedNumber . $numberTemplate;
         }
 
-        return response()->setJSON([
+        return $this->response->setJSON([
             'data' => $invNumber,
             'status' => true
         ]);
     }
+
 
     public function historyPembayaran()
     {
