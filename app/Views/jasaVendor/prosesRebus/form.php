@@ -1317,7 +1317,7 @@
                     <td colspan="9" style="text-align: right;">GRAND TOTAL</td>
                     <td style="text-align: right;">${greatFormatRupiah(totalQtyRebus)}</td>
                     <td colspan="1"></td>
-                    <td colspan="2" style="text-align: right;">${greatFormatRupiah(totalQtyHasilRebus)}</td>
+                    <td colspan="2" style="text-align: right;">${greatFormatRupiah(totalHasilGroup)}</td>
                     <td colspan="2"></td>
                 </tr>
             `);
