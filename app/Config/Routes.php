@@ -1471,6 +1471,8 @@ $routes->get('/penerimaan-barang-lokal-bp/print-table', 'Warehouse\PenerimaanBar
 $routes->get('/penerimaan-barang-lokal-bp/export-excel', 'Warehouse\PenerimaanBarangLokalBP::exportExcel', ['filter' => 'Auth']);
 $routes->get('/penerimaan-barang-lokal-bp/load-component', 'Warehouse\PenerimaanBarangLokalBP::loadComponent', ['filter' => 'Auth']);
 $routes->get('/penerimaan-barang-lokal-bp/get-supplier-by-spp', 'Warehouse\PenerimaanBarangLokalBP::dropdownSupplierBySPP', ['filter' => 'Auth']);
+$routes->get('/penerimaan-barang-lokal-bp/cari-barang', 'Warehouse\PenerimaanBarangLokalBP::cariBarang', ['filter' => 'Auth']);
+$routes->get('/penerimaan-barang-lokal-bp/all-cari-barang', 'Warehouse\PenerimaanBarangLokalBP::allCariBarang', ['filter' => 'Auth']);
 // PENERIMAAN BARANG LOKAL BB
 $routes->get('/penerimaan-barang-lokal-bb', 'Warehouse\PenerimaanBarangLokalBB::index', ['filter' => 'Auth']);
 $routes->get('/penerimaan-barang-lokal-bb/all', 'Warehouse\PenerimaanBarangLokalBB::all', ['filter' => 'Auth']);

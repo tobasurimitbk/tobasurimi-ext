@@ -861,4 +861,93 @@ class AMPurchaseOrderDetailModel extends Model
 
         return $dataLPB;
     }
+
+    public function getBarangBelumDiterima($condition, $addCondition, $limit = 10, $offset = 0)
+    {
+        $availableSort = [
+            'createdAt'         => 'am_purchase_orders.createdAt',
+            'division_id'       => 'am_purchase_orders.division_id',
+            'spp_no'            => 'purchase_requests.spp_no',
+            'request_date'      => 'purchase_requests.request_date',
+            'supplier_id'       => 'am_purchase_orders.supplier_id',
+            'po_date'           => 'am_purchase_orders.po_date',
+            'po_no'             => 'am_purchase_orders.po_no',
+            'barang_id'         => 'am_purchase_order_details.barang_id',
+            'spesifikasi_id'    => 'am_purchase_order_details.spesifikasi_id',
+            'note'              => 'am_purchase_order_details.note',
+            'qty'               => 'am_purchase_order_details.qty',
+            'qty_diterima'      => 'am_purchase_order_details.qty_diterima',
+            'remaining_qty'     => 'am_purchase_order_details.remaining_qty',
+            'unit'              => 'am_purchase_order_details.unit',
+
+        ];
+        $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
+
+        $sort = $availableSort[$addCondition['sort'] ?? 'createdAt'] ?? 'am_purchase_orders.createdAt';
+        $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'DESC';
+
+        $selectQry = "am_purchase_order_details.*, 
+                      purchase_requests.spp_no,
+                      purchase_requests.request_date,
+                      suppliers.name AS supplier_name,
+                      am_purchase_orders.po_date,
+                      am_purchase_orders.po_no,
+                      barang_master.barang_name,
+                      barang_master_spesifikasi.spesifikasi,
+                      divisis.divisi,
+                      satuans.kode_satuan";
+
+        $poDataQry = $this->asArray()
+            ->select($selectQry)
+            ->where($condition)
+            ->join('am_purchase_orders', 'am_purchase_orders.id = am_purchase_order_details.am_purchase_order_id', 'left')
+            ->join('suppliers', 'suppliers.id = am_purchase_orders.supplier_id')
+            ->join('divisis', 'divisis.id = am_purchase_orders.division_id', 'left')
+            ->join('purchase_requests', 'purchase_requests.id = am_purchase_orders.purchase_request_id', 'left')
+            ->join('barang_master', 'barang_master.id = am_purchase_order_details.barang_id', 'left')
+            ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = am_purchase_order_details.spesifikasi_id', 'left')
+            ->join('satuans', 'satuans.id = am_purchase_order_details.unit', 'left')
+            ->orderBy($sort, $sortType);
+
+        $totalData = $poDataQry->countAllResults(false);
+
+        if ($addCondition['search'] || $addCondition['dateStart'] || $addCondition['dateEnd']) {
+            $poDataQry->groupStart();
+        }
+
+        if ($addCondition['dateStart']) {
+            $poDataQry->where('purchase_requests.request_date >=', $addCondition['dateStart']);
+        }
+
+        if ($addCondition['dateEnd']) {
+            $poDataQry->where('purchase_requests.request_date <=', $addCondition['dateEnd']);
+        }
+
+        if ($addCondition['search']) {
+            $poDataQry->groupStart();
+            $poDataQry->like('am_purchase_orders.po_no', $addCondition['search'])
+                ->orLike('suppliers.name', $addCondition['search'])
+                ->orLike('divisis.divisi', $addCondition['search'])
+                ->orLike('purchase_requests.spp_no', $addCondition['search'])
+                ->orLike('am_purchase_order_details.note', $addCondition['search'])
+                ->orLike("CONCAT(barang_master.barang_name, ' ', barang_master_spesifikasi.spesifikasi)", $addCondition['search']);
+
+            $poDataQry->groupEnd();
+        }
+
+        if ($addCondition['search'] || $addCondition['dateStart'] || $addCondition['dateEnd']) {
+            $poDataQry->groupEnd();
+        }
+
+        $totalFilteredData = $poDataQry->countAllResults(false);
+        $data = $poDataQry->findAll($limit, $offset);
+
+        return [
+            'data'              => $data,
+            'totalData'         => $totalData,
+            'totalFilteredData' => $totalFilteredData,
+            'sort'  => $sort,
+            'sortType'  => $sortType
+        ];
+    }
 }

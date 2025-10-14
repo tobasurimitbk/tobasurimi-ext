@@ -34,6 +34,9 @@
                     <?php endif; ?>
                 <?php endif; ?>
             <?php else : ?>
+                <button class="btn btn-success float-right" onclick="cariBarang()">
+                    <i class="fa-solid fa-magnifying-glass"></i> Cari Barang
+                </button>
                 <button class="btn btn-show-form btn-save float-right btn-submit-parent">
                     Simpan
                 </button>
@@ -252,6 +255,20 @@
                     console.error(xhr.responseText);
                 }
             });
+        }
+
+        function cariBarang() {
+            const width = 1000;
+            const height = 700;
+            const left = window.innerWidth / 2 - width / 2;
+            const top = window.innerHeight / 2 - height / 2;
+
+            window.open(
+                "<?= base_url('penerimaan-barang-lokal-bp/cari-barang') ?>",
+                "_blank",
+                `width=${width},height=${height},top=${top},left=${left},resizable=yes`
+            );
+
         }
     </script>
 <?php endif; ?>
