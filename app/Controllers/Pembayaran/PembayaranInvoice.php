@@ -2188,7 +2188,6 @@ class PembayaranInvoice extends BaseController
 
             // 🔹 Ambil semua invoice yang terlibat di pembayaran ini
             $invoiceList = $this->pembayaranInvoiceDetailModel
-                ->select('DISTINCT sales_order_invoice_id')
                 ->where('pembayaran_invoice_id', $id)
                 ->where('deletedAt', null)
                 ->findAll();
@@ -2201,6 +2200,7 @@ class PembayaranInvoice extends BaseController
                 $invoice = $this->salesOrderInvoiceModel
                     ->select('pay_amount')
                     ->where('id', $invoiceId)
+                    ->where('deletedAt', null)
                     ->first();
 
                 if (!$invoice) continue;
@@ -2219,13 +2219,11 @@ class PembayaranInvoice extends BaseController
             $now = date('Y-m-d H:i:s');
             $this->pembayaranInvoiceDetailModel
                 ->where('pembayaran_invoice_id', $id)
-                ->set('deletedAt', $now)
-                ->update();
+                ->delete();
 
             $this->pembayaranInvoiceModel
                 ->where('id', $id)
-                ->set('deletedAt', $now)
-                ->update();
+                 ->delete();
 
             $db->transCommit();
 
