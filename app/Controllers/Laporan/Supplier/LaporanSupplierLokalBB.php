@@ -1090,7 +1090,7 @@ class LaporanSupplierLokalBB extends BaseController
             'warehouseName' => 'warehouses.warehouse_name',
         ];
 
-        $allData = $this->RMPurchaseOrderModel->getPoBBLokalForSupplierPerPO(
+        $allData = $this->RMPurchaseOrderModel->getPoBBLokalForSupplierNew(
             $availableSort,
             $condition,
             $addCondition,
@@ -1106,15 +1106,24 @@ class LaporanSupplierLokalBB extends BaseController
             $supplier = $row->supplierName ?? '-';
             $spek     = $row->spekName ?? '-';
 
+            // 🔸 Hitung proporsi qty detail terhadap total qty PO
+            $qtyDetail = floatval($row->qtyPO ?? 0);
+            $qtyTotalPO = floatval($row->sum_qtyPO ?? 0);
+            $proporsi = ($qtyTotalPO > 0) ? ($qtyDetail / $qtyTotalPO) : 0;
+
+            // 🔸 Hitung subsidi proporsional per detail
+            $dppSubsidi    = floatval($row->sum_dpp_tambahan ?? 0) * $proporsi;
+            $pphSubsidi    = floatval($row->sum_pph_tambahan ?? 0) * $proporsi;
+            $totalSubsidi  = floatval($row->sum_nilai_total_tambahan ?? 0) * $proporsi;
+
             if (!isset($grouped[$barang])) {
                 $grouped[$barang] = [];
             }
 
             $found = false;
             foreach ($grouped[$barang] as &$entry) {
-                // 💡 tambahkan spekName dalam kondisi pengecekan
                 if ($entry['supplierName'] === $supplier && $entry['spekName'] === $spek) {
-                    $entry['qtyPO']        += floatval($row->qtyPO ?? 0);
+                    $entry['qtyPO']        += $qtyDetail;
                     $entry['dppUmum']      += floatval($row->dpp_umum ?? 0);
                     $entry['pphUmum']      += floatval($row->pph_umum ?? 0);
                     $entry['totalUmum']    += floatval($row->nilai_total_umum ?? 0);
@@ -1124,21 +1133,20 @@ class LaporanSupplierLokalBB extends BaseController
                     $entry['dppBulanan']   += floatval($row->dpp_bulanan ?? 0);
                     $entry['pphBulanan']   += floatval($row->pph_bulanan ?? 0);
                     $entry['totalBulanan'] += floatval($row->nilai_total_bulanan ?? 0);
-                    $entry['dppSubsidi']   += floatval($row->dpp_tambahan ?? 0);
-                    $entry['pphSubsidi']   += floatval($row->pph_tambahan ?? 0);
-                    $entry['totalSubsidi'] += floatval($row->nilai_total_tambahan ?? 0);
+                    $entry['dppSubsidi']   += $dppSubsidi;
+                    $entry['pphSubsidi']   += $pphSubsidi;
+                    $entry['totalSubsidi'] += $totalSubsidi;
                     $entry['totalRow']     += (
                         floatval($row->nilai_total_umum ?? 0) +
                         floatval($row->nilai_total_harian ?? 0) +
                         floatval($row->nilai_total_bulanan ?? 0) +
-                        floatval($row->nilai_total_tambahan ?? 0)
+                        $totalSubsidi
                     );
                     $found = true;
                     break;
                 }
             }
 
-            // jika belum ada kombinasi supplier + spek, buat baris baru
             if (!$found) {
                 $grouped[$barang][] = [
                     'no'            => $no++,
@@ -1147,7 +1155,7 @@ class LaporanSupplierLokalBB extends BaseController
                     'barangName'    => $barang,
                     'spekName'      => $spek,
                     'satuanName'    => $row->satuanName ?? '-',
-                    'qtyPO'         => floatval($row->qtyPO ?? 0),
+                    'qtyPO'         => $qtyDetail,
                     'dppUmum'       => floatval($row->dpp_umum ?? 0),
                     'pphUmum'       => floatval($row->pph_umum ?? 0),
                     'totalUmum'     => floatval($row->nilai_total_umum ?? 0),
@@ -1157,14 +1165,14 @@ class LaporanSupplierLokalBB extends BaseController
                     'dppBulanan'    => floatval($row->dpp_bulanan ?? 0),
                     'pphBulanan'    => floatval($row->pph_bulanan ?? 0),
                     'totalBulanan'  => floatval($row->nilai_total_bulanan ?? 0),
-                    'dppSubsidi'    => floatval($row->dpp_tambahan ?? 0),
-                    'pphSubsidi'    => floatval($row->pph_tambahan ?? 0),
-                    'totalSubsidi'  => floatval($row->nilai_total_tambahan ?? 0),
+                    'dppSubsidi'    => $dppSubsidi,
+                    'pphSubsidi'    => $pphSubsidi,
+                    'totalSubsidi'  => $totalSubsidi,
                     'totalRow'      => (
                         floatval($row->nilai_total_umum ?? 0) +
                         floatval($row->nilai_total_harian ?? 0) +
                         floatval($row->nilai_total_bulanan ?? 0) +
-                        floatval($row->nilai_total_tambahan ?? 0)
+                        $totalSubsidi
                     ),
                 ];
             }
@@ -1217,24 +1225,31 @@ class LaporanSupplierLokalBB extends BaseController
             'warehouseName' => 'warehouses.warehouse_name',
         ];
 
-        $dataBBLokal = $this->RMPurchaseOrderModel->getPoBBLokalForSupplierPerPO(
+        // 🔸 Ganti ambil data pakai yang sama seperti di PDF
+        $allData = $this->RMPurchaseOrderModel->getPoBBLokalForSupplierNew(
             $availableSort,
             $condition,
             $addCondition,
             null,
             null
-        );
+        )['data'];
 
-        $rawData = $dataBBLokal['data'];
-
-        // --- Grouping per barang, tetap tampil baris baru kalau spek beda ---
+        // --- Grouping per barang dan supplier, dengan hitung subsidi proporsional ---
         $grouped = [];
-        foreach ($rawData as $row) {
+        foreach ($allData as $row) {
             $barang   = $row->barangName ?? '-';
             $supplier = $row->supplierName ?? '-';
             $divisi   = $row->divisiName ?? '-';
             $spek     = $row->spekName ?? '-';
             $satuan   = $row->satuanName ?? '-';
+
+            $qtyDetail = floatval($row->qtyPO ?? 0);
+            $qtyTotalPO = floatval($row->sum_qtyPO ?? 0);
+            $proporsi = ($qtyTotalPO > 0) ? ($qtyDetail / $qtyTotalPO) : 0;
+
+            $dppSubsidi   = floatval($row->sum_dpp_tambahan ?? 0) * $proporsi;
+            $pphSubsidi   = floatval($row->sum_pph_tambahan ?? 0) * $proporsi;
+            $totalSubsidi = floatval($row->sum_nilai_total_tambahan ?? 0) * $proporsi;
 
             if (!isset($grouped[$barang])) {
                 $grouped[$barang] = [];
@@ -1247,24 +1262,24 @@ class LaporanSupplierLokalBB extends BaseController
                     $item['Divisi'] === $divisi &&
                     $item['Spek'] === $spek
                 ) {
-                    $item['Qty']           += floatval($row->qtyPO ?? 0);
-                    $item['DPP Harian']    += floatval($row->dpp_umum ?? 0);
-                    $item['PPh Harian']    += floatval($row->pph_umum ?? 0);
-                    $item['Total Harian']  += floatval($row->nilai_total_umum ?? 0);
-                    $item['DPP Tamb Har']  += floatval($row->dpp_harian ?? 0);
-                    $item['PPh Tamb Har']  += floatval($row->pph_harian ?? 0);
+                    $item['Qty']            += $qtyDetail;
+                    $item['DPP Harian']     += floatval($row->dpp_umum ?? 0);
+                    $item['PPh Harian']     += floatval($row->pph_umum ?? 0);
+                    $item['Total Harian']   += floatval($row->nilai_total_umum ?? 0);
+                    $item['DPP Tamb Har']   += floatval($row->dpp_harian ?? 0);
+                    $item['PPh Tamb Har']   += floatval($row->pph_harian ?? 0);
                     $item['Total Tamb Har'] += floatval($row->nilai_total_harian ?? 0);
-                    $item['DPP Bulanan']   += floatval($row->dpp_bulanan ?? 0);
-                    $item['PPh Bulanan']   += floatval($row->pph_bulanan ?? 0);
-                    $item['Total Bulanan'] += floatval($row->nilai_total_bulanan ?? 0);
-                    $item['DPP Langsung']  += floatval($row->dpp_tambahan ?? 0);
-                    $item['PPh Langsung']  += floatval($row->pph_tambahan ?? 0);
-                    $item['Total Langsung'] += floatval($row->nilai_total_tambahan ?? 0);
-                    $item['Total']         += (
+                    $item['DPP Bulanan']    += floatval($row->dpp_bulanan ?? 0);
+                    $item['PPh Bulanan']    += floatval($row->pph_bulanan ?? 0);
+                    $item['Total Bulanan']  += floatval($row->nilai_total_bulanan ?? 0);
+                    $item['DPP Langsung']   += $dppSubsidi;
+                    $item['PPh Langsung']   += $pphSubsidi;
+                    $item['Total Langsung'] += $totalSubsidi;
+                    $item['Total']          += (
                         floatval($row->nilai_total_umum ?? 0) +
                         floatval($row->nilai_total_harian ?? 0) +
                         floatval($row->nilai_total_bulanan ?? 0) +
-                        floatval($row->nilai_total_tambahan ?? 0)
+                        $totalSubsidi
                     );
                     $found = true;
                     break;
@@ -1278,7 +1293,7 @@ class LaporanSupplierLokalBB extends BaseController
                     'Barang'          => $barang,
                     'Spek'            => $spek,
                     'Satuan'          => $satuan,
-                    'Qty'             => floatval($row->qtyPO ?? 0),
+                    'Qty'             => $qtyDetail,
                     'DPP Harian'      => floatval($row->dpp_umum ?? 0),
                     'PPh Harian'      => floatval($row->pph_umum ?? 0),
                     'Total Harian'    => floatval($row->nilai_total_umum ?? 0),
@@ -1288,14 +1303,14 @@ class LaporanSupplierLokalBB extends BaseController
                     'DPP Bulanan'     => floatval($row->dpp_bulanan ?? 0),
                     'PPh Bulanan'     => floatval($row->pph_bulanan ?? 0),
                     'Total Bulanan'   => floatval($row->nilai_total_bulanan ?? 0),
-                    'DPP Langsung'    => floatval($row->dpp_tambahan ?? 0),
-                    'PPh Langsung'    => floatval($row->pph_tambahan ?? 0),
-                    'Total Langsung'  => floatval($row->nilai_total_tambahan ?? 0),
+                    'DPP Langsung'    => $dppSubsidi,
+                    'PPh Langsung'    => $pphSubsidi,
+                    'Total Langsung'  => $totalSubsidi,
                     'Total'           => (
                         floatval($row->nilai_total_umum ?? 0) +
                         floatval($row->nilai_total_harian ?? 0) +
                         floatval($row->nilai_total_bulanan ?? 0) +
-                        floatval($row->nilai_total_tambahan ?? 0)
+                        $totalSubsidi
                     ),
                 ];
             }
