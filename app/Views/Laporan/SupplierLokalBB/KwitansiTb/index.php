@@ -9,6 +9,9 @@
             <a class="btn btn-hide-form btn-discard float-right" href="<?= base_url("laporan-supplier-lokal-bb"); ?>">
                 Kembali
             </a>
+            <a class="btn btn-hide-form btn-discard float-right" id="btn_generate_no">
+                <i class="fa-solid fa-clock-rotate-left"></i> Generate No
+            </a>
             <?php if (can('Laporan', 'Supplier Lokal BB', 'p')) : ?>
                 <button class="btn btn-discard btn-dropdown-export dropdown-toggle float-right" type="button" id="dropdownMenuButtonExport" data-bs-toggle="dropdown" aria-expanded="false" style="background-color: #FFA426 !important;color: white !important;border: 0px solid !important;">
                     Print All
@@ -101,14 +104,59 @@
         </div>
     </div>
 </section>
+<div class="modal fade" id="generateModal" tabindex="-1">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Generate Nomor Kwitansi TB</h5>
+            </div>
+            <div class="modal-body">
+                <?= csrf_field() ?>
+                <div class="input-group">
+                    <div class="form-floating" style="height: 50px;">
+                        <input placeholder="" value="<?= date('Y-m') ?>" class="form-control periode_kwintansi_tb" id="periode_kwintansi_tb" name="periode_kwintansi_tb" />
+                        <label style="z-index: 1;" style="z-index: 1;">Periode Kwintansi</label>
+                    </div>
+                    <div class="input-group-append" style="height:50px;">
+                        <button class="btn btn-secondary" type="button" id="btn_search_kwintansi">
+                            <i class="fa-solid fa-magnifying-glass"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-bordered nowrap table-hover-tobasurimi dataTable" id="dataTableGenerate" width="100%" cellspacing="0">
+                        <thead class="thead-dark">
+                            <tr>
+                                <th style="width: 10px;">No</th>
+                                <th>Supplier</th>
+                                <th>Total</th>
+                                <th>No Kwitansi</th>
+                                <th>Tanggal</th>
+                            </tr>
+                        </thead>
+                        <tbody class="body-table" id="body-table">
 
+                        </tbody>
+                        <tfoot></tfoot>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-hide-form btn-discard mr-3" id="btnHideGenerate">Kembali</button>
+                <button type="button" class="btn btn-submit-form" id="btnSubmitNomor">Generate</button>
+            </div>
+        </div>
+
+    </div>
+</div>
 <script>
     const csrfToken = '<?= csrf_token() ?>';
     let sort = "name";
     let sortType = "asc";
     var row = 0;
+    var listData = [];
 
-    var table = $('.dataTable').DataTable({
+    var table = $('#dataTable').DataTable({
         processing: true,
         serverSide: true,
         ordering: true,
@@ -117,10 +165,10 @@
         ],
         fixedHeader: true,
         lengthMenu: [
-            [25],
-            [25],
+            [1000],
+            [1000],
         ],
-        pageLength: 25,
+        pageLength: 1000,
         ajax: {
             url: "<?= base_url("laporan-supplier-lokal-bb/kwitansi-tb/all"); ?>",
             dataSrc: "data",
@@ -165,13 +213,13 @@
             sortable: false,
             className: "text-left",
             render: function(data, type, row) {
-                if (row.is_print == "0") {
-                    return "-";
+                if (row.no_kwitansi == "") {
+                    return "";
                 } else {
                     let inputId = "tanggal_" + row.id;
                     return `
                         <div class="mt-0">
-                            <input id="${inputId}" class="tanggal form-control search form-out-search" data-id="${row.id}" type="date" value="${row.tanggal}">
+                            <input disabled id="${inputId}" class="tanggal form-control search form-out-search bg-light" data-id="${row.id}" type="date" value="${row.tanggal}">
                         </div>
                     `;
                 }
@@ -185,20 +233,22 @@
             render: function(data, type, row) {
                 let id = row.id;
                 let no_kwitansi_hash = row.no_kwitansi_hash;
+                let no_kwitansi = row.no_kwitansi;
                 let tanggal = row.tanggal;
                 let year = $(".year").val();
                 let month = $(".month").val();
 
 
                 if (row.is_print == "0") {
-                    return '-';
+                    return '';
                 } else {
-
-                    return `
+                    if (no_kwitansi != '') {
+                        return `
                             <button data-toggle="tooltip" title="Print" class="btn btn-warning btn-print" onclick="print('laporan-supplier-lokal-bb/kwitansi-tb/print/${id}/${year}-${month}/${no_kwitansi_hash}', '${id}')" style="box-shadow: none !important;">
                                 <i class="fa fa-print fa-sm" aria-hidden="true"></i>
                             </button>
                         `;
+                    }
                 }
 
             }
@@ -245,6 +295,98 @@
         window.open("<?= base_url('/') ?>" + res, "_blank");
     }
 
+    $("#periode_kwintansi_tb").datepicker({
+        format: "yyyy-mm",
+        startView: "months", // langsung tampilin bulan
+        minViewMode: "months", // cuma bisa pilih bulan
+        autoclose: true,
+        todayHighlight: true,
+        orientation: "bottom auto"
+    });
+
+    $('#btnHideGenerate').click(function(e) {
+        e.preventDefault();
+        $('#generateModal').modal('hide')
+    });
+
+    $('#btnSubmitNomor').click(function(e) {
+        e.preventDefault();
+        if (listData.length == 0) {
+            Swal.fire({
+                icon: 'error',
+                title: "Data yang akan digenerate kosong",
+                confirmButtonColor: '#4e73df',
+            });
+            return;
+        } else {
+            var csrf = $(`[name="${csrfToken}"]`);
+            var itemError = null;
+
+            $.each(listData, function(i, v) {
+                var supplierID = v.supplier_id;
+                var noKwitansi = $(`.no_kwitansi[supplier_id="${supplierID}"]`).val();
+                var tanggal = $(`.tanggal[supplier_id="${supplierID}"]`).val();
+
+                if (noKwitansi == "" || tanggal == "") {
+                    itemError = v;
+                    return false;
+                }
+
+                listData[i].tanggal = tanggal;
+                listData[i].no_kwitansi = noKwitansi;
+            });
+
+            if (itemError != null) {
+                Swal.fire({
+                    icon: 'error',
+                    title: "No Kwitansi atas nama " + itemError.supplier_name + ", tidak ada tanggal dan nomor kwitansinya",
+                    confirmButtonColor: '#4e73df',
+                });
+                return;
+            } else {
+                var formData = new FormData();
+                formData.set('listData', JSON.stringify(listData));
+
+                $.ajax({
+                    url: "<?= base_url("laporan-supplier-lokal-bb/generate-no-kwitansi-action"); ?>",
+                    data: formData,
+                    beforeSend: function(xhr) {
+                        setLoading();
+                        xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                    },
+                    complete: function() {
+                        stopLoading();
+                    },
+                    method: "POST",
+                    dataType: "json",
+                    processData: false,
+                    contentType: false,
+                    success: function(response) {
+                        if (response.status == false) {
+                            Swal.fire({
+                                icon: 'error',
+                                title: response.message,
+                                confirmButtonColor: '#4e73df',
+                            });
+                            return;
+                        } else {
+                            Swal.fire({
+                                icon: 'success',
+                                title: response.message,
+                                confirmButtonColor: '#4e73df',
+                            });
+                            listData = [];
+                            table.ajax.reload();
+                            $('#generateModal').modal('hide');
+                        }
+
+                    }
+                });
+
+            }
+        }
+    });
+
     // $('#btn-print-f4').on('click', function(e) {
     //     e.preventDefault();
     //     var month = $('#month').val();
@@ -260,6 +402,52 @@
     //         window.open(url);
     //     }
     // });
+
+    $('#btn_generate_no').click(function(e) {
+        e.preventDefault();
+        listData = [];
+        drawTabel(listData);
+        $('#generateModal').modal('show')
+    });
+
+    $('#btn_search_kwintansi').click(function(e) {
+        e.preventDefault();
+        var year_month = $('#periode_kwintansi_tb').val();
+        if (year_month == '') {
+            Swal.fire({
+                icon: 'error',
+                title: "Pilih periode kwintansi",
+                confirmButtonColor: '#4e73df',
+            });
+            return;
+        } else {
+            $.ajax({
+                url: "<?= base_url("laporan-supplier-lokal-bb/generate-no-kwintansi"); ?>",
+                data: {
+                    year_month: year_month
+                },
+                beforeSend: function(xhr) {
+                    setLoading();
+                },
+                complete: function() {
+                    stopLoading();
+                },
+                method: "GET",
+                success: function(response) {
+                    if (response.status) {
+                        listData = response.data;
+                        drawTabel(listData);
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: response.message,
+                            confirmButtonColor: '#4e73df',
+                        })
+                    }
+                }
+            });
+        }
+    });
 
     $('#btn-print-continous').on('click', function(e) {
         e.preventDefault();
@@ -292,6 +480,44 @@
             window.open(url);
         }
     });
+
+    function drawTabel(listData) {
+        const table = $('#dataTableGenerate');
+        var no = 1;
+        table.find('tbody').empty();
+        table.find('tfoot').empty();
+        if (listData.length == 0) {
+            var newRow = $('<tr>');
+            newRow.append($('<td colspan="5">Tidak ada data kwitansi bulanan</td>'));
+            table.find('tfoot').append(newRow);
+        } else {
+            $.each(listData, function(i, v) {
+                var newRow = $('<tr style="color:whitesmoke;">');
+                newRow.append($('<td style="text-align:center;">').text(no++));
+                newRow.append($('<td>').text(v.supplier_name));
+                newRow.append($('<td>').text(greatFormatRupiah(parseFloat(v.total).toFixed(2))));
+                newRow.append($('<td>').html(`
+                    <div class="mt-0">
+                        <input supplier_id="${v.supplier_id}" class="no_kwitansi form-control form-out-search" type="text" value="${v.no_kwitansi}" style="height:40px !important;">
+                    </div>
+                `));
+                newRow.append($('<td>').html(`
+                    <div class="mt-0">
+                        <input supplier_id="${v.supplier_id}" class="tanggal form-control form-out-search" type="text" value="${v.tanggal}" style="height:40px !important;">
+                    </div>
+                `));
+                table.find('tbody').append(newRow);
+            });
+        }
+
+
+        $(".tanggal").datepicker({
+            todayHighlight: true,
+            format: "dd/mm/yyyy",
+            orientation: "bottom auto",
+            autoclose: true
+        });
+    }
 
     const changeSort = function(val) {
         if (sort !== val) {

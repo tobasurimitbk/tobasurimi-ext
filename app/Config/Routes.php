@@ -2428,6 +2428,8 @@ $routes->get('/laporan-supplier-lokal-bb/kwitansi-tb', 'Laporan\Supplier\Kwitans
 $routes->get('/laporan-supplier-lokal-bb/kwitansi-tb/all', 'Laporan\Supplier\KwitansiTb::all', ['filter' => 'Auth']);
 $routes->get('/laporan-supplier-lokal-bb/kwitansi-tb/print/(:segment)/(:segment)/(:segment)/(:segment)', 'Laporan\Supplier\KwitansiTb::exportPDFKwitansiTB/$1/$2/$3/$4', ['filter' => 'Auth']);
 $routes->get('laporan-supplier-lokal-bb/print-all-kwitansi-tb', 'Laporan\Supplier\KwitansiTb::printAllKwitansiTB');
+$routes->get('/laporan-supplier-lokal-bb/generate-no-kwintansi', 'Laporan\Supplier\KwitansiTb::getListGenerateNoKwintansiTb', ['filter' => 'Auth']);
+$routes->post('/laporan-supplier-lokal-bb/generate-no-kwitansi-action', 'Laporan\Supplier\KwitansiTb::generateNoKwitansiAction', ['filter' => 'Auth']);
 
 $routes->get('/laporan-supplier-lokal-bb/pendapatan-supplier', 'Laporan\Supplier\LaporanSupplierLokalBB::laporanPendapatanSupplier', ['filter' => 'Auth']);
 $routes->get('/laporan-supplier-lokal-bb/pendapatan-supplier/all-pendapatan-supplier', 'Laporan\Supplier\LaporanSupplierLokalBB::allLaporanPendapatanSupplier', ['filter' => 'Auth']);
