@@ -349,7 +349,8 @@ class KwitansiTb extends BaseController
                     'no_kwitansi'   => $noKwitansi,
                     'year_month'    => $yearMonth,
                     'total'         => $total,
-                    'tanggal'       => date('d/m/Y', strtotime($tanggal))
+                    'tanggal'       => date('d/m/Y', strtotime($tanggal)),
+                    'company_id' => $this->this_company_id
                 ];
             }
 
@@ -567,6 +568,7 @@ class KwitansiTb extends BaseController
                 if ($noKwitansiStatis == null) {
                     $noKwitansiMax = $this->nomorKwitansuBulananModel
                         ->where('year_month', $year . "-" . $month)
+                        ->where('company_id', $this->this_company_id)
                         ->orderBy('no_kwitansi', "desc")
                         ->first();
 
