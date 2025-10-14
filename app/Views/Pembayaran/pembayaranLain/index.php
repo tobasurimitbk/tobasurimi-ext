@@ -1002,7 +1002,7 @@
             });
 
             updateTableHeaders(jenisPembayaran);
-            $('#total_all_amount').val(formatRupiah(totalAllAmount.toString()));
+            $('#total_all_amount').val(greatFormatRupiah(totalAllAmount));
         }
 
 
