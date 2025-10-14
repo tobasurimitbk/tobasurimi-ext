@@ -60,7 +60,7 @@ class OtherPaymentModel extends Model
         $selectQry = "
             other_payment.*,
             divisis.divisi,
-            SUM(other_payment_detail.nominal) AS nominal_all
+            SUM(other_payment_detail.jumlah) AS nominal_all
         ";
 
         $dataQry = $this->asArray()
