@@ -1169,4 +1169,37 @@ class SalesOrderExportModel extends Model
 
         return $result;
     }
+
+    public function getAllSalesOrderInvoiceExportForPembayaran($company_id)
+    {
+        $selectQry = "sales_order_export.no_invoice as no_faktur, 
+                        sales_order_export.shipment_value as total_invoice,
+                        sales_order_export.tanggal as tanggal_faktur,
+                        companies.company,
+                        metadata.value AS valas_name,
+                        users.name AS acc_holder,
+                        customers.name AS customer_name";
+        $salesDataQry = $this->asObject()
+            ->select($selectQry)
+            ->join('companies', 'sales_order_export.company_id = companies.id', 'left')
+            ->join('sales_contract', 'sales_contract.id = sales_order_export.sales_contract_id', 'left')
+            ->join('customers', 'customers.id = sales_contract.customer_id', 'left')
+            ->join('metadata', 'sales_order_export.valas_id = metadata.id', 'left')
+            ->join('users', 'users.id = sales_order_export.user_id', 'left')
+            ->where('sales_order_export.status', 'POSTED')
+            ->where('sales_order_export.deletedAt', null)
+            ->where('sales_order_export.company_id', $company_id)
+            ->groupBy('sales_order_export.sales_order_export_id');
+
+        $totalData = $salesDataQry->countAllResults(false);
+
+        $totalFilteredData = $salesDataQry->countAllResults(false);
+        $data = $salesDataQry->findAll();
+
+        return [
+            'data'              => $data,
+            'totalData'         => $totalData,
+            'totalFilteredData' => $totalFilteredData
+        ];
+    }
 }

@@ -44,7 +44,7 @@
                 <li class="nav-item">
                     <a class="nav-link active" href="#">Penerimaan Invoice</a>
                 </li>
-                <li class="nav-item">
+                <!-- <li class="nav-item">
                     <a class="nav-link" href="<?= base_url('pembayaran-invoice/create-ekspor') ?>">Pembayaran Invoice Ekspor</a>
                 </li>
                 <li class="nav-item">
@@ -52,7 +52,7 @@
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="<?= base_url('pembayaran-invoice/create-lain') ?>">Pembayaran Invoice Lain Lain</a>
-                </li>
+                </li> -->
                 <li class="nav-item">
                     <a class="nav-link" href="<?= base_url('pembayaran-invoice/create-return') ?>">Pembayaran Return</a>
                 </li>

@@ -6,7 +6,7 @@
     <div class="section-header">
         <h1 class="title-name"><?= !empty($detail) ? "Update Pembayaran Invoice Proforma Invoice" : "Tambah Pembayaran Invoice Proforma Invoice" ?></h1>
         <div class="col-button-tambah-spp">
-            <a class="btn btn-hide-form btn-discard float-right" href="<?= base_url("pembayaran-invoice"); ?>">
+            <a class="btn btn-hide-form btn-discard float-right" href="<?= base_url("pembayaran-proforma-invoice"); ?>">
                 Kembali
             </a>
 
@@ -39,7 +39,7 @@
     </div>
     <div class="card">
         <div class="card-body">
-            <ul class="nav nav-tabs">
+            <!-- <ul class="nav nav-tabs">
                 <li class="nav-item">
                     <a class="nav-link" href="<?= base_url('pembayaran-invoice/create') ?>">Pembayaran Invoice Lokal</a>
                 </li>
@@ -55,7 +55,7 @@
                 <li class="nav-item">
                     <a class="nav-link" href="<?= base_url('pembayaran-invoice/create-return') ?>">Pembayaran Return</a>
                 </li>
-            </ul>
+            </ul> -->
             <div class="row mt-3">
                 <div class="col mb-3">
                     <label class="form-label font-weight-bold lable-title">Data Pembayaran</label>
@@ -432,7 +432,7 @@
                                                 confirmButtonColor: '#4e73df',
                                             })
                                             .then(() => {
-                                                window.location.href = `<?= base_url("pembayaran-invoice"); ?>`;
+                                                window.location.href = `<?= base_url("pembayaran-proforma-invoice"); ?>`;
                                             })
                                     } else {
                                         Swal.fire({
@@ -507,7 +507,7 @@
                                                 confirmButtonColor: '#4e73df',
                                             })
                                             .then(() => {
-                                                window.location.href = `<?= base_url("pembayaran-invoice"); ?>`;
+                                                window.location.href = `<?= base_url("pembayaran-proforma-invoice"); ?>`;
                                             })
                                     } else {
                                         Swal.fire({

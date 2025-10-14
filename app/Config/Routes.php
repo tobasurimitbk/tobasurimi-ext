@@ -560,7 +560,21 @@ $routes->post('/pembayaran-invoice/delete', 'Pembayaran\PembayaranInvoice::delet
 $routes->post('/pembayaran-invoice/posting', 'Pembayaran\PembayaranInvoice::posting', ['filter' => 'Auth']);
 $routes->post('/pembayaran-invoice/unposting', 'Pembayaran\PembayaranInvoice::unposting', ['filter' => 'Auth']);
 $routes->get('/pembayaran-invoice/all-invoice', 'Pembayaran\PembayaranInvoice::getAllDataInvoice', ['filter' => 'Auth']);
+$routes->get('/pembayaran-invoice/check-unpaid', 'Pembayaran\PembayaranInvoice::checkUnpaidInvoice', ['filter' => 'Auth']);
 
+//pembayaran invoice export
+$routes->get('/pembayaran-invoice-export', 'Pembayaran\PembayaranInvoice::indexInvoiceExport', ['filter' => 'Auth']);
+$routes->get('/pembayaran-invoice-export/id/(:segment)', 'Pembayaran\PembayaranInvoice::getById/$1', ['filter' => 'Auth']);
+$routes->get('/pembayaran-invoice-export/all', 'Pembayaran\PembayaranInvoice::getAllPembayaranInvoiceExport', ['filter' => 'Auth']);
+$routes->get('/pembayaran-invoice-export/all-invoice-export', 'Pembayaran\PembayaranInvoice::getAllDataInvoiceExport', ['filter' => 'Auth']);
+$routes->get('/pembayaran-invoice-export/check-unpaid', 'Pembayaran\PembayaranInvoice::checkUnpaidInvoiceExport', ['filter' => 'Auth']);
+
+//pembayaran proforma invoice
+$routes->get('/pembayaran-proforma-invoice', 'Pembayaran\PembayaranInvoice::indexProformaInvoice', ['filter' => 'Auth']);
+$routes->get('/pembayaran-proforma-invoice/id/(:segment)', 'Pembayaran\PembayaranInvoice::getById/$1', ['filter' => 'Auth']);
+$routes->get('/pembayaran-proforma-invoice/all', 'Pembayaran\PembayaranInvoice::getAllPembayaranProformaInvoice', ['filter' => 'Auth']);
+$routes->get('/pembayaran-proforma-invoice/all-proforma-invoice', 'Pembayaran\PembayaranInvoice::getAllDataProformaInvoice', ['filter' => 'Auth']);
+$routes->get('/pembayaran-proforma-invoice/check-unpaid', 'Pembayaran\PembayaranInvoice::checkUnpaidProformaInvoice', ['filter' => 'Auth']);
 
 
 // SALES LOKAL

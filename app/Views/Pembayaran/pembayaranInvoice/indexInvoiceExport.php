@@ -11,7 +11,7 @@
 <!-- Begin Page Content -->
 <section class="section">
     <div class="section-header">
-        <h1>Pembayaran Invoice</h1>
+        <h1>Pembayaran Invoice Export</h1>
         <?php if (can('Pembayaran', 'Pembayaran Invoice', 'c')) : ?>
             <button class="btn btn-discard float-right" 
                     type="button" 
@@ -36,7 +36,7 @@
                     0
                 </span>
             </button>
-            <a class="btn btn-show-form btn-add float-right" href="<?= base_url("pembayaran-invoice/create"); ?>">
+            <a class="btn btn-show-form btn-add float-right" href="<?= base_url("pembayaran-invoice/create-ekspor"); ?>">
                 <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
             </a>
         <?php endif; ?>
@@ -66,14 +66,6 @@
                         <option value="ALL">STATUS : SEMUA</option>
                         <option value="SUDAH POSTING">STATUS : SUDAH POSTING</option>
                         <option value="BELUM POSTING">STATUS : BELUM POSTING</option>
-                    </select>
-                </div>
-                <div class="col mb-3">
-                    <select class="form-select type_invoice" name="type_invoice" id="type_invoice" aria-label="Floating label select example">
-                        <option value="ALL">Tipe : SEMUA</option>
-                        <option value="LOKAL">Tipe : Lokal</option>
-                        <option value="EKSPOR">Tipe : Ekspor</option>
-                        <option value="LAIN-LAIN">Tipe : Lain-Lain</option>
                     </select>
                 </div>
                 <div class="col mb-3">
@@ -117,11 +109,8 @@
                             <tr>
                                 <th width="5%">No</th>
                                 <th width="25%">Customer / No. Faktur</th>
-                                <th width="15%">Termin</th>
                                 <th width="15%">Tgl Faktur</th>
-                                <th width="15%">Jatuh Tempo</th>
                                 <th width="20%">Nilai Faktur</th>
-                                <th width="20%">Status</th>
                             </tr>
                         </thead>
                         <tbody class="body-table-invoice" id="body-table-invoice" style="cursor: pointer;">
@@ -486,7 +475,7 @@
         const csrf = $(`[name="${csrfToken}"]`);
         $.ajax({
             method: "GET",
-            url: "pembayaran-invoice/all-invoice",
+            url: "pembayaran-invoice-export/all-invoice-export",
             dataType: "json",
             beforeSend: function(xhr) {
                 setLoading();
@@ -529,9 +518,7 @@
                     <tr style="background-color: #f8f9fa; font-weight: bold;">
                         <td>${customerRowCount}</td>
                         <td colspan="2">${customerName}</td>
-                        <td></td>
                         <td class="text-right">${formattedTotal}</td>
-                        <td></td>
                     </tr>`;
 
                     // Add invoice detail rows
@@ -540,11 +527,8 @@
                         <tr>
                             <td></td>
                             <td style="padding-left: 30px;">${invoice.no_faktur}</td>
-                            <td>${invoice.terms}</td>
                             <td>${invoice.tanggal_faktur}</td>
-                            <td>${invoice.tanggal_jatuh_tempo}</td>
                             <td class="text-right">${invoice.total_invoice}</td>
-                            <td>${invoice.status_pembayaran}</td>
                         </tr>`;
                     });
                 });
@@ -560,7 +544,7 @@
 
     function checkUnpaidInvoice() {
         $.ajax({
-            url: "pembayaran-invoice/check-unpaid",
+            url: "pembayaran-invoice-export/check-unpaid",
             method: 'GET',
             dataType: 'json',
             success: function(response) {
@@ -579,6 +563,5 @@
             }
         });
     }
-
 </script>
 <?= $this->endSection(); ?>
