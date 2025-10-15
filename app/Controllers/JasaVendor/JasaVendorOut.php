@@ -181,7 +181,6 @@ class JasaVendorOut extends BaseController
             'warehouse' => $this->warehouseModel->where('deletedAt', null)->where('divisi_id', $jasaVendorOut['divisi_id'])->orderBy('warehouse_name', "ASC")->findAll(),
             'jasaVendorOutDetail' => $this->jasaVendorOutDetailModel->getJasaVendorOutDetailNew($id),
             'supplier' => $this->supplierModel->getSupplierByType("BAHAN BAKU")
-
         ];
         return view('jasaVendor/out/form', $data);
     }

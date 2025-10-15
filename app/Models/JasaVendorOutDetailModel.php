@@ -445,16 +445,19 @@ class JasaVendorOutDetailModel extends Model
             $bcType = isset($stockList['bc_id']) ? $metaDataModel->find($stockList['bc_id']) : null;
             $stockList['no_aju'] = isset($stockList['no_aju']) && $stockList['no_aju'] !== "-" ? $stockList['no_aju'] : "-";
             $stockList['bc_type'] = $bcType['value'] ?? "NON PABEAN";
-            $stockList['satuan'] = $satuan['kode_satuan'] ?? '';
+            $stockList['satuan'] = $satuanOutput['kode_satuan'] ?? '';
             $stockList['sumber'] = $stockList['reference_type'] ?? '';
             $stockList['barang'] = strtoupper($barangNameOutput);
             $stockList['stock_dokumen'] = $stock_dokumen;
             $stockList['stock_id'] = $stockList['stock_id'] ?? null;
+            $stockList['po_id'] = $stockList['po_id'] ?? null;
+            $stockList['satuan_id'] = $m['satuan_id'] ?? null;
             $stockList['stock_detail_id'] = $stockList['id'] ?? null;
             $stockList['type_barang'] = $stock['tipe_barang'] ?? '';
             $stockList['type_barang_text'] = isset($stock['tipe_barang']) ? strtoupper(str_replace('_', ' ', $stock['tipe_barang'])) : '';
             $stockList['stok_total'] = $stockList['qty_diterima'] ?? 0;
             $stockList['stock_date'] =  $rmPurchaseOrder['po_date'];
+            $stockList['keterangan'] =  $m['keterangan'];
             $stockList['supplier_name'] = $jasaVendorIn
                 ? $supplierName['supplier_name'] . ' / ' . ($jasaVendorIn['nama_vendor'] ?? '')
                 : $supplierName['supplier_name'];
