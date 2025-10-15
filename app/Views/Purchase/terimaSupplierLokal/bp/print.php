@@ -104,7 +104,7 @@
         <table class="w-100">
             <tr>
                 <td>
-                    <table>
+                    <table style="width: 100%;">
                         <tr>
                             <td>BUKTI PENGELUARAN</td>
                             <td>
@@ -259,7 +259,7 @@
                 <table class="w-100">
                     <tr>
                         <td>
-                            <table>
+                            <table style="width: 100%;">
                                 <tr>
                                     <td>BUKTI PENERIMAAN</td>
                                     <td>
