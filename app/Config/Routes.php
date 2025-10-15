@@ -2075,6 +2075,7 @@ $routes->get('/log-attendance/export-bulanan', 'HR\Attendance::exportExcelLogPre
 $routes->get('/log-attendance/export-harian', 'HR\Attendance::exportExcelLogPresensiHarian', ['filter' => 'Auth']);
 $routes->get('/log-attendance/like-employees', 'HR\Attendance::getEmployeesLike', ['filter' => 'Auth']);
 $routes->post('/log-attendance/update-uangmakan', 'HR\Attendance::updateUangMakanHarian', ['filter' => 'Auth']);
+$routes->post('/log-attendance/sync-attendance', 'HR\Attendance::syncAttendance', ['filter' => 'Auth']);
 
 // Generate Attendance
 $routes->get('/list-attendance', 'HR\Attendance::indexAttendance', ['filter' => 'Auth']);

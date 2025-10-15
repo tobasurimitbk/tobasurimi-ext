@@ -2,9 +2,11 @@
 
 namespace App\Controllers\HR;
 
+use App\Controllers\API\Attendances;
 use App\Controllers\BaseController;
 use App\Models\AttendancesLogModel;
 use App\Models\AttendancesModel;
+use App\Models\AttendancesUnitModel;
 use App\Models\BigDaysModel;
 use App\Models\CompaniesModel;
 use App\Models\DivisisModel;
@@ -44,6 +46,8 @@ class Attendance extends BaseController
     protected $UangMakanHarianModel;
     protected $formLemburModel;
     protected $formLembur;
+    protected $AttendanceUnitModel;
+    protected $AttendancesApi;
 
     public function __construct()
     {
@@ -62,6 +66,8 @@ class Attendance extends BaseController
         $this->UangMakanHarianModel = new UangMakanHarianModel();
         $this->formLemburModel = new FormLemburModel();
         $this->formLembur = new FormLembur();
+        $this->AttendanceUnitModel = new AttendancesUnitModel();
+        $this->AttendancesApi = new Attendances();
     }
 
     public function indexLog()
@@ -79,10 +85,17 @@ class Attendance extends BaseController
             ->where('deletedAt', null)
             ->findAll();
 
+        $dataUnit = $this->AttendanceUnitModel
+            ->where('company_id', $this->this_company_id)
+            ->where('deletedAt', null)
+            ->orderBy('name', "asc")
+            ->findAll();
+
         $data = [
             'divisi' => $dataDivisi,
             'statusPerizinanAll' => $dataStatusPerizinanAll,
-            'golongan' => $dataGolongan
+            'golongan' => $dataGolongan,
+            'dataUnit' => $dataUnit
 
         ];
         return view('hr/attendance/log-attendance', $data);
@@ -171,6 +184,9 @@ class Attendance extends BaseController
                 if (isset($mapLog[$e['id']][$tanggal])) {
                     $in  = $mapLog[$e['id']][$tanggal]['in'];
                     $out = $mapLog[$e['id']][$tanggal]['out'];
+                    if ($in == $out) {
+                        $out = "";
+                    }
                     $statusIzin =  $mapLog[$e['id']][$tanggal]['status'];
                 } else {
                     $in  = '';
@@ -2313,5 +2329,74 @@ class Attendance extends BaseController
             $startMonth,
             $endMonth
         ];
+    }
+
+    public function syncAttendance()
+    {
+        $db = \Config\Database::connect();
+
+        try {
+            $db->transBegin();
+
+            $attendanceUnitId = $this->request->getVar('attendances_unit_id');
+            $startDate = date('Y-m-d', strtotime(str_replace('/', '-', $this->request->getVar('start_date_unit'))));
+            $endDate   = date('Y-m-d', strtotime(str_replace('/', '-', $this->request->getVar('end_date_unit'))));
+
+            $dataFromFinger = $this->AttendancesApi->get_sync_attendance(
+                $attendanceUnitId
+            );
+
+            if (!$dataFromFinger['status']) {
+                $db->transRollback();
+                return response()->setJSON([
+                    'status' => false,
+                    'message' => "Mesin finger tidak terhubung ke mesin fingerprint",
+                    'token' => csrf_hash()
+                ]);
+            }
+
+            // Filter array date_create biar query ga berat
+            $dataAttendance = $dataFromFinger['data'];
+
+
+            // Konversi start & end ke datetime (biar full range harian)
+            $startDateTime = date('Y-m-d 00:00:00', strtotime($startDate));
+            $endDateTime   = date('Y-m-d 23:59:59', strtotime($endDate));
+
+            // Filter dataAttendance berdasarkan date_create
+            $filteredData = array_filter($dataAttendance, function ($item) use ($startDateTime, $endDateTime) {
+                // pastikan format date_create konsisten (datetime)
+                $dateCreate = date('Y-m-d H:i:s', strtotime($item['date_create']));
+                return $dateCreate >= $startDateTime && $dateCreate <= $endDateTime;
+            });
+
+            // Reindex array biar rapi
+            $filteredData = array_values($filteredData);
+
+            // Insert or update ci4
+            foreach ($filteredData as $f) {
+                $this->AttendancesLogModel->insertIgnoreAttendanceLog(
+                    $f['company_id'],
+                    $f['employee_id'],
+                    $f['attendances_unit_id'],
+                    $f['date_create']
+                );
+            }
+
+            $db->transCommit();
+
+            return response()->setJSON([
+                'message' => "Sinkronisasi data berhasil",
+                'status' => true,
+                'token' => csrf_hash()
+            ]);
+        } catch (Exception $e) {
+            $db->transRollback();
+            return response()->setJSON([
+                'message' => $e->getMessage(),
+                'status' => false,
+                'token' => csrf_hash()
+            ]);
+        }
     }
 }
