@@ -236,6 +236,24 @@ class SupplierModel extends Model
         return $results;
     }
 
+    public function getSupplier($type)
+    {
+        $arrCondition = [
+            'deletedAt' => null,
+            'type' => $type
+        ];
+
+        $builder = $this->db->table('suppliers');
+        $builder->where($arrCondition);
+        $builder->orderBy('suppliers.name', "ASC");
+        $query = $builder->get();
+        $results = $query->getResultArray();
+        foreach ($results as &$result) {
+            $result['name'] = strtoupper($result['name']);
+        }
+        return $results;
+    }
+
     public function getSupplierJasVend()
     {
         $arrCondition = [

@@ -60,7 +60,7 @@ class PembayaranPOLokal extends BaseController
         $panjarSupplierModel = new PanjarSupplierModel();
         $Sub_AkunsModel = new Sub_AkunsModel();
 
-        $supplierList = $supplierModel->getSupplierByType("BAHAN PENOLONG");
+        $supplierList = $supplierModel->getSupplier("BAHAN PENOLONG");
 
         $panjarSupplierList = $panjarSupplierModel->asObject()
             ->where('company_id', $this->this_company_id)
