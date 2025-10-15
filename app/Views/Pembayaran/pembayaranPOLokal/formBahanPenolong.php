@@ -113,7 +113,7 @@
                             <select class="form-select" <?= !empty($detail) ? ($detail['pembayaranDetail']['status_posting'] == 1 ? 'disabled' : '') : ""  ?> name="supplier_id" id="supplier_id">
                                 <option disabled selected value=""></option>
                                 <?php foreach ($suppliers as $supplier) : ?>
-                                    <option <?= !empty($detail) ? ($detail['pembayaranDetail']['supplier_id'] == $supplier['id'] ? 'selected' : '') : '' ?> value="<?= $supplier['id'] ?>"><?= strtoupper($supplier['name']) ?></option>
+                                    <option <?= !empty($detail) ? ($detail['pembayaranDetail']['supplier_id'] == $supplier['id'] ? 'selected' : '') : '' ?> value="<?= $supplier['id'] ?>"><?= strtoupper($supplier['name']) ?> - <?= strtoupper($supplier['companies_name']) ?></option>
                                 <?php endforeach ?>
                             </select>
                             <label for="floatingInput" style="z-index: 1;">Supplier</label>

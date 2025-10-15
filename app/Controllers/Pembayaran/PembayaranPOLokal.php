@@ -71,7 +71,7 @@ class PembayaranPOLokal extends BaseController
             ->where('deletedAt', null)
             ->findAll();
 
-        $divisiList = $this->divisiModel->getDivisiAccess();
+        $divisiList = $this->divisiModel->getDivisiAccessAllCompany();
 
         $bankList = $this->banksModel->asObject()
             ->where('company_id', $this->this_company_id)

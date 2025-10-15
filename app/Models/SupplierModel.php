@@ -239,18 +239,27 @@ class SupplierModel extends Model
     public function getSupplier($type)
     {
         $arrCondition = [
-            'deletedAt' => null,
-            'type' => $type
+            'suppliers.deletedAt' => null,
+            'suppliers.type'      => $type
         ];
 
         $builder = $this->db->table('suppliers');
+        $builder->select('suppliers.*, companies.company as companies_name');
+        $builder->join('companies', 'companies.id = suppliers.company_id', 'left');
         $builder->where($arrCondition);
+        $builder->whereIn('suppliers.company_id', [1, 2]);
         $builder->orderBy('suppliers.name', "ASC");
-        $query = $builder->get();
-        $results = $query->getResultArray();
+
+        $results = $builder->get()->getResultArray();
+
         foreach ($results as &$result) {
-            $result['name'] = strtoupper($result['name']);
+            $supplierName = strtoupper($result['name']);
+            $companyName  = strtoupper($result['company_name'] ?? '');
+            $result['name'] = $companyName
+                ? "{$supplierName} ({$companyName})"
+                : $supplierName;
         }
+
         return $results;
     }
 
