@@ -115,7 +115,7 @@ class Invoice extends BaseController
         $pageSize = (int)$this->request->getGet('length');
         $start    = (int)$this->request->getGet('start');
         $currentPage = $pageSize ? (int)($start / $pageSize) + 1 : 1;
-        $offset   = $start;   // gunakan ini!
+        $offset   = $start;
 
         $payload = [
             "pageSize"      => $pageSize,
@@ -127,13 +127,11 @@ class Invoice extends BaseController
 
         if ($this->is_admin == '1') {
             $condition = [
-                // "sales_order_invoice.id_company"    => $this->this_company_id,
                 "sales_order_invoice.deletedAt" => null,
                 "sales_order_invoice.tipe_invoice" => 'LOKAL',
             ];
         } else {
             $condition = [
-                // "sales_order_invoice.id_company"    => $this->this_company_id,
                 "sales_order_invoice.deletedAt" => null,
                 "sales_order_invoice.tipe_invoice" => 'LOKAL',
                 "sales_order_invoice.id_user" => $this->userId
@@ -144,9 +142,9 @@ class Invoice extends BaseController
             "search"        => $this->request->getGet("search"),
             "sort"          => $this->request->getGet("sort"),
             "sortType"      => $this->request->getGet("sortType"),
-            "filter_jenis_dokumen"        => $this->request->getGet("filter_jenis_dokumen"),
-            "filter_customer"        => $this->request->getGet("filter_customer"),
-            "filter_paid"        => $this->request->getGet("filter_paid"),
+            "filter_jenis_dokumen" => $this->request->getGet("filter_jenis_dokumen"),
+            "filter_customer"      => $this->request->getGet("filter_customer"),
+            "filter_paid"          => $this->request->getGet("filter_paid"),
             "dateStart"     => $this->request->getGet("dateStart") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getGet("dateStart")))) : "",
             "dateEnd"       => $this->request->getGet("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getGet("dateEnd")))) : "",
         ];
@@ -157,17 +155,68 @@ class Invoice extends BaseController
         $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
         $dataAllSalesOrderInvoice = [];
 
-        foreach ($dataSalesOrderInvoice['data'] as $data) {
+        foreach ($dataSalesOrderInvoice['data'] as &$data) {
 
-            // Karakter yang akan dihapus
-            $unwanted_characters = array('[', '"', ']');
+            // decode document_id JSON -> [427,435]
+            $docIds = json_decode($data->document_id, true);
+            if (!is_array($docIds)) {
+                $docIds = [$data->document_id];
+            }
 
-            // Gantikan karakter tidak diinginkan dengan string kosong
+            if ($data->doc_type == 'pesanan' && !empty($docIds)) {
+                // ambil semua Sales Order
+                $soList = $this->SalesOrderModel
+                    ->select('no_sales_order')
+                    ->whereIn('id', $docIds)
+                    ->findAll();
+
+                if ($soList) {
+                    $noSalesOrderArr = array_column($soList, 'no_sales_order');
+                    $data->no_sales_order = implode(', ', $noSalesOrderArr);
+                } else {
+                    $data->no_sales_order = '-';
+                }
+
+                $data->no_surat_jalan = '-';
+            } elseif ($data->doc_type == 'pengiriman' && !empty($docIds)) {
+                // ambil surat jalan dan multiple_no_so
+                $sjList = $this->SuratJalanModel
+                    ->select('no_surat_jalan, multiple_no_so')
+                    ->whereIn('id', $docIds)
+                    ->findAll();
+
+                $noSuratJalanArr = [];
+                $noSalesOrderArr = [];
+
+                foreach ($sjList as $sj) {
+                    $noSuratJalanArr[] = $sj['no_surat_jalan'];
+
+                    // decode multiple_no_so JSON
+                    $decodedSO = json_decode($sj['multiple_no_so'], true);
+                    if (json_last_error() === JSON_ERROR_NONE && is_array($decodedSO)) {
+                        // hilangkan karakter escape
+                        $decodedSO = array_map(function ($val) {
+                            return str_replace('\\/', '/', $val);
+                        }, $decodedSO);
+                        $noSalesOrderArr = array_merge($noSalesOrderArr, $decodedSO);
+                    }
+                }
+
+                $data->no_surat_jalan = !empty($noSuratJalanArr) ? implode(', ', $noSuratJalanArr) : '-';
+                $data->no_sales_order = !empty($noSalesOrderArr) ? implode(', ', $noSalesOrderArr) : '-';
+            }
+
+            // Bersihkan tanda [ " ]
+            $unwanted_characters = ['[', '"', ']'];
             $cleaned_string_document_no = str_replace($unwanted_characters, ' ', $data->doc_no);
 
-            $pembayaranInvoice = $this->pembayaranInvoiceModel->where('invoice_id', $data->id)->where('status_posting', "1")->findAll();
-            $statusPembayaranInvoice = "";
+            // Pembayaran invoice
+            $pembayaranInvoice = $this->pembayaranInvoiceModel
+                ->where('invoice_id', $data->id)
+                ->where('status_posting', "1")
+                ->findAll();
 
+            $statusPembayaranInvoice = "";
             if ($data->status_pelunasan == "UNPAID") {
                 $statusPembayaranInvoice = "BELUM LUNAS";
             } elseif ($data->status_pelunasan == "PAID") {
@@ -178,7 +227,7 @@ class Invoice extends BaseController
                 $dataSumAmount = $this->SalesOrderInvoiceDetailModel->getSumAmount($data->id);
             }
 
-            array_push($dataAllSalesOrderInvoice, [
+            $dataAllSalesOrderInvoice[] = [
                 "no"                => $no++,
                 "id"                => encrypt($data->id),
                 "no_faktur"         => $data->no_faktur,
@@ -193,21 +242,20 @@ class Invoice extends BaseController
                 "tipe_invoice"      => $data->tipe_invoice,
                 "status"            => ($data->status_posting == 0) ? 'WAITING' : 'POSTING',
                 "counter_print"     => $data->counter_print,
-                "status_pembayaran"     => $statusPembayaranInvoice,
-                "company_name" => $data->company_name,
-                "no_sales_order" => $data->no_sales_order,
-                "no_surat_jalan" => $data->no_surat_jalan,
-            ]);
+                "status_pembayaran" => $statusPembayaranInvoice,
+                "company_name"      => $data->company_name,
+                "no_sales_order"    => $data->no_sales_order,
+                "no_surat_jalan"    => $data->no_surat_jalan,
+            ];
         }
 
         $data = [
             "draw"            => intval($this->request->getGet("draw")),
             "recordsTotal"    => $dataSalesOrderInvoice['totalData'],
             "recordsFiltered" => $dataSalesOrderInvoice['totalFilteredData'],
-            "data" => $dataAllSalesOrderInvoice,
-            "payload" => $payload
+            "data"            => $dataAllSalesOrderInvoice,
+            "payload"         => $payload
         ];
-        //dd($dataAllSalesOrderInvoice);
 
         echo json_encode($data);
         return;

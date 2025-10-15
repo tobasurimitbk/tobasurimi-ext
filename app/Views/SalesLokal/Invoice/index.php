@@ -109,7 +109,8 @@
                                 <th onclick="changeSort('nama_sales')" class="sort">Nama Sales</th>
                                 <th onclick="changeSort('tipe_invoice')" class="sort">Jenis Invoice</th>
                                 <th onclick="changeSort('document_type')" class="sort">Jenis Dokumen</th>
-                                <th onclick="changeSort('document_no')" class="sort">No Dokumen</th>
+                                <th onclick="changeSort('no_sales_order')" class="sort">No Order Form</th>
+                                <th onclick="changeSort('no_surat_jalan')" class="sort">No Surat Jalan</th>
                                 <th onclick="changeSort('total_invoice')" class="sort">Total Invoice</th>
                                 <th onclick="changeSort('status')" class="sort">Status Pembayaran</th>
                                 <th onclick="changeSort('status')" class="sort">Status</th>
@@ -349,7 +350,11 @@
                     className: "text-center"
                 },
                 {
-                    data: "document_no",
+                    data: "no_sales_order",
+                    className: "text-center"
+                },
+                {
+                    data: "no_surat_jalan",
                     className: "text-center"
                 },
                 {
@@ -494,6 +499,12 @@
             if (result.isConfirmed) {
                 const csrf = $(`[name="${csrfToken}"]`);
 
+                const savedState = {
+                    ...JSON.parse(sessionStorage.getItem('invoicePenjualanLokalTableState') || '{}'),
+                    page: table.page()
+                };
+                saveTableState();
+
                 setLoading()
                 $.ajax({
                     url: "<?= base_url("invoice-penjualan-lokal/delete"); ?>",
@@ -515,7 +526,8 @@
                                     confirmButtonColor: '#4e73df',
                                 })
                                 .then(() => {
-                                    table.ajax.reload()
+                                    table.ajax.reload(null, false);
+                                    table.page(savedState.page).draw('page');
                                 })
                         } else {
                             Swal.fire({
@@ -553,6 +565,11 @@
         }).then((result) => {
             if (result.isConfirmed) {
                 const csrf = $(`[name="${csrfToken}"]`);
+                const savedState = {
+                    ...JSON.parse(sessionStorage.getItem('invoicePenjualanLokalTableState') || '{}'),
+                    page: table.page()
+                };
+                saveTableState();
                 $.ajax({
                     url: "<?= base_url("invoice-penjualan-lokal/posting"); ?>",
                     data: {
@@ -576,7 +593,8 @@
                                     confirmButtonColor: '#4e73df',
                                 })
                                 .then(() => {
-                                    table.ajax.reload()
+                                    table.ajax.reload(null, false);
+                                    table.page(savedState.page).draw('page');
                                 })
                         } else {
                             Swal.fire({
@@ -606,6 +624,11 @@
         }).then((result) => {
             if (result.isConfirmed) {
                 const csrf = $(`[name="${csrfToken}"]`);
+                const savedState = {
+                    ...JSON.parse(sessionStorage.getItem('invoicePenjualanLokalTableState') || '{}'),
+                    page: table.page()
+                };
+                saveTableState();
                 $.ajax({
                     url: "<?= base_url("invoice-penjualan-lokal/unposting"); ?>",
                     data: {
@@ -629,7 +652,8 @@
                                     confirmButtonColor: '#4e73df',
                                 })
                                 .then(() => {
-                                    table.ajax.reload()
+                                    table.ajax.reload(null, false);
+                                    table.page(savedState.page).draw('page');
                                 })
                         } else {
                             Swal.fire({
