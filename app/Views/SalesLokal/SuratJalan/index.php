@@ -354,12 +354,6 @@
                             `;
                     <?php endif; ?>
 
-                    <?php if (can('Penjualan Lokal', 'Surat Jalan', 'd')): ?>
-                        btn_delete = `
-                            <button type="button" onclick="handleDelete('${id}')" class="btn btn-discard delete-btn btn-trash"><i class="fa fa-trash"></i></button>
-                            `;
-                    <?php endif; ?>
-
                     // Cek nilai kolom posting
                     if (row.posting == 0) {
                         btn_posting = `
@@ -367,12 +361,20 @@
                                 <i class="fa fa-paper-plane"></i>
                             </button>
                         `;
+
+                        <?php if (can('Penjualan Lokal', 'Surat Jalan', 'd')): ?>
+                            btn_delete = `
+                                <button type="button" onclick="handleDelete('${id}')" class="btn btn-discard delete-btn btn-trash"><i class="fa fa-trash"></i></button>
+                                `;
+                        <?php endif; ?>
                     } else {
-                        btn_posting = `
-                             <button data-toggle="tooltip" title="Unposting" onclick="posting('${id}', '0')" class="btn btn-danger unposting-btn">
-                                <i class="fa fa-undo"></i>
-                            </button>
-                        `;
+                        if (row.sales_order_invoice_id == null) {
+                            btn_posting = `
+                                 <button data-toggle="tooltip" title="Unposting" onclick="posting('${id}', '0')" class="btn btn-danger unposting-btn">
+                                    <i class="fa fa-undo"></i>
+                                </button>
+                            `;
+                        }
                     }
 
                     <?php if (can('Penjualan Lokal', 'Surat Jalan', 'u')) : ?>

@@ -714,7 +714,7 @@
             $('#no_po').val(noPoList.filter(Boolean).join(', ')).change();
 
             $.ajax({
-                url: `<?= base_url('/order-form-lokal/getItemList'); ?>`,
+                url: `<?= base_url('/surat-jalan/getItemList'); ?>`,
                 method: "GET",
                 data: {
                     ids: $this.val()

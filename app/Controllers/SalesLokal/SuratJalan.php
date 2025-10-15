@@ -629,66 +629,73 @@ class SuratJalan extends BaseController
 
     public function dropDownSalesOrder($idCustomer)
     {
-        // --- ambil data customer + termin + sales name ---
+        // --- Ambil data customer ---
         $customerData = $this->CustomerModel->asObject()
             ->select('customers.*, employees.name as salesName, metadata.value AS customerTermin')
             ->join('employees', 'employees.id = customers.sales_id', 'left')
             ->join('metadata', 'metadata.id = customers.termin', 'left')
             ->find($idCustomer);
 
-        // --- ambil semua multiple_id_so dari surat_jalan_so untuk customer ini ---
-        $sjData = $this->SuratJalanModel->asObject()
-            ->select('surat_jalan_so.multiple_id_so')
-            ->where('id_customer', $idCustomer)
-            ->findAll();
-
-        // kumpulkan id sales_order yang sudah ada di multiple_id_so
-        $usedSoIds = [];
-        foreach ($sjData as $row) {
-            if (!empty($row->multiple_id_so)) {
-                $ids = json_decode($row->multiple_id_so, true);
-                if (is_array($ids)) {
-                    $usedSoIds = array_merge($usedSoIds, $ids);
-                }
-            }
-        }
-        $usedSoIds = array_unique($usedSoIds);
-
-        // --- kondisi dasar Sales Order ---
+        // --- Ambil semua Sales Order aktif milik customer ini ---
         $condition = [
-            'id_customer'            => $idCustomer,
-            'tipe_sales_order'       => 'LOKAL',
-            'surat_jalan_so_id'      => null,
-            'sales_order_invoice_id' => null,
+            'sales_order.id_customer'      => $idCustomer,
+            'sales_order.tipe_sales_order' => 'LOKAL',
+            'sales_order.deletedAt'        => null
         ];
 
-        // --- ambil semua SO ---
-        $soQuery = $this->SalesOrderModel->asObject()
+        $soList = $this->SalesOrderModel->asObject()
             ->where($condition)
-            ->select('sales_order.*, metadata.value AS customerTermin, CONCAT(employees.nip , " - ", employees.name) AS salesName')
+            ->select('sales_order.*, 
+            metadata.value AS customerTermin, 
+            CONCAT(employees.nip , " - ", employees.name) AS salesName')
             ->join('metadata', 'metadata.id = sales_order.payment_terms', 'left')
-            ->join('employees', 'employees.id = sales_order.sales_id', 'left');
+            ->join('employees', 'employees.id = sales_order.sales_id', 'left')
+            ->findAll();
 
-        $soList = $soQuery->findAll();
+        // --- Ambil semua total qty dari surat jalan detail sekaligus (lebih efisien) ---
+        $sjDetails = $this->SuratJalanDetailModel
+            ->select('id_sales_order_detail, SUM(qty) as total_qty')
+            ->where('deletedAt', null)
+            ->groupBy('id_sales_order_detail')
+            ->findAll();
 
-        // --- filter ulang sesuai qty_sekarang ---
+        // Buat array lookup [id_sales_order_detail => total_qty]
+        $sjQtyMap = [];
+        foreach ($sjDetails as $row) {
+            $sjQtyMap[$row['id_sales_order_detail']] = (float)$row['total_qty'];
+        }
+
+        // --- Proses per Sales Order ---
         $finalSoList = [];
+
         foreach ($soList as $so) {
-            // ambil detail SO
-            $detail = $this->SalesOrderDetailModel
+            $detailSO = $this->SalesOrderDetailModel
                 ->where('id_sales_order', $so->id)
+                ->where('deletedAt', null)
                 ->findAll();
 
-            $hasQty = false;
-            foreach ($detail as $d) {
-                if ($d['qty_sekarang'] > 0) {
-                    $hasQty = true;
-                    break;
+            $filteredDetails = [];
+
+            foreach ($detailSO as &$d) {
+                $qtySekarang = (float)$d['qty_sekarang'];
+
+                // Cek apakah detail ini sudah pernah masuk surat jalan
+                $totalQtySJ = $sjQtyMap[$d['id']] ?? 0;
+
+
+                // Hitung sisa qty
+                $qtySekarang -= $totalQtySJ;
+
+                // Hanya tambahkan kalau masih ada sisa qty
+                if ($qtySekarang > 0) {
+                    $d['qty_sekarang'] = $qtySekarang;
+                    $filteredDetails[] = $d;
                 }
             }
 
-            // hanya tampil kalau masih ada qty_sekarang > 0
-            if ($hasQty) {
+            // Hanya tambahkan SO yang punya detail dengan qty > 0
+            if (!empty($filteredDetails)) {
+                $so->details = $filteredDetails;
                 $finalSoList[] = $so;
             }
         }
@@ -699,7 +706,6 @@ class SuratJalan extends BaseController
         ];
 
         echo json_encode($data);
-        return;
     }
 
     public function dropDownSuratJalan($id_customer)
@@ -984,5 +990,47 @@ class SuratJalan extends BaseController
         $writer = new Xlsx($spreadsheet);
         $writer->save('php://output');
         exit;
+    }
+
+    public function getItemListByIds()
+    {
+        $ids = $this->request->getGet('ids');
+
+        if (empty($ids)) {
+            echo json_encode([]);
+            return;
+        }
+
+        $datas = $this->SalesOrderDetailModel->getItemListByIds($ids);
+        $result = [];
+
+        foreach ($datas as $value) {
+
+            // Kalau ADA surat jalan, cek apakah ada detail untuk sales order detail ini
+            $dataSuratJalanDetail = $this->SuratJalanDetailModel
+                ->select('sum(qty) as sum_qty')
+                ->where('id_sales_order_detail', $value->id)
+                ->where('deletedAt', null)
+                ->groupBy('id_sales_order_detail')
+                ->findAll();
+
+            if ($dataSuratJalanDetail) {
+                // Ada detail → kurangi qty sekarang
+                $qty = (float)$value->qty - (float)$dataSuratJalanDetail[0]['sum_qty'];
+                $value->qty = $qty;
+                if ($value->discUnit == "percent") {
+                    $value->amount = ($value->harga_barang - ($value->harga_barang * $value->discAmt)) * $qty;
+                } else {
+                    $value->amount = ($value->harga_barang - $value->discAmt) * $qty;
+                }
+            }
+
+            // Hanya masukkan jika qty masih > 0
+            if ((float)$value->qty > 0) {
+                $result[] = $value;
+            }
+        }
+
+        echo json_encode($result);
     }
 }
