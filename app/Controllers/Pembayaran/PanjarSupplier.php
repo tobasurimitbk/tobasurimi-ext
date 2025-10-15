@@ -634,17 +634,20 @@ class PanjarSupplier extends BaseController
 
         $limit = $payload["pageSize"];
         $offset = $this->request->getGet("start") ?? 0;
+        $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
 
         // Get data from the transaction model
         $panjarPinjamanData = $this->panjarPinjamanTransactionModel
             ->getPanjarPinjamanSupplierList($addCondition, $conditionPanjarPinjaman, $limit, $offset);
 
         $dataPanjarPinjamanTransaction = [];
+        
 
         // Process each transaction
         foreach ($panjarPinjamanData['data'] as $data) {
 
             $dataPanjarPinjamanTransaction[] = [
+                "no"                => $no++,
                 "id"            => encrypt($data->id),
                 "no_transaction" => $data->no_transaction,
                 "type"          => $data->type,
@@ -655,19 +658,11 @@ class PanjarSupplier extends BaseController
             ];
         }
 
-        // Paginate the sorted data
-        $paginatedData = array_slice($dataPanjarPinjamanTransaction, $offset, $limit);
-
-        // Add row numbers
-        foreach ($paginatedData as $key => &$item) {
-            $item['no'] = $offset + $key + 1;
-        }
-
         $response = [
             "draw"              => intval($this->request->getGet("draw") ?? 1),
             "recordsTotal"      => $panjarPinjamanData['totalData'] ?? 0,
             "recordsFiltered"   => $panjarPinjamanData['totalFilteredData'] ?? 0,
-            "data"              => $paginatedData,
+            "data"              => $dataPanjarPinjamanTransaction,
             "payload"           => $payload
         ];
 
