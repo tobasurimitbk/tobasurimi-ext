@@ -4,6 +4,19 @@
     .kode_produksi+.select2-container--bootstrap-5 .select2-selection__choice {
         font-size: 13px !important;
     }
+
+    .dataTables_length {
+        display: block !important;
+    }
+
+    .custom-file,
+    .custom-file-label,
+    .custom-select,
+    .custom-file-label:after,
+    .form-control[type='color'],
+    select.form-control:not([size]):not([multiple]) {
+        width: calc(3.25rem + 5px) !important;
+    }
 </style>
 
 <!-- Begin Page Content -->
@@ -1519,7 +1532,7 @@
             fixedHeader: true,
             "initComplete": function(settings, json) {
                 $('.dataTables_length').empty();
-                $('.dataTables_length').html("<div><label class='text-center ml-2 mt-2'>Show <b class='entries-label'>25</b> Entries</label></div>");
+                // $('.dataTables_length').html("<div><label class='text-center ml-2 mt-2'>Show <b class='entries-label'>25</b> Entries</label></div>");
 
             },
             lengthMenu: [
@@ -1912,18 +1925,14 @@
     // }
 
     function drawTableSelectedItemBahanBaku(data) {
-        // Hancurkan DataTable jika sudah ada
         if ($.fn.DataTable.isDataTable('#selectedItemTableBahanBaku')) {
-            $('#selectedItemTableBahanBaku').DataTable().clear().draw();
-            $('#selectedItemTableBahanBaku').DataTable().destroy();
+            $('#selectedItemTableBahanBaku').DataTable().clear().destroy();
         }
 
         const table = $('#selectedItemTableBahanBaku');
-        table.find('tbody').empty(); // Kosongkan tbody sebelum menggambar ulang
+        table.find('tbody').empty();
         var no = 1;
-        var totalQtyRequest = 0;
 
-        // Loop melalui data dan buat baris tabel
         $.each(data, function(i, v) {
             var newRow = $('<tr>');
             newRow.append($('<td style="text-align: center;">').html(`${no++}`));
@@ -1931,55 +1940,48 @@
             newRow.append($('<td style="text-align: center;">').text(v.departmentTujuanText + ' / ' + v.warehouseTujuanText));
             newRow.append($('<td style="text-align: center;">').text(v.supplier_name));
             newRow.append($('<td style="text-align: center;">').text(v.stock_dokumen));
-            // newRow.append($('<td style="text-align: center;">').text(v.type_barang_text));
-            // newRow.append($('<td style="text-align: center;">').text(v.bc_type));
-            // newRow.append($('<td style="text-align: center;">').text(`${v.no_aju ? v.no_aju : '-'} / ${v.no_daftar ? v.no_daftar : '-'}`));
             newRow.append($('<td style="text-align: center;">').text(v.stock_date));
             newRow.append($('<td style="text-align: center;">').text(v.barang));
             newRow.append($('<td style="text-align: center;">').text(v.satuan));
             newRow.append($('<td style="text-align: center;">').text(v.realStok ?? v.stok_total));
             newRow.append($('<td style="text-align: center;">').html(`
-                <input <?= (isset($dataMaterialRequests) && $dataMaterialRequests->is_posted == 1) ? "readonly" : ""; ?> 
-                    class="form-control qty-baku-request" 
-                    oninput="preventNegativeInput(this)" 
-                    autocomplete="one-time-code" 
-                    data-id="${v.id}" 
-                    data-stok_total="${v.stok_total}" 
-                    data-index="${i}" 
-                    type="text" 
-                    value="${v.qty2}">
-            `));
+            <input <?= (isset($dataMaterialRequests) && $dataMaterialRequests->is_posted == 1) ? "readonly" : ""; ?> 
+                class="form-control qty-baku-request" 
+                oninput="preventNegativeInput(this)" 
+                autocomplete="one-time-code" 
+                data-id="${v.id}" 
+                data-stok_total="${v.stok_total}" 
+                data-index="${i}" 
+                type="text" 
+                value="${v.qty2}">
+        `));
             newRow.append($('<td style="text-align: center;">').html(`
-                <button <?= (isset($dataMaterialRequests) && $dataMaterialRequests->is_posted == 1) ? "disabled" : ""; ?> 
-                        type="button" 
-                        class="btn btn-discard delete-btn btn-trash" 
-                        onclick="deleteDetailBahanBaku('${v.id}', ${v.id_material_request_detail})">
-                    <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
-                </button>
-            `));
+            <button <?= (isset($dataMaterialRequests) && $dataMaterialRequests->is_posted == 1) ? "disabled" : ""; ?> 
+                    type="button" 
+                    class="btn btn-discard delete-btn btn-trash" 
+                    onclick="deleteDetailBahanBaku('${v.id}', ${v.id_material_request_detail})">
+                <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
+            </button>
+        `));
             table.find('tbody').append(newRow);
-
-            // Hitung total qty request
-            totalQtyRequest += parseFloat(v.qty2) || 0; // Pastikan nilai adalah angka
         });
 
-        // Inisialisasi DataTable
         selectedItemTableBahanBaku = $('#selectedItemTableBahanBaku').DataTable({
             processing: false,
             serverSide: false,
             ordering: true,
             order: [],
             fixedHeader: true,
-            initComplete: function(settings, json) {
-                $('.dataTables_length').empty();
-                $('.dataTables_length').html("<div><label class='text-center ml-2 mt-2'>Show <b class='entries-label'>25</b> Entries</label></div>");
-
-            },
-            display: "stripe",
             searching: false,
+            lengthMenu: [
+                [10, 25, 50, 100],
+                [10, 25, 50, 100]
+            ],
+            pageLength: 25,
+            dom: '<"row"<"col-md-6"l><"col-md-6"f>>rtip',
             language: {
                 emptyTable: "Tidak Ada Data",
-                lengthMenu: "Show _MENU_ entries",
+                lengthMenu: "Tampilkan _MENU_ data per halaman",
                 paginate: {
                     previous: '<i class="fa fa-angle-left"></i>',
                     next: '<i class="fa fa-angle-right"></i>'
@@ -1987,22 +1989,12 @@
             }
         });
 
-        // Gambar ulang tabel
-        selectedItemTableBahanBaku.draw();
-
-        // Update total qty request
         updateTotalQtyRequest();
 
-        // Gunakan event delegation untuk input qty-baku-request
-        $(document).on('input change', '.qty-baku-request', function() {
+        $(document).off('input change', '.qty-baku-request').on('input change', '.qty-baku-request', function() {
             var index = $(this).data('index');
-            var stok_max = $(this).data('stok_total');
             var input_user = $(this).val();
-
-            // Update data di listStockSelectedBahanBaku
             listStockSelectedBahanBaku[index].qty2 = input_user;
-
-            // Update total qty request
             updateTotalQtyRequest();
         });
     }
@@ -2022,60 +2014,60 @@
 
     function drawTableSelectedItemBahanSetengahJadi(data) {
         if ($.fn.DataTable.isDataTable('#selectedItemTableBahanSetengahJadi')) {
-            $('#selectedItemTableBahanSetengahJadi').DataTable().clear().draw();
-            selectedItemTableBahanSetengahJadi.destroy();
+            $('#selectedItemTableBahanSetengahJadi').DataTable().clear().destroy();
         }
+
         const table = $('#selectedItemTableBahanSetengahJadi');
+        table.find('tbody').empty();
         var no = 1;
-        var totalQtyRequest = 0;
+
         $.each(data, function(i, v) {
             var newRow = $('<tr>');
-            newRow.append($('<td style="text-align: center;">').html(
-                `
-               ${no++} 
-            `
-            ));
-            newRow.append($('<td style="text-align: center;">').text(v.departmentText + ' / ' + v.warehouseText));
-            newRow.append($('<td style="text-align: center;">').text(v.departmentTujuanText + ' / ' + v.warehouseTujuanText));
-            newRow.append($('<td style="text-align: center;">').text(v.type_barang_text));
-            newRow.append($('<td style="text-align: center;">').text(v.bc_type));
-            newRow.append($('<td style="text-align: center;">').text(`${v.no_aju ? v.no_aju : '-'} / ${v.no_daftar ? v.no_daftar : '-'}`));
-            newRow.append($('<td style="text-align: center;">').text(v.stock_date));
-            newRow.append($('<td style="text-align: center;">').text(v.barang));
-            newRow.append($('<td style="text-align: center;">').text(v.satuan));
-            newRow.append($('<td style="text-align: center;">').text(v.stok_total));
-            newRow.append($('<td style="text-align: center;">').html(
-                `
-                <input <?= (isset($dataMaterialRequests) && $dataMaterialRequests->is_posted == 1) ? "readonly" : ""; ?> class="form-control qty-bahan-request" oninput="preventNegativeInput(this)" autocomplete="one-time-code" data-id="${v.id}" data-stok_total="${v.stok_total}" data-index="${i}" class="form-control" type="text" value="${v.qty2}">
-            `
-            ));
-            newRow.append($('<td style="text-align: center;">').html(
-                `
-                <button <?= (isset($dataMaterialRequests) && $dataMaterialRequests->is_posted == 1) ? "disabled" : ""; ?> type="button" class="btn btn-discard delete-btn btn-trash" onclick="deleteDetailBahanSetengahJadi(${v.id}, ${v.id_material_request_detail})" ><i class="fa fa-trash fa-sm" aria-hidden="true"></i></button>
-            `
-            ));
+            newRow.append(`<td style="text-align: center;">${no++}</td>`);
+            newRow.append(`<td style="text-align: center;">${v.departmentText} / ${v.warehouseText}</td>`);
+            newRow.append(`<td style="text-align: center;">${v.departmentTujuanText} / ${v.warehouseTujuanText}</td>`);
+            newRow.append(`<td style="text-align: center;">${v.type_barang_text}</td>`);
+            newRow.append(`<td style="text-align: center;">${v.bc_type}</td>`);
+            newRow.append(`<td style="text-align: center;">${v.no_aju ? v.no_aju : '-'} / ${v.no_daftar ? v.no_daftar : '-'}</td>`);
+            newRow.append(`<td style="text-align: center;">${v.stock_date}</td>`);
+            newRow.append(`<td style="text-align: center;">${v.barang}</td>`);
+            newRow.append(`<td style="text-align: center;">${v.satuan}</td>`);
+            newRow.append(`<td style="text-align: center;">${v.stok_total}</td>`);
+            newRow.append(`<td style="text-align: center;">
+            <input <?= (isset($dataMaterialRequests) && $dataMaterialRequests->is_posted == 1) ? "readonly" : ""; ?> 
+                class="form-control qty-bahan-request" 
+                oninput="preventNegativeInput(this)" 
+                autocomplete="one-time-code" 
+                data-id="${v.id}" 
+                data-stok_total="${v.stok_total}" 
+                data-index="${i}" 
+                type="text" value="${v.qty2}">
+        </td>`);
+            newRow.append(`<td style="text-align: center;">
+            <button <?= (isset($dataMaterialRequests) && $dataMaterialRequests->is_posted == 1) ? "disabled" : ""; ?> 
+                type="button" class="btn btn-discard delete-btn btn-trash" 
+                onclick="deleteDetailBahanSetengahJadi(${v.id}, ${v.id_material_request_detail})">
+                <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
+            </button>
+        </td>`);
             table.find('tbody').append(newRow);
-            parseFloat(v.qty2)
-            totalQtyRequest += parseFloat(v.qty2) || 0;
         });
 
         selectedItemTableBahanSetengahJadi = $('#selectedItemTableBahanSetengahJadi').DataTable({
-
             processing: false,
             serverSide: false,
             ordering: true,
             order: [],
             fixedHeader: true,
-            "initComplete": function(settings, json) {
-                $('.dataTables_length').empty();
-                $('.dataTables_length').html("<div><label class='text-center ml-2 mt-2'>Show <b class='entries-label'>25</b> Entries</label></div>");
-
-            },
-            display: "stripe",
             searching: false,
+            lengthMenu: [
+                [10, 25, 50, 100],
+                [10, 25, 50, 100]
+            ],
+            pageLength: 25,
             language: {
                 emptyTable: "Tidak Ada Data",
-                lengthMenu: "Show _MENU_ entries",
+                lengthMenu: "Tampilkan _MENU_ data per halaman",
                 paginate: {
                     previous: '<i class="fa fa-angle-left"></i>',
                     next: '<i class="fa fa-angle-right"></i>'
@@ -2083,18 +2075,13 @@
             }
         });
 
-        selectedItemTableBahanSetengahJadi.draw();
         updateTotalQtyRequestSetengahJadi();
 
-        // Tambahkan event listener untuk mengikuti perubahan nilai qty-barang-jadi
-        $('.qty-bahan-request').on('input change', function() {
-            var index = $(this).data('index'); // Dapatkan indeks item dari atribut data-index
-            var stok_max = $(this).data('stok_total');
+        $(document).off('input change', '.qty-bahan-request').on('input change', '.qty-bahan-request', function() {
+            var index = $(this).data('index');
             var input_user = $(this).val();
-
-            updateTotalQtyRequestSetengahJadi();
-
             listStockSelectedBahanSetengahJadi[index].qty2 = input_user;
+            updateTotalQtyRequestSetengahJadi();
         });
     }
 
@@ -2111,61 +2098,60 @@
 
     function drawTableSelectedItemBahan(data) {
         if ($.fn.DataTable.isDataTable('#selectedItemTableBahan')) {
-            $('#selectedItemTableBahan').DataTable().clear().draw();
-            selectedItemTableBahan.destroy();
+            $('#selectedItemTableBahan').DataTable().clear().destroy();
         }
+
         const table = $('#selectedItemTableBahan');
+        table.find('tbody').empty();
         var no = 1;
-        var totalQtyRequest = 0;
+
         $.each(data, function(i, v) {
             var newRow = $('<tr>');
-            newRow.append($('<td style="text-align: center;">').html(
-                `
-               ${no++} 
-            `
-            ));
-            newRow.append($('<td style="text-align: center;">').text(v.departmentText + ' / ' + v.warehouseText));
-            newRow.append($('<td style="text-align: center;">').text(v.departmentTujuanText + ' / ' + v.warehouseTujuanText));
-            newRow.append($('<td style="text-align: center;">').text(v.type_barang_text));
-            newRow.append($('<td style="text-align: center;">').text(v.bc_type));
-            newRow.append($('<td style="text-align: center;">').text(`${v.no_aju ? v.no_aju : '-'} / ${v.no_daftar ? v.no_daftar : '-'}`));
-            newRow.append($('<td style="text-align: center;">').text(v.stock_date));
-            newRow.append($('<td style="text-align: center;">').text(v.barang));
-            newRow.append($('<td style="text-align: center;">').text(v.satuan));
-            newRow.append($('<td style="text-align: center;">').text(v.stok_total));
-            newRow.append($('<td style="text-align: center;">').html(
-                `
-                <input <?= (isset($dataMaterialRequests) && $dataMaterialRequests->is_posted == 1) ? "readonly" : ""; ?> class="form-control qty-bahan-request" oninput="preventNegativeInput(this)" autocomplete="one-time-code" data-id="${v.id}" data-stok_total="${v.stok_total}" data-index="${i}" class="form-control" type="text" value="${v.qty2}">
-            `
-            ));
-            newRow.append($('<td style="text-align: center;">').html(
-                `
-                <button <?= (isset($dataMaterialRequests) && $dataMaterialRequests->is_posted == 1) ? "disabled" : ""; ?> type="button" class="btn btn-discard delete-btn btn-trash" onclick="deleteDetailBahan(${v.id}, ${v.id_material_request_detail})" ><i class="fa fa-trash fa-sm" aria-hidden="true"></i></button>
-            `
-            ));
+            newRow.append(`<td style="text-align: center;">${no++}</td>`);
+            newRow.append(`<td style="text-align: center;">${v.departmentText} / ${v.warehouseText}</td>`);
+            newRow.append(`<td style="text-align: center;">${v.departmentTujuanText} / ${v.warehouseTujuanText}</td>`);
+            newRow.append(`<td style="text-align: center;">${v.type_barang_text}</td>`);
+            newRow.append(`<td style="text-align: center;">${v.bc_type}</td>`);
+            newRow.append(`<td style="text-align: center;">${v.no_aju ? v.no_aju : '-'} / ${v.no_daftar ? v.no_daftar : '-'}</td>`);
+            newRow.append(`<td style="text-align: center;">${v.stock_date}</td>`);
+            newRow.append(`<td style="text-align: center;">${v.barang}</td>`);
+            newRow.append(`<td style="text-align: center;">${v.satuan}</td>`);
+            newRow.append(`<td style="text-align: center;">${v.stok_total}</td>`);
+            newRow.append(`<td style="text-align: center;">
+            <input <?= (isset($dataMaterialRequests) && $dataMaterialRequests->is_posted == 1) ? "readonly" : ""; ?> 
+                class="form-control qty-bahan-request" 
+                oninput="preventNegativeInput(this)" 
+                autocomplete="one-time-code" 
+                data-id="${v.id}" 
+                data-stok_total="${v.stok_total}" 
+                data-index="${i}" 
+                type="text" value="${v.qty2}">
+        </td>`);
+            newRow.append(`<td style="text-align: center;">
+            <button <?= (isset($dataMaterialRequests) && $dataMaterialRequests->is_posted == 1) ? "disabled" : ""; ?> 
+                type="button" class="btn btn-discard delete-btn btn-trash" 
+                onclick="deleteDetailBahan(${v.id}, ${v.id_material_request_detail})">
+                <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
+            </button>
+        </td>`);
             table.find('tbody').append(newRow);
-            parseFloat(v.qty2)
-            totalQtyRequest += parseFloat(v.qty2) || 0;
         });
 
         selectedItemTableBahan = $('#selectedItemTableBahan').DataTable({
-
             processing: false,
             serverSide: false,
             ordering: true,
             order: [],
             fixedHeader: true,
-            "initComplete": function(settings, json) {
-                $('.dataTables_length').empty();
-                $('.dataTables_length').html("<div><label class='text-center ml-2 mt-2'>Show <b class='entries-label'>25</b> Entries</label></div>");
-
-            },
-            display: "stripe",
             searching: false,
-            paging: false,
+            lengthMenu: [
+                [10, 25, 50, 100],
+                [10, 25, 50, 100]
+            ],
+            pageLength: 25,
             language: {
                 emptyTable: "Tidak Ada Data",
-                lengthMenu: "Show _MENU_ entries",
+                lengthMenu: "Tampilkan _MENU_ data per halaman",
                 paginate: {
                     previous: '<i class="fa fa-angle-left"></i>',
                     next: '<i class="fa fa-angle-right"></i>'
@@ -2173,17 +2159,13 @@
             }
         });
 
-        selectedItemTableBahan.draw();
-        updateTotalQtyRequestScrap()
+        updateTotalQtyRequestScrap();
 
-        // Tambahkan event listener untuk mengikuti perubahan nilai qty-barang-jadi
-        $('.qty-bahan-request').on('input change', function() {
-            var index = $(this).data('index'); // Dapatkan indeks item dari atribut data-index
-            var stok_max = $(this).data('stok_total');
+        $(document).off('input change', '.qty-bahan-request').on('input change', '.qty-bahan-request', function() {
+            var index = $(this).data('index');
             var input_user = $(this).val();
-
             listStockSelectedBahan[index].qty2 = input_user;
-            updateTotalQtyRequestScrap()
+            updateTotalQtyRequestScrap();
         });
     }
 
@@ -2200,66 +2182,69 @@
 
     function drawTableSelectedItemBahanJadi(data) {
         if ($.fn.DataTable.isDataTable('#selectedItemTableBahanJadi')) {
-            $('#selectedItemTableBahanJadi').DataTable().clear().draw();
-            selectedItemTableBahanJadi.destroy();
+            $('#selectedItemTableBahanJadi').DataTable().clear().destroy();
         }
+
         const table = $('#selectedItemTableBahanJadi');
+        table.find('tbody').empty();
         var no = 1;
-        var totalQtyRequest = 0;
+
         $.each(data, function(i, v) {
             var newRow = $('<tr>');
-            newRow.append($('<td style="text-align: center;">').html(
-                `
-               ${no++} 
-            `
-            ));
-            newRow.append($('<td style="text-align: center;">').text(v.departmentText + ' / ' + v.warehouseText));
-            newRow.append($('<td style="text-align: center;">').text(v.departmentTujuanText + ' / ' + v.warehouseTujuanText));
-            newRow.append($('<td style="text-align: center;">').text(v.type_barang_text));
-            newRow.append($('<td style="text-align: center;">').text(v.bc_type));
-            newRow.append($('<td style="text-align: center;">').text(`${v.no_aju ? v.no_aju : '-'} / ${v.no_daftar ? v.no_daftar : '-'}`));
-            newRow.append($('<td style="text-align: center;">').text(v.stock_date));
-            newRow.append($('<td style="text-align: center;">').text(v.barang));
-            newRow.append($('<td style="text-align: center;">').text(v.satuan));
-            newRow.append($('<td style="text-align: center;">').text(v.stok_total));
-            newRow.append($('<td style="text-align: center;">').html(
-                `
-                <input <?= (isset($dataMaterialRequests) && $dataMaterialRequests->is_posted == 1) ? "readonly" : ""; ?> class="form-control qty-jadi-isi" oninput="preventNegativeInput(this)" autocomplete="one-time-code" data-id="${v.id}" data-stok_total="${v.stok_total}" data-index="${i}" class="form-control" type="text" value="${v.qty2}">
-            `
-            ));
-            newRow.append($('<td style="text-align: center;">').html(
-                `
-                <input <?= (isset($dataMaterialRequests) && $dataMaterialRequests->is_posted == 1) ? "readonly" : ""; ?> class="form-control qty-jadi-request" oninput="preventNegativeInput(this)" autocomplete="one-time-code" data-id="${v.id}" data-stok_total="${v.stok_total}" class="form-control" type="text" value="${v.qty_isi}">
-            `
-            ));
-            newRow.append($('<td style="text-align: center;">').html(
-                `
-                <button <?= (isset($dataMaterialRequests) && $dataMaterialRequests->is_posted == 1) ? "disabled" : ""; ?> type="button" class="btn btn-discard delete-btn btn-trash" onclick="deleteDetailBahanJadi(${v.id}, ${v.id_material_request_detail})" ><i class="fa fa-trash fa-sm" aria-hidden="true"></i></button>
-            `
-            ));
+            newRow.append(`<td style="text-align: center;">${no++}</td>`);
+            newRow.append(`<td style="text-align: center;">${v.departmentText} / ${v.warehouseText}</td>`);
+            newRow.append(`<td style="text-align: center;">${v.departmentTujuanText} / ${v.warehouseTujuanText}</td>`);
+            newRow.append(`<td style="text-align: center;">${v.type_barang_text}</td>`);
+            newRow.append(`<td style="text-align: center;">${v.bc_type}</td>`);
+            newRow.append(`<td style="text-align: center;">${v.no_aju ? v.no_aju : '-'} / ${v.no_daftar ? v.no_daftar : '-'}</td>`);
+            newRow.append(`<td style="text-align: center;">${v.stock_date}</td>`);
+            newRow.append(`<td style="text-align: center;">${v.barang}</td>`);
+            newRow.append(`<td style="text-align: center;">${v.satuan}</td>`);
+            newRow.append(`<td style="text-align: center;">${v.stok_total}</td>`);
+            newRow.append(`<td style="text-align: center;">
+            <input <?= (isset($dataMaterialRequests) && $dataMaterialRequests->is_posted == 1) ? "readonly" : ""; ?> 
+                class="form-control qty-jadi-isi" 
+                oninput="preventNegativeInput(this)" 
+                autocomplete="one-time-code" 
+                data-id="${v.id}" 
+                data-stok_total="${v.stok_total}" 
+                data-index="${i}" 
+                type="text" value="${v.qty2}">
+        </td>`);
+            newRow.append(`<td style="text-align: center;">
+            <input <?= (isset($dataMaterialRequests) && $dataMaterialRequests->is_posted == 1) ? "readonly" : ""; ?> 
+                class="form-control qty-jadi-request" 
+                oninput="preventNegativeInput(this)" 
+                autocomplete="one-time-code" 
+                data-id="${v.id}" 
+                data-stok_total="${v.stok_total}" 
+                type="text" value="${v.qty_isi}">
+        </td>`);
+            newRow.append(`<td style="text-align: center;">
+            <button <?= (isset($dataMaterialRequests) && $dataMaterialRequests->is_posted == 1) ? "disabled" : ""; ?> 
+                type="button" class="btn btn-discard delete-btn btn-trash" 
+                onclick="deleteDetailBahanJadi(${v.id}, ${v.id_material_request_detail})">
+                <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
+            </button>
+        </td>`);
             table.find('tbody').append(newRow);
-            parseFloat(v.qty2)
-            totalQtyRequest += parseFloat(v.qty2) || 0;
         });
 
         selectedItemTableBahanJadi = $('#selectedItemTableBahanJadi').DataTable({
-
             processing: false,
             serverSide: false,
             ordering: true,
             order: [],
             fixedHeader: true,
-            "initComplete": function(settings, json) {
-                $('.dataTables_length').empty();
-                $('.dataTables_length').html("<div><label class='text-center ml-2 mt-2'>Show <b class='entries-label'>25</b> Entries</label></div>");
-
-            },
-            display: "stripe",
             searching: false,
-            paging: false,
+            lengthMenu: [
+                [10, 25, 50, 100],
+                [10, 25, 50, 100]
+            ],
+            pageLength: 25,
             language: {
                 emptyTable: "Tidak Ada Data",
-                lengthMenu: "Show _MENU_ entries",
+                lengthMenu: "Tampilkan _MENU_ data per halaman",
                 paginate: {
                     previous: '<i class="fa fa-angle-left"></i>',
                     next: '<i class="fa fa-angle-right"></i>'
@@ -2267,19 +2252,13 @@
             }
         });
 
-        selectedItemTableBahanJadi.draw();
-        updateTotalQtyRequestJadi()
+        updateTotalQtyRequestJadi();
 
-        // Tambahkan event listener untuk mengikuti perubahan nilai qty-barang-jadi
-        $('.qty-jadi-isi, .qty-jadi-request').on('input change', function() {
-            var index = $('.qty-jadi-isi').data('index'); // Dapatkan indeks item dari atribut data-index
-            var stok_max = $('.qty-jadi-isi').data('stok_total');
-            var input_user = $('.qty-jadi-isi').val();
-            var input_user_request = $('.qty-jadi-request').val();
-
-            listStockSelectedBahanJadi[index].qty2 = input_user;
-            listStockSelectedBahanJadi[index].qty_isi = input_user_request;
-            updateTotalQtyRequestJadi()
+        $(document).off('input change', '.qty-jadi-isi, .qty-jadi-request').on('input change', '.qty-jadi-isi, .qty-jadi-request', function() {
+            var index = $(this).closest('tr').find('.qty-jadi-isi').data('index');
+            listStockSelectedBahanJadi[index].qty2 = $(this).closest('tr').find('.qty-jadi-isi').val();
+            listStockSelectedBahanJadi[index].qty_isi = $(this).closest('tr').find('.qty-jadi-request').val();
+            updateTotalQtyRequestJadi();
         });
     }
 
