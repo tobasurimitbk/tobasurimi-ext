@@ -21,7 +21,8 @@ class PajakTandaTerimaFakturModel extends Model
         'tax_type',
         'tax_amt',
         'tax_status',
-        'tax_note'
+        'tax_note',
+        'tax_id'
     ];
 
     // Dates
@@ -61,5 +62,19 @@ class PajakTandaTerimaFakturModel extends Model
             'taxType' => count($taxType) == 0 ? '-' : implode(',', $taxType),
             'taxAmt' => $taxAmt
         ];
+    }
+
+    public function getTaxId($taxName, $companyId)
+    {
+        $taxModel = new TaxModel();
+        if ($taxName == "PPN Masukan") {
+            $taxName = "PPN Masukan 0%";
+        }
+        $tax = $taxModel->where('name', $taxName)->where('company_id', $companyId)->first();
+        if ($tax) {
+            return $tax['id'];
+        } else {
+            return null;
+        }
     }
 }
