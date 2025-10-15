@@ -238,16 +238,25 @@ class SupplierModel extends Model
 
     public function getSupplier($type)
     {
+        $session = session()->get('login');
+
         $arrCondition = [
             'suppliers.deletedAt' => null,
             'suppliers.type'      => $type
         ];
 
         $builder = $this->db->table('suppliers');
-        $builder->select('suppliers.*, companies.company as companies_name');
+        $builder->select('suppliers.*, companies.company as company_name');
         $builder->join('companies', 'companies.id = suppliers.company_id', 'left');
+
+        // 🔹 Filter company sesuai session
+        if (in_array($session->this_company_id, [1, 2])) {
+            $builder->whereIn('suppliers.company_id', [1, 2]);
+        } else {
+            $builder->where('suppliers.company_id', $session->this_company_id);
+        }
+
         $builder->where($arrCondition);
-        $builder->whereIn('suppliers.company_id', [1, 2]);
         $builder->orderBy('suppliers.name', "ASC");
 
         $results = $builder->get()->getResultArray();
