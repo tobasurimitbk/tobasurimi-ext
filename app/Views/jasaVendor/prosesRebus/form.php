@@ -1141,9 +1141,19 @@
             const satuan = group[0].output?.kode_satuan || '-';
 
             let totalHasilGroup = 0;
+
             group.forEach(item => {
-                totalHasilGroup += destroyFormatRupiah(item.output?.qty || 0);
+                const val = parseFloat((destroyFormatRupiah(item.output?.qty || 0)).toFixed(2));
+                totalHasilGroup += val;
             });
+
+            // 🔹 Bulatkan ke angka terdekat (tanpa desimal)
+            totalHasilGroup = Math.round(totalHasilGroup);
+
+            // // 🔹 Format ke tampilan "362.00"
+            // console.log(totalHasilGroup); // 362
+            // console.log(totalHasilGroup.toFixed(2)); // "362.00"
+
 
             // Bulatkan ke 2 desimal
             totalHasilGroup = parseFloat(totalHasilGroup.toFixed(2));
@@ -1238,12 +1248,30 @@
             // Jika input valid, bagi secara merata
             const groupRows = $(`tr.data-row[data-group="${stockID}"]`);
             const jumlahBaris = groupRows.length;
-            const qtyPerBaris = (totalQty / jumlahBaris);
-            
-            groupRows.each(function() {
-                $(this).find('.qty-hasil-input').val(greatFormatRupiah(qtyPerBaris));
+
+            // Gunakan fungsi pembulatan yang konsisten
+            function roundToDecimal(value, decimals = 3) {
+                return Number(Math.round(value + 'e' + decimals) + 'e-' + decimals);
+            }
+
+            const qtyPerBaris = roundToDecimal(totalQty / jumlahBaris);
+
+            console.log(`Distribusi: ${totalQty} / ${jumlahBaris} = ${qtyPerBaris}`);
+
+            groupRows.each(function(index) {
+                // Untuk memastikan total tepat, berikan nilai berbeda ke baris terakhir
+                let finalQty = qtyPerBaris;
+                if (index === jumlahBaris - 1) {
+                    // Hitung ulang untuk baris terakhir agar total tepat
+                    const totalSebelumnya = qtyPerBaris * (jumlahBaris - 1);
+                    finalQty = totalQty - totalSebelumnya;
+                    finalQty = roundToDecimal(finalQty);
+                }
+                
+                console.log(`Baris ${index + 1}: ${finalQty}`);
+                $(this).find('.qty-hasil-input').val(greatFormatRupiah(finalQty));
             });
-            
+
             // Sync ke listStockSelected
             listStockSelected.forEach(item => {
                 if (item.output?.stock_id == stockID) {
@@ -1277,8 +1305,8 @@
             });
 
             // Bulatkan ke 2 desimal
-            totalQtyRebus = parseFloat(totalQtyRebus.toFixed(2));
-            totalQtyHasilRebus = parseFloat(totalQtyHasilRebus.toFixed(2));
+            totalQtyRebus = destroyFormatRupiah(totalQtyRebus);
+            totalQtyHasilRebus = destroyFormatRupiah(totalQtyHasilRebus);
 
             // Hapus semua total row yang sudah ada
             $('.grand-total-row').remove();
@@ -1289,7 +1317,7 @@
                     <td colspan="9" style="text-align: right;">GRAND TOTAL</td>
                     <td style="text-align: right;">${greatFormatRupiah(totalQtyRebus)}</td>
                     <td colspan="1"></td>
-                    <td colspan="2" style="text-align: right;">${greatFormatRupiah(totalQtyHasilRebus)}</td>
+                    <td colspan="2" style="text-align: right;">${greatFormatRupiah(totalHasilGroup)}</td>
                     <td colspan="2"></td>
                 </tr>
             `);
@@ -1298,40 +1326,6 @@
 
             // validateRebusInputs();
         }
-
-
-        // Fungsi validasi
-        // function validateRebusInputs() {
-        //     let isValidRebus = true;
-        //     let isValidHasilRebus = true;
-            
-        //     $('.qty-rebus-input').each(function() {
-        //         const inputVal = parseFloat($(this).val());
-        //         const stokMax = parseFloat($(this).data('stok_total'));
-                
-        //         if (isNaN(inputVal) || inputVal <= 0 || inputVal > stokMax) {
-        //             isValidRebus = false;
-        //             $(this).addClass('is-invalid');
-        //         } else {
-        //             $(this).removeClass('is-invalid');
-        //         }
-        //     });
-            
-        //     $('.qty-hasil-input, .total-hasil-input').each(function() {
-        //         const inputVal = parseFloat($(this).val());
-                
-        //         if (isNaN(inputVal) || inputVal <= 0) {
-        //             isValidHasilRebus = false;
-        //             $(this).addClass('is-invalid');
-        //         } else {
-        //             $(this).removeClass('is-invalid');
-        //         }
-        //     });
-            
-        //     // Update status validasi untuk digunakan di form submit
-        //     window.isValidRebus = isValidRebus;
-        //     window.isValidHasilRebus = isValidHasilRebus;
-        // }
 
         // --- Tombol Hapus ---
         $('.btn-remove-row').click(function () {

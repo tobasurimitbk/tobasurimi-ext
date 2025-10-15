@@ -63,12 +63,12 @@
                                 <th onclick="changeSort('faktur_no')" class="sort">No Terima Faktur</th>
                                 <th onclick="changeSort('suppliers.name')" class="sort">Supplier</th>
                                 <th onclick="changeSort('nominal_faktur')" class="sort">Nominal Faktur</th>
-                                <th>Jumlah Item</th>
+                                <th>Jml Item</th>
                                 <th onclick="changeSort('recipient')" class="sort">Penerima</th>
                                 <th class="sort">Action</th>
                             </tr>
                         </thead>
-                        <tbody class="body-table" id="body-table" style="cursor: pointer;">
+                        <tbody class="body-table" id="body-table">
                         </tbody>
                     </table>
                 </div>
@@ -157,36 +157,36 @@
             },
             {
                 data: "divisi",
-                className: "text-center"
+                className: "text-left"
             },
             {
                 data: "receive_date",
-                className: "text-center"
+                className: "text-left"
             },
             {
                 data: "faktur_no",
-                className: "text-center"
+                className: "text-left"
             },
             {
                 data: "supplier_name",
-                className: "text-center",
+                className: "text-left",
             },
             {
                 data: "nominal_faktur",
-                className: "text-center",
+                className: "text-left",
                 render: function(data, type, row) {
                     return data ? greatFormatRupiah(data) : '';
                 }
             },
             {
                 data: "jumlah_item",
-                className: "text-center",
+                className: "text-left",
                 searchable: false,
                 sortable: false,
             },
             {
                 data: "recipient",
-                className: "text-center"
+                className: "text-left"
             },
             {
                 data: "id",
@@ -196,36 +196,47 @@
                 render: function(data, type, row) {
                     let id = row.id;
                     let is_used = row.is_used;
+                    let htmlResult = '';
+
+                    htmlResult = `
+                        <a href="<?= base_url("tanda-terima-faktur-lokal-bp/id"); ?>/${id}" data-toggle="tooltip" title="Edit" class="btn btn-primary">
+                            <i class="fas fa-edit"></i>
+                        </a>
+                    `;
                     if (is_used) {
-                        return `
-                        
-                        
-                    <div class="mt-0">
+                        htmlResult += `
                             <button  data-toggle="tooltip" title="Histori Pembayaran" onclick="displayHistory('${id}')" class="btn btn-success posting-spp">
                                 <i class="fa-solid fa-clock-rotate-left"></i>
                             </button>
-                            <button class="btn btn-warning btn-print" onclick="print('<?= base_url("tanda-terima-faktur-lokal-bp/print/"); ?>${id}')" style="box-shadow: none !important;">
+                            <button data-toggle="tooltip" title="Print" class="btn btn-warning btn-print" onclick="print('<?= base_url("tanda-terima-faktur-lokal-bp/print/"); ?>${id}')" style="box-shadow: none !important;">
                                 <i class="fa fa-print fa-sm" aria-hidden="true"></i>
-                            </button>
-                    <div>
-                        
-                    `
+                            </button>  
+                        `;
                     } else {
-                        return `
-                        <div class="mt-0">
-                            <button onclick="remove('${id}')" class="btn btn-danger delete-parent">
+                        htmlResult += `
+                            <button data-toggle="tooltip" title="Hapus" onclick="remove('${id}')" class="btn btn-danger delete-parent">
                                 <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
                             </button>
-                            <button class="btn btn-warning btn-print" onclick="print('<?= base_url("tanda-terima-faktur-lokal-bp/print/"); ?>${id}')" style="box-shadow: none !important;">
+                            <button data-toggle="tooltip" title="Print" class="btn btn-warning btn-print" onclick="print('<?= base_url("tanda-terima-faktur-lokal-bp/print/"); ?>${id}')" style="box-shadow: none !important;">
                                 <i class="fa fa-print fa-sm" aria-hidden="true"></i>
                             </button>
-                        </div>
-                    `
+                        `;
                     }
 
+                    return `
+                        <div class="mt-0">
+                            ${htmlResult}
+                        </div>
+                    `
                 }
             }
         ],
+        "drawCallback": function(settings) {
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-toggle="tooltip"]'))
+            var tooltipList = tooltipTriggerList.map(function(tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl)
+            });
+        },
         columnDefs: [{
             defaultContent: "-",
             targets: "_all"
@@ -240,10 +251,10 @@
         }
     });
 
-    $('#dataTable tbody').on('click', 'tr td:not(.actions):not(.dataTables_empty)', function() {
-        const data = table.row(this).data();
-        location.replace(`<?= base_url("tanda-terima-faktur-lokal-bp/id/"); ?>${data.id}`);
-    })
+    // $('#dataTable tbody').on('click', 'tr td:not(.actions):not(.dataTables_empty)', function() {
+    //     const data = table.row(this).data();
+    //     location.replace(`<?= base_url("tanda-terima-faktur-lokal-bp/id/"); ?>${data.id}`);
+    // })
 
     // $(".status_lunas").change(function() {
     //     var status_lunas = $(this).val();

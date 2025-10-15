@@ -11,7 +11,7 @@
 <!-- Begin Page Content -->
 <section class="section">
     <div class="section-header">
-        <h1>Pembayaran Invoice</h1>
+        <h1>Pembayaran Proforma Invoice</h1>
         <?php if (can('Pembayaran', 'Pembayaran Invoice', 'c')) : ?>
             <button class="btn btn-discard float-right" 
                     type="button" 
@@ -19,7 +19,7 @@
                     aria-expanded="false" 
                     style="margin-right:20px;"
                     onclick="showInvoice()">
-                <i class="fa fa-eye fa-sm mr-2" aria-hidden="true"></i>Invoice Belum Lunas
+                <i class="fa fa-eye fa-sm mr-2" aria-hidden="true"></i>Proforma Invoice Belum Di Bayar
                 <span id="invoiceBadge"
                     style="display:none;
                             position:absolute;
@@ -36,7 +36,7 @@
                     0
                 </span>
             </button>
-            <a class="btn btn-show-form btn-add float-right" href="<?= base_url("pembayaran-invoice/create"); ?>">
+            <a class="btn btn-show-form btn-add float-right" href="<?= base_url("pembayaran-invoice/create-proforma-invoice"); ?>">
                 <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
             </a>
         <?php endif; ?>
@@ -66,14 +66,6 @@
                         <option value="ALL">STATUS : SEMUA</option>
                         <option value="SUDAH POSTING">STATUS : SUDAH POSTING</option>
                         <option value="BELUM POSTING">STATUS : BELUM POSTING</option>
-                    </select>
-                </div>
-                <div class="col mb-3">
-                    <select class="form-select type_invoice" name="type_invoice" id="type_invoice" aria-label="Floating label select example">
-                        <option value="ALL">Tipe : SEMUA</option>
-                        <option value="LOKAL">Tipe : Lokal</option>
-                        <option value="EKSPOR">Tipe : Ekspor</option>
-                        <option value="LAIN-LAIN">Tipe : Lain-Lain</option>
                     </select>
                 </div>
                 <div class="col mb-3">
@@ -281,7 +273,7 @@
 
     $(document).ready(function() {
 
-        checkUnpaidInvoice();
+        checkUnpaidInvoice()
 
         $(".dateStart").datepicker({
             todayHighlight: true,
@@ -486,7 +478,7 @@
         const csrf = $(`[name="${csrfToken}"]`);
         $.ajax({
             method: "GET",
-            url: "pembayaran-invoice/all-invoice",
+            url: "pembayaran-proforma-invoice/all-proforma-invoice",
             dataType: "json",
             beforeSend: function(xhr) {
                 setLoading();
@@ -560,7 +552,7 @@
 
     function checkUnpaidInvoice() {
         $.ajax({
-            url: "pembayaran-invoice/check-unpaid",
+            url: "pembayaran-proforma-invoice/check-unpaid",
             method: 'GET',
             dataType: 'json',
             success: function(response) {

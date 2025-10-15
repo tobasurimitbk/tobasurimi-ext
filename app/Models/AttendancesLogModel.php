@@ -59,6 +59,29 @@ class AttendancesLogModel extends Model
         return $query->getResultArray();
     }
 
+    public function insertIgnoreAttendanceLog($company_id, $employee_id, $unit_id, $date)
+    {
+        $builder = $this->db->table('attendances_log');
+
+        $exists = $builder->where([
+            'company_id' => $company_id,
+            'employees_id' => $employee_id,
+            'attendances_unit_id' => $unit_id,
+            'date_create' => $date,
+        ])->countAllResults();
+
+        if ($exists == 0) {
+            return $builder->insert([
+                'company_id' => $company_id,
+                'employees_id' => $employee_id,
+                'attendances_unit_id' => $unit_id,
+                'date_create' => $date,
+            ]);
+        }
+
+        return false;
+    }
+
     public function get_all($year, $month)
     {
         $selectQry = "attendances_log.* ,

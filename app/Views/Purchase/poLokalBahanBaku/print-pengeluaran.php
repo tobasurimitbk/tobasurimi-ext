@@ -15,10 +15,10 @@
             padding: 0;
         }
 
-    @page {
-    size: 216mm 330mm;
-    margin: 0;
-}
+        @page {
+            size: 216mm 330mm;
+            margin: 0;
+        }
 
         .align-items-center {
             align-items: center;
@@ -38,7 +38,7 @@
             margin-left: 1rem;
             margin-right: 0.5rem;
             height: 20px;
-            width: 20px;
+            width: 40px;
         }
 
         .bukti-pengeluaran {
@@ -90,22 +90,22 @@
         .w-100 {
             width: 100%;
         }
-        
+
         /* Fold marks */
         .fold-mark {
             position: absolute;
             width: 100%;
             /* border-top: 1px dashed #999; */
         }
-        
+
         .fold-mark-1 {
             top: 4.33in;
         }
-        
+
         .fold-mark-2 {
             top: 8.67in;
         }
-        
+
         .section {
             position: relative;
             height: 3.9in;
@@ -113,7 +113,7 @@
             margin-left: 15px;
             box-sizing: border-box;
         }
-        
+
         .dotted-line {
             border-top: 1px dotted #000;
             margin: 3px 0;
@@ -445,7 +445,7 @@
 
         <div style="margin-top: 0.5rem;margin-bottom: 0.5rem">
             <span>TERBILANG:</span>
-            <span style="text-transform: uppercase;"><u><?= $totalTambahanPaid != 0 ? ($totalTambahanPaidTerbilang) . ' RUPIAH' : ''?></u></span>
+            <span style="text-transform: uppercase;"><u><?= $totalTambahanPaid != 0 ? ($totalTambahanPaidTerbilang) . ' RUPIAH' : '' ?></u></span>
         </div>
 
         <table class="w-100 sign-table border-collapse">
@@ -479,7 +479,7 @@
 
     <?php if ($totalMonthlyPaid != 0) { ?>
 
-          <!-- Fourth section -->
+        <!-- Fourth section -->
         <div class="section">
             <table class="w-100">
                 <tr>
@@ -564,7 +564,7 @@
 
             <div style="margin-top: 0.5rem;margin-bottom: 0.5rem">
                 <span>TERBILANG:</span>
-                <span style="text-transform: uppercase;"><u><?= $totalMonthlyPaid != 0 ? ($totalMonthlyPaidTerbilang) . ' RUPIAH' : ''?></u></span>
+                <span style="text-transform: uppercase;"><u><?= $totalMonthlyPaid != 0 ? ($totalMonthlyPaidTerbilang) . ' RUPIAH' : '' ?></u></span>
             </div>
 
             <table class="w-100 sign-table border-collapse">

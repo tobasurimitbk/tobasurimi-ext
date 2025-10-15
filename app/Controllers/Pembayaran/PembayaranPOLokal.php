@@ -60,7 +60,7 @@ class PembayaranPOLokal extends BaseController
         $panjarSupplierModel = new PanjarSupplierModel();
         $Sub_AkunsModel = new Sub_AkunsModel();
 
-        $supplierList = $supplierModel->getSupplierByType("BAHAN PENOLONG");
+        $supplierList = $supplierModel->getSupplier("BAHAN PENOLONG");
 
         $panjarSupplierList = $panjarSupplierModel->asObject()
             ->where('company_id', $this->this_company_id)
@@ -71,7 +71,7 @@ class PembayaranPOLokal extends BaseController
             ->where('deletedAt', null)
             ->findAll();
 
-        $divisiList = $this->divisiModel->getDivisiAccess();
+        $divisiList = $this->divisiModel->getDivisiAccessAllCompany();
 
         $bankList = $this->banksModel->asObject()
             ->where('company_id', $this->this_company_id)

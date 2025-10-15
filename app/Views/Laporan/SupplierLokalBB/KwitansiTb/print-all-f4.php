@@ -39,7 +39,7 @@
             margin-left: 1rem;
             margin-right: 0.5rem;
             height: 20px;
-            width: 20px;
+            width: 40px;
         }
 
         .bukti-pengeluaran {

@@ -100,6 +100,9 @@
     <div class="section-header">
         <h1>Log Absensi (Mesin Finger)</h1>
         <div class="col-button-tambah-spp">
+            <a class="btn btn-hide-form btn-discard float-right mr-2" href="#" id="ambilDataFingerBtn">
+                <i class="fa-solid fa-clock-rotate-left"></i> Tarik Data
+            </a>
             <?php if (can('Personalia', 'Log Absensi', 'p')): ?>
                 <button class="btn btn-warning btn-dropdown-export dropdown-toggle float-right" type="button" id="dropdownMenuButtonExport" data-bs-toggle="dropdown" aria-expanded="false">
                     <i class="fa fa-download"></i> Export
@@ -409,6 +412,77 @@
                     <button type="button" class="btn btn-submit-form" id="btnExportLapHarian">Export</button>
                 </div>
             </form>
+        </div>
+    </div>
+</div>
+
+<div class="modal" id="ambilDataFingerModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Tarik Data Dari Mesin Fingerprint</h5>
+            </div>
+            <form id="form_tarik_data_finger">
+                <div class="modal-body">
+                    <div class="row mb-3">
+                        <div class="col-sm-12">
+                            <div class="form-floating mb-2">
+                                <select class="form-select" name="attendances_unit_id" id="attendances_unit_id">
+                                    <?php foreach ($dataUnit as $d) : ?>
+                                        <option value="<?= $d['id'] ?>">
+                                            <?= $d['name'] . " (" . $d['ip'] . ")"; ?>
+                                        </option>
+                                    <?php endforeach; ?>
+                                </select>
+                                <label for="floatingInput">Pilih Mesin Fingerprint</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row mb-2">
+                        <div class="col-md-6">
+                            <div class="input-group">
+                                <div class="form-floating mb-2" style="height: 50px;">
+                                    <input type="text"
+                                        id="start_date_unit"
+                                        name="start_date_unit"
+                                        class="form-control start_date_unit"
+                                        placeholder="Tanggal Mulai"
+                                        value="<?= date('d/m/Y') ?>">
+                                    <label for="start_date_unit">Tanggal Mulai</label>
+                                </div>
+                                <div class="input-group-append" style="height:50px;">
+                                    <button disabled class="btn btn-secondary" type="button">
+                                        <i class="fas fa-calendar-alt"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="input-group">
+                                <div class="form-floating mb-2" style="height: 50px;">
+                                    <input type="text"
+                                        id="end_date_unit"
+                                        name="end_date_unit"
+                                        class="form-control end_date_unit"
+                                        placeholder="Tanggal Selesai"
+                                        value="<?= date('t/m/Y') ?>">
+                                    <label for="end_date_unit">Tanggal Selesai</label>
+                                </div>
+                                <div class="input-group-append" style="height:50px;">
+                                    <button disabled class="btn btn-secondary" type="button">
+                                        <i class="fas fa-calendar-alt"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-hide-form btn-discard mr-3" id="btn-discard-ambil-data-finger">Kembali</button>
+                    <button type="submit" class="btn btn-submit-form" id="btnSubmitAmbilDataFinger">Tarik Data</button>
+                </div>
+            </form>
+
         </div>
     </div>
 </div>
@@ -727,6 +801,11 @@
         theme: "bootstrap-5",
         allowClear: true,
     });
+    $("#attendances_unit_id").select2({
+        placeholder: "Pilih Mesin Fingerprint",
+        theme: "bootstrap-5",
+        allowClear: false,
+    });
     $(".month").datepicker({
         format: "yyyy-mm",
         startView: "months", // langsung tampilin bulan
@@ -746,6 +825,22 @@
 
     $("#end_date").datepicker({
         placeholder: " Tanggal Selesai Log Absensi",
+        todayHighlight: true,
+        format: "dd/mm/yyyy",
+        orientation: "bottom auto",
+        autoclose: true
+    });
+
+    $("#start_date_unit").datepicker({
+        placeholder: " Tanggal Mulai",
+        todayHighlight: true,
+        format: "dd/mm/yyyy",
+        orientation: "bottom auto",
+        autoclose: true
+    });
+
+    $("#end_date_unit").datepicker({
+        placeholder: " Tanggal Selesai",
         todayHighlight: true,
         format: "dd/mm/yyyy",
         orientation: "bottom auto",
@@ -831,6 +926,52 @@
             $(element).removeClass('select-class');
         },
     });
+
+    var validatorTarikDataFinger = $("#form_tarik_data_finger").validate({
+        rules: {
+            attendances_unit_id: {
+                required: true
+            },
+            start_date_unit: {
+                required: true
+            },
+            end_date_unit: {
+                required: true
+            },
+        },
+        messages: {
+            attendances_unit_id: {
+                required: "Pilih mesin finger"
+            },
+            start_date_unit: {
+                required: "Tanggal mulai wajib diisi"
+            },
+            end_date_unit: {
+                required: "Tanggal selesai wajib diisi"
+            },
+        },
+        errorElement: 'span',
+        errorClass: 'text-danger',
+        errorPlacement: function(error, element) {
+            var elem = $(element);
+            if (elem.hasClass("select2-hidden-accessible")) {
+                element = $("#select2-" + elem.attr("id") + "-container").parent();
+                error.insertAfter(element);
+            } else {
+                error.insertAfter(element);
+            }
+        },
+        highlight: function(element) {
+            $(element).closest('.form-group').addClass('has-error');
+            $(element).addClass('select-class');
+
+        },
+        unhighlight: function(element) {
+            $(element).closest('.form-group').removeClass('has-error');
+            $(element).removeClass('select-class');
+        },
+    });
+
 
     $('.form-select')
         .parent('div')
@@ -1020,6 +1161,74 @@
         var url = "<?= base_url('log-attendance/export-bulanan') ?>?month=" + month + "&divisi_id=" + divisiId + "&tipe=" + tipe;
         window.location.href = url;
     }
+
+    $('#ambilDataFingerBtn').click(function(e) {
+        e.preventDefault();
+        $('#attendances_unit_id').val(null).change();
+
+        $('#ambilDataFingerModal').modal('show');
+    });
+
+    $('#btn-discard-ambil-data-finger').click(function(e) {
+        e.preventDefault();
+        $('#ambilDataFingerModal').modal('hide');
+    });
+
+    $('#btnSubmitAmbilDataFinger').click(function(e) {
+        e.preventDefault();
+        if ($('#form_tarik_data_finger').valid()) {
+            var csrf = $(`[name="${csrfToken}"]`);
+            var attendances_unit_id = $('#attendances_unit_id option:selected').val();
+            var start_date_unit = $('#start_date_unit').val();
+            var end_date_unit = $('#end_date_unit').val();
+
+            var formData = new FormData();
+            formData.append("attendances_unit_id", attendances_unit_id);
+            formData.append("start_date_unit", start_date_unit);
+            formData.append("end_date_unit", end_date_unit);
+
+            $.ajax({
+                url: "<?= base_url("log-attendance/sync-attendance"); ?>",
+                data: formData,
+                beforeSend: function(xhr) {
+                    setLoading();
+                    xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                },
+                complete: function() {
+                    stopLoading();
+                },
+                method: "POST",
+                dataType: "json",
+                processData: false,
+                contentType: false,
+                success: function(response) {
+                    csrf.val(response.token);
+                    if (response.status) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: response.message,
+                            confirmButtonColor: '#4e73df',
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                attendanceTable.ajax.reload();
+                                attendanceTotalTable.ajax.reload();
+                                $('#ambilDataFingerModal').modal('hide');
+                            }
+                        });
+                        return;
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: response.message,
+                            confirmButtonColor: '#4e73df',
+                        });
+                        return;
+                    }
+
+                }
+            });
+        }
+    })
 </script>
 
 

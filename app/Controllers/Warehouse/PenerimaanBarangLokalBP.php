@@ -1601,4 +1601,79 @@ class PenerimaanBarangLokalBP extends BaseController
             return false;
         }
     }
+
+    public function cariBarang()
+    {
+        return view('Warehouse/penerimaanBarangLokal/bahanPenolong/cariBarang');
+    }
+
+    public function allCariBarang()
+    {
+        $payload = [
+            "pageSize"      => $this->request->getVar("length"),
+            "currentPage"   => ($this->request->getVar("start") / $this->request->getVar("length")) + 1,
+            "sort" => $this->request->getVar("sort"),
+            "sorttype" => $this->request->getVar("sortType"),
+        ];
+
+        $condition = [
+            "am_purchase_orders.company_id" => $this->this_company_id,
+            "am_purchase_orders.po_type" => "Lokal",
+            "am_purchase_orders.is_posted" => 1,
+            "am_purchase_orders.deletedAt" => null,
+            "am_purchase_order_details.deletedAt" => null,
+            "am_purchase_order_details.remaining_qty !=" => 0
+        ];
+
+        $addCondition = [
+            "search"        => $this->request->getVar("search"),
+            "sort"          => $this->request->getVar("sort"),
+            "sortType"      => $this->request->getVar("sortType"),
+            "dateStart" => $this->request->getVar("dateStart") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateStart")))) : "",
+            "dateEnd" => $this->request->getVar("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateEnd")))) : "",
+        ];
+
+        $limit = $this->request->getVar("length");
+        $offset = $this->request->getVar("start");
+        $data = $this->amPurchaseOrderDetailModel->getBarangBelumDiterima(
+            $condition,
+            $addCondition,
+            $limit,
+            $offset
+        );
+
+        $dataResult = [];
+        $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
+
+        foreach ($data['data'] as $d) {
+            array_push($dataResult, [
+                "no"                    => $no++,
+                "id"                    => encrypt($d['id']),
+                "divisi"                => $d['divisi'],
+                "spp_no"                => $d['spp_no'],
+                "request_date"          => date('d/m/Y', strtotime($d['request_date'])),
+                "supplier_name"         => $d['supplier_name'],
+                "po_date"               => date('d/m/Y', strtotime($d['po_date'])),
+                "po_no"                 => $d['po_no'],
+                "barang_name"           => $d['barang_name'],
+                "spesifikasi"           => $d['spesifikasi'],
+                "note"                  => $d['note'],
+                "qty"                   => (float)$d['qty'],
+                "qty_diterima"          => (float)$d['qty_diterima'],
+                "remaining_qty"         => (float)$d['remaining_qty'],
+                "kode_satuan"           => $d['kode_satuan']
+            ]);
+        }
+
+        $data = [
+            "draw"              => intval($this->request->getVar("draw")),
+            "recordsTotal"      => $data['totalData'],
+            "recordsFiltered"   => $data['totalFilteredData'],
+            "data"              => $dataResult,
+            "payload"           => $payload,
+
+        ];
+        echo json_encode($data);
+        return;
+    }
 }

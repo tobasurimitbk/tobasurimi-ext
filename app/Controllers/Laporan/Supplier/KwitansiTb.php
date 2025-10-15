@@ -4,20 +4,24 @@ namespace App\Controllers\Laporan\Supplier;
 
 use App\Controllers\BaseController;
 use App\Models\CompaniesModel;
+use App\Models\NomorKwitansiBulananModel;
 use App\Models\ProvincesModel;
 use App\Models\SupplierModel;
 use Dompdf\Dompdf;
 use Dompdf\Options;
+use Exception;
 
 class KwitansiTb extends BaseController
 {
     protected $this_company_id;
     protected $supplierModel;
+    protected $nomorKwitansuBulananModel;
 
     public function __construct()
     {
         $this->this_company_id = session()->get("login")->this_company_id;
         $this->supplierModel = new SupplierModel();
+        $this->nomorKwitansuBulananModel = new NomorKwitansiBulananModel();
     }
 
     public function index()
@@ -74,19 +78,18 @@ class KwitansiTb extends BaseController
         $dataInv = [];
 
         $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
-        $lastNoKwitansi = ''; // simpan kwitansi terakhir supaya bisa lanjut
 
         foreach ($invData['data'] as $data) {
-            $noKwitansi = ''; // default kosong untuk setiap supplier
+            $noKwitansi = '';
+            $tanggal = '';
 
             if ($data['total_bulanan'] != 0 && $data['total_bulanan'] != null) {
-                if ($lastNoKwitansi == '') {
-                    $lastNoKwitansi = sprintf("%03d/KTB/%02d/%d", 1, $month, $year);
-                } else {
-                    $lastNoKwitansi = generateNoKwitansiTB($lastNoKwitansi, $month, $year);
-                }
-
-                $noKwitansi = $lastNoKwitansi;
+                $noKwitansiStatis = $this->nomorKwitansuBulananModel
+                    ->where('year_month', $year . "-" . $month)
+                    ->where('supplier_id', $data['id'])
+                    ->first();
+                $noKwitansi = $noKwitansiStatis == null ? "" : $noKwitansiStatis['no_kwitansi'];
+                $tanggal = $noKwitansiStatis == null ? "" : $noKwitansiStatis['tanggal'];
             }
 
             array_push($dataInv, [
@@ -96,8 +99,7 @@ class KwitansiTb extends BaseController
                 "no_kwitansi_hash"  => encrypt($noKwitansi),
                 "total"             => number_format($data['total_bulanan'], 2),
                 "no_kwitansi"       => $noKwitansi,
-                "tanggal"           => $year . '-' . $month . '-' . date("t", strtotime("$year-$month-01")),
-                "is_print"          => $noKwitansi == '' ? '0' : '1'
+                "tanggal"           => $tanggal,
             ]);
         }
 
@@ -291,6 +293,157 @@ class KwitansiTb extends BaseController
         $year = $this->request->getGet('year');
         $kertas = $this->request->getGet('kertas');
 
+        $dataResult = $this->getDataKwintansiTb(
+            $month,
+            $year
+        );
+
+        if (empty($dataResult)) {
+            return redirect()->back()->with('error', 'Tidak ada data untuk dicetak.');
+        }
+
+        if ($kertas == "kasir") {
+            $urlView = "Laporan/SupplierLokalBB/KwitansiTb/print-all-kasir";
+        } else {
+            $urlView = "Laporan/SupplierLokalBB/KwitansiTb/print-all-continous";
+        }
+
+        $options = new Options();
+        $options->set('isHtml5ParserEnabled', true);
+        $options->set('isRemoteEnabled', true);
+
+        $dompdf = new Dompdf($options);
+        $dompdf->loadHtml(view($urlView, ['dataResult' => $dataResult]));
+        $dompdf->setPaper('F4', 'portrait');
+        $dompdf->render();
+        $dompdf->stream("Kwitansi_TB_Bulanan_$month-$year.pdf", ["Attachment" => false]);
+        exit;
+    }
+
+    public function getListGenerateNoKwintansiTb()
+    {
+        try {
+            $yearMonth = $this->request->getVar('year_month');
+            $yearMonthSplit = explode('-', $yearMonth);
+            $year = $yearMonthSplit[0];
+            $month = $yearMonthSplit[1];
+
+            $dataResult = $this->getDataKwintansiTbGenerate(
+                $month,
+                $year
+            );
+
+            $dataResultFinal = [];
+
+            foreach ($dataResult as $d) {
+                $supplierId = $d['kwintansi']['supplier']['id'];
+                $supplierName = $d['kwintansi']['supplier']['name'];
+                $noKwitansi = $d['noKwitansi'];
+                $yearMonth = $d['year'] . "-" . $d['month'];
+                $total = (float)$d['kwintansi']['harga_bulanan_pph'];
+                $tanggal = $d['tanggal'];
+
+                $dataResultFinal[] = [
+                    'supplier_id'   => $supplierId,
+                    'supplier_name' => $supplierName,
+                    'no_kwitansi'   => $noKwitansi,
+                    'year_month'    => $yearMonth,
+                    'total'         => $total,
+                    'tanggal'       => date('d/m/Y', strtotime($tanggal)),
+                    'company_id' => $this->this_company_id
+                ];
+            }
+
+            usort($dataResultFinal, function ($a, $b) {
+                return strcmp($a['no_kwitansi'], $b['no_kwitansi']);
+            });
+
+            return response()->setJSON([
+                'data' => $dataResultFinal,
+                'status' => true,
+                'token' => csrf_hash()
+            ]);
+        } catch (Exception $e) {
+            return response()->setJSON([
+                'message' => $e->getMessage(),
+                'token' => csrf_hash(),
+                'status' => false
+            ]);
+        }
+    }
+
+    public function generateNoKwitansiAction()
+    {
+        $db = \Config\Database::connect();
+        $db->transBegin();
+
+        try {
+            $listData = json_decode($this->request->getPost('listData'), true);
+
+            if (empty($listData) || !is_array($listData)) {
+                throw new \Exception('Data tidak valid atau kosong.');
+            }
+
+            // 🔍 Cek duplikat No Kwitansi
+            $noKwitansiArr = array_column($listData, 'no_kwitansi');
+            $duplicates = array_unique(array_diff_assoc($noKwitansiArr, array_unique($noKwitansiArr)));
+
+            if (!empty($duplicates)) {
+                return $this->response->setJSON([
+                    'token' => csrf_hash(),
+                    'status' => false,
+                    'message' => 'Terdapat No Kwitansi yang duplikat yakni: ' . implode(', ', $duplicates),
+                ]);
+            }
+
+            foreach ($listData as $l) {
+                if (is_object($l)) {
+                    $l = (array) $l;
+                }
+
+                unset($l['supplier_name']);
+                unset($l['total']);
+
+                if (empty($l['supplier_id']) || empty($l['year_month'])) {
+                    continue; // skip data tidak lengkap
+                }
+
+                // 🔹 Hapus data lama
+                $this->nomorKwitansuBulananModel
+                    ->where('supplier_id', $l['supplier_id'])
+                    ->where('year_month', $l['year_month'])
+                    ->delete(null, true);
+
+                // 🔹 Format tanggal ke YYYY-MM-DD
+                if (!empty($l['tanggal'])) {
+                    $l['tanggal'] = date("Y-m-d", strtotime(str_replace("/", "-", $l['tanggal'])));
+                } else {
+                    $l['tanggal'] = null;
+                }
+
+                // 🔹 Insert data baru
+                $this->nomorKwitansuBulananModel->insert($l);
+            }
+
+            $db->transCommit();
+
+            return $this->response->setJSON([
+                'status' => true,
+                'token' => csrf_hash(),
+                'message' => 'No Kwitansi berhasil digenerate.'
+            ]);
+        } catch (\Throwable $e) {
+            $db->transRollback();
+            return $this->response->setJSON([
+                'status' => false,
+                'token' => csrf_hash(),
+                'message' => 'Terjadi kesalahan: ' . $e->getMessage(),
+            ]);
+        }
+    }
+
+    private function getDataKwintansiTb($month, $year)
+    {
         $condition = [
             'MONTH(rm_purchase_orders.po_date)' => $month,
             'YEAR(rm_purchase_orders.po_date)' => $year,
@@ -302,6 +455,91 @@ class KwitansiTb extends BaseController
         $allSuppliers = $this->supplierModel->select('suppliers.*,SUM(dpp_bulanan)')
             ->join('rm_purchase_orders', 'rm_purchase_orders.supplier_id = suppliers.id', 'left')
             ->where($condition)
+            ->orderBy('suppliers.name', 'asc')
+            ->groupBy('suppliers.id')
+            ->findAll();
+
+        $dataResult = [];
+
+        $company = (new CompaniesModel())->where('id', $this->this_company_id)->where('deletedAt', null)->first();
+        $provinsi = (new ProvincesModel())->where('id', $company['province_id'])->first();
+
+        foreach ($allSuppliers as $data) {
+            $kwitansiTB = $this->supplierModel->getKwitansiTBBySupplier(
+                $data['id'],
+                $year,
+                $month
+            );
+
+            $totalTB = $kwitansiTB['total'];
+
+            if ($totalTB != 0) {
+                // Get No Kwitansi First
+                $noKwitansiStatis = $this->nomorKwitansuBulananModel
+                    ->where('year_month', $year . "-" . $month)
+                    ->where('supplier_id', $data['id'])
+                    ->first();
+
+                if ($noKwitansiStatis != null) {
+                    $namaBarang = "";
+                    $kodeSatuan = "";
+                    $qtyTotal = 0;
+                    $hargaBulananTotal = 0;
+                    $pphTotal = 0;
+                    $hargaBulananPphTotal = 0;
+
+                    foreach ($kwitansiTB['all'] as $k) {
+                        $namaBarang = $k['nama_barang'];
+                        $kodeSatuan = $k['kode_satuan'];
+                        $qtyTotal += $k['qty'];
+                        $hargaBulananTotal += $k['harga_bulanan'];
+                        $pphTotal += $k['pph'];
+                        $hargaBulananPphTotal += $k['harga_bulanan_pph'];
+                    }
+
+                    $kwitansiTBFinal = [
+                        'nama_barang' => $namaBarang,
+                        'kode_satuan' => $kodeSatuan,
+                        'qty' => $qtyTotal,
+                        'harga_bulanan' => $hargaBulananTotal,
+                        'pph' => $pphTotal,
+                        'harga_bulanan_pph' => $hargaBulananPphTotal,
+                        'supplier' => $kwitansiTB['supplier'],
+                        'total' => $kwitansiTB['total']
+                    ];
+
+                    $data = [
+                        'year' => $year,
+                        'month' => $month,
+                        'tanggal' => $noKwitansiStatis['tanggal'],
+                        'noKwitansi' => $noKwitansiStatis['no_kwitansi'],
+                        'company' => $company,
+                        'kwintansi' => $kwitansiTBFinal,
+                        'provinsi' => $provinsi
+                    ];
+
+                    array_push($dataResult, $data);
+                }
+            }
+        }
+
+        return $dataResult;
+    }
+
+    private function getDataKwintansiTbGenerate($month, $year)
+    {
+        $condition = [
+            'MONTH(rm_purchase_orders.po_date)' => $month,
+            'YEAR(rm_purchase_orders.po_date)' => $year,
+            'rm_purchase_orders.deletedAt' => null,
+            'suppliers.deletedAt' => null,
+            'suppliers.company_id' => $this->this_company_id
+        ];
+
+        $allSuppliers = $this->supplierModel->select('suppliers.*,SUM(dpp_bulanan)')
+            ->join('rm_purchase_orders', 'rm_purchase_orders.supplier_id = suppliers.id', 'left')
+            ->where($condition)
+            ->orderBy('suppliers.name', 'asc')
             ->groupBy('suppliers.id')
             ->findAll();
 
@@ -321,8 +559,30 @@ class KwitansiTb extends BaseController
             $totalTB = $kwitansiTB['total'];
 
             if ($totalTB != 0) {
-                $noKwitansi = ($noKwitansi == '') ? "001/KTB/$month/$year" : generateNoKwitansiTB($noKwitansi, $month, $year);
-                $tanggal = "$year-$month-" . date("t", strtotime("$year-$month-01"));
+                // Get No Kwitansi First
+                $noKwitansiStatis = $this->nomorKwitansuBulananModel
+                    ->where('year_month', $year . "-" . $month)
+                    ->where('supplier_id', $data['id'])
+                    ->first();
+
+                if ($noKwitansiStatis == null) {
+                    $noKwitansiMax = $this->nomorKwitansuBulananModel
+                        ->where('year_month', $year . "-" . $month)
+                        ->where('company_id', $this->this_company_id)
+                        ->orderBy('no_kwitansi', "desc")
+                        ->first();
+
+                    if ($noKwitansiMax != null) {
+                        $noKwitansi = generateNoKwitansiTB($noKwitansiMax['no_kwitansi'], $month, $year);
+                    } else {
+                        $noKwitansi = ($noKwitansi == '') ? "001/KTB/$month/$year" : generateNoKwitansiTB($noKwitansi, $month, $year);
+                    }
+
+                    $tanggal = date("Y-m-t", strtotime("$year-$month-01"));
+                } else {
+                    $noKwitansi = $noKwitansiStatis['no_kwitansi'];
+                    $tanggal = $noKwitansiStatis['tanggal'];
+                }
 
                 $namaBarang = "";
                 $kodeSatuan = "";
@@ -365,27 +625,6 @@ class KwitansiTb extends BaseController
             }
         }
 
-        if (empty($dataResult)) {
-            return redirect()->back()->with('error', 'Tidak ada data untuk dicetak.');
-        }
-
-        if ($kertas == "kasir") {
-            $urlView = "Laporan/SupplierLokalBB/KwitansiTb/print-all-kasir";
-        } else {
-            $urlView = "Laporan/SupplierLokalBB/KwitansiTb/print-all-continous";
-        }
-
-        // dd($dataResult);
-
-        $options = new Options();
-        $options->set('isHtml5ParserEnabled', true);
-        $options->set('isRemoteEnabled', true);
-
-        $dompdf = new Dompdf($options);
-        $dompdf->loadHtml(view($urlView, ['dataResult' => $dataResult]));
-        $dompdf->setPaper('F4', 'portrait');
-        $dompdf->render();
-        $dompdf->stream("Kwitansi_TB_Bulanan_$month-$year.pdf", ["Attachment" => false]);
-        exit;
+        return $dataResult;
     }
 }

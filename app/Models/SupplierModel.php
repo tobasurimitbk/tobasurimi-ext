@@ -236,6 +236,42 @@ class SupplierModel extends Model
         return $results;
     }
 
+    public function getSupplier($type)
+    {
+        $session = session()->get('login');
+
+        $arrCondition = [
+            'suppliers.deletedAt' => null,
+            'suppliers.type'      => $type
+        ];
+
+        $builder = $this->db->table('suppliers');
+        $builder->select('suppliers.*, companies.company as company_name');
+        $builder->join('companies', 'companies.id = suppliers.company_id', 'left');
+
+        // 🔹 Filter company sesuai session
+        if (in_array($session->this_company_id, [1, 2])) {
+            $builder->whereIn('suppliers.company_id', [1, 2]);
+        } else {
+            $builder->where('suppliers.company_id', $session->this_company_id);
+        }
+
+        $builder->where($arrCondition);
+        $builder->orderBy('suppliers.name', "ASC");
+
+        $results = $builder->get()->getResultArray();
+
+        foreach ($results as &$result) {
+            $supplierName = strtoupper($result['name']);
+            $companyName  = strtoupper($result['company_name'] ?? '');
+            $result['name'] = $companyName
+                ? "{$supplierName} ({$companyName})"
+                : $supplierName;
+        }
+
+        return $results;
+    }
+
     public function getSupplierJasVend()
     {
         $arrCondition = [

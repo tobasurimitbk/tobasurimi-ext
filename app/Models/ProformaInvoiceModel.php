@@ -146,4 +146,38 @@ class ProformaInvoiceModel extends Model
         $number = $newCounter . $lastStr;
         return $number;
     }
+
+    public function getAllSalesOrderProformaInvoice($company_id)
+    {
+        $selectQry = "proforma_invoice.no_pi as no_faktur, 
+                        proforma_invoice.total_pi as total_invoice,
+                        proforma_invoice.tanggal_pi as tanggal_faktur,
+                        companies.company,
+                        metadata.value AS valas_name,
+                        users.name AS acc_holder,
+                        customers.name AS customer_name";
+        $salesDataQry = $this->asObject()
+            ->select($selectQry)
+            ->join('companies', 'proforma_invoice.company_id = companies.id', 'left')
+            ->join('sales_order_export', 'sales_order_export.sales_order_export_id = proforma_invoice.sales_order_export_id', 'left')
+            ->join('sales_contract', 'sales_contract.id = sales_order_export.sales_contract_id', 'left')
+            ->join('customers', 'customers.id = sales_contract.customer_id', 'left')
+            ->join('metadata', 'proforma_invoice.valas_id = metadata.id', 'left')
+            ->join('users', 'users.id = sales_order_export.user_id', 'left')
+            ->where('proforma_invoice.status_posting', 1)
+            ->where('proforma_invoice.status_bayar', 0)
+            ->where('proforma_invoice.company_id', $company_id)
+            ->groupBy('proforma_invoice.id');
+
+        $totalData = $salesDataQry->countAllResults(false);
+
+        $totalFilteredData = $salesDataQry->countAllResults(false);
+        $data = $salesDataQry->findAll();
+
+        return [
+            'data'              => $data,
+            'totalData'         => $totalData,
+            'totalFilteredData' => $totalFilteredData
+        ];
+    }
 }

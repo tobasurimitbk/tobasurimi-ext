@@ -91,6 +91,16 @@ class PembayaranInvoice extends BaseController
         return view('Pembayaran/pembayaranInvoice/index');
     }
 
+    public function indexInvoiceExport()
+    {
+        return view('Pembayaran/pembayaranInvoice/indexInvoiceExport');
+    }
+
+    public function indexProformaInvoice()
+    {
+        return view('Pembayaran/pembayaranInvoice/indexProformaInvoice');
+    }
+
     public function createPembayaranInvoiceEkspor()
     {
         $subAkunsModel = $this->Sub_AkunsModel->asObject()
@@ -711,7 +721,182 @@ class PembayaranInvoice extends BaseController
         echo json_encode($data);
         return;
     }
+    
+    public function getAllPembayaranInvoiceExport()
+    {
 
+        $payload = [
+            "pageSize"      => $this->request->getGet("length"),
+            "currentPage"   => ($this->request->getGet("start") / $this->request->getGet("length")) + 1,
+            "sort"          => $this->request->getGet("sort"),
+            "sortType"      => $this->request->getGet("sortType"),
+
+        ];
+
+        if ($this->is_admin == '1') {
+            $condition = [
+                'pembayaran_invoice.company_id' => $this->this_company_id,
+                "pembayaran_invoice.deletedAt" => null,
+            ];
+        } else {
+            $condition = [
+                'pembayaran_invoice.company_id' => $this->this_company_id,
+                "pembayaran_invoice.deletedAt" => null,
+                "pembayaran_invoice.user_id" => $this->user_id, // kecualikan admin yg akses
+            ];
+        }
+
+    
+        $typeInvoice = ['EKSPOR'];
+
+        $addCondition = [
+            "search"    => $this->request->getVar("search"),
+            "sort"      => $this->request->getVar("sort"),
+            "sortType"  => $this->request->getVar("sortType"),
+            "dateStart" =>  $this->request->getVar("dateStart") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateStart")))) : "",
+            "dateEnd" =>  $this->request->getVar("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateEnd")))) : "",
+            "type_invoice" => $typeInvoice,
+            "status_posting" => $this->request->getVar('status_posting'),
+        ];
+
+        $limit = $this->request->getGet("length");
+        $offset = $this->request->getGet("start");
+
+        $pembayaranInvoiceData = $this->pembayaranInvoiceModel->getList($addCondition, $condition, $limit, $offset);
+        $dataPembayaran = [];
+
+
+        $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
+
+
+
+        foreach ($pembayaranInvoiceData['data'] as $p) {
+            $nomor_invoice = "";
+            $customer_name = "";
+            
+            $salesOrderExportData = $this->salesOrderExportModel
+                    ->join('sales_contract', 'sales_contract.id = sales_order_export.sales_contract_id')
+                    ->join('customers', 'customers.id = sales_contract.customer_id')
+                    ->where('sales_order_export_id', $p['invoice_id'])
+                    ->first();
+                $nomor_invoice = $salesOrderExportData['sales_order_export_no'];
+                $customer_name = $salesOrderExportData['name'];
+
+            array_push($dataPembayaran, [
+                "no" => $no++,
+                "id" => encrypt($p['id']),
+                "no_pembayaran" => $p['no_pembayaran'],
+                "customer_name" => $customer_name,
+                "payment_date" => date("d/m/Y", strtotime($p['tanggal'])),
+                "tipe_invoice" => $p['type_invoice'],
+                "amount" => number_format($p['total_bayar'], 2),
+                "currency" =>  $p['valas_id'],
+                "nomor_invoice" => $nomor_invoice,
+                "status_posting" => $p['status_posting']
+            ]);
+        }
+
+        $data = [
+            "draw"              => intval($this->request->getGet("draw")),
+            "recordsTotal"      => $pembayaranInvoiceData['totalData'],
+            "recordsFiltered"   => $pembayaranInvoiceData['totalFilteredData'],
+            "data"              => $dataPembayaran,
+            "payload"           => $payload,
+            'test' => $addCondition
+        ];
+
+        echo json_encode($data);
+        return;
+    }
+
+    public function getAllPembayaranProformaInvoice()
+    {
+
+        $payload = [
+            "pageSize"      => $this->request->getGet("length"),
+            "currentPage"   => ($this->request->getGet("start") / $this->request->getGet("length")) + 1,
+            "sort"          => $this->request->getGet("sort"),
+            "sortType"      => $this->request->getGet("sortType"),
+
+        ];
+
+        if ($this->is_admin == '1') {
+            $condition = [
+                'pembayaran_invoice.company_id' => $this->this_company_id,
+                "pembayaran_invoice.deletedAt" => null,
+            ];
+        } else {
+            $condition = [
+                'pembayaran_invoice.company_id' => $this->this_company_id,
+                "pembayaran_invoice.deletedAt" => null,
+                "pembayaran_invoice.user_id" => $this->user_id, // kecualikan admin yg akses
+            ];
+        }
+
+        $typeInvoice = [];
+      
+        $typeInvoice = ['PROFORMA INVOICE'];
+      
+        $addCondition = [
+            "search"    => $this->request->getVar("search"),
+            "sort"      => $this->request->getVar("sort"),
+            "sortType"  => $this->request->getVar("sortType"),
+            "dateStart" =>  $this->request->getVar("dateStart") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateStart")))) : "",
+            "dateEnd" =>  $this->request->getVar("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateEnd")))) : "",
+            "type_invoice" => $typeInvoice,
+            "status_posting" => $this->request->getVar('status_posting'),
+        ];
+
+        $limit = $this->request->getGet("length");
+        $offset = $this->request->getGet("start");
+
+        $pembayaranInvoiceData = $this->pembayaranInvoiceModel->getList($addCondition, $condition, $limit, $offset);
+        $dataPembayaran = [];
+
+
+        $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
+
+
+
+        foreach ($pembayaranInvoiceData['data'] as $p) {
+            $nomor_invoice = "";
+            $customer_name = "";
+            
+            $salesOrderExportData = $this->proformaInvoiceModel
+                    ->join('sales_order_export', 'sales_order_export.sales_order_export_id = proforma_invoice.sales_order_export_id')
+                    ->join('sales_contract', 'sales_contract.id = sales_order_export.sales_contract_id')
+                    ->join('customers', 'customers.id = sales_contract.customer_id')
+                    ->where('proforma_invoice.id', $p['invoice_id'])
+                    ->first();
+                $nomor_invoice = $salesOrderExportData['sales_order_export_no'];
+                $customer_name = $salesOrderExportData['name'];
+
+            array_push($dataPembayaran, [
+                "no" => $no++,
+                "id" => encrypt($p['id']),
+                "no_pembayaran" => $p['no_pembayaran'],
+                "customer_name" => $customer_name,
+                "payment_date" => date("d/m/Y", strtotime($p['tanggal'])),
+                "tipe_invoice" => $p['type_invoice'],
+                "amount" => number_format($p['total_bayar'], 2),
+                "currency" =>  $p['valas_id'],
+                "nomor_invoice" => $nomor_invoice,
+                "status_posting" => $p['status_posting']
+            ]);
+        }
+
+        $data = [
+            "draw"              => intval($this->request->getGet("draw")),
+            "recordsTotal"      => $pembayaranInvoiceData['totalData'],
+            "recordsFiltered"   => $pembayaranInvoiceData['totalFilteredData'],
+            "data"              => $dataPembayaran,
+            "payload"           => $payload,
+            'test' => $addCondition
+        ];
+
+        echo json_encode($data);
+        return;
+    }
 
     public function getAllDataInvoice()
     {
@@ -783,6 +968,104 @@ class PembayaranInvoice extends BaseController
 
         echo json_encode($data);
         return;
+    }
+
+    public function getAllDataInvoiceExport()
+    {
+        $dataSalesOrderExport = $this->salesOrderExportModel
+            ->getAllSalesOrderInvoiceExportForPembayaran($this->this_company_id);
+    
+        $dataAllSalesOrderExport = [];
+
+        $no = 1;
+        foreach ($dataSalesOrderExport['data'] as $data) {
+            array_push($dataAllSalesOrderExport, [
+                "no"                => $no++,
+                "no_faktur"         => $data->no_faktur,
+                "tanggal_faktur"    => $data->tanggal_faktur,
+                "total_invoice"     => number_format(floatval($data->total_invoice)),
+                "nama_pelanggan"    => $data->customer_name,
+                "nama_sales"        => $data->acc_holder,
+            ]);
+        }
+
+        $data = [
+            "draw"            => intval($this->request->getGet("draw")),
+            "recordsTotal"    => $dataSalesOrderExport['totalData'],
+            "recordsFiltered" => $dataSalesOrderExport['totalFilteredData'],
+            "data" => $dataAllSalesOrderExport,
+        ];
+
+        echo json_encode($data);
+        return;
+    }
+
+    public function getAllDataProformaInvoice()
+    {
+        $dataProformaInvoice = $this->proformaInvoiceModel
+            ->getAllSalesOrderProformaInvoice($this->this_company_id);
+
+        $dataAllProformaInvoice = [];
+
+        $no = 1;
+        foreach ($dataProformaInvoice['data'] as $data) {
+            array_push($dataAllSalesOrderExport, [
+                "no"                => $no++,
+                "no_faktur"         => $data->no_faktur,
+                "tanggal_faktur"    => $data->tanggal_faktur,
+                "total_invoice"     => number_format(floatval($data->total_invoice)),
+                "nama_pelanggan"    => $data->customer_name,
+                "nama_sales"        => $data->acc_holder,
+            ]);
+        }
+
+        $data = [
+            "draw"            => intval($this->request->getGet("draw")),
+            "recordsTotal"    => $dataProformaInvoice['totalData'],
+            "recordsFiltered" => $dataProformaInvoice['totalFilteredData'],
+            "data" => $dataAllProformaInvoice,
+        ];
+
+        echo json_encode($data);
+        return;
+    }
+
+    public function checkUnpaidInvoice()
+    {
+        $count = $this->salesOrderInvoiceModel
+            ->where('deletedAt', null)
+            ->where('status_pelunasan', 'UNPAID')
+            ->where('id_company', $this->this_company_id)
+            ->where('status_posting', 1)
+            ->countAllResults();
+
+        return $this->response->setJSON(['total_unpaid' => $count]);
+    }
+
+    public function checkUnpaidInvoiceExport()
+    {
+        $count = $this->salesOrderExportModel
+            ->where('deletedAt', null)
+            ->where('already_paid', 0)
+            ->where('company_id', $this->this_company_id)
+            ->where('status', 'POSTED')
+            ->countAllResults();
+
+        return $this->response->setJSON(['total_unpaid' => $count]);
+    }
+
+    public function checkUnpaidProformaInvoice()
+    {
+
+        $count = $this->proformaInvoiceModel
+            ->select('proforma_invoice.*')
+            ->where('proforma_invoice.deletedAt', null)
+            ->where('proforma_invoice.status_posting', 1)
+            ->where('proforma_invoice.status_bayar', 0)
+            ->where('proforma_invoice.company_id', $this->this_company_id)
+            ->countAllResults();
+
+        return $this->response->setJSON(['total_unpaid' => $count]);
     }
 
     public function getDokumenList()
@@ -2188,7 +2471,6 @@ class PembayaranInvoice extends BaseController
 
             // 🔹 Ambil semua invoice yang terlibat di pembayaran ini
             $invoiceList = $this->pembayaranInvoiceDetailModel
-                ->select('DISTINCT sales_order_invoice_id')
                 ->where('pembayaran_invoice_id', $id)
                 ->where('deletedAt', null)
                 ->findAll();
@@ -2201,6 +2483,7 @@ class PembayaranInvoice extends BaseController
                 $invoice = $this->salesOrderInvoiceModel
                     ->select('pay_amount')
                     ->where('id', $invoiceId)
+                    ->where('deletedAt', null)
                     ->first();
 
                 if (!$invoice) continue;
@@ -2219,13 +2502,11 @@ class PembayaranInvoice extends BaseController
             $now = date('Y-m-d H:i:s');
             $this->pembayaranInvoiceDetailModel
                 ->where('pembayaran_invoice_id', $id)
-                ->set('deletedAt', $now)
-                ->update();
+                ->delete();
 
             $this->pembayaranInvoiceModel
                 ->where('id', $id)
-                ->set('deletedAt', $now)
-                ->update();
+                 ->delete();
 
             $db->transCommit();
 

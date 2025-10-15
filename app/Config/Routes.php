@@ -560,7 +560,21 @@ $routes->post('/pembayaran-invoice/delete', 'Pembayaran\PembayaranInvoice::delet
 $routes->post('/pembayaran-invoice/posting', 'Pembayaran\PembayaranInvoice::posting', ['filter' => 'Auth']);
 $routes->post('/pembayaran-invoice/unposting', 'Pembayaran\PembayaranInvoice::unposting', ['filter' => 'Auth']);
 $routes->get('/pembayaran-invoice/all-invoice', 'Pembayaran\PembayaranInvoice::getAllDataInvoice', ['filter' => 'Auth']);
+$routes->get('/pembayaran-invoice/check-unpaid', 'Pembayaran\PembayaranInvoice::checkUnpaidInvoice', ['filter' => 'Auth']);
 
+//pembayaran invoice export
+$routes->get('/pembayaran-invoice-export', 'Pembayaran\PembayaranInvoice::indexInvoiceExport', ['filter' => 'Auth']);
+$routes->get('/pembayaran-invoice-export/id/(:segment)', 'Pembayaran\PembayaranInvoice::getById/$1', ['filter' => 'Auth']);
+$routes->get('/pembayaran-invoice-export/all', 'Pembayaran\PembayaranInvoice::getAllPembayaranInvoiceExport', ['filter' => 'Auth']);
+$routes->get('/pembayaran-invoice-export/all-invoice-export', 'Pembayaran\PembayaranInvoice::getAllDataInvoiceExport', ['filter' => 'Auth']);
+$routes->get('/pembayaran-invoice-export/check-unpaid', 'Pembayaran\PembayaranInvoice::checkUnpaidInvoiceExport', ['filter' => 'Auth']);
+
+//pembayaran proforma invoice
+$routes->get('/pembayaran-proforma-invoice', 'Pembayaran\PembayaranInvoice::indexProformaInvoice', ['filter' => 'Auth']);
+$routes->get('/pembayaran-proforma-invoice/id/(:segment)', 'Pembayaran\PembayaranInvoice::getById/$1', ['filter' => 'Auth']);
+$routes->get('/pembayaran-proforma-invoice/all', 'Pembayaran\PembayaranInvoice::getAllPembayaranProformaInvoice', ['filter' => 'Auth']);
+$routes->get('/pembayaran-proforma-invoice/all-proforma-invoice', 'Pembayaran\PembayaranInvoice::getAllDataProformaInvoice', ['filter' => 'Auth']);
+$routes->get('/pembayaran-proforma-invoice/check-unpaid', 'Pembayaran\PembayaranInvoice::checkUnpaidProformaInvoice', ['filter' => 'Auth']);
 
 
 // SALES LOKAL
@@ -1457,6 +1471,8 @@ $routes->get('/penerimaan-barang-lokal-bp/print-table', 'Warehouse\PenerimaanBar
 $routes->get('/penerimaan-barang-lokal-bp/export-excel', 'Warehouse\PenerimaanBarangLokalBP::exportExcel', ['filter' => 'Auth']);
 $routes->get('/penerimaan-barang-lokal-bp/load-component', 'Warehouse\PenerimaanBarangLokalBP::loadComponent', ['filter' => 'Auth']);
 $routes->get('/penerimaan-barang-lokal-bp/get-supplier-by-spp', 'Warehouse\PenerimaanBarangLokalBP::dropdownSupplierBySPP', ['filter' => 'Auth']);
+$routes->get('/penerimaan-barang-lokal-bp/cari-barang', 'Warehouse\PenerimaanBarangLokalBP::cariBarang', ['filter' => 'Auth']);
+$routes->get('/penerimaan-barang-lokal-bp/all-cari-barang', 'Warehouse\PenerimaanBarangLokalBP::allCariBarang', ['filter' => 'Auth']);
 // PENERIMAAN BARANG LOKAL BB
 $routes->get('/penerimaan-barang-lokal-bb', 'Warehouse\PenerimaanBarangLokalBB::index', ['filter' => 'Auth']);
 $routes->get('/penerimaan-barang-lokal-bb/all', 'Warehouse\PenerimaanBarangLokalBB::all', ['filter' => 'Auth']);
@@ -2059,6 +2075,7 @@ $routes->get('/log-attendance/export-bulanan', 'HR\Attendance::exportExcelLogPre
 $routes->get('/log-attendance/export-harian', 'HR\Attendance::exportExcelLogPresensiHarian', ['filter' => 'Auth']);
 $routes->get('/log-attendance/like-employees', 'HR\Attendance::getEmployeesLike', ['filter' => 'Auth']);
 $routes->post('/log-attendance/update-uangmakan', 'HR\Attendance::updateUangMakanHarian', ['filter' => 'Auth']);
+$routes->post('/log-attendance/sync-attendance', 'HR\Attendance::syncAttendance', ['filter' => 'Auth']);
 
 // Generate Attendance
 $routes->get('/list-attendance', 'HR\Attendance::indexAttendance', ['filter' => 'Auth']);
@@ -2428,6 +2445,8 @@ $routes->get('/laporan-supplier-lokal-bb/kwitansi-tb', 'Laporan\Supplier\Kwitans
 $routes->get('/laporan-supplier-lokal-bb/kwitansi-tb/all', 'Laporan\Supplier\KwitansiTb::all', ['filter' => 'Auth']);
 $routes->get('/laporan-supplier-lokal-bb/kwitansi-tb/print/(:segment)/(:segment)/(:segment)/(:segment)', 'Laporan\Supplier\KwitansiTb::exportPDFKwitansiTB/$1/$2/$3/$4', ['filter' => 'Auth']);
 $routes->get('laporan-supplier-lokal-bb/print-all-kwitansi-tb', 'Laporan\Supplier\KwitansiTb::printAllKwitansiTB');
+$routes->get('/laporan-supplier-lokal-bb/generate-no-kwintansi', 'Laporan\Supplier\KwitansiTb::getListGenerateNoKwintansiTb', ['filter' => 'Auth']);
+$routes->post('/laporan-supplier-lokal-bb/generate-no-kwitansi-action', 'Laporan\Supplier\KwitansiTb::generateNoKwitansiAction', ['filter' => 'Auth']);
 
 $routes->get('/laporan-supplier-lokal-bb/pendapatan-supplier', 'Laporan\Supplier\LaporanSupplierLokalBB::laporanPendapatanSupplier', ['filter' => 'Auth']);
 $routes->get('/laporan-supplier-lokal-bb/pendapatan-supplier/all-pendapatan-supplier', 'Laporan\Supplier\LaporanSupplierLokalBB::allLaporanPendapatanSupplier', ['filter' => 'Auth']);

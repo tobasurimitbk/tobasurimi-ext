@@ -239,6 +239,42 @@ class DivisisModel extends Model
         }
     }
 
+    public function getDivisiAccessAllCompany()
+    {
+        $session = session()->get('login');
+        if (empty($session->this_access_divisi_id)) {
+            return [];
+        }
+
+        $builder = $this->db->table('divisis');
+        $builder->select('divisis.*, companies.company as company_name');
+        $builder->join('companies', 'companies.id = divisis.company_id', 'left');
+
+        // 🔹 Filter company sesuai kondisi
+        if (in_array($session->this_company_id, [1, 2])) {
+            $builder->whereIn('divisis.company_id', [1, 2]);
+        } else {
+            $builder->where('divisis.company_id', $session->this_company_id);
+        }
+
+        $builder->where('divisis.deletedAt', null);
+        $builder->orderBy('divisis.divisi', 'ASC');
+
+        $results = $builder->get()->getResultArray();
+
+        foreach ($results as &$result) {
+            $divisiName  = strtoupper($result['divisi']);
+            $companyName = strtoupper($result['company_name'] ?? '');
+            $result['divisi'] = $companyName
+                ? "{$divisiName} ({$companyName})"
+                : $divisiName;
+        }
+
+        return $results;
+    }
+
+
+
     public function getDivisiExcept($divisi_id)
     {
         if (empty(session()->get('login')->this_access_divisi_id)) {

@@ -35,7 +35,7 @@
             margin-left: 1rem;
             margin-right: 0.5rem;
             height: 20px;
-            width: 20px;
+            width: 40px;
         }
 
         .bukti-pengeluaran {
@@ -141,7 +141,7 @@
             </tr>
         </table>
 
-        <div class="d-flex w-100">
+        <div class="d-flex w-100" style="margin-top: 10px;">
             <div style="display: inline-block;">
                 <table>
                     <tr>
@@ -154,11 +154,20 @@
                     </tr>
                 </table>
             </div>
-            <div style="display: inline-block;vertical-align: top;float: right;">
+            <div style="display: inline-block;vertical-align: top; text-align:center; margin-left:30px;">
                 <table>
                     <tr>
-                        <td>NO BUKTI:</td>
+                        <td>NO TT:</td>
                         <td><?= $invKeluarNo ?></td>
+                    </tr>
+                </table>
+            </div>
+            <div style="display: inline-block;vertical-align: top;float: right;">
+                <table>
+
+                    <tr>
+                        <td>NO BUKTI:</td>
+                        <td style="border-bottom: 1px solid #000; width: 170px;"></td>
                     </tr>
                 </table>
             </div>
@@ -300,11 +309,19 @@
                             </tr>
                         </table>
                     </div>
+                    <div style="display: inline-block;vertical-align: top; text-align:center; margin-left:30px;">
+                        <table>
+                            <tr>
+                                <td>NO TT:</td>
+                                <td><?= $invNo ?></td>
+                            </tr>
+                        </table>
+                    </div>
                     <div style="display: inline-block;vertical-align: top;float: right;">
                         <table>
                             <tr>
                                 <td>NO BUKTI:</td>
-                                <td><?= $invNo ?></td>
+                                <td style="border-bottom: 1px solid #000; width: 170px;"></td>
                             </tr>
                         </table>
                     </div>
