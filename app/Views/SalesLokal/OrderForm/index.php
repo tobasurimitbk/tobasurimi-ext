@@ -228,29 +228,29 @@
             const savedState = sessionStorage.getItem('orderFormTableState');
             if (savedState) {
                 const state = JSON.parse(savedState);
-                
+
                 // Terapkan state yang disimpan
                 $(".search").val(state.search || '');
                 sort = state.sort || '';
                 sortType = state.sortType || 'desc';
                 $(".dateStart").val(state.dateStart || '');
                 $(".dateEnd").val(state.dateEnd || '');
-                
+
                 if (state.filter_customer) {
                     $(".filter_customer").val(state.filter_customer).trigger('change');
                 }
-                
+
                 if (state.filter_surat_jalan) {
                     $(".filter_surat_jalan").val(state.filter_surat_jalan).trigger('change');
                 }
-                
+
                 if (state.filter_invoice) {
                     $(".filter_invoice").val(state.filter_invoice).trigger('change');
                 }
-                
+
                 // Hapus state setelah dimuat
                 sessionStorage.removeItem('orderFormTableState');
-                
+
                 console.log('State loaded:', state);
                 return state;
             }
@@ -270,7 +270,7 @@
 
         // Muat state DataTable jika ada
         const savedState = loadTableState();
-        
+
         $(".dateStart").datepicker({
             todayHighlight: true,
             format: "dd/mm/yyyy",
@@ -365,7 +365,7 @@
                 $('.dataTables_length').empty();
                 $('.dataTables_length').html("<div><label class='text-center ml-2 mt-2'>Show <b class='entries-label'>25</b> Entries</label></div>");
                 $('.dataTable').wrap("<div style='overflow:auto; width:100%;position:relative;'></div>");
-                
+
                 // Setel halaman yang disimpan setelah DataTable selesai dimuat
                 if (savedState && savedState.page !== undefined) {
                     setTimeout(() => {
@@ -550,6 +550,11 @@
         }).then((result) => {
             if (result.isConfirmed) {
                 const csrf = $(`[name="${csrfToken}"]`);
+                const savedState = {
+                    ...JSON.parse(sessionStorage.getItem('invoicePenjualanLokalTableState') || '{}'),
+                    page: table.page()
+                };
+                saveTableState();
 
                 setLoading()
                 $.ajax({
@@ -572,7 +577,8 @@
                                     confirmButtonColor: '#4e73df',
                                 })
                                 .then(() => {
-                                    table.ajax.reload()
+                                    table.ajax.reload(null, false);
+                                    table.page(savedState.page).draw('page');
                                 })
                         } else {
                             Swal.fire({
@@ -649,6 +655,11 @@
         }).then((result) => {
             if (result.isConfirmed) {
                 const csrf = $(`[name="${csrfToken}"]`);
+                const savedState = {
+                    ...JSON.parse(sessionStorage.getItem('invoicePenjualanLokalTableState') || '{}'),
+                    page: table.page()
+                };
+                saveTableState();
                 $.ajax({
                     url: "<?= base_url("order-form-lokal/posting"); ?>",
                     data: {
@@ -673,7 +684,8 @@
                                     confirmButtonColor: '#4e73df',
                                 })
                                 .then(() => {
-                                    table.ajax.reload()
+                                    table.ajax.reload(null, false);
+                                    table.page(savedState.page).draw('page');
                                 })
                         } else {
                             Swal.fire({

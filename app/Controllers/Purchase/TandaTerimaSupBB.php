@@ -216,6 +216,11 @@ class TandaTerimaSupBB extends BaseController
 
         // pajak
         foreach (json_decode($_POST['listPajak']) as $l) {
+            // Get Tax Id
+            $taxId = $this->pajakTandaTerimaFakturModel->getTaxId(
+                $l->tax_type,
+                $this->this_company_id
+            );
             $this->pajakTandaTerimaFakturModel->insert([
                 'tanda_terima_faktur_id' => $id,
                 'tax_inv_date' => $l->tax_inv_date ? date_format(date_create_from_format("d/m/Y", $l->tax_inv_date), "Y-m-d") : "",
@@ -224,7 +229,7 @@ class TandaTerimaSupBB extends BaseController
                 'tax_amt' => $l->tax_amt,
                 'tax_status' => $l->tax_status,
                 'tax_note' => $l->tax_note,
-
+                'tax_id' => $taxId
             ]);
         }
 
@@ -295,6 +300,10 @@ class TandaTerimaSupBB extends BaseController
         // delete pajak first and insert again
         $this->pajakTandaTerimaFakturModel->where('tanda_terima_faktur_id', $id)->delete();
         foreach (json_decode($_POST['listPajak']) as $l) {
+            $taxId = $this->pajakTandaTerimaFakturModel->getTaxId(
+                $l->tax_type,
+                $this->this_company_id
+            );
             $this->pajakTandaTerimaFakturModel->insert([
                 'tanda_terima_faktur_id' => $id,
                 'tax_inv_date' => $l->tax_inv_date ? date_format(date_create_from_format("d/m/Y", $l->tax_inv_date), "Y-m-d") : "",
@@ -303,7 +312,7 @@ class TandaTerimaSupBB extends BaseController
                 'tax_amt' => $l->tax_amt,
                 'tax_status' => $l->tax_status,
                 'tax_note' => $l->tax_note,
-
+                'tax_id' => $taxId
             ]);
         }
 

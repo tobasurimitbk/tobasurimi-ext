@@ -445,6 +445,11 @@
         }).then((result) => {
             if (result.isConfirmed) {
                 const csrf = $(`[name="${csrfToken}"]`);
+                const savedState = {
+                    ...JSON.parse(sessionStorage.getItem('invoicePenjualanLokalTableState') || '{}'),
+                    page: table.page()
+                };
+                saveTableState();
 
                 setLoading()
                 $.ajax({
@@ -467,7 +472,8 @@
                                     confirmButtonColor: '#4e73df',
                                 })
                                 .then(() => {
-                                    table.ajax.reload()
+                                    table.ajax.reload(null, false);
+                                    table.page(savedState.page).draw('page');
                                 })
                         } else {
                             Swal.fire({
@@ -505,6 +511,11 @@
         }).then((result) => {
             if (result.isConfirmed) {
                 const csrf = $(`[name="${csrfToken}"]`);
+                const savedState = {
+                    ...JSON.parse(sessionStorage.getItem('invoicePenjualanLokalTableState') || '{}'),
+                    page: table.page()
+                };
+                saveTableState();
                 $.ajax({
                     url: "<?= base_url("surat-jalan/posting"); ?>",
                     data: {
@@ -529,7 +540,8 @@
                                     confirmButtonColor: '#4e73df',
                                 })
                                 .then(() => {
-                                    table.ajax.reload()
+                                    table.ajax.reload(null, false);
+                                    table.page(savedState.page).draw('page');
                                 })
                         } else {
                             Swal.fire({
