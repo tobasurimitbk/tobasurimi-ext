@@ -365,6 +365,8 @@ class SuratJalan extends BaseController
             ->orderBy('CAST(metadata.value AS DECIMAL)', 'ASC')
             ->findAll();
 
+        $dataSuratJalan->posting = 0;
+
         $data = [
             "data" => $dataSuratJalan,
             "dataCustomers" => $customers,
@@ -1033,4 +1035,66 @@ class SuratJalan extends BaseController
 
         echo json_encode($result);
     }
+
+    // public function generateSuratJalanDetail()
+    // {
+    //     $insertedList = []; // array untuk menyimpan hasil insert
+    //     $dataSJ = $this->SuratJalanModel->asObject()
+    //         ->where('deletedAt', null)
+    //         ->findAll();
+
+    //     foreach ($dataSJ as $sj) {
+    //         $id = $sj->id;
+    //         $dataDetail = $this->SuratJalanDetailModel->where('id_surat_jalan', $id)->findAll();
+
+    //         if ($dataDetail) {
+    //             // jika sudah ada detail, lanjut ke SJ berikutnya
+    //             continue;
+    //         } else {
+    //             $dataSuratJalan = $this->SuratJalanModel->getSuratJalanById($id);
+    //             $itemList = $this->SalesOrderDetailModel->getItemListByIds($dataSuratJalan->multiple_id_so);
+
+    //             foreach ($itemList as $item) {
+    //                 if (isset($item->id_detail_sj)) {
+    //                     continue;
+    //                 } else {
+    //                     $valueBarang = [
+    //                         "id_surat_jalan"        => $id,
+    //                         "id_barang"             => $item->id_barang,
+    //                         "id_sales_order"        => $item->id_sales_order ?? null,
+    //                         "id_sales_order_detail" => $item->id_sales_order_detail ?? null,
+    //                         "qty"                   => number_format($item->qty, 2, '.', ''),
+    //                         "qty_sekarang"          => number_format($item->qty, 2, '.', ''),
+    //                         "harga_barang"          => number_format($item->harga_barang, 2, '.', ''),
+    //                         "amount"                => number_format($item->total_harga_barang, 2, '.', ''),
+    //                         "keterangan"            => $item->keterangan,
+    //                         "discount_percentage"   => number_format($item->disc, 2, '.', ''),
+    //                         "tipe_input"            => $item->tipe_input,
+    //                         "status_ppn"            => $item->statusppn,
+    //                         "discount_unit"         => $item->discUnit,
+    //                     ];
+    //                     $this->SuratJalanDetailModel->save($valueBarang);
+    //                 }
+    //             }
+
+    //             // setelah berhasil insert, simpan info SJ
+    //             $insertedList[] = [
+    //                 'id_surat_jalan' => $id,
+    //                 'no_surat_jalan' => $dataSuratJalan->no_surat_jalan
+    //             ];
+    //         }
+    //     }
+
+    //     // tampilkan hasil insert
+    //     if (!empty($insertedList)) {
+    //         echo "Berhasil insert Surat Jalan Detail untuk:\n";
+    //         foreach ($insertedList as $sj) {
+    //             echo "ID: {$sj['id_surat_jalan']}, No Surat Jalan: {$sj['no_surat_jalan']}\n";
+    //         }
+    //     } else {
+    //         echo "Tidak ada Surat Jalan yang baru diinsert.\n";
+    //     }
+
+    //     return;
+    // }
 }

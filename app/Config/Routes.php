@@ -642,6 +642,7 @@ $routes->get('/surat-jalan/print/(:segment)', 'SalesLokal\SuratJalan::printSJ/$1
 $routes->post('/surat-jalan/generate-no-surat-jalan', 'SalesLokal\SuratJalan::generateNomorSuratJalan', ['filter' => 'Auth']);
 $routes->get('/surat-jalan/export-excel', 'SalesLokal\SuratJalan::exportExcel', ['filter' => 'Auth']);
 $routes->get('/surat-jalan/getItemList', 'SalesLokal\SuratJalan::getItemListByIds', ['filter' => 'Auth']);
+// $routes->get('/surat-jalan/generate', 'SalesLokal\SuratJalan::generateSuratJalanDetail', ['filter' => 'Auth']);
 
 // Return barang sales
 $routes->get('/return-barang-sales', 'SalesLokal\Retur::index', ['filter' => 'Auth']);
