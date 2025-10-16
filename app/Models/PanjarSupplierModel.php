@@ -287,83 +287,134 @@ class PanjarSupplierModel extends Model
         return $historyPembayaranPanjarData;
     }
 
-    public function get_new_no($jenis, $divisi, $bank_id, $bln, $thn, $last_day, $companyID)
-    {
+        public function get_new_no(
+        $jenis,
+        $divisi,
+        $paymentMethod,
+        $bank_id,
+        $bln,
+        $thn,
+        $last_day,
+        $companyID,
+        $tanggalPembayaran
+    ) {
         $banksModel = new BanksModel();
-        
-        // Step 1: Dapatkan kode bank dari database
+
+        // Parse tanggalPembayaran
+        $tanggalObj = new \DateTime(str_replace("/", "-", $tanggalPembayaran));
+        $targetYear = $tanggalObj->format('Y');
+        $targetMonth = $tanggalObj->format('m');
+        $lastDayOfMonth = $tanggalObj->format('t');
+
+        // Get bank code
         $kodeBank = '';
-        if (!empty($bank_id)) {
-            $bankData = $banksModel->select('name')
-                                ->where('id', $bank_id)
-                                ->first();
+        if (!empty($bank_id) && strtoupper($paymentMethod) !== 'CASH') {
+            $bankData = $banksModel->select('kode_bank')->where('id', $bank_id)->first();
             if ($bankData) {
-                $name = strtoupper($bankData['name']);
-                if (strpos($name, 'BRI') !== false) {
-                    $kodeBank = 'BRI';
-                } elseif (strpos($name, 'MANDIRI') !== false) {
-                    $kodeBank = 'MND';
-                } elseif (strpos($name, 'BNI') !== false) {
-                    $kodeBank = 'KBA';
-                } elseif (strpos($name, 'BCA') !== false) {
-                    $kodeBank = 'BCI';
+                $kode = strtoupper($bankData['kode_bank']);
+                if (strpos($kode, 'BBRI') !== false) $kodeBank = 'BRI';
+                elseif (strpos($kode, 'BMRIIDJA') !== false) $kodeBank = 'MND';
+                elseif (strpos($kode, 'BBNI') !== false) $kodeBank = 'KBA';
+                elseif (strpos($kode, 'BBCA') !== false) $kodeBank = 'BCI';
+                elseif (strpos($kode, 'BBNL') !== false) $kodeBank = 'BNL';
+            }
+        }
+
+        // Get divisi code
+        $kodeDivisi = '';
+        $divisiKey = '';
+        $divisiUpper = strtoupper($divisi);
+
+        $divisiMap = [
+            'PTS' => ['MKN', 'KKN'],
+            'CANNING' => ['CNM', 'CNK'],
+            'FROZENI' => ['FRM', 'FRK'],
+            'FROZENII' => ['FSM', 'FSK'],
+            'FROZEN1' => ['FRM', 'FRK'],
+            'FROZEN2' => ['FSM', 'FSK'],
+            'FRZI' => ['FRM', 'FRK'],
+            'FRZII' => ['FSM', 'FSK'],
+            'GLOBAL' => ['GBM', 'GBK'],
+            'OCS' => ['OCM', 'OCK']
+        ];
+
+        foreach ($divisiMap as $key => $val) {
+            if (strpos($divisiUpper, $key) !== false) {
+                $kodeDivisi = ($jenis === 'MERAH') ? $val[0] : $val[1];
+                $divisiKey = $key;
+                break;
+            }
+        }
+
+        // Display prefix
+        $displayPrefix = '';
+        $displayPrefix = (strtoupper($paymentMethod) === 'CASH') ? $kodeDivisi : ($kodeBank ?: $kodeDivisi);
+        $displayPrefix .= "/$targetYear/$targetMonth/";
+
+        // Search patterns - hanya pattern yang relevan
+        $searchPatterns = [$displayPrefix];
+
+        // Check all relevant tables dengan query yang lebih robust
+        $db = \Config\Database::connect();
+        $tablesToCheck = [
+            'other_payment' => ['no_pembayaran', 'tanggal', 'deletedAt'],
+            'local_po_payments' => ['payment_no', 'payment_date', 'deletedAt'],
+            'local_po_payment_bp' => ['payment_no', 'payment_date', 'deletedAt'],
+            'panjar_pinjaman_transaction' => ['no_transaction', 'tanggal', 'deletedAt'],
+            'pembayaran_invoice' => ['no_pembayaran', 'tanggal', 'deletedAt'],
+        ];
+
+        $maxNumber = 0;
+        
+        foreach ($tablesToCheck as $table => [$numberColumn, $dateColumn, $deleteColumn]) {
+            $builder = $db->table($table);
+            
+            foreach ($searchPatterns as $pattern) {
+                // Hapus slash terakhir untuk exact pattern matching
+                $cleanPattern = rtrim($pattern, '/');
+                
+                $query = $builder->select("$numberColumn, COALESCE($dateColumn, createdAt) AS effective_date")
+                    ->where("$numberColumn LIKE", $cleanPattern . '/%') // Lebih spesifik
+                    ->where("COALESCE($dateColumn, createdAt) >=", "$targetYear-$targetMonth-01 00:00:00")
+                    ->where("COALESCE($dateColumn, createdAt) <=", "$targetYear-$targetMonth-$lastDayOfMonth 23:59:59");
+
+                // Handle soft delete - cek kolom yang ada
+                $db = \Config\Database::connect();
+                $tableFields = $db->getFieldNames($table);
+                
+                if (in_array('deletedAt', $tableFields)) {
+                    $query->where('deletedAt', null);
+                } elseif (in_array('deleted_at', $tableFields)) {
+                    $query->where('deleted_at', null);
+                }
+
+                if (!in_array($companyID, [1, 2])) {
+                    $query->where('company_id', $companyID);
+                } else {
+                    $query->whereIn('company_id', [1, 2]);
+                }
+
+                $results = $query->orderBy('effective_date', 'DESC')
+                    ->orderBy($numberColumn, 'DESC')
+                    ->get()
+                    ->getResultArray();
+
+                // Debug: lihat data yang ditemukan
+                // if ($results) {
+                //     log_message('debug', "Found in $table: " . json_encode($results));
+                // }
+
+                foreach ($results as $lastRecord) {
+                    $parts = explode('/', $lastRecord[$numberColumn]);
+                    if (count($parts) >= 4) {
+                        $currentNumber = (int)end($parts);
+                        $maxNumber = max($maxNumber, $currentNumber);
+                    }
                 }
             }
         }
 
-        // Step 2: Tentukan kode divisi
-        $kodeDivisi = '';
-        if (!empty($divisi)) {
-            $divisiUpper = strtoupper($divisi);
-            if (strpos($divisiUpper, 'PTS') !== false) {
-                $kodeDivisi = ($jenis == 'MERAH') ? 'MKN' : 'KKN';
-            } elseif (strpos($divisiUpper, 'CANNING') !== false) {
-                $kodeDivisi = ($jenis == 'MERAH') ? 'CNM' : 'CNK';
-            } elseif (strpos($divisiUpper, 'FROZEN I') !== false) {
-                $kodeDivisi = ($jenis == 'MERAH') ? 'FRM' : 'FRK';
-            } elseif (strpos($divisiUpper, 'FROZEN II') !== false) {
-                $kodeDivisi = ($jenis == 'MERAH') ? 'FSM' : 'FSK';
-            } elseif (strpos($divisiUpper, 'GLOBAL') !== false) {
-                $kodeDivisi = ($jenis == 'MERAH') ? 'GBM' : 'GBK';
-            } elseif (strpos($divisiUpper, 'OCS') !== false) {
-                $kodeDivisi = ($jenis == 'MERAH') ? 'OCM' : 'OCK';
-            }
-        }
-
-        // Step 3: Gabungkan kode divisi dan kode bank
-        $prefix = '';
-        if (!empty($kodeDivisi)) {
-            $prefix .= $kodeDivisi . '/';
-        }
-        if (!empty($kodeBank)) {
-            $prefix .= $kodeBank . '/';
-        }
-
-        // Step 4: Tambahkan tahun, bulan, dan nomor urut
-        $prefix .= $thn . '/' . $bln . '/';
-
-        // Step 5: Query nomor terakhir dan generate nomor baru
-        $lastPO = $this->select('no_panjar')
-                    ->like('no_panjar', $prefix)
-                    ->where('createdAt >=', "{$thn}-{$bln}-01 00:00:00")
-                    ->where('createdAt <=', "{$last_day} 23:59:59")
-                    ->where('company_id', $companyID)
-                    ->where('deletedAt', null)
-                    ->orderBy('no_panjar', 'DESC')
-                    ->first();
-
-        $counterFirst = '0001';
-        if ($lastPO == null) {
-            return $prefix . $counterFirst;
-        } else {
-            try {
-                $lastParts = explode('/', $lastPO['no_panjar']);
-                $lastNumber = isset($lastParts[4]) ? (int) $lastParts[4] : 0; // Perhatikan index [4] untuk nomor urut
-                $counterNext = str_pad($lastNumber + 1, 4, '0', STR_PAD_LEFT);
-                return $prefix . $counterNext;
-            } catch (Exception $e) {
-                return 'ERROR GENERATE NUMBER ' . date('Y-m-d');
-            }
-        }
+        $counterNext = str_pad($maxNumber + 1, 4, '0', STR_PAD_LEFT);
+        return $displayPrefix . $counterNext;
     }
 }

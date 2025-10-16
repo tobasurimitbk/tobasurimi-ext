@@ -251,6 +251,7 @@ class PembayaranInvoiceModel extends Model
                 elseif (strpos($kode, 'BBNL') !== false) $kodeBank = 'BNL';
             }
         }
+
         // Get divisi code
         $kodeDivisi = '';
         $divisiKey = '';
@@ -282,41 +283,42 @@ class PembayaranInvoiceModel extends Model
         $displayPrefix = (strtoupper($paymentMethod) === 'CASH') ? $kodeDivisi : ($kodeBank ?: $kodeDivisi);
         $displayPrefix .= "/$targetYear/$targetMonth/";
 
-        // Search patterns
-        $searchPatterns = [];
-        if (strtoupper($paymentMethod) === 'CASH') {
-            if (!empty($divisiKey) && isset($divisiMap[$divisiKey])) {
-                $searchPatterns[] = $divisiMap[$divisiKey][0] . "/$targetYear/$targetMonth/";
-                $searchPatterns[] = $divisiMap[$divisiKey][1] . "/$targetYear/$targetMonth/";
-            }
-        } else {
-            if ($kodeBank) {
-                $searchPatterns[] = "$kodeBank/$targetYear/$targetMonth/";
-            } elseif (!empty($divisiKey) && isset($divisiMap[$divisiKey])) {
-                $searchPatterns[] = $divisiMap[$divisiKey][0] . "/$targetYear/$targetMonth/";
-                $searchPatterns[] = $divisiMap[$divisiKey][1] . "/$targetYear/$targetMonth/";
-            }
-        }
+        // Search patterns - hanya pattern yang relevan
+        $searchPatterns = [$displayPrefix];
 
-        // Check all relevant tables
+        // Check all relevant tables dengan query yang lebih robust
         $db = \Config\Database::connect();
         $tablesToCheck = [
-            'other_payment' => ['no_pembayaran', 'tanggal'],
-            'local_po_payments' => ['payment_no', 'payment_date'],
-            'local_po_payment_bp' => ['payment_no', 'payment_date'],
-            'panjar_pinjaman_transaction' => ['no_transaction', 'tanggal'],
-            'pembayaran_invoice' => ['no_pembayaran', 'tanggal'],
+            'other_payment' => ['no_pembayaran', 'tanggal', 'deletedAt'],
+            'local_po_payments' => ['payment_no', 'payment_date', 'deletedAt'],
+            'local_po_payment_bp' => ['payment_no', 'payment_date', 'deletedAt'],
+            'panjar_pinjaman_transaction' => ['no_transaction', 'tanggal', 'deletedAt'],
+            'pembayaran_invoice' => ['no_pembayaran', 'tanggal', 'deletedAt'],
         ];
 
         $maxNumber = 0;
-        foreach ($tablesToCheck as $table => [$numberColumn, $dateColumn]) {
+        
+        foreach ($tablesToCheck as $table => [$numberColumn, $dateColumn, $deleteColumn]) {
             $builder = $db->table($table);
+            
             foreach ($searchPatterns as $pattern) {
+                // Hapus slash terakhir untuk exact pattern matching
+                $cleanPattern = rtrim($pattern, '/');
+                
                 $query = $builder->select("$numberColumn, COALESCE($dateColumn, createdAt) AS effective_date")
-                    ->like($numberColumn, $pattern, 'after')
+                    ->where("$numberColumn LIKE", $cleanPattern . '/%') // Lebih spesifik
                     ->where("COALESCE($dateColumn, createdAt) >=", "$targetYear-$targetMonth-01 00:00:00")
-                    ->where("COALESCE($dateColumn, createdAt) <=", "$targetYear-$targetMonth-$lastDayOfMonth 23:59:59")
-                    ->where('deletedAt', null);
+                    ->where("COALESCE($dateColumn, createdAt) <=", "$targetYear-$targetMonth-$lastDayOfMonth 23:59:59");
+
+                // Handle soft delete - cek kolom yang ada
+                $db = \Config\Database::connect();
+                $tableFields = $db->getFieldNames($table);
+                
+                if (in_array('deletedAt', $tableFields)) {
+                    $query->where('deletedAt', null);
+                } elseif (in_array('deleted_at', $tableFields)) {
+                    $query->where('deleted_at', null);
+                }
 
                 if (!in_array($companyID, [1, 2])) {
                     $query->where('company_id', $companyID);
@@ -324,15 +326,22 @@ class PembayaranInvoiceModel extends Model
                     $query->whereIn('company_id', [1, 2]);
                 }
 
-                $lastRecord = $query->orderBy('effective_date', 'DESC')
+                $results = $query->orderBy('effective_date', 'DESC')
                     ->orderBy($numberColumn, 'DESC')
-                    ->get(1)
-                    ->getRowArray();
+                    ->get()
+                    ->getResultArray();
 
-                if ($lastRecord) {
+                // Debug: lihat data yang ditemukan
+                // if ($results) {
+                //     log_message('debug', "Found in $table: " . json_encode($results));
+                // }
+
+                foreach ($results as $lastRecord) {
                     $parts = explode('/', $lastRecord[$numberColumn]);
-                    $currentNumber = (int)end($parts);
-                    $maxNumber = max($maxNumber, $currentNumber);
+                    if (count($parts) >= 4) {
+                        $currentNumber = (int)end($parts);
+                        $maxNumber = max($maxNumber, $currentNumber);
+                    }
                 }
             }
         }
