@@ -389,7 +389,8 @@
                     </tr>
                 <?php endforeach ?>
                 <tr>
-                    <td colspan="3" style="border-top: 1px solid black;border-left: none!important;text-align: right; height:5%;font-size:14px;">Total Qty</td>
+                    <td class="txt-left" style="border-top: 1px solid black; height:5%;font-size:11px;">Tgl Dicetak, <?= date('d/m/Y') ?></td>
+                    <td colspan="2" style="border-top: 1px solid black;border-left: none!important;text-align: right; height:5%;font-size:14px;">Total Qty</td>
                     <td class="txt-right" style="border-top: 1px solid black; border-left: 1px solid black; border-bottom: 1px solid black; height:5%;font-size:14px;"><?= number_format($totalQty, 2) ?></td>
                     <td class="txt-right" style="border-top: 1px solid black; border-left: 1px solid black; height:5%;font-size:14px;">JUMLAH</td>
                     <td class="txt-right" style="border: 1px solid black;font-size:14px;"><?= number_format($dataPO->dpp_umum, 2) ?></td>
@@ -441,15 +442,6 @@
                     </td>
                     <td class="sign-name" style="border: none!important;">
                         <div>( &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; )</div>
-                    </td>
-                </tr>
-                <tr style="border: none!important;">
-                    <td colspan="3" class="sign-space" style="border: none!important; text-align:center;">
-                        <br>
-                        <small style="margin-top: 30px;">
-                            Tgl Dicetak, <?= date('d/m/Y') ?>
-                        </small>
-
                     </td>
                 </tr>
             </table>
