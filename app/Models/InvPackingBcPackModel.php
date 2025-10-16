@@ -85,6 +85,7 @@ class InvPackingBcPackModel extends Model
         $resultFinal = [];
         $invPCPack = $this->getInvPack($id);
         foreach ($invPCPack as $i) {
+            $sizeBreakdown = [];
             $sizeBreakdown[] = [
                 'can' => (float)$i['can'],
                 'case' => (float)$i['cased'],
