@@ -1021,6 +1021,7 @@
         })
         var total = harga - potongan + tambahan;
         total = parseFloat(total).toFixed(2);
+        harga = parseFloat(harga).toFixed(2);
         $('.nominal_faktur').val(greatFormatRupiah(harga));
         $('.total_tambahan_potongan').val(greatFormatRupiah(total));
         $('.total_ppn_11').val(greatFormatRupiah(total_ppn_11));
