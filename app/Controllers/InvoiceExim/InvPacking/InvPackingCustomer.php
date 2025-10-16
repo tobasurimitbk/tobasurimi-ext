@@ -340,6 +340,40 @@ class InvPackingCustomer extends BaseController
         );
         $company = $this->companyModel->where('id', $companyId)->first();
 
+        foreach ($dataListPacking as $d) {
+            foreach ($d['size_breakdown'] as $s) {
+                foreach ($s as $key => $value) {
+                    if (is_numeric($value)) {
+                        if (!isset($dataSum[$key])) {
+                            $dataSum[$key] = 0;
+                        }
+                        $dataSum[$key] += $value;
+                    }
+                }
+            }
+        }
+
+        $dataSum = array_filter($dataSum, function ($v) {
+            return $v !== null && $v != 0;
+        });
+
+        if (isset($dataSum['berat_bersih'])) {
+            $dataSum['weight_netto'] = $dataSum['berat_bersih'];
+            unset($dataSum['berat_bersih']);
+        }
+
+        if (isset($dataSum['berat_kotor'])) {
+            $dataSum['weight_gross'] = $dataSum['berat_kotor'];
+            unset($dataSum['berat_kotor']);
+        }
+
+        unset($dataSum['id_detail_breakdown_packing']);
+        unset($dataSum['satuan_size_id']);
+        unset($dataSum['packing']);
+        unset($dataSum['qty']);
+        unset($dataSum['harga']);
+        unset($dataSum['total']);
+
         $data = [
             'dataSalesOrderExport' => $dataSalesOrderExport,
             'dataValuta' => $dataValuta,
@@ -350,7 +384,8 @@ class InvPackingCustomer extends BaseController
             'dataListBarang' => $dataListBarang,
             'dataListPacking' => $dataListPacking,
             'dataListBiayaTambahan' => $dataListBiayaTambahan,
-            'company'   => $company
+            'company'   => $company,
+            'dataSum' => $dataSum
         ];
 
         $this->dompdf->loadHtml(view('InvoiceExim/InvPackingCustomer/print', $data));
