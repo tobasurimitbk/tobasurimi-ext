@@ -68,7 +68,7 @@ class InvPackingCustomerBarangModel extends Model
                 'id_barang' => $i['id'],
                 'nama_barang' => $i['nama_barang'],
                 'catatan' => $i['catatan'],
-                'hs_code_name' => $invPCPack == null ? "" : $invPCPack['code'] . " - " . $invPCPack['uraian_barang'],
+                'hs_code_name' => $invPCPack == null ? "" : $invPCPack['code'],
                 'size_breakdown' => []
             ];
 

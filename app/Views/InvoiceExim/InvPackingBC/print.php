@@ -309,7 +309,7 @@
                     <tr>
                         <td>DATE</td>
                         <td>:</td>
-                        <td><?= date('d/m/Y', strtotime($dataSalesOrderExport->tanggal_invoice)) ?></td>
+                        <td><?= date('d/m/Y', strtotime($dataInvoice['tanggal_invoice'])) ?></td>
                     </tr>
                     <tr>
                         <td style="width: 140px;">INVOICE NO</td>
@@ -517,7 +517,7 @@
                 <td style="padding: 6px; border: 1px solid #7a7a78;"></td>
                 <td style="padding: 6px; border: 1px solid #7a7a78; text-align: right; " colspan="4">
                     <table>
-                        <?php if ($kodeSatuan != "KG"): ?>
+                        <?php if ($kodeSatuan != "KG" && $kodeSatuan != "KGM"): ?>
                             <tr style="font-weight: bold;">
                                 <td>
                                     TOTAL
@@ -790,7 +790,7 @@
                     <tr>
                         <td>DATE</td>
                         <td>:</td>
-                        <td><?= date('d/m/Y', strtotime($dataSalesOrderExport->tanggal_invoice)) ?></td>
+                        <td><?= date('d/m/Y', strtotime($dataInvoice['tanggal_invoice'])) ?></td>
                     </tr>
                     <tr>
                         <td style="width: 140px;">INVOICE NO</td>
@@ -1296,7 +1296,34 @@
 
                 </tr>
             <?php endforeach ?>
+            <?php if (count($dataListPacking) > 1): ?>
+                <tr style="border: 1px solid #7a7a78;">
+                    <td></td>
+                    <td>
+                        <table style="width: 100%;">
+                            <tr style="vertical-align: middle;">
+                                <td style="width: auto; text-align: center; vertical-align: middle;">
+                                    <table style="margin: 0 auto; border-collapse: collapse; font-size: 12px;">
+                                        <tbody>
+                                            <tr>
+                                                <?php foreach ($dataSum as $key => $d): ?>
+                                                    <td style="padding: 5px; font-weight:bold;">
+                                                        <?= strtoupper(str_replace(['_'], ' ',  htmlspecialchars($key))) ?>: <?= number_format($d, 2) ?>
+                                                    </td>
+                                                <?php endforeach; ?>
 
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </td>
+
+                            </tr>
+
+                        </table>
+
+                    </td>
+                </tr>
+            <?php endif; ?>
 
         </tbody>
     </table>

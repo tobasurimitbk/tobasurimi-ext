@@ -2341,7 +2341,7 @@
 
         $('#id_barang').val(item.id_barang);
         $('#nama_barang').val(item.nama_barang);
-        $('#hs_code').val(item.hs_code).change();
+        $('#hs_code_barang').val(item.hs_code).change();
         $('#satuan_id').val(item.satuan_id).change();
         $('#qty_barang').val(greatFormatRupiah(item.qty));
         $('#harga_satuan_barang').val(greatFormatRupiah(item.harga_satuan_barang));

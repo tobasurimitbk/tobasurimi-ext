@@ -285,6 +285,34 @@ class InvPackingBC extends BaseController
         $dataListPacking = $this->invPackingBcPackModel->getByInvIdPrint($id);
         $dataListBiayaTambahan = $this->invPackingBcBiayaModel->getByInvId($id);
         $company = $this->companyModel->where('id', $companyId)->first();
+        $dataSum = [];
+
+        foreach ($dataListPacking as $d) {
+            foreach ($d['size_breakdown'] as $s) {
+                foreach ($s as $key => $value) {
+                    if (is_numeric($value)) {
+                        if (!isset($dataSum[$key])) {
+                            $dataSum[$key] = 0;
+                        }
+                        $dataSum[$key] += $value;
+                    }
+                }
+            }
+        }
+
+        $dataSum = array_filter($dataSum, function ($v) {
+            return $v !== null && $v != 0;
+        });
+
+        if (isset($dataSum['berat_bersih'])) {
+            $dataSum['weight_netto'] = $dataSum['berat_bersih'];
+            unset($dataSum['berat_bersih']);
+        }
+
+        if (isset($dataSum['berat_kotor'])) {
+            $dataSum['weight_gross'] = $dataSum['berat_kotor'];
+            unset($dataSum['berat_kotor']);
+        }
 
         $data = [
             'dataInvoice' => $dataInvoice,
@@ -296,6 +324,7 @@ class InvPackingBC extends BaseController
             'dataListBarang' => $dataListBarang,
             'dataListPacking' => $dataListPacking,
             'dataListBiayaTambahan' => $dataListBiayaTambahan,
+            'dataSum' => $dataSum,
             'company'   => $company
         ];
 
