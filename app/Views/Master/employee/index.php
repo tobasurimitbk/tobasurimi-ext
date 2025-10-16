@@ -74,6 +74,7 @@
                             <tr>
                                 <th>No</th>
                                 <th onclick="changeSort('employees.nip')" class="sort">NIP</th>
+                                <th onclick="changeSort('employees.id')" class="sort">ID Finger</th>
                                 <th onclick="changeSort('employees.name')" class="sort">Nama Lengkap</th>
                                 <th onclick="changeSort('employees.division_id')" class="sort">Departemen</th>
                                 <th onclick="changeSort('employees.bagian_id')" class="sort">Bagian</th>
@@ -245,6 +246,9 @@
             width: "3%"
         }, {
             data: "nip",
+            className: "text-left"
+        }, {
+            data: "id_text",
             className: "text-left"
         }, {
             data: "name",

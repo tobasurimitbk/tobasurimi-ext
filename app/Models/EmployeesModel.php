@@ -83,6 +83,7 @@ class EmployeesModel extends Model
     public function getList($condition, $addCondition, $limit = 10, $offset = 0)
     {
         $availableSort = [
+            'employees.id' => 'employees.id',
             'employees.nip' => 'employees.nip',
             'employees.name' => 'employees.name',
             'employees.division_id' => 'employees.division_id',
@@ -128,7 +129,7 @@ class EmployeesModel extends Model
         }
 
         if ($addCondition['search']) {
-            $employeeQry->like('employees.name', $addCondition['search'])->orLike('employees.nip', $addCondition['search']);
+            $employeeQry->like('employees.name', $addCondition['search'])->orLike('employees.nip', $addCondition['search'])->orLike('employees.id', $addCondition['search']);
         }
 
 
