@@ -46,7 +46,7 @@
                     <table class="table table-bordered nowrap table-hover-tobasurimi dataTable" id="dataTable" width="100%" cellspacing="0">
                         <thead class="thead-dark">
                             <tr>
-                                <th>No.</th>
+                                <th>No</th>
                                 <th onclick="changeSort('divisi')" class="sort">Departemen</th>
                                 <th onclick="changeSort('receive_date')" class="sort">Tgl Terima</th>
                                 <th onclick="changeSort('faktur_no')" class="sort">No Terima Faktur</th>
@@ -101,7 +101,7 @@
     </div>
 </div>
 <script>
-    let sort = "tanda_terima_faktur.id";
+    let sort = "faktur_no";
     let sortType = "desc";
 
     const table = $('.dataTable').DataTable({
