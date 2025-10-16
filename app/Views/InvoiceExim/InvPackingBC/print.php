@@ -309,7 +309,7 @@
                     <tr>
                         <td>DATE</td>
                         <td>:</td>
-                        <td><?= date('d/m/Y', strtotime($dataSalesOrderExport->tanggal_invoice)) ?></td>
+                        <td><?= date('d/m/Y', strtotime($dataInvoice['tanggal_invoice'])) ?></td>
                     </tr>
                     <tr>
                         <td style="width: 140px;">INVOICE NO</td>
@@ -517,7 +517,7 @@
                 <td style="padding: 6px; border: 1px solid #7a7a78;"></td>
                 <td style="padding: 6px; border: 1px solid #7a7a78; text-align: right; " colspan="4">
                     <table>
-                        <?php if ($kodeSatuan != "KG"): ?>
+                        <?php if ($kodeSatuan != "KG" && $kodeSatuan != "KGM"): ?>
                             <tr style="font-weight: bold;">
                                 <td>
                                     TOTAL
@@ -790,7 +790,7 @@
                     <tr>
                         <td>DATE</td>
                         <td>:</td>
-                        <td><?= date('d/m/Y', strtotime($dataSalesOrderExport->tanggal_invoice)) ?></td>
+                        <td><?= date('d/m/Y', strtotime($dataInvoice['tanggal_invoice'])) ?></td>
                     </tr>
                     <tr>
                         <td style="width: 140px;">INVOICE NO</td>

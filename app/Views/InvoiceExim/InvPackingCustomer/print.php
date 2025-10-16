@@ -310,7 +310,7 @@
                     <tr>
                         <td>DATE</td>
                         <td>:</td>
-                        <td><?= date('d/m/Y', strtotime($dataSalesOrderExport->tanggal_invoice)) ?></td>
+                        <td><?= date('d/m/Y', strtotime($dataInvoice['tanggal_invoice'])) ?></td>
                     </tr>
                     <tr>
                         <td style="width: 140px;">INVOICE NO</td>
@@ -564,7 +564,7 @@
                         <tr>
                             <td>
                                 <table>
-                                    <?php if ($satuanQty != "KG"): ?>
+                                    <?php if ($satuanQty != "KG" && $satuanQty != "KGM"): ?>
                                         <tr style="font-weight: bold;">
                                             <td>
                                                 TOTAL
@@ -844,7 +844,7 @@
                     <tr>
                         <td>DATE</td>
                         <td>:</td>
-                        <td><?= date('d/m/Y', strtotime($dataSalesOrderExport->tanggal_invoice)) ?></td>
+                        <td><?= date('d/m/Y', strtotime($dataInvoice['tanggal_invoice'])) ?></td>
                     </tr>
                     <tr>
                         <td style="width: 140px;">INVOICE NO</td>

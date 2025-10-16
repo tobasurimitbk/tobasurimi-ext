@@ -62,7 +62,7 @@ class InvPackingBcBarangModel extends Model
                 'id_barang' => $i['id'],
                 'nama_barang' => $i['nama_barang'],
                 'hs_code' => $i['hs_code_id'],
-                'hs_code_name' => $i['code'] . " - " . $i['uraian_barang'],
+                'hs_code_name' => $i['code'],
                 'qty' => (float)$i['qty'],
                 'satuan_id' => $i['satuan_id'],
                 'kode_satuan' => $i['kode_satuan'],
