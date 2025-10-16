@@ -172,8 +172,9 @@ class BCPurchaseOrderModel extends Model
                 ->where('penerimaan_barang_detail.deletedAt', null)
                 ->whereIn('penerimaan_barang_id', $bcPenerimaanBarangIDArr)
                 // ->whereIn('penerimaan_barang_detail.purchase_order_id', $bcPurchaseOrderIDArr)
-                ->groupBy('penerimaan_barang_id')
+                ->groupBy('penerimaan_barang_detail.penerimaan_barang_id')
                 ->groupBy('penerimaan_barang_detail.spesifikasi_id')
+                ->groupBy('penerimaan_barang_detail.purchase_order_id')
                 ->findAll();
         } elseif ($first['po_type'] == "IMPORT BAKU") {
             // PO IMPORT BAHAN BAKU
