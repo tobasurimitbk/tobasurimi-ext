@@ -790,7 +790,7 @@
                     <tr>
                         <td>DATE</td>
                         <td>:</td>
-                        <td><?= date('d/m/Y', strtotime($dataSalesOrderExport->tanggal_invoice)) ?></td>
+                        <td><?= date('d/m/Y', strtotime($dataInvoice['tanggal_invoice'])) ?></td>
                     </tr>
                     <tr>
                         <td style="width: 140px;">INVOICE NO</td>

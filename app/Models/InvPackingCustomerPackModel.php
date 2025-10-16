@@ -62,7 +62,7 @@ class InvPackingCustomerPackModel extends Model
                 'id_packing' => $i['id'],
                 'nama_barang_packing' => $i['nama_barang_packing'],
                 'hs_code' => $i['hs_code_id'],
-                'hs_code_name' => $i['code'] . " - " . $i['uraian_barang'],
+                'hs_code_name' => $i['code'],
                 'keterangan_packing' => $i['keterangan_packing'],
                 'size_breakdown' => [],
             ];
