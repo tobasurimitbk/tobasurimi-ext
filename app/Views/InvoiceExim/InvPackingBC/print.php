@@ -517,7 +517,7 @@
                 <td style="padding: 6px; border: 1px solid #7a7a78;"></td>
                 <td style="padding: 6px; border: 1px solid #7a7a78; text-align: right; " colspan="4">
                     <table>
-                        <?php if ($kodeSatuan != "KG"): ?>
+                        <?php if ($kodeSatuan != "KG" && $kodeSatuan != "KGM"): ?>
                             <tr style="font-weight: bold;">
                                 <td>
                                     TOTAL
