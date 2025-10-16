@@ -1703,9 +1703,7 @@ class LocalPOPaymentModel extends Model
 
         // Get divisi code
         $kodeDivisi = '';
-        $divisiKey = '';
         $divisiUpper = strtoupper($divisi);
-
         $divisiMap = [
             'PTS' => ['MKN', 'KKN'],
             'CANNING' => ['CNM', 'CNK'],
@@ -1719,23 +1717,29 @@ class LocalPOPaymentModel extends Model
             'OCS' => ['OCM', 'OCK']
         ];
 
+        $kodeMerah = $kodePutih = '';
         foreach ($divisiMap as $key => $val) {
             if (strpos($divisiUpper, $key) !== false) {
+                $kodeMerah = $val[0];
+                $kodePutih = $val[1];
                 $kodeDivisi = ($jenis === 'MERAH') ? $val[0] : $val[1];
-                $divisiKey = $key;
                 break;
             }
         }
 
         // Display prefix
-        $displayPrefix = '';
         $displayPrefix = (strtoupper($paymentMethod) === 'CASH') ? $kodeDivisi : ($kodeBank ?: $kodeDivisi);
         $displayPrefix .= "/$targetYear/$targetMonth/";
 
-        // Search patterns - hanya pattern yang relevan
-        $searchPatterns = [$displayPrefix];
+        // Search patterns — cek dua-duanya (FRM & FRK misalnya)
+        $searchPatterns = [];
+        if ($kodeMerah && $kodePutih) {
+            $searchPatterns[] = str_replace($kodeDivisi, $kodeMerah, $displayPrefix);
+            $searchPatterns[] = str_replace($kodeDivisi, $kodePutih, $displayPrefix);
+        } else {
+            $searchPatterns[] = $displayPrefix;
+        }
 
-        // Check all relevant tables dengan query yang lebih robust
         $db = \Config\Database::connect();
         $tablesToCheck = [
             'other_payment' => ['no_pembayaran', 'tanggal', 'deletedAt'],
@@ -1746,23 +1750,21 @@ class LocalPOPaymentModel extends Model
         ];
 
         $maxNumber = 0;
-        
+
         foreach ($tablesToCheck as $table => [$numberColumn, $dateColumn, $deleteColumn]) {
             $builder = $db->table($table);
-            
+
             foreach ($searchPatterns as $pattern) {
-                // Hapus slash terakhir untuk exact pattern matching
                 $cleanPattern = rtrim($pattern, '/');
-                
+
                 $query = $builder->select("$numberColumn, COALESCE($dateColumn, createdAt) AS effective_date")
-                    ->where("$numberColumn LIKE", $cleanPattern . '/%') // Lebih spesifik
+                    ->where("$numberColumn LIKE", $cleanPattern . '/%')
                     ->where("COALESCE($dateColumn, createdAt) >=", "$targetYear-$targetMonth-01 00:00:00")
                     ->where("COALESCE($dateColumn, createdAt) <=", "$targetYear-$targetMonth-$lastDayOfMonth 23:59:59");
 
-                // Handle soft delete - cek kolom yang ada
                 $db = \Config\Database::connect();
                 $tableFields = $db->getFieldNames($table);
-                
+
                 if (in_array('deletedAt', $tableFields)) {
                     $query->where('deletedAt', null);
                 } elseif (in_array('deleted_at', $tableFields)) {
@@ -1779,11 +1781,6 @@ class LocalPOPaymentModel extends Model
                     ->orderBy($numberColumn, 'DESC')
                     ->get()
                     ->getResultArray();
-
-                // Debug: lihat data yang ditemukan
-                // if ($results) {
-                //     log_message('debug', "Found in $table: " . json_encode($results));
-                // }
 
                 foreach ($results as $lastRecord) {
                     $parts = explode('/', $lastRecord[$numberColumn]);
