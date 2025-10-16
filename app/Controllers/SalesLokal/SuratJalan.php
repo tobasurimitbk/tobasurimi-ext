@@ -1021,7 +1021,7 @@ class SuratJalan extends BaseController
                 $qty = (float)$value->qty - (float)$dataSuratJalanDetail[0]['sum_qty'];
                 $value->qty = $qty;
                 if ($value->discUnit == "percent") {
-                    $value->amount = ($value->harga_barang - ($value->harga_barang * $value->discAmt)) * $qty;
+                    $value->amount = ($value->harga_barang - ($value->harga_barang * $value->discAmt / 100)) * $qty;
                 } else {
                     $value->amount = ($value->harga_barang - $value->discAmt) * $qty;
                 }
