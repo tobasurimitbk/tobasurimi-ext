@@ -24,7 +24,8 @@ class TandaTerimaFakturDetailModel extends Model
         'unit',
         'qty',
         'price',
-        'price_single'
+        'price_single',
+        'divisi_id'
     ];
 
     // Dates
@@ -64,21 +65,29 @@ class TandaTerimaFakturDetailModel extends Model
 
     public function getDetail($tandaTerimaFakturID)
     {
+        $tandaTerimaFakturDetailModel = new TandaTerimaFakturDetailModel();
+
         $condition = [
             'tanda_terima_faktur_detail.tanda_terima_faktur_id' => $tandaTerimaFakturID,
             'tanda_terima_faktur_detail.deletedAt' => null
         ];
-        $tandaTerimaFakturDetailModel = new TandaTerimaFakturDetailModel();
-        $tandaTerimaFakturModel = new TandaTerimaFakturModel();
 
-        $data = $tandaTerimaFakturDetailModel->where($condition)->findAll();
-        $dataTandaTerimaFaktur = $tandaTerimaFakturModel->select('tanda_terima_faktur.*, suppliers.name as supplier_name')
+        $selectQry = "
+            tanda_terima_faktur_detail.*,
+            divisis.divisi,
+            suppliers.name AS supplier_name,
+            tanda_terima_faktur.supplier_id
+        ";
+
+        $data = $tandaTerimaFakturDetailModel
+            ->select($selectQry)
+            ->join('tanda_terima_faktur', 'tanda_terima_faktur.id = tanda_terima_faktur_detail.tanda_terima_faktur_id', 'left')
             ->join('suppliers', 'suppliers.id = tanda_terima_faktur.supplier_id', 'left')
-            ->where('tanda_terima_faktur.id', $tandaTerimaFakturID)
-            ->first();
+            ->join('divisis', 'divisis.id = tanda_terima_faktur_detail.divisi_id', 'left')
+            ->where($condition)
+            ->findAll();
 
         $result = [];
-
         foreach ($data as $d) {
             $result[] = [
                 'penerimaan_barang_detail_id' => $d['penerimaan_barang_detail_id'],
@@ -91,11 +100,12 @@ class TandaTerimaFakturDetailModel extends Model
                 'qty_telah_diterima' => 0,
                 'qty_akan_diterima' => $d['qty'],
                 'kode_satuan' => $d['unit'],
-                'supplier_name' => $dataTandaTerimaFaktur == null ? '' : $dataTandaTerimaFaktur['supplier_name'],
+                'supplier_name' => $d['supplier_name'],
                 'harga' => $d['price_single'],
                 'harga_total' => $d['price'],
-                'divisi_id' =>  $dataTandaTerimaFaktur == null ? '' : $dataTandaTerimaFaktur['divisi_id'],
-                'supplier_id' =>  $dataTandaTerimaFaktur == null ? '' : $dataTandaTerimaFaktur['supplier_id'],
+                'divisi_id' =>  $d['divisi_id'],
+                'supplier_id' =>  $d['supplier_id'],
+                'divisi_name' => $d['divisi']
             ];
         }
 

@@ -15,7 +15,7 @@
         <?= csrf_field() ?>
         <div class="card-body">
             <div class="row justify-content-end row-col-spp">
-                <div class="col mb-3">
+                <div class="col mb-4">
                     <div class="input-group input-group-password">
                         <input autocomplete="one-time-code" class="form-control input-picker dateStart" id="dateStart" name="dateStart" value="01<?= date('/m/Y') ?>" placeholder="Tanggal Mulai">
                         <div class="input-group-prepend group-prepend-password align-items-center">
@@ -23,7 +23,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="col mb-3">
+                <div class="col mb-4">
                     <div class="input-group input-group-password">
                         <input autocomplete="one-time-code" class="form-control input-picker dateEnd" id="dateEnd" name="dateEnd" placeholder="Tanggal Selesai">
                         <div class="input-group-prepend group-prepend-password align-items-center">
@@ -31,24 +31,13 @@
                         </div>
                     </div>
                 </div>
-                <div class="col mb-3">
-                    <div class="form-floating spp-ptspp" style="height: 50px;">
-                        <select class="form-select divisi_id form-out-search" name="divisi_id" id="divisi_id" aria-label="Floating label select example">
-                            <option value="">PILIH DEPARTEMEN</option>
-                            <?php foreach ($dataDivisi as $d) : ?>
-                                <option <?= (!empty($dataSPP) ? ($dataSPP->divisi_id == $d['value'] ? 'selected' : '') : '') ?> value="<?= $d['id'] ?>"><?= $d['divisi'] ?></option>
-                            <?php endforeach; ?>
-                        </select>
-                        <label for="floatingInput" class="l-spp-ptspp"></label>
-                    </div>
-                </div>
-                <div class="col mb-3">
+                <div class="col mb-4">
                     <select name="status_lunas" id="status_lunas" class="form-select status_lunas">
                         <option value="LUNAS">LUNAS</option>
                         <option selected value="BELUM LUNAS">BELUM LUNAS</option>
                     </select>
                 </div>
-                <div class="col mb-3">
+                <div class="col mb-4">
                     <input autocomplete="one-time-code" class="form-control search form-out-search" placeholder="Cari Data" value="" />
                 </div>
             </div>

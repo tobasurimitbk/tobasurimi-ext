@@ -337,7 +337,7 @@
                     <?php foreach ($taxReturnData as $t) : ?>
                         <?php $totalPenerimaan += $t->tax_amt; ?>
                         <tr>
-                            <td><?= $t->tax_type . " - " . $t->tax_inv_no . (!empty($t->tax_note) ? " - " . $t->tax_note : "") ?></td>
+                            <td><?= $t->tax_type . " - " . $t->tax_inv_no . " - " . date('d/m/y', strtotime($t->tax_inv_date))  . (!empty($t->tax_note) ? " - " . $t->tax_note : "") ?></td>
                             <td class="txt-right"><?= number_format($t->tax_amt, 2) ?></td>
                             <td></td>
                         </tr>

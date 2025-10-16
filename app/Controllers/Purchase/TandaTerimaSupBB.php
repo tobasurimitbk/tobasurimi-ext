@@ -12,6 +12,7 @@ use App\Models\TandaTerimaFakturDetailModel;
 use App\Models\TandaTerimaFakturModel;
 use App\Models\LocalPOPaymentBPModel;
 use Dompdf\Dompdf;
+use Exception;
 
 class TandaTerimaSupBB extends BaseController
 {
@@ -44,12 +45,7 @@ class TandaTerimaSupBB extends BaseController
 
     public function index()
     {
-        $dataDivisi = $this->divisiModel->getDivisiAccess();
-        $data = [
-            "dataDivisi"  => $dataDivisi,
-        ];
-
-        return view('Purchase/terimaSupplierLokal/bp/index', $data);
+        return view('Purchase/terimaSupplierLokal/bp/index');
     }
 
     public function all()
@@ -103,7 +99,7 @@ class TandaTerimaSupBB extends BaseController
                 "no"             => $no++,
                 "id"             => encrypt($data->id),
                 "faktur_no"      => $data->faktur_no,
-                "divisi"         => $data->divisi,
+                "divisi"         => str_replace(',', ', ', str_replace(['[', ']', '"', "\\"], '', $data->multiple_divisi_name)),
                 "supplier_name"  => strtoupper($data->supplierName),
                 "nominal_faktur" => $data->nominal_faktur,
                 "jumlah_item"    => $data->jumlah_item,
@@ -140,21 +136,27 @@ class TandaTerimaSupBB extends BaseController
     public function update($id)
     {
         $id = decrypt($id);
-        $tandaTerimaFakturDetail = $this->tandaTerimaFakturModel->find($id);
+        $tandaTerimaFaktur = $this->tandaTerimaFakturModel->find($id);
 
-        if ($tandaTerimaFakturDetail == null) {
+        if ($tandaTerimaFaktur == null) {
             return redirect()->to('tanda-terima-faktur-lokal-bp');
         }
+
+        $selectedDivisi = json_decode($tandaTerimaFaktur['multiple_divisi_id'], true);
 
         $data = [
             'dataSupplier' => $this->supplierModel->getSupplierByType("BAHAN PENOLONG"),
             'dataTandaTerimaFaktur' => $this->tandaTerimaFakturModel->find($id),
-            'dataTandaTerimaFaktur' => $this->tandaTerimaFakturModel->find($id),
             'dataDetailTandaTerimaFaktur' => $this->tandaTerimaFakturDetailModel->getDetail($id),
             'dataPajak' => $this->pajakTandaTerimaFakturModel->where('tanda_terima_faktur_id', $id)->where('deletedAt', null)->findAll(),
-            'dataPenerimaanBarang' => $this->tandaTerimaFakturModel->getListPenerimaanBarangLokalBPNotProcessed($tandaTerimaFakturDetail['supplier_id'], $tandaTerimaFakturDetail['divisi_id'], $this->this_company_id),
+            'dataPenerimaanBarang' => $this->tandaTerimaFakturModel->getListPenerimaanBarangLokalBPNotProcessed(
+                $tandaTerimaFaktur['supplier_id'],
+                json_decode($tandaTerimaFaktur['multiple_divisi_id']),
+                $this->this_company_id
+            ),
             'isUsed' => $this->tandaTerimaFakturModel->getTandaTerimaFakturInPembayaran($id) == null ? false : true,
             'divisi' => $this->divisiModel->getDivisiAccess(),
+            'selectedDivisi' => count($selectedDivisi) == 0 ? [] : $selectedDivisi
         ];
 
         return view('Purchase/terimaSupplierLokal/bp/form', $data);
@@ -162,164 +164,196 @@ class TandaTerimaSupBB extends BaseController
 
     public function createAction()
     {
-        $fakturNo = $this->request->getVar('no_tanda_terima_faktur');
+        $db = \Config\Database::connect();
+        try {
+            $db->transBegin();
 
-        $checkFakturNo = $this->tandaTerimaFakturModel
-            ->where('faktur_no', $fakturNo)
-            ->where('company_id', $this->this_company_id)
-            ->first();
+            $fakturNo = $this->request->getVar('no_tanda_terima_faktur');
+            $checkFakturNo = $this->tandaTerimaFakturModel
+                ->where('faktur_no', $fakturNo)
+                ->where('company_id', $this->this_company_id)
+                ->first();
+            $dataListPenerimaanBarang = json_decode($_POST['listPenerimaanBarang']);
+            if ($checkFakturNo != null) {
+                return response()->setJSON([
+                    'token' => csrf_hash(),
+                    'message' => "Nomor faktur sudah ada",
+                    'status' => false
+                ]);
+            }
 
-        $dataListPenerimaanBarang = json_decode($_POST['listPenerimaanBarang']);
-        if ($checkFakturNo != null) {
+            $id = $this->tandaTerimaFakturModel->insert([
+                'company_id' => $this->this_company_id,
+                'supplier_id' => $dataListPenerimaanBarang[0]->supplier_id,
+                'divisi_id' => null,
+                'multiple_divisi_id' => null,
+                'multiple_divisi_name' => null,
+                'jatuh_tempo' => $this->request->getVar("jatuh_tempo") ? date_format(date_create_from_format("d/m/Y", $this->request->getVar("jatuh_tempo")), "Y-m-d") : date('Y-m-d'),
+                'faktur_no' => $this->request->getVar('no_tanda_terima_faktur'),
+                'faktur_keluar_no' => $this->request->getVar('no_tanda_keluar_faktur'),
+                'nominal_faktur' => $this->request->getVar('total_tambahan_potongan'),
+                'invoice_date' => date('Y-m-d'),
+                'receive_date' => $this->request->getVar("tanggal_terima") ? date_format(date_create_from_format("d/m/Y", $this->request->getVar("tanggal_terima")), "Y-m-d") : "",
+                'potongan' => $this->request->getVar('potongan') ? $this->request->getVar('potongan') : 0,
+                'tambahan' => $this->request->getVar('tambahan') ? $this->request->getVar('tambahan') : 0,
+                'recipient' => $this->request->getVar('penerima'),
+                'faktur_type' => 'LOKAL',
+                'information_tambahan' => $this->request->getVar('keterangan_tambahan'),
+                'information_potongan' => $this->request->getVar('keterangan_potongan'),
+                'tipe_bahan' => 'PENOLONG',
+                'user_id' => $this->user_id,
+            ]);
+
+            // detail faktur
+            foreach ($dataListPenerimaanBarang as $l) {
+                $this->tandaTerimaFakturDetailModel->insert([
+                    'tanda_terima_faktur_id' => $id,
+                    'penerimaan_barang_detail_id' => $l->penerimaan_barang_detail_id,
+                    'lpb_date' => $l->tanggal ? date_format(date_create_from_format("d/m/Y", $l->tanggal), "Y-m-d") : "",
+                    'lpb_no' => $l->no_penerimaan_barang,
+                    'item_name' => $l->nama_barang_dok,
+                    'unit' => $l->kode_satuan,
+                    'qty' => $l->qty_akan_diterima,
+                    'po_no' => $l->po_no,
+                    'price' => $l->harga_total,
+                    'price_single' => $l->harga,
+                    'divisi_id' => $l->divisi_id
+                ]);
+            }
+
+            // pajak
+            foreach (json_decode($_POST['listPajak']) as $l) {
+                // Get Tax Id
+                $taxId = $this->pajakTandaTerimaFakturModel->getTaxId(
+                    $l->tax_type,
+                    $this->this_company_id
+                );
+                $this->pajakTandaTerimaFakturModel->insert([
+                    'tanda_terima_faktur_id' => $id,
+                    'tax_inv_date' => $l->tax_inv_date ? date_format(date_create_from_format("d/m/Y", $l->tax_inv_date), "Y-m-d") : "",
+                    'tax_inv_no' => $l->tax_inv_no,
+                    'tax_type' => $l->tax_type,
+                    'tax_amt' => $l->tax_amt,
+                    'tax_status' => $l->tax_status,
+                    'tax_note' => $l->tax_note,
+                    'tax_id' => $taxId
+                ]);
+            }
+
+            // Update Multiple DivisiId
+            $this->updateMultipleDivisi($id);
+            $db->transCommit();
+
             return response()->setJSON([
                 'token' => csrf_hash(),
-                'message' => "Nomor faktur sudah ada",
-                'status' => false
+                'message' => "Tanda terima faktur berhasil dibuat",
+                'status' => true,
+                'id' => encrypt($id)
+            ]);
+        } catch (Exception $e) {
+            $db->transRollback();
+            return response()->setJSON([
+                'status' => false,
+                'token' => csrf_hash(),
+                'message' => $e->getMessage()
             ]);
         }
-
-        $id = $this->tandaTerimaFakturModel->insert([
-            'company_id' => $this->this_company_id,
-            'supplier_id' => $dataListPenerimaanBarang[0]->supplier_id,
-            'divisi_id' => $dataListPenerimaanBarang[0]->divisi_id,
-            'jatuh_tempo' => $this->request->getVar("jatuh_tempo") ? date_format(date_create_from_format("d/m/Y", $this->request->getVar("jatuh_tempo")), "Y-m-d") : date('Y-m-d'),
-            'faktur_no' => $this->request->getVar('no_tanda_terima_faktur'),
-            'faktur_keluar_no' => $this->request->getVar('no_tanda_keluar_faktur'),
-            'nominal_faktur' => $this->request->getVar('total_tambahan_potongan'),
-            'invoice_date' => date('Y-m-d'),
-            'receive_date' => $this->request->getVar("tanggal_terima") ? date_format(date_create_from_format("d/m/Y", $this->request->getVar("tanggal_terima")), "Y-m-d") : "",
-            'potongan' => $this->request->getVar('potongan') ? $this->request->getVar('potongan') : 0,
-            'tambahan' => $this->request->getVar('tambahan') ? $this->request->getVar('tambahan') : 0,
-            'recipient' => $this->request->getVar('penerima'),
-            'faktur_type' => 'LOKAL',
-            'information_tambahan' => $this->request->getVar('keterangan_tambahan'),
-            'information_potongan' => $this->request->getVar('keterangan_potongan'),
-            'tipe_bahan' => 'PENOLONG',
-            'user_id' => $this->user_id,
-        ]);
-
-        // detail faktur
-        foreach ($dataListPenerimaanBarang as $l) {
-            $this->tandaTerimaFakturDetailModel->insert([
-                'tanda_terima_faktur_id' => $id,
-                'penerimaan_barang_detail_id' => $l->penerimaan_barang_detail_id,
-                'lpb_date' => $l->tanggal ? date_format(date_create_from_format("d/m/Y", $l->tanggal), "Y-m-d") : "",
-                'lpb_no' => $l->no_penerimaan_barang,
-                'item_name' => $l->nama_barang_dok,
-                'unit' => $l->kode_satuan,
-                'qty' => $l->qty_akan_diterima,
-                'po_no' => $l->po_no,
-                'price' => $l->harga_total,
-                'price_single' => $l->harga
-            ]);
-        }
-
-        // pajak
-        foreach (json_decode($_POST['listPajak']) as $l) {
-            // Get Tax Id
-            $taxId = $this->pajakTandaTerimaFakturModel->getTaxId(
-                $l->tax_type,
-                $this->this_company_id
-            );
-            $this->pajakTandaTerimaFakturModel->insert([
-                'tanda_terima_faktur_id' => $id,
-                'tax_inv_date' => $l->tax_inv_date ? date_format(date_create_from_format("d/m/Y", $l->tax_inv_date), "Y-m-d") : "",
-                'tax_inv_no' => $l->tax_inv_no,
-                'tax_type' => $l->tax_type,
-                'tax_amt' => $l->tax_amt,
-                'tax_status' => $l->tax_status,
-                'tax_note' => $l->tax_note,
-                'tax_id' => $taxId
-            ]);
-        }
-
-        return response()->setJSON([
-            'token' => csrf_hash(),
-            'message' => "Tanda terima faktur berhasil dibuat",
-            'status' => true,
-            'id' => encrypt($id)
-        ]);
     }
 
     public function updateAction()
     {
-        $id = decrypt($this->request->getVar('id'));
-        $fakturNo = $this->request->getVar('no_tanda_terima_faktur');
-        $checkFakturNo = $this->tandaTerimaFakturModel
-            ->where('faktur_no', $fakturNo)
-            ->where('company_id', $this->this_company_id)
-            ->where('id <>', $id)
-            ->first();
+        $db = \Config\Database::connect();
+        try {
+            $db->transBegin();
 
-        if ($checkFakturNo != null) {
+            $id = decrypt($this->request->getVar('id'));
+            $fakturNo = $this->request->getVar('no_tanda_terima_faktur');
+            $checkFakturNo = $this->tandaTerimaFakturModel
+                ->where('faktur_no', $fakturNo)
+                ->where('company_id', $this->this_company_id)
+                ->where('id <>', $id)
+                ->first();
+
+            if ($checkFakturNo != null) {
+                return response()->setJSON([
+                    'token' => csrf_hash(),
+                    'message' => "Nomor faktur sudah ada",
+                    'status' => false
+                ]);
+            }
+
+            $dataListPenerimaanBarang = json_decode($_POST['listPenerimaanBarang']);
+
+            $this->tandaTerimaFakturModel->update($id, [
+                'supplier_id' => $this->request->getVar('supplier_id'),
+                'faktur_no' => $this->request->getVar('no_tanda_terima_faktur'),
+                'faktur_keluar_no' => $this->request->getVar('no_tanda_keluar_faktur'),
+                'jatuh_tempo' => $this->request->getVar("jatuh_tempo") ? date_format(date_create_from_format("d/m/Y", $this->request->getVar("jatuh_tempo")), "Y-m-d") : "",
+                'nominal_faktur' => $this->request->getVar('total_tambahan_potongan'),
+                'invoice_date' => date('Y-m-d'),
+                'receive_date' => $this->request->getVar("tanggal_terima") ? date_format(date_create_from_format("d/m/Y", $this->request->getVar("tanggal_terima")), "Y-m-d") : "",
+                'potongan' => $this->request->getVar('potongan') ? $this->request->getVar('potongan') : 0,
+                'tambahan' => $this->request->getVar('tambahan') ? $this->request->getVar('tambahan') : 0,
+                'recipient' => $this->request->getVar('penerima'),
+                'faktur_type' => 'LOKAL',
+                'information_tambahan' => $this->request->getVar('keterangan_tambahan'),
+                'information_potongan' => $this->request->getVar('keterangan_potongan'),
+                'tipe_bahan' => 'PENOLONG',
+            ]);
+
+            // delete detail first and insert again
+            $this->tandaTerimaFakturDetailModel->where('tanda_terima_faktur_id', $id)->delete();
+            foreach ($dataListPenerimaanBarang as $l) {
+                $this->tandaTerimaFakturDetailModel->insert([
+                    'tanda_terima_faktur_id' => $id,
+                    'penerimaan_barang_detail_id' => $l->penerimaan_barang_detail_id,
+                    'lpb_date' => $l->tanggal ? date_format(date_create_from_format("d/m/Y", $l->tanggal), "Y-m-d") : "",
+                    'lpb_no' => $l->no_penerimaan_barang,
+                    'item_name' => $l->nama_barang_dok,
+                    'unit' => $l->kode_satuan,
+                    'qty' => $l->qty_akan_diterima,
+                    'po_no' => $l->po_no,
+                    'price' => $l->harga_total,
+                    'price_single' => $l->harga,
+                    'divisi_id' => $l->divisi_id
+                ]);
+            }
+
+            // delete pajak first and insert again
+            $this->pajakTandaTerimaFakturModel->where('tanda_terima_faktur_id', $id)->delete();
+            foreach (json_decode($_POST['listPajak']) as $l) {
+                $taxId = $this->pajakTandaTerimaFakturModel->getTaxId(
+                    $l->tax_type,
+                    $this->this_company_id
+                );
+                $this->pajakTandaTerimaFakturModel->insert([
+                    'tanda_terima_faktur_id' => $id,
+                    'tax_inv_date' => $l->tax_inv_date ? date_format(date_create_from_format("d/m/Y", $l->tax_inv_date), "Y-m-d") : "",
+                    'tax_inv_no' => $l->tax_inv_no,
+                    'tax_type' => $l->tax_type,
+                    'tax_amt' => $l->tax_amt,
+                    'tax_status' => $l->tax_status,
+                    'tax_note' => $l->tax_note,
+                    'tax_id' => $taxId
+                ]);
+            }
+
+            $this->updateMultipleDivisi($id);
+            $db->transCommit();
+
             return response()->setJSON([
                 'token' => csrf_hash(),
-                'message' => "Nomor faktur sudah ada",
-                'status' => false
+                'status' => true,
+                'message' => "Tanda terima faktur berhasil diupdate",
+            ]);
+        } catch (Exception $e) {
+            $db->transRollback();
+            return response()->setJSON([
+                'status' => false,
+                'token' => csrf_hash(),
+                'message' => $e->getMessage()
             ]);
         }
-
-        $dataListPenerimaanBarang = json_decode($_POST['listPenerimaanBarang']);
-
-        $this->tandaTerimaFakturModel->update($id, [
-            'supplier_id' => $this->request->getVar('supplier_id'),
-            'divisi_id' => $this->request->getVar('divisi_id'),
-            'faktur_no' => $this->request->getVar('no_tanda_terima_faktur'),
-            'faktur_keluar_no' => $this->request->getVar('no_tanda_keluar_faktur'),
-            'jatuh_tempo' => $this->request->getVar("jatuh_tempo") ? date_format(date_create_from_format("d/m/Y", $this->request->getVar("jatuh_tempo")), "Y-m-d") : "",
-            'nominal_faktur' => $this->request->getVar('total_tambahan_potongan'),
-            'invoice_date' => date('Y-m-d'),
-            'receive_date' => $this->request->getVar("tanggal_terima") ? date_format(date_create_from_format("d/m/Y", $this->request->getVar("tanggal_terima")), "Y-m-d") : "",
-            'potongan' => $this->request->getVar('potongan') ? $this->request->getVar('potongan') : 0,
-            'tambahan' => $this->request->getVar('tambahan') ? $this->request->getVar('tambahan') : 0,
-            'recipient' => $this->request->getVar('penerima'),
-            'faktur_type' => 'LOKAL',
-            'information_tambahan' => $this->request->getVar('keterangan_tambahan'),
-            'information_potongan' => $this->request->getVar('keterangan_potongan'),
-            'tipe_bahan' => 'PENOLONG',
-            'user_id' => $this->user_id,
-        ]);
-
-        // delete detail first and insert again
-        $this->tandaTerimaFakturDetailModel->where('tanda_terima_faktur_id', $id)->delete();
-        foreach ($dataListPenerimaanBarang as $l) {
-            $this->tandaTerimaFakturDetailModel->insert([
-                'tanda_terima_faktur_id' => $id,
-                'penerimaan_barang_detail_id' => $l->penerimaan_barang_detail_id,
-                'lpb_date' => $l->tanggal ? date_format(date_create_from_format("d/m/Y", $l->tanggal), "Y-m-d") : "",
-                'lpb_no' => $l->no_penerimaan_barang,
-                'item_name' => $l->nama_barang_dok,
-                'unit' => $l->kode_satuan,
-                'qty' => $l->qty_akan_diterima,
-                'po_no' => $l->po_no,
-                'price' => $l->harga_total,
-                'price_single' => $l->harga
-            ]);
-        }
-
-        // delete pajak first and insert again
-        $this->pajakTandaTerimaFakturModel->where('tanda_terima_faktur_id', $id)->delete();
-        foreach (json_decode($_POST['listPajak']) as $l) {
-            $taxId = $this->pajakTandaTerimaFakturModel->getTaxId(
-                $l->tax_type,
-                $this->this_company_id
-            );
-            $this->pajakTandaTerimaFakturModel->insert([
-                'tanda_terima_faktur_id' => $id,
-                'tax_inv_date' => $l->tax_inv_date ? date_format(date_create_from_format("d/m/Y", $l->tax_inv_date), "Y-m-d") : "",
-                'tax_inv_no' => $l->tax_inv_no,
-                'tax_type' => $l->tax_type,
-                'tax_amt' => $l->tax_amt,
-                'tax_status' => $l->tax_status,
-                'tax_note' => $l->tax_note,
-                'tax_id' => $taxId
-            ]);
-        }
-
-        return response()->setJSON([
-            'token' => csrf_hash(),
-            'message' => "Tanda terima faktur berhasil diupdate",
-        ]);
     }
 
     public function delete()
@@ -455,11 +489,31 @@ class TandaTerimaSupBB extends BaseController
         $tandaTerimaFakturID = $this->request->getVar('tanda_terima_faktur_id');
         $penerimaanBarangDetailID = $this->request->getVar('penerimaan_barang_detail_id');
 
-        $this->tandaTerimaFakturDetailModel->where('tanda_terima_faktur_id', $tandaTerimaFakturID)->where('penerimaan_barang_detail_id', $penerimaanBarangDetailID)->delete();
+        // Hitung dulu
+        $counter = $this->tandaTerimaFakturDetailModel
+            ->where('tanda_terima_faktur_id', $tandaTerimaFakturID)
+            ->where('deletedAt', null)
+            ->findAll();
+
+        if (count($counter) == 1) {
+            return response()->setJSON([
+                'message' => "Gagal hapus : minimal harus ada 1 barang di tanda terima faktur",
+                'token' => csrf_hash(),
+                'status' => false
+            ]);
+        }
+
+        $this->tandaTerimaFakturDetailModel
+            ->where('tanda_terima_faktur_id', $tandaTerimaFakturID)
+            ->where('penerimaan_barang_detail_id', $penerimaanBarangDetailID)
+            ->delete();
+
+        $this->updateMultipleDivisi($tandaTerimaFakturID);
 
         return response()->setJSON([
             'message' => "Daftar penerimaan barang berhasil dihapus",
-            'token' => csrf_hash()
+            'token' => csrf_hash(),
+            'status' => true
         ]);
     }
 
@@ -469,10 +523,25 @@ class TandaTerimaSupBB extends BaseController
         $divisiID = $this->request->getVar('divisiID');
         $companyID = $this->this_company_id;
 
-        return response()->setJSON([
-            'status' => true,
-            'data' => $this->tandaTerimaFakturModel->getListPenerimaanBarangLokalBPNotProcessed($supplierID, $divisiID, $companyID)
-        ]);
+        $divisiIds = json_decode($divisiID);
+        if (count($divisiIds) == 0) {
+            return response()->setJSON([
+                'status' => true,
+                'token' => csrf_hash(),
+                'data' => []
+            ]);
+        } else {
+            $dataTt = $this->tandaTerimaFakturModel->getListPenerimaanBarangLokalBPNotProcessed(
+                $supplierID,
+                $divisiIds,
+                $companyID
+            );
+            return response()->setJSON([
+                'status' => true,
+                'token' => csrf_hash(),
+                'data' => $dataTt
+            ]);
+        }
     }
 
     public function generateTandaTerimaFakturNumber()
@@ -631,5 +700,30 @@ class TandaTerimaSupBB extends BaseController
             $h['amount'] = number_format($h['amount'], 2);
         }
         return response()->setJSON($history);
+    }
+
+    public function updateMultipleDivisi($id)
+    {
+        $tandaTerimaFakturDetail = $this->tandaTerimaFakturDetailModel
+            ->where('tanda_terima_faktur_id', $id)
+            ->where('deletedAt', null)
+            ->findAll();
+
+        $divisiIds = array_unique(array_column($tandaTerimaFakturDetail, 'divisi_id'));
+        $divisis = $this->divisiModel->whereIn('id', $divisiIds)->findAll();
+        $divisiName = array_column($divisis, 'divisi');
+
+        // ubah array ke bentuk string literal seperti [1,2,3]
+        $divisiIdString = '[' . implode(',', $divisiIds) . ']';
+
+        // ubah array string ke bentuk ["abc","def"]
+        $divisiNameString = '["' . implode('","', $divisiName) . '"]';
+
+        $this->tandaTerimaFakturModel->update($id, [
+            'multiple_divisi_id' => $divisiIdString,
+            'multiple_divisi_name' => $divisiNameString
+        ]);
+
+        return;
     }
 }

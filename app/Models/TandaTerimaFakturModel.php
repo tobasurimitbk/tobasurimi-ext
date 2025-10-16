@@ -19,6 +19,8 @@ class TandaTerimaFakturModel extends Model
         'company_id',
         'supplier_id',
         'divisi_id',
+        'multiple_divisi_id',
+        'multiple_divisi_name',
         'faktur_no',
         'faktur_keluar_no',
         'jatuh_tempo',
@@ -65,11 +67,11 @@ class TandaTerimaFakturModel extends Model
         $availableSort = [
             'tanda_terima_faktur.id'  => 'tanda_terima_faktur.id',
             'receive_date'  => 'tanda_terima_faktur.receive_date',
-            'divisi_id'     => 'tanda_terima_faktur.divisi_id',
             'faktur_no'     => 'tanda_terima_faktur.faktur_no',
             'suppliers.name' => 'suppliers.name',
             'nominal_faktur' => 'nominal_faktur',
             'recipient'     => 'recipient',
+            "divisi" => "multiple_divisi_name"
         ];
         $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
 
@@ -79,7 +81,6 @@ class TandaTerimaFakturModel extends Model
         $selectQry = "tanda_terima_faktur.*, 
                       suppliers.name AS supplierName,
                       users.name AS userName,
-                      divisis.divisi AS divisi,  -- ✅ Pastikan alias ini ada
                       COALESCE(SUM(local_po_payment_bp.amount), 0) AS total_dibayar,
                       COUNT(tanda_terima_faktur_detail.id) AS jumlah_item";
 
@@ -88,7 +89,6 @@ class TandaTerimaFakturModel extends Model
             ->where($condition)
             ->join('suppliers', 'suppliers.id = tanda_terima_faktur.supplier_id', 'left')
             ->join('users', 'users.id = tanda_terima_faktur.user_id', 'left')
-            ->join('divisis', 'divisis.id = tanda_terima_faktur.divisi_id', 'left')
             ->join('local_po_payment_bp', 'local_po_payment_bp.tanda_terima_faktur_id = tanda_terima_faktur.id', 'left')
             ->join('tanda_terima_faktur_detail', 'tanda_terima_faktur_detail.tanda_terima_faktur_id = tanda_terima_faktur.id', 'left');
 
@@ -96,14 +96,10 @@ class TandaTerimaFakturModel extends Model
         if (!empty($addCondition['search'])) {
             $tandaTerimaQry->groupStart()
                 ->like('tanda_terima_faktur.faktur_no', $addCondition['search'])
-                ->orLike('divisis.divisi', $addCondition['search'])
+                ->orLike('multiple_divisi_name', $addCondition['search'])
                 ->orLike('suppliers.name', $addCondition['search'])
+                ->orLike('users.name', $addCondition['search'])
                 ->groupEnd();
-        }
-
-        // ✅ Filter berdasarkan divisi_id
-        if (!empty($addCondition['divisi_id'])) {
-            $tandaTerimaQry->where('tanda_terima_faktur.divisi_id', $addCondition['divisi_id']);
         }
 
         // ✅ Filter status lunas menggunakan HAVING
@@ -188,8 +184,12 @@ class TandaTerimaFakturModel extends Model
         return $res;
     }
 
-    public function getListPenerimaanBarangLokalBPNotProcessed($supplierID, $divisiID, $companyID)
-    {
+    public function getListPenerimaanBarangLokalBPNotProcessed(
+        $supplierID,
+        $divisiIds,
+        $companyID
+    ) {
+        // Tampilkan diatas bulan 01-09-2025
         $condition = [
             'penerimaan_barang.status_post' => 'FINISH',
             'penerimaan_barang.company_id' => $companyID,
@@ -198,16 +198,12 @@ class TandaTerimaFakturModel extends Model
             'penerimaan_barang.deletedAt' => null,
             'penerimaan_barang_detail.deletedAt' => null,
             'penerimaan_barang_detail.jml_masuk !=' => 0,
+            'penerimaan_barang.tanggal >=' => "2025-09-01"
         ];
 
         // Tambahkan filter jika $supplierID bukan "all"
         if ($supplierID !== 'all') {
             $condition['penerimaan_barang.supplier_id'] = $supplierID;
-        }
-
-        // Tambahkan filter jika $divisiID bukan "all"
-        if ($divisiID !== 'all') {
-            $condition['penerimaan_barang.divisi_id'] = $divisiID;
         }
 
         $penerimaanBarangModel = new PenerimaanBarangModel();
@@ -227,7 +223,7 @@ class TandaTerimaFakturModel extends Model
             CONCAT(barang_master.barang_name, ' - ', barang_master_spesifikasi.spesifikasi) AS barang
         ";
 
-        $penerimaanList = $penerimaanBarangModel->select($selectQry)
+        $dataQry = $penerimaanBarangModel->select($selectQry)
             ->join('penerimaan_barang_detail', 'penerimaan_barang_detail.penerimaan_barang_id = penerimaan_barang.id')
             ->join('am_purchase_orders', 'am_purchase_orders.id = penerimaan_barang_detail.purchase_order_id')
             ->join('satuans', 'satuans.id = penerimaan_barang_detail.unit')
@@ -235,9 +231,14 @@ class TandaTerimaFakturModel extends Model
             ->join('suppliers', 'suppliers.id = penerimaan_barang.supplier_id', 'left')
             ->join('divisis', 'divisis.id = penerimaan_barang.divisi_id', 'left')
             ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = penerimaan_barang_detail.spesifikasi_id', 'left')
-            ->where($condition)
-            ->orderBy('penerimaan_barang.tanggal', "ASC")
-            ->findAll();
+            ->where($condition);
+
+        if (!in_array("all", $divisiIds)) {
+            // Jika bukan all tampilkan wherein nya 
+            $dataQry->whereIn('penerimaan_barang.divisi_id', $divisiIds);
+        }
+
+        $penerimaanList = $dataQry->orderBy('penerimaan_barang.tanggal', "ASC")->findAll();
 
         $filteredResults = array_map(function ($penerimaan) use ($tandaTerimaFakturDetailModel) {
             $selectQry = "SUM(qty) AS qty_diterima";
