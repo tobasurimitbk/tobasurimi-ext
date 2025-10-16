@@ -443,10 +443,16 @@
                         <div>( &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; )</div>
                     </td>
                 </tr>
+                <tr style="border: none!important;">
+                    <td colspan="3" class="sign-space" style="border: none!important; text-align:center;">
+                        <br>
+                        <small style="margin-top: 30px;">
+                            Tgl Dicetak, <?= date('d/m/Y') ?>
+                        </small>
+
+                    </td>
+                </tr>
             </table>
-            <small style="position: fixed; bottom: 10px; left: 10px; font-size: 10px;">
-                Tgl Dicetak, <?= date('d/m/Y') ?>
-            </small>
 
         </div>
 
