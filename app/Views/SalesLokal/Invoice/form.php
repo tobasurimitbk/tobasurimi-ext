@@ -643,10 +643,10 @@
             let rowData = table.row($(this).parents('tr')).data();
             let dataNo = $(this).data('no');
             let dataId = $(this).data('id');
-            // console.log(list_items, dataNo, dataId);
+            console.log(list_items, dataNo, dataId);
 
             const csrf = $(`[name="${csrfToken}"]`);
-            if (!dataId) {
+            if (dataNo && dataNo != 'undefined') {
                 let indexToRemove = list_items.findIndex(item => item.no === dataNo);
                 if (indexToRemove !== -1) {
                     list_items.splice(indexToRemove, 1);
