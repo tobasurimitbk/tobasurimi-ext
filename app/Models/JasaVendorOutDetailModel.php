@@ -380,6 +380,7 @@ class JasaVendorOutDetailModel extends Model
 
         $jasaVendorOutDetail = $this->asArray()
             ->where('jasa_vendor_out_id', $jasaVendorOutID)
+            ->where('deletedAt', null)
             ->findAll();
 
 
@@ -440,8 +441,7 @@ class JasaVendorOutDetailModel extends Model
                         $stock_dokumen = $doc ? $doc['po_no'] : null;
                     }
 
-            $stockList['qty'] = $stockList['qty_diterima'] ?? 0;
-            $stockList['qty_kotor'] = $stockList['qty_diterima'] ?? 0;
+            $stockList['qty'] = $m['qty'] ?? 0;
             $bcType = isset($stockList['bc_id']) ? $metaDataModel->find($stockList['bc_id']) : null;
             $stockList['no_aju'] = isset($stockList['no_aju']) && $stockList['no_aju'] !== "-" ? $stockList['no_aju'] : "-";
             $stockList['bc_type'] = $bcType['value'] ?? "NON PABEAN";
