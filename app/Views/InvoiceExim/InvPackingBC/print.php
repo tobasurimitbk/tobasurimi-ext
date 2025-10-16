@@ -1296,7 +1296,34 @@
 
                 </tr>
             <?php endforeach ?>
+            <?php if (count($dataListPacking) > 1): ?>
+                <tr style="border: 1px solid #7a7a78;">
+                    <td></td>
+                    <td>
+                        <table style="width: 100%;">
+                            <tr style="vertical-align: middle;">
+                                <td style="width: auto; text-align: center; vertical-align: middle;">
+                                    <table style="margin: 0 auto; border-collapse: collapse; font-size: 12px;">
+                                        <tbody>
+                                            <tr>
+                                                <?php foreach ($dataSum as $key => $d): ?>
+                                                    <td style="padding: 5px; font-weight:bold;">
+                                                        <?= strtoupper(str_replace(['_'], ' ',  htmlspecialchars($key))) ?>: <?= number_format($d, 2) ?>
+                                                    </td>
+                                                <?php endforeach; ?>
 
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </td>
+
+                            </tr>
+
+                        </table>
+
+                    </td>
+                </tr>
+            <?php endif; ?>
 
         </tbody>
     </table>
