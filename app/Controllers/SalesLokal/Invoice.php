@@ -244,8 +244,8 @@ class Invoice extends BaseController
                 "counter_print"     => $data->counter_print,
                 "status_pembayaran" => $statusPembayaranInvoice,
                 "company_name"      => $data->company_name,
-                "no_sales_order"    => $data->no_sales_order,
-                "no_surat_jalan"    => $data->no_surat_jalan,
+                "no_sales_order"    => $data->no_sales_order ?? '-',
+                "no_surat_jalan"    => $data->no_surat_jalan ?? '-',
             ];
         }
 
@@ -1051,7 +1051,6 @@ class Invoice extends BaseController
             ->findAll();
 
         $usedIds = [];
-
         foreach ($usedDocs as $u) {
             if (!empty($u['document_id'])) {
                 $ids = is_array($u['document_id'])
@@ -1063,66 +1062,80 @@ class Invoice extends BaseController
                 }
             }
         }
-
         $usedIds = array_unique($usedIds);
 
-        // jika edit, keluarkan document_id milik invoice saat ini dari daftar yang di-exclude
         if ($condition === 'edit' && !empty($currentDocumentIds)) {
             $usedIds = array_values(array_diff($usedIds, $currentDocumentIds));
         }
 
-        // ---------- ambil dokumen ----------
-        if ($documentType === 'pesanan') {
-            $documentList = $this->SalesOrderModel->asObject()
-                ->select('
-                sales_order.id,
-                sales_order.no_sales_order AS doc_no,
-                sales_order.id_company,
-                sales_order.no_po,
-                sales_order.keterangan,
-                sales_order.payment_terms AS termin,
-                sales_order.jenis_penjualan AS jenis_penjualan,
-                sales_order.sales_id,
-                employees.name AS salesName
-            ')
-                ->join('sales_order_detail', 'sales_order_detail.id_sales_order = sales_order.id')
-                ->join('employees', 'employees.id = sales_order.sales_id', 'left')
-                ->where('sales_order.id_customer', $customer_id)
-                ->where('sales_order.surat_jalan_so_id', null)
-                ->where('sales_order_detail.qty_sekarang !=', 0)
-                ->groupBy('sales_order.no_sales_order')
-                ->findAll();
+        $invoiceDetails = $this->SalesOrderInvoiceDetailModel
+            ->select('id_sales_order, id_surat_jalan, id_barang_invoice, SUM(qty_invoice) as total_invoiced_qty')
+            ->where('deletedAt', null)
+            ->groupBy('id_sales_order, id_surat_jalan, id_barang_invoice')
+            ->findAll();
 
-            // ---------- filter agar id yg sudah dipakai invoice tidak muncul ----------
-            if (!empty($usedIds)) {
-                $documentList = array_values(array_filter(
-                    $documentList,
-                    fn($d) => !in_array($d->id, $usedIds)
-                ));
+        $invoicedSOQty = [];
+        $invoicedSJQty = [];
+
+        foreach ($invoiceDetails as $row) {
+            if (!empty($row['id_sales_order'])) {
+                $key = "{$row['id_sales_order']}_{$row['id_barang_invoice']}";
+                $invoicedSOQty[$key] = (float)$row['total_invoiced_qty'];
             }
-        } else { // pengiriman
-            $documentList1 = $this->SuratJalanModel->asObject()
+            if (!empty($row['id_surat_jalan'])) {
+                $key = "{$row['id_surat_jalan']}_{$row['id_barang_invoice']}";
+                $invoicedSJQty[$key] = (float)$row['total_invoiced_qty'];
+            }
+        }
+
+        $finalList = [];
+        if ($documentType === 'pesanan') {
+            $soList = $this->SalesOrderModel->asObject()
                 ->select('
-                    surat_jalan_so.id,
-                    surat_jalan_so.no_surat_jalan AS doc_no,
-                    surat_jalan_so.id_company,
-                    surat_jalan_so.no_po,
-                    surat_jalan_so.note AS keterangan,
-                    COALESCE(surat_jalan_so.terms, customers.termin) AS termin,
-                    COALESCE(sales_order.jenis_penjualan, customers.jenis_penjualan) AS jenis_penjualan,
+                    sales_order.id,
+                    sales_order.no_sales_order AS doc_no,
+                    sales_order.id_company,
+                    sales_order.no_po,
+                    sales_order.keterangan,
+                    sales_order.payment_terms AS termin,
+                    sales_order.jenis_penjualan AS jenis_penjualan,
                     sales_order.sales_id,
                     employees.name AS salesName
                 ')
-                ->join('sales_order', 'sales_order.surat_jalan_so_id = surat_jalan_so.id', 'left')
-                ->join('sales_order_detail', 'sales_order_detail.id_sales_order = sales_order.id')
-                ->join('customers', 'customers.id = sales_order.id_customer', 'left')
                 ->join('employees', 'employees.id = sales_order.sales_id', 'left')
                 ->where('sales_order.id_customer', $customer_id)
-                ->where('sales_order_detail.qty_sekarang !=', 0)
-                ->groupBy('surat_jalan_so.no_surat_jalan')
+                ->where('sales_order.deletedAt', null)
                 ->findAll();
 
-            $documentList2 = $this->SuratJalanModel->asObject()
+            foreach ($soList as $so) {
+                $details = $this->SalesOrderDetailModel
+                    ->where('id_sales_order', $so->id)
+                    ->where('deletedAt', null)
+                    ->findAll();
+
+                $filteredDetails = [];
+
+                foreach ($details as $d) {
+                    $key = "{$d['id_sales_order']}_{$d['id_barang']}";
+                    $qtyAvailable = (float)$d['qty_sekarang'];
+                    $invoicedQty  = $invoicedSOQty[$key] ?? 0;
+                    $remaining    = $qtyAvailable - $invoicedQty;
+
+                    // Barang yang qty sisa > 0 tetap ditampilkan
+                    // Barang yang qty sisa 0 ditampilkan hanya kalau sedang edit & dokumen ini termasuk currentDocumentIds
+                    if ($remaining > 0 || ($condition === 'edit' && in_array($so->id, $currentDocumentIds))) {
+                        $d['qty_sisa_invoice'] = max($remaining, 0);
+                        $filteredDetails[] = $d;
+                    }
+                }
+
+                if (!empty($filteredDetails)) {
+                    $so->details = $filteredDetails;
+                    $finalList[] = $so;
+                }
+            }
+        } else {
+            $sjList = $this->SuratJalanModel->asObject()
                 ->select('
                     surat_jalan_so.id,
                     surat_jalan_so.no_surat_jalan AS doc_no,
@@ -1135,45 +1148,45 @@ class Invoice extends BaseController
                     employees.name AS salesName
                 ')
                 ->join('surat_jalan_so_detail', 'surat_jalan_so_detail.id_surat_jalan = surat_jalan_so.id', 'left')
-                ->join('sales_order', 'sales_order.surat_jalan_so_id = surat_jalan_so_detail.id_sales_order', 'left')
+                ->join('sales_order', 'sales_order.id = surat_jalan_so_detail.id_sales_order', 'left')
                 ->join('customers', 'customers.id = surat_jalan_so.id_customer', 'left')
                 ->join('employees', 'employees.id = sales_order.sales_id', 'left')
                 ->where('surat_jalan_so.id_customer', $customer_id)
-                ->where('surat_jalan_so_detail.qty !=', 0)
-                ->groupBy('surat_jalan_so.no_surat_jalan')
+                ->where('surat_jalan_so.deletedAt', null)
+                ->groupBy('surat_jalan_so.id')
                 ->findAll();
 
-            $merged = [];
+            foreach ($sjList as $sj) {
+                $details = $this->SuratJalanDetailModel
+                    ->where('id_surat_jalan', $sj->id)
+                    ->where('deletedAt', null)
+                    ->findAll();
 
-            foreach (array_merge($documentList1, $documentList2) as $row) {
-                if (!isset($merged[$row->id])) {
-                    // Jika belum ada, langsung simpan
-                    $merged[$row->id] = $row;
-                } else {
-                    // Jika sudah ada dari list1, jangan timpa field yang sudah terisi
-                    foreach ($row as $key => $value) {
-                        if (empty($merged[$row->id]->{$key}) && !empty($value)) {
-                            $merged[$row->id]->{$key} = $value;
-                        }
+                $filteredDetails = [];
+
+                foreach ($details as $d) {
+                    $key = "{$d['id_surat_jalan']}_{$d['id_barang']}";
+                    $qtySJ = (float)$d['qty'];
+                    $invoicedQty = $invoicedSJQty[$key] ?? 0;
+                    $remaining = $qtySJ - $invoicedQty;
+
+                    if ($remaining > 0 || ($condition === 'edit' && in_array($sj->id, $currentDocumentIds))) {
+                        $d['qty_sisa_invoice'] = max($remaining, 0);
+                        $filteredDetails[] = $d;
                     }
                 }
-            }
 
-            $documentList = array_values($merged);
-
-            // ---------- filter agar id yg sudah dipakai invoice tidak muncul ----------
-            if (!empty($usedIds)) {
-                $documentList = array_values(array_filter(
-                    $documentList,
-                    fn($d) => !in_array($d->id, $usedIds)
-                ));
+                if (!empty($filteredDetails)) {
+                    $sj->details = $filteredDetails;
+                    $finalList[] = $sj;
+                }
             }
         }
 
-        return $documentList;
+        return $finalList;
     }
 
-    private function  getDocDataaaa(string $docType, $docId): object
+    private function getDocDataaaa(string $docType, $docId): object
     {
         $soId = 0;
         $salesName = '';
@@ -1187,6 +1200,29 @@ class Invoice extends BaseController
         $itemTax = [];
 
         $soId = $docId;
+
+        // ===============================================================
+        // 🔹 Ambil total qty yang sudah diinvoice per dokumen + per barang
+        // ===============================================================
+        $invoiceDetails = $this->SalesOrderInvoiceDetailModel
+            ->select('id_sales_order, id_surat_jalan, id_barang_invoice, SUM(qty_invoice) as total_invoiced_qty')
+            ->where('deletedAt', null)
+            ->groupBy('id_sales_order, id_surat_jalan, id_barang_invoice')
+            ->findAll();
+
+        $invoicedSOQty = [];
+        $invoicedSJQty = [];
+
+        foreach ($invoiceDetails as $row) {
+            if (!empty($row['id_sales_order'])) {
+                $key = "{$row['id_sales_order']}_{$row['id_barang_invoice']}";
+                $invoicedSOQty[$key] = (float)$row['total_invoiced_qty'];
+            }
+            if (!empty($row['id_surat_jalan'])) {
+                $key = "{$row['id_surat_jalan']}_{$row['id_barang_invoice']}";
+                $invoicedSJQty[$key] = (float)$row['total_invoiced_qty'];
+            }
+        }
 
         if ($docType == 'pesanan') {
             $soData = $this->SalesOrderModel->asObject()
@@ -1202,7 +1238,6 @@ class Invoice extends BaseController
                 ->join('employees', 'employees.id = sales_order.sales_id', 'left')
                 ->join('metadata', 'metadata.id = customers.termin', 'left')
                 ->where('sales_order.id', $docId)
-                // ->where('sales_order.posting', 1)
                 ->first();
 
             $salesName = $soData->salesName ?? "-";
@@ -1212,16 +1247,37 @@ class Invoice extends BaseController
             $nama_ecommerce = $soData->nama_ecommerce ?? "-";
             $customerName = $soData->customerName ?? "-";
             $customerAddress = $soData->customerAddress ?? "-";
+
+            // 🔹 Ambil detail barang
+            $itemList = $this->SalesOrderDetailModel->getItemListByIds($soId);
+            $itemListPosting = $this->SalesOrderDetailModel->getItemListPostingByIds($soId);
+
+            // 🔹 Filter item yang qty-nya masih tersisa
+            $itemList = array_filter($itemList, function ($d) use ($invoicedSOQty) {
+                $key = "{$d->id_sales_order}_{$d->id_barang}";
+                $qtyAvailable = (float)$d->qty_sekarang;
+                $invoicedQty = $invoicedSOQty[$key] ?? 0;
+                $remaining = $qtyAvailable - $invoicedQty;
+                return $remaining > 0;
+            });
+
+            $itemListPosting = array_filter($itemListPosting, function ($d) use ($invoicedSOQty) {
+                $key = "{$d->id_sales_order}_{$d->id_barang}";
+                $qtyAvailable = (float)$d->qty_sekarang;
+                $invoicedQty = $invoicedSOQty[$key] ?? 0;
+                $remaining = $qtyAvailable - $invoicedQty;
+                return $remaining > 0;
+            });
         } else if ($docType == 'pengiriman') {
             $selectQry = "surat_jalan_so.*, 
-                          sales_order.jenis_penjualan,
-                          sales_order.no_po,
-                          sales_order.nama_ecommerce,
-                          customers.name AS customerName, 
-                          customers.address AS customerAddress,  
-                          CONCAT(employees.nip , ' - ', employees.name) AS salesName, 
-                          metadata.id AS termin,
-                          customers.termin as termin_id";
+                        sales_order.jenis_penjualan,
+                        sales_order.no_po,
+                        sales_order.nama_ecommerce,
+                        customers.name AS customerName, 
+                        customers.address AS customerAddress,  
+                        CONCAT(employees.nip , ' - ', employees.name) AS salesName, 
+                        metadata.id AS termin,
+                        customers.termin as termin_id";
             $suratJalanData = $this->SuratJalanModel->asObject()
                 ->select($selectQry)
                 ->join('customers', 'customers.id = surat_jalan_so.id_customer', 'left')
@@ -1229,7 +1285,6 @@ class Invoice extends BaseController
                 ->join('employees', 'employees.id = sales_order.sales_id', 'left')
                 ->join('metadata', 'metadata.id = customers.termin', 'left')
                 ->where('surat_jalan_so.id', $docId)
-                // ->where('surat_jalan_so.posting', 1)
                 ->first();
 
             $salesName = $suratJalanData->salesName ?? "-";
@@ -1240,6 +1295,49 @@ class Invoice extends BaseController
             $soId = $suratJalanData == NULL ? [] : json_decode($suratJalanData->multiple_id_so);
             $customerName = $suratJalanData->customerName ?? "-";
             $customerAddress = $suratJalanData->customerAddress ?? "-";
+
+            // 🔹 Ambil detail barang (prioritas surat jalan)
+            $checkSuratJalanDetail = $this->SuratJalanDetailModel->whereIn('id_surat_jalan', (array)$docId)->first();
+
+            if ($checkSuratJalanDetail) {
+                $itemList = $this->SuratJalanDetailModel->getItemListByIds($docId);
+                $itemListPosting = $this->SuratJalanDetailModel->getItemListPostingByIds($docId);
+
+                $itemList = array_filter($itemList, function ($d) use ($invoicedSJQty) {
+                    $key = "{$d->id_surat_jalan}_{$d->id_barang}";
+                    $qtyAvailable = (float)$d->qty;
+                    $invoicedQty = $invoicedSJQty[$key] ?? 0;
+                    $remaining = $qtyAvailable - $invoicedQty;
+                    return $remaining > 0;
+                });
+
+                $itemListPosting = array_filter($itemListPosting, function ($d) use ($invoicedSJQty) {
+                    $key = "{$d->id_surat_jalan}_{$d->id_barang}";
+                    $qtyAvailable = (float)$d->qty;
+                    $invoicedQty = $invoicedSJQty[$key] ?? 0;
+                    $remaining = $qtyAvailable - $invoicedQty;
+                    return $remaining > 0;
+                });
+            } else {
+                $itemList = $this->SalesOrderDetailModel->getItemListByIds($soId);
+                $itemListPosting = $this->SalesOrderDetailModel->getItemListPostingByIds($soId);
+
+                $itemList = array_filter($itemList, function ($d) use ($invoicedSOQty) {
+                    $key = "{$d->id_sales_order}_{$d->id_barang}";
+                    $qtyAvailable = (float)$d->qty_sekarang;
+                    $invoicedQty = $invoicedSOQty[$key] ?? 0;
+                    $remaining = $qtyAvailable - $invoicedQty;
+                    return $remaining > 0;
+                });
+
+                $itemListPosting = array_filter($itemListPosting, function ($d) use ($invoicedSOQty) {
+                    $key = "{$d->id_sales_order}_{$d->id_barang}";
+                    $qtyAvailable = (float)$d->qty_sekarang;
+                    $invoicedQty = $invoicedSOQty[$key] ?? 0;
+                    $remaining = $qtyAvailable - $invoicedQty;
+                    return $remaining > 0;
+                });
+            }
         } else {
             $selectQry = "  sales_order_invoice.*,
                             sales_order_invoice.no_faktur, 
@@ -1255,30 +1353,16 @@ class Invoice extends BaseController
                 ->where('sales_order_invoice.id', $docId)
                 ->first();
 
-            $salesName =  "-";
+            $salesName = "-";
             $termin = $soData->termin ?? "-";
             $jenis_penjualan = "-";
             $no_po = $soData->no_po ?? "-";
             $nama_ecommerce = $soData->nama_ecommerce ?? "-";
             $customerName = $soData->customerName ?? "-";
             $customerAddress = $soData->customerAddress ?? "-";
-        }
 
-
-        if ($docType == 'pengiriman') {
-            if (!is_array($docId)) $docId = [$docId];
-            $checkSuratJalanDetail = $this->SuratJalanDetailModel->whereIn('id_surat_jalan', $docId)->first();
-
-            if ($checkSuratJalanDetail) {
-                $itemList = $this->SuratJalanDetailModel->getItemListByIds($docId);
-                $itemListPosting = $this->SuratJalanDetailModel->getItemListPostingByIds($docId);
-            } else {
-                $itemList = $this->SalesOrderDetailModel->getItemListByIds($soId);
-                $itemListPosting = $this->SalesOrderDetailModel->getItemListPostingByIds($soId);
-            }
-        } else {
-            $itemList = $this->SalesOrderDetailModel->getItemListByIds($soId);
-            $itemListPosting = $this->SalesOrderDetailModel->getItemListPostingByIds($soId);
+            $itemList = [];
+            $itemListPosting = [];
         }
 
         $itemTax = $this->taxModel->where('id', '4')->asObject()->findAll();
@@ -1328,11 +1412,11 @@ class Invoice extends BaseController
             'customerAddress'   => $customerAddress,
             'taxStatus'         => $taxStatus,
             'includeTax'        => $includeTax,
-            'itemList'          => $itemList,
-            'itemListPosting'   => $itemListPosting,
+            'itemList'          => array_values($itemList),
+            'itemListPosting'   => array_values($itemListPosting),
             'dpp'               => number_format($dpp),
             'tax'               => number_format($taxAmt),
-            'taxChecked'               => number_format($taxChecked),
+            'taxChecked'        => number_format($taxChecked),
             'total'             => number_format($dpp + $taxAmt)
         ];
         return $data;
