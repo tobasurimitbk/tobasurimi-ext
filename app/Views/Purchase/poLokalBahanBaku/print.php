@@ -444,6 +444,10 @@
                     </td>
                 </tr>
             </table>
+            <small style="position: fixed; bottom: 10px; left: 10px; font-size: 10px;">
+                Tgl Dicetak, <?= date('d/m/Y') ?>
+            </small>
+
         </div>
 
         <div class="pagebreak" style="padding-top: 10px;">
