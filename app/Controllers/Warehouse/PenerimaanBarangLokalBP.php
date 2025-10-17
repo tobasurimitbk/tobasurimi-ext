@@ -1622,7 +1622,8 @@ class PenerimaanBarangLokalBP extends BaseController
             "am_purchase_orders.is_posted" => 1,
             "am_purchase_orders.deletedAt" => null,
             "am_purchase_order_details.deletedAt" => null,
-            "am_purchase_order_details.remaining_qty !=" => 0
+            "am_purchase_order_details.remaining_qty !=" => 0,
+            "am_purchase_orders.supplier_id" => $this->request->getVar('supplier_id')
         ];
 
         $addCondition = [
