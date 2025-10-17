@@ -257,16 +257,15 @@ class SupplierModel extends Model
         }
 
         $builder->where($arrCondition);
+        $builder->groupBy('suppliers.name');
         $builder->orderBy('suppliers.name', "ASC");
 
         $results = $builder->get()->getResultArray();
 
         foreach ($results as &$result) {
             $supplierName = strtoupper($result['name']);
-            $companyName  = strtoupper($result['company_name'] ?? '');
-            $result['name'] = $companyName
-                ? "{$supplierName} ({$companyName})"
-                : $supplierName;
+            // $companyName  = strtoupper($result['company_name'] ?? '');
+            $result['name'] = $supplierName;
         }
 
         return $results;
