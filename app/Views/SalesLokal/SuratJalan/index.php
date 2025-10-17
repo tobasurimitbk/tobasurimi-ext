@@ -81,7 +81,7 @@
                                 <option value="<?= $row['id']; ?>" data-code=""><?= $row['company'] ?></option>
                             <?php endforeach; ?>
                         </select>
-                        <label for="floatingInput">Pilih Customer</label>
+                        <label for="floatingInput">Pilih Company</label>
                     </div>
                 </div>
                 <div class="col-md-4">
