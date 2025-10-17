@@ -881,16 +881,27 @@
                             processData: false,
                             contentType: false,
                             success: function(response) {
-                                Swal.fire({
-                                    icon: 'success',
-                                    title: response.message,
-                                    confirmButtonColor: '#4e73df',
-                                    confirmButtonText: 'Ok'
-                                }).then((result) => {
-                                    if (result.isConfirmed) {
-                                        window.location.href = "<?= base_url('tanda-terima-faktur-lokal-bp') ?>"
-                                    }
-                                });
+                                csrf.val(response.token);
+                                if (response.status == false) {
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: response.message,
+                                        confirmButtonColor: '#4e73df',
+                                        confirmButtonText: 'Ok'
+                                    })
+                                } else {
+                                    Swal.fire({
+                                        icon: 'success',
+                                        title: response.message,
+                                        confirmButtonColor: '#4e73df',
+                                        confirmButtonText: 'Ok'
+                                    }).then((result) => {
+                                        if (result.isConfirmed) {
+                                            window.location.href = "<?= base_url('tanda-terima-faktur-lokal-bp') ?>"
+                                        }
+                                    });
+                                }
+
                             },
                         });
 

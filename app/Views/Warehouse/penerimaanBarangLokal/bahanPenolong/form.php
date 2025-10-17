@@ -137,7 +137,7 @@
                     <div class="row">
                         <div class="col-md-4">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input onkeyup="this.value = greatFormatRupiah(this.value)" autocomplete="one-time-code" type="text" class="form-control jml_diterima_lpb" id="jml_diterima_lpb" name="jml_diterima_lpb" placeholder="Qty Diterima LPB ini">
+                                <input autocomplete="one-time-code" type="text" class="form-control jml_diterima_lpb" id="jml_diterima_lpb" name="jml_diterima_lpb" placeholder="Qty Diterima LPB ini">
                                 <label for="floatingInput">Qty Diterima Saat ini</label>
                             </div>
                         </div>
@@ -262,12 +262,20 @@
             const height = 700;
             const left = window.innerWidth / 2 - width / 2;
             const top = window.innerHeight / 2 - height / 2;
-
-            window.open(
-                "<?= base_url('penerimaan-barang-lokal-bp/cari-barang') ?>",
-                "_blank",
-                `width=${width},height=${height},top=${top},left=${left},resizable=yes`
-            );
+            const supplier_id = $('#supplier_id option:selected').val();
+            if (supplier_id == '') {
+                Swal.fire({
+                    icon: 'error',
+                    title: "Pilih supplier dulu",
+                    confirmButtonColor: '#4e73df',
+                });
+            } else {
+                window.open(
+                    "<?= base_url('penerimaan-barang-lokal-bp/cari-barang') ?>" + "?supplier_id=" + supplier_id,
+                    "_blank",
+                    `width=${width},height=${height},top=${top},left=${left},resizable=yes`
+                );
+            }
 
         }
     </script>

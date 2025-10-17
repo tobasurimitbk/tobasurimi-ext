@@ -595,7 +595,8 @@ class TandaTerimaSupBB extends BaseController
             ->select('faktur_no')
             ->where('company_id', $companyId)
             ->like('faktur_no', $numberTemplate, 'before')
-            ->orderBy('createdAt', 'DESC')
+            ->where('deletedAt', null)
+            ->orderBy('faktur_no', 'DESC')
             ->first();
 
         // Nomor awal default
@@ -668,7 +669,8 @@ class TandaTerimaSupBB extends BaseController
             ->select('faktur_keluar_no')
             ->where('company_id', $companyId)
             ->like('faktur_keluar_no', $numberTemplate, 'before')
-            ->orderBy('createdAt', 'DESC')
+            ->where('deletedAt', null)
+            ->orderBy('faktur_keluar_no', 'DESC')
             ->first();
 
         // Nomor default
