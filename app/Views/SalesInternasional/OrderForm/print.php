@@ -147,13 +147,11 @@
                 <tr>
                     <td>
                         <table class="label">
-                            <?php if ($displayPrice == "true") : ?>
-                                <tr>
-                                    <td>CONSIGNEE</td>
-                                    <td>:</td>
-                                    <td><?= $dataSO->customer_name ?></td>
-                                </tr>
-                            <?php endif ?>
+                            <tr>
+                                <td>CONSIGNEE</td>
+                                <td>:</td>
+                                <td><?= $dataSO->customer_name ?></td>
+                            </tr>
                             <?php if (!empty($dataSO->tax_id)): ?>
                                 <tr>
                                     <td>TAX ID#</td>
