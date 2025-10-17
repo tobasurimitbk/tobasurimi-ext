@@ -64,6 +64,7 @@ class SuratJalan extends BaseController
     {
         $data = [
             'getCustomers' => $this->CustomerModel->getCustomerLokal($this->userId, $this->is_admin),
+            'getCompany' => $this->companyModel->where('deletedAt', NULL)->findAll(),
         ];
         return view('SalesLokal/SuratJalan/index', $data);
     }
@@ -119,6 +120,7 @@ class SuratJalan extends BaseController
             "sort"          => $this->request->getGet("sort"),
             "sortType"      => $this->request->getGet("sortType"),
             "filter_customer"        => $this->request->getGet("filter_customer"),
+            "filter_company"        => $this->request->getGet("filter_company"),
             "dateStart"     => $this->request->getGet("dateStart") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getGet("dateStart")))) : "",
             "dateEnd"       => $this->request->getGet("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getGet("dateEnd")))) : "",
         ];
@@ -160,6 +162,7 @@ class SuratJalan extends BaseController
                 "print" => $data->counter_print,
                 "total_harga" => $data->sum_amount_sj_detail ?? ($data->estimated_freight + $data->total_harga),
                 "posting" => $data->posting,
+                "company_name"      => $data->company_name,
             ]);
         }
         //dd($dataAllSuratJalan);
@@ -556,6 +559,7 @@ class SuratJalan extends BaseController
                 }
 
                 $this->SuratJalanModel->delete($id);
+                $this->SuratJalanDetailModel->where('id_surat_jalan', $id)->delete();
                 $data = [
                     "status"            => true,
                     "message"    => "Data success Dihapus",

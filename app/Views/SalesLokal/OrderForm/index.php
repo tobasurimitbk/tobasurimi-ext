@@ -62,7 +62,35 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-md-4">
+                <div class="col-md-4 mb-3">
+                    <div class="form-floating" style="height: 50px;">
+                        <input placeholder="" class="form-control search" id="search" name="search" aria-label="Floating label select example" />
+                        <label style="z-index: 1;" style="z-index: 1;">Cari Nomor Order </label>
+                    </div>
+                </div>
+            </div>
+            <div class="row justify-content-end row-col-spp">
+                <div class="col-md-3">
+                    <div class="form-floating mb-3">
+                        <select class="form-select filter_surat_jalan" name="filter_surat_jalan" id="filter_surat_jalan">
+                            <option value="" data-code=""></option>
+                            <option value="belum" data-code="">Belum Digunakan Surat Jalan</option>
+                            <option value="sudah" data-code="">Sudah Digunakan Surat Jalan</option>
+                        </select>
+                        <label for="floatingInput">Pilih Surat Jalan</label>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="form-floating mb-3">
+                        <select class="form-select filter_invoice" name="filter_invoice" id="filter_invoice">
+                            <option value="" data-code=""></option>
+                            <option value="belum" data-code="">BELUM DIGUNAKAN INVOICE</option>
+                            <option value="sudah" data-code="">SUDAH DIGUNAKAN INVOICE</option>
+                        </select>
+                        <label for="floatingInput">Pilih Invoice</label>
+                    </div>
+                </div>
+                <div class="col-md-3">
                     <div class="form-floating mb-3">
                         <select class="form-select filter_customer" name="filter_customer" id="filter_customer">
                             <option value="" data-code=""></option>
@@ -73,33 +101,15 @@
                         <label for="floatingInput">Pilih Customer</label>
                     </div>
                 </div>
-
-            </div>
-            <div class="row justify-content-end row-col-spp">
-                <div class="col-md-4">
+                <div class="col-md-3">
                     <div class="form-floating mb-3">
-                        <select class="form-select filter_surat_jalan" name="filter_surat_jalan" id="filter_surat_jalan">
+                        <select class="form-select filter_company" name="filter_company" id="filter_company">
                             <option value="" data-code=""></option>
-                            <option value="belum" data-code="">Belum Digunakan Surat Jalan</option>
-                            <option value="sudah" data-code="">Sudah Digunakan Surat Jalan</option>
+                            <?php foreach ($getCompany as $row) : ?>
+                                <option value="<?= $row['id']; ?>" data-code=""><?= $row['company'] ?></option>
+                            <?php endforeach; ?>
                         </select>
-                        <label for="floatingInput">Pilih Surat Jalan</label>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="form-floating mb-3">
-                        <select class="form-select filter_invoice" name="filter_invoice" id="filter_invoice">
-                            <option value="" data-code=""></option>
-                            <option value="belum" data-code="">BELUM DIGUNAKAN INVOICE</option>
-                            <option value="sudah" data-code="">SUDAH DIGUNAKAN INVOICE</option>
-                        </select>
-                        <label for="floatingInput">Pilih Invoice</label>
-                    </div>
-                </div>
-                <div class="col-md-4 mb-3">
-                    <div class="form-floating" style="height: 50px;">
-                        <input placeholder="" class="form-control search" id="search" name="search" aria-label="Floating label select example" />
-                        <label style="z-index: 1;" style="z-index: 1;">Cari Nomor Order </label>
+                        <label for="floatingInput">Pilih Company</label>
                     </div>
                 </div>
             </div>
@@ -210,6 +220,7 @@
                 dateStart: $(".dateStart").val(),
                 dateEnd: $(".dateEnd").val(),
                 filter_customer: $(".filter_customer").val(),
+                filter_company: $(".filter_company").val(),
                 filter_surat_jalan: $(".filter_surat_jalan").val(),
                 filter_invoice: $(".filter_invoice").val(),
                 page: table.page(),
@@ -238,6 +249,10 @@
 
                 if (state.filter_customer) {
                     $(".filter_customer").val(state.filter_customer).trigger('change');
+                }
+
+                if (state.filter_company) {
+                    $(".filter_company").val(state.filter_company).trigger('change');
                 }
 
                 if (state.filter_surat_jalan) {
@@ -299,6 +314,12 @@
             allowClear: true,
         });
 
+        $('.filter_company').select2({
+            placeholder: "Pilih Company",
+            theme: "bootstrap-5",
+            allowClear: true,
+        });
+
         $('.filter_surat_jalan').select2({
             placeholder: "Pilih Surat Jalan",
             theme: "bootstrap-5",
@@ -312,14 +333,14 @@
         });
 
         //CSS SELECT2 FLOATING LABEL
-        $('.filter_customer, .filter_surat_jalan, .filter_invoice')
+        $('.filter_customer, .filter_surat_jalan, .filter_invoice, .filter_company')
             .parent('div')
             .children('span')
             .children('span')
             .children('span')
             .css('height', ' calc(3.5rem + 2px)');
 
-        $('.filter_customer, .filter_surat_jalan, .filter_invoice')
+        $('.filter_customer, .filter_surat_jalan, .filter_invoice, .filter_company')
             .parent('div')
             .children('span')
             .children('span')
@@ -327,7 +348,7 @@
             .children('span')
             .css('margin-top', '22px').css('margin-left', '-7px');
 
-        $('.filter_customer, .filter_surat_jalan, .filter_invoice')
+        $('.filter_customer, .filter_surat_jalan, .filter_invoice, .filter_company')
             .parent('div')
             .find('label')
             .css('z-index', '1');
@@ -356,6 +377,7 @@
                     data.dateStart = $(".dateStart").val();
                     data.dateEnd = $(".dateEnd").val();
                     data.filter_customer = $(".filter_customer").val();
+                    data.filter_company = $(".filter_company").val();
                     data.filter_surat_jalan = $(".filter_surat_jalan").val();
                     data.filter_invoice = $(".filter_invoice").val();
                 }
@@ -510,7 +532,7 @@
             table.ajax.reload();
         })
 
-        $(".dateStart, .dateEnd, .filter_customer, .filter_surat_jalan, .filter_invoice").change(function() {
+        $(".dateStart, .dateEnd, .filter_customer, .filter_surat_jalan, .filter_invoice, .filter_company").change(function() {
             table.ajax.reload();
         });
 
@@ -521,10 +543,11 @@
             let dateStart = $(".dateStart").val();
             let dateEnd = $(".dateEnd").val();
             let filter_customer = $(".filter_customer").val();
+            let filter_company = $(".filter_company").val();
             let filter_surat_jalan = $(".filter_surat_jalan").val();
             let filter_invoice = $(".filter_invoice").val();
 
-            let exportUrl = `/order-form-lokal/export-excel?search=${encodeURIComponent(search)}&sort=${sort}&sortType=${sortType}&dateStart=${encodeURIComponent(dateStart)}&dateEnd=${encodeURIComponent(dateEnd)}&filter_customer=${filter_customer}&filter_surat_jalan=${filter_surat_jalan}&filter_invoice=${filter_invoice}`;
+            let exportUrl = `/order-form-lokal/export-excel?search=${encodeURIComponent(search)}&sort=${sort}&sortType=${sortType}&dateStart=${encodeURIComponent(dateStart)}&dateEnd=${encodeURIComponent(dateEnd)}&filter_customer=${filter_customer}&filter_company=${filter_company}&filter_surat_jalan=${filter_surat_jalan}&filter_invoice=${filter_invoice}`;
 
             window.open(exportUrl, '_blank');
         });

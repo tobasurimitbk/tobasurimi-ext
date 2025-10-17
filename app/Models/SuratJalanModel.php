@@ -78,6 +78,7 @@ class SuratJalanModel extends Model
         sales_order.sales_id,
         customers.name as nama_pelanggan,
         customers.kode as kode_pelanggan, 
+        companies.company AS company_name,
         SUM(sales_order.total_harga) as total_harga, 
         SUM(sales_order.estimated_freight) as estimated_freight, 
         SUM(surat_jalan_so_detail.amount) as sum_amount_sj_detail, 
@@ -99,12 +100,13 @@ class SuratJalanModel extends Model
             ->join('sales_order', 'sales_order.surat_jalan_so_id = surat_jalan_so.id', 'left')
             ->join('surat_jalan_so_detail', 'surat_jalan_so_detail.id_surat_jalan = surat_jalan_so.id AND surat_jalan_so_detail.deletedAt IS NULL', 'left')
             ->join('employees', 'employees.id = sales_order.sales_id', 'left')
+            ->join('companies', 'companies.id = surat_jalan_so.id_company', 'left')
             ->where($condition)
             ->groupBy('surat_jalan_so.no_surat_jalan');
 
         $totalData = $SuratJalan->countAllResults(false);
 
-        if ($addCondition['search'] || $addCondition['dateStart'] || $addCondition['dateEnd'] || $addCondition['filter_invoice'] || $addCondition['filter_customer']) {
+        if ($addCondition['search'] || $addCondition['dateStart'] || $addCondition['dateEnd'] || $addCondition['filter_invoice'] || $addCondition['filter_customer'] || $addCondition['filter_company']) {
             $SuratJalan->groupStart();
         }
         if ($addCondition['search']) {
@@ -112,6 +114,9 @@ class SuratJalanModel extends Model
         }
         if ($addCondition['filter_customer']) {
             $SuratJalan->where('surat_jalan_so.id_customer', $addCondition['filter_customer']);
+        }
+        if ($addCondition['filter_company']) {
+            $SuratJalan->where('surat_jalan_so.id_company', $addCondition['filter_company']);
         }
         if ($addCondition['filter_invoice'] == "belum") {
             $SuratJalan->where('surat_jalan_so.sales_order_invoice_id', NULL);
@@ -125,7 +130,7 @@ class SuratJalanModel extends Model
         if ($addCondition['dateEnd']) {
             $SuratJalan->where('surat_jalan_so.shipping_date <=', $addCondition['dateEnd']);
         }
-        if ($addCondition['search'] || $addCondition['dateStart'] || $addCondition['dateEnd'] || $addCondition['filter_invoice'] || $addCondition['filter_customer']) {
+        if ($addCondition['search'] || $addCondition['dateStart'] || $addCondition['dateEnd'] || $addCondition['filter_invoice'] || $addCondition['filter_customer'] || $addCondition['filter_company']) {
             $SuratJalan->groupEnd();
         }
 

@@ -86,6 +86,7 @@ class OrderForm extends BaseController
     {
         $data = [
             'getCustomers' => $this->CustomerModel->getCustomerLokal($this->userId, $this->is_admin),
+            'getCompany' => $this->companyModel->where('deletedAt', NULL)->findAll(),
         ];
         return view('SalesLokal/OrderForm/index', $data);
     }
@@ -173,6 +174,7 @@ class OrderForm extends BaseController
             "filter_customer"        => $this->request->getGet("filter_customer"),
             "filter_invoice"        => $this->request->getGet("filter_invoice"),
             "filter_surat_jalan"        => $this->request->getGet("filter_surat_jalan"),
+            "filter_company"        => $this->request->getGet("filter_company"),
             "dateStart"     => $this->request->getGet("dateStart") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateStart")))) : "",
             "dateEnd"       => $this->request->getGet("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateEnd")))) : "",
         ];

@@ -28,7 +28,7 @@
     <div class="card">
         <div class="card-body">
             <div class="row justify-content-end">
-                <div class="col-md-2">
+                <div class="col-md-4">
                     <div class="input-group">
                         <div class="form-floating" style="height: 50px;">
                             <input placeholder="" class="form-control dateStart" id="dateStart" name="dateStart" aria-label="Floating label select example" />
@@ -41,7 +41,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-md-2">
+                <div class="col-md-4">
                     <div class="input-group">
                         <div class="form-floating" style="height: 50px;">
                             <input placeholder="" class="form-control dateEnd" id="dateEnd" name="dateEnd" aria-label="Floating label select example" />
@@ -54,21 +54,37 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-md-3">
+                <div class="col-md-4 mb-2">
+                    <div class="form-floating" style="height: 50px;">
+                        <input placeholder="" class="form-control search" id="search" name="search" aria-label="Floating label select example" />
+                        <label style="z-index: 1;" style="z-index: 1;">Cari Nomor Surat Jalan </label>
+                    </div>
+                </div>
+            </div>
+            <div class="row justify-content-end">
+                <div class="col-md-4">
                     <div class="form-floating mb-3">
                         <select class="form-select filter_customer" name="filter_customer" id="filter_customer">
                             <option value="" data-code=""></option>
-
                             <?php foreach ($getCustomers as $row) : ?>
                                 <option value="<?= $row['id']; ?>" data-code=""><?= $row['name'] ?></option>
                             <?php endforeach; ?>
-
-
                         </select>
                         <label for="floatingInput">Pilih Customer</label>
                     </div>
                 </div>
-                <div class="col-md-3">
+                <div class="col-md-4">
+                    <div class="form-floating mb-3">
+                        <select class="form-select filter_company" name="filter_company" id="filter_company">
+                            <option value="" data-code=""></option>
+                            <?php foreach ($getCompany as $row) : ?>
+                                <option value="<?= $row['id']; ?>" data-code=""><?= $row['company'] ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                        <label for="floatingInput">Pilih Customer</label>
+                    </div>
+                </div>
+                <div class="col-md-4">
                     <div class="form-floating mb-3">
                         <select class="form-select filter_invoice" name="filter_invoice" id="filter_invoice">
                             <option value="" data-code=""></option>
@@ -76,12 +92,6 @@
                             <option value="sudah" data-code="">SUDAH DIGUNAKAN INVOICE</option>
                         </select>
                         <label for="floatingInput">Pilih Invoice</label>
-                    </div>
-                </div>
-                <div class="col-md-2 mb-2">
-                    <div class="form-floating" style="height: 50px;">
-                        <input placeholder="" class="form-control search" id="search" name="search" aria-label="Floating label select example" />
-                        <label style="z-index: 1;" style="z-index: 1;">Cari Nomor Surat Jalan </label>
                     </div>
                 </div>
             </div>
@@ -95,6 +105,7 @@
                                 <th onclick="changeSort('no_surat_jalan')" class="sort">No Surat Jalan</th>
                                 <th onclick="changeSort('nama_pelanggan')" class="sort">Nama Pelanggan</th>
                                 <th onclick="changeSort('customerSales')" class="sort">Nama Sales</th>
+                                <th onclick="changeSort('company')" class="sort">Company</th>
                                 <th onclick="changeSort('tipe_sales_order')" class="sort">Tipe</th>
                                 <th onclick="changeSort('shipping_date')" class="sort">Shipping Date</th>
                                 <th onclick="changeSort('sales_order_invoice_id')" class="sort">Invoice</th>
@@ -135,6 +146,7 @@
                 dateStart: $(".dateStart").val(),
                 dateEnd: $(".dateEnd").val(),
                 filter_customer: $(".filter_customer").val(),
+                filter_company: $(".filter_company").val(),
                 filter_invoice: $(".filter_invoice").val(),
                 page: table.page(),
                 length: table.page.len()
@@ -162,6 +174,10 @@
 
                 if (state.filter_customer) {
                     $(".filter_customer").val(state.filter_customer).trigger('change');
+                }
+
+                if (state.filter_company) {
+                    $(".filter_company").val(state.filter_company).trigger('change');
                 }
 
                 if (state.filter_invoice) {
@@ -197,6 +213,12 @@
             allowClear: true,
         });
 
+        $('.filter_company').select2({
+            placeholder: "Pilih Company",
+            theme: "bootstrap-5",
+            allowClear: true,
+        });
+
         $('.filter_invoice').select2({
             placeholder: "Pilih Invoice",
             theme: "bootstrap-5",
@@ -204,14 +226,14 @@
         });
 
         //CSS SELECT2 FLOATING LABEL
-        $('.filter_customer, .filter_invoice')
+        $('.filter_customer, .filter_invoice, .filter_company')
             .parent('div')
             .children('span')
             .children('span')
             .children('span')
             .css('height', ' calc(3.5rem + 2px)');
 
-        $('.filter_customer, .filter_invoice')
+        $('.filter_customer, .filter_invoice, .filter_company')
             .parent('div')
             .children('span')
             .children('span')
@@ -219,7 +241,7 @@
             .children('span')
             .css('margin-top', '22px').css('margin-left', '-7px');
 
-        $('.filter_customer, .filter_invoice')
+        $('.filter_customer, .filter_invoice, .filter_company')
             .parent('div')
             .find('label')
             .css('z-index', '1');
@@ -270,6 +292,7 @@
                     data.dateStart = $(".dateStart").val();
                     data.dateEnd = $(".dateEnd").val();
                     data.filter_customer = $(".filter_customer").val();
+                    data.filter_company = $(".filter_company").val();
                     data.filter_invoice = $(".filter_invoice").val();
                 }
             },
@@ -301,6 +324,9 @@
                 className: "text-center"
             }, {
                 data: "customerSales",
+                className: "text-center"
+            }, {
+                data: "company_name",
                 className: "text-center"
             }, {
                 data: "tipe_sales_order",
@@ -406,7 +432,7 @@
             table.ajax.reload();
         })
 
-        $(".dateStart, .dateEnd, .filter_customer, .filter_invoice").change(function() {
+        $(".dateStart, .dateEnd, .filter_customer, .filter_invoice, .filter_company").change(function() {
             table.ajax.reload();
         });
 
@@ -417,9 +443,10 @@
             let dateStart = $(".dateStart").val();
             let dateEnd = $(".dateEnd").val();
             let filter_customer = $(".filter_customer").val();
+            let filter_company = $(".filter_company").val();
             let filter_invoice = $(".filter_invoice").val();
 
-            let exportUrl = `/surat-jalan/export-excel?search=${encodeURIComponent(search)}&sort=${sort}&sortType=${sortType}&dateStart=${encodeURIComponent(dateStart)}&dateEnd=${encodeURIComponent(dateEnd)}&filter_customer=${filter_customer}&filter_invoice=${filter_invoice}`;
+            let exportUrl = `/surat-jalan/export-excel?search=${encodeURIComponent(search)}&sort=${sort}&sortType=${sortType}&dateStart=${encodeURIComponent(dateStart)}&dateEnd=${encodeURIComponent(dateEnd)}&filter_customer=${filter_customer}&filter_company=${filter_company}&filter_invoice=${filter_invoice}`;
 
             window.open(exportUrl, '_blank');
         });

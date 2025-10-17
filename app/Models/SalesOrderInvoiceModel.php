@@ -129,7 +129,7 @@ class SalesOrderInvoiceModel extends Model
             ->groupBy('sales_order_invoice.id');
         $totalData = $salesOrderInvoiceLokal->countAllResults(false);
 
-        if ($addCondition['search'] || $addCondition['dateStart'] || $addCondition['dateEnd'] || $addCondition['filter_jenis_dokumen'] || $addCondition['filter_customer']) {
+        if ($addCondition['search'] || $addCondition['dateStart'] || $addCondition['dateEnd'] || $addCondition['filter_jenis_dokumen'] || $addCondition['filter_customer'] || $addCondition['filter_company']) {
             $salesOrderInvoiceLokal->groupStart();
         }
 
@@ -140,6 +140,10 @@ class SalesOrderInvoiceModel extends Model
 
         if ($addCondition['filter_customer']) {
             $salesOrderInvoiceLokal->where('sales_order_invoice.id_customer', $addCondition['filter_customer']);
+        }
+
+        if ($addCondition['filter_company']) {
+            $salesOrderInvoiceLokal->where('sales_order_invoice.id_company', $addCondition['filter_company']);
         }
 
         if ($addCondition['filter_jenis_dokumen'] == "pengiriman") {
@@ -167,7 +171,7 @@ class SalesOrderInvoiceModel extends Model
 
         $salesOrderInvoiceLokal->where('tipe_invoice', 'LOKAL');
 
-        if ($addCondition['search'] || $addCondition['dateStart'] || $addCondition['dateEnd'] || $addCondition['filter_jenis_dokumen'] || $addCondition['filter_customer']) {
+        if ($addCondition['search'] || $addCondition['dateStart'] || $addCondition['dateEnd'] || $addCondition['filter_jenis_dokumen'] || $addCondition['filter_customer'] || $addCondition['filter_company']) {
             $salesOrderInvoiceLokal->groupEnd();
         }
 

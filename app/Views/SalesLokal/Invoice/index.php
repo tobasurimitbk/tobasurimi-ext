@@ -54,21 +54,35 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-md-4">
+                <div class="col-md-4 mb-3">
+                    <div class="form-floating" style="height: 50px;">
+                        <input placeholder="" class="form-control search" id="search" name="search" aria-label="Floating label select example" />
+                        <label style="z-index: 1;" style="z-index: 1;">Cari Nomor Invoice </label>
+                    </div>
+                </div>
+                <div class="col-md-3">
                     <div class="form-floating mb-3">
                         <select class="form-select filter_customer" name="filter_customer" id="filter_customer">
                             <option value="" data-code=""></option>
-
                             <?php foreach ($getCustomers as $row) : ?>
                                 <option value="<?= $row['id']; ?>" data-code=""><?= $row['name'] ?></option>
                             <?php endforeach; ?>
-
-
                         </select>
                         <label for="floatingInput">Pilih Customer</label>
                     </div>
                 </div>
-                <div class="col-md-4">
+                <div class="col-md-3">
+                    <div class="form-floating mb-3">
+                        <select class="form-select filter_company" name="filter_company" id="filter_company">
+                            <option value="" data-code=""></option>
+                            <?php foreach ($getCompany as $row) : ?>
+                                <option value="<?= $row['id']; ?>" data-code=""><?= $row['company'] ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                        <label for="floatingInput">Pilih Company</label>
+                    </div>
+                </div>
+                <div class="col-md-3">
                     <div class="form-floating mb-3">
                         <select class="form-select filter_jenis_dokumen" name="filter_jenis_dokumen" id="filter_jenis_dokumen">
                             <option value="" data-code=""></option>
@@ -78,7 +92,7 @@
                         <label for="floatingInput">Pilih Jenis Dokumen</label>
                     </div>
                 </div>
-                <div class="col-md-4">
+                <div class="col-md-3">
                     <div class="form-floating mb-3">
                         <select class="form-select filter_paid" name="filter_paid" id="filter_paid">
                             <option value="" data-code=""></option>
@@ -86,12 +100,6 @@
                             <option value="paid" data-code="">LUNAS</option>
                         </select>
                         <label for="floatingInput">Pilih Status Pembayaran</label>
-                    </div>
-                </div>
-                <div class="col-md-4 mb-3">
-                    <div class="form-floating" style="height: 50px;">
-                        <input placeholder="" class="form-control search" id="search" name="search" aria-label="Floating label select example" />
-                        <label style="z-index: 1;" style="z-index: 1;">Cari Nomor Invoice </label>
                     </div>
                 </div>
             </div>
@@ -151,6 +159,7 @@
                 dateStart: $(".dateStart").val(),
                 dateEnd: $(".dateEnd").val(),
                 filter_customer: $(".filter_customer").val(),
+                filter_company: $(".filter_company").val(),
                 filter_jenis_dokumen: $(".filter_jenis_dokumen").val(),
                 page: table.page(),
                 length: table.page.len()
@@ -178,6 +187,10 @@
 
                 if (state.filter_customer) {
                     $(".filter_customer").val(state.filter_customer).trigger('change');
+                }
+
+                if (state.filter_company) {
+                    $(".filter_company").val(state.filter_company).trigger('change');
                 }
 
                 if (state.filter_jenis_dokumen) {
@@ -217,6 +230,12 @@
             allowClear: true,
         });
 
+        $('.filter_company').select2({
+            placeholder: "Pilih Company",
+            theme: "bootstrap-5",
+            allowClear: true,
+        });
+
         $('.filter_jenis_dokumen').select2({
             placeholder: "Pilih Jenis Dokumen",
             theme: "bootstrap-5",
@@ -230,14 +249,14 @@
         });
 
         //CSS SELECT2 FLOATING LABEL
-        $('.filter_customer, .filter_jenis_dokumen, .filter_paid')
+        $('.filter_customer, .filter_jenis_dokumen, .filter_paid, .filter_company')
             .parent('div')
             .children('span')
             .children('span')
             .children('span')
             .css('height', ' calc(3.5rem + 2px)');
 
-        $('.filter_customer, .filter_jenis_dokumen, .filter_paid')
+        $('.filter_customer, .filter_jenis_dokumen, .filter_paid, .filter_company')
             .parent('div')
             .children('span')
             .children('span')
@@ -245,7 +264,7 @@
             .children('span')
             .css('margin-top', '22px').css('margin-left', '-7px');
 
-        $('.filter_customer, .filter_jenis_dokumen, .filter_paid')
+        $('.filter_customer, .filter_jenis_dokumen, .filter_paid, .filter_company')
             .parent('div')
             .find('label')
             .css('z-index', '1');
@@ -296,6 +315,7 @@
                     data.dateStart = $(".dateStart").val();
                     data.dateEnd = $(".dateEnd").val();
                     data.filter_customer = $(".filter_customer").val();
+                    data.filter_company = $(".filter_company").val();
                     data.filter_jenis_dokumen = $(".filter_jenis_dokumen").val();
                     data.filter_paid = $(".filter_paid").val();
                 }
@@ -458,7 +478,7 @@
             table.ajax.reload();
         })
 
-        $(".dateStart, .dateEnd, .filter_customer, .filter_jenis_dokumen, .filter_paid").change(function() {
+        $(".dateStart, .dateEnd, .filter_customer, .filter_jenis_dokumen, .filter_paid, .filter_company").change(function() {
             table.ajax.reload();
         });
 
@@ -469,10 +489,11 @@
             let dateStart = $(".dateStart").val();
             let dateEnd = $(".dateEnd").val();
             let filter_customer = $(".filter_customer").val();
+            let filter_company = $(".filter_company").val();
             let filter_jenis_dokumen = $(".filter_jenis_dokumen").val();
             let filter_paid = $(".filter_paid").val();
 
-            let exportUrl = `/invoice-penjualan-lokal/export-excel?search=${encodeURIComponent(search)}&sort=${sort}&sortType=${sortType}&dateStart=${encodeURIComponent(dateStart)}&dateEnd=${encodeURIComponent(dateEnd)}&filter_customer=${filter_customer}&filter_jenis_dokumen=${filter_jenis_dokumen}&filter_paid=${filter_paid}`;
+            let exportUrl = `/invoice-penjualan-lokal/export-excel?search=${encodeURIComponent(search)}&sort=${sort}&sortType=${sortType}&dateStart=${encodeURIComponent(dateStart)}&dateEnd=${encodeURIComponent(dateEnd)}&filter_customer=${filter_customer}&filter_company=${filter_company}&filter_jenis_dokumen=${filter_jenis_dokumen}&filter_paid=${filter_paid}`;
 
             window.open(exportUrl, '_blank');
         });

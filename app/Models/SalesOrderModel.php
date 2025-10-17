@@ -137,6 +137,10 @@ class SalesOrderModel extends Model
             $builder->where('sales_order.id_customer', $addCondition['filter_customer']);
         }
 
+        if ($addCondition['filter_company']) {
+            $builder->where('sales_order.id_company', $addCondition['filter_company']);
+        }
+
         if ($addCondition['filter_invoice'] == "belum") {
             $builder->where('sales_order.sales_order_invoice_id', null);
         } elseif ($addCondition['filter_invoice'] == "sudah") {
