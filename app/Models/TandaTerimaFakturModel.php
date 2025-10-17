@@ -140,16 +140,23 @@ class TandaTerimaFakturModel extends Model
         ];
     }
 
-
-    public function getListTandaTerimaFakturNotProcessed($supplierID, $divisiID)
+    public function getListTandaTerimaFakturNotProcessed($supplier)
     {
         $tandaTerimaFakturModel = new TandaTerimaFakturModel();
+        $supplierModel = new SupplierModel();
+        $divisiModel = new DivisisModel();
+
+        $idSupplierArr = $supplierModel
+            ->select('id')
+            ->where('name', $supplier)
+            ->where('deletedAt', null)
+            ->findColumn('id') ?? [];
+
         $res = $tandaTerimaFakturModel
-            ->where('supplier_id', $supplierID)
-            ->where('divisi_id', $divisiID)
+            ->whereIn('supplier_id', $idSupplierArr)
+            ->where('deletedAt', null)
             ->select('id, faktur_no')
             ->findAll();
-
 
         return $res;
     }
