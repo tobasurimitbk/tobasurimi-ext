@@ -1176,7 +1176,7 @@ $routes->get('/kemasan/export-excel', 'Warehouse\Kemasan::exportExcel', ['filter
 // REBUSAN
 $routes->get('/proses-rebus', 'JasaVendor\ProsesRebus::index', ['filter' => 'Auth']);
 $routes->get('/proses-rebus/create', 'JasaVendor\ProsesRebus::create', ['filter' => 'Auth']);
-$routes->get('/proses-rebus/warehouse', 'Purchase\POLokalBahanBaku::dropdownWarehouse', ['filter' => 'Auth']);
+$routes->get('/proses-rebus/warehouse', 'Purchase\POLokalBahanBaku::dropdownWarehouseNew', ['filter' => 'Auth']);
 $routes->get('/proses-rebus/list-barang-stock-init', 'JasaVendor\ProsesRebus::dropdownListBarangIsInit', ['filter' => 'Auth']);
 $routes->get('/proses-rebus/list-barang-rebus', 'JasaVendor\ProsesRebus::dropdownListHasilRebus', ['filter' => 'Auth']);
 $routes->get('/proses-rebus/list-stock-dokumen-bc', 'JasaVendor\JasaVendorOut::getListStockByStockID', ['filter' => 'Auth']);
