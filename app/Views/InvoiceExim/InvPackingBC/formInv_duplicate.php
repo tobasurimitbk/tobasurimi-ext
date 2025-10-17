@@ -1740,10 +1740,10 @@
                         total_harga_barang: totalHargaBarang,
                         catatan: catatan,
                     });
+                    syncBarangPacking();
                 }
 
                 $('#barangModal').modal('hide');
-                syncBarangPacking();
                 drawTableBarang(listBarang);
             }
 

@@ -1187,6 +1187,20 @@ class POLokalBahanBaku extends BaseController
         ]);
     }
 
+    public function dropdownWarehouseNew()
+    {
+        $id = $this->request->getVar('divisi_id');
+        $warehouse_asal_id = $this->request->getVar('warehouse_asal_id');
+     
+        $res = $this->warehousesModel->where('deletedAt', null)->where('divisi_id', $id)->findAll();
+
+        return response()->setJSON([
+            'data' => $res,
+            'token' => csrf_hash(),
+            'status' => true
+        ]);
+    }
+
     public function dropdownGetSpp()
     {
         $id = $this->request->getVar('divisi_id');

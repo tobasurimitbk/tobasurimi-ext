@@ -41,6 +41,9 @@
                         </div>
                         <?php if (!empty($data)) : ?>
                             <label class="form-label font-weight-bold lable-title mb-3 mt-4">
+                                ID Finger : <?= !empty($data) ? $data['id'] : '' ?>
+                            </label> <br>
+                            <label class="form-label font-weight-bold lable-title">
                                 Riwayat Payroll
                             </label>
                             <div class="table-responsive mt-2 mb-3">

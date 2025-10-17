@@ -90,10 +90,10 @@ class PembayaranPOLokal extends BaseController
         return view('Pembayaran/pembayaranPOLokal/formBahanPenolong', $data);
     }
 
-    public function getTandaTerimaFaktur($supplierID, $divisiID)
+    public function getTandaTerimaFaktur($supplier)
     {
         $tandaTerimaFakturModel = new TandaTerimaFakturModel();
-        $res = $tandaTerimaFakturModel->getListTandaTerimaFakturNotProcessed($supplierID, $divisiID);
+        $res = $tandaTerimaFakturModel->getListTandaTerimaFakturNotProcessed($supplier);
         return response()->setJSON([
             'data' => $res,
             'status' => true
@@ -102,7 +102,6 @@ class PembayaranPOLokal extends BaseController
 
     public function getItemListByTandaTerimaFaktur($tandaTerimaFakturID, $supplierId)
     {
-        $pembayaranId = decrypt($this->request->getVar('id'));
 
         $tandaTerimaFakturDetailModel = new TandaTerimaFakturDetailModel();
         $tandaTerimaFakturModel = new TandaTerimaFakturModel();
@@ -111,23 +110,53 @@ class PembayaranPOLokal extends BaseController
         $localPOPaymentPanjarModel = new LocalPOPaymentPanjarModel();
         $localPOPaymentPinjamanModel = new LocalPOPaymentPinjamanModel();
 
+
         $statusPph = $this->request->getVar('status_pph');
-        $detail = $tandaTerimaFakturModel->getByID($tandaTerimaFakturID);
+        $ids = array_filter(array_map('trim', explode(',', $tandaTerimaFakturID)));
 
-        $taxDipungutNegara = $pajakTandaTerimaFakturModel->getTaxDetail("Pajak dipungut oleh negara", $tandaTerimaFakturID);
-        $pphNilai = $statusPph == '1' ? 0.0025 : 0;
-        $pphResult = $pphNilai * ($detail['nominal_faktur'] + $taxDipungutNegara['taxAmt']);
 
-        return response()->setJSON([
-            'detail' => $tandaTerimaFakturModel->getByID($tandaTerimaFakturID),
-            // 'paymentDetail' => $localPOPaymentBPModel->getPembayaranDetailByid($pembayaranId),
-            'paymentDetail' => $localPOPaymentBPModel->getPembayaranDetailByidTTS($tandaTerimaFakturID),
-            'list' => $tandaTerimaFakturDetailModel->getListTandaTerimaItemFaktur($tandaTerimaFakturID),
-            'tax_dipungut_negara' => $pajakTandaTerimaFakturModel->getTaxDetail("Pajak dipungut oleh negara", $tandaTerimaFakturID),
-            'tax_dikembalikan_lagi' => $pajakTandaTerimaFakturModel->getTaxDetail("Pajak dikembalikan lagi", $tandaTerimaFakturID),
-            'pph' => $pphResult
+        $data = [];
+        foreach ($ids as $id) {
+            $detail = $tandaTerimaFakturModel->getByID($id); // bisa ubah nanti biar ambil 1 data aja
 
+            // ambil pajak per faktur
+            $taxDipungutNegara = $pajakTandaTerimaFakturModel->getTaxDetail("Pajak dipungut oleh negara", $id);
+            $taxDikembalikanLagi = $pajakTandaTerimaFakturModel->getTaxDetail("Pajak dikembalikan lagi", $id);
+
+            $pphRate = $statusPph == '1' ? 0.0025 : 0;
+            $pphResult = $pphRate * ($detail['nominal_faktur'] + ($taxDipungutNegara['taxAmt'] ?? 0));
+
+            $data[] = [
+                'detail' => $detail,
+                'list_lpb' => $detail['list_lpb'],
+                'paymentDetail' => $localPOPaymentBPModel->getPembayaranDetailByidTTS($id),
+                'list' => $tandaTerimaFakturDetailModel->getListTandaTerimaItemFaktur($id),
+                'tax_dipungut_negara' => $taxDipungutNegara,
+                'tax_dikembalikan_lagi' => $taxDikembalikanLagi,
+                'pph' => $pphResult,
+            ];
+        }
+
+        return $this->response->setJSON([
+            'data' => $data
         ]);
+
+        // $detail = $tandaTerimaFakturModel->getByID($tandaTerimaFakturID);
+
+        // $taxDipungutNegara = $pajakTandaTerimaFakturModel->getTaxDetail("Pajak dipungut oleh negara", $tandaTerimaFakturID);
+        // $pphNilai = $statusPph == '1' ? 0.0025 : 0;
+        // $pphResult = $pphNilai * ($detail['nominal_faktur'] + $taxDipungutNegara['taxAmt']);
+
+        // return response()->setJSON([
+        //     'detail' => $tandaTerimaFakturModel->getByID($tandaTerimaFakturID),
+        //     // 'paymentDetail' => $localPOPaymentBPModel->getPembayaranDetailByid($pembayaranId),
+        //     'paymentDetail' => $localPOPaymentBPModel->getPembayaranDetailByidTTS($tandaTerimaFakturID),
+        //     'list' => $tandaTerimaFakturDetailModel->getListTandaTerimaItemFaktur($tandaTerimaFakturID),
+        //     'tax_dipungut_negara' => $pajakTandaTerimaFakturModel->getTaxDetail("Pajak dipungut oleh negara", $tandaTerimaFakturID),
+        //     'tax_dikembalikan_lagi' => $pajakTandaTerimaFakturModel->getTaxDetail("Pajak dikembalikan lagi", $tandaTerimaFakturID),
+        //     'pph' => $pphResult
+
+        // ]);
     }
 
 

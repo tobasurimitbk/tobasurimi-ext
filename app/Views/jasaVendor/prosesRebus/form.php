@@ -1135,12 +1135,14 @@
 
         let rowIndex = 1;
 
+        let totalHasilGroup = 0;
+
         for (const stockID in grouped) {
             const group = grouped[stockID];
             const groupName = group[0].output?.barang || 'Tidak Diketahui';
             const satuan = group[0].output?.kode_satuan || '-';
 
-            let totalHasilGroup = 0;
+         
 
             group.forEach(item => {
                 const val = parseFloat((destroyFormatRupiah(item.output?.qty || 0)).toFixed(2));

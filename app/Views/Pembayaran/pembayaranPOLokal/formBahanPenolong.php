@@ -115,7 +115,7 @@
                                 <?php foreach ($suppliers as $supplier) : ?>
                                     <option 
                                         <?= !empty($detail) ? ($detail['pembayaranDetail']['supplier_id'] == $supplier['id'] ? 'selected' : '') : '' ?> 
-                                        value="<?= $supplier['id'] ?>">
+                                        value="<?= strtoupper($supplier['name']) ?>">
                                         <?= strtoupper($supplier['name']) ?>
                                         <?= !empty($supplier['companies_name']) ? ' - ' . strtoupper($supplier['companies_name']) : '' ?>
                                     </option>
@@ -133,7 +133,7 @@
                                 aria-label="Floating label select example">
                                 <option value=""></option>
                                 <?php foreach ($divisi as $d) : ?>
-                                    <option <?= !empty($detail) ? ($detail['pembayaranDetail']['divisi_id'] == $d['id'] ? 'selected' : '') : '' ?> value="<?= $d['id'] ?>">
+                                    <option <?= !empty($detail) ? ($detail['pembayaranDetail']['divisi_id'] == $d['id'] ? 'selected' : '') : '' ?> value="<?= $d['id']; ?>">
                                         <?= $d['divisi']; ?>
                                     </option>
                                 <?php endforeach; ?>
@@ -145,7 +145,7 @@
                 <div class="row">
                     <div class="col-md-4">
                         <div class="form-floating form-pembayaran-po mb-3" style="height: 50px;">
-                            <select class="form-select" <?= !empty($detail) ? ($detail['pembayaranDetail']['status_posting'] == 1 ? 'disabled' : '') : ""  ?> name="tanda_terima_supplier" id="tanda_terima_supplier">
+                            <select class="form-select" <?= !empty($detail) ? ($detail['pembayaranDetail']['status_posting'] == 1 ? 'disabled' : '') : ""  ?> name="tanda_terima_supplier[]" id="tanda_terima_supplier">
                                 <option value=""></option>
                                 <?php if (!empty($detail)) : ?>
                                     <option value="<?= $detail['tandaTerimaSupplier']['id'] ?>" selected>
@@ -219,11 +219,14 @@
                                                 <tr>
                                                     <th style="text-align: center;">No</th>
                                                     <th style="text-align: center;">Tanggal LPB</th>
+                                                    <th style="text-align: center;">No. Faktur</th>
                                                     <th style="text-align: center;">No. LPB</th>
                                                     <th style="text-align: center;">Barang</th>
                                                     <th style="text-align: center;">Qty</th>
                                                     <th style="text-align: center;">Satuan</th>
-                                                    <th style="text-align: center;">Total</th>
+                                                    <th style="text-align: center;">Total Tagihan</th>
+                                                    <th style="text-align: center;">Total Di Bayar</th>
+                                                    <th style="text-align: center;">Sisa Tagihan</th>
                                                 </tr>
                                             </thead>
                                             <tbody id="body-table" style="text-align: center;">
@@ -427,13 +430,13 @@
             placeholder: "Pilih Departemen",
             theme: "bootstrap-5"
         }).change(function() {
-            getListTandaTerimaSupplier();
             generatePaymentNumber();
         });
 
         $('#tanda_terima_supplier').select2({
             placeholder: "Pilih Tanda Terima Supplier",
-            theme: "bootstrap-5"
+            theme: "bootstrap-5",
+            multiple: true,
         }).change(function() {
             listBarangDetail();
         });
@@ -631,195 +634,201 @@
     })
 
     function listBarangDetail() {
-        var id = $('#tanda_terima_supplier').val();
-        var supplierId = $('#supplier_id option:selected').val();
-        $.ajax({
-            url: '<?= base_url('pembayaran-po-lokal-bp/get-item-list/') ?>' + id + '/' + supplierId,
-            method: "GET",
-            data: {
-                status_pph: $('#status_pph').val()
-            },
-            beforeSend: function() {
-                setLoading();
-            },
-            complete: function() {
-                stopLoading();
-            },
-            dataType: "json",
-            success: function(res) {
-                listPembayaran = [];
-                listPembayaran = res.list;
-                const table = $('#dataTable');
-                // List Pembaayaran
-                generateKeteranganPembayaran(listPembayaran);
+    var id = $('#tanda_terima_supplier').val();
+    var supplierId = $('#supplier_id option:selected').val();
+    $.ajax({
+        url: '<?= base_url('pembayaran-po-lokal-bp/get-item-list/') ?>' + id + '/' + supplierId,
+        method: "GET",
+        data: {
+            status_pph: $('#status_pph').val()
+        },
+        beforeSend: function() {
+            setLoading();
+        },
+        complete: function() {
+            stopLoading();
+        },
+        dataType: "json",
+        success: function(res) {
+            listPembayaran = res.list;
+            const table = $('#dataTable');
+            const tbody = table.find('tbody');
+            tbody.empty();
 
-                var detail = res.detail;
-                // var dateSplit = detail.jatuh_tempo.split('-');
-                var subTotal = Number(detail.nominal_faktur) + Number(res.tax_dipungut_negara.taxAmt) + Number(res.tax_dikembalikan_lagi.taxAmt) + Number(res.pph) - Number(detail.total_amount);
-                var totalPajak = Number(res.tax_dipungut_negara.taxAmt) + Number(res.tax_dikembalikan_lagi.taxAmt) + Number(res.pph);
-                $('.nominal_pembayaran').val(greatFormatRupiah(subTotal));
-                $('.tanda_terima_faktur_id').val(detail.id);
+            if (!res.data || res.data.length === 0) {
+                tbody.html('<tr><td colspan="10" style="color: whitesmoke;">Tidak Ada Data</td></tr>');
+                return;
+            }
 
+            let no = 1;
+            let grandTotalTagihan = 0;
+            let grandTotalBayar = 0;
+            let grandTotalSisa = 0;
+            let grandTotalPajak = 0;
+            let grandTotalPotongan = 0;
+            let grandTotalTambahan = 0;
 
-                // list append
-                table.find('tbody').empty();
-                var no = 1;
-                $.each(res.list, function(i, v) {
-                    var dateSplit = v.lpb_date.split('-');
-                    var newRow = $('<tr>');
-                    newRow.append($('<td>').text(no++));
-                    newRow.append($('<td>').text(dateSplit[2] + '/' + dateSplit[1] + '/' + dateSplit[0]));
-                    newRow.append($('<td>').text(v.lpb_no));
-                    newRow.append($('<td>').text(v.item_name));
-                    newRow.append($('<td>').text(v.qty));
-                    newRow.append($('<td>').text(v.unit));
-                    newRow.append($('<td>').text(greatFormatRupiah(v.price)));
-                    table.find('tbody').append(newRow);
+            // Process each tanda terima
+            $.each(res.data, function(idx, tt) {
+                const detail = tt.detail;
+                const items = tt.list;
+                const paymentDetail = tt.paymentDetail || [];
+                
+                // Calculate totals for this tanda terima
+                const totalPajak = Number(tt.tax_dipungut_negara.taxAmt) + 
+                                  Number(tt.tax_dikembalikan_lagi.taxAmt) + 
+                                  Number(tt.pph);
+                
+                const totalBayar = paymentDetail.reduce((sum, payment) => sum + Number(payment.amount || 0), 0);
+                const sisaTagihan = Number(detail.nominal_faktur) - totalBayar;
+
+                // Add to grand totals
+                grandTotalTagihan += Number(detail.nominal_faktur);
+                grandTotalBayar += totalBayar;
+                grandTotalSisa += sisaTagihan;
+                grandTotalPajak += totalPajak;
+                grandTotalPotongan += Number(detail.potongan || 0);
+                grandTotalTambahan += Number(detail.tambahan || 0);
+
+                // Header for tanda terima (optional - bisa dihide kalo mau rapi)
+                const headerRow = $('<tr class="table-warning">');
+                headerRow.append(`<td colspan="10" style="text-align: center; background-color: #fff3cd;">
+                    <b>Tanda Terima: ${detail.faktur_no} | Total: ${greatFormatRupiah(detail.nominal_faktur)} | Bayar: ${greatFormatRupiah(totalBayar)} | Sisa: ${greatFormatRupiah(sisaTagihan)}</b>
+                </td>`);
+                tbody.append(headerRow);
+
+                // Process each item in this tanda terima
+                $.each(items, function(i, item) {
+                    const dateSplit = item.lpb_date.split('-');
+                    const tanggal = dateSplit[2] + '/' + dateSplit[1] + '/' + dateSplit[0];
+                    
+                    const row = $('<tr>');
+                    row.append($('<td>').text(no++));
+                    row.append($('<td>').text(tanggal));
+                    row.append($('<td>').text(item.faktur_no || detail.faktur_no));
+                    row.append($('<td>').text(item.lpb_no));
+                    row.append($('<td>').text(item.item_name));
+                    row.append($('<td>').text(item.qty));
+                    row.append($('<td>').text(item.unit));
+                    row.append($('<td>').text(greatFormatRupiah(item.price))); // Total Tagihan per item
+                    row.append($('<td>').text(greatFormatRupiah(0))); // Total Dibayar per item (default 0)
+                    row.append($('<td>').text(greatFormatRupiah(item.price))); // Sisa Tagihan per item (default sama dengan tagihan)
+                    
+                    tbody.append(row);
                 });
 
+                // Separator between tanda terima
+                tbody.append('<tr><td colspan="10" style="padding: 5px; background-color: #f8f9fa;"></td></tr>');
+            });
 
-                var newRow1 = $('<tr>');
-                newRow1.append($('<td style="text-align:right;" colspan="6">').text('Tambahan'));
-                newRow1.append($('<td>').text(greatFormatRupiah(detail.tambahan)));
-                table.find('tbody').append(newRow1);
+            // GRAND TOTAL ROW
+            const grandTotalRow = $('<tr class="table-primary font-weight-bold">');
+            grandTotalRow.append($('<td colspan="7" style="text-align: right;">').html('<b>GRAND TOTAL</b>'));
+            grandTotalRow.append($('<td>').html(`<b>${greatFormatRupiah(grandTotalTagihan)}</b>`));
+            grandTotalRow.append($('<td>').html(`<b>${greatFormatRupiah(grandTotalBayar)}</b>`));
+            grandTotalRow.append($('<td>').html(`<b>${greatFormatRupiah(grandTotalSisa)}</b>`));
+            tbody.append(grandTotalRow);
 
+            // DETAIL SUMMARY ROW (Pajak, Potongan, Tambahan)
+            const summaryRow = $('<tr class="table-info">');
+            summaryRow.append($('<td colspan="7" style="text-align: right;">').html(`
+                <small>
+                    Total Pajak: ${greatFormatRupiah(grandTotalPajak)}<br>
+                    Total Potongan: ${greatFormatRupiah(grandTotalPotongan)}<br>
+                    Total Tambahan: ${greatFormatRupiah(grandTotalTambahan)}
+                </small>
+            `));
+            summaryRow.append($('<td colspan="3">').html(`
+                <div class="input-group">
+                    <span class="input-group-text">Nominal Bayar:</span>
+                    <input type="text" 
+                           class="form-control nominalPembayaranInput" 
+                           placeholder="Ketik nominal..." 
+                           onkeyup="this.value = greatFormatRupiah(this.value)"
+                           style="text-align: right; font-weight: bold;">
+                    <button class="btn btn-success" type="button" onclick="processPayment()">Bayar</button>
+                </div>
+            `));
+            tbody.append(summaryRow);
+        }
+    });
+}
 
-                var newRow2 = $('<tr>');
-                newRow2.append($('<td style="text-align:right;" colspan="6">').text('Potongan'));
-                newRow2.append($('<td>').text(greatFormatRupiah(detail.potongan)));
-                table.find('tbody').append(newRow2);
+// Function untuk draw paid table (jika sudah ada pembayaran)
+function drawPaidTable(res) {
+    const table = $('#dataTable');
+    const tbody = table.find('tbody');
+    tbody.empty();
 
-
-                var newRow3 = $('<tr>');
-                newRow3.append($('<td style="text-align:right;" colspan="6">').text('Setelah Tambahan dan Potongan'));
-                newRow3.append($('<td>').text(greatFormatRupiah(detail.nominal_faktur)));
-                table.find('tbody').append(newRow3);
-
-
-                var newRow4 = $('<tr>');
-                newRow4.append($('<td style="text-align:right;" colspan="6">').text('Pajak Dipungut Negara (' + res.tax_dipungut_negara.taxType + ')'));
-                newRow4.append($('<td>').text(greatFormatRupiah(res.tax_dipungut_negara.taxAmt)));
-                table.find('tbody').append(newRow4);
-
-
-                var newRow5 = $('<tr>');
-                newRow5.append($('<td style="text-align:right;" colspan="6">').text('Pajak Dikembalikan Lagi (' + res.tax_dikembalikan_lagi.taxType + ')'));
-                newRow5.append($('<td>').text(greatFormatRupiah(res.tax_dikembalikan_lagi.taxAmt)));
-                table.find('tbody').append(newRow5);
-
-
-                var newRow6 = $('<tr>');
-                newRow6.append($('<td style="text-align:right;" colspan="6">').text('Pajak Penghasilan (2.5 %) (+)'));
-                newRow6.append($('<td>').text(greatFormatRupiah(res.pph.toFixed(2))));
-                table.find('tbody').append(newRow6);
-
-
-                // var newRow7 = $('<tr>');
-                // newRow7.append($('<td style="text-align:right;" colspan="6">').text('Sub Total'));
-                // newRow7.append($('<td class="subtotal">').text(greatFormatRupiah(detail.nominal_faktur)));
-                // newRow7.append($('<td class="subtotalNominal hidden" style="display: none;">').text(greatFormatRupiah(detail.nominal_faktur)));
-                // table.find('tbody').append(newRow7);
-
-                var newRow9 = $('<tr>');
-                newRow9.append($('<td style="text-align:right;" colspan="6"><b>Nominal Pajak</b></td>'));
-                newRow9.append($('<td>').html(
-                    `
-                        <input onkeyup="this.value = greatFormatRupiah(this.value)" oninput="limitInputBayar(this,${totalPajak})" value="${greatFormatRupiah(totalPajak)}" autocomplete="one-time-code" data-id=""  class="form-control nominal_pembayaran_pajak" type="text" value="" name = "nominal_pembayaran_pajak" style="height:40px" readonly>
-                    `
-                ));
-                table.find('tbody').append(newRow9);
-
-                var newRow9 = $('<tr>');
-                newRow9.append($('<td style="text-align:right;" colspan="6"><b>Input Pembayaran</b></td>'));
-                newRow9.append($('<td>').html(
-                    `
-                        <input onkeyup="this.value = greatFormatRupiah(this.value)" oninput="limitInputBayar(this,${detail.nominal_faktur})" value="${greatFormatRupiah(detail.nominal_faktur)}" autocomplete="one-time-code" data-id=""  class="form-control nominal_pembayaran" type="text" value="" name = "nominal_pembayaran" style="height:40px" readonly>
-                    `
-                ));
-                table.find('tbody').append(newRow9);
-
-            }
-        })
+    if (!res.data || res.data.length === 0) {
+        tbody.html('<tr><td colspan="10" style="color: whitesmoke;">Tidak Ada Pembayaran</td></tr>');
+        return;
     }
 
+    let no = 1;
+    let grandTotalTagihan = 0;
+    let grandTotalBayar = 0;
+    let grandTotalSisa = 0;
 
-    function drawPaidTable(res) {
-        const table = $('#dataTable');
-        var detail = res.detail;
-        var paymentDetail = res.paymentDetail;
-        var dateSplit = detail.jatuh_tempo.split('-');
-        var totalPrice = 0;
-        var subTotal = Number(detail.nominal_faktur) + Number(res.tax_dipungut_negara.taxAmt) + Number(res.tax_dikembalikan_lagi.taxAmt) + Number(res.pph);
+    // Process each tanda terima yang sudah ada pembayaran
+    $.each(res.data, function(idx, tt) {
+        const detail = tt.detail;
+        const items = tt.list;
+        const paymentDetail = tt.paymentDetail || [];
+        
+        const totalBayar = paymentDetail.reduce((sum, payment) => sum + Number(payment.amount || 0), 0);
+        const sisaTagihan = Number(detail.nominal_faktur) - totalBayar;
 
+        grandTotalTagihan += Number(detail.nominal_faktur);
+        grandTotalBayar += totalBayar;
+        grandTotalSisa += sisaTagihan;
 
-        $('.nominal_pembayaran').val(greatFormatRupiah(subTotal));
-        $('.jatuh_tempo').val(dateSplit[2] + '/' + dateSplit[1] + '/' + dateSplit[0]);
-        $('.tanda_terima_faktur_id').val(detail.id);
+        // Header tanda terima
+        const headerRow = $('<tr class="table-warning">');
+        headerRow.append(`<td colspan="10" style="text-align: center; background-color: #fff3cd;">
+            <b>${detail.faktur_no} - ${detail.list_lpb}</b>
+        </td>`);
+        tbody.append(headerRow);
 
-        table.find('tbody').empty();
-        var no = 1;
-        $.each(res.list, function(i, v) {
-            totalPrice += Number(v.price);
-            var dateSplit = v.lpb_date.split('-');
-            var newRow = $('<tr>');
-            newRow.append($('<td>').text(no++));
-            newRow.append($('<td>').text(dateSplit[2] + '/' + dateSplit[1] + '/' + dateSplit[0]));
-            newRow.append($('<td>').text(v.lpb_no));
-            newRow.append($('<td>').text(v.item_name));
-            newRow.append($('<td>').text(v.qty));
-            newRow.append($('<td>').text(v.unit));
-            newRow.append($('<td>').text(greatFormatRupiah(v.price)));
-            table.find('tbody').append(newRow);
+        // Items
+        $.each(items, function(i, item) {
+            const dateSplit = item.lpb_date.split('-');
+            const tanggal = dateSplit[2] + '/' + dateSplit[1] + '/' + dateSplit[0];
+            
+            const row = $('<tr>');
+            row.append($('<td>').text(no++));
+            row.append($('<td>').text(tanggal));
+            row.append($('<td>').text(item.faktur_no || detail.faktur_no));
+            row.append($('<td>').text(item.lpb_no));
+            row.append($('<td>').text(item.item_name));
+            row.append($('<td>').text(item.qty));
+            row.append($('<td>').text(item.unit));
+            row.append($('<td>').text(greatFormatRupiah(item.price)));
+            row.append($('<td>').text(greatFormatRupiah(0))); // Dibayar per item
+            row.append($('<td>').text(greatFormatRupiah(item.price))); // Sisa per item
+            
+            tbody.append(row);
         });
-        var newRow1 = $('<tr>');
-        newRow1.append($('<td style="text-align:right;" colspan="6">').text('Tambahan'));
-        newRow1.append($('<td>').text(greatFormatRupiah(detail.tambahan)));
-        table.find('tbody').append(newRow1);
 
-        var newRow2 = $('<tr>');
-        newRow2.append($('<td style="text-align:right;" colspan="6">').text('Potongan'));
-        newRow2.append($('<td>').text(greatFormatRupiah(detail.potongan)));
-        table.find('tbody').append(newRow2);
+        // Summary per tanda terima
+        const summaryRow = $('<tr class="table-secondary font-weight-bold">');
+        summaryRow.append($('<td colspan="7" style="text-align: right;">').html(`<b>Total ${detail.faktur_no}</b>`));
+        summaryRow.append($('<td>').html(`<b>${greatFormatRupiah(detail.nominal_faktur)}</b>`));
+        summaryRow.append($('<td>').html(`<b>${greatFormatRupiah(totalBayar)}</b>`));
+        summaryRow.append($('<td>').html(`<b>${greatFormatRupiah(sisaTagihan)}</b>`));
+        tbody.append(summaryRow);
 
-        var newRow3 = $('<tr>');
-        newRow3.append($('<td style="text-align:right;" colspan="6">').text('Setelah Tambahan dan Potongan'));
-        newRow3.append($('<td>').text(greatFormatRupiah(detail.nominal_faktur)));
-        table.find('tbody').append(newRow3);
+        tbody.append('<tr><td colspan="10" style="padding: 2px;"></td></tr>');
+    });
 
-        var newRow6 = $('<tr>');
-        newRow6.append($('<td style="text-align:right;" colspan="6">').text('Pajak Penghasilan (2.5 %) (+)'));
-        newRow6.append($('<td>').text(greatFormatRupiah(res.pph.toFixed(2))));
-        table.find('tbody').append(newRow6);
-
-        var newRow4 = $('<tr>');
-        newRow4.append($('<td style="text-align:right;" colspan="6">').text('Pajak Dipungut Negara (' + res.tax_dipungut_negara.taxType + ')'));
-        newRow4.append($('<td>').text(greatFormatRupiah(res.tax_dipungut_negara.taxAmt)));
-        table.find('tbody').append(newRow4);
-
-        var newRow5 = $('<tr>');
-        newRow5.append($('<td style="text-align:right;" colspan="6">').text('Pajak Dikembalikan Lagi (' + res.tax_dikembalikan_lagi.taxType + ')'));
-        newRow5.append($('<td>').text(greatFormatRupiah(res.tax_dikembalikan_lagi.taxAmt)));
-        table.find('tbody').append(newRow5);
-
-        var newRow7 = $('<tr>');
-        newRow7.append($('<td style="text-align:right;" colspan="6">').text(''));
-        newRow7.append($('<td class="subtotal">').text(greatFormatRupiah(totalPrice)));
-        newRow7.append($('<td class="subtotalNominal hidden" style="display: none;">').text(greatFormatRupiah(totalPrice)));
-        table.find('tbody').append(newRow7);
-        // let sisaPembayaran = subTotal - paymentDetail.amount;
-        // var newRow9 = $('<tr>');
-        // newRow9.append($('<td style="text-align:right;" colspan="6"><b>Sisa Pembayaran</b></td>'));
-        // newRow9.append($(`<td style="text-align:center;"><b>${greatFormatRupiah(sisaPembayaran)} </b></td>`));
-
-        // table.find('tbody').append(newRow9);
-
-
-        // var newRow10 = $('<tr>');
-        // newRow10.append($('<td style="text-align:right;" colspan="6"><b>Total Di Bayar</b></td>'));
-        // newRow10.append($(`<td style="text-align:center;"><b>${greatFormatRupiah(paymentDetail.amount)} </b></td>`));
-
-        // table.find('tbody').append(newRow10);
-    }
+    // Grand Total
+    const grandTotalRow = $('<tr class="table-primary font-weight-bold">');
+    grandTotalRow.append($('<td colspan="7" style="text-align: right;">').html('<b>GRAND TOTAL</b>'));
+    grandTotalRow.append($('<td>').html(`<b>${greatFormatRupiah(grandTotalTagihan)}</b>`));
+    grandTotalRow.append($('<td>').html(`<b>${greatFormatRupiah(grandTotalBayar)}</b>`));
+    grandTotalRow.append($('<td>').html(`<b>${greatFormatRupiah(grandTotalSisa)}</b>`));
+    tbody.append(grandTotalRow);
+}
 
     function remove(id) {
         const csrfToken = '<?= csrf_token() ?>';
@@ -917,14 +926,13 @@
     function getListTandaTerimaSupplier() {
         // get vat
         var supplier_id = $('#supplier_id').val();
-        var divisi_id = $('#divisi_id').val();
 
-        if (supplier_id != "" && divisi_id != "") {
+        if (supplier_id != "") {
             var table = $('#dataTable');
             table.find('tbody').empty();
             $("#tanda_terima_supplier").empty();
             $.ajax({
-                url: '<?= base_url('pembayaran-po-lokal-bp/get-rekap-faktur/') ?>' + supplier_id + '/' + divisi_id,
+                url: '<?= base_url('pembayaran-po-lokal-bp/get-rekap-faktur/') ?>' + supplier_id,
                 method: "GET",
                 dataType: "json",
                 beforeSend: function() {
@@ -951,43 +959,6 @@
         }
 
     }
-
-    // function changeStatus() {
-    //     let value = document.getElementById('auto_generate').checked ? true : false;
-    //     const csrfToken = '<?= csrf_token() ?>';
-    //     const csrf = $(`[name="${csrfToken}"]`);
-    //     var formData = new FormData();
-    //     formData.append("type", "Bahan Penolong");
-    //     formData.append("payment_date", $("#payment_date").val());
-    //     if (value) {
-    //         $(".no_bukti_pembayaran").attr("readonly", true);
-    //         $.ajax({
-    //             url: "<?= base_url("pembayaran-po-lokal-bp/generate-no-pembayaran"); ?>",
-    //             method: "POST",
-    //             data: formData,
-    //             dataType: "json",
-    //             beforeSend: function(xhr) {
-    //                 xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-    //             },
-    //             processData: false,
-    //             contentType: false,
-    //             success: function(response) {
-    //                 csrf.val(response.token);
-    //                 $(".no_bukti_pembayaran").val(response.paymentNo);
-    //             },
-    //             onError: function(response) {
-    //                 Swal.fire({
-    //                     icon: 'error',
-    //                     title: 'Terjadi kesalahan pada sistem',
-    //                     confirmButtonColor: '#4e73df',
-    //                 });
-    //             }
-    //         });
-    //     } else {
-    //         $(".no_bukti_pembayaran").attr("readonly", false);
-    //         $(".no_bukti_pembayaran").val("");
-    //     }
-    // }
 
     function convertRupiahToNumber(rupiah) {
         if (rupiah == "") {

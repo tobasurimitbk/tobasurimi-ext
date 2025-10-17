@@ -258,16 +258,15 @@ class DivisisModel extends Model
         }
 
         $builder->where('divisis.deletedAt', null);
+        $builder->groupBy('divisis.divisi');
         $builder->orderBy('divisis.divisi', 'ASC');
 
         $results = $builder->get()->getResultArray();
 
         foreach ($results as &$result) {
             $divisiName  = strtoupper($result['divisi']);
-            $companyName = strtoupper($result['company_name'] ?? '');
-            $result['divisi'] = $companyName
-                ? "{$divisiName} ({$companyName})"
-                : $divisiName;
+            // $companyName = strtoupper($result['company_name'] ?? '');
+            $result['divisi'] = $divisiName;
         }
 
         return $results;

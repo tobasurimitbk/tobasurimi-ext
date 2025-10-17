@@ -172,6 +172,7 @@ class Employee extends BaseController
             array_push($dataEmployee, [
                 "no"                    => $no++,
                 "id"                    => encrypt($data->id),
+                "id_text"               => $data->id,
                 "nip"                   => $data->nip,
                 "name"                  => $data->name,
                 "divisionName"          => $data->divisi,

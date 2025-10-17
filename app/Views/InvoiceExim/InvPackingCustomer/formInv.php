@@ -2150,11 +2150,12 @@
                             catatan: catatan,
                             size_breakdown: listSizeBreakdown,
                         });
+                        syncBarangPacking();
+
                     }
 
                     $('#barangModal').modal('hide');
                     listSizeBreakdown = [];
-                    syncBarangPacking();
                     drawTableBarang(listBarang);
                 }
             }

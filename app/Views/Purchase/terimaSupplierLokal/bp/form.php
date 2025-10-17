@@ -142,14 +142,14 @@
                         <div class="row">
                             <div class="col-md-4">
                                 <div class="form-floating mb-3" style="height: 50px;">
-                                    <select <?= $isUsed ? 'disabled' : '' ?> class="form-select divisi_id" name="divisi_id" id="divisi_id">
+                                    <select <?= $isUsed ? 'disabled' : '' ?> class="form-select divisi_id" name="divisi_id" id="divisi_id" multiple>
                                         <option value=""></option>
                                         <option value="all">All</option>
                                         <?php foreach ($divisi as $d) : ?>
-                                            <option <?= !empty($dataTandaTerimaFaktur) ? ($dataTandaTerimaFaktur['divisi_id'] == $d['id'] ? 'selected' : '') : '' ?> value="<?= $d['id'] ?>"><?= $d['divisi'] ?></option>
+                                            <option <?= !empty($dataTandaTerimaFaktur) ? (in_array($d['id'], $selectedDivisi) ? 'selected' : '') : '' ?> value="<?= $d['id'] ?>"><?= $d['divisi'] ?></option>
                                         <?php endforeach; ?>
                                     </select>
-                                    <label for="floatingInput" style="z-index: 1;">Departemen</label>
+                                    <label for="floatingInput"></label>
                                 </div>
                             </div>
                         </div>
@@ -163,18 +163,19 @@
                                     <table class="table table-bordered nowrap table-hover-tobasurimi dataTable table-form-tts" id="dataTable" width="100%" cellspacing="0">
                                         <thead class="thead-dark">
                                             <tr>
-                                                <th style="text-align: center;">No</th>
-                                                <th style="text-align: center;"><input type="checkbox" id="parent"></th>
-                                                <th style="text-align: center;" class="sort">No PO</th>
-                                                <th style="text-align: center;" class="sort">Tgl LPB</th>
-                                                <th style="text-align: center;" class="sort">No LPB</th>
-                                                <th style="text-align: center;" class="sort">Supplier</th>
-                                                <th style="text-align: center;" class="sort">Nama Barang</th>
-                                                <th style="text-align: center;" class="sort">Qty LPB</th>
-                                                <th style="text-align: center;" class="sort">Qty Retur</th>
-                                                <th style="text-align: center;" class="sort">Qty Telah Terima</th>
-                                                <th style="text-align: center;" class="sort">Qty Akan Diterima</th>
-                                                <th style="text-align: center;" class="sort">Satuan</th>
+                                                <th style="text-align: left;">No</th>
+                                                <th style="text-align: left;"><input type="checkbox" id="parent"></th>
+                                                <th style="text-align: left;" class="sort">Dept</th>
+                                                <th style="text-align: left;" class="sort">No PO</th>
+                                                <th style="text-align: left;" class="sort">Tgl LPB</th>
+                                                <th style="text-align: left;" class="sort">No LPB</th>
+                                                <th style="text-align: left;" class="sort">Supplier</th>
+                                                <th style="text-align: left;" class="sort">Nama Barang</th>
+                                                <th style="text-align: left;" class="sort">Qty LPB</th>
+                                                <th style="text-align: left;" class="sort">Qty Retur</th>
+                                                <th style="text-align: left;" class="sort">Qty Telah Terima</th>
+                                                <th style="text-align: left;" class="sort">Qty Akan Diterima</th>
+                                                <th style="text-align: left;" class="sort">Satuan</th>
                                             </tr>
                                         </thead>
                                         <tbody class="body-table" id="body-table">
@@ -194,16 +195,17 @@
                                     <table class="table table-bordered nowrap table-hover-tobasurimi table-form-tts" id="selectedItemTable" width="100%" cellspacing="0">
                                         <thead class="thead-dark">
                                             <tr>
-                                                <th style="text-align: center;">No</th>
-                                                <th style="text-align: center;">No PO</th>
-                                                <th style="text-align: center;">Tgl LPB</th>
-                                                <th style="text-align: center;">No LPB</th>
-                                                <th style="text-align: center;">Supplier</th>
-                                                <th style="text-align: center;">Nama Barang</th>
-                                                <th style="text-align: center;">Qty</th>
-                                                <th style="text-align: center;">Satuan</th>
-                                                <th style="text-align: center;">Total</th>
-                                                <th style="text-align: center;">Action</th>
+                                                <th style="text-align: left;">No</th>
+                                                <th style="text-align: left;">Dept</th>
+                                                <th style="text-align: left;">No PO</th>
+                                                <th style="text-align: left;">Tgl LPB</th>
+                                                <th style="text-align: left;">No LPB</th>
+                                                <th style="text-align: left;">Supplier</th>
+                                                <th style="text-align: left;">Nama Barang</th>
+                                                <th style="text-align: left;">Qty</th>
+                                                <th style="text-align: left;">Satuan</th>
+                                                <th style="text-align: left;">Total</th>
+                                                <th style="text-align: left;">Action</th>
                                             </tr>
                                         </thead>
                                         <tbody class="body-table">
@@ -342,14 +344,14 @@
                                     <table class="table table-bordered nowrap table-hover-tobasurimi table-form-tts" id="taxTable" width="100%" cellspacing="0">
                                         <thead class="thead-dark">
                                             <tr>
-                                                <th style="text-align: center;">No</th>
-                                                <th style="text-align: center;">Tgl Faktur Pajak</th>
-                                                <th style="text-align: center;">No Faktur Pajak</th>
-                                                <th style="text-align: center;">Pajak</th>
-                                                <th style="text-align: center;">Jumlah</th>
-                                                <th style="text-align: center;">Status</th>
-                                                <th style="text-align: center;">Keterangan</th>
-                                                <th style="text-align: center;">Action</th>
+                                                <th style="text-align: left;">No</th>
+                                                <th style="text-align: left;">Tgl Faktur Pajak</th>
+                                                <th style="text-align: left;">No Faktur Pajak</th>
+                                                <th style="text-align: left;">Pajak</th>
+                                                <th style="text-align: left;">Jumlah</th>
+                                                <th style="text-align: left;">Status</th>
+                                                <th style="text-align: left;">Keterangan</th>
+                                                <th style="text-align: left;">Action</th>
                                             </tr>
                                         </thead>
                                         <tbody class="body-table">
@@ -548,12 +550,25 @@
 
     $('#divisi_id').select2({
         placeholder: "Pilih Departemen",
-        theme: "bootstrap-5"
-    }).change(function() {
-        list_penerimaan_selected = [];
-        drawTableSelected(list_penerimaan_selected); // Perbarui tabel selected
+        theme: "bootstrap-5",
+    }).on('change', function() {
+        let selected = $(this).val();
+
+        if (selected && selected.includes('all')) {
+            $(this).val(['all']).trigger('change.select2');
+        } else {
+            // kalau 'all' sebelumnya terpilih dan user pilih yang lain, hapus 'all'
+            if (selected && selected.length > 1 && selected.includes('all')) {
+                const filtered = selected.filter(v => v !== 'all');
+                $(this).val(filtered).trigger('change.select2');
+            }
+        }
+
+        // console.log($(this).val());
+        // list_penerimaan_selected = [];
         listDaftarPenerimaanBarang();
     });
+
 
     $('#supplier_id').select2({
         placeholder: "Pilih Supplier",
@@ -660,6 +675,8 @@
                             divisi_id: v.divisi_id,
                             supplier_id: v.supplier_id,
                             supplier_name: v.supplier_name,
+                            divisi_id: v.divisi_id,
+                            divisi_name: v.divisi_name
                         });
 
                         // Simpan elemen ke daftar baru jika qty_akan_diterima masih ada
@@ -852,19 +869,27 @@
                         data.append("listPajak", JSON.stringify(cleanListPajak));
                         data.append("listPenerimaanBarang", JSON.stringify(list_penerimaan_selected));
 
-                        if (id) {
-                            // UPDATE
-                            $.ajax({
-                                url: "<?= base_url("tanda-terima-faktur-lokal-bp/update"); ?>",
-                                data: data,
-                                beforeSend: function(xhr) {
-                                    xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                                },
-                                method: "POST",
-                                dataType: "json",
-                                processData: false,
-                                contentType: false,
-                                success: function(response) {
+                        var url = id == '' ? "<?= base_url("tanda-terima-faktur-lokal-bp/create"); ?>" : "<?= base_url("tanda-terima-faktur-lokal-bp/update"); ?>";
+                        $.ajax({
+                            url: url,
+                            data: data,
+                            beforeSend: function(xhr) {
+                                xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                            },
+                            method: "POST",
+                            dataType: "json",
+                            processData: false,
+                            contentType: false,
+                            success: function(response) {
+                                csrf.val(response.token);
+                                if (response.status == false) {
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: response.message,
+                                        confirmButtonColor: '#4e73df',
+                                        confirmButtonText: 'Ok'
+                                    })
+                                } else {
                                     Swal.fire({
                                         icon: 'success',
                                         title: response.message,
@@ -875,43 +900,10 @@
                                             window.location.href = "<?= base_url('tanda-terima-faktur-lokal-bp') ?>"
                                         }
                                     });
-                                },
-                            });
-                        } else {
-                            // CREATE
-                            $.ajax({
-                                url: "<?= base_url("tanda-terima-faktur-lokal-bp/create"); ?>",
-                                data: data,
-                                beforeSend: function(xhr) {
-                                    xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                                },
-                                method: "POST",
-                                dataType: "json",
-                                processData: false,
-                                contentType: false,
-                                success: function(response) {
-                                    if (response.status) {
-                                        Swal.fire({
-                                            icon: 'success',
-                                            title: response.message,
-                                            confirmButtonColor: '#4e73df',
-                                            confirmButtonText: 'Ok'
-                                        }).then((result) => {
-                                            if (result.isConfirmed) {
-                                                window.location.href = "<?= base_url('tanda-terima-faktur-lokal-bp') ?>"
-                                            }
-                                        });
-                                    } else {
-                                        Swal.fire({
-                                            icon: 'error',
-                                            title: response.message,
-                                            confirmButtonColor: '#4e73df',
-                                        })
-                                    }
+                                }
 
-                                },
-                            });
-                        }
+                            },
+                        });
 
                     }
                 })
@@ -1001,7 +993,6 @@
             });
             return;
         } else if (cekQtySisa < 0 && qtySisa != 0) {
-            console.log(cekQtySisa);
             Swal.fire({
                 icon: 'error',
                 title: 'Qty yang akan diterima tidak boleh lebih dari ' + qtySisa,
@@ -1040,6 +1031,8 @@
             }
         })
         var total = harga - potongan + tambahan;
+        total = parseFloat(total).toFixed(2);
+        harga = parseFloat(harga).toFixed(2);
         $('.nominal_faktur').val(greatFormatRupiah(harga));
         $('.total_tambahan_potongan').val(greatFormatRupiah(total));
         $('.total_ppn_11').val(greatFormatRupiah(total_ppn_11));
@@ -1135,6 +1128,7 @@
                         divisi_id: removedItem.divisi_id,
                         supplier_id: removedItem.supplier_id,
                         supplier_name: removedItem.supplier_name,
+                        divisi_name: removedItem.divisi_name
                     });
                 }
             }
@@ -1173,7 +1167,15 @@
                         processData: false,
                         contentType: false,
                         success: function(response) {
-                            location.reload()
+                            if (response.status) {
+                                location.reload()
+                            } else {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: response.message,
+                                    confirmButtonColor: '#4e73df',
+                                })
+                            }
                         },
                     });
                 }
@@ -1228,21 +1230,21 @@
 
         $.each(data, function(i, v) {
             var newRow = $('<tr>');
-            newRow.append($('<td style="text-align: center;">').text(no++));
-            newRow.append($('<td style="text-align: center;">').text(v.tax_inv_date));
-            newRow.append($('<td style="text-align: center;">').text(v.tax_inv_no));
-            newRow.append($('<td style="text-align: center;">').text(v.tax_type));
-            newRow.append($('<td style="text-align: center;">').text(greatFormatRupiah(v.tax_amt)));
-            newRow.append($('<td style="text-align: center;">').text(v.tax_status));
-            newRow.append($('<td style="text-align: center;">').text(v.tax_note));
+            newRow.append($('<td style="text-align: left;">').text(no++));
+            newRow.append($('<td style="text-align: left;">').text(v.tax_inv_date));
+            newRow.append($('<td style="text-align: left;">').text(v.tax_inv_no));
+            newRow.append($('<td style="text-align: left;">').text(v.tax_type));
+            newRow.append($('<td style="text-align: left;">').text(greatFormatRupiah(v.tax_amt)));
+            newRow.append($('<td style="text-align: left;">').text(v.tax_status));
+            newRow.append($('<td style="text-align: left;">').text(v.tax_note));
             <?php if ($isUsed) : ?>
-                newRow.append($('<td style="text-align: center;">').html(
+                newRow.append($('<td style="text-align: left;">').html(
                     `
                     -
                 `
                 ));
             <?php else : ?>
-                newRow.append($('<td style="text-align: center;">').html(
+                newRow.append($('<td style="text-align: left;">').html(
                     `
                      <button class="btn btn-warning mr-1" onclick="editPajak('${v.id}')">
                         <i class="fa fa-pencil fa-sm" aria-hidden="true"></i>
@@ -1302,23 +1304,24 @@
         $.each(data, function(i, v) {
             // var harga = Math.round(Number(v.qty_akan_diterima) * Number(v.harga));
             var newRow = $('<tr>');
-            newRow.append($('<td style="text-align: center;">').text(no++));
-            newRow.append($('<td style="text-align: center;">').text(v.po_no));
-            newRow.append($('<td style="text-align: center;">').text(v.tanggal));
-            newRow.append($('<td style="text-align: center;">').text(v.no_penerimaan_barang));
-            newRow.append($('<td style="text-align: center;">').text(v.supplier_name));
-            newRow.append($('<td style="text-align: center;">').text(v.nama_barang_dok));
-            newRow.append($('<td style="text-align: center;">').text(v.qty_akan_diterima));
-            newRow.append($('<td style="text-align: center;">').text(v.kode_satuan));
-            newRow.append($('<td style="text-align: center;">').text(greatFormatRupiah(v.harga_total)));
+            newRow.append($('<td style="text-align: left;">').text(no++));
+            newRow.append($('<td style="text-align: left;">').text(v.divisi_name));
+            newRow.append($('<td style="text-align: left;">').text(v.po_no));
+            newRow.append($('<td style="text-align: left;">').text(v.tanggal));
+            newRow.append($('<td style="text-align: left;">').text(v.no_penerimaan_barang));
+            newRow.append($('<td style="text-align: left;">').text(v.supplier_name));
+            newRow.append($('<td style="text-align: left;">').text(v.nama_barang_dok));
+            newRow.append($('<td style="text-align: left;">').text(v.qty_akan_diterima));
+            newRow.append($('<td style="text-align: left;">').text(v.kode_satuan));
+            newRow.append($('<td style="text-align: left;">').text(greatFormatRupiah(v.harga_total)));
             <?php if ($isUsed) : ?>
-                newRow.append($('<td style="text-align: center;">').html(
+                newRow.append($('<td style="text-align: left;">').html(
                     `
                     -
                 `
                 ));
             <?php else : ?>
-                newRow.append($('<td style="text-align: center;">').html(
+                newRow.append($('<td style="text-align: left;">').html(
                     `
                     <button class="btn btn-warning mr-1" onclick="editDetailRow('${v.penerimaan_barang_detail_id}')">
                         <i class="fa fa-pencil fa-sm" aria-hidden="true"></i>
@@ -1375,37 +1378,38 @@
         var no = 1;
         $.each(data, function(i, v) {
             var newRow = $('<tr>');
-            newRow.append($('<td style="text-align: center;">').html(
+            newRow.append($('<td style="text-align: left;">').html(
                 `
                     <div class="form-check">
                         <input data-supplier_id="${v.supplier_id}" data-id="${v.penerimaan_barang_detail_id}" autocomplete="one-time-code" class="form-check-input child" type="checkbox">
                     </div>
                 `
             ));
-            newRow.append($('<td style="text-align: center;">').text(no++));
-            newRow.append($('<td style="text-align: center;">').text(v.po_no));
-            newRow.append($('<td style="text-align: center;">').text(v.tanggal));
-            newRow.append($('<td style="text-align: center;">').text(v.no_penerimaan_barang));
-            newRow.append($('<td style="text-align: center;">').text(v.supplier_name));
-            newRow.append($('<td style="text-align: center;">').text(v.nama_barang_dok));
-            newRow.append($('<td style="text-align: center;">').text(v.qty_lpb));
-            newRow.append($('<td style="text-align: center;">').text(v.qty_retur));
-            newRow.append($('<td style="text-align: center;">').text(v.qty_telah_diterima));
+            newRow.append($('<td style="text-align: left;">').text(no++));
+            newRow.append($('<td style="text-align: left;">').text(v.divisi_name));
+            newRow.append($('<td style="text-align: left;">').text(v.po_no));
+            newRow.append($('<td style="text-align: left;">').text(v.tanggal));
+            newRow.append($('<td style="text-align: left;">').text(v.no_penerimaan_barang));
+            newRow.append($('<td style="text-align: left;">').text(v.supplier_name));
+            newRow.append($('<td style="text-align: left;">').text(v.nama_barang_dok));
+            newRow.append($('<td style="text-align: left;">').text(v.qty_lpb));
+            newRow.append($('<td style="text-align: left;">').text(v.qty_retur));
+            newRow.append($('<td style="text-align: left;">').text(v.qty_telah_diterima));
             <?php if ($isUsed) : ?>
-                newRow.append($('<td style="text-align: center;">').html(
+                newRow.append($('<td style="text-align: left;">').html(
                     `
                     -
                 `
                 ));
             <?php else : ?>
-                newRow.append($('<td style="text-align: center;">').html(
+                newRow.append($('<td style="text-align: left;">').html(
                     `
                     <input autocomplete="one-time-code" data-id_input_diterima="${v.penerimaan_barang_detail_id}" class="form-control" type="number" min="0" value="${v.qty_akan_diterima}">
                 `
                 ));
             <?php endif ?>
 
-            newRow.append($('<td style="text-align: center;">').text(v.kode_satuan));
+            newRow.append($('<td style="text-align: left;">').text(v.kode_satuan));
             table.find('tbody').append(newRow);
         });
 
@@ -1520,42 +1524,47 @@
         }
     }
 
+    $('.divisi_id')
+        .parent('div')
+        .children('span')
+        .children('span')
+        .children('span')
+        .css('height', ' calc(3.5rem + 2px)');
 
-    function preventNegativeInput(inputElement) {
-        var inputValue = inputElement.value;
-        var numericValue = inputValue.replace(/[^0-9.]/g, '');
-        numericValue = numericValue.replace(/^0+/g, '');
-        numericValue = numericValue.replace(/^\./g, '0.');
-        if (parseFloat(numericValue) < 0 || isNaN(parseFloat(numericValue))) {
-            inputElement.value = '0';
-        } else {
-            inputElement.value = numericValue;
-        }
-    }
+    $('.divisi_id')
+        .parent('div')
+        .children('span')
+        .children('span')
+        .children('span')
+        .children('span')
+        .css('margin-top', '22px').css('margin-left', '-7px');
+
+    $('.divisi_id')
+        .parent('div')
+        .find('label')
+        .css('z-index', '1');
 
     function print(url) {
         window.open(url, "_blank");
     }
 
     function listDaftarPenerimaanBarang() {
-        <?php if (empty($dataTandaTerimaFaktur)) : ?>
-
-            $.ajax({
-                url: `<?= base_url("tanda-terima-faktur-lokal-bp/daftar-penerimaan-barang"); ?>`,
-                method: "GET",
-                data: {
-                    supplierID: $('#supplier_id').val(),
-                    divisiID: $('#divisi_id').val()
-                },
-                dataType: "json",
-                success: function(res) {
-                    if (res.status) {
-                        list_penerimaan_barang = res.data;
-                        drawTableDaftarPenerimaanBarang(res.data);
-                    }
+        let divisiId = $('#divisi_id').val();
+        $.ajax({
+            url: `<?= base_url("tanda-terima-faktur-lokal-bp/daftar-penerimaan-barang"); ?>`,
+            method: "GET",
+            data: {
+                supplierID: $('#supplier_id').val(),
+                divisiID: JSON.stringify(divisiId)
+            },
+            dataType: "json",
+            success: function(res) {
+                if (res.status) {
+                    list_penerimaan_barang = res.data;
+                    drawTableDaftarPenerimaanBarang(res.data);
                 }
-            });
-        <?php endif; ?>
+            }
+        });
     }
 </script>
 
@@ -1582,7 +1591,8 @@
                     supplier_name: "<?= $d['supplier_name'] ?>",
                     supplier_id: "<?= $d['supplier_id'] ?>",
                     harga: "<?= $d['harga'] ?>",
-                    harga_total: "<?= $d['harga_total'] ?>"
+                    harga_total: "<?= $d['harga_total'] ?>",
+                    divisi_name: "<?= $d['divisi_name'] ?>"
                 });
             <?php endforeach; ?>
         }
@@ -1604,7 +1614,9 @@
                 kode_satuan: "<?= $d['kode_satuan'] ?>",
                 supplier_id: "<?= $d['supplier_id'] ?>",
                 harga: "<?= $d['harga'] ?>",
-                harga_total: "<?= $d['harga_total'] ?>"
+                harga_total: "<?= $d['harga_total'] ?>",
+                divisi_name: "<?= $d['divisi_name'] ?>",
+                divisi_id: "<?= $d['divisi_id'] ?>",
             });
         <?php endforeach; ?>
         drawTableDaftarPenerimaanBarang(list_penerimaan_barang);

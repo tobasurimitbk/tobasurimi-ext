@@ -2,6 +2,7 @@
 
 namespace Config;
 
+use App\Models\MetadataModel;
 use CodeIgniter\Events\Events;
 use CodeIgniter\Exceptions\FrameworkException;
 
@@ -32,7 +33,7 @@ Events::on('pre_system', static function () {
             ob_end_flush();
         }
 
-        ob_start(static fn ($buffer) => $buffer);
+        ob_start(static fn($buffer) => $buffer);
     }
 
     /*
@@ -45,4 +46,13 @@ Events::on('pre_system', static function () {
         Events::on('DBQuery', 'CodeIgniter\Debug\Toolbar\Collectors\Database::collect');
         Services::toolbar()->respond();
     }
+
+    // Global Variable Init
+    $view = Services::renderer();
+    $metadata = new MetadataModel();
+
+    $apiTinyValue = $metadata->where('name', 'api_key_tiny')->first()['value'] ?? null;
+
+    // Tambahkan variable global ke semua view
+    $view->setData(['api_tiny' => $apiTinyValue]);
 });

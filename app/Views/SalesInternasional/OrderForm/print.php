@@ -147,13 +147,11 @@
                 <tr>
                     <td>
                         <table class="label">
-                            <?php if ($displayPrice == "true") : ?>
-                                <tr>
-                                    <td>CONSIGNEE</td>
-                                    <td>:</td>
-                                    <td><?= $dataSO->customer_name ?></td>
-                                </tr>
-                            <?php endif ?>
+                            <tr>
+                                <td>CONSIGNEE</td>
+                                <td>:</td>
+                                <td><?= $dataSO->customer_name ?></td>
+                            </tr>
                             <?php if (!empty($dataSO->tax_id)): ?>
                                 <tr>
                                     <td>TAX ID#</td>
@@ -342,6 +340,7 @@
 
                                     // Check if percentage column exists and should be shown
                                     $show_persen_column = isset($columns_to_show['persen']);
+                                    $show_cased_column = isset($columns_to_show['cased']);
 
                                     // Ini untuk mengetahui Qty Satuan apa yang dipakek (ambil paling utama)
                                     $satuanQty = "";
@@ -356,10 +355,14 @@
                                             <thead>
                                                 <tr style="background-color: #f3f4f6;">
                                                     <?php foreach ($columns_to_show as $col => $col_data): ?>
-                                                        <?php if ($col != 'persen'): ?>
+                                                        <?php if ($col != 'persen' && $col != 'cased'): ?>
                                                             <th style="padding: 3px; border: 1px solid #ddd; width: <?= $col_data['width'] ?>"><?= $col_data['label'] ?></th>
                                                         <?php endif; ?>
                                                     <?php endforeach; ?>
+
+                                                    <?php if ($show_cased_column): ?>
+                                                        <th style="padding: 3px; border: 1px solid #ddd; width: 4.5%;text-align: center;">QTY (CASE)</th>
+                                                    <?php endif; ?>
 
                                                     <?php if ($show_persen_column): ?>
                                                         <th style="padding: 3px; border: 1px solid #ddd; width: 4.5%;text-align: right;">%</th>
@@ -376,6 +379,7 @@
                                                 $breakdown_total = 0;
                                                 $breakdown_unit_price_total = 0;
                                                 $breakdown_persen = 0;
+                                                $breakdown_cased = 0;
                                                 foreach ($detail['size_breakdown'] as $breakdown):
                                                     $breakdown_qty += $breakdown['qty_input'];
                                                     $breakdown_total += $breakdown['total_input'];
@@ -384,10 +388,13 @@
                                                         $breakdown_persen += $breakdown['persen'];
                                                         $total_persen += $breakdown['persen'];
                                                     }
+                                                    if (isset($breakdown['cased']) && is_numeric($breakdown['cased'])) {
+                                                        $breakdown_cased += $breakdown['cased'];
+                                                    }
                                                 ?>
                                                     <tr>
                                                         <?php foreach ($columns_to_show as $col => $col_data): ?>
-                                                            <?php if ($col != 'persen'): ?>
+                                                            <?php if ($col != 'persen' && $col != 'cased'): ?>
                                                                 <td style="padding: 3px; border: 1px solid #ddd;">
                                                                     <?= $breakdown[$col] ?> <br>
                                                                     <?php if (!empty($breakdown["note_" . $col])): ?>
@@ -396,6 +403,12 @@
                                                                 </td>
                                                             <?php endif; ?>
                                                         <?php endforeach; ?>
+
+                                                        <?php if ($show_cased_column): ?>
+                                                            <td style="padding: 3px; border: 1px solid #ddd; text-align: right;">
+                                                                <?= !empty($breakdown['cased']) ? number_format($breakdown['cased'], 2) : '' ?>
+                                                            </td>
+                                                        <?php endif; ?>
 
                                                         <?php if ($show_persen_column): ?>
                                                             <td style="padding: 3px; border: 1px solid #ddd; text-align: right;">
@@ -409,9 +422,28 @@
                                                     </tr>
                                                 <?php endforeach; ?>
                                             </tbody>
+                                            <?php
+                                            // Hitung jumlah kolom utama (misalnya dari thead)
+                                            $base_columns = count($columns_to_show);
+
+                                            if ($show_cased_column) {
+                                                $base_columns -= 1;
+                                            }
+
+                                            if ($show_persen_column) {
+                                                $base_columns -= 1;
+                                            }
+
+                                            ?>
                                             <tfoot>
                                                 <tr style="background-color: #e9ecef;">
-                                                    <td colspan="<?= count($columns_to_show) - ($show_persen_column ? 1 : 0) ?>" style="padding: 3px; border: 1px solid #ddd; text-align: right; font-weight: bold;">TOTAL</td>
+                                                    <td colspan="<?= $base_columns ?>" style="padding: 3px; border: 1px solid #ddd; text-align: right; font-weight: bold;">TOTAL</td>
+
+                                                    <?php if ($show_cased_column): ?>
+                                                        <td style="padding: 3px; border: 1px solid #ddd; text-align: right; font-weight: bold;">
+                                                            <?= $breakdown_cased > 0 ? number_format($breakdown_cased, 2) : '' ?>
+                                                        </td>
+                                                    <?php endif; ?>
 
                                                     <?php if ($show_persen_column): ?>
                                                         <td style="padding: 3px; border: 1px solid #ddd; text-align: right; font-weight: bold;">
