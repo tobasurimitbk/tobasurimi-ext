@@ -160,6 +160,11 @@
                 <form class="create-form form-add-spp" role="form" method="POST" enctype="multipart/form-data">
                     <?= csrf_field() ?>
                     <div class="row">
+                        <div class="col-sm-12 mb-3">
+                            <div class="text-center">
+                                <img class="preview_photo" width="130" id="preview_photo" src="" />
+                            </div>
+                        </div>
                         <div class="col-sm-12">
                             <div class="form-floating mb-3" style="height: 50px;">
                                 <input autocomplete="one-time-code" readonly type="text" class="form-control nama_karyawan" id="nama_karyawan" name="nama_karyawan" placeholder="Nama Karyawan">
@@ -754,6 +759,7 @@
                         tableBody.append(row);
                     });
 
+                    $('#preview_photo').attr('src', data.employee.employee_img);
                     $('.list-fingerprint-modal').modal('show');
                 } else {
                     Swal.fire({
