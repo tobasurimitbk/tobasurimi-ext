@@ -192,7 +192,7 @@
     <div class="card">
         <div class="card-body">
             <div class="row justify-content-start mb-3">
-                <div class="col-sm-3">
+                <div class="col-sm-3 mt-3">
                     <div class="input-group">
                         <div class="form-floating" style="height: 50px;">
                             <input placeholder="" value="<?= date('Y-m') ?>" class="form-control month" id="month" name="month" />
@@ -206,7 +206,7 @@
                     </div>
                 </div>
                 <div class="col-sm-3">
-                    <div class="form-floating mt-1">
+                    <div class="form-floating mt-3">
                         <select class="form-select" name="filterDivisiID" id="filterDivisiID">
                             <option value="">
                                 Cari Departemen
@@ -221,7 +221,7 @@
                     </div>
                 </div>
                 <div class="col-sm-3">
-                    <div class="form-floating mt-1">
+                    <div class="form-floating mt-3">
                         <select class="form-select" name="filterBagianID" id="filterBagianID">
                             <option value="">
                                 Cari Bagian
@@ -231,7 +231,7 @@
                     </div>
                 </div>
                 <div class="col-sm-3">
-                    <div class="form-floating">
+                    <div class="form-floating mt-3">
                         <select class="form-select" name="filterGolongan">
                             <option value="">
                                 Cari Tipe / Golongan
@@ -246,7 +246,7 @@
                     </div>
                 </div>
                 <div class="col-sm-3">
-                    <div class="form-floating mt-1">
+                    <div class="form-floating mt-3">
                         <select class="form-select" name="filterEmployeeID" id="filterEmployeeID">
                             <option value="">
                                 Cari Berdasarkan Nama Karyawan
@@ -751,7 +751,7 @@
                 $.each(response.data, function(index, data) {
                     var option = $("<option></option>")
                         .attr("value", data.id)
-                        .text(data.name);
+                        .text("(" + data.nip + ") " + data.name);
                     employeeSelect.append(option);
                 });
 
@@ -792,7 +792,7 @@
                 $.each(response.data, function(index, data) {
                     var option = $("<option></option>")
                         .attr("value", data.id)
-                        .text(data.name);
+                        .text("(" + data.nip + ") " + data.name);
                     employeeSelect.append(option);
                 });
 

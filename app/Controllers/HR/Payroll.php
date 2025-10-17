@@ -199,6 +199,7 @@ class Payroll extends BaseController
                     "libur" => $status['LIBUR_L'],
                     "alpha" => $status['ALPHA_A'],
                     "dinas" => $status['DINAS_D'],
+                    "cuti_keguguran" => $status['CUTI KEGUGURAN_CKG'],
                     "hadir_final" => 0,
                     "total_perizinan_not_approved" => 0,
                     "total_perizinan_approved" => 0,
@@ -328,6 +329,7 @@ class Payroll extends BaseController
             "libur" => $status['LIBUR_L'],
             "alpha" => $status['ALPHA_A'],
             "dinas" => $status['DINAS_D'],
+            "cuti_keguguran" => $status['CUTI KEGUGURAN_CKG'],
             "hadir_final" => 0,
             "total_perizinan_not_approved" => 0,
             "total_perizinan_approved" => 0,
@@ -474,7 +476,8 @@ class Payroll extends BaseController
                         'HADIR_H'           => 0,
                         'LIBUR_L'           => 0,
                         'ALPHA_A'           => 0,
-                        'DINAS_D'           => 0
+                        'DINAS_D'           => 0,
+                        'CUTI KEGUGURAN_CKG' => 0
                     ];
                 }
                 $mapStatusAttendance[$empId][$s['status']] = $s['total'];
@@ -501,6 +504,7 @@ class Payroll extends BaseController
                     "libur"                        => $att["LIBUR_L"] ?? 0,
                     "alpha"                        => $att["ALPHA_A"] ?? 0,
                     "dinas"                        => $att["DINAS_D"] ?? 0,
+                    "cuti_keguguran"               => $att["CUTI KEGUGURAN_CKG"] ?? 0,
                     "hadir_final"                  => 0,
                     "total_perizinan_not_approved" => 0,
                     "total_perizinan_approved"     => 0,
@@ -781,6 +785,7 @@ class Payroll extends BaseController
                         'LIBUR_L'           => 0,
                         'ALPHA_A'           => 0,
                         'DINAS_D'           => 0,
+                        'CUTI KEGUGURAN_CKG' => 0
                     ];
                 }
                 $mapStatusAttendance[$empId][$s['status']] = $s['total'];
@@ -807,6 +812,7 @@ class Payroll extends BaseController
                     "libur"                        => $att["LIBUR_L"] ?? 0,
                     "alpha"                        => $att["ALPHA_A"] ?? 0,
                     "dinas"                        => $att["DINAS_D"] ?? 0,
+                    "cuti_keguguran"               => $att["CUTI KEGUGURAN_CKG"] ?? 0,
                     "hadir_final"                  => 0,
                     "total_perizinan_not_approved" => 0,
                     "total_perizinan_approved"     => 0,

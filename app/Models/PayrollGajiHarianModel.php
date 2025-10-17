@@ -45,6 +45,7 @@ class PayrollGajiHarianModel extends Model
         $result = $this->asArray()->select('payroll_gaji_harian.*, jam_kerja.jenis')
             ->join('jam_kerja', 'jam_kerja.id = payroll_gaji_harian.jam_kerja_id', 'left')
             ->where('payroll_gaji_harian.payroll_id', $payrollID)
+            ->orderBy('tanggal', "asc")
             ->findAll();
         return $result;
     }

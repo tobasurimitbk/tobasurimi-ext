@@ -502,4 +502,21 @@ class AttendancesModel extends Model
 
         return $dataQry;
     }
+
+    public function getAttendanceByDateRangeAmt(
+        $employeeIds,
+        $startDate,
+        $endDate
+    ) {
+        return $this->asArray()
+            ->select('attendances.*')
+            ->whereIn('employee_id', $employeeIds)
+            ->where('deletedAt', null)
+            ->where('periode >=', $startDate)
+            ->where('periode <=', $endDate)
+            ->groupBy('periode')
+            ->groupBy('employee_id')
+            ->orderBy('periode')
+            ->findAll();
+    }
 }

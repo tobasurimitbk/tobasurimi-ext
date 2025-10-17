@@ -159,32 +159,37 @@
                 </div>
                 <div class="col-sm-2 mt-1">
                     <div class="form-floating mb-3" style="height: 50px;">
+                        <input readonly autocomplete="one-time-code" type="text" required name="totalCutiKeguguran" id="totalCutiKeguguran" class="form-control target input-picker" value="<?= $payrollDetail['cuti_keguguran'] ?? 0 ?> Kali">
+                        <label for="floatingInput">Cuti Keguguran</label>
+                    </div>
+                </div>
+                <div class="col-sm-2 mt-1">
+                    <div class="form-floating mb-3" style="height: 50px;">
                         <input readonly autocomplete="one-time-code" type="text" required name="totalHadir" id="totalHadir" class="form-control target input-picker" value="<?= $payrollDetail['hadir'] ?? 0 ?> Kali">
                         <label for="floatingInput">Hadir</label>
                     </div>
                 </div>
-
-                <div class="col-sm-2 mt-1">
+            </div>
+            <div class="row">
+                <div class="col-sm-3 mt-1">
                     <div class="form-floating mb-3" style="height: 50px;">
                         <input readonly autocomplete="one-time-code" type="text" required name="totalUangLembur" id="totalUangLembur" class="form-control target input-picker" value="<?= " " . number_format($payrollDetail['nominal_uang_lembur'],  2, ',', '.') ?>">
                         <label for="floatingInput">Total Uang Lembur Dalam Sebulan</label>
                     </div>
                 </div>
-            </div>
-            <div class="row">
-                <div class="col-sm-4 mt-1">
+                <div class="col-sm-3 mt-1">
                     <div class="form-floating mb-3" style="height: 50px;">
                         <input disabled autocomplete="one-time-code" onkeyup="this.value = greatFormatRupiah(this.value);" type="text" id="gajiPerHari" class="form-control target input-picker" value="<?= " " . number_format($payrollDetail['nominal_gaji_harian'], 2, ',', '.') ?>">
                         <label for="floatingInput">Gaji (Per Hari)</label>
                     </div>
                 </div>
-                <div class="col-sm-4 mt-1">
+                <div class="col-sm-3 mt-1">
                     <div class="form-floating mb-3" style="height: 50px;">
                         <input disabled autocomplete="one-time-code" onkeyup="this.value = greatFormatRupiah(this.value);" type="text" id="cadanganPerHari" class="form-control target input-picker" value="<?= " " . number_format($payrollDetail['nominal_cadangan'], 2, ',', '.') ?>">
                         <label for="floatingInput">Cadangan (Per Hari)</label>
                     </div>
                 </div>
-                <div class="col-sm-4 mt-1">
+                <div class="col-sm-3 mt-1">
                     <div class="form-floating mb-3" style="height: 50px;">
                         <input readonly autocomplete="one-time-code" type="text" id="hariKerja" class="form-control target input-picker" value="<?= $payrollDetail['hadir_final'] ?> Hari">
                         <label for="floatingInput">Hari Kerja (Total Masuk + Perizinan Approved)</label>
@@ -376,8 +381,8 @@
                                     <th style="text-align: center;" class="sort">Tanggal</th>
                                     <th style="text-align: center;" class="sort">Jam Kerja</th>
                                     <th style="text-align: center;" class="sort">CheckIn</th>
-                                    <th style="text-align: center;" class="sort">Mulai Istirahat</th>
-                                    <th style="text-align: center;" class="sort">Selesai Istirahat</th>
+                                    <!-- <th style="text-align: center;" class="sort">Mulai Istirahat</th> -->
+                                    <!-- <th style="text-align: center;" class="sort">Selesai Istirahat</th> -->
                                     <th style="text-align: center;" class="sort">CheckOut</th>
                                     <th style="text-align: center;" class="sort">Total Jam</th>
                                     <th style="text-align: center;" class="sort">Nominal ((GP + CADANGAN) / 7 * Total Jam)</th>
@@ -392,15 +397,15 @@
                                         <td><?= Carbon::createFromFormat('Y-m-d', $r['tanggal'])->translatedFormat('l, d F Y'); ?></td>
                                         <td><?= $r['jenis'] ?></td>
                                         <td><?= $r['jam_masuk'] ?? "-" ?></td>
-                                        <td><?= $r['jam_istirahat_mulai'] ?? "-" ?></td>
-                                        <td><?= $r['jam_istirahat_selesai'] ?? "-" ?></td>
+                                        <!-- <td><?= $r['jam_istirahat_mulai'] ?? "-" ?></td>
+                                        <td><?= $r['jam_istirahat_selesai'] ?? "-" ?></td> -->
                                         <td><?= $r['jam_pulang'] ?? "-"     ?></td>
                                         <td><?= number_format($r['total_jam'], 2) ?></td>
                                         <td style="font-weight: bold;"><?= number_format($r['nominal_diterima'], 2) ?></td>
                                     </tr>
                                 <?php endforeach; ?>
                                 <tr>
-                                    <td colspan="8" style="text-align:right;"><b>Total Gaji Berdasarkan Jam Kerja</b></td>
+                                    <td colspan="6" style="text-align:right;"><b>Total Gaji Berdasarkan Jam Kerja</b></td>
                                     <td style=" text-align:center;">
                                         <b><?= number_format($payrollDetail['nominal_uang_gaji'], 2) ?></b>
                                     </td>
