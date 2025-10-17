@@ -54,14 +54,28 @@ class TandaTerimaFakturDetailModel extends Model
 
     public function getListTandaTerimaItemFaktur($tandaTerimaFakturID)
     {
-        $condition = [
-            'tanda_terima_faktur_detail.tanda_terima_faktur_id' => $tandaTerimaFakturID,
-            'tanda_terima_faktur_detail.deletedAt' => null
-        ];
+        // Ubah string "309,396,397,472" jadi array
+        $ids = array_filter(array_map('trim', explode(',', $tandaTerimaFakturID)));
+
         $tandaTerimaFakturDetailModel = new TandaTerimaFakturDetailModel();
-        $res = $tandaTerimaFakturDetailModel->where($condition)->findAll();
+
+        $res = $tandaTerimaFakturDetailModel
+            ->select('
+                tanda_terima_faktur_detail.*, 
+                tanda_terima_faktur.faktur_no
+            ')
+            ->join(
+                'tanda_terima_faktur',
+                'tanda_terima_faktur.id = tanda_terima_faktur_detail.tanda_terima_faktur_id',
+                'left'
+            )
+            ->whereIn('tanda_terima_faktur_detail.tanda_terima_faktur_id', $ids)
+            ->where('tanda_terima_faktur_detail.deletedAt', null)
+            ->findAll();
+
         return $res;
     }
+
 
     public function getDetail($tandaTerimaFakturID)
     {

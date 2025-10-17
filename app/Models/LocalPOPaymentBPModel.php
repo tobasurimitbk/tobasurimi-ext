@@ -253,14 +253,13 @@ class LocalPOPaymentBPModel extends Model
 
     public function getPembayaranDetailByidTTS($tandaTerimaFakturID)
     {
-        $condition = [
-            'local_po_payment_bp.tanda_terima_faktur_id' => $tandaTerimaFakturID,
-            'local_po_payment_bp.deletedAt' => null,
-        ];
-        
+        // Ubah string jadi array
+        $ids = array_filter(explode(',', $tandaTerimaFakturID));
+
         $payments = $this
             ->select('amount')
-            ->where($condition)
+            ->whereIn('local_po_payment_bp.tanda_terima_faktur_id', $ids)
+            ->where('local_po_payment_bp.deletedAt', null)
             ->findAll();
 
         return $payments;

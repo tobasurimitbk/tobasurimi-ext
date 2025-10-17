@@ -290,13 +290,17 @@ class TandaTerimaFakturModel extends Model
 
 
     public function getByID($tandaTerimaFakturID)
-    {
-        $res = $this
-            ->select('tanda_terima_faktur.*, sum(local_po_payment_bp.amount) as total_amount,  local_po_payment_bp.amount,
-            tanda_terima_faktur.nominal_faktur - SUM(local_po_payment_bp.amount) AS sisa')
-            ->join('local_po_payment_bp', 'local_po_payment_bp.tanda_terima_faktur_id = tanda_terima_faktur.id', 'left')
+    {   
+       $res = $this->select("
+                tanda_terima_faktur.*,
+                GROUP_CONCAT(DISTINCT tanda_terima_faktur_detail.lpb_no ORDER BY tanda_terima_faktur_detail.lpb_no SEPARATOR ', ') AS list_lpb,
+                COALESCE(SUM(tanda_terima_faktur_detail.price), 0) AS total_amount
+            ")
+            ->join('tanda_terima_faktur_detail', 'tanda_terima_faktur_detail.tanda_terima_faktur_id = tanda_terima_faktur.id', 'left')
             ->where('tanda_terima_faktur.id', $tandaTerimaFakturID)
+            ->groupBy('tanda_terima_faktur.id')
             ->first();
+
         return $res;
     }
 
