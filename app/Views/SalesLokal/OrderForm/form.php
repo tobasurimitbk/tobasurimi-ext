@@ -1884,18 +1884,40 @@
             $(".amount").val(greatFormatRupiah(amount));
         });
 
-        $(".discount_percentage").keyup(function() {
-            if ($(".discount_percentage").val()) {
-                if ($(".discount_unit option:selected").val() == 'percent' && $(".discount_percentage").val() > 100) {
-                    $(".discount_percentage").val(100)
-                }
-                if ($(".discount_unit option:selected").val() == 'percent' && $(".discount_percentage").val() < 0) {
-                    $(".discount_percentage").val();
-                }
-            } else {
-                $(".discount_percentage").val();
+        $(".discount_percentage").on("input", function() {
+            let val = $(this).val();
+
+            // Hanya izinkan angka dan satu titik
+            val = val.replace(/[^0-9.]/g, '');
+            const parts = val.split('.');
+
+            // Jika ada lebih dari satu titik, gabungkan sisanya
+            if (parts.length > 2) {
+                val = parts[0] + '.' + parts.slice(1).join('');
             }
-        })
+
+            // Jika diawali titik, ubah jadi "0."
+            if (val.startsWith('.')) {
+                val = '0' + val;
+            }
+
+            // Batasi dua angka di belakang titik
+            if (val.includes('.')) {
+                const [integer, decimal] = val.split('.');
+                val = integer + '.' + decimal.slice(0, 2);
+            }
+
+            // Cegah nilai negatif
+            if (parseFloat(val) < 0) val = '';
+
+            // Batasi 100 kalau unit = percent
+            const unit = $(".discount_unit option:selected").val();
+            if (unit === 'percent' && parseFloat(val) > 100) {
+                val = '100';
+            }
+
+            $(this).val(val);
+        });
 
         $(".discount_unit").change(function() {
             let discVal = $(".discount_percentage").val();
