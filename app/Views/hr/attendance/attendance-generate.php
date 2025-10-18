@@ -93,6 +93,11 @@
         max-width: 100px !important;
         width: 100px !important;
     }
+
+    .form-switch-lg .form-check-input {
+        width: 4rem;
+        height: 1.5rem;
+    }
 </style>
 
 <!-- Begin Page Content -->
@@ -416,17 +421,38 @@
                         </div>
                     </div>
 
-                    <div class="form-floating mb-3" style="height: 50px;">
-                        <input placeholder="Nominal Uang Makan (Opsional)" type="text" name="nominal" class="form-control" id="nominal" oninput="this.value = greatFormatRupiah(this.value)">
-                        <label for="status">Nominal Uang Makan (Opsional)</label>
+                    <div class="row">
+                        <div class="col-sm">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input placeholder="Nominal Uang Makan (Opsional)" type="text" name="nominal_uang_makan" class="form-control" id="nominal_uang_makan" oninput="this.value = greatFormatRupiah(this.value)">
+                                <label for="status">Nominal Uang Makan (Opsional)</label>
+                            </div>
+                        </div>
+                        <div class="col-sm">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <input placeholder="Nominal Denda Keterlambatan (Opsional)" type="text" name="nominal_denda_keterlambatan" class="form-control" id="nominal_denda_keterlambatan" oninput="this.value = greatFormatRupiah(this.value)">
+                                <label for="status">Nominal Denda Keterlambatan (Opsional)</label>
+                            </div>
+                        </div>
                     </div>
 
-                    <div class="form-floating mb-3" style="height: 50px;" id="reasonForm">
-                        <input type="text" name="reason" class="form-control" id="reason" placeholder="Reason">
-                        <label for="floatingInput">Keterangan Tambahan (Opsional)</label>
+                    <div class="row">
+                        <div class="col-sm">
+                            <div class="form-floating mb-3" style="height: 50px;" id="reasonForm">
+                                <input type="text" name="reason" class="form-control" id="reason" placeholder="Reason">
+                                <label for="floatingInput">Keterangan Tambahan (Opsional)</label>
+                            </div>
+                        </div>
+                        <div class="col-sm">
+                            <label class="form-label font-weight-bold modal-sub-title" style="font-size: 14px;">Abaikan Dari Sync Log Absensi</label>
+                            <div class="form-control border-0 custom-toggle-switch" style="margin-top: -15px;">
+                                <div class="form-check form-switch form-switch-lg">
+                                    <input class="form-check-input" type="checkbox" name="abaikan_sync_log" id="abaikan_sync_log">
+                                    <label class="form-check-label" for="abaikan_sync_log"></label>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-
-
 
                     <div class="form-floating mb-3" style="height: 50px;">
                         <input type="text" name="keterangan" class="form-control" id="keterangan" disabled>
@@ -875,6 +901,7 @@
                         var attendance = response.data.attendance;
                         var employee = response.data.employee;
                         var uangMakan = response.data.uangMakanHarian;
+                        var dendaAbsenHarian = response.data.dendaAbsenHarian;
 
                         $('#reason').val(null);
                         $('#attendenceID').val(attendance.id);
@@ -893,6 +920,7 @@
                             // set form
                             $('#checkout').val(attendance.checkout);
                             $('#checkin').val(attendance.checkin);
+                            $('#reason').val(attendance.reason);
                         } else if (attendance.status == "ALPHA_A" || attendance.status == "LIBUR_L" || attendance.status == "RL_RL") {
                             $('#approvalForm').hide();
                         } else {
@@ -904,13 +932,28 @@
                         }
 
                         $('#jamKerjaName').val(response.data.jamKerja.jenis);
+                        // Uang Makan Harian
                         if (uangMakan == null) {
-                            $('#nominal').val(null).keyup();
+                            $('#nominal_uang_makan').val(null).keyup();
                         } else {
-                            $('#nominal').val(greatFormatRupiah(uangMakan.nominal));
+                            $('#nominal_uang_makan').val(greatFormatRupiah(uangMakan.nominal));
                         }
-
-                        // ASSIGN ATTR
+                        // Denda Absen Harian
+                        if (dendaAbsenHarian == null) {
+                            $('#nominal_denda_keterlambatan').val(null).keyup();
+                        } else {
+                            $('#nominal_denda_keterlambatan').val(greatFormatRupiah(dendaAbsenHarian.nominal)).keyup();
+                        }
+                        // Abaikan sync log
+                        var abaikan_sync_log = attendance.abaikan_sync_log;
+                        if (abaikan_sync_log == "yes") {
+                            // Ya
+                            $('#abaikan_sync_log').attr('checked', true).change();
+                        } else {
+                            // Gak
+                            $('#abaikan_sync_log').attr('checked', false).change();
+                        }
+                        // Assign Attr
                         $('#jamKerjaDetail').data('jam_kerja_id', response.data.jamKerja.id);
                         $('#jamKerjaDetail').data('jenis', response.data.jamKerja.jenis);
                         $('#jamKerjaDetail').data('jam_terlambat', response.data.jamKerja.jam_terlambat);
@@ -1149,8 +1192,8 @@
                             })
                             .then(() => {
                                 $('#generateModal').modal('hide');
-                                attendanceTable.ajax.reload(false);
-                                attendanceTotalTable.ajax.reload(false);
+                                attendanceTable.ajax.reload(null, false);
+                                attendanceTotalTable.ajax.reload(null, false);
                             })
                     } else {
                         Swal.fire({
@@ -1204,8 +1247,8 @@
                             })
                             .then(() => {
                                 $('#generateModal').modal('hide');
-                                attendanceTable.ajax.reload(false);
-                                attendanceTotalTable.ajax.reload(false);
+                                attendanceTable.ajax.reload(null, false);
+                                attendanceTotalTable.ajax.reload(null, false);
                             })
                     } else {
                         Swal.fire({
@@ -1230,17 +1273,21 @@
             var checkIn = $('#checkin').val();
             var checkOut = $('#checkout').val();
             var isApproved = $('#isApproved').val();
-            var nominal = destroyFormatRupiah($('#nominal').val());
+            var nominalUangMakan = destroyFormatRupiah($('#nominal_uang_makan').val());
+            var nominalDendaKeterlambatan = destroyFormatRupiah($('#nominal_denda_keterlambatan').val());
+            var abaikanSyncLog_form = $('#abaikan_sync_log').prop('checked');
+            var abaikanSyncLog = abaikanSyncLog_form == true ? "yes" : "no";
             // append to form
             var formData = new FormData();
             formData.append('attendenceID', attendenceID);
             formData.append('statusKehadiran', statusKehadiran);
             formData.append("reason", reason);
-            formData.append("reason", reason);
             formData.append("checkIn", checkIn);
             formData.append("checkOut", checkOut);
             formData.append("isApproved", isApproved);
-            formData.set('nominal', nominal);
+            formData.append("abaikan_sync_log", abaikanSyncLog);
+            formData.set('nominal_uang_makan', nominalUangMakan);
+            formData.set('nominal_denda_keterlambatan', nominalDendaKeterlambatan);
 
             $.ajax({
                 url: "<?= base_url("list-attendance/update-attendance"); ?>",
@@ -1263,8 +1310,8 @@
                             title: response.message,
                             confirmButtonColor: '#4e73df',
                         }).then((result) => {
-                            attendanceTable.ajax.reload(false);
-                            attendanceTotalTable.ajax.reload(false);
+                            attendanceTable.ajax.reload(null, false);
+                            attendanceTotalTable.ajax.reload(null, false);
 
                             $('#updateModal').modal('hide');
                         });
@@ -1340,8 +1387,8 @@
                 });
             }
         });
-        attendanceTable.ajax.reload(false);
-        attendanceTotalTable.ajax.reload(false);
+        attendanceTable.ajax.reload(null, false);
+        attendanceTotalTable.ajax.reload(null, false);
     });
     $('#bagian_id').select2({
         placeholder: "Cari Bagian",
@@ -1349,8 +1396,8 @@
         allowClear: true,
     }).change(function(e) {
         e.preventDefault();
-        attendanceTable.ajax.reload(false);
-        attendanceTotalTable.ajax.reload(false);
+        attendanceTable.ajax.reload(null, false);
+        attendanceTotalTable.ajax.reload(null, false);
     });
     $('#divisi_id_triwulan').select2({
         placeholder: "Cari Departemen",
@@ -1443,8 +1490,8 @@
     $('#month,#divisi_id,#tipe,#employee_id').change(function(e) {
         e.preventDefault();
         if (attendanceTable) {
-            attendanceTable.ajax.reload(false);
-            attendanceTotalTable.ajax.reload(false);
+            attendanceTable.ajax.reload(null, false);
+            attendanceTotalTable.ajax.reload(null, false);
         }
     });
 
@@ -1507,7 +1554,7 @@
             $("input[name='checkIn']").attr('required', true);
             $("input[name='checkOut']").attr('required', true);
             // $('#reasonForm').hide();
-            // $('#approvalForm').hide();
+            $('#approvalForm').show();
             $('#formInOut').show();
         } else if ($(this).val() == "ALPHA_A" || $(this).val() == "LIBUR_L" || $(this).val() == "RL_RL") {
             $('#approvalForm').hide();

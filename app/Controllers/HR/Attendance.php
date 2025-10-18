@@ -9,6 +9,7 @@ use App\Models\AttendancesModel;
 use App\Models\AttendancesUnitModel;
 use App\Models\BigDaysModel;
 use App\Models\CompaniesModel;
+use App\Models\DendaAbsenHarianModel;
 use App\Models\DivisisModel;
 use App\Models\EmployeeJamKerjaModel;
 use App\Models\EmployeesModel;
@@ -48,6 +49,7 @@ class Attendance extends BaseController
     protected $formLembur;
     protected $AttendanceUnitModel;
     protected $AttendancesApi;
+    protected $DendaAbsenHarianModel;
 
     public function __construct()
     {
@@ -68,6 +70,7 @@ class Attendance extends BaseController
         $this->formLembur = new FormLembur();
         $this->AttendanceUnitModel = new AttendancesUnitModel();
         $this->AttendancesApi = new Attendances();
+        $this->DendaAbsenHarianModel = new DendaAbsenHarianModel();
     }
 
     public function indexLog()
@@ -874,6 +877,7 @@ class Attendance extends BaseController
             $this->AttendanceModel->where('periode >=', $startDate)
                 ->where('periode <=', $endDate)
                 ->where('company_id', $this->this_company_id)
+                ->where('abaikan_sync_log', "no") // yang diabaikan jgn diapus
                 ->delete();
 
             $res = $this->AttendanceModel->generate(
@@ -1011,7 +1015,8 @@ class Attendance extends BaseController
             'employee' => $employee,
             'keterangan' => "-",
             'jamTerlambat' => "-",
-            "uangMakanHarian" => null
+            "uangMakanHarian" => null,
+            "dendaAbsenHarian" => null
         ];
 
         $keterangan = static::keterlambatanCheck(
@@ -1039,9 +1044,12 @@ class Attendance extends BaseController
         // GET JAM KERJA USED
         $jamKerja = $this->EmployeeJamKerjaModel->getJamKerjaUsedByEmployeeId($tanggal, $employeeID);
         $uangMakanHarian = $this->UangMakanHarianModel->where('tanggal', $tanggal)->where('employee_id', $employeeID)->first();
+        $dendaAbsenHarian = $this->DendaAbsenHarianModel->where('tanggal', $tanggal)->where('employee_id', $employeeID)->first();
+
         // APPEND TO RESULT
         $resultData['jamKerja'] = $jamKerja;
         $resultData['uangMakanHarian'] = $uangMakanHarian;
+        $resultData['dendaAbsenHarian'] = $dendaAbsenHarian;
 
         return $this->response->setJSON([
             'data' => $resultData,
@@ -1059,14 +1067,17 @@ class Attendance extends BaseController
             $statusKehadiran = $this->request->getVar('statusKehadiran');
             $reason = $this->request->getVar('reason');
             $isApproved = $this->request->getVar('isApproved');
-            $nominal = $this->request->getVar('nominal');
+            $nominalUangMakan = $this->request->getVar('nominal_uang_makan');
+            $nominalDendaKeterlambatan = $this->request->getVar('nominal_denda_keterlambatan');
+            $abaikanSyncLog = $this->request->getVar('abaikan_sync_log');
 
             $this->AttendanceModel->update($attendenceID, [
                 'checkin' => $checkIN, // in
                 'checkout' => $checkOut, // out
                 'status' => $statusKehadiran,
                 'reason' => $reason,
-                'isApproved' => $isApproved
+                'isApproved' => $isApproved,
+                'abaikan_sync_log' => $abaikanSyncLog
             ]);
 
             $attendance = $this->AttendanceModel->where('id', $attendenceID)->first();
@@ -1081,12 +1092,31 @@ class Attendance extends BaseController
                 $this->UangMakanHarianModel->insert([
                     'employee_id'  => $attendance['employee_id'],
                     'tanggal' => $attendance['periode'],
-                    'nominal' => $nominal,
+                    'nominal' => $nominalUangMakan,
                 ]);
             } else {
                 // Jika uang makan harian sudah ada maka update
                 $this->UangMakanHarianModel->update($uangMakanHarian['id'], [
-                    'nominal' => $nominal
+                    'nominal' => $nominalUangMakan
+                ]);
+            }
+
+            $dendaAbsenHarian = $this->DendaAbsenHarianModel
+                ->where('employee_id', $attendance['employee_id'])
+                ->where('tanggal', $attendance['periode'])
+                ->first();
+
+            if ($dendaAbsenHarian == null) {
+                // insert
+                $this->DendaAbsenHarianModel->insert([
+                    'employee_id'  => $attendance['employee_id'],
+                    'tanggal' => $attendance['periode'],
+                    'nominal' => $nominalDendaKeterlambatan,
+                ]);
+            } else {
+                // Update
+                $this->DendaAbsenHarianModel->update($dendaAbsenHarian['id'], [
+                    'nominal' => $nominalDendaKeterlambatan,
                 ]);
             }
 
@@ -1850,6 +1880,8 @@ class Attendance extends BaseController
         [$year, $month] = explode('-', $monthReq);
 
         $monthName = strtoupper(date('F Y', strtotime("$year-$month-01"))); // contoh: SEPTEMBER 2025
+        $startDate = sprintf('%04d-%02d-01', $year, $month);
+        $endDate   = sprintf('%04d-%02d-%02d', $year, $month, cal_days_in_month(CAL_GREGORIAN, $month, $year));
 
         // ambil data employees
         $condition = [
@@ -1878,6 +1910,22 @@ class Attendance extends BaseController
                 'status' => $l['status'],
             ];
         }
+
+        // mapping data denda keterlambatan
+        $dendaKeterlambatan = !empty($employeeIds) ? $this->DendaAbsenHarianModel->getDendaKeterlambatanByDateRangeAmt(
+            $employeeIds,
+            $startDate,
+            $endDate
+        ) : [];
+
+        $mapDendaKeterlambatan = [];
+        foreach ($dendaKeterlambatan as $d) {
+            $mapDendaKeterlambatan[$d['employee_id']][$d['tanggal']] = [
+                'nominal' => $d['nominal']
+            ];
+        }
+
+        // dd($mapLog);
 
         $bigDays = $this->BigDaysModel
             ->where('company_id', $this->this_company_id)
@@ -1911,17 +1959,19 @@ class Attendance extends BaseController
             $sheet1->mergeCellsByColumnAndRow($colIndex, $rowHeader, $colIndex, $rowHeader + 1);
             $sheet1->setCellValueByColumnAndRow($colIndex++, $rowHeader, $h);
         }
-
         // Header tanggal
         for ($d = 1; $d <= $totalDaysInMonth; $d++) {
             $startCol = $colIndex;
-            $sheet1->mergeCellsByColumnAndRow($startCol, $rowHeader, $startCol + 1, $rowHeader);
+            // Sekarang ada 4 kolom per tanggal: IN, OUT, DENDA, LEMBUR
+            $sheet1->mergeCellsByColumnAndRow($startCol, $rowHeader, $startCol + 3, $rowHeader);
             $sheet1->setCellValueByColumnAndRow($startCol, $rowHeader, $d);
 
             $sheet1->setCellValueByColumnAndRow($startCol, $rowHeader + 1, "IN");
             $sheet1->setCellValueByColumnAndRow($startCol + 1, $rowHeader + 1, "OUT");
+            $sheet1->setCellValueByColumnAndRow($startCol + 2, $rowHeader + 1, "DENDA");
+            $sheet1->setCellValueByColumnAndRow($startCol + 3, $rowHeader + 1, "LEMBUR (MENIT)");
 
-            $colIndex += 2;
+            $colIndex += 4; // tambahkan 4 kolom setiap tanggal
         }
 
         $lastCol = $colIndex - 1;
@@ -1952,25 +2002,49 @@ class Attendance extends BaseController
             for ($d = 1; $d <= $totalDaysInMonth; $d++) {
                 $tanggal = sprintf("%04d-%02d-%02d", $year, $month, $d);
                 $dayLog  = $mapLog[$e['id']][$tanggal] ?? null;
+                $dendaKeterlambatan = $mapDendaKeterlambatan[$e['id']][$tanggal]['nominal'] ?? '';
+                $totalLembur = $mapTotalLembur[$e['id']][$tanggal] ?? ''; // asumsi sudah disiapkan map lembur
+                $formLembur = $this->formLemburModel->where('employee_id', $e['id'])->where('periode', $tanggal)->where('deletedAt', null)->first();
+                $totalJamLembur = null;
+                if ($formLembur != null) {
+                    $waktuSelisihPulangLembur = $this->formLembur::selisihWaktu(
+                        $formLembur['jam_mulai_lembur'],
+                        $formLembur['jam_selesai_lembur']
+                    );
+                    $totalJamLembur = (float)$waktuSelisihPulangLembur['jam'] . " Jam, " . $waktuSelisihPulangLembur['menit'] . " Menit";
+                }
 
                 $in  = $dayLog['in'] ?? '';
                 $out = $dayLog['out'] ?? '';
                 $status = $dayLog['status'] ?? '';
 
-                if ($status) {
+                if ($status != "HADIR_H" && $status != null && $status != "") {
                     $val = explode("_", $status)[1];
                     $in = $out = $val;
                 }
 
+
+
+
                 $sheet1->setCellValueByColumnAndRow($colIndex++, $rowIndex, $in);
                 $sheet1->setCellValueByColumnAndRow($colIndex++, $rowIndex, $out);
+                $sheet1->setCellValueByColumnAndRow($colIndex++, $rowIndex, $dendaKeterlambatan);
+                $sheet1->setCellValueByColumnAndRow($colIndex++, $rowIndex, $totalJamLembur);
             }
             $rowIndex++;
         }
-        // Autosize kolom
+
+        // Border isi
+        $sheet1->getStyle("A{$rowHeader}:" . $sheet1->getCellByColumnAndRow($lastCol, $rowIndex - 1)->getCoordinate())
+            ->applyFromArray([
+                'borders' => ['allBorders' => ['borderStyle' => Border::BORDER_THIN]],
+            ]);
+
+        // Auto width semua kolom termasuk denda dan lembur
         foreach (range('A', $sheet1->getCellByColumnAndRow($lastCol, 1)->getColumn()) as $col) {
             $sheet1->getColumnDimension($col)->setAutoSize(true);
         }
+
 
         // Border isi
         $sheet1->getStyle("A" . ($rowHeader) . ":" . $sheet1->getCellByColumnAndRow($lastCol, $rowIndex - 1)->getCoordinate())
@@ -1982,6 +2056,7 @@ class Attendance extends BaseController
         foreach (range('A', 'E') as $col) {
             $sheet1->getColumnDimension($col)->setAutoSize(true);
         }
+
 
         // ================= Sheet 2 : Rekap =================
         $sheet2 = $spreadsheet->createSheet();
@@ -2320,6 +2395,7 @@ class Attendance extends BaseController
                 'in'     => $l['checkin'],
                 'out'    => $l['checkout'],
                 'status' => $status,
+                'reason' => $l['reason']
             ];
         }
 
@@ -2336,6 +2412,19 @@ class Attendance extends BaseController
             ];
         }
 
+        // mapping data denda keterlambatan
+        $dendaKeterlambatan = !empty($employeeIds) ? $this->DendaAbsenHarianModel->getDendaKeterlambatanByDateRangeAmt(
+            $employeeIds,
+            $startDate,
+            $endDate
+        ) : [];
+
+        $mapDendaKeterlambatan = [];
+        foreach ($dendaKeterlambatan as $d) {
+            $mapDendaKeterlambatan[$d['employee_id']][$d['tanggal']] = [
+                'nominal' => $d['nominal']
+            ];
+        }
 
         // ambil big days
         $bigDays = $this->BigDaysModel
@@ -2379,7 +2468,7 @@ class Attendance extends BaseController
             $row++;
 
             // Header kolom
-            $headers = ['No', 'Nip', 'Nama', 'Divisi', 'Bagian', 'IN', 'OUT', 'Status', 'Uang Makan', 'Terlambat (Menit)', 'Total Lembur'];
+            $headers = ['No', 'Nip', 'Nama', 'Divisi', 'Bagian', 'IN', 'OUT', 'Status', 'Uang Makan', 'Terlambat (Menit)', 'Total Lembur', 'Denda Terlambat', 'Keterangan'];
             $col = 'A';
             foreach ($headers as $h) {
                 $sheet->setCellValue("{$col}{$row}", $h);
@@ -2402,11 +2491,14 @@ class Attendance extends BaseController
                 $nama   = $emp['name'] ?? '';
                 $divisi = $emp['divisi'] ?? '';
                 $bagian = $emp['bagian'] ?? '';
+                $reason = $mapLog[$emp['id']][$tgl]['reason'] ?? '';
 
                 $in     = $mapLog[$emp['id']][$tgl]['in'] ?? '';
                 $out    = $mapLog[$emp['id']][$tgl]['out'] ?? '';
                 $status = $mapLog[$emp['id']][$tgl]['status'] ?? '';
                 $uangMakan = $mapUangMakanHarian[$emp['id']][$tgl]['nominal'] ?? 0;
+                $uangDendaKeterlambatan = $mapDendaKeterlambatan[$emp['id']][$tgl]['nominal'] ?? 0;
+
                 $keterlambatanMenit = "";
                 $formLembur = $this->formLemburModel->where('employee_id', $emp['id'])->where('periode', $tgl)->where('deletedAt', null)->first();
                 $totalJamLembur = null;
@@ -2465,18 +2557,31 @@ class Attendance extends BaseController
                 $sheet->setCellValue("I{$row}", $uangMakan);
                 $sheet->setCellValue("J{$row}", !empty($keterlambatanMenit) ? $keterlambatanMenit : '');
                 $sheet->setCellValue("K{$row}", !empty($totalJamLembur) ? $totalJamLembur : '');
+                $sheet->setCellValue("L{$row}", $uangDendaKeterlambatan);
+                $sheet->setCellValue("M{$row}", $reason);
 
                 // border untuk isi
-                $sheet->getStyle("A{$row}:K{$row}")->applyFromArray([
+                $sheet->getStyle("A{$row}:M{$row}")->applyFromArray([
                     'borders' => ['allBorders' => ['borderStyle' => Border::BORDER_THIN]]
                 ]);
 
+                // Untuk Uang Makan
                 $sheet->setCellValue("I{$row}", $uangMakan);
                 $sheet->getStyle("I{$row}")
                     ->getNumberFormat()
                     ->setFormatCode('#,##0');
 
                 $sheet->getStyle("I{$row}")
+                    ->getAlignment()
+                    ->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_RIGHT);
+
+                // Untuk Denda
+                $sheet->setCellValue("L{$row}", $uangMakan);
+                $sheet->getStyle("L{$row}")
+                    ->getNumberFormat()
+                    ->setFormatCode('#,##0');
+
+                $sheet->getStyle("L{$row}")
                     ->getAlignment()
                     ->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_RIGHT);
 
