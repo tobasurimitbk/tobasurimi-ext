@@ -599,11 +599,6 @@ class JasaVendorInModel extends Model
             }
         }
 
-        // // Untuk non one_raw, kita perlu convert associative array ke numeric array
-        // if (!empty($result) && !$result[0]['is_one_raw']) {
-        //     $listBarangMasukGrouped = array_values($listBarangMasukGrouped);
-        // }
-
         $resultGroup = [];
 
         foreach ($result as $item) {
@@ -685,12 +680,20 @@ class JasaVendorInModel extends Model
 
         } else {
             // 🔹 Kondisi NORMAL (non one_raw)
+            // 🔹 Kondisi NORMAL (non one_raw)
             foreach ($resultGroup as $groupKey => $items) {
                 list($supplierId, $keterangan, $stock_dokumen) = explode('|', $groupKey);
                 
                 $qtyTotal = 0;
-                foreach ($items as $i) {
-                    $qtyTotal += (float)$i['qty_out'];
+                $allListBarangMasuk = [];
+
+                foreach ($items as $item) {
+                    $qtyTotal += (float)$item['qty_out'];
+                    
+                    // Kumpulkan semua list_barang_masuk dari semua item dalam group
+                    foreach ($item['list_barang_masuk'] as $barangMasuk) {
+                        $allListBarangMasuk[] = $barangMasuk;
+                    }
                 }
 
                 $barangArr = explode("-", $items[0]['barang_out']);
@@ -706,18 +709,9 @@ class JasaVendorInModel extends Model
                     "barang_out" => count($barangArr) == 0 ? "-" : $barangArr[0],
                     "qty_out" => $qtyTotal,
                     "satuan_out" => $items[0]['satuan_out'],
-                    "list_barang_masuk" => [],
+                    "list_barang_masuk" => $allListBarangMasuk, // Langsung pakai semua data
                     "is_one_raw" => false
                 ];
-
-                // isi list_barang_masuk untuk non-one_raw
-                $barang1Id = $items[0]['barang1_id'];
-                foreach ($listBarangMasukGrouped as $key => $listBarang) {
-                    list($bId, $doc, $stockInId) = explode('|', $key);
-                    if ($bId == $barang1Id && $doc == $stock_dokumen) {
-                        $groupData['list_barang_masuk'][] = $listBarang;
-                    }
-                }
 
                 $dataGroup[] = $groupData;
             }
