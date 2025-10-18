@@ -1007,7 +1007,7 @@ class RMPurchaseOrderModel extends Model
         satuans.kode_satuan AS satuanName, 
         companies.company AS companyName, 
         rm_purchase_orders.pph AS poPPH,
-        supplier_harga.spesifikasi AS spekName,
+        barang_master_spesifikasi.spesifikasi AS spekName,
         divisis.divisi AS divisiName,
         divisis.id AS divisi_id,
         rm_purchase_orders.dpp_harian AS sum_dpp_harian, 
@@ -1037,12 +1037,14 @@ class RMPurchaseOrderModel extends Model
         ";
 
         $poBBLokalData = $this->asObject()
+            ->distinct()
             ->select($selectQry)
             ->join('suppliers', 'suppliers.id = rm_purchase_orders.supplier_id', 'left')
             ->join('companies', 'companies.id = rm_purchase_orders.company_id', 'left')
             ->join('users', 'rm_purchase_orders.createdBy = users.id', 'left')
-            ->join('barang_master', 'rm_purchase_orders.barang_id = barang_master.id', 'left')
             ->join('rm_purchase_order_details', 'rm_purchase_order_details.rm_purchase_order_id = rm_purchase_orders.id', 'left')
+            ->join('barang_master', 'rm_purchase_order_details.barang1_id = barang_master.id', 'left')
+            ->join('barang_master_spesifikasi', 'rm_purchase_order_details.barang2_id = barang_master_spesifikasi.id', 'left')
             ->join('penerimaan_barang_detail', 'penerimaan_barang_detail.purchase_order_details_id = rm_purchase_order_details.id AND penerimaan_barang_detail.purchase_order_id = rm_purchase_orders.id', 'left')
             ->join('satuans', 'satuans.id = rm_purchase_order_details.satuan_id', 'left')
             ->join('penerimaan_barang', 'penerimaan_barang_detail.penerimaan_barang_id = penerimaan_barang.id', 'left')
