@@ -77,6 +77,8 @@ class SuratJalanDetailModel extends Model
                       surat_jalan_so_detail.tax AS tax,
                       surat_jalan_so_detail.amount AS amount,
                       surat_jalan_so_detail.id_surat_jalan,
+                      surat_jalan_so_detail.id_sales_order,
+                      surat_jalan_so_detail.id_sales_order_detail,
                       surat_jalan_so_detail.harga_barang AS harga_barang,
                       surat_jalan_so_detail.status_ppn AS statusppn,
                       surat_jalan_so_detail.tipe_input AS tipe_input,
