@@ -83,6 +83,7 @@ class SuratJalanDetailModel extends Model
                       surat_jalan_so_detail.status_ppn AS statusppn,
                       surat_jalan_so_detail.tipe_input AS tipe_input,
                       surat_jalan_so_detail.keterangan AS keterangan,
+                      surat_jalan_so_detail.*,
                       surat_jalan_so.id_company,
                       sales_order.no_sales_order";
 
