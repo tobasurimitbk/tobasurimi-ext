@@ -1263,6 +1263,7 @@ class Invoice extends BaseController
                 $qtyAvailable = (float)$d->qty_sekarang;
                 $invoicedQty = $invoicedSOQty[$key] ?? 0;
                 $remaining = $qtyAvailable - $invoicedQty;
+                $d->qty_sekarang = $remaining;
                 return $remaining > 0;
             });
 
@@ -1271,6 +1272,7 @@ class Invoice extends BaseController
                 $qtyAvailable = (float)$d->qty_sekarang;
                 $invoicedQty = $invoicedSOQty[$key] ?? 0;
                 $remaining = $qtyAvailable - $invoicedQty;
+                $d->qty_sekarang = $remaining;
                 return $remaining > 0;
             });
         } else if ($docType == 'pengiriman') {
