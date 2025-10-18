@@ -1079,52 +1079,36 @@
         } else {
             if ($('.create-form').valid()) {
                 let data = new FormData(document.querySelector(".create-form"));
-                data.append('listBarang', JSON.stringify(listDataSelected));
+                data.append('listData', JSON.stringify(listDataSelected));
 
-                Swal.fire({
-                    icon: 'question',
-                    title: 'Simpan Data ?',
-                    confirmButtonColor: '#4e73df',
-                    cancelButtonColor: '#d33',
-                    showCancelButton: true,
-                    reverseButtons: true,
-                    confirmButtonText: 'Simpan',
-                    cancelButtonText: 'Kembali',
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        let data = new FormData(document.querySelector(".create-form"));
-                        data.append('listData', JSON.stringify(listDataSelected));
-
-                        $.ajax({
-                            url: "<?= base_url("bea-cukai-bc-40/po/update"); ?>",
-                            data: data,
-                            beforeSend: function(xhr) {
-                                xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                                setLoading();
-                            },
-                            complete: function() {
-                                stopLoading()
-                            },
-                            method: "POST",
-                            dataType: "json",
-                            processData: false,
-                            contentType: false,
-                            success: function(response) {
-                                Swal.fire({
-                                    icon: 'success',
-                                    title: response.message,
-                                    confirmButtonColor: '#4e73df',
-                                    confirmButtonText: 'Ok'
-                                }).then((result) => {
-                                    if (result.isConfirmed) {
-                                        location.reload();
-                                    }
-                                });
-
-                            },
+                $.ajax({
+                    url: "<?= base_url("bea-cukai-bc-40/po/update"); ?>",
+                    data: data,
+                    beforeSend: function(xhr) {
+                        xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                        setLoading();
+                    },
+                    complete: function() {
+                        stopLoading()
+                    },
+                    method: "POST",
+                    dataType: "json",
+                    processData: false,
+                    contentType: false,
+                    success: function(response) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: response.message,
+                            confirmButtonColor: '#4e73df',
+                            confirmButtonText: 'Ok'
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                location.reload();
+                            }
                         });
-                    }
-                })
+
+                    },
+                });
             }
         }
     })

@@ -895,14 +895,14 @@
                 contentType: false,
                 success: function(response) {
                     csrf.val(response.token);
-                    Swal.fire({
-                        icon: 'success',
-                        title: response.message,
-                        confirmButtonColor: '#4e73df',
-                        confirmButtonText: 'Ok'
-                    }).then((result) => {
-                        location.reload();
-                    });
+                    location.reload();
+
+                    // Swal.fire({
+                    //     icon: 'success',
+                    //     title: response.message,
+                    //     confirmButtonColor: '#4e73df',
+                    //     confirmButtonText: 'Ok'
+                    // }).then((result) => {});
                 },
             });
         }
@@ -940,15 +940,16 @@
                 success: function(response) {
                     if (response.status) {
                         csrf.val(response.token);
-                        Swal.fire({
-                            icon: 'success',
-                            title: response.message,
-                            confirmButtonColor: '#4e73df',
-                            confirmButtonText: 'Ok'
-                        }).then((result) => {
-                            csrf.val(response.token);
-                            tableListInformasiDokumen.ajax.reload();
-                        });
+                        tableListInformasiDokumen.ajax.reload();
+                        // Swal.fire({
+                        //     icon: 'success',
+                        //     title: response.message,
+                        //     confirmButtonColor: '#4e73df',
+                        //     confirmButtonText: 'Ok'
+                        // }).then((result) => {
+                        //     csrf.val(response.token);
+
+                        // });
                     }
                 },
             });
@@ -989,15 +990,16 @@
                 contentType: false,
                 success: function(response) {
                     if (response.status) {
-                        Swal.fire({
-                            icon: 'success',
-                            title: response.message,
-                            confirmButtonColor: '#4e73df',
-                            confirmButtonText: 'Ok'
-                        }).then((result) => {
-                            csrf.val(response.token);
-                            tableListInformasiDokumen.ajax.reload();
-                        });
+                        csrf.val(response.token);
+                        tableListInformasiDokumen.ajax.reload();
+                        // Swal.fire({
+                        //     icon: 'success',
+                        //     title: response.message,
+                        //     confirmButtonColor: '#4e73df',
+                        //     confirmButtonText: 'Ok'
+                        // }).then((result) => {
+
+                        // });
 
                     }
                 },
@@ -1055,15 +1057,15 @@
             success: function(response) {
                 if (response.status) {
                     csrf.val(response.token);
-                    Swal.fire({
-                        icon: 'success',
-                        title: response.message,
-                        confirmButtonColor: '#4e73df',
-                        confirmButtonText: 'Ok'
-                    }).then((result) => {
-                        csrf.val(response.token);
-                        tableListInformasiDokumen.ajax.reload();
-                    });
+                    tableListInformasiDokumen.ajax.reload();
+                    // Swal.fire({
+                    //     icon: 'success',
+                    //     title: response.message,
+                    //     confirmButtonColor: '#4e73df',
+                    //     confirmButtonText: 'Ok'
+                    // }).then((result) => {
+
+                    // });
                 }
             },
         });

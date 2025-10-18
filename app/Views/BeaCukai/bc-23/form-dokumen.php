@@ -259,100 +259,74 @@
     $('.btn-submit-dokumen').click(function() {
         var id = $('#bc_dokumen_id').val();
         if ($('#form-dokumen').valid()) {
-            Swal.fire({
-                icon: 'question',
-                title: id == '' ? 'Simpan Dokumen ?' : "Update Dokumen ?",
-                confirmButtonColor: '#4e73df',
-                cancelButtonColor: '#d33',
-                showCancelButton: true,
-                reverseButtons: true,
-                confirmButtonText: 'Ya',
-                cancelButtonText: 'Kembali',
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    var id = $('#bc_dokumen_id').val();
-                    var url = '';
-                    var formData = new FormData(document.querySelector("#form-dokumen"));
-                    formData.append("bc_purchase_order_id", "<?= encrypt($bcPo['id']) ?>");
+            var id = $('#bc_dokumen_id').val();
+            var url = '';
+            var formData = new FormData(document.querySelector("#form-dokumen"));
+            formData.append("bc_purchase_order_id", "<?= encrypt($bcPo['id']) ?>");
 
-                    if (id == '') {
-                        // Create
-                        url = "<?= base_url("bea-cukai-bc-23/id/dokumen/create"); ?>";
+            if (id == '') {
+                // Create
+                url = "<?= base_url("bea-cukai-bc-23/id/dokumen/create"); ?>";
+            } else {
+                // Update
+                url = "<?= base_url("bea-cukai-bc-23/id/dokumen/update"); ?>";
+            }
+
+            $.ajax({
+                url: url,
+                data: formData,
+                beforeSend: function(xhr) {
+                    xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                    setLoading();
+                },
+                complete: function() {
+                    stopLoading();
+                },
+                method: "POST",
+                dataType: "json",
+                processData: false,
+                contentType: false,
+                success: function(response) {
+                    if (response.status) {
+                        csrf.val(response.token);
+                        tableListInformasiDokumen.ajax.reload();
+                        resetForm();
                     } else {
-                        // Update
-                        url = "<?= base_url("bea-cukai-bc-23/id/dokumen/update"); ?>";
+                        Swal.fire({
+                            icon: 'error',
+                            title: response.message,
+                            confirmButtonColor: '#4e73df',
+                            confirmButtonText: 'Ok'
+                        })
                     }
-
-                    $.ajax({
-                        url: url,
-                        data: formData,
-                        beforeSend: function(xhr) {
-                            xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                            setLoading();
-                        },
-                        complete: function() {
-                            stopLoading();
-                        },
-                        method: "POST",
-                        dataType: "json",
-                        processData: false,
-                        contentType: false,
-                        success: function(response) {
-                            if (response.status) {
-                                csrf.val(response.token);
-                                tableListInformasiDokumen.ajax.reload();
-                                resetForm();
-                            } else {
-                                Swal.fire({
-                                    icon: 'error',
-                                    title: response.message,
-                                    confirmButtonColor: '#4e73df',
-                                    confirmButtonText: 'Ok'
-                                })
-                            }
-                        },
-                    });
-                }
-            })
+                },
+            });
         }
     });
 
     function removeDokumen(id) {
-        Swal.fire({
-            icon: 'question',
-            title: 'Hapus Dokumen ?',
-            confirmButtonColor: '#4e73df',
-            cancelButtonColor: '#d33',
-            showCancelButton: true,
-            reverseButtons: true,
-            confirmButtonText: 'Hapus',
-            cancelButtonText: 'Kembali',
-        }).then((result) => {
-            if (result.isConfirmed) {
-                const csrf = $(`[name="${csrfToken}"]`);
-                $.ajax({
-                    url: "<?= base_url("bea-cukai-bc-23/id/dokumen/delete"); ?>",
-                    data: {
-                        id: id
-                    },
-                    beforeSend: function(xhr) {
-                        xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                        setLoading();
-                    },
-                    complete: function() {
-                        stopLoading();
-                    },
-                    method: "POST",
-                    dataType: "json",
-                    success: function(response) {
-                        csrf.val(response.token);
-                        if (response.status) {
-                            tableListInformasiDokumen.ajax.reload();
-                        }
-                    },
-                });
-            }
-        })
+        const csrf = $(`[name="${csrfToken}"]`);
+        $.ajax({
+            url: "<?= base_url("bea-cukai-bc-23/id/dokumen/delete"); ?>",
+            data: {
+                id: id
+            },
+            beforeSend: function(xhr) {
+                xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                setLoading();
+            },
+            complete: function() {
+                stopLoading();
+            },
+            method: "POST",
+            dataType: "json",
+            success: function(response) {
+                csrf.val(response.token);
+                if (response.status) {
+                    tableListInformasiDokumen.ajax.reload();
+                }
+            },
+        });
 
     }
 

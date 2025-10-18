@@ -626,12 +626,12 @@
                 csrf.val(res.token);
                 tableListInformasiPetiKemas.ajax.reload();
                 if (res.status) {
-                    Swal.fire({
-                        icon: 'success',
-                        title: res.message,
-                        confirmButtonColor: '#4e73df',
-                        confirmButtonText: 'Ok'
-                    });
+                    // Swal.fire({
+                    //     icon: 'success',
+                    //     title: res.message,
+                    //     confirmButtonColor: '#4e73df',
+                    //     confirmButtonText: 'Ok'
+                    // });
                 } else {
                     Swal.fire({
                         icon: 'error',

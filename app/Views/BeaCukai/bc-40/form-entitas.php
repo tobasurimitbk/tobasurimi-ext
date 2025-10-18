@@ -342,16 +342,15 @@
                 contentType: false,
                 success: function(response) {
                     if (response.status) {
-                        Swal.fire({
-                            icon: 'success',
-                            title: response.message,
-                            confirmButtonColor: '#4e73df',
-                            confirmButtonText: 'Ok'
-                        }).then((result) => {
-                            if (result.isConfirmed) {
-                                location.reload();
-                            }
-                        });
+                        // Swal.fire({
+                        //     icon: 'success',
+                        //     title: response.message,
+                        //     confirmButtonColor: '#4e73df',
+                        //     confirmButtonText: 'Ok'
+                        // }).then((result) => {
+                        //     if (result.isConfirmed) {}
+                        // });
+                        location.reload();
                     }
                 },
             });

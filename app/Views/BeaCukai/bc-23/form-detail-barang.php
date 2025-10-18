@@ -926,63 +926,49 @@
 
     $('.btn-submit-pungutan').click(function() {
         if ($('#form-pungutan').valid()) {
+            var formData = new FormData(document.querySelector("#form-pungutan"));
             var id = $('#bc_barang_tarif_id').val();
-            Swal.fire({
-                icon: 'question',
-                title: id == '' ? 'Simpan Pungutan ?' : 'Update Pungutan ?',
-                confirmButtonColor: '#4e73df',
-                cancelButtonColor: '#d33',
-                showCancelButton: true,
-                reverseButtons: true,
-                confirmButtonText: 'Ya',
-                cancelButtonText: 'Kembali',
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    var formData = new FormData(document.querySelector("#form-pungutan"));
-                    var id = $('#bc_barang_tarif_id').val();
-                    var url = '';
-                    formData.append("penerimaan_barang_id", "<?= encrypt($barangDetail['penerimaan_barang_id']) ?>");
-                    formData.append("barang1_id", "<?= encrypt($barangDetail['barang1_id']) ?>");
-                    formData.append("bc_purchase_order_id", "<?= encrypt($bcPo['id']) ?>");
-                    if (id) {
-                        // Update
-                        url = "<?= base_url("bea-cukai-bc-23/id/barang-pungutan-update"); ?>";
-                    } else {
-                        // Create
-                        url = "<?= base_url("bea-cukai-bc-23/id/barang-pungutan-create"); ?>";
+            var url = '';
+            formData.append("penerimaan_barang_id", "<?= encrypt($barangDetail['penerimaan_barang_id']) ?>");
+            formData.append("barang1_id", "<?= encrypt($barangDetail['barang1_id']) ?>");
+            formData.append("bc_purchase_order_id", "<?= encrypt($bcPo['id']) ?>");
+            if (id) {
+                // Update
+                url = "<?= base_url("bea-cukai-bc-23/id/barang-pungutan-update"); ?>";
+            } else {
+                // Create
+                url = "<?= base_url("bea-cukai-bc-23/id/barang-pungutan-create"); ?>";
 
+            }
+            $.ajax({
+                url: url,
+                data: formData,
+                beforeSend: function(xhr) {
+                    xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                    setLoading();
+                },
+                complete: function() {
+                    stopLoading();
+                },
+                method: "POST",
+                dataType: "json",
+                processData: false,
+                contentType: false,
+                success: function(response) {
+                    csrf.val(response.token);
+                    if (response.status) {
+                        tableListInformasiPungutan.ajax.reload();
+                        resetFormPungutan();
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: response.message,
+                            confirmButtonColor: '#4e73df',
+                            confirmButtonText: 'Ok'
+                        });
                     }
-                    $.ajax({
-                        url: url,
-                        data: formData,
-                        beforeSend: function(xhr) {
-                            xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                            setLoading();
-                        },
-                        complete: function() {
-                            stopLoading();
-                        },
-                        method: "POST",
-                        dataType: "json",
-                        processData: false,
-                        contentType: false,
-                        success: function(response) {
-                            csrf.val(response.token);
-                            if (response.status) {
-                                tableListInformasiPungutan.ajax.reload();
-                                resetFormPungutan();
-                            } else {
-                                Swal.fire({
-                                    icon: 'error',
-                                    title: response.message,
-                                    confirmButtonColor: '#4e73df',
-                                    confirmButtonText: 'Ok'
-                                });
-                            }
-                        },
-                    });
-                }
-            })
+                },
+            });
 
         }
     });
@@ -1032,76 +1018,56 @@
 
     $('.btn-simpan-detail-barang-form-view').click(function() {
         if ($('#form-barang-dokumen').valid()) {
-            Swal.fire({
-                icon: 'question',
-                title: "Update Detail Barang Dokumen ?",
-                confirmButtonColor: '#4e73df',
-                cancelButtonColor: '#d33',
-                showCancelButton: true,
-                reverseButtons: true,
-                confirmButtonText: 'Ya',
-                cancelButtonText: 'Kembali',
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    var formData = new FormData(document.querySelector("#form-barang-dokumen"));
-                    var barangDetailHarga = destroyFormatRupiah($('#barang_detail_harga').val());
-                    var barangDetailBiayaTambahan = destroyFormatRupiah($('#barang_detail_biaya_tambahan').val());
-                    var barangDetailFob = destroyFormatRupiah($('#barang_detail_fob').val());
-                    var barangDetailHargaSatuan = destroyFormatRupiah($('#barang_detail_harga_satuan').val());
-                    var barangDetailFreight = destroyFormatRupiah($('#barang_detail_freight').val());
-                    var barangDetailAsuransi = destroyFormatRupiah($('#barang_detail_asuransi').val());
-                    var barangDetailCif = destroyFormatRupiah($('#barang_detail_cif').val());
-                    var barangDetailNilaiPabean = destroyFormatRupiah($('#barang_detail_nilai_pabean').val());
-                    var barangDetailJumlahSatuan = destroyFormatRupiah($('#barang_detail_jumlah_satuan').val());
-                    var barangDetailJumlahKemasan = destroyFormatRupiah($('#barang_detail_jumlah_kemasan').val());
-                    var barangDetailBeratBersih = destroyFormatRupiah($('#barang_detail_berat_bersih').val());
+            var formData = new FormData(document.querySelector("#form-barang-dokumen"));
+            var barangDetailHarga = destroyFormatRupiah($('#barang_detail_harga').val());
+            var barangDetailBiayaTambahan = destroyFormatRupiah($('#barang_detail_biaya_tambahan').val());
+            var barangDetailFob = destroyFormatRupiah($('#barang_detail_fob').val());
+            var barangDetailHargaSatuan = destroyFormatRupiah($('#barang_detail_harga_satuan').val());
+            var barangDetailFreight = destroyFormatRupiah($('#barang_detail_freight').val());
+            var barangDetailAsuransi = destroyFormatRupiah($('#barang_detail_asuransi').val());
+            var barangDetailCif = destroyFormatRupiah($('#barang_detail_cif').val());
+            var barangDetailNilaiPabean = destroyFormatRupiah($('#barang_detail_nilai_pabean').val());
+            var barangDetailJumlahSatuan = destroyFormatRupiah($('#barang_detail_jumlah_satuan').val());
+            var barangDetailJumlahKemasan = destroyFormatRupiah($('#barang_detail_jumlah_kemasan').val());
+            var barangDetailBeratBersih = destroyFormatRupiah($('#barang_detail_berat_bersih').val());
 
-                    formData.set('barang_detail_harga', barangDetailHarga);
-                    formData.set('barang_detail_biaya_tambahan', barangDetailBiayaTambahan);
-                    formData.set('barang_detail_fob', barangDetailFob);
-                    formData.set('barang_detail_harga_satuan', barangDetailHargaSatuan);
-                    formData.set('barang_detail_freight', barangDetailFreight);
-                    formData.set('barang_detail_asuransi', barangDetailAsuransi);
-                    formData.set('barang_detail_cif', barangDetailCif);
-                    formData.set('barang_detail_nilai_pabean', barangDetailNilaiPabean);
-                    formData.set('barang_detail_jumlah_satuan', barangDetailJumlahSatuan);
-                    formData.set('barang_detail_jumlah_kemasan', barangDetailJumlahKemasan);
-                    formData.set('barang_detail_berat_bersih', barangDetailBeratBersih);
+            formData.set('barang_detail_harga', barangDetailHarga);
+            formData.set('barang_detail_biaya_tambahan', barangDetailBiayaTambahan);
+            formData.set('barang_detail_fob', barangDetailFob);
+            formData.set('barang_detail_harga_satuan', barangDetailHargaSatuan);
+            formData.set('barang_detail_freight', barangDetailFreight);
+            formData.set('barang_detail_asuransi', barangDetailAsuransi);
+            formData.set('barang_detail_cif', barangDetailCif);
+            formData.set('barang_detail_nilai_pabean', barangDetailNilaiPabean);
+            formData.set('barang_detail_jumlah_satuan', barangDetailJumlahSatuan);
+            formData.set('barang_detail_jumlah_kemasan', barangDetailJumlahKemasan);
+            formData.set('barang_detail_berat_bersih', barangDetailBeratBersih);
 
-                    formData.append("penerimaan_barang_id", "<?= encrypt($barangDetail['penerimaan_barang_id']) ?>");
-                    formData.append("barang1_id", "<?= encrypt($barangDetail['barang1_id']) ?>");
-                    formData.append("bc_purchase_order_id", "<?= encrypt($bcPo['id']) ?>");
+            formData.append("penerimaan_barang_id", "<?= encrypt($barangDetail['penerimaan_barang_id']) ?>");
+            formData.append("barang1_id", "<?= encrypt($barangDetail['barang1_id']) ?>");
+            formData.append("bc_purchase_order_id", "<?= encrypt($bcPo['id']) ?>");
 
-                    $.ajax({
-                        url: "<?= base_url("bea-cukai-bc-23/id/barang"); ?>",
-                        data: formData,
-                        beforeSend: function(xhr) {
-                            xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                            $('#btn-loading').show();
-                            $('.btn-simpan-detail-barang-form-view').hide();
-                        },
-                        complete: function() {
-                            $('#btn-loading').hide();
-                            $('.btn-simpan-detail-barang-form-view').show();
-                        },
-                        method: "POST",
-                        dataType: "json",
-                        processData: false,
-                        contentType: false,
-                        success: function(response) {
-                            csrf.val(response.token);
-                            Swal.fire({
-                                icon: 'success',
-                                title: response.message,
-                                confirmButtonColor: '#4e73df',
-                                confirmButtonText: 'Ok'
-                            }).then((result) => {
-                                location.reload();
-                            });
-                        },
-                    });
-                }
-            })
+            $.ajax({
+                url: "<?= base_url("bea-cukai-bc-23/id/barang"); ?>",
+                data: formData,
+                beforeSend: function(xhr) {
+                    xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                    $('#btn-loading').show();
+                    $('.btn-simpan-detail-barang-form-view').hide();
+                },
+                complete: function() {
+                    $('#btn-loading').hide();
+                    $('.btn-simpan-detail-barang-form-view').show();
+                },
+                method: "POST",
+                dataType: "json",
+                processData: false,
+                contentType: false,
+                success: function(response) {
+                    csrf.val(response.token);
+                    location.reload();
+                },
+            });
         }
     })
 
@@ -1114,144 +1080,87 @@
 
         if (isChecked) {
             // Tambah
-            Swal.fire({
-                icon: 'question',
-                title: "Simpan dokumen dengan nomor seri " + seriDokumen + " ?",
-                confirmButtonColor: '#4e73df',
-                cancelButtonColor: '#d33',
-                showCancelButton: true,
-                reverseButtons: true,
-                confirmButtonText: 'Ya',
-                cancelButtonText: 'Kembali',
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    var formData = new FormData();
-                    formData.append("penerimaan_barang_id", "<?= encrypt($barangDetail['penerimaan_barang_id']) ?>");
-                    formData.append("barang1_id", "<?= encrypt($barangDetail['barang1_id']) ?>");
-                    formData.append("bc_purchase_order_id", "<?= encrypt($bcPo['id']) ?>");
-                    formData.append("bc_dokumen_id", bc23DokumenID);
-                    formData.append("seri_dokumen", seriDokumen);
-                    $.ajax({
-                        url: "<?= base_url("bea-cukai-bc-23/id/barang-dokumen-create"); ?>",
-                        data: formData,
-                        beforeSend: function(xhr) {
-                            xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                            setLoading();
-                        },
-                        complete: function() {
-                            stopLoading();
-                        },
-                        method: "POST",
-                        dataType: "json",
-                        processData: false,
-                        contentType: false,
-                        success: function(response) {
-                            if (response.status) {
-                                csrf.val(response.token);
-                                Swal.fire({
-                                    icon: 'success',
-                                    title: response.message,
-                                    confirmButtonColor: '#4e73df',
-                                    confirmButtonText: 'Ok'
-                                }).then((result) => {
-                                    csrf.val(response.token);
-                                    tableListInformasiDokumen.ajax.reload();
-                                });
-                            }
-                        },
-                    });
-                } else {
-                    checkbox.prop('checked', false);
-                }
+            var formData = new FormData();
+            formData.append("penerimaan_barang_id", "<?= encrypt($barangDetail['penerimaan_barang_id']) ?>");
+            formData.append("barang1_id", "<?= encrypt($barangDetail['barang1_id']) ?>");
+            formData.append("bc_purchase_order_id", "<?= encrypt($bcPo['id']) ?>");
+            formData.append("bc_dokumen_id", bc23DokumenID);
+            formData.append("seri_dokumen", seriDokumen);
+            $.ajax({
+                url: "<?= base_url("bea-cukai-bc-23/id/barang-dokumen-create"); ?>",
+                data: formData,
+                beforeSend: function(xhr) {
+                    xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                    setLoading();
+                },
+                complete: function() {
+                    stopLoading();
+                },
+                method: "POST",
+                dataType: "json",
+                processData: false,
+                contentType: false,
+                success: function(response) {
+                    if (response.status) {
+                        csrf.val(response.token);
+                        tableListInformasiDokumen.ajax.reload();
+                    }
+                },
             });
+
         } else {
             // Hapus
-            Swal.fire({
-                icon: 'question',
-                title: "Hapus dokumen dengan nomor seri " + seriDokumen + " ?",
-                confirmButtonColor: '#4e73df',
-                cancelButtonColor: '#d33',
-                showCancelButton: true,
-                reverseButtons: true,
-                confirmButtonText: 'Ya',
-                cancelButtonText: 'Kembali',
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    var formData = new FormData();
-                    formData.append("id", barangDokumenID);
-                    $.ajax({
-                        url: "<?= base_url("bea-cukai-bc-23/id/barang-dokumen-delete"); ?>",
-                        data: formData,
-                        beforeSend: function(xhr) {
-                            xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                            setLoading();
-                        },
-                        complete: function() {
-                            stopLoading();
-                        },
-                        method: "POST",
-                        dataType: "json",
-                        processData: false,
-                        contentType: false,
-                        success: function(response) {
-                            if (response.status) {
-                                Swal.fire({
-                                    icon: 'success',
-                                    title: response.message,
-                                    confirmButtonColor: '#4e73df',
-                                    confirmButtonText: 'Ok'
-                                }).then((result) => {
-                                    csrf.val(response.token);
-                                    tableListInformasiDokumen.ajax.reload();
-                                });
+            var formData = new FormData();
+            formData.append("id", barangDokumenID);
+            $.ajax({
+                url: "<?= base_url("bea-cukai-bc-23/id/barang-dokumen-delete"); ?>",
+                data: formData,
+                beforeSend: function(xhr) {
+                    xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                    setLoading();
+                },
+                complete: function() {
+                    stopLoading();
+                },
+                method: "POST",
+                dataType: "json",
+                processData: false,
+                contentType: false,
+                success: function(response) {
+                    if (response.status) {
+                        csrf.val(response.token);
+                        tableListInformasiDokumen.ajax.reload();
 
-                            }
-                        },
-                    });
-                } else {
-                    checkbox.prop('checked', true);
-                }
+                    }
+                },
             });
         }
     });
 
 
     function removePungutan(id) {
-        Swal.fire({
-            icon: 'question',
-            title: 'Hapus Pungutan ?',
-            confirmButtonColor: '#4e73df',
-            cancelButtonColor: '#d33',
-            showCancelButton: true,
-            reverseButtons: true,
-            confirmButtonText: 'Hapus',
-            cancelButtonText: 'Kembali',
-        }).then((result) => {
-            if (result.isConfirmed) {
-                const csrf = $(`[name="${csrfToken}"]`);
-                $.ajax({
-                    url: "<?= base_url("bea-cukai-bc-23/id/barang-pungutan-delete"); ?>",
-                    data: {
-                        id: id
-                    },
-                    beforeSend: function(xhr) {
-                        xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                        setLoading();
-                    },
-                    complete: function() {
-                        stopLoading();
-                    },
-                    method: "POST",
-                    dataType: "json",
-                    success: function(response) {
-                        csrf.val(response.token);
-                        if (response.status) {
-                            tableListInformasiPungutan.ajax.reload();
-                        }
-                    },
-                });
-            }
-        })
+        const csrf = $(`[name="${csrfToken}"]`);
+        $.ajax({
+            url: "<?= base_url("bea-cukai-bc-23/id/barang-pungutan-delete"); ?>",
+            data: {
+                id: id
+            },
+            beforeSend: function(xhr) {
+                xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                setLoading();
+            },
+            complete: function() {
+                stopLoading();
+            },
+            method: "POST",
+            dataType: "json",
+            success: function(response) {
+                csrf.val(response.token);
+                if (response.status) {
+                    tableListInformasiPungutan.ajax.reload();
+                }
+            },
+        });
     }
 </script>
 
