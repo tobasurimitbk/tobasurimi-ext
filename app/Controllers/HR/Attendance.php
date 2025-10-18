@@ -510,7 +510,8 @@ class Attendance extends BaseController
             "columns"    => $this->request->getVar('columns') ?? [],
             "divisi_id"   => $this->request->getVar('divisi_id'),
             "tipe"        => $this->request->getVar('tipe'),
-            "employee_id" => $this->request->getVar("employee_id")
+            "employee_id" => $this->request->getVar("employee_id"),
+            "bagian_id"     => $this->request->getVar('bagian_id'),
         ];
 
         // ambil list karyawan (sudah paginate)
@@ -698,7 +699,8 @@ class Attendance extends BaseController
             "columns"    => $this->request->getVar('columns') ?? [],
             "divisi_id"   => $this->request->getVar('divisi_id'),
             "tipe"        => $this->request->getVar('tipe'),
-            "employee_id" => $this->request->getVar("employee_id")
+            "employee_id" => $this->request->getVar("employee_id"),
+            "bagian_id" => $this->request->getVar("bagian_id")
         ];
 
         // ambil list karyawan (sudah paginate)
@@ -1857,6 +1859,7 @@ class Attendance extends BaseController
         $addCondition = [
             "divisi_id"   => $this->request->getVar('divisi_id'),
             "tipe"        => $this->request->getVar('tipe'),
+            "bagian_id" => $this->request->getVar("bagian_id")
         ];
         $employees    = $this->EmployeesModel->getEmployeeListAttendances($condition, $addCondition, 0, 10000000);
         $employeeData = $employees['data'];
@@ -2290,6 +2293,7 @@ class Attendance extends BaseController
             "divisi_id"   => $this->request->getVar('divisi_id'),
             "tipe"        => $this->request->getVar('tipe'),
             "employee_id" => $this->request->getVar("employee_id"),
+            "bagian_id" => $this->request->getVar("bagian_id")
         ];
         $employees    = $this->EmployeesModel->getEmployeeListAttendances($condition, $addCondition, 0, 10000000);
         $employeeData = $employees['data'];

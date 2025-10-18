@@ -216,51 +216,38 @@
             });
             return;
         } else {
-            Swal.fire({
-                icon: 'question',
-                title: 'Simpan Data ?',
-                confirmButtonColor: '#4e73df',
-                cancelButtonColor: '#d33',
-                showCancelButton: true,
-                reverseButtons: true,
-                confirmButtonText: 'Simpan',
-                cancelButtonText: 'Kembali',
-            }).then((result) => {
-                let data = new FormData(document.querySelector(".create-form"));
-                data.append('listData', JSON.stringify(listDataSelected));
+            let data = new FormData(document.querySelector(".create-form"));
+            data.append('listData', JSON.stringify(listDataSelected));
 
-                if (result.isConfirmed) {
-                    $.ajax({
-                        url: "<?= base_url("bea-cukai-bc-23/create"); ?>",
-                        data: data,
-                        beforeSend: function(xhr) {
-                            xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                            setLoading();
-                        },
-                        complete: function() {
-                            stopLoading()
-                        },
-                        method: "POST",
-                        dataType: "json",
-                        processData: false,
-                        contentType: false,
-                        success: function(response) {
-                            if (response.status) {
-                                window.location.replace("<?= base_url('bea-cukai-bc-23/po/') ?>" + response.id)
-                            } else {
-                                Swal.fire({
-                                    icon: 'error',
-                                    title: 'Terjadi kesalahan !',
-                                    confirmButtonColor: '#4e73df',
-                                    cancelButtonColor: '#d33',
-                                    reverseButtons: true,
-                                    confirmButtonText: 'Oke',
-                                })
-                            }
-                        },
-                    });
-                }
-            })
+            $.ajax({
+                url: "<?= base_url("bea-cukai-bc-23/create"); ?>",
+                data: data,
+                beforeSend: function(xhr) {
+                    xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                    setLoading();
+                },
+                complete: function() {
+                    stopLoading()
+                },
+                method: "POST",
+                dataType: "json",
+                processData: false,
+                contentType: false,
+                success: function(response) {
+                    if (response.status) {
+                        window.location.replace("<?= base_url('bea-cukai-bc-23/po/') ?>" + response.id)
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Terjadi kesalahan !',
+                            confirmButtonColor: '#4e73df',
+                            cancelButtonColor: '#d33',
+                            reverseButtons: true,
+                            confirmButtonText: 'Oke',
+                        })
+                    }
+                },
+            });
         }
 
     })

@@ -1098,70 +1098,6 @@
             $(".unpost-modal").modal("hide");
         });
 
-        $(".posting-so").click(function() {
-            Swal.fire({
-                icon: 'question',
-                title: 'Yakin akan di Posting?',
-                confirmButtonColor: '#4e73df',
-                cancelButtonColor: '#d33',
-                showCancelButton: true,
-                reverseButtons: true,
-                confirmButtonText: 'Posting',
-                cancelButtonText: 'Kembali',
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    const csrf = $(`[name="${csrfToken}"]`);
-                    $.ajax({
-                        url: "<?= base_url("order-form-internasional/update-status"); ?>",
-                        data: {
-                            id: $(".id").val(),
-                            status: "POSTED"
-                        },
-                        beforeSend: function(xhr) {
-                            xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                        },
-                        method: "POST",
-                        dataType: "json",
-                        success: function(response) {
-                            csrf.val(response.token);
-                            if (response.status) {
-                                Swal.fire({
-                                        icon: 'success',
-                                        title: response.message,
-                                        confirmButtonColor: '#4e73df',
-                                    })
-                                    .then(() => {
-                                        window.location.href = "<?= base_url("order-form-internasional"); ?>"
-                                    })
-                            } else {
-                                Swal.fire({
-                                    icon: 'error',
-                                    title: response.message,
-                                    confirmButtonColor: '#4e73df',
-                                })
-                                stopLoading()
-                            }
-                        },
-                        onError: function(response) {
-                            csrf.val(response.token);
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Data Gagal Diubah, coba Lagi',
-                                confirmButtonColor: '#4e73df',
-                            })
-                            stopLoading()
-                        }
-                    });
-                }
-            })
-        })
-
-        $(".unposting-so").click(function() {
-
-            $(".unpost-modal").modal("show");
-
-        });
-
 
 
         var validator = $("#form-parent").validate({
@@ -2022,19 +1958,9 @@
 
             listDataSalesKontrak.salesContractDetailList.map((item, index) => {
                 const actionButtonSubtitle = `
-                    <?php if (!empty($dataSalesExport)) : ?>
-                        <?php if ($dataSalesExport->status == "POSTED") : ?>
-                            -
-                        <?php else : ?>
-                            <button type="button" class="btn btn-warning posting-spp mr-1" onclick="detailRowSubtitle('${item.id}')">
-                                <i class="fa fa-pencil fa-sm" aria-hidden="true"></i>
-                            </button>
-                        <?php endif; ?>
-                    <?php else : ?>
-                        <button type="button" class="btn btn-warning posting-spp mr-1" onclick="detailRowSubtitle('${item.id}')">
-                            <i class="fa fa-pencil fa-sm" aria-hidden="true"></i>
-                        </button>
-                    <?php endif; ?>
+                    <button type="button" class="btn btn-warning posting-spp mr-1" onclick="detailRowSubtitle('${item.id}')">
+                        <i class="fa fa-pencil fa-sm" aria-hidden="true"></i>
+                    </button>
                 `;
 
 
@@ -2113,19 +2039,9 @@
                     totalPersenSize += persen;
 
                     const actionButton = `
-                    <?php if (!empty($dataSalesExport)) : ?>
-                        <?php if ($dataSalesExport->status == "POSTED") : ?>
-                            -
-                        <?php else : ?>
-                            <button type="button" class="btn btn-warning posting-spp mr-1" onclick="detailRow('${item.id}', '${size.id_detail_breakdown}')">
-                                <i class="fa fa-pencil fa-sm" aria-hidden="true"></i>
-                            </button>
-                        <?php endif; ?>
-                    <?php else : ?>
-                        <button type="button" class="btn btn-warning posting-spp mr-1" onclick="detailRow('${item.id}', '${size.id_detail_breakdown}')">
+                    <button type="button" class="btn btn-warning posting-spp mr-1" onclick="detailRow('${item.id}', '${size.id_detail_breakdown}')">
                             <i class="fa fa-pencil fa-sm" aria-hidden="true"></i>
-                        </button>
-                    <?php endif; ?>
+                    </button>
                 `;
 
                     var classCss = '';
@@ -2322,24 +2238,13 @@
                 newRow.append($('<td style="text-align:center;">').text(no++));
                 newRow.append($('<td>').text(item.size_packing));
                 newRow.append($('<td>').html(
-                    <?php if (!empty($dataSalesExport)) : ?> <?php if ($dataSalesExport->status == "POSTED") : ?> `-`
-                        <?php else : ?> `
+                    `
                         <button type="button" class="btn btn-warning posting-spp mr-1" onclick="detailRowSpecs('${item.id_detail_specs_list}')">
                                 <i class="fa fa-pencil fa-sm" aria-hidden="true"></i>
                             </button><button type="button" class="btn btn-danger" onclick="deleteRowSpecs('${item.id_detail_specs_list}')">
                                 <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
                             </button>
                     `
-                        <?php endif; ?>
-
-                    <?php else : ?> `
-                        <button type="button" class="btn btn-warning posting-spp mr-1" onclick="detailRowSpecs('${item.id_detail_specs_list}')">
-                                <i class="fa fa-pencil fa-sm" aria-hidden="true"></i>
-                            </button><button type="button" class="btn btn-danger" onclick="deleteRowSpecs('${item.id_detail_specs_list}')">
-                                <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
-                            </button>
-                    `
-                    <?php endif; ?>
                 ));
                 tbody.append(newRow);
 
@@ -2396,24 +2301,13 @@
                 newRow.append($('<td>').text(item.grade));
                 newRow.append($('<td>').text(item.specification));
                 newRow.append($('<td>').html(
-                    <?php if (!empty($dataSalesExport)) : ?> <?php if ($dataSalesExport->status == "POSTED") : ?> `-`
-                        <?php else : ?> `
+                    `
                         <button type="button" class="btn btn-warning posting-spp mr-1" onclick="detailRowGradeSpecs('${item.id_grade_specs}')">
                                 <i class="fa fa-pencil fa-sm" aria-hidden="true"></i>
                             </button><button type="button" class="btn btn-danger" onclick="deleteRowGradeSpecs('${item.id_grade_specs}')">
                                 <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
                             </button>
                     `
-                        <?php endif; ?>
-
-                    <?php else : ?> `
-                        <button type="button" class="btn btn-warning posting-spp mr-1" onclick="detailRowGradeSpecs('${item.id_grade_specs}')">
-                                <i class="fa fa-pencil fa-sm" aria-hidden="true"></i>
-                            </button><button type="button" class="btn btn-danger" onclick="deleteRowGradeSpecs('${item.id_grade_specs}')">
-                                <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
-                            </button>
-                    `
-                    <?php endif; ?>
                 ));
 
                 table.find('tbody').append(newRow);
@@ -2442,24 +2336,13 @@
                 newRow.append($('<td>').text(item.additional_detail));
                 newRow.append($('<td>').text(iconOperator + " " + greatFormatRupiah(item.additional_detail_price)));
                 newRow.append($('<td>').html(
-                    <?php if (!empty($dataSalesExport)) : ?> <?php if ($dataSalesExport->status == "POSTED") : ?> `-`
-                        <?php else : ?> `
+                    `
                         <button type="button" class="btn btn-warning posting-spp mr-1" onclick="detailRowAdditional('${item.id_detail_additional}')">
                                 <i class="fa fa-pencil fa-sm" aria-hidden="true"></i>
                             </button><button type="button" class="btn btn-danger" onclick="deleteRowAdditional('${item.id_detail_additional}')">
                                 <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
                             </button>
                     `
-                        <?php endif; ?>
-
-                    <?php else : ?> `
-                        <button type="button" class="btn btn-warning posting-spp mr-1" onclick="detailRowAdditional('${item.id_detail_additional}')">
-                                <i class="fa fa-pencil fa-sm" aria-hidden="true"></i>
-                            </button><button type="button" class="btn btn-danger" onclick="deleteRowAdditional('${item.id_detail_additional}')">
-                                <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
-                            </button>
-                    `
-                    <?php endif; ?>
                 ));
 
                 table.find('tbody').append(newRow);

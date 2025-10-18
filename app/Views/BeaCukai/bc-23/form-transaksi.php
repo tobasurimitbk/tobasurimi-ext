@@ -419,77 +419,56 @@
 
     $('#btn-simpan-perubahan').click(function() {
         if ($('#form-transaksi').valid()) {
-            Swal.fire({
-                icon: 'question',
-                title: 'Simpan Transaksi ?',
-                confirmButtonColor: '#4e73df',
-                cancelButtonColor: '#d33',
-                showCancelButton: true,
-                reverseButtons: true,
-                confirmButtonText: 'Ya',
-                cancelButtonText: 'Kembali',
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    var formData = new FormData(document.querySelector("#form-transaksi"));
-                    var hargaNdpbm = destroyFormatRupiah($('#harga_ndpbm').val());
-                    var hargaNilaiBarang = destroyFormatRupiah($('#harga_nilai_barang').val());
-                    var hargaCif = destroyFormatRupiah($('#harga_cif').val());
-                    var hargaNilaiPabean = destroyFormatRupiah($('#harga_nilai_pabean').val());
-                    var hargaLainnyaBiayaPenambah = destroyFormatRupiah($('#harga_lainnya_biaya_penambah').val());
-                    var hargaLainnyaBiayaPengurang = destroyFormatRupiah($('#harga_lainnya_biaya_pengurang').val());
-                    var hargaLainnyaFreeOnBoard = destroyFormatRupiah($('#harga_lainnya_free_on_board').val());
-                    var hargaLainnyaFreight = destroyFormatRupiah($('#harga_lainnya_freight').val());
-                    var hargaLainnyaNilaiAsuransi = destroyFormatRupiah($('#harga_lainnya_nilai_asuransi').val());
-                    var beratBruto = destroyFormatRupiah($('#berat_bruto').val());
-                    var beratNetto = destroyFormatRupiah($('#berat_netto').val());
+            var formData = new FormData(document.querySelector("#form-transaksi"));
+            var hargaNdpbm = destroyFormatRupiah($('#harga_ndpbm').val());
+            var hargaNilaiBarang = destroyFormatRupiah($('#harga_nilai_barang').val());
+            var hargaCif = destroyFormatRupiah($('#harga_cif').val());
+            var hargaNilaiPabean = destroyFormatRupiah($('#harga_nilai_pabean').val());
+            var hargaLainnyaBiayaPenambah = destroyFormatRupiah($('#harga_lainnya_biaya_penambah').val());
+            var hargaLainnyaBiayaPengurang = destroyFormatRupiah($('#harga_lainnya_biaya_pengurang').val());
+            var hargaLainnyaFreeOnBoard = destroyFormatRupiah($('#harga_lainnya_free_on_board').val());
+            var hargaLainnyaFreight = destroyFormatRupiah($('#harga_lainnya_freight').val());
+            var hargaLainnyaNilaiAsuransi = destroyFormatRupiah($('#harga_lainnya_nilai_asuransi').val());
+            var beratBruto = destroyFormatRupiah($('#berat_bruto').val());
+            var beratNetto = destroyFormatRupiah($('#berat_netto').val());
 
-                    formData.set('harga_ndpbm', hargaNdpbm);
-                    formData.set('harga_nilai_barang', hargaNilaiBarang);
-                    formData.set('harga_cif', hargaCif);
-                    formData.set('harga_nilai_pabean', hargaNilaiPabean);
-                    formData.set('harga_lainnya_biaya_penambah', hargaLainnyaBiayaPenambah);
-                    formData.set('harga_lainnya_biaya_pengurang', hargaLainnyaBiayaPengurang);
-                    formData.set('harga_lainnya_free_on_board', hargaLainnyaFreeOnBoard);
-                    formData.set('harga_lainnya_freight', hargaLainnyaFreight);
-                    formData.set('harga_lainnya_nilai_asuransi', hargaLainnyaNilaiAsuransi);
-                    formData.set('berat_bruto', beratBruto);
-                    formData.set('berat_netto', beratNetto);
+            formData.set('harga_ndpbm', hargaNdpbm);
+            formData.set('harga_nilai_barang', hargaNilaiBarang);
+            formData.set('harga_cif', hargaCif);
+            formData.set('harga_nilai_pabean', hargaNilaiPabean);
+            formData.set('harga_lainnya_biaya_penambah', hargaLainnyaBiayaPenambah);
+            formData.set('harga_lainnya_biaya_pengurang', hargaLainnyaBiayaPengurang);
+            formData.set('harga_lainnya_free_on_board', hargaLainnyaFreeOnBoard);
+            formData.set('harga_lainnya_freight', hargaLainnyaFreight);
+            formData.set('harga_lainnya_nilai_asuransi', hargaLainnyaNilaiAsuransi);
+            formData.set('berat_bruto', beratBruto);
+            formData.set('berat_netto', beratNetto);
 
-                    formData.append("bc_purchase_order_id", "<?= encrypt($bcPo['id']) ?>");
-                    $.ajax({
-                        url: "<?= base_url("bea-cukai-bc-23/id/transaksi"); ?>",
-                        data: formData,
-                        beforeSend: function(xhr) {
-                            xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                            $('#btn-loading').show();
-                            $('#btn-simpan-perubahan').hide();
-                        },
-                        complete: function() {
-                            $('#btn-loading').hide();
-                            $('#btn-simpan-perubahan').show();
-                        },
-                        method: "POST",
-                        dataType: "json",
-                        processData: false,
-                        contentType: false,
-                        success: function(response) {
-                            if (response.status) {
-                                csrf.val(response.token);
-                                Swal.fire({
-                                    icon: 'success',
-                                    title: response.message,
-                                    confirmButtonColor: '#4e73df',
-                                    confirmButtonText: 'Ok'
-                                }).then((result) => {
-                                    if (result.isConfirmed) {
-                                        location.reload();
-                                    }
-                                });
-                            }
-                        },
-                    });
-                }
-            })
+            formData.append("bc_purchase_order_id", "<?= encrypt($bcPo['id']) ?>");
+            $.ajax({
+                url: "<?= base_url("bea-cukai-bc-23/id/transaksi"); ?>",
+                data: formData,
+                beforeSend: function(xhr) {
+                    xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                    $('#btn-loading').show();
+                    $('#btn-simpan-perubahan').hide();
+                },
+                complete: function() {
+                    $('#btn-loading').hide();
+                    $('#btn-simpan-perubahan').show();
+                },
+                method: "POST",
+                dataType: "json",
+                processData: false,
+                contentType: false,
+                success: function(response) {
+                    if (response.status) {
+                        csrf.val(response.token);
+                        location.reload();
+
+                    }
+                },
+            });
         }
     });
 
