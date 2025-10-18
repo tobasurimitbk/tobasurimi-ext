@@ -1207,7 +1207,10 @@ class Invoice extends BaseController
         // 🔹 Ambil total qty yang sudah diinvoice per dokumen + per barang
         // ===============================================================
         $invoiceDetails = $this->SalesOrderInvoiceDetailModel
-            ->select('id_sales_order, id_surat_jalan, id_barang_invoice, SUM(qty_invoice) as total_invoiced_qty')
+            ->select('id_sales_order, 
+            id_surat_jalan, 
+            id_barang_invoice, 
+            SUM(qty_invoice) as total_invoiced_qty')
             ->where('deletedAt', null)
             ->groupBy('id_sales_order, id_surat_jalan, id_barang_invoice')
             ->findAll();
@@ -1300,24 +1303,25 @@ class Invoice extends BaseController
 
             // 🔹 Ambil detail barang (prioritas surat jalan)
             $checkSuratJalanDetail = $this->SuratJalanDetailModel->whereIn('id_surat_jalan', (array)$docId)->first();
-
             if ($checkSuratJalanDetail) {
                 $itemList = $this->SuratJalanDetailModel->getItemListByIds($docId);
                 $itemListPosting = $this->SuratJalanDetailModel->getItemListPostingByIds($docId);
 
                 $itemList = array_filter($itemList, function ($d) use ($invoicedSJQty) {
-                    $key = "{$d->id_surat_jalan}_{$d->id_barang}";
-                    $qtyAvailable = (float)$d->qty;
+                    $key = "{$d->id_sj}_{$d->id_barang}";
+                    $qtyAvailable = (float)$d->qty_sekarang;
                     $invoicedQty = $invoicedSJQty[$key] ?? 0;
                     $remaining = $qtyAvailable - $invoicedQty;
+                    $d->qty_sekarang = $remaining;
                     return $remaining > 0;
                 });
 
                 $itemListPosting = array_filter($itemListPosting, function ($d) use ($invoicedSJQty) {
-                    $key = "{$d->id_surat_jalan}_{$d->id_barang}";
-                    $qtyAvailable = (float)$d->qty;
+                    $key = "{$d->id_sj}_{$d->id_barang}";
+                    $qtyAvailable = (float)$d->qty_sekarang;
                     $invoicedQty = $invoicedSJQty[$key] ?? 0;
                     $remaining = $qtyAvailable - $invoicedQty;
+                    $d->qty_sekarang = $remaining;
                     return $remaining > 0;
                 });
             } else {
