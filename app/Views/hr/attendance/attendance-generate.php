@@ -108,8 +108,9 @@
                     <i class="fa fa-download"></i> Export
                 </button>
                 <ul class="dropdown-menu list-dropdown-company" aria-labelledby="dropdownMenuButtonExport">
-                    <li><a class="dropdown-item" href="#" onclick="exportExcelBulan()">Bulanan</a></li>
-                    <li><a class="dropdown-item" href="#" id="btnTriwulanModal">Triwulan</a></li>
+                    <li><a class="dropdown-item" href="#" id="btnShowExportHarianModal">Lap. Harian</a></li>
+                    <li><a class="dropdown-item" href="#" onclick="exportExcelBulan()">Lap. Bulanan</a></li>
+                    <li><a class="dropdown-item" href="#" id="btnTriwulanModal">Lap. Triwulan</a></li>
                 </ul>
             <?php endif; ?>
         </div>
@@ -383,13 +384,33 @@
                             </button>
                         </div>
                     </div>
+                    <div class="row">
+                        <div class="col-sm">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <select name="statusKehadiran" class="form-select" id="statusKehadiran">
+                                    <?php foreach ($statusPerizinanAll as $sk) : ?>
+                                        <option value="<?= $sk['value']; ?>"><?= explode("_", $sk['value'])[0] . " (" . explode("_", $sk['value'])[1] . ")"; ?></option>
+                                    <?php endforeach ?>
+                                </select>
+                                <label for="status">Status Kehadiran</label>
+                            </div>
+                        </div>
+                        <div class="col-sm">
+                            <div class="form-floating mb-3" style="height: 50px;" id="approvalForm">
+                                <select name="isApproved" class="form-select" id="isApproved">
+                                    <?php $statusApproval = ["APPROVED", "NOT APPROVED"]; ?>
+                                    <?php foreach ($statusApproval as $sa) : ?>
+                                        <option value="<?= $sa == "APPROVED" ? '1' : '0' ?>"><?= $sa; ?></option>
+                                    <?php endforeach ?>
+                                </select>
+                                <label for="floatingInput">Status Approval</label>
+                            </div>
+                        </div>
+                    </div>
+
                     <div class="form-floating mb-3" style="height: 50px;">
-                        <select name="statusKehadiran" class="form-select" id="statusKehadiran">
-                            <?php foreach ($statusPerizinanAll as $sk) : ?>
-                                <option value="<?= $sk['value']; ?>"><?= explode("_", $sk['value'])[0] . " (" . explode("_", $sk['value'])[1] . ")"; ?></option>
-                            <?php endforeach ?>
-                        </select>
-                        <label for="status">Status Kehadiran</label>
+                        <input placeholder="Nominal Uang Makan (Opsional)" type="text" name="nominal" class="form-control" id="nominal" oninput="this.value = greatFormatRupiah(this.value)">
+                        <label for="status">Nominal Uang Makan (Opsional)</label>
                     </div>
 
                     <div class="form-floating mb-3" style="height: 50px;" id="reasonForm">
@@ -397,15 +418,7 @@
                         <label for="floatingInput">Keterangan Tambahan (Opsional)</label>
                     </div>
 
-                    <div class="form-floating mb-3" style="height: 50px;" id="approvalForm">
-                        <select name="isApproved" class="form-select" id="isApproved">
-                            <?php $statusApproval = ["APPROVED", "NOT APPROVED"]; ?>
-                            <?php foreach ($statusApproval as $sa) : ?>
-                                <option value="<?= $sa == "APPROVED" ? '1' : '0' ?>"><?= $sa; ?></option>
-                            <?php endforeach ?>
-                        </select>
-                        <label for="floatingInput">Status Approval</label>
-                    </div>
+
 
                     <div class="form-floating mb-3" style="height: 50px;">
                         <input type="text" name="keterangan" class="form-control" id="keterangan" disabled>
@@ -543,7 +556,51 @@
         </div>
     </div>
 </div>
-
+<div class="modal" id="lapHarianModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Laporan Harian Presensi</h5>
+            </div>
+            <form id="lapLogAbsensiForm" role="form" method="POST">
+                <div class="modal-body">
+                    <div class="row mb-2">
+                        <div class="col-md-6">
+                            <div class="input-group">
+                                <div class="form-floating mb-2" style="height: 50px;">
+                                    <input type="text" id="start_date" name="start_date" class="form-control start_date" placeholder="Tanggal Mulai Log Absensi">
+                                    <label for="start_date">Tanggal Mulai Absensi</label>
+                                </div>
+                                <div class="input-group-append" style="height:50px;">
+                                    <button disabled class="btn btn-secondary" type="button">
+                                        <i class="fas fa-calendar-alt"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="input-group">
+                                <div class="form-floating mb-2" style="height: 50px;">
+                                    <input type="text" id="end_date" name="end_date" class="form-control end_date" placeholder="Tanggal Selesai Log Absensi">
+                                    <label for="end_date">Tanggal Selesai Absensi</label>
+                                </div>
+                                <div class="input-group-append" style="height:50px;">
+                                    <button disabled class="btn btn-secondary" type="button">
+                                        <i class="fas fa-calendar-alt"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-hide-form btn-discard mr-3" id="btnHideExportHarianModal">Kembali</button>
+                    <button type="button" class="btn btn-submit-form" id="btnExportLapHarian">Export</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 
 
 <script>
@@ -638,6 +695,10 @@
 
                         if (colClass.includes('bg-dinas')) {
                             return renderCell(data, '#ad53a9');
+                        }
+
+                        if (colClass.includes('bg-cuti-keguguran')) {
+                            return renderCell(data, '#75321a');
                         }
 
                         function renderCell(data, bgColor) {
@@ -743,6 +804,11 @@
                 sortable: false,
             },
             {
+                data: "total_cuti_keguguran",
+                className: "text-left",
+                sortable: false,
+            },
+            {
                 data: "total_libur",
                 className: "text-left",
                 sortable: false,
@@ -798,6 +864,7 @@
                     } else {
                         var attendance = response.data.attendance;
                         var employee = response.data.employee;
+                        var uangMakan = response.data.uangMakanHarian;
 
                         $('#reason').val(null);
                         $('#attendenceID').val(attendance.id);
@@ -810,9 +877,9 @@
 
                         if (attendance.status == 'HADIR_H') {
                             // hadir
-                            $('#reasonForm').hide();
+                            $('#reasonForm').show();
                             $('#formInOut').show();
-                            $('#approvalForm').hide();
+                            $('#approvalForm').show();
                             // set form
                             $('#checkout').val(attendance.checkout);
                             $('#checkin').val(attendance.checkin);
@@ -827,6 +894,11 @@
                         }
 
                         $('#jamKerjaName').val(response.data.jamKerja.jenis);
+                        if (uangMakan == null) {
+                            $('#nominal').val(null).keyup();
+                        } else {
+                            $('#nominal').val(greatFormatRupiah(uangMakan.nominal));
+                        }
 
                         // ASSIGN ATTR
                         $('#jamKerjaDetail').data('jam_kerja_id', response.data.jamKerja.id);
@@ -949,10 +1021,16 @@
             statusKehadiran: {
                 required: true
             },
+            isApproved: {
+                required: true
+            },
         },
         messages: {
             statusKehadiran: {
                 required: "Pilih status kehadiran"
+            },
+            isApproved: {
+                required: "Pilih status approval"
             },
         },
         errorElement: 'span',
@@ -1134,64 +1212,62 @@
     $('#updateAbsensi').click(function(e) {
         e.preventDefault();
         if ($('#updateAttendanceForm').valid()) {
-            Swal.fire({
-                icon: 'question',
-                title: 'Update Presensi ?',
-                confirmButtonColor: '#4e73df',
-                cancelButtonColor: '#d33',
-                showCancelButton: true,
-                reverseButtons: true,
-                confirmButtonText: 'Simpan',
-                cancelButtonText: 'Kembali',
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    // set variable
-                    const csrf = $(`[name="${csrfToken}"]`);
-                    var attendenceID = $('#attendenceID').val();
-                    var statusKehadiran = $('#statusKehadiran').val();
-                    var reason = $('#reason').val();
-                    var checkIn = $('#checkin').val();
-                    var checkOut = $('#checkout').val();
-                    var isApproved = $('#isApproved').val();
-                    // append to form
-                    var formData = new FormData();
-                    formData.append('attendenceID', attendenceID);
-                    formData.append('statusKehadiran', statusKehadiran);
-                    formData.append("reason", reason);
-                    formData.append("reason", reason);
-                    formData.append("checkIn", checkIn);
-                    formData.append("checkOut", checkOut);
-                    formData.append("isApproved", isApproved);
+            // set variable
+            const csrf = $(`[name="${csrfToken}"]`);
+            var attendenceID = $('#attendenceID').val();
+            var statusKehadiran = $('#statusKehadiran').val();
+            var reason = $('#reason').val();
+            var checkIn = $('#checkin').val();
+            var checkOut = $('#checkout').val();
+            var isApproved = $('#isApproved').val();
+            var nominal = destroyFormatRupiah($('#nominal').val());
+            // append to form
+            var formData = new FormData();
+            formData.append('attendenceID', attendenceID);
+            formData.append('statusKehadiran', statusKehadiran);
+            formData.append("reason", reason);
+            formData.append("reason", reason);
+            formData.append("checkIn", checkIn);
+            formData.append("checkOut", checkOut);
+            formData.append("isApproved", isApproved);
+            formData.set('nominal', nominal);
 
-                    $.ajax({
-                        url: "<?= base_url("list-attendance/update-attendance"); ?>",
-                        data: formData,
-                        method: "POST",
-                        dataType: "json",
-                        beforeSend: function(xhr) {
-                            setLoading();
-                            xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                        },
-                        complete: function() {
-                            stopLoading();
-                        },
-                        processData: false,
-                        contentType: false,
-                        success: function(response) {
-                            Swal.fire({
-                                icon: 'success',
-                                title: response.message,
-                                confirmButtonColor: '#4e73df',
-                            }).then((result) => {
-                                attendanceTable.ajax.reload();
-                                attendanceTotalTable.ajax.reload();
+            $.ajax({
+                url: "<?= base_url("list-attendance/update-attendance"); ?>",
+                data: formData,
+                method: "POST",
+                dataType: "json",
+                beforeSend: function(xhr) {
+                    setLoading();
+                    xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                },
+                complete: function() {
+                    stopLoading();
+                },
+                processData: false,
+                contentType: false,
+                success: function(response) {
+                    if (response.status) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: response.message,
+                            confirmButtonColor: '#4e73df',
+                        }).then((result) => {
+                            attendanceTable.ajax.reload();
+                            attendanceTotalTable.ajax.reload();
 
-                                $('#updateModal').modal('hide');
-                            });
-                        },
-                    });
-                }
-            })
+                            $('#updateModal').modal('hide');
+                        });
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Pilih bulan dahulu',
+                            confirmButtonColor: '#4e73df',
+                        });
+                        return;
+                    }
+                },
+            });
         }
     })
 
@@ -1259,6 +1335,22 @@
         dropdownParent: $('#updateModal')
     });
 
+    $("#start_date").datepicker({
+        placeholder: "Pilih Tanggal Mulai Absensi",
+        todayHighlight: true,
+        format: "dd/mm/yyyy",
+        orientation: "bottom auto",
+        autoclose: true
+    });
+
+    $("#end_date").datepicker({
+        placeholder: " Tanggal Selesai Absensi",
+        todayHighlight: true,
+        format: "dd/mm/yyyy",
+        orientation: "bottom auto",
+        autoclose: true
+    });
+
     $('#employee_id_filter').select2({
         placeholder: "Cari Karyawan",
         theme: "bootstrap-5",
@@ -1318,6 +1410,17 @@
         }
     });
 
+    $('#btnShowExportHarianModal').click(function(e) {
+        e.preventDefault();
+        $('#start_date,#end_date').val(null);
+        $('#lapHarianModal').modal('show');
+    });
+
+    $('#btnHideExportHarianModal').click(function(e) {
+        e.preventDefault();
+        $('#lapHarianModal').modal('hide');
+    });
+
     $('#btnTriwulanModal').click(function(e) {
         e.preventDefault();
         resetFormTriwulan();
@@ -1365,8 +1468,8 @@
             // hadir
             $("input[name='checkIn']").attr('required', true);
             $("input[name='checkOut']").attr('required', true);
-            $('#reasonForm').hide();
-            $('#approvalForm').hide();
+            // $('#reasonForm').hide();
+            // $('#approvalForm').hide();
             $('#formInOut').show();
         } else if ($(this).val() == "ALPHA_A" || $(this).val() == "LIBUR_L" || $(this).val() == "RL_RL") {
             $('#approvalForm').hide();
@@ -1378,8 +1481,21 @@
             $('#approvalForm').show();
             $('#formInOut').hide();
         }
-
     });
+
+    $('#btnExportLapHarian').click(function(e) {
+        e.preventDefault();
+        if ($('#lapLogAbsensiForm').valid()) {
+            var startDate = $('#start_date').val();
+            var endDate = $('#end_date').val();
+            var divisiId = $('#divisi_id').val();
+            var tipe = $('#tipe').val();
+
+            var url = "<?= base_url('list-attendance/export-harian') ?>" + "?start_date=" + startDate + "&end_date=" + endDate + "&divisi_id=" + divisiId + "&tipe=" + tipe;
+            window.location.href = url;
+        }
+    });
+
 
     $('.form-select')
         .parent('div')

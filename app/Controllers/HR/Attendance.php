@@ -226,7 +226,8 @@ class Attendance extends BaseController
                         'IJIN_I' => 'bg-ijin',
                         'SAKIT_S' => 'bg-sakit',
                         'RL_RL' => 'bg-rl',
-                        'DINAS_D' => 'bg-dinas'
+                        'DINAS_D' => 'bg-dinas',
+                        'CUTI KEGUGURAN_CKG' => 'bg-cuti-keguguran'
                     ];
 
                     $row['day_' . $d . '_in_class']  = $mapping[$statusIzin];
@@ -368,6 +369,7 @@ class Attendance extends BaseController
             $totalAlpha          = 0;
             $totalLibur          = 0;
             $totalDinas          = 0;
+            $totalCutiKeguguran  = 0;
 
             // Loop setiap tanggal dalam bulan
             for ($d = 1; $d <= $totalDaysInMonth; $d++) {
@@ -416,6 +418,9 @@ class Attendance extends BaseController
                     case 'DINAS_D':
                         $totalDinas++;
                         break;
+                    case 'CUTI KEGUGURAN_CKG':
+                        $totalCutiKeguguran++;
+                        break;
                 }
 
                 // Jika hadir (ada in/out)
@@ -436,6 +441,7 @@ class Attendance extends BaseController
             $row['total_alpha']           = $totalAlpha;
             $row['total_libur']           = $totalLibur;
             $row['total_dinas']           = $totalDinas;
+            $row['total_cuti_keguguran']  = $totalCutiKeguguran;
 
             $resultData[] = $row;
         }
@@ -600,7 +606,8 @@ class Attendance extends BaseController
                         'RL_RL' => 'bg-rl',
                         'ALPHA_A' => 'bg-alpha',
                         'LIBUR_L' => 'bg-libur',
-                        'DINAS_D' => 'bg-dinas'
+                        'DINAS_D' => 'bg-dinas',
+                        'CUTI KEGUGURAN_CKG' => 'bg-cuti-keguguran'
                     ];
 
                     $row['day_' . $d . '_in_class']  = $mapping[$statusIzin];
@@ -752,6 +759,7 @@ class Attendance extends BaseController
             $totalAlpha          = 0;
             $totalLibur          = 0;
             $totalDinas          = 0;
+            $totalCutiKeguguran  = 0;
 
             // Loop setiap tanggal dalam bulan
             for ($d = 1; $d <= $totalDaysInMonth; $d++) {
@@ -800,6 +808,9 @@ class Attendance extends BaseController
                     case 'DINAS_D':
                         $totalDinas++;
                         break;
+                    case 'CUTI KEGUGURAN_CKG':
+                        $totalCutiKeguguran++;
+                        break;
                 }
 
                 // Jika hadir (ada in/out)
@@ -820,6 +831,7 @@ class Attendance extends BaseController
             $row['total_alpha']           = $totalAlpha;
             $row['total_libur']           = $totalLibur;
             $row['total_dinas']           = $totalDinas;
+            $row['total_cuti_keguguran']  = $totalCutiKeguguran;
 
             $resultData[] = $row;
         }
@@ -996,7 +1008,8 @@ class Attendance extends BaseController
             'attendance' => $attendanceDetail,
             'employee' => $employee,
             'keterangan' => "-",
-            'jamTerlambat' => "-"
+            'jamTerlambat' => "-",
+            "uangMakanHarian" => null
         ];
 
         $keterangan = static::keterlambatanCheck(
@@ -1023,8 +1036,10 @@ class Attendance extends BaseController
 
         // GET JAM KERJA USED
         $jamKerja = $this->EmployeeJamKerjaModel->getJamKerjaUsedByEmployeeId($tanggal, $employeeID);
+        $uangMakanHarian = $this->UangMakanHarianModel->where('tanggal', $tanggal)->where('employee_id', $employeeID)->first();
         // APPEND TO RESULT
         $resultData['jamKerja'] = $jamKerja;
+        $resultData['uangMakanHarian'] = $uangMakanHarian;
 
         return $this->response->setJSON([
             'data' => $resultData,
@@ -1035,26 +1050,56 @@ class Attendance extends BaseController
 
     public function updateAttendance()
     {
-        $attendenceID = $this->request->getVar('attendenceID');
-        $checkIN = $this->request->getVar('checkIn');
-        $checkOut = $this->request->getVar('checkOut');
-        $statusKehadiran = $this->request->getVar('statusKehadiran');
-        $reason = $this->request->getVar('reason');
-        $isApproved = $this->request->getVar('isApproved');
+        try {
+            $attendenceID = $this->request->getVar('attendenceID');
+            $checkIN = $this->request->getVar('checkIn');
+            $checkOut = $this->request->getVar('checkOut');
+            $statusKehadiran = $this->request->getVar('statusKehadiran');
+            $reason = $this->request->getVar('reason');
+            $isApproved = $this->request->getVar('isApproved');
+            $nominal = $this->request->getVar('nominal');
 
-        $this->AttendanceModel->update($attendenceID, [
-            'checkin' => $checkIN, // in
-            'checkout' => $checkOut, // out
-            'status' => $statusKehadiran,
-            'reason' => $reason,
-            'isApproved' => $isApproved
-        ]);
+            $this->AttendanceModel->update($attendenceID, [
+                'checkin' => $checkIN, // in
+                'checkout' => $checkOut, // out
+                'status' => $statusKehadiran,
+                'reason' => $reason,
+                'isApproved' => $isApproved
+            ]);
 
-        return $this->response->setJSON([
-            'message' => "Attendence diperbaruhi",
-            'status' => true,
-            'token' => csrf_hash()
-        ]);
+            $attendance = $this->AttendanceModel->where('id', $attendenceID)->first();
+
+            $uangMakanHarian = $this->UangMakanHarianModel
+                ->where('employee_id', $attendance['employee_id'])
+                ->where('tanggal', $attendance['periode'])
+                ->first();
+
+            if ($uangMakanHarian == null) {
+                // Jika uang makan harian null maka insert
+                $this->UangMakanHarianModel->insert([
+                    'employee_id'  => $attendance['employee_id'],
+                    'tanggal' => $attendance['periode'],
+                    'nominal' => $nominal,
+                ]);
+            } else {
+                // Jika uang makan harian sudah ada maka update
+                $this->UangMakanHarianModel->update($uangMakanHarian['id'], [
+                    'nominal' => $nominal
+                ]);
+            }
+
+            return $this->response->setJSON([
+                'message' => "Attendence diperbaruhi",
+                'status' => true,
+                'token' => csrf_hash()
+            ]);
+        } catch (Exception $e) {
+            return response()->setJSON([
+                'status' => false,
+                'token' => csrf_hash(),
+                'message' => $e->getMessage()
+            ]);
+        }
     }
 
     public function getEmployeesLike()
@@ -1066,8 +1111,8 @@ class Attendance extends BaseController
             'employees.company_id' => $this->this_company_id,
         ];
 
-        $result = $this->EmployeesModel->select("employees.name, employees.id")
-            ->join('users', 'users.employee_id = employees.id', 'left')
+        $result = $this->EmployeesModel
+            ->select("CONCAT('(', employees.nip, ') ', employees.name) AS name, employees.id")
             ->where($arrCondition)
             ->groupStart()
             ->like('employees.name', $employeesName)
@@ -1347,7 +1392,8 @@ class Attendance extends BaseController
             'RL',
             'Alpha',
             'Libur',
-            'Dinas'
+            'Dinas',
+            'Cuti Keguguran'
         ];
         $colIndex = 1;
         $rowHeader2 = 3;
@@ -1375,7 +1421,7 @@ class Attendance extends BaseController
             $sheet2->setCellValueByColumnAndRow($colIndex++, $rowIndex, $e['divisi']);
             $sheet2->setCellValueByColumnAndRow($colIndex++, $rowIndex, $e['bagian']);
 
-            $total = ['ct' => 0, 'chd' => 0, 'chl' => 0, 'cm' => 0, 'ijin' => 0, 'sakit' => 0, 'rl' => 0, 'hadir' => 0, 'alpha' => 0, 'libur' => 0, 'dinas' => 0];
+            $total = ['ct' => 0, 'chd' => 0, 'chl' => 0, 'cm' => 0, 'ijin' => 0, 'sakit' => 0, 'rl' => 0, 'hadir' => 0, 'alpha' => 0, 'libur' => 0, 'dinas' => 0, 'ckg' => 0];
 
             for ($d = 1; $d <= $totalDaysInMonth; $d++) {
                 $tanggal = sprintf("%04d-%02d-%02d", $year, $month, $d);
@@ -1416,6 +1462,9 @@ class Attendance extends BaseController
                     case 'DINAS_D':
                         $total['dinas']++;
                         break;
+                    case 'CUTI KEGUGURAN_CKG':
+                        $total['ckg']++;
+                        break;
                 }
 
                 if (!empty($in) || !empty($out)) {
@@ -1434,6 +1483,7 @@ class Attendance extends BaseController
             $sheet2->setCellValueByColumnAndRow($colIndex++, $rowIndex, $total['alpha']);
             $sheet2->setCellValueByColumnAndRow($colIndex++, $rowIndex, $total['libur']);
             $sheet2->setCellValueByColumnAndRow($colIndex++, $rowIndex, $total['dinas']);
+            $sheet2->setCellValueByColumnAndRow($colIndex++, $rowIndex, $total['ckg']);
 
             $rowIndex++;
         }
@@ -1678,7 +1728,8 @@ class Attendance extends BaseController
                         'ijin'           => 0,
                         'sakit'          => 0,
                         'rl'             => 0,
-                        'dinas'          => 0
+                        'dinas'          => 0,
+                        'cuti_keguguran' => 0
                     ];
                 }
 
@@ -1716,6 +1767,9 @@ class Attendance extends BaseController
                     case 'D':
                         $rekapKaryawan[$emp['id']]['dinas']++;
                         break;
+                    case 'CKG':
+                        $rekapKaryawan[$emp['id']]['cuti_keguguran']++;
+                        break;
                 }
             }
 
@@ -1734,7 +1788,7 @@ class Attendance extends BaseController
         $row++;
 
         // Header rekap
-        $rekapHeaders = ['No', 'Nip', 'Nama', 'Hadir', 'Alpa', 'Libur', 'Cuti Tahunan', 'Cuti Haid', 'Cuti Hamil', 'Cuti Melahirkan', 'Ijin', 'Sakit', 'RL', 'Dinas'];
+        $rekapHeaders = ['No', 'Nip', 'Nama', 'Hadir', 'Alpa', 'Libur', 'Cuti Tahunan', 'Cuti Haid', 'Cuti Hamil', 'Cuti Melahirkan', 'Ijin', 'Sakit', 'RL', 'Dinas', 'Cuti Keguguran'];
         $col = 'A';
         foreach ($rekapHeaders as $h) {
             $sheet->setCellValue("{$col}{$row}", $h);
@@ -1764,15 +1818,16 @@ class Attendance extends BaseController
             $sheet->setCellValue("L{$row}", $r['sakit']);
             $sheet->setCellValue("M{$row}", $r['rl']);
             $sheet->setCellValue("N{$row}", $r['dinas']);
+            $sheet->setCellValue("O{$row}", $r['cuti_keguguran']);
 
-            $sheet->getStyle("A{$row}:N{$row}")->applyFromArray([
+            $sheet->getStyle("A{$row}:O{$row}")->applyFromArray([
                 'borders' => ['allBorders' => ['borderStyle' => Border::BORDER_THIN]]
             ]);
             $row++;
         }
 
         // auto size kolom
-        foreach (range('A', 'N') as $col) {
+        foreach (range('A', 'O') as $col) {
             $sheet->getColumnDimension($col)->setAutoSize(true);
         }
 
@@ -1953,7 +2008,8 @@ class Attendance extends BaseController
             'RL',
             'Alpha',
             'Libur',
-            'Dinas'
+            'Dinas',
+            'Cuti Keguguran'
         ];
         $colIndex = 1;
         $rowHeader2 = 3;
@@ -1993,7 +2049,8 @@ class Attendance extends BaseController
                 'hadir' => 0,
                 'alpha' => 0,
                 'libur' => 0,
-                'dinas' => 0
+                'dinas' => 0,
+                'ckg' => 0
             ];
 
             for ($d = 1; $d <= $totalDaysInMonth; $d++) {
@@ -2035,6 +2092,9 @@ class Attendance extends BaseController
                     case 'DINAS_D':
                         $total['dinas']++;
                         break;
+                    case 'CUTI KEGUGURAN_CKG':
+                        $total['ckg']++;
+                        break;
                 }
 
                 if (!empty($in) || !empty($out)) {
@@ -2053,6 +2113,7 @@ class Attendance extends BaseController
             $sheet2->setCellValueByColumnAndRow($colIndex++, $rowIndex, $total['alpha']);
             $sheet2->setCellValueByColumnAndRow($colIndex++, $rowIndex, $total['libur']);
             $sheet2->setCellValueByColumnAndRow($colIndex++, $rowIndex, $total['dinas']);
+            $sheet2->setCellValueByColumnAndRow($colIndex++, $rowIndex, $total['ckg']);
 
             $rowIndex++;
         }
@@ -2215,42 +2276,335 @@ class Attendance extends BaseController
         exit();
     }
 
-    public function updateUangMakanHarian()
+    public function exportExcelPresensiHarian()
     {
-        try {
-            $tanggal = date('Y-m-d', strtotime(str_replace('/', '-', $this->request->getVar('tanggal'))));
-            $employeeId = $this->request->getVar('employee_id');
-            $nominal = $this->request->getVar('nominal');
+        $startDate = date('Y-m-d', strtotime(str_replace('/', '-', $this->request->getVar('start_date'))));
+        $endDate   = date('Y-m-d', strtotime(str_replace('/', '-', $this->request->getVar('end_date'))));
 
-            $uangMakanHarian = $this->UangMakanHarianModel
-                ->where('employee_id', $employeeId)
-                ->where('tanggal', $tanggal)
-                ->first();
+        // ambil data employees
+        $condition = [
+            "employees.company_id" => $this->this_company_id,
+            "employees.deletedAt"  => null,
+        ];
+        $addCondition = [
+            "divisi_id"   => $this->request->getVar('divisi_id'),
+            "tipe"        => $this->request->getVar('tipe'),
+            "employee_id" => $this->request->getVar("employee_id"),
+        ];
+        $employees    = $this->EmployeesModel->getEmployeeListAttendances($condition, $addCondition, 0, 10000000);
+        $employeeData = $employees['data'];
+        $employeeIds  = array_column($employeeData, 'id');
 
-            if ($uangMakanHarian == null) {
-                $this->UangMakanHarianModel->insert([
-                    'employee_id'  => $employeeId,
-                    'tanggal' => $tanggal,
-                    'nominal' => $nominal,
-                ]);
+        // log attendance
+        $logData = !empty($employeeIds)
+            ? $this->AttendanceModel->getAttendanceByDateRangeAmt(
+                $employeeIds,
+                $startDate,
+                $endDate
+            )
+            : [];
+
+        // mapping data presensi
+        $mapLog = [];
+        foreach ($logData as $l) {
+            if (!empty($l['checkin']) && !empty($l['checkout'])) {
+                $status = "H";
             } else {
-                $this->UangMakanHarianModel->update($uangMakanHarian['id'], [
-                    'nominal' => $nominal
+                $status = $l['status'] != null ? explode("_", $l['status'])[1] : "";
+            }
+            $mapLog[$l['employee_id']][$l['periode']] = [
+                'in'     => $l['checkin'],
+                'out'    => $l['checkout'],
+                'status' => $status,
+            ];
+        }
+
+        // mapping data uang harian
+        $uangMakanData = !empty($employeeIds) ? $this->UangMakanHarianModel->getUangMakanHarianByDateRangeAmt(
+            $employeeIds,
+            $startDate,
+            $endDate
+        ) : [];
+        $mapUangMakanHarian = [];
+        foreach ($uangMakanData as $u) {
+            $mapUangMakanHarian[$u['employee_id']][$u['tanggal']] = [
+                'nominal' => $u['nominal']
+            ];
+        }
+
+
+        // ambil big days
+        $bigDays = $this->BigDaysModel
+            ->where('company_id', $this->this_company_id)
+            ->where('deletedAt', null)
+            ->findAll();
+        $tanggalBigDay = array_column($bigDays, 'date');
+
+        // Buat spreadsheet
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+        $sheet->setTitle("Presensi Harian");
+
+        // date range
+        $period = new DatePeriod(
+            new DateTime($startDate),
+            new DateInterval('P1D'),
+            (new DateTime($endDate))->modify('+1 day')
+        );
+
+        $row = 1;
+
+        // array rekap total per karyawan
+        $rekapKaryawan = [];
+
+        foreach ($period as $date) {
+            $tgl = $date->format('Y-m-d');
+            $dayName = date('D', strtotime($tgl));
+
+            // Header per tanggal
+            $sheet->mergeCells("A{$row}:H{$row}");
+            $sheet->setCellValue("A{$row}", "Tanggal: {$tgl}");
+            $sheet->getStyle("A{$row}")->applyFromArray([
+                'font' => ['bold' => true, 'size' => 12],
+                'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER],
+                'fill' => [
+                    'fillType' => Fill::FILL_SOLID,
+                    'startColor' => ['rgb' => 'DDDDDD']
+                ]
+            ]);
+            $row++;
+
+            // Header kolom
+            $headers = ['No', 'Nip', 'Nama', 'Divisi', 'Bagian', 'IN', 'OUT', 'Status', 'Uang Makan', 'Terlambat (Menit)', 'Total Lembur'];
+            $col = 'A';
+            foreach ($headers as $h) {
+                $sheet->setCellValue("{$col}{$row}", $h);
+                $sheet->getStyle("{$col}{$row}")->applyFromArray([
+                    'font' => ['bold' => true],
+                    'alignment' => [
+                        'horizontal' => Alignment::HORIZONTAL_CENTER,
+                        'vertical' => Alignment::VERTICAL_CENTER
+                    ],
+                    'borders' => ['allBorders' => ['borderStyle' => Border::BORDER_THIN]]
                 ]);
+                $col++;
+            }
+            $row++;
+
+            // isi data per karyawan
+            $no = 1;
+            foreach ($employeeData as $emp) {
+                $nip    = $emp['nip'] ?? '';
+                $nama   = $emp['name'] ?? '';
+                $divisi = $emp['divisi'] ?? '';
+                $bagian = $emp['bagian'] ?? '';
+
+                $in     = $mapLog[$emp['id']][$tgl]['in'] ?? '';
+                $out    = $mapLog[$emp['id']][$tgl]['out'] ?? '';
+                $status = $mapLog[$emp['id']][$tgl]['status'] ?? '';
+                $uangMakan = $mapUangMakanHarian[$emp['id']][$tgl]['nominal'] ?? 0;
+                $keterlambatanMenit = "";
+                $formLembur = $this->formLemburModel->where('employee_id', $emp['id'])->where('periode', $tgl)->where('deletedAt', null)->first();
+                $totalJamLembur = null;
+                if ($formLembur != null) {
+                    $waktuSelisihPulangLembur = $this->formLembur::selisihWaktu(
+                        $formLembur['jam_mulai_lembur'],
+                        $formLembur['jam_selesai_lembur']
+                    );
+                    $totalJamLembur = (float)$waktuSelisihPulangLembur['jam'] . " Jam, " . $waktuSelisihPulangLembur['menit'] . " Menit";
+                }
+
+                // cek jika tanggal masuk big day
+                if (in_array($tgl, $tanggalBigDay)) {
+                    $status = "L";
+                }
+
+                if ($in == '' && $out == '' && $dayName == 'Sun' && $status == '') {
+                    $status = "L";
+                }
+
+                if ($in == '' && $out == '' && $status == '') {
+                    $status = "A";
+                }
+
+                if ($in != '' && $out != '') {
+                    $status = "H";
+                }
+
+                if ($in != '') {
+                    $keterlambatanCheck = static::keterlambatanCheck(
+                        $tgl,
+                        $in,
+                        $emp['id']
+                    );
+
+                    $jamTerlambat = $keterlambatanCheck[1];
+                    $inTime = new DateTime($in);
+                    $lateTime = new DateTime($jamTerlambat);
+
+                    $diff = $lateTime->diff($inTime);
+                    $keterlambatanMenit = ($diff->h * 60) + $diff->i;
+
+                    if ($inTime < $lateTime) {
+                        $keterlambatanMenit = "";
+                    }
+                }
+
+                $sheet->setCellValue("A{$row}", $no++);
+                $sheet->setCellValue("B{$row}", $nip);
+                $sheet->setCellValue("C{$row}", $nama);
+                $sheet->setCellValue("D{$row}", $divisi);
+                $sheet->setCellValue("E{$row}", $bagian);
+                $sheet->setCellValue("F{$row}", $in);
+                $sheet->setCellValue("G{$row}", $out);
+                $sheet->setCellValue("H{$row}", $status);
+                $sheet->setCellValue("I{$row}", $uangMakan);
+                $sheet->setCellValue("J{$row}", !empty($keterlambatanMenit) ? $keterlambatanMenit : '');
+                $sheet->setCellValue("K{$row}", !empty($totalJamLembur) ? $totalJamLembur : '');
+
+                // border untuk isi
+                $sheet->getStyle("A{$row}:K{$row}")->applyFromArray([
+                    'borders' => ['allBorders' => ['borderStyle' => Border::BORDER_THIN]]
+                ]);
+
+                $sheet->setCellValue("I{$row}", $uangMakan);
+                $sheet->getStyle("I{$row}")
+                    ->getNumberFormat()
+                    ->setFormatCode('#,##0');
+
+                $sheet->getStyle("I{$row}")
+                    ->getAlignment()
+                    ->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_RIGHT);
+
+                $row++;
+
+                // Hitung total status per karyawan
+                if (!isset($rekapKaryawan[$emp['id']])) {
+                    $rekapKaryawan[$emp['id']] = [
+                        'nip'            => $nip,
+                        'nama'           => $nama,
+                        'hadir'          => 0,
+                        'alpa'           => 0,
+                        'libur'          => 0,
+                        'cuti_tahunan'   => 0,
+                        'cuti_haid'      => 0,
+                        'cuti_hamil'     => 0,
+                        'cuti_melahirkan' => 0,
+                        'ijin'           => 0,
+                        'sakit'          => 0,
+                        'rl'             => 0,
+                        'dinas'          => 0,
+                        'cuti_keguguran' => 0,
+                    ];
+                }
+
+                switch ($status) {
+                    case 'H':
+                        $rekapKaryawan[$emp['id']]['hadir']++;
+                        break;
+                    case 'A':
+                        $rekapKaryawan[$emp['id']]['alpa']++;
+                        break;
+                    case 'L':
+                        $rekapKaryawan[$emp['id']]['libur']++;
+                        break;
+                    case 'CT':
+                        $rekapKaryawan[$emp['id']]['cuti_tahunan']++;
+                        break;
+                    case 'CHD':
+                        $rekapKaryawan[$emp['id']]['cuti_haid']++;
+                        break;
+                    case 'CHL':
+                        $rekapKaryawan[$emp['id']]['cuti_hamil']++;
+                        break;
+                    case 'CM':
+                        $rekapKaryawan[$emp['id']]['cuti_melahirkan']++;
+                        break;
+                    case 'I':
+                        $rekapKaryawan[$emp['id']]['ijin']++;
+                        break;
+                    case 'S':
+                        $rekapKaryawan[$emp['id']]['sakit']++;
+                        break;
+                    case 'RL':
+                        $rekapKaryawan[$emp['id']]['rl']++;
+                        break;
+                    case 'D':
+                        $rekapKaryawan[$emp['id']]['dinas']++;
+                        break;
+                    case 'CKG':
+                        $rekapKaryawan[$emp['id']]['cuti_keguguran']++;
+                        break;
+                }
             }
 
-            return response()->setJSON([
-                'status' => true,
-                'message' => "Uang makan harian berhasil disimpan",
-                'token' => csrf_hash()
-            ]);
-        } catch (Exception $e) {
-            return response()->setJSON([
-                'status' => false,
-                'token' => csrf_hash(),
-                'message' => $e->getMessage()
-            ]);
+            // kasih spasi 2 baris antar tanggal
+            $row += 2;
         }
+
+
+        // === REKAP TOTAL DI BAWAH ===
+        $sheet->mergeCells("A{$row}:K{$row}");
+        $sheet->setCellValue("A{$row}", "REKAP KEHADIRAN");
+        $sheet->getStyle("A{$row}")->applyFromArray([
+            'font' => ['bold' => true, 'size' => 12],
+            'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER],
+        ]);
+        $row++;
+
+        // Header rekap
+        $rekapHeaders = ['No', 'Nip', 'Nama', 'Hadir', 'Alpa', 'Libur', 'Cuti Tahunan', 'Cuti Haid', 'Cuti Hamil', 'Cuti Melahirkan', 'Ijin', 'Sakit', 'RL', 'Dinas', 'Cuti Keguguran'];
+        $col = 'A';
+        foreach ($rekapHeaders as $h) {
+            $sheet->setCellValue("{$col}{$row}", $h);
+            $sheet->getStyle("{$col}{$row}")->applyFromArray([
+                'font' => ['bold' => true],
+                'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER],
+                'borders' => ['allBorders' => ['borderStyle' => Border::BORDER_THIN]]
+            ]);
+            $col++;
+        }
+        $row++;
+
+        // Isi data rekap
+        $no = 1;
+        foreach ($rekapKaryawan as $r) {
+            $sheet->setCellValue("A{$row}", $no++);
+            $sheet->setCellValue("B{$row}", $r['nip']);
+            $sheet->setCellValue("C{$row}", $r['nama']);
+            $sheet->setCellValue("D{$row}", $r['hadir']);
+            $sheet->setCellValue("E{$row}", $r['alpa']);
+            $sheet->setCellValue("F{$row}", $r['libur']);
+            $sheet->setCellValue("G{$row}", $r['cuti_tahunan']);
+            $sheet->setCellValue("H{$row}", $r['cuti_haid']);
+            $sheet->setCellValue("I{$row}", $r['cuti_hamil']);
+            $sheet->setCellValue("J{$row}", $r['cuti_melahirkan']);
+            $sheet->setCellValue("K{$row}", $r['ijin']);
+            $sheet->setCellValue("L{$row}", $r['sakit']);
+            $sheet->setCellValue("M{$row}", $r['rl']);
+            $sheet->setCellValue("N{$row}", $r['dinas']);
+            $sheet->setCellValue("O{$row}", $r['cuti_keguguran']);
+
+            $sheet->getStyle("A{$row}:O{$row}")->applyFromArray([
+                'borders' => ['allBorders' => ['borderStyle' => Border::BORDER_THIN]]
+            ]);
+            $row++;
+        }
+
+        // auto size kolom
+        foreach (range('A', 'O') as $col) {
+            $sheet->getColumnDimension($col)->setAutoSize(true);
+        }
+
+        // output excel
+        $filename = "Real_Presensi_Harian_{$startDate}_sd_{$endDate}.xlsx";
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header("Content-Disposition: attachment;filename=\"{$filename}\"");
+        header('Cache-Control: max-age=0');
+
+        $writer = new Xlsx($spreadsheet);
+        $writer->save('php://output');
+        exit();
     }
 
     // Helper: ambil data presensi per bulan

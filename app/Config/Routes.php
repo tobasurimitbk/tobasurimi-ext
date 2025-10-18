@@ -2075,7 +2075,6 @@ $routes->get('/log-attendance/detail', 'HR\Attendance::getLogAttendanceDetail', 
 $routes->get('/log-attendance/export-bulanan', 'HR\Attendance::exportExcelLogPresensiBulanan', ['filter' => 'Auth']);
 $routes->get('/log-attendance/export-harian', 'HR\Attendance::exportExcelLogPresensiHarian', ['filter' => 'Auth']);
 $routes->get('/log-attendance/like-employees', 'HR\Attendance::getEmployeesLike', ['filter' => 'Auth']);
-$routes->post('/log-attendance/update-uangmakan', 'HR\Attendance::updateUangMakanHarian', ['filter' => 'Auth']);
 $routes->post('/log-attendance/sync-attendance', 'HR\Attendance::syncAttendance', ['filter' => 'Auth']);
 
 // Generate Attendance
@@ -2089,6 +2088,7 @@ $routes->post('/list-attendance/get-attendance', 'HR\Attendance::getDetailAttend
 $routes->post('/list-attendance/update-attendance', 'HR\Attendance::updateAttendance', ['filter' => 'Auth']);
 $routes->get('/list-attendance/export-bulanan', 'HR\Attendance::exportExcelPresensi', ['filter' => 'Auth']);
 $routes->get('/list-attendance/export-triwulan', 'HR\Attendance::exportTriwulanPresensi', ['filter' => 'Auth']);
+$routes->get('/list-attendance/export-harian', 'HR\Attendance::exportExcelPresensiHarian', ['filter' => 'Auth']);
 
 // Big Day
 $routes->get('/big-days', 'Master\BigDays::ListBigDay', ['filter' => 'Auth']);

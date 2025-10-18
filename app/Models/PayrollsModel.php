@@ -31,6 +31,7 @@ class PayrollsModel extends Model
         'libur',
         'alpha',
         'dinas',
+        'cuti_keguguran',
         'hadir_final',
         'total_perizinan_not_approved',
         'total_perizinan_approved',

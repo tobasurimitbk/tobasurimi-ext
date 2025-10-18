@@ -109,7 +109,7 @@
                 </button>
                 <ul class="dropdown-menu list-dropdown-company" aria-labelledby="dropdownMenuButtonExport">
                     <li><a class="dropdown-item" href="#" onclick="exportExcelBulanan()">Lap. Bulanan</a></li>
-                    <li><a class="dropdown-item" id="btnShowExportHarianModal" href="#" onclick="exportExcelHarian()">Lap. Harian</a></li>
+                    <li><a class="dropdown-item" id="btnShowExportHarianModal" href="#">Lap. Harian</a></li>
                 </ul>
             <?php endif; ?>
         </div>
@@ -293,11 +293,6 @@
                     </div>
 
                     <div class="form-floating mb-2" style="height: 50px;">
-                        <input placeholder="Nominal Uang Makan (Opsional)" type="text" name="nominal" class="form-control" id="nominal" oninput="this.value = greatFormatRupiah(this.value)">
-                        <label for="status">Nominal Uang Makan (Opsional)</label>
-                    </div>
-
-                    <div class="form-floating mb-2" style="height: 50px;">
                         <input type="text" name="jamTerlambat" class="form-control" id="jamTerlambat" disabled>
                         <label for="jamTerlambat">Jam Terlambat</label>
                     </div>
@@ -320,7 +315,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-hide-form btn-discard btn-discard-1 mr-3">Close</button>
-                    <button type="button" class="btn btn-submit-form" id="btnUpdateUangMakan">Update Uang Makan</button>
+                    <!-- <button type="button" class="btn btn-submit-form" id="btnUpdateUangMakan">Update Uang Makan</button> -->
                 </div>
             </form>
         </div>
@@ -580,6 +575,9 @@
                         if (colClass.includes('bg-dinas')) {
                             return renderCell(data, '#ad53a9');
                         }
+                        if (colClass.includes('bg-cuti-keguguran')) {
+                            return renderCell(data, '#75321a');
+                        }
 
 
                         function renderCell(data, bgColor) {
@@ -681,6 +679,11 @@
             },
             {
                 data: "total_dinas",
+                className: "text-left",
+                sortable: false,
+            },
+            {
+                data: "total_cuti_keguguran",
                 className: "text-left",
                 sortable: false,
             },
@@ -855,38 +858,38 @@
         }
     })
 
-    var validatorUangMakan = $("#updateUangMakanForm").validate({
-        rules: {
-            nominal: {
-                required: true
-            },
-        },
-        messages: {
-            nominal: {
-                required: "Nominal Uang Makan Wajib Diisi"
-            },
-        },
-        errorElement: 'span',
-        errorClass: 'text-danger',
-        errorPlacement: function(error, element) {
-            var elem = $(element);
-            if (elem.hasClass("select2-hidden-accessible")) {
-                element = $("#select2-" + elem.attr("id") + "-container").parent();
-                error.insertAfter(element);
-            } else {
-                error.insertAfter(element);
-            }
-        },
-        highlight: function(element) {
-            $(element).closest('.form-group').addClass('has-error');
-            $(element).addClass('select-class');
+    // var validatorUangMakan = $("#updateUangMakanForm").validate({
+    //     rules: {
+    //         nominal: {
+    //             required: true
+    //         },
+    //     },
+    //     messages: {
+    //         nominal: {
+    //             required: "Nominal Uang Makan Wajib Diisi"
+    //         },
+    //     },
+    //     errorElement: 'span',
+    //     errorClass: 'text-danger',
+    //     errorPlacement: function(error, element) {
+    //         var elem = $(element);
+    //         if (elem.hasClass("select2-hidden-accessible")) {
+    //             element = $("#select2-" + elem.attr("id") + "-container").parent();
+    //             error.insertAfter(element);
+    //         } else {
+    //             error.insertAfter(element);
+    //         }
+    //     },
+    //     highlight: function(element) {
+    //         $(element).closest('.form-group').addClass('has-error');
+    //         $(element).addClass('select-class');
 
-        },
-        unhighlight: function(element) {
-            $(element).closest('.form-group').removeClass('has-error');
-            $(element).removeClass('select-class');
-        },
-    });
+    //     },
+    //     unhighlight: function(element) {
+    //         $(element).closest('.form-group').removeClass('has-error');
+    //         $(element).removeClass('select-class');
+    //     },
+    // });
 
     var validatorLapAbsensi = $("#lapLogAbsensiForm").validate({
         rules: {
@@ -1044,58 +1047,58 @@
         }
     });
 
-    $('#btnUpdateUangMakan').click(function(e) {
-        e.preventDefault();
-        if ($('#updateUangMakanForm').valid()) {
-            var csrf = $(`[name="${csrfToken}"]`);
-            var tanggal = $('#tanggal_uang_makan').val();
-            var employeeId = $('#employee_id_uang_makan').val();
-            var nominal = destroyFormatRupiah($('#nominal').val());
-            var formData = new FormData();
-            formData.set('tanggal', tanggal);
-            formData.set('employee_id', employeeId);
-            formData.set('nominal', nominal);
+    // $('#btnUpdateUangMakan').click(function(e) {
+    //     e.preventDefault();
+    //     if ($('#updateUangMakanForm').valid()) {
+    //         var csrf = $(`[name="${csrfToken}"]`);
+    //         var tanggal = $('#tanggal_uang_makan').val();
+    //         var employeeId = $('#employee_id_uang_makan').val();
+    //         var nominal = destroyFormatRupiah($('#nominal').val());
+    //         var formData = new FormData();
+    //         formData.set('tanggal', tanggal);
+    //         formData.set('employee_id', employeeId);
+    //         formData.set('nominal', nominal);
 
-            $.ajax({
-                url: "<?= base_url("log-attendance/update-uangmakan"); ?>",
-                data: formData,
-                beforeSend: function(xhr) {
-                    setLoading();
-                    xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                },
-                complete: function() {
-                    stopLoading();
-                },
-                method: "POST",
-                dataType: "json",
-                processData: false,
-                contentType: false,
-                success: function(response) {
-                    csrf.val(response.token);
-                    if (response.status) {
-                        Swal.fire({
-                            icon: 'success',
-                            title: response.message,
-                            confirmButtonColor: '#4e73df',
-                        }).then((result) => {
-                            if (result.isConfirmed) {
-                                $('#detailModal').modal('hide');
-                            }
-                        });
-                        return;
-                    } else {
-                        Swal.fire({
-                            icon: 'error',
-                            title: response.message,
-                            confirmButtonColor: '#4e73df',
-                        });
-                        return;
-                    }
+    //         $.ajax({
+    //             url: "<?= base_url("log-attendance/update-uangmakan"); ?>",
+    //             data: formData,
+    //             beforeSend: function(xhr) {
+    //                 setLoading();
+    //                 xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+    //             },
+    //             complete: function() {
+    //                 stopLoading();
+    //             },
+    //             method: "POST",
+    //             dataType: "json",
+    //             processData: false,
+    //             contentType: false,
+    //             success: function(response) {
+    //                 csrf.val(response.token);
+    //                 if (response.status) {
+    //                     Swal.fire({
+    //                         icon: 'success',
+    //                         title: response.message,
+    //                         confirmButtonColor: '#4e73df',
+    //                     }).then((result) => {
+    //                         if (result.isConfirmed) {
+    //                             $('#detailModal').modal('hide');
+    //                         }
+    //                     });
+    //                     return;
+    //                 } else {
+    //                     Swal.fire({
+    //                         icon: 'error',
+    //                         title: response.message,
+    //                         confirmButtonColor: '#4e73df',
+    //                     });
+    //                     return;
+    //                 }
 
-                }
-            });
-        }
-    })
+    //             }
+    //         });
+    //     }
+    // })
 
     function getListDetailJamKerja(jamKerjaId) {
         $.ajax({
