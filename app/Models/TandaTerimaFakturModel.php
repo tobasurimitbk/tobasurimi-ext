@@ -24,6 +24,7 @@ class TandaTerimaFakturModel extends Model
         'faktur_no',
         'faktur_keluar_no',
         'jatuh_tempo',
+        'total_paid',
         'nominal_faktur',
         'invoice_date',
         'receive_date',
@@ -146,9 +147,15 @@ class TandaTerimaFakturModel extends Model
         $supplierModel = new SupplierModel();
         $divisiModel = new DivisisModel();
 
+        $supplierName = $supplierModel
+            ->select('name')
+            ->where('id', $supplier)
+            ->where('deletedAt', null)
+            ->findColumn('name') ?? [];
+
         $idSupplierArr = $supplierModel
             ->select('id')
-            ->where('name', $supplier)
+            ->where('name', $supplierName)
             ->where('deletedAt', null)
             ->findColumn('id') ?? [];
 
@@ -291,15 +298,16 @@ class TandaTerimaFakturModel extends Model
 
     public function getByID($tandaTerimaFakturID)
     {   
-       $res = $this->select("
-                tanda_terima_faktur.*,
-                GROUP_CONCAT(DISTINCT tanda_terima_faktur_detail.lpb_no ORDER BY tanda_terima_faktur_detail.lpb_no SEPARATOR ', ') AS list_lpb,
-                COALESCE(SUM(tanda_terima_faktur_detail.price), 0) AS total_amount
-            ")
-            ->join('tanda_terima_faktur_detail', 'tanda_terima_faktur_detail.tanda_terima_faktur_id = tanda_terima_faktur.id', 'left')
-            ->where('tanda_terima_faktur.id', $tandaTerimaFakturID)
-            ->groupBy('tanda_terima_faktur.id')
-            ->first();
+      $res = $this->select("
+            tanda_terima_faktur.*,
+            GROUP_CONCAT(DISTINCT tanda_terima_faktur_detail.lpb_no ORDER BY tanda_terima_faktur_detail.lpb_no SEPARATOR ', ') AS list_lpb,
+            (tanda_terima_faktur.nominal_faktur - COALESCE(tanda_terima_faktur.total_paid, 0)) AS sisa_bayar
+        ")
+        ->join('tanda_terima_faktur_detail', 'tanda_terima_faktur_detail.tanda_terima_faktur_id = tanda_terima_faktur.id', 'left')
+        ->where('tanda_terima_faktur.id', $tandaTerimaFakturID)
+        ->where('tanda_terima_faktur.deletedAt', null)
+        ->groupBy('tanda_terima_faktur.id')
+        ->first();
 
         return $res;
     }

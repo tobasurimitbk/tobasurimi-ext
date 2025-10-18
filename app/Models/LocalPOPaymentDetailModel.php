@@ -17,6 +17,7 @@ class LocalPOPaymentDetailModel extends Model
     protected $allowedFields    = [
         'local_po_payment_id',
         'penerimaan_barang_id',
+        'tanda_terima_faktur_id',
         'penerimaan_barang_detail_id',
         'rm_purchase_order_id',
         'rm_purchase_order_details_id',
