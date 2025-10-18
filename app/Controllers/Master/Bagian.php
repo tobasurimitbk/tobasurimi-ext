@@ -234,6 +234,17 @@ class Bagian extends BaseController
         ]);
     }
 
+    public function getBagianByDivisionNoEncrypt()
+    {
+        $bagianModel = new BagianModel();
+        $res = $bagianModel->where('division_id', ($this->request->getVar('divisionID')))->where('deletedAt', null)->findAll();
+        return response()->setJSON([
+            'token' => csrf_hash(),
+            'status' => true,
+            'data' => $res,
+        ]);
+    }
+
     public function getAllBagian()
     {
         $bagianModel = new BagianModel();

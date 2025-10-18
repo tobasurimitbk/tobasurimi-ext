@@ -509,6 +509,10 @@ class EmployeesModel extends Model
             $dataQry->where('employees.id', $addCondition['employee_id']);
         }
 
+        if (!empty($addCondition['bagian_id'])) {
+            $dataQry->where('employees.bagian_id', $addCondition['bagian_id']);
+        }
+
         $totalFilteredData = $dataQry->countAllResults(false);
 
         $data = $dataQry->orderBy($sort, $sortType)->findAll($limit, $offset);

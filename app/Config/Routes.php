@@ -2089,6 +2089,7 @@ $routes->post('/list-attendance/update-attendance', 'HR\Attendance::updateAttend
 $routes->get('/list-attendance/export-bulanan', 'HR\Attendance::exportExcelPresensi', ['filter' => 'Auth']);
 $routes->get('/list-attendance/export-triwulan', 'HR\Attendance::exportTriwulanPresensi', ['filter' => 'Auth']);
 $routes->get('/list-attendance/export-harian', 'HR\Attendance::exportExcelPresensiHarian', ['filter' => 'Auth']);
+$routes->post('/list-attendance/get-bagian', 'Master\Bagian::getBagianByDivisionNoEncrypt', ['filter' => 'Auth']);
 
 // Big Day
 $routes->get('/big-days', 'Master\BigDays::ListBigDay', ['filter' => 'Auth']);
