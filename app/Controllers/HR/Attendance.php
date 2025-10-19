@@ -1959,10 +1959,11 @@ class Attendance extends BaseController
             $sheet1->mergeCellsByColumnAndRow($colIndex, $rowHeader, $colIndex, $rowHeader + 1);
             $sheet1->setCellValueByColumnAndRow($colIndex++, $rowHeader, $h);
         }
+
         // Header tanggal
         for ($d = 1; $d <= $totalDaysInMonth; $d++) {
             $startCol = $colIndex;
-            // Sekarang ada 4 kolom per tanggal: IN, OUT, DENDA, LEMBUR
+            // 4 kolom per tanggal: IN, OUT, DENDA, LEMBUR
             $sheet1->mergeCellsByColumnAndRow($startCol, $rowHeader, $startCol + 3, $rowHeader);
             $sheet1->setCellValueByColumnAndRow($startCol, $rowHeader, $d);
 
@@ -1971,12 +1972,16 @@ class Attendance extends BaseController
             $sheet1->setCellValueByColumnAndRow($startCol + 2, $rowHeader + 1, "DENDA");
             $sheet1->setCellValueByColumnAndRow($startCol + 3, $rowHeader + 1, "LEMBUR (MENIT)");
 
-            $colIndex += 4; // tambahkan 4 kolom setiap tanggal
+            $colIndex += 4;
         }
 
-        $lastCol = $colIndex - 1;
+        // === Tambahkan kolom Total Denda Bulan di akhir ===
+        $sheet1->mergeCellsByColumnAndRow($colIndex, $rowHeader, $colIndex, $rowHeader + 1);
+        $sheet1->setCellValueByColumnAndRow($colIndex, $rowHeader, "TOTAL DENDA (BULAN)");
+        $totalDendaColIndex = $colIndex;
+        $lastCol = $colIndex;
 
-        // Style header (2 baris)
+        // Style header
         $sheet1->getStyle("A{$rowHeader}:" . $sheet1->getCellByColumnAndRow($lastCol, $rowHeader + 1)->getCoordinate())
             ->applyFromArray([
                 'font' => ['bold' => true],
@@ -1999,12 +2004,20 @@ class Attendance extends BaseController
             $sheet1->setCellValueByColumnAndRow($colIndex++, $rowIndex, $e['divisi']);
             $sheet1->setCellValueByColumnAndRow($colIndex++, $rowIndex, $e['bagian']);
 
+            $totalDendaBulan = 0;
+
             for ($d = 1; $d <= $totalDaysInMonth; $d++) {
                 $tanggal = sprintf("%04d-%02d-%02d", $year, $month, $d);
                 $dayLog  = $mapLog[$e['id']][$tanggal] ?? null;
-                $dendaKeterlambatan = $mapDendaKeterlambatan[$e['id']][$tanggal]['nominal'] ?? '';
-                $totalLembur = $mapTotalLembur[$e['id']][$tanggal] ?? ''; // asumsi sudah disiapkan map lembur
-                $formLembur = $this->formLemburModel->where('employee_id', $e['id'])->where('periode', $tanggal)->where('deletedAt', null)->first();
+                $dendaKeterlambatan = (float)($mapDendaKeterlambatan[$e['id']][$tanggal]['nominal'] ?? 0);
+
+                $totalDendaBulan += $dendaKeterlambatan;
+
+                $formLembur = $this->formLemburModel->where('employee_id', $e['id'])
+                    ->where('periode', $tanggal)
+                    ->where('deletedAt', null)
+                    ->first();
+
                 $totalJamLembur = null;
                 if ($formLembur != null) {
                     $waktuSelisihPulangLembur = $this->formLembur::selisihWaktu(
@@ -2023,14 +2036,33 @@ class Attendance extends BaseController
                     $in = $out = $val;
                 }
 
-
-
-
                 $sheet1->setCellValueByColumnAndRow($colIndex++, $rowIndex, $in);
                 $sheet1->setCellValueByColumnAndRow($colIndex++, $rowIndex, $out);
-                $sheet1->setCellValueByColumnAndRow($colIndex++, $rowIndex, $dendaKeterlambatan);
+
+                // === DENDA per tanggal ===
+                $dendaCol = $colIndex;
+                $sheet1->setCellValueByColumnAndRow($dendaCol, $rowIndex, $dendaKeterlambatan);
+                // Format angka ribuan & rata kanan
+                $sheet1->getStyleByColumnAndRow($dendaCol, $rowIndex)
+                    ->getNumberFormat()
+                    ->setFormatCode('#,##0');
+                $sheet1->getStyleByColumnAndRow($dendaCol, $rowIndex)
+                    ->getAlignment()
+                    ->setHorizontal(Alignment::HORIZONTAL_RIGHT);
+                $colIndex++;
+
                 $sheet1->setCellValueByColumnAndRow($colIndex++, $rowIndex, $totalJamLembur);
             }
+
+            // === TOTAL DENDA (BULAN) ===
+            $sheet1->setCellValueByColumnAndRow($colIndex, $rowIndex, $totalDendaBulan);
+            $sheet1->getStyleByColumnAndRow($colIndex, $rowIndex)
+                ->getNumberFormat()
+                ->setFormatCode('#,##0');
+            $sheet1->getStyleByColumnAndRow($colIndex, $rowIndex)
+                ->getAlignment()
+                ->setHorizontal(Alignment::HORIZONTAL_RIGHT);
+
             $rowIndex++;
         }
 
@@ -2040,20 +2072,8 @@ class Attendance extends BaseController
                 'borders' => ['allBorders' => ['borderStyle' => Border::BORDER_THIN]],
             ]);
 
-        // Auto width semua kolom termasuk denda dan lembur
+        // Auto width semua kolom
         foreach (range('A', $sheet1->getCellByColumnAndRow($lastCol, 1)->getColumn()) as $col) {
-            $sheet1->getColumnDimension($col)->setAutoSize(true);
-        }
-
-
-        // Border isi
-        $sheet1->getStyle("A" . ($rowHeader) . ":" . $sheet1->getCellByColumnAndRow($lastCol, $rowIndex - 1)->getCoordinate())
-            ->applyFromArray([
-                'borders' => ['allBorders' => ['borderStyle' => Border::BORDER_THIN]],
-            ]);
-
-        // Auto width untuk kolom No, NIP, Nama, Divisi, Bagian
-        foreach (range('A', 'E') as $col) {
             $sheet1->getColumnDimension($col)->setAutoSize(true);
         }
 
@@ -2576,7 +2596,7 @@ class Attendance extends BaseController
                     ->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_RIGHT);
 
                 // Untuk Denda
-                $sheet->setCellValue("L{$row}", $uangMakan);
+                $sheet->setCellValue("L{$row}", $uangDendaKeterlambatan);
                 $sheet->getStyle("L{$row}")
                     ->getNumberFormat()
                     ->setFormatCode('#,##0');

@@ -55,24 +55,24 @@
             <tr style="background-color: #f8f9fa; border-bottom: 2px solid #dee2e6;">
                 <th style="padding: 6px; text-align: left; font-weight: bold; border: 1px solid #ddd; width: 10px; height:2%;">NO</th>
                 <th style="padding: 6px; text-align: left; font-weight: bold; border: 1px solid #ddd;">
-                    SAMPLE/PRODUCTS
+                    PRODUCTS
                 </th>
                 <th style="padding: 6px; text-align: left; font-weight: bold; border: 1px solid #ddd;">
-                    QUANTITY/WEIGHT
+                    QUANTITY
                 </th>
-                <th style="padding: 6px; text-align: left; font-weight: bold; border: 1px solid #ddd;">
+                <th style="padding: 6px; text-align: left; font-weight: bold; border: 1px solid #ddd;width:200px;">
                     SPECIFICATIONS
                 </th>
-                <th style="padding: 6px; text-align: left; font-weight: bold; border: 1px solid #ddd;">
+                <th style="padding: 6px; text-align: left; font-weight: bold; border: 1px solid #ddd;width:300px;">
                     DIKIRIM KE
                 </th>
-                <th style="padding: 6px; text-align: left; font-weight: bold; border: 1px solid #ddd;">
-                    AN
+                <th style="padding: 6px; text-align: left; font-weight: bold; border: 1px solid #ddd; width:50px;">
+                    A/N
                 </th>
-                <th style="padding: 6px; text-align: left; font-weight: bold; border: 1px solid #ddd;">
-                    TANGGAL
+                <th style="padding: 6px; text-align: left; font-weight: bold; border: 1px solid #ddd;width:50px;">
+                    TGL
                 </th>
-                <th style="padding: 6px; text-align: left; font-weight: bold; border: 1px solid #ddd;">
+                <th style="padding: 6px; text-align: left; font-weight: bold; border: 1px solid #ddd;width:50px;">
                     VIA
                 </th>
             </tr>
@@ -82,7 +82,7 @@
             $no = 1;
             $kodeSatuan = ""
             ?>
-            <?php foreach ($dataBarangList as $d): ?>
+            <?php foreach ($dataBarangList as $i => $d): ?>
                 <?php
                 $kodeSatuan = $d['kode_satuan']
                 ?>
@@ -93,32 +93,40 @@
                         <?= $d['note'] ?>
                     </td>
                     <td style="padding: 3px; border: 1px solid #ddd; width: 4.5%;text-align: left;">
-                        <?= $d['qty'] . " " . $d['kode_satuan'] ?>
+                        <?= number_format($d['qty'], 2) ?>
                     </td>
                     <td style="padding: 3px; border: 1px solid #ddd; width: 4.5%;text-align: left;">
                         <b>
                             <?= $d['grade']  ?>
                         </b>
                     </td>
-                    <td style="padding: 3px; border: 1px solid #ddd; width: 4.5%;text-align: left;">
-                        <b style="text-align: center;">
-                            <u>
-                                <?= $dataSample['delivery'] ?>
-                            </u>
-                        </b> <br>
-                        <b>
-                            <?= $dataSample['delivery_address'] ?>
-                        </b>
-                    </td>
-                    <td style="padding: 3px; border: 1px solid #ddd; width: 4.5%;text-align: left;">
-                        <?= $d['an'] ?>
-                    </td>
-                    <td style="padding: 3px; border: 1px solid #ddd; width: 4.5%;text-align: left;">
-                        <?= $d['pickup_date'] ?>
-                    </td>
-                    <td style="padding: 3px; border: 1px solid #ddd; width: 4.5%;text-align: left;">
-                        <?= $d['via'] ?>
-                    </td>
+                    <?php if ($i == 0): ?>
+                        <td style="padding: 3px; border: 1px solid #ddd; width: 4.5%;text-align: left;" rowspan="<?= count($dataBarangList) ?>">
+                            <b style="text-align: center;">
+                                <u>
+                                    <?= $dataSample['delivery'] ?>
+                                </u>
+                            </b> <br>
+                            <b>
+                                <?= $dataSample['delivery_address'] ?>
+                            </b> <br>
+                            <b>
+                                Attn No : <?= $dataSample['attn_no'] ?>
+                            </b><br>
+                            <b>
+                                NB : <?= $dataSample['nb'] ?>
+                            </b><br>
+                        </td>
+                        <td style="padding: 3px; border: 1px solid #ddd; width: 4.5%;text-align: left;" rowspan="<?= count($dataBarangList) ?>">
+                            <?= $d['an'] ?>
+                        </td>
+                        <td style="padding: 3px; border: 1px solid #ddd; width: 4.5%;text-align: left;" rowspan="<?= count($dataBarangList) ?>">
+                            <?= $d['pickup_date'] ?>
+                        </td>
+                        <td style="padding: 3px; border: 1px solid #ddd; width: 4.5%;text-align: left;" rowspan="<?= count($dataBarangList) ?>">
+                            <?= $d['via'] ?>
+                        </td>
+                    <?php endif; ?>
                 </tr>
             <?php endforeach; ?>
             <tr style="font-weight: bold; background-color: #e9ecef; font-size: 11px;">
@@ -130,24 +138,28 @@
                     <?= number_format($dataSample['total_qty'], 2) ?>
                 </td>
             </tr>
-            <tr style="font-weight: bold; background-color: #e9ecef; font-size: 11px;" colspan="6">
-                <td style="padding: 6px; border: 1px solid #ddd;"></td>
-                <td style="padding: 6px; border: 1px solid #ddd; text-align: right;">
-                    TOTAL NET WEIGHT (KG)
-                </td>
-                <td style="padding: 6px; border: 1px solid #ddd; " colspan="6">
-                    <?= number_format($dataSample['total_berat_bersih'], 2) ?>
-                </td>
-            </tr>
-            <tr style="font-weight: bold; background-color: #e9ecef; font-size: 11px;" colspan="6">
-                <td style="padding: 6px; border: 1px solid #ddd;"></td>
-                <td style="padding: 6px; border: 1px solid #ddd; text-align: right;">
-                    TOTAL GROSS WEIGHT (KG)
-                </td>
-                <td style="padding: 6px; border: 1px solid #ddd; " colspan="6">
-                    <?= number_format($dataSample['total_berat_kotor'], 2) ?>
-                </td>
-            </tr>
+            <?php if ($dataSample['total_berat_bersih'] != 0 && !empty($dataSample['total_berat_bersih'])): ?>
+                <tr style="font-weight: bold; background-color: #e9ecef; font-size: 11px;" colspan="6">
+                    <td style="padding: 6px; border: 1px solid #ddd;"></td>
+                    <td style="padding: 6px; border: 1px solid #ddd; text-align: right;">
+                        TOTAL NET WEIGHT (KG)
+                    </td>
+                    <td style="padding: 6px; border: 1px solid #ddd; " colspan="6">
+                        <?= number_format($dataSample['total_berat_bersih'], 2) ?>
+                    </td>
+                </tr>
+            <?php endif; ?>
+            <?php if ($dataSample['total_berat_kotor'] != 0 && !empty($dataSample['total_berat_kotor'])): ?>
+                <tr style="font-weight: bold; background-color: #e9ecef; font-size: 11px;" colspan="6">
+                    <td style="padding: 6px; border: 1px solid #ddd;"></td>
+                    <td style="padding: 6px; border: 1px solid #ddd; text-align: right;">
+                        TOTAL GROSS WEIGHT (KG)
+                    </td>
+                    <td style="padding: 6px; border: 1px solid #ddd; " colspan="6">
+                        <?= number_format($dataSample['total_berat_kotor'], 2) ?>
+                    </td>
+                </tr>
+            <?php endif; ?>
         </tbody>
     </table>
     <table border="1" style="width: 100%; border: 1px solid black; border-collapse: collapse;" class="label">
@@ -166,16 +178,11 @@
                                     <i>
                                         Delivery Address/CNEE/Notify Party
                                     </i> <br>
-                                    <?= $dataSample['delivery_address'] ?> <br>
-                                    Attn No : <?= $dataSample['attn_no'] ?>
+                                    <?= $dataSample['delivery_address'] ?>
+
                                 </b>
                             </td>
-                            <td>
-                                <b>
-                                    NB : <br>
-                                    <?= $dataSample['nb'] ?> <br>
-                                </b>
-                            </td>
+
                         </tr>
                     </table>
                 </td>
@@ -185,17 +192,18 @@
                 <td style=" padding: 0;">
                     <table style="width: 100%; border-collapse: collapse;" class="label">
                         <tr>
+                            <td style="width: 16.66%; border: 1px solid black; border-top: none; border-bottom: none;text-align:center;">
+                                DIMINTA OLEH
+                            </td>
                             <td style="width: 16.66%; border: 1px solid black; border-left: none; border-top: none; border-bottom: none; text-align:center;">
                                 DISETUJUI OLEH
                             </td>
+
                             <td style="width: 16.66%; border: 1px solid black; border-top: none; border-bottom: none;text-align:center;">
-                                EXIM
+                                DIBUAT OLEH
                             </td>
                             <td style="width: 16.66%; border: 1px solid black; border-top: none; border-bottom: none;text-align:center;">
-                                QA / QC <?= $company['company'] ?>
-                            </td>
-                            <td style="width: 16.66%; border: 1px solid black; border-top: none; border-bottom: none;text-align:center;">
-                                DITERIMA OLEH
+                                DIKETAHUI OLEH
                             </td>
                         </tr>
                     </table>
@@ -206,25 +214,30 @@
                 <td style="border: none; padding: 0;">
                     <table style="width: 100%; border-collapse: collapse;" class="label">
                         <tr>
+
+                            <td style="width: 16.66%; border: 1px solid black; border-top: none; border-bottom: none;">
+                                <br><br><br><br>
+                                <center>
+                                    ( MARKETING )
+                                </center>
+                            </td>
                             <td style="width: 16.66%; border: 1px solid black; border-left: none; border-top: none; border-bottom: none;">
                                 <br><br><br><br>
                                 <center>
                                     ( <?= $dataSample['approved_by'] ?> )
                                 </center>
-                                <br>
-
                             </td>
                             <td style="width: 16.66%; border: 1px solid black; border-top: none; border-bottom: none;">
                                 <br><br><br><br>
-
+                                <center>
+                                    ( QA / QC <?= $company['company'] ?> )
+                                </center>
                             </td>
                             <td style="width: 16.66%; border: 1px solid black; border-top: none; border-bottom: none;">
                                 <br><br><br><br>
-
-                            </td>
-                            <td style="width: 16.66%; border: 1px solid black; border-top: none; border-bottom: none;">
-                                <br><br><br><br>
-
+                                <center>
+                                    ( EXIM )
+                                </center>
                             </td>
                         </tr>
                     </table>
