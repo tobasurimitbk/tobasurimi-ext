@@ -218,11 +218,13 @@
     });
 
     function edit(id) {
-        window.location.href = `/sample-ekspor/id/${id}`;
+        var base_url = "<?= base_url() ?>";
+        window.location.href = base_url + `sample-ekspor/id/${id}`;
     }
 
     function print(id) {
-        window.open(`/sample-ekspor/print/${id}`, '_blank');
+        var base_url = "<?= base_url() ?>";
+        window.open(base_url + `sample-ekspor/print/${id}`, '_blank');
     }
 
     const remove = function(id) {
