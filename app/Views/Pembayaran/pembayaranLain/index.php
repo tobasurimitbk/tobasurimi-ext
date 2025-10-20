@@ -108,7 +108,7 @@
                                 <div class="col-md-6">
                                     <div class="input-group input-group-password">
                                         <div class="form-floating mb-3" style="height: 50px;">
-                                            <input autocomplete="one-time-code" class="form-control input-picker tanggal_pembayaran" id="tanggal_pembayaran" name="tanggal_pembayaran" placeholder="Tanggal Jatuh Tempo">
+                                            <input autocomplete="one-time-code" class="form-control input-picker tanggal_pembayaran" id="tanggal_pembayaran" name="tanggal_pembayaran" placeholder="Tanggal Jatuh Tempo" required>
                                             <label for="floatingInput">Tanggal Pembayaran Parent</label>
                                         </div>
                                         <div class="input-group-prepend group-prepend-password align-items-center">
@@ -118,7 +118,7 @@
                                 </div>
                                 <div class="col-md-6">
                                     <div class="form-floating mb-3" style="height: 50px;">
-                                        <textarea autocomplete="one-time-code" style="height: 88px;" type="text" class="form-control keterangan_parent" name="keterangan_parent" id="keterangan_parent" placeholder="Keterangan"></textarea>
+                                        <textarea autocomplete="one-time-code" style="height: 88px;" type="text" class="form-control keterangan_parent" name="keterangan_parent" id="keterangan_parent" placeholder="Keterangan" required></textarea>
                                         <label for="floatingInput">Keterangan</label>
                                     </div>
                                 </div>
@@ -546,7 +546,13 @@
                 },
                 akun_selisih: {
                     required: "Akun kredit wajib diisi"
-                }
+                },
+                no_pembayaran: {
+                    required: "No pembayaran wajib diisi"
+                },
+                keterangan: {
+                    required: "Keterangan wajib diisi"
+                },
             },
             errorElement: 'span',
             errorClass: 'text-danger',

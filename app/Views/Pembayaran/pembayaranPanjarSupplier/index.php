@@ -30,7 +30,7 @@
 
                                 <div class="col-md-6">
                                     <div class="form-floating mb-3" style="height: 50px;">
-                                        <select class="form-select divisi_id" id="divisi_id" name="divisi_id" aria-label="Floating label select example">
+                                        <select class="form-select divisi_id" id="divisi_id" name="divisi_id" aria-label="Floating label select example" required>
                                             <option value=""></option>
                                             <?php foreach ($divisi as $d) : ?>
                                                 <option value="<?= $d['id'] ?>">
@@ -163,7 +163,7 @@
                                 <div class="col-md-6">
                                     <div class="input-group input-group-password">
                                         <div class="form-floating mb-3" style="height: 50px;">
-                                            <input autocomplete="one-time-code" class="form-control input-picker tanggal" id="tanggal" name="tanggal" placeholder="Tanggal Jatuh Tempo">
+                                            <input autocomplete="one-time-code" class="form-control input-picker tanggal" id="tanggal" name="tanggal" placeholder="Tanggal Jatuh Tempo" required>
                                             <label for="floatingInput">Tanggal Pembayaran</label>
                                         </div>
                                         <div class="input-group-prepend group-prepend-password align-items-center">
@@ -310,12 +310,6 @@
                             <label for="floatingInput">Supplier</label>
                         </div>
                     </div>
-                    <!-- <div class="col-sm-12">
-                        <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" type="text" class="form-control lpb_no" name="lpb_no" id="lpb_no">
-                            <label for="floatingInput">Nomor LPB</label>
-                        </div>
-                    </div> -->
                 </div>
                 <div class="table-responsive">
                     <table class="table table-inside table-borderd nowrap table-hover-tobasurimi dataTable2" style="width: 100%;" id="tableHistori">
@@ -515,6 +509,15 @@
             },
             keterangan: {
                 required: "Keterangan wajib dipilih"
+            },
+            tanggal: {
+                required: "Tanggal wajib dipilih"
+            },
+            divisi: {
+                required: "Divisi wajib dipilih"
+            },
+            payment_method: {
+                required: "Payment Method wajib dipilih"
             }
         },
         errorElement: 'span',
