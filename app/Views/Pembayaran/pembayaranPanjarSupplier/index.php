@@ -56,7 +56,7 @@
 
                                 <div class="col-md-6">
                                     <div class="form-floating mb-3" style="height: 50px;">
-                                        <select class="form-select" name="jenis" id="jenis">
+                                        <select class="form-select" name="jenis" id="jenis" required>
                                             <option value="PUTIH">PUTIH</option>
                                             <option value="MERAH">MERAH</option>
                                         </select>
@@ -86,7 +86,7 @@
                             <div class="row">
                                 <div class="col-md-6">
                                     <div class="form-floating mb-3" style="height: 50px;">
-                                        <select class="form-select " name="payment_method" id="payment_method">
+                                        <select class="form-select " name="payment_method" id="payment_method" required>
                                             <option disabled selected value="">Pilih Metode Pembayaran</option>
                                             <option value="Cash">Cash</option>
                                             <option value="Bank">Bank</option>

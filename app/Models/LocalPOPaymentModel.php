@@ -136,16 +136,14 @@ class LocalPOPaymentModel extends Model
         }
 
 
-
         if ($addCondition['search'] != "") {
             $supplierDataQry
-                ->like('payment_no', $addCondition['search'])
-                ->orLike('suppliers.name', $addCondition['search'])
-                ->orLike('local_po_payments.payment_no', $addCondition['search'])
-                // ->orLike('tanda_terima_faktur.faktur_no', $addCondition['search'])
-                ->orLike('local_po_payments.payment_method', $addCondition['search'])
-                ->orLike('local_po_payments.amount', $addCondition['search']);
+                ->groupStart()
+                    ->like('local_po_payments.payment_no', $addCondition['search'])
+                    ->orLike('suppliers.name', $addCondition['search'])
+                ->groupEnd();
         }
+
 
 
 

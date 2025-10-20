@@ -112,11 +112,11 @@ class PanjarPinjamanTransactionModel extends Model
         }
 
         if (!empty($addCondition['dateStart'])) {
-            $builder->where('ppt.createdAt >=', $addCondition['dateStart']);
+            $builder->where('ppt.tanggal >=', $addCondition['dateStart']);
         }
 
         if (!empty($addCondition['dateEnd'])) {
-            $builder->where('ppt.createdAt <=', $addCondition['dateEnd']);
+            $builder->where('ppt.tanggal <=', $addCondition['dateEnd']);
         }
 
         $totalData = $builder->countAllResults(false); // total semua
