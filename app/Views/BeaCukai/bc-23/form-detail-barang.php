@@ -232,7 +232,7 @@
                             </div>
                             <div class="mt-1">
                                 <div class="form-floating mb-3">
-                                    <input id="barang_detail_nilai_pabean" name="barang_detail_nilai_pabean" readonly type="text" value="<?= $bc23DokumenBarang == null ? number_format($barangDetail['harga'] * $bc23['ndpbm'], 2) : number_format($bc23DokumenBarang['harga_ekspor'], 2) ?>" class="form-control barang_detail_nilai_pabean" placeholder="" onkeyup="this.value = greatFormatRupiah(this.value)">
+                                    <input id="barang_detail_nilai_pabean" name="barang_detail_nilai_pabean" readonly type="text" value="<?= $bc23DokumenBarang == null ? number_format($barangDetail['harga'] * $bc23['ndpbm'], 2) : number_format($barangDetail['harga'] * $bc23['ndpbm'], 2) ?>" class="form-control barang_detail_nilai_pabean" placeholder="" onkeyup="this.value = greatFormatRupiah(this.value)">
                                     <label>Nilai Pabean</label>
                                     <small><i>Nilai pabean diambil dari nilai CIF dikalikan dengan Harga barang</i></small>
                                 </div>
