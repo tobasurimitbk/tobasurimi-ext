@@ -265,14 +265,14 @@
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input oninput="this.value = greatFormatRupiah(this.value)" autocomplete="one-time-code" type="text" class="form-control berat_kotor" id="berat_kotor" name="berat_kotor" placeholder="Gross Weight">
-                                <label for="floatingInput">Gross Weight</label>
+                                <input oninput="this.value = greatFormatRupiah(this.value)" autocomplete="one-time-code" type="text" class="form-control berat_kotor" id="berat_kotor" name="berat_kotor" placeholder="Gross Weight (Optional)">
+                                <label for="floatingInput">Gross Weight (Optional)</label>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating mb-3" style="height: 50px;">
-                                <input oninput="this.value = greatFormatRupiah(this.value)" autocomplete="one-time-code" type="text" class="form-control berat_bersih" id="berat_bersih" name="berat_bersih" placeholder="Net Weight">
-                                <label for="floatingInput">Net Weight</label>
+                                <input oninput="this.value = greatFormatRupiah(this.value)" autocomplete="one-time-code" type="text" class="form-control berat_bersih" id="berat_bersih" name="berat_bersih" placeholder="Net Weight (Optional)">
+                                <label for="floatingInput">Net Weight (Optional)</label>
                             </div>
                         </div>
                         <div class="col-md-6">
@@ -456,12 +456,12 @@
                 qty: {
                     required: true
                 },
-                berat_kotor: {
-                    required: true
-                },
-                berat_bersih: {
-                    required: true
-                },
+                // berat_kotor: {
+                //     required: true
+                // },
+                // berat_bersih: {
+                //     required: true
+                // },
             },
             messages: {
                 barang_master_sales_id: {
@@ -485,12 +485,12 @@
                 qty: {
                     required: "Qty required"
                 },
-                berat_kotor: {
-                    required: "Gross weight required"
-                },
-                berat_bersih: {
-                    required: "Net Weight required"
-                },
+                // berat_kotor: {
+                //     required: "Gross weight required"
+                // },
+                // berat_bersih: {
+                //     required: "Net Weight required"
+                // },
             },
             errorElement: 'span',
             errorClass: 'text-danger',
@@ -549,7 +549,7 @@
                     listBarang[index].pickup_date = pickUpDate;
                     listBarang[index].via = via;
                     listBarang[index].qty = qty;
-                    listBarang[index].note = nota;
+                    listBarang[index].note = note;
                     listBarang[index].kode_satuan = kodeSatuan;
                     listBarang[index].satuan_id = satuanId;
                     listBarang[index].berat_kotor = beratKotor;
@@ -772,7 +772,7 @@
         $('#satuan_id').val(item.satuan_id).change();
         $('#berat_kotor').val(greatFormatRupiah(item.berat_kotor));
         $('#berat_bersih').val(greatFormatRupiah(item.berat_bersih));
-        $('#via').val(item.note);
+        $('#note').val(item.note);
 
         $('#label-barang').text("Update ");
         $('#barangModal').modal('show');
