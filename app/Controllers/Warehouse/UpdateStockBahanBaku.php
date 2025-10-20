@@ -560,51 +560,57 @@ class UpdateStockBahanBaku extends BaseController
         try {
             $id = $this->request->getPost("id");
 
-            if (!empty($id)) {
-                $findPenerimaanBarang = $this->penerimaanBarangModel->find($id);
-                if ($findPenerimaanBarang) {
-                    $response =  $this->penerimaanBarangModel->delete($id);
-                    if ($response) {
-                        $data = [
-                            "status"            => true,
-                            "message"   => "Data Berhasil dihapus",
-                            'token' => csrf_hash()
-                        ];
-                        echo json_encode($data);
-                    } else {
-                        $message = 'Data Gagal Dihapus';
-                        $data = [
-                            "status"            => false,
-                            "message"    => $message,
-                            'token' => csrf_hash()
-                        ];
-                        echo json_encode($data);
-                    }
-                } else {
-                    $data = [
-                        "status"            => false,
-                        "message"    => "Data Tidak Ditemukan",
-                        'token' => csrf_hash()
-                    ];
-                    echo json_encode($data);
-                }
+            if (empty($id)) {
+                return $this->response->setJSON([
+                    "status"  => false,
+                    "message" => "Data Gagal Dihapus (ID tidak ditemukan)",
+                    "token"   => csrf_hash(),
+                ]);
+            }
+
+            // 🔹 Pastikan data utama ada
+            $penerimaan = $this->updateStockPurchase
+                ->where('id', $id)
+                ->first();
+
+            if (!$penerimaan) {
+                return $this->response->setJSON([
+                    "status"  => false,
+                    "message" => "Data Tidak Ditemukan",
+                    "token"   => csrf_hash(),
+                ]);
+            }
+
+            // 🔹 Hapus dulu semua detail terkait
+            $this->updateStockPurchaseDetail
+                ->where('update_stock_purchase_id', $id)
+                ->delete();
+
+            // 🔹 Hapus data utamanya
+            $delete = $this->updateStockPurchase
+                ->where('id', $id)
+                ->delete();
+
+            if ($delete) {
+                return $this->response->setJSON([
+                    "status"  => true,
+                    "message" => "Data dan detail berhasil dihapus",
+                    "token"   => csrf_hash(),
+                ]);
             } else {
-                $data = [
-                    "status"            => false,
-                    "message"    => "Data Gagal Dihapus",
-                    'token' => csrf_hash()
-                ];
-                echo json_encode($data);
+                return $this->response->setJSON([
+                    "status"  => false,
+                    "message" => "Data Gagal Dihapus",
+                    "token"   => csrf_hash(),
+                ]);
             }
         } catch (\Exception $e) {
-            $data = [
-                "status"            => false,
-                "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
-                'token' => csrf_hash()
-            ];
-            echo json_encode($data);
+            return $this->response->setJSON([
+                "status"  => false,
+                "message" => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
+                "token"   => csrf_hash(),
+            ]);
         }
-        return;
     }
 
     public function dropdownupdateStockBahanBaku()

@@ -1570,6 +1570,7 @@ $routes->get('/update-stock-bahan-baku/print/(:segment)', 'Warehouse\UpdateStock
 $routes->post('/update-stock-bahan-baku/save', 'Warehouse\UpdateStockBahanBaku::saveStockBahanBakuAction', ['filter' => 'Auth']);
 $routes->post('/update-stock-bahan-baku/update', 'Warehouse\UpdateStockBahanBaku::updateStockBahanBakuAction', ['filter' => 'Auth']);
 $routes->post('/update-stock-bahan-baku/posting', 'Warehouse\UpdateStockBahanBaku::posting', ['filter' => 'Auth']);
+$routes->post('/update-stock-bahan-baku/delete', 'Warehouse\UpdateStockBahanBaku::deleteupdateStockBahanBaku', ['filter' => 'Auth']);
 
 
 // ROUTE BEA CUKAI REVAMP

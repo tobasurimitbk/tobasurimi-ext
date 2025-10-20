@@ -99,11 +99,11 @@
             let parts = value.split("+").map(v => parseFloat(v.trim()) || 0);
             let sum = parts.reduce((a, b) => a + b, 0);
 
-            return (Math.round(sum * 1000) / 1000).toFixed(3);
+            return (Math.round(sum * 1000) / 1000).toFixed(2);
         }
 
         let num = parseFloat(value) || 0;
-        return (Math.round(num * 1000) / 1000).toFixed(3);
+        return (Math.round(num * 1000) / 1000).toFixed(2);
     }
 
 
