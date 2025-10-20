@@ -444,6 +444,7 @@
             multiple: true,
         }).change(function() {
             listBarangDetail();
+            generateKeteranganPembayaran();
         });
 
         $('#bank_id').select2({
@@ -465,7 +466,7 @@
             theme: "bootstrap-5"
         }).change(function(e) {
             getListTandaTerimaSupplier();
-            $('#supplier').val($('#supplier_id option:selected').text());
+            $('#supplier').val($('#supplier_id option:selected').text().trim());
         });
 
         $(document).on('keyup change', '.nominal_pembayaran', function () {
@@ -993,8 +994,8 @@
 
     function generateKeteranganPembayaran(data) {
         var keterangan = "";
-        var supplierName = $('#supplier_id option:selected').text();
-        var noTandaTerima = $('#tanda_terima_supplier option:selected').text();
+        var supplierName = $('#supplier_id option:selected').text().trim();
+        var noTandaTerima = $('#tanda_terima_supplier option:selected').text().trim();
         var poNoText = "";
         $.each(data, function(i, v) {
             poNoText += `${v.item_name} Sebanyak ${v.qty} ${v.unit}, `;
