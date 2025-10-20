@@ -1010,6 +1010,8 @@
         var formData = new FormData();
         formData.append("type", "Bahan Penolong");
         formData.append("payment_date", $("#payment_date").val());
+        formData.append("id", $("#id").val());
+        formData.append("noTransaksi", $("#no_bukti_pembayaran").val());
         formData.append("bankId", $("#bank_id option:selected").val());
         formData.append("divisiId", $("#divisi_id option:selected").text());
         formData.append("jenisPembayaran", $("#jenis_pembayaran option:selected").text());

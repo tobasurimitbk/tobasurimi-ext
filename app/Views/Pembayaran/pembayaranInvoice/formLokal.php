@@ -779,6 +779,8 @@
 
     function generatePaymentNumber() {
             // Get selected divisi and bank values
+            let id = $("#id").val();
+            let noTransaksi = $("#no_bukti_pembayaran").val();
             let jenisPembayaran = "MERAH";
             let divisiId = $("#divisi_id option:selected").text();
             let bankId = $("#bank_id option:selected").val();
@@ -791,7 +793,7 @@
 
                 // Build URL with query parameters
                 let url = "<?= base_url('pembayaran-po-lokal-bb/generate-no-pembayaran'); ?>";
-                url += `?jenisPembayaran=${encodeURIComponent(jenisPembayaran)}&paymentMethod=${encodeURIComponent(paymentMethod)}&divisiId=${encodeURIComponent(divisiId)}&bankId=${encodeURIComponent(bankId)}&tanggalPembayaran=${encodeURIComponent(tanggalPembayaran)}`;
+                url += `?jenisPembayaran=${encodeURIComponent(jenisPembayaran)}&paymentMethod=${encodeURIComponent(paymentMethod)}&divisiId=${encodeURIComponent(divisiId)}&bankId=${encodeURIComponent(bankId)}&tanggalPembayaran=${encodeURIComponent(tanggalPembayaran)}&id=${encodeURIComponent(id)}&noTransaksi=${encodeURIComponent(noTransaksi)}`;
 
                 // Additional data if needed
                 var formData = new FormData();

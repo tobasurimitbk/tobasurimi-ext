@@ -325,7 +325,6 @@
     let select2Initialized = false;
 
     const csrfToken = '<?= csrf_token() ?>';
-    const csrf = $(`[name="${csrfToken}"]`);
 
     const table = $('.dataTable').DataTable({
 
@@ -594,6 +593,19 @@
             todayBtn: "linked"
         }).on('changeDate', function(e) {
             $(this).valid(); // Trigger validasi saat tanggal berubah
+        });
+
+        $('#metode_pembayaran').on('change', function() {
+            const selectedPaymentMethod = $(this).val()?.toUpperCase();
+
+            if (selectedPaymentMethod === 'BANK') {
+                // Aktifkan kembali kalau bukan CASH
+                $('#bank_id').prop('disabled', false);
+            } else {
+                // Kosongin dan disable select bank
+                $('#bank_id').val(null).trigger('change');
+                $('#bank_id').prop('disabled', true);
+            }
         });
 
         $("#tanggal_pembayaran").datepicker({
@@ -1079,6 +1091,13 @@
                 console.log('Field value changed - generating payment number');
                 generatePaymentNumber(true);
             }
+
+             // Jika field 'jenis' berubah, kita MAU selalau generate (karena user ingin mengganti prefix)
+            if (currentField === 'jenis') {
+                // generate dengan paksa karena jenis harus mengubah prefix meskipun balik ke nilai awal
+                generatePaymentNumber(true);
+                return;
+            }
         }
 
         $('.btn-discard').click(function() {
@@ -1233,6 +1252,7 @@
                 }).then((result) => {
                     if (result.isConfirmed) {
                         let id = $('#id').val();
+                        const csrf = $(`[name="${csrfToken}"]`);
                         const jenisPembayaran = $('#jenis_pembayaran option:selected').val();
 
                         // Prepare data with proper formatting
@@ -1341,6 +1361,7 @@
         }).then((result) => {
             if (result.isConfirmed) {
                 var formData = new FormData();
+                const csrf = $(`[name="${csrfToken}"]`);
                 formData.append('id', id);
                 $.ajax({
                     url: "<?= base_url("pembayaran-lain/delete"); ?>",
@@ -1445,6 +1466,7 @@
             cancelButtonText: 'Kembali',
         }).then((result) => {
             if (result.isConfirmed) {
+                const csrf = $(`[name="${csrfToken}"]`);
                 $.ajax({
                     url: "<?= base_url("pembayaran-lain/posting"); ?>",
                     data: {
@@ -1574,14 +1596,17 @@
         };
 
         // Jalankan AJAX generate nomor
+        let id = $("#id").val();
         let jenisPembayaran = $("#jenis_pembayaran option:selected").text();
         let metodePembayaran = $("#metode_pembayaran option:selected").val();
         let divisiId = $("#divisi_id option:selected").text();
         let bankId = $("#bank_id option:selected").val();
         let tanggalPembayaran = $("#tanggal_pembayaran").val();
+        let noTransaksi = $("#no_pembayaran").val();
+        const csrf = $(`[name="${csrfToken}"]`);
 
         let url = "<?= base_url('pembayaran-lain/generate-no-pembayaran'); ?>";
-        url += `?jenisPembayaran=${encodeURIComponent(jenisPembayaran)}&divisiId=${encodeURIComponent(divisiId)}&metodePembayaran=${encodeURIComponent(metodePembayaran)}&bankId=${encodeURIComponent(bankId)}&tanggalPembayaran=${encodeURIComponent(tanggalPembayaran)}`;
+        url += `?jenisPembayaran=${encodeURIComponent(jenisPembayaran)}&divisiId=${encodeURIComponent(divisiId)}&metodePembayaran=${encodeURIComponent(metodePembayaran)}&bankId=${encodeURIComponent(bankId)}&tanggalPembayaran=${encodeURIComponent(tanggalPembayaran)}&id=${encodeURIComponent(id)}&noTransaksi=${encodeURIComponent(noTransaksi)}`;
 
         $(".no_pembayaran").attr("readonly", true);
 

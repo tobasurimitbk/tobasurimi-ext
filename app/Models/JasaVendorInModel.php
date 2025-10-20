@@ -410,149 +410,173 @@ class JasaVendorInModel extends Model
         $barangMasterModel = new BarangMasterModel();
         
 
-        $jasaVendorOutData = $jasaVendorOutDetailModel->whereIn('jasa_vendor_out_id', $jasaVendorOutArr)->where('deletedAt', null)->findAll();
-        $result = array();
+       // Mulai: ambil data jasa vendor out berdasarkan array id
+$jasaVendorOutData = $jasaVendorOutDetailModel
+    ->whereIn('jasa_vendor_out_id', $jasaVendorOutArr)
+    ->where('deletedAt', null)
+    ->findAll();
 
-        foreach ($jasaVendorOutData as $j) {
-            $stockListOutDetail = $stockRevampDetailModel->where('id', $j['stock_out_detail_id'])->first();
-            $stockBarangOut = $stockRevampModel->where('id', $stockListOutDetail['stock_id'])->first();
+$result = [];
 
-            $barangOut = $barangMasterModel->select("CONCAT(barang_master.barang_name, '-', barang_master_spesifikasi.spesifikasi) AS barang, satuans.kode_satuan, barang_master.kode_barang, barang_master_spesifikasi.barang_master_id AS barang1_id")
+// Loop setiap detail keluar
+foreach ($jasaVendorOutData as $j) {
+    // Ambil stock out detail dengan aman
+    $stockListOutDetail = $stockRevampDetailModel->where('id', $j['stock_out_detail_id'])->first();
+    $stockBarangOut = $stockListOutDetail && isset($stockListOutDetail['stock_id'])
+        ? $stockRevampModel->where('id', $stockListOutDetail['stock_id'])->first()
+        : null;
+
+    // Ambil data barangOut hanya jika stockBarangOut ada dan memiliki fields yang dibutuhkan
+    $barangOut = null;
+    if ($stockBarangOut && isset($stockBarangOut['spesifikasi_id'])) {
+        $barangOut = $barangMasterModel
+            ->select("CONCAT(barang_master.barang_name, '-', barang_master_spesifikasi.spesifikasi) AS barang, satuans.kode_satuan, barang_master.kode_barang, barang_master_spesifikasi.barang_master_id AS barang1_id")
+            ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.barang_master_id = barang_master.id', 'left')
+            ->join('satuans', 'satuans.id = barang_master_spesifikasi.satuan_1', 'left')
+            ->where('barang_master_spesifikasi.id', $stockBarangOut['spesifikasi_id'])
+            ->where('barang_master_spesifikasi.barang_master_id', $stockBarangOut['barang_master_id'] ?? null)
+            ->first();
+    }
+
+    // Ambil bc metadata (boleh null)
+    $bc = null;
+    if (!empty($j['bc_out_id'])) {
+        $bc = $metaDataModel->find($j['bc_out_id']);
+    }
+
+    // Ambil jasaVendorInDetail untuk jasaVendorInID jika diberikan
+    $jasaVendorInDetail = [];
+    if (!empty($jasaVendorInID)) {
+        $jasaVendorInDetail = $jasaVendorInDetailModel
+            ->where('jasa_vendor_in_id', $jasaVendorInID)
+            ->where('deletedAt', NULL)
+            ->findAll() ?: [];
+    }
+
+    // Ambil PO -> RM PO -> supplier (semua aman jika null)
+    $rmPurchaseOrder = null;
+    $supplier = null;
+    if ($stockListOutDetail && !empty($stockListOutDetail['po_id'])) {
+        $rmPurchaseOrder = $rmPurchaseOrderModel->where('id', $stockListOutDetail['po_id'])->first();
+        if ($rmPurchaseOrder && !empty($rmPurchaseOrder['supplier_id'])) {
+            $supplier = $supplierModel->where('id', $rmPurchaseOrder['supplier_id'])->first();
+        }
+    }
+
+    // Parsel nomor jasa vendor in dari stock_dokumen (aman jika format beda)
+    $resultNoJasaVendorIn = false;
+    if (!empty($j['stock_dokumen'])) {
+        $resultNoJasaVendorIn = strstr($j['stock_dokumen'], '(', true);
+    }
+    $noJasaVendorIn = $resultNoJasaVendorIn !== false && $resultNoJasaVendorIn !== null
+        ? trim($resultNoJasaVendorIn)
+        : ($j['stock_dokumen'] ?? '');
+
+    $supplierName = $supplier['name'] ?? '-';
+    $supplierId = $supplier['id'] ?? 0;
+
+    // Ambil data jasa_vendor_in (jika ada id)
+    $jasaVendorIn = null;
+    if (!empty($jasaVendorInID)) {
+        $jasaVendorIn = $jasaVendorInModel
+            ->select('jasa_vendor_in.*,vendors.name as nama_vendor')
+            ->join('vendors', 'vendors.id = jasa_vendor_in.vendor_id', 'left')
+            ->where('jasa_vendor_in.id',  $jasaVendorInID)
+            ->where('jasa_vendor_in.deletedAt', NULL)
+            ->first();
+    }
+
+    $isOneRaw = (!empty($jasaVendorIn) && isset($jasaVendorIn['one_raw']) && $jasaVendorIn['one_raw'] == 1) ? true : false;
+
+    // Siapkan base item result
+    $baseItem = [
+        'jasa_vendor_out_detail_id' => $j['id'] ?? null,
+        'jasa_vendor_out_id' => $j['jasa_vendor_out_id'] ?? null,
+        'barang1_id' => $stockBarangOut['barang_master_id'] ?? 0,
+        'stock_out_id' => $j['stock_out_id'] ?? null,
+        'stock_date' => !empty($jasaVendorIn['tanggal']) ? date('d/m/Y', strtotime($jasaVendorIn['tanggal'])) : ($rmPurchaseOrder ? date('d/m/Y', strtotime($rmPurchaseOrder['po_date'])) : ""),
+        'tipe_barang' => "BAHAN BAKU",
+        'supplier_id' => !empty($jasaVendorIn) ? ($supplierId . ' / ' . ($jasaVendorIn['id'] ?? '')) : $supplierId,
+        'supplier_name' => !empty($jasaVendorIn) ? ($supplierName . ' / ' . ($jasaVendorIn['nama_vendor'] ?? '')) : $supplierName,
+        'bc_name' => $bc['value'] ?? 'NON PABEAN',
+        'bc_id' => $j['bc_out_id'] ?? null,
+        'no_aju' => $j['no_aju_out'] ?? null,
+        'kode_barang_out' => $barangOut['kode_barang'] ?? "-",
+        'barang_out' => isset($barangOut['barang']) ? strtoupper($barangOut['barang']) : "-",
+        'satuan_out' => $barangOut['kode_satuan'] ?? "-",
+        'qty_out' => $j['qty'] ?? 0,
+        'keterangan' => !empty($j['keterangan']) ? $j['keterangan'] : '-',
+        'stock_dokumen' => $j['stock_dokumen'] ?? null,
+        'sumber' => $stockListOutDetail ? ($stockListOutDetail['reference_type'] ?? null) : null,
+        'list_barang_masuk' => [],
+        'is_one_raw' => $isOneRaw
+    ];
+
+    // Push base item ke result
+    $result[] = $baseItem;
+}
+
+// Jika ada jasaVendorInDetail (yang berkaitan), kita ingin menyusun list_barang_masuk ke tiap result item.
+// Untuk efisiensi: index result by jasa_vendor_out_detail_id
+if (!empty($result)) {
+    // Buat map id -> index di array result
+    $resultIndexMap = [];
+    foreach ($result as $idx => $r) {
+        $key = $r['jasa_vendor_out_detail_id'];
+        $resultIndexMap[$key] = $idx;
+        // pastikan list_barang_masuk array ada
+        if (!isset($result[$idx]['list_barang_masuk']) || !is_array($result[$idx]['list_barang_masuk'])) {
+            $result[$idx]['list_barang_masuk'] = [];
+        }
+    }
+
+    // Kalau ada $jasaVendorInID, ambil semua detail terkait sekali (lebih efisien)
+    if (!empty($jasaVendorInID)) {
+        $allInDetails = $jasaVendorInDetailModel
+            ->where('jasa_vendor_in_id', $jasaVendorInID)
+            ->where('deletedAt', NULL)
+            ->findAll() ?: [];
+
+        foreach ($allInDetails as $k) {
+            $outDetailId = $k['jasa_vendor_out_detail_id'] ?? null;
+            if ($outDetailId !== null && isset($resultIndexMap[$outDetailId])) {
+                // Ambil barangIn dengan aman
+                $barangIn = null;
+                if (!empty($k['spesifikasi_in_id'])) {
+                    $barangIn = $barangMasterModel
+                        ->select("CONCAT(barang_master.barang_name, '-', barang_master_spesifikasi.spesifikasi) AS barang, satuans.kode_satuan, barang_master.kode_barang")
                         ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.barang_master_id = barang_master.id', 'left')
                         ->join('satuans', 'satuans.id = barang_master_spesifikasi.satuan_1', 'left')
-                        ->where('barang_master_spesifikasi.id', $stockBarangOut['spesifikasi_id'])
-                        ->where('barang_master_spesifikasi.barang_master_id', $stockBarangOut['barang_master_id'])
+                        ->where('barang_master_spesifikasi.id', $k['spesifikasi_in_id'])
                         ->first();
-
-            if ($stockListOutDetail) {
-                $bc = $metaDataModel->find($j['bc_out_id']);
-                $jasaVendorInDetail = $jasaVendorInDetailModel
-                    ->where('jasa_vendor_in_id', $jasaVendorInID)
-                    ->where('deletedAt', NULL)
-                    ->findAll();
-                
-                $rmPurchaseOrder = $rmPurchaseOrderModel->where('id', $stockListOutDetail['po_id'])
-                    ->first();
-
-                $supplier = $supplierModel->where('id', $rmPurchaseOrder['supplier_id'])
-                    ->first();
-
-                $resultNoJasaVendorIn = strstr($j['stock_dokumen'], '(', true);
-                $noJasaVendorIn = trim($resultNoJasaVendorIn);
-                $supplierName = $supplier['name'];
-                $supplierId = $supplier['id'];
-                $stockDate = $rmPurchaseOrder == null ? "" :  date('d/m/Y', strtotime($rmPurchaseOrder['po_date']));
-
-                $jasaVendorIn = $jasaVendorInModel
-                    ->select('jasa_vendor_in.*,vendors.name as nama_vendor')
-                    ->join('vendors', 'vendors.id = jasa_vendor_in.vendor_id', 'left')
-                    ->where('jasa_vendor_in.id',  $jasaVendorInID)
-                    ->where('jasa_vendor_in.deletedAt', NULL)
-                    ->first();
-
-                $isOneRaw = !empty($jasaVendorIn) && isset($jasaVendorIn['one_raw']) && $jasaVendorIn['one_raw'] == 1;
-
-                if ($jasaVendorInID == null) {
-                    $result[] = [
-                        'jasa_vendor_out_detail_id' => $j['id'],
-                        'jasa_vendor_out_id' => $j['jasa_vendor_out_id'],
-                        'barang1_id' => $stockBarangOut != null ? $stockBarangOut['barang_master_id'] : 0,
-                        'stock_out_id' => $j['stock_out_id'],
-                        'stock_date' =>  $jasaVendorIn == null ? $stockDate :  date('d/m/Y', strtotime($jasaVendorIn['tanggal'])),
-                        'tipe_barang' => "BAHAN BAKU",
-                        'supplier_id' => $jasaVendorIn == null ? $supplierId : $supplierId . ' / ' . $jasaVendorIn['id'],
-                        'supplier_name' =>  $jasaVendorIn == null ? $supplierName : $supplierName . ' / ' . $jasaVendorIn['nama_vendor'],
-                        'bc_name' => $bc != null ? $bc['value'] : 'NON PABEAN',
-                        'bc_id' => $j['bc_out_id'],
-                        'no_aju' => $j['no_aju_out'],
-                        'kode_barang_out' => $barangOut != null ? $barangOut['kode_barang'] : "-",
-                        'barang_out' => $barangOut != null ? strtoupper($barangOut['barang']) : "-",
-                        'satuan_out' => $barangOut != null ? $barangOut['kode_satuan'] : "-",
-                        'qty_out' => $j['qty'],
-                        'keterangan' => !empty($j['keterangan']) ? $j['keterangan'] : '-',
-                        'stock_dokumen' => $j['stock_dokumen'],
-                        'sumber' => $stockListOutDetail == null ?: $stockListOutDetail['reference_type'],
-                        'list_barang_masuk' => [],
-                        'is_one_raw' => $isOneRaw // Tambahkan flag one_raw
-                    ];
-                } else {
-                    $result[] = [
-                        'jasa_vendor_out_detail_id' => $j['id'],
-                        'jasa_vendor_out_id' => $j['jasa_vendor_out_id'],
-                        'barang1_id' => $stockBarangOut != null ? $stockBarangOut['barang_master_id'] : 0,
-                        'stock_out_id' => $j['stock_out_id'],
-                        'stock_date' =>  $jasaVendorIn == null ? $stockDate :  date('d/m/Y', strtotime($jasaVendorIn['tanggal'])),
-                        'tipe_barang' => "BAHAN BAKU",
-                        'supplier_id' => $jasaVendorIn == null ? $supplierId : $supplierId . ' / ' . $jasaVendorIn['id'],
-                        'supplier_name' =>  $jasaVendorIn == null ? $supplierName : $supplierName . ' / ' . $jasaVendorIn['nama_vendor'],
-                        'bc_name' => $bc != null ? $bc['value'] : 'NON PABEAN',
-                        'bc_id' => $j['bc_out_id'],
-                        'no_aju' => $j['no_aju_out'],
-                        'kode_barang_out' => $barangOut != null ? $barangOut['kode_barang'] : "-",
-                        'barang_out' => $barangOut != null ? strtoupper($barangOut['barang']) : "-",
-                        'satuan_out' => $barangOut != null ? $barangOut['kode_satuan'] : "-",
-                        'qty_out' => $j['qty'],
-                        'keterangan' => !empty($j['keterangan']) ? $j['keterangan'] : '-',
-                        'stock_dokumen' => $j['stock_dokumen'],
-                        'sumber' => $stockListOutDetail == null ?: $stockListOutDetail['reference_type'],
-                        'list_barang_masuk' => [],
-                        'is_one_raw' => $isOneRaw // Tambahkan flag one_raw
-                    ];
-
-                    if (count($jasaVendorInDetail) != 0) {
-                        for ($i = 0; $i < count($result); $i++) {
-                            foreach ($jasaVendorInDetail as $k) {
-                                if ($result[$i]['jasa_vendor_out_detail_id'] == $k['jasa_vendor_out_detail_id']) {
-                                     $barangIn = $barangMasterModel
-                                        ->select("CONCAT(barang_master.barang_name, '-', barang_master_spesifikasi.spesifikasi) AS barang, satuans.kode_satuan, barang_master.kode_barang, barang_master_spesifikasi.barang_master_id AS barang1_id")
-                                        ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.barang_master_id = barang_master.id', 'left')
-                                        ->join('satuans', 'satuans.id = barang_master_spesifikasi.satuan_1', 'left')
-                                        ->where('barang_master_spesifikasi.id', $k['spesifikasi_in_id'])
-                                        ->first();
-                                    array_push($result[$i]['list_barang_masuk'], [
-                                        'id' => $k['id'],
-                                        'jasa_vendor_in_id' => $k['jasa_vendor_in_id'],
-                                        'barang1_id' => $stockBarangOut != null ? $stockBarangOut['barang_master_id'] : 0,
-                                        'barang_name_in' => $barangIn != null ? strtoupper($barangIn['barang']) : '-',
-                                        'jasa_vendor_out_detail_id' => $k['jasa_vendor_out_detail_id'],
-                                        'kode_barang_in' => $barangIn != null ? strtoupper($barangIn['kode_barang']) : '-',
-                                        'kode_satuan_in' => $barangIn != null ? $barangIn['kode_satuan'] : '-',
-                                        'stock_dokumen' => $k['stock_dokumen'],
-                                        'qty_bersih' => $k['qty_bersih'],
-                                        'qty_kotor' => $k['qty_kotor'],
-                                        'stock_in_id' => $k['stock_in_id'],
-                                        'stock_out_id' => $result[$i]['stock_out_id'],
-                                        'spesifikasi_in_id' => $k['spesifikasi_in_id'],
-                                    ]);
-                                } else {
-                                    $barangIn = $barangMasterModel
-                                        ->select("CONCAT(barang_master.barang_name, '-', barang_master_spesifikasi.spesifikasi) AS barang, satuans.kode_satuan, barang_master.kode_barang, barang_master_spesifikasi.barang_master_id AS barang1_id")
-                                        ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.barang_master_id = barang_master.id', 'left')
-                                        ->join('satuans', 'satuans.id = barang_master_spesifikasi.satuan_1', 'left')
-                                        ->where('barang_master_spesifikasi.id', $k['spesifikasi_in_id'])
-                                        ->first();
-                                    array_push($result[$i]['list_barang_masuk'], [
-                                        'id' => $k['id'],
-                                        'jasa_vendor_in_id' => $k['jasa_vendor_in_id'],
-                                        'barang1_id' => $stockBarangOut != null ? $stockBarangOut['barang_master_id'] : 0,
-                                        'barang_name_in' => $barangIn != null ? strtoupper($barangIn['barang']) : '-',
-                                        'jasa_vendor_out_detail_id' => $k['jasa_vendor_out_detail_id'],
-                                        'kode_barang_in' => $barangIn != null ? strtoupper($barangIn['kode_barang']) : '-',
-                                        'kode_satuan_in' => $barangIn != null ? $barangIn['kode_satuan'] : '-',
-                                        'stock_dokumen' => $k['stock_dokumen'],
-                                        'qty_bersih' => $k['qty_bersih'],
-                                        'qty_kotor' => $k['qty_kotor'],
-                                        'stock_in_id' => $k['stock_in_id'],
-                                        'stock_out_id' => $result[$i]['stock_out_id'],
-                                        'spesifikasi_in_id' => $k['spesifikasi_in_id'],
-                                    ]);
-                                }
-                            }
-                        }
-                    }
                 }
+
+                $pushItem = [
+                    'id' => $k['id'] ?? null,
+                    'jasa_vendor_in_id' => $k['jasa_vendor_in_id'] ?? null,
+                    'barang1_id' => $k['barang_master_id'] ?? ($result[$resultIndexMap[$outDetailId]]['barang1_id'] ?? 0),
+                    'barang_name_in' => $barangIn ? strtoupper($barangIn['barang']) : '-',
+                    'jasa_vendor_out_detail_id' => $k['jasa_vendor_out_detail_id'] ?? null,
+                    'kode_barang_in' => $barangIn ? strtoupper($barangIn['kode_barang']) : '-',
+                    'kode_satuan_in' => $barangIn['kode_satuan'] ?? '-',
+                    'stock_dokumen' => $k['stock_dokumen'] ?? null,
+                    'qty_bersih' => $k['qty_bersih'] ?? 0,
+                    'qty_kotor' => $k['qty_kotor'] ?? 0,
+                    'stock_in_id' => $k['stock_in_id'] ?? null,
+                    'stock_out_id' => $result[$resultIndexMap[$outDetailId]]['stock_out_id'] ?? null,
+                    'spesifikasi_in_id' => $k['spesifikasi_in_id'] ?? null,
+                ];
+
+                $result[$resultIndexMap[$outDetailId]]['list_barang_masuk'][] = $pushItem;
             }
         }
+    }
+}
+
+// // Debug: lihat hasil
+// var_dump($result);
+// die;
+
 
         $listBarangMasukGrouped = [];
         foreach ($result as $r) {
@@ -679,7 +703,6 @@ class JasaVendorInModel extends Model
             ];
 
         } else {
-            // 🔹 Kondisi NORMAL (non one_raw)
             // 🔹 Kondisi NORMAL (non one_raw)
             foreach ($resultGroup as $groupKey => $items) {
                 list($supplierId, $keterangan, $stock_dokumen) = explode('|', $groupKey);

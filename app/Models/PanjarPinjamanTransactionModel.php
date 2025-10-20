@@ -182,7 +182,9 @@ class PanjarPinjamanTransactionModel extends Model
         return $generatedNo;
     }
 
+    
     public function get_new_no(
+        $id = null,
         $jenis,
         $divisi,
         $paymentMethod,
@@ -191,7 +193,8 @@ class PanjarPinjamanTransactionModel extends Model
         $thn,
         $last_day,
         $companyID,
-        $tanggalPembayaran
+        $tanggalPembayaran,
+        $currentNumber = null
     ) {
         $banksModel = new BanksModel();
 
@@ -245,6 +248,69 @@ class PanjarPinjamanTransactionModel extends Model
         $displayPrefix = (strtoupper($paymentMethod) === 'CASH') ? $kodeDivisi : ($kodeBank ?: $kodeDivisi);
         $displayPrefix .= "/$targetYear/$targetMonth/";
 
+        $db = \Config\Database::connect();
+
+
+        // 4. Jika edit mode DAN hanya ganti jenis merah/putih
+        if (!empty($id) && (empty($bank_id) || $bank_id === 'undefined')) {
+            // Cek currentNumber dikirim dan valid
+            if (!empty($currentNumber)) {
+                $parts = explode('/', $currentNumber);
+                if (count($parts) >= 4) {
+                    $oldPrefix = $parts[0]; // contoh: CNK
+                    $tahun = $parts[1];
+                    $bulan = $parts[2];
+                    $lastNumber = $parts[3];
+
+                    // 🔍 Tentukan prefix baru berdasarkan jenis
+                    $newPrefix = strtoupper($paymentMethod) === 'CASH'
+                        ? $kodeDivisi
+                        : ($kodeBank ?: $kodeDivisi);
+
+                    // Jika prefix lama beda dengan yang seharusnya (karena ganti jenis), pakai prefix baru
+                    $finalPrefix = ($oldPrefix !== $newPrefix) ? $newPrefix : $oldPrefix;
+
+                    return "{$finalPrefix}/{$tahun}/{$bulan}/{$lastNumber}";
+                }
+            }
+
+            // 2️⃣ Kalau tidak dikirim, ambil dari DB
+            $tablesToCheckForId = [
+                'other_payment' => 'no_pembayaran',
+                'local_po_payments' => 'payment_no',
+                'local_po_payment_bp' => 'payment_no',
+                'panjar_pinjaman_transaction' => 'no_transaction',
+                'pembayaran_invoice' => 'no_pembayaran',
+            ];
+
+            foreach ($tablesToCheckForId as $table => $numberColumn) {
+                try {
+                    $fields = $db->getFieldNames($table);
+                } catch (\Exception $e) {
+                    continue;
+                }
+                if (!in_array('id', $fields) || !in_array($numberColumn, $fields)) continue;
+
+                $row = $db->table($table)->select($numberColumn)->where('id', $id)->get()->getRowArray();
+                if ($row && !empty($row[$numberColumn])) {
+                    $parts = explode('/', $row[$numberColumn]);
+                    if (count($parts) >= 4) {
+                        $oldPrefix = $parts[0];
+                        $tahun = $parts[1];
+                        $bulan = $parts[2];
+                        $lastNumber = $parts[3];
+
+                        $newPrefix = strtoupper($paymentMethod) === 'CASH'
+                            ? $kodeDivisi
+                            : ($kodeBank ?: $kodeDivisi);
+                        $finalPrefix = ($oldPrefix !== $newPrefix) ? $newPrefix : $oldPrefix;
+
+                        return "{$finalPrefix}/{$tahun}/{$bulan}/{$lastNumber}";
+                    }
+                }
+            }
+        }
+
         // Search patterns — cek dua-duanya (FRM & FRK misalnya)
         $searchPatterns = [];
         if ($kodeMerah && $kodePutih) {
@@ -254,7 +320,7 @@ class PanjarPinjamanTransactionModel extends Model
             $searchPatterns[] = $displayPrefix;
         }
 
-        $db = \Config\Database::connect();
+       
         $tablesToCheck = [
             'other_payment' => ['no_pembayaran', 'tanggal', 'deletedAt'],
             'local_po_payments' => ['payment_no', 'payment_date', 'deletedAt'],
@@ -309,5 +375,6 @@ class PanjarPinjamanTransactionModel extends Model
         $counterNext = str_pad($maxNumber + 1, 4, '0', STR_PAD_LEFT);
         return $displayPrefix . $counterNext;
     }
+
 
 }
