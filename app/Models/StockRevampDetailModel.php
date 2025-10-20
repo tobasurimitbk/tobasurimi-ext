@@ -798,12 +798,16 @@ class StockRevampDetailModel extends Model
         ];
     }
 
-    public function getStockListWithAddConditionForMaterialRequestBaku($condition, $spesifikasiId)
+    public function getStockListPOWithCondition($condition)
     {
         $builder = $this->asArray()
             ->select('
                 stock_revamp_detail.id AS id,
                 stock_revamp.spesifikasi_id,
+                stock_revamp.barang_master_id,
+                stock_revamp.unit_id,
+                stock_revamp.divisi_id,
+                stock_revamp.warehouse_id,
                 suppliers.name AS supplier_name,
                 stock_revamp_detail.stock_id,
                 stock_revamp_detail.bc_id,
@@ -815,14 +819,13 @@ class StockRevampDetailModel extends Model
                 rm_purchase_order_details.id as rm_purchase_order_detail_id,
                 CONCAT(barang_master.barang_name, " ", barang_master_spesifikasi.spesifikasi) AS barang,
                 satuans.kode_satuan,
-                stock_revamp_detail.qty_bersih AS total_penerimaan,
                 stock_revamp_detail.qty_bersih as stok_total,
                 stock_revamp_detail.qty_diterima as stok_total_diterima,
             ')
             ->join('stock_revamp', 'stock_revamp.id = stock_revamp_detail.stock_id', 'left')
             ->join('rm_purchase_orders', 'rm_purchase_orders.id = stock_revamp_detail.po_id', 'left')
-            ->join('suppliers', 'suppliers.id = rm_purchase_orders.supplier_id', 'left')
             ->join('rm_purchase_order_details', 'rm_purchase_order_details.rm_purchase_order_id = rm_purchase_orders.id', 'left')
+            ->join('suppliers', 'suppliers.id = rm_purchase_orders.supplier_id', 'left')
             ->join('barang_master', 'barang_master.id = stock_revamp.barang_master_id', 'left')
             ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = stock_revamp.spesifikasi_id', 'left')
             ->join('satuans', 'satuans.id = barang_master_spesifikasi.satuan_1', 'left');
@@ -837,10 +840,77 @@ class StockRevampDetailModel extends Model
         }
 
         return $builder
-            ->groupBy('
-                stock_revamp_detail.id,
+            ->groupBy('stock_revamp_detail.id')
+            ->orderBy('stock_revamp_detail.createdAt', 'ASC')
+            ->findAll();
+    }
+
+    public function getStockListVendorWithCondition($condition)
+    {
+        $builder = $this->asArray()
+            ->select('
+                stock_revamp_detail.id AS id,
+                stock_revamp.spesifikasi_id,
+                stock_revamp.barang_master_id,
+                stock_revamp.unit_id,
+                stock_revamp.divisi_id,
+                stock_revamp.warehouse_id,
+                stock_revamp_detail.stock_id,
+                stock_revamp_detail.bc_id,
+                rm_purchase_orders.supplier_id,
+                stock_revamp_detail.reference_type,
+                rm_purchase_orders.po_date,
+                rm_purchase_orders.po_no,
+                rm_purchase_orders.id as rm_purchase_order_id,
+                rm_purchase_order_details.id as rm_purchase_order_detail_id,
+                barang_master.barang_name,
+                barang_master_spesifikasi.spesifikasi,
+                CONCAT(barang_master.barang_name, " ", barang_master_spesifikasi.spesifikasi) AS barang,
+                satuans.kode_satuan,
+                stock_revamp_detail.qty_bersih as stok_total,
+                stock_revamp_detail.qty_diterima as stok_total_diterima,
+                jasa_vendor_in.no_penerimaan_surat_jalan,
+                concat(jasa_vendor_in.no_penerimaan_surat_jalan, " (", rm_purchase_orders.po_no, ")") AS stock_dokumen,
+                concat(vendors.name, " / ", suppliers.name) AS supplier_name,
+                bc_purchase_order.no_aju,
+                vendors.name AS vendor_name,
+                rm_purchase_order_details.general_price as harga_umum,
+                rm_purchase_order_details.daily_price as harga_harian,
+                rm_purchase_order_details.monthly_price as harga_bulanan,
+                penerimaan_barang.tanggal as stock_date,
+                stock_revamp_detail.type_bc as type_bc,
+                bc_purchase_order.no_daftar
             ')
-            ->whereIn('stock_revamp.spesifikasi_id', $spesifikasiId)
+            ->join('stock_revamp', 'stock_revamp.id = stock_revamp_detail.stock_id', 'left')
+            ->join('jasa_vendor_in', 'jasa_vendor_in.id = stock_revamp_detail.reference_id', 'left')
+            ->join('jasa_vendor_in_detail', 'jasa_vendor_in_detail.jasa_vendor_in_id = jasa_vendor_in.id', 'left')
+            ->join('vendors', 'vendors.id = jasa_vendor_in.vendor_id', 'left')
+            ->join('stock_revamp_history', 'stock_revamp_history.stock_detail_akhir = stock_revamp_detail.id', 'left')
+
+            //get asal po stock
+            ->join('stock_revamp_detail as stock_revamp_detail2', 'stock_revamp_detail2.id = stock_revamp_history.stock_detail_asal', 'left')
+            ->join('rm_purchase_orders', 'rm_purchase_orders.id = stock_revamp_detail2.po_id', 'left')
+            ->join('rm_purchase_order_details', 'rm_purchase_order_details.rm_purchase_order_id = rm_purchase_orders.id', 'left')
+            ->join('penerimaan_barang', 'penerimaan_barang.id = stock_revamp_detail2.reference_id', 'left')
+            ->join('bc_purchase_order_lpb', 'bc_purchase_order_lpb.penerimaan_barang_id = penerimaan_barang.id', 'left')
+            ->join('bc_purchase_order', 'bc_purchase_order.id = bc_purchase_order_lpb.bc_purchase_order_id', 'left')
+
+            ->join('suppliers', 'suppliers.id = rm_purchase_orders.supplier_id', 'left')
+            ->join('barang_master', 'barang_master.id = stock_revamp.barang_master_id', 'left')
+            ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = stock_revamp.spesifikasi_id', 'left')
+            ->join('satuans', 'satuans.id = barang_master_spesifikasi.satuan_1', 'left');
+
+        // Kondisi dinamis
+        foreach ($condition as $field => $value) {
+            if (is_array($value)) {
+                $builder->whereIn($field, $value);
+            } else {
+                $builder->where($field, $value);
+            }
+        }
+
+        return $builder
+            ->groupBy('stock_revamp_detail.id')
             ->orderBy('stock_revamp_detail.createdAt', 'ASC')
             ->findAll();
     }
