@@ -10,7 +10,7 @@
                 Kembali
             </a>
             <?php if (can('Invoice Exim', 'Proforma Invoice', 'c')) : ?>
-                <a class="btn btn-show-form btn-success float-right" href="<?= base_url("proforma-invoice/create/" . encrypt($dataSalesOrderExport->sales_order_export_id)); ?>">
+                <a class="btn btn-show-form btn-success float-right" href="<?= base_url("proforma-invoice/create/" . encrypt($dataSalesOrderExport->id)); ?>">
                     <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
                 </a>
             <?php endif; ?>
@@ -22,14 +22,9 @@
         <div class="card-header">
             <table class="form-label font-weight-bold lable-title">
                 <tr>
-                    <td style="width: 150px;">No Invoice</td>
-                    <td style="width: 10px;">:</td>
-                    <td><?= $dataSalesOrderExport->no_invoice ?></td>
-                </tr>
-                <tr>
-                    <td>SC</td>
-                    <td>:</td>
-                    <td><?= $dataSalesOrderExport->sales_order_export_no ?></td>
+                    <td style="width: 180px;">SC</td>
+                    <td style="width: 20px;">:</td>
+                    <td><?= $dataSalesOrderExport->sales_contract_no ?></td>
                 </tr>
                 <tr>
                     <td>Buyer / Customer</td>
@@ -45,13 +40,6 @@
                     <td>Payment Term</td>
                     <td>:</td>
                     <td><?= strip_tags($dataSalesOrderExport->payment_term) ?></td>
-                </tr>
-                <tr>
-                    <td>Nilai PEB</td>
-                    <td>:</td>
-                    <td>
-                        <?= "(" . $dataSalesOrderExport->mata_uang . ") " . number_format($dataSalesOrderExport->shipment_value, 2) ?>
-                    </td>
                 </tr>
 
             </table>
@@ -171,7 +159,7 @@
             url: "<?= base_url("proforma-invoice/all-pi"); ?>",
             dataSrc: "data",
             data: function(data) {
-                data.sales_order_export_id = "<?= $dataSalesOrderExport->sales_order_export_id ?>";
+                data.id = "<?= $dataSalesOrderExport->id ?>";
                 data.search = $(".search").val();
                 data.dateStart = $(".dateStart").val();
                 data.dateEnd = $(".dateEnd").val();
@@ -468,6 +456,51 @@
                 const csrf = $(`[name="${csrfToken}"]`);
                 $.ajax({
                     url: "<?= base_url("proforma-invoice/unposting"); ?>",
+                    data: {
+                        id: id,
+                    },
+                    beforeSend: function(xhr) {
+                        xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                        setLoading()
+                    },
+                    complete: function() {
+                        stopLoading();
+                    },
+                    method: "POST",
+                    dataType: "json",
+                    success: function(response) {
+                        if (response.status) {
+                            Swal.fire({
+                                    icon: 'success',
+                                    title: response.message,
+                                    confirmButtonColor: '#4e73df',
+                                })
+                                .then(() => {
+                                    table.ajax.reload()
+                                })
+                        }
+                    },
+                });
+            }
+        })
+
+    }
+
+    function remove(id) {
+        Swal.fire({
+            icon: 'question',
+            title: "Hapus Data ?",
+            confirmButtonColor: '#4e73df',
+            cancelButtonColor: '#d33',
+            showCancelButton: true,
+            reverseButtons: true,
+            confirmButtonText: 'Save',
+            cancelButtonText: 'Back',
+        }).then((result) => {
+            if (result.isConfirmed) {
+                const csrf = $(`[name="${csrfToken}"]`);
+                $.ajax({
+                    url: "<?= base_url("proforma-invoice/delete"); ?>",
                     data: {
                         id: id,
                     },

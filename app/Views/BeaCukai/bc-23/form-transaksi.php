@@ -139,16 +139,17 @@
                         </label>
                         <div class="mt-1">
                             <div class="form-floating mb-3">
-                                <input id="berat_bruto" name="berat_bruto" value="<?= $bc23 != null ? ($bc23['bruto'] != null ? number_format($bc23['bruto']) : '0,00') : '0,00' ?>" type="text" class="form-control berat_bruto" placeholder="" onkeyup="this.value = greatFormatRupiah(this.value)">
-                                <label>Berat Bersih/Bruto (KGM)</label>
+                                <input id="berat_netto" value="<?= $bc23 != null ? ($bc23['netto'] != null ? number_format($bc23['netto']) : '0,00') : '0,00' ?>" name="berat_netto" type="text" class="form-control berat_netto" placeholder="" onkeyup="this.value = greatFormatRupiah(this.value)">
+                                <label>Berat Bersih/Netto (KGM)</label>
                             </div>
                         </div>
                         <div class="mt-1">
                             <div class="form-floating mb-3">
-                                <input id="berat_netto" value="<?= $bc23 != null ? ($bc23['netto'] != null ? number_format($bc23['netto']) : '0,00') : '0,00' ?>" name="berat_netto" type="text" class="form-control berat_netto" placeholder="" onkeyup="this.value = greatFormatRupiah(this.value)">
-                                <label>Berat Kotor/Netto (KGM)</label>
+                                <input id="berat_bruto" name="berat_bruto" value="<?= $bc23 != null ? ($bc23['bruto'] != null ? number_format($bc23['bruto']) : '0,00') : '0,00' ?>" type="text" class="form-control berat_bruto" placeholder="" onkeyup="this.value = greatFormatRupiah(this.value)">
+                                <label>Berat Kotor/Bruto (KGM)</label>
                             </div>
                         </div>
+
                         <label class="form-label font-weight-bold lable-title mt-4 mb-2">
                             Keterangan Pajak
                         </label>
