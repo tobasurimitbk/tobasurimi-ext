@@ -324,7 +324,7 @@
                                 <i class="fas fa-eye"></i>
                             </a>
                         `;
-                    if (row.status_posting === "0") {
+                    if (row.status_posting == "0") {
                         if (row.no_aju != null) {
                             // htmlRes += `
                             //     <button data-toggle="tooltip" title="Update No Aju" onclick="noAjuShowModal('${row.id}', '${row.no_aju}')" class="btn btn-warning posting-spp">
@@ -369,6 +369,7 @@
                         <?php else: ?>
                             buttonUnpost = ``;
                         <?php endif; ?>
+                        htmlRes += buttonUnpost;
                     }
 
                     return htmlRes;
