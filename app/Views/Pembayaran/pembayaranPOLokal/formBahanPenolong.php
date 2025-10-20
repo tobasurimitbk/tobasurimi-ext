@@ -444,7 +444,6 @@
             multiple: true,
         }).change(function() {
             listBarangDetail();
-            generateKeteranganPembayaran();
         });
 
         $('#bank_id').select2({
@@ -709,6 +708,8 @@
                 `));
                 tbody.append(footerRow);
 
+
+                generateKeteranganPembayaran(res.data);
             }
         });
     }
@@ -912,28 +913,6 @@
     }
 
 
-    // function getListTandaTerimaSupplier(callback = null) {
-    //     const supplierId = $('#supplier_id').val();
-
-    //     $.ajax({
-    //         url: '<?= base_url('pembayaran-po-lokal-bp/get-rekap-faktur/') ?>' + supplier_id,
-    //         method: 'GET',
-    //         dataType: 'json',
-    //         success: function(res) {
-    //             let options = '';
-    //             res.data.forEach(item => {
-    //                 options += `<option value="${item.id}">${item.no_tanda_terima}</option>`;
-    //             });
-
-    //             $('#tanda_terima_supplier').html(options);
-
-    //             // 🔹 Jalankan callback kalau ada
-    //             if (typeof callback === 'function') callback();
-    //         }
-    //     });
-    // }
-
-
     function convertRupiahToNumber(rupiah) {
         if (rupiah == "") {
             return 0;
@@ -993,17 +972,43 @@
     }
 
     function generateKeteranganPembayaran(data) {
-        var keterangan = "";
-        var supplierName = $('#supplier_id option:selected').text().trim();
-        var noTandaTerima = $('#tanda_terima_supplier option:selected').text().trim();
-        var poNoText = "";
-        $.each(data, function(i, v) {
-            poNoText += `${v.item_name} Sebanyak ${v.qty} ${v.unit}, `;
-        });
+    let keterangan = "";
 
-        keterangan = "Pembayaran " + supplierName + "; No TTS : " + noTandaTerima + "; " + poNoText;
-        $('#keterangan').val(keterangan);
-    }
+    // Ambil nama supplier
+    const supplierName = $('#supplier_id option:selected').text().trim() || '-';
+
+    // Ambil semua teks tanda terima (bisa multiple)
+    const noTandaTerimaArr = $('#tanda_terima_supplier option:selected').map(function () {
+        return $(this).text().trim();
+    }).get();
+
+    // Buat jadi satu string, pisahkan dengan koma
+    const noTandaTerimaText = noTandaTerimaArr.join(", ") || '-';
+
+    // Ambil semua LPB unik (kalau dalam data ada duplikat)
+    let lpbList = [];
+    $.each(data, function (i, v) {
+        if (v.list_lpb) {
+            // Pecah kalau ada lebih dari satu LPB di field (misal "LPB-01, LPB-02")
+            const lpbItems = v.list_lpb.split(',').map(l => l.trim());
+            lpbItems.forEach(lpb => {
+                if (lpb && !lpbList.includes(lpb)) {
+                    lpbList.push(lpb);
+                }
+            });
+        }
+    });
+
+    // Gabungkan LPB jadi string
+    const lpbText = lpbList.length > 0 ? lpbList.join(", ") : '-';
+
+    // Susun keterangan pembayaran
+    keterangan = `Pembayaran ${supplierName}; No TTS: ${noTandaTerimaText}; LPB: ${lpbText}`;
+
+    // Set ke input keterangan
+    $('#keterangan').val(keterangan);
+}
+
 
     function generatePaymentNumber() {
         const csrfToken = '<?= csrf_token() ?>';
