@@ -1383,7 +1383,7 @@ class BC23 extends BaseController
                 'tarif_fasilitas' => ($this->request->getVar('barang_detail_tarif_fasilitas')),
                 'seri_barang' => $bc23Barang['seri_barang'],
                 'kode_satuan_barang' => $bc23Barang['kode_satuan_barang'],
-                'nilai_bayar' => $nilaiBayar
+                'nilai_bayar' => ceil($nilaiBayar / 1000) * 1000,
             ]);
 
             return response()->setJSON([
@@ -1502,7 +1502,7 @@ class BC23 extends BaseController
                 'tarif_fasilitas' => ($this->request->getVar('barang_detail_tarif_fasilitas')),
                 'seri_barang' => $bc23Barang['seri_barang'],
                 'kode_satuan_barang' => $bc23Barang['kode_satuan_barang'],
-                'nilai_bayar' => $nilaiBayar
+                'nilai_bayar' => ceil($nilaiBayar / 1000) * 1000,
             ]);
 
             return response()->setJSON([
