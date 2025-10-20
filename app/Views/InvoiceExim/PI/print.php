@@ -315,7 +315,7 @@
                     <tr>
                         <td>SC</td>
                         <td>:</td>
-                        <td><?= $dataSalesOrderExport->sales_order_export_no ?></td>
+                        <td><?= $dataSalesOrderExport->sales_contract_no ?></td>
                     </tr>
                 </table>
 

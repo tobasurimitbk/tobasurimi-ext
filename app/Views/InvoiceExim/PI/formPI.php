@@ -12,7 +12,7 @@
     <div class="section-header">
         <h1 class="title-name"><?= !empty($dataPI) ? "Update Proforma Invoice" : "Tambah Proforma Invoice" ?></h1>
         <div class="col-button-tambah-spp">
-            <a class="btn btn-hide-form btn-discard float-right" href="<?= base_url("proforma-invoice/detail/" . encrypt($dataSalesOrderExport->sales_order_export_id)); ?>">
+            <a class="btn btn-hide-form btn-discard float-right" href="<?= base_url("proforma-invoice/detail/" . encrypt($dataSalesOrderExport->id)); ?>">
                 Kembali
             </a>
             <?php if (!empty($dataPI)) { ?>
@@ -59,24 +59,13 @@
                     </div>
                 </div>
                 <input autocomplete="one-time-code" value="<?= !empty($dataPI) ? encrypt($dataPI['id']) : '' ?>" type="hidden" class="id" name="id" id="id" />
-                <input type="hidden" name="sales_order_export_id" id="sales_order_export_id" value="<?= $dataSalesOrderExport->sales_order_export_id ?>">
+                <input type="hidden" name="sales_contract_id" id="sales_contract_id" value="<?= $dataSalesOrderExport->id ?>">
                 <?= csrf_field() ?>
                 <div class="row">
+
                     <div class="col-md-4">
                         <div class="form-floating mb-3">
-                            <input value="<?= $dataSalesOrderExport->no_invoice ?>" autocomplete="one-time-code" disabled type="text" class="form-control">
-                            <label for="floatingInput">No Invoice</label>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="form-floating mb-3">
-                            <input value="<?= date('d/m/Y', strtotime($dataSalesOrderExport->tanggal_invoice))  ?>" autocomplete="one-time-code" disabled type="text" class="form-control">
-                            <label for="floatingInput">Tanggal Invoice</label>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="form-floating mb-3">
-                            <input value="<?= $dataSalesOrderExport->sales_order_export_no ?>" autocomplete="one-time-code" disabled type="text" class="form-control">
+                            <input value="<?= $dataSalesOrderExport->sales_contract_no ?>" autocomplete="one-time-code" disabled type="text" class="form-control">
                             <label for="floatingInput">SC</label>
                         </div>
                     </div>
@@ -1081,7 +1070,7 @@
                                                 confirmButtonColor: '#4e73df',
                                             })
                                             .then(() => {
-                                                window.location.href = "<?= base_url("proforma-invoice/detail/" . encrypt($dataSalesOrderExport->sales_order_export_id)) ?>";
+                                                window.location.href = "<?= base_url("proforma-invoice/detail/" . encrypt($dataSalesOrderExport->id)) ?>";
                                             })
                                     } else {
                                         Swal.fire({
@@ -1458,7 +1447,7 @@
                                     confirmButtonColor: '#4e73df',
                                 })
                                 .then(() => {
-                                    var salesOrderExportId = "<?= !empty($dataPI) ? encrypt($dataPI['sales_order_export_id']) : '' ?>";
+                                    var salesOrderExportId = "<?= !empty($dataPI) ? encrypt($dataPI['sales_contract_id']) : '' ?>";
                                     location.href = "<?= base_url('proforma-invoice/detail/') ?>" + salesOrderExportId;
                                 })
                         }

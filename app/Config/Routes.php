@@ -886,7 +886,7 @@ $routes->get('/biaya-lokal/detail/(:segment)', 'BiayaExim\BiayaLokal\BiayaLokal:
 // INVOICE EXIM
 // PI
 $routes->get('/proforma-invoice', 'InvoiceExim\PI\PI::index', ['filter' => 'Auth']);
-$routes->get('/proforma-invoice/all-order-form', 'InvoiceExim\PI\PI::allOrderForm', ['filter' => 'Auth']);
+$routes->get('/proforma-invoice/all-contract', 'InvoiceExim\PI\PI::allContract', ['filter' => 'Auth']);
 $routes->get('/proforma-invoice/detail/(:segment)', 'InvoiceExim\PI\PI::indexPI/$1', ['filter' => 'Auth']);
 $routes->get('/proforma-invoice/create/(:segment)', 'InvoiceExim\PI\PI::createPI/$1', ['filter' => 'Auth']);
 $routes->post('/proforma-invoice/create', 'InvoiceExim\PI\PI::storePI', ['filter' => 'Auth']);
