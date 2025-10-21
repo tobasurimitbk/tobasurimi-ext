@@ -558,7 +558,7 @@ class UpdateStockBahanBaku extends BaseController
     public function deleteupdateStockBahanBaku()
     {
         try {
-            $id = $this->request->getPost("id");
+            $id = decrypt($this->request->getPost("id"));
 
             if (empty($id)) {
                 return $this->response->setJSON([
