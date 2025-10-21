@@ -196,8 +196,8 @@ class BC23 extends BaseController
             "searchData" => $this->request->getGet('searchData'),
             "statusPosting" => $this->request->getGet('statusPosting'),
             "statusLPB" => $this->request->getGet("statusLPB"),
-            "mulaiTanggalBC23" => $this->request->getGet("mulaiTanggalBC23"),
-            "selesaiTanggalBC23" => $this->request->getGet('selesaiTanggalBC23'),
+            "mulaiTanggalBC23" =>  $this->request->getVar("mulaiTanggalBC23") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("mulaiTanggalBC23")))) : "",
+            "selesaiTanggalBC23" => $this->request->getVar("selesaiTanggalBC23") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("selesaiTanggalBC23")))) : "",
         ];
 
         $limit = $this->request->getGet("length");

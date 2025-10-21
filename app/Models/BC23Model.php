@@ -106,15 +106,15 @@ class BC23Model extends Model
             $bcDataQry->groupEnd();
         }
 
-        if ($addCondition['mulaiTanggalBC23'] || $addCondition['mulaiTanggalBC23']) {
+        if ($addCondition['mulaiTanggalBC23'] || $addCondition['selesaiTanggalBC23']) {
             $bcDataQry->groupStart();
 
-            if ($addCondition['mulaiTanggalBC40']) {
+            if ($addCondition['mulaiTanggalBC23']) {
                 $bcDataQry->where('date(bc_purchase_order.createdAt) >=', $addCondition['mulaiTanggalBC23']);
             }
 
-            if ($addCondition['selesaiTanggalBC40']) {
-                $bcDataQry->where('date(bc_purchase_order.createdAt) <=',  $addCondition['mulaiTanggalBC23']);
+            if ($addCondition['selesaiTanggalBC23']) {
+                $bcDataQry->where('date(bc_purchase_order.createdAt) <=',  $addCondition['selesaiTanggalBC23']);
             }
 
             $bcDataQry->groupEnd();
