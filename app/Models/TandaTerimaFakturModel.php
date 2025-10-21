@@ -82,7 +82,7 @@ class TandaTerimaFakturModel extends Model
         $selectQry = "tanda_terima_faktur.*, 
                       suppliers.name AS supplierName,
                       users.name AS userName,
-                      COALESCE(SUM(local_po_payment_bp.amount), 0) AS total_dibayar,
+                      COALESCE(SUM(local_po_payment_details.total), 0) AS total_dibayar,
                       COUNT(tanda_terima_faktur_detail.id) AS jumlah_item";
 
         $tandaTerimaQry = $this->asObject()
@@ -90,8 +90,11 @@ class TandaTerimaFakturModel extends Model
             ->where($condition)
             ->join('suppliers', 'suppliers.id = tanda_terima_faktur.supplier_id', 'left')
             ->join('users', 'users.id = tanda_terima_faktur.user_id', 'left')
-            ->join('local_po_payment_bp', 'local_po_payment_bp.tanda_terima_faktur_id = tanda_terima_faktur.id', 'left')
-            ->join('tanda_terima_faktur_detail', 'tanda_terima_faktur_detail.tanda_terima_faktur_id = tanda_terima_faktur.id', 'left');
+            ->join(
+                'local_po_payment_details',
+                'local_po_payment_details.tanda_terima_faktur_id = tanda_terima_faktur.id AND local_po_payment_details.deletedAt IS NULL',
+                'left'
+            )->join('tanda_terima_faktur_detail', 'tanda_terima_faktur_detail.tanda_terima_faktur_id = tanda_terima_faktur.id', 'left');
 
         // ✅ Pencarian berdasarkan input `search`
         if (!empty($addCondition['search'])) {
@@ -171,14 +174,16 @@ class TandaTerimaFakturModel extends Model
     public function getTandaTerimaFakturInPembayaran($tandaTerimaFakturID)
     {
         $condition = [
-            'local_po_payment_bp.tanda_terima_faktur_id' => $tandaTerimaFakturID,
-            'local_po_payment_bp.deletedAt' => null
+            'local_po_payment_details.tanda_terima_faktur_id' => $tandaTerimaFakturID,
+            'local_po_payment_details.tipe' => "BP",
+            'local_po_payment_details.deletedAt' => null
         ];
-        $localPoPaymentBPModel = new LocalPOPaymentBPModel();
-        $res = $localPoPaymentBPModel
+        $localpoPaymentDetailModel = new LocalPOPaymentDetailModel();
+        $res = $localpoPaymentDetailModel
+            ->select('local_po_payment_details.*,local_po_payment_bp.payment_date,local_po_payment_bp.payment_no')
+            ->join('local_po_payment_bp', 'local_po_payment_bp.id = local_po_payment_details.local_po_payment_id', 'left')
             ->where($condition)
             ->first();
-
 
         return $res;
     }
@@ -186,14 +191,16 @@ class TandaTerimaFakturModel extends Model
     public function getAllTandaTerimaFakturInPembayaran($tandaTerimaFakturID)
     {
         $condition = [
-            'local_po_payment_bp.tanda_terima_faktur_id' => $tandaTerimaFakturID,
-            'local_po_payment_bp.deletedAt' => null
+            'local_po_payment_details.tanda_terima_faktur_id' => $tandaTerimaFakturID,
+            'local_po_payment_details.tipe' => "BP",
+            'local_po_payment_details.deletedAt' => null
         ];
-        $localPoPaymentBPModel = new LocalPOPaymentBPModel();
-        $res = $localPoPaymentBPModel
+        $localpoPaymentDetailModel = new LocalPOPaymentDetailModel();
+        $res = $localpoPaymentDetailModel
+            ->select('local_po_payment_details.*,local_po_payment_bp.payment_date,local_po_payment_bp.payment_no')
+            ->join('local_po_payment_bp', 'local_po_payment_bp.id = local_po_payment_details.local_po_payment_id', 'left')
             ->where($condition)
             ->findAll();
-
 
         return $res;
     }
@@ -297,17 +304,17 @@ class TandaTerimaFakturModel extends Model
 
 
     public function getByID($tandaTerimaFakturID)
-    {   
-      $res = $this->select("
+    {
+        $res = $this->select("
             tanda_terima_faktur.*,
             GROUP_CONCAT(DISTINCT tanda_terima_faktur_detail.lpb_no ORDER BY tanda_terima_faktur_detail.lpb_no SEPARATOR ', ') AS list_lpb,
             (tanda_terima_faktur.nominal_faktur - COALESCE(tanda_terima_faktur.total_paid, 0)) AS sisa_bayar
         ")
-        ->join('tanda_terima_faktur_detail', 'tanda_terima_faktur_detail.tanda_terima_faktur_id = tanda_terima_faktur.id', 'left')
-        ->where('tanda_terima_faktur.id', $tandaTerimaFakturID)
-        ->where('tanda_terima_faktur.deletedAt', null)
-        ->groupBy('tanda_terima_faktur.id')
-        ->first();
+            ->join('tanda_terima_faktur_detail', 'tanda_terima_faktur_detail.tanda_terima_faktur_id = tanda_terima_faktur.id', 'left')
+            ->where('tanda_terima_faktur.id', $tandaTerimaFakturID)
+            ->where('tanda_terima_faktur.deletedAt', null)
+            ->groupBy('tanda_terima_faktur.id')
+            ->first();
 
         return $res;
     }

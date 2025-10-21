@@ -697,9 +697,11 @@ class TandaTerimaSupBB extends BaseController
         $tandaTerimaFakturid = decrypt($this->request->getVar('id'));
 
         $history = $this->tandaTerimaFakturModel->getAllTandaTerimaFakturInPembayaran($tandaTerimaFakturid);
+
         foreach ($history as &$h) {
             $h['payment_date'] = date('d/m/Y', strtotime($h['payment_date']));
-            $h['amount'] = number_format($h['amount'], 2);
+            $h['total'] = $h['total'];
+            $h['payment_no'] = $h['payment_no'];
         }
         return response()->setJSON($history);
     }
