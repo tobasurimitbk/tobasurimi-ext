@@ -1109,7 +1109,7 @@
 
             var presentaseDecimal = presentase / 100;
             var nilaiPaymentTerm = presentaseDecimal * totalNilaiBarang;
-            $('#nilai_payment_term').val(greatFormatRupiah(nilaiPaymentTerm.toFixed()));
+            $('#nilai_payment_term').val(greatFormatRupiah(nilaiPaymentTerm.toFixed(2)));
         });
 
         $('#btnSubmitPaymentTerm').click(function(e) {
