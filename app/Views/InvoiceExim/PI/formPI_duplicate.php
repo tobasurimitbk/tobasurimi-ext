@@ -1103,7 +1103,7 @@
             var totalNilaiBarang = 0;
             $.each(listBarang, function(i, v) {
                 $.each(v.size_breakdown, function(j, v2) {
-                    totalNilaiBarang += v2.total;
+                    totalNilaiBarang += parseFloat(v2.total);
                 });
             });
 
