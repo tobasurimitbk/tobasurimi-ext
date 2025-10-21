@@ -308,8 +308,8 @@
                                     <thead class="thead-dark">
                                         <tr>
                                             <th>No</th>
-                                            <th>Size</th>
                                             <th>Grade</th>
+                                            <th>Size</th>
                                             <th>Packing</th>
                                             <th>Satuan</th>
                                             <th>Qty</th>
@@ -1335,8 +1335,8 @@
                         <table class="table table-sm table-bordered mb-2 w-100">
                             <thead class="bg-warning text-dark">
                                 <tr>
-                                    <th>Size</th>
                                     <th>Grade</th>
+                                    <th>Size</th>
                                     <th>Packing</th>
                                     <th>Satuan</th>
                                     <th>Qty</th>
@@ -1370,8 +1370,8 @@
 
                     const row = `
                             <tr>
-                                <td>${size.size || ''}</td>
                                 <td>${size.grade || ''}</td>
+                                <td>${size.size || ''}</td>
                                 <td>${size.packing_size || ''}</td>
                                 <td>${size.satuan_size_code || ''}</td>
                                 <td>${greatFormatRupiah(qty.toFixed(2))}</td>

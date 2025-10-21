@@ -369,8 +369,8 @@
                                 // Identify which columns have data
                                 $columns_to_show = [];
                                 $all_columns = [
-                                    'size' => ['label' => 'SIZE', 'width' => '8%'],
                                     'grade' => ['label' => 'GRADE', 'width' => '8%'],
+                                    'size' => ['label' => 'SIZE', 'width' => '8%'],
                                     'packing_size' => ['label' => 'PACKING', 'width' => '8%']
                                 ];
 
@@ -524,7 +524,7 @@
                                     </b>
                                     <br>
                                     <b>
-                                        <?= $dataPI['payment_instruction'] ?>
+                                        <?= nl2br(htmlspecialchars($dataPI['payment_instruction'])) ?>
                                     </b>
                                 </td>
 
@@ -536,7 +536,7 @@
                                     </b>
                                     <br>
                                     <b>
-                                        <?= $dataPI['valas_name'] . " " . strtoupper(terbilangInggris((float)$dataPI['total_pi'])) ?>
+                                        <?= $dataPI['valas_name'] . " " . strtoupper(terbilangInggris((float)$dataPI['total_pi'])) . " ONLY" ?>
                                     </b>
                                 </td>
                                 <td style="padding: 6px; border: 1px solid #ddd; vertical-align: top;" rowspan="2">
