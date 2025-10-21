@@ -300,6 +300,7 @@
                             <tr>
                                 <th>No</th>
                                 <th onclick="changeSort('no_pembayaran')">No. Pembayaran</th>
+                                <th onclick="changeSort('tanggal')">Tanggal</th>
                                 <th onclick="changeSort('divisi_id')">Departemen</th>
                                 <th onclick="changeSort('bayar_ke')">Uraian</th>
                                 <th>Nominal</th>
@@ -370,6 +371,10 @@
             },
             {
                 data: "no_pembayaran",
+                className: "text-center"
+            },
+            {
+                data: "tanggal",
                 className: "text-center"
             },
             {

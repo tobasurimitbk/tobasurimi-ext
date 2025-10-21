@@ -93,6 +93,7 @@ class OtherPayment extends BaseController
                 "status_posting"    => $data['status_posting'],
                 "nominal"           => number_format($data['nominal_all'], 2),
                 "bayar_ke"          => $data['bayar_ke'],
+                "tanggal"          => $data['tanggal'],
 
             ]);
         }
