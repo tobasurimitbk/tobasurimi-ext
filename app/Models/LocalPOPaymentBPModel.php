@@ -153,84 +153,38 @@ class LocalPOPaymentBPModel extends Model
         $localPOPaymentPanjarModel = new LocalPOPaymentPanjarModel();
 
         $condition = [
-            'local_po_payment_bp.id'            => $id,
-            'local_po_payment_bp.company_id'    => $companyId,
-            'local_po_payment_bp.deletedAt'     => null
+            'local_po_payment_bp.id'         => $id,
+            'local_po_payment_bp.company_id' => $companyId,
+            'local_po_payment_bp.deletedAt'  => null
         ];
 
-
-        $result = [
-            'pembayaranDetail' => null,
-            'itemList' => null,
-            'company' => null,
-            'supplierDetail' => null,
-        ];
-
-
-        $resultPaymentBP = $this
-            ->select('local_po_payment_bp.*, tanda_terima_faktur.jatuh_tempo')
-            ->join('tanda_terima_faktur', 'tanda_terima_faktur.id = local_po_payment_bp.tanda_terima_faktur_id')
+        // 🔹 Ambil data utama + join ke detail
+        $result = $this
+            ->select('local_po_payment_bp.*, suppliers.name as supplier_name')
+            ->join('suppliers', 'suppliers.id = local_po_payment_bp.supplier_id', 'left')
             ->where($condition)
             ->first();
 
+        if ($result) {
+            // 🔹 Ambil semua tanda_terima_faktur_id dari detail
+            $db = \Config\Database::connect();
+            $builder = $db->table('local_po_payment_details');
+            $details = $builder
+                ->select('tanda_terima_faktur_id')
+                ->where('local_po_payment_id', $id)
+                ->where('tipe', 'BP')
+                ->get()
+                ->getResultArray();
 
-        $result['pembayaranDetail'] = $resultPaymentBP;
-
-        $result['tandaTerimaSupplier'] = $tandaTerimaFakturModel->getByID($result['pembayaranDetail']['tanda_terima_faktur_id']);
-
-
-        $conditionListBarang = [
-            'tanda_terima_faktur_detail.deletedAt' => null,
-            'tanda_terima_faktur_detail.tanda_terima_faktur_id' => $resultPaymentBP['tanda_terima_faktur_id']
-        ];
-
-        $selectQry = "lpb_date, lpb_no, item_name, qty, price, unit";
-        $listBarang = $this
-            ->select($selectQry)
-            ->join('tanda_terima_faktur', 'tanda_terima_faktur.id = local_po_payment_bp.tanda_terima_faktur_id', 'left')
-            ->join('tanda_terima_faktur_detail', 'tanda_terima_faktur_detail.tanda_terima_faktur_id = tanda_terima_faktur.id')
-            ->where($conditionListBarang)
-            ->distinct()
-            ->findAll();
-
-        $result['itemLpbList'] = $listBarang;
-
-        $result['company'] = $companyModel->select('companies.company')
-            ->where('id', $companyId)
-            ->first();
-
-        $panjarList = $localPOPaymentPanjarModel
-            ->select('*, no_panjar, type, panjar_supplier.id as panjar_id')
-            ->join("local_po_payment_bp", 'local_po_payment_panjar.local_po_payment_id = local_po_payment_bp.id')
-            ->join('panjar_supplier', 'local_po_payment_panjar.panjar_id = panjar_supplier.id')
-            ->where('local_po_payment_bp.deletedAt', null)
-            ->where('local_po_payment_bp.id', $id)
-            ->where('type', 'BP')
-            ->findAll();
-
-
-        $total_bayar_panjar = 0;
-        $total_panjar = 0;
-        $dataPembayaranPanjar = [];
-        foreach ($panjarList as $p) {
-            $total_bayar_panjar = $localPOPaymentPanjarModel->getTotalPembayaranPanjar($p['panjar_id'], "BP");
-            array_push($dataPembayaranPanjar, [
-                'bayar_panjar'  => number_format($p['bayar_panjar'], 2),
-                'no_panjar'     => $p['no_panjar'],
-                'payment_date'  => date('d/m/Y', strtotime($p['payment_date'])),
-                'total_panjar'  => number_format($p['total_panjar'], 2),
-                'sisa_panjar'   => number_format(intval($p['total_panjar']) - intval($total_bayar_panjar['total_bayar_panjar']), 2)
-            ]);
-            $total_panjar = $p['bayar_panjar'];
+            // 🔹 Convert jadi array integer
+            $result['tanda_terima_faktur_ids'] = array_map(fn($d) => (int)$d['tanda_terima_faktur_id'], $details);
+        } else {
+            $result = null;
         }
 
-
-
-        $result['totalpanjar'] = $total_panjar;
-        $result['panjar'] = $dataPembayaranPanjar;
-        $result['supplierDetail'] = $supplierModel->where('id', $result['pembayaranDetail']['supplier_id'])->first();
         return $result;
     }
+
 
     public function getPembayaranDetailByid($id)
     {
@@ -266,6 +220,7 @@ class LocalPOPaymentBPModel extends Model
     }
 
     public function get_new_no(
+        $id = null,
         $jenis,
         $divisi,
         $paymentMethod,
@@ -274,7 +229,8 @@ class LocalPOPaymentBPModel extends Model
         $thn,
         $last_day,
         $companyID,
-        $tanggalPembayaran
+        $tanggalPembayaran,
+        $currentNumber = null
     ) {
         $banksModel = new BanksModel();
 
@@ -328,6 +284,69 @@ class LocalPOPaymentBPModel extends Model
         $displayPrefix = (strtoupper($paymentMethod) === 'CASH') ? $kodeDivisi : ($kodeBank ?: $kodeDivisi);
         $displayPrefix .= "/$targetYear/$targetMonth/";
 
+        $db = \Config\Database::connect();
+
+
+        // 4. Jika edit mode DAN hanya ganti jenis merah/putih
+        if (!empty($id) && (empty($bank_id) || $bank_id === 'undefined')) {
+            // Cek currentNumber dikirim dan valid
+            if (!empty($currentNumber)) {
+                $parts = explode('/', $currentNumber);
+                if (count($parts) >= 4) {
+                    $oldPrefix = $parts[0]; // contoh: CNK
+                    $tahun = $parts[1];
+                    $bulan = $parts[2];
+                    $lastNumber = $parts[3];
+
+                    // 🔍 Tentukan prefix baru berdasarkan jenis
+                    $newPrefix = strtoupper($paymentMethod) === 'CASH'
+                        ? $kodeDivisi
+                        : ($kodeBank ?: $kodeDivisi);
+
+                    // Jika prefix lama beda dengan yang seharusnya (karena ganti jenis), pakai prefix baru
+                    $finalPrefix = ($oldPrefix !== $newPrefix) ? $newPrefix : $oldPrefix;
+
+                    return "{$finalPrefix}/{$tahun}/{$bulan}/{$lastNumber}";
+                }
+            }
+
+            // 2️⃣ Kalau tidak dikirim, ambil dari DB
+            $tablesToCheckForId = [
+                'other_payment' => 'no_pembayaran',
+                'local_po_payments' => 'payment_no',
+                'local_po_payment_bp' => 'payment_no',
+                'panjar_pinjaman_transaction' => 'no_transaction',
+                'pembayaran_invoice' => 'no_pembayaran',
+            ];
+
+            foreach ($tablesToCheckForId as $table => $numberColumn) {
+                try {
+                    $fields = $db->getFieldNames($table);
+                } catch (\Exception $e) {
+                    continue;
+                }
+                if (!in_array('id', $fields) || !in_array($numberColumn, $fields)) continue;
+
+                $row = $db->table($table)->select($numberColumn)->where('id', $id)->get()->getRowArray();
+                if ($row && !empty($row[$numberColumn])) {
+                    $parts = explode('/', $row[$numberColumn]);
+                    if (count($parts) >= 4) {
+                        $oldPrefix = $parts[0];
+                        $tahun = $parts[1];
+                        $bulan = $parts[2];
+                        $lastNumber = $parts[3];
+
+                        $newPrefix = strtoupper($paymentMethod) === 'CASH'
+                            ? $kodeDivisi
+                            : ($kodeBank ?: $kodeDivisi);
+                        $finalPrefix = ($oldPrefix !== $newPrefix) ? $newPrefix : $oldPrefix;
+
+                        return "{$finalPrefix}/{$tahun}/{$bulan}/{$lastNumber}";
+                    }
+                }
+            }
+        }
+
         // Search patterns — cek dua-duanya (FRM & FRK misalnya)
         $searchPatterns = [];
         if ($kodeMerah && $kodePutih) {
@@ -337,7 +356,7 @@ class LocalPOPaymentBPModel extends Model
             $searchPatterns[] = $displayPrefix;
         }
 
-        $db = \Config\Database::connect();
+       
         $tablesToCheck = [
             'other_payment' => ['no_pembayaran', 'tanggal', 'deletedAt'],
             'local_po_payments' => ['payment_no', 'payment_date', 'deletedAt'],

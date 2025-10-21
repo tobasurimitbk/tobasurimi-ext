@@ -842,21 +842,18 @@ class JasaVendorOut extends BaseController
                 // Untuk Dari Jasa Vendor
                 $condition = [
                     'stock_revamp_detail.reference_type' => "JASA VENDOR",
-                    'stock_revamp_detail.qty_diterima <' => 0,
+                    'stock_revamp.barang_master_id' => $barangMasterId,
+                    'stock_revamp_detail.qty_diterima >' => 0,
+                    'jasa_vendor_in.vendor_id' => $vendorId,
                 ];
 
-                $dataResult = $stockRevampDetailModel->getStockListWithAddConditionForJasaVendorOut($condition);
+                $dataResult = $stockRevampDetailModel->getStockListWithAddConditionForJasaVendorOutByVendor($condition);
 
-                // var_dump($dataResult);
-                // die;
 
                 $resultArr = [];
                 foreach ($dataResult as $item) {
-                    if (floatval($item['stok_total']) <= 0) continue;
-                    
-                    $stock = $this->stockModel->find($item['stock_id']);
-                    $bcType = $this->metaDataModel->find($item['bc_id']);
-                    $noJasaVendorIn = trim(strstr($item['stock_dokumen'], '(', true));
+                    if (floatval($item['stok_total_diterima']) <= 0) continue;
+                    $noJasaVendorIn = $item['no_penerimaan_vendor'];
                    
                     $jasaVendorInQuery = $this->jasaVendorInModel
                         ->select('jasa_vendor_in.*, vendors.name as nama_vendor')
@@ -875,14 +872,19 @@ class JasaVendorOut extends BaseController
 
                     $resultArr[] = [
                         'id' => $item['id'],
-                        'sumber' => $item['sumber'],
-                        'supplier_name' => $item['supplier_name'] . ' / ' . $jasaVendorIn['nama_vendor'],
-                        'bc_type' => $bcType ? $bcType['value'] : 'NON PABEAN',
-                        'stock_dokumen' => $item['stock_dokumen'] ?? '-',
-                        'stock_date' => date('d/m/Y', strtotime($jasaVendorIn['tanggal'])),
+                        'sumber' => $item['reference_type'],
+                        'bc_id' => $item['bc_id'],
+                        'supplier_name' => $jasaVendorIn['nama_vendor'],
+                        'bc_type' => $item['type_bc'],
+                        'stock_dokumen' => $item['no_penerimaan_vendor'] ?? '-',
+                        'stock_date' => $jasaVendorIn['tanggal'],
                         'barang' => $item['barang'],
+                        'reference_id' => $item['reference_id'],
+                        'po_id' => $item['rm_purchase_order_id'],
+                        'reference_type' => $item['reference_type'],
                         'satuan' => $item['kode_satuan'],
-                        'stok_total' => floatval($item['stok_total'])
+                        'satuan_id' => $item['satuan_id'],
+                        'stok_total' => floatval($item['stok_total_diterima'])
                     ];
                 }
             }

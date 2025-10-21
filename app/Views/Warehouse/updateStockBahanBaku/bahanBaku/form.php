@@ -1117,39 +1117,6 @@
             // validateRebusInputs();
         }
 
-        // Fungsi validasi
-        // function validateRebusInputs() {
-        //     let isValidRebus = true;
-        //     let isValidHasilRebus = true;
-            
-        //     $('.qty-rebus-input').each(function() {
-        //         const inputVal = parseFloat($(this).val());
-        //         const stokMax = parseFloat($(this).data('stok_total'));
-                
-        //         if (isNaN(inputVal) || inputVal <= 0 || inputVal > stokMax) {
-        //             isValidRebus = false;
-        //             $(this).addClass('is-invalid');
-        //         } else {
-        //             $(this).removeClass('is-invalid');
-        //         }
-        //     });
-            
-        //     $('.qty-hasil-input, .total-hasil-input').each(function() {
-        //         const inputVal = parseFloat($(this).val());
-                
-        //         if (isNaN(inputVal) || inputVal <= 0) {
-        //             isValidHasilRebus = false;
-        //             $(this).addClass('is-invalid');
-        //         } else {
-        //             $(this).removeClass('is-invalid');
-        //         }
-        //     });
-            
-        //     // Update status validasi untuk digunakan di form submit
-        //     window.isValidRebus = isValidRebus;
-        //     window.isValidHasilRebus = isValidHasilRebus;
-        // }
-
         // --- Tombol Hapus ---
         $('.btn-remove-row').click(function () {
             const $tr = $(this).closest('tr');

@@ -8,7 +8,6 @@
                 <h5 class="modal-title"><label class="title-name"></label></h5>
             </div>
             <div class="modal-body">
-                <?= csrf_field() ?>
                 <form class="create-form" role="form" method="POST">
                     <!-- Parent Form (Header) -->
                     <div class="card mb-4">
@@ -18,6 +17,7 @@
                         <div class="card-body">
                             <div class="row">
                                 <input type="text" style="display: none;" class="form-control hidden" name="id" id="id">
+                                <?= csrf_field() ?>
 
                                 <div class="col-md-6">
                                     <div class="input-group input-group-password">
@@ -30,7 +30,7 @@
 
                                 <div class="col-md-6">
                                     <div class="form-floating mb-3" style="height: 50px;">
-                                        <select class="form-select divisi_id" id="divisi_id" name="divisi_id" aria-label="Floating label select example">
+                                        <select class="form-select divisi_id" id="divisi_id" name="divisi_id" aria-label="Floating label select example" required>
                                             <option value=""></option>
                                             <?php foreach ($divisi as $d) : ?>
                                                 <option value="<?= $d['id'] ?>">
@@ -56,7 +56,7 @@
 
                                 <div class="col-md-6">
                                     <div class="form-floating mb-3" style="height: 50px;">
-                                        <select class="form-select" name="jenis" id="jenis">
+                                        <select class="form-select" name="jenis" id="jenis" required>
                                             <option value="PUTIH">PUTIH</option>
                                             <option value="MERAH">MERAH</option>
                                         </select>
@@ -86,7 +86,7 @@
                             <div class="row">
                                 <div class="col-md-6">
                                     <div class="form-floating mb-3" style="height: 50px;">
-                                        <select class="form-select " name="payment_method" id="payment_method">
+                                        <select class="form-select " name="payment_method" id="payment_method" required>
                                             <option disabled selected value="">Pilih Metode Pembayaran</option>
                                             <option value="Cash">Cash</option>
                                             <option value="Bank">Bank</option>
@@ -163,7 +163,7 @@
                                 <div class="col-md-6">
                                     <div class="input-group input-group-password">
                                         <div class="form-floating mb-3" style="height: 50px;">
-                                            <input autocomplete="one-time-code" class="form-control input-picker tanggal" id="tanggal" name="tanggal" placeholder="Tanggal Jatuh Tempo">
+                                            <input autocomplete="one-time-code" class="form-control input-picker tanggal" id="tanggal" name="tanggal" placeholder="Tanggal Jatuh Tempo" required>
                                             <label for="floatingInput">Tanggal Pembayaran</label>
                                         </div>
                                         <div class="input-group-prepend group-prepend-password align-items-center">
@@ -310,12 +310,6 @@
                             <label for="floatingInput">Supplier</label>
                         </div>
                     </div>
-                    <!-- <div class="col-sm-12">
-                        <div class="form-floating mb-3" style="height: 50px;">
-                            <input autocomplete="one-time-code" type="text" class="form-control lpb_no" name="lpb_no" id="lpb_no">
-                            <label for="floatingInput">Nomor LPB</label>
-                        </div>
-                    </div> -->
                 </div>
                 <div class="table-responsive">
                     <table class="table table-inside table-borderd nowrap table-hover-tobasurimi dataTable2" style="width: 100%;" id="tableHistori">
@@ -344,7 +338,6 @@
 
 <script>
     const csrfToken = '<?= csrf_token() ?>';
-    const csrf = $(`[name="${csrfToken}"]`);
 
     let sort = "no_panjar";
     let sortType = "desc";
@@ -516,6 +509,15 @@
             },
             keterangan: {
                 required: "Keterangan wajib dipilih"
+            },
+            tanggal: {
+                required: "Tanggal wajib dipilih"
+            },
+            divisi: {
+                required: "Divisi wajib dipilih"
+            },
+            payment_method: {
+                required: "Payment Method wajib dipilih"
             }
         },
         errorElement: 'span',
@@ -572,6 +574,7 @@
             cancelButtonText: 'Kembali',
         }).then((result) => {
             if (result.isConfirmed) {
+                const csrf = $(`[name="${csrfToken}"]`);
                 $.ajax({
                     url: "<?= base_url("panjar-supplier/delete"); ?>",
                     data: {
@@ -617,6 +620,7 @@
         }).then((result) => {
             if (result.isConfirmed) {
                 let id = $(".id").val();
+                const csrf = $(`[name="${csrfToken}"]`);
                 setLoading()
                 $.ajax({
                     url: "<?= base_url("panjar-supplier/delete"); ?>",
@@ -756,11 +760,10 @@
         const commonOptions = {
             theme: "bootstrap-5",
             dropdownParent: $('#add_modal .modal-content'),
-            minimumResultsForSearch: 10, // Tambahkan opsi pencarian
-            allowClear: true, // Tambahkan opsi ini
+            minimumResultsForSearch: 10,
+            allowClear: true,
         };
 
-        // Daftar field select2 yang akan diinisialisasi
         const select2Fields = [
             { id: '#jenis', placeholder: "Pilih Jenis" },
             { id: '#divisi_id', placeholder: "Pilih Departemen" },
@@ -768,68 +771,78 @@
             { id: '#payment_method', placeholder: "Pilih Metode Pembayaran" }
         ];
 
-        // Inisialisasi semua field sekaligus
+        // Inisialisasi
         select2Fields.forEach(field => {
+            if ($(field.id).data('select2')) {
+                // jika sudah inisialisasi, skip re-init
+                return;
+            }
             $(field.id).select2({
                 ...commonOptions,
                 placeholder: field.placeholder
             }).data('select2').$container.addClass('select2-custom-style');
         });
 
-        // Handler untuk perubahan field dengan debounce
         if (!silent) {
             let changeTimeout;
-            
-            // Hapus semua event handler sebelumnya untuk menghindari duplikasi
+
+            // Unbind previous namespaced handlers to avoid duplicates
             $('#jenis, #divisi_id, #bank_id, #payment_method').off('change.select2-generate');
-            
-            // Pasang handler baru dengan debounce
+
             $('#jenis, #divisi_id, #bank_id, #payment_method').on('change.select2-generate', function() {
                 clearTimeout(changeTimeout);
-                
-                // Dapatkan konteks field yang berubah
                 const changedField = this;
-                
+
                 changeTimeout = setTimeout(() => {
-                    // Tambahkan pengecekan modal terbuka
                     if ($('#add_modal').is(':visible')) {
                         handleFieldChange(changedField);
                     }
-                }, 300); // Debounce 300ms
+                }, 300);
             });
         }
 
-        // Tambahkan handler untuk modal close
+        // Destroy select2 when modal closed (cleanup)
         $('#add_modal').off('hidden.bs.modal.select2-cleanup').on('hidden.bs.modal.select2-cleanup', function() {
-            // Destroy select2 instance saat modal ditutup
             select2Fields.forEach(field => {
-                $(field.id).select2('destroy');
+                if ($(field.id).data('select2')) {
+                    try { $(field.id).select2('destroy'); } catch(e) { /* ignore */ }
+                }
             });
         });
     }
 
     function handleFieldChange(element, silent = false) {
-        if (silent) return; // Skip if silent mode
-        
+        if (silent) return;
+
+        // Jika bukan edit mode -> always generate for create mode
         if (!isEditMode) {
             generatePaymentNumber();
             return;
         }
-        
-        // Untuk mode edit, hanya generate jika nilai berubah
+
+        // Mode edit: kita harus cek perubahan per-field
         let currentField = $(element).attr('id');
-        let currentValue = $(element).val();
-        
-        if (initialValues[currentField] !== currentValue) {
+        let currentValue = $(element).val(); // pakai .val() konsisten
+
+        // Jika field 'jenis' berubah, kita MAU selalau generate (karena user ingin mengganti prefix)
+        if (currentField === 'jenis') {
+            // generate dengan paksa karena jenis harus mengubah prefix meskipun balik ke nilai awal
+            generatePaymentNumber(true);
+            return;
+        }
+
+        // Untuk field selain 'jenis', hanya generate kalau value berbeda dari initial
+        if (initialValues.hasOwnProperty(currentField) && initialValues[currentField] !== currentValue) {
             generatePaymentNumber(true);
         }
     }
 
+    // generatePaymentNumber sekarang konsisten kirim values (bukan text)
     function generatePaymentNumber(forceGenerate = false) {
         // Jika di mode edit dan bukan force generate, skip
         if (isEditMode && !forceGenerate) return;
-        
-        // Get current values
+
+        // Ambil current values (pakai value, bukan text)
         let currentValues = {
             divisi_id: $("#divisi_id").val(),
             bank_id: $("#bank_id").val(),
@@ -837,22 +850,26 @@
             jenis: $("#jenis").val(),
             tanggal_pembayaran: $("#tanggal_pembayaran").val()
         };
-        
-        // Jika nilai sama dengan initial values, skip
+
+        // Jika di edit mode dan semua values sama persis dg initial, skip.
+        // NOTE: kita sudah memaksa generate di handleFieldChange ketika jenis berubah.
         if (isEditMode && JSON.stringify(currentValues) === JSON.stringify(initialValues)) return;
         
         // Proses generate nomor
+        let id = $("#id").val();
         let jenisPembayaran = $("#jenis option:selected").text();
         let divisiId = $("#divisi_id option:selected").text();
         let paymentMethod = $("#payment_method option:selected").text();
         let bankId = $("#bank_id option:selected").val();
         let tanggalPembayaran = $("#tanggal_pembayaran").val();
+        let noTransaksi = $("#no_transaksi").val();
+        const csrf = $(`[name="${csrfToken}"]`);
         
         let url = "<?= base_url('panjar-supplier/generate-no-panjar'); ?>";
-        url += `?jenisPembayaran=${encodeURIComponent(jenisPembayaran)}&divisiId=${encodeURIComponent(divisiId)}&paymentMethod=${encodeURIComponent(paymentMethod)}&bankId=${encodeURIComponent(bankId)}&tanggalPembayaran=${encodeURIComponent(tanggalPembayaran)}`;
-        
+        url += `?jenisPembayaran=${encodeURIComponent(jenisPembayaran)}&divisiId=${encodeURIComponent(divisiId)}&paymentMethod=${encodeURIComponent(paymentMethod)}&bankId=${encodeURIComponent(bankId)}&tanggalPembayaran=${encodeURIComponent(tanggalPembayaran)}&id=${encodeURIComponent(id)}&noTransaksi=${encodeURIComponent(noTransaksi)}`;
+
         $("#no_transaksi").attr("readonly", true);
-        
+
         $.ajax({
             url: url,
             method: "GET",
@@ -1056,6 +1073,20 @@
 
 
     $(document).ready(function() {
+
+        $('#payment_method').on('change', function() {
+            const selectedPaymentMethod = $(this).val()?.toUpperCase();
+
+            if (selectedPaymentMethod === 'BANK') {
+                // Aktifkan kembali kalau bukan CASH
+                $('#bank_id').prop('disabled', false);
+            } else {
+                // Kosongin dan disable select bank
+                $('#bank_id').val(null).trigger('change');
+                $('#bank_id').prop('disabled', true);
+            }
+        });
+
 
         $("#akun_kas, #akun_selisih").select2({
             theme: "bootstrap-5",
@@ -1299,6 +1330,7 @@
                     cancelButtonText: 'Kembali',
                 }).then((result) => {
                     if (result.isConfirmed) {
+                        const csrf = $(`[name="${csrfToken}"]`);
                         let data = new FormData();
                         // Add main form data
                         data.append('no_transaksi', $('#no_transaksi').val());
@@ -1459,6 +1491,7 @@
             cancelButtonText: 'Kembali',
         }).then((result) => {
             if (result.isConfirmed) {
+                const csrf = $(`[name="${csrfToken}"]`);
                 $.ajax({
                     url: "<?= base_url("panjar-supplier/update-status"); ?>",
                     data: {

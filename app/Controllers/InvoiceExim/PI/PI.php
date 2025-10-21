@@ -11,6 +11,7 @@ use App\Models\ProformaInvoiceBarangModel;
 use App\Models\ProformaInvoiceBiayaModel;
 use App\Models\ProformaInvoiceModel;
 use App\Models\ProformaInvoiceTermModel;
+use App\Models\SalesKontrakModel;
 use App\Models\SalesOrderExportModel;
 use App\Models\SatuansModel;
 use Dompdf\Dompdf;
@@ -20,6 +21,7 @@ class PI extends BaseController
 {
     protected $this_company_id;
     protected $salesOrderExportModel;
+    protected $salesKontrakModel;
     protected $metaDataModel;
     protected $divisiModel;
     protected $bankModel;
@@ -33,6 +35,7 @@ class PI extends BaseController
 
     public function __construct()
     {
+        $this->salesKontrakModel = new SalesKontrakModel();
         $this->salesOrderExportModel = new SalesOrderExportModel();
         $this->this_company_id = session()->get("login")->this_company_id;
         $this->metaDataModel = new MetadataModel();
@@ -56,7 +59,7 @@ class PI extends BaseController
         return view('InvoiceExim/PI/index', $data);
     }
 
-    public function allOrderForm()
+    public function allContract()
     {
         $payload = [
             "pageSize"      => $this->request->getGet("length"),
@@ -69,11 +72,12 @@ class PI extends BaseController
         ];
 
         $condition = [
-            "sales_order_export.company_id"    => $this->this_company_id,
-            "sales_order_export.deletedAt" => null,
+            "sales_contract.company_id"    => $this->this_company_id,
+            "sales_contract.deletedAt" => null
         ];
 
         $addCondition = [
+            "status_posting" => "",
             "search"        => $this->request->getGet("search"),
             "sort"          => $this->request->getGet("sort"),
             "sortType"      => $this->request->getGet("sortType"),
@@ -83,28 +87,30 @@ class PI extends BaseController
 
         $limit = $this->request->getGet("length");
         $offset = $this->request->getGet("start");
-        $salesData = $this->salesOrderExportModel->getListPeb($condition, $addCondition, $limit, $offset);
+        $salesData = $this->salesKontrakModel->getList(
+            $condition,
+            $addCondition,
+            $limit,
+            $offset
+        );
 
         $dataSales = [];
 
         $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
 
         foreach ($salesData['data'] as $data) {
-            $totalInvPI = \count($this->proformaInvoiceModel
-                ->where('sales_order_export_id', $data->sales_order_export_id)
+            $totalInvPI = count($this->proformaInvoiceModel
+                ->where('sales_contract_id', $data->id)
                 ->where('deletedAt', null)
                 ->findAll());
 
             array_push($dataSales, [
                 "no"                        => $no++,
-                "id"                        => \encrypt($data->sales_order_export_id),
-                "no_invoice"                => $data->no_invoice,
-                "tanggal_invoice"           => $data->tanggal_invoice != "" ? date('d/m/Y', strtotime($data->tanggal_invoice)) : "-",
+                "id"                        => \encrypt($data->id),
+                "createdAt"             => date('d/m/Y', strtotime($data->createdAt)),
                 "customer_name"             => $data->customer_name,
-                "sales_order_export_no"     => $data->sales_order_export_no,
+                "sales_contract_no"         => $data->sales_contract_no,
                 "dicharge_port"             => $data->dicharge_port,
-                "status_invoice"            => $data->status_invoice,
-                "nilai_peb"                 =>  "(" . $data->valas_peb_name . ") " . \number_format($data->shipment_value, 2),
                 "total_inv_pi"              => $totalInvPI != 0 ? $totalInvPI . " Invoice" : ""
             ]);
         }
@@ -136,7 +142,7 @@ class PI extends BaseController
         $condition = [
             "proforma_invoice.company_id"    => $this->this_company_id,
             "proforma_invoice.deletedAt" => null,
-            "proforma_invoice.sales_order_export_id" => $this->request->getVar('sales_order_export_id')
+            "proforma_invoice.sales_contract_id" => $this->request->getVar('id')
         ];
 
         $addCondition = [
@@ -195,7 +201,7 @@ class PI extends BaseController
     public function indexPI($id)
     {
         $id = \decrypt($id);
-        $dataSalesOrderExport = $this->salesOrderExportModel->getById($id);
+        $dataSalesOrderExport = $this->salesKontrakModel->getById($id);
         $dataCompany = $this->companyModel->whereIn('id', [1, 2])->findAll();
         if ($dataSalesOrderExport == null) {
             return \redirect()->to('proforma-invoice');
@@ -214,7 +220,7 @@ class PI extends BaseController
     public function createPI($id)
     {
         $id = \decrypt($id);
-        $dataSalesOrderExport = $this->salesOrderExportModel->getById($id);
+        $dataSalesOrderExport = $this->salesKontrakModel->getById($id);
         if ($dataSalesOrderExport == null) {
             return \redirect()->to('proforma-invoice');
         }
@@ -239,7 +245,7 @@ class PI extends BaseController
         if ($dataPI == null) {
             return \redirect()->to('proforma-invoice');
         }
-        $dataSalesOrderExport = $this->salesOrderExportModel->getById($dataPI['sales_order_export_id']);
+        $dataSalesOrderExport = $this->salesKontrakModel->getById($dataPI['sales_contract_id']);
         if ($dataSalesOrderExport == null) {
             return \redirect()->to('proforma-invoice');
         }
@@ -271,7 +277,7 @@ class PI extends BaseController
         if ($dataPI == null) {
             return \redirect()->to('proforma-invoice');
         }
-        $dataSalesOrderExport = $this->salesOrderExportModel->getById($dataPI['sales_order_export_id']);
+        $dataSalesOrderExport = $this->salesKontrakModel->getById($dataPI['sales_contract_id']);
         if ($dataSalesOrderExport == null) {
             return \redirect()->to('proforma-invoice');
         }
@@ -327,7 +333,7 @@ class PI extends BaseController
 
             $id = $this->proformaInvoiceModel->insert([
                 'company_id' => $this->this_company_id,
-                'sales_order_export_id' => $this->request->getVar('sales_order_export_id'),
+                'sales_contract_id' => $this->request->getVar('sales_contract_id'),
                 'valas_id' => $this->request->getVar('valas_id'),
                 'bank_id' => $this->request->getVar('bank_id'),
                 'no_pi' => $noInvoicePI,
@@ -407,7 +413,7 @@ class PI extends BaseController
 
             $this->proformaInvoiceModel->update($id, [
                 'company_id' => $this->this_company_id,
-                'sales_order_export_id' => $this->request->getVar('sales_order_export_id'),
+                'sales_contract_id' => $this->request->getVar('sales_contract_id'),
                 'valas_id' => $this->request->getVar('valas_id'),
                 'bank_id' => $this->request->getVar('bank_id'),
                 'no_pi' => $noInvoicePI,
@@ -579,7 +585,7 @@ class PI extends BaseController
             ->join('banks', 'banks.id = proforma_invoice.bank_id', 'left')
             ->where('proforma_invoice.id', $id)
             ->first();
-        $dataSalesOrderExport = $this->salesOrderExportModel->getById($dataPI['sales_order_export_id']);
+        $dataSalesOrderExport = $this->salesKontrakModel->getById($dataPI['sales_contract_id']);
         $dataPIBarang = $this->proformaInvoiceBarangModel->getBarang($id);
         $dataPIPaymentTerm = $this->proformaInvoiceTermModel->where('proforma_invoice_id', $id)->where('deletedAt', null)->findAll();
         $dataPIBiaya = $this->proformaInvoiceBiayaModel->where('proforma_invoice_id', $id)->where('deletedAt', null)->findAll();
@@ -651,7 +657,7 @@ class PI extends BaseController
 
             $check = $this->salesOrderExportModel
                 ->where('no_invoice', $noInvoice)
-                ->where('sales_order_export_id !=', $id)
+                ->where('sales_contract_id !=', $id)
                 ->first();
 
             if ($check != null) {

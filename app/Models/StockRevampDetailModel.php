@@ -274,6 +274,55 @@ class StockRevampDetailModel extends Model
             ->findAll();
     }
 
+    public function getStockListWithAddConditionForJasaVendorOutByVendor($condition)
+    {
+        $builder = $this->asArray()
+            ->select('
+                stock_revamp_detail.id AS id,
+                stock_revamp.spesifikasi_id,
+                suppliers.name AS supplier_name,
+                stock_revamp_detail.stock_id,
+                stock_revamp_detail.bc_id,
+                stock_revamp_detail.type_bc,
+                rm_purchase_orders.supplier_id,
+                stock_revamp_detail.reference_type,
+                stock_revamp_detail.reference_id,
+                rm_purchase_orders.po_date,
+                rm_purchase_orders.po_no,
+                rm_purchase_orders.id as rm_purchase_order_id,
+                rm_purchase_order_details.id as rm_purchase_order_detail_id,
+                CONCAT(barang_master.barang_name, " ", barang_master_spesifikasi.spesifikasi) AS barang,
+                satuans.kode_satuan,
+                satuans.id as satuan_id,
+                stock_revamp_detail.qty_bersih AS total_penerimaan,
+                stock_revamp_detail.qty_bersih as stok_total,
+                stock_revamp_detail.qty_diterima as stok_total_diterima,
+                jasa_vendor_in.no_penerimaan_surat_jalan AS no_penerimaan_vendor
+            ')
+            ->join('stock_revamp', 'stock_revamp.id = stock_revamp_detail.stock_id', 'left')
+            ->join('rm_purchase_orders', 'rm_purchase_orders.id = stock_revamp_detail.po_id', 'left')
+            ->join('suppliers', 'suppliers.id = rm_purchase_orders.supplier_id', 'left')
+            ->join('rm_purchase_order_details', 'rm_purchase_order_details.rm_purchase_order_id = rm_purchase_orders.id', 'left')
+            ->join('barang_master', 'barang_master.id = stock_revamp.barang_master_id', 'left')
+            ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = stock_revamp.spesifikasi_id', 'left')
+            ->join('satuans', 'satuans.id = barang_master_spesifikasi.satuan_1', 'left')
+            ->join('jasa_vendor_in', 'jasa_vendor_in.id = stock_revamp_detail.reference_id', 'left');
+
+        // Kondisi dinamis
+        foreach ($condition as $field => $value) {
+            if (is_array($value)) {
+                $builder->whereIn($field, $value);
+            } else {
+                $builder->where($field, $value);
+            }
+        }
+
+        return $builder
+            ->groupBy('stock_revamp_detail.id')
+            ->orderBy('rm_purchase_orders.po_date', 'ASC')
+            ->findAll();
+    }
+
     public function getListStockDetailByPoLokalBb($condition = [], $addCondition = [], $limit = 10, $offset = 0)
     {
         $availableSort = [

@@ -151,7 +151,7 @@
                     if (status != 1) {
                         return `
                                 <div class="mt-0">
-                                    <button type="button" onclick="handleDelete('${id}')" class="btn btn-discard delete-btn btn-trash">
+                                    <button type="button" onclick="remove('${id}')" class="btn btn-discard delete-btn btn-trash">
                                         <i class="fa fa-trash"></i>
                                     </button>
                                     <button class="btn btn-warning" onclick="handlePrint('${id}')">

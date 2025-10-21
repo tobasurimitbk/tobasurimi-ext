@@ -43,7 +43,9 @@ class SalesKontrakModel extends Model
     public function getList($condition, $addCondition, $limit = 10, $offset = 0)
     {
         $availableSort = [
+            'sales_contract.id'      => 'sales_contract.id',
             'sales_contract_no'     => 'sales_contract.sales_contract_no',
+            'sales_contract.dicharge_port'         => 'sales_contract.dicharge_port',
             'customer_name'         => 'customers.name',
             'due_date'              => 'sales_contract.due_date',
             'shipment_date'         => 'sales_contract.shipment_date',
@@ -114,7 +116,7 @@ class SalesKontrakModel extends Model
 
     public function getById($id)
     {
-        $selectQry = "sales_contract.*, customers.name as customer_name";
+        $selectQry = "sales_contract.*, customers.name as customer_name,customers.address";
 
         $salesData = $this->asObject()
             ->select($selectQry)

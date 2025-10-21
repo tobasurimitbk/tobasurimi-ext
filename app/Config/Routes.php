@@ -435,7 +435,7 @@ $routes->post('/ambil-pinjaman-karyawan/check-ambil-pinjaman', 'Pembayaran\Ambil
 $routes->get('/pembayaran-po-lokal-bp', 'Pembayaran\PembayaranPOLokal::pembayaranPOLokalBP', ['filter' => 'Auth']);
 $routes->get('/pembayaran-po-lokal-bp/create', 'Pembayaran\PembayaranPOLokal::createPembayaranPOLokalBP', ['filter' => 'Auth']);
 $routes->get('/pembayaran-po-lokal-bp/get-rekap-faktur/(:segment)', 'Pembayaran\PembayaranPOLokal::getTandaTerimaFaktur/$1/$2', ['filter' => 'Auth']);
-$routes->get('/pembayaran-po-lokal-bp/get-item-list/(:segment)/(:segment)', 'Pembayaran\PembayaranPOLokal::getItemListByTandaTerimaFaktur/$1/$2', ['filter' => 'Auth']);
+$routes->get('/pembayaran-po-lokal-bp/get-item-list/(:segment)', 'Pembayaran\PembayaranPOLokal::getItemListByTandaTerimaFaktur/$1', ['filter' => 'Auth']);
 $routes->post('/pembayaran-po-lokal-bp/generate-no-pembayaran', 'Pembayaran\PembayaranPOLokal::generatePaymentNoBPNew', ['filter' => 'Auth']);
 $routes->post('/pembayaran-po-lokal-bp/create', 'Pembayaran\PembayaranPOLokal::createPembayaranPOLokalBPAction', ['filter' => 'Auth']);
 $routes->post('/pembayaran-po-lokal-bp/update', 'Pembayaran\PembayaranPOLokal::updatePembayaranPOLokalBPAction', ['filter' => 'Auth']);
@@ -886,7 +886,7 @@ $routes->get('/biaya-lokal/detail/(:segment)', 'BiayaExim\BiayaLokal\BiayaLokal:
 // INVOICE EXIM
 // PI
 $routes->get('/proforma-invoice', 'InvoiceExim\PI\PI::index', ['filter' => 'Auth']);
-$routes->get('/proforma-invoice/all-order-form', 'InvoiceExim\PI\PI::allOrderForm', ['filter' => 'Auth']);
+$routes->get('/proforma-invoice/all-contract', 'InvoiceExim\PI\PI::allContract', ['filter' => 'Auth']);
 $routes->get('/proforma-invoice/detail/(:segment)', 'InvoiceExim\PI\PI::indexPI/$1', ['filter' => 'Auth']);
 $routes->get('/proforma-invoice/create/(:segment)', 'InvoiceExim\PI\PI::createPI/$1', ['filter' => 'Auth']);
 $routes->post('/proforma-invoice/create', 'InvoiceExim\PI\PI::storePI', ['filter' => 'Auth']);
@@ -1570,6 +1570,7 @@ $routes->get('/update-stock-bahan-baku/print/(:segment)', 'Warehouse\UpdateStock
 $routes->post('/update-stock-bahan-baku/save', 'Warehouse\UpdateStockBahanBaku::saveStockBahanBakuAction', ['filter' => 'Auth']);
 $routes->post('/update-stock-bahan-baku/update', 'Warehouse\UpdateStockBahanBaku::updateStockBahanBakuAction', ['filter' => 'Auth']);
 $routes->post('/update-stock-bahan-baku/posting', 'Warehouse\UpdateStockBahanBaku::posting', ['filter' => 'Auth']);
+$routes->post('/update-stock-bahan-baku/delete', 'Warehouse\UpdateStockBahanBaku::deleteupdateStockBahanBaku', ['filter' => 'Auth']);
 
 
 // ROUTE BEA CUKAI REVAMP

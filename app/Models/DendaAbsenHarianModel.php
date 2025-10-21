@@ -4,30 +4,20 @@ namespace App\Models;
 
 use CodeIgniter\Model;
 
-class LocalPOPaymentDetailModel extends Model
+class DendaAbsenHarianModel extends Model
 {
     protected $DBGroup          = 'default';
-    protected $table            = 'local_po_payment_details';
+    protected $table            = 'denda_absen_harian';
     protected $primaryKey       = 'id';
     protected $useAutoIncrement = true;
     protected $insertID         = 0;
     protected $returnType       = 'array';
     protected $useSoftDeletes   = true;
-    protected $protectFields    = true;
-    protected $allowedFields    = [
-        'local_po_payment_id',
-        'penerimaan_barang_id',
-        'tanda_terima_faktur_id',
-        'penerimaan_barang_detail_id',
-        'rm_purchase_order_id',
-        'rm_purchase_order_details_id',
-        'total',
-        'total_pay_pph',
-        'tipe'
-    ];
+    protected $protectFields    = false;
+    protected $allowedFields    = [];
 
     // Dates
-    protected $useTimestamps = false;
+    protected $useTimestamps = true;
     protected $dateFormat    = 'datetime';
     protected $createdField  = 'createdAt';
     protected $updatedField  = 'updatedAt';
@@ -49,4 +39,19 @@ class LocalPOPaymentDetailModel extends Model
     protected $afterFind      = [];
     protected $beforeDelete   = [];
     protected $afterDelete    = [];
+
+    public function getDendaKeterlambatanByDateRangeAmt(
+        $employeeIds,
+        $startDate,
+        $endDate
+    ) {
+        $dendaHarianAll = $this->asArray()
+            ->whereIn('employee_id', $employeeIds)
+            ->where('tanggal >=', $startDate)
+            ->where('tanggal <=', $endDate)
+            ->where('deletedAt', null)
+            ->findAll();
+
+        return $dendaHarianAll;
+    }
 }

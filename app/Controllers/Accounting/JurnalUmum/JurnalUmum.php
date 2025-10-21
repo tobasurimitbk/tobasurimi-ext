@@ -50,6 +50,7 @@ use App\Models\PinjamanSupplierModel;
 use App\Models\EmployeesModel;
 use App\Models\LocalPOPaymentBPModel;
 use App\Models\PenerimaanBarangDetailModel;
+use App\Models\TandaTerimaFakturModel;
 use App\Models\TaxModel;
 use Carbon\Carbon;
 
@@ -2105,19 +2106,25 @@ class JurnalUmum extends BaseController
         } elseif ($module == "LOKAL BP") {
             $result = [];
 
-            // ✅ 1. Ambil data PO lokal
+            // ✅ 1. Ambil data pembayaran utama
             $POlocal = $this->localPoPaymentBpModel->where('id', $payID)->first();
 
             if (!$POlocal) {
                 throw new Exception("❌ Tidak ada data pembayaran Lokal BP dengan ID: {$payID}");
             }
 
-            // ✅ 2. Ambil data pajak
-            $pajakTandaTerimaFakturModel = new PajakTandaTerimaFakturModel();
-            $pajakTandaTerima = $pajakTandaTerimaFakturModel
-                ->where("tanda_terima_faktur_id", $POlocal['tanda_terima_faktur_id'])
-                ->where("deletedAt", null)
+            // ✅ 2. Ambil detail pembayaran
+            $detailModel = new LocalPOPaymentDetailModel();
+            $tandaTerimaFakturModel = new TandaTerimaFakturModel();
+
+            $details = $detailModel
+                ->where('local_po_payment_id', $payID)
+                ->where('deletedAt', null)
                 ->findAll();
+
+            if (empty($details)) {
+                throw new Exception("❌ Tidak ada detail tanda terima untuk pembayaran ini.");
+            }
 
             // ✅ 3. Ambil ID tipe transaksi (PEMBAYARAN)
             $dataMetadataTipeTransaksi = $this->MetadataModel
@@ -2132,7 +2139,7 @@ class JurnalUmum extends BaseController
 
             $idTransaksi = $dataMetadataTipeTransaksi->id;
 
-            // ✅ 4. Pastikan variabel penting ada
+            // ✅ 4. Cek data penting
             $divisi = $POlocal['divisi_id'] ?? null;
             if (!$divisi) {
                 throw new Exception("❌ Divisi belum diisi pada data pembayaran lokal.");
@@ -2140,12 +2147,12 @@ class JurnalUmum extends BaseController
 
             $tanggal = date('Y-m-d', strtotime(str_replace('/', '-', $POlocal['payment_date'])));
 
-            // ✅ 5. Insert ke tabel transaksi_jurnal
+            // ✅ 5. Insert ke transaksi_jurnal
             $resultTransaksiJurnal = [
                 'no_transaksi'      => $POlocal['payment_no'],
                 'tanggal_transaksi' => $tanggal,
-                'total_debit'       => $POlocal['amount'] + $POlocal['amount_pajak'],
-                'total_kredit'      => $POlocal['amount'] + $POlocal['amount_pajak'],
+                'total_debit'       => $POlocal['amount'],
+                'total_kredit'      => $POlocal['amount'],
                 'metode_input'      => 'system',
                 'type_transaksi'    => $idTransaksi,
                 'no_bukti'          => $POlocal['payment_no'],
@@ -2158,95 +2165,195 @@ class JurnalUmum extends BaseController
             $id_transaksi_jurnal = $this->transaksiJurnalModel->insertTransaksiJurnal($resultTransaksiJurnal);
 
             if (!$id_transaksi_jurnal || !is_numeric($id_transaksi_jurnal)) {
-                throw new Exception("❌ Insert transaksi jurnal gagal. Cek function insertTransaksiJurnal() return ID atau tidak.");
+                throw new Exception("❌ Insert transaksi jurnal gagal.");
             }
 
-            // ✅ 6. Baris Debit
-            $result[] = [
-                'id_transaksi'   => $id_transaksi_jurnal,
-                'id_coa'         => $POlocal['akun_kas'],
-                'company_id'     => $POlocal['company_id'],
-                'divisi_id'      => $divisi,
-                'supplier_id'    => $POlocal['supplier_id'],
-                'tanggal_jurnal' => $tanggal,
-                'debit'          => $POlocal['amount'],
-                'kredit'         => 0,
-                'valas'          => '30',
-                'kurs'           => 1,
-                'keterangan'     => $POlocal['keterangan'],
-                'id_inputer'     => session()->get("login")->user_id
-            ];
+            // ✅ 6. Loop setiap detail tanda terima
+            foreach ($details as $det) {
+                $tandaTerimaID = $det['tanda_terima_faktur_id'];
 
-            // ✅ 7. Baris Kredit
-            $result[] = [
-                'id_transaksi'   => $id_transaksi_jurnal,
-                'id_coa'         => $POlocal['akun_selisih'],
-                'company_id'     => $POlocal['company_id'],
-                'divisi_id'      => $divisi,
-                'supplier_id'    => $POlocal['supplier_id'],
-                'tanggal_jurnal' => $tanggal,
-                'debit'          => 0,
-                'kredit'         => $POlocal['amount'],
-                'valas'          => '30',
-                'kurs'           => 1,
-                'keterangan'     => $POlocal['keterangan'],
-                'id_inputer'     => session()->get("login")->user_id
-            ];
+                // Ambil data tanda terima untuk keterangan tambahan
+                $ttf = $tandaTerimaFakturModel->where('id', $tandaTerimaID)->first();
+                $keteranganTTF = $ttf['no_tanda_terima'] ?? $POlocal['keterangan'];
 
-            // ✅ 8. Jika ada pajak, buat baris tambahan
-            if ($pajakTandaTerima) {
-                $taxesModel = new TaxModel();
+                // 🔹 Debit utama (kas)
+                $result[] = [
+                    'id_transaksi'   => $id_transaksi_jurnal,
+                    'id_coa'         => $POlocal['akun_kas'],
+                    'company_id'     => $POlocal['company_id'],
+                    'divisi_id'      => $divisi,
+                    'supplier_id'    => $POlocal['supplier_id'],
+                    'tanggal_jurnal' => $tanggal,
+                    'debit'          => $det['total'],
+                    'kredit'         => 0,
+                    'valas'          => '30',
+                    'kurs'           => 1,
+                    'keterangan'     => "Pembayaran: {$keteranganTTF}",
+                    'id_inputer'     => session()->get("login")->user_id
+                ];
 
-                foreach ($pajakTandaTerima as $ptt) {
-                    $tax = $taxesModel->where('id', $ptt['tax_id'])->first();
+                // 🔹 Kredit utama (akun selisih / hutang)
+                $result[] = [
+                    'id_transaksi'   => $id_transaksi_jurnal,
+                    'id_coa'         => $POlocal['akun_selisih'],
+                    'company_id'     => $POlocal['company_id'],
+                    'divisi_id'      => $divisi,
+                    'supplier_id'    => $POlocal['supplier_id'],
+                    'tanggal_jurnal' => $tanggal,
+                    'debit'          => 0,
+                    'kredit'         => $det['total'],
+                    'valas'          => '30',
+                    'kurs'           => 1,
+                    'keterangan'     => "Pembayaran: {$keteranganTTF}",
+                    'id_inputer'     => session()->get("login")->user_id
+                ];
 
-                    // Debit pajak
+                // 🔹 Tambahan (kalau ada)
+                if (!empty($ttf['tambahan']) && $ttf['tambahan'] > 0) {
                     $result[] = [
                         'id_transaksi'   => $id_transaksi_jurnal,
-                        'id_coa'         => $tax['akun_debit'],
+                        'id_coa'         => $POlocal['akun_kas'],
                         'company_id'     => $POlocal['company_id'],
                         'divisi_id'      => $divisi,
                         'supplier_id'    => $POlocal['supplier_id'],
                         'tanggal_jurnal' => $tanggal,
-                        'debit'          => $ptt['tax_amt'],
+                        'debit'          => $ttf['tambahan'],
                         'kredit'         => 0,
                         'valas'          => '30',
                         'kurs'           => 1,
-                        'keterangan'     => "Pajak " . $POlocal['keterangan'],
+                        'keterangan'     => "Tambahan dari {$keteranganTTF}",
                         'id_inputer'     => session()->get("login")->user_id
                     ];
+                }
 
-                    // Kredit pajak
+                // 🔹 Potongan (kalau ada)
+                if (!empty($ttf['potongan']) && $ttf['potongan'] > 0) {
                     $result[] = [
                         'id_transaksi'   => $id_transaksi_jurnal,
-                        'id_coa'         => $tax['akun_kredit'],
+                        'id_coa'         => $POlocal['akun_selisih'],
                         'company_id'     => $POlocal['company_id'],
                         'divisi_id'      => $divisi,
                         'supplier_id'    => $POlocal['supplier_id'],
                         'tanggal_jurnal' => $tanggal,
                         'debit'          => 0,
-                        'kredit'         => $ptt['tax_amt'],
+                        'kredit'         => $ttf['potongan'],
                         'valas'          => '30',
                         'kurs'           => 1,
-                        'keterangan'     => "Pajak " . $POlocal['keterangan'],
+                        'keterangan'     => "Potongan dari {$keteranganTTF}",
                         'id_inputer'     => session()->get("login")->user_id
                     ];
                 }
+
+                // 🔹 Pajak per tanda terima (kalau ada)
+                $pajakTandaTerimaFakturModel = new PajakTandaTerimaFakturModel();
+                $pajakTandaTerimaPutih = $pajakTandaTerimaFakturModel
+                    ->where("tanda_terima_faktur_id", $tandaTerimaID)
+                    ->whereIn('tax_type', ['PPN Masukan', 'PPN Masukan 11%'])
+                    ->where("deletedAt", null)
+                    ->findAll();
+
+                $pajakTandaTerimaMerah = $pajakTandaTerimaFakturModel
+                    ->where("tanda_terima_faktur_id", $tandaTerimaID)
+                    ->whereIn('tax_type', ['PPN Masukan', 'PPh Pasal 21', 'PPh Pasal 23', 'PPh Pasal 4 (2)'])
+                    ->where("deletedAt", null)
+                    ->findAll();
+
+                if ($pajakTandaTerimaPutih) {
+                    $taxesModel = new TaxModel();
+                    foreach ($pajakTandaTerimaPutih as $ptt) {
+                        $tax = $taxesModel->where('id', $ptt['tax_id'])->first();
+
+                        $taxStatus = $ptt['tax_status'] ?? '-';
+                        $taxNote   = $ptt['tax_note'] ?? '';
+
+                        // Debit pajak
+                        $result[] = [
+                            'id_transaksi'   => $id_transaksi_jurnal,
+                            'id_coa'         => $tax['akun_debit'],
+                            'company_id'     => $POlocal['company_id'],
+                            'divisi_id'      => $divisi,
+                            'supplier_id'    => $POlocal['supplier_id'],
+                            'tanggal_jurnal' => $tanggal,
+                            'debit'          => $ptt['tax_amt'],
+                            'kredit'         => 0,
+                            'valas'          => '30',
+                            'kurs'           => 1,
+                            'keterangan'     => "Pajak {$keteranganTTF} | Status: {$taxStatus}" . (!empty($taxNote) ? " | Catatan: {$taxNote}" : ''),
+                            'id_inputer'     => session()->get("login")->user_id
+                        ];
+
+                        // Kredit pajak
+                        $result[] = [
+                            'id_transaksi'   => $id_transaksi_jurnal,
+                            'id_coa'         => $tax['akun_kredit'],
+                            'company_id'     => $POlocal['company_id'],
+                            'divisi_id'      => $divisi,
+                            'supplier_id'    => $POlocal['supplier_id'],
+                            'tanggal_jurnal' => $tanggal,
+                            'debit'          => 0,
+                            'kredit'         => $ptt['tax_amt'],
+                            'valas'          => '30',
+                            'kurs'           => 1,
+                            'keterangan'     => "Pajak {$keteranganTTF} | Status: {$taxStatus}" . (!empty($taxNote) ? " | Catatan: {$taxNote}" : ''),
+                            'id_inputer'     => session()->get("login")->user_id
+                        ];
+                    }
+                }
+
+                if ($pajakTandaTerimaMerah) {
+                    $taxesModel = new TaxModel();
+                    foreach ($pajakTandaTerimaMerah as $ptt) {
+                        $tax = $taxesModel->where('id', $ptt['tax_id'])->first();
+
+                        $taxStatus = $ptt['tax_status'] ?? '-';
+                        $taxNote   = $ptt['tax_note'] ?? '';
+
+                        // Debit pajak
+                        $result[] = [
+                            'id_transaksi'   => $id_transaksi_jurnal,
+                            'id_coa'         => $tax['akun_debit'],
+                            'company_id'     => $POlocal['company_id'],
+                            'divisi_id'      => $divisi,
+                            'supplier_id'    => $POlocal['supplier_id'],
+                            'tanggal_jurnal' => $tanggal,
+                            'debit'          => $ptt['tax_amt'],
+                            'kredit'         => 0,
+                            'valas'          => '30',
+                            'kurs'           => 1,
+                            'keterangan'     => "Pajak {$keteranganTTF} | Status: {$taxStatus}" . (!empty($taxNote) ? " | Catatan: {$taxNote}" : ''),
+                            'id_inputer'     => session()->get("login")->user_id
+                        ];
+
+                        // Kredit pajak
+                        $result[] = [
+                            'id_transaksi'   => $id_transaksi_jurnal,
+                            'id_coa'         => $tax['akun_kredit'],
+                            'company_id'     => $POlocal['company_id'],
+                            'divisi_id'      => $divisi,
+                            'supplier_id'    => $POlocal['supplier_id'],
+                            'tanggal_jurnal' => $tanggal,
+                            'debit'          => 0,
+                            'kredit'         => $ptt['tax_amt'],
+                            'valas'          => '30',
+                            'kurs'           => 1,
+                            'keterangan'     => "Pajak {$keteranganTTF} | Status: {$taxStatus}" . (!empty($taxNote) ? " | Catatan: {$taxNote}" : ''),
+                            'id_inputer'     => session()->get("login")->user_id
+                        ];
+                    }
+                }
             }
 
-            // ✅ 9. Pastikan array result gak kosong
+            // ✅ 7. Insert batch ke jurnal umum
             if (empty($result)) {
-                throw new Exception("❌ Tidak ada data jurnal yang terbentuk dari pembayaran ini.");
+                throw new Exception("❌ Tidak ada data jurnal yang terbentuk dari detail pembayaran ini.");
             }
 
-            // ✅ 10. Insert batch ke jurnal umum
             $insertResult = $this->jurnalUmumModel->insertJurnalBatch($result);
 
             if (!$insertResult) {
                 throw new Exception("❌ Gagal insert ke jurnal umum.");
             }
 
-            // ✅ Sukses
             log_message('info', "✅ Jurnal berhasil dibuat untuk payment_no {$POlocal['payment_no']}");
             return $insertResult;
         } else if ($module == "IMPORT") {
@@ -2522,6 +2629,7 @@ class JurnalUmum extends BaseController
             // 1. Cari transaksi jurnal berdasarkan no_transaksi
             $transaksiJurnal = $this->transaksiJurnalModel
                 ->where('no_transaksi', $paymentNo)
+                ->where('deleted_at', null)
                 ->first();
 
             if (!$transaksiJurnal) {

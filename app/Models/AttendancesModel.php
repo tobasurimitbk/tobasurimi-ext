@@ -26,6 +26,7 @@ class AttendancesModel extends Model
         'reason',
         'year_month',
         'isApproved',
+        'abaikan_sync_log'
     ];
 
     // Dates
@@ -269,6 +270,19 @@ class AttendancesModel extends Model
         $AttendancesLogModel = new AttendancesLogModel();
 
         try {
+            // Siapkan yang diabaikan dulu
+            $attendanceAbaikan =  $AttendanceModel
+                ->where('periode >=', $startDate)
+                ->where('periode <=', $endDate)
+                ->where('company_id', $this->this_company_id)
+                ->where('abaikan_sync_log', "yes")
+                ->findAll();
+
+            $abaikanMap = [];
+            foreach ($attendanceAbaikan as $a) {
+                $abaikanMap[$a['employee_id']][$a['periode']] = true;
+            }
+
             // --- 1. siapkan range tanggal
             $allDates = [];
             $startDateTimestamp = strtotime($startDate);
@@ -356,18 +370,21 @@ class AttendancesModel extends Model
                         $checkout = $log['checkout'];
                     }
 
-                    $batchInsert[] = [
-                        'company_id'  => $companyID,
-                        'division_id' => $e['division_id'],
-                        'employee_id' => $e['id'],
-                        'periode'     => $dates,
-                        'checkin'     => $checkin,
-                        'checkout'    => $checkout,
-                        'status'      => $status,
-                        'reason'      => $reason,
-                        'year_month'  => $year . "-" . $month,
-                        'isApproved'  => $izin['is_approval'] ?? 1
-                    ];
+                    if (empty($abaikanMap[$e['id']][$dates])) {
+                        // yang 
+                        $batchInsert[] = [
+                            'company_id'  => $companyID,
+                            'division_id' => $e['division_id'],
+                            'employee_id' => $e['id'],
+                            'periode'     => $dates,
+                            'checkin'     => $checkin,
+                            'checkout'    => $checkout,
+                            'status'      => $status,
+                            'reason'      => $reason,
+                            'year_month'  => $year . "-" . $month,
+                            'isApproved'  => $izin['is_approval'] ?? 1
+                        ];
+                    }
                 }
             }
 

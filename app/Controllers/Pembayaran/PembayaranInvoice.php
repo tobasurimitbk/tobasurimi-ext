@@ -547,8 +547,11 @@ class PembayaranInvoice extends BaseController
         $divisi = str_replace(' ', '', trim($this->request->getGet('divisiId')));
         $bank = str_replace(' ', '', trim($this->request->getGet('bankId')));
         $tanggalPembayaran = $this->request->getGet('tanggalPembayaran');
+        $noTransaksi = $this->request->getGet('noTransaksi');
+        $id = decrypt($this->request->getGet('id'));
 
         $paymentNo = $pembayaranInvoiceModel->get_new_no(
+            $id,
             $jenis,
             $divisi,
             $metodePembayaran,
@@ -558,6 +561,7 @@ class PembayaranInvoice extends BaseController
             getLastDay(),
             $this->this_company_id,
             $tanggalPembayaran,
+            $noTransaksi
         );
 
         return response()->setJSON([
