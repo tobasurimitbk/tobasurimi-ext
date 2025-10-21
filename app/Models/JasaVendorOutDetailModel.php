@@ -467,9 +467,9 @@ class JasaVendorOutDetailModel extends Model
             $stockList['stok_total'] = $stockList['qty_diterima'] ?? 0;
             $stockList['stock_date'] =  $rmPurchaseOrder['po_date'] ?? $jasaVendorIn['tanggal'];
             $stockList['keterangan'] =  $m['keterangan'];
-            $stockList['supplier_name'] = $jasaVendorIn
-                    ? ((($supplierName['supplier_name'] ?? '') ?? '') . ' / ' . (($jasaVendorIn['nama_vendor'] ?? '') ?? ''))
-                    : (($supplierName['supplier_name'] ?? '') ?? '');
+            $stockList['supplier_name'] = ($jasaVendorIn ?? false) 
+                        ? (($supplierName['supplier_name'] ?? '') . ' / ' . ($jasaVendorIn['nama_vendor'] ?? ''))
+                        : ($supplierName['supplier_name'] ?? '');
 
 
             // id langsung encrypt tanpa grouping
