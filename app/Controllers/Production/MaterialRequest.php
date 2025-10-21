@@ -16,6 +16,7 @@ use App\Models\PenerimaanBarangDetailModel;
 use App\Models\PenerimaanBarangModel;
 use App\Models\RMPurchaseOrderModel;
 use App\Models\SatuansModel;
+use App\Models\StockRevampDetailModel;
 use App\Models\StockDetail2Model;
 use App\Models\StockDetailModel;
 use App\Models\StockModel;
@@ -42,6 +43,7 @@ class MaterialRequest extends BaseController
     protected $barangMasterSpesifikasiModel;
     protected $stockDetailModel;
     protected $stockDetail2Model;
+    protected $stockRevampDetailModel;
     protected $kemasanModel;
     protected $penerimaanBarangModel;
     protected $barangMasterModel;
@@ -73,6 +75,7 @@ class MaterialRequest extends BaseController
         $this->barangMasterSpesifikasiModel = new BarangMasterSpesifikasiModel();
         $this->stockDetailModel = new StockDetailModel();
         $this->stockDetail2Model = new StockDetail2Model();
+        $this->stockRevampDetailModel = new StockRevampDetailModel();
         $this->kemasanModel = new KemasanModel();
         $this->penerimaanBarangModel = new PenerimaanBarangModel();
         $this->barangMasterModel = new BarangMasterModel();
@@ -1515,7 +1518,6 @@ class MaterialRequest extends BaseController
         }
     }
 
-
     public function getListStockMaterialRequestBahanBakuNew()
     {
         $barangMasterId = $this->request->getVar('barang_master_id');
@@ -1619,14 +1621,138 @@ class MaterialRequest extends BaseController
                     $dataResult[$i]['stock_dokumen']
                 );
 
-                
+
                 if ($dataMaterialRequestNotApprove) {
                     $dataResult[$i]['is_requested'] = true;
                     $dataResult[$i]['stok_total'] = round(max(0, (float)$dataResult[$i]['stok_total'] - (float)$dataMaterialRequestNotApprove['qty']), 2);
                 } else {
                     $dataResult[$i]['is_requested'] = false;
                 }
-                // var_dump($dataResult[$i]['barang'] . "/" . $dataResult[$i]['stock_id'] . "/" . $dataResult[$i]['no_aju'] . "/" . $dataResult[$i]['stok_total']);
+
+                if ($dataResult[$i]['stok_total'] > 0.01) {
+                    array_push($resultArr, $dataResult[$i]);
+                }
+            }
+
+            return response()->setJSON([
+                'data' => $resultArr,
+                'token' => csrf_hash(),
+                'status' => true
+            ]);
+        }
+    }
+
+    public function getListStockMaterialRequestBahanBakuNew2()
+    {
+        $barangMasterId = $this->request->getVar('barang_master_id');
+        $supplierId = $this->request->getVar('supplier_id');
+        $vendorId = $this->request->getVar('vendor_id');
+        $divisiAsalId = $this->request->getVar('divisi_asal_bahan_baku_id');
+        $warehouseAsalId = $this->request->getVar('warehouse_asal_bahan_baku_id');
+        $typeAsalBarang = $this->request->getVar('type_asal_barang');
+
+        if ((!empty($this->request->getVar('stock_id')) || !empty($this->request->getVar('barang_master_id'))) || !empty($typeAsalBarang)) {
+            $condition = [
+                "stock_revamp.company_id" => $this->this_company_id,
+                "stock_revamp.barang_master_id" => $barangMasterId,
+                "stock_revamp.divisi_id" => $divisiAsalId,
+                "stock_revamp.warehouse_id" => $warehouseAsalId,
+            ];
+
+            if ($typeAsalBarang == "SUPPLIER") {
+                if (!empty($supplierId)) {
+                    $condition["rm_purchase_orders.supplier_id"] = $supplierId;
+                }
+                $condition["stock_revamp_detail.reference_type "] = "LPB";
+                $dataResult = $this->stockRevampDetailModel->getStockListPOWithCondition($condition);
+            } else {
+                if (!empty($vendorId)) {
+                    $condition["jasa_vendor_in.vendor_id "] = $vendorId;
+                }
+                $condition["stock_revamp_detail.reference_type "] = "JASA VENDOR";
+                $dataResult = $this->stockRevampDetailModel->getStockListVendorWithCondition($condition);
+            }
+
+            $resultArr = array();
+
+            // var_dump($dataResult);
+            // exit;
+
+            for ($i = 0; $i < count($dataResult); $i++) {
+                $noDaftar = "";
+
+                if (!empty($dataResult[$i]['no_daftar_bc23'])) {
+                    $noDaftar = $dataResult[$i]['no_daftar_bc23'];
+                } elseif (!empty($dataResult[$i]['no_daftar_bc27'])) {
+                    $noDaftar = $dataResult[$i]['no_daftar_bc27'];
+                } elseif (!empty($dataResult[$i]['no_daftar_bc40'])) {
+                    $noDaftar = $dataResult[$i]['no_daftar_bc40'];
+                } elseif (!empty($dataResult[$i]['no_daftar_ppbkb'])) {
+                    $noDaftar = $dataResult[$i]['no_daftar_ppbkb'];
+                }
+
+                $spesifikasi = isset($dataResult[$i]['spesifikasi']) ? $dataResult[$i]['spesifikasi'] : '';
+                $barangName = $dataResult[$i]['barang_name'];
+
+                if (!empty($vendorId)) {
+                    $dataResult[$i]['stock_id'] = $dataResult[$i]['stock_id'];
+                    $dataResult[$i]['supplier_name'] = $dataResult[$i]['supplier_name'] == null ? "-" : $dataResult[$i]['supplier_name'];
+                    $dataResult[$i]['id'] = encrypt($dataResult[$i]['stock_id']) . '-' . encrypt($dataResult[$i]['id']);
+                    $dataResult[$i]['bc_id'] =  $dataResult[$i]['bc_id'] == "-" ? "-" : $dataResult[$i]['bc_id'];
+                    $dataResult[$i]['no_aju'] =  empty($dataResult[$i]['no_aju']) ? "-" : $dataResult[$i]['no_aju'];
+                    $dataResult[$i]['stock_dokumen'] = $dataResult[$i]['stock_dokumen'] == null ? "-" : $dataResult[$i]['stock_dokumen'];
+                    $dataResult[$i]['no_dokumen_2'] = $dataResult[$i]['no_penerimaan_surat_jalan'] == null ? "-" : $dataResult[$i]['no_penerimaan_surat_jalan'];
+                    $dataResult[$i]['supplier_id'] = $vendorId;
+                    $dataResult[$i]['harga_umum'] = $dataResult[$i]['harga_umum'] == null ? "0" : $dataResult[$i]['harga_umum'];
+                    $dataResult[$i]['harga_harian'] = $dataResult[$i]['harga_harian'] == null ? "0" : $dataResult[$i]['harga_harian'];
+                    $dataResult[$i]['harga_bulanan'] = $dataResult[$i]['harga_bulanan'] == null ? "0" : $dataResult[$i]['harga_bulanan'];
+                    $dataResult[$i]['no_po'] = $dataResult[$i]['po_no'] == null ? "-" : $dataResult[$i]['po_no'];
+                    $dataResult[$i]['barang_name'] = $dataResult[$i]['barang_name'] == null ? "-" : $dataResult[$i]['barang_name'];
+                    $dataResult[$i]['spesifikasi'] = $dataResult[$i]['spesifikasi'] == null ? "-" : $dataResult[$i]['spesifikasi'];
+                    $dataResult[$i]['kode_satuan'] = $dataResult[$i]['kode_satuan'] == null ? "-" : $dataResult[$i]['kode_satuan'];
+                    $dataResult[$i]['stock_date'] = date('d/m/Y', strtotime($dataResult[$i]['stock_date']));
+                    $dataResult[$i]['nama_vendor'] = $dataResult[$i]['vendor_name'] == null ? "-" : $dataResult[$i]['vendor_name'];
+                    $dataResult[$i]['bc_type'] = $dataResult[$i]['type_bc'] == null ? "NON PABEAN" : $dataResult[$i]['type_bc'];
+                    $dataResult[$i]['no_daftar'] = $dataResult[$i]['no_daftar'] == null ? "-" : $dataResult[$i]['no_daftar'];
+                    $dataResult[$i]['stok_total'] = floatval($dataResult[$i]['stok_total_diterima']);
+                    $dataResult[$i]['satuan'] = $dataResult[$i]['kode_satuan'];
+                    $dataResult[$i]['barang'] = $dataResult[$i]['barang'];
+                    $dataResult[$i]['sepsifikasi'] = $dataResult[$i]['spesifikasi'];
+                    $dataResult[$i]['type_barang'] = "bahan_baku";
+                    $dataResult[$i]['type_barang_text'] = "BAHAN BAKU";
+                    $dataResult[$i]['sumber'] = "JASA VENDOR";
+                } else {
+                    $dataResult[$i]['stock_dokumen'] = $dataResult[$i]['stock_dokumen'] == null ? "-" : $dataResult[$i]['stock_dokumen'];
+                    $dataResult[$i]['no_aju'] =  $dataResult[$i]['no_aju'] == "-" ? "-" : $dataResult[$i]['no_aju'];
+                    $dataResult[$i]['bc_type'] = $dataResult[$i]['bc_type'] == null ? "NON PABEAN" : $dataResult[$i]['bc_type'];
+                    $dataResult[$i]['satuan'] = $dataResult[$i]['kode_satuan'];
+                    $dataResult[$i]['barang'] = $barangName . (!empty($spesifikasi) ? " - " . $spesifikasi : "");
+                    $dataResult[$i]['sepsifikasi'] = $dataResult[$i]['spesifikasi'];
+                    $dataResult[$i]['stock_date'] = date('d/m/Y', strtotime($dataResult[$i]['stock_date']));
+                    $dataResult[$i]['stock_id'] = $dataResult[$i]['stock_id'];
+                    $dataResult[$i]['type_barang'] = "bahan_baku";
+                    $dataResult[$i]['type_barang_text'] = "BAHAN BAKU";
+                    $dataResult[$i]['stok_total'] = floatval($dataResult[$i]['stok_total']);
+                    $dataResult[$i]['no_daftar'] = $noDaftar;
+                    $dataResult[$i]['id'] = encrypt($dataResult[$i]['stock_id']) . '-' . encrypt($dataResult[$i]['id']);
+                    $dataResult[$i]['supplier_name'] = $dataResult[$i]['supplier_name'] . ' / ' . $dataResult[$i]['nama_vendor'];
+                    $dataResult[$i]['sumber'] = "JASA VENDOR";
+                }
+
+                // $dataMaterialRequestNotApprove = $this->materialRequestDetailsModel->getMaterialRequestNotApprove(
+                //     $dataResult[$i]['stock_id'],
+                //     $dataResult[$i]['bc_id'],
+                //     $dataResult[$i]['no_aju'],
+                //     date('Y-m-d', strtotime(str_replace('/', '-', $dataResult[$i]['stock_date']))),
+                //     $dataResult[$i]['stock_dokumen']
+                // );
+
+                // if ($dataMaterialRequestNotApprove) {
+                //     $dataResult[$i]['is_requested'] = true;
+                //     $dataResult[$i]['stok_total'] = round(max(0, (float)$dataResult[$i]['stok_total'] - (float)$dataMaterialRequestNotApprove['qty']), 2);
+                // } else {
+                //     $dataResult[$i]['is_requested'] = false;
+                // }
 
                 if ($dataResult[$i]['stok_total'] > 0.01) {
                     array_push($resultArr, $dataResult[$i]);
