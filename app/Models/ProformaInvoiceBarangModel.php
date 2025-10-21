@@ -42,16 +42,42 @@ class ProformaInvoiceBarangModel extends Model
 
     public function getBarang($PIId)
     {
-        $selectQry = '
-            proforma_invoice_barang.*,
-            satuans.kode_satuan
-        ';
-        $dataQry = $this->select($selectQry)
-            ->join('satuans', 'satuans.id = proforma_invoice_barang.satuan_id', 'left')
-            ->where('proforma_invoice_barang.deletedAt', null)
-            ->where('proforma_invoice_id', $PIId)
-            ->findAll();
+        $proformaInvoiceSizeBreakdownModel = new ProformaInvoiceSizeBreakdownModel();
 
-        return $dataQry;
+        $resultFinal = [];
+        $barang = $this->where('proforma_invoice_id', $PIId)->findAll();
+        foreach ($barang as $b) {
+
+            $sizeBreakdown = $proformaInvoiceSizeBreakdownModel
+                ->select('proforma_invoice_size_breakdown.*,satuans.kode_satuan AS satuan_size_code')
+                ->join('satuans', 'satuans.id = proforma_invoice_size_breakdown.satuan_id', 'left')
+                ->where('proforma_invoice_barang_id', $b['id'])
+                ->where('proforma_invoice_size_breakdown.deletedAt')
+                ->findAll();
+
+            $resultBarang = [
+                'id_barang' => $b['id'],
+                'nama_barang' => $b['nama_barang'],
+                'keterangan' => $b['keterangan'],
+                'size_breakdown' => []
+            ];
+
+            foreach ($sizeBreakdown as $s) {
+                array_push($resultBarang['size_breakdown'], [
+                    'id_detail_breakdown' => $s['id'],
+                    'size' => $s['size'],
+                    'grade' => $s['grade'],
+                    'packing_size' => $s['packing'],
+                    'qty' => (float)$s['qty'],
+                    'harga' => (float)$s['harga'],
+                    'total' => (float)$s['total'],
+                    'satuan_size_id' => $s['satuan_id'],
+                    'satuan_size_code' => $s['satuan_size_code']
+                ]);
+            }
+            array_push($resultFinal, $resultBarang);
+        }
+
+        return $resultFinal;
     }
 }
