@@ -117,6 +117,7 @@ nb-configuration.xml
 *.sublime-project
 .phpintel
 /api/
+/Config/
 
 # Visual Studio Code
 .vscode/
