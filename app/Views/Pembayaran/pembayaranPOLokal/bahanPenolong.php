@@ -114,7 +114,7 @@
                 width: "5%"
             },
             {
-                data: "faktur_no",
+                data: "payment_no",
                 className: "text-center"
             },
             {
