@@ -663,7 +663,7 @@
                 newRow.append($('<td style="text-align: center;">').text(parseFloat(v.qty_lpb)));
                 newRow.append($('<td style="text-align: center;">').text(parseFloat(v.qty_lpb_konversi) + " " + v.kode_satuan_lpb));
                 newRow.append($('<td style="text-align: center;">').text(v.valas));
-                newRow.append($('<td style="text-align: center;">').text(greatFormatRupiah(v.harga_number)));
+                newRow.append($('<td style="text-align: center;">').text(greatFormatRupiah(parseFloat(v.harga_number).toFixed(2))));
                 newRow.append($('<td style="text-align: center;">').html(
                     `
                     <button <?= !empty($bcPo) ? (($bcPo['status_posting'] == "1") ? 'disabled' : '') : '' ?> type="button" class="btn btn-danger" onclick="deleteDetail(${v.penerimaan_barang_id})" ><i class="fa fa-trash fa-sm" aria-hidden="true"></i></button>
