@@ -49,6 +49,7 @@
                                 <th>No</th>
                                 <th onclick="changeSort('divisi')" class="sort">Departemen</th>
                                 <th onclick="changeSort('receive_date')" class="sort">Tgl Terima</th>
+                                <th onclick="changeSort('jatuh_tempo')" class="sort">Jatuh Tempo</th>
                                 <th onclick="changeSort('faktur_no')" class="sort">No Terima Faktur</th>
                                 <th onclick="changeSort('suppliers.name')" class="sort">Supplier</th>
                                 <th onclick="changeSort('nominal_faktur')" class="sort">Nominal Faktur</th>
@@ -150,6 +151,10 @@
             },
             {
                 data: "receive_date",
+                className: "text-left"
+            },
+            {
+                data: "jatuh_tempo",
                 className: "text-left"
             },
             {

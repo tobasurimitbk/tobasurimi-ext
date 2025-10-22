@@ -72,7 +72,8 @@ class TandaTerimaFakturModel extends Model
             'suppliers.name' => 'suppliers.name',
             'nominal_faktur' => 'nominal_faktur',
             'recipient'     => 'recipient',
-            "divisi" => "multiple_divisi_name"
+            "divisi" => "multiple_divisi_name",
+            "jatuh_tempo" => "tanda_terima_faktur.jatuh_tempo"
         ];
         $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
 
