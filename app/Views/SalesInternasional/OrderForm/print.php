@@ -271,7 +271,7 @@
                                         </span>
                                     <?php endif; ?>
                                 </div><br>
-                                <div style="font-size: 12px; margin-top: 4px; line-height: 1.4;">
+                                <div style="font-size: 12px; margin-top: 4px; line-height: 1;">
                                     <table style="margin-left: -3px;">
                                         <?php if (!empty($detail['species'])): ?>
                                             <tr>
@@ -349,7 +349,7 @@
                                     endforeach;
                                     ?>
 
-                                    <div style="margin-top: 6px;">
+                                    <div style="margin-top: 0px;">
                                         <div style="font-size: 12px; font-weight: bold;">SIZE & BREAKDOWN:</div>
                                         <table style="width: 100%; border-collapse: collapse; margin-top: 4px; font-size: 11px;">
                                             <thead>

@@ -10,6 +10,7 @@ use App\Models\MetadataModel;
 use App\Models\ProformaInvoiceBarangModel;
 use App\Models\ProformaInvoiceBiayaModel;
 use App\Models\ProformaInvoiceModel;
+use App\Models\ProformaInvoiceSizeBreakdownModel;
 use App\Models\ProformaInvoiceTermModel;
 use App\Models\SalesKontrakModel;
 use App\Models\SalesOrderExportModel;
@@ -30,6 +31,7 @@ class PI extends BaseController
     protected $proformaInvoiceTermModel;
     protected $proformaInvoiceBarangModel;
     protected $proformaInvoiceBiayaModel;
+    protected $proformaInvoiceSizeBreakdownModel;
     protected $companyModel;
     protected $dompdf;
 
@@ -47,6 +49,7 @@ class PI extends BaseController
         $this->proformaInvoiceBarangModel = new ProformaInvoiceBarangModel();
         $this->companyModel = new CompaniesModel();
         $this->proformaInvoiceBiayaModel = new ProformaInvoiceBiayaModel();
+        $this->proformaInvoiceSizeBreakdownModel = new ProformaInvoiceSizeBreakdownModel();
         $this->dompdf = new Dompdf();
     }
 
@@ -311,7 +314,9 @@ class PI extends BaseController
         //     'listPaymentTerm' => \json_decode($_POST['listPaymentTerm']),
         //     'listBarang' => \json_decode($_POST['listBarang'])
         // ]);
+        $db = \Config\Database::connect();
         try {
+            $db->transBegin();
             $noInvoicePI = $this->request->getVar('no_invoice_pi');
             if ($noInvoicePI == "AUTO GENERATE") {
                 $noInvoicePI = $this->proformaInvoiceModel->generateNo(
@@ -345,7 +350,8 @@ class PI extends BaseController
                 'status_posting' => 0,
                 'status_bayar' => 0,
                 'penanda_tangan' => $this->request->getVar('penanda_tangan'),
-                'alamat_customer' => $this->request->getVar('alamat_customer')
+                'alamat_customer' => $this->request->getVar('alamat_customer'),
+                'nama_customer' => $this->request->getVar('nama_customer')
             ]);
 
             foreach (\json_decode($_POST['listPaymentTerm']) as $l) {
@@ -359,14 +365,25 @@ class PI extends BaseController
             }
 
             foreach (\json_decode($_POST['listBarang']) as $l) {
-                $this->proformaInvoiceBarangModel->insert([
+                $proformaInvBarangId = $this->proformaInvoiceBarangModel->insert([
                     'proforma_invoice_id' => $id,
-                    'satuan_id' => $l->satuan_id,
                     'nama_barang' => $l->nama_barang,
-                    'qty_barang' => $l->qty_barang,
-                    'harga_satuan' => $l->harga_satuan,
-                    'total_harga' => $l->total_harga,
+                    'keterangan' => $l->keterangan,
                 ]);
+
+                foreach ($l->size_breakdown as $s) {
+                    $this->proformaInvoiceSizeBreakdownModel->insert([
+                        'proforma_invoice_id' => $id,
+                        'proforma_invoice_barang_id' => $proformaInvBarangId,
+                        'satuan_id' => $s->satuan_size_id,
+                        'grade' => $s->grade,
+                        'size' => $s->size,
+                        'packing' => $s->packing_size,
+                        'qty' => $s->qty,
+                        'harga' => $s->harga,
+                        'total' => $s->total
+                    ]);
+                }
             }
 
             foreach (json_decode($_POST['listBiayaTambahan']) as $l) {
@@ -378,12 +395,15 @@ class PI extends BaseController
                 ]);
             }
 
+            $db->transCommit();
+
             return \response()->setJSON([
                 'status' => true,
                 'message' => "PI berhasil dibuat",
                 'token' => \csrf_hash()
             ]);
         } catch (Exception $e) {
+            $db->transRollback();
             return \response()->setJSON([
                 'status' => \false,
                 'message' => $e->getMessage(),
@@ -394,7 +414,9 @@ class PI extends BaseController
 
     public function updatePI()
     {
+        $db = \Config\Database::connect();
         try {
+            $db->transBegin();
             $id = \decrypt($this->request->getVar('id'));
             $noInvoicePI = $this->request->getVar('no_invoice_pi');
 
@@ -423,8 +445,11 @@ class PI extends BaseController
                 'packing' => $this->request->getVar('packing'),
                 'total_pi' => $this->request->getVar('total_pi'),
                 'penanda_tangan' => $this->request->getVar('penanda_tangan'),
-                'alamat_customer' => $this->request->getVar('alamat_customer')
+                'alamat_customer' => $this->request->getVar('alamat_customer'),
+                'nama_customer' => $this->request->getVar('nama_customer')
             ]);
+
+            $this->proformaInvoiceSizeBreakdownModel->where('proforma_invoice_id', $id)->delete();
 
             $id_proforma_invoice_payment_term = [];
             $id_proforma_invoice_barang = [];
@@ -462,23 +487,45 @@ class PI extends BaseController
                 if ($check != null) {
                     $this->proformaInvoiceBarangModel->update($check['id'], [
                         'proforma_invoice_id' => $id,
-                        'satuan_id' => $l->satuan_id,
                         'nama_barang' => $l->nama_barang,
-                        'qty_barang' => $l->qty_barang,
-                        'harga_satuan' => $l->harga_satuan,
-                        'total_harga' => $l->total_harga,
+                        'keterangan' => $l->keterangan,
                     ]);
+
+                    foreach ($l->size_breakdown as $s) {
+                        $this->proformaInvoiceSizeBreakdownModel->insert([
+                            'proforma_invoice_id' => $id,
+                            'proforma_invoice_barang_id' => $check['id'],
+                            'satuan_id' => $s->satuan_size_id,
+                            'grade' => $s->grade,
+                            'size' => $s->size,
+                            'packing' => $s->packing_size,
+                            'qty' => $s->qty,
+                            'harga' => $s->harga,
+                            'total' => $s->total
+                        ]);
+                    }
 
                     \array_push($id_proforma_invoice_barang, $check['id']);
                 } else {
                     $id_new =  $this->proformaInvoiceBarangModel->insert([
                         'proforma_invoice_id' => $id,
-                        'satuan_id' => $l->satuan_id,
                         'nama_barang' => $l->nama_barang,
-                        'qty_barang' => $l->qty_barang,
-                        'harga_satuan' => $l->harga_satuan,
-                        'total_harga' => $l->total_harga,
+                        'keterangan' => $l->keterangan,
                     ]);
+
+                    foreach ($l->size_breakdown as $s) {
+                        $this->proformaInvoiceSizeBreakdownModel->insert([
+                            'proforma_invoice_id' => $id,
+                            'proforma_invoice_barang_id' => $id_new,
+                            'satuan_id' => $s->satuan_size_id,
+                            'grade' => $s->grade,
+                            'size' => $s->size,
+                            'packing' => $s->packing_size,
+                            'qty' => $s->qty,
+                            'harga' => $s->harga,
+                            'total' => $s->total
+                        ]);
+                    }
                     \array_push($id_proforma_invoice_barang, $id_new);
                 }
             }
@@ -511,12 +558,15 @@ class PI extends BaseController
             $this->proformaInvoiceTermModel->whereNotIn('id', $id_proforma_invoice_payment_term)->where('proforma_invoice_id', $id)->delete();
             $this->proformaInvoiceBiayaModel->whereNotIn('id', $id_proforma_invoice_biaya)->where('proforma_invoice_id', $id)->delete();
 
+            $db->transCommit();
+
             return \response()->setJSON([
                 'status' => true,
                 'message' => "PI berhasil diupdate",
                 'token' => \csrf_hash()
             ]);
         } catch (Exception $e) {
+            $db->transRollback();
             return \response()->setJSON([
                 'status' => \false,
                 'message' => $e->getMessage(),
@@ -531,6 +581,7 @@ class PI extends BaseController
         $this->proformaInvoiceModel->delete($id);
         $this->proformaInvoiceBarangModel->where('proforma_invoice_id', $id)->delete();
         $this->proformaInvoiceTermModel->where('proforma_invoice_id', $id)->delete();
+        $this->proformaInvoiceSizeBreakdownModel->where('proforma_invoice_id', $id)->delete();
 
         return \response()->setJSON([
             'status' => \true,

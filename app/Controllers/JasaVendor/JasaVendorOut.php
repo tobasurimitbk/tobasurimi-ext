@@ -666,6 +666,7 @@ class JasaVendorOut extends BaseController
 
     public function dropdownListBarangIsInit()
     {
+        $stockRevampModel = new StockRevampModel();
         $asalBarang = $this->request->getVar('asal_barang');
 
         if ($asalBarang == "SUPPLIER") {
@@ -675,7 +676,7 @@ class JasaVendorOut extends BaseController
             );
         } else {
             // Stok Dengan Master Barang & Spesifikasi
-            $data = $this->stockModel->getBarangRebusAndStock(
+            $data = $stockRevampModel->getBarangRebusAndStock(
                 $this->request->getVar('type_barang'),
                 $this->request->getVar('divisi_id'),
                 $this->request->getVar('warehouse_id')

@@ -1433,8 +1433,8 @@ class BCPurchaseOrderModel extends Model
             WHERE penerimaan_barang.deletedAt IS NULL
             AND penerimaan_barang_detail.deletedAt IS NULL
             AND penerimaan_barang.status_post = 'FINISH'   
-            AND penerimaan_barang.status_penerimaan='BAKU'
-            AND penerimaan_barang.tipe_bahan='IMPORT'
+            AND penerimaan_barang.status_penerimaan='IMPORT'
+            AND penerimaan_barang.tipe_bahan='BAKU'
             AND bc_purchase_order.status_posting='1'      
             $filterCondition
             GROUP BY penerimaan_barang_detail.id

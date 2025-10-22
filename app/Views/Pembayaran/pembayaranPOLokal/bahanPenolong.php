@@ -48,9 +48,7 @@
                             <tr>
                                 <th>No</th>
                                 <th onclick="changeSort('payment_no')">No. Pembayaran</th>
-                                <th onclick="changeSort('tanda_terima_faktur.faktur_no')">No. Faktur</th>
                                 <th onclick="changeSort('suppliers.name')">Supplier</th>
-                                <th onclick="changeSort('due_date')">Tgl Jatuh Tempo</th>
                                 <th onclick="changeSort('payment_date')">Tgl Pembayaran</th>
                                 <th onclick="changeSort('payment_method')">Metode Pembayaran</th>
                                 <th onclick="changeSort('amount')">Jumlah</th>
@@ -120,15 +118,7 @@
                 className: "text-center"
             },
             {
-                data: "faktur_no",
-                className: "text-center"
-            },
-            {
                 data: "supplier",
-                className: "text-center"
-            },
-            {
-                data: "due_date",
                 className: "text-center"
             },
             {

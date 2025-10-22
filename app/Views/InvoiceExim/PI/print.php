@@ -300,12 +300,12 @@
 
     <table style="width: 100%;">
         <tr>
-            <td>
-                <table class="label" style="font-size: 12px;">
+            <td style="width: 40%;">
+                <table class="label" style="font-size: 12px; width:100%;">
                     <tr>
                         <td>BUYER</td>
                         <td>:</td>
-                        <td><?= $dataSalesOrderExport->customer_name ?></td>
+                        <td><?= $dataPI['nama_customer'] ?></td>
                     </tr>
                     <tr>
                         <td>ADDRESS</td>
@@ -321,7 +321,7 @@
 
             </td>
             <td>
-                <table class="label" style="font-size: 12px;">
+                <table class="label" style="font-size: 12px;width:100%;">
                     <tr>
                         <td>PI NO</td>
                         <td>:</td>
@@ -330,43 +330,23 @@
                     <tr>
                         <td>DATE</td>
                         <td>:</td>
-                        <td><?= date('d/m/Y', strtotime($dataPI['tanggal_pi'])) ?></td>
+                        <td><?= date('d-M-Y', strtotime($dataPI['tanggal_pi'])) ?></td>
                     </tr>
                     <tr>
-                        <td>TERM OF PAYMENT</td>
-                        <td>:</td>
-                        <td><?= $dataPI['payment_term'] ?></td>
+                        <td style="vertical-align:top;">TERM OF PAYMENT</td>
+                        <td style="vertical-align:top;">:</td>
+                        <td><?= nl2br(htmlspecialchars($dataPI['payment_term'])) ?></td>
                     </tr>
                 </table>
             </td>
         </tr>
     </table>
-
-    <?php
-    $kodeSatuan = "";
-    foreach ($dataPIBarang as $d) {
-        $kodeSatuan = $d['kode_satuan'];
-    }
-    ?>
-
     <table style="width: 100%; border-collapse: collapse; margin-top: 4px; font-size: 12px; ">
         <thead>
             <tr style="background-color: #f8f9fa; border-bottom: 2px solid #dee2e6;">
                 <th style="padding: 6px; text-align: left; font-weight: bold; border: 1px solid #ddd; width: 4%; height:2.5%;">NO</th>
                 <th style="padding: 6px; text-align: left; font-weight: bold; border: 1px solid #ddd;">
                     DESCRIPTION AND QUANTITY OF PRODUCT / GOODS
-                </th>
-                <th style="padding: 6px; text-align: center; font-weight: bold; border: 1px solid #ddd; width:15%;">
-                    QUANTITY <br>
-                    (<?= $kodeSatuan ?>)
-                </th>
-                <th style="padding: 6px; text-align: center; font-weight: bold; border: 1px solid #ddd; width:15%;">
-                    UNIT PRICE <br>
-                    (<?= $dataPI['valas_name'] ?>/<?= $kodeSatuan ?>)
-                </th>
-                <th style="padding: 6px; text-align: center; font-weight: bold; border: 1px solid #ddd; width:17%;">
-                    TOTAL AMOUNT <br>
-                    (<?= $dataPI['valas_name']  ?>)
                 </th>
             </tr>
         </thead>
@@ -375,179 +355,247 @@
             <?php
             $no = 1;
             $totalQty = 0;
-            $totalTotalHarga = 0;
             foreach ($dataPIBarang as $key => $barang) {
-                $totalQty += $barang['qty_barang'];
-                $totalTotalHarga += $barang['total_harga'];
             ?>
                 <tr style="border-bottom: 1px solid #eee;">
                     <td style="padding: 6px; border: 1px solid #ddd; vertical-align: top;"><?= $no++ ?></td>
                     <td style="padding: 6px; border: 1px solid #ddd; vertical-align: top;">
-                        <?= $barang['nama_barang'] ?>
-                    </td>
-                    <td style="padding: 6px; border: 1px solid #ddd; vertical-align: top;">
-                        <?= number_format($barang['qty_barang'], 2) ?>
-                    </td>
-                    <td style="padding: 6px; border: 1px solid #ddd; vertical-align: top;">
-                        <?= number_format($barang['harga_satuan'], 2) ?>
-                    </td>
-                    <td style="padding: 6px; border: 1px solid #ddd; vertical-align: top;">
-                        <span>
-                            <?= $dataPI['valas_name'] ?>
-                        </span>
-                        <span class="text-align:right;">
-                            <?= number_format($barang['total_harga'], 2) ?>
-                        </span>
+                        <?= $barang['nama_barang'] ?> <br>
+                        <?= nl2br(htmlspecialchars($barang['keterangan'])) ?>
+
+                        <div>
+                            <?php if (!empty($barang['size_breakdown'])): ?>
+                                <?php
+                                // Identify which columns have data
+                                $columns_to_show = [];
+                                $all_columns = [
+                                    'grade' => ['label' => 'GRADE', 'width' => '8%'],
+                                    'size' => ['label' => 'SIZE', 'width' => '8%'],
+                                    'packing_size' => ['label' => 'PACKING', 'width' => '8%']
+                                ];
+
+                                // Check which columns have data
+                                foreach ($all_columns as $col => $col_data) {
+                                    foreach ($barang['size_breakdown'] as $breakdown) {
+                                        if (!empty($breakdown[$col])) {
+                                            $columns_to_show[$col] = $col_data;
+                                            break;
+                                        }
+                                    }
+                                }
+
+                                // Ini untuk mengetahui Qty Satuan apa yang dipakek (ambil paling utama)
+                                $satuanQty = "";
+                                foreach ($barang['size_breakdown'] as $breakdown):
+                                    $satuanQty =  $breakdown['satuan_size_code'];
+                                    $totalQty += $breakdown['qty'];
+                                endforeach;
+                                ?>
+
+                                <div style="margin-top: 6px;">
+                                    <div style="font-size: 11px; font-weight: bold;">DETAIL GRADE / SIZE:</div>
+                                    <table style="width: 100%; border-collapse: collapse; margin-top: 4px; font-size: 11px;">
+                                        <thead>
+                                            <tr style="background-color: #f3f4f6;">
+                                                <?php foreach ($columns_to_show as $col => $col_data): ?>
+                                                    <th style="padding: 3px; border: 1px solid #7a7a78; width: <?= $col_data['width'] ?>"><?= $col_data['label'] ?></th>
+                                                <?php endforeach; ?>
+
+                                                <th style=" padding: 3px; border: 1px solid #7a7a78; width: 4.5%; text-align: center;">QTY (<?= $satuanQty ?>)</th>
+                                                <th style="padding: 3px; border: 1px solid #7a7a78; width: 4.5%; text-align: center;">UNIT PRICE (<?= $dataPI['valas_name'] . "/" . $satuanQty ?>)</th>
+                                                <th style="padding: 3px; border: 1px solid #7a7a78; width: 4.5%; text-align: center;">TOTAL AMOUNT (<?= $dataPI['valas_name'] ?>)</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <?php
+                                            $breakdown_qty = 0;
+                                            $breakdown_total = 0;
+                                            $breakdown_unit_price_total = 0;
+
+                                            foreach ($barang['size_breakdown'] as $breakdown):
+                                                $breakdown_qty += $breakdown['qty'];
+                                                $breakdown_total += $breakdown['total'];
+                                                $breakdown_unit_price_total += $breakdown['harga'];
+
+                                            ?>
+                                                <tr>
+                                                    <?php foreach ($columns_to_show as $col => $col_data): ?>
+                                                        <?php if ($col != 'persen' && $col != 'cased'): ?>
+                                                            <td style="padding: 3px; border: 1px solid #7a7a78;"><?= $breakdown[$col] ?></td>
+                                                        <?php endif; ?>
+                                                    <?php endforeach; ?>
+
+                                                    <td style="padding: 3px; border: 1px solid #7a7a78; text-align: right;"><?= number_format($breakdown['qty'], 2)  ?></td>
+                                                    <td style="padding: 3px; border: 1px solid #7a7a78; text-align: right;"><?= number_format($breakdown['harga'], 2) ?></td>
+                                                    <td style="padding: 3px; border: 1px solid #7a7a78; text-align: right;"><?= number_format($breakdown['total'], 2) ?></td>
+                                                </tr>
+                                            <?php endforeach; ?>
+                                        </tbody>
+                                        <?php
+                                        // Hitung jumlah kolom utama (misalnya dari thead)
+                                        $base_columns = count($columns_to_show);
+
+                                        ?>
+
+                                        <tfoot>
+                                            <tr style="background-color: #e9ecef;">
+                                                <td colspan="<?= $base_columns ?>" style="padding: 3px; border: 1px solid #7a7a78; text-align: right; font-weight: bold;">
+                                                    TOTAL
+                                                </td>
+
+                                                <td style="padding: 3px; border: 1px solid #7a7a78; text-align: right; font-weight: bold;">
+                                                    <?= number_format($breakdown_qty, 2)  ?>
+                                                </td>
+                                                <td style="padding: 3px; border: 1px solid #7a7a78; text-align: right; font-weight: bold;">-</td>
+                                                <td style="padding: 3px; border: 1px solid #7a7a78; text-align: right; font-weight: bold;">
+                                                    <?= number_format($breakdown_total, 2) ?>
+                                                </td>
+                                            </tr>
+                                        </tfoot>
+
+                                    </table>
+                                </div>
+                            <?php endif; ?>
+
+                        </div>
 
                     </td>
                 </tr>
             <?php } ?>
             <tr style="border-bottom: 1px solid #eee;">
-                <td style="padding: 6px; border: 1px solid #ddd; vertical-align: top;"></td>
-                <td style="padding: 6px; border: 1px solid #ddd; vertical-align: top;" colspan="4">
-                    <?= $dataPI['packing'] ?>
-                </td>
-            </tr>
-            <tr style="border-bottom: 1px solid #eee;">
-                <td style="padding: 6px; border: 1px solid #ddd; vertical-align: top;"></td>
-                <td style="padding: 6px; border: 1px solid #ddd; vertical-align: top;">
-                    <br>
-                    PLEASE MAKE YOUR PAYMENT TO OUR BANK ACCOUNT WITH DETAILS BELLOW: <br>
-                    <table style="margin-left:-3px;">
-                        <tr>
-                            <td style="width: 103px;"><b>BANK NAME</b></td>
-                            <td>:</td>
-                            <td><b><?= $dataPI['nama_bank'] ?></b></td>
-                        </tr>
-                        <tr>
-                            <td><b>ACCOUNT NO</b></td>
-                            <td>:</td>
-                            <td><b><?= $dataPI['no_rekening'] ?></b></td>
-                        </tr>
-                        <tr>
-                            <td><b>SWIFT CODE</b></td>
-                            <td>:</td>
-                            <td><b><?= $dataPI['kode_bank'] ?></b></td>
-                        </tr>
-                        <tr>
-                            <td><b>REMARKS</b></td>
-                            <td>:</td>
-                            <td><b>BENECIFIARY ACCOUNT:FULL AMOUNT</b></td>
-                        </tr>
-                        <tr>
-                            <td><b>ACCOUNT NAME</b></td>
-                            <td>:</td>
-                            <td><b><?= $dataPI['atas_nama'] ?></b></td>
-                        </tr>
+
+                <td style="padding: 6px; border: 1px solid #ddd; vertical-align: top;" colspan="2">
+
+                    <table style="width: 100%; border-collapse: collapse; margin-top: 4px; font-size: 11px;">
+
+                        <tbody>
+                            <?php foreach ($dataPIBiaya as $d): ?>
+                                <tr style="border-bottom: 1px solid #eee;">
+                                    <td style="padding: 6px; border: 1px solid #ddd; vertical-align: top;">
+                                        <b>
+                                            <?= $d['biaya_tambahan'] ?>
+                                        </b>
+                                    </td>
+                                    <td style="padding: 6px; border: 1px solid #ddd; vertical-align: top;">
+                                        <b>
+
+                                            <b>
+                                                <span>
+                                                    <?= $dataPI['valas_name'] ?>
+                                                </span>
+                                                <span class="text-align:right;" style="<?= $d['tipe_biaya_tambahan'] == "MINUS" ? 'color:red' : '' ?>">
+                                                    <?= number_format($d['nilai_biaya_tambahan'], 2) ?>
+                                                </span>
+                                            </b>
+                                        </b>
+                                    </td>
+                                </tr>
+                            <?php endforeach; ?>
+                            <?php foreach ($dataPIPaymentTerm as $d): ?>
+                                <?php
+                                if ($d['is_penagihan']) {
+                                    $bgColor = "yellow";
+                                } else {
+                                    $bgColor = "white";
+                                }
+                                ?>
+                                <tr style="border-bottom: 1px solid #eee; background-color:<?= $bgColor ?>">
+                                    <td style="padding: 6px; border: 1px solid #ddd; vertical-align: top;">
+                                        <b>
+                                            <?= $d['payment_term'] ?>
+                                        </b>
+                                    </td>
+                                    <td style="padding: 6px; border: 1px solid #ddd; vertical-align: top;">
+                                        <b>
+                                            <span>
+                                                <?= $dataPI['valas_name'] ?>
+                                            </span>
+                                            <span class="text-align:right;">
+                                                <?= number_format($d['nilai_payment_term'], 2) ?>
+                                            </span>
+                                        </b>
+                                    </td>
+                                </tr>
+                            <?php endforeach; ?>
+                            <tr style="border-bottom: 1px solid #eee;">
+                                <td style="padding: 6px; border: 1px solid #ddd; vertical-align: top;" colspan="2">
+                                    <b>
+                                        PAYMENT INSTRUCTION :
+                                    </b>
+                                    <br>
+                                    <b>
+                                        <?= nl2br(htmlspecialchars($dataPI['payment_instruction'])) ?>
+                                    </b>
+                                </td>
+
+                            </tr>
+                            <tr style="border-bottom: 1px solid #eee;">
+                                <td style="padding: 6px; border: 1px solid #ddd; vertical-align: top;">
+                                    <b>
+                                        AMOUNT IN WORLD :
+                                    </b>
+                                    <br>
+                                    <b>
+                                        <?= $dataPI['valas_name'] . " " . strtoupper(terbilangInggris((float)$dataPI['total_pi'])) . " ONLY" ?>
+                                    </b>
+                                </td>
+                                <td style="padding: 6px; border: 1px solid #ddd; vertical-align: top;" rowspan="2">
+                                    <center>
+                                        <b>
+                                            FOR AND BEHALF OF
+                                        </b>
+                                        <br><br><br><br><br><br><br><br>
+                                        <b>
+                                            <?= $dataPI['penanda_tangan'] ?> <br>
+                                            AUTHORIZED SIGNATURE
+                                        </b>
+                                    </center>
+
+                                </td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid #eee;">
+                                <td style="padding: 6px; border: 1px solid #ddd; vertical-align: top;">
+                                    <table style="margin-left:-3px;">
+                                        <tr>
+                                            <td style="width: 103px;"><b>BANK NAME</b></td>
+                                            <td>:</td>
+                                            <td><b><?= $dataPI['nama_bank'] ?></b></td>
+                                        </tr>
+                                        <tr>
+                                            <td><b>ACCOUNT NO</b></td>
+                                            <td>:</td>
+                                            <td><b><?= $dataPI['no_rekening'] ?></b></td>
+                                        </tr>
+                                        <tr>
+                                            <td><b>SWIFT CODE</b></td>
+                                            <td>:</td>
+                                            <td><b><?= $dataPI['kode_bank'] ?></b></td>
+                                        </tr>
+                                        <tr>
+                                            <td><b>REMARKS</b></td>
+                                            <td>:</td>
+                                            <td><b>BENECIFIARY ACCOUNT:FULL AMOUNT</b></td>
+                                        </tr>
+                                        <tr>
+                                            <td><b>ACCOUNT NAME</b></td>
+                                            <td>:</td>
+                                            <td><b><?= $dataPI['atas_nama'] ?></b></td>
+                                        </tr>
+                                    </table>
+                                </td>
+
+                            </tr>
+
+                        </tbody>
+
+
                     </table>
-                </td>
-                <td style="padding: 6px; border: 1px solid #ddd; vertical-align: top;"></td>
-                <td style="padding: 6px; border: 1px solid #ddd; vertical-align: top;"></td>
-                <td style="padding: 6px; border: 1px solid #ddd; vertical-align: top;"></td>
-            </tr>
-            <tr style="border-bottom: 1px solid #eee;">
-                <td style="padding: 6px; border: 1px solid #ddd; vertical-align: top;"></td>
-                <td style="padding: 6px; border: 1px solid #ddd; vertical-align: top;">
-                    <b>
-                        GRAND TOTAL
-                    </b>
-                </td>
-                <td style="padding: 6px; border: 1px solid #ddd; vertical-align: top;"><b><?= number_format($totalQty, 2) ?></b></td>
-                <td style="padding: 6px; border: 1px solid #ddd; vertical-align: top;"></td>
-                <td style="padding: 6px; border: 1px solid #ddd; vertical-align: top;">
-                    <b>
-                        <span>
-                            <?= $dataPI['valas_name'] ?>
-                        </span>
-                        <span class="text-align:right;">
-                            <?= number_format($totalTotalHarga, 2) ?>
-                        </span>
-                    </b>
-                </td>
-            </tr>
-            <?php foreach ($dataPIBiaya as $d): ?>
-                <tr style="border-bottom: 1px solid #eee;">
-                    <td style="padding: 6px; border: 1px solid #ddd; vertical-align: top;"></td>
-                    <td style="padding: 6px; border: 1px solid #ddd; vertical-align: top;" colspan="3">
-                        <b>
-                            <?= $d['biaya_tambahan'] ?>
-                        </b>
-                    </td>
-                    <td style="padding: 6px; border: 1px solid #ddd; vertical-align: top;">
-                        <b>
-                            <span class="text-align:right;" style="<?= $d['tipe_biaya_tambahan'] == "MINUS" ? 'color:red' : '' ?>">
-                                <?= number_format($d['nilai_biaya_tambahan'], 2) ?>
-                            </span>
-                        </b>
-                    </td>
-                </tr>
-            <?php endforeach; ?>
-            <?php foreach ($dataPIPaymentTerm as $d): ?>
-                <?php
-                if ($d['is_penagihan']) {
-                    $bgColor = "yellow";
-                } else {
-                    $bgColor = "white";
-                }
-                ?>
-                <tr style="border-bottom: 1px solid #eee; background-color:<?= $bgColor ?>">
-                    <td style="padding: 6px; border: 1px solid #ddd; vertical-align: top;"></td>
-                    <td style="padding: 6px; border: 1px solid #ddd; vertical-align: top;">
-                        <b>
-                            <?= $d['payment_term'] ?>
-                        </b>
-                    </td>
-                    <td style="padding: 6px; border: 1px solid #ddd; vertical-align: top;"></td>
-                    <td style="padding: 6px; border: 1px solid #ddd; vertical-align: top;"></td>
-                    <td style="padding: 6px; border: 1px solid #ddd; vertical-align: top;">
-                        <b>
-                            <span>
-                                <?= $dataPI['valas_name'] ?>
-                            </span>
-                            <span class="text-align:right;">
-                                <?= number_format($d['nilai_payment_term'], 2) ?>
-                            </span>
-                        </b>
-                    </td>
-                </tr>
-            <?php endforeach; ?>
-            <tr style="border-bottom: 1px solid #eee;">
-                <td style="padding: 6px; border: 1px solid #ddd; vertical-align: top;"></td>
-                <td style="padding: 6px; border: 1px solid #ddd; vertical-align: top;">
-                    <b>
-                        AMOUNT IN WORLD :
-                    </b>
-                    <br>
-                    <b>
-                        <?= $dataPI['valas_name'] . " " . strtoupper(terbilangInggris((float)$dataPI['total_pi'])) ?>
-                    </b>
-                </td>
-                <td style="padding: 6px; border: 1px solid #ddd; vertical-align: top;" colspan="3" rowspan="2">
-                    <center>
-                        <b>
-                            FOR AND BEHALF OF
-                        </b>
-                        <br><br><br><br><br>
-                        <?= $dataPI['penanda_tangan'] ?> <br>
-                        AUTHORIZED SIGNATURE
-                    </center>
 
-                </td>
-            </tr>
-            <tr style="border-bottom: 1px solid #eee;">
-                <td style="padding: 6px; border: 1px solid #ddd; vertical-align: top;"></td>
-                <td style="padding: 6px; border: 1px solid #ddd; vertical-align: top;">
-                    <b>
-                        PAYMENT INSTRUCTION :
-                    </b>
-                    <br>
-                    <b>
-                        <?= $dataPI['payment_instruction'] ?> <br>
-                        1011/<?= $dataPI['no_pi'] ?> (<?= number_format($dataPI['total_pi'], 2) ?>)
-                    </b>
+
                 </td>
 
             </tr>
+
 
         </tbody>
     </table>

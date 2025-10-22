@@ -700,26 +700,26 @@ class POLokalBahanBaku extends BaseController
                     // cek if warehouse_id != null
                     if ($detail['warehouse_id'] != null && $detail['warehouse_id'] != 0) {
                         $penerimaanBarangId = $this->penerimaanBarangModel->generateLpbBB($detail['id'], $detail['warehouse_id'], $detail['bc_type'], $detail['po_date']);
-                        if ($detail['status_external'] == "no") {
-                            // JIka Status Eksternal Tidak Maka ga masuk kedalam stok
-                            $result = $this->jurnalController->insertDataPembelian($id, "BAHAN BAKU", "LOKAL", "pembelian", $penerimaanBarangId);
+                        // if ($detail['status_external'] == "no") {
+                        // JIka Status Eksternal Tidak Maka ga masuk kedalam stok
+                        $result = $this->jurnalController->insertDataPembelian($id, "BAHAN BAKU", "LOKAL", "pembelian", $penerimaanBarangId);
 
-                            if ($result) {
-                                $responseBody = json_decode($result->getBody(), true);
-                                if ($responseBody && isset($responseBody['status'])) {
-                                    $this->penerimaanBarangModel->delete($penerimaanBarangId);
-                                    $this->penerimaanBarangDetailModel->where('penerimaan_barang_id', $penerimaanBarangId)->delete();
-                                    $data = [
-                                        "status"    => false,
-                                        "message"   => $responseBody['message'],
-                                        "payload"   => "",
-                                        'token'     => csrf_hash()
-                                    ];
-                                    echo json_encode($data);
-                                    return;
-                                }
+                        if ($result) {
+                            $responseBody = json_decode($result->getBody(), true);
+                            if ($responseBody && isset($responseBody['status'])) {
+                                $this->penerimaanBarangModel->delete($penerimaanBarangId);
+                                $this->penerimaanBarangDetailModel->where('penerimaan_barang_id', $penerimaanBarangId)->delete();
+                                $data = [
+                                    "status"    => false,
+                                    "message"   => $responseBody['message'],
+                                    "payload"   => "",
+                                    'token'     => csrf_hash()
+                                ];
+                                echo json_encode($data);
+                                return;
                             }
                         }
+                        // }
                     }
                 }
                 $this->RMPurchaseOrderModel->update($id, $payload);
@@ -1191,7 +1191,7 @@ class POLokalBahanBaku extends BaseController
     {
         $id = $this->request->getVar('divisi_id');
         $warehouse_asal_id = $this->request->getVar('warehouse_asal_id');
-     
+
         $res = $this->warehousesModel->where('deletedAt', null)->where('divisi_id', $id)->findAll();
 
         return response()->setJSON([

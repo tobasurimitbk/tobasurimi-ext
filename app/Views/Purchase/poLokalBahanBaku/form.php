@@ -469,11 +469,19 @@
     </script>
 
 <?php else : ?>
-    <script>
-        $(document).ready(function() {
-            changeStatus();
-        });
-    </script>
+    <?php if (session()->get('login')->this_company_id != 16): ?>
+        <script>
+            $(document).ready(function() {
+                changeStatus();
+            });
+        </script>
+    <?php else: ?>
+        <script>
+            $(".po_no").attr("readonly", false);
+            $("#auto_generate").prop("checked", false);
+            $(".po_no").val("");
+        </script>
+    <?php endif ?>
 <?php endif; ?>
 
 

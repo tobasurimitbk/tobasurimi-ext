@@ -352,7 +352,7 @@
                         newRow.append($('<td style="text-align:center;">').text(no++));
                         newRow.append($('<td style="text-align:center;">').text(v.payment_no));
                         newRow.append($('<td style="text-align:center;">').text(v.payment_date));
-                        newRow.append($('<td style="text-align:center;">').text(v.amount));
+                        newRow.append($('<td style="text-align:center;">').text(greatFormatRupiah(v.total)));
 
                         table.find('tbody').append(newRow);
                     });
