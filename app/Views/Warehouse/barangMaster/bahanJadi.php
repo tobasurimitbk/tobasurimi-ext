@@ -691,8 +691,8 @@
             dataType: "json",
             success: function(res) {
                 $('.delete-btn').show();
-                $('.title-name').text("Update Bahan Penolong");
-                <?php if (!can('Master Barang', 'Bahan Penolong', 'u')) : ?>
+                $('.title-name').text("Update Barang Jadi");
+                <?php if (!can('Master Barang', 'Barang Jadi', 'u')) : ?>
                     $('.btn-submit-master-barang').hide();
                 <?php endif; ?>
                 // $('input[name="kode_barang"]').attr('readonly', true);
