@@ -924,10 +924,11 @@
                 <?php endif ?>
                 <tr>
                     <td colspan="4">
-                        <br>
-                        <label class="label-header">
-                            FOR THOSE ITEMS WHICH ARE NOT COVERED IN THIS CONTRACT, BOTH PARTIES WILL NEGOTIATE AND COME TO COMPROMISE.
-                        </label>
+                        <div class="mt-1">
+                            <label class="label-header">
+                                FOR THOSE ITEMS WHICH ARE NOT COVERED IN THIS CONTRACT, BOTH PARTIES WILL NEGOTIATE AND COME TO COMPROMISE.
+                            </label>
+                        </div>
                     </td>
                 </tr>
             </tbody>
