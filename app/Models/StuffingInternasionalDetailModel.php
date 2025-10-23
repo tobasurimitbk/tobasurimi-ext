@@ -43,6 +43,8 @@ class StuffingInternasionalDetailModel extends Model
     public function getStuffingDetail($stuffingLokalID)
     {
         $stockDetail2Model = new StockDetail2Model();
+        $stockRevampModel = new StockRevampModel();
+        $stockRevampDetailModel = new StockRevampDetailModel();
         $stockModel = new StockModel();
         $barangMasterModel = new BarangMasterModel();
         $barangMasterSpesifikasiModel = new BarangMasterSpesifikasiModel();
@@ -52,6 +54,7 @@ class StuffingInternasionalDetailModel extends Model
         $barangMasterSalesModel = new BarangMasterSalesModel();
         $metaDataModel = new MetadataModel();
         $salesOrderExportDetailModel = new SalesOrderExportDetailModel();
+        $salesKontrakDetailModel = new SalesKontrakDetailModel();
 
         $result = array();
         $stuffingLokalDetail = $this->asArray()
@@ -61,49 +64,30 @@ class StuffingInternasionalDetailModel extends Model
             ->findAll();
 
         foreach ($stuffingLokalDetail as $m) {
-            $stockList = $stockDetail2Model->getStockListDetail(
-                $m['stock_id_warehouse'],
-                $m['bc_id_warehouse'],
-                $m['no_aju_warehouse'],
-                $m['stock_dokumen']
-
+            $stockList = $stockRevampDetailModel->getStockListWithAddConditionForStuffingById(
+                $m['stock_detail_id'],
             );
-            $stock = $stockModel->find($m['stock_id_warehouse']);
 
-            if ($stock['kemasan_id'] == 0) {
-                $barangMaster = $barangMasterModel->find($stock['barang1_id']);
-                $barangMasterSpesifikasi = $barangMasterSpesifikasiModel->find($stock['barang2_id']);
+            $stock = $stockRevampModel->find($m['stock_id_warehouse']);
+
+                $barangMaster = $barangMasterModel->find($stock['barang_master_id']);
+                $barangMasterSpesifikasi = $barangMasterSpesifikasiModel->find($stock['spesifikasi_id']);
                 $satuan = $satuanModel->find($barangMasterSpesifikasi['satuan_1']);
                 $barangName = $barangMaster['barang_name'] . "-" . $barangMasterSpesifikasi['spesifikasi'];
-            } else {
-                $kemasan = $kemasanModel->find($stock['kemasan_id']);
-                $satuan = $satuanModel->find($kemasan['satuan_id']);
-                $barangName = $kemasan['name'];
-            }
-
-            $stockOutput = $salesOrderExportDetailModel
-                ->select('barang_master_sales.*, sales_order_detail_export.qty')
-                ->join('barang_master_sales', 'barang_master_sales.id = sales_order_detail_export.barang_id', 'left')
-                ->where('barang_master_sales.id', $m['barang_id_order'])
-                ->where('sales_order_detail_export.sales_order_export_id', $m['sales_order_export_id'])
+           
+            $stockOutput = $salesKontrakDetailModel
+                ->select('barang_master_sales.*, sales_contract_detail.qty')
+                ->join('barang_master_sales', 'barang_master_sales.id = sales_contract_detail.barang_master_sales_id', 'left')
+                ->where('sales_contract_detail.id', $m['sales_order_export_id'])
                 ->first();
-
-            if ($stockOutput) {
+           
                 $barangNameOutput = $stockOutput['barang_name'];
                 $barangKodeOutput = $stockOutput['id'];
                 $barangQtyOutput = $stockOutput['qty'];
-            } else {
-                $kemasan = $kemasanModel->find($stock['kemasan_id']);
-                $satuan = $satuanModel->find($kemasan['satuan_id']);
-                $barangName = $kemasan['name'];
-            }
-
+            
             $stockList['id_stuffing_detail'] = $m['id'];
             $stockList['divisi_id'] = $m['divisi_id'];
             $stockList['warehouse_id'] = $m['warehouse_id'];
-            $stockList['stock_dokumen'] = $m['stock_dokumen'];
-            $stockList['no_dokumen_1'] = $m['no_dokumen_1'];
-            $stockList['no_dokumen_2'] = $m['no_dokumen_2'];
             $stockList['qty'] = $m['qty'];
             $bcType = isset($stockList['bc_id']) ? $metaDataModel->find($stockList['bc_id']) : null;
             $stockList['no_aju'] =  !isset($stockList['no_aju']) ? "-" : $stockList['no_aju'];
@@ -111,10 +95,11 @@ class StuffingInternasionalDetailModel extends Model
             $stockList['satuan'] = $satuan['kode_satuan'];
             $stockList['barang'] = strtoupper($barangName);
             $stockList['stock_id'] = $stockList['stock_id'];
-            $stockList['type_barang'] = $stock['tipe_barang'];
-            $stockList['type_barang_text'] = strtoupper(str_replace('_', ' ', $stock['tipe_barang']));
-            $stockList['stok_total'] = ($m['stok_total']);
-            $stockList['stock_date'] = date('d/m/Y', strtotime($stockList['stock_date']));
+            $stockList['stock_detail_id'] = $m['stock_detail_id'];
+            $stockList['type_barang'] = ucwords(str_replace('_', ' ', $stockList['type_barang']));;
+            // $stockList['type_barang_text'] = strtoupper(str_replace('_', ' ', $stock['tipe_barang']));
+            $stockList['stok_total'] = $stockList['stok_total_diterima'];
+            $stockList['stock_date'] = date('d/m/Y', strtotime($stockList['createdAt']));
             $stockList['output'] = [
                 'id_barang' => $barangKodeOutput,
                 'barang' => $barangNameOutput,
