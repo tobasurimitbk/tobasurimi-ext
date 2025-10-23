@@ -254,7 +254,8 @@ class BC23 extends BaseController
             ->join('suppliers', 'suppliers.id = bc_purchase_order.supplier_id', 'left')
             ->where('bc_purchase_order.id', $bcPurchaseOrderID)
             ->first();
-        $noAju = $this->generateNomorAju();
+        $tanggalDokumen = date('Y-m-d', strtotime($bcPo['createdAt']));
+        $noAju = $this->generateNomorAju($tanggalDokumen);
 
         if ($bcPo == null) {
             return redirect()->to('bea-cukai-bc-23');
@@ -309,6 +310,8 @@ class BC23 extends BaseController
 
         $bcPo = $this->bcPurchaseOrderModel->find($bcPurchaseOrderID);
         $bc23 = $this->bc23Model->get($bcPurchaseOrderID);
+        $bcPurchaseOrder = $this->bcPurchaseOrderModel->where('id', $bcPurchaseOrderID)->first();
+        $tanggalDokumen = date('Y-m-d', strtotime($bcPurchaseOrder['createdAt']));
 
         if ($bcPo == null) {
             return redirect()->to('bea-cukai-bc-40');
@@ -318,7 +321,7 @@ class BC23 extends BaseController
 
         $data = [
             'bc23' => $bc23,
-            'noAju' => $bc23 == null ? $this->generateNomorAju() : $bc23['no_aju'],
+            'noAju' => $bc23 == null ? $this->generateNomorAju($tanggalDokumen) : $bc23['no_aju'],
             'kodeKantor' => $this->kantorBeaCukaiModel->findAll(),
             'kodeTujuanTpb' => $this->metaDataModel->where('name', "Jenis TPB")->findAll(),
             'selectedKantor' => $this->metaDataModel->where('name', "Kode Kantor Pabean Pengawas Static")->first(),
@@ -331,15 +334,15 @@ class BC23 extends BaseController
     public function createHeaderAction()
     {
         $bcPurchaseOrderID = decrypt($this->request->getVar('bc_purchase_order_id'));
-        $lastData = $this->bc23Model->get($bcPurchaseOrderID);
+        $bcPurchaseOrder = $this->bcPurchaseOrderModel->where('id', $bcPurchaseOrderID)->first();
+        $tanggalDokumen = date('Y-m-d', strtotime($bcPurchaseOrder['createdAt']));
 
+        $lastData = $this->bc23Model->get($bcPurchaseOrderID);
         if ($lastData == null) {
-            $last_day = date("Y-m-t", strtotime(date('Y') . "-" . date('m') . "-" . date('d')));
             // insert
             $this->bc23Model->insert([
                 'bc_purchase_order_id' => $bcPurchaseOrderID,
-                'no_aju' => $this->generateNomorAju(),
-
+                'no_aju' => $this->generateNomorAju($tanggalDokumen),
                 'kode_pelabuhan_bongkar' => $this->request->getVar('header_pelabuhan_bongkar'),
                 'kode_kantor_bongkar' => decrypt($this->request->getVar('header_kantor_pabean_bongkar')),
                 'kode_kantor' => decrypt($this->request->getVar('header_kantor_pabean_pengawas')),
@@ -356,7 +359,7 @@ class BC23 extends BaseController
 
             if ($lastData['no_aju'] == null) {
                 $this->bc23Model->update($lastData['id'], [
-                    'no_aju' => $this->generateNomorAju(),
+                    'no_aju' => $this->generateNomorAju($tanggalDokumen),
                 ]);
             }
         }
@@ -683,17 +686,16 @@ class BC23 extends BaseController
     public function createPengangkutAction()
     {
         $bcPurchaseOrderID = decrypt($this->request->getVar('bc_purchase_order_id'));
-
+        $bcPurchaseOrder = $this->bcPurchaseOrderModel->where('id', $bcPurchaseOrderID)->first();
+        $tanggalDokumen = date('Y-m-d', strtotime($bcPurchaseOrder['createdAt']));
         $lastDataBC23 = $this->bc23Model->get($bcPurchaseOrderID);
         $lastPengangkutBC23 = $this->bcPengangkutModel->get($bcPurchaseOrderID);
 
         if ($lastDataBC23 == null) {
             // insert
-            $last_day = date("Y-m-t", strtotime(date('Y') . "-" . date('m') . "-" . date('d')));
-            // insert
             $this->bc23Model->insert([
                 'bc_purchase_order_id' => $bcPurchaseOrderID,
-                'no_aju' => $this->generateNomorAju(),
+                'no_aju' => $this->generateNomorAju($tanggalDokumen),
                 'no_bc_11' => $this->request->getVar('bc_11_no_bc_11'),
                 'tanggal_bc_11' => $this->request->getVar('bc_11_tanggal_bc_11') ? date_format(date_create_from_format("d/m/Y", $this->request->getVar('bc_11_tanggal_bc_11')), "Y-m-d") : "",
                 'pos_bc_11' => $this->request->getVar('bc_11_pos_bc_11'),
@@ -1114,16 +1116,14 @@ class BC23 extends BaseController
     public function createTransaksiAction()
     {
         $bcPurchaseOrderID = decrypt($this->request->getVar('bc_purchase_order_id'));
-
+        $bcPurchaseOrder = $this->bcPurchaseOrderModel->where('id', $bcPurchaseOrderID)->first();
+        $tanggalDokumen = date('Y-m-d', strtotime($bcPurchaseOrder['createdAt']));
         $lastDataBC23 = $this->bc23Model->get($bcPurchaseOrderID);
         if ($lastDataBC23 == null) {
             // insert
-            $last_day = date("Y-m-t", strtotime(date('Y') . "-" . date('m') . "-" . date('d')));
-            // insert
             $this->bc23Model->insert([
                 'bc_purchase_order_id' => $bcPurchaseOrderID,
-                'no_aju' => $this->generateNomorAju(),
-
+                'no_aju' => $this->generateNomorAju($tanggalDokumen),
                 'kode_valuta' => decrypt($this->request->getVar('harga_kode_valuta')),
                 'ndpbm' => ($this->request->getVar('harga_ndpbm')),
                 'kode_incoterm' => decrypt($this->request->getVar('harga_kode_harga_barang')),
@@ -1700,10 +1700,11 @@ class BC23 extends BaseController
 
         $bc23 = $this->bc23Model->get($bcPurchaseOrderID);
         if ($bc23 == null) {
-            $last_day = date("Y-m-t", strtotime(date('Y') . "-" . date('m') . "-" . date('d')));
+            $bcPurchaseOrder = $this->bcPurchaseOrderModel->where('id', $bcPurchaseOrderID)->first();
+            $tanggalDokumen = date('Y-m-d', strtotime($bcPurchaseOrder['createdAt']));
             $this->bc23Model->insert([
                 'bc_purchase_order_id' => $bcPurchaseOrderID,
-                'no_aju' => $this->generateNomorAju(),
+                'no_aju' => $this->generateNomorAju($tanggalDokumen),
                 'nilai_barang' => $hargaTotal
             ]);
         } else {
@@ -1843,12 +1844,11 @@ class BC23 extends BaseController
         $lastData = $this->bc23Model->get($bcPurchaseOrderID);
 
         if ($lastData == null) {
-            $last_day = date("Y-m-t", strtotime(date('Y') . "-" . date('m') . "-" . date('d')));
-            // insert
+            $bcPurchaseOrder = $this->bcPurchaseOrderModel->where('id', $bcPurchaseOrderID)->first();
+            $tanggalDokumen = date('Y-m-d', strtotime($bcPurchaseOrder['createdAt']));            // insert
             $this->bc23Model->insert([
                 'bc_purchase_order_id' => $bcPurchaseOrderID,
-                'no_aju' => $this->generateNomorAju(),
-
+                'no_aju' => $this->generateNomorAju($tanggalDokumen),
                 'nama_ttd' => $this->request->getVar('pernyatan_nama'),
                 'kota_ttd' => $this->request->getVar('pernyatan_tempat'),
                 'tanggal_ttd' => $this->request->getVar('pernyataan_tanggal') ? date_format(date_create_from_format("d/m/Y", $this->request->getVar('pernyataan_tanggal')), "Y-m-d") : "",
@@ -2035,12 +2035,14 @@ class BC23 extends BaseController
     {
         $bcPurchaseOrderID = decrypt($this->request->getVar('bc_purchase_order_id'));
         $bc40 = $this->bc23Model->where('bc_purchase_order_id', $bcPurchaseOrderID)->first();
+        $bcPurchaseOrder = $this->bcPurchaseOrderModel->where('id', $bcPurchaseOrderID)->first();
+        $tanggalDokumen = date('Y-m-d', strtotime($bcPurchaseOrder['createdAt']));
 
         if ($bc40 == null) {
             // insert
             $this->bc23Model->insert([
                 'bc_purchase_order_id' => $bcPurchaseOrderID,
-                'no_aju' => $this->generateNomorAju(),
+                'no_aju' => $this->generateNomorAju($tanggalDokumen),
             ]);
         }
 
@@ -2187,34 +2189,81 @@ class BC23 extends BaseController
         return $this->response->setJSON(['results' => $data,]);
     }
 
-    public function generateNomorAju()
+    public function generateNomorAju($tanggalDokumen)
     {
-        $ceisaSetting = $this->ceisaSettingModel->where('company_id', $this->this_company_id)->first();
-        $kodeDokumenBC23Static = $this->metaDataModel->where('name', "Kode BC23 Static")->first();
-
-        $kodeKantorStatic = $ceisaSetting['kode_kantor_pabean'];
-        $tanggalAju = date('Ymd');
-        $sequenceNoUrutPengajuan = "";
-
-        $bc23Last = $this->bc23Model->orderBy('createdAt', "DESC")->limit(1)->first();
-
-        if ($bc23Last == null) {
-            $sequenceNoUrutPengajuan = "000001";
+        // ===============================
+        // 🔹 Tentukan company yang disatukan
+        // ===============================
+        if (in_array($this->this_company_id, [1, 2])) {
+            $company_id_arr = [1, 2];
         } else {
-            if ($bc23Last['no_aju'] == null) {
-                $sequenceNoUrutPengajuan = "000001";
-            } else {
-                // Buatkan auto increment
-                $arrNo = explode('-', $bc23Last['no_aju']);
+            $company_id_arr = [$this->this_company_id];
+        }
+
+        // ===============================
+        // 🔹 Ambil setting dan metadata
+        // ===============================
+        $ceisaSetting = $this->ceisaSettingModel
+            ->where('company_id', $this->this_company_id)
+            ->first();
+
+        $kodeDokumenBC23Static = $this->metaDataModel
+            ->where('name', "Kode BC23 Static")
+            ->first();
+
+        // ===============================
+        // 🔹 Tentukan variabel dasar
+        // ===============================
+        $kodeKantorStatic = $ceisaSetting['kode_kantor_pabean'] ?? 'XXXX';
+        $tanggalAju = date('Ymd', strtotime($tanggalDokumen));
+        $tahunAjuSekarang = date('Y', strtotime($tanggalDokumen));
+
+        // ===============================
+        // 🔹 Ambil data BC23 terakhir
+        // ===============================
+        $bc23Last = $this->bc23Model
+            ->select('bc_23.*')
+            ->join('bc_purchase_order', 'bc_purchase_order.id = bc_23.bc_purchase_order_id', 'left')
+            ->whereIn('bc_purchase_order.company_id', $company_id_arr)
+            ->whereIn('po_type', ["IMPORT BAKU", "IMPORT PENOLONG"])
+            ->orderBy('bc_23.createdAt', "DESC")
+            ->limit(1)
+            ->first();
+
+        // ===============================
+        // 🔹 Tentukan nomor urut baru
+        // ===============================
+        $sequenceNoUrutPengajuan = "000001"; // default jika kosong
+
+        if ($bc23Last && !empty($bc23Last['no_aju'])) {
+            $arrNo = explode('-', $bc23Last['no_aju']);
+
+            // Format seharusnya: KODE-KANTOR-YYYYMMDD-NOMOR
+            if (count($arrNo) === 4) {
+                $tanggalTerakhir = $arrNo[2];
+                $tahunTerakhir = substr($tanggalTerakhir, 0, 4);
                 $lastNomor = $arrNo[3];
-                // lakukan increment
-                $nextNomor = str_pad((int)$lastNomor + 1, strlen($lastNomor), '0', STR_PAD_LEFT);
-                $sequenceNoUrutPengajuan = $nextNomor;
+
+                if ($tahunTerakhir === $tahunAjuSekarang) {
+                    // Tahun sama → lanjut urutan
+                    $nextNomor = str_pad((int)$lastNomor + 1, strlen($lastNomor), '0', STR_PAD_LEFT);
+                    $sequenceNoUrutPengajuan = $nextNomor;
+                } else {
+                    // Tahun berbeda → reset
+                    $sequenceNoUrutPengajuan = "000001";
+                }
             }
         }
 
-        return $kodeDokumenBC23Static['value'] . '-' . $kodeKantorStatic . '-' . $tanggalAju . '-' . $sequenceNoUrutPengajuan;
+        // ===============================
+        // 🔹 Return hasil akhir
+        // ===============================
+        return $kodeDokumenBC23Static['value']
+            . '-' . $kodeKantorStatic
+            . '-' . $tanggalAju
+            . '-' . $sequenceNoUrutPengajuan;
     }
+
 
     // public function dropdownSupplier()
     // {

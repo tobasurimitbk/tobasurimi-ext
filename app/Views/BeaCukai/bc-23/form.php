@@ -77,6 +77,19 @@
                             <label style="z-index: 1;">Supplier</label>
                         </div>
                     </div>
+                    <div class="col-sm-3">
+                        <div class="form-floating mb-3 mt-1" style="height: 50px;">
+                            <div class="input-group input-group-password">
+                                <div class="form-floating mb-3" style="height: 50px;">
+                                    <input autocomplete="one-time-code" class="form-control input-picker tanggal_dokumen" id="tanggal_dokumen" name="tanggal_dokumen" placeholder="Tanggal Dokumen" value="">
+                                    <label for="floatingInput">Tanggal Dokumen</label>
+                                </div>
+                                <div class="input-group-prepend group-prepend-password align-items-center">
+                                    <i style="cursor: pointer; z-index: 99; margin-bottom: 20px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-po-date"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </form>
 
@@ -139,7 +152,7 @@
         }
     });
 
-    $(".start_date,.end_date").datepicker({
+    $(".start_date,.end_date,.tanggal_dokumen").datepicker({
         todayHighlight: true,
         format: "dd/mm/yyyy",
         orientation: "bottom auto",
@@ -186,6 +199,7 @@
             return $(this).data("penerimaan_barang_id");
         }).get();
         var id_selected = getIDListDataSelected();
+        var tanggal_dokumen = $('#tanggal_dokumen').val();
 
         $.each(listData, function(i, v) {
             var currentID = Number(v.penerimaan_barang_id);
@@ -212,6 +226,14 @@
             Swal.fire({
                 icon: 'error',
                 title: "Pilih Supplier Dahulu",
+                confirmButtonColor: '#4e73df',
+            });
+            return;
+        } else if (tanggal_dokumen == '') {
+            // Pengecekan Supplier
+            Swal.fire({
+                icon: 'error',
+                title: "Tanggal Dokumen Wajib Diisi",
                 confirmButtonColor: '#4e73df',
             });
             return;
