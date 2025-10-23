@@ -93,6 +93,7 @@ class SalesOrderModel extends Model
         $availableSort = [
             'no_sales_order'        => 'sales_order.no_sales_order',
             'order_date'            => 'sales_order.order_date',
+            'shipping_date'         => 'sales_order.shipping_date',
             'destination'           => 'sales_order.destination',
             'qty_barang'            => 'sales_order.qty_barang',
             'total_harga'           => 'sales_order.total_harga',
