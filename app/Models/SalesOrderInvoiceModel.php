@@ -78,6 +78,7 @@ class SalesOrderInvoiceModel extends Model
             'company_name'       => 'companies.company',
             'nama_pelanggan'     => 'customers.name',
             'kode_pelanggan'     => 'customers.kode',
+            'tanggal_faktur'          => 'sales_order_invoice.tanggal_faktur',
             'no_faktur'          => 'sales_order_invoice.no_faktur',
             'total_invoice'      => 'sales_order_invoice.total_invoice',
             'keterangan'         => 'sales_order_invoice.keterangan',
