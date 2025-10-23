@@ -2126,6 +2126,7 @@ class PembayaranInvoice extends BaseController
                 'keterangan' =>  $this->request->getVar('keterangan'),
                 'tanggal' => date('Y-m-d', strtotime(str_replace('/', '-', $this->request->getVar('payment_date')))),
                 'potongan' => $this->request->getVar('potongan') ? repairDouble($this->request->getVar('potongan')) : 0,
+                'no_pembayaran' => $this->request->getVar('no_bukti_pembayaran'),
                 'total_bayar' =>  $totalAmountInvoice,
                 'akun_kas' => $this->request->getVar('akun_kas'),
                 'akun_selisih' => $this->request->getVar('akun_selisih'),
