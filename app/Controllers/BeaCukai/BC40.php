@@ -266,6 +266,8 @@ class BC40 extends BaseController
             array_push($lpbNoArr, $l->lpb_no);
         }
 
+        $tanggalDokumen = formatDMYtoYMD($this->request->getVar('tanggal_dokumen'));
+
         $id = $this->bcPurchaseOrderModel->insert([
             'supplier_id' => $this->request->getVar('supplier_id'),
             'company_id' => $this->this_company_id,
@@ -274,6 +276,7 @@ class BC40 extends BaseController
             'multiple_lpb_id' => str_replace(['\\"', '\\', '"'], '', json_encode($lpbIdArr)),
             'multiple_po_no' => str_replace(['\\"', '\\'], '', json_encode($poNoArr)),
             'multiple_lpb_no' => str_replace(['\\"', '\\'], '', json_encode($lpbNoArr)),
+            'createdAt' => date('Y-m-d H:i:s', strtotime($tanggalDokumen))
         ]);
 
         $lpbIdUnique = array_values(array_unique($lpbIdArr));
@@ -284,6 +287,13 @@ class BC40 extends BaseController
                 'penerimaan_barang_id' => $l
             ]);
         }
+
+        // Update Nomor Aju
+        $noAju = $this->generateNomorAju($tanggalDokumen);
+        $this->bc40Model->insert([
+            'bc_purchase_order_id' => $id,
+            'no_aju' => $noAju
+        ]);
 
         return response()->setJSON([
             'status' => true,
@@ -301,7 +311,8 @@ class BC40 extends BaseController
             ->join('suppliers', 'suppliers.id = bc_purchase_order.supplier_id', 'left')
             ->where('bc_purchase_order.id', $bcPurchaseOrderID)
             ->first();
-        $noAju = $this->generateNomorAju();
+        $tanggalDokumen = date('Y-m-d', strtotime($bcPo['createdAt']));
+        $noAju = $this->generateNomorAju($tanggalDokumen);
 
         if ($bcPo == null) {
             return redirect()->to('bea-cukai-bc-40');
@@ -496,6 +507,8 @@ class BC40 extends BaseController
         $bcPo = $this->bcPurchaseOrderModel->find($bcPurchaseOrderID);
         $bc40 = $this->bc40Model->get($bcPurchaseOrderID);
         $ceisaSetting = $this->ceisaSettingModel->where('company_id', $this->this_company_id)->first();
+        $bcPurchaseOrder = $this->bcPurchaseOrderModel->where('id', $bcPurchaseOrderID)->first();
+        $tanggalDokumen = date('Y-m-d', strtotime($bcPurchaseOrder['createdAt']));
 
         $this->setFlashDataNavigatorSession($bcPurchaseOrderID);
 
@@ -505,7 +518,7 @@ class BC40 extends BaseController
 
         $data = [
             'bc40' => $bc40,
-            'noAju' => $bc40 == null ? $this->generateNomorAju() : $bc40['no_aju'],
+            'noAju' => $bc40 == null ? $this->generateNomorAju($tanggalDokumen) : $bc40['no_aju'],
             'kodeKantor' => $this->kantorBeaCukaiModel->findAll(),
             'kodeTujuanTpb' => $this->metaDataModel->where('name', "Jenis TPB")->findAll(),
             'kodeTujuanPengiriman' => $this->metaDataModel->where('name', "Kode Tujuan Pengiriman BC")->like('value', 40)->where('deletedAt', null)->findAll(),
@@ -519,15 +532,15 @@ class BC40 extends BaseController
     public function createHeaderAction()
     {
         $bcPurchaseOrderID = decrypt($this->request->getVar('bc_purchase_order_id'));
+        $bcPurchaseOrder = $this->bcPurchaseOrderModel->where('id', $bcPurchaseOrderID)->first();
+        $tanggalDokumen = date('Y-m-d', strtotime($bcPurchaseOrder['createdAt']));
 
         $lastData = $this->bc40Model->get($bcPurchaseOrderID);
         if ($lastData == null) {
-            $last_day = date("Y-m-t", strtotime(date('Y') . "-" . date('m') . "-" . date('d')));
             // insert
             $this->bc40Model->insert([
                 'bc_purchase_order_id' => $bcPurchaseOrderID,
-                'no_aju' => $this->generateNomorAju(),
-
+                'no_aju' => $this->generateNomorAju($tanggalDokumen),
                 'kode_kantor' => decrypt($this->request->getVar('header_kantor_pabean')),
                 'kode_jenis_tpb' => decrypt($this->request->getVar('header_kode_jenis_tpb')),
                 'kode_tujuan_pengiriman' => decrypt($this->request->getVar('header_kode_tujuan_pengiriman'))
@@ -542,7 +555,7 @@ class BC40 extends BaseController
 
             if ($lastData['no_aju'] == null) {
                 $this->bc40Model->update($lastData['id'], [
-                    'no_aju' => $this->generateNomorAju(),
+                    'no_aju' => $this->generateNomorAju($tanggalDokumen),
                 ]);
             }
         }
@@ -1117,13 +1130,17 @@ class BC40 extends BaseController
     public function createTransaksiAction()
     {
         $bcPurchaseOrderID = decrypt($this->request->getVar('bc_purchase_order_id'));
+        $bcPurchaseOrder = $this->bcPurchaseOrderModel->where('id', $bcPurchaseOrderID)->first();
 
         $lastData = $this->bc40Model->get($bcPurchaseOrderID);
         if ($lastData == null) {
             // insert
+            $tanggalDokumen = date('Y-m-d', strtotime($bcPurchaseOrder['createdAt']));
             $this->bc40Model->insert([
                 'bc_purchase_order_id' => $bcPurchaseOrderID,
-                'no_aju' => $this->generateNomorAju(),
+                'no_aju' => $this->generateNomorAju(
+                    $tanggalDokumen
+                ),
 
                 // 'harga_penyerahan' => convertRupiahToNumber($this->request->getVar('harga_nilai_pabean')),
                 'nilai_jasa' => ($this->request->getVar('nilai_jasa')),
@@ -1229,6 +1246,7 @@ class BC40 extends BaseController
         $bcPurchaseOrderID = decrypt($this->request->getVar('bc_purchase_order_id'));
         $penerimaanBarangID = decrypt($this->request->getVar('penerimaan_barang_id'));
         $barang1ID = decrypt($this->request->getVar('barang1_id'));
+        $bcPurchaseOrder = $this->bcPurchaseOrderModel->where('id', $bcPurchaseOrderID)->first();
 
         $bcBarang = $this->bcBarangModel
             ->where('bc_purchase_order_id', $bcPurchaseOrderID)
@@ -1292,8 +1310,11 @@ class BC40 extends BaseController
         $bc40 = $this->bc40Model->get($bcPurchaseOrderID);
 
         if ($bc40 == null) {
+            $tanggalDokumen = date('Y-m-d', strtotime($bcPurchaseOrder['createdAt']));
             $this->bc40Model->insert([
-                'no_aju' => $this->generateNomorAju(),
+                'no_aju' => $this->generateNomorAju(
+                    $tanggalDokumen
+                ),
                 'bc_purchase_order_id' => $bcPurchaseOrderID,
                 'netto' => $this->bcBarangModel->totalBeratBersih($bcPurchaseOrderID),
                 'harga_penyerahan' => $this->bcBarangModel->totalHargaPenyerahan($bcPurchaseOrderID),
@@ -1699,15 +1720,17 @@ class BC40 extends BaseController
     public function createPernyataanAction()
     {
         $bcPurchaseOrderID = decrypt($this->request->getVar('bc_purchase_order_id'));
-
+        $bcPurchaseOrder = $this->bcPurchaseOrderModel->where('id', $bcPurchaseOrderID)->first();
         $lastData = $this->bc40Model->get($bcPurchaseOrderID);
 
         if ($lastData == null) {
+            $tanggalDokumen = date('Y-m-d', strtotime($bcPurchaseOrder['createdAt']));
             // insert
             $this->bc40Model->insert([
                 'bc_purchase_order_id' => $bcPurchaseOrderID,
-                'no_aju' => $this->generateNomorAju(),
-
+                'no_aju' => $this->generateNomorAju(
+                    $tanggalDokumen
+                ),
                 'nama_ttd' => $this->request->getVar('pernyatan_nama'),
                 'kota_ttd' => $this->request->getVar('pernyatan_tempat'),
                 'tanggal_ttd' => $this->request->getVar('pernyataan_tanggal') ? date_format(date_create_from_format("d/m/Y", $this->request->getVar('pernyataan_tanggal')), "Y-m-d") : "",
@@ -1865,18 +1888,21 @@ class BC40 extends BaseController
     public function posting()
     {
         $bcPurchaseOrderID = decrypt($this->request->getVar('bc_purchase_order_id'));
+        $bcPurchaseOrder = $this->bcPurchaseOrderModel->where('id', $bcPurchaseOrderID)->first();
         $bc40 = $this->bc40Model->where('bc_purchase_order_id', $bcPurchaseOrderID)->first();
 
         if ($bc40 == null) {
             // insert
+            $tanggalDokumen = date('Y-m-d', strtotime($bcPurchaseOrder['createdAt']));
             $this->bc40Model->insert([
                 'bc_purchase_order_id' => $bcPurchaseOrderID,
-                'no_aju' => $this->generateNomorAju(),
+                'no_aju' => $this->generateNomorAju(
+                    $tanggalDokumen
+                ),
             ]);
         }
 
         $bc40 = $this->bc40Model->where('bc_purchase_order_id', $bcPurchaseOrderID)->first();
-        $bcPurchaseOrder = $this->bcPurchaseOrderModel->where('id', $bcPurchaseOrderID)->first();
         if ($bcPurchaseOrder['no_daftar'] == null) {
             return response()->setJSON([
                 'token' => csrf_hash(),
@@ -1946,34 +1972,58 @@ class BC40 extends BaseController
         }
     }
 
-    public function generateNomorAju()
+    public function generateNomorAju($tanggalDokumen)
     {
-        $ceisaSetting = $this->ceisaSettingModel->where('company_id', $this->this_company_id)->first();
-        $kodeDokumenbc40Static = $this->metaDataModel->where('name', "Kode BC40 Static")->first();
+        $ceisaSetting = $this->ceisaSettingModel
+            ->where('company_id', $this->this_company_id)
+            ->first();
 
-        $kodeKantorStatic = $ceisaSetting['kode_unik'] == null ? $ceisaSetting['kode_kantor_pabean'] : $ceisaSetting['kode_unik'];
-        $tanggalAju = date('Ymd');
-        $sequenceNoUrutPengajuan = "";
+        $kodeDokumenbc40Static = $this->metaDataModel
+            ->where('name', "Kode BC40 Static")
+            ->first();
 
-        $bc40Last = $this->bc40Model->orderBy('createdAt', "DESC")->limit(1)->first();
+        $kodeKantorStatic = $ceisaSetting['kode_unik']
+            ? $ceisaSetting['kode_unik']
+            : $ceisaSetting['kode_kantor_pabean'];
 
-        if ($bc40Last == null) {
-            $sequenceNoUrutPengajuan = "000001";
-        } else {
-            if ($bc40Last['no_aju'] == null) {
-                $sequenceNoUrutPengajuan = "000001";
-            } else {
-                // Buatkan auto increment
-                $arrNo = explode('-', $bc40Last['no_aju']);
+        $tanggalAju = date('Ymd', strtotime($tanggalDokumen));
+        $tahunAjuSekarang = date('Y', strtotime($tanggalDokumen));
+
+        // Ambil BC40 terakhir berdasarkan urutan no_aju terbaru
+        $bc40Last = $this->bc40Model
+            ->orderBy('createdAt', "DESC")
+            ->limit(1)
+            ->first();
+
+        // Default urutan
+        $sequenceNoUrutPengajuan = "000001";
+
+        if ($bc40Last && $bc40Last['no_aju']) {
+            $arrNo = explode('-', $bc40Last['no_aju']);
+
+            // Pastikan format sesuai: DOC-KANTOR-YYYYMMDD-NOMOR
+            if (count($arrNo) === 4) {
+                $tanggalTerakhir = $arrNo[2];
+                $tahunTerakhir = substr($tanggalTerakhir, 0, 4);
                 $lastNomor = $arrNo[3];
-                // lakukan increment
-                $nextNomor = str_pad((int)$lastNomor + 1, strlen($lastNomor), '0', STR_PAD_LEFT);
-                $sequenceNoUrutPengajuan = $nextNomor;
+
+                if ($tahunTerakhir === $tahunAjuSekarang) {
+                    // Masih tahun yang sama → lanjutkan nomor urut
+                    $nextNomor = str_pad((int)$lastNomor + 1, strlen($lastNomor), '0', STR_PAD_LEFT);
+                    $sequenceNoUrutPengajuan = $nextNomor;
+                } else {
+                    // Tahun baru → reset ke 000001
+                    $sequenceNoUrutPengajuan = "000001";
+                }
             }
         }
 
-        return $kodeDokumenbc40Static['value'] . '-' . $kodeKantorStatic . '-' . $tanggalAju . '-' . $sequenceNoUrutPengajuan;
+        return $kodeDokumenbc40Static['value']
+            . '-' . $kodeKantorStatic
+            . '-' . $tanggalAju
+            . '-' . $sequenceNoUrutPengajuan;
     }
+
 
     // public function dropdownSupplier()
     // {
