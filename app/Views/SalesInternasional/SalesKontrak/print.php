@@ -807,7 +807,7 @@
                                                     foreach ($groupBySatuan as $satuan => $data):
                                                         $grand_total_qty += $data['qty'];
                                                     ?>
-                                                        <td style="padding: 0 2px; text-align: right; width: 60px;">
+                                                        <td style="padding: 0 2px; text-align: right; width: 100px;">
                                                             <?= number_format($data['qty'], 2) ?> <?= $satuan ?>
                                                         </td>
                                                     <?php endforeach; ?>
