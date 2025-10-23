@@ -783,30 +783,23 @@
             <?php endif; ?> -->
 
             <!-- Final Amount Row -->
-            <tr style="font-weight: bold; background-color: #e9ecef; font-size: 11px;">
-                <td style="padding: 6px; border: 1px solid #ddd;"></td>
-                <td style="padding: 6px; border: 1px solid #ddd;">
-                    <table style="width: 100%; table-layout: fixed;">
+            <tr style="font-weight: bold; background-color: #e9ecef; font-size: 10px; line-height: 1;">
+                <td style="padding: 4px; border: 1px solid #ddd;"></td>
+                <td style="padding: 4px; border: 1px solid #ddd;">
+                    <table style="width: 100%; table-layout: fixed; border-collapse: collapse;">
                         <tr style="vertical-align: middle;">
                             <!-- Kolom 1: GRAND TOTAL Label -->
-                            <td style="width: 25%; text-align: left; vertical-align: middle; white-space: nowrap;">
+                            <td style="width: 35%; text-align: left; vertical-align: middle; white-space: nowrap;">
                                 <span style="margin-left: -3px;">
                                     GRAND TOTAL <?= !empty($salesKontrak['total_container']) ? "(" . $salesKontrak['total_container'] . ")" : "" ?>
                                 </span>
                             </td>
 
                             <!-- Kolom 2: Tabel Satuan -->
-                            <td style="width: 10px ; text-align: center; ">
+                            <td style="width: 30%; text-align: center;">
                                 <?php if ($currentItemSaleskontrakdetail === $totalSalesKontrakdetail): ?>
                                     <?php if (!empty($groupBySatuan)) : ?>
-                                        <table style="width:auto; margin: 0 auto; border-collapse: none; font-size: 11px;">
-                                            <!-- <thead>
-                                                <tr style="background-color: #f3f4f6;">
-                                                    <?php foreach ($groupBySatuan as $satuan => $data): ?>
-                                                        <th style="padding: 5px; border: 1px solid #ddd; text-align: right;"><?= $satuan ?></th>
-                                                    <?php endforeach; ?>
-                                                </tr>
-                                            </thead> -->
+                                        <table style="width: auto; margin: 0 auto; border-collapse: collapse; font-size: 10px;">
                                             <tbody>
                                                 <tr>
                                                     <?php
@@ -814,7 +807,7 @@
                                                     foreach ($groupBySatuan as $satuan => $data):
                                                         $grand_total_qty += $data['qty'];
                                                     ?>
-                                                        <td style="padding: 0px; text-align: right;width:80px;">
+                                                        <td style="padding: 0 2px; text-align: right; width: 60px;">
                                                             <?= number_format($data['qty'], 2) ?> <?= $satuan ?>
                                                         </td>
                                                     <?php endforeach; ?>
@@ -826,13 +819,14 @@
                             </td>
 
                             <!-- Kolom 3: Nilai Grand Total -->
-                            <td style="width: 25%; text-align: right; vertical-align: middle; white-space: nowrap;">
+                            <td style="width: 35%; text-align: right; vertical-align: middle; white-space: nowrap;">
                                 (<?= $salesKontrak['mata_uang'] ?>) <?= number_format($grand_total, 2) ?>
                             </td>
                         </tr>
                     </table>
                 </td>
             </tr>
+
         </tbody>
     </table>
     <div style="margin-top: 5px;line-height:1;">
