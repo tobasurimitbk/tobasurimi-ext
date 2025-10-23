@@ -177,7 +177,7 @@
 <script>
     const csrfToken = '<?= csrf_token() ?>';
     const csrf = $(`[name="${csrfToken}"]`);
-    let sort = "bc_purchase_order.createdAt";
+    let sort = "bc_40.no_aju";
     let sortType = "desc";
 
     const table = $('.dataTable').DataTable({

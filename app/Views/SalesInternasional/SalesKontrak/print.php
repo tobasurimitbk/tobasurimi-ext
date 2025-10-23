@@ -317,7 +317,7 @@
             </div>
 
         </div>
-        <div class="d-flex flex-column">
+        <div class="d-flex flex-column" style="line-height: 1;">
             <table>
                 <tr>
                     <td>
@@ -398,13 +398,13 @@
 
         </div>
         <div class="mt-1 justify-content-center">
-            <label class="label-header" style="color: red;">
+            <div class="label-header" style="color: red;">
                 <?= nl2br(htmlspecialchars($salesKontrak['banking_information'])) ?>
-            </label>
+            </div>
         </div>
 
-        <div class="mt-1 justify-content-center">
-            <label class="label-header" style="font-size:12.2px;">THIS SALES CONTRACT IS MADE BY AND BETWEEN THE BUYER AND SELLER, WHEREBY THE BUYER AGREES TO PURCHASE AND THE SELLER AGREES TO SELL THE UNDER MENTIONED COMMODITIES AS PER THE TERMS AND CONDITIONS STIPULATED BELOW:</label>
+        <div class="mt-1">
+            <div class="label-header" style="font-size:12.2px;">THIS SALES CONTRACT IS MADE BY AND BETWEEN THE BUYER AND SELLER, WHEREBY THE BUYER AGREES TO PURCHASE AND THE SELLER AGREES TO SELL THE UNDER MENTIONED COMMODITIES AS PER THE TERMS AND CONDITIONS STIPULATED BELOW:</div>
         </div>
     </div>
     <div class="header">
@@ -460,7 +460,7 @@
                     <td style="padding: 6px; border: 1px solid #ddd; vertical-align: top;"><?= $no++ ?></td>
                     <td style="padding: 6px; border: 1px solid #ddd; vertical-align: top;">
                         <div style="font-weight: bold; font-size: 11px;"><?= $detail["nama_barang"]; ?></div>
-                        <div style="font-size: 11px; margin-top: 4px; line-height: 1.4;">
+                        <div style="font-size: 11px; margin-top: 4px; line-height: 1;">
                             <table style="margin-left: -3px;">
                                 <?php if (!empty($detail['species'])): ?>
                                     <tr>
@@ -622,33 +622,35 @@
 
                                     ?>
 
-                                    <tfoot>
-                                        <tr style="background-color: #e9ecef;">
-                                            <td colspan="<?= $base_columns ?>" style="padding: 3px; border: 1px solid #ddd; text-align: right; font-weight: bold;">
-                                                TOTAL
-                                            </td>
-
-                                            <?php if ($show_cased_column): ?>
-                                                <td style="padding: 3px; border: 1px solid #ddd; text-align: right; font-weight: bold;">
-                                                    <?= $breakdown_cased > 0 ? number_format($breakdown_cased, 2) : '' ?>
+                                    <?php if (count($salesKontrakdetail) > 1): ?>
+                                        <tfoot>
+                                            <tr style="background-color: #e9ecef;">
+                                                <td colspan="<?= $base_columns ?>" style="padding: 3px; border: 1px solid #ddd; text-align: right; font-weight: bold;">
+                                                    TOTAL
                                                 </td>
-                                            <?php endif; ?>
 
-                                            <?php if ($show_persen_column): ?>
+                                                <?php if ($show_cased_column): ?>
+                                                    <td style="padding: 3px; border: 1px solid #ddd; text-align: right; font-weight: bold;">
+                                                        <?= $breakdown_cased > 0 ? number_format($breakdown_cased, 2) : '' ?>
+                                                    </td>
+                                                <?php endif; ?>
+
+                                                <?php if ($show_persen_column): ?>
+                                                    <td style="padding: 3px; border: 1px solid #ddd; text-align: right; font-weight: bold;">
+                                                        <?= $breakdown_persen > 0 ? number_format($breakdown_persen, 2) . " %" : '' ?>
+                                                    </td>
+                                                <?php endif; ?>
+
                                                 <td style="padding: 3px; border: 1px solid #ddd; text-align: right; font-weight: bold;">
-                                                    <?= $breakdown_persen > 0 ? number_format($breakdown_persen, 2) . " %" : '' ?>
+                                                    <?= number_format($breakdown_qty, 2)  ?>
                                                 </td>
-                                            <?php endif; ?>
-
-                                            <td style="padding: 3px; border: 1px solid #ddd; text-align: right; font-weight: bold;">
-                                                <?= number_format($breakdown_qty, 2)  ?>
-                                            </td>
-                                            <td style="padding: 3px; border: 1px solid #ddd; text-align: right; font-weight: bold;">-</td>
-                                            <td style="padding: 3px; border: 1px solid #ddd; text-align: right; font-weight: bold;">
-                                                <?= number_format($breakdown_total, 2) ?>
-                                            </td>
-                                        </tr>
-                                    </tfoot>
+                                                <td style="padding: 3px; border: 1px solid #ddd; text-align: right; font-weight: bold;">-</td>
+                                                <td style="padding: 3px; border: 1px solid #ddd; text-align: right; font-weight: bold;">
+                                                    <?= number_format($breakdown_total, 2) ?>
+                                                </td>
+                                            </tr>
+                                        </tfoot>
+                                    <?php endif; ?>
 
                                 </table>
                             </div>
@@ -781,30 +783,23 @@
             <?php endif; ?> -->
 
             <!-- Final Amount Row -->
-            <tr style="font-weight: bold; background-color: #e9ecef; font-size: 11px;">
-                <td style="padding: 6px; border: 1px solid #ddd;"></td>
-                <td style="padding: 6px; border: 1px solid #ddd;">
-                    <table style="width: 100%; table-layout: fixed;">
+            <tr style="font-weight: bold; background-color: #e9ecef; font-size: 10px; line-height: 1;">
+                <td style="padding: 4px; border: 1px solid #ddd;"></td>
+                <td style="padding: 4px; border: 1px solid #ddd;">
+                    <table style="width: 100%; table-layout: fixed; border-collapse: collapse;">
                         <tr style="vertical-align: middle;">
                             <!-- Kolom 1: GRAND TOTAL Label -->
-                            <td style="width: 25%; text-align: left; vertical-align: middle; white-space: nowrap;">
+                            <td style="width: 35%; text-align: left; vertical-align: middle; white-space: nowrap;">
                                 <span style="margin-left: -3px;">
                                     GRAND TOTAL <?= !empty($salesKontrak['total_container']) ? "(" . $salesKontrak['total_container'] . ")" : "" ?>
                                 </span>
                             </td>
 
                             <!-- Kolom 2: Tabel Satuan -->
-                            <td style="width: 10px ; text-align: center; ">
+                            <td style="width: 30%; text-align: center;">
                                 <?php if ($currentItemSaleskontrakdetail === $totalSalesKontrakdetail): ?>
                                     <?php if (!empty($groupBySatuan)) : ?>
-                                        <table style="width:auto; margin: 0 auto; border-collapse: collapse; font-size: 11px;">
-                                            <!-- <thead>
-                                                <tr style="background-color: #f3f4f6;">
-                                                    <?php foreach ($groupBySatuan as $satuan => $data): ?>
-                                                        <th style="padding: 5px; border: 1px solid #ddd; text-align: right;"><?= $satuan ?></th>
-                                                    <?php endforeach; ?>
-                                                </tr>
-                                            </thead> -->
+                                        <table style="width: auto; margin: 0 auto; border-collapse: collapse; font-size: 10px;">
                                             <tbody>
                                                 <tr>
                                                     <?php
@@ -812,7 +807,7 @@
                                                     foreach ($groupBySatuan as $satuan => $data):
                                                         $grand_total_qty += $data['qty'];
                                                     ?>
-                                                        <td style="padding: 5px; border: 1px solid #ddd; text-align: right;width:80px;">
+                                                        <td style="padding: 0 2px; text-align: right; width: 100px;">
                                                             <?= number_format($data['qty'], 2) ?> <?= $satuan ?>
                                                         </td>
                                                     <?php endforeach; ?>
@@ -824,16 +819,17 @@
                             </td>
 
                             <!-- Kolom 3: Nilai Grand Total -->
-                            <td style="width: 25%; text-align: right; vertical-align: middle; white-space: nowrap;">
+                            <td style="width: 35%; text-align: right; vertical-align: middle; white-space: nowrap;">
                                 (<?= $salesKontrak['mata_uang'] ?>) <?= number_format($grand_total, 2) ?>
                             </td>
                         </tr>
                     </table>
                 </td>
             </tr>
+
         </tbody>
     </table>
-    <div class="header" style="margin-top: 5px;">
+    <div style="margin-top: 5px;line-height:1;">
         <table style="border-spacing: 0 4px; width: 100%;">
             <tbody>
                 <?php
@@ -888,7 +884,7 @@
     </div>
 
     <!-- Mulai blok yang harus utuh di halaman yang sama -->
-    <div class="ttd-section" style="margin-top: -5px;">
+    <div class="ttd-section" style="margin-top: -5px; line-height:1;">
         <table style="border-spacing: 0 4px; width: 100%;">
             <tbody>
                 <?php if (!empty($salesKontrak['payment_term'])): ?>
@@ -928,10 +924,11 @@
                 <?php endif ?>
                 <tr>
                     <td colspan="4">
-                        <br>
-                        <label class="label-header">
-                            FOR THOSE ITEMS WHICH ARE NOT COVERED IN THIS CONTRACT, BOTH PARTIES WILL NEGOTIATE AND COME TO COMPROMISE.
-                        </label>
+                        <div class="mt-1">
+                            <label class="label-header">
+                                FOR THOSE ITEMS WHICH ARE NOT COVERED IN THIS CONTRACT, BOTH PARTIES WILL NEGOTIATE AND COME TO COMPROMISE.
+                            </label>
+                        </div>
                     </td>
                 </tr>
             </tbody>

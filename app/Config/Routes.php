@@ -1316,8 +1316,8 @@ $routes->post('/biaya-kepiting/autocomplete', 'JasaVendor\BiayaKepiting::autoCom
 $routes->get('/pengeluaran-lokal',  'Stuffing\Lokal::index', ['filter' => 'Auth']);
 $routes->get('/pengeluaran-lokal/create',  'Stuffing\Lokal::create', ['filter' => 'Auth']);
 $routes->get('/pengeluaran-lokal/warehouse', 'Purchase\POLokalBahanBaku::dropdownWarehouse', ['filter' => 'Auth']);
-$routes->get('/pengeluaran-lokal/list-barang-stock-init', 'Inventori\StokAdjusment::getListBarangIsInit', ['filter' => 'Auth']);
-$routes->get('/pengeluaran-lokal/list-stock-dokumen-bc', 'Inventori\StokAdjusment::getListStockByStockID', ['filter' => 'Auth']);
+$routes->get('/pengeluaran-lokal/list-barang-stock-init', 'JasaVendor\ProsesRebus::dropdownListBarangIsInit', ['filter' => 'Auth']);
+$routes->get('/pengeluaran-lokal/list-stock-dokumen-bc', 'JasaVendor\JasaVendorOut::getListStockByStockID', ['filter' => 'Auth']);
 $routes->get('/pengeluaran-lokal/list-barang-output', 'Stuffing\Lokal::dropdownListOrder', ['filter' => 'Auth']);
 $routes->get('/pengeluaran-lokal/all', 'Stuffing\Lokal::all', ['filter' => 'Auth']);
 $routes->post('/pengeluaran-lokal/save',  'Stuffing\Lokal::createAction', ['filter' => 'Auth']);
@@ -1337,8 +1337,8 @@ $routes->post('/pengeluaran-lokal/delete-kemasan',  'Stuffing\Lokal::deleteKemas
 $routes->get('/pengeluaran-internasional',  'Stuffing\Internasional::index', ['filter' => 'Auth']);
 $routes->get('/pengeluaran-internasional/create',  'Stuffing\Internasional::create', ['filter' => 'Auth']);
 $routes->get('/pengeluaran-internasional/warehouse', 'Purchase\POLokalBahanBaku::dropdownWarehouse', ['filter' => 'Auth']);
-$routes->get('/pengeluaran-internasional/list-barang-stock-init', 'Inventori\StokAdjusment::getListBarangIsInit', ['filter' => 'Auth']);
-$routes->get('/pengeluaran-internasional/list-stock-dokumen-bc', 'Inventori\StokAdjusment::getListStockByStockID', ['filter' => 'Auth']);
+$routes->get('/pengeluaran-internasional/list-barang-stock-init', 'JasaVendor\ProsesRebus::dropdownListBarangIsInit', ['filter' => 'Auth']);
+$routes->get('/pengeluaran-internasional/list-stock-dokumen-bc', 'Stuffing\Internasional::getListStockByStockID', ['filter' => 'Auth']);
 $routes->get('/pengeluaran-internasional/list-barang-output', 'Stuffing\Internasional::dropdownListOrder', ['filter' => 'Auth']);
 $routes->get('/pengeluaran-internasional/all', 'Stuffing\Internasional::all', ['filter' => 'Auth']);
 $routes->post('/pengeluaran-internasional/save',  'Stuffing\Internasional::createAction', ['filter' => 'Auth']);

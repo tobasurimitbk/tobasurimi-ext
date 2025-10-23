@@ -21,6 +21,9 @@ use App\Models\StuffingLokalModel;
 use App\Models\VendorModel;
 use App\Models\WarehousesModel;
 use App\Models\BarangMasterSalesModel;
+use App\Models\SalesOrderExportSpecsModel;
+use App\Models\StockRevampDetailModel;
+use App\Models\StockRevampModel;
 use Dompdf\Dompdf;
 
 class Internasional extends BaseController
@@ -42,6 +45,7 @@ class Internasional extends BaseController
     protected $stuffingInternasionalDetailModel;
     protected $BarangMasterSalesModel;
     protected $dompdf;
+    protected $salesOrderExportSpecsModel;
 
     public function __construct()
     {
@@ -61,6 +65,7 @@ class Internasional extends BaseController
         $this->stuffingInternasionalModel = new StuffingInternasionalModel();
         $this->stuffingInternasionalDetailModel = new StuffingInternasionalDetailModel();
         $this->BarangMasterSalesModel = new BarangMasterSalesModel();
+        $this->salesOrderExportSpecsModel = new SalesOrderExportSpecsModel();
         $this->dompdf = new Dompdf();
     }
 
@@ -147,9 +152,9 @@ class Internasional extends BaseController
                 ->join('sales_contract', 'sales_contract.id = sales_order_export.sales_contract_id')
                 ->join('customers', 'customers.id = sales_contract.customer_id')
                 ->where('sales_order_export.deletedAt', null)
-                ->where('sales_order_export.status', 'POSTED')
+                // ->where('sales_order_export.status', 'POSTED')
                 ->where('sales_order_export.used', 'NOT USED')
-                ->where('sales_order_export.company_id', $this->this_company_id)
+                // ->where('sales_order_export.company_id', $this->this_company_id)
                 ->orderBy('sales_order_export.sales_order_export_no', "ASC")
                 ->findAll(),
             'divisi' => $this->divisiModel->getDivisiAccess(),
@@ -217,19 +222,12 @@ class Internasional extends BaseController
         $barang = json_decode($this->request->getVar('listBarang'));
 
         foreach ($barang as $b) {
-            $checkStock = $this->stockModel->where('id', $b->stock_id)->first();
             $this->stuffingInternasionalDetailModel->insert([
                 'divisi_id' => $b->divisi_id,
                 'warehouse_id' => $b->warehouse_id,
                 'stuffing_internasional_id' => $id,
                 'stock_id_warehouse' => $b->stock_id,
-                'stock_dokumen' => $b->stock_dokumen,
-                'no_dokumen_1' => $b->no_dokumen_1,
-                'no_dokumen_2' => $b->no_dokumen_2,
-                'bc_id_warehouse' => $b->bc_id,
-                'no_aju_warehouse' => $b->no_aju,
-                'barang1_id_warehouse' => $checkStock['barang1_id'],
-                'barang2_id_warehouse' => $checkStock['barang2_id'],
+                'stock_detail_id' => $b->id,
                 'barang_id_order' => $b->output->id_barang,
                 'qty' => $b->qty,
                 'stok_total' => $b->stok_total
@@ -302,7 +300,11 @@ class Internasional extends BaseController
 
     public function posting()
     {
+        $db = \Config\Database::connect();
+        $db->transBegin();
         $id = decrypt($this->request->getVar('id'));
+
+        $stockRevampModel = new StockRevampModel();
 
         // BARANG OUT KE VENDOR
         // Insert To Inventori (-)
@@ -311,52 +313,22 @@ class Internasional extends BaseController
         $stuffingInternasionalDetail = $this->stuffingInternasionalDetailModel->where('stuffing_internasional_id', $id)->where('deletedAt', null)->findAll();
 
         foreach ($stuffingInternasionalDetail as $j) {
-            $stock = $this->stockModel->find($j['stock_id_warehouse']);
-            $qty = $j['qty'];
+            $data = [
+                    "stock_detail_id" => $j['stock_detail_id'],
+                    "qty_digunakan" => $j['qty'],
+                    "no_dokumen" => $salesOrder['sales_order_export_no'],
+                ];
 
-            if ($stock['tipe_barang'] == "kemasan") {
-                $barang2_id = $stock['kemasan_id'];
-            } else {
-                $barang2_id = $stock['barang2_id'];
-            }
-
-            $stok = $this->stockModel->insertStok(
-                $stuffingInternasional['company_id'],
-                $j['warehouse_id'],
-                $j['divisi_id'],
-                $stock['tipe_barang'],
-                $stock['barang1_id'],
-                $barang2_id,
-                ($qty * -1)
-            );
-
-            // DETAIL
-            $stokDetail = $this->stockDetailModel->insertStokDetail(
-                $stok,
-                $qty,
-                "Out",
-                date('Y-m-d'),
-                $this->this_user_id,
-                "PENJUALAN",
-                $salesOrder['sales_order_export_no'],
-                $j['no_dokumen_1'],
-                "-"
-            );
-
-            // SUB DETAIL
-            $this->stockDetail2Model->insertStokDetail2(
-                $j['bc_id_warehouse'],
-                $j['stock_id_warehouse'],
-                $stokDetail,
-                $qty,
-                $j['no_aju_warehouse'],
-                $stuffingInternasional['no_stuffing'],
-                $j['stock_dokumen']
-            );
+                // Panggil model - jika gagal akan throw exception
+                $result = $stockRevampModel->outStockRevamp($db, $data);
+                
+                if (!$result) {
+                    throw new \Exception("Gagal memproses stock untuk detail ID: {$j['stock_out_detail_id']}");
+                }
         }
 
         $this->stuffingInternasionalModel->update($id, ['status_posting' => '1']);
-
+        $db->transCommit();
         return response()->setJSON([
             'status' => true,
             'message' => "Pengeluaran Internasional berhasil diposting",
@@ -424,17 +396,28 @@ class Internasional extends BaseController
 
     public function dropdownListOrder()
     {
-        $data = $this->salesOrderDetailModel
-            ->select('sales_order_detail_export.*, barang_master_sales.id AS id_barang, barang_master_sales.barang_name AS nama_barang, barang_master_sales.kode_barang AS kode_barang')
-            ->join('barang_master_sales', 'barang_master_sales.id = sales_order_detail_export.barang_id')
-            ->where('sales_order_detail_export.sales_order_export_id', $this->request->getVar('sales_order_id'))
-            ->where('sales_order_detail_export.deletedAt', null)
-            ->findAll();
+        // $data = $this->salesOrderDetailModel
+        //     ->select('sales_order_detail_export.*, barang_master_sales.id AS id_barang, barang_master_sales.barang_name AS nama_barang, barang_master_sales.kode_barang AS kode_barang')
+        //     ->join('barang_master_sales', 'barang_master_sales.id = sales_order_detail_export.barang_id')
+        //     ->where('sales_order_detail_export.sales_order_export_id', $this->request->getVar('sales_order_id'))
+        //     ->where('sales_order_detail_export.deletedAt', null)
+        //     ->findAll();
+
+        $dataSalesExport = $this->salesOrderModel
+            ->where('sales_order_export.sales_order_export_id', $this->request->getVar('sales_order_id'))
+            ->first();
+        $dataSalesExportDetail =  $this->salesOrderModel
+            ->getDetailSalesKontrakInOrderForm(
+                $dataSalesExport['sales_contract_id'],
+                $this->request->getVar('sales_order_id')
+            );
+
+        $dataSalesExportSpecs = $this->salesOrderModel->getSalesOrderSpecs($this->request->getVar('sales_order_id'));
 
         return response()->setJSON([
             'token' => csrf_hash(),
             'status' => true,
-            'data' => $data
+            'data' => $dataSalesExportDetail,
         ]);
     }
 
@@ -578,4 +561,54 @@ class Internasional extends BaseController
         }
         return;
     }
+
+
+
+    public function getListStockByStockID()
+    {
+        $stockRevampDetailModel = new StockRevampDetailModel();
+
+        if (!empty($this->request->getVar('stock_id'))) {
+
+            $condition = [
+                'stock_revamp.id' => $this->request->getVar('stock_id'),
+            ];
+
+            $dataResult = $stockRevampDetailModel->getStockListWithAddConditionForStuffing(
+                $condition,
+            );
+
+            
+            $resultArr = array();
+
+            $metaDataModel = new MetadataModel();
+
+            for ($i = 0; $i < count($dataResult); $i++) {
+                            $bcType = $metaDataModel->find($dataResult[$i]['bc_id']);
+                            $dataResult[$i]['type_barang'] = ucwords(str_replace('_', ' ', $dataResult[$i]['type_barang']));
+                            $dataResult[$i]['po_no'] = $dataResult[$i]['po_no'];
+                            $dataResult[$i]['bc_type'] = $bcType == null ? "NON PABEAN" : $bcType['value'];
+                            $dataResult[$i]['satuan'] = $dataResult[$i]['kode_satuan'];
+                            $dataResult[$i]['barang'] = strtoupper($dataResult[$i]['barang']);
+                            $dataResult[$i]['stock_date'] = $dataResult == null ? "-" : date('d/m/Y', strtotime($dataResult[$i]['po_date']));
+                            $dataResult[$i]['stock_id'] = $dataResult[$i]['stock_id'];
+                            $dataResult[$i]['stok_total_bersih']          = round((float)$dataResult[$i]['stok_total_bersih'], 2);
+                            $dataResult[$i]['stok_total_diterima'] = round((float)$dataResult[$i]['stok_total_diterima'], 2);
+                            $dataResult[$i]['total_penerimaan']    = round((float)$dataResult[$i]['total_penerimaan'], 2);
+                            $dataResult[$i]['stok_total_kotor']    = round((float)$dataResult[$i]['stok_total_diterima'] - (float)$dataResult[$i]['stok_total_bersih'], 2);
+
+
+                            array_push($resultArr, $dataResult[$i]);
+                            
+            }
+
+
+            return response()->setJSON([
+                'data' => $resultArr,
+                'token' => csrf_hash(),
+                'status' => true
+            ]);
+        }
+    }
+
 }
