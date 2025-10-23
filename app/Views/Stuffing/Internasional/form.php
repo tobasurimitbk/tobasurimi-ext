@@ -130,21 +130,26 @@
                     </div>
                 </div>
                 <div class="row">
-
                     <div class="table-responsive">
-                        <table class="table table-bordered nowrap table-hover-tobasurimi dataTableSalesOrder" id="dataTableSalesOrder" width="100%" cellspacing="0">
+                         <table class="table table-bordered nowrap table-hover-tobasurimi dataTable" id="dataTableBarang" width="100%" cellspacing="0">
                             <thead class="thead-dark">
                                 <tr>
-                                    <th style="width: 10px;">#</th>
-                                    <th>Kode Barang</th>
-                                    <th>Nama Barang</th>
-                                    <th>Qty</th>
-                                    <th>Action</th>
+                                    <th>#</th>
+                                    <th>No</th>
+                                    <th>Item Code</th>
+                                    <th>Barang Sales</th>
+                                    <th>Grade</th>
+                                    <th>Case</th>
+                                    <th>Brand</th>
+                                    <th>Packing</th>
+                                    <th>Qty Order</th>
+                                    <th>Unit</th>
+                                    <th style="min-width: 100px;">Qty Konversi</th>
                                 </tr>
                             </thead>
-                            <tbody class="body-detail-table" id="body-detail-table" style="cursor: pointer;">
+                            <tbody id="body-detail-table-barang">
                             </tbody>
-                        </table>
+                        </table>                                   
                     </div>
                 </div>
                 <div class="row mt-3">
@@ -242,9 +247,9 @@
                                 <thead class="thead-dark">
                                     <tr>
                                         <th style="text-align: center; width:10px">#</th>
-                                        <th style="text-align: center;">Tipe Barang</th>
+                                        <!-- <th style="text-align: center;">Tipe Barang</th> -->
                                         <th style="text-align: center;">Dokumen Pabean</th>
-                                        <th style="text-align: center;">No Aju / No Daftar</th>
+                                        <!-- <th style="text-align: center;">No Aju / No Daftar</th> -->
                                         <th style="text-align: center;">Tanggal Penerimaan</th>
                                         <th style="text-align: center;">Barang - Spesifikasi</th>
                                         <th style="text-align: center;">Satuan</th>
@@ -272,7 +277,7 @@
                                     <th style="text-align: center; width:10px">#</th>
                                     <th style="text-align: center;">Tipe Barang</th>
                                     <th style="text-align: center;">Dokumen Pabean</th>
-                                    <th style="text-align: center;">No Aju / No Daftar</th>
+                                    <!-- <th style="text-align: center;">No Aju / No Daftar</th> -->
                                     <th style="text-align: center;">Tanggal Penerimaan</th>
                                     <th style="text-align: center;">Barang - Spesifikasi</th>
                                     <th style="text-align: center;">Satuan</th>
@@ -510,14 +515,10 @@
                 no_aju: "<?= $m['no_aju'] ?>",
                 stock_id: "<?= $m['stock_id'] ?>",
                 stok_total: "<?= $m['stok_total'] ?>",
-                stock_dokumen: "<?= $m['stock_dokumen'] ?>",
-                no_dokumen_1: "<?= $m['no_dokumen_1'] ?>",
-                no_dokumen_2: "<?= $m['no_dokumen_2'] ?>",
                 bc_type: "<?= $m['bc_type'] ?>",
                 satuan: "<?= $m['satuan'] ?>",
                 barang: "<?= $m['barang'] ?>",
                 type_barang: "<?= $m['type_barang'] ?>",
-                type_barang_text: "<?= $m['type_barang_text'] ?>",
                 stock_date: "<?= $m['stock_date'] ?>",
                 qty: "<?= $m['qty'] ?>",
                 divisi_id: "<?= $m['divisi_id'] ?>",
@@ -861,25 +862,25 @@
         return id_selected;
     }
 
-    function definisiQtyInput() {
-        $.each(listStockSelected, function(i, v) {
-            var element = $('input[data-id="' + v.id + '"].stok-out');
-            var input_user = parseFloat(element.val());
-            var stok_max = parseFloat(element.data('stok_total'));
+    // function definisiQtyInput() {
+    //     $.each(listStockSelected, function(i, v) {
+    //         var element = $('input[data-id="' + v.id + '"].stok-out');
+    //         var input_user = parseFloat(element.val());
+    //         var stok_max = parseFloat(element.data('stok_total'));
 
-            if (input_user > stok_max && input_user > listStockSelected[i].output.qty) {
-                listStockSelected[i].qty = stok_max;
-            } else if (input_user > stok_max && input_user < listStockSelected[i].output.qty) {
-                listStockSelected[i].qty = stok_max;
-            } else if (input_user < stok_max && input_user > listStockSelected[i].output.qty) {
-                listStockSelected[i].qty = listStockSelected[i].output.qty;
-            } else if (input_user < stok_max && input_user < listStockSelected[i].output.qty) {
-                listStockSelected[i].qty = input_user;
-            } else {
-                listStockSelected[i].qty = input_user;
-            }
-        });
-    }
+    //         if (input_user > stok_max && input_user > listStockSelected[i].output.qty) {
+    //             listStockSelected[i].qty = stok_max;
+    //         } else if (input_user > stok_max && input_user < listStockSelected[i].output.qty) {
+    //             listStockSelected[i].qty = stok_max;
+    //         } else if (input_user < stok_max && input_user > listStockSelected[i].output.qty) {
+    //             listStockSelected[i].qty = listStockSelected[i].output.qty;
+    //         } else if (input_user < stok_max && input_user < listStockSelected[i].output.qty) {
+    //             listStockSelected[i].qty = input_user;
+    //         } else {
+    //             listStockSelected[i].qty = input_user;
+    //         }
+    //     });
+    // }
 
     function getListWarehouse() {
         $.ajax({
@@ -996,7 +997,7 @@
         var typePengambilanStok = $('#type_pengambilan_stock option:selected').val();
         $.each(data, function(i, v) {
             var newRow = $('<tr>');
-            if (typePengambilanStok == "FIFO" || parseFloat(v.stok_total) == 0) {
+            if (typePengambilanStok == "FIFO" || parseFloat(v.stok_total_diterima) == 0) {
                 newRow.append($('<td style="text-align: center;">').html(
                     `
                 `
@@ -1005,19 +1006,19 @@
                 newRow.append($('<td style="text-align: center;">').html(
                     `
                     <div class="form-check">
-                        <input data-id="${v.id}" data-stok_total="${v.stok_total}" autocomplete="one-time-code" class="form-check-input child" type="checkbox">
+                        <input data-id="${v.id}" data-stok_total="${v.stok_total_diterima}" autocomplete="one-time-code" class="form-check-input child" type="checkbox">
                     </div>
                 `
                 ));
             }
 
-            newRow.append($('<td style="text-align: center;">').text(v.type_barang_text));
+            // newRow.append($('<td style="text-align: center;">').text(v.type_barang_text));
             newRow.append($('<td style="text-align: center;">').text(v.bc_type));
-            newRow.append($('<td style="text-align: center;">').text(v.no_aju));
+            // newRow.append($('<td style="text-align: center;">').text(v.no_aju));
             newRow.append($('<td style="text-align: center;">').text(v.stock_date));
             newRow.append($('<td style="text-align: center;">').text(v.barang));
             newRow.append($('<td style="text-align: center;">').text(v.satuan));
-            newRow.append($('<td style="text-align: center;">').text(v.stok_total));
+            newRow.append($('<td style="text-align: center;">').text(v.stok_total_diterima));
             table.find('tbody').append(newRow);
         });
 
@@ -1062,7 +1063,6 @@
             var salesOrderExportDetailId = $(this).data("id");
             $('button[data-sales_order_export_detail_id="' + salesOrderExportDetailId + '"]').prop('disabled', true);
         });
-        // console.log(listStockAsal);
 
 
     });
@@ -1072,16 +1072,29 @@
         var dataIds = checkedCheckboxes.map(function() {
             return $(this).data("id");
         }).get();
+        // Get selected data after the rows are created
         var id_selected = getIDListDataSelected();
         var barangIn = $('#spesifikasi_in_id option:selected');
-
         var checkedCheckboxesorder = $(".childOrder:checked");
+
         var dataIdBarangOrder = checkedCheckboxesorder.map(function() {
             return $(this).data("id_barang");
         }).get().toString();
-        var dataQtyBarangOrder = checkedCheckboxesorder.map(function() {
-            return $(this).data("qty_barang");
+
+        console.log(dataIdBarangOrder)
+
+        // Get qty from input qty-konversi instead of data attribute
+        var dataQtyBarangKonversi = checkedCheckboxesorder.map(function() {
+            // Find the closest row and then find the qty-konversi input within that row
+            const row = $(this).closest('tr');
+            const qtyInput = row.find('.qty-konversi');
+            return qtyInput.val() || '0'; // Return 0 if empty
         }).get().toString();
+
+        var dataQtyBarangOrder = checkedCheckboxesorder.map(function() {
+            return $(this).data("qty_order");
+        }).get().toString();
+
         var dataNamaBarangOrder = checkedCheckboxesorder.map(function() {
             return $(this).data("nama_barang");
         }).get().toString();
@@ -1116,40 +1129,46 @@
                             }
 
                         });
-                        var isDuplicateOutput = listStockSelected.some(function(item) {
+                        // var isDuplicateOutput = listStockSelected.some(function(item) {
 
-                            // console.log(parseFloat(dataQtyBarangOrder));
-                            // console.log(parseFloat(getItemQty));
-
-                            return item.output.id_barang == dataIdBarangOrder && parseFloat(getItemQty) >= parseFloat(dataQtyBarangOrder);
-                        });
+                        //     return item.output.id_barang == dataIdBarangOrder && parseFloat(getItemQty) >= parseFloat(dataQtyBarangOrder);
+                        // });
 
                         // console.log(isDuplicateOutput);
 
-                        if (!isDuplicateOutput) {
+                      
+                        let qtyKonversi = 0;
+
+                        if (listStockAsal[i].type_barang  == "Bahan Penolong") {
+                            qtyKonversi = 0;
+                        } else {
+                            qtyKonversi = parseFloat(dataQtyBarangKonversi * dataQtyBarangOrder);
+                        }
+
+                        // if (!isDuplicateOutput) {
                             listStockAsal[i].stok_total = parseFloat(listStockAsal[i].stok_total);
                             listStockAsal[i].divisi_id = $('#divisi_id option:selected').val();
                             listStockAsal[i].warehouse_id = $('#warehouse_id option:selected').val();
                             listStockAsal[i].tipe_barang = $('#type_barang option:selected').val();
-                            listStockAsal[i].qty = 0;
+                            listStockAsal[i].qty = qtyKonversi;
                             listStockAsal[i].output = {
                                 id_barang: dataIdBarangOrder,
                                 barang: dataNamaBarangOrder,
-                                qty: parseFloat(dataQtyBarangOrder)
+                                qty: parseFloat(dataQtyBarangOrder),
                             }
                             listStockSelected.push(listStockAsal[i]);
 
                             // Disable the corresponding delete button
                             var salesOrderDetailId = checkedCheckboxesorder.data("sales_order_export_detail_id");
                             $(`[data-sales_order_export_detail_id="${salesOrderDetailId}"]`).prop('disabled', true);
-                        } else {
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Qty barang diorder sudah terpenuhi',
-                                confirmButtonColor: '#4e73df',
-                                confirmButtonText: 'Ok'
-                            });
-                        }
+                        // } else {
+                        //     Swal.fire({
+                        //         icon: 'error',
+                        //         title: 'Qty barang diorder sudah terpenuhi',
+                        //         confirmButtonColor: '#4e73df',
+                        //         confirmButtonText: 'Ok'
+                        //     });
+                        // }
                     }
                 }
             });
@@ -1188,7 +1207,7 @@
 
         var totalStokTotal = 0;
         $.each(listStockAsal, function(i, v) {
-            totalStokTotal += parseFloat(v.stok_total);
+            totalStokTotal += parseFloat(v.stok_total_diterima);
         });
 
         if (qtyMutasiFifo > totalStokTotal) {
@@ -1244,9 +1263,9 @@
                 return item.id == currentID;
             }).length > 0;
 
-            if (!isIDSelected && parseFloat(v.stok_total) > 0) {
-                var mutasiQty = Math.min(qtyMutasiFifo, parseFloat(v.stok_total));
-                v.stok_total = parseFloat(v.stok_total);
+            if (!isIDSelected && parseFloat(v.stok_total_diterima) > 0) {
+                var mutasiQty = Math.min(qtyMutasiFifo, parseFloat(v.stok_total_diterima));
+                v.stok_total_diterima = parseFloat(v.stok_total_diterima);
                 v.qty = 0;
                 v.qty_isi = 0;
                 v.divisi_id = divisi_id;
@@ -1275,37 +1294,85 @@
         drawTableSelectedItem(listStockSelected);
     }
 
-    function drawTableOrderBarang(data) {
-        const table = $('#dataTableSalesOrder').DataTable();
-        // Clear the existing rows
-        table.clear().draw();
+    function drawTableOrderBarang(listDataSalesKontrak) {
+        const table = $('#dataTableBarang');
+        const tbody = table.find('#body-detail-table-barang'); // tbody utama
+        const tfoot = table.find('#foot-detail-table-barang');
 
-        // Add new rows
-        data.forEach(function(v) {
-            var newRow = $('<tr>');
-            newRow.append($('<td style="text-align: center;">').html(`
-                <div class="form-check">
-                    <input data-id="${v.sales_order_export_detail_id}" data-kode_barang="${v.kode_barang}" data-nama_barang="${v.nama_barang}" data-qty_barang="${v.qty}" data-id_barang="${v.barang_id}" autocomplete="one-time-code" class="form-check-input childOrder" type="radio" name="selectedItem">
-                </div>
-            `));
-            newRow.append($('<td style="text-align: center;">').text(v.kode_barang));
-            newRow.append($('<td style="text-align: center;">').text(v.nama_barang));
-            newRow.append($('<td style="text-align: center;">').text(v.qty));
+        tbody.empty();
+        tfoot.empty();
 
-            if (v.tipe_input === 'stuffing') {
-                newRow.append($('<td style="text-align: center;">').html(`
-            <button type="button" data-sales_order_export_detail_id = "${v.sales_order_export_detail_id}" onclick="handleDelete('${v.sales_order_export_detail_id}')" class="btn btn-discard delete-btn btn-trash <?= !empty($stuffingInternasional) ? (($stuffingInternasional['status_posting'] == "1") ? 'disabled' : '') : '' ?>"">
-                <i class="fa fa-trash"></i>
-            </button>
-        `));
-            } else {
-                newRow.append($('<td style="text-align: center;">').html(''));
-            }
-            table.row.add(newRow).draw(false);
-        });
+        var row = '';
+        var no = 1;
+        var totalQty = 0;
+        var totalHarga = 0;
+        var totalTotalHarga = 0;
+
+        if (listDataSalesKontrak.length === 0) {
+            row += `
+            <tr>
+                <td colspan="9">Item List Empty</td>
+            </tr>
+        `;
+            $('#foot-detail-table-barang').append(row);
+        } else {
+
+            listDataSalesKontrak.salesContractDetailList.map((item, index) => {
+                // === Row Kedua: Breakdown Table ===
+                const detailRow = $('<tr class="bg-light">');
+
+
+              
+
+                item.size_breakdown.forEach(size => {
+
+                    if (size.cased == "0") {
+                        carton = size.qty
+                    } else {
+                        carton = size.cased
+                    }
+
+                    const newRow = $('<tr style="color:whitesmoke;">');
+                    newRow.append($('<td style="text-align: center;">').html(`
+                        <div class="form-check">
+                            <input data-id="${item.id}" data-qty_order="${carton}" data-kode_barang="${item.kode_barang}" data-nama_barang="${item.barang_name}" data-id_barang="${item.barang_id}" autocomplete="one-time-code" class="form-check-input childOrder" type="radio" name="selectedItem">
+                        </div>
+                    `));
+                    newRow.append(`<td style="text-align:center;">${no++}</td>`);
+                    newRow.append(`<td>${item.kode_barang}</td>`);
+                    newRow.append(`<td>${item.barang_name}</td>`);
+                    newRow.append(`<td>${size.grade}</td>`);
+                    newRow.append(`<td>${size.cased}</td>`);
+                    newRow.append(`<td>${item.brand}</td>`);
+                    newRow.append(`<td>${item.packing}</td>`);
+                    newRow.append(`<td>${size.qty}</td>`);
+                    newRow.append(`<td>${size.satuan_size_code}</td>`);
+                    newRow.append(`
+                        <td>
+                            <input type="text" class="form-control form-control-sm qty-konversi" 
+                                value="" 
+                                name="qty-konversi[]" />
+                        </td>
+                    `);
+                    tbody.append(newRow);
+                });
+            });
+
+        }
     }
 
+    function recalculateQtyTotal() {
+        let total = 0;
+        $('#dataTableSalesOrder .qty-input').each(function() {
+            const val = parseFloat($(this).val()) || 0;
+            total += val;
+        });
+        $('#total_qty').text(total.toFixed(2));
+    }
+
+
     function drawTableSelectedItem(data) {
+        console.log(data)
         if ($.fn.DataTable.isDataTable('#selectedItemTable')) {
             $('#selectedItemTable').DataTable().clear().draw();
             selectedItemTable.destroy();
@@ -1319,16 +1386,16 @@
                    ${no++} 
                 `
             ));
-            newRow.append($('<td style="text-align: center;">').text(v.type_barang_text));
+            newRow.append($('<td style="text-align: center;">').text(v.type_barang));
             newRow.append($('<td style="text-align: center;">').text(v.bc_type));
-            newRow.append($('<td style="text-align: center;">').text(v.no_aju));
+            // newRow.append($('<td style="text-align: center;">').text(v.no_aju));
             newRow.append($('<td style="text-align: center;">').text(v.stock_date));
             newRow.append($('<td style="text-align: center;">').text(v.barang));
             newRow.append($('<td style="text-align: center;">').text(v.satuan));
-            newRow.append($('<td style="text-align: center;">').text(v.stok_total));
+            newRow.append($('<td style="text-align: center;">').text(v.stok_total_diterima));
             newRow.append($('<td style="text-align: center;">').html(
                 `
-                    <input onchange="definisiQtyInput()" <?= !empty($stuffingInternasional) ? (($stuffingInternasional['status_posting'] == "1") ? 'disabled' : '') : '' ?> class="form-control stok-out" oninput="preventNegativeInput(this);updateOrder($(this));" autocomplete="one-time-code" data-id="${v.id}" data-index="${i}"  data-stok_total="${v.stok_total}" class="form-control" type="text" value="${v.qty}">
+                    <input  <?= !empty($stuffingInternasional) ? (($stuffingInternasional['status_posting'] == "1") ? 'disabled' : '') : '' ?> class="form-control stok-out" oninput="preventNegativeInput(this);updateOrder($(this));" autocomplete="one-time-code" data-id="${v.id}" data-index="${i}"  data-stok_total="${v.qty}" class="form-control" type="text" value="${v.qty}">
                 `
             ));
             newRow.append($('<td style="text-align: center;">').text(v.output.barang));
@@ -1385,15 +1452,30 @@
         $(`[data-sales_order_export_detail_id="${salesOrderDetailId}"]`).removeAttr('disabled');;
     }
 
+    // function updateOrder(input) {
+    //     var index = input.data('index');
+    //     var qtyInput = input.val() == "" ? 0.0 : parseFloat(input.val());
+    //     var item = listStockSelected[index];
+    //     var maxQty = parseFloat(item.stok_total);
+    //     var maxOutputQty = parseFloat(item.output.qty);
+    //     var qty = Math.min(maxQty, qtyInput, maxOutputQty);
+    //     input.val(qty);
+    // }
+
     function updateOrder(input) {
         var index = input.data('index');
         var qtyInput = input.val() == "" ? 0.0 : parseFloat(input.val());
-        var item = listStockSelected[index];
-        var maxQty = parseFloat(item.stok_total);
-        var maxOutputQty = parseFloat(item.output.qty);
-        var qty = Math.min(maxQty, qtyInput, maxOutputQty);
-        input.val(qty);
+
+        // Pastikan object-nya ada
+        if (!listStockSelected[index]) return;
+
+        // Update langsung ke qty_konversi
+        listStockSelected[index].qty = qtyInput;
+
+        // Optional: update tampilan input biar tetap sinkron
+        input.val(qtyInput);
     }
+
 
     function preventNegativeInput(inputElement) {
         var inputValue = inputElement.value;
