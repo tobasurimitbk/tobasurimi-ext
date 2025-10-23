@@ -387,11 +387,13 @@ class OtherPayment extends BaseController
         $otherPaymentModel = new otherPaymentModel();
         $jenis = $this->request->getGet('jenisPembayaran');
         $divisi = str_replace(' ', '', trim($this->request->getGet('divisiId')));
+        $divisiId = $this->request->getGet('divisiIdInt');
         $bank = str_replace(' ', '', trim($this->request->getGet('bankId')));
         $metodePembayaran = $this->request->getGet('metodePembayaran');
         $tanggalPembayaran = $this->request->getGet('tanggalPembayaran');
         $noTransaksi = $this->request->getGet('noTransaksi');
         $id = decrypt($this->request->getGet('id'));
+        $parentData = $this->otherPaymentModel->where('id', $id)->first();
 
         $paymentNo = $otherPaymentModel->get_new_no(
             $id,
@@ -404,7 +406,9 @@ class OtherPayment extends BaseController
             getLastDay(),
             $this->this_company_id,
             $tanggalPembayaran,
-            $noTransaksi
+            $divisiId ?? null,
+            $parentData['no_pembayaram'] ?? null,
+            $parentData['divisi_id'] ?? null,
         );
 
         return response()->setJSON([

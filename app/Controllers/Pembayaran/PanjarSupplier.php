@@ -873,10 +873,12 @@ class PanjarSupplier extends BaseController
         $jenis = $this->request->getGet('jenisPembayaran');
         $metodePembayaran = $this->request->getGet('paymentMethod');
         $divisi = str_replace(' ', '', trim($this->request->getGet('divisiId')));
+        $divisiId = $this->request->getGet('divisiIdInt');
         $bank = str_replace(' ', '', trim($this->request->getGet('bankId')));
         $tanggalPembayaran = $this->request->getGet('tanggalPembayaran');
         $noTransaksi = $this->request->getGet('noTransaksi');
         $id = decrypt($this->request->getGet('id'));
+        $panjarPinjaman = $this->panjarPinjamanTransactionModel->where('id',$id)->first();
 
         $paymentNo = $panjarPinjamanSupplierModel->get_new_no(
             $id,
@@ -889,7 +891,9 @@ class PanjarSupplier extends BaseController
             getLastDay(),
             $this->this_company_id,
             $tanggalPembayaran,
-            $noTransaksi,
+            $divisiId ?? null,
+            $panjarPinjaman['no_transaction'] ?? null,
+            $panjarPinjaman['divisi_id'] ?? null,
         );
 
         return response()->setJSON([

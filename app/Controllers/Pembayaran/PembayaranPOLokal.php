@@ -207,6 +207,7 @@ class PembayaranPOLokal extends BaseController
         try {
             $localPOPaymentDetailModel = new LocalPOPaymentDetailModel();
             $localPOPaymentBPModel = new LocalPOPaymentBPModel();
+            $tandaTerimaFakturModel = new TandaTerimaFakturModel();
 
             // Validasi input
             if (!$this->request->getVar('id') || !$this->request->getVar('pembayaranList')) {
@@ -214,7 +215,7 @@ class PembayaranPOLokal extends BaseController
             }
 
             $id = decrypt($this->request->getVar('id'));
-            $pembayaranList = json_decode($this->request->getVar('pembayaranList'), true);
+            $pembayaranList = json_decode($this->request->getVar('pembayaranList'));
 
             // Validasi JSON
             if (json_last_error() !== JSON_ERROR_NONE) {
@@ -248,17 +249,13 @@ class PembayaranPOLokal extends BaseController
                 'divisi_id' => $this->request->getVar('divisi_id'),
                 'bank_id' => $this->request->getVar('bank_id'),
                 'supplier_id' => $this->request->getVar('supplier_id'),
-                'tanda_terima_faktur_id' => $this->request->getVar('tanda_terima_faktur_id'),
                 'jenis_pembayaran' => $this->request->getVar('jenis_pembayaran'),
-                'amount' => $this->request->getVar('nominal_pembayaran'),
+                'amount' => $this->request->getVar('total_pembayaran'),
                 'payment_method' => $this->request->getVar('payment_method'),
                 'keterangan' => $this->request->getVar('keterangan'),
                 'supplier' => $this->request->getVar('supplier'),
                 'akun_kas' => $this->request->getVar('akun_kas'),
                 'akun_selisih' => $this->request->getVar('akun_selisih'),
-                'akun_pajak' => $this->request->getVar('akun_pajak'),
-                'amount' => $this->request->getVar('nominal_pembayaran'),
-                'amount_pajak' => $this->request->getVar('nominal_pembayaran_pajak'),
                 'supplier' => $this->request->getVar('supplier'),
                 'status_posting' => '0',
                 'pembayaran_oleh'   => $this->request->getVar('pembayaran_oleh'),
@@ -273,23 +270,25 @@ class PembayaranPOLokal extends BaseController
             $localPOPaymentDetailModel->where('local_po_payment_id', $id)->delete();
 
             // Insert detail pembayaran baru
-            foreach ($pembayaranList as $item) {
-                if (!isset($item['penerimaan_barang_detail_id']) || !isset($item['price'])) {
-                    continue; // Skip data tidak valid
-                }
+            foreach ($pembayaranList as $l) {
+                $localPOPaymentDetailModel->insert([
+                    "local_po_payment_id"    => $id,
+                    "tanda_terima_faktur_id" => $l->id,
+                    "tipe"                   => "BP",
+                    "total"                  => repairDouble($l->nominal_pembayaran)
+                ]);
 
-                $price = repairDouble($item['price']);
-                if ($price > 0) {
-                    $insertData = [
-                        "local_po_payment_id" => $id,
-                        "penerimaan_barang_detail_id" => intval($item['penerimaan_barang_detail_id']),
-                        "total" => $price,
-                        "tipe" => "BP",
-                    ];
+                $current = $tandaTerimaFakturModel->select('total_paid')->where('id', $l->id)->first();
+        
+                if (!$current) continue; // skip kalau gak ketemu
 
-                    if (!$localPOPaymentDetailModel->insert($insertData)) {
-                        throw new \Exception("Gagal menyimpan detail pembayaran");
-                    }
+                $totalPaidLama = repairDouble($current['total_paid']) ?? 0;
+                $totalBaru = $totalPaidLama + repairDouble($l->nominal_pembayaran);
+
+                if ($totalBaru != $totalPaidLama) {
+                    $tandaTerimaFakturModel->update($l->id, [
+                        'total_paid' => $totalBaru
+                    ]);
                 }
             }
 
@@ -866,7 +865,7 @@ class PembayaranPOLokal extends BaseController
             ->findAll();
 
         $id = decrypt($id);
-        $paymentDetail = $localPOPaymentBPModel->find($id);
+        $paymentDetail = $localPOPaymentBPModel->where('id', $id)->first();
 
         if ($paymentDetail == null) {
             return redirect()->to('pembayaran-po-lokal-bp');
@@ -1553,10 +1552,12 @@ class PembayaranPOLokal extends BaseController
         $jenis = $this->request->getGet('jenisPembayaran');
         $metodePembayaran = $this->request->getGet('paymentMethod');
         $divisi = str_replace(' ', '', trim($this->request->getGet('divisiId')));
+        $divisiId = $this->request->getGet('divisiIdInt');
         $bank = str_replace(' ', '', trim($this->request->getGet('bankId')));
         $tanggalPembayaran = $this->request->getGet('tanggalPembayaran');
         $noTransaksi = $this->request->getGet('noTransaksi');
         $id = decrypt($this->request->getGet('id'));
+        $payData = $localPOPaymentModel->where('id', $id)->first();
         
 
         $paymentNo = $localPOPaymentModel->get_new_no(
@@ -1570,7 +1571,9 @@ class PembayaranPOLokal extends BaseController
             getLastDay(),
             $this->this_company_id,
             $tanggalPembayaran,
-            $noTransaksi
+            $divisiId ?? null,
+            $payData['payment_no'] ?? null,
+            $payData['divisi_id'] ?? null,
         );
 
         return response()->setJSON([
@@ -1618,10 +1621,12 @@ class PembayaranPOLokal extends BaseController
         $jenis = $this->request->getvar('jenisPembayaran');
         $paymentMethod = $this->request->getvar('paymentMethod');
         $divisi = str_replace(' ', '', trim($this->request->getvar('divisiId')));
+        $divisiId = $this->request->getGet('divisiIdInt');
         $bank = str_replace(' ', '', trim($this->request->getvar('bankId')));
         $tanggalPembayaran = $this->request->getGet('tanggalPembayaran');
         $noTransaksi = $this->request->getGet('noTransaksi');
         $id = decrypt($this->request->getGet('id'));
+        $payData = $localPOPaymentBPModel->where('id', $id)->first();
 
         $paymentNo = $localPOPaymentBPModel->get_new_no(
             $id,
@@ -1634,7 +1639,9 @@ class PembayaranPOLokal extends BaseController
             getLastDay(),
             $this->this_company_id,
             $tanggalPembayaran,
-            $noTransaksi
+            $divisiId ?? null,
+            $payData['payment_no'] ?? null,
+            $payData['divisi_id'] ?? null,
         );
 
         return response()->setJSON([

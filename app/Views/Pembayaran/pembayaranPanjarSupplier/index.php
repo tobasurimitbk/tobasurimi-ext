@@ -825,7 +825,7 @@
         let currentValue = $(element).val(); // pakai .val() konsisten
 
         // Jika field 'jenis' berubah, kita MAU selalau generate (karena user ingin mengganti prefix)
-        if (currentField === 'jenis') {
+        if (currentField === 'jenis' || currentField === 'divisi_id') {
             // generate dengan paksa karena jenis harus mengubah prefix meskipun balik ke nilai awal
             generatePaymentNumber(true);
             return;
@@ -860,13 +860,14 @@
         let jenisPembayaran = $("#jenis option:selected").text();
         let divisiId = $("#divisi_id option:selected").text();
         let paymentMethod = $("#payment_method option:selected").text();
+        let divisiIdInt = $("#divisi_id option:selected").val();
         let bankId = $("#bank_id option:selected").val();
         let tanggalPembayaran = $("#tanggal_pembayaran").val();
         let noTransaksi = $("#no_transaksi").val();
         const csrf = $(`[name="${csrfToken}"]`);
         
         let url = "<?= base_url('panjar-supplier/generate-no-panjar'); ?>";
-        url += `?jenisPembayaran=${encodeURIComponent(jenisPembayaran)}&divisiId=${encodeURIComponent(divisiId)}&paymentMethod=${encodeURIComponent(paymentMethod)}&bankId=${encodeURIComponent(bankId)}&tanggalPembayaran=${encodeURIComponent(tanggalPembayaran)}&id=${encodeURIComponent(id)}&noTransaksi=${encodeURIComponent(noTransaksi)}`;
+        url += `?jenisPembayaran=${encodeURIComponent(jenisPembayaran)}&divisiId=${encodeURIComponent(divisiId)}&paymentMethod=${encodeURIComponent(paymentMethod)}&bankId=${encodeURIComponent(bankId)}&tanggalPembayaran=${encodeURIComponent(tanggalPembayaran)}&id=${encodeURIComponent(id)}&noTransaksi=${encodeURIComponent(noTransaksi)}&divisiIdInt=${encodeURIComponent(divisiIdInt)}`;
 
         $("#no_transaksi").attr("readonly", true);
 

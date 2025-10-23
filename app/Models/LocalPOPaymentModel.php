@@ -1677,7 +1677,9 @@ class LocalPOPaymentModel extends Model
         $last_day,
         $companyID,
         $tanggalPembayaran,
-        $currentNumber = null
+        $divisiId,
+        $currentNumber = null,
+        $originalDivisi = null
     ) {
         $banksModel = new BanksModel();
 
@@ -1737,61 +1739,67 @@ class LocalPOPaymentModel extends Model
         // 4. Jika edit mode DAN hanya ganti jenis merah/putih
         if (!empty($id) && (empty($bank_id) || $bank_id === 'undefined')) {
             // Cek currentNumber dikirim dan valid
-            if (!empty($currentNumber)) {
-                $parts = explode('/', $currentNumber);
-                if (count($parts) >= 4) {
-                    $oldPrefix = $parts[0]; // contoh: CNK
-                    $tahun = $parts[1];
-                    $bulan = $parts[2];
-                    $lastNumber = $parts[3];
 
-                    // 🔍 Tentukan prefix baru berdasarkan jenis
-                    $newPrefix = strtoupper($paymentMethod) === 'CASH'
-                        ? $kodeDivisi
-                        : ($kodeBank ?: $kodeDivisi);
+            // if (strtoupper($divisi) === strtoupper($originalDivisi)) {
 
-                    // Jika prefix lama beda dengan yang seharusnya (karena ganti jenis), pakai prefix baru
-                    $finalPrefix = ($oldPrefix !== $newPrefix) ? $newPrefix : $oldPrefix;
+                if ($divisiId == $originalDivisi) {
 
-                    return "{$finalPrefix}/{$tahun}/{$bulan}/{$lastNumber}";
-                }
-            }
+                    if (!empty($currentNumber)) {
+                        $parts = explode('/', $currentNumber);
+                        if (count($parts) >= 4) {
+                            $oldPrefix = $parts[0]; // contoh: CNK
+                            $tahun =  $parts[1];
+                            $bulan = $parts[2];
+                            $lastNumber = $parts[3];
 
-            // 2️⃣ Kalau tidak dikirim, ambil dari DB
-            $tablesToCheckForId = [
-                'other_payment' => 'no_pembayaran',
-                'local_po_payments' => 'payment_no',
-                'local_po_payment_bp' => 'payment_no',
-                'panjar_pinjaman_transaction' => 'no_transaction',
-                'pembayaran_invoice' => 'no_pembayaran',
-            ];
+                            // 🔍 Tentukan prefix baru berdasarkan jenis
+                            $newPrefix = strtoupper($paymentMethod) === 'CASH'
+                                ? $kodeDivisi
+                                : ($kodeBank ?: $kodeDivisi);
 
-            foreach ($tablesToCheckForId as $table => $numberColumn) {
-                try {
-                    $fields = $db->getFieldNames($table);
-                } catch (\Exception $e) {
-                    continue;
-                }
-                if (!in_array('id', $fields) || !in_array($numberColumn, $fields)) continue;
+                            // Jika prefix lama beda dengan yang seharusnya (karena ganti jenis), pakai prefix baru
+                            $finalPrefix = ($oldPrefix !== $newPrefix) ? $newPrefix : $oldPrefix;
 
-                $row = $db->table($table)->select($numberColumn)->where('id', $id)->get()->getRowArray();
-                if ($row && !empty($row[$numberColumn])) {
-                    $parts = explode('/', $row[$numberColumn]);
-                    if (count($parts) >= 4) {
-                        $oldPrefix = $parts[0];
-                        $tahun = $parts[1];
-                        $bulan = $parts[2];
-                        $lastNumber = $parts[3];
+                            return "{$finalPrefix}/{$tahun}/{$bulan}/{$lastNumber}";
+                        }
+                    }
+              
+                    $tablesToCheckForId = [
+                        'other_payment' => 'no_pembayaran',
+                        'local_po_payments' => 'payment_no',
+                        'local_po_payment_bp' => 'payment_no',
+                        'panjar_pinjaman_transaction' => 'no_transaction',
+                        'pembayaran_invoice' => 'no_pembayaran',
+                    ];
 
-                        $newPrefix = strtoupper($paymentMethod) === 'CASH'
-                            ? $kodeDivisi
-                            : ($kodeBank ?: $kodeDivisi);
-                        $finalPrefix = ($oldPrefix !== $newPrefix) ? $newPrefix : $oldPrefix;
+                    foreach ($tablesToCheckForId as $table => $numberColumn) {
+                        try {
+                            $fields = $db->getFieldNames($table);
+                        } catch (\Exception $e) {
+                            continue;
+                        }
+                        if (!in_array('id', $fields) || !in_array($numberColumn, $fields)) continue;
 
-                        return "{$finalPrefix}/{$tahun}/{$bulan}/{$lastNumber}";
+                        $row = $db->table($table)->select($numberColumn)->where('id', $id)->get()->getRowArray();
+                        if ($row && !empty($row[$numberColumn])) {
+                            $parts = explode('/', $row[$numberColumn]);
+                            if (count($parts) >= 4) {
+                                $oldPrefix = $parts[0];
+                                $tahun = $parts[1];
+                                $bulan = $parts[2];
+                                $lastNumber = $parts[3];
+
+                                $newPrefix = strtoupper($paymentMethod) === 'CASH'
+                                    ? $kodeDivisi
+                                    : ($kodeBank ?: $kodeDivisi);
+                                $finalPrefix = ($oldPrefix !== $newPrefix) ? $newPrefix : $oldPrefix;
+
+                                return "{$finalPrefix}/{$tahun}/{$bulan}/{$lastNumber}";
+                            }
+                        }
                     }
                 }
-            }
+           
         }
 
         // Search patterns — cek dua-duanya (FRM & FRK misalnya)

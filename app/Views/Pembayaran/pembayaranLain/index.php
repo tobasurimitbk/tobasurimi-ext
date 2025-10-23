@@ -48,7 +48,7 @@
                                 <div class="col-md-6">
                                     <div class="form-floating form-pembayaran-po mb-3" style="height: 50px;">
                                         <select class="form-select" name="bank_id" id="bank_id">
-                                                <option selected disabled value="">Pilih Bank</option>
+                                                <option selected disabled value=""></option>
                                             <?php foreach ($bankList as $b) : ?>
                                                 <option value="<?= $b['id'] ?>"><?= strtoupper($b['kode_bank']) ?></option>
                                             <?php endforeach ?>
@@ -59,7 +59,7 @@
                                 <div class="col-md-6">
                                     <div class="form-floating mb-3" style="height: 50px;">
                                         <select class="form-select" name="jenis_pembayaran" id="jenis_pembayaran" required>
-                                            <option selected disabled value="">Pilih Bank</option>
+                                            <option selected disabled value=""></option>
                                             <option value="PUTIH">PUTIH</option>
                                             <option value="MERAH">MERAH</option>
                                         </select>
@@ -1104,7 +1104,7 @@
             }
 
              // Jika field 'jenis' berubah, kita MAU selalau generate (karena user ingin mengganti prefix)
-            if (currentField === 'jenis') {
+            if (currentField === 'jenis_pembayaran' || currentField === 'divisi_id') {
                 // generate dengan paksa karena jenis harus mengubah prefix meskipun balik ke nilai awal
                 generatePaymentNumber(true);
                 return;
@@ -1611,13 +1611,14 @@
         let jenisPembayaran = $("#jenis_pembayaran option:selected").text();
         let metodePembayaran = $("#metode_pembayaran option:selected").val();
         let divisiId = $("#divisi_id option:selected").text();
+        let divisiIdInt = $("#divisi_id option:selected").val();
         let bankId = $("#bank_id option:selected").val();
         let tanggalPembayaran = $("#tanggal_pembayaran").val();
         let noTransaksi = $("#no_pembayaran").val();
         const csrf = $(`[name="${csrfToken}"]`);
 
         let url = "<?= base_url('pembayaran-lain/generate-no-pembayaran'); ?>";
-        url += `?jenisPembayaran=${encodeURIComponent(jenisPembayaran)}&divisiId=${encodeURIComponent(divisiId)}&metodePembayaran=${encodeURIComponent(metodePembayaran)}&bankId=${encodeURIComponent(bankId)}&tanggalPembayaran=${encodeURIComponent(tanggalPembayaran)}&id=${encodeURIComponent(id)}&noTransaksi=${encodeURIComponent(noTransaksi)}`;
+        url += `?jenisPembayaran=${encodeURIComponent(jenisPembayaran)}&divisiId=${encodeURIComponent(divisiId)}&metodePembayaran=${encodeURIComponent(metodePembayaran)}&bankId=${encodeURIComponent(bankId)}&tanggalPembayaran=${encodeURIComponent(tanggalPembayaran)}&id=${encodeURIComponent(id)}&noTransaksi=${encodeURIComponent(noTransaksi)}&divisiIdInt=${encodeURIComponent(divisiIdInt)}`;
 
         $(".no_pembayaran").attr("readonly", true);
 

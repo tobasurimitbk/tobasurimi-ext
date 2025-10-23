@@ -783,6 +783,7 @@
             let noTransaksi = $("#no_bukti_pembayaran").val();
             let jenisPembayaran = "MERAH";
             let divisiId = $("#divisi_id option:selected").text();
+            let divisiIdInt = $("#divisi_id option:selected").val();
             let bankId = $("#bank_id option:selected").val();
             let paymentMethod = $("#payment_method option:selected").val();
             let tanggalPembayaran = $("#payment_date").val();
@@ -793,7 +794,7 @@
 
                 // Build URL with query parameters
                 let url = "<?= base_url('pembayaran-po-lokal-bb/generate-no-pembayaran'); ?>";
-                url += `?jenisPembayaran=${encodeURIComponent(jenisPembayaran)}&paymentMethod=${encodeURIComponent(paymentMethod)}&divisiId=${encodeURIComponent(divisiId)}&bankId=${encodeURIComponent(bankId)}&tanggalPembayaran=${encodeURIComponent(tanggalPembayaran)}&id=${encodeURIComponent(id)}&noTransaksi=${encodeURIComponent(noTransaksi)}`;
+                url += `?jenisPembayaran=${encodeURIComponent(jenisPembayaran)}&paymentMethod=${encodeURIComponent(paymentMethod)}&divisiId=${encodeURIComponent(divisiId)}&bankId=${encodeURIComponent(bankId)}&tanggalPembayaran=${encodeURIComponent(tanggalPembayaran)}&id=${encodeURIComponent(id)}&noTransaksi=${encodeURIComponent(noTransaksi)}&divisiIdInt=${encodeURIComponent(divisiIdInt)}`;
 
                 // Additional data if needed
                 var formData = new FormData();
@@ -900,14 +901,20 @@
         });
     }
 
+
+
+    // ✅ FIX: Gunakan local variable dengan scope yang jelas
     function getDataSalesLokal() {
-        const selectedIds = $("#no_dokumen").val(); // Ambil nilai array dari dropdown
-        dataList = [];
+        const selectedIds = $("#no_dokumen").val();
+        
+        // ✅ FIX: Clear data sebelumnya dan gunakan local variable
+        const localDataList = [];
+        
         $.ajax({
             url: "<?= base_url('pembayaran-invoice/get-barang-sales-lokal'); ?>",
             method: "GET",
             data: {
-                id: JSON.stringify(selectedIds), // Kirim sebagai string JSON
+                id: JSON.stringify(selectedIds),
                 pembayaran_invoice_id: "<?= !empty($detail) ? encrypt($detail['id']) : '' ?>"
             },
             dataType: "json",
@@ -915,7 +922,7 @@
                 if (res.status && res.data.length > 0) {
                     if (res.isImport) {
                         res.data.forEach((data) => {
-                            dataList.push({
+                            localDataList.push({
                                 id: getID(),
                                 qty_invoice: data.qty_invoice || "-",
                                 document_type: data.document_type || "-",
@@ -934,7 +941,7 @@
                         });
                     } else {
                         res.data.forEach((data) => {
-                            dataList.push({
+                            localDataList.push({
                                 id: getID(),
                                 qty_invoice: data.qty_invoice,
                                 harga_barang_invoice: data.harga_barang_invoice,
@@ -958,8 +965,8 @@
                 const totalPembayaran = parseFloat(res.totalPembayaran) || 0;
                 const totalSudahDiBayar = parseFloat(res.totalSudahDiBayar) || 0;
 
-                // Refresh tabel dengan data terbaru
-                drawTable(dataList, totalPembayaran, totalSudahDiBayar);
+                // ✅ FIX: Pass local variable instead of global
+                drawTable(localDataList, totalPembayaran, totalSudahDiBayar);
             },
             error: function(xhr, status, error) {
                 console.error("Error:", error);
@@ -967,14 +974,20 @@
         });
     }
 
-    
+    // ✅ FIX: Improved drawTable function
     function drawTable(dataList, totalPembayaran = 0, totalSudahDiBayar = 0) {
         const table = $('#dataTable');
-        table.find('tbody').empty();
-
+        
+        // ✅ FIX: Clear existing content and event handlers
+        table.find('tbody').empty().off('keyup');
+        
         let globalIndex = 0;
-        let totaTagihan = 0;
+        let totalTagihan = 0;
 
+        // ✅ FIX: Calculate total tagihan dengan benar
+        dataList.forEach(item => {
+            totalTagihan += destroyFormatRupiah(item.amount_invoice || 0);
+        });
 
         // Group data berdasarkan faktur dan nama barang
         const groupedData = dataList.reduce((acc, item) => {
@@ -984,16 +997,12 @@
             return acc;
         }, {});
 
-
-        Object.keys(groupedData).forEach(key => {
-            const group = groupedData[key];
-            let isFirstRow = true;
-
-            group.forEach(item => {
-                const total = destroyFormatRupiah(item.amount_invoice || 0);
-                totaTagihan = total;
-            })
-        })
+        // ✅ FIX: Gunakan event delegation untuk menghindari duplicate handlers
+        table.on('keyup', '.sisa-bayar', function() {
+            const value = destroyFormatRupiah($(this).val());
+            $(this).val(greatFormatRupiah(value));
+            updateTotalSummary();
+        });
 
         Object.keys(groupedData).forEach(key => {
             const group = groupedData[key];
@@ -1056,17 +1065,10 @@
                     name: 'sisa_bayar[]',
                     id: 'sisa_bayar_' + globalIndex,
                     class: 'form-control text-end sisa-bayar',
-                    value: greatFormatRupiah(sisa),
-                    onkeyup: "updateKeterangan('" + totaTagihan + "')" // ✅ panggil fungsi updateKeterangan 
-                });
-
-                sisaInput.on('keyup', function () {
-                    this.value = greatFormatRupiah(this.value);
-                    updateTotalSummary();
+                    value: greatFormatRupiah(sisa)
                 });
 
                 newRow.append($('<td style="text-align:center;">').append(sisaInput));
-
                 table.find('tbody').append(newRow);
                 globalIndex++;
             });
@@ -1075,6 +1077,20 @@
         addSummaryRows(table);
         updateTotalSummary();
     }
+
+    // ✅ FIX: Tambahkan fungsi cleanup sebelum memanggil ulang
+    function refreshData() {
+        // Clear global variable jika ada
+        if (typeof dataList !== 'undefined') {
+            dataList = [];
+        }
+        
+        // Clear event handlers
+        $('#dataTable').off('keyup', '.sisa-bayar');
+        
+        getDataSalesLokal();
+    }
+
 
     // Tambahkan summary total di bawah
     function addSummaryRows(table) {

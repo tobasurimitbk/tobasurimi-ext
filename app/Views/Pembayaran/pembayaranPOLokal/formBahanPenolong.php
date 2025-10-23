@@ -267,9 +267,70 @@
                         id: $('#id').val()
                     },
                     dataType: "json",
-                    success: function(res) {
-                        listPembayaran = res.data;
-                    }
+                    success: function (res) {
+                listPembayaran = res.data;
+                const table = $('#dataTable');
+                const tbody = table.find('tbody');
+                tbody.empty();
+
+                if (!res.data || res.data.length === 0) {
+                    tbody.html('<tr><td colspan="10" style="color: whitesmoke;">Tidak Ada Pembayaran</td></tr>');
+                    return;
+                }
+
+                let no = 1;
+                let grandTotalTagihan = 0;
+
+                $.each(res.data, function (i, v) {
+                    const tanggal = v.invoice_date.split('-');
+                    const tglFormat = `${tanggal[2]}/${tanggal[1]}/${tanggal[0]}`;
+                    const totalTagihan = Number(v.sisa_bayar);
+                    grandTotalTagihan += totalTagihan;
+
+                    const row = $('<tr>');
+                    row.append($('<td>').text(no++));
+                    row.append($('<td>').text(tglFormat));
+                    row.append($('<td>').text(v.faktur_no));
+                    row.append($('<td>').text(v.list_lpb));
+                    row.append($('<td>').text(greatFormatRupiah(v.potongan)));
+                    row.append($('<td>').text(greatFormatRupiah(v.tambahan)));
+                    row.append($('<td>').text(greatFormatRupiah(v.nominal_faktur)));
+                    row.append($('<td>').text(greatFormatRupiah(v.total_paid)));
+
+                    // Kolom input pembayaran
+                    const inputCell = $('<td>').html(`
+                        <input type="text"
+                            class="form-control form-control-sm text-end nominal_pembayaran"
+                            style="font-weight:bold;"
+                            onkeyup="this.value = greatFormatRupiah(this.value)"
+                            oninput="limitInputBayar(this, ${totalTagihan})"
+                            value="${greatFormatRupiah(totalTagihan)}"
+                            data-id="${v.id}">
+                    `);
+                    row.append(inputCell);
+
+                    tbody.append(row);
+                });
+
+                // Footer total
+                const footerRow = $('<tr class="table-dark text-end">');
+                footerRow.append($('<td></td>'));
+                footerRow.append($('<td colspan="7"><b>GRAND TOTAL</b></td>'));
+                footerRow.append($(`
+                    <td>
+                        <input type="text"
+                            id="total_pembayaran"
+                            name="total_pembayaran"
+                            class="form-control form-control-sm text-end fw-bold"
+                            value="${greatFormatRupiah(grandTotalTagihan)}"
+                            readonly>
+                    </td>
+                `));
+                tbody.append(footerRow);
+
+
+                generateKeteranganPembayaran(res.data);
+            }
                 });
             });
         }
@@ -498,7 +559,31 @@
                     }).then((result) => {
                         if (result.isConfirmed) {
                             let formData = new FormData(document.querySelector(".create-form"));
+
+                            // ambil semua nominal dari tabel langsung
+                            let totalPembayaran = 0;
+
+                            $('.nominal_pembayaran').each(function () {
+                                const id = $(this).data('id');
+                                const nominalFormatted = $(this).val();
+                                const nominal = destroyFormatRupiah(nominalFormatted) || 0;
+
+                                // cari item yang id-nya sama
+                                const item = listPembayaran.find(i => i.id == id);
+                                if (item) {
+                                    item.nominal_pembayaran = nominal;
+                                }
+
+                                totalPembayaran += item.nominal_pembayaran;
+                            });
+
+                            // masukin total ke input form (kalau punya)
+                            $('#total_pembayaran').val(greatFormatRupiah(totalPembayaran));
+
+                            // tambahkan ke FormData
                             formData.append("pembayaranList", JSON.stringify(listPembayaran));
+                            formData.append("total_pembayaran", totalPembayaran);
+                            
                             $.ajax({
 
                                 url: "<?= base_url("/pembayaran-po-lokal-bp/update"); ?>",
@@ -1020,6 +1105,7 @@
         formData.append("noTransaksi", $("#no_bukti_pembayaran").val());
         formData.append("bankId", $("#bank_id option:selected").val());
         formData.append("divisiId", $("#divisi_id option:selected").text());
+        formData.append("divisiIdInt", $("#divisi_id option:selected").val());
         formData.append("jenisPembayaran", $("#jenis_pembayaran option:selected").text());
         formData.append("paymentMethod", $("#payment_method option:selected").text());
         formData.append("tanggalPembayaran", $("#payment_date").val());
