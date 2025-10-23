@@ -8,6 +8,7 @@ use App\Helpers\BeaCukaiApi;
 use App\Models\AMPurchaseOrderDetailModel;
 use App\Models\AMPurchaseOrderModel;
 use App\Models\BarangMasterModel;
+use App\Models\BC23Model;
 use App\Models\BC40Model;
 use App\Models\BCBarangDokumenModel;
 use App\Models\BCBarangModel;
@@ -85,7 +86,7 @@ class BC40 extends BaseController
     protected $divisiModel;
     protected $bcPurchaseOrderLPBModel;
     protected $penerimaanBarangLokalBp;
-
+    protected $bc23Model;
 
     public function __construct()
     {
@@ -120,6 +121,7 @@ class BC40 extends BaseController
         $this->divisiModel = new DivisisModel();
         $this->bcPurchaseOrderLPBModel = new BCPurchaseOrderLPBModel();
         $this->penerimaanBarangLokalBp = new PenerimaanBarangLokalBP();
+        $this->bc23Model = new BC23Model();
 
         $this->this_user_id = session()->get("login")->user_id;
         $this->this_company_id = session()->get("login")->this_company_id;
@@ -267,11 +269,14 @@ class BC40 extends BaseController
         }
 
         $tanggalDokumen = formatDMYtoYMD($this->request->getVar('tanggal_dokumen'));
+        // Update Nomor Aju
+        $poType = $this->request->getVar('po_type');
+
 
         $id = $this->bcPurchaseOrderModel->insert([
             'supplier_id' => $this->request->getVar('supplier_id'),
             'company_id' => $this->this_company_id,
-            'po_type' => $this->request->getVar('po_type'),
+            'po_type' => $poType,
             'multiple_po_id' => str_replace(['\\"', '\\', '"'], '', json_encode($poIdArr)),
             'multiple_lpb_id' => str_replace(['\\"', '\\', '"'], '', json_encode($lpbIdArr)),
             'multiple_po_no' => str_replace(['\\"', '\\'], '', json_encode($poNoArr)),
@@ -288,12 +293,21 @@ class BC40 extends BaseController
             ]);
         }
 
-        // Update Nomor Aju
-        $noAju = $this->generateNomorAju($tanggalDokumen);
-        $this->bc40Model->insert([
-            'bc_purchase_order_id' => $id,
-            'no_aju' => $noAju
-        ]);
+        if ($poType == "LOKAL BAKU" || $poType == "LOKAL PENOLONG") {
+            $noAju = $this->generateNomorAju($tanggalDokumen);
+
+            $this->bc40Model->insert([
+                'bc_purchase_order_id' => $id,
+                'no_aju' => $noAju
+            ]);
+        } else {
+            $noAju = $this->generateNomorAjuBc23($tanggalDokumen);
+
+            $this->bc23Model->insert([
+                'bc_purchase_order_id' => $id,
+                'no_aju' => $noAju
+            ]);
+        }
 
         return response()->setJSON([
             'status' => true,
@@ -1974,6 +1988,11 @@ class BC40 extends BaseController
 
     public function generateNomorAju($tanggalDokumen)
     {
+        if ($this->this_company_id == 1 || $this->this_company_id == 2) {
+            $company_id_arr = [1, 2];
+        } else {
+            $company_id_arr = [$this->this_company_id];
+        }
         $ceisaSetting = $this->ceisaSettingModel
             ->where('company_id', $this->this_company_id)
             ->first();
@@ -1991,7 +2010,11 @@ class BC40 extends BaseController
 
         // Ambil BC40 terakhir berdasarkan urutan no_aju terbaru
         $bc40Last = $this->bc40Model
-            ->orderBy('createdAt', "DESC")
+            ->select('bc_40.*')
+            ->join('bc_purchase_order', 'bc_purchase_order.id = bc_40.bc_purchase_order_id', 'left')
+            ->whereIn('bc_purchase_order.company_id', $company_id_arr)
+            ->whereIn('po_type', ["LOKAL BAKU", "LOKAL PENOLONG"])
+            ->orderBy('bc_40.createdAt', "DESC")
             ->limit(1)
             ->first();
 
@@ -2010,6 +2033,7 @@ class BC40 extends BaseController
                 if ($tahunTerakhir === $tahunAjuSekarang) {
                     // Masih tahun yang sama → lanjutkan nomor urut
                     $nextNomor = str_pad((int)$lastNomor + 1, strlen($lastNomor), '0', STR_PAD_LEFT);
+
                     $sequenceNoUrutPengajuan = $nextNomor;
                 } else {
                     // Tahun baru → reset ke 000001
@@ -2019,6 +2043,81 @@ class BC40 extends BaseController
         }
 
         return $kodeDokumenbc40Static['value']
+            . '-' . $kodeKantorStatic
+            . '-' . $tanggalAju
+            . '-' . $sequenceNoUrutPengajuan;
+    }
+
+    public function generateNomorAjuBc23($tanggalDokumen)
+    {
+        // ===============================
+        // 🔹 Tentukan company yang disatukan
+        // ===============================
+        if (in_array($this->this_company_id, [1, 2])) {
+            $company_id_arr = [1, 2];
+        } else {
+            $company_id_arr = [$this->this_company_id];
+        }
+
+        // ===============================
+        // 🔹 Ambil setting dan metadata
+        // ===============================
+        $ceisaSetting = $this->ceisaSettingModel
+            ->where('company_id', $this->this_company_id)
+            ->first();
+
+        $kodeDokumenBC23Static = $this->metaDataModel
+            ->where('name', "Kode BC23 Static")
+            ->first();
+
+        // ===============================
+        // 🔹 Tentukan variabel dasar
+        // ===============================
+        $kodeKantorStatic = $ceisaSetting['kode_kantor_pabean'] ?? 'XXXX';
+        $tanggalAju = date('Ymd', strtotime($tanggalDokumen));
+        $tahunAjuSekarang = date('Y', strtotime($tanggalDokumen));
+
+        // ===============================
+        // 🔹 Ambil data BC23 terakhir
+        // ===============================
+        $bc23Last = $this->bc23Model
+            ->select('bc_23.*')
+            ->join('bc_purchase_order', 'bc_purchase_order.id = bc_23.bc_purchase_order_id', 'left')
+            ->whereIn('bc_purchase_order.company_id', $company_id_arr)
+            ->whereIn('po_type', ["IMPORT BAKU", "IMPORT PENOLONG"])
+            ->orderBy('bc_23.createdAt', "DESC")
+            ->limit(1)
+            ->first();
+
+        // ===============================
+        // 🔹 Tentukan nomor urut baru
+        // ===============================
+        $sequenceNoUrutPengajuan = "000001"; // default jika kosong
+
+        if ($bc23Last && !empty($bc23Last['no_aju'])) {
+            $arrNo = explode('-', $bc23Last['no_aju']);
+
+            // Format seharusnya: KODE-KANTOR-YYYYMMDD-NOMOR
+            if (count($arrNo) === 4) {
+                $tanggalTerakhir = $arrNo[2];
+                $tahunTerakhir = substr($tanggalTerakhir, 0, 4);
+                $lastNomor = $arrNo[3];
+
+                if ($tahunTerakhir === $tahunAjuSekarang) {
+                    // Tahun sama → lanjut urutan
+                    $nextNomor = str_pad((int)$lastNomor + 1, strlen($lastNomor), '0', STR_PAD_LEFT);
+                    $sequenceNoUrutPengajuan = $nextNomor;
+                } else {
+                    // Tahun berbeda → reset
+                    $sequenceNoUrutPengajuan = "000001";
+                }
+            }
+        }
+
+        // ===============================
+        // 🔹 Return hasil akhir
+        // ===============================
+        return $kodeDokumenBC23Static['value']
             . '-' . $kodeKantorStatic
             . '-' . $tanggalAju
             . '-' . $sequenceNoUrutPengajuan;
