@@ -200,8 +200,22 @@ class Account extends BaseController
                     "no_kategori" => $this->request->getPost("kode_akun_kategori"),
                     "nama_kategori" => $this->request->getPost("nama_akun_kategori"),
                 ];
+                
+                $checkKodeAkun = $this->KategoriAkunsModel
+                ->where('no_kategori', $this->request->getPost("kode_akun_kategori"))
+                ->where('company_id', $this->this_company_id)
+                ->first();
 
-                //$response = curl_request("POST", "/kategoriAkun", $this->token, $payload);
+                if ($checkKodeAkun) {
+                    $data = [
+                        "status"    => false,
+                        "message"   => "Kode Kategori Sudah Digunakan",
+                        "payload"   => $values,
+                        'token'     => csrf_hash(),
+                    ];
+                    echo json_encode($data);
+                    return;
+                }
 
                 if ($this->KategoriAkunsModel->insert($values)) {
                     $data = [
@@ -587,6 +601,22 @@ class Account extends BaseController
                     "no_header" => $this->request->getPost("kode_akun_header"),
                     "nama_header" => $this->request->getPost("nama_akun_header"),
                 ];
+
+                $checkKodeAkun = $this->HeaderAkunsModel
+                ->where('no_header', $this->request->getPost("kode_akun_header"))
+                ->where('company_id', $this->this_company_id)
+                ->first();
+
+                if ($checkKodeAkun) {
+                    $data = [
+                        "status"    => false,
+                        "message"   => "Kode Header Sudah Digunakan",
+                        "payload"   => $values,
+                        'token'     => csrf_hash(),
+                    ];
+                    echo json_encode($data);
+                    return;
+                }
 
                 if ($this->HeaderAkunsModel->insert($values)) {
                     $data = [
@@ -990,6 +1020,22 @@ class Account extends BaseController
                     "nama_sub" => $this->request->getPost("nama_akun_sub"),
                     "status" => !empty($this->request->getPost("status_sub")) ? "Aktif" : "Void"
                 ];
+
+                $checkKodeAkun = $this->Sub_AkunsModel
+                ->where('no_sub', $this->request->getPost("kode_akun_sub"))
+                ->where('company_id', $this->this_company_id)
+                ->first();
+
+                if ($checkKodeAkun) {
+                    $data = [
+                        "status"    => false,
+                        "message"   => "Kode Akun Sudah Digunakan",
+                        "payload"   => $values,
+                        'token'     => csrf_hash(),
+                    ];
+                    echo json_encode($data);
+                    return;
+                }
 
                 if ($this->Sub_AkunsModel->insert($values)) {
                     $data = [
