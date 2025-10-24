@@ -133,6 +133,7 @@ class OtherPaymentModel extends Model
         $originalDivisi = null
     ) {
         $banksModel = new BanksModel();
+        $db = \Config\Database::connect();
 
         // Parse tanggalPembayaran
         $tanggalObj = new \DateTime(str_replace("/", "-", $tanggalPembayaran));
@@ -184,73 +185,64 @@ class OtherPaymentModel extends Model
         $displayPrefix = (strtoupper($paymentMethod) === 'CASH') ? $kodeDivisi : ($kodeBank ?: $kodeDivisi);
         $displayPrefix .= "/$targetYear/$targetMonth/";
 
-        $db = \Config\Database::connect();
-
-
         // 4. Jika edit mode DAN hanya ganti jenis merah/putih
         if (!empty($id) && (empty($bank_id) || $bank_id === 'undefined')) {
-            // Cek currentNumber dikirim dan valid
 
-            // if (strtoupper($divisi) === strtoupper($originalDivisi)) {
+            if ($divisiId == $originalDivisi) {
 
-                if ($divisiId == $originalDivisi) {
+                if (!empty($currentNumber)) {
+                    $parts = explode('/', $currentNumber);
+                    if (count($parts) >= 4) {
+                        $oldPrefix = $parts[0];
+                        $tahun = $parts[1];
+                        $bulan = $parts[2];
+                        $lastNumber = $parts[3];
 
-                    if (!empty($currentNumber)) {
-                        $parts = explode('/', $currentNumber);
+                        $newPrefix = strtoupper($paymentMethod) === 'CASH'
+                            ? $kodeDivisi
+                            : ($kodeBank ?: $kodeDivisi);
+
+                        $finalPrefix = ($oldPrefix !== $newPrefix) ? $newPrefix : $oldPrefix;
+
+                        return "{$finalPrefix}/{$tahun}/{$bulan}/{$lastNumber}";
+                    }
+                }
+
+                $tablesToCheckForId = [
+                    'other_payment' => 'no_pembayaran',
+                    'local_po_payments' => 'payment_no',
+                    'local_po_payment_bp' => 'payment_no',
+                    'panjar_pinjaman_transaction' => 'no_transaction',
+                    'pembayaran_invoice' => 'no_pembayaran',
+                ];
+
+                foreach ($tablesToCheckForId as $table => $numberColumn) {
+                    try {
+                        $fields = $db->getFieldNames($table);
+                    } catch (\Exception $e) {
+                        continue;
+                    }
+                    if (!in_array('id', $fields) || !in_array($numberColumn, $fields)) continue;
+
+                    $row = $db->table($table)->select($numberColumn)->where('id', $id)->get()->getRowArray();
+                    if ($row && !empty($row[$numberColumn])) {
+                        $parts = explode('/', $row[$numberColumn]);
                         if (count($parts) >= 4) {
-                            $oldPrefix = $parts[0]; // contoh: CNK
-                            $tahun =  $parts[1];
+                            $oldPrefix = $parts[0];
+                            $tahun = $parts[1];
                             $bulan = $parts[2];
                             $lastNumber = $parts[3];
 
-                            // 🔍 Tentukan prefix baru berdasarkan jenis
                             $newPrefix = strtoupper($paymentMethod) === 'CASH'
                                 ? $kodeDivisi
                                 : ($kodeBank ?: $kodeDivisi);
-
-                            // Jika prefix lama beda dengan yang seharusnya (karena ganti jenis), pakai prefix baru
                             $finalPrefix = ($oldPrefix !== $newPrefix) ? $newPrefix : $oldPrefix;
 
                             return "{$finalPrefix}/{$tahun}/{$bulan}/{$lastNumber}";
                         }
                     }
-              
-                    $tablesToCheckForId = [
-                        'other_payment' => 'no_pembayaran',
-                        'local_po_payments' => 'payment_no',
-                        'local_po_payment_bp' => 'payment_no',
-                        'panjar_pinjaman_transaction' => 'no_transaction',
-                        'pembayaran_invoice' => 'no_pembayaran',
-                    ];
-
-                    foreach ($tablesToCheckForId as $table => $numberColumn) {
-                        try {
-                            $fields = $db->getFieldNames($table);
-                        } catch (\Exception $e) {
-                            continue;
-                        }
-                        if (!in_array('id', $fields) || !in_array($numberColumn, $fields)) continue;
-
-                        $row = $db->table($table)->select($numberColumn)->where('id', $id)->get()->getRowArray();
-                        if ($row && !empty($row[$numberColumn])) {
-                            $parts = explode('/', $row[$numberColumn]);
-                            if (count($parts) >= 4) {
-                                $oldPrefix = $parts[0];
-                                $tahun = $parts[1];
-                                $bulan = $parts[2];
-                                $lastNumber = $parts[3];
-
-                                $newPrefix = strtoupper($paymentMethod) === 'CASH'
-                                    ? $kodeDivisi
-                                    : ($kodeBank ?: $kodeDivisi);
-                                $finalPrefix = ($oldPrefix !== $newPrefix) ? $newPrefix : $oldPrefix;
-
-                                return "{$finalPrefix}/{$tahun}/{$bulan}/{$lastNumber}";
-                            }
-                        }
-                    }
                 }
-           
+            }
         }
 
         // Search patterns — cek dua-duanya (FRM & FRK misalnya)
@@ -262,7 +254,6 @@ class OtherPaymentModel extends Model
             $searchPatterns[] = $displayPrefix;
         }
 
-       
         $tablesToCheck = [
             'other_payment' => ['no_pembayaran', 'tanggal', 'deletedAt'],
             'local_po_payments' => ['payment_no', 'payment_date', 'deletedAt'],
@@ -271,20 +262,18 @@ class OtherPaymentModel extends Model
             'pembayaran_invoice' => ['no_pembayaran', 'tanggal', 'deletedAt'],
         ];
 
-        $maxNumber = 0;
+        $existingNumbers = [];
 
         foreach ($tablesToCheck as $table => [$numberColumn, $dateColumn, $deleteColumn]) {
-            $builder = $db->table($table);
-
             foreach ($searchPatterns as $pattern) {
                 $cleanPattern = rtrim($pattern, '/');
 
-                $query = $builder->select("$numberColumn, COALESCE($dateColumn, createdAt) AS effective_date")
+                $query = $db->table($table)
+                    ->select("$numberColumn, COALESCE($dateColumn, createdAt) AS effective_date")
                     ->where("$numberColumn LIKE", $cleanPattern . '/%')
                     ->where("COALESCE($dateColumn, createdAt) >=", "$targetYear-$targetMonth-01 00:00:00")
                     ->where("COALESCE($dateColumn, createdAt) <=", "$targetYear-$targetMonth-$lastDayOfMonth 23:59:59");
 
-                $db = \Config\Database::connect();
                 $tableFields = $db->getFieldNames($table);
 
                 if (in_array('deletedAt', $tableFields)) {
@@ -304,19 +293,35 @@ class OtherPaymentModel extends Model
                     ->get()
                     ->getResultArray();
 
-                foreach ($results as $lastRecord) {
-                    $parts = explode('/', $lastRecord[$numberColumn]);
+                foreach ($results as $row) {
+                    $parts = explode('/', $row[$numberColumn]);
                     if (count($parts) >= 4) {
-                        $currentNumber = (int)end($parts);
-                        $maxNumber = max($maxNumber, $currentNumber);
+                        $existingNumbers[] = (int)end($parts);
                     }
                 }
             }
         }
 
-        $counterNext = str_pad($maxNumber + 1, 4, '0', STR_PAD_LEFT);
+        // ======= NEW LOGIC: cari nomor kosong (gap) =======
+        sort($existingNumbers);
+        $counterNext = null;
+
+        for ($i = 1; $i <= count($existingNumbers) + 1; $i++) {
+            if (!in_array($i, $existingNumbers)) {
+                $counterNext = str_pad($i, 4, '0', STR_PAD_LEFT);
+                break;
+            }
+        }
+
+        // Fallback kalau semua sudah berurutan
+        if (!$counterNext) {
+            $lastNumber = end($existingNumbers) ?: 0;
+            $counterNext = str_pad($lastNumber + 1, 4, '0', STR_PAD_LEFT);
+        }
+
         return $displayPrefix . $counterNext;
     }
+
 
 
 }
