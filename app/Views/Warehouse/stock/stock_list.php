@@ -3,9 +3,12 @@
 
 <section class="section">
     <div class="section-header">
-        <h1>Stock List</h1>
-        <div class="col-button-tambah-spp">
+        <h1>Stok List</h1>
 
+        <div class="col-button-tambah-spp">
+            <a class="btn btn-hide-form btn-discard float-right" href="<?= base_url("stock-list/create"); ?>">
+                Inisiasi Stok Awal
+            </a>
             <?php if (can('Inventori', 'Stok List', 'p')) : ?>
                 <button class="btn btn-discard btn-dropdown-export dropdown-toggle float-right" type="button" id="dropdownMenuButtonExport" data-bs-toggle="dropdown" aria-expanded="false" style="background-color: #FFA426 !important;color: white !important;border: 0px solid !important;">
                     Import / Export

@@ -233,6 +233,20 @@ class StokHistori extends BaseController
                 $limit,
                 $offset
             );
+        } elseif ($addCondition['sumber_barang'] == "INISIASI") {
+            $condition = [
+                "stock_revamp.company_id" => $this->this_company_id,
+                "stock_revamp_detail.deletedAt" => null,
+                "stock_revamp_log.deletedAt" => null,
+                "stock_revamp_detail.reference_type" => "INISIASI",
+            ];
+
+            $dataQry = $this->stockRevampLogModel->getListLogInisiasi(
+                $condition,
+                $addCondition,
+                $limit,
+                $offset
+            );
         }
 
         $dataResult = [];
@@ -248,7 +262,7 @@ class StokHistori extends BaseController
                 'divisi' => $d['divisi'],
                 'warehouse_name' => $d['warehouse_name'],
                 'type_bc' => $d['type_bc'],
-                'ref_no' => $d['ref_no'],
+                'ref_no' => $d['ref_no'] ?? "",
                 'po_no' => isset($d['po_no']) ? $d['po_no'] : "",
                 'tanggal_po' => isset($d['tanggal_po']) ? date('d/m/Y', strtotime($d['tanggal_po'])) : "",
                 'createdAt' => date('d/m/Y H:i:s', strtotime($d['createdAt'])),
