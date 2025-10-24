@@ -418,7 +418,7 @@ class AMPurchaseOrderModel extends Model
         // === FORMAT OCS ===
         // ======================
         if ((int)$companyId === 16) {
-            $counterLength = 3;
+            $counterLength = 4;
             $counterFirst = str_repeat('0', $counterLength - 1) . '1';
 
             $thnShort = substr($thn, -2);
