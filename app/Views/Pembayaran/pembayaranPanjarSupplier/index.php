@@ -97,7 +97,7 @@
                                 <div class="col-md-6">
                                     <div class="input-group input-group-password">
                                         <div class="form-floating mb-3" style="height: 50px;">
-                                            <input autocomplete="one-time-code" class="form-control input-picker tanggal_pembayaran" id="tanggal_pembayaran" name="tanggal_pembayaran" placeholder="Tanggal Jatuh Tempo">
+                                            <input autocomplete="one-time-code" class="form-control input-picker tanggal_pembayaran" id="tanggal_pembayaran" name="tanggal_pembayaran" placeholder="Tanggal Jatuh Tempo" required>
                                             <label for="floatingInput">Tanggal Pembayaran Parent</label>
                                         </div>
                                         <div class="input-group-prepend group-prepend-password align-items-center">
@@ -163,7 +163,7 @@
                                 <div class="col-md-6">
                                     <div class="input-group input-group-password">
                                         <div class="form-floating mb-3" style="height: 50px;">
-                                            <input autocomplete="one-time-code" class="form-control input-picker tanggal" id="tanggal" name="tanggal" placeholder="Tanggal Jatuh Tempo" required>
+                                            <input autocomplete="one-time-code" class="form-control input-picker tanggal" id="tanggal" name="tanggal" placeholder="Tanggal Jatuh Tempo">
                                             <label for="floatingInput">Tanggal Pembayaran</label>
                                         </div>
                                         <div class="input-group-prepend group-prepend-password align-items-center">
@@ -492,6 +492,9 @@
             },
             keterangan: {
                 required: true
+            },
+            tanggal_pembayaran: {
+                required: true
             }
         },
         messages: {
@@ -510,7 +513,7 @@
             keterangan: {
                 required: "Keterangan wajib dipilih"
             },
-            tanggal: {
+            tanggal_pembayarans: {
                 required: "Tanggal wajib dipilih"
             },
             divisi: {
