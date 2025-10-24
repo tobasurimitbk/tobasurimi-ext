@@ -966,7 +966,7 @@ $routes->get('/work-order/dropdown/divisi/(:segment)', 'Production\WorkOrder::dr
 $routes->get('/request-stock', 'Production\RequestStock::index', ['filter' => 'Auth']);
 $routes->get('/request-stock/all', 'Production\RequestStock::all', ['filter' => 'Auth']);
 $routes->post('/request-stock/all', 'Production\RequestStock::all', ['filter' => 'Auth']);
-$routes->post('/request-stock/update-approve', 'Production\RequestStock::approve', ['filter' => 'Auth']);
+$routes->post('/request-stock/update-approve', 'Production\RequestStock::approveNew', ['filter' => 'Auth']);
 $routes->post('/request-stock/update-approve-penolong', 'Production\RequestStock::approvePenolong', ['filter' => 'Auth']);
 $routes->get('/request-stock/details/(:segment)', 'Production\RequestStock::getById/$1', ['filter' => 'Auth']);
 $routes->get('/request-stock/data-detail-material', 'Production\MaterialRequest::allDetailMaterialRequest', ['filter' => 'Auth']);
@@ -988,7 +988,7 @@ $routes->get('/material-request/list-supplier', 'Production\MaterialRequest::get
 $routes->get('/material-request/list-stock-dokumen-bc', 'Production\MaterialRequest::getListStockByStockID', ['filter' => 'Auth']);
 $routes->get('/material-request/list-barang-stock-init-bahan-baku', 'Production\MaterialRequest::dropdownListBarangIsInit', ['filter' => 'Auth']);
 $routes->get('/material-request/warehouse', 'Purchase\POLokalBahanBaku::dropdownWarehouse', ['filter' => 'Auth']);
-$routes->get('/material-request/list-stock-dokumen-bc-bahan-baku', 'Production\MaterialRequest::getListStockMaterialRequestBahanBakuNew', ['filter' => 'Auth']);
+$routes->get('/material-request/list-stock-dokumen-bc-bahan-baku', 'Production\MaterialRequest::getListStockMaterialRequestBahanBakuNew2', ['filter' => 'Auth']);
 // Material Request Penolong
 $routes->get('/material-request-penolong', 'Production\MaterialRequestPenolong::index', ['filter' => 'Auth']);
 $routes->get('/material-request-penolong/generate-kode-request', 'Production\MaterialRequestPenolong::generateKodeRequest', ['filter' => 'Auth']);

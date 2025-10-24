@@ -519,7 +519,7 @@ class MaterialRequestDetailsModel extends Model
             $stockList['type_barang'] = $stock['tipe_barang'];
             $stockList['type_barang_text'] = strtoupper(str_replace('_', ' ', $stock['tipe_barang']));
             $stockList['stok_total'] = ($stockList['stok_total']);
-            $stockList['stock_date'] = $jasaVendorIn == null ? $stockDate : date('d/m/Y', strtotime($jasaVendorIn['tanggal']));
+            $stockList['stock_date'] = $jasaVendorIn == null ? $stockDate : date('d/m/Y', strtotime($m['stock_date']));
             $stockList['supplier_name'] = $jasaVendorIn == null ? $supplierName : $supplierName . ' / ' . $jasaVendorIn['nama_vendor'];
             $stockList['divisi_id'] = $m['divisi_id'];
             $stockList['divisi_tujuan_id'] = $m['divisi_tujuan_id'];
@@ -545,7 +545,7 @@ class MaterialRequestDetailsModel extends Model
         return $result;
     }
 
-    public function getMaterialRequestNotApprove($stockId, $bcId, $noAju, $stockDate, $stockDokumen)
+    public function getMaterialRequestNotApprove($stockId, $stockDetailId)
     {
         $selectQry = '
             SUM(material_request_details.qty) as qty
@@ -555,14 +555,10 @@ class MaterialRequestDetailsModel extends Model
             ->select($selectQry)
             ->join('material_requests', 'material_requests.id = material_request_details.material_request_id', 'left')
             ->where('material_request_details.stock_id', $stockId)
-            ->where('material_request_details.bc_id', $bcId)
-            ->where('material_request_details.no_aju', $noAju)
-            ->where('material_request_details.stock_date', $stockDate)
-            ->where('material_request_details.stock_dokumen', $stockDokumen)
+            ->where('material_request_details.stock_detail_id', $stockDetailId)
             ->where('material_request_details.deletedAt', null)
             ->where('material_requests.deletedAt', null)
             ->where('material_requests.is_approve', null)
-            ->where('material_requests.deletedAt', null)
             ->first();
 
         return $dataQry;

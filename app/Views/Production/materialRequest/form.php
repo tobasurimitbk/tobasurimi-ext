@@ -1933,6 +1933,9 @@
         table.find('tbody').empty();
         var no = 1;
 
+        console.log(data);
+
+
         $.each(data, function(i, v) {
             var newRow = $('<tr>');
             newRow.append($('<td style="text-align: center;">').html(`${no++}`));
