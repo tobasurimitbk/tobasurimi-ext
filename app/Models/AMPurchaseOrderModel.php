@@ -399,31 +399,83 @@ class AMPurchaseOrderModel extends Model
         return $generatedNo;
     }
 
-    public function get_new_no_po($bln, $thn, $last_day, $companyID)
+    public function get_new_no_po($tanggal, $companyId, $last_day)
     {
-        $head = "PO/LBP-" . $bln . $thn . '/';
+        // Pastikan tanggal valid
+        if (empty($tanggal) || !preg_match('/\d{4}-\d{2}-\d{2}/', $tanggal)) {
+            throw new \Exception("Format tanggal tidak valid. Gunakan yyyy-mm-dd");
+        }
+
+        $tanggalExplode = explode('-', $tanggal);
+        $thn = $tanggalExplode[0];
+        $bln = $tanggalExplode[1];
+
+        // Counter default (6 digit)
+        $counterLength = 6;
+        $counterFirst = str_repeat('0', $counterLength - 1) . '1';
+
+        // ======================
+        // === FORMAT OCS ===
+        // ======================
+        if ((int)$companyId === 16) {
+            $thnShort = substr($thn, -2);
+            $romanMonth = romanMonthNumber((int)$bln);
+            $head = "/P/{$romanMonth}/{$thnShort}";
+
+            // Cari PO terakhir dengan format OCS
+            $lastPO = $this->select('po_no')
+                ->like('po_no', $head, 'before') // cari dari awal string
+                ->where('am_purchase_orders.po_date >=', "{$thn}-{$bln}-01")
+                ->where('am_purchase_orders.po_date <=', $last_day)
+                ->where('am_purchase_orders.company_id', $companyId)
+                ->orderBy('po_no', 'DESC')
+                ->first();
+
+            if ($lastPO) {
+                try {
+                    // Format contoh: 0004/P/IX/25
+                    $parts = explode('/', $lastPO['po_no']);
+                    $poLastDigit = (int) preg_replace('/\D/', '', $parts[0]); // ambil angka di depan
+                    $newCounter = str_pad($poLastDigit + 1, $counterLength, '0', STR_PAD_LEFT);
+                } catch (\Throwable $e) {
+                    $newCounter = $counterFirst;
+                }
+            } else {
+                $newCounter = $counterFirst;
+            }
+
+            return "{$newCounter}{$head}";
+        }
+
+        // ======================
+        // === FORMAT NON-OCS ===
+        // ======================
+        $head = "PO/LBP-{$bln}{$thn}/";
+
         $lastPO = $this->select('po_no')
-            ->like('po_no', "PO/LBP-")
-            ->where('am_purchase_orders.createdAt >=', $thn . "-" . $bln . "-01" . " 00:00:00")
-            ->where('am_purchase_orders.createdAt <=', $last_day . " 23:59:59")
-            ->where('am_purchase_orders.company_id', $companyID)
-            ->orderBy('po_no', "DESC")
+            ->like('po_no', $head, 'after') // pastikan format prefix sesuai
+            ->where('am_purchase_orders.po_date >=', "{$thn}-{$bln}-01")
+            ->where('am_purchase_orders.po_date <=', $last_day)
+            ->where('am_purchase_orders.company_id', $companyId)
+            ->orderBy('po_no', 'DESC')
             ->first();
 
-        $counterFirst = '000001';
-        if ($lastPO == null) {
-            return $head . '' . $counterFirst;
-        } else {
+        if ($lastPO) {
             try {
-                $last = explode('/', $lastPO['po_no']);
-                $poLastDigit = $last[2];
-                $counterFirst = str_pad((int) $poLastDigit + 1, strlen($counterFirst), '0', STR_PAD_LEFT);
-                return $head . '' . $counterFirst;
-            } catch (Exception $e) {
-                return 'ERROR GENERATE NUMBER ' . date('Y-m-d');
+                // Format contoh: PO/LBP-102025/000023
+                $parts = explode('/', $lastPO['po_no']);
+                $poLastDigit = isset($parts[2]) ? (int)$parts[2] : 0;
+                $newCounter = str_pad($poLastDigit + 1, $counterLength, '0', STR_PAD_LEFT);
+            } catch (\Throwable $e) {
+                $newCounter = $counterFirst;
             }
+        } else {
+            $newCounter = $counterFirst;
         }
+
+        return "{$head}{$newCounter}";
     }
+
 
     public function get_new_no_po_import($bln, $thn, $last_day, $companyID)
     {

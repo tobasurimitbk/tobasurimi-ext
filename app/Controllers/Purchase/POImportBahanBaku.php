@@ -375,6 +375,7 @@ class POImportBahanBaku extends BaseController
                 ->where('rm_import_po_details.rm_import_po_id', $id)
                 ->where('spesifikasi_id', $b->spesifikasi_id)
                 ->where('barang_id', $b->barang_id)
+                ->where('note', trim($b->note))
                 ->first();
 
             if ($check != null) {
@@ -401,6 +402,7 @@ class POImportBahanBaku extends BaseController
                     ->where('rm_import_po_details.rm_import_po_id', $id)
                     ->where('spesifikasi_id', $b->spesifikasi_id)
                     ->where('barang_id', $b->barang_id)
+                    ->where('note', trim($b->note))
                     ->delete();
 
                 // INSERT NEW

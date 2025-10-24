@@ -233,12 +233,30 @@
     </div>
     <script>
         const isNumberKey = function(evt) {
-            var charCode = (evt.which) ? evt.which : event.keyCode;
-            if (charCode > 31 && (charCode < 48 || charCode > 57)) {
+            var charCode = (evt.which) ? evt.which : evt.keyCode;
+            var input = evt.target.value;
+
+            // Jika sudah ada titik dan user tekan titik lagi → tolak
+            if (charCode === 46 && input.includes('.')) {
                 return false;
             }
-            return true;
-        }
+
+            // Izinkan angka, titik, dan tombol kontrol
+            if (
+                (charCode >= 48 && charCode <= 57) || // angka
+                charCode === 46 || // titik
+                charCode === 8 || // backspace
+                charCode === 9 || // tab
+                charCode === 37 || // panah kiri
+                charCode === 39 || // panah kanan
+                charCode === 46 // delete
+            ) {
+                return true;
+            }
+
+            return false;
+        };
+
         //Function Set Spinner Button
         const setLoading = function() {
             // $(".delete-btn").attr("disabled", true)
