@@ -1065,7 +1065,8 @@
                     name: 'sisa_bayar[]',
                     id: 'sisa_bayar_' + globalIndex,
                     class: 'form-control text-end sisa-bayar',
-                    value: greatFormatRupiah(sisa)
+                    value: greatFormatRupiah(sisa),
+                    onkeyup: "updateKeterangan('" + totalTagihan + "')",
                 });
 
                 newRow.append($('<td style="text-align:center;">').append(sisaInput));

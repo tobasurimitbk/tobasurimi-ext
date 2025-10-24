@@ -148,6 +148,7 @@ class StockRevampLogModel extends Model
             'createdAt'     => 'stock_revamp_log.createdAt',
             'qty_diterima'  => 'stock_revamp_log.qty_diterima',
             'unit_id'       => 'stock_revamp.unit_id',
+            'keterangan'    => 'stock_revamp_log.keterangan'
 
         ];
 

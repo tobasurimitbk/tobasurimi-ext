@@ -254,7 +254,8 @@ class StokHistori extends BaseController
                 'createdAt' => date('d/m/Y H:i:s', strtotime($d['createdAt'])),
                 'qty' => (float)$d['qty_diterima'],
                 'status' => $d['status'],
-                'kode_satuan' => $d['kode_satuan']
+                'kode_satuan' => $d['kode_satuan'],
+                'keterangan' => $d['keterangan']
             ]);
         }
 

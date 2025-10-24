@@ -149,7 +149,7 @@ class StockRevampDetailModel extends Model
                 stock_revamp_detail.qty_bersih as stok_total_bersih,
                 stock_revamp_detail.qty_diterima as stok_total_diterima,
             ')
-         
+
             ->join('stock_revamp', 'stock_revamp.id = stock_revamp_detail.stock_id', 'left')
             ->join('rm_purchase_orders', 'rm_purchase_orders.id = stock_revamp_detail.po_id', 'left')
             ->join('suppliers', 'suppliers.id = rm_purchase_orders.supplier_id', 'left')
@@ -1069,5 +1069,40 @@ class StockRevampDetailModel extends Model
             ->groupBy('stock_revamp_detail.id')
             ->orderBy('stock_revamp_detail.createdAt', 'ASC')
             ->findAll();
+    }
+
+
+    public function getStockIdentity($id)
+    {
+        $selectQry = "
+            stock_revamp_detail.*,
+            barang_master.kode_barang,
+            barang_master.barang_name,
+            barang_master_spesifikasi.spesifikasi,
+            barang_master_spesifikasi.satuan_1,
+            barang_master_spesifikasi.satuan_2,
+            barang_master_spesifikasi.satuan_3,
+            barang_master_spesifikasi.konversi_satuan_2,
+            barang_master_spesifikasi.konversi_satuan_3,
+            barang_master.type_barang,
+            parent_barang.parent_name,
+            satuans.kode_satuan,
+            warehouses.warehouse_name,
+            divisis.divisi
+        ";
+
+        $dataResult = $this->asArray()
+            ->select($selectQry)
+            ->join('stock_revamp', 'stock_revamp.id = stock_revamp_detail.stock_id')
+            ->join('barang_master', 'barang_master.id = stock_revamp.barang_master_id', 'left')
+            ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = stock_revamp.spesifikasi_id', 'left')
+            ->join('parent_barang', 'parent_barang.id = barang_master.parent_type_id', 'left')
+            ->join('satuans', 'satuans.id = stock_revamp.unit_id', 'left')
+            ->join('warehouses', 'warehouses.id = stock_revamp.warehouse_id', 'left')
+            ->join('divisis', 'divisis.id = stock_revamp.divisi_id', 'left')
+            ->where('stock_revamp_detail.id', $id)
+            ->first();
+
+        return $dataResult;
     }
 }
