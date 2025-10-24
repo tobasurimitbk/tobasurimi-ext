@@ -19,6 +19,8 @@ use App\Models\StockModel;
 use App\Models\SupplierModel;
 use App\Controllers\Accounting\JurnalUmum\JurnalUmum;
 use App\Models\AccountBarangModel;
+use App\Models\StockRevampDetailModel;
+use App\Models\StockRevampModel;
 use Exception;
 
 class RequestStock extends BaseController
@@ -231,8 +233,6 @@ class RequestStock extends BaseController
             $data["ids"] = $ids;
         }
 
-
-
         return view('Production/requestStock/form', $data);
     }
 
@@ -311,14 +311,201 @@ class RequestStock extends BaseController
 
                 foreach ($materialRequestDetailData as $key => $value) {
 
-                    // $statusOUT = $this->accountBarangModel->checkAccountBarang($this->this_company_id, $value['divisi_id'], $value['barang1_id'], $value['barang2_id'], $value['keterangan']);
-                    // $statusIN = $this->accountBarangModel->checkAccountBarang($this->this_company_id, $value['divisi_tujuan_id'], $value['barang1_id'], $value['barang2_id'], $value['keterangan']);
+                    $statusOUT = $this->accountBarangModel->checkAccountBarang($this->this_company_id, $value['divisi_id'], $value['barang1_id'], $value['barang2_id'], $value['keterangan']);
+                    $statusIN = $this->accountBarangModel->checkAccountBarang($this->this_company_id, $value['divisi_tujuan_id'], $value['barang1_id'], $value['barang2_id'], $value['keterangan']);
 
 
                     // $statusOUT = $this->jurnalUmumController->TransaksiJurnalStockBarang($this->this_company_id, $value['divisi_id'], $value['barang1_id'], $value['barang2_id'], $value['barang_type'], $value['stock_dokumen'], 'OUT');
                     // $statusIN = $this->jurnalUmumController->TransaksiJurnalStockBarang($this->this_company_id, $value['divisi_tujuan_id'], $value['barang1_id'], $value['barang2_id'], $value['barang_type'], $value['stock_dokumen'], 'IN');
                     // var_dump($statusOUT, $statusIN);
                     // exit;
+
+                    if (!$statusOUT && !$statusIN) {
+                        $data = [
+                            "status"    => false,
+                            "message"   => "Barang belum memiliki Akun COA",
+                            'token'     => csrf_hash()
+                        ];
+                        echo json_encode($data);
+                        return;
+                    } else {
+                        $stok = $this->stockModel->insertStok(
+                            $materialRequestData['company_id'],
+                            $value['warehouse_id'],
+                            $value['divisi_id'],
+                            $value['barang_type'],
+                            $value['barang1_id'],
+                            $value['barang2_id'],
+                            ($value['qty2'] * -1)
+                        );
+
+                        // DETAIL
+                        $stokDetail = $this->stockDetailModel->insertStokDetail(
+                            $stok,
+                            $value['qty2'],
+                            "Out",
+                            date('Y-m-d'),
+                            $this->this_user_id,
+                            "PRODUKSI",
+                            $materialRequestData['req_no'],
+                            $value['note'] ? $value['note'] : "-"
+                        );
+
+                        // SUB DETAIL
+                        $this->stockDetail2Model->insertStokDetail2(
+                            $value['bc_id'],
+                            $value['stock_id'],
+                            $stokDetail,
+                            $value['qty2'],
+                            $value['no_aju'],
+                            $materialRequestData['req_no'],
+                            $value['stock_dokumen'],
+                            $value['supplier_id'],
+                            $value['harga_umum'],
+                            $value['harga_harian'],
+                            $value['harga_bulanan'],
+                        );
+
+                        // -----
+                        // BARANG IN KE INVENTORI
+                        $stokIn = $this->stockModel->insertStok(
+                            $materialRequestData['company_id'],
+                            $value['warehouse_tujuan_id'],
+                            $value['divisi_tujuan_id'],
+                            $value['barang_type'],
+                            $value['barang1_id'],
+                            $value['barang2_id'],
+                            $value['qty2']
+                        );
+
+                        $this->materialRequestDetailsModel->update($value['id'], [
+                            'stock_tujuan_id' => $stokIn
+                        ]);
+
+                        $checkStokDetailIn =  $this->stockModel->isDefinedStockSubDetail(
+                            $materialRequestData['company_id'],
+                            $value['warehouse_tujuan_id'],
+                            $value['divisi_tujuan_id'],
+                            $value['barang_type'],
+                            $value['barang1_id'],
+                            $value['barang2_id'],
+                            $value['bc_id'],
+                            $value['no_aju'],
+                            $stokIn
+                        );
+
+                        if ($checkStokDetailIn == null) {
+                            // INSERT STOK INISIASI
+                            $stokDetailIn = $this->stockDetailModel->insertStokDetail(
+                                $stokIn,
+                                0,
+                                "In",
+                                date('Y-m-d'),
+                                $this->this_user_id,
+                                "INISIASI",
+                                "-",
+                                "-"
+                            );
+                            $this->stockDetail2Model->insertStokDetail2(
+                                $value['bc_id'],
+                                $value['stock_id'],
+                                $stokDetailIn,
+                                0,
+                                $value['no_aju'],
+                                "-"
+                            );
+                        }
+
+                        $stockRebusDetailIn = $this->stockDetail2Model->getStockListDetail(
+                            $value['bc_id'],
+                            $value['stock_id'],
+                            $value['no_aju'],
+                            $value['stock_dokumen']
+                        );
+
+                        // DETAIL
+                        $stokDetailIn = $this->stockDetailModel->insertStokDetail(
+                            $stokIn,
+                            $value['qty2'],
+                            "In",
+                            date('Y-m-d'),
+                            $this->this_user_id,
+                            "PRODUKSI",
+                            $materialRequestData['req_no'],
+                            $value['note'] ? $value['note'] : "-"
+                        );
+
+                        // SUB DETAIL
+                        $this->stockDetail2Model->insertStokDetail2(
+                            $value['bc_id'],
+                            $stokIn,
+                            $stokDetailIn,
+                            $value['qty2'],
+                            $value['no_aju'],
+                            $materialRequestData['req_no'],
+                            $value['stock_dokumen'],
+                            $value['supplier_id'],
+                            $value['harga_umum'],
+                            $value['harga_harian'],
+                            $value['harga_bulanan'],
+                        );
+                        $this->materialRequestModel->update($id, $data);
+
+                        $this->workOrdersModel->update($materialRequestData['work_order_id'], [
+                            'is_posted' => 1
+                        ]);
+                    }
+                }
+                $data = [
+                    "status"    => true,
+                    "message"   => "Status Approve Berhasil Diperbaharui",
+                    'token'     => csrf_hash()
+                ];
+                echo json_encode($data);
+                // } else {
+                //     $data = [
+                //         "status"    => false,
+                //         "message"   => "Data Not Found",
+                //         'token'     => csrf_hash()
+                //     ];
+                //     echo json_encode($data);
+            }
+        } catch (Exception $e) {
+            $data = [
+                "status"     => false,
+                "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
+                'token' => csrf_hash()
+            ];
+            echo json_encode($data);
+        }
+
+        return;
+    }
+
+    public function approveNew()
+    {
+        $db = \Config\Database::connect();
+        $db->transBegin();
+        try {
+            $id = $this->request->getVar('id');
+            $id = decrypt($id);
+            $stockRevampModel = new StockRevampModel();
+            $stockRevampDetailModel = new StockRevampDetailModel();
+
+            $data = [
+                'is_approve' => $this->request->getVar('status_approve'),
+            ];
+
+            if (!empty($id)) {
+                $materialRequestData = $this->materialRequestModel->find($id);
+                $materialRequestDetailData = $this->materialRequestDetailsModel
+                    ->where('material_request_id', $id)
+                    ->findAll();
+
+                foreach ($materialRequestDetailData as $key => $value) {
+
+                    // $statusOUT = $this->accountBarangModel->checkAccountBarang($this->this_company_id, $value['divisi_id'], $value['barang1_id'], $value['barang2_id'], $value['keterangan']);
+                    // $statusIN = $this->accountBarangModel->checkAccountBarang($this->this_company_id, $value['divisi_tujuan_id'], $value['barang1_id'], $value['barang2_id'], $value['keterangan']);
 
                     // if (!$statusOUT && !$statusIN) {
                     //     $data = [
@@ -329,148 +516,88 @@ class RequestStock extends BaseController
                     //     echo json_encode($data);
                     //     return;
                     // } else {
-                    $stok = $this->stockModel->insertStok(
-                        $materialRequestData['company_id'],
-                        $value['warehouse_id'],
-                        $value['divisi_id'],
-                        $value['barang_type'],
-                        $value['barang1_id'],
-                        $value['barang2_id'],
-                        ($value['qty2'] * -1)
-                    );
+                    if ($value['stock_id'] && $value['stock_detail_id']) {
+                        $dataOut = [
+                            "stock_detail_id" => $value['stock_detail_id'],
+                            "qty_digunakan" => $value['qty'],
+                            "no_dokumen" => $materialRequestData['req_no']
+                        ];
+                        $getStockIdOld = $stockRevampDetailModel->find($value['stock_detail_id']);
 
-                    // DETAIL
-                    $stokDetail = $this->stockDetailModel->insertStokDetail(
-                        $stok,
-                        $value['qty2'],
-                        "Out",
-                        date('Y-m-d'),
-                        $this->this_user_id,
-                        "PRODUKSI",
-                        $materialRequestData['req_no'],
-                        $value['note'] ? $value['note'] : "-"
-                    );
+                        $result = $stockRevampModel->outStockRevamp($db, $dataOut);
+                        if ($result) {
+                            $stockData = $stockRevampModel->find($value['stock_id']);
+                            $dataIn = [
+                                "company_id"       => $this->this_company_id,
+                                "spesifikasi_id"   => $value["barang2_id"],
+                                "barang_master_id" => $value["barang1_id"],
+                                "unit_id"          => $stockData["unit_id"],
+                                "divisi_id"        => $value["divisi_tujuan_id"],
+                                "warehouse_id"     => $value["warehouse_tujuan_id"],
+                                "no_dokumen"       => $materialRequestData["req_no"],
+                                "bc_id"            => $value['bc_id'],
+                                "type_bc"          => $value['ref_no'] == null ? "NON PABEAN" : $value['ref_no'],
+                                "qty_diterima"     => $value['qty'],
+                                "qty_bersih"       => $value['qty'],
+                                "reference_id"     => $id,
+                                "po_type"          => "LOKAL BAKU",
+                                "reference_type"   => "MATERIAL REQUEST BAKU",
+                                "status"           => "IN"
+                            ];
 
-                    // SUB DETAIL
-                    $this->stockDetail2Model->insertStokDetail2(
-                        $value['bc_id'],
-                        $value['stock_id'],
-                        $stokDetail,
-                        $value['qty2'],
-                        $value['no_aju'],
-                        $materialRequestData['req_no'],
-                        $value['stock_dokumen'],
-                        $value['supplier_id'],
-                        $value['harga_umum'],
-                        $value['harga_harian'],
-                        $value['harga_bulanan'],
-                    );
+                            $stockDetailId = $stockRevampModel->insertStockRevamp($db, $dataIn);
+                            if ($stockDetailId) {
+                                $getStockIdNew = $stockRevampDetailModel->find($stockDetailId);
 
-                    // -----
-                    // BARANG IN KE INVENTORI
-                    $stokIn = $this->stockModel->insertStok(
-                        $materialRequestData['company_id'],
-                        $value['warehouse_tujuan_id'],
-                        $value['divisi_tujuan_id'],
-                        $value['barang_type'],
-                        $value['barang1_id'],
-                        $value['barang2_id'],
-                        $value['qty2']
-                    );
-
-                    $this->materialRequestDetailsModel->update($value['id'], [
-                        'stock_tujuan_id' => $stokIn
-                    ]);
-
-                    $checkStokDetailIn =  $this->stockModel->isDefinedStockSubDetail(
-                        $materialRequestData['company_id'],
-                        $value['warehouse_tujuan_id'],
-                        $value['divisi_tujuan_id'],
-                        $value['barang_type'],
-                        $value['barang1_id'],
-                        $value['barang2_id'],
-                        $value['bc_id'],
-                        $value['no_aju'],
-                        $stokIn
-                    );
-
-                    if ($checkStokDetailIn == null) {
-                        // INSERT STOK INISIASI
-                        $stokDetailIn = $this->stockDetailModel->insertStokDetail(
-                            $stokIn,
-                            0,
-                            "In",
-                            date('Y-m-d'),
-                            $this->this_user_id,
-                            "INISIASI",
-                            "-",
-                            "-"
-                        );
-                        $this->stockDetail2Model->insertStokDetail2(
-                            $value['bc_id'],
-                            $value['stock_id'],
-                            $stokDetailIn,
-                            0,
-                            $value['no_aju'],
-                            "-"
-                        );
+                                $this->materialRequestDetailsModel->update(
+                                    $value['id'],
+                                    [
+                                        'stock_tujuan_id' => $getStockIdNew['stock_id'],
+                                        'stock_detail_tujuan_id' => $stockDetailId
+                                    ]
+                                );
+                                $db->table('stock_revamp_history')->insert([
+                                    'stock_detail_asal'    => $value['stock_detail_id'],
+                                    'stock_detail_akhir'   => $stockDetailId,
+                                    'qty_bersih_asal'      => $getStockIdOld['qty_bersih'],
+                                    'qty_diterima_asal'    => $getStockIdOld['qty_diterima'],
+                                    'qty_bersih_akhir'     => $value['qty'], // hasil rumus
+                                    'qty_diterima_akhir'   => $value['qty'], // bisa disamakan kalau proporsional
+                                    'status'               => 'IN',
+                                    'createdAt'            => date('Y-m-d H:i:s'),
+                                    'updatedAt'            => date('Y-m-d H:i:s'),
+                                ]);
+                            }
+                        }
+                    } else {
+                        # code...
                     }
-
-                    $stockRebusDetailIn = $this->stockDetail2Model->getStockListDetail(
-                        $value['bc_id'],
-                        $value['stock_id'],
-                        $value['no_aju'],
-                        $value['stock_dokumen']
-                    );
-
-                    // DETAIL
-                    $stokDetailIn = $this->stockDetailModel->insertStokDetail(
-                        $stokIn,
-                        $value['qty2'],
-                        "In",
-                        date('Y-m-d'),
-                        $this->this_user_id,
-                        "PRODUKSI",
-                        $materialRequestData['req_no'],
-                        $value['note'] ? $value['note'] : "-"
-                    );
-
-                    // SUB DETAIL
-                    $this->stockDetail2Model->insertStokDetail2(
-                        $value['bc_id'],
-                        $stokIn,
-                        $stokDetailIn,
-                        $value['qty2'],
-                        $value['no_aju'],
-                        $materialRequestData['req_no'],
-                        $value['stock_dokumen'],
-                        $value['supplier_id'],
-                        $value['harga_umum'],
-                        $value['harga_harian'],
-                        $value['harga_bulanan'],
-                    );
-                    $this->materialRequestModel->update($id, $data);
-
-                    $this->workOrdersModel->update($materialRequestData['work_order_id'], [
-                        'is_posted' => 1
-                    ]);
                 }
+                $this->materialRequestModel->update($id, $data);
+
+                $this->workOrdersModel->update($materialRequestData['work_order_id'], [
+                    'is_posted' => 1
+                ]);
+
+                // Commit transaksi
+                $db->transCommit();
+                // }
+                $data = [
+                    "status"    => true,
+                    "message"   => "Status Approve Berhasil Diperbaharui",
+                    'token'     => csrf_hash()
+                ];
+                echo json_encode($data);
+                // } else {
+                //     $data = [
+                //         "status"    => false,
+                //         "message"   => "Data Not Found",
+                //         'token'     => csrf_hash()
+                //     ];
+                //     echo json_encode($data);
             }
-            $data = [
-                "status"    => true,
-                "message"   => "Status Approve Berhasil Diperbaharui",
-                'token'     => csrf_hash()
-            ];
-            echo json_encode($data);
-            // } else {
-            //     $data = [
-            //         "status"    => false,
-            //         "message"   => "Data Not Found",
-            //         'token'     => csrf_hash()
-            //     ];
-            //     echo json_encode($data);
-            // }
         } catch (Exception $e) {
+            $db->transRollback();
             $data = [
                 "status"     => false,
                 "message"    => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),

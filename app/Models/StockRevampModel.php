@@ -103,7 +103,7 @@ class StockRevampModel extends Model
                 ]);
                 $stockId = $db->insertID();
             }
-            
+
             if (!empty($data['stock_detail_result_id'])) {
                 // ✅ UPDATE jika stock_detail_result_id sudah ada
                 $db->table('stock_revamp_detail')
@@ -319,15 +319,16 @@ class StockRevampModel extends Model
                 ]);
 
             $db->table('stock_revamp_history')->insert([
-                            'stock_detail_asal'    => $data['stock_detail_id'],
-                            'stock_detail_akhir'   => $data['stock_detail_id'],
-                            'qty_bersih_asal'      => $data['qty_digunakan'],
-                            'qty_diterima_asal'    => $data['qty_digunakan'],
-                            'qty_bersih_akhir'     => $data['qty_digunakan'], // hasil rumus
-                            'qty_diterima_akhir'   => $data['qty_digunakan'], // bisa disamakan kalau proporsional
-                            'createdAt'            => date('Y-m-d H:i:s'),
-                            'updatedAt'            => date('Y-m-d H:i:s'),
-                        ]);
+                'stock_detail_asal'    => $data['stock_detail_id'],
+                'stock_detail_akhir'   => $data['stock_detail_id'],
+                'qty_bersih_asal'      => $data['qty_digunakan'],
+                'qty_diterima_asal'    => $data['qty_digunakan'],
+                'qty_bersih_akhir'     => $data['qty_digunakan'], // hasil rumus
+                'qty_diterima_akhir'   => $data['qty_digunakan'], // bisa disamakan kalau proporsional
+                'status'   => 'OUT', // bisa disamakan kalau proporsional
+                'createdAt'            => date('Y-m-d H:i:s'),
+                'updatedAt'            => date('Y-m-d H:i:s'),
+            ]);
 
             // ==============================
             // 5. Insert ke log
@@ -446,7 +447,6 @@ class StockRevampModel extends Model
 
             $db->transComplete();
             return true;
-
         } catch (\Throwable $e) {
             $db->transRollback();
             log_message('error', 'Unpost Stock Revamp Failed: ' . $e->getMessage());
@@ -496,7 +496,7 @@ class StockRevampModel extends Model
                     'qty_bersih'   => $parentAsal['qty_bersih'] + $qtyAsal,
                 ]);
 
-            
+
             // 🔹 Hapus history lama berdasarkan stock_detail_asal
             $db->table('stock_revamp_history')
                 ->where('stock_detail_asal', $asalId)
@@ -609,7 +609,6 @@ class StockRevampModel extends Model
             ]);
 
             return true;
-
         } catch (\Throwable $e) {
             log_message('error', 'Unpost Stock IN Failed: ' . $e->getMessage());
             throw $e;
