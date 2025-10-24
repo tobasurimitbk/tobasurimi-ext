@@ -1119,6 +1119,7 @@ $routes->get('/barang/dropdown/type-nospec', 'Warehouse\Barang::dropdownBarangTy
 $routes->get('/barang/dropdown/type-nospecwo', 'Warehouse\Barang::dropdownBarangTypeWithoutSpecWO', ['filter' => 'Auth']);
 $routes->get('/barang/dropdown/type-server', 'Purchase\SPP::dropdownBarang', ['filter' => 'Auth']);
 $routes->get('/barang/dropdown/type-server-first', 'Purchase\SPP::dropdownBarangFirst', ['filter' => 'Auth']);
+$routes->get('/barang/dropdown/type-server-inventori', 'Inventori\StokAdjusment::dropdownBarangInventori', ['filter' => 'Auth']);
 // ACCOUNT
 $routes->get('/kategori-account/dropdown', 'Master\Account::dropdownKategoriAccount', ['filter' => 'Auth']);
 $routes->get('/header-account/dropdown', 'Master\Account::dropdownHeaderAccount', ['filter' => 'Auth']);
@@ -1393,7 +1394,8 @@ $routes->post('/stock-adjusment/posting', 'Inventori\StokAdjusment::posting', ['
 $routes->post('/stock-adjusment/delete', 'Inventori\StokAdjusment::delete', ['filter' => 'Auth']);
 $routes->get('/stock-adjusment/id/(:segment)', 'Inventori\StokAdjusment::detail/$1', ['filter' => 'Auth']);
 $routes->get('/stock-adjusment/all', 'Inventori\StokAdjusment::all', ['filter' => 'Auth']);
-
+$routes->get('/stock-adjusment/all-stock-list', 'Inventori\StokAdjusment::allStockList', ['filter' => 'Auth']);
+$routes->get('/stock-adjusment/list-satuan-konversi', 'Inventori\StokAdjusment::getSatuanKonversi', ['filter' => 'Auth']);
 // MUTASI
 $routes->get('/mutasi', 'Inventori\Mutasi::index', ['filter' => 'Auth']);
 $routes->get('/mutasi/create', 'Inventori\Mutasi::create', ['filter' => 'Auth']);

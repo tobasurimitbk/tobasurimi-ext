@@ -89,6 +89,8 @@
                             <th onclick="changeSort('createdAt')">Tgl Log</th>
                             <th onclick="changeSort('qty_diterima')">Qty</th>
                             <th onclick="changeSort('unit_id')">Unit</th>
+                            <th onclick="changeSort('keterangan')">Note</th>
+
                         </tr>
                     </thead>
                     <tbody class="body-table" id="body-table">
@@ -208,6 +210,10 @@
             },
             {
                 data: "kode_satuan",
+                className: "text-left",
+            },
+            {
+                data: "keterangan",
                 className: "text-left",
             },
         ],

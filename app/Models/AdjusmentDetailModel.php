@@ -17,7 +17,7 @@ class AdjusmentDetailModel extends Model
     protected $allowedFields    = [];
 
     // Dates
-    protected $useTimestamps = false;
+    protected $useTimestamps = true;
     protected $dateFormat    = 'datetime';
     protected $createdField  = 'createdAt';
     protected $updatedField  = 'updatedAt';
@@ -40,83 +40,60 @@ class AdjusmentDetailModel extends Model
     protected $beforeDelete   = [];
     protected $afterDelete    = [];
 
-    public function getDetail($adjusmentID)
+    public function getDetail($id)
     {
-        $stockModel = new StockModel();
-        $adjusmentModel = new AdjusmentModel();
-        $metaDataModel = new MetadataModel();
-        $barangMasterModel = new BarangMasterModel();
-        $barangMasterSpesifikasiModel = new BarangMasterSpesifikasiModel();
-        $kemasanModel = new KemasanModel();
-        $satuanModel = new SatuansModel();
-        $warehouseModel = new WarehousesModel();
-        $stockDetail2Model = new StockDetail2Model();
-        $supplierModel = new SupplierModel();
+        $stockRevampModel = new StockRevampModel();
+        $dataResult = array();
+        $adjusmentDetail = $this->asArray()
+            ->select('adjusment_detail.*,satuans.kode_satuan AS kode_satuan_adjusment')
+            ->join('satuans', 'satuans.id = adjusment_detail.unit_id_adjusment', 'left')
+            ->where('adjusment_detail.adjusment_id', $id)
+            ->where('adjusment_detail.deletedAt', null)
+            ->findAll();
 
-        $result = $this->asArray()->where('adjusment_id', $adjusmentID)->findAll();
-        $adjusment = $adjusmentModel->find($adjusmentID);
+        $no = 1;
+        foreach ($adjusmentDetail as $a) {
 
-        $response = array();
-        foreach ($result as $r) {
-            $spesifikasi_id = ($r['kemasan_id'] == 0) ? $r['barang2_id'] : $r['kemasan_id'];
-            $bc = $metaDataModel->find($r['bc_id']);
-            $bc_name = $bc == null ? "NON PABEAN" : $bc['value'];
-            $barangMaster = $barangMasterModel->find($r['barang1_id']);
-            $barangMasterSpesifikasi = $barangMasterSpesifikasiModel->find($r['barang2_id']);
-            $kemasan = $kemasanModel->find($r['kemasan_id']);
-            $warehouse = $warehouseModel->find($r['warehouse_id']);
-
-            $barang = $r['kemasan_id'] == 0 ? $barangMaster['barang_name'] . '-' . $barangMasterSpesifikasi['spesifikasi'] : $kemasan['name'];
-            $kode_barang = $r['kemasan_id'] == 0 ? $barangMaster['kode_barang'] : $kemasan['kode'];
-            $satuan = $r['kemasan_id'] == 0 ? $satuanModel->find($barangMasterSpesifikasi['satuan_1']) : $satuanModel->find($kemasan['satuan_id']);
-            $no_aju = ($r['no_aju'] == "") ? "-" : $r['no_aju'];
-
-            $stock = $stockModel->getStokMaster(
-                $adjusment['company_id'],
-                $r['warehouse_id'],
-                $adjusment['divisi_id'],
-                $r['tipe_barang'],
-                $r['barang1_id'],
-                $spesifikasi_id
+            $fromStock = $stockRevampModel->getStockListAll(
+                ["id" => $a['stock_detail_id']],
+                0,
+                "desc"
             );
 
-            $stockDetail2 = $stockDetail2Model->select('stock_details2.*, stock_details.sumber')
-                ->join('stock_details', 'stock_details.id = stock_details2.stock_detail_id')
-                ->where('stock_details2.stock_id', $stock['id'])
-                ->where('bc_id', $r['bc_id'])
-                ->where('no_aju', $no_aju)
-                ->first();
-
-            $supplier = $supplierModel->select('suppliers.*')
-                ->join('penerimaan_barang', 'penerimaan_barang.supplier_id = suppliers.id')
-                ->where('penerimaan_barang.no_penerimaan_barang', $stockDetail2['no_dokumen'])
-                ->first();
-
-            $stockDetail2GroubBy = $stockDetail2Model->getStockListDetail($stock['id'], $r['bc_id'], $r['no_aju'], $r['stock_dokumen']);
-
-            $response[] = array(
-                'id' => $stockDetail2['id'],
-                'stock_id' => $stock['id'],
-                'spesifikasi_id' => $spesifikasi_id,
-                'sumber' => $stockDetail2['sumber'],
-                'stock_dokumen' => $r['stock_dokumen'],
-                'supplier_name' => $supplier != null ? strtoupper($supplier['name']) : "-",
-                'bc_id' => $r['bc_id'],
-                'no_aju' => $r['no_aju'],
-                'dokumen_text' =>  $bc_name . " / " . $r['no_aju'],
-                'barang' => $barang,
-                'kode_barang' => $kode_barang,
-                'type_barang' => $r['tipe_barang'],
-                'type_barang_text' => strtoupper(str_replace('_', ' ', $r['tipe_barang'])),
-                'satuan' => $satuan == null ? "" : $satuan['kode_satuan'],
-                'warehouse_text' => $warehouse == null ? "" : $warehouse['warehouse_name'],
-                'warehouse_id' => $warehouse == null ? 0 : $warehouse['id'],
-                'stok_total' => $stockDetail2GroubBy == null ? 0 : $stockDetail2GroubBy['stok_total'],
-                'type_adjusment' => $r['operasi'],
-                'qty_adjusment' => $r['qty'],
-            );
+            foreach ($fromStock['data'] as $d) {
+                // Stock
+                array_push($dataResult, [
+                    'no' => $no++,
+                    'id' => $d['id'],
+                    'divisi' => $d['divisi'],
+                    'warehouse_name' => $d['warehouse_name'],
+                    'reference_type' => $d['reference_type'],
+                    'supplier_name' => $d['supplier_name'],
+                    'kode_barang' => $d['kode_barang'],
+                    'barang_name' => $d['barang_name'],
+                    'spesifikasi' => $d['spesifikasi'],
+                    'type_bc' => $d['type_bc'],
+                    'po_no' => $d['po_no'],
+                    'po_date' => !empty($d['po_date']) ? date('d/m/Y', strtotime($d['po_date'])) : "",
+                    'lpb_date' => !empty($d['lpb_date']) ? date('d/m/Y', strtotime($d['lpb_date'])) : "",
+                    'reference_no' => $d['reference_no'],
+                    'qty_diterima' => (float)$a['qty_asal'], // pakai asal sebelum di adjusment
+                    'kode_satuan' => $d['kode_satuan'],
+                    "unit_id" => $d['unit_id'],
+                    "adjusment" => [
+                        "operasi_adjusment_detail" => $a['operasi_adjusment_detail'],
+                        "qty_adjusment" => $a['qty_adjusment'],
+                        'unit_id_adjusment' => $a['unit_id_adjusment'],
+                        'unit_name_adjusment' => $a['kode_satuan_adjusment'],
+                        'qty_konversi' => $a['qty_konversi'],
+                        'unit_id_konversi' => $a['unit_id_konversi'],
+                        'unit_name_konversi' => $d['kode_satuan'],
+                        'hasil_adjusment' => $a['hasil_adjusment']
+                    ]
+                ]);
+            }
         }
 
-        return $response;
+        return $dataResult;
     }
 }

@@ -21,6 +21,11 @@ use App\Models\BC23Model;
 use App\Models\BC27Model;
 use App\Models\BC40Model;
 use App\Models\PPBKBModel;
+use App\Models\StockRevampDetailModel;
+use App\Models\StockRevampHistoryModel;
+use App\Models\StockRevampLogModel;
+use App\Models\StockRevampModel;
+use Exception;
 
 class StokAdjusment extends BaseController
 {
@@ -44,6 +49,11 @@ class StokAdjusment extends BaseController
     protected $bc23Model;
     protected $bc27Model;
     protected $ppbkbModel;
+    protected $stockRevampModel;
+    protected $barangMasterModel;
+    protected $stockRevampDetailModel;
+    protected $stockRevampLogModel;
+    protected $stockRevampHistoryModel;
 
     public function __construct()
     {
@@ -67,13 +77,29 @@ class StokAdjusment extends BaseController
         $this->bc27Model = new BC27Model();
         $this->bc23Model = new BC23Model();
         $this->ppbkbModel = new PPBKBModel();
+        $this->stockRevampModel = new StockRevampModel();
+        $this->stockRevampDetailModel = new StockRevampDetailModel();
+        $this->barangMasterModel = new BarangMasterModel();
+        $this->stockRevampLogModel = new StockRevampLogModel();
+        $this->stockRevampHistoryModel = new StockRevampHistoryModel();
     }
 
     public function index()
     {
+        $tipeBarang = $this->metaDataModel->where('deletedAt', null)
+            ->where('name', "Kategori Barang")
+            ->where('value !=', "kemasan")
+            ->findAll();
+        $dataTipeAdjusment = $this->metaDataModel
+            ->where('deletedAt', null)
+            ->where('name', "Tipe Adjusment")
+            ->findAll();
+
         $data = [
-            'tipeBarang' => $this->metaDataModel->where('deletedAt', null)->where('name', "Kategori Barang")->findAll(),
-            'dataDivisi' => $this->divisiModel->getDivisiAccess()
+            'tipeBarang' => $tipeBarang,
+            'dataDivisi' => $this->divisiModel->getDivisiAccess(),
+            'tipeAdjusment' => $dataTipeAdjusment,
+
         ];
 
         return view('Warehouse/stockAdjusment/index', $data);
@@ -94,46 +120,41 @@ class StokAdjusment extends BaseController
             "sortType"  => $this->request->getVar("sortType"),
             "search" => $this->request->getVar("search"),
             "divisi_id" => $this->request->getVar("divisi_id"),
-            "status" => $this->request->getVar("status"),
-            "no_adjusment" => $this->request->getVar("no_adjusment"),
+            "tipe_adjusment" => $this->request->getVar("tipe_adjusment"),
             "dateStart"     => $this->request->getVar("dateStart") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateStart")))) : "",
             "dateEnd"       => $this->request->getVar("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateEnd")))) : "",
         ];
 
         $limit = $this->request->getVar("length");
         $offset = $this->request->getVar("start");
-        $divisiArr = array();
-        $dataResult = array();
+
 
         $condition = [
             'adjusment.company_id' => $this->this_company_id,
-            'divisis.deletedAt' => null,
             'adjusment.deletedAt' => null
         ];
 
-        foreach ($this->divisiModel->getDivisiAccess() as $d) {
-            array_push($divisiArr, $d['id']);
-        }
 
-        $dataQry = $this->adjusmentModel->getList($condition, $divisiArr,  $addCondition, $limit, $offset);
+        $dataQry = $this->adjusmentModel->getList(
+            $condition,
+            $addCondition,
+            $limit,
+            $offset
+        );
+        $dataResult = array();
         $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
-
         foreach ($dataQry['data'] as $data) {
-            $listItem = $this->adjusmentDetailModel->where('adjusment_id', $data->id)->findAll();
-            $totalItem = count($listItem);
-            $userName = $this->userModel->find($data->createdBy);
-
             array_push($dataResult, [
                 "no"                    => $no++,
-                "id"                    => encrypt($data->id),
-                "no_adjusment"          => $data->no_adjusment,
-                "tanggal"               => date('d/m/Y', strtotime($data->tanggal)),
-                "divisi"                => $data->divisi,
-                "keterangan"            => $data->keterangan,
-                "divisi"                => $data->divisi,
-                "total_item"            => $totalItem,
-                "status_posting"        => $data->status_posting,
-                "created_by"            => $userName == null ? "-" : $userName['name']
+                "id"                    => encrypt($data['id']),
+                "divisi"                => $data['divisi'],
+                "no_adjusment"          => $data['no_adjusment'],
+                "tanggal"               => date('d/m/Y', strtotime($data['tanggal'])),
+                "keterangan"            => $data['keterangan'],
+                "tipe_adjusment"        => $data['tipe_adjusment_text'],
+                "created_by"            => $data['user_name'],
+                "status_posting"        => $data['status_posting'],
+                "divisi"                => $data['divisi'],
             ]);
         }
 
@@ -150,258 +171,483 @@ class StokAdjusment extends BaseController
 
     public function create()
     {
+        $dataTipeBarang = $this->metaDataModel
+            ->where('deletedAt', null)
+            ->where('name', "Kategori Barang")
+            ->where('description !=', "kemasan")
+            ->findAll();
+        $dataDivisi = $this->divisiModel->getDivisiAccess();
+        $dataTipeAdjusment = $this->metaDataModel
+            ->where('deletedAt', null)
+            ->where('name', "Tipe Adjusment")
+            ->findAll();
+        $dataSatuan = $this->satuanModel->where('deletedAt', null)->findAll();
+
         $data = [
-            'tipeBarang' => $this->metaDataModel->where('deletedAt', null)->where('name', "Kategori Barang")->findAll(),
-            'divisi' => $this->divisiModel->getDivisiAccess(),
-            'tipeAdjusment' => $this->metaDataModel->where('deletedAt', null)->where('name', "Tipe Adjusment")->findAll(),
+            'tipeBarang' => $dataTipeBarang,
+            'divisi' => $dataDivisi,
+            'tipeAdjusment' => $dataTipeAdjusment,
+            'dataSatuan' => $dataSatuan,
             'tanggal' => date('Y-m-d'),
         ];
 
         return view('Warehouse/stockAdjusment/form', $data);
     }
 
+    public function allStockList()
+    {
+        $draw = $this->request->getGet('draw');
+        $start = (int)$this->request->getGet('start');
+        $length = (int)$this->request->getGet('length');
+        $orderDir = $this->request->getGet('order')[0]['dir'] ?? 'asc';
+        $orderColumnIndex = $this->request->getGet('order')[0]['column'] ?? null;
+
+        $dateStart = $this->request->getVar("dateStart")
+            ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateStart"))))
+            : null;
+
+        $dateEnd = $this->request->getVar("dateEnd")
+            ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateEnd"))))
+            : null;
+
+        $divisiId = $this->request->getGet('divisi_id');
+        $warehouseId = $this->request->getGet('warehouse_id');
+        $typeBarang = $this->request->getGet('type_barang');
+        $spesifikasiId = $this->request->getGet('spesifikasi_id');
+        $search = $this->request->getGet('search');
+
+        $condition = [
+            'company_id'        => $this->this_company_id,
+            'dateStart'         => $dateStart,
+            'dateEnd'           => $dateEnd,
+            'type_barang'       => $typeBarang,
+            'divisi_id'         => $divisiId,
+            'warehouse_id'      => $warehouseId,
+            'spesifikasi_id'    => $spesifikasiId,
+            'search'            => $search
+        ];
+
+        if (empty($condition['divisi_id']) || empty($condition['type_barang'])) {
+            return response()->setJSON([
+                'draw' => intval($draw),
+                'recordsTotal' => intval($data['totalData'] ?? 0),
+                'recordsFiltered' => intval($data['totalFilteredData'] ?? 0),
+                'data' => [],
+            ]);
+        }
+
+        $data = $this->stockRevampModel->getStockListAll(
+            $condition,
+            $orderColumnIndex,
+            $orderDir,
+            $length,
+            $start
+        );
+
+        $dataResult = array();
+        $no = $start + 1;
+        foreach ($data['data'] as $d) {
+            array_push($dataResult, [
+                'no' => $no++,
+                'id' => $d['id'],
+                'divisi' => $d['divisi'],
+                'warehouse_name' => $d['warehouse_name'],
+                'reference_type' => $d['reference_type'],
+                'supplier_name' => $d['supplier_name'],
+                'kode_barang' => $d['kode_barang'],
+                'barang_name' => $d['barang_name'],
+                'spesifikasi' => $d['spesifikasi'],
+                'type_bc' => $d['type_bc'],
+                'po_no' => $d['po_no'],
+                'po_date' => !empty($d['po_date']) ? date('d/m/Y', strtotime($d['po_date'])) : "",
+                'lpb_date' => !empty($d['lpb_date']) ? date('d/m/Y', strtotime($d['lpb_date'])) : "",
+                'reference_no' => $d['reference_no'],
+                'qty_diterima' => (float)$d['qty_diterima'],
+                'kode_satuan' => $d['kode_satuan'],
+                "unit_id"               => $d['unit_id'],
+            ]);
+        }
+
+        return $this->response->setJSON([
+            'draw' => intval($draw),
+            'recordsTotal' => intval($data['totalData'] ?? 0),
+            'recordsFiltered' => intval($data['totalFilteredData'] ?? 0),
+            'data' => $dataResult,
+        ]);
+    }
+
+    public function dropdownBarangInventori()
+    {
+        try {
+            $typeBarang = $this->request->getVar('type_barang');
+
+            if (empty($typeBarang)) {
+                return response()->setJSON(['data' => []]);
+            }
+
+            $search = $this->request->getVar('q');
+            $data = $this->barangMasterModel->dropdownBarangStock(
+                $typeBarang,
+                $this->this_company_id,
+                $search
+            );
+
+            $dataList = array();
+            foreach ($data as $d) {
+                array_push($dataList, [
+                    'id' => $d['spesifikasi_id'],
+                    'text' => "(" . $d['kode_barang'] . ") " . trim(
+                        str_replace(
+                            ["\"", "\t"],
+                            "'",
+                            $d['barang_name'] . '- ' . $d['spesifikasi']
+                        )
+                    )
+                ]);
+            }
+
+            return response()->setJSON([
+                'results' => $dataList,
+                'status' => true,
+                'token' => csrf_hash()
+            ]);
+        } catch (Exception $e) {
+            return  response()->setJSON([
+                'status' => false,
+                'token' => csrf_hash(),
+                'message' => $e->getMessage()
+            ]);
+        }
+    }
+
+    public function getSatuanKonversi()
+    {
+        try {
+            $stockDetailId = $this->request->getVar('id');
+            $dataSatuanIdMap = array();
+            $dataSatuanIdArr = array();
+            $dataSatuanKonversi = array();
+            $dataResult = $this->stockRevampDetailModel->getStockIdentity(
+                $stockDetailId
+            );
+
+            // Map
+            $dataSatuanIdMap[$dataResult['satuan_1']] = 1;
+            $dataSatuanIdMap[$dataResult['satuan_2']] = $dataResult['konversi_satuan_2'];
+            $dataSatuanIdMap[$dataResult['satuan_3']] = $dataResult['konversi_satuan_3'];
+            // Satuan Id Arr
+            $dataSatuanIdArr = [
+                $dataResult['satuan_1'],
+                $dataResult['satuan_2'],
+                $dataResult['satuan_3']
+            ];
+
+            $dataSatuan = $this->satuanModel->whereIn('id', $dataSatuanIdArr)->findAll();
+            foreach ($dataSatuan as $d) {
+                array_push($dataSatuanKonversi, [
+                    'id' => $d['id'],
+                    'kode_satuan' => $d['kode_satuan'],
+                    'konversi_satuan' => (float)$dataSatuanIdMap[$d['id']]
+                ]);
+            }
+
+            return response()->setJSON([
+                'status' => true,
+                'token' => csrf_hash(),
+                'data' => $dataSatuanKonversi
+            ]);
+        } catch (Exception $e) {
+            return  response()->setJSON([
+                'status' => false,
+                'token' => csrf_hash(),
+                'message' => $e->getMessage()
+            ]);
+        }
+    }
+
     public function detail($id)
     {
         $id = decrypt($id);
+        $dataTipeBarang = $this->metaDataModel
+            ->where('deletedAt', null)
+            ->where('name', "Kategori Barang")
+            ->where('description !=', "kemasan")
+            ->findAll();
+        $dataDivisi = $this->divisiModel->getDivisiAccess();
+        $dataTipeAdjusment = $this->metaDataModel
+            ->where('deletedAt', null)
+            ->where('name', "Tipe Adjusment")
+            ->findAll();
+        $dataSatuan = $this->satuanModel->where('deletedAt', null)->findAll();
+        $dataListBarang = $this->adjusmentDetailModel->getDetail($id);
+        $adjusment = $this->adjusmentModel->where('id', $id)->first();
+
         $data = [
-            'tipeBarang' => $this->metaDataModel->where('deletedAt', null)->where('name', "Kategori Barang")->findAll(),
-            'divisi' => $this->divisiModel->getDivisiAccess(),
-            'adjusment' => $this->adjusmentModel->find($id),
-            'tipeAdjusment' => $this->metaDataModel->where('deletedAt', null)->where('name', "Tipe Adjusment")->findAll(),
-            'listBarang' => $this->adjusmentDetailModel->getDetail($id)
+            'tipeBarang' => $dataTipeBarang,
+            'divisi' => $dataDivisi,
+            'tipeAdjusment' => $dataTipeAdjusment,
+            'dataSatuan' => $dataSatuan,
+            'dataListBarang' => $dataListBarang,
+            'adjusment' => $adjusment
         ];
 
         if ($data['adjusment'] == null) {
             return redirect()->to('stock-adjusment');
         }
 
-        $data['warehouse'] = $this->warehouseModel->where('divisi_id', $data['adjusment']['divisi_id'])->where('deletedAt', null)->findAll();
-
         return view('Warehouse/stockAdjusment/form', $data);
     }
 
     public function createAction()
     {
+        // return response()->setJSON([
+        //     'listBarang' => json_decode($_POST['listBarang']),
+        //     '$_POST' => $_POST,
+        //     'token' => csrf_hash()
+        // ]);
 
-        $first = $this->adjusmentModel->where('company_id', $this->this_company_id)->where('no_adjusment', $this->request->getVar('no_adjusment'))->first();
+        $db = \Config\Database::connect();
+        $db->transBegin();
 
-        if ($first != null) {
+        try {
+            $tanggal = formatDMYtoYMD($this->request->getVar('tanggal'));
+            $noAdjusment =  $this->request->getVar('no_adjusment');
+            $first = $this->adjusmentModel
+                ->where('company_id', $this->this_company_id)
+                ->where('no_adjusment', $noAdjusment)
+                ->first();
+
+            if ($first != null) {
+                // sudah ada generate ulang
+                $noAdjusment = $this->get_no_str($tanggal);
+            }
+
+            $id = $this->adjusmentModel->insert([
+                'company_id' => $this->this_company_id,
+                'divisi_id' => $this->request->getVar('divisi_id'),
+                'no_adjusment' => $this->request->getVar('no_adjusment'),
+                'tanggal' => $tanggal,
+                'tipe_adjusment' => $this->request->getVar('tipe_adjusment'),
+                'keterangan' => $this->request->getVar('keterangan') ?? null,
+                'status_posting' => 0,
+                'createdBy' => $this->this_user_id
+            ]);
+
+
+            foreach (json_decode($_POST['listBarang']) as $l) {
+
+                $this->adjusmentDetailModel->insert([
+                    'adjusment_id' => $id,
+                    'stock_detail_id' => $l->id,
+                    'qty_asal' => $l->qty_diterima,
+                    'operasi_adjusment_detail' => $l->adjusment->operasi_adjusment_detail,
+                    'qty_adjusment' => $l->adjusment->qty_adjusment,
+                    'unit_id_adjusment' => $l->adjusment->unit_id_adjusment,
+                    'qty_konversi' => $l->adjusment->qty_konversi,
+                    'unit_id_konversi' => $l->adjusment->unit_id_konversi,
+                    'hasil_adjusment' => $l->adjusment->hasil_adjusment
+                ]);
+            }
+
+            $db->transCommit();
             return response()->setJSON([
-                'message' => "Nomor Adjusment Sudah Ada",
+                'token' => csrf_hash(),
+                'status' => true,
+                'message' => "Adjusment berhasil disimpan",
+            ]);
+        } catch (Exception $e) {
+            $db->transRollback();
+            return response()->setJSON([
                 'token' => csrf_hash(),
                 'status' => false,
+                'message' => $e->getMessage(),
             ]);
         }
-
-        $id = $this->adjusmentModel->insert([
-            'company_id' => $this->this_company_id,
-            'divisi_id' => $this->request->getVar('divisi_id'),
-            'no_adjusment' => $this->request->getVar('no_adjusment'),
-            'tanggal' => date('Y-m-d'),
-            'keterangan' => $this->request->getVar('keterangan'),
-            'tipe_adjusment' => $this->request->getVar('tipe_adjusment'),
-            'tipe_pengambilan_stock' => $this->request->getVar('type_pengambilan_stock'),
-            'status_posting' => '0',
-            'createdBy' => $this->this_user_id
-        ]);
-
-        foreach (json_decode($_POST['listBarang']) as $l) {
-            $stock = $this->stockModel->find($l->stock_id);
-            $this->adjusmentDetailModel->insert([
-                'adjusment_id' => $id,
-                'bc_id' => $l->bc_id,
-                'warehouse_id' => $l->warehouse_id,
-                'barang1_id' => $stock['barang1_id'],
-                'barang2_id' => $stock['barang2_id'],
-                'kemasan_id' => $stock['kemasan_id'],
-                'no_aju' => $l->no_aju,
-                'stock_dokumen' => $l->stock_dokumen,
-                'tipe_barang' => $l->type_barang,
-                'operasi' => $l->type_adjusment,
-                'qty' => $l->qty_adjusment
-            ]);
-        }
-
-        return response()->setJSON([
-            'token' => csrf_hash(),
-            'status' => true,
-            'message' => "Adjusment berhasil disimpan",
-            'id' => encrypt($id)
-        ]);
     }
 
     public function updateAction()
     {
-        $id = decrypt($this->request->getVar('id'));
-
-        $first = $this->adjusmentModel
-            ->where('company_id', $this->this_company_id)
-            ->where('no_adjusment', $this->request->getVar('no_adjusment'))
-            ->where('id !=', $id)
-            ->first();
-
-        if ($first != null) {
-            return response()->setJSON([
-                'message' => "Nomor Adjusment Sudah Ada",
-                'token' => csrf_hash(),
-                'status' => false,
-            ]);
-        }
-
-        $this->adjusmentModel->update($id, [
-            'company_id' => $this->this_company_id,
-            'divisi_id' => $this->request->getVar('divisi_id'),
-            'keterangan' => $this->request->getVar('keterangan'),
-            'tipe_adjusment' => $this->request->getVar('tipe_adjusment'),
-            'tipe_pengambilan_stock' => $this->request->getVar('type_pengambilan_stock'),
-            'status_posting' => '0',
-            'createdBy' => $this->this_user_id
-        ]);
-
-        // get all id detail
-        $id_detail_all = [];
-
-        foreach (json_decode($_POST['listBarang']) as $l) {
-            $stock = $this->stockModel->find($l->stock_id);
-            // CHECK
-            $check = $this->adjusmentDetailModel
-                ->where('adjusment_id', $id)
-                ->where('warehouse_id', $l->warehouse_id)
-                ->where('barang1_id', $stock['barang1_id'])
-                ->where('barang2_id', $stock['barang2_id'])
-                ->where('kemasan_id', $stock['kemasan_id'])
-                ->where('bc_id', $l->bc_id)
-                ->where('no_aju', $l->no_aju)
-                ->where('stock_dokumen', $l->stock_dokumen)
+        $db = \Config\Database::connect();
+        $db->transBegin();
+        try {
+            $id = decrypt($this->request->getVar('id'));
+            $tanggal = formatDMYtoYMD($this->request->getVar('tanggal'));
+            $noAdjusment =  $this->request->getVar('no_adjusment');
+            $first = $this->adjusmentModel
+                ->where('company_id', $this->this_company_id)
+                ->where('no_adjusment', $noAdjusment)
+                ->where('id !=', $id)
                 ->first();
 
-            if ($check != null) {
-                $this->adjusmentDetailModel->update($check['id'], [
-                    'adjusment_id' => $id,
-                    'bc_id' => $l->bc_id,
-                    'warehouse_id' => $l->warehouse_id,
-                    'barang1_id' => $stock['barang1_id'],
-                    'barang2_id' => $stock['barang2_id'],
-                    'kemasan_id' => $stock['kemasan_id'],
-                    'stock_dokumen' => $l->stock_dokumen,
-                    'no_aju' => $l->no_aju,
-                    'operasi' => $l->type_adjusment,
-                    'tipe_barang' => $l->type_barang,
-                    'qty' => $l->qty_adjusment
+            if ($first != null) {
+                return response()->setJSON([
+                    'message' => "No adjusment sudah ada",
+                    'status' => false,
+                    'token' => csrf_hash()
                 ]);
-                array_push($id_detail_all, $check['id']);
-            } else {
-                // NEW BARANG
-                // DELETE
-                $this->adjusmentDetailModel
-                    ->where('adjusment_id', $id)
-                    ->where('warehouse_id', $l->warehouse_id)
-                    ->where('barang1_id', $stock['barang1_id'])
-                    ->where('barang2_id', $stock['barang2_id'])
-                    ->where('kemasan_id', $stock['kemasan_id'])
-                    ->where('bc_id', $l->bc_id)
-                    ->where('no_aju', $l->no_aju)
-                    ->where('stock_dokumen', $l->stock_dokumen)
-                    ->delete();
-
-                // INSERT NEW
-                $id_detail_new = $this->adjusmentDetailModel->insert([
-                    'adjusment_id' => $id,
-                    'bc_id' => $l->bc_id,
-                    'warehouse_id' => $l->warehouse_id,
-                    'barang1_id' => $stock['barang1_id'],
-                    'barang2_id' => $stock['barang2_id'],
-                    'kemasan_id' => $stock['kemasan_id'],
-                    'tipe_barang' => $l->type_barang,
-                    'no_aju' => $l->no_aju,
-                    'operasi' => $l->type_adjusment,
-                    'stock_dokumen' => $l->stock_dokumen,
-                    'qty' => $l->qty_adjusment
-                ]);
-
-                array_push($id_detail_all,  $id_detail_new);
             }
-        }
 
-        $this->adjusmentDetailModel->where('adjusment_id', $id)->whereNotIn('id', $id_detail_all)->delete();
-        return response()->setJSON([
-            "status" => true,
-            "message" => "Adjusment berhasil diupdate",
-            'token' => csrf_hash()
-        ]);
+            $this->adjusmentModel->update($id, [
+                'company_id' => $this->this_company_id,
+                'divisi_id' => $this->request->getVar('divisi_id'),
+                'no_adjusment' => $this->request->getVar('no_adjusment'),
+                'tanggal' => $tanggal,
+                'tipe_adjusment' => $this->request->getVar('tipe_adjusment'),
+                'keterangan' => $this->request->getVar('keterangan') ?? null,
+                'status_posting' => 0,
+            ]);
+
+            $this->adjusmentDetailModel->where('adjusment_id', $id)->delete(null, false);
+
+            foreach (json_decode($_POST['listBarang']) as $l) {
+                // var_dump($l->adjusment);
+                // die;
+                $this->adjusmentDetailModel->insert([
+                    'adjusment_id' => $id,
+                    'stock_detail_id' => $l->id,
+                    'qty_asal' => $l->qty_diterima,
+                    'operasi_adjusment_detail' => $l->adjusment->operasi_adjusment_detail,
+                    'qty_adjusment' => $l->adjusment->qty_adjusment,
+                    'unit_id_adjusment' => $l->adjusment->unit_id_adjusment,
+                    'qty_konversi' => $l->adjusment->qty_konversi,
+                    'unit_id_konversi' => $l->adjusment->unit_id_konversi,
+                    'hasil_adjusment' => $l->adjusment->hasil_adjusment
+                ]);
+            }
+
+
+            $db->transCommit();
+            return response()->setJSON([
+                'token' => csrf_hash(),
+                'status' => true,
+                'message' => "Adjusment berhasil diupdate",
+            ]);
+        } catch (Exception $e) {
+            $db->transRollback();
+            return response()->setJSON([
+                'token' => csrf_hash(),
+                'status' => false,
+                'message' => $e->getMessage(),
+            ]);
+        }
     }
 
     public function delete()
     {
-        $id = decrypt($this->request->getVar('id'));
-        $this->adjusmentModel->delete($id);
-        $this->adjusmentDetailModel->where('adjusment_id', $id)->delete();
-
-        return response()->setJSON([
-            "status" => true,
-            "message" => "Adjusment berhasil dihapus",
-            'token' => csrf_hash()
-        ]);
+        $db = \Config\Database::connect();
+        $db->transBegin();
+        try {
+            $id = decrypt($this->request->getVar('id'));
+            $this->adjusmentModel->delete($id);
+            $this->adjusmentDetailModel->where('adjusment_id', $id)->delete();
+            $db->transCommit();
+            return response()->setJSON([
+                "status" => true,
+                "message" => "Adjusment berhasil dihapus",
+                'token' => csrf_hash()
+            ]);
+        } catch (Exception $e) {
+            $db->transRollback();
+            return response()->setJSON([
+                'token' => csrf_hash(),
+                'status' => false,
+                'message' => $e->getMessage(),
+            ]);
+        }
     }
 
     public function posting()
     {
-        $id = decrypt($this->request->getVar('id'));
-        $adjusmentList = $this->adjusmentDetailModel->where('adjusment_id', $id)->where('deletedAt', null)->findAll();
-        $adjusment = $this->adjusmentModel->find($id);
 
-        // INSERT TO STOCK
-        foreach ($adjusmentList as $a) {
-            // HEADER
-            $spesifikasiID =  $a['kemasan_id'] != 0 ? $a['kemasan_id'] : $a['barang2_id'];
-            $qtyTotal =  $a['operasi'] == "PLUS" ? $a['qty'] : (-$a['qty']);
-            $qty = $a['qty'];
-            $status =  $a['operasi'] == "PLUS" ? "In" : "Out";
-            $no_aju = $a['no_aju'] == "" ? "-" : $a['no_aju'];
+        $db = \Config\Database::connect();
+        $db->transBegin();
+        try {
+            $id = decrypt($this->request->getVar('id'));
+            $adjusmentList = $this->adjusmentDetailModel->where('adjusment_id', $id)->where('deletedAt', null)->findAll();
+            $adjusment = $this->adjusmentModel->where('id', $id)->first();
 
-            $stok = $this->stockModel->insertStok(
-                $adjusment['company_id'],
-                $a['warehouse_id'],
-                $adjusment['divisi_id'],
-                $a['tipe_barang'],
-                $a['barang1_id'],
-                $spesifikasiID,
-                $qtyTotal,
-            );
+            foreach ($adjusmentList as $a) {
+                // Update
+                $stock = $this->stockRevampDetailModel
+                    ->select('stock_revamp.*')
+                    ->join('stock_revamp', 'stock_revamp.id = stock_revamp_detail.stock_id', 'left')
+                    ->where('stock_revamp_detail.id', $a['stock_detail_id'])
+                    ->first();
 
-            // DETAIL
-            $stokDetail = $this->stockDetailModel->insertStokDetail(
-                $stok,
-                $qty,
-                $status,
-                date('Y-m-d'),
-                $this->this_user_id,
-                "ADJUSMENT",
-                $adjusment['no_adjusment'],
-                $adjusment['keterangan'],
-            );
+                $stockDetail = $this->stockRevampDetailModel->where('id', $a['stock_detail_id'])->first();
 
-            // SUB DETAIL
-            $this->stockDetail2Model->insertStokDetail2(
-                $a['bc_id'],
-                $stok,
-                $stokDetail,
-                $qty,
-                $no_aju,
-                "-",
-                $a['stock_dokumen']
-            );
+                if ($a['operasi_adjusment_detail'] == "PLUS") {
+                    // PLUS
+                    $this->stockRevampModel->update($stock['id'], [
+                        'qty_diterima' => $stock['qty_diterima'] + $a['hasil_adjusment']
+                    ]);
+
+                    $this->stockRevampDetailModel->update($a['stock_detail_id'], [
+                        'qty_diterima' => $a['hasil_adjusment']
+                    ]);
+
+                    $this->stockRevampLogModel->insert([
+                        'stock_detail_id'   => $a['stock_detail_id'],
+                        'status'            => 'IN',
+                        'qty_bersih'        => $stockDetail['qty_bersih'],
+                        'qty_diterima'      => $a['qty_konversi'],
+                        'keterangan'        => $adjusment['no_adjusment'],
+                    ]);
+
+                    $this->stockRevampHistoryModel->insert([
+                        'stock_detail_asal' => $a['stock_detail_id'],
+                        'stock_detail_akhir' => null,
+                        'status' => "IN",
+                        'qty_bersih_asal' => $stockDetail['qty_bersih'],
+                        'qty_bersih_akhir' => $stockDetail['qty_bersih'],
+                        'qty_diterima_asal' => $a['qty_asal'],
+                        'qty_diterima_akhir' => $a['hasil_adjusment']
+                    ]);
+                } else {
+                    // MINUS
+                    $this->stockRevampModel->update($stock['id'], [
+                        'qty_diterima' => $stock['qty_diterima'] - $a['hasil_adjusment']
+                    ]);
+
+                    $this->stockRevampDetailModel->update($a['stock_detail_id'], [
+                        'qty_diterima' => $a['hasil_adjusment']
+                    ]);
+
+                    $this->stockRevampLogModel->insert([
+                        'stock_detail_id' => $a['stock_detail_id'],
+                        'status'         => 'OUT',
+                        'qty_bersih'     => $stockDetail['qty_bersih'],
+                        'qty_diterima'      => $a['qty_konversi'],
+                        'keterangan'     => $adjusment['no_adjusment'],
+                    ]);
+
+                    $this->stockRevampHistoryModel->insert([
+                        'stock_detail_asal' => $a['stock_detail_id'],
+                        'stock_detail_akhir' => null,
+                        'status' => "OUT",
+                        'qty_bersih_asal' => $stockDetail['qty_bersih'],
+                        'qty_bersih_akhir' => $stockDetail['qty_bersih'],
+                        'qty_diterima_asal' => $a['qty_asal'],
+                        'qty_diterima_akhir' => $a['hasil_adjusment']
+                    ]);
+                }
+            }
+
+            $this->adjusmentModel->update($id, ['status_posting' => 1]);
+            $db->transCommit();
+            return response()->setJSON([
+                "status" => true,
+                "message" => "Adjusment berhasil diposting",
+                'token' => csrf_hash()
+            ]);
+        } catch (Exception $e) {
+            $db->transRollback();
+            return response()->setJSON([
+                'token' => csrf_hash(),
+                'status' => false,
+                'message' => $e->getMessage(),
+            ]);
         }
-
-        $this->adjusmentModel->update($id, [
-            'status_posting' => '1'
-        ]);
-
-        return response()->setJSON([
-            'message' => "Adjusment berhasil diposting",
-            'token' => csrf_hash(),
-            'status' => true
-        ]);
     }
 
     public function getListBarangIsInit()
@@ -464,19 +710,45 @@ class StokAdjusment extends BaseController
 
     public function getAdjusmentNo()
     {
-        $last_day = date("Y-m-t", strtotime(date('Y') . "-" . date('m') . "-" . date('d')));
-        $divisi_id = $this->request->getVar('divisi_id');
-
-        if (empty($divisi_id)) {
-            $no = $this->adjusmentModel->get_no(date('m'), date('Y'), $last_day, "", $divisi_id);
-        } else {
-            $divisi = $this->divisiModel->where('id', $divisi_id)->first();
-            $no = $this->adjusmentModel->get_no(date('m'), date('Y'), $last_day, strtoupper($divisi['divisi']), $divisi_id);
+        $tanggal = $this->request->getVar('tanggal');
+        if (empty($tanggal)) {
+            return response()->setJSON([
+                'status' => true,
+                'data' => '',
+                'token' => csrf_hash()
+            ]);
         }
+
+        $tanggal = formatDMYtoYMD($tanggal); // 2025-09-21
+        $tanggalParts = explode('-', $tanggal);
+        if (count($tanggalParts) !== 3) {
+            return $this->response->setJSON([
+                'data' => '',
+                'status' => false,
+                'message' => 'Format tanggal tidak valid. Gunakan dd/mm/yyyy.'
+            ]);
+        }
+
+        $no = $this->get_no_str($tanggal);
         return response()->setJSON([
             'status' => true,
             'data' => $no,
             'token' => csrf_hash()
         ]);
+    }
+
+    private function get_no_str($tanggal)
+    {
+        $tanggalParts = explode('-', $tanggal);
+        $month = $tanggalParts[1];
+        $year = $tanggalParts[0];
+
+        $no = $this->adjusmentModel->get_no(
+            $month,
+            $year,
+            $this->this_company_id
+        );
+
+        return $no;
     }
 }

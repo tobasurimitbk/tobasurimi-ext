@@ -3,7 +3,7 @@
 
 <section class="section">
     <div class="section-header">
-        <h1>Stock Adjusment</h1>
+        <h1>Stok Adjusment</h1>
         <?php if (can("Inventori", "Stok Adjusment", "c")) : ?>
             <a href="<?= base_url('stock-adjusment/create') ?>" type="button" class="btn btn-show-form btn-add float-right">
                 <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
@@ -14,37 +14,10 @@
         <div class="card-body">
             <?= csrf_field() ?>
             <div class="row mb-4">
-                <div class="col-sm-4 mt-2">
-                    <div class="form-floating">
-                        <select class="form-select divisi_id" id="divisi_id" name="divisi_id" aria-label="Floating label select example">
-                            <option value=""></option>
-                            <?php foreach ($dataDivisi as $divisi) : ?>
-                                <option value="<?= $divisi["id"]; ?>" <?= !empty($dataPenerimaanBarang) ? ($dataPenerimaanBarang['divisi_id'] === $divisi["id"] ? "selected" : "") : ""; ?>><?= strtoupper($divisi["divisi"]); ?></option>
-                            <?php endforeach; ?>
-                        </select>
-                        <label style="z-index: 1;">Departemen</label>
-                    </div>
-                </div>
-                <div class="col-sm-4 mt-2">
-                    <div class="form-floating">
-                        <select class="form-select status" id="status" name="status" aria-label="Floating label select example">
-                            <option value="">SEMUA</option>
-                            <option value="1">POSTED</option>
-                            <option value="0">WAITING</option>
-                        </select>
-                        <label style="z-index: 1;">Status Adjusment</label>
-                    </div>
-                </div>
-                <div class="col-sm-4 mt-2">
-                    <div class="form-floating" style="height: 50px;">
-                        <input placeholder="" class="form-control search" id="search" name="search" aria-label="Floating label select example" />
-                        <label style="z-index: 1;" style="z-index: 1;">Cari Nomor Adjusment </label>
-                    </div>
-                </div>
-                <div class="col-md-4 mt-2">
+                <div class="col-sm-3 mt-1">
                     <div class="input-group">
                         <div class="form-floating" style="height: 50px;">
-                            <input placeholder="" class="form-control dateStart" id="dateStart" name="dateStart" aria-label="Floating label select example" />
+                            <input placeholder="" value="01/<?= date('m/Y') ?>" class="form-control dateStart" id="dateStart" name="dateStart" />
                             <label style="z-index: 1;" style="z-index: 1;">Tanggal Awal</label>
                         </div>
                         <div class="input-group-append" style="height:50px;">
@@ -54,10 +27,10 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-md-4 mt-2">
+                <div class="col-sm-3 mt-1">
                     <div class="input-group">
                         <div class="form-floating" style="height: 50px;">
-                            <input placeholder="" class="form-control dateEnd" id="dateEnd" name="dateEnd" aria-label="Floating label select example" />
+                            <input placeholder="" class="form-control dateEnd" id="dateEnd" name="dateEnd" />
                             <label style="z-index: 1;" style="z-index: 1;">Tanggal Akhir</label>
                         </div>
                         <div class="input-group-append" style="height:50px;">
@@ -67,22 +40,42 @@
                         </div>
                     </div>
                 </div>
+                <div class="col-sm-3 mt-1">
+                    <div class="form-floating">
+                        <select class="form-select tipe_adjusment" id="tipe_adjusment" name="tipe_adjusment">
+                            <option value=""></option>
+                            <?php foreach ($tipeAdjusment as $t) : ?>
+                                <option value="<?= $t['id'] ?>">
+                                    <?= $t['value']; ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                        <label style="z-index: 1;">Tipe Adjusment</label>
+                    </div>
+                </div>
+                <div class="col-sm-3 mt-1">
+                    <div class="form-floating" style="height: 50px;">
+                        <input placeholder="" class="form-control search" id="search" name="search" />
+                        <label style="z-index: 1;" style="z-index: 1;">Cari Data </label>
+                    </div>
+                </div>
             </div>
             <div class="table-responsive">
                 <table class="table table-bordered nowrap table-hover-tobasurimi dataTable" id="dataTable" width="100%" cellspacing="0">
                     <thead class="thead-dark">
                         <tr>
                             <th>No</th>
-                            <th onclick="changeSort('no_adjusment')">No Adjusment</th>
-                            <th onclick="changeSort('tanggal')">Tanggal</th>
-                            <th onclick="changeSort('divisis.divisi')">Departemen</th>
-                            <th onclick="changeSort('keterangan')">Keterangan</th>
-                            <th>Total Item</th>
-                            <th onclick="changeSort('createdBy')">Created By</th>
+                            <th onclick="changeSort('adjusment.divisi_id')">Dept</th>
+                            <th onclick="changeSort('adjusment.no_adjusment')">No Adjusment</th>
+                            <th onclick="changeSort('adjusment.tanggal')">Tgl</th>
+                            <th onclick="changeSort('adjusment.keterangan')">Keterangan</th>
+                            <th onclick="changeSort('adjusment.tipe_adjusment')">Tipe</th>
+                            <th onclick="changeSort('adjusment.createdBy')">Dibuat Oleh</th>
+                            <th onclick="changeSort('adjusment.status_posting')">Posting</th>
                             <th>Action</th>
                         </tr>
                     </thead>
-                    <tbody class="body-table" id="body-table" style="cursor: pointer;">
+                    <tbody class="body-table" id="body-table">
                     </tbody>
                 </table>
             </div>
@@ -94,12 +87,11 @@
 
 
 <script>
-    let sort = "createdAt";
+    let sort = "adjusment.no_adjusment";
     let sortType = "desc";
     const csrfToken = '<?= csrf_token() ?>';
 
     const table = $('.dataTable').DataTable({
-
         processing: true,
         serverSide: true,
         ordering: true,
@@ -116,9 +108,8 @@
             url: "<?= base_url("stock-adjusment/all"); ?>",
             dataSrc: "data",
             data: function(data) {
-                data.divisi_id = $(".divisi_id").val();
-                data.status = $(".status").val();
-                data.no_adjusment = $(".no_adjusment").val();
+                data.tipe_adjusment = $(".tipe_adjusment").val();
+                data.search = $(".search").val();
                 data.dateStart = $('#dateStart').val();
                 data.dateEnd = $('#dateEnd').val();
                 data.sort = sort;
@@ -134,34 +125,55 @@
         searching: false,
         columns: [{
                 data: "no",
-                className: "text-center",
+                className: "text-left",
                 orderable: false
             },
             {
+                data: "divisi",
+                className: "text-left"
+            },
+            {
                 data: "no_adjusment",
-                className: "text-center"
+                className: "text-left"
             },
             {
                 data: "tanggal",
-                className: "text-center"
-            },
-            {
-                data: "divisi",
-                className: "text-center",
+                className: "text-left",
             },
             {
                 data: "keterangan",
-                className: "text-center"
+                className: "text-left"
             },
             {
-                data: "total_item",
-                className: "text-center",
-                searchable: false,
-                sortable: false
+                data: "tipe_adjusment",
+                className: "text-left",
             },
             {
                 data: "created_by",
-                className: "text-center"
+                className: "text-left"
+            },
+            {
+                data: "status_posting",
+                className: "text-center",
+                searchable: false,
+                width: "5%",
+                render: function(data, type, row) {
+                    let htmlRes = '';
+
+                    if (row.status_posting == 1) {
+                        htmlRes += `
+                            <div class="text-success">
+                               <i class="fa-solid fa-check"></i>
+                            </div>`
+                    } else {
+                        htmlRes += `
+                            <div class="text-danger">
+                               <i class="fa-solid fa-x"></i>
+                            </div>`
+                    }
+
+                    return htmlRes;
+                }
             },
             {
                 data: "id",
@@ -170,26 +182,31 @@
                 sortable: false,
                 render: function(data, type, row) {
                     let id = row.id;
-                    let status = row.status_posting
+                    let status_posting = row.status_posting;
 
-                    if (status === "0") {
+                    if (status_posting == 0) {
                         return `
                         <div class="mt-0">
-                        <?php if (can('Inventori', 'Stok Adjusment', 'a')) : ?>
-                            <button data-toggle="tooltip" title="Posting" onclick="posting('${id}')" class="btn btn-success posting-spp">
-                                <i class="fa fa-paper-plane fa-sm" aria-hidden="true"></i>
-                            </button>
-                        <?php endif; ?>
-                        <?php if (can('Inventori', 'Stok Adjusment', 'd')) : ?>
-                            <button data-toggle="tooltip" title="Hapus" onclick="remove('${id}')" class="btn btn-danger delete-parent">
-                                <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
-                            </button>
-                        <?php endif; ?>
+                             <a href="javascript:void(0)" onclick="edit('${id}')" data-toggle="tooltip" title="Edit" class="btn btn-primary">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <?php if (can('Inventori', 'Stok Adjusment', 'a')) : ?>
+                                <button data-toggle="tooltip" title="Posting" onclick="posting('${id}')" class="btn btn-success posting-spp">
+                                    <i class="fa fa-paper-plane fa-sm" aria-hidden="true"></i>
+                                </button>
+                            <?php endif; ?>
+                            <?php if (can('Inventori', 'Stok Adjusment', 'd')) : ?>
+                                <button data-toggle="tooltip" title="Hapus" onclick="remove('${id}')" class="btn btn-danger delete-parent">
+                                    <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
+                                </button>
+                            <?php endif; ?>
                         </div>
                     `
                     } else {
                         return `
-                        -
+                        <a href="javascript:void(0)" onclick="edit('${id}')" data-toggle="tooltip" title="Edit" class="btn btn-primary">
+                            <i class="fas fa-edit"></i>
+                        </a>
                     `
                     }
 
@@ -228,25 +245,17 @@
         format: "dd/mm/yyyy",
         orientation: "bottom auto",
         autoclose: true
-    })
+    });
 
-    $('#divisi_id').select2({
-        placeholder: "Pilih Departemen",
+    $('#tipe_adjusment').select2({
+        placeholder: "Pilih Tipe Adjusment",
         theme: "bootstrap-5",
         allowClear: true
     }).change(function() {
         table.ajax.reload();
     });
 
-    $('#status').select2({
-        placeholder: "Pilih Status",
-        theme: "bootstrap-5",
-        allowClear: true
-    }).change(function() {
-        table.ajax.reload();
-    });
-
-    $("#divisi_id,#status")
+    $("#divisi_id,#tipe_adjusment")
         .parent('div')
         .children('span')
         .children('span')
@@ -254,20 +263,19 @@
         .children('span')
         .css('margin-top', '22px').css('margin-left', '-7px');
 
-    $(".no_adjusment").keyup(function() {
+    $(".search").keyup(function() {
         table.ajax.reload();
-    })
-
-    $('#dataTable tbody').on('click', 'tr td:not(.actions):not(.dataTables_empty)', function() {
-        const data = table.row(this).data();
-        location.replace(`<?= base_url("stock-adjusment/id"); ?>/${data.id}`);
     });
+
+    function edit(id) {
+        window.location.href = "<?= base_url('stock-adjusment/id') ?>" + '/' + id
+    }
 
     $('#dateStart,#dateEnd').change(function() {
         table.ajax.reload();
     });
 
-    const posting = function(id) {
+    function posting(id) {
         Swal.fire({
             icon: 'question',
             title: 'Posting Adjusment ?',
@@ -317,7 +325,7 @@
         })
     }
 
-    const remove = function(id) {
+    function remove(id) {
         Swal.fire({
             icon: 'question',
             title: 'Hapus Adjusment ?',

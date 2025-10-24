@@ -17,7 +17,7 @@ class AdjusmentModel extends Model
     protected $allowedFields    = [];
 
     // Dates
-    protected $useTimestamps = false;
+    protected $useTimestamps = true;
     protected $dateFormat    = 'datetime';
     protected $createdField  = 'createdAt';
     protected $updatedField  = 'updatedAt';
@@ -41,56 +41,75 @@ class AdjusmentModel extends Model
     protected $afterDelete    = [];
 
 
-    public function getList($condition, $conditionArr, $addCondition, $limit = 10, $offset = 0)
+    public function getList($condition, $addCondition, $limit = 10, $offset = 0)
     {
         $availableSort = [
-            'no_adjusment'                           => 'no_adjusment',
-            'tanggal'                                => 'tanggal',
-            'divisis.divisi'                         => 'divisis.divisi',
-            'keterangan'                             => 'keterangan',
-            'createdBy'                              => 'createdBy'
+            'adjusment.divisi_id' => 'adjusment.divisi_id',
+            'adjusment.no_adjusment' => 'adjusment.no_adjusment',
+            'adjusment.tanggal' => 'adjusment.tanggal',
+            'adjusment.keterangan' => 'adjusment.keterangan',
+            'adjusment.tipe_adjusment' => 'adjusment.tipe_adjusment',
+            'adjusment.createdBy' => 'adjusment.createdAt',
+            'adjusment.status_posting' => 'adjusment.status_posting',
         ];
         $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
 
-        $sort = $availableSort[$addCondition['sort'] ?? 'updatedAt'] ?? 'createdAt';
+        $sort = $availableSort[$addCondition['sort'] ?? 'adjusment.no_adjusment'] ?? 'adjusment.no_adjusment';
         $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'DESC';
 
         $selectQry = "adjusment.*,
-            divisis.divisi";
+            divisis.divisi,
+            users.name AS user_name,
+            metadata.value AS tipe_adjusment_text";
 
-        $dataQry = $this->asObject()
+        $dataQry = $this->asArray()
             ->select($selectQry)
             ->where($condition)
-            ->whereIn('divisi_id', $conditionArr)
             ->join('divisis', 'adjusment.divisi_id = divisis.id', 'left')
+            ->join('users', 'users.id = adjusment.createdBy', 'left')
+            ->join('metadata', 'metadata.id = adjusment.tipe_adjusment')
             ->orderBy($sort, $sortType);
 
         $totalData = $dataQry->countAllResults(false);
 
-        if ($addCondition['divisi_id'] || $addCondition['status'] || $addCondition['no_adjusment'] || $addCondition['dateStart'] || $addCondition['dateEnd']) {
+        if (
+            $addCondition['divisi_id'] ||
+            $addCondition['tipe_adjusment'] ||
+            $addCondition['search'] ||
+            $addCondition['dateStart'] ||
+            $addCondition['dateEnd']
+        ) {
             $dataQry->groupStart();
         }
 
         if ($addCondition['divisi_id']) {
-            $dataQry->where('divisi_id', $addCondition['divisi_id']);
+            $dataQry->where('adjusment.divisi_id', $addCondition['divisi_id']);
         }
 
-        if ($addCondition['status'] || $addCondition['status'] == '0') {
-            $dataQry->where('status_posting', $addCondition['status']);
+        if ($addCondition['tipe_adjusment']) {
+            $dataQry->where('adjusment.tipe_adjusment', $addCondition['tipe_adjusment']);
         }
 
         if ($addCondition['dateStart']) {
-            $dataQry->where('tanggal >=',  $addCondition['dateStart']);
+            $dataQry->where('adjusment.tanggal >=',  $addCondition['dateStart']);
         }
         if ($addCondition['dateEnd']) {
-            $dataQry->where('tanggal <=', $addCondition['dateEnd']);
+            $dataQry->where('adjusment.tanggal <=', $addCondition['dateEnd']);
         }
 
-        if ($addCondition['no_adjusment']) {
-            $dataQry->like('no_adjusment', $addCondition['no_adjusment']);
+        if ($addCondition['search']) {
+            $dataQry->like('users.name', $addCondition['search'])
+                ->orLike('adjusment.no_adjusment', $addCondition['search'])
+                ->orLike('divisis.divisi', $addCondition['search']);
         }
 
-        if ($addCondition['divisi_id'] || $addCondition['status'] || $addCondition['no_adjusment'] || $addCondition['dateStart'] || $addCondition['dateEnd']) {
+        if (
+            $addCondition['divisi_id'] ||
+            $addCondition['tipe_adjusment'] ||
+            $addCondition['search'] ||
+            $addCondition['dateStart'] ||
+            $addCondition['dateEnd']
+        ) {
             $dataQry->groupEnd();
         }
 
@@ -105,38 +124,49 @@ class AdjusmentModel extends Model
     }
 
 
-    public function get_no($bln, $thn, $last_day, $warehouseKode, $divisi_id)
-    {
-        $lastStr =  convertBulanToAngkaRomawi($bln) . '/' . $thn;
-
-        $builder = $this->db->table('adjusment');
-        $builder->select('no_adjusment');
-        $builder->orderBy('no_adjusment', 'desc');
-        $builder->where('adjusment.divisi_id', $divisi_id);
-        $builder->where('createdAt >=', $thn . "-" . $bln . "-01" . " 00:00:00")
-            ->where('createdAt <=', $last_day . " 23:59:59");
-        $builder->like('no_adjusment', $lastStr);
-        $query = $builder->get();
-
-        $kode = 'ADJ/' . $warehouseKode;
-
-        $lastPenerimaan = '1';
-
-        if (!empty($query->getResultArray())) {
-            foreach ($query->getResultArray() as $string) {
-                $explode = explode('/', $string['no_adjusment']);
-                $number = intval($explode[2]);
-
-                if ($number > $lastPenerimaan) {
-                    $lastPenerimaan = $number;
-                }
-            }
-            $lastPenerimaan++;
+    public function get_no(
+        $month,
+        $year,
+        $companyId
+    ) {
+        $romanMonth = romanMonthNumber((int)$month);
+        // Tentukan template berdasarkan company
+        switch ($companyId) {
+            case 1: // KIM 1 (FRZ)
+                $numberTemplate = "/F/ADJ/$romanMonth/" . substr($year, -2);
+                break;
+            case 2: // KIM 2
+                $numberTemplate = "/ADJ/$romanMonth/" . substr($year, -2);
+                break;
+            case 15: // GLOBAL
+                $numberTemplate = "/G/ADJ/$romanMonth/" . substr($year, -2);
+                break;
+            default: // OCS atau lainnya
+                $numberTemplate = "/ADJ/$romanMonth/" . substr($year, -2);
+                break;
         }
 
-        $formattedLastPenerimaan = sprintf("%02d", $lastPenerimaan);
-        $generatedNo = $kode . '/' . $formattedLastPenerimaan . '/' . $lastStr;
+        // Cari nomor terakhir berdasarkan template
+        $lastData = $this->asArray()
+            ->select('no_adjusment')
+            ->where('company_id', $companyId)
+            ->like('no_adjusment', $numberTemplate, 'before')
+            ->where('deletedAt', null)
+            ->orderBy('no_adjusment', 'DESC')
+            ->first();
 
-        return $generatedNo;
+        // Nomor awal default
+        $invNumber = '001' . $numberTemplate;
+
+        if ($lastData && !empty($lastData['no_adjusment'])) {
+            // Ambil angka urutan terakhir
+            $parts = explode('/', $lastData['no_adjusment']);
+            $lastIncrement = isset($parts[0]) ? (int)$parts[0] : 0;
+            $newIncrement = $lastIncrement + 1;
+            $paddedNumber = str_pad($newIncrement, 3, '0', STR_PAD_LEFT);
+
+            $invNumber = $paddedNumber . $numberTemplate;
+        }
+        return $invNumber;
     }
 }
