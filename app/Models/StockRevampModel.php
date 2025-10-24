@@ -319,16 +319,17 @@ class StockRevampModel extends Model
                     'qty_bersih'   => $newQtyParentBersih,
                 ]);
 
-            $db->table('stock_revamp_history')->insert([
-                'stock_detail_asal'    => $data['stock_detail_id'],
-                'stock_detail_akhir'   => $data['stock_detail_id'],
-                'qty_bersih_asal'      => $data['qty_digunakan'],
-                'qty_diterima_asal'    => $data['qty_digunakan'],
-                'qty_bersih_akhir'     => $data['qty_digunakan'], // hasil rumus
-                'qty_diterima_akhir'   => $data['qty_digunakan'], // bisa disamakan kalau proporsional
-                'createdAt'            => date('Y-m-d H:i:s'),
-                'updatedAt'            => date('Y-m-d H:i:s'),
-            ]);
+            // $db->table('stock_revamp_history')->insert([
+            //     'stock_detail_asal'    => $data['stock_detail_id'],
+            //     'stock_detail_akhir'   => $data['stock_detail_id'],
+            //     'qty_bersih_asal'      => $data['qty_digunakan'],
+            //     'qty_diterima_asal'    => $data['qty_digunakan'],
+            //     'qty_bersih_akhir'     => $data['qty_digunakan'], // hasil rumus
+            //     'qty_diterima_akhir'   => $data['qty_digunakan'], // bisa disamakan kalau proporsional
+            //     'tanggal'         => date('Y-m-d'),
+            //     'createdAt'            => date('Y-m-d H:i:s'),
+            //     'updatedAt'            => date('Y-m-d H:i:s'),
+            // ]);
 
             // ==============================
             // 5. Insert ke log
