@@ -836,11 +836,14 @@
                 $counter = 2;
 
                 if ($grand_total > 0): ?>
-                    <tr class="label-header">
+                    <tr class="label-header" style="line-height: 1 !important;">
                         <td style="width: 25px;"><?= strtoupper(numToRoman($counter++)) ?>.</td>
                         <td style="width: 180px;">TOTAL AMOUNT (<?= $salesKontrak['mata_uang'] ?>)</td>
                         <td style="width: 10px;">:</td>
-                        <td><?= number_format($grand_total, 2) ?> (<?= strtoupper(terbilangInggris($grand_total)) . " ONLY" ?>)</td>
+                        <td>
+
+                            <?= number_format($grand_total, 2) ?> (<?= strtoupper(terbilangInggris($grand_total)) . " ONLY" ?>)
+                        </td>
                     </tr>
                 <?php endif; ?>
 
