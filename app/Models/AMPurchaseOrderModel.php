@@ -418,6 +418,9 @@ class AMPurchaseOrderModel extends Model
         // === FORMAT OCS ===
         // ======================
         if ((int)$companyId === 16) {
+            $counterLength = 3;
+            $counterFirst = str_repeat('0', $counterLength - 1) . '1';
+
             $thnShort = substr($thn, -2);
             $romanMonth = romanMonthNumber((int)$bln);
             $head = "/P/{$romanMonth}/{$thnShort}";
