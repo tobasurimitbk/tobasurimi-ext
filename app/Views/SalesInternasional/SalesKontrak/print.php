@@ -317,7 +317,7 @@
             </div>
 
         </div>
-        <div class="d-flex flex-column" style="line-height: 1;">
+        <div class="d-flex flex-column" style="line-height: 0.8;">
             <table>
                 <tr>
                     <td>
@@ -399,7 +399,7 @@
         </div>
         <div class="mt-1 justify-content-center">
             <div class="label-header" style="color: red;">
-                <?= nl2br(htmlspecialchars($salesKontrak['banking_information'])) ?>
+                <?= nl2br(htmlspecialchars(trim($salesKontrak['banking_information']))) ?>
             </div>
         </div>
 
@@ -460,7 +460,7 @@
                     <td style="padding: 6px; border: 1px solid #ddd; vertical-align: top;"><?= $no++ ?></td>
                     <td style="padding: 6px; border: 1px solid #ddd; vertical-align: top;">
                         <div style="font-weight: bold; font-size: 11px;"><?= $detail["nama_barang"]; ?></div>
-                        <div style="font-size: 11px; margin-top: 4px; line-height: 1;">
+                        <div style="font-size: 11px; margin-top: 4px; line-height: 0.8;">
                             <table style="margin-left: -3px;">
                                 <?php if (!empty($detail['species'])): ?>
                                     <tr>
@@ -622,7 +622,7 @@
 
                                     ?>
 
-                                    <?php if (count($salesKontrakdetail) > 1): ?>
+                                    <?php if (count($detail['size_breakdown']) > 1): ?>
                                         <tfoot>
                                             <tr style="background-color: #e9ecef;">
                                                 <td colspan="<?= $base_columns ?>" style="padding: 3px; border: 1px solid #ddd; text-align: right; font-weight: bold;">
@@ -783,7 +783,7 @@
             <?php endif; ?> -->
 
             <!-- Final Amount Row -->
-            <tr style="font-weight: bold; background-color: #e9ecef; font-size: 10px; line-height: 1;">
+            <tr style="font-weight: bold; background-color: #e9ecef; font-size: 10px; line-height: 0.8;">
                 <td style="padding: 4px; border: 1px solid #ddd;"></td>
                 <td style="padding: 4px; border: 1px solid #ddd;">
                     <table style="width: 100%; table-layout: fixed; border-collapse: collapse;">
@@ -829,7 +829,7 @@
 
         </tbody>
     </table>
-    <div style="margin-top: 5px;line-height:1;">
+    <div style="margin-top: 5px;line-height: 0.8;">
         <table style="border-spacing: 0 4px; width: 100%;">
             <tbody>
                 <?php
@@ -884,7 +884,7 @@
     </div>
 
     <!-- Mulai blok yang harus utuh di halaman yang sama -->
-    <div class="ttd-section" style="margin-top: -5px; line-height:1;">
+    <div class="ttd-section" style="margin-top: -5px; line-height: 0.8;">
         <table style="border-spacing: 0 4px; width: 100%;">
             <tbody>
                 <?php if (!empty($salesKontrak['payment_term'])): ?>
@@ -936,7 +936,7 @@
         <br>
 
         <!-- SIGNATURE TABLE -->
-        <table class="mt-1 sign-table border-collapse" style="margin-top: -18px; width: 100%;">
+        <table class="mt-1 sign-table border-collapse" style="margin-top: -10px; width: 100%; line-height:0.8;">
             <thead>
                 <tr>
                     <th style="width: 350px;">
