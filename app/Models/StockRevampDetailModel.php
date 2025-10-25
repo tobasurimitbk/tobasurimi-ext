@@ -1019,7 +1019,6 @@ class StockRevampDetailModel extends Model
                 rm_purchase_orders.po_no AS stock_dokumen,
                 suppliers.name AS supplier_name,
                 bc_purchase_order.no_aju,
-                vendors.name AS vendor_name,
                 rm_purchase_order_details.general_price as harga_umum,
                 rm_purchase_order_details.daily_price as harga_harian,
                 rm_purchase_order_details.monthly_price as harga_bulanan,
