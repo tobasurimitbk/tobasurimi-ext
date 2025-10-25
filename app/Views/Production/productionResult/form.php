@@ -1425,6 +1425,7 @@
                                     'material_request_id': item.material_request_id,
                                     'bc_id': item.bc_id,
                                     'stock_id': item.stock_tujuan_id,
+                                    'stock_detail_id': item.stock_detail_tujuan_id,
                                     'stock_date': item.stock_date,
                                     'stock_dokumen': item.stock_dokumen,
                                     'barang1_id': item.barang1_id,
@@ -1451,6 +1452,7 @@
                             data-material_request_id="${item.material_request_id}" 
                             data-bc_id="${item.bc_id}" 
                             data-stock_id="${item.stock_tujuan_id}" 
+                            data-stock_detail_id="${item.stock_detail_tujuan_id}" 
                             data-stock_date="${item.stock_date}" 
                             data-stock_dokumen="${item.stock_dokumen}" 
                             data-barang1_id="${item.barang1_id}" 
@@ -1528,6 +1530,7 @@
                                     'material_request_id': item.material_request_id,
                                     'bc_id': item.bc_id,
                                     'stock_id': item.stock_tujuan_id,
+                                    'stock_detail_id': item.stock_detail_tujuan_id,
                                     'stock_date': item.stock_date,
                                     'stock_dokumen': item.stock_dokumen,
                                     'barang1_id': item.barang1_id,
@@ -1676,6 +1679,7 @@
                 let material_request_id = $(".kode_barang_filling option:selected").data("material_request_id");
                 let bc_id = $(".kode_barang_filling option:selected").data("bc_id");
                 let stock_id = $(".kode_barang_filling option:selected").data("stock_id");
+                let stock_detail_id = $(".kode_barang_filling option:selected").data("stock_detail_id");
                 let stock_date = $(".kode_barang_filling option:selected").data("stock_date");
                 let stock_dokumen = $(".kode_barang_filling option:selected").data("stock_dokumen");
                 let barang1_id = $(".kode_barang_filling option:selected").data("barang1_id");
@@ -1702,6 +1706,7 @@
                     'material_request_id': material_request_id,
                     'bc_id': bc_id,
                     'stock_id': stock_id,
+                    'stock_detail_id': stock_detail_id,
                     'stock_date': stock_date,
                     'stock_dokumen': stock_dokumen,
                     'barang1_id': barang1_id,

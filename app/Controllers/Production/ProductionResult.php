@@ -8,6 +8,7 @@ use App\Controllers\Master\Account;
 use App\Controllers\Master\Divisi;
 use App\Models\AccountBarangModel;
 use App\Models\BarangMasterModel;
+use App\Models\BarangMasterSpesifikasiModel;
 use App\Models\DivisisModel;
 use App\Models\MaterialRequestDetailsModel;
 use App\Models\MaterialRequestPenolongDetailsModel;
@@ -19,6 +20,8 @@ use App\Models\ProductionResultDetailModel;
 use App\Models\StockDetail2Model;
 use App\Models\StockDetailModel;
 use App\Models\StockModel;
+use App\Models\StockRevampDetailModel;
+use App\Models\StockRevampModel;
 use App\Models\WarehousesModel;
 use App\Models\WorkOrderDetailsModel;
 use App\Models\WorkOrdersModel;
@@ -35,6 +38,7 @@ class ProductionResult extends BaseController
     private $this_company_id;
     protected $this_user_id;
     private $barangMasterModel;
+    private $barangMasterSpesifikasiModel;
     private $productionResultModel;
     private $productionResultDetailModel;
     private $warehousesModel;
@@ -57,6 +61,7 @@ class ProductionResult extends BaseController
         $this->this_company_id = session()->get("login")->this_company_id;
         $this->this_user_id = session()->get("login")->user_id;;
         $this->barangMasterModel = new BarangMasterModel();
+        $this->barangMasterSpesifikasiModel = new BarangMasterSpesifikasiModel();
         $this->productionResultModel = new ProductionResultModel();
         $this->productionResultDetailModel = new ProductionResultDetailModel();
         $this->warehousesModel = new WarehousesModel();
@@ -435,6 +440,7 @@ class ProductionResult extends BaseController
                         "bc_id" => 0,
                         "stock_dokumen" => $productionResData['pr_no'],
                         "stock_id" => 0,
+                        "stock_detail_id" => 0,
                         "no_aju" => "-",
                         "barang_type" => $bj->type_barang,
                         "type" => "JADI",
@@ -463,6 +469,7 @@ class ProductionResult extends BaseController
                     "stock_dokumen" => $bd->stock_dokumen,
                     "stock_date" => $bd->stock_date,
                     "stock_id" => $bd->stock_id ?? 0,
+                    "stock_detail_id" => $bd->stock_detail_id ?? 0,
                     "no_aju" => $bd->no_aju == "-" ? "-" : $bd->no_aju,
                     "barang_type" => $bd->type_barang,
                     "type" => "DIGUNAKAN",
@@ -488,6 +495,7 @@ class ProductionResult extends BaseController
                         "stock_dokumen" => $bd->stock_dokumen,
                         "stock_date" => $bd->stock_date,
                         "stock_id" => $bd->stock_id ?? 0,
+                        "stock_detail_id" => $bd->stock_detail_id ?? 0,
                         "no_aju" => $bd->no_aju == "-" ? "-" : $bd->no_aju,
                         "barang_type" => $bd->type_barang,
                         "type" => "RETURN",
@@ -512,6 +520,7 @@ class ProductionResult extends BaseController
                     "bc_id" => 0,
                     "stock_dokumen" => $productionResData['pr_no'],
                     "stock_id" => 0,
+                    "stock_detail_id" => 0,
                     "no_aju" => "-",
                     "barang_type" => "bahan_scrap",
                     "type" => "SCRAP",
@@ -614,6 +623,7 @@ class ProductionResult extends BaseController
                         "bc_id" => 0,
                         "stock_dokumen" => $productionResData['pr_no'],
                         "stock_id" => 0,
+                        "stock_detail_id" => 0,
                         "no_aju" => "-",
                         "barang_type" => $bj->type_barang,
                         "type" => "JADI",
@@ -886,10 +896,13 @@ class ProductionResult extends BaseController
 
     public function updateStatusPostedProductionResult()
     {
+        $db = \Config\Database::connect();
+        $db->transBegin();
         try {
-
             $id = $this->request->getVar('id');
             $id = decrypt($id);
+            $stockRevampModel = new StockRevampModel();
+            $stockRevampDetailModel = new StockRevampDetailModel();
 
             // po posting
             $payload = [
@@ -970,124 +983,45 @@ class ProductionResult extends BaseController
                             }
                         }
                         if ($value['type'] == 'JADI') {
-                            // -----
-                            // BARANG IN KE INVENTORI
-                            $stokIn = $this->stockModel->insertStok(
-                                $resultData['company_id'],
-                                $value['warehouse_id'],
-                                $value['divisi_id'],
-                                $value['barang_type'],
-                                $value['barang1_id'],
-                                $value['barang2_id'],
-                                $value['qty']
-                            );
+                            if ($value['stock_detail_id']) {
+                                $dataSpek = $this->barangMasterSpesifikasiModel->find($value["barang2_id"]);
+                                $dataIn = [
+                                    "company_id"       => $this->this_company_id,
+                                    "spesifikasi_id"   => $value["barang2_id"],
+                                    "barang_master_id" => $value["barang1_id"],
+                                    "unit_id"          => $dataSpek["satuan_1"],
+                                    "divisi_id"        => $value["divisi_id"],
+                                    "warehouse_id"     => $value["warehouse_id"],
+                                    "no_dokumen"       => $resultData["pr_no"],
+                                    "bc_id"            => $value['bc_id'],
+                                    "type_bc"          => $value['no_ref'] == null ? "NON PABEAN" : $value['no_ref'],
+                                    "qty_diterima"     => $value['qty'],
+                                    "qty_bersih"       => $value['qty'],
+                                    "reference_id"     => $id,
+                                    "po_type"          => "LOKAL BAKU",
+                                    "reference_type"   => "HASIL PRODUKSI",
+                                    "status"           => "IN"
+                                ];
 
-                            $this->productionResultDetailModel->update($value['id'], [
-                                'stock_id' => $stokIn
-                            ]);
+                                $stockDetailId = $stockRevampModel->insertStockRevamp($db, $dataIn);
+                                $stockData = $stockRevampDetailModel->find($stockDetailId);
 
-                            $checkStokDetailIn =  $this->stockModel->isDefinedStockSubDetail(
-                                $resultData['company_id'],
-                                $value['warehouse_id'],
-                                $value['divisi_id'],
-                                $value['barang_type'],
-                                $value['barang1_id'],
-                                $value['barang2_id'],
-                                $value['bc_id'],
-                                $value['no_aju'],
-                                $stokIn
-                            );
-
-                            if ($checkStokDetailIn == null) {
-                                // INSERT STOK INISIASI
-                                $stokDetailIn = $this->stockDetailModel->insertStokDetail(
-                                    $stokIn,
-                                    0,
-                                    "In",
-                                    date('Y-m-d'),
-                                    $this->this_user_id,
-                                    "INISIASI",
-                                    "-",
-                                    "-"
-                                );
-                                $this->stockDetail2Model->insertStokDetail2(
-                                    $value['bc_id'],
-                                    $value['stock_id'],
-                                    $stokDetailIn,
-                                    0,
-                                    $value['no_aju'],
-                                    "-"
-                                );
+                                $this->productionResultDetailModel->update($value['id'], [
+                                    'stock_id' => $stockData['stock_id'],
+                                    'stock_detail_id' => $stockDetailId,
+                                ]);
+                            } else {
+                                # code...
                             }
-
-                            $stockRebusDetailIn = $this->stockDetail2Model->getStockListDetail(
-                                $value['bc_id'],
-                                $value['stock_id'],
-                                $value['no_aju'],
-                                $value['stock_dokumen']
-                            );
-
-                            // DETAIL
-                            $stokDetailIn = $this->stockDetailModel->insertStokDetail(
-                                $stokIn,
-                                $value['qty'],
-                                "In",
-                                $resultData['receive_date'],
-                                $this->this_user_id,
-                                "PRODUKSI",
-                                $resultData['pr_no'],
-                                "-"
-                            );
-
-                            // SUB DETAIL
-                            $this->stockDetail2Model->insertStokDetail2(
-                                $value['bc_id'],
-                                $stokIn,
-                                $stokDetailIn,
-                                $value['qty'],
-                                $value['no_aju'],
-                                $resultData['pr_no'],
-                                $value['stock_dokumen'],
-                            );
                         } else {
-                            // Stok OUT
-                            $stok = $this->stockModel->insertStok(
-                                $resultData['company_id'],
-                                $value['warehouse_id'],
-                                $value['divisi_id'],
-                                $value['barang_type'],
-                                $value['barang1_id'],
-                                $value['barang2_id'],
-                                ($value['qty'] * -1)
-                            );
-
-                            // DETAIL
-                            $stokDetail = $this->stockDetailModel->insertStokDetail(
-                                $stok,
-                                $value['qty'],
-                                "Out",
-                                date('Y-m-d'),
-                                $this->this_user_id,
-                                "PRODUKSI",
-                                $resultData['pr_no'],
-                                "-"
-                            );
-
-                            // SUB DETAIL
-                            $this->stockDetail2Model->insertStokDetail2(
-                                $value['bc_id'],
-                                $value['stock_id'],
-                                $stokDetail,
-                                $value['qty'],
-                                $value['no_aju'],
-                                $resultData['pr_no'],
-                                $value['stock_dokumen'],
-                            );
                         }
                     }
                 }
                 // exit;
                 $this->productionResultModel->update($id, $payload);
+
+                // Commit transaksi
+                $db->transCommit();
 
 
                 // $this->workOrdersModel->update($resultData['work_order_id'], [
