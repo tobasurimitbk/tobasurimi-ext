@@ -1152,6 +1152,14 @@ class PenerimaanBarangLokalBP extends BaseController
         try {
             $penerimaanBarang = $this->penerimaanBarangModel->where('id', $id)->first();
 
+            if ($penerimaanBarang['status_post'] == "FINISH") {
+                return response()->setJSON([
+                    'status' => false,
+                    'message' => "LPB Sudah diposting user lain",
+                    'token' => csrf_hash()
+                ]);
+            }
+
             foreach (json_decode($penerimaanBarang['multiple_po_id']) as $p) {
                 $amPurchaseOrder = $this->amPurchaseOrderModel
                     ->select('am_purchase_orders.*,purchase_requests.spp_no')
