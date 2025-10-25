@@ -1905,6 +1905,14 @@ class BC40 extends BaseController
         $bcPurchaseOrder = $this->bcPurchaseOrderModel->where('id', $bcPurchaseOrderID)->first();
         $bc40 = $this->bc40Model->where('bc_purchase_order_id', $bcPurchaseOrderID)->first();
 
+        if ($bcPurchaseOrder['status_posting'] == 1) {
+            return response()->setJSON([
+                'token' => csrf_hash(),
+                'status' => false,
+                'message' => "Dokumen sudah di posting user lain silahkan reload halaman anda",
+            ]);
+        }
+
         if ($bc40 == null) {
             // insert
             $tanggalDokumen = date('Y-m-d', strtotime($bcPurchaseOrder['createdAt']));

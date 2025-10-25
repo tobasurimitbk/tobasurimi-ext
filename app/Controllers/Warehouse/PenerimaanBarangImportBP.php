@@ -1009,6 +1009,14 @@ class PenerimaanBarangImportBP extends BaseController
             $penerimaanBarang = $this->penerimaanBarangModel->where('id', $id)->first();
             $penerimaanBarangList = $this->penerimaanBarangDetailModel->where('penerimaan_barang_id', $id)->where('deletedAt', null)->findAll();
 
+            if ($penerimaanBarang['status_post'] == "FINISH") {
+                return response()->setJSON([
+                    'status' => false,
+                    'message' => "LPB Sudah diposting user lain",
+                    'token' => csrf_hash()
+                ]);
+            }
+
             $multiple_po_id = json_decode($penerimaanBarang['multiple_po_id']);
             foreach ($multiple_po_id as $key => $value) {
                 $result = $this->jurnalUmumController->insertDataPembelian($value, "BAHAN " . $penerimaanBarang['tipe_bahan'], $penerimaanBarang['status_penerimaan'], "pembelian", $id);
