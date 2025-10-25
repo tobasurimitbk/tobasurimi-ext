@@ -1605,6 +1605,7 @@ class Invoice extends BaseController
             "filter_jenis_dokumen" => $this->request->getGet("filter_jenis_dokumen"),
             "filter_customer"       => $this->request->getGet("filter_customer"),
             "filter_paid"       => $this->request->getGet("filter_paid"),
+            "filter_company"        => $this->request->getGet("filter_company"),
             "dateStart"             => $this->request->getGet("dateStart") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getGet("dateStart")))) : "",
             "dateEnd"               => $this->request->getGet("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getGet("dateEnd")))) : "",
         ];
