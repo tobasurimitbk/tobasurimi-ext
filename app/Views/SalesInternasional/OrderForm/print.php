@@ -137,13 +137,12 @@
                 <h3>
                     <span style="margin-top: -20px;">
                         <?= strtoupper(str_ireplace(', Tbk', '', $company['holding_company'])) . " (" . $subCompany . ")" ?> <br>
-
                         ORDER FORM <?= $dataSO->container ?>
-                    </span>
+                        </br>
                 </h3>
             </div>
 
-            <table style="width: 100%; margin-top:-10px;">
+            <table style="width: 100%; margin-top:-10px;line-height: 0.8 !important;">
                 <tr>
                     <td>
                         <table class="label">
@@ -271,7 +270,7 @@
                                         </span>
                                     <?php endif; ?>
                                 </div><br>
-                                <div style="font-size: 12px; margin-top: 4px; line-height: 1;">
+                                <div style="font-size: 12px; margin-top: 4px; line-height: 0.8;">
                                     <table style="margin-left: -3px;">
                                         <?php if (!empty($detail['species'])): ?>
                                             <tr>
@@ -356,21 +355,21 @@
                                                 <tr style="background-color: #f3f4f6;">
                                                     <?php foreach ($columns_to_show as $col => $col_data): ?>
                                                         <?php if ($col != 'persen' && $col != 'cased'): ?>
-                                                            <th style="padding: 3px; border: 1px solid #ddd; width: <?= $col_data['width'] ?>"><?= $col_data['label'] ?></th>
+                                                            <th style=" border: 1px solid #ddd; width: <?= $col_data['width'] ?>"><?= $col_data['label'] ?></th>
                                                         <?php endif; ?>
                                                     <?php endforeach; ?>
 
                                                     <?php if ($show_cased_column): ?>
-                                                        <th style="padding: 3px; border: 1px solid #ddd; width: 4.5%;text-align: center;">QTY (CASE)</th>
+                                                        <th style=" border: 1px solid #ddd; width: 4.5%;text-align: center;">QTY (CASE)</th>
                                                     <?php endif; ?>
 
                                                     <?php if ($show_persen_column): ?>
-                                                        <th style="padding: 3px; border: 1px solid #ddd; width: 4.5%;text-align: right;">%</th>
+                                                        <th style=" border: 1px solid #ddd; width: 4.5%;text-align: right;">%</th>
                                                     <?php endif; ?>
 
-                                                    <th style="padding: 3px; border: 1px solid #ddd; width: 4.5%; text-align: center;">QTY (<?= $satuanQty ?>)</th>
-                                                    <th style="padding: 3px; border: 1px solid #ddd; width: 8%; text-align: center;" class="price">UNIT PRICE (<?= $dataSO->mata_uang . "/" . $satuanQty ?>)</th>
-                                                    <th style="padding: 3px; border: 1px solid #ddd; width: 8%; text-align: center;" class="price">TOTAL AMOUNT (<?= $dataSO->mata_uang ?>)</th>
+                                                    <th style=" border: 1px solid #ddd; width: 4.5%; text-align: center;">QTY (<?= $satuanQty ?>)</th>
+                                                    <th style=" border: 1px solid #ddd; width: 8%; text-align: center;" class="price">UNIT PRICE (<?= $dataSO->mata_uang . "/" . $satuanQty ?>)</th>
+                                                    <th style=" border: 1px solid #ddd; width: 8%; text-align: center;" class="price">TOTAL AMOUNT (<?= $dataSO->mata_uang ?>)</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
@@ -395,7 +394,7 @@
                                                     <tr>
                                                         <?php foreach ($columns_to_show as $col => $col_data): ?>
                                                             <?php if ($col != 'persen' && $col != 'cased'): ?>
-                                                                <td style="padding: 3px; border: 1px solid #ddd;">
+                                                                <td style=" border: 1px solid #ddd;">
                                                                     <?= $breakdown[$col] ?> <br>
                                                                     <?php if (!empty($breakdown["note_" . $col])): ?>
                                                                         (<?= $breakdown["note_" . $col] ?>)
@@ -405,20 +404,20 @@
                                                         <?php endforeach; ?>
 
                                                         <?php if ($show_cased_column): ?>
-                                                            <td style="padding: 3px; border: 1px solid #ddd; text-align: right;">
+                                                            <td style=" border: 1px solid #ddd; text-align: right;">
                                                                 <?= !empty($breakdown['cased']) ? number_format($breakdown['cased'], 2) : '' ?>
                                                             </td>
                                                         <?php endif; ?>
 
                                                         <?php if ($show_persen_column): ?>
-                                                            <td style="padding: 3px; border: 1px solid #ddd; text-align: right;">
+                                                            <td style=" border: 1px solid #ddd; text-align: right;">
                                                                 <?= !empty($breakdown['persen']) ? number_format($breakdown['persen'], 2) . " %" : '' ?>
                                                             </td>
                                                         <?php endif; ?>
 
-                                                        <td style="padding: 3px; border: 1px solid #ddd; text-align: right;"><?= number_format($breakdown['qty_input'], 2) ?></td>
-                                                        <td style="padding: 3px; border: 1px solid #ddd; text-align: right;" class="price"><?= number_format($breakdown['harga'], 2) ?></td>
-                                                        <td style="padding: 3px; border: 1px solid #ddd; text-align: right;" class="price"><?= number_format($breakdown['total_input'], 2) ?></td>
+                                                        <td style=" border: 1px solid #ddd; text-align: right;"><?= number_format($breakdown['qty_input'], 2) ?></td>
+                                                        <td style=" border: 1px solid #ddd; text-align: right;" class="price"><?= number_format($breakdown['harga'], 2) ?></td>
+                                                        <td style=" border: 1px solid #ddd; text-align: right;" class="price"><?= number_format($breakdown['total_input'], 2) ?></td>
                                                     </tr>
                                                 <?php endforeach; ?>
                                             </tbody>
@@ -435,29 +434,31 @@
                                             }
 
                                             ?>
-                                            <tfoot>
-                                                <tr style="background-color: #e9ecef;">
-                                                    <td colspan="<?= $base_columns ?>" style="padding: 3px; border: 1px solid #ddd; text-align: right; font-weight: bold;">TOTAL</td>
+                                            <?php if (count($detail['size_breakdown']) > 1): ?>
+                                                <tfoot>
+                                                    <tr style="background-color: #e9ecef;">
+                                                        <td colspan="<?= $base_columns ?>" style="border: 1px solid #ddd; text-align: right; font-weight: bold;">TOTAL</td>
 
-                                                    <?php if ($show_cased_column): ?>
-                                                        <td style="padding: 3px; border: 1px solid #ddd; text-align: right; font-weight: bold;">
-                                                            <?= $breakdown_cased > 0 ? number_format($breakdown_cased, 2) : '' ?>
-                                                        </td>
-                                                    <?php endif; ?>
+                                                        <?php if ($show_cased_column): ?>
+                                                            <td style=" border: 1px solid #ddd; text-align: right; font-weight: bold;">
+                                                                <?= $breakdown_cased > 0 ? number_format($breakdown_cased, 2) : '' ?>
+                                                            </td>
+                                                        <?php endif; ?>
 
-                                                    <?php if ($show_persen_column): ?>
-                                                        <td style="padding: 3px; border: 1px solid #ddd; text-align: right; font-weight: bold;">
-                                                            <?= $breakdown_persen > 0 ? number_format($breakdown_persen, 2) . " %" : '' ?>
-                                                        </td>
-                                                    <?php endif; ?>
+                                                        <?php if ($show_persen_column): ?>
+                                                            <td style=" border: 1px solid #ddd; text-align: right; font-weight: bold;">
+                                                                <?= $breakdown_persen > 0 ? number_format($breakdown_persen, 2) . " %" : '' ?>
+                                                            </td>
+                                                        <?php endif; ?>
 
-                                                    <td style="padding: 3px; border: 1px solid #ddd; text-align: right; font-weight: bold;"><?= number_format($breakdown_qty, 2)  ?></td>
-                                                    <?php if ($displayPrice == "true"): ?>
-                                                        <td style="padding: 3px; border: 1px solid #ddd; text-align: right; font-weight: bold;"></td>
-                                                        <td style="padding: 3px; border: 1px solid #ddd; text-align: right; font-weight: bold;" class="price"><?= number_format($breakdown_total, 2) ?></td>
-                                                    <?php endif; ?>
-                                                </tr>
-                                            </tfoot>
+                                                        <td style=" border: 1px solid #ddd; text-align: right; font-weight: bold;"><?= number_format($breakdown_qty, 2)  ?></td>
+                                                        <?php if ($displayPrice == "true"): ?>
+                                                            <td style=" border: 1px solid #ddd; text-align: right; font-weight: bold;"></td>
+                                                            <td style=" border: 1px solid #ddd; text-align: right; font-weight: bold;" class="price"><?= number_format($breakdown_total, 2) ?></td>
+                                                        <?php endif; ?>
+                                                    </tr>
+                                                </tfoot>
+                                            <?php endif; ?>
                                         </table>
                                     </div>
                                 <?php endif; ?>
@@ -623,7 +624,7 @@
                                 <tr style="vertical-align: middle;">
                                     <!-- Kolom 1: GRAND TOTAL Label -->
                                     <td style="width: 25%; text-align: left; vertical-align: middle; white-space: nowrap;">
-                                        <span style="margin-left: -3px; font-size:12px;">
+                                        <span style="margin-left: -3px; font-size:11px;">
                                             GRAND TOTAL <?= !empty($salesKontrak['total_container']) ? "(" . $salesKontrak['total_container'] . ")" : "" ?>
                                         </span>
                                     </td>
@@ -632,7 +633,7 @@
                                     <td style="width: auto; text-align: center; vertical-align: middle;">
                                         <?php if ($currentItemSaleskontrakdetail === $totalSalesKontrakdetail): ?>
                                             <?php if (!empty($groupBySatuan)) : ?>
-                                                <table style="width: 15%; margin: 0 auto; border-collapse: collapse; font-size: 12px;">
+                                                <table style="width: auto; margin: 0 auto; border-collapse: collapse; font-size: 11px;">
                                                     <!-- <thead>
                                                         <tr style="background-color: #f3f4f6;">
                                                             <?php foreach ($groupBySatuan as $satuan => $data): ?>
@@ -647,7 +648,7 @@
                                                             foreach ($groupBySatuan as $satuan => $data):
                                                                 $grand_total_qty += $data['qty_input'];
                                                             ?>
-                                                                <td style="padding: 5px; border: 1px solid #ddd; text-align: right; width:120px;">
+                                                                <td style="padding: 0 2px; text-align: right; width: 100px;">
                                                                     <?= number_format($data['qty_input'], 2) ?> <?= $satuan ?>
                                                                 </td>
                                                             <?php endforeach; ?>
