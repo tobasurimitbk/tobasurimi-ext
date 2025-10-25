@@ -1670,7 +1670,7 @@ class MaterialRequest extends BaseController
                 if (!empty($supplierId)) {
                     $condition["rm_purchase_orders.supplier_id"] = $supplierId;
                 }
-                $condition["stock_revamp_detail.reference_type "] = "LPB";
+                $condition["stock_revamp_detail.reference_type"] = ["LPB", "PROSES REBUS"];
                 $dataResult = $this->stockRevampDetailModel->getStockListPOWithCondition($condition);
             } else {
                 if (!empty($vendorId)) {

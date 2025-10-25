@@ -721,6 +721,7 @@ class POLokalBahanPenolong extends BaseController
                 $totalDisc = 0;
                 $totalPpn = 0;
                 $totalTambahan = 0;
+                $totalTambahanPlus = 0;
                 $keterangan = [];
 
                 foreach ($dataBPLokalDetail as $value) {
@@ -729,10 +730,13 @@ class POLokalBahanPenolong extends BaseController
                     $totalan = $value->total;
                     $value->nilaiPpn = number_format($totalan * (float)$value->ppnValue / 100);
                     $value->nilaiPph = number_format($totalan * (float)$value->pphValue / 100);
-                    $totalTambahan += formatter($value->additional_cost, "CURR_TO_INT");
+                    $totalTambahan += (float)$value->additional_cost;
                     $totalPrice += $value->totalPriceWithoutAdditional;
                     $totalDisc += ($totalan) * (float)$value->disc / 100;
                     $totalPpn += $totalan * (float)$value->ppnValue / 100;
+                    if ($value->additional_cost > 0) {
+                        $totalTambahanPlus += $value->additional_cost;
+                    }
                     $keterangan[] = $value->note;
                 }
 
@@ -740,7 +744,7 @@ class POLokalBahanPenolong extends BaseController
                 $dataBPLokal->totalPrice = number_format(formatter(($totalPrice), "STR_TO_FLOAT"), 2, '.', ',');
                 $dataBPLokal->totalDisc = number_format(formatter(($totalDisc), "STR_TO_FLOAT"), 2, '.', ',');
                 $dataBPLokal->totalPpn = number_format(formatter(round($totalPpn), "STR_TO_FLOAT"), 2, '.', ',');
-                $dataBPLokal->totalPo = number_format(formatter(($totalTambahan + $totalPrice - $totalDisc + round($totalPpn)), "STR_TO_FLOAT"), 2, '.', ',');
+                $dataBPLokal->totalPo = number_format(formatter(($totalPrice - $totalDisc + round($totalPpn) + $totalTambahanPlus), "STR_TO_FLOAT"), 2, '.', ',');
                 $dataBPLokal->keterangan = implode(",", array_unique($keterangan));
                 $dataBPLokal->jatuhTempoHari = \totalDayInRange($dataBPLokal->po_date, $dataBPLokal->payment_date);
                 $data["dataPOLokal"] = $dataBPLokal;

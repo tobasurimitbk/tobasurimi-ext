@@ -241,7 +241,7 @@
                                         <option value="<?= $v['id'] ?>"> <?= strtoupper($v['name']); ?></option>
                                     <?php endforeach; ?>
                                 </select>
-                                <label for="floatingInput" style="z-index: 1;">Vendor</label>
+                                <label for="floatingInput" style="z-index: 1;">Vendor (Opsional)</label>
                             </div>
                         </div>
                         <div class="col-md-4">
@@ -860,6 +860,7 @@
     $('#supplier_id').select2({
         placeholder: "Pilih Supplier",
         theme: "bootstrap-5",
+        allowClear: true
     }).change(function() {
         // LIST DOKUMEN PABEAN
         getListDokumenPabeanBahanBaku();
@@ -868,6 +869,7 @@
     $('#vendor_barang_id').select2({
         placeholder: "Pilih Vendor",
         theme: "bootstrap-5",
+        allowClear: true
     }).change(function() {
         // LIST DOKUMEN PABEAN
         getListDokumenPabeanBahanBaku();
