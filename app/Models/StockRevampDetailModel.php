@@ -1012,6 +1012,8 @@ class StockRevampDetailModel extends Model
                 rm_purchase_orders.po_no,
                 rm_purchase_orders.id as rm_purchase_order_id,
                 rm_purchase_order_details.id as rm_purchase_order_detail_id,
+                barang_master.barang_name,
+                barang_master_spesifikasi.spesifikasi,
                 CONCAT(barang_master.barang_name, " ", barang_master_spesifikasi.spesifikasi) AS barang,
                 satuans.kode_satuan,
                 stock_revamp_detail.qty_bersih as stok_total,

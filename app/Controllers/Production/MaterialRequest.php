@@ -1745,7 +1745,6 @@ class MaterialRequest extends BaseController
                     $dataResult[$i]['spesifikasi'] = $dataResult[$i]['spesifikasi'] == null ? "-" : $dataResult[$i]['spesifikasi'];
                     $dataResult[$i]['kode_satuan'] = $dataResult[$i]['kode_satuan'] == null ? "-" : $dataResult[$i]['kode_satuan'];
                     $dataResult[$i]['stock_date'] = date('d/m/Y', strtotime($dataResult[$i]['stock_date']));
-                    $dataResult[$i]['nama_vendor'] = $dataResult[$i]['vendor_name'] == null ? "-" : $dataResult[$i]['vendor_name'];
                     $dataResult[$i]['bc_type'] = $dataResult[$i]['type_bc'] == null ? "NON PABEAN" : $dataResult[$i]['type_bc'];
                     $dataResult[$i]['no_daftar'] = $dataResult[$i]['no_daftar'] == null ? "-" : $dataResult[$i]['no_daftar'];
                     $dataResult[$i]['stok_total'] = floatval($dataResult[$i]['stok_total_diterima']);
