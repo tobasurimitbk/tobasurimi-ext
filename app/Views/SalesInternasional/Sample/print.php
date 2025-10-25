@@ -171,7 +171,7 @@
                     </b><br>
                     <hr>
                     <?= $dataSample['description_notes'] ?>
-                    <table border="0" style="width: 100%;">
+                    <!-- <table border="0" style="width: 100%;">
                         <tr>
                             <td>
                                 <b>
@@ -184,7 +184,7 @@
                             </td>
 
                         </tr>
-                    </table>
+                    </table> -->
                 </td>
             </tr>
 
@@ -230,7 +230,7 @@
                             <td style="width: 16.66%; border: 1px solid black; border-top: none; border-bottom: none;">
                                 <br><br><br><br>
                                 <center>
-                                    ( QA / QC <?= $company['company'] ?> )
+                                    ( QC <?= $company['company'] ?> )
                                 </center>
                             </td>
                             <td style="width: 16.66%; border: 1px solid black; border-top: none; border-bottom: none;">
