@@ -8,7 +8,7 @@
     <style>
         body {
             font-size: 12px;
-            font-family: 'Times New Roman', Times, serif;
+            font-family: 'ARIAL UNICODE MS', Times, serif;
             font-weight: 700;
         }
 
