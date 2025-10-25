@@ -2038,6 +2038,14 @@ class BC23 extends BaseController
         $bcPurchaseOrder = $this->bcPurchaseOrderModel->where('id', $bcPurchaseOrderID)->first();
         $tanggalDokumen = date('Y-m-d', strtotime($bcPurchaseOrder['createdAt']));
 
+        if ($bcPurchaseOrder['status_posting'] == 1) {
+            return response()->setJSON([
+                'token' => csrf_hash(),
+                'status' => false,
+                'message' => "Dokumen sudah di posting user lain silahkan reload halaman anda",
+            ]);
+        }
+
         if ($bc40 == null) {
             // insert
             $this->bc23Model->insert([
