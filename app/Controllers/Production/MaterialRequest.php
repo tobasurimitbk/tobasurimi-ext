@@ -1698,13 +1698,13 @@ class MaterialRequest extends BaseController
                     $noDaftar = $dataResult[$i]['no_daftar_ppbkb'];
                 }
 
-                if (!empty($vendorId)) {
+                if ($typeAsalBarang != "SUPPLIER") {
                     $dataResult[$i]['stock_id'] = $dataResult[$i]['stock_id'];
-                    $dataResult[$i]['supplier_name'] = $dataResult[$i]['supplier_name'] == null ? "-" : $dataResult[$i]['supplier_name'];
+                    $dataResult[$i]['supplier_name'] = $dataResult[$i]['supplier_name'] == null ? ($dataResult[$i]['vendor_name'] == null ? "-" : $dataResult[$i]['vendor_name']) : $dataResult[$i]['supplier_name'];
                     $dataResult[$i]['id'] = encrypt($dataResult[$i]['stock_id']) . '-' . encrypt($dataResult[$i]['id']);
                     $dataResult[$i]['bc_id'] =  $dataResult[$i]['bc_id'] == "-" ? "-" : $dataResult[$i]['bc_id'];
                     $dataResult[$i]['no_aju'] =  empty($dataResult[$i]['no_aju']) ? "-" : $dataResult[$i]['no_aju'];
-                    $dataResult[$i]['stock_dokumen'] = $dataResult[$i]['stock_dokumen'] == null ? "-" : $dataResult[$i]['stock_dokumen'];
+                    $dataResult[$i]['stock_dokumen'] = $dataResult[$i]['stock_dokumen'] == null ? ($dataResult[$i]['no_penerimaan_surat_jalan'] == null ? "-" : $dataResult[$i]['no_penerimaan_surat_jalan']) : $dataResult[$i]['stock_dokumen'];
                     $dataResult[$i]['no_dokumen_2'] = $dataResult[$i]['no_penerimaan_surat_jalan'] == null ? "-" : $dataResult[$i]['no_penerimaan_surat_jalan'];
                     $dataResult[$i]['supplier_id'] = $vendorId;
                     $dataResult[$i]['harga_umum'] = $dataResult[$i]['harga_umum'] == null ? "0" : $dataResult[$i]['harga_umum'];
@@ -1734,7 +1734,7 @@ class MaterialRequest extends BaseController
                     $dataResult[$i]['id'] = encrypt($dataResult[$i]['stock_id']) . '-' . encrypt($dataResult[$i]['id']);
                     $dataResult[$i]['bc_id'] =  $dataResult[$i]['bc_id'] == "-" ? "-" : $dataResult[$i]['bc_id'];
                     $dataResult[$i]['no_aju'] =  empty($dataResult[$i]['no_aju']) ? "-" : $dataResult[$i]['no_aju'];
-                    $dataResult[$i]['stock_dokumen'] = $dataResult[$i]['stock_dokumen'] == null ? "-" : $dataResult[$i]['stock_dokumen'];
+                    $dataResult[$i]['stock_dokumen'] = $dataResult[$i]['stock_dokumen'] == null ? ($dataResult[$i]['no_penerimaan_barang'] == null ? "-" : $dataResult[$i]['no_penerimaan_barang']) : $dataResult[$i]['stock_dokumen'];
                     $dataResult[$i]['no_dokumen_2'] = $dataResult[$i]['no_penerimaan_barang'] == null ? "-" : $dataResult[$i]['no_penerimaan_barang'];
                     $dataResult[$i]['supplier_id'] = $vendorId;
                     $dataResult[$i]['harga_umum'] = $dataResult[$i]['harga_umum'] == null ? "0" : $dataResult[$i]['harga_umum'];
