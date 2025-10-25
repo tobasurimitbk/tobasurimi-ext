@@ -996,7 +996,7 @@ class StockRevampDetailModel extends Model
     public function getStockListPOWithCondition($condition)
     {
         $builder = $this->asArray()
-            ->select('
+            ->select("
                 stock_revamp_detail.id AS id,
                 stock_revamp_detail.id AS stock_detail_id,
                 stock_revamp.spesifikasi_id,
@@ -1014,27 +1014,31 @@ class StockRevampDetailModel extends Model
                 rm_purchase_order_details.id as rm_purchase_order_detail_id,
                 barang_master.barang_name,
                 barang_master_spesifikasi.spesifikasi,
-                CONCAT(barang_master.barang_name, " ", barang_master_spesifikasi.spesifikasi) AS barang,
+                CONCAT(barang_master.barang_name, ' ', barang_master_spesifikasi.spesifikasi) AS barang,
                 satuans.kode_satuan,
                 stock_revamp_detail.qty_bersih as stok_total,
                 stock_revamp_detail.qty_diterima as stok_total_diterima,
                 rm_purchase_orders.po_no AS stock_dokumen,
-                suppliers.name AS supplier_name,
+                UPPER(suppliers.name) AS supplier_name,
                 bc_purchase_order.no_aju,
                 rm_purchase_order_details.general_price as harga_umum,
                 rm_purchase_order_details.daily_price as harga_harian,
                 rm_purchase_order_details.monthly_price as harga_bulanan,
-                penerimaan_barang.tanggal as stock_date,
+                CASE 
+                    WHEN stock_revamp_detail.reference_type = 'PROSES REBUS' THEN proses_rebus.tanggal
+                    ELSE penerimaan_barang.tanggal
+                END AS stock_date,
                 penerimaan_barang.no_penerimaan_barang as no_penerimaan_barang,
                 stock_revamp_detail.type_bc as type_bc,
                 bc_purchase_order.no_daftar
-            ')
+            ")
             ->join('stock_revamp', 'stock_revamp.id = stock_revamp_detail.stock_id', 'left')
             ->join('rm_purchase_orders', 'rm_purchase_orders.id = stock_revamp_detail.po_id', 'left')
             ->join('rm_purchase_order_details', 'rm_purchase_order_details.rm_purchase_order_id = rm_purchase_orders.id', 'left')
             ->join('penerimaan_barang', 'penerimaan_barang.id = stock_revamp_detail.reference_id', 'left')
             ->join('bc_purchase_order_lpb', 'bc_purchase_order_lpb.penerimaan_barang_id = penerimaan_barang.id', 'left')
             ->join('bc_purchase_order', 'bc_purchase_order.id = bc_purchase_order_lpb.bc_purchase_order_id', 'left')
+            ->join('proses_rebus', 'proses_rebus.id = stock_revamp_detail.reference_id', 'left')
             ->join('suppliers', 'suppliers.id = rm_purchase_orders.supplier_id', 'left')
             ->join('barang_master', 'barang_master.id = stock_revamp.barang_master_id', 'left')
             ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = stock_revamp.spesifikasi_id', 'left')
@@ -1082,14 +1086,14 @@ class StockRevampDetailModel extends Model
                 stock_revamp_detail.qty_diterima as stok_total_diterima,
                 jasa_vendor_in.no_penerimaan_surat_jalan,
                 concat(jasa_vendor_in.no_penerimaan_surat_jalan, " (", rm_purchase_orders.po_no, ")") AS stock_dokumen,
-                concat(vendors.name, " / ", suppliers.name) AS supplier_name,
+                UPPER(concat(vendors.name, " / ", suppliers.name)) AS supplier_name,
                 bc_purchase_order.no_aju,
                 vendors.id AS vendor_id,
-                vendors.name AS vendor_name,
+                UPPER(vendors.name) AS vendor_name,
                 rm_purchase_order_details.general_price as harga_umum,
                 rm_purchase_order_details.daily_price as harga_harian,
                 rm_purchase_order_details.monthly_price as harga_bulanan,
-                penerimaan_barang.tanggal as stock_date,
+                COALESCE (penerimaan_barang.tanggal, jasa_vendor_in.tanggal) as stock_date,
                 stock_revamp_detail.type_bc as type_bc,
                 bc_purchase_order.no_daftar
             ')

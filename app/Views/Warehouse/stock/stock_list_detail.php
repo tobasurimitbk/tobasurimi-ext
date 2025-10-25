@@ -76,7 +76,7 @@
                 </div>
                 <div class="col-md-4 mb-3">
                     <div class="form-floating" style="height: 50px;">
-                        <input placeholder="Cari Data" class="form-control" id="search" name="search" />
+                        <input placeholder="Cari Data" class="form-control search" id="search" name="search" />
                         <label style="z-index: 1;" style="z-index: 1;">Cari Data</label>
                     </div>
                 </div>
