@@ -1023,6 +1023,7 @@ class StockRevampDetailModel extends Model
                 rm_purchase_order_details.daily_price as harga_harian,
                 rm_purchase_order_details.monthly_price as harga_bulanan,
                 penerimaan_barang.tanggal as stock_date,
+                penerimaan_barang.no_penerimaan_barang as no_penerimaan_barang,
                 stock_revamp_detail.type_bc as type_bc,
                 bc_purchase_order.no_daftar
             ')

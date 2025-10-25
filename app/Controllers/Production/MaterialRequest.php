@@ -1735,7 +1735,7 @@ class MaterialRequest extends BaseController
                     $dataResult[$i]['bc_id'] =  $dataResult[$i]['bc_id'] == "-" ? "-" : $dataResult[$i]['bc_id'];
                     $dataResult[$i]['no_aju'] =  empty($dataResult[$i]['no_aju']) ? "-" : $dataResult[$i]['no_aju'];
                     $dataResult[$i]['stock_dokumen'] = $dataResult[$i]['stock_dokumen'] == null ? "-" : $dataResult[$i]['stock_dokumen'];
-                    $dataResult[$i]['no_dokumen_2'] = $dataResult[$i]['no_penerimaan_surat_jalan'] == null ? "-" : $dataResult[$i]['no_penerimaan_surat_jalan'];
+                    $dataResult[$i]['no_dokumen_2'] = $dataResult[$i]['no_penerimaan_barang'] == null ? "-" : $dataResult[$i]['no_penerimaan_barang'];
                     $dataResult[$i]['supplier_id'] = $vendorId;
                     $dataResult[$i]['harga_umum'] = $dataResult[$i]['harga_umum'] == null ? "0" : $dataResult[$i]['harga_umum'];
                     $dataResult[$i]['harga_harian'] = $dataResult[$i]['harga_harian'] == null ? "0" : $dataResult[$i]['harga_harian'];
