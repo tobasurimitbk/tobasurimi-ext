@@ -1961,6 +1961,7 @@ class JurnalUmum extends BaseController
                         ->select('local_po_payments.*, local_po_payment_details.*, suppliers.name as supplier_name')
                         ->join('local_po_payment_details', 'local_po_payment_details.local_po_payment_id = local_po_payments.id', 'left')
                         ->join('suppliers', 'suppliers.id = local_po_payments.supplier_id', 'left')
+                        ->where('local_po_payment_details.tipe', 'BB')
                         ->where('local_po_payments.id', $payID)
                         ->where('local_po_payments.deletedAt', null)
                         ->where('local_po_payment_details.deletedAt', null)
@@ -2119,6 +2120,7 @@ class JurnalUmum extends BaseController
 
             $details = $detailModel
                 ->where('local_po_payment_id', $payID)
+                ->where('tipe', 'BP')
                 ->where('deletedAt', null)
                 ->findAll();
 
