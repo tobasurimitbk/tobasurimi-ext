@@ -1698,9 +1698,6 @@ class MaterialRequest extends BaseController
                     $noDaftar = $dataResult[$i]['no_daftar_ppbkb'];
                 }
 
-                $spesifikasi = isset($dataResult[$i]['spesifikasi']) ? $dataResult[$i]['spesifikasi'] : '';
-                $barangName = $dataResult[$i]['barang_name'];
-
                 if (!empty($vendorId)) {
                     $dataResult[$i]['stock_id'] = $dataResult[$i]['stock_id'];
                     $dataResult[$i]['supplier_name'] = $dataResult[$i]['supplier_name'] == null ? "-" : $dataResult[$i]['supplier_name'];
