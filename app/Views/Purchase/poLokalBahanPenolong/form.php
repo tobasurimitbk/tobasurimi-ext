@@ -444,6 +444,14 @@
 
     });
 
+    $('#po_date').change(function(e) {
+        e.preventDefault();
+        <?php if (empty($poDetail)): ?>
+            // JIka Buat Aja
+            changeStatus();
+        <?php endif; ?>
+    });
+
     $('#division_id').change(function() {
         getListSPP();
     });
@@ -1064,6 +1072,9 @@
                 url: `<?= base_url("/po-lokal-bahan-penolong/generate-po-no"); ?>`,
                 method: "GET",
                 dataType: "json",
+                data: {
+                    tanggal: $('#po_date').val()
+                },
                 success: function(res) {
                     if (res) {
                         $(".po_no").val(res);

@@ -939,6 +939,60 @@ class StockRevampDetailModel extends Model
         ];
     }
 
+    public function getListStockDetailByInisiasi($condition = [], $addCondition = [], $limit = 10, $offset = 0)
+    {
+        $availableSort = [
+            'kode_barang'   => 'barang_master.kode_barang',
+            'barang_name'   => 'barang_master.barang_name',
+            'spesifikasi'   => 'barang_master_spesifikasi.spesifikasi',
+            'type_bc'       => 'stock_revamp_detail.type_bc',
+            'reference_id'  => 'stock_revamp_detail.reference_id',
+            'qty_diterima'  => 'stock_revamp_detail.qty_diterima',
+            'unit_id'       => 'stock_revamp.unit_id'
+        ];
+
+        $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
+
+        $sort = $availableSort[$addCondition['sort'] ?? 'stock_revamp_detail.id'] ?? 'stock_revamp_detail.id';
+        $sortType = $availableSortType[strtolower($addCondition['sortType'] ?? 'desc')] ?? 'DESC';
+
+        $selectQry = "
+            stock_revamp_detail.*,
+            barang_master.kode_barang,
+            barang_master.barang_name,
+            barang_master_spesifikasi.spesifikasi,
+            satuans.kode_satuan,
+        ";
+
+        $builder = $this->asArray()
+            ->select($selectQry)
+            ->join('stock_revamp', 'stock_revamp.id = stock_revamp_detail.stock_id', 'left')
+            ->join('barang_master', 'stock_revamp.barang_master_id = barang_master.id', 'left')
+            ->join('barang_master_spesifikasi', 'stock_revamp.spesifikasi_id = barang_master_spesifikasi.id', 'left')
+            ->join('satuans', 'satuans.id = stock_revamp.unit_id', 'left')
+            ->where($condition)
+            ->orderBy($sort, $sortType);
+
+        $totalData = $builder->countAllResults(false);
+
+        if (!empty($addCondition['search'])) {
+            $builder->groupStart()
+                ->like('barang_master.kode_barang', $addCondition['search'])
+                ->orLike('vendors.name', $addCondition['search'])
+                ->groupEnd();
+        }
+
+        $countBuilder = clone $builder;
+        $totalFilteredData = $countBuilder->countAllResults(false);
+        $data = $builder->findAll($limit, $offset);
+
+        return [
+            'data'              => $data,
+            'totalData'         => $totalData,
+            'totalFilteredData' => $totalFilteredData,
+        ];
+    }
+
     public function getStockListPOWithCondition($condition)
     {
         $builder = $this->asArray()

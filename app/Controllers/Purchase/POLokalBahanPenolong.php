@@ -991,14 +991,19 @@ class POLokalBahanPenolong extends BaseController
 
     public function generateNoPO()
     {
-        $noPoNew =  $this->aMPurchaseOrderModel->get_new_no_po(
-            date('m'),
-            date('Y'),
-            getLastDay(),
-            $this->this_company_id
-        );
+        $tanggal = $this->request->getVar('tanggal');
+        if (empty($tanggal)) {
+            return json_encode("");
+        } else {
+            $tanggalFormat = formatDMYtoYMD($tanggal);
+            $noPoNew =  $this->aMPurchaseOrderModel->get_new_no_po(
+                $tanggalFormat,
+                $this->this_company_id,
+                getLastDayByDate($tanggalFormat)
+            );
 
-        return json_encode($noPoNew);
+            return json_encode($noPoNew);
+        }
     }
 
     public function dropdownBarang()

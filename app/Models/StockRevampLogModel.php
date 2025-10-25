@@ -735,4 +735,82 @@ class StockRevampLogModel extends Model
             'totalFilteredData' => $totalFilteredData,
         ];
     }
+
+    public function getListLogInisiasi($condition = [], $addCondition = [], $limit = 10, $offset = 0)
+    {
+        $availableSort = [
+            'kode_barang'   => 'barang_master.kode_barang',
+            'barang_name'   => 'barang_master.barang_name',
+            'spesifikasi'   => 'barang_master_spesifikasi.spesifikasi',
+            'divisi_id'     => 'stock_revamp.divisi_id',
+            'warehouse_id'  => 'stock_revamp.warehouse_id',
+            'type_bc'       => 'stock_revamp_detail.type_bc',
+            'reference_id'  => 'stock_revamp_detail.reference_id',
+            'createdAt'     => 'stock_revamp_log.createdAt',
+            'qty_diterima'  => 'stock_revamp_log.qty_diterima',
+            'unit_id'       => 'stock_revamp.unit_id',
+        ];
+
+        $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
+
+        $sort = $availableSort[$addCondition['sort'] ?? 'createdAt'] ?? 'stock_revamp_log.createdAt';
+        $sortType = $availableSortType[strtolower($addCondition['sortType'] ?? 'desc')] ?? 'DESC';
+
+        // SELECT utama
+        $selectQry = "
+            stock_revamp_log.*,
+            barang_master.kode_barang,
+            barang_master.barang_name,
+            barang_master_spesifikasi.spesifikasi,
+            divisis.divisi,
+            warehouses.warehouse_name,
+            stock_revamp_detail.type_bc,
+            satuans.kode_satuan
+        ";
+
+        $builder = $this->asArray()
+            ->select($selectQry)
+            ->join('stock_revamp_detail', 'stock_revamp_detail.id = stock_revamp_log.stock_detail_id', 'left')
+            ->join('stock_revamp', 'stock_revamp.id = stock_revamp_detail.stock_id', 'left')
+            ->join('barang_master', 'stock_revamp.barang_master_id = barang_master.id', 'left')
+            ->join('barang_master_spesifikasi', 'stock_revamp.spesifikasi_id = barang_master_spesifikasi.id', 'left')
+            ->join('divisis', 'divisis.id = stock_revamp.divisi_id', 'left')
+            ->join('satuans', 'satuans.id = stock_revamp.unit_id', 'left')
+            ->join('warehouses', 'warehouses.id = stock_revamp.warehouse_id', 'left')
+            ->where($condition)
+            ->orderBy($sort, $sortType);
+
+        $totalData = $builder->countAllResults(false);
+
+        if (!empty($addCondition['dateStart'])) {
+            $builder->where('DATE(stock_revamp_log.createdAt) >=', $addCondition['dateStart']);
+        }
+        if (!empty($addCondition['dateEnd'])) {
+            $builder->where('DATE(stock_revamp_log.createdAt) <=', $addCondition['dateEnd']);
+        }
+        if (!empty($addCondition['divisi_id'])) {
+            $builder->where('stock_revamp.divisi_id', $addCondition['divisi_id']);
+        }
+        if (!empty($addCondition['warehouse_id'])) {
+            $builder->where('stock_revamp.warehouse_id', $addCondition['warehouse_id']);
+        }
+        if (!empty($addCondition['search'])) {
+            $builder->groupStart()
+                ->like('divisis.divisi', $addCondition['search'])
+                ->orLike('barang_master.kode_barang', $addCondition['search'])
+                ->orLike('barang_master.barang_name', $addCondition['search'])
+                ->orLike('barang_master_spesifikasi.spesifikasi', $addCondition['search'])
+                ->groupEnd();
+        }
+
+        $countBuilder = clone $builder;
+        $totalFilteredData = $countBuilder->countAllResults(false);
+        $data = $builder->findAll($limit, $offset);
+
+        return [
+            'data'              => $data,
+            'totalData'         => $totalData,
+            'totalFilteredData' => $totalFilteredData,
+        ];
+    }
 }

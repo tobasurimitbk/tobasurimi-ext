@@ -319,16 +319,17 @@ class StockRevampModel extends Model
                     'qty_bersih'   => $newQtyParentBersih,
                 ]);
 
-            $db->table('stock_revamp_history')->insert([
-                'stock_detail_asal'    => $data['stock_detail_id'],
-                'stock_detail_akhir'   => $data['stock_detail_id'],
-                'qty_bersih_asal'      => $data['qty_digunakan'],
-                'qty_diterima_asal'    => $data['qty_digunakan'],
-                'qty_bersih_akhir'     => $data['qty_digunakan'], // hasil rumus
-                'qty_diterima_akhir'   => $data['qty_digunakan'], // bisa disamakan kalau proporsional
-                'createdAt'            => date('Y-m-d H:i:s'),
-                'updatedAt'            => date('Y-m-d H:i:s'),
-            ]);
+            // $db->table('stock_revamp_history')->insert([
+            //     'stock_detail_asal'    => $data['stock_detail_id'],
+            //     'stock_detail_akhir'   => $data['stock_detail_id'],
+            //     'qty_bersih_asal'      => $data['qty_digunakan'],
+            //     'qty_diterima_asal'    => $data['qty_digunakan'],
+            //     'qty_bersih_akhir'     => $data['qty_digunakan'], // hasil rumus
+            //     'qty_diterima_akhir'   => $data['qty_digunakan'], // bisa disamakan kalau proporsional
+            //     'tanggal'         => date('Y-m-d'),
+            //     'createdAt'            => date('Y-m-d H:i:s'),
+            //     'updatedAt'            => date('Y-m-d H:i:s'),
+            // ]);
 
             // ==============================
             // 5. Insert ke log
@@ -1404,6 +1405,47 @@ class StockRevampModel extends Model
             $whereDateMaterialRequestPenolong
             $searchMaterialRequestPenolong
         )
+        UNION ALL
+        (
+            -- STOK DARI INISIASI
+             SELECT
+                stock_revamp_detail.id,
+                stock_revamp_detail.reference_type,
+                stock_revamp_detail.qty_diterima,
+                stock_revamp_detail.type_bc,
+                barang_master.kode_barang,
+                barang_master.barang_name,
+                barang_master_spesifikasi.spesifikasi,
+                '' AS lpb_date,
+                '' AS po_no,
+                '' AS po_date,
+                '' AS supplier_name,
+                '' AS reference_no,
+                satuans.kode_satuan,
+                divisis.divisi,
+                warehouses.warehouse_name,
+                stock_revamp.unit_id,
+                -- HELPER UNTUK STOK
+                stock_revamp.barang_master_id,
+                stock_revamp.spesifikasi_id,
+                stock_revamp.divisi_id,
+                stock_revamp.warehouse_id,
+                stock_revamp_detail.bc_id,
+                stock_revamp_detail.reference_id,
+                stock_revamp_detail.po_type,
+                stock_revamp_detail.po_id
+            FROM
+                stock_revamp_detail
+            LEFT JOIN stock_revamp ON stock_revamp.id = stock_revamp_detail.stock_id
+            LEFT JOIN barang_master ON stock_revamp.barang_master_id = barang_master.id
+            LEFT JOIN barang_master_spesifikasi ON stock_revamp.spesifikasi_id = barang_master_spesifikasi.id
+            LEFT JOIN satuans ON satuans.id = stock_revamp.unit_id
+            LEFT JOIN divisis ON divisis.id = stock_revamp.divisi_id
+            LEFT JOIN warehouses ON warehouses.id = stock_revamp.warehouse_id
+            WHERE stock_revamp_detail.deletedAt IS NULL
+            AND stock_revamp_detail.reference_type='INISIASI'
+            $filterCondition
+        )
         ";
 
 
@@ -1437,5 +1479,49 @@ class StockRevampModel extends Model
             'sort'              => $orderColumnIndex,
             'sortType'          => $orderDir,
         ];
+    }
+
+    public function getBarangBelumInisiasi(
+        $type_barang,
+        $divisi_id,
+        $warehouse_id,
+        $company_id,
+        $search
+    ) {
+        $barangMasterSpesifikasiModel = new BarangMasterSpesifikasiModel();
+
+        $stockSudahInisiasi = $this->asArray()
+            ->select('stock_revamp.*')
+            ->where('stock_revamp.deletedAt', null)
+            ->where('stock_revamp.company_id', $company_id)
+            ->where('stock_revamp.divisi_id', $divisi_id)
+            ->where('stock_revamp.warehouse_id', $warehouse_id)
+            ->findAll();
+
+        $spesifikasiIdSudahInisiasi = array_column($stockSudahInisiasi, 'spesifikasi_id');
+        $dataQry = $barangMasterSpesifikasiModel
+            ->select(
+                '
+                barang_master_spesifikasi.*,
+                barang_master.barang_name,
+                barang_master.kode_barang
+                '
+            )
+            ->join('barang_master', 'barang_master.id = barang_master_spesifikasi.barang_master_id', 'left')
+            ->where('barang_master_spesifikasi.deletedAt', null)
+            ->where('barang_master.deletedAt', null)
+            ->where('barang_master.company_id', $company_id)
+            ->where('barang_master.type_barang', $type_barang);
+
+        if (count($spesifikasiIdSudahInisiasi) > 0) {
+            $dataQry->whereNotIn('barang_master_spesifikasi.id', $spesifikasiIdSudahInisiasi);
+        }
+
+        $dataQry->groupStart()
+            ->like('CONCAT(barang_master.barang_name, " ", barang_master_spesifikasi.spesifikasi)', $search)
+            ->orLike('barang_master.kode_barang', $search)
+            ->groupEnd();
+
+        return $dataQry->findAll(100);
     }
 }
