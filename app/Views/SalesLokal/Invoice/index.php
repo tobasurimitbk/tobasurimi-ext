@@ -493,7 +493,7 @@
             let filter_jenis_dokumen = $(".filter_jenis_dokumen").val();
             let filter_paid = $(".filter_paid").val();
 
-            let exportUrl = `/invoice-penjualan-lokal/export-excel?search=${encodeURIComponent(search)}&sort=${sort}&sortType=${sortType}&dateStart=${encodeURIComponent(dateStart)}&dateEnd=${encodeURIComponent(dateEnd)}&filter_customer=${filter_customer}&filter_company=${filter_company}&filter_jenis_dokumen=${filter_jenis_dokumen}&filter_paid=${filter_paid}`;
+            let exportUrl = `/lyrid/invoice-penjualan-lokal/export-excel?search=${encodeURIComponent(search)}&sort=${sort}&sortType=${sortType}&dateStart=${encodeURIComponent(dateStart)}&dateEnd=${encodeURIComponent(dateEnd)}&filter_customer=${filter_customer}&filter_company=${filter_company}&filter_jenis_dokumen=${filter_jenis_dokumen}&filter_paid=${filter_paid}`;
 
             window.open(exportUrl, '_blank');
         });

@@ -446,7 +446,7 @@
             let filter_company = $(".filter_company").val();
             let filter_invoice = $(".filter_invoice").val();
 
-            let exportUrl = `/surat-jalan/export-excel?search=${encodeURIComponent(search)}&sort=${sort}&sortType=${sortType}&dateStart=${encodeURIComponent(dateStart)}&dateEnd=${encodeURIComponent(dateEnd)}&filter_customer=${filter_customer}&filter_company=${filter_company}&filter_invoice=${filter_invoice}`;
+            let exportUrl = `/lyrid/surat-jalan/export-excel?search=${encodeURIComponent(search)}&sort=${sort}&sortType=${sortType}&dateStart=${encodeURIComponent(dateStart)}&dateEnd=${encodeURIComponent(dateEnd)}&filter_customer=${filter_customer}&filter_company=${filter_company}&filter_invoice=${filter_invoice}`;
 
             window.open(exportUrl, '_blank');
         });
