@@ -918,7 +918,7 @@
                 <?php endif ?>
 
                 <?php if (!empty($salesKontrak['special_instructions'])): ?>
-                    <tr class="label-header">
+                    <tr class="label-header" style="line-height: 1 !important;">
                         <td style="vertical-align: top;"><?= strtoupper(numToRoman($counter++)) ?>.</td>
                         <td style="vertical-align: top;">ADDITIONAL CLAUSES</td>
                         <td style="vertical-align: top;">:</td>
