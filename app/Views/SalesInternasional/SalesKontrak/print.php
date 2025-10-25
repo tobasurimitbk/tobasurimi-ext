@@ -891,7 +891,7 @@
         <table style="border-spacing: 0 4px; width: 100%;">
             <tbody>
                 <?php if (!empty($salesKontrak['payment_term'])): ?>
-                    <tr class="label-header">
+                    <tr class="label-header" style="line-height: 1 !important;">
                         <td style="width: 25px; vertical-align: top;"><?= strtoupper(numToRoman($counter++)) ?>.</td>
                         <td style="width: 180px; vertical-align: top;">PAYMENT TERM</td>
                         <td style="width: 10px; vertical-align: top;">:</td>
@@ -909,7 +909,7 @@
                 <?php endif ?>
 
                 <?php if (!empty($salesKontrak['documents_required'])): ?>
-                    <tr class="label-header">
+                    <tr class="label-header" style="line-height: 1 !important;">
                         <td><?= strtoupper(numToRoman($counter++)) ?>.</td>
                         <td>DOCUMENT REQUIRED</td>
                         <td>:</td>
@@ -918,7 +918,7 @@
                 <?php endif ?>
 
                 <?php if (!empty($salesKontrak['special_instructions'])): ?>
-                    <tr class="label-header">
+                    <tr class="label-header" style="line-height: 1 !important;">
                         <td style="vertical-align: top;"><?= strtoupper(numToRoman($counter++)) ?>.</td>
                         <td style="vertical-align: top;">ADDITIONAL CLAUSES</td>
                         <td style="vertical-align: top;">:</td>
