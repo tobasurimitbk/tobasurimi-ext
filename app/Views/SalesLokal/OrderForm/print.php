@@ -8,8 +8,8 @@
     <style>
         body {
             font-size: 12px;
-            font-family: 'ARIAL UNICODE MS', Times, serif;
-            font-weight: 700;
+            font-family: 'ARIAL UNICODE MS';
+            font-weight: 500;
         }
 
         @page {

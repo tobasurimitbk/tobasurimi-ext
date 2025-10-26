@@ -8,7 +8,8 @@
     <style>
         body {
             font-size: 12px;
-            font-family: 'Courier New', monospace; /* Font monospace */
+            font-family: 'ARIAL UNICODE MS';
+            /* Font monospace */
         }
 
         @page {

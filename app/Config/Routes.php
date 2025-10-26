@@ -2365,6 +2365,54 @@ $routes->post('/ratio-gurita/delete', 'Accounting\Rasio\RasioGuritaController::d
 $routes->post('/ratio-gurita/get', 'Accounting\Rasio\RasioGuritaController::get', ['filter' => 'Auth']);
 $routes->get('/ratio-gurita/load_content', 'Accounting\Rasio\RasioGuritaController::load_content', ['filter' => 'Auth']);
 
+$routes->get('/ratio-baby-octopus', 'Accounting\Rasio\RasioBabyOctopusController::index', ['filter' => 'Auth']);
+$routes->get('/ratio-baby-octopus/create', 'Accounting\Rasio\RasioBabyOctopusController::createRasio', ['filter' => 'Auth']);
+$routes->get('/ratio-baby-octopus/get-barang-digunakan', 'Accounting\Rasio\RasioBabyOctopusController::getRasioBarangDigunakan', ['filter' => 'Auth']);
+$routes->get('/ratio-baby-octopus/get-barang-digunakan-jadi', 'Accounting\Rasio\RasioBabyOctopusController::getRasioBarangDigunakanJadi', ['filter' => 'Auth']);
+$routes->get('/ratio-baby-octopus/get-saldo-akhir', 'Accounting\Rasio\RasioBabyOctopusController::getSaldoAkhir', ['filter' => 'Auth']);
+$routes->get('/ratio-baby-octopus/get-saldo-awal', 'Accounting\Rasio\RasioBabyOctopusController::getSaldoAwal', ['filter' => 'Auth']);
+$routes->get('/ratio-baby-octopus/get-saldo-adjusment', 'Accounting\Rasio\RasioBabyOctopusController::getSaldoAdjusment', ['filter' => 'Auth']);
+$routes->get('/ratio-baby-octopus/get-saldo-jual', 'Accounting\Rasio\RasioBabyOctopusController::getSaldoJual', ['filter' => 'Auth']);
+$routes->get('/ratio-baby-octopus/get-saldo-trimming', 'Accounting\Rasio\RasioBabyOctopusController::getSaldoTrimming', ['filter' => 'Auth']);
+$routes->get('/ratio-baby-octopus/get-barang-jadi', 'Accounting\Rasio\RasioBabyOctopusController::getRasioBarangJadi', ['filter' => 'Auth']);
+
+$routes->get('/ratio-baby-octopus/get-material-i', 'Accounting\Rasio\RasioBabyOctopusController::getRawMaterialI', ['filter' => 'Auth']);
+
+$routes->get('/ratio-baby-octopus/get-barang-digunakan-penolong', 'Accounting\Rasio\RasioBabyOctopusController::getRasioBarangDigunakanPenolong', ['filter' => 'Auth']);
+$routes->get('/ratio-baby-octopus/get-jurnal', 'Accounting\Rasio\RasioBabyOctopusController::getDataJurnal', ['filter' => 'Auth']);
+$routes->get('/ratio-baby-octopus/get-cost', 'Accounting\Rasio\RasioBabyOctopusController::getCost', ['filter' => 'Auth']);
+$routes->get('/ratio-baby-octopus/all', 'Accounting\Rasio\RasioBabyOctopusController::allRasio', ['filter' => 'Auth']);
+$routes->get('/ratio-baby-octopus/id/(:segment)', 'Accounting\Rasio\RasioBabyOctopusController::getById/$1', ['filter' => 'Auth']);
+$routes->post('/ratio-baby-octopus/save', 'Accounting\Rasio\RasioBabyOctopusController::saveRasio', ['filter' => 'Auth']);
+$routes->post('/ratio-baby-octopus/update', 'Accounting\Rasio\RasioBabyOctopusController::updateRasio', ['filter' => 'Auth']);
+$routes->post('/ratio-baby-octopus/delete', 'Accounting\Rasio\RasioBabyOctopusController::deleteRasio', ['filter' => 'Auth']);
+$routes->post('/ratio-baby-octopus/get', 'Accounting\Rasio\RasioBabyOctopusController::get', ['filter' => 'Auth']);
+$routes->get('/ratio-baby-octopus/load_content', 'Accounting\Rasio\RasioBabyOctopusController::load_content', ['filter' => 'Auth']);
+
+$routes->get('/ratio-baby-crab', 'Accounting\Rasio\RasioBabyCrabController::index', ['filter' => 'Auth']);
+$routes->get('/ratio-baby-crab/create', 'Accounting\Rasio\RasioBabyCrabController::createRasio', ['filter' => 'Auth']);
+$routes->get('/ratio-baby-crab/get-barang-digunakan', 'Accounting\Rasio\RasioBabyCrabController::getRasioBarangDigunakan', ['filter' => 'Auth']);
+$routes->get('/ratio-baby-crab/get-barang-digunakan-jadi', 'Accounting\Rasio\RasioBabyCrabController::getRasioBarangDigunakanJadi', ['filter' => 'Auth']);
+$routes->get('/ratio-baby-crab/get-saldo-akhir', 'Accounting\Rasio\RasioBabyCrabController::getSaldoAkhir', ['filter' => 'Auth']);
+$routes->get('/ratio-baby-crab/get-saldo-awal', 'Accounting\Rasio\RasioBabyCrabController::getSaldoAwal', ['filter' => 'Auth']);
+$routes->get('/ratio-baby-crab/get-saldo-adjusment', 'Accounting\Rasio\RasioBabyCrabController::getSaldoAdjusment', ['filter' => 'Auth']);
+$routes->get('/ratio-baby-crab/get-saldo-jual', 'Accounting\Rasio\RasioBabyCrabController::getSaldoJual', ['filter' => 'Auth']);
+$routes->get('/ratio-baby-crab/get-saldo-trimming', 'Accounting\Rasio\RasioBabyCrabController::getSaldoTrimming', ['filter' => 'Auth']);
+$routes->get('/ratio-baby-crab/get-barang-jadi', 'Accounting\Rasio\RasioBabyCrabController::getRasioBarangJadi', ['filter' => 'Auth']);
+
+$routes->get('/ratio-baby-crab/get-material-i', 'Accounting\Rasio\RasioBabyCrabController::getRawMaterialI', ['filter' => 'Auth']);
+
+$routes->get('/ratio-baby-crab/get-barang-digunakan-penolong', 'Accounting\Rasio\RasioBabyCrabController::getRasioBarangDigunakanPenolong', ['filter' => 'Auth']);
+$routes->get('/ratio-baby-crab/get-jurnal', 'Accounting\Rasio\RasioBabyCrabController::getDataJurnal', ['filter' => 'Auth']);
+$routes->get('/ratio-baby-crab/get-cost', 'Accounting\Rasio\RasioBabyCrabController::getCost', ['filter' => 'Auth']);
+$routes->get('/ratio-baby-crab/all', 'Accounting\Rasio\RasioBabyCrabController::allRasio', ['filter' => 'Auth']);
+$routes->get('/ratio-baby-crab/id/(:segment)', 'Accounting\Rasio\RasioBabyCrabController::getById/$1', ['filter' => 'Auth']);
+$routes->post('/ratio-baby-crab/save', 'Accounting\Rasio\RasioBabyCrabController::saveRasio', ['filter' => 'Auth']);
+$routes->post('/ratio-baby-crab/update', 'Accounting\Rasio\RasioBabyCrabController::updateRasio', ['filter' => 'Auth']);
+$routes->post('/ratio-baby-crab/delete', 'Accounting\Rasio\RasioBabyCrabController::deleteRasio', ['filter' => 'Auth']);
+$routes->post('/ratio-baby-crab/get', 'Accounting\Rasio\RasioBabyCrabController::get', ['filter' => 'Auth']);
+$routes->get('/ratio-baby-crab/load_content', 'Accounting\Rasio\RasioBabyCrabController::load_content', ['filter' => 'Auth']);
+
 // Tutup Buku
 $routes->get('/tutup-buku', 'Accounting\TutupBuku\TutupBukuController::index', ['filter' => 'Auth']);
 $routes->get('/tutup-buku/all', 'Accounting\TutupBuku\TutupBukuController::all', ['filter' => 'Auth']);
