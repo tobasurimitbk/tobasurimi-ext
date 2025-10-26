@@ -23,37 +23,10 @@
 
             <?= csrf_field() ?>
             <div class="row mb-4 mt-3">
-                <div class="col-sm-4 mt-2">
-                    <div class="form-floating">
-                        <select class="form-select divisi_id" id="divisi_id" name="divisi_id" aria-label="Floating label select example">
-                            <option value=""></option>
-                            <?php foreach ($dataDivisi as $divisi) : ?>
-                                <option value="<?= $divisi["id"]; ?>"><?= strtoupper($divisi["divisi"]); ?></option>
-                            <?php endforeach; ?>
-                        </select>
-                        <label style="z-index: 1;">Departemen</label>
-                    </div>
-                </div>
-                <div class="col-sm-4 mt-2">
-                    <div class="form-floating">
-                        <select class="form-select status" id="status" name="status" aria-label="Floating label select example">
-                            <option value="">SEMUA</option>
-                            <option value="1">POSTED</option>
-                            <option value="0">WAITING</option>
-                        </select>
-                        <label style="z-index: 1;">Status Mutasi</label>
-                    </div>
-                </div>
-                <div class="col-sm-4 mt-2">
-                    <div class="form-floating" style="height: 50px;">
-                        <input placeholder="" class="form-control search" id="search" name="search" aria-label="Floating label select example" />
-                        <label style="z-index: 1;" style="z-index: 1;">Cari Nomor Mutasi </label>
-                    </div>
-                </div>
                 <div class="col-md-4 mt-2">
                     <div class="input-group">
                         <div class="form-floating" style="height: 50px;">
-                            <input placeholder="" class="form-control dateStart" id="dateStart" name="dateStart" aria-label="Floating label select example" />
+                            <input placeholder="" class="form-control dateStart" id="dateStart" name="dateStart" value="01/<?= date('m/Y') ?>" />
                             <label style="z-index: 1;" style="z-index: 1;">Tanggal Awal</label>
                         </div>
                         <div class="input-group-append" style="height:50px;">
@@ -66,7 +39,7 @@
                 <div class="col-md-4 mt-2">
                     <div class="input-group">
                         <div class="form-floating" style="height: 50px;">
-                            <input placeholder="" class="form-control dateEnd" id="dateEnd" name="dateEnd" aria-label="Floating label select example" />
+                            <input placeholder="" class="form-control dateEnd" id="dateEnd" name="dateEnd" />
                             <label style="z-index: 1;" style="z-index: 1;">Tanggal Akhir</label>
                         </div>
                         <div class="input-group-append" style="height:50px;">
@@ -76,23 +49,30 @@
                         </div>
                     </div>
                 </div>
+                <div class="col-sm-4 mt-2">
+                    <div class="form-floating" style="height: 50px;">
+                        <input placeholder="" class="form-control search" id="search" name="search" />
+                        <label style="z-index: 1;" style="z-index: 1;">Cari Data </label>
+                    </div>
+                </div>
             </div>
             <div class="table-responsive">
                 <table class="table table-bordered nowrap table-hover-tobasurimi dataTable" id="dataTable" width="100%" cellspacing="0">
                     <thead class="thead-dark">
                         <tr>
                             <th>No</th>
-                            <th onclick="changeSort('no_mutasi')">No Mutasi</th>
                             <th onclick="changeSort('tanggal')">Tanggal</th>
-                            <th onclick="changeSort('divisis.divisi')">Warehouse Asal</th>
-                            <th onclick="changeSort('divisis.divisi')">Warehouse Tujuan</th>
-                            <th>No PPBKB</th>
-                            <th>Total Item</th>
-                            <th>Status</th>
+                            <th onclick="changeSort('no_mutasi')">No Mutasi</th>
+                            <th onclick="changeSort('divisi_asal_id')">Dept Asal</th>
+                            <th onclick="changeSort('warehouse_asal_id')">Warehouse Asal</th>
+                            <th onclick="changeSort('divisi_tujuan_id')">Dept Tujuan</th>
+                            <th onclick="changeSort('warehouse_tujuan_id')">Warehouse Tujuan</th>
+                            <th onclick="changeSort('ppbkb.no_ppbkb')">No PPBKB</th>
+                            <th onclick="changeSort('status_posting')">Posting</th>
                             <th>Action</th>
                         </tr>
                     </thead>
-                    <tbody class="body-table" id="body-table" style="cursor: pointer;">
+                    <tbody class="body-table" id="body-table">
                     </tbody>
                 </table>
             </div>
@@ -104,12 +84,11 @@
 
 
 <script>
-    let sort = "createdAt";
+    let sort = "no_mutasi";
     let sortType = "desc";
     const csrfToken = '<?= csrf_token() ?>';
 
     const table = $('.dataTable').DataTable({
-
         processing: true,
         serverSide: true,
         ordering: true,
@@ -126,12 +105,9 @@
             url: "<?= base_url("mutasi/all"); ?>",
             dataSrc: "data",
             data: function(data) {
-                data.divisi_id = $(".divisi_id").val();
-                data.status = $(".status").val();
-                data.no_mutasi = $(".no_mutasi").val();
+                data.search = $("#search").val();
                 data.dateStart = $('#dateStart').val();
                 data.dateEnd = $('#dateEnd').val();
-
                 data.sort = sort;
                 data.sortType = sortType;
             }
@@ -145,62 +121,49 @@
         searching: false,
         columns: [{
                 data: "no",
-                className: "text-center",
                 orderable: false
             },
             {
-                data: "no_mutasi",
-                className: "text-center"
+                data: "tanggal",
             },
             {
-                data: "tanggal",
-                className: "text-center"
+                data: "no_mutasi",
+            },
+            {
+                data: "divisi_asal",
             },
             {
                 data: "warehouse_asal",
-                className: "text-center",
+            },
+            {
+                data: "divisi_tujuan",
             },
             {
                 data: "warehouse_tujuan",
-                className: "text-center"
             },
             {
                 data: "no_ppbkb",
-                className: "text-center",
-                searchable: false,
-                sortable: false,
-                render: function(data, type, row) {
-                    if (row.no_ppbkb == "-") {
-                        return '<div class="text-danger">BELUM DIBUAT</div>';
-
-                    } else {
-                        return row.no_ppbkb
-
-                    }
-
-                }
             },
             {
-                data: "total_item",
-                className: "text-center",
+                data: "status_posting",
                 searchable: false,
-                sortable: false
-            },
-            {
-                data: "id",
-                className: "text-center actions",
-                searchable: false,
-                sortable: false,
+                width: "5%",
                 render: function(data, type, row) {
-                    let state = row.state;
-                    if (state == '0') {
-                        return '<i class="fa-solid fa-square text-danger"></i>';
+                    let htmlRes = '';
 
+                    if (row.status_posting == 1) {
+                        htmlRes += `
+                            <div class="text-success">
+                               <i class="fa-solid fa-check"></i>
+                            </div>`
                     } else {
-                        return '<i class="fa-solid fa-square text-success"></i>';
-
+                        htmlRes += `
+                            <div class="text-danger">
+                               <i class="fa-solid fa-x"></i>
+                            </div>`
                     }
 
+                    return htmlRes;
                 }
             }, {
                 data: "id",
@@ -211,9 +174,12 @@
                     let id = row.id;
                     let status = row.status_posting
 
-                    if (status === "0") {
+                    if (status == 0) {
                         return `
                         <div class="mt-0">
+                          <a href="javascript:void(0)" onclick="edit('${id}')" data-toggle="tooltip" title="Edit" class="btn btn-primary">
+                                <i class="fas fa-edit"></i>
+                            </a>
                         <?php if (can('Inventori', 'Mutasi', 'a')) : ?>
                             <button data-toggle="tooltip" title="Posting" onclick="posting('${id}')" class="btn btn-success posting-spp">
                                 <i class="fa fa-paper-plane fa-sm" aria-hidden="true"></i>
@@ -227,16 +193,23 @@
                         </div>
                     `
                     } else {
-                        if (row.no_ppbkb === "-") {
+                        if (row.no_ppbkb == null) {
                             return `
+                                <a href="javascript:void(0)" onclick="edit('${id}')" data-toggle="tooltip" title="Edit" class="btn btn-primary">
+                                    <i class="fas fa-edit"></i>
+                                </a>
                                 <?php if (can('Inventori', 'Mutasi', 'ua')) : ?>
-                                    <button data-toggle="tooltip" title="Un-Posting" onclick="unPostingAction('${id}')" class="btn btn-danger posting-spp">
+                                    <button data-toggle="tooltip" title="Un-Posting" onclick="unposting('${id}')" class="btn btn-danger posting-spp">
                                         <i class="fa-solid fa-ban"></i>    
                                     </button>
                                 <?php endif; ?>
                             `;
                         } else {
-                            return ``;
+                            return `
+                              <a href="javascript:void(0)" onclick="edit('${id}')" data-toggle="tooltip" title="Edit" class="btn btn-primary">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                            `;
                         }
                     }
 
@@ -268,55 +241,28 @@
         format: "dd/mm/yyyy",
         orientation: "bottom auto",
         autoclose: true
-    })
+    });
 
     $(".dateEnd").datepicker({
         todayHighlight: true,
         format: "dd/mm/yyyy",
         orientation: "bottom auto",
         autoclose: true
-    })
-
-    $('#divisi_id').select2({
-        placeholder: "Pilih Departemen",
-        theme: "bootstrap-5",
-        allowClear: true
-    }).change(function() {
-        table.ajax.reload();
     });
-
-    $('#status').select2({
-        placeholder: "Pilih Status",
-        theme: "bootstrap-5",
-        allowClear: true
-    }).change(function() {
-        table.ajax.reload();
-    });
-
 
     $('#dateStart,#dateEnd').change(function() {
         table.ajax.reload();
     });
 
-    $("#divisi_id,#status")
-        .parent('div')
-        .children('span')
-        .children('span')
-        .children('span')
-        .children('span')
-        .css('margin-top', '22px').css('margin-left', '-7px');
-
-    $(".no_mutasi").keyup(function() {
+    $(".search").keyup(function() {
         table.ajax.reload();
-    })
-
-    $('#dataTable tbody').on('click', 'tr td:not(.actions):not(.dataTables_empty)', function() {
-        const data = table.row(this).data();
-        location.replace(`<?= base_url("mutasi/id"); ?>/${data.id}`);
     });
 
+    function edit(id) {
+        window.location.href = "<?= base_url('mutasi/id') ?>" + '/' + id
+    }
 
-    const posting = function(id) {
+    function posting(id) {
         Swal.fire({
             icon: 'question',
             title: 'Posting Mutasi ?',
@@ -366,7 +312,7 @@
         })
     }
 
-    const remove = function(id) {
+    function remove(id) {
         Swal.fire({
             icon: 'question',
             title: 'Hapus Mutasi ?',
@@ -402,6 +348,12 @@
                             }).then((result) => {
                                 table.ajax.reload()
                             });
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: response.message,
+                                confirmButtonColor: '#4e73df',
+                            });
                         }
                     },
                 });
@@ -409,7 +361,7 @@
         })
     }
 
-    const unPostingAction = function(id) {
+    function unposting(id) {
         Swal.fire({
             icon: 'question',
             title: 'Un Posting Mutasi ?',
@@ -444,6 +396,12 @@
                                 confirmButtonColor: '#4e73df',
                             }).then((result) => {
                                 table.ajax.reload()
+                            });
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: response.message,
+                                confirmButtonColor: '#4e73df',
                             });
                         }
                     },

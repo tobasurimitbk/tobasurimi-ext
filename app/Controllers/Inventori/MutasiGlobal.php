@@ -10,7 +10,10 @@ use App\Models\MetadataModel;
 use App\Models\MutasiGlobalDetailModel;
 use App\Models\MutasiGlobalModel;
 use App\Models\PenerimaanMutasiGlobalDetailModel;
+use App\Models\SatuansModel;
+use App\Models\StockRevampModel;
 use App\Models\WarehousesModel;
+use Exception;
 
 class MutasiGlobal extends BaseController
 {
@@ -24,6 +27,8 @@ class MutasiGlobal extends BaseController
     protected $penerimaanMutasiGlobalDetailModel;
     protected $warehouseModel;
     protected $bc27Model;
+    protected $stockRevampModel;
+    protected $satuanModel;
 
     public function __construct()
     {
@@ -37,6 +42,8 @@ class MutasiGlobal extends BaseController
         $this->penerimaanMutasiGlobalDetailModel = new PenerimaanMutasiGlobalDetailModel();
         $this->warehouseModel = new WarehousesModel();
         $this->bc27Model = new BC27Model();
+        $this->satuanModel = new SatuansModel();
+        $this->stockRevampModel = new StockRevampModel();
     }
 
     public function index()
@@ -63,17 +70,12 @@ class MutasiGlobal extends BaseController
             "sort"              => $this->request->getVar("sort"),
             "sortType"          => $this->request->getVar("sortType"),
             "search"            => $this->request->getVar("search"),
-            "divisi_id"         => $this->request->getVar("divisi_id"),
-            "company_tujuan_id" => $this->request->getVar("company_tujuan_id"),
-            "status"            => $this->request->getVar("status"),
-            "no_mutasi"         => $this->request->getVar("no_mutasi"),
             "dateStart"         => $this->request->getVar("dateStart") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateStart")))) : "",
             "dateEnd"           => $this->request->getVar("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("dateEnd")))) : "",
         ];
 
         $limit = $this->request->getVar("length");
         $offset = $this->request->getVar("start");
-        $divisiArr = array();
         $dataResult = array();
 
         $condition = [
@@ -81,50 +83,25 @@ class MutasiGlobal extends BaseController
             'mutasi_global.deletedAt' => null
         ];
 
-        foreach ($this->divisiModel->getDivisiAccess() as $d) {
-            array_push($divisiArr, $d['id']);
-        }
-
-        $dataQry = $this->mutasiGlobalModel->getList($condition, $divisiArr,  $addCondition, $limit, $offset);
+        $dataQry = $this->mutasiGlobalModel->getList(
+            $condition,
+            $addCondition,
+            $limit,
+            $offset
+        );
         $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
 
         foreach ($dataQry['data'] as $data) {
-            $listItem = $this->mutasiGlobalDetailModel->where('mutasi_global_id', $data->id)->findAll();
-            $totalItem = count($listItem);
-            $warehouseAsal = $this->warehouseModel->find($data->warehouse_asal_id);
-            $warehouseAsalName = $warehouseAsal == null ? '-' : $warehouseAsal['warehouse_name'];
-            $bc27 = $this->bc27Model->where('mutasi_global_id', $data->id)->first();
-
-            $penerimaanTotalDetail =   $this->penerimaanMutasiGlobalDetailModel
-                ->select('SUM(qty) AS qty_diterima')
-                ->where('mutasi_global_id', $data->id)
-                ->where('deletedAt', null)
-                ->groupBy('mutasi_global_id')
-                ->findAll();
-
-            $totalQtyMutasi = $this->mutasiGlobalDetailModel
-                ->select('SUM(qty) AS qty_mutasi')
-                ->where('mutasi_global_id', $data->id)
-                ->where('deletedAt', null)
-                ->groupBy('mutasi_global_id')
-                ->findAll();
-
-
-            $totalDiterima = count($penerimaanTotalDetail) == 0 ? 0 : $penerimaanTotalDetail[0]['qty_diterima'];
-            $totalMutasi = count($totalQtyMutasi) == 0 ? 0 : $totalQtyMutasi[0]['qty_mutasi'];
-
             array_push($dataResult, [
                 "no"                    => $no++,
-                "id"                    => encrypt($data->id),
-                "no_mutasi"             => $data->no_mutasi,
-                "tanggal"               => date('d/m/Y', strtotime($data->tanggal)),
-                "warehouse_asal"        => strtoupper($data->divisi . ' - ' . $warehouseAsalName),
-                "company_tujuan"        => strtoupper($data->company_tujuan_name),
-                "no_aju"                => $bc27 == null ? "BELUM DIBUAT" : $bc27['no_aju'],
-                "total_item"            => $totalItem,
-                "state"                 => $totalDiterima == $totalMutasi ? '1' : '0',
-                "status_posting"        => $data->status_posting,
-                "is_used"               => $bc27 == null ? '1' : '0'
+                "id"                    => encrypt($data['id']),
+                "no_mutasi"             => $data['no_mutasi'],
+                "tanggal"               => date('d/m/Y', strtotime($data['tanggal'])),
+                "divisi"                => $data['divisi'],
+                "warehouse_name"        => $data['warehouse_name'],
+                "company_tujuan_name"   => $data['company_tujuan_name'],
+                "bc_doc"                => $data['no_aju'] == null ? "" : $data['no_aju'] . " / " . $data['no_daftar'],
+                "status_posting"        => $data['status_posting']
             ]);
         }
 
@@ -141,9 +118,19 @@ class MutasiGlobal extends BaseController
 
     public function create()
     {
+
+        $dataTipeBarang = $this->metaDataModel
+            ->where('deletedAt', null)
+            ->where('name', "Kategori Barang")
+            ->where('description !=', "kemasan")
+            ->findAll();
+        $dataDivisi = $this->divisiModel->getDivisiAccess();
+        $dataSatuan = $this->satuanModel->where('deletedAt', null)->findAll();
+
         $data = [
-            'tipeBarang' => $this->metaDataModel->where('deletedAt', null)->where('name', "Kategori Barang")->findAll(),
-            'divisi' => $this->divisiModel->getDivisiAccess(),
+            'tipeBarang' => $dataTipeBarang,
+            'divisi' => $dataDivisi,
+            'dataSatuan' => $dataSatuan,
             'tanggal' => date('Y-m-d'),
             'companyAsalName' => session()->get('login')->this_company,
             'dropdownCompanyExcept' => $this->companyModel->getCompaniesExcepct($this->this_company_id)
@@ -155,16 +142,28 @@ class MutasiGlobal extends BaseController
     public function detail($id)
     {
         $id = decrypt($id);
-        $mutasiGlobal = $this->mutasiGlobalModel->find($id);
+        $mutasiGlobal = $this->mutasiGlobalModel->where('id', $id)->first();
         if ($mutasiGlobal == null) {
             return redirect()->to('mutasi/global');
         }
+
+        $dataTipeBarang = $this->metaDataModel
+            ->where('deletedAt', null)
+            ->where('name', "Kategori Barang")
+            ->where('description !=', "kemasan")
+            ->findAll();
+        $dataDivisi = $this->divisiModel->getDivisiAccess();
+        $dataSatuan = $this->satuanModel->where('deletedAt', null)->findAll();
+        $dataWarehouseAsal = $this->warehouseModel->where('id', $mutasiGlobal['warehouse_asal_id'])->findAll();
+        $dataMutasiGlobalDetail = $this->mutasiGlobalDetailModel->getDetail($id);
+
         $data = [
-            'tipeBarang' => $this->metaDataModel->where('deletedAt', null)->where('name', "Kategori Barang")->findAll(),
-            'divisi' => $this->divisiModel->getDivisiAccess(),
+            'tipeBarang' => $dataTipeBarang,
+            'divisi' => $dataDivisi,
+            'dataSatuan' => $dataSatuan,
             'mutasiGlobal' => $mutasiGlobal,
-            'mutasiGlobalDetail' => $this->mutasiGlobalDetailModel->getMutasiDetail($id),
-            'warehouseAsal' => $this->warehouseModel->where('divisi_id', $mutasiGlobal['divisi_asal_id'])->findAll(),
+            'mutasiGlobalDetail' => $dataMutasiGlobalDetail,
+            'warehouseAsal' => $dataWarehouseAsal,
             'companyAsalName' => session()->get('login')->this_company,
             'dropdownCompanyExcept' => $this->companyModel->getCompaniesExcepct($this->this_company_id)
         ];
@@ -174,122 +173,168 @@ class MutasiGlobal extends BaseController
 
     public function createAction()
     {
-        $first = $this->mutasiGlobalModel->where('company_asal_id', $this->this_company_id)->where('no_mutasi', $this->request->getVar('no_mutasi'))->first();
+        // return response()->setJSON([
+        //     'listMutasi' => json_decode($_POST['listMutasi']),
+        //     '$_POST' => $_POST,
+        //     'token' => csrf_hash()
+        // ]);
+        $db = \Config\Database::connect();
+        $db->transBegin();
+        try {
+            $noMutasi = $this->request->getVar('no_mutasi');
+            $tanggal = formatDMYtoYMD($this->request->getVar('tanggal'));
 
-        if ($first != null) {
+            $first = $this->mutasiGlobalModel
+                ->where('company_asal_id', $this->this_company_id)
+                ->where('no_mutasi', $noMutasi)
+                ->where('deletedAt', null)
+                ->first();
+
+            if ($first != null) {
+                $noMutasi = $this->get_no_str($tanggal);
+            }
+
+            $id = $this->mutasiGlobalModel->insert([
+                'no_mutasi' => $this->request->getVar('no_mutasi'),
+                'company_tujuan_id' => $this->request->getVar('company_tujuan_id'),
+                'company_asal_id' => $this->this_company_id,
+                'tanggal' => $tanggal,
+                'divisi_asal_id' => $this->request->getVar('divisi_asal_id'),
+                'warehouse_asal_id' => $this->request->getVar('warehouse_asal_id'),
+                'keterangan' => $this->request->getVar('keterangan'),
+                'createdBy' => $this->this_user_id,
+                'status_posting' => 0
+            ]);
+
+
+            foreach (json_decode($_POST['listMutasi']) as $l) {
+                $this->mutasiGlobalDetailModel->insert([
+                    'mutasi_global_id' => $id,
+                    'stock_detail_id' => $l->id,
+                    'qty_mutasi' => $l->mutasi->qty_mutasi,
+                    'unit_id_mutasi' => $l->mutasi->unit_id_mutasi,
+                    'qty_konversi' => $l->mutasi->qty_konversi,
+                    'unit_id_konversi' => $l->mutasi->unit_id_konversi,
+                    'hasil_mutasi' => $l->mutasi->hasil_mutasi
+                ]);
+            }
+
+            $db->transCommit();
             return response()->setJSON([
-                'message' => "Nomor Mutasi Sudah Ada",
+                'message' => "Mutasi berhasil disimpan",
+                'status' => true,
+                'token' => csrf_hash()
+            ]);
+        } catch (Exception $e) {
+            $db->transRollback();
+            return response()->setJSON([
                 'token' => csrf_hash(),
                 'status' => false,
+                'message' => $e->getMessage(),
             ]);
         }
-
-        $tanggal = $this->request->getVar("tanggal") ? date_format(date_create_from_format("d/m/Y", $this->request->getVar("tanggal")), "Y-m-d") : "";
-
-        $id = $this->mutasiGlobalModel->insert([
-            'no_mutasi' => $this->request->getVar('no_mutasi'),
-            'company_tujuan_id' => $this->request->getVar('company_tujuan_id'),
-            'company_asal_id' => $this->this_company_id,
-            'tanggal' => $tanggal,
-            'divisi_asal_id' => $this->request->getVar('divisi_asal_id'),
-            'warehouse_asal_id' => $this->request->getVar('warehouse_asal_id'),
-            'keterangan' => $this->request->getVar('keterangan'),
-            'tipe_pengambilan_stock' => $this->request->getVar('type_pengambilan_stock'),
-            'createdBy' => $this->this_user_id,
-            'status_posting' => '0'
-        ]);
-
-        foreach (json_decode($_POST['listMutasi']) as $l) {
-            $this->mutasiGlobalDetailModel->insert([
-                'mutasi_global_id' => $id,
-                'stock_id' => $l->stock_id,
-                'bc_id' => $l->bc_id,
-                'no_aju' => $l->no_aju,
-                'stock_dokumen' => $l->stock_dokumen,
-                'qty' => $l->qty
-            ]);
-        }
-
-        return response()->setJSON([
-            'id' => encrypt($id),
-            'message' => "Mutasi berhasil disimpan",
-            'status' => true,
-            'token' => csrf_hash()
-        ]);
     }
 
     public function updateAction()
     {
-        $id = decrypt($this->request->getVar('id'));
-        $tanggal = $this->request->getVar("tanggal") ? date_format(date_create_from_format("d/m/Y", $this->request->getVar("tanggal")), "Y-m-d") : "";
+        $db = \Config\Database::connect();
+        $db->transBegin();
 
-        $this->mutasiGlobalModel->update($id, [
-            'tanggal' => $tanggal,
-            'company_tujuan_id' => $this->request->getVar('company_tujuan_id'),
-            'company_asal_id' => $this->this_company_id,
-            'divisi_asal_id' => $this->request->getVar('divisi_asal_id'),
-            'warehouse_asal_id' => $this->request->getVar('warehouse_asal_id'),
-            'keterangan' => $this->request->getVar('keterangan'),
-            'createdBy' => $this->this_user_id,
-            'tipe_pengambilan_stock' => $this->request->getVar('type_pengambilan_stock'),
-            'status_posting' => '0'
-        ]);
+        try {
+            $id = decrypt($this->request->getVar('id'));
+            $tanggal = formatDMYtoYMD($this->request->getVar('tanggal'));
+            $noMutasi = $this->request->getVar('no_mutasi');
 
-        // get all id detail
-        $id_detail_all = [];
-
-        foreach (json_decode($_POST['listMutasi']) as $l) {
-            // CHECK
-            $check = $this->mutasiGlobalDetailModel
-                ->where('mutasi_global_id', $id)
-                ->where('stock_id', $l->stock_id)
-                ->where('bc_id', $l->bc_id)
-                ->where('no_aju', $l->no_aju)
-                ->where('stock_dokumen', $l->stock_dokumen)
+            $first = $this->mutasiGlobalModel
+                ->where('company_asal_id', $this->this_company_id)
+                ->where('no_mutasi', $noMutasi)
+                ->where('deletedAt', null)
+                ->where('id !=', $id)
                 ->first();
 
-            if ($check != null) {
-                $this->mutasiGlobalDetailModel->update($check['id'], [
-                    'mutasi_global_id' => $id,
-                    'stock_id' => $l->stock_id,
-                    'bc_id' => $l->bc_id,
-                    'no_aju' => $l->no_aju,
-                    'stock_dokumen' => $l->stock_dokumen,
-                    'qty' => $l->qty
+            if ($first != null) {
+                return response()->setJSON([
+                    'token' => csrf_hash(),
+                    'status' => false,
+                    'message' => "nomor mutasi sudah digunakan",
                 ]);
-
-                array_push($id_detail_all, $check['id']);
-            } else {
-                // NEW
-                // DELETE
-                $this->mutasiGlobalDetailModel
-                    ->where('mutasi_global_id', $id)
-                    ->where('stock_id', $l->stock_id)
-                    ->where('bc_id', $l->bc_id)
-                    ->where('no_aju', $l->no_aju)
-                    ->where('stock_dokumen', $l->stock_dokumen)
-                    ->delete();
-
-                // INSERT
-                $id_detail_new = $this->mutasiGlobalDetailModel->insert([
-                    'mutasi_global_id' => $id,
-                    'stock_id' => $l->stock_id,
-                    'bc_id' => $l->bc_id,
-                    'no_aju' => $l->no_aju,
-                    'stock_dokumen' => $l->stock_dokumen,
-                    'qty' => $l->qty
-                ]);
-
-                array_push($id_detail_all,  $id_detail_new);
             }
-        }
 
-        $this->mutasiGlobalDetailModel->where('mutasi_global_id', $id)->whereNotIn('id', $id_detail_all)->delete();
-        return response()->setJSON([
-            'message' => "Mutasi berhasil diupdate",
-            'status' => true,
-            'token' => csrf_hash()
-        ]);
+            $this->mutasiGlobalModel->update($id, [
+                'no_mutasi' => $this->request->getVar('no_mutasi'),
+                'company_tujuan_id' => $this->request->getVar('company_tujuan_id'),
+                'company_asal_id' => $this->this_company_id,
+                'tanggal' => $tanggal,
+                'divisi_asal_id' => $this->request->getVar('divisi_asal_id'),
+                'warehouse_asal_id' => $this->request->getVar('warehouse_asal_id'),
+                'keterangan' => $this->request->getVar('keterangan'),
+                'createdBy' => $this->this_user_id,
+                'status_posting' => 0
+            ]);
+
+            // get all id detail
+            $id_detail_all = [];
+
+            foreach (json_decode($_POST['listMutasi']) as $l) {
+
+
+                // CHECK
+                $check = $this->mutasiGlobalDetailModel
+                    ->where('mutasi_global_id', $id)
+                    ->where('stock_detail_id', $l->id)
+                    ->where('deletedAt', null)
+                    ->first();
+
+                if ($check != null) {
+                    $this->mutasiGlobalDetailModel->update($check['id'], [
+                        'mutasi_global_id' => $id,
+                        'stock_detail_id' => $l->id,
+                        'qty_mutasi' => $l->mutasi->qty_mutasi,
+                        'unit_id_mutasi' => $l->mutasi->unit_id_mutasi,
+                        'qty_konversi' => $l->mutasi->qty_konversi,
+                        'unit_id_konversi' => $l->mutasi->unit_id_konversi,
+                        'hasil_mutasi' => $l->mutasi->hasil_mutasi
+                    ]);
+
+                    array_push($id_detail_all, $check['id']);
+                } else {
+                    // NEW
+                    // DELETE
+                    $this->mutasiGlobalDetailModel
+                        ->where('mutasi_global_id', $id)
+                        ->where('stock_detail_id', $l->id)
+                        ->delete();
+
+                    // INSERT
+                    $id_detail_new = $this->mutasiGlobalDetailModel->insert([
+                        'mutasi_global_id' => $id,
+                        'stock_detail_id' => $l->id,
+                        'qty_mutasi' => $l->mutasi->qty_mutasi,
+                        'unit_id_mutasi' => $l->mutasi->unit_id_mutasi,
+                        'qty_konversi' => $l->mutasi->qty_konversi,
+                        'unit_id_konversi' => $l->mutasi->unit_id_konversi,
+                        'hasil_mutasi' => $l->mutasi->hasil_mutasi
+                    ]);
+
+                    array_push($id_detail_all,  $id_detail_new);
+                }
+            }
+
+            $this->mutasiGlobalDetailModel->where('mutasi_id', $id)->whereNotIn('id', $id_detail_all)->delete();
+            $db->transCommit();
+            return response()->setJSON([
+                'message' => "Mutasi berhasil diupdate",
+                'status' => true,
+                'token' => csrf_hash()
+            ]);
+        } catch (Exception $e) {
+            $db->transRollback();
+            return response()->setJSON([
+                'token' => csrf_hash(),
+                'status' => false,
+                'message' => $e->getMessage(),
+            ]);
+        }
     }
 
 
@@ -309,7 +354,7 @@ class MutasiGlobal extends BaseController
     public function posting()
     {
         $id = decrypt($this->request->getVar('id'));
-        $this->mutasiGlobalModel->update($id, ['status_posting' => '1']);
+        $this->mutasiGlobalModel->update($id, ['status_posting' => 1]);
         return response()->setJSON([
             'message' => "Mutasi berhasil diposting",
             'status' => true,
@@ -320,7 +365,7 @@ class MutasiGlobal extends BaseController
     public function unPosting()
     {
         $id = decrypt($this->request->getVar('id'));
-        $this->mutasiGlobalModel->update($id, ['status_posting' => '0']);
+        $this->mutasiGlobalModel->update($id, ['status_posting' => 0]);
         return response()->setJSON([
             'message' => "Mutasi berhasil diunposting",
             'status' => true,
@@ -330,19 +375,45 @@ class MutasiGlobal extends BaseController
 
     public function getMutasiNo()
     {
-        $last_day = date("Y-m-t", strtotime(date('Y') . "-" . date('m') . "-" . date('d')));
-        $divisi_id = $this->request->getVar('divisi_id');
-
-        if (empty($divisi_id)) {
-            $no = $this->mutasiGlobalModel->get_no(date('m'), date('Y'), $last_day, "", $divisi_id);
-        } else {
-            $divisi = $this->divisiModel->where('id', $divisi_id)->first();
-            $no = $this->mutasiGlobalModel->get_no(date('m'), date('Y'), $last_day, strtoupper($divisi['divisi']), $divisi_id);
+        $tanggal = $this->request->getVar('tanggal');
+        if (empty($tanggal)) {
+            return response()->setJSON([
+                'status' => true,
+                'data' => '',
+                'token' => csrf_hash()
+            ]);
         }
+
+        $tanggal = formatDMYtoYMD($tanggal); // 2025-09-21
+        $tanggalParts = explode('-', $tanggal);
+        if (count($tanggalParts) !== 3) {
+            return $this->response->setJSON([
+                'data' => '',
+                'status' => false,
+                'message' => 'Format tanggal tidak valid. Gunakan dd/mm/yyyy.'
+            ]);
+        }
+
+        $no = $this->get_no_str($tanggal);
         return response()->setJSON([
             'status' => true,
             'data' => $no,
             'token' => csrf_hash()
         ]);
+    }
+
+    private function get_no_str($tanggal)
+    {
+        $tanggalParts = explode('-', $tanggal);
+        $month = $tanggalParts[1];
+        $year = $tanggalParts[0];
+
+        $no = $this->mutasiGlobalModel->get_no(
+            $month,
+            $year,
+            $this->this_company_id
+        );
+
+        return $no;
     }
 }

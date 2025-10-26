@@ -40,62 +40,63 @@ class MutasiGlobalModel extends Model
     protected $beforeDelete   = [];
     protected $afterDelete    = [];
 
-    public function getList($condition, $conditionArr, $addCondition, $limit = 10, $offset = 0)
+    public function getList($condition, $addCondition, $limit = 10, $offset = 0)
     {
         $availableSort = [
-            'no_mutasi'                           => 'no_mutasi',
-            'tanggal'                             => 'tanggal',
-            'warehouse_asal_id'                   => 'warehouse_asal_id',
-            'company_tujuan_id'                   => 'company_tujuan_id',
+            'tanggal'                             => 'mutasi_global.tanggal',
+            'no_mutasi'                           => 'mutasi_global.no_mutasi',
+            'divisi_asal_id'                      => 'mutasi_global.divisi_asal_id',
+            'warehouse_asal_id'                   => 'mutasi_global.warehouse_asal_id',
+            'warehouse_tujuan_id'                 => 'mutasi_global.warehouse_tujuan_id',
+            'company_tujuan_id'                   => 'mutasi_global.company_tujuan_id',
+            'bc_27.no_aju'                        => 'bc_27.no_aju',
+            'status_posting'                      => 'mutasi_global.status_posting',
         ];
         $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
 
-        $sort = $availableSort[$addCondition['sort'] ?? 'updatedAt'] ?? 'createdAt';
+        $sort = $availableSort[$addCondition['sort'] ?? 'no_mutasi'] ?? 'no_mutasi';
         $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'DESC';
 
         $selectQry = "mutasi_global.*,
-        divisis.divisi,
-        companies.company AS company_tujuan_name
+            divisis.divisi,
+            warehouses.warehouse_name,
+            companies.company AS company_tujuan_name,
+            bc_27.no_aju,
+            bc_27.no_daftar
         ";
 
-        $dataQry = $this->asObject()
+        $dataQry = $this->asArray()
             ->select($selectQry)
             ->join('divisis', 'divisis.id = mutasi_global.divisi_asal_id', 'left')
             ->join('companies', 'companies.id = mutasi_global.company_tujuan_id', 'left')
+            ->join('warehouses', 'warehouses.id = mutasi_global.warehouse_asal_id', 'left')
+            ->join('bc_27', 'bc_27.mutasi_global_id = mutasi_global.id', 'left')
             ->where($condition)
-            ->whereIn('divisi_asal_id', $conditionArr)
             ->orderBy($sort, $sortType);
 
         $totalData = $dataQry->countAllResults(false);
 
-        if ($addCondition['company_tujuan_id'] || $addCondition['divisi_id'] || $addCondition['status'] || $addCondition['no_mutasi'] || $addCondition['dateStart'] || $addCondition['dateEnd']) {
+        if ($addCondition['search'] || $addCondition['dateStart'] || $addCondition['dateEnd']) {
             $dataQry->groupStart();
         }
 
-        if ($addCondition['divisi_id']) {
-            $dataQry->where('divisi_asal_id', $addCondition['divisi_id']);
-        }
-
         if ($addCondition['dateStart']) {
-            $dataQry->where('tanggal >=',  $addCondition['dateStart']);
+            $dataQry->where('mutasi_global.tanggal >=',  $addCondition['dateStart']);
         }
         if ($addCondition['dateEnd']) {
-            $dataQry->where('tanggal <=', $addCondition['dateEnd']);
+            $dataQry->where('mutasi_global.tanggal <=', $addCondition['dateEnd']);
         }
 
-        if ($addCondition['status'] || $addCondition['status'] == '0') {
-            $dataQry->where('status_posting', $addCondition['status']);
+        if ($addCondition['search']) {
+            $dataQry->like('mutasi_global.no_mutasi', $addCondition['search'])
+                ->orLike('divisis.divisi', $addCondition['search'])
+                ->orLike('warehouses.warehouse_name', $addCondition['search'])
+                ->orLike('bc_27.no_aju', $addCondition['search'])
+                ->orLike('bc_27.no_daftar', $addCondition['search'])
+                ->orLike('companies.company', $addCondition['search']);
         }
 
-        if ($addCondition['company_tujuan_id']) {
-            $dataQry->where('company_tujuan_id', $addCondition['company_tujuan_id']);
-        }
-
-        if ($addCondition['no_mutasi']) {
-            $dataQry->like('no_mutasi', $addCondition['no_mutasi']);
-        }
-
-        if ($addCondition['company_tujuan_id'] || $addCondition['divisi_id'] || $addCondition['status'] || $addCondition['no_mutasi'] || $addCondition['dateStart'] || $addCondition['dateEnd']) {
+        if ($addCondition['search'] || $addCondition['dateStart'] || $addCondition['dateEnd']) {
             $dataQry->groupEnd();
         }
 
@@ -133,38 +134,50 @@ class MutasiGlobalModel extends Model
         return $result;
     }
 
-    public function get_no($bln, $thn, $last_day, $divisiName, $divisi_id)
-    {
-        $lastStr =  convertBulanToAngkaRomawi($bln) . '/' . $thn;
 
-        $builder = $this->db->table('mutasi_global');
-        $builder->select('no_mutasi');
-        $builder->orderBy('no_mutasi', 'desc');
-        $builder->where('mutasi_global.divisi_asal_id', $divisi_id);
-        $builder->where('createdAt >=', $thn . "-" . $bln . "-01" . " 00:00:00")
-            ->where('createdAt <=', $last_day . " 23:59:59");
-        $builder->like('no_mutasi', $lastStr);
-        $query = $builder->get();
-
-        $kode = 'BC27/' . $divisiName;
-
-        $lastPenerimaan = '1';
-
-        if (!empty($query->getResultArray())) {
-            foreach ($query->getResultArray() as $string) {
-                $explode = explode('/', $string['no_mutasi']);
-                $number = intval($explode[2]);
-
-                if ($number > $lastPenerimaan) {
-                    $lastPenerimaan = $number;
-                }
-            }
-            $lastPenerimaan++;
+    public function get_no(
+        $month,
+        $year,
+        $companyId
+    ) {
+        $romanMonth = romanMonthNumber((int)$month);
+        // Tentukan template berdasarkan company
+        switch ($companyId) {
+            case 1: // KIM 1 (FRZ)
+                $numberTemplate = "/F/BC 2.7/$romanMonth/" . substr($year, -2);
+                break;
+            case 2: // KIM 2
+                $numberTemplate = "/BC 2.7/$romanMonth/" . substr($year, -2);
+                break;
+            case 15: // GLOBAL
+                $numberTemplate = "/G/BC 2.7/$romanMonth/" . substr($year, -2);
+                break;
+            default: // OCS atau lainnya
+                $numberTemplate = "/BC 2.7/$romanMonth/" . substr($year, -2);
+                break;
         }
 
-        $formattedLastPenerimaan = sprintf("%02d", $lastPenerimaan);
-        $generatedNo = $kode . '/' . $formattedLastPenerimaan . '/' . $lastStr;
+        // Cari nomor terakhir berdasarkan template
+        $lastData = $this->asArray()
+            ->select('no_mutasi')
+            ->where('mutasi_global.company_asal_id', $companyId)
+            ->like('no_mutasi', $numberTemplate, 'before')
+            ->where('deletedAt', null)
+            ->orderBy('no_mutasi', 'DESC')
+            ->first();
 
-        return $generatedNo;
+        // Nomor awal default
+        $invNumber = '001' . $numberTemplate;
+
+        if ($lastData && !empty($lastData['no_mutasi'])) {
+            // Ambil angka urutan terakhir
+            $parts = explode('/', $lastData['no_mutasi']);
+            $lastIncrement = isset($parts[0]) ? (int)$parts[0] : 0;
+            $newIncrement = $lastIncrement + 1;
+            $paddedNumber = str_pad($newIncrement, 3, '0', STR_PAD_LEFT);
+
+            $invNumber = $paddedNumber . $numberTemplate;
+        }
+        return $invNumber;
     }
 }

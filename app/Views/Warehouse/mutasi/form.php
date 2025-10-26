@@ -45,12 +45,7 @@
                 </li>
             </ul>
 
-            <div class="row mt-3">
-                <div class="col mb-3">
-                    <label class="form-label font-weight-bold lable-title">Data Mutasi</label>
-                </div>
-            </div>
-            <form class="create-form">
+            <form class="create-form mt-3">
                 <input type="hidden" name="id" id="id" value="<?= !empty($mutasi) ? encrypt($mutasi['id']) : '' ?>" class="id">
                 <?= csrf_field() ?>
                 <div class="row">
@@ -71,7 +66,7 @@
                         <div class="form-floating mb-3" style="height: 50px;">
                             <div class="input-group input-group-password">
                                 <div class="form-floating mb-3" style="height: 50px;">
-                                    <input readonly autocomplete="one-time-code" <?= !empty($mutasi) ? 'disabled=true' : ''; ?> value="<?= !empty($mutasi) ? $mutasi['no_mutasi'] : "PPBKB//" . date('m') . "/1/" . date('Y'); ?>" type="text" class="form-control no_mutasi" id="no_mutasi" name="no_mutasi" placeholder="No. Adjusment">
+                                    <input autocomplete="one-time-code" <?= !empty($mutasi) ? ($mutasi['status_posting'] ? 'disabled' : '') : '' ?> value="<?= !empty($mutasi) ? $mutasi['no_mutasi'] : ""; ?>" type="text" class="form-control no_mutasi" id="no_mutasi" name="no_mutasi" placeholder="No. mutasi">
                                     <label for="floatingInput">No. Mutasi</label>
                                 </div>
                                 <div style="<?= !empty($mutasi) ? "display: none" : ""; ?>" class="input-generate input-group-prepend group-prepend-password align-items-center">
@@ -83,7 +78,7 @@
 
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <select <?= !empty($mutasi) ? ($mutasi['status_posting'] ? 'disabled' : '') : '' ?> class="form-select divisi_asal_id" id="divisi_asal_id" name="divisi_asal_id" aria-label="Floating label select example">
+                            <select <?= !empty($mutasi) ? ($mutasi['status_posting'] ? 'disabled' : '') : '' ?> class="form-select divisi_asal_id" id="divisi_asal_id" name="divisi_asal_id">
                                 <option value=""></option>
                                 <?php foreach ($divisi as $d) : ?>
                                     <option <?= !empty($mutasi) ? ($mutasi['divisi_asal_id'] == $d['id'] ? 'selected' : '') : '' ?> value="<?= $d['id'] ?>">
@@ -97,7 +92,7 @@
 
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <select <?= !empty($mutasi) ? ($mutasi['status_posting'] ? 'disabled' : '') : '' ?> class="form-select warehouse_asal_id" id="warehouse_asal_id" name="warehouse_asal_id" aria-label="Floating label select example">
+                            <select <?= !empty($mutasi) ? ($mutasi['status_posting'] ? 'disabled' : '') : '' ?> class="form-select warehouse_asal_id" id="warehouse_asal_id" name="warehouse_asal_id">
                                 <option value=""></option>
                                 <?php if (!empty($warehouseAsal)) : ?>
                                     <?php foreach ($warehouseAsal as $w) : ?>
@@ -113,7 +108,7 @@
 
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <select <?= !empty($mutasi) ? ($mutasi['status_posting'] ? 'disabled' : '') : '' ?> class="form-select divisi_tujuan_id" id="divisi_tujuan_id" name="divisi_tujuan_id" aria-label="Floating label select example">
+                            <select <?= !empty($mutasi) ? ($mutasi['status_posting'] ? 'disabled' : '') : '' ?> class="form-select divisi_tujuan_id" id="divisi_tujuan_id" name="divisi_tujuan_id">
                                 <option value=""></option>
                                 <?php foreach ($divisi as $d) : ?>
                                     <option <?= !empty($mutasi) ? ($mutasi['divisi_asal_id'] == $d['id'] ? 'selected' : '') : '' ?> value="<?= $d['id'] ?>">
@@ -124,14 +119,9 @@
                             <label for="floatingInput" style="z-index: 1;">Departemen Tujuan</label>
                         </div>
                     </div>
-
-
-
-
-
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <select <?= !empty($mutasi) ? ($mutasi['status_posting'] ? 'disabled' : '') : '' ?> class="form-select warehouse_tujuan_id" id="warehouse_tujuan_id" name="warehouse_tujuan_id" aria-label="Floating label select example">
+                            <select <?= !empty($mutasi) ? ($mutasi['status_posting'] ? 'disabled' : '') : '' ?> class="form-select warehouse_tujuan_id" id="warehouse_tujuan_id" name="warehouse_tujuan_id">
                                 <option value=""></option>
                                 <?php if (!empty($warehouseTujuan)) : ?>
                                     <?php foreach ($warehouseTujuan as $w) : ?>
@@ -146,120 +136,59 @@
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <select <?= !empty($mutasi) ? ($mutasi['status_posting'] ? 'disabled' : '') : '' ?> class="form-select type_pengambilan_stock" id="type_pengambilan_stock" name="type_pengambilan_stock" aria-label="Floating label select example">
-                                <option value=""></option>
-                                <option <?= !empty($mutasi) ? ($mutasi['tipe_pengambilan_stock'] == "PABEAN" ? 'selected' : '') : '' ?> value="PABEAN">PABEAN</option>
-                                <option <?= !empty($mutasi) ? ($mutasi['tipe_pengambilan_stock'] == "FIFO" ? 'selected' : '') : '' ?> value="FIFO">FIFO</option>
-                            </select>
-                            <label for="floatingInput" style="z-index: 1;">Tipe Pengambilan Stok</label>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="form-floating mb-3" style="height: 50px;">
-                            <input <?= !empty($mutasi) ? ($mutasi['status_posting'] ? 'disabled' : '') : '' ?> placeholder="Keterangan" value="<?= !empty($mutasi) ? $mutasi['keterangan'] : '' ?>" class="form-control keterangan" id="keterangan" name="keterangan" aria-label="Floating label select example" />
+                            <input <?= !empty($mutasi) ? ($mutasi['status_posting'] ? 'disabled' : '') : '' ?> placeholder="Keterangan" value="<?= !empty($mutasi) ? $mutasi['keterangan'] : '' ?>" class="form-control keterangan" id="keterangan" name="keterangan" />
                             <label for="floatingInput" style="z-index: 1;">Keterangan (Opsional)</label>
                         </div>
                     </div>
                 </div>
 
             </form>
-            <div class="detail-form-layout">
-                <div class="row">
-                    <div class="col mb-3">
-                        <label class="form-label font-weight-bold lable-title">Data Barang</label>
-                    </div>
-                </div>
-                <form class="detail-form">
-                    <input type="hidden" name="id_detail" class="id_detail" id="id_detail">
-                    <div class="row">
-                        <div class="col-md-4">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <select class="form-select type_barang" id="type_barang" name="type_barang" aria-label="Floating label select example">
-                                    <option value=""></option>
-                                    <?php foreach ($tipeBarang as $t) : ?>
-                                        <option value="<?= $t['description'] ?>">
-                                            <?= strtoupper($t['value']); ?>
-                                        </option>
-                                    <?php endforeach; ?>
-                                </select>
-                                <label for="floatingInput" style="z-index: 1;">Tipe Barang</label>
-                            </div>
-                        </div>
 
-                        <div class="col-md-4">
-                            <div class="form-floating mb-3" style="height: 50px;">
-                                <select class="form-select spesifikasi_id" id="spesifikasi_id" name="spesifikasi_id" aria-label="Floating label select example">
-                                    <option value=""></option>
-
-                                </select>
-                                <label for="floatingInput" style="z-index: 1;">Barang - Spesifikasi</label>
-                            </div>
-                        </div>
-                        <div class="col-md-4 form-fifo">
-                            <div class="form-floating" style="height: 50px;">
-                                <input placeholder="Qty" oninput="preventNegativeInput(this)" class="form-control qty_mutasi_fifo" id="qty_mutasi_fifo" name="qty_mutasi_fifo" aria-label="Floating label select example" />
-                                <label for="floatingInput" style="z-index: 1;">Qty Mutasi Keluar</label>
-                            </div>
-                        </div>
-                    </div>
-                </form>
-
+            <div class="col-subtitle-modal">
                 <div class="row mt-3">
-                    <div class="col mb-0">
-                        <label class="form-label font-weight-bold lable-title">List Inventori Asal Barang</label>
+                    <div class="col-md-6">
+                        <label class="form-label font-weight-bold modal-sub-title">Daftar Barang Yang Akan Dipindahkan</label>
                     </div>
-                    <div class="col-md-12 col-table-button-tts">
-                        <div class="table-responsive">
-                            <table class="table table-bordered nowrap table-hover-tobasurimi table-form-tts" id="dataTable" width="100%" cellspacing="0">
-                                <thead class="thead-dark">
-                                    <tr>
-                                        <th style="text-align: center;">#</th>
-                                        <th style="text-align: center;">Asal Barang</th>
-                                        <th style="text-align: center;">No Dokumen</th>
-                                        <th style="text-align: center;">Supplier</th>
-                                        <th style="text-align: center;">Dokumen Pabean</th>
-                                        <th style="text-align: center;">No Aju / No Daftar</th>
-                                        <th style="text-align: center;">Tanggal Penerimaan</th>
-                                        <th style="text-align: center;">Barang - Spesifikasi</th>
-                                        <th style="text-align: center;">Satuan</th>
-                                        <th style="text-align: center;">Qty</th>
-                                    </tr>
-                                </thead>
-                                <tbody class="body-table">
-                                </tbody>
-                            </table>
-                            <button type="button" class="btn btn-primary" id="select-item-btn">Pilih</button>
-                        </div>
+                    <div class="col-md-6">
+                        <button class="btn btn-show-detail btn-add btn-block float-right" type="button" id="btnDetailStockModal">
+                            <i class="fa-solid fa-magnifying-glass"></i> Inventori
+                        </button>
                     </div>
                 </div>
-
             </div>
 
             <div class="row">
-                <div class="col mb-3">
-                    <label class="form-label font-weight-bold lable-title">Daftar Barang Yang Akan Dipindahkan</label>
-                </div>
                 <div class="col-md-12 mb-5">
                     <div class="table-responsive" style="margin-top: -10px;">
-                        <table class="table table-bordered nowrap table-hover-tobasurimi table-form-tts" id="selectedItemTable" width="100%" cellspacing="0">
+                        <table class="table table-bordered nowrap table-hover-tobasurimi dataTable" id="selectedItemTable" width="100%" cellspacing="0">
                             <thead class="thead-dark">
                                 <tr>
-                                    <th style="text-align: center;">No</th>
-                                    <th style="text-align: center;">Tipe Barang</th>
-                                    <th style="text-align: center;">Asal Barang</th>
-                                    <th style="text-align: center;">No Dokumen</th>
-                                    <th style="text-align: center;">Supplier</th>
-                                    <th style="text-align: center;">Dokumen Pabean</th>
-                                    <th style="text-align: center;">Tgl Penerimaan</th>
-                                    <th style="text-align: center;">Barang - Spesifikasi</th>
-                                    <th style="text-align: center;">Satuan</th>
-                                    <th style="text-align: center;">Qty Asal</th>
-                                    <th style="text-align: center;">Qty Mutasi</th>
-                                    <th style="text-align: center;">Action</th>
+                                    <th>No</th>
+                                    <th>Sumber</th>
+                                    <th>Supplier / Vendor</th>
+                                    <th>Kode</th>
+                                    <th>Barang</th>
+                                    <th>Spesifikasi</th>
+                                    <th>Doc</th>
+                                    <th>No Po</th>
+                                    <th>Tgl Po</th>
+                                    <th>Tgl Masuk</th>
+                                    <th>Ref No</th>
+                                    <th>Stok Awal</th>
+                                    <th>Qty Mutasi</th>
+                                    <th>Satuan Mutasi</th>
+                                    <th>Qty Konversi</th>
+                                    <th>Satuan Konversi</th>
+                                    <th>Action</th>
                                 </tr>
                             </thead>
                             <tbody class="body-table">
                             </tbody>
+                            <tfoot>
+                                <tr>
+                                    <td colspan="17">Tidak Ada Data</td>
+                                </tr>
+                            </tfoot>
                         </table>
                     </div>
                 </div>
@@ -271,58 +200,375 @@
     </div>
 </section>
 
+<div class="modal detail-modal" id="detailStockModal" tabindex="1">
+    <div class="modal-dialog modal-xl" style="min-width: 100rem !important;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title title-secondary">Cari Stok Barang</h5>
+            </div>
+            <div class="modal-body">
+                <div class="detail-form-component">
+                    <div class="detail-form-layout">
+                        <label class="form-label font-weight-bold lable-title" id="cari_stock_title">Pilih Tipe Ambil Stok</label>
+                        <div class="row mt-3">
+                            <div class="col-md-4">
+                                <div class="form-floating mb-3" style="height: 50px;">
+                                    <select class="form-select type_pengambilan_stock" id="type_pengambilan_stock" name="type_pengambilan_stock">
+                                        <option value=""></option>
+                                        <option value="PABEAN">PABEAN</option>
+                                        <option value="FIFO">FIFO</option>
+                                    </select>
+                                    <label for="floatingInput" style="z-index: 1;">Tipe Pengambilan Stok</label>
+                                </div>
+                            </div>
+                            <div class="col-md-4 form-fifo">
+                                <div class="form-floating" style="height: 50px;">
+                                    <input placeholder="Qty Mutasi" oninput="this.value = greatFormatRupiah(this.value)" class="form-control qty_mutasi_fifo" id="qty_mutasi_fifo" name="qty_mutasi_fifo" />
+                                    <label for="floatingInput" style="z-index: 1;">Qty Mutasi</label>
+                                </div>
+                            </div>
+                        </div>
 
+                        <label class="form-label font-weight-bold lable-title">Pilih Inventori Barang Yang Akan Anda Mutasikan</label>
+                        <div class="row mt-3 justify-content-left">
+                            <div class="col-sm-3 mb-2">
+                                <div class="form-floating" style="height: 50px;">
+                                    <select class="form-select type_barang" id="type_barang" name="type_barang">
+                                        <option value=""></option>
+                                        <?php foreach ($tipeBarang as $t) : ?>
+                                            <option value="<?= $t['description'] ?>">
+                                                <?= strtoupper($t['value']); ?>
+                                            </option>
+                                        <?php endforeach; ?>
+                                    </select>
+                                    <label for="floatingInput" style="z-index: 1;">Tipe Barang</label>
+                                </div>
+                            </div>
+                            <div class="col-sm-3 mb-2">
+                                <div class="input-group">
+                                    <div class="form-floating" style="height: 50px;">
+                                        <input value="01/09/2025" placeholder="" class="form-control dateStart" id="dateStart" name="dateStart" />
+                                        <label style="z-index: 1;" style="z-index: 1;">Tgl Awal Masuk</label>
+                                    </div>
+                                    <div class="input-group-append" style="height:50px;">
+                                        <button disabled class="btn btn-secondary" type="button">
+                                            <i class="fas fa-calendar-alt"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-3 mb-2">
+                                <div class="input-group">
+                                    <div class="form-floating" style="height: 50px;">
+                                        <input value="<?= date('d/m/Y') ?>" placeholder="" class="form-control dateEnd" id="dateEnd" name="dateEnd" />
+                                        <label style="z-index: 1;" style="z-index: 1;">Tgl Akhir Masuk</label>
+                                    </div>
+                                    <div class="input-group-append" style="height:50px;">
+                                        <button disabled class="btn btn-secondary" type="button">
+                                            <i class="fas fa-calendar-alt"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-3 mb-2">
+                                <div class="form-floating" style="height: 50px;">
+                                    <select class="form-select spesifikasi_id" id="spesifikasi_id" name="spesifikasi_id">
+                                        <option value=""></option>
+                                    </select>
+                                    <label for="floatingInput" style="z-index: 1;">Cari Barang</label>
+                                </div>
+                            </div>
+                            <div class="col-sm-3 mb-2">
+                                <div class="form-floating mb-3" style="height: 50px;">
+                                    <input placeholder="Cari Data" value="" class="form-control search" id="search" name="search" />
+                                    <label for="floatingInput" style="z-index: 1;">Cari Data</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12 col-table-button-tts" style="margin-top: 10px;">
+                                <div class="table-responsive">
+                                    <table class="table table-bordered nowrap table-hover-tobasurimi dataTable table-inventori" id="dataTable" width="100%" cellspacing="0">
+                                        <thead class="thead-dark">
+                                            <tr>
+                                                <th>No</th>
+                                                <th>#</th>
+                                                <th>Dept</th>
+                                                <th>Warehouse</th>
+                                                <th>Sumber</th>
+                                                <th>Supplier / Vendor</th>
+                                                <th>Kode Barang</th>
+                                                <th>Barang</th>
+                                                <th>Spesifikasi</th>
+                                                <th>Doc</th>
+                                                <th>No Po</th>
+                                                <th>Tgl Po</th>
+                                                <th>Tgl Masuk</th>
+                                                <th>Ref No</th>
+                                                <th>Qty</th>
+                                                <th>Satuan</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody class="body-table" id="body-detail-list-inventori">
+
+                                        </tbody>
+                                    </table>
+                                    <button type="button" class="btn btn-primary" id="select-item-btn">
+                                        Pilih Inventori
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-discard mr-2" id="btnHideDetailStock">Kembali</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal detail-modal" id="detailMutasiModal" tabindex="1">
+    <div class="modal-dialog modal-xl" style="min-width: 900px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title title-secondary">Input Qty Mutasi</h5>
+            </div>
+            <form class="update-form-mutasi" role="form" method="POST">
+                <input type="hidden" name="id_stock_detail" id="id_stock_detail" class="id_stock_detail">
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="input-group">
+                                <div class="form-floating mb-3" style="height: 50px;">
+                                    <input readonly autocomplete="one-time-code" type="text" class="form-control kode_barang" id="kode_barang" name="kode_barang" placeholder="Kode Barang">
+                                    <label for="floatingInput">Kode Barang</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="input-group">
+                                <div class="form-floating mb-3" style="height: 50px;">
+                                    <input readonly autocomplete="one-time-code" type="text" class="form-control barang_name" id="barang_name" name="barang_name" placeholder="Barang">
+                                    <label for="floatingInput">Nama Barang</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="input-group">
+                                <div class="form-floating mb-3" style="height: 50px;">
+                                    <input readonly autocomplete="one-time-code" type="text" class="form-control spesifikasi" id="spesifikasi" name="spesifikasi" placeholder="Spesifikasi">
+                                    <label for="floatingInput">Spesifikasi</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="input-group">
+                                <div class="form-floating mb-3" style="height: 50px;">
+                                    <input oninput="this.value = greatFormatRupiah(this.value)" autocomplete="one-time-code" type="text" class="form-control qty_mutasi" id="qty_mutasi" name="qty_mutasi" placeholder="Qty mutasi">
+                                    <label for="floatingInput">Qty Mutasi</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <select class="form-select unit_id_mutasi" name="unit_id_mutasi" id="unit_id_mutasi">
+                                    <option value=""></option>
+                                </select>
+                                <label for="floatingInput" style="z-index: 1;">Satuan Mutasi</label>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="input-group">
+                                <div class="form-floating mb-3" style="height: 50px;">
+                                    <input readonly oninput="this.value = greatFormatRupiah(this.value)" autocomplete="one-time-code" type="text" class="form-control qty_asal" id="qty_asal" name="qty_asal" placeholder="Qty Asal">
+                                    <label for="floatingInput">Stok Asal</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="input-group">
+                                <div class="form-floating mb-3" style="height: 50px;">
+                                    <input readonly oninput="this.value = greatFormatRupiah(this.value)" autocomplete="one-time-code" type="text" class="form-control qty_konversi" id="qty_konversi" name="qty_konversi" placeholder="Qty Konversi">
+                                    <label for="floatingInput">Qty Konversi</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-floating mb-3" style="height: 50px;">
+                                <select class="form-select unit_id_konversi" name="unit_id_konversi" id="unit_id_konversi" disabled>
+                                    <option value=""></option>
+                                    <?php foreach ($dataSatuan as $d): ?>
+                                        <option value="<?= $d['id'] ?>"><?= $d['kode_satuan'] ?></option>
+                                    <?php endforeach; ?>
+                                </select>
+                                <label for="floatingInput" style="z-index: 1;">Satuan Konversi</label>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="input-group">
+                                <div class="form-floating mb-3" style="height: 50px;">
+                                    <input readonly oninput="this.value = greatFormatRupiah(this.value)" autocomplete="one-time-code" type="text" class="form-control qty_hasil_mutasi" id="qty_hasil_mutasi" name="qty_hasil_mutasi" placeholder="Qty Hasil mutasi">
+                                    <label for="floatingInput">Hasil mutasi</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-discard mr-2" id="btnHideMutasiModal">Kembali</button>
+                    <button type="button" class="btn btn-submit-form" id="btnSubmitMutasi">Simpan</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 
 <script>
-    var listStockAsal = [];
+    var listStockInventori = [];
     var listStockSelected = [];
-
     $('.form-fifo').hide();
-
     <?php if (!empty($mutasiDetail)) : ?>
-        <?php foreach ($mutasiDetail as $m) :  ?>
-            listStockSelected.push({
-                id: "<?= $m['id'] ?>",
-                bc_id: "<?= $m['bc_id'] ?>",
-                stock_detail_id: "<?= $m['stock_detail_id'] ?>",
-                no_aju: "<?= $m['no_aju'] ?>",
-                stock_id: "<?= $m['stock_id'] ?>",
-                stok_total: "<?= $m['stok_total'] ?>",
-                bc_type: "<?= $m['bc_type'] ?>",
-                satuan: "<?= $m['satuan'] ?>",
-                barang: "<?= $m['barang'] ?>",
-                type_barang: "<?= $m['type_barang'] ?>",
-                type_barang_text: "<?= $m['type_barang_text'] ?>",
-                stock_date: "<?= $m['stock_date'] ?>",
-                qty: "<?= $m['qty'] ?>",
-                supplier_name: "<?= $m['supplier_name'] ?>",
-                stock_dokumen: "<?= $m['stock_dokumen'] ?>",
-                sumber: "<?= $m['sumber'] ?>"
-            });
-        <?php endforeach; ?>
-        <?php if ($mutasi['status_posting']) : ?>
-            $('.detail-form-layout').hide()
-        <?php endif; ?>
+        listStockSelected = <?= json_encode($mutasiDetail) ?>;
+        drawTableSelectedItem(listStockSelected);
+    <?php else: ?>
+        changeStatus();
     <?php endif; ?>
 
-    var qtyTotal = 0;
     const csrfToken = '<?= csrf_token() ?>';
     const csrf = $(`[name="${csrfToken}"]`);
 
-    var dataTable = $('#dataTable').DataTable({
-
-        processing: false,
-        serverSide: false,
+    var table = $('.table-inventori').DataTable({
+        processing: true,
+        serverSide: true,
         ordering: true,
-        order: [],
+        order: [
+            [12, 'desc']
+        ],
         fixedHeader: true,
+        lengthMenu: [
+            [25],
+            [25],
+        ],
+        pageLength: 25,
+        ajax: {
+            url: "<?= base_url('mutasi/all-stock-list'); ?>",
+            type: "GET",
+            data: function(data) {
+                data.spesifikasi_id = $("#spesifikasi_id").val();
+                data.divisi_id = $("#divisi_asal_id").val();
+                data.warehouse_id = $("#warehouse_asal_id").val();
+                data.dateStart = $("#dateStart").val();
+                data.dateEnd = $("#dateEnd").val();
+                data.type_barang = $("#type_barang").val();
+                data.search = $("#search").val();
+            },
+            dataSrc: function(json) {
+                // simpan data hasil request ke variabel global
+                window.listStockInventori = json.data;
+                // kembalikan array data agar DataTables bisa menampilkannya
+                return json.data;
+            }
+        },
         "initComplete": function(settings, json) {
             $('.dataTables_length').empty();
             $('.dataTables_length').html("<div><label class='text-center ml-2 mt-2'>Show <b class='entries-label'>25</b> Entries</label></div>");
             $('.dataTable').wrap("<div style='overflow:auto; width:100%;position:relative;'></div>");
         },
         display: "stripe",
-        searching: true,
+        searching: false,
+        columns: [{
+                data: "no",
+                className: "text-left",
+                orderable: false
+            },
+            {
+                data: null,
+                orderable: false,
+                className: "text-center",
+                render: function(data, type, row) {
+                    return `<input type="checkbox" class="row-check child" value="${row.id}">`;
+                }
+            },
+            {
+                data: "divisi",
+                className: "text-left"
+            },
+            {
+                data: "warehouse_name",
+                className: "text-left"
+            },
+            {
+                data: "reference_type",
+                className: "text-left"
+            },
+            {
+                data: "supplier_name",
+                className: "text-left"
+            },
+            {
+                data: "kode_barang",
+                className: "text-left"
+            },
+            {
+                data: "barang_name",
+                className: "text-left",
+            },
+            {
+                data: "spesifikasi",
+                className: "text-left"
+            },
+            {
+                data: "bc_detail",
+                className: "text-left"
+            },
+            {
+                data: "po_no",
+                className: "text-left"
+            },
+            {
+                data: "po_date",
+                className: "text-left"
+            },
+            {
+                data: "lpb_date",
+                className: "text-left"
+            },
+            {
+                data: "reference_no",
+                className: "text-left"
+            },
+            {
+                data: "qty_diterima",
+                className: "text-left",
+                render: function(data) {
+                    return greatFormatRupiah(data);
+                }
+            },
+            {
+                data: "kode_satuan",
+                className: "text-left"
+            },
+        ],
+        "drawCallback": function(settings) {
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-toggle="tooltip"]'))
+            var tooltipList = tooltipTriggerList.map(function(tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl)
+            });
+            var typePengambilanStock = $('#type_pengambilan_stock option:selected').val();
+            if (typePengambilanStock == "FIFO") {
+                // Hide form check
+                $('.child').hide();
+            } else {
+                $('.child').show();
+            }
+        },
+        columnDefs: [{
+            defaultContent: "-",
+            targets: "_all"
+        }],
         language: {
             emptyTable: "Tidak Ada Data",
             lengthMenu: "Show _MENU_ entries",
@@ -333,68 +579,71 @@
         }
     });
 
-    <?php if (!empty($mutasi)) : ?>
-        if ($.fn.DataTable.isDataTable('#selectedItemTable')) {
-            $('#selectedItemTable').DataTable().clear().draw();
-            selectedItemTable.destroy();
-        }
-        var selectedItemTable = $('#selectedItemTable').DataTable({
-
-            processing: false,
-            serverSide: false,
-            ordering: true,
-            order: [],
-            fixedHeader: true,
-            "initComplete": function(settings, json) {
-                $('.dataTables_length').empty();
-                $('.dataTables_length').html("<div><label class='text-center ml-2 mt-2'>Show <b class='entries-label'>25</b> Entries</label></div>");
-                $('.dataTable').wrap("<div style='overflow:auto; width:100%;position:relative;'></div>");
-            },
-            display: "stripe",
-            searching: false,
-            language: {
-                emptyTable: "Tidak Ada Data",
-                lengthMenu: "Show _MENU_ entries",
-                paginate: {
-                    previous: '<i class="fa fa-angle-left"></i>',
-                    next: '<i class="fa fa-angle-right"></i>'
-                }
-            }
-        });
-        drawTableSelectedItem(listStockSelected);
-
-    <?php else : ?>
-        var selectedItemTable = $('#selectedItemTable').DataTable({
-
-            processing: false,
-            serverSide: false,
-            ordering: true,
-            order: [],
-            fixedHeader: true,
-            "initComplete": function(settings, json) {
-                $('.dataTables_length').empty();
-                $('.dataTables_length').html("<div><label class='text-center ml-2 mt-2'>Show <b class='entries-label'>25</b> Entries</label></div>");
-                $('.dataTable').wrap("<div style='overflow:auto; width:100%;position:relative;'></div>");
-            },
-            display: "stripe",
-            searching: false,
-            language: {
-                emptyTable: "Tidak Ada Data",
-                lengthMenu: "Show _MENU_ entries",
-                paginate: {
-                    previous: '<i class="fa fa-angle-left"></i>',
-                    next: '<i class="fa fa-angle-right"></i>'
-                }
-            }
-        });
-    <?php endif; ?>
-
     $(".tanggal").datepicker({
         todayHighlight: true,
         format: "dd/mm/yyyy",
         orientation: "bottom auto",
         autoclose: true
-    })
+    });
+
+    $("#dateStart,#dateEnd").datepicker({
+        todayHighlight: true,
+        format: "dd/mm/yyyy",
+        orientation: "bottom auto",
+        autoclose: true
+    });
+
+    $('.tanggal').change(function(e) {
+        e.preventDefault();
+        changeStatus();
+    });
+
+    $('#dateStart,#dateEnd,#type_barang,#spesifikasi_id').change(function(e) {
+        e.preventDefault();
+        table.ajax.reload();
+    });
+
+    $('#search').keyup(function(e) {
+        e.preventDefault();
+        table.ajax.reload();
+    });
+
+    $('#btnDetailStockModal').click(function(e) {
+        e.preventDefault();
+        var divisiAsalId = $('#divisi_asal_id option:selected').val();
+        var warehouseAsalId = $('#warehouse_asal_id option:selected').val();
+
+        if (divisiAsalId == "") {
+            Swal.fire({
+                icon: 'error',
+                title: "Pilih departemen asal dahulu, sebelum buka data inventori",
+                confirmButtonColor: '#4e73df',
+            });
+            return;
+        } else if (warehouseAsalId == "") {
+            Swal.fire({
+                icon: 'error',
+                title: "Pilih warehouse asal dahulu, sebelum buka data inventori",
+                confirmButtonColor: '#4e73df',
+            });
+            return;
+        } else {
+            // reset tabel stok
+            table.ajax.reload();
+            var divisiAsal = $('#divisi_asal_id option:selected').text();
+            var warehouseAsal = $('#warehouse_asal_id option:selected').text();
+            $('#cari_stock_title')
+                .text('Departemen ' + divisiAsal + ", Warehouse " + warehouseAsal)
+                .addClass('text-danger');
+            $('#type_pengambilan_stock').val("PABEAN").change();
+            $('#detailStockModal').modal('show');
+        }
+    });
+
+    $('#btnHideDetailStock').click(function(e) {
+        e.preventDefault();
+        $('#detailStockModal').modal('hide');
+    });
 
     $('#type_pengambilan_stock').select2({
         placeholder: "Pilih Tipe Ambil Stok",
@@ -407,85 +656,107 @@
             $('.form-fifo').hide();
         }
         $('#spesifikasi_id').val(null).change();
-        listStockAsal = [];
-        listStockSelected = [];
-        drawTableAsalBarang();
-        drawTableSelectedItem();
     });
 
     $('#warehouse_tujuan_id').select2({
         placeholder: "Pilih Warehouse Tujuan",
         theme: "bootstrap-5",
-        allowClear: true
+        allowClear: false
     }).change(function() {});
 
 
     $('#warehouse_asal_id').select2({
         placeholder: "Pilih Warehouse Asal",
         theme: "bootstrap-5",
-        allowClear: true
+        allowClear: false
     }).change(function() {
-        // RESET TYPE BARANG
-        $('#type_barang').val(null).change();
-        // RESET SEMUA LIST
-        listStockAsal = [];
+        listStockInventori = [];
         listStockSelected = [];
-        drawTableAsalBarang(listStockAsal);
-        drawTableSelectedItem(listStockSelected);
         getListWarehouseTujuan();
+        drawTableSelectedItem(listStockSelected);
     });
 
     $('#divisi_asal_id').select2({
         placeholder: "Pilih Departemen Asal",
         theme: "bootstrap-5",
-        allowClear: true
+        allowClear: false
     }).change(function() {
-        // CARI DIVISI TUJUAN
-        // getListDivisiTujuan();
-        // CARI WAREHOUSE ASAL
         getListWarehouseAsal()
-        // RESET TYPE BARANG
-        $('#type_barang').val(null).change();
-        // GET NO MUTASI
-        changeStatus();
         // RESET SEMUA LIST
-        listStockAsal = [];
+        listStockInventori = [];
         listStockSelected = [];
-        drawTableAsalBarang(listStockAsal);
         drawTableSelectedItem(listStockSelected);
     });
 
     $('#divisi_tujuan_id').select2({
         placeholder: "Pilih Departemen Tujuan",
         theme: "bootstrap-5",
-        allowClear: true
+        allowClear: false
     }).change(function() {
         // CARI WAREHOUSE TUJUAN
         getListWarehouseTujuan();
     });
 
+
+    $('#unit_id_mutasi').select2({
+        placeholder: "Pilih Satuan Mutasi",
+        theme: "bootstrap-5",
+        allowClear: false,
+        dropdownParent: $('#detailMutasiModal')
+    });
+
+    $('#unit_id_konversi').select2({
+        placeholder: "Pilih Satuan Konversi",
+        theme: "bootstrap-5",
+        allowClear: false,
+        dropdownParent: $('#detailMutasiModal')
+    });
+
     $('#type_barang').select2({
         placeholder: "Pilih Tipe Barang",
         theme: "bootstrap-5",
-        allowClear: true
-    }).change(function() {
-        //CARI BARANG
-        getListBarang();
-        // RESET STOK LIST
-        listStockAsal = [];
-        drawTableAsalBarang(listStockAsal);
+        allowClear: true,
     });
 
     $('#spesifikasi_id').select2({
-        placeholder: "Pilih Barang (Hanya Barang Yang Sudah Inisiasi Stok)",
+        placeholder: "Cari Kode / Nama Barang",
         theme: "bootstrap-5",
-        allowClear: true
-    }).change(function() {
-        getListDokumenPabean();
+        allowClear: true,
+        dropdownParent: $('#detailStockModal'),
+        ajax: {
+            url: '<?= base_url("barang/dropdown/type-server-inventori") ?>',
+            dataType: 'json',
+            delay: 250,
+            data: function(params) {
+                return {
+                    q: params.term,
+                    type_barang: $('#type_barang option:selected').val()
+                };
+            },
+            processResults: function(data) {
+                // Pastikan server mengembalikan data dengan struktur yang lengkap
+                return {
+                    results: $.map(data.results, function(item) {
+                        return {
+                            id: item.id,
+                            text: item.text,
+                        };
+                    })
+                };
+            },
+            cache: false
+        },
+        minimumInputLength: 1
+    });
+
+    $('#btnHideMutasiModal').click(function(e) {
+        e.preventDefault();
+        $('#detailMutasiModal').modal('hide');
     });
 
 
-    $("#type_barang,#divisi_asal_id,#divisi_tujuan_id,#warehouse_asal_id,#warehouse_tujuan_id,#spesifikasi_id,#bc_id,#no_aju,#operasi,#type_pengambilan_stock")
+
+    $("#type_barang,#divisi_asal_id,#divisi_tujuan_id,#warehouse_asal_id,#warehouse_tujuan_id,#spesifikasi_id,#bc_id,#unit_id_mutasi,#unit_id_konversi,#type_pengambilan_stock")
         .parent('div')
         .children('span')
         .children('span')
@@ -506,34 +777,58 @@
     function insertListPabean() {
         var checkedCheckboxes = $(".child:checked");
         var dataIds = checkedCheckboxes.map(function() {
-            return $(this).data("id");
+            return parseFloat($(this).val());
         }).get();
-        var id_selected = getIDListDataSelected();
+        if (dataIds.length == 0) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Checklist inventori yang ingin di mutasikan',
+                confirmButtonColor: '#4e73df',
+                confirmButtonText: 'Oke',
+            });
+            return;
+        } else {
+            var id_selected = getIDListDataSelected();
+            $.each(listStockInventori, function(i, v) {
+                var currentID = Number(v.id);
+                if ($.inArray(currentID, dataIds) !== -1) {
+                    var isIDSelected = $.grep(listStockSelected, function(item) {
+                        return item.id == Number(currentID);
+                    }).length > 0;
 
-        $.each(listStockAsal, function(i, v) {
-            var currentID = Number(v.id);
-
-            if ($.inArray(currentID, dataIds) !== -1) {
-                var isIDSelected = $.grep(listStockSelected, function(item) {
-                    return item.id == Number(currentID);
-                }).length > 0;
-
-                if (!isIDSelected) {
-                    listStockAsal[i].stok_total = parseFloat(listStockAsal[i].stok_total);
-                    listStockAsal[i].qty = 0;
-                    listStockSelected.push(listStockAsal[i]);
+                    if (!isIDSelected) {
+                        listStockInventori[i].mutasi = {
+                            qty_mutasi: 0,
+                            unit_id_mutasi: null,
+                            unit_name_mutasi: "",
+                            qty_konversi: 0,
+                            unit_id_konversi: v.unit_id,
+                            unit_name_konversi: v.kode_satuan,
+                        }
+                        listStockSelected.push(listStockInventori[i]);
+                    }
                 }
-            }
-        });
+            });
+        }
         drawTableSelectedItem(listStockSelected);
+        // Tutup Modal Stok
+        $('#detailStockModal').modal('hide');
     }
 
     function insertListFifo() {
         var dataIds = getIDListDataSelected();
-        var qtyMutasiFifo = parseFloat($('#qty_mutasi_fifo').val());
-        var stockID = $(".spesifikasi_id option:selected").data('stock_id');
+        var qtyMutasiFifo = parseFloat(destroyFormatRupiah($('#qty_mutasi_fifo').val()));
+        var spesifikasiId = $(".spesifikasi_id option:selected").val();
 
-        if (isNaN(qtyMutasiFifo)) {
+        if (listStockInventori.length === 0) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Stok Inventori Kosong',
+                confirmButtonColor: '#4e73df',
+                confirmButtonText: 'Oke',
+            });
+            return;
+        } else if (isNaN(qtyMutasiFifo)) {
             Swal.fire({
                 icon: 'error',
                 title: 'Terjadi Kesalahan : Qty Mutasi Keluar Wajib Diisi',
@@ -541,13 +836,21 @@
                 cancelButtonColor: '#d33',
                 reverseButtons: true,
                 confirmButtonText: 'Oke',
-            })
+            });
+            return;
+        } else if (spesifikasiId == '') {
+            Swal.fire({
+                icon: 'error',
+                title: 'Kode & Nama Barang Wajib Diisi',
+                confirmButtonColor: '#4e73df',
+                confirmButtonText: 'Oke',
+            });
+            return;
         } else {
             var totalStokTotal = 0;
-            $.each(listStockAsal, function(i, v) {
-                totalStokTotal += parseFloat(v.stok_total);
+            $.each(listStockInventori, function(i, v) {
+                totalStokTotal += parseFloat(v.qty_diterima);
             });
-            deleteByStockID(stockID);
 
             if (qtyMutasiFifo > totalStokTotal) {
                 Swal.fire({
@@ -557,19 +860,30 @@
                     cancelButtonColor: '#d33',
                     reverseButtons: true,
                     confirmButtonText: 'Oke',
-                })
+                });
+                return;
             } else {
-                $.each(listStockAsal, function(i, v) {
+                $.each(listStockInventori, function(i, v) {
                     var currentID = Number(v.id);
                     if ($.inArray(currentID, dataIds) == -1) {
                         var isIDSelected = $.grep(listStockSelected, function(item) {
                             return item.id == Number(currentID);
                         }).length > 0;
-                        if (!isIDSelected && qtyMutasiFifo != 0 && parseFloat(listStockAsal[i].stok_total) != 0) {
-                            var mutasiQty = Math.min(qtyMutasiFifo, parseFloat(listStockAsal[i].stok_total));
-                            listStockAsal[i].stok_total = parseFloat(listStockAsal[i].stok_total);
-                            listStockAsal[i].qty = parseFloat(mutasiQty.toFixed(4));
-                            listStockSelected.push(listStockAsal[i]);
+                        if (!isIDSelected && qtyMutasiFifo != 0 && parseFloat(listStockInventori[i].qty_diterima) != 0) {
+                            var mutasiQty = Math.min(qtyMutasiFifo, parseFloat(listStockInventori[i].qty_diterima));
+                            var hasilMutasi = v.qty_diterima - mutasiQty;
+
+                            listStockInventori[i].mutasi = {
+                                qty_mutasi: parseFloat(mutasiQty),
+                                unit_id_mutasi: v.unit_id,
+                                unit_name_mutasi: v.kode_satuan,
+                                qty_konversi: parseFloat(mutasiQty).toFixed(2),
+                                unit_id_konversi: v.unit_id,
+                                unit_name_konversi: v.kode_satuan,
+                                hasil_mutasi: parseFloat(hasilMutasi).toFixed(2)
+                            }
+
+                            listStockSelected.push(listStockInventori[i]);
                             qtyMutasiFifo = qtyMutasiFifo - mutasiQty;
                         }
                     }
@@ -577,12 +891,8 @@
             }
         }
         drawTableSelectedItem(listStockSelected);
-    }
-
-    function deleteByStockID(stockID) {
-        listStockSelected = listStockSelected.filter(function(item) {
-            return item.stock_id != stockID;
-        });
+        // Tutup Modal Stok
+        $('#detailStockModal').modal('hide');
     }
 
     // VALIDATOR
@@ -655,6 +965,57 @@
         },
     });
 
+    var validatorUpdateStock = $(".update-form-mutasi").validate({
+        rules: {
+            qty_mutasi: {
+                required: true
+            },
+            unit_id_mutasi: {
+                required: true
+            },
+            qty_konversi: {
+                required: true
+            },
+            qty_hasil_mutasi: {
+                required: true
+            },
+        },
+        messages: {
+            qty_mutasi: {
+                required: "Qty mutasi wajib diisi"
+            },
+            unit_id_mutasi: {
+                required: "Satuan mutasi wajib diisi"
+            },
+            qty_konversi: {
+                required: "Qty konversi wajib diisi"
+            },
+            qty_hasil_mutasi: {
+                required: "Qty hasil mutasi wajib diisi"
+            },
+        },
+        errorElement: 'span',
+        errorClass: 'text-danger',
+        errorPlacement: function(error, element) {
+            var elem = $(element);
+            if (elem.hasClass("select2-hidden-accessible")) {
+                element = $("#select2-" + elem.attr("id") + "-container").parent();
+                error.insertAfter(element);
+            } else {
+                error.insertAfter(element);
+            }
+        },
+        highlight: function(element) {
+            $(element).closest('.form-group').addClass('has-error');
+            $(element).addClass('select-class');
+
+        },
+        unhighlight: function(element) {
+            $(element).closest('.form-group').removeClass('has-error');
+            $(element).removeClass('select-class');
+        },
+    });
+
 
     $('.btn-submit-parent').click(function() {
         if (listStockSelected.length == 0) {
@@ -665,117 +1026,95 @@
                 confirmButtonText: 'Ok'
             });
         } else {
-            var typePengambilanStock = $('#type_pengambilan_stock option:selected').val();
             if ($('.create-form').valid()) {
-                var isValid = true;
-                var dataError = null;
-
-                if (typePengambilanStock == "PABEAN") {
-                    $.each(listStockSelected, function(i, v) {
-                        var element = $('input[data-id="' + v.id + '"].stok-mutasi');
-                        var input_user = parseFloat(element.val());
-                        var stok_max = parseFloat(element.data('stok_total'));
-
-                        if (input_user > stok_max || isNaN(input_user) || input_user == undefined || input_user == 0) {
-                            dataError = listStockSelected[i];
-                            isValid = false;
-                        } else {
-                            listStockSelected[i].qty = input_user;
-                        }
-                    });
-                }
-
-                if (!isValid) {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Stok mutasi barang ' + dataError.barang + ' dengan dokumen ' + dataError.bc_type + ' / ' + dataError.no_aju + ' tidak valid!',
-                        confirmButtonColor: '#4e73df',
-                        confirmButtonText: 'Ok'
-                    });
-                } else {
-                    Swal.fire({
-                        icon: 'question',
-                        title: 'Simpan Data ?',
-                        confirmButtonColor: '#4e73df',
-                        cancelButtonColor: '#d33',
-                        showCancelButton: true,
-                        reverseButtons: true,
-                        confirmButtonText: 'Simpan',
-                        cancelButtonText: 'Kembali',
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            let id = $('#id').val();
-                            let data = new FormData(document.querySelector(".create-form"));
-                            data.append('listMutasi', JSON.stringify(listStockSelected));
-                            if (id) {
-                                // UPDATE
-                                $.ajax({
-                                    url: "<?= base_url("mutasi/update"); ?>",
-                                    data: data,
-                                    beforeSend: function(xhr) {
-                                        xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                                        setLoading();
-                                    },
-                                    complete: function() {
-                                        stopLoading()
-                                    },
-                                    method: "POST",
-                                    dataType: "json",
-                                    processData: false,
-                                    contentType: false,
-                                    success: function(response) {
-                                        Swal.fire({
-                                            icon: 'success',
-                                            title: response.message,
-                                            confirmButtonColor: '#4e73df',
-                                            confirmButtonText: 'Ok'
-                                        }).then((result) => {
-                                            if (result.isConfirmed) {
-                                                window.location.href = "<?= base_url("mutasi"); ?>";
-                                            }
-                                        });
-                                    },
+                Swal.fire({
+                    icon: 'question',
+                    title: 'Simpan Data ?',
+                    confirmButtonColor: '#4e73df',
+                    cancelButtonColor: '#d33',
+                    showCancelButton: true,
+                    reverseButtons: true,
+                    confirmButtonText: 'Simpan',
+                    cancelButtonText: 'Kembali',
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        let id = $('#id').val();
+                        let data = new FormData(document.querySelector(".create-form"));
+                        let url = id == '' ? '<?= base_url("mutasi/save"); ?>' : '<?= base_url("mutasi/update"); ?>';
+                        data.append('listMutasi', JSON.stringify(listStockSelected));
+                        $.ajax({
+                            url: url,
+                            data: data,
+                            beforeSend: function(xhr) {
+                                xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                                setLoading();
+                            },
+                            complete: function() {
+                                stopLoading()
+                            },
+                            method: "POST",
+                            dataType: "json",
+                            processData: false,
+                            contentType: false,
+                            success: function(response) {
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: response.message,
+                                    confirmButtonColor: '#4e73df',
+                                    confirmButtonText: 'Ok'
+                                }).then((result) => {
+                                    if (result.isConfirmed) {
+                                        window.location.href = "<?= base_url("mutasi"); ?>";
+                                    }
                                 });
-                            } else {
-                                // INSERT
-                                $.ajax({
-                                    url: "<?= base_url("mutasi/save"); ?>",
-                                    data: data,
-                                    beforeSend: function(xhr) {
-                                        xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                                        setLoading();
-                                    },
-                                    complete: function() {
-                                        stopLoading()
-                                    },
-                                    method: "POST",
-                                    dataType: "json",
-                                    processData: false,
-                                    contentType: false,
-                                    success: function(response) {
-                                        Swal.fire({
-                                            icon: 'success',
-                                            title: response.message,
-                                            confirmButtonColor: '#4e73df',
-                                            confirmButtonText: 'Ok'
-                                        }).then((result) => {
-                                            if (result.isConfirmed) {
-                                                window.location.href = "<?= base_url("mutasi"); ?>";
-                                            }
-                                        });
-                                    },
-                                });
-                            }
-                        }
-                    });
-                }
+                            },
+                        });
+                    }
+                });
 
             }
         }
     });
 
+    $('#btnSubmitMutasi').click(function(e) {
+        e.preventDefault();
+        if ($('.update-form-mutasi').valid()) {
+            var qty_hasil_mutasi = destroyFormatRupiah($('#qty_hasil_mutasi').val());
+            if (qty_hasil_mutasi < 0) {
+                Swal.fire({
+                    icon: 'error',
+                    title: "Qty hasil mutasi menghasilkan nilai minus  !",
+                    confirmButtonColor: '#4e73df',
+                });
+                return;
+            } else {
+                var id_stock_detail = $('#id_stock_detail').val();
+                var qty_mutasi = parseFloat(destroyFormatRupiah($('#qty_mutasi').val()));
+                var unit_id_mutasi = $('#unit_id_mutasi option:selected').val();
+                var unit_name_mutasi = $('#unit_id_mutasi option:selected').text().trim();
+                var qty_konversi = parseFloat(destroyFormatRupiah($('#qty_konversi').val()));
+                var hasil_mutasi = parseFloat(destroyFormatRupiah($('#qty_hasil_mutasi').val()));
 
-    function deleteDetail(id) {
+                var index = null;
+                for (let i = 0; i < listStockSelected.length; i++) {
+                    if (listStockSelected[i].id == id_stock_detail) {
+                        index = i;
+                    }
+                }
+
+                listStockSelected[index].mutasi.qty_mutasi = qty_mutasi;
+                listStockSelected[index].mutasi.unit_id_mutasi = unit_id_mutasi;
+                listStockSelected[index].mutasi.unit_name_mutasi = unit_name_mutasi;
+                listStockSelected[index].mutasi.qty_konversi = qty_konversi;
+                listStockSelected[index].mutasi.hasil_mutasi = hasil_mutasi;
+                drawTableSelectedItem(listStockSelected);
+                $('#detailMutasiModal').modal('hide');
+            }
+        }
+    })
+
+
+    function remove(id) {
         var indexToRemove = -1;
         for (var i = 0; i < listStockSelected.length; i++) {
             if (listStockSelected[i].id == id) {
@@ -789,54 +1128,111 @@
         }
     }
 
-    function preventNegativeInput(inputElement) {
-        var inputValue = inputElement.value;
-        var numericValue = inputValue.replace(/[^0-9.]/g, '');
-        numericValue = numericValue.replace(/^0+/g, '');
-        numericValue = numericValue.replace(/^\./g, '0.');
-        if (parseFloat(numericValue) < 0 || isNaN(parseFloat(numericValue))) {
-            inputElement.value = '0';
+    $('#qty_mutasi').keyup(function(e) {
+        hitungHasilMutasi();
+    });
+
+    function hitungHasilMutasi() {
+        var qty_mutasi = destroyFormatRupiah($('#qty_mutasi').val());
+        var konversi = parseFloat($('#unit_id_mutasi option:selected').data('konversi_satuan'));
+        var qty_asal = destroyFormatRupiah($('#qty_asal').val());
+        var qty_konversi = 0;
+        var qty_hasil_mutasi = 0;
+
+        qty_konversi = qty_mutasi * konversi;
+        qty_hasil_mutasi = qty_asal - qty_konversi;
+        qty_konversi = parseFloat(qty_konversi).toFixed(2);
+        qty_hasil_mutasi = parseFloat(qty_hasil_mutasi).toFixed(2);
+        $('#qty_hasil_mutasi').val(greatFormatRupiah(qty_hasil_mutasi));
+        $('#qty_konversi').val(greatFormatRupiah(qty_konversi));
+    }
+
+    function detail(id) {
+        resetFormDetail();
+        var item = null;
+        for (let i = 0; i < listStockSelected.length; i++) {
+            if (listStockSelected[i].id == id) {
+                item = listStockSelected[i];
+            }
+        }
+        if (item == '') {
+            Swal.fire({
+                icon: 'error',
+                title: "Detail stok tidak ada (Kesalahan sistem)",
+                confirmButtonColor: '#4e73df',
+            });
+            return;
         } else {
-            inputElement.value = numericValue;
+            $.ajax({
+                url: "<?= base_url("mutasi/list-satuan-konversi"); ?>",
+                data: {
+                    id: id
+                },
+                method: "GET",
+                success: function(response) {
+                    if (response.status) {
+                        var satuanmutasiArr = response.data;
+                        $('#id_stock_detail').val(item.id);
+                        $('#kode_barang').val(item.kode_barang);
+                        $('#barang_name').val(item.barang_name);
+                        $('#spesifikasi').val(item.spesifikasi);
+                        $('#qty_mutasi').val(greatFormatRupiah(item.mutasi.qty_mutasi));
+                        $('#unit_id_mutasi').val(item.mutasi.unit_id_mutasi).change();
+                        $('#qty_konversi').val(greatFormatRupiah(item.mutasi.qty_konversi));
+                        $('#unit_id_konversi').val(item.mutasi.unit_id_konversi).change();
+                        $('#qty_hasil_mutasi').val(greatFormatRupiah(item.mutasi.hasil_mutasi));
+                        $('#operasi_mutasi_detail').val(item.mutasi.operasi_mutasi_detail).change();
+                        $('#qty_asal').val(greatFormatRupiah(item.qty_diterima));
+
+                        // append select
+                        dropdownUnitMutasi(satuanmutasiArr);
+                        $('#unit_id_mutasi').val(item.mutasi.unit_id_konversi).change();
+
+                        $('#detailMutasiModal').modal('show');
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: response.message,
+                            confirmButtonColor: '#4e73df',
+                            cancelButtonColor: '#d33',
+                            reverseButtons: true,
+                            confirmButtonText: 'Oke',
+                        });
+                        return;
+                    }
+                },
+            });
         }
     }
 
-    // function getListDivisiTujuan() {
-    //     // GET LIST DIVISI TUJUAN
-    //     $.ajax({
-    //         url: `<?= base_url('mutasi/list-divisi-except'); ?>`,
-    //         method: "GET",
-    //         beforeSend: function() {
-    //             setLoading();
-    //         },
-    //         complete: function() {
-    //             stopLoading();
-    //         },
-    //         data: {
-    //             divisi_id: $(".divisi_asal_id option:selected").val(),
-    //         },
-    //         dataType: "json",
-    //         success: function(res) {
-    //             $(".divisi_tujuan_id").empty()
-    //             $(".divisi_tujuan_id").append(`<option value=""></option>`)
-    //             res.data.forEach(function(item) {
-    //                 $(".divisi_tujuan_id").append(`<option value="${item.id}">${item.divisi}</option>`)
-    //             })
-    //         }
-    //     });
-    // }
+    function resetFormDetail() {
+        $('#id_stock_detail').val(null);
+        $('#kode_barang').val(null);
+        $('#barang_name').val(null);
+        $('#spesifikasi').val(null);
+        $('#qty_mutasi').val(null);
+        $('#unit_id_mutasi').val(null).change();
+        $('#qty_konversi').val(null);
+        $('#unit_id_konversi').val(null).change();
+        $('#qty_hasil_mutasi').val(null);
+        $('#operasi_mutasi_detail').val(null).change();
+        $('#qty_asal').val(null);
+    }
+
+
+    function dropdownUnitMutasi(satuanArr) {
+        $("#unit_id_mutasi").empty()
+        $("#unit_id_mutasi").append(`<option value=""></option>`)
+        satuanArr.forEach(function(item) {
+            $("#unit_id_mutasi").append(`<option data-konversi_satuan="${item.konversi_satuan}" value="${item.id}">${item.kode_satuan}</option>`)
+        });
+    }
 
     function getListWarehouseAsal() {
         // GET LIST WAREHOUSE ASAL
         $.ajax({
             url: `<?= base_url('mutasi/warehouse'); ?>`,
             method: "GET",
-            beforeSend: function() {
-                setLoading();
-            },
-            complete: function() {
-                stopLoading();
-            },
             data: {
                 divisi_id: $(".divisi_asal_id option:selected").val(),
             },
@@ -856,12 +1252,6 @@
         $.ajax({
             url: `<?= base_url('mutasi/warehouse'); ?>`,
             method: "GET",
-            beforeSend: function() {
-                setLoading();
-            },
-            complete: function() {
-                stopLoading();
-            },
             data: {
                 divisi_id: $(".divisi_tujuan_id option:selected").val(),
                 warehouse_asal_id: $(".warehouse_asal_id option:selected").val(),
@@ -877,227 +1267,85 @@
         });
     }
 
-    function getListBarang() {
-        // GET LIST BARANG
-        $.ajax({
-            url: `<?= base_url('mutasi/list-barang-stock-init'); ?>`,
-            method: "GET",
-            beforeSend: function() {
-                setLoading();
-            },
-            complete: function() {
-                stopLoading();
-            },
-            data: {
-                type_barang: $(".type_barang option:selected").val(),
-                divisi_id: $(".divisi_asal_id option:selected").val(),
-                warehouse_id: $(".warehouse_asal_id option:selected").val()
-            },
-            dataType: "json",
-            success: function(res) {
-                $(".spesifikasi_id").empty()
-                $(".spesifikasi_id").append(`<option value=""></option>`)
-                res.data.forEach(function(item) {
-                    $(".spesifikasi_id").append(`<option data-stock_id="${item.stock_id}" data-kode_barang="${item.kode_barang}" data-barang="${item.barang}" data-kode_satuan="${item.kode_satuan}" value="${item.spesifikasi_id}">(${item.kode_barang}) ${item.barang}</option>`)
-                })
-                $(".spesifikasi_id").val();
-            }
-        });
-    }
-
-    function getListDokumenPabean() {
-        // GET LIST STOCK PER DOKUMEN PABEAN
-        $.ajax({
-            url: `<?= base_url('mutasi/list-stock-dokumen-bc'); ?>`,
-            method: "GET",
-            beforeSend: function() {
-                setLoading();
-            },
-            complete: function() {
-                stopLoading();
-            },
-            data: {
-                stock_id: $(".spesifikasi_id option:selected").data('stock_id'),
-            },
-            dataType: "json",
-            success: function(res) {
-                // LIST STOK PER BC
-                listStockAsal = [];
-                listStockAsal = res.data;
-                drawTableAsalBarang(res.data);
-            }
-        });
-    }
-
     function changeStatus() {
         let value = document.getElementById('auto_generate').checked ? true : false;
+        let tanggal = $('#tanggal').val();
         if (value) {
-            $(".no_mutasi").attr("readonly", true);
+            $("#no_mutasi").attr("readonly", true);
             $.ajax({
                 url: `<?= base_url("mutasi/get-mutasi-no"); ?>`,
-                method: "GET",
                 data: {
-                    divisi_id: $('#divisi_asal_id option:selected').val()
+                    tanggal: tanggal
                 },
+                method: "GET",
                 dataType: "json",
                 success: function(res) {
                     if (res.status) {
-                        $(".no_mutasi").val(res.data);
+                        $("#no_mutasi").val(res.data);
                     } else {
                         Swal.fire({
                             icon: 'error',
                             title: res.message,
                             confirmButtonColor: '#4e73df',
                         })
-                        $(".no_mutasi").attr("readonly", false);
+                        $("#no_mutasi").attr("readonly", false);
                         $("#auto_generate").prop("checked", false);
-                        $(".no_mutasi").val("");
+                        $("#no_mutasi").val("");
                     }
                 }
             })
         } else {
-            $(".no_mutasi").attr("readonly", false);
-            $(".no_mutasi").val("");
+            $("#no_mutasi").attr("readonly", false);
+            $("#no_mutasi").val("");
         }
-    }
-
-    function drawTableAsalBarang(data) {
-        if ($.fn.DataTable.isDataTable('#dataTable')) {
-            $('#dataTable').DataTable().clear().draw();
-            dataTable.destroy();
-        }
-        const table = $('#dataTable');
-        var typePengambilanStok = $('#type_pengambilan_stock option:selected').val();
-
-        $.each(data, function(i, v) {
-            var newRow = $('<tr style="color:whitesmoke;">');
-            if (typePengambilanStok == "FIFO" || parseFloat(v.stok_total) == 0) {
-                newRow.append($('<td style="text-align: center;">').html(
-                    `
-                `
-                ));
-            } else {
-                newRow.append($('<td style="text-align: center;">').html(
-                    `
-                    <div class="form-check">
-                        <input  data-id="${v.id}" data-stok_total="${v.stok_total}" autocomplete="one-time-code" class="form-check-input child" type="checkbox">
-                    </div>
-                `
-                ));
-            }
-
-            newRow.append($('<td style="text-align:center;">').text(v.sumber));
-            newRow.append($('<td style="text-align:center;">').text(v.stock_dokumen));
-            newRow.append($('<td style="text-align:center;">').text(v.supplier_name));
-            newRow.append($('<td style="text-align:center;">').text(v.bc_type));
-            newRow.append($('<td style="text-align:center;">').text(v.no_aju));
-            newRow.append($('<td style="text-align:center;">').text(v.stock_date));
-            newRow.append($('<td style="text-align:center;">').text(v.barang));
-            newRow.append($('<td style="text-align:center;">').text(v.satuan));
-            newRow.append($('<td style="text-align:center;">').text(v.stok_total));
-            table.find('tbody').append(newRow);
-        });
-
-        dataTable = $('#dataTable').DataTable({
-
-            processing: false,
-            serverSide: false,
-            ordering: true,
-            order: [],
-            fixedHeader: true,
-            "initComplete": function(settings, json) {
-                $('.dataTables_length').empty();
-                $('.dataTables_length').html("<div><label class='text-center ml-2 mt-2'>Show <b class='entries-label'>25</b> Entries</label></div>");
-                $('.dataTable').wrap("<div style='overflow:auto; width:100%;position:relative;'></div>");
-            },
-            lengthMenu: [
-                [100],
-                [100]
-            ],
-            display: "stripe",
-            searching: true,
-            language: {
-                emptyTable: "Tidak Ada Data",
-                lengthMenu: "Show _MENU_ entries",
-                paginate: {
-                    previous: '<i class="fa fa-angle-left"></i>',
-                    next: '<i class="fa fa-angle-right"></i>'
-                }
-            }
-        });
-
-        dataTable.draw();
     }
 
     function drawTableSelectedItem(data) {
-        if ($.fn.DataTable.isDataTable('#selectedItemTable')) {
-            $('#selectedItemTable').DataTable().clear().draw();
-            selectedItemTable.destroy();
-        }
         const table = $('#selectedItemTable');
-        var typePengambilanStok = $('#type_pengambilan_stock option:selected').val();
+        table.find('tbody').empty();
+        table.find('tfoot').empty();
         var no = 1;
-        $.each(data, function(i, v) {
+        if (data.length == 0) {
             var newRow = $('<tr>');
-            newRow.append($('<td style="text-align: center;">').html(
-                `
+            newRow.append($('<td  colspan="17" >').text("Tidak Ada Data"));
+            table.find('tfoot').append(newRow);
+        } else {
+            $.each(data, function(i, v) {
+                var newRow = $('<tr>');
+                newRow.append($('<td>').html(
+                    `
                    ${no++} 
                 `
-            ));
-            newRow.append($('<td style="text-align: center;">').text(v.type_barang_text));
-            newRow.append($('<td style="text-align: center;">').text(v.sumber));
-            newRow.append($('<td style="text-align: center;">').text(v.stock_dokumen));
-            newRow.append($('<td style="text-align: center;">').text(v.supplier_name));
-            newRow.append($('<td style="text-align: center;">').text(v.bc_type + " / " + v.no_aju));
-            newRow.append($('<td style="text-align: center;">').text(v.stock_date));
-            newRow.append($('<td style="text-align: center;">').text(v.barang));
-            newRow.append($('<td style="text-align: center;">').text(v.satuan));
-            newRow.append($('<td style="text-align: center;">').text(v.stok_total));
-
-            if (typePengambilanStok == "FIFO") {
-                newRow.append($('<td>').text(
-                    v.qty
                 ));
-            } else {
-                newRow.append($('<td style="text-align: center;">').html(
+                newRow.append($('<td>').text(v.reference_type));
+                newRow.append($('<td>').text(v.supplier_name));
+                newRow.append($('<td>').text(v.kode_barang));
+                newRow.append($('<td>').text(v.barang_name));
+                newRow.append($('<td>').text(v.spesifikasi));
+                newRow.append($('<td>').text(v.bc_detail));
+                newRow.append($('<td>').text(v.po_no));
+                newRow.append($('<td>').text(v.po_date));
+                newRow.append($('<td>').text(v.lpb_date));
+                newRow.append($('<td>').text(v.reference_no));
+                newRow.append($('<td>').text(greatFormatRupiah(v.qty_diterima)));
+                newRow.append($('<td>').text(greatFormatRupiah(v.mutasi.qty_mutasi)));
+                newRow.append($('<td>').text(v.mutasi.unit_name_mutasi));
+                newRow.append($('<td>').text(greatFormatRupiah(v.mutasi.qty_konversi)));
+                newRow.append($('<td>').text(v.mutasi.unit_name_konversi));
+                newRow.append($('<td >').html(
                     `
-                    <input <?= !empty($mutasi) ? (($mutasi['status_posting'] == "1") ? 'disabled' : '') : '' ?> class="form-control stok-mutasi" oninput="preventNegativeInput(this)" autocomplete="one-time-code" data-id="${v.id}" data-stok_total="${v.stok_total}" class="form-control" type="text" value="${v.qty}">
+                    <button type="button" class="btn btn-warning posting-spp mr-1" onclick="detail('${v.id}')">
+                        <i class="fa fa-pencil fa-sm" aria-hidden="true"></i>
+                    </button>
+                    <button type="button" class="btn btn-danger" onclick="remove('${v.id}')">
+                        <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
+                    </button>
                 `
                 ));
-            }
-            newRow.append($('<td style="text-align: center;">').html(
-                `
-                    <button <?= !empty($mutasi) ? (($mutasi['status_posting'] == "1") ? 'disabled' : '') : '' ?> type="button" class="btn btn-danger" onclick="deleteDetail(${v.id})" ><i class="fa fa-trash fa-sm" aria-hidden="true"></i></button>
-                `
-            ));
-            table.find('tbody').append(newRow);
-        });
+                table.find('tbody').append(newRow);
+            });
+        }
 
-        selectedItemTable = $('#selectedItemTable').DataTable({
-
-            processing: false,
-            serverSide: false,
-            ordering: true,
-            order: [],
-            fixedHeader: true,
-            "initComplete": function(settings, json) {
-                $('.dataTables_length').empty();
-                $('.dataTables_length').html("<div><label class='text-center ml-2 mt-2'>Show <b class='entries-label'>25</b> Entries</label></div>");
-                $('.dataTable').wrap("<div style='overflow:auto; width:100%;position:relative;'></div>");
-            },
-            display: "stripe",
-            searching: true,
-            language: {
-                emptyTable: "Tidak Ada Data",
-                lengthMenu: "Show _MENU_ entries",
-                paginate: {
-                    previous: '<i class="fa fa-angle-left"></i>',
-                    next: '<i class="fa fa-angle-right"></i>'
-                }
-            }
-        });
-
-        selectedItemTable.draw();
     }
 
     function getIDListDataSelected() {

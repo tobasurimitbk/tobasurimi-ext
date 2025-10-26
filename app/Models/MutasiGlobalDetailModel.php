@@ -17,7 +17,7 @@ class MutasiGlobalDetailModel extends Model
     protected $allowedFields    = [];
 
     // Dates
-    protected $useTimestamps = false;
+    protected $useTimestamps = true;
     protected $dateFormat    = 'datetime';
     protected $createdField  = 'createdAt';
     protected $updatedField  = 'updatedAt';
@@ -40,84 +40,60 @@ class MutasiGlobalDetailModel extends Model
     protected $beforeDelete   = [];
     protected $afterDelete    = [];
 
-    public function getMutasiDetail($mutasiID)
+    public function getDetail($id)
     {
-        $stockDetail2Model = new StockDetail2Model();
-        $stockModel = new StockModel();
-        $barangMasterModel = new BarangMasterModel();
-        $barangMasterSpesifikasiModel = new BarangMasterSpesifikasiModel();
-        $satuanModel = new SatuansModel();
-        $kemasanModel = new KemasanModel();
-        $metaDataModel = new MetadataModel();
-        $supplierModel = new SupplierModel();
-        $bc27Model = new BC27Model();
+        $stockRevampModel = new StockRevampModel();
+        $dataResult = array();
 
-        $result = array();
-        $bcMutasiId = $metaDataModel->getBCFirst('BC 2.7');
-        $mutasiDetail = $this->asArray()->where('mutasi_global_id', $mutasiID)->findAll();
-        $bc27 = $bc27Model->where('mutasi_global_id', $mutasiID)->first();
-        foreach ($mutasiDetail as $m) {
-            $stockList = $stockDetail2Model->getStockListDetail(
-                $m['stock_id'],
-                $m['bc_id'],
-                $m['no_aju'],
-                $m['stock_dokumen']
+        $mutasiDetail = $this->asArray()
+            ->select('mutasi_global_detail.*,satuans.kode_satuan AS kode_satuan_mutasi')
+            ->join('satuans', 'satuans.id = mutasi_global_detail.unit_id_mutasi', 'left')
+            ->where('mutasi_global_detail.mutasi_global_id', $id)
+            ->where('mutasi_global_detail.deletedAt', null)
+            ->findAll();
+
+        $no = 1;
+        foreach ($mutasiDetail as $a) {
+
+            $fromStock = $stockRevampModel->getStockListAll(
+                ["id" => $a['stock_detail_id']],
+                0,
+                "desc"
             );
-            $stock = $stockModel->find($m['stock_id']);
 
-
-            if ($stock['kemasan_id'] == 0) {
-                $barangMaster = $barangMasterModel->find($stock['barang1_id']);
-                $barangMasterSpesifikasi = $barangMasterSpesifikasiModel->find($stock['barang2_id']);
-                $satuan = $satuanModel->find($barangMasterSpesifikasi['satuan_1']);
-                $barangName = $barangMaster['barang_name'] . "-" . $barangMasterSpesifikasi['spesifikasi'];
-                $kodeBarang = $barangMaster['kode_barang'];
-            } else {
-                $kemasan = $kemasanModel->find($stock['kemasan_id']);
-                $satuan = $satuanModel->find($kemasan['satuan_id']);
-                $barangName = $kemasan['name'];
-                $kodeBarang = $kemasan['kode'];
+            foreach ($fromStock['data'] as $d) {
+                // Stock
+                array_push($dataResult, [
+                    'no' => $no++,
+                    'id' => $d['id'],
+                    'divisi' => $d['divisi'],
+                    'warehouse_name' => $d['warehouse_name'],
+                    'reference_type' => $d['reference_type'],
+                    'supplier_name' => $d['supplier_name'],
+                    'kode_barang' => $d['kode_barang'],
+                    'barang_name' => $d['barang_name'],
+                    'spesifikasi' => $d['spesifikasi'],
+                    'type_bc' => $d['type_bc'],
+                    'po_no' => $d['po_no'],
+                    'po_date' => !empty($d['po_date']) ? date('d/m/Y', strtotime($d['po_date'])) : "",
+                    'lpb_date' => !empty($d['lpb_date']) ? date('d/m/Y', strtotime($d['lpb_date'])) : "",
+                    'reference_no' => $d['reference_no'],
+                    'qty_diterima' => (float)$a['hasil_mutasi'] + $a['qty_mutasi'],
+                    'kode_satuan' => $d['kode_satuan'],
+                    "unit_id" => $d['unit_id'],
+                    "mutasi" => [
+                        "qty_mutasi" => $a['qty_mutasi'],
+                        'unit_id_mutasi' => $a['unit_id_mutasi'],
+                        'unit_name_mutasi' => $a['kode_satuan_mutasi'],
+                        'qty_konversi' => $a['qty_konversi'],
+                        'unit_id_konversi' => $a['unit_id_konversi'],
+                        'unit_name_konversi' => $d['kode_satuan'],
+                        'hasil_mutasi' => $a['hasil_mutasi']
+                    ]
+                ]);
             }
-
-            $supplier = $supplierModel->select('suppliers.*')
-                ->join('penerimaan_barang', 'penerimaan_barang.supplier_id = suppliers.id')
-                ->where('penerimaan_barang.no_penerimaan_barang', $stockList['no_dokumen_1'])
-                ->first();
-
-
-            $bcType = $metaDataModel->find($stockList['bc_id']);
-
-            $stockList['mutasi_global_id'] = $m['mutasi_global_id'];
-            $stockList['mutasi_global_detail_id'] = $m['id'];
-            $stockList['qty'] = $m['qty'];
-            $stockList['no_aju'] =  $stockList['no_aju'] == "-" ? "-" : $stockList['no_aju'];
-            $stockList['bc_type'] = $bcType == null ? "NON PABEAN" : $bcType['value'];
-            $stockList['stock_date'] = $stockList != null ? date('d/m/Y', strtotime($stockList['stock_date'])) : "-";
-            $stockList['satuan'] = $satuan['kode_satuan'];
-            $stockList['barang'] = strtoupper($barangName);
-            $stockList['stock_id'] = $stockList['stock_id'];
-            $stockList['type_barang'] = $stock['tipe_barang'];
-            $stockList['type_barang_text'] = strtoupper(str_replace('_', ' ', $stock['tipe_barang']));
-            $stockList['supplier_name'] = $supplier != null ? strtoupper($supplier['name']) : "-";
-            $stockList['stok_total'] = $stockList['stok_total'];
-            $stockList['kode_barang'] = $kodeBarang;
-            $stockList['satuan_id'] = $satuan['id'];
-            $stockList['satuan'] = $satuan['kode_satuan'];
-            $stockList['total_harga'] = $stockList['harga_umum'] + $stockList['harga_harian'] + $stockList['harga_bulanan'];
-            // ------------
-            $stockList['bc_mutasi_id'] = $bcMutasiId['id'];
-            $stockList['bc_mutasi_name'] = $bcMutasiId['value'];
-            $stockList['no_aju_mutasi'] = $bc27 == null ? "-" : $bc27['no_aju'];
-            $stockList['company_tujuan_id'] = $m['company_tujuan_id'];
-            $stockList['divisi_tujuan_id'] = $m['divisi_tujuan_id'];
-            $stockList['warehouse_tujuan_id'] = $m['warehouse_tujuan_id'];
-            $stockList['stock_mutasi_id'] = $m['stock_mutasi_id'];
-            $stockList['qty_diterima'] = $m['qty_diterima'];
-
-            array_push($result, $stockList);
         }
 
-
-        return $result;
+        return $dataResult;
     }
 }
