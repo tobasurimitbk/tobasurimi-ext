@@ -1411,6 +1411,8 @@ $routes->post('/mutasi/posting', 'Inventori\Mutasi::posting', ['filter' => 'Auth
 $routes->get('/mutasi/id/(:segment)', 'Inventori\Mutasi::detail/$1', ['filter' => 'Auth']);
 $routes->get('/mutasi/all', 'Inventori\Mutasi::all', ['filter' => 'Auth']);
 $routes->post('/mutasi/un-posting', 'Inventori\Mutasi::unPosting', ['filter' => 'Auth']);
+$routes->get('/mutasi/all-stock-list', 'Inventori\StokAdjusment::allStockList', ['filter' => 'Auth']);
+$routes->get('/mutasi/list-satuan-konversi', 'Inventori\StokAdjusment::getSatuanKonversi', ['filter' => 'Auth']);
 // PENERIMAAN MUTASI PPBKB
 $routes->get('/penerimaan-mutasi', 'Inventori\PenerimaanMutasi::index', ['filter' => 'Auth']);
 $routes->get('/penerimaan-mutasi/create', 'Inventori\PenerimaanMutasi::create', ['filter' => 'Auth']);

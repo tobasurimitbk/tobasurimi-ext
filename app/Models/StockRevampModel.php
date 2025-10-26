@@ -339,6 +339,7 @@ class StockRevampModel extends Model
                 'status'          => 'OUT',
                 'qty_diterima'    => $data['qty_digunakan'],
                 'qty_bersih'      => $data['qty_digunakan'],
+                'keterangan'     => $data['keterangan'] ?? null,
                 'createdAt'       => date('Y-m-d H:i:s'),
                 'updatedAt'       => date('Y-m-d H:i:s'),
             ]);
@@ -1011,7 +1012,9 @@ class StockRevampModel extends Model
                 divisis.divisi,
                 warehouses.warehouse_name,
                 stock_revamp.unit_id,
-                -- HELPER UNTUK STOK
+                bc_purchase_order.no_aju AS no_aju,
+                bc_purchase_order.no_daftar AS no_daftar,
+                -- HELPER UNTUK OUT DAN IN STOK GLOBAL
                 stock_revamp.barang_master_id,
                 stock_revamp.spesifikasi_id,
                 stock_revamp.divisi_id,
@@ -1031,6 +1034,8 @@ class StockRevampModel extends Model
             LEFT JOIN suppliers ON suppliers.id = rm_purchase_orders.supplier_id
             LEFT JOIN divisis ON divisis.id = stock_revamp.divisi_id
             LEFT JOIN warehouses ON warehouses.id = stock_revamp.warehouse_id
+            LEFT JOIN bc_purchase_order_lpb ON bc_purchase_order_lpb.penerimaan_barang_id = penerimaan_barang.id
+            LEFT JOIN bc_purchase_order ON bc_purchase_order.id = bc_purchase_order_lpb.bc_purchase_order_id
             WHERE stock_revamp_detail.deletedAt IS NULL
             AND stock_revamp_detail.reference_type='LPB'
             AND penerimaan_barang.tipe_bahan='BAKU'
@@ -1059,7 +1064,9 @@ class StockRevampModel extends Model
                 divisis.divisi,
                 warehouses.warehouse_name,
                 stock_revamp.unit_id,
-                -- HELPER UNTUK STOK
+                bc_purchase_order.no_aju AS no_aju,
+                bc_purchase_order.no_daftar AS no_daftar,
+                -- HELPER UNTUK OUT DAN IN STOK GLOBAL
                 stock_revamp.barang_master_id,
                 stock_revamp.spesifikasi_id,
                 stock_revamp.divisi_id,
@@ -1079,6 +1086,8 @@ class StockRevampModel extends Model
             LEFT JOIN suppliers ON suppliers.id = am_purchase_orders.supplier_id
             LEFT JOIN divisis ON divisis.id = stock_revamp.divisi_id
             LEFT JOIN warehouses ON warehouses.id = stock_revamp.warehouse_id
+            LEFT JOIN bc_purchase_order_lpb ON bc_purchase_order_lpb.penerimaan_barang_id = penerimaan_barang.id
+            LEFT JOIN bc_purchase_order ON bc_purchase_order.id = bc_purchase_order_lpb.bc_purchase_order_id
             WHERE stock_revamp_detail.deletedAt IS NULL
             AND stock_revamp_detail.reference_type='LPB'
             AND penerimaan_barang.tipe_bahan='PENOLONG'
@@ -1107,7 +1116,9 @@ class StockRevampModel extends Model
                 divisis.divisi,
                 warehouses.warehouse_name,
                 stock_revamp.unit_id,
-                -- HELPER UNTUK STOK
+                bc_purchase_order.no_aju AS no_aju,
+                bc_purchase_order.no_daftar AS no_daftar,
+                -- HELPER UNTUK OUT DAN IN STOK GLOBAL
                 stock_revamp.barang_master_id,
                 stock_revamp.spesifikasi_id,
                 stock_revamp.divisi_id,
@@ -1127,6 +1138,8 @@ class StockRevampModel extends Model
             LEFT JOIN suppliers ON suppliers.id = am_purchase_orders.supplier_id
             LEFT JOIN divisis ON divisis.id = stock_revamp.divisi_id
             LEFT JOIN warehouses ON warehouses.id = stock_revamp.warehouse_id
+            LEFT JOIN bc_purchase_order_lpb ON bc_purchase_order_lpb.penerimaan_barang_id = penerimaan_barang.id
+            LEFT JOIN bc_purchase_order ON bc_purchase_order.id = bc_purchase_order_lpb.bc_purchase_order_id
             WHERE stock_revamp_detail.deletedAt IS NULL
             AND stock_revamp_detail.reference_type='LPB'
             AND penerimaan_barang.tipe_bahan='PENOLONG'
@@ -1155,7 +1168,9 @@ class StockRevampModel extends Model
                 divisis.divisi,
                 warehouses.warehouse_name,
                 stock_revamp.unit_id,
-                -- HELPER UNTUK STOK
+                bc_purchase_order.no_aju AS no_aju,
+                bc_purchase_order.no_daftar AS no_daftar,
+                -- HELPER UNTUK OUT DAN IN STOK GLOBAL
                 stock_revamp.barang_master_id,
                 stock_revamp.spesifikasi_id,
                 stock_revamp.divisi_id,
@@ -1175,6 +1190,8 @@ class StockRevampModel extends Model
             LEFT JOIN suppliers ON suppliers.id = rm_import_pos.supplier_id
             LEFT JOIN divisis ON divisis.id = stock_revamp.divisi_id
             LEFT JOIN warehouses ON warehouses.id = stock_revamp.warehouse_id
+            LEFT JOIN bc_purchase_order_lpb ON bc_purchase_order_lpb.penerimaan_barang_id = penerimaan_barang.id
+            LEFT JOIN bc_purchase_order ON bc_purchase_order.id = bc_purchase_order_lpb.bc_purchase_order_id
             WHERE stock_revamp_detail.deletedAt IS NULL
             AND stock_revamp_detail.reference_type='LPB'
             AND penerimaan_barang.tipe_bahan='BAKU'
@@ -1203,7 +1220,9 @@ class StockRevampModel extends Model
                 divisis.divisi,
                 warehouses.warehouse_name,
                 stock_revamp.unit_id,
-                -- HELPER UNTUK STOK
+                '' AS no_aju,
+                '' AS no_daftar,
+                -- HELPER UNTUK OUT DAN IN STOK GLOBAL
                 stock_revamp.barang_master_id,
                 stock_revamp.spesifikasi_id,
                 stock_revamp.divisi_id,
@@ -1249,6 +1268,8 @@ class StockRevampModel extends Model
                 divisis.divisi,
                 warehouses.warehouse_name,
                 stock_revamp.unit_id,
+                '' AS no_aju,
+                '' AS no_daftar,
                 -- HELPER UNTUK STOK
                 stock_revamp.barang_master_id,
                 stock_revamp.spesifikasi_id,
@@ -1293,6 +1314,8 @@ class StockRevampModel extends Model
                 divisis.divisi,
                 warehouses.warehouse_name,
                 stock_revamp.unit_id,
+                '' AS no_aju,
+                '' AS no_daftar,
                 -- HELPER UNTUK STOK
                 stock_revamp.barang_master_id,
                 stock_revamp.spesifikasi_id,
@@ -1337,6 +1360,8 @@ class StockRevampModel extends Model
                 divisis.divisi,
                 warehouses.warehouse_name,
                 stock_revamp.unit_id,
+                '' AS no_aju,
+                '' AS no_daftar,
                 -- HELPER UNTUK STOK
                 stock_revamp.barang_master_id,
                 stock_revamp.spesifikasi_id,
@@ -1381,6 +1406,8 @@ class StockRevampModel extends Model
                 divisis.divisi,
                 warehouses.warehouse_name,
                 stock_revamp.unit_id,
+                '' AS no_aju,
+                '' AS no_daftar,
                 -- HELPER UNTUK STOK
                 stock_revamp.barang_master_id,
                 stock_revamp.spesifikasi_id,
@@ -1425,6 +1452,8 @@ class StockRevampModel extends Model
                 divisis.divisi,
                 warehouses.warehouse_name,
                 stock_revamp.unit_id,
+                '' AS no_aju,
+                '' AS no_daftar,
                 -- HELPER UNTUK STOK
                 stock_revamp.barang_master_id,
                 stock_revamp.spesifikasi_id,

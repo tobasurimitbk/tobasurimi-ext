@@ -17,7 +17,7 @@ class MutasiModel extends Model
     protected $allowedFields    = [];
 
     // Dates
-    protected $useTimestamps = false;
+    protected $useTimestamps = true;
     protected $dateFormat    = 'datetime';
     protected $createdField  = 'createdAt';
     protected $updatedField  = 'updatedAt';
@@ -40,56 +40,65 @@ class MutasiModel extends Model
     protected $beforeDelete   = [];
     protected $afterDelete    = [];
 
-    public function getList($condition, $conditionArr, $addCondition, $limit = 10, $offset = 0)
+    public function getList($condition, $addCondition, $limit = 10, $offset = 0)
     {
         $availableSort = [
-            'no_mutasi'                           => 'no_mutasi',
-            'tanggal'                             => 'tanggal',
-            'warehouse_asal_id'                   => 'warehouse_asal_id',
-            'warehouse_tujuan_id'                 => 'warehouse_tujuan_id',
+            'tanggal'                             => 'mutasi.tanggal',
+            'no_mutasi'                           => 'mutasi.no_mutasi',
+            'divisi_asal_id'                      => 'mutasi.divisi_asal_id',
+            'divisi_tujuan_id'                    => 'mutasi.divisi_tujuan_id',
+            'warehouse_asal_id'                   => 'mutasi.warehouse_asal_id',
+            'warehouse_tujuan_id'                 => 'mutasi.warehouse_tujuan_id',
+            'ppbkb.no_ppbkb'                      => 'ppbkb.no_ppbkb',
+            'status_posting'                      => 'mutasi.status_posting',
         ];
         $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
 
-        $sort = $availableSort[$addCondition['sort'] ?? 'updatedAt'] ?? 'createdAt';
+        $sort = $availableSort[$addCondition['sort'] ?? 'no_mutasi'] ?? 'no_mutasi';
         $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'DESC';
 
-        $selectQry = "mutasi.*,
-        divisis.divisi
+        $selectQry = "
+            mutasi.*,
+            tb_divisi_asal.divisi AS divisi_asal,
+            tb_warehouse_asal.warehouse_name AS warehouse_name_asal,
+            tb_divisi_tujuan.divisi AS divisi_tujuan,
+            tb_warehouse_tujuan.warehouse_name AS warehouse_name_tujuan,
+            ppbkb.no_ppbkb
         ";
 
-        $dataQry = $this->asObject()
+        $dataQry = $this->asArray()
             ->select($selectQry)
-            ->join('divisis', 'divisis.id = mutasi.divisi_asal_id', 'left')
+            ->join('divisis AS tb_divisi_asal', 'tb_divisi_asal.id = mutasi.divisi_asal_id', 'left')
+            ->join('divisis AS tb_divisi_tujuan', 'tb_divisi_tujuan.id = mutasi.divisi_tujuan_id', 'left')
+            ->join('warehouses AS tb_warehouse_asal', 'tb_warehouse_asal.id = mutasi.warehouse_asal_id', 'left')
+            ->join('warehouses AS tb_warehouse_tujuan', 'tb_warehouse_tujuan.id = mutasi.warehouse_tujuan_id', 'left')
+            ->join('ppbkb', 'ppbkb.mutasi_id = mutasi.id', 'left')
             ->where($condition)
-            ->whereIn('divisi_asal_id', $conditionArr)
             ->orderBy($sort, $sortType);
 
         $totalData = $dataQry->countAllResults(false);
 
-        if ($addCondition['divisi_id'] || $addCondition['status'] || $addCondition['no_mutasi'] || $addCondition['dateStart'] || $addCondition['dateEnd']) {
+        if ($addCondition['search'] || $addCondition['dateStart'] || $addCondition['dateEnd']) {
             $dataQry->groupStart();
         }
 
-        if ($addCondition['divisi_id']) {
-            $dataQry->where('divisi_asal_id', $addCondition['divisi_id']);
-        }
-
         if ($addCondition['dateStart']) {
-            $dataQry->where('tanggal >=',  $addCondition['dateStart']);
+            $dataQry->where('mutasi.tanggal >=',  $addCondition['dateStart']);
         }
         if ($addCondition['dateEnd']) {
-            $dataQry->where('tanggal <=', $addCondition['dateEnd']);
+            $dataQry->where('mutasi.tanggal <=', $addCondition['dateEnd']);
         }
 
-        if ($addCondition['status'] || $addCondition['status'] == '0') {
-            $dataQry->where('status_posting', $addCondition['status']);
+        if ($addCondition['search']) {
+            $dataQry->like('mutasi.no_mutasi', $addCondition['search'])
+                ->orLike('tb_divisi_asal.divisi', $addCondition['search'])
+                ->orLike('tb_divisi_tujuan.divisi', $addCondition['search'])
+                ->orLike('tb_warehouse_asal.warehouse_name', $addCondition['search'])
+                ->orLike('tb_warehouse_tujuan.warehouse_name', $addCondition['search'])
+                ->orLike('ppbkb.no_ppbkb', $addCondition['search']);
         }
 
-        if ($addCondition['no_mutasi']) {
-            $dataQry->like('no_mutasi', $addCondition['no_mutasi']);
-        }
-
-        if ($addCondition['divisi_id'] || $addCondition['status'] || $addCondition['no_mutasi'] || $addCondition['dateStart'] || $addCondition['dateEnd']) {
+        if ($addCondition['search'] || $addCondition['dateStart'] || $addCondition['dateEnd']) {
             $dataQry->groupEnd();
         }
 
@@ -133,38 +142,49 @@ class MutasiModel extends Model
 
 
 
-    public function get_no($bln, $thn, $last_day, $divisiName, $divisi_id)
-    {
-        $lastStr =  convertBulanToAngkaRomawi($bln) . '/' . $thn;
-
-        $builder = $this->db->table('mutasi');
-        $builder->select('no_mutasi');
-        $builder->orderBy('no_mutasi', 'desc');
-        $builder->where('mutasi.divisi_asal_id', $divisi_id);
-        $builder->where('createdAt >=', $thn . "-" . $bln . "-01" . " 00:00:00")
-            ->where('createdAt <=', $last_day . " 23:59:59");
-        $builder->like('no_mutasi', $lastStr);
-        $query = $builder->get();
-
-        $kode = 'PPBKB/' . $divisiName;
-
-        $lastPenerimaan = '1';
-
-        if (!empty($query->getResultArray())) {
-            foreach ($query->getResultArray() as $string) {
-                $explode = explode('/', $string['no_mutasi']);
-                $number = intval($explode[2]);
-
-                if ($number > $lastPenerimaan) {
-                    $lastPenerimaan = $number;
-                }
-            }
-            $lastPenerimaan++;
+    public function get_no(
+        $month,
+        $year,
+        $companyId
+    ) {
+        $romanMonth = romanMonthNumber((int)$month);
+        // Tentukan template berdasarkan company
+        switch ($companyId) {
+            case 1: // KIM 1 (FRZ)
+                $numberTemplate = "/F/PPBKB/$romanMonth/" . substr($year, -2);
+                break;
+            case 2: // KIM 2
+                $numberTemplate = "/PPBKB/$romanMonth/" . substr($year, -2);
+                break;
+            case 15: // GLOBAL
+                $numberTemplate = "/G/PPBKB/$romanMonth/" . substr($year, -2);
+                break;
+            default: // OCS atau lainnya
+                $numberTemplate = "/PPBKB/$romanMonth/" . substr($year, -2);
+                break;
         }
 
-        $formattedLastPenerimaan = sprintf("%02d", $lastPenerimaan);
-        $generatedNo = $kode . '/' . $formattedLastPenerimaan . '/' . $lastStr;
+        // Cari nomor terakhir berdasarkan template
+        $lastData = $this->asArray()
+            ->select('no_mutasi')
+            ->where('company_id', $companyId)
+            ->like('no_mutasi', $numberTemplate, 'before')
+            ->where('deletedAt', null)
+            ->orderBy('no_mutasi', 'DESC')
+            ->first();
 
-        return $generatedNo;
+        // Nomor awal default
+        $invNumber = '001' . $numberTemplate;
+
+        if ($lastData && !empty($lastData['no_mutasi'])) {
+            // Ambil angka urutan terakhir
+            $parts = explode('/', $lastData['no_mutasi']);
+            $lastIncrement = isset($parts[0]) ? (int)$parts[0] : 0;
+            $newIncrement = $lastIncrement + 1;
+            $paddedNumber = str_pad($newIncrement, 3, '0', STR_PAD_LEFT);
+
+            $invNumber = $paddedNumber . $numberTemplate;
+        }
+        return $invNumber;
     }
 }
