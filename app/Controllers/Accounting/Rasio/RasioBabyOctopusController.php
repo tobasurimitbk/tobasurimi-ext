@@ -180,7 +180,7 @@ class RasioBabyOctopusController extends BaseController
             'dataDivisi' => $this->divisisModel->getDivisiAccess(),
             "subAkuns" => $subAkunsModel
         ];
-        return view('Accounting/rasio/RatioGurita/index', $data);
+        return view('Accounting/rasio/RatioBabyOctopus/index', $data);
     }
 
     public function createRasio()
@@ -197,7 +197,7 @@ class RasioBabyOctopusController extends BaseController
             "subAkuns" => $subAkunsModel,
             "dataMetadata" => $dataMetadata,
         ];
-        return view('Accounting/rasio/RatioGurita/form', $data);
+        return view('Accounting/rasio/RatioBabyOctopus/form', $data);
     }
 
     public function saveRasio()
@@ -609,7 +609,7 @@ class RasioBabyOctopusController extends BaseController
             // "rasioBarangPenolong" => $rasioBarangPenolongModel,
             // "rasioCost" => $rasioCostModel,
         ];
-        return view('Accounting/rasio/RatioGurita/form', $data);
+        return view('Accounting/rasio/RatioBabyOctopus/form', $data);
     }
 
     public function allRasio()
@@ -2290,7 +2290,7 @@ class RasioBabyOctopusController extends BaseController
         ];
 
         if (in_array($page, $validPages)) {
-            return view('Accounting/rasio/RatioGurita/' . $page, $data);
+            return view('Accounting/rasio/RatioBabyOctopus/' . $page, $data);
         } else {
             return view('default_view', $data);
         }
