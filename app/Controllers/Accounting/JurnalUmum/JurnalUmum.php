@@ -2591,75 +2591,85 @@ class JurnalUmum extends BaseController
     public function unpostDataPembayaran($payID, $module, $divisi)
     {
         try {
-            // Cari transaksi berdasarkan module dan payID
-            $transaction = null;
-            $paymentNo = '';
+            // Mapping antara module dan model + field nomor pembayaran
+            $moduleMap = [
+                'LOKAL BB' => [
+                    'model' => $this->localPOPaymentModel,
+                    'field' => 'payment_no',
+                ],
+                'LOKAL BP' => [
+                    'model' => $this->localPoPaymentBpModel,
+                    'field' => 'payment_no',
+                ],
+                'IMPORT' => [
+                    'model' => $this->importPOPaymentModel,
+                    'field' => 'payment_no',
+                ],
+                'LAIN-LAIN' => [
+                    'model' => $this->otherPaymentModel,
+                    'field' => 'no_pembayaran',
+                ],
+            ];
 
-            switch ($module) {
-                case "LOKAL BB":
-                    $payment = $this->localPOPaymentModel->asObject()->find($payID);
-                    if ($payment) {
-                        $paymentNo = $payment->payment_no;
-                    }
-                    break;
-
-                case "LOKAL BP":
-                    $payment = $this->localPoPaymentBpModel->where('id', $payID)->first();
-                    if ($payment) {
-                        $paymentNo = $payment['payment_no'];
-                    }
-                    break;
-
-                case "IMPORT":
-                    $payment = $this->importPOPaymentModel->asObject()->where('deletedAt', null)->where('id', $payID)->first();
-                    if ($payment) {
-                        $paymentNo = $payment->payment_no;
-                    }
-                    break;
-
-                case "LAIN-LAIN":
-                    $payment = $this->otherPaymentModel->asObject()->where('deletedAt', null)->where('id', $payID)->first();
-                    if ($payment) {
-                        $paymentNo = $payment->no_pembayaran;
-                    }
-                    break;
+            // Validasi module
+            if (!isset($moduleMap[$module])) {
+                throw new Exception("Module tidak dikenal: {$module}");
             }
 
-            if (empty($paymentNo)) {
+            $map = $moduleMap[$module];
+            $model = $map['model'];
+
+            // Ambil semua data pembayaran berdasarkan ID
+            $payments = $model
+                ->asArray()
+                ->where('id', $payID)
+                ->where('deletedAt', null)
+                ->findAll();
+
+            if (empty($payments)) {
                 throw new Exception("Data pembayaran tidak ditemukan");
             }
 
-            // 1. Cari transaksi jurnal berdasarkan no_transaksi
-            $transaksiJurnal = $this->transaksiJurnalModel
-                ->where('no_transaksi', $paymentNo)
-                ->where('deleted_at', null)
-                ->first();
+            foreach ($payments as $payment) {
+                $paymentNo = $payment[$map['field']];
 
-            if (!$transaksiJurnal) {
-                throw new Exception("Transaksi jurnal tidak ditemukan");
+                // Ambil semua transaksi jurnal berdasarkan no_transaksi
+                $transaksiJurnals = $this->transaksiJurnalModel
+                    ->where('no_transaksi', $paymentNo)
+                    ->where('deleted_at', null)
+                    ->findAll();
+
+                if (empty($transaksiJurnals)) {
+                    continue; // lewatin kalau gak ada jurnalnya
+                }
+
+                foreach ($transaksiJurnals as $transaksi) {
+                    $transaksiId = $transaksi['id'];
+
+                    // Hapus jurnal umum
+                    $this->jurnalUmumModel
+                        ->where('id_transaksi', $transaksiId)
+                        ->delete();
+
+                    // Hapus transaksi jurnal
+                    $this->transaksiJurnalModel
+                        ->where('id', $transaksiId)
+                        ->delete();
+                }
             }
-
-            // 2. Hapus jurnal umum terkait
-            $this->jurnalUmumModel
-                ->where('id_transaksi', $transaksiJurnal['id'])
-                ->delete();
-
-            // 3. Hapus transaksi jurnal
-            $this->transaksiJurnalModel
-                ->where('id', $transaksiJurnal['id'])
-                ->delete();
 
             return [
                 'status' => true,
-                'message' => 'Data jurnal berhasil diunpost'
+                'message' => 'Data jurnal berhasil diunpost',
             ];
         } catch (Exception $e) {
             return [
                 'status' => false,
-                'message' => $e->getMessage()
+                'message' => $e->getMessage(),
             ];
         }
     }
+
 
 
     public function insertDataPanjarPinjamanTransaction($payID)
