@@ -544,8 +544,24 @@
             const csrfToken = '<?= csrf_token() ?>';
             const csrf = $(`[name="${csrfToken}"]`);
 
+            // Fungsi bantu buat konversi string ke angka
+            const parseNominal = (val) => {
+                const n = destroyFormatRupiah(val);
+                return isNaN(n) ? 0 : Number(n);
+            };
+
+            // fungsi bantu biar listPembayaran selalu punya nominal_pembayaran
+            const ensureNominalPembayaran = () => {
+                listPembayaran = listPembayaran.map(item => ({
+                    ...item,
+                    nominal_pembayaran: Number(item.nominal_pembayaran ?? item.sisa_bayar ?? 0)
+                }));
+            };
+
+            ensureNominalPembayaran();
+
             if (id) {
-                // UPDATE
+                // UPDATE MODE
                 if ($(".create-form").valid()) {
                     Swal.fire({
                         icon: 'question',
@@ -559,42 +575,37 @@
                     }).then((result) => {
                         if (result.isConfirmed) {
                             let formData = new FormData(document.querySelector(".create-form"));
-
-                            // ambil semua nominal dari tabel langsung
                             let totalPembayaran = 0;
 
-                            $('.nominal_pembayaran').each(function () {
+                            $('.nominal_pembayaran').each(function() {
                                 const id = $(this).data('id');
-                                const nominalFormatted = $(this).val();
-                                const nominal = destroyFormatRupiah(nominalFormatted) || 0;
-
-                                // cari item yang id-nya sama
+                                const nominal = parseNominal($(this).val());
                                 const item = listPembayaran.find(i => i.id == id);
                                 if (item) {
-                                    item.nominal_pembayaran = nominal;
+                                    // kalau user ubah nominal → simpan baru
+                                    // kalau item lunas & input 0 → keep nilai lama
+                                    if (nominal > 0) {
+                                        item.nominal_pembayaran = nominal;
+                                    } else if (!item.nominal_pembayaran) {
+                                        item.nominal_pembayaran = 0;
+                                    }
+                                    totalPembayaran += Number(item.nominal_pembayaran) + Number(item.nominal_faktur)
                                 }
-
-                                totalPembayaran += item.nominal_pembayaran;
                             });
 
-                            // masukin total ke input form (kalau punya)
                             $('#total_pembayaran').val(greatFormatRupiah(totalPembayaran));
 
-                            // tambahkan ke FormData
                             formData.append("pembayaranList", JSON.stringify(listPembayaran));
                             formData.append("total_pembayaran", totalPembayaran);
-                            
-                            $.ajax({
 
+                            $.ajax({
                                 url: "<?= base_url("/pembayaran-po-lokal-bp/update"); ?>",
                                 data: formData,
                                 beforeSend: function(xhr) {
                                     setLoading();
                                     xhr.setRequestHeader('X-CSRF-Token', csrf.val());
                                 },
-                                complete: function() {
-                                    stopLoading();
-                                },
+                                complete: stopLoading,
                                 method: "POST",
                                 dataType: "json",
                                 processData: false,
@@ -603,13 +614,12 @@
                                     csrf.val(response.token);
                                     if (response.status) {
                                         Swal.fire({
-                                                icon: 'success',
-                                                title: response.message,
-                                                confirmButtonColor: '#4e73df',
-                                            })
-                                            .then(() => {
-                                                window.location.href = `<?= base_url("pembayaran-po-lokal-bp"); ?>`;
-                                            })
+                                            icon: 'success',
+                                            title: response.message,
+                                            confirmButtonColor: '#4e73df',
+                                        }).then(() => {
+                                            window.location.href = `<?= base_url("pembayaran-po-lokal-bp"); ?>`;
+                                        });
                                     } else {
                                         Swal.fire({
                                             icon: 'error',
@@ -618,22 +628,19 @@
                                         });
                                     }
                                 },
-                                onError: function(response) {
-                                    csrf.val(response.token);
+                                error: function() {
                                     Swal.fire({
                                         icon: 'error',
                                         title: 'Data Gagal Disimpan, coba Lagi',
                                         confirmButtonColor: '#4e73df',
-                                    })
+                                    });
                                 }
                             });
                         }
-
-                    })
+                    });
                 }
-
             } else {
-                // CREATE
+                // CREATE MODE
                 if ($(".create-form").valid()) {
                     Swal.fire({
                         icon: 'question',
@@ -647,30 +654,24 @@
                     }).then((result) => {
                         if (result.isConfirmed) {
                             let formData = new FormData(document.querySelector(".create-form"));
-
-                            // ambil semua nominal dari tabel langsung
                             let totalPembayaran = 0;
 
-                            $('.nominal_pembayaran').each(function () {
+                            $('.nominal_pembayaran').each(function() {
                                 const id = $(this).data('id');
-                                const nominalFormatted = $(this).val();
-                                const nominal = destroyFormatRupiah(nominalFormatted) || 0;
-
-                                // cari item yang id-nya sama
+                                const nominal = parseNominal($(this).val());
                                 const item = listPembayaran.find(i => i.id == id);
+
                                 if (item) {
                                     item.nominal_pembayaran = nominal;
+                                    totalPembayaran += nominal;
                                 }
-
-                                totalPembayaran += item.nominal_pembayaran;
                             });
 
-                            // masukin total ke input form (kalau punya)
                             $('#total_pembayaran').val(greatFormatRupiah(totalPembayaran));
 
-                            // tambahkan ke FormData
                             formData.append("pembayaranList", JSON.stringify(listPembayaran));
                             formData.append("total_pembayaran", totalPembayaran);
+
                             $.ajax({
                                 url: "<?= base_url("pembayaran-po-lokal-bp/create"); ?>",
                                 data: formData,
@@ -678,9 +679,7 @@
                                     setLoading();
                                     xhr.setRequestHeader('X-CSRF-Token', csrf.val());
                                 },
-                                complete: function() {
-                                    stopLoading();
-                                },
+                                complete: stopLoading,
                                 method: "POST",
                                 dataType: "json",
                                 processData: false,
@@ -689,35 +688,34 @@
                                     csrf.val(response.token);
                                     if (response.status) {
                                         Swal.fire({
-                                                icon: 'success',
-                                                title: response.message,
-                                                confirmButtonColor: '#4e73df',
-                                            })
-                                            .then(() => {
-                                                window.location.href = `<?= base_url("pembayaran-po-lokal-bp/id/"); ?>` + response.id;
-                                            })
+                                            icon: 'success',
+                                            title: response.message,
+                                            confirmButtonColor: '#4e73df',
+                                        }).then(() => {
+                                            window.location.href = `<?= base_url("pembayaran-po-lokal-bp/id/"); ?>` + response.id;
+                                        });
                                     } else {
                                         Swal.fire({
                                             icon: 'error',
                                             title: response.message,
                                             confirmButtonColor: '#4e73df',
-                                        })
+                                        });
                                     }
                                 },
-                                onError: function(response) {
-                                    csrf.val(response.token);
+                                error: function() {
                                     Swal.fire({
                                         icon: 'error',
                                         title: 'Data Gagal Disimpan, coba Lagi',
                                         confirmButtonColor: '#4e73df',
-                                    })
+                                    });
                                 }
                             });
                         }
-                    })
+                    });
                 }
             }
-        })
+        });
+
     })
 
     function listBarangDetail() {
@@ -733,7 +731,12 @@
             complete: stopLoading,
             dataType: "json",
             success: function (res) {
-                listPembayaran = res.data;
+                listPembayaran = res.data.map(item => {
+                    return {
+                        ...item,
+                        nominal_pembayaran: Number(item.nominal_pembayaran ?? item.sisa_bayar ?? 0)
+                    };
+                });
                 const table = $('#dataTable');
                 const tbody = table.find('tbody');
                 tbody.empty();

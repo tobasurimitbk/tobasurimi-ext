@@ -136,15 +136,16 @@ class PembayaranPOLokal extends BaseController
             $pembayaranList = json_decode($this->request->getVar('pembayaranList'));
 
             // CHECK
-            $check = $localPOPaymentBPModel->where('company_id', $this->this_company_id)->where('deletedAt', null)->where('payment_no',  $this->request->getVar('no_bukti_pembayaran'))->first();
+            // $check = $localPOPaymentBPModel->where('company_id', $this->this_company_id)->where('deletedAt', null)->where('payment_no',  $this->request->getVar('no_bukti_pembayaran'))->first();
 
-            if ($check != null) {
-                return response()->setJSON([
-                    'token' => csrf_hash(),
-                    'message' => "No pembayaran sudah digunakan",
-                    'status' => false
-                ]);
-            }
+            // if ($check != null) {
+            //     return response()->setJSON([
+            //         'token' => csrf_hash(),
+            //         'message' => "No pembayaran sudah digunakan",
+            //         'status' => false
+            //     ]);
+            // }
+
             $id = $localPOPaymentBPModel->insert([
                 'company_id' => $this->this_company_id,
                 'divisi_id' => $this->request->getVar('divisi_id'),
@@ -222,21 +223,8 @@ class PembayaranPOLokal extends BaseController
                 throw new \Exception("Format data pembayaran tidak valid");
             }
 
-            // CHECK
-            $check = $localPOPaymentBPModel
-                ->where('company_id', $this->this_company_id)
-                ->where('payment_no',  $this->request->getVar('no_bukti_pembayaran'))
-                ->where('deletedAt', null)
-                ->where('id !=', $id)
-                ->first();
-
-            if ($check != null) {
-                return response()->setJSON([
-                    'token' => csrf_hash(),
-                    'message' => "No pembayaran sudah digunakan",
-                    'status' => false
-                ]);
-            }
+            // var_dump($this->request->getVar());
+            // die;
 
             // Mulai transaction
             $db = \Config\Database::connect();
