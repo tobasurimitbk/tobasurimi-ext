@@ -3,9 +3,9 @@
 
 <section class="section">
     <div class="section-header">
-        <h1><?= empty($mutasi) ? "Tambah Mutasi PPBKB" : "Update Mutasi PPBKB" ?></h1>
+        <h1><?= empty($mutasi) ? "Tambah Mutasi Lokal" : "Update Mutasi Lokal" ?></h1>
         <div class="col-button-tambah-spp">
-            <a class="btn btn-hide-form btn-discard float-right" href="<?= base_url("mutasi"); ?>">
+            <a class="btn btn-hide-form btn-discard float-right" href="<?= base_url("mutasi/lokal"); ?>">
                 Kembali
             </a>
             <?php if (!empty($mutasi)) : ?>
@@ -37,11 +37,12 @@
         <div class="card-body">
 
             <ul class="nav nav-tabs">
+
                 <li class="nav-item">
-                    <a class="nav-link" href="<?= base_url('mutasi/create-lokal') ?>">Mutasi Lokal</a>
+                    <a class="nav-link active" href="#">Mutasi Lokal</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link active" href="#">Mutasi PPBKB</a>
+                    <a class="nav-link" href="<?= base_url('mutasi/create') ?>">Mutasi PPBKB</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="<?= base_url('mutasi/create-global') ?>">Mutasi BC 2.7</a>
@@ -1045,7 +1046,7 @@
                         let data = new FormData(document.querySelector(".create-form"));
                         let url = id == '' ? '<?= base_url("mutasi/save"); ?>' : '<?= base_url("mutasi/update"); ?>';
                         data.append('listMutasi', JSON.stringify(listStockSelected));
-                        data.append("tipe_mutasi", "PPBKB");
+                        data.append("tipe_mutasi", "LOKAL");
                         $.ajax({
                             url: url,
                             data: data,
@@ -1068,7 +1069,7 @@
                                     confirmButtonText: 'Ok'
                                 }).then((result) => {
                                     if (result.isConfirmed) {
-                                        window.location.href = "<?= base_url("mutasi"); ?>";
+                                        window.location.href = "<?= base_url("mutasi/lokal"); ?>";
                                     }
                                 });
                             },
@@ -1280,7 +1281,7 @@
                 url: `<?= base_url("mutasi/get-mutasi-no"); ?>`,
                 data: {
                     tanggal: tanggal,
-                    tipe_mutasi: "PPBKB"
+                    tipe_mutasi: "LOKAL"
                 },
                 method: "GET",
                 dataType: "json",

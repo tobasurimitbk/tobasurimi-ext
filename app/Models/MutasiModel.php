@@ -145,24 +145,45 @@ class MutasiModel extends Model
     public function get_no(
         $month,
         $year,
-        $companyId
+        $companyId,
+        $tipe_mutasi
     ) {
         $romanMonth = romanMonthNumber((int)$month);
         // Tentukan template berdasarkan company
-        switch ($companyId) {
-            case 1: // KIM 1 (FRZ)
-                $numberTemplate = "/F/PPBKB/$romanMonth/" . substr($year, -2);
-                break;
-            case 2: // KIM 2
-                $numberTemplate = "/PPBKB/$romanMonth/" . substr($year, -2);
-                break;
-            case 15: // GLOBAL
-                $numberTemplate = "/G/PPBKB/$romanMonth/" . substr($year, -2);
-                break;
-            default: // OCS atau lainnya
-                $numberTemplate = "/PPBKB/$romanMonth/" . substr($year, -2);
-                break;
+        if ($tipe_mutasi == "PPBKB") {
+            // MUTASI PPBKB
+            switch ($companyId) {
+                case 1: // KIM 1 (FRZ)
+                    $numberTemplate = "/F/PPBKB/$romanMonth/" . substr($year, -2);
+                    break;
+                case 2: // KIM 2
+                    $numberTemplate = "/PPBKB/$romanMonth/" . substr($year, -2);
+                    break;
+                case 15: // GLOBAL
+                    $numberTemplate = "/G/PPBKB/$romanMonth/" . substr($year, -2);
+                    break;
+                default: // OCS atau lainnya
+                    $numberTemplate = "/PPBKB/$romanMonth/" . substr($year, -2);
+                    break;
+            }
+        } else {
+            // MUTASI LOKAL
+            switch ($companyId) {
+                case 1: // KIM 1 (FRZ)
+                    $numberTemplate = "/F/MUT/$romanMonth/" . substr($year, -2);
+                    break;
+                case 2: // KIM 2
+                    $numberTemplate = "/MUT/$romanMonth/" . substr($year, -2);
+                    break;
+                case 15: // GLOBAL
+                    $numberTemplate = "/G/MUT/$romanMonth/" . substr($year, -2);
+                    break;
+                default: // OCS atau lainnya
+                    $numberTemplate = "/MUT/$romanMonth/" . substr($year, -2);
+                    break;
+            }
         }
+
 
         // Cari nomor terakhir berdasarkan template
         $lastData = $this->asArray()
@@ -170,6 +191,7 @@ class MutasiModel extends Model
             ->where('company_id', $companyId)
             ->like('no_mutasi', $numberTemplate, 'before')
             ->where('deletedAt', null)
+            ->where('tipe_mutasi', $tipe_mutasi)
             ->orderBy('no_mutasi', 'DESC')
             ->first();
 

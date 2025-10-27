@@ -783,14 +783,14 @@
             <?php endif; ?> -->
 
             <!-- Final Amount Row -->
-            <tr style="font-weight: bold; background-color: #e9ecef; font-size: 10px; line-height: 0.8;">
+            <tr style="font-weight: bold; background-color: #e9ecef; font-size: 11px; line-height: 0.8;">
                 <td style="padding: 4px; border: 1px solid #ddd;"></td>
                 <td style="padding: 4px; border: 1px solid #ddd;">
                     <table style="width: 100%; table-layout: fixed; border-collapse: collapse;">
                         <tr style="vertical-align: middle;">
                             <!-- Kolom 1: GRAND TOTAL Label -->
                             <td style="width: 35%; text-align: left; vertical-align: middle; white-space: nowrap;">
-                                <span style="margin-left: -3px;">
+                                <span style="margin-left: -1px;">
                                     GRAND TOTAL <?= !empty($salesKontrak['total_container']) ? "(" . $salesKontrak['total_container'] . ")" : "" ?>
                                 </span>
                             </td>
@@ -799,7 +799,7 @@
                             <td style="width: 30%; text-align: center;">
                                 <?php if ($currentItemSaleskontrakdetail === $totalSalesKontrakdetail): ?>
                                     <?php if (!empty($groupBySatuan)) : ?>
-                                        <table style="width: auto; margin: 0 auto; border-collapse: collapse; font-size: 10px;">
+                                        <table style="width: auto; margin: 0 auto; border-collapse: collapse; font-size: 11px;">
                                             <tbody>
                                                 <tr>
                                                     <?php

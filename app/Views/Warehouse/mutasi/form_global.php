@@ -38,6 +38,9 @@
 
             <ul class="nav nav-tabs">
                 <li class="nav-item">
+                    <a class="nav-link" href="<?= base_url('mutasi/lokal') ?>">Mutasi Lokal</a>
+                </li>
+                <li class="nav-item">
                     <a class="nav-link" href="<?= base_url('mutasi/create') ?>">Mutasi PPBKB</a>
                 </li>
                 <li class="nav-item">
