@@ -261,6 +261,7 @@ class StokList extends BaseController
 
                 $no         = trim($val[0] ?? '');
                 $kodeBarang = trim($val[1] ?? '');
+                $barangName = trim($val[2] ?? '');
                 $spesifikasi = trim($val[3] ?? '');
                 $divisi     = trim($val[4] ?? '');
                 $warehouse  = trim($val[5] ?? '');
@@ -272,6 +273,7 @@ class StokList extends BaseController
                 $barangMasterFirst = $this->barangMasterModel
                     ->where('company_id', $this->this_company_id)
                     ->where('kode_barang', $kodeBarang)
+                    ->where('barang_name', $barangName)
                     ->where('deletedAt', null)
                     ->first();
 
