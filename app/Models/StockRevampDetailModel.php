@@ -1062,7 +1062,7 @@ class StockRevampDetailModel extends Model
     public function getStockListVendorWithCondition($condition)
     {
         $builder = $this->asArray()
-            ->select('
+            ->select("
                 stock_revamp_detail.id AS id,
                 stock_revamp_detail.id AS stock_detail_id,
                 stock_revamp.spesifikasi_id,
@@ -1080,25 +1080,30 @@ class StockRevampDetailModel extends Model
                 rm_purchase_order_details.id as rm_purchase_order_detail_id,
                 barang_master.barang_name,
                 barang_master_spesifikasi.spesifikasi,
-                CONCAT(barang_master.barang_name, " ", barang_master_spesifikasi.spesifikasi) AS barang,
+                CONCAT(barang_master.barang_name, ' ', barang_master_spesifikasi.spesifikasi) AS barang,
                 satuans.kode_satuan,
                 stock_revamp_detail.qty_bersih as stok_total,
                 stock_revamp_detail.qty_diterima as stok_total_diterima,
                 jasa_vendor_in.no_penerimaan_surat_jalan,
-                concat(jasa_vendor_in.no_penerimaan_surat_jalan, " (", rm_purchase_orders.po_no, ")") AS stock_dokumen,
-                UPPER(concat(vendors.name, " / ", suppliers.name)) AS supplier_name,
+                concat(jasa_vendor_in.no_penerimaan_surat_jalan, ' (', rm_purchase_orders.po_no, ')') AS stock_dokumen,
+                UPPER(concat(vendors.name, ' / ', suppliers.name)) AS supplier_name,
                 bc_purchase_order.no_aju,
                 vendors.id AS vendor_id,
                 UPPER(vendors.name) AS vendor_name,
                 rm_purchase_order_details.general_price as harga_umum,
                 rm_purchase_order_details.daily_price as harga_harian,
                 rm_purchase_order_details.monthly_price as harga_bulanan,
-                COALESCE (penerimaan_barang.tanggal, jasa_vendor_in.tanggal) as stock_date,
+                CASE 
+                    WHEN stock_revamp_detail.reference_type = 'PROSES REBUS' THEN proses_rebus.tanggal
+                    WHEN stock_revamp_detail.reference_type = 'JASA VENDOR' THEN jasa_vendor_in.tanggal
+                    ELSE penerimaan_barang.tanggal
+                END AS stock_date,
                 stock_revamp_detail.type_bc as type_bc,
                 bc_purchase_order.no_daftar
-            ')
+            ")
             ->join('stock_revamp', 'stock_revamp.id = stock_revamp_detail.stock_id', 'left')
             ->join('jasa_vendor_in', 'jasa_vendor_in.id = stock_revamp_detail.reference_id', 'left')
+            ->join('proses_rebus', 'proses_rebus.id = stock_revamp_detail.reference_id', 'left')
             ->join('jasa_vendor_in_detail', 'jasa_vendor_in_detail.jasa_vendor_in_id = jasa_vendor_in.id', 'left')
             ->join('vendors', 'vendors.id = jasa_vendor_in.vendor_id', 'left')
             ->join('stock_revamp_history', 'stock_revamp_history.stock_detail_akhir = stock_revamp_detail.id', 'left')
