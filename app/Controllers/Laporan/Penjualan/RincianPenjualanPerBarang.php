@@ -159,6 +159,10 @@ class RincianPenjualanPerBarang extends BaseController
 
     public function printPDFAll($tglAwal = "all", $tglAkhir = "now", $filter = "all", $search = "all")
     {
+        ini_set('memory_limit', '-1');
+        set_time_limit(0);
+        ob_end_clean();
+        ob_start();
         $condition = [
             "sales_order_invoice.deletedAt" => null,
             "sales_order_invoice.tipe_invoice" => 'LOKAL'
@@ -255,6 +259,10 @@ class RincianPenjualanPerBarang extends BaseController
 
     public function printExcelAll($tglAwal = "all", $tglAkhir = "now", $filter = "all", $search = "all")
     {
+        ini_set('memory_limit', '-1');
+        set_time_limit(0);
+        ob_end_clean();
+        ob_start();
         $condition = [
             "sales_order_invoice.deletedAt" => null,
             "sales_order_invoice.tipe_invoice" => 'LOKAL'

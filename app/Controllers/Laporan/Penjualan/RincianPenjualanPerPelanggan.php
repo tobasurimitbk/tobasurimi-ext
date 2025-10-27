@@ -171,6 +171,10 @@ class RincianPenjualanPerPelanggan extends BaseController
 
     public function LaporanPenjualanPrint($tglAwal, $tglAkhir, $filter, $search)
     {
+        ini_set('memory_limit', '-1');
+        set_time_limit(0);
+        ob_end_clean();
+        ob_start();
         $dompdf = new Dompdf();
 
         $condition = [
@@ -300,6 +304,10 @@ class RincianPenjualanPerPelanggan extends BaseController
 
     public function exportExcel($tglAwal, $tglAkhir, $filter, $search)
     {
+        ini_set('memory_limit', '-1');
+        set_time_limit(0);
+        ob_end_clean();
+        ob_start();
         $condition = [
             // "sales_order_invoice.id_company" => $this->this_company_id,
             "sales_order_invoice.deletedAt" => null,

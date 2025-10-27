@@ -151,6 +151,10 @@ class ReturnPenjualanPerBarang extends BaseController
 
     public function printPDF($tglAwal, $tglAkhir, $filter, $search)
     {
+        ini_set('memory_limit', '-1');
+        set_time_limit(0);
+        ob_end_clean();
+        ob_start();
         $dompdf = new Dompdf();
 
         $condition = [
@@ -266,6 +270,10 @@ class ReturnPenjualanPerBarang extends BaseController
 
     public function printExcel($tglAwal, $tglAkhir, $filter, $search)
     {
+        ini_set('memory_limit', '-1');
+        set_time_limit(0);
+        ob_end_clean();
+        ob_start();
         $condition = [
             "sales_order_return.deletedAt" => null,
             "sales_order_return_detail.deletedAt" => null

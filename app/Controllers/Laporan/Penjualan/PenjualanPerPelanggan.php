@@ -92,6 +92,10 @@ class PenjualanPerPelanggan extends BaseController
 
     public function printPDF($tglAwal = "all", $tglAkhir = "now", $filter = "all", $search = "all")
     {
+        ini_set('memory_limit', '-1');
+        set_time_limit(0);
+        ob_end_clean();
+        ob_start();
         $condition = [
             // "sales_order_invoice.id_company" => $this->this_company_id,
             "sales_order_invoice.deletedAt" => null,
@@ -117,7 +121,7 @@ class PenjualanPerPelanggan extends BaseController
         foreach ($dataSalesOrderInvoice['data'] as $data) {
             $totalInvoice = floatval($data->sum_amount_invoice);
             $totalAllInvoice += $totalInvoice;
-            
+
             array_push($dataAllSalesOrderInvoice, [
                 "no" => $no++,
                 "total_invoice" => number_format($totalInvoice),
@@ -147,6 +151,10 @@ class PenjualanPerPelanggan extends BaseController
 
     public function printExcel($tglAwal = "all", $tglAkhir = "now", $filter = "all", $search = "all")
     {
+        ini_set('memory_limit', '-1');
+        set_time_limit(0);
+        ob_end_clean();
+        ob_start();
         $condition = [
             // "sales_order_invoice.id_company" => $this->this_company_id,
             "sales_order_invoice.deletedAt" => null,
@@ -175,9 +183,9 @@ class PenjualanPerPelanggan extends BaseController
         $sheet->mergeCells('A2:E2');
         $sheet->getStyle('A1:A2')->getFont()->setBold(true)->setSize(14);
         $sheet->getStyle('A1:A2')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
-        
+
         // Set informasi filter
-        $sheet->setCellValue('A3', 'Periode: '. ($tglAwal != "all" ? date("d/m/Y", strtotime($tglAwal)) : "All") . ' - ' . ($tglAkhir != "now" ? date("d/m/Y", strtotime($tglAkhir)) : "Now"));
+        $sheet->setCellValue('A3', 'Periode: ' . ($tglAwal != "all" ? date("d/m/Y", strtotime($tglAwal)) : "All") . ' - ' . ($tglAkhir != "now" ? date("d/m/Y", strtotime($tglAkhir)) : "Now"));
         $sheet->mergeCells('A3:E3');
         $sheet->getStyle('A3:A3')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
 
@@ -213,7 +221,7 @@ class PenjualanPerPelanggan extends BaseController
             $sheet->setCellValue('C' . $row, $data->kode_pelanggan);
             $sheet->setCellValue('D' . $row, $data->count_invoice);
             $sheet->setCellValue('E' . $row, $totalInvoice);
-            
+
             $row++;
         }
 
@@ -221,7 +229,7 @@ class PenjualanPerPelanggan extends BaseController
         $sheet->setCellValue('A' . $row, 'TOTAL');
         $sheet->mergeCells('A' . $row . ':D' . $row);
         $sheet->setCellValue('E' . $row, $totalAllInvoice);
-        
+
         $sheet->getStyle('A' . $row . ':E' . $row)->getFont()->setBold(true);
         $sheet->getStyle('A' . $row . ':E' . $row)->getFill()
             ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
@@ -231,7 +239,7 @@ class PenjualanPerPelanggan extends BaseController
         $sheet->getStyle('E7:E' . $row)->getNumberFormat()->setFormatCode('#,##0');
 
         // Auto size columns
-        foreach(range('A','E') as $columnID) {
+        foreach (range('A', 'E') as $columnID) {
             $sheet->getColumnDimension($columnID)->setAutoSize(true);
         }
 
