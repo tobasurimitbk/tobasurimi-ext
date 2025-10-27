@@ -14,7 +14,7 @@
 
         @page {
             size: 8.27in 5.50in landscape;
-            margin-top: 5px !important;
+            margin-top: 10px !important;
             margin: 25px;
             padding: 25px;
         }
@@ -215,11 +215,11 @@
 
     <table class="signature-table">
         <tr style="vertical-align: top;">
-            <td style="height: 65px;border-bottom: 1px solid;width: 90px">Sales</td>
+            <td style="height: 60px;border-bottom: 1px solid;width: 90px">Sales</td>
             <td style="width: 80px"></td>
-            <td style="height: 65px;border-bottom: 1px solid;width: 90px">Gudang</td>
+            <td style="height: 60px;border-bottom: 1px solid;width: 90px">Gudang</td>
             <td style="width: 80px"></td>
-            <td style="height: 65px;border-bottom: 1px solid;width: 90px">Produksi</td>
+            <td style="height: 60px;border-bottom: 1px solid;width: 90px">Produksi</td>
         </tr>
         <tr>
             <td>Date: </td>

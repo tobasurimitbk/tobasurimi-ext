@@ -956,14 +956,54 @@ class OrderForm extends BaseController
 
         $id = decrypt($id);
 
-        $soSelectQry = "sales_order.*,
-                        DATE_FORMAT(sales_order.order_date, '%d %b %Y') AS order_date, 
-                        DATE_FORMAT(sales_order.shipping_date, '%d %b %Y') AS shipping_date, 
-                        customers.name AS customerName, 
-                        customers.phone AS customerPhone, 
-                        customers.address AS customerAddress,
-                        metadata.value AS termin,
-                        companies.company";
+        $soSelectQry = "
+            sales_order.*,
+            CONCAT(
+                LPAD(DAY(sales_order.order_date), 2, '0'), ' ',
+                CASE MONTH(sales_order.order_date)
+                    WHEN 1 THEN 'JAN'
+                    WHEN 2 THEN 'FEB'
+                    WHEN 3 THEN 'MAR'
+                    WHEN 4 THEN 'APR'
+                    WHEN 5 THEN 'MEI'
+                    WHEN 6 THEN 'JUNI'
+                    WHEN 7 THEN 'JULI'
+                    WHEN 8 THEN 'AGUS'
+                    WHEN 9 THEN 'SEPT'
+                    WHEN 10 THEN 'OKT'
+                    WHEN 11 THEN 'NOV'
+                    WHEN 12 THEN 'DES'
+                END,
+                ' ',
+                YEAR(sales_order.order_date)
+            ) AS order_date,
+
+            CONCAT(
+                LPAD(DAY(sales_order.shipping_date), 2, '0'), ' ',
+                CASE MONTH(sales_order.shipping_date)
+                    WHEN 1 THEN 'JAN'
+                    WHEN 2 THEN 'FEB'
+                    WHEN 3 THEN 'MAR'
+                    WHEN 4 THEN 'APR'
+                    WHEN 5 THEN 'MEI'
+                    WHEN 6 THEN 'JUNI'
+                    WHEN 7 THEN 'JULI'
+                    WHEN 8 THEN 'AGUS'
+                    WHEN 9 THEN 'SEPT'
+                    WHEN 10 THEN 'OKT'
+                    WHEN 11 THEN 'NOV'
+                    WHEN 12 THEN 'DES'
+                END,
+                ' ',
+                YEAR(sales_order.shipping_date)
+            ) AS shipping_date,
+
+            customers.name AS customerName,
+            customers.phone AS customerPhone,
+            customers.address AS customerAddress,
+            metadata.value AS termin,
+            companies.company
+        ";
         $salesOrderData = $this->SalesOrderModel->asObject()
             ->select($soSelectQry)
             ->join('customers', 'customers.id = sales_order.id_customer', 'left')

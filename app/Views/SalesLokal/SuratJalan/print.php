@@ -7,8 +7,8 @@
     <title>Surat Jalan</title>
     <style>
         body {
-            font-size: 12px;
-            font-family: 'Courier New', monospace;
+            font-size: 11px;
+            font-family: 'DejaVu Sans Mono', monospace;
         }
 
         @page {
@@ -100,11 +100,11 @@
                         <tr>
                             <td style="width:1px;vertical-align:top">Customer: </td>
                             <td style="border:1px solid;border-radius:7px;padding:5px">
-                                <div>
+                                <div class="txt-bold">
                                     <?= $firstSO->customerName ?? '-' ?>
                                     <?= !empty($firstSO->phone) ? ' - ' . $firstSO->phone : '' ?>
                                 </div>
-                                <div><?= $firstSO->customerAddress ?? '-' ?></div>
+                                <div class="txt-bold"><?= $firstSO->customerAddress ?? '-' ?></div>
                             </td>
                         </tr>
                     </table>
