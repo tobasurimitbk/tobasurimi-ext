@@ -2415,6 +2415,246 @@ $routes->post('/ratio-baby-crab/delete', 'Accounting\Rasio\RasioBabyCrabControll
 $routes->post('/ratio-baby-crab/get', 'Accounting\Rasio\RasioBabyCrabController::get', ['filter' => 'Auth']);
 $routes->get('/ratio-baby-crab/load_content', 'Accounting\Rasio\RasioBabyCrabController::load_content', ['filter' => 'Auth']);
 
+$routes->get('/ratio-bakso', 'Accounting\Rasio\RasioBaksoController::index', ['filter' => 'Auth']);
+$routes->get('/ratio-bakso/create', 'Accounting\Rasio\RasioBaksoController::createRasio', ['filter' => 'Auth']);
+$routes->get('/ratio-bakso/get-barang-digunakan', 'Accounting\Rasio\RasioBaksoController::getRasioBarangDigunakan', ['filter' => 'Auth']);
+$routes->get('/ratio-bakso/get-barang-digunakan-jadi', 'Accounting\Rasio\RasioBaksoController::getRasioBarangDigunakanJadi', ['filter' => 'Auth']);
+$routes->get('/ratio-bakso/get-saldo-akhir', 'Accounting\Rasio\RasioBaksoController::getSaldoAkhir', ['filter' => 'Auth']);
+$routes->get('/ratio-bakso/get-saldo-awal', 'Accounting\Rasio\RasioBaksoController::getSaldoAwal', ['filter' => 'Auth']);
+$routes->get('/ratio-bakso/get-saldo-adjusment', 'Accounting\Rasio\RasioBaksoController::getSaldoAdjusment', ['filter' => 'Auth']);
+$routes->get('/ratio-bakso/get-saldo-jual', 'Accounting\Rasio\RasioBaksoController::getSaldoJual', ['filter' => 'Auth']);
+$routes->get('/ratio-bakso/get-saldo-trimming', 'Accounting\Rasio\RasioBaksoController::getSaldoTrimming', ['filter' => 'Auth']);
+$routes->get('/ratio-bakso/get-barang-jadi', 'Accounting\Rasio\RasioBaksoController::getRasioBarangJadi', ['filter' => 'Auth']);
+
+$routes->get('/ratio-bakso/get-material-i', 'Accounting\Rasio\RasioBaksoController::getRawMaterialI', ['filter' => 'Auth']);
+
+$routes->get('/ratio-bakso/get-barang-digunakan-penolong', 'Accounting\Rasio\RasioBaksoController::getRasioBarangDigunakanPenolong', ['filter' => 'Auth']);
+$routes->get('/ratio-bakso/get-jurnal', 'Accounting\Rasio\RasioBaksoController::getDataJurnal', ['filter' => 'Auth']);
+$routes->get('/ratio-bakso/get-cost', 'Accounting\Rasio\RasioBaksoController::getCost', ['filter' => 'Auth']);
+$routes->get('/ratio-bakso/all', 'Accounting\Rasio\RasioBaksoController::allRasio', ['filter' => 'Auth']);
+$routes->get('/ratio-bakso/id/(:segment)', 'Accounting\Rasio\RasioBaksoController::getById/$1', ['filter' => 'Auth']);
+$routes->post('/ratio-bakso/save', 'Accounting\Rasio\RasioBaksoController::saveRasio', ['filter' => 'Auth']);
+$routes->post('/ratio-bakso/update', 'Accounting\Rasio\RasioBaksoController::updateRasio', ['filter' => 'Auth']);
+$routes->post('/ratio-bakso/delete', 'Accounting\Rasio\RasioBaksoController::deleteRasio', ['filter' => 'Auth']);
+$routes->post('/ratio-bakso/get', 'Accounting\Rasio\RasioBaksoController::get', ['filter' => 'Auth']);
+$routes->get('/ratio-bakso/load_content', 'Accounting\Rasio\RasioBaksoController::load_content', ['filter' => 'Auth']);
+
+$routes->get('/ratio-cooked-tuna', 'Accounting\Rasio\RasioCookedTunaController::index', ['filter' => 'Auth']);
+$routes->get('/ratio-cooked-tuna/create', 'Accounting\Rasio\RasioCookedTunaController::createRasio', ['filter' => 'Auth']);
+$routes->get('/ratio-cooked-tuna/get-barang-digunakan', 'Accounting\Rasio\RasioCookedTunaController::getRasioBarangDigunakan', ['filter' => 'Auth']);
+$routes->get('/ratio-cooked-tuna/get-barang-digunakan-jadi', 'Accounting\Rasio\RasioCookedTunaController::getRasioBarangDigunakanJadi', ['filter' => 'Auth']);
+$routes->get('/ratio-cooked-tuna/get-saldo-akhir', 'Accounting\Rasio\RasioCookedTunaController::getSaldoAkhir', ['filter' => 'Auth']);
+$routes->get('/ratio-cooked-tuna/get-saldo-awal', 'Accounting\Rasio\RasioCookedTunaController::getSaldoAwal', ['filter' => 'Auth']);
+$routes->get('/ratio-cooked-tuna/get-saldo-adjusment', 'Accounting\Rasio\RasioCookedTunaController::getSaldoAdjusment', ['filter' => 'Auth']);
+$routes->get('/ratio-cooked-tuna/get-saldo-jual', 'Accounting\Rasio\RasioCookedTunaController::getSaldoJual', ['filter' => 'Auth']);
+$routes->get('/ratio-cooked-tuna/get-saldo-trimming', 'Accounting\Rasio\RasioCookedTunaController::getSaldoTrimming', ['filter' => 'Auth']);
+$routes->get('/ratio-cooked-tuna/get-barang-jadi', 'Accounting\Rasio\RasioCookedTunaController::getRasioBarangJadi', ['filter' => 'Auth']);
+
+$routes->get('/ratio-cooked-tuna/get-material-i', 'Accounting\Rasio\RasioCookedTunaController::getRawMaterialI', ['filter' => 'Auth']);
+
+$routes->get('/ratio-cooked-tuna/get-barang-digunakan-penolong', 'Accounting\Rasio\RasioCookedTunaController::getRasioBarangDigunakanPenolong', ['filter' => 'Auth']);
+$routes->get('/ratio-cooked-tuna/get-jurnal', 'Accounting\Rasio\RasioCookedTunaController::getDataJurnal', ['filter' => 'Auth']);
+$routes->get('/ratio-cooked-tuna/get-cost', 'Accounting\Rasio\RasioCookedTunaController::getCost', ['filter' => 'Auth']);
+$routes->get('/ratio-cooked-tuna/all', 'Accounting\Rasio\RasioCookedTunaController::allRasio', ['filter' => 'Auth']);
+$routes->get('/ratio-cooked-tuna/id/(:segment)', 'Accounting\Rasio\RasioCookedTunaController::getById/$1', ['filter' => 'Auth']);
+$routes->post('/ratio-cooked-tuna/save', 'Accounting\Rasio\RasioCookedTunaController::saveRasio', ['filter' => 'Auth']);
+$routes->post('/ratio-cooked-tuna/update', 'Accounting\Rasio\RasioCookedTunaController::updateRasio', ['filter' => 'Auth']);
+$routes->post('/ratio-cooked-tuna/delete', 'Accounting\Rasio\RasioCookedTunaController::deleteRasio', ['filter' => 'Auth']);
+$routes->post('/ratio-cooked-tuna/get', 'Accounting\Rasio\RasioCookedTunaController::get', ['filter' => 'Auth']);
+$routes->get('/ratio-cooked-tuna/load_content', 'Accounting\Rasio\RasioCookedTunaController::load_content', ['filter' => 'Auth']);
+
+$routes->get('/ratio-cumi-cumi', 'Accounting\Rasio\RasioCumiCumiController::index', ['filter' => 'Auth']);
+$routes->get('/ratio-cumi-cumi/create', 'Accounting\Rasio\RasioCumiCumiController::createRasio', ['filter' => 'Auth']);
+$routes->get('/ratio-cumi-cumi/get-barang-digunakan', 'Accounting\Rasio\RasioCumiCumiController::getRasioBarangDigunakan', ['filter' => 'Auth']);
+$routes->get('/ratio-cumi-cumi/get-barang-digunakan-jadi', 'Accounting\Rasio\RasioCumiCumiController::getRasioBarangDigunakanJadi', ['filter' => 'Auth']);
+$routes->get('/ratio-cumi-cumi/get-saldo-akhir', 'Accounting\Rasio\RasioCumiCumiController::getSaldoAkhir', ['filter' => 'Auth']);
+$routes->get('/ratio-cumi-cumi/get-saldo-awal', 'Accounting\Rasio\RasioCumiCumiController::getSaldoAwal', ['filter' => 'Auth']);
+$routes->get('/ratio-cumi-cumi/get-saldo-adjusment', 'Accounting\Rasio\RasioCumiCumiController::getSaldoAdjusment', ['filter' => 'Auth']);
+$routes->get('/ratio-cumi-cumi/get-saldo-jual', 'Accounting\Rasio\RasioCumiCumiController::getSaldoJual', ['filter' => 'Auth']);
+$routes->get('/ratio-cumi-cumi/get-saldo-trimming', 'Accounting\Rasio\RasioCumiCumiController::getSaldoTrimming', ['filter' => 'Auth']);
+$routes->get('/ratio-cumi-cumi/get-barang-jadi', 'Accounting\Rasio\RasioCumiCumiController::getRasioBarangJadi', ['filter' => 'Auth']);
+
+$routes->get('/ratio-cumi-cumi/get-material-i', 'Accounting\Rasio\RasioCumiCumiController::getRawMaterialI', ['filter' => 'Auth']);
+
+$routes->get('/ratio-cumi-cumi/get-barang-digunakan-penolong', 'Accounting\Rasio\RasioCumiCumiController::getRasioBarangDigunakanPenolong', ['filter' => 'Auth']);
+$routes->get('/ratio-cumi-cumi/get-jurnal', 'Accounting\Rasio\RasioCumiCumiController::getDataJurnal', ['filter' => 'Auth']);
+$routes->get('/ratio-cumi-cumi/get-cost', 'Accounting\Rasio\RasioCumiCumiController::getCost', ['filter' => 'Auth']);
+$routes->get('/ratio-cumi-cumi/all', 'Accounting\Rasio\RasioCumiCumiController::allRasio', ['filter' => 'Auth']);
+$routes->get('/ratio-cumi-cumi/id/(:segment)', 'Accounting\Rasio\RasioCumiCumiController::getById/$1', ['filter' => 'Auth']);
+$routes->post('/ratio-cumi-cumi/save', 'Accounting\Rasio\RasioCumiCumiController::saveRasio', ['filter' => 'Auth']);
+$routes->post('/ratio-cumi-cumi/update', 'Accounting\Rasio\RasioCumiCumiController::updateRasio', ['filter' => 'Auth']);
+$routes->post('/ratio-cumi-cumi/delete', 'Accounting\Rasio\RasioCumiCumiController::deleteRasio', ['filter' => 'Auth']);
+$routes->post('/ratio-cumi-cumi/get', 'Accounting\Rasio\RasioCumiCumiController::get', ['filter' => 'Auth']);
+$routes->get('/ratio-cumi-cumi/load_content', 'Accounting\Rasio\RasioCumiCumiController::load_content', ['filter' => 'Auth']);
+
+$routes->get('/ratio-lobster', 'Accounting\Rasio\RasioLobsterController::index', ['filter' => 'Auth']);
+$routes->get('/ratio-lobster/create', 'Accounting\Rasio\RasioLobsterController::createRasio', ['filter' => 'Auth']);
+$routes->get('/ratio-lobster/get-barang-digunakan', 'Accounting\Rasio\RasioLobsterController::getRasioBarangDigunakan', ['filter' => 'Auth']);
+$routes->get('/ratio-lobster/get-barang-digunakan-jadi', 'Accounting\Rasio\RasioLobsterController::getRasioBarangDigunakanJadi', ['filter' => 'Auth']);
+$routes->get('/ratio-lobster/get-saldo-akhir', 'Accounting\Rasio\RasioLobsterController::getSaldoAkhir', ['filter' => 'Auth']);
+$routes->get('/ratio-lobster/get-saldo-awal', 'Accounting\Rasio\RasioLobsterController::getSaldoAwal', ['filter' => 'Auth']);
+$routes->get('/ratio-lobster/get-saldo-adjusment', 'Accounting\Rasio\RasioLobsterController::getSaldoAdjusment', ['filter' => 'Auth']);
+$routes->get('/ratio-lobster/get-saldo-jual', 'Accounting\Rasio\RasioLobsterController::getSaldoJual', ['filter' => 'Auth']);
+$routes->get('/ratio-lobster/get-saldo-trimming', 'Accounting\Rasio\RasioLobsterController::getSaldoTrimming', ['filter' => 'Auth']);
+$routes->get('/ratio-lobster/get-barang-jadi', 'Accounting\Rasio\RasioLobsterController::getRasioBarangJadi', ['filter' => 'Auth']);
+
+$routes->get('/ratio-lobster/get-material-i', 'Accounting\Rasio\RasioLobsterController::getRawMaterialI', ['filter' => 'Auth']);
+
+$routes->get('/ratio-lobster/get-barang-digunakan-penolong', 'Accounting\Rasio\RasioLobsterController::getRasioBarangDigunakanPenolong', ['filter' => 'Auth']);
+$routes->get('/ratio-lobster/get-jurnal', 'Accounting\Rasio\RasioLobsterController::getDataJurnal', ['filter' => 'Auth']);
+$routes->get('/ratio-lobster/get-cost', 'Accounting\Rasio\RasioLobsterController::getCost', ['filter' => 'Auth']);
+$routes->get('/ratio-lobster/all', 'Accounting\Rasio\RasioLobsterController::allRasio', ['filter' => 'Auth']);
+$routes->get('/ratio-lobster/id/(:segment)', 'Accounting\Rasio\RasioLobsterController::getById/$1', ['filter' => 'Auth']);
+$routes->post('/ratio-lobster/save', 'Accounting\Rasio\RasioLobsterController::saveRasio', ['filter' => 'Auth']);
+$routes->post('/ratio-lobster/update', 'Accounting\Rasio\RasioLobsterController::updateRasio', ['filter' => 'Auth']);
+$routes->post('/ratio-lobster/delete', 'Accounting\Rasio\RasioLobsterController::deleteRasio', ['filter' => 'Auth']);
+$routes->post('/ratio-lobster/get', 'Accounting\Rasio\RasioLobsterController::get', ['filter' => 'Auth']);
+$routes->get('/ratio-lobster/load_content', 'Accounting\Rasio\RasioLobsterController::load_content', ['filter' => 'Auth']);
+
+$routes->get('/ratio-prefried-ssc', 'Accounting\Rasio\RasioPrefriedSSCController::index', ['filter' => 'Auth']);
+$routes->get('/ratio-prefried-ssc/create', 'Accounting\Rasio\RasioPrefriedSSCController::createRasio', ['filter' => 'Auth']);
+$routes->get('/ratio-prefried-ssc/get-barang-digunakan', 'Accounting\Rasio\RasioPrefriedSSCController::getRasioBarangDigunakan', ['filter' => 'Auth']);
+$routes->get('/ratio-prefried-ssc/get-barang-digunakan-jadi', 'Accounting\Rasio\RasioPrefriedSSCController::getRasioBarangDigunakanJadi', ['filter' => 'Auth']);
+$routes->get('/ratio-prefried-ssc/get-saldo-akhir', 'Accounting\Rasio\RasioPrefriedSSCController::getSaldoAkhir', ['filter' => 'Auth']);
+$routes->get('/ratio-prefried-ssc/get-saldo-awal', 'Accounting\Rasio\RasioPrefriedSSCController::getSaldoAwal', ['filter' => 'Auth']);
+$routes->get('/ratio-prefried-ssc/get-saldo-adjusment', 'Accounting\Rasio\RasioPrefriedSSCController::getSaldoAdjusment', ['filter' => 'Auth']);
+$routes->get('/ratio-prefried-ssc/get-saldo-jual', 'Accounting\Rasio\RasioPrefriedSSCController::getSaldoJual', ['filter' => 'Auth']);
+$routes->get('/ratio-prefried-ssc/get-saldo-trimming', 'Accounting\Rasio\RasioPrefriedSSCController::getSaldoTrimming', ['filter' => 'Auth']);
+$routes->get('/ratio-prefried-ssc/get-barang-jadi', 'Accounting\Rasio\RasioPrefriedSSCController::getRasioBarangJadi', ['filter' => 'Auth']);
+
+$routes->get('/ratio-prefried-ssc/get-material-i', 'Accounting\Rasio\RasioPrefriedSSCController::getRawMaterialI', ['filter' => 'Auth']);
+
+$routes->get('/ratio-prefried-ssc/get-barang-digunakan-penolong', 'Accounting\Rasio\RasioPrefriedSSCController::getRasioBarangDigunakanPenolong', ['filter' => 'Auth']);
+$routes->get('/ratio-prefried-ssc/get-jurnal', 'Accounting\Rasio\RasioPrefriedSSCController::getDataJurnal', ['filter' => 'Auth']);
+$routes->get('/ratio-prefried-ssc/get-cost', 'Accounting\Rasio\RasioPrefriedSSCController::getCost', ['filter' => 'Auth']);
+$routes->get('/ratio-prefried-ssc/all', 'Accounting\Rasio\RasioPrefriedSSCController::allRasio', ['filter' => 'Auth']);
+$routes->get('/ratio-prefried-ssc/id/(:segment)', 'Accounting\Rasio\RasioPrefriedSSCController::getById/$1', ['filter' => 'Auth']);
+$routes->post('/ratio-prefried-ssc/save', 'Accounting\Rasio\RasioPrefriedSSCController::saveRasio', ['filter' => 'Auth']);
+$routes->post('/ratio-prefried-ssc/update', 'Accounting\Rasio\RasioPrefriedSSCController::updateRasio', ['filter' => 'Auth']);
+$routes->post('/ratio-prefried-ssc/delete', 'Accounting\Rasio\RasioPrefriedSSCController::deleteRasio', ['filter' => 'Auth']);
+$routes->post('/ratio-prefried-ssc/get', 'Accounting\Rasio\RasioPrefriedSSCController::get', ['filter' => 'Auth']);
+$routes->get('/ratio-prefried-ssc/load_content', 'Accounting\Rasio\RasioPrefriedSSCController::load_content', ['filter' => 'Auth']);
+
+$routes->get('/ratio-softshell', 'Accounting\Rasio\RasioSoftshellController::index', ['filter' => 'Auth']);
+$routes->get('/ratio-softshell/create', 'Accounting\Rasio\RasioSoftshellController::createRasio', ['filter' => 'Auth']);
+$routes->get('/ratio-softshell/get-barang-digunakan', 'Accounting\Rasio\RasioSoftshellController::getRasioBarangDigunakan', ['filter' => 'Auth']);
+$routes->get('/ratio-softshell/get-barang-digunakan-jadi', 'Accounting\Rasio\RasioSoftshellController::getRasioBarangDigunakanJadi', ['filter' => 'Auth']);
+$routes->get('/ratio-softshell/get-saldo-akhir', 'Accounting\Rasio\RasioSoftshellController::getSaldoAkhir', ['filter' => 'Auth']);
+$routes->get('/ratio-softshell/get-saldo-awal', 'Accounting\Rasio\RasioSoftshellController::getSaldoAwal', ['filter' => 'Auth']);
+$routes->get('/ratio-softshell/get-saldo-adjusment', 'Accounting\Rasio\RasioSoftshellController::getSaldoAdjusment', ['filter' => 'Auth']);
+$routes->get('/ratio-softshell/get-saldo-jual', 'Accounting\Rasio\RasioSoftshellController::getSaldoJual', ['filter' => 'Auth']);
+$routes->get('/ratio-softshell/get-saldo-trimming', 'Accounting\Rasio\RasioSoftshellController::getSaldoTrimming', ['filter' => 'Auth']);
+$routes->get('/ratio-softshell/get-barang-jadi', 'Accounting\Rasio\RasioSoftshellController::getRasioBarangJadi', ['filter' => 'Auth']);
+
+$routes->get('/ratio-softshell/get-material-i', 'Accounting\Rasio\RasioSoftshellController::getRawMaterialI', ['filter' => 'Auth']);
+
+$routes->get('/ratio-softshell/get-barang-digunakan-penolong', 'Accounting\Rasio\RasioSoftshellController::getRasioBarangDigunakanPenolong', ['filter' => 'Auth']);
+$routes->get('/ratio-softshell/get-jurnal', 'Accounting\Rasio\RasioSoftshellController::getDataJurnal', ['filter' => 'Auth']);
+$routes->get('/ratio-softshell/get-cost', 'Accounting\Rasio\RasioSoftshellController::getCost', ['filter' => 'Auth']);
+$routes->get('/ratio-softshell/all', 'Accounting\Rasio\RasioSoftshellController::allRasio', ['filter' => 'Auth']);
+$routes->get('/ratio-softshell/id/(:segment)', 'Accounting\Rasio\RasioSoftshellController::getById/$1', ['filter' => 'Auth']);
+$routes->post('/ratio-softshell/save', 'Accounting\Rasio\RasioSoftshellController::saveRasio', ['filter' => 'Auth']);
+$routes->post('/ratio-softshell/update', 'Accounting\Rasio\RasioSoftshellController::updateRasio', ['filter' => 'Auth']);
+$routes->post('/ratio-softshell/delete', 'Accounting\Rasio\RasioSoftshellController::deleteRasio', ['filter' => 'Auth']);
+$routes->post('/ratio-softshell/get', 'Accounting\Rasio\RasioSoftshellController::get', ['filter' => 'Auth']);
+$routes->get('/ratio-softshell/load_content', 'Accounting\Rasio\RasioSoftshellController::load_content', ['filter' => 'Auth']);
+
+$routes->get('/ratio-sosis', 'Accounting\Rasio\RasioSosisController::index', ['filter' => 'Auth']);
+$routes->get('/ratio-sosis/create', 'Accounting\Rasio\RasioSosisController::createRasio', ['filter' => 'Auth']);
+$routes->get('/ratio-sosis/get-barang-digunakan', 'Accounting\Rasio\RasioSosisController::getRasioBarangDigunakan', ['filter' => 'Auth']);
+$routes->get('/ratio-sosis/get-barang-digunakan-jadi', 'Accounting\Rasio\RasioSosisController::getRasioBarangDigunakanJadi', ['filter' => 'Auth']);
+$routes->get('/ratio-sosis/get-saldo-akhir', 'Accounting\Rasio\RasioSosisController::getSaldoAkhir', ['filter' => 'Auth']);
+$routes->get('/ratio-sosis/get-saldo-awal', 'Accounting\Rasio\RasioSosisController::getSaldoAwal', ['filter' => 'Auth']);
+$routes->get('/ratio-sosis/get-saldo-adjusment', 'Accounting\Rasio\RasioSosisController::getSaldoAdjusment', ['filter' => 'Auth']);
+$routes->get('/ratio-sosis/get-saldo-jual', 'Accounting\Rasio\RasioSosisController::getSaldoJual', ['filter' => 'Auth']);
+$routes->get('/ratio-sosis/get-saldo-trimming', 'Accounting\Rasio\RasioSosisController::getSaldoTrimming', ['filter' => 'Auth']);
+$routes->get('/ratio-sosis/get-barang-jadi', 'Accounting\Rasio\RasioSosisController::getRasioBarangJadi', ['filter' => 'Auth']);
+
+$routes->get('/ratio-sosis/get-material-i', 'Accounting\Rasio\RasioSosisController::getRawMaterialI', ['filter' => 'Auth']);
+
+$routes->get('/ratio-sosis/get-barang-digunakan-penolong', 'Accounting\Rasio\RasioSosisController::getRasioBarangDigunakanPenolong', ['filter' => 'Auth']);
+$routes->get('/ratio-sosis/get-jurnal', 'Accounting\Rasio\RasioSosisController::getDataJurnal', ['filter' => 'Auth']);
+$routes->get('/ratio-sosis/get-cost', 'Accounting\Rasio\RasioSosisController::getCost', ['filter' => 'Auth']);
+$routes->get('/ratio-sosis/all', 'Accounting\Rasio\RasioSosisController::allRasio', ['filter' => 'Auth']);
+$routes->get('/ratio-sosis/id/(:segment)', 'Accounting\Rasio\RasioSosisController::getById/$1', ['filter' => 'Auth']);
+$routes->post('/ratio-sosis/save', 'Accounting\Rasio\RasioSosisController::saveRasio', ['filter' => 'Auth']);
+$routes->post('/ratio-sosis/update', 'Accounting\Rasio\RasioSosisController::updateRasio', ['filter' => 'Auth']);
+$routes->post('/ratio-sosis/delete', 'Accounting\Rasio\RasioSosisController::deleteRasio', ['filter' => 'Auth']);
+$routes->post('/ratio-sosis/get', 'Accounting\Rasio\RasioSosisController::get', ['filter' => 'Auth']);
+$routes->get('/ratio-sosis/load_content', 'Accounting\Rasio\RasioSosisController::load_content', ['filter' => 'Auth']);
+
+$routes->get('/ratio-stuffcrabmeat', 'Accounting\Rasio\RasioStuffcrabmeatController::index', ['filter' => 'Auth']);
+$routes->get('/ratio-stuffcrabmeat/create', 'Accounting\Rasio\RasioStuffcrabmeatController::createRasio', ['filter' => 'Auth']);
+$routes->get('/ratio-stuffcrabmeat/get-barang-digunakan', 'Accounting\Rasio\RasioStuffcrabmeatController::getRasioBarangDigunakan', ['filter' => 'Auth']);
+$routes->get('/ratio-stuffcrabmeat/get-barang-digunakan-jadi', 'Accounting\Rasio\RasioStuffcrabmeatController::getRasioBarangDigunakanJadi', ['filter' => 'Auth']);
+$routes->get('/ratio-stuffcrabmeat/get-saldo-akhir', 'Accounting\Rasio\RasioStuffcrabmeatController::getSaldoAkhir', ['filter' => 'Auth']);
+$routes->get('/ratio-stuffcrabmeat/get-saldo-awal', 'Accounting\Rasio\RasioStuffcrabmeatController::getSaldoAwal', ['filter' => 'Auth']);
+$routes->get('/ratio-stuffcrabmeat/get-saldo-adjusment', 'Accounting\Rasio\RasioStuffcrabmeatController::getSaldoAdjusment', ['filter' => 'Auth']);
+$routes->get('/ratio-stuffcrabmeat/get-saldo-jual', 'Accounting\Rasio\RasioStuffcrabmeatController::getSaldoJual', ['filter' => 'Auth']);
+$routes->get('/ratio-stuffcrabmeat/get-saldo-trimming', 'Accounting\Rasio\RasioStuffcrabmeatController::getSaldoTrimming', ['filter' => 'Auth']);
+$routes->get('/ratio-stuffcrabmeat/get-barang-jadi', 'Accounting\Rasio\RasioStuffcrabmeatController::getRasioBarangJadi', ['filter' => 'Auth']);
+
+$routes->get('/ratio-stuffcrabmeat/get-material-i', 'Accounting\Rasio\RasioStuffcrabmeatController::getRawMaterialI', ['filter' => 'Auth']);
+
+$routes->get('/ratio-stuffcrabmeat/get-barang-digunakan-penolong', 'Accounting\Rasio\RasioStuffcrabmeatController::getRasioBarangDigunakanPenolong', ['filter' => 'Auth']);
+$routes->get('/ratio-stuffcrabmeat/get-jurnal', 'Accounting\Rasio\RasioStuffcrabmeatController::getDataJurnal', ['filter' => 'Auth']);
+$routes->get('/ratio-stuffcrabmeat/get-cost', 'Accounting\Rasio\RasioStuffcrabmeatController::getCost', ['filter' => 'Auth']);
+$routes->get('/ratio-stuffcrabmeat/all', 'Accounting\Rasio\RasioStuffcrabmeatController::allRasio', ['filter' => 'Auth']);
+$routes->get('/ratio-stuffcrabmeat/id/(:segment)', 'Accounting\Rasio\RasioStuffcrabmeatController::getById/$1', ['filter' => 'Auth']);
+$routes->post('/ratio-stuffcrabmeat/save', 'Accounting\Rasio\RasioStuffcrabmeatController::saveRasio', ['filter' => 'Auth']);
+$routes->post('/ratio-stuffcrabmeat/update', 'Accounting\Rasio\RasioStuffcrabmeatController::updateRasio', ['filter' => 'Auth']);
+$routes->post('/ratio-stuffcrabmeat/delete', 'Accounting\Rasio\RasioStuffcrabmeatController::deleteRasio', ['filter' => 'Auth']);
+$routes->post('/ratio-stuffcrabmeat/get', 'Accounting\Rasio\RasioStuffcrabmeatController::get', ['filter' => 'Auth']);
+$routes->get('/ratio-stuffcrabmeat/load_content', 'Accounting\Rasio\RasioStuffcrabmeatController::load_content', ['filter' => 'Auth']);
+
+$routes->get('/ratio-udang-kipas', 'Accounting\Rasio\RasioUdangKipasController::index', ['filter' => 'Auth']);
+$routes->get('/ratio-udang-kipas/create', 'Accounting\Rasio\RasioUdangKipasController::createRasio', ['filter' => 'Auth']);
+$routes->get('/ratio-udang-kipas/get-barang-digunakan', 'Accounting\Rasio\RasioUdangKipasController::getRasioBarangDigunakan', ['filter' => 'Auth']);
+$routes->get('/ratio-udang-kipas/get-barang-digunakan-jadi', 'Accounting\Rasio\RasioUdangKipasController::getRasioBarangDigunakanJadi', ['filter' => 'Auth']);
+$routes->get('/ratio-udang-kipas/get-saldo-akhir', 'Accounting\Rasio\RasioUdangKipasController::getSaldoAkhir', ['filter' => 'Auth']);
+$routes->get('/ratio-udang-kipas/get-saldo-awal', 'Accounting\Rasio\RasioUdangKipasController::getSaldoAwal', ['filter' => 'Auth']);
+$routes->get('/ratio-udang-kipas/get-saldo-adjusment', 'Accounting\Rasio\RasioUdangKipasController::getSaldoAdjusment', ['filter' => 'Auth']);
+$routes->get('/ratio-udang-kipas/get-saldo-jual', 'Accounting\Rasio\RasioUdangKipasController::getSaldoJual', ['filter' => 'Auth']);
+$routes->get('/ratio-udang-kipas/get-saldo-trimming', 'Accounting\Rasio\RasioUdangKipasController::getSaldoTrimming', ['filter' => 'Auth']);
+$routes->get('/ratio-udang-kipas/get-barang-jadi', 'Accounting\Rasio\RasioUdangKipasController::getRasioBarangJadi', ['filter' => 'Auth']);
+
+$routes->get('/ratio-udang-kipas/get-material-i', 'Accounting\Rasio\RasioUdangKipasController::getRawMaterialI', ['filter' => 'Auth']);
+
+$routes->get('/ratio-udang-kipas/get-barang-digunakan-penolong', 'Accounting\Rasio\RasioUdangKipasController::getRasioBarangDigunakanPenolong', ['filter' => 'Auth']);
+$routes->get('/ratio-udang-kipas/get-jurnal', 'Accounting\Rasio\RasioUdangKipasController::getDataJurnal', ['filter' => 'Auth']);
+$routes->get('/ratio-udang-kipas/get-cost', 'Accounting\Rasio\RasioUdangKipasController::getCost', ['filter' => 'Auth']);
+$routes->get('/ratio-udang-kipas/all', 'Accounting\Rasio\RasioUdangKipasController::allRasio', ['filter' => 'Auth']);
+$routes->get('/ratio-udang-kipas/id/(:segment)', 'Accounting\Rasio\RasioUdangKipasController::getById/$1', ['filter' => 'Auth']);
+$routes->post('/ratio-udang-kipas/save', 'Accounting\Rasio\RasioUdangKipasController::saveRasio', ['filter' => 'Auth']);
+$routes->post('/ratio-udang-kipas/update', 'Accounting\Rasio\RasioUdangKipasController::updateRasio', ['filter' => 'Auth']);
+$routes->post('/ratio-udang-kipas/delete', 'Accounting\Rasio\RasioUdangKipasController::deleteRasio', ['filter' => 'Auth']);
+$routes->post('/ratio-udang-kipas/get', 'Accounting\Rasio\RasioUdangKipasController::get', ['filter' => 'Auth']);
+$routes->get('/ratio-udang-kipas/load_content', 'Accounting\Rasio\RasioUdangKipasController::load_content', ['filter' => 'Auth']);
+
+$routes->get('/ratio-udang-mantis', 'Accounting\Rasio\RasioUdangMantisController::index', ['filter' => 'Auth']);
+$routes->get('/ratio-udang-mantis/create', 'Accounting\Rasio\RasioUdangMantisController::createRasio', ['filter' => 'Auth']);
+$routes->get('/ratio-udang-mantis/get-barang-digunakan', 'Accounting\Rasio\RasioUdangMantisController::getRasioBarangDigunakan', ['filter' => 'Auth']);
+$routes->get('/ratio-udang-mantis/get-barang-digunakan-jadi', 'Accounting\Rasio\RasioUdangMantisController::getRasioBarangDigunakanJadi', ['filter' => 'Auth']);
+$routes->get('/ratio-udang-mantis/get-saldo-akhir', 'Accounting\Rasio\RasioUdangMantisController::getSaldoAkhir', ['filter' => 'Auth']);
+$routes->get('/ratio-udang-mantis/get-saldo-awal', 'Accounting\Rasio\RasioUdangMantisController::getSaldoAwal', ['filter' => 'Auth']);
+$routes->get('/ratio-udang-mantis/get-saldo-adjusment', 'Accounting\Rasio\RasioUdangMantisController::getSaldoAdjusment', ['filter' => 'Auth']);
+$routes->get('/ratio-udang-mantis/get-saldo-jual', 'Accounting\Rasio\RasioUdangMantisController::getSaldoJual', ['filter' => 'Auth']);
+$routes->get('/ratio-udang-mantis/get-saldo-trimming', 'Accounting\Rasio\RasioUdangMantisController::getSaldoTrimming', ['filter' => 'Auth']);
+$routes->get('/ratio-udang-mantis/get-barang-jadi', 'Accounting\Rasio\RasioUdangMantisController::getRasioBarangJadi', ['filter' => 'Auth']);
+
+$routes->get('/ratio-udang-mantis/get-material-i', 'Accounting\Rasio\RasioUdangMantisController::getRawMaterialI', ['filter' => 'Auth']);
+
+$routes->get('/ratio-udang-mantis/get-barang-digunakan-penolong', 'Accounting\Rasio\RasioUdangMantisController::getRasioBarangDigunakanPenolong', ['filter' => 'Auth']);
+$routes->get('/ratio-udang-mantis/get-jurnal', 'Accounting\Rasio\RasioUdangMantisController::getDataJurnal', ['filter' => 'Auth']);
+$routes->get('/ratio-udang-mantis/get-cost', 'Accounting\Rasio\RasioUdangMantisController::getCost', ['filter' => 'Auth']);
+$routes->get('/ratio-udang-mantis/all', 'Accounting\Rasio\RasioUdangMantisController::allRasio', ['filter' => 'Auth']);
+$routes->get('/ratio-udang-mantis/id/(:segment)', 'Accounting\Rasio\RasioUdangMantisController::getById/$1', ['filter' => 'Auth']);
+$routes->post('/ratio-udang-mantis/save', 'Accounting\Rasio\RasioUdangMantisController::saveRasio', ['filter' => 'Auth']);
+$routes->post('/ratio-udang-mantis/update', 'Accounting\Rasio\RasioUdangMantisController::updateRasio', ['filter' => 'Auth']);
+$routes->post('/ratio-udang-mantis/delete', 'Accounting\Rasio\RasioUdangMantisController::deleteRasio', ['filter' => 'Auth']);
+$routes->post('/ratio-udang-mantis/get', 'Accounting\Rasio\RasioUdangMantisController::get', ['filter' => 'Auth']);
+$routes->get('/ratio-udang-mantis/load_content', 'Accounting\Rasio\RasioUdangMantisController::load_content', ['filter' => 'Auth']);
+
 // Tutup Buku
 $routes->get('/tutup-buku', 'Accounting\TutupBuku\TutupBukuController::index', ['filter' => 'Auth']);
 $routes->get('/tutup-buku/all', 'Accounting\TutupBuku\TutupBukuController::all', ['filter' => 'Auth']);

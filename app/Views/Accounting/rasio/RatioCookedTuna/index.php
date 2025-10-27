@@ -3,9 +3,9 @@
 
 <section class="section">
     <div class="section-header">
-        <h1>Ratio Gurita</h1>
-        <?php if (can("Accounting", "Ratio Gurita", "c")) : ?>
-            <a href="<?= base_url('ratio-gurita/create') ?>" type="button" class="btn btn-show-form btn-add float-right">
+        <h1>Ratio Cooked Tuna</h1>
+        <?php if (can("Accounting", "Ratio Cooked Tuna", "c")) : ?>
+            <a href="<?= base_url('ratio-cooked-tuna/create') ?>" type="button" class="btn btn-show-form btn-add float-right">
                 <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
             </a>
         <?php endif; ?>
@@ -167,7 +167,7 @@
             ],
             pageLength: 25,
             ajax: {
-                url: "<?= base_url("ratio-gurita/all"); ?>",
+                url: "<?= base_url("ratio-cooked-tuna/all"); ?>",
                 dataSrc: "data",
                 data: function(data) {
                     data.search = $(".search").val();
@@ -239,7 +239,7 @@
         $('#dataTable tbody').on('click', 'tr td:not(.actions):not(.dataTables_empty)', function() {
             const data = table.row(this).data();
             console.log(data);
-            location.replace(`<?= base_url("ratio-gurita/id"); ?>/${data.id}`);
+            location.replace(`<?= base_url("ratio-cooked-tuna/id"); ?>/${data.id}`);
         });
     });
     // sort

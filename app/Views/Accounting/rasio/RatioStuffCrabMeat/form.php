@@ -3,9 +3,9 @@
 
 <section class="section">
     <div class="section-header">
-        <h1><?= empty($rasio) ? "Tambah Ratio Gurita" : "Update Ratio Gurita" ?></h1>
+        <h1><?= empty($rasio) ? "Tambah Ratio StuffCrabMeat" : "Update Ratio StuffCrabMeat" ?></h1>
         <div class="col-button-tambah-spp text-right">
-            <a class="btn btn-hide-form btn-discard" href="<?= base_url("ratio-gurita"); ?>">
+            <a class="btn btn-hide-form btn-discard" href="<?= base_url("ratio-stuffcrabmeat"); ?>">
                 Kembali
             </a>
             <button class="btn btn-show-form btn-save btn-submit-parent">
@@ -570,7 +570,7 @@
         if (department_id && tanggal_awal && tanggal_akhir && coa_id) {
             setLoading();
             $.ajax({
-                url: `<?= base_url('ratio-gurita/get-jurnal'); ?>`,
+                url: `<?= base_url('ratio-stuffcrabmeat/get-jurnal'); ?>`,
                 method: "GET",
                 data: {
                     department: department_id,
@@ -615,7 +615,7 @@
         if (department_id && tanggal_awal && tanggal_akhir && coa_id) {
             setLoading();
             $.ajax({
-                url: `<?= base_url('ratio-gurita/get-jurnal'); ?>`,
+                url: `<?= base_url('ratio-stuffcrabmeat/get-jurnal'); ?>`,
                 method: "GET",
                 data: {
                     department: department_id,
@@ -660,7 +660,7 @@
         if (department_id && tanggal_awal && tanggal_akhir && coa_id) {
             setLoading();
             $.ajax({
-                url: `<?= base_url('ratio-gurita/get-jurnal'); ?>`,
+                url: `<?= base_url('ratio-stuffcrabmeat/get-jurnal'); ?>`,
                 method: "GET",
                 data: {
                     department: department_id,
@@ -705,7 +705,7 @@
         if (department_id && tanggal_awal && tanggal_akhir && kategori) {
             setLoading();
             $.ajax({
-                url: `<?= base_url('ratio-gurita/get-material-i'); ?>`,
+                url: `<?= base_url('ratio-stuffcrabmeat/get-material-i'); ?>`,
                 method: "GET",
                 data: {
                     department: department_id,
@@ -880,7 +880,7 @@
         if (department_id && tanggal_awal && tanggal_akhir && kategori && akun_pemakaian.length > 0) {
             setLoading();
             $.ajax({
-                url: `<?= base_url('ratio-gurita/get-barang-digunakan-penolong'); ?>`,
+                url: `<?= base_url('ratio-stuffcrabmeat/get-barang-digunakan-penolong'); ?>`,
                 method: "GET",
                 data: {
                     department: department_id,
@@ -907,7 +907,7 @@
                 },
             });
             $.ajax({
-                url: `<?= base_url('ratio-gurita/get-barang-jadi'); ?>`,
+                url: `<?= base_url('ratio-stuffcrabmeat/get-barang-jadi'); ?>`,
                 method: "GET",
                 data: {
                     department: department_id,
@@ -955,7 +955,7 @@
         if (department_id && tanggal_awal && tanggal_akhir && kategori) {
             setLoading();
             $.ajax({
-                url: `<?= base_url('ratio-gurita/get-cost'); ?>`,
+                url: `<?= base_url('ratio-stuffcrabmeat/get-cost'); ?>`,
                 method: "GET",
                 data: {
                     department: department_id,
@@ -3046,7 +3046,7 @@
 
         function loadContent(page) {
             $.ajax({
-                url: '<?= base_url('/ratio-gurita/load_content') ?>',
+                url: '<?= base_url('/ratio-stuffcrabmeat/load_content') ?>',
                 type: 'GET',
                 data: {
                     page: page
@@ -3420,7 +3420,7 @@
                             // UPDATE
                             if (id) {
                                 $.ajax({
-                                    url: "<?= base_url("ratio-gurita/update"); ?>",
+                                    url: "<?= base_url("ratio-stuffcrabmeat/update"); ?>",
                                     data: data,
                                     beforeSend: function(xhr) {
                                         xhr.setRequestHeader('X-CSRF-Token', csrf.val());
@@ -3442,7 +3442,7 @@
                                                     confirmButtonColor: '#4e73df',
                                                 })
                                                 .then(() => {
-                                                    window.location.href = "<?= base_url("ratio-gurita"); ?>";
+                                                    window.location.href = "<?= base_url("ratio-stuffcrabmeat"); ?>";
                                                 })
                                         } else {
                                             Swal.fire({
@@ -3467,7 +3467,7 @@
                             // CREATE
                             else {
                                 $.ajax({
-                                    url: "<?= base_url("ratio-gurita/save"); ?>",
+                                    url: "<?= base_url("ratio-stuffcrabmeat/save"); ?>",
                                     data: data,
                                     beforeSend: function(xhr) {
                                         xhr.setRequestHeader('X-CSRF-Token', csrf.val());
@@ -3489,7 +3489,7 @@
                                                     confirmButtonColor: '#4e73df',
                                                 })
                                                 .then(() => {
-                                                    window.location.href = "<?= base_url("ratio-gurita"); ?>";
+                                                    window.location.href = "<?= base_url("ratio-stuffcrabmeat"); ?>";
                                                 })
                                         } else {
                                             Swal.fire({
