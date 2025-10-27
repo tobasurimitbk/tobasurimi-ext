@@ -197,6 +197,232 @@ class StokList extends BaseController
         return view('Warehouse/stock/stock_init', $data);
     }
 
+    public function importView()
+    {
+        return view('Warehouse/stock/stock_import');
+    }
+
+    public function importPreview()
+    {
+        try {
+            // ========================
+            // 🔍 VALIDASI FILE
+            // ========================
+            $rules = [
+                "file" => [
+                    'rules' => 'uploaded[file]|ext_in[file,xlsx,xls]',
+                    'errors' => [
+                        'uploaded' => 'Tidak ada file yang di-upload.',
+                        'ext_in'   => 'File yang di-upload harus berupa file Excel (.xlsx atau .xls).',
+                    ],
+                ],
+            ];
+
+            if (!$this->validate($rules)) {
+                $errorList = $this->validator->getErrors();
+                return $this->response->setJSON([
+                    "status"  => false,
+                    "message" => $errorList[array_key_first($errorList)],
+                    'token'   => csrf_hash()
+                ]);
+            }
+
+            // ========================
+            // 📂 BACA FILE EXCEL
+            // ========================
+            $file = $this->request->getFile('file');
+            if (!$file->isValid()) {
+                throw new \RuntimeException($file->getErrorString() . '(' . $file->getError() . ')');
+            }
+
+            $spreadsheet = \PhpOffice\PhpSpreadsheet\IOFactory::load($file->getTempName());
+            $worksheet   = $spreadsheet->getActiveSheet();
+
+            $data = [];
+            foreach ($worksheet->getRowIterator(2) as $row) {
+                $cellIterator = $row->getCellIterator();
+                $cellIterator->setIterateOnlyExistingCells(false);
+                $rowData = [];
+                foreach ($cellIterator as $cell) {
+                    $rowData[] = trim((string) $cell->getValue());
+                }
+                $data[] = $rowData;
+            }
+
+            // ========================
+            // 🔍 VALIDASI DATA
+            // ========================
+            $dataResult  = [];
+            $dataPreview = [];
+
+            foreach ($data as $index => $val) {
+                $status  = true;
+                $message = null;
+
+                $no         = trim($val[0] ?? '');
+                $kodeBarang = trim($val[1] ?? '');
+                $spesifikasi = trim($val[3] ?? '');
+                $divisi     = trim($val[4] ?? '');
+                $warehouse  = trim($val[5] ?? '');
+                $qty        = (float) ($val[6] ?? 0);
+
+                // =========================
+                // 🔸 Validasi master barang
+                // =========================
+                $barangMasterFirst = $this->barangMasterModel
+                    ->where('company_id', $this->this_company_id)
+                    ->where('kode_barang', $kodeBarang)
+                    ->where('deletedAt', null)
+                    ->first();
+
+                $barangMasterSpesifikasi = null;
+                if ($barangMasterFirst) {
+                    $barangMasterSpesifikasi = $this->barangMasterSpesifikasiModel
+                        ->select('barang_master_spesifikasi.*, satuans.kode_satuan')
+                        ->join('satuans', 'satuans.id = barang_master_spesifikasi.satuan_1', 'left')
+                        ->where('barang_master_id', $barangMasterFirst['id'])
+                        ->where('TRIM(spesifikasi)', $spesifikasi)
+                        ->where('barang_master_spesifikasi.deletedAt', null)
+                        ->first();
+
+                    if (!$barangMasterSpesifikasi) {
+                        $status = false;
+                        $message = "Spesifikasi tidak ditemukan di master barang.";
+                    }
+                } else {
+                    $status = false;
+                    $message = "Kode barang tidak ditemukan di master barang.";
+                }
+
+                // =========================
+                // 🔸 Validasi Divisi dan Warehouse
+                // =========================
+                $divisiFirst = $this->divisiModel
+                    ->where('divisi', $divisi)
+                    ->where('deletedAt', null)
+                    ->first();
+
+                $warehouseFirst = null;
+                if ($divisiFirst) {
+                    $warehouseFirst = $this->warehouseModel
+                        ->where('divisi_id', $divisiFirst['id'])
+                        ->where('warehouse_name', $warehouse)
+                        ->where('deletedAt', null)
+                        ->first();
+
+                    if (!$warehouseFirst) {
+                        $status = false;
+                        $message = "Warehouse tidak ditemukan di master data.";
+                    }
+                } else {
+                    $status = false;
+                    $message = "Departemen tidak ditemukan di master data.";
+                }
+
+                // =========================
+                // 🔸 Validasi stok inisiasi
+                // =========================
+                if ($status && $barangMasterSpesifikasi && $divisiFirst && $warehouseFirst) {
+                    $validasiStokInisiasi = $this->stockRevampModel->getBarangBelumDiinisiasi(
+                        $this->this_company_id,
+                        $divisiFirst['id'],
+                        $warehouseFirst['id'],
+                        $barangMasterSpesifikasi['id'],
+                        $barangMasterSpesifikasi['satuan_1']
+                    );
+
+                    if ($validasiStokInisiasi != null) {
+                        $status = false;
+                        $message = "Stok sudah pernah diinisiasi.";
+                    }
+                }
+
+                // =========================
+                // 💾 Simpan ke array result
+                // =========================
+                $dataResult[] = [
+                    'company_id' => $this->this_company_id,
+                    'barang_master_id' => $barangMasterSpesifikasi['barang_master_id'] ?? null,
+                    'spesifikasi_id'   => $barangMasterSpesifikasi['id'] ?? null,
+                    'unit_id'          => $barangMasterSpesifikasi['satuan_1'] ?? null,
+                    'divisi_id'        => $divisiFirst['id'] ?? null,
+                    'warehouse_id'     => $warehouseFirst['id'] ?? null,
+                    'qty_bersih'       => $qty,
+                    'qty_diterima'     => $qty,
+                    'bc_id'            => 0,
+                    'type_bc'          => 'NON PABEAN',
+                    'reference_id'     => null,
+                    'po_type'          => null,
+                    'po_id'            => null,
+                    'reference_type'   => 'INISIASI',
+                    'status'           => 'IN',
+                    'keterangan'       => 'INISIASI',
+                ];
+
+                $dataPreview[] = [
+                    'no'               => $no,
+                    'type_barang'   => strtoupper(str_replace(['_'], ' ', $barangMasterFirst['type_barang'] ?? '')) ?? null,
+                    'divisi'        => $divisiFirst['divisi'] ?? null,
+                    'warehouse_name' => $warehouseFirst['warehouse_name'] ?? null,
+                    'kode_barang'   => $barangMasterFirst['kode_barang'] ?? null,
+                    'barang_name'   => $barangMasterFirst['barang_name'] ?? null,
+                    'spesifikasi'   => $barangMasterSpesifikasi['spesifikasi'] ?? null,
+                    'qty'           => $qty,
+                    'kode_satuan'   => $barangMasterSpesifikasi['kode_satuan'] ?? null,
+                    'status'        => $status,
+                    'message'       => $message,
+                ];
+            }
+
+            // =========================
+            // ✅ RETURN RESPONSE
+            // =========================
+            return $this->response->setJSON([
+                'data' => [
+                    'dataResult'  => $dataResult,
+                    'dataPreview' => $dataPreview
+                ],
+                'status' => true,
+                'token'  => csrf_hash()
+            ]);
+        } catch (\Throwable $e) {
+            return $this->response->setJSON([
+                'status'  => false,
+                'token'   => csrf_hash(),
+                'message' => $e->getMessage()
+            ]);
+        }
+    }
+
+    public function importInitStok()
+    {
+        $db = \Config\Database::connect();
+        $db->transBegin();
+        try {
+            foreach (json_decode($_POST['list_stock']) as $l) {
+                $data = (array)$l;
+                $this->stockRevampModel->insertStockRevamp(
+                    $db,
+                    $data
+                );
+            }
+            $db->transCommit();
+            return response()->setJSON([
+                'token' => csrf_hash(),
+                'message' => "Stok berhasil di inisiasi",
+                'status' => true
+            ]);
+        } catch (Exception $e) {
+            $db->transRollback();
+            return  response()->setJSON([
+                'status' => false,
+                'token' => csrf_hash(),
+                'message' => $e->getMessage()
+            ]);
+        }
+    }
+
+
     public function getListBarangNotInit()
     {
         try {
@@ -312,276 +538,276 @@ class StokList extends BaseController
         }
     }
 
-    public function import()
-    {
+    // public function import()
+    // {
 
-        $db = \Config\Database::connect();
-        $db->transBegin();
+    //     $db = \Config\Database::connect();
+    //     $db->transBegin();
 
-        try {
-            $rules = [
-                "file" => [
-                    'rules' => 'uploaded[file]|ext_in[file,xlsx]',
-                    'errors' => [
-                        'uploaded' => 'Tidak ada file yang di-upload.',
-                        'ext_in' => 'File yang di-upload harus berupa file Excel (.xlsx).',
-                    ],
+    //     try {
+    //         $rules = [
+    //             "file" => [
+    //                 'rules' => 'uploaded[file]|ext_in[file,xlsx]',
+    //                 'errors' => [
+    //                     'uploaded' => 'Tidak ada file yang di-upload.',
+    //                     'ext_in' => 'File yang di-upload harus berupa file Excel (.xlsx).',
+    //                 ],
 
-                ],
-            ];
+    //             ],
+    //         ];
 
-            if ($this->validate($rules)) {
+    //         if ($this->validate($rules)) {
 
-                $file = $this->request->getFile('file');
+    //             $file = $this->request->getFile('file');
 
-                $spreadsheet = IOFactory::load($file);
-                $worksheet = $spreadsheet->getActiveSheet();
+    //             $spreadsheet = IOFactory::load($file);
+    //             $worksheet = $spreadsheet->getActiveSheet();
 
-                $data = [];
-                $rowIterator = $worksheet->getRowIterator(2);
-                foreach ($rowIterator as $row) {
-                    $cellIterator = $row->getCellIterator();
-                    $rowData = [];
-                    foreach ($cellIterator as $cell) {
-                        $rowData[] = $cell->getValue();
-                    }
-                    $data[] = $rowData;
-                }
+    //             $data = [];
+    //             $rowIterator = $worksheet->getRowIterator(2);
+    //             foreach ($rowIterator as $row) {
+    //                 $cellIterator = $row->getCellIterator();
+    //                 $rowData = [];
+    //                 foreach ($cellIterator as $cell) {
+    //                     $rowData[] = $cell->getValue();
+    //                 }
+    //                 $data[] = $rowData;
+    //             }
 
-                $gagalArr = [];
-                $berhasilTotal = 0;
+    //             $gagalArr = [];
+    //             $berhasilTotal = 0;
 
-                // INSERT INVENTORI
-                for ($i = 0; $i < count($data); $i++) {
+    //             // INSERT INVENTORI
+    //             for ($i = 0; $i < count($data); $i++) {
 
-                    $type_barang = str_replace(' ', '_', strtolower(trim($data[$i][0])));
-                    $type_barang = str_replace('barang', 'bahan', $type_barang);
+    //                 $type_barang = str_replace(' ', '_', strtolower(trim($data[$i][0])));
+    //                 $type_barang = str_replace('barang', 'bahan', $type_barang);
 
-                    // VALIDASI TIPE BARANG
-                    $parentBarang = $this->parentBarangModel
-                        ->where('parent_type', trim($type_barang))
-                        ->where('parent_name', trim($data[$i][1]))
-                        ->where('company_id', $this->this_company_id)
-                        ->where('deletedAt', null)
-                        ->first();
+    //                 // VALIDASI TIPE BARANG
+    //                 $parentBarang = $this->parentBarangModel
+    //                     ->where('parent_type', trim($type_barang))
+    //                     ->where('parent_name', trim($data[$i][1]))
+    //                     ->where('company_id', $this->this_company_id)
+    //                     ->where('deletedAt', null)
+    //                     ->first();
 
-                    // VALIDASI DEPARTEMEN
-                    $divisi = $this->divisiModel
-                        ->where('company_id', $this->this_company_id)
-                        ->where(
-                            'divisi',
-                            trim($data[$i][4])
-                        )->first();
+    //                 // VALIDASI DEPARTEMEN
+    //                 $divisi = $this->divisiModel
+    //                     ->where('company_id', $this->this_company_id)
+    //                     ->where(
+    //                         'divisi',
+    //                         trim($data[$i][4])
+    //                     )->first();
 
-                    // CARI SUPPLIER BY NAME
-                    $supplier = $this->supplierModel->where('company_id', $this->this_company_id)
-                        ->where('UPPER(name)', trim($data[$i][10]))
-                        ->first();
+    //                 // CARI SUPPLIER BY NAME
+    //                 $supplier = $this->supplierModel->where('company_id', $this->this_company_id)
+    //                     ->where('UPPER(name)', trim($data[$i][10]))
+    //                     ->first();
 
-                    if ($parentBarang != null && $divisi != null) {
-                        // VALIDASI WAREHOUSE
-                        $warehouse = $this->warehouseModel->where('divisi_id', $divisi['id'])->where('code_warehouse', trim($data[$i][5]))->first();
-                        // VALIDASI JENIS DOK AJU (PABEAN)
-                        if (trim($data[$i][6]) == "NON PABEAN") {
-                            $bc_id = 0;
-                            $no_aju = "-";
-                        } else {
-                            $bc = $this->metaDataModel->where('name', 'jenis_dok_aju')->where('value', trim($data[$i][6]))->first();
-                            if ($bc != null) {
-                                $bc_id = $bc['id'];
-                                $no_aju = $data[$i][7];
-                            } else {
-                                $bc_id = null;
-                                $no_aju = null;
-                            }
-                        }
+    //                 if ($parentBarang != null && $divisi != null) {
+    //                     // VALIDASI WAREHOUSE
+    //                     $warehouse = $this->warehouseModel->where('divisi_id', $divisi['id'])->where('code_warehouse', trim($data[$i][5]))->first();
+    //                     // VALIDASI JENIS DOK AJU (PABEAN)
+    //                     if (trim($data[$i][6]) == "NON PABEAN") {
+    //                         $bc_id = 0;
+    //                         $no_aju = "-";
+    //                     } else {
+    //                         $bc = $this->metaDataModel->where('name', 'jenis_dok_aju')->where('value', trim($data[$i][6]))->first();
+    //                         if ($bc != null) {
+    //                             $bc_id = $bc['id'];
+    //                             $no_aju = $data[$i][7];
+    //                         } else {
+    //                             $bc_id = null;
+    //                             $no_aju = null;
+    //                         }
+    //                     }
 
 
-                        if ($type_barang != "kemasan") {
-                            // INI BARANG
-                            // VALIDASI BARANG
-                            $barangMaster = $this->barangMasterModel
-                                ->where('kode_barang', trim($data[$i][2]))
-                                ->where('company_id', $this->this_company_id)
-                                ->first();
+    //                     if ($type_barang != "kemasan") {
+    //                         // INI BARANG
+    //                         // VALIDASI BARANG
+    //                         $barangMaster = $this->barangMasterModel
+    //                             ->where('kode_barang', trim($data[$i][2]))
+    //                             ->where('company_id', $this->this_company_id)
+    //                             ->first();
 
-                            if ($barangMaster != null) {
-                                // SPESIFIKASI
-                                $barangMasterSpesifikasi = $this->barangMasterSpesifikasiModel
-                                    ->where('barang_master_id', $barangMaster['id'])
-                                    ->where('spesifikasi', trim($data[$i][3]))
-                                    ->first();
+    //                         if ($barangMaster != null) {
+    //                             // SPESIFIKASI
+    //                             $barangMasterSpesifikasi = $this->barangMasterSpesifikasiModel
+    //                                 ->where('barang_master_id', $barangMaster['id'])
+    //                                 ->where('spesifikasi', trim($data[$i][3]))
+    //                                 ->first();
 
-                                if ($barangMasterSpesifikasi != null) {
-                                    $spesifikasi_id = $barangMasterSpesifikasi['id'];
-                                } else {
-                                    // GAGAL
-                                    $spesifikasi_id = null;
-                                }
-                                $barang_id = $barangMaster['id'];
-                            } else {
-                                // GAGAL
-                                $barang_id = null;
-                                $spesifikasi_id = null;
-                            }
-                        } else {
-                            // INI KEMASAN
-                            $barang_id = 0;
-                            // CARI KEMASAN
-                            $kemasan = $this->kemasanModel
-                                ->where('company_id', $this->this_company_id)
-                                ->where('kode', trim($data[$i][2]))
-                                ->first();
+    //                             if ($barangMasterSpesifikasi != null) {
+    //                                 $spesifikasi_id = $barangMasterSpesifikasi['id'];
+    //                             } else {
+    //                                 // GAGAL
+    //                                 $spesifikasi_id = null;
+    //                             }
+    //                             $barang_id = $barangMaster['id'];
+    //                         } else {
+    //                             // GAGAL
+    //                             $barang_id = null;
+    //                             $spesifikasi_id = null;
+    //                         }
+    //                     } else {
+    //                         // INI KEMASAN
+    //                         $barang_id = 0;
+    //                         // CARI KEMASAN
+    //                         $kemasan = $this->kemasanModel
+    //                             ->where('company_id', $this->this_company_id)
+    //                             ->where('kode', trim($data[$i][2]))
+    //                             ->first();
 
-                            if ($kemasan != null) {
-                                $spesifikasi_id = $kemasan['id'];
-                            } else {
-                                $spesifikasi_id = null;
-                            }
-                        }
+    //                         if ($kemasan != null) {
+    //                             $spesifikasi_id = $kemasan['id'];
+    //                         } else {
+    //                             $spesifikasi_id = null;
+    //                         }
+    //                     }
 
-                        // START INISIASI
-                        // VARIABEL
-                        $warehouse_id = ($warehouse == null) ? null : $warehouse['id'];
-                        $divisi_id = ($divisi == null) ? null : $divisi['id'];
-                        $type_barang = $type_barang;
-                        $barang_id = $barang_id;
-                        $spesifikasi_id = $spesifikasi_id;
-                        $bc_id = $bc_id;
-                        $qty = $data[$i][8];
-                        $supplier_id = $supplier == null ? null : $supplier['id'];
-                        if (!empty($data[$i][9])) {
-                            // Cek apakah nilai adalah angka (format serial Excel)
-                            if (is_numeric($data[$i][9])) {
-                                $stock_date = Date::excelToDateTimeObject($data[$i][9])->format('Y-m-d');
-                            } else {
-                                $stock_date = $data[$i][9]; // Jika sudah dalam format string
-                            }
-                        } else {
-                            $stock_date = date('Y-m-d'); // Jika kosong, gunakan tanggal sekarang
-                        }
+    //                     // START INISIASI
+    //                     // VARIABEL
+    //                     $warehouse_id = ($warehouse == null) ? null : $warehouse['id'];
+    //                     $divisi_id = ($divisi == null) ? null : $divisi['id'];
+    //                     $type_barang = $type_barang;
+    //                     $barang_id = $barang_id;
+    //                     $spesifikasi_id = $spesifikasi_id;
+    //                     $bc_id = $bc_id;
+    //                     $qty = $data[$i][8];
+    //                     $supplier_id = $supplier == null ? null : $supplier['id'];
+    //                     if (!empty($data[$i][9])) {
+    //                         // Cek apakah nilai adalah angka (format serial Excel)
+    //                         if (is_numeric($data[$i][9])) {
+    //                             $stock_date = Date::excelToDateTimeObject($data[$i][9])->format('Y-m-d');
+    //                         } else {
+    //                             $stock_date = $data[$i][9]; // Jika sudah dalam format string
+    //                         }
+    //                     } else {
+    //                         $stock_date = date('Y-m-d'); // Jika kosong, gunakan tanggal sekarang
+    //                     }
 
-                        $is_init = true;
+    //                     $is_init = true;
 
-                        if ($divisi_id != null && $warehouse_id != null && $barang_id !== null && $spesifikasi_id != null && $bc_id !== null && $no_aju != null) {
-                            // CHECK STOK
-                            if (
-                                $this->stockModel->isDefinedStockMaster(
-                                    $this->this_company_id,
-                                    $warehouse_id,
-                                    $divisi_id,
-                                    $type_barang,
-                                    $barang_id,
-                                    $spesifikasi_id
-                                )
-                            ) {
+    //                     if ($divisi_id != null && $warehouse_id != null && $barang_id !== null && $spesifikasi_id != null && $bc_id !== null && $no_aju != null) {
+    //                         // CHECK STOK
+    //                         if (
+    //                             $this->stockModel->isDefinedStockMaster(
+    //                                 $this->this_company_id,
+    //                                 $warehouse_id,
+    //                                 $divisi_id,
+    //                                 $type_barang,
+    //                                 $barang_id,
+    //                                 $spesifikasi_id
+    //                             )
+    //                         ) {
 
-                                // ADA STOK MASTER
-                                $stokMaster = $this->stockModel->getStokMaster(
-                                    $this->this_company_id,
-                                    $warehouse_id,
-                                    $divisi_id,
-                                    $type_barang,
-                                    $barang_id,
-                                    $spesifikasi_id
-                                );
+    //                             // ADA STOK MASTER
+    //                             $stokMaster = $this->stockModel->getStokMaster(
+    //                                 $this->this_company_id,
+    //                                 $warehouse_id,
+    //                                 $divisi_id,
+    //                                 $type_barang,
+    //                                 $barang_id,
+    //                                 $spesifikasi_id
+    //                             );
 
-                                $stokSubDetail = $this->stockModel->isDefinedStockSubDetail(
-                                    $this->this_company_id,
-                                    $warehouse_id,
-                                    $divisi_id,
-                                    $type_barang,
-                                    $barang_id,
-                                    $spesifikasi_id,
-                                    $bc_id,
-                                    $no_aju,
-                                    $stokMaster['id']
-                                );
+    //                             $stokSubDetail = $this->stockModel->isDefinedStockSubDetail(
+    //                                 $this->this_company_id,
+    //                                 $warehouse_id,
+    //                                 $divisi_id,
+    //                                 $type_barang,
+    //                                 $barang_id,
+    //                                 $spesifikasi_id,
+    //                                 $bc_id,
+    //                                 $no_aju,
+    //                                 $stokMaster['id']
+    //                             );
 
-                                if ($stokSubDetail != null) {
-                                    // GAGAL KARENA SUDAH INISIASI
-                                    $is_init = false;
-                                } else {
-                                    // 
-                                    $is_init = true;
-                                }
-                            }
+    //                             if ($stokSubDetail != null) {
+    //                                 // GAGAL KARENA SUDAH INISIASI
+    //                                 $is_init = false;
+    //                             } else {
+    //                                 // 
+    //                                 $is_init = true;
+    //                             }
+    //                         }
 
-                            if ($is_init) {
-                                $stok = $this->stockModel->insertStok(
-                                    $this->this_company_id,
-                                    $warehouse_id,
-                                    $divisi_id,
-                                    $type_barang,
-                                    $barang_id,
-                                    $spesifikasi_id,
-                                    $qty
-                                );
+    //                         if ($is_init) {
+    //                             $stok = $this->stockModel->insertStok(
+    //                                 $this->this_company_id,
+    //                                 $warehouse_id,
+    //                                 $divisi_id,
+    //                                 $type_barang,
+    //                                 $barang_id,
+    //                                 $spesifikasi_id,
+    //                                 $qty
+    //                             );
 
-                                $stokDetail = $this->stockDetailModel->insertStokDetail(
-                                    $stok,
-                                    $qty,
-                                    "In",
-                                    $stock_date,
-                                    $this->this_user_id,
-                                    "INISIASI",
-                                    "-",
-                                    "-"
-                                );
+    //                             $stokDetail = $this->stockDetailModel->insertStokDetail(
+    //                                 $stok,
+    //                                 $qty,
+    //                                 "In",
+    //                                 $stock_date,
+    //                                 $this->this_user_id,
+    //                                 "INISIASI",
+    //                                 "-",
+    //                                 "-"
+    //                             );
 
-                                $this->stockDetail2Model->insertStokDetail2(
-                                    $bc_id,
-                                    $stok,
-                                    $stokDetail,
-                                    $qty,
-                                    $no_aju,
-                                    '-',
-                                    '-',
-                                    $supplier_id
-                                );
-                                // BERHASIL
-                                $berhasilTotal++;
-                            } else {
-                                // GAGAL
-                                array_push($gagalArr, $data[$i]);
-                            }
-                        } else {
-                            array_push($gagalArr, $data[$i]);
-                        }
-                    } else {
-                        array_push($gagalArr, $data[$i]);
-                    }
-                }
+    //                             $this->stockDetail2Model->insertStokDetail2(
+    //                                 $bc_id,
+    //                                 $stok,
+    //                                 $stokDetail,
+    //                                 $qty,
+    //                                 $no_aju,
+    //                                 '-',
+    //                                 '-',
+    //                                 $supplier_id
+    //                             );
+    //                             // BERHASIL
+    //                             $berhasilTotal++;
+    //                         } else {
+    //                             // GAGAL
+    //                             array_push($gagalArr, $data[$i]);
+    //                         }
+    //                     } else {
+    //                         array_push($gagalArr, $data[$i]);
+    //                     }
+    //                 } else {
+    //                     array_push($gagalArr, $data[$i]);
+    //                 }
+    //             }
 
-                $db->transCommit();
-                $gagalTotal = count($gagalArr);
+    //             $db->transCommit();
+    //             $gagalTotal = count($gagalArr);
 
-                return response()->setJSON([
-                    'message' => "Berhasil Import : $berhasilTotal Data, Gagal Import : $gagalTotal",
-                    'status' => true,
-                    'gagal' => $gagalArr,
-                    'token' => csrf_hash()
-                ]);
-            } else {
-                $db->transRollback();
-                $errorList = $this->validator->getErrors();
-                $data = [
-                    "status"    => false,
-                    "message"   => $errorList[array_keys($errorList)[0]],
-                    'token'     => csrf_hash()
-                ];
-                return response()->setJSON($data);
-            }
-        } catch (Exception $e) {
-            $db->transRollback();
-            $data = [
-                "status"    => false,
-                "message"   => "Terjadi Kesalahan",
-                'token'     => csrf_hash()
-            ];
-            return response()->setJSON($data);
-        }
-    }
+    //             return response()->setJSON([
+    //                 'message' => "Berhasil Import : $berhasilTotal Data, Gagal Import : $gagalTotal",
+    //                 'status' => true,
+    //                 'gagal' => $gagalArr,
+    //                 'token' => csrf_hash()
+    //             ]);
+    //         } else {
+    //             $db->transRollback();
+    //             $errorList = $this->validator->getErrors();
+    //             $data = [
+    //                 "status"    => false,
+    //                 "message"   => $errorList[array_keys($errorList)[0]],
+    //                 'token'     => csrf_hash()
+    //             ];
+    //             return response()->setJSON($data);
+    //         }
+    //     } catch (Exception $e) {
+    //         $db->transRollback();
+    //         $data = [
+    //             "status"    => false,
+    //             "message"   => "Terjadi Kesalahan",
+    //             'token'     => csrf_hash()
+    //         ];
+    //         return response()->setJSON($data);
+    //     }
+    // }
 
     public function detail($id)
     {

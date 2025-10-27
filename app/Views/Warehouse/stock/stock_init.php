@@ -9,6 +9,9 @@
                 <a class="btn btn-hide-form btn-discard float-right" href="<?= base_url("stock-list"); ?>">
                     Kembali
                 </a>
+                <a class="btn btn-hide-form btn-discard float-right" style="background-color: #628a2dff !important; color:white !important; border:none !important;" href="<?= base_url("stock-list/import"); ?>">
+                    Import Stok Awal
+                </a>
                 <button class="btn btn-show-form btn-save float-right btn-submit-parent">
                     Simpan
                 </button>
