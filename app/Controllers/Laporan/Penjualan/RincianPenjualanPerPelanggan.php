@@ -60,6 +60,7 @@ class RincianPenjualanPerPelanggan extends BaseController
             "sortType" => $this->request->getGet("sortType"),
             "filter_jenis_dokumen" => $this->request->getGet("filter_jenis_dokumen"),
             "filter_customer" => $this->request->getGet("filter"),
+            "filter_company" => '',
             "dateStart" => $this->request->getGet("dateStart") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getGet("dateStart")))) : "",
             "dateEnd" => $this->request->getGet("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getGet("dateEnd")))) : "",
         ];
