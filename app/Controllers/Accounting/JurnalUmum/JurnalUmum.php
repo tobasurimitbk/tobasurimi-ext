@@ -2468,6 +2468,7 @@ class JurnalUmum extends BaseController
 
                 $detailPembayaran = $this->otherPaymentDetailModel
                     ->where('other_payment_id', $otherPayment->id)
+                    ->where('deletedAt', null)
                     ->findAll();
 
                 $totalNominal = array_reduce($detailPembayaran, function ($carry, $item) {
