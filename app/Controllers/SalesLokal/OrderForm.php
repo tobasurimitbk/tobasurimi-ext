@@ -996,6 +996,7 @@ class OrderForm extends BaseController
 
         // (optional) setup the paper size and orientation
         $domPdf->setPaper('A4', 'landscape');
+        $domPdf->set_option('defaultFont', 'DejaVu Sans Mono');
 
         // render html as PDF
         $domPdf->render();

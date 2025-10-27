@@ -7,8 +7,8 @@
     <title>Order Form <?= $soData->customerName ?></title>
     <style>
         body {
-            font-size: 12px;
-            font-family: 'ARIAL UNICODE MS';
+            font-size: 10px;
+            font-family: 'DejaVu Sans Mono', monospace;
             font-weight: 500;
         }
 
@@ -32,7 +32,7 @@
             margin-bottom: 10px;
             display: inline-block;
             min-width: 70px;
-            font-size: 15px;
+            font-size: 13px;
         }
 
         .description-container {
@@ -149,7 +149,7 @@
                 </div>
             </td>
             <td style="width: 35%;text-align: right;">
-                <div class="txt-bold txt-center" style="font-size: 35px; margin-bottom:3px;">ORDER FORM</div>
+                <div class="txt-bold txt-center" style="font-size: 25px; margin-bottom:3px;">ORDER FORM</div>
                 <table class="w-100" style="border: 0.5px solid;border-radius: 7px;margin-right: 0">
                     <tr>
                         <td style="border-right: 0.5px solid;border-right-style: dashed">
