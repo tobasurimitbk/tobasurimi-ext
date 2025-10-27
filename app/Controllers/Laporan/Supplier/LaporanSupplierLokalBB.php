@@ -492,6 +492,10 @@ class LaporanSupplierLokalBB extends BaseController
 
     public function exportPDFPendapatanSupplier()
     {
+        ini_set('memory_limit', '-1');
+        set_time_limit(0);
+        ob_end_clean();
+        ob_start();
         $condition = [
             'rm_purchase_orders.deletedAt' => null,
             // 'rm_purchase_orders.is_posted' => '1',
@@ -805,6 +809,10 @@ class LaporanSupplierLokalBB extends BaseController
 
     public function exportPDFPendapatanSupplierPembelian()
     {
+        ini_set('memory_limit', '-1');
+        set_time_limit(0);
+        ob_end_clean();
+        ob_start();
         $condition = [
             'rm_purchase_orders.deletedAt' => null,
             // 'rm_purchase_orders.is_posted' => '1',
@@ -1063,6 +1071,10 @@ class LaporanSupplierLokalBB extends BaseController
 
     public function exportPDFLaporanRekapAllSupplier()
     {
+        ini_set('memory_limit', '-1');
+        set_time_limit(0);
+        ob_end_clean();
+        ob_start();
         $condition = [
             'rm_purchase_orders.deletedAt' => null,
             'rm_purchase_order_details.deletedAt' => null,
@@ -1472,6 +1484,10 @@ class LaporanSupplierLokalBB extends BaseController
 
     public function exportPDFLaporanRekapAllSupplierPembelian()
     {
+        ini_set('memory_limit', '-1');
+        set_time_limit(0);
+        ob_end_clean();
+        ob_start();
         $condition = [
             'rm_purchase_orders.deletedAt' => null,
             'rm_purchase_order_details.deletedAt' => null,
@@ -2306,6 +2322,10 @@ class LaporanSupplierLokalBB extends BaseController
 
     public function exportPDFLaporanRekapAllBarang()
     {
+        ini_set('memory_limit', '-1');
+        set_time_limit(0);
+        ob_end_clean();
+        ob_start();
         $condition = [
             'rm_purchase_orders.deletedAt' => null,
             'rm_purchase_order_details.deletedAt' => null,
