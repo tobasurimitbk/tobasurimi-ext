@@ -14,7 +14,7 @@
                     Import / Export
                 </button>
                 <ul class="dropdown-menu list-dropdown-company" aria-labelledby="dropdownMenuButtonExport">
-                    <!-- <li><button class="dropdown-item btn-upload-excel">Import Excel</button></li> -->
+                    <li><button class="dropdown-item btn-upload-excel">Import Excel</button></li>
                     <li><button class="dropdown-item" onclick="exportExcel()">Export Excel</button></li>
                 </ul>
             <?php endif; ?>
@@ -316,9 +316,7 @@
 
     // upload excel
     $('.btn-upload-excel').click(function() {
-        $('#file').val(null);
-        $('#import_excel_modal').modal('show');
-
+        window.location.href = "<?= base_url('stock-list/import') ?>";
     });
 
     $('.btn-discard-import-excel').click(function() {

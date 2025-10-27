@@ -1553,4 +1553,23 @@ class StockRevampModel extends Model
 
         return $dataQry->findAll(100);
     }
+
+    public function getBarangBelumDiinisiasi(
+        $company_id,
+        $divisi_id,
+        $warehouse_id,
+        $spesifikasi_id,
+        $unit_id
+    ) {
+        $stockSudahInisiasi = $this->asArray()
+            ->select('stock_revamp.*')
+            ->where('stock_revamp.company_id', $company_id)
+            ->where('stock_revamp.divisi_id', $divisi_id)
+            ->where('stock_revamp.warehouse_id', $warehouse_id)
+            ->where('stock_revamp.spesifikasi_id', $spesifikasi_id)
+            ->where('stock_revamp.unit_id', $unit_id)
+            ->where('stock_revamp.deletedAt', null)
+            ->first();
+        return $stockSudahInisiasi;
+    }
 }
