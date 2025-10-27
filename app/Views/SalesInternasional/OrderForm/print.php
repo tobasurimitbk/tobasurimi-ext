@@ -178,9 +178,9 @@
                                 <td style="width: 150px;"><?= $dataSO->sales_order_export_no ?></td>
                             </tr> -->
                             <tr style="text-align: right;">
-                                <td>CONTRACT NO</td>
+                                <td style="width: 190px;">ORDER</td>
                                 <td>:</td>
-                                <td><?= $dataSO->sales_contract_no ?></td>
+                                <td><?= $dataSO->sales_order_export_no ?></td>
                             </tr>
                             <?php if (!empty($dataSO->po_no)): ?>
                                 <tr style="text-align: right;">
