@@ -30,7 +30,8 @@
             border: 0.5px solid;
             padding: 5px;
             border-radius: 7px;
-            margin-bottom: 10px;
+            margin-top: 10px;
+            margin-bottom: 5px;
             display: inline-block;
             min-width: 70px;
             font-size: 14px;
@@ -134,8 +135,8 @@
         <tr>
             <td style="width: 70%;padding-right: 100px">
                 <div class="company-name">
-                    Toba Fish <br>
-                    <?= $companyName ?>
+                    Toba Fish
+                    (<?= $companyName ?>)
                 </div>
                 <div>
                     <table class="w-100">

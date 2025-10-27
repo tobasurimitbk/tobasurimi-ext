@@ -23,6 +23,7 @@ use App\Models\ProvincesModel;
 use App\Models\SalesOrderInvoiceModel;
 use App\Models\SatuansModel;
 use App\Models\SuratJalanModel;
+use Dompdf\Options;
 use Error;
 use ErrorException;
 use Exception;
@@ -948,6 +949,7 @@ class OrderForm extends BaseController
         echo json_encode($datas);
     }
 
+
     public function printOrder($id)
     {
         $domPdf = new Dompdf();
@@ -1032,11 +1034,29 @@ class OrderForm extends BaseController
         // return view('SalesLokal/OrderForm/print', $data);
 
         // load HTML content
+        // $html = view('SalesLokal/OrderForm/print', $data);
+
+        // // Tambahkan class num-font untuk teks yang mengandung angka 0
+        // // tapi tidak menyentuh tag HTML
+        // $html = preg_replace_callback(
+        //     '/>([^<]*0[^<]*)</', // cari teks di antara tag yang mengandung 0
+        //     function ($matches) {
+        //         return '><span class="num-font">' . $matches[1] . '</span><';
+        //     },
+        //     $html
+        // );
+        $options = new Options();
+        $options->set('isHtml5ParserEnabled', true);
+        $options->set('isRemoteEnabled', true);
+        $options->set('defaultFont', 'DejaVuSansMonoNoDot');
+
+        $domPdf = new Dompdf($options);
+        // $domPdf->loadHtml($html);
         $domPdf->loadHtml(view('SalesLokal/OrderForm/print', $data));
 
         // (optional) setup the paper size and orientation
         $domPdf->setPaper('A4', 'landscape');
-        $domPdf->set_option('defaultFont', 'DejaVu Sans Mono');
+        // $domPdf->set_option('defaultFont', 'DejaVu Sans Mono');
 
         // render html as PDF
         $domPdf->render();
@@ -1046,55 +1066,6 @@ class OrderForm extends BaseController
 
         exit();
     }
-
-    // public function generateNomorSalesOrder()
-    // {
-    //     $code = "TSI";
-    //     $currentYear = date('y'); // 2 digit
-    //     $currentMonth = date('n'); // 1-12
-    //     $romawi = ['', 'I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI', 'XII'];
-    //     $numberTemplate = $code . "/" . $romawi[$currentMonth] . "/" . $currentYear . "/";
-
-    //     $listData = $this->SalesOrderModel->asObject()
-    //         ->like('no_sales_order', $numberTemplate)
-    //         ->orderBy('no_sales_order', 'ASC') // penting: ASC buat gap detect
-    //         ->findAll();
-
-    //     $existingNumbers = [];
-
-    //     foreach ($listData as $data) {
-    //         $parts = explode('/', $data->no_sales_order);
-    //         if (isset($parts[3]) && is_numeric($parts[3])) {
-    //             $existingNumbers[] = intval($parts[3]);
-    //         }
-    //     }
-
-    //     sort($existingNumbers);
-
-    //     $nextNumber = 1;
-    //     $foundGap = false;
-
-    //     foreach ($existingNumbers as $num) {
-    //         if ($num != $nextNumber) {
-    //             $foundGap = true;
-    //             break;
-    //         }
-    //         $nextNumber++;
-    //     }
-
-    //     if (!$foundGap) {
-    //         $nextNumber = empty($existingNumbers) ? 1 : end($existingNumbers) + 1;
-    //     }
-
-    //     $paddedNumber = str_pad($nextNumber, 3, '0', STR_PAD_LEFT);
-    //     $invNumber = $numberTemplate . $paddedNumber;
-
-    //     return response()->setJSON([
-    //         'data' => $invNumber,
-    //         'token' => csrf_hash(),
-    //         'status' => true
-    //     ]);
-    // }
 
     public function generateNomorSalesOrder()
     {
