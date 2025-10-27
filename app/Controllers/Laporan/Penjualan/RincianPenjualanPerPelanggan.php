@@ -61,6 +61,7 @@ class RincianPenjualanPerPelanggan extends BaseController
             "filter_jenis_dokumen" => $this->request->getGet("filter_jenis_dokumen"),
             "filter_customer" => $this->request->getGet("filter"),
             "filter_company" => $this->request->getGet("filter_company") ?? null,
+            "filter_paid" => $this->request->getGet("filter_paid") ?? null,
             "dateStart" => $this->request->getGet("dateStart") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getGet("dateStart")))) : "",
             "dateEnd" => $this->request->getGet("dateEnd") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getGet("dateEnd")))) : "",
         ];
@@ -185,6 +186,7 @@ class RincianPenjualanPerPelanggan extends BaseController
             "filter_jenis_dokumen" => $this->request->getGet("filter_jenis_dokumen"),
             "filter_customer" => $filter == "all" ? null : $filter,
             "filter_company" => $this->request->getGet("filter_company") ?? null,
+            "filter_paid" => $this->request->getGet("filter_paid") ?? null,
             "dateStart" => $tglAwal ? date("Y-m-d", strtotime(str_replace("/", "-", $tglAwal))) : "",
             "dateEnd" => $tglAkhir ? date("Y-m-d", strtotime(str_replace("/", "-", $tglAkhir))) : "",
         ];
@@ -311,6 +313,7 @@ class RincianPenjualanPerPelanggan extends BaseController
             "filter_jenis_dokumen" => $this->request->getGet("filter_jenis_dokumen"),
             "filter_customer" => $filter == "all" ? "" : $filter,
             "filter_company" => $this->request->getGet("filter_company") ?? null,
+            "filter_paid" => $this->request->getGet("filter_paid") ?? null,
             "dateStart" => $tglAwal ? date("Y-m-d", strtotime(str_replace("/", "-", $tglAwal))) : "",
             "dateEnd" => $tglAkhir ? date("Y-m-d", strtotime(str_replace("/", "-", $tglAkhir))) : "",
         ];
