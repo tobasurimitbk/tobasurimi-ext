@@ -72,6 +72,7 @@ class Mutasi extends BaseController
         $dataResult = array();
 
         $condition = [
+            'mutasi.tipe_mutasi' => $this->request->getVar('tipe_mutasi'),
             'mutasi.company_id' => $this->this_company_id,
             'mutasi.deletedAt' => null
         ];
@@ -177,6 +178,7 @@ class Mutasi extends BaseController
         try {
             $noMutasi = $this->request->getVar('no_mutasi');
             $tanggal = formatDMYtoYMD($this->request->getVar('tanggal'));
+            $tipe_mutasi = $this->request->getVar('tipe_mutasi');
 
             $first = $this->mutasiModel
                 ->where('company_id', $this->this_company_id)
@@ -185,7 +187,7 @@ class Mutasi extends BaseController
                 ->first();
 
             if ($first != null) {
-                $noMutasi = $this->get_no_str($tanggal);
+                $noMutasi = $this->get_no_str($tanggal, $tipe_mutasi);
             }
 
             $id = $this->mutasiModel->insert([
@@ -198,6 +200,7 @@ class Mutasi extends BaseController
                 'warehouse_tujuan_id' => $this->request->getVar('warehouse_tujuan_id'),
                 'keterangan' => $this->request->getVar('keterangan'),
                 'createdBy' => $this->this_user_id,
+                'tipe_mutasi' => $this->request->getVar('tipe_mutasi'),
                 'status_posting' => 0
             ]);
 
@@ -263,7 +266,7 @@ class Mutasi extends BaseController
                 'warehouse_asal_id' => $this->request->getVar('warehouse_asal_id'),
                 'warehouse_tujuan_id' => $this->request->getVar('warehouse_tujuan_id'),
                 'keterangan' => $this->request->getVar('keterangan'),
-                'createdBy' => $this->this_user_id,
+                'tipe_mutasi' => $this->request->getVar('tipe_mutasi'),
                 'status_posting' => 0
             ]);
 
@@ -424,6 +427,8 @@ class Mutasi extends BaseController
     public function getMutasiNo()
     {
         $tanggal = $this->request->getVar('tanggal');
+        $tipe_mutasi = $this->request->getVar('tipe_mutasi');
+
         if (empty($tanggal)) {
             return response()->setJSON([
                 'status' => true,
@@ -442,7 +447,7 @@ class Mutasi extends BaseController
             ]);
         }
 
-        $no = $this->get_no_str($tanggal);
+        $no = $this->get_no_str($tanggal, $tipe_mutasi);
         return response()->setJSON([
             'status' => true,
             'data' => $no,
@@ -450,7 +455,7 @@ class Mutasi extends BaseController
         ]);
     }
 
-    private function get_no_str($tanggal)
+    private function get_no_str($tanggal, $tipe_mutasi)
     {
         $tanggalParts = explode('-', $tanggal);
         $month = $tanggalParts[1];
@@ -459,7 +464,8 @@ class Mutasi extends BaseController
         $no = $this->mutasiModel->get_no(
             $month,
             $year,
-            $this->this_company_id
+            $this->this_company_id,
+            $tipe_mutasi
         );
 
         return $no;

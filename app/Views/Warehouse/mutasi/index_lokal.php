@@ -3,9 +3,9 @@
 
 <section class="section">
     <div class="section-header">
-        <h1>Mutasi PPBKB</h1>
+        <h1>Mutasi Lokal</h1>
         <?php if (can("Inventori", "Mutasi", "c")) : ?>
-            <a href="<?= base_url('mutasi/create') ?>" type="button" class="btn btn-show-form btn-add float-right">
+            <a href="<?= base_url('mutasi/create-lokal') ?>" type="button" class="btn btn-show-form btn-add float-right">
                 <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
             </a>
         <?php endif; ?>
@@ -14,10 +14,10 @@
         <div class="card-body">
             <ul class="nav nav-tabs">
                 <li class="nav-item">
-                    <a class="nav-link" href="<?= base_url('mutasi/lokal') ?>">Mutasi Lokal</a>
+                    <a class="nav-link active" href="#">Mutasi Lokal</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link active" href="#">Mutasi PPBKB</a>
+                    <a class="nav-link" href="<?= base_url('mutasi') ?>">Mutasi PPBKB</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="<?= base_url('mutasi/global') ?>">Mutasi BC 2.7</a>
@@ -70,7 +70,6 @@
                             <th onclick="changeSort('warehouse_asal_id')">Warehouse Asal</th>
                             <th onclick="changeSort('divisi_tujuan_id')">Dept Tujuan</th>
                             <th onclick="changeSort('warehouse_tujuan_id')">Warehouse Tujuan</th>
-                            <th onclick="changeSort('ppbkb.no_ppbkb')">No PPBKB</th>
                             <th onclick="changeSort('status_posting')">Posting</th>
                             <th>Action</th>
                         </tr>
@@ -111,7 +110,7 @@
                 data.search = $("#search").val();
                 data.dateStart = $('#dateStart').val();
                 data.dateEnd = $('#dateEnd').val();
-                data.tipe_mutasi = "PPBKB";
+                data.tipe_mutasi = "LOKAL";
                 data.sort = sort;
                 data.sortType = sortType;
             }
@@ -144,9 +143,6 @@
             },
             {
                 data: "warehouse_tujuan",
-            },
-            {
-                data: "no_ppbkb",
             },
             {
                 data: "status_posting",
@@ -263,7 +259,7 @@
     });
 
     function edit(id) {
-        window.location.href = "<?= base_url('mutasi/id') ?>" + '/' + id
+        window.location.href = "<?= base_url('mutasi/id-lokal') ?>" + '/' + id
     }
 
     function posting(id) {
