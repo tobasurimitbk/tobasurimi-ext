@@ -213,6 +213,7 @@ class BukuBesar extends BaseController
             // Hitung saldo lama (fungsi model tetap dipanggil dengan array id_coa)
             $saldoLama = $this->jurnalUmumModel->getTotalSaldoLama([
                 'tanggal_awal' => $dateStart,
+                'company_id' => $this->this_company_id,
                 'id_coa' => $coaIds
             ]);
 
@@ -252,7 +253,7 @@ class BukuBesar extends BaseController
                                 'result' => $resultJurnalUmum,
                             ];
                         } else {
-                            $result[$key]['saldo_lama'] += $saldoLama;
+                            $result[$key]['saldo_lama'] = $saldoLama;
                             $result[$key]['result'] = $mergeUniqueJurnal($result[$key]['result'], $resultJurnalUmum);
                         }
 
@@ -294,7 +295,7 @@ class BukuBesar extends BaseController
                             'result' => $resultJurnalUmum,
                         ];
                     } else {
-                        $result[$key]['saldo_lama'] += $saldoLama;
+                        $result[$key]['saldo_lama'] = $saldoLama;
                         $result[$key]['result'] = $mergeUniqueJurnal($result[$key]['result'], $resultJurnalUmum);
                     }
                 }

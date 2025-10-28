@@ -125,22 +125,72 @@ class JurnalUmumModel extends Model
 
     public function getTotalSaldoLama($where)
     {
-        $totalDebit = 0;
-        $totalKredit = 0;
-        $dataJurnalUmum = $this
-            ->select('jurnal_umum.*')
-            ->where('tanggal_jurnal <=', $where['tanggal_awal'])
-            ->whereIn('id_coa', $where['id_coa'])
-            ->where('jurnal_umum.deletedAt', null)
+        if (empty($where['tanggal_awal']) || empty($where['id_coa'])) {
+            return 0;
+        }
+
+        // Tentukan company scope
+        if ($where['company_id'] == 1 || $where['company_id'] == 2) {
+            $companyId = [1, 2];
+            $companyScope = [1, 2];
+        } else if ($where['company_id'] == 15) {
+            $companyId = [15];
+            $companyScope = [15];
+        } else {
+            $companyId = [16];
+            $companyScope = [16];
+        }
+
+        $subModel = new \App\Models\Sub_AkunsModel(); // sesuaikan namespace model lu
+        $idCoa = is_array($where['id_coa']) ? $where['id_coa'] : [$where['id_coa']];
+
+        // 1️⃣ Ambil semua no_sub dari id_coa yang dikirim
+        $subList = $subModel
+            ->select('no_sub')
+            ->whereIn('id', $idCoa)
+            ->whereIn('company_id', $companyScope)
+            ->where('deletedAt', null)
             ->findAll();
 
-        foreach ($dataJurnalUmum as $d) {
-            $totalDebit += $d['debit'] ?? 0;
-            $totalKredit += $d['kredit'] ?? 0;
+       
+
+        if (empty($subList)) {
+            return 0;
         }
-        $saldoLama = $totalDebit - $totalKredit;
-        return $saldoLama;
+
+        $noSubs = array_column($subList, 'no_sub');
+
+        // 2️⃣ Ambil semua id yang punya no_sub yang sama (karena bisa duplicate antar divisi)
+        $relatedSubIds = $subModel
+            ->select('id')
+            ->whereIn('no_sub', $noSubs)
+            ->whereIn('company_id', $companyScope)
+            ->where('deletedAt', null)
+            ->findColumn('id');
+
+        if (empty($relatedSubIds)) {
+            return 0;
+        }
+
+        // 3️⃣ Query ke jurnal umum pakai semua id dan scope company
+        $row = $this
+            ->select('COALESCE(SUM(jurnal_umum.debit),0) AS total_debit, COALESCE(SUM(jurnal_umum.kredit),0) AS total_kredit')
+            ->where('jurnal_umum.tanggal_jurnal <', $where['tanggal_awal'])
+            ->whereIn('jurnal_umum.id_coa', $relatedSubIds)
+            ->whereIn('jurnal_umum.company_id', $companyId)
+            ->where('jurnal_umum.deletedAt', null)
+            ->get()
+            ->getRowArray();
+
+        $totalDebit  = (float) ($row['total_debit'] ?? 0);
+        $totalKredit = (float) ($row['total_kredit'] ?? 0);
+        
+        // var_dump($totalDebit, $totalKredit);
+        // die;
+
+        return $totalDebit - $totalKredit;
     }
+
 
     public function getListExport($condition, $addCondition, $limit = 10, $offset = 0)
     {
