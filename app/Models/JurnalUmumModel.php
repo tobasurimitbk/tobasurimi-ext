@@ -135,8 +135,8 @@ class JurnalUmumModel extends Model
             ->findAll();
 
         foreach ($dataJurnalUmum as $d) {
-            $totalDebit += ($d['debit'] ?? 0) * ($d['kurs'] ?? 1);
-            $totalKredit += ($d['kredit'] ?? 0) * ($d['kurs'] ?? 1);
+            $totalDebit += $d['debit'] ?? 0;
+            $totalKredit += $d['kredit'] ?? 0;
         }
         $saldoLama = $totalDebit - $totalKredit;
         return $saldoLama;
