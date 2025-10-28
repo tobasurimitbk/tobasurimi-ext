@@ -1457,6 +1457,10 @@ $routes->post('/mutasi/delete-global', 'Inventori\MutasiGlobal::delete', ['filte
 $routes->post('/mutasi/posting-global', 'Inventori\MutasiGlobal::posting', ['filter' => 'Auth']);
 $routes->post('/mutasi/un-posting-global', 'Inventori\MutasiGlobal::unposting', ['filter' => 'Auth']);
 
+// MUTASI LOKAL
+$routes->get('/mutasi/lokal', 'Inventori\MutasiLokal::index', ['filter' => 'Auth']);
+$routes->get('/mutasi/create-lokal', 'Inventori\MutasiLokal::create', ['filter' => 'Auth']);
+$routes->get('/mutasi/id-lokal/(:segment)', 'Inventori\MutasiLokal::detail/$1', ['filter' => 'Auth']);
 
 // PENERIMAAN BARANG LOKAL BP
 $routes->get('/penerimaan-barang-lokal-bp', 'Warehouse\PenerimaanBarangLokalBP::index', ['filter' => 'Auth']);

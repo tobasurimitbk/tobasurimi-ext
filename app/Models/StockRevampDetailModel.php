@@ -1085,7 +1085,6 @@ class StockRevampDetailModel extends Model
                 stock_revamp_detail.qty_bersih as stok_total,
                 stock_revamp_detail.qty_diterima as stok_total_diterima,
                 jasa_vendor_in.no_penerimaan_surat_jalan,
-                concat(jasa_vendor_in.no_penerimaan_surat_jalan, ' (', rm_purchase_orders.po_no, ')') AS stock_dokumen,
                 UPPER(concat(vendors.name, ' / ', suppliers.name)) AS supplier_name,
                 bc_purchase_order.no_aju,
                 vendors.id AS vendor_id,
@@ -1093,6 +1092,11 @@ class StockRevampDetailModel extends Model
                 rm_purchase_order_details.general_price as harga_umum,
                 rm_purchase_order_details.daily_price as harga_harian,
                 rm_purchase_order_details.monthly_price as harga_bulanan,
+                CASE 
+                    WHEN stock_revamp_detail.reference_type = 'PROSES REBUS' THEN concat(jasa_vendor_in.no_penerimaan_surat_jalan, ' (', rm_purchase_orders.po_no, ')')
+                    WHEN stock_revamp_detail.reference_type = 'JASA VENDOR' THEN concat(jasa_vendor_in.no_penerimaan_surat_jalan, ' (', COALESCE (rm_purchase_orders.po_no, proses_rebus.no_rebus), ')')
+                    ELSE penerimaan_barang.tanggal
+                END AS stock_dokumen,
                 CASE 
                     WHEN stock_revamp_detail.reference_type = 'PROSES REBUS' THEN proses_rebus.tanggal
                     WHEN stock_revamp_detail.reference_type = 'JASA VENDOR' THEN jasa_vendor_in.tanggal
