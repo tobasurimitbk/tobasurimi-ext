@@ -450,6 +450,12 @@ class ProductionResult extends BaseController
                         "qty_isi" => (float) $bj->qty_isi_jadi,
                     ];
                     $this->productionResultDetailModel->insert($datasbj);
+                    $this->accountBarangModel->insertAccountBarang(
+                        $this->this_company_id, 
+                        $bj->divisi_id, 
+                        $bj->barang1_id, 
+                        $bj->barang2_id
+                    );
                 }
             }
 
@@ -507,6 +513,12 @@ class ProductionResult extends BaseController
                         "harga_bulanan" => (float) isset($bd->harga_bulanan) ? $bd->harga_bulanan : 0,
                     ];
                     $this->productionResultDetailModel->insert($datasbr);
+                    $this->accountBarangModel->insertAccountBarang(
+                        $this->this_company_id, 
+                        $bd->divisi_id, 
+                        $bd->barang1_id, 
+                        $bd->barang2_id
+                    );
                 }
             }
 
@@ -531,6 +543,12 @@ class ProductionResult extends BaseController
                     "harga_bulanan" => (float) isset($bs->harga_bulanan) ? $bs->harga_bulanan : 0,
                 ];
                 $this->productionResultDetailModel->insert($datasbs);
+                    $this->accountBarangModel->insertAccountBarang(
+                        $this->this_company_id, 
+                        $bs->divisi_id, 
+                        $bs->barang1_id, 
+                        $bs->barang2_id
+                    );
             }
 
             foreach ($barangFilling as $bf) {
@@ -557,6 +575,13 @@ class ProductionResult extends BaseController
                     "harga_bulanan" => (float) isset($bf->harga_bulanan) ? $bf->harga_bulanan : 0,
                 ];
                 $this->productionResultDetailModel->insert($datasbf);
+                
+                    $this->accountBarangModel->insertAccountBarang(
+                        $this->this_company_id, 
+                        $bf->divisi_id, 
+                        $bf->barang1_id, 
+                        $bf->barang2_id
+                    );
             }
 
             $data = [
@@ -612,6 +637,13 @@ class ProductionResult extends BaseController
                             "qty_isi" => (float) $bj->qty_isi_jadi,
                         ];
                         $this->productionResultDetailModel->update($bj->production_result_detail_id, $datasbj);
+                        
+                        $this->accountBarangModel->insertAccountBarang(
+                            $this->this_company_id, 
+                            $bj->divisi_id, 
+                            $bj->barang1_id, 
+                            $bj->barang2_id
+                        );
                     }
                 } else {
                     $datasbj = [
@@ -633,6 +665,13 @@ class ProductionResult extends BaseController
                         "qty_isi" => (float) $bj->qty_isi_jadi,
                     ];
                     $this->productionResultDetailModel->insert($datasbj);
+                    
+                    $this->accountBarangModel->insertAccountBarang(
+                        $this->this_company_id, 
+                        $bj->divisi_id, 
+                        $bj->barang1_id, 
+                        $bj->barang2_id
+                    );
                 }
             }
 
@@ -644,6 +683,13 @@ class ProductionResult extends BaseController
                     "qty" => isset($bd->qty2) ? $qty2 : $qty,
                 ];
                 $this->productionResultDetailModel->update($bd->production_result_detail_id, $datasbd);
+                
+                    $this->accountBarangModel->insertAccountBarang(
+                        $this->this_company_id, 
+                        $bd->divisi_id, 
+                        $bd->barang1_id, 
+                        $bd->barang2_id
+                    );
             }
 
             foreach ($barangScrap as $bs) {
@@ -651,6 +697,13 @@ class ProductionResult extends BaseController
                     "qty" => (float) $bs->qty,
                 ];
                 $this->productionResultDetailModel->update($bs->production_result_detail_id, $datasbs);
+                
+                    $this->accountBarangModel->insertAccountBarang(
+                        $this->this_company_id, 
+                        $bs->divisi_id, 
+                        $bs->barang1_id, 
+                        $bs->barang2_id
+                    );
             }
 
             foreach ($barangFilling as $bf) {
@@ -658,6 +711,13 @@ class ProductionResult extends BaseController
                     "qty" => (float) $bf->qty,
                 ];
                 $this->productionResultDetailModel->update($bf->production_result_detail_id, $datasbf);
+                
+                $this->accountBarangModel->insertAccountBarang(
+                    $this->this_company_id, 
+                    $bf->divisi_id, 
+                    $bf->barang1_id, 
+                    $bf->barang2_id
+                );
             }
 
             $data = [
