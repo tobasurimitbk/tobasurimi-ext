@@ -49,12 +49,7 @@ class ReturPembelianImportBP extends BaseController
 
     public function index()
     {
-        $data = [
-            'dataDivisi' => $this->divisiModel->getDivisiAccess(),
-            'dataSupplier' => $this->supplierModel->getSupplierByType('INTERNASIONAL')
-        ];
-
-        return view('Warehouse/returnBarang/indexImportBP', $data);
+        return view('Warehouse/returnBarang/indexImportBP');
     }
 
     public function all()
@@ -70,74 +65,40 @@ class ReturPembelianImportBP extends BaseController
         $condition = [
             "pengembalian_barang.company_id" => $this->this_company_id,
             "pengembalian_barang.deletedAt" => null,
-            "penerimaan_barang.status_penerimaan" => "IMPORT",
-            "penerimaan_barang.tipe_bahan" => "PENOLONG",
+            "pengembalian_barang.type_return" => "IMPORT PENOLONG",
         ];
 
         $addCondition = [
             "sort"          => $this->request->getVar("sort"),
             "sortType"      => $this->request->getVar("sortType"),
             "search" => $this->request->getVar('search'),
-            "status" => $this->request->getVar("status"),
-            "divisi_id" => $this->request->getVar('divisi_id'),
-            "warehouse_id" => $this->request->getVar('warehouse_id'),
-            "supplier_id" => $this->request->getVar("supplier_id"),
-            "status_post" => $this->request->getVar('status_post'),
             "start_date" => $this->request->getVar("start_date") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("start_date")))) : "",
             "end_date" => $this->request->getVar("end_date") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("end_date")))) : "",
-            "divisi_access_id" => $this->this_divisi_access,
         ];
 
         $limit = $this->request->getVar("length");
         $offset = $this->request->getVar("start");
-        $penerimaanBarangData = $this->pengembalianBarangModel->getPengembalianBarangList($condition, $addCondition, $limit, $offset);
+        $penerimaanBarangData = $this->pengembalianBarangModel->getPengembalianBarangList(
+            $condition,
+            $addCondition,
+            $limit,
+            $offset
+        );
 
         $dataPenerimaanBarang = [];
         $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
 
         foreach ($penerimaanBarangData['data'] as $data) {
-            $status_bc = 0;
-            $dokumen_pengeluaran = $this->metaDataModel->where('id', $data->bc_pengeluaran_id)->first();
-
-            if ($data->bc_pengeluaran_id == '0') {
-                // TIDAK ADA
-                if ($data->status_post == "FINISH") {
-                    $status_bc = 1;
-                } else {
-                    $status_bc = 0;
-                }
-            } else {
-                // ADA DOKUMEN BC   
-                // 54 -> 4.1
-                // 49 -> 2.5
-                $bc25 = $this->bc25Model->where('pengembalian_barang_id', $data->id)->first();
-                $bc41 = $this->bc41Model->where('pengembalian_barang_id', $data->id)->first();
-                $bc30 = $this->bc30Model->where('pengembalian_barang_id', $data->id)->first();
-
-                if ($bc25 != null || $bc41 != null || $bc30 != null) {
-                    $status_bc = 1;
-                } else {
-                    $status_bc = 0;
-                }
-            }
-
             array_push($dataPenerimaanBarang, [
                 "no"                    => $no++,
-                "id"                    => encrypt($data->id),
-                "no_surat_jalan"        => $data->no_surat_jalan,
-                "no_penerimaan_barang"  => $data->no_penerimaan_barang,
-                "supplier_name"         => $data->supplier_name,
-                "tanggal_surat_jalan"   => $data->tanggal_surat_jalan ? date("d/m/Y", strtotime($data->tanggal_surat_jalan)) : "",
-                "divisi_name"           => $data->divisi_name,
-                "warehouse_name"        => $data->warehouse_name,
-                "status_post"           => $data->status_post,
-                "status_bc"             => $status_bc,
-                "dokumen_pengeluaran" =>
-                $data->bc_pengeluaran_id == '0'
-                    ? "NON PABEAN"
-                    : ($data->bc_pengeluaran_id == null
-                        ? "-"
-                        : $dokumen_pengeluaran['value']),
+                "id"                    => encrypt($data['id']),
+                "status_post"           => $data['status_post'],
+                "tanggal_surat_jalan"   => $data['tanggal_surat_jalan'] ? date("d/m/Y", strtotime($data['tanggal_surat_jalan'])) : "",
+                "supplier_name"         => $data['supplier_name'],
+                "no_surat_jalan"        => $data['no_surat_jalan'],
+                "multiple_spp_no"       => str_replace(',', ', ', str_replace(['[', ']', '"', "\\"], '', $data['multiple_spp_no'])),
+                "multiple_lpb_no"       => str_replace(',', ', ', str_replace(['[', ']', '"', "\\"], '', $data['multiple_lpb_no'])),
+                "status_bc"             => 0
             ]);
         }
 
@@ -149,14 +110,19 @@ class ReturPembelianImportBP extends BaseController
             "payload"           => $payload,
         ];
 
-        echo json_encode($data);
-        return;
+        return response()->setJSON($data);
     }
-
     public function create()
     {
+        $dataSupplier = $this->supplierModel
+            ->where('company_id', $this->this_company_id)
+            ->where('deletedAt', null)
+            ->where('type', "INTERNASIONAL")
+            ->orderBy('name', "ASC")
+            ->findAll();
+
         $data = [
-            'dataDivisi' => $this->divisiModel->getDivisiAccess(),
+            'dataSupplier' => $dataSupplier
         ];
 
         return view('Warehouse/returnBarang/formImportBP', $data);
@@ -165,34 +131,34 @@ class ReturPembelianImportBP extends BaseController
     public function update($id)
     {
         $id = decrypt($id);
+        $dataPengembalianBarang = $this->pengembalianBarangModel->where('id', $id)->first();
 
-        if ($this->pengembalianBarangModel->find($id) == null) {
-            return redirect()->to('retur-po-lokal-bp');
+        if ($dataPengembalianBarang == null) {
+            return redirect()->to('retur-po-import-bb');
         }
 
-        $dataPengembalianBarang = $this->pengembalianBarangModel->find($id);
         $dataPengembalianBarangDetail = $this->pengembalianBarangModel->getReturDetail(
             $id,
-            $dataPengembalianBarang['penerimaan_barang_id']
+            json_decode($dataPengembalianBarang['multiple_lpb_id']),
+            true
         );
-        $dataPenerimaanBarang = $this->penerimaanBarangModel
-            ->select('penerimaan_barang.*,warehouses.warehouse_name,suppliers.name as supplier_name')
-            ->join('suppliers', 'suppliers.id = penerimaan_barang.supplier_id', 'left')
-            ->join('warehouses', 'warehouses.id = penerimaan_barang.warehouse_id', 'left')
-            ->where('penerimaan_barang.id', $dataPengembalianBarang['penerimaan_barang_id'])
+        $dataPenerimaanBarang = $this->pengembalianBarangModel->dropdownPenerimaanBarang(
+            $dataPengembalianBarang['company_id'],
+            $dataPengembalianBarang['supplier_id'],
+            "PENOLONG",
+            "IMPORT"
+        );
+        $dataSupplier = $this->supplierModel
+            ->where('company_id', $this->this_company_id)
+            ->where('deletedAt', null)
+            ->where('type', "INTERNASIONAL")
+            ->orderBy('name', "ASC")
             ->findAll();
 
-        $resultPengembalianDetail = array();
-        foreach ($dataPengembalianBarangDetail as $d) {
-            if ($d['jml_retur'] != 0) {
-                array_push($resultPengembalianDetail, $d);
-            }
-        }
-
         $data = [
-            'dataDivisi' => $this->divisiModel->getDivisiAccess(),
+            'dataSupplier' => $dataSupplier,
             'dataPengembalianBarang' => $dataPengembalianBarang,
-            'dataPengembalianBarangDetail' => $resultPengembalianDetail,
+            'dataPengembalianBarangDetail' => $dataPengembalianBarangDetail,
             'dataPenerimaanBarang' => $dataPenerimaanBarang
         ];
 
@@ -203,39 +169,29 @@ class ReturPembelianImportBP extends BaseController
     {
         $id = decrypt($id);
 
-        if ($this->pengembalianBarangModel->find($id) == null) {
-            return redirect()->to('retur-po-lokal-bp');
-        }
+        $dataPengembalianBarang = $this->pengembalianBarangModel
+            ->select('pengembalian_barang.*,suppliers.name AS supplier_name')
+            ->join('suppliers', 'suppliers.id = pengembalian_barang.supplier_id', 'left')
+            ->where('pengembalian_barang.id', $id)
+            ->first();
 
-        $dataPengembalianBarang = $this->pengembalianBarangModel->find($id);
+        if ($dataPengembalianBarang == null) {
+            return redirect()->to('retur-po-import-bp');
+        }
         $dataPengembalianBarangDetail = $this->pengembalianBarangModel->getReturDetail(
             $id,
-            $dataPengembalianBarang['penerimaan_barang_id']
+            json_decode($dataPengembalianBarang['multiple_lpb_id']),
+            true
         );
-        $dataPenerimaanBarang = $this->penerimaanBarangModel
-            ->select('penerimaan_barang.*,warehouses.warehouse_name,suppliers.name as supplier_name,divisis.divisi')
-            ->join('suppliers', 'suppliers.id = penerimaan_barang.supplier_id', 'left')
-            ->join('warehouses', 'warehouses.id = penerimaan_barang.warehouse_id', 'left')
-            ->join('divisis', 'divisis.id = penerimaan_barang.divisi_id', 'left')
-            ->where('penerimaan_barang.id', $dataPengembalianBarang['penerimaan_barang_id'])
-            ->findAll();
 
-        $resultPengembalianDetail = array();
-        foreach ($dataPengembalianBarangDetail as $d) {
-            if ($d['jml_retur'] != 0) {
-                array_push($resultPengembalianDetail, $d);
-            }
-        }
-
+        // dd($dataPengembalianBarangDetail);
 
         $data = [
             'dataDivisi' => $this->divisiModel->getDivisiAccess(),
             'dataPengembalianBarang' => $dataPengembalianBarang,
-            'dataPengembalianBarangDetail' => $resultPengembalianDetail,
-            'dataPenerimaanBarang' => $dataPenerimaanBarang,
+            'dataPengembalianBarangDetail' => $dataPengembalianBarangDetail,
             'title' => "Retur Pembelian Import Bahan Penolong"
         ];
-
         $this->dompdf->loadHtml(view('Warehouse/returnBarang/print', $data));
         $this->dompdf->setPaper('A4', 'portrait');
         $this->dompdf->render();
@@ -245,17 +201,18 @@ class ReturPembelianImportBP extends BaseController
 
     public function dropdownPenerimaanBarang()
     {
-        $divisiId = $this->request->getVar('divisi_id');
+        $supplierId = $this->request->getVar('supplier_id');
         $dataList = $this->pengembalianBarangModel->dropdownPenerimaanBarang(
             $this->this_company_id,
-            $divisiId,
+            $supplierId,
             "PENOLONG",
             "IMPORT"
         );
 
         return response()->setJSON([
             'data' => $dataList,
-            'status' => true
+            'status' => true,
+            'token' => csrf_hash()
         ]);
     }
 }
