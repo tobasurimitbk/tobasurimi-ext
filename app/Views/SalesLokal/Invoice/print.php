@@ -9,7 +9,7 @@
         body {
             font-size: 10px;
             font-family: 'DejaVu Sans Mono';
-            /* Font monospace */
+            font-weight: 500;
         }
 
         @page {
@@ -21,7 +21,7 @@
 
         .company-name {
             font-weight: 700;
-            border: 1px solid;
+            border: 0.5px solid;
             padding: 3px;
             /* Padding diperkecil */
             border-radius: 5px;
@@ -31,7 +31,7 @@
         }
 
         .description-container {
-            border: 1px solid;
+            border: 0.5px solid;
             border-radius: 5px;
             min-height: 50px;
             margin-top: 3px;
@@ -39,7 +39,7 @@
         }
 
         .item-table {
-            border: 1px solid black;
+            border: 0.5px solid black;
             /* border luar */
             width: 100%;
             border-collapse: collapse;
@@ -50,8 +50,8 @@
         /* Semua sel: garis vertikal saja */
         .item-table th,
         .item-table td {
-            border-left: 1px solid black;
-            border-right: 1px solid black;
+            border-left: 0.5px solid black;
+            border-right: 0.5px solid black;
             border-top: none;
             border-bottom: none;
             padding: 2px 4px;
@@ -71,11 +71,11 @@
 
         /* Hanya untuk baris thead: tambahkan garis horizontal bawah */
         .item-table thead tr {
-            border-bottom: 1px solid black;
+            border-bottom: 0.5px solid black;
         }
 
         .rounded-border {
-            border: 1px solid;
+            border: 0.5px solid;
             border-radius: 5px;
             padding: 3px;
             /* Padding diperkecil */
@@ -88,7 +88,7 @@
         }
 
         .txt-bold {
-            font-weight: 700;
+            font-weight: 500;
         }
 
         .txt-center {
@@ -130,7 +130,7 @@
                 <div class="txt-bold txt-center" style="font-size: 25px;margin-bottom:2px;">Sales Invoice</div>
                 <table class="w-100 rounded-border" style="margin-left: auto;margin-right: 0">
                     <tr>
-                        <td style="border-right: 1px solid;border-right-style: dashed;width: 50%;">
+                        <td style="border-right: 0.5px solid;border-right-style: dashed;width: 50%;">
                             <div>Tgl. Faktur</div>
                             <div class="txt-center"><?= $invData->tanggal_faktur ?></div>
                         </td>
@@ -140,12 +140,12 @@
                         </td>
                     </tr>
                     <tr>
-                        <td style="border: 1px solid;border-style: dashed dashed hidden hidden">
+                        <td style="border: 0.5px solid;border-style: dashed dashed hidden hidden">
                             <div>No. PO</div>
                             <div class="txt-center"><?= $invData->no_po ?>&nbsp;</div>
                         </td>
 
-                        <td style="border-top: 1px solid;border-top-style: dashed">
+                        <td style="border-top: 0.5px solid;border-top-style: dashed">
                             <div>SJ/OF No.</div>
                             <?php
                             $unwanted_characters = array('[', '"', ']');
@@ -204,7 +204,7 @@
         </tbody>
     </table>
 
-    <table class="w-100" style="border-spacing: 3px 0;border: 1px;">
+    <table class="w-100" style="border-spacing: 3px 0;border: 0.5px;">
         <tr>
             <td style="width: 40px;" valign="top">Say : </td>
             <td class="rounded-border" style="width: 65%;" valign="top">
@@ -213,8 +213,8 @@
             <td class="rounded-border">
                 <table class="w-100" style="border-collapse: collapse">
                     <tr>
-                        <td class="txt-right" style="border-bottom: 1px solid;">DPP: </td>
-                        <td class="txt-right" style="border-bottom: 1px solid;"><?= number_format($invData->dpp) ?></td>
+                        <td class="txt-right" style="border-bottom: 0.5px solid;">DPP: </td>
+                        <td class="txt-right" style="border-bottom: 0.5px solid;"><?= number_format($invData->dpp) ?></td>
                     </tr>
                     <tr>
                         <td class="txt-right">PPN: </td>
@@ -242,7 +242,7 @@
                         <td valign="bottom">
                             <table class="signature-table">
                                 <tr style="vertical-align: top;">
-                                    <td style="height: 65px;border-bottom: 1px solid;width: 90px">Hormat Kami</td>
+                                    <td style="height: 65px;border-bottom: 0.5px solid;width: 90px">Hormat Kami</td>
                                 </tr>
                                 <tr>
                                     <td>Date: </td>
@@ -263,14 +263,14 @@
                 <div class="rounded-border">
                     <table class="w-100 txt-bold" style="border-collapse: collapse;">
                         <tr>
-                            <td style="border-right: 1px solid;width: 100px;">Total Invoice</td>
+                            <td style="border-right: 0.5px solid;width: 100px;">Total Invoice</td>
                             <td class="txt-right">Rp. <?= number_format($invData->total_invoice) ?></td>
                         </tr>
                     </table>
                 </div>
                 <table class="signature-table" style="margin-left: auto;margin-right: 0;">
                     <tr style="vertical-align: top;">
-                        <td style="height: 65px;border-bottom: 1px solid;width: 100px">Diterima Oleh</td>
+                        <td style="height: 65px;border-bottom: 0.5px solid;width: 100px">Diterima Oleh</td>
                     </tr>
                     <tr>
                         <td>Date: </td>

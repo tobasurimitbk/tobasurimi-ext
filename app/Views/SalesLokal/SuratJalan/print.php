@@ -8,7 +8,8 @@
     <style>
         body {
             font-size: 11px;
-            font-family: 'DejaVu Sans Mono', monospace;
+            font-family: 'DejaVu Sans Mono';
+            font-weight: 500;
         }
 
         @page {
@@ -20,7 +21,7 @@
 
         .company-name {
             font-weight: 700;
-            border: 1px solid;
+            border: 0.5px solid;
             padding: 5px;
             border-radius: 7px;
             margin-bottom: 10px;
@@ -29,7 +30,7 @@
         }
 
         .description-container {
-            border: 1px solid;
+            border: 0.5px solid;
             border-radius: 7px;
             height: 65px;
             margin-top: 8px;
@@ -48,19 +49,19 @@
         }
 
         .item-table {
-            border: 1px solid;
+            border: 0.5px solid;
             width: 100%;
             margin: 2px 0;
             border-collapse: collapse;
         }
 
         .item-table th {
-            border-right: 1px solid;
-            border-bottom: 1px solid;
+            border-right: 0.5px solid;
+            border-bottom: 0.5px solid;
         }
 
         .item-table td {
-            border-right: 1px solid;
+            border-right: 0.5px solid;
         }
 
         .signature-table {
@@ -69,7 +70,7 @@
         }
 
         .txt-bold {
-            font-weight: 700;
+            font-weight: 500;
         }
 
         .txt-center {
@@ -100,7 +101,7 @@
                     <table class="w-100">
                         <tr>
                             <td style="width:1px;vertical-align:top">Customer: </td>
-                            <td style="border:1px solid;border-radius:7px;padding:5px">
+                            <td style="border:0.5px solid;border-radius:7px;padding:5px">
                                 <div class="txt-bold">
                                     <?= $firstSO->customerName ?? '-' ?>
                                     <?= !empty($firstSO->phone) ? ' - ' . $firstSO->phone : '' ?>
@@ -113,9 +114,9 @@
             </td>
             <td align="right">
                 <div class="txt-bold txt-center" style="font-size:25px;margin-bottom:3px;">SURAT JALAN</div>
-                <table class="w-100" style="border:1px solid;border-radius:7px;margin-left:auto;">
+                <table class="w-100" style="border:0.5px solid;border-radius:7px;margin-left:auto;">
                     <tr>
-                        <td style="border-right:1px dashed;width:50%;">
+                        <td style="border-right:0.5px dashed;width:50%;">
                             <div>Tgl</div>
                             <div class="txt-center"><?= $sjData->shipping_date ?? '' ?></div>
                         </td>
@@ -125,7 +126,7 @@
                         </td>
                     </tr>
                     <tr>
-                        <td style="border-right:1px dashed;border-top:1px dashed;width:50%;">
+                        <td style="border-right:0.5px dashed;border-top:0.5px dashed;width:50%;">
                             <div>No. Order</div>
                             <div class="txt-center">
                                 <?php
@@ -143,7 +144,7 @@
                                 ?>
                             </div>
                         </td>
-                        <td style="border-top:1px dashed">
+                        <td style="border-top:0.5px dashed">
                             <div>PO. No.</div>
                             <div class="txt-center"><?= $sjData->no_po ?? '' ?>&nbsp;</div>
                         </td>
@@ -236,15 +237,15 @@
         <tr>
             <td colspan="2"></td>
             <td class="txt-right">Biaya Lain:</td>
-            <td class="txt-right" style="width:20%; border:1px solid; padding: 5px;">&nbsp;</td>
+            <td class="txt-right" style="width:20%; border:0.5px solid; padding: 1px;">&nbsp;</td>
         </tr>
         <tr>
             <td style="width:1px;">Terbilang</td>
-            <td style="border:1px solid;width: 400px;">
+            <td style="border:0.5px solid;width: 400px;">
                 <div><?= terbilang($totalInv) ?></div>
             </td>
             <td class="txt-right">Total Faktur:</td>
-            <td class="txt-right" style="border:1px solid;"><?= number_format($totalInv) ?></td>
+            <td class="txt-right" style="border:0.5px solid;"><?= number_format($totalInv) ?></td>
         </tr>
     </table>
 

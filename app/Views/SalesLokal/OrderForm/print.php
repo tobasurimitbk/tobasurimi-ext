@@ -58,24 +58,6 @@
             padding-right: 5px;
         }
 
-        /* .item-table {
-            border: 0.5px solid;
-            width: 100%;
-
-            margin-top: 5px;
-            margin-bottom: 10px;
-            border-collapse: collapse;
-        }
-
-        .item-table th {
-            border-right: 1px solid;
-            border-bottom: 1px solid;
-        }
-
-        .item-table td {
-            border-right: 1px solid;
-        } */
-
         .signature-table {
             margin-top: 5px;
         }
