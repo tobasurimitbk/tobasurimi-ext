@@ -81,11 +81,12 @@
                     </div>
                     <div class="col-md-3">
                         <div class="form-floating" style="height: 50px;">
-                            <select class="form-select account-select" name="account_id[]" id="account_id" multiple>
+                            <select class="form-select account-select" name="account_id[]" id="account_id" multiple onchange="updateSelectedAccounts()">
                                 <!-- Opsi akan di-load secara dinamis -->
                             </select>
                             <label for="floatingInput">Pilih Akun (COA)</label>
                         </div>
+                        <div id="selectedAccounts" class="mt-2 d-flex flex-wrap gap-2"></div>
                     </div>
                     <div class="col-md-3">
                         <div class="form-floating mb-3" style="height: 50px;">
@@ -98,24 +99,16 @@
                             <label for="floatingInput">Pilih Supplier</label>
                         </div>
                     </div>
-                    <div class="col-md-3">
+                    <!-- <div class="col-md-3">
                         <div class="form-floating mb-3" style="height: 50px;">
-                            <select class="form-select account-select" name="range_account_start_id" id="range_account_start_id">
-                                <!-- Opsi akan di-load secara dinamis -->
+                            <select class="form-select" name="search_no_transaksi" id="search_no_transaksi">
                             </select>
                             <label for="floatingInput">Range Awal Akun</label>
                         </div>
-                    </div>
+                    </div> -->
                     <div class="col-md-3">
-                        <div class="input-group">
-                            <select class="form-select account-select" name="range_account_finish_id" id="range_account_finish_id">
-                                <!-- Opsi akan di-load secara dinamis -->
-                            </select>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <button class="btn btn-outline-secondary" type="submit" name="cariTanggal">
-                            <i class="fas fa-search"></i>
+                        <button class="btn btn-outline-secondary w-50 bg-secondary" style="margin-bottom: 25px;height: 50px" type="submit" name="cariTanggal">
+                            <i class="fas fa-search me-2"></i>
                         </button>
                     </div>
 
@@ -376,6 +369,28 @@
         $form.appendTo('body').submit().remove();
     };
 
+    function printExcel(url) {
+        const formData = $('.create-form').serializeArray();
+
+        const $form = $('<form>', {
+            action: url,
+            method: 'POST',
+            target: '_blank',
+        });
+
+        $.each(formData, function(index, field) {
+            $('<input>')
+                .attr({
+                    type: 'hidden',
+                    name: field.name,
+                    value: field.value,
+                })
+                .appendTo($form);
+        });
+
+        $form.appendTo('body').submit().remove();
+    };
+
     function changeAccount() {
         $('.range_account_start_id option:selected').val(null);
         $('.range_account_finish_id option:selected').val(null);
@@ -417,6 +432,19 @@
                 })
                 $(".range_account_finish_id").val(null).change();
             }
+        });
+    }
+
+    function updateSelectedAccounts() {
+        const select = document.getElementById("account_id");
+        const selectedDiv = document.getElementById("selectedAccounts");
+        selectedDiv.innerHTML = "";
+
+        Array.from(select.selectedOptions).forEach(opt => {
+            const badge = document.createElement("span");
+            badge.className = "badge bg-primary text-white px-3 py-2";
+            badge.textContent = opt.text;
+            selectedDiv.appendChild(badge);
         });
     }
 </script>

@@ -10,6 +10,11 @@ use App\Models\HeaderAkunsModel;
 use App\Models\MetadataModel;
 use App\Models\JurnalUmumModel;
 use App\Models\SupplierModel;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+use PhpOffice\PhpSpreadsheet\Style\Border;
+use PhpOffice\PhpSpreadsheet\Style\Alignment;
+use PhpOffice\PhpSpreadsheet\Style\Fill;
 use Dompdf\Dompdf;
 
 class BukuBesar extends BaseController
@@ -528,5 +533,162 @@ class BukuBesar extends BaseController
         $dompdf->setPaper('A4', 'portrait');
         $dompdf->render();
         $dompdf->stream("Laporan Jurnal Umum ", array("Attachment" => false));
+    }
+
+    public function exportExcel()
+    {
+        if (!empty($this->request->getPost('dateStart')) && !empty($this->request->getPost('jenis_account')) && ($this->request->getPost('account_id') || $this->request->getPost('range_account_start_id'))) {
+            
+            // Get data dari function yang sudah ada
+            $dataJurnalUmum = $this->getDataBukuBesar();
+            
+            if (empty($dataJurnalUmum)) {
+                return $this->response->setJSON(['success' => false, 'message' => 'Tidak ada data untuk di-export']);
+            }
+
+            try {
+                // Create new Spreadsheet
+                $spreadsheet = new Spreadsheet();
+                $sheet = $spreadsheet->getActiveSheet();
+                
+                // Set judul dan informasi header
+                $title = "LAPORAN BUKU BESAR";
+                $sheet->setCellValue('A1', $title);
+                $sheet->mergeCells('A1:H1');
+                
+                $periode = "Periode: " . $this->request->getPost('dateStart') . " s/d " . $this->request->getPost('dateEnd');
+                $sheet->setCellValue('A2', $periode);
+                $sheet->mergeCells('A2:H2');
+                
+                // Header tabel
+                $headers = [
+                    'No',
+                    'Tanggal',
+                    'No. Transaksi', 
+                    'Keterangan',
+                    'Jenis Transaksi',
+                    'Debit',
+                    'Kredit',
+                    'Saldo'
+                ];
+                
+                $sheet->fromArray($headers, NULL, 'A4');
+                
+                // Styling header
+                $headerStyle = [
+                    'font' => ['bold' => true, 'color' => ['rgb' => 'FFFFFF']],
+                    'fill' => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['rgb' => '2C3E50']],
+                    'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER],
+                    'borders' => ['allBorders' => ['borderStyle' => Border::BORDER_THIN]]
+                ];
+                
+                $sheet->getStyle('A4:H4')->applyFromArray($headerStyle);
+                
+                $row = 5;
+                $no = 1;
+                
+                // Loop melalui setiap account
+                foreach ($dataJurnalUmum as $accountNumber => $accountData) {
+                    // Header untuk setiap account
+                    $sheet->setCellValue('A' . $row, 'Account: ' . $accountNumber . ' - ' . $accountData['name']);
+                    $sheet->mergeCells('A' . $row . ':H' . $row);
+                    $sheet->getStyle('A' . $row . ':H' . $row)->applyFromArray([
+                        'font' => ['bold' => true],
+                        'fill' => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['rgb' => 'E8F4FD']],
+                        'borders' => ['allBorders' => ['borderStyle' => Border::BORDER_THIN]]
+                    ]);
+                    $row++;
+                    
+                    // Tampilkan saldo awal
+                    $sheet->setCellValue('A' . $row, '');
+                    $sheet->setCellValue('B' . $row, '');
+                    $sheet->setCellValue('C' . $row, '');
+                    $sheet->setCellValue('D' . $row, 'SALDO AWAL');
+                    $sheet->setCellValue('E' . $row, '');
+                    $sheet->setCellValue('F' . $row, '');
+                    $sheet->setCellValue('G' . $row, '');
+                    $sheet->setCellValue('H' . $row, $accountData['saldo_lama']);
+                    
+                    $sheet->getStyle('A' . $row . ':H' . $row)->applyFromArray([
+                        'font' => ['bold' => true],
+                        'fill' => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['rgb' => 'F0F0F0']]
+                    ]);
+                    $row++;
+                    
+                    $runningBalance = $accountData['saldo_lama'];
+                    
+                    // Loop melalui setiap transaksi
+                    foreach ($accountData['result'] as $transaction) {
+                        $sheet->setCellValue('A' . $row, $no++);
+                        $sheet->setCellValue('B' . $row, date('d/m/Y', strtotime($transaction['tanggal_jurnal'])));
+                        $sheet->setCellValue('C' . $row, $transaction['no_transaksi']);
+                        $sheet->setCellValue('D' . $row, $transaction['keterangan']);
+                        $sheet->setCellValue('E' . $row, $transaction['jenis_transaksi']);
+                        $sheet->setCellValue('F' . $row, (float)$transaction['debit']);
+                        $sheet->setCellValue('G' . $row, (float)$transaction['kredit']);
+                        
+                        // Hitung running balance
+                        $runningBalance += (float)$transaction['debit'] - (float)$transaction['kredit'];
+                        $sheet->setCellValue('H' . $row, $runningBalance);
+                        
+                        $row++;
+                    }
+                    
+                    // Tambahkan baris kosong antara account
+                    $row++;
+                }
+                
+                // Apply styling untuk data
+                $dataStyle = [
+                    'borders' => ['allBorders' => ['borderStyle' => Border::BORDER_THIN]],
+                    'alignment' => ['horizontal' => Alignment::HORIZONTAL_LEFT]
+                ];
+                
+                $lastRow = $row - 1;
+                $sheet->getStyle('A5:H' . $lastRow)->applyFromArray($dataStyle);
+                
+                // Format number untuk kolom debit, kredit, saldo
+                $sheet->getStyle('F5:H' . $lastRow)
+                    ->getNumberFormat()
+                    ->setFormatCode('#,##0.00');
+                
+                // Auto size columns
+                foreach (range('A', 'H') as $column) {
+                    $sheet->getColumnDimension($column)->setAutoSize(true);
+                }
+                
+                // Center alignment untuk beberapa kolom
+                $sheet->getStyle('A:A')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+                $sheet->getStyle('B:B')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+                $sheet->getStyle('F:H')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_RIGHT);
+                
+                // Set judul utama
+                $sheet->getStyle('A1')->getFont()->setBold(true)->setSize(16);
+                $sheet->getStyle('A1')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+                $sheet->getStyle('A2')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+                
+                // Prepare download
+                $filename = 'Buku_Besar_' . date('Y_m_d_His') . '.xlsx';
+                
+                header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+                header('Content-Disposition: attachment;filename="' . $filename . '"');
+                header('Cache-Control: max-age=0');
+                
+                $writer = new Xlsx($spreadsheet);
+                $writer->save('php://output');
+                exit();
+                
+            } catch (\Exception $e) {
+                return $this->response->setJSON([
+                    'success' => false, 
+                    'message' => 'Error generating Excel: ' . $e->getMessage()
+                ]);
+            }
+        } else {
+            return $this->response->setJSON([
+                'success' => false, 
+                'message' => 'Parameter tidak lengkap'
+            ]);
+        }
     }
 }

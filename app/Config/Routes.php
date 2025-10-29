@@ -2722,7 +2722,7 @@ $routes->get('/laporan-accounting/labarugi/printExcel/(:segment)/(:segment)', 'L
 $routes->get('/laporan-accounting/bukubesar', 'Laporan\Accounting\BukuBesar::index', ['filter' => 'Auth']);
 $routes->post('/laporan-accounting/bukubesar', 'Laporan\Accounting\BukuBesar::index', ['filter' => 'Auth']);
 $routes->post('/laporan-accounting/bukubesar/printPDF', 'Laporan\Accounting\BukuBesar::exportPDF', ['filter' => 'Auth']);
-$routes->get('/laporan-accounting/bukubesar/printExcel/(:segment)/(:segment)/(:segment)', 'Laporan\Accounting\BukuBesar::exportExcel/$1/$2/$3', ['filter' => 'Auth']);
+$routes->post('/laporan-accounting/bukubesar/printExcel', 'Laporan\Accounting\BukuBesar::exportExcel', ['filter' => 'Auth']);
 $routes->get('/laporan-accounting/bukubesar/dropdown-account', 'Laporan\Accounting\BukuBesar::dropdownAccount', ['filter' => 'Auth']);
 $routes->get('/laporan-accounting/bukubesar/get-sub-akun', 'Laporan\Accounting\BukuBesar::searchAccounts', ['filter' => 'Auth']);
 
