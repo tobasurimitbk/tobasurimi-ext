@@ -14,52 +14,10 @@
         <div class="card-body">
             <?= csrf_field() ?>
             <div class="row mb-4">
-                <div class="col-sm-3 mt-2">
-                    <div class="form-floating">
-                        <select class="form-select divisi_id" id="divisi_id" name="divisi_id">
-                            <option value=""></option>
-                            <?php foreach ($dataDivisi as $divisi) : ?>
-                                <option value="<?= $divisi["id"]; ?>"><?= strtoupper($divisi["divisi"]); ?></option>
-                            <?php endforeach; ?>
-                        </select>
-                        <label style="z-index: 1;">Departemen</label>
-                    </div>
-                </div>
-                <div class="col-sm-3 mt-2">
-                    <div class="form-floating">
-                        <select class="form-select warehouse_id" id="warehouse_id" name="warehouse_id">
-                            <option value=""></option>
-
-                        </select>
-                        <label style="z-index: 1;">Warehouse</label>
-                    </div>
-                </div>
-                <div class="col-sm-3 mt-2">
-                    <div class="form-floating">
-                        <select class="form-select supplier_id" id="supplier_id" name="supplier_id">
-                            <option value=""></option>
-                            <?php foreach ($dataSupplier as $d): ?>
-                                <option value="<?= $d['id'] ?>"><?= $d['name'] ?></option>
-                            <?php endforeach; ?>
-                        </select>
-                        <label style="z-index: 1;">Supplier</label>
-                    </div>
-                </div>
-                <div class="col-sm-3 mt-2">
-                    <div class="form-floating">
-                        <select class="form-select status" id="status_post" name="status_post">
-                            <option value="">SEMUA</option>
-                            <option value="FINISH">FINISH</option>
-                            <option value="WAITING">WAITING</option>
-                        </select>
-                        <label style="z-index: 1;">Status Posting</label>
-                    </div>
-                </div>
-
-                <div class="col-sm-3 mt-2">
+                <div class="col-sm-4 mt-2">
                     <div class="input-group">
                         <div class="form-floating" style="height: 50px;">
-                            <input placeholder="" class="form-control start_date" id="start_date" name="start_date" />
+                            <input placeholder="" class="form-control start_date" id="start_date" name="start_date" value="01/<?= date('m/Y') ?>" />
                             <label style="z-index: 1;" style="z-index: 1;">Tanggal Awal</label>
                         </div>
                         <div class="input-group-append" style="height:50px;">
@@ -69,7 +27,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-sm-3 mt-2">
+                <div class="col-sm-4 mt-2">
                     <div class="input-group">
                         <div class="form-floating" style="height: 50px;">
                             <input placeholder="" class="form-control end_date" id="end_date" name="end_date" />
@@ -82,7 +40,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-sm-3 mt-2">
+                <div class="col-sm-4 mt-2">
                     <div class="form-floating" style="height: 50px;">
                         <input placeholder="" class="form-control search" id="search" name="search" />
                         <label style="z-index: 1;" style="z-index: 1;">Cari Data </label>
@@ -94,17 +52,14 @@
                     <thead class="thead-dark">
                         <tr>
                             <th>No</th>
+                            <th onclick="changeSort('supplier_id')">Supplier</th>
+                            <th onclick="changeSort('tanggal_surat_jalan')">Tgl Retur</th>
                             <th onclick="changeSort('no_surat_jalan')">No Surat Jalan</th>
-                            <th onclick="changeSort('no_penerimaan_barang')">No LPB</th>
-                            <th onclick="changeSort('suppliers.name')">Supplier</th>
-                            <th onclick="changeSort('tanggal_surat_jalan')">Tanggal Retur</th>
-                            <th onclick="changeSort('divisi')">Departemen</th>
-                            <th onclick="changeSort('warehouse')">Warehouse</th>
-                            <th>Dokumen Pengeluaran</th>
+                            <th onclick="changeSort('multiple_lpb_id')">No Lpb</th>
                             <th>Action</th>
                         </tr>
                     </thead>
-                    <tbody class="body-table" id="body-table" style="cursor: pointer;">
+                    <tbody class="body-table" id="body-table">
                     </tbody>
                 </table>
             </div>
@@ -116,12 +71,11 @@
 
 
 <script>
-    let sort = "createdAt";
+    let sort = "tanggal_surat_jalan";
     let sortType = "desc";
     const csrfToken = '<?= csrf_token() ?>';
 
     const table = $('.dataTable').DataTable({
-
         processing: true,
         serverSide: true,
         ordering: true,
@@ -139,10 +93,6 @@
             dataSrc: "data",
             data: function(data) {
                 data.search = $("#search").val();
-                data.status_post = $("#status_post").val();
-                data.divisi_id = $("#divisi_id").val();
-                data.warehouse_id = $("#warehouse_id").val();
-                data.supplier_id = $("#supplier_id").val();
                 data.start_date = $('#start_date').val();
                 data.end_date = $('#end_date').val();
                 data.sort = sort;
@@ -162,34 +112,20 @@
                 orderable: false
             },
             {
-                data: "no_surat_jalan",
-                className: "text-center"
-            },
-            {
-                data: "no_penerimaan_barang",
-                className: "text-center"
-            },
-            {
                 data: "supplier_name",
-                className: "text-center",
+                className: "text-left"
             },
             {
                 data: "tanggal_surat_jalan",
-                className: "text-center"
+                className: "text-left"
             },
             {
-                data: "divisi_name",
-                className: "text-center",
+                data: "no_surat_jalan",
+                className: "text-left",
             },
             {
-                data: "warehouse_name",
-                className: "text-center"
-            },
-            {
-                data: "dokumen_pengeluaran",
-                className: "text-center",
-                searchable: false,
-                sortable: false,
+                data: "multiple_lpb_no",
+                className: "text-left",
             },
             {
                 data: "id",
@@ -204,6 +140,11 @@
                     if (status_post === "WAITING") {
                         return `
                         <div class="mt-0">
+                        <?php if (can('Retur Pembelian', 'Retur Import BP', 'u')): ?>
+                                <a href="<?= base_url("retur-po-import-bp/id"); ?>/${id}" data-toggle="tooltip" title="Edit" class="btn btn-primary">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                            <?php endif ?>
                             <?php if (can('Retur Pembelian', 'Retur Import BP', 'p')) : ?>
                                 <button data-toggle="tooltip" title="Print" class="btn btn-warning btn-print" onclick="print('<?= base_url("retur-po-import-bp/print/"); ?>${id}')" style="box-shadow: none !important;">
                                     <i class="fa fa-print fa-sm" aria-hidden="true"></i>
@@ -224,6 +165,11 @@
                     } else {
                         var string = '';
                         string = `
+                        <?php if (can('Retur Pembelian', 'Retur Import BP', 'u')): ?>
+                                <a href="<?= base_url("retur-po-import-bp/id"); ?>/${id}" data-toggle="tooltip" title="Edit" class="btn btn-primary">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                            <?php endif ?>
                             <?php if (can('Retur Pembelian', 'Retur Import BP', 'p')) : ?>
                                 <button data-toggle="tooltip" title="Print" class="btn btn-warning btn-print" onclick="print('<?= base_url("retur-po-import-bp/print/"); ?>${id}')" style="box-shadow: none !important;">
                                     <i class="fa fa-print fa-sm" aria-hidden="true"></i>
@@ -284,55 +230,14 @@
         autoclose: true
     })
 
-    $('#divisi_id').select2({
-        placeholder: "Pilih Departemen",
-        theme: "bootstrap-5",
-        allowClear: true
-    }).change(function() {
-        // GET WAREHOUSES
-        getWarehouse();
-        // RELOAD
-        table.ajax.reload();
-    });
-    $('#warehouse_id').select2({
-        placeholder: "Pilih Warehouse",
-        theme: "bootstrap-5",
-        allowClear: true
-    }).change(function() {
+    $('#start_date,#end_date').change(function() {
         // RELOAD
         table.ajax.reload();
     });
 
-    $('#supplier_id').select2({
-        placeholder: "Pilih Supplier",
-        theme: "bootstrap-5",
-        allowClear: true
-    }).change(function() {
-        // RELOAD
+    $('#search').keyup(function(e) {
+        e.preventDefault();
         table.ajax.reload();
-    });
-
-    $('#status_post').select2({
-        placeholder: "Pilih Status Posting",
-        theme: "bootstrap-5",
-        allowClear: true
-    }).change(function() {
-        // RELOAD
-        table.ajax.reload();
-    });
-
-    $("#divisi_id,#warehouse_id,#supplier_id,#status_post")
-        .parent('div')
-        .children('span')
-        .children('span')
-        .children('span')
-        .children('span')
-        .css('margin-top', '22px').css('margin-left', '-7px');
-
-
-    $('#dataTable tbody').on('click', 'tr td:not(.actions):not(.dataTables_empty)', function() {
-        const data = table.row(this).data();
-        location.replace(`<?= base_url("retur-po-import-bp/id"); ?>/${data.id}`);
     });
 
     $('#start_date,#end_date').change(function() {

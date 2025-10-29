@@ -11,12 +11,6 @@
             font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
         }
 
-        @page {
-            size: 8.27in 5.50in landscape;
-            margin: 25px;
-            padding: 25px;
-        }
-
         .header {
             display: flex;
             justify-content: space-between;
@@ -120,7 +114,7 @@
                     <div><span class="txt-bold">No. Surat Jalan : <?= $dataPengembalianBarang['no_surat_jalan']; ?></span></div>
                 </td>
                 <td>
-                    <div><span class="txt-bold">Supplier : <?= $dataPenerimaanBarang[0]['supplier_name']; ?></span></div>
+                    <div><span class="txt-bold">Supplier : <?= $dataPengembalianBarang['supplier_name']; ?></span></div>
                 </td>
                 <td>
                     <div><span class="txt-bold">Tanggal Retur: <?= date('d/m/Y', strtotime($dataPengembalianBarang['tanggal_surat_jalan'])) ?></span></div>
@@ -128,52 +122,50 @@
             </tr>
             <tr>
                 <td>
-                    <div><span class="txt-bold">Departemen : <?= $dataPenerimaanBarang[0]['divisi'] ?></span></div>
-                </td>
-                <td>
-                    <div><span class="txt-bold">Gudang: <?= $dataPenerimaanBarang[0]['warehouse_name']; ?></span></div>
-                </td>
-                <td>
                     <div><span class="txt-bold">Keterangan: <?= $dataPengembalianBarang['keterangan']; ?></span></div>
                 </td>
+                <td></td>
+                <td></td>
             </tr>
         </table>
         <table class="item-table mt-050">
             <tr>
-                <th class="txt-left" style="text-align:center; width: 30px;">No</th>
-                <th class="txt-left" style="text-align:center; width: 100px;">Nama Barang</th>
-                <th class="txt-left" style="text-align:center; width: 40px;">No PO</th>
-                <th class="txt-left" style="text-align:center; width: 30px;">Jml Diterima</th>
-                <th class="txt-left" style="text-align:center; width: 60px;">Jml Retur</th>
-                <th class="txt-left" style="text-align:center; width: 60px;">Satuan</th>
-                <th class="txt-left" style=" text-align:center; width: 150px;">Keterangan</th>
+                <th class="txt-left" style="width: 30px;">No</th>
+                <th class="txt-left" style="width: 30px;">Kode</th>
+                <th class="txt-left" style="width: 60px;">Barang</th>
+                <th class="txt-left" style="width: 60px;">Spesifikasi</th>
+                <th class="txt-left" style="width: 60px;">Satuan</th>
+                <th class="txt-left" style="width: 60px;">Jml Retur</th>
+                <th class="txt-left" style="width: 60px;">Harga Retur</th>
+                <th class="txt-left" style=" width: 150px;">Keterangan</th>
             </tr>
 
             <?php
             $no = 1;
-            $jml_diterima = 0;
             $jml_retur = 0;
+            $sub_total_retur = 0;
+
             ?>
             <?php foreach ($dataPengembalianBarangDetail as $detail) : ?>
                 <?php
-                $jml_diterima += $detail['jml_diterima'];
-                $jml_retur += $detail['jml_retur'];
+                $jml_retur += $detail['jumlah_return'];
+                $sub_total_retur += $detail['total_harga_return'];
                 ?>
                 <tr>
-                    <td class="txt-center" style="text-align:center;"><?= $no++; ?></td>
-                    <td class="txt-left" style="text-align:center;"><?= $detail['nama_barang'] ?></td>
-                    <td class="txt-right" style="text-align:center;"><?= $detail["no_po"]; ?></td>
-                    <td class="txt-left" style="text-align:center;"><?= $detail["jml_diterima"]; ?></td>
-                    <td class="txt-left" style="text-align:center;"><?= $detail["jml_retur"]; ?></td>
-                    <td class="txt-left" style="text-align:center;"><?= $detail["kode_satuan"]; ?></td>
-                    <td class="txt-left" style="text-align:center;"><?= $detail["ket_retur"]; ?></td>
+                    <td class="txt-center"><?= $no++; ?></td>
+                    <td class="txt-left"><?= $detail["kode_barang"]; ?></td>
+                    <td class="txt-left"><?= $detail['barang_name']; ?></td>
+                    <td class="txt-left"><?= $detail['spesifikasi']; ?></td>
+                    <td class="txt-left"><?= $detail['kode_satuan']; ?></td>
+                    <td class="txt-left"><?= number_format($detail["jumlah_return"], 2); ?></td>
+                    <td class="txt-left"><?= number_format($detail["total_harga_return"], 2); ?></td>
+                    <td class="txt-left"><?= $detail["keterangan_return"]; ?></td>
                 </tr>
             <?php endforeach; ?>
             <tr>
-                <td class="txt-left" style="padding-left: 5px" colspan="3"><b>TOTAL</b></td>
-                <td class="txt-right" style="text-align:center;"><?= $jml_diterima ?></td>
-                <td class="txt-right" style="text-align:center;"><?= $jml_retur ?></td>
-                <td></td>
+                <td class="txt-left" style="padding-left: 5px" colspan="5"><b>TOTAL</b></td>
+                <td class="txt-left"><?= number_format($jml_retur, 2); ?></td>
+                <td class="txt-left"><?= number_format($sub_total_retur, 2); ?></td>
                 <td></td>
             </tr>
         </table>
