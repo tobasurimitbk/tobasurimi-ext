@@ -312,275 +312,300 @@ class POLokalBahanBaku extends BaseController
 
     public function savePOLokalBahanBaku()
     {
+        $db = \Config\Database::connect();
+        $db->transBegin();
 
-        if ($this->this_company_id == 16) {
-            // Untuk Ocs
-            $first = $this->RMPurchaseOrderModel
-                ->select('rm_purchase_orders.*,companies.company')
-                ->join('companies', 'companies.id = rm_purchase_orders.company_id', 'left')
-                ->where('po_no', $this->request->getVar("po_no"))
-                ->where('company_id', $this->this_company_id)
-                ->first();
-        } else {
-            // Kim 1 2 Global Gabung Nomornya
-            $first = $this->RMPurchaseOrderModel
-                ->select('rm_purchase_orders.*,companies.company')
-                ->join('companies', 'companies.id = rm_purchase_orders.company_id', 'left')
-                ->where('po_no', $this->request->getVar("po_no"))
-                ->where('company_id !=', 16)
-                ->first();
-        }
+        try {
+            if ($this->this_company_id == 16) {
+                // Untuk Ocs
+                $first = $this->RMPurchaseOrderModel
+                    ->select('rm_purchase_orders.*,companies.company')
+                    ->join('companies', 'companies.id = rm_purchase_orders.company_id', 'left')
+                    ->where('po_no', $this->request->getVar("po_no"))
+                    ->where('company_id', $this->this_company_id)
+                    ->first();
+            } else {
+                // Kim 1 2 Global Gabung Nomornya
+                $first = $this->RMPurchaseOrderModel
+                    ->select('rm_purchase_orders.*,companies.company')
+                    ->join('companies', 'companies.id = rm_purchase_orders.company_id', 'left')
+                    ->where('po_no', $this->request->getVar("po_no"))
+                    ->where('company_id !=', 16)
+                    ->first();
+            }
 
-        $po_date = $this->request->getVar("po_date") ? date_format(date_create_from_format("d/m/Y", $this->request->getVar("po_date")), "Y-m-d") : "";
+            $po_date = $this->request->getVar("po_date") ? date_format(date_create_from_format("d/m/Y", $this->request->getVar("po_date")), "Y-m-d") : "";
 
-        if ($first != null) {
-            // GENERATE YANG BARU
-            $po_no = $this->getNumberPoStr($po_date);
-        } else {
-            // AMBIL YANG LAMA
-            $po_no = $this->request->getVar("po_no");
-        }
+            if ($first != null) {
+                // GENERATE YANG BARU
+                $po_no = $this->getNumberPoStr($po_date);
+            } else {
+                // AMBIL YANG LAMA
+                $po_no = $this->request->getVar("po_no");
+            }
 
-        $statusEksternal = "no";
-        if (session()->get('login')->user_id == 119) {
-            // Jika user bu nopita
-            $statusEksternal = "yes";
-        }
+            $statusEksternal = "no";
+            if (session()->get('login')->user_id == 119) {
+                // Jika user bu nopita
+                $statusEksternal = "yes";
+            }
 
-        $id = $this->RMPurchaseOrderModel->insert([
-            'company_id' => $this->this_company_id,
-            "warehouse_id" => $this->request->getVar("warehouse_id"),
-            "purchase_request_id" => $this->request->getVar('spp_id'),
-            "supplier_id" => $this->request->getVar("supplier_id"),
-            "barang_id" => $this->request->getVar("barang_id"),
-            "divisi_id" => $this->request->getVar('divisi_id'),
-            "bc_type" => $this->request->getVar("bc_type"),
-            "kemasan_id" => $this->request->getVar('kemasan_id'),
-            "jumlah_kemasan" => $this->request->getVar('jumlah_kemasan'),
-            "kemasan_tambahan" => $this->request->getVar('kemasan_tambahan'),
-            "po_no" =>  $po_no,
-            "po_date" => $po_date,
-            "pph" => $this->request->getVar("pph"),
-            "cong_sebenarnya" => $this->request->getVar("cong_sebenarnya") ? formatter($this->request->getVar("cong_sebenarnya"), "STR_TO_INT") : 0,
-            "cong_batasan" => $this->request->getVar("cong_batasan") ? formatter($this->request->getVar("cong_batasan"), "STR_TO_INT") : 0,
-            "subsidi_langsung" => $this->request->getVar("subsidi_langsung") ? formatter($this->request->getVar("subsidi_langsung"), "STR_TO_INT") : 0,
-            "total" => $this->request->getVar("total") ? formatter($this->request->getVar("total"), "STR_TO_INT") : 0,
-            "is_posted" => false,
-            "createdBy" => session()->get("login")->user_id,
-            'status_external' => $statusEksternal
-        ]);
-
-        $this->sppModel->update($this->request->getVar('spp_id'), [
-            'request_status' => 'finished'
-        ]);
-
-        foreach (json_decode($this->request->getVar("items")) as $r) {
-            $this->RMPurchaseOrderDetailModel->insert([
-                'rm_purchase_order_id' => $id,
-                'supplier_harga_id' => $r->supplier_harga_id,
-                'barang1_id' =>  $this->request->getVar("barang_id"),
-                'barang2_id' => $r->spesifikasi_id,
-                'satuan_id' => $r->satuan_id,
-                'peti' => $r->peti,
-                'quality' => $r->quality,
-                'note' => $r->keterangan,
-                'qty' => $r->qty,
-                'qty_diterima' => 0,
-                'remaining_qty' => $r->qty,
-                'general_price' => $r->harga,
-                'daily_price' => $r->daily_price,
-                'monthly_price' => $r->monthly_price
+            $id = $this->RMPurchaseOrderModel->insert([
+                'company_id' => $this->this_company_id,
+                "warehouse_id" => $this->request->getVar("warehouse_id"),
+                "purchase_request_id" => $this->request->getVar('spp_id'),
+                "supplier_id" => $this->request->getVar("supplier_id"),
+                "barang_id" => $this->request->getVar("barang_id"),
+                "divisi_id" => $this->request->getVar('divisi_id'),
+                "bc_type" => $this->request->getVar("bc_type"),
+                "kemasan_id" => $this->request->getVar('kemasan_id'),
+                "jumlah_kemasan" => $this->request->getVar('jumlah_kemasan'),
+                "kemasan_tambahan" => $this->request->getVar('kemasan_tambahan'),
+                "po_no" =>  $po_no,
+                "po_date" => $po_date,
+                "pph" => $this->request->getVar("pph"),
+                "cong_sebenarnya" => $this->request->getVar("cong_sebenarnya") ? formatter($this->request->getVar("cong_sebenarnya"), "STR_TO_INT") : 0,
+                "cong_batasan" => $this->request->getVar("cong_batasan") ? formatter($this->request->getVar("cong_batasan"), "STR_TO_INT") : 0,
+                "subsidi_langsung" => $this->request->getVar("subsidi_langsung") ? formatter($this->request->getVar("subsidi_langsung"), "STR_TO_INT") : 0,
+                "total" => $this->request->getVar("total") ? formatter($this->request->getVar("total"), "STR_TO_INT") : 0,
+                "is_posted" => false,
+                "createdBy" => session()->get("login")->user_id,
+                'status_external' => $statusEksternal
             ]);
-            $this->accountBarangModel->insertAccountBarang($this->this_company_id, $this->request->getVar('divisi_id'), $this->request->getVar("barang_id"), $r->spesifikasi_id);
+
+            $this->sppModel->update($this->request->getVar('spp_id'), [
+                'request_status' => 'finished'
+            ]);
+
+            foreach (json_decode($this->request->getVar("items")) as $r) {
+                $this->RMPurchaseOrderDetailModel->insert([
+                    'rm_purchase_order_id' => $id,
+                    'supplier_harga_id' => $r->supplier_harga_id,
+                    'barang1_id' =>  $this->request->getVar("barang_id"),
+                    'barang2_id' => $r->spesifikasi_id,
+                    'satuan_id' => $r->satuan_id,
+                    'peti' => $r->peti,
+                    'quality' => $r->quality,
+                    'note' => $r->keterangan,
+                    'qty' => $r->qty,
+                    'qty_diterima' => 0,
+                    'remaining_qty' => $r->qty,
+                    'general_price' => $r->harga,
+                    'daily_price' => $r->daily_price,
+                    'monthly_price' => $r->monthly_price
+                ]);
+                $this->accountBarangModel->insertAccountBarang($this->this_company_id, $this->request->getVar('divisi_id'), $this->request->getVar("barang_id"), $r->spesifikasi_id);
+            }
+
+            $detailPurchase = $this->RMPurchaseOrderDetailModel->where('rm_purchase_order_id', $id)->where('deletedAt', null)->findAll();
+            $totalHarga = 0;
+            foreach ($detailPurchase as $d) {
+                $totalHarga += ($d['general_price'] + $d['daily_price'] + $d['monthly_price']) * $d['qty'];
+            }
+
+            $totalFinal = $this->RMPurchaseOrderModel->generateKomponenHarga($id);
+            $this->RMPurchaseOrderDetailModel->updateBatch($totalFinal['rm_purchase_order_detail_nilai'], 'id');
+
+            $this->RMPurchaseOrderModel->update($id, [
+                'total' => $totalHarga  + $this->request->getVar("subsidi_langsung"),
+                'total_before_pph'  => $totalFinal['nilai_before_pph'],
+                'total_after_pph' => $totalFinal['nilai_after_pph'],
+                'dpp_umum' => $totalFinal['dpp_umum'],
+                'dpp_harian' => $totalFinal['dpp_harian'],
+                'dpp_bulanan' => $totalFinal['dpp_bulanan'],
+                'dpp_tambahan' => $totalFinal['dpp_tambahan'],
+                'pph_umum' => $totalFinal['pph_umum'],
+                'pph_harian' => $totalFinal['pph_harian'],
+                'pph_bulanan' => $totalFinal['pph_bulanan'],
+                'pph_tambahan' => $totalFinal['pph_tambahan'],
+                'nilai_total_umum' => $totalFinal['nilai_total_umum'],
+                'nilai_total_harian' => $totalFinal['nilai_total_harian'],
+                'nilai_total_bulanan' => $totalFinal['nilai_total_bulanan'],
+                'nilai_total_tambahan' => $totalFinal['nilai_total_tambahan'],
+                'nilai_total_qty' => $totalFinal['nilai_total_qty']
+            ]);
+
+            $db->transCommit();
+
+            return response()->setJSON([
+                'message' => "PO Lokal Bahan Baku Berhasil Disimpan",
+                'token' => csrf_hash(),
+                'id' => encrypt($id),
+                'status' => true
+            ]);
+        } catch (Exception $e) {
+            $db->transRollback();
+            return response()->setJSON([
+                'message' => $e->getMessage(),
+                'token' => csrf_hash(),
+                'status' => false
+            ]);
         }
-
-        $detailPurchase = $this->RMPurchaseOrderDetailModel->where('rm_purchase_order_id', $id)->where('deletedAt', null)->findAll();
-        $totalHarga = 0;
-        foreach ($detailPurchase as $d) {
-            $totalHarga += ($d['general_price'] + $d['daily_price'] + $d['monthly_price']) * $d['qty'];
-        }
-
-        $totalFinal = $this->RMPurchaseOrderModel->generateKomponenHarga($id);
-        $this->RMPurchaseOrderDetailModel->updateBatch($totalFinal['rm_purchase_order_detail_nilai'], 'id');
-
-        $this->RMPurchaseOrderModel->update($id, [
-            'total' => $totalHarga  + $this->request->getVar("subsidi_langsung"),
-            'total_before_pph'  => $totalFinal['nilai_before_pph'],
-            'total_after_pph' => $totalFinal['nilai_after_pph'],
-            'dpp_umum' => $totalFinal['dpp_umum'],
-            'dpp_harian' => $totalFinal['dpp_harian'],
-            'dpp_bulanan' => $totalFinal['dpp_bulanan'],
-            'dpp_tambahan' => $totalFinal['dpp_tambahan'],
-            'pph_umum' => $totalFinal['pph_umum'],
-            'pph_harian' => $totalFinal['pph_harian'],
-            'pph_bulanan' => $totalFinal['pph_bulanan'],
-            'pph_tambahan' => $totalFinal['pph_tambahan'],
-            'nilai_total_umum' => $totalFinal['nilai_total_umum'],
-            'nilai_total_harian' => $totalFinal['nilai_total_harian'],
-            'nilai_total_bulanan' => $totalFinal['nilai_total_bulanan'],
-            'nilai_total_tambahan' => $totalFinal['nilai_total_tambahan'],
-            'nilai_total_qty' => $totalFinal['nilai_total_qty']
-        ]);
-
-        return response()->setJSON([
-            'message' => "PO Lokal Bahan Baku Berhasil Disimpan",
-            'token' => csrf_hash(),
-            'id' => encrypt($id),
-            'status' => true
-        ]);
     }
 
     public function updatePOLokalBahanBaku()
     {
-        $id = decrypt($this->request->getVar('id'));
+        $db = \Config\Database::connect();
+        $db->transBegin();
 
-        $first = $this->RMPurchaseOrderModel
-            ->where('company_id', $this->this_company_id)
-            ->where('po_no', $this->request->getVar("po_no"))
-            ->where('id !=', $id)
-            ->first();
+        try {
+            $id = decrypt($this->request->getVar('id'));
 
-        if ($first != null) {
+            $first = $this->RMPurchaseOrderModel
+                ->where('company_id', $this->this_company_id)
+                ->where('po_no', $this->request->getVar("po_no"))
+                ->where('id !=', $id)
+                ->first();
+
+            if ($first != null) {
+                return response()->setJSON([
+                    'token' => csrf_hash(),
+                    'message' => "No Purchase Order Sudah Ada",
+                    'status' => false
+                ]);
+            }
+
+            $firstData = $this->RMPurchaseOrderModel->find($id);
+
+            $this->sppModel->update($firstData['purchase_request_id'], [
+                'request_status' => 'waiting'
+            ]);
+
+            $detailPurchase = $this->RMPurchaseOrderDetailModel->where('rm_purchase_order_id', $id)->where('deletedAt', null)->findAll();
+            $totalHarga = 0;
+            foreach ($detailPurchase as $d) {
+                $totalHarga += ($d['general_price'] + $d['daily_price'] + $d['monthly_price']) * $d['qty'];
+            }
+
+            $this->RMPurchaseOrderModel->update($id, [
+                'company_id' => $this->this_company_id,
+                "warehouse_id" => $this->request->getVar("warehouse_id"),
+                "purchase_request_id" => $this->request->getVar('spp_id') ?  $this->request->getVar('spp_id') :  $firstData['purchase_request_id'],
+                "supplier_id" => $this->request->getVar("supplier_id"),
+                "barang_id" => $this->request->getVar("barang_id"),
+                "divisi_id" => $this->request->getVar('divisi_id'),
+                "kemasan_id" => $this->request->getVar('kemasan_id'),
+                "jumlah_kemasan" => $this->request->getVar('jumlah_kemasan'),
+                "kemasan_tambahan" => $this->request->getVar('kemasan_tambahan'),
+                "bc_type" => $this->request->getVar("bc_type"),
+                "po_no" =>  $this->request->getVar("po_no"),
+                "po_date" => $this->request->getVar("po_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getVar("po_date")))) : "",
+                "pph" => $this->request->getVar("pph"),
+                "cong_sebenarnya" => $this->request->getVar("cong_sebenarnya") ? formatter($this->request->getVar("cong_sebenarnya"), "STR_TO_INT") : 0,
+                "cong_batasan" => $this->request->getVar("cong_batasan") ? formatter($this->request->getVar("cong_batasan"), "STR_TO_INT") : 0,
+                "subsidi_langsung" => $this->request->getVar("subsidi_langsung") ? formatter($this->request->getVar("subsidi_langsung"), "STR_TO_INT") : 0,
+                "total" => $totalHarga  + $this->request->getVar("subsidi_langsung"),
+                "createdBy" => session()->get("login")->user_id,
+            ]);
+
+            $this->sppModel->update($this->request->getVar('spp_id'), [
+                'request_status' => 'finished'
+            ]);
+
+            // get all id detail
+            $id_detail_all = [];
+
+            foreach (json_decode($this->request->getVar("items")) as $r) {
+                $check = $this->RMPurchaseOrderDetailModel
+                    ->where('rm_purchase_order_id', $id)
+                    ->where('id', $r->id_detail)
+                    ->first();
+
+                if ($check != null) {
+                    // UPDATE
+                    $this->RMPurchaseOrderDetailModel->update($check['id'], [
+                        'rm_purchase_order_id' => $id,
+                        'supplier_harga_id' => $r->supplier_harga_id,
+                        'barang1_id' =>  $this->request->getVar("barang_id"),
+                        'barang2_id' => $r->spesifikasi_id,
+                        'satuan_id' => $r->satuan_id,
+                        'peti' => $r->peti,
+                        'quality' => $r->quality,
+                        'note' => $r->keterangan,
+                        'qty' => $r->qty,
+                        'qty_diterima' => 0,
+                        'remaining_qty' => $r->qty,
+                        'general_price' => $r->harga,
+                        'daily_price' => $r->daily_price,
+                        'monthly_price' => $r->monthly_price
+                    ]);
+                    array_push($id_detail_all, $check['id']);
+                } else {
+                    // NEW BARANG
+                    // DELETE
+                    // $this->RMPurchaseOrderDetailModel
+                    //     ->where('rm_purchase_order_id', $id)
+                    //     ->where('supplier_harga_id', $r->supplier_harga_id)
+                    //     ->where('barang2_id', $r->spesifikasi_id)
+                    //     ->where('barang1_id', $this->request->getVar('barang_id'))
+                    //     ->delete();
+
+                    // INSERT NEW
+                    $id_detail_new = $this->RMPurchaseOrderDetailModel->insert([
+                        'rm_purchase_order_id' => $id,
+                        'supplier_harga_id' => $r->supplier_harga_id,
+                        'barang1_id' =>  $this->request->getVar("barang_id"),
+                        'barang2_id' => $r->spesifikasi_id,
+                        'satuan_id' => $r->satuan_id,
+                        'peti' => $r->peti,
+                        'quality' => $r->quality,
+                        'note' => $r->keterangan,
+                        'qty' => $r->qty,
+                        'qty_diterima' => 0,
+                        'remaining_qty' => $r->qty,
+                        'general_price' => $r->harga,
+                        'daily_price' => $r->daily_price,
+                        'monthly_price' => $r->monthly_price
+                    ]);
+
+                    array_push($id_detail_all, $id_detail_new);
+                }
+                $this->accountBarangModel->insertAccountBarang($this->this_company_id, $this->request->getVar('divisi_id'), $this->request->getVar("barang_id"), $r->spesifikasi_id);
+            }
+
+            $this->RMPurchaseOrderDetailModel
+                ->where('rm_purchase_order_id', $id)
+                ->whereNotIn('id', $id_detail_all)
+                ->delete();
+
+            $totalFinal = $this->RMPurchaseOrderModel->generateKomponenHarga($id);
+
+            $this->RMPurchaseOrderDetailModel->updateBatch($totalFinal['rm_purchase_order_detail_nilai'], 'id');
+
+            $this->RMPurchaseOrderModel->update($id, [
+                'total' => $totalHarga  + $this->request->getVar("subsidi_langsung"),
+                'total_before_pph'  => $totalFinal['nilai_before_pph'],
+                'total_after_pph' => $totalFinal['nilai_after_pph'],
+                'dpp_umum' => $totalFinal['dpp_umum'],
+                'dpp_harian' => $totalFinal['dpp_harian'],
+                'dpp_bulanan' => $totalFinal['dpp_bulanan'],
+                'dpp_tambahan' => $totalFinal['dpp_tambahan'],
+                'pph_umum' => $totalFinal['pph_umum'],
+                'pph_harian' => $totalFinal['pph_harian'],
+                'pph_bulanan' => $totalFinal['pph_bulanan'],
+                'pph_tambahan' => $totalFinal['pph_tambahan'],
+                'nilai_total_umum' => $totalFinal['nilai_total_umum'],
+                'nilai_total_harian' => $totalFinal['nilai_total_harian'],
+                'nilai_total_bulanan' => $totalFinal['nilai_total_bulanan'],
+                'nilai_total_tambahan' => $totalFinal['nilai_total_tambahan'],
+                'nilai_total_qty' => $totalFinal['nilai_total_qty']
+            ]);
+
+            $db->transCommit();
             return response()->setJSON([
+                'message' => "PO Lokal Bahan Baku Berhasil Diupdate",
                 'token' => csrf_hash(),
-                'message' => "No Purchase Order Sudah Ada",
+                'id' => encrypt($id),
+                'status' => true
+            ]);
+        } catch (Exception $e) {
+            $db->transRollback();
+            return response()->setJSON([
+                'message' => $e->getMessage(),
+                'token' => csrf_hash(),
                 'status' => false
             ]);
         }
-
-        $firstData = $this->RMPurchaseOrderModel->find($id);
-
-        $this->sppModel->update($firstData['purchase_request_id'], [
-            'request_status' => 'waiting'
-        ]);
-
-        $detailPurchase = $this->RMPurchaseOrderDetailModel->where('rm_purchase_order_id', $id)->where('deletedAt', null)->findAll();
-        $totalHarga = 0;
-        foreach ($detailPurchase as $d) {
-            $totalHarga += ($d['general_price'] + $d['daily_price'] + $d['monthly_price']) * $d['qty'];
-        }
-
-        $this->RMPurchaseOrderModel->update($id, [
-            'company_id' => $this->this_company_id,
-            "warehouse_id" => $this->request->getVar("warehouse_id"),
-            "purchase_request_id" => $this->request->getVar('spp_id') ?  $this->request->getVar('spp_id') :  $firstData['purchase_request_id'],
-            "supplier_id" => $this->request->getVar("supplier_id"),
-            "barang_id" => $this->request->getVar("barang_id"),
-            "divisi_id" => $this->request->getVar('divisi_id'),
-            "kemasan_id" => $this->request->getVar('kemasan_id'),
-            "jumlah_kemasan" => $this->request->getVar('jumlah_kemasan'),
-            "kemasan_tambahan" => $this->request->getVar('kemasan_tambahan'),
-            "bc_type" => $this->request->getVar("bc_type"),
-            "po_no" =>  $this->request->getVar("po_no"),
-            "po_date" => $this->request->getVar("po_date") ? date("Y/m/d", strtotime(str_replace("/", "-", $this->request->getVar("po_date")))) : "",
-            "pph" => $this->request->getVar("pph"),
-            "cong_sebenarnya" => $this->request->getVar("cong_sebenarnya") ? formatter($this->request->getVar("cong_sebenarnya"), "STR_TO_INT") : 0,
-            "cong_batasan" => $this->request->getVar("cong_batasan") ? formatter($this->request->getVar("cong_batasan"), "STR_TO_INT") : 0,
-            "subsidi_langsung" => $this->request->getVar("subsidi_langsung") ? formatter($this->request->getVar("subsidi_langsung"), "STR_TO_INT") : 0,
-            "total" => $totalHarga  + $this->request->getVar("subsidi_langsung"),
-            "createdBy" => session()->get("login")->user_id,
-        ]);
-
-        $this->sppModel->update($this->request->getVar('spp_id'), [
-            'request_status' => 'finished'
-        ]);
-
-        // get all id detail
-        $id_detail_all = [];
-
-        foreach (json_decode($this->request->getVar("items")) as $r) {
-            $check = $this->RMPurchaseOrderDetailModel
-                ->where('rm_purchase_order_id', $id)
-                ->where('id', $r->id_detail)
-                ->first();
-
-            if ($check != null) {
-                // UPDATE
-                $this->RMPurchaseOrderDetailModel->update($check['id'], [
-                    'rm_purchase_order_id' => $id,
-                    'supplier_harga_id' => $r->supplier_harga_id,
-                    'barang1_id' =>  $this->request->getVar("barang_id"),
-                    'barang2_id' => $r->spesifikasi_id,
-                    'satuan_id' => $r->satuan_id,
-                    'peti' => $r->peti,
-                    'quality' => $r->quality,
-                    'note' => $r->keterangan,
-                    'qty' => $r->qty,
-                    'qty_diterima' => 0,
-                    'remaining_qty' => $r->qty,
-                    'general_price' => $r->harga,
-                    'daily_price' => $r->daily_price,
-                    'monthly_price' => $r->monthly_price
-                ]);
-                array_push($id_detail_all, $check['id']);
-            } else {
-                // NEW BARANG
-                // DELETE
-                // $this->RMPurchaseOrderDetailModel
-                //     ->where('rm_purchase_order_id', $id)
-                //     ->where('supplier_harga_id', $r->supplier_harga_id)
-                //     ->where('barang2_id', $r->spesifikasi_id)
-                //     ->where('barang1_id', $this->request->getVar('barang_id'))
-                //     ->delete();
-
-                // INSERT NEW
-                $id_detail_new = $this->RMPurchaseOrderDetailModel->insert([
-                    'rm_purchase_order_id' => $id,
-                    'supplier_harga_id' => $r->supplier_harga_id,
-                    'barang1_id' =>  $this->request->getVar("barang_id"),
-                    'barang2_id' => $r->spesifikasi_id,
-                    'satuan_id' => $r->satuan_id,
-                    'peti' => $r->peti,
-                    'quality' => $r->quality,
-                    'note' => $r->keterangan,
-                    'qty' => $r->qty,
-                    'qty_diterima' => 0,
-                    'remaining_qty' => $r->qty,
-                    'general_price' => $r->harga,
-                    'daily_price' => $r->daily_price,
-                    'monthly_price' => $r->monthly_price
-                ]);
-
-                array_push($id_detail_all, $id_detail_new);
-            }
-            $this->accountBarangModel->insertAccountBarang($this->this_company_id, $this->request->getVar('divisi_id'), $this->request->getVar("barang_id"), $r->spesifikasi_id);
-        }
-
-        $this->RMPurchaseOrderDetailModel
-            ->where('rm_purchase_order_id', $id)
-            ->whereNotIn('id', $id_detail_all)
-            ->delete();
-
-        $totalFinal = $this->RMPurchaseOrderModel->generateKomponenHarga($id);
-
-        $this->RMPurchaseOrderDetailModel->updateBatch($totalFinal['rm_purchase_order_detail_nilai'], 'id');
-
-        $this->RMPurchaseOrderModel->update($id, [
-            'total' => $totalHarga  + $this->request->getVar("subsidi_langsung"),
-            'total_before_pph'  => $totalFinal['nilai_before_pph'],
-            'total_after_pph' => $totalFinal['nilai_after_pph'],
-            'dpp_umum' => $totalFinal['dpp_umum'],
-            'dpp_harian' => $totalFinal['dpp_harian'],
-            'dpp_bulanan' => $totalFinal['dpp_bulanan'],
-            'dpp_tambahan' => $totalFinal['dpp_tambahan'],
-            'pph_umum' => $totalFinal['pph_umum'],
-            'pph_harian' => $totalFinal['pph_harian'],
-            'pph_bulanan' => $totalFinal['pph_bulanan'],
-            'pph_tambahan' => $totalFinal['pph_tambahan'],
-            'nilai_total_umum' => $totalFinal['nilai_total_umum'],
-            'nilai_total_harian' => $totalFinal['nilai_total_harian'],
-            'nilai_total_bulanan' => $totalFinal['nilai_total_bulanan'],
-            'nilai_total_tambahan' => $totalFinal['nilai_total_tambahan'],
-            'nilai_total_qty' => $totalFinal['nilai_total_qty']
-        ]);
-
-
-        return response()->setJSON([
-            'message' => "PO Lokal Bahan Baku Berhasil Diupdate",
-            'token' => csrf_hash(),
-            'id' => encrypt($id),
-            'status' => true
-        ]);
     }
 
     public function getSupplierHargaById()

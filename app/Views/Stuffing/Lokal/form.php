@@ -178,7 +178,7 @@
                                 <div class="form-floating mb-3" style="height: 50px;">
                                     <select <?= !empty($mutasi) ? ($mutasi['status_posting'] ? 'disabled' : '') : '' ?> class="form-select type_pengambilan_stock" id="type_pengambilan_stock" name="type_pengambilan_stock" aria-label="Floating label select example">
                                         <option value=""></option>
-                                        <option <?= !empty($mutasi) ? ($mutasi['tipe_pengambilan_stock'] == "PABEAN" ? 'selected' : '') : '' ?> value="PABEAN">PABEAN</option>
+                                        <option <?= !empty($mutasi) ? ($mutasi['tipe_pengambilan_stock'] == "PABEAN" ? 'selected' : '') : '' ?> value="PABEAN">MANUAL</option>
                                         <option <?= !empty($mutasi) ? ($mutasi['tipe_pengambilan_stock'] == "FIFO" ? 'selected' : '') : '' ?> value="FIFO">FIFO</option>
                                     </select>
                                     <label for="floatingInput" style="z-index: 1;">Tipe Pengambilan Stok</label>
@@ -1239,10 +1239,10 @@
 
             if (v.tipe_input === 'stuffing') {
                 newRow.append($('<td style="text-align: center;">').html(`
-            <button type="button" data-sales_order_detail_id = "${v.id}" onclick="handleDelete('${v.id}')" class="btn btn-discard delete-btn btn-trash <?= !empty($stuffingLokal) ? (($stuffingLokal['status_posting'] == "1") ? 'disabled' : '') : '' ?>">
-                <i class="fa fa-trash"></i>
-            </button>
-        `));
+                    <button type="button" data-sales_order_detail_id = "${v.id}" onclick="handleDelete('${v.id}')" class="btn btn-discard delete-btn btn-trash <?= !empty($stuffingLokal) ? (($stuffingLokal['status_posting'] == "1") ? 'disabled' : '') : '' ?>">
+                        <i class="fa fa-trash"></i>
+                    </button>
+                `));
             } else {
                 newRow.append($('<td style="text-align: center;">').html(''));
             }

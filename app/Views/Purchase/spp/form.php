@@ -1084,6 +1084,7 @@
                             list_items[i].satuan_id = satuan_id;
                             list_items[i].qty = qty;
                             list_items[i].keterangan = keterangan;
+                            list_items[i].status_po = false;
                         }
                     });
                     drawTableDetail();
@@ -1102,7 +1103,8 @@
                             'nama_satuan': nama_satuan,
                             'satuan_id': satuan_id,
                             'qty': qty,
-                            'keterangan': keterangan
+                            'keterangan': keterangan,
+                            'status_po': false
                         });
                     }
                     resetFormDetail();
@@ -2221,13 +2223,20 @@
                 row += '<td>' + item.keterangan + '</td>';
                 <?php if (!empty($dataSPP)) : ?>
                     <?php if ($dataSPP->is_posted == '0') : ?>
-                        row += '<td>' + `
-                    <button class="btn btn-warning posting-spp mr-1 edit-table-detail" data-barang_detail_id="${item.barang_detail_id}" >
-                        <i class="fa fa-pencil fa-sm" aria-hidden="true"></i>
-                    </button><button class="btn btn-danger" onclick="deleteRowDetail('${item.barang_detail_id}', '${item.purchase_detail_id}')">
-                        <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
-                    </button>` +
-                            '</td>';
+                        if (item.status_po == false) {
+                            row += '<td>' + `
+                                        <button class="btn btn-warning posting-spp mr-1 edit-table-detail" data-barang_detail_id="${item.barang_detail_id}" >
+                                            <i class="fa fa-pencil fa-sm" aria-hidden="true"></i>
+                                        </button><button class="btn btn-danger" onclick="deleteRowDetail('${item.barang_detail_id}', '${item.purchase_detail_id}')">
+                                            <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
+                                        </button>` +
+                                '</td>';
+                        } else {
+                            row += '<td>' + `
+                                        <span class="badge badge-danger">Sudah PO</span>` +
+                                '</td>';
+                        }
+
                     <?php endif; ?>
                 <?php else : ?>
                     row += '<td>' + `
@@ -2258,7 +2267,8 @@
                 'nama_satuan': "<?= $d->kode_satuan ?>",
                 'satuan_id': "<?= $d->unit ?>",
                 'qty': "<?= $d->qty ?>",
-                'keterangan': "<?= trim(str_replace('"', '\"', $d->note))  ?>"
+                'keterangan': "<?= trim(str_replace('"', '\"', $d->note))  ?>",
+                'status_po': "<?= $d->status_po ?>"
             });
         <?php endforeach; ?>
         drawTableDetail();
