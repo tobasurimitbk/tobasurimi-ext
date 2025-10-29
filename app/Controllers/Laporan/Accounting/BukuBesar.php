@@ -49,9 +49,15 @@ class BukuBesar extends BaseController
         $divisi = $this->divisiModel->getDivisiAccess();
         $supplier = $this->supplierModel->where('company_id', $this->this_company_id)->where('deletedAt', null)->findAll();
 
-        if (!empty($this->request->getPost('dateStart')) && !empty($this->request->getPost('jenis_account')) && ($this->request->getPost('account_id') || $this->request->getPost('range_account_start_id'))) {
+        // var_dump($this->request->getGet());
+        // die;
+
+        if (!empty($this->request->getGet('dateStart')) && !empty($this->request->getGet('jenis_account')) && ($this->request->getGet('account_id') || $this->request->getGet('range_account_start_id'))) {
             $dataJurnalUmum = $this->getDataBukuBesar();
         }
+
+        // var_dump($dataJurnalUmum);
+        // die;
         
         $data = [
             "supplier" => $supplier,
@@ -62,75 +68,87 @@ class BukuBesar extends BaseController
         return view('Laporan/LaporanBukuBesar/index', $data);
     }
 
-    public function searchAccounts() {
+    public function searchAccounts()
+    {
         $search = $this->request->getVar('search');
+        $noSubs = $this->request->getVar('no_subs');
         $jenisAccount = $this->request->getVar('jenis_account');
-        $ids = $this->request->getVar('ids'); // For handling selected options
-        
+        $ids = $this->request->getVar('ids'); // for preselected options
+
         $results = [];
-        
-        if ($jenisAccount == "header_account") {
-            $headerBuilder = $this->HeaderAkunsModel
-                ->select('header_akuns.id, header_akuns.no_header as number, header_akuns.nama_header as name, companies.company')
+
+        if ($jenisAccount === "header_account") {
+            $builder = $this->HeaderAkunsModel
+                ->select('header_akuns.id, header_akuns.no_header AS number, header_akuns.nama_header AS name, companies.company')
                 ->where('header_akuns.deletedAt', null)
-                ->join('companies', 'companies.id = header_akuns.company_id', 'left')
-                ->where('header_akuns.company_id', $this->this_company_id);
-            
-            // If IDs are provided (for selected options)
+                ->where('header_akuns.company_id', $this->this_company_id)
+                ->join('companies', 'companies.id = header_akuns.company_id', 'left');
+
+            // 🔹 Selected (IDs)
             if (!empty($ids)) {
                 $ids = is_array($ids) ? $ids : [$ids];
-                $headerBuilder->whereIn('header_akuns.id', $ids);
-                $results = $headerBuilder->orderBy('header_akuns.no_header', 'ASC')->findAll();
-            } 
-            // If searching
-            else if (!empty($search)) {
-                $headerBuilder->groupStart()
+                $builder->whereIn('header_akuns.id', $ids);
+            }
+
+            // 🔹 Searching
+            elseif (!empty($search)) {
+                $builder->groupStart()
                     ->like('header_akuns.no_header', $search)
                     ->orLike('header_akuns.nama_header', $search)
                     ->orLike('companies.company', $search)
                     ->groupEnd();
-                $results = $headerBuilder->orderBy('header_akuns.no_header', 'ASC')->findAll(10);
             }
+
+            $results = $builder->orderBy('header_akuns.no_header', 'ASC')->findAll(10);
         } else {
-            $subBuilder = $this->Sub_AkunsModel
-                ->select('sub_akuns.id, sub_akuns.no_sub as number, sub_akuns.nama_sub as name, companies.company')
-                 ->where('sub_akuns.deletedAt', null)
-                ->join('companies', 'companies.id = sub_akuns.company_id', 'left')
-                ->where('sub_akuns.company_id', $this->this_company_id);
-            
-            // If IDs are provided (for selected options)
+            // 🔹 SUB ACCOUNT
+            $builder = $this->Sub_AkunsModel
+                ->select('sub_akuns.id, sub_akuns.no_sub AS number, sub_akuns.nama_sub AS name, companies.company')
+                ->where('sub_akuns.deletedAt', null)
+                ->where('sub_akuns.company_id', $this->this_company_id)
+                ->join('companies', 'companies.id = sub_akuns.company_id', 'left');
+
+            // 🔹 Handle multiple IDs (preselected)
             if (!empty($ids)) {
                 $ids = is_array($ids) ? $ids : [$ids];
-                $subBuilder->whereIn('sub_akuns.id', $ids);
-                $results = $subBuilder->orderBy('sub_akuns.no_sub', 'ASC')->findAll();
-            } 
-            // If searching
-            else if (!empty($search)) {
-                $subBuilder->groupStart()
+                $builder->whereIn('sub_akuns.id', $ids);
+            }
+
+            // 🔹 Handle multiple no_subs (for reload selected values)
+            elseif (!empty($noSubs)) {
+                $noSubs = is_array($noSubs) ? $noSubs : [$noSubs];
+                $builder->whereIn('sub_akuns.no_sub', $noSubs);
+            }
+
+            // 🔹 Searching (autocomplete)
+            elseif (!empty($search)) {
+                $builder->groupStart()
                     ->like('sub_akuns.no_sub', $search)
                     ->orLike('sub_akuns.nama_sub', $search)
                     ->orLike('companies.company', $search)
                     ->groupEnd();
-                $results = $subBuilder->orderBy('sub_akuns.no_sub', 'ASC')->findAll(10);
             }
+
+            $results = $builder->orderBy('sub_akuns.no_sub', 'ASC')->findAll(10);
         }
-        
+
         return $this->response->setJSON($results);
     }
+
 
     private function getDataBukuBesar()
     {
         // Ambil nilai input dan lakukan validasi awal
-        $dateStart = $this->request->getPost('dateStart') ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getPost("dateStart")))) : null;
-        $dateEnd = $this->request->getPost('dateEnd') ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getPost("dateEnd")))) : null;
-        $divisiId = $this->request->getPost('divisi_id');
-        $accountId = isset($_POST['account_id']) ? array_filter($_POST['account_id'], function ($value) {
+        $dateStart = $this->request->getGet('dateStart') ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getGet("dateStart")))) : null;
+        $dateEnd = $this->request->getGet('dateEnd') ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getGet("dateEnd")))) : null;
+        $divisiId = $this->request->getGet('divisi_id');
+        $accountId = isset($_GET['account_id']) ? array_filter($_GET['account_id'], function ($value) {
             return $value !== "";
         }) : [];
-        $rangeAccountStartId = $this->request->getPost('range_account_start_id');
-        $rangeAccountFinishId = $this->request->getPost('range_account_finish_id');
-        $jenisAccount = $this->request->getPost('jenis_account');
-        $supplierId = $this->request->getPost('supplier_id');
+        $rangeAccountStartId = $this->request->getGet('range_account_start_id');
+        $rangeAccountFinishId = $this->request->getGet('range_account_finish_id');
+        $jenisAccount = $this->request->getGet('jenis_account');
+        $supplierId = $this->request->getGet('supplier_id');
 
         $result = [];
 
