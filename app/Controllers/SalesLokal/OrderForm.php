@@ -1033,18 +1033,6 @@ class OrderForm extends BaseController
 
         // return view('SalesLokal/OrderForm/print', $data);
 
-        // load HTML content
-        // $html = view('SalesLokal/OrderForm/print', $data);
-
-        // // Tambahkan class num-font untuk teks yang mengandung angka 0
-        // // tapi tidak menyentuh tag HTML
-        // $html = preg_replace_callback(
-        //     '/>([^<]*0[^<]*)</', // cari teks di antara tag yang mengandung 0
-        //     function ($matches) {
-        //         return '><span class="num-font">' . $matches[1] . '</span><';
-        //     },
-        //     $html
-        // );
         $options = new Options();
         $options->set('isHtml5ParserEnabled', true);
         $options->set('isRemoteEnabled', true);
@@ -1056,7 +1044,7 @@ class OrderForm extends BaseController
 
         // (optional) setup the paper size and orientation
         $domPdf->setPaper('A4', 'landscape');
-        // $domPdf->set_option('defaultFont', 'DejaVu Sans Mono');
+        $domPdf->set_option('defaultFont', 'DejaVu Sans Mono');
 
         // render html as PDF
         $domPdf->render();
