@@ -2472,7 +2472,7 @@ class JurnalUmum extends BaseController
                     ->findAll();
 
                 $totalNominal = array_reduce($detailPembayaran, function ($carry, $item) {
-                    return $carry + floatval(str_replace([',', '.'], '', $item['nominal']));
+                    return $carry + floatval(str_replace([',', '.'], '', $item['jumlah']));
                 }, 0);
 
                 $isFirstTransaction = true;
@@ -2507,7 +2507,7 @@ class JurnalUmum extends BaseController
                 $id_transaksi_jurnal = $this->transaksiJurnalModel->insertTransaksiJurnal($resultTransaksiJurnal);
 
                 foreach ($detailPembayaran as $detail) {
-                    $nominal = floatval(str_replace([',', '.'], '', $detail['nominal']));
+                    $nominal = floatval(str_replace([',', '.'], '', $detail['jumlah']));
                     $tanggal = date('Y-m-d', strtotime(str_replace('/', '-', $detail['tanggal_pembayaran'])));
 
                     // 2. Buat jurnal umum: kredit akun kas, debit akun selisih
@@ -2584,6 +2584,11 @@ class JurnalUmum extends BaseController
                     $this->jurnalUmumModel->insertJurnalBatch($result);
                     $isFirstTransaction = false;
                 }
+                
+                return [
+                    'status' => true,
+                    'message' => 'Journal entries created successfully'
+                ];
             }
         }
     }
