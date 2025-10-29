@@ -50,6 +50,8 @@ class SppDetailModel extends Model
 
     public function getSppDetailById($id)
     {
+        $amPurchaseOrderDetailModel = new AMPurchaseOrderDetailModel();
+
         $selectQry = "purchase_request_details.*,
                     barang_master.kode_barang,
                     satuans.nama_satuan AS nama_satuan,
@@ -68,6 +70,18 @@ class SppDetailModel extends Model
             ->join('satuans', 'purchase_request_details.unit = satuans.id', 'left')
             ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = purchase_request_details.barang2_id', 'left')
             ->findAll();
+
+        foreach ($sppDetailData as $i => $d) {
+            $poRes = $amPurchaseOrderDetailModel
+                ->select('am_purchase_orders.po_no,am_purchase_order_details.*')
+                ->join('am_purchase_orders', 'am_purchase_orders.id = am_purchase_order_details.am_purchase_order_id', 'left')
+                ->where('am_purchase_order_details.barang_id', $d->barang1_id)
+                ->where('am_purchase_order_details.spesifikasi_id', $d->barang2_id)
+                ->where('am_purchase_order_details.note', $d->note)
+                ->where('am_purchase_orders.purchase_request_id', $id)
+                ->first();
+            $sppDetailData[$i]->status_po = $poRes == null ? false : true;
+        }
 
         return $sppDetailData;
     }
