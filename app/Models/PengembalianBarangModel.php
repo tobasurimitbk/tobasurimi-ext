@@ -163,7 +163,7 @@ class PengembalianBarangModel extends Model
             ->where('status_penerimaan', $statusPenerimaan)
             ->where('penerimaan_barang.status_post', "FINISH")
             ->where('penerimaan_barang.deletedAt', null)
-            // ->where('penerimaan_barang.tanggal >=', '2025-09-01') // diatas bulan 9
+            ->where('penerimaan_barang.tanggal >=', '2025-09-01') // diatas bulan 9
             ->orderBy('penerimaan_barang.no_penerimaan_barang', "asc")
             ->findAll();
 

@@ -207,7 +207,7 @@ class ReturPembelianLokalBP extends BaseController
             $this->this_company_id,
             $supplierId,
             "PENOLONG",
-            "IMPORT"
+            "LOKAL"
         );
 
 
