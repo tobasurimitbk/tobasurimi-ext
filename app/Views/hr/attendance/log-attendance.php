@@ -122,7 +122,7 @@
                 <form action="#" method="get">
 
                     <div class="row mb-4">
-                        <div class="col-sm-3">
+                        <div class="col-sm-2">
                             <div class="input-group">
                                 <div class="form-floating" style="height: 50px;">
                                     <input placeholder="" value="<?= date('Y-m') ?>" class="form-control month" id="month" name="month" />
@@ -135,7 +135,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-sm-3">
+                        <div class="col-sm-2">
                             <div class="form-floating">
                                 <select class="form-select" name="divisi_id" id="divisi_id">
                                     <option value="">
@@ -150,7 +150,15 @@
                                 <label for="floatingInput">Cari Departemen</label>
                             </div>
                         </div>
-                        <div class="col-sm-3">
+                        <div class="col-sm-2">
+                            <div class="form-floating" style="height: 50px;">
+                                <select class="form-select bagian_id" name="bagian_id" id="bagian_id" aria-label="Floating label select example">
+                                    <option value=""></option>
+                                </select>
+                                <label for="floatingInput" style="z-index: 1;">Cari Bagian </label>
+                            </div>
+                        </div>
+                        <div class="col-sm-2">
                             <div class="form-floating">
                                 <select class="form-select" name="tipe" id="tipe">
                                     <option value="">
@@ -165,7 +173,7 @@
                                 <label for="floatingInput">Cari Tipe / Golongan</label>
                             </div>
                         </div>
-                        <div class="col-sm-3">
+                        <div class="col-sm-4">
                             <div class="form-floating">
                                 <select class="form-select" id="employee_id" name="employee_id">
 
@@ -494,7 +502,7 @@
             year: $('#year').val(),
             divisi_id: $('#divisi_id').val(),
             tipe: $('#tipe').val(),
-            employee_id: $('#employee_id').val()
+            employee_id: $('#employee_id').val(),
         },
         success: function(json) {
             // buat header <th> sesuai response columns
@@ -521,6 +529,7 @@
                         d.divisi_id = $('#divisi_id').val();
                         d.tipe = $('#tipe').val();
                         d.employee_id = $('#employee_id').val();
+                        d.bagian_id = $('#bagian_id').val();
                     },
                     dataSrc: 'data' // penting, biar DataTables ngerti
                 },
@@ -621,6 +630,7 @@
                 d.divisi_id = $('#divisi_id').val();
                 d.tipe = $('#tipe').val();
                 d.employee_id = $('#employee_id').val();
+                d.bagian_id = $('#bagian_id').val();
             },
             dataSrc: 'data'
         },
@@ -798,6 +808,41 @@
         placeholder: "Cari Departemen",
         theme: "bootstrap-5",
         allowClear: true,
+    }).change(function(e) {
+        e.preventDefault();
+        let csrf = $(`[name="${csrfToken}"]`);
+        var formData = new FormData();
+        formData.append('divisionID', $(this).val());
+        $.ajax({
+            url: `<?= base_url("list-attendance/get-bagian"); ?>`,
+            data: formData,
+            beforeSend: function(xhr) {
+                xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+            },
+            method: "POST",
+            dataType: "json",
+            processData: false,
+            contentType: false,
+            success: function(result) {
+                csrf.val(result.token);
+                $("select[name='bagian_id']").empty()
+                $("select[name='bagian_id']").append(`<option value=""></option>`)
+                result.data.forEach(function(item) {
+                    $("select[name='bagian_id']").append(`<option value="${item.id}">${item.kode_bagian.toUpperCase()} - ${item.nama_bagian.toUpperCase()}</option>`)
+                });
+            }
+        });
+        attendanceTable.ajax.reload(null, false);
+        attendanceTotalTable.ajax.reload(null, false);
+    });
+    $('#bagian_id').select2({
+        placeholder: "Cari Bagian",
+        theme: "bootstrap-5",
+        allowClear: true,
+    }).change(function(e) {
+        e.preventDefault();
+        attendanceTable.ajax.reload(null, false);
+        attendanceTotalTable.ajax.reload(null, false);
     });
     $("#tipe").select2({
         placeholder: "Cari Tipe/Golongan Pegawai",
@@ -1041,8 +1086,9 @@
             var endDate = $('#end_date').val();
             var divisiId = $('#divisi_id').val();
             var tipe = $('#tipe').val();
+            var bagianId = $('#bagian_id').val();
 
-            var url = "<?= base_url('log-attendance/export-harian') ?>" + "?start_date=" + startDate + "&end_date=" + endDate + "&divisi_id=" + divisiId + "&tipe=" + tipe;
+            var url = "<?= base_url('log-attendance/export-harian') ?>" + "?start_date=" + startDate + "&end_date=" + endDate + "&divisi_id=" + divisiId + "&tipe=" + tipe + "&bagian_id=" + bagianId;
             window.location.href = url;
         }
     });
@@ -1151,6 +1197,7 @@
         var month = $('#month').val();
         var divisiId = $('#divisi_id').val();
         var tipe = $('#tipe').val();
+        var bagianId = $('#bagian_id').val();
 
         if (month == '') {
             Swal.fire({
@@ -1161,7 +1208,7 @@
             return;
         }
 
-        var url = "<?= base_url('log-attendance/export-bulanan') ?>?month=" + month + "&divisi_id=" + divisiId + "&tipe=" + tipe;
+        var url = "<?= base_url('log-attendance/export-bulanan') ?>?month=" + month + "&divisi_id=" + divisiId + "&tipe=" + tipe + "&bagian_id=" + bagianId;
         window.location.href = url;
     }
 
