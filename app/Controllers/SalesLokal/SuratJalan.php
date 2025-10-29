@@ -836,6 +836,7 @@ class SuratJalan extends BaseController
         // --- jika mau PDF, pindahkan return view dan pakai Dompdf ---
         $domPdf->loadHtml(view('SalesLokal/SuratJalan/print', $data));
         $domPdf->setPaper('A4', 'landscape');
+        $domPdf->set_option('defaultFont', 'DejaVu Sans Mono');
         $domPdf->render();
         $domPdf->stream($fileName, ["Attachment" => false]);
         exit();

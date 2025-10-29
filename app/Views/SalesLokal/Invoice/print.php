@@ -7,17 +7,16 @@
     <title>Invoice Penjualan Lokal</title>
     <style>
         body {
-            font-size: 12px;
-            font-family: 'ARIAL UNICODE MS';
+            font-size: 10px;
+            font-family: 'DejaVu Sans Mono';
             /* Font monospace */
         }
 
         @page {
             size: 8.27in 5.50in landscape;
+            margin-top: 10px !important;
             margin: 15px;
-            /* Margin diperkecil */
             padding: 15px;
-            /* Padding diperkecil */
         }
 
         .company-name {
@@ -35,11 +34,8 @@
             border: 1px solid;
             border-radius: 5px;
             min-height: 50px;
-            /* Tinggi diperkecil */
             margin-top: 3px;
-            /* Margin diperkecil */
             padding-left: 5px;
-            /* Padding diperkecil */
         }
 
         .item-table {
@@ -47,8 +43,8 @@
             /* border luar */
             width: 100%;
             border-collapse: collapse;
-            margin-top: 5px;
-            margin-bottom: 10px;
+            margin-top: 2px;
+            margin-bottom: 5px;
         }
 
         /* Semua sel: garis vertikal saja */
@@ -112,10 +108,9 @@
 <body>
     <table class="w-100">
         <tr>
-            <td style="width: 70%;padding-right: 100px">
+            <td style="width: 70%; padding-right: 20px;">
                 <div class="company-name">
-                    Toba Fish <br>
-                    <?= $companyName ?>
+                    Toba Fish (<?= $companyName ?>)
                 </div>
 
                 <div>
@@ -131,8 +126,8 @@
                     </table>
                 </div>
             </td>
-            <td align="right" style="text-align: right;">
-                <div class="txt-bold txt-center" style="font-size: 25px;margin-bottom:3px;">Sales Invoice</div>
+            <td align="right" style="width: 40%; text-align: right;">
+                <div class="txt-bold txt-center" style="font-size: 25px;margin-bottom:2px;">Sales Invoice</div>
                 <table class="w-100 rounded-border" style="margin-left: auto;margin-right: 0">
                     <tr>
                         <td style="border-right: 1px solid;border-right-style: dashed;width: 50%;">
@@ -150,17 +145,14 @@
                             <div class="txt-center"><?= $invData->no_po ?>&nbsp;</div>
                         </td>
 
-
                         <td style="border-top: 1px solid;border-top-style: dashed">
                             <div>SJ/OF No.</div>
                             <?php
-                            // Karakter yang akan dihapus
                             $unwanted_characters = array('[', '"', ']');
 
-                            // Gantikan karakter tidak diinginkan dengan string kosong
                             $cleaned_string_document_no = str_replace($unwanted_characters, '', $invData->document_no);
                             ?>
-                            <div class="txt-center" style="font-size: 11px;"><?= $cleaned_string_document_no ?>&nbsp;</div>
+                            <div class="txt-center" style="font-size: 10px;"><?= $cleaned_string_document_no ?>&nbsp;</div>
                         </td>
                     </tr>
                 </table>
@@ -181,11 +173,9 @@
             </tr>
         </thead>
         <tbody>
-
             <?php
             $rowNumber = 1;
             foreach ($soData as $detail) :
-
             ?>
                 <tr>
                     <td class="txt-center" style="height: 1px;"><?= $rowNumber ?></td>
@@ -243,7 +233,7 @@
                         <td valign="top" style="width: 65%;">
                             <div class="description-container">
                                 <label class="description-label">Description: </label>
-                                <ol class="payment-list" style="margin-left: -23px; font-size:12px;">
+                                <ol class="payment-list" style="margin-left: -23px;">
                                     <?= $companyAccount ?>
                                 </ol>
                                 <?= $invData->keterangan ?>

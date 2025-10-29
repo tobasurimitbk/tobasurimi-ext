@@ -1034,7 +1034,8 @@ class Invoice extends BaseController
         $domPdf->loadHtml(view('SalesLokal/Invoice/print', $data));
 
         // (optional) setup the paper size and orientation
-        $domPdf->setPaper([0, 0, 792.96, 528]);
+        $domPdf->setPaper('A4', 'landscape');
+        $domPdf->set_option('defaultFont', 'DejaVu Sans Mono');
 
         // render html as PDF
         $domPdf->render();

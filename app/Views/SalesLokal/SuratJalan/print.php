@@ -13,6 +13,7 @@
 
         @page {
             size: 8.27in 5.50in landscape;
+            margin-top: 10px !important;
             margin: 25px;
             padding: 25px;
         }
@@ -209,8 +210,8 @@
             endforeach;
         }
 
-        // tambahkan baris kosong agar selalu 8 baris
-        $emptyRows = max(0, 8 - ($rowNumber - 1));
+        // tambahkan baris kosong agar selalu 6 baris
+        $emptyRows = max(0, 6 - ($rowNumber - 1));
         for ($i = 0; $i < $emptyRows; $i++): ?>
             <tr>
                 <td>&nbsp;</td>
