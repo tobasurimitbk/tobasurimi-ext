@@ -8,7 +8,7 @@
     <style>
         body {
             font-size: 11px;
-            font-family: 'DejaVuSansMonoNoDot', monospace;
+            font-family: 'DejaVu Sans Mono';
             font-weight: 500;
         }
 

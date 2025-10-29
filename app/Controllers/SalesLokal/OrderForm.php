@@ -1048,7 +1048,7 @@ class OrderForm extends BaseController
         $options = new Options();
         $options->set('isHtml5ParserEnabled', true);
         $options->set('isRemoteEnabled', true);
-        $options->set('defaultFont', 'DejaVuSansMonoNoDot');
+        $options->set('defaultFont', 'DejaVu Sans Mono');
 
         $domPdf = new Dompdf($options);
         // $domPdf->loadHtml($html);
