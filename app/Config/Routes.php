@@ -1569,6 +1569,19 @@ $routes->get('/penerimaan-barang-import/receivedItemsBySupplier/(:num)', 'Wareho
 $routes->get('/penerimaan-barang-import/generate', 'Warehouse\PenerimaanBarangImport::generatePenerimaanBarang', ['filter' => 'Auth']);
 
 
+// PENERIMAAN BARANG BROKEN
+$routes->get('/penerimaan-barang-broken', 'Warehouse\PenerimaanBarangBroken::penerimaanBarangBroken', ['filter' => 'Auth']);
+$routes->get('/penerimaan-barang-broken/all', 'Warehouse\PenerimaanBarangBroken::allPenerimaanBarangBroken', ['filter' => 'Auth']);
+$routes->get('/penerimaan-barang-broken/create', 'Warehouse\PenerimaanBarangBroken::createPenerimaanBarangBroken', ['filter' => 'Auth']);
+$routes->get('/penerimaan-barang-broken/id/(:segment)', 'Warehouse\PenerimaanBarangBroken::getByIdPenerimaanBarangBroken/$1', ['filter' => 'Auth']);
+$routes->get('/penerimaan-barang-broken/print/(:segment)', 'Warehouse\PenerimaanBarangBroken::print/$1', ['filter' => 'Auth']);
+$routes->post('/penerimaan-barang-broken/save', 'Warehouse\PenerimaanBarangBroken::savePenerimaanBarangBroken', ['filter' => 'Auth']);
+$routes->post('/penerimaan-barang-broken/update', 'Warehouse\PenerimaanBarangBroken::updatePenerimaanBarangBroken', ['filter' => 'Auth']);
+$routes->post('/penerimaan-barang-broken/update-status', 'Warehouse\PenerimaanBarangBroken::updateStatusPenerimaanBarangBroken', ['filter' => 'Auth']);
+$routes->post('/penerimaan-barang-broken/delete', 'Warehouse\PenerimaanBarangBroken::deletePenerimaanBarangBroken', ['filter' => 'Auth']);
+$routes->get('/penerimaan-barang-broken/receivedItemsBySupplier/(:num)', 'Warehouse\PenerimaanBarangBroken::getReceivedItemsBySupplier/$1', ['filter' => 'Auth']);
+$routes->get('/penerimaan-barang-broken/generate', 'Warehouse\PenerimaanBarangBroken::generatePenerimaanBarang', ['filter' => 'Auth']);
+
 $routes->get('/update-stock-bahan-baku', 'Warehouse\UpdateStockBahanBaku::UpdateStockBahanBaku', ['filter' => 'Auth']);
 $routes->get('/update-stock-bahan-baku/all', 'Warehouse\UpdateStockBahanBaku::allUpdateStockBahanBaku', ['filter' => 'Auth']);
 $routes->get('/update-stock-bahan-baku/create', 'Warehouse\UpdateStockBahanBaku::createUpdateStockBahanBaku', ['filter' => 'Auth']);
@@ -2707,9 +2720,9 @@ $routes->get('/laporan-accounting/labarugi/printPDF/(:segment)/(:segment)', 'Lap
 $routes->get('/laporan-accounting/labarugi/printExcel/(:segment)/(:segment)', 'Laporan\Accounting\LabaRugi::exportExcel/$1/$2', ['filter' => 'Auth']);
 
 $routes->get('/laporan-accounting/bukubesar', 'Laporan\Accounting\BukuBesar::index', ['filter' => 'Auth']);
-$routes->post('/laporan-accounting/bukubesar', 'Laporan\Accounting\BukuBesar::index', ['filter' => 'Auth']);
+// $routes->post('/laporan-accounting/bukubesarData', 'Laporan\Accounting\BukuBesar::index', ['filter' => 'Auth']);
 $routes->post('/laporan-accounting/bukubesar/printPDF', 'Laporan\Accounting\BukuBesar::exportPDF', ['filter' => 'Auth']);
-$routes->get('/laporan-accounting/bukubesar/printExcel/(:segment)/(:segment)/(:segment)', 'Laporan\Accounting\BukuBesar::exportExcel/$1/$2/$3', ['filter' => 'Auth']);
+$routes->post('/laporan-accounting/bukubesar/printExcel', 'Laporan\Accounting\BukuBesar::exportExcel', ['filter' => 'Auth']);
 $routes->get('/laporan-accounting/bukubesar/dropdown-account', 'Laporan\Accounting\BukuBesar::dropdownAccount', ['filter' => 'Auth']);
 $routes->get('/laporan-accounting/bukubesar/get-sub-akun', 'Laporan\Accounting\BukuBesar::searchAccounts', ['filter' => 'Auth']);
 

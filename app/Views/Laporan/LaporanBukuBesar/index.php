@@ -11,23 +11,22 @@
             </button>
             <ul class="dropdown-menu list-dropdown-company" aria-labelledby="dropdownMenuButtonExport">
                 <li><button class="dropdown-item" onclick="printPDF('<?= base_url("laporan-accounting/bukubesar/printPDF"); ?>')">PDF</button></li>
-                <!-- <li><button class="dropdown-item" onclick="printExcel('<?= base_url("laporan-accounting/bukubesar/printExcel"); ?>')">Excel</button></li> -->
+                <li><button class="dropdown-item" onclick="printExcel('<?= base_url("laporan-accounting/bukubesar/printExcel"); ?>')">Excel</button></li>
             </ul>
         <?php endif; ?>
     </div>
 
     <div class="card">
         <div class="card-body">
-            <form method="post" action="<?= base_url('/laporan-accounting/bukubesar') ?>" class="create-form form-add-spp" role="form">
-                <?= csrf_field(); ?>
+            <form method="get" action="<?= base_url('/laporan-accounting/bukubesar') ?>" class="create-form form-add-spp" role="form">
                 <div class="row justify-content-start">
                     <div class="col-md-3">
                         <div class="input-group mb-3">
                             <div class="form-floating" style="height: 50px;">
                                 <input
                                     placeholder=""
-                                    value="<?= isset($_POST['dateStart']) && !empty($_POST['dateStart'])
-                                                ? $_POST['dateStart']
+                                    value="<?= isset($_GET['dateStart']) && !empty($_GET['dateStart'])
+                                                ? $_GET['dateStart']
                                                 : date('01/m/Y') ?>"
                                     class="form-control dateStart"
                                     id="dateStart"
@@ -45,7 +44,7 @@
                     <div class="col-md-3">
                         <div class="input-group mb-3">
                             <div class="form-floating" style="height: 50px;">
-                                <input value="<?= isset($_POST['dateEnd']) ? $_POST['dateEnd']  : '' ?>" placeholder="" class="form-control dateEnd" id="dateEnd" name="dateEnd" aria-label="Floating label select example" />
+                                <input value="<?= isset($_GET['dateEnd']) ? $_GET['dateEnd']  : '' ?>" placeholder="" class="form-control dateEnd" id="dateEnd" name="dateEnd" aria-label="Floating label select example" />
                                 <label style="z-index: 1;" style="z-index: 1;">Tanggal Akhir</label>
                             </div>
                             <div class="input-group-append" style="height:50px;">
@@ -60,7 +59,7 @@
                             <select class="form-select divisi_id" name="divisi_id" id="divisi_id">
                                 <option value="">SEMUA</option>
                                 <?php foreach ($divisi ?? [] as $d) : ?>
-                                    <option <?= isset($_POST['divisi_id']) ? ($d['id'] == $_POST['divisi_id'] ? 'selected' : '') : '' ?> value="<?= $d['id']; ?>"><?= $d['divisi'] ?></option>
+                                    <option <?= isset($_GET['divisi_id']) ? ($d['id'] == $_GET['divisi_id'] ? 'selected' : '') : '' ?> value="<?= $d['id']; ?>"><?= $d['divisi'] ?></option>
                                 <?php endforeach; ?>
                             </select>
                             <label for="floatingInput">Pilih Departemen</label>
@@ -71,51 +70,37 @@
                             <select class="form-select jenis_account" name="jenis_account" id="jenis_account" onchange="dropdownAccount()">
                                 <option
                                     value="sub_account"
-                                    <?= isset($_POST['jenis_account']) && $_POST['jenis_account'] === 'sub_account' ? 'selected' : '' ?>>
+                                    <?= isset($_GET['jenis_account']) && $_GET['jenis_account'] === 'sub_account' ? 'selected' : '' ?>>
                                     SUB AKUN
                                 </option>
-                                <option <?= isset($_POST['jenis_account']) && $_POST['jenis_account'] === 'header_account' ? 'selected' : '' ?> value="header_account">HEADER AKUN</option>
+                                <option <?= isset($_GET['jenis_account']) && $_GET['jenis_account'] === 'header_account' ? 'selected' : '' ?> value="header_account">HEADER AKUN</option>
                             </select>
                             <label for="floatingInput">Pilih Jenis Akun</label>
                         </div>
                     </div>
                     <div class="col-md-3">
                         <div class="form-floating" style="height: 50px;">
-                            <select class="form-select account-select" name="account_id[]" id="account_id" multiple>
+                            <select class="form-select account-select" name="account_id[]" id="account_id" multiple onchange="updateSelectedAccounts()">
                                 <!-- Opsi akan di-load secara dinamis -->
                             </select>
                             <label for="floatingInput">Pilih Akun (COA)</label>
                         </div>
+                        <div id="selectedAccounts" class="mt-2 d-flex flex-wrap gap-2"></div>
                     </div>
                     <div class="col-md-3">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <select class="form-select supplier_id" name="supplier_id" id="supplier_id">
                                 <option value="">SEMUA</option>
                                 <?php foreach ($supplier ?? [] as $s) : ?>
-                                    <option <?= isset($_POST['supplier_id']) ? ($s['id'] == $_POST['supplier_id'] ? 'selected' : '') : '' ?> value="<?= $s['id']; ?>"><?= $s['name'] ?></option>
+                                    <option <?= isset($_GET['supplier_id']) ? ($s['id'] == $_GET['supplier_id'] ? 'selected' : '') : '' ?> value="<?= $s['id']; ?>"><?= $s['name'] ?></option>
                                 <?php endforeach; ?>
                             </select>
                             <label for="floatingInput">Pilih Supplier</label>
                         </div>
                     </div>
                     <div class="col-md-3">
-                        <div class="form-floating mb-3" style="height: 50px;">
-                            <select class="form-select account-select" name="range_account_start_id" id="range_account_start_id">
-                                <!-- Opsi akan di-load secara dinamis -->
-                            </select>
-                            <label for="floatingInput">Range Awal Akun</label>
-                        </div>
-                    </div>
-                    <div class="col-md-3">
-                        <div class="input-group">
-                            <select class="form-select account-select" name="range_account_finish_id" id="range_account_finish_id">
-                                <!-- Opsi akan di-load secara dinamis -->
-                            </select>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <button class="btn btn-outline-secondary" type="submit" name="cariTanggal">
-                            <i class="fas fa-search"></i>
+                        <button class="btn btn-outline-secondary w-50 bg-secondary" style="margin-bottom: 25px;height: 50px" type="submit" name="cariTanggal">
+                            <i class="fas fa-search me-2"></i>
                         </button>
                     </div>
 
@@ -224,14 +209,14 @@
                 $.ajax({
                     url: '<?= base_url("laporan-accounting/bukubesar/get-sub-akun"); ?>',
                     data: { 
-                        ids: selectedIds,
+                        no_subs: selectedIds,
                         jenis_account: $('#jenis_account').val()
                     },
                     dataType: 'json'
                 }).done(function(data) {
                     data.forEach(function(item) {
                         var option = new Option(
-                            item.number + ' ' + item.name + ' ' + item.company,
+                            item.number + ' ' + item.name,
                             item.id,
                             true,
                             true
@@ -300,17 +285,7 @@
         // Load selected options dari form submit
         loadSelectedOptions(
             $('#account_id'), 
-            <?= json_encode(isset($_POST['account_id']) ? $_POST['account_id'] : []) ?>
-        );
-        
-        loadSelectedOptions(
-            $('#range_account_start_id'), 
-            <?= json_encode(isset($_POST['range_account_start_id']) ? [$_POST['range_account_start_id']] : []) ?>
-        );
-        
-        loadSelectedOptions(
-            $('#range_account_finish_id'), 
-            <?= json_encode(isset($_POST['range_account_finish_id']) ? [$_POST['range_account_finish_id']] : []) ?>
+            <?= json_encode(isset($_GET['account_id']) ? $_GET['account_id'] : []) ?>
         );
 
         
@@ -351,10 +326,31 @@
             .find('label')
             .css('z-index', '1');
 
-
     });
 
     function printPDF(url) {
+        const formData = $('.create-form').serializeArray();
+
+        const $form = $('<form>', {
+            action: url,
+            method: 'POST',
+            target: '_blank',
+        });
+
+        $.each(formData, function(index, field) {
+            $('<input>')
+                .attr({
+                    type: 'hidden',
+                    name: field.name,
+                    value: field.value,
+                })
+                .appendTo($form);
+        });
+
+        $form.appendTo('body').submit().remove();
+    };
+
+    function printExcel(url) {
         const formData = $('.create-form').serializeArray();
 
         const $form = $('<form>', {
@@ -417,6 +413,19 @@
                 })
                 $(".range_account_finish_id").val(null).change();
             }
+        });
+    }
+
+    function updateSelectedAccounts() {
+        const select = document.getElementById("account_id");
+        const selectedDiv = document.getElementById("selectedAccounts");
+        selectedDiv.innerHTML = "";
+
+        Array.from(select.selectedOptions).forEach(opt => {
+            const badge = document.createElement("span");
+            badge.className = "badge bg-primary text-white px-3 py-2";
+            badge.textContent = opt.text;
+            selectedDiv.appendChild(badge);
         });
     }
 </script>

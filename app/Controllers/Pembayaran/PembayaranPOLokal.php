@@ -568,9 +568,27 @@ class PembayaranPOLokal extends BaseController
             $akunPajakId = $taxModel->where('name', 'PPH PASAL 22')->first();
 
 
+            $total_pembayaran = $this->request->getVar('total_pembayaran');
             $potongan = $this->request->getVar('potongan');
             $potongan = is_numeric($potongan) ? $potongan : 0;
+
+            // ambil data lama
+            $payment = $localPOPaymentModel->find($id);
+            if (!$payment) {
+                return response()->setJSON([
+                    'message' => "Data pembayaran tidak ditemukan",
+                    'status' => false,
+                    'token' => csrf_hash()
+                ]);
+            }
+
+            // Jika total_pembayaran dari form 0, tapi data lama punya nilai, pakai yang lama
+            if (floatval($total_pembayaran) == 0 && floatval($payment['amount']) > 0) {
+                $total_pembayaran = $payment['amount'];
+            }
+
             $totalFinalBayar = $total_pembayaran - $potongan;
+
 
             $localPOPaymentModel->update($id, [
                 'divisi_id'         => $this->request->getVar('divisi_id'),
