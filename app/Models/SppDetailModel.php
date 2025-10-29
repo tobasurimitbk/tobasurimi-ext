@@ -79,6 +79,7 @@ class SppDetailModel extends Model
                 ->where('am_purchase_order_details.spesifikasi_id', $d->barang2_id)
                 ->where('am_purchase_order_details.note', $d->note)
                 ->where('am_purchase_orders.purchase_request_id', $id)
+                ->where('am_purchase_order_details.deletedAt', null)
                 ->first();
             $sppDetailData[$i]->status_po = $poRes == null ? false : true;
         }
