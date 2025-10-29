@@ -68,7 +68,64 @@ class BukuBesar extends BaseController
         return view('Laporan/LaporanBukuBesar/index', $data);
     }
 
-    public function searchAccounts()
+    public function searchAccounts() {
+        $search = $this->request->getVar('search');
+        $no_subs = $this->request->getVar('no_subs');
+        $jenisAccount = $this->request->getVar('jenis_account');
+        $ids = $this->request->getVar('ids'); // For handling selected options
+        
+        $results = [];
+        
+        if ($jenisAccount == "header_account") {
+            $headerBuilder = $this->HeaderAkunsModel
+                ->select('header_akuns.id, header_akuns.no_header as number, header_akuns.nama_header as name, companies.company')
+                ->where('header_akuns.deletedAt', null)
+                ->join('companies', 'companies.id = header_akuns.company_id', 'left')
+                ->where('header_akuns.company_id', $this->this_company_id);
+            
+            // If IDs are provided (for selected options)
+            if (!empty($ids)) {
+                $ids = is_array($ids) ? $ids : [$ids];
+                $headerBuilder->whereIn('header_akuns.id', $ids);
+                $results = $headerBuilder->orderBy('header_akuns.no_header', 'ASC')->findAll();
+            } 
+            // If searching
+            else if (!empty($search)) {
+                $headerBuilder->groupStart()
+                    ->like('header_akuns.no_header', $search)
+                    ->orLike('header_akuns.nama_header', $search)
+                    ->orLike('companies.company', $search)
+                    ->groupEnd();
+                $results = $headerBuilder->orderBy('header_akuns.no_header', 'ASC')->findAll(10);
+            }
+        } else {
+            $subBuilder = $this->Sub_AkunsModel
+                ->select('sub_akuns.id, sub_akuns.no_sub as number, sub_akuns.nama_sub as name, companies.company')
+                 ->where('sub_akuns.deletedAt', null)
+                ->join('companies', 'companies.id = sub_akuns.company_id', 'left')
+                ->where('sub_akuns.company_id', $this->this_company_id);
+            
+            // If IDs are provided (for selected options)
+            if (!empty($ids)) {
+                $ids = is_array($ids) ? $ids : [$ids];
+                $subBuilder->whereIn('sub_akuns.id', $ids);
+                $results = $subBuilder->orderBy('sub_akuns.no_sub', 'ASC')->findAll();
+            } 
+            // If searching
+            else if (!empty($search)) {
+                $subBuilder->groupStart()
+                    ->like('sub_akuns.no_sub', $search)
+                    ->orLike('sub_akuns.nama_sub', $search)
+                    ->orLike('companies.company', $search)
+                    ->groupEnd();
+                $results = $subBuilder->orderBy('sub_akuns.no_sub', 'ASC')->findAll(10);
+            }
+        }
+        
+        return $this->response->setJSON($results);
+    }
+
+    public function searchAccountsBukuBesar()
     {
         $search = $this->request->getVar('search');
         $noSubs = $this->request->getVar('no_subs');
