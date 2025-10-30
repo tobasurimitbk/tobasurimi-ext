@@ -4,18 +4,18 @@
 <!-- Begin Page Content -->
 <section class="section">
     <div class="section-header">
-        <h1>Pembaruan Stock Pembelian Bahan Baku</h1>
+        <h1>Pembaruan Stock Pembelian Bahan Baku Broken</h1>
         <?php if (can('Warehouse', 'P. Barang Import BB', 'p')) : ?>
             <button class="btn btn-discard btn-dropdown-export dropdown-toggle float-right" type="button" id="dropdownMenuButtonExport" data-bs-toggle="dropdown" aria-expanded="false">
                 Export
             </button>
             <ul class="dropdown-menu list-dropdown-company" aria-labelledby="dropdownMenuButtonExport">
-                <li><button class="dropdown-item" onclick="pdf('<?= base_url("update-stock-bahan-baku/print-table"); ?>')">PDF</button></li>
-                <li><button class="dropdown-item" onclick="pdf('<?= base_url("update-stock-bahan-baku/export-excel"); ?>')">EXCEL</button></li>
+                <li><button class="dropdown-item" onclick="pdf('<?= base_url("penerimaan-barang-broken/print-table"); ?>')">PDF</button></li>
+                <li><button class="dropdown-item" onclick="pdf('<?= base_url("penerimaan-barang-broken/export-excel"); ?>')">EXCEL</button></li>
             </ul>
         <?php endif; ?>
         <?php if (can('Warehouse', 'P. Barang Import BB', 'c')) : ?>
-            <a class="btn btn-show-form btn-add float-right" href="<?= base_url("update-stock-bahan-baku/create"); ?>">
+            <a class="btn btn-show-form btn-add float-right" href="<?= base_url("penerimaan-barang-broken/create"); ?>">
                 <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
             </a>
         <?php endif; ?>
@@ -100,7 +100,7 @@
         },
         pageLength: 25,
         ajax: {
-            url: "<?= base_url("update-stock-bahan-baku/all"); ?>",
+            url: "<?= base_url("penerimaan-barang-broken/all"); ?>",
             dataSrc: "data",
             data: function(data) {
                 data.search = $(".search").val();
@@ -220,13 +220,13 @@
 
         $('#dataTable tbody').on('click', 'tr td:not(.actions):not(.dataTables_empty)', function() {
             const data = table.row(this).data();
-            location.replace(`<?= base_url("update-stock-bahan-baku/id"); ?>/${data.id}`);
+            location.replace(`<?= base_url("penerimaan-barang-broken/id"); ?>/${data.id}`);
         })
 
         $('#dataTable tbody').on('click', '.return-out', function() {
             // Use the closest 'tr' element to get the data
             const data = table.row($(this).closest('tr')).data();
-            location.replace(`<?= base_url("update-stock-bahan-baku/return-barang/id"); ?>/${data.id}`);
+            location.replace(`<?= base_url("penerimaan-barang-broken/return-barang/id"); ?>/${data.id}`);
         });
     })
 
@@ -244,7 +244,7 @@
             if (result.isConfirmed) {
                 const csrf = $(`[name="${csrfToken}"]`);
                 $.ajax({
-                    url: "<?= base_url("update-stock-bahan-baku/posting"); ?>",
+                    url: "<?= base_url("penerimaan-barang-broken/posting"); ?>",
                     data: {
                         id: id,
                     },
@@ -295,7 +295,7 @@
             if (result.isConfirmed) {
                 const csrf = $(`[name="${csrfToken}"]`);
                 $.ajax({
-                    url: "<?= base_url("/update-stock-bahan-baku/unposting"); ?>",
+                    url: "<?= base_url("/penerimaan-barang-broken/unposting"); ?>",
                     data: {
                         id: id,
                     },
@@ -349,7 +349,7 @@
             if (result.isConfirmed) {
                 const csrf = $(`[name="${csrfToken}"]`);
                 $.ajax({
-                    url: "<?= base_url("update-stock-bahan-baku/delete"); ?>",
+                    url: "<?= base_url("penerimaan-barang-broken/delete"); ?>",
                     data: {
                         id: id
                     },

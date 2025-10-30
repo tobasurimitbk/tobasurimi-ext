@@ -229,6 +229,34 @@ class RMPurchaseOrderModel extends Model
         ];
     }
 
+    public function getDataPOList($divisi_id, $warehouse_id, $supplier_id)
+    {
+        $selectQry = "
+            rm_purchase_orders.*,
+            suppliers.name AS supplier_name
+        ";
+
+        $bbLokalDataQry = $this->asObject()
+            ->select($selectQry)
+            ->join('suppliers', 'rm_purchase_orders.supplier_id = suppliers.id', 'left')
+            ->join('companies', 'rm_purchase_orders.company_id = companies.id', 'left')
+            ->join('rm_purchase_order_details', 'rm_purchase_orders.id = rm_purchase_order_details.rm_purchase_order_id', 'left')
+            ->join('divisis', 'divisis.id = rm_purchase_orders.divisi_id', 'left')
+            ->join('penerimaan_barang_broken_detail', 'penerimaan_barang_broken_detail.rm_purchase_order_id = rm_purchase_orders.id AND penerimaan_barang_broken_detail.deletedAt IS NULL', 'left')
+            ->where('rm_purchase_orders.supplier_id', $supplier_id)
+            ->where('rm_purchase_orders.divisi_id', $divisi_id)
+            ->where('rm_purchase_orders.warehouse_id', $warehouse_id)
+            ->where('rm_purchase_orders.deletedAt', NULL)
+            ->where('rm_purchase_orders.is_posted', 1)
+            ->where('penerimaan_barang_broken_detail.rm_purchase_order_id IS NULL') // exclude yang sudah dipakai
+            ->groupBy('rm_purchase_orders.id');
+
+        $data = $bbLokalDataQry->findAll();
+
+        return [
+            'data' => $data,
+        ];
+    }
 
     public function getListLaporanPurchaseOrder($condition = [], $addCondition = [], $limit = 10, $offset = 0)
     {
