@@ -48,6 +48,7 @@ class BC40Model extends Model
             'bc_40.no_aju'                           => 'bc_40.no_aju',
             'bc_purchase_order.po_type'              => 'bc_purchase_order.po_type',
             'bc_purchase_order.supplier_id'      => 'bc_purchase_order.supplier_id',
+            'bc_purchase_order.multiple_po_no'      => 'bc_purchase_order.multiple_po_no',
         ];
         $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
 
@@ -103,7 +104,8 @@ class BC40Model extends Model
             $bcDataQry->like('suppliers.name', $addCondition['searchData'])
                 ->orLike('multiple_lpb_no', $addCondition['searchData'])
                 ->orLike('bc_40.no_aju', $addCondition['searchData'])
-                ->orLike('bc_purchase_order.no_daftar', $addCondition['searchData']);
+                ->orLike('bc_purchase_order.no_daftar', $addCondition['searchData'])
+                ->orLike('bc_purchase_order.multiple_po_no', $addCondition['searchData']);
         }
 
         if ($addCondition['searchData']) {
