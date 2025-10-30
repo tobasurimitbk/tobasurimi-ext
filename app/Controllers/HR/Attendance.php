@@ -879,7 +879,10 @@ class Attendance extends BaseController
             $this->AttendanceModel->where('periode >=', $startDate)
                 ->where('periode <=', $endDate)
                 ->where('company_id', $this->this_company_id)
+                ->groupStart()
                 ->where('abaikan_sync_log', "no") // yang diabaikan jgn diapus
+                ->orWhere('abaikan_sync_log', null)
+                ->groupEnd()
                 ->delete();
 
             $res = $this->AttendanceModel->generate(
