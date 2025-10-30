@@ -200,7 +200,7 @@
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3">
-                            <input autocomplete="one-time-code" type="text" class="form-control destination" id="destination" name="destination" placeholder="Destination" readonly value="<?= !empty($dataSalesExport) ? $dataSalesExport->dicharge_port : '' ?>">
+                            <input autocomplete="one-time-code" type="text" class="form-control destination" id="destination" name="destination" placeholder="Destination" value="<?= !empty($dataSalesExport) ? $dataSalesExport->destination : '' ?>">
                             <label for="floatingInput">Destination</label>
                         </div>
                     </div>
@@ -1219,9 +1219,9 @@
                 deadline: {
                     required: true
                 },
-                // container: {
-                //     required: true
-                // },
+                destination: {
+                    required: true
+                },
                 document_required: {
                     required: true
                 }
@@ -1245,9 +1245,9 @@
                 deadline: {
                     required: "Deadline required"
                 },
-                // container: {
-                //     required: "Container required"
-                // },
+                destination: {
+                    required: "Destination required"
+                },
                 document_required: {
                     required: "Document required"
                 }

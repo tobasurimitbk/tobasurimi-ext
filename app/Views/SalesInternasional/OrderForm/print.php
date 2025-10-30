@@ -161,7 +161,7 @@
                             <tr>
                                 <td>DESTINATION</td>
                                 <td>:</td>
-                                <td><?= $dataSO->dicharge_port ?></td>
+                                <td><?= $dataSO->destination ?></td>
                             </tr>
                             <tr>
                                 <td>DEADLINE</td>
@@ -178,7 +178,7 @@
                                 <td style="width: 150px;"><?= $dataSO->sales_order_export_no ?></td>
                             </tr> -->
                             <tr style="text-align: right;">
-                                <td style="width: 190px;">ORDER</td>
+                                <td style="width: 140px;">ORDER</td>
                                 <td>:</td>
                                 <td><?= $dataSO->sales_order_export_no ?></td>
                             </tr>

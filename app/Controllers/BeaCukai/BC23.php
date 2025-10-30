@@ -193,7 +193,7 @@ class BC23 extends BaseController
         $addCondition = [
             "sort" => $this->request->getGet("sort"),
             "sortType" => $this->request->getGet("sortType"),
-            "searchData" => $this->request->getGet('searchData'),
+            "searchData" => trim($this->request->getGet('searchData')),
             "statusPosting" => $this->request->getGet('statusPosting'),
             "statusLPB" => $this->request->getGet("statusLPB"),
             "mulaiTanggalBC23" =>  $this->request->getVar("mulaiTanggalBC23") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("mulaiTanggalBC23")))) : "",
@@ -210,8 +210,8 @@ class BC23 extends BaseController
         $no = ($payload["pageSize"] * ($payload["currentPage"] - 1)) + 1;
 
         foreach ($beaCukaiData['data'] as $data) {
-            $bc23 = $this->bc23Model->where('bc_purchase_order_id', $data->bc_purchase_order_id)->first();
-            $totalBarang = $this->bcPurchaseOrderModel->findDetailBarang($data->bc_purchase_order_id);
+            // $bc23 = $this->bc23Model->where('bc_purchase_order_id', $data->bc_purchase_order_id)->first();
+            // $totalBarang = $this->bcPurchaseOrderModel->findDetailBarang($data->bc_purchase_order_id);
 
             array_push($dataBeaCukai, [
                 "no"                    => $no++,
@@ -222,10 +222,11 @@ class BC23 extends BaseController
                 "lpb_no"                => str_replace(['"', ']', '['], " ",  $data->multiple_lpb_no),
                 "po_no"                 => str_replace(['"', ']', '['], " ",  $data->multiple_po_no),
                 "supplier_name"         => strtoupper($data->supplier_name),
-                "status"                => strtoupper($bc23 == null ? "BELUM DIBUAT" : $data->status_dokumen),
-                "total_barang"          => count($totalBarang),
+                "status"                => strtoupper($data->status_dokumen == null ? "BELUM DIBUAT" : $data->status_dokumen),
+                // "total_barang"          => count($totalBarang),
+                "total_po"              => count(json_decode($data->multiple_po_no)),
                 "status_posting"        => $data->status_posting,
-                "is_update_no_aju"      => $bc23 == null ? false : ($data->status_posting === "1" ? false : true),
+                // "is_update_no_aju"      => $bc23 == null ? false : ($data->status_posting === "1" ? false : true),
             ]);
         }
 

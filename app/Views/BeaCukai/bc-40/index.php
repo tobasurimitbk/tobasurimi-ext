@@ -108,10 +108,11 @@
                                 <th onclick="changeSort('bc_purchase_order.supplier_id')" class="sort" style="text-align: center;">Supplier</th>
                                 <th onclick="changeSort('bc_40.createdAt')" class="sort" style="text-align: center;">Tanggal</th>
                                 <th onclick="changeSort('bc_40.no_aju')" class="sort" style="text-align: center;">No Aju / No Daftar</th>
-                                <th onclick="changeSort('bc_purchase_order.po_type')" style="text-align: center;">Jenis PO</th>
-                                <!-- <th onclick="changeSort('bc_purchase_order.multiple_lpb_id')" class="sort" style="text-align: center;">No LPB</th>
-                                <th onclick="changeSort('bc_purchase_order.multiple_po_id')" class="sort" style="text-align: center;">No PO</th> -->
-                                <th>Total Barang</th>
+                                <!-- <th onclick="changeSort('bc_purchase_order.po_type')" style="text-align: center;">Jenis PO</th> -->
+                                <!-- <th onclick="changeSort('bc_purchase_order.multiple_lpb_id')" class="sort" style="text-align: center;">No PO</th> -->
+                                <!-- <th onclick="changeSort('bc_purchase_order.multiple_po_id')" class="sort" style="text-align: center;">No PO</th> -->
+                                <th onclick="changeSort('bc_purchase_order.multiple_po_id')">No Po</th>
+                                <!-- <th>Total Po</th> -->
                                 <th>Posting</th>
                                 <th>Doc Ceisa (Host to Host)</th>
                                 <th style="text-align: center;">Action</th>
@@ -236,16 +237,36 @@
                 data: "no_aju",
                 className: "text-left"
             },
+            // {
+            //     data: "po_type",
+            //     className: "text-left",
+            // },
             {
-                data: "po_type",
+                data: "po_no",
                 className: "text-left",
+                render: function(data, type, row) {
+                    if (!data) return "";
+
+                    let list = data.split(",").map(v => v.trim());
+                    let result = "";
+                    for (let i = 0; i < list.length; i++) {
+                        result += list[i];
+                        if ((i + 1) % 2 === 0) {
+                            result += "<br>"; // turun ke bawah
+                        } else if (i < list.length - 1) {
+                            result += ", ";
+                        }
+                    }
+
+                    return result;
+                }
             },
-            {
-                data: "total_barang",
-                searchable: false,
-                sortable: false,
-                className: "text-left",
-            },
+            // {
+            //     data: "total_po",
+            //     searchable: false,
+            //     sortable: false,
+            //     className: "text-left",
+            // },
             // {
             //     data: "lpb_no",
             //     className: "text-center"
@@ -412,7 +433,7 @@
         table.ajax.reload();
     });
 
-    $('.searchData').keyup(function() {
+    $('.searchData').change(function() {
         table.ajax.reload();
     });
 
