@@ -4,21 +4,22 @@
 <!-- Begin Page Content -->
 <section class="section">
     <div class="section-header">
-        <h1>Pembaruan Stock Pembelian Bahan Baku</h1>
-        <?php if (can('Warehouse', 'P. Barang Import BB', 'p')) : ?>
+        <h1>Penerimaan Barang Import Penolong</h1>
+        <?php if (can('Warehouse', 'P. Barang Import BP', 'p')) : ?>
             <button class="btn btn-discard btn-dropdown-export dropdown-toggle float-right" type="button" id="dropdownMenuButtonExport" data-bs-toggle="dropdown" aria-expanded="false">
                 Export
             </button>
             <ul class="dropdown-menu list-dropdown-company" aria-labelledby="dropdownMenuButtonExport">
-                <li><button class="dropdown-item" onclick="pdf('<?= base_url("update-stock-bahan-baku/print-table"); ?>')">PDF</button></li>
-                <li><button class="dropdown-item" onclick="pdf('<?= base_url("update-stock-bahan-baku/export-excel"); ?>')">EXCEL</button></li>
+                <li><button class="dropdown-item" onclick="pdf('<?= base_url("penerimaan-barang-import-bp/print-table"); ?>')">PDF</button></li>
+                <li><button class="dropdown-item" onclick="pdf('<?= base_url("penerimaan-barang-import-bp/export-excel"); ?>')">EXCEL</button></li>
             </ul>
         <?php endif; ?>
-        <?php if (can('Warehouse', 'P. Barang Import BB', 'c')) : ?>
-            <a class="btn btn-show-form btn-add float-right" href="<?= base_url("update-stock-bahan-baku/create"); ?>">
+        <?php if (can('Warehouse', 'P. Barang Import BP', 'c')) : ?>
+            <a class="btn btn-show-form btn-add float-right" href="<?= base_url("penerimaan-barang-import-bp/create"); ?>">
                 <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
             </a>
         <?php endif; ?>
+
     </div>
     <div class="card">
         <div class="card-body">
@@ -40,14 +41,14 @@
                         </div>
                     </div>
                 </div>
-                <!-- <div class="col">
+                <div class="col">
                     <select class="form-select status" name="status" id="status" aria-label="Floating label select example">
                         <option value="waiting">STATUS LPB:WAITING</option>
                         <option value="finish">STATUS LPB:FINISH</option>
                     </select>
-                </div> -->
+                </div>
                 <div class="col">
-                    <input autocomplete="one-time-code" class="form-control search form-out-search" placeholder="Cari Data PO" value="" />
+                    <input autocomplete="one-time-code" class="form-control search form-out-search" placeholder="Cari Data LPB" value="" />
                 </div>
             </div>
             <div class="row">
@@ -57,10 +58,13 @@
                             <tr>
                                 <th>No.</th>
                                 <th onclick="changeSort('divisi')" class="sort">Departemen</th>
+                                <th onclick="changeSort('no_penerimaan_barang')" class="sort">No. Penerimaan</th>
+                                <th>No. PO</th>
                                 <th onclick="changeSort('warehouse_name')" class="sort">Gudang</th>
                                 <th onclick="changeSort('createdAt')">Tanggal</th>
                                 <th onclick="changeSort('supplier_name')" class="sort">Supplier</th>
-                                <th >Action</th>
+                                <th>Jumlah Item</th>
+                                <th>Actions</th>
                             </tr>
                         </thead>
                         <tbody class="body-table" id="body-table" style="cursor: pointer;">
@@ -100,7 +104,7 @@
         },
         pageLength: 25,
         ajax: {
-            url: "<?= base_url("update-stock-bahan-baku/all"); ?>",
+            url: "<?= base_url("penerimaan-barang-import-bp/all"); ?>",
             dataSrc: "data",
             data: function(data) {
                 data.search = $(".search").val();
@@ -128,6 +132,16 @@
                 className: "text-center"
             },
             {
+                data: "no_penerimaan_barang",
+                className: "text-center"
+            },
+            {
+                data: "multiple_po_no",
+                className: "text-center",
+                searchable: false,
+                sortable: false
+            },
+            {
                 data: "warehouse_name",
                 className: "text-center"
             },
@@ -140,29 +154,66 @@
                 className: "text-center"
             },
             {
+                data: "itemCount",
+                className: "text-center",
+                searchable: false,
+                sortable: false
+            },
+            {
                 data: "id",
                 className: "text-center actions",
                 searchable: false,
                 sortable: false,
                 render: function(data, type, row) {
                     let id = row.id;
-                    let status = row.status_posting
-                    // console.log(status);
-                    if (status != 1) {
+                    let status = row.status_post;
+                    let tipe_bahan = row.tipe_bahan;
+                    let type_bc = row.bc_type;
+                    let in_bc = row.in_bc;
+
+
+                    if (status == "WAITING") {
                         return `
-                                <div class="mt-0">
-                                    <button type="button" onclick="remove('${id}')" class="btn btn-discard delete-btn btn-trash">
-                                        <i class="fa fa-trash"></i>
-                                    </button>
-                                    <button class="btn btn-warning" onclick="handlePrint('${id}')">
-                                        <i class="fa fa-print fa-sm" aria-hidden="true"></i>
-                                    </button>
-                                    <button type="button" class="btn btn-success" onclick="posting('${id}', 1)">
-                                        <i class="fa fa-paper-plane" aria-hidden="true"></i>
-                                    </button>
-                                </div>
+                        <div class="mt-0">
+                        <?php if (can('Warehouse', 'P. Barang Import BP', 'p')) : ?>
+                            <button data-toggle="tooltip" title="Print" class="btn btn-warning btn-print" onclick="print('<?= base_url("penerimaan-barang-import-bp/print/"); ?>${id}')" style="box-shadow: none !important;">
+                                <i class="fa fa-print fa-sm" aria-hidden="true"></i>
+                            </button>
+                        <?php endif; ?>
+                        <?php if (can('Warehouse', 'P. Barang Import BP', 'a')) : ?>
+                            <button data-toggle="tooltip" title="Posting" onclick="posting('${id}')" class="btn btn-success posting-spp">
+                                <i class="fa fa-paper-plane fa-sm" aria-hidden="true"></i>
+                            </button>
+                        <?php endif; ?>
+                        <?php if (can('Warehouse', 'P. Barang Import BP', 'd')) : ?>
+                            <button data-toggle="tooltip" title="Hapus" onclick="remove('${id}')" class="btn btn-danger delete-parent">
+                                <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
+                            </button>
+                        <?php endif; ?>
+                        </div>
+                    `
+                    } else {
+                        buttonUnpost = `<button data-toggle="tooltip" title="Unpost" class="btn btn-danger btn-print" onclick="unposting('${id}')" style="box-shadow: none !important;">
+                                    <i class="fa fa-ban fa-sm" aria-hidden="true"></i>
+                                </button>
+                        `;
+                        string =
                             `
+                        <div class="mt-0" style="text-align:center;">
+                          
+                            <?php if (can('Warehouse', 'P. Barang Import BP', 'p')) : ?>
+                                <button data-toggle="tooltip" title="Print" class="btn btn-warning btn-print" onclick="print('<?= base_url("penerimaan-barang-import-bp/print/"); ?>${id}')" style="box-shadow: none !important;">
+                                    <i class="fa fa-print fa-sm" aria-hidden="true"></i>
+                                </button>
+                            <?php endif; ?>
+                    `
+                        if (type_bc !== '0' && in_bc == 'out') {
+                            string += buttonUnpost
+                        }
+                        return string + ` </div>`;
+
                     }
+
                 }
             }
         ],
@@ -220,13 +271,13 @@
 
         $('#dataTable tbody').on('click', 'tr td:not(.actions):not(.dataTables_empty)', function() {
             const data = table.row(this).data();
-            location.replace(`<?= base_url("update-stock-bahan-baku/id"); ?>/${data.id}`);
+            location.replace(`<?= base_url("penerimaan-barang-import-bp/id"); ?>/${data.id}`);
         })
 
         $('#dataTable tbody').on('click', '.return-out', function() {
             // Use the closest 'tr' element to get the data
             const data = table.row($(this).closest('tr')).data();
-            location.replace(`<?= base_url("update-stock-bahan-baku/return-barang/id"); ?>/${data.id}`);
+            location.replace(`<?= base_url("penerimaan-barang-import-bp/return-barang/id"); ?>/${data.id}`);
         });
     })
 
@@ -244,7 +295,7 @@
             if (result.isConfirmed) {
                 const csrf = $(`[name="${csrfToken}"]`);
                 $.ajax({
-                    url: "<?= base_url("update-stock-bahan-baku/posting"); ?>",
+                    url: "<?= base_url("penerimaan-barang-import-bp/posting"); ?>",
                     data: {
                         id: id,
                     },
@@ -274,6 +325,7 @@
                                 title: response.message,
                                 confirmButtonColor: '#4e73df',
                             })
+                            table.ajax.reload();
                         }
                     },
 
@@ -281,6 +333,7 @@
             }
         })
     }
+
     const unposting = function(id) {
         Swal.fire({
             icon: 'question',
@@ -295,7 +348,7 @@
             if (result.isConfirmed) {
                 const csrf = $(`[name="${csrfToken}"]`);
                 $.ajax({
-                    url: "<?= base_url("/update-stock-bahan-baku/unposting"); ?>",
+                    url: "<?= base_url("/penerimaan-barang-import-bp/unposting"); ?>",
                     data: {
                         id: id,
                     },
@@ -334,6 +387,7 @@
         })
 
     }
+
 
     const remove = function(id) {
         Swal.fire({
@@ -349,7 +403,7 @@
             if (result.isConfirmed) {
                 const csrf = $(`[name="${csrfToken}"]`);
                 $.ajax({
-                    url: "<?= base_url("update-stock-bahan-baku/delete"); ?>",
+                    url: "<?= base_url("penerimaan-barang-import-bp/delete"); ?>",
                     data: {
                         id: id
                     },

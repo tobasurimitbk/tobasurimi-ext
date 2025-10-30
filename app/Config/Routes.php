@@ -1575,12 +1575,13 @@ $routes->get('/penerimaan-barang-broken/all', 'Warehouse\PenerimaanBarangBroken:
 $routes->get('/penerimaan-barang-broken/create', 'Warehouse\PenerimaanBarangBroken::createPenerimaanBarangBroken', ['filter' => 'Auth']);
 $routes->get('/penerimaan-barang-broken/id/(:segment)', 'Warehouse\PenerimaanBarangBroken::getByIdPenerimaanBarangBroken/$1', ['filter' => 'Auth']);
 $routes->get('/penerimaan-barang-broken/print/(:segment)', 'Warehouse\PenerimaanBarangBroken::print/$1', ['filter' => 'Auth']);
+$routes->get('/penerimaan-barang-broken/get-po', 'Warehouse\PenerimaanBarangBroken::getListPO', ['filter' => 'Auth']);
 $routes->post('/penerimaan-barang-broken/save', 'Warehouse\PenerimaanBarangBroken::savePenerimaanBarangBroken', ['filter' => 'Auth']);
 $routes->post('/penerimaan-barang-broken/update', 'Warehouse\PenerimaanBarangBroken::updatePenerimaanBarangBroken', ['filter' => 'Auth']);
-$routes->post('/penerimaan-barang-broken/update-status', 'Warehouse\PenerimaanBarangBroken::updateStatusPenerimaanBarangBroken', ['filter' => 'Auth']);
+$routes->post('/penerimaan-barang-broken/posting', 'Warehouse\PenerimaanBarangBroken::posting', ['filter' => 'Auth']);
 $routes->post('/penerimaan-barang-broken/delete', 'Warehouse\PenerimaanBarangBroken::deletePenerimaanBarangBroken', ['filter' => 'Auth']);
 $routes->get('/penerimaan-barang-broken/receivedItemsBySupplier/(:num)', 'Warehouse\PenerimaanBarangBroken::getReceivedItemsBySupplier/$1', ['filter' => 'Auth']);
-$routes->get('/penerimaan-barang-broken/generate', 'Warehouse\PenerimaanBarangBroken::generatePenerimaanBarang', ['filter' => 'Auth']);
+$routes->get('/penerimaan-barang-broken/generate', 'Warehouse\PenerimaanBarangBroken::generatePenerimaanBarangBroken', ['filter' => 'Auth']);
 
 $routes->get('/update-stock-bahan-baku', 'Warehouse\UpdateStockBahanBaku::UpdateStockBahanBaku', ['filter' => 'Auth']);
 $routes->get('/update-stock-bahan-baku/all', 'Warehouse\UpdateStockBahanBaku::allUpdateStockBahanBaku', ['filter' => 'Auth']);

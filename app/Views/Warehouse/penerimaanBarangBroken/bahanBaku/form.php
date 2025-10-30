@@ -3,9 +3,9 @@
 
 <section class="section">
     <div class="section-header">
-        <h1><?= empty($updateStockData) ? "Tambah Update Data Stock Pembelian" : "Update Update Data Stock Pembelian" ?></h1>
+        <h1><?= empty($penerimaanBarangBroken) ? "Tambah Update Data Stock Pembelian" : "Update Update Data Stock Pembelian" ?></h1>
         <div class="col-button-tambah-spp">
-            <a class="btn btn-hide-form btn-discard float-right" href="<?= base_url("update-stock-bahan-baku"); ?>">
+            <a class="btn btn-hide-form btn-discard float-right" href="<?= base_url("penerimaan-barang-broken"); ?>">
                 Kembali
             </a>
             <button class="btn btn-show-form btn-save float-right btn-submit-parent">
@@ -17,13 +17,27 @@
         <div class="card-body">
             <div class="row">
                 <div class="col mb-3">
-                    <label class="form-label font-weight-bold lable-title">Data Po</label>
+                    <label class="form-label font-weight-bold lable-title">Data Po Barang Broken</label>
                 </div>
             </div>
             <form class="create-form form-add-spp" role="form" method="POST" enctype="multipart/form-data">
-                <input type="hidden" name="id" id="id" value="<?= !empty($updateStockData) ? encrypt($updateStockData['id']) : '' ?>" class="id">
+                <input type="hidden" name="id" id="id" value="<?= !empty($penerimaanBarangBroken) ? encrypt($penerimaanBarangBroken['id']) : '' ?>" class="id">
                 <?= csrf_field() ?>
                 <div class="row">
+
+                    <div class="col-md-4">
+                        <div class="form-floating mb-3" style="height: 50px;">
+                            <div class="input-group input-group-password">
+                                <div class="form-floating mb-3" style="height: 50px;">
+                                    <input autocomplete="one-time-code" <?= !empty($penerimaanBarangBroken) ? ($penerimaanBarangBroken['status_posting'] === "FINISH" ? 'disabled=true' : '') : ''; ?> value="<?= !empty($penerimaanBarangBroken) ? $penerimaanBarangBroken['no_penerimaan_barang'] : ""; ?>" type="text" class="form-control no_penerimaan_barang" id="no_penerimaan_barang" name="no_penerimaan_barang" placeholder="No. Penerimaan">
+                                    <label for="floatingInput">No. Penerimaan</label>
+                                </div>
+                                <div class="input-generate input-group-prepend group-prepend-password align-items-center">
+                                    <input <?= !empty($penerimaanBarangBroken) ? ($penerimaanBarangBroken['no_penerimaan_barang']  ? 'checked' : '') : ''; ?> autocomplete="one-time-code" style="z-index: 99; margin-bottom: 10px; margin-left: -30px;" class="auto_generate" id="auto_generate" name="auto_generate" type="checkbox" onchange="changeStatus()">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
 
                     <!-- DIVISI -->
                     <div class="col-md-4">
@@ -31,7 +45,7 @@
                             <select class="form-select divisi_id" id="divisi_id" name="divisi_id" aria-label="Floating label select example">
                                 <option value=""></option>
                                 <?php foreach ($divisi as $d) : ?>
-                                    <option <?= !empty($updateStockData) && $updateStockData['divisi_id'] == $d['id'] ? 'selected' : '' ?>
+                                    <option <?= !empty($penerimaanBarangBroken) && $penerimaanBarangBroken['divisi_id'] == $d['id'] ? 'selected' : '' ?>
                                             value="<?= $d['id'] ?>">
                                         <?= $d['divisi']; ?>
                                     </option>
@@ -83,7 +97,7 @@
                             <select class="form-select supplier_id" id="supplier_id" name="supplier_id" aria-label="Floating label select example">
                                 <option value=""></option>
                                 <?php foreach ($supplier as $s): ?>
-                                    <option <?= !empty($updateStockData) && $updateStockData['supplier_id'] == $s['id'] ? 'selected' : '' ?>
+                                    <option <?= !empty($penerimaanBarangBroken) && $penerimaanBarangBroken['supplier_id'] == $s['id'] ? 'selected' : '' ?>
                                             value="<?= $s['id'] ?>">
                                         <?= $s['name'] ?>
                                     </option>
@@ -93,28 +107,9 @@
                         </div>
                     </div>
 
-                    <!-- MASTER BARANG -->
-                    <div class="col-md-4">
-                        <div class="form-floating mb-3" style="height: 50px;">
-                            <select class="form-select barang_id" id="barang_id" name="barang_id">
-                                <option value=""></option>
-                            </select>
-                            <label for="floatingInput" style="z-index: 1;">Pilih Barang</label>
-                        </div>
-                    </div>
-
-                    <!-- SPESIFIKASI BARANG -->
-                    <div class="col-md-4">
-                        <div class="form-spp form-floating mb-3">
-                                <select class="form-select spesifikasi_id" id="spesifikasi_id" name="spesifikasi_id[]">
-                                </select>
-                                <label for="spesifikasi_id">Pilih Spesifikasi Barang</label>
-                        </div>
-                    </div>
-
                 </div>
 
-                 <div class="row mt-3">
+                <div class="row mt-3">
                     <div class="col mb-0">
                         <label class="form-label font-weight-bold lable-title">Pilih Inventori Barang Yang Akan Di Update Stock</label>
                     </div>
@@ -124,19 +119,36 @@
                                 <thead class="thead-dark">
                                     <tr>
                                         <th style="text-align: center;">#</th>
-                                        <th style="text-align: center;">Asal Barang</th>
                                         <th style="text-align: center;">No PO</th>
                                         <th style="text-align: center;">Supplier</th>
                                         <th style="text-align: center;">Dokumen Pabean</th>
                                         <th style="text-align: center;">Tgl PO</th>
-                                        <th style="text-align: center;">Barang - Spesifikasi</th>
-                                        <th style="text-align: center;">Satuan</th>
-                                        <th style="text-align: center;">Qty</th>
                                     </tr>
                                 </thead>
                                 <tbody class="body-table">
                                 </tbody>
                             </table>
+
+                            <div class="row">
+                                <!-- MASTER BARANG -->
+                                <div class="col-md-4">
+                                    <div class="form-floating mb-3" style="height: 50px;">
+                                        <select class="form-select barang_id" id="barang_id" name="barang_id">
+                                            <option value=""></option>
+                                        </select>
+                                        <label for="floatingInput" style="z-index: 1;">Pilih Barang</label>
+                                    </div>
+                                </div>
+
+                                <!-- SPESIFIKASI BARANG -->
+                                <div class="col-md-4">
+                                    <div class="form-spp form-floating mb-3">
+                                            <select class="form-select spesifikasi_id" id="spesifikasi_id" name="spesifikasi_id[]">
+                                            </select>
+                                            <label for="spesifikasi_id">Pilih Spesifikasi Barang</label>
+                                    </div>
+                                </div>
+                            </div>
                             <button type="button" class="btn btn-primary" id="select-item-btn">Pilih</button>
                         </div>
                     </div>
@@ -154,18 +166,14 @@
                         <table class="table table-bordered nowrap table-hover-tobasurimi dataTable" id="selectedItemTable" width="100%" border="1" cellspacing="0">
                             <thead class="thead-dark">
                                 <tr>
-                                    <th style="text-align: center;" colspan="12">Detail PO & LPB</th>
+                                    <th style="text-align: center;" colspan="12">Detail Penerimaan Barang Broken</th>
                                 </tr>
                                 <tr>
                                     <th style="text-align: center;">No</th>
-                                    <th style="text-align: center;">Asal Barang</th>
                                     <th style="text-align: center;">No Dokumen</th>
                                     <th style="text-align: center;">Supplier</th>
                                     <th style="text-align: center;">Tgl PO</th>
                                     <th style="text-align: center;">Barang - Spesifikasi</th>
-                                    <th style="text-align: center;">Satuan</th>
-                                    <th style="text-align: center;">Qty PO</th>
-                                    <th style="text-align: center;">Qty Kotor (selisih)</th>
                                     <th style="text-align: center;">Qty Di Terima</th>
                                     <th style="text-align: center;">Action</th>
                                 </tr>
@@ -212,7 +220,7 @@
             autoclose: true
         });
 
-        <?php if (!empty($updateStockData)) : ?>
+        <?php if (!empty($penerimaanBarangBroken)) : ?>
             // convert YYYY-MM-DD -> DD/MM/YYYY
             function formatDate(dateString) {
                 if (!dateString) return "";
@@ -221,8 +229,8 @@
             }
 
             // set value ke datepicker
-            $("#tanggal_po_awal").datepicker("setDate", formatDate("<?= $updateStockData['tanggal_awal'] ?>"));
-            $("#tanggal_po_akhir").datepicker("setDate", formatDate("<?= $updateStockData['tanggal_akhir'] ?>"));
+            $("#tanggal_po_awal").datepicker("setDate", formatDate("<?= $penerimaanBarangBroken['tanggal_awal'] ?>"));
+            $("#tanggal_po_akhir").datepicker("setDate", formatDate("<?= $penerimaanBarangBroken['tanggal_akhir'] ?>"));
 
             // trigger change supaya kalau ada listener ikut ke-execute
             $("#tanggal_po_awal").trigger("change");
@@ -233,16 +241,32 @@
             $('#warehouse_id').trigger('change');  
             $('#supplier_id').trigger('change');   
 
-            var barangId = "<?= $updateStockData['master_barang_id'] ?>";
-            var barangText = "<?= $updateStockData['barang_name'] ?? '' ?>"; // pastikan kirim nama barang dari controller
 
-            if (barangId && barangText) {
-                // bikin option baru untuk select2
-                var option = new Option(barangText, barangId, true, true);
-                $('#barang_id').append(option).trigger('change');
+            const penerimaanBarangBrokenDetail = <?= json_encode($penerimaanBarangBrokenDetail ?? []) ?>;
+
+            if (Array.isArray(penerimaanBarangBrokenDetail) && penerimaanBarangBrokenDetail.length > 0) {
+                // Reset list global biar clean
+                listStockSelected = [];
+
+                penerimaanBarangBrokenDetail.forEach(item => {
+                    listStockSelected.push({
+                        po_id: item.po_id ?? null,
+                        po_no: item.po_no ?? "-",
+                        po_date: item.po_date ?? "-",
+                        supplier_name: item.supplier_name ?? "-",
+                        barang_id: item.barang_id,
+                        barang_name: item.barang_name,
+                        spesifikasi_id: item.spesifikasi_id,
+                        spesifikasi_name: item.spesifikasi_name,
+                        qty_diterima: item.qty_diterima ?? 0
+                    });
+                });
+
+                // Draw tabel langsung
+                drawTableSelectedItem(listStockSelected);
             }
 
-            getListBarangPoAlreadyHaveKotor();
+
         <?php endif; ?>
     });
 
@@ -359,20 +383,22 @@
             }
         }
     }).change(function() {
-        getListBarangPo();
+        // getListBarangPo();
     });
 
     $('#supplier_id').select2({
         placeholder: "Pilih Supplier",
         theme: "bootstrap-5",
         allowClear: true
+    }).change(function() {
+        getListPo();
     });
 
 
     // VALIDATOR
     var validator = $(".create-form").validate({
         rules: {
-            no_rebus: {
+            no_penerimaan_barang: {
                 required: true
             },
             tanggal: {
@@ -389,7 +415,7 @@
             },
         },
         messages: {
-            no_rebus: {
+            no_penerimaan_barang: {
                 required: "No surat jalan wajib diisi"
             },
             tanggal: {
@@ -428,49 +454,66 @@
     });
 
 
-    $('#select-item-btn').click(function() {
-        var typePengambilanStock = $('#type_pengambilan_stock option:selected').val();
-        if (typePengambilanStock == "FIFO") {
-            var spesifikasiHasilRebus = $('.spesifikasi_hasil_rebus_id option:selected');
-            if (spesifikasiHasilRebus.val() == "") {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Barang hasil rebus wajib diisi',
-                    confirmButtonColor: '#4e73df',
-                    confirmButtonText: 'Ok'
-                });
-            } else {
-                insertListFifo();
-            }
-        } else {
-            insertListPabean();
-        }
+    $('#select-item-btn').click(function() { 
+        insertListPabean();
     });
 
     function insertListPabean() {
-        var checkedCheckboxes = $(".child:checked");
-        var dataIds = checkedCheckboxes.map(function() {
-            return $(this).data("id");
+        const checkedRadio = $(".child:checked");
+        if (checkedRadio.length === 0) {
+            Swal.fire('Pilih salah satu PO dulu', '', 'warning');
+            return;
+        }
+
+        const poId = checkedRadio.data("id");
+        const poData = listStockAsal.find(v => Number(v.id) === Number(poId));
+
+        const barangId = $('#barang_id').val();
+        const barangName = $('#barang_id option:selected').text();
+        const spesifikasiIds = $('#spesifikasi_id').val(); // bisa multiple
+        const spesifikasiNames = $('#spesifikasi_id option:selected').map(function() {
+            return $(this).text();
         }).get();
-        var id_selected = getIDListDataSelected();
 
-            $.each(listStockAsal, function(i, v) {
-                var currentID = Number(v.id);
+        if (!spesifikasiIds || spesifikasiIds.length === 0) {
+            Swal.fire('Pilih spesifikasi dulu', '', 'warning');
+            return;
+        }
 
-                if ($.inArray(currentID, dataIds) !== -1) {
-                    var isIDSelected = $.grep(listStockSelected, function(item) {
-                        return item.id == Number(currentID);
-                    }).length > 0;
+        spesifikasiIds.forEach((spekId, i) => {
+            const spekName = spesifikasiNames[i];
 
-                    if (!isIDSelected) {
-                        listStockAsal[i].stok_total = parseFloat(listStockAsal[i].stok_total);
-                        listStockAsal[i].qty = 0;
-                        listStockSelected.push(listStockAsal[i]);
-                    }
-                }
+            // Cek duplikasi
+            const alreadyExist = listStockSelected.some(item =>
+                item.po_id == poId &&
+                item.barang_id == barangId &&
+                item.spesifikasi_id == spekId
+            );
+
+            if (alreadyExist) return; // skip kalau sudah ada
+
+            listStockSelected.push({
+                po_id: poData.id,
+                po_no: poData.po_no,
+                po_date: poData.po_date,
+                supplier_name: poData.supplier_name,
+                barang_id: barangId,
+                barang_name: barangName,
+                spesifikasi_id: spekId,
+                spesifikasi_name: spekName,
+                stok_total: 0,
+                stok_total_kotor: 0,
+                stok_total_diterima: 0,
+                satuan: '-',
+                qty_diterima: 0
             });
-            drawTableSelectedItem(listStockSelected);
+        });
+
+        drawTableSelectedItem(listStockSelected);
     }
+
+
+
 
     function insertListFifo() {
         var dataIds = getIDListDataSelected();
@@ -568,162 +611,82 @@
     }
 
     $('.btn-submit-parent').click(function() {
-        if (listStockSelected.length == 0) {
-            Swal.fire({
+        if (!listStockSelected.length) {
+            return Swal.fire({
                 icon: 'error',
-                title: 'Barang yang akan direbus tidak boleh kosong !',
+                title: 'Barang yang akan direbus tidak boleh kosong!',
                 confirmButtonColor: '#4e73df',
-                confirmButtonText: 'Ok'
             });
-        } else {
-            var typePengambilanStock = $('#type_pengambilan_stock option:selected').val();
-            if ($('.create-form').valid()) {
-                var isValidRebus = true;
-                var isValidHasilRebus = true;
-                var dataErrorRebus = null;
-                var dataErrorHasilRebus = null;
+        }
 
-                    // Reset status validasi
-                    isValidRebus = true;
-                    isValidHasilRebus = true;
-                    dataErrorRebus = null;
-                    dataErrorHasilRebus = null;
-                    
-                    // Reset semua class error terlebih dahulu
-                    $('.qty-diterima').removeClass('is-invalid');
-                    
-                    // Validasi per item
-                    $.each(listStockSelected, function(i, v) {
-                        var qty_diterima = $('input.qty-diterima[data-id="' + v.id + '"]');
+        if (!$('.create-form').valid()) return;
 
-                        var input_user_diterima = destroyFormatRupiah(qty_diterima.val()) || 0;
+        // ambil dan set ulang qty diterima
+        $('.qty-diterima').each(function() {
+            let id = $(this).data('id');
+            let val = parseFloat($(this).val()) || 0;
+            let item = listStockSelected.find(x => Number(x.id) === Number(id));
+            if (item) item.qty_diterima = val;
+        });
 
-                        // Always set the qty value regardless of validation
-                        listStockSelected[i].qty_diterima = input_user_diterima;
-                    });
+        // validasi sederhana qty diterima > 0
+        const invalidItem = listStockSelected.find(x => (x.qty_diterima || 0) <= 0);
+        if (invalidItem) {
+            return Swal.fire({
+                icon: 'error',
+                title: 'Qty Diterima Tidak Valid!',
+                html: `Barang: <strong>${invalidItem.barang_name || '-'}</strong><br>
+                    Qty diterima harus lebih dari 0`,
+                confirmButtonColor: '#4e73df',
+            });
+        }
 
+        Swal.fire({
+            icon: 'question',
+            title: 'Simpan Data?',
+            showCancelButton: true,
+            reverseButtons: true,
+            confirmButtonColor: '#4e73df',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Simpan',
+            cancelButtonText: 'Kembali'
+        }).then((result) => {
+            if (!result.isConfirmed) return;
 
-                    
-                    if (!isValidHasilRebus) {
-                        const errorItem = dataErrorHasilRebus || listStockSelected[0];
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Qty Hasil Rebus Tidak Valid',
-                            html: `Barang: <strong>${errorItem.output?.barang || 'Tidak Diketahui'}</strong><br>
-                                Dokumen: ${errorItem.bc_type || '-'} / ${errorItem.no_aju || '-'}<br>
-                                <span class="text-danger">Qty hasil rebus harus lebih dari 0</span>`,
-                            confirmButtonColor: '#4e73df',
-                            confirmButtonText: 'Ok'
-                        });
-                        return false;
-                    }
-                
+            let id = $('#id').val();
+            let data = new FormData(document.querySelector(".create-form"));
+            data.append('listBarang', JSON.stringify(listStockSelected));
 
-                if (!isValidRebus) {
+            const url = id 
+                ? "<?= base_url('penerimaan-barang-broken/update'); ?>"
+                : "<?= base_url('penerimaan-barang-broken/save'); ?>";
+
+            $.ajax({
+                url: url,
+                method: "POST",
+                data: data,
+                dataType: "json",
+                processData: false,
+                contentType: false,
+                beforeSend: xhr => {
+                    xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                    setLoading();
+                },
+                complete: stopLoading,
+                success: (res) => {
                     Swal.fire({
-                        icon: 'error',
-                        title: 'Qty Barang Rebus, barang ' + dataErrorRebus.barang + ' dengan dokumen ' + dataErrorRebus.bc_type + ' / ' + dataErrorRebus.no_aju + ' tidak valid!',
+                        icon: res.status === false ? 'error' : 'success',
+                        title: res.message,
                         confirmButtonColor: '#4e73df',
-                        confirmButtonText: 'Ok'
-                    });
-                } else if (!isValidHasilRebus) {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Qty Barang Hasil Rebus, barang ' + dataErrorHasilRebus.output.barang + ' dengan dokumen ' + dataErrorHasilRebus.bc_type + ' / ' + dataErrorHasilRebus.no_aju + ' tidak valid!',
-                        confirmButtonColor: '#4e73df',
-                        confirmButtonText: 'Ok'
-                    });
-                } else {
-                    Swal.fire({
-                        icon: 'question',
-                        title: 'Simpan Data ?',
-                        confirmButtonColor: '#4e73df',
-                        cancelButtonColor: '#d33',
-                        showCancelButton: true,
-                        reverseButtons: true,
-                        confirmButtonText: 'Simpan',
-                        cancelButtonText: 'Kembali',
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            let id = $('#id').val();
-                            let data = new FormData(document.querySelector(".create-form"));
-                            data.append('listBarang', JSON.stringify(listStockSelected));
-
-                            if (id) {
-                                // UPDATE
-                                $.ajax({
-                                    url: "<?= base_url("update-stock-bahan-baku/update"); ?>",
-                                    data: data,
-                                    beforeSend: function(xhr) {
-                                        xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                                        setLoading();
-                                    },
-                                    complete: function() {
-                                        stopLoading()
-                                    },
-                                    method: "POST",
-                                    dataType: "json",
-                                    processData: false,
-                                    contentType: false,
-                                    success: function(response) {
-                                        Swal.fire({
-                                            icon: 'success',
-                                            title: response.message,
-                                            confirmButtonColor: '#4e73df',
-                                            confirmButtonText: 'Ok'
-                                        }).then((result) => {
-                                            if (result.isConfirmed) {
-                                                window.location.href = "<?= base_url("update-stock-bahan-baku") ?>";
-                                            }
-                                        });
-                                    },
-                                });
-                            } else {
-                                // INSERT
-                                $.ajax({
-                                    url: "<?= base_url("update-stock-bahan-baku/save"); ?>",
-                                    data: data,
-                                    beforeSend: function(xhr) {
-                                        xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                                        setLoading();
-                                    },
-                                    complete: function() {
-                                        stopLoading()
-                                    },
-                                    method: "POST",
-                                    dataType: "json",
-                                    processData: false,
-                                    contentType: false,
-                                    success: function(response) {
-                                        if (response.status == false) {
-                                            Swal.fire({
-                                                icon: 'error',
-                                                title: response.message,
-                                                confirmButtonColor: '#4e73df',
-                                            })
-                                        } else {
-                                            Swal.fire({
-                                                icon: 'success',
-                                                title: response.message,
-                                                confirmButtonColor: '#4e73df',
-                                                confirmButtonText: 'Ok'
-                                            }).then((result) => {
-                                                if (result.isConfirmed) {
-                                                    window.location.href = "<?= base_url("update-stock-bahan-baku") ?>";
-                                                }
-                                            });
-                                        }
-
-                                    },
-                                });
-                            }
-                        }
+                    }).then((ok) => {
+                        if (ok.isConfirmed && res.status !== false)
+                            window.location.href = "<?= base_url('penerimaan-barang-broken'); ?>";
                     });
                 }
-
-            }
-        }
+            });
+        });
     });
+
 
 
     $("#vendor_id,#warehouse_id,#divisi_id,#type_barang,#spesifikasi_rebus_id,#spesifikasi_hasil_rebus_id,#type_pengambilan_stock,#supplier_id")
@@ -763,8 +726,8 @@
                     $(".warehouse_id").append(`<option value="${item.id}">${item.warehouse_name}</option>`)
                 })
 
-                <?php if (!empty($updateStockData)) : ?>
-                    $(".warehouse_id").val("<?= $updateStockData['warehouse_id'] ?>").trigger('change');
+                <?php if (!empty($penerimaanBarangBroken)) : ?>
+                    $(".warehouse_id").val("<?= $penerimaanBarangBroken['warehouse_id'] ?>").trigger('change');
                 <?php endif; ?>
                 $(".warehouse_id").val();
             }
@@ -799,35 +762,9 @@
         });
     }
 
-    function getListDokumenPabean() {
-        // GET LIST STOCK PER DOKUMEN PABEAN
-        $.ajax({
-            url: `<?= base_url('proses-rebus/list-stock-dokumen-bc'); ?>`,
-            method: "GET",
-            beforeSend: function() {
-                setLoading();
-            },
-            complete: function() {
-                stopLoading();
-            },
-            data: {
-                stock_id: $(".spesifikasi_rebus_id option:selected").data('stock_id'),
-                spesifikasi_id: $(".spesifikasi_rebus_id option:selected").val(),
-                supplier_id: $(".supplier_id option:selected").val()
-            },
-            dataType: "json",
-            success: function(res) {
-                // LIST STOK PER BC
-                listStockAsal = [];
-                listStockAsal = res.data;
-                drawTableAsalBarang(res.data);
-            }
-        });
-    }
-
     function getListPo() {
         $.ajax({
-            url: `<?= base_url('update-stock-bahan-baku/list-po'); ?>`,
+            url: `<?= base_url('penerimaan-barang-broken/get-po'); ?>`,
             method: "GET",
             beforeSend: function() {
                 setLoading();
@@ -842,108 +779,9 @@
             },
             dataType: "json",
             success: function(res) {
-                let $select = $("#no_po");
-                $select.empty(); // kosongkan dulu biar ga double
-                $select.append(`<option value=""></option>`); // default kosong
-
-                if (res && res.data && res.data.data && res.data.data.length > 0) {
-                    res.data.data.forEach(function(item) {
-                        // asumsinya res ada field id & no_po
-                        $select.append(`<option value="${item.id}">${item.po_no}</option>`);
-                    });
-
-                    <?php if (!empty($updateStockData)) : ?>
-                        // terakhir banget: pilih no_po, lalu trigger change
-                        $("#no_po").val("<?= $updateStockData['id'] ?>").trigger('change');
-                    <?php endif; ?>
-                }
-            }
-        });
-    }
-
-
-    function getListBarangPo() {
-        // GET LIST STOCK PER DOKUMEN PABEAN
-        $.ajax({
-            url: `<?= base_url('update-stock-bahan-baku/list-barang-po'); ?>`,
-            method: "GET",
-            beforeSend: function() {
-                setLoading();
-            },
-            complete: function() {
-                stopLoading();
-            },
-            data: {
-                divisi_id: $("#divisi_id option:selected").val(),
-                supplier_id: $("#supplier_id option:selected").val(),
-                warehouse_id: $("#warehouse_id option:selected").val(),
-                barang_id: $("#barang_id option:selected").val(),
-                spesifikasi_id: $("#spesifikasi_id").val(),
-                tanggal_po_awal: $("#tanggal_po_awal").val(),
-                tanggal_po_akhir: $("#tanggal_po_akhir").val(),
-            },
-            dataType: "json",
-            success: function(res) {
-                // LIST STOK PER BC
                 listStockAsal = [];
-                listStockAsal = res.data;
-                drawTableAsalBarang(res.data);
-            }
-        });
-    }
-
-
-    function getListBarangPoAlreadyHaveKotor() {
-        // GET LIST STOCK PER DOKUMEN PABEAN
-        $.ajax({
-            url: `<?= base_url('update-stock-bahan-baku/list-barang-po-kotor'); ?>`,
-            method: "GET",
-            beforeSend: function() {
-                setLoading();
-            },
-            complete: function() {
-                stopLoading();
-            },
-            data: {
-                id: $("#id").val(),
-                divisi_id: $("#divisi_id option:selected").val(),
-                supplier_id: $("#supplier_id option:selected").val(),
-                warehouse_id: $("#warehouse_id option:selected").val(),
-                tanggal_po_awal: $("#tanggal_po_awal").val(),
-                tanggal_po_akhir: $("#tanggal_po_akhir").val(),
-            },
-            dataType: "json",
-            success: function(res) {
-                // LIST STOK PER BC
-                listStockSelected = [];
-                listStockSelected = res.data;
-                drawTableSelectedItem(res.data);
-               
-            }
-        });
-    }
-
-    function getListBarangHasilRebus() {
-        $.ajax({
-            url: `<?= base_url('jasa-vendor-in/list-barang-masuk'); ?>`,
-            method: "GET",
-            beforeSend: function() {
-                setLoading();
-            },
-            complete: function() {
-                stopLoading();
-            },
-            data: {
-                type_barang: $(".type_barang option:selected").val(),
-            },
-            dataType: "json",
-            success: function(res) {
-                $(".spesifikasi_hasil_rebus_id").empty()
-                $(".spesifikasi_hasil_rebus_id").append(`<option value=""></option>`)
-                res.data.forEach(function(item) {
-                    $(".spesifikasi_hasil_rebus_id").append(`<option data-barang_id="${item.spesifikasi_id}" data-stock_id="${item.stock_id}" data-kode_barang="${item.kode_barang}" data-barang="${item.barang}" data-kode_satuan="${item.kode_satuan}" value="${item.spesifikasi_rebus_id}">(${item.kode_barang}) ${item.barang}</option>`)
-                })
-                $(".spesifikasi_hasil_rebus_id").val();
+                listStockAsal = res.data.data;
+                drawTableAsalBarang(res.data.data);
             }
         });
     }
@@ -963,20 +801,15 @@
                 newRow.append($('<td style="text-align: center;">').html(
                     `
                     <div class="form-check">
-                        <input data-id="${v.id}" data-stok_total="${v.stok_total}" autocomplete="one-time-code" class="form-check-input child" type="checkbox">
+                        <input data-id="${v.id}" data-stok_total="${v.stok_total}" autocomplete="one-time-code" class="form-check-input child" type="radio">
                     </div>
                 `
                 ));
 
-            newRow.append($('<td style="text-align:center;">').text(v.reference_type));
             newRow.append($('<td style="text-align:center;">').text(v.po_no));
             newRow.append($('<td style="text-align:center;">').text(v.supplier_name));
             newRow.append($('<td style="text-align:center;">').text(v.bc_type));
-            // newRow.append($('<td style="text-align:center;">').text(v.no_aju));
-            newRow.append($('<td style="text-align:center;">').text(v.stock_date));
-            newRow.append($('<td style="text-align:center;">').text(v.barang));
-            newRow.append($('<td style="text-align:center;">').text(v.satuan));
-            newRow.append($('<td style="text-align:center;">').text(greatFormatRupiah(v.total_penerimaan)));
+            newRow.append($('<td style="text-align:center;">').text(v.po_date));
             table.find('tbody').append(newRow);
         });
 
@@ -1012,139 +845,50 @@
     }
 
     function drawTableSelectedItem(data) {
-        console.log(data)
         const $tbody = $('#selectedItemTable .body-table');
         $tbody.empty();
 
-        if (data.length === 0) {
+        if (!data || data.length === 0) {
             $('#foot-detail-table').show();
             return;
         } else {
             $('#foot-detail-table').hide();
         }
 
-        // Group by stock_id hasil rebus
-        const grouped = {};
-        console.log(data)
-        data.forEach(item => {
-            const key = item.output?.stock_id || 'undefined';
-            if (!grouped[key]) grouped[key] = [];
-            grouped[key].push(item);
-        });
-
         let rowIndex = 1;
-
-        for (const stockID in grouped) {
-            const group = grouped[stockID];
-            const groupName = group[0].output?.barang || 'Tidak Diketahui';
-            const satuan = group[0].output?.kode_satuan || '-';
-
-            // Hitung total hasil rebus per group
-            let totalHasilGroup = 0;
-            group.forEach(item => {
-                totalHasilGroup += parseFloat(item.output?.qty || 0);
-            });
-
-            // --- Baris Data ---
-            group.forEach((item, i) => {
-                const tr = $(`
-                    <tr class="data-row" data-group="${stockID}" data-index="${i}">
-                        <td style="text-align: center;">${rowIndex++}</td>
-                        <td>${item.reference_type || '-'}</td>
-                        <td>${item.po_no || '-'}</td>
-                        <td>${item.supplier_name || '-'}</td>
-                        <td>${item.stock_date || '-'}</td>
-                        <td>${item.barang || '-'}</td>
-                        <td>${item.satuan || '-'}</td>
-                        <td style="text-align: right;">${greatFormatRupiah(item.stok_total)}</td>
-                        <td style="text-align: right;">${greatFormatRupiah(item.stok_total_kotor)}</td>
-                        <td>
-                            <input type="text" step="0.001" min="0" 
-                                class="form-control qty-diterima" 
-                                name="qty_diterima" 
-                                data-id="${item.id}"
-                                data-index="${i}"
-                                value="${greatFormatRupiah(item.stok_total_diterima) || 0}" />
-                        </td>
-                        <td><button type="button" class="btn btn-danger btn-sm btn-remove-row">Hapus</button></td>
-                    </tr>
-                `);
-                $tbody.append(tr);
-            });
-        }
-
-        // --- Tambah Total Keseluruhan Rebus & Hasil Rebus ---
-        updateTotalRow();
-
-        // --- Logic Ubah Qty Rebus Manual ---
-        $tbody.on('input', '.qty-rebus-input, .qty-diterima, .total-hasil-input', function() {
-            updateTotalRow();
-        });
-
-
-        function updateTotalRow() {
-            let totalQtyRebus = 0;
-            let totalQtyHasilRebus = 0;
-
-            // Hitung total rebus dari masing-masing baris input qty rebus
-            $('.qty-rebus-input').each(function () {
-                const val = destroyFormatRupiah($(this).val());
-                if (!isNaN(val)) totalQtyRebus += val;
-            });
-
-            // Hitung total hasil rebus dari input qty hasil rebus per item
-            $('.qty-diterima').each(function () {
-                const val = destroyFormatRupiah($(this).val());
-                if (!isNaN(val)) totalQtyHasilRebus += val;
-            });
-
-            // Hapus semua total row yang sudah ada
-            $('.grand-total-row').remove();
-
-            // Buat hanya satu grand total row di bagian paling bawah
-            const totalRow = $(`
-                <tr class="grand-total-row" style="background-color: #d1ecf1; font-weight: bold;">
-                    <td colspan="8" style="text-align: right;">GRAND TOTAL</td>
-                    <td style="text-align: right;">${greatFormatRupiah(totalQtyRebus)}</td>
-                    <td style="text-align: right;">${greatFormatRupiah(totalQtyHasilRebus)}</td>
-                    <td></td>
+        data.forEach((item, i) => {
+            const tr = $(`
+                <tr data-index="${i}">
+                    <td style="text-align:center;">${rowIndex++}</td>
+                    <td>${item.po_no || '-'}</td>
+                    <td>${item.supplier_name || '-'}</td>
+                    <td>${item.po_date || '-'}</td>
+                    <td>${item.spesifikasi_name || '-'}</td>
+                    <td style="text-align:right;">
+                        <input type="text" class="form-control qty-diterima" 
+                            data-index="${i}" value="${greatFormatRupiah(item.qty_diterima) || 0}" />
+                    </td>
+                    <td><button type="button" class="btn btn-danger btn-sm btn-remove-row">Hapus</button></td>
                 </tr>
             `);
+            $tbody.append(tr);
+        });
 
-            $tbody.append(totalRow);
-            
-            // Panggil validasi setelah update total
-            // validateRebusInputs();
-        }
-
-        // --- Tombol Hapus ---
-        $('.btn-remove-row').click(function () {
-            const $tr = $(this).closest('tr');
-            const index = $tr.data('index');
-            const stockID = $tr.data('group');
-
-            // Hapus dari list
+        // event hapus
+        $tbody.off('click', '.btn-remove-row').on('click', '.btn-remove-row', function () {
+            const index = $(this).closest('tr').data('index');
             listStockSelected.splice(index, 1);
-
-            // Redraw
             drawTableSelectedItem(listStockSelected);
         });
-    }
-  
 
-    function deleteDetail(id) {
-        var indexToRemove = -1;
-        for (var i = 0; i < listStockSelected.length; i++) {
-            if (listStockSelected[i].id == id) {
-                indexToRemove = i;
-                break;
-            }
-        }
-        if (indexToRemove !== -1) {
-            listStockSelected.splice(indexToRemove, 1);
-            drawTableSelectedItem(listStockSelected);
-        }
+        $tbody.off('input', '.qty-diterima').on('input', '.qty-diterima', function() {
+            const index = $(this).data('index');
+            const diterimaVal = destroyFormatRupiah($(`.qty-diterima[data-index="${index}"]`).val());
+            listStockSelected[index].qty_diterima = diterimaVal;
+        });
     }
+
+
 
     function preventNegativeInput(inputElement) {
         var inputValue = inputElement.value;
@@ -1161,9 +905,9 @@
     function changeStatus() {
         let value = document.getElementById('auto_generate').checked ? true : false;
         if (value) {
-            $(".no_rebus").attr("readonly", true);
+            $(".no_penerimaan_barang").attr("readonly", true);
             $.ajax({
-                url: `<?= base_url("update-stock-bahan-baku/get-no"); ?>`,
+                url: `<?= base_url("penerimaan-barang-broken/generate"); ?>`,
                 method: "GET",
                 data: {
                     warehouse_id: $('#warehouse_id option:selected').val(),
@@ -1172,22 +916,22 @@
                 dataType: "json",
                 success: function(res) {
                     if (res.status) {
-                        $(".no_rebus").val(res.data);
+                        $(".no_penerimaan_barang").val(res.data);
                     } else {
                         Swal.fire({
                             icon: 'error',
                             title: res.message,
                             confirmButtonColor: '#4e73df',
                         })
-                        $(".no_rebus").attr("readonly", false);
+                        $(".no_penerimaan_barang").attr("readonly", false);
                         $("#auto_generate").prop("checked", false);
-                        $(".no_rebus").val("");
+                        $(".no_penerimaan_barang").val("");
                     }
                 }
             })
         } else {
-            $(".no_rebus").attr("readonly", false);
-            $(".no_rebus").val("");
+            $(".no_penerimaan_barang").attr("readonly", false);
+            $(".no_penerimaan_barang").val("");
         }
     }
 
@@ -1209,7 +953,7 @@
             if (result.isConfirmed) {
                 const csrf = $(`[name="${csrfToken}"]`);
                 $.ajax({
-                    url: "<?= base_url("update-stock-bahan-baku/posting"); ?>",
+                    url: "<?= base_url("penerimaan-barang-broken/posting"); ?>",
                     data: {
                         id: id
                     },
@@ -1230,7 +974,7 @@
                                 title: response.message,
                                 confirmButtonColor: '#4e73df',
                             }).then((result) => {
-                                window.location.href = "<?= base_url("update-stock-bahan-baku") ?>";
+                                window.location.href = "<?= base_url("penerimaan-barang-broken") ?>";
                             });
                         } else {
                             Swal.fire({
@@ -1259,7 +1003,7 @@
             if (result.isConfirmed) {
                 const csrf = $(`[name="${csrfToken}"]`);
                 $.ajax({
-                    url: "<?= base_url("update-stock-bahan-baku/delete"); ?>",
+                    url: "<?= base_url("penerimaan-barang-broken/delete"); ?>",
                     data: {
                         id: id
                     },
@@ -1279,7 +1023,7 @@
                                 title: response.message,
                                 confirmButtonColor: '#4e73df',
                             }).then((result) => {
-                                window.location.href = "<?= base_url("update-stock-bahan-baku") ?>";
+                                window.location.href = "<?= base_url("penerimaan-barang-broken") ?>";
                             });
                         }
                     },
