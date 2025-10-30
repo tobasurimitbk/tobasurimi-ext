@@ -149,6 +149,10 @@
                         <td>: <?= $data->invoice_date ?></td>
                     </tr>
                     <tr>
+                        <td>JATUH TEMPO</td>
+                        <td>: <?= date('d/m/Y', strtotime($data->jatuh_tempo)) ?></td>
+                    </tr>
+                    <tr>
                         <td>DIBAYAR KEPADA</td>
                         <td>: <?= $data->supplier_name ?></td>
                     </tr>
@@ -302,6 +306,10 @@
                             <tr>
                                 <td>TGL</td>
                                 <td>: <?= $data->invoice_date ?></td>
+                            </tr>
+                            <tr>
+                                <td>JATUH TEMPO</td>
+                                <td>: <?= date('d/m/Y', strtotime($data->jatuh_tempo)) ?></td>
                             </tr>
                             <tr>
                                 <td>DIBAYAR KEPADA</td>
