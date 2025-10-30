@@ -1506,8 +1506,8 @@
             } else {
                 newRow.append($('<td style="text-align: center;">').html(
                     `
-                    <div class="form-check">
-                        <input  data-id="${v.id}" data-stok_total="${v.stok_total}" autocomplete="one-time-code" class="form-check-input child" type="checkbox">
+                    <div class="form-check" style="margin-top: -12px; padding-left: 0px;">
+                        <input  data-id="${v.id}" data-stok_total="${v.stok_total}" autocomplete="one-time-code" class="form-check-input child" type="checkbox" style="width:30px; height:30px;">
                     </div>
                 `
                 ));
