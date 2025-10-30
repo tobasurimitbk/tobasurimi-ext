@@ -83,6 +83,7 @@ class SalesOrderExportModel extends Model
                 ->orLike('sales_contract.customer_po_no', $addCondition['search'])
                 ->orLike('customers.name', $addCondition['search'])
                 ->orLike('divisis.divisi', $addCondition['search'])
+                ->orLike('sales_order_export.destination', $addCondition['search'])
                 ->groupEnd();
         }
 

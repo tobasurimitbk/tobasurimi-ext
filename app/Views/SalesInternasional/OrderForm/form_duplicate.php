@@ -165,7 +165,7 @@
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating mb-3">
-                            <input autocomplete="one-time-code" type="text" class="form-control destination" id="destination" name="destination" placeholder="Destination" readonly value="">
+                            <input autocomplete="one-time-code" type="text" class="form-control destination" id="destination" name="destination" placeholder="Destination" value="">
                             <label for="floatingInput">Destination</label>
                         </div>
                     </div>

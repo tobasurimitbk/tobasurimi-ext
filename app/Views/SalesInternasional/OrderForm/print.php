@@ -161,7 +161,7 @@
                             <tr>
                                 <td>DESTINATION</td>
                                 <td>:</td>
-                                <td><?= $dataSO->dicharge_port ?></td>
+                                <td><?= $dataSO->destination ?></td>
                             </tr>
                             <tr>
                                 <td>DEADLINE</td>
