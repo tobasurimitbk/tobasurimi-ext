@@ -1174,6 +1174,39 @@ class StockRevampDetailModel extends Model
 
         return $dataResult;
     }
+    public function getBarangAndStockCondition($type_barang, $divisi_id, $warehouse_id, $addCondition = null)
+    {
+        if ($type_barang) {
+            // LIST BARANG
+            $selectQry = "
+                stock_revamp.id AS stock_id,
+                stock_revamp.barang_master_id AS barang_id,
+                stock_revamp.spesifikasi_id AS spesifikasi_id,
+                CONCAT(UPPER(barang_master.barang_name), '-', UPPER(barang_master_spesifikasi.spesifikasi)) AS barang,
+                barang_master.kode_barang,
+                satuans.kode_satuan,
+                parent_barang.parent_name
+            ";
+
+            $dataResult = $this->asArray()->select($selectQry)
+                ->join('stock_revamp', 'stock_revamp.id = stock_revamp_detail.stock_id')
+                ->join('barang_master', 'barang_master.id = stock_revamp.barang_master_id')
+                ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = stock_revamp.spesifikasi_id')
+                ->join('satuans', 'satuans.id = stock_revamp.unit_id', 'left')
+                ->join('parent_barang', 'parent_barang.id = barang_master.parent_type_id')
+                ->where('barang_master.type_barang', $type_barang)
+                ->where('stock_revamp.divisi_id', $divisi_id)
+                ->where('stock_revamp.warehouse_id', $warehouse_id)
+                ->where('stock_revamp.deletedAt', null)
+                ->where('barang_master_spesifikasi.deletedAt', null)
+                ->where('barang_master.deletedAt', null)
+                ->where($addCondition)
+                ->orderBy('barang_master.kode_barang', "ASC")
+                ->findAll();
+        }
+
+        return $dataResult;
+    }
 
     public function getStockListWithCondition($condition)
     {
