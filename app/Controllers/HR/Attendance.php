@@ -1076,6 +1076,11 @@ class Attendance extends BaseController
             $nominalDendaKeterlambatan = $this->request->getVar('nominal_denda_keterlambatan');
             $abaikanSyncLog = $this->request->getVar('abaikan_sync_log');
 
+            if ($statusKehadiran != "HADIR_H") {
+                $checkIN = null;
+                $checkOut = null;
+            }
+
             $this->AttendanceModel->update($attendenceID, [
                 'checkin' => $checkIN, // in
                 'checkout' => $checkOut, // out

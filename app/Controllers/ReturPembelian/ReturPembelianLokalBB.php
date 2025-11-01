@@ -171,15 +171,15 @@ class ReturPembelianLokalBB extends BaseController
                 array_push($multipleLpbNo, $l->no_penerimaan_barang);
             }
 
-            $multipleLpbId =  array_unique($multipleLpbId);
-            $multipleSppId =  array_unique($multipleSppId);
-            $multipleSppNo = array_unique($multipleSppNo);
-            $multipleLpbNo =  array_unique($multipleLpbNo);
+            $multipleLpbId = array_values(array_unique($multipleLpbId));
+            $multipleSppId = array_values(array_unique($multipleSppId));
+            $multipleSppNo = array_values(array_unique($multipleSppNo));
+            $multipleLpbNo = array_values(array_unique($multipleLpbNo));
 
             $multipleLpbIdStr =   str_replace(['\\"', '\\', '"'], '', json_encode($multipleLpbId));
             $multipleSppIdStr = str_replace(['\\"', '\\', '"'], '', json_encode($multipleSppId));
-            $multipleSppNoStr = str_replace(['\\"', '\\', '"'], '', json_encode($multipleSppNo));
-            $multipleLpbNoStr = str_replace(['\\"', '\\', '"'], '', json_encode($multipleLpbNo));
+            $multipleSppNoStr = json_encode($multipleSppNo, JSON_UNESCAPED_SLASHES);
+            $multipleLpbNoStr = json_encode($multipleLpbNo, JSON_UNESCAPED_SLASHES);
 
 
             $id = $this->pengembalianBarangModel->insert([
@@ -250,15 +250,15 @@ class ReturPembelianLokalBB extends BaseController
                 array_push($multipleLpbNo, $l->no_penerimaan_barang);
             }
 
-            $multipleLpbId =  array_unique($multipleLpbId);
-            $multipleSppId =  array_unique($multipleSppId);
-            $multipleSppNo = array_unique($multipleSppNo);
-            $multipleLpbNo =  array_unique($multipleLpbNo);
+            $multipleLpbId = array_values(array_unique($multipleLpbId));
+            $multipleSppId = array_values(array_unique($multipleSppId));
+            $multipleSppNo = array_values(array_unique($multipleSppNo));
+            $multipleLpbNo = array_values(array_unique($multipleLpbNo));
 
             $multipleLpbIdStr =   str_replace(['\\"', '\\', '"'], '', json_encode($multipleLpbId));
             $multipleSppIdStr = str_replace(['\\"', '\\', '"'], '', json_encode($multipleSppId));
-            $multipleSppNoStr = str_replace(['\\"', '\\', '"'], '', json_encode($multipleSppNo));
-            $multipleLpbNoStr = str_replace(['\\"', '\\', '"'], '', json_encode($multipleLpbNo));
+            $multipleSppNoStr = json_encode($multipleSppNo, JSON_UNESCAPED_SLASHES);
+            $multipleLpbNoStr = json_encode($multipleLpbNo, JSON_UNESCAPED_SLASHES);
 
 
             $this->pengembalianBarangModel->update($id, [

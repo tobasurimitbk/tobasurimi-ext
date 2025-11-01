@@ -1259,10 +1259,10 @@ class StockRevampModel extends Model
                 barang_master.kode_barang,
                 barang_master.barang_name,
                 barang_master_spesifikasi.spesifikasi,
-                jasa_vendor_in.tanggal AS lpb_date,
                 '' AS po_no,
                 '' AS po_date,
-                '' AS supplier_name,
+                jasa_vendor_in.tanggal AS lpb_date,
+                vendors.name AS supplier_name,
                 jasa_vendor_in.no_penerimaan_surat_jalan AS reference_no,
                 satuans.kode_satuan,
                 divisis.divisi,
@@ -1286,6 +1286,7 @@ class StockRevampModel extends Model
             LEFT JOIN barang_master_spesifikasi ON stock_revamp.spesifikasi_id = barang_master_spesifikasi.id
             LEFT JOIN satuans ON satuans.id = stock_revamp.unit_id
             LEFT JOIN jasa_vendor_in ON jasa_vendor_in.id = stock_revamp_detail.reference_id
+            LEFT JOIN vendors ON vendors.id = jasa_vendor_in.vendor_id
             LEFT JOIN divisis ON divisis.id = stock_revamp.divisi_id
             LEFT JOIN warehouses ON warehouses.id = stock_revamp.warehouse_id
             WHERE stock_revamp_detail.deletedAt IS NULL

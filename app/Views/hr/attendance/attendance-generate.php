@@ -641,124 +641,8 @@
     let csrfToken = '<?= csrf_token() ?>';
     let attendanceTable;
 
-    $.ajax({
-        url: "<?= base_url('list-attendance/all') ?>",
-        type: "POST",
-        data: {
-            month: $('#month').val(),
-            year: $('#year').val(),
-            divisi_id: $('#divisi_id').val(),
-            tipe: $('#tipe').val(),
-            employee_id: $('#employee_id').val()
-        },
-        success: function(json) {
-            // buat header <th> sesuai response columns
-            let thead = '<tr>';
-            json.columns.forEach(col => thead += `<th>${col.title}</th>`);
-            thead += '</tr>';
-            $('#attendanceTable thead').html(thead);
-
-            // init DataTable (sekali saja)
-            attendanceTable = $('#attendanceTable').DataTable({
-                processing: true,
-                serverSide: true,
-                searching: false,
-                ordering: true,
-                paging: true,
-                autoWidth: true,
-                pageLength: 25, // 🔹 default 25 baris per halaman
-                ajax: {
-                    url: "<?= base_url('list-attendance/all') ?>",
-                    type: "POST",
-                    data: function(d) {
-                        d.month = $('#month').val();
-                        d.year = $('#year').val();
-                        d.divisi_id = $('#divisi_id').val();
-                        d.tipe = $('#tipe').val();
-                        d.employee_id = $('#employee_id').val();
-                        d.bagian_id = $('#bagian_id').val();
-                    },
-                    dataSrc: 'data' // penting, biar DataTables ngerti
-                },
-                columnDefs: [{
-                    targets: "_all",
-                    render: function(data, type, row, meta) {
-                        let colName = meta.settings.aoColumns[meta.col].data; // contoh: "day_1_in"
-                        let colClass = row[colName + "_class"] || ""; // contoh: row.day_1_in_class
-
-                        if (colClass.includes('bg-libur')) {
-                            return `<img src="<?= base_url('assets/img/stop.png') ?>" 
-                        width="16" height="16" alt="Stop">`;
-                        }
-
-
-                        if (colClass.includes('bg-alpha')) {
-                            return renderCell(data, '#e7323a');
-                        }
-
-                        if (colClass.includes('bg-cuti-tahunan')) {
-                            return renderCell(data, '#ffc107');
-                        }
-
-                        if (colClass.includes('bg-cuti-haid')) {
-                            return renderCell(data, '#242120');
-                        }
-
-                        if (colClass.includes('bg-cuti-hamil')) {
-                            return renderCell(data, '#C34A36');
-                        }
-
-                        if (colClass.includes('bg-cuti-melahirkan')) {
-                            return renderCell(data, '#4B4453');
-                        }
-
-                        if (colClass.includes('bg-ijin')) {
-                            return renderCell(data, '#17a2b8');
-                        }
-
-                        if (colClass.includes('bg-sakit')) {
-                            return renderCell(data, '#28a745');
-                        }
-
-                        if (colClass.includes('bg-rl')) {
-                            return renderCell(data, '#ff7b00');
-                        }
-
-                        if (colClass.includes('bg-hadir')) {
-                            return renderCell(data, '#304de2');
-                        }
-
-                        if (colClass.includes('bg-dinas')) {
-                            return renderCell(data, '#ad53a9');
-                        }
-
-                        if (colClass.includes('bg-cuti-keguguran')) {
-                            return renderCell(data, '#75321a');
-                        }
-
-                        function renderCell(data, bgColor) {
-                            return `<div style="
-                                width:100%; 
-                                height:100%; 
-                                background-color:${bgColor}; 
-                                color:#fff; 
-                                display:flex; 
-                                align-items:center; 
-                                justify-content:center; 
-                                font-weight:bold;
-                            ">
-                                ${data ?? ''}
-                            </div>`;
-                        }
-
-                        return data ?? '';
-                    }
-                }],
-
-                columns: json.columns,
-            });
-        }
-    });
+    // Inisiasi Kolom Dinamis
+    refreshStructureColoumn();
 
     let attendanceTotalTable = $('#attendanceTotalTable').DataTable({
         processing: true,
@@ -852,6 +736,131 @@
 
         ],
     });
+
+    function refreshStructureColoumn() {
+        if ($.fn.DataTable.isDataTable('#attendanceTable')) {
+            $('#attendanceTable').DataTable().clear().destroy();
+        }
+
+        $.ajax({
+            url: "<?= base_url('list-attendance/all') ?>",
+            type: "POST",
+            data: {
+                month: $('#month').val(),
+                year: $('#year').val(),
+                divisi_id: $('#divisi_id').val(),
+                tipe: $('#tipe').val(),
+                employee_id: $('#employee_id').val()
+            },
+            success: function(json) {
+                // buat header <th> sesuai response columns
+                let thead = '<tr>';
+                json.columns.forEach(col => thead += `<th>${col.title}</th>`);
+                thead += '</tr>';
+                $('#attendanceTable thead').html(thead);
+
+                // init DataTable (sekali saja)
+                attendanceTable = $('#attendanceTable').DataTable({
+                    processing: true,
+                    serverSide: true,
+                    searching: false,
+                    ordering: true,
+                    paging: true,
+                    autoWidth: true,
+                    pageLength: 25, // 🔹 default 25 baris per halaman
+                    ajax: {
+                        url: "<?= base_url('list-attendance/all') ?>",
+                        type: "POST",
+                        data: function(d) {
+                            d.month = $('#month').val();
+                            d.year = $('#year').val();
+                            d.divisi_id = $('#divisi_id').val();
+                            d.tipe = $('#tipe').val();
+                            d.employee_id = $('#employee_id').val();
+                            d.bagian_id = $('#bagian_id').val();
+                        },
+                        dataSrc: 'data' // penting, biar DataTables ngerti
+                    },
+                    columnDefs: [{
+                        targets: "_all",
+                        render: function(data, type, row, meta) {
+                            let colName = meta.settings.aoColumns[meta.col].data; // contoh: "day_1_in"
+                            let colClass = row[colName + "_class"] || ""; // contoh: row.day_1_in_class
+
+                            if (colClass.includes('bg-libur')) {
+                                return `<img src="<?= base_url('assets/img/stop.png') ?>" 
+                        width="16" height="16" alt="Stop">`;
+                            }
+
+
+                            if (colClass.includes('bg-alpha')) {
+                                return renderCell(data, '#e7323a');
+                            }
+
+                            if (colClass.includes('bg-cuti-tahunan')) {
+                                return renderCell(data, '#ffc107');
+                            }
+
+                            if (colClass.includes('bg-cuti-haid')) {
+                                return renderCell(data, '#242120');
+                            }
+
+                            if (colClass.includes('bg-cuti-hamil')) {
+                                return renderCell(data, '#C34A36');
+                            }
+
+                            if (colClass.includes('bg-cuti-melahirkan')) {
+                                return renderCell(data, '#4B4453');
+                            }
+
+                            if (colClass.includes('bg-ijin')) {
+                                return renderCell(data, '#17a2b8');
+                            }
+
+                            if (colClass.includes('bg-sakit')) {
+                                return renderCell(data, '#28a745');
+                            }
+
+                            if (colClass.includes('bg-rl')) {
+                                return renderCell(data, '#ff7b00');
+                            }
+
+                            if (colClass.includes('bg-hadir')) {
+                                return renderCell(data, '#304de2');
+                            }
+
+                            if (colClass.includes('bg-dinas')) {
+                                return renderCell(data, '#ad53a9');
+                            }
+
+                            if (colClass.includes('bg-cuti-keguguran')) {
+                                return renderCell(data, '#75321a');
+                            }
+
+                            function renderCell(data, bgColor) {
+                                return `<div style="
+                                width:100%; 
+                                height:100%; 
+                                background-color:${bgColor}; 
+                                color:#fff; 
+                                display:flex; 
+                                align-items:center; 
+                                justify-content:center; 
+                                font-weight:bold;
+                            ">
+                                ${data ?? ''}
+                            </div>`;
+                            }
+
+                            return data ?? '';
+                        }
+                    }],
+
+                    columns: json.columns,
+                });
+            }
+        });
+    }
 
 
     $('#attendanceTable tbody').on('click', 'td', function() {
@@ -1487,12 +1496,17 @@
         autoclose: true
     });
 
-    $('#month,#divisi_id,#tipe,#employee_id').change(function(e) {
+    $('#divisi_id,#tipe,#employee_id').change(function(e) {
         e.preventDefault();
         if (attendanceTable) {
             attendanceTable.ajax.reload(null, false);
             attendanceTotalTable.ajax.reload(null, false);
         }
+    });
+
+    $('#month').change(function(e) {
+        e.preventDefault();
+        refreshStructureColoumn();
     });
 
     $('#btnShowExportHarianModal').click(function(e) {

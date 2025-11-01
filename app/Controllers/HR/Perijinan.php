@@ -193,6 +193,25 @@ class Perijinan extends BaseController
                 ]);
             }
 
+            for ($currentDate = $tglAwal; $currentDate <= $tglAkhir; $currentDate += 86400) {
+                $currentDateFormatted = date('Y-m-d', $currentDate);
+                // Cek di tabel form perijinan
+                $formPerijinanAlreadyExist = $this->FormPerijinanModel
+                    ->where('periode', $currentDateFormatted)
+                    ->where('employee_id', $employeeId)
+                    ->where('deletedAt', null)
+                    ->first();
+
+                if ($formPerijinanAlreadyExist) {
+                    $statusKehadiran = explode('_', $formPerijinanAlreadyExist['status'])[0];
+                    return response()->setJSON([
+                        'message' => "Tanggal " . $currentDateFormatted . ", pegawai sudah mengajukan " . $statusKehadiran,
+                        'token' => csrf_hash(),
+                        'status' => false,
+                    ]);
+                }
+            }
+
             // Hapus data sebelumnya jika ada
             // Data range
             $this->FormPerijinanModel
