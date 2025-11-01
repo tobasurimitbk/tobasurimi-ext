@@ -439,46 +439,89 @@ class CustomerModel extends Model
         // Bentuk prefix sesuai tipe
         $prefix = ($tipe_customer == "LOKAL") ? "CS" : "IN";
 
-        // Bentuk pola pencarian yang spesifik untuk bulan & tahun
-        $kodePrefix = $prefix . '/' . $bln . '/' . $thn2;
+        if ($prefix == "CS") {
+            // Bentuk pola pencarian yang spesifik untuk bulan & tahun
+            $kodePrefix = $prefix . '/' . $bln . '/' . $thn2;
 
-        $builder = $this->db->table('customers');
-        $builder->select('kode');
-        $builder->where('tipe_customer', $tipe_customer);
-        $builder->where('deletedAt', null);
-        $builder->like('kode', $kodePrefix, 'after'); // hanya ambil yang prefix-nya cocok
+            $builder = $this->db->table('customers');
+            $builder->select('kode');
+            $builder->where('tipe_customer', $tipe_customer);
+            $builder->where('deletedAt', null); // hanya ambil yang prefix-nya cocok
 
-        if ($tipe_customer == "LOKAL") {
-            if (session()->get("login")->this_company_id == 16) {
-                $builder->where('company_id', 16);
+            if ($tipe_customer == "LOKAL") {
+                if (session()->get("login")->this_company_id == 16) {
+                    $builder->where('company_id', 16);
+                } else {
+                    $builder->whereIn('company_id', [1, 2, 15]);
+                }
             } else {
-                $builder->whereIn('company_id', [1, 2, 15]);
+                $builder->whereIn('company_id', [1, 2, 15, 16]);
             }
+
+            // ambil kode terbesar
+            $builder->orderBy('id', 'desc');
+            $builder->limit(1);
+            $query = $builder->get();
+            $row = $query->getRowArray();
+
+            // Jika belum ada data di bulan/tahun ini
+            if (!$row) {
+                $lastKode = 1;
+            } else {
+                // contoh kode: CS/10/25/0117
+                $parts = explode('/', $row['kode']);
+                $lastNumber = intval(end($parts)); // ambil angka terakhir (0117 → 117)
+                $lastKode = $lastNumber + 1;
+            }
+
+            // Format ke 4 digit
+            $formattedKode = sprintf("%04d", $lastKode);
+
+            $prefix = implode('/', array_slice($parts, 0, -1));
+            // Gabungkan kembali
+            $generatedNo = $prefix . '/' . $formattedKode;
         } else {
-            $builder->whereIn('company_id', [1, 2, 15, 16]);
+            // Bentuk pola pencarian yang spesifik untuk bulan & tahun
+            $kodePrefix = $prefix . '/' . $bln . '/' . $thn2;
+
+            $builder = $this->db->table('customers');
+            $builder->select('kode');
+            $builder->where('tipe_customer', $tipe_customer);
+            $builder->where('deletedAt', null);
+            $builder->like('kode', $kodePrefix, 'after'); // hanya ambil yang prefix-nya cocok
+
+            if ($tipe_customer == "LOKAL") {
+                if (session()->get("login")->this_company_id == 16) {
+                    $builder->where('company_id', 16);
+                } else {
+                    $builder->whereIn('company_id', [1, 2, 15]);
+                }
+            } else {
+                $builder->whereIn('company_id', [1, 2, 15, 16]);
+            }
+
+            // ambil kode terbesar
+            $builder->orderBy('id', 'desc');
+            $builder->limit(1);
+            $query = $builder->get();
+            $row = $query->getRowArray();
+
+            // Jika belum ada data di bulan/tahun ini
+            if (!$row) {
+                $lastKode = 1;
+            } else {
+                // contoh kode: CS/10/25/0117
+                $parts = explode('/', $row['kode']);
+                $lastNumber = intval(end($parts)); // ambil angka terakhir (0117 → 117)
+                $lastKode = $lastNumber + 1;
+            }
+
+            // Format ke 4 digit
+            $formattedKode = sprintf("%04d", $lastKode);
+
+            // Gabungkan kembali
+            $generatedNo = $kodePrefix . '/' . $formattedKode;
         }
-
-        // ambil kode terbesar
-        $builder->orderBy('kode', 'desc');
-        $builder->limit(1);
-        $query = $builder->get();
-        $row = $query->getRowArray();
-
-        // Jika belum ada data di bulan/tahun ini
-        if (!$row) {
-            $lastKode = 1;
-        } else {
-            // contoh kode: CS/10/25/0117
-            $parts = explode('/', $row['kode']);
-            $lastNumber = intval(end($parts)); // ambil angka terakhir (0117 → 117)
-            $lastKode = $lastNumber + 1;
-        }
-
-        // Format ke 4 digit
-        $formattedKode = sprintf("%04d", $lastKode);
-
-        // Gabungkan kembali
-        $generatedNo = $kodePrefix . '/' . $formattedKode;
 
         return $generatedNo;
     }

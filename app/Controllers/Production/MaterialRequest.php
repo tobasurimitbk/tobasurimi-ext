@@ -1145,7 +1145,7 @@ class MaterialRequest extends BaseController
     public function getListBarangIsInit()
     {
         $addCondition = [
-            "stock.company_id" => $this->this_company_id,
+            "stock_revamp.company_id" => $this->this_company_id,
             "barang_master.company_id" => $this->this_company_id
         ];
         if ($this->request->getVar('type_barang') == "bahan_penolong" && $this->request->getVar('kondisi') == "nonkimia") {
@@ -1157,12 +1157,13 @@ class MaterialRequest extends BaseController
                 "parent_name" => "KIMIA"
             ];
         }
-        $data = $this->stockModel->getBarangAndStockCondition(
+        $data = $this->stockRevampDetailModel->getBarangAndStockCondition(
             $this->request->getVar('type_barang'),
             $this->request->getVar('divisi_id'),
             $this->request->getVar('warehouse_id'),
             $addCondition
         );
+
         return response()->setJSON([
             'data' => $data,
             'token' => csrf_hash(),
