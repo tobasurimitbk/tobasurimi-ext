@@ -6,6 +6,9 @@ use App\Controllers\BaseController;
 use App\Models\DivisisModel;
 use App\Models\HROutsourcingCompanyModel;
 use App\Models\HROutsourcingEmployeeModel;
+use Endroid\QrCode\QrCode;
+use Endroid\QrCode\ErrorCorrectionLevel;
+use Exception;
 
 class Employee extends BaseController
 {
@@ -175,5 +178,108 @@ class Employee extends BaseController
             'message' => "Employee Outsourcing Berhasil Dihapus",
             'token' => csrf_hash()
         ]);
+    }
+
+    public function generateQrCode($employeeId)
+    {
+        $html = "";
+
+        $empId = decrypt($employeeId);
+
+        try {
+            // Ambil data employee
+            $employee = $this->hrOutsourcingEmployeeModel
+                ->select('id, nama, badge')
+                ->where('id', $empId)
+                ->first();
+
+            if (!$employee) {
+                return $this->response->setJSON([
+                    'status' => 'error',
+                    'message' => 'Employee tidak ditemukan.'
+                ]);
+            }
+
+            // Enkripsi ID
+            $encrypted = encrypt($empId);
+
+            // Generate QR Code (link ke detail)
+            $qrCode = new QrCode(base_url("hr-outsourcing-company/employee/detail/" . $encrypted));
+            $qrCode->setSize(350);
+            $qrCode->setMargin(10);
+            $qrCode->setErrorCorrectionLevel(new ErrorCorrectionLevel(ErrorCorrectionLevel::HIGH));
+
+            // Convert QR ke Data URI (base64)
+            $dataUri = $qrCode->writeDataUri();
+
+            // HTML output
+            $html .= "
+                <div class='col-md-12 mb-4 text-center'>
+                    <a href='{$dataUri}' download='qr-employee-{$employee['id']}.png'>
+                        <img src='{$dataUri}' alt='QR Code' class='img-fluid'>
+                    </a><br>
+                    <small>
+                        <strong>{$employee['nama']}</strong><br>
+                        <strong>NO BADGE:</strong> {$employee['badge']}<br>
+                        <strong>ID:</strong> {$encrypted}
+                    </small>
+                </div>
+            ";
+
+            return $this->response->setJSON([
+                'status' => 'ok',
+                'html'   => "<div class='row'>{$html}</div>"
+            ]);
+
+        } catch (Exception $e) {
+            return $this->response->setJSON([
+                'status' => 'error',
+                'message' => $e->getMessage()
+            ]);
+        }
+    }
+
+    public function getEmployeeByIdQr($encryptedId)
+    {
+        try {
+            // decrypt dulu
+            $id = decrypt($encryptedId);
+
+            // ambil data employee
+            $employee = $this->hrOutsourcingEmployeeModel
+                ->select('employee_name, nik, jabatan, divisi, phone_number, status')
+                ->where('id', $id)
+                ->first();
+
+            if (!$employee) {
+                return $this->response
+                    ->setHeader('Access-Control-Allow-Origin', '*')
+                    ->setJSON([
+                        'status' => 'error',
+                        'message' => 'Data employee tidak ditemukan.'
+                    ]);
+            }
+
+            return $this->response
+                ->setHeader('Access-Control-Allow-Origin', '*')
+                ->setJSON([
+                    'status' => 'ok',
+                    'employee' => [
+                        'nama' => $employee['employee_name'],
+                        'nik' => $employee['nik'],
+                        'jabatan' => $employee['jabatan'],
+                        'divisi' => $employee['divisi'] ?? '-',
+                        'phone' => $employee['phone_number'] ?? '-',
+                        'status' => $employee['status'] ?? 'Aktif',
+                    ]
+                ]);
+        } catch (Exception $e) {
+            return $this->response
+                ->setHeader('Access-Control-Allow-Origin', '*')
+                ->setJSON([
+                    'status' => 'error',
+                    'message' => $e->getMessage()
+                ]);
+        }
     }
 }

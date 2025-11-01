@@ -103,6 +103,23 @@
     </div>
 </section>
 
+
+    <div class="modal fade" id="qrModal" tabindex="-1" role="dialog" aria-labelledby="qrModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-sm" role="document">
+            <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">QR Code Karyawan</h5>
+                <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
+            </div>
+            <div class="modal-body text-center" id="qrResult"></div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Tutup</button>
+                <button type="button" class="btn btn-primary" id="btn-print">Print</button>
+            </div>
+            </div>
+        </div>
+    </div>
+
 <script>
     const csrfToken = '<?= csrf_token() ?>';
     let sort = "createdAt";
@@ -161,11 +178,18 @@
                 sortable: false,
                 render: function(data, type, row) {
                     return `
-                        <button class="btn btn-warning mr-1 edit-table-detail" data-id="${row.id}" data-badge="${row.badge}" data-tanggal_masuk_kerja="${row.tanggal_masuk_kerja}" data-nama="${row.nama}">
-                            <i class="fa fa-pencil fa-sm" aria-hidden="true"></i>
+                        <button class="btn btn-warning mr-1 edit-table-detail" 
+                            data-id="${row.id}" 
+                            data-badge="${row.badge}" 
+                            data-tanggal_masuk_kerja="${row.tanggal_masuk_kerja}" 
+                            data-nama="${row.nama}">
+                            <i class="fa fa-pencil fa-sm"></i>
                         </button>
-                        <button class="btn btn-danger" onclick="deleteForm('${row.id}')">
-                            <i class="fa fa-trash fa-sm" aria-hidden="true"></i>
+                        <button class="btn btn-danger mr-1" onclick="deleteForm('${row.id}')">
+                            <i class="fa fa-trash fa-sm"></i>
+                        </button>
+                        <button class="btn btn-primary print-barcode" data-id="${row.id}" data-nama="${row.nama}">
+                            <i class="fa fa-qrcode fa-sm"></i>
                         </button>
                     `;
                 }
@@ -361,6 +385,47 @@
             sortType = sortType === "asc" ? "desc" : "asc";
         }
     }
+
+    // tombol generate QR per baris
+    $(document).on("click", ".print-barcode", function() {
+        const id = $(this).data("id");
+        const nama = $(this).data("nama");
+        const csrf = $(`[name="${csrfToken}"]`);
+
+        $.ajax({
+            url: `<?= base_url('hr-outsourcing-company/employee/generateQrCode/'); ?>${id}`,
+            method: "POST",
+            beforeSend: function(xhr) {
+                xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                setLoading();
+            },
+            complete: function() {
+                stopLoading();
+            },
+            success: function(res) {
+                if (res.status === "ok") {
+                    $("#qrResult").html(res.html);
+                    $("#qrModal").modal("show");
+                } else {
+                    Swal.fire('Gagal generate QR', res.message || '', 'error');
+                }
+            },
+            error: function() {
+                Swal.fire('Error', 'Gagal konek ke server', 'error');
+            }
+        });
+    });
+
+    // Tombol print isi modal
+    $("#btn-print").on("click", function() {
+        let printContents = document.getElementById("qrResult").innerHTML;
+        let w = window.open();
+        w.document.write(printContents);
+        w.document.close();
+        w.print();
+    });
+
+
 </script>
 
 <?= $this->endSection(); ?>
