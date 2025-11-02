@@ -247,7 +247,7 @@ class Employee extends BaseController
 
             // ambil data employee
             $employee = $this->hrOutsourcingEmployeeModel
-                ->select('employee_name, nik, jabatan, divisi, phone_number, status')
+                ->select('id, nama, badge')
                 ->where('id', $id)
                 ->first();
 
@@ -265,11 +265,8 @@ class Employee extends BaseController
                 ->setJSON([
                     'status' => 'ok',
                     'employee' => [
-                        'nama' => $employee['employee_name'],
-                        'nik' => $employee['nik'],
-                        'jabatan' => $employee['jabatan'],
-                        'divisi' => $employee['divisi'] ?? '-',
-                        'phone' => $employee['phone_number'] ?? '-',
+                        'nama' => $employee['nama'],
+                        'badge' => $employee['badge'],
                         'status' => $employee['status'] ?? 'Aktif',
                     ]
                 ]);
