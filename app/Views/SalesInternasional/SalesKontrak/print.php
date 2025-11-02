@@ -300,20 +300,34 @@
                 <label class="label-header">DATE: </label>
             </div> -->
             <div class="txt-right po-customer">
-                <?php if (!empty($salesKontrak['customer_po_no'])): ?>
-                    <label class="label-header">PO NO: <?= $salesKontrak['customer_po_no']; ?></label>
-                <?php endif; ?>
-                <br>
-                <?php if (!empty($salesKontrak['no_container'])): ?>
-                    <label class="label-header">CONTAINER: <?= $salesKontrak['no_container']; ?></label>
-                <?php endif; ?>
 
-                <?php $no = 1; ?>
-                <br>
-                <?php foreach ($revisionList as $r): ?>
-                    <label class="label-header">REV: <?= $no ?>: <?= date('d-M-Y', strtotime($r['date_revision'])) ?></label> <br>
-                    <?php $no++ ?>
-                <?php endforeach; ?>
+                <table style="line-height: 0.8; float:right;">
+                    <?php if (!empty($salesKontrak['customer_po_no'])): ?>
+                        <tr>
+                            <td><label class="label-header">PO NO</label></td>
+                            <td><label class="label-header">:</label></td>
+                            <td><label class="label-header"><?= $salesKontrak['customer_po_no'] ?></label></td>
+                        </tr>
+                    <?php endif; ?>
+                    <?php if (!empty($salesKontrak['no_container'])): ?>
+                        <tr>
+                            <td><label class="label-header">CONTAINER</label></td>
+                            <td><label class="label-header">:</label></td>
+                            <td><label class="label-header"><?= $salesKontrak['no_container'] ?></label></td>
+                        </tr>
+                    <?php endif; ?>
+                    <?php $no = 1; ?>
+                    <?php foreach ($revisionList as $r): ?>
+                        <tr>
+                            <td><label class="label-header">REV <?= $no ?></label></td>
+                            <td><label class="label-header">:</label></td>
+                            <td><label class="label-header"><?= date('d-M-Y', strtotime($r['date_revision'])) ?></label></td>
+                        </tr>
+                        <?php $no++ ?>
+                    <?php endforeach; ?>
+                </table>
+
+
             </div>
 
         </div>
