@@ -19,7 +19,7 @@ class Employee extends BaseController
 
     public function __construct()
     {
-        $this->this_company_id = session()->get("login")->this_company_id;
+        $this->this_company_id = session()->get("login")->this_company_id ?? NULL;
         $this->divisiModel = new DivisisModel();
         $this->hrOutsourcingCompanyModel = new HROutsourcingCompanyModel();
         $this->hrOutsourcingEmployeeModel = new HROutsourcingEmployeeModel();
