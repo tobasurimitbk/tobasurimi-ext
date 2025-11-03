@@ -240,7 +240,13 @@ class Employee extends BaseController
     }
 
     public function getEmployeeByIdQr($encryptedId)
-    {
+    {   return $this->response
+                    ->setHeader('Access-Control-Allow-Origin', '*')
+                    ->setJSON([
+                        'status' => 'error',
+                        'message' => $encryptedId,
+                    ]);
+        
         try {
             // decrypt dulu
             $id = decrypt($encryptedId);
