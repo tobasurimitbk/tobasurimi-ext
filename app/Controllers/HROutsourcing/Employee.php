@@ -182,11 +182,10 @@ class Employee extends BaseController
 
     public function generateQrCode($employeeId)
     {
-        $html = "";
-
-        $empId = decrypt($employeeId);
-
         try {
+            // Decrypt ID karyawan
+            $empId = decrypt($employeeId);
+
             // Ambil data employee
             $employee = $this->hrOutsourcingEmployeeModel
                 ->select('id, nama, badge')
@@ -200,28 +199,38 @@ class Employee extends BaseController
                 ]);
             }
 
-            // Enkripsi ID
-            $encrypted = encrypt($empId);
+            // Tentukan type (bisa lo ganti dari kolom DB juga bro)
+            $type = 'EMP'; // contoh: EMP untuk employee, VEN untuk vendor, VIS untuk visitor
 
-            // Generate QR Code (link ke detail)
-            $qrCode = new QrCode(base_url("hr-outsourcing-company/employee/detail/" . $encrypted));
+            // Gabung jadi satu string type-id
+            $payload = "{$type}-{$empId}";
+
+            // Encrypt biar aman
+            $encryptedPayload = encrypt($payload);
+
+            // Link validasi universal (bisa dipakai modul lain)
+            $url = base_url("scan/validate/" . $encryptedPayload);
+
+            // Generate QR Code
+            $qrCode = new QrCode($url);
             $qrCode->setSize(350);
             $qrCode->setMargin(10);
             $qrCode->setErrorCorrectionLevel(new ErrorCorrectionLevel(ErrorCorrectionLevel::HIGH));
 
-            // Convert QR ke Data URI (base64)
+            // Convert ke data URI
             $dataUri = $qrCode->writeDataUri();
 
-            // HTML output
-            $html .= "
+            // HTML Output
+            $html = "
                 <div class='col-md-12 mb-4 text-center'>
-                    <a href='{$dataUri}' download='qr-employee-{$employee['id']}.png'>
+                    <a href='{$dataUri}' download='qr-{$type}-{$employee['id']}.png'>
                         <img src='{$dataUri}' alt='QR Code' class='img-fluid'>
                     </a><br>
                     <small>
                         <strong>{$employee['nama']}</strong><br>
                         <strong>NO BADGE:</strong> {$employee['badge']}<br>
-                        <strong>ID:</strong> {$encrypted}
+                        <strong>TYPE:</strong> {$type}<br>
+                        <strong>PAYLOAD:</strong> {$payload}
                     </small>
                 </div>
             ";
@@ -240,49 +249,66 @@ class Employee extends BaseController
     }
 
     public function getEmployeeByIdQr($encryptedId)
-    {   return $this->response
-                    ->setHeader('Access-Control-Allow-Origin', '*')
-                    ->setJSON([
-                        'status' => 'error',
-                        'message' => $encryptedId,
-                    ]);
-        
+    {
+        // Set CORS header
+        $this->response->setHeader('Access-Control-Allow-Origin', '*');
+
         try {
-            // decrypt dulu
-            $id = decrypt($encryptedId);
+            // --- Step 1: decrypt payload ---
+            $decoded = decrypt($encryptedId);
 
-            // ambil data employee
-            $employee = $this->hrOutsourcingEmployeeModel
-                ->select('id, nama, badge')
-                ->where('id', $id)
-                ->first();
+            // --- Step 2: pecah jadi type dan id ---
+            $parts = explode('-', $decoded);
+            if (count($parts) < 2) {
+                return $this->response->setJSON([
+                    'status'  => 'error',
+                    'message' => 'Format QR tidak valid.'
+                ]);
+            }
 
-            if (!$employee) {
-                return $this->response
-                    ->setHeader('Access-Control-Allow-Origin', '*')
-                    ->setJSON([
-                        'status' => 'error',
-                        'message' => 'Data employee tidak ditemukan.'
+            [$type, $id] = $parts;
+            $type = strtoupper($type);
+
+            // --- Step 3: proses berdasarkan tipe ---
+            switch ($type) {
+                case 'EMP':
+                    $employee = $this->hrOutsourcingEmployeeModel
+                        ->select('id, nama, badge, status')
+                        ->where('id', $id)
+                        ->first();
+
+                    if (!$employee) {
+                        return $this->response->setJSON([
+                            'status'  => 'error',
+                            'message' => 'Data employee tidak ditemukan.'
+                        ]);
+                    }
+
+                    return $this->response->setJSON([
+                        'status'   => 'ok',
+                        'type'     => $type,
+                        'employee' => [
+                            'id'     => $employee['id'],
+                            'nama'   => $employee['nama'],
+                            'badge'  => $employee['badge'],
+                            'status' => $employee['status'] ?? 'Aktif',
+                        ]
+                    ]);
+
+                default:
+                    return $this->response->setJSON([
+                        'status'  => 'error',
+                        'message' => "Tipe QR '{$type}' tidak dikenali."
                     ]);
             }
 
-            return $this->response
-                ->setHeader('Access-Control-Allow-Origin', '*')
-                ->setJSON([
-                    'status' => 'ok',
-                    'employee' => [
-                        'nama' => $employee['nama'],
-                        'badge' => $employee['badge'],
-                        'status' => $employee['status'] ?? 'Aktif',
-                    ]
-                ]);
         } catch (Exception $e) {
-            return $this->response
-                ->setHeader('Access-Control-Allow-Origin', '*')
-                ->setJSON([
-                    'status' => 'error',
-                    'message' => $e->getMessage()
-                ]);
+            // --- Step 4: error handler umum ---
+            return $this->response->setJSON([
+                'status'  => 'error',
+                'message' => 'Gagal membaca QR: ' . $e->getMessage()
+            ]);
         }
     }
+
 }
