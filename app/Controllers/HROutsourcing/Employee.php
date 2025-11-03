@@ -248,49 +248,49 @@ class Employee extends BaseController
     }
 
     public function getEmployeeByIdQr($encryptedId)
-{
-    // Set CORS header
-    $this->response->setHeader('Access-Control-Allow-Origin', '*');
+    {
+        // Set CORS header
+        $this->response->setHeader('Access-Control-Allow-Origin', '*');
 
-    try {
-        // --- Step 1: decode balik dari Base64 URL-Safe ke raw encrypted ---
-        $base64 = strtr($encryptedId, '-_', '+/'); // balik simbol
-        $padded = str_pad($base64, strlen($base64) % 4 === 0 ? strlen($base64) : strlen($base64) + (4 - strlen($base64) % 4), '='); // padding "="
-        $decodedEncrypted = base64_decode($padded);
+        try {
+            // --- Step 1: decode balik dari Base64 URL-Safe ke raw encrypted ---
+            $base64 = strtr($encryptedId, '-_', '+/'); // balik simbol
+            $padded = str_pad($base64, strlen($base64) % 4 === 0 ? strlen($base64) : strlen($base64) + (4 - strlen($base64) % 4), '='); // padding "="
+            $decodedEncrypted = base64_decode($padded);
 
-        // --- Step 2: decrypt hasil decode ---
-        $decoded = decrypt($decodedEncrypted);
+            // --- Step 2: decrypt hasil decode ---
+            $decoded = decrypt($decodedEncrypted);
 
-        // --- Step 3: ambil data employee ---
-        $employee = $this->hrOutsourcingEmployeeModel
-            ->select('id, nama, badge')
-            ->where('id', $decoded)
-            ->first();
+            // --- Step 3: ambil data employee ---
+            $employee = $this->hrOutsourcingEmployeeModel
+                ->select('id, nama, badge')
+                ->where('id', $decoded)
+                ->first();
 
-        if (!$employee) {
+            if (!$employee) {
+                return $this->response->setJSON([
+                    'status'  => 'error',
+                    'message' => 'Data employee tidak ditemukan.'
+                ]);
+            }
+
+            return $this->response->setJSON([
+                'status'   => 'ok',
+                'employee' => [
+                    'id'     => $employee['id'],
+                    'nama'   => $employee['nama'],
+                    'badge'  => $employee['badge'],
+                    'status' => $employee['status'] ?? 'Aktif',
+                ]
+            ]);
+
+        } catch (Exception $e) {
             return $this->response->setJSON([
                 'status'  => 'error',
-                'message' => 'Data employee tidak ditemukan.'
+                'message' => 'Gagal membaca QR: ' . $e->getMessage()
             ]);
         }
-
-        return $this->response->setJSON([
-            'status'   => 'ok',
-            'employee' => [
-                'id'     => $employee['id'],
-                'nama'   => $employee['nama'],
-                'badge'  => $employee['badge'],
-                'status' => $employee['status'] ?? 'Aktif',
-            ]
-        ]);
-
-    } catch (Exception $e) {
-        return $this->response->setJSON([
-            'status'  => 'error',
-            'message' => 'Gagal membaca QR: ' . $e->getMessage()
-        ]);
     }
-}
 
 
 }
