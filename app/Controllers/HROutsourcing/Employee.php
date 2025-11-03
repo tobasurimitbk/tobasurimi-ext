@@ -257,7 +257,7 @@ class Employee extends BaseController
             $decoded = decrypt($encryptedId);
 
                     $employee = $this->hrOutsourcingEmployeeModel
-                        ->select('id, nama, badge, status')
+                        ->select('id, nama, badge')
                         ->where('id', $decoded)
                         ->first();
 
