@@ -182,8 +182,10 @@ class Employee extends BaseController
 
     public function generateQrCode($employeeId)
     {
+        $html = "";
+
         try {
-            // Decrypt ID karyawan
+            // Decrypt dulu biar dapat id asli
             $empId = decrypt($employeeId);
 
             // Ambil data employee
@@ -199,38 +201,35 @@ class Employee extends BaseController
                 ]);
             }
 
-            // Tentukan type (bisa lo ganti dari kolom DB juga bro)
-            $type = 'EMP'; // contoh: EMP untuk employee, VEN untuk vendor, VIS untuk visitor
+            // === generate type dan encoded id ===
+            $type = 'EMP';
+            $encrypted = encrypt($empId);
 
-            // Gabung jadi satu string type-id
-            $payload = "{$type}-{$empId}";
+            // Encode ke Base64 URL-Safe (biar gak ada "-" "/" "=")
+            $safeValue = rtrim(strtr(base64_encode($encrypted), '+/', '-_'), '=');
 
-            // Encrypt biar aman
-            $encryptedPayload = encrypt($payload);
-
-            // Link validasi universal (bisa dipakai modul lain)
-            $url = base_url("scan/validate/" . $encryptedPayload);
+            // Format QR: TYPE-VALUE (dibaca langsung Golang)
+            $qrText = "{$type}-{$safeValue}";
 
             // Generate QR Code
-            $qrCode = new QrCode($url);
+            $qrCode = new QrCode($qrText);
             $qrCode->setSize(350);
             $qrCode->setMargin(10);
             $qrCode->setErrorCorrectionLevel(new ErrorCorrectionLevel(ErrorCorrectionLevel::HIGH));
 
-            // Convert ke data URI
+            // Convert QR ke Data URI (base64)
             $dataUri = $qrCode->writeDataUri();
 
-            // HTML Output
-            $html = "
+            // HTML output
+            $html .= "
                 <div class='col-md-12 mb-4 text-center'>
-                    <a href='{$dataUri}' download='qr-{$type}-{$employee['id']}.png'>
+                    <a href='{$dataUri}' download='qr-employee-{$employee['id']}.png'>
                         <img src='{$dataUri}' alt='QR Code' class='img-fluid'>
                     </a><br>
                     <small>
                         <strong>{$employee['nama']}</strong><br>
                         <strong>NO BADGE:</strong> {$employee['badge']}<br>
-                        <strong>TYPE:</strong> {$type}<br>
-                        <strong>PAYLOAD:</strong> {$payload}
+                        <strong>SCAN VALUE:</strong> {$qrText}
                     </small>
                 </div>
             ";
