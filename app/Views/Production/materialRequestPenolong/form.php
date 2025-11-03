@@ -320,6 +320,7 @@
                 stock_date: '<?= date('d/m/Y', strtotime($materialRequestDetails->stock_date)) ?>',
                 stock_dokumen: '<?= $materialRequestDetails->stock_dokumen ?>',
                 stock_id: '<?= $materialRequestDetails->stock_id ?>',
+                stock_detail_id: '<?= $materialRequestDetails->stock_detail_id ?>',
                 stok_total: '<?= $materialRequestDetails->stok_total ?>',
                 realStok: '<?= $materialRequestDetails->realStok ?>',
                 supplier_name: '-',

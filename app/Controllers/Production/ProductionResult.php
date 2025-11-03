@@ -190,14 +190,20 @@ class ProductionResult extends BaseController
                 $value->type_barang_text = "BAHAN SETENGAH JADI";
             }
         }
-        $productionResDetSelectBS = "production_result_details.*, barang_master.barang_name AS barang_name, CONCAT(barang_master.barang_name, ' ', barang_master_spesifikasi.spesifikasi) AS nama_barang, barang_master.kode_barang AS kode_barang, satuans.kode_satuan, warehouses.warehouse_name as warehouse, divisis.divisi as divisi";
+        $productionResDetSelectBS = "production_result_details.*, 
+        barang_master.barang_name AS barang_name, 
+        CONCAT(barang_master.barang_name, ' ', barang_master_spesifikasi.spesifikasi) AS nama_barang, 
+        barang_master.kode_barang AS kode_barang, 
+        satuans.kode_satuan, 
+        warehouses.warehouse_name as warehouse, 
+        divisis.divisi as divisi";
         $productionResDetDataBS = $this->productionResultDetailModel->asObject()
             ->select($productionResDetSelectBS)
             ->join('barang_master', 'barang_master.id = production_result_details.barang1_id', 'left')
             ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = production_result_details.barang2_id', 'left')
-            ->join('stock', 'stock.id = production_result_details.stock_id', 'left')
-            ->join('warehouses', 'warehouses.id = stock.warehouse_id', 'left')
-            ->join('divisis', 'divisis.id = stock.divisi_id', 'left')
+            // ->join('stock', 'stock.id = production_result_details.stock_id', 'left')
+            ->join('warehouses', 'warehouses.id = production_result_details.warehouse_id', 'left')
+            ->join('divisis', 'divisis.id = production_result_details.divisi_id', 'left')
             ->join('satuans', 'satuans.id = barang_master_spesifikasi.satuan_1', 'left')
             ->where('production_result_details.type', 'SCRAP')
             ->where('production_result_details.production_result_id', $id)
@@ -414,15 +420,19 @@ class ProductionResult extends BaseController
                 "company_id" => $this->this_company_id,
                 "pr_no" => $this->request->getVar("res_no") == "AUTO GENERATE" ? $this->generatePRNo() : $this->request->getVar("res_no"),
                 "material_request_id" => json_encode($this->request->getPost("kode_request")),
+                "material_request_penolong_id" => json_encode($this->request->getPost("kode_request_penolong")),
                 "work_order_id" => is_array($workOrderIds) ? implode(',', $workOrderIds) : $workOrderIds,
                 "receive_date" => $this->request->getVar("date_production") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("date_production")))) : date("Y-m-d"),
             ];
 
             $barangJadi = json_decode($this->request->getVar("jadi"));
             $barangDigunakan = json_decode($this->request->getVar("digunakan"));
-            // $barangDigunakanPenolong = json_decode($this->request->getVar("digunakan_penolong"));
+            $barangDigunakanPenolong = json_decode($this->request->getVar("digunakan_penolong"));
             $barangScrap = json_decode($this->request->getVar("scrap"));
             $barangFilling = json_decode($this->request->getVar("filling"));
+
+            // var_dump($datas, $barangJadi, $barangDigunakan, $barangDigunakanPenolong, $barangScrap, $barangFilling);
+            // exit;
 
             $productionResID = $this->productionResultModel->insert($datas);
 
@@ -451,9 +461,9 @@ class ProductionResult extends BaseController
                     ];
                     $this->productionResultDetailModel->insert($datasbj);
                     $this->accountBarangModel->insertAccountBarang(
-                        $this->this_company_id, 
-                        $bj->divisi_id, 
-                        $bj->barang1_id, 
+                        $this->this_company_id,
+                        $bj->divisi_id,
+                        $bj->barang1_id,
                         $bj->barang2_id
                     );
                 }
@@ -514,12 +524,49 @@ class ProductionResult extends BaseController
                     ];
                     $this->productionResultDetailModel->insert($datasbr);
                     $this->accountBarangModel->insertAccountBarang(
-                        $this->this_company_id, 
-                        $bd->divisi_id, 
-                        $bd->barang1_id, 
+                        $this->this_company_id,
+                        $bd->divisi_id,
+                        $bd->barang1_id,
                         $bd->barang2_id
                     );
                 }
+            }
+
+            foreach ($barangDigunakanPenolong as $bdp) {
+                $qty = (float) $bdp->qty;
+                $qty2 = isset($bdp->qty2) ? (float) $bdp->qty2 : 0;
+                $qtySisa = $qty - $qty2;
+                $datasbdp = [
+                    "production_result_id" => $productionResID,
+                    "material_request_detail_id" => $bdp->material_request_detail_id,
+                    "material_request_id" => $bdp->material_request_id,
+                    "barang1_id" => $bdp->barang1_id,
+                    "barang2_id" => $bdp->barang2_id,
+                    "warehouse_id" => $bdp->warehouse_id,
+                    "divisi_id" => $bdp->divisi_id,
+                    "bc_id" => $bdp->bc_id,
+                    "stock_dokumen" => $bdp->stock_dokumen,
+                    "stock_date" => $bdp->stock_date,
+                    "stock_id" => $bdp->stock_id ?? 0,
+                    "stock_detail_id" => $bdp->stock_detail_id ?? 0,
+                    "no_aju" => $bdp->no_aju == "-" ? "-" : $bdp->no_aju,
+                    "barang_type" => $bdp->type_barang,
+                    "type" => "DIGUNAKAN",
+                    "no_ref" => $bdp->ref_no,
+                    "qty" => isset($bdp->qty2) ? $qty2 : $qty,
+                    "kondisi_barang" => $bdp->kondisi_barang,
+                    "harga_umum" => (float) isset($bdp->harga_umum) ? $bdp->harga_umum :  0,
+                    "harga_harian" => (float) isset($bdp->harga_harian) ? $bdp->harga_harian : 0,
+                    "harga_bulanan" => (float) isset($bdp->harga_bulanan) ? $bdp->harga_bulanan : 0,
+                ];
+                $this->productionResultDetailModel->insert($datasbdp);
+
+                $this->accountBarangModel->insertAccountBarang(
+                    $this->this_company_id,
+                    $bdp->divisi_id,
+                    $bdp->barang1_id,
+                    $bdp->barang2_id
+                );
             }
 
             foreach ($barangScrap as $bs) {
@@ -543,12 +590,12 @@ class ProductionResult extends BaseController
                     "harga_bulanan" => (float) isset($bs->harga_bulanan) ? $bs->harga_bulanan : 0,
                 ];
                 $this->productionResultDetailModel->insert($datasbs);
-                    $this->accountBarangModel->insertAccountBarang(
-                        $this->this_company_id, 
-                        $bs->divisi_id, 
-                        $bs->barang1_id, 
-                        $bs->barang2_id
-                    );
+                $this->accountBarangModel->insertAccountBarang(
+                    $this->this_company_id,
+                    $bs->divisi_id,
+                    decrypt($bs->barang_id),
+                    decrypt($bs->barang_spesifikasi_id)
+                );
             }
 
             foreach ($barangFilling as $bf) {
@@ -575,13 +622,13 @@ class ProductionResult extends BaseController
                     "harga_bulanan" => (float) isset($bf->harga_bulanan) ? $bf->harga_bulanan : 0,
                 ];
                 $this->productionResultDetailModel->insert($datasbf);
-                
-                    $this->accountBarangModel->insertAccountBarang(
-                        $this->this_company_id, 
-                        $bf->divisi_id, 
-                        $bf->barang1_id, 
-                        $bf->barang2_id
-                    );
+
+                $this->accountBarangModel->insertAccountBarang(
+                    $this->this_company_id,
+                    $bf->divisi_id,
+                    $bf->barang1_id,
+                    $bf->barang2_id
+                );
             }
 
             $data = [
@@ -592,7 +639,7 @@ class ProductionResult extends BaseController
             ];
             echo json_encode($data);
             return;
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $data = [
                 "status"    => false,
                 "message"   => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
@@ -613,12 +660,14 @@ class ProductionResult extends BaseController
                 "company_id" => $this->this_company_id,
                 "pr_no" => $this->request->getVar("res_no") == "AUTO GENERATE" ? $this->generatePRNo() : $this->request->getVar("res_no"),
                 "material_request_id" => json_encode($this->request->getPost("kode_request")),
+                "material_request_penolong_id" => json_encode($this->request->getPost("kode_request_penolong")),
                 "work_order_id" => is_array($workOrderIds) ? implode(',', $workOrderIds) : $workOrderIds,
                 "receive_date" => $this->request->getVar("date_production") ? date("Y-m-d", strtotime(str_replace("/", "-", $this->request->getVar("date_production")))) : date("Y-m-d"),
             ];
 
             $barangJadi = json_decode($this->request->getVar("jadi"));
             $barangDigunakan = json_decode($this->request->getVar("digunakan"));
+            $barangDigunakanPenolong = json_decode($this->request->getVar("digunakan_penolong"));
             $barangScrap = json_decode($this->request->getVar("scrap"));
             $barangFilling = json_decode($this->request->getVar("filling"));
 
@@ -637,11 +686,11 @@ class ProductionResult extends BaseController
                             "qty_isi" => (float) $bj->qty_isi_jadi,
                         ];
                         $this->productionResultDetailModel->update($bj->production_result_detail_id, $datasbj);
-                        
+
                         $this->accountBarangModel->insertAccountBarang(
-                            $this->this_company_id, 
-                            $bj->divisi_id, 
-                            $bj->barang1_id, 
+                            $this->this_company_id,
+                            $bj->divisi_id,
+                            $bj->barang1_id,
                             $bj->barang2_id
                         );
                     }
@@ -665,11 +714,11 @@ class ProductionResult extends BaseController
                         "qty_isi" => (float) $bj->qty_isi_jadi,
                     ];
                     $this->productionResultDetailModel->insert($datasbj);
-                    
+
                     $this->accountBarangModel->insertAccountBarang(
-                        $this->this_company_id, 
-                        $bj->divisi_id, 
-                        $bj->barang1_id, 
+                        $this->this_company_id,
+                        $bj->divisi_id,
+                        $bj->barang1_id,
                         $bj->barang2_id
                     );
                 }
@@ -683,13 +732,30 @@ class ProductionResult extends BaseController
                     "qty" => isset($bd->qty2) ? $qty2 : $qty,
                 ];
                 $this->productionResultDetailModel->update($bd->production_result_detail_id, $datasbd);
-                
-                    $this->accountBarangModel->insertAccountBarang(
-                        $this->this_company_id, 
-                        $bd->divisi_id, 
-                        $bd->barang1_id, 
-                        $bd->barang2_id
-                    );
+
+                $this->accountBarangModel->insertAccountBarang(
+                    $this->this_company_id,
+                    $bd->divisi_id,
+                    $bd->barang1_id,
+                    $bd->barang2_id
+                );
+            }
+
+            foreach ($barangDigunakanPenolong as $bdp) {
+                $qty = (float) $bdp->qty;
+                $qty2 = isset($bdp->qty2) ? (float) $bdp->qty2 : 0;
+                $qtySisa = $qty - $qty2;
+                $datasbdp = [
+                    "qty" => isset($bdp->qty2) ? $qty2 : $qty,
+                ];
+                $this->productionResultDetailModel->update($bdp->production_result_detail_id, $datasbdp);
+
+                $this->accountBarangModel->insertAccountBarang(
+                    $this->this_company_id,
+                    $bdp->divisi_id,
+                    $bdp->barang1_id,
+                    $bdp->barang2_id
+                );
             }
 
             foreach ($barangScrap as $bs) {
@@ -697,13 +763,13 @@ class ProductionResult extends BaseController
                     "qty" => (float) $bs->qty,
                 ];
                 $this->productionResultDetailModel->update($bs->production_result_detail_id, $datasbs);
-                
-                    $this->accountBarangModel->insertAccountBarang(
-                        $this->this_company_id, 
-                        $bs->divisi_id, 
-                        $bs->barang1_id, 
-                        $bs->barang2_id
-                    );
+
+                $this->accountBarangModel->insertAccountBarang(
+                    $this->this_company_id,
+                    $bs->divisi_id,
+                    $bs->barang1_id,
+                    $bs->barang2_id
+                );
             }
 
             foreach ($barangFilling as $bf) {
@@ -711,11 +777,11 @@ class ProductionResult extends BaseController
                     "qty" => (float) $bf->qty,
                 ];
                 $this->productionResultDetailModel->update($bf->production_result_detail_id, $datasbf);
-                
+
                 $this->accountBarangModel->insertAccountBarang(
-                    $this->this_company_id, 
-                    $bf->divisi_id, 
-                    $bf->barang1_id, 
+                    $this->this_company_id,
+                    $bf->divisi_id,
+                    $bf->barang1_id,
                     $bf->barang2_id
                 );
             }

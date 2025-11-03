@@ -185,7 +185,36 @@ class MaterialRequest extends BaseController
 
         if (!empty($id)) {
             $dataMaterialRequests = $this->materialRequestModel->asObject()->find($id);
-            $dataMaterialRequestDetailsBahanBaku = $this->materialRequestDetailsModel->getMaterialRequestBahanBakuDetailNew($id);
+            $dataMaterialRequestDetailsBahanBaku = $this->materialRequestDetailsModel
+                ->getMaterialRequestBahanBakuDetailNew($id);
+
+            foreach ($dataMaterialRequestDetailsBahanBaku as $key => &$value) {
+                $dataMaterialRequestNotApprove = $this->materialRequestDetailsModel->getMaterialRequestNotApprove(
+                    $value['stock_id'],
+                    $value['stock_detail_id'],
+                    $value['bc_id'],
+                    $value['no_aju'],
+                    date('Y-m-d', strtotime(str_replace('/', '-', $value['stock_date']))),
+                    $value['stock_dokumen']
+                );
+
+                if ($dataMaterialRequestNotApprove) {
+                    $value['is_requested'] = true;
+                    $stokTotal = (float) $this->stockDetail2Model->getStockListDetail(
+                        $value['stock_id'],
+                        $value['bc_id'],
+                        $value['no_aju'],
+                        $value['stock_dokumen']
+                    )['stok_total'];
+
+                    $selisih = $stokTotal - (float) $dataMaterialRequestNotApprove['qty'];
+
+                    $value['realStok'] = round(max(0, $selisih), 2);
+                } else {
+                    $value['is_requested'] = false;
+                }
+            }
+
             $dataMaterialRequestDetails = $this->materialRequestDetailsModel->asObject()
                 ->select(
                     '
@@ -227,33 +256,6 @@ class MaterialRequest extends BaseController
                     $value->barang_type_text = "BARANG MODAL";
                 } elseif ($value->barang_type == "bahan_setengah_jadi") {
                     $value->barang_type_text = "BARANG SETENGAH JADI";
-                }
-            }
-
-            foreach ($dataMaterialRequestDetailsBahanBaku as $key => &$value) {
-                $dataMaterialRequestNotApprove = $this->materialRequestDetailsModel->getMaterialRequestNotApprove(
-                    $value['stock_id'],
-                    $value['stock_detail_id'],
-                    $value['bc_id'],
-                    $value['no_aju'],
-                    date('Y-m-d', strtotime(str_replace('/', '-', $value['stock_date']))),
-                    $value['stock_dokumen']
-                );
-
-                if ($dataMaterialRequestNotApprove) {
-                    $value['is_requested'] = true;
-                    $stokTotal = (float) $this->stockDetail2Model->getStockListDetail(
-                        $value['stock_id'],
-                        $value['bc_id'],
-                        $value['no_aju'],
-                        $value['stock_dokumen']
-                    )['stok_total'];
-
-                    $selisih = $stokTotal - (float) $dataMaterialRequestNotApprove['qty'];
-
-                    $value['realStok'] = round(max(0, $selisih), 2);
-                } else {
-                    $value['is_requested'] = false;
                 }
             }
 
@@ -695,7 +697,6 @@ class MaterialRequest extends BaseController
             ]);
         }
     }
-
 
     public function update()
     {
@@ -1189,45 +1190,77 @@ class MaterialRequest extends BaseController
     public function getListStockByStockID()
     {
         if (!empty($this->request->getVar('stock_id'))) {
-            $isAdjusment = !empty($this->request->getVar('isAdjusment')) ? true : false;
-            $supplierId = !empty($this->request->getVar('supplier_id')) ? $this->request->getVar('supplier_id') : null;
+            $datas = [
+                'stock_revamp.id' => $this->request->getVar('stock_id'),
+            ];
 
-            $dataResult = $this->stockDetail2Model->getStockListWithBCDoc(
-                $this->request->getVar('stock_id'),
-                $isAdjusment,
-                $supplierId
-            );
+            $dataResult = $this->stockRevampDetailModel->getStockListWithCondition($datas);
 
             if (!is_array($dataResult)) {
                 $dataResult = []; // Ensure $dataResult is an array if the method does not return one
             }
 
-            $stock = $this->stockModel->find($this->request->getVar('stock_id'));
-            if ($stock['kemasan_id'] == 0) {
-                $barangMaster = $this->barangMasterModel->find($stock['barang1_id']);
-                $barangMasterSpesifikasi = $this->barangMasterSpesifikasiModel->find($stock['barang2_id']);
-                $satuan = $this->satuanModel->find($barangMasterSpesifikasi['satuan_1']);
-                $barangName = $barangMaster['barang_name'] . "-" . $barangMasterSpesifikasi['spesifikasi'];
-            } else {
-                $kemasan = $this->kemasanModel->find($stock['kemasan_id']);
-                $satuan = $this->satuanModel->find($kemasan['satuan_id']);
-                $barangName = $kemasan['name'];
-            }
-            for ($i = 0; $i < count($dataResult); $i++) {
-                $bcType = $this->metaDataModel->find($dataResult[$i]['bc_id']);
-                $noDaftar = $this->stockDetail2Model->getNomorDaftar($dataResult[$i]['no_aju'], $dataResult[$i]['bc_id']);
+            $resultArr = array();
 
-                $dataResult[$i]['stock_dokumen'] = $dataResult[$i]['stock_dokumen'] == null ? "-" : $dataResult[$i]['stock_dokumen'];
-                $dataResult[$i]['no_aju'] =  $dataResult[$i]['no_aju'] == "-" ? "-" : $dataResult[$i]['no_aju'];
-                $dataResult[$i]['bc_type'] = $bcType == null ? "NON PABEAN" : $bcType['value'];
-                $dataResult[$i]['satuan'] = $satuan['kode_satuan'];
-                $dataResult[$i]['barang'] = strtoupper($barangName);
-                $dataResult[$i]['stock_date'] = date('d/m/Y', strtotime($dataResult[$i]['stock_date']));
+            for ($i = 0; $i < count($dataResult); $i++) {
+                $noDaftar = "";
+
+                if (!empty($dataResult[$i]['no_daftar_bc23'])) {
+                    $noDaftar = $dataResult[$i]['no_daftar_bc23'];
+                } elseif (!empty($dataResult[$i]['no_daftar_bc27'])) {
+                    $noDaftar = $dataResult[$i]['no_daftar_bc27'];
+                } elseif (!empty($dataResult[$i]['no_daftar_bc40'])) {
+                    $noDaftar = $dataResult[$i]['no_daftar_bc40'];
+                } elseif (!empty($dataResult[$i]['no_daftar_ppbkb'])) {
+                    $noDaftar = $dataResult[$i]['no_daftar_ppbkb'];
+                }
+
                 $dataResult[$i]['stock_id'] = $dataResult[$i]['stock_id'];
-                $dataResult[$i]['type_barang'] = $stock['tipe_barang'];
-                $dataResult[$i]['type_barang_text'] = strtoupper(str_replace('_', ' ', $stock['tipe_barang']));
-                $dataResult[$i]['stok_total'] = floatval($dataResult[$i]['stok_total']);
-                $dataResult[$i]['no_daftar'] = $noDaftar;
+                $dataResult[$i]['supplier_name'] = !isset($dataResult[$i]['supplier_name']) ? "-" : $dataResult[$i]['supplier_name'];
+                $dataResult[$i]['id'] = encrypt($dataResult[$i]['stock_id']) . '-' . encrypt($dataResult[$i]['id']);
+                $dataResult[$i]['bc_id'] =  $dataResult[$i]['bc_id'] == "-" ? "-" : $dataResult[$i]['bc_id'];
+                $dataResult[$i]['no_aju'] =  empty($dataResult[$i]['no_aju']) ? "-" : $dataResult[$i]['no_aju'];
+                $dataResult[$i]['stock_dokumen'] = $dataResult[$i]['stock_dokumen'] ?? "-";
+                $dataResult[$i]['no_dokumen_2'] = $dataResult[$i]['stock_dokumen'] ?? "-";
+                $dataResult[$i]['supplier_id'] = null;
+                $dataResult[$i]['harga_umum'] = $dataResult[$i]['harga_umum'] == null ? "0" : $dataResult[$i]['harga_umum'];
+                $dataResult[$i]['harga_harian'] = $dataResult[$i]['harga_harian'] == null ? "0" : $dataResult[$i]['harga_harian'];
+                $dataResult[$i]['harga_bulanan'] = $dataResult[$i]['harga_bulanan'] == null ? "0" : $dataResult[$i]['harga_bulanan'];
+                $dataResult[$i]['no_po'] = "-";
+                $dataResult[$i]['barang_name'] = $dataResult[$i]['barang_name'] == null ? "-" : $dataResult[$i]['barang_name'];
+                $dataResult[$i]['spesifikasi'] = $dataResult[$i]['spesifikasi'] == null ? "-" : $dataResult[$i]['spesifikasi'];
+                $dataResult[$i]['kode_satuan'] = $dataResult[$i]['kode_satuan'] == null ? "-" : $dataResult[$i]['kode_satuan'];
+                $dataResult[$i]['stock_date'] = date('d/m/Y', strtotime($dataResult[$i]['stock_date']));
+                $dataResult[$i]['bc_type'] = $dataResult[$i]['type_bc'] == null ? "NON PABEAN" : $dataResult[$i]['type_bc'];
+                $dataResult[$i]['no_daftar'] = $dataResult[$i]['no_daftar'] == null ? "-" : $dataResult[$i]['no_daftar'];
+                $dataResult[$i]['stok_total'] = floatval($dataResult[$i]['stok_total_diterima']);
+                $dataResult[$i]['satuan'] = $dataResult[$i]['kode_satuan'];
+                $dataResult[$i]['barang'] = $dataResult[$i]['barang'];
+                $dataResult[$i]['sepsifikasi'] = $dataResult[$i]['spesifikasi'];
+                $dataResult[$i]['type_barang'] = $dataResult[$i]['type_barang'];
+                $dataResult[$i]['type_barang_text'] = strtoupper(str_replace("_", " ", $dataResult[$i]['type_barang']));
+                $dataResult[$i]['supplier_id'] = $dataResult[$i]['supplier_id'] ?? null;
+                $dataResult[$i]['stock_detail_id'] = $dataResult[$i]['stock_detail_id'];
+                $dataResult[$i]['sumber'] = "LPB";
+
+                $dataMaterialRequestNotApprove = $this->materialRequestDetailsModel->getMaterialRequestNotApprove(
+                    $dataResult[$i]['stock_id'],
+                    $dataResult[$i]['stock_detail_id'],
+                    $dataResult[$i]['no_aju'],
+                    date('Y-m-d', strtotime(str_replace('/', '-', $dataResult[$i]['stock_date']))),
+                    $dataResult[$i]['stock_dokumen']
+                );
+
+                if ($dataMaterialRequestNotApprove) {
+                    $dataResult[$i]['is_requested'] = true;
+                    $dataResult[$i]['stok_total'] = round(max(0, (float)$dataResult[$i]['stok_total'] - (float)$dataMaterialRequestNotApprove['qty']), 2);
+                } else {
+                    $dataResult[$i]['is_requested'] = false;
+                }
+
+                if ($dataResult[$i]['stok_total'] > 0.01) {
+                    array_push($resultArr, $dataResult[$i]);
+                }
             }
             return response()->setJSON([
                 'data' => $dataResult,
@@ -1683,9 +1716,6 @@ class MaterialRequest extends BaseController
 
             $resultArr = array();
 
-            // var_dump($dataResult);
-            // exit;
-
             for ($i = 0; $i < count($dataResult); $i++) {
                 $noDaftar = "";
 
@@ -1761,7 +1791,10 @@ class MaterialRequest extends BaseController
 
                 $dataMaterialRequestNotApprove = $this->materialRequestDetailsModel->getMaterialRequestNotApprove(
                     $dataResult[$i]['stock_id'],
-                    $dataResult[$i]['stock_detail_id']
+                    $dataResult[$i]['stock_detail_id'],
+                    $dataResult[$i]['no_aju'],
+                    date('Y-m-d', strtotime(str_replace('/', '-', $dataResult[$i]['stock_date']))),
+                    $dataResult[$i]['stock_dokumen']
                 );
 
                 if ($dataMaterialRequestNotApprove) {

@@ -63,7 +63,7 @@ class MaterialRequestPenolongDetailsModel extends Model
     public function getMaterialRequestNotApprove($stockId, $bcId, $noAju, $stockDate, $stockDokumen)
     {
         $selectQry = '
-            SUM(material_request_penolong_details.qty2) as qty2
+            SUM(material_request_penolong_details.qty) as qty
         ';
 
         $dataQry = $this->asArray()

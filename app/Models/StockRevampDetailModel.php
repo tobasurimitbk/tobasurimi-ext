@@ -1202,6 +1202,7 @@ class StockRevampDetailModel extends Model
                 ->where('barang_master.deletedAt', null)
                 ->where($addCondition)
                 ->orderBy('barang_master.kode_barang', "ASC")
+                ->groupBy('stock_revamp.id')
                 ->findAll();
         }
 
@@ -1211,7 +1212,7 @@ class StockRevampDetailModel extends Model
     public function getStockListWithCondition($condition)
     {
         $builder = $this->asArray()
-            ->select('
+            ->select("
                 stock_revamp_detail.id AS id,
                 stock_revamp_detail.id AS stock_detail_id,
                 stock_revamp.spesifikasi_id,
@@ -1221,31 +1222,44 @@ class StockRevampDetailModel extends Model
                 stock_revamp.warehouse_id,
                 stock_revamp_detail.stock_id,
                 stock_revamp_detail.bc_id,
-                rm_purchase_orders.supplier_id,
                 stock_revamp_detail.reference_type,
-                rm_purchase_orders.po_date,
-                rm_purchase_orders.po_no,
-                rm_purchase_orders.id as rm_purchase_order_id,
-                rm_purchase_order_details.id as rm_purchase_order_detail_id,
-                CONCAT(barang_master.barang_name, " ", barang_master_spesifikasi.spesifikasi) AS barang,
+                barang_master.barang_name,
+                barang_master_spesifikasi.spesifikasi,
+                CONCAT(barang_master.barang_name, ' ', barang_master_spesifikasi.spesifikasi) AS barang,
                 satuans.kode_satuan,
                 stock_revamp_detail.qty_bersih as stok_total,
                 stock_revamp_detail.qty_diterima as stok_total_diterima,
-                rm_purchase_orders.po_no AS stock_dokumen,
-                suppliers.name AS supplier_name,
-                bc_purchase_order.no_aju,
-                vendors.name AS vendor_name,
-                rm_purchase_order_details.general_price as harga_umum,
-                rm_purchase_order_details.daily_price as harga_harian,
-                rm_purchase_order_details.monthly_price as harga_bulanan,
-                penerimaan_barang.tanggal as stock_date,
+                production_result_details.no_aju,
+                production_result_details.harga_umum as harga_umum,
+                production_result_details.harga_harian as harga_harian,
+                production_result_details.harga_bulanan as harga_bulanan,
+                CASE 
+                    WHEN stock_revamp_detail.reference_type = 'LPB' THEN concat(penerimaan_barang.no_penerimaan_barang, ' (', rm_purchase_orders.po_no, ')')
+                    WHEN stock_revamp_detail.reference_type = 'HASIL PRODUKSI' THEN production_results.pr_no
+                    ELSE penerimaan_barang.no_penerimaan_barang
+                END AS stock_dokumen,
+                CASE 
+                    WHEN stock_revamp_detail.reference_type = 'LPB' THEN penerimaan_barang.tanggal
+                    WHEN stock_revamp_detail.reference_type = 'HASIL PRODUKSI' THEN production_results.receive_date
+                    ELSE penerimaan_barang.tanggal
+                END AS stock_date,
+                CASE 
+                    WHEN stock_revamp_detail.reference_type = 'LPB' THEN bc_purchase_order.no_daftar
+                    WHEN stock_revamp_detail.reference_type = 'HASIL PRODUKSI' THEN production_result_details.no_ref
+                    ELSE bc_purchase_order.no_daftar
+                END AS no_daftar,
                 stock_revamp_detail.type_bc as type_bc,
-                bc_purchase_order.no_daftar
-            ')
+                production_result_details.no_ref as no_daftar,
+                barang_master.type_barang,
+                COALESCE (UPPER(suppliers.name), '-') AS supplier_name
+
+            ")
             ->join('stock_revamp', 'stock_revamp.id = stock_revamp_detail.stock_id', 'left')
+            ->join('production_results', 'production_results.id = stock_revamp_detail.reference_id', 'left')
+            ->join('production_result_details', 'production_result_details.stock_detail_id = stock_revamp_detail.id', 'left')
+            ->join('penerimaan_barang', 'penerimaan_barang.id = stock_revamp_detail.reference_id', 'left')
             ->join('rm_purchase_orders', 'rm_purchase_orders.id = stock_revamp_detail.po_id', 'left')
             ->join('rm_purchase_order_details', 'rm_purchase_order_details.rm_purchase_order_id = rm_purchase_orders.id', 'left')
-            ->join('penerimaan_barang', 'penerimaan_barang.id = stock_revamp_detail.reference_id', 'left')
             ->join('bc_purchase_order_lpb', 'bc_purchase_order_lpb.penerimaan_barang_id = penerimaan_barang.id', 'left')
             ->join('bc_purchase_order', 'bc_purchase_order.id = bc_purchase_order_lpb.bc_purchase_order_id', 'left')
             ->join('suppliers', 'suppliers.id = rm_purchase_orders.supplier_id', 'left')

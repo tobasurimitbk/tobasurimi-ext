@@ -999,8 +999,8 @@ $routes->get('/material-request-penolong/all', 'Production\MaterialRequestPenolo
 $routes->post('/material-request-penolong/delete', 'Production\MaterialRequestPenolong::deleteMR', ['filter' => 'Auth']);
 $routes->post('/material-request-penolong/delete-detail', 'Production\MaterialRequestPenolong::deleteMRDetail', ['filter' => 'Auth']);
 $routes->get('/material-request-penolong/data-detail-material', 'Production\MaterialRequestPenolong::allDetailMaterialRequest', ['filter' => 'Auth']);
-$routes->post('/material-request-penolong/save', 'Production\MaterialRequestPenolong::create', ['filter' => 'Auth']);
-$routes->post('/material-request-penolong/update', 'Production\MaterialRequestPenolong::update', ['filter' => 'Auth']);
+$routes->post('/material-request-penolong/save', 'Production\MaterialRequestPenolong::createNew', ['filter' => 'Auth']);
+$routes->post('/material-request-penolong/update', 'Production\MaterialRequestPenolong::updateNew', ['filter' => 'Auth']);
 $routes->post('/material-request-penolong/update-status', 'Production\MaterialRequestPenolong::updateStatusPostedMaterialRequest', ['filter' => 'Auth']);
 $routes->get('/material-request-penolong/list-barang-stock-init', 'Production\MaterialRequestPenolong::getListBarangIsInit', ['filter' => 'Auth']);
 $routes->get('/material-request-penolong/list-stock-dokumen-bc', 'Production\MaterialRequestPenolong::getListStockByStockID', ['filter' => 'Auth']);

@@ -376,7 +376,7 @@
                                 </div>
                             </div>
 
-                            <!-- <div class="tab-pane fade" id="nav-barang-material-request-penolong" role="tabpanel" aria-labelledby="nav-barang-material-request">
+                            <div class="tab-pane fade" id="nav-barang-material-request-penolong" role="tabpanel" aria-labelledby="nav-barang-material-request">
                                 <div class="row">
                                     <div class="col-md-4">
                                         <div class="form-floating mb-3" style="height: 50px;">
@@ -417,7 +417,7 @@
                                         </div>
                                     </div>
                                 </div>
-                            </div> -->
+                            </div>
 
                         </div>
                     </div>
@@ -539,6 +539,7 @@
             }, 300);
 
             const materialRequestIds = <?= json_encode(json_decode($data->material_request_id, true)) ?>;
+            const materialRequestPenolongIds = <?= json_encode(json_decode($data->material_request_penolong_id, true)) ?>;
 
             <?php foreach ($dataResultBarangJadi as $key => $bj) : ?>
                 list_items_barang_jadi.push({
@@ -578,25 +579,49 @@
                 });
             <?php endforeach; ?>
             drawTableBarangScrap();
-            <?php foreach ($dataResultBarangDigunakan as $key => $bd) : ?>
-                list_items_barang_digunakan.push({
-                    'barang_detail_id': getID(),
-                    'production_result_detail_id': '<?= $bd->id; ?>',
-                    'barang1_id': '<?= $bd->barang1_id; ?>',
-                    'barang2_id': '<?= $bd->barang2_id; ?>',
-                    'barang_name': '<?= str_replace('"', '\"', $bd->nama_barang); ?>',
-                    'kode_barang': '<?= $bd->kode_barang; ?>',
-                    'satuan': '<?= $bd->kode_satuan; ?>',
-                    'nama_barang': '<?= str_replace('"', '\"', $bd->nama_barang); ?>',
-                    'qty': '<?= floatval($bd->qty); ?>',
-                    'qty_now': '<?= floatval($bd->qty_now); ?>',
-                    'ref_no': '<?= $bd->no_ref; ?>',
-                    'no_aju': '<?= $bd->no_aju; ?>',
-                    'type_barang': '<?= $bd->barang_type; ?>',
-                    'type_barang_text': '<?= $bd->type_barang_text; ?>',
-                });
-            <?php endforeach; ?>
+            <?php
+            foreach ($dataResultBarangDigunakan as $key => $bd) :
+                if ($bd->barang_type == 'bahan_penolong') :
+            ?>
+                    list_items_barang_digunakan_penolong.push({
+                        'barang_detail_id': getID(),
+                        'production_result_detail_id': '<?= $bd->id; ?>',
+                        'barang1_id': '<?= $bd->barang1_id; ?>',
+                        'barang2_id': '<?= $bd->barang2_id; ?>',
+                        'barang_name': '<?= str_replace('"', '\"', $bd->nama_barang); ?>',
+                        'kode_barang': '<?= $bd->kode_barang; ?>',
+                        'satuan': '<?= $bd->kode_satuan; ?>',
+                        'nama_barang': '<?= str_replace('"', '\"', $bd->nama_barang); ?>',
+                        'qty': '<?= floatval($bd->qty); ?>',
+                        'qty_now': '<?= floatval($bd->qty_now); ?>',
+                        'ref_no': '<?= $bd->no_ref; ?>',
+                        'no_aju': '<?= $bd->no_aju; ?>',
+                        'type_barang': '<?= $bd->barang_type; ?>',
+                        'type_barang_text': '<?= $bd->type_barang_text; ?>',
+                    });
+                <?php else : ?>
+                    list_items_barang_digunakan.push({
+                        'barang_detail_id': getID(),
+                        'production_result_detail_id': '<?= $bd->id; ?>',
+                        'barang1_id': '<?= $bd->barang1_id; ?>',
+                        'barang2_id': '<?= $bd->barang2_id; ?>',
+                        'barang_name': '<?= str_replace('"', '\"', $bd->nama_barang); ?>',
+                        'kode_barang': '<?= $bd->kode_barang; ?>',
+                        'satuan': '<?= $bd->kode_satuan; ?>',
+                        'nama_barang': '<?= str_replace('"', '\"', $bd->nama_barang); ?>',
+                        'qty': '<?= floatval($bd->qty); ?>',
+                        'qty_now': '<?= floatval($bd->qty_now); ?>',
+                        'ref_no': '<?= $bd->no_ref; ?>',
+                        'no_aju': '<?= $bd->no_aju; ?>',
+                        'type_barang': '<?= $bd->barang_type; ?>',
+                        'type_barang_text': '<?= $bd->type_barang_text; ?>',
+                    });
+            <?php
+                endif;
+            endforeach;
+            ?>
             drawTableBarangDigunakan();
+            drawTableBarangDigunakanPenolong();
             <?php foreach ($dataResultBarangReturn as $key => $br) : ?>
                 list_items_barang_filling.push({
                     'barang_detail_id': getID(),
@@ -1265,8 +1290,8 @@
                                 $('.kode_request_penolong').append(`<option value="${item.id}" data-tanggal-request="${item.request_date}" data-user-request="${item.user_name}" data-warehouse-request="${item.warehouse_id}" data-divisi-request="${item.divisi_id}">${item.req_no}</option>`);
                             });
                             <?php if (isset($data)) : ?>
-                                if (Array.isArray(materialRequestIds) && materialRequestIds.length > 0) {
-                                    $('.kode_request_penolong').val(materialRequestIds).trigger('change');
+                                if (Array.isArray(materialRequestPenolongIds) && materialRequestPenolongIds.length > 0) {
+                                    $('.kode_request_penolong').val(materialRequestPenolongIds).trigger('change');
                                 }
                             <?php endif; ?>
                         } else {
@@ -1518,11 +1543,11 @@
 
                                     // Pisahkan string berdasarkan tanda slash '/'
                                     var parts = ref_no.split('/');
-                                    var partsAju = parts[1].split('-');
+                                    var partsAju = parts[1].split('-')[3] ?? '-';
                                     var partsDate = parts[2].replace(/-/g, '');
 
                                     // // Dapatkan bagian yang Anda inginkan (bagian ke-1 dan ke-4)
-                                    var new_ref_no = parts[0] + '/' + partsAju[3] + '/' + partsDate;
+                                    var new_ref_no = parts[0] + '/' + partsAju + '/' + partsDate;
                                 }
                                 list_items_barang_digunakan_penolong.push({
                                     'barang_detail_id': getID(),
@@ -1890,13 +1915,24 @@
             $('.body-table-barang-digunakan').append(row);
 
             // Tambahkan footer untuk menampilkan total
-            var footerRow = `
-                <tr style="font-weight: bold;">
-                    <td colspan="6"></td>
-                    <td class="text-center">${greatFormatRupiah(totalQtyRequest.toFixed(2))}</td>
-                    <td colspan="2" >${greatFormatRupiah(totalQtyDigunakan.toFixed(2))}</td>
-                </tr>
-            `;
+
+            <?php if (!isset($data)) : ?>
+                var footerRow = `
+                    <tr style="font-weight: bold;">
+                        <td colspan="7"></td>
+                        <td class="text-center">${greatFormatRupiah(totalQtyRequest.toFixed(2))}</td>
+                        <td class="text-center">${greatFormatRupiah(totalQtyDigunakan.toFixed(2))}</td>
+                    </tr>
+                `;
+            <?php else: ?>
+                var footerRow = `
+                    <tr style="font-weight: bold;">
+                        <td colspan="6"></td>
+                        <td class="text-center">${greatFormatRupiah(totalQtyRequest.toFixed(2))}</td>
+                        <td class="text-center">${greatFormatRupiah(totalQtyDigunakan.toFixed(2))}</td>
+                    </tr>
+                `;
+            <?php endif; ?>
             $('#tfoot-barang-digunakan').append(footerRow); // Gunakan ID untuk target footer khusus
         }
 
@@ -1958,12 +1994,11 @@
             $('#tfoot-barang-digunakan-penolong').append(footerRow); // Gunakan ID untuk target footer khusus
         }
 
-        // Tambahkan event listener untuk input qty
         $('.qty-barang-digunakan-penolong').on('input change', function() {
-            var index = $(this).data('index'); // Dapatkan indeks item
-            var newValue = $(this).val(); // Nilai input dari pengguna
-            list_items_barang_digunakan[index].qty2 = newValue; // Simpan nilai baru
-            drawTableBarangDigunakanPenolong(); // Render ulang tabel untuk update total
+            var index = $(this).data('index');
+            var newValue = $(this).val();
+            list_items_barang_digunakan_penolong[index].qty2 = newValue;
+            drawTableBarangDigunakanPenolong();
         });
     };
 
