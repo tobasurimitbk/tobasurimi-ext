@@ -74,6 +74,7 @@ class Scale extends BaseController
             // decrypt isi QR (hasilnya misal "BRG-123")
             $decoded = decrypt($encryptedId);
 
+            // pecah tipe dan id (misal "BRG-12")
             $parts = explode('-', $decoded);
             if (count($parts) < 2) {
                 return $this->response->setJSON([
@@ -85,6 +86,7 @@ class Scale extends BaseController
             [$type, $id] = $parts;
             $type = strtoupper($type);
 
+            // Validasi type
             if ($type !== 'BRG') {
                 return $this->response->setJSON([
                     'status' => 'error',
@@ -108,9 +110,9 @@ class Scale extends BaseController
                 ]);
             }
 
+            // ✅ Biar Golang lo bisa langsung ambil "nama_barang"
             return $this->response->setJSON([
                 'status' => 'ok',
-                'type'   => $type,
                 'nama_barang' => $data['nama_barang'],
             ]);
 
@@ -121,5 +123,6 @@ class Scale extends BaseController
             ]);
         }
     }
+
 
 }
