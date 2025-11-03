@@ -3064,7 +3064,7 @@ $routes->post('/hr-outsourcing-sallary-payment/delete/(:segment)', 'HROutsourcin
 $routes->get('/hr-outsourcing-scale', 'HROutsourcing\Scale::generateQrBarangView', ['filter' => 'Auth']);
 $routes->post('/hr-outsourcing-scale', 'HROutsourcing\Scale::generateQrBarang', ['filter' => 'Auth']);
 $routes->get('/hr-outsourcing-scale/id/(:segment)', 'HROutsourcing\Scale::getBarangByIdQr/$1');
-$routes->get('/hr-outsourcing-company/employee/detail/(:segment)', 'HROutsourcing\Employee::getEmployeeByIdQr/$1', ['filter' => 'Auth']);
+$routes->get('/hr-outsourcing-company/employee/detail/(:segment)', 'HROutsourcing\Employee::getEmployeeByIdQr/$1');
 $routes->get('/get-spesifikasi-by-qr', 'Setting\Auth::login');
 
 /*
