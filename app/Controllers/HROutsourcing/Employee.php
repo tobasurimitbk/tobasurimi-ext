@@ -256,7 +256,7 @@ class Employee extends BaseController
             // --- Step 1: decrypt payload ---
             $decoded = decrypt($encryptedId);
 
-            var_dump($decoded); exit;
+            var_dump($encryptedId); exit;
 
                     $employee = $this->hrOutsourcingEmployeeModel
                         ->select('id, nama, badge')
