@@ -256,24 +256,9 @@ class Employee extends BaseController
             // --- Step 1: decrypt payload ---
             $decoded = decrypt($encryptedId);
 
-            // --- Step 2: pecah jadi type dan id ---
-            $parts = explode('-', $decoded);
-            if (count($parts) < 2) {
-                return $this->response->setJSON([
-                    'status'  => 'error',
-                    'message' => 'Format QR tidak valid.'
-                ]);
-            }
-
-            [$type, $id] = $parts;
-            $type = strtoupper($type);
-
-            // --- Step 3: proses berdasarkan tipe ---
-            switch ($type) {
-                case 'EMP':
                     $employee = $this->hrOutsourcingEmployeeModel
                         ->select('id, nama, badge, status')
-                        ->where('id', $id)
+                        ->where('id', $decoded)
                         ->first();
 
                     if (!$employee) {
@@ -285,7 +270,6 @@ class Employee extends BaseController
 
                     return $this->response->setJSON([
                         'status'   => 'ok',
-                        'type'     => $type,
                         'employee' => [
                             'id'     => $employee['id'],
                             'nama'   => $employee['nama'],
@@ -293,13 +277,6 @@ class Employee extends BaseController
                             'status' => $employee['status'] ?? 'Aktif',
                         ]
                     ]);
-
-                default:
-                    return $this->response->setJSON([
-                        'status'  => 'error',
-                        'message' => "Tipe QR '{$type}' tidak dikenali."
-                    ]);
-            }
 
         } catch (Exception $e) {
             // --- Step 4: error handler umum ---
