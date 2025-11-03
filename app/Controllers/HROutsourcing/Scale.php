@@ -20,30 +20,30 @@ class Scale extends BaseController
         $html = "";
 
         try {
-            // Buat format "BRG-{id}"
+            // Format dan encrypt ID
             $type = 'BRG';
-            $payload = "{$type}-{$spesifikasiId}";
+            $encryptedId = encrypt("{$type}-{$spesifikasiId}");
 
-            // Encrypt biar aman
-            $encrypted = encrypt($payload);
+            // QR text langsung isi type + value, bukan URL
+            $qrText = "{$type}-{$encryptedId}";
 
-            // Generate QR Code ke URL validasi universal
-            $qrCode = new QrCode(base_url("barang/detail/" . $encrypted));
+            // Generate QR Code (isi text-nya aja)
+            $qrCode = new QrCode($qrText);
             $qrCode->setSize(350);
             $qrCode->setMargin(10);
             $qrCode->setErrorCorrectionLevel(new ErrorCorrectionLevel(ErrorCorrectionLevel::HIGH));
 
-            // Convert ke base64 (Data URI)
+            // Convert ke data URI
             $dataUri = $qrCode->writeDataUri();
 
-            // HTML output
+            // Output tampilan
             $html .= "
                 <div class='col-md-12 mb-4 text-center'>
                     <a href='{$dataUri}' download='qr-{$type}-{$spesifikasiId}.png'>
                         <img src='{$dataUri}' alt='QR Code' class='img-fluid'>
                     </a><br>
                     <small>
-                        <strong>TYPE:</strong> {$type}<br>
+                        <strong>SCAN VALUE:</strong> {$qrText}<br>
                         <strong>ID:</strong> {$spesifikasiId}
                     </small>
                 </div>
@@ -61,6 +61,7 @@ class Scale extends BaseController
             ]);
         }
     }
+
 
     public function getBarangByIdQr($encryptedId)
     {
