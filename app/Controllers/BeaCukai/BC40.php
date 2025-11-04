@@ -233,7 +233,7 @@ class BC40 extends BaseController
                 "supplier_name"         => strtoupper($data->supplier_name),
                 "status"                => strtoupper($data->status_dokumen == null ? "BELUM DIBUAT" : $data->status_dokumen),
                 // "total_barang"          => count($totalBarang),
-                "total_po"              => count(json_decode($data->multiple_po_no)),
+                "total_po"              => "",
                 "status_posting"        => $data->status_posting,
             ]);
         }

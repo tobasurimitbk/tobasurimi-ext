@@ -19,12 +19,30 @@ class Scale extends BaseController
         $spesifikasiId = $this->request->getPost('spesifikasi_id');
         $html = "";
 
+        $spesifikasiModel = new BarangMasterSpesifikasiModel();
+
+
         try {
+            // Ambil data barang dan spesifikasi
+            $spesifikasi = $spesifikasiModel
+                ->select('barang_master_spesifikasi.*, barang_master.barang_name')
+                ->join('barang_master', 'barang_master.id = barang_master_spesifikasi.barang_master_id', 'left')
+                ->where('barang_master_spesifikasi.id', $spesifikasiId)
+                ->get()
+                ->getRow();
+
+            if (!$spesifikasi) {
+                throw new Exception("Data spesifikasi tidak ditemukan.");
+            }
+
+            $barangName = strtoupper($spesifikasi->barang_name);
+            $spesifikasiName = strtoupper($spesifikasi->spesifikasi ?? '-');
+
             // Format dan encrypt ID
             $type = 'BRG';
             $encryptedId = encrypt("{$type}-{$spesifikasiId}");
 
-            // QR text langsung isi type + value, bukan URL
+            // QR text langsung isi type + value
             $qrText = "{$type}-{$encryptedId}";
 
             // Generate QR Code (isi text-nya aja)
@@ -36,22 +54,28 @@ class Scale extends BaseController
             // Convert ke data URI
             $dataUri = $qrCode->writeDataUri();
 
-            // Output tampilan
+            // Output tampilan HTML-nya
             $html .= "
                 <div class='col-md-12 mb-4 text-center'>
+                    <div style='font-size: 22px; font-weight: bold; text-transform: uppercase;'>
+                        {$barangName}
+                    </div>
+                    <div style='font-size: 16px; margin-bottom: 10px;'>
+                        {$spesifikasiName}
+                    </div>
                     <a href='{$dataUri}' download='qr-{$type}-{$spesifikasiId}.png'>
-                        <img src='{$dataUri}' alt='QR Code' class='img-fluid'>
-                    </a><br>
-                    <small>
+                        <img src='{$dataUri}' alt='QR Code' style='width: 350px; height: 350px;'>
+                    </a>
+                    <div style='margin-top: 10px; font-size: 13px;'>
                         <strong>SCAN VALUE:</strong> {$qrText}<br>
                         <strong>ID:</strong> {$spesifikasiId}
-                    </small>
+                    </div>
                 </div>
             ";
 
             return $this->response->setJSON([
                 'status' => 'ok',
-                'html'   => "<div class='row'>{$html}</div>"
+                'html'   => "<div class='row justify-content-center'>{$html}</div>"
             ]);
 
         } catch (Exception $e) {
@@ -61,6 +85,7 @@ class Scale extends BaseController
             ]);
         }
     }
+
 
 
     public function getBarangByIdQr($encryptedId)
