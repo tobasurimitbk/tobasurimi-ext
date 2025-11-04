@@ -5,6 +5,11 @@
 <section class="section">
     <div class="section-header">
         <h1>Departemen & Jam Kerja</h1>
+        <?php if (can('Personalia', 'Jam Kerja', 'c')) : ?>
+            <a class="btn btn-show-form btn-add float-right" href="<?= base_url("jam-kerja/setting"); ?>">
+                <i class="fa-solid fa-gears fa-sm mr-2"></i> Set Jam Kerja Karyawan
+            </a>
+        <?php endif; ?>
     </div>
     <?= csrf_field() ?>
     <div class="card">

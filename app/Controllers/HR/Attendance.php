@@ -1956,7 +1956,7 @@ class Attendance extends BaseController
         $sheet1->setTitle("Real Detail Presensi");
 
         // Judul
-        $sheet1->mergeCells('A1:Z1');
+        $sheet1->mergeCells('A1:ZZ1'); // panjang kolom disesuaikan
         $sheet1->setCellValue('A1', "DETIL PRESENSI BULAN $monthName");
         $sheet1->getStyle('A1')->applyFromArray([
             'font' => ['bold' => true, 'size' => 14],
@@ -1975,16 +1975,17 @@ class Attendance extends BaseController
         // Header tanggal
         for ($d = 1; $d <= $totalDaysInMonth; $d++) {
             $startCol = $colIndex;
-            // 4 kolom per tanggal: IN, OUT, DENDA, LEMBUR
-            $sheet1->mergeCellsByColumnAndRow($startCol, $rowHeader, $startCol + 3, $rowHeader);
+            // 5 kolom per tanggal: IN, OUT, DENDA, LEMBUR, UANG MAKAN
+            $sheet1->mergeCellsByColumnAndRow($startCol, $rowHeader, $startCol + 4, $rowHeader);
             $sheet1->setCellValueByColumnAndRow($startCol, $rowHeader, $d);
 
             $sheet1->setCellValueByColumnAndRow($startCol, $rowHeader + 1, "IN");
             $sheet1->setCellValueByColumnAndRow($startCol + 1, $rowHeader + 1, "OUT");
             $sheet1->setCellValueByColumnAndRow($startCol + 2, $rowHeader + 1, "DENDA");
-            $sheet1->setCellValueByColumnAndRow($startCol + 3, $rowHeader + 1, "LEMBUR (MENIT)");
+            $sheet1->setCellValueByColumnAndRow($startCol + 3, $rowHeader + 1, "LEMBUR");
+            $sheet1->setCellValueByColumnAndRow($startCol + 4, $rowHeader + 1, "UANG MAKAN");
 
-            $colIndex += 4;
+            $colIndex += 5;
         }
 
         // === Tambahkan kolom Total Denda Bulan di akhir ===
@@ -2030,7 +2031,7 @@ class Attendance extends BaseController
                     ->where('deletedAt', null)
                     ->first();
 
-                $totalJamLembur = null;
+                $totalJamLembur = '';
                 if ($formLembur != null) {
                     $waktuSelisihPulangLembur = $this->formLembur::selisihWaktu(
                         $formLembur['jam_mulai_lembur'],
@@ -2048,13 +2049,13 @@ class Attendance extends BaseController
                     $in = $out = $val;
                 }
 
+                // IN / OUT
                 $sheet1->setCellValueByColumnAndRow($colIndex++, $rowIndex, $in);
                 $sheet1->setCellValueByColumnAndRow($colIndex++, $rowIndex, $out);
 
-                // === DENDA per tanggal ===
+                // DENDA
                 $dendaCol = $colIndex;
                 $sheet1->setCellValueByColumnAndRow($dendaCol, $rowIndex, $dendaKeterlambatan);
-                // Format angka ribuan & rata kanan
                 $sheet1->getStyleByColumnAndRow($dendaCol, $rowIndex)
                     ->getNumberFormat()
                     ->setFormatCode('#,##0');
@@ -2063,10 +2064,22 @@ class Attendance extends BaseController
                     ->setHorizontal(Alignment::HORIZONTAL_RIGHT);
                 $colIndex++;
 
+                // LEMBUR
                 $sheet1->setCellValueByColumnAndRow($colIndex++, $rowIndex, $totalJamLembur);
+
+                // UANG MAKAN
+                $uangMakan = (float)($mapUangMakan[$e['id']][$tanggal] ?? 0);
+                $sheet1->setCellValueByColumnAndRow($colIndex, $rowIndex, $uangMakan);
+                $sheet1->getStyleByColumnAndRow($colIndex, $rowIndex)
+                    ->getNumberFormat()
+                    ->setFormatCode('#,##0');
+                $sheet1->getStyleByColumnAndRow($colIndex, $rowIndex)
+                    ->getAlignment()
+                    ->setHorizontal(Alignment::HORIZONTAL_RIGHT);
+                $colIndex++;
             }
 
-            // === TOTAL DENDA (BULAN) ===
+            // TOTAL DENDA (BULAN)
             $sheet1->setCellValueByColumnAndRow($colIndex, $rowIndex, $totalDendaBulan);
             $sheet1->getStyleByColumnAndRow($colIndex, $rowIndex)
                 ->getNumberFormat()
@@ -2079,16 +2092,15 @@ class Attendance extends BaseController
         }
 
         // Border isi
-        $sheet1->getStyle("A{$rowHeader}:" . $sheet1->getCellByColumnAndRow($lastCol, $rowIndex - 1)->getCoordinate())
+        $sheet1->getStyle("A{$rowHeader}:" . $sheet1->getCellByColumnAndRow($colIndex, $rowIndex - 1)->getCoordinate())
             ->applyFromArray([
                 'borders' => ['allBorders' => ['borderStyle' => Border::BORDER_THIN]],
             ]);
 
         // Auto width semua kolom
-        foreach (range('A', $sheet1->getCellByColumnAndRow($lastCol, 1)->getColumn()) as $col) {
-            $sheet1->getColumnDimension($col)->setAutoSize(true);
+        for ($c = 1; $c <= $colIndex; $c++) {
+            $sheet1->getColumnDimensionByColumn($c)->setAutoSize(true);
         }
-
 
         // ================= Sheet 2 : Rekap =================
         $sheet2 = $spreadsheet->createSheet();
@@ -2250,6 +2262,167 @@ class Attendance extends BaseController
         $writer->save('php://output');
         exit();
     }
+
+    public function exportExcelPresensiKaryawanBulanan()
+    {
+        $monthReq = $this->request->getVar('month') ?: date('Y-m');
+        [$year, $month] = explode('-', $monthReq);
+
+        $monthName = strtoupper(date('F Y', strtotime("$year-$month-01"))); // SEPTEMBER 2025
+        $startDate = sprintf('%04d-%02d-01', $year, $month);
+        $endDate   = sprintf('%04d-%02d-%02d', $year, $month, cal_days_in_month(CAL_GREGORIAN, $month, $year));
+        $employeeId = $this->request->getVar('employee_id');
+
+        // ambil data employees
+        $condition = [
+            "employees.company_id" => $this->this_company_id,
+            "employees.id" => $employeeId,
+        ];
+        $employees    = $this->EmployeesModel->getEmployeeListAttendances($condition, [], 0, 10000000);
+        $employeeData = $employees['data'];
+        $employeeIds  = array_column($employeeData, 'id');
+
+        // log attendance
+        $logData = !empty($employeeIds)
+            ? $this->AttendanceModel->getAttendanceAmt($employeeIds, $year, $month)
+            : [];
+
+        $mapLog = [];
+        foreach ($logData as $l) {
+            $mapLog[$l['employee_id']][$l['periode']] = [
+                'in'     => $l['checkin'],
+                'out'    => $l['checkout'],
+                'status' => $l['status'],
+            ];
+        }
+
+        // mapping data denda keterlambatan
+        $dendaKeterlambatan = !empty($employeeIds) ? $this->DendaAbsenHarianModel->getDendaKeterlambatanByDateRangeAmt(
+            $employeeIds,
+            $startDate,
+            $endDate
+        ) : [];
+
+        $mapDendaKeterlambatan = [];
+        foreach ($dendaKeterlambatan as $d) {
+            $mapDendaKeterlambatan[$d['employee_id']][$d['tanggal']] = ['nominal' => $d['nominal']];
+        }
+
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+        $sheet->setTitle("Presensi Bulanan");
+
+        $row = 1;
+
+        // ========== Judul besar ==========
+        $sheet->mergeCells("A$row:G$row");
+        $sheet->setCellValue("A$row", "LAPORAN PRESENSI BULAN $monthName");
+        $sheet->getStyle("A$row")->applyFromArray([
+            'font' => ['bold' => true, 'size' => 14],
+            'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER],
+        ]);
+        $row += 2;
+
+        foreach ($employeeData as $e) {
+            // ======== Card Info Karyawan ========
+            $sheet->mergeCells("A$row:G$row");
+            $sheet->setCellValue("A$row", "Nama: {$e['name']} | NIP: {$e['nip']} | Divisi: {$e['divisi']} | Bagian: {$e['bagian']}");
+            $sheet->getStyle("A$row")->applyFromArray([
+                'font' => ['bold' => true],
+                'fill' => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['rgb' => 'FCE4D6']], // warna kartu
+                'alignment' => ['horizontal' => Alignment::HORIZONTAL_LEFT],
+                'borders' => ['allBorders' => ['borderStyle' => Border::BORDER_THIN]],
+            ]);
+            $row += 2;
+
+            // ======== Header ========
+            $headers = ['No', 'Tanggal', 'IN', 'OUT', 'DENDA', 'LEMBUR', 'UANG MAKAN'];
+            $col = 1;
+            foreach ($headers as $h) {
+                $sheet->setCellValueByColumnAndRow($col++, $row, $h);
+            }
+
+            // Style header
+            $sheet->getStyle("A$row:G$row")->applyFromArray([
+                'font' => ['bold' => true],
+                'fill' => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['rgb' => 'D9E1F2']],
+                'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER],
+                'borders' => ['allBorders' => ['borderStyle' => Border::BORDER_THIN]],
+            ]);
+
+            $row++;
+
+            // ======== Isi data per tanggal ========
+            $totalDendaBulan = 0;
+            $totalDaysInMonth = cal_days_in_month(CAL_GREGORIAN, $month, $year);
+            for ($d = 1; $d <= $totalDaysInMonth; $d++) {
+                $tanggal = sprintf("%04d-%02d-%02d", $year, $month, $d);
+                $dayLog  = $mapLog[$e['id']][$tanggal] ?? null;
+                $denda = (float)($mapDendaKeterlambatan[$e['id']][$tanggal]['nominal'] ?? 0);
+                $totalDendaBulan += $denda;
+
+                $in  = $dayLog['in'] ?? '';
+                $out = $dayLog['out'] ?? '';
+                $status = $dayLog['status'] ?? '';
+                if ($status != "HADIR_H" && !empty($status)) {
+                    $val = explode("_", $status)[1];
+                    $in = $out = $val;
+                }
+
+                $formLembur = $this->formLemburModel->where('employee_id', $e['id'])
+                    ->where('periode', $tanggal)
+                    ->where('deletedAt', null)
+                    ->first();
+                $lembur = '';
+                if ($formLembur != null) {
+                    $selisih = $this->formLembur::selisihWaktu(
+                        $formLembur['jam_mulai_lembur'],
+                        $formLembur['jam_selesai_lembur']
+                    );
+                    $lembur = (float)$selisih['jam'] . " Jam, " . $selisih['menit'] . " Menit";
+                }
+
+                $uangMakan = (float)($mapUangMakan[$e['id']][$tanggal] ?? 0);
+
+                $col = 1;
+                $sheet->setCellValueByColumnAndRow($col++, $row, $d); // No
+                $sheet->setCellValueByColumnAndRow($col++, $row, $tanggal); // YYYY-MM-DD
+                $sheet->setCellValueByColumnAndRow($col++, $row, $in);
+                $sheet->setCellValueByColumnAndRow($col++, $row, $out);
+                $sheet->setCellValueByColumnAndRow($col++, $row, $denda);
+                $sheet->setCellValueByColumnAndRow($col++, $row, $lembur);
+                $sheet->setCellValueByColumnAndRow($col++, $row, $uangMakan);
+
+                // Format angka & alignment
+                $sheet->getStyle("E$row:G$row")->getNumberFormat()->setFormatCode('#,##0');
+                $sheet->getStyle("E$row:G$row")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_RIGHT);
+
+                // Border tiap baris
+                $sheet->getStyle("A$row:G$row")->applyFromArray([
+                    'borders' => ['allBorders' => ['borderStyle' => Border::BORDER_THIN]],
+                ]);
+
+                $row++;
+            }
+
+            $row += 3; // spasi sebelum karyawan berikutnya
+        }
+
+        // Auto width
+        foreach (range('A', 'G') as $col) {
+            $sheet->getColumnDimension($col)->setAutoSize(true);
+        }
+
+        // Output Excel
+        $writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet);
+        $fileName = "Presensi_Bulanan_{$monthName}.xlsx";
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header("Content-Disposition: attachment; filename=\"$fileName\"");
+        $writer->save("php://output");
+    }
+
+
+
 
     public function exportTriwulanPresensi()
     {
@@ -2500,7 +2673,7 @@ class Attendance extends BaseController
             $row++;
 
             // Header kolom
-            $headers = ['No', 'Nip', 'Nama', 'Divisi', 'Bagian', 'IN', 'OUT', 'Status', 'Uang Makan', 'Terlambat (Menit)', 'Total Lembur', 'Denda Terlambat', 'Keterangan'];
+            $headers = ['No', 'Nip', 'Nama', 'Divisi', 'Bagian', 'IN', 'OUT', 'Status', 'Keterangan', 'Uang Makan', 'Terlambat (Menit)', 'Total Lembur', 'Denda Terlambat'];
             $col = 'A';
             foreach ($headers as $h) {
                 $sheet->setCellValue("{$col}{$row}", $h);
@@ -2586,11 +2759,11 @@ class Attendance extends BaseController
                 $sheet->setCellValue("F{$row}", $in);
                 $sheet->setCellValue("G{$row}", $out);
                 $sheet->setCellValue("H{$row}", $status);
-                $sheet->setCellValue("I{$row}", $uangMakan);
-                $sheet->setCellValue("J{$row}", !empty($keterlambatanMenit) ? $keterlambatanMenit : '');
-                $sheet->setCellValue("K{$row}", !empty($totalJamLembur) ? $totalJamLembur : '');
-                $sheet->setCellValue("L{$row}", $uangDendaKeterlambatan);
-                $sheet->setCellValue("M{$row}", $reason);
+                $sheet->setCellValue("I{$row}", $reason);
+                $sheet->setCellValue("J{$row}", $uangMakan);
+                $sheet->setCellValue("K{$row}", !empty($keterlambatanMenit) ? $keterlambatanMenit : '');
+                $sheet->setCellValue("L{$row}", !empty($totalJamLembur) ? $totalJamLembur : '');
+                $sheet->setCellValue("M{$row}", $uangDendaKeterlambatan);
 
                 // border untuk isi
                 $sheet->getStyle("A{$row}:M{$row}")->applyFromArray([
@@ -2598,12 +2771,12 @@ class Attendance extends BaseController
                 ]);
 
                 // Untuk Uang Makan
-                $sheet->setCellValue("I{$row}", $uangMakan);
+                $sheet->setCellValue("J{$row}", $uangMakan);
                 $sheet->getStyle("I{$row}")
                     ->getNumberFormat()
                     ->setFormatCode('#,##0');
 
-                $sheet->getStyle("I{$row}")
+                $sheet->getStyle("J{$row}")
                     ->getAlignment()
                     ->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_RIGHT);
 

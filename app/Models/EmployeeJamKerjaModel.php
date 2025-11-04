@@ -90,6 +90,7 @@ class EmployeeJamKerjaModel extends Model
         $selectQry = "
                 jam_kerja.id AS jam_kerja_id,
                 jam_kerja.jenis,
+                jam_kerja.shift,
                 jam_kerja_detail.*
             ";
         if ($jamKerjaEmployee != null) {
@@ -265,5 +266,31 @@ class EmployeeJamKerjaModel extends Model
         }
 
         return $result;
+    }
+
+    public function getJamKerjaKaryawan(
+        $bagianId,
+        $tanggal
+    ) {
+        $employeeModel = new EmployeesModel();
+        $employeeData = $employeeModel->where('deletedAt', null)->where('bagian_id', $bagianId)->orderBy('name', "asc")->findAll();
+
+        $dataResult = array();
+        foreach ($employeeData as $e) {
+            $jamKerja = $this->getJamKerjaDetailByEmployeeId(
+                $tanggal,
+                $e['id']
+            );
+
+            array_push($dataResult, [
+                'id' => $e['id'],
+                'nip' => $e['nip'],
+                'name' => $e['name'],
+                'jenis' => trim($jamKerja['jenis']),
+                'shift' => trim($jamKerja['shift']),
+            ]);
+        }
+
+        return $dataResult;
     }
 }

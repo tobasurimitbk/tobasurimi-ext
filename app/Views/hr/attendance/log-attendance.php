@@ -863,6 +863,7 @@
         placeholder: "Pilih Mesin Fingerprint",
         theme: "bootstrap-5",
         allowClear: false,
+        dropdownParent: $('#ambilDataFingerModal')
     });
     $(".month").datepicker({
         format: "yyyy-mm",

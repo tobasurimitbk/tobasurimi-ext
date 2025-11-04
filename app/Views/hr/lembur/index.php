@@ -20,7 +20,7 @@
     <div class="card">
         <div class="card-body">
             <div class="row justify-content-end">
-                <div class="col-sm-3">
+                <div class="col-sm-2">
                     <div class="input-group">
                         <div class="form-floating" style="height: 50px;">
                             <input placeholder="" value="<?= date('Y-m') ?>" class="form-control month" id="month" name="month" />
@@ -33,7 +33,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-sm-3">
+                <div class="col-sm-2">
                     <div class="form-floating">
                         <select class="form-select" name="divisi_id" id="divisi_id">
                             <option value="">
@@ -46,6 +46,16 @@
                             <?php endforeach; ?>
                         </select>
                         <label for="floatingInput">Cari Departemen</label>
+                    </div>
+                </div>
+                <div class="col-sm-2">
+                    <div class="form-floating">
+                        <select class="form-select" name="bagian_id" id="bagian_id">
+                            <option value="">
+                                Cari Bagian
+                            </option>
+                        </select>
+                        <label for="floatingInput">Cari Bagian</label>
                     </div>
                 </div>
                 <div class="col-sm-3">
@@ -120,6 +130,7 @@
                 data.month = $('#month').val();
                 data.tipe = $('#tipe').val();
                 data.divisi_id = $('#divisi_id').val();
+                data.bagian_id = $('#bagian_id').val();
                 data.sort = sort;
                 data.sortType = sortType;
             }
@@ -254,7 +265,7 @@
         table.ajax.reload();
     });
 
-    $('#divisi_id,#tipe').change(function(e) {
+    $('#divisi_id,#tipe,#bagian_id').change(function(e) {
         e.preventDefault();
         table.ajax.reload();
     });
@@ -263,10 +274,40 @@
         placeholder: "Cari Departemen",
         theme: "bootstrap-5",
         allowClear: true,
+    }).change(function(e) {
+        e.preventDefault();
+        let csrf = $(`[name="${csrfToken}"]`);
+        var formData = new FormData();
+        formData.append('divisionID', $(this).val());
+        $.ajax({
+            url: `<?= base_url("list-attendance/get-bagian"); ?>`,
+            data: formData,
+            beforeSend: function(xhr) {
+                xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+            },
+            method: "POST",
+            dataType: "json",
+            processData: false,
+            contentType: false,
+            success: function(result) {
+                csrf.val(result.token);
+                $("#bagian_id").empty()
+                $("#bagian_id").append(`<option value=""></option>`)
+                result.data.forEach(function(item) {
+                    $("#bagian_id").append(`<option value="${item.id}">${item.kode_bagian.toUpperCase()} - ${item.nama_bagian.toUpperCase()}</option>`)
+                });
+            }
+        });
     });
 
     $("#tipe").select2({
         placeholder: "Cari Tipe / Golongan",
+        theme: "bootstrap-5",
+        allowClear: true,
+    });
+
+    $("#bagian_id").select2({
+        placeholder: "Cari Bagian",
         theme: "bootstrap-5",
         allowClear: true,
     });

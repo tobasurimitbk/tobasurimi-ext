@@ -116,6 +116,7 @@
                     <li><a class="dropdown-item" href="#" id="btnShowExportHarianModal">Lap. Harian</a></li>
                     <li><a class="dropdown-item" href="#" onclick="exportExcelBulan()">Lap. Bulanan</a></li>
                     <li><a class="dropdown-item" href="#" id="btnTriwulanModal">Lap. Triwulan</a></li>
+                    <li><a class="dropdown-item" href="#" id="btnPerKaryawan">Lap. Per Karyawan</a></li>
                 </ul>
             <?php endif; ?>
         </div>
@@ -1541,6 +1542,34 @@
             window.open(url, '_blank');
         }
     });
+
+    $('#btnPerKaryawan').click(function(e) {
+        e.preventDefault();
+        var month = $('#month').val();
+        var employeeId = $('#employee_id').val();
+
+        console.log(employeeId, month);
+
+        if (month == '') {
+            Swal.fire({
+                icon: 'error',
+                title: 'Pilih bulan dahulu',
+                confirmButtonColor: '#4e73df',
+            });
+            return;
+        } else if (employeeId == '' || employeeId == null) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Pilih karyawan dahulu',
+                confirmButtonColor: '#4e73df',
+            });
+            return;
+        } else {
+            var url = "<?= base_url('list-attendance/export-bulanan-employee') ?>?month=" + month + "&employee_id=" + employeeId;
+            window.location.href = url;
+        }
+
+    })
 
     // datepicker checkin dan checkout
     $(function() {

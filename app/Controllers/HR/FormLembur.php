@@ -4,6 +4,7 @@ namespace App\Controllers\HR;
 
 use App\Controllers\BaseController;
 use App\Models\AttendancesLogModel;
+use App\Models\BagianModel;
 use App\Models\BigDaysModel;
 use App\Models\DivisisModel;
 use App\Models\EmployeeJamKerjaModel;
@@ -78,8 +79,11 @@ class FormLembur extends BaseController
     public function getEmployeeByDivision()
     {
         $divisiId = $this->request->getVar('divisionID');
+        $bagianId = $this->request->getVar('bagianID');
+
         $employee = $this->EmployeeModel->where('deletedAt', null)
             ->where('division_id', $divisiId)
+            ->where('bagian_id', $bagianId)
             ->orderBy('name', "ASC")
             ->findAll();
 
@@ -95,13 +99,25 @@ class FormLembur extends BaseController
         $employeesModel = new EmployeesModel();
         $formLemburModel = new FormLemburModel();
         $DivisiModel = new DivisisModel();
+        $BagianModel = new BagianModel();
 
         $id = decrypt($id);
+        $lemburDetail = $formLemburModel->where('id', $id)->first();
+
+        if ($lemburDetail == null) {
+            return redirect()->to('lembur');
+        }
+
+        $employeeFirst = $employeesModel->where('id', $lemburDetail['employee_id'])->first();
+        $divisi = $DivisiModel->get_by_company_id($this->this_company_id);
+        $employees = $employeesModel->getEmployeesAndDivisi($this->this_company_id);
+        $bagian = $BagianModel->where('id', $employeeFirst['bagian_id'])->findAll();
 
         $data = [
-            "divisi" => $DivisiModel->get_by_company_id($this->this_company_id),
-            'employees' => $employeesModel->getEmployeesAndDivisi($this->this_company_id),
-            'lemburDetail' => $formLemburModel->where('id', $id)->first()
+            "divisi" => $divisi,
+            'employees' => $employees,
+            'lemburDetail' => $lemburDetail,
+            'bagian' => $bagian
         ];
 
         return view('hr/lembur/form', $data);
@@ -138,7 +154,8 @@ class FormLembur extends BaseController
         $addCondition = [
             "search"           => $this->request->getGet("search"),
             "tipe" => $this->request->getGet('tipe'),
-            "divisi_id" => $this->request->getGet('divisi_id')
+            "divisi_id" => $this->request->getGet('divisi_id'),
+            "bagian_id" => $this->request->getGet("bagian_id")
         ];
 
         $limit = $this->request->getGet("length");

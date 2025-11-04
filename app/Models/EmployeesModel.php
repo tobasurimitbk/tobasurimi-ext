@@ -401,17 +401,14 @@ class EmployeesModel extends Model
     public function getEmployeesAndDivisi($company_id)
     {
         $arrCondition = [
-            'divisis.deletedAt' => null,
-            'bagian.deletedAt' => null,
             'employees.deletedAt' => null,
             'employees.company_id' => $company_id,
-            'employees.status' => "Aktif"
         ];
 
         $builder = $this->db->table('employees')
             ->select("employees.*, divisis.divisi, bagian.nama_bagian AS namaBagian")
-            ->join('divisis', 'divisis.id = employees.division_id')
-            ->join('bagian', 'bagian.id = employees.bagian_id');
+            ->join('divisis', 'divisis.id = employees.division_id', 'left')
+            ->join('bagian', 'bagian.id = employees.bagian_id', 'left');
         $builder->where($arrCondition);
         $query = $builder->get();
 
