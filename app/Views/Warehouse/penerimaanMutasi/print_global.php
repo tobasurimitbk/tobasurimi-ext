@@ -11,12 +11,6 @@
             font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
         }
 
-        @page {
-            size: 14.27in 6.50in landscape;
-            margin: 25px;
-            padding: 25px;
-        }
-
         .header {
             display: flex;
             justify-content: space-between;
@@ -122,9 +116,7 @@
                 <td>
                     <div><span class="txt-bold">Tanggal : <?= date("d/m/Y", strtotime($penerimaanMutasiGlobal->tanggal)); ?></span></div>
                 </td>
-                <td class="txt-right">
-                    <div><span class="txt-bold">Jenis Mutasi: BC 2.7</span></div>
-                </td>
+
             </tr>
             <tr>
                 <td>
@@ -133,20 +125,15 @@
                 <td>
                     <div><span class="txt-bold">Company Pengirim : <?= $penerimaanMutasiGlobal->company_pengirim  ?></span></div>
                 </td>
-                <td>
-                    <div><span class="txt-bold">Keterangan : <?= $penerimaanMutasiGlobal->keterangan; ?></span></div>
-                </td>
+
             </tr>
         </table>
         <table class="item-table mt-050">
             <tr>
                 <th class="txt-left" style="text-align:center; width: 30px;">No</th>
                 <th class="txt-left" style="text-align:center; width: 100px;">No Mutasi</th>
-                <th class="txt-left" style="text-align:center; width: 40px;">Tipe Barang</th>
                 <th class="txt-left" style="text-align:center; width: 30px;">Dokumen Mutasi</th>
-                <th class="txt-left" style="text-align:center; width: 30px;">Dokumen Asal</th>
                 <th class="txt-left" style="text-align:center; width: 30px;">Departemen / Warehouse Pengirim</th>
-                <th class="txt-left" style="text-align:center; width: 30px;">Supplier</th>
                 <th class="txt-left" style="text-align:center; width: 60px;">Barang - Spesifikasi</th>
                 <th class="txt-left" style="text-align:center; width: 60px;">Qty Diterima</th>
                 <th class="txt-left" style=" text-align:center; width: 150px;">Satuan</th>
@@ -157,14 +144,11 @@
                 <tr>
                     <td class="txt-center" style="text-align:center;"><?= $no++; ?></td>
                     <td class="txt-left" style="text-align:center;"><?= $detail['no_mutasi'] ?></td>
-                    <td class="txt-right" style="text-align:center;"><?= $detail["tipe_barang_text"]; ?></td>
-                    <td class="txt-left" style="text-align:center;"><?= $detail["bc_mutasi_name"] . " / " . $detail['no_aju_mutasi']; ?></td>
-                    <td class="txt-left" style="text-align:center;"><?= $detail["bc_asal_name"] . " / " . $detail['no_aju_asal']; ?></td>
-                    <td class="txt-left" style="text-align:center;"><?= $detail["divisi_asal_name"] . " / " . $detail['warehouse_asal_name']; ?></td>
-                    <td class="txt-right" style="text-align:center;"><?= $detail['supplier_name'] ?></td>
-                    <td class="txt-right" style="text-align:center;"><?= $detail['barang'] ?></td>
-                    <td class="txt-left" style="text-align:center;"><?= $detail["qty_diterima_current"]; ?></td>
-                    <td class="txt-left" style="text-align:center;"><?= $detail["satuan"]; ?></td>
+                    <td class="txt-left" style="text-align:center;"><?= $detail["type_bc"] . " / " . $detail['no_aju']; ?></td>
+                    <td class="txt-left" style="text-align:center;"><?= $detail["divisi_asal"] . " / " . $detail['warehouse_asal']; ?></td>
+                    <td class="txt-right" style="text-align:center;"><?= $detail['penerimaan']['barang_name'] . " - " . $detail['penerimaan']['spesifikasi'] ?></td>
+                    <td class="txt-left" style="text-align:center;"><?= $detail["penerimaan"]['qty']; ?></td>
+                    <td class="txt-left" style="text-align:center;"><?= $detail["penerimaan"]['kode_satuan']; ?></td>
                 </tr>
             <?php endforeach; ?>
         </table>

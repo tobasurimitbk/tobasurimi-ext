@@ -3,9 +3,9 @@
 
 <section class="section">
     <div class="section-header">
-        <h1><?= empty($penerimaanMutasi) ? "Tambah Penerimaan Mutasi PPBKB" : "Update Penerimaan Mutasi PPBKB" ?></h1>
+        <h1><?= empty($penerimaanMutasi) ? "Tambah Penerimaan Mutasi Lokal" : "Update Penerimaan Mutasi Lokal" ?></h1>
         <div class="col-button-tambah-spp">
-            <a class="btn btn-hide-form btn-discard float-right" href="<?= base_url("penerimaan-mutasi"); ?>">
+            <a class="btn btn-hide-form btn-discard float-right" href="<?= base_url("penerimaan-mutasi/lokal"); ?>">
                 Kembali
             </a>
             <?php if (!empty($penerimaanMutasi)) : ?>
@@ -51,7 +51,7 @@
 
                 <ul class="nav nav-tabs mb-3">
                     <li class="nav-item">
-                        <a class="nav-link active" href="#">Penerimaan Mutasi PPBKB</a>
+                        <a class="nav-link active" href="#">Penerimaan Mutasi Lokal</a>
                     </li>
                 </ul>
 
@@ -305,7 +305,7 @@
                         let data = new FormData(document.querySelector(".create-form"));
                         let url = id == '' ? '<?= base_url('penerimaan-mutasi/save') ?>' : '<?= base_url('penerimaan-mutasi/update') ?>';
                         data.append('listBarang', JSON.stringify(listBarang));
-                        data.append('tipe_mutasi', "PPBKB");
+                        data.append('tipe_mutasi', "LOKAL");
 
                         $.ajax({
                             url: url,
@@ -330,7 +330,7 @@
                                         confirmButtonText: 'Ok'
                                     }).then((result) => {
                                         if (result.isConfirmed) {
-                                            window.location.href = "<?= base_url("penerimaan-mutasi") ?>";
+                                            window.location.href = "<?= base_url("penerimaan-mutasi/lokal") ?>";
                                         }
                                     });
                                 } else {
@@ -390,7 +390,7 @@
             },
             data: {
                 divisi_id: $(".divisi_id option:selected").val(),
-                tipe_mutasi: "PPBKB",
+                tipe_mutasi: "LOKAL",
                 id: $('#id').val()
             },
             dataType: "json",
@@ -538,7 +538,7 @@
                 url: `<?= base_url("penerimaan-mutasi/get-penerimaan-mutasi-no"); ?>`,
                 method: "GET",
                 data: {
-                    tipe_mutasi: "PPBKB",
+                    tipe_mutasi: "LOKAL",
                     tanggal: tanggal
                 },
                 dataType: "json",

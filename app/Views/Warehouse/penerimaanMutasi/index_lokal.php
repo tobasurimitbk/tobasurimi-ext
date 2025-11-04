@@ -3,9 +3,9 @@
 
 <section class="section">
     <div class="section-header">
-        <h1>Penerimaan Mutasi BC 2.7</h1>
+        <h1>Penerimaan Mutasi Lokal</h1>
         <?php if (can("Inventori", "Penerimaan Mutasi", "c")) : ?>
-            <a href="<?= base_url('penerimaan-mutasi/create-global') ?>" type="button" class="btn btn-show-form btn-add float-right">
+            <a href="<?= base_url('penerimaan-mutasi/create-lokal') ?>" type="button" class="btn btn-show-form btn-add float-right">
                 <i class="fa fa-plus fa-sm mr-2" aria-hidden="true"></i>Tambah
             </a>
         <?php endif; ?>
@@ -14,13 +14,13 @@
         <div class="card-body">
             <ul class="nav nav-tabs mb-3">
                 <li class="nav-item">
-                    <a class="nav-link" href="<?= base_url('penerimaan-mutasi/lokal') ?>">Penerimaan Mutasi Lokal</a>
+                    <a class="nav-link active" href="#">Penerimaan Mutasi Lokal</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="<?= base_url('penerimaan-mutasi') ?>">Penerimaan Mutasi PPBKB</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link active" href="#">Penerimaan Mutasi BC 2.7 (BC 2.7 IN)</a>
+                    <a class="nav-link" href="<?= base_url('penerimaan-mutasi/global') ?>">Penerimaan Mutasi BC 2.7 (BC 2.7 IN)</a>
                 </li>
             </ul>
             <?= csrf_field() ?>
@@ -57,21 +57,17 @@
                         <label style="z-index: 1;" style="z-index: 1;">Cari Data </label>
                     </div>
                 </div>
-
             </div>
             <div class="table-responsive">
                 <table class="table table-bordered nowrap table-hover-tobasurimi dataTable" id="dataTable" width="100%" cellspacing="0">
                     <thead class="thead-dark">
                         <tr>
                             <th>No</th>
-                            <th onclick="changeSort('penerimaan_mutasi_global.tanggal')">Tanggal</th>
-                            <th onclick="changeSort('penerimaan_mutasi_no')">No Penerimaan</th>
-                            <th onclick="changeSort('penerimaan_mutasi_global.multiple_mutasi_no')">Nomor Mutasi</th>
-                            <th onclick="changeSort('penerimaan_mutasi_global.divisi_penerima_id')">Dept Penerima</th>
-                            <th onclick="changeSort('penerimaan_mutasi_global.warehouse_penerima_id')">Warehouse Penerima</th>
-                            <th onclick="changeSort('penerimaan_mutasi_global.company_pengirim_id')">Company Pengirim</th>
-                            <th>Doc Mutasi</th>
-                            <th>Status</th>
+                            <th onclick="changeSort('penerimaan_mutasi.penerimaan_mutasi_no')">No Penerimaan</th>
+                            <th onclick="changeSort('penerimaan_mutasi.divisi_id')">Dept</th>
+                            <th onclick="changeSort('penerimaan_mutasi.tanggal')">Tanggal</th>
+                            <th onclick="changeSort('penerimaan_mutasi.multiple_no_mutasi')">No Mutasi</th>
+                            <th onclick="changeSort('penerimaan_mutasi.status_posting')">Status</th>
                             <th>Action</th>
                         </tr>
                     </thead>
@@ -87,7 +83,7 @@
 
 
 <script>
-    let sort = "penerimaan_mutasi_global.penerimaan_mutasi_no";
+    let sort = "penerimaan_mutasi.penerimaan_mutasi_no";
     let sortType = "desc";
     const csrfToken = '<?= csrf_token() ?>';
 
@@ -105,10 +101,10 @@
         ],
         pageLength: 25,
         ajax: {
-            url: "<?= base_url("penerimaan-mutasi/all-global"); ?>",
+            url: "<?= base_url("penerimaan-mutasi/all-lokal"); ?>",
             dataSrc: "data",
             data: function(data) {
-                data.search = $(".search").val();
+                data.search = $("#search").val();
                 data.dateStart = $('#dateStart').val();
                 data.dateEnd = $('#dateEnd').val();
                 data.sort = sort;
@@ -124,32 +120,22 @@
         searching: false,
         columns: [{
                 data: "no",
+                className: "text-center",
                 orderable: false
-            },
-            {
-                data: "tanggal",
             },
             {
                 data: "penerimaan_mutasi_no",
             },
             {
+                data: "divisi",
+            },
+            {
+                data: "tanggal",
+            },
+            {
                 data: "multiple_no_mutasi",
             },
-            {
-                data: "divisi_penerima",
 
-            },
-            {
-                data: "warehouse_penerima",
-            },
-            {
-                data: "company_pengirim",
-            },
-            {
-                data: "dokumen_mutasi_barang",
-                searchable: false,
-                sortable: false
-            },
             {
                 data: "status_posting",
                 className: "text-center",
@@ -185,7 +171,7 @@
                         return `
                         <div class="mt-0">
                         <?php if (can('Inventori', 'Penerimaan Mutasi', 'u')): ?>
-                            <a href="<?= base_url("penerimaan-mutasi/id-global"); ?>/${id}" data-toggle="tooltip" title="Edit" class="btn btn-primary">
+                            <a href="<?= base_url("penerimaan-mutasi/id-lokal"); ?>/${id}" data-toggle="tooltip" title="Edit" class="btn btn-primary">
                                 <i class="fas fa-edit"></i>
                             </a>
                         <?php endif ?>
@@ -195,7 +181,7 @@
                             </button>
                         <?php endif; ?>
                         <?php if (can('Inventori', 'Penerimaan Mutasi', 'p')) : ?>
-                            <button data-toggle="tooltip" title="Print" class="btn btn-warning btn-print" onclick="print('<?= base_url("penerimaan-mutasi/print-global/"); ?>${id}')" style="box-shadow: none !important;">
+                            <button data-toggle="tooltip" title="Print" class="btn btn-warning btn-print" onclick="print('<?= base_url("penerimaan-mutasi/print/"); ?>${id}')" style="box-shadow: none !important;">
                                 <i class="fa fa-print fa-sm" aria-hidden="true"></i>
                             </button>
                         <?php endif; ?>
@@ -208,13 +194,19 @@
                     `
                     } else {
                         return `
-                         <?php if (can('Inventori', 'Penerimaan Mutasi', 'u')): ?>
-                            <a href="<?= base_url("penerimaan-mutasi/id-global"); ?>/${id}" data-toggle="tooltip" title="Edit" class="btn btn-primary">
+                        <?php if (can('Warehouse', 'Penerimaan Mutasi', 'u')): ?>
+                            <a href="<?= base_url("penerimaan-mutasi/id-lokal"); ?>/${id}" data-toggle="tooltip" title="Edit" class="btn btn-primary">
                                 <i class="fas fa-edit"></i>
                             </a>
                         <?php endif ?>
+                          <?php if (can('Inventori', 'Penerimaan Mutasi', 'ua')): ?>
+                           <button data-toggle="tooltip" title="Unpost" class="btn btn-danger btn-print" onclick="unposting('${id}')" style="box-shadow: none !important;">
+                                <i class="fa fa-ban fa-sm" aria-hidden="true"></i>
+                            </button>
+                        <?php endif ?>
+
                         <?php if (can('Inventori', 'Penerimaan Mutasi', 'p')) : ?>
-                            <button data-toggle="tooltip" title="Print" class="btn btn-warning btn-print" onclick="print('<?= base_url("penerimaan-mutasi/print-global/"); ?>${id}')" style="box-shadow: none !important;">
+                            <button data-toggle="tooltip" title="Print" class="btn btn-warning btn-print" onclick="print('<?= base_url("penerimaan-mutasi/print/"); ?>${id}')" style="box-shadow: none !important;">
                                 <i class="fa fa-print fa-sm" aria-hidden="true"></i>
                             </button>
                         <?php endif; ?>
@@ -245,7 +237,6 @@
         }
     });
 
-
     $(".dateStart").datepicker({
         todayHighlight: true,
         format: "dd/mm/yyyy",
@@ -268,14 +259,6 @@
         table.ajax.reload();
     });
 
-    $("#company_pengirim_id,#status")
-        .parent('div')
-        .children('span')
-        .children('span')
-        .children('span')
-        .children('span')
-        .css('margin-top', '22px').css('margin-left', '-7px');
-
     const posting = function(id) {
         Swal.fire({
             icon: 'question',
@@ -284,13 +267,63 @@
             cancelButtonColor: '#d33',
             showCancelButton: true,
             reverseButtons: true,
-            confirmButtonText: 'Simpan',
+            confirmButtonText: 'Ya',
             cancelButtonText: 'Kembali',
         }).then((result) => {
             if (result.isConfirmed) {
                 const csrf = $(`[name="${csrfToken}"]`);
                 $.ajax({
-                    url: "<?= base_url("penerimaan-mutasi/posting-global"); ?>",
+                    url: "<?= base_url("penerimaan-mutasi/posting"); ?>",
+                    data: {
+                        id: id
+                    },
+                    beforeSend: function(xhr) {
+                        setLoading();
+                        xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                    },
+                    complete: function() {
+                        stopLoading();
+                    },
+                    method: "POST",
+                    dataType: "json",
+                    success: function(response) {
+                        csrf.val(response.token);
+                        if (response.status) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: response.message,
+                                confirmButtonColor: '#4e73df',
+                            }).then((result) => {
+                                table.ajax.reload()
+                            });
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: response.message,
+                                confirmButtonColor: '#4e73df',
+                            })
+                        }
+                    },
+                });
+            }
+        })
+    }
+
+    const unposting = function(id) {
+        Swal.fire({
+            icon: 'question',
+            title: 'Unposting Penerimaan Mutasi ?',
+            confirmButtonColor: '#4e73df',
+            cancelButtonColor: '#d33',
+            showCancelButton: true,
+            reverseButtons: true,
+            confirmButtonText: 'Ya',
+            cancelButtonText: 'Kembali',
+        }).then((result) => {
+            if (result.isConfirmed) {
+                const csrf = $(`[name="${csrfToken}"]`);
+                $.ajax({
+                    url: "<?= base_url("penerimaan-mutasi/unposting"); ?>",
                     data: {
                         id: id
                     },
@@ -340,7 +373,7 @@
             if (result.isConfirmed) {
                 const csrf = $(`[name="${csrfToken}"]`);
                 $.ajax({
-                    url: "<?= base_url("penerimaan-mutasi/delete-global"); ?>",
+                    url: "<?= base_url("penerimaan-mutasi/delete"); ?>",
                     data: {
                         id: id
                     },

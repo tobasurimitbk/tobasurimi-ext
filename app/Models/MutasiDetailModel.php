@@ -40,13 +40,20 @@ class MutasiDetailModel extends Model
     protected $beforeDelete   = [];
     protected $afterDelete    = [];
 
-    public function getDetail($id)
-    {
+    public function getDetail(
+        $id
+    ) {
         $stockRevampModel = new StockRevampModel();
+        $pbbkbDetailModel = new PPBKBDetailModel();
         $dataResult = array();
 
+        $selectQry = "
+            mutasi_detail.*,
+            satuans.kode_satuan AS kode_satuan_mutasi
+        ";
+
         $mutasiDetail = $this->asArray()
-            ->select('mutasi_detail.*,satuans.kode_satuan AS kode_satuan_mutasi')
+            ->select($selectQry)
             ->join('satuans', 'satuans.id = mutasi_detail.unit_id_mutasi', 'left')
             ->where('mutasi_detail.mutasi_id', $id)
             ->where('mutasi_detail.deletedAt', null)
@@ -58,8 +65,16 @@ class MutasiDetailModel extends Model
             $fromStock = $stockRevampModel->getStockListAll(
                 ["id" => $a['stock_detail_id']],
                 0,
-                "desc"
+                "desc",
+                1
             );
+
+            $ppbkbDetail = $pbbkbDetailModel
+                ->select('ppbkb_detail.*,hs_codes.code')
+                ->join('hs_codes', 'hs_codes.id = ppbkb_detail.hs_code_id', 'left')
+                ->where('mutasi_detail_id', $a['id'])
+                ->where('ppbkb_detail.deletedAt', null)
+                ->first();
 
             foreach ($fromStock['data'] as $d) {
                 // Stock
@@ -81,7 +96,11 @@ class MutasiDetailModel extends Model
                     'qty_diterima' => (float)$a['hasil_mutasi'] + $a['qty_mutasi'],
                     'kode_satuan' => $d['kode_satuan'],
                     "unit_id" => $d['unit_id'],
+                    "hs_code" => $ppbkbDetail == null ? "" : $ppbkbDetail['code'],
+                    "hs_code_id" => $ppbkbDetail == null ? "" : $ppbkbDetail['hs_code_id'],
                     "mutasi" => [
+                        "mutasi_id" => $a['mutasi_id'],
+                        "mutasi_detail_id" => $a['id'],
                         "qty_mutasi" => $a['qty_mutasi'],
                         'unit_id_mutasi' => $a['unit_id_mutasi'],
                         'unit_name_mutasi' => $a['kode_satuan_mutasi'],
@@ -89,7 +108,12 @@ class MutasiDetailModel extends Model
                         'unit_id_konversi' => $a['unit_id_konversi'],
                         'unit_name_konversi' => $d['kode_satuan'],
                         'hasil_mutasi' => $a['hasil_mutasi']
-                    ]
+                    ],
+                    "dokumen_asal" => [
+                        'no_aju' => $d['no_aju'],
+                        'no_daftar' => $d['no_daftar'],
+                        'tanggal_dokumen' => $d['tanggal_dokumen']
+                    ],
                 ]);
             }
         }

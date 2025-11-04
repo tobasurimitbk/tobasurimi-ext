@@ -203,17 +203,17 @@
                             <table class="table table-bordered nowrap table-hover-tobasurimi dataTable" id="dataTable" width="100%" border="1" cellspacing="0">
                                 <thead class="thead-dark">
                                     <tr>
-                                        <th style="text-align: center;">No</th>
-                                        <th style="text-align: center;">Tipe Barang</th>
-                                        <th style="text-align: center;">Kode Barang</th>
-                                        <th style="text-align: center;">Kode HS</th>
-                                        <th style="text-align: center;">Barang</th>
-                                        <th style="text-align: center;">Qty Mutasi</th>
-                                        <th style="text-align: center;">Satuan</th>
-                                        <th style="text-align: center;">Dokumen Pemasukan</th>
-                                        <th style="text-align: center;">No Aju / No Daftar</th>
-                                        <th style="text-align: center;">Tanggal Masuk</th>
-                                        <th style="text-align: center;">Action</th>
+                                        <th>No</th>
+                                        <th>Kode Barang</th>
+                                        <th>Kode HS</th>
+                                        <th>Barang</th>
+                                        <th>Spesifikasi</th>
+                                        <th>Qty Mutasi</th>
+                                        <th>Satuan</th>
+                                        <th>Dokumen Pemasukan</th>
+                                        <th>No Aju / No Daftar</th>
+                                        <th>Tgl Dokumen</th>
+                                        <th>Action</th>
 
                                     </tr>
                                 </thead>
@@ -221,7 +221,7 @@
                                 </tbody>
                                 <tfoot class="foot-detail-table" id="foot-detail-table">
                                     <tr>
-                                        <td colspan="11" style="text-align: center;">
+                                        <td colspan="11">
                                             Tidak Ada Barang
                                         </td>
                                     </tr>
@@ -298,16 +298,22 @@
                     <?= csrf_field() ?>
                     <input type="hidden" name="stock_detail2_id" id="stock_detail2_id" class="stock_detail2_id">
                     <div class="row">
-                        <div class="col-md-6">
+                        <div class="col-md-4">
                             <div class="form-floating mb-3">
                                 <input autocomplete="one-time-code" readonly type="text" class="form-control kode_barang_name_modal" id="kode_barang_name_modal" name="kode_barang_name_modal" placeholder="Kode Barang">
                                 <label for="floatingInput">Kode Barang</label>
                             </div>
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-md-4">
                             <div class="form-floating mb-3">
                                 <input autocomplete="one-time-code" readonly type="text" class="form-control barang_name_modal" id="barang_name_modal" name="barang_name_modal" placeholder="Nama Barang">
-                                <label for="floatingInput">Nama Barang</label>
+                                <label for="floatingInput">Barang</label>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-floating mb-3">
+                                <input autocomplete="one-time-code" readonly type="text" class="form-control spesifikasi_modal" id="spesifikasi_modal" name="spesifikasi_modal" placeholder="Spesifikasi">
+                                <label for="floatingInput">Spesifikasi</label>
                             </div>
                         </div>
                         <div class="col-md-6">
@@ -603,7 +609,7 @@
                     // GAK VALID
                     Swal.fire({
                         icon: 'error',
-                        title: 'Barang ' + firstError.barang + ', HS Code nya belum ada !',
+                        title: 'Barang ' + firstError.barang_name + ' ' + firstError.spesifikasi + ', HS Code nya belum ada !',
                         confirmButtonColor: '#4e73df',
                         confirmButtonText: 'Ok'
                     });
@@ -621,90 +627,47 @@
                     }).then((result) => {
                         var id = $('#id').val();
                         var data = new FormData(document.querySelector(".create-form"));
+                        var url = id == '' ? '<?= base_url("bea-cukai-ppbkb/save"); ?>' : '<?= base_url("bea-cukai-ppbkb/update"); ?>';
                         data.append('listData', JSON.stringify(listData));
+                        $.ajax({
+                            url: url,
+                            data: data,
+                            beforeSend: function(xhr) {
+                                xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                                setLoading();
+                            },
+                            complete: function() {
+                                stopLoading()
+                            },
+                            method: "POST",
+                            dataType: "json",
+                            processData: false,
+                            contentType: false,
+                            success: function(response) {
+                                if (response.status) {
+                                    Swal.fire({
+                                        icon: 'success',
+                                        title: response.message,
+                                        confirmButtonColor: '#4e73df',
+                                        confirmButtonText: 'Ok'
+                                    }).then((result) => {
+                                        if (result.isConfirmed) {
+                                            window.location.href = "<?= base_url("bea-cukai-ppbkb") ?>";
+                                        }
+                                    });
+                                } else {
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: response.message,
+                                        confirmButtonColor: '#4e73df',
+                                        cancelButtonColor: '#d33',
+                                        reverseButtons: true,
+                                        confirmButtonText: 'Oke',
+                                    })
+                                }
 
-                        if (id) {
-                            // UPDATE
-                            $.ajax({
-                                url: "<?= base_url("bea-cukai-ppbkb/update"); ?>",
-                                data: data,
-                                beforeSend: function(xhr) {
-                                    xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                                    setLoading();
-                                },
-                                complete: function() {
-                                    stopLoading()
-                                },
-                                method: "POST",
-                                dataType: "json",
-                                processData: false,
-                                contentType: false,
-                                success: function(response) {
-                                    if (response.status) {
-                                        Swal.fire({
-                                            icon: 'success',
-                                            title: response.message,
-                                            confirmButtonColor: '#4e73df',
-                                            confirmButtonText: 'Ok'
-                                        }).then((result) => {
-                                            if (result.isConfirmed) {
-                                                window.location.href = "<?= base_url("bea-cukai-ppbkb") ?>";
-                                            }
-                                        });
-                                    } else {
-                                        Swal.fire({
-                                            icon: 'error',
-                                            title: response.message,
-                                            confirmButtonColor: '#4e73df',
-                                            cancelButtonColor: '#d33',
-                                            reverseButtons: true,
-                                            confirmButtonText: 'Oke',
-                                        })
-                                    }
-
-                                },
-                            });
-                        } else {
-                            // INSERT
-                            $.ajax({
-                                url: "<?= base_url("bea-cukai-ppbkb/save"); ?>",
-                                data: data,
-                                beforeSend: function(xhr) {
-                                    xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                                    setLoading();
-                                },
-                                complete: function() {
-                                    stopLoading()
-                                },
-                                method: "POST",
-                                dataType: "json",
-                                processData: false,
-                                contentType: false,
-                                success: function(response) {
-                                    if (response.status) {
-                                        Swal.fire({
-                                            icon: 'success',
-                                            title: response.message,
-                                            confirmButtonColor: '#4e73df',
-                                            confirmButtonText: 'Ok'
-                                        }).then((result) => {
-                                            if (result.isConfirmed) {
-                                                window.location.href = "<?= base_url("bea-cukai-ppbkb") ?>";
-                                            }
-                                        });
-                                    } else {
-                                        Swal.fire({
-                                            icon: 'error',
-                                            title: response.message,
-                                            confirmButtonColor: '#4e73df',
-                                            cancelButtonColor: '#d33',
-                                            reverseButtons: true,
-                                            confirmButtonText: 'Oke',
-                                        })
-                                    }
-                                },
-                            });
-                        }
+                            },
+                        });
                     })
                 }
 
@@ -764,26 +727,26 @@
 
         if (listData.length === 0) {
             var newRow = $('<tr>');
-            newRow.append($('<td colspan="11" style="text-align:center">Tidak Ada Barang</td>'));
+            newRow.append($('<td colspan="11" style="text-align:left">Tidak Ada Barang</td>'));
             table.find('tfoot').append(newRow);
         } else {
             $.each(listData, function(i, v) {
                 var newRow = $('<tr style="color:whitesmoke;">');
-                newRow.append($('<td style="text-align: center;">').html(
+                newRow.append($('<td >').html(
                     `
                             ${no++} 
                         `
                 ));
-                newRow.append($('<td style="text-align: center;">').text(v.type_barang_text));
-                newRow.append($('<td style="text-align: center;">').text(v.kode_barang));
-                newRow.append($('<td style="text-align: center;">').text(v.hs_code == null ? "-" : v.hs_code));
-                newRow.append($('<td style="text-align: center;">').text(v.barang));
-                newRow.append($('<td style="text-align: center;">').text(v.qty));
-                newRow.append($('<td style="text-align: center;">').text(v.satuan));
-                newRow.append($('<td style="text-align: center;">').text(v.bc_type));
-                newRow.append($('<td style="text-align: center;">').text(v.no_aju));
-                newRow.append($('<td style="text-align: center;">').text(v.stock_date));
-                newRow.append($('<td style="text-align: center;">').html(
+                newRow.append($('<td >').text(v.kode_barang));
+                newRow.append($('<td >').text(v.hs_code == null ? "" : v.hs_code));
+                newRow.append($('<td >').text(v.barang_name));
+                newRow.append($('<td >').text(v.spesifikasi));
+                newRow.append($('<td >').text(greatFormatRupiah(v.mutasi.qty_konversi)));
+                newRow.append($('<td >').text(v.mutasi.unit_name_konversi));
+                newRow.append($('<td >').text(v.type_bc));
+                newRow.append($('<td >').text(v.dokumen_asal.no_aju == null ? "" : v.dokumen_asal.no_aju + ' / ' + v.dokumen_asal.no_daftar));
+                newRow.append($('<td >').text(v.dokumen_asal.no_aju == null ? "" : v.dokumen_asal.tanggal_dokumen));
+                newRow.append($('<td >').html(
                     `
                     <button <?= !empty($ppbkb) ? (($ppbkb['status_posting'] == "1") ? 'disabled' : '') : '' ?> type="button" class="btn btn-primary" onclick="updateHsCodeModal(${v.id})" ><i class="fas fa-pencil-alt"></i></button>
                 `
@@ -804,7 +767,8 @@
 
         $('#stock_detail2_id').val(first.id);
         $('#kode_barang_name_modal').val(first.kode_barang);
-        $('#barang_name_modal').val(first.barang);
+        $('#barang_name_modal').val(first.barang_name);
+        $('#spesifikasi_modal').val(first.spesifikasi);
         $('#hs_code_id').val(first.hs_code_id).change();
 
         $('#update_hs_code_modal').modal('show');

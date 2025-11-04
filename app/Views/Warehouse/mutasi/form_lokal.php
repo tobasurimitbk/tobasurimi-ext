@@ -41,12 +41,12 @@
                 <li class="nav-item">
                     <a class="nav-link active" href="#">Mutasi Lokal</a>
                 </li>
-                <li class="nav-item">
+                <!-- <li class="nav-item">
                     <a class="nav-link" href="<?= base_url('mutasi/create') ?>">Mutasi PPBKB</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="<?= base_url('mutasi/create-global') ?>">Mutasi BC 2.7</a>
-                </li>
+                </li> -->
             </ul>
 
             <form class="create-form mt-3">

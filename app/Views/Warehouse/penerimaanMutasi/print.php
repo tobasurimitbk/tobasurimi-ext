@@ -4,17 +4,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Penerimaan Mutasi PPBKB</title>
+    <title><?= $penerimaanMutasi->penerimaan_mutasi_no ?></title>
     <style>
         body {
             font-size: 13px;
             font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
-        }
-
-        @page {
-            size: 14.27in 6.50in landscape;
-            margin: 25px;
-            padding: 25px;
         }
 
         .header {
@@ -113,7 +107,7 @@
 
 <body>
     <?php if (!empty($penerimaanMutasi)) { ?>
-        <div class="txt-center"><span class="title">LAPORAN PENERIMAAN MUTASI PPBKB</span></div>
+        <div class="txt-center"><span class="title">LAPORAN PENERIMAAN MUTASI <?= $penerimaanMutasi->tipe_mutasi ?></span></div>
         <table class="w-100 mt-050">
             <tr>
                 <td>
@@ -123,7 +117,7 @@
                     <div><span class="txt-bold">Tanggal : <?= date("d/m/Y", strtotime($penerimaanMutasi->tanggal)); ?></span></div>
                 </td>
                 <td class="txt-right">
-                    <div><span class="txt-bold">Jenis Mutasi: PPBKB</span></div>
+                    <div><span class="txt-bold">Jenis Mutasi: <?= $penerimaanMutasi->tipe_mutasi ?></span></div>
                 </td>
             </tr>
             <tr>
@@ -139,12 +133,9 @@
             <tr>
                 <th class="txt-left" style="text-align:center; width: 30px;">No</th>
                 <th class="txt-left" style="text-align:center; width: 100px;">No Mutasi</th>
-                <th class="txt-left" style="text-align:center; width: 40px;">Tipe Barang</th>
-                <th class="txt-left" style="text-align:center; width: 30px;">Dokumen Mutasi</th>
-                <th class="txt-left" style="text-align:center; width: 30px;">Departemen / Warehouse Pengirim</th>
-                <th class="txt-left" style="text-align:center; width: 30px;">Warehouse Penerima</th>
-                <th class="txt-left" style="text-align:center; width: 30px;">Supplier</th>
-                <th class="txt-left" style="text-align:center; width: 60px;">Barang - Spesifikasi</th>
+                <th class="txt-left" style="text-align:center; width: 30px;">Kode</th>
+                <th class="txt-left" style="text-align:center; width: 60px;">Barang</th>
+                <th class="txt-left" style="text-align:center; width: 60px;">Spesifikasi</th>
                 <th class="txt-left" style="text-align:center; width: 60px;">Qty Diterima</th>
                 <th class="txt-left" style=" text-align:center; width: 150px;">Satuan</th>
             </tr>
@@ -154,14 +145,11 @@
                 <tr>
                     <td class="txt-center" style="text-align:center;"><?= $no++; ?></td>
                     <td class="txt-left" style="text-align:center;"><?= $detail['no_mutasi'] ?></td>
-                    <td class="txt-right" style="text-align:center;"><?= $detail["tipe_barang"]; ?></td>
-                    <td class="txt-left" style="text-align:center;"><?= $detail["bc_mutasi_name"] . " / " . $detail['no_aju_mutasi']; ?></td>
-                    <td class="txt-left" style="text-align:center;"><?= $detail["divisi_asal_name"] . " / " . $detail['warehouse_asal_name']; ?></td>
-                    <td class="txt-right" style="text-align:center;"><?= $detail['warehouse_name'] ?></td>
-                    <td class="txt-right" style="text-align:center;"><?= $detail['supplier_name'] ?></td>
-                    <td class="txt-right" style="text-align:center;"><?= $detail['barang'] ?></td>
-                    <td class="txt-left" style="text-align:center;"><?= $detail["qty_diterima_current"]; ?></td>
-                    <td class="txt-left" style="text-align:center;"><?= $detail["satuan"]; ?></td>
+                    <td class="txt-right" style="text-align:center;"><?= $detail['kode_barang'] ?></td>
+                    <td class="txt-right" style="text-align:center;"><?= $detail['barang_name'] ?></td>
+                    <td class="txt-right" style="text-align:center;"><?= $detail['spesifikasi'] ?></td>
+                    <td class="txt-left" style="text-align:center;"><?= number_format($detail["qty_diterima_sekarang"], 2); ?></td>
+                    <td class="txt-left" style="text-align:center;"><?= $detail["satuan_diterima"]; ?></td>
                 </tr>
             <?php endforeach; ?>
         </table>

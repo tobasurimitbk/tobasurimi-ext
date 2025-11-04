@@ -1416,6 +1416,11 @@ $routes->get('/mutasi/all', 'Inventori\Mutasi::all', ['filter' => 'Auth']);
 $routes->post('/mutasi/un-posting', 'Inventori\Mutasi::unPosting', ['filter' => 'Auth']);
 $routes->get('/mutasi/all-stock-list', 'Inventori\StokAdjusment::allStockList', ['filter' => 'Auth']);
 $routes->get('/mutasi/list-satuan-konversi', 'Inventori\StokAdjusment::getSatuanKonversi', ['filter' => 'Auth']);
+// LOKAL
+$routes->get('/penerimaan-mutasi/lokal', 'Inventori\PenerimaanMutasiLokal::index', ['filter' => 'Auth']);
+$routes->get('/penerimaan-mutasi/all-lokal', 'Inventori\PenerimaanMutasiLokal::all', ['filter' => 'Auth']);
+$routes->get('/penerimaan-mutasi/create-lokal', 'Inventori\PenerimaanMutasiLokal::create', ['filter' => 'Auth']);
+$routes->get('/penerimaan-mutasi/id-lokal/(:segment)', 'Inventori\PenerimaanMutasiLokal::detail/$1', ['filter' => 'Auth']);
 // PENERIMAAN MUTASI PPBKB
 $routes->get('/penerimaan-mutasi', 'Inventori\PenerimaanMutasi::index', ['filter' => 'Auth']);
 $routes->get('/penerimaan-mutasi/create', 'Inventori\PenerimaanMutasi::create', ['filter' => 'Auth']);
@@ -1425,6 +1430,7 @@ $routes->get('/penerimaan-mutasi/list-barang', 'Inventori\PenerimaanMutasi::drop
 $routes->post('/penerimaan-mutasi/save', 'Inventori\PenerimaanMutasi::createAction', ['filter' => 'Auth']);
 $routes->post('/penerimaan-mutasi/update', 'Inventori\PenerimaanMutasi::updateAction', ['filter' => 'Auth']);
 $routes->post('/penerimaan-mutasi/posting', 'Inventori\PenerimaanMutasi::posting', ['filter' => 'Auth']);
+$routes->post('/penerimaan-mutasi/unposting', 'Inventori\PenerimaanMutasi::unposting', ['filter' => 'Auth']);
 $routes->post('/penerimaan-mutasi/delete', 'Inventori\PenerimaanMutasi::delete', ['filter' => 'Auth']);
 $routes->get('/penerimaan-mutasi/id/(:segment)', 'Inventori\PenerimaanMutasi::detail/$1', ['filter' => 'Auth']);
 $routes->get('/penerimaan-mutasi/get-penerimaan-mutasi-no', 'Inventori\PenerimaanMutasi::getPenerimaanMutasiNo', ['filter' => 'Auth']);
@@ -1787,17 +1793,16 @@ $routes->group('bea-cukai-bc-40', ['filter' => 'Auth'], function ($routes) {
 // BC 2.7
 $routes->group('bea-cukai-bc-27', ['filter' => 'Auth'], function ($routes) {
     $routes->get('/', 'BeaCukai\BC27::index');
-    $routes->get('all', 'BeaCukai\BC27::all');
-    $routes->get('online', 'BeaCukai\BC27::online');
     $routes->get('download-response', 'BeaCukai\BC40::downloadResponPdf');
-    $routes->get('all-online', 'BeaCukai\BC27::allOnline');
+    $routes->get('all', 'BeaCukai\BC27::all');
     $routes->get('create', 'BeaCukai\BC27::create');
     $routes->get('id/(:segment)', 'BeaCukai\BC27::detail/$1');
     $routes->post('save', 'BeaCukai\BC27::createAction');
     $routes->post('update', 'BeaCukai\BC27::updateAction');
     $routes->post('delete', 'BeaCukai\BC27::delete');
     $routes->post('posting', 'BeaCukai\BC27::posting');
-    $routes->get('check-no-aju', 'BeaCukai\BC27::checkNoAju');
+    $routes->get('generate-no-aju', 'BeaCukai\BC27::getNomorAju');
+
     $routes->get('divisi', 'BeaCukai\BC27::dropdownDivisiByCompany');
 
     $routes->get('list-mutasi-global', 'BeaCukai\BC27::dropdownMutasiGlobal');

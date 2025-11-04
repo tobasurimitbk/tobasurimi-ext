@@ -1014,6 +1014,7 @@ class StockRevampModel extends Model
                 stock_revamp.unit_id,
                 bc_purchase_order.no_aju AS no_aju,
                 bc_purchase_order.no_daftar AS no_daftar,
+                DATE(bc_purchase_order.createdAt) AS tanggal_dokumen,
                 -- HELPER UNTUK OUT DAN IN STOK GLOBAL
                 stock_revamp.barang_master_id,
                 stock_revamp.spesifikasi_id,
@@ -1066,6 +1067,7 @@ class StockRevampModel extends Model
                 stock_revamp.unit_id,
                 bc_purchase_order.no_aju AS no_aju,
                 bc_purchase_order.no_daftar AS no_daftar,
+                DATE(bc_purchase_order.createdAt) AS tanggal_dokumen,
                 -- HELPER UNTUK OUT DAN IN STOK GLOBAL
                 stock_revamp.barang_master_id,
                 stock_revamp.spesifikasi_id,
@@ -1118,6 +1120,7 @@ class StockRevampModel extends Model
                 stock_revamp.unit_id,
                 bc_purchase_order.no_aju AS no_aju,
                 bc_purchase_order.no_daftar AS no_daftar,
+                DATE(bc_purchase_order.createdAt) AS tanggal_dokumen,
                 -- HELPER UNTUK OUT DAN IN STOK GLOBAL
                 stock_revamp.barang_master_id,
                 stock_revamp.spesifikasi_id,
@@ -1170,6 +1173,7 @@ class StockRevampModel extends Model
                 stock_revamp.unit_id,
                 bc_purchase_order.no_aju AS no_aju,
                 bc_purchase_order.no_daftar AS no_daftar,
+                DATE(bc_purchase_order.createdAt) AS tanggal_dokumen,
                 -- HELPER UNTUK OUT DAN IN STOK GLOBAL
                 stock_revamp.barang_master_id,
                 stock_revamp.spesifikasi_id,
@@ -1222,6 +1226,7 @@ class StockRevampModel extends Model
                 stock_revamp.unit_id,
                 '' AS no_aju,
                 '' AS no_daftar,
+                '' AS tanggal_dokumen,
                 -- HELPER UNTUK OUT DAN IN STOK GLOBAL
                 stock_revamp.barang_master_id,
                 stock_revamp.spesifikasi_id,
@@ -1270,6 +1275,7 @@ class StockRevampModel extends Model
                 stock_revamp.unit_id,
                 '' AS no_aju,
                 '' AS no_daftar,
+                '' AS tanggal_dokumen,
                 -- HELPER UNTUK STOK
                 stock_revamp.barang_master_id,
                 stock_revamp.spesifikasi_id,
@@ -1317,6 +1323,7 @@ class StockRevampModel extends Model
                 stock_revamp.unit_id,
                 '' AS no_aju,
                 '' AS no_daftar,
+                '' AS tanggal_dokumen,
                 -- HELPER UNTUK STOK
                 stock_revamp.barang_master_id,
                 stock_revamp.spesifikasi_id,
@@ -1363,6 +1370,7 @@ class StockRevampModel extends Model
                 stock_revamp.unit_id,
                 '' AS no_aju,
                 '' AS no_daftar,
+                '' AS tanggal_dokumen,
                 -- HELPER UNTUK STOK
                 stock_revamp.barang_master_id,
                 stock_revamp.spesifikasi_id,
@@ -1409,6 +1417,7 @@ class StockRevampModel extends Model
                 stock_revamp.unit_id,
                 '' AS no_aju,
                 '' AS no_daftar,
+                '' AS tanggal_dokumen,
                 -- HELPER UNTUK STOK
                 stock_revamp.barang_master_id,
                 stock_revamp.spesifikasi_id,
@@ -1455,6 +1464,7 @@ class StockRevampModel extends Model
                 stock_revamp.unit_id,
                 '' AS no_aju,
                 '' AS no_daftar,
+                '' AS tanggal_dokumen,
                 -- HELPER UNTUK STOK
                 stock_revamp.barang_master_id,
                 stock_revamp.spesifikasi_id,

@@ -40,14 +40,25 @@ class MutasiGlobalDetailModel extends Model
     protected $beforeDelete   = [];
     protected $afterDelete    = [];
 
-    public function getDetail($id)
-    {
+    public function getDetail(
+        $id
+    ) {
         $stockRevampModel = new StockRevampModel();
         $dataResult = array();
 
+        $selectQry = "
+            mutasi_global_detail.*,
+            satuans.kode_satuan AS kode_satuan_mutasi,
+            barang_master.kode_barang,
+            barang_master.barang_name,
+            barang_master_spesifikasi.spesifikasi
+        ";
+
         $mutasiDetail = $this->asArray()
-            ->select('mutasi_global_detail.*,satuans.kode_satuan AS kode_satuan_mutasi')
+            ->select($selectQry)
             ->join('satuans', 'satuans.id = mutasi_global_detail.unit_id_mutasi', 'left')
+            ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = mutasi_global_detail.spesifikasi_hasil_id', 'left')
+            ->join('barang_master', 'barang_master.id = barang_master_spesifikasi.barang_master_id', 'left')
             ->where('mutasi_global_detail.mutasi_global_id', $id)
             ->where('mutasi_global_detail.deletedAt', null)
             ->findAll();
@@ -58,7 +69,8 @@ class MutasiGlobalDetailModel extends Model
             $fromStock = $stockRevampModel->getStockListAll(
                 ["id" => $a['stock_detail_id']],
                 0,
-                "desc"
+                "desc",
+                1
             );
 
             foreach ($fromStock['data'] as $d) {
@@ -82,14 +94,29 @@ class MutasiGlobalDetailModel extends Model
                     'kode_satuan' => $d['kode_satuan'],
                     "unit_id" => $d['unit_id'],
                     "mutasi" => [
+                        "mutasi_detail_id" => $a['id'],
+                        'company_tujuan_id' => $a['company_tujuan_id'],
+                        'divisi_tujuan_id' => $a['divisi_tujuan_id'],
+                        'warehouse_tujuan_id' => $a['warehouse_tujuan_id'],
                         "qty_mutasi" => $a['qty_mutasi'],
                         'unit_id_mutasi' => $a['unit_id_mutasi'],
                         'unit_name_mutasi' => $a['kode_satuan_mutasi'],
                         'qty_konversi' => $a['qty_konversi'],
                         'unit_id_konversi' => $a['unit_id_konversi'],
                         'unit_name_konversi' => $d['kode_satuan'],
-                        'hasil_mutasi' => $a['hasil_mutasi']
-                    ]
+                        'hasil_mutasi' => $a['hasil_mutasi'],
+                        'spesifikasi_hasil_id' => $a['spesifikasi_hasil_id'],
+                        'unit_hasil_id' => $a['unit_hasil_id'],
+                        'kode_barang' => $a['kode_barang'],
+                        'barang_name' => $a['barang_name'],
+                        'spesifikasi' => $a['spesifikasi']
+
+                    ],
+                    "dokumen_asal" => [
+                        'no_aju' => $d['no_aju'],
+                        'no_daftar' => $d['no_daftar'],
+                        'tanggal_dokumen' => $d['tanggal_dokumen']
+                    ],
                 ]);
             }
         }
