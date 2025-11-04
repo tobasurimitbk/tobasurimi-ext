@@ -27,7 +27,7 @@
                 <div class="col-md-3 mb-3">
                     <?= csrf_field() ?>
                     <div class="input-group input-group-password">
-                        <input autocomplete="one-time-code" class="form-control input-picker mulaiTanggalPPBKB" id="mulaiTanggalPPBKB" name="mulaiTanggalPPBKB" placeholder="Mulai Tanggal">
+                        <input autocomplete="one-time-code" class="form-control input-picker mulaiTanggalPPBKB" id="mulaiTanggalPPBKB" name="mulaiTanggalPPBKB" placeholder="Mulai Tanggal" value="01/<?= date('m/Y') ?>">
                         <div class="input-group-prepend group-prepend-password align-items-center">
                             <i style="cursor: pointer; z-index: 99; margin-bottom: 10px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-mulaiTanggalPPBKB"></i>
                         </div>
@@ -49,7 +49,7 @@
                     </select>
                 </div>
                 <div class="col-md-3 mb-3">
-                    <input autocomplete="one-time-code" class="form-control noPPBKB search form-out-search" placeholder="Cari Nomor PPBKB / Mutasi / Daftar" value="" />
+                    <input autocomplete="one-time-code" class="form-control search search form-out-search" placeholder="Cari Data" value="" />
                 </div>
             </div>
             <?php if ($akunCeisa == null) : ?>
@@ -69,18 +69,19 @@
                         <thead class="thead-dark">
                             <tr>
                                 <th style="text-align: center;">No</th>
-                                <th onclick="changeSort('mutasi.divisi_asal_id')" class="sort" style="text-align: center;">Departemen Asal</th>
-                                <th onclick="changeSort('mutasi.warehouse_asal_id')" class="sort" style="text-align: center;">Warehouse Asal</th>
-                                <th onclick="changeSort('mutasi.divisi_tujuan_id')" class="sort" style="text-align: center;">Departemen Tujuan</th>
-                                <th onclick="changeSort('mutasi.warehouse_tujuan_id')" class="sort" style="text-align: center;">Warehouse Tujuan</th>
-                                <th onclick="changeSort('mutasi.no_mutasi')" class="sort" style="text-align: center;">No Mutasi</th>
-                                <th onclick="changeSort('ppbkb.no_ppbkb')" class="sort" style="text-align: center;">No PPBKB / Daftar</th>
-                                <th onclick="changeSort('ppbkb.createdAt')" class="sort" style="text-align: center;">Tanggal</th>
-                                <th onclick="changeSort('ppbkb.status_posting')" style="text-align: center;">Status Posting</th>
+                                <th onclick="changeSort('ppbkb.tanggal')">Tgl</th>
+                                <th onclick="changeSort('mutasi.divisi_asal_id')">Dept Asal</th>
+                                <th onclick="changeSort('mutasi.warehouse_asal_id')">Warehouse Asal</th>
+                                <th onclick="changeSort('mutasi.divisi_tujuan_id')">Dept Tujuan</th>
+                                <th onclick="changeSort('mutasi.warehouse_tujuan_id')">Warehouse Tujuan</th>
+                                <th onclick="changeSort('mutasi.no_mutasi')">No Mutasi</th>
+                                <th onclick="changeSort('ppbkb.no_ppbkb')">No PPBKB</th>
+                                <th onclick="changeSort('ppbkb.no_daftar')">No Daftar</th>
+                                <th onclick="changeSort('ppbkb.status_posting')">Status</th>
                                 <th style="text-align: center;">Action</th>
                             </tr>
                         </thead>
-                        <tbody class="body-table" id="body-table" style="cursor: pointer;">
+                        <tbody class="body-table" id="body-table">
                         </tbody>
                     </table>
                 </div>
@@ -93,11 +94,10 @@
 <script>
     const csrfToken = '<?= csrf_token() ?>';
     const csrf = $(`[name="${csrfToken}"]`);
-    let sort = "ppbkb.id";
+    let sort = "ppbkb.tanggal";
     let sortType = "desc";
 
     const table = $('.dataTable').DataTable({
-
         processing: true,
         serverSide: true,
         ordering: true,
@@ -117,7 +117,7 @@
                 data.mulaiTanggalPPBKB = $('.mulaiTanggalPPBKB').val();
                 data.selesaiTanggalPPBKB = $('.selesaiTanggalPPBKB').val();
                 data.statusPosting = $('.statusPosting').val();
-                data.noPPBKB = $('.noPPBKB').val();
+                data.search = $('.search').val();
                 data.sort = sort;
                 data.sortType = sortType;
             }
@@ -131,56 +131,47 @@
         searching: false,
         columns: [{
                 data: "no",
-                className: "text-center",
                 orderable: false
             },
             {
-                data: "divisi_asal_name",
-                className: "text-center",
+                data: "tanggal",
             },
             {
-                data: "warehouse_asal_name",
-                className: "text-center"
+                data: "divisi_asal",
             },
             {
-                data: "divisi_tujuan_name",
-                className: "text-center",
-                searchable: false,
-                sortable: false
+                data: "warehouse_asal",
             },
             {
-                data: "warehouse_tujuan_name",
-                className: "text-center",
-                searchable: false,
-                sortable: false
+                data: "divisi_tujuan",
+            },
+            {
+                data: "warehouse_tujuan",
             },
             {
                 data: "no_mutasi",
-                className: "text-center",
             },
             {
                 data: "no_ppbkb",
-                className: "text-center",
             },
             {
-                data: "tanggal",
-                className: "text-center"
+                data: "no_daftar",
             },
             {
                 data: "status_posting",
-                className: "text-center",
+
                 render: function(data, type, row) {
                     let htmlRes = '';
 
                     if (row.status_posting == "1") {
                         htmlRes += `
                         <div class="text-success">
-                            SUDAH POSTING
+                            <i class="fa-solid fa-check"></i>
                         </div>`
                     } else {
                         htmlRes += `
                         <div class="text-danger">
-                            BELUM POSTING
+                            <i class="fa-solid fa-x"></i>
                         </div>`
                     }
 
@@ -194,9 +185,17 @@
                 searchable: false,
                 sortable: false,
                 render: function(data, type, row) {
+                    let id = row.id;
                     let htmlRes = '';
 
                     if (row.status_posting === "0") {
+                        <?php if (can('Bea Cukai', 'PPBKB', 'u')) : ?>
+                            htmlRes += `
+                                <a href="<?= base_url("bea-cukai-ppbkb/id"); ?>/${id}" data-toggle="tooltip" title="Edit" class="btn btn-primary">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                            `;
+                        <?php endif; ?>
                         <?php if (can('Bea Cukai', 'PPBKB', 'd')) : ?>
                             htmlRes += `
                                 <button data-toggle="tooltip" title="Hapus" onclick="deleteAction('${row.id}')" class="btn btn-danger delete-parent">
@@ -219,6 +218,13 @@
                             `;
                         <?php endif; ?>
                     } else {
+                        <?php if (can('Bea Cukai', 'PPBKB', 'u')) : ?>
+                            htmlRes += `
+                                <a href="<?= base_url("bea-cukai-ppbkb/id"); ?>/${id}" data-toggle="tooltip" title="Edit" class="btn btn-primary">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                            `;
+                        <?php endif; ?>
                         <?php if (can('Bea Cukai', 'PPBKB', 'p')) : ?>
                             htmlRes += `
                                  <button data-toggle="tooltip" title="Print" class="btn btn-warning btn-print" onclick="printAction('${row.id}')" style="box-shadow: none !important;">
@@ -253,20 +259,15 @@
         }
     });
 
-    $('#dataTable tbody').on('click', 'tr td:not(.actions):not(.dataTables_empty)', function() {
-        const data = table.row(this).data();
-        location.replace(`<?= base_url("bea-cukai-ppbkb/id/"); ?>${data.id}`);
-    });
-
-    $('.mulaiTanggalPPBKB, .selesaiTanggalPPBKB,.statusPosting').change(function() {
+    $('.mulaiTanggalPPBKB,.selesaiTanggalPPBKB,.statusPosting').change(function() {
         table.ajax.reload();
     });
 
-    $('.noPPBKB').keyup(function() {
+    $('.search').keyup(function() {
         table.ajax.reload();
     });
 
-    $(".mulaiTanggalPPBKB, .selesaiTanggalPPBKB").datepicker({
+    $(".mulaiTanggalPPBKB,.selesaiTanggalPPBKB").datepicker({
         todayHighlight: true,
         format: "dd/mm/yyyy",
         orientation: "bottom auto",
@@ -313,6 +314,13 @@
                             }).then((result) => {
                                 table.ajax.reload();
                             });
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: res.message,
+                                confirmButtonColor: '#4e73df',
+                                confirmButtonText: 'Ok'
+                            });
                         }
                     }
                 })
@@ -358,6 +366,13 @@
                                 confirmButtonText: 'Ok'
                             }).then((result) => {
                                 table.ajax.reload();
+                            });
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: res.message,
+                                confirmButtonColor: '#4e73df',
+                                confirmButtonText: 'Ok'
                             });
                         }
                     }

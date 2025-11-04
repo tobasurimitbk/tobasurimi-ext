@@ -57,7 +57,8 @@ class AdjusmentDetailModel extends Model
             $fromStock = $stockRevampModel->getStockListAll(
                 ["id" => $a['stock_detail_id']],
                 0,
-                "desc"
+                "desc",
+                1
             );
 
             foreach ($fromStock['data'] as $d) {

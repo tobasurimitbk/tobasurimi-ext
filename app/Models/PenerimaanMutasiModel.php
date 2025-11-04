@@ -40,37 +40,37 @@ class PenerimaanMutasiModel extends Model
     protected $beforeDelete   = [];
     protected $afterDelete    = [];
 
-    public function getList($condition, $conditionArr, $addCondition, $limit = 10, $offset = 0)
+    public function getList($condition, $addCondition, $limit = 10, $offset = 0)
     {
         $availableSort = [
-            'penerimaan_mutasi_no'                 => 'penerimaan_mutasi_no',
-            'penerimaan_mutasi.multiple_mutasi_no' => 'penerimaan_mutasi.multiple_mutasi_no',
+            'penerimaan_mutasi.penerimaan_mutasi_no' => 'penerimaan_mutasi.penerimaan_mutasi_no',
+            'penerimaan_mutasi.multiple_no_mutasi' => 'penerimaan_mutasi.multiple_no_mutasi',
             'penerimaan_mutasi.tanggal'            => 'penerimaan_mutasi.tanggal',
             'penerimaan_mutasi.divisi_id'          => 'penerimaan_mutasi.divisi_id',
         ];
         $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
 
-        $sort = $availableSort[$addCondition['sort'] ?? 'updatedAt'] ?? 'createdAt';
+        $sort = $availableSort[$addCondition['sort'] ?? 'penerimaan_mutasi_no'] ?? 'penerimaan_mutasi_no';
         $sortType = $availableSortType[$addCondition['sortType'] ?? 'desc'] ?? 'DESC';
 
         $selectQry = "penerimaan_mutasi.*,
-        divisis.divisi AS divisi_penerima";
+        divisis.divisi AS divisi,
+        ";
 
         $dataQry = $this->asObject()
             ->select($selectQry)
             ->join('divisis', 'divisis.id = penerimaan_mutasi.divisi_id', 'left')
             ->where($condition)
-            ->whereIn('penerimaan_mutasi.divisi_id', $conditionArr)
             ->orderBy($sort, $sortType);
 
         $totalData = $dataQry->countAllResults(false);
 
-        if ($addCondition['divisi_id'] || $addCondition['status'] || $addCondition['penerimaan_mutasi_no'] || $addCondition['dateStart'] || $addCondition['dateEnd']) {
+        if (
+            $addCondition['search'] ||
+            $addCondition['dateStart'] ||
+            $addCondition['dateEnd']
+        ) {
             $dataQry->groupStart();
-        }
-
-        if ($addCondition['divisi_id']) {
-            $dataQry->where('penerimaan_mutasi.divisi_id', $addCondition['divisi_id']);
         }
 
         if ($addCondition['dateStart']) {
@@ -80,19 +80,17 @@ class PenerimaanMutasiModel extends Model
             $dataQry->where('tanggal <=', $addCondition['dateEnd']);
         }
 
-        if ($addCondition['status'] || $addCondition['status'] == '0') {
-            $dataQry->where('status_posting', $addCondition['status']);
+        if ($addCondition['search']) {
+            $dataQry->like('multiple_no_mutasi', $addCondition['search'])
+                ->orLike('divisis.divisi', $addCondition['search'])
+                ->orLike('penerimaan_mutasi_no', $addCondition['search']);
         }
 
-        if ($addCondition['penerimaan_mutasi_no']) {
-            $dataQry->like('penerimaan_mutasi_no', $addCondition['penerimaan_mutasi_no']);
-        }
-
-        if ($addCondition['multiple_mutasi_no']) {
-            $dataQry->like('multiple_mutasi_no', $addCondition['multiple_mutasi_no']);
-        }
-
-        if ($addCondition['divisi_id'] || $addCondition['status'] || $addCondition['penerimaan_mutasi_no'] || $addCondition['dateStart'] || $addCondition['dateEnd']) {
+        if (
+            $addCondition['search'] ||
+            $addCondition['dateStart'] ||
+            $addCondition['dateEnd']
+        ) {
             $dataQry->groupEnd();
         }
 
@@ -153,16 +151,19 @@ class PenerimaanMutasiModel extends Model
         }
     }
 
-    public function getListNomorMutasi($divisiId)
-    {
+    public function getListNomorMutasi(
+        $divisiId,
+        $tipeMutasi
+    ) {
         $mutasiModel = new MutasiModel();
         $penerimaanMutasiDetailModel = new PenerimaanMutasiDetailModel();
         $ppbkbModel = new PPBKBModel();
 
 
         $listMutasi = $mutasiModel
-            ->select('mutasi.id, mutasi.no_mutasi, SUM(qty) AS qty_mutasi')
+            ->select('mutasi.id, mutasi.no_mutasi, SUM(qty_konversi) AS qty_konversi')
             ->join('mutasi_detail', 'mutasi_detail.mutasi_id = mutasi.id', 'left')
+            ->where('mutasi.tipe_mutasi', $tipeMutasi)
             ->where('mutasi.divisi_tujuan_id', $divisiId)
             ->where('mutasi.deletedAt', null)
             ->where('mutasi_detail.deletedAt', null)
@@ -173,7 +174,8 @@ class PenerimaanMutasiModel extends Model
         $mutasiResult = [];
 
         foreach ($listMutasi as $mutasi) {
-            $checkPPBKB = $ppbkbModel->where('mutasi_id', $mutasi['id'])->first();
+
+            // Cek Total Diterima
             $penerimaanTotal = $penerimaanMutasiDetailModel
                 ->select('SUM(qty) AS qty_diterima')
                 ->where('mutasi_id', $mutasi['id'])
@@ -181,9 +183,26 @@ class PenerimaanMutasiModel extends Model
                 ->groupBy('mutasi_id')
                 ->findAll();
 
-            if ($checkPPBKB) {
-                if (empty($penerimaanTotal) || $penerimaanTotal[0]['qty_diterima'] < $mutasi['qty_mutasi']) {
+            if ($tipeMutasi == "PPBKB") {
+                // PPBKB
+                $checkPPBKB = $ppbkbModel->where('mutasi_id', $mutasi['id'])->first();
+                if ($checkPPBKB) {
+                    if (count($penerimaanTotal) == 0) {
+                        array_push($mutasiResult, $mutasi);
+                    } else {
+                        if (empty($penerimaanTotal) || $penerimaanTotal[0]['qty_diterima'] < $mutasi['qty_konversi']) {
+                            array_push($mutasiResult, $mutasi);
+                        }
+                    }
+                }
+            } else {
+                // LOKAL
+                if (count($penerimaanTotal) == 0) {
                     array_push($mutasiResult, $mutasi);
+                } else {
+                    if ($penerimaanTotal[0]['qty_diterima'] < $mutasi['qty_konversi']) {
+                        array_push($mutasiResult, $mutasi);
+                    }
                 }
             }
         }
@@ -191,159 +210,113 @@ class PenerimaanMutasiModel extends Model
         return $mutasiResult;
     }
 
-    public function getListBarangMutasi($mutasiArrID, $penerimaanMutasiID = null)
-    {
-        $stockModel = new StockModel();
-        $kemasanModel = new KemasanModel();
-        $satuanModel = new SatuansModel();
-        $barangMasterModel = new BarangMasterModel();
+    public function getListBarangMutasi(
+        $mutasiArrID,
+        $penerimaanMutasiID = null,
+        $isEdit = false
+    ) {
         $mutasiDetailModel = new MutasiDetailModel();
         $penerimaanMutasiDetailModel = new PenerimaanMutasiDetailModel();
-        $stockDetail2Model = new StockDetail2Model();
-        $metaDataModel = new MetadataModel();
-        $ppbkbModel = new PPBKBModel();
-        $mutasiModel = new MutasiModel();
+        $stockRevampModel = new StockRevampModel();
 
         $selectQry = "
-            mutasi.no_mutasi, 
             mutasi_detail.*, 
-            stock.tipe_barang, 
-            metadata.value AS bc_name,
-            warehouses.warehouse_name
+            mutasi.no_mutasi,
+            tb_divisi_asal.divisi AS divisi_asal,
+            tb_divisi_tujuan.divisi AS divisi_tujuan,
+            tb_warehouses_asal.warehouse_name AS warehouse_asal,
+            tb_warehouses_tujuan.warehouse_name AS warehouse_tujuan,
+            satuans.kode_satuan AS satuan_konversi
         ";
 
         $mutasiDetailList = $mutasiDetailModel
             ->select($selectQry)
             ->join('mutasi', 'mutasi.id = mutasi_detail.mutasi_id', 'left')
-            ->join('stock', 'stock.id = mutasi_detail.stock_id', 'left')
-            ->join('metadata', 'metadata.id = mutasi_detail.bc_id', 'left')
-            ->join('warehouses', 'warehouses.id = mutasi.warehouse_tujuan_id', 'left')
+            ->join('divisis tb_divisi_asal', 'tb_divisi_asal.id = mutasi.divisi_asal_id', 'left')
+            ->join('divisis tb_divisi_tujuan', 'tb_divisi_tujuan.id = mutasi.divisi_tujuan_id', 'left')
+            ->join('warehouses tb_warehouses_asal', 'tb_warehouses_asal.id = mutasi.warehouse_asal_id', 'left')
+            ->join('warehouses tb_warehouses_tujuan', 'tb_warehouses_tujuan.id = mutasi.warehouse_tujuan_id', 'left')
+            ->join('satuans', 'satuans.id = mutasi_detail.unit_id_konversi', 'left')
             ->whereIn('mutasi_id', $mutasiArrID)
             ->where('mutasi_detail.deletedAt', null)
             ->findAll();
 
         $barangResult = [];
-
-        $bcMutasiId = $metaDataModel->getBCFirst('PPB-KB');
-
+        $no = 1;
         foreach ($mutasiDetailList as $m) {
-            $penerimaanTotal = $penerimaanMutasiDetailModel
+
+            $penerimaanTotalQty = $penerimaanMutasiDetailModel
                 ->select('SUM(qty) AS qty_diterima')
                 ->where('mutasi_id', $m['mutasi_id'])
                 ->where('mutasi_detail_id', $m['id'])
                 ->where('deletedAt', null)
                 ->groupBy('mutasi_detail_id')
-                ->findAll();
+                ->first();
 
-            $penerimaanTotalCurrent = $penerimaanMutasiDetailModel
+            $penerimaanTotalCurrentQty = $penerimaanMutasiDetailModel
                 ->select('SUM(qty) AS qty_diterima')
                 ->where('mutasi_id', $m['mutasi_id'])
                 ->where('mutasi_detail_id', $m['id'])
                 ->where('penerimaan_mutasi_id', $penerimaanMutasiID)
                 ->where('deletedAt', null)
                 ->groupBy('mutasi_detail_id')
-                ->findAll();
-
-            $stock = $stockModel->find($m['stock_id']);
-
-            $stockListDetail = $stockDetail2Model->getStockListDetail(
-                $m['stock_id'],
-                $m['bc_id'],
-                $m['no_aju'],
-                $m['stock_dokumen']
-            );
-
-            $ppbkb = $ppbkbModel->where('mutasi_id', $m['mutasi_id'])->first();
-
-            $divisiWarehouseAsal = $mutasiModel->select('divisis.divisi, warehouses.warehouse_name')
-                ->join('divisis', 'divisis.id = mutasi.divisi_asal_id', 'left')
-                ->join('warehouses', 'warehouses.id = mutasi.warehouse_asal_id', 'left')
-                ->where('mutasi.id', $m['mutasi_id'])
                 ->first();
 
-            if ($m['tipe_barang'] == 'kemasan') {
-                // Kemasan
-                $kemasan = $kemasanModel->find($stock['kemasan_id']);
-                $satuan = $satuanModel->find($kemasan['satuan_id'])['kode_satuan'];
-                $barang = $kemasan['name'];
-                $kodeBarang = $kemasan['kode'];
-            } else {
-                // Barang
-                $barangSpesifikasi = $barangMasterModel
-                    ->select("barang_master_spesifikasi.satuan_1, CONCAT(barang_master.barang_name, ' ', barang_master_spesifikasi.spesifikasi) AS barang, barang_master.kode_barang")
-                    ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.barang_master_id = barang_master.id', 'left')
-                    ->where('barang_master_spesifikasi.id', $stock['barang2_id'])
-                    ->where('barang_master_spesifikasi.barang_master_id', $stock['barang1_id'])
-                    ->first();
-                $satuan = $satuanModel->find($barangSpesifikasi['satuan_1'])['kode_satuan'];
-                $barang = $barangSpesifikasi['barang'];
-                $kodeBarang = $barangSpesifikasi['kode_barang'];
-            }
+            $qtyDiterimaTotal = $penerimaanTotalQty == null ? 0 : $penerimaanTotalQty['qty_diterima'];
+            $qtySisaMutasi = $m['qty_konversi'] - $qtyDiterimaTotal;
+            $qtyDiterimaSekarang =  $penerimaanTotalCurrentQty == null ? 0 : $penerimaanTotalCurrentQty['qty_diterima'];
 
-            if ($penerimaanMutasiID == null) {
-                if (empty($penerimaanTotal) || $penerimaanTotal[0]['qty_diterima'] < $m['qty']) {
-                    $qtyDiterima =  (count($penerimaanTotal) == 0 ? 0 : $penerimaanTotal[0]['qty_diterima']);
+
+            $fromStock = $stockRevampModel->getStockListAll(
+                ["id" => $m['stock_detail_id']],
+                0,
+                "desc",
+                1
+            );
+
+            foreach ($fromStock['data'] as $d) {
+
+                if ($isEdit && $penerimaanTotalCurrentQty != null) {
+                    // INI TAMPILAN EDIT
                     array_push($barangResult, [
+                        'no' => $no++,
                         'mutasi_id' => $m['mutasi_id'],
                         'mutasi_detail_id' => $m['id'],
-                        'stock_asal_id' => $m['stock_id'],
-                        'bc_asal_id' => $m['bc_id'],
-                        'no_aju_asal' => $m['no_aju'],
-                        'stock_dokumen_asal' => $m['stock_dokumen'],
-                        'stock_date_asal' => $stockListDetail != null ? date('d/m/Y', strtotime($stockListDetail['stock_date'])) : "-",
-                        'bc_asal_name' => $m['bc_name'] == null ? "NON PABEAN" : $m['bc_name'],
-                        'divisi_asal_name' => $divisiWarehouseAsal == null ? '-' : $divisiWarehouseAsal['divisi'],
-                        'warehouse_asal_name' => $divisiWarehouseAsal == null ? '-' : $divisiWarehouseAsal['warehouse_name'],
-                        // ---
-                        'bc_mutasi_id' => $bcMutasiId['id'],
-                        'bc_mutasi_name' => $bcMutasiId['value'],
-                        'no_aju_mutasi' => $ppbkb['no_ppbkb'],
-                        // -----
-                        'qty' => $m['qty'],
-                        'qty_diterima_all' => count($penerimaanTotal) == 0 ? 0 : $penerimaanTotal[0]['qty_diterima'],
-                        'qty_diterima_current' => count($penerimaanTotalCurrent) == 0 ? 0 : $penerimaanTotalCurrent[0]['qty_diterima'],
-                        'qty_sisa' => $m['qty'] - $qtyDiterima,
+                        'divisi_asal' => $m['divisi_asal'],
+                        'divisi_tujuan' => $m['divisi_tujuan'],
+                        'warehouse_asal' => $m['warehouse_asal'],
+                        'warehouse_tujuan' => $m['warehouse_tujuan'],
                         'no_mutasi' => $m['no_mutasi'],
-                        'tipe_barang' => strtoupper(str_replace('_', ' ', $m['tipe_barang'])),
-                        'barang' => $barang,
-                        'satuan' => $satuan,
-                        'kode_barang' => $kodeBarang,
-                        'warehouse_name' => $m['warehouse_name'],
-                        'supplier_name' => $stockListDetail['supplier_name'],
-                        'no_po' => $stockListDetail['no_po']
+                        'supplier_name' => $d['supplier_name'],
+                        'kode_barang' => $d['kode_barang'],
+                        'barang_name' => $d['barang_name'],
+                        'spesifikasi' => $d['spesifikasi'],
+                        'qty_sisa_mutasi' => (float)$qtySisaMutasi,
+                        'qty_diterima_sekarang' => (float)$qtyDiterimaSekarang,
+                        'satuan_mutasi' => $m['satuan_konversi'],
+                        "qty_diterima_total" => (float)$qtyDiterimaTotal,
+                        'satuan_diterima' => $m['satuan_konversi']
                     ]);
-                }
-            } else {
-                if (count($penerimaanTotal) != 0 &&  count($penerimaanTotalCurrent) != 0) {
-                    $qtyDiterima =  (count($penerimaanTotal) == 0 ? 0 : $penerimaanTotal[0]['qty_diterima']);
+                } else if (!$isEdit && $qtySisaMutasi != 0) {
+                    // INI TAMPILAN CREATE
                     array_push($barangResult, [
+                        'no' => $no++,
                         'mutasi_id' => $m['mutasi_id'],
                         'mutasi_detail_id' => $m['id'],
-                        'stock_asal_id' => $m['stock_id'],
-                        'bc_asal_id' => $m['bc_id'],
-                        'no_aju_asal' => $m['no_aju'],
-                        'stock_dokumen_asal' => $m['stock_dokumen'],
-                        'stock_date_asal' => $stockListDetail != null ? date('d/m/Y', strtotime($stockListDetail['stock_date'])) : "-",
-                        'bc_asal_name' => $m['bc_name'] == null ? "NON PABEAN" : $m['bc_name'],
-                        'divisi_asal_name' => $divisiWarehouseAsal == null ? '-' : $divisiWarehouseAsal['divisi'],
-                        'warehouse_asal_name' => $divisiWarehouseAsal == null ? '-' : $divisiWarehouseAsal['warehouse_name'],
-                        // ---
-                        'bc_mutasi_id' => $bcMutasiId['id'],
-                        'bc_mutasi_name' => $bcMutasiId['value'],
-                        'no_aju_mutasi' => $ppbkb['no_ppbkb'],
-                        // -----                       
-                        'qty' => $m['qty'],
-                        'qty_diterima_all' => count($penerimaanTotal) == 0 ? 0 : $penerimaanTotal[0]['qty_diterima'],
-                        'qty_diterima_current' => count($penerimaanTotalCurrent) == 0 ? 0 : $penerimaanTotalCurrent[0]['qty_diterima'],
-                        'qty_sisa' => $m['qty'] - $qtyDiterima,
+                        'divisi_asal' => $m['divisi_asal'],
+                        'divisi_tujuan' => $m['divisi_tujuan'],
+                        'warehouse_asal' => $m['warehouse_asal'],
+                        'warehouse_tujuan' => $m['warehouse_tujuan'],
                         'no_mutasi' => $m['no_mutasi'],
-                        'tipe_barang' => strtoupper(str_replace('_', ' ', $m['tipe_barang'])),
-                        'barang' => $barang,
-                        'satuan' => $satuan,
-                        'kode_barang' => $kodeBarang,
-                        'warehouse_name' => $m['warehouse_name'],
-                        'supplier_name' => $stockListDetail['supplier_name'],
-                        'no_po' => $stockListDetail['no_po']
+                        'supplier_name' => $d['supplier_name'],
+                        'kode_barang' => $d['kode_barang'],
+                        'barang_name' => $d['barang_name'],
+                        'spesifikasi' => $d['spesifikasi'],
+                        'qty_sisa_mutasi' => (float)$qtySisaMutasi,
+                        'qty_diterima_sekarang' => (float)$qtyDiterimaSekarang,
+                        'satuan_mutasi' => $m['satuan_konversi'],
+                        "qty_diterima_total" => (float)$qtyDiterimaTotal,
+                        'satuan_diterima' => $m['satuan_konversi']
                     ]);
                 }
             }
@@ -363,39 +336,72 @@ class PenerimaanMutasiModel extends Model
         return $response;
     }
 
-    public function get_no($bln, $thn, $last_day, $divisiName, $divisiID)
-    {
-        $lastStr =  convertBulanToAngkaRomawi($bln) . '/' . $thn;
-
-        $builder = $this->db->table('penerimaan_mutasi');
-        $builder->select('penerimaan_mutasi_no');
-        $builder->orderBy('penerimaan_mutasi_no', 'desc');
-        $builder->where('penerimaan_mutasi.divisi_id', $divisiID);
-        $builder->where('createdAt >=', $thn . "-" . $bln . "-01" . " 00:00:00")
-            ->where('createdAt <=', $last_day . " 23:59:59");
-        $builder->like('penerimaan_mutasi_no', $lastStr);
-        $query = $builder->get();
-
-        $kode = 'PMU/' . $divisiName;
-
-        $lastPenerimaan = '1';
-
-        if (!empty($query->getResultArray())) {
-            foreach ($query->getResultArray() as $string) {
-                $explode = explode('/', $string['penerimaan_mutasi_no']);
-                $number = intval($explode[2]);
-
-                if ($number > $lastPenerimaan) {
-                    $lastPenerimaan = $number;
-                }
+    public function get_no(
+        $month,
+        $year,
+        $companyId,
+        $tipe_mutasi
+    ) {
+        $romanMonth = romanMonthNumber((int)$month);
+        // Tentukan template berdasarkan company
+        if ($tipe_mutasi == "PPBKB") {
+            // PENERIMAAN MUTASI PPBKB
+            switch ($companyId) {
+                case 1: // KIM 1 (FRZ)
+                    $numberTemplate = "/F/PM/PPBKB/$romanMonth/" . substr($year, -2);
+                    break;
+                case 2: // KIM 2
+                    $numberTemplate = "/PM/PPBKB/$romanMonth/" . substr($year, -2);
+                    break;
+                case 15: // GLOBAL
+                    $numberTemplate = "/G/PM/PPBKB/$romanMonth/" . substr($year, -2);
+                    break;
+                default: // OCS atau lainnya
+                    $numberTemplate = "/PM/PPBKB/$romanMonth/" . substr($year, -2);
+                    break;
             }
-            $lastPenerimaan++;
+        } else {
+            // PENERIMAAN MUTASI LOKAL
+            switch ($companyId) {
+                case 1: // KIM 1 (FRZ)
+                    $numberTemplate = "/F/PM/$romanMonth/" . substr($year, -2);
+                    break;
+                case 2: // KIM 2
+                    $numberTemplate = "/PM/$romanMonth/" . substr($year, -2);
+                    break;
+                case 15: // GLOBAL
+                    $numberTemplate = "/G/PM/$romanMonth/" . substr($year, -2);
+                    break;
+                default: // OCS atau lainnya
+                    $numberTemplate = "/PM/$romanMonth/" . substr($year, -2);
+                    break;
+            }
         }
 
-        $formattedLastPenerimaan = sprintf("%02d", $lastPenerimaan);
-        $generatedNo = $kode . '/' . $formattedLastPenerimaan . '/' . $lastStr;
 
-        return $generatedNo;
+        // Cari nomor terakhir berdasarkan template
+        $lastData = $this->asArray()
+            ->select('penerimaan_mutasi_no')
+            ->where('company_id', $companyId)
+            ->like('penerimaan_mutasi_no', $numberTemplate, 'before')
+            ->where('deletedAt', null)
+            ->where('tipe_mutasi', $tipe_mutasi)
+            ->orderBy('penerimaan_mutasi_no', 'DESC')
+            ->first();
+
+        // Nomor awal default
+        $invNumber = '001' . $numberTemplate;
+
+        if ($lastData && !empty($lastData['penerimaan_mutasi_no'])) {
+            // Ambil angka urutan terakhir
+            $parts = explode('/', $lastData['penerimaan_mutasi_no']);
+            $lastIncrement = isset($parts[0]) ? (int)$parts[0] : 0;
+            $newIncrement = $lastIncrement + 1;
+            $paddedNumber = str_pad($newIncrement, 3, '0', STR_PAD_LEFT);
+
+            $invNumber = $paddedNumber . $numberTemplate;
+        }
+        return $invNumber;
     }
 
     public function getPenerimaanBarangListReportPPBKB($addCondition, $limit = 10, $offset = 0)

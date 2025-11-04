@@ -182,16 +182,16 @@
                     <td>
                         <?= $d['kode_barang'] ?> <br>
                         <?= $d['hs_code'] ?> <br>
-                        <?= $d['barang'] ?>
+                        <?= $d['barang_name'] . " - " . $d['spesifikasi'] ?>
                     </td>
                     <td>
-                        <?= $d['qty'] ?> <br>
-                        <?= $d['satuan'] ?>
+                        <?= $d['mutasi']['qty_konversi'] ?> <br>
+                        <?= $d['mutasi']['unit_name_konversi'] ?>
                     </td>
                     <td>
-                        <?= $d['bc_type'] ?> <br>
-                        <?= $d['bc_type'] == "NON PABEAN" ? "-" : explode("-", $d['no_aju'])[3] ?> <br>
-                        <?= $d['stock_date'] ?>
+                        <?= $d['type_bc'] ?> <br>
+                        <?= $d['type_bc'] == "NON PABEAN" ? "-" : $d['dokumen_asal']['no_aju'] . " / " . $d['dokumen_asal']['no_daftar'] ?> <br>
+                        <?= $d['dokumen_asal']['tanggal_dokumen'] ?>
                     </td>
                 </tr> <br>
             <?php endforeach; ?>

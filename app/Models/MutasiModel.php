@@ -125,6 +125,7 @@ class MutasiModel extends Model
             ->join('warehouses', 'warehouses.id = mutasi.warehouse_tujuan_id', 'left')
             ->where('mutasi.divisi_asal_id', $divisiAsalId)
             ->where('status_posting', '1')
+            ->where('tipe_mutasi', "PPBKB")
             ->where('mutasi.deletedAt', null)
             ->findAll();
 

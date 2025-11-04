@@ -14,6 +14,9 @@
         <div class="card-body">
             <ul class="nav nav-tabs mb-3">
                 <li class="nav-item">
+                    <a class="nav-link" href="<?= base_url('penerimaan-mutasi/lokal') ?>">Penerimaan Mutasi Lokal</a>
+                </li>
+                <li class="nav-item">
                     <a class="nav-link active" href="#">Penerimaan Mutasi PPBKB</a>
                 </li>
                 <li class="nav-item">
@@ -22,43 +25,10 @@
             </ul>
             <?= csrf_field() ?>
             <div class="row mb-4">
-                <div class="col-sm-4 mt-2">
-                    <div class="form-floating">
-                        <select class="form-select divisi_id" id="divisi_id" name="divisi_id" aria-label="Floating label select example">
-                            <option value=""></option>
-                            <?php foreach ($dataDivisi as $divisi) : ?>
-                                <option value="<?= $divisi["id"]; ?>"><?= strtoupper($divisi["divisi"]); ?></option>
-                            <?php endforeach; ?>
-                        </select>
-                        <label style="z-index: 1;">Departemen Penerima</label>
-                    </div>
-                </div>
-                <div class="col-sm-4 mt-2">
-                    <div class="form-floating">
-                        <select class="form-select status" id="status" name="status" aria-label="Floating label select example">
-                            <option value="">SEMUA</option>
-                            <option value="1">POSTED</option>
-                            <option value="0">WAITING</option>
-                        </select>
-                        <label style="z-index: 1;">Status Penerimaan Mutasi</label>
-                    </div>
-                </div>
-                <div class="col-sm-4 mt-2">
-                    <div class="form-floating" style="height: 50px;">
-                        <input placeholder="" class="form-control search penerimaan_mutasi_no" id="search" name="search" aria-label="Floating label select example" />
-                        <label style="z-index: 1;" style="z-index: 1;">Cari Nomor Penerimaan Mutasi </label>
-                    </div>
-                </div>
-                <div class="col-sm-4 mt-2">
-                    <div class="form-floating" style="height: 50px;">
-                        <input placeholder="" class="form-control search multiple_no_mutasi" id="multiple_no_mutasi" name="multiple_no_mutasi" aria-label="Floating label select example" />
-                        <label style="z-index: 1;" style="z-index: 1;">Cari Nomor Mutasi </label>
-                    </div>
-                </div>
                 <div class="col-md-4 mt-2">
                     <div class="input-group">
                         <div class="form-floating" style="height: 50px;">
-                            <input placeholder="" class="form-control dateStart" id="dateStart" name="dateStart" aria-label="Floating label select example" />
+                            <input placeholder="" class="form-control dateStart" id="dateStart" name="dateStart" value="01/<?= date('m/Y') ?>" />
                             <label style="z-index: 1;" style="z-index: 1;">Tanggal Awal</label>
                         </div>
                         <div class="input-group-append" style="height:50px;">
@@ -71,7 +41,7 @@
                 <div class="col-md-4 mt-2">
                     <div class="input-group">
                         <div class="form-floating" style="height: 50px;">
-                            <input placeholder="" class="form-control dateEnd" id="dateEnd" name="dateEnd" aria-label="Floating label select example" />
+                            <input placeholder="" class="form-control dateEnd" id="dateEnd" name="dateEnd" />
                             <label style="z-index: 1;" style="z-index: 1;">Tanggal Akhir</label>
                         </div>
                         <div class="input-group-append" style="height:50px;">
@@ -81,24 +51,28 @@
                         </div>
                     </div>
                 </div>
+                <div class="col-sm-4 mt-2">
+                    <div class="form-floating" style="height: 50px;">
+                        <input placeholder="" class="form-control search" id="search" name="search" />
+                        <label style="z-index: 1;" style="z-index: 1;">Cari Data </label>
+                    </div>
+                </div>
             </div>
             <div class="table-responsive">
                 <table class="table table-bordered nowrap table-hover-tobasurimi dataTable" id="dataTable" width="100%" cellspacing="0">
                     <thead class="thead-dark">
                         <tr>
                             <th>No</th>
-                            <th onclick="changeSort('penerimaan_mutasi_no')">No Penerimaan Mutasi</th>
-                            <th onclick="changeSort('penerimaan_mutasi.multiple_mutasi_no')">Nomor Mutasi</th>
-                            <th onclick="changeSort('penerimaan_mutasi.tanggal')">Tanggal Penerimaan</th>
-                            <th onclick="changeSort('penerimaan_mutasi.divisi_id')">Departemen Penerima</th>
-                            <th>Departemen Pengirim</th>
-                            <th>Dokumen Mutasi Barang</th>
-                            <th>Total Item</th>
-                            <th>Status</th>
+                            <th onclick="changeSort('penerimaan_mutasi.penerimaan_mutasi_no')">No Penerimaan</th>
+                            <th onclick="changeSort('penerimaan_mutasi.divisi_id')">Dept</th>
+                            <th onclick="changeSort('penerimaan_mutasi.tanggal')">Tanggal</th>
+                            <th onclick="changeSort('penerimaan_mutasi.multiple_no_mutasi')">No Mutasi</th>
+                            <th>No Ppbkb</th>
+                            <th onclick="changeSort('penerimaan_mutasi.status_posting')">Status</th>
                             <th>Action</th>
                         </tr>
                     </thead>
-                    <tbody class="body-table" id="body-table" style="cursor: pointer;">
+                    <tbody class="body-table" id="body-table">
                     </tbody>
                 </table>
             </div>
@@ -115,7 +89,6 @@
     const csrfToken = '<?= csrf_token() ?>';
 
     const table = $('.dataTable').DataTable({
-
         processing: true,
         serverSide: true,
         ordering: true,
@@ -132,13 +105,9 @@
             url: "<?= base_url("penerimaan-mutasi/all"); ?>",
             dataSrc: "data",
             data: function(data) {
-                data.divisi_id = $(".divisi_id").val();
-                data.status = $(".status").val();
-                data.penerimaan_mutasi_no = $(".penerimaan_mutasi_no").val();
-                data.multiple_mutasi_no = $(".multiple_no_mutasi").val();
+                data.search = $("#search").val();
                 data.dateStart = $('#dateStart').val();
                 data.dateEnd = $('#dateEnd').val();
-
                 data.sort = sort;
                 data.sortType = sortType;
             }
@@ -157,41 +126,20 @@
             },
             {
                 data: "penerimaan_mutasi_no",
-                className: "text-center",
-
             },
             {
-                data: "multiple_no_mutasi",
-                className: "text-center",
-                searchable: false,
-                sortable: false,
+                data: "divisi",
             },
             {
                 data: "tanggal",
-                className: "text-center"
             },
             {
-                data: "divisi_penerima",
-                className: "text-center"
+                data: "multiple_no_mutasi",
             },
             {
-                data: "divisi_pengirim",
+                data: "no_ppbkb",
                 className: "text-center",
-                searchable: false,
-                sortable: false,
-            },
-
-            {
-                data: "dokumen_mutasi_barang",
-                className: "text-center",
-                searchable: false,
-                sortable: false
-            },
-            {
-                data: "total_item",
-                className: "text-center",
-                searchable: false,
-                sortable: false
+                orderable: false
             },
             {
                 data: "status_posting",
@@ -202,12 +150,12 @@
                     if (row.status_posting == "1") {
                         htmlRes += `
                         <div class="text-success">
-                            <b>SUDAH POSTING</b>
+                            <i class="fa-solid fa-check"></i>
                         </div>`
                     } else {
                         htmlRes += `
                         <div class="text-danger">
-                           <b>BELUM POSTING<b/>
+                            <i class="fa-solid fa-x"></i>
                         </div>`
                     }
 
@@ -227,6 +175,11 @@
                     if (status === "0") {
                         return `
                         <div class="mt-0">
+                        <?php if (can('Inventori', 'Penerimaan Mutasi', 'u')): ?>
+                            <a href="<?= base_url("penerimaan-mutasi/id"); ?>/${id}" data-toggle="tooltip" title="Edit" class="btn btn-primary">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                        <?php endif ?>
                         <?php if (can('Inventori', 'Penerimaan Mutasi', 'a')) : ?>
                             <button data-toggle="tooltip" title="Posting" onclick="posting('${id}')" class="btn btn-success posting-spp">
                                 <i class="fa fa-paper-plane fa-sm" aria-hidden="true"></i>
@@ -246,6 +199,17 @@
                     `
                     } else {
                         return `
+                        <?php if (can('Warehouse', 'Penerimaan Mutasi', 'u')): ?>
+                            <a href="<?= base_url("penerimaan-mutasi/id"); ?>/${id}" data-toggle="tooltip" title="Edit" class="btn btn-primary">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                        <?php endif ?>
+                          <?php if (can('Inventori', 'Penerimaan Mutasi', 'ua')): ?>
+                           <button data-toggle="tooltip" title="Unpost" class="btn btn-danger btn-print" onclick="unposting('${id}')" style="box-shadow: none !important;">
+                                <i class="fa fa-ban fa-sm" aria-hidden="true"></i>
+                            </button>
+                        <?php endif ?>
+
                         <?php if (can('Inventori', 'Penerimaan Mutasi', 'p')) : ?>
                             <button data-toggle="tooltip" title="Print" class="btn btn-warning btn-print" onclick="print('<?= base_url("penerimaan-mutasi/print/"); ?>${id}')" style="box-shadow: none !important;">
                                 <i class="fa fa-print fa-sm" aria-hidden="true"></i>
@@ -278,6 +242,7 @@
         }
     });
 
+
     $(".dateStart").datepicker({
         todayHighlight: true,
         format: "dd/mm/yyyy",
@@ -292,46 +257,12 @@
         autoclose: true
     })
 
-    $('#divisi_id').select2({
-        placeholder: "Pilih Departemen Penerima",
-        theme: "bootstrap-5",
-        allowClear: true
-    }).change(function() {
-        table.ajax.reload();
-    });
-
-    $('#status').select2({
-        placeholder: "Pilih Status",
-        theme: "bootstrap-5",
-        allowClear: true
-    }).change(function() {
-        table.ajax.reload();
-    });
-
-    $('#multiple_no_mutasi').keyup(function() {
+    $('#search').keyup(function() {
         table.ajax.reload();
     })
-
 
     $('#dateStart,#dateEnd').change(function() {
         table.ajax.reload();
-    });
-
-    $("#divisi_id,#status")
-        .parent('div')
-        .children('span')
-        .children('span')
-        .children('span')
-        .children('span')
-        .css('margin-top', '22px').css('margin-left', '-7px');
-
-    $(".penerimaan_mutasi_no").keyup(function() {
-        table.ajax.reload();
-    })
-
-    $('#dataTable tbody').on('click', 'tr td:not(.actions):not(.dataTables_empty)', function() {
-        const data = table.row(this).data();
-        location.replace(`<?= base_url("penerimaan-mutasi/id"); ?>/${data.id}`);
     });
 
 
@@ -426,18 +357,6 @@
                 });
             }
         })
-    }
-
-    const print = function(url) {
-        window.open(url, "_blank");
-    }
-    const changeSort = function(val) {
-        if (sort !== val) {
-            sortType = "asc";
-            sort = val;
-        } else {
-            sortType = sortType === "asc" ? "desc" : "asc";
-        }
     }
 </script>
 

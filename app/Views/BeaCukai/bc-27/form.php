@@ -9,7 +9,7 @@
 <section class="section section-form">
 
     <div class="section-header">
-        <h1 class="title-name"><?= !empty($bc27) ? "Update Dokumen BC 2.7" : "Tambah Dokumen BC 2.7" ?></h1>
+        <h1 class="title-name"><?= !empty($bc27) ? "Update Dokumen BC 2.7 Out" : "Tambah Dokumen BC 2.7 Out" ?></h1>
         <div class="col-button-tambah-spp">
             <a class="btn btn-hide-form btn-discard float-right root-form-view" href="<?= base_url("bea-cukai-bc-27"); ?>">
                 Kembali
@@ -19,28 +19,28 @@
                     Form Ceisa
                 </a>
                 <?php if ($bc27['status_posting'] == "0") : ?>
-                    <?php if (can('Bea Cukai', 'BC 2.7', 'd')) : ?>
+                    <?php if (can('Bea Cukai', 'BC 2.7 Out', 'd')) : ?>
                         <button class="btn btn-hapus delete-parent float-right" onclick="deleteAction()">
                             Hapus
                         </button>
                     <?php endif; ?>
                 <?php endif; ?>
                 <?php if ($bc27['status_posting'] == "0") : ?>
-                    <?php if (can('Bea Cukai', 'BC 2.7', 'a')) : ?>
+                    <?php if (can('Bea Cukai', 'BC 2.7 Out', 'a')) : ?>
                         <button class="btn btn-success posting-spp float-right posting-mutasi" onclick="postingAction()">
                             Posting
                         </button>
                     <?php endif; ?>
                 <?php endif; ?>
                 <?php if ($bc27['status_posting'] == "0") : ?>
-                    <?php if (can('Bea Cukai', 'BC 2.7', 'u')) : ?>
+                    <?php if (can('Bea Cukai', 'BC 2.7 Out', 'u')) : ?>
                         <button class="btn btn-show-form btn-save float-right btn-submit-parent">
                             Simpan
                         </button>
                     <?php endif; ?>
                 <?php endif; ?>
             <?php else : ?>
-                <?php if (can('Bea Cukai', 'BC 2.7', 'c')) : ?>
+                <?php if (can('Bea Cukai', 'BC 2.7 Out', 'c')) : ?>
                     <button class="btn btn-show-form btn-save float-right btn-submit-parent">
                         Simpan
                     </button>
@@ -57,7 +57,32 @@
             <form class="create-form">
                 <?= csrf_field() ?>
                 <input type="hidden" name="id" id="id" class="id" value="<?= !empty($bc27) ? encrypt($bc27['id']) : '' ?>">
+
                 <div class="row">
+                    <div class="col-sm-4">
+                        <div class="input-group input-group-password">
+                            <div class="form-floating mb-3">
+                                <input <?= !empty($bc27) ? ($bc27['status_posting'] == "1" ? "disabled" : "") : '' ?> value="<?= !empty($bc27) ? date('d/m/Y', strtotime($bc27['createdAt'])) : date('d/m/Y') ?>" autocomplete="one-time-code" type="text" class="form-control tanggal" id="tanggal" name="tanggal" placeholder="Tanggal Dokumen">
+                                <label for="floatingInput">Tanggal Dokumen</label>
+                            </div>
+                            <div class="input-group-prepend group-prepend-password align-items-center">
+                                <i style="cursor: pointer; z-index: 99; margin-bottom: 21px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-po-date"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-4">
+                        <div class="input-group">
+                            <div class="form-floating mb-3">
+                                <input value="<?= !empty($bc27) ? $bc27['no_aju'] : $noAju ?>" name="no_aju" readonly type="text" id="no_aju" class="form-control no_aju" placeholder="">
+                                <label>Nomor Pengajuan</label>
+                            </div>
+                            <div class="input-group-append" style="height:50px;">
+                                <button <?= !empty($bc27) ? ($bc27['status_posting'] == "1" ? "disabled" : "") : '' ?> class="btn btn-success btn-customer-add" id="btn-customer-add" data-toggle="modal" type="button" onclick="noAjuShowModal()">
+                                    <i class="fas fa-pencil-alt"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
                     <div class="col-sm-4">
                         <div class="form-floating mb-3 mt-1" style="height: 50px;">
                             <select <?= !empty($bc27) ? ($bc27['status_posting'] == "1" ? "disabled" : "") : '' ?> class="form-select company_tujuan_id" id="company_tujuan_id" name="company_tujuan_id" aria-label="Floating label select example">
@@ -103,34 +128,11 @@
                             <label for="floatingInput" style="z-index: 1;">Warehouse Asal</label>
                         </div>
                     </div>
-                    <div class="col-sm-4">
-                        <div class="input-group">
-                            <div class="form-floating mb-3">
-                                <input value="<?= !empty($bc27) ? $bc27['no_aju'] : $noAju ?>" name="no_aju" readonly type="text" id="no_aju" class="form-control no_aju" placeholder="">
-                                <label>Nomor Pengajuan</label>
-                            </div>
-                            <div class="input-group-append" style="height:50px;">
-                                <button <?= !empty($bc27) ? ($bc27['status_posting'] == "1" ? "disabled" : "") : '' ?> class="btn btn-success btn-customer-add" id="btn-customer-add" data-toggle="modal" type="button" onclick="noAjuShowModal()">
-                                    <i class="fas fa-pencil-alt"></i>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
+
                     <div class="col-sm-4">
                         <div class="form-floating mb-3">
                             <input <?= !empty($bc27) ? ($bc27['status_posting'] == "1" ? "disabled" : "") : '' ?> value="<?= !empty($bc27) ? $bc27['no_daftar'] : $noAju ?>" autocomplete="one-time-code" type="number" class="form-control no_daftar" id="no_daftar" name="no_daftar" placeholder="No Daftar">
                             <label for="floatingInput">Nomor Daftar</label>
-                        </div>
-                    </div>
-                    <div class="col-sm-4">
-                        <div class="input-group input-group-password">
-                            <div class="form-floating mb-3">
-                                <input <?= !empty($bc27) ? ($bc27['status_posting'] == "1" ? "disabled" : "") : '' ?> value="<?= !empty($bc27) ? date('d/m/Y', strtotime($bc27['createdAt'])) : "" ?>" autocomplete="one-time-code" type="text" class="form-control tanggal" id="tanggal" name="tanggal" placeholder="Tanggal Dokumen">
-                                <label for="floatingInput">Tanggal Dokumen</label>
-                            </div>
-                            <div class="input-group-prepend group-prepend-password align-items-center">
-                                <i style="cursor: pointer; z-index: 99; margin-bottom: 21px; margin-left: -30px; border: 0px" class="fa fa-calendar icon-form icon-po-date"></i>
-                            </div>
                         </div>
                     </div>
                 </div>
@@ -190,24 +192,23 @@
                         <table class="table table-bordered nowrap table-hover-tobasurimi dataTable" id="dataTable" width="100%" border="1" cellspacing="0">
                             <thead class="thead-dark">
                                 <tr>
-                                    <th style="text-align: center;">No</th>
-                                    <th style="text-align: center;">Tipe Barang</th>
-                                    <th style="text-align: center;">Asal Barang</th>
-                                    <th style="text-align: center;">No Dokumen</th>
-                                    <th style="text-align: center;">Supplier</th>
-                                    <th style="text-align: center;">Dokumen Pabean</th>
-                                    <th style="text-align: center;">Tgl Penerimaan</th>
-                                    <th style="text-align: center;">Barang - Spesifikasi</th>
-                                    <th style="text-align: center;">Qty Mutasi</th>
-                                    <th style="text-align: center;">Satuan</th>
-                                    <th style="text-align: center;">Aksi</th>
+                                    <th>No</th>
+                                    <th>Kode Barang</th>
+                                    <th>Barang</th>
+                                    <th>Spesifikasi</th>
+                                    <th>Qty Mutasi</th>
+                                    <th>Satuan</th>
+                                    <th>Dokumen Pemasukan</th>
+                                    <th>No Aju / No Daftar</th>
+                                    <th>Tgl Dokumen</th>
+                                    <th>Aksi</th>
                                 </tr>
                             </thead>
                             <tbody class="body-table">
                             </tbody>
                             <tfoot class="foot-detail-table" id="foot-detail-table">
                                 <tr>
-                                    <td colspan="11" style="text-align: center;">
+                                    <td colspan="10">
                                         Tidak Ada Barang
                                     </td>
                                 </tr>
@@ -327,14 +328,8 @@
                         </div>
 
                         <div class="col-md-6">
-                            <div class="form-floating mb-3">
-                                <input autocomplete="one-time-code" readonly type="text" class="form-control tipe_barang_name" id="tipe_barang_name" name="tipe_barang_name" placeholder="Tipe Barang">
-                                <label for="floatingInput">Tipe Barang</label>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
                             <div class="form-floating" style="height: 50px;">
-                                <select <?= !empty($bc27) ? ($bc27['status_posting'] == '1' ? 'disabled' : '') : '' ?> class="form-select stock_mutasi_id" name="stock_mutasi_id" id="stock_mutasi_id">
+                                <select <?= !empty($bc27) ? ($bc27['status_posting'] == '1' ? 'disabled' : '') : '' ?> class="form-select spesifikasi_hasil_id" name="spesifikasi_hasil_id" id="spesifikasi_hasil_id">
                                     <option value=""></option>
                                 </select>
                                 <label for="floatingInput" style="z-index: 1;">Pilih Barang Masuk</label>
@@ -424,13 +419,65 @@
 
     });
 
-    $('#stock_mutasi_id').select2({
+    $('#spesifikasi_hasil_id').select2({
         placeholder: "Pilih Barang Masuk",
         theme: "bootstrap-5",
         allowClear: true,
-        dropdownParent: $('#update_barang_masuk')
-    }).change(function() {
+        dropdownParent: $('#update_barang_masuk'),
+        ajax: {
+            url: '<?= base_url('penerimaan-mutasi/list-barang-masuk'); ?>',
+            dataType: 'json',
+            delay: 250,
+            data: function(params) {
+                return {
+                    q: params.term,
+                    company_tujuan_id: "<?= session()->get('login')->this_company_id ?>"
+                };
+            },
+            processResults: function(data) {
+                // Pastikan server mengembalikan data dengan struktur yang lengkap
+                return {
+                    results: $.map(data.data, function(item) {
+                        return {
+                            id: item.id,
+                            text: item.text,
+                            satuan_1: item.satuan_1,
+                            kode_barang: item.kode_barang,
+                            barang_name: item.barang_name,
+                            spesifikasi: item.spesifikasi
+                        };
+                    })
+                };
+            },
+            cache: false
+        },
+        minimumInputLength: 1
+    });
 
+    $('#unit_hasil_id').select2({
+        placeholder: "Pilih Satuan Masuk",
+        theme: "bootstrap-5",
+        allowClear: false,
+        dropdownParent: $('#update_barang_masuk')
+    });
+
+    $('#spesifikasi_hasil_id').on('select2:select', function(e) {
+        e.preventDefault();
+        var data = e.params.data;
+        var selectedOption = $(this).find('option:selected');
+        selectedOption.data('satuan_1', data.satuan_1);
+        selectedOption.data('kode_barang', data.kode_barang);
+        selectedOption.data('barang_name', data.barang_name);
+        selectedOption.data('spesifikasi', data.spesifikasi);
+
+        // Trigger change event manual
+        $(this).trigger('change');
+    });
+
+    $('#spesifikasi_hasil_id').change(function(e) {
+        e.preventDefault();
+        var satuan_id = $('#spesifikasi_hasil_id option:selected').data('satuan_1');
+        $('#unit_hasil_id').val(satuan_id).change();
     });
 
     $('#mutasi_global_id').select2({
@@ -447,7 +494,7 @@
         getListMutasiDetail();
     });
 
-    $("#company_tujuan_id,#mutasi_global_id,#divisi_tujuan_id,#warehouse_tujuan_id,#mutasi_global_id,#stock_mutasi_id")
+    $("#company_tujuan_id,#mutasi_global_id,#divisi_tujuan_id,#warehouse_tujuan_id,#mutasi_global_id,#spesifikasi_hasil_id,#unit_hasil_id")
         .parent('div')
         .children('span')
         .children('span')
@@ -493,12 +540,14 @@
         var noAju = $('#no_pengajuan').val();
         var tanggalPengajuanSplit = tanggalPengajuan.split("/");
         var noPengajuanSplit = noAju.split("-");
-        $('#no_pengajuan').val(noPengajuanSplit[0] + '-' + noPengajuanSplit[1] + '-' + tanggalPengajuanSplit[2] + '' + tanggalPengajuanSplit[1] + '' + tanggalPengajuanSplit[0] + '-' + noPengajuanSplit[3]);
+        $('#no_pengajuan,#no_aju').val(noPengajuanSplit[0] + '-' + noPengajuanSplit[1] + '-' + tanggalPengajuanSplit[2] + '' + tanggalPengajuanSplit[1] + '' + tanggalPengajuanSplit[0] + '-' + noPengajuanSplit[3]);
     });
 
     $('#ubahNoAjuButton').click(function(e) {
         e.preventDefault();
-        checkNoAju();
+        var no_pengajuan = $('#no_pengajuan').val();
+        $('#no_aju').val(no_pengajuan);
+        $('#modalUpdateNoAju').modal('hide');
     });
 
     $('#tanggal').datepicker({
@@ -506,6 +555,13 @@
         format: "dd/mm/yyyy",
         orientation: "bottom auto",
         autoclose: true
+    });
+
+    $('#tanggal').change(function(e) {
+        e.preventDefault();
+        var tanggal = $('#tanggal').val();
+        // GENERATE NO AJU
+        generateNomorAju(tanggal);
     });
 
     // VALIDATOR
@@ -579,17 +635,17 @@
                 })
             } else {
 
-                // Validasi Apakah stock_mutasi_id sudah diterapkan jikalau checked true
+                // Validasi Apakah spesifikasi_hasil_id sudah diterapkan jikalau checked true
                 var error = false;
                 var noAju = '';
                 var bcType = '';
                 var namaBarang = '';
                 if (checked) {
                     for (let i = 0; i < listData.length; i++) {
-                        if (listData[i].stock_mutasi_id == '' || listData[i].stock_mutasi_id == null) {
-                            noAju = listData[i].no_aju;
-                            bcType = listData[i].bc_type;
-                            namaBarang = listData[i].barang;
+                        if (listData[i].mutasi.spesifikasi_hasil_id == '' || listData[i].mutasi.spesifikasi_hasil_id == null) {
+                            noAju = listData[i].dokumen_asal.no_aju;
+                            bcType = listData[i].type_bc;
+                            namaBarang = listData[i].barang_name + " " + listData[i].spesifikasi;
                             error = true;
                         }
                     }
@@ -614,72 +670,46 @@
                         cancelButtonText: 'Kembali',
                     }).then((result) => {
                         if (result.isConfirmed) {
+                            var id = $('#id').val();
+                            var url = id == '' ? `<?= base_url("bea-cukai-bc-27/save"); ?>` : `<?= base_url("bea-cukai-bc-27/update"); ?>`;
                             var formData = new FormData(document.querySelector(".create-form"));
                             formData.append('barang', JSON.stringify(listData))
-                            var id = $('#id').val();
-                            if (id) {
-                                // UPDATE
-                                $.ajax({
-                                    url: `<?= base_url("bea-cukai-bc-27/update"); ?>`,
-                                    method: "POST",
-                                    data: formData,
-                                    beforeSend: function(xhr) {
-                                        setLoading();
-                                        xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                                    },
-                                    complete: function() {
-                                        stopLoading();
-                                    },
-                                    method: "POST",
-                                    dataType: "json",
-                                    processData: false,
-                                    contentType: false,
-                                    success: function(res) {
-                                        if (res.status) {
-                                            Swal.fire({
-                                                icon: 'success',
-                                                title: res.message,
-                                                confirmButtonColor: '#4e73df',
-                                                confirmButtonText: 'Ok'
-                                            }).then((result) => {
-                                                location.href = "<?= base_url('bea-cukai-bc-27') ?>"
-                                            });
+                            $.ajax({
+                                url: url,
+                                method: "POST",
+                                data: formData,
+                                beforeSend: function(xhr) {
+                                    setLoading();
+                                    xhr.setRequestHeader('X-CSRF-Token', csrf.val());
+                                },
+                                complete: function() {
+                                    stopLoading();
+                                },
+                                method: "POST",
+                                dataType: "json",
+                                processData: false,
+                                contentType: false,
+                                success: function(res) {
+                                    if (res.status) {
+                                        Swal.fire({
+                                            icon: 'success',
+                                            title: res.message,
+                                            confirmButtonColor: '#4e73df',
+                                            confirmButtonText: 'Ok'
+                                        }).then((result) => {
+                                            location.href = "<?= base_url('bea-cukai-bc-27') ?>"
+                                        });
 
-                                        }
+                                    } else {
+                                        Swal.fire({
+                                            icon: 'error',
+                                            title: res.message,
+                                            confirmButtonColor: '#4e73df',
+                                            confirmButtonText: 'Ok'
+                                        })
                                     }
-                                })
-                            } else {
-                                // CREATE
-                                $.ajax({
-                                    url: `<?= base_url("bea-cukai-bc-27/save"); ?>`,
-                                    method: "POST",
-                                    data: formData,
-                                    beforeSend: function(xhr) {
-                                        setLoading();
-                                        xhr.setRequestHeader('X-CSRF-Token', csrf.val());
-                                    },
-                                    complete: function() {
-                                        stopLoading();
-                                    },
-                                    method: "POST",
-                                    dataType: "json",
-                                    processData: false,
-                                    contentType: false,
-                                    success: function(res) {
-                                        if (res.status) {
-                                            Swal.fire({
-                                                icon: 'success',
-                                                title: res.message,
-                                                confirmButtonColor: '#4e73df',
-                                                confirmButtonText: 'Ok'
-                                            }).then((result) => {
-                                                location.href = "<?= base_url('bea-cukai-bc-27') ?>"
-                                            });
-
-                                        }
-                                    }
-                                })
-                            }
+                                }
+                            })
                         }
                     })
 
@@ -700,7 +730,10 @@
 
     var validatorBarangMasuk = $(".create-form-barang-masuk").validate({
         rules: {
-            stock_mutasi_id: {
+            spesifikasi_hasil_id: {
+                required: true
+            },
+            unit_hasil_id: {
                 required: true
             },
             qty_diterima_current: {
@@ -708,8 +741,11 @@
             },
         },
         messages: {
-            stock_mutasi_id: {
+            spesifikasi_hasil_id: {
                 required: "Barang masuk wajib diisi"
+            },
+            unit_hasil_id: {
+                required: "Satuan wajib diisi"
             },
             qty_diterima_current: {
                 required: "Qty diterima masuk wajib diisi"
@@ -741,24 +777,33 @@
         e.preventDefault();
         if ($('.create-form-barang-masuk').valid()) {
             var id = $('#mutasi_global_detail_id').val();
-            var stockMutasiId = $('#stock_mutasi_id option:selected').val();
+            var spesifikasiHasilId = $('#spesifikasi_hasil_id option:selected').val();
+            var unitHasilId = $('#spesifikasi_hasil_id option:selected').data('satuan_1');
+            var kodeBarang = $('#spesifikasi_hasil_id option:selected').data('kode_barang');
+            var barangName = $('#spesifikasi_hasil_id option:selected').data('barang_name');
+            var spesifikasi = $('#spesifikasi_hasil_id option:selected').data('spesifikasi');
+
             var divisiTujuanId = $('#divisi_tujuan_id option:selected').val();
             var warehouseTujuanId = $('#warehouse_tujuan_id option:selected').val();
             var companyTujuanId = $('#company_tujuan_id option:selected').val();
 
             var index = 0;
-            var qtyBarangDiterima = parseFloat($('#qty_diterima_current').val());
             $.each(listData, function(i, v) {
-                if (v.mutasi_global_detail_id == id) {
+                if (v.id == id) {
                     index = i;
                 }
             });
 
-            listData[index].stock_mutasi_id = stockMutasiId;
-            listData[index].qty_diterima = qtyBarangDiterima;
-            listData[index].divisi_tujuan_id = divisiTujuanId;
-            listData[index].warehouse_tujuan_id = warehouseTujuanId;
-            listData[index].company_tujuan_id = companyTujuanId;
+            console.log(unitHasilId);
+
+            listData[index].mutasi.spesifikasi_hasil_id = spesifikasiHasilId;
+            listData[index].mutasi.kode_barang = kodeBarang;
+            listData[index].mutasi.barang_name = barangName;
+            listData[index].mutasi.spesifikasi = spesifikasi;
+            listData[index].mutasi.unit_hasil_id = unitHasilId;
+            listData[index].mutasi.divisi_tujuan_id = divisiTujuanId;
+            listData[index].mutasi.warehouse_tujuan_id = warehouseTujuanId;
+            listData[index].mutasi.company_tujuan_id = companyTujuanId;
 
             $('#update_barang_masuk').modal('hide');
             drawTable(listData);
@@ -783,21 +828,20 @@
 
             var barangFirst = null;
             $.each(listData, function(i, v) {
-                if (v.mutasi_global_detail_id == id) {
+                if (v.id == id) {
                     barangFirst = v;
                 }
             });
 
             var nomorAju = $('#no_aju').val();
             var companyAsalName = $('#company_tujuan_id option:selected').text();
-            var barangDikirim = barangFirst.kode_barang + ' / ' + barangFirst.barang;
-            var dokumenMutasi = barangFirst.bc_mutasi_name + ' / ' + nomorAju;
-            var dokumenAsal = barangFirst.bc_type + ' / ' + barangFirst.no_aju;
+            var barangDikirim = barangFirst.kode_barang + ' / ' + barangFirst.barang_name + " - " + barangFirst.spesifikasi;
+            var dokumenMutasi = 'BC 2.7 / ' + nomorAju;
+            var dokumenAsal = barangFirst.type_bc == "NON PABEAN" ? "" : (barangFirst.dokumen_asal.no_aju == null ? "" : barangFirst.dokumen_asal.no_daftar + ' / ' + barangFirst.dokumen_asal.no_aju);
             var divisiTujuan = $('#divisi_tujuan_id option:selected').text();
             var warehouseTujuan = $('#warehouse_tujuan_id option:selected').text();
-            var tipeBarangText = barangFirst.type_barang_text;
-            var tipeBarang = barangFirst.type_barang;
-            var qtyDiterimaCurrent = barangFirst.qty;
+            var qtyDiterimaCurrent = barangFirst.mutasi.qty_konversi;
+            var unitHasilId = barangFirst.mutasi.unit_hasil_id;
 
             $('#company_tujuan_name').val(companyAsalName.trim());
             $('#barang_keluar_name').val(barangDikirim);
@@ -805,40 +849,29 @@
             $('#dokumen_asal_name').val(dokumenAsal);
             $('#divisi_penerima_name').val(divisiTujuan.trim());
             $('#warehouse_penerima_name').val(warehouseTujuan.trim());
-            $('#tipe_barang_name').val(tipeBarangText);
             $('#qty_diterima_current').val(qtyDiterimaCurrent);
-            // APPEND TO HIDDEN ELEMENT
             $('#mutasi_global_detail_id').val(id);
-            $('#tipe_barang').val(tipeBarang);
-            // AJAX DROPDOWN BARANG
-            $.ajax({
-                url: `<?= base_url('penerimaan-mutasi/list-barang-masuk'); ?>`,
-                method: "GET",
-                beforeSend: function() {
-                    setLoading();
-                },
-                complete: function() {
-                    stopLoading();
-                },
-                data: {
-                    tipe_barang: tipeBarang,
-                    divisi_id: $("#divisi_tujuan_id option:selected").val(),
-                    warehouse_id: $("#warehouse_tujuan_id option:selected").val(),
-                },
-                dataType: "json",
-                success: function(res) {
-                    $('#update_detail_barang').modal('show')
+            $('#unit_hasil_id').val(unitHasilId).change();
+            // Reset dan isi spesifikasi
+            const $spesifikasi = $("#spesifikasi_hasil_id");
+            $spesifikasi.empty()
+                .append('<option value=""></option>')
+                .append(`
+                <option 
+                    data-satuan_1="${barangFirst.mutasi.unit_hasil_id}"
+                    data-kode_barang="${barangFirst.mutasi.kode_barang}" 
+                    data-barang_name="${barangFirst.mutasi.barang_name}" 
+                    data-spesifikasi="${barangFirst.mutasi.spesifikasi}" 
+                    selected 
+                    value="${barangFirst.mutasi.spesifikasi_hasil_id}">
+                    (${barangFirst.mutasi.kode_barang}) ${barangFirst.mutasi.barang_name} - ${barangFirst.mutasi.spesifikasi}
+                </option>
+            `)
+                .val(barangFirst.mutasi.spesifikasi_hasil_id)
+                .trigger('change');
+            $('#spesifikasi_hasil_id').val(barangFirst.mutasi.spesifikasi_hasil_id).change();
+            $('#update_barang_masuk').modal('show');
 
-                    $("#stock_mutasi_id").empty()
-                    $("#stock_mutasi_id").append(`<option value=""></option>`)
-                    res.data.forEach(function(item) {
-                        $("#stock_mutasi_id").append(`<option data-stock_mutasi_id="${item.stock_id}" data-kode_barang="${item.kode_barang}" data-barang="${item.barang}" data-kode_satuan="${item.kode_satuan}" value="${item.stock_id}">(${item.kode_barang}) ${item.barang}</option>`)
-                    })
-                    $("#stock_mutasi_id").val(barangFirst.stock_mutasi_id).change();
-
-                    $('#update_barang_masuk').modal('show');
-                }
-            });
         }
     }
 
@@ -860,19 +893,12 @@
         $('#modalUpdateNoAju').modal('show');
     }
 
-    function checkNoAju() {
+    function generateNomorAju(tanggal) {
         $.ajax({
-            url: `<?= base_url('bea-cukai-bc-27/check-no-aju'); ?>`,
+            url: `<?= base_url('bea-cukai-bc-27/generate-no-aju'); ?>`,
             method: "GET",
-            beforeSend: function() {
-                setLoading();
-            },
-            complete: function() {
-                stopLoading();
-            },
             data: {
-                id: $("#id").val(),
-                no_aju: $('#no_pengajuan').val()
+                tanggal: tanggal
             },
             dataType: "json",
             success: function(res) {
@@ -882,16 +908,13 @@
                         title: res.message,
                         confirmButtonColor: '#4e73df',
                         confirmButtonText: 'Ok'
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            // ERROR
-                        }
-                    })
+                    });
                 } else {
                     // APPEND
-                    var noPengajuan = $('#no_pengajuan').val();
-                    $('#no_aju').val(noPengajuan);
-                    $('#modalUpdateNoAju').modal('hide');
+                    if (res.data != '') {
+                        $('#no_aju').val(res.data).change();
+                        $('#no_pengajuan').val(res.data).change();
+                    }
                 }
             }
         });
@@ -977,33 +1000,31 @@
 
         if (listData.length === 0) {
             var newRow = $('<tr>');
-            newRow.append($('<td colspan="11" style="text-align:center">Tidak Ada Barang</td>'));
+            newRow.append($('<td colspan="10" >Tidak Ada Barang</td>'));
             table.find('tfoot').append(newRow);
         } else {
             var checked = $('#penerimaan_otomatis').is(':checked');
-
             $.each(listData, function(i, v) {
                 var newRow = $('<tr style="color:whitesmoke;">');
-                newRow.append($('<td style="text-align: center;">').html(
+                newRow.append($('<td >').html(
                     `
                             ${no++} 
                         `
                 ));
-                newRow.append($('<td style="text-align: center;">').text(v.type_barang_text));
-                newRow.append($('<td style="text-align: center;">').text(v.sumber));
-                newRow.append($('<td style="text-align: center;">').text(v.stock_dokumen));
-                newRow.append($('<td style="text-align: center;">').text(v.supplier_name));
-                newRow.append($('<td style="text-align: center;">').text(v.bc_type + " / " + v.no_aju));
-                newRow.append($('<td style="text-align: center;">').text(v.stock_date));
-                newRow.append($('<td style="text-align: center;">').text(v.barang));
-                newRow.append($('<td style="text-align: center;">').text(v.qty));
-                newRow.append($('<td style="text-align: center;">').text(v.satuan));
+                newRow.append($('<td >').text(v.kode_barang));
+                newRow.append($('<td >').text(v.barang_name));
+                newRow.append($('<td >').text(v.spesifikasi));
+                newRow.append($('<td >').text(greatFormatRupiah(v.mutasi.qty_konversi)));
+                newRow.append($('<td >').text(v.mutasi.unit_name_konversi));
+                newRow.append($('<td >').text(v.type_bc));
+                newRow.append($('<td >').text(v.dokumen_asal.no_aju == null ? "" : v.dokumen_asal.no_aju + ' / ' + v.dokumen_asal.no_daftar));
+                newRow.append($('<td >').text(v.dokumen_asal.no_aju == null ? "" : v.dokumen_asal.tanggal_dokumen));
                 if (checked) {
-                    newRow.append($('<td style="text-align: center;">').html(`
-                    <button type="button" class="btn btn-primary" onclick="displayDetailModal(${v.mutasi_global_detail_id})" data-toggle="tooltip"><i class="fas fa-pencil-alt"></i></button>
+                    newRow.append($('<td >').html(`
+                    <button type="button" class="btn btn-primary" onclick="displayDetailModal(${v.id})" data-toggle="tooltip"><i class="fas fa-pencil-alt"></i></button>
                 `));
                 } else {
-                    newRow.append($('<td style="text-align: center;">').text(''));
+                    newRow.append($('<td >').text(''));
                 }
 
                 table.find('tbody').append(newRow);
@@ -1131,6 +1152,13 @@
                                 if (result.isConfirmed) {
                                     location.href = "<?= base_url('bea-cukai-bc-27') ?>"
                                 }
+                            });
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: res.message,
+                                confirmButtonColor: '#4e73df',
+                                confirmButtonText: 'Ok'
                             });
                         }
                     }
