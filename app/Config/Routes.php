@@ -2849,6 +2849,8 @@ $routes->get('/laporan-supplier-lokal-bb/rekap-all-supplier', 'Laporan\Supplier\
 $routes->get('/laporan-supplier-lokal-bb/rekap-all-supplier/all-rekap-all-supplier', 'Laporan\Supplier\LaporanSupplierLokalBB::allLaporanRekapAllSupplier', ['filter' => 'Auth']);
 $routes->get('/laporan-supplier-lokal-bb/rekap-all-supplier/print', 'Laporan\Supplier\LaporanSupplierLokalBB::exportPDFLaporanRekapAllSupplier', ['filter' => 'Auth']);
 $routes->get('/laporan-supplier-lokal-bb/rekap-all-supplier/print-excel', 'Laporan\Supplier\LaporanSupplierLokalBB::exportExcelLaporanRekapAllSupplier', ['filter' => 'Auth']);
+$routes->get('/laporan-supplier-lokal-bb/rekap-all-supplier/print-per-spek', 'Laporan\Supplier\LaporanSupplierLokalBB::exportPDFLaporanRekapAllSupplierPerSpek', ['filter' => 'Auth']);
+$routes->get('/laporan-supplier-lokal-bb/rekap-all-supplier/print-excel-per-spek', 'Laporan\Supplier\LaporanSupplierLokalBB::exportExcelLaporanRekapAllSupplierPerSpek', ['filter' => 'Auth']);
 
 $routes->get('/laporan-supplier-lokal-bb/rekap-all-barang', 'Laporan\Supplier\LaporanSupplierLokalBB::laporanRekapAllBarang', ['filter' => 'Auth']);
 $routes->get('/laporan-supplier-lokal-bb/rekap-all-barang/all-rekap-all-barang', 'Laporan\Supplier\LaporanSupplierLokalBB::allLaporanRekapAllBarang', ['filter' => 'Auth']);
