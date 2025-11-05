@@ -107,38 +107,37 @@
 
 <body>
     <?php if (!empty($dataPengembalianBarang)) { ?>
+        <div class="w-100 d-flex content-between" style="margin-top: -20px;">
+            <b>
+                <?= $company['holding_company'] ?> (<?= $company['company'] ?>)<br>
+            </b>
+        </div><br>
         <div class="txt-center"><span class="title"> <?= strtoupper($title) ?></span></div>
         <table class="w-100 mt-050">
             <tr>
                 <td>
-                    <div><span class="txt-bold">No. Surat Jalan : <?= $dataPengembalianBarang['no_surat_jalan']; ?></span></div>
-                </td>
-                <td>
                     <div><span class="txt-bold">Supplier : <?= $dataPengembalianBarang['supplier_name']; ?></span></div>
                 </td>
                 <td>
-                    <div><span class="txt-bold">Tanggal Retur: <?= date('d/m/Y', strtotime($dataPengembalianBarang['tanggal_surat_jalan'])) ?></span></div>
+                    <div><span class="txt-bold">Alamat : <?= $dataPengembalianBarang['address'] ?></span></div>
                 </td>
             </tr>
             <tr>
                 <td>
-                    <div><span class="txt-bold">Keterangan: <?= $dataPengembalianBarang['keterangan']; ?></span></div>
+                    <div><span class="txt-bold">No LPB : <?= str_replace(',', ', ', str_replace(['[', ']', '"', "\\"], '', $dataPengembalianBarang['multiple_lpb_no'])) ?></span></div>
                 </td>
-                <td></td>
-                <td></td>
             </tr>
+
         </table>
         <table class="item-table mt-050">
             <tr>
                 <th class="txt-left" style="width: 30px;">No</th>
-                <th class="txt-left" style="width: 40px;">No SPP</th>
-                <th class="txt-left" style="width: 30px;">Kode</th>
-                <th class="txt-left" style="width: 60px;">Barang</th>
-                <th class="txt-left" style="width: 60px;">Spesifikasi</th>
-                <th class="txt-left" style="width: 60px;">Satuan</th>
-                <th class="txt-left" style="width: 60px;">Jml Retur</th>
-                <th class="txt-left" style="width: 60px;">Harga Retur</th>
-                <th class="txt-left" style=" width: 150px;">Keterangan</th>
+                <th class="txt-left" style="width: 150px;">Nama Barang</th>
+                <th class="txt-left" style="width: 40px;">Qty</th>
+                <th class="txt-left" style="width: 30px;">Satuan</th>
+                <th class="txt-left" style="width: 60px;">Rp</th>
+                <th class="txt-left" style="width: 60px;">Total Harga</th>
+                <th class="txt-left" style="width: 60px;">Keterangan</th>
             </tr>
 
             <?php
@@ -154,39 +153,61 @@
                 ?>
                 <tr>
                     <td class="txt-center"><?= $no++; ?></td>
-                    <td class="txt-left"><?= $detail['spp_no'] ?></td>
-                    <td class="txt-left"><?= $detail["kode_barang"]; ?></td>
-                    <td class="txt-left"><?= $detail['barang_name']; ?></td>
-                    <td class="txt-left"><?= $detail['spesifikasi']; ?></td>
-                    <td class="txt-left"><?= $detail['kode_satuan']; ?></td>
+                    <td class="txt-left"><?= $detail["kode_barang"] . " - " . $detail['barang_name'] . " " . $detail['spesifikasi']; ?></td>
                     <td class="txt-left"><?= number_format($detail["jumlah_return"], 2); ?></td>
+                    <td class="txt-left"><?= $detail['kode_satuan']; ?></td>
+                    <td class="txt-left"><?= number_format($detail["harga_satuan_return"], 2); ?></td>
                     <td class="txt-left"><?= number_format($detail["total_harga_return"], 2); ?></td>
                     <td class="txt-left"><?= $detail["keterangan_return"]; ?></td>
                 </tr>
             <?php endforeach; ?>
             <tr>
-                <td class="txt-left" style="padding-left: 5px" colspan="6"><b>TOTAL</b></td>
+                <td class="txt-left" style="padding-left: 5px" colspan="2"><b>TOTAL</b></td>
                 <td class="txt-left"><?= number_format($jml_retur, 2); ?></td>
+                <td colspan="2"></td>
                 <td class="txt-left"><?= number_format($sub_total_retur, 2); ?></td>
                 <td></td>
             </tr>
+            <tr>
+                <td class="txt-left" style="padding-left: 5px" colspan="7"><b>TERBILANG : <?= terbilang($sub_total_retur); ?></b></td>
+            </tr>
         </table>
         <div class="header mt-050">
-            <table class="w-50 sign-table footer" style="padding-top: 0px; margin-top: 0px">
+            <table class="w-100 sign-table border-collapse signed-info footer" style="margin-top: 1rem;">
+
                 <tr>
-                    <td>Diperiksa & Dibukukan</td>
-                    <td class="txt-center" style="width:100px;">Tgl</td>
-                    <td class="txt-center" style="width:100px;">Paraf</td>
+                    <!-- <th>
+                    <div class="sign-row">
+                        <div>TTD Penerima Bahan Baku</div>
+                    </div>
+                </th> -->
+                    <th>
+                        <div class="sign-row">
+                            <div>Dibuat Oleh,</div>
+                        </div>
+                    </th>
+                    <th>
+                        <div class="sign-row">
+                            <div>Diperiksa</div>
+                        </div>
+                    </th>
+                </tr>
+                <tr style="border: none!important;">
+                    <td class="sign-space" style="border: none!important;"></td>
+                    <td class="sign-space" style="border: none!important;"></td>
                 </tr>
                 <tr>
-                    <td style="height: 40px;">Pembelian</td>
-                    <td></td>
-                    <td></td>
-                </tr>
-                <tr>
-                    <td style="height: 40px;">Accounting</td>
-                    <td></td>
-                    <td></td>
+                    <td class="sign-name" style="border: none!important; margin-top:30px;">
+                        <br><br>
+                        <div> </div>
+                    </td>
+                    <td class="sign-name" style="border: none!important;margin-top:30px;">
+                        <br><br>
+                        <div> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </div>
+                    </td>
+                    <!-- <td class="sign-name" style="border: none!important;">
+                    <div>( &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; )</div>
+                </td> -->
                 </tr>
             </table>
         <?php } ?>
