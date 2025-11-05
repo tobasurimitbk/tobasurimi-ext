@@ -485,7 +485,7 @@ class ProsesRebus extends BaseController
                     "barang_master_id" => $spesifikasiData["barang_master_id"],
                     "unit_id"          => $p["unit_out_id"],
                     "stock_detail_id"  => $p["stock_detail_rebus_id"],
-                    "stock_detail_asal"  => $p["stock_detail_rebus_id"],
+                    "stock_detail_asal" => $p["stock_detail_rebus_id"],
                     "stock_detail_result_id"  => $p["stock_detail_hasil_rebus_id"],
                     "divisi_id"        => $prosoesRebus["divisi_id"],
                     "warehouse_id"     => $prosoesRebus["warehouse_id"],
@@ -496,6 +496,8 @@ class ProsesRebus extends BaseController
                     "qty_diterima"     => round($p["qty_hasil_rebus"], 2),
                     "qty_bersih"       => round($p["qty_hasil_rebus"], 2),
                     "qty_digunakan"    => round($p["qty_rebus"], 2),
+                    "qty_bersih_asal"  => round($p["qty_rebus"], 2) ?? 0,
+                    "qty_diterima_asal"=> round($p["qty_kotor"], 2) ?? 0,
                     'reference_id'     => $id,
                     'po_type'          => "LOKAL BAKU",
                     'reference_type'   => "PROSES REBUS",
@@ -510,9 +512,13 @@ class ProsesRebus extends BaseController
 
                 $stockDetail = $this->stockRevampModel->insertStockRevamp($db, $data);
 
-                $this->prosesRebusDetailModel->update($p['id'], [
-                    'stock_detail_hasil_rebus_id' => $stockDetail,
-                ]);
+                if ($stockDetail) {
+                    $this->prosesRebusDetailModel->update($p['id'], [
+                        'stock_detail_hasil_rebus_id' => $stockDetail,
+                    ]);
+                } else {
+                    throw new \Exception("Gagal membuat stock detail hasil rebus untuk detail ID {$p['id']}");
+                }
             }
 
             // update status proses rebus
