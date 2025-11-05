@@ -455,7 +455,7 @@ class POLokalBahanPenolong extends BaseController
                 ->where('am_purchase_order_details.am_purchase_order_id', $id)
                 ->where('spesifikasi_id', $d->spesifikasi_id)
                 ->where('barang_id', $d->barang_id)
-                // ->where('note', trim($d->keterangan))
+                ->where('note', trim($d->keterangan))
                 ->first();
 
             if ($check != null) {
@@ -485,6 +485,7 @@ class POLokalBahanPenolong extends BaseController
                     ->where('am_purchase_order_details.am_purchase_order_id', $id)
                     ->where('spesifikasi_id', $d->spesifikasi_id)
                     ->where('barang_id', $d->barang_id)
+                    ->where('note', trim($d->keterangan))
                     ->delete();
 
                 // INSERT NEW
