@@ -52,7 +52,6 @@
                     <div class="col-sm-3 mt-1">
                         <div class="form-floating mb-3" style="height: 50px;">
                             <select <?= (!empty($lemburDetail)) ? "disabled" : "" ?> class="form-select" name="bagian_id" id="bagian_id">
-                                <option value=""> Pilih Nama Karyawan</option>
                                 <?php if (!empty($lemburDetail)): ?>
                                     <?php foreach ($bagian as $b) : ?>
                                         <option selected value="<?= $b['id'] ?>">
@@ -565,15 +564,39 @@
                             processData: false,
                             contentType: false,
                             success: function(response) {
+                                csrf.val(response.token)
                                 if (response.status) {
                                     Swal.fire({
-                                            icon: 'success',
-                                            title: response.message,
-                                            confirmButtonColor: '#4e73df',
-                                        })
-                                        .then(() => {
+                                        icon: 'success',
+                                        title: response.message,
+                                        showCancelButton: true,
+                                        showDenyButton: true,
+                                        confirmButtonText: 'Buat Lembur Lagi',
+                                        denyButtonText: 'Tidak Buat Lagi',
+                                        confirmButtonColor: '#4e73df',
+                                        denyButtonColor: '#dc3545',
+                                    }).then((result) => {
+                                        if (result.isConfirmed) {
+                                            // Buat Lagi
+                                            $('#employeeID').val(null).change();
+                                            var table = $('#tabelGaji');
+                                            table.find('tbody').empty();
+                                            hideRincianUangLembur();
+
+                                            $('input[name="jamKerjaMasuk"]').val(null);
+                                            $('input[name="jamKerjaKeluar"]').val(null);
+                                            $('input[name="jamMulaiLembur"]').val(null);
+                                            $('input[name="jamSelesaiLembur"]').val(null);
+                                            $('input[name="jumlahJamIstirahat"]').val(null);
+                                            $('input[name="jumlahJamKerjaBersih"]').val(null);
+                                            $('input[name="totalUangLembur"]').val(null);
+                                            $('input[name="gajiPokokPerHari"]').val(null);
+                                            generateLembur();
+                                        } else if (result.isDenied) {
+                                            // Buat baru
                                             window.location.href = "<?= base_url("lembur"); ?>";
-                                        })
+                                        }
+                                    });
                                 } else {
                                     Swal.fire({
                                         icon: 'error',

@@ -130,7 +130,8 @@ class FormLembur extends BaseController
 
         return response()->setJSON([
             'status' => true,
-            'message' => "Form data lembur berhasil dihapus"
+            'message' => "Form data lembur berhasil dihapus",
+            'token' => csrf_hash()
         ]);
     }
 
