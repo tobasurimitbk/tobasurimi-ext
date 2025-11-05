@@ -414,7 +414,7 @@
                 <tr>
                     <th>
                         <div class="sign-row">
-                            <div>DIBUAT OLEH PEMB BHN BAKU</div>
+                            <div>DIBUAT OLEH <br> ADM PEMB. BHN BAKU</div>
                         </div>
                     </th>
                     <th>
@@ -680,7 +680,7 @@
                 <tr style="border: none!important;">
                     <th>
                         <div class="sign-row-second column-table-normal">
-                            <div>DIBUAT OLEH PEMB BHN BAKU</div>
+                            <div>DIBUAT OLEH <br> ADM PEMB. BHN BAKU</div>
                         </div>
                     </th>
                     <th>
