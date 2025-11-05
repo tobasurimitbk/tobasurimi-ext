@@ -126,6 +126,8 @@ class ProsesRebusDetailModel extends Model
     {
         $stockDetail2Model = new StockDetail2Model();
         $stockModel = new StockModel();
+        $jasaVendorInModel = new JasaVendorInModel();
+        $vendorModel = new VendorModel();
         $barangMasterModel = new BarangMasterModel();
         $barangMasterSpesifikasiModel = new BarangMasterSpesifikasiModel();
         $satuanModel = new SatuansModel();
@@ -166,13 +168,19 @@ class ProsesRebusDetailModel extends Model
             // === Supplier ===
 
             // === PO RM ===
-            $rmPurchaseOrder = $rmPurchaseOrderModel
-                ->where('id', $stockList['po_id'])
-                ->first();
+            if ($m['po_id'] != null) {
+                $rmPurchaseOrder = $rmPurchaseOrderModel
+                    ->where('id', $stockList['po_id'])
+                    ->first();
 
-            $supplier = $supplierModel->select('suppliers.*')
-                        ->where('id',  $rmPurchaseOrder['supplier_id'])
-                        ->first();
+                $supplier = $supplierModel->select('suppliers.*')
+                            ->where('id',  $rmPurchaseOrder['supplier_id'])
+                            ->first();
+            } else {
+                $jasaVendorin = $jasaVendorInModel->where('id', $m['jasa_vendor_id'])->first();
+
+                $vendor = $vendorModel->where('id', $jasaVendorin['vendor_id'])->first();
+            }
 
             // === Susun hasil ===
             $bcType = $metaDataModel->find($stockList['bc_id']);
@@ -181,16 +189,29 @@ class ProsesRebusDetailModel extends Model
             $stockList['satuan_id'] = $satuanIn['id'];
             $stockList['barang'] = $dataBarangIn['barang_name'] . ' - ' . strtoupper($barangMasterSpesifikasiIn['spesifikasi']);
             $stockList['stock_id'] = $stockList['stock_id'];
-            $stockList['po_no'] =  $rmPurchaseOrder['po_no'];
-            $stockList['po_id'] =  $rmPurchaseOrder['id'];
+            $stockList['po_no'] =  $rmPurchaseOrder['po_no'] ?? NULL;
+            $stockList['po_id'] =  $rmPurchaseOrder['id'] ?? NULL;
+            $stockList['jasa_vendor_id'] =  $jasaVendorin['id'] ?? NULL;
+            $stockList['no_penerimaan_surat_jalan'] =  $jasaVendorin['no_penerimaan_surat_jalan'] ?? NULL;
             $stockList['stock_detail_id'] = $stockList['id'];
             $stockList['reference_type'] = $stockList['reference_type'];
             $stockList['qty']         = round((float)$m['qty_rebus'], 2);
             $stockList['qty_bersih']  = round((float)$stockList['qty_bersih'], 2);
             $stockList['stock_total'] = round((float)$stockList['qty_diterima'], 2);
             $stockList['qty_kotor']   = round((float)$stockList['qty_diterima'] - (float)$stockList['qty_bersih'], 2);
-            $stockList['stock_date'] = $rmPurchaseOrder == null ? "" : date('d/m/Y', strtotime($rmPurchaseOrder['po_date']));
-            $stockList['supplier_name'] = $supplier != null ? strtoupper($supplier['name']) : "-";
+            $stockList['stock_date'] = (isset($rmPurchaseOrder['po_date']) && $rmPurchaseOrder['po_date'])
+                    ? date('d/m/Y', strtotime($rmPurchaseOrder['po_date']))
+                    : NULL;
+            $stockList['tanggal'] = (isset($jasaVendorin['tanggal']) && $jasaVendorin['tanggal'])
+                    ? date('d/m/Y', strtotime($jasaVendorin['tanggal']))
+                    : NULL;
+            $stockList['supplier_name'] = (isset($supplier['name']) && $supplier['name'])
+                ? strtoupper($supplier['name'])
+                : NULL;
+
+            $stockList['vendor_name'] = (isset($vendor['name']) && $vendor['name'])
+                ? strtoupper($vendor['name'])
+                : NULL;
             $stockList['total_penerimaan'] = $stockList['qty_bersih'] ?? 0;
             $stockList['output'] = [
                 'barang' => $barangNameOutput,
