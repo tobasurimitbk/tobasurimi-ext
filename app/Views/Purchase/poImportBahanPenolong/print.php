@@ -346,8 +346,8 @@
                         <td style="text-align: center;">MARKS & NO</td>
                         <td style="text-align: center;">PARTICULAR</td>
                         <td style="text-align: center;">QTTY</td>
-                        <td style="text-align: center;">UNIT PRICE <br>USD</td>
-                        <td style="text-align: center;">TOTAL AMOUNT<br>USD</td>
+                        <td style="text-align: center;">UNIT PRICE <br><?= $valutaName ?></td>
+                        <td style="text-align: center;">TOTAL AMOUNT<br><?= $valutaName ?></td>
                     </tr>
                     <tr>
                         <td style="border:0px;"></td>

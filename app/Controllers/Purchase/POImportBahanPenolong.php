@@ -506,6 +506,7 @@ class POImportBahanPenolong extends BaseController
         }
 
         $data["valuta"] =  $this->metadataModel->where('id', $data['dataPO']->currency)->first()['description'];
+        $data["valutaName"] =  $this->metadataModel->where('id', $data['dataPO']->currency)->first()['value'];
         $data["shipmentPO"] =  $this->metadataModel->where('name', 'Shipment PO')->first()['value'];
         $data["shipmentName"] = $this->metadataModel->where('id', $data['dataPO']->shipment)->first()['value'];
         $data["telpKantor"] = $this->metadataModel->where('name', 'Telp Kantor')->first()['value'];

@@ -414,7 +414,7 @@
                 <tr>
                     <th>
                         <div class="sign-row">
-                            <div>TTD Penerima Bahan Baku</div>
+                            <div>DIBUAT OLEH PEMB BHN BAKU</div>
                         </div>
                     </th>
                     <th>
@@ -679,7 +679,9 @@
             <table class="w-100 sign-table border-collapse signed-info footer mt-3" style="border: none!important;">
                 <tr style="border: none!important;">
                     <th>
-                        <div class="sign-row-second column-table-normal">Dibuat Oleh</div>
+                        <div class="sign-row-second column-table-normal">
+                            <div>DIBUAT OLEH PEMB BHN BAKU</div>
+                        </div>
                     </th>
                     <th>
                         <div class="sign-row-second column-table-normal">Diketahui</div>
