@@ -267,6 +267,53 @@ class StockRevampDetailModel extends Model
             ->findAll();
     }
 
+    public function getStockListWithAddConditionForProsesRebusFromVendor($condition, $spesifikasiId)
+    {
+        $builder = $this->asArray()
+            ->select('
+                stock_revamp_detail.id AS id,
+                stock_revamp.spesifikasi_id,
+                vendors.name AS vendor_name,
+                stock_revamp_detail.stock_id,
+                stock_revamp_detail.bc_id,
+                jasa_vendor_in.vendor_id,
+                stock_revamp_detail.reference_type,
+                jasa_vendor_in.tanggal,
+                jasa_vendor_in.no_penerimaan_surat_jalan,
+                jasa_vendor_in.id as jasa_vendor_in_id,
+                CONCAT(barang_master.barang_name, " ", barang_master_spesifikasi.spesifikasi) AS barang,
+                satuans.kode_satuan,
+                satuans.id as satuan_id,
+                stock_revamp_detail.qty_bersih AS total_penerimaan,
+                stock_revamp_detail.qty_bersih as stok_total_bersih,
+                stock_revamp_detail.qty_diterima as stok_total_diterima,
+            ')
+            ->join('stock_revamp', 'stock_revamp.id = stock_revamp_detail.stock_id', 'left')
+            ->join('rm_purchase_orders', 'rm_purchase_orders.id = stock_revamp_detail.po_id', 'left')
+            ->join('jasa_vendor_in', 'stock_revamp_detail.reference_id = jasa_vendor_in.id', 'left')
+            ->join('vendors', 'vendors.id = jasa_vendor_in.vendor_id', 'left')
+            ->join('barang_master', 'barang_master.id = stock_revamp.barang_master_id', 'left')
+            ->join('barang_master_spesifikasi', 'barang_master_spesifikasi.id = stock_revamp.spesifikasi_id', 'left')
+            ->join('satuans', 'satuans.id = barang_master_spesifikasi.satuan_1', 'left');
+
+        // Kondisi dinamis
+        foreach ($condition as $field => $value) {
+            if (is_array($value)) {
+                $builder->whereIn($field, $value);
+            } else {
+                $builder->where($field, $value);
+            }
+        }
+
+        return $builder
+            ->groupBy('
+                stock_revamp_detail.id,
+            ')
+            ->where('stock_revamp_detail.reference_type !=', "PROSES REBUS")
+            ->where('stock_revamp.spesifikasi_id', $spesifikasiId)
+            ->orderBy('stock_revamp_detail.createdAt', 'ASC')
+            ->findAll();
+    }
 
     public function getStockListWithAddConditionForJasaVendorIn($condition, $stock_detail_id)
     {
