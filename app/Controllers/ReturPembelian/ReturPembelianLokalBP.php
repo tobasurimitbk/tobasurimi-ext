@@ -6,6 +6,7 @@ use App\Controllers\BaseController;
 use App\Models\BC25Model;
 use App\Models\BC30Model;
 use App\Models\BC41Model;
+use App\Models\CompaniesModel;
 use App\Models\DivisisModel;
 use App\Models\MetadataModel;
 use App\Models\PenerimaanBarangModel;
@@ -29,6 +30,7 @@ class ReturPembelianLokalBP extends BaseController
     protected $bc25Model;
     protected $bc30Model;
     protected $dompdf;
+    protected $companyModel;
 
     public function __construct()
     {
@@ -45,6 +47,7 @@ class ReturPembelianLokalBP extends BaseController
         $this->bc25Model = new BC25Model();
         $this->bc30Model = new BC30Model();
         $this->dompdf = new Dompdf();
+        $this->companyModel = new CompaniesModel();
     }
 
     public function index()
@@ -171,7 +174,7 @@ class ReturPembelianLokalBP extends BaseController
         $id = decrypt($id);
 
         $dataPengembalianBarang = $this->pengembalianBarangModel
-            ->select('pengembalian_barang.*,suppliers.name AS supplier_name')
+            ->select('pengembalian_barang.*,suppliers.name AS supplier_name, suppliers.address')
             ->join('suppliers', 'suppliers.id = pengembalian_barang.supplier_id', 'left')
             ->where('pengembalian_barang.id', $id)
             ->first();
@@ -185,13 +188,16 @@ class ReturPembelianLokalBP extends BaseController
             true
         );
 
-        // dd($dataPengembalianBarangDetail);
+        $dataCompany = $this->companyModel->where('id', $this->this_company_id)->first();
+
+        // dd($dataPengembalianBarang, $dataPengembalianBarangDetail);
 
         $data = [
             'dataDivisi' => $this->divisiModel->getDivisiAccess(),
             'dataPengembalianBarang' => $dataPengembalianBarang,
             'dataPengembalianBarangDetail' => $dataPengembalianBarangDetail,
-            'title' => "Retur Pembelian Lokal Bahan Penolong"
+            'title' => "Retur Pembelian",
+            'company' => $dataCompany
         ];
         $this->dompdf->loadHtml(view('Warehouse/returnBarang/printLokalBP', $data));
         $this->dompdf->setPaper('A4', 'portrait');
