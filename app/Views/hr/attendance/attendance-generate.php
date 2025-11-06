@@ -1546,9 +1546,8 @@
     $('#btnPerKaryawan').click(function(e) {
         e.preventDefault();
         var month = $('#month').val();
-        var employeeId = $('#employee_id').val();
-
-        console.log(employeeId, month);
+        var divisiId = $('#divisi_id').val();
+        var bagianId = $('#bagian_id').val();
 
         if (month == '') {
             Swal.fire({
@@ -1557,15 +1556,22 @@
                 confirmButtonColor: '#4e73df',
             });
             return;
-        } else if (employeeId == '' || employeeId == null) {
+        } else if (divisiId == '') {
             Swal.fire({
                 icon: 'error',
-                title: 'Pilih karyawan dahulu',
+                title: 'Pilih departemen dahulu',
+                confirmButtonColor: '#4e73df',
+            });
+            return;
+        } else if (bagianId == '') {
+            Swal.fire({
+                icon: 'error',
+                title: 'Pilih bagian dahulu',
                 confirmButtonColor: '#4e73df',
             });
             return;
         } else {
-            var url = "<?= base_url('list-attendance/export-bulanan-employee') ?>?month=" + month + "&employee_id=" + employeeId;
+            var url = "<?= base_url('list-attendance/export-bulanan-employee') ?>?month=" + month + "&divisi_id=" + divisiId + '&bagian_id=' + bagianId + '&bagian_id=' + bagianId;
             window.location.href = url;
         }
 

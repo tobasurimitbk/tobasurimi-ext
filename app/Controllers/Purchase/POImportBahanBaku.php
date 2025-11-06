@@ -510,6 +510,7 @@ class POImportBahanBaku extends BaseController
 
                 if ($dataPODetail) {
                     $data["valuta"] =  $this->metadataModel->where('id', $dataPO->currency)->first()['description'];
+                    $data["valutaName"] =  $this->metadataModel->where('id', $dataPO->currency)->first()['value'];
                     $data["shipmentPO"] =  $this->metadataModel->where('name', 'Shipment PO')->first()['value'];
                     $data["shipmentName"] = $this->metadataModel->where('id', $dataPO->shipment)->first()['value'];
                     $data["telpKantor"] = $this->metadataModel->where('name', 'Telp Kantor')->first()['value'];

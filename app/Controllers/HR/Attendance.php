@@ -2276,9 +2276,14 @@ class Attendance extends BaseController
         // ambil data employees
         $condition = [
             "employees.company_id" => $this->this_company_id,
-            "employees.id" => $employeeId,
+            "employees.deletedAt"  => null,
         ];
-        $employees    = $this->EmployeesModel->getEmployeeListAttendances($condition, [], 0, 10000000);
+        $addCondition = [
+            "divisi_id"   => $this->request->getVar('divisi_id'),
+            "tipe"        => $this->request->getVar('tipe'),
+            "bagian_id" => $this->request->getVar("bagian_id")
+        ];
+        $employees    = $this->EmployeesModel->getEmployeeListAttendances($condition, $addCondition, 0, 10000000);
         $employeeData = $employees['data'];
         $employeeIds  = array_column($employeeData, 'id');
 

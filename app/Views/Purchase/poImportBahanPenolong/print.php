@@ -346,17 +346,17 @@
                         <td style="text-align: center;">MARKS & NO</td>
                         <td style="text-align: center;">PARTICULAR</td>
                         <td style="text-align: center;">QTTY</td>
-                        <td style="text-align: center;">UNIT PRICE <br>USD</td>
-                        <td style="text-align: center;">TOTAL AMOUNT<br>USD</td>
+                        <td style="text-align: center;">UNIT PRICE <br><?= $valutaName ?></td>
+                        <td style="text-align: center;">TOTAL AMOUNT<br><?= $valutaName ?></td>
                     </tr>
-                    <tr>
+                    <!-- <tr>
                         <td style="border:0px;"></td>
                         <td style="border:0px;"></td>
                         <td style="border:0px;"></td>
                         <td colspan="2" style="text-align: center;border:0px;">
                             <?= strtoupper($valuta) ?>
                         </td>
-                    </tr>
+                    </tr> -->
                 </thead>
                 <tbody>
                     <?php foreach ($chunk as $detail) : ?>
