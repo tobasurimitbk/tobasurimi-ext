@@ -1018,6 +1018,7 @@ class JasaVendorIn extends BaseController
                     "type_bc"          => $typeBc == null ? "NON PABEAN" : $typeBc['value'],
                     "qty_diterima"     => $totalMasuk,
                     "qty_bersih"       => $p["qty_bersih"],
+                    "keterangan"       => $p["keterangan"],
                     "reference_id"     => $id,
                     "po_type"          => "LOKAL BAKU",
                     "reference_type"   => "JASA VENDOR",
