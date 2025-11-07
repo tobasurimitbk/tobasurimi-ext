@@ -1305,6 +1305,7 @@ $routes->get('/biaya-kepiting/warehouse', 'Purchase\POLokalBahanBaku::dropdownWa
 $routes->get('/biaya-kepiting/get-no', 'JasaVendor\BiayaKepiting::getNo', ['filter' => 'Auth']);
 $routes->get('/biaya-kepiting/list-barang', 'JasaVendor\BiayaKepiting::dropdownBarang', ['filter' => 'Auth']);
 $routes->post('/biaya-kepiting/save', 'JasaVendor\BiayaKepiting::createAction', ['filter' => 'Auth']);
+$routes->get('/biaya-kepiting/get-jasa-vendor-in/(:segment)',  'JasaVendor\BiayaKepiting::getSuratJalan/$1', ['filter' => 'Auth']);
 $routes->post('/biaya-kepiting/update', 'JasaVendor\BiayaKepiting::updateAction', ['filter' => 'Auth']);
 $routes->post('/biaya-kepiting/delete', 'JasaVendor\BiayaKepiting::delete', ['filter' => 'Auth']);
 $routes->get('/biaya-kepiting/id/(:segment)',  'JasaVendor\BiayaKepiting::detail/$1', ['filter' => 'Auth']);
@@ -3076,6 +3077,11 @@ $routes->post('/hr-outsourcing-sallary-payment/delete/(:segment)', 'HROutsourcin
 //HR Ousourcing Scale 
 $routes->get('/hr-outsourcing-scale', 'HROutsourcing\Scale::generateQrBarangView', ['filter' => 'Auth']);
 $routes->post('/hr-outsourcing-scale', 'HROutsourcing\Scale::generateQrBarang', ['filter' => 'Auth']);
+$routes->get('/hr-outsourcing-scale/get-data', 'HROutsourcing\Scale::getData', ['filter' => 'Auth']);
+$routes->post('/hr-outsourcing-scale/store', 'HROutsourcing\Scale::store', ['filter' => 'Auth']);
+$routes->get('/hr-outsourcing-scale/edit/(:num)', 'HROutsourcing\Scale::edit/$1', ['filter' => 'Auth']);
+$routes->post('/hr-outsourcing-scale/update/(:num)', 'HROutsourcing\Scale::update/$1', ['filter' => 'Auth']);
+$routes->post('/hr-outsourcing-scale/delete/(:num)', 'HROutsourcing\Scale::delete/$1', ['filter' => 'Auth']);
 $routes->get('/hr-outsourcing-scale/id/(:segment)', 'HROutsourcing\Scale::getBarangByIdQr/$1');
 $routes->get('/hr-outsourcing-company/employee/detail/(:segment)', 'HROutsourcing\Employee::getEmployeeByIdQr/$1');
 $routes->get('/get-spesifikasi-by-qr', 'Setting\Auth::login');
