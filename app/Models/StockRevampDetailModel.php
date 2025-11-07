@@ -1153,9 +1153,8 @@ class StockRevampDetailModel extends Model
                 bc_purchase_order.no_daftar
             ")
             ->join('stock_revamp', 'stock_revamp.id = stock_revamp_detail.stock_id', 'left')
-            ->join('jasa_vendor_in', 'jasa_vendor_in.id = stock_revamp_detail.reference_id', 'left')
-            ->join('proses_rebus', 'proses_rebus.id = stock_revamp_detail.reference_id', 'left')
-            ->join('jasa_vendor_in_detail', 'jasa_vendor_in_detail.jasa_vendor_in_id = jasa_vendor_in.id', 'left')
+            ->join('jasa_vendor_in', "jasa_vendor_in.id = stock_revamp_detail.reference_id AND stock_revamp_detail.reference_type = 'JASA VENDOR'", 'left')
+            ->join('proses_rebus', "proses_rebus.id = stock_revamp_detail.reference_id AND stock_revamp_detail.reference_type = 'PROSES REBUS'", 'left')
             ->join('vendors', 'vendors.id = jasa_vendor_in.vendor_id', 'left')
             ->join('stock_revamp_history', 'stock_revamp_history.stock_detail_akhir = stock_revamp_detail.id', 'left')
 
