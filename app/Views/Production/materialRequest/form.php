@@ -402,12 +402,15 @@
                                 <tr>
                                     <th style="text-align: center;">#</th>
                                     <!-- <th style="text-align: center;">Asal Barang</th> -->
-                                    <th style="text-align: center;">No PO / No VBM</th>
+                                    <?php if (session()->get("login")->this_company_id == 16) : ?>
+                                        <th style="text-align: center;">No PO / No VBM</th>
+                                    <?php endif; ?>
                                     <th style="text-align: center;">Supplier / Vendor</th>
                                     <!-- <th style="text-align: center;">Dokumen Pabean</th> -->
                                     <!-- <th style="text-align: center;">No Aju / No Daftar</th> -->
                                     <th style="text-align: center;">Tgl PO / Tgl Vendor Masuk</th>
                                     <th style="text-align: center;">Barang - Spesifikasi</th>
+                                    <th style="text-align: center;">Keterangan</th>
                                     <th style="text-align: center;">Satuan</th>
                                     <th style="text-align: center;">Qty</th>
                                 </tr>
@@ -458,9 +461,12 @@
                                         <th style="text-align: center;">Departemen / Warehouse Asal</th>
                                         <th style="text-align: center;">Departemen / Warehouse Tujuan</th>
                                         <th style="text-align: center;">Supplier / Vendor</th>
-                                        <th style="text-align: center;">No PO / No VBM</th>
+                                        <?php if (session()->get("login")->this_company_id == 16) : ?>
+                                            <th style="text-align: center;">No PO / No VBM</th>
+                                        <?php endif; ?>
                                         <th style="text-align: center;">Tgl PO / Tgl Vendor Masuk</th>
                                         <th style="text-align: center;">Barang - Spesifikasi</th>
+                                        <th style="text-align: center;">Keterangan</th>
                                         <th style="text-align: center;">Satuan</th>
                                         <th style="text-align: center;">Qty Awal</th>
                                         <th style="text-align: center;">Qty Direquest</th>
@@ -630,7 +636,7 @@
                                                 'harga_umum' => $materialRequestDetails['harga_umum'],
                                                 'harga_harian' => $materialRequestDetails['harga_harian'],
                                                 'harga_bulanan' => $materialRequestDetails['harga_bulanan'],
-                                                'keterangan' => '',
+                                                'keterangan' => $materialRequestDetails['keterangan'],
                                                 'barang' => $materialRequestDetails['barang'],
                                                 'bc_id' => $materialRequestDetails['bc_id'],
                                                 'bc_type' => $materialRequestDetails['bc_type'],
@@ -1514,12 +1520,16 @@
             }
 
             // newRow.append($('<td style="text-align:center;">').text(v.sumber));
-            newRow.append($('<td style="text-align:center;">').text(v.stock_dokumen));
+
+            <?php if (session()->get("login")->this_company_id == 16) : ?>
+                newRow.append($('<td style="text-align:center;">').text(v.stock_dokumen));
+            <?php endif; ?>
             newRow.append($('<td style="text-align:center;">').text(v.supplier_name));
             // newRow.append($('<td style="text-align:center;">').text(v.bc_type));
             // newRow.append($('<td style="text-align: center;">').text(`${v.no_aju ? v.no_aju : '-'} / ${v.no_daftar ? v.no_daftar : '-'}`));
             newRow.append($('<td style="text-align:center;">').text(v.stock_date));
             newRow.append($('<td style="text-align:center;">').text(v.barang));
+            newRow.append($('<td style="text-align:center;">').text(v.keterangan));
             newRow.append($('<td style="text-align:center;">').text(v.satuan));
             newRow.append($('<td style="text-align:center;">').text(v.stok_total));
             table.find('tbody').append(newRow);
@@ -1613,7 +1623,7 @@
             var departmentTujuanID = $("#divisi_tujuan_id").val();
             var departmentTujuanText = $("#divisi_tujuan_id option:selected").text();
             var warehouseTujuanID = $("#warehouse_tujuan_id").val();
-            var keterangan = $("#keterangan").val();
+            // var keterangan = $("#keterangan").val();
             var warehouseTujuanText = $("#warehouse_tujuan_id option:selected").text();
         } else if (typePengambilanStockBahanBaku != '') {
             // Bahan Baku
@@ -1624,7 +1634,7 @@
             var departmentTujuanID = $("#divisi_tujuan_bahan_baku_id").val();
             var departmentTujuanText = $("#divisi_tujuan_bahan_baku_id option:selected").text();
             var warehouseTujuanID = $("#warehouse_tujuan_bahan_baku_id").val();
-            var keterangan = $("#keterangan").val();
+            // var keterangan = $("#keterangan").val();
             var warehouseTujuanText = $("#warehouse_tujuan_bahan_baku_id option:selected").text();
         }
 
@@ -1653,7 +1663,7 @@
                         listStockAsal[i].departmentText = departmentText;
                         listStockAsal[i].warehouseID = warehouseID;
                         listStockAsal[i].warehouseText = warehouseText;
-                        listStockAsal[i].keterangan = keterangan;
+                        // listStockAsal[i].keterangan = keterangan;
                         listStockAsal[i].departmentTujuanID = departmentTujuanID;
                         listStockAsal[i].departmentTujuanText = departmentTujuanText;
                         listStockAsal[i].warehouseTujuanID = warehouseTujuanID;
@@ -1677,7 +1687,7 @@
                         listStockAsal[i].departmentText = departmentText;
                         listStockAsal[i].warehouseID = warehouseID;
                         listStockAsal[i].warehouseText = warehouseText;
-                        listStockAsal[i].keterangan = keterangan;
+                        // listStockAsal[i].keterangan = keterangan;
                         listStockAsal[i].departmentTujuanID = departmentTujuanID;
                         listStockAsal[i].departmentTujuanText = departmentTujuanText;
                         listStockAsal[i].warehouseTujuanID = warehouseTujuanID;
@@ -1700,7 +1710,7 @@
                         listStockAsal[i].departmentText = departmentText;
                         listStockAsal[i].warehouseID = warehouseID;
                         listStockAsal[i].warehouseText = warehouseText;
-                        listStockAsal[i].keterangan = keterangan;
+                        // listStockAsal[i].keterangan = keterangan;
                         listStockAsal[i].departmentTujuanID = departmentTujuanID;
                         listStockAsal[i].departmentTujuanText = departmentTujuanText;
                         listStockAsal[i].warehouseTujuanID = warehouseTujuanID;
@@ -1725,7 +1735,7 @@
                         listStockAsal[i].departmentText = departmentText;
                         listStockAsal[i].warehouseID = warehouseID;
                         listStockAsal[i].warehouseText = warehouseText;
-                        listStockAsal[i].keterangan = keterangan;
+                        // listStockAsal[i].keterangan = keterangan;
                         listStockAsal[i].departmentTujuanID = departmentTujuanID;
                         listStockAsal[i].departmentTujuanText = departmentTujuanText;
                         listStockAsal[i].warehouseTujuanID = warehouseTujuanID;
@@ -1756,7 +1766,7 @@
             var departmentTujuanID = $("#divisi_tujuan_id").val();
             var departmentTujuanText = $("#divisi_tujuan_id option:selected").text();
             var warehouseTujuanID = $("#warehouse_tujuan_id").val();
-            var keterangan = $("#keterangan").val();
+            // var keterangan = $("#keterangan").val();
             var warehouseTujuanText = $("#warehouse_tujuan_id option:selected").text();
             var qtyMutasiFifo = parseFloat($('#qty_mutasi_fifo').val());
 
@@ -1769,7 +1779,7 @@
             var departmentTujuanID = $("#divisi_tujuan_bahan_baku_id").val();
             var departmentTujuanText = $("#divisi_tujuan_bahan_baku_id option:selected").text();
             var warehouseTujuanID = $("#warehouse_tujuan_bahan_baku_id").val();
-            var keterangan = $("#keterangan").val();
+            // var keterangan = $("#keterangan").val();
             var warehouseTujuanText = $("#warehouse_tujuan_bahan_baku_id option:selected").text();
             var qtyMutasiFifo = parseFloat($('#qty_keluar_fifo').val());
         }
@@ -1822,7 +1832,7 @@
                                 listStockAsal[i].departmentText = departmentText;
                                 listStockAsal[i].warehouseID = warehouseID;
                                 listStockAsal[i].warehouseText = warehouseText;
-                                listStockAsal[i].keterangan = keterangan;
+                                // listStockAsal[i].keterangan = keterangan;
                                 listStockAsal[i].departmentTujuanID = departmentTujuanID;
                                 listStockAsal[i].departmentTujuanText = departmentTujuanText;
                                 listStockAsal[i].warehouseTujuanID = warehouseTujuanID;
@@ -1847,7 +1857,7 @@
                                 listStockAsal[i].departmentText = departmentText;
                                 listStockAsal[i].warehouseID = warehouseID;
                                 listStockAsal[i].warehouseText = warehouseText;
-                                listStockAsal[i].keterangan = keterangan;
+                                // listStockAsal[i].keterangan = keterangan;
                                 listStockAsal[i].departmentTujuanID = departmentTujuanID;
                                 listStockAsal[i].departmentTujuanText = departmentTujuanText;
                                 listStockAsal[i].warehouseTujuanID = warehouseTujuanID;
@@ -1872,7 +1882,7 @@
                                 listStockAsal[i].departmentText = departmentText;
                                 listStockAsal[i].warehouseID = warehouseID;
                                 listStockAsal[i].warehouseText = warehouseText;
-                                listStockAsal[i].keterangan = keterangan;
+                                // listStockAsal[i].keterangan = keterangan;
                                 listStockAsal[i].departmentTujuanID = departmentTujuanID;
                                 listStockAsal[i].departmentTujuanText = departmentTujuanText;
                                 listStockAsal[i].warehouseTujuanID = warehouseTujuanID;
@@ -1897,7 +1907,7 @@
                                 listStockAsal[i].departmentText = departmentText;
                                 listStockAsal[i].warehouseID = warehouseID;
                                 listStockAsal[i].warehouseText = warehouseText;
-                                listStockAsal[i].keterangan = keterangan;
+                                // listStockAsal[i].keterangan = keterangan;
                                 listStockAsal[i].departmentTujuanID = departmentTujuanID;
                                 listStockAsal[i].departmentTujuanText = departmentTujuanText;
                                 listStockAsal[i].warehouseTujuanID = warehouseTujuanID;
@@ -1944,9 +1954,12 @@
             newRow.append($('<td style="text-align: center;">').text(v.departmentText + ' / ' + v.warehouseText));
             newRow.append($('<td style="text-align: center;">').text(v.departmentTujuanText + ' / ' + v.warehouseTujuanText));
             newRow.append($('<td style="text-align: center;">').text(v.supplier_name));
-            newRow.append($('<td style="text-align: center;">').text(v.stock_dokumen));
+            <?php if (session()->get("login")->this_company_id == 16) : ?>
+                newRow.append($('<td style="text-align: center;">').text(v.stock_dokumen));
+            <?php endif; ?>
             newRow.append($('<td style="text-align: center;">').text(v.stock_date));
             newRow.append($('<td style="text-align: center;">').text(v.barang));
+            newRow.append($('<td style="text-align:center;">').text(v.keterangan));
             newRow.append($('<td style="text-align: center;">').text(v.satuan));
             newRow.append($('<td style="text-align: center;">').text(v.realStok ?? v.stok_total));
             newRow.append($('<td style="text-align: center;">').html(`
