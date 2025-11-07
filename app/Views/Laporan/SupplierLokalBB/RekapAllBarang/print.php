@@ -138,7 +138,7 @@
                     'dppBulanan' => 0,
                     'pphBulanan' => 0,
                     'totalBulanan' => 0,
-                    'subsidi' => 0,
+                    'dppSubsidi' => 0,
                     'pphSubsidi' => 0,
                     'totalSubsidi' => 0,
                     'totalRow' => 0,
@@ -162,7 +162,7 @@
                         <td class="text-right"><?= number_format($record['dppBulanan'], 2) ?></td>
                         <td class="text-right"><?= number_format($record['pphBulanan'], 2) ?></td>
                         <td class="text-right"><?= number_format($record['totalBulanan'], 2) ?></td>
-                        <td class="text-right"><?= number_format($record['subsidi'], 2) ?></td>
+                        <td class="text-right"><?= number_format($record['dppSubsidi'], 2) ?></td>
                         <td class="text-right"><?= number_format($record['pphSubsidi'], 2) ?></td>
                         <td class="text-right"><?= number_format($record['totalSubsidi'], 2) ?></td>
                         <td class="text-right"><?= number_format($record['totalRow'], 2) ?></td>
@@ -180,7 +180,7 @@
                     $groupTotals['dppBulanan'] += $record['dppBulanan'];
                     $groupTotals['pphBulanan'] += $record['pphBulanan'];
                     $groupTotals['totalBulanan'] += $record['totalBulanan'];
-                    $groupTotals['subsidi'] += $record['subsidi'];
+                    $groupTotals['dppSubsidi'] += $record['dppSubsidi'];
                     $groupTotals['pphSubsidi'] += $record['pphSubsidi'];
                     $groupTotals['totalSubsidi'] += $record['totalSubsidi'];
                     $groupTotals['totalRow'] += $record['totalRow'];
@@ -200,7 +200,7 @@
                     <td class="text-right"><?= number_format($groupTotals['dppBulanan'], 2) ?></td>
                     <td class="text-right"><?= number_format($groupTotals['pphBulanan'], 2) ?></td>
                     <td class="text-right"><?= number_format($groupTotals['totalBulanan'], 2) ?></td>
-                    <td class="text-right"><?= number_format($groupTotals['subsidi'], 2) ?></td>
+                    <td class="text-right"><?= number_format($groupTotals['dppSubsidi'], 2) ?></td>
                     <td class="text-right"><?= number_format($groupTotals['pphSubsidi'], 2) ?></td>
                     <td class="text-right"><?= number_format($groupTotals['totalSubsidi'], 2) ?></td>
                     <td class="text-right"><?= number_format($groupTotals['totalRow'], 2) ?></td>
