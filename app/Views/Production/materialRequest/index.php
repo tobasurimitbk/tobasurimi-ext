@@ -45,7 +45,7 @@
 <script>
     const csrfToken = '<?= csrf_token() ?>';
     const csrf = $(`[name="${csrfToken}"]`);
-    let sort = "req_no";
+    let sort = "createdAt";
     let sortType = "desc";
 
     let search = $('.search').val();

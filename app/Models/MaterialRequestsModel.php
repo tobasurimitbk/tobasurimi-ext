@@ -63,6 +63,7 @@ class MaterialRequestsModel extends Model
             'req_no'        => 'material_requests.req_no',
             'wo_no'         => 'work_orders.wo_no',
             'barangName'    => 'work_order_details.nama_barang',
+            'createdAt'    => 'material_requests.createdAt',
         ];
         $availableSortType = ['asc' => 'ASC', 'desc' => 'DESC'];
 

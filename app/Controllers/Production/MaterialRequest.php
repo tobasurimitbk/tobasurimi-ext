@@ -1756,6 +1756,7 @@ class MaterialRequest extends BaseController
                     $dataResult[$i]['supplier_id'] = $dataResult[$i]['supplier_id'];
                     $dataResult[$i]['vendor_id'] = $dataResult[$i]['vendor_id'];
                     $dataResult[$i]['stock_detail_id'] = $dataResult[$i]['stock_detail_id'];
+                    $dataResult[$i]['keterangan'] = $dataResult[$i]['keterangan'];
                     $dataResult[$i]['type_barang'] = "bahan_baku";
                     $dataResult[$i]['type_barang_text'] = "BAHAN BAKU";
                     $dataResult[$i]['sumber'] = "JASA VENDOR";
@@ -1786,6 +1787,7 @@ class MaterialRequest extends BaseController
                     $dataResult[$i]['type_barang_text'] = "BAHAN BAKU";
                     $dataResult[$i]['supplier_id'] = $dataResult[$i]['supplier_id'];
                     $dataResult[$i]['stock_detail_id'] = $dataResult[$i]['stock_detail_id'];
+                    $dataResult[$i]['keterangan'] = $dataResult[$i]['keterangan'];
                     $dataResult[$i]['sumber'] = "LPB";
                 }
 
