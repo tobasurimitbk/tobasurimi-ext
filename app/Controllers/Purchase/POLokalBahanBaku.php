@@ -1013,99 +1013,27 @@ class POLokalBahanBaku extends BaseController
                 $totalMonthlyPrice = 0.0;
                 $totalQty = 0.0;
 
-                // Hitung tarif PPh
-                if ($dataPO->po_date <= '2025-06-30') {
-                    $pphTax = !empty($dataPO->supplierNPWP) ? 0.0025 : 0.005;
-                } else {
-                    $pphTax = 0.0025;
-                }
-
-                // Simpan nilai asli PPh
-                $dataPO->nilai_pph2 = ($dataPO->po_date <= '2025-06-30') ? (!empty($dataPO->supplierNPWP) ? 0.0025 : 0.005) : 0.0025;
-                $dataPO->nilai_pph = 1 - $dataPO->nilai_pph2;
-
                 foreach ($dataPODetail as $value) {
-                    $price = formatter($value->general_price, "CURR_TO_FLOAT");
-                    $daily = formatter($value->daily_price, "CURR_TO_FLOAT");
-                    $monthly = formatter($value->monthly_price, "CURR_TO_FLOAT");
-                    $qty = formatter($value->qty, "CURR_TO_FLOAT");
 
-                    $totalPrice += $price * $qty;
-                    $totalMonthlyPrice += $monthly * $qty;
-                    $totalDailyPrice += $daily * $qty;
-                    $totalQty += $qty;
-                }
-
-                // var_dump($totalPrice);
-
-                if ($dataPO->pph == "Company") {
-                    $totalPrice = $totalPrice;
-                    $pph = $totalPrice * 0;
-                    $totalDailyPrice = $totalDailyPrice;
-                    $totalMonthlyPrice = $totalMonthlyPrice;
-                    $pphDaily = $totalDailyPrice * 0;
-                    $pphMonthly = $totalMonthlyPrice * 0;
-                } else if ($dataPO->pph == "Supplier") {
-                    $totalPrice = $totalPrice;
-                    $pph = $totalPrice * $dataPO->nilai_pph2;
-                    $totalDailyPrice = $totalDailyPrice;
-                    $totalMonthlyPrice = $totalMonthlyPrice;
-                    $pphDaily = $totalDailyPrice * $dataPO->nilai_pph2;
-                    $pphMonthly = $totalMonthlyPrice * $dataPO->nilai_pph2;
-                } else {
-                    $totalPrice = $totalPrice;
-                    $pph = $totalPrice * 0;
-                    $totalDailyPrice = $totalDailyPrice;
-                    $totalMonthlyPrice = $totalMonthlyPrice;
-                    $pphDaily = $totalDailyPrice * 0;
-                    $pphMonthly = $totalMonthlyPrice * 0;
+                    $totalPrice += formatter($value->dpp_umum, "CURR_TO_FLOAT");
+                    $totalMonthlyPrice += formatter($value->dpp_bulanan, "CURR_TO_FLOAT");
+                    $totalDailyPrice += formatter($value->dpp_harian, "CURR_TO_FLOAT");
+                    $totalQty += formatter($value->qty, "CURR_TO_FLOAT");
                 }
 
                 // Format yang akan dikirim ke view
                 $dataPO->kode_satuan = $dataPODetail[0]->kode_satuan ?? '';
-                $dataPO->totalPriceRaw = round($totalPrice, 2);
-                $dataPO->totalDailyPriceRaw = round($totalDailyPrice, 2);
-                $dataPO->totalMonthlyPriceRaw = round($totalMonthlyPrice, 2);
-                $dataPO->totalQtyRaw = round($totalQty, 2);
-                $dataPO->totalPphRaw = round($pph, 2);
-                $dataPO->totalDailyPphRaw = round($pphDaily, 2);
-                $dataPO->totalMonthlyPphRaw = round($pphMonthly, 2);
-                $dataPO->totalPaidRaw = round($totalPrice - $dataPO->totalPphRaw, 2);
-                $dataPO->totalDailyPaidRaw = round($totalDailyPrice - $dataPO->totalDailyPphRaw, 2);
-                $dataPO->totalMonthlyPaidRaw = round($totalMonthlyPrice - $dataPO->totalMonthlyPphRaw, 2);
-
-                $dataPO->totalPrice = number_format($dataPO->totalPriceRaw, 2, '.', ',');
-                $dataPO->totalDailyPrice = number_format($dataPO->totalDailyPriceRaw, 2, '.', ',');
-                $dataPO->totalQty = number_format($dataPO->totalQtyRaw, 2, '.', ',');
-                $dataPO->totalPph = number_format($dataPO->totalPphRaw, 2, '.', ',');
-                $dataPO->totalDailyPph = number_format($dataPO->totalDailyPphRaw, 2, '.', ',');
-                $dataPO->totalPaid = number_format($dataPO->totalPaidRaw, 2, '.', ',');
-                $dataPO->totalDailyPaid = number_format($dataPO->totalDailyPaidRaw, 2, '.', ',');
-                $dataPO->totalMonthlyPaid = number_format($dataPO->totalMonthlyPaidRaw, 2, '.', ',');
+                $dataPO->totalQty = number_format($dataPO->nilai_total_qty, 2, '.', ',');
+                $dataPO->totalPaid = number_format($dataPO->nilai_total_umum, 2, '.', ',');
+                $dataPO->totalDailyPaid = number_format($dataPO->nilai_total_harian, 2, '.', ',');
+                $dataPO->totalMonthlyPaid = number_format($dataPO->nilai_total_bulanan, 2, '.', ',');
+                $dataPO->totalTambahanPaid = number_format($dataPO->nilai_total_tambahan, 2, '.', ',');
 
                 // Konsistensi dengan nilai asli
-                $dataPO->totalPaidTerbilang = terbilang($dataPO->totalPaidRaw);
-                $dataPO->totalDailyPaidTerbilang = terbilang($dataPO->totalDailyPaidRaw);
-                $dataPO->totalMonthlyPaidTerbilang = terbilang($dataPO->totalMonthlyPaidRaw);
-                $dataPO->amount = terbilang($dataPO->totalPriceRaw);
-                $dataPO->amountDaily = terbilang($dataPO->totalDailyPriceRaw);
-                $dataPO->amountMonthly = terbilang($dataPO->totalMonthlyPriceRaw);
-
-                if ($dataPO->pph == "Company") {
-                    $selisih = (($dataPO->cong_batasan ?? 0) - ($dataPO->cong_sebenarnya ?? 0) + $dataPO->subsidi_langsung) / $dataPO->nilai_pph;
-                } else {
-                    $selisih = (($dataPO->cong_batasan ?? 0) - ($dataPO->cong_sebenarnya ?? 0) + $dataPO->subsidi_langsung) * $totalQty;
-                }
-
-                $selisih = round($selisih, 2);
-                $selisihPph = $dataPO->pph != "None" ? round($selisih * $pphTax, 2) : 0;
-                $selisihPaid = round($selisih - $selisihPph, 2);
-
-                $dataPO->selisih = $selisih;
-                $dataPO->totalTambahan = number_format($selisih, 2, '.', ',');
-                $dataPO->totalTambahanPph = number_format($selisihPph, 2, '.', ',');
-                $dataPO->totalTambahanPaid = number_format($selisihPaid, 2, '.', ',');
-                $dataPO->totalTambahanPaidTerbilang = terbilang($selisihPaid);
+                $dataPO->totalPaidTerbilang = terbilang($dataPO->totalPaid);
+                $dataPO->totalDailyPaidTerbilang = terbilang($dataPO->totalDailyPaid);
+                $dataPO->totalMonthlyPaidTerbilang = terbilang($dataPO->totalMonthlyPaid);
+                $dataPO->totalTambahanPaidTerbilang = terbilang($dataPO->totalTambahanPaid);
 
                 // Siapkan data sebagai array untuk view
                 $data = (array) $dataPO;
