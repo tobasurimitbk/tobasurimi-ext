@@ -2,6 +2,7 @@
 
 use App\Controllers\BaseController;
 use App\Models\BarangMasterModel;
+use App\Models\BarangMasterSortirModel;
 use App\Models\BarangMasterSpesifikasiModel;
 use Endroid\QrCode\QrCode;
 use Endroid\QrCode\ErrorCorrectionLevel;
@@ -10,24 +11,146 @@ use Exception;
 
 class Scale extends BaseController
 {
+    protected $this_company_id;
+    protected $barangModel;
+
+    public function __construct()
+    {
+        $this->this_company_id = session()->get("login")->this_company_id;
+        $this->barangModel = new BarangMasterSortirModel();
+    }
+
     public function generateQrBarangView()
     {
         return view('HROutsourcing/scale/index');
     }
+
+    public function getData()
+    {
+        $barang = $this->barangModel
+            ->asObject()
+            ->where('company_id', $this->this_company_id)
+            ->findAll();
+        
+        $data = [];
+        foreach ($barang as $item) {
+            $data[] = [
+                'id' => $item->id,
+                'name' => $item->name,
+                'createdAt' => $item->createdAt,
+            ];
+        }
+
+        return $this->response->setJSON([
+            'status' => 'success',
+            'data' => $data
+        ]);
+    }
+
+
+    public function store()
+    {
+        if (!$this->validate([
+            'name' => 'required',
+        ])) {
+            return $this->response->setJSON([
+                'status' => 'error',
+                'errors' => $this->validator->getErrors()
+            ]);
+        }
+
+        try {
+            $this->barangModel->save([
+                'name' => $this->request->getPost('name'),
+                'company_id' => $this->this_company_id,
+            ]);
+
+            return $this->response->setJSON([
+                'status' => 'success',
+                'message' => 'Barang berhasil ditambahkan'
+            ]);
+        } catch (\Exception $e) {
+            return $this->response->setJSON([
+                'status' => 'error',
+                'message' => 'Gagal menambahkan barang: ' . $e->getMessage()
+            ]);
+        }
+    }
+
+    public function edit($id)
+    {
+        $barang = $this->barangModel->find($id);
+
+        if (!$barang) {
+            return $this->response->setJSON([
+                'status' => 'error',
+                'message' => 'Data tidak ditemukan'
+            ]);
+        }
+
+        $data = [
+            'barang' => $barang,
+        ];
+
+        return view('hr_outsourcing/scale/modal_edit', $data);
+    }
+
+    public function update($id)
+    {
+        if (!$this->validate([
+            'name' => 'required',
+        ])) {
+            return $this->response->setJSON([
+                'status' => 'error',
+                'errors' => $this->validator->getErrors()
+            ]);
+        }
+
+        try {
+            $this->barangModel->update($id, [
+                'name' => $this->request->getPost('name'),
+                'company_id' => $this->this_company_id,
+            ]);
+
+            return $this->response->setJSON([
+                'status' => 'success',
+                'message' => 'Barang berhasil diupdate'
+            ]);
+        } catch (\Exception $e) {
+            return $this->response->setJSON([
+                'status' => 'error',
+                'message' => 'Gagal mengupdate barang: ' . $e->getMessage()
+            ]);
+        }
+    }
+
+    public function delete($id)
+    {
+        try {
+            $this->barangModel->delete($id);
+            
+            return $this->response->setJSON([
+                'status' => 'success',
+                'message' => 'Barang berhasil dihapus'
+            ]);
+        } catch (\Exception $e) {
+            return $this->response->setJSON([
+                'status' => 'error',
+                'message' => 'Gagal menghapus barang: ' . $e->getMessage()
+            ]);
+        }
+    }
+
 
     public function generateQrBarang()
     {
         $spesifikasiId = $this->request->getPost('spesifikasi_id');
         $html = "";
 
-        $spesifikasiModel = new BarangMasterSpesifikasiModel();
-
         try {
             // Ambil data barang dan spesifikasi
-            $spesifikasi = $spesifikasiModel
-                ->select('barang_master_spesifikasi.*, barang_master.barang_name')
-                ->join('barang_master', 'barang_master.id = barang_master_spesifikasi.barang_master_id', 'left')
-                ->where('barang_master_spesifikasi.id', $spesifikasiId)
+            $spesifikasi = $this->barangModel
+                ->where('id', $spesifikasiId)
                 ->get()
                 ->getRow();
 
@@ -35,8 +158,7 @@ class Scale extends BaseController
                 throw new Exception("Data spesifikasi tidak ditemukan.");
             }
 
-            $barangName = strtoupper($spesifikasi->barang_name);
-            $spesifikasiName = strtoupper($spesifikasi->spesifikasi ?? '-');
+            $barangName = strtoupper($spesifikasi->name);
 
             // Format dan encrypt ID
             $type = 'BRG';
@@ -66,16 +188,8 @@ class Scale extends BaseController
                         font-weight:900;
                         letter-spacing:1px;
                         text-transform:uppercase;
-                        margin-bottom:5px;
+                        margin-bottom:10px;
                     '>{$barangName}</div>
-
-                    <div style='
-                        font-size:23px;
-                        font-weight:600;
-                        color:#555;
-                        margin-bottom:20px;
-                        text-transform:uppercase;
-                    '>{$spesifikasiName}</div>
 
                     <img src='{$dataUri}' alt='QR Code' 
                         style='width:350px;height:350px;display:block;margin:0 auto;border:5px solid #000;border-radius:8px;'>
@@ -154,7 +268,7 @@ class Scale extends BaseController
             }
 
             // Ambil data barang
-            $spesifikasiModel = new BarangMasterSpesifikasiModel();
+            $spesifikasiModel = new BarangMasterSortirModel();;
 
             $data = $spesifikasiModel
                 ->select("CONCAT(barang_master.barang_name, ' ', barang_master_spesifikasi.spesifikasi) AS nama_barang")
@@ -221,7 +335,7 @@ class Scale extends BaseController
         $term = $this->request->getGet('q');
         $barang = $this->request->getGet('barang_id');
 
-        $barangSpesifikasiModel = new BarangMasterSpesifikasiModel();
+        $barangSpesifikasiModel = new BarangMasterSortirModel();;
 
         $builder = $barangSpesifikasiModel
             ->select('barang_master_spesifikasi.id as spesifikasi_id, barang_master.barang_name as master_barang, barang_master_spesifikasi.spesifikasi as spesifikasi, satuans.kode_satuan')
