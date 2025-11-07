@@ -1962,207 +1962,207 @@
             const currentItemList = table.rows().data().toArray();
             let validate_same = currentItemList.findIndex((obj) => obj.id_barang == id_barang && obj.warehouse_id == warehouseId);
 
-            if (validate_same >= 0 && row_detail == 0) {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Barang tidak boleh sama',
-                    confirmButtonColor: '#4e73df',
-                })
+            // if (validate_same >= 0 && row_detail == 0) {
+            //     Swal.fire({
+            //         icon: 'error',
+            //         title: 'Barang tidak boleh sama',
+            //         confirmButtonColor: '#4e73df',
+            //     })
 
-            } else {
-                // update detail
-                if (row_detail != 0) {
-                    // console.log("Editing row with ID:", row_detail);
+            // } else {
+            // update detail
+            if (row_detail != 0) {
+                // console.log("Editing row with ID:", row_detail);
 
-                    // 1. Cari index di list_items
-                    const itemIndex = list_items.findIndex(item => item.id == row_detail);
-                    // console.log("Found in list_items at index:", itemIndex);
+                // 1. Cari index di list_items
+                const itemIndex = list_items.findIndex(item => item.id == row_detail);
+                // console.log("Found in list_items at index:", itemIndex);
 
-                    if (itemIndex !== -1) {
-                        // Hitung nilai diskon dan amount baru
-                        const discAmt = discountUnit == "percent" ?
-                            amount * (discountPercentage / 100) :
-                            discountPercentage;
+                if (itemIndex !== -1) {
+                    // Hitung nilai diskon dan amount baru
+                    const discAmt = discountUnit == "percent" ?
+                        amount * (discountPercentage / 100) :
+                        discountPercentage;
 
-                        const discountedAmt = amount - discAmt;
+                    const discountedAmt = amount - discAmt;
 
-                        // 2. Update item di list_items
-                        const updatedItem = {
-                            ...list_items[itemIndex],
-                            id_barang: id_barang,
-                            nama_barang: nama_barang,
-                            harga_barang: harga,
-                            qty: qty,
-                            amount: amount,
-                            discountedAmt: discountedAmt,
-                            keterangan: keterangan,
-                            statusppn: statusppn,
-                            tax: tax,
-                            taxAmt: amount * (tax / 100),
-                            discount_percentage: discountPercentage,
-                            dept: dept,
-                            warehouse_id: warehouseId,
-                            warhouse_name: warhouseName,
-                            kode_barang: selectedData.code,
-                            satuan: selectedData.satuan,
-                            disc: discountPercentage,
-                            discAmt: discAmt,
-                            discUnit: discountUnit,
-                            barangTotal: amount
-                        };
+                    // 2. Update item di list_items
+                    const updatedItem = {
+                        ...list_items[itemIndex],
+                        id_barang: id_barang,
+                        nama_barang: nama_barang,
+                        harga_barang: harga,
+                        qty: qty,
+                        amount: amount,
+                        discountedAmt: discountedAmt,
+                        keterangan: keterangan,
+                        statusppn: statusppn,
+                        tax: tax,
+                        taxAmt: amount * (tax / 100),
+                        discount_percentage: discountPercentage,
+                        dept: dept,
+                        warehouse_id: warehouseId,
+                        warhouse_name: warhouseName,
+                        kode_barang: selectedData.code,
+                        satuan: selectedData.satuan,
+                        disc: discountPercentage,
+                        discAmt: discAmt,
+                        discUnit: discountUnit,
+                        barangTotal: amount
+                    };
 
-                        list_items[itemIndex] = updatedItem;
-                        // console.log("Updated list_items:", list_items[itemIndex]);
+                    list_items[itemIndex] = updatedItem;
+                    // console.log("Updated list_items:", list_items[itemIndex]);
 
-                        // 3. Update baris di tabel
-                        let rowUpdated = false;
-                        const rows = table.rows().indexes().toArray();
+                    // 3. Update baris di tabel
+                    let rowUpdated = false;
+                    const rows = table.rows().indexes().toArray();
 
-                        for (let i = 0; i < rows.length; i++) {
-                            const rowData = table.row(rows[i]).data();
-                            if (rowData.id == row_detail) {
-                                const newData = {
-                                    ...rowData,
-                                    id_barang: id_barang,
-                                    kode_barang: selectedData.code,
-                                    nama_barang: nama_barang,
-                                    qty: qty,
-                                    satuan: selectedData.satuan,
-                                    harga_barang: harga,
-                                    barangTotal: amount,
-                                    disc: discountPercentage,
-                                    statusppn: statusppn,
-                                    tax: tax,
-                                    taxAmt: amount * (tax / 100),
-                                    keterangan: keterangan,
-                                    discAmt: discAmt,
-                                    discUnit: discountUnit,
-                                    amount: discountedAmt,
-                                    dept: dept,
-                                    warehouse_id: warehouseId,
-                                    warehouse_name: warhouseName
-                                };
+                    for (let i = 0; i < rows.length; i++) {
+                        const rowData = table.row(rows[i]).data();
+                        if (rowData.id == row_detail) {
+                            const newData = {
+                                ...rowData,
+                                id_barang: id_barang,
+                                kode_barang: selectedData.code,
+                                nama_barang: nama_barang,
+                                qty: qty,
+                                satuan: selectedData.satuan,
+                                harga_barang: harga,
+                                barangTotal: amount,
+                                disc: discountPercentage,
+                                statusppn: statusppn,
+                                tax: tax,
+                                taxAmt: amount * (tax / 100),
+                                keterangan: keterangan,
+                                discAmt: discAmt,
+                                discUnit: discountUnit,
+                                amount: discountedAmt,
+                                dept: dept,
+                                warehouse_id: warehouseId,
+                                warehouse_name: warhouseName
+                            };
 
-                                table.row(rows[i]).data(newData).invalidate();
-                                rowUpdated = true;
-                                // console.log("Updated table row:", newData);
-                                break;
-                            }
+                            table.row(rows[i]).data(newData).invalidate();
+                            rowUpdated = true;
+                            // console.log("Updated table row:", newData);
+                            break;
                         }
+                    }
 
-                        if (rowUpdated) {
-                            table.draw(); // Refresh tampilan tabel
-                            // console.log("Table refreshed");
-                        } else {
-                            console.warn("Row not found in table with ID:", row_detail);
-                        }
-
-                        // 4. Hitung ulang total
-                        reCountTotal();
-
-                        // 5. Reset form dan tutup modal
-                        $(".detail-form")[0].reset();
-                        $(".detail-modal").modal("hide");
-                        // console.log("Modal closed");
+                    if (rowUpdated) {
+                        table.draw(); // Refresh tampilan tabel
+                        // console.log("Table refreshed");
                     } else {
-                        console.warn("Item not found in list_items with ID:", row_detail);
+                        console.warn("Row not found in table with ID:", row_detail);
                     }
+
+                    // 4. Hitung ulang total
+                    reCountTotal();
+
+                    // 5. Reset form dan tutup modal
+                    $(".detail-form")[0].reset();
+                    $(".detail-modal").modal("hide");
+                    // console.log("Modal closed");
                 } else {
-                    if ($(".detail-form").valid()) {
-                        let id = generateRandomId();
-
-                        no = no + 1;
-                        list_items.push({
-                            id: id,
-                            no: no,
-                            row: row + 1,
-                            id_barang: id_barang,
-                            nama_barang: nama_barang,
-                            harga_barang: harga,
-                            qty: qty,
-                            amount: amount,
-                            discountedAmt: discountedAmt,
-                            keterangan: keterangan,
-                            statusppn: statusppn,
-                            tax: tax,
-                            taxAmt: amount * (tax / 100),
-                            discount_percentage: discountPercentage,
-                            dept: dept,
-                            warehouse_id: warehouseId,
-                            warhouse_name: warhouseName,
-
-                            kode_barang: selectedData.code,
-                            satuan: selectedData.satuan,
-                            disc: discountPercentage,
-                            discAmt: discAmt,
-                            discUnit: discountUnit,
-                            isDeleted: false,
-
-                            barangTotal: amount,
-                        });
-
-                        table.row.add({
-                            id: id,
-                            no: no,
-                            id_barang: id_barang,
-                            kode_barang: selectedData.code,
-                            nama_barang: nama_barang,
-                            qty: qty,
-                            satuan: selectedData.satuan,
-                            harga_barang: harga,
-                            barangTotal: amount,
-                            disc: discountPercentage,
-                            statusppn: statusppn,
-                            tax: tax,
-                            taxAmt: amount * (tax / 100),
-                            keterangan: keterangan,
-                            discAmt: discAmt,
-                            discUnit: discountUnit,
-                            amount: discountedAmt,
-                            dept: dept,
-                            warehouse_id: warehouseId,
-                            warehouse_name: warhouseName,
-                            isDeleted: false
-                        }).draw(false);
-
-                        reCountTotal();
-
-                        total_harga_barang = total_harga_barang + harga;
-                        total_qty = total_qty + qty;
-                        total_harga = total_harga + amount;
-
-                        let tag_html = "";
-                        let tag_total = "";
-
-                        $(".foot-detail-table").empty()
-
-                        tag_total += `<tr>`;
-                        tag_total += "<td colspan='1'>";
-                        tag_total += "</td>";
-                        tag_total += "<td>";
-                        tag_total += "<b>TOTAL</b>";
-                        tag_total += "</td>";
-                        tag_total += "<td>";
-                        tag_total += `<b>${greatFormatRupiah(total_harga_barang)}</b>`;
-                        tag_total += "</td>";
-                        tag_total += "<td>";
-                        tag_total += `<b>${total_qty}</b>`;
-                        tag_total += "</td>";
-                        tag_total += "<td>";
-                        tag_total += `<b>${greatFormatRupiah(total_harga)}</b>`;
-                        tag_total += "</td>";
-                        tag_total += "<td colspan='3'>";
-                        tag_total += "</td>";
-                        tag_total += "</tr>";
-
-                        $(".foot-detail-table").append(tag_total);
-
-                        $(".detail-modal").modal("hide")
-                        row = row + 1;
-                    }
-
+                    console.warn("Item not found in list_items with ID:", row_detail);
                 }
+            } else {
+                if ($(".detail-form").valid()) {
+                    let id = generateRandomId();
+
+                    no = no + 1;
+                    list_items.push({
+                        id: id,
+                        no: no,
+                        row: row + 1,
+                        id_barang: id_barang,
+                        nama_barang: nama_barang,
+                        harga_barang: harga,
+                        qty: qty,
+                        amount: amount,
+                        discountedAmt: discountedAmt,
+                        keterangan: keterangan,
+                        statusppn: statusppn,
+                        tax: tax,
+                        taxAmt: amount * (tax / 100),
+                        discount_percentage: discountPercentage,
+                        dept: dept,
+                        warehouse_id: warehouseId,
+                        warhouse_name: warhouseName,
+
+                        kode_barang: selectedData.code,
+                        satuan: selectedData.satuan,
+                        disc: discountPercentage,
+                        discAmt: discAmt,
+                        discUnit: discountUnit,
+                        isDeleted: false,
+
+                        barangTotal: amount,
+                    });
+
+                    table.row.add({
+                        id: id,
+                        no: no,
+                        id_barang: id_barang,
+                        kode_barang: selectedData.code,
+                        nama_barang: nama_barang,
+                        qty: qty,
+                        satuan: selectedData.satuan,
+                        harga_barang: harga,
+                        barangTotal: amount,
+                        disc: discountPercentage,
+                        statusppn: statusppn,
+                        tax: tax,
+                        taxAmt: amount * (tax / 100),
+                        keterangan: keterangan,
+                        discAmt: discAmt,
+                        discUnit: discountUnit,
+                        amount: discountedAmt,
+                        dept: dept,
+                        warehouse_id: warehouseId,
+                        warehouse_name: warhouseName,
+                        isDeleted: false
+                    }).draw(false);
+
+                    reCountTotal();
+
+                    total_harga_barang = total_harga_barang + harga;
+                    total_qty = total_qty + qty;
+                    total_harga = total_harga + amount;
+
+                    let tag_html = "";
+                    let tag_total = "";
+
+                    $(".foot-detail-table").empty()
+
+                    tag_total += `<tr>`;
+                    tag_total += "<td colspan='1'>";
+                    tag_total += "</td>";
+                    tag_total += "<td>";
+                    tag_total += "<b>TOTAL</b>";
+                    tag_total += "</td>";
+                    tag_total += "<td>";
+                    tag_total += `<b>${greatFormatRupiah(total_harga_barang)}</b>`;
+                    tag_total += "</td>";
+                    tag_total += "<td>";
+                    tag_total += `<b>${total_qty}</b>`;
+                    tag_total += "</td>";
+                    tag_total += "<td>";
+                    tag_total += `<b>${greatFormatRupiah(total_harga)}</b>`;
+                    tag_total += "</td>";
+                    tag_total += "<td colspan='3'>";
+                    tag_total += "</td>";
+                    tag_total += "</tr>";
+
+                    $(".foot-detail-table").append(tag_total);
+
+                    $(".detail-modal").modal("hide")
+                    row = row + 1;
+                }
+
             }
+            //}
         });
 
         $('#estimated_freight').keyup(function() {
